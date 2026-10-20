@@ -1,0 +1,14 @@
+{
+  "owned_native_process_ids": [
+    81590,
+    81609,
+    81595,
+    81618,
+    81645,
+    81643,
+    81659
+  ],
+  "all_owned_native_processes_stopped": true,
+  "both_custodians_stopped": true,
+  "observation": "Controller waited for every native launcher and stopped both resident processes through their control doors. The owned bundle executables are absent from the process table."
+}

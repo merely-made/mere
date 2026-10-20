@@ -1,0 +1,29 @@
+{
+  "graphshell_library": {
+    "passed": 337,
+    "failed": 0,
+    "ignored": 6,
+    "co_op_tests_included": 8
+  },
+  "djinn_custody_policy": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "port_boundaries": "passed",
+  "changed_file_rustfmt": "passed",
+  "clippy": "passed with warnings in existing dependencies and Graphshell code; no warnings in new co-op files",
+  "package_rustfmt": "existing differences in 12 untouched files; exact log retained",
+  "native": {
+    "result": "ok",
+    "phases": 7,
+    "reviewed_captures": 18
+  },
+  "platform": {
+    "os": "macOS",
+    "version": "15.8.1",
+    "build": "24H32",
+    "architecture": "x86_64"
+  },
+  "full_workspace_suite_run": false
+}

@@ -1,0 +1,3004 @@
+0djinn v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/ports/djinn)
+1armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def)
+2tokio v1.53.2
+3bytes v1.12.1
+4serde v1.0.229
+5serde_core v1.0.229
+5serde_derive v1.0.229 (proc-macro)
+6proc-macro2 v1.0.107
+7unicode-ident v1.0.26
+6quote v1.0.47
+7proc-macro2 v1.0.107 (*)
+6syn v3.0.6
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7unicode-ident v1.0.26
+3libc v0.2.190
+3mio v1.2.3
+4libc v0.2.190
+3pin-project-lite v0.2.17
+3signal-hook-registry v1.4.8
+4errno v0.3.14
+5libc v0.2.190
+4libc v0.2.190
+3socket2 v0.6.5
+4libc v0.2.190
+3tokio-macros v2.7.2 (proc-macro)
+4proc-macro2 v1.0.107 (*)
+4quote v1.0.47 (*)
+4syn v3.0.6 (*)
+2tracing v0.1.44
+3log v0.4.34
+3pin-project-lite v0.2.17
+3tracing-attributes v0.1.31 (proc-macro)
+4proc-macro2 v1.0.107 (*)
+4quote v1.0.47 (*)
+4syn v2.0.119
+5proc-macro2 v1.0.107 (*)
+5quote v1.0.47 (*)
+5unicode-ident v1.0.26
+3tracing-core v0.1.36
+4once_cell v1.21.4
+5critical-section v1.2.0
+5portable-atomic v1.15.0
+6serde v1.0.229 (*)
+1base64 v0.22.1
+1blake3 v1.8.7
+2arrayvec v0.7.8
+2cfg-if v1.0.5
+2constant_time_eq v0.4.2
+2cpufeatures v0.3.1
+1castellan v0.0.3 (/Users/markik/Code/worktrees/mere-graphshell-coop/ports/djinn/castellan)
+2argon2 v0.5.3
+3base64ct v1.8.3
+3blake2 v0.10.6
+4digest v0.10.7
+5block-buffer v0.10.4
+6generic-array v0.14.7
+7typenum v1.20.1
+7zeroize v1.9.1
+8zeroize_derive v1.5.0 (proc-macro)
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9syn v2.0.119 (*)
+5const-oid v0.9.6
+5crypto-common v0.1.7
+6generic-array v0.14.7 (*)
+6typenum v1.20.1
+5subtle v2.6.1
+3cpufeatures v0.2.17
+3password-hash v0.5.0
+4base64ct v1.8.3
+4rand_core v0.6.4
+5getrandom v0.2.17
+6cfg-if v1.0.5
+6libc v0.2.190
+4subtle v2.6.1
+3zeroize v1.9.1 (*)
+2base64 v0.22.1
+2blake3 v1.8.7 (*)
+2chacha20poly1305 v0.11.0
+3aead v0.6.1
+4crypto-common v0.2.2
+5getrandom v0.4.3
+6cfg-if v1.0.5
+6libc v0.2.190
+6rand_core v0.10.1
+5hybrid-array v0.4.15
+6typenum v1.20.1
+5rand_core v0.10.1
+4inout v0.2.2
+5block-padding v0.4.2
+6hybrid-array v0.4.15 (*)
+5hybrid-array v0.4.15 (*)
+3chacha20 v0.10.2
+4cfg-if v1.0.5
+4cipher v0.5.2
+5block-buffer v0.12.1
+6hybrid-array v0.4.15 (*)
+5crypto-common v0.2.2 (*)
+5inout v0.2.2 (*)
+4cpufeatures v0.3.1
+4rand_core v0.10.1
+4zeroize v1.9.1 (*)
+3cipher v0.5.2 (*)
+3poly1305 v0.9.1
+4cpufeatures v0.3.1
+4universal-hash v0.6.1
+5crypto-common v0.2.2 (*)
+5ctutils v0.4.2
+6cmov v0.5.4
+3zeroize v1.9.1 (*)
+2chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+3serde v1.0.229 (*)
+3uuid v1.27.0
+4getrandom v0.4.3 (*)
+4serde_core v1.0.229
+4sha1_smol v1.0.1
+3zeroize v1.9.1 (*)
+2credential-exchange-format v0.4.0
+3chrono v0.4.45
+4iana-time-zone v0.1.65
+5core-foundation-sys v0.8.7
+4num-traits v0.2.19
+5libm v0.2.16
+4serde v1.0.229 (*)
+3data-encoding v2.11.1
+3serde v1.0.229 (*)
+3serde_json v1.0.151
+4itoa v1.0.18
+4memchr v2.8.3
+4serde_core v1.0.229
+4zmij v1.0.23
+2dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+3gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+4insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+5blake3 v1.8.7 (*)
+5ed25519-dalek v3.0.0
+6curve25519-dalek v5.0.0
+7cfg-if v1.0.5
+7cpufeatures v0.3.1
+7curve25519-dalek-derive v0.1.1 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+7digest v0.11.3
+8block-buffer v0.12.1 (*)
+8const-oid v0.10.2
+8crypto-common v0.2.2 (*)
+8ctutils v0.4.2 (*)
+7rand_core v0.10.1
+7serde v1.0.229 (*)
+7subtle v2.6.1
+7zeroize v1.9.1 (*)
+6ed25519 v3.0.0
+7pkcs8 v0.11.0
+8der v0.8.2
+9const-oid v0.10.2
+9pem-rfc7468 v1.0.0
+10base64ct v1.8.3
+9zeroize v1.9.1 (*)
+8spki v0.8.0
+9der v0.8.2 (*)
+7serdect v0.4.3
+8base16ct v1.0.0
+8serde v1.0.229 (*)
+7signature v3.0.0
+8rand_core v0.10.1
+6rand_core v0.10.1
+6serde v1.0.229 (*)
+6sha2 v0.11.0
+7cfg-if v1.0.5
+7cpufeatures v0.3.1
+7digest v0.11.3 (*)
+6signature v3.0.0 (*)
+6subtle v2.6.1
+6zeroize v1.9.1 (*)
+5serde v1.0.229 (*)
+4serde v1.0.229 (*)
+4uuid v1.27.0 (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+4blake3 v1.8.7 (*)
+4chacha20poly1305 v0.11.0 (*)
+4ed25519-dalek v3.0.0 (*)
+4gethostname v1.1.0
+5rustix v1.1.5
+6bitflags v2.13.2
+6errno v0.3.14 (*)
+6libc v0.2.190
+4getrandom v0.3.4
+5cfg-if v1.0.5
+5libc v0.2.190
+4insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4ssh-key v0.6.7
+5bcrypt-pbkdf v0.10.0
+6blowfish v0.9.1
+7byteorder v1.5.0
+7cipher v0.4.4
+8crypto-common v0.1.7 (*)
+8inout v0.1.4
+9block-padding v0.3.3
+10generic-array v0.14.7 (*)
+9generic-array v0.14.7 (*)
+8zeroize v1.9.1 (*)
+6pbkdf2 v0.12.2
+7digest v0.10.7 (*)
+6sha2 v0.10.9
+7cfg-if v1.0.5
+7cpufeatures v0.2.17
+7digest v0.10.7 (*)
+5ed25519-dalek v2.2.0
+6curve25519-dalek v4.1.3
+7cfg-if v1.0.5
+7cpufeatures v0.2.17
+7curve25519-dalek-derive v0.1.1 (proc-macro) (*)
+7digest v0.10.7 (*)
+7subtle v2.6.1
+7zeroize v1.9.1 (*)
+6ed25519 v2.2.3
+7pkcs8 v0.10.2
+8der v0.7.10
+9const-oid v0.9.6
+9pem-rfc7468 v0.7.0
+10base64ct v1.8.3
+9zeroize v1.9.1 (*)
+8spki v0.7.3
+9der v0.7.10 (*)
+7signature v2.2.0
+8digest v0.10.7 (*)
+8rand_core v0.6.4 (*)
+6sha2 v0.10.9 (*)
+6subtle v2.6.1
+6zeroize v1.9.1 (*)
+5num-bigint-dig v0.8.6
+6lazy_static v1.5.0
+7spin v0.9.9
+8lock_api v0.4.14
+9scopeguard v1.2.0
+6libm v0.2.16
+6num-integer v0.1.47
+7num-traits v0.2.19 (*)
+6num-iter v0.1.46
+7num-integer v0.1.47 (*)
+7num-traits v0.2.19 (*)
+6num-traits v0.2.19 (*)
+6rand v0.8.8
+7libc v0.2.190
+7rand_chacha v0.3.1
+8ppv-lite86 v0.2.21
+9zerocopy v0.8.57
+10zerocopy-derive v0.8.57 (proc-macro)
+11proc-macro2 v1.0.107 (*)
+11quote v1.0.47 (*)
+11syn v2.0.119 (*)
+8rand_core v0.6.4 (*)
+7rand_core v0.6.4 (*)
+6smallvec v1.16.1
+7serde v1.0.229 (*)
+6zeroize v1.9.1 (*)
+5p256 v0.13.2
+6ecdsa v0.16.9
+7der v0.7.10 (*)
+7digest v0.10.7 (*)
+7elliptic-curve v0.13.8
+8base16ct v0.2.0
+8crypto-bigint v0.5.5
+9generic-array v0.14.7 (*)
+9rand_core v0.6.4 (*)
+9subtle v2.6.1
+9zeroize v1.9.1 (*)
+8digest v0.10.7 (*)
+8ff v0.13.1
+9rand_core v0.6.4 (*)
+9subtle v2.6.1
+8generic-array v0.14.7 (*)
+8group v0.13.0
+9ff v0.13.1 (*)
+9rand_core v0.6.4 (*)
+9subtle v2.6.1
+8hkdf v0.12.4
+9hmac v0.12.1
+10digest v0.10.7 (*)
+8pem-rfc7468 v0.7.0 (*)
+8pkcs8 v0.10.2 (*)
+8rand_core v0.6.4 (*)
+8sec1 v0.7.3
+9base16ct v0.2.0
+9der v0.7.10 (*)
+9generic-array v0.14.7 (*)
+9pkcs8 v0.10.2 (*)
+9subtle v2.6.1
+9zeroize v1.9.1 (*)
+8subtle v2.6.1
+8zeroize v1.9.1 (*)
+7rfc6979 v0.4.0
+8hmac v0.12.1 (*)
+8subtle v2.6.1
+7signature v2.2.0 (*)
+7spki v0.7.3 (*)
+6elliptic-curve v0.13.8 (*)
+6primeorder v0.13.6
+7elliptic-curve v0.13.8 (*)
+6sha2 v0.10.9 (*)
+5p384 v0.13.1
+6ecdsa v0.16.9 (*)
+6elliptic-curve v0.13.8 (*)
+6primeorder v0.13.6 (*)
+6sha2 v0.10.9 (*)
+5p521 v0.13.3
+6base16ct v0.2.0
+6ecdsa v0.16.9 (*)
+6elliptic-curve v0.13.8 (*)
+6primeorder v0.13.6 (*)
+6rand_core v0.6.4 (*)
+6sha2 v0.10.9 (*)
+5rand_core v0.6.4 (*)
+5rsa v0.9.10
+6const-oid v0.9.6
+6digest v0.10.7 (*)
+6num-bigint-dig v0.8.6 (*)
+6num-integer v0.1.47 (*)
+6num-traits v0.2.19 (*)
+6pkcs1 v0.7.5
+7der v0.7.10 (*)
+7pkcs8 v0.10.2 (*)
+7spki v0.7.3 (*)
+6pkcs8 v0.10.2 (*)
+6rand_core v0.6.4 (*)
+6sha2 v0.10.9 (*)
+6signature v2.2.0 (*)
+6spki v0.7.3 (*)
+6subtle v2.6.1
+6zeroize v1.9.1 (*)
+5sec1 v0.7.3 (*)
+5sha2 v0.10.9 (*)
+5signature v2.2.0 (*)
+5ssh-cipher v0.2.0
+6aes v0.8.4
+7cfg-if v1.0.5
+7cipher v0.4.4 (*)
+7cpufeatures v0.2.17
+6aes-gcm v0.10.3
+7aead v0.5.2
+8crypto-common v0.1.7 (*)
+8generic-array v0.14.7 (*)
+7aes v0.8.4 (*)
+7cipher v0.4.4 (*)
+7ctr v0.9.2
+8cipher v0.4.4 (*)
+7ghash v0.5.1
+8opaque-debug v0.3.1
+8polyval v0.6.2
+9cfg-if v1.0.5
+9cpufeatures v0.2.17
+9opaque-debug v0.3.1
+9universal-hash v0.5.1
+10crypto-common v0.1.7 (*)
+10subtle v2.6.1
+7subtle v2.6.1
+6cbc v0.1.2
+7cipher v0.4.4 (*)
+6chacha20 v0.9.1
+7cfg-if v1.0.5
+7cipher v0.4.4 (*)
+7cpufeatures v0.2.17
+6cipher v0.4.4 (*)
+6ctr v0.9.2 (*)
+6poly1305 v0.8.0
+7cpufeatures v0.2.17
+7opaque-debug v0.3.1
+7universal-hash v0.5.1 (*)
+6ssh-encoding v0.2.0
+7base64ct v1.8.3
+7pem-rfc7468 v0.7.0 (*)
+7sha2 v0.10.9 (*)
+6subtle v2.6.1
+5ssh-encoding v0.2.0 (*)
+5subtle v2.6.1
+5zeroize v1.9.1 (*)
+4thiserror v1.0.69
+5thiserror-impl v1.0.69 (proc-macro)
+6proc-macro2 v1.0.107 (*)
+6quote v1.0.47 (*)
+6syn v2.0.119 (*)
+4uuid v1.27.0 (*)
+4zeroize v1.9.1 (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3uuid v1.27.0 (*)
+2ed25519-dalek v2.2.0 (*)
+2eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+3async-trait v0.1.92 (proc-macro)
+4proc-macro2 v1.0.107 (*)
+4quote v1.0.47 (*)
+4syn v3.0.6 (*)
+3blake3 v1.8.7 (*)
+3chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+4muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+5async-trait v0.1.92 (proc-macro) (*)
+5blake3 v1.8.7 (*)
+5redb v2.6.3
+6libc v0.2.190
+5serde v1.0.229 (*)
+5serde_json v1.0.151 (*)
+4petgraph v0.8.3
+5fixedbitset v0.5.7
+5hashbrown v0.15.5
+6foldhash v0.1.5
+5indexmap v2.14.2
+6equivalent v1.0.2
+6hashbrown v0.17.1
+7allocator-api2 v0.2.21
+7equivalent v1.0.2
+7foldhash v0.2.0
+6serde_core v1.0.229
+5serde v1.0.229 (*)
+5serde_derive v1.0.229 (proc-macro) (*)
+4rkyv v0.8.18
+5bytecheck v0.8.3
+6bytecheck_derive v0.8.3 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+6ptr_meta v0.3.2
+7ptr_meta_derive v0.3.2 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v3.0.6 (*)
+6rancor v0.1.3
+7ptr_meta v0.3.2 (*)
+6simdutf8 v0.1.5
+5hashbrown v0.17.1 (*)
+5munge v0.4.7
+6munge_macro v0.4.7 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v2.0.119 (*)
+5ptr_meta v0.3.2 (*)
+5rancor v0.1.3 (*)
+5rend v0.5.4
+6bytecheck v0.8.3 (*)
+5rkyv_derive v0.8.18 (proc-macro)
+6proc-macro2 v1.0.107 (*)
+6quote v1.0.47 (*)
+6syn v3.0.6 (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4slotmap v1.1.1
+5serde v1.0.229 (*)
+4uuid v1.27.0 (*)
+3jsonschema v0.18.3
+4ahash v0.8.12
+5cfg-if v1.0.5
+5const-random v0.1.18
+6const-random-macro v0.1.16 (proc-macro)
+7getrandom v0.2.17
+8cfg-if v1.0.5
+8libc v0.2.190
+7once_cell v1.21.4
+7tiny-keccak v2.0.2
+8crunchy v0.2.4
+5getrandom v0.3.4 (*)
+5once_cell v1.21.4 (*)
+5serde v1.0.229 (*)
+5zerocopy v0.8.57 (*)
+4anyhow v1.0.104
+4base64 v0.22.1
+4bytecount v0.6.9
+4fancy-regex v0.13.0
+5bit-set v0.5.3
+6bit-vec v0.6.3
+5regex-automata v0.4.18
+6aho-corasick v1.1.5
+7memchr v2.8.3
+6memchr v2.8.3
+6regex-syntax v0.8.11
+5regex-syntax v0.8.11
+4fraction v0.15.4
+5lazy_static v1.5.0 (*)
+5num v0.4.3
+6num-bigint v0.4.8
+7num-integer v0.1.47 (*)
+7num-traits v0.2.19 (*)
+6num-complex v0.4.6
+7num-traits v0.2.19 (*)
+6num-integer v0.1.47 (*)
+6num-iter v0.1.46 (*)
+6num-rational v0.4.2
+7num-bigint v0.4.8 (*)
+7num-integer v0.1.47 (*)
+7num-traits v0.2.19 (*)
+6num-traits v0.2.19 (*)
+4iso8601 v0.6.6
+5nom v8.0.0
+6memchr v2.8.3
+4itoa v1.0.18
+4memchr v2.8.3
+4num-cmp v0.1.0
+4once_cell v1.21.4 (*)
+4parking_lot v0.12.5
+5lock_api v0.4.14 (*)
+5parking_lot_core v0.9.12
+6cfg-if v1.0.5
+6libc v0.2.190
+6smallvec v1.16.1 (*)
+4percent-encoding v2.3.2
+4regex v1.13.1
+5aho-corasick v1.1.5 (*)
+5memchr v2.8.3
+5regex-automata v0.4.18 (*)
+5regex-syntax v0.8.11
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4time v0.3.55
+5deranged v0.5.8
+5num-conv v0.2.2
+5powerfmt v0.2.0
+5time-core v0.1.9
+5time-macros v0.2.32 (proc-macro)
+6num-conv v0.2.2
+6time-core v0.1.9
+4url v2.5.8
+5form_urlencoded v1.2.2
+6percent-encoding v2.3.2
+5idna v1.1.0
+6idna_adapter v1.2.2
+7icu_normalizer v2.3.0
+8icu_collections v2.3.0
+9displaydoc v0.2.7 (proc-macro)
+10proc-macro2 v1.0.107 (*)
+10quote v1.0.47 (*)
+10syn v3.0.6 (*)
+9potential_utf v0.1.6
+10writeable v0.6.4
+10zerovec v0.11.8
+11yoke v0.8.3
+12stable_deref_trait v1.2.1
+12yoke-derive v0.8.3 (proc-macro)
+13proc-macro2 v1.0.107 (*)
+13quote v1.0.47 (*)
+13syn v3.0.6 (*)
+13synstructure v0.14.0
+14proc-macro2 v1.0.107 (*)
+14quote v1.0.47 (*)
+14syn v3.0.6 (*)
+12zerofrom v0.1.8
+13zerofrom-derive v0.1.8 (proc-macro)
+14proc-macro2 v1.0.107 (*)
+14quote v1.0.47 (*)
+14syn v3.0.6 (*)
+14synstructure v0.14.0 (*)
+11zerofrom v0.1.8 (*)
+11zerovec-derive v0.11.6 (proc-macro)
+12proc-macro2 v1.0.107 (*)
+12quote v1.0.47 (*)
+12syn v3.0.6 (*)
+9utf8_iter v1.0.4
+9yoke v0.8.3 (*)
+9zerofrom v0.1.8 (*)
+9zerovec v0.11.8 (*)
+8icu_normalizer_data v2.3.0
+8icu_provider v2.3.1
+9displaydoc v0.2.7 (proc-macro) (*)
+9icu_locale_core v2.3.0
+10displaydoc v0.2.7 (proc-macro) (*)
+10litemap v0.8.3
+10tinystr v0.8.4
+11displaydoc v0.2.7 (proc-macro) (*)
+11zerovec v0.11.8 (*)
+10writeable v0.6.4
+10zerovec v0.11.8 (*)
+9stable_deref_trait v1.2.1
+9writeable v0.6.4
+9yoke v0.8.3 (*)
+9zerofrom v0.1.8 (*)
+9zerotrie v0.2.5
+10displaydoc v0.2.7 (proc-macro) (*)
+10yoke v0.8.3 (*)
+10zerofrom v0.1.8 (*)
+9zerovec v0.11.8 (*)
+8smallvec v1.16.1 (*)
+8zerovec v0.11.8 (*)
+7icu_properties v2.3.0
+8displaydoc v0.2.7 (proc-macro) (*)
+8icu_collections v2.3.0 (*)
+8icu_locale_core v2.3.0 (*)
+8icu_properties_data v2.3.0
+8icu_provider v2.3.1 (*)
+8zerotrie v0.2.5 (*)
+8zerovec v0.11.8 (*)
+6smallvec v1.16.1 (*)
+6utf8_iter v1.0.4
+5percent-encoding v2.3.2
+5serde v1.0.229 (*)
+5serde_derive v1.0.229 (proc-macro) (*)
+4uuid v1.27.0 (*)
+3muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3url v2.5.8 (*)
+3zeroize v1.9.1 (*)
+2getrandom v0.3.4 (*)
+2hmac v0.13.0
+3digest v0.11.3 (*)
+2insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+3blake3 v1.8.7 (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3postcard v1.1.3
+4cobs v0.3.0
+5thiserror v2.0.21
+6thiserror-impl v2.0.21 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+4heapless v0.7.17
+5hash32 v0.2.1
+6byteorder v1.5.0
+5serde v1.0.229 (*)
+5spin v0.9.9 (*)
+5stable_deref_trait v1.2.1
+4postcard-derive v0.2.2 (proc-macro)
+5proc-macro2 v1.0.107 (*)
+5quote v1.0.47 (*)
+5syn v2.0.119 (*)
+4serde v1.0.229 (*)
+3serde v1.0.229 (*)
+3thiserror v1.0.69 (*)
+3tokio v1.53.2 (*)
+2p256 v0.13.2 (*)
+2p384 v0.13.1 (*)
+2pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect)
+3async-trait v0.1.92 (proc-macro) (*)
+3blake3 v1.8.7 (*)
+3chacha20poly1305 v0.11.0 (*)
+3chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3ciborium v0.2.2
+4ciborium-io v0.2.2
+4ciborium-ll v0.2.2
+5ciborium-io v0.2.2
+5half v2.7.1
+6cfg-if v1.0.5
+6num-traits v0.2.19 (*)
+6zerocopy v0.8.57 (*)
+4serde v1.0.229 (*)
+3command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/command-menu)
+4serde v1.0.229 (*)
+3dirs v5.0.1
+4dirs-sys v0.4.1
+5libc v0.2.190
+5option-ext v0.2.0
+3eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3getrandom v0.3.4 (*)
+3hex v0.4.3
+4serde v1.0.229 (*)
+3incipit v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/incipit)
+4serde v1.0.229 (*)
+4uuid v1.27.0 (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/distillery/alembic)
+4mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel)
+5accesskit v0.25.1
+6enumn v0.1.14 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v2.0.119 (*)
+6serde v1.0.229 (*)
+6uuid v1.27.0 (*)
+5chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+5command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/command-menu) (*)
+5crossbeam-channel v0.5.17
+6crossbeam-utils v0.8.23
+5euclid v0.22.14
+6num-traits v0.2.19 (*)
+6serde v1.0.229 (*)
+5futures-util v0.3.34
+6futures-channel v0.3.34
+7futures-core v0.3.34
+7futures-sink v0.3.34
+6futures-core v0.3.34
+6futures-io v0.3.34
+6futures-macro v0.3.34 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+6futures-sink v0.3.34
+6futures-task v0.3.34
+6memchr v2.8.3
+6pin-project-lite v0.2.17
+6slab v0.4.12
+5infer v0.19.0
+6cfb v0.7.3
+7byteorder v1.5.0
+7fnv v1.0.7
+7uuid v1.27.0 (*)
+5mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/forme)
+6mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/curation)
+7serde v1.0.229 (*)
+6serde v1.0.229 (*)
+6serde_json v1.0.151 (*)
+6taffy v0.11.0-experimental-cache-fix.3
+7arrayvec v0.7.8
+7grid v1.0.1
+7slotmap v1.1.1 (*)
+6uuid v1.27.0 (*)
+5mime_guess v2.0.5
+6mime v0.3.17
+6unicase v2.9.0
+5muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+5numen v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/numen)
+6serde v1.0.229 (*)
+6strum v0.28.0
+7strum_macros v0.28.0 (proc-macro)
+8heck v0.5.0
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+6uuid v1.27.0 (*)
+5petgraph v0.8.3 (*)
+5rkyv v0.8.18 (*)
+5serde v1.0.229 (*)
+5serde_json v1.0.151 (*)
+5strum v0.28.0 (*)
+5time v0.3.55 (*)
+5url v2.5.8 (*)
+5uuid v1.27.0 (*)
+5web-time v1.1.0
+4serde v1.0.229 (*)
+3mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/curation) (*)
+3mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+3muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3tabard v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/tabard)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4tinct v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/tinct)
+5serde v1.0.229 (*)
+3uuid v1.27.0 (*)
+2personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2rand_core v0.6.4 (*)
+2ring v0.17.14
+3cfg-if v1.0.5
+3getrandom v0.2.17 (*)
+3untrusted v0.9.0
+2rsa v0.9.10 (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2sha1 v0.11.0
+3cfg-if v1.0.5
+3cpufeatures v0.3.1
+3digest v0.11.3 (*)
+2sha2 v0.11.0 (*)
+2signature v2.2.0 (*)
+2ssh-agent-lib v0.6.0
+3async-trait v0.1.92 (proc-macro) (*)
+3byteorder v1.5.0
+3futures v0.3.34
+4futures-channel v0.3.34 (*)
+4futures-core v0.3.34
+4futures-executor v0.3.34
+5futures-core v0.3.34
+5futures-task v0.3.34
+5futures-util v0.3.34 (*)
+4futures-io v0.3.34
+4futures-sink v0.3.34
+4futures-task v0.3.34
+4futures-util v0.3.34 (*)
+3log v0.4.34
+3secrecy v0.10.3
+4zeroize v1.9.1 (*)
+3service-binding v3.0.0
+4raunch v1.0.1
+5libc v0.2.190
+3signature v2.2.0 (*)
+3ssh-encoding v0.2.0 (*)
+3ssh-key v0.6.7 (*)
+3subtle v2.6.1
+3thiserror v2.0.21 (*)
+3tokio v1.53.2 (*)
+3tokio-util v0.7.19
+4bytes v1.12.1 (*)
+4futures-core v0.3.34
+4futures-io v0.3.34
+4futures-sink v0.3.34
+4futures-util v0.3.34 (*)
+4libc v0.2.190
+4pin-project-lite v0.2.17
+4tokio v1.53.2 (*)
+2ssh-key v0.6.7 (*)
+2thiserror v1.0.69 (*)
+2tokio v1.53.2 (*)
+2tracing v0.1.44 (*)
+2tracing-subscriber v0.3.23
+3matchers v0.2.0
+4regex-automata v0.4.18 (*)
+3nu-ansi-term v0.50.3
+3once_cell v1.21.4 (*)
+3regex-automata v0.4.18 (*)
+3sharded-slab v0.1.7
+4lazy_static v1.5.0 (*)
+3smallvec v1.16.1 (*)
+3thread_local v1.1.10
+4cfg-if v1.0.5
+3tracing v0.1.44 (*)
+3tracing-core v0.1.36 (*)
+3tracing-log v0.2.0
+4log v0.4.34
+4once_cell v1.21.4 (*)
+4tracing-core v0.1.36 (*)
+2uuid v1.27.0 (*)
+2zeroize v1.9.1 (*)
+1chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+1chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph)
+2base64 v0.22.1
+2blake3 v1.8.7 (*)
+2sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+2scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2sha2 v0.11.0 (*)
+1chrono v0.4.45 (*)
+1cleromancy-core-acceptance v0.1.0 (https://github.com/merely-made/cleromancy.git?branch=main#c94f7039)
+2blake3 v1.8.7 (*)
+2chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+2chrono v0.4.45 (*)
+2chrono-tz v0.10.4
+3chrono v0.4.45 (*)
+3phf v0.12.1
+4phf_shared v0.12.1
+5siphasher v1.0.3
+2dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-client)
+3chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+3scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+2mere v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/mere)
+3accesskit v0.25.1 (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker)
+4accesskit v0.25.1 (*)
+4document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5serde v1.0.229 (*)
+4petgraph v0.8.3 (*)
+4serde v1.0.229 (*)
+4tracing v0.1.44 (*)
+4uuid v1.27.0 (*)
+3mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/forme) (*)
+3mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+3netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+4log v0.4.34
+4netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+5bytemuck v1.25.2
+6bytemuck_derive v1.12.1 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+5futures-intrusive v0.5.0
+6futures-core v0.3.34
+6lock_api v0.4.14 (*)
+6parking_lot v0.12.5 (*)
+5log v0.4.34
+5peniko v0.6.1
+6color v0.3.3
+7serde v1.0.229 (*)
+6kurbo v0.13.1
+7arrayvec v0.7.8
+7polycool v0.4.0
+8arrayvec v0.7.8
+7serde v1.0.229 (*)
+7smallvec v1.16.1 (*)
+6linebender_resource_handle v0.1.1
+7serde v1.0.229 (*)
+7serde_bytes v0.11.19
+8serde_core v1.0.229
+6serde v1.0.229 (*)
+6smallvec v1.16.1 (*)
+5png v0.18.1
+6bitflags v2.13.2
+6crc32fast v1.5.2
+7cfg-if v1.0.5
+6fdeflate v0.3.7
+7simd-adler32 v0.3.10
+6flate2 v1.1.10
+7crc32fast v1.5.2 (*)
+7miniz_oxide v0.9.1
+8adler2 v2.0.1
+8simd-adler32 v0.3.10
+6miniz_oxide v0.8.9
+7adler2 v2.0.1
+7simd-adler32 v0.3.10
+5skrifa v0.44.0
+6bytemuck v1.25.2 (*)
+6read-fonts v0.41.0
+7bytemuck v1.25.2 (*)
+7font-types v0.12.5
+8bytemuck v1.25.2 (*)
+7once_cell v1.21.4 (*)
+5static_assertions v1.1.0
+5thiserror v2.0.21 (*)
+5vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+6bytemuck v1.25.2 (*)
+6guillotiere v0.7.0
+7euclid v0.22.14 (*)
+7svg_fmt v0.4.5
+6peniko v0.6.1 (*)
+6skrifa v0.44.0 (*)
+6smallvec v1.16.1 (*)
+5vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+6bytemuck v1.25.2 (*)
+6vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+5wgpu v30.0.1
+6arrayvec v0.7.8
+6bitflags v2.13.2
+6bytemuck v1.25.2 (*)
+6cfg-if v1.0.5
+6document-features v0.2.12 (proc-macro)
+7litrs v1.0.0
+6hashbrown v0.17.1 (*)
+6log v0.4.34
+6parking_lot v0.12.5 (*)
+6profiling v1.0.18
+7profiling-procmacros v1.0.18 (proc-macro)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+6raw-window-handle v0.6.2
+6smallvec v1.16.1 (*)
+6static_assertions v1.1.0
+6wgpu-core v30.0.1
+7arrayvec v0.7.8
+7bit-set v0.10.0
+8bit-vec v0.9.1
+7bit-vec v0.9.1
+7bitflags v2.13.2
+7bytemuck v1.25.2 (*)
+7document-features v0.2.12 (proc-macro) (*)
+7hashbrown v0.17.1 (*)
+7indexmap v2.14.2 (*)
+7log v0.4.34
+7naga v30.0.1
+8arrayvec v0.7.8
+8bit-set v0.10.0 (*)
+8bitflags v2.13.2
+8cfg-if v1.0.5
+8codespan-reporting v0.13.1
+9unicode-width v0.2.2
+8half v2.7.1 (*)
+8hashbrown v0.17.1 (*)
+8indexmap v2.14.2 (*)
+8libm v0.2.16
+8log v0.4.34
+8naga-types v30.0.1
+9hashbrown v0.17.1 (*)
+9indexmap v2.14.2 (*)
+9rustc-hash v1.1.0
+9thiserror v2.0.21 (*)
+8num-traits v0.2.19 (*)
+8once_cell v1.21.4 (*)
+8rustc-hash v1.1.0
+8thiserror v2.0.21 (*)
+8unicode-ident v1.0.26
+7naga-types v30.0.1 (*)
+7once_cell v1.21.4 (*)
+7parking_lot v0.12.5 (*)
+7profiling v1.0.18 (*)
+7raw-window-handle v0.6.2
+7rustc-hash v1.1.0
+7smallvec v1.16.1 (*)
+7thiserror v2.0.21 (*)
+7wgpu-core-deps-apple v30.0.1
+8wgpu-hal v30.0.1
+9arrayvec v0.7.8
+9bitflags v2.13.2
+9block2 v0.6.2
+10objc2 v0.6.4
+11objc2-encode v4.1.0
+9bytemuck v1.25.2 (*)
+9cfg-if v1.0.5
+9hashbrown v0.17.1 (*)
+9libloading v0.8.9
+10cfg-if v1.0.5
+9log v0.4.34
+9naga v30.0.1 (*)
+9naga-types v30.0.1 (*)
+9objc2 v0.6.4 (*)
+9objc2-core-foundation v0.3.2
+10bitflags v2.13.2
+10block2 v0.6.2 (*)
+10dispatch2 v0.3.1
+11bitflags v2.13.2
+11objc2 v0.6.4 (*)
+10libc v0.2.190
+10objc2 v0.6.4 (*)
+9objc2-core-graphics v0.3.2
+10objc2 v0.6.4 (*)
+10objc2-core-foundation v0.3.2 (*)
+9objc2-foundation v0.3.2
+10bitflags v2.13.2
+10objc2 v0.6.4 (*)
+10objc2-core-foundation v0.3.2 (*)
+9objc2-metal v0.3.2
+10bitflags v2.13.2
+10block2 v0.6.2 (*)
+10objc2 v0.6.4 (*)
+10objc2-foundation v0.3.2 (*)
+9objc2-quartz-core v0.3.2
+10bitflags v2.13.2
+10objc2 v0.6.4 (*)
+10objc2-core-foundation v0.3.2 (*)
+10objc2-core-graphics v0.3.2 (*)
+10objc2-foundation v0.3.2 (*)
+10objc2-metal v0.3.2 (*)
+9parking_lot v0.12.5 (*)
+9profiling v1.0.18 (*)
+9raw-window-handle v0.6.2
+9raw-window-metal v1.1.0
+10objc2 v0.6.4 (*)
+10objc2-core-foundation v0.3.2 (*)
+10objc2-foundation v0.3.2 (*)
+10objc2-quartz-core v0.3.2 (*)
+9smallvec v1.16.1 (*)
+9static_assertions v1.1.0
+9thiserror v2.0.21 (*)
+9wgpu-naga-bridge v30.0.1
+10naga v30.0.1 (*)
+10wgpu-types v30.0.1
+11bitflags v2.13.2
+11bytemuck v1.25.2 (*)
+11log v0.4.34
+11naga-types v30.0.1 (*)
+11raw-window-handle v0.6.2
+11static_assertions v1.1.0
+9wgpu-types v30.0.1 (*)
+7wgpu-hal v30.0.1 (*)
+7wgpu-naga-bridge v30.0.1 (*)
+7wgpu-types v30.0.1 (*)
+6wgpu-hal v30.0.1 (*)
+6wgpu-types v30.0.1 (*)
+4netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+5log v0.4.34
+5pollster v1.0.1
+5serde v1.0.229 (*)
+5wgpu v30.0.1 (*)
+4peniko v0.6.1 (*)
+4postcard v1.1.3 (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4skrifa v0.44.0 (*)
+4tracing v0.1.44 (*)
+4wgpu v30.0.1 (*)
+3pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/canvas/pictograph)
+4armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+4chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+4chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+4emblem v0.2.0
+4esp v0.1.0 (https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6b)
+5serde v1.0.229 (*)
+5zeroize v1.9.1 (*)
+4euclid v0.22.14 (*)
+4genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7arrayvec v0.7.8
+7smallvec v1.16.1 (*)
+6stacker v0.1.25
+7cfg-if v1.0.5
+7libc v0.2.190
+7psm v0.1.32
+5cssparser v0.37.0
+6cssparser-macros v0.7.1 (proc-macro)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+6dtoa-short v0.3.5
+7dtoa v1.0.11
+6itoa v1.0.18
+6phf v0.13.1
+7phf_macros v0.13.1 (proc-macro)
+8phf_generator v0.13.1
+9fastrand v2.5.0
+9phf_shared v0.13.1
+10siphasher v1.0.3
+8phf_shared v0.13.1 (*)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+7phf_shared v0.13.1 (*)
+6serde v1.0.229 (*)
+6smallvec v1.16.1 (*)
+5data-url v0.3.2
+5euclid v0.22.14 (*)
+5fontsan v0.7.0
+6libc v0.2.190
+6libz-sys v1.1.29
+7libc v0.2.190
+6wuff-capi v0.2.0
+7wuff v0.2.9
+8brotli-decompressor v5.0.3
+9alloc-no-stdlib v2.0.4
+9alloc-stdlib v0.2.4
+10alloc-no-stdlib v2.0.4
+8bytes v1.12.1 (*)
+5genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7serde v1.0.229 (*)
+6layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7markup5ever v0.39.0
+8log v0.4.34
+8tendril v0.5.1
+9new_debug_unreachable v1.0.6
+8web_atoms v0.2.6
+9phf v0.13.1 (*)
+9string_cache v0.9.0
+10new_debug_unreachable v1.0.6
+10parking_lot v0.12.5 (*)
+10phf_shared v0.13.1 (*)
+10precomputed-hash v0.1.1
+7serde v1.0.229 (*)
+5genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7hashbrown v0.17.1 (*)
+7linebender_resource_handle v0.1.1 (*)
+7memmap2 v0.9.11
+8libc v0.2.190
+7objc2 v0.6.4 (*)
+7objc2-core-foundation v0.3.2 (*)
+7objc2-core-text v0.3.2
+8bitflags v2.13.2
+8objc2-core-foundation v0.3.2 (*)
+7objc2-foundation v0.3.2 (*)
+7parlance v0.1.0
+7read-fonts v0.41.0 (*)
+7smallvec v1.16.1 (*)
+6harfrust v0.12.0
+7bitflags v2.13.2
+7bytemuck v1.25.2 (*)
+7read-fonts v0.41.0 (*)
+7smallvec v1.16.1 (*)
+6hashbrown v0.17.1 (*)
+6icu_normalizer v2.3.0 (*)
+6icu_properties v2.3.0 (*)
+6icu_provider v2.3.1 (*)
+6icu_segmenter v2.3.0
+7icu_collections v2.3.0 (*)
+7icu_locale_fallback v2.3.0
+8icu_locale_core v2.3.0 (*)
+8icu_locale_fallback_data v2.3.0
+8icu_provider v2.3.1 (*)
+8potential_utf v0.1.6 (*)
+8tinystr v0.8.4 (*)
+8zerovec v0.11.8 (*)
+7icu_provider v2.3.1 (*)
+7icu_segmenter_data v2.3.0
+7potential_utf v0.1.6 (*)
+7smallvec v1.16.1 (*)
+7utf8_iter v1.0.4
+7zerovec v0.11.8 (*)
+6linebender_resource_handle v0.1.1 (*)
+6parlance v0.1.0
+6parley_data v0.10.0
+7icu_properties v2.3.0 (*)
+6skrifa v0.44.0 (*)
+6zerovec v0.11.8 (*)
+5genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+5icu_properties v2.3.0 (*)
+5icu_segmenter v2.3.0 (*)
+5image v0.25.10
+6bytemuck v1.25.2 (*)
+6byteorder-lite v0.1.0
+6color_quant v1.1.0
+6gif v0.14.2
+7color_quant v1.1.0
+7weezl v0.1.12
+6image-webp v0.2.4
+7byteorder-lite v0.1.0
+7quick-error v2.0.1
+6moxcms v0.8.1
+7num-traits v0.2.19 (*)
+7pxfm v0.1.30
+6num-traits v0.2.19 (*)
+6png v0.18.1 (*)
+6rayon v1.12.0
+7either v1.18.0
+7rayon-core v1.13.0
+8crossbeam-deque v0.8.8
+9crossbeam-epoch v0.9.21
+10crossbeam-utils v0.8.23
+9crossbeam-utils v0.8.23
+8crossbeam-utils v0.8.23
+6zune-core v0.5.3
+6zune-jpeg v0.5.15
+7zune-core v0.5.3
+5layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+5livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7cssparser v0.37.0 (*)
+6cssparser v0.37.0 (*)
+6genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+6euclid v0.22.14 (*)
+6serde v1.0.229 (*)
+5serde v1.0.229 (*)
+5stacker v0.1.25 (*)
+4genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5encoding_rs v0.8.42
+6cfg-if v1.0.5
+6core_detect v1.0.0
+6multiversion_no_op v1.0.0 (proc-macro)
+6scopeguard v1.2.0
+6serde v1.0.229 (*)
+6simdutf8 v0.1.5
+5engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+7app_units v0.7.8
+8num-traits v0.2.19 (*)
+8serde v1.0.229 (*)
+7euclid v0.22.14 (*)
+7serde v1.0.229 (*)
+6serde v1.0.229 (*)
+5genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6html5ever v0.39.0
+7log v0.4.34
+7markup5ever v0.39.0 (*)
+6layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+6xml5ever v0.39.0
+7log v0.4.34
+7markup5ever v0.39.0 (*)
+5genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6unicode-segmentation v1.13.3
+5html5ever v0.39.0 (*)
+5layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+5markup5ever v0.39.0 (*)
+5regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+6hashbrown v0.16.1
+7allocator-api2 v0.2.21
+7equivalent v1.0.2
+7foldhash v0.2.0
+6memchr v2.8.3
+5serde v1.0.229 (*)
+5url v2.5.8 (*)
+4layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4libm v0.2.16
+4mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/canvas/cartography)
+5mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+5sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+5scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise)
+6backstep v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/backstep)
+6libm v0.2.16
+6sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+6scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph)
+7mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/curation) (*)
+7sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+7serde v1.0.229 (*)
+7serde_json v1.0.151 (*)
+6serde v1.0.229 (*)
+6serde_json v1.0.151 (*)
+6workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+5serde v1.0.229 (*)
+4mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/curation) (*)
+4mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/forme) (*)
+4mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+4netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4numen v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/numen) (*)
+4paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+5log v0.4.34
+5netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+5paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+5postcard v1.1.3 (*)
+5serde v1.0.229 (*)
+5serde_json v1.0.151 (*)
+5sha2 v0.11.0 (*)
+5skrifa v0.44.0 (*)
+4petgraph v0.8.3 (*)
+4sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+4scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+4scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise) (*)
+4scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+4seiche v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/seiche)
+5armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+5euclid v0.22.14 (*)
+5numen v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/numen) (*)
+5petgraph v0.8.3 (*)
+5rapier2d v0.36.0
+6approx v0.5.1
+7num-traits v0.2.19 (*)
+6arrayvec v0.7.8
+6bitflags v2.13.2
+6glamx v0.3.1
+7approx v0.5.1 (*)
+7glam v0.33.8
+8approx v0.5.1 (*)
+8libm v0.2.16
+7nalgebra v0.35.0
+8approx v0.5.1 (*)
+8glam v0.33.8 (*)
+8matrixmultiply v0.3.11
+9rawpointer v0.2.1
+8nalgebra-macros v0.3.0 (proc-macro)
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9syn v2.0.119 (*)
+8num-complex v0.4.6 (*)
+8num-rational v0.4.2 (*)
+8num-traits v0.2.19 (*)
+8simba v0.10.2
+9approx v0.5.1 (*)
+9libm v0.2.16
+9num-complex v0.4.6 (*)
+9num-traits v0.2.19 (*)
+9wide v1.7.1
+10bytemuck v1.25.2 (*)
+10safe_arch v1.2.0
+11bytemuck v1.25.2 (*)
+8typenum v1.20.1
+7num-traits v0.2.19 (*)
+7simba v0.10.2 (*)
+6log v0.4.34
+6nalgebra v0.35.0 (*)
+6num-traits v0.2.19 (*)
+6parry2d v0.31.1
+7approx v0.5.1 (*)
+7arrayvec v0.7.8
+7bitflags v2.13.2
+7downcast-rs v2.0.2
+7either v1.18.0
+7ena v0.14.4
+8log v0.4.34
+7foldhash v0.2.0
+7glamx v0.3.1 (*)
+7hashbrown v0.17.1 (*)
+7indexmap v2.14.2 (*)
+7log v0.4.34
+7num-derive v0.5.1 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v3.0.6 (*)
+7num-traits v0.2.19 (*)
+7ordered-float v5.5.0
+8num-traits v0.2.19 (*)
+7simba v0.10.2 (*)
+7slab v0.4.12
+7smallvec v1.16.1 (*)
+7spade v2.15.1
+8hashbrown v0.16.1 (*)
+8num-traits v0.2.19 (*)
+8robust v1.2.0
+8smallvec v1.16.1 (*)
+7thiserror v2.0.21 (*)
+6profiling v1.0.18 (*)
+6simba v0.10.2 (*)
+6static_assertions v1.1.0
+6thiserror v2.0.21 (*)
+6wide v1.7.1 (*)
+5serde v1.0.229 (*)
+5serde_path_to_error v0.1.20
+6itoa v1.0.18
+6serde_core v1.0.229
+5tracing v0.1.44 (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4tinct v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/tinct) (*)
+4tracing v0.1.44 (*)
+4uuid v1.27.0 (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3tabard v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/tabard) (*)
+3tracing v0.1.44 (*)
+3uuid v1.27.0 (*)
+3uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/uxtree)
+4accesskit v0.25.1 (*)
+4inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+4tracing v0.1.44 (*)
+2mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/distillery/alembic) (*)
+2mere-personal-facts v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/domain/personal-facts)
+3blake3 v1.8.7 (*)
+3chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+2muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2rand_core v0.6.4 (*)
+2sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+2scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+2scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+2seiche v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/seiche) (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+3chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2thiserror v2.0.21 (*)
+2turquet v0.17.0 (https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b#30875f30)
+3hifitime v4.3.1
+4lexical-core v1.0.6
+5lexical-parse-float v1.0.6
+6lexical-parse-integer v1.0.6
+7lexical-util v1.0.7
+6lexical-util v1.0.7
+5lexical-parse-integer v1.0.6 (*)
+5lexical-util v1.0.7
+4num-traits v0.2.19 (*)
+4serde v1.0.229 (*)
+4serde_derive v1.0.229 (proc-macro) (*)
+4snafu v0.9.2
+5snafu-derive v0.9.2 (proc-macro)
+6heck v0.5.0
+6proc-macro2 v1.0.107 (*)
+6quote v1.0.47 (*)
+6syn v2.0.119 (*)
+4web-time v1.1.0
+3sofars v0.6.1
+2turquet v0.17.0 (https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802#8e3755bb)
+3hifitime v4.3.1 (*)
+3sofars v0.6.1
+2turquet v0.17.0 (https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306#e2f65c02)
+3hifitime v4.3.1 (*)
+3sofars v0.6.1
+1distillery v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/ports/distillery)
+2armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+2cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium)
+3backstep v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/backstep)
+3command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/command-menu) (*)
+3genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/surface-api)
+4workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+3meristem v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/meristem)
+4anymore v1.0.0
+4tracing v0.1.44 (*)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+3scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+3scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise) (*)
+3sprigging v0.2.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/sprigging)
+4accesskit v0.25.1 (*)
+4netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+4paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+2chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+2eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-endpoint)
+3armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+3base64 v0.22.1
+3chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+3dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3libc v0.2.190
+3pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3rand_core v0.6.4 (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3thiserror v1.0.69 (*)
+3tokio v1.53.2 (*)
+3tracing v0.1.44 (*)
+3uuid v1.27.0 (*)
+3zeroize v1.9.1 (*)
+2incipit v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/incipit) (*)
+2insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2mere-mesh v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/mesh/mesh)
+3blake3 v1.8.7 (*)
+3esp v0.1.0 (https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6b) (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+4futures-channel v0.3.34 (*)
+4futures-util v0.3.34 (*)
+4hex v0.4.3 (*)
+4iroh v1.3.0
+5backon v1.6.0
+6fastrand v2.5.0
+6tokio v1.53.2 (*)
+5blake3 v1.8.7 (*)
+5bytes v1.12.1 (*)
+5ctutils v0.4.2 (*)
+5data-encoding v2.11.1
+5derive_more v2.1.1
+6derive_more-impl v2.1.1 (proc-macro)
+7convert_case v0.10.0
+8unicode-segmentation v1.13.3
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v2.0.119 (*)
+7unicode-xid v0.2.6
+5ed25519-dalek v3.0.0 (*)
+5futures-util v0.3.34 (*)
+5http v1.5.0
+6bytes v1.12.1 (*)
+6itoa v1.0.18
+5ipnet v2.12.2
+5iroh-base v1.3.0
+6curve25519-dalek v5.0.0 (*)
+6data-encoding v2.11.1
+6data-encoding-macro v0.1.21
+7data-encoding v2.11.1
+7data-encoding-macro-internal v0.1.19 (proc-macro)
+8data-encoding v2.11.1
+8syn v3.0.6 (*)
+6derive_more v2.1.1 (*)
+6ed25519-dalek v3.0.0 (*)
+6n0-error v1.0.1
+7anyhow v1.0.104
+7n0-error-macros v1.0.1 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+7spez v0.1.2 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+6rand v0.10.3
+7chacha20 v0.10.2 (*)
+7getrandom v0.4.3 (*)
+7rand_core v0.10.1
+6serde v1.0.229 (*)
+6url v2.5.8 (*)
+6zeroize v1.9.1 (*)
+5iroh-dns v1.3.0
+6arc-swap v1.9.2
+7rustversion v1.0.23 (proc-macro)
+6derive_more v2.1.1 (*)
+6iroh-base v1.3.0 (*)
+6n0-dns-resolver v0.1.0
+7derive_more v2.1.1 (*)
+7lru v0.18.4
+8hashbrown v0.17.1 (*)
+7n0-error v1.0.1 (*)
+7n0-future v0.3.2
+8derive_more v2.1.1 (*)
+8futures-buffered v0.2.13
+9cordyceps v0.3.5
+9diatomic-waker v0.2.3
+9futures-core v0.3.34
+9pin-project-lite v0.2.17
+9spin v0.10.1
+8futures-lite v2.6.1
+9fastrand v2.5.0
+9futures-core v0.3.34
+9futures-io v0.3.34
+9parking v2.2.1
+9pin-project-lite v0.2.17
+8futures-util v0.3.34 (*)
+8pin-project v1.1.13
+9pin-project-internal v1.1.13 (proc-macro)
+10proc-macro2 v1.0.107 (*)
+10quote v1.0.47 (*)
+10syn v2.0.119 (*)
+8tokio v1.53.2 (*)
+8tokio-util v0.7.19 (*)
+7rand v0.10.3 (*)
+7reqwest v0.13.5
+8base64 v0.23.1
+8bytes v1.12.1 (*)
+8futures-core v0.3.34
+8futures-util v0.3.34 (*)
+8http v1.5.0 (*)
+8http-body v1.1.0
+9bytes v1.12.1 (*)
+9http v1.5.0 (*)
+8http-body-util v0.1.5
+9bytes v1.12.1 (*)
+9futures-core v0.3.34
+9http v1.5.0 (*)
+9http-body v1.1.0 (*)
+9pin-project-lite v0.2.17
+8hyper v1.11.1
+9atomic-waker v1.1.2
+9bytes v1.12.1 (*)
+9futures-channel v0.3.34 (*)
+9futures-core v0.3.34
+9h2 v0.4.19
+10atomic-waker v1.1.2
+10bytes v1.12.1 (*)
+10fnv v1.0.7
+10futures-core v0.3.34
+10futures-sink v0.3.34
+10http v1.5.0 (*)
+10indexmap v2.14.2 (*)
+10slab v0.4.12
+10tokio v1.53.2 (*)
+10tokio-util v0.7.19 (*)
+10tracing v0.1.44 (*)
+9http v1.5.0 (*)
+9http-body v1.1.0 (*)
+9httparse v1.10.1
+9httpdate v1.0.3
+9itoa v1.0.18
+9pin-project-lite v0.2.17
+9smallvec v1.16.1 (*)
+9tokio v1.53.2 (*)
+9want v0.3.1
+10try-lock v0.2.5
+8hyper-rustls v0.27.9
+9http v1.5.0 (*)
+9hyper v1.11.1 (*)
+9hyper-util v0.1.20
+10base64 v0.22.1
+10bytes v1.12.1 (*)
+10futures-channel v0.3.34 (*)
+10futures-util v0.3.34 (*)
+10http v1.5.0 (*)
+10http-body v1.1.0 (*)
+10hyper v1.11.1 (*)
+10ipnet v2.12.2
+10libc v0.2.190
+10percent-encoding v2.3.2
+10pin-project-lite v0.2.17
+10socket2 v0.6.5 (*)
+10tokio v1.53.2 (*)
+10tower-service v0.3.3
+10tracing v0.1.44 (*)
+9rustls v0.23.45
+10log v0.4.34
+10once_cell v1.21.4 (*)
+10ring v0.17.14 (*)
+10rustls-pki-types v1.15.1
+11zeroize v1.9.1 (*)
+10rustls-webpki v0.103.15
+11ring v0.17.14 (*)
+11rustls-pki-types v1.15.1 (*)
+11untrusted v0.9.0
+10subtle v2.6.1
+10zeroize v1.9.1 (*)
+9tokio v1.53.2 (*)
+9tokio-rustls v0.26.6
+10rustls v0.23.45 (*)
+10tokio v1.53.2 (*)
+9tower-service v0.3.3
+9webpki-roots v1.0.9
+10rustls-pki-types v1.15.1 (*)
+8hyper-util v0.1.20 (*)
+8log v0.4.34
+8percent-encoding v2.3.2
+8pin-project-lite v0.2.17
+8rustls v0.23.45 (*)
+8rustls-pki-types v1.15.1 (*)
+8rustls-platform-verifier v0.7.0
+9core-foundation v0.10.1
+10core-foundation-sys v0.8.7
+10libc v0.2.190
+9core-foundation-sys v0.8.7
+9log v0.4.34
+9rustls v0.23.45 (*)
+9security-framework v3.7.0
+10bitflags v2.13.2
+10core-foundation v0.10.1 (*)
+10core-foundation-sys v0.8.7
+10libc v0.2.190
+10security-framework-sys v2.17.0
+11core-foundation-sys v0.8.7
+11libc v0.2.190
+9security-framework-sys v2.17.0 (*)
+8sync_wrapper v1.0.2
+9futures-core v0.3.34
+8tokio v1.53.2 (*)
+8tokio-rustls v0.26.6 (*)
+8tokio-util v0.7.19 (*)
+8tower v0.5.3
+9futures-core v0.3.34
+9futures-util v0.3.34 (*)
+9pin-project-lite v0.2.17
+9sync_wrapper v1.0.2 (*)
+9tokio v1.53.2 (*)
+9tower-layer v0.3.3
+9tower-service v0.3.3
+8tower-http v0.6.11
+9bitflags v2.13.2
+9bytes v1.12.1 (*)
+9futures-util v0.3.34 (*)
+9http v1.5.0 (*)
+9http-body v1.1.0 (*)
+9pin-project-lite v0.2.17
+9tower v0.5.3 (*)
+9tower-layer v0.3.3
+9tower-service v0.3.3
+9url v2.5.8 (*)
+8tower-service v0.3.3
+8url v2.5.8 (*)
+7rustc-hash v2.1.3
+7rustls v0.23.45 (*)
+7simple-dns v0.12.0
+8bitflags v2.13.2
+7system-configuration v0.8.0
+8bitflags v2.13.2
+8core-foundation v0.10.1 (*)
+8system-configuration-sys v0.6.0
+9core-foundation-sys v0.8.7
+9libc v0.2.190
+7tokio v1.53.2 (*)
+7tokio-rustls v0.26.6 (*)
+7tracing v0.1.44 (*)
+7webpki-roots v1.0.9 (*)
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6portable-atomic v1.15.0 (*)
+6rand v0.10.3 (*)
+6rustls v0.23.45 (*)
+6simple-dns v0.12.0 (*)
+6strum v0.28.0 (*)
+6tokio v1.53.2 (*)
+6tracing v0.1.44 (*)
+6url v2.5.8 (*)
+5iroh-metrics v1.0.2
+6iroh-metrics-derive v1.0.1 (proc-macro)
+7heck v0.5.0
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v2.0.119 (*)
+6itoa v1.0.18
+6n0-error v1.0.1 (*)
+6portable-atomic v1.15.0 (*)
+6ryu v1.0.23
+6serde v1.0.229 (*)
+6tracing v0.1.44 (*)
+5iroh-relay v1.3.0
+6blake3 v1.8.7 (*)
+6bytes v1.12.1 (*)
+6data-encoding v2.11.1
+6derive_more v2.1.1 (*)
+6http v1.5.0 (*)
+6http-body-util v0.1.5 (*)
+6hyper v1.11.1 (*)
+6hyper-util v0.1.20 (*)
+6iroh-base v1.3.0 (*)
+6iroh-dns v1.3.0 (*)
+6iroh-metrics v1.0.2 (*)
+6lru v0.18.4 (*)
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6noq v1.3.0
+7bytes v1.12.1 (*)
+7derive_more v2.1.1 (*)
+7noq-proto v1.3.0
+8aes-gcm v0.10.3 (*)
+8bytes v1.12.1 (*)
+8derive_more v2.1.1 (*)
+8enum-assoc v1.4.1 (proc-macro)
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9syn v3.0.6 (*)
+8fastbloom v0.17.0
+9foldhash v0.2.0
+9libm v0.2.16
+9portable-atomic v1.15.0 (*)
+9siphasher v1.0.3
+8identity-hash v0.1.0
+8lru-slab v0.1.3
+8rand v0.10.3 (*)
+8rand_pcg v0.10.2
+9rand_core v0.10.1
+8ring v0.17.14 (*)
+8rustc-hash v2.1.3
+8rustls v0.23.45 (*)
+8rustls-platform-verifier v0.7.0 (*)
+8slab v0.4.12
+8sorted-index-buffer v0.2.1
+8thiserror v2.0.21 (*)
+8tinyvec v1.13.3
+8tracing v0.1.44 (*)
+7noq-udp v1.3.0
+8libc v0.2.190
+8socket2 v0.6.5 (*)
+8tracing v0.1.44 (*)
+7pin-project-lite v0.2.17
+7rustc-hash v2.1.3
+7rustls v0.23.45 (*)
+7socket2 v0.6.5 (*)
+7thiserror v2.0.21 (*)
+7tokio v1.53.2 (*)
+7tokio-stream v0.1.19
+8futures-core v0.3.34
+8pin-project-lite v0.2.17
+8tokio v1.53.2 (*)
+8tokio-util v0.7.19 (*)
+7tracing v0.1.44 (*)
+6noq-proto v1.3.0 (*)
+6num_enum v0.7.6
+7num_enum_derive v0.7.6 (proc-macro)
+8proc-macro-crate v3.5.0
+9toml_edit v0.25.15+spec-1.1.0
+10indexmap v2.14.2
+11equivalent v1.0.2
+11hashbrown v0.17.1
+12foldhash v0.2.0
+10toml_datetime v1.1.1+spec-1.1.0
+11serde_core v1.0.229
+10toml_parser v1.1.3+spec-1.1.0
+11winnow v1.0.4
+10winnow v1.0.4
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+7rustversion v1.0.23 (proc-macro)
+6pin-project v1.1.13 (*)
+6postcard v1.1.3 (*)
+6rand v0.10.3 (*)
+6reqwest v0.13.5 (*)
+6rustls v0.23.45 (*)
+6rustls-pki-types v1.15.1 (*)
+6serde v1.0.229 (*)
+6serde_bytes v0.11.19 (*)
+6strum v0.28.0 (*)
+6tokio v1.53.2 (*)
+6tokio-rustls v0.26.6 (*)
+6tokio-util v0.7.19 (*)
+6tokio-websockets v0.13.3
+7base64 v0.22.1
+7bytes v1.12.1 (*)
+7futures-core v0.3.34
+7futures-sink v0.3.34
+7getrandom v0.4.3 (*)
+7http v1.5.0 (*)
+7httparse v1.10.1
+7rand v0.10.3 (*)
+7ring v0.17.14 (*)
+7rustls-pki-types v1.15.1 (*)
+7sha1_smol v1.0.1
+7simdutf8 v0.1.5
+7tokio v1.53.2 (*)
+7tokio-rustls v0.26.6 (*)
+7tokio-util v0.7.19 (*)
+6tracing v0.1.44 (*)
+6url v2.5.8 (*)
+6webpki-roots v1.0.9 (*)
+5n0-error v1.0.1 (*)
+5n0-future v0.3.2 (*)
+5n0-watcher v1.0.0
+6derive_more v2.1.1 (*)
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+5netwatch v0.19.3
+6atomic-waker v1.1.2
+6bytes v1.12.1 (*)
+6derive_more v2.1.1 (*)
+6ipnet v2.12.2
+6libc v0.2.190
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6n0-watcher v1.0.0 (*)
+6netdev v0.46.3
+7ipnet v2.12.2
+7libc v0.2.190
+7mac-addr v0.3.0
+7objc2-core-foundation v0.3.2 (*)
+7objc2-system-configuration v0.3.2
+8bitflags v2.13.2
+8dispatch2 v0.3.1 (*)
+8libc v0.2.190
+8objc2 v0.6.4 (*)
+8objc2-core-foundation v0.3.2 (*)
+8objc2-security v0.3.2
+9bitflags v2.13.2
+9objc2 v0.6.4 (*)
+9objc2-core-foundation v0.3.2 (*)
+7plist v1.10.1
+8base64 v0.23.1
+8indexmap v2.14.2 (*)
+8quick-xml v0.42.0
+9memchr v2.8.3
+8serde v1.0.229 (*)
+8time v0.3.55 (*)
+6noq-udp v1.3.0 (*)
+6objc2-core-foundation v0.3.2 (*)
+6objc2-system-configuration v0.3.2 (*)
+6pin-project-lite v0.2.17
+6socket2 v0.6.5 (*)
+6time v0.3.55 (*)
+6tokio v1.53.2 (*)
+6tokio-util v0.7.19 (*)
+6tracing v0.1.44 (*)
+5noq v1.3.0 (*)
+5noq-proto v1.3.0 (*)
+5noq-udp v1.3.0 (*)
+5papaya v0.2.5
+6equivalent v1.0.2
+6seize v0.5.1
+5pin-project v1.1.13 (*)
+5portable-atomic v1.15.0 (*)
+5portmapper v0.19.3
+6base64 v0.22.1
+6bytes v1.12.1 (*)
+6derive_more v2.1.1 (*)
+6hyper-util v0.1.20 (*)
+6igd-next v0.17.1
+7attohttpc v0.30.1
+8base64 v0.22.1
+8http v1.5.0 (*)
+8log v0.4.34
+8url v2.5.8 (*)
+7bytes v1.12.1 (*)
+7futures v0.3.34 (*)
+7http v1.5.0 (*)
+7http-body-util v0.1.5 (*)
+7hyper v1.11.1 (*)
+7hyper-util v0.1.20 (*)
+7log v0.4.34
+7rand v0.10.3 (*)
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+7xmltree v0.10.3
+8xml-rs v0.8.29
+6iroh-metrics v1.0.2 (*)
+6libc v0.2.190
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6netwatch v0.19.3 (*)
+6num_enum v0.7.6 (*)
+6rand v0.10.3 (*)
+6serde v1.0.229 (*)
+6smallvec v1.16.1 (*)
+6socket2 v0.6.5 (*)
+6time v0.3.55 (*)
+6tokio v1.53.2 (*)
+6tokio-util v0.7.19 (*)
+6tower-layer v0.3.3
+6tracing v0.1.44 (*)
+6url v2.5.8 (*)
+5rand v0.10.3 (*)
+5reqwest v0.13.5 (*)
+5rustc-hash v2.1.3
+5rustls v0.23.45 (*)
+5rustls-pki-types v1.15.1 (*)
+5serde v1.0.229 (*)
+5smallvec v1.16.1 (*)
+5strum v0.28.0 (*)
+5tokio v1.53.2 (*)
+5tokio-stream v0.1.19 (*)
+5tokio-util v0.7.19 (*)
+5tracing v0.1.44 (*)
+5url v2.5.8 (*)
+4iroh-base v1.3.0 (*)
+4iroh-gossip v0.101.0
+5blake3 v1.8.7 (*)
+5bytes v1.12.1 (*)
+5data-encoding v2.11.1
+5derive_more v2.1.1 (*)
+5futures-concurrency v7.7.1
+6fixedbitset v0.5.7
+6futures-core v0.3.34
+6futures-lite v2.6.1 (*)
+6pin-project v1.1.13 (*)
+6smallvec v1.16.1 (*)
+5hex v0.4.3 (*)
+5indexmap v2.14.2 (*)
+5iroh v1.3.0 (*)
+5iroh-base v1.3.0 (*)
+5iroh-metrics v1.0.2 (*)
+5irpc v0.17.0
+6futures-buffered v0.2.13 (*)
+6futures-util v0.3.34 (*)
+6irpc-derive v0.17.0 (proc-macro)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v2.0.119 (*)
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6noq v1.3.0 (*)
+6postcard v1.1.3 (*)
+6rcgen v0.14.10
+7pem v4.0.0
+8base64 v0.23.1
+7ring v0.17.14 (*)
+7rustls-pki-types v1.15.1 (*)
+7time v0.3.55 (*)
+7yasna v0.6.0
+8time v0.3.55 (*)
+6rustls v0.23.45 (*)
+6serde v1.0.229 (*)
+6smallvec v1.16.1 (*)
+6tokio v1.53.2 (*)
+6tokio-util v0.7.19 (*)
+6tracing v0.1.44 (*)
+5n0-error v1.0.1 (*)
+5n0-future v0.3.2 (*)
+5postcard v1.1.3 (*)
+5rand v0.10.3 (*)
+5serde v1.0.229 (*)
+5tokio v1.53.2 (*)
+5tokio-util v0.7.19 (*)
+5tracing v0.1.44 (*)
+4iroh-mdns-address-lookup v0.6.0
+5data-encoding v2.11.1
+5derive_more v2.1.1 (*)
+5futures-util v0.3.34 (*)
+5iroh v1.3.0 (*)
+5iroh-base v1.3.0 (*)
+5n0-error v1.0.1 (*)
+5n0-future v0.3.2 (*)
+5n0-watcher v1.0.0 (*)
+5swarm-discovery v0.6.4
+6acto v0.8.2
+7parking_lot v0.12.5 (*)
+7pin-project-lite v0.2.17
+7smol_str v0.1.24
+7sync_wrapper v1.0.2 (*)
+7tokio v1.53.2 (*)
+7tracing v0.1.44 (*)
+6hickory-proto v0.26.3
+7data-encoding v2.11.1
+7idna v1.1.0 (*)
+7ipnet v2.12.2
+7once_cell v1.21.4 (*)
+7rand v0.10.3 (*)
+7thiserror v2.0.21 (*)
+7tinyvec v1.13.3
+7tracing v0.1.44 (*)
+7url v2.5.8 (*)
+6rand v0.10.3 (*)
+6socket2 v0.6.5 (*)
+6thiserror v2.0.21 (*)
+6tokio v1.53.2 (*)
+6tracing v0.1.44 (*)
+5tokio v1.53.2 (*)
+5tokio-stream v0.1.19 (*)
+5tracing v0.1.44 (*)
+4p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+5blake3 v1.8.7 (*)
+5cbor-core v0.10.1
+6serde v1.0.229 (*)
+5ed25519-dalek v3.0.0 (*)
+5hex v0.4.3 (*)
+5rand v0.8.8 (*)
+5serde v1.0.229 (*)
+5serde_bytes v0.11.19 (*)
+5thiserror v2.0.21 (*)
+4p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+5blake3 v1.8.7 (*)
+5futures-util v0.3.34 (*)
+5p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+6async-stream v0.3.6
+7async-stream-impl v0.3.6 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v2.0.119 (*)
+7futures-core v0.3.34
+7pin-project-lite v0.2.17
+6futures-util v0.3.34 (*)
+6p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5rand v0.10.3 (*)
+5serde v1.0.229 (*)
+5thiserror v2.0.21 (*)
+5tokio v1.53.2 (*)
+4p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+4p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+5futures-channel v0.3.34 (*)
+5futures-util v0.3.34 (*)
+5p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5pin-project-lite v0.2.17
+5serde v1.0.229 (*)
+5thiserror v2.0.21 (*)
+5tokio v1.53.2 (*)
+5tokio-stream v0.1.19 (*)
+5tracing v0.1.44 (*)
+4postcard v1.1.3 (*)
+4ractor v0.16.5
+5bon v3.10.1
+6bon-macros v3.10.1 (proc-macro)
+7darling v0.24.1
+8darling_core v0.24.1
+9ident_case v1.0.1
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9strsim v0.11.1
+9syn v3.0.6 (*)
+8darling_macro v0.24.1 (proc-macro)
+9darling_core v0.24.1 (*)
+9quote v1.0.47 (*)
+9syn v3.0.6 (*)
+7ident_case v1.0.1
+7prettyplease v0.3.0
+8proc-macro2 v1.0.107 (*)
+8syn v3.0.6 (*)
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7syn v3.0.6 (*)
+5dashmap v6.2.1
+6cfg-if v1.0.5
+6crossbeam-utils v0.8.23
+6hashbrown v0.14.5
+6lock_api v0.4.14 (*)
+6once_cell v1.21.4 (*)
+6parking_lot_core v0.9.12 (*)
+5futures v0.3.34 (*)
+5once_cell v1.21.4 (*)
+5strum v0.28.0 (*)
+5tokio v1.53.2 (*)
+5tracing v0.1.44 (*)
+4rand v0.10.3 (*)
+4rand_chacha v0.10.0
+5ppv-lite86 v0.2.21 (*)
+5rand_core v0.10.1
+4serde v1.0.229 (*)
+4thiserror v2.0.21 (*)
+4tokio v1.53.2 (*)
+4tokio-stream v0.1.19 (*)
+4tokio-util v0.7.19 (*)
+4tracing v0.1.44 (*)
+3mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+4blake3 v1.8.7 (*)
+4serde v1.0.229 (*)
+4thiserror v1.0.69 (*)
+3mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea)
+4bytes v1.12.1 (*)
+4hkdf v0.13.0
+5hmac v0.13.0 (*)
+4iroh v1.3.0 (*)
+4iroh-blobs v0.103.1
+5arrayvec v0.7.8
+5bao-tree v0.16.1
+6blake3 v1.8.7 (*)
+6bytes v1.12.1 (*)
+6futures-lite v2.6.1 (*)
+6genawaiter v0.99.1
+7futures-core v0.3.34
+7genawaiter-macro v0.99.1
+7genawaiter-proc-macro v0.99.1 (proc-macro)
+8proc-macro-error v0.4.12
+9proc-macro-error-attr v0.4.12 (proc-macro)
+10proc-macro2 v1.0.107 (*)
+10quote v1.0.47 (*)
+10syn v1.0.109
+11proc-macro2 v1.0.107 (*)
+11quote v1.0.47 (*)
+11unicode-ident v1.0.26
+10syn-mid v0.5.4
+11proc-macro2 v1.0.107 (*)
+11quote v1.0.47 (*)
+11syn v1.0.109 (*)
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9syn v1.0.109 (*)
+8proc-macro-hack v0.5.20+deprecated (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v1.0.109 (*)
+7proc-macro-hack v0.5.20+deprecated (proc-macro)
+6iroh-io v0.6.2
+7bytes v1.12.1 (*)
+7futures-lite v2.6.1 (*)
+7pin-project v1.1.13 (*)
+7smallvec v1.16.1 (*)
+7tokio v1.53.2 (*)
+6positioned-io v0.3.5
+7libc v0.2.190
+6range-collections v0.4.6
+7binary-merge v0.1.2
+7inplace-vec-builder v0.1.1
+8smallvec v1.16.1 (*)
+7ref-cast v1.0.27
+8ref-cast-impl v1.0.27 (proc-macro)
+9proc-macro2 v1.0.107 (*)
+9quote v1.0.47 (*)
+9syn v3.0.6 (*)
+7serde v1.0.229 (*)
+7smallvec v1.16.1 (*)
+6self_cell v1.3.0
+6serde v1.0.229 (*)
+6smallvec v1.16.1 (*)
+6tokio v1.53.2 (*)
+5bytes v1.12.1 (*)
+5chrono v0.4.45 (*)
+5constant_time_eq v0.1.5
+5data-encoding v2.11.1
+5derive_more v2.1.1 (*)
+5genawaiter v0.99.1 (*)
+5hex v0.4.3 (*)
+5iroh v1.3.0 (*)
+5iroh-base v1.3.0 (*)
+5iroh-io v0.6.2 (*)
+5iroh-metrics v1.0.2 (*)
+5iroh-tickets v1.0.0
+6data-encoding v2.11.1
+6derive_more v2.1.1 (*)
+6iroh-base v1.3.0 (*)
+6n0-error v1.0.1 (*)
+6postcard v1.1.3 (*)
+6serde v1.0.229 (*)
+5iroh-util v0.6.0
+6derive_more v2.1.1 (*)
+6iroh v1.3.0 (*)
+6n0-error v1.0.1 (*)
+6n0-future v0.3.2 (*)
+6tokio v1.53.2 (*)
+6tracing v0.1.44 (*)
+5irpc v0.17.0 (*)
+5n0-error v1.0.1 (*)
+5n0-future v0.3.2 (*)
+5nested_enum_utils v0.2.3 (proc-macro)
+6proc-macro-crate v3.5.0 (*)
+6proc-macro2 v1.0.107 (*)
+6quote v1.0.47 (*)
+6syn v2.0.119 (*)
+5noq v1.3.0 (*)
+5postcard v1.1.3 (*)
+5rand v0.10.3 (*)
+5range-collections v0.4.6 (*)
+5redb v4.3.0
+6libc v0.2.190
+5ref-cast v1.0.27 (*)
+5reflink-copy v0.1.30
+6cfg-if v1.0.5
+5self_cell v1.3.0
+5serde v1.0.229 (*)
+5smallvec v1.16.1 (*)
+5tokio v1.53.2 (*)
+5tracing v0.1.44 (*)
+4iroh-tickets v1.0.0 (*)
+4mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+4muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+4n0-future v0.3.2 (*)
+4notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+4p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+4personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+4sha2 v0.11.0 (*)
+4snow v0.10.0
+5aes-gcm v0.10.3 (*)
+5blake2 v0.10.6 (*)
+5chacha20poly1305 v0.10.1
+6aead v0.5.2 (*)
+6chacha20 v0.9.1 (*)
+6cipher v0.4.4 (*)
+6poly1305 v0.8.0 (*)
+6zeroize v1.9.1 (*)
+5curve25519-dalek v4.1.3 (*)
+5getrandom v0.3.4 (*)
+5ring v0.17.14 (*)
+5sha2 v0.10.9 (*)
+5subtle v2.6.1
+4stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+5blake3 v1.8.7 (*)
+5futures-util v0.3.34 (*)
+5hex v0.4.3 (*)
+5insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+5mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+5muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+5p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)
+6chacha20poly1305 v0.10.1 (*)
+6curve25519-dalek v5.0.0 (*)
+6hex v0.4.3 (*)
+6hkdf v0.12.4 (*)
+6hpke-rs v0.7.0
+7hpke-rs-crypto v0.7.0
+8rand v0.10.3 (*)
+8zeroize v1.9.1 (*)
+7libcrux-sha3 v0.0.10
+8hax-lib v0.3.7
+9hax-lib-macros v0.3.7 (proc-macro)
+10proc-macro2 v1.0.107 (*)
+10quote v1.0.47 (*)
+10syn v2.0.119 (*)
+8libcrux-intrinsics v0.0.8
+9hax-lib v0.3.7 (*)
+8libcrux-platform v0.0.3
+9libc v0.2.190
+8libcrux-traits v0.0.8
+9libcrux-secrets v0.0.6
+10hax-lib v0.3.7 (*)
+9rand v0.10.3 (*)
+7log v0.4.34
+7subtle v2.6.1
+7zeroize v1.9.1 (*)
+6hpke-rs-crypto v0.7.0 (*)
+6hpke-rs-rust-crypto v0.7.0
+7aes-gcm v0.10.3 (*)
+7chacha20poly1305 v0.10.1 (*)
+7hkdf v0.13.0 (*)
+7hpke-rs-crypto v0.7.0 (*)
+7k256 v0.13.4
+8cfg-if v1.0.5
+8elliptic-curve v0.13.8 (*)
+7p256 v0.13.2 (*)
+7p384 v0.13.1 (*)
+7rand v0.10.3 (*)
+7rand_chacha v0.10.0 (*)
+7rand_core v0.10.1
+7sha2 v0.11.0 (*)
+7subtle v2.6.1
+7x25519-dalek v2.0.1
+8curve25519-dalek v4.1.3 (*)
+8rand_core v0.6.4 (*)
+8zeroize v1.9.1 (*)
+7zeroize v1.9.1 (*)
+6p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+6rand_chacha v0.9.0
+7ppv-lite86 v0.2.21 (*)
+7rand_core v0.9.5
+8getrandom v0.3.4 (*)
+6serde v1.0.229 (*)
+6serde_bytes v0.11.19 (*)
+6sha2 v0.10.9 (*)
+6subtle v2.6.1
+6thiserror v2.0.21 (*)
+6x25519-dalek v3.0.0
+7curve25519-dalek v5.0.0 (*)
+7rand_core v0.10.1
+7zeroize v1.9.1 (*)
+6zeroize v1.9.1 (*)
+5p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+5personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+5serde v1.0.229 (*)
+5serde_bytes v0.11.19 (*)
+5thiserror v1.0.69 (*)
+5tokio v1.53.2 (*)
+5tokio-stream v0.1.19 (*)
+4thiserror v1.0.69 (*)
+4tokio v1.53.2 (*)
+4tracing v0.1.44 (*)
+4zeroize v1.9.1 (*)
+3muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+3p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3thiserror v1.0.69 (*)
+3tokio v1.53.2 (*)
+2mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/surface-api) (*)
+2mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+2muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+2personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+2scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+2scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise) (*)
+2scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2thiserror v1.0.69 (*)
+2tokio v1.53.2 (*)
+1dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+1gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+2log v0.4.34
+2ring v0.17.14 (*)
+2rustls v0.23.45 (*)
+2tokio v1.53.2 (*)
+2tokio-rustls v0.26.6 (*)
+2url v2.5.8 (*)
+1graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/ports/graphshell)
+2async-trait v0.1.92 (proc-macro) (*)
+2backstep v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/backstep)
+2base64 v0.22.1
+2blake3 v1.8.7 (*)
+2cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium) (*)
+2cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium-rootstock)
+3accesskit v0.25.1 (*)
+3cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium) (*)
+3cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium-winit)
+4cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium) (*)
+4web-time v1.1.0
+4winit v0.30.13
+5bitflags v2.13.2
+5block2 v0.5.1
+6objc2 v0.5.2
+7objc-sys v0.3.5
+7objc2-encode v4.1.0
+5core-foundation v0.9.4
+6core-foundation-sys v0.8.7
+6libc v0.2.190
+5core-graphics v0.23.2
+6bitflags v1.3.2
+6core-foundation v0.9.4 (*)
+6core-graphics-types v0.1.3
+7bitflags v1.3.2
+7core-foundation v0.9.4 (*)
+7libc v0.2.190
+6foreign-types v0.5.0
+7foreign-types-macros v0.2.4 (proc-macro)
+8proc-macro2 v1.0.107 (*)
+8quote v1.0.47 (*)
+8syn v3.0.6 (*)
+7foreign-types-shared v0.3.1
+6libc v0.2.190
+5cursor-icon v1.2.0
+5dpi v0.1.2
+5objc2 v0.5.2 (*)
+5objc2-app-kit v0.2.2
+6bitflags v2.13.2
+6objc2 v0.5.2 (*)
+6objc2-foundation v0.2.2
+7bitflags v2.13.2
+7block2 v0.5.1 (*)
+7dispatch v0.2.0
+7objc2 v0.5.2 (*)
+5objc2-foundation v0.2.2 (*)
+5raw-window-handle v0.6.2
+5smol_str v0.2.2
+5tracing v0.1.44 (*)
+3document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+4accesskit v0.25.1 (*)
+4document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+4netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4tracing v0.1.44 (*)
+4wgpu v30.0.1 (*)
+3genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3meristem v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/meristem) (*)
+3netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3sprigging v0.2.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/sprigging) (*)
+3web-time v1.1.0
+3wgpu v30.0.1 (*)
+2chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+2command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/command-menu) (*)
+2dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+2getrandom v0.3.4 (*)
+2graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-client) (*)
+2graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-endpoint) (*)
+2graphshell-host v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-host)
+3base64 v0.22.1
+3chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+3getrandom v0.3.4 (*)
+3graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-client) (*)
+3graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-endpoint) (*)
+3insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+3mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#660606ea)
+4blake3 v1.8.7 (*)
+4luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)
+5semver v1.0.28
+5serde v1.0.229 (*)
+5serde_json v1.0.151 (*)
+5thiserror v1.0.69 (*)
+5time v0.3.55 (*)
+5url v2.5.8 (*)
+4thiserror v1.0.69 (*)
+3notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+3personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+3rand_core v0.6.4 (*)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+3scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3thiserror v1.0.69 (*)
+3tokio v1.53.2 (*)
+2inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+2insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2mere v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/mere) (*)
+2mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/document-lanes)
+3document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/document-canvas)
+4genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+4netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4serde v1.0.229 (*)
+3document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3image v0.25.10 (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/fleece)
+4eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+4fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+5sha2 v0.10.9 (*)
+5unicode-bidi v0.3.18
+5unicode-segmentation v1.13.3
+4genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4url v2.5.8 (*)
+3netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3serde_json v1.0.151 (*)
+3tabard v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/tabard) (*)
+3tempfile v3.27.0
+4fastrand v2.5.0
+4getrandom v0.4.3 (*)
+4once_cell v1.21.4 (*)
+4rustix v1.1.5 (*)
+3url v2.5.8 (*)
+2mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/fleece) (*)
+2mere-overmap v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/mere-overmap)
+3chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+3mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+3pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+3scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+2mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+2mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+2muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+2notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+2pelt-core v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/ports/pelt/core)
+3genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3genet-documents v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+4browsing-context-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+5url v2.5.8 (*)
+4data-url v0.3.2
+4document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+4serde_json v1.0.151 (*)
+4url v2.5.8 (*)
+3genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/document-lanes) (*)
+3mere-page-load v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/page-load)
+3netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+3serde_json v1.0.151 (*)
+3url v2.5.8 (*)
+3workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+2personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2platen v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/platen/platen)
+3accesskit v0.25.1 (*)
+3document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/document-canvas) (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/forme) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3tracing v0.1.44 (*)
+3uuid v1.27.0 (*)
+3uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/forme/uxtree) (*)
+3workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+2rand_core v0.6.4 (*)
+2sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+2scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+2scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise) (*)
+2scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2sha2 v0.11.0 (*)
+2signature v2.2.0 (*)
+2ssh-agent-lib v0.6.0 (*)
+2ssh-key v0.6.7 (*)
+2stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2tabard v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/tabard) (*)
+2thiserror v1.0.69 (*)
+2tokio v1.53.2 (*)
+2tracing v0.1.44 (*)
+2tracing-subscriber v0.3.23 (*)
+2url v2.5.8 (*)
+2uuid v1.27.0 (*)
+2wgpu v30.0.1 (*)
+2workbench v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/workbench)
+2zeroize v1.9.1 (*)
+1graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-endpoint) (*)
+1graphshell-host v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-host) (*)
+1incipit v0.2.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/incipit) (*)
+1insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+2base64 v0.22.1
+2blake3 v1.8.7 (*)
+2chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/chirograph) (*)
+2eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2esp v0.1.0 (https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6b) (*)
+2fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+2graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graphshell/graphshell-endpoint) (*)
+2inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+2insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2jotdown v0.10.0
+2knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+3knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+4muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+4pollster v0.4.0
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+4uuid v1.27.0 (*)
+4zeroize v1.9.1 (*)
+2knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+3blake3 v1.8.7 (*)
+3knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9) (*)
+3quick-xml v0.39.4
+4memchr v2.8.3
+3reference-data v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/intel/reference-data)
+4blake3 v1.8.7 (*)
+4serde v1.0.229 (*)
+4serde_json v1.0.151 (*)
+3sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+3scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+3scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenomise) (*)
+3scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+3seiche v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/conatus/seiche) (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3tempfile v3.27.0 (*)
+3uuid v1.27.0 (*)
+2knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+3cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium) (*)
+3illume v0.0.3 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/nematic/illume)
+4jotdown v0.10.0
+4logos v0.16.1
+5logos-derive v0.16.1 (proc-macro)
+6logos-codegen v0.16.1
+7fnv v1.0.7
+7proc-macro2 v1.0.107 (*)
+7quote v1.0.47 (*)
+7regex-automata v0.4.18
+8aho-corasick v1.1.5 (*)
+8memchr v2.8.3
+8regex-syntax v0.8.11
+7regex-syntax v0.8.11
+7syn v2.0.119 (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3knot-editor-host v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/knot-editor-host)
+4cambium v0.4.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/cambium) (*)
+4illume v0.0.3 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/nematic/illume) (*)
+4inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+4nematic v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/nematic/nematic)
+5errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+6finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+6gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7log v0.4.34
+7percent-encoding v2.3.2
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7log v0.4.34
+7rcgen v0.13.2
+8pem v3.0.6
+9base64 v0.22.1
+8ring v0.17.14 (*)
+8rustls-pki-types v1.15.1 (*)
+8time v0.3.55 (*)
+8yasna v0.5.2
+9time v0.3.55 (*)
+7rustls v0.23.45 (*)
+7rustls-pki-types v1.15.1 (*)
+7serde v1.0.229 (*)
+7serde_json v1.0.151 (*)
+7sha2 v0.11.0 (*)
+7tokio v1.53.2 (*)
+7tokio-rustls v0.26.6 (*)
+7url v2.5.8 (*)
+6nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7log v0.4.34
+7percent-encoding v2.3.2
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6quick-xml v0.39.4 (*)
+6rustls v0.23.45 (*)
+6scroll-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6spartan-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+7idna v1.1.0 (*)
+7log v0.4.34
+7percent-encoding v2.3.2
+7tokio v1.53.2 (*)
+7url v2.5.8 (*)
+6tokio v1.53.2 (*)
+6tokio-rustls v0.26.6 (*)
+6tracing v0.1.44 (*)
+6url v2.5.8 (*)
+5genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+5inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+5jotdown v0.10.0
+5pulldown-cmark v0.13.4
+6bitflags v2.13.2
+6memchr v2.8.3
+6unicase v2.9.0
+5serde v1.0.229 (*)
+5serde_json v1.0.151 (*)
+5tracing v0.1.44 (*)
+5url v2.5.8 (*)
+4pulldown-cmark v0.13.4 (*)
+3mere-source-edit v0.1.0 (https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c)
+4serde v1.0.229 (*)
+3mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/surface-api) (*)
+3nematic v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/nematic/nematic) (*)
+3same-file v1.0.6
+3serde_json v1.0.151 (*)
+2knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9) (*)
+2mere-fetch v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/fetch)
+3armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+3async-trait v0.1.92 (proc-macro) (*)
+3bytes v1.12.1 (*)
+3eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+3errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+3futures-util v0.3.34 (*)
+3genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3mere-page-load v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/page-load)
+3netfetcher v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+4async-compression v0.4.48
+5compression-codecs v0.4.43
+6brotli v8.0.4
+7alloc-no-stdlib v2.0.4
+7alloc-stdlib v0.2.4 (*)
+7brotli-decompressor v5.0.3 (*)
+6compression-core v0.4.33
+6flate2 v1.1.10 (*)
+6memchr v2.8.3
+6zstd v0.14.0
+7zstd-safe v8.0.0
+8zstd-sys v2.1.0+zstd.1.5.7
+6zstd-safe v8.0.0 (*)
+5compression-core v0.4.33
+5pin-project-lite v0.2.17
+5tokio v1.53.2 (*)
+4base64 v0.22.1
+4bytes v1.12.1 (*)
+4cookie v0.18.2
+5time v0.3.55 (*)
+4futures-util v0.3.34 (*)
+4genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+4httpdate v1.0.3
+4murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#660606ea)
+5bytes v1.12.1 (*)
+5futures-util v0.3.34 (*)
+5h3 v0.0.8
+6bytes v1.12.1 (*)
+6fastrand v2.5.0
+6futures-util v0.3.34 (*)
+6http v1.5.0 (*)
+6pin-project-lite v0.2.17
+6tokio v1.53.2 (*)
+5h3-quinn v0.0.10
+6bytes v1.12.1 (*)
+6futures v0.3.34 (*)
+6h3 v0.0.8 (*)
+6quinn v0.11.12
+7bytes v1.12.1 (*)
+7futures-io v0.3.34
+7pin-project-lite v0.2.17
+7quinn-proto v0.11.18
+8bytes v1.12.1 (*)
+8fastbloom v0.17.0 (*)
+8lru-slab v0.1.3
+8rand v0.10.3 (*)
+8rand_pcg v0.10.2 (*)
+8ring v0.17.14 (*)
+8rustc-hash v2.1.3
+8rustls v0.23.45 (*)
+8rustls-platform-verifier v0.7.0 (*)
+8slab v0.4.12
+8thiserror v2.0.21 (*)
+8tinyvec v1.13.3
+8tracing v0.1.44 (*)
+7quinn-udp v0.5.15
+8libc v0.2.190
+8socket2 v0.6.5 (*)
+8tracing v0.1.44 (*)
+7rustc-hash v2.1.3
+7rustls v0.23.45 (*)
+7socket2 v0.6.5 (*)
+7thiserror v2.0.21 (*)
+7tokio v1.53.2 (*)
+7tracing v0.1.44 (*)
+6tokio v1.53.2 (*)
+6tokio-util v0.7.19 (*)
+5http v1.5.0 (*)
+5http-body-util v0.1.5 (*)
+5hyper v1.11.1 (*)
+5hyper-rustls v0.27.9 (*)
+5hyper-util v0.1.20 (*)
+5quinn v0.11.12 (*)
+5rustls v0.23.45 (*)
+5tokio v1.53.2 (*)
+5tokio-tungstenite v0.29.0
+6futures-util v0.3.34 (*)
+6log v0.4.34
+6rustls v0.23.45 (*)
+6rustls-pki-types v1.15.1 (*)
+6tokio v1.53.2 (*)
+6tokio-rustls v0.26.6 (*)
+6tungstenite v0.29.0
+7bytes v1.12.1 (*)
+7data-encoding v2.11.1
+7http v1.5.0 (*)
+7httparse v1.10.1
+7log v0.4.34
+7rand v0.9.5
+8rand_chacha v0.9.0 (*)
+8rand_core v0.9.5 (*)
+7rustls v0.23.45 (*)
+7rustls-pki-types v1.15.1 (*)
+7sha1 v0.10.7
+8cfg-if v1.0.5
+8cpufeatures v0.2.17
+8digest v0.10.7 (*)
+7thiserror v2.0.21 (*)
+6webpki-roots v0.26.11
+7webpki-roots v1.0.9 (*)
+5url v2.5.8 (*)
+5webpki-roots v1.0.9 (*)
+4psl v2.1.234
+5psl-types v2.0.11
+4ring v0.17.14 (*)
+4time v0.3.55 (*)
+4tokio v1.53.2 (*)
+4tokio-tungstenite v0.29.0 (*)
+4tokio-util v0.7.19 (*)
+4tracing v0.1.44 (*)
+4url v2.5.8 (*)
+3pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+3pollster v0.4.0
+3rustls-pki-types v1.15.1 (*)
+3serde v1.0.229 (*)
+3serde_json v1.0.151 (*)
+3tokio v1.53.2 (*)
+3tracing v0.1.44 (*)
+3url v2.5.8 (*)
+3zeroize v1.9.1 (*)
+2mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+2mora v0.1.0
+2mora-cmudict v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/intel/mora-cmudict)
+3mora v0.1.0
+2muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2nematic v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/nematic/nematic) (*)
+2notify v8.2.0
+3bitflags v2.13.2
+3fsevent-sys v4.1.0
+4libc v0.2.190
+3libc v0.2.190
+3log v0.4.34
+3notify-types v2.1.0
+4bitflags v2.13.2
+3walkdir v2.5.0
+4same-file v1.0.6
+2notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+2pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+2personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+2pollster v0.4.0
+2postcard v1.1.3 (*)
+2quinn v0.11.12 (*)
+2rustls v0.23.45 (*)
+2sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+2scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+2script-rhai v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/script/rhai)
+3inker v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/inker/inker) (*)
+3libm v0.2.16
+3rhai v1.26.1
+4ahash v0.8.12 (*)
+4bitflags v2.13.2
+4num-traits v0.2.19 (*)
+4once_cell v1.21.4 (*)
+4rhai_codegen v3.2.0 (proc-macro)
+5proc-macro2 v1.0.107 (*)
+5quote v1.0.47 (*)
+5syn v2.0.119 (*)
+4smallvec v1.16.1 (*)
+4smartstring v1.0.1
+5static_assertions v1.1.0
+4thin-vec v0.2.20
+3script-engine-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2sha2 v0.11.0 (*)
+2similar v2.7.0
+2stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+2thiserror v1.0.69 (*)
+2tokio v1.53.2 (*)
+2tracing v0.1.44 (*)
+2tracing-subscriber v0.3.23 (*)
+2url v2.5.8 (*)
+2uuid v1.27.0 (*)
+2zeroize v1.9.1 (*)
+1knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#450766f9)
+2blake3 v1.8.7 (*)
+2gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+2getrandom v0.2.17 (*)
+2language-tags v0.3.2
+2rcgen v0.13.2 (*)
+2retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#660606ea)
+3aes v0.9.3
+4cipher v0.5.2 (*)
+4cpubits v0.1.1
+4cpufeatures v0.3.1
+3bzip2 v0.6.1
+4libbz2-rs-sys v0.2.5
+3cbc v0.2.1
+4cipher v0.5.2 (*)
+3ed25519-dalek v3.0.0 (*)
+3getrandom v0.2.17 (*)
+3heapless v0.9.3
+4hash32 v0.3.1
+5byteorder v1.5.0
+4stable_deref_trait v1.2.1
+3hkdf v0.13.0 (*)
+3hmac v0.13.0 (*)
+3sha2 v0.11.0 (*)
+3socket2 v0.6.5 (*)
+3tokio v1.53.2 (*)
+3x25519-dalek v3.0.0 (*)
+2rustls v0.23.45 (*)
+2scroll-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+2serde v1.0.229 (*)
+2serde_json v1.0.151 (*)
+2spartan-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085) (*)
+2tempfile v3.27.0 (*)
+2time v0.3.55 (*)
+2tokio v1.53.2 (*)
+2url v2.5.8 (*)
+1libc v0.2.190
+1light-file-dialog v3.21.3
+1mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/graph/graph-kernel) (*)
+1mere-mesh v0.0.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/mesh/mesh) (*)
+1mere-overmap v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/mere-overmap) (*)
+1mere-personal-facts v0.1.0 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/domain/personal-facts) (*)
+1mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#660606ea) (*)
+1muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+1notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+1p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc) (*)
+1pandect v0.1.1 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/system/pandect) (*)
+1personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+1rand_core v0.6.4 (*)
+1rcgen v0.13.2 (*)
+1rpassword v7.5.4
+2libc v0.2.190
+2rtoolbox v0.0.6
+3libc v0.2.190
+1rustls v0.23.45 (*)
+1sceno v0.0.6 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/sceno) (*)
+1scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenograph) (*)
+1scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-graphshell-coop/crates/cambium/scenes/scenotime) (*)
+1serde v1.0.229 (*)
+1serde_json v1.0.151 (*)
+1sha2 v0.11.0 (*)
+1signature v2.2.0 (*)
+1ssh-agent-lib v0.6.0 (*)
+1ssh-key v0.6.7 (*)
+1stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159) (*)
+1thiserror v1.0.69 (*)
+1tokio v1.53.2 (*)
+1tokio-rustls v0.26.6 (*)
+1toml v0.8.23
+2serde v1.0.229 (*)
+2serde_spanned v0.6.9
+3serde v1.0.229 (*)
+2toml_datetime v0.6.11
+3serde v1.0.229 (*)
+2toml_edit v0.22.27
+3indexmap v2.14.2 (*)
+3serde v1.0.229 (*)
+3serde_spanned v0.6.9 (*)
+3toml_datetime v0.6.11 (*)
+3toml_write v0.1.2
+3winnow v0.7.15
+1tracing v0.1.44 (*)
+1tracing-subscriber v0.3.23 (*)
+1uuid v1.27.0 (*)
+1zeroize v1.9.1 (*)

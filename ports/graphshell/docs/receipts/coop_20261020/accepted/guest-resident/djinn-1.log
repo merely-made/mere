@@ -1,0 +1,10 @@
+2026-10-20T19:27:37.381343Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/vault/vault.json
+2026-10-20T19:27:37.382745Z  WARN djinn: selected profile was created profile=CoopGuest
+2026-10-20T19:27:37.384091Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-20T19:27:37.531119Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/mere yet; pair this device first, or name a persona
+2026-10-20T19:27:37.531420Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/agent.sock"
+2026-10-20T19:27:37.531529Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/local/graphshell/settings/CoopGuest.json configured=false
+2026-10-20T19:28:02.111935Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-20T19:28:17.701931Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-20T19:28:29.829117Z  INFO djinn: stop requested on the control route
+2026-10-20T19:28:29.829763Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 7, cancelled: 3, panicked: 0, rejected: 0 }
