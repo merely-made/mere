@@ -45,6 +45,12 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
         );
     }
     owner.inference.as_ref().unwrap().recall.validate()?;
+    if let Some(embedding) = &owner.inference.as_ref().unwrap().embedding {
+        if !cfg!(feature = "inference-embedding") {
+            return Err("embedding recall requires the inference-embedding feature".into());
+        }
+        embedding.validate()?;
+    }
     if owner.distillery.is_none() {
         return Err(
             "inference needs the distillery lane: it borrows that lane's model library \
@@ -381,6 +387,7 @@ mod tests {
 
     fn stub() -> Option<InferenceLaneSettings> {
         Some(InferenceLaneSettings {
+            embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Stub,
         })
@@ -470,6 +477,7 @@ mod tests {
         };
         let set_model = |row: String, device, max_tokens| {
             Some(InferenceLaneSettings {
+                embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
                     row,
