@@ -1,0 +1,81 @@
+{
+  "supplier_revisions": {
+    "armillary": "5d8754dc2a00be02d82b075441ac9ea44aa4f135",
+    "eidetic": "543f5ff38f87a09afc04dbc59f57c2dfbc6a9943",
+    "esp": "ddb5037bae30bd89f9e558c7dd5c9065eedfb162",
+    "gemot": "67ce0ac3e2b48be951a677a9eca245eaabd56d63",
+    "errand": "dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+  },
+  "root_metadata_exit": 0,
+  "lock_sha256": "438ef884042db448676187908bc21b43ea78245d71d02336a1afcc271b735d55",
+  "promoted_sources": {
+    "armillary": [
+      "git+https://github.com/merely-made/armillary.git?rev=5d8754dc2a00be02d82b075441ac9ea44aa4f135#5d8754dc2a00be02d82b075441ac9ea44aa4f135"
+    ],
+    "chartulary": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "commons-spine": [
+      "git+https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+    ],
+    "eidetic": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "errand": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "esp": [
+      "git+https://github.com/merely-made/esp.git?rev=ddb5037bae30bd89f9e558c7dd5c9065eedfb162#ddb5037bae30bd89f9e558c7dd5c9065eedfb162"
+    ],
+    "finger-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "gemini-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "gemot": [
+      "git+https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+    ],
+    "gopher-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "guppy-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "luggage": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "mere-proofs": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "mien": [
+      "git+https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+    ],
+    "misfin": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "mooting": [
+      "git+https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3e2b48be951a677a9eca245eaabd56d63"
+    ],
+    "muniment": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "nex-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "scroll-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "servitor": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ],
+    "spartan-protocol": [
+      "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
+    ],
+    "stickleback": [
+      "git+https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff38f87a09afc04dbc59f57c2dfbc6a9943"
+    ]
+  },
+  "source_issues": [],
+  "independent_normal_dependency_tree": "armillary-consumer-fixture v0.0.0 (C:\\Users\\mark_\\Code\\repos\\mere\\support\\fixtures\\armillary-consumer)\n\u2514\u2500\u2500 armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=5d8754dc2a00be02d82b075441ac9ea44aa4f135#5d8754dc)\n    \u2514\u2500\u2500 tracing v0.1.44\n        \u251c\u2500\u2500 pin-project-lite v0.2.17\n        \u251c\u2500\u2500 tracing-attributes v0.1.31 (proc-macro)\n        \u2502   \u251c\u2500\u2500 proc-macro2 v1.0.107\n        \u2502   \u2502   \u2514\u2500\u2500 unicode-ident v1.0.27\n        \u2502   \u251c\u2500\u2500 quote v1.0.47\n        \u2502   \u2502   \u2514\u2500\u2500 proc-macro2 v1.0.107 (*)\n        \u2502   \u2514\u2500\u2500 syn v2.0.119\n        \u2502       \u251c\u2500\u2500 proc-macro2 v1.0.107 (*)\n        \u2502       \u251c\u2500\u2500 quote v1.0.47 (*)\n        \u2502       \u2514\u2500\u2500 unicode-ident v1.0.27\n        \u2514\u2500\u2500 tracing-core v0.1.36\n            \u2514\u2500\u2500 once_cell v1.21.4\n"
+}

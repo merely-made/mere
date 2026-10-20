@@ -15,6 +15,7 @@ use std::sync::Arc;
 #[cfg(feature = "personal-sync")]
 use std::time::Duration;
 
+use armillary::tasks::ResidentTasks;
 use castellan::authority::PersonaeHost;
 #[cfg(windows)]
 use castellan::authority::STANDARD_WINDOWS_AGENT_ENDPOINT;
@@ -63,7 +64,6 @@ use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
 use graphshell_endpoint::door::local_endpoint::prepare_unix_endpoint;
 #[cfg(feature = "personal-sync")]
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
-use graphshell_endpoint::door::tasks::ResidentTasks;
 #[cfg(feature = "personal-sync")]
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{ProfileId, default_vault_dir};
@@ -1177,7 +1177,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(not(feature = "personal-sync"))]
         let app_surface: Option<djinn::door::device_broker::DeviceSurfaceHandle> = None;
         // The catalog and grants are shared with the door, so a mere ensured
-        // while it serves gets its route then (reservoir plan §7 item 20).
+        // while it serves gets its route then (reservoir plan Â§7 item 20).
         #[cfg(feature = "personal-sync")]
         let (allowed_app_routes, app_catalog) = {
             let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
@@ -1345,7 +1345,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
 
         // The loop does not leave the moment it knows how the run ended. It
         // records the outcome, asks the works to stop, and waits for them,
-        // because whichever arm ended the run — Ctrl-C or a broker failing —
+        // because whichever arm ended the run â€” Ctrl-C or a broker failing â€”
         // the ring on the other side of a lease deserves the same deliberate
         // release. `stopping` and `works_running` exist to keep a resolved
         // future from being polled again.
@@ -1470,8 +1470,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     }))
     .await;
     // Before the release checks: every spawned holder ends and lets go.
-    let ended = tasks.cancel_and_join().await;
-    tracing::info!(tasks = ended, "resident tasks cancelled and joined");
+    let ended = tasks.close_and_join().await;
+    tracing::info!(?ended, "resident task shutdown report");
+    let outcome = if ended.is_clean() {
+        outcome
+    } else {
+        Err(format!("resident task failures: {ended:?}; listener outcome: {outcome:?}").into())
+    };
 
     // The run loop borrowed the works; hand them back so the ordered shutdown
     // below is the one thing that closes them.

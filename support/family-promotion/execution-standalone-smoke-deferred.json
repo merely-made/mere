@@ -1,0 +1,7 @@
+{
+  "manifest": "crates\\cambium\\examples\\genet_web_smoke\\Cargo.toml",
+  "status": "deferred; metadata probe stopped",
+  "reason": "Legacy standalone renderer root resolves a fresh moving Genet snapshot during source refresh; preserve prior manifest pins and qualify renderer prototype separately. Required execution consumers remain in this slice.",
+  "preserved_source_manifest": "HEAD:crates/cambium/examples/genet_web_smoke/Cargo.toml",
+  "generated_cache": "Cargo-owned partial Genet source checkout retained; no source cache deleted"
+}

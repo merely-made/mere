@@ -1,0 +1,21 @@
+{
+  "base": "4d60510c",
+  "knot_revision": "806ae90f8a136acaaad9fc398fa879550f73c40d",
+  "exit_code": 0,
+  "diagnostics": "warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph\nwarning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph\nwarning: patch `dict-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `fsp-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)` was not used in the crate graph\nwarning: patch `kepler-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `moothold v0.1.0 (https://github.com/merely-made/gemot.git?rev=67ce0ac3e2b48be951a677a9eca245eaabd56d63#67ce0ac3)` was not used in the crate graph\nwarning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph\nwarning: patch `scorpion-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nwarning: patch `text-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)` was not used in the crate graph\nhelp: Check that the patched package version and available features are compatible\n      with the dependency requirements. If the patch has a different version from\n      what is locked in the Cargo.lock file, run `cargo update` to use the new\n      version. This may also occur with an optional dependency that is not enabled.\n",
+  "preparation": "Two broad resolver attempts stopped; seeded Knot commit and matching local GUI versions, then Cargo regenerated the lock. The streaming runner failed printing metadata under CP1252 after Cargo completed; this UTF-8 parse replaces that harness attempt.",
+  "promoted_sources_unchanged": false,
+  "gui_packages": [
+    {
+      "name": "cambium",
+      "version": "0.4.0",
+      "source": null
+    },
+    {
+      "name": "illume",
+      "version": "0.0.3",
+      "source": null
+    }
+  ],
+  "gui_single_local_source": true
+}

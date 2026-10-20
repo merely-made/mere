@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "run",
+    "--manifest-path",
+    "support/fixtures/armillary-consumer/Cargo.toml",
+    "--offline"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T02:03:46.879836+00:00",
+  "finished": "2026-10-20T02:03:47.977725+00:00",
+  "exit_code": 0,
+  "results": [
+    "Finished `dev` profile [unoptimized] target(s) in 0.95s",
+    "Running `C:\\t\\cargo-targets\\mere\\debug\\armillary-consumer-fixture.exe`"
+  ],
+  "diagnostic_tail": "     Locking 1 package to highest Rust 1.99.1 compatible version\n      Adding armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def)\n   Compiling armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def)\n   Compiling armillary-consumer-fixture v0.0.0 (C:\\Users\\mark_\\Code\\repos\\mere\\support\\fixtures\\armillary-consumer)\n    Finished `dev` profile [unoptimized] target(s) in 0.95s\n     Running `C:\\t\\cargo-targets\\mere\\debug\\armillary-consumer-fixture.exe`\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

@@ -7,6 +7,7 @@ target/
 # their independent platform/fixture gates are inventoried.
 Cargo.lock
 !/Cargo.lock
+!/support/fixtures/armillary-consumer/Cargo.lock
 !/crates/script/app-host/guest/Cargo.lock
 !/ports/moot/examples/capsule-library/guest/Cargo.lock
 !/crates/script/document-host/guest/Cargo.lock
