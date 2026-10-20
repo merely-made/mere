@@ -4616,6 +4616,7 @@ dependencies = [
  "eidetic",
  "eidetic-search",
  "esp",
+ "esp-test-support",
  "gemot",
  "genet-scripted-dom",
  "graphshell-endpoint",
@@ -5478,6 +5479,14 @@ dependencies = [
  "tracing",
  "wgpu",
  "zeroize",
+]
+
+[[package]]
+name = "esp-test-support"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/esp.git?rev=0ce20bf76542df8c4c1b0875b1cb04c9c2fa98af#0ce20bf76542df8c4c1b0875b1cb04c9c2fa98af"
+dependencies = [
+ "safetensors 0.4.5",
 ]
 
 [[package]]

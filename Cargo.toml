@@ -229,6 +229,8 @@ chartulary = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.
 hagiograph = { version = "0.0.1", git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 numen = { version = "0.2.0", path = "crates/conatus/numen" }
 esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+# Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
+esp-test-support = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "0ce20bf76542df8c4c1b0875b1cb04c9c2fa98af" }
 mora = "0.1.0"
 mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
