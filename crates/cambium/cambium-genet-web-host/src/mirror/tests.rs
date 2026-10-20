@@ -233,14 +233,18 @@ fn names_go_where_aria_reads_them() {
     };
     let mut field = named(4, DocumentA11yRole::TextField, "Title");
     field.value = Some("Draft".into());
+    let mut menubar = named(6, DocumentA11yRole::MenuBar, "Application");
+    menubar.children.push(DocumentA11yNodeId::new(7));
     let nodes = vec![
         named(2, DocumentA11yRole::Button, "Save"),
         named(3, DocumentA11yRole::Group, "Tools"),
         field,
         named(5, DocumentA11yRole::Unknown, "Plain words"),
+        menubar,
+        named(7, DocumentA11yRole::MenuItem, "File"),
     ];
-    let mirror = plan(&projection(&[2, 3, 4, 5], nodes), 1.0, |_, _| None);
-    let [button, group, field, plain] = mirror.as_slice() else {
+    let mirror = plan(&projection(&[2, 3, 4, 5, 6], nodes), 1.0, |_, _| None);
+    let [button, group, field, plain, menubar] = mirror.as_slice() else {
         panic!("{mirror:?}")
     };
     assert_eq!(
@@ -259,6 +263,12 @@ fn names_go_where_aria_reads_them() {
         (attr(plain, "role"), plain.text.as_deref()),
         (None, Some("Plain words"))
     );
+    assert_eq!(attr(menubar, "role"), Some("menubar"));
+    assert_eq!(attr(menubar, "aria-label"), Some("Application"));
+    assert!(menubar.text.is_none());
+    assert_eq!(menubar.children.len(), 1);
+    assert_eq!(attr(&menubar.children[0], "role"), Some("menuitem"));
+    assert_eq!(menubar.children[0].text.as_deref(), Some("File"));
 }
 
 #[test]
