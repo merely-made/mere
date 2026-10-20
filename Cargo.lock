@@ -6932,9 +6932,11 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "illume",
  "image",
  "inker",
  "insigne",
+ "knot-editor-host",
  "layout-dom-api",
  "mere",
  "mere-document-lanes",
@@ -6978,6 +6980,7 @@ dependencies = [
  "url",
  "uuid",
  "wgpu",
+ "woodshedding",
  "workbench",
  "zeroize",
 ]
@@ -20118,6 +20121,14 @@ dependencies = [
  "thiserror 2.0.21",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "woodshedding"
+version = "0.1.0"
+dependencies = [
+ "roxmltree 0.21.1",
+ "serde",
 ]
 
 [[package]]

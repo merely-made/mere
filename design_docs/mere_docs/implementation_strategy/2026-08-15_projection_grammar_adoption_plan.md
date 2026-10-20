@@ -2000,3 +2000,19 @@ claim Woodshed receiving qualification or native playback. Current command
 output is recorded in the local
 `/Users/markik/Code/output/woodshed-arrangement-playback-20261019` evidence
 directory.
+
+### Woodshed notation readings on canonical main (2026-10-19)
+
+Graphshell's editable progression blocks now consume the pure `woodshedding`
+notation model/conversion and the Woodshed-owned `woodshed-notation` leaf.
+Chart, Tab and Score read saved Set MusicXML; absent music requires an explicit
+Write notation action, which is one ordinary document edit. Hosts retain their
+own commands, attention, labels and persistence. The accepted boundary and
+trade-offs live once in
+`woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, section
+“ADR: shared notation readings in Graphshell (2026-10-19)”.
+
+Evidence and coverage limits:
+`ports/graphshell/docs/receipts/notation_readings_20261019/`. The local source
+integration uses canonical sibling checkouts; publication and a portable family
+source pin remain separate.

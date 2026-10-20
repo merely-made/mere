@@ -1,0 +1,513 @@
+warning: skipping duplicate package `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/proofs/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/system/proofs/Cargo.toml
+
+warning: skipping duplicate package `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/muniment/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/eidetic/muniment/Cargo.toml
+
+warning: skipping duplicate package `sprigging v0.2.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/sprigging/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/cambium/sprigging/Cargo.toml
+
+warning: skipping duplicate package `cambium v0.3.3 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/cambium/cambium/Cargo.toml
+
+warning: skipping duplicate package `chartulary v0.2.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/chartulary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/eidetic/chartulary/Cargo.toml
+
+warning: skipping duplicate package `mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/surface-api/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/system/surface-api/Cargo.toml
+
+warning: skipping duplicate package `workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/workbench/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/cambium/workbench/Cargo.toml
+
+warning: skipping duplicate package `meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/meristem/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/cambium/meristem/Cargo.toml
+
+warning: skipping duplicate package `cambium-winit v0.3.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/cambium/cambium-winit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/cambium/cambium-winit/Cargo.toml
+
+warning: skipping duplicate package `mere-apparatus v0.0.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/domain/apparatus/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/domain/apparatus/Cargo.toml
+
+warning: skipping duplicate package `armillary v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/armillary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/armillary/Cargo.toml
+
+warning: skipping duplicate package `mere-kernel v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/graph/graph-kernel/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/graph/graph-kernel/Cargo.toml
+
+warning: skipping duplicate package `numen v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/conatus/numen/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/conatus/numen/Cargo.toml
+
+warning: skipping duplicate package `document-canvas v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/document-canvas/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/inker/document-canvas/Cargo.toml
+
+warning: skipping duplicate package `inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/inker/inker/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/inker/inker/Cargo.toml
+
+warning: skipping duplicate package `mere-document-lanes v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/document-lanes/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/system/document-lanes/Cargo.toml
+
+warning: skipping duplicate package `pandect v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/system/pandect/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/system/pandect/Cargo.toml
+
+warning: skipping duplicate package `illume v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/nematic/illume/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/nematic/illume/Cargo.toml
+
+warning: skipping duplicate package `mere-alembic v0.0.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/distillery/alembic/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/distillery/alembic/Cargo.toml
+
+warning: skipping duplicate package `eidetic v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/eidetic-core/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/eidetic/eidetic-core/Cargo.toml
+
+warning: skipping duplicate package `incipit v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/incipit/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/d1a200b/crates/incipit/Cargo.toml
+
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)` was not used in the crate graph
+warning: patch `mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#cba46d85)` was not used in the crate graph
+warning: patch `mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#cba46d85)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+   Compiling unicode-ident v1.0.26
+   Compiling arrayvec v0.7.8
+   Compiling foldhash v0.2.0
+   Compiling bitflags v2.13.2
+   Compiling log v0.4.34
+   Compiling objc2-encode v4.1.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling scopeguard v1.2.0
+   Compiling libc v0.2.190
+   Compiling libm v0.2.16
+   Compiling once_cell v1.21.4
+   Compiling siphasher v1.0.4
+   Compiling rustc-hash v1.1.0
+   Compiling serde_json v1.0.151
+   Compiling bit-vec v0.9.1
+   Compiling unicode-width v0.2.2
+   Compiling proc-macro2 v1.0.107
+   Compiling writeable v0.6.4
+   Compiling lock_api v0.4.14
+   Compiling hashbrown v0.17.1
+   Compiling litemap v0.8.3
+   Compiling new_debug_unreachable v1.0.6
+   Compiling phf_shared v0.13.1
+   Compiling serde_bytes v0.11.19
+   Compiling raw-window-handle v0.6.2
+   Compiling utf8_iter v1.0.4
+   Compiling objc2 v0.6.4
+   Compiling codespan-reporting v0.13.1
+   Compiling bit-set v0.10.0
+   Compiling tracing-core v0.1.36
+   Compiling libloading v0.8.9
+   Compiling precomputed-hash v0.1.1
+   Compiling icu_properties_data v2.3.0
+   Compiling polycool v0.4.0
+   Compiling wgpu-core v30.0.1
+   Compiling phf_generator v0.13.1
+   Compiling const-oid v0.10.2
+   Compiling futures-core v0.3.34
+   Compiling quote v1.0.47
+   Compiling png v0.18.1
+   Compiling phf_codegen v0.13.1
+   Compiling icu_normalizer_data v2.3.0
+   Compiling tendril v0.5.1
+   Compiling wgpu v30.0.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling allocator-api2 v0.2.21
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling string_cache_codegen v0.6.1
+   Compiling indexmap v2.14.2
+   Compiling getrandom v0.4.3
+   Compiling jobserver v0.1.35
+   Compiling simdutf8 v0.1.5
+   Compiling uuid v1.27.0
+   Compiling num-traits v0.2.19
+   Compiling crypto-common v0.2.2
+   Compiling web_atoms v0.2.6
+   Compiling cc v1.6.0
+   Compiling hashbrown v0.16.1
+   Compiling byteorder v1.5.0
+   Compiling either v1.18.0
+   Compiling objc2-core-foundation v0.3.2
+   Compiling block2 v0.6.2
+   Compiling crossbeam-epoch v0.9.21
+   Compiling fnv v1.0.7
+   Compiling percent-encoding v2.3.2
+   Compiling unicode-segmentation v1.13.3
+   Compiling heapless v0.7.17
+   Compiling object v0.39.1
+   Compiling num-integer v0.1.47
+   Compiling form_urlencoded v1.2.2
+   Compiling anyhow v1.0.104
+   Compiling hash32 v0.2.1
+   Compiling digest v0.11.3
+   Compiling crossbeam-deque v0.8.8
+   Compiling spin v0.9.9
+   Compiling as-slice v0.2.1
+   Compiling icu_locale_fallback_data v2.3.0
+   Compiling sha2 v0.11.0
+   Compiling num-bigint v0.4.8
+   Compiling rayon-core v1.13.0
+   Compiling aligned v0.4.3
+   Compiling no_std_io2 v0.9.4
+   Compiling aho-corasick v1.1.5
+   Compiling nom v8.0.0
+   Compiling y4m v0.8.0
+   Compiling objc-sys v0.3.5
+   Compiling core_detect v1.0.0
+   Compiling pollster v1.0.1
+   Compiling bitstream-io v4.10.0
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling icu_segmenter_data v2.3.0
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling itertools v0.14.0
+   Compiling memmap2 v0.9.11
+   Compiling rayon v1.12.0
+   Compiling blake3 v1.8.7
+   Compiling libz-sys v1.1.29
+   Compiling simd_helpers v0.1.0
+   Compiling objc2-foundation v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling objc2-core-text v0.3.2
+   Compiling dtoa v1.0.11
+   Compiling imgref v1.12.3
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling parlance v0.1.0
+   Compiling regex-automata v0.4.18
+   Compiling quick-error v2.0.1
+   Compiling num-rational v0.4.2
+   Compiling brotli-decompressor v5.0.3
+   Compiling loop9 v0.1.5
+   Compiling dtoa-short v0.3.5
+   Compiling stacker v0.1.25
+   Compiling avif-serialize v0.8.9
+   Compiling pxfm v0.1.30
+   Compiling byteorder-lite v0.1.0
+   Compiling zune-core v0.5.3
+   Compiling color_quant v1.1.0
+   Compiling weezl v0.1.12
+   Compiling rgb v0.8.53
+   Compiling bytes v1.12.1
+   Compiling fontsan v0.7.0
+   Compiling zune-jpeg v0.5.15
+   Compiling image-webp v0.2.4
+   Compiling gif v0.14.2
+   Compiling objc2 v0.5.2
+   Compiling genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling synstructure v0.14.0
+   Compiling wuff v0.2.9
+   Compiling maybe-rayon v0.1.1
+   Compiling universal-hash v0.6.1
+   Compiling wuff-capi v0.2.0
+   Compiling cipher v0.5.2
+   Compiling core-foundation-sys v0.8.7
+   Compiling workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling jotdown v0.10.0
+   Compiling dispatch v0.2.0
+   Compiling anymore v1.0.0
+   Compiling core-foundation v0.9.4
+   Compiling mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling poly1305 v0.9.1
+   Compiling ar_archive_writer v0.5.3
+   Compiling zerocopy-derive v0.8.59
+   Compiling profiling-procmacros v1.0.18
+   Compiling phf_macros v0.13.1
+   Compiling tracing-attributes v0.1.31
+   Compiling enumn v0.1.14
+   Compiling equator-macro v0.4.2
+   Compiling zeroize_derive v1.5.0
+   Compiling profiling v1.0.18
+   Compiling arg_enum_proc_macro v0.3.4
+   Compiling num-derive v0.4.2
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.1
+   Compiling thiserror-impl v2.0.21
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling phf v0.13.1
+   Compiling equator v0.4.2
+   Compiling tracing v0.1.44
+   Compiling zeroize v1.9.0
+   Compiling psm v0.1.32
+   Compiling logos-codegen v0.16.1
+   Compiling ptr_meta_derive v0.3.2
+   Compiling zerocopy v0.8.59
+   Compiling cssparser-macros v0.7.1
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling zerofrom v0.1.8
+   Compiling bytemuck v1.25.2
+   Compiling thiserror v2.0.21
+   Compiling ptr_meta v0.3.2
+   Compiling moxcms v0.8.1
+   Compiling async-trait v0.1.92
+   Compiling aligned-vec v0.6.4
+   Compiling curve25519-dalek v5.0.0
+   Compiling bytecheck_derive v0.8.3
+   Compiling v_frame v0.3.9
+   Compiling av1-grain v0.2.5
+   Compiling block2 v0.5.1
+   Compiling logos-derive v0.16.1
+   Compiling meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling chacha20 v0.10.2
+   Compiling objc2-foundation v0.2.2
+   Compiling logos v0.16.1
+   Compiling foreign-types-macros v0.2.4
+   Compiling serde v1.0.229
+   Compiling yoke v0.8.3
+   Compiling naga-types v30.0.1
+   Compiling cobs v0.3.0
+   Compiling av-scenechange v0.14.1
+   Compiling objc2-metal v0.3.2
+   Compiling thiserror-impl v1.0.69
+   Compiling munge_macro v0.4.7
+   Compiling wgpu-types v30.0.1
+   Compiling font-types v0.12.6
+   Compiling font-types v0.11.3
+   Compiling read-fonts v0.41.0
+   Compiling rancor v0.1.3
+   Compiling read-fonts v0.39.2
+   Compiling bytecheck v0.8.3
+   Compiling illume v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling smallvec v1.16.2
+   Compiling euclid v0.22.14
+   Compiling linebender_resource_handle v0.1.1
+   Compiling parking_lot_core v0.9.12
+   Compiling kurbo v0.13.1
+   Compiling parking_lot v0.12.5
+   Compiling color v0.3.3
+   Compiling string_cache v0.9.0
+   Compiling accesskit v0.24.1
+   Compiling half v2.7.1
+   Compiling futures-intrusive v0.5.0
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling naga v30.0.1
+   Compiling guillotiere v0.7.0
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling mere-curation v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling sceno v0.0.5 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling markup5ever v0.39.0
+   Compiling peniko v0.6.1
+   Compiling app_units v0.7.8
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling icu_provider v2.3.1
+   Compiling objc2-quartz-core v0.3.2
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling icu_locale_fallback v2.3.0
+   Compiling tinct v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling raw-window-metal v1.1.0
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling postcard v1.1.3
+   Compiling scenograph v0.0.4 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling encoding_rs v0.8.42
+   Compiling icu_segmenter v2.3.0
+   Compiling rav1e v0.8.1
+   Compiling command-menu v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling petgraph v0.8.3
+   Compiling cssparser v0.37.0
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling idna_adapter v1.2.2
+   Compiling parley_data v0.10.0
+   Compiling idna v1.1.0
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling url v2.5.8
+   Compiling ed25519-dalek v3.0.0
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling slotmap v1.1.1
+   Compiling safe_arch v1.2.0
+   Compiling generic-array v0.14.7
+   Compiling aead v0.6.1
+   Compiling skrifa v0.44.0
+   Compiling harfrust v0.8.4
+   Compiling scenomise v0.0.5 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling skrifa v0.42.1
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling approx v0.5.1
+   Compiling foreign-types-shared v0.3.1
+   Compiling bitflags v1.3.2
+   Compiling data-url v0.3.2
+   Compiling backstep v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling core-graphics-types v0.1.3
+   Compiling foreign-types v0.5.0
+   Compiling wide v1.7.1
+   Compiling chacha20poly1305 v0.11.0
+   Compiling objc2-app-kit v0.2.2
+   Compiling rend v0.5.4
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling wgpu-hal v30.0.1
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling ravif v0.13.0
+   Compiling thiserror v1.0.69
+   Compiling munge v0.4.7
+   Compiling rkyv_derive v0.8.18
+   Compiling getrandom v0.3.4
+   Compiling num-complex v0.4.6
+   Compiling winit v0.30.13
+   Compiling web-time v1.1.0
+   Compiling slab v0.4.12
+   Compiling rawpointer v0.2.1
+   Compiling strum_macros v0.28.0
+   Compiling image v0.25.10
+   Compiling wgpu-core-deps-apple v30.0.1
+   Compiling matrixmultiply v0.3.11
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling rkyv v0.8.18
+   Compiling core-graphics v0.23.2
+   Compiling glam v0.33.12
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling nalgebra-macros v0.3.0
+   Compiling ciborium-io v0.2.2
+   Compiling cursor-icon v1.2.0
+   Compiling dpi v0.1.2
+   Compiling smol_str v0.2.2
+   Compiling unicase v2.10.0
+   Compiling ciborium-ll v0.2.2
+   Compiling mime_guess v2.0.5
+   Compiling digest v0.10.7
+   Compiling strum v0.28.0
+   Compiling grid v1.0.1
+   Compiling simba v0.10.2
+   Compiling cpufeatures v0.2.17
+   Compiling robust v1.2.0
+   Compiling chartulary v0.2.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling sha2 v0.10.9
+   Compiling spade v2.15.1
+   Compiling numen v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling ciborium v0.2.2
+   Compiling accesskit_consumer v0.38.0
+   Compiling futures-macro v0.3.34
+   Compiling num-derive v0.5.1
+   Compiling ordered-float v5.5.0
+   Compiling cfb v0.7.3
+   Compiling ena v0.14.4
+   Compiling futures-task v0.3.34
+   Compiling unicode-bidi v0.3.18
+   Compiling regex-syntax v0.8.11
+   Compiling deranged v0.5.8
+   Compiling mime v0.3.17
+   Compiling num-conv v0.2.2
+   Compiling powerfmt v0.2.1
+   Compiling time-core v0.1.9
+   Compiling downcast-rs v2.0.2
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling infer v0.19.0
+   Compiling futures-util v0.3.34
+   Compiling woodshedding v0.1.0 (/Users/markik/Code/repos/woodshed/crates/woodshedding)
+   Compiling mere-forme v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling accesskit_macos v0.26.3
+   Compiling hocket-model v0.1.0 (/Users/markik/Code/repos/woodshed/crates/hocket-model)
+   Compiling inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling time v0.3.55
+   Compiling tabard v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling nalgebra v0.35.0
+   Compiling scenotime v0.0.4 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling crossbeam-channel v0.5.17
+   Compiling lazy_static v1.5.1
+   Compiling hound v3.5.1
+   Compiling sharded-slab v0.1.7
+   Compiling mere-kernel v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling hocket-project v0.1.0 (/Users/markik/Code/repos/woodshed/crates/hocket-project)
+   Compiling matchers v0.2.0
+   Compiling mere-fleece v0.0.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling objc2-core-image v0.3.2
+   Compiling objc2-cloud-kit v0.3.2
+   Compiling objc2-core-data v0.3.2
+   Compiling armillary v0.1.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling objc2-core-video v0.3.2
+   Compiling tracing-log v0.2.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling thread_local v1.1.10
+   Compiling base64 v0.22.1
+   Compiling nu-ansi-term v0.50.3
+   Compiling objc2-app-kit v0.3.2
+   Compiling dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#cf562f47)
+   Compiling tracing-subscriber v0.3.23
+   Compiling hocket-recorder v0.1.0 (/Users/markik/Code/repos/woodshed/crates/hocket-recorder)
+   Compiling chirograph v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling woodshed-graph v0.1.0 (/Users/markik/Code/repos/woodshed/crates/woodshed-graph)
+   Compiling esp v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling emblem v0.2.0
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling light-file-dialog v3.21.3
+   Compiling woodshed-core v0.1.0 (/Users/markik/Code/repos/woodshed/crates/woodshed-core)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling sprigging v0.2.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling cambium v0.3.3 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling woodshed-notation v0.1.0 (/Users/markik/Code/repos/woodshed/crates/woodshed-notation)
+   Compiling glamx v0.3.1
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?rev=e8cda06efc11c11595f2fa1bb30bce7e72979537#e8cda06e)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling parry2d v0.31.1
+   Compiling document-canvas v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling cambium-winit v0.3.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling mere-document-lanes v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling hocket-views v0.1.0 (/Users/markik/Code/repos/woodshed/crates/hocket-views)
+   Compiling rapier2d v0.36.0
+   Compiling mere-cartography v0.0.2 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling mere-persona-picker v0.0.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#917f88e6)
+   Compiling tabard-workshop v0.0.1 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling cambium-rootstock v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling cambium-winit-a11y v0.3.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling seiche v0.0.6 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling pictograph v0.2.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling cambium-genet-winit-host v0.1.0 (https://github.com/merely-made/mere.git?branch=main#d1a200b1)
+   Compiling woodshed-views v0.1.0 (/Users/markik/Code/repos/woodshed/crates/woodshed-views)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4m 05s
+     Running unittests src/lib.rs (target/build/debug/deps/woodshed_views-864535249b569de5)
+
+running 1 test
+test stage::notation_reading::tests::readings_and_attention_do_not_author_and_corrupt_music_is_retained ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 243 filtered out; finished in 0.40s
+
