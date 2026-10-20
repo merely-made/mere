@@ -1,0 +1,260 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -470,0 +471 @@
++cambium = { path = "/Users/markik/Code/testing/mere/hest-h2-20261020/cambium-receiving-current" }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1652 +1651,0 @@
+-source = "git+https://github.com/merely-made/mere.git?branch=main#dffcc9c806457319d3f748477bff6327f220b085"
+@@ -1655 +1654 @@
+- "command-menu",
++ "hest",
+@@ -5618,0 +5618,7 @@
++
++[[package]]
++name = "hest"
++version = "0.2.0"
++dependencies = [
++ "serde",
++]
+--- a/.cargo/config.toml
++++ b/.cargo/config.toml
+@@ -2 +2 @@
+-build-dir = "{workspace-root}/target/build"
++build-dir = "/Users/markik/Code/testing/mere/hest-h1-20261020/target/build"
+--- a/src/action.rs
++++ b/src/action.rs
+@@ -29,0 +30,3 @@
++
++mod command_metadata;
++pub(crate) use command_metadata::command_metadata;
+--- a/src/app/palette.rs
++++ b/src/app/palette.rs
+@@ -320 +320,2 @@
+-            let command = match shared.and_then(cambium::catalogue::command) {
++            let (effect, destructive) = crate::action::command_metadata(&action);
++            let mut command = match shared.and_then(cambium::catalogue::command) {
+@@ -328 +329 @@
+-                    cambium::Command::new(label.clone(), label.clone(), category)
++                    cambium::Command::new(label.clone(), label.clone(), category, effect)
+@@ -330,0 +332,2 @@
++            command.effect = effect;
++            command.destructive = destructive;
+@@ -902,0 +906,26 @@
++    fn offered_actions_carry_the_hosts_effect_and_destructive_declarations() {
++        use cambium::{EffectClass, catalogue::ids};
++        let app = App::test_stub();
++        let catalog = app.command_catalog();
++        // Exercise actual static and contextual registrations, including the
++        // fallback constructor for Turnstone-owned ids.
++        assert!(!catalog.actions.is_empty());
++        for (id, action) in &catalog.actions {
++            let offered = catalog.set.get(id).expect("each action is offered");
++            assert_eq!(
++                (offered.effect, offered.destructive),
++                crate::action::command_metadata(action),
++                "metadata must follow the exact offered Action: {id}"
++            );
++        }
++        let delete = catalog.set.get(ids::NODE_DELETE).unwrap();
++        assert_eq!((delete.effect, delete.destructive), (EffectClass::DomainTruth, true));
++        let fit = catalog.set.get(ids::VIEW_FIT).unwrap();
++        assert_eq!((fit.effect, fit.destructive), (EffectClass::Curation, false));
++        let save = catalog.set.get(ids::SESSION_SAVE).unwrap();
++        assert_eq!((save.effect, save.destructive), (EffectClass::ExternalEffect, false));
++        assert_eq!(crate::action::command_metadata(&Action::EmptyRecycleBin), (EffectClass::DomainTruth, true));
++        assert_eq!(crate::action::command_metadata(&Action::CloseSession), (EffectClass::DomainTruth, true));
++    }
++
++    #[test]
+--- /dev/null
++++ b/src/action/command_metadata.rs
+@@ -0,0 +1,188 @@
++// Copyright 2026 Mark Alan Boykin
++// This Source Code Form is subject to the terms of the Mozilla Public
++// License, v. 2.0. If a copy of the MPL was not distributed with this
++// file, You can obtain one at https://mozilla.org/MPL/2.0/.
++// SPDX-License-Identifier: MPL-2.0
++
++//! Host declarations for offered commands. The reducer and ring gates retain
++//! execution authority; this metadata does not grant permission or add a
++//! confirmation flow. Effect class describes the semantic operation rather
++//! than incidental saving of local view state.
++
++use super::Action;
++use cambium::EffectClass;
++
++/// Every new Action requires an explicit effect-class decision here.
++pub(crate) fn command_metadata(action: &Action) -> (EffectClass, bool) {
++    let effect = match action {
++        Action::ContentNavigationCommitted { .. }
++        | Action::ContentTitleChanged { .. }
++        | Action::KeepNode { .. }
++        | Action::SetNodeSprite { .. }
++        | Action::ResearchNoteCreated { .. }
++        | Action::ForkNode { .. }
++        | Action::ForkFocusedNode
++        | Action::NewSession
++        | Action::CloseSession
++        | Action::DeleteFocusedNode
++        | Action::RecoverDeletedNode(..)
++        | Action::EmptyRecycleBin
++        | Action::WriteNote { .. }
++        | Action::RecoverSession(..) => EffectClass::DomainTruth,
++        Action::OpenAddress(..)
++        | Action::CapturePage { .. }
++        | Action::CaptureSourceDocument { .. }
++        | Action::RetrySourceDocumentCapture { .. }
++        | Action::OpenSavedSource(..)
++        | Action::ChoosePermission { .. }
++        | Action::SubmitAuthentication { .. }
++        | Action::CancelAuthentication { .. }
++        | Action::NavBack
++        | Action::NavForward
++        | Action::Reload
++        | Action::Stop
++        | Action::SubscribeFocusedFeed { .. }
++        | Action::RefreshFeeds
++        | Action::SaveSession
++        | Action::FoundPlace { .. }
++        | Action::ExportPlaceCard { .. }
++        | Action::RefreshPlaceContact { .. }
++        | Action::ReconnectPlaceWithCard { .. }
++        | Action::OfferPlacePrekey { .. }
++        | Action::OfferPlacePrekeyForCard { .. }
++        | Action::InviteToPlace { .. }
++        | Action::InviteToPlaceWithPrekey { .. }
++        | Action::RevokePlaceMember { .. }
++        | Action::JoinPlaceFile { .. }
++        | Action::JoinPlace(..)
++        | Action::LeavePlace
++        | Action::ReconnectPlace
++        | Action::RejoinPlace
++        | Action::CopyLocalRendezvous
++        | Action::SendPlaceMessage { .. }
++        | Action::ShareFocusedNode
++        | Action::ResyncPlace
++        | Action::ToggleNodeContent
++        | Action::RepeatShellEntry(..)
++        | Action::OpenShellEntryTarget(..)
++        | Action::OpenAnswers
++        | Action::NewResearchNote
++        | Action::OpenResearchNote
++        | Action::ChooseResearchNote { .. }
++        | Action::CommitResearchNote { .. }
++        | Action::ChooseKnotDocumentFile { .. }
++        | Action::ChooseClipPackageFile
++        | Action::RetainProducerSelection { .. }
++        | Action::ImportClipPackage(..)
++        | Action::ChooseClipExportFile
++        | Action::ExportClipPackage { .. }
++        | Action::InstallDenizen { .. }
++        | Action::ConfirmInstallDenizen
++        | Action::UninstallDenizen { .. }
++        | Action::RunDenizen { .. } => EffectClass::ExternalEffect,
++        Action::OpenThemeWorkshop
++        | Action::ComposeFocusedSmolwebSubmission
++        | Action::ComposeFocusedMicronForm
++        | Action::BeginSmolwebSubmission { .. }
++        | Action::SmolwebSubmissionFile { .. }
++        | Action::OpenDocumentFind
++        | Action::CloseDocumentFind
++        | Action::InsertDocumentFind(..)
++        | Action::BackspaceDocumentFind
++        | Action::StepDocumentFind(..)
++        | Action::PageZoomIn { .. }
++        | Action::PageZoomOut { .. }
++        | Action::PageZoomReset { .. }
++        | Action::SearchSavedSources
++        | Action::FocusAuthenticationField(..)
++        | Action::InsertAuthentication(..)
++        | Action::BackspaceAuthentication
++        | Action::ToggleAuthenticationMemory
++        | Action::UnsubscribeFocusedFeed
++        | Action::MarkFocusedFeedEntryRead
++        | Action::NewWindow
++        | Action::TearOutActivePane
++        | Action::FloatActivePane
++        | Action::DockActivePane
++        | Action::ReturnActivePaneToPrimary
++        | Action::SetViewerOverride { .. }
++        | Action::ReseedLayout
++        | Action::ResetToSeed
++        | Action::SetSeed
++        | Action::RestoreRecipeSeed
++        | Action::ToggleForegroundPin
++        | Action::DismissRetained
++        | Action::GrowTiles
++        | Action::ShrinkTiles
++        | Action::FoldSelection
++        | Action::ExpandFold
++        | Action::ExpandAllFolds
++        | Action::UndoFold
++        | Action::RedoFold
++        | Action::FitView
++        | Action::SetLayoutStrategy(..)
++        | Action::SetPhysicsLaw(..)
++        | Action::SetPhysicsOverlay(..)
++        | Action::SetPhysicsKindSource(..)
++        | Action::SetPhysicsMassSource(..)
++        | Action::SetPhysicsDepthSource(..)
++        | Action::ApplyPhysicsProfile(..)
++        | Action::ToggleIsometric
++        | Action::OrbitBy(..)
++        | Action::TiltBy(..)
++        | Action::ToggleHeightByDegree
++        | Action::TogglePhysics
++        | Action::ToggleSizeByRecency
++        | Action::BeginFoundPlace
++        | Action::BeginExportPlaceCard
++        | Action::BeginRefreshPlaceContact
++        | Action::BeginOfferPlacePrekey
++        | Action::BeginInviteToPlace
++        | Action::BeginInviteToPlaceAsReader
++        | Action::BeginJoinPlaceFile
++        | Action::BeginSendPlaceMessage
++        | Action::ShowPlaceStatus
++        | Action::SetPlaceCollection(..)
++        | Action::SearchCapturedPages
++        | Action::OmnibarOpen { .. }
++        | Action::OmnibarClose
++        | Action::OmnibarChar(..)
++        | Action::OmnibarInsert(..)
++        | Action::OmnibarBackspace
++        | Action::OmnibarDelete
++        | Action::OmnibarCaret(..)
++        | Action::OmnibarMove(..)
++        | Action::OmnibarCommit
++        | Action::OmnibarCommitRow(..)
++        | Action::OmnibarShowAllCommands
++        | Action::OmnibarToggleKeepRow(..)
++        | Action::OmnibarToggleKeepSelected
++        | Action::SummonPane(..)
++        | Action::SetAnswerSelection { .. }
++        | Action::SummonContributedPane { .. }
++        | Action::CloseActivePane
++        | Action::OuterWorkspace { .. }
++        | Action::SetActivePaneDivider(..)
++        | Action::SetSplitRatio { .. }
++        | Action::ToggleMaximizePane
++        | Action::TogglePaneSection { .. }
++        | Action::MovePaneSection { .. }
++        | Action::OpenInWorkbench
++        | Action::TearOutTile { .. }
++        | Action::SwitchSession(..)
++        | Action::BeginRenameSession
++        | Action::RenameSession { .. }
++        | Action::CancelInstallDenizen
++        | Action::WorkbenchActivate(..)
++        | Action::CloseWorkbenchTile
++        | Action::WorkbenchStackOnto { .. }
++        | Action::WorkbenchSplitBeside { .. }
++        | Action::WorkbenchSplitOut { .. }
++        | Action::WorkbenchSetFractions { .. } => EffectClass::Curation,
++    };
++    let destructive = matches!(
++        action,
++        Action::DeleteFocusedNode | Action::EmptyRecycleBin | Action::CloseSession
++    );
++    (effect, destructive)
++}

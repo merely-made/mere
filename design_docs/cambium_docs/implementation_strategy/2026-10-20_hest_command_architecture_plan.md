@@ -2,9 +2,11 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** H1 implemented and qualified locally; publication and
-push are explicitly deferred. `hest` 0.1.0 and the `command-menu` 0.1.1 shim are
-local candidates. Published releases remain `hest` 0.0.1, `command-menu` 0.1.0,
+**Status (2026-10-20):** H1 and H2 implemented and qualified locally; push and
+publication remain explicitly deferred. Hest 0.1.0, its `command-menu` 0.1.1
+shim and the separate Hest 0.2.0 API are local candidates. The actual Turnstone
+receiving patch is qualified in isolation; canonical adoption remains a
+delivery gate. Published releases remain `hest` 0.0.1, `command-menu` 0.1.0,
 and Cambium 0.4.0.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
@@ -103,6 +105,8 @@ The port law applies: a piece moves only when a second host exercises it. A pure
 
 ## Findings (2026-10-20)
 
+### H1 historical qualification
+
 - The four public types live in `crates/cambium/hest/src/menu/mod.rs` and
   `crates/cambium/hest/src/menu/session.rs`; the entire catalogue lives in
   `crates/cambium/hest/src/catalogue.rs`. Only module imports and one intra-doc
@@ -118,7 +122,7 @@ The port law applies: a piece moves only when a second host exercises it. A pure
   model (`viewer_commands::tests`, through the port's `web` feature) and
   Turnstone's actual palette (`app::palette::command_menu_tests`). The compact
   Cambium harness remains a separate rendering/input receipt.
-- Turnstone's current `main` was fetched as
+- At the H1 start, Turnstone's `main` was fetched as
   `e94e7381b39ebc1927d4bf258d3c92787f9abeca` and exported into an isolated
   fixture. All 244 Rust files are byte-identical to that commit. Its locked
   Cambium 0.3.3 at Mere `48fd3385` exercises Hest through the shim; the separate
@@ -128,27 +132,72 @@ The port law applies: a piece moves only when a second host exercises it. A pure
   differ from the consumer's lock; every unrelated entry is byte-identical.
   The manifest/lock patch and source hashes are retained in the receipt.
 
+### H2 declaration boundary
+
+- `crates/cambium/hest/src/menu/mod.rs` requires an explicit `EffectClass`
+  when constructing a command and carries an independent `destructive` flag.
+  The 36 catalogue ids and labels remain unchanged. Their declared effects
+  flow into offered commands, including disabled and searched rows. Storage
+  remains `CommandChoices`; its field names and defaults are unchanged.
+- `crates/chirograph/src/command_effect.rs` owns exhaustive conversions in
+  both directions. All three effect variants round-trip with identical Serde
+  representation; Hest imports no Chirograph or graph types.
+- `crates/system/ux-events/src/ux_probes/destructive_action_gate.rs` now
+  receives the offered `CommandSet`. It reads each dispatched id's destructive
+  flag while retaining its existing one-use confirmation-grant semantics.
+  Controls flip the flag on an unchanged id to prove the declaration supplies
+  the fact. This probe is observational; it does not enact or authorize actions.
+- The H2 Turnstone exercise uses consumer `c889038` and its locked Mere
+  `dffcc9c8` cohort. It changes the actual palette to register every offered
+  `Action` with host-owned metadata; an exhaustive match classifies all 164
+  action variants. Delete node, empty recycle bin and close session are
+  declared destructive. The reducer and ring/confirmation policies are unchanged.
+- Turnstone's fixture adapts only Cambium's command dependency, re-export and
+  `From<&Command>` path to Hest 0.2. All 74 other Cambium Rust files, 242 of
+  Turnstone's 244 existing Rust files and all 1,670 unrelated consumer lock
+  entries are unchanged. The two modified receiver files and new declaration
+  module are retained as an applicable patch, not a canonical Turnstone commit.
+- Hest 0.1.0 is frozen byte-for-byte in `crates/cambium/hest-0_1`; Cargo
+  resolves the shim to it and current consumers to 0.2.0. The compatibility
+  fixture still uses immutable registry Cambium 0.4.0 and only overrides the
+  two H1 candidates. A future Cambium release exposing Hest 0.2 must advance
+  its own breaking version and the affected facade requirements before
+  publication; those facade releases are not prepared by this phase.
+
 ### Reproduce the bounded checks
 
 Commands below are ready to run from the Mere repository root:
 
 ```sh
-cargo test --locked -p hest -p command-menu
+cargo test --locked -p hest@0.2.0 -p command-menu
+cargo test --locked --manifest-path crates/cambium/hest-0_1/Cargo.toml
+cargo test --locked -p ux-events --lib
+cargo test --locked -p chirograph --lib command_effect::
 cargo test --locked -p mere-kernel --lib tests::actions
 cargo test --locked -p mere-registry --no-default-features --features input --lib input::
 cargo test --locked -p cambium-genet-winit-host --test command_menu_compact
+cargo test --locked -p cambium-genet-winit-host --test accessibility
 cargo test --locked -p graphshell --no-default-features --features web --lib viewer_commands::tests
+cargo test --locked -p graphshell --no-default-features --features web --test command_declarations
 cargo test --locked -p pandect --lib a_view_set_now_waits_for_the_next_batch
 cargo test --locked --manifest-path support/fixtures/hest-h1-compatibility/Cargo.toml
-RUSTDOCFLAGS='-D rustdoc::broken_intra_doc_links' cargo doc --locked -p hest -p command-menu --no-deps
+RUSTDOCFLAGS='-D rustdoc::broken_intra_doc_links' cargo doc --locked -p hest@0.2.0 -p command-menu --no-deps
+cargo check --locked --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown --no-default-features --features presentation-webgpu
 ```
 
-For Turnstone, export the named consumer commit, apply the retained fixture
-patch there with `git apply --unidiff-zero`, and run `cargo test --locked --offline --lib app::palette::command_menu_tests`.
-The fixture patch uses this workspace's absolute shim path; adjust it when
-reproducing elsewhere. Keep the consumer Rust source and unrelated locked
-packages unchanged. These receipts cover CPU model/integration and headless
-rendering; desktop/browser presentation and native restart were not exercised.
+For H2 Turnstone, export consumer `c889038` into an isolated directory and
+export its Cambium crate at locked Mere `dffcc9c8` into a second directory.
+Apply the [Cambium adapter patch](../../../support/receipts/hest-h2-20261020/cambium-adapter.patch)
+there and the [Turnstone fixture patch](../../../support/receipts/hest-h2-20261020/turnstone-fixture.patch)
+to the consumer, using `git apply --unidiff-zero` for both. Adjust the absolute
+local paths in these prepublication patches for another workspace, including
+the build cache path. Then run `cargo metadata --locked --offline` and
+`cargo test --locked --offline --lib app::palette::command_menu_tests`.
+The [source/lock proof](../../../support/receipts/hest-h2-20261020/turnstone-source.json)
+records the exact dependency chain and finite source changes. H1's original
+patch instead applies to its named `e94e738` consumer and the H1 supplier tree.
+These receipts cover CPU model/integration and headless rendering;
+desktop/browser presentation and native restart were not exercised.
 
 ## Progress (2026-10-20)
 
@@ -172,5 +221,44 @@ rendering; desktop/browser presentation and native restart were not exercised.
   original batch-95 status line was repaired, and a new scoped H1 judgment
   records this continuation. Repository-wide documentation findings outside
   this work remain; no full-tree clean audit is claimed.
-- H1 is ready as a local commit. Push, publication, registry-only new-version
-  resolution and native/browser presentation remain deferred. H2 has not begun.
+- H1 was committed locally, then rebased to `a68de7098` over fetched main
+  `42baea78b`. Only the batch-95 D2 record needed conflict resolution; no product
+  source conflicted. Fresh reconciliation checks pass: 45 model/integration
+  tests, including eight existing accessibility checks, plus the three
+  published-Cambium shim checks. The original Turnstone receipt retains its
+  original consumer revision and is not represented as a fresh canonical repin.
+- H2 began on the 0.2.0 line. The 0.1.0 source is frozen in
+  `crates/cambium/hest-0_1`, an excluded standalone package, while the active
+  workspace Hest advances to 0.2.0. The shim continues to depend on 0.1.x.
+  This bounded compatibility source is needed until the two unpublished H1
+  candidates can be delivered without breaking published Cambium 0.4.0.
+  H2's two exercises are the declaration-driven `ux-events` probe and an
+  isolated Turnstone receiver; canonical Turnstone changes remain separate.
+- Push, publication, registry-only new-version resolution and native/browser
+  presentation remain deferred.
+
+- **Second reconciliation:** main advanced during qualification. Both local
+  commits were rebased onto fetched Mere `b10ae5f88`; H1 is now `cea6d09b2`.
+  The only conflicts were lockfile rows adding Hest beside upstream Illume;
+  both dependencies were retained. Turnstone independently committed its
+  AccessKit cohort update as `c889038`; the receiving export was refreshed to
+  it before the final checks. No canonical Turnstone source was edited.
+- **H2 local qualification:** 118 tests pass, zero fail: Hest 0.2 model (15),
+  declaration-driven probe (40), Chirograph effect round trip (1), kernel
+  actions (3), registry input (14), compact menu (1), accessibility (8),
+  Graphshell retained viewer (5), actual browser-page declarations (1),
+  Pandect stored choices (1), frozen Hest 0.1 model (13), published-Cambium
+  shim compatibility (3), and actual Turnstone palette (13). The standalone
+  WebGPU/Wasm source check and strict Rustdoc links pass. All final test and
+  source checks use locked dependencies; the newly referenced upstream
+  Woodshed revision was fetched before retrying the offline checks.
+- [H2 qualification](../../../support/receipts/hest-h2-20261020/qualification.json),
+  [command outcomes](../../../support/receipts/hest-h2-20261020/checks.json),
+  [tested source](../../../support/receipts/hest-h2-20261020/tested-source.json),
+  [frozen H1 source](../../../support/receipts/hest-h2-20261020/h1-frozen-source.json)
+  and [receiving proof](../../../support/receipts/hest-h2-20261020/turnstone-source.json)
+  retain the evidence. The original H1 receipts remain historical, with their
+  original source basis; their 52-test total is not added to the H2 count.
+- H3 invocation/outcome and H4 scripting are unstarted. Push, publication,
+  facade release preparation, canonical Turnstone adoption and native/browser
+  presentation remain explicit delivery or later-phase gates.

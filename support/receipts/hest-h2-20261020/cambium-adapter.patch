@@ -1,0 +1,61 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -4,3 +4 @@
+-description = "A Meristem backend and application toolkit for Genet"
+-edition.workspace = true
+-
++edition = "2024"
+@@ -9,2 +7,3 @@
+-repository.workspace = true
+-publish = true
++publish = false
++
++[workspace]
+@@ -16,20 +15,14 @@
+-# The generic undo History; EditHistory is the text field's instance of it.
+-backstep = { workspace = true }
+-# The command set, the person's choices and a palette's state (SE45 to SE48).
+-command-menu = { workspace = true }
+-meristem = { version = "0.2.0", path = "../meristem" }
+-sprigging = { version = "0.2.2", path = "../sprigging" }
+-sceno = { workspace = true }
+-scenograph = { workspace = true }
+-scenomise = { workspace = true }
+-genet-scripted-dom = { workspace = true }
+-# Cambium also renders host settings and surface descriptors, which remain
+-# product-neutral Genet host contracts rather than workspace vocabulary.
+-mere-surface-api = { workspace = true }
+-# The pane-frame contract Frisket renders. Its host effects remain for the
+-# embedding shell to interpret, while the component owns one vocabulary.
+-workbench = { workspace = true }
+-layout_dom_api = { workspace = true }
+-genet-text = { workspace = true }
+-illume = { workspace = true, optional = true }
+-tinct = { workspace = true, optional = true }
++backstep = { version = "^0.1.0", git = "https://github.com/merely-made/mere.git", branch = "main" }
++hest = { version = "=0.2.0", path = "/Users/markik/Code/repos/mere/crates/cambium/hest" }
++genet-scripted-dom = { version = "=0.1.2", git = "https://github.com/merely-made/genet.git", branch = "main" }
++genet-text = { version = "^0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
++illume = { version = "^0.0.3", git = "https://github.com/merely-made/mere.git", branch = "main", optional = true }
++layout_dom_api = { version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main", package = "layout-dom-api" }
++mere-surface-api = { version = "^0.1.0", git = "https://github.com/merely-made/mere.git", branch = "main" }
++meristem = { version = "^0.2.0", git = "https://github.com/merely-made/mere.git", branch = "main" }
++sceno = { version = "^0.0.6", git = "https://github.com/merely-made/mere.git", branch = "main" }
++scenograph = { version = "^0.0.5", git = "https://github.com/merely-made/mere.git", branch = "main" }
++scenomise = { version = "^0.0.6", git = "https://github.com/merely-made/mere.git", branch = "main" }
++sprigging = { version = "^0.2.2", git = "https://github.com/merely-made/mere.git", branch = "main" }
++tinct = { version = "=0.2.0", git = "https://github.com/merely-made/mere.git", branch = "main", optional = true }
++workbench = { version = "=0.1.0", git = "https://github.com/merely-made/mere.git", branch = "main" }
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -108 +108,2 @@
+-pub use ::command_menu::{Command, CommandChoices, CommandSet, MenuSession, catalogue};
++pub use hest::{EffectClass, catalogue};
++pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
+--- a/src/command_surface.rs
++++ b/src/command_surface.rs
+@@ -26,2 +26,2 @@
+-impl From<&::command_menu::Command> for CommandItem {
+-    fn from(command: &::command_menu::Command) -> Self {
++impl From<&::hest::menu::Command> for CommandItem {
++    fn from(command: &::hest::menu::Command) -> Self {

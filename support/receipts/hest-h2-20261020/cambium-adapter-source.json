@@ -1,0 +1,24 @@
+{
+  "baseline_source": "git+https://github.com/merely-made/mere.git?branch=main#dffcc9c806457319d3f748477bff6327f220b085",
+  "baseline_manifest": "/Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/dffcc9c/crates/cambium/cambium/Cargo.toml",
+  "package_version": "0.4.0",
+  "modified": [
+    {
+      "path": "Cargo.toml",
+      "baseline_sha256": "1a3d02a9708bd8016fb69f66105522351ca289f9728b46ecfd3619d99dd3ef71",
+      "receiving_sha256": "acd6ae288bdfa101a86a1e6b70ccf3dcd23ba2eec2151177d883af54f7475458"
+    },
+    {
+      "path": "src/lib.rs",
+      "baseline_sha256": "162a88e634f4e87c1209591ba342f7b028abb07f19cc4a6aa3a513ac35657dea",
+      "receiving_sha256": "aa536874f738b02bd794f912dedfc471021cd0ec2a405bea4919bae671dcddeb"
+    },
+    {
+      "path": "src/command_surface.rs",
+      "baseline_sha256": "f06e01da9c1f575304119b173d734d3616cf2d9c0dae29e488811df0d625a08b",
+      "receiving_sha256": "6066c9978406e1a0a7c50c1b5d02dd1eca9b728c0bc62bb48348d8a815a11536"
+    }
+  ],
+  "unchanged_rust_files": 74,
+  "scope": "Standalone manifest with identical feature/dependency declarations except command-menu replaced by direct Hest 0.2; only command re-export and From<&Command> paths change in the implementation."
+}

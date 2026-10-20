@@ -1,0 +1,31 @@
+{
+  "first_fetched_main": "42baea78b47fcc3ad7b3f445db5bd6041f922060",
+  "first_rebased_h1": "a68de709826ca0a3882c236195ad5c005bb086a9",
+  "first_reconciliation_passed_tests": 48,
+  "final_fetched_main": "b10ae5f88d32d8e54d39856e93dd7b52981b353f",
+  "final_rebased_h1": "cea6d09b2a9b04cb5567531778e6e62d8cdac0d4",
+  "final_test_results": "checks.json",
+  "conflict_resolutions": [
+    {
+      "round": 1,
+      "path": "support/doc-audit/d2/batch_95_hest_command_architecture.md",
+      "resolution": "Preserved one parser-correct status verdict and the historical notes."
+    },
+    {
+      "round": 2,
+      "path": "Cargo.lock",
+      "resolution": "Preserved the upstream Illume dependency and the appropriate Hest version on Graphshell."
+    },
+    {
+      "round": 2,
+      "path": "ports/graphshell/web/Cargo.lock",
+      "resolution": "Preserved both Illume and Hest dependencies."
+    }
+  ],
+  "consumer_start": "e94e7381b39ebc1927d4bf258d3c92787f9abeca",
+  "consumer_final_fetched_main": "c889038ddd9c2fd56384c216e50d600f92af751e",
+  "consumer_unrelated_changes": "Preserved without edits; independently committed upstream during the run. Final receiving export refreshed to that commit.",
+  "push_performed": false,
+  "publish_performed": false,
+  "source_scope": "H1 history and H2 implementation rebased onto the named main; the final 118-test total belongs solely to the H2 cohort."
+}

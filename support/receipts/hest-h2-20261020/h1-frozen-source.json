@@ -1,0 +1,27 @@
+{
+  "h1_revision": "cea6d09b2a9b04cb5567531778e6e62d8cdac0d4",
+  "files": [
+    {
+      "path": "src/lib.rs",
+      "sha256": "6b9e36092ec6ee3782dda08e6776b062739e398722a38af64f7635fbde2b7c72",
+      "byte_identical": true
+    },
+    {
+      "path": "src/menu/mod.rs",
+      "sha256": "c8ed224fda0422cc81ae7a6e18c8a1ae7b1a86f8be92a2f6183ddbb0464ee86e",
+      "byte_identical": true
+    },
+    {
+      "path": "src/menu/session.rs",
+      "sha256": "1bf3cd93ab0eaf6ea8dc570ce5ab6a3f822c2c013c1b9a43209c0aba41247583",
+      "byte_identical": true
+    },
+    {
+      "path": "src/catalogue.rs",
+      "sha256": "2b43216153a0b30a4d890b7b9aa224d92c1185d5842f76cb9520eaf056ce43cb",
+      "byte_identical": true
+    }
+  ],
+  "catalogue_ids_unchanged": true,
+  "catalogue_ids_and_labels_unchanged": true
+}

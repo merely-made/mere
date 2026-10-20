@@ -16,4 +16,4 @@ publish = true
 path = "src/lib.rs"
 
 [dependencies]
-hest = { version = "0.1.0", path = "../hest" }
+hest = { version = "0.1.0", path = "../hest-0_1" }
