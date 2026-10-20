@@ -27,6 +27,7 @@ members = [
     "crates/forme/uxtree",
     "crates/domain/apparatus",
     "crates/domain/personal-facts",
+    "crates/domain/site",
     "crates/platen/platen",
     "crates/fleece",
     "crates/intel/eidetic-search",
@@ -471,6 +472,7 @@ forme = { package = "mere-forme", version = "0.2.0", path = "crates/forme/forme"
 uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
+site-model = { package = "mere-site", version = "0.1.0", path = "crates/domain/site" }
 personal-facts = { package = "mere-personal-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus", default-features = false }
 eidetic = { version = "0.0.2", default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
@@ -651,6 +653,7 @@ all = "warn"
 # names them through dramatis.git needs no entry, only the same revision
 # (Cargo refuses a patch from dramatis.git to dramatis.git).
 [patch."https://github.com/merely-made/mere.git"]
+mere-site = { path = "crates/domain/site" }
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "4342aed4bd101e68b1e71d24e010190d81765201" }
 mere-personal-facts = { path = "crates/domain/personal-facts" }

@@ -23,6 +23,8 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
+- [Shared site model extraction](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable site/snapshot model shared by Knot and Djinn, preserving V1 bytes and native metadata.
+
 Native shadow-mask admission (2026-10-16): the [browser presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md#native-shadow-mask-admission-continuation-2026-10-16) records the Rootstock producer remapper correction exposed by Woodshed Rehearsal. Translator-owned shadow images retain their keys, physical producer allocations stay below their range, and exact draw boundaries preserve colliding authored IDs. Six focused controls and 307 Rootstock/native-host tests pass with zero failures and six existing ignores; [source and lock receipt](../support/receipts/producer-shadow-20261016/qualification.json). Woodshed's bounded receiving gate passes on Mere `6575075057e`: fourteen reviewed native captures, exact fresh-process Set/voicing reopening, default/narrow controls and final-binary save-refusal close behavior; [receiving closure](../support/receipts/producer-shadow-20261016/woodshed-receiving.json). Physical audio and portable shadow-mask composition remain separate.
 
 Sennet directed custody (2026-10-16): the [Djinn plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
