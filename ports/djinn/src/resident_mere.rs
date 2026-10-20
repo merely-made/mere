@@ -27,7 +27,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use crate::door::app_broker::AppEndpointCatalog;
+use crate::door::app_broker::{AppEndpointCatalog, WeakAppEndpointCatalog};
 use crate::resident_reservoir::ResidentReservoir;
 use chirograph::{
     AdvertisedAction, BoundsRelationship, CachePolicy, CardValueV1, CarrierNotice, ContentHash,
@@ -109,7 +109,7 @@ struct Routes {
     custody_endpoint: Option<String>,
     shared_root: PathBuf,
     persona: PersonaId,
-    catalog: AppEndpointCatalog,
+    catalog: WeakAppEndpointCatalog,
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
@@ -173,7 +173,7 @@ impl MereRoutes {
                 custody_endpoint: None,
                 shared_root,
                 persona,
-                catalog,
+                catalog: catalog.downgrade(),
                 grants,
                 apps,
                 validators: BTreeMap::new(),
@@ -316,6 +316,11 @@ impl MereRoutes {
         {
             return Err("mere does not belong to this reservoir persona/domain".into());
         }
+        let catalog = self
+            .inner
+            .catalog
+            .upgrade()
+            .ok_or("the mere's application catalog is closed")?;
         let domain = mere.domain.to_string();
         // Product records must never be writable under generic graph authority.
         // Both daemon and embedded composition install the same product callback.
@@ -367,8 +372,7 @@ impl MereRoutes {
         let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let grants = self.inner.grants.clone();
-        self.inner
-            .catalog
+        catalog
             .update(|catalog| register_mere_routes(catalog, &route, &ambient, &shared, &grants))
             .await
             .map_err(|error| error.to_string())?;
@@ -384,8 +388,7 @@ impl MereRoutes {
                 .map_err(|e| e.to_string())?;
             let coop_shared = shared.clone();
             let coop_grants = self.inner.grants.clone();
-            self.inner
-                .catalog
+            catalog
                 .update(|catalog| coop::register(catalog, coop_shared, coop_grants))
                 .await
                 .map_err(|e| e.to_string())?;
@@ -1993,6 +1996,29 @@ mod tests {
     use crate::resident_reservoir::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     };
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn dropping_the_catalog_releases_a_populated_reservoir_and_its_registrar() {
+        let Fixture {
+            _root,
+            reservoir,
+            catalog,
+            routes,
+            ..
+        } = fixture(0xc010, "catalog-release").await;
+        let weak = catalog.downgrade();
+        drop(routes);
+        drop(catalog);
+        assert!(
+            weak.upgrade().is_none(),
+            "the reservoir factory must not retain its owning catalog"
+        );
+        crate::resident_reservoir::ReservoirLane::Open(reservoir)
+            .close()
+            .await
+            .unwrap();
+        drop(_root);
+    }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn coop_owner_controls_are_local_and_do_not_follow_the_remote_mere_catalog() {
