@@ -328,4 +328,78 @@ all existing supplier versions/revisions.
 
 ## Isocosm continuation — 2026-10-19
 
-<!-- Reserved for the coordinating session: results from the parallel Isocosm session. -->
+Isocosm main [`2389818c`](https://github.com/merely-made/isocosm/commit/2389818c) lands five step commits on `c3ad4b97`,
+then merges origin/main `028a5ef1`. The owning record is the P8 section of
+Isocosm's `design_docs/2026-10-17_private_pack_authoring_plan.md`, with receipts in
+`design_docs/receipts/2026-10-19_pack_authoring/`. A fresh clone of pushed
+main, checked again by the coordinating session on 2026-10-20, passes 85
+feature-enabled tests (two ignored helpers) and 58 default tests. The fork
+branch passes 107 tests from a fresh clone.
+
+**Stale save lease** ([`80137113`](https://github.com/merely-made/isocosm/commit/80137113)). The lease records PID, host
+and source. A lease left by a dead process on the same host is reclaimed, along
+with that saver's temporary file. A live holder, another host, or an old-format
+lease still refuses. Tests kill a real saver mid-save, then save successfully;
+a live holder still blocks. A dead saver's PID reused by a live process, for
+example after a reboot, still needs manual removal.
+
+**History memory** ([`8d6499c1`](https://github.com/merely-made/isocosm/commit/8d6499c1)). Three modes behind `--history`,
+plus a 64 MiB byte budget alongside the 32-revision cap. Requested-heap retained
+bytes on the annotated pack were identical across three release runs:
+
+| Revisions | full | text | cached | 2026-10-16 baseline |
+|---:|---:|---:|---:|---:|
+| 2 | 26,632 | 14,896 | 23,424 | 26,796 |
+| 17 | 222,584 | 34,928 | 145,672 | 224,742 |
+| 65 | 849,544 | 98,944 | 537,240 | 859,206 |
+
+After history release, 13,608 bytes remain in every mode; after document drop,
+0. The cached mode shares 90 of 152 green nodes and 323 of 324 tokens across
+revisions; full and text share none. Median edit publication, in microseconds
+(full / text / cached): real pack 69.18 / 68.95 / 65.11; annotated pack
+80.57 / 81.22 / 75.57; 4,096 keys 5,983 / 6,221 / 5,249; 65,536 keys
+113,429 / 120,652 / 98,521. At 65,536 keys the byte budget keeps 3 revisions in
+full and cached modes and 32 in text mode.
+
+The default is **text**. It retains 88% less than full at 65 revisions, publishes
+within noise of full, and no command reads an older revision's tree. Cached is
+6–13% faster but retains 5.4 times as much as text. The `NodeCache` result
+shows real structural sharing is available if a later consumer needs older
+trees resident.
+
+**Fork in its own repository** ([`b0f9988a`](https://github.com/merely-made/isocosm/commit/b0f9988a)). Mark confirmed the
+name and public visibility. [merely-made/taplo](https://github.com/merely-made/taplo)
+is a GitHub fork of tamasfe/taplo. Branch `merely/rowan-0.17` starts at upstream
+tag `release-taplo-0.14.0` and adds four commits: Rowan 0.17
+([`8ad7de4`](https://github.com/merely-made/taplo/commit/8ad7de4)), DOM batching ([`c316724`](https://github.com/merely-made/taplo/commit/c316724)),
+`parse_with_cache` ([`118aae3`](https://github.com/merely-made/taplo/commit/118aae3)) and TOML 1.1
+([`aa6d784`](https://github.com/merely-made/taplo/commit/aa6d784)). Isocosm pins `aa6d784` by exact revision; `vendor/taplo`
+is removed. The fork passes 102 tests at `118aae3` (101 inherited plus one) and
+107 at `aa6d784`. The earlier 3,460-document differential corpus matches the
+unchanged control at both revisions.
+
+**TOML 1.1** ([`5dd01ab8`](https://github.com/merely-made/isocosm/commit/5dd01ab8)). The fork accepts `\e`, `\xHH`,
+multiline inline tables with comments and a trailing comma, and times without
+seconds. TOML 1.1 is opt-in; TOML 1.0 stays the fork's default, so two inherited
+tests that treat those inline-table forms as invalid still pass. Against
+`toml` 1.1.8 and Isocosm's locked 1.1.6, 33 named cases and their 914 prefixes
+give 167 accepted with equal values, 780 rejected by both, and no disagreements.
+All four 2026-10-15 spot checks are accepted. The advisory partial-index
+diagnostic is gone for valid 1.1 source. The fork's formatter preserves comments
+and values in multiline inline tables but does not lay them out.
+
+**Structure-aware commands** ([`286e690d`](https://github.com/merely-made/isocosm/commit/286e690d)). `insert_lock_preset`,
+`replace_lock_preset`, `remove_lock_preset` and `set_generator_field` address
+generators by id and presets by key. They publish through the existing
+`mere-source-edit` proposal path with the same revision checks and receipts.
+The unchanged 59-command workflow stops at one assertion, which expected TOML
+1.1 source to block a preset proposal; step 4 removed that by design. With only
+that assertion changed it passes, and 60 of its 64 records are identical to the
+earlier transcript; the other four differ only in the removed diagnostic and
+the refusal reason. A new workflow, 66 commands across five processes, passes
+without caller byte offsets.
+
+**Toolchain caveat.** Since `c3ad4b97`, cargo 1.97.1 cannot resolve the Isocosm
+workspace: Eidetic's chartulary manifest uses a cargo 1.98+ form while
+declaring `rust-version` 1.97.1. The gates compiled and tested with rustc and
+rustdoc 1.97.1, driven by cargo 1.99.1. Eidetic was not changed.
