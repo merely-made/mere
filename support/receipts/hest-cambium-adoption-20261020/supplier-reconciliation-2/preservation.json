@@ -1,0 +1,18 @@
+{
+  "local_parent": "eafee8a3afc6000226c13b9ee68248aaab8c3cb2",
+  "incoming_parent": "d4756e0fb6a759746e97d71b3e9a8eb8c2d0e9cf",
+  "merge_base": "d95e04bb49c367d17b94064a647fbbdb50c0414d",
+  "incoming_only_files_preserved": 52,
+  "local_only_files_preserved": 151,
+  "shared_changed_paths": [
+    "Cargo.lock",
+    "Cargo.toml",
+    "design_docs/DOC_README.md",
+    "ports/graphshell/web/Cargo.lock"
+  ],
+  "incoming_mismatches": [],
+  "local_mismatches": [],
+  "turnstone_head": "9df2f000722d3e3f52855930b2f98ad4c07c6855",
+  "turnstone_worktree_clean": true,
+  "lock_sha256": "49616b8c35ed66f374738c631fdd48fb1bc1265a9136ddd919e1329463927cca"
+}

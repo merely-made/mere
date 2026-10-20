@@ -1,0 +1,30 @@
+[
+  {
+    "name": "graphshell-declarations",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "page_commands"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 3.07,
+    "log": "graphshell-declarations.log",
+    "log_sha256": "7bdb062c7e8dead48bffd29590dadf7263f8acd3ce0d37a61d13daacdff444fd",
+    "suites": [
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "reason": "Exploratory library filter matched no tests; replaced by the existing integration target."
+  }
+]

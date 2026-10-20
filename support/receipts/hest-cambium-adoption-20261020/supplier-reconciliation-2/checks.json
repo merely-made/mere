@@ -1,0 +1,213 @@
+[
+  {
+    "name": "metadata",
+    "command": [
+      "cargo",
+      "metadata",
+      "--locked",
+      "--offline",
+      "--format-version",
+      "1"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.51,
+    "suites": [],
+    "raw_log_sha256": "d1ec5caf5e544172cefb559464fc295b48598c6abc3b73d9c80777b8267f68d8",
+    "stdout_artifact": "/Users/markik/Code/testing/mere/hest-cambium-adoption-20261020/reconciliation-2/metadata.log"
+  },
+  {
+    "name": "cambium",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "cambium",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 8.95,
+    "log": "cambium.log",
+    "suites": [
+      {
+        "passed": 279,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "3da44a87716a7297247575cc8b2b3203a3189b5e83fd0fde36496b7cd52ce8f7",
+    "log_sha256": "3c7c81754807596bac0b92eed8582abe627efbebe1c5b8126dc2f6c0782f3650"
+  },
+  {
+    "name": "command-contract",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "hest@0.2.0",
+      "-p",
+      "chirograph",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 1.43,
+    "log": "command-contract.log",
+    "suites": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "a157a0a6bd725940d0dd45441520cd9b48e8cd9dab7fbfcd990206abcbecdd9a",
+    "log_sha256": "0c6ee286208502efc0a51b3fa89a74fbe463ff67b0973b36173dd89a82f5cfdf"
+  },
+  {
+    "name": "probe",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "ux-events",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 13.5,
+    "log": "probe.log",
+    "suites": [
+      {
+        "passed": 40,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "dd6507c8531f0dcfab049f3dc099efb76c65372f8679ec1673324bedd0432728",
+    "log_sha256": "77f7a0d2f7547608023fe6583a4fe8bad43f0e9e450d4e2ff0f9f27b92b91c93"
+  },
+  {
+    "name": "host",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "cambium-genet-winit-host",
+      "--test",
+      "command_menu_compact",
+      "--test",
+      "accessibility"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 16.23,
+    "log": "host.log",
+    "suites": [
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "cb6465c7d0f97903cfc2c2a97ccedb7652c613195c1265361a64c0fa1ce06158",
+    "log_sha256": "493076fa311891d3fec8ea8a3719022b900edd513e2bec833f3068cda4e07846"
+  },
+  {
+    "name": "graphshell-viewer",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "viewer_commands"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 41.31,
+    "log": "graphshell-viewer.log",
+    "suites": [
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "13335cf465911414f5c6f92819ddc1859c2efd9e7ead0d65451122d477a99a1c",
+    "log_sha256": "0988426718eb8da799f71aab8426c988b58ccab45fa9ab6b0b7832e479c830ee"
+  },
+  {
+    "name": "graphshell-declarations",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--test",
+      "command_declarations"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 7.79,
+    "log": "graphshell-declarations.log",
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "994a276a4a3d2ae3ec27c71b87091cc3a6f1dea14b74717afbc9dbcc2fc86e3c",
+    "log_sha256": "0ae88d0a9e57a30e273b577e9249d7786353cc35d36dc0a5a2aee37ed2720b4d"
+  },
+  {
+    "name": "shim-compatibility",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "support/fixtures/hest-h1-compatibility/Cargo.toml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.21,
+    "log": "shim-compatibility.log",
+    "suites": [
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "1a43036a03c4bce8a6cdedc3c2f1ad2d4acf3853d13c5fd4690cd0ee83bd7260",
+    "log_sha256": "ab6ead1d1bf392659b64c1dcd4a198f0c757e8347b81152c5dd7afe859fb5857"
+  }
+]

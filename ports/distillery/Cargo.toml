@@ -71,6 +71,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # actor and provider seam, the run table and the `inference.ask` endpoint. No
 # model runtime: the host supplies the provider.
 inference = ["dep:esp", "esp/actor", "dep:apparatus"]
+inference-embedding = ["inference-model", "esp/persistence", "esp/bert"]
 inference-gpu = ["inference-model", "esp/decoder-wgpu"]
 inference-stages = ["inference-model", "dep:notochord", "tokio/io-util"]
 inference-wire = ["dep:eidetic"]
