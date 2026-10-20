@@ -1,0 +1,332 @@
+{
+  "passed": true,
+  "private_journal_scan": {
+    "path_relative_to_fixture": "data/distillery/meshes/14005b47c144dcb18052eff69bf425c6e3930167b197aad32e14b588ca8185b5/inference.redb",
+    "bytes": 34222080,
+    "sha256": "bb33d8eadde91e50fd700a8c6dab17ec20a6ae8e1dfecf0391728288a8cd713e",
+    "needles": {
+      "\"vectors\"": 0,
+      "\"producer\"": 0,
+      "foreign/v1": 0,
+      "https://retained.test/": 0
+    }
+  },
+  "run": "accepted",
+  "processes": {
+    "prepare": {
+      "exit_code": 0,
+      "elapsed_seconds": 55.638,
+      "binary_sha256": "8ebbe23ce639bc7c924c5e982acf4b489d8f671da3f14b7efac9a8d650b6b81f",
+      "log": "accepted-prepare.log",
+      "pid": 4775,
+      "maximum_resident_set_bytes": 898736128
+    },
+    "cold": {
+      "exit_code": 0,
+      "elapsed_seconds": 42.077,
+      "binary_sha256": "8ebbe23ce639bc7c924c5e982acf4b489d8f671da3f14b7efac9a8d650b6b81f",
+      "log": "accepted-cold.log",
+      "pid": 5039,
+      "maximum_resident_set_bytes": 589180928
+    },
+    "foreign": {
+      "exit_code": 0,
+      "elapsed_seconds": 7.951,
+      "binary_sha256": "8ebbe23ce639bc7c924c5e982acf4b489d8f671da3f14b7efac9a8d650b6b81f",
+      "log": "accepted-foreign.log",
+      "pid": 5119,
+      "maximum_resident_set_bytes": 511066112
+    }
+  },
+  "metrics": {
+    "all": {
+      "lexical": {
+        "queries": 12,
+        "top1": 6,
+        "recall_at_3": 7,
+        "mrr": 0.5509259259259259
+      },
+      "vector": {
+        "queries": 12,
+        "top1": 12,
+        "recall_at_3": 12,
+        "mrr": 1.0
+      },
+      "fused": {
+        "queries": 12,
+        "top1": 8,
+        "recall_at_3": 11,
+        "mrr": 0.7853535353535354
+      }
+    },
+    "paraphrase": {
+      "lexical": {
+        "queries": 8,
+        "top1": 2,
+        "recall_at_3": 3,
+        "mrr": 0.3263888888888889
+      },
+      "vector": {
+        "queries": 8,
+        "top1": 8,
+        "recall_at_3": 8,
+        "mrr": 1.0
+      },
+      "fused": {
+        "queries": 8,
+        "top1": 4,
+        "recall_at_3": 7,
+        "mrr": 0.678030303030303
+      }
+    },
+    "lexical_control": {
+      "lexical": {
+        "queries": 4,
+        "top1": 4,
+        "recall_at_3": 4,
+        "mrr": 1.0
+      },
+      "vector": {
+        "queries": 4,
+        "top1": 4,
+        "recall_at_3": 4,
+        "mrr": 1.0
+      },
+      "fused": {
+        "queries": 4,
+        "top1": 4,
+        "recall_at_3": 4,
+        "mrr": 1.0
+      }
+    }
+  },
+  "matching_cold_index_and_passages": true,
+  "foreign_refusals": [
+    {
+      "error": "foreign embedding space; rebuild the derived index",
+      "kind": "space",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding corpus or chunker changed; rebuild the derived index",
+      "kind": "chunker",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding corpus or chunker changed; rebuild the derived index",
+      "kind": "source",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding cache format: missing field `envelope` at line 1 column 76513",
+      "kind": "legacy",
+      "same_dimensions": 384
+    }
+  ],
+  "source_corpus_removed": true,
+  "executable_sha256": "8ebbe23ce639bc7c924c5e982acf4b489d8f671da3f14b7efac9a8d650b6b81f",
+  "limits": [
+    "Real CPU MiniLM embeddings; a tiny tensor-decoder fixture supplies the durable exact ask session; no trained generative-answer quality claim",
+    "Native resident/application IPC; no headed UI or second-device gate",
+    "Frozen synthetic retained corpus and fixed fusion weights; benchmark is bounded to these queries"
+  ],
+  "date": "2026-10-20",
+  "implementation_basis": {
+    "mere": "fb56a2ae1907011f371090df7a9a056d3eddf775",
+    "eidetic": "34105d63ec17826e0a58a5b461b65150357dd000",
+    "esp": "6d371901435b68e3fb4099a97789222d15f87cf0"
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-apple-darwin\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "feature": "djinn/inference-embedding",
+  "max_index_bytes": 8388608,
+  "benchmark": {
+    "file": "ports/djinn/tests/fixtures/embedding/retained-paraphrases-v1.json",
+    "sha256": "b3dbc99cdfb62695d1624ae6c5e2b659da09d116bbcaaee75612fdf38c15bada",
+    "documents": 16,
+    "queries": 12,
+    "fusion": {
+      "lexical_weight": 1,
+      "vector_weight": 1,
+      "rrf_k": 60
+    }
+  },
+  "projection": {
+    "dimensions": 384,
+    "passages": 16,
+    "built": {
+      "cache": "built",
+      "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+      "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+      "lexical_weight": 1,
+      "persisted_bytes": 81349,
+      "rrf_k": 60,
+      "vector_bytes": 24576,
+      "vector_weight": 1
+    },
+    "cold": {
+      "cache": "reopened",
+      "envelope": "blake3:03f43d662293d4a6b79db64a2b2396b635d7b039ae91262df1a1667fa6cf7c52",
+      "index": "blake3:b043749d7fb0c19807bc6f2d5cbc59c39e5a21f577f66ef75fa6df0041f584bb",
+      "lexical_weight": 1,
+      "persisted_bytes": 81349,
+      "rrf_k": 60,
+      "vector_bytes": 32768,
+      "vector_weight": 1
+    },
+    "allocation_note": "JSON vector deserialization reserves capacity beyond the logical 384 floats. Actual vector capacity is budgeted and reported; every logical width is independently checked against the envelope."
+  },
+  "findings": [
+    "Equal-weight RRF improves on lexical recall but underperforms the vector lane on this fixed corpus. One paraphrase remains rank 11 in fused recall despite vector rank 1. Corpus, queries and weights were not tuned after measurement.",
+    "Native application IPC uses the extended recall protocol. Existing lexical-only settings omit embedding evidence; older clients must be rebuilt before enabling the extended evidence.",
+    "The resident resolves already admitted local model components through NoFetcher. The projection uses the existing sealed private journal; the source owner supplies retained text and current-version authority."
+  ],
+  "checks": {
+    "eidetic_contract": {
+      "passed": 2
+    },
+    "esp_embedding": {
+      "passed": 147,
+      "ignored": 2
+    },
+    "esp_real_model_identity": {
+      "passed": 1,
+      "scope": "actual loaded 384-dimensional MiniLM vector; changed pooling and normalization refuse saved index"
+    },
+    "esp_no_default_features": "passed",
+    "distillery_recall": {
+      "passed": 13
+    },
+    "resident_existing_routes": {
+      "passed": 2,
+      "tmpdir": "short temporary path required for macOS Unix-domain socket path limit"
+    },
+    "separate_processes": 3,
+    "standalone_resolution": "six locked metadata roots; no standalone full-suite claim"
+  },
+  "preparation_findings": [
+    "Retained recall correctly refused the original stub generation fixture; the accepted run uses a tiny exact-session tensor decoder.",
+    "The tiny decoder default context (16 tokens) was too small for retained-passage prompts; its fixture config now admits 2048 positions without changing the MiniLM retriever or benchmark.",
+    "The first cold assertion incorrectly equated vector length with allocated capacity. Accepted checks report real allocated capacity and apply the existing owner byte ceiling; numerical-width and compatibility guards remain unchanged."
+  ],
+  "qualified_source_sha256": {
+    "ports/distillery/Cargo.toml": "ad629a5bc4cc045a6f61b0bac7ed194ce4444f1e0ca831e149688fd70c9a7e13",
+    "ports/distillery/src/inference.rs": "7239cd483f0e9267f2106dc975be2bee349dcf77b646ef198a595a94c0added5",
+    "ports/distillery/src/inference/durable.rs": "2c1c86aaca6661029feb982e157cd3653fb64aa635272b1217a5e6f98f3aa558",
+    "ports/distillery/src/inference/recall.rs": "491b6eba05b543ecaaaec0f50b4d115f90cb5dab4d693f4c27c4037bfee67a46",
+    "ports/distillery/src/inference/recall_embedding.rs": "f3f85dacf5ce555b4c91915c8395ce56e54a579e65b655082004e7c1b8006013",
+    "ports/distillery/src/inference_protocol/recall.rs": "c865dabbf3d0359d1c1cbbc877726692bba361cc2edbcd1997f44b620a716591",
+    "ports/djinn/Cargo.toml": "9cd41ce57de02074bcd17f8ad65ccf95742a8e7201438e6f45453faabab7b1f9",
+    "ports/djinn/src/bin/djinn.rs": "726e24ce357f842aac4ac416ad62fdf941d8b734d3fdb24d691ec0b5da011dec",
+    "ports/djinn/src/door/app_broker.rs": "e87b37859a37665ae000e3bfbe81b0c351fccd6d2af3f550d1e5c845cc4841d2",
+    "ports/djinn/src/door/device_broker.rs": "2f91ff841c317676d129016370465ad48b66b80100791e407d9b5d2bde5f7d52",
+    "ports/djinn/src/resident.rs": "ce7697b8d78cf4ee5cc7a16e5b8213ffb7080714e55f0f1ceaac941ac039838c",
+    "ports/djinn/src/resident_inference.rs": "67885c4dd50381d19d51bc9982f59490c9ec1abe44e09ee1d1fcf739d7d16020",
+    "ports/djinn/src/settings.rs": "ec1d1ce045ad22686315f008e4826148c7e30f897ddf006953a4c6e4851a12c1",
+    "ports/djinn/tests/embedding_recall.rs": "6e6d72e09a74880b864f85fcd23463c20cba9670c4978fc79703a8b0d90d7ea4",
+    "ports/djinn/tests/fixtures/embedding/retained-paraphrases-v1.json": "b3dbc99cdfb62695d1624ae6c5e2b659da09d116bbcaaee75612fdf38c15bada",
+    "ports/djinn/tests/harness.rs": "6f697af423896ef8e889d7c20c580a63f00a68741eacf2471586bc3bd81ace42",
+    "ports/djinn/tests/inference_automatic.rs": "a3d2837f3a1eee293bea9d9812b46e429eea1b0af2f6513bdccfdf6029a80132",
+    "ports/djinn/tests/inference_gpu_reclaim.rs": "165a9015cc0fed79bfdc9df610b327189bccbd79ce5ae101a7ef16eefb29f13f",
+    "ports/djinn/tests/inference_route.rs": "e49c0363666328c1f7f5ab9ff735420f7b409dca6a1310f16d4cc791825cafe8",
+    "Cargo.toml": "2db5042a42577d809ebc765ddbb17f9430f8030e223f43c72f1fc4ead2634053",
+    "Cargo.lock": "9a9d7259025c18e22f3c56ee666b7a7a732d2543a2d130dcabd5e71027c545bb"
+  },
+  "qualified_git_graph": [
+    {
+      "name": "chartulary",
+      "version": "0.2.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "cleromancy-core-acceptance",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/cleromancy.git?branch=main#69ed4554285a0fcc6b9d5dfd550eb3481aa1c9c2"
+    },
+    {
+      "name": "eidetic",
+      "version": "0.0.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "esp",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
+    },
+    {
+      "name": "gemot",
+      "version": "0.1.1",
+      "source": "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201"
+    },
+    {
+      "name": "knot-editor",
+      "version": "0.0.3",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#9000603a2fea54d24366c066173a36d2239d07ca"
+    },
+    {
+      "name": "luggage",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "mere-proofs",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "mere-transport",
+      "version": "0.0.2",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
+    },
+    {
+      "name": "muniment",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "servitor",
+      "version": "0.0.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "stickleback",
+      "version": "0.1.1",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    }
+  ],
+  "supplier_lock_receiving_heads": {
+    "knot": "3a7f9a9307d70bae0c5dddcbec65e12f7ba68393",
+    "gemot": "e9b7aafc81d6fdaac787758871dd5fc357d56925",
+    "cleromancy": "b56ba4148b9d854857163badeebb4f9c420bf767",
+    "murm": "f36fd209cc66be1870d379c6ea25a32fc7acb1cd"
+  },
+  "supplier_scope": "The qualification graph uses the published manifest revisions in qualified_git_graph. Later supplier commits close standalone manifests/locks only; their SDK/artifact source revisions agree with the receiving graph. Six standalone roots pass locked dependency resolution, not full application suites.",
+  "commands": {
+    "native_build": "rustup run 1.99.1 cargo test -p djinn --features inference-embedding --test embedding_recall --no-run --locked --offline",
+    "resident_processes": "Copy driver.py and model-artifacts.json to a scratch directory. Place the digest-pinned model files in all-MiniLM-L6-v2 there, then run python3 driver.py UNIQUE_RUN /absolute/path/to/embedding_recall-test-executable. Each phase is a separate OS process. The driver refuses an existing runtime directory.",
+    "distillery": "rustup run 1.99.1 cargo test -p distillery --features inference-embedding --lib inference::recall --locked --offline",
+    "esp": "rustup run 1.99.1 cargo test -p esp --lib --features persistence,bert embed:: --locked --offline",
+    "esp_default": "rustup run 1.99.1 cargo check -p esp --lib --no-default-features --locked --offline",
+    "esp_real_identity": "ESP_MINILM_DIR=/path/to/digest-pinned/model rustup run 1.99.1 cargo test -p esp --lib --features persistence,bert --locked --offline loaded_bert_artifacts_and_output_transforms_bind_the_space -- --ignored --exact embed::bert::provider::compatibility_tests::loaded_bert_artifacts_and_output_transforms_bind_the_space"
+  },
+  "artifact_manifest": {
+    "accepted-cold.log": "e50d3fa8dca5da58edfa07052a79cb91966874b89445a0c7457cb4dbb80deb1a",
+    "accepted-foreign.log": "a9937238b0472ace05be3edada8f1f700a7fa6b79cb764d02cc20687909f1460",
+    "accepted-prepare.log": "7c7046f335bc399b9ad4da6396ce8b4e55f0f106b97a7a8daa1b0979ca7fb99a",
+    "accepted-source-removal.json": "91ed5f796e4b8294065d03165bc5a0f510210fe6a85b81f2f4cd67bb42f7d341",
+    "benchmark-before-first-run.json": "f5b8196df57b56aa14371fb10d582e2557bab477b8cfaeb48ff5af312feef9a5",
+    "cohort-locked-metadata.json": "d9a3ae2fb66bfa1e6076fedb15c8da816db0817cdee6f3e45cc9210f2a4ff4be",
+    "cold-receipt.json": "0b858d6e583b4ff612e86fec63dd5cb9790ff730a3cfdbb0d15d21a384265c9e",
+    "distillery-recall-tests.log": "8d5dbf08a883d786eb8e17bea6e0edc36be86b443454477b0c8ffc095198427d",
+    "driver.py": "166fbfa281a0ac7563b494c11506518c78cf634c69fbac75e0aeeeb59f91f5c3",
+    "eidetic-contract-tests.log": "e76fd986844427e3937c3ee7f12f847497f468025cce865a62712015cce5add3",
+    "esp-default-check.log": "2bc683fb4e4f4f21ee9ee39e2b8ecce2efe20d3b1be57bda5316aa519ab3d30a",
+    "esp-embedding-tests.log": "50b404c1d3206e74a62f7e7ca556d19cd87eabbb7d2e1fb6d05b79600fae436e",
+    "esp-real-identity-test.log": "a2732fcf433e7bc498df19f413cf93e2da9be7ffeb52ee69b27efdc015b3bfe2",
+    "foreign-receipt.json": "599d318b66ef6e8029016afa221fe3b26411145e6c90d15aa285a289d4860ff2",
+    "model-artifacts.json": "84bb15348c0d76489c7b452a6c036a36cb5e78be33b710a6446251b7f3d6f7d0",
+    "model-source.json": "1f9338b35b54df090022670e7d751c846702787447d2dd4c4e4ff606449a13c6",
+    "prepare-receipt.json": "ec34e6bc89f0ba234ba0202a8adafb3a69ec44105b1027b1e24f7e6960e4e9e5",
+    "resident-library-baseline.log": "cab53d39bbe9703ef8ec182833c28207756255e8c663be4743ebf84b323f7441",
+    "resident-stub-baseline.log": "70c69f569c1a0e204f5ee8b26b56f7fc80f2dcaf7e6f129da93b530ab44fdd01"
+  }
+}

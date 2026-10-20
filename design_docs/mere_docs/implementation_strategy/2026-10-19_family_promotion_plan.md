@@ -298,13 +298,38 @@ separate from Apparatus's independent-reader retained history. Preserve each
 layer's configured count/byte/age limits, rejection policy and loss accounting.
 No universal event enum, global semantic revision or new diagnostics daemon.
 
-Take one real worker operation and one UI operation through their existing
-owners. Connect source/run/operation identity, action admission, terminal reply
-and optional semantic/frame evidence where the producer can establish them.
-Taproot selectors and Mesquite driving continue to consume the host's retained
-projection and geometry. UxTree's Inker-specific projections and ux-events'
-browser vocabulary remain adapters; generic core users must not inherit them.
-Diagnostics and local automation must continue to work without Djinn running.
+The selected worker/UI evidence paths have already been qualified in the
+[observations continuation](2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20):
+Distillery records real actor replies and journal refusals, and the retained-host
+wheel fixture records its application callback. Continue from those paths and
+the later DOM/collector repairs rather than repeat their initial implementation.
+Their CPU receipts do not establish headed product completion or pixel causality.
+
+**Command-contract owner:** the
+[Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+owns shared declaration, invocation and outcome vocabulary. Its H1/H2 and
+Cambium 0.5 receiving work are a separate, locally committed delivery cohort;
+H3 remains the invocation/result gate. This diagnostics continuation consumes
+that owner instead of defining another command catalogue or outcome protocol.
+Keep Hest independent of Chirograph, Apparatus and application runtimes.
+
+Hosts and Chirograph retain authorization, confirmation, current-target and
+session/document/revision lifetime validation, dispatch and execution. Hest's
+effect/destructive declarations describe commands; they do not grant permission.
+An accepted invocation or handled input establishes admission/dispatch only.
+A terminal completion requires the executing owner's actual reply; the current
+Chirograph `IntentResult::Accepted` must not convert to terminal `Done`.
+Apparatus records a redacted copy of those facts using producer-supplied
+operation/source scope, with its existing independent readers and loss bounds.
+
+The remaining action migration must carry that distinction through the Hest
+owner's two-host and Chirograph round-trip gates, then through a selected current
+target's automation/platform adapters. Replaced or expired targets must refuse;
+unsupported, stale, ambiguous, cancelled and failed operations must retain their
+actual results. Taproot and Mesquite consume the host's retained projection and
+geometry. UxTree's Inker-specific projections and ux-events' browser vocabulary
+remain adapters; generic users must not inherit them. Diagnostics and local
+automation must continue to work without Djinn running.
 
 Done when the two paths produce bounded, redacted evidence with independent
 inspection/test readers; unsupported, stale, ambiguous, cancelled and failed
@@ -588,3 +613,25 @@ hashes, exact commands, exit results and the failed pre-repair controls. These
 are CPU/source checks; native UI, physical audio/radio, heavy models and the
 Knot checkpoint lane keep their own acceptance records. Q112/Q113 pool admission
 and worker lifetime remain open.
+
+
+### Embedding compatibility receiving cohort (2026-10-20)
+
+The resident I10 receiving build exposed parallel exact-revision Eidetic and
+Chartulary types through older Knot, Cleromancy, Gemot and Murm manifests. A
+root-only pin change could resolve metadata but could not compile the actual
+consumer interfaces. The retained schema is Eidetic `34105d63`; the guarded
+ESP implementation is `6d371901`. The manifest intakes were published first,
+then Mere `fb56a2ae1` supplied the receiving SDK, followed by standalone lock
+refreshes. No local Cargo overrides remain in the qualified graph.
+
+The canonical receipt is
+`support/receipts/resident-embedding-20261020/qualification.json`; its
+`qualified_git_graph` records exact tested inputs and
+`supplier_lock_receiving_heads` records the subsequent lock closure. Six roots
+(Knot, Gemot, Cleromancy root/core, Murm native/Signalman) pass locked metadata
+with one Eidetic source per package. Those checks establish source resolution;
+the compiled behavioral qualification is the resident I10 gate. They do not
+assert unfiltered standalone application suites. Later manifest/lock commits
+carry the same code and SDK/artifact revisions as the qualified receiving
+closure. Frozen earlier promotion and native receipts remain unchanged.

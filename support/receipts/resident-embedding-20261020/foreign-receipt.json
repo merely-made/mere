@@ -1,0 +1,26 @@
+{
+  "phase": "foreign",
+  "pid": 5119,
+  "refusals": [
+    {
+      "error": "foreign embedding space; rebuild the derived index",
+      "kind": "space",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding corpus or chunker changed; rebuild the derived index",
+      "kind": "chunker",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding corpus or chunker changed; rebuild the derived index",
+      "kind": "source",
+      "same_dimensions": 384
+    },
+    {
+      "error": "embedding cache format: missing field `envelope` at line 1 column 76513",
+      "kind": "legacy",
+      "same_dimensions": 384
+    }
+  ]
+}
