@@ -1,0 +1,64 @@
+{
+  "status": "Cambium 0.5 prepared and canonical Turnstone adoption qualified locally",
+  "upstream_mere": "c5db7d6918d4a88c9062d468a1e623c8fd72592b",
+  "reconciled_h1": "f9ff6156d44123414492d01b899ea1f75dc6fde9",
+  "reconciled_h2": "60b527b31e3c90b91423b74ee648ba7df1960f14",
+  "supplier_commit": "0151950f8407769c977c9d04e4655cb104ebe3ef",
+  "knot_compatibility_commit": "65a6632a24b764d04eecf7302a1087342eccbfbe",
+  "consumer_commit": "c210fa05bb6cb7ad4eab93f387d6ea6b8846c101",
+  "cambium_version": "0.5.0",
+  "hest_version": "0.2.0",
+  "legacy_hest_version": "0.1.0",
+  "shim_version": "0.1.1",
+  "supplier_test_passes": 405,
+  "knot_compatibility_passes": 119,
+  "knot_existing_ignored_per_run": 1,
+  "consumer_full_library_result": {
+    "passed": 1103,
+    "failed": 0,
+    "ignored": 15
+  },
+  "consumer_focused_passes": 14,
+  "focused_consumer_tests_are_included_in_full_count": true,
+  "workspace_all_targets_check_exit_code": 0,
+  "portable_metadata_verification_exit_code": 0,
+  "wasm_compile_exit_code": 0,
+  "strict_rustdoc_link_exit_code": 0,
+  "source_proofs": [
+    "supplier-source.json",
+    "turnstone-tested-source.json",
+    "turnstone-source-files.json",
+    "turnstone-cohort.json",
+    "knot-prerequisite.json"
+  ],
+  "preservation_proofs": [
+    "mere-lock-scope.json",
+    "turnstone-lock-scope.json"
+  ],
+  "checks": [
+    "supplier-checks.json",
+    "turnstone-checks.json",
+    "knot-compatibility-checks.json"
+  ],
+  "documentation_check": "documentation-check.json",
+  "consumer_owned_receipt": "turnstone/docs/receipts/hest-cambium-adoption-20261020/qualification.json",
+  "git_delivery_order": [
+    "Knot compatibility commit",
+    "Mere supplier commit and its prerequisite history",
+    "Turnstone consumer commit"
+  ],
+  "crates_delivery_order": [
+    "Hest 0.1 before command-menu 0.1.1",
+    "Hest 0.2 before Cambium 0.5"
+  ],
+  "not_claimed": [
+    "push",
+    "publication",
+    "fresh remote-only resolution before supplier delivery",
+    "native GUI review",
+    "human assistive technology",
+    "H3 invocation/outcome",
+    "H4 scripting"
+  ],
+  "excluded_attempts": "Preliminary dependency discovery, standalone lock setup and unavailable dependency-workspace test attempts are excluded; every admitted check uses its real process exit status."
+}

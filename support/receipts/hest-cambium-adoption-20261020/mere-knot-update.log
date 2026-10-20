@@ -1,0 +1,13 @@
+    Removing cambium v0.4.0 (https://github.com/merely-made/mere.git?branch=main#dffcc9c8)
+    Updating knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#814c9784) -> #3d330d11
+    Updating murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#814c9784) -> #3d330d11
+    Updating retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#814c9784) -> #3d330d11
+    Updating selvage v0.1.0 (https://github.com/merely-made/murm.git?branch=main#814c9784) -> #3d330d11
+    Updating tulle v0.2.0 (https://github.com/merely-made/murm.git?branch=main#814c9784) -> #3d330d11
+note: pass `--verbose` to see 116 unchanged dependencies behind latest

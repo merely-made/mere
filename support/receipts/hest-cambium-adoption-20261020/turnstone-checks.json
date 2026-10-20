@@ -1,0 +1,93 @@
+[
+  {
+    "name": "turnstone-command-menu",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "command_menu"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 52.69,
+    "log": "turnstone-command-menu.log",
+    "raw_log_sha256": "5e364f3df98783de1fcda50e11aaddc7691cc867fc3749e40b0a235908544fad",
+    "log_sha256": "cc8c6ad7efef63d157b360ba71673c87ec8668729ebeccf3327a231c103ab3b0"
+  },
+  {
+    "name": "turnstone-all-targets",
+    "command": [
+      "cargo",
+      "check",
+      "--workspace",
+      "--all-targets",
+      "--locked",
+      "--offline"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 25.26,
+    "log": "turnstone-all-targets.log",
+    "raw_log_sha256": "da6071894eedc9441462ff7121d37cb6afea7ad57d7843b5f6df233694a66d6d",
+    "log_sha256": "da6071894eedc9441462ff7121d37cb6afea7ad57d7843b5f6df233694a66d6d"
+  },
+  {
+    "name": "turnstone-library",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 1103,
+        "failed": 0,
+        "ignored": 15
+      }
+    ],
+    "elapsed_seconds": 872.11,
+    "log": "turnstone-library.log",
+    "raw_log_sha256": "338cf22540bee3a99ac25275ace5089e5faf3ab21cc3ae2ee63030fcca076340",
+    "log_sha256": "c050047aa62008c932f31680de32cb83cc45ddc94ea1b0e50c6f16ee11d1cea7"
+  },
+  {
+    "name": "turnstone-portable-metadata",
+    "command": [
+      "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "scripts/cargo_mode.py",
+      "verify",
+      "--metadata-only"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 5.77,
+    "log": "turnstone-portable-metadata.log",
+    "raw_log_sha256": "5b30510bda4a137518e6bdf89c6d306705f0ce9fbf7e6c93d91290263be7e1f3",
+    "log_sha256": "5b30510bda4a137518e6bdf89c6d306705f0ce9fbf7e6c93d91290263be7e1f3"
+  }
+]

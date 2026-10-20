@@ -1,13 +1,13 @@
-# Batch 98: Hest Cambium release and canonical receiving continuation
+# Batch 98: Cambium 0.5 and canonical Turnstone adoption
 
-Audit date: 2026-10-20. Local continuation after clean reconciliation onto
-Mere `c5db7d691`. Qualification is still in progress.
+Audit date: 2026-10-20. Scoped judgment of the local supplier and canonical
+consumer qualification on the named reconciled cohort.
 
 ## cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md
 
 - disposition: current
-- status line: "H1/H2 are implemented locally; Cambium 0.5.0 release preparation and canonical Turnstone adoption are in progress" - accurate: yes
-- claims checked: 6 - holds: 6, stale: 0, unverifiable: 0
+- status line: "Cambium 0.5.0 is prepared and canonical Turnstone H2 adoption is qualified locally" - accurate: yes
+- claims checked: 12 - holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -19,12 +19,23 @@ Mere `c5db7d691`. Qualification is still in progress.
 
 ### Recommended action
 
-Finish source-coherent canonical receiving checks, retain the exact supplier
-commit and outcomes, and commit locally without push or publication.
+Commit the receiving evidence locally. Retain the explicit push/publication
+hold and distinguish local Git-object qualification from fresh remote-only
+resolution and native GUI acceptance. H3/H4 remain unstarted.
 
 ### Notes
 
-Checked Cambium 0.5.0, its seven versioned requirement edges, unchanged H1
-compatibility pins, clean reconciliation basis, the necessary embedded Knot
-constraint widening and explicit publication hold. Earlier H1/H2 receipt
-cohorts remain historical; they are not substituted for current receiving.
+The 12 checked claims are: Cambium 0.5.0; all seven versioned requirement
+edges; unchanged frozen H1/shim compatibility pins; the narrow embedded Knot
+0.4/0.5 prerequisite; no Knot desktop repin; canonical Turnstone declarations;
+the canonical URL/branch source with one Cambium/Hest and no command-menu;
+unchanged 1,761 supplier and 1,604 consumer unrelated lock blocks; the source
+scope of two modified host Rust files plus one module; real passing supplier,
+Knot and complete canonical receiving tests; successful all-targets/metadata,
+Wasm and strict Rustdoc checks; and the publication/delivery/native limits.
+
+Evidence: `support/receipts/hest-cambium-adoption-20261020/qualification.json`,
+its source/dependency proofs and command outcomes. Focused host tests overlap
+the full library count and are not added to it. Earlier fixtures and setup
+failures are excluded from this current qualification. Existing global doc
+findings outside this plan are outside the judgment.

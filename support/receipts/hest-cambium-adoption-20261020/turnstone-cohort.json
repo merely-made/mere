@@ -1,0 +1,34 @@
+{
+  "supplier_commit": "0151950f8407769c977c9d04e4655cb104ebe3ef",
+  "supplier_upstream": "c5db7d6918d4a88c9062d468a1e623c8fd72592b",
+  "consumer_baseline": "0dd9b1b020aa3cdf27d15e2d97509c760f2101f3",
+  "knot_commit": "65a6632a24b764d04eecf7302a1087342eccbfbe",
+  "metadata_command": "cargo metadata --locked --offline --format-version 1",
+  "metadata_exit_code": 0,
+  "metadata_sha256": "2fb95db785c6c35ac4643ef5851980ec4bc3cc46c522395d93c51b0126391819",
+  "cambium_version": "0.5.0",
+  "hest_version": "0.2.0",
+  "cambium_package_count": 1,
+  "hest_package_count": 1,
+  "command_menu_package_count": 0,
+  "direct_cambium_to_hest_edge": true,
+  "external_path_packages": [],
+  "source_overrides_added": false,
+  "source_edit_exact_revision_exception": "70deef2c8cf3d3410ae35b496a9396514070b24f",
+  "git_sources": {
+    "mere.git": [
+      "git+https://github.com/merely-made/mere.git?branch=main#0151950f8407769c977c9d04e4655cb104ebe3ef",
+      "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
+    ],
+    "knot-editor.git": [
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632a24b764d04eecf7302a1087342eccbfbe"
+    ],
+    "genet.git": [
+      "git+https://github.com/merely-made/genet.git?branch=main#6ef3cd37a785a395670d3b472fb3573665497f29"
+    ],
+    "murm.git": [
+      "git+https://github.com/merely-made/murm.git?branch=main#3d330d11302b694595ce99488b69c082be26127c"
+    ]
+  },
+  "delivery": "Qualified with locally fetched Git objects under canonical URL/branch identities. Fresh remote-only resolution requires later authorized delivery of the local Knot and Mere commits."
+}

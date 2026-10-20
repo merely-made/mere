@@ -1,0 +1,208 @@
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `mere-p2panda-net v0.7.5 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#f4f9c0d8)` was not used in the crate graph
+warning: patch `p2panda-auth v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-core v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-discovery v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-encryption v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-store v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-stream v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `p2panda-sync v0.7.1 (https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bc)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef159)` was not used in the crate graph
+warning: patch `vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling find-msvc-tools v0.1.14
+   Compiling shlex v2.0.1
+   Compiling percent-encoding v2.3.2
+   Compiling syn v3.0.8
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling bytes v1.12.1
+   Compiling getrandom v0.2.17
+   Compiling zeroize v1.9.1
+   Compiling untrusted v0.9.0
+   Compiling cc v1.8.0
+   Compiling form_urlencoded v1.2.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling rustls v0.23.45
+   Compiling typenum v1.20.1
+   Compiling subtle v2.6.1
+   Compiling powerfmt v0.2.1
+   Compiling num-conv v0.2.2
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling uuid v1.28.0
+   Compiling base64 v0.22.1
+   Compiling const-oid v0.10.2
+   Compiling cpufeatures v0.3.1
+   Compiling pem v3.0.6
+   Compiling hashbrown v0.17.1
+   Compiling foldhash v0.1.5
+   Compiling fixedbitset v0.5.7
+   Compiling quick-xml v0.39.4
+   Compiling hashbrown v0.15.5
+   Compiling workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling backstep v0.1.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling illume v0.0.3 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling indexmap v2.14.2
+   Compiling hybrid-array v0.4.15
+   Compiling time v0.3.55
+   Compiling ring v0.17.14
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling yasna v0.5.2
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.1
+   Compiling synstructure v0.14.0
+   Compiling serde_derive v1.0.229
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling bytemuck_derive v1.12.1
+   Compiling thiserror-impl v2.0.21
+   Compiling tokio v1.53.2
+   Compiling zerofrom v0.1.8
+   Compiling bytemuck v1.25.2
+   Compiling thiserror v2.0.21
+   Compiling yoke v0.8.3
+   Compiling font-types v0.12.6
+   Compiling read-fonts v0.41.0
+   Compiling serde v1.0.229
+   Compiling rustls-webpki v0.103.15
+   Compiling rcgen v0.13.2
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling euclid v0.22.14
+   Compiling app_units v0.7.8
+   Compiling accesskit v0.25.1
+   Compiling mere-curation v0.1.1 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling sceno v0.0.6 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling encoding_rs v0.8.42
+   Compiling guillotiere v0.7.0
+   Compiling icu_provider v2.3.1
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#54d864c2)
+   Compiling petgraph v0.8.3
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling scenograph v0.0.5 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling hest v0.2.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling mere-source-edit v0.1.0 (https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling tokio-rustls v0.26.6
+   Compiling url v2.5.8
+   Compiling gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling spartan-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+   Compiling scroll-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling errand v0.4.0 (https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f085)
+   Compiling scenomise v0.0.6 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling skrifa v0.44.0
+   Compiling nematic v0.1.1 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling sprigging v0.2.2 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling cambium v0.5.0 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling knot-editor-host v0.1.1 (https://github.com/merely-made/mere.git?branch=main#0151950f)
+   Compiling knot-document v0.0.1 (/Users/markik/Code/testing/mere/hest-cambium-adoption-20261020/knot-document)
+    Finished `test` profile [unoptimized] target(s) in 12.01s
+     Running unittests src/lib.rs (/Users/markik/Code/repos/turnstone/target/build/debug/deps/knot_document-993b121ad4c11bd9)
+
+running 67 tests
+test document_surface::recovery_candidate_tests::candidate_rejects_invalid_selection_without_panicking ... ok
+test document_surface::recovery_candidate_tests::candidate_keeps_exact_utf8_selection_and_has_no_file_target ... ok
+test document_surface::tests::native_source_has_no_editor_folds ... ok
+test document_surface::tests::byte_identical_replacement_is_still_an_external_change ... ok
+test document_surface::tests::compare_disk_refuses_scratch_and_reports_missing_or_invalid_files_without_mutation ... ok
+test document_surface::tests::outline_snapshot_large_unicode_and_atom_fixture_receipt ... ignored, manual A2 outline performance and parser-limit receipt
+test document_surface::tests::compare_disk_reads_each_external_edit_freshly ... ok
+test document_surface::tests::external_edit_or_deletion_refuses_save_until_explicit_reload ... ok
+test document_surface::tests::outline_snapshot_uses_committed_unicode_source_and_selects_the_heading_span ... ok
+test document_surface::tests::preview_and_fold_selection_reject_stale_or_forged_snapshots_without_mutation ... ok
+test document_surface::tests::compare_disk_reports_an_identity_only_replacement ... ok
+test document_surface::tests::read_only_scratch_is_an_explicit_immutable_projection ... ok
+test document_surface::tests::read_only_session_allows_view_local_outline_selection ... ok
+test document_surface::tests::compare_disk_is_unicode_exact_and_does_not_mutate_a_refusal_or_undo ... ok
+test document_surface::tests::preview_and_fold_snapshots_are_unicode_exact_and_select_retained_source ... ok
+test document_surface::tests::scratch_save_is_an_explicit_typed_refusal ... ok
+test document_surface::tests::file_session_round_trips_edit_save_drop_and_reopen ... ok
+test document_view::tests::host_owned_status_leaves_the_row_and_save_to_the_host ... ok
+test document_view::tests::note_highlighting_is_limited_to_djot_and_legacy_knot ... ok
+test document_surface::tests::outline_selection_rejects_stale_or_forged_ranges_without_changing_session_state ... ok
+test document_view::tests::read_only_posture_has_explicit_visible_labels ... ok
+test document_surface::tests::file_becoming_read_only_after_open_refuses_save_but_allows_save_as ... ok
+test document_view::tests::state_uses_the_session_input_as_the_component_buffer ... ok
+test document_surface::tests::read_only_file_refuses_edit_and_save_without_mutating_document_state ... ok
+test document_surface::tests::long_valid_filename_supports_save_as_then_atomic_save ... ok
+test document_surface::tests::read_only_file_mode_opens_without_atomic_replace_authority ... ok
+test document_view::tests::read_only_view_has_no_editable_textbox_or_save_button ... ok
+test editor::tests::commands_drive_the_one_source_used_by_every_readout ... ok
+test document_surface::tests::same_path_save_as_keeps_the_external_change_guard ... ok
+test editor::tests::ime_preedit_is_not_committed_or_fed_to_the_readout ... ok
+test editor::tests::layout_selection_preserves_byte_affinity ... ok
+test hard_wrap::tests::blank_lines_separate_paragraphs_and_short_blocks_do_not_count ... ok
+test editor::tests::djot_cannot_be_relabelled_as_a_native_protocol_file ... ok
+test document_surface::tests::scratch_save_as_creates_a_new_djot_target_and_retains_undo_history ... ok
+test editor::tests::gemtext_preview_uses_the_native_engine_without_rewriting_source ... ok
+test hard_wrap::tests::block_structure_is_excluded ... ok
+test hard_wrap::tests::exactly_half_of_prose_lines_is_not_a_majority ... ok
+test hard_wrap::tests::latin1_columns_and_tabs_use_eight_column_stops ... ok
+test hard_wrap::tests::non_whitespace_latin1_control_characters_return_none ... ok
+test hard_wrap::tests::matching_fences_and_div_closers_exclude_their_contents ... ok
+test document_surface::tests::save_as_does_not_clobber_an_existing_target_or_convert_scratch ... ok
+test hard_wrap::tests::one_oversized_outlier_does_not_expand_the_wrap_column ... ok
+test editor::tests::scroll_preview_uses_native_engine_and_retains_relations ... ok
+test editor::tests::micron_preview_uses_the_native_engine_without_rewriting_source ... ok
+test hard_wrap::tests::ordinary_soft_wrapped_paragraphs_are_not_inferred ... ok
+test hard_wrap::tests::oversized_source_returns_none_before_scanning ... ok
+test hard_wrap::tests::repeated_long_prose_continuations_infer_the_longest_column ... ok
+test hard_wrap::tests::wide_or_combining_unicode_returns_none_instead_of_guessing ... ok
+test hard_wrap::tests::short_or_mismatched_fence_closers_do_not_end_a_fence ... ok
+test hard_wrap::tests::small_wrapped_passage_does_not_outvote_single_line_paragraphs ... ok
+test source_edit::tests::read_only_and_multi_range_refusal_leave_buffer_unchanged ... ok
+test source_edit::tests::snapshot_exact_source_check_refuses_forged_reused_stamp_without_mutation ... ok
+test source_edit::tests::snapshot_selected_text_and_proposal_keep_the_original_base ... ok
+test editor::tests::committed_commands_write_back_to_the_native_file ... ok
+test source_edit::tests::proposals_refuse_wrong_instance_ime_selection_and_mutable_escape_aba ... ok
+test writer::tests::a_canonical_knot_round_trip_is_byte_exact ... ok
+test source_edit::tests::typing_and_following_typing_are_separate_from_proposal_undo ... ok
+test writer::tests::native_protocol_extensions_preserve_their_source_identity ... ok
+test writer::tests::foreign_formats_reach_a_fixed_point_after_one_parse_write ... ok
+test editor::tests::scroll_save_preserves_native_source_and_rejects_implicit_conversion ... ok
+test writer::tests::untouched_files_never_enter_the_write_path ... ok
+test source_edit::tests::successful_proposal_clears_edit_refusal_without_resetting_save_history ... ok
+test source_edit::tests::preview_receipt_one_step_undo_selection_and_explicit_guarded_save ... ok
+test writer::atomic_tests::failed_replacement_leaves_the_old_document_bytes_intact ... ok
+test editor::tests::gemtext_and_micron_save_exact_source_and_refuse_conversion ... ok
+test writer::tests::caller_selects_the_output_format ... ok
+test source_edit::tests::selection_intents_do_not_advance_and_save_as_round_trip_invalidates ... ok
+
+test result: ok. 66 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
