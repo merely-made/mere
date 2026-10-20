@@ -1,0 +1,23 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -472,0 +473,2 @@
++# Hest H1 prepublication fixture: change only the command-menu supplier.
++command-menu = { path = "/Users/markik/Code/repos/mere/crates/cambium/command-menu" }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2284,4 +2284,3 @@
+-version = "0.1.0"
+-source = "git+https://github.com/merely-made/mere.git?branch=main#48fd33851ed0e9386ea06b511acb0a3b5f33bc04"
+-dependencies = [
+- "serde",
++version = "0.1.1"
++dependencies = [
++ "hest",
+@@ -5622,0 +5622,7 @@
++
++[[package]]
++name = "hest"
++version = "0.1.0"
++dependencies = [
++ "serde",
++]

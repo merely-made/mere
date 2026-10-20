@@ -1,6 +1,6 @@
 [package]
 name = "command-menu"
-version = "0.1.0"
+version = "0.1.1"
 description = "The commands a host offers, the person's choices among them, and a palette's in-progress state."
 authors.workspace = true
 edition.workspace = true
@@ -16,7 +16,4 @@ publish = true
 path = "src/lib.rs"
 
 [dependencies]
-serde = { workspace = true }
-
-[dev-dependencies]
-serde_json = { workspace = true }
+hest = { version = "0.1.0", path = "../hest" }

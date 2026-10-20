@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! **Hest** (an old word for a command) is the command architecture of the
-//! Mere stack. This release only holds the name.
+//! Hest is the command vocabulary of the Mere stack.
 //!
-//! The pieces exist today but live apart: `command-menu` declares and offers
-//! commands (the set, the person's choices, the palette's session, the shared
-//! ids), Cambium draws them, Chirograph carries invocations and results, and
-//! hosts keep their own enums. The plan is one vocabulary for the whole
-//! lifecycle: declare, offer, invoke, enact and audit. `command-menu`
-//! becomes `hest::menu`. See
+//! [`menu`] declares and offers commands: the command set, the person's
+//! choices, and a palette's session. [`catalogue`] holds shared ids and labels.
+//! Hosts own storage, drawing, and enactment. Serde is the only dependency.
+//!
+//! Effect classification, invocation, and outcomes are later phases of
 //! `design_docs/cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md`
-//! in the Mere repository.
+//! in the Mere repository. H1 moves the published `command-menu` API unchanged.
+
+pub mod catalogue;
+pub mod menu;

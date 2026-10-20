@@ -1,0 +1,24 @@
+{
+  "consumer_revision": "e94e7381b39ebc1927d4bf258d3c92787f9abeca",
+  "unchanged_rust_files": 244,
+  "rust_manifest_sha256": "7a9a4829001fea821d4aad60509826b034ffa1c34ae920e6ad1ce6f9d02316d0",
+  "only_lock_changes": [
+    "command-menu 0.1.0 Git -> 0.1.1 local shim",
+    "add hest 0.1.0 local"
+  ],
+  "verified_dependency_chain": [
+    "git+https://github.com/merely-made/mere.git?branch=main#cambium@0.3.3",
+    "path+file:///Users/markik/Code/repos/mere/crates/cambium/command-menu#0.1.1",
+    "path+file:///Users/markik/Code/repos/mere/crates/cambium/hest#0.1.0"
+  ],
+  "metadata_command": [
+    "cargo",
+    "metadata",
+    "--locked",
+    "--offline",
+    "--format-version",
+    "1"
+  ],
+  "metadata_exit_code": 0,
+  "cambium_locked_source": "git+https://github.com/merely-made/mere.git?branch=main#48fd33851ed0e9386ea06b511acb0a3b5f33bc04"
+}

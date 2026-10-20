@@ -1,0 +1,20 @@
+    Blocking waiting for file lock on package cache
+   Compiling hest v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/hest)
+   Compiling command-menu v0.1.1 (/Users/markik/Code/repos/mere/crates/cambium/command-menu)
+   Compiling cambium v0.4.0
+   Compiling hest-h1-compatibility v0.0.0 (/Users/markik/Code/repos/mere/support/fixtures/hest-h1-compatibility)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.46s
+     Running unittests src/lib.rs (support/fixtures/hest-h1-compatibility/target/build/debug/deps/hest_h1_compatibility-ca90b90481749f7f)
+
+running 3 tests
+test tests::stored_choices_keep_the_published_field_names_and_defaults ... ok
+test tests::the_old_catalogue_path_reexports_the_same_entries_and_functions ... ok
+test tests::old_and_new_imports_cross_published_cambium_without_conversion ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hest_h1_compatibility
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use command_menu::catalogue::ids;
+use hest::catalogue::ids;
 
 use super::{
     InputBinding, InputBindingSection, InputContext, Keycode, ModifierMask, NamedKey, binding_id,

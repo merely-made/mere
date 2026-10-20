@@ -58,7 +58,7 @@ impl InputRegistry {
             .into_iter()
             .map(|spec| InputActionBindingDescriptor {
                 action_id: spec.action_id.to_string(),
-                display_name: command_menu::catalogue::label(spec.action_id)
+                display_name: hest::catalogue::label(spec.action_id)
                     .expect("default bindings name catalogue ids"),
                 context: spec.context,
                 section: spec.section,

@@ -10,7 +10,7 @@
 //! register these ids for these verbs, graph-kernel's `ActionId` is their
 //! typed form, and registry's default key bindings name them.
 
-use crate::Command;
+use crate::menu::Command;
 
 /// The ids, one constant each.
 pub mod ids {

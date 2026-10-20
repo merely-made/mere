@@ -359,7 +359,8 @@ mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-genet-web-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
-command-menu = { version = "0.1.0", path = "crates/cambium/command-menu" }
+command-menu = { version = "0.1.1", path = "crates/cambium/command-menu" }
+hest = { version = "0.1.0", path = "crates/cambium/hest" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.2.2", path = "crates/cambium/sprigging" }
@@ -697,6 +698,7 @@ cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { path = "crates/cambium/cambium-winit-a11y" }
 command-menu = { path = "crates/cambium/command-menu" }
+hest = { path = "crates/cambium/hest" }
 document-canvas = { path = "crates/inker/document-canvas" }
 backstep = { path = "crates/cambium/backstep" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "dce1f08546b8475e42a5a01ca1ea18794c6e9b97" }
