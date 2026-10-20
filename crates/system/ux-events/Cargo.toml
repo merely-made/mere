@@ -15,6 +15,7 @@ categories = ["development-tools::debugging"]
 path = "src/lib.rs"
 
 [dependencies]
+hest.workspace = true
 chrome.workspace = true
 kernel.workspace = true
 serde = { version = "1.0", features = ["derive"] }

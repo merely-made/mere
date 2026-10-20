@@ -9,7 +9,7 @@
 
 use std::sync::Mutex;
 
-use kernel::actions::ActionId;
+use hest::menu::CommandSet;
 
 use crate::ux_observability::{DismissReason, SurfaceId, UxEvent};
 
@@ -21,13 +21,10 @@ use super::{ProbeFailure, UxProbe};
 /// that destructive actions (Delete node, Retract relation, ...) always carry
 /// a confirmation step.
 ///
-/// The probe is parameterised by the list of `ActionId`s the caller
-/// considers destructive. Today the iced host marks `NodeDelete`
-/// destructive in `items_for_target`; future destructive actions are
-/// added by extending this list (and the corresponding
-/// `ContextMenuEntry::destructive()` flag).
+/// The offered command set supplies the destructive declaration. The host
+/// still owns the confirmation gesture and action dispatch.
 pub struct DestructiveActionGateProbe {
-    destructive: Vec<ActionId>,
+    commands: CommandSet,
     /// True if the most recent ConfirmDialog event was a Confirmed
     /// dismissal. Cleared by Cancelled / Superseded dismissals or by
     /// any subsequent ActionDispatched (the grant is consumed).
@@ -36,18 +33,12 @@ pub struct DestructiveActionGateProbe {
 }
 
 impl DestructiveActionGateProbe {
-    pub fn new(destructive: Vec<ActionId>) -> Self {
+    pub fn new(commands: CommandSet) -> Self {
         Self {
-            destructive,
+            commands,
             confirm_grant: Mutex::new(false),
             failures: Mutex::new(Vec::new()),
         }
-    }
-
-    /// Default wiring with the iced host's currently-known destructive
-    /// actions. Extend this list as new destructive actions land.
-    pub fn iced_default() -> Self {
-        Self::new(vec![ActionId::NodeDelete])
     }
 }
 
@@ -67,7 +58,12 @@ impl UxProbe for DestructiveActionGateProbe {
             },
             UxEvent::ActionDispatched { action_id, .. } => {
                 let mut grant = self.confirm_grant.lock().unwrap();
-                if self.destructive.contains(action_id) && !*grant {
+                if self
+                    .commands
+                    .get(action_id.key())
+                    .is_some_and(|command| command.destructive)
+                    && !*grant
+                {
                     self.failures.lock().unwrap().push(ProbeFailure {
                         probe_name: self.name(),
                         description: format!(

@@ -91,7 +91,7 @@ mod tests {
     fn set() -> CommandSet {
         let mut set = CommandSet::new().with_defaults(["zoom-in"]);
         for (id, category) in [("open", "node"), ("zoom-in", "canvas"), ("add", "canvas")] {
-            set.register(Command::new(id, id, category));
+            set.register(Command::new(id, id, category, crate::EffectClass::Curation));
         }
         set
     }

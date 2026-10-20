@@ -10,7 +10,7 @@
 //! register these ids for these verbs, graph-kernel's `ActionId` is their
 //! typed form, and registry's default key bindings name them.
 
-use crate::menu::Command;
+use crate::{EffectClass, menu::Command};
 
 /// The ids, one constant each.
 pub mod ids {
@@ -52,57 +52,214 @@ pub mod ids {
     pub const FOLD_EXPAND: &str = "fold:expand";
 }
 
-/// A shared id and its label.
+/// A shared id, its label, and its declared semantic effect.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Entry {
     pub id: &'static str,
     pub label: &'static str,
+    pub effect: EffectClass,
+    pub destructive: bool,
 }
 
-const fn entry(id: &'static str, label: &'static str) -> Entry {
-    Entry { id, label }
+const fn entry(
+    id: &'static str,
+    label: &'static str,
+    effect: EffectClass,
+    destructive: bool,
+) -> Entry {
+    Entry {
+        id,
+        label,
+        effect,
+        destructive,
+    }
 }
 
 /// Every shared id with its label, in the plan's order (F13; four labels
 /// revised by SE52), then the graph view's fold verbs (mer3ly site plan,
 /// Ruling 165; added for the editor lane's review).
 pub const CATALOGUE: &[Entry] = &[
-    entry(ids::NODE_NEW, "New node"),
-    entry(ids::NODE_DELETE, "Delete node"),
-    entry(ids::NODE_EDIT, "Edit selected node"),
-    entry(ids::NODE_PIN, "Pin"),
-    entry(ids::NODE_UNPIN, "Unpin"),
-    entry(ids::NODE_PIN_TOGGLE, "Pin or unpin"),
-    entry(ids::NODE_VIEWER_AUTO, "Choose viewer automatically"),
-    entry(ids::RELATION_ADD, "Add relation"),
-    entry(ids::RELATION_ADD_BOTH, "Add relation both ways"),
-    entry(ids::RELATION_RETRACT, "Retract relation"),
-    entry(ids::IDENTITY_WEBFINGER, "Import from WebFinger"),
-    entry(ids::IDENTITY_ACTIVITYPUB, "Import ActivityPub actor"),
-    entry(ids::IDENTITY_NIP05, "Resolve NIP-05"),
-    entry(ids::WORKBENCH_SPLIT_BESIDE, "Open beside"),
-    entry(ids::WORKBENCH_SPLIT_OUT, "Split out"),
-    entry(ids::WORKBENCH_STACK_ONTO, "Stack onto"),
-    entry(ids::VIEW_FIT, "Fit to view"),
-    entry(ids::VIEW_ZOOM_IN, "Zoom in"),
-    entry(ids::VIEW_ZOOM_OUT, "Zoom out"),
-    entry(ids::PHYSICS_TOGGLE, "Pause or resume physics"),
-    entry(ids::PHYSICS_SETTINGS, "Physics settings"),
-    entry(ids::SESSION_UNDO, "Undo change"),
-    entry(ids::SESSION_REDO, "Redo change"),
-    entry(ids::SESSION_SAVE, "Save session"),
-    entry(ids::PANE_SETTINGS, "Open Settings pane"),
-    entry(ids::PANE_TRAIL, "Open Trail pane"),
-    entry(ids::PANE_WORKBENCH, "Open Workbench pane"),
-    entry(ids::PALETTE_OPEN, "Open command palette"),
-    entry(ids::IMPORT_BOOKMARKS, "Import bookmarks"),
-    entry(ids::NAV_BACK, "Back"),
-    entry(ids::NAV_FORWARD, "Forward"),
-    entry(ids::NAV_RELOAD, "Reload"),
-    entry(ids::NAV_STOP, "Stop loading"),
-    entry(ids::FOLD_SELECTION, "Fold selection"),
-    entry(ids::FOLD_COLLAPSE_DESCENDANTS, "Collapse descendants"),
-    entry(ids::FOLD_EXPAND, "Expand fold"),
+    entry(ids::NODE_NEW, "New node", EffectClass::DomainTruth, false),
+    entry(
+        ids::NODE_DELETE,
+        "Delete node",
+        EffectClass::DomainTruth,
+        true,
+    ),
+    entry(
+        ids::NODE_EDIT,
+        "Edit selected node",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(ids::NODE_PIN, "Pin", EffectClass::DomainTruth, false),
+    entry(ids::NODE_UNPIN, "Unpin", EffectClass::DomainTruth, false),
+    entry(
+        ids::NODE_PIN_TOGGLE,
+        "Pin or unpin",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(
+        ids::NODE_VIEWER_AUTO,
+        "Choose viewer automatically",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::RELATION_ADD,
+        "Add relation",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(
+        ids::RELATION_ADD_BOTH,
+        "Add relation both ways",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(
+        ids::RELATION_RETRACT,
+        "Retract relation",
+        EffectClass::DomainTruth,
+        true,
+    ),
+    entry(
+        ids::IDENTITY_WEBFINGER,
+        "Import from WebFinger",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::IDENTITY_ACTIVITYPUB,
+        "Import ActivityPub actor",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::IDENTITY_NIP05,
+        "Resolve NIP-05",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::WORKBENCH_SPLIT_BESIDE,
+        "Open beside",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::WORKBENCH_SPLIT_OUT,
+        "Split out",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::WORKBENCH_STACK_ONTO,
+        "Stack onto",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(ids::VIEW_FIT, "Fit to view", EffectClass::Curation, false),
+    entry(ids::VIEW_ZOOM_IN, "Zoom in", EffectClass::Curation, false),
+    entry(ids::VIEW_ZOOM_OUT, "Zoom out", EffectClass::Curation, false),
+    entry(
+        ids::PHYSICS_TOGGLE,
+        "Pause or resume physics",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::PHYSICS_SETTINGS,
+        "Physics settings",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::SESSION_UNDO,
+        "Undo change",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(
+        ids::SESSION_REDO,
+        "Redo change",
+        EffectClass::DomainTruth,
+        false,
+    ),
+    entry(
+        ids::SESSION_SAVE,
+        "Save session",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::PANE_SETTINGS,
+        "Open Settings pane",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::PANE_TRAIL,
+        "Open Trail pane",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::PANE_WORKBENCH,
+        "Open Workbench pane",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::PALETTE_OPEN,
+        "Open command palette",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::IMPORT_BOOKMARKS,
+        "Import bookmarks",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(ids::NAV_BACK, "Back", EffectClass::ExternalEffect, false),
+    entry(
+        ids::NAV_FORWARD,
+        "Forward",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::NAV_RELOAD,
+        "Reload",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::NAV_STOP,
+        "Stop loading",
+        EffectClass::ExternalEffect,
+        false,
+    ),
+    entry(
+        ids::FOLD_SELECTION,
+        "Fold selection",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::FOLD_COLLAPSE_DESCENDANTS,
+        "Collapse descendants",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::FOLD_EXPAND,
+        "Expand fold",
+        EffectClass::Curation,
+        false,
+    ),
 ];
 
 /// The label for a shared id.
@@ -121,7 +278,10 @@ pub fn namespace(id: &str) -> &str {
 /// A shared id as a command to register, its category its namespace.
 pub fn command(id: &str) -> Option<Command> {
     let entry = CATALOGUE.iter().find(|entry| entry.id == id)?;
-    Some(Command::new(entry.id, entry.label, namespace(entry.id)))
+    Some(
+        Command::new(entry.id, entry.label, namespace(entry.id), entry.effect)
+            .with_destructive(entry.destructive),
+    )
 }
 
 /// `true` when `id` is `namespace:name`, both parts lowercase ASCII letters,
@@ -142,6 +302,25 @@ pub fn is_well_formed(id: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn offered_shared_commands_preserve_the_catalogues_effect_and_destructive_facts() {
+        for entry in CATALOGUE {
+            let command = command(entry.id).unwrap();
+            assert_eq!(command.effect, entry.effect, "{}", entry.id);
+            assert_eq!(command.destructive, entry.destructive, "{}", entry.id);
+        }
+        let delete = command(ids::NODE_DELETE).unwrap();
+        assert_eq!(delete.effect, EffectClass::DomainTruth);
+        assert!(delete.destructive);
+        let save = command(ids::SESSION_SAVE).unwrap();
+        assert_eq!(save.effect, EffectClass::ExternalEffect);
+        assert!(!save.destructive);
+        assert_eq!(
+            command(ids::VIEW_FIT).unwrap().effect,
+            EffectClass::Curation
+        );
+    }
 
     #[test]
     fn every_id_is_well_formed_unique_and_labelled() {

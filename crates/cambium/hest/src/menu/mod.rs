@@ -16,6 +16,7 @@
 
 mod session;
 
+use crate::EffectClass;
 use serde::{Deserialize, Serialize};
 
 pub use session::MenuSession;
@@ -28,6 +29,11 @@ pub struct Command {
     /// The surface it belongs to when the menu opens over one (`"node"`,
     /// `"canvas"`), or a family for search (`"projection"`).
     pub category: String,
+    /// The semantic effect the host declares for this command.
+    pub effect: EffectClass,
+    /// The command can discard data or otherwise perform a destructive change.
+    /// Hosts retain confirmation and authorization policy.
+    pub destructive: bool,
     pub shortcut: Option<String>,
     /// Why it cannot run right now; shown rather than hidden.
     pub disabled_reason: Option<String>,
@@ -38,11 +44,14 @@ impl Command {
         id: impl Into<String>,
         label: impl Into<String>,
         category: impl Into<String>,
+        effect: EffectClass,
     ) -> Self {
         Self {
             id: id.into(),
             label: label.into(),
             category: category.into(),
+            effect,
+            destructive: false,
             shortcut: None,
             disabled_reason: None,
         }
@@ -50,6 +59,11 @@ impl Command {
 
     pub fn with_shortcut(mut self, shortcut: impl Into<String>) -> Self {
         self.shortcut = Some(shortcut.into());
+        self
+    }
+
+    pub fn with_destructive(mut self, destructive: bool) -> Self {
+        self.destructive = destructive;
         self
     }
 
@@ -236,6 +250,39 @@ impl CommandSet {
 mod tests {
     use super::*;
 
+    #[test]
+    fn search_and_disabled_rows_preserve_the_hosts_effect_and_destructive_declarations() {
+        let mut set = CommandSet::new();
+        set.register(
+            Command::new(
+                "host:discard_layout",
+                "Discard layout",
+                "view",
+                EffectClass::Curation,
+            )
+            .with_destructive(true),
+        );
+        set.register(Command::new(
+            "host:send",
+            "Send",
+            "network",
+            EffectClass::ExternalEffect,
+        ));
+        set.set_disabled(
+            "host:discard_layout",
+            Some("Finish the current edit".into()),
+        );
+        let choices = CommandChoices::default();
+        let rows = set.menu(&choices, None, "discard");
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].effect, EffectClass::Curation);
+        assert!(rows[0].destructive);
+        assert!(rows[0].disabled_reason.is_some());
+        let send = set.menu(&choices, None, "send");
+        assert_eq!(send[0].effect, EffectClass::ExternalEffect);
+        assert!(!send[0].destructive);
+    }
+
     fn set() -> CommandSet {
         let mut set = CommandSet::new()
             .with_defaults(["zoom-in", "zoom-out", "save-projection"])
@@ -248,7 +295,7 @@ mod tests {
             ("save-projection", "Save projection", "projection"),
             ("add-address", "Add address", "canvas"),
         ] {
-            set.register(Command::new(id, label, category));
+            set.register(Command::new(id, label, category, EffectClass::Curation));
         }
         set
     }

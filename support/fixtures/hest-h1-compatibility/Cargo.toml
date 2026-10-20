@@ -16,4 +16,4 @@ serde_json = "1"
 # Prepublication candidates only. Every other dependency resolves from crates.io.
 [patch.crates-io]
 command-menu = { path = "../../../crates/cambium/command-menu" }
-hest = { path = "../../../crates/cambium/hest" }
+hest = { path = "../../../crates/cambium/hest-0_1" }

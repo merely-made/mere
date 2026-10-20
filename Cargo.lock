@@ -2129,7 +2129,7 @@ dependencies = [
  "backstep",
  "genet-scripted-dom",
  "genet-text",
- "hest",
+ "hest 0.2.0",
  "illume",
  "layout-dom-api",
  "mere-surface-api",
@@ -2578,6 +2578,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "blake3",
+ "hest 0.2.0",
  "sceno",
  "scenotime",
  "serde",
@@ -2773,7 +2774,7 @@ dependencies = [
 name = "command-menu"
 version = "0.1.1"
 dependencies = [
- "hest",
+ "hest 0.1.0",
 ]
 
 [[package]]
@@ -6948,7 +6949,7 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
- "hest",
+ "hest 0.2.0",
  "illume",
  "image",
  "inker",
@@ -7372,6 +7373,13 @@ checksum = "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284"
 [[package]]
 name = "hest"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "hest"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -9913,7 +9921,7 @@ dependencies = [
  "crossbeam-channel",
  "euclid",
  "futures-util",
- "hest",
+ "hest 0.2.0",
  "infer",
  "mere-forme",
  "mime_guess",
@@ -10099,7 +10107,7 @@ dependencies = [
 name = "mere-registry"
 version = "0.0.1"
 dependencies = [
- "hest",
+ "hest 0.2.0",
  "http",
  "infer",
  "inventory",
@@ -12788,7 +12796,7 @@ dependencies = [
  "eidetic",
  "euclid",
  "getrandom 0.3.4",
- "hest",
+ "hest 0.2.0",
  "hex",
  "incipit",
  "insigne",
@@ -18259,6 +18267,7 @@ dependencies = [
 name = "ux-events"
 version = "0.0.1"
 dependencies = [
+ "hest 0.2.0",
  "mere-chrome",
  "mere-kernel",
  "serde",

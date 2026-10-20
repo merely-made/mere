@@ -152,6 +152,7 @@ members = [
     "crates/cambium/tinct",
 ]
 exclude = [
+    "crates/cambium/hest-0_1",
     "crates/probes",
     # The unpublished browser host carries Git-only Genet presentation deps.
     # Keep it outside release resolution. NOTE: the entry below sits inside a
@@ -360,7 +361,7 @@ cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-genet-web-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
 command-menu = { version = "0.1.1", path = "crates/cambium/command-menu" }
-hest = { version = "0.1.0", path = "crates/cambium/hest" }
+hest = { version = "0.2.0", path = "crates/cambium/hest" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.2.2", path = "crates/cambium/sprigging" }
