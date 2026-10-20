@@ -44,11 +44,24 @@ async fn open(route: &str) -> (AppBrokerClient, EndpointDescriptor) {
 }
 async fn attach(c: &mut AppBrokerClient, d: &EndpointDescriptor, id: pandect::SessionId) {
     let s = c.snapshot(d.projections[0].request.clone()).await.unwrap();
-    let intent = mere_overmap::route::intent(
+    let Some(intent) = mere_overmap::route::intent(
         &mere_view::MereViewRequest::Session(id, mere_view::SessionStep::Switch),
         &s,
-    )
-    .unwrap();
+    ) else {
+        let current = c.snapshot(d.projections[1].request.clone()).await.unwrap();
+        assert!(
+            current
+                .scene
+                .tables
+                .sources
+                .iter()
+                .flatten()
+                .any(|source| source.adapter == SESSION_ITEM_SOURCE
+                    && source.id == id.as_uuid().to_string()),
+            "the requested session is neither attached nor attachable"
+        );
+        return;
+    };
     let reply = c
         .request_body(CarrierRequestBody::Intent(intent))
         .await
