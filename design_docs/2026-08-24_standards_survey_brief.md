@@ -32,6 +32,15 @@ it". §7.1 re-reads every PULL row under the new meaning.
 
 ---
 
+## How to read these findings
+
+2026-10-19: this survey preserves evidence, alternatives and dependencies, rather
+than assigning work to a future reader. Recommendations describe the opportunity
+seen at their dates. Explicit rulings remain recorded; normative requirements
+still describe what conformance entails. Neither the section order nor PULL's
+historical wording commits anyone to an implementation sequence. Consumer names
+are cues for relevance, and technical dependencies explain costs if revisited.
+
 ## 1. What went stale, and what that says about the shelf life of a standards doc
 
 Three findings invalidated statements in the 2026-08-10 credential brief, all
@@ -827,16 +836,18 @@ empty, which reads exactly like "no matches". The reliable instrument is
 `git grep` per repo (it uses the index and skips `target/`). Any negative result
 in a workspace-wide sweep should be accompanied by a positive control in the same
 run, or it means nothing.
-This brief should be re-checked against primary sources before it is used to
-justify work, and certainly before 2027 — §1 exists because the last inventory
-went stale in nine months.
+The primary sources and verification dates are the recovery points for these
+claims. The previous inventory went stale in nine months (§1), so an old finding
+can be a useful cue without establishing the current state.
 
 ---
 
-## 9. Decisions this leaves open
+## 9. Open questions and tradeoffs
 
-Recorded here rather than resolved, because each has more than one defensible
-answer and the choice is Mark's.
+These are questions the survey exposed at the recorded dates, including answers
+subsequently ruled. They preserve alternatives, costs and dependencies; unresolved
+entries are not requests for a decision or a backlog. Current source may already
+have changed the premise.
 
 1. **The vault format and its parameters (§2.1).** Revised: this is *not* one
    decision with `derive_child`, and it is not a v2 root. It is a self-contained
@@ -1036,7 +1047,7 @@ repair amplification, CPU/memory, storage, airtime and energy with assumptions.
 The end product is a profile/requirement matrix and reusable corpus, with a
 benchmark companion; no single compliance score or invented certification.
 
-### Source verification and next implementation
+### Source verification and integration dependencies
 
 Current source inspected at Mere `0e78fcffb140395a5c0d2f64a4dfda2b81751681` and
 Retinue `7aa87f2e9fdd973e4729e610d7130189dc22c0a0`. Tulle's heterogeneous sans-io
@@ -1048,8 +1059,9 @@ These are current source findings, not device or RF qualification.
 
 [Dash's September 16 update](https://p2panda.org/2026/09/16/dash-router-sync-api.html)
 places routing/networking/sync together behind an external event stream into
-p2panda processing and says proof-of-concept hacking is next. Preserve that
-adapter boundary and test its delivery behavior when selected. The Retinue plan
+p2panda processing and says proof-of-concept hacking is next. That
+adapter boundary is the integration seam identified here. Delivery behavior
+requires evidence from the selected implementation. The Retinue plan
 sequences the executable seed, independent codec peers, portable adapters,
 retained-repair simulation, original-byte admission, embedded resource profiles
 and physical multi-radio qualification. Later protocol branches retain their
@@ -1197,8 +1209,8 @@ For the 256-object combined-fault churn, mean historical remote receipt is
 repair reservation reduces receipt from eager's 73.44% to 59.54%/59.82%; Cuckoo
 uses about half exact repair's modeled bytes in that case. The fitting case
 recovers fully with either inventory mode, with exact using fewer modeled bytes.
-The first live producer's four-object/64 KiB profile should begin with exact
-inventory; choose Cuckoo against a concrete workload and budget. These are
+For the examined four-object/64 KiB producer profile, exact inventory provides
+a simple baseline. Cuckoo's relative value depends on the workload and budget. These are
 scheduling/policy observations, not universal delivery guarantees or a pure
 filter comparison independent of scheduling.
 
