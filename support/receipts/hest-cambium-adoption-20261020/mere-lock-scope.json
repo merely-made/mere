@@ -1,0 +1,14 @@
+{
+  "changed_package_names": [
+    "cambium",
+    "knot-capture",
+    "knot-composition",
+    "knot-document",
+    "knot-editor",
+    "knot-file-catalog",
+    "knot-site"
+  ],
+  "unrelated_blocks_byte_identical": 1761,
+  "nested_wasm_lock_change": "Cambium 0.4.0 to 0.5.0 only",
+  "murm_cohorts_preserved": true
+}

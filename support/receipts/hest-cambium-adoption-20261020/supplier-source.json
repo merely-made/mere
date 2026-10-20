@@ -1,0 +1,73 @@
+{
+  "supplier_commit": "0151950f8407769c977c9d04e4655cb104ebe3ef",
+  "source_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "d57817a6b44289751539dd10f61564c3f2e92b3b8ede9d3c33a5cec47762d17d"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "c700d674c03679dff3f9bc17bf97f92293d604108a9effd6d10b3cdf721f5baa"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "bf67dae442bf573781ed9eaa190bdda13388d062833abdbd15d2b73a840a3ea0"
+    },
+    {
+      "path": "crates/cambium/cambium/Cargo.toml",
+      "sha256": "3451afd5cf5a38d20d899ebeacd3643ac99a1af54508e095524664d591d7f250"
+    },
+    {
+      "path": "crates/cambium/cambium-winit/Cargo.toml",
+      "sha256": "84034a1bc582c130ea5464b131384a42c09c0816f2835d57c005a0e55f6217b8"
+    },
+    {
+      "path": "crates/cambium/cambium-winit-a11y/Cargo.toml",
+      "sha256": "00dbaa37e777c0be0f15d541541171f83baf7cdc2ed87016020684698d581c8d"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/Cargo.toml",
+      "sha256": "008a60d09e66251a1316ac3e0e87af6e06a117deaabc93a32c48ca0e4c7c918d"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/Cargo.toml",
+      "sha256": "97b46304f4ab276b0414b7ca082c482567d7fe55d19e5b8882fe552bef0d9d68"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-web-host/Cargo.toml",
+      "sha256": "1bd7e6b4c4b629e39fc370fce6770a5a1746e096f2ef66580407964489a2d94d"
+    },
+    {
+      "path": "crates/cambium/mesquite/Cargo.toml",
+      "sha256": "5d70d0efe4ddd9d2e8087439a846fced4df307ea8c19a216ce25a229c3f3cf7a"
+    },
+    {
+      "path": "crates/cambium/hest/Cargo.toml",
+      "sha256": "9964e146c86cf43152d35005b0432cd81e624b2eefb303761425c666519acb69"
+    },
+    {
+      "path": "crates/cambium/hest/src/lib.rs",
+      "sha256": "e763aed81d3a41c4519f6aaeeea4c11f31a30cbe3fb1fbcfcce10274459f0cb8"
+    },
+    {
+      "path": "crates/cambium/hest/src/menu/mod.rs",
+      "sha256": "8df52053783331139c8df9f3a919ca04f28c9ef409273762f701c0fe56913ea1"
+    },
+    {
+      "path": "crates/cambium/hest/src/menu/session.rs",
+      "sha256": "631eb9378be454e719fd573de5c24920aaf3af9fca8a1c8d877bb42e73f9cec9"
+    },
+    {
+      "path": "crates/cambium/hest/src/catalogue.rs",
+      "sha256": "ec51238a15945935b5c064081107060550e16a12fe60f99e2f410219239e0a7f"
+    },
+    {
+      "path": "crates/cambium/cambium/src/lib.rs",
+      "sha256": "706809767e24bcd056b589b2fbb7e43d058ccaff6744c9ed912d419dcb6924aa"
+    },
+    {
+      "path": "crates/cambium/cambium/src/command_surface.rs",
+      "sha256": "6066c9978406e1a0a7c50c1b5d02dd1eca9b728c0bc62bb48348d8a815a11536"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "fetched_main": "c5db7d6918d4a88c9062d468a1e623c8fd72592b",
+  "reconciled_h1": "f9ff6156d44123414492d01b899ea1f75dc6fde9",
+  "reconciled_h2": "60b527b31e3c90b91423b74ee648ba7df1960f14",
+  "manifests": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "c73df229dd702f2c8ed4d1b8153e565907c566cb0bcd8b327fc1f3fbe26d953f"
+    },
+    {
+      "path": "crates/cambium/cambium/Cargo.toml",
+      "sha256": "a8d81b32659e63cc86e04ec86c38085c6e068daf98aa98c68a30a30e83b9cbf4"
+    },
+    {
+      "path": "crates/cambium/cambium-winit/Cargo.toml",
+      "sha256": "8135d795ad6c2814545fe751bc2cba2e5a6b532f29ceda90aec6bd73aa0a506f"
+    },
+    {
+      "path": "crates/cambium/cambium-winit-a11y/Cargo.toml",
+      "sha256": "62040559ca5fb1111f707f5882675de8109dcf71fe515ae33e4001590ee3a205"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/Cargo.toml",
+      "sha256": "0014ff66b32ba5470a0c585f9cb8a333165e40f72dbdf2f107eed4c9c173d174"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/Cargo.toml",
+      "sha256": "bc9072f012fc5084e48caef05f224fce249113477b841164a383220caa1dfbdf"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-web-host/Cargo.toml",
+      "sha256": "9a19f5054cc61c0569e9ee3ceab1b71d0b669120bc6da647b744027ee37ff56e"
+    },
+    {
+      "path": "crates/cambium/mesquite/Cargo.toml",
+      "sha256": "6db9df54b8a48b74317af1550fb698ec470ef8a018842f95827c7dcbe008037c"
+    }
+  ]
+}

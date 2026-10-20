@@ -2,13 +2,11 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** H1/H2 are implemented locally; Cambium 0.5.0 release
-preparation and canonical Turnstone adoption are in progress. Push and
-publication remain explicitly deferred. Hest 0.1.0, its `command-menu` 0.1.1
-shim and the separate Hest 0.2.0 API are local candidates. The actual Turnstone
-receiving patch is qualified in isolation; canonical adoption remains a
-delivery gate. Published releases remain `hest` 0.0.1, `command-menu` 0.1.0,
-and Cambium 0.4.0.
+**Status (2026-10-20):** Cambium 0.5.0 is prepared and canonical Turnstone H2
+adoption is qualified locally. Hest 0.2.0 carries declarations; the frozen
+Hest 0.1.0 and `command-menu` 0.1.1 shim preserve the H1 compatibility line.
+All commits remain local. Push, publication and fresh remote-only resolution
+are deferred; native GUI and human AT acceptance remain separate.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
@@ -161,9 +159,34 @@ The port law applies: a piece moves only when a second host exercises it. A pure
 - Hest 0.1.0 is frozen byte-for-byte in `crates/cambium/hest-0_1`; Cargo
   resolves the shim to it and current consumers to 0.2.0. The compatibility
   fixture still uses immutable registry Cambium 0.4.0 and only overrides the
-  two H1 candidates. A future Cambium release exposing Hest 0.2 must advance
-  its own breaking version and the affected facade requirements before
-  publication; those facade releases are not prepared by this phase.
+  two H1 candidates. At the initial H2 fixture snapshot, the breaking Cambium version and
+  canonical adoption were deferred. The canonical continuation below now
+  prepares 0.5.0 and its direct requirement edges.
+
+### Canonical Cambium 0.5 adoption (2026-10-20)
+
+- `crates/cambium/cambium/Cargo.toml` prepares 0.5.0 because its public command
+  alias now exposes Hest 0.2's breaking declaration API. The root requirement
+  and six direct wrapper requirements follow 0.5.0. Registry Cambium 0.4.0
+  remains immutable and continues to pass the separate H1 shim check.
+- Embedded Knot `65a6632` permits the widget subset in Cambium 0.4/0.5.
+  Its desktop requirement and root lock stay fixed at 0.4. In an exact source
+  export, 53 default cases pass against the old 0.4 cohort and 66 engine cases
+  against local Mere's 0.5 cohort, with one existing ignore per run.
+- Canonical Turnstone `c210fa05b` requires Cambium 0.5 and locks the Mere
+  branch source to supplier `0151950f8`, with Knot `65a6632`. Its actual palette
+  declares the effect/destructive facts through `src/action/command_metadata.rs`;
+  only two existing Rust files change plus that new module. 242 existing Rust
+  files and 1,604 unrelated consumer lock blocks remain byte-identical.
+- Locked metadata verifies one Cambium 0.5, one Hest 0.2, a direct dependency
+  edge between them and no `command-menu`. No source path override is present.
+  The pre-existing exact source-edit revision exception remains. Mere's 1,761
+  unrelated lock blocks, including both distinct Murm cohorts, are unchanged.
+- Local Git-object fetches make the unpublished supplier commits available
+  under their canonical URL/branch identities. Fresh remote-only resolution
+  waits for authorized delivery of Knot, Mere and then Turnstone. Crates.io
+  release order is Hest 0.1 before the shim, and Hest 0.2 before Cambium 0.5;
+  no push or publication is performed by this continuation.
 
 ### Reproduce the bounded checks
 
@@ -283,3 +306,22 @@ desktop/browser presentation and native restart were not exercised.
   Mere follows that small local prerequisite commit; all six Knot package
   source rows move together. A collateral Murm resolver refresh was
   discarded; all unrelated lock blocks retain their exact prior contents.
+
+- **Canonical adoption qualified:** supplier `0151950f8`, embedded Knot
+  `65a6632` and canonical Turnstone `c210fa05b` are committed locally.
+  Supplier checks pass 405 tests; standalone Knot passes 119 across the two
+  compatibility cohorts, with one existing ignore per run. The actual
+  Turnstone full default library passes 1103 with 15 ignored,
+  zero failures, run serially with `TMPDIR=/tmp`. Its 14 focused menu/sidecar
+  cases are included in that full-library count. Workspace all-targets,
+  portable metadata, standalone WebGPU/Wasm and strict Rustdoc links pass.
+- [Canonical qualification](../../../support/receipts/hest-cambium-adoption-20261020/qualification.json),
+  [consumer checks](../../../support/receipts/hest-cambium-adoption-20261020/turnstone-checks.json),
+  [supplier source](../../../support/receipts/hest-cambium-adoption-20261020/supplier-source.json),
+  [consumer source](../../../support/receipts/hest-cambium-adoption-20261020/turnstone-tested-source.json)
+  and [dependency proof](../../../support/receipts/hest-cambium-adoption-20261020/turnstone-cohort.json)
+  retain the actual canonical receiving evidence. The previous H1/H2 fixture
+  receipts retain their original cohorts and are not represented as reruns.
+- Push/publication, remote-only delivery qualification and native GUI/human AT
+  remain held. H3/H4 remain unstarted; this adoption changes declarations and
+  registration, without adding invocation/outcome or execution authority.
