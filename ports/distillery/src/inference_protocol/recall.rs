@@ -87,6 +87,8 @@ pub enum CitationBasis {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RecallEvidence {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding: Option<EmbeddingRecallEvidence>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub owner: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub scope: Vec<RecallSourceId>,
@@ -120,4 +122,69 @@ impl RecallConfig {
             Ok(())
         }
     }
+}
+
+/// Owner-selected optional vector lane. It is unavailable without the resident's
+/// explicit inference-embedding feature; absence preserves lexical-only recall.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EmbeddingRecallSettings {
+    pub provider: EmbeddingRecallProvider,
+    pub max_index_bytes: usize,
+    pub lexical_weight: u32,
+    pub vector_weight: u32,
+    pub rrf_k: u32,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
+pub enum EmbeddingRecallProvider {
+    LexicalSparse {
+        dimensions: usize,
+        token_ngram_orders: Vec<usize>,
+    },
+    /// An already admitted model artifact in the resident's existing library.
+    Library { model: String },
+}
+impl EmbeddingRecallSettings {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.max_index_bytes == 0
+            || self.lexical_weight == 0
+            || self.vector_weight == 0
+            || self.rrf_k == 0
+        {
+            return Err(
+                "embedding recall requires positive byte, ranking and fusion bounds".into(),
+            );
+        }
+        match &self.provider {
+            EmbeddingRecallProvider::LexicalSparse {
+                dimensions,
+                token_ngram_orders,
+            } => {
+                if *dimensions == 0
+                    || *dimensions > u32::MAX as usize
+                    || token_ngram_orders.is_empty()
+                    || token_ngram_orders.contains(&0)
+                {
+                    return Err("invalid sparse embedding recall settings".into());
+                }
+            },
+            EmbeddingRecallProvider::Library { model } => {
+                eidetic::Hash::parse(model).map_err(|e| e.to_string())?;
+            },
+        }
+        Ok(())
+    }
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EmbeddingRecallEvidence {
+    pub envelope: eidetic::ManifestId,
+    pub index: eidetic::ManifestId,
+    pub cache: String,
+    pub vector_bytes: usize,
+    pub persisted_bytes: usize,
+    pub lexical_weight: u32,
+    pub vector_weight: u32,
+    pub rrf_k: u32,
 }

@@ -574,6 +574,83 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         ))
         .map_err(|e| e.to_string())
     }
+    #[cfg(feature = "inference-embedding")]
+    pub fn load_embedding_projection(
+        &self,
+        envelope: eidetic::ManifestId,
+        max_bytes: usize,
+    ) -> Result<Option<Vec<u8>>, String> {
+        let _writer = self.writer.lock().unwrap();
+        let mut backend = self.store.backend().clone();
+        let key = format!("inference/embedding-projection/v1/{envelope}");
+        let Some(reference) = pollster::block_on(backend.get(&key)).map_err(|e| e.to_string())?
+        else {
+            return Ok(None);
+        };
+        if reference.len() > 256 {
+            return Err("invalid embedding cache reference".into());
+        }
+        let id: eidetic::ManifestId =
+            serde_json::from_slice(&reference).map_err(|e| e.to_string())?;
+        let manifest = pollster::block_on(eidetic::manifest::load_manifest(&mut backend, id))
+            .map_err(|e| e.to_string())?
+            .ok_or("embedding cache manifest is unavailable")?;
+        if manifest.byte_size > max_bytes as u64
+            || eidetic::seal::seal_marker(&manifest)
+                .map_err(|e| e.to_string())?
+                .is_none()
+        {
+            return Err("embedding cache exceeds its limit or lacks private custody".into());
+        }
+        pollster::block_on(eidetic::typed::load_typed_sealed::<
+            eidetic::models::OpaqueBlob,
+        >(
+            &mut backend, &mut eidetic::NoFetcher, Some(self), id
+        ))
+        .map(|body| body.map(|b| b.0))
+        .map_err(|e| e.to_string())
+    }
+    #[cfg(feature = "inference-embedding")]
+    pub fn save_embedding_projection(
+        &self,
+        envelope: eidetic::ManifestId,
+        bytes: &[u8],
+    ) -> Result<(), String> {
+        let _writer = self.writer.lock().unwrap();
+        if !self.execution_permitted() {
+            return Err("embedding cache writing is not admitted".into());
+        }
+        let mut backend = self.store.backend().clone();
+        let body = eidetic::models::OpaqueBlob(bytes.to_vec());
+        let id = pollster::block_on(eidetic::typed::save_typed_sealed(
+            &mut backend,
+            Some(self),
+            &body,
+            vec![],
+            eidetic::PrivacyClass::LocalOnly,
+            eidetic::ProvenanceRecord::self_imported("resident recall embedding projection"),
+            eidetic::TrustEnvelope::self_asserted(),
+            eidetic::Timestamp::ZERO,
+        ))
+        .map_err(|e| e.to_string())?;
+        let manifest = pollster::block_on(eidetic::manifest::load_manifest(&mut backend, id))
+            .map_err(|e| e.to_string())?
+            .ok_or("embedding projection manifest missing")?;
+        if eidetic::seal::seal_marker(&manifest)
+            .map_err(|e| e.to_string())?
+            .is_none()
+        {
+            return Err("embedding projection requires private custody".into());
+        }
+        // Publish the cache pointer after the immutable private artifact commits.
+        // A failed pointer write leaves only an unreferenced derived artifact.
+        pollster::block_on(backend.put(
+            &format!("inference/embedding-projection/v1/{envelope}"),
+            &serde_json::to_vec(&id).map_err(|e| e.to_string())?,
+        ))
+        .map_err(|e| e.to_string())
+    }
+
     fn save_evidence<T: eidetic::TypedPayload>(
         &self,
         value: &T,

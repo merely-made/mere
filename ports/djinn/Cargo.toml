@@ -30,6 +30,7 @@ trainer = ["distillery/trainer"]
 # and recall plan, I1). Gated for the trainer's reason: a default build stays
 # light, and settings naming the lane in a build without it are refused.
 inference = ["distillery/inference-model"]
+inference-embedding = ["inference", "distillery/inference-embedding"]
 inference-gpu = ["inference", "distillery/inference-gpu"]
 inference-stages = ["inference", "personal-sync", "distillery/inference-stages"]
 # The same trainer, composed on this machine's discrete GPU. Additive over

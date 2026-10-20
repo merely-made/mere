@@ -751,6 +751,21 @@ continues to bind those exact template and weight artifacts.
 
 ### I10. The envelope and a vector lane
 
+**Implementation (2026-10-20): in progress.** Eidetic's retained
+`models::embedding` contract is published at `34105d63`. ESP supplies exact
+provider/loaded-artifact identity and guarded dense/sparse persistence. The
+resident's opt-in `inference-embedding` feature reads an already admitted model
+or a declared deterministic sparse algorithm, and stores the derived index in
+its existing encrypted journal. Source owners still supply exact retained text
+and current-version authority. Missing/foreign envelopes refuse before search;
+ordinary lexical-only settings and generic numerical APIs retain their behavior.
+
+Qualification binds one fixed held-out paraphrase corpus, native resident route,
+independent cold process, matching index reuse, same-dimension foreign-space
+refusal, stale source/chunker refusal and lexical/vector/fused measurements.
+Memory remains sparse or at most 384 dense dimensions, with owner byte bounds.
+This is not yet a completed I10 verdict.
+
 R4's vector lane behind Eidetic's embedding envelope.
 
 Done when: restart accepts an index whose envelope matches and rejects a
