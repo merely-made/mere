@@ -1,5 +1,5 @@
 {
-  "accepted": "gs-coop-view-20261020-07",
+  "accepted": "gs-coop-view-20261020-08",
   "rejected": [
     {
       "run": "01",
@@ -23,18 +23,26 @@
     },
     {
       "run": "06",
-      "reason": "Warm phases passed, then activation raced the owner window closing and open returned an error. Cold phases were not accepted.",
-      "fix": "Remove redundant owner activations after the guest finishing barriers; finishing the phase validates its receipt and process exit directly."
+      "reason": "Warm phases passed, then redundant activation raced the completed owner window closing. Cold phases were not accepted.",
+      "fix": "Remove final owner activations after the guest finishing barriers; validate the owner receipt and process exit directly."
     }
   ],
   "software_regression": {
     "reason": "The weak-catalog acquisition preceded the missing product-authority check, changing its error.",
     "fix": "Validate product authority first; rerun all 30 resident Mere tests, which pass."
   },
-  "prior_accepted": {
-    "cohort": "gs-coop-view-20261020-05",
-    "packet": "prior-cohort/native05",
-    "source_commit_for_verification": "1197db034",
-    "reason_repeated": "Main advanced to c25c2d441 with the new shared site model dependency; the ordinary view binary stayed identical but resident and preparation binary hashes changed."
-  }
+  "prior_accepted": [
+    {
+      "cohort": "native05",
+      "packet": "prior-cohort/native05",
+      "source_commit_for_verification": "1197db034",
+      "reason_repeated": "Main added the shared site model dependency; resident/preparation executable hashes changed."
+    },
+    {
+      "cohort": "native07",
+      "packet_commit": "55c8d0f4db70368860222318dbb75945048faa39",
+      "reason_repeated": "Main adopted the new native/web renderer revision; all three executable hashes changed."
+    }
+  ],
+  "renderer_source_fetch": "The new pinned netrender revision was absent from the cache. A locked application build fetched that exact source; the remaining builds and all software gates ran locked and offline."
 }

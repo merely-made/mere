@@ -2,9 +2,9 @@ await {"coop-nodes": "3", "coop": "~Guest revised existing source"}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-return.png
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-return.png
 await {"coop-available": "false", "nodes": "0", "selected": ""}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-coop-view-20261020-07/evidence/guest-withdrawn.png
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-withdrawn.png

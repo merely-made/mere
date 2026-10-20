@@ -1,8 +1,8 @@
-2026-10-20T21:43:34.704548Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-coop-view-20261020-07/private/guest/vault/vault.json
-2026-10-20T21:43:34.706967Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
-2026-10-20T21:43:34.750874Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /Users/markik/Code/output/gs-coop-view-20261020-07/private/guest/mere yet; pair this device first, or name a persona
-2026-10-20T21:43:34.751309Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-coop-view-20261020-07/private/guest/agent.sock"
-2026-10-20T21:43:34.751422Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-coop-view-20261020-07/private/guest/local/graphshell/settings/GraphViewGuest.json configured=false
-2026-10-20T21:43:40.879717Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
-2026-10-20T21:43:45.721869Z  INFO djinn: stop requested on the control route
-2026-10-20T21:43:45.722474Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 5, cancelled: 1, panicked: 0, rejected: 0 }
+2026-10-20T21:49:55.913763Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-coop-view-20261020-08/private/guest/vault/vault.json
+2026-10-20T21:49:55.934121Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-20T21:49:56.076317Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /Users/markik/Code/output/gs-coop-view-20261020-08/private/guest/mere yet; pair this device first, or name a persona
+2026-10-20T21:49:56.149567Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-coop-view-20261020-08/private/guest/agent.sock"
+2026-10-20T21:49:56.149772Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-coop-view-20261020-08/private/guest/local/graphshell/settings/GraphViewGuest.json configured=false
+2026-10-20T21:50:02.749926Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-20T21:50:08.450317Z  INFO djinn: stop requested on the control route
+2026-10-20T21:50:08.452753Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 5, cancelled: 1, panicked: 0, rejected: 0 }

@@ -1,7 +1,7 @@
-{"at_ms":1792532574481,"event":"started","installed":false,"pid":8983,"schema":"djinn.resident-events/v1","version":"0.0.2"}
-{"at_ms":1792532574482,"creating":true,"event":"waiting-for-unlock","pid":8983,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792532574914,"event":"vault-created","pid":8983,"schema":"djinn.resident-events/v1"}
-{"agent":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/app.sock","at_ms":1792532575211,"browser":"/Users/markik/Code/output/gs-coop-view-20261020-07/private/owner/browser.sock","event":"listening","pid":8983,"schema":"djinn.resident-events/v1","ticket":null}
-{"at_ms":1792532575212,"event":"ready","pid":8983,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792532612817,"event":"stopping","pid":8983,"reason":"stop intent","schema":"djinn.resident-events/v1"}
-{"at_ms":1792532613271,"event":"stopped","ok":true,"pid":8983,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792532943938,"event":"started","installed":false,"pid":9589,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792532943938,"creating":true,"event":"waiting-for-unlock","pid":9589,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792532944363,"event":"vault-created","pid":9589,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/gs-coop-view-20261020-08/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-coop-view-20261020-08/private/owner/app.sock","at_ms":1792532944662,"browser":"/Users/markik/Code/output/gs-coop-view-20261020-08/private/owner/browser.sock","event":"listening","pid":9589,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792532944663,"event":"ready","pid":9589,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792532992355,"event":"stopping","pid":9589,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792532993707,"event":"stopped","ok":true,"pid":9589,"reason":"stop intent","schema":"djinn.resident-events/v1"}
