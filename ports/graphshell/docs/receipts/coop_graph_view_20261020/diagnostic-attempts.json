@@ -1,0 +1,48 @@
+{
+  "accepted": "gs-coop-view-20261020-08",
+  "rejected": [
+    {
+      "run": "01",
+      "reason": "Preparation assumed Mint attached the minted graph; both sources reached one session.",
+      "fix": "Explicitly discover and attach each minted session, then assert distinct graph UUIDs."
+    },
+    {
+      "run": "02",
+      "reason": "Await incorrectly counted the hidden session control item as a canvas node; capture review also found invisible empty textboxes.",
+      "fix": "Assert domain node counts and style the real role=textbox elements. Replace direct-state input helper with shared native textbox/key-event input."
+    },
+    {
+      "run": "03",
+      "reason": "The controller attempted to activate an already closed owner app and open returned an error.",
+      "fix": "Activate only an unfinished phase whose owned executable is still running."
+    },
+    {
+      "run": "04",
+      "reason": "All warm phases passed, but populated resident shutdown reported active borrowers and exited unsuccessfully. Cold phases were not accepted.",
+      "fix": "Break the catalog/registrar ownership cycle with a weak catalog reference and use resident tracked tasks for co-op listeners/session waiters. Add a populated reservoir release regression."
+    },
+    {
+      "run": "06",
+      "reason": "Warm phases passed, then redundant activation raced the completed owner window closing. Cold phases were not accepted.",
+      "fix": "Remove final owner activations after the guest finishing barriers; validate the owner receipt and process exit directly."
+    }
+  ],
+  "software_regression": {
+    "reason": "The weak-catalog acquisition preceded the missing product-authority check, changing its error.",
+    "fix": "Validate product authority first; rerun all 30 resident Mere tests, which pass."
+  },
+  "prior_accepted": [
+    {
+      "cohort": "native05",
+      "packet": "prior-cohort/native05",
+      "source_commit_for_verification": "1197db034",
+      "reason_repeated": "Main added the shared site model dependency; resident/preparation executable hashes changed."
+    },
+    {
+      "cohort": "native07",
+      "packet_commit": "55c8d0f4db70368860222318dbb75945048faa39",
+      "reason_repeated": "Main adopted the new native/web renderer revision; all three executable hashes changed."
+    }
+  ],
+  "renderer_source_fetch": "The new pinned netrender revision was absent from the cache. A locked application build fetched that exact source; the remaining builds and all software gates ran locked and offline."
+}

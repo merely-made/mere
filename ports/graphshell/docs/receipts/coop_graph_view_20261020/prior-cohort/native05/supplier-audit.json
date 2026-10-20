@@ -1,0 +1,253 @@
+{
+  "result": "ok",
+  "scope": "Resolved Git packages from locked offline metadata; tracked Rust/TOML/lock/WGSL/C/C++ code compared with each pinned checkout HEAD. Includes uncompiled packages; excludes untracked and asset-only changes.",
+  "checkouts": [
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/armillary-e301d2b0038cb879/e67c5de",
+      "source": "git+https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def1c735be047492a867bcdc8b41fba22b8",
+      "head": "e67c5def1c735be047492a867bcdc8b41fba22b8",
+      "packages": [
+        "armillary"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/cleromancy-1cf25b25af3bf29c/69ed455",
+      "source": "git+https://github.com/merely-made/cleromancy.git?branch=main#69ed4554285a0fcc6b9d5dfd550eb3481aa1c9c2",
+      "head": "69ed4554285a0fcc6b9d5dfd550eb3481aa1c9c2",
+      "packages": [
+        "cleromancy-core-acceptance"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/0c53784",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3",
+      "head": "0c537848dbd2ba3f29810555eaa4df716050c2f3",
+      "packages": [
+        "chatelaine",
+        "dramatis",
+        "gaz",
+        "insigne",
+        "notochord",
+        "personae"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/eidetic-da5f5f1bff0a3046/34105d6",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000",
+      "head": "34105d63ec17826e0a58a5b461b65150357dd000",
+      "packages": [
+        "chartulary",
+        "eidetic",
+        "luggage",
+        "mere-proofs",
+        "muniment",
+        "servitor",
+        "stickleback"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/errand-22a5c66f8a0a2658/dce1f08",
+      "source": "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97",
+      "head": "dce1f08546b8475e42a5a01ca1ea18794c6e9b97",
+      "packages": [
+        "errand",
+        "finger-protocol",
+        "gemini-protocol",
+        "gopher-protocol",
+        "guppy-protocol",
+        "misfin",
+        "nex-protocol",
+        "scroll-protocol",
+        "spartan-protocol"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/esp-45bbaf8e1db2afe3/6d37190",
+      "source": "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0",
+      "head": "6d371901435b68e3fb4099a97789222d15f87cf0",
+      "packages": [
+        "esp",
+        "esp-test-support"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/gemot-59818c29094871e0/4342aed",
+      "source": "git+https://github.com/merely-made/gemot.git?rev=4342aed4bd101e68b1e71d24e010190d81765201#4342aed4bd101e68b1e71d24e010190d81765201",
+      "head": "4342aed4bd101e68b1e71d24e010190d81765201",
+      "packages": [
+        "commons-spine",
+        "gemot",
+        "mien",
+        "mooting"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/6ef3cd3",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#6ef3cd37a785a395670d3b472fb3573665497f29",
+      "head": "6ef3cd37a785a395670d3b472fb3573665497f29",
+      "packages": [
+        "browsing-context-api",
+        "buckram",
+        "cadency",
+        "document-session-api",
+        "engine-observables-api",
+        "fleece",
+        "genet-css-flow",
+        "genet-document-resources",
+        "genet-documents",
+        "genet-events",
+        "genet-fontique",
+        "genet-host-api",
+        "genet-livery",
+        "genet-paint-types",
+        "genet-parley",
+        "genet-render",
+        "genet-render-host",
+        "genet-scripted",
+        "genet-scripted-dom",
+        "genet-static-dom",
+        "genet-taffy",
+        "genet-text",
+        "genet-winit-host",
+        "layout-dom-api",
+        "livery",
+        "netfetcher",
+        "regress",
+        "script-engine-api",
+        "script-runtime-api",
+        "servo-xpath",
+        "taproot"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/kiss3d-2156ff9785df68b8/c362cd5",
+      "source": "git+https://github.com/mark-ik/kiss3d.git?rev=c362cd5855c01a525d1091589a0e38135007692f#c362cd5855c01a525d1091589a0e38135007692f",
+      "head": "c362cd5855c01a525d1091589a0e38135007692f",
+      "packages": [
+        "kiss3d",
+        "kiss3d-macro"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/9000603",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#9000603a2fea54d24366c066173a36d2239d07ca",
+      "head": "9000603a2fea54d24366c066173a36d2239d07ca",
+      "packages": [
+        "knot-capture",
+        "knot-composition",
+        "knot-document",
+        "knot-editor",
+        "knot-file-catalog",
+        "knot-site"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/70deef2",
+      "source": "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f",
+      "head": "70deef2c8cf3d3410ae35b496a9396514070b24f",
+      "packages": [
+        "mere-source-edit"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/e2f19a3",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6",
+      "head": "e2f19a3f3b42012951c4a820f9a53cb90d9bacd6",
+      "packages": [
+        "embedded-graphics",
+        "embedded-graphics-core",
+        "mere-transport",
+        "mere-webrtc-carrier",
+        "murm-wire",
+        "outrider",
+        "postilion",
+        "radio-face",
+        "radio-hand",
+        "retinue",
+        "selvage",
+        "seneschal",
+        "tulle"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/netrender-a79f0762881dec01/54d864c",
+      "source": "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "head": "54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "packages": [
+        "netrender",
+        "netrender_device",
+        "paint_list_api",
+        "paint_list_render"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b",
+      "source": "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5-upstream-20261013#1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+      "head": "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+      "packages": [
+        "mere-p2panda-net",
+        "p2panda-auth",
+        "p2panda-core",
+        "p2panda-discovery",
+        "p2panda-encryption",
+        "p2panda-store",
+        "p2panda-sync"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/turquet-b11669ab490b8380/30875f3",
+      "source": "git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b#30875f30e83909f3030bc01237a5046e14cde29b",
+      "head": "30875f30e83909f3030bc01237a5046e14cde29b",
+      "packages": [
+        "turquet"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/turquet-b11669ab490b8380/8e3755b",
+      "source": "git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802#8e3755bbd0d40343eb4750b072801c941ff32802",
+      "head": "8e3755bbd0d40343eb4750b072801c941ff32802",
+      "packages": [
+        "turquet"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/turquet-b11669ab490b8380/e2f65c0",
+      "source": "git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306#e2f65c021a6bf744ab5fe77121e0441a46b47306",
+      "head": "e2f65c021a6bf744ab5fe77121e0441a46b47306",
+      "packages": [
+        "turquet"
+      ],
+      "tracked_code_changes": []
+    },
+    {
+      "checkout": "/Users/markik/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466",
+      "source": "git+https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b46648c08f3d2062e70559afa999842e1873c",
+      "head": "276b46648c08f3d2062e70559afa999842e1873c",
+      "packages": [
+        "glifo",
+        "netrender-vello",
+        "vello_common",
+        "vello_cpu",
+        "vello_encoding",
+        "vello_shaders"
+      ],
+      "tracked_code_changes": []
+    }
+  ]
+}

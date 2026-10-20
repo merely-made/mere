@@ -1,0 +1,24 @@
+{
+  "result": "ok",
+  "accepted_test_owned_processes_stopped": true,
+  "native_processes": [
+    8028,
+    8117,
+    8183,
+    8229,
+    8250,
+    8253,
+    8262
+  ],
+  "custodian_launches": 4,
+  "diagnostic_app_copies_removed": "Only the stopped owner/guest .app copies from attempts 02, 03 and 04 were removed to recover build space. Diagnostic evidence and isolated stores were retained.",
+  "public_packet_excludes": [
+    "vaults",
+    "stores",
+    "passphrases",
+    "keys",
+    "live grants",
+    "contact files",
+    "executables"
+  ]
+}

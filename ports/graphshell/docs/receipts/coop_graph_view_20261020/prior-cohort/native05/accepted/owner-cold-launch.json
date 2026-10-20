@@ -1,0 +1,6 @@
+{
+  "launcher_pid": 8249,
+  "role": "owner",
+  "binary_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1",
+  "scenario": "owner-cold.scn"
+}
