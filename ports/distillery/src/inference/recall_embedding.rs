@@ -214,7 +214,7 @@ mod tests {
         atomic::{AtomicUsize, Ordering},
     };
     #[derive(Default)]
-    struct Cache(Mutex<std::collections::BTreeMap<eidetic::ManifestId, Vec<u8>>>);
+    struct Cache(Mutex<std::collections::HashMap<eidetic::ManifestId, Vec<u8>>>);
     impl RecallEmbeddingCache for Cache {
         fn load(&self, id: eidetic::ManifestId, _: usize) -> Result<Option<Vec<u8>>, String> {
             Ok(self.0.lock().unwrap().get(&id).cloned())
@@ -353,6 +353,33 @@ mod tests {
                 .err()
                 .unwrap()
                 .contains("before embedding")
+        );
+    }
+    #[test]
+    fn a_sparse_provider_does_not_admit_an_oversized_stored_dense_representation() {
+        let provider = Arc::new(esp::embed::LexicalEmbeddingProvider::new(512).unwrap());
+        let corpus = EmbeddingCorpusV1 {
+            chunker: "test/v1".into(),
+            sources: vec![],
+        };
+        let envelope = esp::embed::compatible::envelope(&provider, corpus.clone()).unwrap();
+        let mut index = esp::embed::VectorIndex::new(512, esp::embed::SimilarityMetric::Cosine);
+        index.insert("p".to_string(), vec![1.0; 512]).unwrap();
+        let saved = CompatibleIndex {
+            envelope: envelope.clone(),
+            vectors: esp::embed::compatible::CompatibleVectors::Dense(index),
+        };
+        let cache = Arc::new(Cache::default());
+        cache
+            .save(envelope.id(), &serde_json::to_vec(&saved).unwrap())
+            .unwrap();
+        let runtime = RecallEmbedding::new(provider, cache, options()).unwrap();
+        assert!(
+            runtime
+                .project(corpus, &[("p".into(), "text")])
+                .err()
+                .unwrap()
+                .contains("384 dense dimensions in stored projections")
         );
     }
 }

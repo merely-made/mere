@@ -65,12 +65,16 @@ async fn seed_generation_model(root: &Path, data: &Path) -> eidetic::ManifestId 
     use distillery::inference::{InferenceModelRow, PromptTemplate};
     let path = djinn::resident_distillery::model_library_path(data, &profile().0, None);
     let mut store = muniment::RedbBackend::open(path).unwrap();
+    // RoPE has no learned position tensor; retain the tiny decoder weights
+    // while admitting the complete retained-passage prompt in this fixture.
+    let mut config: Value = serde_json::from_str(decoder_fixture::CONFIG_JSON).unwrap();
+    config["max_position_embeddings"] = 2048.into();
     let model = eidetic::ModelLibrary::save_model_with_components(
         &mut store,
         "qualification/tiny-exact-session",
         "llama",
         "MIT",
-        serde_json::from_str(decoder_fixture::CONFIG_JSON).unwrap(),
+        config,
         &decoder_fixture::weights_bytes(),
         decoder_fixture::tokenizer_json().as_bytes(),
         vec![],
@@ -399,9 +403,11 @@ async fn resident_embedding_process_fixture() {
                 "reopened"
             }
         );
-        assert!(
-            projection.vector_bytes <= 384 * 4 * benchmark["documents"].as_array().unwrap().len()
-        );
+        // Serde may reserve more capacity than the logical 384 floats on
+        // reopen. Budget actual vector capacity as well as persisted bytes;
+        // CompatibleSearch independently checks every vector's exact width.
+        assert!(projection.vector_bytes <= embedding.max_index_bytes);
+        assert!(projection.persisted_bytes <= embedding.max_index_bytes);
         let ranked: Vec<_> = e
             .passages
             .iter()
