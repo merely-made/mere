@@ -456,9 +456,9 @@ livery = { version = "0.0.5", git = "https://github.com/merely-made/genet.git", 
 # neither may be patched: tinct is a workspace member as of 2026-09-03.
 tinct = { version = "=0.2.0", path = "crates/cambium/tinct" }
 
-netrender = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "c5efc94f876e93caba20807709189c5f9589492b" }
-paint_list_api = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "c5efc94f876e93caba20807709189c5f9589492b" }
-paint_list_render = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "c5efc94f876e93caba20807709189c5f9589492b" }
+netrender = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "d92050146768357ead4e4e42967866be7061262e" }
+paint_list_api = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "d92050146768357ead4e4e42967866be7061262e" }
+paint_list_render = { version = "=0.1.2", git = "https://github.com/merely-made/netrender.git", rev = "d92050146768357ead4e4e42967866be7061262e" }
 
 # Published as `mere-forme`: the crates.io name `forme` is owned by someone else
 # (an HTML template engine). The `package =` alias keeps every `use forme::...`
@@ -758,7 +758,7 @@ spartan-protocol = { git = "https://github.com/merely-made/errand.git", rev = "d
 stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "de6b1dce75dd6725d72c79b829e4878c7903a381" }
 text-protocol = { git = "https://github.com/merely-made/errand.git", rev = "dce1f08546b8475e42a5a01ca1ea18794c6e9b97" }
 # Pictograph's published dev dependency shares the renderer's device source.
-netrender_device = { git = "https://github.com/merely-made/netrender.git", rev = "c5efc94f876e93caba20807709189c5f9589492b" }
+netrender_device = { git = "https://github.com/merely-made/netrender.git", rev = "d92050146768357ead4e4e42967866be7061262e" }
 # gaz (dramatis) takes muniment from crates.io so dramatis never pins mere;
 # this swaps in mere's own, so the graph holds one muniment and castellan's
 # stores and gaz's agree on its types.
