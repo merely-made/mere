@@ -39,7 +39,7 @@ wgpu = { workspace = true }
 # The accessibility mirror: genet's neutral projection, lowered to ARIA, and
 # AccessKit only to read what a leaf says of itself.
 document-session-api = { workspace = true }
-accesskit = "0.24"
+accesskit.workspace = true
 # Walking the laid-out DOM for the mirror's targets and a leaf's key.
 layout_dom_api = { workspace = true }
 

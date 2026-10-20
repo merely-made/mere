@@ -17,11 +17,11 @@
 //! sessions, Tab handing focus across, a caught panic and the leaf key
 //! namespace are the session half of E1a.
 //!
-//! Each check runs against `accesskit_consumer` 0.35 (under
-//! `accesskit_windows` 0.32), 0.36 (under `accesskit_unix` 0.21) and 0.38
-//! (under `accesskit_macos` 0.26).
+//! Each check runs against `accesskit_consumer` 0.39.1, shared by
+//! `accesskit_windows` 0.35.1, `accesskit_unix` 0.24.0 and
+//! `accesskit_macos` 0.27.1.
 
-use accesskit::{Action, ActionRequest, Node, NodeId, Rect, Role, Tree, TreeId, TreeUpdate};
+use accesskit::{Action, ActionRequest, Node, NodeId, Rect, Role, TreeId, TreeInfo, TreeUpdate};
 use uxtree::{
     ActionTarget, Composition, GraftError, GraftTable, Grafts, graft_node, tree_id_for_path,
 };
@@ -45,7 +45,7 @@ impl FieldGuest {
         field.add_action(Action::SetValue);
         TreeUpdate {
             nodes: vec![(NodeId(1), root), (NodeId(2), field)],
-            tree: Some(Tree::new(NodeId(1))),
+            tree: Some(TreeInfo::new(NodeId(1))),
             tree_id: TreeId::ROOT,
             focus: if focused { NodeId(2) } else { NodeId(1) },
         }
@@ -74,7 +74,7 @@ impl CounterGuest {
         button.add_action(Action::Focus);
         TreeUpdate {
             nodes: vec![(NodeId(1), root), (NodeId(2), button), (NodeId(3), item)],
-            tree: Some(Tree::new(NodeId(1))),
+            tree: Some(TreeInfo::new(NodeId(1))),
             tree_id: TreeId::ROOT,
             focus: if focused { NodeId(2) } else { NodeId(1) },
         }
@@ -178,7 +178,7 @@ impl Host {
         }
         TreeUpdate {
             nodes,
-            tree: Some(Tree::new(NodeId(1))),
+            tree: Some(TreeInfo::new(NodeId(1))),
             tree_id: TreeId::ROOT,
             focus: match self.focus {
                 Focus::Host => NodeId(1),
@@ -231,15 +231,15 @@ macro_rules! e1a_against {
     ($module:ident, $consumer:ident) => {
         mod $module {
             use super::*;
-            use $consumer::{Node as Read, Tree as ConsumerTree, TreeChangeHandler};
+            use $consumer::{NodeRef as Read, Tree as ConsumerTree, TreeChangeHandler};
 
             struct Ignore;
 
             impl TreeChangeHandler for Ignore {
-                fn node_added(&mut self, _: &Read) {}
-                fn node_updated(&mut self, _: &Read, _: &Read) {}
-                fn focus_moved(&mut self, _: Option<&Read>, _: Option<&Read>) {}
-                fn node_removed(&mut self, _: &Read) {}
+                fn node_added(&mut self, _: &Read<'_>) {}
+                fn node_updated(&mut self, _: &Read<'_>, _: &Read<'_>) {}
+                fn focus_moved(&mut self, _: Option<&Read<'_>>, _: Option<&Read<'_>>) {}
+                fn node_removed(&mut self, _: &Read<'_>) {}
             }
 
             /// Activation takes the host alone; the first frame follows.
@@ -262,12 +262,12 @@ macro_rules! e1a_against {
             struct FocusLog(Vec<Option<String>>);
 
             impl TreeChangeHandler for FocusLog {
-                fn node_added(&mut self, _: &Read) {}
-                fn node_updated(&mut self, _: &Read, _: &Read) {}
-                fn focus_moved(&mut self, _: Option<&Read>, new: Option<&Read>) {
+                fn node_added(&mut self, _: &Read<'_>) {}
+                fn node_updated(&mut self, _: &Read<'_>, _: &Read<'_>) {}
+                fn focus_moved(&mut self, _: Option<&Read<'_>>, new: Option<&Read<'_>>) {
                     self.0.push(new.and_then(|node| node.label()));
                 }
-                fn node_removed(&mut self, _: &Read) {}
+                fn node_removed(&mut self, _: &Read<'_>) {}
             }
 
             fn reading_order(tree: &ConsumerTree) -> Vec<String> {
@@ -517,6 +517,4 @@ macro_rules! e1a_against {
     };
 }
 
-e1a_against!(windows_consumer_0_35, accesskit_consumer_windows);
-e1a_against!(unix_consumer_0_36, accesskit_consumer_unix);
-e1a_against!(macos_consumer_0_38, accesskit_consumer_macos);
+e1a_against!(shared_consumer_0_39, accesskit_consumer);

@@ -580,10 +580,12 @@ color = "0.3"
 
 
 # Input + accessibility + window plumbing.
-accesskit = "0.24"
-accesskit_windows = "0.32"
-accesskit_unix = "0.21"
-accesskit_macos = "0.26"
+accesskit = "0.25.1"
+accesskit_windows = "0.35.1"
+accesskit_unix = "0.24.0"
+accesskit_macos = "0.27.1"
+accesskit_winit = "0.34.1"
+accesskit_consumer = "=0.39.1"
 ui-events = "0.3"
 dpi = "0.1.2"
 raw-window-handle = "0.6"
