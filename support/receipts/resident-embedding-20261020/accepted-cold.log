@@ -1,0 +1,24 @@
+
+running 1 test
+test resident_embedding_process_fixture ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 41.99s
+
+       42.07 real        45.36 user         1.48 sys
+           589180928  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              145510  page reclaims
+                   1  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                7194  messages sent
+                7193  messages received
+                   0  signals received
+                 849  voluntary context switches
+               58651  involuntary context switches
+        352774400222  instructions retired
+        182081118382  cycles elapsed
+           309506048  peak memory footprint
