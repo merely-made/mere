@@ -1,0 +1,202 @@
+{
+  "status": "reconciled canonical receiving passed locally",
+  "tested_merge_commit": "8e3e5cb1074153c0178cec13ab5cf72dc6cdbeaa",
+  "upstream_mere": "d95e04bb49c367d17b94064a647fbbdb50c0414d",
+  "upstream_turnstone": "1d131854bedecc2528fbc9b4cf5d08928fcae5dd",
+  "upstream_knot": "d30dff67f078943ececc91f4cd226087c9a2dea1",
+  "mere_merge": "5c48985ca1af5e138a644b7e98ccdd820395177c",
+  "knot_merge": "255b9987b0748ade89b583f1c4756607e4336ed4",
+  "supplier_commit": "0151950f8407769c977c9d04e4655cb104ebe3ef",
+  "active_knot_commit": "65a6632a24b764d04eecf7302a1087342eccbfbe",
+  "git_sources": {
+    "mere.git": [
+      "git+https://github.com/merely-made/mere.git?branch=main#0151950f8407769c977c9d04e4655cb104ebe3ef",
+      "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
+    ],
+    "knot-editor.git": [
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632a24b764d04eecf7302a1087342eccbfbe"
+    ],
+    "genet.git": [
+      "git+https://github.com/merely-made/genet.git?branch=main#6ef3cd37a785a395670d3b472fb3573665497f29"
+    ],
+    "netrender.git": [
+      "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6"
+    ],
+    "murm.git": [
+      "git+https://github.com/merely-made/murm.git?branch=main#814c978462b42276d1be7bec0b07430b655ccd7b"
+    ]
+  },
+  "checks": [
+    {
+      "name": "command-menu",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "command_menu"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "elapsed_seconds": 35.52,
+      "log": "reconciled/command-menu.log",
+      "raw_log_sha256": "e5c73ed4b7cd009aa1ece3dbb0228c3d747cb4f2a107bd2cf76ea29d5730f780",
+      "log_sha256": "088db0072f5dae93bfc357eb3560edf7e2d81aa9605b3e80f0502140c666c896"
+    },
+    {
+      "name": "inspector",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "inspector_pane::tests::"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "elapsed_seconds": 5.89,
+      "log": "reconciled/inspector.log",
+      "raw_log_sha256": "26c0f053e044424a0e7b938507f4939d62781622f092b6a31ba895950e4a8059",
+      "log_sha256": "39b12db918df8e40f9dfe008f2893817a0256334a4222262a5883e5167e9a4dc"
+    },
+    {
+      "name": "knot-authoring",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "knot_authoring::tests::"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [
+        {
+          "passed": 23,
+          "failed": 0,
+          "ignored": 5
+        }
+      ],
+      "elapsed_seconds": 4.27,
+      "log": "reconciled/knot-authoring.log",
+      "raw_log_sha256": "3f88b6d6f88f7808e1da48d08cd5a0ead3cfa8d2d2df5a626b52d96426493b3d",
+      "log_sha256": "2beaa0015e4f3d220cebd11d9d0ede5b3d36a9ce27a98776045ecc1f6a6def23"
+    },
+    {
+      "name": "all-targets",
+      "command": [
+        "cargo",
+        "check",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [],
+      "elapsed_seconds": 9.93,
+      "log": "reconciled/all-targets.log",
+      "raw_log_sha256": "8ef993566c8f7ab4e131c083f9f94eccc05af023db26f503a92d9d55f8939d12",
+      "log_sha256": "8ef993566c8f7ab4e131c083f9f94eccc05af023db26f503a92d9d55f8939d12"
+    },
+    {
+      "name": "library",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [
+        {
+          "passed": 1103,
+          "failed": 0,
+          "ignored": 15
+        }
+      ],
+      "elapsed_seconds": 668.24,
+      "log": "reconciled/library.log",
+      "raw_log_sha256": "742051397023f7dc85c11f27b315a401b34a6e451a07e44cc6812cb9f9504f87",
+      "log_sha256": "ac3c5cfe992a821e54d62bea1571be65a1dcd6326e15095cdf3a704419ecea6a"
+    },
+    {
+      "name": "portable-metadata",
+      "command": [
+        "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "scripts/cargo_mode.py",
+        "verify",
+        "--metadata-only"
+      ],
+      "environment": {
+        "TMPDIR": "/tmp"
+      },
+      "exit_code": 0,
+      "suites": [],
+      "elapsed_seconds": 5.06,
+      "log": "reconciled/portable-metadata.log",
+      "raw_log_sha256": "ef80a3e51c5be60e19e671e9c7565d9915ecdd811fea8ffa7b57479280fc7214",
+      "log_sha256": "ef80a3e51c5be60e19e671e9c7565d9915ecdd811fea8ffa7b57479280fc7214"
+    }
+  ],
+  "full_library_result": {
+    "passed": 1103,
+    "failed": 0,
+    "ignored": 15
+  },
+  "focused_passes": {
+    "command_menu_and_sidecar": 14,
+    "inspector": 15,
+    "knot_authoring": 23
+  },
+  "focused_tests_overlap_full_library": true,
+  "knot_authoring_existing_ignored": 5,
+  "unchanged_upstream_rust_files": 242,
+  "unchanged_upstream_package_blocks": 1604,
+  "source_override_added": false,
+  "note": "Mere/Knot supplier pins remain the qualified local commits. All upstream renderer and geometry-fixture changes are preserved. The separate upstream Knot Eidetic-manifest update is merged without adopting that unrelated cohort into Turnstone.",
+  "push_performed": false,
+  "publish_performed": false,
+  "consumer_receipt_commit": "9df2f000722d3e3f52855930b2f98ad4c07c6855",
+  "metadata_exit_code": 0,
+  "metadata_sha256": "91753e3f7a11c14d1f7c969ab3bd7d5d61f3d4f747fe981e6171105122af8d42",
+  "cambium_version": "0.5.0",
+  "hest_version": "0.2.0",
+  "cambium_package_count": 1,
+  "hest_package_count": 1,
+  "command_menu_package_count": 0,
+  "direct_cambium_to_hest_edge": true,
+  "documentation_check": "reconciled/documentation-check.json"
+}
