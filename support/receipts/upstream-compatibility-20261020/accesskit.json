@@ -1,0 +1,576 @@
+{
+  "pass": "accesskit",
+  "date": "2026-10-20",
+  "mere_base": "81dd41681581a1e7b94e6284bb66081088daba6c",
+  "toolchain": "1.99.1-x86_64-apple-darwin",
+  "debug_info": 0,
+  "incremental": 0,
+  "jobs": 4,
+  "gates": {
+    "genet-accesskit-test": {
+      "cwd": "/Users/markik/Code/worktrees/genet-accesskit-025",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "genet-winit-host"
+      ],
+      "exit": 0,
+      "seconds": 2.64,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "d19c9faba1016fdf6df7bb135896881c7c276e7a05f8d572e3d01cd7087e2f87",
+      "test_results": [
+        "ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    "genet-render-a11y": {
+      "cwd": "/Users/markik/Code/worktrees/genet-accesskit-025",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "genet-render",
+        "a11y",
+        "--lib"
+      ],
+      "exit": 0,
+      "seconds": 106.81,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "33a3601769d95590f06d99aece5b0ceb8037427611b3d4a1fa438b6b7bc3d2ef",
+      "test_results": [
+        "ok. 61 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.30s"
+      ]
+    },
+    "mere-native-composition": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "uxtree",
+        "-p",
+        "cambium-winit-a11y",
+        "--lib",
+        "--tests"
+      ],
+      "exit": 0,
+      "seconds": 141.66,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "1179fd189a07fb7b09a5e578435d46de30d6885af545dda4570c5c943aae3e7c",
+      "test_results": [
+        "ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.83s",
+        "ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    "mere-native-host-a11y": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-genet-winit-host",
+        "--test",
+        "accessibility"
+      ],
+      "exit": 0,
+      "seconds": 61.13,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "9237acde4dc0b06bede8386452b79ae99919bd8b86748c63b66a0734a35db6e2",
+      "test_results": [
+        "ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s"
+      ]
+    },
+    "mere-graft-a11y": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "graft-engine",
+        "--lib"
+      ],
+      "exit": 0,
+      "seconds": 14.84,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "5257c349d23e00f89e036cab78a3c7f1987ab236fd7c989983a3e799729c08c1",
+      "test_results": [
+        "ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    "mere-a11y-example": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-winit-a11y",
+        "--example",
+        "e1b_two_sessions"
+      ],
+      "exit": 0,
+      "seconds": 46.25,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "33fe8e0a60a635ead5a8c7c23a0f64a862ee1267c44c23c93c033a3450288ef3",
+      "test_results": []
+    },
+    "mere-web-host": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit": 0,
+      "seconds": 61.0,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "5f42cec9cfd634493bcbde4dae8d2b786622ed713831603ad75da8e264f96921",
+      "test_results": []
+    },
+    "browser-webgl2": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "check",
+        "--locked",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "remote,presentation-webgl2,without-classic-vello"
+      ],
+      "exit": 0,
+      "seconds": 122.11,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "7149907cefab1798223cc07126fb5497430a014bf7b663cd73d8c666e199f7e9",
+      "test_results": []
+    },
+    "genet-metadata-probe": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/distillery/probe",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit": 0,
+      "seconds": 31.51,
+      "debug": 0,
+      "incremental": 0,
+      "log_sha256": "bff4e6e9256def42e0ff110356c8b0d9dd9dc8d682f41ec29a04940710e11f29",
+      "test_results": []
+    },
+    "genet-metadata-remote-fixture": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/distillery/probe/remote-fixture",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit": 0,
+      "seconds": 2.26,
+      "debug": 0,
+      "incremental": 0,
+      "log_sha256": "a4933cf52586279c5daf71f83e54fd1a5fac65e50b055659e4e8a33b1fb8acf7",
+      "test_results": []
+    },
+    "mere-port-boundaries": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit": 0,
+      "seconds": 4.86,
+      "lock_unchanged": true,
+      "log_sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "test_results": []
+    },
+    "mere-accesskit-format": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/rustfmt",
+        "--check",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "crates/cambium/cambium-winit-a11y/examples/e1b_two_sessions.rs",
+        "crates/cambium/cambium-winit-a11y/src/lib.rs",
+        "crates/cambium/cambium-winit-a11y/tests/e1a_sessions.rs",
+        "crates/forme/uxtree/src/graft.rs",
+        "crates/forme/uxtree/src/lib.rs",
+        "crates/forme/uxtree/tests/e1a_subtrees.rs",
+        "crates/inker/engines/graft-engine/src/engine.rs"
+      ],
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_results": []
+    },
+    "accesskit-web-wasm-tree": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "tree",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--edges",
+        "normal",
+        "--prefix",
+        "none",
+        "--format",
+        "{p}"
+      ],
+      "exit": 0,
+      "seconds": 2.32,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "d226dde464a8d3e245808a7844a856b012bb6285012a5edcc9d4c49b24741b77",
+      "test_results": []
+    }
+  },
+  "changed_source_sha256": {
+    "Cargo.lock": "e0a991aa17d70728725466c24b064e5bd0914792ad34d9c2d26e1452d6cd84da",
+    "Cargo.toml": "4259c862d9a35fc9f10f3a288d3d3977a4ca9e8fc63f2b9ca518451be92e26cd",
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": "9a19f5054cc61c0569e9ee3ceab1b71d0b669120bc6da647b744027ee37ff56e",
+    "crates/cambium/cambium-genet-winit-host/Cargo.toml": "bc9072f012fc5084e48caef05f224fce249113477b841164a383220caa1dfbdf",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "9938b2ffc1aca59e10dda09b7974f2dbb633ec6915c43151a81bb562835e3888",
+    "crates/cambium/cambium-winit-a11y/examples/e1b_two_sessions.rs": "6a7dcbd0ff300d9ed3cac7f5a1252c1b21e6113462de59f6a598b7a70c551dfa",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "dddef78586ee592e5860617c5692f04e534df7a3bd6aff26e45206627ea83a3a",
+    "crates/cambium/cambium-winit-a11y/tests/e1a_sessions.rs": "909f8c033aca1e7dda349383cebc77bd7139a0befba2ffb0394213132a1c8eba",
+    "crates/cambium/sprigging/Cargo.toml": "94d344efe23c38f9b3c771a6743d3bf9f01361ca84b89bfd0a7117bf8e5ec14b",
+    "crates/cambium/tabard-workshop/Cargo.toml": "e793fa409a86cc7679eb8fdb44ee4aaee9eb43763377478a16bc1b274a65a6e3",
+    "crates/forme/uxtree/Cargo.toml": "2d9bd2e8ac72b361eb54fa800b1f06d999cea6befa2ea0f383b7b82da774a79e",
+    "crates/forme/uxtree/src/graft.rs": "331d43baffde6dbbd5557bfe5f2a0be861fdc6b06ae18b121c275fc08eefa308",
+    "crates/forme/uxtree/src/lib.rs": "a5ec4b9b91fe905821ead1daf3f560d3332d11dd377ddff5eb469c06375edf19",
+    "crates/forme/uxtree/tests/e1a_subtrees.rs": "cb502434ddfd8a6560f27762806bb27d8060b13c4eb15bde2580b1fe5f3c4158",
+    "crates/inker/engines/graft-engine/src/engine.rs": "d1f31e232d885a1927ad620ffa3dc78f439e0f38f0e4e2c8dafe8e6184958eb4",
+    "ports/distillery/probe/Cargo.lock": "80698e3dfbcda35f111b53ff7992c1cd470f6aeb5c5bd520f5620a63b7003a51",
+    "ports/distillery/probe/remote-fixture/Cargo.lock": "b8a793e0663492884e382bd4b6653e0a390bd73b89ac242069c25c351dd03f66",
+    "ports/graphshell/Cargo.toml": "a8221ea3a0c265a989e91697807c4ce9716fbe984eefda218b22febf3ef3c557",
+    "ports/graphshell/web/Cargo.lock": "d84050411dafb5c98b0bb22cbbdb09401e5cb0cb0b97b5241187903d3bbfcbdb"
+  },
+  "description": "Adopt one stable AccessKit 0.25.1 cohort and shared 0.39.1 consumer; migrate TreeInfo/NodeRef; reconcile active consumer locks.",
+  "genet_candidate": {
+    "provider": "genet",
+    "candidate": "319af6fd2df8f28ad0553d77291933262829c526",
+    "published_ref": "refs/heads/codex/accesskit-025-20261020",
+    "source_sha256": {
+      "Cargo.toml": "cb0511e402b603a597e70c80d69fabb268497c6ec0a9397b27c9fef4a713c582",
+      "components/genet-winit-host/Cargo.toml": "ba872b11c32dfc2e4afd40f6186af08474fe1d6ed57fb09f8b6ae21e6ab9d14a",
+      "components/genet-winit-host/src/a11y.rs": "0a9d68e40370f211d638ab8e2e08d2f2486c4e050aaedf6f385d1c48a9c14a34",
+      "components/genet-render/src/a11y.rs": "e18f528db6d14a6807adac566776f7c07be8c7e8a314c3cd8a2404b811e0ab55"
+    },
+    "gates": {
+      "genet-accesskit-test": {
+        "cwd": "/Users/markik/Code/worktrees/genet-accesskit-025",
+        "command": [
+          "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+          "test",
+          "--locked",
+          "-p",
+          "genet-winit-host"
+        ],
+        "exit": 0,
+        "seconds": 2.64,
+        "debug": 0,
+        "incremental": 0,
+        "jobs": 4
+      },
+      "genet-render-a11y": {
+        "cwd": "/Users/markik/Code/worktrees/genet-accesskit-025",
+        "command": [
+          "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+          "test",
+          "--locked",
+          "-p",
+          "genet-render",
+          "a11y",
+          "--lib"
+        ],
+        "exit": 0,
+        "seconds": 106.81,
+        "debug": 0,
+        "incremental": 0,
+        "jobs": 4
+      }
+    }
+  },
+  "lock_audit": [
+    {
+      "lock": "Cargo.lock",
+      "sha256": "e0a991aa17d70728725466c24b064e5bd0914792ad34d9c2d26e1452d6cd84da",
+      "package_count": [
+        1764,
+        1764
+      ],
+      "git_removed": [
+        "git+https://github.com/merely-made/genet.git?branch=main#4987cdf895cd1b6ddc0bdd060bf1522893392494"
+      ],
+      "git_added": [
+        "git+https://github.com/merely-made/genet.git?branch=main#319af6fd2df8f28ad0553d77291933262829c526"
+      ],
+      "accesskit": [
+        [
+          "accesskit",
+          "0.24.1"
+        ],
+        [
+          "accesskit",
+          "0.25.1"
+        ],
+        [
+          "accesskit_atspi_common",
+          "0.21.0"
+        ],
+        [
+          "accesskit_consumer",
+          "0.39.1"
+        ],
+        [
+          "accesskit_ios",
+          "0.2.1"
+        ],
+        [
+          "accesskit_macos",
+          "0.27.1"
+        ],
+        [
+          "accesskit_unix",
+          "0.24.0"
+        ],
+        [
+          "accesskit_windows",
+          "0.35.1"
+        ],
+        [
+          "accesskit_winit",
+          "0.34.1"
+        ]
+      ]
+    },
+    {
+      "lock": "ports/graphshell/web/Cargo.lock",
+      "sha256": "d84050411dafb5c98b0bb22cbbdb09401e5cb0cb0b97b5241187903d3bbfcbdb",
+      "package_count": [
+        1028,
+        1055
+      ],
+      "git_removed": [],
+      "git_added": [
+        "git+https://github.com/merely-made/genet.git?branch=main#319af6fd2df8f28ad0553d77291933262829c526",
+        "git+https://github.com/merely-made/netrender.git?branch=main#d92050146768357ead4e4e42967866be7061262e"
+      ],
+      "accesskit": [
+        [
+          "accesskit",
+          "0.25.1"
+        ]
+      ]
+    },
+    {
+      "lock": "ports/distillery/probe/Cargo.lock",
+      "sha256": "80698e3dfbcda35f111b53ff7992c1cd470f6aeb5c5bd520f5620a63b7003a51",
+      "package_count": [
+        811,
+        805
+      ],
+      "git_removed": [
+        "git+https://github.com/merely-made/genet.git?branch=main#e37762d752e423dc43f920bd728c83f70c47f2cc",
+        "git+https://github.com/merely-made/netrender.git?branch=main#f4f9c0d87e6a6030b61075a45118055dfe6a12df",
+        "git+https://github.com/merely-made/netrender.git?rev=d92050146768357ead4e4e42967866be7061262e#d92050146768357ead4e4e42967866be7061262e"
+      ],
+      "git_added": [
+        "git+https://github.com/merely-made/genet.git?branch=main#319af6fd2df8f28ad0553d77291933262829c526",
+        "git+https://github.com/merely-made/netrender.git?branch=main#d92050146768357ead4e4e42967866be7061262e"
+      ],
+      "accesskit": [
+        [
+          "accesskit",
+          "0.25.1"
+        ]
+      ]
+    },
+    {
+      "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
+      "sha256": "b8a793e0663492884e382bd4b6653e0a390bd73b89ac242069c25c351dd03f66",
+      "package_count": [
+        989,
+        989
+      ],
+      "git_removed": [
+        "git+https://github.com/merely-made/genet.git?branch=main#e37762d752e423dc43f920bd728c83f70c47f2cc",
+        "git+https://github.com/merely-made/netrender.git?rev=d92050146768357ead4e4e42967866be7061262e#d92050146768357ead4e4e42967866be7061262e"
+      ],
+      "git_added": [
+        "git+https://github.com/merely-made/genet.git?branch=main#319af6fd2df8f28ad0553d77291933262829c526",
+        "git+https://github.com/merely-made/netrender.git?branch=main#d92050146768357ead4e4e42967866be7061262e"
+      ],
+      "accesskit": [
+        [
+          "accesskit",
+          "0.25.1"
+        ]
+      ]
+    }
+  ],
+  "dependency_boundaries": {
+    "worktree": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "toolchain": "Rust 1.99.1",
+    "checks": {
+      "accesskit-web-wasm-tree": {
+        "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+        "command": [
+          "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+          "tree",
+          "--locked",
+          "-p",
+          "cambium-genet-web-host",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--edges",
+          "normal",
+          "--prefix",
+          "none",
+          "--format",
+          "{p}"
+        ],
+        "exit": 0,
+        "seconds": 2.32,
+        "debug": 0,
+        "incremental": 0,
+        "jobs": 4
+      },
+      "accesskit-native-legacy-inverse": {
+        "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+        "command": [
+          "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+          "tree",
+          "--locked",
+          "-p",
+          "cambium-genet-winit-host",
+          "-i",
+          "accesskit@0.24.1",
+          "--edges",
+          "normal"
+        ],
+        "exit": 101,
+        "seconds": 8.68,
+        "debug": 0,
+        "incremental": 0,
+        "jobs": 4
+      },
+      "accesskit-workspace-legacy-inverse": {
+        "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+        "command": [
+          "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+          "tree",
+          "--locked",
+          "--workspace",
+          "-i",
+          "accesskit@0.24.1",
+          "--edges",
+          "normal"
+        ],
+        "exit": 101,
+        "seconds": 4.85,
+        "debug": 0,
+        "incremental": 0,
+        "jobs": 4
+      }
+    },
+    "wasm_graph": {
+      "tree_lines": 569,
+      "accesskit_0_25_1_occurrences": 3,
+      "forbidden_native_nodes": {
+        "genet-winit-host": false,
+        "accesskit_winit": false,
+        "accesskit_windows": false,
+        "accesskit_unix": false,
+        "accesskit_macos": false
+      },
+      "locked": true
+    },
+    "legacy_0_24_1": {
+      "active_native_host_inverse_exit": 101,
+      "active_workspace_inverse_exit": 101,
+      "lock_only": true,
+      "lock_dependent": "egui 0.36.2",
+      "optional_manifest_owner": "crates/cambium/cambium-rootstock/Cargo.toml (optional egui dependency behind embedding-egui feature)",
+      "active_in_requested_graphs": false
+    }
+  },
+  "untouched_other_tracked_locks": 39,
+  "qualification_limits": [
+    "Native macOS x86_64 automated bridge/projector/composition/headless-host tests; no live assistive-technology session.",
+    "Wasm compile and normal dependency-cone checks; no browser runtime interaction.",
+    "Windows/Linux adapters are resolved and share the tested consumer; their native binaries were not built.",
+    "AccessKit 0.24.1 remains lock-only for optional egui embedding.",
+    "Genet candidate is published only on its feature branch; provider and consumer main integration are separate."
+  ]
+}

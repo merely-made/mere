@@ -36,7 +36,7 @@
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
-use accesskit::{Action, Node, NodeId, Role, Tree, TreeId, TreeUpdate};
+use accesskit::{Action, Node, NodeId, Role, TreeId, TreeInfo, TreeUpdate};
 use inker::{Block, EngineDocument, FoldState, InlineSpan, MenuRow, inline_text};
 
 pub mod graft;
@@ -83,7 +83,7 @@ impl UxTree {
     pub fn to_tree_update(&self, focus: Option<NodeId>) -> TreeUpdate {
         TreeUpdate {
             nodes: self.nodes.iter().map(|(id, n)| (*id, n.clone())).collect(),
-            tree: Some(Tree::new(self.root)),
+            tree: Some(TreeInfo::new(self.root)),
             tree_id: TreeId::ROOT,
             focus: focus.unwrap_or(self.root),
         }

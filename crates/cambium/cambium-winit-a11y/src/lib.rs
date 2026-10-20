@@ -529,7 +529,7 @@ mod dpi_tests {
     use std::collections::HashMap;
 
     use super::*;
-    use accesskit::{ActionRequest, Node, Role, Tree, TreeId};
+    use accesskit::{ActionRequest, Node, Role, TreeId, TreeInfo};
 
     /// A 125% window must report physical coordinates to the platform: the
     /// logical layout bounds ride a root transform that scales them.
@@ -539,7 +539,7 @@ mod dpi_tests {
         let root = A11yNodeId(dom.opaque_id(dom.document()));
         let mut tree = TreeUpdate {
             nodes: vec![(root, Node::new(Role::Window))],
-            tree: Some(Tree::new(root)),
+            tree: Some(TreeInfo::new(root)),
             tree_id: TreeId::ROOT,
             focus: root,
         };
@@ -768,7 +768,7 @@ mod dpi_tests {
                 });
                 node
             })],
-            tree: Some(Tree::new(slot)),
+            tree: Some(TreeInfo::new(slot)),
             tree_id: TreeId::ROOT,
             focus: slot,
         };

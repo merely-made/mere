@@ -15,11 +15,11 @@
 //! chain, bounds compose through the graft's transform, and a screen reader's
 //! action names its tree in [`ActionRequest::target_tree`].
 //!
-//! AccessKit 0.24 implements subtrees in the consumer layer under every pinned
-//! adapter (`accesskit_windows` 0.32, `accesskit_unix` 0.21, `accesskit_macos`
-//! 0.26). The consumer enforces its rules by panicking, inside the adapter, on
-//! the host's frame. [`Composition::new`] checks the same rules first and
-//! returns a [`GraftError`] instead.
+//! AccessKit 0.25.1 implements subtrees in the consumer layer under every
+//! pinned adapter (`accesskit_windows` 0.35.1, `accesskit_unix` 0.24.0,
+//! `accesskit_macos` 0.27.1). The consumer enforces its rules by panicking
+//! inside the adapter on the host's frame. [`Composition::new`] checks the same
+//! rules first and returns a [`GraftError`] instead.
 //!
 //! Ruled as the stack's join (app composition brief, AC2, 2026-10-07):
 //! `design_docs/cambium_docs/research/2026-10-06_app_composition_brief.md`.
@@ -27,7 +27,9 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 
-use accesskit::{ActionRequest, Affine, Node, NodeId, Rect, Role, Tree, TreeId, TreeUpdate, Uuid};
+use accesskit::{
+    ActionRequest, Affine, Node, NodeId, Rect, Role, TreeId, TreeInfo, TreeUpdate, Uuid,
+};
 
 /// Derive a stable [`TreeId`] from a domain path, as [`node_id_for_path`]
 /// does for nodes: the same path always names the same tree, so automation
@@ -81,7 +83,7 @@ pub fn as_subtree(mut update: TreeUpdate, tree: TreeId) -> TreeUpdate {
             .flat_map(|(_, node)| node.children().iter().copied())
             .collect();
         if let Some((root, _)) = update.nodes.iter().find(|(id, _)| !children.contains(id)) {
-            update.tree = Some(Tree::new(*root));
+            update.tree = Some(TreeInfo::new(*root));
         }
     }
     update
@@ -401,7 +403,7 @@ mod tests {
         }
         TreeUpdate {
             nodes,
-            tree: Some(Tree::new(NodeId(1))),
+            tree: Some(TreeInfo::new(NodeId(1))),
             tree_id: TreeId::ROOT,
             focus: NodeId(1),
         }
