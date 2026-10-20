@@ -1,0 +1,128 @@
+[
+  {
+    "capture": "private-baseline.png",
+    "sha256": "f0773c376daedf9fcd579d1d3147433d68b481fcd6bcb92bc3abba6d471999be",
+    "reviewed": true,
+    "observation": "Owner sees only the private sentinel in the separately selected sibling graph, with Saved acknowledgement.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-created.png",
+    "sha256": "259b2f5a2d0b200c3f273419dca6ec466a3e80d7d6d5a4d25be875a3d683fd7d",
+    "reviewed": true,
+    "observation": "Owner sees the chosen graph and its first saved source; guest is uninvited.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-invited.png",
+    "sha256": "e70a8c57697525e80711ab4b3c19660982f57f5b8447e71f382c7fdf40c95292",
+    "reviewed": true,
+    "observation": "Invitation saved; the chosen graph names the distinct guest root and editor access.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-joined.png",
+    "sha256": "36ca53e9c27785ae80e901802f7ce60f5b60ecd08065643ddced5f952cd1ac2e",
+    "reviewed": true,
+    "observation": "Distinct guest identity sees one chosen graph and the owner source; invitation controls are absent.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-added.png",
+    "sha256": "4584c92b4dabd02c76712b8069b10fb0211b7e67bd2558019f53f13eaecbafab",
+    "reviewed": true,
+    "observation": "Saved by holder; both source cards and a Guest activity entry are visible.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-saw-guest.png",
+    "sha256": "b9635cd6715ed912c5561097349ae0fce22095cad0969e642c3665854dff0536",
+    "reviewed": true,
+    "observation": "Owner sees the guest source and Guest attribution in the same chosen graph.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-live-append.png",
+    "sha256": "2be0c48d48d743f1c5b8d0f933231fe7a653126b540aed7e6754dfcebf30153d",
+    "reviewed": true,
+    "observation": "Owner sees all three source cards after the live owner addition, with Saved acknowledgement.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-saw-push.png",
+    "sha256": "556d1df56f28656b1dbc843414df4a77bef02aef2943a879058e79c0bd6ddee4",
+    "reviewed": true,
+    "observation": "Guest receives the owner live source as a third card without a refresh action; Owner and Guest activity remain distinct.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-reopened.png",
+    "sha256": "5f0502e23525b255ff8de83a182da0b30f6d9b2bd7bbbc904c1307ab016dfb6b",
+    "reviewed": true,
+    "observation": "New guest process sees the same three cards and saved activity under the same guest identity.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-selected.png",
+    "sha256": "278fd19c1b57304825778b449924c4ef8e79f10d6b7fefc427aa6a7b7f624b19",
+    "reviewed": true,
+    "observation": "Guest source is selected locally for title editing; other source cards remain visible.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-renamed.png",
+    "sha256": "b57c439784ebd3ba18f8c0f41e5b616a5ce57ccce71ca1eda4ffbb3529e34c8c",
+    "reviewed": true,
+    "observation": "Guest source revised is visible with Saved by holder and a new Guest activity entry.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-ended-access.png",
+    "sha256": "daec6701c98154a4697ba670516b5b72d95610d67519c9d57d562909e0f93dcf",
+    "reviewed": true,
+    "observation": "Owner sees Guest access ended and revoked access; the revised guest title and three cards remain retained.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-access-ended.png",
+    "sha256": "c2145de0619b133421b9fa073aa5ded4776a8aef6fad5c790caac981f6669753",
+    "reviewed": true,
+    "observation": "Guest sees an Unavailable connection message and Reconnect control; graph cards, edit fields and activity are removed.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-cold-retained.png",
+    "sha256": "89cef46c9ebe17b46a2afa6521d3bd120afa66c951f10601ccbd7178a4423525",
+    "reviewed": true,
+    "observation": "After both custodians and apps restarted, owner sees the revised three-card graph, retained activity, same journal position and revoked guest.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-cold-new-edit.png",
+    "sha256": "c2e57bc0bf93657b2a2c5e6bffa1cf7a91a66b3109ffb9996d301c7d5f8f9667",
+    "reviewed": true,
+    "observation": "Owner can save a fourth source after cold reopen while guest access remains revoked.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "guest-cold-denied.png",
+    "sha256": "665f1edc58c51dfda1b63287c9cda72734b5548c6dda45e1683e7c4021406840",
+    "reviewed": true,
+    "observation": "Cold guest admission names Delegation(Revoked); no graph, edit fields or activity is disclosed.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "owner-cold-refused-guest.png",
+    "sha256": "ff29c5d6f1427fdc2111a69af3fe133f85efa6032cb39dab55a9c686026da8b8",
+    "reviewed": true,
+    "observation": "Owner retains all four cards and revoked access after the guest admission refusal.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  },
+  {
+    "capture": "private-unchanged.png",
+    "sha256": "07f13eae2ce58427a0233b499039c45ffaf9f3bb11e082bef241b263fe50510c",
+    "reviewed": true,
+    "observation": "A final explicit sibling visit shows only the original private sentinel and unchanged owner activity and journal position.",
+    "presentation_note": "The overview scroll leaves the heading partly clipped at the top; relevant status, scope and controls remain legible."
+  }
+]

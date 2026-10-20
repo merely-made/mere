@@ -1,0 +1,26 @@
+[
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-reopened.png",
+    "nodes": 3
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-selected.png",
+    "click": "select-d8741e9e-fe05-4d1d-a5af-f87e817354c7",
+    "nodes": 3
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-renamed.png",
+    "set": [
+      "",
+      "Guest source revised"
+    ],
+    "click": "rename",
+    "nodes": 3,
+    "status": "Saved by holder"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-access-ended.png",
+    "wait_file": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-ended-access.json",
+    "status": "Unavailable"
+  }
+]

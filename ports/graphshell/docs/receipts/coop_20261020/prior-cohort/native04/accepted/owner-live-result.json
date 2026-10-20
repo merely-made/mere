@@ -1,0 +1,67 @@
+{
+  "captures": 5,
+  "frames": 503,
+  "pid": 80959,
+  "result": "ok",
+  "state": {
+    "data": {
+      "access": "revoked",
+      "authors": [
+        {
+          "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell"
+        },
+        {
+          "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        },
+        {
+          "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        },
+        {
+          "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        },
+        {
+          "id": "personae:be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        }
+      ],
+      "epoch": 1,
+      "graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+      "guest": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+      "nodes": [
+        {
+          "address": "https://shared.invalid/owner",
+          "id": "e9fb8f7d-3509-43ac-87e2-0d85e7fc19e7",
+          "title": "Owner source"
+        },
+        {
+          "address": "https://shared.invalid/guest",
+          "id": "d8741e9e-fe05-4d1d-a5af-f87e817354c7",
+          "title": "Guest source revised"
+        },
+        {
+          "address": "https://shared.invalid/owner-live",
+          "id": "757b2ac7-9047-42df-938b-f57f326095da",
+          "title": "Owner live source"
+        }
+      ],
+      "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+      "revision": 16
+    },
+    "root": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+    "status": "Guest access ended"
+  }
+}
