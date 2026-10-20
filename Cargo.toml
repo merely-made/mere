@@ -472,7 +472,7 @@ uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
 personal-facts = { package = "mere-personal-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
-apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus" }
+apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus", default-features = false }
 eidetic = { version = "0.0.2", default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
 # index + weighted-field recall + column reports + the hybrid-fusion seam.
