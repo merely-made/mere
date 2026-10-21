@@ -1,0 +1,149 @@
+[
+  {
+    "name": "cambium",
+    "command": "cargo test --locked --offline -p cambium --lib",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 279,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 22.5,
+    "log": "cambium.log",
+    "raw_log_sha256": "dccfa27b921924a6795bd3a4fa501a668a7ffa1cabb74ecbbca29983e5416ade",
+    "log_sha256": "2cbd550147e60f3340582234a9e10fac8d70f3ae6539a6fc089f439959168c93"
+  },
+  {
+    "name": "graphshell-viewer",
+    "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --lib viewer_commands::tests",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 42.57,
+    "log": "graphshell-viewer.log",
+    "raw_log_sha256": "42a3f07b7f179cc69c075dab9a25bbdec104408409d210d7ca249070d5739cd9",
+    "log_sha256": "2426bc06f37082af4b6333f04ea7991b17cd1d87402174c824b603d5968ce6cf"
+  },
+  {
+    "name": "graphshell-declarations",
+    "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --test command_declarations",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 11.14,
+    "log": "graphshell-declarations.log",
+    "raw_log_sha256": "a81576792f54215c57b21b6458d2b1b4539f06ef9c9f84f85fdf2c6ae558a6f7",
+    "log_sha256": "99c1bdd08c0c015e5b9d5a0b9bc9865a4cf5825581a5af463f1523909947eb5f"
+  },
+  {
+    "name": "probe",
+    "command": "cargo test --locked --offline -p ux-events --lib",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 40,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 5.87,
+    "log": "probe.log",
+    "raw_log_sha256": "1857ed7778f5ae746436cd2a5d9583fa62c70d344bcc801bd0ac9c04b4ab430b",
+    "log_sha256": "b968e7a24fba6b7d1126c61fb7a1766912b78e9f9c0091c70935e75c585cd953"
+  },
+  {
+    "name": "supplier-contract",
+    "command": "cargo test --locked --offline -p hest@0.2.0 -p chirograph --lib",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "kind": "test",
+    "log": "supplier-contract.log",
+    "raw_log_sha256": "1e39f64e560bcaf4ee7bb8e388b84d3a83607c933e99e0d39f155a7bccf54ed4",
+    "log_sha256": "4395ec75650ae16fb92c129dc62fc07c9ddc443f36043d308a2a19655cb38a23"
+  },
+  {
+    "name": "supplier-host",
+    "command": "cargo test --locked --offline -p cambium-genet-winit-host --test command_menu_compact --test accessibility",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "kind": "test",
+    "log": "supplier-host.log",
+    "raw_log_sha256": "bc76c0d415b923b5e47d816088505e6cfe1de27c12ac12a4d35adafc3d6c845c",
+    "log_sha256": "5c605c56c839d6bf8f182f5713b506acaed7436cdd13a4fd722fc380777e85a1"
+  },
+  {
+    "name": "shim-compatibility",
+    "command": "cargo test --locked --offline --manifest-path support/fixtures/hest-h1-compatibility/Cargo.toml",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "kind": "test",
+    "log": "shim-compatibility.log",
+    "raw_log_sha256": "bf3c42ac70513a8f188e8a811d83576388ae50512f8f617cffd6b2f933465f35",
+    "log_sha256": "f5e8f20545c4435e72f055347e61d1f5d1cd7e9a9053fbf02868323bb6e3cb25"
+  },
+  {
+    "name": "wasm-first",
+    "command": "cargo check --offline --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown --no-default-features --features presentation-webgpu",
+    "exit_code": 0,
+    "suites": [],
+    "kind": "compile",
+    "log": "wasm-first.log",
+    "raw_log_sha256": "7f5d21fd1ea7b786d60be96694bfe4a3d0f730a3a03789cfaf6f0cd25f8f4f90",
+    "log_sha256": "7f5d21fd1ea7b786d60be96694bfe4a3d0f730a3a03789cfaf6f0cd25f8f4f90"
+  },
+  {
+    "name": "rustdoc",
+    "command": "RUSTDOCFLAGS='-D rustdoc::broken_intra_doc_links' cargo doc --locked --offline -p hest@0.2.0 -p cambium -p command-menu --no-deps",
+    "exit_code": 0,
+    "suites": [],
+    "kind": "compile",
+    "log": "rustdoc.log",
+    "raw_log_sha256": "03c3fec3017296e45bd97c23c7351362a45ed819057e102de50004471db2ecad",
+    "log_sha256": "03c3fec3017296e45bd97c23c7351362a45ed819057e102de50004471db2ecad"
+  }
+]

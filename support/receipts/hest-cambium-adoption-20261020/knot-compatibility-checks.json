@@ -1,0 +1,88 @@
+[
+  {
+    "name": "knot-old-lock",
+    "command": [
+      "cargo",
+      "update",
+      "-p",
+      "cambium",
+      "--precise",
+      "dffcc9c806457319d3f748477bff6327f220b085",
+      "--offline"
+    ],
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 6.88,
+    "log": "knot-old-lock.log",
+    "raw_log_sha256": "b9a3b23b9e5cb8601d256cea0a1afce451190800874420e76e73f67295a04bb6",
+    "log_sha256": "b9a3b23b9e5cb8601d256cea0a1afce451190800874420e76e73f67295a04bb6"
+  },
+  {
+    "name": "knot-old-default",
+    "command": [
+      "cargo",
+      "test",
+      "--config",
+      "profile.dev.debug=0",
+      "--locked",
+      "--offline",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 53,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "elapsed_seconds": 30.51,
+    "log": "knot-old-default.log",
+    "raw_log_sha256": "c4640dd1cf3e425ce6a7ef4116588c4944a18466ddca50f27eff239f44da1b5d",
+    "log_sha256": "ba9745f7a89b57e880897310c02b067668b4050bb95c93f68ba25cdff6b498c6"
+  },
+  {
+    "name": "knot-new-update",
+    "command": [
+      "cargo",
+      "update",
+      "-p",
+      "cambium",
+      "--precise",
+      "0151950f8407769c977c9d04e4655cb104ebe3ef",
+      "--offline"
+    ],
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 2.15,
+    "log": "knot-new-update.log",
+    "raw_log_sha256": "43253320c1752ee64a9c86e77726ea617ba125cd844350500c5e374f2410b320",
+    "log_sha256": "43253320c1752ee64a9c86e77726ea617ba125cd844350500c5e374f2410b320"
+  },
+  {
+    "name": "knot-new-engine",
+    "command": [
+      "cargo",
+      "test",
+      "--config",
+      "profile.dev.debug=0",
+      "--locked",
+      "--offline",
+      "--features",
+      "engine",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 66,
+        "failed": 0,
+        "ignored": 1
+      }
+    ],
+    "elapsed_seconds": 12.4,
+    "log": "knot-new-engine.log",
+    "raw_log_sha256": "55776c63e3dd101fc66a5a59825eb9a95ad05f17592a28b938e4f26b3d365137",
+    "log_sha256": "011a7a3482699e575ab1ac7d8a1078e2c33580f62914a027fb34be220132cfeb"
+  }
+]

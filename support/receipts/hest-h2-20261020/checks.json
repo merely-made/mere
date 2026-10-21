@@ -1,0 +1,225 @@
+[
+  {
+    "name": "model",
+    "command": "cargo test --locked --offline -p hest@0.2.0",
+    "exit_code": 0,
+    "elapsed_seconds": 5.78,
+    "suites": [
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "0d1c1e03875238e2d5a436319fd07896ffa2f208e3bce046ac8d6f115c576ff7",
+    "log_sha256": "842a0040d7baf477d6d63cc50c94b42b4dc2b547d7a69f6e0b34e1149365e891",
+    "log": "model.log"
+  },
+  {
+    "name": "probe",
+    "command": "cargo test --locked --offline -p ux-events --lib",
+    "exit_code": 0,
+    "elapsed_seconds": 5.05,
+    "suites": [
+      {
+        "passed": 40,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "6bc9d14b94be356c3301a1e9241c6b550539b82fb205ac127e6a188144bdb1ca",
+    "log_sha256": "3374fef1e1aac009ee8660d1dc8f581eff7c4c72a9fc07427c896b34a7af221b",
+    "log": "probe.log"
+  },
+  {
+    "name": "effect-adapter",
+    "command": "cargo test --locked --offline -p chirograph --lib command_effect::",
+    "exit_code": 0,
+    "elapsed_seconds": 2.64,
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "911386be91cd1cc038215e9710435c4bbfb6beeecdcd6f440240f31319ee30e5",
+    "log_sha256": "2bce1f61f14b1fce14822a12177df927e011b961af6fee4ec732bdb2b09c8fc7",
+    "log": "effect-adapter.log"
+  },
+  {
+    "name": "actions",
+    "command": "cargo test --locked --offline -p mere-kernel --lib tests::actions",
+    "exit_code": 0,
+    "elapsed_seconds": 3.98,
+    "suites": [
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "68573b20026b5ce143e651adbf66252e0fc272902acf237b1a741893c8b43033",
+    "log_sha256": "4a6e3f3d544f67c079917c0216b56c84581c1a91a673a12c4cf9e419e494d2a2",
+    "log": "actions.log"
+  },
+  {
+    "name": "input",
+    "command": "cargo test --locked --offline -p mere-registry --no-default-features --features input --lib input::",
+    "exit_code": 0,
+    "elapsed_seconds": 5.46,
+    "suites": [
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "4e3ffa44301e0cb65a4d0f199c051a5fafbdf0ca24624b51ed13a6062ea9fb04",
+    "log_sha256": "14afc14b2938378e85ea607c024a75fda3e63a92ec7302fe9010e6054848ac1e",
+    "log": "input.log"
+  },
+  {
+    "name": "compact",
+    "command": "cargo test --locked --offline -p cambium-genet-winit-host --test command_menu_compact",
+    "exit_code": 0,
+    "elapsed_seconds": 10.56,
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "d81ea23a1bfbca2f81c946353482f1f83496f812e661c0c0f96efa01df653e14",
+    "log_sha256": "5a98057e6eee7ca21cb277106cf5ba99fdf1364cc8f138fe7cdc44d76263ca2f",
+    "log": "compact.log"
+  },
+  {
+    "name": "accessibility",
+    "command": "cargo test --locked --offline -p cambium-genet-winit-host --test accessibility",
+    "exit_code": 0,
+    "elapsed_seconds": 5.91,
+    "suites": [
+      {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "d21fd61ac2e597786060bdd0d02fbb2eaea17ba1b807cdb1662b65080e15436b",
+    "log_sha256": "68d47e4411a1b296f41ef2cb7f9a4a2ea93a473c85947770a20fd94202773936",
+    "log": "accessibility.log"
+  },
+  {
+    "name": "viewer",
+    "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --lib viewer_commands::tests",
+    "exit_code": 0,
+    "elapsed_seconds": 35.42,
+    "suites": [
+      {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "03e955c1a68e36cbdb45c82a3fd07c8210158d8f2796a683e642799937fec36f",
+    "log_sha256": "8942b201f013005380cf72885566894778e4f1bb8982c960649d578d571f7977",
+    "log": "viewer.log"
+  },
+  {
+    "name": "page-declarations",
+    "command": "cargo test --locked --offline -p graphshell --no-default-features --features web --test command_declarations",
+    "exit_code": 0,
+    "elapsed_seconds": 13.0,
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "b23d7d106f9c6aebb517d82d8f3dd835d659ee911cd68205f74df1bcc7e1108e",
+    "log_sha256": "085821971ba9247db94cc5cd8d19a266d7c95dcc7f05c93d00bd04298b6ba8c0",
+    "log": "page-declarations.log"
+  },
+  {
+    "name": "stored-choices",
+    "command": "cargo test --locked --offline -p pandect --lib a_view_set_now_waits_for_the_next_batch",
+    "exit_code": 0,
+    "elapsed_seconds": 10.6,
+    "suites": [
+      {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "95258f866a5193bb540129d497903c742ef2465668e01b4d199ab7f789cef0e9",
+    "log_sha256": "51e70f5b53347fcd4f35c47588a9f27c4c7a674ece8d639fc61d4f14091802f8",
+    "log": "stored-choices.log"
+  },
+  {
+    "name": "frozen-h1",
+    "command": "cargo test --locked --offline --manifest-path crates/cambium/hest-0_1/Cargo.toml",
+    "exit_code": 0,
+    "elapsed_seconds": 0.62,
+    "suites": [
+      {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "30d926f90277780e319c39199232a29b6fb8d1a73808b05fffcd6a5aad9ae61c",
+    "log_sha256": "624e5f1a469cc4765d3eae73923946ba04767ceeb3a61646534d30ce5b703e2d",
+    "log": "frozen-h1.log"
+  },
+  {
+    "name": "shim-compatibility",
+    "command": "cargo test --locked --offline --manifest-path support/fixtures/hest-h1-compatibility/Cargo.toml",
+    "exit_code": 0,
+    "elapsed_seconds": 3.18,
+    "suites": [
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "raw_log_sha256": "3ba33af64364e8d5ca7ee5c4a827a3786cf999f638b953d3864fe559109c63ba",
+    "log_sha256": "8da169635e2866a673f637b2ff465c395f30c3bc38117355d330d72df0392c49",
+    "log": "shim-compatibility.log"
+  },
+  {
+    "name": "turnstone",
+    "command": "cargo test --locked --offline --lib app::palette::command_menu_tests",
+    "working_directory": "/Users/markik/Code/testing/mere/hest-h2-20261020/turnstone",
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "log": "turnstone.log",
+    "raw_log_sha256": "88fee988ece98e16939e7cb89b47bcdd5c0d86ad1abd3df105a782efeedda940",
+    "log_sha256": "5ee5e9584fee89a206bd4d3dc71d209950b37231a7c8c317aaebd4e7a6c0e287"
+  }
+]

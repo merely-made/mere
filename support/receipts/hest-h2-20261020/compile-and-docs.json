@@ -1,0 +1,18 @@
+[
+  {
+    "name": "wasm",
+    "command": "cargo check --locked --offline --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown --no-default-features --features presentation-webgpu",
+    "exit_code": 0,
+    "log": "wasm.log",
+    "raw_log_sha256": "e2048799d3ff512fce9bf7a331a52eadd137493aef5cc4853587ed820cfa0dad",
+    "log_sha256": "e2048799d3ff512fce9bf7a331a52eadd137493aef5cc4853587ed820cfa0dad"
+  },
+  {
+    "name": "rustdoc",
+    "command": "RUSTDOCFLAGS='-D rustdoc::broken_intra_doc_links' cargo doc --locked --offline -p hest@0.2.0 -p command-menu --no-deps",
+    "exit_code": 0,
+    "log": "rustdoc.log",
+    "raw_log_sha256": "d2508f9e58042f16bdfc660fc9ae1469bd733633a98b18b27c13169fa14091ca",
+    "log_sha256": "d2508f9e58042f16bdfc660fc9ae1469bd733633a98b18b27c13169fa14091ca"
+  }
+]

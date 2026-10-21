@@ -1,0 +1,8 @@
+{
+  "accepted_cohort": "gs-c2-20261020-05",
+  "owner_owned_subjects_remaining": [],
+  "guest_owned_subjects_remaining": [],
+  "native_and_custodian_exit": "All seven native exits and four ordinary custodian stop events passed. Independent local/SSH process inspection found no accepted native or custodian subjects remaining on either Mac.",
+  "checkout_scope": "Task source worktrees only; primary working files were not edited by this task. Separate active work and local commits remained in both primary checkouts; the remote primary advanced independently during qualification.",
+  "ssh": "Task-owned control master closed after the M4 verified publication 351456fc3. No forwarding or personal agent forwarding."
+}

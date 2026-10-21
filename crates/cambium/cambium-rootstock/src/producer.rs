@@ -158,9 +158,13 @@ pub trait TextureProducer {
 
     /// What the slot means to an assistive technology: a role and name for
     /// the slot itself, and the things drawn in it as child nodes with their
-    /// rectangles. Read when the host publishes its accessibility tree, not
-    /// per frame. `None`, the default, leaves the slot's DOM semantics alone.
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    /// rectangles. Read for host semantic publication and current-target action
+    /// admission; separate reads may occur between frames. Describe current
+    /// state without rendering, allocating identities, rebuilding action routes
+    /// or advancing application state. `None`, the default,
+    /// leaves the slot's DOM/Sprigging semantics alone. Reading and activation
+    /// are separate calls, without a snapshot or transaction guarantee.
+    fn semantics(&self) -> Option<ProducerSemantics> {
         None
     }
 
@@ -190,11 +194,16 @@ pub struct ProducerSemantics {
 pub struct ProducerNode {
     /// The producer's stable name for the node, so a reader's request
     /// reaches it however the list is ordered when the reader acts.
+    /// Keys must be unique within one `ProducerSemantics` description.
     pub key: u64,
     pub role: ProducerRole,
     pub name: String,
     /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
-    /// (layout) pixels, from the slot's top-left corner.
+    /// (layout) pixels, from the content-box top-left corner, matching
+    /// `ProducerFrameInfo::logical_size` and content-local pointer coordinates.
+    /// The host currently publishes untransformed, scroll-adjusted bounds;
+    /// forward CSS transform/clip and flattened-ancestor placement remain
+    /// unqualified.
     pub rect: [f32; 4],
     /// What a reader may do to it, each lowered to a button of its own
     /// ([`TextureProducer::act`] carries one out).
@@ -206,6 +215,8 @@ pub struct ProducerNode {
 /// [`TextureProducer::act`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProducerAction {
+    /// Unique within this child's actions. Other child keys may use the same
+    /// action ID. Ambiguous contributions are refused by shared host composition.
     pub id: String,
     /// The button's name.
     pub label: String,
@@ -273,8 +284,8 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     fn retire(&mut self) {
         self.borrow_mut().retire();
     }
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
-        self.borrow_mut().semantics()
+    fn semantics(&self) -> Option<ProducerSemantics> {
+        self.borrow().semantics()
     }
     fn act(&mut self, key: u64, id: &str) -> bool {
         self.borrow_mut().act(key, id)

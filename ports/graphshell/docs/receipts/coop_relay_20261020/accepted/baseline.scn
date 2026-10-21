@@ -1,0 +1,14 @@
+await {"status": "ready", "attached": "b780a303-0f03-4f8f-8b6b-449c289b7da7"}
+wait 30000
+click role:button @data-session-step=switch:db281f81-0353-4c9a-b22c-674dd5460151
+await {"attached": "db281f81-0353-4c9a-b22c-674dd5460151"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-relay-20261020-04/local/evidence/private-before.png
+click role:button @data-session-step=switch:b780a303-0f03-4f8f-8b6b-449c289b7da7
+await {"attached": "b780a303-0f03-4f8f-8b6b-449c289b7da7"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-relay-20261020-04/local/evidence/existing-graph.png

@@ -1,0 +1,140 @@
+{
+  "basis": "4e4a2c8c51802dd0a285fce4b096c39d909312de",
+  "target": "C:\\t\\cargo-targets\\mere",
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "gates": {
+    "diagnostics-admission-final": {
+      "receipt": "diagnostics-admission-final.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "--test",
+        "accessibility"
+      ],
+      "exit_code": 0,
+      "lock_sha256": "1d2d8d28ecb4a201ca00c0ebcb58c07d9a0bb14198c342f3766e48318eb9a427"
+    },
+    "diagnostics-platform-native": {
+      "receipt": "diagnostics-platform-native.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-web-host",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "lock_sha256": "1d2d8d28ecb4a201ca00c0ebcb58c07d9a0bb14198c342f3766e48318eb9a427"
+    },
+    "diagnostics-collector-clock": {
+      "receipt": "diagnostics-collector-clock.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "mere-registry",
+        "-p",
+        "mere-apparatus",
+        "--no-default-features",
+        "--features",
+        "mere-registry/diagnostics,mere-apparatus/registry,mere-apparatus/serde",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "lock_sha256": "015da5779e580ab4317da5c71eb4e52a6aa7c3092cde989615dc9f4131416c7f"
+    },
+    "diagnostics-browser-compile": {
+      "receipt": "diagnostics-browser-compile.json",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features"
+      ],
+      "exit_code": 0,
+      "lock_sha256": "1d2d8d28ecb4a201ca00c0ebcb58c07d9a0bb14198c342f3766e48318eb9a427"
+    },
+    "diagnostics-collector-wasm": {
+      "receipt": "diagnostics-collector-wasm.json",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "mere-apparatus",
+        "--no-default-features",
+        "--features",
+        "registry,serde",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0,
+      "lock_sha256": "015da5779e580ab4317da5c71eb4e52a6aa7c3092cde989615dc9f4131416c7f"
+    }
+  },
+  "passed_counts": [
+    19,
+    7,
+    126,
+    17,
+    5,
+    24,
+    39
+  ],
+  "passed_total": 237,
+  "existing_ignores": 7,
+  "source_hash_convention": "sha256 after CRLF-to-LF normalization",
+  "source_sha256": {
+    "Cargo.lock": "015da5779e580ab4317da5c71eb4e52a6aa7c3092cde989615dc9f4131416c7f",
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "1d7abef2bb5f95807ec910f95ffc4a0497b9bf03d9cbc787012053a211c12328",
+    "crates/cambium/cambium-genet-winit-host/tests/accessibility.rs": "f28fb206790d14f6e3218981bc8ade8c5db83476caab42e05d35b241c8688656",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "0014ff66b32ba5470a0c585f9cb8a333165e40f72dbdf2f107eed4c9c173d174",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "b79cc5557c520e3a8f73a94a13b935b0857d344638624b06f93d1413a80daaba",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "6ac3f275bd0699df2ab0296c31172dd4432a443ead05b29b41ed6120e7b41f3d",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "51c1e68acf2b34a87682624b1f7b5c883cae03df9a37df7d8988b95b6b1739e8",
+    "crates/cambium/cambium-rootstock/src/multi_host_tests.rs": "db5f2fbe832f2922a4694f8423f466c95a0e7279098814cf69f0037aada6356c",
+    "crates/domain/apparatus/Cargo.toml": "e4ccd4a283f6b7a970261e3ea7a6b0c1b77989f1f935ed0b811f3af22b2e8b7d",
+    "crates/domain/apparatus/src/lib.rs": "0727eff8dccb8f115f538da460c255bbc8f17d3720cc32792a614cf52ad5a47f",
+    "crates/system/registry/Cargo.toml": "b390606744f8843a2f8a6747066ac02c82b9f37162aef734041c3c29ea9273a1",
+    "crates/system/registry/src/diagnostics/emit/queue.rs": "124528eded19b5b6087fb8dc1341d123226373222e25e4f34e2649802d1f0c48",
+    "crates/domain/apparatus/src/collector.rs": "d4f3572ad1ba07601c2478438fbf7893da6e619083a2dea4eb9a0de6b4e65693",
+    "crates/domain/apparatus/src/collector/tests.rs": "53380a6735377b280205ba848e9bfe21be5e5f1d03da180f559115f0ca4d61d7",
+    "Cargo.toml": "def9ceb18aaa2503a1730167973ac03385d382255b17133cead039f3e664bf68",
+    "rust-toolchain.toml": "70b1451554546366dd35c01225416776cfb8c0e3a73da440def1bed6de93808e"
+  },
+  "artifact_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-fdbcc76612630b98.exe": "8cf3d4629f3c349d9581b2e2725a9a00f7332b3e25ca6a426cd026c460fcb019",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-7357e183b2b7e2bb.exe": "db744ac097cc8e0f109bd9e4adb1308b682f0cc31c20a7ccf777894ea36b89e4",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-d682f53638f684b2.exe": "8ec1a374e240552058c194f03333e1aed5813043008326762c8c7f16b86f1f02",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-f15af630697aa3b1.exe": "98b319f53e4fc3dc7732d36c26b039e24f8db455581f947312fa376af58938a0",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-5938f34120850204.exe": "c2bde0c2bb2202a54f0694ce3b41aaab21e092738742af03357508d740219b8e",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\apparatus-83ab4a79832f02f0.exe": "e3c4a6736124f515ff5d5ccc4e564a24c107a77a784ece968d395f30bfa20245",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\registry-4ecf0ac15555443b.exe": "5c40695fbe1addbb0823bddd286ef72cd2e784c1e14b9367883c7db437c62774"
+  },
+  "locked_package_identities_unchanged": true,
+  "lock_changes": "Only dependency edges: Rootstock to existing AccessKit; optional Apparatus to Registry diagnostics; Registry diagnostics to existing web-time. No package source, version or checksum changes.",
+  "earlier_development_checks": "Earlier failed CLI, compile and fixture checks are retained separately and are not qualification. Previous passing intermediary gates are not added again to totals.",
+  "limits": [
+    "not full-source audit closure",
+    "no product-wide collector startup/sampling/invariant installation",
+    "no target session/revision/lifetime guarantee",
+    "separate semantic projectors and AccessKit leaf contributions remain",
+    "no terminal outcome proof from routing",
+    "no headed/browser runtime or human AT acceptance"
+  ],
+  "isolated_outputs_created": []
+}

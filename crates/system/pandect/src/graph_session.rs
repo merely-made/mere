@@ -4786,7 +4786,7 @@ mod tests {
             assert!(!session.has_unstored());
             let key = ViewKey::new("graphshell", "commands").unwrap();
             let menu = ViewIntent {
-                commands: Some(command_menu::CommandChoices {
+                commands: Some(hest::menu::CommandChoices {
                     added: vec!["add-address".into()],
                     removed: vec!["zoom-out".into()],
                     recent: vec!["zoom-in".into()],

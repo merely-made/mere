@@ -13,6 +13,78 @@ use layout_dom_api::{LayoutDom, LayoutDomMut, LocalName, Namespace};
 
 use super::*;
 
+fn plan_document(projection: &DocumentA11yProjection, scale: f32) -> Vec<MirrorNode> {
+    plan(
+        &SemanticProjection::from_document(projection.clone()),
+        scale,
+    )
+}
+
+struct Board(cambium_rootstock::ProducerSemantics);
+impl cambium_rootstock::TextureProducer for Board {
+    fn render(
+        &mut self,
+        _: &cambium_rootstock::ProducerContext<'_>,
+    ) -> Option<cambium_rootstock::ProducedTexture> {
+        None
+    }
+    fn semantics(&self) -> Option<cambium_rootstock::ProducerSemantics> {
+        Some(self.0.clone())
+    }
+}
+fn producer_fixture() -> (ScriptedDom, cambium_rootstock::OwnedLayout) {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(root, "<custom-leaf id='producer-slot' key='7' aria-label='Graph' style='position:absolute;left:10px;top:100px;width:900px;height:600px'></custom-leaf>");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 1200.0, 900.0, &[], &Default::default());
+    (dom, layout)
+}
+fn producer_plan(semantics: cambium_rootstock::ProducerSemantics, scale: f32) -> Vec<MirrorNode> {
+    let (dom, layout) = producer_fixture();
+    producer_plan_for(&dom, &layout, semantics, scale)
+}
+fn producer_plan_for(
+    dom: &ScriptedDom,
+    layout: &cambium_rootstock::OwnedLayout,
+    semantics: cambium_rootstock::ProducerSemantics,
+    scale: f32,
+) -> Vec<MirrorNode> {
+    let mut producers = cambium_rootstock::ProducerRegistry::new();
+    producers.register(7, Board(semantics), &[]).unwrap();
+    let projection = cambium_rootstock::project_semantics(
+        dom,
+        layout,
+        &mut cambium_rootstock::LeafRegistry::new(),
+        &mut producers,
+        None,
+    );
+    let mirror = plan(&projection, scale);
+    let mut lowered = produced_actions(&mirror);
+    let mut source = projection
+        .produced_targets
+        .iter()
+        .map(|(id, action)| (id.0, action.clone()))
+        .collect::<Vec<_>>();
+    lowered.sort_by_key(|(id, _)| *id);
+    source.sort_by_key(|(id, _)| *id);
+    assert_eq!(
+        lowered, source,
+        "ARIA preserves shared native IDs and action bindings"
+    );
+    // Select the real slot without assuming the document's wrapper elements.
+    vec![
+        flat(&mirror)
+            .into_iter()
+            .find(|n| {
+                n.id == dom
+                    .opaque_id(element_with_id(dom, dom.document(), "producer-slot").unwrap())
+            })
+            .unwrap()
+            .clone(),
+    ]
+}
+
 #[path = "../../examples/a11y_page/page.rs"]
 mod page;
 
@@ -60,14 +132,14 @@ fn element_with_id(dom: &ScriptedDom, node: NodeId, id: &str) -> Option<NodeId> 
     if dom.attribute(node, &Namespace::from(""), &LocalName::from("id")) == Some(id) {
         return Some(node);
     }
-    dom.dom_children(node)
+    dom.flat_children(node)
         .find_map(|child| element_with_id(dom, child, id))
 }
 
 #[test]
 fn each_control_on_the_page_lowers_to_its_aria_role_and_name() {
     let h = laid_out_page();
-    let mirror = plan(&h.a11y_projection(), 1.0, |_, _| None);
+    let mirror = plan_document(&h.a11y_projection(), 1.0);
 
     let named = |role: &str| -> Vec<Option<String>> {
         with_role(&mirror, role)
@@ -125,7 +197,10 @@ fn app_textbox_marker_runs_through_the_browser_mirror_as_a_leaf() {
         .expect("the fixture has its ordinary textbox");
     let app_id = dom.opaque_id(app_field);
     let ordinary_id = dom.opaque_id(ordinary_field);
-    let drawn_children: Vec<_> = dom.dom_children(app_field).map(|child| dom.opaque_id(child)).collect();
+    let drawn_children: Vec<_> = dom
+        .dom_children(app_field)
+        .map(|child| dom.opaque_id(child))
+        .collect();
     let layout =
         cambium_rootstock::OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &Default::default());
     let projection = cambium_rootstock::document_projection(
@@ -133,7 +208,7 @@ fn app_textbox_marker_runs_through_the_browser_mirror_as_a_leaf() {
         &layout,
         Some(app_id),
     );
-    let mirror = plan(&projection, 1.0, |_, _| None);
+    let mirror = plan_document(&projection, 1.0);
     let flat_mirror = flat(&mirror);
     let app = flat_mirror
         .iter()
@@ -146,7 +221,9 @@ fn app_textbox_marker_runs_through_the_browser_mirror_as_a_leaf() {
     assert!(app.focusable, "the app textbox keeps its focus action");
     assert!(app.rect.is_some(), "the textbox keeps its painted bounds");
     assert_eq!(
-        dom.dom_children(app_field).map(|child| dom.opaque_id(child)).collect::<Vec<_>>(),
+        dom.dom_children(app_field)
+            .map(|child| dom.opaque_id(child))
+            .collect::<Vec<_>>(),
         drawn_children,
         "the browser accessibility pipeline leaves drawing DOM children intact"
     );
@@ -184,7 +261,7 @@ fn a_box_sits_where_the_layout_painted_its_node() {
     }
     let id = h.with_dom(|dom| dom.opaque_id(press));
     for scale in [1.0, 2.0] {
-        let mirror = plan(&h.a11y_projection(), scale, |_, _| None);
+        let mirror = plan_document(&h.a11y_projection(), scale);
         let rect = absolute(&mirror, id, [0.0, 0.0]).expect("the button is mirrored");
         let expected = [x * scale, y * scale, width * scale, height * scale];
         for (got, want) in rect.iter().zip(expected) {
@@ -233,14 +310,18 @@ fn names_go_where_aria_reads_them() {
     };
     let mut field = named(4, DocumentA11yRole::TextField, "Title");
     field.value = Some("Draft".into());
+    let mut menubar = named(6, DocumentA11yRole::MenuBar, "Application");
+    menubar.children.push(DocumentA11yNodeId::new(7));
     let nodes = vec![
         named(2, DocumentA11yRole::Button, "Save"),
         named(3, DocumentA11yRole::Group, "Tools"),
         field,
         named(5, DocumentA11yRole::Unknown, "Plain words"),
+        menubar,
+        named(7, DocumentA11yRole::MenuItem, "File"),
     ];
-    let mirror = plan(&projection(&[2, 3, 4, 5], nodes), 1.0, |_, _| None);
-    let [button, group, field, plain] = mirror.as_slice() else {
+    let mirror = plan_document(&projection(&[2, 3, 4, 5, 6], nodes), 1.0);
+    let [button, group, field, plain, menubar] = mirror.as_slice() else {
         panic!("{mirror:?}")
     };
     assert_eq!(
@@ -259,6 +340,12 @@ fn names_go_where_aria_reads_them() {
         (attr(plain, "role"), plain.text.as_deref()),
         (None, Some("Plain words"))
     );
+    assert_eq!(attr(menubar, "role"), Some("menubar"));
+    assert_eq!(attr(menubar, "aria-label"), Some("Application"));
+    assert!(menubar.text.is_none());
+    assert_eq!(menubar.children.len(), 1);
+    assert_eq!(attr(&menubar.children[0], "role"), Some("menuitem"));
+    assert_eq!(menubar.children[0].text.as_deref(), Some("File"));
 }
 
 #[test]
@@ -320,7 +407,7 @@ fn states_lower_to_their_aria_attributes() {
         ),
         slider,
     ];
-    let mirror = plan(&projection(&[2, 3, 4, 5, 6, 7, 8], nodes), 1.0, |_, _| None);
+    let mirror = plan_document(&projection(&[2, 3, 4, 5, 6, 7, 8], nodes), 1.0);
     let states: Vec<Vec<(&str, &str)>> = mirror
         .iter()
         .map(|node| {
@@ -354,46 +441,34 @@ fn states_lower_to_their_aria_attributes() {
 }
 
 #[test]
-fn a_leaf_describes_itself_and_an_author_name_wins() {
-    let mut labelled = blank(3, DocumentA11yRole::Unknown);
-    labelled.name = Some("Reading map".into());
-    let nodes = vec![blank(2, DocumentA11yRole::Unknown), labelled];
-    let mut asked = Vec::new();
-    let mirror = plan(&projection(&[2, 3], nodes), 1.0, |id, name| {
-        asked.push((id, name.map(str::to_owned)));
-        Some(LeafSemantics {
-            role: Some("graphics-object"),
-            name: Some("graph: 3 nodes, 2 links".into()),
-            children: Vec::new(),
-            names_itself: false,
-            slot: None,
-        })
-    });
-    assert_eq!(asked, [(2, None), (3, Some("Reading map".into()))]);
-    let described: Vec<(Option<&str>, Option<&str>)> = mirror
-        .iter()
-        .map(|node| (attr(node, "role"), name(node)))
-        .collect();
-    assert_eq!(
-        described,
-        [
-            (Some("graphics-object"), Some("graph: 3 nodes, 2 links")),
-            (Some("graphics-object"), Some("Reading map")),
-        ]
+fn registered_knob_keeps_its_numeric_semantics_and_author_name() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(root, "<custom-leaf key='7' aria-label='Gain' style='display:block;width:80px;height:30px'></custom-leaf>");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &Default::default());
+    let mut leaves = cambium_rootstock::LeafRegistry::new();
+    leaves.insert(
+        7,
+        Box::new(sprigging::Knob::new(sprigging::Size {
+            width: 80.0,
+            height: 30.0,
+        })),
     );
-
-    let mut node = accesskit::Node::new(accesskit::Role::GraphicsObject);
-    node.set_label("graph: 3 nodes, 2 links");
-    assert_eq!(
-        leaf_semantics(&node),
-        LeafSemantics {
-            role: Some("graphics-object"),
-            name: Some("graph: 3 nodes, 2 links".into()),
-            children: Vec::new(),
-            names_itself: false,
-            slot: None,
-        }
+    let projection = cambium_rootstock::project_semantics(
+        &dom,
+        &layout,
+        &mut leaves,
+        &cambium_rootstock::ProducerRegistry::new(),
+        None,
     );
+    let mirror = plan(&projection, 1.0);
+    let knobs = with_role(&mirror, "slider");
+    assert_eq!(knobs.len(), 1);
+    assert_eq!(name(knobs[0]), Some("Gain"));
+    assert_eq!(attr(knobs[0], "aria-valuenow"), Some("0"));
+    assert_eq!(attr(knobs[0], "aria-valuemin"), Some("0"));
+    assert_eq!(attr(knobs[0], "aria-valuemax"), Some("1"));
 }
 
 #[test]
@@ -413,13 +488,14 @@ fn boxes_are_relative_to_their_parent_and_hidden_nodes_are_left_out() {
     item.bounds = bounds(15.0, 20.0, 50.0, 10.0);
     let mut hidden = blank(4, DocumentA11yRole::ListItem);
     hidden.state.hidden = true;
-    let mirror = plan(&projection(&[2], vec![list, item, hidden]), 2.0, |_, _| {
-        None
-    });
+    let mirror = plan_document(&projection(&[2], vec![list, item, hidden]), 2.0);
     assert_eq!(mirror[0].rect, Some([20.0, 20.0, 400.0, 200.0]));
     assert_eq!(mirror[0].children.len(), 1, "the hidden item is left out");
     assert_eq!(mirror[0].children[0].rect, Some([10.0, 20.0, 100.0, 20.0]));
-    assert_eq!(ids(&mirror), [2, 3]);
+    assert_eq!(
+        flat(&mirror).iter().map(|n| n.id).collect::<Vec<_>>(),
+        [2, 3]
+    );
 }
 
 #[test]
@@ -433,23 +509,39 @@ fn an_option_keeps_its_name_without_duplicating_its_child_content() {
     let option = element_with_id(&dom, root, "fit").expect("the option is declared");
     let id = dom.opaque_id(option);
     let children: Vec<_> = dom.dom_children(option).map(|n| dom.opaque_id(n)).collect();
-    let layout = cambium_rootstock::OwnedLayout::new(
-        &dom, &[""], 360.0, 180.0, &[], &Default::default(),
-    );
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 360.0, 180.0, &[], &Default::default());
     let projection = cambium_rootstock::document_projection(
-        &cambium_rootstock::WindowDom::document(&dom), &layout, None,
+        &cambium_rootstock::WindowDom::document(&dom),
+        &layout,
+        None,
     );
-    let mirror = plan(&projection, 1.0, |_, _| None);
+    let mirror = plan_document(&projection, 1.0);
     let nodes = flat(&mirror);
-    let option = nodes.iter().find(|n| n.id == id).expect("the option is mirrored");
+    let option = nodes
+        .iter()
+        .find(|n| n.id == id)
+        .expect("the option is mirrored");
     assert_eq!(attr(option, "role"), Some("option"));
     assert_eq!(attr(option, "aria-label"), Some("Fit selection"));
-    assert_eq!(attr(option, "aria-description"), Some("Select a visible node first"));
+    assert_eq!(
+        attr(option, "aria-description"),
+        Some("Select a visible node first")
+    );
     assert_eq!(attr(option, "aria-disabled"), Some("true"));
     assert_eq!(option.text, None, "the name must not duplicate child text");
-    assert_eq!(option.children.len(), 2, "declared child content remains present");
+    assert_eq!(
+        option.children.len(),
+        2,
+        "declared child content remains present"
+    );
     let source = element_with_id(&dom, root, "fit").unwrap();
-    assert_eq!(dom.dom_children(source).map(|n| dom.opaque_id(n)).collect::<Vec<_>>(), children);
+    assert_eq!(
+        dom.dom_children(source)
+            .map(|n| dom.opaque_id(n))
+            .collect::<Vec<_>>(),
+        children
+    );
 }
 
 #[test]
@@ -460,7 +552,7 @@ fn a_description_lowers_to_aria_description_and_an_empty_one_is_left_out() {
     let mut empty = blank(3, DocumentA11yRole::Button);
     empty.name = Some("Forbidden action".into());
     empty.description = Some("  ".into());
-    let mirror = plan(&projection(&[2, 3], vec![described, empty]), 1.0, |_, _| None);
+    let mirror = plan_document(&projection(&[2, 3], vec![described, empty]), 1.0);
     assert_eq!(
         attr(&mirror[0], "aria-description"),
         Some("Adds one card and advances the revision.")
@@ -471,41 +563,36 @@ fn a_description_lowers_to_aria_description_and_an_empty_one_is_left_out() {
 
 #[test]
 fn what_a_leaf_draws_lowers_to_named_boxes_under_it() {
-    let mut leaf = blank(2, DocumentA11yRole::Unknown);
-    leaf.name = Some("Graph".into());
-    leaf.bounds = Some(DocumentA11yBounds {
-        x: 10.0,
-        y: 100.0,
-        width: 900.0,
-        height: 600.0,
-    });
-    let mirror = plan(&projection(&[2], vec![leaf]), 2.0, |id, _| {
-        (id == 2).then(|| {
-            LeafSemantics::from_producer(1, cambium_rootstock::ProducerSemantics {
-                role: Some(cambium_rootstock::ProducerRole::List),
-                name: Some("Remote board".into()),
-                children: vec![
-                    cambium_rootstock::ProducerNode {
-                        key: 10,
-                        role: cambium_rootstock::ProducerRole::ListItem,
-                        name: "Card 0".into(),
-                        rect: [24.0, 24.0, 120.0, 80.0],
-                        actions: Vec::new(),
-                    },
-                    cambium_rootstock::ProducerNode {
-                        key: 11,
-                        role: cambium_rootstock::ProducerRole::Image,
-                        name: "Card 1".into(),
-                        rect: [164.0, 24.0, 120.0, 80.0],
-                        actions: Vec::new(),
-                    },
-                ],
-            })
-        })
-    });
+    let mirror = producer_plan(
+        cambium_rootstock::ProducerSemantics {
+            role: Some(cambium_rootstock::ProducerRole::List),
+            name: Some("Remote board".into()),
+            children: vec![
+                cambium_rootstock::ProducerNode {
+                    key: 10,
+                    role: cambium_rootstock::ProducerRole::ListItem,
+                    name: "Card 0".into(),
+                    rect: [24.0, 24.0, 120.0, 80.0],
+                    actions: Vec::new(),
+                },
+                cambium_rootstock::ProducerNode {
+                    key: 11,
+                    role: cambium_rootstock::ProducerRole::Image,
+                    name: "Card 1".into(),
+                    rect: [164.0, 24.0, 120.0, 80.0],
+                    actions: Vec::new(),
+                },
+            ],
+        },
+        2.0,
+    );
     let board = &mirror[0];
     assert_eq!(attr(board, "role"), Some("list"));
-    assert_eq!(name(board), Some("Remote board"), "the producer names its slot");
+    assert_eq!(
+        name(board),
+        Some("Remote board"),
+        "the producer names its slot"
+    );
     assert_eq!(board.children.len(), 2);
     let (first, second) = (&board.children[0], &board.children[1]);
     assert_eq!(attr(first, "role"), Some("listitem"));
@@ -521,15 +608,14 @@ fn what_a_leaf_draws_lowers_to_named_boxes_under_it() {
     assert!(first.id >= 1 << 63, "outside the DOM's id range");
 
     // With nothing drawn, the producer still names its slot.
-    let mut empty = blank(2, DocumentA11yRole::Unknown);
-    empty.name = Some("Graph".into());
-    let mirror = plan(&projection(&[2], vec![empty]), 1.0, |_, _| {
-        Some(LeafSemantics::from_producer(1, cambium_rootstock::ProducerSemantics {
+    let mirror = producer_plan(
+        cambium_rootstock::ProducerSemantics {
             role: Some(cambium_rootstock::ProducerRole::List),
             name: Some("Remote board · 0 cards".into()),
             children: Vec::new(),
-        }))
-    });
+        },
+        1.0,
+    );
     assert_eq!(name(&mirror[0]), Some("Remote board · 0 cards"));
 }
 
@@ -540,13 +626,6 @@ fn what_a_leaf_draws_lowers_to_named_boxes_under_it() {
 /// grammar plan, F65 and F66). Ids hold whatever order the nodes come in.
 #[test]
 fn a_drawn_nodes_actions_lower_to_buttons_that_name_their_action() {
-    let mut leaf = blank(2, DocumentA11yRole::Unknown);
-    leaf.bounds = Some(DocumentA11yBounds {
-        x: 0.0,
-        y: 0.0,
-        width: 900.0,
-        height: 600.0,
-    });
     let item = |key: u64, name: &str| cambium_rootstock::ProducerNode {
         key,
         role: cambium_rootstock::ProducerRole::Group,
@@ -565,17 +644,18 @@ fn a_drawn_nodes_actions_lower_to_buttons_that_name_their_action() {
             },
         ],
     };
+    let (dom, layout) = producer_fixture();
     let lower = |children: Vec<cambium_rootstock::ProducerNode>| {
-        plan(&projection(&[2], vec![leaf.clone()]), 1.0, move |_, _| {
-            Some(LeafSemantics::from_producer(
-                7,
-                cambium_rootstock::ProducerSemantics {
-                    role: Some(cambium_rootstock::ProducerRole::Group),
-                    name: Some("2 of 2 shown".into()),
-                    children: children.clone(),
-                },
-            ))
-        })
+        producer_plan_for(
+            &dom,
+            &layout,
+            cambium_rootstock::ProducerSemantics {
+                role: Some(cambium_rootstock::ProducerRole::Group),
+                name: Some("2 of 2 shown".into()),
+                children,
+            },
+            1.0,
+        )
     };
     let mirror = lower(vec![item(3, "Port notes"), item(4, "Relay")]);
     let canvas = &mirror[0];
@@ -591,7 +671,11 @@ fn a_drawn_nodes_actions_lower_to_buttons_that_name_their_action() {
     assert_eq!(pin.text.as_deref(), Some("Pin"));
     assert_eq!(attr(pin, "aria-description"), Some("Pin this item"));
     assert!(pin.focusable);
-    assert_eq!(pin.rect, Some([0.0, 0.0, 36.0, 36.0]), "over the item's box");
+    assert_eq!(
+        pin.rect,
+        Some([0.0, 0.0, 36.0, 36.0]),
+        "over the item's box"
+    );
     assert_eq!(
         pin.action,
         Some(cambium_rootstock::ProducedAction {
@@ -602,11 +686,137 @@ fn a_drawn_nodes_actions_lower_to_buttons_that_name_their_action() {
     );
     let produced = produced_actions(&mirror);
     assert_eq!(produced.len(), 4, "every button, and only buttons");
-    assert!(produced.iter().any(|(id, action)| *id == pin.id && action.key == 3));
+    assert!(
+        produced
+            .iter()
+            .any(|(id, action)| *id == pin.id && action.key == 3)
+    );
 
     // Reordered, the same item and button keep their ids.
     let reordered = lower(vec![item(4, "Relay"), item(3, "Port notes")]);
     let moved = &reordered[0].children[1];
     assert_eq!(moved.id, notes.id);
     assert_eq!(moved.children[1].id, pin.id);
+}
+
+#[test]
+fn flat_tree_tests_mirror_only_the_assigned_producer_and_its_action() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerRole, ProducerSemantics};
+    use layout_dom_api::{QualName, ShadowRootInit};
+    let (mut dom, _) = producer_fixture();
+    let root = dom.document();
+    let leaf = element_with_id(&dom, root, "producer-slot").unwrap();
+    let qual = |tag| QualName::new(None, Namespace::default(), LocalName::from(tag));
+    let host = dom.create_element(qual("section"));
+    dom.append_child(root, host);
+    dom.append_child(host, leaf);
+    dom.set_attribute(leaf, qual("slot"), "scene");
+    let decoy = dom.create_element(qual("custom-leaf"));
+    dom.set_attribute(decoy, qual("key"), "7");
+    dom.append_child(host, decoy);
+    let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+    dom.set_inner_html(shadow,"<slot name='scene'><custom-leaf key='7' style='display:block;width:8px;height:6px'></custom-leaf></slot>");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 1200.0, 900.0, &[], &Default::default());
+    let mirror = producer_plan_for(
+        &dom,
+        &layout,
+        ProducerSemantics {
+            role: Some(ProducerRole::Group),
+            name: Some("Slotted board".into()),
+            children: vec![ProducerNode {
+                key: 40,
+                role: ProducerRole::ListItem,
+                name: "Card".into(),
+                rect: [0.0, 0.0, 8.0, 6.0],
+                actions: vec![ProducerAction {
+                    id: "pin".into(),
+                    label: "Pin".into(),
+                    description: "Keep card".into(),
+                }],
+            }],
+        },
+        1.0,
+    );
+    assert_eq!(mirror[0].id, dom.opaque_id(leaf));
+    assert_eq!(name(&mirror[0]), Some("Slotted board"));
+    let actions = produced_actions(&mirror);
+    assert_eq!(actions.len(), 1);
+    assert_eq!(
+        actions[0].1,
+        cambium_rootstock::ProducedAction {
+            slot: 7,
+            key: 40,
+            id: "pin".into()
+        }
+    );
+    assert!(
+        !flat(&mirror)
+            .iter()
+            .any(|node| node.id == dom.opaque_id(decoy))
+    );
+}
+
+#[test]
+fn content_origin_tests_mirror_offsets_from_the_padded_content_box_once() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerSemantics};
+    let (mut dom, _) = producer_fixture();
+    let leaf = element_with_id(&dom, dom.document(), "producer-slot").unwrap();
+    dom.set_attribute(leaf, layout_dom_api::QualName::new(None, Namespace::default(), LocalName::from("style")),
+        "position:absolute;display:block;left:20px;top:30px;width:80px;height:40px;padding:7px;border:5px solid black");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &Default::default());
+    let mirror = producer_plan_for(
+        &dom,
+        &layout,
+        ProducerSemantics {
+            children: vec![ProducerNode {
+                key: 40,
+                role: cambium_rootstock::ProducerRole::ListItem,
+                name: "Card".into(),
+                rect: [4.0, 5.0, 10.0, 20.0],
+                actions: vec![ProducerAction {
+                    id: "pin".into(),
+                    label: "Pin".into(),
+                    description: "Keep card".into(),
+                }],
+            }],
+            ..Default::default()
+        },
+        2.0,
+    );
+    assert_eq!(mirror[0].rect, Some([40.0, 60.0, 208.0, 128.0]));
+    assert_eq!(mirror[0].children[0].rect, Some([32.0, 34.0, 20.0, 40.0]));
+    assert_eq!(
+        mirror[0].children[0].children[0].rect,
+        Some([0.0, 0.0, 20.0, 40.0])
+    );
+    assert_eq!(produced_actions(&mirror).len(), 1);
+}
+
+#[test]
+fn identity_tests_browser_mirror_omits_ambiguous_producer_actions() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerSemantics};
+    let action = ProducerAction {
+        id: "pin".into(),
+        label: "Pin".into(),
+        description: "Keep card".into(),
+    };
+    let child = ProducerNode {
+        key: 40,
+        role: cambium_rootstock::ProducerRole::ListItem,
+        name: "Card".into(),
+        rect: [0.0, 0.0, 10.0, 10.0],
+        actions: vec![action.clone(), action],
+    };
+    let mirror = producer_plan(
+        ProducerSemantics {
+            children: vec![child],
+            ..Default::default()
+        },
+        1.0,
+    );
+    assert!(produced_actions(&mirror).is_empty());
+    let ids: std::collections::HashSet<_> = flat(&mirror).into_iter().map(|node| node.id).collect();
+    assert_eq!(ids.len(), flat(&mirror).len());
 }

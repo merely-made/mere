@@ -216,7 +216,7 @@ impl<T> TextureProducer for SceneProducer<T> {
         self.texture = None;
     }
 
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    fn semantics(&self) -> Option<ProducerSemantics> {
         (self.semantics_callback)(&self.source.borrow())
     }
 }

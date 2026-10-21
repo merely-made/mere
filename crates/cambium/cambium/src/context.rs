@@ -405,7 +405,7 @@ impl GenetCtx {
 
     /// The key handlers on `node`, in registration order (empty if none).
     ///
-    /// A handler whose [`Handler::focusable`] is true also makes `node`
+    /// A handler whose `Handler::focusable` is true also makes `node`
     /// focusable, independent of phase. The runner's
     /// [`dispatch_click`](crate::GenetAppRunner::dispatch_click) uses
     /// [`is_focusable`](Self::is_focusable) to find the focus target (nearest

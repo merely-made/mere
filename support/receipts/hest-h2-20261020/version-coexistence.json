@@ -1,0 +1,27 @@
+{
+  "command": "cargo metadata --locked --offline --format-version 1",
+  "root_exit_code": 0,
+  "compatibility_exit_code": 0,
+  "root_metadata_sha256": "1dcfb83baadef111057bb7eb5c9ce5df20c2f42469f7ccfb6f79233020bf196c",
+  "compatibility_metadata_sha256": "6555de6ac76215ac1e86cdf482748de50f1d48cb759c2aa2d22389c87c9a1de9",
+  "root_hest_versions": [
+    "0.1.0",
+    "0.2.0"
+  ],
+  "active_hest_normal_dependencies": [
+    "serde"
+  ],
+  "shim_hest_version": "0.1.0",
+  "shim_hest_manifest": "/Users/markik/Code/repos/mere/crates/cambium/hest-0_1/Cargo.toml",
+  "current_hest_manifest": "/Users/markik/Code/repos/mere/crates/cambium/hest/Cargo.toml",
+  "published_cambium": {
+    "version": "0.4.0",
+    "source": "registry+https://github.com/rust-lang/crates.io-index"
+  },
+  "compatibility_dependency_chain": [
+    "registry Cambium 0.4.0",
+    "local command-menu 0.1.1",
+    "local frozen Hest 0.1.0"
+  ],
+  "old_and_new_hest_types_deliberately_distinct": true
+}

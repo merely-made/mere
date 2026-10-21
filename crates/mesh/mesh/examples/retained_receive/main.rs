@@ -10,6 +10,8 @@ mod campaign;
 mod carrier;
 mod identity;
 mod peer;
+#[path = "../support/provenance.rs"]
+mod provenance;
 
 use std::io::Write;
 use std::path::PathBuf;

@@ -1,0 +1,39 @@
+{
+  "colors": 1703,
+  "frames": 8,
+  "pid": 80965,
+  "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 5, width: 2200, height: 1700, layout_scale: 2.0 }",
+  "state": {
+    "data": {
+      "access": "editor",
+      "authors": [
+        {
+          "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell"
+        },
+        {
+          "id": "personae:30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        }
+      ],
+      "epoch": 1,
+      "graph": "66faf6ff-72d3-4a8e-b3d8-d52a0be74187",
+      "guest": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+      "nodes": [
+        {
+          "address": "https://shared.invalid/owner",
+          "id": "e9fb8f7d-3509-43ac-87e2-0d85e7fc19e7",
+          "title": "Owner source"
+        }
+      ],
+      "owner": "30d8152abc3dd7f1b4485453fdcff1ccdd0be146252ab4f35abc2a16b3e495ac",
+      "revision": 5
+    },
+    "root": "be8d3932a0275bbc7e2eb59d20ddb42a575f0b40d31f4ae5cdf1701e811a8055",
+    "status": "Connected to invited graph"
+  }
+}

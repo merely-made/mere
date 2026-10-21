@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "tree",
+    "--locked",
+    "--offline",
+    "-p",
+    "taproot",
+    "--no-default-features",
+    "--features",
+    "accesskit",
+    "--edges",
+    "normal",
+    "--depth",
+    "1"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/genet",
+  "started": "2026-10-21T08:32:58.792238+00:00",
+  "finished": "2026-10-21T08:32:59.994847+00:00",
+  "exit_code": 0,
+  "results": [],
+  "diagnostic_tail": "taproot v0.1.0 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\taproot)\n\u251c\u2500\u2500 accesskit v0.25.1\n\u251c\u2500\u2500 document-session-api v0.1.0 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\shared\\document-session-api)\n\u251c\u2500\u2500 genet-livery v0.0.4 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\genet-livery)\n\u251c\u2500\u2500 genet-scripted-dom v0.1.2 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\genet-scripted-dom)\n\u2514\u2500\u2500 layout-dom-api v0.1.1 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\shared\\layout-dom)\n",
+  "target": "C:\\t\\cargo-targets\\genet"
+}

@@ -43,7 +43,7 @@ use std::sync::{Arc, Mutex};
 
 use accesskit::{
     Action, ActionHandler, ActionRequest, ActivationHandler, DeactivationHandler, Node,
-    NodeId as A11yNodeId, Rect, Role, Tree, TreeId, TreeUpdate,
+    NodeId as A11yNodeId, Rect, Role, TreeId, TreeInfo, TreeUpdate,
 };
 use cambium::CompositionEvent;
 use cambium::{
@@ -440,7 +440,7 @@ impl Host {
         };
         TreeUpdate {
             nodes,
-            tree: Some(Tree::new(A11yNodeId(1))),
+            tree: Some(TreeInfo::new(A11yNodeId(1))),
             tree_id: TreeId::ROOT,
             focus,
         }
@@ -684,14 +684,14 @@ impl ApplicationHandler for App {
 /// Without a window: join the trees, read them through the AT-SPI consumer,
 /// and walk Tab and a Click once, printing what a reader would meet.
 fn self_check(options: Options) {
-    use accesskit_consumer_unix::{Node as Read, Tree as ConsumerTree, TreeChangeHandler};
+    use accesskit_consumer::{NodeRef as Read, Tree as ConsumerTree, TreeChangeHandler};
 
     struct Ignore;
     impl TreeChangeHandler for Ignore {
-        fn node_added(&mut self, _: &Read) {}
-        fn node_updated(&mut self, _: &Read, _: &Read) {}
-        fn focus_moved(&mut self, _: Option<&Read>, _: Option<&Read>) {}
-        fn node_removed(&mut self, _: &Read) {}
+        fn node_added(&mut self, _: &Read<'_>) {}
+        fn node_updated(&mut self, _: &Read<'_>, _: &Read<'_>) {}
+        fn focus_moved(&mut self, _: Option<&Read<'_>>, _: Option<&Read<'_>>) {}
+        fn node_removed(&mut self, _: &Read<'_>) {}
     }
     fn walk(node: Read<'_>, out: &mut Vec<String>) {
         if let Some(label) = node.label() {

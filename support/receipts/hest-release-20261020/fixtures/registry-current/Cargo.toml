@@ -1,0 +1,10 @@
+[package]
+name = "hest-current-registry-contract"
+version = "0.0.0"
+edition = "2024"
+publish = false
+[workspace]
+[dependencies]
+cambium = "=0.5.0"
+hest = "=0.2.0"
+serde_json = "1"

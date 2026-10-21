@@ -1,0 +1,55 @@
+await {"status": "ready", "attached": "cad05077-c527-4ca2-813b-b6a73f9ae4ce"}
+wait 30000
+click role:button @id=coop-use
+await {"coop-nodes": "1"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-existing.png
+click role:textbox @id=coop-field-2
+input-text /Users/markik/Code/output/gs-recovery-20261021-01/local/private/guest-contact.json
+click role:textbox @id=coop-field-3
+input-text /Users/markik/Code/output/gs-recovery-20261021-01/local/private/invitation
+click role:button Invite editor
+await {"coop-access": "editor"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-invited.png
+await {"coop-nodes": "2", "nodes": "2"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-saw-guest.png
+click role:button @data-session-step=switch:f0ffa931-be55-4c03-bf9a-956872a0982f
+await {"attached": "f0ffa931-be55-4c03-bf9a-956872a0982f", "coop-available": "false"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-private-during-coop.png
+await {"file": "/Users/markik/Code/output/gs-recovery-20261021-01/local/private/markers/guest-still-scoped"}
+wait 30000
+click role:button @data-session-step=switch:cad05077-c527-4ca2-813b-b6a73f9ae4ce
+await {"attached": "cad05077-c527-4ca2-813b-b6a73f9ae4ce"}
+wait 30000
+click role:button @id=coop-use
+await {"coop-nodes": "2", "coop-access": "editor"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-returned-to-chosen.png
+await {"coop-nodes": "3", "nodes": "3"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-ordinary-push.png
+await {"file": "/Users/markik/Code/output/gs-recovery-20261021-01/local/private/markers/revoke-now"}
+wait 30000
+click role:button @id=coop-revoke
+await {"coop-access": "revoked"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261021-01/local/evidence/owner-revoked.png
+await {"file": "/Users/markik/Code/output/gs-recovery-20261021-01/local/private/markers/guest-withdrawn"}
+wait 30000

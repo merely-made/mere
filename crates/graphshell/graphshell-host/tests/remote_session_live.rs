@@ -136,7 +136,7 @@ fn the_live_board_receipts_hold_without_a_browser() {
     );
     assert_eq!(remote.revision(), Some(2));
     assert_eq!(cards(&remote), 2);
-    assert_eq!(remote.last_resume(), "diff · 1 → 2");
+    assert_eq!(remote.last_resume(), "updated · 1 → 2");
     let events = remote.take_events();
     assert!(
         events.contains(&"remote-bell revision 2".to_string()),
@@ -156,7 +156,7 @@ fn the_live_board_receipts_hold_without_a_browser() {
     assert_eq!(remote.rejoins(), 1);
     assert_eq!(remote.revision(), Some(3));
     assert_eq!(cards(&remote), 3);
-    assert_eq!(remote.last_resume(), "diff · 2 → 3");
+    assert_eq!(remote.last_resume(), "updated · 2 → 3");
     assert_eq!(
         host.count("Snapshot"),
         2,

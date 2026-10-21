@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "hest",
+    "-p",
+    "command-menu"
+  ],
+  "exit_code": 0,
+  "test_results": [
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+    "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+  ],
+  "log_sha256": "ed33588621016c7fb1d7cb59234e0ae5188ab274993d1b7fc5c53dac0f3704df",
+  "raw_log_sha256": "b31b08555adf491d122ec1bfe9323994f6b02440bb121bd2786a83ba3536153b",
+  "log_normalization": "Terminal empty lines removed only; raw hash retained."
+}

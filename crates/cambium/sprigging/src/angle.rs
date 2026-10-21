@@ -93,7 +93,7 @@ impl AngleStrip {
 }
 
 impl Leaf for AngleStrip {
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::GraphicsObject);
     }
 

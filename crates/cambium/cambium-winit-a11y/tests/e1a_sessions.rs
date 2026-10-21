@@ -15,15 +15,15 @@
 //! from B's own layout, offset by its pane; a panic in B's dispatch retires B
 //! and its graft while A and the host carry on; and two sessions that place a
 //! leaf under one key each keep their own leaf. Each check runs against
-//! `accesskit_consumer` 0.35, 0.36 and 0.38, the consumers under the Windows,
-//! AT-SPI and macOS adapters.
+//! `accesskit_consumer` 0.39.1, shared by the Windows, AT-SPI and macOS
+//! adapters.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
 use accesskit::TreeUpdate;
-use accesskit::{Action, ActionRequest, Node, NodeId as A11yNodeId, Rect, Role, Tree, TreeId};
+use accesskit::{Action, ActionRequest, Node, NodeId as A11yNodeId, Rect, Role, TreeId, TreeInfo};
 use cambium::{
     AnyView, ContainedSession, FocusExit, GenetAppRunner, GenetCtx, GenetElement, Key, KeyEvent,
     NamedKey, PointerClick, ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession,
@@ -129,7 +129,7 @@ impl Leaf for Named {
 
     fn paint(&mut self, _cx: &mut PaintCx<'_>) {}
 
-    fn accessibility(&mut self, node: &mut Node) {
+    fn accessibility(&self, node: &mut Node) {
         node.set_label(self.0);
     }
 
@@ -285,7 +285,7 @@ impl Host {
         }
         TreeUpdate {
             nodes,
-            tree: Some(Tree::new(A11yNodeId(1))),
+            tree: Some(TreeInfo::new(A11yNodeId(1))),
             tree_id: TreeId::ROOT,
             focus: match self.focus {
                 Focus::Host => A11yNodeId(1),
@@ -397,15 +397,15 @@ macro_rules! e1a_sessions_against {
     ($module:ident, $consumer:ident) => {
         mod $module {
             use super::*;
-            use $consumer::{Node as Read, Tree as ConsumerTree, TreeChangeHandler};
+            use $consumer::{NodeRef as Read, Tree as ConsumerTree, TreeChangeHandler};
 
             struct Ignore;
 
             impl TreeChangeHandler for Ignore {
-                fn node_added(&mut self, _: &Read) {}
-                fn node_updated(&mut self, _: &Read, _: &Read) {}
-                fn focus_moved(&mut self, _: Option<&Read>, _: Option<&Read>) {}
-                fn node_removed(&mut self, _: &Read) {}
+                fn node_added(&mut self, _: &Read<'_>) {}
+                fn node_updated(&mut self, _: &Read<'_>, _: &Read<'_>) {}
+                fn focus_moved(&mut self, _: Option<&Read<'_>>, _: Option<&Read<'_>>) {}
+                fn node_removed(&mut self, _: &Read<'_>) {}
             }
 
             fn open(host: &mut Host) -> (ConsumerTree, Grafts) {
@@ -612,6 +612,4 @@ macro_rules! e1a_sessions_against {
     };
 }
 
-e1a_sessions_against!(windows_consumer_0_35, accesskit_consumer_windows);
-e1a_sessions_against!(unix_consumer_0_36, accesskit_consumer_unix);
-e1a_sessions_against!(macos_consumer_0_38, accesskit_consumer_macos);
+e1a_sessions_against!(shared_consumer_0_39, accesskit_consumer);

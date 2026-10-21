@@ -25,6 +25,7 @@ use std::path::{Path, PathBuf};
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, SealedIdentityProvider, load_existing_auto_unlock_root};
+use pandect::write_bytes_with_backup;
 use personae::{IdentityError, ProfileId, SealedRecordStorage};
 use serde::{Deserialize, Serialize};
 
@@ -85,7 +86,10 @@ pub fn adopt_from<S: IdentityStorage + 'static>(
     let records = SealedRecordStorage::open_with_key(data_root.join("personae/records"), root_key);
     let path = if records.load_record::<serde_json::Value>(RECORD)?.is_some() {
         RECORD
-    } else if records.load_record::<serde_json::Value>(LEGACY_RECORD)?.is_some() {
+    } else if records
+        .load_record::<serde_json::Value>(LEGACY_RECORD)?
+        .is_some()
+    {
         LEGACY_RECORD
     } else {
         return Ok(None);
@@ -99,7 +103,10 @@ pub fn adopt_from<S: IdentityStorage + 'static>(
         None => {
             let apart = ProfileId(APART_PROFILE.into());
             host.import_profile(&apart, "Hocket", master)?;
-            tracing::info!(profile = APART_PROFILE, "adopted Hocket's identity into custody");
+            tracing::info!(
+                profile = APART_PROFILE,
+                "adopted Hocket's identity into custody"
+            );
             apart
         },
     };
@@ -117,10 +124,42 @@ pub fn adopt_from<S: IdentityStorage + 'static>(
 
 fn write_marker(data_root: &Path, custody: &HocketCustody) -> Result<(), IdentityError> {
     let path = data_root.join(MARKER);
-    let temporary = path.with_extension("json.tmp");
+    let root_metadata = std::fs::metadata(data_root)
+        .map_err(|error| IdentityError::Backend(format!("write {path:?}: {error}")))?;
+    if !root_metadata.is_dir() {
+        return Err(IdentityError::Backend(format!(
+            "write {path:?}: data root is not a directory"
+        )));
+    }
     let bytes = serde_json::to_vec_pretty(custody)
         .map_err(|error| IdentityError::Backend(error.to_string()))?;
-    std::fs::write(&temporary, bytes)
-        .and_then(|()| std::fs::rename(&temporary, &path))
+    write_bytes_with_backup(&path, &bytes)
         .map_err(|error| IdentityError::Backend(format!("write {path:?}: {error}")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn marker_replacement_is_repeatable_and_requires_an_existing_data_root() {
+        let directory = tempfile::tempdir().unwrap();
+        let custody = HocketCustody {
+            profile: "hocket".into(),
+            public_key: "ab".repeat(32),
+        };
+        write_marker(directory.path(), &custody).unwrap();
+        write_marker(directory.path(), &custody).unwrap();
+
+        let marker = directory.path().join(MARKER);
+        assert_eq!(
+            serde_json::from_slice::<HocketCustody>(&std::fs::read(&marker).unwrap()).unwrap(),
+            custody
+        );
+        assert!(!directory.path().join("custody-profile.json.tmp").exists());
+
+        let absent_root = directory.path().join("missing");
+        assert!(write_marker(&absent_root, &custody).is_err());
+        assert!(!absent_root.exists());
+    }
 }

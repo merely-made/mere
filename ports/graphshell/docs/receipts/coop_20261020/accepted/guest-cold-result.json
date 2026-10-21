@@ -1,0 +1,11 @@
+{
+  "captures": 1,
+  "frames": 9,
+  "pid": 81645,
+  "result": "ok",
+  "state": {
+    "data": null,
+    "root": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+    "status": "Unavailable: admission refused: Delegation(Revoked)"
+  }
+}

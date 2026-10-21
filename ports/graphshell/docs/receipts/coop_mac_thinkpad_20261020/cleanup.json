@@ -1,0 +1,27 @@
+{
+  "accepted_cohort": "gs-tp-20261020-05",
+  "owner": {
+    "subject_pids": [
+      65536,
+      65557,
+      65600,
+      65809,
+      65848,
+      66032
+    ],
+    "remaining": []
+  },
+  "guest": {
+    "subject_pids": [
+      2202992,
+      2203071,
+      2203136,
+      2203213,
+      2203263
+    ],
+    "remaining": []
+  },
+  "native_and_custodian_exit": "All seven native exits and four ordinary custodian stop events passed. Independent local/SSH process inspection found none of the accepted subjects remaining.",
+  "checkout_scope": "Task source worktrees only. Primary source working files were not edited; separate active work remains in the local primary. Remote primary stays clean at d4756e0fb6a759746e97d71b3e9a8eb8c2d0e9cf. Shared ignored build caches and task-owned outputs were used.",
+  "ssh": "Task-owned control master; no data-plane forwarding or personal agent forwarding. Close the master after the ThinkPad verifies the committed publication."
+}

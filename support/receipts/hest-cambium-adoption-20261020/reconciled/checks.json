@@ -1,0 +1,145 @@
+[
+  {
+    "name": "command-menu",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "command_menu"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 35.52,
+    "log": "reconciled/command-menu.log",
+    "raw_log_sha256": "e5c73ed4b7cd009aa1ece3dbb0228c3d747cb4f2a107bd2cf76ea29d5730f780",
+    "log_sha256": "088db0072f5dae93bfc357eb3560edf7e2d81aa9605b3e80f0502140c666c896"
+  },
+  {
+    "name": "inspector",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "inspector_pane::tests::"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "elapsed_seconds": 5.89,
+    "log": "reconciled/inspector.log",
+    "raw_log_sha256": "26c0f053e044424a0e7b938507f4939d62781622f092b6a31ba895950e4a8059",
+    "log_sha256": "39b12db918df8e40f9dfe008f2893817a0256334a4222262a5883e5167e9a4dc"
+  },
+  {
+    "name": "knot-authoring",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "knot_authoring::tests::"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 23,
+        "failed": 0,
+        "ignored": 5
+      }
+    ],
+    "elapsed_seconds": 4.27,
+    "log": "reconciled/knot-authoring.log",
+    "raw_log_sha256": "3f88b6d6f88f7808e1da48d08cd5a0ead3cfa8d2d2df5a626b52d96426493b3d",
+    "log_sha256": "2beaa0015e4f3d220cebd11d9d0ede5b3d36a9ce27a98776045ecc1f6a6def23"
+  },
+  {
+    "name": "all-targets",
+    "command": [
+      "cargo",
+      "check",
+      "--workspace",
+      "--all-targets",
+      "--locked",
+      "--offline"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 9.93,
+    "log": "reconciled/all-targets.log",
+    "raw_log_sha256": "8ef993566c8f7ab4e131c083f9f94eccc05af023db26f503a92d9d55f8939d12",
+    "log_sha256": "8ef993566c8f7ab4e131c083f9f94eccc05af023db26f503a92d9d55f8939d12"
+  },
+  {
+    "name": "library",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [
+      {
+        "passed": 1103,
+        "failed": 0,
+        "ignored": 15
+      }
+    ],
+    "elapsed_seconds": 668.24,
+    "log": "reconciled/library.log",
+    "raw_log_sha256": "742051397023f7dc85c11f27b315a401b34a6e451a07e44cc6812cb9f9504f87",
+    "log_sha256": "ac3c5cfe992a821e54d62bea1571be65a1dcd6326e15095cdf3a704419ecea6a"
+  },
+  {
+    "name": "portable-metadata",
+    "command": [
+      "/Users/markik/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+      "scripts/cargo_mode.py",
+      "verify",
+      "--metadata-only"
+    ],
+    "environment": {
+      "TMPDIR": "/tmp"
+    },
+    "exit_code": 0,
+    "suites": [],
+    "elapsed_seconds": 5.06,
+    "log": "reconciled/portable-metadata.log",
+    "raw_log_sha256": "ef80a3e51c5be60e19e671e9c7565d9915ecdd811fea8ffa7b57479280fc7214",
+    "log_sha256": "ef80a3e51c5be60e19e671e9c7565d9915ecdd811fea8ffa7b57479280fc7214"
+  }
+]

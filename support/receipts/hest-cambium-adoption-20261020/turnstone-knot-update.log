@@ -1,0 +1,11 @@
+error: invalid type: boolean `true`, expected a map
+ --> ../../../.cargo/git/checkouts/servo-e53a6e7b994a25fe/aac43a3/python/tidy/tests/lints-configuration/no-workspace/Cargo.toml:8:7
+  |
+8 | foo = true
+  |       ^^^^
+    Updating knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+    Updating knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#aa81a335) -> #65a6632a
+note: pass `--verbose` to see 95 unchanged dependencies behind latest

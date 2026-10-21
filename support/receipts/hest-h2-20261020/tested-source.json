@@ -1,0 +1,121 @@
+{
+  "upstream_revision": "b10ae5f88d32d8e54d39856e93dd7b52981b353f",
+  "h1_commit": "cea6d09b2a9b04cb5567531778e6e62d8cdac0d4",
+  "implementation_commit_before_receipt": "64796095dfd7c16c878ca06f143d4cf4012dda6f",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "ffae075db0dd75a2ed72fdee25e6c309050e84fb50bb47b0a635d8a374d6edc6"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "c73df229dd702f2c8ed4d1b8153e565907c566cb0bcd8b327fc1f3fbe26d953f"
+    },
+    {
+      "path": "crates/cambium/cambium/src/lib.rs",
+      "sha256": "706809767e24bcd056b589b2fbb7e43d058ccaff6744c9ed912d419dcb6924aa"
+    },
+    {
+      "path": "crates/cambium/command-menu/Cargo.toml",
+      "sha256": "c4bb285c0b5aa8df650ab7d815efec2bd7416dce27fd3f6d450056c0d29577fc"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/Cargo.lock",
+      "sha256": "2bd3f4318c61eb4fa7522e239b30724f773780952af443e8f51624d26bf2660e"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/Cargo.toml",
+      "sha256": "afeab4b13e7a0a160074b4958c97adf4f84baf6e4751d37b5f6c52741dcd1811"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/src/catalogue.rs",
+      "sha256": "2b43216153a0b30a4d890b7b9aa224d92c1185d5842f76cb9520eaf056ce43cb"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/src/lib.rs",
+      "sha256": "6b9e36092ec6ee3782dda08e6776b062739e398722a38af64f7635fbde2b7c72"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/src/menu/mod.rs",
+      "sha256": "c8ed224fda0422cc81ae7a6e18c8a1ae7b1a86f8be92a2f6183ddbb0464ee86e"
+    },
+    {
+      "path": "crates/cambium/hest-0_1/src/menu/session.rs",
+      "sha256": "1bf3cd93ab0eaf6ea8dc570ce5ab6a3f822c2c013c1b9a43209c0aba41247583"
+    },
+    {
+      "path": "crates/cambium/hest/Cargo.toml",
+      "sha256": "9964e146c86cf43152d35005b0432cd81e624b2eefb303761425c666519acb69"
+    },
+    {
+      "path": "crates/cambium/hest/src/catalogue.rs",
+      "sha256": "ec51238a15945935b5c064081107060550e16a12fe60f99e2f410219239e0a7f"
+    },
+    {
+      "path": "crates/cambium/hest/src/lib.rs",
+      "sha256": "e763aed81d3a41c4519f6aaeeea4c11f31a30cbe3fb1fbcfcce10274459f0cb8"
+    },
+    {
+      "path": "crates/cambium/hest/src/menu/mod.rs",
+      "sha256": "8df52053783331139c8df9f3a919ca04f28c9ef409273762f701c0fe56913ea1"
+    },
+    {
+      "path": "crates/cambium/hest/src/menu/session.rs",
+      "sha256": "631eb9378be454e719fd573de5c24920aaf3af9fca8a1c8d877bb42e73f9cec9"
+    },
+    {
+      "path": "crates/chirograph/Cargo.toml",
+      "sha256": "74e323f1f118354dc2263638cdb6e6a81d939792acc414064d03a4e9d0f16fbc"
+    },
+    {
+      "path": "crates/chirograph/src/command_effect.rs",
+      "sha256": "e5349e76021733f80c0e7e10a0021730e320f4ae6437876e44edf1b5658a6f00"
+    },
+    {
+      "path": "crates/chirograph/src/lib.rs",
+      "sha256": "1d972584c179ebe8ab022f63ca16553bbbf057a9921e0ae3491c81d07f6c9cc9"
+    },
+    {
+      "path": "crates/system/ux-events/Cargo.toml",
+      "sha256": "4c8d0effc2edb999ccc0485d1de8707a10c07aa5896e2ef12a62a921198f591e"
+    },
+    {
+      "path": "crates/system/ux-events/src/ux_probes/destructive_action_gate.rs",
+      "sha256": "c2b6d30666b5e48116df304c17410ce6597bc49539a74669a94b5bd0cc01b699"
+    },
+    {
+      "path": "crates/system/ux-events/src/ux_probes/tests.rs",
+      "sha256": "440caf937e1e2e53e92c2d3cbcbe9d075116dd8c380abd9b33c4a58620ba6679"
+    },
+    {
+      "path": "ports/graphshell/Cargo.toml",
+      "sha256": "69c32ba4d83d486e5b277d81f1f1352bf9097b3b58f8f9fb2dc834c2ec0cf040"
+    },
+    {
+      "path": "ports/graphshell/src/viewer_commands.rs",
+      "sha256": "f50caf3ba9500b9118a737daf4db9d9cfea946cc32d87327e7c3a55e7476a5ac"
+    },
+    {
+      "path": "ports/graphshell/src/web_command_catalog.rs",
+      "sha256": "2470d2c860428865bd9882091fb9e35c05d12aa733b0ebe3909115256d962f0f"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/commands.rs",
+      "sha256": "8bb7da7e44a6998f94d3f34903f17e607a96f4a03042e4a24939cd0096a61c77"
+    },
+    {
+      "path": "ports/graphshell/tests/command_declarations.rs",
+      "sha256": "a8a063ab988031a77c434303c5da7e5636ea4b454ad47e041f59aea682806435"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "672cd4162db38a411602d4e8e9c61e24c3a2c79f8be586689a201318fd5d7978"
+    },
+    {
+      "path": "support/fixtures/hest-h1-compatibility/Cargo.toml",
+      "sha256": "b701f1d2183403fb2fbaed13f9a01f6341b54f10282b40c7bc34851352f8142c"
+    }
+  ]
+}

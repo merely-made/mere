@@ -1,0 +1,36 @@
+{
+  "qualified_basis": "6394e931a0e1df386d10472755babfb45bcf9a5d",
+  "integrated_main": "9a173f18",
+  "rebased_change": "d867b8d1230848a174b8e4ab251f350e72d8bfb9",
+  "upstream_changes": [
+    "2fead114 Hest reservation",
+    "9a173f18 Hest architecture plan"
+  ],
+  "qualification_preserved": "diagnostics-shared-qualification.json remains the original test receipt and source/lock basis; no cited receipt overwritten",
+  "all_qualified_source_hashes_match_except": [
+    "Cargo.lock",
+    "Cargo.toml"
+  ],
+  "published_workspace_sha256": {
+    "Cargo.lock": "98aad9d8a15d98977c559ffe018fe91928353524a92796dd85f8f6362e65f8bd",
+    "Cargo.toml": "7fef6ea843bf13ae6b62602b5ca08cf7e151d32a52383146102315d54d534bbb"
+  },
+  "locked_metadata_command": [
+    "cargo",
+    "metadata",
+    "--locked",
+    "--offline",
+    "--no-deps",
+    "--format-version",
+    "1"
+  ],
+  "locked_metadata_exit_code": 0,
+  "hest_dependencies": [],
+  "only_new_locked_package": {
+    "name": "hest",
+    "version": "0.0.1",
+    "source": "workspace"
+  },
+  "acceptance_scope_unchanged": true,
+  "isolated_outputs_created": []
+}

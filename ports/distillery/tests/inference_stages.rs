@@ -5,8 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #![cfg(feature = "inference-stages")]
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
-mod fixture;
+use esp_test_support::decoder as fixture;
 
 use distillery::inference_stage::*;
 use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
@@ -115,10 +114,9 @@ fn tiny_library(directory: &std::path::Path) -> (Library, ManifestId) {
         )
         .await
         .unwrap();
-        let mut template = esp::infer::prompt::PromptTemplate::from_bytes(include_bytes!(
-            "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-        ))
-        .unwrap();
+        let mut template =
+            esp::infer::prompt::PromptTemplate::from_bytes(esp_test_support::SMOLLM2_INSTRUCT_V1)
+                .unwrap();
         template.bos.clear();
         template.eos.clear();
         template.system_prompt.clear();
@@ -239,9 +237,9 @@ async fn real_smollm2_f16_stages_match_and_recover_under_supervised_leases() {
                     .unwrap(),
                 row_record.model
             );
-            let template = esp::infer::prompt::PromptTemplate::from_bytes(include_bytes!(
-                "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
-            ))
+            let template = esp::infer::prompt::PromptTemplate::from_bytes(
+                esp_test_support::SMOLLM2_INSTRUCT_V1,
+            )
             .unwrap();
             let template = pollster::block_on(eidetic::typed::save_typed(
                 &mut store,
@@ -679,6 +677,8 @@ async fn exercise(
     let leaving = conditions[1].clone();
     let departed = services[1].clone();
     let departed_job = jobs[1];
+    let departed_lease = leases[1];
+    let reclaim_steps = steps.clone();
     let work = tokio::task::spawn_blocking(move || {
         let make_chain = || StageChain::new(network.clone(),handle.clone(),peers.clone(),settings.clone(),profile.format,StageShape{hidden:profile.width,vocab:profile.vocab,context:profile.context,layers:profile.layers},{let gate=key_gate.clone();let roots=retiring_roots.clone();let peers=peer_roots.clone();Arc::new(move |peer:transport::PeerID|gate.load(std::sync::atomic::Ordering::SeqCst) && peers.get(&peer.to_bytes()).is_some_and(|root|roots.read().unwrap().contains(root)))}).unwrap();
         let request = GenerationRequest{prompt:profile.prompt.clone(),max_tokens:profile.max_tokens,temperature:profile.temperature,top_p:Some(0.9),seed:Some(19),..Default::default()};
@@ -705,8 +705,28 @@ async fn exercise(
             if cp.token_ids.len()==3 && !reclaimed {
                 reclaimed = true; match profile.departure {Departure::Owner=>leaving.in_use(),Departure::Lock=>departed.set_private_locked(true),Departure::Reader=>{retiring_roots.write().unwrap().remove(&retiring_root);},Departure::Idle=>{}}
                 let deadline = std::time::Instant::now()+Duration::from_secs(5);
-                while departed.is_active(jobs[1],leases[1]) && std::time::Instant::now()<deadline {std::thread::sleep(Duration::from_millis(5));}
-                assert!(!departed.is_active(jobs[1],leases[1]));
+                let owner_reclaim = matches!(profile.departure, Departure::Owner);
+                let reclaim_recorded = || {
+                    reclaim_steps.lock().unwrap().iter().any(|step| {
+                        matches!(step, Step::Reclaimed { job, lease, .. } if *job == departed_job && *lease == departed_lease)
+                    })
+                };
+                while (departed.is_active(departed_job, departed_lease)
+                    || (owner_reclaim && !reclaim_recorded()))
+                    && std::time::Instant::now() < deadline
+                {
+                    std::thread::sleep(Duration::from_millis(5));
+                }
+                assert!(
+                    !departed.is_active(departed_job, departed_lease),
+                    "departing stage remained active past its drain deadline"
+                );
+                if owner_reclaim {
+                    assert!(
+                        reclaim_recorded(),
+                        "host did not record Step::Reclaimed for the departing job and lease before the deadline"
+                    );
+                }
             }
             Ok(())
         },&mut ||false).unwrap();
@@ -735,7 +755,8 @@ async fn exercise(
                 .lock()
                 .unwrap()
                 .iter()
-                .any(|step| matches!(step, Step::Reclaimed { .. }))
+                .any(|step| matches!(step, Step::Reclaimed { job, lease, .. } if *job == departed_job && *lease == departed_lease)),
+            "owner departure must publish reclaim for the exact departing job and lease"
         );
     }
 

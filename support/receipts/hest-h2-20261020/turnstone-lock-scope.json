@@ -1,0 +1,21 @@
+{
+  "consumer_revision": "c889038ddd9c2fd56384c216e50d600f92af751e",
+  "unchanged_package_blocks": 1670,
+  "removed_or_changed_keys": [
+    [
+      "cambium",
+      "0.4.0",
+      "git+https://github.com/merely-made/mere.git?branch=main#dffcc9c806457319d3f748477bff6327f220b085"
+    ]
+  ],
+  "added_keys": [
+    [
+      "cambium",
+      "0.4.0"
+    ],
+    [
+      "hest",
+      "0.2.0"
+    ]
+  ]
+}

@@ -1,11 +1,13 @@
 # apparatus
 
-Shared diagnostics home for [mere](https://crates.io/crates/mere).
-Package `mere-apparatus`, library `apparatus`. The September 29 ruling assigns
-bounded observations and inspection to this crate; the current implementation
-provides a renderer-independent bounded record store and read-only inspection
-data, and retains the earlier
-peripheral system-inspector skeleton behind its default `projection` feature.
+Shared diagnostic integration for [mere](https://crates.io/crates/mere).
+Package `mere-apparatus`, library `apparatus`. Its existing public observation
+and inspection values are re-exported from `apparatus-core`, an independent
+sibling crate in [Armillary](https://github.com/merely-made/armillary).
+One portable implementation supplies bounded storage and read-only inspection
+data. This crate retains the Registry collector, accessibility projections and
+the earlier system-inspector skeleton behind its default `projection` feature.
+Existing `apparatus::` imports and feature names remain supported.
 
 See the [diagnostics plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 for the accepted ownership boundaries, qualified bounded-core consumers and
@@ -75,6 +77,26 @@ original admission accounting when adapting a batch to a receipt payload.
 No action dispatcher, terminal-outcome matcher, ingress queue, exporter or durable
 storage is installed. Products retain operation and persistence authority.
 
+## Optional Registry collector
+
+Feature `registry` connects the existing Registry staging receiver to an
+Apparatus store. `collector::RegistryCollector<P>` requires caller-chosen run,
+source, queue boot and retention limits; construction never locks or drains the
+queue. Install and schedule it in the owning product. Each `collect` call must
+project packets to an already-redacted `DiagnosticProjection<P>` or filter them.
+No raw event or producer correlation is retained automatically.
+
+Queue boot/sequence/time stay in `CollectedDiagnostic<P>`; the retained envelope
+keeps its own run/source/sequence. Product metadata remains product-owned.
+`read` returns an independent cursor batch plus the latest queue statistics,
+absent until a successful drain. Queue losses and retained gaps are distinct;
+process-global no-sink counters must be queried separately. After retiring a
+collector, sample final disconnect/discard counters through its old sender if
+required. A replacement queue needs a fresh run and boot; old cursors then
+report a run boundary. Identity freshness, panic policy and export remain the
+product's responsibility. This feature installs neither a global sender nor
+registry sampling/invariant policy into the emitter.
+
 ## Skeleton node shape
 
 The current `inspect_batch` interface is independent of the legacy skeleton.
@@ -100,11 +122,14 @@ Node ids come from `uxtree::node_id_for_path`: `apparatus` for the root,
 
 ## Dependencies
 
-The storage core uses only `std`. Disable default features for core-only consumers.
+The shared storage core uses only `std` and has no actor/runtime dependency.
+Disable default features for core-only consumers.
 `projection` enables `accesskit`, `uxtree`, `tracing` and `project_skeleton`;
-it is enabled by default to preserve the earlier API. Optional `serde` enables
+it is enabled by default to preserve the earlier API. Optional `serde` forwards
+to `apparatus-core/serde` and enables
 envelope, metadata, payload batch, statistics and cursor serialization; opaque
-cursors cannot be deserialized/restored into another store.
+cursors cannot be deserialized/restored into another store. Optional `registry`
+adds the diagnostics-only `mere-registry` dependency for the collector bridge.
 
 ## Status
 

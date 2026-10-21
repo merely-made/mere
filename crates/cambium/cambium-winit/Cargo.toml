@@ -14,7 +14,7 @@ publish = true
 # dependencies were unpublished and made this crate
 # unpublishable with them. Adding anything unpublishable here undoes that.
 [dependencies]
-cambium = { version = "0.4.0", path = "../cambium" }
+cambium = { version = "0.6.0", path = "../cambium" }
 winit = "0.30.13"
 # The fade clock. std::time::Instant panics on wasm32-unknown-unknown; this
 # re-exports std on native and performance.now() on wasm.

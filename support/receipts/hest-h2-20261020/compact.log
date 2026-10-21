@@ -1,0 +1,124 @@
+   Compiling sceno v0.0.6 (/Users/markik/Code/repos/mere/crates/cambium/scenes/sceno)
+   Compiling hest v0.2.0 (/Users/markik/Code/repos/mere/crates/cambium/hest)
+   Compiling scenograph v0.0.5 (/Users/markik/Code/repos/mere/crates/cambium/scenes/scenograph)
+   Compiling scenomise v0.0.6 (/Users/markik/Code/repos/mere/crates/cambium/scenes/scenomise)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling cambium v0.4.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium)
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling cambium-winit v0.3.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-winit)
+   Compiling cambium-rootstock v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/cambium/cambium-rootstock/src/producer/registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates/cambium/cambium-rootstock/src/scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates/cambium/cambium-rootstock/src/host.rs:116:10
+    |
+116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: unused import: `LayoutDom`
+   --> crates/cambium/cambium-rootstock/src/lib.rs:403:26
+    |
+403 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+    |                          ^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `layout_dom_api::LayoutDom`
+   --> crates/cambium/cambium-rootstock/src/lib.rs:552:9
+    |
+552 |     use layout_dom_api::LayoutDom as _;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates/cambium/cambium-rootstock/src/producer/registry.rs:678:13
+    |
+678 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+678 -             drop(renderer);
+678 +             let _ = renderer;
+    |
+
+   Compiling cambium-winit-a11y v0.3.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-winit-a11y)
+   Compiling mesquite v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/mesquite)
+warning: `cambium-rootstock` (lib) generated 6 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+   Compiling cambium-genet-winit-host v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium-genet-winit-host)
+warning: unused import: `NSWindow`
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:511:25
+    |
+511 |     use objc2_app_kit::{NSWindow, NSWindowButton};
+    |                         ^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unnecessary `unsafe` block
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:540:46
+    |
+540 |             view.convertRect_fromView(frame, unsafe { ns_window.contentView() }.as_deref());
+    |                                              ^^^^^^ unnecessary `unsafe` block
+    |
+    = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_node` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:113:4
+    |
+113 | fn window_control_node<D>(dom: &D, root: NodeId, accessible_label: &str) -> Option<NodeId>
+    |    ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `window_control_rect` is never used
+   --> crates/cambium/cambium-genet-winit-host/src/decorations.rs:139:15
+    |
+139 | pub(crate) fn window_control_rect<D>(
+    |               ^^^^^^^^^^^^^^^^^^^
+
+warning: `cambium-genet-winit-host` (lib) generated 4 warnings (run `cargo fix --lib -p cambium-genet-winit-host` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.69s
+     Running tests/command_menu_compact.rs (target/build/debug/deps/command_menu_compact-4d402e7365e12fce)
+
+running 1 test
+test nested_compact_menu_and_back_stay_in_one_popup_at_320_by_175 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s

@@ -35,7 +35,7 @@ use graphshell_endpoint::door::app_admission::{
     AppRouteId,
 };
 use graphshell_endpoint::door::custody::CUSTODY_ROUTE;
-use graphshell_endpoint::door::local_endpoint::{LocalStream, connect_local, serve_local};
+use graphshell_endpoint::door::local_endpoint::{LocalListener, LocalStream, connect_local};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::door::wire::{
     APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge,
@@ -86,10 +86,29 @@ pub struct AppEndpointCatalog {
     inner: Arc<tokio::sync::Mutex<ResidentEndpointCatalog>>,
 }
 
+/// Dynamic registrars must not own the catalog that owns their factories.
+#[derive(Clone)]
+pub struct WeakAppEndpointCatalog {
+    inner: std::sync::Weak<tokio::sync::Mutex<ResidentEndpointCatalog>>,
+}
+impl WeakAppEndpointCatalog {
+    pub fn upgrade(&self) -> Option<AppEndpointCatalog> {
+        self.inner
+            .upgrade()
+            .map(|inner| AppEndpointCatalog { inner })
+    }
+}
+
 impl AppEndpointCatalog {
     pub fn new(catalog: ResidentEndpointCatalog) -> Self {
         Self {
             inner: Arc::new(tokio::sync::Mutex::new(catalog)),
+        }
+    }
+
+    pub fn downgrade(&self) -> WeakAppEndpointCatalog {
+        WeakAppEndpointCatalog {
+            inner: Arc::downgrade(&self.inner),
         }
     }
 
@@ -144,10 +163,32 @@ pub async fn serve_app_broker<A>(
 where
     A: ResidentIdentity,
 {
-    serve_local(
-        endpoint,
-        "first-party",
-        move |stream: Box<dyn LocalStream>| {
+    let listener = LocalListener::bind(endpoint, "first-party").await?;
+    serve_app_broker_on(
+        listener,
+        personae,
+        grants,
+        session_duration_ms,
+        surface,
+        catalog,
+    )
+    .await
+}
+
+/// Serve first-party applications on an already bound owner-only listener.
+pub async fn serve_app_broker_on<A>(
+    listener: LocalListener,
+    personae: Arc<A>,
+    grants: AppRouteGrants,
+    session_duration_ms: u64,
+    surface: Option<DeviceSurfaceHandle>,
+    catalog: AppEndpointCatalog,
+) -> Result<(), AppBrokerError>
+where
+    A: ResidentIdentity,
+{
+    listener
+        .serve(move |stream: Box<dyn LocalStream>| {
             let personae = Arc::clone(&personae);
             let allowed = grants.current();
             let surface = surface.clone();
@@ -168,9 +209,8 @@ where
                     tracing::warn!(%error, "first-party session failed");
                 }
             }
-        },
-    )
-    .await?;
+        })
+        .await?;
     Ok(())
 }
 

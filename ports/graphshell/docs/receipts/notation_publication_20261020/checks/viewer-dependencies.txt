@@ -1,0 +1,1046 @@
+graphshell-web v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/ports/graphshell/web)
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium)
+backstep v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/backstep)
+command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/command-menu)
+serde v1.0.229
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+proc-macro2 v1.0.107
+unicode-ident v1.0.26
+quote v1.0.47
+proc-macro2 v1.0.107 (*)
+syn v3.0.6
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.26
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+encoding_rs v0.8.42
+cfg-if v1.0.5
+multiversion_no_op v1.0.0 (proc-macro)
+scopeguard v1.2.0
+serde v1.0.229 (*)
+engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+app_units v0.7.8
+num-traits v0.2.19
+libm v0.2.16
+serde v1.0.229 (*)
+euclid v0.22.14
+num-traits v0.2.19 (*)
+serde v1.0.229 (*)
+serde v1.0.229 (*)
+serde v1.0.229 (*)
+genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+html5ever v0.39.0
+log v0.4.34
+markup5ever v0.39.0
+log v0.4.34
+tendril v0.5.1
+new_debug_unreachable v1.0.6
+web_atoms v0.2.6
+phf v0.13.1
+phf_macros v0.13.1 (proc-macro)
+phf_generator v0.13.1
+fastrand v2.5.0
+phf_shared v0.13.1
+siphasher v1.0.3
+phf_shared v0.13.1 (*)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.26
+phf_shared v0.13.1
+siphasher v1.0.3
+string_cache v0.9.0
+new_debug_unreachable v1.0.6
+parking_lot v0.12.5
+lock_api v0.4.14
+scopeguard v1.2.0
+parking_lot_core v0.9.12
+cfg-if v1.0.5
+smallvec v1.16.1
+serde v1.0.229 (*)
+phf_shared v0.13.1 (*)
+precomputed-hash v0.1.1
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+markup5ever v0.39.0 (*)
+serde v1.0.229 (*)
+xml5ever v0.39.0
+log v0.4.34
+markup5ever v0.39.0 (*)
+genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+unicode-segmentation v1.13.3
+html5ever v0.39.0 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+markup5ever v0.39.0 (*)
+regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+hashbrown v0.16.1
+allocator-api2 v0.2.21
+equivalent v1.0.2
+foldhash v0.2.0
+memchr v2.8.3
+serde v1.0.229 (*)
+url v2.5.8
+form_urlencoded v1.2.2
+percent-encoding v2.3.2
+idna v1.1.0
+idna_adapter v1.2.2
+icu_normalizer v2.2.0
+icu_collections v2.2.0
+displaydoc v0.2.7 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+potential_utf v0.1.6
+writeable v0.6.4
+zerovec v0.11.8
+yoke v0.8.3
+stable_deref_trait v1.2.1
+yoke-derive v0.8.3 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+synstructure v0.14.0
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+zerofrom v0.1.8
+zerofrom-derive v0.1.8 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+synstructure v0.14.0 (*)
+zerofrom v0.1.8 (*)
+zerovec-derive v0.11.6 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+utf8_iter v1.0.4
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerovec v0.11.8 (*)
+icu_normalizer_data v2.2.0
+icu_provider v2.3.1
+displaydoc v0.2.7 (proc-macro) (*)
+icu_locale_core v2.3.0
+displaydoc v0.2.7 (proc-macro) (*)
+litemap v0.8.3
+tinystr v0.8.4
+displaydoc v0.2.7 (proc-macro) (*)
+zerovec v0.11.8 (*)
+writeable v0.6.4
+zerovec v0.11.8 (*)
+stable_deref_trait v1.2.1
+writeable v0.6.4
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerotrie v0.2.5
+displaydoc v0.2.7 (proc-macro) (*)
+yoke v0.8.3 (*)
+zerofrom v0.1.8 (*)
+zerovec v0.11.8 (*)
+smallvec v1.16.1 (*)
+zerovec v0.11.8 (*)
+icu_properties v2.2.0
+icu_collections v2.2.0 (*)
+icu_locale_core v2.3.0 (*)
+icu_properties_data v2.2.0
+icu_provider v2.3.1 (*)
+zerotrie v0.2.5 (*)
+zerovec v0.11.8 (*)
+smallvec v1.16.1 (*)
+utf8_iter v1.0.4
+percent-encoding v2.3.2
+genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+mere-surface-api v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/surface-api)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)
+meristem v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/meristem)
+anymore v1.0.0
+tracing v0.1.44
+pin-project-lite v0.2.17
+tracing-attributes v0.1.31 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+tracing-core v0.1.36
+once_cell v1.21.4
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno)
+serde v1.0.229 (*)
+serde_json v1.0.151
+itoa v1.0.18
+memchr v2.8.3
+serde_core v1.0.229
+zmij v1.0.23
+scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenograph)
+mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/curation)
+serde v1.0.229 (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenomise)
+backstep v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/backstep)
+libm v0.2.16
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenograph) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)
+sprigging v0.2.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/sprigging)
+accesskit v0.25.1
+enumn v0.1.14 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+serde v1.0.229 (*)
+uuid v1.27.0
+serde_core v1.0.229
+sha1_smol v1.0.1
+uuid-rng-internal v1.27.0
+getrandom v0.4.3
+cfg-if v1.0.5
+rand_core v0.10.1
+wasm-bindgen v0.2.129
+cfg-if v1.0.5
+once_cell v1.21.4
+wasm-bindgen-macro v0.2.129 (proc-macro)
+quote v1.0.47 (*)
+wasm-bindgen-macro-support v0.2.129
+bumpalo v3.20.3
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+wasm-bindgen-shared v0.2.129
+unicode-ident v1.0.26
+wasm-bindgen-shared v0.2.129
+unicode-ident v1.0.26
+wasm-bindgen v0.2.129 (*)
+netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2
+bytemuck_derive v1.12.1 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+futures-intrusive v0.5.0
+futures-core v0.3.34
+lock_api v0.4.14 (*)
+parking_lot v0.12.5 (*)
+log v0.4.34
+peniko v0.6.1
+bytemuck v1.25.2 (*)
+color v0.3.3
+bytemuck v1.25.2 (*)
+serde v1.0.229 (*)
+kurbo v0.13.1
+arrayvec v0.7.8
+polycool v0.4.0
+arrayvec v0.7.8
+serde v1.0.229 (*)
+smallvec v1.16.1 (*)
+linebender_resource_handle v0.1.1
+serde v1.0.229 (*)
+serde_bytes v0.11.19
+serde_core v1.0.229
+serde v1.0.229 (*)
+smallvec v1.16.1 (*)
+png v0.18.1
+bitflags v2.13.2
+crc32fast v1.5.2
+cfg-if v1.0.5
+fdeflate v0.3.7
+simd-adler32 v0.3.10
+flate2 v1.1.10
+crc32fast v1.5.2 (*)
+miniz_oxide v0.9.1
+adler2 v2.0.1
+simd-adler32 v0.3.10
+miniz_oxide v0.8.9
+adler2 v2.0.1
+simd-adler32 v0.3.10
+skrifa v0.44.0
+bytemuck v1.25.2 (*)
+read-fonts v0.41.0
+bytemuck v1.25.2 (*)
+font-types v0.12.5
+bytemuck v1.25.2 (*)
+once_cell v1.21.4
+static_assertions v1.1.0
+thiserror v2.0.21
+thiserror-impl v2.0.21 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2 (*)
+guillotiere v0.7.0
+euclid v0.22.14 (*)
+svg_fmt v0.4.5
+peniko v0.6.1 (*)
+skrifa v0.44.0 (*)
+smallvec v1.16.1 (*)
+vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2 (*)
+vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+wgpu v30.0.1
+arrayvec v0.7.8
+bitflags v2.13.2
+bytemuck v1.25.2 (*)
+cfg-if v1.0.5
+document-features v0.2.12 (proc-macro)
+litrs v1.0.0
+hashbrown v0.17.1
+foldhash v0.2.0
+js-sys v0.3.106
+cfg-if v1.0.5
+futures-util v0.3.34
+futures-core v0.3.34
+futures-macro v0.3.34 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+futures-task v0.3.34
+pin-project-lite v0.2.17
+slab v0.4.12
+wasm-bindgen v0.2.129 (*)
+log v0.4.34
+parking_lot v0.12.5 (*)
+profiling v1.0.18
+profiling-procmacros v1.0.18 (proc-macro)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+raw-window-handle v0.6.2
+static_assertions v1.1.0
+wasm-bindgen v0.2.129 (*)
+wasm-bindgen-futures v0.4.79
+js-sys v0.3.106 (*)
+wasm-bindgen v0.2.129 (*)
+web-sys v0.3.106
+js-sys v0.3.106 (*)
+wasm-bindgen v0.2.129 (*)
+wgpu-types v30.0.1
+bitflags v2.13.2
+bytemuck v1.25.2 (*)
+js-sys v0.3.106 (*)
+log v0.4.34
+naga-types v30.0.1
+hashbrown v0.17.1 (*)
+indexmap v2.14.2
+equivalent v1.0.2
+hashbrown v0.17.1 (*)
+serde_core v1.0.229
+rustc-hash v1.1.0
+thiserror v2.0.21 (*)
+raw-window-handle v0.6.2
+static_assertions v1.1.0
+web-sys v0.3.106 (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+euclid v0.22.14 (*)
+serde v1.0.229 (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)
+cambium-genet-web-host v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-genet-web-host)
+accesskit v0.25.1 (*)
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium) (*)
+cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-rootstock)
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium) (*)
+cambium-winit v0.3.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-winit)
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium) (*)
+web-time v1.1.0
+js-sys v0.3.106 (*)
+wasm-bindgen v0.2.129 (*)
+winit v0.30.13
+bitflags v2.13.2
+cursor-icon v1.2.0
+dpi v0.1.2
+js-sys v0.3.106 (*)
+pin-project v1.1.13
+pin-project-internal v1.1.13 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+raw-window-handle v0.6.2
+smol_str v0.2.2
+tracing v0.1.44 (*)
+wasm-bindgen v0.2.129 (*)
+wasm-bindgen-futures v0.4.79 (*)
+web-sys v0.3.106 (*)
+web-time v1.1.0 (*)
+document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+serde v1.0.229 (*)
+genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+arrayvec v0.7.8
+smallvec v1.16.1 (*)
+stacker v0.1.25
+cfg-if v1.0.5
+libc v0.2.190
+psm v0.1.32
+cssparser v0.37.0
+cssparser-macros v0.7.1 (proc-macro)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+dtoa-short v0.3.5
+dtoa v1.0.11
+itoa v1.0.18
+phf v0.13.1 (*)
+serde v1.0.229 (*)
+smallvec v1.16.1 (*)
+data-url v0.3.2
+euclid v0.22.14 (*)
+genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+serde v1.0.229 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+hashbrown v0.17.1 (*)
+linebender_resource_handle v0.1.1 (*)
+memmap2 v0.9.11
+parlance v0.1.0
+read-fonts v0.41.0 (*)
+smallvec v1.16.1 (*)
+harfrust v0.12.0
+bitflags v2.13.2
+bytemuck v1.25.2 (*)
+read-fonts v0.41.0 (*)
+smallvec v1.16.1 (*)
+hashbrown v0.17.1 (*)
+icu_normalizer v2.2.0 (*)
+icu_properties v2.2.0 (*)
+icu_segmenter v2.2.0
+icu_collections v2.2.0 (*)
+icu_locale v2.2.0
+icu_collections v2.2.0 (*)
+icu_locale_core v2.3.0 (*)
+icu_locale_data v2.2.0
+icu_provider v2.3.1 (*)
+potential_utf v0.1.6 (*)
+tinystr v0.8.4 (*)
+zerovec v0.11.8 (*)
+icu_provider v2.3.1 (*)
+icu_segmenter_data v2.2.0
+potential_utf v0.1.6 (*)
+utf8_iter v1.0.4
+zerovec v0.11.8 (*)
+linebender_resource_handle v0.1.1 (*)
+parlance v0.1.0
+parley_data v0.10.0
+icu_properties v2.2.0 (*)
+skrifa v0.44.0 (*)
+genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+icu_properties v2.2.0 (*)
+icu_segmenter v2.2.0 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+cssparser v0.37.0 (*)
+cssparser v0.37.0 (*)
+genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+serde v1.0.229 (*)
+stacker v0.1.25 (*)
+genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+accesskit v0.25.1 (*)
+document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+glifo v0.4.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2 (*)
+foldhash v0.2.0
+hashbrown v0.17.1 (*)
+log v0.4.34
+peniko v0.6.1 (*)
+skrifa v0.44.0 (*)
+smallvec v1.16.1 (*)
+vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2 (*)
+fearless_simd v0.7.0
+guillotiere v0.7.0 (*)
+log v0.4.34
+peniko v0.6.1 (*)
+smallvec v1.16.1 (*)
+thiserror v2.0.21 (*)
+log v0.4.34
+netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+log v0.4.34
+serde v1.0.229 (*)
+web-time v1.1.0 (*)
+wgpu v30.0.1 (*)
+peniko v0.6.1 (*)
+postcard v1.1.3
+cobs v0.3.0
+thiserror v2.0.21 (*)
+heapless v0.7.17
+hash32 v0.2.1
+byteorder v1.5.0
+serde v1.0.229 (*)
+stable_deref_trait v1.2.1
+serde v1.0.229 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+skrifa v0.44.0 (*)
+tracing v0.1.44 (*)
+vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+vello_gpu v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+bytemuck v1.25.2 (*)
+glifo v0.4.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+hashbrown v0.17.1 (*)
+js-sys v0.3.106 (*)
+log v0.4.34
+thiserror v2.0.21 (*)
+vello_common v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664) (*)
+vello_gpu_shaders v0.3.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+naga v30.0.1
+arrayvec v0.7.8
+bit-set v0.10.0
+bit-vec v0.9.1
+bitflags v2.13.2
+cfg-if v1.0.5
+codespan-reporting v0.13.1
+unicode-width v0.2.2
+half v2.7.1
+cfg-if v1.0.5
+num-traits v0.2.19 (*)
+zerocopy v0.8.57
+zerocopy-derive v0.8.57 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+hashbrown v0.17.1 (*)
+indexmap v2.14.2 (*)
+libm v0.2.16
+log v0.4.34
+naga-types v30.0.1 (*)
+num-traits v0.2.19 (*)
+once_cell v1.21.4
+rustc-hash v1.1.0
+thiserror v2.0.21 (*)
+unicode-ident v1.0.26
+web-sys v0.3.106 (*)
+wgpu v30.0.1 (*)
+wasm-bindgen v0.2.129 (*)
+web-sys v0.3.106 (*)
+web-time v1.1.0 (*)
+wgpu v30.0.1 (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014)
+log v0.4.34
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+postcard v1.1.3 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+sha2 v0.11.0
+cfg-if v1.0.5
+digest v0.11.3
+block-buffer v0.12.1
+hybrid-array v0.4.15
+typenum v1.20.1
+const-oid v0.10.2
+crypto-common v0.2.2
+getrandom v0.4.3 (*)
+hybrid-array v0.4.15 (*)
+rand_core v0.10.1
+skrifa v0.44.0 (*)
+genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+gloo-timers v0.3.0
+futures-channel v0.3.34
+futures-core v0.3.34
+futures-core v0.3.34
+js-sys v0.3.106 (*)
+wasm-bindgen v0.2.129 (*)
+js-sys v0.3.106 (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+tracing v0.1.44 (*)
+wasm-bindgen v0.2.129 (*)
+wasm-bindgen-futures v0.4.79 (*)
+web-time v1.1.0 (*)
+wgpu v30.0.1 (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+meristem v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/meristem) (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+sprigging v0.2.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/sprigging) (*)
+web-time v1.1.0 (*)
+wgpu v30.0.1 (*)
+document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+js-sys v0.3.106 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/mesquite)
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium) (*)
+cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-rootstock) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+mere-apparatus v0.0.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/domain/apparatus)
+serde v1.0.229 (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+png v0.17.16
+bitflags v1.3.2
+crc32fast v1.5.2 (*)
+fdeflate v0.3.7 (*)
+flate2 v1.1.10 (*)
+miniz_oxide v0.8.9 (*)
+postcard v1.1.3 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+wasm-bindgen v0.2.129 (*)
+wasm-bindgen-futures v0.4.79 (*)
+web-sys v0.3.106 (*)
+wgpu v30.0.1 (*)
+cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-rootstock) (*)
+console_error_panic_hook v0.1.7
+cfg-if v1.0.5
+wasm-bindgen v0.2.129 (*)
+eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)
+async-trait v0.1.92 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+blake3 v1.8.7
+arrayvec v0.7.8
+cfg-if v1.0.5
+constant_time_eq v0.4.2
+chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3)
+async-trait v0.1.92 (proc-macro) (*)
+blake3 v1.8.7 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+petgraph v0.8.3
+fixedbitset v0.5.7
+hashbrown v0.15.5
+foldhash v0.1.5
+indexmap v2.14.2 (*)
+serde v1.0.229 (*)
+serde_derive v1.0.229 (proc-macro) (*)
+rkyv v0.8.18
+bytecheck v0.8.3
+bytecheck_derive v0.8.3 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+ptr_meta v0.3.2
+ptr_meta_derive v0.3.2 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+rancor v0.1.3
+ptr_meta v0.3.2 (*)
+simdutf8 v0.1.5
+hashbrown v0.17.1 (*)
+munge v0.4.7
+munge_macro v0.4.7 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+ptr_meta v0.3.2 (*)
+rancor v0.1.3 (*)
+rend v0.5.4
+bytecheck v0.8.3 (*)
+rkyv_derive v0.8.18 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+slotmap v1.1.1
+serde v1.0.229 (*)
+uuid v1.27.0 (*)
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+url v2.5.8 (*)
+zeroize v1.9.1
+zeroize_derive v1.5.0 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+graphshell v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/ports/graphshell)
+async-trait v0.1.92 (proc-macro) (*)
+backstep v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/backstep)
+base64 v0.22.1
+cambium v0.4.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium) (*)
+cambium-rootstock v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/cambium-rootstock) (*)
+chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph)
+base64 v0.22.1
+blake3 v1.8.7 (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+sha2 v0.11.0 (*)
+command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/command-menu) (*)
+eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-client)
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph) (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-endpoint)
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph) (*)
+graphshell-host v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-host)
+base64 v0.22.1
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph) (*)
+graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-client) (*)
+graphshell-endpoint v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-endpoint) (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+serde_json v1.0.151 (*)
+insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+blake3 v1.8.7 (*)
+ed25519-dalek v3.0.0
+curve25519-dalek v5.0.0
+cfg-if v1.0.5
+digest v0.11.3 (*)
+subtle v2.6.1
+zeroize v1.9.1 (*)
+ed25519 v3.0.0
+signature v3.0.0
+sha2 v0.11.0 (*)
+subtle v2.6.1
+zeroize v1.9.1 (*)
+serde v1.0.229 (*)
+mere v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/mere)
+accesskit v0.25.1 (*)
+inker v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/inker/inker)
+accesskit v0.25.1 (*)
+document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+getrandom v0.4.3 (*)
+petgraph v0.8.3 (*)
+serde v1.0.229 (*)
+tracing v0.1.44 (*)
+uuid v1.27.0 (*)
+mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/forme)
+mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/curation) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+taffy v0.11.0-experimental-cache-fix.3
+arrayvec v0.7.8
+grid v1.0.1
+slotmap v1.1.1 (*)
+uuid v1.27.0 (*)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel)
+accesskit v0.25.1 (*)
+chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/command-menu) (*)
+crossbeam-channel v0.5.17
+crossbeam-utils v0.8.23
+euclid v0.22.14 (*)
+futures-util v0.3.34 (*)
+infer v0.19.0
+cfb v0.7.3
+byteorder v1.5.0
+fnv v1.0.7
+uuid v1.27.0 (*)
+mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/forme) (*)
+mime_guess v2.0.5
+mime v0.3.17
+unicase v2.9.0
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+numen v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/conatus/numen)
+serde v1.0.229 (*)
+strum v0.28.0
+strum_macros v0.28.0 (proc-macro)
+heck v0.5.0
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+uuid v1.27.0 (*)
+petgraph v0.8.3 (*)
+rkyv v0.8.18 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+strum v0.28.0 (*)
+time v0.3.55
+deranged v0.5.8
+num-conv v0.2.2
+powerfmt v0.2.0
+time-core v0.1.9
+url v2.5.8 (*)
+uuid v1.27.0 (*)
+web-time v1.1.0 (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+pictograph v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/canvas/pictograph)
+armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def)
+tracing v0.1.44 (*)
+chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph) (*)
+emblem v0.2.0
+esp v0.1.0 (https://github.com/merely-made/esp.git?rev=b20ae7db257dae83493031efd92da3a102c44a48#b20ae7db)
+serde v1.0.229 (*)
+zeroize v1.9.1 (*)
+euclid v0.22.14 (*)
+genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+libm v0.2.16
+mere-cartography v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/canvas/cartography)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel) (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenomise) (*)
+serde v1.0.229 (*)
+mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/curation) (*)
+mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/forme) (*)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel) (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+numen v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/conatus/numen) (*)
+paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+petgraph v0.8.3 (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenograph) (*)
+scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenomise) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+seiche v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/conatus/seiche)
+armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=e67c5def1c735be047492a867bcdc8b41fba22b8#e67c5def) (*)
+euclid v0.22.14 (*)
+numen v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/conatus/numen) (*)
+petgraph v0.8.3 (*)
+rapier2d v0.36.0
+approx v0.5.1
+num-traits v0.2.19 (*)
+arrayvec v0.7.8
+bitflags v2.13.2
+glamx v0.3.1
+approx v0.5.1 (*)
+glam v0.33.8
+approx v0.5.1 (*)
+libm v0.2.16
+nalgebra v0.35.0
+approx v0.5.1 (*)
+glam v0.33.8 (*)
+matrixmultiply v0.3.11
+rawpointer v0.2.1
+nalgebra-macros v0.3.0 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+num-complex v0.4.6
+num-traits v0.2.19 (*)
+num-rational v0.4.2
+num-integer v0.1.47
+num-traits v0.2.19 (*)
+num-traits v0.2.19 (*)
+num-traits v0.2.19 (*)
+simba v0.10.2
+approx v0.5.1 (*)
+libm v0.2.16
+num-complex v0.4.6 (*)
+num-traits v0.2.19 (*)
+wide v1.7.1
+bytemuck v1.25.2 (*)
+typenum v1.20.1
+num-traits v0.2.19 (*)
+simba v0.10.2 (*)
+log v0.4.34
+nalgebra v0.35.0 (*)
+num-traits v0.2.19 (*)
+parry2d v0.31.1
+approx v0.5.1 (*)
+arrayvec v0.7.8
+bitflags v2.13.2
+downcast-rs v2.0.2
+either v1.18.0
+ena v0.14.4
+log v0.4.34
+foldhash v0.2.0
+glamx v0.3.1 (*)
+hashbrown v0.17.1 (*)
+indexmap v2.14.2 (*)
+log v0.4.34
+num-derive v0.5.1 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+num-traits v0.2.19 (*)
+ordered-float v5.5.0
+num-traits v0.2.19 (*)
+simba v0.10.2 (*)
+slab v0.4.12
+smallvec v1.16.1 (*)
+spade v2.15.1
+hashbrown v0.16.1 (*)
+num-traits v0.2.19 (*)
+robust v1.2.0
+smallvec v1.16.1 (*)
+thiserror v2.0.21 (*)
+profiling v1.0.18 (*)
+simba v0.10.2 (*)
+static_assertions v1.1.0
+thiserror v2.0.21 (*)
+wide v1.7.1 (*)
+serde v1.0.229 (*)
+serde_path_to_error v0.1.20
+itoa v1.0.18
+serde_core v1.0.229
+tracing v0.1.44 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tinct v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/tinct)
+serde v1.0.229 (*)
+tracing v0.1.44 (*)
+uuid v1.27.0 (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tabard v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/tabard)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tinct v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/tinct) (*)
+tracing v0.1.44 (*)
+uuid v1.27.0 (*)
+uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/uxtree)
+accesskit v0.25.1 (*)
+inker v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/inker/inker) (*)
+tracing v0.1.44 (*)
+mere-overmap v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/mere-overmap)
+chirograph v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/chirograph) (*)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel) (*)
+pandect v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/pandect)
+async-trait v0.1.92 (proc-macro) (*)
+blake3 v1.8.7 (*)
+chacha20poly1305 v0.11.0
+aead v0.6.1
+crypto-common v0.2.2 (*)
+inout v0.2.2
+hybrid-array v0.4.15 (*)
+chacha20 v0.10.2
+cfg-if v1.0.5
+cipher v0.5.2
+block-buffer v0.12.1 (*)
+crypto-common v0.2.2 (*)
+inout v0.2.2 (*)
+zeroize v1.9.1 (*)
+cipher v0.5.2 (*)
+poly1305 v0.9.1
+universal-hash v0.6.1
+crypto-common v0.2.2 (*)
+ctutils v0.4.2
+cmov v0.5.4
+zeroize v1.9.1 (*)
+chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+ciborium v0.2.2
+ciborium-io v0.2.2
+ciborium-ll v0.2.2
+ciborium-io v0.2.2
+half v2.7.1 (*)
+serde v1.0.229 (*)
+command-menu v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/command-menu) (*)
+dirs v5.0.1
+dirs-sys v0.4.1
+option-ext v0.2.0
+eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+getrandom v0.3.4
+cfg-if v1.0.5
+wasm-bindgen v0.2.129 (*)
+hex v0.4.3
+incipit v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/incipit)
+serde v1.0.229 (*)
+uuid v1.27.0 (*)
+insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+mere-alembic v0.0.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/distillery/alembic)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel) (*)
+serde v1.0.229 (*)
+mere-curation v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/curation) (*)
+mere-kernel v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graph/graph-kernel) (*)
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+blake3 v1.8.7 (*)
+insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848)
+blake3 v1.8.7 (*)
+chacha20poly1305 v0.11.0 (*)
+ed25519-dalek v3.0.0 (*)
+getrandom v0.3.4 (*)
+getrandom v0.4.3 (*)
+insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+thiserror v1.0.69
+thiserror-impl v1.0.69 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v2.0.119 (*)
+uuid v1.27.0 (*)
+zeroize v1.9.1 (*)
+postcard v1.1.3 (*)
+serde v1.0.229 (*)
+thiserror v1.0.69 (*)
+personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tabard v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/tabard) (*)
+uuid v1.27.0 (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+pandect v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/pandect) (*)
+platen v0.0.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/platen/platen)
+accesskit v0.25.1 (*)
+inker v0.1.1 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/inker/inker) (*)
+mere-forme v0.2.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/forme) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tracing v0.1.44 (*)
+uuid v1.27.0 (*)
+uxtree v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/forme/uxtree) (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenograph) (*)
+scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenomise) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+sha2 v0.11.0 (*)
+tabard v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/tabard) (*)
+url v2.5.8 (*)
+uuid v1.27.0 (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)
+graphshell-client v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/graphshell/graphshell-client) (*)
+js-sys v0.3.106 (*)
+layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+mere v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/mere) (*)
+mesquite v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/mesquite) (*)
+muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=543f5ff38f87a09afc04dbc59f57c2dfbc6a9943#543f5ff3) (*)
+netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#d9205014) (*)
+sceno v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/sceno) (*)
+scenograph v0.0.5 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenograph) (*)
+scenomise v0.0.6 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenomise) (*)
+scenotime v0.0.4 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/scenes/scenotime) (*)
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+tabard v0.0.2 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/system/tabard) (*)
+taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37) (*)
+uuid v1.27.0 (*)
+wasm-bindgen v0.2.129 (*)
+wasm-bindgen-futures v0.4.79 (*)
+web-sys v0.3.106 (*)
+wgpu v30.0.1 (*)
+workbench v0.1.0 (/Users/markik/Code/worktrees/mere-scene-canonical-integration/crates/cambium/workbench)

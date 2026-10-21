@@ -1,0 +1,60 @@
+{
+  "packages": [
+    {
+      "name": "cambium",
+      "version": "0.5.0",
+      "source": null
+    },
+    {
+      "name": "command-menu",
+      "version": "0.1.1",
+      "source": null
+    },
+    {
+      "name": "eidetic",
+      "version": "0.0.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63ec17826e0a58a5b461b65150357dd000"
+    },
+    {
+      "name": "eidetic",
+      "version": "0.0.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=738ef15956a29a125820b2d6c2280d39a6214f8e#738ef15956a29a125820b2d6c2280d39a6214f8e"
+    },
+    {
+      "name": "esp",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/esp.git?rev=6d371901435b68e3fb4099a97789222d15f87cf0#6d371901435b68e3fb4099a97789222d15f87cf0"
+    },
+    {
+      "name": "esp",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/esp.git?rev=809deb6be341d3b6eeaad9534d9d162bd3105f4a#809deb6be341d3b6eeaad9534d9d162bd3105f4a"
+    },
+    {
+      "name": "hest",
+      "version": "0.1.0",
+      "source": null
+    },
+    {
+      "name": "hest",
+      "version": "0.2.0",
+      "source": null
+    },
+    {
+      "name": "knot-document",
+      "version": "0.0.1",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632a24b764d04eecf7302a1087342eccbfbe"
+    },
+    {
+      "name": "knot-editor",
+      "version": "0.0.3",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#65a6632a24b764d04eecf7302a1087342eccbfbe"
+    },
+    {
+      "name": "netrender",
+      "version": "0.1.2",
+      "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+    }
+  ],
+  "full_metadata_sha256": "d1ec5caf5e544172cefb559464fc295b48598c6abc3b73d9c80777b8267f68d8"
+}

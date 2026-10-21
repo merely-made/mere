@@ -234,7 +234,7 @@ impl DjinnResident {
             .distillery
             .as_mut()
             .ok_or("inference needs Distillery during composition")?;
-        let library = if settings.model.library().is_some() {
+        let library = if settings.model.library().is_some() || settings.embedding.is_some() {
             Some(works.inference_model_library(&self.data_root)?)
         } else {
             None
@@ -285,6 +285,27 @@ impl DjinnResident {
         } else {
             None
         };
+        #[cfg(feature = "inference-embedding")]
+        let embedding = if let Some(embedding) = settings.embedding.clone() {
+            let library = library
+                .clone()
+                .ok_or("embedding recall requires the resident model library")?;
+            let cache = journal
+                .clone()
+                .ok_or("embedding recall requires the private resident journal")?;
+            Some(
+                tokio::task::spawn_blocking(move || {
+                    distillery::inference::recall_embedding::open_embedding_recall(
+                        embedding, library, cache,
+                    )
+                    .map(Arc::new)
+                })
+                .await
+                .map_err(|e| format!("embedding recall startup: {e}"))??,
+            )
+        } else {
+            None
+        };
         let mut inference = ResidentInference::open(
             settings,
             library,
@@ -293,6 +314,15 @@ impl DjinnResident {
             #[cfg(feature = "inference-stages")]
             stages,
         )?;
+        #[cfg(feature = "inference-embedding")]
+        if let Some(embedding) = embedding {
+            if let Err(error) = inference.lane().configure_embedding_recall(embedding) {
+                let closed = inference.close().await.err();
+                return Err(format!(
+                    "embedding recall composition: {error}; close: {closed:?}"
+                ));
+            }
+        }
         if let (Some(host), Some(journal)) = (&personal, &journal) {
             if let Err(error) = resident_inference::personal::join(host, journal).await {
                 let closed = inference.close().await.err();

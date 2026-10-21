@@ -1,0 +1,14 @@
+[
+  {
+    "repository": "knot-editor",
+    "source_commit": "2cfe1d4a51bbbf54de4e47b20c46ff9456a3f416",
+    "supplier": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+    "qualification": "docs/receipts/hest-h4-20261020/qualification.json",
+    "checks": "docs/receipts/hest-h4-20261020/checks.json",
+    "passed_tests": 14,
+    "workspace_all_targets": "passed",
+    "unrelated_package_blocks_preserved": 1246,
+    "other_rust_files_exact": 150,
+    "production_endpoint_logic_exact": true
+  }
+]

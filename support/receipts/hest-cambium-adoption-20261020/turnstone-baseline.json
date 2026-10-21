@@ -1,0 +1,9 @@
+{
+  "revision": "0dd9b1b020aa3cdf27d15e2d97509c760f2101f3",
+  "files": {
+    "Cargo.toml": "538f3a51ce78420f82d8483b1ce9e189c790b1251898d26716b355c8c955d9b1",
+    "Cargo.lock": "e02bca31b11ad6bb01f363b21f22d0b588d35d8d486539020c82c2f0a0d897ab",
+    "src/action.rs": "3fa808a2d512d2346ac9b08bb3c16c989ef975df343b60e218f4e1eb6bd5e440",
+    "src/app/palette.rs": "22e88f0b8c69c1d8e8a2dc613e241022f74d6a209b939279b52d7ac9a2f7b795"
+  }
+}

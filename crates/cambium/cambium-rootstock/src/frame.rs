@@ -413,6 +413,7 @@ where
                 capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
+                a11y: &mut self.s.pending_a11y,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1041,7 +1042,7 @@ where
     /// goes through the same dispatch a mouse press does; `Focus` is "put the
     /// cursor here" and only moves focus. Collapsing them would fire every
     /// control a reader navigates across.
-    pub fn sync_a11y(&mut self) {
+    pub fn sync_a11y(&mut self) -> Vec<crate::A11yDispatch> {
         // A screen reader is told physical client pixels, and the tree it is
         // told them about is laid out in layout pixels: the transform between
         // them is the layout scale, zoom included. A reader that read the
@@ -1050,7 +1051,7 @@ where
         let requests = {
             let (dom, mount, focus) = match self.s.runner.as_ref() {
                 Some(runner) => (runner.dom(), runner.mount(), runner.focus()),
-                None => return,
+                None => return Vec::new(),
             };
             let dom_ref = dom.borrow();
             let view = crate::WindowDom::new(&dom_ref, mount);
@@ -1058,7 +1059,7 @@ where
             // not to the accessibility adapter's current focus report.
             let focus = focus.map(|node| view.opaque_id(node));
             let (Some(a11y), Some(layout)) = (self.s.a11y.as_mut(), self.s.layout.as_ref()) else {
-                return;
+                return Vec::new();
             };
             // The window is the adapter's own now, so the seam does not carry it.
             a11y.sync(
@@ -1070,63 +1071,145 @@ where
                 layout_scale,
             )
         };
-        self.apply_a11y_requests(&requests);
+        self.apply_a11y_requests(&requests)
     }
 
     /// Route drained screen-reader requests into the retained DOM. Split out of
-    /// [`sync_a11y`] so the routing is exercisable without an OS adapter.
-    pub fn apply_a11y_requests(&mut self, requests: &[crate::A11yRequest]) {
-        if requests.is_empty() {
-            return;
-        }
+    /// [`sync_a11y`](Self::sync_a11y) so the routing is exercisable without an
+    /// OS adapter.
+    /// Results correspond to input order; dispatch is not terminal completion.
+    pub fn apply_a11y_requests(
+        &mut self,
+        requests: &[crate::A11yRequest],
+    ) -> Vec<crate::A11yDispatch> {
+        use crate::A11yDispatch;
+        let mut results = Vec::with_capacity(requests.len());
+        let mut dispatched = false;
         for request in requests {
-            let node = match &request.target {
-                crate::A11yTarget::Node(node) => *node,
-                // A drawn node's action button: the node lives in its slot,
-                // so the app's focus goes to the slot (keys then reach the
-                // producer's view, a keyboard move's arrows), and a click is
-                // the producer's to carry out.
-                crate::A11yTarget::Produced(produced) => {
-                    let slot = match (self.s.runner.as_ref(), self.s.layout.as_ref()) {
-                        (Some(runner), Some(layout)) => {
-                            let dom = runner.dom();
-                            let dom = dom.borrow();
-                            let view = crate::WindowDom::new(&dom, runner.mount());
-                            layout
-                                .custom_leaf_nodes(&view)
-                                .into_iter()
-                                .find_map(|(key, node)| (key == produced.slot).then_some(node))
-                        },
-                        _ => None,
-                    };
-                    if let (Some(slot), Some(runner)) = (slot, self.s.runner.as_mut()) {
-                        runner.set_focus(Some(slot));
-                    }
-                    if request.action == A11yAction::Click {
-                        self.s.shared.producers.act(produced);
-                    }
+            // Recompute against the current DOM for each request: a previous
+            // callback in this batch may have removed or disabled its target.
+            let node = match self.admit_a11y_request(request) {
+                Ok(node) => node,
+                Err(reason) => {
+                    results.push(A11yDispatch::Rejected(reason));
                     continue;
                 },
             };
-            let Some(runner) = self.s.runner.as_mut() else {
-                break;
+            let runner = self.s.runner.as_mut().expect("admission requires a runner");
+            let result = match &request.target {
+                crate::A11yTarget::Produced(produced) => {
+                    if request.action == A11yAction::Click {
+                        if self.s.shared.producers.act(produced) {
+                            runner.set_focus(Some(node));
+                            A11yDispatch::Dispatched
+                        } else {
+                            A11yDispatch::ProducerDeclined
+                        }
+                    } else {
+                        runner.set_focus(Some(node));
+                        A11yDispatch::Dispatched
+                    }
+                },
+                crate::A11yTarget::Node(_) => {
+                    match request.action {
+                        A11yAction::Click => {
+                            runner.dispatch_click(node, PointerClick::at((0.0, 0.0)));
+                        },
+                        A11yAction::Focus => runner.set_focus(Some(node)),
+                        A11yAction::SetValue(value) => {
+                            runner.dispatch_value(node, cambium::ValueEvent { value });
+                        },
+                    }
+                    A11yDispatch::Dispatched
+                },
             };
-            match request.action {
-                A11yAction::Click => {
-                    // No cursor is involved, so the local point is genuinely the
-                    // element's own origin rather than a hit position.
-                    runner.dispatch_click(node, PointerClick::at((0.0, 0.0)));
-                },
-                A11yAction::Focus => runner.set_focus(Some(node)),
-                A11yAction::SetValue(value) => {
-                    runner.dispatch_value(node, cambium::ValueEvent { value });
-                },
+            dispatched = true;
+            results.push(result);
+        }
+        if dispatched {
+            self.hover();
+            self.after_dispatch();
+        }
+        results
+    }
+
+    /// Admission belongs to the host, not to a platform's last-synced ID map.
+    /// Layout visibility is the retained host view; this does not establish a
+    /// presentation revision or distinguish reuse of producer keys across lives.
+    fn admit_a11y_request(
+        &mut self,
+        request: &crate::A11yRequest,
+    ) -> Result<crate::NodeId, crate::A11yRejection> {
+        use crate::A11yRejection as Refusal;
+        use layout_dom_api::LayoutDom as _;
+        if matches!(request.action, A11yAction::SetValue(value) if !value.is_finite()) {
+            return Err(Refusal::InvalidValue);
+        }
+        let (Some(runner), Some(layout)) = (self.s.runner.as_ref(), self.s.layout.as_ref()) else {
+            return Err(Refusal::Unavailable);
+        };
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, runner.mount());
+        if let crate::A11yTarget::Node(node) = request.target {
+            if !view.contains(node) {
+                return Err(Refusal::TargetAbsent);
             }
         }
-        // Focus may have moved without any pointer motion; refresh the
-        // `:focus` restyle so the visible state matches what the reader says.
-        self.hover();
-        self.after_dispatch();
+        let projection = crate::project_semantics(
+            &view,
+            layout,
+            &mut self.s.shared.leaves,
+            &mut self.s.shared.producers,
+            runner.focus().map(|node| view.opaque_id(node)),
+        );
+        let node = match &request.target {
+            crate::A11yTarget::Node(node) => *node,
+            crate::A11yTarget::Produced(produced) => *projection
+                .producer_slots
+                .get(&produced.slot)
+                .ok_or(Refusal::TargetAbsent)?,
+        };
+        let id = accesskit::NodeId(view.opaque_id(node));
+        if !projection.dom_targets.contains_key(&id) {
+            return Err(Refusal::TargetAbsent);
+        }
+        let semantic = projection
+            .tree
+            .nodes
+            .iter()
+            .find(|(candidate, _)| *candidate == id)
+            .map(|(_, node)| node)
+            .filter(|node| !node.is_hidden())
+            .ok_or(Refusal::TargetAbsent)?;
+        if semantic.is_disabled() {
+            return Err(Refusal::Disabled);
+        }
+        let action = match request.action {
+            A11yAction::Click => accesskit::Action::Click,
+            A11yAction::Focus => accesskit::Action::Focus,
+            A11yAction::SetValue(_) => accesskit::Action::SetValue,
+        };
+        let semantic = if let crate::A11yTarget::Produced(produced) = &request.target {
+            let id = projection
+                .produced_targets
+                .iter()
+                .find_map(|(id, target)| (target == produced).then_some(*id))
+                .ok_or(Refusal::Unsupported)?;
+            projection
+                .tree
+                .nodes
+                .iter()
+                .find(|(candidate, _)| *candidate == id)
+                .map(|(_, node)| node)
+                .ok_or(Refusal::TargetAbsent)?
+        } else {
+            semantic
+        };
+        if !semantic.supports_action(action) {
+            return Err(Refusal::Unsupported);
+        }
+        Ok(node)
     }
 
     /// Drive `:hover` / `:focus` restyles on target change. The retained layout

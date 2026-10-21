@@ -1,0 +1,5 @@
+{
+  "source_commit": "b48fd8b40db53a416316a8e4ac60e10d0ff36c6b",
+  "result": "passed",
+  "scope": "Native04 passed before incoming shared DOM semantics and Djinn diagnostics changes. Use the root verifier with --packet this directory and --commit source_commit."
+}

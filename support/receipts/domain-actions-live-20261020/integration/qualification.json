@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "source_commit": "3b73f15c83d9c9680c696a2c521d4ccd67c39357",
+  "original_feature_commit": "c2db56559c661ebad82fe47eba81dcdc144b964d",
+  "upstream_commit": "1797a2eed829def9d155af7a7c75a738f133675a",
+  "tests": {
+    "native": 39,
+    "resident_mere": 31,
+    "owner_settings": 23,
+    "total": 93
+  },
+  "native_acceptance": "accepted/qualification.json",
+  "original_receipt_files_verified_unchanged": 50,
+  "compiled_repository_inputs": 970,
+  "provenance": "Rebuilt all three binaries after merging main. Native host and helper match the original live artifacts; resident differs. Repeated the complete native acceptance with frozen rebuilt binaries and reviewed all four captures. Original receipts remain unchanged.",
+  "limits": [
+    "macOS only; no Linux or Windows runtime qualification",
+    "retained native harness activation; no physical pointer, keyboard or screen-reader qualification",
+    "system handoff and observed local browser visit; no general page-load or application completion contract"
+  ]
+}

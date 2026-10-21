@@ -273,12 +273,21 @@ impl ReleasePolicy {
             SaltRule::Exact(b"mere/knot-publish/reader/v1".to_vec()),
         );
         // A participant install is the root's act: signed here, never released.
-        policy.with_act(
-            KeySource::Persona,
-            SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
-                "mere.denizen",
-            )),
-        )
+        policy
+            .with_act(
+                KeySource::Persona,
+                SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
+                    "mere.denizen",
+                )),
+            )
+            .with_act(
+                KeySource::Persona,
+                // Inviting a Graphshell guest and withdrawing that invitation are
+                // root acts. Sign inside custody; never release the scope key.
+                SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
+                    "mere.graphshell",
+                )),
+            )
     }
 }
 
@@ -303,6 +312,12 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         CustodyCall::LockVault => {
             keeper.host().lock_vault().map_err(refused)?;
             Ok(CustodyAnswer::Done)
+        },
+        CustodyCall::ChangePassphraseNative(_) => {
+            if app.as_str() != "dramatis" { return Err(CustodyRefusal::NotServed); }
+            let receipt = tokio::task::spawn_blocking(move || keeper.change_passphrase_native())
+                .await.map_err(failed)?;
+            Ok(CustodyAnswer::PassphraseChange { receipt })
         },
         CustodyCall::UnlockNative => tokio::task::spawn_blocking(move || keeper.unlock_native())
             .await
@@ -561,6 +576,7 @@ fn call_name(call: &CustodyCall) -> &'static str {
         CustodyCall::Payload(_) => "retained_payload",
         CustodyCall::VaultCommand { .. } => "vault_command",
         CustodyCall::UnlockNative => "unlock_native",
+        CustodyCall::ChangePassphraseNative(_) => "change_passphrase_native",
         CustodyCall::UnassignedImports => "unassigned_imports",
         CustodyCall::AssignImport(_) => "assign_import",
         CustodyCall::LockVault => "lock_vault",
@@ -975,6 +991,25 @@ mod tests {
         assert!(
             !policy.allows(KeySource::Persona, &install),
             "and never releases its key"
+        );
+        let graphshell =
+            insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
+                domain: "mere.graphshell".into(),
+                resource: vec![2; 32],
+                path_prefix: "/services/projection/coop/chosen-graph".into(),
+                actions: ["connect".into(), "edit".into()].into_iter().collect(),
+            });
+        assert!(
+            policy.allows_act(KeySource::Persona, &graphshell),
+            "the holder signs a scoped Graphshell invitation and revocation"
+        );
+        assert!(
+            !policy.allows(KeySource::Persona, &graphshell),
+            "Graphshell never receives the delegation signing key"
+        );
+        assert!(
+            !policy.allows_act(KeySource::Wallet, &graphshell),
+            "the graph grant is not a wallet act"
         );
         for door in crate::door::local_session::door_salts([7; 32]) {
             assert!(

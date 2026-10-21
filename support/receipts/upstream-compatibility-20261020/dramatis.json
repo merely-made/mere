@@ -1,0 +1,815 @@
+{
+  "pass": "dramatis",
+  "date": "2026-10-20",
+  "mere_base": "81dd41681581a1e7b94e6284bb66081088daba6c",
+  "toolchain": "1.99.1-x86_64-apple-darwin",
+  "debug_info": 0,
+  "incremental": 0,
+  "jobs": 4,
+  "gates": {
+    "dramatis-castellan": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "castellan",
+        "--features",
+        "keeper"
+      ],
+      "exit": 0,
+      "seconds": 116.58,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "03b8929fb7e01bc7044239df105857a89c1c7c31d877f6ed6c1f731fcad9738a",
+      "test_results": [
+        "ok. 281 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.96s",
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.95s",
+        "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.74s",
+        "ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.99s",
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.41s",
+        "ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    "dramatis-app": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "dramatis-app"
+      ],
+      "exit": 0,
+      "seconds": 103.28,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "a5f415d21affa9fa995d0a6720fceeacd75aa9dc0fe165ca73898ff0e554208f",
+      "test_results": [
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.55s",
+        "ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    "dramatis-mesh": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "test",
+        "--locked",
+        "-p",
+        "mere-mesh",
+        "--test",
+        "lease_receipts"
+      ],
+      "exit": 0,
+      "seconds": 16.45,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "0446cd2d26bbc20fedfa205503b534ce27ba89a67aad42af45795000c045d1ea",
+      "test_results": [
+        "ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+      ]
+    },
+    "dramatis-browser": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "check",
+        "--locked",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "remote,presentation-webgl2,without-classic-vello"
+      ],
+      "exit": 0,
+      "seconds": 22.86,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "2ecc49f9a65a9af1fd366e58e749ecb0de15efef4211dd0ef92657cff14881be",
+      "test_results": []
+    },
+    "dramatis-remote-fixture": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/distillery/probe/remote-fixture",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "check",
+        "--locked"
+      ],
+      "exit": 0,
+      "seconds": 258.85,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "39f87c9793362a8610e2d909bd9c33ebf9171acc9f5c5916e61e9edd12600bf5",
+      "test_results": []
+    },
+    "dramatis-metadata-remote-fixture": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/distillery/probe/remote-fixture",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit": 0,
+      "seconds": 9.17,
+      "debug": 0,
+      "incremental": 0,
+      "jobs": 4,
+      "log_sha256": "a13d724544e3f1daa5b5e4912b037d24f045fac5adf34e44a8a85b1ce9c02ff8",
+      "test_results": []
+    },
+    "dramatis-port-boundaries": {
+      "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit": 0,
+      "seconds": 8.94,
+      "lock_unchanged": true,
+      "log_sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+      "test_results": []
+    }
+  },
+  "changed_source_sha256": {
+    "Cargo.lock": "ee793ae7f3040bb38e7d0996c3248c58665ca8258099d537c91e8ef9a920f1e6",
+    "ports/distillery/probe/remote-fixture/Cargo.lock": "2dc9fda6dd2a6681bae1027e558df666a95ac14d4b6e54ded1598e67496554ae",
+    "ports/graphshell/web/Cargo.lock": "5b49b037fd4618308ebf73b7bd6b175dfab19e682393cea691c1ac7e9467b748"
+  },
+  "description": "Align active Dramatis consumers to one upstream cohort without changing package versions or manifests.",
+  "dramatis_revision": "0c537848dbd2ba3f29810555eaa4df716050c2f3",
+  "lock_audit": [
+    {
+      "lock": "Cargo.lock",
+      "package_counts": [
+        1764,
+        1764
+      ],
+      "removed": [],
+      "added": [],
+      "dramatis_source": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3"
+      ],
+      "registry_edge_normalization": [
+        {
+          "package": [
+            "cap-fs-ext",
+            "3.4.6",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "cap-primitives",
+            "3.4.6",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "colored",
+            "3.1.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.48.0"
+          ]
+        },
+        {
+          "package": [
+            "data-encoding-macro-internal",
+            "0.1.19",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "syn 3.0.6"
+          ],
+          "added": [
+            "syn 1.0.109"
+          ]
+        },
+        {
+          "package": [
+            "dirs-sys",
+            "0.5.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "errno",
+            "0.3.14",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "fs-set-times",
+            "0.20.3",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "io-extras",
+            "0.18.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "nu-ansi-term",
+            "0.50.3",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "quinn-udp",
+            "0.5.15",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustix",
+            "0.38.44",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustix",
+            "1.1.5",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustls-platform-verifier",
+            "0.7.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "socket2",
+            "0.6.5",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.60.2"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "stacker",
+            "0.1.25",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.60.2"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "tempfile",
+            "3.27.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "term",
+            "1.2.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "uds_windows",
+            "1.2.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.60.2"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "winapi-util",
+            "0.1.11",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.48.0"
+          ]
+        },
+        {
+          "package": [
+            "winx",
+            "0.36.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        }
+      ],
+      "sha256": "ee793ae7f3040bb38e7d0996c3248c58665ca8258099d537c91e8ef9a920f1e6"
+    },
+    {
+      "lock": "ports/graphshell/web/Cargo.lock",
+      "package_counts": [
+        1055,
+        1054
+      ],
+      "removed": [
+        [
+          "windows-sys",
+          "0.59.0",
+          "registry+https://github.com/rust-lang/crates.io-index"
+        ]
+      ],
+      "added": [],
+      "dramatis_source": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3"
+      ],
+      "registry_edge_normalization": [
+        {
+          "package": [
+            "dirs-sys",
+            "0.5.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "errno",
+            "0.3.14",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "nu-ansi-term",
+            "0.50.3",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        },
+        {
+          "package": [
+            "oxjsonld",
+            "0.2.6",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "oxrdf",
+            "0.3.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "oxsdatatypes",
+            "0.2.3",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "oxttl",
+            "0.2.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "rustix",
+            "0.38.44",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustix",
+            "1.1.5",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustls-platform-verifier",
+            "0.7.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "sparesults",
+            "0.3.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "spareval",
+            "0.2.7",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "sha2 0.11.0",
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "sha2 0.10.9",
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "spargebra",
+            "0.4.7",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "thiserror 1.0.69"
+          ],
+          "added": [
+            "thiserror 2.0.21"
+          ]
+        },
+        {
+          "package": [
+            "tempfile",
+            "3.27.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "term",
+            "1.2.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.59.0"
+          ],
+          "added": [
+            "windows-sys 0.61.2"
+          ]
+        }
+      ],
+      "sha256": "5b49b037fd4618308ebf73b7bd6b175dfab19e682393cea691c1ac7e9467b748"
+    },
+    {
+      "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
+      "package_counts": [
+        989,
+        989
+      ],
+      "removed": [],
+      "added": [],
+      "dramatis_source": [
+        "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3"
+      ],
+      "registry_edge_normalization": [
+        {
+          "package": [
+            "colored",
+            "3.1.1",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.48.0"
+          ]
+        },
+        {
+          "package": [
+            "data-encoding-macro-internal",
+            "0.1.19",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "syn 3.0.6"
+          ],
+          "added": [
+            "syn 1.0.109"
+          ]
+        },
+        {
+          "package": [
+            "errno",
+            "0.3.14",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "iroh-blobs",
+            "0.103.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "constant_time_eq 0.4.2"
+          ],
+          "added": [
+            "constant_time_eq 0.1.5"
+          ]
+        },
+        {
+          "package": [
+            "rustix",
+            "1.1.4",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "rustls-platform-verifier",
+            "0.7.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "tempfile",
+            "3.27.0",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.52.0"
+          ]
+        },
+        {
+          "package": [
+            "winapi-util",
+            "0.1.11",
+            "registry+https://github.com/rust-lang/crates.io-index"
+          ],
+          "removed": [
+            "windows-sys 0.61.2"
+          ],
+          "added": [
+            "windows-sys 0.48.0"
+          ]
+        }
+      ],
+      "sha256": "2dc9fda6dd2a6681bae1027e558df666a95ac14d4b6e54ded1598e67496554ae"
+    }
+  ],
+  "tests_passed": 312,
+  "tests_ignored": 3,
+  "ignored_test_requirements": [
+    "Marker-owned test-signed packaging fixture.",
+    "dramatis-review-host and DRAMATIS_RECEIPT_ENDPOINT.",
+    "Synthetic native Djinn UI and resident denial fixture."
+  ],
+  "primary_preservation": {
+    "mere": {
+      "head_unchanged": true,
+      "status_unchanged": true,
+      "tracked_dirty_files_unchanged": {
+        "Cargo.lock": true,
+        "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md": true,
+        "ports/graphshell/Cargo.toml": true,
+        "ports/graphshell/web/Cargo.lock": true,
+        "ports/graphshell/web/Cargo.toml": true
+      }
+    },
+    "genet": {
+      "head_unchanged": true,
+      "status_unchanged": true,
+      "tracked_dirty_files_unchanged": {}
+    }
+  },
+  "qualification_limits": [
+    "Native macOS automated tests and compile checks; no Windows/Linux native qualification.",
+    "Browser and remote-inference fixture compile checks; no new browser runtime or model-inference session.",
+    "Existing three packaging/native-host qualification tests remain ignored."
+  ],
+  "p2panda_source_unchanged": true,
+  "other_tracked_locks_unchanged_since_initial_refresh": 39
+}

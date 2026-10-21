@@ -1,0 +1,396 @@
+{
+  "cards": [
+    {
+      "badges": [],
+      "media": [
+        [
+          186,
+          106,
+          226,
+          148,
+          132,
+          211,
+          84,
+          236,
+          240,
+          235,
+          161,
+          112,
+          237,
+          175,
+          177,
+          55,
+          102,
+          151,
+          170,
+          233,
+          55,
+          0,
+          15,
+          74,
+          29,
+          13,
+          243,
+          92,
+          207,
+          248,
+          58,
+          58
+        ]
+      ],
+      "title": "Session",
+      "values": [
+        {
+          "label": "Session",
+          "value": "a2dedb28-a5e1-4a40-8213-7f639730118c"
+        },
+        {
+          "label": "Changes",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "badges": [],
+      "media": [],
+      "title": "https://private.invalid/owner-only",
+      "values": [
+        {
+          "label": "Address",
+          "value": "https://private.invalid/owner-only"
+        },
+        {
+          "label": "Kind",
+          "value": "web"
+        },
+        {
+          "label": "Accesses",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "graphs": [
+    {
+      "application": "graphshell",
+      "epoch": 4,
+      "facets": {
+        "nodes": {
+          "85ecfd1a-040e-4a81-b8db-b2d851fafb5b": {
+            "visit.history": {
+              "last_session_visited": 0,
+              "last_visited_ms": 1792543418882
+            }
+          }
+        }
+      },
+      "graph": {
+        "assertion_schema": 1,
+        "couplings": [],
+        "edges": [],
+        "fields": [],
+        "import_records": [],
+        "navigation": {
+          "snapshot": {
+            "entries": [],
+            "owners": [],
+            "visits": []
+          }
+        },
+        "nodes": [
+          {
+            "address": {
+              "Http": "https://private.invalid/owner-only"
+            },
+            "body": null,
+            "cached_host": null,
+            "classifications": [],
+            "derivations": [],
+            "frame_layout_hints": [],
+            "frame_split_offer_suppressed": false,
+            "import_provenance": [],
+            "is_pinned": false,
+            "last_session_visited": 0,
+            "mime_hint": null,
+            "nested": null,
+            "node_id": "85ecfd1a-040e-4a81-b8db-b2d851fafb5b",
+            "properties": [],
+            "session_state": {
+              "form_draft": null,
+              "last_visited_ms": null,
+              "scroll_x": null,
+              "scroll_y": null
+            },
+            "tag_presentation": {
+              "icon_overrides": {},
+              "ordered_tags": []
+            },
+            "tags": [],
+            "title": "https://private.invalid/owner-only",
+            "url": "https://private.invalid/owner-only"
+          }
+        ],
+        "resource_edges": [],
+        "resources": [],
+        "shown_resources": [],
+        "timestamp_secs": 0
+      },
+      "read_only": false,
+      "revision": 1,
+      "schema": "mere.session.graph/v1",
+      "session": "a2dedb28-a5e1-4a40-8213-7f639730118c",
+      "views": {}
+    }
+  ],
+  "snapshot": {
+    "cache_policy": {
+      "expires_at_ms": null,
+      "purge_on_revocation": true,
+      "retention": "MemoryOnly"
+    },
+    "presentation": {
+      "bindings": [
+        {
+          "instance": 0,
+          "key": "mere.session:a2dedb28-a5e1-4a40-8213-7f639730118c"
+        },
+        {
+          "instance": 1,
+          "key": "mere:85ecfd1a-040e-4a81-b8db-b2d851fafb5b"
+        }
+      ],
+      "offers": {
+        "mere.session:a2dedb28-a5e1-4a40-8213-7f639730118c": [
+          {
+            "byte_size": 269,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              63,
+              146,
+              91,
+              86,
+              64,
+              249,
+              141,
+              1,
+              129,
+              228,
+              214,
+              0,
+              229,
+              127,
+              159,
+              64,
+              113,
+              92,
+              52,
+              9,
+              48,
+              105,
+              127,
+              224,
+              91,
+              92,
+              154,
+              37,
+              41,
+              62,
+              140,
+              243
+            ],
+            "semantics": {
+              "actions": [
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Apply edits in stable-id form to this session as one change, under your name.",
+                  "intent": "mere.session.apply",
+                  "label": "Apply edits",
+                  "payload_schema": "mere.session.apply/v1"
+                },
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Undo your latest change still in effect; what others changed since stays.",
+                  "intent": "mere.session.undo",
+                  "label": "Undo",
+                  "payload_schema": "mere.session.step/v1"
+                },
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Redo your most recent undo.",
+                  "intent": "mere.session.redo",
+                  "label": "Redo",
+                  "payload_schema": "mere.session.step/v1"
+                },
+                {
+                  "effect": "Curation",
+                  "explanation": "Keep one of your views of this session: its folds, camera and layout.",
+                  "intent": "mere.session.view",
+                  "label": "Change a view",
+                  "payload_schema": "mere.session.view/v1"
+                }
+              ],
+              "bounds": "FillFootprint",
+              "label": "Session",
+              "role": "Article"
+            }
+          }
+        ],
+        "mere:85ecfd1a-040e-4a81-b8db-b2d851fafb5b": [
+          {
+            "byte_size": 209,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              171,
+              187,
+              34,
+              81,
+              232,
+              200,
+              134,
+              87,
+              243,
+              7,
+              162,
+              196,
+              18,
+              164,
+              238,
+              98,
+              107,
+              96,
+              228,
+              174,
+              19,
+              141,
+              107,
+              251,
+              41,
+              122,
+              176,
+              64,
+              163,
+              221,
+              175,
+              157
+            ],
+            "semantics": {
+              "actions": [],
+              "bounds": "FillFootprint",
+              "label": "https://private.invalid/owner-only",
+              "role": "Article"
+            }
+          }
+        ]
+      }
+    },
+    "scene": {
+      "epoch": 4,
+      "revision": 1,
+      "tables": {
+        "backdrops": [],
+        "bounds": {
+          "origin": {
+            "x": -120.0,
+            "y": -280.0
+          },
+          "size": {
+            "h": 336.0,
+            "w": 240.0
+          }
+        },
+        "generation": 1,
+        "honored_holds": [],
+        "item_order": [
+          0,
+          1
+        ],
+        "items": [
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Card",
+            "source": 0,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 0.0,
+                "y": -224.0
+              }
+            },
+            "visible": true
+          },
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Card",
+            "source": 1,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "visible": true
+          }
+        ],
+        "regions": [],
+        "relations": [],
+        "sources": [
+          {
+            "adapter": "mere.session",
+            "id": "a2dedb28-a5e1-4a40-8213-7f639730118c"
+          },
+          {
+            "adapter": "mere.graph",
+            "id": "85ecfd1a-040e-4a81-b8db-b2d851fafb5b"
+          }
+        ],
+        "spaces": [
+          {
+            "name": "world",
+            "parent": null,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            }
+          }
+        ],
+        "unmet_holds": []
+      }
+    },
+    "session": "djinn.mere/v1/graph",
+    "version": {
+      "major": 1,
+      "minor": 3
+    }
+  }
+}

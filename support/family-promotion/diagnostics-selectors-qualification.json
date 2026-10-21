@@ -1,0 +1,256 @@
+{
+  "scope": "Shared read-only semantic selector receiving and explicit virtual action routing; no lifetime-token or broader command migration",
+  "basis": "5573500dc1678c542ee5f60827d523961a7b4fcb",
+  "supplier": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "source_seal": "diagnostics-selectors-source-receiving.json",
+  "source_seal_sha256": "54276f95198d6717c363f983f7848f0ac1f40bbfc42b66fc5c466d55c6538837",
+  "supplier_seal": "diagnostics-selectors-supplier-source.json",
+  "supplier_seal_sha256": "eff95b7abe3638c5afb12795183115ecd9197a0317b4b84ef6e2d06f83bcdaa6",
+  "gates": [
+    {
+      "receipt": "diagnostics-selectors-receiving-native.json",
+      "sha256": "ea98cde3e678b789cec083554a2a58a00536dde7749ae9fbd47174183f2a11f3",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "mesquite",
+        "-p",
+        "cambium-genet-winit-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-web-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "click_on_scroll",
+        "--test",
+        "e1a_sessions",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-browser.json",
+      "sha256": "33c987f9a9567d32a97d98968c5803919c0582cd14645cb86d8f70b814a64397",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-graphshell-browser.json",
+      "sha256": "36e73e385930ee1779d4dc9fafc834d4f163baf57eb8c3b6e5bea5a6cffb4b88",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-distillery-browser.json",
+      "sha256": "0c3ee7e6db8b20d22fc71a9fc633e5f8108c4aca2b5108e4022aa2bd59963ab9",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "ports/distillery/probe/Cargo.toml",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-embedding.json",
+      "sha256": "cb4166c56398b0bbcb334079e061bceebeee88780fe43c75dbae8b1ae7e76421",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "--features",
+        "embedding"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-product.json",
+      "sha256": "3836467c74fa6916ea57582e764514a45a1dc9daca0241ae2de298b68bf253ae",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "--lib",
+        "--features",
+        "retained-content",
+        "retained_content::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-receiving-resident.json",
+      "sha256": "969067c89b8e46dd95efae73d8192140c39220e1670911fdd4507139d6f9c471",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "--bin",
+        "djinn"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-supplier-bridge.json",
+      "sha256": "264ee1def9433c4f12942bf6d3e0ffb9b9b49996893011f6f0c15c2eee696bf7",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "-p",
+        "taproot",
+        "--features",
+        "accesskit",
+        "--lib"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-supplier-bridge-lean.json",
+      "sha256": "03148910d566898fd731ac5ef7ebabfbe6767723a628f9bd13f785fe566ca9db",
+      "command": [
+        "cargo",
+        "check",
+        "--offline",
+        "-p",
+        "taproot",
+        "--no-default-features"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-selectors-supplier-normal-deps.json",
+      "sha256": "6685efffaa2635c19b4664b3c12db42c2f305cb96384ac2704ac243ea9c57df4",
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "--offline",
+        "-p",
+        "taproot",
+        "--no-default-features",
+        "--features",
+        "accesskit",
+        "--edges",
+        "normal",
+        "--depth",
+        "1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "passed": 322,
+  "existing_ignored": 7,
+  "affected_native_passed": 264,
+  "supplier_passed": 46,
+  "retained_product_passed": 12,
+  "executed_native_binaries": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe": {
+      "sha256": "643162e719d093f608954d7758960d0670a8795ecfa8f12510e8d6814c2206c5",
+      "bytes": 19906560
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe": {
+      "sha256": "884481646708155c4b20c272be83f3c6dbb2796c5b4effa64c3398d6ea9daddf",
+      "bytes": 36669952
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe": {
+      "sha256": "fe298d66b7b6780810f3e56711d75399fd545d8b1455fdaf2c43527c7e98071e",
+      "bytes": 16775168
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe": {
+      "sha256": "66a6f4fb18238a63be3376133271e765ed54e22c867865b63e546934f71bc4ab",
+      "bytes": 16340480
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe": {
+      "sha256": "905787372b54a87b32693aea94f8eaa5dfe2623a395148edfcddc32bf44c7c79",
+      "bytes": 41622016
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe": {
+      "sha256": "ba861a215ee808f528e14bb6d654a6005446bf983f4f555b08f4ff1f13cd67dc",
+      "bytes": 17842688
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe": {
+      "sha256": "a11c7f777d4e8ca79918d910265ea883ea8d9c1db1a69d7c3581a8e2ed97960f",
+      "bytes": 17551872
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe": {
+      "sha256": "e007d75e5207fc8d7f3cf97d7b130777c55c6e472e1835282c0e0f1d8d54c3cc",
+      "bytes": 39017984
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-6aada3354d9e6cc2.exe": {
+      "sha256": "dca338d831519c496ff6a912ef0267f0a8179fcf9cc0e96b7b116034ba1a4e83",
+      "bytes": 92213760
+    },
+    "C:\\t\\cargo-targets\\genet\\build\\debug\\deps\\taproot-3a91c7e998313860.exe": {
+      "sha256": "836629f567be129e28bb5e30ff70bb3a60ff7977eb600aed63050e7f4165ba75",
+      "bytes": 15300608
+    }
+  },
+  "expected_before_failures": "diagnostics-selectors-before-consumers.json: Harness leaf-only slider miss and Probe read-miss verdict mutation, both runtime assertions",
+  "before_source_seal": "diagnostics-selectors-before-control-source.json",
+  "source_restored_and_unchanged": true,
+  "preparation": [
+    "diagnostics-selectors-supplier-prepare.json: unsupported StaticText spelling corrected to TextRun before qualification",
+    "diagnostics-selectors-repin.json and repin-cli.json: own incomplete Cargo checkout attempts cancelled; not runtime failures",
+    "diagnostics-selectors-receiving-prepare.json: scenario fixture tick assumption, corrected without changing lane completion",
+    "diagnostics-selectors-final-native.json: browser import used a non-dependency, fixed to its explicit contract dependency"
+  ],
+  "root_lock_preparation": "diagnostics-selectors-locks.json; final seal also receives main site-publication dependency edges",
+  "genet_sources": [
+    "git+https://github.com/merely-made/genet.git?branch=main#206b80c2d6219cdefa2519a773197d4566f2d54c"
+  ],
+  "sealed_registers_unchanged": 433,
+  "doc_receiving": "diagnostics-selectors-doc-receiving.json",
+  "retained_byte_cap": 10000000,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "isolated_artifacts_created": false,
+  "limits": [
+    "No originating window/provider/child lifetime lease; queued receipts report routing only",
+    "No wider Hest action completion or full forward geometry",
+    "No new headed/browser-runtime/human AT qualification",
+    "No registry publication, new MSRV or other external product receiving claim"
+  ]
+}

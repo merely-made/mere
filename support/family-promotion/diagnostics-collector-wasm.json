@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--locked",
+    "-p",
+    "mere-apparatus",
+    "--no-default-features",
+    "--features",
+    "registry,serde",
+    "--target",
+    "wasm32-unknown-unknown"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T18:04:47.672677+00:00",
+  "finished": "2026-10-20T18:05:46.074230+00:00",
+  "exit_code": 0,
+  "results": [
+    "Blocking waiting for file lock on build directory",
+    "Finished `dev` profile [unoptimized] target(s) in 58.09s"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on build directory\n   Compiling syn v3.0.6\n   Compiling wasm-bindgen v0.2.129\n    Checking futures-core v0.3.34\n    Checking once_cell v1.21.4\n    Checking futures-util v0.3.34\n   Compiling wasm-bindgen-macro-support v0.2.129\n   Compiling serde_derive v1.0.229\n   Compiling wasm-bindgen-macro v0.2.129\n    Checking serde v1.0.229\n    Checking js-sys v0.3.106\n    Checking web-time v1.1.0\n    Checking mere-registry v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\registry)\nwarning: unused import: `crate::diagnostics::channels::*`\n  --> crates\\system\\registry\\src\\diagnostics\\descriptor\\catalog.rs:10:5\n   |\n10 | use crate::diagnostics::channels::*;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused import: `crate::diagnostics::channels::*`\n  --> crates\\system\\registry\\src\\diagnostics\\descriptor\\registry.rs:12:5\n   |\n12 | use crate::diagnostics::channels::*;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\system\\registry\\src\\diagnostics\\emit\\queue.rs:89:31\n   |\n89 |         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n   |                               ^^^^^^^^^^^^\n   |\n   = note: `#[warn(deprecated)]` on by default\nhelp: replace the use of the deprecated method\n   |\n89 -         let _ = self.0[index].fetch_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n89 +         let _ = self.0[index].try_update(Ordering::Relaxed, Ordering::Relaxed, |old| {\n   |\n\nwarning: `mere-registry` (lib) generated 3 warnings (run `cargo fix --lib -p mere-registry` to apply 3 suggestions)\n    Checking mere-apparatus v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus)\n    Finished `dev` profile [unoptimized] target(s) in 58.09s\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

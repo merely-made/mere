@@ -38,6 +38,9 @@ pub use sprigging::LeafRegistry;
 
 use genet_render::VisualMovement;
 
+mod semantics;
+pub use semantics::{ProducerSemanticIssue, SemanticProjection, project_semantics};
+
 mod files;
 pub use files::{FileAnswer, FileChooser};
 mod presentation;
@@ -49,9 +52,9 @@ pub use presentation::{
 };
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
-pub mod producer;
 #[cfg(feature = "embedding")]
 pub mod embedding;
+pub mod producer;
 mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
@@ -290,6 +293,50 @@ pub enum A11yAction {
     SetValue(f64),
 }
 
+/// Host routing result, not a promise that application work completed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum A11yDispatch {
+    Dispatched,
+    Rejected(A11yRejection),
+    /// The current producer advertised the action but declined to handle it.
+    ProducerDeclined,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum A11yRejection {
+    Unavailable,
+    TargetAbsent,
+    Disabled,
+    Unsupported,
+    InvalidValue,
+}
+
+/// Routing acknowledgement for one queued semantic request. Only the host
+/// writes this result; `Dispatched` does not claim application completion.
+#[derive(Clone)]
+pub struct A11yReceipt(std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>);
+impl A11yReceipt {
+    pub fn result(&self) -> Option<A11yDispatch> {
+        self.0.get()
+    }
+}
+pub(crate) struct QueuedA11y {
+    pub request: A11yRequest,
+    pub reply: std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>,
+}
+impl QueuedA11y {
+    pub fn new(request: A11yRequest) -> (Self, A11yReceipt) {
+        let reply = std::rc::Rc::new(std::cell::Cell::new(None));
+        (
+            Self {
+                request,
+                reply: reply.clone(),
+            },
+            A11yReceipt(reply),
+        )
+    }
+}
+
 /// One drained screen-reader request: which action, on what.
 #[derive(Clone, Debug, PartialEq)]
 pub struct A11yRequest {
@@ -332,8 +379,8 @@ impl A11yRequest {
 /// that is not a translation. AccessKit builds a *parallel* tree that the
 /// platform queries through a handle bound to a native window. A browser has no
 /// such handle, but needs a parallel tree all the same: Cambium presents onto a
-/// canvas, which a reader sees as one graphic, so the browser host mirrors
-/// [`document_projection`] into DOM elements carrying ARIA.
+/// canvas, which a reader sees as one graphic, so the browser host lowers
+/// [`project_semantics`] into DOM elements carrying ARIA.
 ///
 /// The signature is what both can honestly implement. Notably absent is the
 /// window: the winit implementation holds its own, and a browser has none to
@@ -365,20 +412,21 @@ pub trait Accessibility {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest>;
 }
 
-/// This frame's renderer-neutral accessibility projection, including
-/// Cambium's app-owned committed text for marked textboxes. A host without an
-/// AccessKit adapter lowers it to its platform tree; the browser host lowers
-/// it to ARIA. `focus` is the focused node's opaque id, as
+/// The renderer-neutral DOM observation used to seed host semantics, including
+/// Cambium's app-owned committed text for marked textboxes. Contributed leaf
+/// and producer semantics are added by [`project_semantics`], which native and
+/// browser publication consume. This read does not invoke those contributors.
+/// `focus` is the focused node's opaque id, as
 /// [`Accessibility::sync`] receives it.
-pub fn document_projection(
-    dom: &WindowDom<'_>,
+pub fn document_projection<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
+    dom: &D,
     layout: &OwnedLayout,
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
@@ -402,6 +450,7 @@ pub fn document_projection(
     // marked app textboxes accessible leaves with their app-owned value.
     let mut markers = std::collections::HashMap::new();
     let mut painted = std::collections::HashMap::new();
+    let mut numeric = std::collections::HashSet::new();
     let mut pending = vec![dom.document()];
     while let Some(node) = pending.pop() {
         if let Some((x, y, width, height)) = layout.painted_rect(dom, node) {
@@ -432,7 +481,15 @@ pub fn document_projection(
             ) == Some("true");
             markers.insert(dom.opaque_id(node), (value.to_owned(), multiline));
         }
-        pending.extend(dom.dom_children(node));
+        if dom.attribute(
+            node,
+            &Namespace::default(),
+            &LocalName::from("data-cambium-set-value"),
+        ) == Some("true")
+        {
+            numeric.insert(dom.opaque_id(node));
+        }
+        pending.extend(dom.flat_children(node));
     }
     // Genet supplies semantic names and actions; this host owns the retained
     // scroll planes. Match the rectangles used by paint and pointer hit testing,
@@ -441,6 +498,19 @@ pub fn document_projection(
     // actions remain independent of the current cursor or scroll offset.
     let mut nodes = projection.nodes().to_vec();
     for node in &mut nodes {
+        if numeric.contains(&node.id.get())
+            && node
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::Click)
+            && !node.state.disabled
+            && !node.state.read_only
+            && !node
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::SetValue)
+        {
+            node.actions
+                .push(document_session_api::DocumentA11yAction::SetValue);
+        }
         if node.bounds.is_some()
             && let Some(bounds) = painted.get(&node.id.get())
         {
@@ -504,12 +574,16 @@ pub fn document_projection(
     )
 }
 
-fn find_opaque(dom: &WindowDom<'_>, node: NodeId, opaque: u64) -> Option<NodeId> {
+fn find_opaque<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    node: NodeId,
+    opaque: u64,
+) -> Option<NodeId> {
     use layout_dom_api::LayoutDom as _;
     if dom.opaque_id(node) == opaque {
         return Some(node);
     }
-    dom.dom_children(node)
+    dom.flat_children(node)
         .find_map(|child| find_opaque(dom, child, opaque))
 }
 
@@ -1149,12 +1223,12 @@ mod spatial_tests {
 
 #[cfg(test)]
 mod accessibility_tests;
-#[cfg(test)]
-mod mount_probe_tests;
 mod capture;
 mod frame;
 mod host;
 mod input;
+#[cfg(test)]
+mod mount_probe_tests;
 mod multi_host;
 #[cfg(test)]
 mod multi_host_tests;
@@ -1185,13 +1259,13 @@ pub use capture::{
     start_presentation_readback,
 };
 pub use host::{
-    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
+    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CaptureFrame, CaptureRefusal,
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
-    FrameProfile, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage, HostOptions,
-    HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
+    FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
+    HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
     PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
-    StampedCaptureFn, StampedCaptureFrame, WindowFrame, WheelUnit, ZOOM_LADDER, env_size,
-    fit_zoom, ladder_step,
+    StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;

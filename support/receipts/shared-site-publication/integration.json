@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-21T08:42:47.4295658Z",
+  "integrated_source_commit": "943f3f5640e46a2571a7c83ef88a621c9187c376",
+  "isolated_source_commit": "5d6deffad8b68b4b7c157832912994139dff5ba6",
+  "upstream_integrated": "67ed725ae908925b6381c583b9775594f16ee2f7",
+  "gemot_owner_documentation": "6485b8c4943556f6911ae19e8027cb039ad599fe",
+  "command": "cargo test --locked --offline -p mere-site --features publication,history,serde_json/preserve_order --quiet",
+  "exit_code": 0,
+  "compatibility": 3,
+  "history": 6,
+  "publication": 5,
+  "doctest": 1,
+  "receiving_lock_sha256": "da8b4ac2e3ed8d05067612fb988ec2b6fad08eb9627831302cba36a685e2da03",
+  "root_manifest_has_concurrent_uncommitted_changes": true,
+  "preserved_concurrent_work": "Applied only the publication diff to the index and working tree; retained other root Cargo and diagnostics hunks",
+  "scope": "native local owner composition, disk content reopen and in-process signed replica; no live protocol serving qualification",
+  "temporary_worktree_removed": true,
+  "temporary_branch_removed": true,
+  "isolated_targets": [],
+  "retained_cargo_homes": [
+    {
+      "cache_junctions": 0,
+      "regular_files": 4,
+      "bytes": 110906,
+      "path": "C:/t/cargo-homes/mere-site-publication",
+      "reason": "Automatic approval review rejected metadata deletion as blocked by policy",
+      "owner": "Moot site publication qualification"
+    },
+    {
+      "cache_junctions": 0,
+      "regular_files": 4,
+      "bytes": 168089,
+      "path": "C:/t/cargo-homes/knot-editor-site-model",
+      "reason": "Metadata retained after the earlier cleanup rejection; existence and byte count rechecked",
+      "owner": "Earlier shared site extraction qualification"
+    }
+  ],
+  "receipt_cap_bytes": 100000000
+}

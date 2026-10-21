@@ -1,0 +1,8 @@
+serving /home/markik/Code/testing/mere/hest-qualification-20261021/site on http://127.0.0.1:20860, receipts to /home/markik/Code/testing/mere/hest-qualification-20261021/viewer-runtime
+127.0.0.1 - "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - "POST /scenario-progress HTTP/1.1" 204 -
+127.0.0.1 - "POST /scenario-receipt HTTP/1.1" 204 -
+receipt written to /home/markik/Code/testing/mere/hest-qualification-20261021/viewer-runtime (RESULT ok, 4 capture(s))

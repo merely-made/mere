@@ -291,7 +291,7 @@ impl<P: TextureProducer> View<P> {
             produced,
         })
     }
-    pub fn semantics(&mut self) -> Option<ProducerSemantics> {
+    pub fn semantics(&self) -> Option<ProducerSemantics> {
         if self.disposed || !self.visible {
             None
         } else {

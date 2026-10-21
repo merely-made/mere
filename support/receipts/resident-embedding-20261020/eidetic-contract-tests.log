@@ -1,0 +1,12 @@
+running 2 tests
+test models::embedding::tests::unknown_versions_and_ambiguous_corpus_identities_are_refused ... ok
+test models::embedding::tests::every_output_or_corpus_setting_is_part_of_compatibility ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 136 filtered out; finished in 0.00s
+
+     Running tests/fjall_store.rs (/Users/markik/Code/output/embedding-envelope-20261020/contract-build/debug/deps/fjall_store-165b34fa5209adce)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+

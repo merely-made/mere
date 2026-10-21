@@ -36,10 +36,14 @@ use chirograph::{
 use esp::infer::actor::spawn_inference_actor_with_checkpoints;
 pub use esp::infer::provider::GenerationCheckpoint;
 use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
+mod observations;
+pub use observations::InferenceObservation;
 #[cfg(feature = "inference-model")]
 pub mod durable;
 #[cfg(feature = "inference-model")]
 pub mod recall;
+#[cfg(feature = "inference-embedding")]
+pub mod recall_embedding;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -222,6 +226,7 @@ pub trait RunJournal: Send + Sync {
 
 #[derive(Default)]
 struct RunTable {
+    observations: Option<observations::Observations>,
     weight_format: Option<String>,
     model: Option<String>,
     session: Option<esp::infer::provider::SessionIdentity>,
@@ -249,6 +254,11 @@ fn capability_weight_format(capability: &esp::infer::ModelCapability) -> Option<
 }
 
 impl RunTable {
+    fn observe(&mut self, id: u64, phase: InferenceObservation) {
+        if let Some(observations) = &mut self.observations {
+            observations.note(id, phase);
+        }
+    }
     fn view(&self) -> InferenceRunsV1 {
         InferenceRunsV1 {
             schema: INFERENCE_RUNS_SCHEMA.into(),
@@ -278,7 +288,26 @@ impl RunTable {
 
     /// Fold one actor update. Updates for a run that has already ended are
     /// dropped, so nothing reaches a cancelled run after its cancel lands.
-    fn apply(&mut self, update: InferUpdate) {
+    /// Returns admission to this run table, not successful domain completion.
+    fn apply(&mut self, update: InferUpdate) -> bool {
+        let id = match &update {
+            InferUpdate::Started { id }
+            | InferUpdate::Paused { id }
+            | InferUpdate::Checkpoint { id, .. }
+            | InferUpdate::Fragment { id, .. }
+            | InferUpdate::Finished { id, .. }
+            | InferUpdate::Cancelled { id }
+            | InferUpdate::Failed { id, .. } => Some(*id),
+            _ => None,
+        };
+        if let Some(id) = id {
+            let Some(&index) = self.by_actor_id.get(&id) else {
+                return false;
+            };
+            if self.runs[index].view.state.is_terminal() {
+                return false;
+            }
+        }
         match update {
             InferUpdate::Ready { capability } => {
                 self.weight_format = capability_weight_format(&capability);
@@ -352,6 +381,7 @@ impl RunTable {
             },
         }
         self.generation += 1;
+        true
     }
 }
 
@@ -365,6 +395,8 @@ struct Shared {
     caches: Mutex<Vec<std::sync::Weak<Mutex<Option<(Vec<u8>, Vec<u8>)>>>>>,
     #[cfg(feature = "inference-model")]
     recall: Mutex<Option<RecallBinding>>,
+    #[cfg(feature = "inference-embedding")]
+    embedding: Mutex<Option<Arc<recall_embedding::RecallEmbedding>>>,
     #[cfg(feature = "inference-model")]
     published: Mutex<PublishedRecall>,
 }
@@ -425,6 +457,9 @@ impl Shared {
                         table.journal_failures.push(error);
                     }
                 }
+                if let Some(observations) = &mut table.observations {
+                    observations.note(record.actor_id, InferenceObservation::RunFailed);
+                }
             }
         }
         table.generation += 1;
@@ -441,6 +476,19 @@ impl Shared {
         } else {
             Ok(())
         }
+    }
+
+    #[cfg(feature = "inference-model")]
+    fn build_recall(
+        &self,
+        corpus: Arc<dyn recall::RecallCorpus>,
+        config: recall::RecallConfig,
+    ) -> Result<recall::RecallIndex, String> {
+        #[cfg(feature = "inference-embedding")]
+        if let Some(runtime) = self.embedding.lock().unwrap().as_ref() {
+            return recall::RecallIndex::build_with_embedding(corpus, config, runtime);
+        }
+        recall::RecallIndex::build(corpus, config)
     }
 
     #[cfg(feature = "inference-model")]
@@ -667,6 +715,8 @@ impl InferenceLane {
             caches: Mutex::new(Vec::new()),
             #[cfg(feature = "inference-model")]
             recall: Mutex::new(None),
+            #[cfg(feature = "inference-embedding")]
+            embedding: Mutex::new(None),
             #[cfg(feature = "inference-model")]
             published: Mutex::new(PublishedRecall::default()),
         });
@@ -731,6 +781,25 @@ impl InferenceLane {
         )
     }
 
+    #[cfg(feature = "inference-embedding")]
+    pub fn configure_embedding_recall(
+        &self,
+        runtime: Arc<recall_embedding::RecallEmbedding>,
+    ) -> Result<(), String> {
+        let mut table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        if self.shared.recall.lock().unwrap().is_some()
+            || !self.shared.published.lock().unwrap().owners.is_empty()
+        {
+            return Err("configure the embedding space before attaching retained sources".into());
+        }
+        *self.shared.embedding.lock().unwrap() = Some(runtime);
+        table.generation += 1;
+        Ok(())
+    }
+
     /// Borrow a retained corpus from its owner and build a disposable BM25 index.
     #[cfg(feature = "inference-model")]
     pub fn configure_recall(
@@ -742,7 +811,7 @@ impl InferenceLane {
         if table.locked {
             return Err("inference.ask is locked".into());
         }
-        let index = recall::RecallIndex::build(corpus.clone(), config.clone())?;
+        let index = self.shared.build_recall(corpus.clone(), config.clone())?;
         *self.shared.recall.lock().unwrap() = Some(RecallBinding {
             corpus,
             config,
@@ -750,6 +819,26 @@ impl InferenceLane {
         });
         table.generation += 1;
         Ok(())
+    }
+
+    /// Explain the local retained-source ranking through the same scoped,
+    /// current-version and provider-bound path used for prompt assembly.
+    #[cfg(feature = "inference-model")]
+    pub fn recall_rankings(
+        &self,
+        question: &str,
+        scope: &[eidetic::models::recall::RecallSourceId],
+    ) -> Result<recall::RecallRankings, String> {
+        let table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        let binding = self.shared.recall.lock().unwrap();
+        binding
+            .as_ref()
+            .and_then(|b| b.index.as_ref())
+            .ok_or("no retained recall index is attached")?
+            .rankings(question, scope)
     }
 
     #[cfg(feature = "inference-model")]
@@ -872,7 +961,8 @@ impl InferenceLane {
             };
             if binding.index.is_none() {
                 binding.index = Some(
-                    recall::RecallIndex::build(binding.corpus.clone(), binding.config.clone())
+                    self.shared
+                        .build_recall(binding.corpus.clone(), binding.config.clone())
                         .map_err(InferenceLaneError::Recall)?,
                 );
             }
@@ -949,6 +1039,7 @@ impl InferenceLane {
         }
         table.by_actor_id.insert(actor_id, index);
         if recall_failure.is_some() {
+            table.observe(actor_id, InferenceObservation::RunFailed);
             table.generation += 1;
             return Ok(());
         }
@@ -967,6 +1058,7 @@ impl InferenceLane {
         if !actor.command(command) {
             return Err(InferenceLaneError::Closed);
         }
+        table.observe(actor_id, InferenceObservation::Queued);
         table.generation += 1;
         Ok(())
     }
@@ -997,6 +1089,8 @@ impl InferenceLane {
                 journal.append(&next).map_err(InferenceLaneError::Journal)?;
             }
             *record = next;
+            let id = record.actor_id;
+            table.observe(id, InferenceObservation::RunCancelled);
             table.generation += 1;
         } else if !record.view.state.is_terminal() {
             if !actor.command(InferCommand::Cancel {
@@ -1004,6 +1098,8 @@ impl InferenceLane {
             }) {
                 return Err(InferenceLaneError::Closed);
             }
+            let id = record.actor_id;
+            table.observe(id, InferenceObservation::CancelRequested);
         }
         Ok(())
     }
@@ -1406,6 +1502,7 @@ impl InferenceLane {
 /// Fold updates until the actor is gone and its channel closes.
 fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
     while let Ok(update) = updates.recv() {
+        let observed = observations::worker_update(&update);
         let changed = match &update {
             InferUpdate::Paused { id }
             | InferUpdate::Cancelled { id }
@@ -1414,8 +1511,11 @@ fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
             _ => None,
         };
         let mut table = shared.table();
-        table.apply(update);
-        if let (Some(id), Some(journal)) = (changed, &shared.journal) {
+        if let Some((id, phase)) = observed {
+            table.observe(id, phase);
+        }
+        let accepted = table.apply(update);
+        if let (Some(id), Some(journal), true) = (changed, &shared.journal, accepted) {
             if let Some(index) = table.by_actor_id.get(&id).copied() {
                 if let Err(error) = journal.append(&table.runs[index]) {
                     table
@@ -1425,6 +1525,19 @@ fn bridge(shared: &Shared, updates: &Receiver<InferUpdate>) {
                     table.runs[index].view.error =
                         Some(format!("checkpoint commit failed: {error}"));
                 }
+            }
+        }
+        if let Some((id, _)) = observed {
+            if accepted {
+                if let Some(phase) = table
+                    .by_actor_id
+                    .get(&id)
+                    .and_then(|&index| observations::accepted_state(&table.runs[index].view.state))
+                {
+                    table.observe(id, phase);
+                }
+            } else {
+                table.observe(id, InferenceObservation::UpdateDiscarded);
             }
         }
     }
@@ -1512,7 +1625,10 @@ impl InferenceAskEndpoint {
         let corpus: Arc<dyn recall::RecallCorpus> =
             Arc::new(recall::PublishedCorpus(request.sources));
         let config = published.config.clone();
-        let index = recall::RecallIndex::build(corpus.clone(), config.clone())
+        let index = self
+            .lane
+            .shared
+            .build_recall(corpus.clone(), config.clone())
             .map_err(InferenceLaneError::Recall)?;
         self.publication = Some(request.owner.clone());
         published.owners.insert(

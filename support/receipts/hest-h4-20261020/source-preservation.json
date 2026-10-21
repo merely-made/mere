@@ -1,0 +1,24 @@
+{
+  "h4_release_core_delta": [],
+  "published_hest_and_shim_exact_after_reconciliation": true,
+  "incoming_cambium_shell_is_separate_from_registry_release": true,
+  "supplier_lock_changed_package_blocks": [
+    [
+      "pictograph",
+      "0.2.0"
+    ],
+    [
+      "seiche",
+      "0.0.6"
+    ],
+    [
+      "graphshell",
+      "0.0.2"
+    ],
+    [
+      "script-rhai",
+      "0.0.1"
+    ]
+  ],
+  "scope": "Graphshell dev edge and Rhai hest/serde_json edges are H4. Pictograph/Seiche example dev edges arrived with the independent incoming replay lane; no source pins changed."
+}

@@ -1,0 +1,191 @@
+{
+  "basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "post_gate_head": "22325273b85f844485f43ca622218598c9e5e439",
+  "scope": "Read-only provider/accessor foundation, owner-frame keys and Knot/resident family repair; not completion of the first or all four migrations",
+  "source_seal": "diagnostics-readonly-source-receiving.json",
+  "source_seal_sha256": "e1eb39fba30e4cd53a0db814ac18984052433e5211b2b8e3a2b1327eacb1e170",
+  "gates": [
+    {
+      "receipt": "diagnostics-readonly-current-native.json",
+      "sha256": "dd1445d178d018d9c748b120d181795166574b40367c86c8b6f82606dc60ea8e",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "sprigging@0.3.0",
+        "-p",
+        "cambium@0.6.0",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "e1a_sessions",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "receipt": "diagnostics-readonly-current-product.json",
+      "sha256": "7faf888926d8bd3b38f9f56b44149be18a65b631c07e9ddcbdc027324f0e5f40",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "--lib",
+        "--features",
+        "retained-content",
+        "retained_content::tests",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "receipt": "diagnostics-readonly-current-embedding.json",
+      "sha256": "7c7fde28a43339d61d46d2fde78a5a3fb29a90c784bc7c1a0ccc4d9dc5ee0e1d",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "--features",
+        "embedding"
+      ]
+    },
+    {
+      "receipt": "diagnostics-readonly-current-browser.json",
+      "sha256": "ab574feee60ab7b637c87130ec749e4208c5de4b407569bea27e2e1fc13ef96c",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ]
+    },
+    {
+      "receipt": "diagnostics-readonly-current-graphshell-browser.json",
+      "sha256": "bec9c1bdcaed5707009e8d6b84847e6828eb2576cdac250382b589653c180d98",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--target",
+        "wasm32-unknown-unknown"
+      ]
+    },
+    {
+      "receipt": "diagnostics-readonly-resident-retained-cohort.json",
+      "sha256": "87b9d7639c5ff1281f011f518a525a9b2e3b08a7160258c372845ff6fa3ab01c",
+      "exit_code": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "--bin",
+        "djinn"
+      ]
+    }
+  ],
+  "native_passed": 537,
+  "native_existing_ignored": 7,
+  "executed_native_binaries": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium-29b0ddb9af21211c.exe": {
+      "sha256": "3d2851d5a8d3755ee9e4327fb68db0799af1b6c9d0572f6daf4c910b090ce892",
+      "bytes": 19049472
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-216d704e18f1bbae.exe": {
+      "sha256": "edcd3af0b0267bb2d0c7e171151f6cc6c8dbca9d9293a11a2820ffe8595aa601",
+      "bytes": 20689408
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-636cb1eaea073a92.exe": {
+      "sha256": "2764283b58c52d2b2acea97e7e41376b0183cd6a1ab0321e33fca95cbb80abca",
+      "bytes": 36805632
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-411f19fac1199782.exe": {
+      "sha256": "84d1da52e9c869e35971d63ff4c08477dc083ce24839b2cddc1aef1f96662d9b",
+      "bytes": 16572928
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-1e9297a0cefc1936.exe": {
+      "sha256": "48e5b3665e6827e78aa19f34f299524d1891624b96dc0fdf5ac12608c68325b6",
+      "bytes": 41576448
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-5590d04b27f629fb.exe": {
+      "sha256": "4d725430a3a7f69e1f6040897cc9d7e1e7f06020a2d55be1b9a0b1985f04cf69",
+      "bytes": 17842688
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-5b046d672a094189.exe": {
+      "sha256": "e8683956407a255bdf439dc557afcc36ecb93da6bd1619ef25fb11c48a93e1a9",
+      "bytes": 17551360
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\sprigging-6a4615d00f698574.exe": {
+      "sha256": "660f698ff79e8187d679eeda43266f429c302f92c4b5c508622ca0c588ec845b",
+      "bytes": 1176064
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-16f29afe4287dbca.exe": {
+      "sha256": "c033e0405f66615742eb2f0320fef9de0ce6d8b9dc45fa493aae4b56c1dc2d66",
+      "bytes": 92149248
+    }
+  },
+  "sealed_registers_unchanged": 433,
+  "current_prepared_family": [
+    {
+      "name": "cambium",
+      "version": "0.6.0"
+    },
+    {
+      "name": "sprigging",
+      "version": "0.3.0"
+    }
+  ],
+  "knot_receiver": "b8d0e2fd5f090a8edde5a2ddef09b784ecdf5f75",
+  "retained_byte_cap": 10000000,
+  "preserved_failures": [
+    "diagnostics-readonly-lock.json: unavailable dependency checkout",
+    "diagnostics-readonly-preparation.json: stale lock refused",
+    "diagnostics-readonly-retained.json: test fixture read after invalidating action, corrected before receiving",
+    "diagnostics-readonly-final-resident.json: real split Cambium types"
+  ],
+  "intermediate_cohorts": [
+    "diagnostics-readonly-final-native.json and final-product: earlier 537 native passes before owner pruning and final Knot cutover",
+    "diagnostics-readonly-resident-receiving.json and resident-narrow: both pass before the actual narrow-lock restoration; neither substitutes for resident-retained-cohort"
+  ],
+  "doc_receiving": "diagnostics-readonly-doc-receiving.json",
+  "limits": [
+    "First migration still needs supplier selector lookup/flat traversal and Mesquite/Harness receiving",
+    "No target-generation, broader-action or full-forward-geometry completion",
+    "Prepared versions not registry publication; other product pins remain separate",
+    "No new headed, browser-runtime or human AT acceptance"
+  ],
+  "temporary_worktree_removed": true
+}

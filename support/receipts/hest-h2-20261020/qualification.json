@@ -1,0 +1,55 @@
+{
+  "status": "local supplier and isolated receiving qualification passed",
+  "upstream_revision": "b10ae5f88d32d8e54d39856e93dd7b52981b353f",
+  "h1_commit": "cea6d09b2a9b04cb5567531778e6e62d8cdac0d4",
+  "hest_version": "0.2.0",
+  "frozen_h1_hest_version": "0.1.0",
+  "shim_version": "0.1.1",
+  "passed_tests": 118,
+  "failed_tests": 0,
+  "checks": "checks.json",
+  "tested_source": "tested-source.json",
+  "h1_frozen_source": "h1-frozen-source.json",
+  "phase_exercises": [
+    {
+      "name": "ux-events destructive-action gate",
+      "receipt": "probe.log",
+      "passed_tests": 40
+    },
+    {
+      "name": "Turnstone actual palette",
+      "consumer_revision": "c889038ddd9c2fd56384c216e50d600f92af751e",
+      "receipt": "turnstone.log",
+      "source_proof": "turnstone-source.json",
+      "passed_tests": 13
+    }
+  ],
+  "additional_host_regressions": [
+    {
+      "name": "Graphshell retained viewer",
+      "passed_tests": 5
+    },
+    {
+      "name": "Graphshell browser page declarations",
+      "passed_tests": 1
+    }
+  ],
+  "compile_and_docs": "compile-and-docs.json",
+  "compatibility": "Immutable registry Cambium 0.4.0 with only the Hest 0.1.0 and command-menu 0.1.1 prepublication overrides.",
+  "not_claimed": [
+    "push",
+    "publication",
+    "registry-only resolution of the new versions",
+    "canonical Turnstone adoption",
+    "native/browser presentation",
+    "fresh-process native reopen",
+    "facade release preparation"
+  ],
+  "delivery_gates": [
+    "Publish Hest 0.1.0 before command-menu 0.1.1 only after authorization.",
+    "Hest 0.2.0 is a separate breaking release candidate.",
+    "Advance the breaking Cambium facade and affected requirements before publishing an API that exposes Hest 0.2.",
+    "Deliver the qualified host patch and repin its canonical supplier cohort separately."
+  ],
+  "excluded_attempts": "Earlier compile fixes, the unavailable offline upstream checkout before cargo fetch, and preliminary checks on 42baea are not included in this 118-test total."
+}

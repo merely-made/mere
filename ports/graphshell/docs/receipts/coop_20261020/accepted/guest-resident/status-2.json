@@ -1,0 +1,17 @@
+{
+  "schema": "djinn.resident-status/v1",
+  "pid": 81637,
+  "started_ms": 1792524510908,
+  "installed": false,
+  "ready": true,
+  "startup_unlock": "passphrase",
+  "protection": "passphrase",
+  "lock": "unlocked",
+  "endpoints": {
+    "agent": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/agent.sock",
+    "agent_listener": "receipt",
+    "browser": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/browser.sock",
+    "app": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/private/guest/app.sock"
+  },
+  "sync": null
+}

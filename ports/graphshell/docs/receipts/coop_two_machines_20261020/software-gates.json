@@ -1,0 +1,173 @@
+{
+  "scope": "Current runtime 763c2881. Graphshell executable hashes and all source inputs outside two Djinn roster files are unchanged from the earlier successful cohort. Resident and roster gates repeated after main advanced. Bounded checks, not full workspace or CI.",
+  "gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib",
+      "result": "339 passed, 6 existing ignores",
+      "exit": 0,
+      "log": "software/local-core-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "reused": "Byte-identical native Graphshell executable; unchanged Graphshell source and pinned dependencies"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "16 passed",
+      "exit": 0,
+      "log": "software/local-ui-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "reused": "Byte-identical native Graphshell executable; unchanged Graphshell source and pinned dependencies"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p graphshell-mere",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/local-ui-clippy.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "reused": "Byte-identical native Graphshell executable; unchanged Graphshell source and pinned dependencies"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "16 passed",
+      "exit": 0,
+      "log": "software/guest-ui-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "reused": "Byte-identical native Graphshell executable; unchanged Graphshell source and pinned dependencies"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "10 passed",
+      "exit": 0,
+      "log": "software/guest-coop-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "reused": "Byte-identical native Graphshell executable; unchanged Graphshell source and pinned dependencies"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/refresh-owner-resident-tests.log.gz",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib roster_tests",
+      "result": "4 passed",
+      "exit": 0,
+      "log": "software/refresh-owner-roster-tests.log.gz",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib roster_tests",
+      "result": "4 passed",
+      "exit": 0,
+      "log": "software/refresh-guest-roster-tests.log.gz",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p djinn --features passphrase-fd --lib",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/refresh-owner-resident-clippy.log.gz",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0"
+    }
+  ],
+  "build_environment": {
+    "toolchain": "1.99.1",
+    "jobs": 2,
+    "CARGO_TARGET_DIR": "/Users/markik/Code/output/graphshell-coop-two-machines-20261020/artifacts",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/repos/mere/target/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "note": "These are producer build/test settings. The environment member in each frozen build-inputs.json observes the separate freeze process."
+  },
+  "earlier_gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib",
+      "result": "339 passed, 6 existing ignores",
+      "exit": 0,
+      "log": "software/local-core-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "16 passed",
+      "exit": 0,
+      "log": "software/local-ui-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/local-resident-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib custody::tests::the_default_policy_releases_named_namespaces_and_never_the_master",
+      "result": "1 passed",
+      "exit": 0,
+      "log": "software/local-custody-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p graphshell-mere",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/local-ui-clippy.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p djinn --features passphrase-fd --lib",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/local-resident-clippy.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/boundaries.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "owner",
+      "command": "rustfmt +1.99.1 --check --edition 2024 ports/graphshell/src/coop/network.rs ports/graphshell/mere/src/coop.rs",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/format.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "16 passed",
+      "exit": 0,
+      "log": "software/guest-ui-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "10 passed",
+      "exit": 0,
+      "log": "software/guest-coop-tests.log.gz",
+      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6"
+    }
+  ]
+}

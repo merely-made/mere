@@ -1,5 +1,843 @@
 # System Diagnostics and Accessibility Plan
 
+## Shared selector receiving, 2026-10-21
+
+**Status:** shared observation/selector receiving qualified on the sealed
+current family: 264 affected native tests, 46 supplier tests and 12 retained
+product tests pass, with seven existing ignores. Core browser, actual Graphshell
+and Distillery probe Wasm builds, embedding and resident lib/binary checks pass.
+Owner/target lifetime admission is the next migration. This continuation
+starts on Mere `3af00fc90`; the final receiving seal uses integrated main
+`5573500dc` and Genet `206b80c2d62`. It retains the 10 MB receipt cap
+and the existing Mere/Genet Cargo targets.
+
+Taproot owns one matcher over borrowed semantic lookup views. Its DOM adapter
+uses flattened traversal; its composed adapter reads the complete published
+semantic tree and skips hidden subtrees. Exact-name preference, supported role
+aliases, shallow class matching and DOM attribute filters retain their stated
+contracts. Generated semantic objects are distinct targets. They do not inherit
+arbitrary DOM attributes from the producer slot.
+
+Harness and Mesquite now read the existing shared contributed composition,
+including leaf-only roles and producer action buttons. DOM target coordinates
+retain the existing product hook. Virtual action buttons have no invented
+pointer or secondary-click route. Point-only queries may miss while an explicit
+semantic click is available; querying must not record a false interaction failure.
+Generated activation uses the owner-supplied
+`ProducedAction` through the existing host accessibility admission path. The
+Harness observes the dispatch result directly. Mesquite queues the request and
+checks an immutable routing acknowledgement before spending another scenario
+step. Producer refusal and a withdrawn offer are failures; queueing is not an
+application-completion claim. Requests made by post-dispatch hooks wait for a
+later drain rather than recursively consuming the semantic queue.
+
+The browser mirror's independent role-spelling table is retired. The optional
+`document-session-api/accesskit` bridge supplies the same spellings to Taproot
+and `genet-render`'s host export. Taproot's normal dependencies do not acquire a
+renderer. The default document contract remains neutral. This is a spelling
+bridge for existing contributor vocabulary, not a new universal semantic model.
+
+`support/family-promotion/diagnostics-selectors-qualification.json` records the
+final gates and their exact source. Temporary Cargo checkout/update attempts and
+the corrected scenario-test tick assumption remain preparation evidence. Normal
+scenario completion already takes another tick after the last command; this
+continuation makes no claim of repairing an existing last-step completion bug.
+
+This observation/selector slice does not bind an invocation to a provider life.
+Queued targets still use the existing DOM or `(slot, child, action)` identities.
+The next migration must audit platform tree/window identity, host queue disposal,
+provider replacement and key reuse before choosing lifetime tokens. Ordinary
+republication must keep valid targets, and replacement must refuse old requests.
+Broader Hest actions and full supplier-owned transform/scroll/clip placement
+remain subsequent gates. This receiving does not establish new headed, browser
+runtime, human AT or other external product acceptance.
+
+### Next: owner and target lifetime admission
+
+The native mapper rebuilds its maps before translating queued requests, and
+currently drops the platform request's target-tree field. Browser events carry
+resolved DOM or `(slot, child, action)` targets without a registration lifetime.
+`LeafRegistry::insert` replaces the boxed contributor at a key. Producer keys
+are unique within a description; the contract does not yet distinguish removal
+and replacement from an ordinary state update. Renderer registration identities
+exist, but are not automatically semantic target lifetimes.
+
+The next done-condition covers two DOM owners with colliding numeric IDs,
+window/provider replacement, removed-and-reintroduced child keys and disposal
+of queued acknowledgements. Old requests must be refused while current requests
+and ordinary republication remain valid. Audit actual caller replacement/update
+patterns before choosing tokens; do not allocate lifetimes from observation
+reads or substitute a global presentation revision. Native tree filtering must
+be qualified against the bridge's root/embedded-tree contract first.
+
+The native initial-install branch also sets its private installed guard after
+an error, preventing a later install retry in that object. This is separately
+tracked as a state/recovery gap, not new evidence of a successful native adapter.
+Transient failure, permanent unsupported status and bounded retry/fallback need
+an actual headed failure/recovery gate before a policy repair is claimed.
+
+## Ordered ownership migrations, 2026-10-21
+
+**Foundation cohort:** provider/accessor work was implemented on refreshed main
+`4232d5622`. Its qualification below leaves selector adoption open at that basis;
+the later shared-selector continuation above records its own receiving gates.
+Proceed in order: read-only observations, target generations, broader actions,
+then supplier-owned forward geometry. Existing receipts retain their bases;
+this continuation keeps the 10 MB cap and reusable Cargo target.
+
+First done-condition: contributor descriptions use shared borrows; reading a
+description does not allocate target identities, rebuild activation routes,
+render or advance application state. Graphshell retained-content identities
+move to the content owner's frame update; activation resolves against the
+current document. AppCtx and Harness expose the same contributed composition
+through read-only accessors. This is a borrowing/observation contract, not a
+read/act transaction or presentation-revision lease. Selector catalogue adoption
+and immutable observation receiving must be named explicitly before this first
+migration is called complete. Preserve the DOM observation API's narrower
+contract rather than inventing another role/name lowering.
+
+The public Sprigging callback change is breaking. Prepare a new Sprigging minor
+and matching Cambium minor in source; publication and receiving against existing
+external product pins remain separate gates. Do not introduce a mutable
+compatibility callback or hide identity allocation behind interior mutation.
+
+### Read-only foundation and receiving
+
+Sprigging descriptions and `TextureProducer::semantics` now take `&self`.
+The registry, shared composition, native/browser adapters and embedding view
+preserve shared provider borrows. `AppCtx::semantic_projection` and
+`Harness::semantic_projection` return that same contributed tree, owner maps
+and refusal report. Their existing `a11y_projection` remains the DOM seed.
+A shared receiver is a provider contract, not proof against arbitrary interior
+mutation by a third-party implementation or an atomic read/act transaction.
+
+Graphshell's retained content owner allocates keys after an admitted document
+frame, preserving live keys across ordinary frames and producer recreation and
+retiring keys absent from the current session projection. Description reads no
+longer allocate keys or rebuild activation routes. An unobserved producer can
+activate a current advertised target through the owner; retired sources refuse.
+
+Sprigging 0.3.0 and Cambium 0.6.0 are prepared source versions, not registry
+publications. The resident gate exposed a real split: Knot's range excluded
+0.6 while its shared editor host returned 0.6 types. Knot `b8d0e2f` widens the
+unchanged embedded widget API's range; the current Mere lock now has one
+Cambium/Sprigging family. That frozen test cohort retained the existing Murm
+and Dramatis source revisions.
+`diagnostics-readonly-final-resident.json` preserves the original four type
+errors. The later retained-cohort resident check passes both lib and binary;
+other external product adoption, including Woodshed's older Leaf callback,
+remains a separate receiving gate.
+
+The qualification record is
+`support/family-promotion/diagnostics-readonly-qualification.json`; it separates
+initial preparation and failed integration from the final source-sealed
+receiving cohort. Automated native and Wasm gates do not establish headed,
+human assistive-technology or cross-product acceptance. Taproot selector intake
+below is a supplier/consumer migration, so it is documented here rather than
+adding a second role/name catalogue in Mere.
+
+Publication integration `d7fd54d71` receives main's subsequent local-passphrase
+work and its intentional Dramatis `7d498c27` intake. All sealed semantic sources
+remain unchanged; the root lock adds the authentication dependencies and that
+supplier revision. `diagnostics-readonly-integration-qualification.json` records
+the affected resident, retained-product and actual Graphshell Wasm gates on the
+merged basis. It supplements the original 537-test cohort rather than replacing
+its source seal or claiming a repeat of every unchanged family test.
+
+### Ordered gates and current disposition
+
+1. The current shared observation/selector receiving is described above.
+   Other external product intake and registry publication remain separate;
+   neither is inferred from this shared-host qualification.
+2. Bind requests to the originating owner and target life. Receiving must refuse
+   stale requests after window/session/provider/child replacement, while retaining
+   valid targets across ordinary republication. Audit the actual platform queue
+   and source lifetimes before choosing token representation.
+3. Route the broader advertised action set through its current owner/Hest
+   boundary. Keep focus distinct from activation, numeric validation and
+   restrictive state shared, and routing acceptance distinct from terminal
+   effects. Declined or unsupported requests must not claim success.
+4. Finish forward geometry in Genet, including flattened paint-scope ancestry,
+   transforms, scroll and explicit clipping semantics. Native/browser lowering
+   must consume that mapping and qualify real producer pixels and input against
+   semantic bounds. The current untransformed content-origin repair is not this
+   full mapping.
+
+## Producer semantic identities, 2026-10-21
+
+**Status:** contained identity validation qualified on frozen main `8942e3050`, preserving Hest H4
+receiving qualification. Receipt cap remains 10 MB across this continuation;
+builds reuse `C:\t\cargo-targets\mere`.
+
+Scope: validate child keys, per-child action IDs and generated platform IDs at
+shared composition before publishing a producer contribution. Done when duplicate
+descriptions and deterministic collision controls cannot emit repeated nodes or
+leave actionable partial maps; valid siblings, reorderings and same action IDs
+on different child keys must keep working through native/browser receiving and
+current-target admission. Keep key generations, cross-window ownership and
+read-only contributor contracts as separate migrations.
+
+[AccessKit 0.25.1's TreeUpdate contract](https://docs.rs/accesskit/0.25.1/accesskit/struct.TreeUpdate.html#structfield.nodes)
+uses IDs as replacement identity and requires rooted parent/child membership.
+Repeated generated IDs cannot represent two distinct semantic objects. The
+existing FNV allocator is stable, not collision-proof; a HashMap insertion is
+not evidence of an unambiguous action binding.
+
+At this identity-validation cohort, contributor callbacks still required
+mutable access and selector observations still used the DOM seed. The later
+read-only foundation and selector receiving above supersede those gaps. The
+identity cohort's original test counts and source basis remain unchanged;
+target lifetimes and full forward geometry remain separate migrations.
+
+### Repair and qualification
+
+One preflight in shared composition validates every child key and per-child
+action ID, then reserves the generated IDs against DOM IDs and already accepted
+producer IDs. Refusal is atomic per contribution: slot overrides, children,
+action routes and ID reservations all remain untouched. The DOM seed remains
+available and valid sibling providers continue to publish. `producer_issues`
+returns typed refusal details from this read. Platform convenience APIs and
+product collector adoption of that report remain open; it is not a new retained
+diagnostic store or a lifetime-token mechanism.
+
+Three before-repair runtime controls reproduce repeated browser action buttons,
+actionable ambiguous descriptions and an actual host dispatch. Seven repair
+controls pass, covering duplicate keys/actions, deterministic already-claimed
+node/action ID collisions, valid siblings, stable reorderings, same action name
+on different children and invalid/valid/invalid readmission without a stale
+verdict. An earlier test-fixture borrow error is retained as preparation evidence,
+separate from runtime failures.
+
+Final frozen receiving passes 122 targeted native tests with five existing
+ignores: producer lifecycle 41/one ignore, shared semantics 11, admission eight,
+and native/browser/session receiving 62/four ignores. Browser-host Wasm
+compilation passes. `support/family-promotion/diagnostics-identity-qualification.json`
+records source/lock and executed-binary hashes; `diagnostics-identity-final-check.json`
+records document, formatting, sealed-register and retained-byte checks. All
+builds reuse the existing target; no isolated output was created.
+
+Native projection comments no longer call mutable contributor reads pure, and
+the DOM projection documentation names its actual seed role. This cohort does
+not qualify immutable observations, generation-safe targets, collision-free
+allocation, full geometry, browser runtime, headed interaction or human AT.
+
+Publication preserves concurrent relay-recovery qualification and fixture tooling
+at main `ad6c725e8`. Every tested source, manifest and lock hash still matches
+the frozen seal; `diagnostics-identity-publication.json` records that comparison
+without claiming another test cohort.
+
+## Producer content origin, 2026-10-20
+
+**Status:** bounded content-origin repair qualified on integrated main
+`e94cb23e8`, after the initial `1797a2eed` refresh. Native Hest routing,
+shared-shell/Hest scripting and concurrent co-op/replay changes are preserved.
+Receipt budget remains
+10 MB across this continuation; builds reuse `C:\t\cargo-targets\mere`.
+
+Scope: use Genet's content-box origin for generated producer children and
+action bounds in the host's existing untransformed, scroll-adjusted observation
+space. Done when padded/bordered receiving, nested/document scroll, headless
+sampled pixels, native/browser lowering and Wasm compilation pass with frozen
+source evidence. Keep transform/clip and shadow/slot ancestor placement as
+supplier-owned follow-up rather than recreating CSS placement in Mere.
+
+The pinned `genet-livery::ElementGeometry` exposes content size/origin and inverse
+pointer mapping but no forward semantic bounds query. Its placement query
+collects ancestors through `dom.parent`, whereas paint/discovery consume the
+flattened tree. Rootstock's `painted_rect` and browser mirror also retain
+untransformed boxes. Completing this boundary requires supplier-owned forward
+mapping and an explicit clipping representation, qualified against flattened
+paint scopes and both platform consumers. That broader migration remains open.
+
+### Repair and receiving evidence
+
+Producer pixels and inverse pointer coordinates already use Genet's content
+box, but generated semantic children and their action buttons used the DOM
+slot's border-box corner. Pixel borders/padding therefore displaced semantic
+bounds from the rendered producer. Rootstock now queries the supplier's content
+origin and applies the existing scroll observation, with one composition shared
+by publication and current-target admission. Missing slot or supplier geometry
+does not invent coordinates. `ProducerNode::rect` now explicitly names content
+pixels, matching `ProducerFrameInfo::logical_size`.
+
+Before-repair runtime controls fail by twelve layout pixels in both axes,
+including a headless GPU fixture whose sampled image is already painted at the
+correct content position. The browser control fails by twenty-four CSS pixels
+at 2x scale. Three repaired controls pass for sampled GPU pixels, both document
+and ancestor scroll planes, and relative browser boxes with scale applied once.
+The native fixture also includes actual border/padding and verifies child/action
+rectangle equality before mapping an AccessKit request to producer dispatch.
+
+This repair does not supply forward transforms, path clipping or flattened
+ancestor placement. Existing percentage-padding interpretation is inherited
+from Genet; the receiving controls qualify pixel padding and borders.
+
+### Qualification
+
+The final integrated cohort passes 115 targeted native tests with five existing
+ignores, plus browser-host Wasm compilation: producer lifecycle 41/one ignore,
+shared semantics seven, admission seven and native/browser/session receiving
+60/four ignores. The initial `1797a2eed` cohort has the same results and remains
+separate; it is not added to the final count. Before-repair failures remain
+separate from repaired receiving.
+
+`support/family-promotion/diagnostics-content-origin-qualification.json` records
+the source/lock seals, both cohorts, executed native binary hashes and the
+receiving boundary. The `before` and `before-rootstock` receipts retain the
+three expected runtime failures. The `final-check` record preserves document
+checks, unchanged sealed audit registers and the aggregate receipt budget.
+All runs reuse the existing Cargo target; no isolated output was created.
+This qualifies pixel border/padding, sampled headless RGBA, native action
+mapping and browser mirror plans. It does not qualify browser runtime, headed
+interaction, human AT or the supplier forward-placement migration above.
+
+Publication integration preserves concurrent live owner-action delivery at
+merge `7c9bc885e`. The tested source/manifests still match the integrated seal;
+the sole later lock change adds the existing `url` dependency to the separate
+`graphshell-mere` product. `diagnostics-content-origin-publication.json` records
+that comparison separately; it does not replace or recount the test cohorts.
+
+## Flattened producer discovery, 2026-10-20
+
+**Status:** flattened discovery qualified on source-frozen main `24b079538`.
+The initial refresh incorporated main `52690098b`. Hest H1/H2/H3 and
+Cambium 0.5 receiving changes are preserved; accessibility's existing action
+vocabulary still needs its separately tracked routing work. The diagnostics
+continuation retains its 10 MB receipt cap and existing reusable Cargo target.
+
+### Scope and done-conditions
+
+Align producer discovery with Genet's `flat_children` traversal, shared with
+semantic composition. Preserve ordinary light-DOM text walks. Prove actual
+shadow/nested-shadow and assigned-slot discovery, fallback replacement,
+unassigned-node exclusion, duplicate refusal and WindowDom containment through
+portable capture and headless GPU receiving. Publication must name the same
+current DOM owner. Keep full content-origin/transform/clip mapping, immutable
+semantic observation and target generations as explicit later migrations.
+
+### Findings
+
+The old light-DOM finder served GPU preparation, portable capture and custom-leaf
+size reads. It missed shadow producers while counting unassigned light-DOM
+nodes as duplicate owners. Semantic composition independently walked the flat
+tree, so an advertised action could coexist with absent rendering or capture.
+GPU preparation, portable capture, leaf size reads and semantic routing now use
+one Genet-based flattened traversal and the existing shared leaf-key parser.
+The unrelated text-position walk retains its light-DOM text contract. Discovery
+retains flat-tree members that may be CSS-hidden; existing layout geometry and
+suspension rules still decide their rendering state.
+
+The before-repair gate demonstrates the false observation path directly: the
+browser semantic control passes while all six producer discovery/capture/GPU
+controls fail. The repair controls pass for shadow, nested-shadow and named-slot
+content, masked fallback/unassigned exclusion, duplicate refusal before callbacks,
+WindowDom containment, fallback rebinding and removal retirement. Headless wgpu
+RGBA samples change from the assigned image to the fallback image and then to
+background after retirement. Native action mapping and browser mirror binding
+also select only the assigned owner. This is sampled axis-aligned receiving,
+not arbitrary padding/transform/scroll/clip or human AT acceptance.
+
+### Qualification
+
+The final source-frozen cohort passes 112 targeted native tests with five
+existing ignores, plus browser-host Wasm compilation. Producer lifecycle,
+shared semantics, current-target admission, native/browser publication and
+session receiving are covered. The eight repair controls also pass separately;
+they are not added to the final cohort count. The pre-repair runtime failures
+remain recorded separately from repaired receiving.
+
+Receipts are `support/family-promotion/diagnostics-flat-discovery-{before,repair,
+producers,semantics,admission,platform,wasm}.json`; the `source` and `qualification`
+records freeze source/manifest hashes and executed native binary hashes.
+`diagnostics-flat-discovery-final-check.json` records document checks, unchanged
+sealed audit registers and the aggregate diagnostics receipt budget. All builds
+reuse `C:\t\cargo-targets\mere`; no isolated target, Cargo home or worktree was
+created. This qualifies portable capture and sampled headless GPU receiving,
+native action maps and browser mirror plans. Browser runtime, headed interaction,
+human AT and full content-origin/transform/scroll/clip mapping remain open.
+
+## Shared leaf and producer composition, 2026-10-20
+
+This historical cohort precedes the flattened discovery continuation above.
+Its light-versus-flat producer finder gap is superseded there; the coordinate,
+read-only observation, action routing and target-lifetime gates remain open.
+
+**Status:** contained host composition qualified on 2026-10-20 at integrated
+main `67964c3ea`, implementation `3798e0c2d`. The refresh preserves resident
+recall/readiness, portable-site extraction and Graphshell co-op work, plus
+Netrender's borrowed-lowering supplier update (`ec15eb26`). Receipt
+budget remains 10 MB across the diagnostics continuation; builds reuse
+`C:\t\cargo-targets\mere`. Earlier cohorts below keep their original basis.
+
+### Scope and done-conditions
+
+Native publication, browser ARIA lowering and current-target admission consume
+Rootstock's `project_semantics`. This composes the existing neutral DOM
+projection through Genet's converter and then the existing AccessKit-shaped
+Sprigging/producer contracts. Done when real registered contributors, native
+receiving, browser mirror lowering, current-target/session controls and Wasm
+compilation pass with source and lock evidence. This is host composition policy;
+Genet still owns DOM extraction and products own contributor meaning and effects.
+
+### Repairs and retired duplication
+
+Previously native leaves received a fully seeded node, browser leaves a scratch
+node and admission a scratch node containing only the requested DOM action.
+Browser lowering retained a small role/name subset, dropping a real Knob's
+slider role and numeric properties. Producer role/name/children/action IDs were
+also constructed twice. Those independent compositions are retired. Native
+publication consumes the shared tree and maps; ARIA lowers that composed tree;
+admission rereads that same construction with current window membership.
+Multiline role repair lives at this shared boundary. Custom-leaf keys reuse
+OwnedLayout's parser. Multiple producer DOM slots for one key refuse contributed
+children/action targets, matching the renderer's existing `DuplicateDomKey`
+refusal rather than selecting an arbitrary semantic owner.
+
+Producer descriptions take precedence over co-registered Sprigging leaves.
+Otherwise an authored DOM name wins over the leaf's label in all consumers,
+matching the browser's established policy. The leaf callback sees the seeded
+node. Host geometry and tree edges and restrictive hidden/disabled/read-only
+state survive callbacks. Disabled contributions cannot reintroduce actions;
+read-only leaves cannot reintroduce numeric mutation. Producer action buttons
+inherit disabled/hidden slot restrictions and have no admitted target map entry
+when blocked. Hidden contributed subtrees lose route entries; a focused node
+hidden by its contributor falls back to the document root. Missing slot geometry
+no longer invents an origin at `(0,0)`;
+nonfinite or negative producer rectangles produce no accessibility bounds.
+
+### Remaining ownership migrations
+
+- This original composition cohort left mutable callbacks and DOM-only selector
+  intake open. The later shared observation/selector receiving above resolves
+  those gaps. The contributor vocabulary remains AccessKit-shaped, and separate
+  reads are not an atomic read/act transaction or presentation-revision lease.
+- `a11y_projection` deliberately remains the DOM seed. Current consumers use
+  `semantic_projection` and the shared Taproot lookup for contributed roles and
+  actions; the narrow DOM API is not a second contributed catalogue.
+- Requests still lack originating document/window/session/revision lifetime
+  tokens. Within-window duplicate producer DOM bindings now refuse; cross-window
+  producer ownership, reused registry/child keys, duplicate semantic keys/action
+  IDs and generated hash collisions need explicit supplier/consumer rules.
+- The existing host request enum routes only Click, Focus and numeric SetValue.
+  An advertised Increment, Decrement or ScrollIntoView is not thereby routed.
+  Broader command declaration/invocation/result migration belongs with Hest;
+  routing acceptance remains distinct from terminal success.
+- At this cohort's basis, producer render discovery used OwnedLayout's light-DOM
+  walk while semantic discovery was flattened. The continuation above repairs
+  that discovery gap. Render/input also use Genet's content origin,
+  transforms and clips; this cohort's generated semantic bounds offset the
+  projected slot rectangle. The content-origin continuation above repairs the
+  border/padding offset in existing scroll-adjusted observation space. Forward
+  transformed/clipped placement and shadow/slot ancestor geometry still need
+  one supplier-qualified mapping and receiving controls.
+  Consolidating the two old lowerings does not qualify their geometric premise.
+- ARIA maps the known DOM and contributor roles. Other AccessKit roles remain
+  generic; this does not qualify arbitrary leaf roles, clipping/pixel parity,
+  browser runtime, installed platform delivery or human assistive technology.
+- Product diagnostic final-process evidence, durable recovery, additional
+  sources, A873 inspection, A961 input routing and selector grammar retain the
+  open gates recorded below. This slice does not change those owners.
+
+### Qualification
+
+The broad native cohort passes 190 tests with seven existing ignores:
+Rootstock 133/three ignores, native host 19/four ignores, native accessibility
+receiving eight, browser mirror 17, Winit adapter seven and joined sessions six.
+Its exact pre-integration source and binary hashes remain in
+`support/family-promotion/diagnostics-contributed-pre-integration.json` and the
+native gate. After merging main, 70 focused native receiving tests pass with
+four existing ignores: contributor owner six, host admission seven, browser
+mirror 17, native host 19/four ignores, native accessibility receiving eight,
+Winit adapter seven and joined sessions six. The browser host compiles for
+`wasm32-unknown-unknown` with default features disabled. No browser runtime or
+human AT acceptance is claimed.
+
+The [qualification index](../../../support/family-promotion/diagnostics-contributed-qualification.json)
+records exact source/lock basis, executed binaries, gate commands, the four
+upstream Netrender package-source changes and unchanged sealed registers. The
+one local lock dependency addition is the existing Sprigging crate for actual
+browser contributor tests. Current source hashes match the integrated seal.
+Development compile failures and the fixture correction to reuse one DOM for
+reordered producer IDs remain separate from passing gates. An initial
+fast-forward refusal left the local lock patch intact; the tested implementation
+was committed and main merged normally. The intermediate platform gate is
+retained but excluded from the separately sealed 70-test current-main count.
+
+The D2 audit reports no errors for the two updated plans and 40 existing
+whole-tree errors. No isolated target, Cargo home or worktree was created;
+receipts remain under the diagnostics continuation's 10 MB cap.
+
+## Shared DOM semantics and resident collector, 2026-10-20
+
+This historical cohort records the pre-contribution boundary. The shared leaf
+and producer continuation above supersedes its contribution-lowering gaps.
+
+**Status:** contained shared DOM projection and resident collector qualified
+on 2026-10-20, based on main `6394e931`. The five intervening upstream commits cover recoverable settings
+writes, Chronicle request binding, supplier inference fixtures and Mesh
+provenance; they are preserved. The earlier 237-test and 178-test cohorts below
+retain their original source identities. Receipt budget remains 10 MB for the
+diagnostics continuation, using `C:\t\cargo-targets\mere` without isolation.
+
+### Scope and done-conditions
+
+Retire the native adapter's independent textbox/numeric DOM policy and consume
+Rootstock's existing neutral projection through Genet's existing AccessKit
+converter. Preserve native roles, focus, pruning and retained geometry. Wire one
+real product lifecycle source through product sampling, bounded ingress,
+redacted retained history and its existing admitted inspection route. Done when
+the owner, platform/session and product receiving controls pass with source,
+lock, binary and explicit remaining-gate evidence. Do not turn this into a
+universal semantic or process-wide diagnostics model.
+
+### Findings and repairs
+
+Winit now lowers `document_projection`, the same DOM observation the browser
+uses. Its separate app-textbox value/pruning implementation and unconditional
+numeric marker override are retired. Routing maps contain only projected nodes.
+Genet's converter currently maps multiline text fields to its single-line
+AccessKit role; Winit derives the platform role from the shared `multiline`
+state rather than rescanning DOM markers. Existing Sprigging and producer
+contributions still follow, owned by those contributors.
+
+The old native and browser ID walks used `dom_children`, while Genet projects
+`flat_children`. This could announce a shadow control without a route to it;
+Rootstock's marker and focus walks could also miss that control. All four now
+use the supplier's flattened-child API. Scope membership still belongs to
+`WindowDom`; traversal does not grant a foreign window's node authority.
+
+Djinn's existing `EventLog` now accepts explicit optional diagnostic bounds.
+The real executable reads `--diagnostics-config <path>` before starting its
+vault/lifecycle, using the existing event source rather than a new authority.
+It creates separate random nonsecret run/queue boot IDs, a local Registry
+sampling policy, one explicit sender/receiver and an Apparatus collector.
+No global sender or thread-local scope captures unrelated product logs.
+Recognized owner phases are projected to fixed labels before queue admission;
+profile, vault, endpoints, stop reasons, private fields and raw errors never
+enter this diagnostic queue. A stopped event distinguishes explicit `ok=true`,
+`ok=false` and absent/nonboolean outcome. Sampling refusals and unrecognized
+events have separate counters, not inferred retained gaps. Zero bounds retain
+the queue/store's existing disabled behavior.
+
+Collection runs synchronously on that low-volume source, under its existing
+serialization lock. Each inspection or receipt reader has its own cursor;
+queue/history counters and identities remain separate. The existing owner-only
+status route carries an optional second, content-addressed diagnostic resource,
+with its original status resource first. The native `--resident-diagnostics`
+client reads it through the same admission route. Off coverage is explicit;
+diagnostic read failure produces an unavailable diagnostic resource without
+breaking the resident's ordinary status. This does not alter vault access or
+stop permissions. The original event-file persistence remains a distinct path,
+not proof of diagnostic durability or successful application work.
+
+A further contained authority bug was found in `EventLog::emit`: arbitrary
+caller fields could overwrite schema, PID, receipt time and even event name.
+Reserved fields now retain their owner values. Other event fields keep their
+existing file behavior; the diagnostic copy retains only the fixed allowlist.
+
+### Remaining ownership migrations
+
+- **Contributed semantics:** Sprigging callbacks remain AccessKit-shaped;
+  native, browser and admission still seed/lower their contributions differently.
+  Browser leaf lowering currently keeps only a small role/name subset, losing
+  numeric roles, values and actions. Producer semantics and generated action
+  IDs are also lowered separately. A shared neutral contribution model needs
+  supplier and native/browser receiving qualification, including read-only,
+  disabled, labels, clipping and action lifetime. Shared DOM semantics do not
+  complete that migration.
+- **Targets and outcomes:** requests still lack document/window/session/revision
+  lifetime tokens, and producer semantic reads and activation remain separate.
+  Current projection membership and routing results do not establish terminal
+  success or presentation/pixel causality. The new Hest command architecture
+  plan owns the wider declaration/invocation/result consolidation; target and
+  operation lifetime work should coordinate with that owner.
+- **Product diagnostics:** this source covers only named resident lifecycle
+  events. Unlock subevents, inference/workers, arbitrary tracing/mod-loader
+  emitters and other products are not silently included. The source already
+  serializes with event-file IO; adding a nonblocking ingress does not make
+  that owner API nonblocking. Mutex/panic and durable recovery contracts remain
+  open. History and final stopped/disconnect evidence are in memory; after
+  process exit they are not available through the status route or exported by
+  default. Installed-process, abrupt termination and final receipt custody
+  remain separate receiving work.
+- **Other owners:** A873 inspection skeleton retirement, A961 input routing,
+  private selector grammar, legacy invariant-clock result loss and journal
+  recovery remain open as recorded below. The sealed audit registers remain
+  unchanged; the successor ledger carries new repairs and remaining migrations.
+
+### Qualification
+
+191 targeted native tests pass, with seven existing ignores: Rootstock 126,
+native host 19/four ignores, native accessibility receiving eight, browser-host
+native plan tests 17, Winit adapter seven, joined-session controls six,
+resident lifecycle owner four and admitted status receiving four. Rootstock's
+126 passes include three existing ignores outside that passing count. The
+receiving test launches the actual compiled Djinn CLI as a separate process,
+reads the redacted phase from the fixture broker, checks owner-only admission,
+and verifies that inspector reads leave the independent receipt cursor intact.
+The browser host compiles for `wasm32-unknown-unknown` with the flattened-tree
+route walk. The source ledger and
+[qualification index](../../../support/family-promotion/diagnostics-shared-qualification.json)
+retain exact commands, source/lock basis and executed binaries.
+
+The first compile checks caught a redundant `.into()` inference error and a
+fixture using a private scroll setter. Both were corrected; scroll parity now
+runs through the host's public wheel path. Failed development receipts remain
+separate from final gates. Installed resident/vault startup and termination,
+browser runtime, human AT and broader contributed semantics remain unqualified.
+A client-process fixture is not an installed-resident acceptance receipt.
+
+After qualification, upstream's Hest reservation and architecture plan
+(`2fead114`, `9a173f18`) were integrated. Its reserved crate has no dependencies;
+only workspace membership and the local Hest lock entry differ from the tested
+manifest basis. Tested source hashes match, and locked offline no-dependency
+metadata passes; the [integration receipt](../../../support/family-promotion/diagnostics-shared-integration.json)
+records this separately without overwriting the original qualification. The
+[Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+owns broader command declaration, invocation and result consolidation.
+
+
+## Current-target admission and collector bridge, 2026-10-20
+
+**Status:** contained host admission and collector bridge qualified on main
+on 2026-10-20, based on `4e4a2c8c`.
+The earlier 178-test continuation below retains its exact source and scope.
+Receipt budget remains 10 MB across this diagnostics continuation; builds reuse
+`C:\t\cargo-targets\mere`, without an isolated target, Cargo home or worktree.
+
+### Scope and done-conditions
+
+Revalidate each semantic request against the current host subtree, DOM semantics
+and existing leaf/producer contributions immediately before dispatch. Expose
+refusal and producer-declined results through the host and native harness. Wire
+Registry staging to Apparatus independent readers through an explicit product
+redaction function. Done when the targeted owner/receiving controls pass and
+source, lock, binaries, results and unresolved migrations are recorded together.
+This is a contained shared-library slice; product startup and broader source
+migration remain separately owned.
+
+### Findings and ownership
+
+`Host::apply_a11y_requests` previously invoked producer actions even when their
+slot was absent from this host, and trusted node requests beyond the runner's
+live-node check. It now checks current window membership, projection presence,
+disabled state, supported action, finite numeric data and current producer action
+availability for every request. A callback's DOM change can refuse a later
+request in the same batch. `WindowDom::contains` remains the subtree authority,
+including shadow hosts; the host does not invent another ancestry walk.
+
+`A11yDispatch` describes routing only. A producer's `false` reply is
+`ProducerDeclined`, and does not move focus. DOM dispatch is not proof that a
+handler ran or that downstream work completed. Rejected requests do not run
+post-dispatch hooks; actual producer calls still do, including declined calls.
+`sync_a11y` returns results in request order, and the native harness exposes its
+single-request result. Native/browser event loops may still discard results;
+automatic retained action-outcome instrumentation is not installed.
+
+The neutral document projection now includes the existing enabled numeric
+control marker. Sprigging contributions still use their existing AccessKit
+callback. Admission consults that owner too so a leaf-only numeric action is not
+silently broken by the stricter gate. This adds a direct Rootstock AccessKit
+edge, already present transitively through Sprigging. It does not complete a
+neutral semantic projection migration.
+
+Apparatus's opt-in `registry` feature adds `RegistryCollector<P>`. Products
+supply a bounded, redacted `DiagnosticProjection<P>` or explicitly filter a
+packet. Raw messages, fields and producer correlation are not copied by default.
+The retained envelope keeps collector run/source/sequence; payload context keeps
+queue boot/sequence/receipt time separately. Product metadata is preserved,
+without assigning a queue boot to a producer clock or inventing cause references.
+Queue counters remain an independently scoped drain snapshot, absent before a
+successful drain. Ingress rejection never becomes an invented retained sequence
+gap; retained rejection/eviction still uses Apparatus's actual sequence space.
+
+The constructor does not inspect or lock the receiver, avoiding a contended
+startup dropping its sole receiver. Collection validates retained time and
+sequence capacity before draining. Ingress and history retain independently
+configured count/byte/age bounds. Each inspector/receipt gets its own cursor.
+New queue lifetimes require fresh product-chosen run and boot identities;
+old cursors observe the retained run boundary. The old sender remains the owner
+of final disconnect/discard counters after collector retirement. Process-wide
+`uninstalled_loss` is separate from any installed queue's loss snapshot.
+
+The queue clock also used `std::time::Instant`, which is not a working browser
+clock on `wasm32-unknown-unknown`. Registry diagnostics now uses the existing
+`web-time` clock, matching the hosts. Native and Wasm compile gates are separate;
+compilation does not establish browser runtime acceptance.
+
+### Unfinished migrations and larger effects
+
+- **Host identity and lifetime:** requests still lack an originating
+  document/window/session/revision token. Current membership does not establish
+  presentation freshness, disambiguate a foreign-document ID alias, or protect
+  producer-key reuse across lifetimes. Producer semantic reads and activation
+  also remain separate callbacks. Qualify an owner-issued target lifetime and
+  atomic admission contract before claiming those guarantees.
+- **Projection ownership at `65adff84`:** Winit built from Genet's AccessKit projection
+  while Rootstock/browser consumed the neutral document projection, with local
+  textbox/numeric/leaf overrides. This slice shares admission, not all semantic
+  construction. Move the existing contributions into one supplier-qualified
+  semantic model, preserving geometry, clipping, disabled/read-only behavior,
+  shadow trees and actual native/browser receivers. Current AccessKit leaf
+  callbacks also receive differently seeded nodes across these paths;
+  context-sensitive callback equivalence remains unqualified.
+- **Collector installation and policy (A1154/A1156):** the bridge is callable and
+  fixture-wired; that cohort added no production `install_global_sender`, `should_emit_channel`
+  or `should_emit_and_observe` caller. The continuation above adds an explicitly
+  injected product sender and local sampling gate, without a global sink. Products must choose redaction,
+  sink lifetime/thread routing, drain scheduling, registry policy/invariants and
+  final-counter custody. A process-global OnceLock is not a per-window collector.
+  Projection callbacks must not panic; panic/durable recovery is not supplied.
+- **Other open owners:** A961 key/text routing, private selector grammar, A873
+  skeleton adoption, journal panic recovery, legacy invariant-clock result loss
+  and presentation/pixel identity remain with the previously named owners below.
+
+### Qualification
+
+237 targeted native tests pass: Rootstock 126 (three existing ignores), native
+host library 19 (four existing ignores), native accessibility receiver seven,
+Winit adapter five, browser-host native plan tests 17, Apparatus core/collector
+24 and Registry diagnostics 39. The real browser host and the diagnostics-only
+collector each compile for `wasm32-unknown-unknown`. The native receiving gate
+includes the final read-only guard and actual sibling-window refusal.
+
+The [qualification index](../../../support/family-promotion/diagnostics-admission-qualification.json)
+records commands, source/lock and seven executed binary hashes. Named final
+gates are `diagnostics-admission-final`, `diagnostics-platform-native`,
+`diagnostics-collector-clock`, `diagnostics-browser-compile` and
+`diagnostics-collector-wasm`. Earlier compile/CLI/fixture failures remain retained
+as development attempts, not successful qualification. Native/platform/browser
+checks preceded the diagnostics-only clock edge; their pins and tested sources
+are unchanged, and the final combined Registry/collector gate plus collector
+Wasm check cover that edge. The qualification index preserves both lock hashes.
+
+OS/human AT, headed/browser runtime, whole-workspace acceptance and product-wide
+installation remain separate. The sealed audit registers are unchanged.
+
+
+## Observations and semantic action continuation, 2026-10-20
+
+**Status:** contained continuation qualified on 2026-10-20; broader owner
+migrations remain open. Continues the second boundary slice in the family
+promotion plan; the completed September and October receipts below retain their
+original scope. Main refreshed to `21deb0cb` before implementation.
+
+Receipt cap: 10 MB for this continuation, within the family programme's 100 MB
+total. Reuse `C:\t\cargo-targets\mere`. Keep the sealed full-source audit
+registers unchanged; dated successor findings and qualification belong under
+`support/family-promotion/`.
+
+Read the ingress, retained store, UX mapper, scenario driver and their consumers
+before changing shared contracts. First reproduce and repair Q326 (wheel surface
+scope), Q386 (descriptor/config defaults) and Q391 (emitted channel catalogue).
+Preserve configured overrides, queue/store lifetimes and producer redaction.
+Follow one worker operation and one host-driven UI operation through admitted
+dispatch and actual owner outcome, using independent bounded readers. Record
+remaining owner migrations separately from individual defects; do not infer
+terminal success, presentation or pixel causality from acceptance or quiescence.
+
+Done when the contained regressions and selected receiving gates pass, the
+worker/UI evidence and its limits are recorded, and remaining architectural
+forks have named owners and concrete follow-ups. The graph/history and receipt
+repair sessions in the ownership repair plan remain separate work.
+
+### Findings and ownership, 2026-10-20
+
+The dated successor review is
+[`diagnostics-ownership-review.json`](../../../support/family-promotion/diagnostics-ownership-review.json).
+It preserves the sealed audit and separately tracks individual repairs and
+unfinished owner migrations. Q326 routes wheel selectors through Taproot's
+surface-enforcing resolver. Q386 derives new-channel defaults from descriptors
+without replacing existing configuration. Q391 generates emitted surface
+channels and their catalogue from one exhaustive declaration. Further contained
+repairs refuse nonfinite sampling settings, preserve fractional sampling rates,
+and prevent stale inference replies from reviving or re-journaling terminal work.
+
+| Responsibility | Current continuation | Remaining boundary |
+|---|---|---|
+| UX channel vocabulary (A1168) | One exhaustive declaration supplies emission and registration, including Inspector/Steward. | Browser-specific SurfaceId remains an adapter vocabulary. |
+| Descriptor/config policy (A1154) | Descriptor defaults seed sampling/KeepRecent count; existing configuration retains precedence. | Registry metadata does not enforce a collector's retention. |
+| Ingress and history (A1156, A870, A872) | Existing newest-rejecting ingress and oldest-evicting retained store keep their different lifetimes; inspection and receipt readers remain independent. | A collector must preserve source/boot scope and unsequenced contention/no-sink loss; ingress numbers cannot be invented as retained causal references. |
+| Inference outcomes (A869, A1155) | An explicit opt-in adapter records fixed phases and generated execution IDs through the real actor and receiving run table. Worker reply, accepted outcome and journal refusal remain distinct. | Consumers choose run identity, count/byte/age limits and export policy. This does not bound the domain run table/token transport or backfill unobserved commands. |
+| UI delivery | A retained-host fixture drives the actual wheel path and records its application callback, then samples the existing Mesquite attachment independently. | This is windowless CPU qualification, not a headed product or human AT receipt. |
+
+`InferenceLane::enable_observations` adds no automatic export or daemon.
+`observation_cursor` and `read_observations` use the existing Apparatus contract;
+`set_observation_limits` changes retention without resetting identity or loss.
+The payload omits prompts, answers, caller run names and error strings. The
+producer supplies neither a semantic revision nor a presented frame it cannot
+establish. Enabling twice refuses instead of silently discarding reader coverage.
+
+The broader semantic-action migration remains open. `A11yHost::map_parts`
+resolves against the last synced maps. At `4e4a2c8c`,
+`Host::apply_a11y_requests` dispatched node/producer actions without a fresh
+semantic admission/result boundary; the continuation above repairs that host
+seam while retaining the wider identity migration.
+Finishing it requires current-target and supported-action checks across platform,
+local automation and producer lifetimes, with attributable refusal/outcome tests.
+This is a separate API/receiving migration, beyond the contained repair pass.
+
+Mesquite also restates Taproot's private selector grammar in `wheel::parse_selector`,
+and key/input-text verbs take the narrower runner route (A961). Product `act`
+and click booleans remain dispatch-handling facts, not unique-target or terminal
+success receipts. The Apparatus skeleton and real inspection coexist (A873).
+Presentation ordinals still require their run/host/context scope; attaching a
+batch does not establish pixel correlation. These are named follow-ups, not
+claims that the shared semantic application migration is finished.
+
+The Registry gate remains an explicit API, not an installed process-wide filter.
+At that earlier source, Mere had no production caller of
+`should_emit_and_observe` or `should_emit_channel`, and no production
+`install_global_sender` call. Djinn's new explicitly injected lifecycle source
+and local sampling gate are recorded in the continuation above. The
+nonblocking emitter does not consult the mutable registry automatically. The
+sampling repairs therefore qualify that owner API; connecting producer policy,
+bounded ingress and retained readers is still a host/collector migration.
+
+A further source-confirmed failure-contract gap remains in
+`descriptor::registry::legacy_violations`: an invariant clock error is mapped to
+an empty violation vector. The keyed API exposes its typed error. Promoting that
+truthful result through the legacy FIFO/public caller contract belongs with the
+invariant adapter migration (A1155); an empty vector must not be treated as proof
+that a valid inspection found no violation. No runtime reproduction of that
+additional candidate is claimed by this pass.
+
+The inference table also assumes its mutex is never poisoned while invoking
+owner journal callbacks under that guard. A panicking journal can violate that
+assumption; recovering a guard alone cannot establish whether an external write
+committed. This remains a source candidate for the journal/lifecycle owner,
+requiring panic and durable-recovery controls. The qualified controls here use
+returned journal errors and actor panic outside that guarded callback.
+
+### Qualification and progress, 2026-10-20
+
+178 targeted native tests pass on the current Windows/Rust 1.99.1 source:
+Apparatus core/serde 18, registry diagnostics 39, UX events 38, Mesquite 35,
+Distillery library 42, inference observations 4, inference shutdown 1 and
+lifecycle 1. The actor controls cover real threaded dispatch/replies using
+deterministic providers, journal refusal after successful generation, cancellation,
+actor loss and stale/unknown replies through the actual bridge. The retained-host
+wheel control preserves request errors and observes the callback's real effect.
+
+The three command receipts are `diagnostics-core-online.json`,
+`diagnostics-mesquite-current.json` and `diagnostics-inference-current.json` under
+`support/family-promotion/`. The
+[qualification index](../../../support/family-promotion/diagnostics-qualification.json)
+retains their exact source, lock and eight executed binary hashes. Setup attempts
+remain distinct: early interrupted
+Genet materialization, package-cache waits and missing offline sources executed
+no qualifying tests. The completed Cargo-owned checkout is retained. All builds
+reuse `C:\t\cargo-targets\mere`; this pass creates no isolated target, Cargo home
+or worktree.
+
+The selected gates all use `--locked`. `diagnostics-lock-inventory.json` records
+one canonical source for each of 22 promoted packages in the lockfile; its only
+task change is the Distillery-to-Apparatus edge. This is a locked-source inventory,
+not all-target runtime qualification. A separate all-target metadata attempt
+could not download uncached `accesskit_ios` in offline mode and is retained as
+preparation evidence. Model/GPU, headed product, browser and human AT acceptance
+remain separate, as do full command-refusal coverage and the migrations above.
+
 ## Current design: shared observations, 2026-09-29
 
 **Status:** first diagnostics implementation qualified by focused Mere tests.

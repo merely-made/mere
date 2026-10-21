@@ -1,7 +1,7 @@
 # Foundation family promotion
 
 **Date:** 2026-10-19
-**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19; observations/action evidence, custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
+**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19. A contained observations/action-evidence continuation qualified on 2026-10-20 in the diagnostics plan; broader semantic/collector migrations remain open. Custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
 **Receipt budget:** 100 MB total across this migration. Keep compact command summaries and source hashes; do not copy model weights, build trees or historical audit receipts.
 
 ## Decision
@@ -197,7 +197,9 @@ The owner clarified that names and umbrella repositories are secondary. The
 objective is one implementation per shared responsibility, with explicit
 ownership of state, permissions, execution, lifetime and reported outcomes.
 The scope below defines separate acceptance gates. Execution/shutdown progress
-and qualification are recorded at the end; the other lanes remain scoped. The
+and qualification are recorded at the end; the diagnostics plan records the
+2026-10-20 contained observations/action-evidence continuation and remaining
+owner migrations. Custody/process and source-home lanes remain scoped. The
 completed source promotion above remains its own checkpoint.
 
 ### Responsibility boundaries
@@ -269,6 +271,79 @@ the lane still journals or acknowledges work after its actor has disconnected.
 
 ### Second implementation slice: observations and semantic action evidence
 
+Current-target/collector continuation (2026-10-20, qualified): the
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#current-target-admission-and-collector-bridge-2026-10-20)
+records fresh host admission and explicit routing results, plus the opt-in
+Registry-to-Apparatus bridge: 237 targeted native tests pass with seven existing
+ignores, plus browser-host and collector Wasm compilation. Product startup
+wiring, target lifetime tokens and
+shared semantic construction remain open.
+
+Shared DOM semantics/product continuation (2026-10-20, qualified):
+Winit consumes Rootstock's DOM projection, and Djinn's lifecycle source wires
+an opt-in product-projected collector into its admitted status reader. 191
+targeted native passes/seven existing ignores and browser-host Wasm compilation
+qualify the bounded supplier and product paths, including a real CLI client
+process against the admitted fixture broker. Shared
+leaf/producer semantics, target lifetimes and process-final evidence were
+separately tracked for that historical cohort.
+
+Shared leaf/producer continuation (2026-10-20, qualified): native,
+browser and admission now consume one Rootstock host composition over the
+existing AccessKit-shaped provider contracts. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-leaf-and-producer-composition-2026-10-20)
+tracks repairs to numeric leaf lowering, producer IDs/action maps, restrictive
+state, hidden focus, duplicate producer DOM bindings and missing/invalid geometry.
+Seventy affected native receiving tests pass on integrated main, with four
+existing ignores, plus browser-host Wasm compilation. The earlier broad cohort
+has 190 passes/seven existing ignores on its preserved pre-repin basis. Neutral contributor contracts, mutable
+read/act boundaries, target lifetimes, broader Hest action routing and
+process-final diagnostic evidence remain open.
+
+Flattened producer discovery (2026-10-20, qualified): GPU preparation, portable
+capture, leaf size reads and semantic routing share Genet's flattened child
+selection through one Rootstock traversal. Shadow and assigned-slot producers
+now reach rendering/capture; masked fallback and unassigned light nodes cannot
+become competing owners. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#flattened-producer-discovery-2026-10-20)
+records 112 targeted native passes/five existing ignores and browser-host Wasm
+compilation on source-frozen main `24b079538`, including sampled headless GPU
+pixels, fallback rebinding, retirement and native/browser action mapping.
+Full producer coordinate mapping, read-only semantic observations, target
+lifetimes and broader action routing remain separate migrations.
+
+Producer content-origin repair (2026-10-20, qualified): generated children and
+their action bounds now use Genet's content-box origin in the existing
+untransformed, scroll-adjusted observation space. This removes the border and
+padding displacement from rendered producer pixels. On integrated main
+`e94cb23e8`, 115 targeted native tests pass with five existing ignores, plus
+browser-host Wasm compilation. Sampled headless pixels, both scroll planes,
+native action bounds and scaled browser boxes receive the repair. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-content-origin-2026-10-20)
+keeps full forward transform/clip and flattened-ancestor mapping with the
+supplier; no duplicate CSS placement implementation is introduced in Mere.
+
+Producer semantic identity validation (2026-10-21, qualified): one shared
+preflight refuses duplicate child keys, per-child action IDs and platform-ID
+collisions before mutating any contribution or route. Native/browser publication
+and current-target admission receive the same policy. Frozen main `8942e3050`
+passes 122 targeted native tests/five existing ignores and browser-host Wasm
+compilation. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-semantic-identities-2026-10-21)
+keeps immutable observations, target generations and report/collector adoption
+open; the stable ID hash is not a generation token or collision-free allocator.
+
+Read-only observation and selector continuation (2026-10-21): provider callbacks
+and composition use shared borrows; the content owner allocates retained keys.
+Taproot's borrowed lookup now receives leaf/producer contributions in the Harness
+and Mesquite, with explicit generated target identity and host-written routing
+acknowledgements. The browser and selector role-spelling duplication is retired
+through an optional contract bridge without adding a renderer dependency to
+Taproot. Exact qualification and remaining acceptance are recorded in the
+[shared selector receiving](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-selector-receiving-2026-10-21)
+section. Registry publication and other product adoption remain separate. Target
+lifetimes are next, followed by broader actions and supplier forward geometry.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse
@@ -279,13 +354,38 @@ separate from Apparatus's independent-reader retained history. Preserve each
 layer's configured count/byte/age limits, rejection policy and loss accounting.
 No universal event enum, global semantic revision or new diagnostics daemon.
 
-Take one real worker operation and one UI operation through their existing
-owners. Connect source/run/operation identity, action admission, terminal reply
-and optional semantic/frame evidence where the producer can establish them.
-Taproot selectors and Mesquite driving continue to consume the host's retained
-projection and geometry. UxTree's Inker-specific projections and ux-events'
-browser vocabulary remain adapters; generic core users must not inherit them.
-Diagnostics and local automation must continue to work without Djinn running.
+The selected worker/UI evidence paths have already been qualified in the
+[observations continuation](2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20):
+Distillery records real actor replies and journal refusals, and the retained-host
+wheel fixture records its application callback. Continue from those paths and
+the later DOM/collector repairs rather than repeat their initial implementation.
+Their CPU receipts do not establish headed product completion or pixel causality.
+
+**Command-contract owner:** the
+[Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
+owns shared declaration, invocation and outcome vocabulary. H1–H4 now have
+their own published delivery/receiving cohorts, including H3's nonterminal
+acceptance and H4's script/automation adapters. This diagnostics continuation consumes
+that owner instead of defining another command catalogue or outcome protocol.
+Keep Hest independent of Chirograph, Apparatus and application runtimes.
+
+Hosts and Chirograph retain authorization, confirmation, current-target and
+session/document/revision lifetime validation, dispatch and execution. Hest's
+effect/destructive declarations describe commands; they do not grant permission.
+An accepted invocation or handled input establishes admission/dispatch only.
+A terminal completion requires the executing owner's actual reply; the current
+Chirograph `IntentResult::Accepted` must not convert to terminal `Done`.
+Apparatus records a redacted copy of those facts using producer-supplied
+operation/source scope, with its existing independent readers and loss bounds.
+
+The remaining action migration must carry that distinction through the Hest
+owner's two-host and Chirograph round-trip gates, then through a selected current
+target's automation/platform adapters. Replaced or expired targets must refuse;
+unsupported, stale, ambiguous, cancelled and failed operations must retain their
+actual results. Taproot and Mesquite consume the host's retained projection and
+geometry. UxTree's Inker-specific projections and ux-events' browser vocabulary
+remain adapters; generic users must not inherit them. Diagnostics and local
+automation must continue to work without Djinn running.
 
 Done when the two paths produce bounded, redacted evidence with independent
 inspection/test readers; unsupported, stale, ambiguous, cancelled and failed
@@ -569,3 +669,79 @@ hashes, exact commands, exit results and the failed pre-repair controls. These
 are CPU/source checks; native UI, physical audio/radio, heavy models and the
 Knot checkpoint lane keep their own acceptance records. Q112/Q113 pool admission
 and worker lifetime remain open.
+
+
+### Embedding compatibility receiving cohort (2026-10-20)
+
+The resident I10 receiving build exposed parallel exact-revision Eidetic and
+Chartulary types through older Knot, Cleromancy, Gemot and Murm manifests. A
+root-only pin change could resolve metadata but could not compile the actual
+consumer interfaces. The retained schema is Eidetic `34105d63`; the guarded
+ESP implementation is `6d371901`. The manifest intakes were published first,
+then Mere `fb56a2ae1` supplied the receiving SDK, followed by standalone lock
+refreshes. No local Cargo overrides remain in the qualified graph.
+
+The canonical receipt is
+`support/receipts/resident-embedding-20261020/qualification.json`; its
+`qualified_git_graph` records exact tested inputs and
+`supplier_lock_receiving_heads` records the subsequent lock closure. Six roots
+(Knot, Gemot, Cleromancy root/core, Murm native/Signalman) pass locked metadata
+with one Eidetic source per package. Those checks establish source resolution;
+the compiled behavioral qualification is the resident I10 gate. They do not
+assert unfiltered standalone application suites. Later manifest/lock commits
+carry the same code and SDK/artifact revisions as the qualified receiving
+closure. Frozen earlier promotion and native receipts remain unchanged.
+
+
+### Apparatus portable-core extraction, 2026-10-21
+
+The portable bounded observation store and renderer-independent inspection data
+now have one implementation in `apparatus-core`, a sibling crate in Armillary
+at `75643df1f178757bb7b6386913af1a39353f3069`. Its default library uses only
+`std`; optional Serde is its only library dependency. It does not depend on
+Armillary's actor package, Tokio, Mere, Registry, AccessKit or UxTree.
+
+Mere retains `mere-apparatus` as its integration facade: existing public types
+are re-exported, the `serde` feature forwards to the shared core, and the
+Registry collector, structural accessibility projection and default projection
+behavior remain in Mere. The old store and portable inspection implementations
+are removed from Mere. Hest vocabulary, command admission/execution, producer
+redaction, retention/export decisions and persistence authority are unchanged.
+Armillary's existing execution package pin is independent and stays qualified;
+adding this sibling crate does not require an actor-source migration.
+
+The donor is Mere `8942e30503f2fa91fdefe879ec5268ee42a5241a`. Source hashes
+prove the observation implementation/tests were moved verbatim; inspection
+removes only its Mere projection blocks and the resulting blank seam. All 18
+portable tests move with their implementation. Receiving proof checks shared
+Rust type identity and the original serialized batch/cursor values, including
+Unicode payload bytes, eviction and scoped cause metadata. The independent
+Git consumer exercises the default core without the Mere facade or a runtime.
+
+Compact source, command and publication evidence belongs in
+`support/family-promotion/apparatus-core-extraction.json`. These source/CPU
+checks do not establish new native UI, physical-device or durable audit-log
+qualification. The shared core remains a bounded observation copy; products
+retain authoritative execution results and persistence.
+
+
+Apparatus extraction receiving qualification is complete. Armillary's default
+and Serde configurations pass the 18 transferred core tests on Rust 1.97.1;
+its existing 19 execution tests also pass. Mere passes ten retained projection/
+collector tests plus two public-type/wire controls, Distillery's 42 library and
+five observation/shutdown tests, Djinn's four resident-event tests, and
+Mesquite's 39 library tests. The standalone Git consumer runs on Rust 1.97.1
+with no normal dependency beyond `apparatus-core`. Four selected locked roots
+revalidate; the optional Distillery probe does not consume the core in its
+default resolved graph.
+
+The supplier core is pushed at Armillary `75643df1`. Mere's integration is
+pushed at `7edfe3b0`, preserving concurrent producer-identity refusal and native
+co-op/save-recovery work. The final facade rerun passes on that integrated
+source. Turnstone's actual diagnostics, redaction and projection paths pass 16
+focused tests against the canonical Git supplier, and its receiving lock/receipt
+are pushed at `fc7a3e49`. Its product sources and dependency declarations are
+unchanged. Cargo also reselected an already-present Windows dependency in 16
+lock entries; this is recorded in the receiving receipt, with no unrelated
+package-version or source changes. The qualified code pins remain fixed as
+later documentation-only records are published; no recursive repin is needed.

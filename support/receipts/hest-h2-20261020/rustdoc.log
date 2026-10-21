@@ -1,0 +1,6 @@
+    Blocking waiting for file lock on build directory
+    Checking hest v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/hest-0_1)
+ Documenting hest v0.2.0 (/Users/markik/Code/repos/mere/crates/cambium/hest)
+ Documenting command-menu v0.1.1 (/Users/markik/Code/repos/mere/crates/cambium/command-menu)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.81s
+   Generated /Users/markik/Code/repos/mere/target/doc/command_menu/index.html and 1 other file

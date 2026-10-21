@@ -1,0 +1,7 @@
+{"at_ms":1792543447002,"event":"started","installed":false,"pid":60232,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792543447003,"creating":false,"event":"waiting-for-unlock","pid":60232,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792543447228,"event":"unlocked-at-start","pid":60232,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/agent.sock","app":"/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/app.sock","at_ms":1792543447239,"browser":"/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/browser.sock","event":"listening","pid":60232,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792543447245,"event":"ready","pid":60232,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792543460778,"event":"stopping","pid":60232,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792543460807,"event":"stopped","ok":true,"pid":60232,"reason":"stop intent","schema":"djinn.resident-events/v1"}

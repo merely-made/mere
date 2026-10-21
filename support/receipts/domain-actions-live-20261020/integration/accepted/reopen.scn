@@ -1,0 +1,8 @@
+await {"status":"ready","attached":"2ad7a02c-42db-4597-8902-c216e9072bda"}
+wait 30000
+click role:button @data-key=d6b4c532-f18d-4fe3-83ae-6afdc528d049
+await {"selected":"d6b4c532-f18d-4fe3-83ae-6afdc528d049"}
+wait 30000
+wheel 0 10000 px on .mere-record
+settle 2
+capture /Users/markik/Code/output/live-owner-actions-delivery-20261020/acceptance/reopened.png

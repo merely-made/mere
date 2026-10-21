@@ -289,7 +289,15 @@ fn a_canary_catches_a_write_under_its_root() {
 }
 
 /// C3: killing the process that holds the run leaves nothing it spawned.
+///
+/// Linux's parent-death signal and Windows' job object provide this; other
+/// platforms read no process start times and have no such mechanism until the
+/// remote runner (H5), so the control does not apply there.
 #[test]
+#[cfg_attr(
+    not(any(target_os = "linux", windows)),
+    ignore = "C3 needs parent-death cleanup and process start times; none here until H5"
+)]
 fn killing_the_test_process_leaves_no_spawned_process() {
     if role().is_some() {
         return;

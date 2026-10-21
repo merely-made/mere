@@ -7,7 +7,7 @@
 //! Selector clicks shared by Cambium's scenario runners.
 
 use cambium_rootstock::{AppCtx, HostPointer, NodeId, ScrollAlign, meristem_bounds::RootView};
-use taproot::Selector;
+use taproot::{Selector, SemanticTarget};
 
 /// Holds a clipped target until the host has laid out its scroll request.
 /// Pump [`after_frame`](Self::after_frame) before ticking the scenario. A
@@ -15,9 +15,14 @@ use taproot::Selector;
 #[derive(Default)]
 pub struct Clicks {
     pending: Option<(NodeId, Selector)>,
+    produced: Option<(Selector, cambium_rootstock::A11yReceipt)>,
 }
 
 impl Clicks {
+    pub(crate) fn is_pending(&self) -> bool {
+        self.pending.is_some() || self.produced.is_some()
+    }
+
     /// Match roles/names against the host's semantic projection; explicit
     /// class/text selectors keep their DOM meaning. Click a visible target or
     /// substantial visible part of a tall textbox. Otherwise reveal it and
@@ -34,15 +39,37 @@ impl Clicks {
         Logic: FnMut(&State) -> V,
         V: RootView<State>,
     {
-        let Some(projection) = ctx.a11y_projection() else {
+        if self.is_pending() {
+            return false;
+        }
+        let Some(projection) = ctx.semantic_projection() else {
             return false;
         };
-        let nodes = taproot::matching_prefer_exact_with_projection(
+        let lookup = taproot::AccessKitLookup::new(&projection.tree, |id| projection.dom_node(id));
+        let nodes = taproot::matching_prefer_exact_with_lookup(
             &ctx.runner.dom().borrow(),
             selector,
-            &projection,
+            &lookup,
         );
+        // A virtual action button has no physical pointer target. Queue its
+        // explicit route and require the host's acknowledgement next frame.
+        if let Some(SemanticTarget::Contributed(id)) = nodes.first() {
+            let Some(action) = projection.produced_action(*id) else {
+                return false;
+            };
+            self.produced = Some((
+                selector.clone(),
+                ctx.queue_a11y(cambium_rootstock::A11yRequest::produced(
+                    cambium_rootstock::A11yAction::Click,
+                    action.clone(),
+                )),
+            ));
+            return true;
+        }
         let Some((node, rect)) = nodes.into_iter().find_map(|node| {
+            let SemanticTarget::Dom(node) = node else {
+                return None;
+            };
             ctx.painted_rect(node)
                 .filter(|r| r.2 > 0.0 && r.3 > 0.0)
                 .map(|rect| (node, rect))
@@ -50,12 +77,12 @@ impl Clicks {
             return false;
         };
         let visible = ctx.visible_rect(node);
-        let is_textbox = taproot::matching_with_projection(
+        let is_textbox = taproot::matching_with_lookup(
             &ctx.runner.dom().borrow(),
             &Selector::role("textbox"),
-            &projection,
+            &lookup,
         )
-        .contains(&node);
+        .contains(&SemanticTarget::Dom(node));
         // A tall editor already has enough visible space to focus without
         // scrolling its toolbar away. Other controls retain reveal behavior.
         const USABLE_HEIGHT: f32 = 44.0;
@@ -89,17 +116,31 @@ impl Clicks {
         Logic: FnMut(&State) -> V,
         V: RootView<State>,
     {
+        if let Some((selector, receipt)) = self.produced.take() {
+            return match receipt.result() {
+                Some(cambium_rootstock::A11yDispatch::Dispatched) => Ok(true),
+                Some(result) => Err(format!("click {selector:?}: semantic routing {result:?}")),
+                None => {
+                    // One host drain is required before the next presented frame.
+                    Err(format!(
+                        "click {selector:?}: host did not acknowledge semantic routing"
+                    ))
+                },
+            };
+        }
         let Some((node, selector)) = self.pending.take() else {
             return Ok(false);
         };
         if matches!(selector.matcher, taproot::Match::Role(_)) {
-            let still_matches = ctx.a11y_projection().is_some_and(|projection| {
-                taproot::matching_prefer_exact_with_projection(
+            let still_matches = ctx.semantic_projection().is_some_and(|projection| {
+                let lookup =
+                    taproot::AccessKitLookup::new(&projection.tree, |id| projection.dom_node(id));
+                taproot::matching_prefer_exact_with_lookup(
                     &ctx.runner.dom().borrow(),
                     &selector,
-                    &projection,
+                    &lookup,
                 )
-                .contains(&node)
+                .contains(&SemanticTarget::Dom(node))
             });
             if !still_matches {
                 return Err(format!(

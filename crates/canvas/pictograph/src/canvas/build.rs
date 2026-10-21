@@ -94,7 +94,10 @@ fn build_node_sheet() -> Vec<String> {
              color: var(--node-selected-fg); box-shadow: 0 0 0 2px var(--node-caption-fg), 0 4px 10px rgba(0, 0, 0, 0.35); }}"
         ),
         format!(".gnode-site {{ {GNODE_BOX} color: rgb(20, 22, 30); }}"),
-        ".gnode-retained { border-bottom: 2px dashed var(--node-caption-fg); }".to_string(),
+        // Retained nodes keep an underline on the native paint-list path,
+        // whose border lowering supports solid sides. A dashed side refuses
+        // the whole canvas scene rather than just this decoration.
+        ".gnode-retained { border-bottom: 2px solid var(--node-caption-fg); }".to_string(),
         ".gnode-suggestion { opacity: 0.6; }".to_string(),
         ".gnode-quiet .gcaption { display: none; }".to_string(),
         // A suggestion's mark, the person's choice: dot and ring are bare, word keeps

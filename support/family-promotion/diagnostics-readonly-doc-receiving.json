@@ -1,0 +1,25 @@
+{
+  "status": "no new D2 errors",
+  "baseline_count": 40,
+  "current_count": 40,
+  "added_errors": [],
+  "removed_errors": [],
+  "touched_docs": [
+    {
+      "path": "design_docs/DOC_README.md",
+      "sha256": "6280a842344948bba46c86fd399321a1ae145adfc9d1cd1c82cddde5910c3d62"
+    },
+    {
+      "path": "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md",
+      "sha256": "fa94b5e788dcd2604181393a68878f60fe042d463f36d4b4a86a39f1ac439543"
+    },
+    {
+      "path": "design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md",
+      "sha256": "304b3439663a7d2a2ebf74b076cd5d98dda5848364c5fa4387ded6a136cf9d7d"
+    },
+    {
+      "path": "support/doc-audit/d2/batch_94_diagnostics_semantics_qualification.md",
+      "sha256": "34a1e3729253bcc1e045c16e0efe371def81546b849239d7e7fcef945281fdea"
+    }
+  ]
+}

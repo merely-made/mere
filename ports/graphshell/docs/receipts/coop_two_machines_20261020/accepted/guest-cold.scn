@@ -1,0 +1,5 @@
+await {"coop-status": "~Revoked", "coop-available": "false", "nodes": "0", "sessions": "0", "archives": "0"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-c2-20261020-05/guest/evidence/guest-cold-denied.png

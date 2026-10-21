@@ -13,7 +13,7 @@
 #![cfg(feature = "inference")]
 
 mod common;
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
+#[path = "fixtures/esp/decoder.rs"]
 mod decoder_fixture;
 
 use std::sync::Arc;
@@ -37,6 +37,7 @@ use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {
     Some(InferenceLaneSettings {
+        embedding: None,
         recall: Default::default(),
         model: InferenceModelSettings::Stub,
     })
@@ -79,7 +80,7 @@ async fn save_library(data_root: &std::path::Path) -> eidetic::ManifestId {
     .await
     .unwrap();
     let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        "fixtures/esp/smollm2-instruct-v1.json"
     ))
     .unwrap();
     template.system_prompt.clear();
@@ -144,6 +145,7 @@ async fn exercise_route(library_model: bool) {
         let expected = provider.bound().generate_prepared(&prepared).unwrap();
         (
             Some(InferenceLaneSettings {
+                embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
                     row: row.to_string(),
@@ -368,6 +370,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     assert_eq!(save_library(&data_b).await, row);
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
@@ -655,15 +658,19 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
             .unwrap()
             .to_seed(),
     );
-    let sibling_operation = journal_b
+    // The journal rejects an operation whose checkpoint parent it has not
+    // seen, so carry the sibling's whole chain in order, not only its tip.
+    let sibling_operations: Vec<_> = journal_b
         .operations()
         .await
         .unwrap()
         .into_iter()
         .filter(|op| op.header.verifying_key == sibling_key.verifying_key())
-        .last()
-        .unwrap();
-    journal_a.accept(&sibling_operation).await.unwrap();
+        .collect();
+    assert!(!sibling_operations.is_empty(), "the sibling wrote nothing");
+    for operation in &sibling_operations {
+        journal_a.accept(operation).await.unwrap();
+    }
     host_a.set_roster(roster.clone()).await;
 
     wait_run(
@@ -1099,6 +1106,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     let row = save_pinned_answer_model(&data_root).await;
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
@@ -1262,7 +1270,8 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     let checkpoint: serde_json::Value = serde_json::from_slice(&checkpoint).unwrap();
     let prompt = checkpoint["request"]["prompt"].as_str().unwrap();
     assert!(prompt.contains(text_a));
-    assert!(prompt.contains(&supplied.passage.version));
+    assert!(!prompt.contains(&supplied.passage.version));
+    assert!(!prompt.contains(&supplied.passage.source.source));
     assert!(prompt.contains("[1]"));
     assert!(!prompt.contains(text_b));
     let source_revision_before = lane.generation();
@@ -1386,7 +1395,7 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     let directory =
         std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
     let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "../../../crates/intel/esp/tests/smollm2_360m_reference.json"
+        "fixtures/esp/smollm2_360m_reference.json"
     ))
     .unwrap();
     let read = |name: &str| {
@@ -1427,7 +1436,7 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     .unwrap();
     drop(weights);
     let template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        "fixtures/esp/smollm2-instruct-v1.json"
     ))
     .unwrap();
     let template = save_typed(
@@ -1491,8 +1500,57 @@ async fn serve_trained_model_for_headed_turnstone() {
         std::fs::write(&row_file, serde_json::to_vec(&row).unwrap()).unwrap();
         row
     };
+    // Optional embedding qualification uses the same ordinary headed fixture,
+    // source publication and private journal as trained lexical recall.
+    let embedding = std::env::var_os("DJINN_HEADED_EMBEDDING_DIR").map(|directory| {
+        assert!(cfg!(feature = "inference-embedding"));
+        assert!(
+            private_root.is_some(),
+            "embedding gate requires a retained root"
+        );
+        let file = output.join("embedding-model.json");
+        let model: eidetic::ManifestId = if phase == Some(1) {
+            serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap()
+        } else {
+            let directory = std::path::PathBuf::from(directory);
+            let path =
+                djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+            let mut store = muniment::RedbBackend::open(path).unwrap();
+            let model = pollster::block_on(eidetic::ModelLibrary::save_model_with_components(
+                &mut store,
+                "sentence-transformers/all-MiniLM-L6-v2",
+                "bert",
+                "Apache-2.0",
+                serde_json::from_slice(&std::fs::read(directory.join("config.json")).unwrap())
+                    .unwrap(),
+                &std::fs::read(directory.join("model.safetensors")).unwrap(),
+                &std::fs::read(directory.join("tokenizer.json")).unwrap(),
+                vec![],
+                vec![],
+                eidetic::PrivacyClass::LocalOnly,
+                eidetic::ProvenanceRecord::self_imported(
+                    "headed retained-source embedding qualification",
+                ),
+                eidetic::TrustEnvelope::self_asserted(),
+                eidetic::Timestamp::ZERO,
+            ))
+            .unwrap();
+            std::fs::write(&file, serde_json::to_vec(&model).unwrap()).unwrap();
+            model
+        };
+        distillery::inference::recall::EmbeddingRecallSettings {
+            provider: distillery::inference::recall::EmbeddingRecallProvider::Library {
+                model: model.to_string(),
+            },
+            max_index_bytes: 8 * 1024 * 1024,
+            lexical_weight: 1,
+            vector_weight: 1,
+            rrf_k: 60,
+        }
+    });
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: embedding.clone(),
             recall: distillery::inference::recall::RecallConfig {
                 max_passages: 1,
                 ..Default::default()
@@ -1543,20 +1601,34 @@ async fn serve_trained_model_for_headed_turnstone() {
             .unwrap()
             .unwrap();
         grants.grant(AppId::new("turnstone"), route);
+        // Opt-in receiving fixture: the same broker supplies the normal
+        // wallet-backed clip custody route alongside inference. Both cold
+        // processes use this marked wallet; no host-side fallback key exists.
+        let keeper = Arc::new(djinn::keeper::Keeper::new(keeper_host()));
+        if let Some(root) = std::env::var_os("DJINN_HEADED_CLIP_CUSTODY") {
+            let root = std::path::PathBuf::from(root);
+            assert_eq!(
+                std::fs::read_to_string(root.join("fixture-marker")).unwrap(),
+                "retained-embedding-20261020\n"
+            );
+            let persona = pandect::PersonaId::from_uuid(uuid::Uuid::from_u128(0xe1de_2026_1020));
+            castellan::custody::wallet::ensure_wallet_state(
+                &root,
+                persona,
+                "Retained recall fixture",
+            )
+            .unwrap();
+            keeper
+                .configure_payload_custody(personae::ProfileId("default".into()), persona, root)
+                .unwrap();
+            djinn::custody::grant(&grants).unwrap();
+        }
         let server = {
             let endpoint = endpoint.clone();
             let grants = grants.clone();
             let catalog = catalog.clone();
             tokio::spawn(async move {
-                let _ = serve_app_broker(
-                    &endpoint,
-                    Arc::new(djinn::keeper::Keeper::new(keeper_host())),
-                    grants,
-                    1_200_000,
-                    None,
-                    catalog,
-                )
-                .await;
+                let _ = serve_app_broker(&endpoint, keeper, grants, 1_200_000, None, catalog).await;
             })
         };
         // Prove the application endpoint is accepting before announcing readiness.
@@ -1574,8 +1646,14 @@ async fn serve_trained_model_for_headed_turnstone() {
         )
         .unwrap();
         let deadline = tokio::time::Instant::now() + Duration::from_secs(1200);
+        let mut last_observation = Vec::new();
         loop {
             let runs = lane.runs();
+            let observation = serde_json::to_vec_pretty(&runs).unwrap();
+            if observation != last_observation {
+                std::fs::write(output.join(format!("live-runs-{phase}.json")), &observation).unwrap();
+                last_observation = observation;
+            }
             if runs.runs.len() >= 2
                 && runs
                     .runs
@@ -1622,6 +1700,20 @@ async fn serve_trained_model_for_headed_turnstone() {
                     )
                     .unwrap();
                 }
+                if phase == 1
+                    && !output.join("embedding-cold-ask.json").exists()
+                    && run.state == RunStateV1::Finished
+                    && run.recall.as_ref().is_some_and(|r| {
+                        !r.citations.is_empty()
+                            && r.embedding.as_ref().is_some_and(|e| e.cache == "reopened")
+                    })
+                {
+                    std::fs::write(
+                        output.join("embedding-cold-ask.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
                 if run.state == RunStateV1::Cancelled && !output.join("cancelled.json").exists() {
                     std::fs::write(
                         output.join("cancelled.json"),
@@ -1663,7 +1755,23 @@ async fn serve_trained_model_for_headed_turnstone() {
                         .unwrap()
                         .cmp(b["record"]["run"].as_str().unwrap())
                 });
-                snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence}));
+                let projections = std::collections::BTreeMap::<String, serde_json::Value>::new();
+                #[cfg(feature = "inference-embedding")]
+                let mut projections = projections;
+                #[cfg(feature = "inference-embedding")]
+                for run in &runs.runs {
+                    if let Some(e) = run.recall.as_ref().and_then(|r| r.embedding.as_ref()) {
+                        let bytes = journal
+                            .load_embedding_projection(e.envelope, 8 * 1024 * 1024)
+                            .unwrap()
+                            .unwrap();
+                        assert_eq!(eidetic::ManifestId::of_blob(&bytes), e.index);
+                        let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+                        assert_eq!(value["envelope"]["space"]["dimensions"], 384);
+                        projections.insert(e.envelope.to_string(), serde_json::json!({"index":e.index,"envelope":value["envelope"],"persisted_bytes":bytes.len()}));
+                    }
+                }
+                snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence,"embedding_projections":projections}));
                 break;
             }
             assert!(
@@ -1699,6 +1807,74 @@ async fn serve_trained_model_for_headed_turnstone() {
         serde_json::to_vec_pretty(&receipt).unwrap(),
     )
     .unwrap();
+    if embedding.is_some() {
+        let first = snapshots[0]["runs"]["runs"].as_array().unwrap();
+        let warm = first.iter().find(|r| r["state"] == "finished").unwrap();
+        let cold = snapshots[1]["runs"]["runs"].as_array().unwrap();
+        let restored = cold.iter().find(|r| r["run"] == warm["run"]).unwrap();
+        assert_eq!(
+            restored, warm,
+            "cold reopen preserves the historical answer and exact citations"
+        );
+        let new = cold
+            .iter()
+            .find(|r| r["state"] == "finished" && r["run"] != warm["run"])
+            .unwrap();
+        assert_eq!(warm["recall"]["embedding"]["cache"], "built");
+        assert_eq!(new["recall"]["embedding"]["cache"], "reopened");
+        for field in ["envelope", "index"] {
+            assert_eq!(
+                new["recall"]["embedding"][field],
+                warm["recall"]["embedding"][field]
+            );
+        }
+        assert_eq!(new["recall"]["passages"], warm["recall"]["passages"]);
+        // The app has exited before these snapshots: its publisher withdraws
+        // live heads. Validate citation admission from the live observations,
+        // while comparing the immutable historical evidence below separately.
+        let live_warm: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(output.join("finished.json")).unwrap()).unwrap();
+        let live_cold: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(output.join("embedding-cold-ask.json")).unwrap())
+                .unwrap();
+        assert!(
+            !live_warm["recall"]["citations"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        assert!(
+            !live_cold["recall"]["citations"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(
+            live_warm["recall"]["passages"],
+            live_cold["recall"]["passages"]
+        );
+        assert_eq!(
+            snapshots[0]["embedding_projections"],
+            snapshots[1]["embedding_projections"]
+        );
+        let old = snapshots[0]["evidence"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["record"]["run"] == warm["run"])
+            .unwrap();
+        let restored = snapshots[1]["evidence"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["record"]["run"] == warm["run"])
+            .unwrap();
+        assert_eq!(
+            old, restored,
+            "historical sealed source and prompt evidence is immutable"
+        );
+        return;
+    }
     assert!(saw_stream && saw_pause);
     let first = &snapshots[0]["runs"]["runs"];
     let finished = first

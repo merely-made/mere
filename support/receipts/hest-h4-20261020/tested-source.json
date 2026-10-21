@@ -1,0 +1,26 @@
+{
+  "h4_code_commit": "a5878051a87580fb9373993cfb4f7bbc9c78d652",
+  "reconciled_runtime_commit": "4927aae86760444e1a06563606de1d347839629d",
+  "canonical_supplier": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "files": {
+    "Cargo.lock": "544e583278e86cdcf9c5e066b2aa7311cb7a174299b89fbadcf4f391afdb3b35",
+    "crates/cambium/mesquite/src/command.rs": "f26f3170a07aaa47d8c1bb08782ce87dc2bf320e92fe88994b17f212c6e4f797",
+    "crates/cambium/mesquite/src/command/tests.rs": "9f3e5e30ca24abb1697ed7f002982f3d7258b44c9d2721d08a20f0a96c88d063",
+    "crates/cambium/mesquite/src/lane.rs": "d536750df66e6ab680d47bdb3ed52f36460d5fce22e50190fddab9d00417727c",
+    "crates/cambium/mesquite/src/lib.rs": "211ae767efa9ee59389670fe4441f870bcc34f4c0a1cfe2fa3327673f19c57e5",
+    "crates/cambium/mesquite/src/probe.rs": "48d4bb9d4a8106d51ad7cce4cb586aa0e6f7e9c87d88f1e5887046bdd2d87123",
+    "crates/script/rhai/Cargo.toml": "942f15068273c9a28a625962959ee1f1c04da4cca8ee9edb82b99eaa569e3cd7",
+    "crates/script/rhai/src/command.rs": "bd9b479aaa818bdaa1787560b1997d76485ccf163e545dc0fab1d9712dc6018d",
+    "crates/script/rhai/src/command/tests.rs": "42100e705418190bd53d2fba0e27cd5f207bd93f670886ceafe50ae0df64a29a",
+    "crates/script/rhai/src/lib.rs": "b28551887f322bf24b26d678dc3ca404a309aa3922deb1df9cf534f8e7a3b5d7",
+    "ports/graphshell/Cargo.toml": "7c522159e258e1bcd692b178bb6e6b8cc25b4e78e8f990b4b4323fb15daaad65",
+    "ports/graphshell/src/command_invocation.rs": "c8c7355d2ee1f1df1c6e5e1d9a76e84b7a48fd159aa18b3cf80397e4153956fb",
+    "ports/graphshell/src/command_invocation/tests.rs": "76a134756e05cdb65bc62fa11fb0f886a8bb53cef0cf4a8f81eeaf930a3b3a72",
+    "ports/graphshell/src/lib.rs": "64fac546af9c1fd8c774222855b47777defcc5c46adf75624f161aee9a319dd9",
+    "ports/graphshell/src/viewer_commands.rs": "5bdaf20994b229e1eb7af46489085b474cdb46231e408931cd0519a6851ef5a2",
+    "ports/graphshell/src/web_tree/commands.rs": "1e4a3683ed5150503ccef7f67b7cc93d94a7e67ca95b639ed2ae81c0765a9527",
+    "ports/graphshell/src/web_tree/controls.rs": "b02a77376459b517c53188b07b5d0e6d820ad76c02dd7c624c60e9d9ee5132bc",
+    "ports/graphshell/src/web_tree/lane.rs": "b9ef63d67ebf0a6e3b6764a769eb5a9e89a83407bc0a5764c64104f68461ed05"
+  },
+  "note": "Reconciled command and Wasm checks cover the merged runtime. e94cb23e changes only scope documentation."
+}

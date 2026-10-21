@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "cambium-winit-a11y",
+    "--lib",
+    "-p",
+    "cambium-genet-web-host",
+    "--lib"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T18:01:36.334896+00:00",
+  "finished": "2026-10-20T18:01:36.534569+00:00",
+  "exit_code": 1,
+  "results": [
+    "error: the argument '--lib' cannot be used multiple times"
+  ],
+  "diagnostic_tail": "error: the argument '--lib' cannot be used multiple times\n\nUsage: cargo.exe test [OPTIONS] [TESTNAME] [-- [ARGS]...]\n\nFor more information, try '--help'.\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

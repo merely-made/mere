@@ -8,6 +8,115 @@ use super::*;
 use crate::diagnostics::channels::*;
 
 #[test]
+fn descriptor_policy_seeds_the_effective_config_without_overwriting_explicit_choices() {
+    let mut registry = DiagnosticsRegistry::default();
+    let config = registry.get_config(CHANNEL_COMPOSITOR_TILE_ACTIVITY);
+    assert_eq!(config.sample_rate, 0.25);
+    assert_eq!(config.retention_count, 256);
+    assert_eq!(
+        (0..8)
+            .filter(|_| registry.should_emit_channel(CHANNEL_COMPOSITOR_TILE_ACTIVITY))
+            .count(),
+        2
+    );
+
+    let mut descriptor = RuntimeChannelDescriptor::info(
+        "runtime.test.sampled",
+        1,
+        DiagnosticsChannelOwner::runtime(),
+        None,
+    );
+    descriptor.sampling = SamplingPolicy::SampleRate(0.5);
+    descriptor.retention = RetentionPolicy::KeepRecent(7);
+    registry
+        .register_runtime_channel(
+            descriptor.clone(),
+            ChannelRegistrationPolicy::RejectConflict,
+        )
+        .unwrap();
+    assert_eq!(registry.get_config(&descriptor.channel_id).sample_rate, 0.5);
+    assert_eq!(
+        registry.get_config(&descriptor.channel_id).retention_count,
+        7
+    );
+
+    registry.set_config(
+        &descriptor.channel_id,
+        ChannelConfig {
+            enabled: false,
+            sample_rate: 0.75,
+            retention_count: 3,
+        },
+    );
+    descriptor.sampling = SamplingPolicy::All;
+    registry
+        .register_runtime_channel(
+            descriptor.clone(),
+            ChannelRegistrationPolicy::ReplaceExisting,
+        )
+        .unwrap();
+    let config = registry.get_config(&descriptor.channel_id);
+    assert!(!config.enabled);
+    assert_eq!(config.sample_rate, 0.75);
+    assert_eq!(config.retention_count, 3);
+
+    registry.set_config(
+        "runtime.test.preconfigured",
+        ChannelConfig {
+            sample_rate: 0.0,
+            ..ChannelConfig::default()
+        },
+    );
+    registry
+        .register_runtime_channel(
+            RuntimeChannelDescriptor::info(
+                "runtime.test.preconfigured",
+                1,
+                DiagnosticsChannelOwner::runtime(),
+                None,
+            ),
+            ChannelRegistrationPolicy::RejectConflict,
+        )
+        .unwrap();
+    assert!(!registry.should_emit_channel("runtime.test.preconfigured"));
+}
+
+#[test]
+fn nonfinite_sample_config_never_silently_admits_every_event() {
+    let mut registry = DiagnosticsRegistry::default();
+    for rate in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+        registry.set_config(
+            CHANNEL_COMPOSITOR_TILE_ACTIVITY,
+            ChannelConfig {
+                sample_rate: rate,
+                ..ChannelConfig::default()
+            },
+        );
+        assert!(!registry.should_emit_channel(CHANNEL_COMPOSITOR_TILE_ACTIVITY));
+    }
+}
+
+#[test]
+fn fractional_sampling_does_not_round_the_configured_rate_down_to_a_reciprocal() {
+    let mut registry = DiagnosticsRegistry::default();
+    for (rate, expected) in [(0.25, 2), (0.5, 4), (0.75, 6)] {
+        registry.set_config(
+            CHANNEL_COMPOSITOR_TILE_ACTIVITY,
+            ChannelConfig {
+                sample_rate: rate,
+                ..ChannelConfig::default()
+            },
+        );
+        assert_eq!(
+            (0..8)
+                .filter(|_| registry.should_emit_channel(CHANNEL_COMPOSITOR_TILE_ACTIVITY))
+                .count(),
+            expected
+        );
+    }
+}
+
+#[test]
 fn diagnostics_registry_seeds_phase_contract_channels() {
     let registry = DiagnosticsRegistry::default();
     assert!(registry.has_channel(CHANNEL_PROTOCOL_RESOLVE_STARTED));

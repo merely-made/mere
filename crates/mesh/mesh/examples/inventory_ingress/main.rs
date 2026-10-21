@@ -6,6 +6,8 @@
 
 mod campaign;
 mod network;
+#[path = "../support/provenance.rs"]
+mod provenance;
 mod source;
 
 use std::fs::OpenOptions;
@@ -82,12 +84,21 @@ async fn main() -> Result<()> {
         "peer changed during run",
     )?;
     report["peer_executable_blake3"] = serde_json::json!(before.to_hex().to_string());
+    let lock = include_bytes!("../../../../../Cargo.lock");
+    report["mere_source_identity_schema"] =
+        serde_json::json!("mere.mesh.inventory_ingress_identity/v2");
     report["mere_source_blake3"] = serde_json::json!(source_hash());
-    report["compiled_lock_blake3"] = serde_json::json!(
-        blake3::hash(include_bytes!("../../../../../Cargo.lock"))
-            .to_hex()
-            .to_string()
-    );
+    report["compiled_lock_blake3"] = serde_json::json!(blake3::hash(lock).to_hex().to_string());
+    report["selected_external_dependencies"] =
+        serde_json::Value::Array(provenance::selected_git_packages(
+            lock,
+            &[
+                "mere-p2panda-net",
+                "mere-transport",
+                "muniment",
+                "stickleback",
+            ],
+        )?);
     let mut output = OpenOptions::new()
         .write(true)
         .create_new(true)
@@ -104,22 +115,47 @@ async fn main() -> Result<()> {
 fn source_hash() -> String {
     let mut h = blake3::Hasher::new();
     for source in [
-        include_str!("main.rs"),
-        include_str!("source.rs"),
-        include_str!("network.rs"),
-        include_str!("campaign.rs"),
-        include_str!("../../src/ingress/mod.rs"),
-        include_str!("../../src/ingress/budget.rs"),
-        include_str!("../../src/ingress/session.rs"),
-        include_str!("../../src/ingress/lifecycle.rs"),
-        include_str!("../../src/ingress/records.rs"),
-        include_str!("../../src/ingress/client.rs"),
-        include_str!("../../../../murm/transport/src/p2panda_transport/bounded_accept.rs"),
-        include_str!("../../../../murm/transport/src/p2panda_transport.rs"),
-        include_str!("../../../../../ports/distillery/src/resident.rs"),
+        ("main.rs", include_str!("main.rs")),
+        ("source.rs", include_str!("source.rs")),
+        ("network.rs", include_str!("network.rs")),
+        ("campaign.rs", include_str!("campaign.rs")),
+        (
+            "src/ingress/mod.rs",
+            include_str!("../../src/ingress/mod.rs"),
+        ),
+        (
+            "src/ingress/budget.rs",
+            include_str!("../../src/ingress/budget.rs"),
+        ),
+        (
+            "src/ingress/session.rs",
+            include_str!("../../src/ingress/session.rs"),
+        ),
+        (
+            "src/ingress/lifecycle.rs",
+            include_str!("../../src/ingress/lifecycle.rs"),
+        ),
+        (
+            "src/ingress/records.rs",
+            include_str!("../../src/ingress/records.rs"),
+        ),
+        (
+            "src/ingress/client.rs",
+            include_str!("../../src/ingress/client.rs"),
+        ),
+        (
+            "ports/distillery/src/resident.rs",
+            include_str!("../../../../../ports/distillery/src/resident.rs"),
+        ),
+        (
+            "examples/support/provenance.rs",
+            include_str!("../support/provenance.rs"),
+        ),
     ] {
-        h.update(&(source.len() as u64).to_le_bytes());
-        h.update(source.as_bytes());
+        h.update(&(source.0.len() as u64).to_le_bytes());
+        h.update(source.0.as_bytes());
+        h.update(&(source.1.len() as u64).to_le_bytes());
+        h.update(source.1.as_bytes());
     }
     h.finalize().to_hex().to_string()
 }

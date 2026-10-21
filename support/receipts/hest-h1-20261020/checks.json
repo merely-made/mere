@@ -1,0 +1,110 @@
+[
+  {
+    "label": "kernel-actions",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "mere-kernel",
+      "--lib",
+      "tests::actions"
+    ],
+    "started_utc": "2026-10-20T19:15:40.553206+00:00",
+    "exit_code": 0,
+    "log_sha256": "cbee25f90f1862711861710d414c99d867c53d94789002323bb27b5468e0783d",
+    "test_results": [
+      "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 470 filtered out; finished in 0.00s"
+    ],
+    "raw_log_sha256": "06392cd06eefb4786afd4323ebe76cc2d69c9a9375c5b4c42c3289e025be7623",
+    "log_normalization": "Terminal empty lines removed only; raw hash retained."
+  },
+  {
+    "label": "registry-input",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "mere-registry",
+      "--no-default-features",
+      "--features",
+      "input",
+      "--lib",
+      "input::"
+    ],
+    "started_utc": "2026-10-20T19:16:33.340184+00:00",
+    "exit_code": 0,
+    "log_sha256": "4fd4e3fed997bd42098307c6d61d303fd4782c9f0de5ac0d307b063738c59998",
+    "test_results": [
+      "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "raw_log_sha256": "b5e3f58d01979f2d9a63aef1cef817fa4c3dc585714ff672a38517672f9f6980",
+    "log_normalization": "Terminal empty lines removed only; raw hash retained."
+  },
+  {
+    "label": "compact-menu",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "cambium-genet-winit-host",
+      "--test",
+      "command_menu_compact"
+    ],
+    "started_utc": "2026-10-20T19:17:30.103933+00:00",
+    "exit_code": 0,
+    "log_sha256": "b33c07d55698b290b708a73f5ce116a1b5e8c140c50192457dcc0927c35779a7",
+    "test_results": [
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.37s"
+    ],
+    "raw_log_sha256": "eba09288c3f4d8b0689fe6158e1609cb4b0a73475de8bef1c36ca4ae55d7bc47",
+    "log_normalization": "Terminal empty lines removed only; raw hash retained."
+  },
+  {
+    "label": "graphshell-viewer",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "viewer_commands::tests"
+    ],
+    "started_utc": "2026-10-20T19:23:55.977263+00:00",
+    "exit_code": 0,
+    "log_sha256": "1e53a00480f133c8893702657f18246e9acf2f92b512de64d3bc617918addd4b",
+    "test_results": [
+      "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 319 filtered out; finished in 0.01s"
+    ],
+    "raw_log_sha256": "2324b3c7650756a3ed0ef4fa1137919017b65d6ace8c310a07182e8198c3ab06",
+    "log_normalization": "Terminal empty lines removed only; raw hash retained."
+  },
+  {
+    "label": "pandect-choices",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "-p",
+      "pandect",
+      "--lib",
+      "command_menu"
+    ],
+    "started_utc": "2026-10-20T19:30:35.009731+00:00",
+    "exit_code": 0,
+    "log_sha256": "9c8276a987ecccb97f3f9c214b6bfe983152579678f17d8450c86f56e647f19d",
+    "test_results": [
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 332 filtered out; finished in 0.00s"
+    ],
+    "admitted_as_validation": false,
+    "reason": "Filter matched no tests; superseded by pandect-check.json (the exact stored-choices test).",
+    "raw_log_sha256": "49a57c2265be7ecf0f6200f2c986bbcb4b8c12d94dac19c6c6d8c28360e6549f",
+    "log_normalization": "Terminal empty lines removed only; raw hash retained."
+  }
+]

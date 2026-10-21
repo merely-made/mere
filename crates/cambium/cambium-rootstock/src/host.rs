@@ -249,8 +249,8 @@ pub struct HostOptions {
     /// Environment variable names overriding the logical width and height,
     /// for reproducible scenario receipts (`WOODSHED_WIDTH`-shaped).
     pub size_env: Option<(String, String)>,
-    /// Renderer options for [`SurfaceHost::boot`]. A factory rather than a
-    /// value: `NetrenderOptions` is not `Clone`, and the surface is booted
+    /// Renderer options for the event source's surface boot. A factory rather
+    /// than a value: `NetrenderOptions` is not `Clone`, and the surface is booted
     /// again every time the platform takes it away and hands it back
     /// (suspend/resume), which must not silently fall back to defaults.
     pub netrender: Box<dyn Fn() -> NetrenderOptions>,
@@ -310,8 +310,7 @@ impl Default for HostOptions {
     }
 }
 
-/// The browser zoom ladder, the rungs [`Host::zoom_in`] and [`Host::zoom_out`]
-/// step between.
+/// The browser zoom ladder, the rungs [`Host::step_ui_zoom`] steps between.
 ///
 /// Borrowed rather than invented: every desktop browser offers these thirteen
 /// stops, so Ctrl+plus in a Cambium application moves the interface by the
@@ -736,9 +735,9 @@ where
     /// read-only methods keyed by DOM node identity.
     pub(crate) layout: Option<&'a OwnedLayout>,
     /// The native window (chrome requests, redraws, cursor, IME area), when
-    /// there is one. `None` under [`Harness`], the windowless test host — an
-    /// application that asks for window chrome must tolerate its absence
-    /// rather than assume a window exists.
+    /// there is one. `None` under `cambium_genet_winit_host::Harness`, the
+    /// windowless test host — an application that asks for window chrome must
+    /// tolerate its absence rather than assume a window exists.
     /// The frame, behind the neutral seam rather than as a winit handle.
     ///
     /// Applications ask it for redraws, size and scale, all of which a browser
@@ -797,6 +796,7 @@ where
     /// Pointer events for the host to deliver to itself once this hook
     /// returns, in order. See [`HostPointer`].
     pub pointer: &'a mut Vec<HostPointer>,
+    pub(crate) a11y: &'a mut Vec<crate::QueuedA11y>,
     /// Scroll requests for the next layout; queued through
     /// [`scroll_into_view`](Self::scroll_into_view).
     pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
@@ -808,10 +808,10 @@ where
     /// device and renderer, booted once and kept across suspend and resume.
     /// Hand it to a same-device tenant (a compute or import pass) so what it
     /// renders lands on the device the host presents with. `None` under
-    /// [`Harness`] and before the first surface exists.
+    /// `cambium_genet_winit_host::Harness` and before the first surface exists.
     pub render_core: Option<&'a Arc<RenderCore>>,
     /// Where the window is now, for persisting across launches. `None` under
-    /// [`Harness`], which has no window.
+    /// `cambium_genet_winit_host::Harness`, which has no window.
     pub geometry: Option<WindowGeometry>,
     /// CPU-side attribution for the frame that just completed. Present in
     /// `after_frame`; other hooks see the last completed frame, if any.
@@ -901,6 +901,35 @@ where
         let view = crate::WindowDom::new(&dom, self.runner.mount());
         let focus = self.runner.focus().map(|node| view.opaque_id(node));
         Some(crate::document_projection(&view, layout, focus))
+    }
+
+    /// Queue a semantic action through the same current-target admission as
+    /// platform accessibility. The host drains it after queued pointer input;
+    /// observe the returned routing acknowledgement before claiming delivery.
+    pub fn queue_a11y(&mut self, request: crate::A11yRequest) -> crate::A11yReceipt {
+        let (queued, receipt) = crate::QueuedA11y::new(request);
+        self.a11y.push(queued);
+        receipt
+    }
+
+    /// Current contributed semantics, using the same composition as native and
+    /// browser publication. This shared-borrow read performs no layout, paint,
+    /// target allocation or action dispatch. It is not a presentation lease or
+    /// an atomic read/act transaction.
+    pub fn semantic_projection(&self) -> Option<crate::SemanticProjection> {
+        use layout_dom_api::LayoutDom as _;
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        let focus = self.runner.focus().map(|node| view.opaque_id(node));
+        Some(crate::project_semantics(
+            &view,
+            layout,
+            self.leaves,
+            self.producers,
+            focus,
+        ))
     }
 
     /// Ask the host to scroll `node` into view.
@@ -1279,6 +1308,8 @@ where
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
     pub pending_pointer: Vec<HostPointer>,
+    pub(crate) pending_a11y: Vec<crate::QueuedA11y>,
+    draining_a11y: bool,
     /// Scroll requests an application hook queued, resolved in order by the
     /// next [`relayout`](Host::relayout) once its layout is current.
     pub pending_scroll: Vec<ScrollIntoView>,
@@ -1362,6 +1393,8 @@ where
             last_redraw_presentation: None,
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
+            pending_a11y: Vec::new(),
+            draining_a11y: false,
             pending_scroll: Vec::new(),
             caret_followed: None,
             last_frame_profile: None,
@@ -1446,7 +1479,7 @@ where
     /// Assemble a host and seed the runtime zoom from its options.
     ///
     /// The seeding is why this exists rather than a struct literal:
-    /// [`HostOptions::ui_zoom`] is an input and [`HostState::user_zoom`] is
+    /// [`HostOptions::ui_zoom`] is an input and `HostState::user_zoom` is
     /// where it lives afterwards, and a second event source that built the
     /// struct by hand would silently launch at 1.0.
     pub fn new(
@@ -1513,8 +1546,8 @@ where
     /// [`HostOptions::fit_design`] is measured against.
     ///
     /// Windowless, this is whatever the event source last stated (the
-    /// [`Harness`](crate::Harness) states it as it lays out), falling back to
-    /// the size the retained layout was built at.
+    /// `cambium_genet_winit_host::Harness` states it as it lays out), falling
+    /// back to the size the retained layout was built at.
     pub fn available_size(&self) -> (f32, f32) {
         match self.s.window.as_ref() {
             Some(window) => {
@@ -1552,8 +1585,8 @@ where
     }
 
     /// The logical size being laid out: the window's over the layout scale,
-    /// or — windowless, under [`Harness`] — the size the retained layout was
-    /// last built at.
+    /// or — windowless, under `cambium_genet_winit_host::Harness` — the size the
+    /// retained layout was last built at.
     pub fn logical_size(&self) -> (f32, f32) {
         match self.s.window.as_ref() {
             Some(window) => {
@@ -1580,7 +1613,7 @@ where
     /// device-logical pixels.
     ///
     /// Ignored while there is a window, which knows better. This is how the
-    /// [`Harness`](crate::Harness) gives `fit_design` something to measure
+    /// `cambium_genet_winit_host::Harness` gives `fit_design` something to measure
     /// against without inventing a fake window.
     pub fn set_surface_size(&mut self, width: f32, height: f32) {
         self.s.surface_size = Some((width, height));
@@ -1686,6 +1719,7 @@ where
                 capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
+                a11y: &mut self.s.pending_a11y,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1733,6 +1767,7 @@ where
             capture_stamped: &mut self.s.pending_stamped_capture,
             capture_paint: &mut self.s.pending_paint_capture,
             pointer: &mut self.s.pending_pointer,
+            a11y: &mut self.s.pending_a11y,
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
             render_core: self.s.shared.render_core.as_ref(),
@@ -1826,6 +1861,7 @@ where
                 capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
+                a11y: &mut self.s.pending_a11y,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1854,10 +1890,9 @@ where
     /// the events — each delivery runs its own, and the queue is taken whole so
     /// an event queued by that dispatch lands on the next drain rather than
     /// looping.
+    // Pointer gestures retain their existing order. Semantic requests follow
+    // through the same admission/dispatch path used by platform accessibility.
     pub fn drain_pointer(&mut self) {
-        if self.s.pending_pointer.is_empty() {
-            return;
-        }
         for event in std::mem::take(&mut self.s.pending_pointer) {
             match event {
                 HostPointer::Moved(x, y) => {
@@ -1898,6 +1933,16 @@ where
                     self.s.modifiers = held;
                 },
             }
+        }
+        // Post-dispatch hooks may enqueue another request. Reentrant hook
+        // drains must not consume it recursively within this batch.
+        if !self.s.draining_a11y {
+            self.s.draining_a11y = true;
+            for queued in std::mem::take(&mut self.s.pending_a11y) {
+                let result = self.apply_a11y_requests(&[queued.request])[0];
+                queued.reply.set(Some(result));
+            }
+            self.s.draining_a11y = false;
         }
     }
 

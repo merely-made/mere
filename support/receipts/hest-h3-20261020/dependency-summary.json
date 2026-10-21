@@ -1,0 +1,12 @@
+{
+  "hest_runtime_dependencies": [
+    "serde"
+  ],
+  "package": {
+    "name": "hest",
+    "version": "0.2.0",
+    "rust_version": "1.97.1"
+  },
+  "full_metadata_sha256": "de12f4188ff3f20a39c954dc7fffb9e53cfdd61545a746b521624edf6e674705",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+}

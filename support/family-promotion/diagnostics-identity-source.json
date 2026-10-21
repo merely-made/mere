@@ -1,0 +1,24 @@
+{
+  "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "source_sha256": {
+    "Cargo.lock": "4c14cf927d8a4a6e8bc8da31500d50d7344876b815fcfd92f7202fdd6fa897e2",
+    "Cargo.toml": "aa885fe59726cc95171c8acbe536c578cce236fc2968c1a3c8f35fcaddc505cc",
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": "485cdb620bc9cc7533845f2abbf1b85d596e92443e6b0546121a1e2a567f2f21",
+    "crates/cambium/cambium-genet-web-host/src/mirror.rs": "6f41233f2d1aa134b14b7aca79ef6af75cf623956b857465ab017831219b0b9c",
+    "crates/cambium/cambium-genet-web-host/src/mirror/tests.rs": "20ebb4c109a56c0bffa859e8d064ebda6e40492498388fc08bfd4d1645ba9aef",
+    "crates/cambium/cambium-genet-winit-host/Cargo.toml": "97b46304f4ab276b0414b7ca082c482567d7fe55d19e5b8882fe552bef0d9d68",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "008a60d09e66251a1316ac3e0e87af6e06a117deaabc93a32c48ca0e4c7c918d",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "94fad5fb243a03673d36a8866ff41ad5c77a0cb7b4653d541b541def894b0f03",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "6aa089aa06606c4489d64dfaf534c578fa86998519830e93439461f46b8a3b6b",
+    "crates/cambium/cambium-rootstock/src/host.rs": "ddfecc2de3e9dbc1752bc5fb15691c8babde1e2c9a958148c8ccf171fe2933f6",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "f8d9a08dc4501801b6a7aeda54f9f348cdce481e47b54b1bc027a50354088af7",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "990da0c7614f3b63e95fd42284aa9cbf1540d564fb576fd9eed51497cf94936f",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "1f31466a741e254996a49aa8b60b625657ac5da3771eee70751c482f40b0d47c",
+    "crates/cambium/cambium-rootstock/src/semantics/tests.rs": "b7694a17d9046c60d7186358d0ffd660d310b4dab2a952c778ef77df30e73344",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "00dbaa37e777c0be0f15d541541171f83baf7cdc2ed87016020684698d581c8d",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "d4978d730f4c891126e73b97fbb33e904743f8566496a21de3a5de01609fa0aa",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b"
+  },
+  "sealed_audit_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256",
+  "sealed_registers_match": true
+}
