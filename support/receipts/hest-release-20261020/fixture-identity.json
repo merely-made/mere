@@ -1,0 +1,71 @@
+[
+  {
+    "fixture": "support/receipts/hest-release-20261020/fixtures/registry-old",
+    "command": [
+      "cargo",
+      "metadata",
+      "--locked",
+      "--offline",
+      "--format-version",
+      "1",
+      "--manifest-path",
+      "/Users/markik/Code/repos/mere/support/receipts/hest-release-20261020/fixtures/registry-old/Cargo.toml"
+    ],
+    "exit_code": 0,
+    "same_test_source_and_lock_as_executed": true,
+    "files": {
+      "Cargo.toml": "b14a4a00a51b23e3b9a92f85f3946876b2e14118ee654b96dbf041b00d7f044e",
+      "Cargo.lock": "cc1b9a044b75ac1b0741ff74efae9db9c336d93535809afa4fa9583a4d1c6db5",
+      "src/lib.rs": "b061f4df2b17a5f7a01b0f9c8f2f207a8ef0e8d577540247a05983d5a192b772"
+    },
+    "packages": [
+      {
+        "name": "cambium",
+        "version": "0.4.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      },
+      {
+        "name": "command-menu",
+        "version": "0.1.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      },
+      {
+        "name": "hest",
+        "version": "0.1.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      }
+    ]
+  },
+  {
+    "fixture": "support/receipts/hest-release-20261020/fixtures/registry-current",
+    "command": [
+      "cargo",
+      "metadata",
+      "--locked",
+      "--offline",
+      "--format-version",
+      "1",
+      "--manifest-path",
+      "/Users/markik/Code/repos/mere/support/receipts/hest-release-20261020/fixtures/registry-current/Cargo.toml"
+    ],
+    "exit_code": 0,
+    "same_test_source_and_lock_as_executed": true,
+    "files": {
+      "Cargo.toml": "8ce6535052c79dfe305e6b1de46bcda7d23d548439a38c2d8fd7c1ab537c5bb5",
+      "Cargo.lock": "ad2ecc51758acdbcc612446e5fda6ef407a7734ad946e2caf1d6069e36e0944a",
+      "src/lib.rs": "50481346d5971f53a0c0d6df2c58c95d75d2915f91ac314f3a1afcefc24802ed"
+    },
+    "packages": [
+      {
+        "name": "cambium",
+        "version": "0.5.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      },
+      {
+        "name": "hest",
+        "version": "0.2.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index"
+      }
+    ]
+  }
+]

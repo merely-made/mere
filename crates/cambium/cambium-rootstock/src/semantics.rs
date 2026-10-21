@@ -7,7 +7,7 @@
 //! Shared host composition of DOM, Sprigging and producer semantics.
 //! AccessKit remains the existing contributor vocabulary. This copied read is
 //! not a presentation revision, target lease or operation-outcome authority.
-use crate::owned_layout::custom_leaf_key;
+use crate::owned_layout::{custom_leaf_key, flat_nodes};
 use crate::{
     LeafRegistry, NodeId, OwnedLayout, ProducedAction, ProducerRegistry, ProducerRole,
     ProducerSemantics,
@@ -68,11 +68,9 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
         .enumerate()
         .map(|(i, (id, _))| (*id, i))
         .collect();
-    let mut pending = vec![dom.document()];
     let mut nodes = Vec::new();
     let mut slot_counts = HashMap::<u64, usize>::new();
-    while let Some(node) = pending.pop() {
-        pending.extend(dom.flat_children(node));
+    for node in flat_nodes(dom) {
         let key = custom_leaf_key(dom, node);
         if let Some(key) = key {
             *slot_counts.entry(key).or_default() += 1;

@@ -419,3 +419,6 @@ fn portable_refusal_preserves_live_gpu_view_and_stamp() {
     assert!(registry.contains(7));
     assert!(registry.pending_retire.is_empty());
 }
+
+#[path = "flat_tree_tests.rs"]
+mod flat_tree_tests;

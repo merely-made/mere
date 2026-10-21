@@ -1283,6 +1283,22 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
+/// Genet owns flat-tree child selection. Preserve its order while sharing the
+/// traversal between producer discovery and semantic routing. Light-DOM text
+/// offsets below retain their separate DOM-text contract.
+pub(crate) fn flat_nodes<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+) -> impl Iterator<Item = NodeId> + '_ {
+    let mut pending = vec![dom.document()];
+    std::iter::from_fn(move || {
+        let node = pending.pop()?;
+        let start = pending.len();
+        pending.extend(dom.flat_children(node));
+        pending[start..].reverse();
+        Some(node)
+    })
+}
+
 fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {
     visit(node);
     for child in dom.dom_children(node) {

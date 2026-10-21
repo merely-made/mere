@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "metadata",
+    "--locked",
+    "--offline",
+    "--format-version",
+    "1",
+    "--manifest-path",
+    "/Users/markik/Code/testing/mere/hest-release-20261020/registry-current/Cargo.toml"
+  ],
+  "exit_code": 0,
+  "packages": [
+    {
+      "name": "cambium",
+      "version": "0.5.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "hest",
+      "version": "0.2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  ],
+  "all_dependencies_registry": true
+}

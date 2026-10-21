@@ -1,0 +1,12 @@
+{
+  "basis": "24b0795382b1fc1fe72968cd5dbf27685c004e45",
+  "source_and_manifests_match_seal": true,
+  "sealed_audit_registers_unchanged": true,
+  "git_diff_check": 0,
+  "changed_plan_d2_errors": [],
+  "whole_tree_preexisting_d2_errors": 40,
+  "diagnostics_retained_bytes_before_this_check": 899053,
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "parallel_dirty_paths_excluded": []
+}

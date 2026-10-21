@@ -631,9 +631,7 @@ impl MereRouteSession {
                                         source.adapter == crate::wire::SESSION_ITEM_SOURCE
                                     });
                             if is_session {
-                                if card.media.is_empty() {
-                                    return Err("The explicit session does not disclose its scoped graph material.".into());
-                                }
+                                crate::wire::session_media(&card)?;
                                 self.tasks
                                     .push_front(Task::Media(session.clone(), instance));
                             }
@@ -743,10 +741,18 @@ impl graphshell_client::LineDriven for MereRouteSession {
 #[cfg(test)]
 mod busy_tests {
     use super::*;
-    use chirograph::{PresentationCapability, ProjectionOffer, ProjectionRequest};
-    use sceno::score::{Arrangement, Score};
+    use chirograph::{
+        BoundsRelationship, CarrierOutput, CarrierRequest, CarrierResponse, CarrierResponseBody,
+        PresentationBinding, PresentationCapability, PresentationCodec, PresentationKey,
+        PresentationManifest, PresentationOffer, PresentationSemantics, ProjectionOffer,
+        ProjectionRequest, SemanticRole,
+    };
+    use sceno::{
+        Arrangement, Footprint, ProjectedItem, Representation, Scene, Score, SourceRef, Transform2,
+    };
+    use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 
-    fn closed_panel() -> MereRouteSession {
+    fn panel() -> MereRouteSession {
         let descriptor = EndpointDescriptor {
             label: "Resident mere".into(),
             projections: [MERE_SESSIONS, MERE_GRAPH]
@@ -761,16 +767,170 @@ mod busy_tests {
                 })
                 .collect(),
         };
-        let mut panel = MereRouteSession::from_descriptor(
+        MereRouteSession::from_descriptor(
             descriptor,
             CapabilityProfile::new([PresentationCapability::PortableCard]),
             "graphshell",
         )
-        .unwrap();
+        .unwrap()
+    }
+
+    fn closed_panel() -> MereRouteSession {
+        let mut panel = panel();
         panel.fail("The resident route closed.".into());
         assert!(!panel.in_flight());
         assert_eq!(panel.status(), "unavailable");
         panel
+    }
+
+    fn seed_partial_state(panel: &mut MereRouteSession) {
+        let hash = ContentHash::of(b"partial card");
+        panel.cards.insert(hash, b"partial card".to_vec());
+        panel.records.insert(
+            "partial".into(),
+            chirograph::PortableCardV1 {
+                title: "partial".into(),
+                values: vec![],
+                badges: vec![],
+                media: vec![],
+            },
+        );
+        panel.inspected = Some("partial".into());
+        panel.transient_layout = Some("grid.default".into());
+        panel
+            .merge_choices
+            .insert("partial".into(), MergeOption::Source);
+    }
+
+    fn send_response(panel: &mut MereRouteSession, body: CarrierResponseBody) {
+        let outgoing = panel.take_outgoing();
+        assert_eq!(outgoing.len(), 1);
+        let request: CarrierRequest = serde_json::from_str(&outgoing[0]).unwrap();
+        let line = chirograph::line::encode(&CarrierOutput::Response(CarrierResponse {
+            id: request.id,
+            body: Ok(body),
+        }))
+        .unwrap();
+        panel.on_line(&line);
+    }
+
+    fn graph_snapshot(card_bytes: &[u8]) -> ProjectionSnapshot {
+        let session_id = uuid::Uuid::from_u128(9).to_string();
+        let mut scene = Scene::new();
+        let source = scene.intern_source(SourceRef::new(
+            crate::wire::SESSION_ITEM_SOURCE,
+            &session_id,
+        ));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::translation(0.0, 0.0),
+            footprint: Footprint::Circle { radius: 8.0 },
+            representation: Representation::Card,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: vec![],
+        });
+        let key = PresentationKey("session-card".into());
+        let card_hash = ContentHash::of(card_bytes);
+        let presentation = PresentationManifest {
+            bindings: vec![PresentationBinding {
+                instance: InstanceId(0),
+                key: key.clone(),
+            }],
+            offers: [(
+                key,
+                vec![PresentationOffer {
+                    codec: PresentationCodec::PortableCardV1,
+                    resource: card_hash,
+                    byte_size: card_bytes.len() as u64,
+                    requires: PresentationCapability::PortableCard,
+                    semantics: PresentationSemantics {
+                        label: "session".into(),
+                        role: SemanticRole::Graphic,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
+                }],
+            )]
+            .into_iter()
+            .collect(),
+        };
+        ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession(MERE_GRAPH.into()),
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap(),
+            presentation,
+            cache_policy: Default::default(),
+        }
+    }
+
+    #[test]
+    fn live_route_validates_session_media_before_fetching_it() {
+        for count in [0, 1, 2] {
+            let mut panel = panel();
+            seed_partial_state(&mut panel);
+            let empty =
+                SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap();
+            send_response(
+                &mut panel,
+                CarrierResponseBody::Snapshot(Box::new(ProjectionSnapshot {
+                    version: ProtocolVersion::V1,
+                    session: ProjectionSession(MERE_SESSIONS.into()),
+                    scene: empty,
+                    presentation: PresentationManifest::default(),
+                    cache_policy: Default::default(),
+                })),
+            );
+
+            let first_media = ContentHash::of(b"scoped graph envelope");
+            let media = match count {
+                0 => vec![],
+                1 => vec![first_media],
+                _ => vec![first_media, ContentHash::of(b"unexpected second resource")],
+            };
+            let card_bytes = serde_json::to_vec(&chirograph::PortableCardV1 {
+                title: "attached session".into(),
+                values: vec![],
+                badges: vec![],
+                media,
+            })
+            .unwrap();
+            let graph = graph_snapshot(&card_bytes);
+            send_response(&mut panel, CarrierResponseBody::Snapshot(Box::new(graph)));
+            send_response(
+                &mut panel,
+                CarrierResponseBody::Resource(chirograph::ResourceResponse::new(
+                    ProjectionSession(MERE_GRAPH.into()),
+                    card_bytes,
+                )),
+            );
+
+            if count == 1 {
+                assert!(!panel.closed);
+                let outgoing = panel.take_outgoing();
+                assert_eq!(outgoing.len(), 1);
+                let request: CarrierRequest = serde_json::from_str(&outgoing[0]).unwrap();
+                assert!(matches!(
+                    request.body,
+                    chirograph::CarrierRequestBody::Resource(resource)
+                        if resource.session.0 == MERE_GRAPH && resource.resource == first_media
+                ));
+            } else {
+                assert!(panel.closed);
+                assert!(
+                    matches!(&panel.model.status, ViewStatus::Unavailable(note) if note.message.contains("exactly one media"))
+                );
+                assert!(panel.take_outgoing().is_empty());
+                assert!(panel.cards.is_empty());
+                assert!(panel.records.is_empty());
+                assert!(panel.inspected.is_none());
+                assert!(panel.transient_layout.is_none());
+                assert!(panel.merge_choices.is_empty());
+                assert!(panel.material.is_none());
+            }
+        }
     }
 
     #[test]

@@ -1,0 +1,46 @@
+[
+  {
+    "name": "isolated-packaged-cambium-tests",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/packaged/cambium-0.5.0/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 101,
+    "elapsed_seconds": 10.09,
+    "finished_utc": "2026-10-21T01:53:48.767248+00:00",
+    "log": "isolated-packaged-cambium-tests.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "93172cf812d678bf45d68997771c649ba41f707e571f9e094a12122bc6e289f8",
+    "stored_log_sha256": "b97a9c2cb5a90fd2e35b27113e6c3d28541a42cc8de1843afc4f34661a9edde8",
+    "suites": []
+  },
+  {
+    "name": "packaged-hest-0.2-tests",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "target/build/package/hest-0.2.0/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "c5f3a4cd5dcc3cdd5c79cc5b553bfcf13237aa86",
+    "exit_code": 101,
+    "elapsed_seconds": 0.05,
+    "finished_utc": "2026-10-21T01:51:10.706413+00:00",
+    "log": "packaged-hest-0.2-tests.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "b26a9fd0fb663204826ad118d916ad1a38f4185749ef46118355e97ba2dce6ed",
+    "stored_log_sha256": "d8c01376abec16f666d6a2bd0f2d41716b58135ea15bcc6c7e7760b8266b7ae3",
+    "suites": []
+  }
+]

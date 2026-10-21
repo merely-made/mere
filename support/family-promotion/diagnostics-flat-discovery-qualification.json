@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-20",
+  "basis": "24b0795382b1fc1fe72968cd5dbf27685c004e45",
+  "scope": "Shared Genet-flat producer discovery and semantic routing; shadow/slotted receiving",
+  "source_seal": "diagnostics-flat-discovery-source.json",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "gates": [
+    {
+      "receipt": "diagnostics-flat-discovery-producers.json",
+      "sha256": "a5e16624b5b98394085b67c66026af1a639490f95bc41a58999e8615a90fc536",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "producer::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-flat-discovery-semantics.json",
+      "sha256": "0f30298e3c00f350817319dfc5f8d8fe90254746f8966ad7c12a534563d7cb90",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "semantics::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-flat-discovery-admission.json",
+      "sha256": "8fb01fbb314d04f2d40a44eb3d3a4eddf38ce87e2d322cd48aa02ae650da1ebf",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "accessibility_tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-flat-discovery-platform.json",
+      "sha256": "d3a1da453bfe01156782b4c09f964e148798552db88bd06f4a66635b682361e8",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "e1a_sessions"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-flat-discovery-wasm.json",
+      "sha256": "d94c98a7d709cc223bfcabde72d416e9a6e622ea7bb2d25cb5b7977461314cc2",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "targeted_native_passes": 112,
+  "existing_ignores": 5,
+  "wasm": "locked browser-host no-default-features wasm32-unknown-unknown check passed",
+  "development_receipts": {
+    "before": "diagnostics-flat-discovery-before.json: expected exit 101; browser semantic control passes while six producer controls fail at runtime",
+    "repair": "diagnostics-flat-discovery-repair.json: eight controls pass, not added again to final cohort count"
+  },
+  "receiving_evidence": [
+    "Actual ScriptedDom shadow, nested shadow and named-slot discovery/capture with unassigned and masked fallback exclusion",
+    "Portable duplicate refusal before source callbacks, current-window containment, fallback reassignment/restoration and removal retirement",
+    "Headless wgpu sampled RGBA assigned source -> fallback source -> background; direct shadow source -> background",
+    "Native AccessKit request mapping and producer dispatch; browser mirror plan selects only assigned source"
+  ],
+  "executed_native_binary_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-2273349d02cf466b.exe": "f7e81372f2d36f503a66e0f21db9f4f4bdbf028757a93f5c3c39ae0b08e4cc8b",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-56f94a9ce355cb5d.exe": "8fd719d86dd13a6becfd306a0f52f027c9fee591207fe51bb805c35abbeba511",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-e372f7f3ed456408.exe": "33dde9fc1338c80d54823ad901fe5ad5e911f054f6efe2ca87affcffe521c37e",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-662143e96433e173.exe": "3609f87b6ab7060a9f39da98a7a9e7edfc385922551068ba24edecbcf61de170",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-4f747cdd5ec6d9ee.exe": "a069e7cb059d46b9aabe358d73bcef8df5db3ae2f4258f0173adc35fcc6c24cc",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-eeb9f4d905241ba4.exe": "16dc1f79d17d5d735c7b99f29216b805cb7fa8c94ffb33640b30bd32c20326f1",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-9bb5b3ed00e95546.exe": "ece739bec82d52c4333d8b53b3e7e2e52cb11a2206c3b12bd4235eef4bf3467c",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-ca955e8978e01b83.exe": "f7a7df900b1d36f2ae3dd758fb8fa06e8c74c0c257368f1c8077075288376fd4",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-b0a270e6c3c5aa20.exe": "6b6120956320c493998c829c38b0c0da442693f6b8f0da3f6dc05e951927484a"
+  },
+  "target": "C:\\t\\cargo-targets\\mere",
+  "build_dir": "C:\\t\\cargo-targets\\mere\\build",
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "limits": [
+    "Sampled axis-aligned headless pixels, not headed/browser runtime/human AT acceptance",
+    "Full content-origin/transform/scroll/clip mapping and shadow/slot ancestor geometry remain open",
+    "Immutable semantic observation, selector adoption, target lifetimes and broader action routing remain open",
+    "Shared traversal is discovery authority; CSS visibility/layout/suspension keep their separate contracts",
+    "Unrelated DOM-text offset walks intentionally retain DOM child traversal"
+  ],
+  "sealed_registers_unchanged": true
+}
