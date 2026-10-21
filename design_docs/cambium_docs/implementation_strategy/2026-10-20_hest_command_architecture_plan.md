@@ -2,8 +2,9 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** Cambium 0.5.0 is prepared and canonical Turnstone H2
-adoption is qualified locally. Hest 0.2.0 carries declarations; the frozen
+**Status (2026-10-20):** H3 implementation is in progress under Mark's explicit
+commit-and-push authorization. Cambium 0.5.0 and canonical Turnstone H2
+adoption retain their recorded qualification. Hest 0.2.0 carries declarations; the frozen
 Hest 0.1.0 and `command-menu` 0.1.1 shim preserve the H1 compatibility line.
 All commits remain local. Push, publication and fresh remote-only resolution
 are deferred; native GUI and human AT acceptance remain separate.
@@ -364,3 +365,39 @@ desktop/browser presentation and native restart were not exercised.
   records the exact tree, checks, preservation and dependency consequence.
   H3/H4 are unstarted. Push, publication, remote-only new-version receiving
   and native GUI/human AT remain held or separate.
+
+
+## H3 implementation and delivery (2026-10-20)
+
+Mark authorized H3, local commits and Git pushes. Crate publication remains
+held. H3 adds API without changing the prepared Hest 0.2.0 declarations or the
+frozen 0.1 compatibility line.
+
+- Hest owns `Invocation` (id, schema id, opaque bytes and declared effect) and
+  terminal `Outcome` (`Done`, `Refused`, `Stale`). An invocation grants no
+  authority. Hosts decode arguments and recheck their current declaration.
+- Chirograph owns the observation and routing context and checks the command
+  against its advertised id, schema and effect. Its existing wire remains
+  unchanged. `IntentResult::Accepted` has no terminal Hest outcome; terminal
+  `Done` cannot be encoded as acceptance in that dispatch-only result. Stale
+  epoch/revision context remains in Chirograph. Receipt admission or a handled
+  click is not evidence of completed enactment.
+- The portable window queue carries Hest invocations and drains through the
+  existing `WindowCommand` event-source seam. Its adapter owns the window ids
+  and versioned argument schema (resize carries two little-endian f64 values).
+  These ids remain outside Hest's shared catalogue until its offer admission
+  rule is met. Queue admission produces no terminal completion; close policy
+  and actual window-manager handling retain authority.
+- Turnstone binds static declared commands to a host-owned session/pane/graph/
+  selection observation, validates it before entering the existing reducer,
+  and returns stale/refusal without enactment. Its canvas key route uses this
+  adapter; text input and contextual producer actions keep their dedicated
+  paths. Only observed synchronous physics/isometric view changes report
+  `Done`; deferred work such as saving remains without a terminal outcome.
+- Receiving gates are Turnstone's actual canvas key binding through its app
+  reducer, Knot's actual desktop caption/window queue harness, and a command
+  round trip through Chirograph's real carrier request vocabulary. Existing
+  model, probe, host, compatibility and consumer checks remain required.
+- Delivery order is the compatible Knot prerequisite, Mere supplier, then
+  final Knot and Turnstone consumers. Canonical URLs and committed locks are
+  preserved. No release publication is included in the push authorization.

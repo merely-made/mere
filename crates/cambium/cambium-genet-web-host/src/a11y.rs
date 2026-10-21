@@ -9,7 +9,7 @@
 //! Cambium presents onto a `<canvas>`, which a screen reader sees as one
 //! graphic, so the browser needs what the desktop needs: a parallel tree kept
 //! in step with the layout. Here it is made of DOM elements. Each sync lowers
-//! genet's neutral projection to ARIA ([`crate::mirror`]) and writes only what
+//! Rootstock's composed host projection to ARIA ([`crate::mirror`]) and writes only what
 //! changed onto an element per node, positioned over the canvas where the
 //! node painted. The elements are transparent and let the pointer through to
 //! the canvas; they exist for a reader, whose Tab, virtual cursor and touch
@@ -27,18 +27,15 @@
 //! drains nothing, and a page whose frame callback never runs, as in a
 //! background tab, still answers.
 //!
-//! **A leaf describes itself through AccessKit.** For a node that is a leaf,
-//! the leaf's own hook fills a scratch AccessKit node, and its role and label
-//! are carried over into ARIA; an author's name wins over the leaf's.
+//! **Contributions follow shared host policy.** Rootstock seeds leaf callbacks
+//! with DOM semantics and composes producer children and action targets before
+//! platform lowering. ARIA consumes that same AccessKit-shaped observation.
 
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
-use cambium_rootstock::{
-    A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, WindowDom, document_projection,
-};
-use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+use cambium_rootstock::{A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, WindowDom};
 use wasm_bindgen::JsCast;
 use web_sys::{Document, Element, HtmlCanvasElement, HtmlElement, Text};
 
@@ -308,30 +305,6 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
     }
 }
 
-/// Every DOM node by its opaque id, and each leaf's key.
-fn walk(
-    dom: &WindowDom<'_>,
-    node: NodeId,
-    targets: &mut HashMap<u64, NodeId>,
-    leaves: &mut HashMap<u64, u64>,
-) {
-    let id = dom.opaque_id(node);
-    targets.insert(id, node);
-    if dom.kind(node) == NodeKind::Element
-        && dom
-            .element_name(node)
-            .is_some_and(|name| matches!(name.local.as_ref(), "custom-leaf" | "chisel-leaf"))
-        && let Some(key) = dom
-            .attribute(node, &Namespace::default(), &LocalName::from("key"))
-            .and_then(|key| key.parse().ok())
-    {
-        leaves.insert(id, key);
-    }
-    for child in dom.flat_children(node) {
-        walk(dom, child, targets, leaves);
-    }
-}
-
 impl Accessibility for DomAccessibility {
     fn sync(
         &mut self,
@@ -342,29 +315,16 @@ impl Accessibility for DomAccessibility {
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
-        let mut targets = HashMap::new();
-        let mut leaf_keys = HashMap::new();
-        walk(dom, dom.document(), &mut targets, &mut leaf_keys);
-
-        // Layout pixels ride the UI zoom into CSS pixels; the device half of
-        // the layout scale is the browser's own.
+        let projection =
+            cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
+        let targets = projection
+            .dom_targets
+            .iter()
+            .map(|(id, node)| (id.0, *node))
+            .collect();
         let device = web_sys::window().map_or(1.0, |window| window.device_pixel_ratio());
         let scale = (layout_scale / device) as f32;
-        let projection = document_projection(dom, layout, focus);
-        let plan = mirror::plan(&projection, scale, |id, name| {
-            let key = leaf_keys.get(&id)?;
-            // A producer that describes its slot speaks for it.
-            if let Some(semantics) = producers.semantics(*key) {
-                return Some(mirror::LeafSemantics::from_producer(*key, semantics));
-            }
-            let leaf = leaves.get_mut(key)?;
-            let mut scratch = accesskit::Node::new(accesskit::Role::Unknown);
-            if let Some(name) = name {
-                scratch.set_label(name);
-            }
-            leaf.accessibility(&mut scratch);
-            Some(mirror::leaf_semantics(&scratch))
-        });
+        let plan = mirror::plan(&projection, scale);
 
         self.cover_canvas();
         let root = self.handle.root.clone();
@@ -385,6 +345,7 @@ impl Accessibility for DomAccessibility {
             keep
         });
 
+        let focus = focus.map(|_| projection.tree.focus.0);
         let focused = focus.and_then(|id| self.elements.get(&id).map(|m| m.element.clone()));
         {
             let mut shared = self.handle.shared.borrow_mut();

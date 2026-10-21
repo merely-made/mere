@@ -285,8 +285,20 @@ an opt-in product-projected collector into its admitted status reader. 191
 targeted native passes/seven existing ignores and browser-host Wasm compilation
 qualify the bounded supplier and product paths, including a real CLI client
 process against the admitted fixture broker. Shared
-leaf/producer semantics, target lifetimes and process-final evidence remain
-separately tracked in the diagnostics plan.
+leaf/producer semantics, target lifetimes and process-final evidence were
+separately tracked for that historical cohort.
+
+Shared leaf/producer continuation (2026-10-20, qualified): native,
+browser and admission now consume one Rootstock host composition over the
+existing AccessKit-shaped provider contracts. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-leaf-and-producer-composition-2026-10-20)
+tracks repairs to numeric leaf lowering, producer IDs/action maps, restrictive
+state, hidden focus, duplicate producer DOM bindings and missing/invalid geometry.
+Seventy affected native receiving tests pass on integrated main, with four
+existing ignores, plus browser-host Wasm compilation. The earlier broad cohort
+has 190 passes/seven existing ignores on its preserved pre-repin basis. Neutral contributor contracts, mutable
+read/act boundaries, target lifetimes, broader Hest action routing and
+process-final diagnostic evidence remain open.
 
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),

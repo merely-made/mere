@@ -1,0 +1,16 @@
+{
+  "basis": "c25c2d441b3b93c934ad500b020c7a8f910ef1ea",
+  "source_seal": "diagnostics-contributed-source-reviewed.json",
+  "native_gate": "diagnostics-contributed-native-final.json",
+  "passed": 190,
+  "existing_ignored": 7,
+  "artifacts_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-e9edfd5303833490.exe": "e052e6530384dd8e537708fe28aa57db189bcc44c02c8eb40ddf59f01f9ba427",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-0b91c10dc616862e.exe": "12bd5227f98374fbcedd01f6a5696bdc40a33002bc99d5e2097ee5f5636d0e11",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-969c7e2b8e216f67.exe": "da5ef2a8b855ed1bb6163e00d2415bb5200e0ace78f14233bc585c6d04da965b",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-1035c602ff157782.exe": "6f86daa5ade90aebfb0480d32847e20ab709841f33e7b177b38414677f0e23f4",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-179e87367df1c71c.exe": "5f5d3e7eab7567737cdd378f1f78b8ccba03eeeccafdfef35d0c0298b82eeb64",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-8e2744d7de387a8b.exe": "4dcb97850ca7d235809d9d4b77299310865449a0c74c04845af77b3223eb8eb1"
+  },
+  "source_unchanged_after_gate": true
+}
