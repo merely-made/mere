@@ -1,0 +1,198 @@
+{
+  "core-tests-final": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "physics_controls"
+    ],
+    "exit": 0,
+    "seconds": 24.97,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "canvas-full": {
+    "command": [
+      "/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build/debug/deps/pictograph-b53c81d3f6e8c3bb",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 299.2,
+    "built_by": "core-tests-final.json",
+    "debug": 0,
+    "incremental": 0
+  },
+  "graphshell-web-tests": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 197.55,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "binding-native": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--features",
+      "serde",
+      "--example",
+      "binding_replay"
+    ],
+    "exit": 0,
+    "seconds": 2.42,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "binding-wasm": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--features",
+      "serde",
+      "--example",
+      "binding_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 2.32,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "mix-native": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "occurrence_replay"
+    ],
+    "exit": 0,
+    "seconds": 17.41,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "mix-wasm": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "occurrence_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 18.39,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "product-wasm-ready": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,presentation-webgpu"
+    ],
+    "exit": 0,
+    "seconds": 21.42,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "product-wasm-reopen-status": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,presentation-webgpu"
+    ],
+    "exit": 0,
+    "seconds": 31.09,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+}
