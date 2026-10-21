@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
-  "status": "Shared selector receiving remains qualified. Bounded queued host/document/mount/producer registration lives, cancellation and native foreign-tree admission qualified on a845b0b22: 270 targeted native tests, seven existing ignores; browser Wasm and embedding compile pass. Authored child/leaf lifetimes and platform publication provenance remain open before broader actions and forward geometry.",
+  "status": "Queued owner/document/mount/producer registration lives, cancellation and native foreign-tree admission qualified again after integrating current main at 60daf11dc: 270 targeted native tests, seven existing ignores; browser Wasm and embedding compile pass. Authored child/leaf lifetimes (including the source-confirmed leaf paint-cache replacement lead) and platform publication provenance remain open before broader actions and forward geometry.",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -366,6 +366,13 @@
       "source": "crates/cambium/cambium-genet-web-host/src/a11y.rs:MirrorHandle::request_target_of",
       "status": "membership guard implemented and Wasm compiled; browser runtime unqualified",
       "change": "Require the event element to remain in the owning mirror before mapping a numeric data-node attribute. This does not establish provider or child lifetime."
+    },
+    {
+      "id": "diagnostics-leaf-replacement-paint-cache",
+      "source": "crates/cambium/sprigging/src/lib.rs:LeafRegistry::insert/render_into; RenderedLeaves",
+      "status": "source-confirmed missing replacement distinction; stale-cache runtime control pending; deferred with shared leaf registration migration",
+      "evidence": "insert replaces a boxed contributor. render_into checks only paint_dirty and cached size, then carries cached prior_scene through take_scene().or(prior_scene) without contributor identity. Same-key/same-size replacement can retain the former leaf scene, particularly when replacing a Path B leaf with Path A.",
+      "gate": "One registry-owned registration life consumed by both paint cache and semantic admission. Qualify clean replacements and Path B-to-A at unchanged key/size, plus ordinary retained updates; check owned fragment/image retirement. Do not add a separate paint-only replacement catalogue."
     }
   ],
   "ownership_migrations": [
@@ -605,5 +612,7 @@
       "gate": "One owner-issued target-life request/publication contract, received at native/browser/automation boundaries, with exact stale/foreign/reuse controls. Private queue bindings cannot repair provenance lost before enqueue."
     }
   ],
-  "target_lifetime_qualification": "diagnostics-lifetimes-qualification.json"
+  "target_lifetime_qualification": "diagnostics-lifetimes-qualification.json",
+  "target_lifetime_integration_qualification": "diagnostics-lifetimes-integrated-qualification.json",
+  "target_lifetime_integration_basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f"
 }

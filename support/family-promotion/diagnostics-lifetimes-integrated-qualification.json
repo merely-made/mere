@@ -1,0 +1,120 @@
+{
+  "scope": "Queued semantic owner/document/mount/producer lifetimes, cancellation and native foreign-tree refusal received on integrated current main; browser membership source/Wasm check",
+  "basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f",
+  "implementation_commit": "8d4864d91",
+  "remote_basis": "49f0e197e8d4b748bec192ca993010fcdfc76bc3",
+  "source_seal": "diagnostics-lifetimes-integrated-source.json",
+  "source_seal_sha256": "f047bd11ed2792496eb8b10c523a62175eb4261447433841ea6e3cc78add7876",
+  "implementation_files_unchanged": true,
+  "original_qualification": "diagnostics-lifetimes-qualification.json",
+  "original_qualification_sha256": "bb40987fd6aca8c49a26f432ec1566ab290074f6188fd6242e1b6f17a89a584f",
+  "native_tests_passed": 270,
+  "native_ignored": 7,
+  "native_binary_evidence": "diagnostics-lifetimes-integrated-native-evidence.json",
+  "native_binary_evidence_sha256": "8cd5043a5147b26d0185b43e94d84576e15f5e736b02f9d31b15da776bf29418",
+  "gates": [
+    {
+      "receipt": "diagnostics-lifetimes-integrated-native.json",
+      "sha256": "51bb2c51f378c3904f01b90d91461450c47d61c333aa5bf3096c358cb2814173",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "mesquite",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "click_on_scroll",
+        "--test",
+        "e1a_sessions"
+      ],
+      "exit_code": 0,
+      "results": [
+        "Blocking waiting for file lock on build directory",
+        "Finished `test` profile [unoptimized] target(s) in 3m 36s",
+        "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe)",
+        "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s",
+        "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe)",
+        "test result: ok. 19 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "Running tests\\accessibility.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe)",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s",
+        "Running tests\\click_on_scroll.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe)",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s",
+        "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe)",
+        "test owned_layout::incremental_tests::incremental_style_equals_a_fresh_session_at_100_rows has been running for over 60 seconds",
+        "test result: ok. 157 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 102.84s",
+        "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe)",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s",
+        "Running tests\\e1a_sessions.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe)",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s",
+        "Running unittests src\\lib.rs (C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe)",
+        "test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s"
+      ]
+    },
+    {
+      "receipt": "diagnostics-lifetimes-integrated-browser.json",
+      "sha256": "d897a4e0686f811f8f28c00a935c35797baf63f34f6b6fa203220209bc4fc21f",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0,
+      "results": [
+        "Blocking waiting for file lock on build directory",
+        "Finished `dev` profile [unoptimized] target(s) in 6m 28s"
+      ]
+    },
+    {
+      "receipt": "diagnostics-lifetimes-integrated-embedding.json",
+      "sha256": "cf6187834b31afd91a22138a23a6bd1c89bfdcc88542e65d9ff83a13c2df732d",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "cambium-rootstock",
+        "--features",
+        "embedding"
+      ],
+      "exit_code": 0,
+      "results": [
+        "Blocking waiting for file lock on build directory",
+        "Finished `dev` profile [unoptimized] target(s) in 4m 04s"
+      ]
+    }
+  ],
+  "documentation_receipt": "diagnostics-lifetimes-integrated-docs.json",
+  "documentation_receipt_sha256": "0ea19087451593b1c6036129f0f722313cb550fa22c23b55a36069eec4545c89",
+  "sealed_registers_unchanged": 433,
+  "retained_bytes_before_qualification": 127297,
+  "retained_byte_cap": 10000000,
+  "receiving_worktree": "C:/Users/mark_/Code/worktrees/mere-owner-target-lifetimes",
+  "worktree_reason": "Actual collision: primary Cargo.lock/Djinn WIP prevents safe fast-forward. No concurrent WIP copied into receiving.",
+  "target": "C:/t/cargo-targets/mere",
+  "new_isolated_target_or_cargo_home": false,
+  "limits": [
+    "Native Rust tests are not headed platform or human assistive-technology acceptance.",
+    "Browser mirror membership was Wasm-compiled; browser runtime is unqualified.",
+    "Raw direct A11yRequest remains current-context-only. Child/leaf lives and platform publication provenance remain open.",
+    "Leaf paint-cache replacement is a documented source-confirmed lead; its runtime control and shared registry-life repair remain open."
+  ]
+}
