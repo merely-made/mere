@@ -1,0 +1,127 @@
+{
+  "status": "published and registry-qualified",
+  "authorization": "Fix, proceed. Commit, push, merge, publish, prune.",
+  "prepared_date_local": "2026-10-20 America/New_York",
+  "sealed_utc": "2026-10-21T01:59:43.732042+00:00",
+  "repair_commit": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+  "packaging_commit": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+  "release_order": [
+    [
+      "hest",
+      "0.1.0"
+    ],
+    [
+      "command-menu",
+      "0.1.1"
+    ],
+    [
+      "hest",
+      "0.2.0"
+    ],
+    [
+      "cambium",
+      "0.5.0"
+    ]
+  ],
+  "publication_proof": "registry-publication-proof.json",
+  "checks": "checks.json",
+  "superseded_attempts": "superseded-checks.json",
+  "fixtures": "fixtures/",
+  "reproduce_registry_tests": "cargo test --locked --manifest-path <receipt>/fixtures/{registry-old,registry-current}/Cargo.toml --lib (run separately)",
+  "checks_on_frozen_releases": {
+    "hest_0_1_tests": 13,
+    "hest_0_2_tests": 17,
+    "packaged_cambium_tests": 279,
+    "packaged_cambium_all_features": "passed",
+    "registry_old_tests": 3,
+    "registry_current_tests": 2,
+    "rootstock_tests": 141,
+    "rootstock_existing_ignores": 3,
+    "strict_rustdoc": "passed for broken links, private links and invalid HTML"
+  },
+  "receivers": [
+    {
+      "repository": "turnstone",
+      "head": "49e7928d84dca82311a2c681f3de7066e0e6d320",
+      "cargo_lock_sha256": "78a8293d46cb001d63f615d2b00f164a8cae17a9e2988e98aa1968d9462f6e67",
+      "new_receiving_check": "turnstone-receiving",
+      "prior_complete_qualification": "turnstone/docs/receipts/hest-h3-20261020/qualification.json",
+      "receives_mere": "9ef5e3026997dce50760ae445da9eedd38a325ac"
+    },
+    {
+      "repository": "knot-editor",
+      "head": "db929c8752c72749463bca775dfe0203489f0ee5",
+      "cargo_lock_sha256": "ac564fc7cd1c2aa53373b382267aaf5d14e84738e87248703c1d9c0de7ee23b3",
+      "new_receiving_check": "knot-receiving",
+      "prior_complete_qualification": "knot-editor/docs/receipts/hest-h3-20261020/qualification.json",
+      "receives_mere": "9ef5e3026997dce50760ae445da9eedd38a325ac"
+    }
+  ],
+  "source_preservation": {
+    "hest_and_shim_exact_since_h3": [
+      "crates/cambium/hest",
+      "crates/cambium/hest-0_1",
+      "crates/cambium/command-menu"
+    ],
+    "fixture_sha256": "f39d0aaffd27e0211943c531417661f801b324812e5a097cf5508a07a9e46a8a",
+    "release_scope_patch": "release-scope.diff.gz",
+    "cambium_runtime_change": "none; documentation and package-local test fixture only",
+    "consumer_code_and_locks": "unchanged",
+    "release_scope_compression": "gzip",
+    "release_scope_raw_sha256": "f1d09b4183569b29de1a43e67c66a4edf4f7e9a9eea6c3509b416218c4c3aa90",
+    "release_scope_stored_sha256": "132fe2b6c2620037bd870c602089f08d49b1bec704221b5d7d4120e49fa13917"
+  },
+  "integration": {
+    "mere": "fast-forwarded incoming main through c5f3a4cd5; scoped fixes committed directly to main",
+    "open_mere_pull_requests_at_preflight": 0,
+    "post_release_reconciliation": {
+      "incoming_main": "02477e04e",
+      "merge_commit": "9fe4a7ef0ca001a0ea5ca7a3004590d4047b352c",
+      "scope": "Concurrent native Graphshell Hest routing, material validation and receipt deposit work preserved intact.",
+      "released_package_comparison": [
+        "git",
+        "diff",
+        "--exit-code",
+        "615b35e2e..9fe4a7ef0",
+        "--",
+        "crates/cambium/hest",
+        "crates/cambium/hest-0_1",
+        "crates/cambium/command-menu",
+        "crates/cambium/cambium"
+      ],
+      "exit_code": 0,
+      "released_packages_unchanged": true,
+      "consumer_code_and_locks_unchanged": true,
+      "qualification_scope": "Existing release and receiving checks apply to their unchanged source inputs; this release does not claim a repeated qualification of the incoming lane."
+    }
+  },
+  "pruning": {
+    "repositories": [
+      "mere",
+      "turnstone",
+      "knot-editor"
+    ],
+    "commands": [
+      "git remote prune origin --dry-run",
+      "git worktree prune --dry-run --verbose",
+      "git fetch --prune origin",
+      "git worktree prune --verbose"
+    ],
+    "exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "removed_task_branches_or_worktrees": [],
+    "result": "No task branch, task worktree, stale tracking ref or expired worktree metadata required removal. Unrelated branches and both Mere worktrees retained."
+  },
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "not_claimed": [
+    "H4 audit/scripting",
+    "new MSRV qualification",
+    "native window-manager acceptance",
+    "fresh-process native reopen",
+    "human assistive-technology acceptance"
+  ]
+}

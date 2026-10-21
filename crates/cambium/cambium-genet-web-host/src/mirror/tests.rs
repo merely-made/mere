@@ -132,7 +132,7 @@ fn element_with_id(dom: &ScriptedDom, node: NodeId, id: &str) -> Option<NodeId> 
     if dom.attribute(node, &Namespace::from(""), &LocalName::from("id")) == Some(id) {
         return Some(node);
     }
-    dom.dom_children(node)
+    dom.flat_children(node)
         .find_map(|child| element_with_id(dom, child, id))
 }
 
@@ -697,4 +697,62 @@ fn a_drawn_nodes_actions_lower_to_buttons_that_name_their_action() {
     let moved = &reordered[0].children[1];
     assert_eq!(moved.id, notes.id);
     assert_eq!(moved.children[1].id, pin.id);
+}
+
+#[test]
+fn flat_tree_tests_mirror_only_the_assigned_producer_and_its_action() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerRole, ProducerSemantics};
+    use layout_dom_api::{QualName, ShadowRootInit};
+    let (mut dom, _) = producer_fixture();
+    let root = dom.document();
+    let leaf = element_with_id(&dom, root, "producer-slot").unwrap();
+    let qual = |tag| QualName::new(None, Namespace::default(), LocalName::from(tag));
+    let host = dom.create_element(qual("section"));
+    dom.append_child(root, host);
+    dom.append_child(host, leaf);
+    dom.set_attribute(leaf, qual("slot"), "scene");
+    let decoy = dom.create_element(qual("custom-leaf"));
+    dom.set_attribute(decoy, qual("key"), "7");
+    dom.append_child(host, decoy);
+    let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+    dom.set_inner_html(shadow,"<slot name='scene'><custom-leaf key='7' style='display:block;width:8px;height:6px'></custom-leaf></slot>");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 1200.0, 900.0, &[], &Default::default());
+    let mirror = producer_plan_for(
+        &dom,
+        &layout,
+        ProducerSemantics {
+            role: Some(ProducerRole::Group),
+            name: Some("Slotted board".into()),
+            children: vec![ProducerNode {
+                key: 40,
+                role: ProducerRole::ListItem,
+                name: "Card".into(),
+                rect: [0.0, 0.0, 8.0, 6.0],
+                actions: vec![ProducerAction {
+                    id: "pin".into(),
+                    label: "Pin".into(),
+                    description: "Keep card".into(),
+                }],
+            }],
+        },
+        1.0,
+    );
+    assert_eq!(mirror[0].id, dom.opaque_id(leaf));
+    assert_eq!(name(&mirror[0]), Some("Slotted board"));
+    let actions = produced_actions(&mirror);
+    assert_eq!(actions.len(), 1);
+    assert_eq!(
+        actions[0].1,
+        cambium_rootstock::ProducedAction {
+            slot: 7,
+            key: 40,
+            id: "pin".into()
+        }
+    );
+    assert!(
+        !flat(&mirror)
+            .iter()
+            .any(|node| node.id == dom.opaque_id(decoy))
+    );
 }

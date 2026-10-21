@@ -223,8 +223,9 @@ mod tests {
     }
     #[test]
     fn semantic_actions_keep_distinct_occurrences_and_never_mutate_source() {
+        // The design-study fixture is also packaged so registry tests are self-contained.
         let input = scenomise::backdrops::SceneInput::parse(include_str!(
-            "../../../../support/design-studies/backdrops/fretboard.json"
+            "../tests/fixtures/fretboard.json"
         ))
         .unwrap();
         let reading = input.compile().unwrap();

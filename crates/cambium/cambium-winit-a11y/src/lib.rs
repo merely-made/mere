@@ -687,4 +687,89 @@ mod dpi_tests {
         assert_eq!(map.get(&A11yNodeId(opaque)), Some(&button));
         assert_eq!(tree.focus, A11yNodeId(opaque));
     }
+    #[test]
+    fn flat_tree_tests_native_action_map_contains_only_the_assigned_producer() {
+        use cambium_rootstock::{
+            ProducedTexture, ProducerAction, ProducerContext, ProducerNode, TextureProducer,
+        };
+        use layout_dom_api::ShadowRootInit;
+        struct Board;
+        impl TextureProducer for Board {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn semantics(&mut self) -> Option<ProducerSemantics> {
+                Some(ProducerSemantics {
+                    role: Some(ProducerRole::Group),
+                    name: Some("Slotted board".into()),
+                    children: vec![ProducerNode {
+                        key: 40,
+                        role: ProducerRole::ListItem,
+                        name: "Card".into(),
+                        rect: [0.0, 0.0, 8.0, 6.0],
+                        actions: vec![ProducerAction {
+                            id: "pin".into(),
+                            label: "Pin".into(),
+                            description: "Keep card".into(),
+                        }],
+                    }],
+                })
+            }
+            fn act(&mut self, key: u64, id: &str) -> bool {
+                key == 40 && id == "pin"
+            }
+        }
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(root,"<section><custom-leaf id='active' key='7' slot='scene' style='display:block;width:8px;height:6px'></custom-leaf><custom-leaf id='decoy' key='7'></custom-leaf></section>");
+        let host = dom
+            .dom_children(root)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let leaf = dom
+            .dom_children(host)
+            .find(|node| {
+                dom.attribute(*node, &Namespace::default(), &LocalName::from("id"))
+                    == Some("active")
+            })
+            .unwrap();
+        let decoy = dom
+            .dom_children(host)
+            .find(|node| {
+                dom.attribute(*node, &Namespace::default(), &LocalName::from("id")) == Some("decoy")
+            })
+            .unwrap();
+        let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+        dom.set_inner_html(shadow,"<slot name='scene'><custom-leaf key='7' style='display:block;width:8px;height:6px'></custom-leaf></slot>");
+        let layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+        let mut producers = ProducerRegistry::new();
+        producers.register(7, Board, &[]).unwrap();
+        let (_, map, produced) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
+        assert_eq!(map.get(&A11yNodeId(dom.opaque_id(leaf))), Some(&leaf));
+        assert!(!map.contains_key(&A11yNodeId(dom.opaque_id(decoy))));
+        assert_eq!(produced.len(), 1);
+        let (&button, target) = produced.iter().next().unwrap();
+        let expected = target.clone();
+        let mut host = A11yHost::new(|| {});
+        host.produced_map = produced;
+        let request = host
+            .map_request(&ActionRequest {
+                action: Action::Click,
+                target_tree: TreeId::ROOT,
+                target_node: button,
+                data: None,
+            })
+            .unwrap();
+        assert_eq!(
+            request,
+            A11yRequest::produced(A11yAction::Click, expected.clone())
+        );
+        assert!(producers.act(&expected));
+    }
 }
