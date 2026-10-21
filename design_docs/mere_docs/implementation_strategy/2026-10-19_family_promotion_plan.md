@@ -712,3 +712,25 @@ Compact source, command and publication evidence belongs in
 checks do not establish new native UI, physical-device or durable audit-log
 qualification. The shared core remains a bounded observation copy; products
 retain authoritative execution results and persistence.
+
+
+Apparatus extraction receiving qualification is complete. Armillary's default
+and Serde configurations pass the 18 transferred core tests on Rust 1.97.1;
+its existing 19 execution tests also pass. Mere passes ten retained projection/
+collector tests plus two public-type/wire controls, Distillery's 42 library and
+five observation/shutdown tests, Djinn's four resident-event tests, and
+Mesquite's 39 library tests. The standalone Git consumer runs on Rust 1.97.1
+with no normal dependency beyond `apparatus-core`. Four selected locked roots
+revalidate; the optional Distillery probe does not consume the core in its
+default resolved graph.
+
+The supplier core is pushed at Armillary `75643df1`. Mere's integration is
+pushed at `7edfe3b0`, preserving concurrent producer-identity refusal and native
+co-op/save-recovery work. The final facade rerun passes on that integrated
+source. Turnstone's actual diagnostics, redaction and projection paths pass 16
+focused tests against the canonical Git supplier, and its receiving lock/receipt
+are pushed at `fc7a3e49`. Its product sources and dependency declarations are
+unchanged. Cargo also reselected an already-present Windows dependency in 16
+lock entries; this is recorded in the receiving receipt, with no unrelated
+package-version or source changes. The qualified code pins remain fixed as
+later documentation-only records are published; no recursive repin is needed.
