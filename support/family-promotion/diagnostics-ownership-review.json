@@ -495,5 +495,8 @@
     }
   ],
   "readonly_observation_qualification": "diagnostics-readonly-qualification.json",
-  "readonly_observation_basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4"
+  "readonly_observation_basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "readonly_observation_integration_qualification": "diagnostics-readonly-integration-qualification.json",
+  "readonly_observation_integration_basis": "d7fd54d71",
+  "integration_note": "Subsequent main authentication work intentionally receives Dramatis 7d498c27. The frozen 537-native cohort retained earlier suppliers; affected resident/product/Wasm integration gates supplement it without changing the semantic source seal."
 }

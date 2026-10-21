@@ -160,3 +160,10 @@ resident integration are not substituted for final receiving. Supplier-owned
 selector lookup/flat traversal remains within the first migration; target
 lifetimes, broader Hest action routing and full forward geometry remain ordered
 behind it. No complete first-migration or four-migration claim is made.
+
+Publication integration d7fd54d71 preserves those semantic sources while receiving
+main's intentional Dramatis 7d498c27 authentication cohort and its lock changes.
+A separate integration record qualifies the affected resident, retained product
+and actual Graphshell Wasm entry point; it does not relabel the original 537
+native passes as a rerun on the merged lock. Historical narrow-lock evidence
+remains valid for its frozen cohort, not a promise to hold later main repins.
