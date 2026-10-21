@@ -33,11 +33,10 @@ pub fn root(state: &State) -> Child {
         Box::new(el("h1", text("Dramatis"))),
         line("Your personae and imported credentials"),
     ];
-    if !state.notice.is_empty() {
-        body.push(Box::new(
-            el("p", text(state.notice.clone())).attr("role", "status"),
-        ));
-    }
+    // Keep the live region and following controls stable across acknowledgements.
+    body.push(Box::new(
+        el("p", text(state.notice.clone())).attr("role", "status"),
+    ));
     body.push(action("Reconnect", Request::Refresh, state.busy));
     match &state.snapshot {
         None => body.push(line(
