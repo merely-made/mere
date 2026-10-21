@@ -58,6 +58,7 @@ def main():
     for name, relative, export in [
         ('binding', 'crates/conatus/seiche/examples/binding_replay.json', 'run_replay'),
         ('occurrence', 'crates/canvas/pictograph/examples/occurrence_replay.json', 'run_occurrence_replay'),
+        ('occurrence-mix', 'crates/canvas/pictograph/examples/occurrence_mix_replay.json', 'run_occurrence_replay'),
     ]:
         example = 'binding_replay' if name == 'binding' else 'occurrence_replay'
         native = target / 'debug/examples' / example
@@ -102,6 +103,15 @@ def main():
                 for field in ('relationship_ids', 'ticks'):
                     if n1[field] != candidate[field]:
                         failures.append(f'{name}/{label}/{field}: metadata differs')
+        if name == 'occurrence-mix':
+            for label, candidate in [('native-1', n1), ('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                difference = first_difference(candidate['trace'], candidate['reopened_trace'])
+                if difference:
+                    failures.append(f'{name}/{label}/saved-recipe-reopen: {difference}')
+            for label, candidate in [('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                for field in ('relationship_ids', 'ticks'):
+                    if n1[field] != candidate[field]:
+                        failures.append(f'{name}/{label}/{field}: metadata differs')
         controls = {}
         if name == 'binding':
             changed = copy.deepcopy(fixture)
@@ -137,12 +147,47 @@ def main():
                 for runtime in (False, True):
                     label = control + '-refusal-' + ('wasm' if runtime else 'native')
                     controls[label] = run(label, json.dumps(changed), runtime, refusal=path)
-        results['cases'][name] = {"accepted_ticks": expected_ticks[-1], "witnesses": len(n1['trace']), "native_sha256": sha(native), "wasm_sha256": sha(wasm),
+            if name == 'occurrence-mix':
+                base = n1
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['parts'][0]['weight'] = 0.75
+                spec['root']['parts'][1]['weight'] = 0.25
+                changed['spec'] = json.dumps(spec)
+                for runtime in (False, True):
+                    label = 'share-divergence-' + ('wasm' if runtime else 'native')
+                    value = run(label, json.dumps(changed), runtime)
+                    difference = first_difference(base['trace'] if not runtime else w1['trace'], value['trace'], 'position-bits:')
+                    if difference is None:
+                        raise AssertionError(f'{label}: changed mix shares must alter positions')
+                    controls[label] = difference
+
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['parts'][1]['id'] = 'stress.kamada-kawai'
+                changed['spec'] = json.dumps(spec)
+                for runtime in (False, True):
+                    label = 'law-divergence-' + ('wasm' if runtime else 'native')
+                    value = run(label, json.dumps(changed), runtime)
+                    difference = first_difference(base['trace'] if not runtime else w1['trace'], value['trace'], 'position-bits:')
+                    if difference is None:
+                        raise AssertionError(f'{label}: changed mix law must alter positions')
+                    controls[label] = difference
+
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['parts'][1]['id'] = 'still.default'
+                changed['spec'] = json.dumps(spec)
+                for runtime in (False, True):
+                    label = 'kinematic-mix-refusal-' + ('wasm' if runtime else 'native')
+                    controls[label] = run(label, json.dumps(changed), runtime, refusal='root.parts[1]')
+        results['cases'][name] = {"accepted_ticks": expected_ticks[-1], "witnesses": len(n1['trace']), "input_sha256": sha(out / (name + '-input.json')), "native_sha256": sha(native), "wasm_sha256": sha(wasm),
                                   "executed_wasm_sha256": sha(pkg / 'replay_bg.wasm'), "wasm_glue_sha256": sha(pkg / 'replay.js'),
                                   "fixture_sha256": sha(fixture_path), "differences": differences, "controls": controls}
     results['failures'] = failures
     results['qualified'] = not failures
     results['limits'] = ['Fresh-start replay for these fixtures on this native host and Node Wasm runtime.',
+                         'The occurrence Mix case round-trips the serialized DynamicsSlot recipe before replay; this does not qualify Graphshell v4 persistence or checkpoint restoration.',
                          'No checkpoint restoration, cross-OS, browser UI, actor replay or consumer repin qualification.',
                          'Occurrence witnesses cover public positions, roles and source identities; Seiche witnesses also cover velocities and field time.']
     (out / 'replay-results.json').write_text(json.dumps(results, indent=2) + '\n')
