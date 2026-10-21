@@ -5,8 +5,8 @@
 **Status (2026-10-20):** H3 is implemented and qualified through canonical
 Turnstone keys, Knot window verbs and a Chirograph wire round trip. Hest 0.2.0
 and Cambium 0.5.0 remain the prepared versions; frozen Hest 0.1.0 and the
-command-menu 0.1.1 shim are unchanged. Mark authorized commits and Git pushes;
-crate publication remains held. H4 is unstarted.
+command-menu 0.1.1 shim are unchanged. Mark authorized commits, pushes, merges,
+publication and scoped pruning. Release verification is in progress. H4 is unstarted.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
@@ -91,8 +91,9 @@ The port law applies: a piece moves only when a second host exercises it. A pure
 4. **Delivery:** implement H1 as a pure move, run existing receipts and a shim
    compatibility check, identify two host exercises, and commit locally.
    The original H1 instruction held Git pushes and publication. Mark's H3
-   authorization below lifts the Git hold. Publication remains held: its
-   future order is Hest first, shim second, after publication authorization.
+   authorization below lifted the Git hold. The later release authorization
+   lifts the publication hold; Hest 0.1 precedes its shim, and Hest 0.2
+   precedes Cambium 0.5.
 
 ## Risks
 
@@ -369,8 +370,8 @@ desktop/browser presentation and native restart were not exercised.
 
 ## H3 implementation and delivery (2026-10-20)
 
-Mark authorized H3, local commits and Git pushes. Crate publication remains
-held. H3 adds API without changing the prepared Hest 0.2.0 declarations or the
+Mark authorized H3, local commits and Git pushes. At that checkpoint crate
+publication remained held. H3 adds API without changing the prepared Hest 0.2.0 declarations or the
 frozen 0.1 compatibility line.
 
 - Hest owns `Invocation` (id, schema id, opaque bytes and declared effect) and
@@ -462,3 +463,21 @@ availability and identity evidence, not a repeated native/runtime test.
 [Git delivery and fresh resolution](../../../support/receipts/hest-h3-20261020/delivery.json)
 records the exact pushed heads, commands, real exit statuses and source proof.
 No crate publication occurred. H4 and native GUI/human AT remain separate.
+
+
+### Release authorization and documentation repair
+
+Mark subsequently directed: “Fix, proceed. Commit, push, merge, publish, prune.”
+This authorizes the prepared Hest 0.1.0, command-menu 0.1.1, Hest 0.2.0 and
+Cambium 0.5.0 releases in dependency order. H4 remains unstarted. Incoming
+Mere commits through `c5f3a4cd5` were fast-forwarded before release work; the
+canonical Turnstone and Knot receivers retain their already-qualified locks.
+
+The expanded rootstock Rustdoc failure is repaired at its actual ownership
+boundary: `sync_a11y` and zoom use their current associated methods; the
+windowless harness is named in its event-source crate without introducing a
+reverse dependency. Stale surface-boot and private-state links are corrected.
+The released Cambium docs also correct a private-handler link and an HTML
+placeholder. These edits change documentation only. The incoming rootstock
+producer changes receive a fresh library run. Package verification and
+registry-only old/new API checks are required before marking delivery done.
