@@ -50,15 +50,15 @@ python3 ports/graphshell/docs/receipts/coop_two_machines_20261020/verify.py --co
 
 ## Qualified result, 2026-10-20
 
-The accepted `gs-c2-20261020-04` cohort passes all seven phases with 22
+The accepted `gs-c2-20261020-05` cohort passes all seven phases with 22
 reviewed nonblank captures, seven distinct machine/native-PID pairs and four
 successful custodian launches and ordinary stops. The owner runs x86_64 macOS;
 the guest is the physical M4 iMac running arm64 macOS 26.5.1. Salted hardware
 identifiers distinguish the machines without recording hardware UUIDs.
 
-The guest's existing carrier reports **active direct 192.168.4.68:56242**,
-matching the owner's LAN interface; the guest return also reports a direct
-IPv6 path to the owner. SSH carries control and handoff only;
+The guest's existing carrier reports an **active direct IPv6 path** to
+`[2603:6014:5d01:26d3:95ff:624b:b51c:8bd5]:59558`, matching the owner's
+interface address. SSH carries control and handoff only;
 there are no forwarded data-plane ports or guest graph-state writes.
 
 The guest adds a source and revises the original source by its durable UUID.
@@ -76,10 +76,10 @@ A fresh M4 guest is refused as `Delegation(Revoked)` using the byte-identical
 original invitation, with fresh owner connection information. Thus the cold
 refusal exercises the old grant against restored authority.
 
-The current runtime source is `262fe3631acec3620020c08628bf567514d8ece6`,
-based on main `cf0dc82f27d2d7036ec48eac01c3d63baa4d8446`. It includes the
+The current runtime source is `763c28814382f055424da8795f37b0df4d0a3df0`,
+including main `18c3549b3ba5848b8ee3f57a38b7fe244e38bce2`. It includes the
 current shared site/contributor stack. Both builds record identical hashes for
-3,289 repository/compiler-declared inputs and the executed harness, plus
+3,290 repository/compiler-declared inputs and the executed harness, plus
 18 pinned Git suppliers and normal/build dependency trees. Resolved external
 path packages are excluded from the actual compiled trees. Rust/Cargo 1.99.1
 is explicit on both machines.
@@ -106,9 +106,15 @@ runs complete with existing warnings. Commands and compressed logs are in
 workspace or CI qualification. `capture-review.json` records all 22 visual
 inspections, backed by three contact sheets and individual critical captures.
 
-During final freshness checking, main advanced to `2764c84895ba7bca564113eb14aecf7894cf1592`
-with six Markdown-only description updates. They were merged at
-`33171fa2811af2fb9b0111f6c0bff599a9afefa1`. All recorded compiler and harness
-input hashes remain identical; the packet verifier checks those inputs against
-the final committed tree, so the earlier runtime result is not relabelled as a
-new binary build. Both primary checkouts retain their separate active work.
+During final freshness checking, main first advanced with six Markdown-only
+updates, then to `18c3549b3ba5848b8ee3f57a38b7fe244e38bce2` with a Djinn
+personal-sync roster authority change. The earlier complete cohort is preserved
+in commit `b9ab9755296e1d77ecb0063e378e1097bcd38664`. After merging the new
+resident code, both architectures were rebuilt and the complete acceptance
+sequence repeated as `gs-c2-20261020-05`. Graphshell's signed UI executables are
+byte-identical on both architectures; only the two Djinn roster source inputs
+changed. All 30 resident Mere tests and the four new roster regressions pass on
+Intel; the four roster regressions also pass on M4. Resident Clippy passes with
+existing warnings. The earlier Graphshell test and Clippy results are retained
+with explicit source and reuse provenance in `software-gates.json`. All current
+compiler and harness inputs are verified against the final committed tree.

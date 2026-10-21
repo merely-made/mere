@@ -1,5 +1,5 @@
 {
-  "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+  "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0",
   "files": {
     ".cargo/config.toml": "af174c7f9ac5ae8e0536a8fd2fa0251e680f23edab3ffbb5098aa914a48cdb01",
     "Cargo.lock": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
@@ -1817,7 +1817,8 @@
     "ports/djinn/src/sync/graph_keys.rs": "be7ced82fd4329ad162220aed9de282f5a783bec633155654c0ebb7af65d7383",
     "ports/djinn/src/sync/mod.rs": "4f8ff30b94dc78268bde84c91c5f482bb74f30708ba7290c5d7522bfdea83f4a",
     "ports/djinn/src/sync/personal_seals.rs": "cb8f466f46aedd664a54cf1a710ad7fbe2c034dfcfdc2165f14ad87f56154ba5",
-    "ports/djinn/src/sync/personal_sync_host.rs": "1ea23203d2b943a3a50af6a519e05f0128b14127604d81ea7000b45b7abe7e0d",
+    "ports/djinn/src/sync/personal_sync_host.rs": "5fe90447c1653f7f83541d7be1e987955ff2c6a708702008cfaec2da06ed12b7",
+    "ports/djinn/src/sync/personal_sync_host/roster_tests.rs": "1309babe776500a8e48e50398762692dde25cdb4f1e18fdbef31acc6b46ff092",
     "ports/djinn/src/sync/transfer_staging.rs": "de7c1b6d32a668248189a0bac8c0ba20e73974dcfae9572a71ed4fdcf47a1763",
     "ports/djinn/tests/carriage_commissioning.rs": "61938c979ee3813c40498017732f462cfdc26cb0d763cb2c78a7fa78d5c47f5b",
     "ports/djinn/tests/common/inference_door.rs": "f6da5850861bca5a56c228330b4580f5cfa1a537c21cf72b48175ae0db56c452",
@@ -3305,13 +3306,13 @@
       "signing": "ad-hoc, timestamp=none; no personal signing identity"
     },
     "djinn": {
-      "sha256": "6025db81396b46f95e9abad01576a6baf67bba2417598844e61967cf0675cdab",
-      "bytes": 271324560,
+      "sha256": "ebe10b88340cdde075399cbbf01a3e99c60005006497469960ed926d366254df",
+      "bytes": 271310192,
       "architecture": "x86_64",
       "signing": "ad-hoc, timestamp=none; no personal signing identity"
     },
     "coop_existing_graph": {
-      "sha256": "07cdc55c1d5ac0735cb4ddcacf7e93dd4395341b30e9e547407fa0850956b7cf",
+      "sha256": "d48ffb55d37db14e5b0c8a064e2380f067cc10e6eda54334d1d84c4e998cddee",
       "bytes": 16324656,
       "architecture": "x86_64",
       "signing": "ad-hoc, timestamp=none; no personal signing identity"

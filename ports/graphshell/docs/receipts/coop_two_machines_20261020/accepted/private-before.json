@@ -4,45 +4,45 @@
       "badges": [],
       "media": [
         [
-          166,
-          190,
-          183,
-          161,
-          212,
-          82,
-          166,
-          46,
-          175,
-          64,
-          130,
-          129,
-          198,
-          138,
-          68,
-          23,
-          199,
-          188,
-          85,
-          236,
-          72,
-          179,
-          113,
-          37,
-          93,
-          213,
-          55,
-          114,
-          51,
-          110,
+          215,
+          96,
+          12,
+          104,
+          34,
+          207,
           27,
-          41
+          165,
+          146,
+          229,
+          33,
+          85,
+          183,
+          1,
+          0,
+          167,
+          239,
+          127,
+          90,
+          104,
+          129,
+          127,
+          163,
+          10,
+          133,
+          53,
+          225,
+          139,
+          95,
+          216,
+          210,
+          60
         ]
       ],
       "title": "Session",
       "values": [
         {
           "label": "Session",
-          "value": "5ec6391b-97dc-444d-9177-73f2af74844d"
+          "value": "a2dedb28-a5e1-4a40-8213-7f639730118c"
         },
         {
           "label": "Changes",
@@ -76,10 +76,10 @@
       "epoch": 1,
       "facets": {
         "nodes": {
-          "6549fb73-2c27-4ed4-b197-d871f2b8a4e0": {
+          "85ecfd1a-040e-4a81-b8db-b2d851fafb5b": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792542915614
+              "last_visited_ms": 1792543418882
             }
           }
         }
@@ -113,7 +113,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "6549fb73-2c27-4ed4-b197-d871f2b8a4e0",
+            "node_id": "85ecfd1a-040e-4a81-b8db-b2d851fafb5b",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -138,7 +138,7 @@
       "read_only": false,
       "revision": 2,
       "schema": "mere.session.graph/v1",
-      "session": "5ec6391b-97dc-444d-9177-73f2af74844d",
+      "session": "a2dedb28-a5e1-4a40-8213-7f639730118c",
       "views": {}
     }
   ],
@@ -152,52 +152,52 @@
       "bindings": [
         {
           "instance": 0,
-          "key": "mere.session:5ec6391b-97dc-444d-9177-73f2af74844d"
+          "key": "mere.session:a2dedb28-a5e1-4a40-8213-7f639730118c"
         },
         {
           "instance": 1,
-          "key": "mere:6549fb73-2c27-4ed4-b197-d871f2b8a4e0"
+          "key": "mere:85ecfd1a-040e-4a81-b8db-b2d851fafb5b"
         }
       ],
       "offers": {
-        "mere.session:5ec6391b-97dc-444d-9177-73f2af74844d": [
+        "mere.session:a2dedb28-a5e1-4a40-8213-7f639730118c": [
           {
-            "byte_size": 268,
+            "byte_size": 266,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              246,
-              39,
-              245,
-              210,
-              245,
-              191,
+              101,
+              142,
+              10,
+              125,
+              92,
+              60,
+              26,
+              144,
+              27,
               169,
-              6,
-              97,
-              21,
-              229,
-              102,
-              88,
-              148,
-              140,
-              123,
-              135,
-              30,
-              168,
-              226,
-              252,
-              156,
-              209,
+              201,
+              48,
+              121,
+              82,
+              167,
+              112,
+              220,
+              138,
               233,
-              40,
-              229,
-              149,
-              22,
-              71,
-              31,
-              42,
-              26
+              105,
+              58,
+              69,
+              151,
+              213,
+              19,
+              166,
+              103,
+              35,
+              171,
+              43,
+              41,
+              86
             ],
             "semantics": {
               "actions": [
@@ -236,7 +236,7 @@
             }
           }
         ],
-        "mere:6549fb73-2c27-4ed4-b197-d871f2b8a4e0": [
+        "mere:85ecfd1a-040e-4a81-b8db-b2d851fafb5b": [
           {
             "byte_size": 209,
             "codec": "PortableCardV1",
@@ -363,11 +363,11 @@
         "sources": [
           {
             "adapter": "mere.session",
-            "id": "5ec6391b-97dc-444d-9177-73f2af74844d"
+            "id": "a2dedb28-a5e1-4a40-8213-7f639730118c"
           },
           {
             "adapter": "mere.graph",
-            "id": "6549fb73-2c27-4ed4-b197-d871f2b8a4e0"
+            "id": "85ecfd1a-040e-4a81-b8db-b2d851fafb5b"
           }
         ],
         "spaces": [

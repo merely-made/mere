@@ -40,27 +40,27 @@
     "fe80::820:6370:7015:90f2%en0",
     "fe80::94af:fef:7b2f:9854%utun6",
     "fe80::9e96:ed26:cb4a:8139%utun11",
+    "fe80::a8f5:29ff:feb7:9c77%awdl0",
+    "fe80::a8f5:29ff:feb7:9c77%llw0",
     "fe80::bcde:2767:c880:5a00%utun5",
     "fe80::bdb0:e07e:a817:c838%utun2",
     "fe80::c400:666d:50d0:a035%utun9",
     "fe80::c5c2:2c03:d627:9a6f%utun14",
     "fe80::ce81:b1c:bd2c:69e%utun10",
     "fe80::ce81:b1c:bd2c:69e%utun3",
-    "fe80::da14:690b:4d83:d23f%utun4",
-    "fe80::e448:beff:feeb:8ae%awdl0",
-    "fe80::e448:beff:feeb:8ae%llw0"
+    "fe80::da14:690b:4d83:d23f%utun4"
   ],
   "console_user": "markik",
   "console_locked": false,
   "console_present": true,
-  "worker_pid": 55596,
+  "worker_pid": 60100,
   "worker_sha256": "50ee4c7c97f721636402537d6c8de460de47e21cd5c9d517660d70a9410dd904",
-  "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+  "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0",
   "lock_sha256": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
   "binaries": {
     "graphshell_mere": "411c999eaa3389d1453e2dfdb5f643bf3cc34d69a62312e8c097caeea67999a0",
-    "djinn": "dc8ad63b906d3f9b48288a0dcb5ee538fb376da97d498b5e2bed70230fde4c24"
+    "djinn": "1bc8413af838c0c3dae59b9a3f054cd1fe5e54c74713c32214d220b81631b5a9"
   },
-  "public": "/Users/markik/Code/output/gs-c2-20261020-04/guest/evidence",
-  "private": "/Users/markik/Code/output/gs-c2-20261020-04/guest/private"
+  "public": "/Users/markik/Code/output/gs-c2-20261020-05/guest/evidence",
+  "private": "/Users/markik/Code/output/gs-c2-20261020-05/guest/private"
 }

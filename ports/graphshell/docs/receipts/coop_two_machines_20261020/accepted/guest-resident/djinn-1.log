@@ -1,10 +1,10 @@
-2026-10-21T00:35:14.563972Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/vault/vault.json
-2026-10-21T00:35:14.566787Z  WARN djinn: selected profile was created profile=CrossGraphGuest
-2026-10-21T00:35:14.569092Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
-2026-10-21T00:35:14.613830Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/mere yet; pair this device first, or name a persona
-2026-10-21T00:35:14.614097Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/agent.sock"
-2026-10-21T00:35:14.614266Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/local/graphshell/settings/CrossGraphGuest.json configured=false
-2026-10-21T00:35:40.226702Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
-2026-10-21T00:35:49.528190Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
-2026-10-21T00:35:52.621746Z  INFO djinn: stop requested on the control route
-2026-10-21T00:35:52.622951Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 7, cancelled: 3, panicked: 0, rejected: 0 }
+2026-10-21T00:43:37.708459Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/vault/vault.json
+2026-10-21T00:43:37.709744Z  WARN djinn: selected profile was created profile=CrossGraphGuest
+2026-10-21T00:43:37.710982Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-21T00:43:37.752925Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/mere yet; pair this device first, or name a persona
+2026-10-21T00:43:37.753140Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/agent.sock"
+2026-10-21T00:43:37.753277Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/local/graphshell/settings/CrossGraphGuest.json configured=false
+2026-10-21T00:43:56.269477Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-21T00:44:03.240768Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-21T00:44:06.053452Z  INFO djinn: stop requested on the control route
+2026-10-21T00:44:06.054299Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 7, cancelled: 3, panicked: 0, rejected: 0 }
