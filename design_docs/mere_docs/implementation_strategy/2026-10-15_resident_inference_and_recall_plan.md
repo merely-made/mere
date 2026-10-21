@@ -1828,6 +1828,15 @@ receipt does not promote those pending product gates to passes.
   leaving it below the unchanged 32-character automatic quote threshold.
   Numeric-marker requests were also unreliable. The final sentence-length
   selection qualifies ordinary exact quotation; no citation or owner/version
-  validation was relaxed. Concurrent Turnstone shared-shell changes preserve
-  the context repair in newer SDK `d574d4b50`; merged native and 43 focused
-  Turnstone cases pass. A separate integration packet owns the headed rerun.
+  validation was relaxed. Final Turnstone shared-shell and Apparatus-core integration receives SDK
+  `7edfe3b09` in source cut `a048adcc36eef8597ed913940d83103b9eae1633`.
+  Native/libtest builds and all 43 focused Turnstone cases pass on Rust 1.99.1.
+  Its four native warm/cold phases also pass with twenty reviewed captures,
+  exact local citations, compatible reuse, immutable historical evidence and
+  selected-only cold export. The full recall implementation is byte-identical
+  across the repair, the frozen `c6540a4b7` GPU fixture and receiving SDK cuts.
+  [The final integration packet](https://github.com/merely-made/turnstone/tree/main/docs/receipts/retained_clip_embedding_integration_20261021)
+  records raw/public independent verification and Git-blob source proofs.
+  The fixture binary remains explicitly bound to its compiled source cut; this
+  is not qualification of every current-main resident configuration or a
+  personal installation.
