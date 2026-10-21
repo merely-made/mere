@@ -135,6 +135,8 @@ question for Mark (vendored code, upstream ledger first).
    per finding: Mark: **"Ledger only, out of this plan (Recommended)"**. L0 names them and
    stops; their fourteen findings go to the upstream ledger with the audit's evidence.
 
+L1 card round, 2026-10-20 (Mark's words, unnumbered): chartulary is now in repos/eidetic, pinned by rev: **"Branch in eidetic + repin (Recommended)"**. Current address on load: **"Stored node address (Recommended)"**. Adding an existing node id: **"Insert-if-missing live too (Recommended)"**. Creator after owner deletion: **"1, or 2 if no ancestor"** (re-parent to the deleted owner's creator, else clear).
+
 Still open, to be put when a lane reaches it: who owns L2 to L5's start order after L1's first
 slice lands.
 
@@ -143,7 +145,32 @@ slice lands.
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
   are a sizing aid, not an assignment. 98 of the 147 graph-and-session findings sit in
   graph-kernel, chartulary, graphshell and the canvas crates.
+- 2026-10-20 (L6): a read of all 465 findings replaced the keyword count of 57 for the
+  misleading-success class: **95 in class**, 30 production code in mere, 39 tooling in mere,
+  11 in the vendored GPU patches, 15 whose source has since left mere (eidetic-core, luggage and
+  stickleback now in `repos/eidetic`; esp in `repos/esp`; mien in `repos/gemot`; errand), plus 12
+  related findings whose fix needs an owner choice and belong to L1 to L5. The register holds 39
+  findings under `support/patches` (Q424 to Q462), not the fourteen named in §5.4; the eleven in
+  the class include burn-remote, cubecl-runtime and cubecl-wgpu, which the ruling's list did not
+  name. Q054 (djinn-testkit) was already repaired on main by `2e683fcfc`. List and receipt:
+  [`l6/2026-10-20_l6_receipt.json`](../../../support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json).
 
 ## 7. Progress
 
 - 2026-10-20: drafted after Mark's answer; first round answered the same day (§5); L1 (kernel and chartulary) and L6 (receipts class) briefed as sessions, each in its own worktree, with the bar in §5.3.
+- 2026-10-20: L1 repaired Q013 (stored address wins on load, regression plus kernel suite 474/474, receipt `support/receipts/ownership-repair/l1/2026-10-20_l1_receipt.json`). Remaining in the slice: Q009, Q010, Q012, Q015, Q016, Q017, Q031, Q032 in the kernel, Q014 re-document only; Q001, Q002, Q003, Q019 wait on an eidetic branch and repin.
+
+- 2026-10-20 (L6): Mark's card round, his words: first crate **"djinn-testkit first
+  (Recommended)"**; moved code **"Record and hand off (Recommended)"**; historical dated
+  scripts **"Re-document, keep bytes (Recommended)"**; GPU patches **"Ledger all 11
+  (Recommended)"**; Q052 **"Narrow claim, report all (Recommended)"**. First crate landed on
+  branch `l6/misleading-success` (not merged): Q052 repaired (verdict extracted to
+  `ports/djinn/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
+  `residue_verdict_classifier` 5 tests, mutation control fails 4 of 5, the audit's probe rerun 5
+  passed), Q054 verified in the worktree (djinn-testkit 14 passed), GPU findings added to the
+  upstream ledger as item 14. Receipt: `support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json`.
+  Remaining by consumer risk: support/testing runners (Q422, Q463 to Q465), script-host
+  build.rs (Q371), cambium-genet-winit-host receipts, pelt and graphshell receipt paths, the 30
+  production findings, probes. Not run: the full `knot_residue` run (heavy); its verdict is
+  unchanged, only its reporting.
+
