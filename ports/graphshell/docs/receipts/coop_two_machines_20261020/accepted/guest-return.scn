@@ -1,0 +1,10 @@
+await {"coop-nodes": "3", "coop": "~Guest revised existing source"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-c2-20261020-05/guest/evidence/guest-return.png
+await {"coop-available": "false", "nodes": "0", "selected": ""}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-c2-20261020-05/guest/evidence/guest-withdrawn.png
