@@ -15,19 +15,31 @@ use crate::{
 use accesskit::{Action, NodeId as A11yNodeId, Rect, Role, TreeUpdate};
 use document_session_api::{DocumentA11yProjection, DocumentA11yRole};
 use layout_dom_api::LayoutDom;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+
+/// A producer contribution refused by this composition read. These identify
+/// ambiguous declarations, not producer generations or operation outcomes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ProducerSemanticIssue {
+    DuplicateChildKey { producer: u64, key: u64 },
+    DuplicateActionId { producer: u64, key: u64, id: String },
+    NodeIdCollision { producer: u64, id: A11yNodeId },
+}
 
 pub struct SemanticProjection {
     pub tree: TreeUpdate,
     pub dom_targets: HashMap<A11yNodeId, NodeId>,
     pub produced_targets: HashMap<A11yNodeId, ProducedAction>,
     pub producer_slots: HashMap<u64, NodeId>,
+    /// Refused contributions; their slot overrides, children and action routes
+    /// are absent. The underlying DOM observation remains available.
+    pub producer_issues: Vec<ProducerSemanticIssue>,
 }
 impl SemanticProjection {
     /// Lower a DOM observation before optional contributions. The usual host
     /// entry point is `project_semantics`, which binds the current providers.
     pub fn from_document(projection: DocumentA11yProjection) -> Self {
-        let multiline: std::collections::HashSet<_> = projection
+        let multiline: HashSet<_> = projection
             .nodes()
             .iter()
             .filter(|node| node.role == DocumentA11yRole::TextField && node.state.multiline)
@@ -44,6 +56,7 @@ impl SemanticProjection {
             dom_targets: HashMap::new(),
             produced_targets: HashMap::new(),
             producer_slots: HashMap::new(),
+            producer_issues: Vec::new(),
         }
     }
 }
@@ -68,6 +81,7 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
         .enumerate()
         .map(|(i, (id, _))| (*id, i))
         .collect();
+    let mut reserved_ids = indices.keys().copied().collect();
     let mut nodes = Vec::new();
     let mut slot_counts = HashMap::<u64, usize>::new();
     for node in flat_nodes(dom) {
@@ -86,15 +100,20 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
         // publish actionable children or choose one arbitrary semantic owner.
         if let Some(key) = key.filter(|key| !producers.contains(*key) || slot_counts[key] == 1) {
             if let Some(semantics) = producers.semantics(key) {
-                result.producer_slots.insert(key, node);
-                add_producer_semantics(
+                match add_producer_semantics(
                     &mut result.tree,
                     id,
                     key,
                     semantics,
                     layout.scrolled_content_origin(dom, node),
                     &mut result.produced_targets,
-                );
+                    &mut reserved_ids,
+                ) {
+                    Ok(()) => {
+                        result.producer_slots.insert(key, node);
+                    },
+                    Err(issue) => result.producer_issues.push(issue),
+                }
             } else if let Some(leaf) = leaves.get_mut(&key) {
                 let access = &mut result.tree.nodes[index].1;
                 let label = access.label().map(str::to_owned);
@@ -143,7 +162,7 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
         .iter()
         .map(|(id, node)| (*id, node))
         .collect();
-    let mut visible = std::collections::HashSet::new();
+    let mut visible = HashSet::new();
     let mut pending = result
         .tree
         .tree
@@ -191,10 +210,14 @@ fn add_producer_semantics(
     semantics: ProducerSemantics,
     content_origin: Option<(f64, f64)>,
     produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
-) {
+    reserved_ids: &mut HashSet<A11yNodeId>,
+) -> Result<(), ProducerSemanticIssue> {
     let Some(index) = tree.nodes.iter().position(|(id, _)| *id == slot) else {
-        return;
+        return Ok(());
     };
+    // Reserve the complete contribution before changing the slot or any route.
+    // An invalid later child must not leave an actionable prefix behind.
+    reserve_producer_ids(slot, producer, &semantics, reserved_ids)?;
     let (origin, disabled, hidden) = {
         let access = &mut tree.nodes[index].1;
         if let Some(role) = semantics.role {
@@ -274,12 +297,52 @@ fn add_producer_semantics(
     }
     tree.nodes.extend(children);
     tree.nodes.extend(buttons);
+    Ok(())
+}
+
+fn reserve_producer_ids(
+    slot: A11yNodeId,
+    producer: u64,
+    semantics: &ProducerSemantics,
+    reserved: &mut HashSet<A11yNodeId>,
+) -> Result<(), ProducerSemanticIssue> {
+    let mut keys = HashSet::new();
+    let mut candidate_ids = HashSet::new();
+    let mut reserve = |id| {
+        if reserved.contains(&id) || !candidate_ids.insert(id) {
+            Err(ProducerSemanticIssue::NodeIdCollision { producer, id })
+        } else {
+            Ok(())
+        }
+    };
+    for child in &semantics.children {
+        if !keys.insert(child.key) {
+            return Err(ProducerSemanticIssue::DuplicateChildKey {
+                producer,
+                key: child.key,
+            });
+        }
+        reserve(produced_node_id(slot, child.key, None))?;
+        let mut actions = HashSet::new();
+        for action in &child.actions {
+            if !actions.insert(action.id.as_str()) {
+                return Err(ProducerSemanticIssue::DuplicateActionId {
+                    producer,
+                    key: child.key,
+                    id: action.id.clone(),
+                });
+            }
+            reserve(produced_node_id(slot, child.key, Some(&action.id)))?;
+        }
+    }
+    reserved.extend(candidate_ids);
+    Ok(())
 }
 
 /// A drawn node's id, or its action button's: stable for the slot, the
 /// node's key and the action, however the producer orders its nodes, in a
-/// reserved high-bit range used by current DOM IDs. This hash is not a
-/// generation token or a collision-proof identity.
+/// high-bit range. Composition checks it against all current DOM and generated
+/// IDs. This hash is not a generation token or a collision-proof identity.
 fn produced_node_id(slot: A11yNodeId, key: u64, action: Option<&str>) -> A11yNodeId {
     // FNV-1a: fixed, so an id is the same on every frame and every run.
     let mut hash: u64 = 0xcbf2_9ce4_8422_2325;

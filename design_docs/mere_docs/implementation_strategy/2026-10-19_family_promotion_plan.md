@@ -323,6 +323,16 @@ native action bounds and scaled browser boxes receive the repair. The
 keeps full forward transform/clip and flattened-ancestor mapping with the
 supplier; no duplicate CSS placement implementation is introduced in Mere.
 
+Producer semantic identity validation (2026-10-21, qualified): one shared
+preflight refuses duplicate child keys, per-child action IDs and platform-ID
+collisions before mutating any contribution or route. Native/browser publication
+and current-target admission receive the same policy. Frozen main `8942e3050`
+passes 122 targeted native tests/five existing ignores and browser-host Wasm
+compilation. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-semantic-identities-2026-10-21)
+keeps immutable observations, target generations and report/collector adoption
+open; the stable ID hash is not a generation token or collision-free allocator.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

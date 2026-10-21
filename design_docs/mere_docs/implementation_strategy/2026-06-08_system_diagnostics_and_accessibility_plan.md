@@ -1,5 +1,71 @@
 # System Diagnostics and Accessibility Plan
 
+## Producer semantic identities, 2026-10-21
+
+**Status:** contained identity validation qualified on frozen main `8942e3050`, preserving Hest H4
+receiving qualification. Receipt cap remains 10 MB across this continuation;
+builds reuse `C:\t\cargo-targets\mere`.
+
+Scope: validate child keys, per-child action IDs and generated platform IDs at
+shared composition before publishing a producer contribution. Done when duplicate
+descriptions and deterministic collision controls cannot emit repeated nodes or
+leave actionable partial maps; valid siblings, reorderings and same action IDs
+on different child keys must keep working through native/browser receiving and
+current-target admission. Keep key generations, cross-window ownership and
+read-only contributor contracts as separate migrations.
+
+[AccessKit 0.25.1's TreeUpdate contract](https://docs.rs/accesskit/0.25.1/accesskit/struct.TreeUpdate.html#structfield.nodes)
+uses IDs as replacement identity and requires rooted parent/child membership.
+Repeated generated IDs cannot represent two distinct semantic objects. The
+existing FNV allocator is stable, not collision-proof; a HashMap insertion is
+not evidence of an unambiguous action binding.
+
+The read-only migration remains open: Sprigging `Leaf::accessibility` and
+`TextureProducer::semantics` require mutable callbacks, including wrapped
+`RefCell` access. `AppCtx`/Harness observations and Taproot/Mesquite selectors
+currently consume the read-only DOM projection, not the contributed catalogue.
+Changing that contract requires provider observation rules and consumer adoption;
+silently invoking mutable callbacks or caching them without lifetime rules would
+introduce another semantic authority. Forward geometry remains supplier-owned
+as described in the preceding content-origin cohort below.
+
+### Repair and qualification
+
+One preflight in shared composition validates every child key and per-child
+action ID, then reserves the generated IDs against DOM IDs and already accepted
+producer IDs. Refusal is atomic per contribution: slot overrides, children,
+action routes and ID reservations all remain untouched. The DOM seed remains
+available and valid sibling providers continue to publish. `producer_issues`
+returns typed refusal details from this read. Platform convenience APIs and
+product collector adoption of that report remain open; it is not a new retained
+diagnostic store or a lifetime-token mechanism.
+
+Three before-repair runtime controls reproduce repeated browser action buttons,
+actionable ambiguous descriptions and an actual host dispatch. Seven repair
+controls pass, covering duplicate keys/actions, deterministic already-claimed
+node/action ID collisions, valid siblings, stable reorderings, same action name
+on different children and invalid/valid/invalid readmission without a stale
+verdict. An earlier test-fixture borrow error is retained as preparation evidence,
+separate from runtime failures.
+
+Final frozen receiving passes 122 targeted native tests with five existing
+ignores: producer lifecycle 41/one ignore, shared semantics 11, admission eight,
+and native/browser/session receiving 62/four ignores. Browser-host Wasm
+compilation passes. `support/family-promotion/diagnostics-identity-qualification.json`
+records source/lock and executed-binary hashes; `diagnostics-identity-final-check.json`
+records document, formatting, sealed-register and retained-byte checks. All
+builds reuse the existing target; no isolated output was created.
+
+Native projection comments no longer call mutable contributor reads pure, and
+the DOM projection documentation names its actual seed role. This cohort does
+not qualify immutable observations, generation-safe targets, collision-free
+allocation, full geometry, browser runtime, headed interaction or human AT.
+
+Publication preserves concurrent relay-recovery qualification and fixture tooling
+at main `ad6c725e8`. Every tested source, manifest and lock hash still matches
+the frozen seal; `diagnostics-identity-publication.json` records that comparison
+without claiming another test cohort.
+
 ## Producer content origin, 2026-10-20
 
 **Status:** bounded content-origin repair qualified on integrated main

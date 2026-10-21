@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-21",
+  "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "scope": "Atomic producer semantic identity validation in shared native/browser/admission composition",
+  "source_seal": "diagnostics-identity-source.json",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "gates": [
+    {
+      "receipt": "diagnostics-identity-producers.json",
+      "sha256": "057331e46c9d260c06bd38626b101562d01e37af98841ccd387d8f271c7f5880",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "producer::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-identity-semantics.json",
+      "sha256": "bcc62416e8688c93058d0997da3caaac013b7fe2789c205f4ab5f6e455b1e09e",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "semantics::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-identity-admission.json",
+      "sha256": "22b9293a37f6091be51ce417757543029ece2e590d5d270d30afbdaffafa6e58",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "accessibility_tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-identity-platform.json",
+      "sha256": "3337e53fe0c1bee0ae312794b4d5ccf034b8e6726359b3d2d55dad8e643eeb0c",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "e1a_sessions"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-identity-wasm.json",
+      "sha256": "a42910e86f4388e56f79a15125fa3cd5db0ff7c42c31e7b71da9223dc52f5942",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "targeted_native_passes": 122,
+  "existing_ignores": 5,
+  "wasm": "locked browser-host no-default-features wasm32-unknown-unknown check passed",
+  "development_receipts": {
+    "preparation": "diagnostics-identity-before.json: test-fixture E0502 borrow error; not a runtime regression receipt",
+    "before_runtime": "diagnostics-identity-before-runtime.json: three expected runtime failures (shared composition, current admission, browser mirror)",
+    "repair": "diagnostics-identity-repair.json: original three controls pass",
+    "receiving_controls": "diagnostics-identity-controls.json: seven controls pass; not added again to the final cohort count"
+  },
+  "receiving_evidence": [
+    "Duplicate child keys and per-child action IDs refuse entire contributions, including an invalid later child",
+    "Already-claimed child/action ID collision preserves the original tree, focus, route maps and ID reservations",
+    "Reordering children preserves distinct target maps; the same action name on different child keys remains valid",
+    "Invalid provider does not suppress a valid sibling",
+    "Current admission refuses invalid declaration without activation; recovers on valid description and refuses later invalid description without cached verdict",
+    "Native tree and browser mirror publish no ambiguous producer action routes"
+  ],
+  "executed_native_binary_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-2273349d02cf466b.exe": "9df4f414f06b11891380d842df58440caa87803a716ae36c559481c69dd4e497",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-56f94a9ce355cb5d.exe": "02989971e81d32033f234fc0eb21cecfa41556cca6da6b5a8c985db74c333495",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-e372f7f3ed456408.exe": "c473400054aacb0d1eb895c140e39118fe3ef52e3156efef88558b7bb324c6a5",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-662143e96433e173.exe": "e8e01e3f3abddb55607a3f62d977aaa3bcd33cc043aa37e323146cb103974a19",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-4f747cdd5ec6d9ee.exe": "135fbba0db82432d8532b459a98de611431b1e76a0e1362d2f0e838b55b0a703",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-eeb9f4d905241ba4.exe": "d9c906c60e84e8983833d5a1ab679ef29feae0cdaddb2e0c0a69ca20066ee61d",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-9bb5b3ed00e95546.exe": "2b257e4eb7b9edaade7583b26500dbf953e38dabd2e65f64b638d2fa37a41afa",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-ca955e8978e01b83.exe": "ff528b5662981f7ce52867137e60457cf3865d55a96b543896cf94792d365e7b",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-b0a270e6c3c5aa20.exe": "ca8a6586789f406256733e19ff1a4a88445ca5048594d2180eb4a20ab3eff5c9"
+  },
+  "specification_reference": "https://docs.rs/accesskit/0.25.1/accesskit/struct.TreeUpdate.html#structfield.nodes",
+  "target": "C:\\t\\cargo-targets\\mere",
+  "build_dir": "C:\\t\\cargo-targets\\mere\\build",
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "limits": [
+    "Per-read uniqueness and atomic refusal; not generation-safe target identity or collision-free ID allocation",
+    "Read-only AppCtx/Harness/selector observations remain DOM-only; contributors still use mutable callbacks",
+    "ProducerSemanticIssue is returned by shared composition; platform convenience APIs and product collector adoption remain open",
+    "No new full geometry, browser-runtime, headed or human AT acceptance"
+  ],
+  "sealed_audit_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256"
+}
