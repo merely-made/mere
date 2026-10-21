@@ -1,0 +1,23 @@
+{
+  "result": "ok",
+  "tested_source": "576061da39c91f0f210a2f473c5c04c85630d982",
+  "publication_parent": "9d6f7e2c9e47a24e79396bc9cad99be91032b33c",
+  "dramatis_main": "7d498c27df8076dacccb74ba4a05f863f9f48c76",
+  "platform": "macOS x86_64",
+  "captures": 24,
+  "formats": [
+    "wrapped-root",
+    "portable encrypted profiles"
+  ],
+  "cold_reopens": 4,
+  "providers": [
+    "scripted owner UI",
+    "SystemNativeIdentityUi with human input"
+  ],
+  "old_rejected_new_accepted": true,
+  "identity_seed_and_protocol_slot_bytes_preserved": true,
+  "personal_vaults_changed": false,
+  "forgotten_password_recovery": false,
+  "cross_device_change": false,
+  "power_loss_qualification": false
+}

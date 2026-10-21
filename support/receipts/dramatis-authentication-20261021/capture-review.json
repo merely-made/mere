@@ -1,0 +1,371 @@
+{
+  "reviewed": [
+    {
+      "capture": "scripted/sealed/before.png",
+      "sha256": "37081919243f8c904cd5b369c82114ec757a02a5e8d6241ea001f748b691dae1",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/cancelled.png",
+      "sha256": "2bc022feaa94c790445c41a0e1f26b07529337b2abe41e8a7bbdec37e939566c",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/wrong-current.png",
+      "sha256": "442fc78337092c6e5cc535b8674fdfbb36ccbf33d34e55e59f9d4ec024d1dfd5",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/mismatch.png",
+      "sha256": "101810b384a03da987f4c35eda0188a4a5e1d7b495526c403e35c8e20dbced26",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/empty.png",
+      "sha256": "f778c67c996a00c85119a0a050747d21d1502ae7045f30daba5fbbf7ad37f413",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/changed.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/acknowledged-after-refresh.png",
+      "sha256": "737bb3438a0763634f10e4a849c5a6e7d82b96202b87af8e87c451468df61259",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17254",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/sealed/cold-reopened.png",
+      "sha256": "803807f95ca19f84ec9f5bd713ca891ec25231fdc936dbef6830891dd77fcf3c",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17304",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/before.png",
+      "sha256": "803807f95ca19f84ec9f5bd713ca891ec25231fdc936dbef6830891dd77fcf3c",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/cancelled.png",
+      "sha256": "2bc022feaa94c790445c41a0e1f26b07529337b2abe41e8a7bbdec37e939566c",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/wrong-current.png",
+      "sha256": "23dc9f3d2814c4e03a6b724796885b1add26f0311614ca2d6a12b8cf95acc108",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/mismatch.png",
+      "sha256": "101810b384a03da987f4c35eda0188a4a5e1d7b495526c403e35c8e20dbced26",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/empty.png",
+      "sha256": "f778c67c996a00c85119a0a050747d21d1502ae7045f30daba5fbbf7ad37f413",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/changed.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/acknowledged-after-refresh.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17307",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "scripted/portable/cold-reopened.png",
+      "sha256": "bec7f8609446980c94d10cfd21b22358cce6b8609f02fea2d8d1989ccc0b1231",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17360",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/sealed/before.png",
+      "sha256": "74d7ab7838e5c0232186b332a3fcd5ffa37eb6bda293a35764a328230499d987",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/sealed/changed.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/sealed/acknowledged-after-refresh.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/sealed/cold-reopened.png",
+      "sha256": "803807f95ca19f84ec9f5bd713ca891ec25231fdc936dbef6830891dd77fcf3c",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17904",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/portable/before.png",
+      "sha256": "37081919243f8c904cd5b369c82114ec757a02a5e8d6241ea001f748b691dae1",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17958",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/portable/changed.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17958",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/portable/acknowledged-after-refresh.png",
+      "sha256": "a21ab2512849f7b2aba50403a312692cbdd1a4664acf9d263c1273274c73367e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17958",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    },
+    {
+      "capture": "native/portable/cold-reopened.png",
+      "sha256": "37081919243f8c904cd5b369c82114ec757a02a5e8d6241ea001f748b691dae1",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "18337",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Readable action/status and roster; expected notice; no visible credential value or overlap"
+    }
+  ],
+  "native_dialog_pixels": "Not captured; real SystemNativeIdentityUi with human input; application captures only",
+  "acknowledgement_capture_delay_seconds": {
+    "scripted/sealed": 8.467453002929688,
+    "scripted/portable": 8.253466844558716,
+    "native/sealed": 8.417605638504028,
+    "native/portable": 8.424605131149292
+  }
+}

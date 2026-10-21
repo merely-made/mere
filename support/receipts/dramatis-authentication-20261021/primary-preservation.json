@@ -1,0 +1,26 @@
+{
+  "before": {
+    "head": "99b489bc713b3446c794035d57e4b4f607918fe5",
+    "tracked_changes": " M Cargo.lock\n M design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md\n M ports/graphshell/Cargo.toml\n M ports/graphshell/web/Cargo.lock\n M ports/graphshell/web/Cargo.toml\n",
+    "sha256": {
+      "Cargo.lock": "67dfceca553736bf5d82bf9a1d75ed5d900caa2077d49ffe8bb5013051be6462",
+      "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md": "44eb5017eff10c6b4d89dd74939c74b2469fad364b75f2448af6bcc83633bbea",
+      "ports/graphshell/Cargo.toml": "ddfcf9dbbc0aa37a42c65111af33626e46072ad4ea575d73bf0374884234966b",
+      "ports/graphshell/web/Cargo.lock": "9b4c2a85851a063d2e2226eff615d6cdbd337c7cac244a4e827717b18211c450",
+      "ports/graphshell/web/Cargo.toml": "73394db514f178a86f5b1a3a43370b5fe48089be56059064284238a78b744256"
+    }
+  },
+  "after": {
+    "head": "99b489bc713b3446c794035d57e4b4f607918fe5",
+    "tracked_changes": " M Cargo.lock\n M design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md\n M ports/graphshell/Cargo.toml\n M ports/graphshell/web/Cargo.lock\n M ports/graphshell/web/Cargo.toml\n",
+    "sha256": {
+      "Cargo.lock": "67dfceca553736bf5d82bf9a1d75ed5d900caa2077d49ffe8bb5013051be6462",
+      "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md": "44eb5017eff10c6b4d89dd74939c74b2469fad364b75f2448af6bcc83633bbea",
+      "ports/graphshell/Cargo.toml": "ddfcf9dbbc0aa37a42c65111af33626e46072ad4ea575d73bf0374884234966b",
+      "ports/graphshell/web/Cargo.lock": "9b4c2a85851a063d2e2226eff615d6cdbd337c7cac244a4e827717b18211c450",
+      "ports/graphshell/web/Cargo.toml": "73394db514f178a86f5b1a3a43370b5fe48089be56059064284238a78b744256"
+    }
+  },
+  "unchanged_since_snapshot": true,
+  "note": "Primary was never edited or staged by this task; ignored build cache reused."
+}
