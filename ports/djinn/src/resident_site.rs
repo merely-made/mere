@@ -30,7 +30,7 @@ use chirograph::{
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
-use knot_site::{MAX_ENCODED_SNAPSHOT_BYTES, Publication, PublishedSnapshotV1, SiteFormat};
+use knot_site::Publication;
 use sceno::{
     Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,
     SourceRef, Transform2,
@@ -38,6 +38,7 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
+use site_model::{MAX_ENCODED_SNAPSHOT_BYTES, PublishedSnapshotV1, SiteFormat};
 use tokio::sync::watch;
 use transport::{BlobHash, BlobLease, BlobScope};
 

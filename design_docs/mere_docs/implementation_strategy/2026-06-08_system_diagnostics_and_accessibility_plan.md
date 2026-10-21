@@ -1,6 +1,116 @@
 # System Diagnostics and Accessibility Plan
 
+## Shared leaf and producer composition, 2026-10-20
+
+**Status:** contained host composition qualified on 2026-10-20 at integrated
+main `67964c3ea`, implementation `3798e0c2d`. The refresh preserves resident
+recall/readiness, portable-site extraction and Graphshell co-op work, plus
+Netrender's borrowed-lowering supplier update (`ec15eb26`). Receipt
+budget remains 10 MB across the diagnostics continuation; builds reuse
+`C:\t\cargo-targets\mere`. Earlier cohorts below keep their original basis.
+
+### Scope and done-conditions
+
+Native publication, browser ARIA lowering and current-target admission consume
+Rootstock's `project_semantics`. This composes the existing neutral DOM
+projection through Genet's converter and then the existing AccessKit-shaped
+Sprigging/producer contracts. Done when real registered contributors, native
+receiving, browser mirror lowering, current-target/session controls and Wasm
+compilation pass with source and lock evidence. This is host composition policy;
+Genet still owns DOM extraction and products own contributor meaning and effects.
+
+### Repairs and retired duplication
+
+Previously native leaves received a fully seeded node, browser leaves a scratch
+node and admission a scratch node containing only the requested DOM action.
+Browser lowering retained a small role/name subset, dropping a real Knob's
+slider role and numeric properties. Producer role/name/children/action IDs were
+also constructed twice. Those independent compositions are retired. Native
+publication consumes the shared tree and maps; ARIA lowers that composed tree;
+admission rereads that same construction with current window membership.
+Multiline role repair lives at this shared boundary. Custom-leaf keys reuse
+OwnedLayout's parser. Multiple producer DOM slots for one key refuse contributed
+children/action targets, matching the renderer's existing `DuplicateDomKey`
+refusal rather than selecting an arbitrary semantic owner.
+
+Producer descriptions take precedence over co-registered Sprigging leaves.
+Otherwise an authored DOM name wins over the leaf's label in all consumers,
+matching the browser's established policy. The leaf callback sees the seeded
+node. Host geometry and tree edges and restrictive hidden/disabled/read-only
+state survive callbacks. Disabled contributions cannot reintroduce actions;
+read-only leaves cannot reintroduce numeric mutation. Producer action buttons
+inherit disabled/hidden slot restrictions and have no admitted target map entry
+when blocked. Hidden contributed subtrees lose route entries; a focused node
+hidden by its contributor falls back to the document root. Missing slot geometry
+no longer invents an origin at `(0,0)`;
+nonfinite or negative producer rectangles produce no accessibility bounds.
+
+### Remaining ownership migrations
+
+- The contributor vocabulary is still AccessKit-shaped, with mutable callbacks.
+  Separate publication and admission reads can observe different state; no
+  observation-purity, transaction or atomic read/act contract is established.
+  Admission composes providers in the current window; this is not a provider
+  cache or presentation-revision authority.
+- `AppCtx::a11y_projection` and `Harness::a11y_projection` remain DOM-only
+  read-only observations; Mesquite selectors consume those roles/names, not
+  the contributed platform catalogue. A leaf-only slider role or generated
+  producer action is not thereby selectable. Migrating those readers requires
+  a defined read-only observation/snapshot contract instead of hidden mutation.
+- Requests still lack originating document/window/session/revision lifetime
+  tokens. Within-window duplicate producer DOM bindings now refuse; cross-window
+  producer ownership, reused registry/child keys, duplicate semantic keys/action
+  IDs and generated hash collisions need explicit supplier/consumer rules.
+- The existing host request enum routes only Click, Focus and numeric SetValue.
+  An advertised Increment, Decrement or ScrollIntoView is not thereby routed.
+  Broader command declaration/invocation/result migration belongs with Hest;
+  routing acceptance remains distinct from terminal success.
+- Producer render discovery still uses OwnedLayout's light-DOM walk while
+  semantic discovery is flattened. Render/input also use Genet's content origin,
+  transforms and clips; generated semantic bounds still offset the projected
+  slot rectangle. Padded/transformed/clipped placement and shadow/slotted producer
+  ownership need one supplier-qualified mapping and actual receiving controls.
+  Consolidating the two old lowerings does not qualify their geometric premise.
+- ARIA maps the known DOM and contributor roles. Other AccessKit roles remain
+  generic; this does not qualify arbitrary leaf roles, clipping/pixel parity,
+  browser runtime, installed platform delivery or human assistive technology.
+- Product diagnostic final-process evidence, durable recovery, additional
+  sources, A873 inspection, A961 input routing and selector grammar retain the
+  open gates recorded below. This slice does not change those owners.
+
+### Qualification
+
+The broad native cohort passes 190 tests with seven existing ignores:
+Rootstock 133/three ignores, native host 19/four ignores, native accessibility
+receiving eight, browser mirror 17, Winit adapter seven and joined sessions six.
+Its exact pre-integration source and binary hashes remain in
+`support/family-promotion/diagnostics-contributed-pre-integration.json` and the
+native gate. After merging main, 70 focused native receiving tests pass with
+four existing ignores: contributor owner six, host admission seven, browser
+mirror 17, native host 19/four ignores, native accessibility receiving eight,
+Winit adapter seven and joined sessions six. The browser host compiles for
+`wasm32-unknown-unknown` with default features disabled. No browser runtime or
+human AT acceptance is claimed.
+
+The [qualification index](../../../support/family-promotion/diagnostics-contributed-qualification.json)
+records exact source/lock basis, executed binaries, gate commands, the four
+upstream Netrender package-source changes and unchanged sealed registers. The
+one local lock dependency addition is the existing Sprigging crate for actual
+browser contributor tests. Current source hashes match the integrated seal.
+Development compile failures and the fixture correction to reuse one DOM for
+reordered producer IDs remain separate from passing gates. An initial
+fast-forward refusal left the local lock patch intact; the tested implementation
+was committed and main merged normally. The intermediate platform gate is
+retained but excluded from the separately sealed 70-test current-main count.
+
+The D2 audit reports no errors for the two updated plans and 40 existing
+whole-tree errors. No isolated target, Cargo home or worktree was created;
+receipts remain under the diagnostics continuation's 10 MB cap.
+
 ## Shared DOM semantics and resident collector, 2026-10-20
+
+This historical cohort records the pre-contribution boundary. The shared leaf
+and producer continuation above supersedes its contribution-lowering gaps.
 
 **Status:** contained shared DOM projection and resident collector qualified
 on 2026-10-20, based on main `6394e931`. The five intervening upstream commits cover recoverable settings

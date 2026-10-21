@@ -36,11 +36,10 @@ netrender = { workspace = true }
 paint_list_render = { workspace = true, features = ["resource-bundle"] }
 paint_list_api = { workspace = true }
 wgpu = { workspace = true }
-# The accessibility mirror: genet's neutral projection, lowered to ARIA, and
-# AccessKit only to read what a leaf says of itself.
+# The accessibility mirror lowers Rootstock's composed host projection to ARIA.
 document-session-api = { workspace = true }
 accesskit.workspace = true
-# Walking the laid-out DOM for the mirror's targets and a leaf's key.
+# DOM and layout fixture vocabulary.
 layout_dom_api = { workspace = true }
 
 # The browser itself. Declared for wasm32 only, so a native build of the
@@ -81,6 +80,7 @@ web-sys = { version = "0.3", features = [
 
 # The mirror's tests lay the example page out without a window.
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+sprigging = { version = "0.2.2", path = "../sprigging" }
 cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-host" }
 netrender = { workspace = true, features = ["vello-cpu"] }
 

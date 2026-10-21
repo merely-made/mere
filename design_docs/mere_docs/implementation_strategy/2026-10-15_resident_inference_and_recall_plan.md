@@ -367,7 +367,8 @@ Each names its evidence; a later phase may correct one.
   remote sessions (Distillery plan, 2026-10-15). Portable checkpoints are
   deferred to Distillery M4, but an ask's checkpoint (ruling 10) is only
   token ids and settings, not model state.
-- **Lexical recall is ready; semantic recall is not.** `eidetic-search`
+- **Recall baseline (2026-10-15).** Lexical recall was ready; semantic recall
+  was not yet admitted. I10 below records the October 20 qualified vector lane. `eidetic-search`
   BM25 with n-gram RRF scored 15/15 Ranking@1 on the 28-record fixed corpus;
   MiniLM alone scored 12/15 at about 195 MB and 22 ms per query on CPU
   (search surface wiring plan, :231-247, :278-327). The vector lane was
@@ -380,7 +381,8 @@ Each names its evidence; a later phase may correct one.
   Fleece's `ContentRef{source_id, node_id, version}` with selectors
   (`eidetic-core/src/browsing/captures.rs:35`, `browsing/text.rs:42`,
   `clip_profile.rs:93`, `crates/fleece/src/traversal.rs:18`).
-- **No embedding envelope exists.** A persisted `VectorIndex` records only
+- **Embedding baseline (2026-10-15).** No embedding envelope existed. The
+  October 20 I10 continuation below supplies it. A generic `VectorIndex` records only
   dimensions, metric and entries, and `with_index` checks only dimensions
   (`esp/src/embed/persistence.rs:40`, `search.rs:272`). The nearest envelope is
   `esp.meaning-model/v1` for e5-base-v2 (`embed/meaning_model.json`), used by
@@ -750,6 +752,67 @@ whose base-config EOS differs from the end-of-turn token. Model/session identity
 continues to bind those exact template and weight artifacts.
 
 ### I10. The envelope and a vector lane
+
+**Status (2026-10-20): implemented and qualified for this bounded resident gate.** Eidetic's retained
+`models::embedding` contract is published at `34105d63`. ESP supplies exact
+provider/loaded-artifact identity and guarded dense/sparse persistence. The
+resident's opt-in `inference-embedding` feature reads an already admitted model
+or a declared deterministic sparse algorithm, and stores the derived index in
+its existing encrypted journal. Source owners still supply exact retained text
+and current-version authority. Missing/foreign envelopes refuse before search;
+ordinary lexical-only settings and generic numerical APIs retain their behavior.
+
+Qualification binds one fixed held-out paraphrase corpus, native resident route,
+independent cold process, matching index reuse, same-dimension foreign-space
+refusal, stale source/chunker refusal and lexical/vector/fused measurements.
+Memory remains sparse or at most 384 dense dimensions, with owner byte bounds.
+The I10 done-conditions below pass. The canonical receipt is
+[qualification.json](../../../support/receipts/resident-embedding-20261020/qualification.json),
+with per-query rankings, exact passage evidence, process IDs, artifact/source
+hashes and repeatable commands. The three independent processes build the
+private projection, cold-reopen it after origin removal, and refuse a foreign
+384-dimensional space, changed chunker/source revision and a legacy record
+without an envelope. Matching cold reopen preserves the exact saved index ID,
+rankings and supplied source-version/selector evidence.
+
+The frozen corpus has 16 retained pages and 12 queries (eight paraphrases, four
+lexical controls). At fixed equal weights and RRF k=60, lexical/vector/fused
+Top1 hits are 6/12, 12/12 and 8/12; Recall@3 is 7/12, 12/12 and 11/12; MRR is
+0.551, 1.000 and 0.785. On the paraphrases alone, lexical/fused Top1 is 2/8 and
+4/8, Recall@3 is 3/8 and 7/8, and MRR is 0.326 and 0.678. All four lexical
+controls remain rank one in every lane. The vector lane beats fusion on this
+corpus; one vector-rank-one paraphrase becomes fused rank eleven. These are
+measurements of the original weights, without tuning against the held-out set.
+
+The 384-dimensional projection occupies 24 KiB of vector capacity when built
+and 32 KiB after JSON deserialization; the persisted projection is 81,349 bytes,
+within the owner's 8 MiB ceiling. Every vector's logical width is checked
+independently. Peak RSS for the complete preparation fixture, including both
+models and source/journal stores, is 898,736,128 bytes; this is separate from
+the derived-index budget. The raw private journal scan finds none of the
+checked source URLs, vector JSON fields or foreign-space markers in plaintext.
+
+Two Eidetic contract cases, 147 ESP embedding cases, the separate real MiniLM
+identity helper, 13 focused Distillery recall cases and both existing native
+resident-route baselines pass. The retrieval provider is the digest-pinned
+CPU MiniLM model. A tiny tensor decoder supplies the exact generation session;
+this gate measures retrieval and lifecycle, without a new trained-answer,
+headed UI or second-device claim. Standalone supplier metadata checks qualify
+resolution only. The broader P4 and I11 requirements remain separately scoped.
+
+The receiving binary enables `djinn/inference-embedding`. Owner settings add an
+optional `inference.embedding` object to an existing exact library-model lane.
+For a library embedding provider its serialized shape is
+`{"provider":{"kind":"library","model":"blake3:<admitted-model-manifest>"},"max_index_bytes":8388608,"lexical_weight":1,"vector_weight":1,"rrf_k":60}`
+(illustrative identifier). The model is the embedding model artifact, distinct
+from the generation row. The resident resolves its components locally with
+`NoFetcher`; it does not acquire a model on an ask. The sparse alternative is
+`{"kind":"lexical-sparse","dimensions":384,"token_ngram_orders":[1,2]}`.
+Missing identities, incompatible projections and byte-limit failures are errors;
+operators rebuild derived indexes from admitted sources after an intentional
+space/chunker change. Lexical-only settings omit `embedding`. New embedding
+run evidence requires clients built with the extended recall protocol; the
+omitted field preserves the existing lexical-only wire shape.
 
 R4's vector lane behind Eidetic's embedding envelope.
 
@@ -1690,3 +1753,9 @@ record equal; its failed checker remains in the consumer diagnostics. The
 supplier receipt is `support/receipts/turnstone-r4-process-20261018/qualification.json`.
 The consumer continues its own final-source UI/failure checks; this supplier
 receipt does not promote those pending product gates to passes.
+
+- **2026-10-20, I10 qualified.** Published Eidetic `34105d63`, ESP `6d371901`
+  and Mere `fb56a2ae1` compose the opt-in compatible embedding lane. The native
+  retained-source/cold/foreign-space gate and measured recall comparison above
+  pass; the receipt keeps the fixed fusion weakness and actual allocation costs
+  visible. Existing lexical-only routes pass with embedding absent.

@@ -169,6 +169,7 @@ async fn exercise_inner(native: bool) {
                 relay_urls: vec![],
             }),
             inference: Some(InferenceLaneSettings {
+                embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Automatic {
                     row: selected.to_string(),

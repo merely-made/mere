@@ -1,0 +1,114 @@
+{
+  "result": "ok",
+  "accepted_test_owned_processes_stopped": true,
+  "native_processes": [
+    9610,
+    9631,
+    9639,
+    9657,
+    9673,
+    9676,
+    9688
+  ],
+  "custodian_launches": 4,
+  "diagnostic_app_copies_removed": "Only the stopped owner/guest .app copies from attempts 02, 03 and 04 were removed to recover build space. Diagnostic evidence and isolated stores were retained.",
+  "public_packet_excludes": [
+    "vaults",
+    "stores",
+    "passphrases",
+    "keys",
+    "live grants",
+    "contact files",
+    "executables"
+  ],
+  "additional_owned_build_cleanup": {
+    "removed_stopped_owned_app_and_duplicate_build_copies": [
+      "/Users/markik/Code/output/gs-coop-view-20261020-05/private/owner.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-05/private/guest.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-06/private/owner.app",
+      "/Users/markik/Code/output/gs-coop-view-20261020-06/private/guest.app",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/graphshell_mere",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/djinn",
+      "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/artifacts/debug/examples/coop_existing_graph"
+    ],
+    "frozen_executables_and_evidence_preserved": true,
+    "prior_frozen_executables_losslessly_compressed": [
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/graphshell_mere",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/graphshell_mere.gz",
+        "uncompressed_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1"
+      },
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/djinn",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/djinn.gz",
+        "uncompressed_sha256": "e59843b98be01ea5fca133264a94a8a473dfcefaf58d1ebb49c3df6016f14e14"
+      },
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/coop_existing_graph",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-01/coop_existing_graph.gz",
+        "uncompressed_sha256": "3a0fb4f58735097fb31d3ddd39e01cdcda6a031198107f48ac2ccfe74904f42d"
+      },
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/graphshell_mere",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/graphshell_mere.gz",
+        "uncompressed_sha256": "c3b1c26a992ccc06718209cd1c412f95c0ecc5af8a66e8531fcaa2659cfdfee1"
+      },
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/djinn",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/djinn.gz",
+        "uncompressed_sha256": "d74d31162a31cddb0ec832851a1f85e1f7146b07885f68bd5adb2a282d21d703"
+      },
+      {
+        "original": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/coop_existing_graph",
+        "recoverable_gzip": "/Users/markik/Code/output/graphshell-coop-view-frozen-20261020-02/coop_existing_graph.gz",
+        "uncompressed_sha256": "773a47dd9c0715138d10867007b370a3ffdf2cc1fe45191e626856260a295e5f"
+      }
+    ],
+    "additional_stopped_app_copies_removed": [
+      "native07 owner.app",
+      "native07 guest.app"
+    ],
+    "old_owned_test_executable_cache_cleanup": {
+      "reason": "Build volume capacity; only stopped executable files older than 21:00 UTC whose depfiles name this task worktree. No libraries, incremental caches, source, stores, or other-worktree artifacts removed.",
+      "files": [
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/graphshell-f5d66a64005bcea2",
+          "bytes": 212243680
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/djinn-e64054abb4e1fb74",
+          "bytes": 265273496
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/djinn-b2017f5870fda0af",
+          "bytes": 265862504
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/graphshell-9cdc57cc5ae14edb",
+          "bytes": 212354384
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/graphshell-ef340ccdff323c87",
+          "bytes": 212362744
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/deps/graphshell-e3088397aefc704d",
+          "bytes": 212961016
+        }
+      ]
+    },
+    "old_owned_incremental_snapshot_cleanup": {
+      "reason": "Capacity for final renderer gate; only two inactive Djinn cache families, snapshots wholly older than 21:00 UTC, whose query caches contain this exact task worktree path. Active compiler paths were excluded; newer snapshots and all other worktree/shared-library caches retained.",
+      "snapshots": [
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/incremental/djinn-2xg1u9mmaezsd/s-hne9xjgspv-07y0l9q-eneekvh112wfufs921x32rr86",
+          "bytes": 358864061
+        },
+        {
+          "path": "/Users/markik/Code/repos/mere/target/build/debug/incremental/djinn-1k14xynshjaij/s-hneacb56g8-0ki06tp-7rjwuo6hcxe84aiqtg2sbu6cz",
+          "bytes": 361247961
+        }
+      ]
+    }
+  }
+}

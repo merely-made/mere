@@ -1,0 +1,36 @@
+await {"coop-nodes": "1", "sessions": "0", "archives": "0"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-joined.png
+click role:textbox @id=coop-field-0
+input-text https://shared.invalid/guest
+click role:textbox @id=coop-field-1
+input-text Guest source
+click role:button @id=coop-add
+await {"coop-nodes": "2", "coop-status": "~Saved"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-added.png
+await {"file": "/Users/markik/Code/output/gs-coop-view-20261020-08/evidence/owner-private-during-coop.png"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-still-scoped.png
+await {"coop-nodes": "3", "relations": "1"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-push.png
+click role:button @data-key=1867d2d5-6bf8-4c72-9610-2b6fd7950296
+await {"selected": "1867d2d5-6bf8-4c72-9610-2b6fd7950296"}
+wait 30000
+click role:textbox @id=coop-field-1
+input-text Guest revised existing source
+click role:button @id=coop-title
+await {"coop-status": "~Saved", "coop": "~Guest revised existing source"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-coop-view-20261020-08/evidence/guest-renamed.png

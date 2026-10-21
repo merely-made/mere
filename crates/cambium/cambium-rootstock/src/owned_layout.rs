@@ -1114,7 +1114,15 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         extent.1 = extent.1.max(lines.y + lines.height + end.1);
     }
     for child in dom.dom_children(node) {
-        extend_scroll_extent(dom, styles, fragments, child, end, (true, true), &mut extent);
+        extend_scroll_extent(
+            dom,
+            styles,
+            fragments,
+            child,
+            end,
+            (true, true),
+            &mut extent,
+        );
     }
     (
         (extent.0 - container.x - container.width).max(0.0),
@@ -1282,7 +1290,7 @@ fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl F
     }
 }
 
-fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
+pub(crate) fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
     if dom.kind(node) != NodeKind::Element
         || !matches!(
             dom.element_name(node)?.local.as_ref(),

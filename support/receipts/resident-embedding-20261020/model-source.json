@@ -1,0 +1,26 @@
+{
+  "repository": "sentence-transformers/all-MiniLM-L6-v2",
+  "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "files": {
+    "config.json": {
+      "rfilename": "config.json",
+      "blobId": "72b987fd805cfa2b58c4c8c952b274a11bfd5a00",
+      "size": 612
+    },
+    "tokenizer.json": {
+      "rfilename": "tokenizer.json",
+      "blobId": "cb202bfe2e3c98645018a6d12f182a434c9d3e02",
+      "size": 466247
+    },
+    "model.safetensors": {
+      "rfilename": "model.safetensors",
+      "blobId": "d49eff1e4a6f0e3ba5069f21c6d20aad156dd2c9",
+      "size": 90868376,
+      "lfs": {
+        "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+        "size": 90868376,
+        "pointerSize": 133
+      }
+    }
+  }
+}

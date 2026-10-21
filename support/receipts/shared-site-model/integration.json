@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-20",
+  "tested_base_head": "5b00507ea2a9c6952a391caca6c511d97b953588",
+  "observed_head_after_test": "5b00507ea2a9c6952a391caca6c511d97b953588",
+  "command": "cargo test -p djinn --lib resident_site::tests --locked --offline -j 2",
+  "passed": true,
+  "tests_passed": 8,
+  "unrelated_tests_filtered_out": 221,
+  "cargo_lock_sha256": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
+  "resident_site_sha256": "878274f2b9715a15f33d43fa51c80cf7965984e3c76789592f3809bcebb179a2",
+  "model_lib_sha256": "0baa14ba70f0095316c6c902fa0a89207180dd1e9e9a946ba67dfb60edfc3a3c",
+  "knot_site_source": "0fcc522e8eaa04dc6465f1e7b8392625dc42e49c",
+  "knot_current_root_cohort": "00a25f2c698ed0fee1d1e46ec8b3b5fa3e0d6889",
+  "snapshot_v1": "Fixed four-profile donor bytes and digests retained unchanged",
+  "qualification_boundary": "Automated local library and loopback lifecycle checks; no new headed or public-serving claim",
+  "cleanup_requirement": "Remove temporary qualification worktree and named offline Cargo home after integration; retain ordinary stable repository targets."
+}

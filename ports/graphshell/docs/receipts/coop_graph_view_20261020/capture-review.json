@@ -1,0 +1,149 @@
+[
+  {
+    "capture": "private-before.png",
+    "sha256": "468bdd8cdb0d56480583055699ba486e07bc18a169b763c8205e820b48db5d5c",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The private sibling is visible in the ordinary owner canvas, with owner sessions/archive and no active co-op selection."
+  },
+  {
+    "capture": "existing-graph.png",
+    "sha256": "e05b65ab545d3f2b8bc4f0d6d178891a41a8c4cb241831df2758a96a5641d2ff",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The pre-existing chosen source appears in the ordinary owner canvas before co-op activation."
+  },
+  {
+    "capture": "owner-existing.png",
+    "sha256": "f7a2efbadf03d2127fe823c7ba8d7df4fe6298e0510c2304e2e1754e433fe9f1",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "Activating the existing graph retains its source and ordinary controls; visible address/title/contact textboxes accompany an uninvited scope."
+  },
+  {
+    "capture": "owner-invited.png",
+    "sha256": "3d9580dfe62f901779fa28044dbb7d0a407a5699dedb9224ca375aaab77e825c",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The same graph and named guest show editor access and an acknowledged invitation; visible editable fields remain beside the ordinary view."
+  },
+  {
+    "capture": "owner-saw-guest.png",
+    "sha256": "36892ac96dfa70e28699dc2dac5ffcee2be6a86ddfcd7d902cc47dc9fccec32f",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The ordinary owner canvas now shows the existing source and the guest-added source."
+  },
+  {
+    "capture": "owner-private-during-coop.png",
+    "sha256": "89e91d339d823f06e6a4d6305a073fd4ba626d117301bd90a286d3374e278737",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The owner canvas shows the private source and the panel asks for an explicit graph choice; prior co-op controls are cleared."
+  },
+  {
+    "capture": "owner-returned-to-chosen.png",
+    "sha256": "38b6fbdbc3cdffb3321a385fe506013756e97455cbd232430a65b47f630fa8ea",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "Returning and explicitly choosing the original graph restores its two sources and existing editor grant."
+  },
+  {
+    "capture": "owner-ordinary-push.png",
+    "sha256": "2f353da1715230af46fdfb4973d8e40a21326d9339fa67b813d4052bfd7eae3e",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The owner canvas contains three sources and a visible relationship following an ordinary admitted owner write."
+  },
+  {
+    "capture": "owner-revoked.png",
+    "sha256": "94002986af8576c6c98f10ebd6379667d016be10e626de26f2acc232b105078c",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The ordinary owner canvas retains all three sources and the guest-renamed title while scope reports revoked."
+  },
+  {
+    "capture": "guest-joined.png",
+    "sha256": "0e043c29daf51fc429d52fd33694e1ce424b65a954970ad23a9c20796f9b5cca",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The guest canvas contains the single invited existing source and no owner session or archive controls."
+  },
+  {
+    "capture": "guest-added.png",
+    "sha256": "700d0830a5febb5e1c9014b0987cce1772dc0f8a0590278c865f1977645d5ffa",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The guest sees the added source, typed address/title, saved acknowledgement and guest authorship."
+  },
+  {
+    "capture": "guest-still-scoped.png",
+    "sha256": "ff6f4484382f48b21b7b7025f95932741d048418c439493abc43ae1191dcc0ae",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "While the owner views its private sibling, the guest still sees only the original chosen graph and its two sources."
+  },
+  {
+    "capture": "guest-push.png",
+    "sha256": "61bc889524703ab1fbd893e0c8b9e771b074448f8ff9d5ec572161080117339c",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The guest canvas shows the ordinary owner-added third source and relationship, with no owner session/archive controls."
+  },
+  {
+    "capture": "guest-renamed.png",
+    "sha256": "ad5a92a6609f69b402cf25f2454180be3050f610b0bf16b5025d91df60172ea6",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures; individual full capture inspected",
+    "observation": "Selecting the pre-existing source and typing a title updates both its canvas label and record details; saved activity records the guest identity."
+  },
+  {
+    "capture": "guest-return.png",
+    "sha256": "7c8e1ce4e24182dfccfea6e6f5da486cf62d3870bcc57f4917a6da7f47b35d10",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "A fresh guest window restores three sources, the revised existing-source title, relationship and saved authorship."
+  },
+  {
+    "capture": "guest-withdrawn.png",
+    "sha256": "7efa15c900843f06c370f8c5d04829aeddfabb0f538148df0e1f7152181b7183",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "After access ends, the guest canvas is empty, controls are reduced to reconnect, and selected record details are cleared."
+  },
+  {
+    "capture": "owner-cold-retained.png",
+    "sha256": "8501bd5865dbaee3f0439a610b4996d085afab598fe0628eb3db4f7aa47e38cf",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "After both custodians and applications restart, the owner canvas retains three sources, the revised title and relationship; scope remains revoked."
+  },
+  {
+    "capture": "owner-cold-edited.png",
+    "sha256": "3a8abe1557c8edfdc92b9e418a5e34c0d1e842fcbbbe4685abce93ca8c0bbb1b",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "A fourth owner source appears after a cold-reopen save while the guest grant remains revoked."
+  },
+  {
+    "capture": "owner-cold-refused.png",
+    "sha256": "5e562c649cb0af0b132002ccb8bf4caeb42178c7bf83107f92d57ca8e63c8403",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The owner retains its four-source graph after the old guest invitation is refused."
+  },
+  {
+    "capture": "guest-cold-denied.png",
+    "sha256": "33f63f316f0aa6d97444de150c3deef053fb1b43e0178859bad310d951f53d10",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures; individual full capture inspected",
+    "observation": "The cold guest window explicitly reports Delegation(Revoked); its graph and record area remain empty, with no owner sessions or archives."
+  },
+  {
+    "capture": "private-after.png",
+    "sha256": "18229eccdcf213af07ee7f32e65ae70d6c189c41b00d2514ef74447cf9ca6ecc",
+    "reviewed": true,
+    "method": "three contact sheets covering all 21 captures",
+    "observation": "The final ordinary private-sibling view matches its initial single source; the co-op panel has no active graph selection."
+  }
+]

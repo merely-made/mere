@@ -38,6 +38,9 @@ pub use sprigging::LeafRegistry;
 
 use genet_render::VisualMovement;
 
+mod semantics;
+pub use semantics::{SemanticProjection, project_semantics};
+
 mod files;
 pub use files::{FileAnswer, FileChooser};
 mod presentation;

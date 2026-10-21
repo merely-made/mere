@@ -1,0 +1,117 @@
+{
+  "scope": "shared native-site model extraction; existing snapshot V1 preserved",
+  "date": "2026-10-20",
+  "retained_receipt_cap_bytes": 100000000,
+  "supplier_commit": "c25c2d441b3b93c934ad500b020c7a8f910ef1ea",
+  "knot_consumer_commit": "0fcc522e8eaa04dc6465f1e7b8392625dc42e49c",
+  "donor_revision": "9832691",
+  "donor_lib_sha256": "38c6210635f9d34775033ae8119a0523a7df850bf71894131449f7196e36b7b4",
+  "pre_extraction_fixture_gate": {
+    "passed": true,
+    "profiles": [
+      "scroll",
+      "gemini",
+      "spartan",
+      "micron"
+    ],
+    "native_metadata": "Unicode, BCP47, UDC, UTC timestamps, abstract",
+    "source": "exact UTF-8 bytes including CRLF"
+  },
+  "gates": [
+    {
+      "command": "cargo test -p mere-site --locked --offline",
+      "passed": true,
+      "tests_passed": 3
+    },
+    {
+      "command": "cargo test --all-targets (knot-site)",
+      "passed": true,
+      "tests_passed": 17,
+      "supplier": "published Git source"
+    },
+    {
+      "command": "cargo test --all-targets --features retinue (knot-site)",
+      "passed": true,
+      "tests_passed": 22,
+      "supplier": "published Git source"
+    }
+  ],
+  "baseline_failure": {
+    "test": "exports_canonical_snapshot_and_exact_saved_page_bytes_to_static_layout",
+    "reproduced_with_unchanged_donor": true,
+    "cause": "Windows extended-length path prefix compared with an uncanonicalized returned path",
+    "repair": "Canonicalize both test operands; export implementation unchanged"
+  },
+  "resident_qualification": {
+    "passed": true,
+    "tests_passed": 8,
+    "filtered_out_unrelated_tests": 219,
+    "command": "cargo test -p djinn --lib resident_site::tests --locked --offline -j 2",
+    "basis": "c25c2d441 plus the shared-model consumer patch and locked Knot 0fcc522",
+    "checks": [
+      "durable snapshot/certificate reopening",
+      "opt-in restart",
+      "missing identity refusal",
+      "failed replacement",
+      "connection ceiling",
+      "typed status",
+      "interrupted removal recovery",
+      "malformed/wrong-format handoff refusal"
+    ]
+  },
+  "excluded": [
+    "new revision/ancestry domain",
+    "new persistence or replication authority",
+    "new Errand/Armillary adapters",
+    "headed/public/two-machine acceptance"
+  ],
+  "cleanup": "donor cache moved to approved reusable Knot Cargo target; source-tree target removed; temporary donor test removed",
+  "lockfile_scope": {
+    "changed_source_family": "Knot only",
+    "package_version_additions": 0,
+    "package_version_removals": 0,
+    "registry_dependency_edges_normalized_by_cargo": 24,
+    "other_git_source_families": "Existing Murm and Netrender revisions restored with cargo update --precise"
+  },
+  "fixture_sha256": {
+    "gemini-v1.json": "40a48b0899231a22478edd33a0015adb30a46d0833aee23b07d2d0687c813145",
+    "micron-v1.json": "a71c835665e51b8c02de03db1d3fd8f23799b0ca91a20099cd0bb85277d9ead6",
+    "scroll-v1.json": "4e3df8d0cb8c75f9098f5d2ecebf30b0727311044e14401f5c76b55236f78440",
+    "spartan-v1.json": "8c94f50ae416015b504f393e23bcb2ab78da84446af069b2fdf6a4506cf707a3"
+  },
+  "donor_source_comparison": {
+    "validation_and_records_unchanged": true,
+    "snapshot_implementation_unchanged": true,
+    "only_added_model_api": "SiteFormat::accepts_page_name forwarding to existing filename validation"
+  },
+  "documentation_audit": {
+    "command": "python scripts/mere_doc_audit.py --json (primary Mere checkout)",
+    "active_documents": 298,
+    "indexed_active_documents": 279,
+    "owned_findings": [],
+    "whole_repository_clean": false,
+    "note": "Existing audit backlog is outside this extraction."
+  },
+  "knot_root_lock_commit": "00a25f2c698ed0fee1d1e46ec8b3b5fa3e0d6889",
+  "knot_root_premerge_receiving_gate": {
+    "passed": true,
+    "supplier": "c25c2d441",
+    "check": "cargo check -p knot-site --lib --locked --offline",
+    "compatibility_test": "cargo test -p mere-site --test compatibility --locked --offline",
+    "compatibility_cases_passed": 3,
+    "changed_git_source_family": "Mere only",
+    "added_package": "mere-site 0.1.0",
+    "other_package_versions_unchanged": true,
+    "murm_and_netrender_revisions_retained": true,
+    "cargo_home": "temporary named offline Cargo home; removal required after final gates"
+  },
+  "knot_root_current_receiving_gate": {
+    "passed": true,
+    "cohort_base": "80bb318",
+    "mere_supplier": "d4756e0fb",
+    "check": "cargo check -p knot-site --lib --locked --offline",
+    "compatibility_test": "cargo test -p mere-site --test compatibility --locked --offline",
+    "compatibility_cases_passed": 3,
+    "upstream_borrowed_lowering_lock_preserved": true
+  }
+}

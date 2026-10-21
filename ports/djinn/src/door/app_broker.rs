@@ -86,10 +86,29 @@ pub struct AppEndpointCatalog {
     inner: Arc<tokio::sync::Mutex<ResidentEndpointCatalog>>,
 }
 
+/// Dynamic registrars must not own the catalog that owns their factories.
+#[derive(Clone)]
+pub struct WeakAppEndpointCatalog {
+    inner: std::sync::Weak<tokio::sync::Mutex<ResidentEndpointCatalog>>,
+}
+impl WeakAppEndpointCatalog {
+    pub fn upgrade(&self) -> Option<AppEndpointCatalog> {
+        self.inner
+            .upgrade()
+            .map(|inner| AppEndpointCatalog { inner })
+    }
+}
+
 impl AppEndpointCatalog {
     pub fn new(catalog: ResidentEndpointCatalog) -> Self {
         Self {
             inner: Arc::new(tokio::sync::Mutex::new(catalog)),
+        }
+    }
+
+    pub fn downgrade(&self) -> WeakAppEndpointCatalog {
+        WeakAppEndpointCatalog {
+            inner: Arc::downgrade(&self.inner),
         }
     }
 
