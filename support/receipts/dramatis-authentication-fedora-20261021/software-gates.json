@@ -1,0 +1,58 @@
+{
+  "toolchain": "Rust 1.99.1",
+  "environment": {
+    "CARGO_TARGET_DIR": "/home/markik/Code/output/graphshell-coop-thinkpad-20261020/artifacts",
+    "CARGO_BUILD_BUILD_DIR": "/home/markik/Code/repos/mere/target/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "commands": [
+    {
+      "command": "cargo +1.99.1 test --locked -j2 -p castellan --features keeper --lib passphrase",
+      "passed": 26,
+      "filtered": 259,
+      "ignored": 0,
+      "source": "0d912a62591fbb5acf111a98c9c817529ced542a"
+    },
+    {
+      "command": "cargo +1.99.1 test --locked -j2 -p djinn --lib identity_ui::tests",
+      "passed": 5,
+      "filtered": 230,
+      "ignored": 0,
+      "source": "0d912a62591fbb5acf111a98c9c817529ced542a"
+    },
+    {
+      "command": "cargo +1.99.1 test --locked -j2 -p djinn --test passphrase_change",
+      "passed": 2,
+      "filtered": 0,
+      "ignored": 2,
+      "source": "0d912a62591fbb5acf111a98c9c817529ced542a"
+    },
+    {
+      "command": "env -u DISPLAY -u WAYLAND_DISPLAY -u DBUS_SESSION_BUS_ADDRESS AUTHENTICATION_HOST --ignored --exact absent_graphical_password_provider_refuses_without_changing_the_vault --nocapture",
+      "passed": 1,
+      "filtered": 3,
+      "ignored": 0,
+      "source": "0d912a62591fbb5acf111a98c9c817529ced542a"
+    },
+    {
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p dramatis-app",
+      "passed": 15,
+      "ignored": 3,
+      "source": "9069774d7076283225db00b154bd36baf30bf501"
+    },
+    {
+      "command": "cargo +1.99.1 build --locked --offline -j2 -p dramatis-app --bin dramatis-ui",
+      "result": "ok",
+      "source": "73b25d9ee71184a1a8e7bf53b774255815810727"
+    },
+    {
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "ok",
+      "source": "0d912a62591fbb5acf111a98c9c817529ced542a"
+    }
+  ],
+  "whole_workspace_or_other_platform_qualification": false,
+  "client_normal_dependency_tree_excludes_castellan": true,
+  "unchanged_host_sha256": "aac5043483468fc585df00707d1d0a74140ae5f396f4fb310d310832e8069ccd"
+}

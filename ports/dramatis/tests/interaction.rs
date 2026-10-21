@@ -246,3 +246,48 @@ fn authentication_control_is_a_public_request_and_disabled_when_locked() {
         }
     }
 }
+
+#[test]
+fn authentication_can_retry_after_a_presented_busy_state_and_cancellation() {
+    let mut h = host(false, false, 860.);
+    let change = Selector::role("button").containing("Change passphrase");
+    assert!(h.click_on(&change));
+    h.update(|s| s.request = None);
+    h.layout_at(860., 720.);
+    assert!(h.state().busy);
+    h.update(|s| {
+        s.busy = false;
+        s.notice = "Passphrase change cancelled. Your passphrase is unchanged.".into();
+    });
+    assert!(h.click_on(&change));
+    assert!(matches!(h.state().request, Some(Request::ChangePassphrase)));
+}
+
+#[test]
+fn feedback_keeps_its_live_region_and_personae_heading_stable() {
+    let mut h = host(false, false, 860.);
+    let node = |h: &Harness<State, Logic, Child>, selector: Selector| {
+        h.with_dom(|dom| {
+            let nodes = taproot::matching_classes(dom, &selector);
+            assert_eq!(nodes.len(), 1, "{selector:?}");
+            nodes[0]
+        })
+    };
+    let status_selector = Selector::class("authentication-status").with_attr("role", "status");
+    let heading_selector = Selector::class("personae-heading").containing("Personae");
+    let status = node(&h, status_selector.clone());
+    let heading = node(&h, heading_selector.clone());
+    let before = h.painted_rect(heading).unwrap();
+    let before_font = h.computed_value(heading, "font-size");
+    for notice in ["Passphrase changed.", ""] {
+        h.update(|s| s.notice = notice.into());
+        assert_eq!(node(&h, status_selector.clone()), status);
+        assert_eq!(node(&h, heading_selector.clone()), heading);
+        assert_eq!(h.computed_value(heading, "font-size"), before_font);
+        let after = h.painted_rect(heading).unwrap();
+        assert!(
+            (after.3 - before.3).abs() < 0.1,
+            "feedback must not turn the heading into a control"
+        );
+    }
+}
