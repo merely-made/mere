@@ -1074,7 +1074,8 @@ where
     }
 
     /// Route drained screen-reader requests into the retained DOM. Split out of
-    /// [`sync_a11y`] so the routing is exercisable without an OS adapter.
+    /// [`sync_a11y`](Self::sync_a11y) so the routing is exercisable without an
+    /// OS adapter.
     /// Results correspond to input order; dispatch is not terminal completion.
     pub fn apply_a11y_requests(
         &mut self,

@@ -229,10 +229,10 @@ fn media(
     let hash = card_hash(snapshot, instance)?;
     let bytes = cards.get(&hash).ok_or("Missing material card resource.")?;
     let card: PortableCardV1 = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-    if card.media.len() != 1 {
-        return Err("The material card must advertise exactly one media resource.".into());
-    }
-    Ok(card.media[0])
+    card.media
+        .first()
+        .copied()
+        .ok_or_else(|| "The material card must advertise a media resource.".into())
 }
 
 /// Read fresh projections and validate every fetched resource before decoding.
@@ -301,7 +301,13 @@ pub async fn read(
                 uuid::Uuid::parse_str(&attached.id)
                     .map_err(|_| "The material card names no attached session.")?,
             );
-            let hash = media(&result.graph, *instance, &result.cards)?;
+            let card_hash = card_hash(&result.graph, *instance)?;
+            let bytes = result
+                .cards
+                .get(&card_hash)
+                .ok_or("Missing material card resource.")?;
+            let card: PortableCardV1 = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+            let hash = wire::session_media(&card)?;
             let bytes = resource(source, &result.graph.session, hash).await?;
             let envelope: wire::SessionGraphV1 = serde_json::from_slice(&bytes)
                 .map_err(|e| format!("Invalid scoped graph material: {e}"))?;
@@ -716,12 +722,21 @@ mod tests {
         let bytes = serde_json::to_vec(&pending).unwrap();
         let hash = ContentHash::of(&bytes);
         fake.resources.insert(hash, bytes);
+        let media = (0..media_count)
+            .map(|index| {
+                if index == 0 {
+                    hash
+                } else {
+                    ContentHash::of(b"ignored merge media")
+                }
+            })
+            .collect();
         let sessions = snapshot_fixture(
             wire::MERE_SESSIONS,
             &[(
                 wire::MERGE_SOURCE,
                 pending.source.as_uuid().to_string(),
-                vec![hash; media_count],
+                media,
             )],
             &mut fake.resources,
         );
@@ -744,16 +759,34 @@ mod tests {
     }
 
     #[test]
-    fn pending_merge_rejects_schema_media_and_corruption() {
-        for count in [0, 2] {
-            let (mut fake, _) = fixture(&envelope());
-            add_merge(&mut fake, wire::PENDING_MERGE_SCHEMA, count);
-            assert!(
-                read_complete(&mut fake)
-                    .unwrap_err()
-                    .contains("exactly one media")
-            );
-        }
+    fn pending_merge_uses_its_first_media_resource() {
+        let (mut fake, _) = fixture(&envelope());
+        let hash = add_merge(&mut fake, wire::PENDING_MERGE_SCHEMA, 2);
+        let material = read_complete(&mut fake).unwrap();
+        assert!(material.pending_merge.is_some());
+        assert!(fake.fetched.iter().any(|(_, fetched)| *fetched == hash));
+        assert_eq!(
+            fake.fetched
+                .iter()
+                .filter(|(_, fetched)| *fetched == hash)
+                .count(),
+            1
+        );
+        assert!(
+            !fake
+                .fetched
+                .iter()
+                .any(|(_, fetched)| *fetched == ContentHash::of(b"ignored merge media"))
+        );
+
+        let (mut fake, _) = fixture(&envelope());
+        add_merge(&mut fake, wire::PENDING_MERGE_SCHEMA, 0);
+        assert!(
+            read_complete(&mut fake)
+                .unwrap_err()
+                .contains("media resource")
+        );
+
         let (mut fake, _) = fixture(&envelope());
         add_merge(&mut fake, "wrong", 1);
         assert!(

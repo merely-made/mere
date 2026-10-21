@@ -249,8 +249,8 @@ pub struct HostOptions {
     /// Environment variable names overriding the logical width and height,
     /// for reproducible scenario receipts (`WOODSHED_WIDTH`-shaped).
     pub size_env: Option<(String, String)>,
-    /// Renderer options for [`SurfaceHost::boot`]. A factory rather than a
-    /// value: `NetrenderOptions` is not `Clone`, and the surface is booted
+    /// Renderer options for the event source's surface boot. A factory rather
+    /// than a value: `NetrenderOptions` is not `Clone`, and the surface is booted
     /// again every time the platform takes it away and hands it back
     /// (suspend/resume), which must not silently fall back to defaults.
     pub netrender: Box<dyn Fn() -> NetrenderOptions>,
@@ -310,8 +310,7 @@ impl Default for HostOptions {
     }
 }
 
-/// The browser zoom ladder, the rungs [`Host::zoom_in`] and [`Host::zoom_out`]
-/// step between.
+/// The browser zoom ladder, the rungs [`Host::step_ui_zoom`] steps between.
 ///
 /// Borrowed rather than invented: every desktop browser offers these thirteen
 /// stops, so Ctrl+plus in a Cambium application moves the interface by the
@@ -736,9 +735,9 @@ where
     /// read-only methods keyed by DOM node identity.
     pub(crate) layout: Option<&'a OwnedLayout>,
     /// The native window (chrome requests, redraws, cursor, IME area), when
-    /// there is one. `None` under [`Harness`], the windowless test host — an
-    /// application that asks for window chrome must tolerate its absence
-    /// rather than assume a window exists.
+    /// there is one. `None` under `cambium_genet_winit_host::Harness`, the
+    /// windowless test host — an application that asks for window chrome must
+    /// tolerate its absence rather than assume a window exists.
     /// The frame, behind the neutral seam rather than as a winit handle.
     ///
     /// Applications ask it for redraws, size and scale, all of which a browser
@@ -808,10 +807,10 @@ where
     /// device and renderer, booted once and kept across suspend and resume.
     /// Hand it to a same-device tenant (a compute or import pass) so what it
     /// renders lands on the device the host presents with. `None` under
-    /// [`Harness`] and before the first surface exists.
+    /// `cambium_genet_winit_host::Harness` and before the first surface exists.
     pub render_core: Option<&'a Arc<RenderCore>>,
     /// Where the window is now, for persisting across launches. `None` under
-    /// [`Harness`], which has no window.
+    /// `cambium_genet_winit_host::Harness`, which has no window.
     pub geometry: Option<WindowGeometry>,
     /// CPU-side attribution for the frame that just completed. Present in
     /// `after_frame`; other hooks see the last completed frame, if any.
@@ -1446,7 +1445,7 @@ where
     /// Assemble a host and seed the runtime zoom from its options.
     ///
     /// The seeding is why this exists rather than a struct literal:
-    /// [`HostOptions::ui_zoom`] is an input and [`HostState::user_zoom`] is
+    /// [`HostOptions::ui_zoom`] is an input and `HostState::user_zoom` is
     /// where it lives afterwards, and a second event source that built the
     /// struct by hand would silently launch at 1.0.
     pub fn new(
@@ -1513,8 +1512,8 @@ where
     /// [`HostOptions::fit_design`] is measured against.
     ///
     /// Windowless, this is whatever the event source last stated (the
-    /// [`Harness`](crate::Harness) states it as it lays out), falling back to
-    /// the size the retained layout was built at.
+    /// `cambium_genet_winit_host::Harness` states it as it lays out), falling
+    /// back to the size the retained layout was built at.
     pub fn available_size(&self) -> (f32, f32) {
         match self.s.window.as_ref() {
             Some(window) => {
@@ -1552,8 +1551,8 @@ where
     }
 
     /// The logical size being laid out: the window's over the layout scale,
-    /// or — windowless, under [`Harness`] — the size the retained layout was
-    /// last built at.
+    /// or — windowless, under `cambium_genet_winit_host::Harness` — the size the
+    /// retained layout was last built at.
     pub fn logical_size(&self) -> (f32, f32) {
         match self.s.window.as_ref() {
             Some(window) => {
@@ -1580,7 +1579,7 @@ where
     /// device-logical pixels.
     ///
     /// Ignored while there is a window, which knows better. This is how the
-    /// [`Harness`](crate::Harness) gives `fit_design` something to measure
+    /// `cambium_genet_winit_host::Harness` gives `fit_design` something to measure
     /// against without inventing a fake window.
     pub fn set_surface_size(&mut self, width: f32, height: f32) {
         self.s.surface_size = Some((width, height));

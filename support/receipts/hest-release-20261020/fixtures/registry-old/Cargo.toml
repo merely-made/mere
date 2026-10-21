@@ -1,0 +1,14 @@
+[package]
+name = "hest-registry-compatibility"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+# Exercise the immutable published Cambium, including its old command-menu API.
+cambium = "=0.4.0"
+command-menu = "=0.1.1"
+hest = "=0.1.0"
+serde_json = "1"
