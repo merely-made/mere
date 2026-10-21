@@ -216,6 +216,7 @@ mod tests {
     fn configured(directory: &Path) -> PathBuf {
         let path = owner_settings::settings_path(directory, &profile());
         OwnerSettings {
+            coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),
                 ..SyncSettings::default()
@@ -288,6 +289,7 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let path = owner_settings::settings_path(directory.path(), &profile());
         OwnerSettings {
+            coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),
                 roster_roots: vec![owner_settings::hex32(&[0xc0; 32])],
