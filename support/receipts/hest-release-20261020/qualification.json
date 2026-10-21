@@ -73,7 +73,27 @@
   },
   "integration": {
     "mere": "fast-forwarded incoming main through c5f3a4cd5; scoped fixes committed directly to main",
-    "open_mere_pull_requests_at_preflight": 0
+    "open_mere_pull_requests_at_preflight": 0,
+    "post_release_reconciliation": {
+      "incoming_main": "02477e04e",
+      "merge_commit": "9fe4a7ef0ca001a0ea5ca7a3004590d4047b352c",
+      "scope": "Concurrent native Graphshell Hest routing, material validation and receipt deposit work preserved intact.",
+      "released_package_comparison": [
+        "git",
+        "diff",
+        "--exit-code",
+        "615b35e2e..9fe4a7ef0",
+        "--",
+        "crates/cambium/hest",
+        "crates/cambium/hest-0_1",
+        "crates/cambium/command-menu",
+        "crates/cambium/cambium"
+      ],
+      "exit_code": 0,
+      "released_packages_unchanged": true,
+      "consumer_code_and_locks_unchanged": true,
+      "qualification_scope": "Existing release and receiving checks apply to their unchanged source inputs; this release does not claim a repeated qualification of the incoming lane."
+    }
   },
   "pruning": {
     "repositories": [
