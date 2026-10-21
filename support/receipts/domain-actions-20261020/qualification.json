@@ -2,10 +2,10 @@
   "status": "focused qualification passed for canonical integration",
   "baseline_feature_commit": "ac099b385",
   "upstream_commit": "4214af8025d8754cc7ed23359f17aeb27df6d074",
-  "total_tests": 128,
+  "total_tests": 130,
   "tests": {
     "native-tests": [
-      34
+      36
     ],
     "client-route-tests": [
       78,
@@ -100,7 +100,7 @@
     "crates/graphshell/graphshell-client/Cargo.toml": "756a77f44110ccfa065576532900ed7288911abae58ef16fb857050434eee244",
     "crates/graphshell/graphshell-client/src/core.rs": "561a066269235a462387b7b060d3edaee67e45a29bab9884f602cd3e2afe0f60",
     "ports/graphshell/mere/Cargo.toml": "3720d8bcca177b8194f3bee2bdeeaea178855672cf2137fcf171193c7c992156",
-    "ports/graphshell/mere/src/app_tests.rs": "56f612b6e2130e1a2424bc5688655ed42dc37755eb8c981fdc921ed37ced7a4e",
+    "ports/graphshell/mere/src/app_tests.rs": "b6a5849c385e1c5f2b26ebd96dd66a72ae0880d0654bb36d73ebb7b0be16df58",
     "ports/graphshell/mere/src/command.rs": "ed149862fcf4482ca53469eafb69987fdda7026a7bc068cab638d7f4f61aeae7",
     "ports/graphshell/mere/src/connection.rs": "435b4a0991804b026c1338a3c5a504ae836a7812115cff41898c3775ad56900d",
     "ports/graphshell/mere/src/connection_tests.rs": "8c3aafb7a0ad54e2ee8c55fd323b8ad344fe540fc11f26612b69c806d98dc761",
@@ -109,12 +109,13 @@
     "ports/graphshell/src/bound_actions.rs": "bb420a672e14d2c7c4970c6c3c5a96dba0b00249bb095d12212cc94e632c3e02",
     "ports/graphshell/src/lib.rs": "cf419b37b326ffc761dd0531fd53f8355d3e50d64f734ba950a00257f93f06ec",
     "ports/graphshell/tests/bound_actions.rs": "d0000a02ef83583bf71837263f4a2df8bb4df67c70c0c32fe7c4d59230a3e5ac",
-    "ports/graphshell/web/Cargo.lock": "73487c98f1fc189aa51784af1f0537dbb67ed829a0c238dc9d41f4893024e258"
+    "ports/graphshell/web/Cargo.lock": "73487c98f1fc189aa51784af1f0537dbb67ed829a0c238dc9d41f4893024e258",
+    "ports/graphshell/mere/src/coop.rs": "3cb90abd0bc76cb2f94c00e6d5fa710065b2d563545e8e70f7f17ebdc3545c06"
   },
   "logs": {
     "native-tests.log.gz": {
-      "sha256": "fabc1ecf8c99361cab30c361c167f6f5429c7d902b67cf2f4a25f21792a400b4",
-      "uncompressed_sha256": "de3ac8b1176d0382e12df8f384686f922d15f66314da57dad4dc3fcb99ae658f"
+      "sha256": "aa188decc979c8689517505f9694eb0c112d9537047546291d4ba94e4da6e4cf",
+      "uncompressed_sha256": "9681ccaff114ed320e56cca5ae554c064a0d38f09c5b3629580d09402bcd863a"
     },
     "client-route-tests.log.gz": {
       "sha256": "6da3e54d96c025e3da495261658041c5b3a8288226437dd548328b8a6bf4ad8c",
@@ -131,6 +132,10 @@
     "port-boundaries.log.gz": {
       "sha256": "5a96a5f88d75301f7ad1c391eaa92fe6d7dcd916c7de90872241ca9eeb9251fe",
       "uncompressed_sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186"
+    },
+    "native-initial-tests.log.gz": {
+      "sha256": "fabc1ecf8c99361cab30c361c167f6f5429c7d902b67cf2f4a25f21792a400b4",
+      "uncompressed_sha256": "de3ac8b1176d0382e12df8f384686f922d15f66314da57dad4dc3fcb99ae658f"
     }
   },
   "integration": [
@@ -146,6 +151,9 @@
   ],
   "final_integration": {
     "main_parent": "80c938abc7d3b68e8f3ca49259ee4bf20601e01c",
-    "scope_note": "The later main parent adds unrelated design documentation and Djinn inference tests. Focused owner-action source hashes remain identical to the tested integration. Removed inference_route.rs from the source hash scope because it was an unrelated upstream baseline difference, not qualified owner-action source."
+    "scope_note": "The later main parent adds unrelated design documentation and Djinn inference tests. Focused owner-action source hashes remain identical to the tested integration. Removed inference_route.rs from the source hash scope because it was an unrelated upstream baseline difference, not qualified owner-action source.",
+    "concurrent_upstream": "9755fc1944be02611ee99a8b1b4ac4b25d4db877",
+    "native_retested_commit": "c51292d070f636712d0d9f797b6282cda06566a5",
+    "native_retest": "36 native tests passed after merging the concurrent co-op revocation fix; the other 94 focused tests and Wasm/dependency checks remain qualified on identical source."
   }
 }
