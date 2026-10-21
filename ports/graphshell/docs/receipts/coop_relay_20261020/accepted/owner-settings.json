@@ -1,0 +1,9 @@
+{
+  "reservoir": {
+    "enabled": true,
+    "persona": "ea722cfc-21ed-4f95-9f76-ae2f7b486721"
+  },
+  "coop_relay_urls": [
+    "http://192.168.4.32:32867/"
+  ]
+}

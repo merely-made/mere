@@ -1,0 +1,1387 @@
+{
+  "source_commit": "166d0aefdb520599612c137c63764427ab51cb54",
+  "sha256": "9a3d57c1ab0f65a60615190e487372ababe649bd4984e003f1c91be782b4ae08",
+  "bytes": 28296512,
+  "architecture": "x86_64",
+  "files": {
+    "ports/graphshell/docs/receipts/coop_relay_20261020/relay/Cargo.toml": "c615a1c3ce8ef1e27cbfe039b66123902e1731b996b519c10f7b228e32635c81",
+    "ports/graphshell/docs/receipts/coop_relay_20261020/relay/Cargo.lock": "b12943661bdfe6f023d8cc6d204ec1807b408943edb0fad41f68e6bba9215ab1",
+    "ports/graphshell/docs/receipts/coop_relay_20261020/relay/src/main.rs": "0bfabb6a8d06c0d65355b7776aa3d920df2d7cd595405853b892b673b4f4cad4",
+    "ports/graphshell/docs/receipts/coop_relay_20261020/freeze_relay.py": "c4f103682576fce1ca975f29764892ba291f6d06a73bfd9ca9b1f1681e9a3629"
+  },
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "registry_files_verified": 10002,
+  "registry_packages": [
+    {
+      "package": "aead-0.5.2",
+      "archive_sha256": "d122413f284cf2d62fb1b7db97e02edb8cda96d769b16e443a4f6195e35662b0",
+      "source_files_verified": 10
+    },
+    {
+      "package": "aes-0.8.4",
+      "archive_sha256": "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0",
+      "source_files_verified": 32
+    },
+    {
+      "package": "aes-gcm-0.10.3",
+      "archive_sha256": "831010a0f742e1209b3bcea8fab6a8e149051ba6099432c8cb2cc117dec3ead1",
+      "source_files_verified": 14
+    },
+    {
+      "package": "anstream-1.0.0",
+      "archive_sha256": "824a212faf96e9acacdbd09febd34438f8f711fb84e09a8916013cd7815ca28d",
+      "source_files_verified": 20
+    },
+    {
+      "package": "anstyle-1.0.14",
+      "archive_sha256": "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000",
+      "source_files_verified": 14
+    },
+    {
+      "package": "anstyle-parse-1.0.0",
+      "archive_sha256": "52ce7f38b242319f7cabaa6813055467063ecdc9d355bbb4ce0c68908cd8130e",
+      "source_files_verified": 14
+    },
+    {
+      "package": "anstyle-query-1.1.5",
+      "archive_sha256": "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc",
+      "source_files_verified": 10
+    },
+    {
+      "package": "arc-swap-1.9.3",
+      "archive_sha256": "380962b3d93b99642e50b9febf72c071e97e8b32d86eae9cf4ef582bb960ae6e",
+      "source_files_verified": 46
+    },
+    {
+      "package": "arrayvec-0.7.8",
+      "archive_sha256": "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56",
+      "source_files_verified": 22
+    },
+    {
+      "package": "asn1-rs-0.7.2",
+      "archive_sha256": "b7f43a50ac4fdca5df8e885c21b835997f0a1cdee65494a6847694a98652d9d8",
+      "source_files_verified": 93
+    },
+    {
+      "package": "asn1-rs-derive-0.6.0",
+      "archive_sha256": "3109e49b1e4909e9db6515a30c633684d68cdeaa252f215214cb4fa1a5bfee2c",
+      "source_files_verified": 12
+    },
+    {
+      "package": "asn1-rs-impl-0.2.0",
+      "archive_sha256": "7b18050c2cd6fe86c3a76584ef5e0baf286d038cda203eb6223df2cc413565f7",
+      "source_files_verified": 5
+    },
+    {
+      "package": "async-trait-0.1.92",
+      "archive_sha256": "82f6aeea286b8eb4dd3431a1be1b59d290ace00f5bfd8e2a159bc2a05e2c1667",
+      "source_files_verified": 53
+    },
+    {
+      "package": "atomic-waker-1.1.2",
+      "archive_sha256": "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0",
+      "source_files_verified": 11
+    },
+    {
+      "package": "autocfg-1.5.1",
+      "archive_sha256": "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53",
+      "source_files_verified": 23
+    },
+    {
+      "package": "base16ct-1.0.0",
+      "archive_sha256": "fd307490d624467aa6f74b0eabb77633d1f758a7b25f12bceb0b22e08d9726f6",
+      "source_files_verified": 16
+    },
+    {
+      "package": "base64-0.22.1",
+      "archive_sha256": "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6",
+      "source_files_verified": 38
+    },
+    {
+      "package": "base64-0.23.1",
+      "archive_sha256": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+      "source_files_verified": 39
+    },
+    {
+      "package": "bitflags-2.13.2",
+      "archive_sha256": "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06",
+      "source_files_verified": 64
+    },
+    {
+      "package": "blake3-1.8.7",
+      "archive_sha256": "6d9e454fc11f76977dc803893aff6304ed33d6a26efae8696573bea74baa27ae",
+      "source_files_verified": 80
+    },
+    {
+      "package": "block-buffer-0.12.1",
+      "archive_sha256": "d2f6c7dbe95a6ed67ad9f18e57daf93a2f034c524b99fd2b76d18fdfeb6660aa",
+      "source_files_verified": 12
+    },
+    {
+      "package": "bytes-1.12.1",
+      "archive_sha256": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
+      "source_files_verified": 40
+    },
+    {
+      "package": "cc-1.9.0",
+      "archive_sha256": "877bf67ac8e52449eb2f9e98a344ea163beb70dd1f9eebe3cc5357dcfeaee4df",
+      "source_files_verified": 39
+    },
+    {
+      "package": "cfg-if-1.0.5",
+      "archive_sha256": "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600",
+      "source_files_verified": 14
+    },
+    {
+      "package": "cfg_aliases-0.2.2",
+      "archive_sha256": "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527",
+      "source_files_verified": 10
+    },
+    {
+      "package": "chacha20-0.10.2",
+      "archive_sha256": "65c35e4b699c7e15ccbe7ee35c005e4fc0a278d22238a2857e6ce2dadeda1b06",
+      "source_files_verified": 25
+    },
+    {
+      "package": "chrono-0.4.45",
+      "archive_sha256": "1aa79e62e7697b8e29b513a68abacf485adcd1fe8284a4316c5ae868e6633327",
+      "source_files_verified": 51
+    },
+    {
+      "package": "cipher-0.4.4",
+      "archive_sha256": "773f3b9af64447d2ce9850330c473515014aa235e6a783b02db81ff39e4a3dad",
+      "source_files_verified": 16
+    },
+    {
+      "package": "clap-4.6.7",
+      "archive_sha256": "aa8876b300ab35ba921adea3dfd70157a46249b33f95c9084ae5709785478946",
+      "source_files_verified": 147
+    },
+    {
+      "package": "clap_builder-4.6.7",
+      "archive_sha256": "ec0797fb7aeb1406c84efac526901f7ec3ead2124f946b494e72879d4b54704d",
+      "source_files_verified": 64
+    },
+    {
+      "package": "clap_derive-4.6.7",
+      "archive_sha256": "f9c751b79415d4e559e3d1fcf128e09e720eb673a06d26cf6f392d37d75b66e0",
+      "source_files_verified": 23
+    },
+    {
+      "package": "clap_lex-1.1.1",
+      "archive_sha256": "1c133bc6a41be0d194c306b5506d15e6feeea7b1d6604bd3f8310dfb2ca96486",
+      "source_files_verified": 9
+    },
+    {
+      "package": "cobs-0.3.0",
+      "archive_sha256": "0fa961b519f0b462e3a3b4a34b64d119eeaca1d59af726fe450bbba07a9fc0a1",
+      "source_files_verified": 14
+    },
+    {
+      "package": "colorchoice-1.0.5",
+      "archive_sha256": "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570",
+      "source_files_verified": 8
+    },
+    {
+      "package": "const-oid-0.10.2",
+      "archive_sha256": "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c",
+      "source_files_verified": 22
+    },
+    {
+      "package": "constant_time_eq-0.4.2",
+      "archive_sha256": "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b",
+      "source_files_verified": 24
+    },
+    {
+      "package": "convert_case-0.10.0",
+      "archive_sha256": "633458d4ef8c78b72454de2d54fd6ab2e60f9e02be22f3c6104cdc8a4e0fceb9",
+      "source_files_verified": 19
+    },
+    {
+      "package": "cordyceps-0.3.5",
+      "archive_sha256": "5b9ab7e0ca1d179628fa0172b2b97203c7fa0cd81be2448bd446fb9559ca9261",
+      "source_files_verified": 22
+    },
+    {
+      "package": "cpufeatures-0.2.17",
+      "archive_sha256": "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280",
+      "source_files_verified": 16
+    },
+    {
+      "package": "cpufeatures-0.3.1",
+      "archive_sha256": "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566",
+      "source_files_verified": 16
+    },
+    {
+      "package": "crossbeam-utils-0.8.23",
+      "archive_sha256": "a31eee39dddec8330830986fcd7625edb5a24ec90ea038215273bbc3adb08ac6",
+      "source_files_verified": 32
+    },
+    {
+      "package": "crypto-common-0.1.7",
+      "archive_sha256": "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a",
+      "source_files_verified": 9
+    },
+    {
+      "package": "crypto-common-0.2.2",
+      "archive_sha256": "ce6e4c961d6cd6c9a86db418387425e8bdeaf05b3c8bc1411e6dca4c252f1453",
+      "source_files_verified": 11
+    },
+    {
+      "package": "ctr-0.9.2",
+      "archive_sha256": "0369ee1ad671834580515889b80f2ea915f23b8be8d0daa4bbaf2ac5c7590835",
+      "source_files_verified": 23
+    },
+    {
+      "package": "curve25519-dalek-5.0.0",
+      "archive_sha256": "b5eed333089e2e1c1ac8c6c0398e5e2497b4c9926ca6d0365ed1e099afa5bc23",
+      "source_files_verified": 74
+    },
+    {
+      "package": "curve25519-dalek-derive-0.1.1",
+      "archive_sha256": "f46882e17999c6cc590af592290432be3bce0428cb0d5f8b6715e4dc7b383eb3",
+      "source_files_verified": 9
+    },
+    {
+      "package": "dashmap-6.2.1",
+      "archive_sha256": "e6361d5c062261c78a176addb82d4c821ae42bed6089de0e12603cd25de2059c",
+      "source_files_verified": 30
+    },
+    {
+      "package": "data-encoding-2.11.1",
+      "archive_sha256": "4583a4551df46e2792f82ceeac45e850d2e2d5debba0b91f102385cda5b11f06",
+      "source_files_verified": 7
+    },
+    {
+      "package": "data-encoding-macro-0.1.21",
+      "archive_sha256": "c6a127ecbb3c4632e1525380e04c0c3fcf8dcb44d32a79ea290d8a36906edcd8",
+      "source_files_verified": 7
+    },
+    {
+      "package": "data-encoding-macro-internal-0.1.19",
+      "archive_sha256": "c54e03a951783e8b327515db3f2a2fd0e3bed362a96b066f341ce66ed49b4ead",
+      "source_files_verified": 7
+    },
+    {
+      "package": "der-parser-10.0.0",
+      "archive_sha256": "07da5016415d5a3c4dd39b11ed26f915f52fc4e0dc197d87908bc916e51bc1a6",
+      "source_files_verified": 40
+    },
+    {
+      "package": "deranged-0.5.9",
+      "archive_sha256": "9e9de72ce2ad1f90dc62fa25f0f430ef85eb4b0d8fa0be4f30373bc40a21d28e",
+      "source_files_verified": 10
+    },
+    {
+      "package": "derive_more-2.1.1",
+      "archive_sha256": "d751e9e49156b02b44f9c1815bcb94b984cdcc4396ecc32521c739452808b134",
+      "source_files_verified": 191
+    },
+    {
+      "package": "derive_more-impl-2.1.1",
+      "archive_sha256": "799a97264921d8623a957f6c3b9011f3b5492f557bbb7a5a19b7fa6d06ba8dcb",
+      "source_files_verified": 67
+    },
+    {
+      "package": "diatomic-waker-0.2.3",
+      "archive_sha256": "ab03c107fafeb3ee9f5925686dbb7a73bc76e3932abb0d2b365cb64b169cf04c",
+      "source_files_verified": 16
+    },
+    {
+      "package": "digest-0.11.3",
+      "archive_sha256": "f1dd6dbb5841937940781866fa1281a1ff7bd3bf827091440879f9994983d5c2",
+      "source_files_verified": 26
+    },
+    {
+      "package": "displaydoc-0.2.7",
+      "archive_sha256": "c6232dd377dcc64799954cbd3a9bb882e9cdc1308ccd87b1c098f1fb2eaf82a8",
+      "source_files_verified": 25
+    },
+    {
+      "package": "ed25519-3.0.0",
+      "archive_sha256": "29fcf32e6c73d1079f83ab4d782de2d81620346a5f38c6237a86a22f8368980a",
+      "source_files_verified": 19
+    },
+    {
+      "package": "ed25519-dalek-3.0.0",
+      "archive_sha256": "6ebaa1a2bf1290ab3bfe5a7b771d050ebffab2711c19a81691c683a5144a25de",
+      "source_files_verified": 29
+    },
+    {
+      "package": "enum-assoc-1.4.1",
+      "archive_sha256": "0590c4a94da3372e83493b956755a6e2266830b6e4e3b101afe66e3f39477b91",
+      "source_files_verified": 12
+    },
+    {
+      "package": "equivalent-1.0.3",
+      "archive_sha256": "00d174d5400e5e8fd687ad1049e2f578285fa914201b1af7e8b112a4546bd826",
+      "source_files_verified": 10
+    },
+    {
+      "package": "errno-0.3.14",
+      "archive_sha256": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb",
+      "source_files_verified": 18
+    },
+    {
+      "package": "fastrand-2.5.0",
+      "archive_sha256": "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223",
+      "source_files_verified": 13
+    },
+    {
+      "package": "find-msvc-tools-0.1.15",
+      "archive_sha256": "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48",
+      "source_files_verified": 19
+    },
+    {
+      "package": "foldhash-0.2.0",
+      "archive_sha256": "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb",
+      "source_files_verified": 12
+    },
+    {
+      "package": "form_urlencoded-1.2.2",
+      "archive_sha256": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf",
+      "source_files_verified": 7
+    },
+    {
+      "package": "futures-0.3.34",
+      "archive_sha256": "9a31d2a3fbaaeb2af2368bbdd904aa8e812d3c04a1ee10d3171f52d556e5d0a3",
+      "source_files_verified": 68
+    },
+    {
+      "package": "futures-buffered-0.2.13",
+      "archive_sha256": "4421cb78ee172b6b06080093479d3c50f058e7c81b7d577bbb8d118d551d4cd5",
+      "source_files_verified": 29
+    },
+    {
+      "package": "futures-channel-0.3.34",
+      "archive_sha256": "b1f9e3d69d39e4862ffed03ed071a76f9a13ba1d9109d355b0f0aa6b15e393c4",
+      "source_files_verified": 19
+    },
+    {
+      "package": "futures-core-0.3.34",
+      "archive_sha256": "92d699e522242e69e3003b94ecc1f960f3a5e015aa7c5d7486e65ad01dd94f5e",
+      "source_files_verified": 14
+    },
+    {
+      "package": "futures-executor-0.3.34",
+      "archive_sha256": "031b47cf1a3c6cc8bc2fc76cd437f521619387907d469316e7c0bc278f1f5432",
+      "source_files_verified": 14
+    },
+    {
+      "package": "futures-io-0.3.34",
+      "archive_sha256": "53c0fa8157de1303bfffdaa1cc2a673bfffb60102f76b0ef4441659124373fed",
+      "source_files_verified": 8
+    },
+    {
+      "package": "futures-lite-2.6.1",
+      "archive_sha256": "f78e10609fe0e0b3f4157ffab1876319b5b0db102a2c60dc4626306dc46b44ad",
+      "source_files_verified": 15
+    },
+    {
+      "package": "futures-macro-0.3.34",
+      "archive_sha256": "9fb9654ba8355388abeb8dcb4fc62f511300867002afc858860463bdd9fe0c44",
+      "source_files_verified": 11
+    },
+    {
+      "package": "futures-sink-0.3.34",
+      "archive_sha256": "1944426bf7d03f1d14f708785e4b33efd750b36d48a157b836b3efc15ede8e1d",
+      "source_files_verified": 8
+    },
+    {
+      "package": "futures-task-0.3.34",
+      "archive_sha256": "cd417de3d1d015fc3bfd2b1ea46dfc7bab72ef86f1cc7cc9c78e728b34a6d1fd",
+      "source_files_verified": 14
+    },
+    {
+      "package": "futures-util-0.3.34",
+      "archive_sha256": "0d50a92467f8ba5dd6e3ee5d4bd04d73ab2e4e1c44474a0674821dfce14b79bc",
+      "source_files_verified": 193
+    },
+    {
+      "package": "generic-array-0.14.7",
+      "archive_sha256": "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a",
+      "source_files_verified": 16
+    },
+    {
+      "package": "getrandom-0.2.17",
+      "archive_sha256": "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0",
+      "source_files_verified": 38
+    },
+    {
+      "package": "getrandom-0.4.3",
+      "archive_sha256": "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099",
+      "source_files_verified": 48
+    },
+    {
+      "package": "ghash-0.5.1",
+      "archive_sha256": "f0d8a4362ccb29cb0b265253fb0a2728f592895ee6854fd9bc13f2ffda266ff1",
+      "source_files_verified": 10
+    },
+    {
+      "package": "hashbrown-0.14.5",
+      "archive_sha256": "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1",
+      "source_files_verified": 41
+    },
+    {
+      "package": "hashbrown-0.17.1",
+      "archive_sha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+      "source_files_verified": 50
+    },
+    {
+      "package": "heck-0.5.0",
+      "archive_sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea",
+      "source_files_verified": 16
+    },
+    {
+      "package": "http-1.5.0",
+      "archive_sha256": "918d3568bebf352712bc2ef3d46a8bcf1a75b373be6539de198e9105cbbf9ce0",
+      "source_files_verified": 35
+    },
+    {
+      "package": "http-body-1.1.0",
+      "archive_sha256": "ca2a8f2913ee65f60facd6a5905613afaa448497a0230cc41ce022d93290bc2c",
+      "source_files_verified": 11
+    },
+    {
+      "package": "http-body-util-0.1.5",
+      "archive_sha256": "23169fe34a5fbcdd3f3862e78fb9b6fccd5f02a6dc6f732547005d45631ce71c",
+      "source_files_verified": 26
+    },
+    {
+      "package": "httparse-1.10.1",
+      "archive_sha256": "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87",
+      "source_files_verified": 25
+    },
+    {
+      "package": "httpdate-1.0.3",
+      "archive_sha256": "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9",
+      "source_files_verified": 11
+    },
+    {
+      "package": "hybrid-array-0.4.15",
+      "archive_sha256": "27f864f10dfb56725ce5ce5472bc52252c8f93a4ab86327122cebf62c5f59a17",
+      "source_files_verified": 24
+    },
+    {
+      "package": "hyper-1.12.0",
+      "archive_sha256": "2c3e324da4c95177d6291d4c8730197c0d1822f8a9766814a4a44fa5ab797c9c",
+      "source_files_verified": 70
+    },
+    {
+      "package": "hyper-rustls-0.27.10",
+      "archive_sha256": "dfa8e654703247911e29c23fbeaa261834bd9bb74efba2f9acddc37bfb127f53",
+      "source_files_verified": 13
+    },
+    {
+      "package": "hyper-util-0.1.21",
+      "archive_sha256": "ddc03d96684f9226b8a787cdb71488417b53ab5ea8fdb1dac946cb9431cc8bff",
+      "source_files_verified": 62
+    },
+    {
+      "package": "iana-time-zone-0.1.65",
+      "archive_sha256": "e31bc9ad994ba00e440a8aa5c9ef0ec67d5cb5e5cb0cc7f8b744a35b389cc470",
+      "source_files_verified": 37
+    },
+    {
+      "package": "icu_collections-2.3.0",
+      "archive_sha256": "fa68d21081c4a05d5a901a1c62add574c77048b6a1c67be3b50ce0b60d4ca513",
+      "source_files_verified": 75
+    },
+    {
+      "package": "icu_locale_core-2.3.0",
+      "archive_sha256": "d56e28588da92eee5c3201a6eff33fabdd49b62269c8938d4ff050ce4d900deb",
+      "source_files_verified": 87
+    },
+    {
+      "package": "icu_normalizer-2.3.0",
+      "archive_sha256": "12f9cf5f235641ed274641dd81c3f28d870e276763d0797aeeab72317b1c646f",
+      "source_files_verified": 38
+    },
+    {
+      "package": "icu_normalizer_data-2.3.0",
+      "archive_sha256": "1563da1ed3e0b3bf3d74c9b85917ac9c56464d2f57242270c09c9e752f8021a0",
+      "source_files_verified": 16
+    },
+    {
+      "package": "icu_properties-2.3.0",
+      "archive_sha256": "7e7ca276ad3145661a65914e6daf131ca5120cd3dcee8f8f3214b8875184a148",
+      "source_files_verified": 23
+    },
+    {
+      "package": "icu_properties_data-2.3.0",
+      "archive_sha256": "e590f038c1464a96894fd6d10127e90a8be4509f56ff7ecef851b15cee0b7caa",
+      "source_files_verified": 146
+    },
+    {
+      "package": "icu_provider-2.3.1",
+      "archive_sha256": "d27bbb9d3abbefac45d55f647c9de1d44aafcd1186eb91879afef17c396c3e73",
+      "source_files_verified": 25
+    },
+    {
+      "package": "identity-hash-0.1.0",
+      "archive_sha256": "dfdd7caa900436d8f13b2346fe10257e0c05c1f1f9e351f4f5d57c03bd5f45da",
+      "source_files_verified": 10
+    },
+    {
+      "package": "idna-1.1.0",
+      "archive_sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+      "source_files_verified": 21
+    },
+    {
+      "package": "idna_adapter-1.2.2",
+      "archive_sha256": "cb68373c0d6620ef8105e855e7745e18b0d00d3bdb07fb532e434244cdb9a714",
+      "source_files_verified": 9
+    },
+    {
+      "package": "indexmap-2.14.2",
+      "archive_sha256": "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855",
+      "source_files_verified": 43
+    },
+    {
+      "package": "inout-0.1.4",
+      "archive_sha256": "879f10e63c20629ecabbb64a8010319738c66a5cd0c29b02d63d272b03751d01",
+      "source_files_verified": 12
+    },
+    {
+      "package": "ipnet-2.12.2",
+      "archive_sha256": "791930b43c0d5973160d90a8f3894509f2b273430f5c5c73b668636d0287c5c0",
+      "source_files_verified": 18
+    },
+    {
+      "package": "iroh-base-1.3.0",
+      "archive_sha256": "6ae9092be76c9f5429776ab3394f5a5a78dc19dc2524267e884a5b9781546c3f",
+      "source_files_verified": 11
+    },
+    {
+      "package": "iroh-dns-1.3.0",
+      "archive_sha256": "80276761b56e904e26ea71d0863beef0bb8d5ab6b639cbd1338e4b615209e3a1",
+      "source_files_verified": 13
+    },
+    {
+      "package": "iroh-metrics-1.0.2",
+      "archive_sha256": "8ede55536349842337f7cdc63012ec33dc637945f3259c98a0763aac364cdf09",
+      "source_files_verified": 38
+    },
+    {
+      "package": "iroh-metrics-derive-1.0.1",
+      "archive_sha256": "1ae5f0c4405d1fbc9fb16ff422ca40620e93dc36c30ecaba0c2aee3992b7bd48",
+      "source_files_verified": 6
+    },
+    {
+      "package": "iroh-relay-1.3.0",
+      "archive_sha256": "ee116a8233f84980574bb8d11e4517503080cd2c3605bafca04ee9c35d708bd9",
+      "source_files_verified": 43
+    },
+    {
+      "package": "is_terminal_polyfill-1.70.2",
+      "archive_sha256": "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695",
+      "source_files_verified": 8
+    },
+    {
+      "package": "itoa-1.0.18",
+      "archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "source_files_verified": 14
+    },
+    {
+      "package": "lazy_static-1.5.1",
+      "archive_sha256": "20870f649af7073d53e38067b2a84312175d56ea15217e1b15bc83506ec50afb",
+      "source_files_verified": 21
+    },
+    {
+      "package": "libc-0.2.191",
+      "archive_sha256": "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a",
+      "source_files_verified": 452
+    },
+    {
+      "package": "litemap-0.8.3",
+      "archive_sha256": "47d9d19d1d6efa0109d2f65ff4c85cddd50bd572e5a00127ab10987290bcefae",
+      "source_files_verified": 23
+    },
+    {
+      "package": "lock_api-0.4.14",
+      "archive_sha256": "224399e74b87b5f3557511d98dff8b14089b3dadafcab6bb93eab67d3aace965",
+      "source_files_verified": 10
+    },
+    {
+      "package": "log-0.4.34",
+      "archive_sha256": "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6",
+      "source_files_verified": 23
+    },
+    {
+      "package": "lru-0.18.5",
+      "archive_sha256": "ef9ac18847474e638e3702b76c65d4eb93428471a74778ef0f1be711717f89b5",
+      "source_files_verified": 10
+    },
+    {
+      "package": "lru-slab-0.1.3",
+      "archive_sha256": "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f",
+      "source_files_verified": 8
+    },
+    {
+      "package": "matchers-0.2.0",
+      "archive_sha256": "d1525a2a28c7f4fa0fc98bb91ae755d1e2d1505079e05539e35bc876b5d65ae9",
+      "source_files_verified": 10
+    },
+    {
+      "package": "memchr-2.8.3",
+      "archive_sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98",
+      "source_files_verified": 59
+    },
+    {
+      "package": "minimal-lexical-0.2.1",
+      "archive_sha256": "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a",
+      "source_files_verified": 57
+    },
+    {
+      "package": "mio-1.2.4",
+      "archive_sha256": "1788edb87fdc09c7e26304471e2f5be8cdefb1b6930d6e3985fc02ff53bf86ee",
+      "source_files_verified": 71
+    },
+    {
+      "package": "n0-dns-resolver-0.1.0",
+      "archive_sha256": "535c99c9a786bee714155d2ee4fc2477405c2c43536e1bc6a51de09a0d1448f7",
+      "source_files_verified": 43
+    },
+    {
+      "package": "n0-error-1.0.1",
+      "archive_sha256": "26c59ea174675ce6bc196878851e5049e11b8b1f9af3ba87e4d6df8d828bb001",
+      "source_files_verified": 29
+    },
+    {
+      "package": "n0-error-macros-1.0.1",
+      "archive_sha256": "4412346410d6616f3668c40e53c298e5320c7b856f7a960e5914e442601be79f",
+      "source_files_verified": 5
+    },
+    {
+      "package": "n0-future-0.3.2",
+      "archive_sha256": "e2ab99dfb861450e68853d34ae665243a88b8c493d01ba957321a1e9b2312bbe",
+      "source_files_verified": 27
+    },
+    {
+      "package": "nom-7.1.3",
+      "archive_sha256": "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a",
+      "source_files_verified": 52
+    },
+    {
+      "package": "noq-1.3.0",
+      "archive_sha256": "b78be567e796cfa74bb9bdc4117790af2d505eb887019cf8803244353eb09d89",
+      "source_files_verified": 33
+    },
+    {
+      "package": "noq-proto-1.3.0",
+      "archive_sha256": "7c1e5b6fe668491eca022f745a0a9402585626c73a7b839b3424ace15d6a9c8f",
+      "source_files_verified": 69
+    },
+    {
+      "package": "noq-udp-1.3.0",
+      "archive_sha256": "4dc50afea61aff926e150a36c31f06094608848e114a3fe667d76ec233163b1c",
+      "source_files_verified": 19
+    },
+    {
+      "package": "nu-ansi-term-0.50.3",
+      "archive_sha256": "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5",
+      "source_files_verified": 28
+    },
+    {
+      "package": "num-bigint-0.4.8",
+      "archive_sha256": "c89e69e7e0f03bea5ef08013795c25018e101932225a656383bd384495ecc367",
+      "source_files_verified": 53
+    },
+    {
+      "package": "num-conv-0.2.2",
+      "archive_sha256": "521739c6d2bac4aa25192232afe6841231376b2b26d4d9fae5ecf8ca5772e441",
+      "source_files_verified": 8
+    },
+    {
+      "package": "num-integer-0.1.47",
+      "archive_sha256": "7ce2d95d4b3734dc35aa2f45e1aa22cd416814592a4f9d9205e11affd5b8e10b",
+      "source_files_verified": 17
+    },
+    {
+      "package": "num-traits-0.2.19",
+      "archive_sha256": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+      "source_files_verified": 29
+    },
+    {
+      "package": "num_enum-0.7.6",
+      "archive_sha256": "5d0bca838442ec211fa11de3a8b0e0e8f3a4522575b5c4c06ed722e005036f26",
+      "source_files_verified": 87
+    },
+    {
+      "package": "num_enum_derive-0.7.6",
+      "archive_sha256": "680998035259dcfcafe653688bf2aa6d3e2dc05e98be6ab46afb089dc84f1df8",
+      "source_files_verified": 13
+    },
+    {
+      "package": "oid-registry-0.8.1",
+      "archive_sha256": "12f40cff3dde1b6087cc5d5f5d4d65712f34016a03ed60e9c08dcc392736b5b7",
+      "source_files_verified": 13
+    },
+    {
+      "package": "once_cell-1.21.4",
+      "archive_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+      "source_files_verified": 29
+    },
+    {
+      "package": "opaque-debug-0.3.1",
+      "archive_sha256": "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381",
+      "source_files_verified": 9
+    },
+    {
+      "package": "openssl-probe-0.2.1",
+      "archive_sha256": "7c87def4c32ab89d880effc9e097653c8da5d6ef28e6b539d313baaacfbafcbe",
+      "source_files_verified": 12
+    },
+    {
+      "package": "parking-2.2.1",
+      "archive_sha256": "f38d5652c16fde515bb1ecef450ab0f6a219d619a7274976324d5e377f7dceba",
+      "source_files_verified": 11
+    },
+    {
+      "package": "parking_lot_core-0.9.12",
+      "archive_sha256": "2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1",
+      "source_files_verified": 24
+    },
+    {
+      "package": "pem-3.0.6",
+      "archive_sha256": "1d30c53c26bc5b31a98cd02d20f25a7c8567146caf63ed593a9d87b2775291be",
+      "source_files_verified": 13
+    },
+    {
+      "package": "pem-4.0.0",
+      "archive_sha256": "d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120",
+      "source_files_verified": 13
+    },
+    {
+      "package": "percent-encoding-2.3.2",
+      "archive_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+      "source_files_verified": 8
+    },
+    {
+      "package": "pin-project-1.1.13",
+      "archive_sha256": "2466b2336ed02bcdca6b294417127b90ec92038d1d5c4fbeac971a922e0e0924",
+      "source_files_verified": 208
+    },
+    {
+      "package": "pin-project-internal-1.1.13",
+      "archive_sha256": "c96395f0a926bc13b1c17622aaddda1ecb55d49c8f1bf9777e4d877800a43f8b",
+      "source_files_verified": 14
+    },
+    {
+      "package": "pin-project-lite-0.2.17",
+      "archive_sha256": "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd",
+      "source_files_verified": 81
+    },
+    {
+      "package": "polyval-0.6.2",
+      "archive_sha256": "9d1fe60d06143b2430aa532c94cfe9e29783047f06c0d7fd359a9a51b729fa25",
+      "source_files_verified": 17
+    },
+    {
+      "package": "portable-atomic-1.15.0",
+      "archive_sha256": "05c8b63e8d9609db387f0324918f81d68fe27748f084ef092fb35954d0539a85",
+      "source_files_verified": 69
+    },
+    {
+      "package": "postcard-1.1.3",
+      "archive_sha256": "6764c3b5dd454e283a30e6dfe78e9b31096d9e32036b5d1eaac7a6119ccb9a24",
+      "source_files_verified": 24
+    },
+    {
+      "package": "postcard-derive-0.2.2",
+      "archive_sha256": "e0232bd009a197ceec9cc881ba46f727fcd8060a2d8d6a9dde7a69030a6fe2bb",
+      "source_files_verified": 10
+    },
+    {
+      "package": "potential_utf-0.1.6",
+      "archive_sha256": "d83eb9bc6d8e5cf568e7a1101d60ee05e81ed50ea106026f3d18deeb046d7661",
+      "source_files_verified": 10
+    },
+    {
+      "package": "powerfmt-0.2.1",
+      "archive_sha256": "4a6394b9e965e73d0a289ee54f589087e2c676aedf60885baf52c76b771e4958",
+      "source_files_verified": 12
+    },
+    {
+      "package": "proc-macro-crate-3.5.0",
+      "archive_sha256": "e67ba7e9b2b56446f1d419b1d807906278ffa1a658a8a5d8a39dcb1f5a78614f",
+      "source_files_verified": 14
+    },
+    {
+      "package": "proc-macro2-1.0.107",
+      "archive_sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9",
+      "source_files_verified": 33
+    },
+    {
+      "package": "quote-1.0.47",
+      "archive_sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001",
+      "source_files_verified": 35
+    },
+    {
+      "package": "rand-0.10.3",
+      "archive_sha256": "65c9fb96cbc91e3478eaae79a69fcd3f1ae4ad052e471fe6732fff548984b4af",
+      "source_files_verified": 38
+    },
+    {
+      "package": "rand_core-0.10.1",
+      "archive_sha256": "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69",
+      "source_files_verified": 19
+    },
+    {
+      "package": "rand_pcg-0.10.2",
+      "archive_sha256": "caa0f4137e1c0a72f4c651489402276c8e8e1cf081f3b0ba156d2cbeef09e86a",
+      "source_files_verified": 17
+    },
+    {
+      "package": "rcgen-0.14.10",
+      "archive_sha256": "8774e05a7d0de114588e6a28fe7e71694b82614ed569d86d8b389dfbc98b8ad8",
+      "source_files_verified": 22
+    },
+    {
+      "package": "regex-automata-0.4.18",
+      "archive_sha256": "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2",
+      "source_files_verified": 107
+    },
+    {
+      "package": "regex-syntax-0.8.11",
+      "archive_sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+      "source_files_verified": 42
+    },
+    {
+      "package": "reloadable-core-0.1.0",
+      "archive_sha256": "1dc20ac1418988b60072d783c9f68e28a173fb63493c127952f6face3b40c6e0",
+      "source_files_verified": 5
+    },
+    {
+      "package": "reloadable-state-0.1.0",
+      "archive_sha256": "3853ef78d45b50f8b989896304a85239539d39b7f866a000e8846b9b72d74ce8",
+      "source_files_verified": 5
+    },
+    {
+      "package": "reqwest-0.13.5",
+      "archive_sha256": "16a1cfa75cc186dd73d5818e510e042e40927bccc9c236b061cea97e1eb08029",
+      "source_files_verified": 47
+    },
+    {
+      "package": "ring-0.17.14",
+      "archive_sha256": "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7",
+      "source_files_verified": 391
+    },
+    {
+      "package": "rustc-hash-2.1.3",
+      "archive_sha256": "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d",
+      "source_files_verified": 14
+    },
+    {
+      "package": "rustc_version-0.4.1",
+      "archive_sha256": "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92",
+      "source_files_verified": 13
+    },
+    {
+      "package": "rusticata-macros-4.1.0",
+      "archive_sha256": "faf0c4a6ece9950b9abdb62b1cfcf2a68b3b67a10ba445b3bb85be2a293d0632",
+      "source_files_verified": 17
+    },
+    {
+      "package": "rustls-0.23.46",
+      "archive_sha256": "48e13bd8c0e9365c43cfa5c9e8f9ad49d3c8444926c9aac819e0e4dc503c8fdf",
+      "source_files_verified": 119
+    },
+    {
+      "package": "rustls-cert-file-reader-0.4.2",
+      "archive_sha256": "8bb47c2a50fdfdaf95b0ac8b12620fc327da1fd4adbb30d0c56d866b005873ff",
+      "source_files_verified": 9
+    },
+    {
+      "package": "rustls-cert-read-0.3.0",
+      "archive_sha256": "dd46e8c5ae4de3345c4786a83f99ec7aff287209b9e26fa883c473aeb28f19d5",
+      "source_files_verified": 5
+    },
+    {
+      "package": "rustls-cert-reloadable-resolver-0.7.1",
+      "archive_sha256": "fe1baa8a3a1f05eaa9fc55aed4342867f70e5c170ea3bfed1b38c51a4857c0c8",
+      "source_files_verified": 9
+    },
+    {
+      "package": "rustls-native-certs-0.8.5",
+      "archive_sha256": "4a073f5dc7469f984c52ad2752b63b0807745133b6de880b7b64c1ac4c48aec4",
+      "source_files_verified": 13
+    },
+    {
+      "package": "rustls-pki-types-1.15.1",
+      "archive_sha256": "2f4925028c7eb5d1fcdaf196971378ed9d2c1c4efc7dc5d011256f76c99c0a96",
+      "source_files_verified": 32
+    },
+    {
+      "package": "rustls-platform-verifier-0.7.1",
+      "archive_sha256": "1167586491e2b18b8bfbb293e8180ec17c201c4f076d7cb3070ca964e7598f98",
+      "source_files_verified": 50
+    },
+    {
+      "package": "rustls-webpki-0.103.15",
+      "archive_sha256": "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2",
+      "source_files_verified": 28
+    },
+    {
+      "package": "rustversion-1.0.23",
+      "archive_sha256": "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f",
+      "source_files_verified": 39
+    },
+    {
+      "package": "ryu-1.0.23",
+      "archive_sha256": "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f",
+      "source_files_verified": 38
+    },
+    {
+      "package": "scopeguard-1.2.0",
+      "archive_sha256": "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49",
+      "source_files_verified": 11
+    },
+    {
+      "package": "semver-1.0.28",
+      "archive_sha256": "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd",
+      "source_files_verified": 25
+    },
+    {
+      "package": "serde-1.0.229",
+      "archive_sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+      "source_files_verified": 33
+    },
+    {
+      "package": "serde_bytes-0.11.19",
+      "archive_sha256": "a5d440709e79d88e51ac01c4b72fc6cb7314017bb7da9eeff678aa94c10e3ea8",
+      "source_files_verified": 18
+    },
+    {
+      "package": "serde_core-1.0.229",
+      "archive_sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+      "source_files_verified": 27
+    },
+    {
+      "package": "serde_derive-1.0.229",
+      "archive_sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+      "source_files_verified": 36
+    },
+    {
+      "package": "serde_json-1.0.154",
+      "archive_sha256": "e7e9cc8b1b85264074fbcc02a88680c4096b1e47df8f739dceb03bf482f04bd6",
+      "source_files_verified": 90
+    },
+    {
+      "package": "serde_spanned-1.1.2",
+      "archive_sha256": "4e7523beb55eece201a2356bee0bbca0d1ab466c14c07703b2e0ee6d42cb0c2c",
+      "source_files_verified": 10
+    },
+    {
+      "package": "serdect-0.4.3",
+      "archive_sha256": "66cf8fedced2fcf12406bcb34223dffb92eaf34908ede12fed414c82b7f00b3e",
+      "source_files_verified": 17
+    },
+    {
+      "package": "sha1-0.11.0",
+      "archive_sha256": "aacc4cc499359472b4abe1bf11d0b12e688af9a805fa5e3016f9a386dc2d0214",
+      "source_files_verified": 20
+    },
+    {
+      "package": "sha1_smol-1.0.1",
+      "archive_sha256": "bbfa15b3dddfee50a0fff136974b3e1bde555604ba463834a7eb7deb6417705d",
+      "source_files_verified": 14
+    },
+    {
+      "package": "sha2-0.11.1",
+      "archive_sha256": "47d7069beb7d6ac7b9acd1039986e73443f24234f41074da099d6f994ac9ad19",
+      "source_files_verified": 47
+    },
+    {
+      "package": "sharded-slab-0.1.7",
+      "archive_sha256": "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6",
+      "source_files_verified": 37
+    },
+    {
+      "package": "shlex-2.0.1",
+      "archive_sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+      "source_files_verified": 13
+    },
+    {
+      "package": "signal-hook-registry-1.4.8",
+      "archive_sha256": "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b",
+      "source_files_verified": 11
+    },
+    {
+      "package": "signature-3.0.0",
+      "archive_sha256": "28d567dcbaf0049cb8ac2608a76cd95ff9e4412e1899d389ee400918ca7537f5",
+      "source_files_verified": 15
+    },
+    {
+      "package": "simdutf8-0.1.5",
+      "archive_sha256": "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e",
+      "source_files_verified": 26
+    },
+    {
+      "package": "simple-dns-0.12.0",
+      "archive_sha256": "2b6f884fa9a8d48101774bfbd3aeb81e968dd22cffd19a372da69f183db22c1a",
+      "source_files_verified": 85
+    },
+    {
+      "package": "slab-0.4.12",
+      "archive_sha256": "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5",
+      "source_files_verified": 13
+    },
+    {
+      "package": "smallvec-1.16.3",
+      "archive_sha256": "5b3dc8af474f516a851ff4bd12db780f948b9250ad37211e4eec0bccea54e01b",
+      "source_files_verified": 11
+    },
+    {
+      "package": "socket2-0.6.5",
+      "archive_sha256": "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4",
+      "source_files_verified": 13
+    },
+    {
+      "package": "sorted-index-buffer-0.2.1",
+      "archive_sha256": "ea06cc588e43c632923a55450401b8f25e628131571d4e1baea1bdfdb2b5ed06",
+      "source_files_verified": 12
+    },
+    {
+      "package": "spez-0.1.2",
+      "archive_sha256": "c87e960f4dca2788eeb86bbdde8dd246be8948790b7618d656e68f9b720a86e8",
+      "source_files_verified": 13
+    },
+    {
+      "package": "spin-0.10.1",
+      "archive_sha256": "023a211cb3138dbc438680b32560ad89f699977624c9f8dbb95a47d5b4c07dd3",
+      "source_files_verified": 24
+    },
+    {
+      "package": "stable_deref_trait-1.2.1",
+      "archive_sha256": "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596",
+      "source_files_verified": 9
+    },
+    {
+      "package": "strsim-0.11.1",
+      "archive_sha256": "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f",
+      "source_files_verified": 13
+    },
+    {
+      "package": "strum-0.28.0",
+      "archive_sha256": "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd",
+      "source_files_verified": 8
+    },
+    {
+      "package": "strum_macros-0.28.0",
+      "archive_sha256": "ab85eea0270ee17587ed4156089e10b9e6880ee688791d45a905f5b1ca36f664",
+      "source_files_verified": 30
+    },
+    {
+      "package": "subtle-2.6.1",
+      "archive_sha256": "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292",
+      "source_files_verified": 10
+    },
+    {
+      "package": "syn-2.0.119",
+      "archive_sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+      "source_files_verified": 105
+    },
+    {
+      "package": "syn-3.0.9",
+      "archive_sha256": "d78c8dee4c7bf0e14673097256fed6142ce9d3b85a408189d07482442145823b",
+      "source_files_verified": 104
+    },
+    {
+      "package": "sync_wrapper-1.0.2",
+      "archive_sha256": "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263",
+      "source_files_verified": 7
+    },
+    {
+      "package": "synstructure-0.13.2",
+      "archive_sha256": "728a70f3dbaf5bab7f0c4b1ac8d7ae5ea60a4b5549c8a5914361c99147a709d2",
+      "source_files_verified": 8
+    },
+    {
+      "package": "synstructure-0.14.0",
+      "archive_sha256": "901704edd0dfe137f1987838ee4f259e4e063c31371bdb423f7ae38ec6f77f02",
+      "source_files_verified": 8
+    },
+    {
+      "package": "thiserror-2.0.21",
+      "archive_sha256": "09e52cb86a36cede5cb101bf8908837b3e4c6e5e59fe7fd85c23fb56200d189e",
+      "source_files_verified": 105
+    },
+    {
+      "package": "thiserror-impl-2.0.21",
+      "archive_sha256": "fe5197923287db20a58125f0bc85c062f7f2c892de97b18c356f9efb14b28524",
+      "source_files_verified": 17
+    },
+    {
+      "package": "thread_local-1.1.10",
+      "archive_sha256": "1ad99c4c6d32803332c548b1af0540b357b3f5fc0be8f6c6bfe8b2e6ae784070",
+      "source_files_verified": 14
+    },
+    {
+      "package": "time-0.3.55",
+      "archive_sha256": "cdb87b95ec50ddfa440816d227a17b2ccbdda963a316a727fda0fc4334f7d134",
+      "source_files_verified": 178
+    },
+    {
+      "package": "time-core-0.1.9",
+      "archive_sha256": "9e1c906769ad99c88eaa54e728060edef082f8e358ff32030cb7c7d315e81109",
+      "source_files_verified": 10
+    },
+    {
+      "package": "time-macros-0.2.32",
+      "archive_sha256": "7e689342a48d2ea927c87ea50cabf8594854bf940e9310208848d680d668ed85",
+      "source_files_verified": 27
+    },
+    {
+      "package": "tinystr-0.8.4",
+      "archive_sha256": "b1e27c91459209c2986af3dcf603a5a74a4368754ce37414f59acc971167f643",
+      "source_files_verified": 22
+    },
+    {
+      "package": "tinyvec-1.13.3",
+      "archive_sha256": "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee",
+      "source_files_verified": 38
+    },
+    {
+      "package": "tokio-1.54.0",
+      "archive_sha256": "a0c168a474b95bfecfe908a65d4bdffc523144b649a74c09c286afb35d53e0bc",
+      "source_files_verified": 581
+    },
+    {
+      "package": "tokio-macros-2.7.2",
+      "archive_sha256": "78773a2a397f451582ce068015985c33193cf6dea8b74d2a639fe457b2f07b0e",
+      "source_files_verified": 10
+    },
+    {
+      "package": "tokio-rustls-0.26.6",
+      "archive_sha256": "c9cc2678c2cdd569ef8215e2afd7954ada2ae20b4fdd2c5fe6139a3b02d105db",
+      "source_files_verified": 16
+    },
+    {
+      "package": "tokio-rustls-acme-0.9.1",
+      "archive_sha256": "1af8573b15fdad8d66da116198cd8fd8d87ff62a67c1c6c3df7f62da1170793f",
+      "source_files_verified": 36
+    },
+    {
+      "package": "tokio-stream-0.1.19",
+      "archive_sha256": "a3d06f0b082ba57c26b79407372e57cf2a1e28124f78e9479fe80322cf53420b",
+      "source_files_verified": 77
+    },
+    {
+      "package": "tokio-util-0.7.20",
+      "archive_sha256": "e464cf451ba96ebfc6f9b6542f17ee8b8956e33f1e40d9690624e59d7a7f8a4b",
+      "source_files_verified": 97
+    },
+    {
+      "package": "tokio-websockets-0.13.3",
+      "archive_sha256": "d52efb639344a7c6adb8e62c6f3d2c19c001ff1b79a5041ba1c6ed42e19c6aa5",
+      "source_files_verified": 73
+    },
+    {
+      "package": "toml-1.1.8+spec-1.1.0",
+      "archive_sha256": "20489e00e4d8741d6be680764cc12e270655e375a20d1011e844a9c3379e678d",
+      "source_files_verified": 46
+    },
+    {
+      "package": "toml_datetime-1.1.2+spec-1.1.0",
+      "archive_sha256": "2b86d767906c6c42421dcba507eb9d203e779497710a47782a224bb871653053",
+      "source_files_verified": 11
+    },
+    {
+      "package": "toml_edit-0.25.17+spec-1.1.0",
+      "archive_sha256": "e3641d5bbb5349a79e1020a242d251efbc546ad8048d133958323ce9c40a9c9c",
+      "source_files_verified": 45
+    },
+    {
+      "package": "toml_parser-1.1.5+spec-1.1.0",
+      "archive_sha256": "baa693a8032d7e1cada7d0041e96126df243179ff061456783ac7f12bda4744c",
+      "source_files_verified": 22
+    },
+    {
+      "package": "toml_writer-1.1.3+spec-1.1.0",
+      "archive_sha256": "06bdbd8cfc056b8d2e2e85f29b56a3bdbecb527cef81eb39e3e7b98af4652770",
+      "source_files_verified": 13
+    },
+    {
+      "package": "tower-0.5.3",
+      "archive_sha256": "ebe5ef63511595f1344e2d5cfa636d973292adc0eec1f0ad45fae9f0851ab1d4",
+      "source_files_verified": 127
+    },
+    {
+      "package": "tower-http-0.6.11",
+      "archive_sha256": "4cfcf7e2740e6fc6d4d688b4ef00650406bb94adf4731e43c096c3a19fe40840",
+      "source_files_verified": 114
+    },
+    {
+      "package": "tower-layer-0.3.3",
+      "archive_sha256": "121c2a6cda46980bb0fcd1647ffaf6cd3fc79a013de288782836f6df9c48780e",
+      "source_files_verified": 11
+    },
+    {
+      "package": "tower-service-0.3.3",
+      "archive_sha256": "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3",
+      "source_files_verified": 7
+    },
+    {
+      "package": "tracing-0.1.44",
+      "archive_sha256": "63e71662fa4b2a2c3a26f570f037eb95bb1f85397f3cd8076caed2f026a6d100",
+      "source_files_verified": 93
+    },
+    {
+      "package": "tracing-attributes-0.1.31",
+      "archive_sha256": "7490cfa5ec963746568740651ac6781f701c9c5ea257c58e057f3ba8cf69e8da",
+      "source_files_verified": 30
+    },
+    {
+      "package": "tracing-core-0.1.36",
+      "archive_sha256": "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a",
+      "source_files_verified": 28
+    },
+    {
+      "package": "tracing-log-0.2.0",
+      "archive_sha256": "ee855f1f400bd0e5c02d150ae5de3840039a3f54b025156404e34c23c03f47c3",
+      "source_files_verified": 12
+    },
+    {
+      "package": "tracing-subscriber-0.3.23",
+      "archive_sha256": "cb7f578e5945fb242538965c2d0b04418d38ec25c79d160cd279bf0731c8d319",
+      "source_files_verified": 87
+    },
+    {
+      "package": "try-lock-0.2.5",
+      "archive_sha256": "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b",
+      "source_files_verified": 8
+    },
+    {
+      "package": "typenum-1.20.1",
+      "archive_sha256": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20",
+      "source_files_verified": 26
+    },
+    {
+      "package": "unicode-ident-1.0.27",
+      "archive_sha256": "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563",
+      "source_files_verified": 26
+    },
+    {
+      "package": "unicode-segmentation-1.13.3",
+      "archive_sha256": "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8",
+      "source_files_verified": 19
+    },
+    {
+      "package": "unicode-xid-0.2.6",
+      "archive_sha256": "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853",
+      "source_files_verified": 13
+    },
+    {
+      "package": "universal-hash-0.5.1",
+      "archive_sha256": "fc1de2c688dc15305988b563c3854064043356019f97a4b46276fe734c4f07ea",
+      "source_files_verified": 8
+    },
+    {
+      "package": "untrusted-0.9.0",
+      "archive_sha256": "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1",
+      "source_files_verified": 19
+    },
+    {
+      "package": "url-2.5.8",
+      "archive_sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+      "source_files_verified": 19
+    },
+    {
+      "package": "utf8_iter-1.0.4",
+      "archive_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+      "source_files_verified": 11
+    },
+    {
+      "package": "utf8parse-0.2.2",
+      "archive_sha256": "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821",
+      "source_files_verified": 9
+    },
+    {
+      "package": "version_check-0.9.5",
+      "archive_sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a",
+      "source_files_verified": 13
+    },
+    {
+      "package": "want-0.3.2",
+      "archive_sha256": "ec4cdd0dd910afe868b7ef477227d8d538b46b3075031afee8a9f2acb0a2ed0b",
+      "source_files_verified": 9
+    },
+    {
+      "package": "webpki-roots-1.0.10",
+      "archive_sha256": "1c1c8e20c8a38fc7d65abfe74eb7280e4aa667e8eec8bc84996d2874810748d9",
+      "source_files_verified": 12
+    },
+    {
+      "package": "winnow-1.0.4",
+      "archive_sha256": "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81",
+      "source_files_verified": 107
+    },
+    {
+      "package": "writeable-0.6.4",
+      "archive_sha256": "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc",
+      "source_files_verified": 21
+    },
+    {
+      "package": "x509-parser-0.18.1",
+      "archive_sha256": "d43b0f71ce057da06bc0851b23ee24f3f86190b07203dd8f567d0b706a185202",
+      "source_files_verified": 74
+    },
+    {
+      "package": "yasna-0.6.0",
+      "archive_sha256": "b5f6765e852b9b4dc8e2a76843e4d64d1cea8e79bcde0b6901aea8e7c7f08282",
+      "source_files_verified": 20
+    },
+    {
+      "package": "yoke-0.8.3",
+      "archive_sha256": "709fe23a0424b6a435d82152b1bd3fdfb0833487d5fa90d05d42762a9891fef5",
+      "source_files_verified": 18
+    },
+    {
+      "package": "yoke-derive-0.8.4",
+      "archive_sha256": "ec8ebde2db3681e8c9980cc27822030e68752690ddfa9473e739aeb4dbde6d71",
+      "source_files_verified": 10
+    },
+    {
+      "package": "zerofrom-0.1.8",
+      "archive_sha256": "0ec05a11813ea801ff6d75110ad09cd0824ddba17dfe17128ea0d5f68e6c5272",
+      "source_files_verified": 9
+    },
+    {
+      "package": "zerofrom-derive-0.1.8",
+      "archive_sha256": "f75b4683f6c7f45248d4d64056a24298c6281e0993356d7d1b4a1a962ef10d4a",
+      "source_files_verified": 9
+    },
+    {
+      "package": "zeroize-1.9.1",
+      "archive_sha256": "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879",
+      "source_files_verified": 16
+    },
+    {
+      "package": "zeroize_derive-1.5.0",
+      "archive_sha256": "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328",
+      "source_files_verified": 9
+    },
+    {
+      "package": "zerotrie-0.2.5",
+      "archive_sha256": "4ea269c3bd32f0a32c321907a2ae912ba6f4649bb0fc764a15627e99a7095a3f",
+      "source_files_verified": 39
+    },
+    {
+      "package": "zerovec-0.11.8",
+      "archive_sha256": "bb0464e17806c1d976d5cba29399c7f08e516e279e2ba493f63123b5fca67dd8",
+      "source_files_verified": 67
+    },
+    {
+      "package": "zerovec-derive-0.11.6",
+      "archive_sha256": "34df6fc39dbd26ddc9c10e6a2984476e13acce22e64e4487636ef494369225da",
+      "source_files_verified": 18
+    },
+    {
+      "package": "zmij-1.0.23",
+      "archive_sha256": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b",
+      "source_files_verified": 17
+    }
+  ],
+  "format": "ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=fbd124b3d3d4fcc2aac2147d683c69cee116982f, not stripped"
+}
