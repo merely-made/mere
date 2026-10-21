@@ -112,6 +112,7 @@ pub struct Lane<P: Product> {
     capture_backend: Box<dyn CaptureBackend>,
     capture_paint: bool,
     pub(crate) diagnostics: Option<Diagnostics>,
+    pub(crate) commands: Option<crate::command::CommandAudit>,
     projection_limits: crate::CaptureProjectionLimits,
     projection_bytes: usize,
     paired_requests: usize,
@@ -162,6 +163,7 @@ impl<P: Product> Lane<P> {
             capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
             diagnostics: None,
+            commands: None,
             projection_limits: crate::CaptureProjectionLimits::default(),
             projection_bytes: 0,
             paired_requests: 0,
@@ -303,6 +305,9 @@ impl<P: Product> Lane<P> {
         });
         if let Some(diagnostics) = &self.diagnostics {
             receipt["diagnostics"] = serde_json::json!(diagnostics);
+        }
+        if let Some(commands) = &self.commands {
+            receipt["commands"] = serde_json::json!(commands);
         }
         receipt
     }
@@ -850,6 +855,9 @@ impl<P: Product> Lane<P> {
             // Value payloads and integer timing fields have a JSON encoding;
             // the shared write path reports actual export/I/O failures.
             lines.push(format!("diagnostics {}", serde_json::json!(diagnostics)));
+        }
+        if let Some(commands) = &self.commands {
+            lines.push(format!("commands {}", serde_json::json!(commands)));
         }
         lines.extend(self.errors.iter().map(|e| format!("FAIL: {e}")));
         lines.join("\n") + "\n"

@@ -6983,6 +6983,7 @@ dependencies = [
  "scenograph",
  "scenomise",
  "scenotime",
+ "script-rhai",
  "serde",
  "serde_json",
  "servitor",
@@ -15527,11 +15528,13 @@ name = "script-rhai"
 version = "0.0.1"
 dependencies = [
  "getrandom 0.3.4",
+ "hest 0.2.0",
  "inker",
  "libm",
  "rhai",
  "scenograph",
  "script-engine-api",
+ "serde_json",
  "wasm-bindgen",
 ]
 
