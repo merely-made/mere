@@ -1114,7 +1114,15 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         extent.1 = extent.1.max(lines.y + lines.height + end.1);
     }
     for child in dom.dom_children(node) {
-        extend_scroll_extent(dom, styles, fragments, child, end, (true, true), &mut extent);
+        extend_scroll_extent(
+            dom,
+            styles,
+            fragments,
+            child,
+            end,
+            (true, true),
+            &mut extent,
+        );
     }
     (
         (extent.0 - container.x - container.width).max(0.0),
@@ -1275,6 +1283,22 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
+/// Genet owns flat-tree child selection. Preserve its order while sharing the
+/// traversal between producer discovery and semantic routing. Light-DOM text
+/// offsets below retain their separate DOM-text contract.
+pub(crate) fn flat_nodes<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+) -> impl Iterator<Item = NodeId> + '_ {
+    let mut pending = vec![dom.document()];
+    std::iter::from_fn(move || {
+        let node = pending.pop()?;
+        let start = pending.len();
+        pending.extend(dom.flat_children(node));
+        pending[start..].reverse();
+        Some(node)
+    })
+}
+
 fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {
     visit(node);
     for child in dom.dom_children(node) {
@@ -1282,7 +1306,7 @@ fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl F
     }
 }
 
-fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
+pub(crate) fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
     if dom.kind(node) != NodeKind::Element
         || !matches!(
             dom.element_name(node)?.local.as_ref(),

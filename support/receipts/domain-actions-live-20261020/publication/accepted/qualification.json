@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "source_commit": "0dacf49a29077bec315fe30065dc8ae9cc123cfe",
+  "source_state": "working source qualified by hashes; not a published commit",
+  "source_sha256": {
+    "ports/graphshell/mere/src/browser.rs": "33c3876497df7cb9d237c2a595f61a6bfb79279ed66139c7cab48cd60805df85",
+    "support/receipts/domain-actions-live-20261020/run.py": "ad60f8ec879060a7377334554ececdae1f197191b4b01130b3dcd0b9b92a0ea8"
+  },
+  "binaries": {
+    "native_artifact": "4a5fbbb2a22926578552da1611afee88e8b2facc1625a33b2ea2a135f656249c",
+    "native_signed_bundle": "3b99b265b96e1430bc8c50c6decd0fcb4fddce674752e012c36c1c361f10621f",
+    "preparation_helper": "7406275eb8b4e0cae49ce8dac296ab217ee82ac14442d815dbb25855ec295719",
+    "resident": "719d474c731ea3c16d2177672265a6fb2d06f4bd31739834b8691fdb2072e2fa"
+  },
+  "platform": "macOS-15.8.1-x86_64-i386-64bit-Mach-O",
+  "architecture": "x86_64",
+  "real_unlocked_console": true,
+  "phases": [
+    {
+      "name": "open",
+      "pid": 86935,
+      "exit_code": 0
+    },
+    {
+      "name": "reopen",
+      "pid": 86987,
+      "exit_code": 0
+    },
+    {
+      "name": "disabled",
+      "pid": 87030,
+      "exit_code": 0
+    }
+  ],
+  "resident_starts": 3,
+  "address": "http://127.0.0.1:61344/owner-action/0c2c2c37b0fd44ac93a3c9d3fdecc562",
+  "node": "11919941-2545-4759-b470-86ce7d89294f",
+  "session": "1befcd28-0921-4d6a-9660-579c72818594",
+  "browser_visits": [
+    {
+      "path": "/owner-action/0c2c2c37b0fd44ac93a3c9d3fdecc562",
+      "at_ns": 1792554767350610000,
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0"
+    }
+  ],
+  "checks": [
+    "real native retained control",
+    "exact accepted owner request",
+    "one system browser visit",
+    "one persisted access-history entry",
+    "cold native and resident reopen without redispatch",
+    "disabled owner setting removes offer without changing access history"
+  ],
+  "limits": [
+    "macOS only; no Linux or Windows runtime qualification",
+    "retained native harness activation; no physical pointer, keyboard or screen-reader qualification",
+    "system handoff and observed local browser visit; no general page-load or application completion contract"
+  ]
+}

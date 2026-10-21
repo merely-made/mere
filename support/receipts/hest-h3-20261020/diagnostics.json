@@ -1,0 +1,22 @@
+[
+  {
+    "name": "expanded-rootstock-rustdoc",
+    "exit_code": 101,
+    "scope": "Additional non-gating expansion beyond the required Hest/Chirograph/Cambium/shim Rustdoc scope.",
+    "finding": "Existing unresolved Harness links in unchanged rootstock host documentation. Scoped strict Rustdoc passes.",
+    "source_unchanged_against_incoming": true,
+    "log": "expanded-rootstock-rustdoc.log.gz",
+    "raw_log_sha256": "3d4651ab4a596ee6829813dd5059d2891cf83da9cca8746692fea0e1252d6d4f",
+    "stored_log_sha256": "482c21c91d0104c6ffd7c6ca6dfda08b499c9230551746c719e876e1c8626616",
+    "compression": "gzip"
+  },
+  {
+    "name": "initial-wasm",
+    "exit_code": 101,
+    "finding": "An incoming authored-block command still used the old three-argument constructor. Fixed by declaring DomainTruth in 94f50b95f; final locked Wasm check passes.",
+    "log": "initial-wasm.log.gz",
+    "raw_log_sha256": "01c08450f6a13316c500b6bd1165aba8a96833c917ed053daa038e571fb98cb6",
+    "stored_log_sha256": "c69058bdfc15c745396ff2299dee63f279188a86c4375d69eb82661d4b2cc50a",
+    "compression": "gzip"
+  }
+]

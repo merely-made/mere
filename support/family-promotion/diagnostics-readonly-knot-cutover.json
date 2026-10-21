@@ -1,0 +1,34 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "-p",
+    "knot-document",
+    "--precise",
+    "b8d0e2f"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/mere",
+  "started": "2026-10-21T06:49:41.739521+00:00",
+  "finished": "2026-10-21T06:51:12.955850+00:00",
+  "exit_code": 0,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/netrender.git`",
+    "Updating git repository `https://github.com/merely-made/armillary.git`",
+    "Updating git repository `https://github.com/merely-made/eidetic.git`",
+    "Updating git repository `https://github.com/merely-made/genet.git`",
+    "Updating git repository `https://github.com/merely-made/errand.git`",
+    "Updating git repository `https://github.com/merely-made/armillary.git`",
+    "Updating git repository `https://github.com/merely-made/murm.git`",
+    "Updating git repository `https://github.com/merely-made/dramatis.git`",
+    "Updating git repository `https://github.com/merely-made/esp.git`",
+    "Updating git repository `https://github.com/mark-ik/vello`",
+    "Updating git repository `https://github.com/iced-rs/iced`",
+    "Updating git repository `https://github.com/merely-made/knot-editor.git`",
+    "Updating git repository `https://github.com/iced-rs/cryoglyph.git`",
+    "Updating git repository `https://github.com/merely-made/mere.git`",
+    "Updating git repository `https://github.com/hecrj/cosmic-text.git`",
+    "Updating git repository `https://github.com/merely-made/mere.git`"
+  ],
+  "diagnostic_tail": "    Updating crates.io index\n    Updating git repository `https://github.com/merely-made/netrender.git`\n    Updating git repository `https://github.com/merely-made/armillary.git`\n    Updating git repository `https://github.com/merely-made/eidetic.git`\n    Updating git repository `https://github.com/merely-made/genet.git`\n    Updating git repository `https://github.com/merely-made/errand.git`\n    Updating git repository `https://github.com/merely-made/armillary.git`\n    Updating git repository `https://github.com/merely-made/murm.git`\n    Updating git repository `https://github.com/merely-made/dramatis.git`\n    Updating git repository `https://github.com/merely-made/esp.git`\n    Updating git repository `https://github.com/mark-ik/vello`\n    Updating git repository `https://github.com/iced-rs/iced`\n    Updating git repository `https://github.com/merely-made/knot-editor.git`\n    Updating git repository `https://github.com/iced-rs/cryoglyph.git`\n    Updating git repository `https://github.com/merely-made/mere.git`\n    Updating git repository `https://github.com/hecrj/cosmic-text.git`\n    Updating git repository `https://github.com/merely-made/mere.git`\n    Removing cambium v0.5.0 (https://github.com/merely-made/mere.git?branch=main#c66620ca)\n    Updating chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating knot-capture v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating knot-composition v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating knot-document v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating knot-editor v0.0.3 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating knot-file-catalog v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating knot-site v0.0.1 (https://github.com/merely-made/knot-editor.git?branch=main#ebf10c74) -> #b8d0e2fd\n    Updating mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#e2f19a3f) -> #64d47ac4\n    Updating murm-wire v0.1.0 (https://github.com/merely-made/murm.git?branch=main#e2f19a3f) -> #64d47ac4\n    Updating notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#0c537848) -> #7d498c27\n    Updating retinue v0.3.0 (https://github.com/merely-made/murm.git?branch=main#e2f19a3f) -> #64d47ac4\n    Updating selvage v0.1.0 (https://github.com/merely-made/murm.git?branch=main#e2f19a3f) -> #64d47ac4\n    Removing sprigging v0.2.2 (https://github.com/merely-made/mere.git?branch=main#c66620ca)\n    Updating tulle v0.2.0 (https://github.com/merely-made/murm.git?branch=main#e2f19a3f) -> #64d47ac4\nnote: pass `--verbose` to see 220 unchanged dependencies behind latest\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

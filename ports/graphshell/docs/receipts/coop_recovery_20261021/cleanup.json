@@ -1,0 +1,30 @@
+{
+  "accepted_cohort": "gs-recovery-20261021-01",
+  "owner": {
+    "subject_pids": [
+      97418,
+      97455,
+      97520,
+      97548,
+      97386,
+      97510
+    ],
+    "remaining": []
+  },
+  "guest": {
+    "subject_pids": [
+      2235782,
+      2235998,
+      2236256,
+      2235709,
+      2236204,
+      2235780,
+      2235996,
+      2236254,
+      2235549,
+      2236116
+    ],
+    "remaining": []
+  },
+  "scope": "Seven native clients, four ordinary custodian lifetimes, three Pasta forwarders and both relay processes stopped. Independent process inspection found none of these accepted subjects. Source changes stay in the isolated worktrees; shared ignored build caches and task outputs were used."
+}

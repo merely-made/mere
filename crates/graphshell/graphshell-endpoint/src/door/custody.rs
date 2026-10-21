@@ -57,6 +57,8 @@ pub enum CustodyCall {
     Payload(super::custody_payload::PayloadRequest),
     /// Ask the resident to render its own native unlock prompt.
     UnlockNative,
+    /// Local Dramatis authentication update; credentials are collected by Djinn.
+    ChangePassphraseNative(dramatis::authentication::ChangePassphraseIntentV1),
     /// Older imports requiring an explicit profile association.
     UnassignedImports,
     /// Djinn asks the owner to associate one exact older import namespace.
@@ -278,6 +280,9 @@ impl Drop for ReleasedKey {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "answer", rename_all = "snake_case")]
 pub enum CustodyAnswer {
+    PassphraseChange {
+        receipt: dramatis::authentication::PassphraseChangeReceiptV1,
+    },
     Payload {
         result: super::custody_payload::PayloadResult,
     },

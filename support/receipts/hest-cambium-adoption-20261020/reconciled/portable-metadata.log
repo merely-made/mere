@@ -1,0 +1,6 @@
+error: invalid type: boolean `true`, expected a map
+ --> ../../../.cargo/git/checkouts/servo-e53a6e7b994a25fe/aac43a3/python/tidy/tests/lints-configuration/no-workspace/Cargo.toml:8:7
+  |
+8 | foo = true
+  |       ^^^^
+Verified /Users/markik/Code/repos/turnstone: cargo 1.99.1 (5f94df478 2026-08-27); lock sha256=e3af843ebe2027cb5fa06124ceca4fc8913dfffc133c18b90fa1522be90e76f5; packages=1279

@@ -1,0 +1,21 @@
+[
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-joined.png",
+    "nodes": 1
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-added.png",
+    "set": [
+      "https://shared.invalid/guest",
+      "Guest source"
+    ],
+    "click": "add",
+    "nodes": 2,
+    "status": "Saved by holder"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/guest-saw-push.png",
+    "wait_file": "/Users/markik/Code/output/graphshell-coop-native-20261020-04/evidence/owner-live-append.json",
+    "nodes": 3
+  }
+]

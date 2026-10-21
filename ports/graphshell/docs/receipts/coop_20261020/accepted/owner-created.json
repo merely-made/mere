@@ -1,0 +1,39 @@
+{
+  "colors": 1606,
+  "frames": 9,
+  "pid": 81595,
+  "presentation": "PresentedFrame { context_generation: ContextGeneration(1), host: 1, sequence: 6, width: 2200, height: 1700, layout_scale: 2.0 }",
+  "state": {
+    "data": {
+      "access": "uninvited",
+      "authors": [
+        {
+          "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell"
+        },
+        {
+          "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "kind": "person",
+          "version": null,
+          "via": "graphshell.coop"
+        }
+      ],
+      "epoch": 1,
+      "graph": "e71cc6d4-57a5-41c3-804f-ff65a0db37c5",
+      "guest": null,
+      "nodes": [
+        {
+          "address": "https://shared.invalid/owner",
+          "id": "94c5bff4-631f-4e43-954d-a65f98d982d1",
+          "title": "Owner source"
+        }
+      ],
+      "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+      "revision": 5
+    },
+    "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+    "status": "Saved"
+  }
+}

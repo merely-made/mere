@@ -1,6 +1,6 @@
 [package]
 name = "sprigging"
-version = "0.2.2"
+version = "0.3.0"
 description = "Retained custom-paint leaves and arrangement helpers for Rust GUI hosts"
 edition.workspace = true
 
@@ -11,5 +11,5 @@ publish = true
 
 [dependencies]
 paint_list_api.workspace = true
-accesskit = { version = "0.24.0", features = ["serde"] }
+accesskit = { workspace = true, features = ["serde"] }
 vello = { workspace = true }

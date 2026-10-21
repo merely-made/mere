@@ -1,0 +1,14 @@
+{
+  "scope": "Only the old consumer lookup paths are restored; new shared-provider/queue contracts and supplier stay in place",
+  "consumer_basis": "3af00fc90",
+  "before_sha256": {
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "f0a583b80bd84c0e184f395108a64bf35f65ae3260eedfe36d80d959b58a8aa7",
+    "crates/cambium/mesquite/src/probe.rs": "48d4bb9d4a8106d51ad7cce4cb586aa0e6f7e9c87d88f1e5887046bdd2d87123",
+    "crates/cambium/mesquite/src/clicks.rs": "973cabc1f481f1fd355a042861cf17bb7849ab1a85f436c7b8fa0dd0508a9d1f"
+  },
+  "repair_sha256": {
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "3d30bbfae22a64a521b2219ab7fbef4497af105ec5c8c7aea6e50de487ef202a",
+    "crates/cambium/mesquite/src/probe.rs": "ffa2710fe14da056c6db363308691fa74cf0569ff2bcea67a065e81d5b634316",
+    "crates/cambium/mesquite/src/clicks.rs": "573d9f7fe91caf6c99d0b1718b28efe56503918333d0b2c7e41e60aa05e5f8f9"
+  }
+}

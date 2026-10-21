@@ -87,6 +87,7 @@ mod tabs;
 mod tags;
 mod text;
 mod title_bar;
+mod shell;
 mod value;
 mod wheel;
 mod workspace;
@@ -105,7 +106,9 @@ pub use atlas::{
     GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
 };
 // The command set lives in its own crate so hosts without Cambium share it (SE45 to SE48).
-pub use ::command_menu::{Command, CommandChoices, CommandSet, MenuSession, catalogue};
+pub use hest::catalogue;
+pub use hest::{EffectClass, Invocation, Outcome};
+pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
@@ -229,6 +232,9 @@ pub use tabs::{
 pub use tags::*;
 pub use text::text;
 pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
+pub use shell::{shell_activity_control, shell_activity_rail, shell_document_rail, SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot,
+    shell_control, shell_popup, shell_projection_switch, shell_toolbar,
+    shell_source_binding, shell_navigation_item};
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{

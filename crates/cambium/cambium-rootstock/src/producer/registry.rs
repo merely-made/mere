@@ -304,8 +304,8 @@ impl ProducerRegistry {
     }
 
     /// The registered producer's description of its slot, if it gives one.
-    pub fn semantics(&mut self, key: u64) -> Option<ProducerSemantics> {
-        self.entries.get_mut(&key)?.producer.semantics()
+    pub fn semantics(&self, key: u64) -> Option<ProducerSemantics> {
+        self.entries.get(&key)?.producer.semantics()
     }
 
     /// Hand a reader's invoked action to the producer that drew the node.

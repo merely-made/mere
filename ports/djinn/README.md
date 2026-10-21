@@ -28,6 +28,26 @@ with its reason. `djinn --resident-status` prints a running resident's status
 from its app door, and `djinn --stop-resident` stops it the way Ctrl-C does;
 both routes are owner-only.
 
+`--diagnostics-config <path>` opts into an in-memory redacted lifecycle history.
+The JSON file requires explicit ingress and retained record/byte/age bounds and
+a sampling rate. For example:
+
+```json
+{"ingress_records":32,"ingress_bytes":65536,"ingress_age_secs":300,
+ "retained_records":32,"retained_bytes":65536,"retained_age_secs":300,
+ "sample_rate":1.0}
+```
+
+A zero in any ingress or retained bound disables that buffer; `sample_rate`
+must be between zero and one. `djinn --resident-diagnostics` reads the bounded
+copy through the existing owner-only status route. Absent configuration reports
+disabled coverage. Only fixed lifecycle phases and explicit stopped outcomes
+are retained; profile/credential/endpoint/error text is excluded before queue
+admission. The event file remains separate. This history is neither a durable
+journal nor a final stopped receipt after process exit, and it installs no
+process-wide capture of other logs. Each reader has an independent cursor. Byte limits use admission accounting,
+not JSON output size.
+
 The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,
 pairing records, and content-store migrations, not an additional resident.

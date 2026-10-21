@@ -1,0 +1,112 @@
+[
+  {
+    "name": "native-tests",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell-mere",
+      "--bin",
+      "graphshell_mere"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "resident-tests",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "djinn",
+      "--lib",
+      "resident_mere::"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "settings-tests",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "djinn",
+      "--lib",
+      "settings::tests::"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "resident-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "djinn",
+      "--features",
+      "passphrase-fd",
+      "--bin",
+      "djinn"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "helper-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "djinn",
+      "--example",
+      "coop_existing_graph"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "native-build",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.target-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/target\"",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/output/domain-action-bindings-20261020/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell-mere",
+      "--bin",
+      "graphshell_mere"
+    ],
+    "exit_code": 0
+  }
+]

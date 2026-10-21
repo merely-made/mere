@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "mere-registry",
+    "-p",
+    "ux-events",
+    "-p",
+    "mere-apparatus",
+    "--no-default-features",
+    "--features",
+    "mere-registry/diagnostics,mere-apparatus/serde",
+    "--lib"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T17:06:20.273507+00:00",
+  "finished": "2026-10-20T17:16:43.406709+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: failed to get `cleromancy-core-acceptance` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\repos\\mere\\ports\\djinn)`"
+  ],
+  "diagnostic_tail": "error: failed to get `cleromancy-core-acceptance` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\repos\\mere\\ports\\djinn)`\n\nCaused by:\n  failed to load source for dependency `cleromancy-core-acceptance`\n\nCaused by:\n  unable to update https://github.com/merely-made/cleromancy.git?branch=main#c94f7039\n\nCaused by:\n  can't checkout from 'https://github.com/merely-made/cleromancy.git': you are in the offline mode (--offline)\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

@@ -1,0 +1,6 @@
+{
+  "origin_corpus_sha256": "b3dbc99cdfb62695d1624ae6c5e2b659da09d116bbcaaee75612fdf38c15bada",
+  "origin_path": "/Users/markik/Code/output/embedding-envelope-20261020/runtime-accepted/origin-corpus.json",
+  "absent_before_cold": true,
+  "retained_store": "/Users/markik/Code/output/embedding-envelope-20261020/runtime-accepted/retained.redb"
+}

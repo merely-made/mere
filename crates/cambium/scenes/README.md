@@ -1,23 +1,44 @@
 # Cambium scenes
 
-The scene lane of the Cambium umbrella: a projection engine family for interactive surfaces: heterogeneous sources
-(graphs, maps, timelines, instruments, meshes) projected into scenes through one
-grammar.
+The scene lane of Cambium provides authoring definitions, layout compilation,
+projected scenes and scene updates. Domains supply disclosed facts; hosts supply
+content measurements, drawing and interaction. The shared grammar describes
+presentation without taking ownership of the source data.
 
 ```text
-source data + relationships + signals + score
-    → select and derive
-    → map data to visual channels
+recipe + disclosed facts + host measurements
+    → ProjectionCompiler: validate and resolve supported choices
+    → sceno::Score: layout instructions
     → solve placement
-    → produce an interactive scene
+    → sceno::Scene: projected items, relationships and bounds
+    → host drawing, input and owner-controlled commands
 ```
 
-Sources keep their native truth behind adapters; what is shared is the scene
-contract, not a data model. The representation measures content; the projection
-places it.
+The [compiler](scenomise/src/projection.rs) converts the authored
+`scenograph::Arrangement` descriptor into the resolved `sceno::Arrangement` used
+by a score. Hosts can also supply a score directly to the solver. These are
+different stages of one supported pipeline, with distinct data types.
 
-Four crates on the unpublished 0.0.4 development line. The three engine crates
-share the `sceno-` stem with one function morpheme each; `scenograph` is the
+The current `ProjectionCompiler` accepts the `nodes` reading, text labels,
+supported field encodings, and built-in or registered arrangements. Its realization is a
+slate canvas with single selection and a fitted viewport; it rejects color
+encoding, pan/zoom interaction and other unsupported choices. The broader
+authoring vocabulary does not imply that every definition can execute. Optional
+dynamics are carried as configuration for the host to validate and bind.
+
+Saved source bindings identify authority, domain and resource. Disclosed datasets
+carry revisions, field types and occurrences. Owner-offered actions use the
+separate [Chirograph action contract](../../chirograph/src/lib.rs); advertising
+an action does not grant permission to invoke it. Hosts and source owners admit
+commands through their own interfaces.
+
+Saved recipes may include authored dynamics; Knot additionally retains authored
+motion roles and normalized placement traces in immutable versions. Those
+portable values remain distinct from live simulation state and execution
+handles. The carrier is `knot-editor/crates/knot-composition/src/retention.rs`.
+
+Four crates with separate package versions, recorded in their manifests. The
+three engine crates share the `sceno-` stem with one function morpheme each; `scenograph` is the
 published name for authoring definitions. The engine crates landed under
 `crates/cambium/scenes/` on 2026-09-03 with the Cambium family, and the
 authoring crate followed on 2026-09-09 when a second host forced extraction,
@@ -29,11 +50,17 @@ interaction structure; a scene is a projection of content.
 | Crate | Contents |
 | --- | --- |
 | [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Fold` (with `StandIn`, `FoldRule`, `FoldBoundary` and the derived `FoldEffect`), `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
-| [scenomise](scenomise/) | Choreography. `solve(&Score) -> Scene` realizes the arrangements; `relax(&mut Scene, &Relaxation)` is a dependency-free repulsion / spring / arrangement-pull pass for surfaces without their own physics sim, including static collision against collidable backdrops. |
+| [scenomise](scenomise/) | Layout compilation and choreography. `ProjectionCompiler` converts supported Scenograph definitions and disclosed datasets into scores and scenes. `solve(&Score) -> Scene` realizes a supplied score; `relax(&mut Scene, &Relaxation)` adds repulsion, springs and arrangement pull without a physics engine dependency, including static collision against collidable backdrops. |
 | [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId` / `FoldId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
 | [scenograph](scenograph/) | Host-neutral authoring model. Durable projection definitions, local validation, reusable definition binding and variants, deterministic JSON, public source revisions, and opaque runtime witness binding. It owns neither a widget UI, a source authority, a solver, nor a renderer. |
 
 ## Vocabulary
+
+Here a **recipe** is authored configuration, a **score** is resolved layout
+instructions, and a **scene** is the placed projection. A Sprigging `SceneSlot`
+carries a renderer drawing (`vello::Scene`). Seiche's `SceneSpec` describes a
+physics world of bodies, joints and fields. Qualify the object at those
+boundaries; these types do not represent the same state.
 
 - `Arrangement`: `Spiral` (with `SpiralCurve`), `Grid`, `Geographic`, `Hulls`.
 - `Placement`: `Ordinal`, `Cell { column, row }`, `Coordinate(Vec2)`.
@@ -200,20 +227,22 @@ and saved voicing facts; the host supplies no musical interpretation.
 
 ## Dependencies
 
-`sceno` depends on `serde` alone. `scenomise` depends on `sceno`, `serde` and
-`serde_json` — the last two for the solver registry it absorbed. `scenotime`
-depends on `sceno`, `serde` and `serde_json`, the last for a scene trace's
-opaque host annotation. `scenograph` depends on `serde` and
-`serde_json` for its durable authoring wire format. No product, engine, or GPU
-dependencies: the scene lane does not reach up into Cambium's widgets or down
-into Genet.
+`sceno` and `scenotime` use `serde` and `serde_json` for portable values;
+`scenotime` also uses the `sceno` contracts. `scenograph` adds authoring data over
+`sceno` and curation scope, with an optional script-engine interface.
+`scenomise` consumes both contracts and uses `libm` for deterministic solver
+math. Its optional `authoring` feature adds editing history and a workbench;
+its `djot` feature adds attributed-block transport. The crate manifests record
+the exact dependencies and feature gates. Compiling a projection takes
+disclosed data and host measurements, with drawing and GPU ownership left to
+the host.
 
 The generic `scenograph` facade is still gone (platform boundary plan §1).
 Every engine consumer takes the member it needs directly, and the former
 facade's solver registry behind `sceno::Arrangement::Custom` lives in
 `scenomise::registry`: a registry needs the score and solver contracts at once.
 `scenomise::solve_via` remains the registry dispatch entry because the plain
-name is its closed-form solve over named families. The `scenograph 0.0.4` name
+name is its closed-form solve over named families. The `scenograph` name
 now hosts the portable authoring model only; it is neither an engine facade nor
 a runtime.
 

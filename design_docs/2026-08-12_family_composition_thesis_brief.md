@@ -1307,10 +1307,17 @@ origin still uses an actual supported owner interface.
 
 #### Existing seams and the remaining host boundary
 
+**Native host clarification (2026-10-20):** the winit host can reuse a caller's
+render core and event loop, and the multi-window entry shares its core across
+windows. The [Cambium architecture note](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20)
+records those implemented choices. The embedding questions below concern
+adapting compatible caller-owned GPU contexts and targets across other host
+toolkits; they do not imply that native shared-core hosting is absent.
+
 | Existing seam | What it already separates | Remaining embedding question |
 |---|---|---|
 | Sprigging paint commands and Vello scene leaves | Custom paint production from its retained host | How another toolkit presents that output and forwards its semantics/input |
-| Conatus `HostDevice` and `DeviceNeeds` | A tenant's needs from host-owned GPU handles | How the whole native document/UI lane accepts a caller-owned context |
+| Conatus `HostDevice` and `DeviceNeeds` | A tenant's needs from host-owned GPU handles | How other host toolkits provide compatible contexts and targets beyond the native shared-`RenderCore` entry |
 | Cambium Rootstock `Surface` and host lifecycle | Platform events from shared document/UI behavior | Its current surface still exposes a `RenderCore` and acquires a `SurfaceTexture`; arbitrary target views need an explicit boundary |
 | Inker `SurfaceProducer` | Producer commands/events from raw native frames, format, synchronization and allocation epoch | Preserve native interop and backend/thread requirements while fitting another host's render schedule |
 | Mere view model and requests | Presentation from session/storage authority | Adapt toolkit input, focus and accessibility while retaining the same owner requests |
@@ -1656,6 +1663,124 @@ checks). Vendored/patch suppliers and frozen historical receipts are preserved.
 The shared wgpu CI support-floor default is aligned too. Compiler qualification,
 publication and the first Murm imports are recorded in the canonical Murm move
 plan. Metadata checks alone do not establish all-platform MSRV compatibility.
+
+## MSRV cohort repin (2026-10-20)
+
+**Finding.** cargo 1.97.1 could not resolve any workspace that reached Eidetic
+`543f5ff38`. Chartulary's manifest set `default-features = false` on a muniment
+dependency inherited from a workspace entry that left defaults on. cargo 1.98+
+accepts that override; 1.97.1 rejects it, despite the declared `rust-version`
+1.97.1. The 2026-10-19 Isocosm gates used rustc 1.97.1 driven by cargo 1.99.1
+as a workaround.
+
+**Fix.** [Eidetic `738ef15`](https://github.com/merely-made/eidetic/commit/738ef15) turns muniment's
+defaults off in the workspace entry, and members that relied on `json` request
+it explicitly. Feature sets are unchanged.
+
+**Cohort.** Every active repository named `543f5ff38` directly or through
+another supplier. They moved in dependency order:
+[esp `809deb6`](https://github.com/merely-made/esp/commit/809deb6) and [gemot `692674c`](https://github.com/merely-made/gemot/commit/692674c),
+then Mere. Mere's Git dependencies on Cleromancy, Knot and Murm depend back on
+Mere, so these moved in two phases:
+
+1. [Cleromancy `c94f703`](https://github.com/merely-made/cleromancy/commit/c94f703),
+   [Knot `450766f`](https://github.com/merely-made/knot-editor/commit/450766f) and
+   [Murm `660606e`](https://github.com/merely-made/murm/commit/660606e) name the fixed revisions.
+2. [Mere `7de937d`](https://github.com/merely-made/mere/commit/7de937d) locks those commits.
+3. [Cleromancy `3715ecf`](https://github.com/merely-made/cleromancy/commit/3715ecf),
+   [Knot `aa81a33`](https://github.com/merely-made/knot-editor/commit/aa81a33) and
+   [Murm `e02fbba`](https://github.com/merely-made/murm/commit/e02fbba) lock that Mere.
+
+Between steps 1 and 3, Knot's main did not compile: it resolved two Eidetic
+copies whose types collided. Mark accepted that window. [Woodshed
+`b2fe4df`](https://github.com/merely-made/woodshed/commit/b2fe4df) and [Isocosm `94d4421`](https://github.com/merely-made/isocosm/commit/94d4421)
+followed. The Mere move brings its accesskit 0.25 and phf 0.14 lock updates, so
+Signalman desktop and three Woodshed crates move their direct accesskit to 0.25
+to keep one version.
+
+**cargo 1.97.1 lockfile ordering.** cargo 1.97.1 writes `[[patch.unused]]` lock
+entries in a different order on every resolution. `--locked` therefore failed on
+any root with two or more unused patches, whatever its sources. Unused `[patch]`
+entries were removed from every active root in Mere, Gemot, Murm, Cleromancy,
+Knot, Woodshed, Isocosm and Turnstone, root by root. Each removal was kept only
+when the resolved package graph stayed identical. No active lock root in
+those repositories has two or more unused patches, and each resolves to the
+same lock on every cargo 1.97.1 run. Add new compatibility patches only where a root uses them.
+
+**Verification.** Fresh clones of pushed main, `cargo +1.97.1 test --locked`:
+
+| Repository and root | Passed | Failed |
+|---|---:|---:|
+| Eidetic | 545 | 0 |
+| esp | 91 | 0 |
+| Gemot | 242 | 0 |
+| Knot | 722 | 0 |
+| Cleromancy root / core | 151 / 60 | 0 / 0 |
+| Murm root (CI `cargo test`), after [`3d330d1`](https://github.com/merely-made/murm/commit/3d330d1) | 1,701 | 0 |
+| Murm native (CI `-p murm --lib`) | 69 | 0 |
+| Murm Signalman desktop (declares 1.99; cargo 1.99.1) | 97 | 0 |
+| Woodshed root / hocket / redshank / relationship-recipe | 1,576 / 136 / 275 / 11 | 0 |
+| Isocosm root `--all-features` / host / shared / wing-integration | 205 / 51 / 700 / 9 | 2 / 0 / 0 / 0 |
+| Mere workspace libs, bins and tests (`--no-fail-fast`) | 6,537 | 4 |
+
+The Isocosm failures are two `isometry-genet` `host_zoom` layout-figure tests.
+The Mere failures are a Djinn testkit process-kill control, a document-canvas
+table-wrap layout test, a Graphshell fold-parity test and a Graphshell live-board
+receipt test. Each fails identically on the commit before the repin, so none was
+introduced by it. Mere runs need a short `TMPDIR`, because Djinn's door tests use
+Unix socket paths. A Murm native workspace-wide run also failed one
+timing-dependent transport probe that its own message calls inconclusive.
+[Murm `3d330d1`](https://github.com/merely-made/murm/commit/3d330d1) sets `LocalStatus::device_name` where
+the root had not compiled since 2026-10-16.
+
+**Turnstone and Tabard follow-up (2026-10-20).** [Turnstone
+`c889038`](https://github.com/merely-made/turnstone/commit/c889038) locks current
+Mere and adopts its AccessKit 0.25 cohort. Under 0.25 every platform adapter
+shares `accesskit_consumer` 0.39.1, so Turnstone's three per-platform consumer
+pins collapse to one. Its supplier pins follow Mere's (Eidetic `738ef15`, Gemot
+`692674c`, Armillary `e67c5de`, esp `809deb6`, netrender on `main`). Upstream
+Servo still pins AccessKit 0.24, so Turnstone's `servo` feature converts each
+Servo tree update into the 0.25 surface contract through serde; 0.25 only adds
+node properties and renames `Tree` to `TreeInfo`. That feature is Windows-only
+and was not compiled on this pass; the conversion was checked in a standalone
+crate holding both versions. The migration left three layout-geometry failures
+from Turnstone's chrome polish (`c7b6cad`), which failed identically before it.
+They are not font metrics: at the default 1.1 UI zoom the pane close button's
+min-height left out its padding, so the compact header measured 37 px against
+36 px, and the lens-to-primary float tests compared pixels across windows whose
+workspaces differ by the primary navigation row. [Turnstone
+`0dd9b1b`](https://github.com/merely-made/turnstone/commit/0dd9b1b) makes the close
+button border-box and has those tests require the same relative float record
+and body inset. A fresh clone then passes `cargo +1.97.1 test --locked` with
+1,102 passed and 0 failed.
+
+[Mere `a316c6b`](https://github.com/merely-made/mere/commit/a316c6b) ports the
+Tabard desktop example `native_shared_recovery` to host-owned captures. It takes
+the presentation stamp from its presentation observer, polls the host's readback
+and refuses pixels whose returned stamp differs.
+
+**Earlier failures resolved (2026-10-20).** The six failures recorded above
+are fixed:
+
+- [Mere `f21bb408`](https://github.com/merely-made/mere/commit/f21bb408) omits routed relations' link facts
+  at their defaults, so a fold-free trace round-trips byte-identical again, and
+  updates the live-board test to the client's "updated" resume wording.
+- [Mere `2528108a`](https://github.com/merely-made/mere/commit/2528108a) overflows a table whose column
+  cannot fit its longest unbroken run. Link adornment prefixes had hidden long
+  labels from the whitespace-only check since `f7c9374f3`.
+- [Mere `4a9f9387`](https://github.com/merely-made/mere/commit/4a9f9387) ignores the testkit's C3 orphan
+  control outside Linux and Windows, which alone provide the parent-death
+  cleanup and start times it needs until H5.
+- [Isocosm `99fdfdc`](https://github.com/merely-made/isocosm/commit/99fdfdc) asserts the side panel's
+  pixel figures on Windows, where they were measured in Segoe UI. Everywhere
+  it asserts the relations they support.
+
+[Mere `079c966d`](https://github.com/merely-made/mere/commit/079c966d) repaired a new MSRV regression:
+`d867b8d1` had Djinn override the workspace's apparatus `default-features`,
+the pattern cargo 1.97.1 rejects. [Murm `814c978`](https://github.com/merely-made/murm/commit/814c978)
+carries the public device name through radio-mirror's local document; existing
+v1 documents parse unchanged. Graphshell-host's lib tests do not compile on
+Mere main after the Graphshell co-op lane's `b48fd8b4`; that lane owns them.
 
 ## Family source convention (2026-10-15)
 

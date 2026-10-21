@@ -28,11 +28,11 @@
 
 use std::collections::HashMap;
 
-use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, Rect, Role, TreeUpdate};
-use cambium_rootstock::{ProducedAction, ProducerRegistry, ProducerRole, ProducerSemantics};
+use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, TreeUpdate};
+use cambium_rootstock::{ProducedAction, ProducerRegistry};
 use genet_scripted_dom::NodeId;
 use genet_winit_host::{AccessKitBridge, BridgeStatus};
-use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
+use layout_dom_api::LayoutDom;
 use sprigging::LeafRegistry;
 use winit::window::Window;
 
@@ -48,8 +48,8 @@ impl Accessibility for A11yHost {
         &mut self,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -115,8 +115,8 @@ impl A11yHost {
         &mut self,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -202,7 +202,8 @@ impl A11yHost {
 }
 
 /// Project a laid-out Cambium document into an AccessKit tree, with no window
-/// and no platform adapter: the half of [`A11yHost::sync`] that is pure.
+/// and no platform adapter. Providers are read through shared borrows; this
+/// copied observation is not a presentation-revision snapshot or target lease.
 ///
 /// Returns the tree update and the AccessKit-id → DOM-node map a drained
 /// action is resolved through. Split out so the projection is assertable in an
@@ -211,8 +212,8 @@ impl A11yHost {
 pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> (TreeUpdate, HashMap<A11yNodeId, NodeId>) {
     let (tree, nodes, _) = project_tree_with_actions(dom, layout, leaves, producers, focus);
@@ -224,245 +225,20 @@ pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
 pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> (
     TreeUpdate,
     HashMap<A11yNodeId, NodeId>,
     HashMap<A11yNodeId, ProducedAction>,
 ) {
-    let root = dom.document();
-    let id_of = |d: &D, n: NodeId| A11yNodeId(d.opaque_id(n));
-    let focused = focus.and_then(|opaque| find_opaque(dom, root, opaque));
-    let mut tree = genet_render::accesskit_tree_with_style(
-        dom,
-        layout.fragments(),
-        focused,
-        &genet_render::A11yStyleQueries {
-            generated: &|node| layout.generated_text(dom, node),
-            rendered: &|node| layout.rendered_visible(dom, node),
-        },
-    );
-    let mut action_map = HashMap::new();
-    let mut produced = Vec::new();
-    let mut app_textboxes = Vec::new();
-    walk(dom, root, &mut |node| {
-        let id = id_of(dom, node);
-        action_map.insert(id, node);
-        if let Some(key) = custom_leaf_key(dom, node)
-            && let Some(leaf) = leaves.get_mut(&key)
-            && let Some((_, access)) = tree
-                .nodes
-                .iter_mut()
-                .find(|(candidate, _)| *candidate == id)
-        {
-            leaf.accessibility(access);
-        }
-        if let Some(key) = custom_leaf_key(dom, node)
-            && let Some(semantics) = producers.semantics(key)
-        {
-            produced.push((id, key, semantics));
-        }
-        if dom
-            .attribute(node, &Namespace::default(), &LocalName::from("role"))
-            .is_some_and(|role| role.trim().eq_ignore_ascii_case("textbox"))
-            && let Some(value) = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("data-cambium-text-value"),
-            )
-            && let Some((_, access)) = tree
-                .nodes
-                .iter_mut()
-                .find(|(candidate, _)| *candidate == id)
-        {
-            app_textboxes.push(id);
-            // Cambium paints committed text alongside ephemeral preedit,
-            // ghost and caret nodes. The owner marker carries only the model
-            // value, so platform accessibility never mistakes painted
-            // decoration for the field's editable contents.
-            let multiline = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("aria-multiline"),
-            ) == Some("true");
-            access.set_role(if multiline {
-                Role::MultilineTextInput
-            } else {
-                Role::TextInput
-            });
-            access.set_value(value.to_owned());
-        }
-        if dom.attribute(
-            node,
-            &Namespace::default(),
-            &LocalName::from("data-cambium-set-value"),
-        ) == Some("true")
-            && let Some((_, access)) = tree
-                .nodes
-                .iter_mut()
-                .find(|(candidate, _)| *candidate == id)
-        {
-            access.add_action(Action::SetValue);
-        }
-    });
-    let mut produced_map = HashMap::new();
-    for (slot, key, semantics) in produced {
-        add_producer_semantics(&mut tree, slot, key, semantics, &mut produced_map);
-    }
-    prune_app_textbox_descendants(
-        dom,
-        &mut tree,
-        &mut action_map,
-        &mut produced_map,
-        &app_textboxes,
-    );
-    (tree, action_map, produced_map)
-}
-
-/// App textboxes expose their committed value as a leaf. Decoration and
-/// painted text remain in the drawing DOM, while their accessibility rows and
-/// routes are removed after all producer semantics have been added.
-fn prune_app_textbox_descendants(
-    dom: &impl LayoutDom<NodeId = NodeId>,
-    tree: &mut TreeUpdate,
-    action_map: &mut HashMap<A11yNodeId, NodeId>,
-    produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
-    textboxes: &[A11yNodeId],
-) {
-    let children: HashMap<_, Vec<_>> = tree
-        .nodes
-        .iter()
-        .map(|(id, node)| (*id, node.children().to_vec()))
-        .collect();
-    let mut hidden = HashMap::new();
-    for textbox in textboxes {
-        if let Some(owner) = find_opaque(dom, dom.document(), textbox.0) {
-            let mut pending: Vec<_> = dom.dom_children(owner).collect();
-            while let Some(child) = pending.pop() {
-                hidden
-                    .entry(A11yNodeId(dom.opaque_id(child)))
-                    .or_insert(*textbox);
-                pending.extend(dom.dom_children(child));
-            }
-        }
-        let mut pending = children.get(textbox).cloned().unwrap_or_default();
-        while let Some(child) = pending.pop() {
-            hidden.entry(child).or_insert(*textbox);
-            pending.extend(children.get(&child).into_iter().flatten().copied());
-        }
-        if let Some((_, node)) = tree.nodes.iter_mut().find(|(id, _)| id == textbox) {
-            node.set_children(Vec::new());
-        }
-    }
-    if let Some(owner) = hidden.get(&tree.focus) {
-        tree.focus = *owner;
-    }
-    let hidden_ids: std::collections::HashSet<_> = hidden.keys().copied().collect();
-    tree.nodes.retain(|(id, _)| !hidden_ids.contains(id));
-    action_map.retain(|id, _| !hidden_ids.contains(id));
-    produced_map.retain(|id, _| !hidden_ids.contains(id));
-}
-
-/// Write a producer's own semantics onto its slot's node, and what it draws
-/// as child nodes placed where it draws them. A drawn node's actions become
-/// its Button children, each taking Click (`producer` is the slot's registry
-/// key, which a reader's click on one names in `produced_map`).
-fn add_producer_semantics(
-    tree: &mut TreeUpdate,
-    slot: A11yNodeId,
-    producer: u64,
-    semantics: ProducerSemantics,
-    produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
-) {
-    let Some(index) = tree.nodes.iter().position(|(id, _)| *id == slot) else {
-        return;
-    };
-    let origin = {
-        let access = &mut tree.nodes[index].1;
-        if let Some(role) = semantics.role {
-            access.set_role(accesskit_role(role));
-        }
-        if let Some(name) = semantics.name {
-            access.set_label(name);
-        }
-        access
-            .bounds()
-            .map_or((0.0, 0.0), |bounds| (bounds.x0, bounds.y0))
-    };
-    let mut children = Vec::new();
-    let mut buttons = Vec::new();
-    for child in semantics.children {
-        let id = produced_node_id(slot, child.key, None);
-        let mut access = accesskit::Node::new(accesskit_role(child.role));
-        access.set_label(child.name);
-        let [x, y, width, height] = child.rect.map(f64::from);
-        let bounds = Rect {
-            x0: origin.0 + x,
-            y0: origin.1 + y,
-            x1: origin.0 + x + width,
-            y1: origin.1 + y + height,
-        };
-        access.set_bounds(bounds);
-        for action in child.actions {
-            let button_id = produced_node_id(slot, child.key, Some(&action.id));
-            let mut button = accesskit::Node::new(Role::Button);
-            button.set_label(action.label);
-            button.set_description(action.description);
-            button.set_bounds(bounds);
-            button.add_action(Action::Click);
-            button.add_action(Action::Focus);
-            access.push_child(button_id);
-            produced_map.insert(
-                button_id,
-                ProducedAction {
-                    slot: producer,
-                    key: child.key,
-                    id: action.id,
-                },
-            );
-            buttons.push((button_id, button));
-        }
-        children.push((id, access));
-    }
-    let ids: Vec<A11yNodeId> = children.iter().map(|(id, _)| *id).collect();
-    for id in &ids {
-        tree.nodes[index].1.push_child(*id);
-    }
-    tree.nodes.extend(children);
-    tree.nodes.extend(buttons);
-}
-
-/// A drawn node's id, or its action button's: stable for the slot, the
-/// node's key and the action, however the producer orders its nodes, in a
-/// range DOM ids never reach.
-fn produced_node_id(slot: A11yNodeId, key: u64, action: Option<&str>) -> A11yNodeId {
-    // FNV-1a: fixed, so an id is the same on every frame and every run.
-    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
-    let mut eat = |bytes: &[u8]| {
-        for byte in bytes {
-            hash ^= u64::from(*byte);
-            hash = hash.wrapping_mul(0x0100_0000_01b3);
-        }
-    };
-    eat(&slot.0.to_le_bytes());
-    eat(&key.to_le_bytes());
-    if let Some(action) = action {
-        eat(&[1]);
-        eat(action.as_bytes());
-    }
-    A11yNodeId((1 << 63) | (hash >> 1))
-}
-
-fn accesskit_role(role: ProducerRole) -> Role {
-    match role {
-        ProducerRole::List => Role::List,
-        ProducerRole::ListItem => Role::ListItem,
-        ProducerRole::Group => Role::Group,
-        ProducerRole::Image => Role::Image,
-        ProducerRole::GraphicsObject => Role::GraphicsObject,
-    }
+    let projection = cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
+    (
+        projection.tree,
+        projection.dom_targets,
+        projection.produced_targets,
+    )
 }
 
 /// Stamp the host's layout scale on the tree root.
@@ -487,39 +263,6 @@ pub fn scale_tree_to_window<D: LayoutDom<NodeId = NodeId>>(
     }
 }
 
-fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {
-    visit(node);
-    for child in dom.dom_children(node) {
-        walk(dom, child, visit);
-    }
-}
-
-fn find_opaque<D: LayoutDom<NodeId = NodeId>>(
-    dom: &D,
-    node: NodeId,
-    opaque: u64,
-) -> Option<NodeId> {
-    if dom.opaque_id(node) == opaque {
-        return Some(node);
-    }
-    dom.dom_children(node)
-        .find_map(|child| find_opaque(dom, child, opaque))
-}
-
-fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
-    if dom.kind(node) != NodeKind::Element
-        || !matches!(
-            dom.element_name(node)?.local.as_ref(),
-            "custom-leaf" | "chisel-leaf"
-        )
-    {
-        return None;
-    }
-    dom.attribute(node, &Namespace::default(), &LocalName::from("key"))?
-        .parse()
-        .ok()
-}
-
 #[cfg(test)]
 mod dpi_tests {
     use cambium_rootstock::{OwnedLayout, ProducerRegistry};
@@ -529,7 +272,9 @@ mod dpi_tests {
     use std::collections::HashMap;
 
     use super::*;
-    use accesskit::{ActionRequest, Node, Role, Tree, TreeId};
+    use accesskit::{ActionRequest, Node, Rect, Role, TreeId, TreeInfo};
+    use cambium_rootstock::{ProducerRole, ProducerSemantics};
+    use layout_dom_api::{LocalName, Namespace, NodeKind};
 
     /// A 125% window must report physical coordinates to the platform: the
     /// logical layout bounds ride a root transform that scales them.
@@ -539,7 +284,7 @@ mod dpi_tests {
         let root = A11yNodeId(dom.opaque_id(dom.document()));
         let mut tree = TreeUpdate {
             nodes: vec![(root, Node::new(Role::Window))],
-            tree: Some(Tree::new(root)),
+            tree: Some(TreeInfo::new(root)),
             tree_id: TreeId::ROOT,
             focus: root,
         };
@@ -725,7 +470,7 @@ mod dpi_tests {
             fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
                 None
             }
-            fn semantics(&mut self) -> Option<ProducerSemantics> {
+            fn semantics(&self) -> Option<ProducerSemantics> {
                 Some(ProducerSemantics {
                     role: Some(ProducerRole::List),
                     name: Some("Remote board".into()),
@@ -756,28 +501,32 @@ mod dpi_tests {
                 key == 40 && id == "pin"
             }
         }
-        let slot = A11yNodeId(7);
-        let mut tree = TreeUpdate {
-            nodes: vec![(slot, {
-                let mut node = Node::new(Role::Image);
-                node.set_bounds(Rect {
-                    x0: 10.0,
-                    y0: 100.0,
-                    x1: 1000.0,
-                    y1: 700.0,
-                });
-                node
-            })],
-            tree: Some(Tree::new(slot)),
-            tree_id: TreeId::ROOT,
-            focus: slot,
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(root, "<custom-leaf key='1' style='position:absolute;left:10px;top:100px;width:990px;height:600px;padding:7px;border:5px solid black'></custom-leaf>");
+        let layout = OwnedLayout::new(&dom, &[""], 1200.0, 900.0, &[], &HashMap::new());
+        let slot_node = {
+            let mut pending = vec![root];
+            loop {
+                let node = pending.pop().expect("the fixture has a producer slot");
+                if dom.attribute(node, &Namespace::default(), &LocalName::from("key")) == Some("1")
+                {
+                    break node;
+                }
+                pending.extend(dom.flat_children(node));
+            }
         };
+        let slot = A11yNodeId(dom.opaque_id(slot_node));
         let acted = Rc::new(RefCell::new(Vec::new()));
         let mut producers = ProducerRegistry::new();
         producers.register(1, Board(acted.clone()), &[]).unwrap();
-        let semantics = producers.semantics(1).expect("the board describes itself");
-        let mut produced_map = HashMap::new();
-        add_producer_semantics(&mut tree, slot, 1, semantics, &mut produced_map);
+        let (tree, _, produced_map) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
 
         let (_, board) = tree.nodes.iter().find(|(id, _)| *id == slot).unwrap();
         assert_eq!(board.role(), Role::List);
@@ -790,12 +539,12 @@ mod dpi_tests {
         assert_eq!(
             first.bounds(),
             Some(Rect {
-                x0: 34.0,
-                y0: 124.0,
-                x1: 154.0,
-                y1: 204.0
+                x0: 46.0,
+                y0: 136.0,
+                x1: 166.0,
+                y1: 216.0
             }),
-            "placed where it is drawn, from the slot's corner"
+            "placed where it is drawn, inside the slot's border and padding"
         );
         assert_eq!(card(board.children()[1]).label(), Some("Card 1"));
         assert!(
@@ -812,6 +561,7 @@ mod dpi_tests {
         assert_eq!(pin.label(), Some("Pin"));
         assert_eq!(pin.description(), Some("Hold this card"));
         assert!(pin.supports_action(Action::Click));
+        assert_eq!(pin.bounds(), first.bounds());
 
         // A reader's click on it maps to the drawn node's action and reaches
         // the producer, which carries it out; the card itself is no button.
@@ -843,5 +593,247 @@ mod dpi_tests {
         }));
         // A producer without semantics leaves its slot alone.
         assert_eq!(producers.semantics(2), None);
+    }
+    #[test]
+    fn native_projection_uses_shared_bounds_and_disabled_numeric_policy() {
+        use layout_dom_api::{LayoutDom as _, LocalName, Namespace};
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(root, "<button aria-label='Off' disabled data-cambium-set-value='true' style='display:block;width:80px;height:30px'>Off</button><button aria-label='On' data-cambium-set-value='true' style='display:block;width:80px;height:30px'>On</button><div style='height:600px'></div>");
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+        let projection = cambium_rootstock::document_projection(&dom, &layout, None);
+        let (tree, map, _) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut ProducerRegistry::new(),
+            None,
+        );
+        for semantic in projection.nodes() {
+            let (_, native) = tree
+                .nodes
+                .iter()
+                .find(|(id, _)| id.0 == semantic.id.get())
+                .unwrap();
+            if let Some(bounds) = semantic.bounds {
+                let native = native.bounds().unwrap();
+                assert_eq!(
+                    (native.x0, native.y0, native.width(), native.height()),
+                    (
+                        f64::from(bounds.x),
+                        f64::from(bounds.y),
+                        f64::from(bounds.width),
+                        f64::from(bounds.height)
+                    )
+                );
+            }
+            assert_eq!(
+                native.supports_action(Action::SetValue),
+                semantic
+                    .actions
+                    .contains(&document_session_api::DocumentA11yAction::SetValue)
+            );
+        }
+        let disabled = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| node.label() == Some("Off"))
+            .unwrap();
+        assert!(!disabled.1.supports_action(Action::SetValue));
+        assert!(map.values().all(|node| dom.attribute(
+            *node,
+            &Namespace::default(),
+            &LocalName::from("aria-hidden")
+        ) != Some("true")));
+    }
+    #[test]
+    fn native_routes_and_shared_overrides_follow_the_supplier_flat_tree() {
+        use layout_dom_api::{LayoutDom as _, ShadowRootInit};
+        let mut dom = ScriptedDom::new();
+        let document = dom.document();
+        dom.set_inner_html(
+            document,
+            "<main style='display:block;width:100px;height:100px'></main>",
+        );
+        let host = dom
+            .dom_children(document)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+        dom.set_inner_html(shadow, "<button aria-label='Shadow' data-cambium-set-value='true' style='display:block;width:80px;height:30px'>Shadow</button>");
+        let button = dom
+            .dom_children(shadow)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let opaque = dom.opaque_id(button);
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+        let projection = cambium_rootstock::document_projection(&dom, &layout, Some(opaque));
+        let semantic = projection
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == opaque)
+            .expect("shadow button projects");
+        assert!(semantic.state.focused);
+        assert!(
+            semantic
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::SetValue)
+        );
+        let (tree, map, _) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut ProducerRegistry::new(),
+            Some(opaque),
+        );
+        assert_eq!(map.get(&A11yNodeId(opaque)), Some(&button));
+        assert_eq!(tree.focus, A11yNodeId(opaque));
+    }
+    #[test]
+    fn flat_tree_tests_native_action_map_contains_only_the_assigned_producer() {
+        use cambium_rootstock::{
+            ProducedTexture, ProducerAction, ProducerContext, ProducerNode, TextureProducer,
+        };
+        use layout_dom_api::ShadowRootInit;
+        struct Board;
+        impl TextureProducer for Board {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn semantics(&self) -> Option<ProducerSemantics> {
+                Some(ProducerSemantics {
+                    role: Some(ProducerRole::Group),
+                    name: Some("Slotted board".into()),
+                    children: vec![ProducerNode {
+                        key: 40,
+                        role: ProducerRole::ListItem,
+                        name: "Card".into(),
+                        rect: [0.0, 0.0, 8.0, 6.0],
+                        actions: vec![ProducerAction {
+                            id: "pin".into(),
+                            label: "Pin".into(),
+                            description: "Keep card".into(),
+                        }],
+                    }],
+                })
+            }
+            fn act(&mut self, key: u64, id: &str) -> bool {
+                key == 40 && id == "pin"
+            }
+        }
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(root,"<section><custom-leaf id='active' key='7' slot='scene' style='display:block;width:8px;height:6px'></custom-leaf><custom-leaf id='decoy' key='7'></custom-leaf></section>");
+        let host = dom
+            .dom_children(root)
+            .find(|node| dom.kind(*node) == NodeKind::Element)
+            .unwrap();
+        let leaf = dom
+            .dom_children(host)
+            .find(|node| {
+                dom.attribute(*node, &Namespace::default(), &LocalName::from("id"))
+                    == Some("active")
+            })
+            .unwrap();
+        let decoy = dom
+            .dom_children(host)
+            .find(|node| {
+                dom.attribute(*node, &Namespace::default(), &LocalName::from("id")) == Some("decoy")
+            })
+            .unwrap();
+        let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+        dom.set_inner_html(shadow,"<slot name='scene'><custom-leaf key='7' style='display:block;width:8px;height:6px'></custom-leaf></slot>");
+        let layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+        let mut producers = ProducerRegistry::new();
+        producers.register(7, Board, &[]).unwrap();
+        let (_, map, produced) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
+        assert_eq!(map.get(&A11yNodeId(dom.opaque_id(leaf))), Some(&leaf));
+        assert!(!map.contains_key(&A11yNodeId(dom.opaque_id(decoy))));
+        assert_eq!(produced.len(), 1);
+        let (&button, target) = produced.iter().next().unwrap();
+        let expected = target.clone();
+        let mut host = A11yHost::new(|| {});
+        host.produced_map = produced;
+        let request = host
+            .map_request(&ActionRequest {
+                action: Action::Click,
+                target_tree: TreeId::ROOT,
+                target_node: button,
+                data: None,
+            })
+            .unwrap();
+        assert_eq!(
+            request,
+            A11yRequest::produced(A11yAction::Click, expected.clone())
+        );
+        assert!(producers.act(&expected));
+    }
+
+    #[test]
+    fn identity_tests_native_tree_omits_ambiguous_producer_action_routes() {
+        use cambium_rootstock::{
+            ProducedTexture, ProducerAction, ProducerContext, ProducerNode, TextureProducer,
+        };
+        struct Board(ProducerSemantics);
+        impl TextureProducer for Board {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn semantics(&self) -> Option<ProducerSemantics> {
+                Some(self.0.clone())
+            }
+        }
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(
+            root,
+            "<custom-leaf key='7' style='display:block;width:80px;height:30px'></custom-leaf>",
+        );
+        let layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+        let action = ProducerAction {
+            id: "pin".into(),
+            label: "Pin".into(),
+            description: "Keep card".into(),
+        };
+        let child = ProducerNode {
+            key: 40,
+            role: ProducerRole::ListItem,
+            name: "Card".into(),
+            rect: [0.0, 0.0, 10.0, 10.0],
+            actions: vec![action.clone(), action],
+        };
+        let mut producers = ProducerRegistry::new();
+        producers
+            .register(
+                7,
+                Board(ProducerSemantics {
+                    children: vec![child],
+                    ..Default::default()
+                }),
+                &[],
+            )
+            .unwrap();
+        let (tree, _, produced) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
+        assert!(produced.is_empty());
+        assert!(
+            !tree
+                .nodes
+                .iter()
+                .any(|(_, node)| node.label() == Some("Pin"))
+        );
+        let ids: std::collections::HashSet<_> = tree.nodes.iter().map(|(id, _)| id).collect();
+        assert_eq!(ids.len(), tree.nodes.len());
     }
 }

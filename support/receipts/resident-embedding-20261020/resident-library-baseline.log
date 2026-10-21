@@ -1,0 +1,23 @@
+running 1 test
+test a_library_model_answers_through_the_resident_app_door_without_a_trainer ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 4.07s
+
+        4.51 real         2.09 user         0.11 sys
+            97669120  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               25601  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                 141  messages sent
+                 140  messages received
+                   0  signals received
+                 394  voluntary context switches
+                 963  involuntary context switches
+         16173520586  instructions retired
+          8622599661  cycles elapsed
+            41291776  peak memory footprint

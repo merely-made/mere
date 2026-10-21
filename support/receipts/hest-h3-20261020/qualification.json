@@ -1,0 +1,59 @@
+{
+  "schema": "hest-h3-qualification/v1",
+  "date": "2026-10-20",
+  "status": "qualified-and-git-delivered",
+  "supplier_code_commit": "9ef5e3026997dce50760ae445da9eedd38a325ac",
+  "wasm_constructor_adaptation_commit": "94f50b95f374f2072e8d930a5cdcb9ceadf4104e",
+  "supplier_reconciliation_commit": "b9827a3695c511c6cdfc5a21ee97dba5a363c943",
+  "compatible_knot_prerequisite": "ebf10c7410241ae7fca11f100d7e430d7b31ce99",
+  "checks": "checks.json",
+  "supplier_tests": {
+    "passed": 545,
+    "failed": 0,
+    "ignored": 3
+  },
+  "receivers": "receivers.json",
+  "source_preservation": "source-preservation.json",
+  "supplier_lock_scope": "supplier-lock-scope.json",
+  "dependency_proof": "dependency-summary.json",
+  "diagnostics": "diagnostics.json",
+  "versions": {
+    "hest": "0.2.0 additive H3 API",
+    "frozen_hest": "0.1.0 unchanged",
+    "command_menu_shim": "0.1.1 unchanged",
+    "cambium": "0.5.0"
+  },
+  "semantics": {
+    "terminal_outcomes": [
+      "Done",
+      "Refused",
+      "Stale"
+    ],
+    "chirograph_accepted_terminal_outcome": null,
+    "terminal_done_encodable_as_dispatch_acceptance": false,
+    "window_queue_admission_is_completion": false,
+    "turnstone_deferred_save_is_completion": false,
+    "host_owns_authority_and_target_lifetime": true
+  },
+  "limits": {
+    "crate_publication": false,
+    "h4_started": false,
+    "native_gui_or_human_at_acceptance": false,
+    "git_delivery": "Delivered; fresh remote-only dependency resolution verified."
+  },
+  "documentation": {
+    "hest_actionable_findings": 0,
+    "informational_exclusions": {
+      "ambiguous_known_root_paths": [
+        {
+          "source": "cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md",
+          "subject": "src/action/command_metadata.rs",
+          "detail": "bare src/tests/examples path has no crate context"
+        }
+      ]
+    },
+    "global_audit_clean": false,
+    "report_sha256": "e306a614014fd836a934616e3578e63efe41f7e93a1b0a498d5d6d38230e3772"
+  },
+  "delivery": "delivery.json"
+}

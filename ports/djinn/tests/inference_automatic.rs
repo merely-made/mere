@@ -8,7 +8,7 @@
 #![cfg(feature = "inference-stages")]
 
 mod common;
-#[path = "../../../crates/intel/esp/tests/support/decoder.rs"]
+#[path = "fixtures/esp/decoder.rs"]
 mod fixture;
 
 use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs};
@@ -62,7 +62,7 @@ async fn save_library(data: &std::path::Path, root: &std::path::Path) -> eidetic
     .await
     .unwrap();
     let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "../../../crates/intel/esp/templates/smollm2-instruct-v1.json"
+        "fixtures/esp/smollm2-instruct-v1.json"
     ))
     .unwrap();
     template.bos.clear();
@@ -169,6 +169,7 @@ async fn exercise_inner(native: bool) {
                 relay_urls: vec![],
             }),
             inference: Some(InferenceLaneSettings {
+                embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Automatic {
                     row: selected.to_string(),

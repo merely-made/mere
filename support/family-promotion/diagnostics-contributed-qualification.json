@@ -1,0 +1,125 @@
+{
+  "basis": "67964c3eab5c063fc0bcd87563b0aa268ffb4851",
+  "implementation_commit": "3798e0c2d",
+  "source_seal": "diagnostics-contributed-source-integrated.json",
+  "earlier_broad_cohort": "diagnostics-contributed-pre-integration.json",
+  "gates": {
+    "diagnostics-contributed-current-owner": {
+      "receipt": "diagnostics-contributed-current-owner.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--lib",
+        "semantics::tests"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-contributed-current-admission": {
+      "receipt": "diagnostics-contributed-current-admission.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-rootstock",
+        "--lib",
+        "accessibility_tests"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-contributed-current-platform": {
+      "receipt": "diagnostics-contributed-current-platform.json",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-winit-a11y",
+        "-p",
+        "cambium-genet-winit-host",
+        "-p",
+        "cambium-genet-web-host",
+        "--lib",
+        "--test",
+        "accessibility",
+        "--test",
+        "e1a_sessions"
+      ],
+      "exit_code": 0
+    },
+    "diagnostics-contributed-wasm": {
+      "receipt": "diagnostics-contributed-wasm.json",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "cambium-genet-web-host",
+        "--no-default-features",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    }
+  },
+  "current_passed": 70,
+  "current_existing_ignored": 4,
+  "broad_pre_integration_passed": 190,
+  "broad_pre_integration_existing_ignored": 7,
+  "artifact_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-051388771004b8e7.exe": "7c610910c08f6f00afad9027486e16c5ab60a23d417838213571863effe9f7e4",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-b1285adfac7720f6.exe": "8e9be1b20f27d39e533cec402887825251ab1779907bd2df4c7f35043ec22136",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-59246843c2d1490a.exe": "a42e8a6befc07d6069cf65fe483f412bd6aabbb11a50d443b43239046f13ed98",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-a8a67a99a16a4cee.exe": "3551a6555af1cbfa38307e8b554a90e954ce44be442ac4fd277a2c72e81c2088",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f821493368a4a763.exe": "ef5b62b37b366e5036c3f8caeadb982fb4c5746a912e0777864f35f798df10be",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c164ccbe1736eebf.exe": "6d071ed3b35ae5fd8267850b0f2adeb4ea3114e0a390a93364439d837ef6ce4d"
+  },
+  "root_manifest_sha256": "618b45bdc3399bf5a72fd64cc849045f3b3f776afc56e158895fa88e278cd0c8",
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "upstream_lock_source_changes": [
+    {
+      "package": "netrender",
+      "version": "0.1.2",
+      "before": "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "after": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+    },
+    {
+      "package": "netrender_device",
+      "version": "0.1.2",
+      "before": "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "after": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+    },
+    {
+      "package": "paint_list_api",
+      "version": "0.1.2",
+      "before": "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "after": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+    },
+    {
+      "package": "paint_list_render",
+      "version": "0.1.2",
+      "before": "git+https://github.com/merely-made/netrender.git?branch=main#54d864c20aeac9e46275cdab6e34edbd95d8ecf6",
+      "after": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+    }
+  ],
+  "source_matches_seal_after_gates": true,
+  "sealed_registers_unchanged": true,
+  "d2": {
+    "whole_tree_error_count": 40,
+    "changed_plan_errors": []
+  },
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "limits": [
+    "AccessKit-shaped mutable provider reads; no pure observation or atomic activation contract",
+    "AppCtx/Harness/Mesquite remain DOM-only semantic readers",
+    "cross-window/child/action key lifetimes and hash collisions remain open",
+    "light-DOM render discovery and content-origin/transform/clip mapping remain separate receiving work",
+    "Click/Focus/numeric SetValue routing only; no general advertised-action or terminal-success claim",
+    "native CPU receiving and Wasm compile; no new browser runtime, installed product or human AT acceptance",
+    "product process-final diagnostic evidence and durability unchanged"
+  ]
+}

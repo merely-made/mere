@@ -1,0 +1,23 @@
+[
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/evidence/owner-cold-retained.png",
+    "nodes": 3,
+    "access": "revoked"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/evidence/owner-cold-new-edit.png",
+    "set": [
+      "https://shared.invalid/after-revoke",
+      "Owner after revoke"
+    ],
+    "click": "add",
+    "nodes": 4,
+    "status": "Saved"
+  },
+  {
+    "capture": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/evidence/owner-cold-refused-guest.png",
+    "wait_file": "/Users/markik/Code/output/graphshell-coop-native-20261020-05/evidence/guest-cold-denied.json",
+    "nodes": 4,
+    "access": "revoked"
+  }
+]

@@ -1,0 +1,223 @@
+{
+  "date": "2026-10-20",
+  "sealed_utc": "2026-10-20T19:40:24.480810+00:00",
+  "scope": "H1 local source qualification; no push, publication or native/browser presentation acceptance",
+  "baseline": "9a173f18b29f5452a7cf4a833d237b7d6c04d775",
+  "versions": {
+    "hest": "0.1.0 candidate",
+    "command-menu": "0.1.1 candidate",
+    "cambium": "0.4.0 unchanged version",
+    "H2": "deferred to hest 0.2.0"
+  },
+  "tests_passed": 52,
+  "tests_failed": 0,
+  "checks": [
+    {
+      "label": "kernel-actions",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "mere-kernel",
+        "--lib",
+        "tests::actions"
+      ],
+      "started_utc": "2026-10-20T19:15:40.553206+00:00",
+      "exit_code": 0,
+      "log_sha256": "cbee25f90f1862711861710d414c99d867c53d94789002323bb27b5468e0783d",
+      "test_results": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 470 filtered out; finished in 0.00s"
+      ],
+      "log": "kernel-actions.log",
+      "passed": 3,
+      "raw_log_sha256": "06392cd06eefb4786afd4323ebe76cc2d69c9a9375c5b4c42c3289e025be7623",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "label": "registry-input",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "mere-registry",
+        "--no-default-features",
+        "--features",
+        "input",
+        "--lib",
+        "input::"
+      ],
+      "started_utc": "2026-10-20T19:16:33.340184+00:00",
+      "exit_code": 0,
+      "log_sha256": "4fd4e3fed997bd42098307c6d61d303fd4782c9f0de5ac0d307b063738c59998",
+      "test_results": [
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "log": "registry-input.log",
+      "passed": 14,
+      "raw_log_sha256": "b5e3f58d01979f2d9a63aef1cef817fa4c3dc585714ff672a38517672f9f6980",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "label": "compact-menu",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "cambium-genet-winit-host",
+        "--test",
+        "command_menu_compact"
+      ],
+      "started_utc": "2026-10-20T19:17:30.103933+00:00",
+      "exit_code": 0,
+      "log_sha256": "b33c07d55698b290b708a73f5ce116a1b5e8c140c50192457dcc0927c35779a7",
+      "test_results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.37s"
+      ],
+      "log": "compact-menu.log",
+      "passed": 1,
+      "raw_log_sha256": "eba09288c3f4d8b0689fe6158e1609cb4b0a73475de8bef1c36ca4ae55d7bc47",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "label": "graphshell-viewer",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib",
+        "viewer_commands::tests"
+      ],
+      "started_utc": "2026-10-20T19:23:55.977263+00:00",
+      "exit_code": 0,
+      "log_sha256": "1e53a00480f133c8893702657f18246e9acf2f92b512de64d3bc617918addd4b",
+      "test_results": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 319 filtered out; finished in 0.01s"
+      ],
+      "log": "graphshell-viewer.log",
+      "passed": 5,
+      "raw_log_sha256": "2324b3c7650756a3ed0ef4fa1137919017b65d6ace8c310a07182e8198c3ab06",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "hest",
+        "-p",
+        "command-menu"
+      ],
+      "exit_code": 0,
+      "test_results": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "log_sha256": "ed33588621016c7fb1d7cb59234e0ae5188ab274993d1b7fc5c53dac0f3704df",
+      "label": "model",
+      "log": "model.log",
+      "passed": 13,
+      "raw_log_sha256": "b31b08555adf491d122ec1bfe9323994f6b02440bb121bd2786a83ba3536153b",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "support/fixtures/hest-h1-compatibility/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "test_results": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "log_sha256": "7540cea1a478bf1384493e6f2b8b128e116c8545cdd44c38b3069c5ef6c243f4",
+      "label": "compatibility",
+      "log": "compatibility.log",
+      "passed": 3,
+      "raw_log_sha256": "33e44dbd21fafa17a828b1d56de77b77db52909153562e1238fab694a9dd56dd",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "pandect",
+        "--lib",
+        "a_view_set_now_waits_for_the_next_batch"
+      ],
+      "exit_code": 0,
+      "test_results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 331 filtered out; finished in 0.01s"
+      ],
+      "log_sha256": "dd4b52e0c79e53166aff2b61420175f04bca029b300919d21da1dba474a1c04f",
+      "label": "pandect",
+      "log": "pandect-stored-choices.log",
+      "passed": 1,
+      "raw_log_sha256": "e0c3234b63473f4dc8dc689acb38ba5d00396743784117131e64783e4a1b376a",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    },
+    {
+      "host": "Turnstone",
+      "consumer_revision": "e94e7381b39ebc1927d4bf258d3c92787f9abeca",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "app::palette::command_menu_tests"
+      ],
+      "cwd": "/Users/markik/Code/testing/mere/hest-h1-20261020",
+      "exit_code": 0,
+      "test_results": [
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 1107 filtered out; finished in 2.36s"
+      ],
+      "log_sha256": "86ad065f6c8e08a22986c12aaa237acc11a99212121ffd126de6427a708f76b4",
+      "manifest_sha256": "b7229a65bc66589f5c9f8a22a32f7382919e95a4e8ab287bdd8ba73fa15af5cd",
+      "lock_sha256": "56f047a175ef0dfb6b40e34395c740b3c938ea85389ebad7ab49a5ba0da5ee97",
+      "override": "Only command-menu is patched; every unrelated consumer lock entry and every consumer Rust file is unchanged.",
+      "label": "turnstone",
+      "log": "turnstone-menu.log",
+      "passed": 12,
+      "raw_log_sha256": "3f2e0db1a692b51aeef455c1749e44e09a5bd38b477c9177f1462fa6f22a3960",
+      "log_normalization": "Terminal empty lines removed only; raw hash retained."
+    }
+  ],
+  "host_exercises": [
+    {
+      "host": "Graphshell",
+      "receipt": "graphshell-viewer.log",
+      "mode": "CPU tests of the retained viewer command model via the web feature; direct Hest imports"
+    },
+    {
+      "host": "Turnstone",
+      "revision": "e94e7381b39ebc1927d4bf258d3c92787f9abeca",
+      "receipt": "turnstone-menu.log",
+      "source_receipt": "turnstone-source.json",
+      "fixture_patch": "turnstone-fixture.patch",
+      "mode": "Actual palette CPU tests via pinned Cambium 0.3.3 -> command-menu 0.1.1 -> Hest 0.1.0; 244 Rust sources unchanged"
+    }
+  ],
+  "compatibility": "Published registry Cambium 0.4.0 with local overrides only for Hest and command-menu; one of each package; old and new public types are identical. Registry-only resolution of the new versions remains a publication gate.",
+  "excluded_discovery": "pandect-choices.log matched zero tests and is not counted; the exact stored-choices test passed in pandect-stored-choices.log.",
+  "nonfatal_baseline_diagnostic": "Turnstone Cargo source discovery prints an invalid-manifest diagnostic for Servo's deliberately malformed lint fixture (foo = true). It also occurs before the H1 override. Locked metadata and the final test command exit 0; all 12 selected tests pass.",
+  "pure_move": "pure-move.json records exact source equality after only module imports and an intra-doc link are relocated.",
+  "rustdoc": "rustdoc-check.json: strict broken-intra-doc-link validation passes."
+}

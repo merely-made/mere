@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--offline",
+    "-p",
+    "taproot",
+    "--no-default-features"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/genet",
+  "started": "2026-10-21T08:16:48.365942+00:00",
+  "finished": "2026-10-21T08:16:50.322729+00:00",
+  "exit_code": 0,
+  "results": [
+    "Finished `dev` profile [unoptimized] target(s) in 1.84s"
+  ],
+  "diagnostic_tail": "warning: use of deprecated method `icu_properties::props::BidiClass::to_icu4c_value`: please comment on https://github.com/unicode-org/icu4x/issues/6067 if you need this\n   --> support\\patches\\parley\\src\\bidi.rs:893:13\n    |\n893 |     1 << (t.to_icu4c_value() as u32)\n    |             ^^^^^^^^^^^^^^\n    |\n    = note: `#[warn(deprecated)]` on by default\n\nwarning: `genet-parley` (lib) generated 1 warning\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> components\\genet-scripted-dom\\forms_submission.rs:98:14\n   |\n98 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n   |              ^^^^^^^^^^^^\n   |\n   = note: `#[warn(deprecated)]` on by default\nhelp: replace the use of the deprecated method\n   |\n98 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n98 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n   |\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u32>::fetch_update`: renamed to `try_update` for consistency\n   --> components\\genet-scripted-dom\\lib.rs:164:10\n    |\n164 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |          ^^^^^^^^^^^^\n    |\nhelp: replace the use of the deprecated method\n    |\n164 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n164 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |\n\n    Checking document-session-api v0.1.0 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\shared\\document-session-api)\nwarning: `genet-scripted-dom` (lib) generated 2 warnings (run `cargo fix --lib -p genet-scripted-dom` to apply 2 suggestions)\n    Checking taproot v0.1.0 (C:\\Users\\mark_\\Code\\repos\\genet\\components\\taproot)\n    Finished `dev` profile [unoptimized] target(s) in 1.84s\n",
+  "target": "C:\\t\\cargo-targets\\genet"
+}

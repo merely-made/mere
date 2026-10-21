@@ -1,0 +1,59 @@
+{
+  "url": "http://127.0.0.1:20860/tree.html?scenario=scenarios/hest_viewer_commands.scn&sink=http://127.0.0.1:20860/scenario-receipt&render_backend=webgl2",
+  "capturedAt": "2026-10-21T07:14:17.532Z",
+  "layout": {
+    "layoutViewport": {
+      "pageX": 0,
+      "pageY": 0,
+      "clientWidth": 1356,
+      "clientHeight": 649
+    },
+    "visualViewport": {
+      "offsetX": 0,
+      "offsetY": 0,
+      "pageX": 0,
+      "pageY": 0,
+      "clientWidth": 1356,
+      "clientHeight": 649,
+      "scale": 1,
+      "zoom": 1
+    },
+    "contentSize": {
+      "x": 0,
+      "y": 0,
+      "width": 1356,
+      "height": 649
+    },
+    "cssLayoutViewport": {
+      "pageX": 0,
+      "pageY": 0,
+      "clientWidth": 1356,
+      "clientHeight": 649
+    },
+    "cssVisualViewport": {
+      "offsetX": 0,
+      "offsetY": 0,
+      "pageX": 0,
+      "pageY": 0,
+      "clientWidth": 1356,
+      "clientHeight": 649,
+      "scale": 1,
+      "zoom": 1
+    },
+    "cssContentSize": {
+      "x": 0,
+      "y": 0,
+      "width": 1356,
+      "height": 649
+    }
+  },
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/155.0.8059.84",
+    "revision": "@5869fe313571d75152b77813cf0a4ee26a4e6df0",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+    "jsVersion": "15.5.35.25"
+  },
+  "headed": true,
+  "captureBeyondViewport": false
+}

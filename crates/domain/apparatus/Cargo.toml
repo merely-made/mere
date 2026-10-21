@@ -18,10 +18,18 @@ path = "src/lib.rs"
 [features]
 default = ["projection"]
 projection = ["dep:accesskit", "dep:tracing", "dep:uxtree"]
-serde = ["dep:serde"]
+serde = ["apparatus-core/serde"]
+registry = ["dep:registry"]
 
 [dependencies]
 accesskit = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 uxtree = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
+
+registry = { workspace = true, default-features = false, features = ["diagnostics"], optional = true }
+
+# The portable implementation is owned by Armillary's independent sibling crate.
+apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "75643df1f178757bb7b6386913af1a39353f3069", default-features = false }
+
+[dev-dependencies]
+serde_json = { workspace = true }

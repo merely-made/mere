@@ -255,9 +255,20 @@ fn productive_selection_context_menu_destructive_path_passes() {
 
 // DestructiveActionGateProbe -------------------------------------------
 
+fn destructive_gate() -> DestructiveActionGateProbe {
+    let mut commands = hest::menu::CommandSet::new();
+    for id in [
+        hest::catalogue::ids::NODE_DELETE,
+        hest::catalogue::ids::PHYSICS_TOGGLE,
+    ] {
+        commands.register(hest::catalogue::command(id).unwrap());
+    }
+    DestructiveActionGateProbe::new(commands)
+}
+
 #[test]
 fn destructive_gate_passes_when_confirm_dialog_grants() {
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -277,7 +288,7 @@ fn destructive_gate_passes_when_confirm_dialog_grants() {
 
 #[test]
 fn destructive_gate_flags_unconfirmed_destructive() {
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -296,7 +307,7 @@ fn destructive_gate_flags_unconfirmed_destructive() {
 fn destructive_gate_consumes_grant_after_one_destructive() {
     // A confirmation grants ONE destructive dispatch, not many. A
     // second destructive without re-confirmation must trip the probe.
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -320,7 +331,7 @@ fn destructive_gate_consumes_grant_after_one_destructive() {
 
 #[test]
 fn destructive_gate_cancelled_confirm_does_not_grant() {
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -339,7 +350,7 @@ fn destructive_gate_cancelled_confirm_does_not_grant() {
 
 #[test]
 fn destructive_gate_ignores_non_destructive_actions() {
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -358,7 +369,7 @@ fn destructive_gate_intervening_action_consumes_grant() {
     // dispatch. A non-destructive ActionDispatched between confirm
     // and the destructive consumes the grant defensively, so the
     // destructive that follows trips the probe.
-    let probe = Arc::new(DestructiveActionGateProbe::iced_default());
+    let probe = Arc::new(destructive_gate());
     let mut observers = UxObservers::new();
     observers.register(probe_as_observer(Arc::clone(&probe) as Arc<dyn UxProbe>));
 
@@ -377,4 +388,39 @@ fn destructive_gate_intervening_action_consumes_grant() {
 
     let failures = probe.drain_failures();
     assert_eq!(failures.len(), 1);
+}
+
+#[test]
+fn destructive_gate_reads_the_offered_declaration_instead_of_an_action_list() {
+    let mut commands = hest::menu::CommandSet::new();
+    let toggle = hest::catalogue::command(hest::catalogue::ids::PHYSICS_TOGGLE)
+        .unwrap()
+        .with_destructive(true);
+    commands.register(toggle);
+    let probe = DestructiveActionGateProbe::new(commands);
+    probe.observe(&UxEvent::ActionDispatched {
+        action_id: ActionId::PhysicsToggle,
+        target: None,
+    });
+    assert_eq!(
+        probe.drain_failures().len(),
+        1,
+        "the offered flag supplies the fact"
+    );
+}
+
+#[test]
+fn destructive_gate_does_not_infer_destructiveness_from_the_shared_id() {
+    let mut commands = hest::menu::CommandSet::new();
+    commands.register(
+        hest::catalogue::command(hest::catalogue::ids::NODE_DELETE)
+            .unwrap()
+            .with_destructive(false),
+    );
+    let probe = DestructiveActionGateProbe::new(commands);
+    probe.observe(&UxEvent::ActionDispatched {
+        action_id: ActionId::NodeDelete,
+        target: None,
+    });
+    assert!(probe.drain_failures().is_empty());
 }

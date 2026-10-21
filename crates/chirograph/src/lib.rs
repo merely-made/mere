@@ -20,13 +20,17 @@ use serde::{Deserialize, Serialize};
 // The card vocabulary: neutral, a label for a projected resource rather than a
 // wire message. It was its own crate from 2026-08-14 to 2026-09-23 and is a
 // module again; nothing but chirograph used it.
+mod command_effect;
+mod command_invocation;
 pub mod line;
+mod presentation;
 pub mod titulus;
 pub use titulus::{
     ActionFormChoiceV1, ActionFormError, ActionFormFieldV1, ActionFormV1, CardValueV1, ContentHash,
     ContentReferenceError, PortableCardV1, PortableContentRefV1, Sha256NamedInformation,
 };
 
+pub use presentation::{PresentationValidationError, validate_presentation};
 pub use scenotime::{Revision, SceneDiff, SceneEpoch, SceneSnapshot};
 
 // Portable projection captures, apart from the live wire they snapshot.
@@ -621,6 +625,13 @@ impl ResourceResponse {
 
     pub fn has_valid_address(&self) -> bool {
         ContentHash::of(&self.bytes) == self.resource
+    }
+
+    /// Whether this is the content-addressed reply to the exact request.
+    pub fn matches_request(&self, request: &ResourceRequest) -> bool {
+        self.session == request.session
+            && self.resource == request.resource
+            && self.has_valid_address()
     }
 }
 

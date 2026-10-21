@@ -1,0 +1,16 @@
+{
+  "command": [
+    "C:\\Users\\mark_\\.rustup\\toolchains\\1.97.1-x86_64-pc-windows-msvc\\bin\\cargo.exe",
+    "metadata",
+    "--offline",
+    "--locked",
+    "--format-version",
+    "1"
+  ],
+  "exit_code": 1,
+  "timed_out": true,
+  "lines": 1,
+  "tail": [
+    "    Blocking waiting for file lock on package cache"
+  ]
+}

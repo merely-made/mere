@@ -1,0 +1,10 @@
+   Compiling sceno v0.0.6 (/Users/markik/Code/repos/mere/crates/cambium/scenes/sceno)
+   Compiling scenotime v0.0.4 (/Users/markik/Code/repos/mere/crates/cambium/scenes/scenotime)
+   Compiling chirograph v0.0.2 (/Users/markik/Code/repos/mere/crates/chirograph)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.11s
+     Running unittests src/lib.rs (target/build/debug/deps/chirograph-76a9452adafae46c)
+
+running 1 test
+test command_effect::tests::every_effect_round_trips_without_changing_the_wire_representation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 52 filtered out; finished in 0.00s

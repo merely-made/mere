@@ -1,0 +1,24 @@
+[package]
+name = "hest"
+version = "0.1.0"
+description = "Shared command menus, personal choices, palette sessions, and command ids."
+authors = ["Mark AB (markik)"]
+edition = "2024"
+rust-version = "1.97.1"
+license = "MPL-2.0"
+repository = "https://github.com/merely-made/mere"
+keywords = ["commands", "palette", "menu", "intents"]
+categories = ["gui"]
+publish = true
+
+# The immutable H1 release contract, retained while its shim is unpublished.
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"

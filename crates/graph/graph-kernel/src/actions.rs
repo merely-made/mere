@@ -6,14 +6,14 @@
 
 //! The shared commands as a typed vocabulary.
 //!
-//! [`ActionId`] is the typed form of `command-menu`'s catalogue (Scenograph
+//! [`ActionId`] is the typed form of `hest`'s catalogue (Scenograph
 //! editor plan, SE49 and SE50): one variant per shared id, its key and label
 //! read from the catalogue, so a command is defined once. ux-events and
 //! `HostIntent` carry it where a typed id is wanted; hosts register the same
 //! ids as strings. The egui-era catalogue it replaces (68 actions, four
 //! categories) was audited in the plan's F12.
 
-use command_menu::catalogue::{self, ids};
+use hest::catalogue::{self, ids};
 use serde::{Deserialize, Serialize};
 
 /// A shared command.

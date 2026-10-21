@@ -1,0 +1,217 @@
+[
+  {
+    "name": "adapters-final",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "mesquite",
+      "-p",
+      "script-rhai",
+      "--lib"
+    ],
+    "source_revision": "eb1244ccfa644348fcd4c5cc8bd5ccf72315ba11",
+    "exit_code": 0,
+    "elapsed_seconds": 27.1,
+    "finished_utc": "2026-10-21T03:46:19.024908+00:00",
+    "log": "adapters-final.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "2821e002dc6d243b905aef9dc4e69f746899ed6b44627aa529b56738a0f36c92",
+    "stored_log_sha256": "e923917a486d5aa1b4048da92e8334369ce5d0fc28b037c619875388d34c3824",
+    "suites": [
+      {
+        "passed": 39,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "contract",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "hest@0.2.0",
+      "-p",
+      "chirograph",
+      "--lib"
+    ],
+    "source_revision": "eb1244ccfa644348fcd4c5cc8bd5ccf72315ba11",
+    "exit_code": 0,
+    "elapsed_seconds": 4.28,
+    "finished_utc": "2026-10-21T03:42:41.412402+00:00",
+    "log": "contract.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "ceb8634302300fd2e894d2481c2ff4b5315ba58ec83b3ac7b53f466025f40114",
+    "stored_log_sha256": "8c7f2f39ae3b45a1447a78ba540389187eeccf03a61f4f495a8581c0c94f2c18",
+    "suites": [
+      {
+        "passed": 56,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "scenario",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "cambium-genet-winit-host",
+      "--test",
+      "scenario",
+      "--",
+      "--test-threads=1"
+    ],
+    "source_revision": "eb1244ccfa644348fcd4c5cc8bd5ccf72315ba11",
+    "exit_code": 0,
+    "elapsed_seconds": 17.7,
+    "finished_utc": "2026-10-21T03:42:55.960325+00:00",
+    "log": "scenario.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "7bd8af839661abb924d491085928c52cdf646cac03070d6e2696ff173028b252",
+    "stored_log_sha256": "c9a8c1f8ba9f04cf3d099487f22294abe02df11e22477de1b883c6b75624ee99",
+    "suites": [
+      {
+        "passed": 25,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "evaluation",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "inker",
+      "--lib",
+      "document::evaluate"
+    ],
+    "source_revision": "eb1244ccfa644348fcd4c5cc8bd5ccf72315ba11",
+    "exit_code": 0,
+    "elapsed_seconds": 4.15,
+    "finished_utc": "2026-10-21T03:42:43.569840+00:00",
+    "log": "evaluation.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "377375792b28356e8015b4fcd5c3e38e20b0d8350351ded430802e30f950af45",
+    "stored_log_sha256": "3e2c69023be9318ec110807f9ac709bf0540b03417e3d3fc8c133acd60380e89",
+    "suites": [
+      {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "rustdoc",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "env",
+      "RUSTDOCFLAGS=-D rustdoc::broken_intra_doc_links -D rustdoc::private_intra_doc_links -D rustdoc::invalid_html_tags",
+      "cargo",
+      "doc",
+      "--locked",
+      "--offline",
+      "--no-deps",
+      "-p",
+      "hest@0.2.0",
+      "-p",
+      "mesquite",
+      "-p",
+      "script-rhai"
+    ],
+    "source_revision": "eb1244ccfa644348fcd4c5cc8bd5ccf72315ba11",
+    "exit_code": 0,
+    "elapsed_seconds": 21.86,
+    "finished_utc": "2026-10-21T03:43:02.437195+00:00",
+    "log": "rustdoc.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "4c4aade5b6ea493845cc5810c0f99362e256f173d117e093fd1648041c7c3d10",
+    "stored_log_sha256": "8f0a7812e5c2c6d15c9a74151bc65fd62e6d6c456f2a4243b1f080ae6ebd75a9",
+    "suites": []
+  },
+  {
+    "name": "reconciled-commands",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "command",
+      "--",
+      "--test-threads=1"
+    ],
+    "source_revision": "4927aae86760444e1a06563606de1d347839629d",
+    "exit_code": 0,
+    "elapsed_seconds": 22.29,
+    "finished_utc": "2026-10-21T03:48:30.519553+00:00",
+    "log": "reconciled-commands.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "6df24298ef8bcb73618771b82c7e4f3f5e8079f7edba2bc1cd36862731951520",
+    "stored_log_sha256": "39d3eded4efdffa621addc49bc1939342abf463182ae6935fb79c168023d4d84",
+    "suites": [
+      {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "reconciled-wasm",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "check",
+      "--manifest-path",
+      "ports/graphshell/web/Cargo.toml",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--locked",
+      "--offline"
+    ],
+    "source_revision": "4927aae86760444e1a06563606de1d347839629d",
+    "exit_code": 0,
+    "elapsed_seconds": 9.95,
+    "finished_utc": "2026-10-21T03:48:18.189362+00:00",
+    "log": "reconciled-wasm.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "794a05bd88f5587152328a423b34ae33de89437e01a79deebcdb0d373ac03ed2",
+    "stored_log_sha256": "2ba11d5468b5f18ee83a7e064adf7e7bc828f3ac45583106ba129951c5153ef4",
+    "suites": []
+  }
+]

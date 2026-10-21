@@ -1,0 +1,37 @@
+[
+  {
+    "name": "boundaries",
+    "command": [
+      "python3",
+      "scripts/check_port_boundaries.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "format",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/rustfmt",
+      "--check",
+      "--edition",
+      "2024",
+      "ports/graphshell/src/handlers.rs",
+      "ports/djinn/src/bin/djinn.rs",
+      "ports/djinn/src/resident_mere.rs",
+      "ports/djinn/src/settings.rs",
+      "ports/graphshell/mere/src/browser.rs",
+      "ports/graphshell/mere/src/connection.rs",
+      "ports/graphshell/mere/src/connection_tests.rs",
+      "ports/graphshell/mere/src/main.rs"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "diff",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0
+  }
+]

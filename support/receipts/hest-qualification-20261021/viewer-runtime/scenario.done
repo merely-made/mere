@@ -1,0 +1,9 @@
+RESULT ok
+captured hest-script-invocation
+captured hest-menu-open
+captured hest-disabled-command
+waited 41 frames
+waited 25 frames
+captured viewer_commands
+viewer commands receipt complete
+gpu timestamps: no

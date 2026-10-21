@@ -30,6 +30,7 @@ trainer = ["distillery/trainer"]
 # and recall plan, I1). Gated for the trainer's reason: a default build stays
 # light, and settings naming the lane in a build without it are refused.
 inference = ["distillery/inference-model"]
+inference-embedding = ["inference", "distillery/inference-embedding"]
 inference-gpu = ["inference", "distillery/inference-gpu"]
 inference-stages = ["inference", "personal-sync", "distillery/inference-stages"]
 # The same trainer, composed on this machine's discrete GPU. Additive over
@@ -69,6 +70,10 @@ path = "src/bin/c1_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [dependencies]
+site-model.workspace = true
+# Local redacted lifecycle diagnostics, without the projection/rendering feature.
+apparatus = { workspace = true, features = ["registry", "serde"] }
+registry = { workspace = true, features = ["diagnostics"] }
 armillary = { workspace = true, features = ["tokio"] }
 # The personal sync, carriage and transfer staging hosts (`sync`) and the
 # browser door's nonces (`door::browser_host`), moved from Graphshell's
@@ -99,7 +104,7 @@ incipit.workspace = true
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop
 # resident, and `trainer` pulls it deliberately and by the owner's request.
 distillery = { workspace = true, features = ["inference-wire"] }
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
 graphshell-endpoint = { workspace = true, features = ["door"] }
@@ -114,8 +119,8 @@ kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from
 # graphshell with the keeper adapters (dramatis repo plan, D15).
 light-file-dialog = "3.21.3"
-# Immutable saved-site snapshot contract published by Knot, at the workspace's
-# Knot revision so knot-site and knot-editor share one Knot source.
+# Knot's file-source and protocol-serving adapters. Portable snapshot records
+# come directly from site-model; both consumers share the same model identity.
 knot-site = { git = "https://github.com/merely-made/knot-editor.git", branch = "main", package = "knot-site", features = ["retinue"] }
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
@@ -272,7 +277,7 @@ insigne = { workspace = true, features = ["verify"] }
 graphshell-client = { workspace = true, features = ["pump"] }
 # The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
-graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint.workspace = true
 pollster = "0.4"

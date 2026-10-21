@@ -106,8 +106,10 @@ pub enum PersonalSyncHostError {
 pub struct PersonalSyncHost {
     graph: [u8; 32],
     store_path: PathBuf,
-    roster: Arc<RwLock<SyncRoster>>,
-    replica: Mutex<PersonalGraphReplica<RedbBackend>>,
+    // Intake, authoring and projection share this replica's roster. Holding
+    // the mutex through admission also makes a roster change wait for writes
+    // already being admitted, rather than publishing half of a policy change.
+    replica: Arc<Mutex<PersonalGraphReplica<RedbBackend>>>,
     joined: JoinedSpace<PersonalGraphExt>,
     network: P2pandaOverlayHost,
     /// Bytes this device serves to its paired siblings, and the bytes it has
@@ -319,13 +321,8 @@ impl PersonalSyncHost {
             );
         }
         let store = replica.sync_store();
-        let accepted = store.clone();
-        // Shared rather than captured by value: pairing a device while the
-        // host runs has to change who is admitted, not only who is reachable.
-        // A roster baked in at open time meant a device could become reachable
-        // and still have every write refused until the next restart.
-        let roster = Arc::new(RwLock::new(config.roster.clone()));
-        let admitting = Arc::clone(&roster);
+        let replica = Arc::new(Mutex::new(replica));
+        let admitting = Arc::clone(&replica);
         let intake_keys = Arc::clone(&keys);
         let graph = config.graph;
         let (endpoint, gossip) = network
@@ -341,16 +338,10 @@ impl PersonalSyncHost {
             gossip,
             graph,
             move |operation| {
-                let store = accepted.clone();
                 let admitting = Arc::clone(&admitting);
                 let intake_keys = Arc::clone(&intake_keys);
                 async move {
-                    let roster = admitting.read().await.clone();
-                    // Read live. A sealed operation arriving before this device
-                    // is keyed is refused rather than stored unread, and the
-                    // peer will offer it again once the key lands.
-                    let keyring = intake_keys.read().await.clone();
-                    match accept_into(&store, graph, &roster, keyring.as_ref(), &operation).await {
+                    match accept_incoming(&admitting, &intake_keys, graph, &operation).await {
                         Ok(inserted) => inserted,
                         Err(error) => {
                             // A refused operation and a failed one both have to
@@ -391,8 +382,7 @@ impl PersonalSyncHost {
         let host = Self {
             graph,
             store_path: config.store_path,
-            roster,
-            replica: Mutex::new(replica),
+            replica,
             joined,
             network,
             blobs,
@@ -694,7 +684,7 @@ impl PersonalSyncHost {
     }
 
     pub async fn roster(&self) -> SyncRoster {
-        self.roster.read().await.clone()
+        self.replica.lock().await.roster().clone()
     }
 
     /// Replace the set of roots admitted to write this graph.
@@ -702,12 +692,9 @@ impl PersonalSyncHost {
     /// The authority half of [`pair_node`](Self::pair_node). Reachability
     /// without admission is a device that connects and has everything it sends
     /// refused, so the two must move together.
-    /// Both copies move together. The replica re-checks stored operations
-    /// against its own roster when projecting, so admitting a writer on intake
-    /// without admitting it here stores the operation and then fails the whole
-    /// projection on the way out.
+    /// Intake and projection use this same roster under the replica mutex.
+    /// A blocked or cancelled update cannot change one ahead of the other.
     pub async fn set_roster(&self, roster: SyncRoster) {
-        *self.roster.write().await = roster.clone();
         self.replica.lock().await.set_roster(roster);
     }
 
@@ -889,17 +876,18 @@ impl PersonalSyncHost {
     /// device has been given, and add any device whose pre-key has arrived and
     /// which is not a member yet. Returns how many devices it added.
     pub async fn key_paired_devices(&self) -> Result<usize, PersonalSyncHostError> {
-        let roster = self.roster.read().await.clone();
-        let steps = {
-            let replica = self.replica.lock().await;
-            graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?
-        };
-        let (report, keyed) = {
+        // Match author_key_change's lock order: group, then replica. Keep the
+        // roster stable through the decision to absorb a peer's key agreement.
+        let (steps, keyed) = {
             let mut group = self.key_group.lock().await;
-            let report = group.absorb_admitted(&steps, &roster).map_err(key_error)?;
-            (report, group.is_keyed())
+            let replica = self.replica.lock().await;
+            let steps =
+                graphshell::personal_sync::key_agreement(&replica.sync_store(), self.graph).await?;
+            group
+                .absorb_admitted(&steps, replica.roster())
+                .map_err(key_error)?;
+            (steps, group.is_keyed())
         };
-        let _ = report;
         self.refresh_keyring().await?;
 
         // Only a seated device can change seats, so an unkeyed one stops here
@@ -1365,6 +1353,28 @@ impl PersonalSyncHost {
     }
 }
 
+/// Admit and insert under the same roster authoring and projection use. The
+/// guard stays held across store work so a pending update cannot overtake it.
+async fn accept_incoming(
+    replica: &Mutex<PersonalGraphReplica<RedbBackend>>,
+    keys: &RwLock<Option<Arc<DataKeyring>>>,
+    graph: [u8; 32],
+    operation: &p2panda_core::Operation<PersonalGraphExt>,
+) -> Result<bool, stickleback::ProcessError> {
+    let replica = replica.lock().await;
+    // Read live intake keys separately from the replica's retained history
+    // keys, so admission sees current key state while projection keeps history.
+    let keyring = keys.read().await.clone();
+    accept_into(
+        &replica.sync_store(),
+        graph,
+        replica.roster(),
+        keyring.as_ref(),
+        operation,
+    )
+    .await
+}
+
 fn value(label: impl Into<String>, value: impl Into<String>) -> CardValueV1 {
     CardValueV1 {
         label: label.into(),
@@ -1465,6 +1475,10 @@ fn hex(bytes: &[u8; 32]) -> String {
 fn short_hex(bytes: &[u8; 32]) -> String {
     hex(bytes)[..12].to_string()
 }
+
+#[cfg(test)]
+#[path = "personal_sync_host/roster_tests.rs"]
+mod roster_tests;
 
 #[cfg(test)]
 mod tests {

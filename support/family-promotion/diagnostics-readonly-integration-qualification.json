@@ -1,0 +1,90 @@
+{
+  "basis": "d7fd54d71dfb38dfdb84976a45c18bafd90e3332",
+  "qualified_implementation": "8a910926a",
+  "original_qualification": "diagnostics-readonly-qualification.json",
+  "original_qualification_sha256": "8aaeb2b1835c10c3175a7e1322dd4f1ce5dd96d0cb151459c0b1f89fc29e8362",
+  "integration_source": "diagnostics-readonly-integration-source.json",
+  "semantic_sources_preserved": true,
+  "changed_qualified_inputs": [
+    "Cargo.lock"
+  ],
+  "integration": "Current main authentication intake deliberately upgrades Dramatis to 7d498c27; Murm and semantic implementation retained",
+  "gates": [
+    {
+      "receipt": "diagnostics-readonly-integrated-resident.json",
+      "sha256": "dc64ab3880a2d4fbe85b43e4e5ae086d548dfbe1bc557b88892193fd59ee973b",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "-p",
+        "djinn",
+        "--lib",
+        "--bin",
+        "djinn"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-readonly-integrated-product.json",
+      "sha256": "5a5ec6f93cbb3967d4756eb8917308ac31b97a49850e0606999fc23511e46cb3",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "--lib",
+        "--features",
+        "retained-content",
+        "retained_content::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "receipt": "diagnostics-readonly-integrated-graphshell-browser.json",
+      "sha256": "8b587fa89637eaf28c8edcf174485aab44cda99930966ae37ce148ff502e7bde",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--target",
+        "wasm32-unknown-unknown"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "retained_product_passed_again": 12,
+  "executed_native_binaries": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-16f29afe4287dbca.exe": "05c7e2b2c48dfc21763e1df58e59a83a380af49d2b06e640937581b81e4bd508"
+  },
+  "prepared_family": [
+    {
+      "name": "cambium",
+      "version": "0.6.0"
+    },
+    {
+      "name": "sprigging",
+      "version": "0.3.0"
+    }
+  ],
+  "sealed_registers_unchanged": 433,
+  "doc_receiving": "diagnostics-readonly-doc-integrated.json",
+  "retained_byte_cap": 10000000,
+  "temporary_worktree_branch_and_empty_directory_removed": true,
+  "isolated_targets_or_cargo_homes_created": false,
+  "remaining": [
+    "First migration supplier selector intake and other external product receiving",
+    "Target lifetimes",
+    "Broader actions",
+    "Supplier-owned full forward geometry"
+  ],
+  "acceptance_limits": "Original 537 native passes retain original source/lock identity. Integration repeats only affected product tests and resident/Wasm compilation. No registry publication, new headed, browser-runtime or human AT acceptance."
+}

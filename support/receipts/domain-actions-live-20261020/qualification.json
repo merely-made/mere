@@ -1,0 +1,70 @@
+{
+  "status": "passed on working source",
+  "accepted": "accepted/qualification.json",
+  "source_commit": "a1f860d03210f0434a046aa46ee6351b24980feb",
+  "source_sha256": {
+    "Cargo.lock": "e307b8cafafb60dd0d746f583d75a13ebad8bc758903471bdd862f8a8117610a",
+    "ports/djinn/src/bin/djinn.rs": "50e1151b916c5b18457dc00a256415131019e787e915ce38df78731854e881b9",
+    "ports/djinn/src/resident_mere.rs": "ed93db9b4955d7d42684fca665ee62fbd161bbfd74e06dbd7474f691997ed475",
+    "ports/djinn/src/settings.rs": "669b3973a39d19f8020eb907d1987b9861a33034d4309640f99557574e7de337",
+    "ports/graphshell/mere/Cargo.toml": "b71b3294f7154bb71f8e3b6744075cd41e4a7a530a93ff4114ecce0429cdaff6",
+    "ports/graphshell/mere/src/browser.rs": "33c3876497df7cb9d237c2a595f61a6bfb79279ed66139c7cab48cd60805df85",
+    "ports/graphshell/mere/src/connection.rs": "549729e077a5e92246c1a346b46ea1d37af5eee3b66aca3a479f8f1244e8e9ab",
+    "ports/graphshell/mere/src/connection_tests.rs": "6691cb3f1904ebaec42619065b9e2f7a2ee5db82baec93cf11cbaf4f79e36109",
+    "ports/graphshell/mere/src/main.rs": "6c2bfbc00ce16e7888e2649357cbb791529f3ad4d5b7ed1e3f93d780d9ba6213",
+    "ports/graphshell/src/handlers.rs": "dc7280538262f4f2651ba1367695bf1158f6d37c1fb3ea0f6ecc9d0cc3a85452",
+    "support/receipts/domain-actions-live-20261020/run.py": "ad60f8ec879060a7377334554ececdae1f197191b4b01130b3dcd0b9b92a0ea8"
+  },
+  "tests": {
+    "native": 39,
+    "resident_mere": 31,
+    "owner_settings": 23,
+    "total": 93
+  },
+  "qualification": "Three native processes and three resident starts on macOS 15.8.1; one accepted owner request, one Firefox page visit, one durable access-history entry; cold reopen and disabled configuration passed.",
+  "diagnostics": "Initial native regression exposed browser failure feedback being overwritten by generic owner acceptance. Corrected before the accepted runs. The final controller records signed and build-native executables separately and scrolls to show the accepted control and status. Earlier full cohort remains outside this packet in acceptance-01.",
+  "visual_review": "visual-review.json",
+  "limits": [
+    "macOS only; no Linux or Windows runtime qualification",
+    "retained native harness activation; no physical pointer, keyboard or screen-reader qualification",
+    "system handoff and observed local browser visit; no general page-load or application completion contract"
+  ],
+  "checks": [
+    {
+      "name": "boundaries",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "format",
+      "command": [
+        "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/rustfmt",
+        "--check",
+        "--edition",
+        "2024",
+        "ports/graphshell/src/handlers.rs",
+        "ports/djinn/src/bin/djinn.rs",
+        "ports/djinn/src/resident_mere.rs",
+        "ports/djinn/src/settings.rs",
+        "ports/graphshell/mere/src/browser.rs",
+        "ports/graphshell/mere/src/connection.rs",
+        "ports/graphshell/mere/src/connection_tests.rs",
+        "ports/graphshell/mere/src/main.rs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "preservation": "preservation.json"
+}

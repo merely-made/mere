@@ -12,8 +12,9 @@ use std::{
         Arc, Mutex, MutexGuard, TryLockError,
         atomic::{AtomicBool, AtomicU64, Ordering},
     },
-    time::{Duration, Instant},
+    time::Duration,
 };
+use web_time::Instant;
 
 /// Independent ingress policy. Any zero disables buffering. Full queues reject
 /// the newest attempt, preserving the order of already admitted observations.

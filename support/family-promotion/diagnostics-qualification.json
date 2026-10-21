@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-20",
+  "base": "21deb0cb29379957e07219609de9eee2bbdd65fe",
+  "scope": "six contained repairs plus optional owner-redacted worker observations and a retained-host UI evidence control; broader migrations open",
+  "target": "C:\\t\\cargo-targets\\mere",
+  "toolchain": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "gates": [
+    "diagnostics-core-online.json",
+    "diagnostics-mesquite-current.json",
+    "diagnostics-inference-current.json"
+  ],
+  "passed_counts": [
+    18,
+    39,
+    38,
+    35,
+    42,
+    4,
+    1,
+    1
+  ],
+  "passed_total": 178,
+  "source_hash_convention": "sha256 after CRLF-to-LF normalization",
+  "source_sha256": {
+    "Cargo.toml": "def9ceb18aaa2503a1730167973ac03385d382255b17133cead039f3e664bf68",
+    "Cargo.lock": "02d348e360ebf441553ec0312c256d14fa66fbc4bfceb89d7f44ec4dcc134e6c",
+    "rust-toolchain.toml": "70b1451554546366dd35c01225416776cfb8c0e3a73da440def1bed6de93808e",
+    "crates/cambium/mesquite/src/probe.rs": "222a1d5764a7cb8ba47e183a43bd7f71e5090cc70b819fc163f81b415e54297b",
+    "crates/cambium/mesquite/src/probe_tests.rs": "dc36c17b56df615813ada035385844968c5180fb0b638ccb3ba1490da05dc206",
+    "crates/system/registry/src/diagnostics/descriptor.rs": "a9dc25c4f5919c3114070995f9c695f958526c8b0470b3ce098961ba34a7657b",
+    "crates/system/registry/src/diagnostics/descriptor/registry.rs": "0491c97b5ac6ec68f7828467f240d39d9cf56db682b6ef18cad71c8f5dc93750",
+    "crates/system/registry/src/diagnostics/descriptor/tests.rs": "b5c3b3c1af7ccf1ed941aeb5d01f38de0a999fb48686615d293587d71ee79a47",
+    "crates/system/ux-events/src/ux_diagnostics.rs": "bc9398d6f3acb76f097c834131ab25304bf8f7422971b6b421e473473fbe9a3d",
+    "ports/distillery/Cargo.toml": "319ed2364eb8ed1f75c926d8447c4139c40ccd88e5e7c551801b92462e7b51ab",
+    "ports/distillery/src/inference.rs": "bf5c54c48233a183768c2aceec201d3b3aa5269585e953ac4d7e96923429a690",
+    "ports/distillery/src/inference/observations.rs": "6dadb14c05998e3cb4d455d53a3f59b74bc4e53927070bd337034c9596e193f4",
+    "ports/distillery/tests/inference_observations.rs": "dd96c08ee0c2ecfcedd7c8045aa183a6a5414c60e5884e65885bd341cd0ef65e",
+    "ports/distillery/tests/inference_shutdown.rs": "74187eed5afbae5692e6c2da23e2283dfff98eca9a1842ca9bcb1378157b255c"
+  },
+  "artifact_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\apparatus-91960e99a85ce061.exe": "b4ccbb451b3e2496d7fb38b3ee4a6347e29a93dd4e908c015563c96576a29417",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\distillery-2095cf5c68d615cb.exe": "5b40d45e061238c692c8a1d1c0f2e48a400c55d9300805b505a40165c0fa1f1a",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\inference_observations-442672588221ef07.exe": "1e6b86f759cb406c37f6d113a7166fc80c279ea8b80195f6c867ff360bed8581",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\inference_shutdown-f625c3e2b73bd625.exe": "b150fb35fa1058806981daec2911f6c6d5515012a99f6b40ceb27fd77c9c0e39",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\lifecycle-f02f93c3d7272960.exe": "542e931fef28495730de1efc30a5024dc403d109766a2d88c46c2b8f7a556ab9",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-a34bf92356c7c943.exe": "33dbeaff65443dd8990eaaa1bd49c02e25fc516bbe521edbfbb5908f532edd53",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\registry-154e5bcefaa030d0.exe": "1bbd2873c7a7a8ea0e1b3587e9053237d0ec16f28d2ca432f72ce76fdfba3725",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\ux_events-b91e3e6f241dc63d.exe": "897459850586683478b89f9c958cfdb99eb56b0dddba0ce6d873da5b90501a44"
+  },
+  "lock_inventory": "diagnostics-lock-inventory.json",
+  "ownership_review": "diagnostics-ownership-review.json",
+  "preparation_limits": "Stopped/blocked or source-incomplete setup attempts are not test failures or passed gates. Offline all-target metadata missed uncached accesskit_ios; targeted native locked gates and lock inventory are qualified.",
+  "unqualified": [
+    "whole-workspace/all-target acceptance",
+    "actual model/GPU/backend execution",
+    "headed/browser/human AT acceptance",
+    "all command refusal/outcome coverage",
+    "journal-panic/poison recovery",
+    "current-target semantic admission and collector wiring"
+  ],
+  "isolated_outputs_created": []
+}

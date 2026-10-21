@@ -27,7 +27,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use crate::door::app_broker::AppEndpointCatalog;
+use crate::door::app_broker::{AppEndpointCatalog, WeakAppEndpointCatalog};
 use crate::resident_reservoir::ResidentReservoir;
 use chirograph::{
     AdvertisedAction, BoundsRelationship, CachePolicy, CardValueV1, CarrierNotice, ContentHash,
@@ -106,12 +106,15 @@ pub struct MereRoutes {
 type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + Send + Sync>;
 
 struct Routes {
+    custody_endpoint: Option<String>,
+    coop_relays: Vec<transport::p2panda_transport::RelayUrl>,
     shared_root: PathBuf,
     persona: PersonaId,
-    catalog: AppEndpointCatalog,
+    catalog: WeakAppEndpointCatalog,
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
+    handlers: HandlerRegistry,
     profile_lookup: Option<ProfileLookup>,
     /// The dialable projection host's catalog, when one serves these routes
     /// to remote peers (remote mere route admission note, §6).
@@ -169,12 +172,15 @@ impl MereRoutes {
     ) -> Self {
         Self {
             inner: Arc::new(Routes {
+                custody_endpoint: None,
+                coop_relays: Vec::new(),
                 shared_root,
                 persona,
-                catalog,
+                catalog: catalog.downgrade(),
                 grants,
                 apps,
                 validators: BTreeMap::new(),
+                handlers: HandlerRegistry::default(),
                 profile_lookup: None,
                 remote: None,
                 served: Mutex::new(BTreeMap::new()),
@@ -182,6 +188,34 @@ impl MereRoutes {
                 access_loaded: AtomicBool::new(false),
             }),
         }
+    }
+
+    /// Install the owner's ordered address offers before serving routes.
+    /// Offers use the existing open-address contract; native dispatch belongs
+    /// to the application host and is not an executable command in the graph.
+    pub fn with_handlers(mut self, handlers: HandlerRegistry) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("configure handlers before serving routes")
+            .handlers = handlers;
+        self
+    }
+
+    /// The daemon's own custody door. Embedded compositions that do not
+    /// serve custody leave co-op controls absent rather than borrowing another
+    /// resident's identity from process-global configuration.
+    pub fn with_custody_endpoint(mut self, endpoint: String) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("compose custody before serving")
+            .custody_endpoint = Some(endpoint);
+        self
+    }
+
+    /// Owner-selected reachability for co-op, composed before any routes open.
+    pub fn with_coop_relays(mut self, relays: Vec<transport::p2panda_transport::RelayUrl>) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("compose co-op relays before serving")
+            .coop_relays = relays;
+        self
     }
 
     /// Load the durable decisions before serving routes. This is mandatory
@@ -314,6 +348,11 @@ impl MereRoutes {
                 "{domain} domain authority is not composed into this resident"
             ));
         }
+        let catalog = self
+            .inner
+            .catalog
+            .upgrade()
+            .ok_or("the mere's application catalog is closed")?;
         let route = ResidentEndpointRoute::new(mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let mut served = self.inner.served.lock().await;
@@ -324,6 +363,9 @@ impl MereRoutes {
             .map_err(|error| error.to_string())?;
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
+            custody_endpoint: self.inner.custody_endpoint.clone(),
+            handlers: self.inner.handlers.clone(),
+            coop_relays: self.inner.coop_relays.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
             admission_validator: if domain == personal_facts::DOMAIN {
                 let lookup = self.inner.profile_lookup.clone();
@@ -346,6 +388,7 @@ impl MereRoutes {
             backend,
             persona: self.inner.persona,
             hosts: Mutex::new(HashMap::new()),
+            coop: Default::default(),
             lifecycle: AtomicU64::new(1),
             codicil_sessions: Mutex::new(HashMap::new()),
             pending_merges: Mutex::new(BTreeMap::new()),
@@ -353,8 +396,7 @@ impl MereRoutes {
         let ambient = ResidentEndpointRoute::new(ambient_mere_route_id(&domain), MERE_NOTICE_POLL)
             .map_err(|error| error.to_string())?;
         let grants = self.inner.grants.clone();
-        self.inner
-            .catalog
+        catalog
             .update(|catalog| register_mere_routes(catalog, &route, &ambient, &shared, &grants))
             .await
             .map_err(|error| error.to_string())?;
@@ -364,6 +406,19 @@ impl MereRoutes {
                 .map_err(|_| "the remote catalog lock is poisoned".to_string())?;
             register_mere_routes(&mut remote, &route, &ambient, &shared, &grants)
                 .map_err(|error| error.to_string())?;
+        }
+        if self.inner.custody_endpoint.is_some() {
+            let coop_route = ResidentEndpointRoute::new(format!("coop/{domain}"), MERE_NOTICE_POLL)
+                .map_err(|e| e.to_string())?;
+            let coop_shared = shared.clone();
+            let coop_grants = self.inner.grants.clone();
+            catalog
+                .update(|catalog| coop::register(catalog, coop_shared, coop_grants))
+                .await
+                .map_err(|e| e.to_string())?;
+            self.inner
+                .grants
+                .grant(AppId::new("graphshell"), coop_route);
         }
         for app in &self.inner.apps {
             self.inner.grants.grant(app.clone(), route.clone());
@@ -621,11 +676,17 @@ impl ResumableProjectionSource for AccessEndpoint {
     }
 }
 
+#[path = "resident_mere_coop.rs"]
+mod coop;
+
 type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 
 /// One mere's store, and the host of each of its sessions an application has
 /// attached to.
 struct MereShared {
+    custody_endpoint: Option<String>,
+    handlers: HandlerRegistry,
+    coop_relays: Vec<transport::p2panda_transport::RelayUrl>,
     domain: String,
     validator: Option<pandect::GraphValidator>,
     admission_validator: Option<pandect::GraphAdmissionValidator>,
@@ -633,6 +694,7 @@ struct MereShared {
     archive: RedbBackend,
     persona: PersonaId,
     hosts: Mutex<HashMap<SessionId, SharedHost>>,
+    coop: coop::Activities,
     /// The sessions projection's revision: it moves with every lifecycle step.
     lifecycle: AtomicU64,
     /// The sessions each codicil was saved from, by codicil id. A codicil
@@ -707,7 +769,7 @@ impl MereShared {
                 persona: persona.clone(),
                 profile: "djinn".to_string(),
             },
-            HandlerRegistry::new(Vec::new()),
+            self.handlers.clone(),
             AccessContext {
                 persona,
                 device: "djinn".to_string(),
@@ -1696,6 +1758,17 @@ impl MereEndpoint {
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
+                host.set_access_context(AccessContext {
+                    persona: shared.persona_id(),
+                    device: "djinn".into(),
+                    at_ms: u64::try_from(
+                        SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap_or_default()
+                            .as_millis(),
+                    )
+                    .unwrap_or(u64::MAX),
+                });
                 let result = host.through(app.clone(), |host| host.invoke(intent));
                 let result = match result {
                     Ok(IntentResult::Accepted) => host
@@ -1961,6 +2034,76 @@ mod tests {
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     };
 
+    #[tokio::test(flavor = "multi_thread")]
+    async fn dropping_the_catalog_releases_a_populated_reservoir_and_its_registrar() {
+        let Fixture {
+            _root,
+            reservoir,
+            catalog,
+            routes,
+            ..
+        } = fixture(0xc010, "catalog-release").await;
+        let weak = catalog.downgrade();
+        drop(routes);
+        drop(catalog);
+        assert!(
+            weak.upgrade().is_none(),
+            "the reservoir factory must not retain its owning catalog"
+        );
+        crate::resident_reservoir::ReservoirLane::Open(reservoir)
+            .close()
+            .await
+            .unwrap();
+        drop(_root);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn coop_owner_controls_are_local_and_do_not_follow_the_remote_mere_catalog() {
+        let remote = Arc::new(std::sync::Mutex::new(ResidentEndpointCatalog::new()));
+        let fixture = fixture_serving(0xc00f, "coop-scope", None, Some(remote.clone())).await;
+        let route = "coop/coop-scope";
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&AppRequest {
+                    app: AppId::new("graphshell"),
+                    route: AppRouteId::new(route).unwrap()
+                })
+                .is_ok()
+        );
+        assert!(
+            fixture
+                .grants
+                .current()
+                .admit(&AppRequest {
+                    app: AppId::new("turnstone"),
+                    route: AppRouteId::new(route).unwrap()
+                })
+                .is_err()
+        );
+        assert!(
+            remote
+                .lock()
+                .unwrap()
+                .open(route, &context("graphshell"))
+                .is_err()
+        );
+        assert!(
+            fixture
+                .catalog
+                .update(|catalog| catalog.open(route, &context("turnstone")))
+                .await
+                .is_err()
+        );
+        let endpoint = fixture
+            .catalog
+            .update(|catalog| catalog.open(route, &context("graphshell")))
+            .await
+            .unwrap();
+        assert_eq!(endpoint.describe().projections.len(), 1);
+    }
+
     fn persona(n: u128) -> PersonaId {
         PersonaId::from_uuid(Uuid::from_u128(n))
     }
@@ -2016,6 +2159,23 @@ mod tests {
         validator: Option<pandect::GraphValidator>,
         remote: Option<graphshell_host::projection_host::SharedCatalog>,
     ) -> Fixture {
+        fixture_serving_handlers(
+            persona_n,
+            domain,
+            validator,
+            remote,
+            HandlerRegistry::default(),
+        )
+        .await
+    }
+
+    async fn fixture_serving_handlers(
+        persona_n: u128,
+        domain: &str,
+        validator: Option<pandect::GraphValidator>,
+        remote: Option<graphshell_host::projection_host::SharedCatalog>,
+        handlers: HandlerRegistry,
+    ) -> Fixture {
         let root = tempfile::tempdir().unwrap();
         let reservoir = ResidentReservoir::open(root.path(), Some(persona(persona_n)))
             .await
@@ -2028,7 +2188,8 @@ mod tests {
             catalog.clone(),
             grants.clone(),
             vec![AppId::new("turnstone"), AppId::new("knot-editor")],
-        );
+        )
+        .with_handlers(handlers);
         let storage = castellan::custody::InMemoryStorage::new();
         let profile = castellan::custody::Profile::new(
             personae::ProfileId("fixture-profile".into()),
@@ -2041,7 +2202,9 @@ mod tests {
             None,
             graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
         ));
-        let routes = routes.with_profile_subject_authority(owner);
+        let routes = routes
+            .with_custody_endpoint("unused-in-unit-tests".into())
+            .with_profile_subject_authority(owner);
         let routes = if let Some(validator) = validator {
             routes.with_domain_validator(domain, validator)
         } else {
@@ -2511,6 +2674,118 @@ mod tests {
                 "{fault}: durable session changed"
             );
         }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn configured_record_handlers_validate_targets_and_persist_access() {
+        use graphshell::handlers::{HandlerOffer, OpenAddressV1, intent_id};
+        let handler = HandlerOffer {
+            id: "configured-browser".into(),
+            label: "Open in browser".into(),
+            explanation: "Owner-configured address handoff".into(),
+            address_kinds: vec![kernel::address::AddressKind::Http],
+        };
+        let fixture = fixture_serving_handlers(
+            0xac71,
+            "handler-acceptance",
+            None,
+            None,
+            HandlerRegistry::new(vec![handler.clone()]),
+        )
+        .await;
+        let mut app = fixture.attach("turnstone").await;
+        let initial = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&initial, vec![node(1), node(2)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let current = graph(&mut app);
+        let target = current
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .find_map(|(id, item)| {
+                current.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .filter(|source| source.id == Uuid::from_u128(1).to_string())
+                    .map(|_| id)
+            })
+            .unwrap();
+        let binding = current
+            .presentation
+            .bindings
+            .iter()
+            .find(|b| b.instance == target)
+            .unwrap();
+        assert_eq!(
+            current.presentation.offers[&binding.key][0]
+                .semantics
+                .actions,
+            vec![handler.advertised_action()]
+        );
+        let request = |address: &str| IntentInvocation {
+            session: current.session.clone(),
+            target,
+            observed_epoch: current.scene.epoch,
+            observed_revision: current.scene.revision,
+            intent: intent_id(&handler.id),
+            payload: serde_json::to_vec(&OpenAddressV1 {
+                address: address.into(),
+                handler: handler.id.clone(),
+            })
+            .unwrap(),
+        };
+        assert!(matches!(
+            app.invoke(request("https://2.test/")).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        let accepted = request("https://1.test/");
+        assert_eq!(
+            app.invoke(accepted.clone()).unwrap(),
+            IntentResult::Accepted
+        );
+        assert!(matches!(
+            app.invoke(accepted).unwrap(),
+            IntentResult::Stale { .. }
+        ));
+        let saved = graph(&mut app);
+        let material = disclosed_graph(&mut app, &saved).into_graph().unwrap();
+        let key = material
+            .nodes()
+            .find(|(_, n)| n.id == Uuid::from_u128(1))
+            .unwrap()
+            .0;
+        let history = graphshell::access::access_history(&material, key).unwrap();
+        assert_eq!(history.records.len(), 1);
+        assert_eq!(history.records[0].handler, handler.id);
+        assert!(history.records[0].at_ms > 0);
+        // Reopen the durable session with a new host, not just another view.
+        drop(app);
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        shared.hosts.lock().await.clear();
+        let mut reopened = fixture.attach("knot-editor").await;
+        let snapshot = graph(&mut reopened);
+        let material = disclosed_graph(&mut reopened, &snapshot)
+            .into_graph()
+            .unwrap();
+        let key = material
+            .nodes()
+            .find(|(_, n)| n.id == Uuid::from_u128(1))
+            .unwrap()
+            .0;
+        assert_eq!(
+            graphshell::access::access_history(&material, key).unwrap(),
+            history
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]

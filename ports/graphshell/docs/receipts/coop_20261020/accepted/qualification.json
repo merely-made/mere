@@ -1,0 +1,331 @@
+{
+  "result": "ok",
+  "binary_sha256": "679507f0d3ad8f22132a13a7ba1a112c8ae39fc5ddb23c22f0208dfe74c457ea",
+  "djinn_sha256": "b51a687d7e2799c9b0b265f54302a0be7d75fb8fe8ddaecad977e02ed5633ed3",
+  "chosen_graph": "e71cc6d4-57a5-41c3-804f-ff65a0db37c5",
+  "private_graph": "4dbefb09-7adf-4ea5-b6bb-7893231c171c",
+  "owner_root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+  "guest_root": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+  "phases": [
+    {
+      "name": "private-baseline",
+      "captures": 1,
+      "frames": 9,
+      "pid": 81590,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "uninvited",
+          "authors": [
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "4dbefb09-7adf-4ea5-b6bb-7893231c171c",
+          "guest": null,
+          "nodes": [
+            {
+              "address": "https://private.invalid/owner-only",
+              "id": "1fa50dd9-3f5b-42e1-aaa0-a7dcef0078f9",
+              "title": "Private sentinel"
+            }
+          ],
+          "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "revision": 5
+        },
+        "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+        "status": "Saved"
+      }
+    },
+    {
+      "name": "guest-live",
+      "captures": 3,
+      "frames": 130,
+      "pid": 81609,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "editor",
+          "authors": [
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "e71cc6d4-57a5-41c3-804f-ff65a0db37c5",
+          "guest": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "94c5bff4-631f-4e43-954d-a65f98d982d1",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "3c366ef9-367b-41f3-a2e5-1cd6993e3b88",
+              "title": "Guest source"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "44dc4f3f-9e71-4c65-bed3-28ffec63c848",
+              "title": "Owner live source"
+            }
+          ],
+          "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "revision": 15
+        },
+        "root": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+        "status": "Saved by holder"
+      }
+    },
+    {
+      "name": "owner-live",
+      "captures": 5,
+      "frames": 499,
+      "pid": 81595,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "revoked",
+          "authors": [
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 1,
+          "graph": "e71cc6d4-57a5-41c3-804f-ff65a0db37c5",
+          "guest": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "94c5bff4-631f-4e43-954d-a65f98d982d1",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "3c366ef9-367b-41f3-a2e5-1cd6993e3b88",
+              "title": "Guest source revised"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "44dc4f3f-9e71-4c65-bed3-28ffec63c848",
+              "title": "Owner live source"
+            }
+          ],
+          "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "revision": 16
+        },
+        "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+        "status": "Guest access ended"
+      }
+    },
+    {
+      "name": "guest-return",
+      "captures": 4,
+      "frames": 126,
+      "pid": 81618,
+      "result": "ok",
+      "state": {
+        "data": null,
+        "root": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+        "status": "Unavailable: session stream failed: connection lost"
+      }
+    },
+    {
+      "name": "guest-cold",
+      "captures": 1,
+      "frames": 9,
+      "pid": 81645,
+      "result": "ok",
+      "state": {
+        "data": null,
+        "root": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+        "status": "Unavailable: admission refused: Delegation(Revoked)"
+      }
+    },
+    {
+      "name": "owner-cold",
+      "captures": 3,
+      "frames": 21,
+      "pid": 81643,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "revoked",
+          "authors": [
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 2,
+          "graph": "e71cc6d4-57a5-41c3-804f-ff65a0db37c5",
+          "guest": "5d67c357724b6a65367954f679581a78ee7ea4af37edff9f7862a6e8f8960468",
+          "nodes": [
+            {
+              "address": "https://shared.invalid/owner",
+              "id": "94c5bff4-631f-4e43-954d-a65f98d982d1",
+              "title": "Owner source"
+            },
+            {
+              "address": "https://shared.invalid/guest",
+              "id": "3c366ef9-367b-41f3-a2e5-1cd6993e3b88",
+              "title": "Guest source revised"
+            },
+            {
+              "address": "https://shared.invalid/owner-live",
+              "id": "44dc4f3f-9e71-4c65-bed3-28ffec63c848",
+              "title": "Owner live source"
+            },
+            {
+              "address": "https://shared.invalid/after-revoke",
+              "id": "aba53bee-b800-48cf-a647-bbe4669ad4f9",
+              "title": "Owner after revoke"
+            }
+          ],
+          "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "revision": 21
+        },
+        "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+        "status": "Saved"
+      }
+    },
+    {
+      "name": "private-return",
+      "captures": 1,
+      "frames": 8,
+      "pid": 81659,
+      "result": "ok",
+      "state": {
+        "data": {
+          "access": "uninvited",
+          "authors": [
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell"
+            },
+            {
+              "id": "personae:fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+              "kind": "person",
+              "version": null,
+              "via": "graphshell.coop"
+            }
+          ],
+          "epoch": 2,
+          "graph": "4dbefb09-7adf-4ea5-b6bb-7893231c171c",
+          "guest": null,
+          "nodes": [
+            {
+              "address": "https://private.invalid/owner-only",
+              "id": "1fa50dd9-3f5b-42e1-aaa0-a7dcef0078f9",
+              "title": "Private sentinel"
+            }
+          ],
+          "owner": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+          "revision": 5
+        },
+        "root": "fad62bbbfaf9c61ec6d4c6fcf5e9b38db2ca92a69c7ed227cb0a15eec99f12a5",
+        "status": "Ready"
+      }
+    }
+  ],
+  "cold_reopen": {
+    "native_processes_stopped": true,
+    "residents_stopped": true,
+    "same_owner": true,
+    "revoked_guest_refused": true,
+    "private_sibling_unchanged": true
+  }
+}

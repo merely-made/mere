@@ -1,0 +1,32 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-winit-a11y",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "cambium-genet-web-host",
+    "--lib",
+    "--test",
+    "accessibility",
+    "--test",
+    "e1a_sessions"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-20T21:43:58.422132+00:00",
+  "finished": "2026-10-20T21:45:00.277059+00:00",
+  "exit_code": 101,
+  "results": [
+    "Blocking waiting for file lock on package cache",
+    "error[E0277]: the trait bound `std::boxed::Box<accesskit::Affine>: From<&accesskit::Affine>` is not satisfied",
+    "error: could not compile `cambium-rootstock` (lib) due to 1 previous error; 5 warnings emitted",
+    "error: could not compile `cambium-rootstock` (lib test) due to 1 previous error; 5 warnings emitted"
+  ],
+  "diagnostic_tail": "    Blocking waiting for file lock on package cache\nwarning: unused variable: `time_range`\n   --> crates\\cambium\\scenes\\scenomise\\src\\opened_link.rs:599:9\n    |\n599 |     let time_range = timeline_range(pending);\n    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`\n    |\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\n   Compiling sprigging v0.2.2 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\sprigging)\nwarning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)\n   Compiling cambium v0.4.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium)\n   Compiling cambium-winit v0.3.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium-winit)\n   Compiling cambium-rootstock v0.1.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium-rootstock)\nerror[E0277]: the trait bound `std::boxed::Box<accesskit::Affine>: From<&accesskit::Affine>` is not satisfied\n    --> crates\\cambium\\cambium-rootstock\\src\\semantics.rs:108:42\n     |\n 108 |                     access.set_transform(transform);\n     |                            ------------- ^^^^^^^^^ the trait `From<&accesskit::Affine>` is not implemented for `std::boxed::Box<accesskit::Affine>`\n     |                            |\n     |                            required by a bound introduced by this call\n     |\n     = note: required for `&accesskit::Affine` to implement `Into<std::boxed::Box<accesskit::Affine>>`\nnote: required by a bound in `Node::set_transform`\n    --> C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\accesskit-0.25.1\\src\\lib.rs:2521:107\n     |\n2521 | ...orm, set_affine_property, impl Into<Box<Affine>>, clear_transform),\n     |                                   ^^^^^^^^^^^^^^^^^ required by this bound in `Node::set_transform`\nhelp: consider dereferencing here\n     |\n 108 |                     access.set_transform(*transform);\n     |                                          +\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\cambium\\cambium-rootstock\\src\\producer\\registry.rs:47:10\n   |\n47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n   |          ^^^^^^^^^^^^\n   |\n   = note: `#[warn(deprecated)]` on by default\nhelp: replace the use of the deprecated method\n   |\n47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {\n   |\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency\n  --> crates\\cambium\\cambium-rootstock\\src\\scene_producer.rs:25:10\n   |\n25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n   |          ^^^^^^^^^^^^\n   |\nhelp: replace the use of the deprecated method\n   |\n25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {\n   |\n\nwarning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency\n   --> crates\\cambium\\cambium-rootstock\\src\\host.rs:116:10\n    |\n116 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |          ^^^^^^^^^^^^\n    |\nhelp: replace the use of the deprecated method\n    |\n116 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n116 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {\n    |\n\nwarning: unused import: `layout_dom_api::LayoutDom`\n   --> crates\\cambium\\cambium-rootstock\\src\\lib.rs:555:9\n    |\n555 |     use layout_dom_api::LayoutDom as _;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused import: `LayoutDom`\n   --> crates\\cambium\\cambium-rootstock\\src\\lib.rs:406:26\n    |\n406 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};\n    |                          ^^^^^^^^^\n\nFor more information about this error, try `rustc --explain E0277`.\nwarning: `cambium-rootstock` (lib) generated 5 warnings\nerror: could not compile `cambium-rootstock` (lib) due to 1 previous error; 5 warnings emitted\nwarning: build failed, waiting for other jobs to finish...\nwarning: unused import: `LayoutDom`\n   --> crates\\cambium\\cambium-rootstock\\src\\lib.rs:406:26\n    |\n406 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};\n    |                          ^^^^^^^^^\n    |\n    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused import: `layout_dom_api::LayoutDom`\n   --> crates\\cambium\\cambium-rootstock\\src\\lib.rs:555:9\n    |\n555 |     use layout_dom_api::LayoutDom as _;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: `cambium-rootstock` (lib test) generated 5 warnings (3 duplicates)\nerror: could not compile `cambium-rootstock` (lib test) due to 1 previous error; 5 warnings emitted\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

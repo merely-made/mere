@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Input binding registry — keyboard / mouse / pad bindings keyed by
-//! shared command ids (`command_menu::catalogue`), late-bound via `register_binding` and resolved
+//! shared command ids (`hest::catalogue`), late-bound via `register_binding` and resolved
 //! via `resolve_binding_id`.
 //!
 //! Extracted from `shell/desktop/runtime/registries/input.rs` per
@@ -28,7 +28,7 @@ pub mod binding_id {
 
 /// Input-level actions with no shared command: Enter submits the omnibar and
 /// confirms in the graph view. Every other default binding names a shared
-/// command id from `command_menu::catalogue` (Scenograph editor plan, SE50).
+/// command id from `hest::catalogue` (Scenograph editor plan, SE50).
 pub mod action_id {
     pub mod toolbar {
         pub const SUBMIT: &str = "toolbar:submit";

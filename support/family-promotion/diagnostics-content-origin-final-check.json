@@ -1,0 +1,14 @@
+{
+  "basis": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "source_and_lock_match_integrated_seal": true,
+  "sealed_audit_registers_unchanged": true,
+  "git_diff_check": 0,
+  "rustfmt_check": 0,
+  "changed_plan_d2_errors": [],
+  "whole_tree_preexisting_d2_errors": 40,
+  "whole_tree_d2_errors_match_before_baseline": true,
+  "diagnostics_retained_bytes_before_this_check": 1042543,
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "parallel_dirty_paths_excluded": []
+}

@@ -2016,3 +2016,262 @@ Evidence and coverage limits:
 `ports/graphshell/docs/receipts/notation_readings_20261019/`. The local source
 integration uses canonical sibling checkouts; publication and a portable family
 source pin remain separate.
+
+#### Current-host reconciliation (2026-10-20)
+
+The maintainer confirmed selectable Chart/Tab/Score readings with linked event
+selection, keeping MusicXML as source, and an explicit **Write notation** action
+when a progression has no music. This does not add Graphshell note editing or
+practice playback. Reading and selection changes do not author; notation creation
+uses the ordinary document history and save/reopen path.
+
+The published Woodshed provider is now `a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61`
+on `codex/woodshed-timing-integration` (superseding `111da595`).
+Current Mere uses AccessKit 0.25, while that provider's native fallback adapter
+names 0.24. The provider refinement makes the renderer's fallback
+`accessibility` feature optional and default-on. Graphshell disables it and owns
+the notation label and focusable musical-event buttons; Woodshed retains its
+existing default labels and playback description. Paint, glyphs, layout, label
+positions and event rectangles are shared unchanged across the two hosts.
+
+Initial development qualification used an explicit local provider override;
+the consumer now pins the published provider without that override. No sibling
+path is committed in the consumer manifests. Current-host evidence is kept separately
+from the historical packet at
+`ports/graphshell/docs/receipts/notation_readings_20261020/`; raw development
+attempts remain under `Code/output/graphshell-notation-20261020`.
+
+The current read path consumes saved MusicXML independently of legacy
+Card/arrangement validation. Those commands keep their own admission checks;
+invalid legacy metadata does not prevent displaying otherwise valid music.
+
+The maintainer confirmed whole-number 1–400 BPM for notation creation as well
+as the existing MusicXML score profile. The local converter and Graphshell
+command accept that full range; practice tempo remains separately controlled.
+The follow-up evidence is in
+`ports/graphshell/docs/receipts/notation_tempo_20261020/`; the earlier packet
+preserves the initial qualification and its then-pending range decision.
+
+Publication qualification uses the immutable `a0ae58f` supplier without the
+development override, with both consumer lockfiles refreshed. Its published
+provider resolution, locked checks and browser evidence are recorded at
+`ports/graphshell/docs/receipts/notation_publication_20261020/`. The read-only
+viewer continues to exclude the musical packages.
+
+### Current owner actions on bound views (2026-10-20)
+
+**Status (2026-10-20):** runtime adapter and native selected-record controls
+implemented and reconciled with the canonical Hest worker; 128 focused tests
+and portable-client checks passed for Git integration. The live Mere handler
+continuation below now qualifies one configured action through the native UI;
+other owners and platforms retain their own acceptance gates.
+
+The maintainer chose the owner's current actions for selected content first,
+leaving recipes unchanged. If an owner cannot identify the exact target for
+an occurrence, its actions are unavailable. The roster remains the existing
+way to select graph objects; this connection adds no target chooser.
+The first visible owner integration is the Mere graph already available to
+Graphshell, as chosen by the maintainer; Woodshed remains a later consumer.
+
+**Findings.** `scenograph::SourceBinding` records descriptive source identity;
+`RuntimeSourceBinding<W>` carries an opaque host witness without serialization.
+The compiler's item IDs and a Chirograph owner's item IDs belong to different
+projections. A `SourceRef` can occur repeatedly, so finding the first matching
+source or the first same-named action is insufficient. Chirograph already
+carries owner offers, bounded forms, exact target observations and dispatch
+results. Its Hest bridge preserves schema/effect checks and does not turn
+dispatch acceptance into terminal completion.
+
+The Graphshell host adapter in `ports/graphshell/src/bound_actions.rs` borrows
+one endpoint's `SessionCore` and an explicitly supplied runtime source binding
+whose witness maps occurrence IDs to exact owner targets. It checks the view's
+source, selected occurrence and target source before reading that target's
+current supported offers. No owner is discovered or authenticated from imported
+source names. The integrating host must obtain the association from its known
+owner; a scripted fixture does not qualify that product integration.
+
+The existing `SessionCore::invoke` and `submit_action_draft` paths now use
+`submit_command`: it rechecks the current offer, live status and active target,
+uses Chirograph's Hest invocation bridge, and preserves the command's original
+epoch/revision for the owner's stale check.
+Viewer-local actions retain their separate route. Owner authorization,
+confirmation and enactment remain with the owner. No wire format, recipe field,
+permission model, command vocabulary or shared crate is introduced.
+
+The native Graphshell selected-record panel reads its offers from the admitted
+`MereRouteSession`. That controller already validates graph material against
+the application, attached session and acknowledged position. Its new
+`record_actions` method requires one exact active graph record and keeps the
+synthetic session item out of record actions. The native panel keeps choices
+in the existing `ActionForm`, sends existing Hest invocation data through its
+worker, and preserves owner refusal/stale feedback. Acceptance is worded
+“Request accepted by the owner”, with no terminal completion claim.
+
+The domain-specific address action uses the existing `OpenAddressV1` schema;
+bounded forms retain the owner's fields and exact opaque choices. The initial
+integration used an empty `HandlerRegistry`. The live continuation below adds
+opt-in web handlers while preserving that empty default. The UI distinguishes
+a valid empty offer from an unavailable owner.
+
+Qualification phases and done-conditions:
+
+1. Exact-target connection: prove repeated source appearances can expose
+   different current offers despite different compiled/owner IDs; retain the
+   existing form values, command contract and wire target unchanged.
+2. Refusal and lifetime checks: prove missing/wrong mappings, changed selection,
+   changed offers, unsupported presentations and disconnected owners do not
+   invoke; preserve owner refusal/stale results and pending acceptance.
+3. Regression and persistence boundary: run the existing client and local
+   projection checks; prove ordinary projection snapshots contain no runtime
+   owner session or action data. Record focused evidence separately from any
+   future headed host acceptance.
+4. Native Mere receiving path: prove record selection exposes the owner's exact
+   target after the synthetic session item; exercise current offers, existing
+   address payloads and bounded choices through the native worker and admitted
+   route controller, including refusal and changed-target checks.
+
+**Initial qualification (2026-10-20):** the adapter and focused scripted-endpoint
+tests were implemented together with the native Mere receiving path, recorded
+in source checkpoint `ac099b385`. Locked,
+offline checks passed with Rust 1.99.1 and debug information disabled:
+
+- 6 bound-action tests, including actual mutation/refusal/stale behavior in
+  Graphshell's existing endpoint fixture, repeated-source targets, changed
+  offers, stale forms and mismatched compiled/disclosed sources;
+- 3 existing local projection save/reopen tests;
+- all 78 client library and 6 Mere-route library tests;
+- all 20 native Graphshell Mere tests, including actual Genet button/form
+  dispatch, existing typed address payloads, exact owner-target forwarding
+  after the hidden session item, owner refusal, and the existing framed-door
+  receiving checks;
+- the shared client's `wasm32-unknown-unknown` check, the web consumer's locked
+  offline metadata resolution, source formatting and whitespace checks.
+
+Source hashes, commands, final outputs and acceptance limits are recorded in
+`Code/output/domain-action-bindings-20261020/receipt.json`. These are source,
+headless UI and protocol checks, not headed rendering, screen-reader, configured
+live-handler or second-product qualification. The canonical-worker continuation
+below supersedes this initial integration status.
+
+The generic projection editor's imported fixture table still has
+no live owner association; this pass does not claim editing through a live
+Woodshed owner. New direct Hest dependencies use its existing package and do
+not change the wire or recipe serialization.
+
+#### Canonical worker reconciliation (2026-10-20)
+
+Upstream's native Hest worker landed while this connection was being qualified.
+The integrated implementation keeps that worker's `WorkerCommand` /
+`WorkerReply` envelope, one request-generation allocator and persistent refusal
+handling. Record actions add their runtime target context beside the existing
+Hest invocation; they retain the owner's declaration and are not recoded as
+local Mere-view commands. Both command origins use the same send path.
+
+The worker checks the supplied owner declaration through Chirograph's existing
+bridge, then the admitted route rechecks the actual current offer and exact
+selected target before dispatch. An unrelated automatic reading cannot settle
+a pending owner request. The receiving tests cover that generation boundary
+and reject changed owner command IDs, schemas and effects before dispatch.
+
+The integrated check runs pass: 78 client tests, 7 Mere-route tests, 6 bound-action
+tests, 3 existing projection save/reopen tests and 34 native Graphshell Mere
+tests. The client Wasm check, web locked/offline metadata resolution, port
+dependency boundaries, source formatting and whitespace checks also pass.
+The tracked [qualification receipt](../../../support/receipts/domain-actions-20261020/qualification.json)
+pins source hashes, commands and compressed final logs. It preserves the same
+headless/protocol and live-handler limits as the initial qualification.
+
+
+### Live Mere owner handler (2026-10-20)
+
+**Status (2026-10-20):** implemented and qualified on working source. The
+maintainer chose opening a web address in the receiving device's default
+browser only after owner acceptance. All 93 focused tests pass (39 native,
+31 resident Mere, 23 owner-settings tests). Three fresh native processes and
+three resident starts pass real macOS acceptance, including cold reopen and
+disabling the offer. This is source-hash qualification, not publication.
+
+**Findings (2026-10-20).** The resident previously supplied an empty
+`HandlerRegistry` for every session. `MereHost::invoke` already validates the
+open-address intent, handler, exact target, address, epoch and revision, then
+journals an access-history entry and returns `Accepted`. That result does not
+perform an operating-system launch. The web host separately attempts a browser
+open; the native Mere host currently has no equivalent dispatch. Enabling an
+“Open” offer alone would leave its visible behavior incomplete.
+
+Phases and done-conditions:
+
+1. Owner configuration: supply the existing ordered `HandlerRegistry` at route
+   composition; preserve the empty default and owner-side target checks. Prove
+   a configured offer reaches the exact record and a wrong address or stale
+   observation is refused without another access-history entry.
+2. Native action: implement the chosen host behavior using the existing
+   `OpenAddressV1` and owner response. Preserve refusal and unknown-outcome
+   feedback; an ordinary refreshed reading cannot authorize the action.
+3. Live acceptance: run an isolated real resident and native window, activate
+   the retained native control, inspect presented captures and verify the
+   resulting owner state through its admitted route. Reopen fresh processes
+   and check persistence; retain actual commands, source hashes and limits.
+
+No new recipe action grants, command language, graph-derived executable
+configuration or shared crate is part of this continuation.
+
+The resident's existing owner settings now accept
+`reservoir.open_web_addresses: true` (default false, read at startup). This
+composes the existing web-only `system.default` offer through
+`MereRoutes::with_handlers`; there are no graph-provided executable paths or
+shell commands. The native adapter compares the actual outbound invocation
+with the retained exact request and dispatches only on its typed `Accepted`
+response. Refusal, staleness, transport failure and ordinary readings cannot
+authorize a launch; reconnects and refreshes do not retry it. The native
+adapter validates HTTP/HTTPS URLs and bounds its platform handoff. Successful
+handoff is described as requested, not proof of page loading or terminal
+completion. Local handoff failures remain distinct from owner acceptance.
+The resident supplies a fresh owner timestamp for access-history writes,
+instead of the previous host-construction placeholder of zero.
+
+
+**Acceptance (2026-10-20).**
+`support/receipts/domain-actions-live-20261020/qualification.json` records the
+93 passing tests and links the native packet. The existing Mesquite lane
+activated the retained **Open in browser** control in a real native window.
+The owner accepted the exact selected record; macOS's default browser
+(Firefox in this run) visited a unique localhost page once. The owner saved
+one access-history entry with its handler, address and nonzero timestamp.
+Fresh resident and native processes preserved the same history and current
+offer without another browser visit. Disabling `open_web_addresses` and
+restarting removed the offer while preserving history. Four host-owned
+captures were reviewed. The native action retains both the button and honest
+handoff status after acceptance.
+
+The packet uses an isolated profile and synthetic graph; ordinary installed
+settings are unchanged. This qualifies the local admitted owner route on
+macOS, retained-control activation, native presentation and the observed
+browser visit. Linux/Windows runtime, physical pointer/keyboard input,
+assistive activation and general page-load completion remain unqualified.
+The access-history entry records the accepted handoff; it is not a page-load
+or successful application-completion receipt.
+
+
+**Git integration qualification (2026-10-20).** The live handler checkpoint is
+`c2db56559`; `3b73f15c8` reconciles it with main `1797a2eed`. The integration
+packet at `support/receipts/domain-actions-live-20261020/integration/` records
+93 passing focused tests on the combined source. Rebuilt native and helper
+binaries match the original live artifacts; the rebuilt resident differs after
+upstream's retained-recall change, so the full native acceptance was repeated
+with frozen binaries. The new browser visit, durable history, cold reopen,
+disabled offer and four reviewed captures all pass. The original 50 receipt
+files remain unchanged. This integration adds no new product decisions.
+
+
+**Publication qualification (2026-10-20).** Tested source `0dacf49a2` includes
+main `e94cb23e8`, the co-op relay/shared-shell integration and H4 command
+adapters. Both independent MereShared handler and relay fields survive the
+merge. All 94 focused tests pass (39 native, 31 resident Mere, 24 settings).
+The independently rebuilt and frozen native host, resident and helper pass a
+fresh complete native run, including one browser visit, durable access history,
+cold reopen without redispatch and disabled-offer behavior. Four new presented
+captures were reviewed. The final packet is
+`support/receipts/domain-actions-live-20261020/publication/`; all 95 original
+and earlier integration receipt files remain unchanged. Intermediate native
+receipts and frozen binaries also remain in the external delivery output.

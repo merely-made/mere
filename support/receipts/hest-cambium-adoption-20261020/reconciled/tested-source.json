@@ -1,0 +1,34 @@
+{
+  "tested_merge_commit": "8e3e5cb1074153c0178cec13ab5cf72dc6cdbeaa",
+  "upstream_turnstone": "1d131854bedecc2528fbc9b4cf5d08928fcae5dd",
+  "source_files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "5126ef31a7fdc814a0f4e3f11c7186933f392cf6a4da4d3b8988fdf6f9637243"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "e3af843ebe2027cb5fa06124ceca4fc8913dfffc133c18b90fa1522be90e76f5"
+    },
+    {
+      "path": "src/action.rs",
+      "sha256": "6dabbc9b3feca07a5ff4f391be4da41be5fbbaaad7af63179485dcf0dbc8d325"
+    },
+    {
+      "path": "src/action/command_metadata.rs",
+      "sha256": "f229b08944ea7ba2901f68235bf6beeb68bbfeaee634159509c96408a9fb2ad1"
+    },
+    {
+      "path": "src/app/palette.rs",
+      "sha256": "f819160418622260539c8db3332d8c06c7de6bb8eec5e26175fe38af711eaa35"
+    },
+    {
+      "path": "src/inspector_pane/tests.rs",
+      "sha256": "47f844a69e9a5259f21968b5353d2e3cec8e38d01b951ca90d5edc76a82b0ec6"
+    },
+    {
+      "path": "src/knot_authoring.rs",
+      "sha256": "86195e509831b3552ef9720aa6ccfbabb80451a1f57b230d9ced5072c35f6f01"
+    }
+  ]
+}

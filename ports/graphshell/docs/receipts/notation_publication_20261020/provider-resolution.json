@@ -1,0 +1,16 @@
+{
+  "provider": "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+  "web_packages": [
+    {
+      "name": "woodshed-notation",
+      "source": "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+      "manifest_path": "/Users/markik/.cargo/git/checkouts/woodshed-b9974f59ddc43cf9/a0ae58f/crates/woodshed-notation/Cargo.toml"
+    },
+    {
+      "name": "woodshedding",
+      "source": "git+https://github.com/merely-made/woodshed.git?rev=a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61#a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+      "manifest_path": "/Users/markik/.cargo/git/checkouts/woodshed-b9974f59ddc43cf9/a0ae58f/crates/woodshedding/Cargo.toml"
+    }
+  ],
+  "local_override": false
+}

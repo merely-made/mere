@@ -1,0 +1,25 @@
+{
+  "mechanical_command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json"
+  ],
+  "mechanical_exit_code": 0,
+  "judgment_command": [
+    "python3",
+    "scripts/mere_doc_judgment_audit.py",
+    "--json"
+  ],
+  "whole_tree_judgment_exit_code": 1,
+  "scope": "2026-10-20_hest_command_architecture_plan.md",
+  "mechanical_findings": {},
+  "judgment_findings": {
+    "missing_active_records": [],
+    "unknown_supplemental_records": [],
+    "inactive_supplemental_records": [],
+    "errors": []
+  },
+  "whole_tree_clean_claimed": false,
+  "claims": 20,
+  "holds": 20
+}

@@ -4,35 +4,16 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The accessibility mirror's plan: genet's neutral projection lowered to
-//! WAI-ARIA, one element per projected node.
-//!
-//! The projection's roles and states were read from the tree's own ARIA and
-//! HTML semantics, so this lowering is close to an identity inside ARIA's
-//! vocabulary. A name goes where ARIA looks for it: a value control or an
-//! author-named container carries it in `aria-label`, and anything named from
-//! its content carries it as its own text. A leaf, which describes itself
-//! only through AccessKit, contributes a role and a name through
-//! [`LeafSemantics`].
-//!
-//! Pure, and compiled on every target, so it is tested without a browser.
-//! `a11y` applies the plan to DOM elements.
-
+//! ARIA lowering of Rootstock's fully composed host semantics. Leaf callbacks,
+//! producer children, IDs and action maps are composed by the shared host.
+use accesskit::{Action, HasPopup, Live, Node, NodeId, Orientation, Role, Toggled};
+use cambium_rootstock::SemanticProjection;
 use std::collections::HashMap;
-
-use document_session_api::{
-    DocumentA11yAction, DocumentA11yHasPopup, DocumentA11yLive, DocumentA11yNode,
-    DocumentA11yNodeId, DocumentA11yOrientation, DocumentA11yProjection, DocumentA11yRole,
-    DocumentA11yToggled,
-};
-
-/// The projection's nodes by id, built once per plan.
-type Nodes<'a> = HashMap<DocumentA11yNodeId, &'a DocumentA11yNode>;
 
 /// One mirror element: what the DOM element for one projected node carries.
 #[derive(Clone, Debug, PartialEq)]
 pub struct MirrorNode {
-    /// The projected node's id, the DOM node's opaque id.
+    /// The composed ID: a DOM opaque ID or a generated producer/action ID.
     pub id: u64,
     /// ARIA attributes, `role` first when there is one.
     pub attrs: Vec<(&'static str, String)>,
@@ -49,268 +30,98 @@ pub struct MirrorNode {
     pub children: Vec<MirrorNode>,
 }
 
-/// What a leaf says of itself: an ARIA role and a name.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct LeafSemantics {
-    pub role: Option<&'static str>,
-    pub name: Option<String>,
-    /// What the leaf draws, each with its ARIA role, its name and where it is
-    /// drawn (`[x, y, width, height]` in the leaf's layout pixels).
-    pub children: Vec<LeafChild>,
-    /// Whether this name replaces the author's. A producer speaks for its
-    /// slot; a sprigging leaf's own label yields to an author's name.
-    pub names_itself: bool,
-    /// The producer's registry key, which a click on one of its drawn
-    /// nodes' action buttons names; `None` for a sprigging leaf.
-    pub slot: Option<u64>,
-}
-
-/// One thing a leaf draws, as the mirror places it.
-#[derive(Clone, Debug, PartialEq)]
-pub struct LeafChild {
-    /// The producer's stable name for it.
-    pub key: u64,
-    pub role: &'static str,
-    pub name: String,
-    pub rect: [f32; 4],
-    /// Each lowered to a button child.
-    pub actions: Vec<cambium_rootstock::ProducerAction>,
-}
-
-impl LeafSemantics {
-    /// A producer's own account of its slot, the producer registered under
-    /// `slot`.
-    pub fn from_producer(slot: u64, semantics: cambium_rootstock::ProducerSemantics) -> Self {
-        Self {
-            role: semantics.role.map(cambium_rootstock::ProducerRole::aria),
-            name: semantics.name,
-            children: semantics
-                .children
-                .into_iter()
-                .map(|child| LeafChild {
-                    key: child.key,
-                    role: child.role.aria(),
-                    name: child.name,
-                    rect: child.rect,
-                    actions: child.actions,
-                })
-                .collect(),
-            names_itself: true,
-            slot: Some(slot),
-        }
-    }
-}
-
-/// A leaf's AccessKit account of itself, in ARIA. A graphic keeps its role
-/// from WAI-ARIA's Graphics Module, and its label becomes its name.
-pub fn leaf_semantics(node: &accesskit::Node) -> LeafSemantics {
-    use accesskit::Role;
-    let role = match node.role() {
-        Role::GraphicsDocument => Some("graphics-document"),
-        Role::GraphicsObject => Some("graphics-object"),
-        Role::GraphicsSymbol => Some("graphics-symbol"),
-        Role::Image | Role::Canvas => Some("img"),
-        _ => None,
-    };
-    LeafSemantics {
-        role,
-        name: node.label().map(str::to_owned),
-        children: Vec::new(),
-        names_itself: false,
-        slot: None,
-    }
-}
-
-/// Lower `projection` to mirror elements. `scale` carries layout pixels into
-/// CSS pixels. `leaf` answers for a node that is a leaf, given its projected
-/// name, and returns `None` for every other node.
-pub fn plan(
-    projection: &DocumentA11yProjection,
-    scale: f32,
-    mut leaf: impl FnMut(u64, Option<&str>) -> Option<LeafSemantics>,
-) -> Vec<MirrorNode> {
-    let nodes: Nodes = projection
-        .nodes()
+/// Lower a copied host observation. Geometry stays in layout pixels until this
+/// platform scale is applied; producer action targets come from the same read.
+pub fn plan(projection: &SemanticProjection, scale: f32) -> Vec<MirrorNode> {
+    let nodes: HashMap<_, _> = projection
+        .tree
+        .nodes
         .iter()
-        .map(|node| (node.id, node))
+        .map(|(id, node)| (*id, node))
         .collect();
-    let Some(root) = nodes.get(&projection.root()) else {
+    let Some(root) = projection
+        .tree
+        .tree
+        .as_ref()
+        .and_then(|tree| nodes.get(&tree.root))
+    else {
         return Vec::new();
     };
-    // The root stands for the canvas, so its children sit at the top.
-    lower_children(&nodes, root, [0.0, 0.0], scale, &mut leaf)
+    lower_children(
+        &nodes,
+        root,
+        [0.0, 0.0],
+        scale,
+        &projection.produced_targets,
+    )
 }
-
 fn lower_children(
-    nodes: &Nodes,
-    parent: &DocumentA11yNode,
-    origin: [f32; 2],
+    nodes: &HashMap<NodeId, &Node>,
+    parent: &Node,
+    origin: [f64; 2],
     scale: f32,
-    leaf: &mut impl FnMut(u64, Option<&str>) -> Option<LeafSemantics>,
+    actions: &HashMap<NodeId, cambium_rootstock::ProducedAction>,
 ) -> Vec<MirrorNode> {
     parent
-        .children
+        .children()
         .iter()
-        .filter_map(|id| nodes.get(id))
-        .filter(|node| !node.state.hidden)
-        .map(|node| lower(nodes, node, origin, scale, leaf))
+        .filter_map(|id| nodes.get(id).map(|node| (*id, *node)))
+        .filter(|(_, node)| !node.is_hidden())
+        .map(|(id, node)| lower(nodes, id, node, origin, scale, actions))
         .collect()
 }
-
 fn lower(
-    nodes: &Nodes,
-    node: &DocumentA11yNode,
-    origin: [f32; 2],
+    nodes: &HashMap<NodeId, &Node>,
+    id: NodeId,
+    node: &Node,
+    origin: [f64; 2],
     scale: f32,
-    leaf: &mut impl FnMut(u64, Option<&str>) -> Option<LeafSemantics>,
+    actions: &HashMap<NodeId, cambium_rootstock::ProducedAction>,
 ) -> MirrorNode {
-    let id = node.id.get();
-    let mut semantics = leaf(id, node.name.as_deref());
-    let drawn = semantics
-        .as_mut()
-        .map(|semantics| std::mem::take(&mut semantics.children))
-        .unwrap_or_default();
-    let slot = semantics.as_ref().and_then(|semantics| semantics.slot);
-    let role = semantics
-        .as_ref()
-        .and_then(|semantics| semantics.role)
-        .or_else(|| aria_role(node.role));
-    // A producer names its slot; otherwise the author's name wins.
-    let names_itself = semantics
-        .as_ref()
-        .is_some_and(|semantics| semantics.names_itself);
-    let name = if !names_itself {
-        node.name
-            .clone()
-            .or_else(|| semantics.and_then(|semantics| semantics.name))
-    } else {
-        semantics
-            .and_then(|semantics| semantics.name)
-            .or_else(|| node.name.clone())
-    }
-    .filter(|name| !name.trim().is_empty());
-
+    let role = aria_role(node.role());
     let mut attrs = Vec::new();
     if let Some(role) = role {
-        attrs.push(("role", role.to_string()));
+        attrs.push(("role", role.to_owned()));
     }
     let mut text = None;
-    match (placement(node.role, role), name) {
-        (Placement::Label | Placement::Value, Some(name)) => attrs.push(("aria-label", name)),
-        (Placement::Content, Some(name)) => text = Some(name),
-        (_, None) => {},
+    if let Some(name) = node.label().filter(|name| !name.trim().is_empty()) {
+        if label_role(node.role()) || (node.role() == Role::ListItem && !node.children().is_empty())
+        {
+            attrs.push(("aria-label", name.to_owned()));
+        } else {
+            text = Some(name.to_owned());
+        }
     }
-    // A description says more than the name: what a control does, say.
-    if let Some(description) = node
-        .description
-        .clone()
-        .filter(|description| !description.trim().is_empty())
-    {
-        attrs.push(("aria-description", description));
+    if let Some(description) = node.description().filter(|s| !s.trim().is_empty()) {
+        attrs.push(("aria-description", description.to_owned()));
     }
-    // A text control's content is its value, which is where a reader reads it.
     if matches!(
-        node.role,
-        DocumentA11yRole::TextField | DocumentA11yRole::ComboBox
+        node.role(),
+        Role::TextInput | Role::MultilineTextInput | Role::ComboBox
     ) {
-        text = node.value.clone().filter(|value| !value.is_empty());
+        text = node.value().filter(|s| !s.is_empty()).map(str::to_owned);
     }
     attrs.extend(states(node));
-
-    let (rect, child_origin) = match node.bounds {
-        Some(bounds) => (
+    let (rect, child_origin) = node.bounds().map_or((None, origin), |bounds| {
+        (
             Some([
-                (bounds.x - origin[0]) * scale,
-                (bounds.y - origin[1]) * scale,
-                bounds.width * scale,
-                bounds.height * scale,
+                ((bounds.x0 - origin[0]) * f64::from(scale)) as f32,
+                ((bounds.y0 - origin[1]) * f64::from(scale)) as f32,
+                ((bounds.x1 - bounds.x0) * f64::from(scale)) as f32,
+                ((bounds.y1 - bounds.y0) * f64::from(scale)) as f32,
             ]),
-            [bounds.x, bounds.y],
-        ),
-        None => (None, origin),
-    };
-    let mut children = lower_children(nodes, node, child_origin, scale, leaf);
-    children.extend(
-        drawn
-            .into_iter()
-            .map(|child| drawn_node(id, slot, child, scale)),
-    );
+            [bounds.x0, bounds.y0],
+        )
+    });
     MirrorNode {
-        id,
+        id: id.0,
         attrs,
         text,
         rect,
-        focusable: node.actions.contains(&DocumentA11yAction::Focus),
-        action: None,
-        children,
+        focusable: node.supports_action(Action::Focus),
+        action: actions.get(&id).cloned(),
+        children: lower_children(nodes, node, child_origin, scale, actions),
     }
-}
-
-/// One thing a leaf draws, as a mirror element over where it is drawn, its
-/// actions as button children over the same box (F65). Ids are stable for
-/// the leaf, the node's key and the action, and sit in a range a DOM node's
-/// opaque id never reaches.
-fn drawn_node(leaf: u64, slot: Option<u64>, child: LeafChild, scale: f32) -> MirrorNode {
-    let [x, y, width, height] = child.rect;
-    let mut attrs = vec![("role", child.role.to_string())];
-    let text = if child.role == "listitem" && child.actions.is_empty() {
-        Some(child.name)
-    } else {
-        attrs.push(("aria-label", child.name));
-        None
-    };
-    let key = child.key;
-    let buttons = child
-        .actions
-        .into_iter()
-        .map(|action| {
-            let mut attrs = vec![("role", "button".to_string())];
-            if !action.description.trim().is_empty() {
-                attrs.push(("aria-description", action.description));
-            }
-            MirrorNode {
-                id: drawn_id(leaf, key, Some(&action.id)),
-                attrs,
-                text: Some(action.label),
-                rect: Some([0.0, 0.0, width * scale, height * scale]),
-                focusable: true,
-                action: slot.map(|slot| cambium_rootstock::ProducedAction {
-                    slot,
-                    key,
-                    id: action.id,
-                }),
-                children: Vec::new(),
-            }
-        })
-        .collect();
-    MirrorNode {
-        id: drawn_id(leaf, key, None),
-        attrs,
-        text,
-        rect: Some([x * scale, y * scale, width * scale, height * scale]),
-        focusable: false,
-        action: None,
-        children: buttons,
-    }
-}
-
-/// A drawn node's mirror id, or its action button's: FNV-1a over the leaf,
-/// the key and the action, fixed so an element keeps its id frame to frame.
-fn drawn_id(leaf: u64, key: u64, action: Option<&str>) -> u64 {
-    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
-    let mut eat = |bytes: &[u8]| {
-        for byte in bytes {
-            hash ^= u64::from(*byte);
-            hash = hash.wrapping_mul(0x0100_0000_01b3);
-        }
-    };
-    eat(&leaf.to_le_bytes());
-    eat(&key.to_le_bytes());
-    if let Some(action) = action {
-        eat(&[1]);
-        eat(action.as_bytes());
-    }
-    (1 << 63) | (hash >> 1)
 }
 
 /// Every drawn node's action button in `nodes` and their descendants: its
@@ -327,202 +138,138 @@ pub fn produced_actions(nodes: &[MirrorNode]) -> Vec<(u64, cambium_rootstock::Pr
     out
 }
 
-/// Where ARIA looks for a role's name.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Placement {
-    /// Named by the author, never from content: `aria-label`.
-    Label,
-    /// Named from content: the element's own text.
-    Content,
-    /// A control whose content is its value: `aria-label` for the name.
-    Value,
+fn label_role(role: Role) -> bool {
+    matches!(
+        role,
+        Role::TextInput
+            | Role::MultilineTextInput
+            | Role::ComboBox
+            | Role::Slider
+            | Role::SpinButton
+            | Role::Splitter
+            | Role::Document
+            | Role::Article
+            | Role::Region
+            | Role::Group
+            | Role::Navigation
+            | Role::Main
+            | Role::Form
+            | Role::Dialog
+            | Role::List
+            | Role::ListBox
+            | Role::ListBoxOption
+            | Role::Table
+            | Role::Row
+            | Role::TabList
+            | Role::TabPanel
+            | Role::Tree
+            | Role::Menu
+            | Role::MenuBar
+            | Role::Toolbar
+            | Role::RadioGroup
+            | Role::ProgressIndicator
+            | Role::Meter
+            | Role::Image
+            | Role::Canvas
+            | Role::ColorWell
+            | Role::GraphicsDocument
+            | Role::GraphicsObject
+            | Role::GraphicsSymbol
+    )
 }
+pub use document_session_api::a11y::accesskit_aria_role as aria_role;
 
-fn placement(role: DocumentA11yRole, aria: Option<&str>) -> Placement {
-    use DocumentA11yRole as R;
-    if matches!(
-        aria,
-        Some("graphics-document" | "graphics-object" | "graphics-symbol" | "img")
-    ) {
-        return Placement::Label;
-    }
-    match role {
-        R::TextField | R::ComboBox | R::Slider | R::SpinButton | R::Splitter => Placement::Value,
-        R::Document
-        | R::Article
-        | R::Region
-        | R::Group
-        | R::Navigation
-        | R::Main
-        | R::Form
-        | R::Dialog
-        | R::List
-        | R::ListBox
-        | R::ListBoxOption
-        | R::Table
-        | R::Row
-        | R::TabList
-        | R::TabPanel
-        | R::Tree
-        | R::Menu
-        | R::Toolbar
-        | R::RadioGroup
-        | R::ProgressIndicator
-        | R::Image => Placement::Label,
-        _ => Placement::Content,
-    }
-}
-
-/// The ARIA role a projected role lowers to. `None` leaves a generic element.
-pub fn aria_role(role: DocumentA11yRole) -> Option<&'static str> {
-    use DocumentA11yRole as R;
-    Some(match role {
-        R::Document => "document",
-        R::Article => "article",
-        R::Region => "region",
-        R::Group => "group",
-        R::Navigation => "navigation",
-        R::Main => "main",
-        R::Heading { .. } => "heading",
-        R::Paragraph => "paragraph",
-        R::Link => "link",
-        R::Button => "button",
-        R::TextField => "textbox",
-        R::CheckBox => "checkbox",
-        R::RadioButton => "radio",
-        R::RadioGroup => "radiogroup",
-        R::Switch => "switch",
-        R::ComboBox => "combobox",
-        R::List => "list",
-        R::ListItem => "listitem",
-        R::ListBox => "listbox",
-        R::ListBoxOption => "option",
-        R::Table => "table",
-        R::Row => "row",
-        R::Cell => "cell",
-        R::Image => "img",
-        R::Form => "form",
-        R::Dialog => "dialog",
-        R::Alert => "alert",
-        R::Menu => "menu",
-        R::MenuItem => "menuitem",
-        R::MenuItemCheckBox => "menuitemcheckbox",
-        R::MenuItemRadio => "menuitemradio",
-        R::TabList => "tablist",
-        R::Tab => "tab",
-        R::TabPanel => "tabpanel",
-        R::Tree => "tree",
-        R::TreeItem => "treeitem",
-        R::Slider => "slider",
-        R::SpinButton => "spinbutton",
-        R::Splitter => "separator",
-        R::Toolbar => "toolbar",
-        R::ProgressIndicator => "progressbar",
-        R::Status => "status",
-        R::Log => "log",
-        R::Note => "note",
-        R::Window | R::StaticText | R::Label | R::Unknown => return None,
-    })
-}
-
-/// A node's states as ARIA attributes, each only where the projection says
-/// something.
-fn states(node: &DocumentA11yNode) -> Vec<(&'static str, String)> {
-    let state = &node.state;
-    let flag = |on: bool| on.then(|| "true".to_string());
-    let bool_text = |value: bool| value.to_string();
+fn states(node: &Node) -> Vec<(&'static str, String)> {
     let mut attrs = Vec::new();
-    let mut push = |name: &'static str, value: Option<String>| {
+    let mut push = |name, value: Option<String>| {
         if let Some(value) = value {
             attrs.push((name, value));
         }
     };
-    if let DocumentA11yRole::Heading { level } = node.role
-        && level > 0
-    {
-        push("aria-level", Some(level.to_string()));
+    let flag = |value: bool| value.then(|| "true".to_owned());
+    if node.role() == Role::Heading {
+        push("aria-level", node.level().map(|v| v.to_string()));
     }
-    push("aria-disabled", flag(state.disabled));
-    push("aria-selected", state.selected.map(bool_text));
-    push("aria-expanded", state.expanded.map(bool_text));
-    // A toggle button is pressed; anything else that toggles is checked.
-    let toggled = state.toggled.map(|toggled| {
-        match toggled {
-            DocumentA11yToggled::On => "true",
-            DocumentA11yToggled::Off => "false",
-            DocumentA11yToggled::Mixed => "mixed",
+    push("aria-disabled", flag(node.is_disabled()));
+    push("aria-selected", node.is_selected().map(|v| v.to_string()));
+    push("aria-expanded", node.is_expanded().map(|v| v.to_string()));
+    let toggled = node.toggled().map(|v| {
+        match v {
+            Toggled::True => "true",
+            Toggled::False => "false",
+            Toggled::Mixed => "mixed",
         }
-        .to_string()
+        .to_owned()
     });
-    match (node.role, state.checked, toggled) {
-        (DocumentA11yRole::Button, _, Some(pressed)) => push("aria-pressed", Some(pressed)),
-        (_, Some(checked), _) => push("aria-checked", Some(checked.to_string())),
-        (_, None, toggled) => push("aria-checked", toggled),
+    push(
+        if node.role() == Role::Button {
+            "aria-pressed"
+        } else {
+            "aria-checked"
+        },
+        toggled,
+    );
+    if matches!(node.role(), Role::TextInput | Role::MultilineTextInput) {
+        push(
+            "aria-multiline",
+            flag(node.role() == Role::MultilineTextInput),
+        );
     }
-    if node.role == DocumentA11yRole::TextField {
-        push("aria-multiline", flag(state.multiline));
-    }
-    push("aria-readonly", flag(state.read_only));
-    push("aria-required", flag(state.required));
+    push("aria-readonly", flag(node.is_read_only()));
+    push("aria-required", flag(node.is_required()));
     push(
         "aria-live",
-        state.live.map(|live| {
-            match live {
-                DocumentA11yLive::Off => "off",
-                DocumentA11yLive::Polite => "polite",
-                DocumentA11yLive::Assertive => "assertive",
+        node.live().map(|v| {
+            match v {
+                Live::Off => "off",
+                Live::Polite => "polite",
+                Live::Assertive => "assertive",
             }
-            .to_string()
+            .to_owned()
         }),
     );
     push(
         "aria-orientation",
-        state.orientation.map(|orientation| {
-            match orientation {
-                DocumentA11yOrientation::Horizontal => "horizontal",
-                DocumentA11yOrientation::Vertical => "vertical",
+        node.orientation().map(|v| {
+            match v {
+                Orientation::Horizontal => "horizontal",
+                Orientation::Vertical => "vertical",
             }
-            .to_string()
+            .to_owned()
         }),
     );
     push(
         "aria-haspopup",
-        state.has_popup.map(|popup| {
-            match popup {
-                DocumentA11yHasPopup::Menu => "menu",
-                DocumentA11yHasPopup::ListBox => "listbox",
-                DocumentA11yHasPopup::Tree => "tree",
-                DocumentA11yHasPopup::Grid => "grid",
-                DocumentA11yHasPopup::Dialog => "dialog",
+        node.has_popup().map(|v| {
+            match v {
+                HasPopup::Menu => "menu",
+                HasPopup::Listbox => "listbox",
+                HasPopup::Tree => "tree",
+                HasPopup::Grid => "grid",
+                HasPopup::Dialog => "dialog",
             }
-            .to_string()
+            .to_owned()
         }),
     );
     push(
         "aria-valuenow",
-        node.numeric_value.map(|value| value.to_string()),
+        node.numeric_value()
+            .filter(|v| v.is_finite())
+            .map(|v| v.to_string()),
     );
     push(
         "aria-valuemin",
-        node.numeric_minimum.map(|value| value.to_string()),
+        node.min_numeric_value()
+            .filter(|v| v.is_finite())
+            .map(|v| v.to_string()),
     );
     push(
         "aria-valuemax",
-        node.numeric_maximum.map(|value| value.to_string()),
+        node.max_numeric_value()
+            .filter(|v| v.is_finite())
+            .map(|v| v.to_string()),
     );
     attrs
 }
-
-/// Every id in `nodes` and their descendants, parents first.
-pub fn ids(nodes: &[MirrorNode]) -> Vec<u64> {
-    let mut out = Vec::new();
-    let mut stack: Vec<&MirrorNode> = nodes.iter().rev().collect();
-    while let Some(node) = stack.pop() {
-        out.push(node.id);
-        stack.extend(node.children.iter().rev());
-    }
-    out
-}
-
 #[cfg(test)]
 mod tests;

@@ -1,0 +1,41 @@
+{
+  "consumer_revision": "c889038ddd9c2fd56384c216e50d600f92af751e",
+  "consumer_canonical_checkout_modified": false,
+  "baseline_cambium_source": "git+https://github.com/merely-made/mere.git?branch=main#dffcc9c806457319d3f748477bff6327f220b085",
+  "metadata_command": "cargo metadata --locked --offline --format-version 1",
+  "metadata_exit_code": 0,
+  "metadata_sha256": "a5bf627b8e3746bb7a8fda0ef04102e4588fe57e79e8855d67dad436be8fb885",
+  "hest_package_id": "path+file:///Users/markik/Code/repos/mere/crates/cambium/hest#0.2.0",
+  "cambium_package_id": "path+file:///Users/markik/Code/testing/mere/hest-h2-20261020/cambium-receiving-current#cambium@0.4.0",
+  "direct_cambium_to_hest_edge": true,
+  "hest_package_count": 1,
+  "unrelated_command_menu": {
+    "version": "0.1.0",
+    "source": "git+https://github.com/merely-made/mere.git?branch=main#dffcc9c806457319d3f748477bff6327f220b085"
+  },
+  "baseline_rust_files": 244,
+  "unchanged_baseline_rust_files": 242,
+  "modified_rust_files": [
+    "src/action.rs",
+    "src/app/palette.rs"
+  ],
+  "new_rust_files": [
+    "src/action/command_metadata.rs"
+  ],
+  "classified_action_variants": 164,
+  "destructive_actions": [
+    "DeleteFocusedNode",
+    "EmptyRecycleBin",
+    "CloseSession"
+  ],
+  "unrelated_consumer_lock_blocks_unchanged": 1670,
+  "adapter_other_rust_files_unchanged": 74,
+  "tests_passed": 13,
+  "scope": "Actual host palette test module on the isolated receiving export; no canonical consumer repin, native launch, browser runtime or publication is claimed.",
+  "reproduction": {
+    "cambium_adapter_patch": "cambium-adapter.patch",
+    "consumer_patch": "turnstone-fixture.patch",
+    "apply": "git apply --unidiff-zero",
+    "path_note": "Adjust absolute supplier, isolated Cambium and shared build-cache paths for another checkout."
+  }
+}

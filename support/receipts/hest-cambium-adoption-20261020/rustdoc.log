@@ -1,0 +1,78 @@
+    Checking serde v1.0.229
+    Checking bytemuck v1.25.2
+    Checking zerofrom v0.1.8
+    Checking serde_json v1.0.151
+    Checking thiserror v2.0.21
+    Checking uuid v1.27.0
+    Checking genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking tracing v0.1.44
+    Checking regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking yoke v0.8.3
+    Checking meristem v0.2.0 (/Users/markik/Code/repos/mere/crates/cambium/meristem)
+    Checking font-types v0.12.5
+    Checking euclid v0.22.14
+    Checking app_units v0.7.8
+    Checking mere-curation v0.1.1 (/Users/markik/Code/repos/mere/crates/forme/curation)
+    Checking layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking encoding_rs v0.8.42
+    Checking zerovec v0.11.8
+    Checking zerotrie v0.2.5
+    Checking read-fonts v0.41.0
+    Checking sceno v0.0.6 (/Users/markik/Code/repos/mere/crates/cambium/scenes/sceno)
+    Checking accesskit v0.25.1
+    Checking hest v0.1.0 (/Users/markik/Code/repos/mere/crates/cambium/hest-0_1)
+    Checking genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking hest v0.2.0 (/Users/markik/Code/repos/mere/crates/cambium/hest)
+ Documenting hest v0.2.0 (/Users/markik/Code/repos/mere/crates/cambium/hest)
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking guillotiere v0.7.0
+    Checking genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#54d864c2)
+ Documenting command-menu v0.1.1 (/Users/markik/Code/repos/mere/crates/cambium/command-menu)
+    Checking icu_locale_core v2.3.0
+    Checking icu_collections v2.3.0
+    Checking scenograph v0.0.5 (/Users/markik/Code/repos/mere/crates/cambium/scenes/scenograph)
+    Checking engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+    Checking icu_provider v2.3.1
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking scenomise v0.0.6 (/Users/markik/Code/repos/mere/crates/cambium/scenes/scenomise)
+    Checking skrifa v0.44.0
+    Checking url v2.5.8
+    Checking genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#6ef3cd37)
+warning: unused variable: `time_range`
+   --> crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+    Checking vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+    Checking netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+    Checking sprigging v0.2.2 (/Users/markik/Code/repos/mere/crates/cambium/sprigging)
+ Documenting cambium v0.5.0 (/Users/markik/Code/repos/mere/crates/cambium/cambium)
+warning: public documentation for `key_handlers_at` links to private item `Handler::focusable`
+   --> crates/cambium/cambium/src/context.rs:408:27
+    |
+408 |     /// A handler whose [`Handler::focusable`] is true also makes `node`
+    |                           ^^^^^^^^^^^^^^^^^^ this item is private
+    |
+    = note: this link will resolve properly if you pass `--document-private-items`
+    = note: `#[warn(rustdoc::private_intra_doc_links)]` on by default
+
+warning: unclosed HTML tag `label`
+   --> crates/cambium/cambium/src/tabs.rs:527:63
+    |
+527 | /// `tab-close` control (`role="button"`, announced as "Close <label>").
+    |                                                               ^^^^^^^
+    |
+    = note: `#[warn(rustdoc::invalid_html_tags)]` on by default
+
+warning: `cambium` (lib doc) generated 2 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.54s
+   Generated /Users/markik/Code/repos/mere/target/doc/cambium/index.html and 2 other files

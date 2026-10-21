@@ -28,6 +28,12 @@ enum Task {
     Mount(usize),
     Resolve(ProjectionSession, InstanceId, ContentHash),
     Invoke(MereViewRequest),
+    RecordAction {
+        key: String,
+        target: graphshell_client::ActionDraftTarget,
+        action: chirograph::AdvertisedAction,
+        command: hest::Invocation,
+    },
     Media(ProjectionSession, InstanceId),
     /// A pending merge card's material in the sessions projection.
     MergeMedia(ProjectionSession, InstanceId),
@@ -198,6 +204,76 @@ impl MereRouteSession {
                     .any(|value| value.label == "Address" && &value.value == focus)
             })
             .map(|(key, _)| key)
+    }
+
+    /// Current actions on one exact disclosed graph record. A record key is
+    /// not an endpoint item ID; repeated appearances do not select a first
+    /// match. This uses the already admitted route, never source-name lookup.
+    pub fn record_actions(
+        &self,
+        key: &str,
+    ) -> Result<
+        (
+            graphshell_client::ActionDraftTarget,
+            Vec<chirograph::AdvertisedAction>,
+        ),
+        String,
+    > {
+        if self.closed || self.in_flight() || !self.records.contains_key(key) {
+            return Err("The record's owner actions are unavailable.".into());
+        }
+        let core = self.driver.core().ok_or("The route is closed.")?;
+        let mounted = core
+            .client()
+            .mounted(&self.graph)
+            .ok_or("The graph is not mounted.")?;
+        let targets: Vec<_> = mounted
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .filter(|(_, item)| {
+                mounted.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .is_some_and(|source| {
+                        source.adapter == cartography::MERE_GRAPH_ADAPTER && source.id == key
+                    })
+            })
+            .map(|(instance, _)| instance)
+            .collect();
+        let [instance] = targets.as_slice() else {
+            return Err(
+                "The owner has not supplied one exact action target for this record.".into(),
+            );
+        };
+        let target = graphshell_client::ActionDraftTarget {
+            session: self.graph.clone(),
+            target: *instance,
+            observed_epoch: mounted.scene.epoch,
+            observed_revision: mounted.scene.revision,
+        };
+        Ok((target, core.current_actions(&self.graph, *instance)?))
+    }
+
+    /// A selected-record command uses the existing owner contract and exact
+    /// observed target. The owner still authorizes and enacts it.
+    pub fn invoke_record_command(
+        &mut self,
+        key: String,
+        target: graphshell_client::ActionDraftTarget,
+        action: chirograph::AdvertisedAction,
+        command: hest::Invocation,
+    ) -> Result<(), String> {
+        if self.focus_key().as_deref() != Some(&key) || self.record_actions(&key)?.0 != target {
+            return Err("The selected record changed; reopen its owner action.".into());
+        }
+        self.notice = None;
+        self.tasks.push_back(Task::RecordAction {
+            key,
+            target,
+            action,
+            command,
+        });
+        self.advance()
     }
     pub fn primary(&self) -> Option<&MountedScene> {
         if self.closed {
@@ -458,6 +534,20 @@ impl MereRouteSession {
                     .core_mut()
                     .ok_or("The route is closed.")?
                     .media_resource(session, *instance, 0)?,
+                Task::RecordAction {
+                    key,
+                    target,
+                    action,
+                    command,
+                } => {
+                    if self.focus_key().as_deref() != Some(key) {
+                        return Err("The selected record changed; reopen its owner action.".into());
+                    }
+                    self.driver
+                        .core_mut()
+                        .ok_or("The route is closed.")?
+                        .submit_command(target, action, command)?
+                },
                 Task::Invoke(request) => {
                     let sessions = self.snapshot(&self.sessions)?;
                     let invocation = self
@@ -631,9 +721,7 @@ impl MereRouteSession {
                                         source.adapter == crate::wire::SESSION_ITEM_SOURCE
                                     });
                             if is_session {
-                                if card.media.is_empty() {
-                                    return Err("The explicit session does not disclose its scoped graph material.".into());
-                                }
+                                crate::wire::session_media(&card)?;
                                 self.tasks
                                     .push_front(Task::Media(session.clone(), instance));
                             }
@@ -711,6 +799,19 @@ impl MereRouteSession {
                         self.tasks
                             .extend(self.indices.iter().copied().map(Task::Mount));
                     },
+                    (Task::RecordAction { .. }, Outcome::Intent(result)) => {
+                        self.notice = Some(match *result {
+                            chirograph::IntentResult::Accepted => {
+                                "Request accepted by the owner.".into()
+                            },
+                            chirograph::IntentResult::Rejected { reason } => reason,
+                            chirograph::IntentResult::Stale { .. } => {
+                                "The record changed; read it again.".into()
+                            },
+                        });
+                        self.tasks
+                            .extend(self.indices.iter().copied().map(Task::Mount));
+                    },
                     _ => return Err("The resident answered another operation.".into()),
                 }
             },
@@ -743,10 +844,18 @@ impl graphshell_client::LineDriven for MereRouteSession {
 #[cfg(test)]
 mod busy_tests {
     use super::*;
-    use chirograph::{PresentationCapability, ProjectionOffer, ProjectionRequest};
-    use sceno::score::{Arrangement, Score};
+    use chirograph::{
+        BoundsRelationship, CarrierOutput, CarrierRequest, CarrierResponse, CarrierResponseBody,
+        PresentationBinding, PresentationCapability, PresentationCodec, PresentationKey,
+        PresentationManifest, PresentationOffer, PresentationSemantics, ProjectionOffer,
+        ProjectionRequest, SemanticRole,
+    };
+    use sceno::{
+        Arrangement, Footprint, ProjectedItem, Representation, Scene, Score, SourceRef, Transform2,
+    };
+    use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 
-    fn closed_panel() -> MereRouteSession {
+    fn panel() -> MereRouteSession {
         let descriptor = EndpointDescriptor {
             label: "Resident mere".into(),
             projections: [MERE_SESSIONS, MERE_GRAPH]
@@ -761,16 +870,170 @@ mod busy_tests {
                 })
                 .collect(),
         };
-        let mut panel = MereRouteSession::from_descriptor(
+        MereRouteSession::from_descriptor(
             descriptor,
             CapabilityProfile::new([PresentationCapability::PortableCard]),
             "graphshell",
         )
-        .unwrap();
+        .unwrap()
+    }
+
+    fn closed_panel() -> MereRouteSession {
+        let mut panel = panel();
         panel.fail("The resident route closed.".into());
         assert!(!panel.in_flight());
         assert_eq!(panel.status(), "unavailable");
         panel
+    }
+
+    fn seed_partial_state(panel: &mut MereRouteSession) {
+        let hash = ContentHash::of(b"partial card");
+        panel.cards.insert(hash, b"partial card".to_vec());
+        panel.records.insert(
+            "partial".into(),
+            chirograph::PortableCardV1 {
+                title: "partial".into(),
+                values: vec![],
+                badges: vec![],
+                media: vec![],
+            },
+        );
+        panel.inspected = Some("partial".into());
+        panel.transient_layout = Some("grid.default".into());
+        panel
+            .merge_choices
+            .insert("partial".into(), MergeOption::Source);
+    }
+
+    fn send_response(panel: &mut MereRouteSession, body: CarrierResponseBody) {
+        let outgoing = panel.take_outgoing();
+        assert_eq!(outgoing.len(), 1);
+        let request: CarrierRequest = serde_json::from_str(&outgoing[0]).unwrap();
+        let line = chirograph::line::encode(&CarrierOutput::Response(CarrierResponse {
+            id: request.id,
+            body: Ok(body),
+        }))
+        .unwrap();
+        panel.on_line(&line);
+    }
+
+    fn graph_snapshot(card_bytes: &[u8]) -> ProjectionSnapshot {
+        let session_id = uuid::Uuid::from_u128(9).to_string();
+        let mut scene = Scene::new();
+        let source = scene.intern_source(SourceRef::new(
+            crate::wire::SESSION_ITEM_SOURCE,
+            &session_id,
+        ));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::translation(0.0, 0.0),
+            footprint: Footprint::Circle { radius: 8.0 },
+            representation: Representation::Card,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: vec![],
+        });
+        let key = PresentationKey("session-card".into());
+        let card_hash = ContentHash::of(card_bytes);
+        let presentation = PresentationManifest {
+            bindings: vec![PresentationBinding {
+                instance: InstanceId(0),
+                key: key.clone(),
+            }],
+            offers: [(
+                key,
+                vec![PresentationOffer {
+                    codec: PresentationCodec::PortableCardV1,
+                    resource: card_hash,
+                    byte_size: card_bytes.len() as u64,
+                    requires: PresentationCapability::PortableCard,
+                    semantics: PresentationSemantics {
+                        label: "session".into(),
+                        role: SemanticRole::Graphic,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
+                }],
+            )]
+            .into_iter()
+            .collect(),
+        };
+        ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession(MERE_GRAPH.into()),
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap(),
+            presentation,
+            cache_policy: Default::default(),
+        }
+    }
+
+    #[test]
+    fn live_route_validates_session_media_before_fetching_it() {
+        for count in [0, 1, 2] {
+            let mut panel = panel();
+            seed_partial_state(&mut panel);
+            let empty =
+                SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap();
+            send_response(
+                &mut panel,
+                CarrierResponseBody::Snapshot(Box::new(ProjectionSnapshot {
+                    version: ProtocolVersion::V1,
+                    session: ProjectionSession(MERE_SESSIONS.into()),
+                    scene: empty,
+                    presentation: PresentationManifest::default(),
+                    cache_policy: Default::default(),
+                })),
+            );
+
+            let first_media = ContentHash::of(b"scoped graph envelope");
+            let media = match count {
+                0 => vec![],
+                1 => vec![first_media],
+                _ => vec![first_media, ContentHash::of(b"unexpected second resource")],
+            };
+            let card_bytes = serde_json::to_vec(&chirograph::PortableCardV1 {
+                title: "attached session".into(),
+                values: vec![],
+                badges: vec![],
+                media,
+            })
+            .unwrap();
+            let graph = graph_snapshot(&card_bytes);
+            send_response(&mut panel, CarrierResponseBody::Snapshot(Box::new(graph)));
+            send_response(
+                &mut panel,
+                CarrierResponseBody::Resource(chirograph::ResourceResponse::new(
+                    ProjectionSession(MERE_GRAPH.into()),
+                    card_bytes,
+                )),
+            );
+
+            if count == 1 {
+                assert!(!panel.closed);
+                let outgoing = panel.take_outgoing();
+                assert_eq!(outgoing.len(), 1);
+                let request: CarrierRequest = serde_json::from_str(&outgoing[0]).unwrap();
+                assert!(matches!(
+                    request.body,
+                    chirograph::CarrierRequestBody::Resource(resource)
+                        if resource.session.0 == MERE_GRAPH && resource.resource == first_media
+                ));
+            } else {
+                assert!(panel.closed);
+                assert!(
+                    matches!(&panel.model.status, ViewStatus::Unavailable(note) if note.message.contains("exactly one media"))
+                );
+                assert!(panel.take_outgoing().is_empty());
+                assert!(panel.cards.is_empty());
+                assert!(panel.records.is_empty());
+                assert!(panel.inspected.is_none());
+                assert!(panel.transient_layout.is_none());
+                assert!(panel.merge_choices.is_empty());
+                assert!(panel.material.is_none());
+            }
+        }
     }
 
     #[test]

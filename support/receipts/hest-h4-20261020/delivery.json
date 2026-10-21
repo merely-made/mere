@@ -1,0 +1,25 @@
+{
+  "supplier_pushed": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "canonical_knot_pushed": "2cfe1d4a51bbbf54de4e47b20c46ff9456a3f416",
+  "remote_resolution": "Knot cargo update used the canonical HTTPS Git source, then all receiving tests ran locked/offline; no local path overrides or Git seeding.",
+  "late_main_incoming": "52d235927",
+  "late_merge_tested": "da805a080041b4f372621c04d6ec921694044eec",
+  "post_merge_checks": "post-merge-checks.json",
+  "native_acceptance_claimed": false,
+  "pruning": {
+    "repositories": [
+      "mere",
+      "knot-editor"
+    ],
+    "commands": [
+      "git fetch --prune origin",
+      "git worktree prune --verbose"
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "task_branch_or_worktree_removals": 0,
+    "unrelated_worktrees_and_branches_preserved": true
+  }
+}

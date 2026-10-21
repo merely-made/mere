@@ -1,0 +1,192 @@
+{
+  "schema": "hest-h3-git-delivery/v1",
+  "date": "2026-10-20",
+  "qualified_push_snapshot": {
+    "mere": "52690098b5bbba8b4148396a759a624c4f2bd0a3",
+    "knot-editor": "db929c8752c72749463bca775dfe0203489f0ee5",
+    "turnstone": "49e7928d84dca82311a2c681f3de7066e0e6d320"
+  },
+  "pushes": [
+    {
+      "name": "knot-prerequisite",
+      "repository": "knot-editor",
+      "command": [
+        "git",
+        "push",
+        "origin",
+        "ebf10c7410241ae7fca11f100d7e430d7b31ce99:refs/heads/main"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.61,
+      "log": "push-knot-prerequisite.log.gz",
+      "raw_log_sha256": "87a179c7fa61bbcfbcfc3459bd984d8e0c54ef18c31634c072db9039bc6819cc",
+      "stored_log_sha256": "b5f9d8d6c8faeab087124b7cfe4215774f8bff4a6aa048941f535ace7dcfe9af",
+      "compression": "gzip"
+    },
+    {
+      "name": "mere",
+      "repository": "mere",
+      "command": [
+        "git",
+        "push",
+        "origin",
+        "HEAD:refs/heads/main"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.81,
+      "log": "push-mere.log.gz",
+      "raw_log_sha256": "8f49d4388ebfff39c53dd1fa3d55e1a4bbbc23600669925bf13f3ade7a3b91ef",
+      "stored_log_sha256": "35c180c66ca904474dae34e16aff067f7dd80a946d8c07ad18401d1252e28853",
+      "compression": "gzip"
+    },
+    {
+      "name": "knot-final",
+      "repository": "knot-editor",
+      "command": [
+        "git",
+        "push",
+        "origin",
+        "HEAD:refs/heads/main"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.5,
+      "log": "push-knot-final.log.gz",
+      "raw_log_sha256": "2ac25b6ed6c464e83bce3c1546adac74eb795b4695284e92cba1fc9378eb43df",
+      "stored_log_sha256": "7ef5ba31e1ecd6ef752e53f185c2f4a2bf46481a5e1bee5be21090231e35500c",
+      "compression": "gzip"
+    },
+    {
+      "name": "turnstone",
+      "repository": "turnstone",
+      "command": [
+        "git",
+        "push",
+        "origin",
+        "HEAD:refs/heads/main"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.25,
+      "log": "push-turnstone.log.gz",
+      "raw_log_sha256": "c6d9b108d15937d841c397c9d5122f06cfee1ca836d6c77d1af0e884110dc298",
+      "stored_log_sha256": "8c777e1bd79737e76c8ad6aa7c8d2825aa720b2cc1a0a303fca2db6049e97f1d",
+      "compression": "gzip"
+    }
+  ],
+  "remote_receiving": [
+    {
+      "repository": "turnstone",
+      "cloned_head": "49e7928d84dca82311a2c681f3de7066e0e6d320",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 283.96,
+      "git_sources_seeded_locally": false,
+      "registry_download_cache_reused": true,
+      "foreign_path_packages": [],
+      "tested_source_hashes_match": true,
+      "selected_packages": {
+        "hest": [
+          {
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/mere.git?branch=main#9ef5e3026997dce50760ae445da9eedd38a325ac"
+          }
+        ],
+        "cambium": [
+          {
+            "version": "0.5.0",
+            "source": "git+https://github.com/merely-made/mere.git?branch=main#9ef5e3026997dce50760ae445da9eedd38a325ac"
+          }
+        ],
+        "command-menu": [],
+        "netrender": [
+          {
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+          }
+        ],
+        "murm-wire": [
+          {
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
+          }
+        ],
+        "genet-scripted-dom": [
+          {
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#6ef3cd37a785a395670d3b472fb3573665497f29"
+          }
+        ]
+      },
+      "metadata_sha256": "dffadd00f339c5b11c96cc73d38b6c7dce11f73b9dfdbed52fb0193816b2254e",
+      "log": "remote-turnstone-metadata.log.gz",
+      "raw_log_sha256": "003e7253b4c0f4557d5ba97c4d318a22caa9f904c1a93e2858ce391c778966e5",
+      "stored_log_sha256": "1a954353f04215cab65a7d7fb797aa945f4dc906280e300d19a57e49d6b1f10b",
+      "compression": "gzip",
+      "shared_verification_cache_initially_empty": true
+    },
+    {
+      "repository": "knot-editor",
+      "cloned_head": "db929c8752c72749463bca775dfe0203489f0ee5",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.4,
+      "git_sources_seeded_locally": false,
+      "registry_download_cache_reused": true,
+      "foreign_path_packages": [],
+      "tested_source_hashes_match": true,
+      "selected_packages": {
+        "hest": [
+          {
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/mere.git?branch=main#9ef5e3026997dce50760ae445da9eedd38a325ac"
+          }
+        ],
+        "cambium": [
+          {
+            "version": "0.5.0",
+            "source": "git+https://github.com/merely-made/mere.git?branch=main#9ef5e3026997dce50760ae445da9eedd38a325ac"
+          }
+        ],
+        "command-menu": [],
+        "netrender": [
+          {
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+          }
+        ],
+        "murm-wire": [
+          {
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6"
+          }
+        ],
+        "genet-scripted-dom": [
+          {
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#6ef3cd37a785a395670d3b472fb3573665497f29"
+          }
+        ]
+      },
+      "metadata_sha256": "beaced393772eabdbf41447803541bd8f1d81e0d8c76f2db5f9f582cbd3f117b",
+      "log": "remote-knot-editor-metadata.log.gz",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_log_sha256": "f1b651238a58fe290baec6c5e32f3bdb1943dd2bd582f02569231f7a757c7837",
+      "compression": "gzip",
+      "shared_verification_cache_initially_empty": true
+    }
+  ],
+  "cache_scope": "One initially empty Cargo Git cache was shared by the two fresh checkout metadata checks. No Git objects were seeded from local checkouts or the existing Cargo Git cache; only the registry download cache was reused.",
+  "crate_publication": false,
+  "native_gui_or_window_manager_acceptance": false
+}
