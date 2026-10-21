@@ -1,0 +1,10 @@
+{
+  "status": "reviewed",
+  "captures": {
+    "offered.png": "Open in browser visible, Accesses: 0.",
+    "accepted.png": "Owner accepted and browser handoff requested visible; Accesses: 1.",
+    "reopened.png": "Current offer and Accesses: 1 after fresh processes, no redispatch.",
+    "disabled.png": "Empty owner offer with Accesses: 1 preserved."
+  },
+  "scope": "All four whole presented native captures inspected on the reconciled source."
+}

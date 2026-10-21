@@ -1,0 +1,10 @@
+{
+  "status": "reviewed",
+  "captures": {
+    "offered.png": "Selected web record shows Accesses: 0 and Open in browser.",
+    "accepted.png": "Accesses: 1; action remains available; both native notices say Owner accepted and browser handoff requested.",
+    "reopened.png": "Fresh processes preserve Accesses: 1 and the current owner offer; no automatic browser dispatch.",
+    "disabled.png": "Accesses: 1 remains; valid empty offer displays No actions offered by this record\u2019s owner."
+  },
+  "scope": "Host-owned presented native frames; entire captures inspected. No physical input or screen-reader acceptance claim."
+}

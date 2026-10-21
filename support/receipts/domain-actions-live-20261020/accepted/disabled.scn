@@ -1,0 +1,8 @@
+await {"status":"ready","attached":"1d85ee25-eeed-4714-82dd-920c1c801e38"}
+wait 30000
+click role:button @data-key=4bcfb806-bc8e-4d2b-9f1a-a40339475b81
+await {"selected":"4bcfb806-bc8e-4d2b-9f1a-a40339475b81"}
+wait 30000
+wheel 0 10000 px on .mere-record
+settle 2
+capture /Users/markik/Code/output/live-owner-actions-20261020/acceptance-02/disabled.png
