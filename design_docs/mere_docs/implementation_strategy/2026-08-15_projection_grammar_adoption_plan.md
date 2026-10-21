@@ -2262,3 +2262,16 @@ upstream's retained-recall change, so the full native acceptance was repeated
 with frozen binaries. The new browser visit, durable history, cold reopen,
 disabled offer and four reviewed captures all pass. The original 50 receipt
 files remain unchanged. This integration adds no new product decisions.
+
+
+**Publication qualification (2026-10-20).** Tested source `0dacf49a2` includes
+main `e94cb23e8`, the co-op relay/shared-shell integration and H4 command
+adapters. Both independent MereShared handler and relay fields survive the
+merge. All 94 focused tests pass (39 native, 31 resident Mere, 24 settings).
+The independently rebuilt and frozen native host, resident and helper pass a
+fresh complete native run, including one browser visit, durable access history,
+cold reopen without redispatch and disabled-offer behavior. Four new presented
+captures were reviewed. The final packet is
+`support/receipts/domain-actions-live-20261020/publication/`; all 95 original
+and earlier integration receipt files remain unchanged. Intermediate native
+receipts and frozen binaries also remain in the external delivery output.

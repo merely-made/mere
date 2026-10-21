@@ -1,0 +1,14 @@
+{
+  "resident": {
+    "sha256": "719d474c731ea3c16d2177672265a6fb2d06f4bd31739834b8691fdb2072e2fa",
+    "dependency_file_sha256": "2c0be8150907775abcf76bb8c46cc920965a4c7b73f08842f76894cb07d1277f"
+  },
+  "preparation_helper": {
+    "sha256": "7406275eb8b4e0cae49ce8dac296ab217ee82ac14442d815dbb25855ec295719",
+    "dependency_file_sha256": "a1981715a3db10b3948d0eb8d85fa10fd3a90d73a3219995f64720de4b46cc78"
+  },
+  "native_artifact": {
+    "sha256": "4a5fbbb2a22926578552da1611afee88e8b2facc1625a33b2ea2a135f656249c",
+    "dependency_file_sha256": "255fb749b1cf4e9ed7115eeb1da88127b3fc701d1ac209c1e93a3c3bc2999c46"
+  }
+}
