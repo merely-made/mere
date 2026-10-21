@@ -1,0 +1,987 @@
+[
+  {
+    "machine": "owner",
+    "method": "info",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "info",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "start",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "start",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "seed",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "prepare",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "export_contact",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "owner_contact",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "exported_handoff",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "install_handoff",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "marker",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "marker",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "exported_handoff",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "prepare",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "marker",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "marker",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "prepare",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "stop",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "stop",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "start",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "start",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "exported_handoff",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "install_handoff",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "marker",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "prepare",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "launch",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "progress",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "finish",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "prepare",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "stop",
+    "ok": true
+  },
+  {
+    "machine": "owner",
+    "method": "collect",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "stop",
+    "ok": true
+  },
+  {
+    "machine": "guest",
+    "method": "collect",
+    "ok": true
+  }
+]
