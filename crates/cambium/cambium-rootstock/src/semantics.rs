@@ -92,6 +92,7 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
                     id,
                     key,
                     semantics,
+                    layout.scrolled_content_origin(dom, node),
                     &mut result.produced_targets,
                 );
             } else if let Some(leaf) = leaves.get_mut(&key) {
@@ -178,7 +179,9 @@ fn restrict_actions(node: &mut accesskit::Node) {
 }
 
 /// Write a producer's own semantics onto its slot's node, and what it draws
-/// as child nodes placed where it draws them. A drawn node's actions become
+/// as child nodes in the host's current untransformed, scroll-adjusted content
+/// space. Forward CSS transforms and clipping remain a supplier mapping gate.
+/// A drawn node's actions become
 /// its Button children, each taking Click (`producer` is the slot's registry
 /// key, which a reader's click on one names in `produced_map`).
 fn add_producer_semantics(
@@ -186,6 +189,7 @@ fn add_producer_semantics(
     slot: A11yNodeId,
     producer: u64,
     semantics: ProducerSemantics,
+    content_origin: Option<(f64, f64)>,
     produced_map: &mut HashMap<A11yNodeId, ProducedAction>,
 ) {
     let Some(index) = tree.nodes.iter().position(|(id, _)| *id == slot) else {
@@ -201,7 +205,7 @@ fn add_producer_semantics(
         }
         restrict_actions(access);
         (
-            access.bounds().map(|bounds| (bounds.x0, bounds.y0)),
+            content_origin.filter(|_| access.bounds().is_some()),
             access.is_disabled(),
             access.is_hidden(),
         )

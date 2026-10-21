@@ -1,5 +1,76 @@
 # System Diagnostics and Accessibility Plan
 
+## Producer content origin, 2026-10-20
+
+**Status:** bounded content-origin repair qualified on integrated main
+`e94cb23e8`, after the initial `1797a2eed` refresh. Native Hest routing,
+shared-shell/Hest scripting and concurrent co-op/replay changes are preserved.
+Receipt budget remains
+10 MB across this continuation; builds reuse `C:\t\cargo-targets\mere`.
+
+Scope: use Genet's content-box origin for generated producer children and
+action bounds in the host's existing untransformed, scroll-adjusted observation
+space. Done when padded/bordered receiving, nested/document scroll, headless
+sampled pixels, native/browser lowering and Wasm compilation pass with frozen
+source evidence. Keep transform/clip and shadow/slot ancestor placement as
+supplier-owned follow-up rather than recreating CSS placement in Mere.
+
+The pinned `genet-livery::ElementGeometry` exposes content size/origin and inverse
+pointer mapping but no forward semantic bounds query. Its placement query
+collects ancestors through `dom.parent`, whereas paint/discovery consume the
+flattened tree. Rootstock's `painted_rect` and browser mirror also retain
+untransformed boxes. Completing this boundary requires supplier-owned forward
+mapping and an explicit clipping representation, qualified against flattened
+paint scopes and both platform consumers. That broader migration remains open.
+
+### Repair and receiving evidence
+
+Producer pixels and inverse pointer coordinates already use Genet's content
+box, but generated semantic children and their action buttons used the DOM
+slot's border-box corner. Pixel borders/padding therefore displaced semantic
+bounds from the rendered producer. Rootstock now queries the supplier's content
+origin and applies the existing scroll observation, with one composition shared
+by publication and current-target admission. Missing slot or supplier geometry
+does not invent coordinates. `ProducerNode::rect` now explicitly names content
+pixels, matching `ProducerFrameInfo::logical_size`.
+
+Before-repair runtime controls fail by twelve layout pixels in both axes,
+including a headless GPU fixture whose sampled image is already painted at the
+correct content position. The browser control fails by twenty-four CSS pixels
+at 2x scale. Three repaired controls pass for sampled GPU pixels, both document
+and ancestor scroll planes, and relative browser boxes with scale applied once.
+The native fixture also includes actual border/padding and verifies child/action
+rectangle equality before mapping an AccessKit request to producer dispatch.
+
+This repair does not supply forward transforms, path clipping or flattened
+ancestor placement. Existing percentage-padding interpretation is inherited
+from Genet; the receiving controls qualify pixel padding and borders.
+
+### Qualification
+
+The final integrated cohort passes 115 targeted native tests with five existing
+ignores, plus browser-host Wasm compilation: producer lifecycle 41/one ignore,
+shared semantics seven, admission seven and native/browser/session receiving
+60/four ignores. The initial `1797a2eed` cohort has the same results and remains
+separate; it is not added to the final count. Before-repair failures remain
+separate from repaired receiving.
+
+`support/family-promotion/diagnostics-content-origin-qualification.json` records
+the source/lock seals, both cohorts, executed native binary hashes and the
+receiving boundary. The `before` and `before-rootstock` receipts retain the
+three expected runtime failures. The `final-check` record preserves document
+checks, unchanged sealed audit registers and the aggregate receipt budget.
+All runs reuse the existing Cargo target; no isolated output was created.
+This qualifies pixel border/padding, sampled headless RGBA, native action
+mapping and browser mirror plans. It does not qualify browser runtime, headed
+interaction, human AT or the supplier forward-placement migration above.
+
+Publication integration preserves concurrent live owner-action delivery at
+merge `7c9bc885e`. The tested source/manifests still match the integrated seal;
+the sole later lock change adds the existing `url` dependency to the separate
+`graphshell-mere` product. `diagnostics-content-origin-publication.json` records
+that comparison separately; it does not replace or recount the test cohorts.
+
 ## Flattened producer discovery, 2026-10-20
 
 **Status:** flattened discovery qualified on source-frozen main `24b079538`.
@@ -131,9 +202,11 @@ nonfinite or negative producer rectangles produce no accessibility bounds.
 - At this cohort's basis, producer render discovery used OwnedLayout's light-DOM
   walk while semantic discovery was flattened. The continuation above repairs
   that discovery gap. Render/input also use Genet's content origin,
-  transforms and clips; generated semantic bounds still offset the projected
-  slot rectangle. Padded/transformed/clipped placement and shadow/slot ancestor
-  geometry still need one supplier-qualified mapping and receiving controls.
+  transforms and clips; this cohort's generated semantic bounds offset the
+  projected slot rectangle. The content-origin continuation above repairs the
+  border/padding offset in existing scroll-adjusted observation space. Forward
+  transformed/clipped placement and shadow/slot ancestor geometry still need
+  one supplier-qualified mapping and receiving controls.
   Consolidating the two old lowerings does not qualify their geometric premise.
 - ARIA maps the known DOM and contributor roles. Other AccessKit roles remain
   generic; this does not qualify arbitrary leaf roles, clipping/pixel parity,

@@ -196,7 +196,11 @@ pub struct ProducerNode {
     pub role: ProducerRole,
     pub name: String,
     /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
-    /// (layout) pixels, from the slot's top-left corner.
+    /// (layout) pixels, from the content-box top-left corner, matching
+    /// `ProducerFrameInfo::logical_size` and content-local pointer coordinates.
+    /// The host currently publishes untransformed, scroll-adjusted bounds;
+    /// forward CSS transform/clip and flattened-ancestor placement remain
+    /// unqualified.
     pub rect: [f32; 4],
     /// What a reader may do to it, each lowered to a button of its own
     /// ([`TextureProducer::act`] carries one out).

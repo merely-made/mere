@@ -1,0 +1,268 @@
+{
+  "date": "2026-10-20",
+  "basis": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "scope": "Producer content origin in existing untransformed, scroll-adjusted semantic observation",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "cohorts": [
+    {
+      "basis": "1797a2eed829def9d155af7a7c75a738f133675a",
+      "source_seal": "diagnostics-content-origin-source.json",
+      "targeted_native_passes": 115,
+      "existing_ignores": 5,
+      "gates": [
+        {
+          "receipt": "diagnostics-content-origin-producers.json",
+          "sha256": "3f0ac8f70e76c62e26f525359636bac5d79507ba83c5b5114e02c6b85dc330ba",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "producer::",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-semantics.json",
+          "sha256": "3a6344d07964e94c45eedb317b91110b74ca7ddfea0835259f29b22016df2578",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "semantics::tests",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-admission.json",
+          "sha256": "7334a4fab8117c08516307dc2774f4a4e964616f37d614e724c2fa6387cf1e01",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "accessibility_tests",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-platform.json",
+          "sha256": "83417b40005345d0fe90e8955cf9df0cd51057b23aca8fdfd65c0625e819d629",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "--test",
+            "accessibility",
+            "--test",
+            "e1a_sessions"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-wasm.json",
+          "sha256": "683b689bdf632d93a14929944eaf1ec22d44eec5d864daba9a47711e8dcd7506",
+          "command": [
+            "cargo",
+            "check",
+            "--locked",
+            "-p",
+            "cambium-genet-web-host",
+            "--no-default-features",
+            "--target",
+            "wasm32-unknown-unknown"
+          ],
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "basis": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+      "source_seal": "diagnostics-content-origin-source-integrated.json",
+      "targeted_native_passes": 115,
+      "existing_ignores": 5,
+      "gates": [
+        {
+          "receipt": "diagnostics-content-origin-integrated-producers.json",
+          "sha256": "05227e71d2fc16b5726d599dcf038d99bbe89375c1d35007876a365eb41babe0",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "producer::",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-integrated-semantics.json",
+          "sha256": "5094ad13298db3f5026246c25fe1becb78dcfb1bb27755d4199611ffff56525a",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "semantics::tests",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-integrated-admission.json",
+          "sha256": "ce0b8d0303cf67f7fcbeae705cce8126849e504b2a2b697493283f87e572229a",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-rootstock",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "accessibility_tests",
+            "--",
+            "--test-threads=1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-integrated-platform.json",
+          "sha256": "83391d81ec9016750fa2895c40c37c199f5183934ba0e6cee72f5a0b65e7a66f",
+          "command": [
+            "cargo",
+            "test",
+            "--locked",
+            "-p",
+            "cambium-genet-web-host",
+            "-p",
+            "cambium-winit-a11y",
+            "-p",
+            "cambium-genet-winit-host",
+            "--lib",
+            "--test",
+            "accessibility",
+            "--test",
+            "e1a_sessions"
+          ],
+          "exit_code": 0
+        },
+        {
+          "receipt": "diagnostics-content-origin-integrated-wasm.json",
+          "sha256": "62d37b2f25edb095303171de5b409daff355a7f6438ba85ba13d3efb7a4ced4e",
+          "command": [
+            "cargo",
+            "check",
+            "--locked",
+            "-p",
+            "cambium-genet-web-host",
+            "--no-default-features",
+            "--target",
+            "wasm32-unknown-unknown"
+          ],
+          "exit_code": 0
+        }
+      ]
+    }
+  ],
+  "final_targeted_native_passes": 115,
+  "final_existing_ignores": 5,
+  "cohorts_are_not_additive": true,
+  "development_receipts": [
+    "diagnostics-content-origin-before-source.json",
+    "diagnostics-content-origin-before.json",
+    "diagnostics-content-origin-before-rootstock.json",
+    "diagnostics-content-origin-repair.json"
+  ],
+  "before_evidence": "Three runtime failures: 12 layout pixel displacement, 24 CSS pixel displacement at browser 2x scale; headless producer image already paints at correct padded content position.",
+  "repair_evidence": "Three repair controls pass. Final platform native fixture also verifies padded child/action bounds and producer dispatch.",
+  "receiving_evidence": [
+    "Pixel borders and padding, producer logical extent, actual headless RGBA samples at content and border positions",
+    "Document and nested scroll planes; inverse producer pointer coordinate agreement",
+    "Native child/action bounds and AccessKit request mapping to producer dispatch",
+    "Browser relative child/action boxes and scale applied exactly once"
+  ],
+  "executed_native_binary_sha256": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-2273349d02cf466b.exe": "52c6e7052b9c136d997a1fd25ab5a3ed60951837b9a2535b0792f6f7cd7ec6d2",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-56f94a9ce355cb5d.exe": "42681fbd44284a95b79e9fcf077bd8deb2b5f2fd2e26f9962859b922e96d5a59",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-e372f7f3ed456408.exe": "348a9a9b0959f969dab78b45dbd6447efa9e167f04cf0f0de8b4993c0ed9c10a",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-662143e96433e173.exe": "66e76fa2adb5b0d1eba10c1fc97b4eb822655ab3e39d6e935dc6e873a859cced",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-4f747cdd5ec6d9ee.exe": "d36a660d85c893c265b1639d1713d13e4b7991f63134065a7cc0561bdac3fafd",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-eeb9f4d905241ba4.exe": "f386851240cd5da49604f4ae1e598e2d59bdbfe1ae10ecb807e977def14d50fa",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-9bb5b3ed00e95546.exe": "4d35c9d0b110edd42506927b58f0b051ccc245d839657b5bd4f8bc0f097b1c25",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-ca955e8978e01b83.exe": "f16da97fcf9e8d6e24b0a0a0becd86f7df19601bc73a969d24e3e30407b1c941",
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-b0a270e6c3c5aa20.exe": "4d17ce5ad8be29dd41a358713b83e43e47ee7f388606d2aa255da51f7a71e864"
+  },
+  "target": "C:\\t\\cargo-targets\\mere",
+  "build_dir": "C:\\t\\cargo-targets\\mere\\build",
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "limits": [
+    "Sampled axis-aligned headless receiving; no browser-runtime/headed/human AT acceptance",
+    "Full forward transforms, rectangular/path clips and flattened shadow/slot ancestor mapping remain supplier work",
+    "Percentage-padding interpretation inherits the existing supplier fragment-width basis; controls qualify pixel padding",
+    "Read-only contributed observations, selector adoption, target lifetimes and broader action vocabulary remain open"
+  ],
+  "sealed_audit_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256"
+}

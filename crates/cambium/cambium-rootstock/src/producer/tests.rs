@@ -213,6 +213,16 @@ fn pixel(
     dom: &ScriptedDom,
     layout: &mut OwnedLayout,
 ) -> [u8; 4] {
+    pixel_at(surface, registry, dom, layout, (2, 2))
+}
+
+fn pixel_at(
+    surface: &TestSurface,
+    registry: &ProducerRegistry,
+    dom: &ScriptedDom,
+    layout: &mut OwnedLayout,
+    point: (usize, usize),
+) -> [u8; 4] {
     let list = layout.emit_paint_list_with_leaves(
         dom,
         DeviceIntSize::new(160, 120),
@@ -238,7 +248,7 @@ fn pixel(
         .core()
         .read_rgba8_texture(&texture, 160, 120)
         .unwrap();
-    frame.rgba[(2 * 160 + 2) * 4..(2 * 160 + 2) * 4 + 4]
+    frame.rgba[(point.1 * 160 + point.0) * 4..(point.1 * 160 + point.0) * 4 + 4]
         .try_into()
         .unwrap()
 }
@@ -688,4 +698,66 @@ fn gpu_flat_tree_tests_receive_shadow_and_slotted_pixels_and_retire_removed_slot
             [0, 0, 0, 255]
         );
     }
+}
+
+#[test]
+fn gpu_content_origin_tests_semantic_child_sits_on_the_padded_producer_pixels() {
+    struct Described(Rc<RefCell<Producer>>);
+    impl TextureProducer for Described {
+        fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
+            self.0.borrow_mut().render(cx)
+        }
+        fn semantics(&mut self) -> Option<ProducerSemantics> {
+            Some(ProducerSemantics {
+                children: vec![ProducerNode {
+                    key: 40,
+                    role: ProducerRole::Image,
+                    name: "Patch".into(),
+                    rect: [1.0, 1.0, 3.0, 2.0],
+                    actions: vec![],
+                }],
+                ..Default::default()
+            })
+        }
+    }
+    let surface = surface();
+    let (dom, mut layout, _) = fixture(
+        "custom-leaf {position:absolute;display:block;left:20px;top:20px;width:8px;height:6px;padding:7px;border:5px solid black;color:rgb(64,128,192)}",
+    );
+    let producer = Rc::new(RefCell::new(Producer::default()));
+    let mut registry = ProducerRegistry::new();
+    registry
+        .register(7, Described(producer.clone()), &["color"])
+        .unwrap();
+    assert_eq!(
+        registry.prepare(&surface, &layout, &dom, 1.0).render_calls,
+        1
+    );
+    assert_eq!(producer.borrow().frames[0].logical_size, (8.0, 6.0));
+    assert_eq!(
+        pixel_at(&surface, &registry, &dom, &mut layout, (34, 34)),
+        [64, 128, 192, 255]
+    );
+    assert_eq!(
+        pixel_at(&surface, &registry, &dom, &mut layout, (22, 22)),
+        [0, 0, 0, 255]
+    );
+    let projection = crate::project_semantics(
+        &dom,
+        &layout,
+        &mut crate::LeafRegistry::new(),
+        &mut registry,
+        None,
+    );
+    let patch = &projection
+        .tree
+        .nodes
+        .iter()
+        .find(|(_, n)| n.label() == Some("Patch"))
+        .unwrap()
+        .1;
+    assert_eq!(
+        patch.bounds(),
+        Some(accesskit::Rect::new(33.0, 33.0, 36.0, 35.0))
+    );
 }
