@@ -2057,3 +2057,125 @@ development override, with both consumer lockfiles refreshed. Its published
 provider resolution, locked checks and browser evidence are recorded at
 `ports/graphshell/docs/receipts/notation_publication_20261020/`. The read-only
 viewer continues to exclude the musical packages.
+
+### Current owner actions on bound views (2026-10-20)
+
+**Status (2026-10-20):** runtime adapter and native selected-record controls
+implemented and reconciled with the canonical Hest worker; 128 focused tests
+and portable-client checks passed for Git integration. Headed UI and a
+configured live product action remain separate acceptance gates.
+
+The maintainer chose the owner's current actions for selected content first,
+leaving recipes unchanged. If an owner cannot identify the exact target for
+an occurrence, its actions are unavailable. The roster remains the existing
+way to select graph objects; this connection adds no target chooser.
+The first visible owner integration is the Mere graph already available to
+Graphshell, as chosen by the maintainer; Woodshed remains a later consumer.
+
+**Findings.** `scenograph::SourceBinding` records descriptive source identity;
+`RuntimeSourceBinding<W>` carries an opaque host witness without serialization.
+The compiler's item IDs and a Chirograph owner's item IDs belong to different
+projections. A `SourceRef` can occur repeatedly, so finding the first matching
+source or the first same-named action is insufficient. Chirograph already
+carries owner offers, bounded forms, exact target observations and dispatch
+results. Its Hest bridge preserves schema/effect checks and does not turn
+dispatch acceptance into terminal completion.
+
+The Graphshell host adapter in `ports/graphshell/src/bound_actions.rs` borrows
+one endpoint's `SessionCore` and an explicitly supplied runtime source binding
+whose witness maps occurrence IDs to exact owner targets. It checks the view's
+source, selected occurrence and target source before reading that target's
+current supported offers. No owner is discovered or authenticated from imported
+source names. The integrating host must obtain the association from its known
+owner; a scripted fixture does not qualify that product integration.
+
+The existing `SessionCore::invoke` and `submit_action_draft` paths now use
+`submit_command`: it rechecks the current offer, live status and active target,
+uses Chirograph's Hest invocation bridge, and preserves the command's original
+epoch/revision for the owner's stale check.
+Viewer-local actions retain their separate route. Owner authorization,
+confirmation and enactment remain with the owner. No wire format, recipe field,
+permission model, command vocabulary or shared crate is introduced.
+
+The native Graphshell selected-record panel reads its offers from the admitted
+`MereRouteSession`. That controller already validates graph material against
+the application, attached session and acknowledged position. Its new
+`record_actions` method requires one exact active graph record and keeps the
+synthetic session item out of record actions. The native panel keeps choices
+in the existing `ActionForm`, sends existing Hest invocation data through its
+worker, and preserves owner refusal/stale feedback. Acceptance is worded
+“Request accepted by the owner”, with no terminal completion claim.
+
+The domain-specific address action uses the existing `OpenAddressV1` schema;
+bounded forms retain the owner's fields and exact opaque choices. The resident
+currently constructs an empty `HandlerRegistry`, so ordinary graph records may
+offer no actions. The UI distinguishes that valid empty offer from an unavailable
+owner. This pass configures no handlers and adds no native application launch.
+
+Qualification phases and done-conditions:
+
+1. Exact-target connection: prove repeated source appearances can expose
+   different current offers despite different compiled/owner IDs; retain the
+   existing form values, command contract and wire target unchanged.
+2. Refusal and lifetime checks: prove missing/wrong mappings, changed selection,
+   changed offers, unsupported presentations and disconnected owners do not
+   invoke; preserve owner refusal/stale results and pending acceptance.
+3. Regression and persistence boundary: run the existing client and local
+   projection checks; prove ordinary projection snapshots contain no runtime
+   owner session or action data. Record focused evidence separately from any
+   future headed host acceptance.
+4. Native Mere receiving path: prove record selection exposes the owner's exact
+   target after the synthetic session item; exercise current offers, existing
+   address payloads and bounded choices through the native worker and admitted
+   route controller, including refusal and changed-target checks.
+
+**Initial qualification (2026-10-20):** the adapter and focused scripted-endpoint
+tests were implemented together with the native Mere receiving path, recorded
+in source checkpoint `ac099b385`. Locked,
+offline checks passed with Rust 1.99.1 and debug information disabled:
+
+- 6 bound-action tests, including actual mutation/refusal/stale behavior in
+  Graphshell's existing endpoint fixture, repeated-source targets, changed
+  offers, stale forms and mismatched compiled/disclosed sources;
+- 3 existing local projection save/reopen tests;
+- all 78 client library and 6 Mere-route library tests;
+- all 20 native Graphshell Mere tests, including actual Genet button/form
+  dispatch, existing typed address payloads, exact owner-target forwarding
+  after the hidden session item, owner refusal, and the existing framed-door
+  receiving checks;
+- the shared client's `wasm32-unknown-unknown` check, the web consumer's locked
+  offline metadata resolution, source formatting and whitespace checks.
+
+Source hashes, commands, final outputs and acceptance limits are recorded in
+`Code/output/domain-action-bindings-20261020/receipt.json`. These are source,
+headless UI and protocol checks, not headed rendering, screen-reader, configured
+live-handler or second-product qualification. The canonical-worker continuation
+below supersedes this initial integration status.
+
+The generic projection editor's imported fixture table still has
+no live owner association; this pass does not claim editing through a live
+Woodshed owner. New direct Hest dependencies use its existing package and do
+not change the wire or recipe serialization.
+
+#### Canonical worker reconciliation (2026-10-20)
+
+Upstream's native Hest worker landed while this connection was being qualified.
+The integrated implementation keeps that worker's `WorkerCommand` /
+`WorkerReply` envelope, one request-generation allocator and persistent refusal
+handling. Record actions add their runtime target context beside the existing
+Hest invocation; they retain the owner's declaration and are not recoded as
+local Mere-view commands. Both command origins use the same send path.
+
+The worker checks the supplied owner declaration through Chirograph's existing
+bridge, then the admitted route rechecks the actual current offer and exact
+selected target before dispatch. An unrelated automatic reading cannot settle
+a pending owner request. The receiving tests cover that generation boundary
+and reject changed owner command IDs, schemas and effects before dispatch.
+
+The integrated check runs pass: 78 client tests, 7 Mere-route tests, 6 bound-action
+tests, 3 existing projection save/reopen tests and 34 native Graphshell Mere
+tests. The client Wasm check, web locked/offline metadata resolution, port
+dependency boundaries, source formatting and whitespace checks also pass.
+The tracked [qualification receipt](../../../support/receipts/domain-actions-20261020/qualification.json)
+pins source hashes, commands and compressed final logs. It preserves the same
+headless/protocol and live-handler limits as the initial qualification.
