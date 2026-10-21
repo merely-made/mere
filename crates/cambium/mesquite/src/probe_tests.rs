@@ -171,3 +171,269 @@ fn wheel_surface_refusal_and_owner_effect_survive_independent_diagnostic_reads()
     assert_eq!(records[0]["envelope"]["metadata"]["operation"], "wheel:1");
     assert!(records[0]["envelope"]["metadata"]["presented_frame"].is_null());
 }
+
+#[test]
+fn selector_tests_probe_routes_generated_actions_and_observes_declines() {
+    use cambium_rootstock::{
+        ProducedTexture, ProducerAction, ProducerContext, ProducerNode, ProducerRole,
+        ProducerSemantics, TextureProducer,
+    };
+    type V = Box<dyn AnyView<u32, (), GenetCtx, GenetElement>>;
+    fn view(state: &u32) -> V {
+        Box::new(el(
+            "main",
+            (
+                cambium::clickable(
+                    el("button", "Pin selected in workbench"),
+                    |s: &mut u32, _| *s += 1,
+                ),
+                cambium::custom_leaf::<u32, ()>(7, 80, 30)
+                    .attr("aria-hidden", (*state > 0).to_string()),
+                cambium::custom_leaf::<u32, ()>(8, 80, 30),
+            ),
+        ))
+    }
+    struct ProductFixture;
+    impl Product for ProductFixture {
+        type State = u32;
+        type Logic = fn(&u32) -> V;
+        type View = V;
+        const KIND: &'static str = "semantic-receiving";
+        const SURFACE: &'static str = "local";
+        const LOG_PREFIX: &'static str = "semantic-test";
+        fn sheet(&self) -> &str {
+            "main,button,custom-leaf {display:block;width:80px;height:30px}"
+        }
+        fn snapshot(&self, _: &Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+            ProbeSnapshot::default()
+        }
+    }
+    struct Board {
+        calls: Rc<Cell<u32>>,
+        accepted: Rc<Cell<bool>>,
+        offered: Rc<Cell<bool>>,
+    }
+    impl TextureProducer for Board {
+        fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+            None
+        }
+        fn semantics(&self) -> Option<ProducerSemantics> {
+            Some(ProducerSemantics {
+                children: vec![ProducerNode {
+                    key: 41,
+                    role: ProducerRole::ListItem,
+                    name: "Card".into(),
+                    rect: [0., 0., 40., 20.],
+                    actions: if self.offered.get() {
+                        vec![ProducerAction {
+                            id: "pin".into(),
+                            label: "Pin selected".into(),
+                            description: "Pin".into(),
+                        }]
+                    } else {
+                        vec![]
+                    },
+                }],
+                ..Default::default()
+            })
+        }
+        fn act(&mut self, key: u64, id: &str) -> bool {
+            assert_eq!((key, id), (41, "pin"));
+            self.calls.set(self.calls.get() + 1);
+            self.accepted.get()
+        }
+    }
+    let calls = Rc::new(Cell::new(0));
+    let accepted = Rc::new(Cell::new(true));
+    let offered = Rc::new(Cell::new(true));
+    let mut state: HostState<u32, fn(&u32) -> V, V> = HostState::new();
+    let lane = Rc::new(RefCell::new(Lane::new(
+        ProductFixture,
+        None,
+        None,
+        None,
+        Rc::new(Cell::new(0)),
+    )));
+    state.shared.sheet = lane.borrow().product.sheet().into();
+    state
+        .shared
+        .producers
+        .register(
+            7,
+            Board {
+                calls: calls.clone(),
+                accepted: accepted.clone(),
+                offered: offered.clone(),
+            },
+            &[],
+        )
+        .unwrap();
+    // A leaf-only slider; its DOM seed has no slider role.
+    state.shared.leaves.insert(
+        8,
+        Box::new(sprigging::Knob::new(sprigging::Size {
+            width: 80.,
+            height: 30.,
+        })),
+    );
+    state.runner = Some(Runner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as fn(&u32) -> V,
+        0,
+    ));
+    let stage = Rc::new(Cell::new(0));
+    let results = Rc::new(RefCell::new(Vec::new()));
+    let (driving, step, saved, current_offer) = (
+        lane.clone(),
+        stage.clone(),
+        results.clone(),
+        offered.clone(),
+    );
+    let mut hooks = HostHooks::inert();
+    hooks.after_frame = Box::new(move |ctx| {
+        let mut lane = driving.borrow_mut();
+        let selector = Selector::role("button").containing("Pin selected");
+        match step.get() {
+            0 | 2 | 5 => {
+                let mut probe = Probe {
+                    ctx,
+                    lane: &mut lane,
+                };
+                let before = probe.lane.misses.borrow().len();
+                assert!(
+                    probe
+                        .resolve(&Selector::role("button").containing("absent target"))
+                        .is_none()
+                );
+                assert_eq!(
+                    probe.lane.misses.borrow().len(),
+                    before,
+                    "read-only point misses are not failed interactions"
+                );
+                assert!(matches!(
+                    probe.selector_target(&Selector::role("slider")),
+                    SelectorTarget::Hit(_)
+                ));
+                assert!(
+                    probe
+                        .resolve(&Selector::role("slider").on_surface("foreign"))
+                        .is_none()
+                );
+                assert!(probe.click(&selector.clone().on_surface("local")));
+                assert!(
+                    probe.ctx.pointer.is_empty(),
+                    "virtual buttons use semantic routing"
+                );
+                if step.get() == 5 {
+                    current_offer.set(false);
+                }
+            },
+            1 | 3 | 6 => saved.borrow_mut().push(
+                lane.clicks
+                    .after_frame(ctx, |_, _, _| panic!("no pointer for virtual actions")),
+            ),
+            4 => {
+                let mut probe = Probe {
+                    ctx,
+                    lane: &mut lane,
+                };
+                assert_eq!(probe.click_target(&selector), Some(true));
+            },
+            _ => unreachable!(),
+        }
+    });
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut host = Host::new(HostOptions::default(), None, hooks, state, wake);
+    host.set_surface_size(320., 240.);
+    host.relayout(320., 240.);
+    host.with_ctx(Hook::AfterFrame);
+    assert_eq!(calls.get(), 1);
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+    stage.set(1);
+    host.with_ctx(Hook::AfterFrame);
+    assert!(matches!(results.borrow()[0], Ok(true)));
+    accepted.set(false);
+    stage.set(2);
+    host.with_ctx(Hook::AfterFrame);
+    assert_eq!(calls.get(), 2);
+    stage.set(3);
+    host.with_ctx(Hook::AfterFrame);
+    assert!(
+        results.borrow()[1]
+            .as_ref()
+            .unwrap_err()
+            .contains("ProducerDeclined")
+    );
+    offered.set(false);
+    stage.set(4);
+    host.with_ctx(Hook::AfterFrame);
+    assert_eq!(
+        calls.get(),
+        2,
+        "a removed action cannot reuse its old route"
+    );
+    assert_eq!(
+        *host.s.runner.as_ref().unwrap().state(),
+        1,
+        "remaining prefix is the native DOM button"
+    );
+    // Admission must re-read an offer withdrawn after matching but before drain.
+    offered.set(true);
+    accepted.set(true);
+    host.s.runner.as_mut().unwrap().update(|state| *state = 0);
+    host.relayout(320., 240.);
+    stage.set(5);
+    host.with_ctx(Hook::AfterFrame);
+    assert_eq!(
+        calls.get(),
+        2,
+        "withdrawn queued action must not reach the producer"
+    );
+    stage.set(6);
+    host.with_ctx(Hook::AfterFrame);
+    assert!(
+        results.borrow()[2]
+            .as_ref()
+            .unwrap_err()
+            .contains("Unsupported")
+    );
+    // Scoped virtual clicks must not be recorded as pointer misses. Both
+    // accepted and declined last actions pass through the actual scenario lane.
+    for accepts in [true, false] {
+        offered.set(true);
+        accepted.set(accepts);
+        host.s.close_requested = false;
+        host.s.runner.as_mut().unwrap().update(|state| *state = 0);
+        host.relayout(320., 240.);
+        let exit = Rc::new(Cell::new(0));
+        let completion = Rc::new(RefCell::new(Lane::new(
+            ProductFixture,
+            Some(
+                taproot::Scenario::parse("click surface:local role:button Pin selected\n").unwrap(),
+            ),
+            None,
+            None,
+            exit.clone(),
+        )));
+        let drive = completion.clone();
+        host.hooks.after_frame = Box::new(move |ctx| drive.borrow_mut().after_frame(ctx));
+        host.with_ctx(Hook::AfterFrame);
+        assert!(!host.s.close_requested);
+        host.with_ctx(Hook::AfterFrame);
+        assert!(!host.s.close_requested);
+        host.with_ctx(Hook::AfterFrame);
+        assert!(host.s.close_requested);
+        assert_eq!(exit.get(), if accepts { 0 } else { 1 });
+        if accepts {
+            assert!(completion.borrow().errors.is_empty());
+        } else {
+            assert!(
+                completion
+                    .borrow()
+                    .errors
+                    .iter()
+                    .any(|e| e.contains("ProducerDeclined"))
+            );
+        }
+    }
+}

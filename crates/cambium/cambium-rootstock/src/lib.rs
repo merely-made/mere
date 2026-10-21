@@ -311,6 +311,32 @@ pub enum A11yRejection {
     InvalidValue,
 }
 
+/// Routing acknowledgement for one queued semantic request. Only the host
+/// writes this result; `Dispatched` does not claim application completion.
+#[derive(Clone)]
+pub struct A11yReceipt(std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>);
+impl A11yReceipt {
+    pub fn result(&self) -> Option<A11yDispatch> {
+        self.0.get()
+    }
+}
+pub(crate) struct QueuedA11y {
+    pub request: A11yRequest,
+    pub reply: std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>,
+}
+impl QueuedA11y {
+    pub fn new(request: A11yRequest) -> (Self, A11yReceipt) {
+        let reply = std::rc::Rc::new(std::cell::Cell::new(None));
+        (
+            Self {
+                request,
+                reply: reply.clone(),
+            },
+            A11yReceipt(reply),
+        )
+    }
+}
+
 /// One drained screen-reader request: which action, on what.
 #[derive(Clone, Debug, PartialEq)]
 pub struct A11yRequest {

@@ -333,15 +333,16 @@ compilation. The
 keeps immutable observations, target generations and report/collector adoption
 open; the stable ID hash is not a generation token or collision-free allocator.
 
-Read-only observation foundation (2026-10-21): contributor callbacks and shared
-composition now use shared borrows. AppCtx/Harness expose the same contributed
-projection, and Graphshell's content owner allocates keys during admitted frames
-rather than during reads. The real Knot/resident split is repaired through Knot
-`b8d0e2f`, keeping one prepared Cambium 0.6/Sprigging 0.3 family. Publication and
-other product adoption remain separate. The
-[ordered migration gates](2026-06-08_system_diagnostics_and_accessibility_plan.md#ordered-ownership-migrations-2026-10-21)
-retain supplier selector intake, target lifetimes, broader action routing and
-forward geometry; the first migration is not yet complete.
+Read-only observation and selector continuation (2026-10-21): provider callbacks
+and composition use shared borrows; the content owner allocates retained keys.
+Taproot's borrowed lookup now receives leaf/producer contributions in the Harness
+and Mesquite, with explicit generated target identity and host-written routing
+acknowledgements. The browser and selector role-spelling duplication is retired
+through an optional contract bridge without adding a renderer dependency to
+Taproot. Exact qualification and remaining acceptance are recorded in the
+[shared selector receiving](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-selector-receiving-2026-10-21)
+section. Registry publication and other product adoption remain separate. Target
+lifetimes are next, followed by broader actions and supplier forward geometry.
 
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),

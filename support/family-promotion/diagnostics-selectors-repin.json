@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "-p",
+    "taproot",
+    "--precise",
+    "0d70f902d6e"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/mere",
+  "started": "2026-10-21T07:56:15.595495+00:00",
+  "finished": "2026-10-21T08:01:07.565567+00:00",
+  "exit_code": 4294967295,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/genet.git`"
+  ],
+  "diagnostic_tail": "    Updating git repository `https://github.com/merely-made/genet.git`\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

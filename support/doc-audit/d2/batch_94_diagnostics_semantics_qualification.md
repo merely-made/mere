@@ -3,8 +3,8 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Read-only provider/accessor foundation implemented; first selector gate and later migrations open" - accurate: yes
-- claims checked: 6 - holds: 6, stale: 0, unverifiable: 0
+- status line: "Shared observation and selector intake qualified; lifetimes, broader actions and geometry open" - accurate: yes
+- claims checked: 9 - holds: 9, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -167,3 +167,28 @@ A separate integration record qualifies the affected resident, retained product
 and actual Graphshell Wasm entry point; it does not relabel the original 537
 native passes as a rerun on the merged lock. Historical narrow-lock evidence
 remains valid for its frozen cohort, not a promise to hold later main repins.
+
+### Shared selector intake, 2026-10-21
+
+Taproot owns borrowed lookup adapters over the DOM seed and complete contributed
+observation. The former follows flat traversal and the latter publication child
+order. Consumers retain exact-name preference, aliases and shallow DOM class
+semantics. Generated targets have no fabricated DOM identity or inherited slot
+attributes. Harness and Mesquite use shared composition and current host action
+admission; a producer refusal or withdrawn offer is observed through the routing
+result, not inferred from successful queueing.
+
+One optional document-session-api spelling bridge replaces the independent
+browser table and serves the selector adapter. Taproot's normal dependencies
+remain independent of the renderer. The first attempted supplier placement was
+narrowed before final Mere receiving to preserve this boundary. Shared receivers
+are not a proof against arbitrary interior mutation, provider lifetime leases,
+full forward geometry or application completion.
+
+Supplier and consumer preparation, negative controls and final source-frozen
+qualification are named separately in diagnostics-selectors-qualification.json.
+The scenario fixture initially assumed a wrong tick count; the existing normal
+completion path is preserved. There is no claimed last-step completion repair.
+The original read-only and earlier identity cohorts retain their source identities.
+Cross-product registry publication, target generations, broader Hest routing,
+full supplier placement, headed/browser-runtime and human AT gates remain open.

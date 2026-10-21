@@ -40,4 +40,5 @@ postcard = { version = "1", default-features = false, features = ["alloc"] }
 png = "0.17"
 
 [dev-dependencies]
+sprigging = { workspace = true }
 taproot = { workspace = true, features = ["estimated-probe-fixtures"] }

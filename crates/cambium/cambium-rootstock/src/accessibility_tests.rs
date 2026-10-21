@@ -602,3 +602,97 @@ fn action_admission_gives_context_sensitive_leaf_the_published_seed() {
     );
     assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
 }
+
+#[test]
+fn selector_tests_queued_actions_acknowledge_current_admission_per_request() {
+    let mut host = counter_host();
+    let replies = Rc::new(RefCell::new(Vec::new()));
+    let saved = replies.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        let node = p.dom_node(id.0).unwrap();
+        for _ in 0..2 {
+            let receipt = ctx.queue_a11y(crate::A11yRequest::node(crate::A11yAction::Click, node));
+            assert_eq!(receipt.result(), None, "queueing is not routing acceptance");
+            saved.borrow_mut().push(receipt);
+        }
+        assert_eq!(*ctx.runner.state(), 0);
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 1);
+    let replies = replies.borrow();
+    assert_eq!(replies[0].result(), Some(crate::A11yDispatch::Dispatched));
+    assert_eq!(
+        replies[1].result(),
+        Some(crate::A11yDispatch::Rejected(
+            crate::A11yRejection::Disabled
+        ))
+    );
+}
+
+#[test]
+fn selector_tests_post_dispatch_semantic_requests_wait_for_the_next_batch() {
+    let mut host = counter_host();
+    let replies = Rc::new(RefCell::new(Vec::new()));
+    let saved = replies.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        saved
+            .borrow_mut()
+            .push(ctx.queue_a11y(crate::A11yRequest::node(
+                crate::A11yAction::Focus,
+                p.dom_node(id.0).unwrap(),
+            )));
+    });
+    let saved = replies.clone();
+    let once = Rc::new(std::cell::Cell::new(false));
+    host.hooks.after_dispatch = Box::new(move |ctx| {
+        if once.replace(true) {
+            return;
+        }
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        saved
+            .borrow_mut()
+            .push(ctx.queue_a11y(crate::A11yRequest::node(
+                crate::A11yAction::Focus,
+                p.dom_node(id.0).unwrap(),
+            )));
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    assert_eq!(replies.borrow().len(), 2);
+    assert_eq!(
+        replies.borrow()[0].result(),
+        Some(crate::A11yDispatch::Dispatched)
+    );
+    assert_eq!(
+        replies.borrow()[1].result(),
+        None,
+        "post-dispatch hooks cannot recursively drain semantic actions"
+    );
+    host.drain_pointer();
+    assert_eq!(
+        replies.borrow()[1].result(),
+        Some(crate::A11yDispatch::Dispatched)
+    );
+}
