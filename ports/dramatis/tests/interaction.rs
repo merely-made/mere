@@ -246,3 +246,29 @@ fn authentication_control_is_a_public_request_and_disabled_when_locked() {
         }
     }
 }
+
+#[test]
+fn feedback_keeps_its_live_region_and_personae_heading_stable() {
+    let mut h = host(false, false, 860.);
+    let node = |h: &Harness<State, Logic, Child>, role: &str, label: &str| {
+        h.with_dom(|dom| {
+            let nodes =
+                taproot::matching_estimated_fixture(dom, &Selector::role(role).containing(label));
+            assert_eq!(nodes.len(), 1, "{role} {label}");
+            nodes[0]
+        })
+    };
+    let status = node(&h, "status", "");
+    let heading = node(&h, "heading", "Personae");
+    let before = h.painted_rect(heading).unwrap();
+    for notice in ["Passphrase changed.", ""] {
+        h.update(|s| s.notice = notice.into());
+        assert_eq!(node(&h, "status", ""), status);
+        assert_eq!(node(&h, "heading", "Personae"), heading);
+        let after = h.painted_rect(heading).unwrap();
+        assert!(
+            (after.3 - before.3).abs() < 0.1,
+            "feedback must not turn the heading into a control"
+        );
+    }
+}
