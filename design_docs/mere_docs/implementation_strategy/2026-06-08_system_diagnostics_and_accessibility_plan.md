@@ -1,6 +1,69 @@
 # System Diagnostics and Accessibility Plan
 
+## Flattened producer discovery, 2026-10-20
+
+**Status:** flattened discovery qualified on source-frozen main `24b079538`.
+The initial refresh incorporated main `52690098b`. Hest H1/H2/H3 and
+Cambium 0.5 receiving changes are preserved; accessibility's existing action
+vocabulary still needs its separately tracked routing work. The diagnostics
+continuation retains its 10 MB receipt cap and existing reusable Cargo target.
+
+### Scope and done-conditions
+
+Align producer discovery with Genet's `flat_children` traversal, shared with
+semantic composition. Preserve ordinary light-DOM text walks. Prove actual
+shadow/nested-shadow and assigned-slot discovery, fallback replacement,
+unassigned-node exclusion, duplicate refusal and WindowDom containment through
+portable capture and headless GPU receiving. Publication must name the same
+current DOM owner. Keep full content-origin/transform/clip mapping, immutable
+semantic observation and target generations as explicit later migrations.
+
+### Findings
+
+The old light-DOM finder served GPU preparation, portable capture and custom-leaf
+size reads. It missed shadow producers while counting unassigned light-DOM
+nodes as duplicate owners. Semantic composition independently walked the flat
+tree, so an advertised action could coexist with absent rendering or capture.
+GPU preparation, portable capture, leaf size reads and semantic routing now use
+one Genet-based flattened traversal and the existing shared leaf-key parser.
+The unrelated text-position walk retains its light-DOM text contract. Discovery
+retains flat-tree members that may be CSS-hidden; existing layout geometry and
+suspension rules still decide their rendering state.
+
+The before-repair gate demonstrates the false observation path directly: the
+browser semantic control passes while all six producer discovery/capture/GPU
+controls fail. The repair controls pass for shadow, nested-shadow and named-slot
+content, masked fallback/unassigned exclusion, duplicate refusal before callbacks,
+WindowDom containment, fallback rebinding and removal retirement. Headless wgpu
+RGBA samples change from the assigned image to the fallback image and then to
+background after retirement. Native action mapping and browser mirror binding
+also select only the assigned owner. This is sampled axis-aligned receiving,
+not arbitrary padding/transform/scroll/clip or human AT acceptance.
+
+### Qualification
+
+The final source-frozen cohort passes 112 targeted native tests with five
+existing ignores, plus browser-host Wasm compilation. Producer lifecycle,
+shared semantics, current-target admission, native/browser publication and
+session receiving are covered. The eight repair controls also pass separately;
+they are not added to the final cohort count. The pre-repair runtime failures
+remain recorded separately from repaired receiving.
+
+Receipts are `support/family-promotion/diagnostics-flat-discovery-{before,repair,
+producers,semantics,admission,platform,wasm}.json`; the `source` and `qualification`
+records freeze source/manifest hashes and executed native binary hashes.
+`diagnostics-flat-discovery-final-check.json` records document checks, unchanged
+sealed audit registers and the aggregate diagnostics receipt budget. All builds
+reuse `C:\t\cargo-targets\mere`; no isolated target, Cargo home or worktree was
+created. This qualifies portable capture and sampled headless GPU receiving,
+native action maps and browser mirror plans. Browser runtime, headed interaction,
+human AT and full content-origin/transform/scroll/clip mapping remain open.
+
 ## Shared leaf and producer composition, 2026-10-20
+
+This historical cohort precedes the flattened discovery continuation above.
+Its light-versus-flat producer finder gap is superseded there; the coordinate,
+read-only observation, action routing and target-lifetime gates remain open.
 
 **Status:** contained host composition qualified on 2026-10-20 at integrated
 main `67964c3ea`, implementation `3798e0c2d`. The refresh preserves resident
@@ -65,11 +128,12 @@ nonfinite or negative producer rectangles produce no accessibility bounds.
   An advertised Increment, Decrement or ScrollIntoView is not thereby routed.
   Broader command declaration/invocation/result migration belongs with Hest;
   routing acceptance remains distinct from terminal success.
-- Producer render discovery still uses OwnedLayout's light-DOM walk while
-  semantic discovery is flattened. Render/input also use Genet's content origin,
+- At this cohort's basis, producer render discovery used OwnedLayout's light-DOM
+  walk while semantic discovery was flattened. The continuation above repairs
+  that discovery gap. Render/input also use Genet's content origin,
   transforms and clips; generated semantic bounds still offset the projected
-  slot rectangle. Padded/transformed/clipped placement and shadow/slotted producer
-  ownership need one supplier-qualified mapping and actual receiving controls.
+  slot rectangle. Padded/transformed/clipped placement and shadow/slot ancestor
+  geometry still need one supplier-qualified mapping and receiving controls.
   Consolidating the two old lowerings does not qualify their geometric premise.
 - ARIA maps the known DOM and contributor roles. Other AccessKit roles remain
   generic; this does not qualify arbitrary leaf roles, clipping/pixel parity,

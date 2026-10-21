@@ -2060,8 +2060,9 @@ viewer continues to exclude the musical packages.
 
 ### Current owner actions on bound views (2026-10-20)
 
-**Status (2026-10-20):** local runtime adapter and native selected-record
-controls implemented; focused qualification passed. Headed UI and a
+**Status (2026-10-20):** runtime adapter and native selected-record controls
+implemented and reconciled with the canonical Hest worker; 128 focused tests
+and portable-client checks passed for Git integration. Headed UI and a
 configured live product action remain separate acceptance gates.
 
 The maintainer chose the owner's current actions for selected content first,
@@ -2128,8 +2129,9 @@ Qualification phases and done-conditions:
    address payloads and bounded choices through the native worker and admitted
    route controller, including refusal and changed-target checks.
 
-**Progress (2026-10-20):** the adapter and focused scripted-endpoint tests are
-implemented locally, together with the native Mere receiving path. Locked,
+**Initial qualification (2026-10-20):** the adapter and focused scripted-endpoint
+tests were implemented together with the native Mere receiving path, recorded
+in source checkpoint `ac099b385`. Locked,
 offline checks passed with Rust 1.99.1 and debug information disabled:
 
 - 6 bound-action tests, including actual mutation/refusal/stale behavior in
@@ -2147,9 +2149,33 @@ offline checks passed with Rust 1.99.1 and debug information disabled:
 Source hashes, commands, final outputs and acceptance limits are recorded in
 `Code/output/domain-action-bindings-20261020/receipt.json`. These are source,
 headless UI and protocol checks, not headed rendering, screen-reader, configured
-live-handler or second-product qualification. Work remains local and uncommitted.
+live-handler or second-product qualification. The canonical-worker continuation
+below supersedes this initial integration status.
 
 The generic projection editor's imported fixture table still has
 no live owner association; this pass does not claim editing through a live
 Woodshed owner. New direct Hest dependencies use its existing package and do
 not change the wire or recipe serialization.
+
+#### Canonical worker reconciliation (2026-10-20)
+
+Upstream's native Hest worker landed while this connection was being qualified.
+The integrated implementation keeps that worker's `WorkerCommand` /
+`WorkerReply` envelope, one request-generation allocator and persistent refusal
+handling. Record actions add their runtime target context beside the existing
+Hest invocation; they retain the owner's declaration and are not recoded as
+local Mere-view commands. Both command origins use the same send path.
+
+The worker checks the supplied owner declaration through Chirograph's existing
+bridge, then the admitted route rechecks the actual current offer and exact
+selected target before dispatch. An unrelated automatic reading cannot settle
+a pending owner request. The receiving tests cover that generation boundary
+and reject changed owner command IDs, schemas and effects before dispatch.
+
+The integrated check runs pass: 78 client tests, 7 Mere-route tests, 6 bound-action
+tests, 3 existing projection save/reopen tests and 34 native Graphshell Mere
+tests. The client Wasm check, web locked/offline metadata resolution, port
+dependency boundaries, source formatting and whitespace checks also pass.
+The tracked [qualification receipt](../../../support/receipts/domain-actions-20261020/qualification.json)
+pins source hashes, commands and compressed final logs. It preserves the same
+headless/protocol and live-handler limits as the initial qualification.

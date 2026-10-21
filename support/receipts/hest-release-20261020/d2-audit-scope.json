@@ -1,0 +1,19 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_judgment_audit.py",
+    "--json"
+  ],
+  "whole_tree_exit_code": 1,
+  "scope": "cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md",
+  "scoped_findings": {
+    "missing_active_records": [],
+    "unknown_supplemental_records": [],
+    "inactive_supplemental_records": [],
+    "errors": []
+  },
+  "record": "support/doc-audit/d2/batch_100_hest_release.md",
+  "claims": 24,
+  "holds": 24,
+  "whole_tree_clean_claimed": false
+}
