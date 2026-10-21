@@ -37,6 +37,7 @@ use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {
     Some(InferenceLaneSettings {
+        embedding: None,
         recall: Default::default(),
         model: InferenceModelSettings::Stub,
     })
@@ -144,6 +145,7 @@ async fn exercise_route(library_model: bool) {
         let expected = provider.bound().generate_prepared(&prepared).unwrap();
         (
             Some(InferenceLaneSettings {
+                embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
                     row: row.to_string(),
@@ -368,6 +370,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     assert_eq!(save_library(&data_b).await, row);
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
@@ -1103,6 +1106,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     let row = save_pinned_answer_model(&data_root).await;
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
                 row: row.to_string(),
@@ -1497,6 +1501,7 @@ async fn serve_trained_model_for_headed_turnstone() {
     };
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
+            embedding: None,
             recall: distillery::inference::recall::RecallConfig {
                 max_passages: 1,
                 ..Default::default()

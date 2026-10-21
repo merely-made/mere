@@ -1,0 +1,12 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 4adc37170..e79b2c45f 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2162,6 +2162,7 @@ dependencies = [
+  "paint_list_render",
+  "serde_json",
+  "sha2 0.11.0",
++ "sprigging",
+  "tabard",
+  "tabard-workshop",
+  "wasm-bindgen",
