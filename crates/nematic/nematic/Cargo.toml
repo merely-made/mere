@@ -30,6 +30,7 @@ html-fragment = ["dep:genet-static-dom"]
 
 [dependencies]
 inker = { workspace = true }
+illume = { workspace = true }
 # A relative path into genet's `components/` before this crate landed in mere
 # on 2026-09-03; now the root workspace's genet.git pin, like the rest.
 genet-static-dom = { workspace = true, optional = true }

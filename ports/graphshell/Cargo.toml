@@ -29,6 +29,7 @@ name = "moot_resources_reopen"
 required-features = ["moot-resources"]
 
 [features]
+editable-blocks = ["web", "dep:knot-editor-host", "dep:illume", "dep:woodshedding"]
 query-views = ["web", "mere/query", "dep:cambium"]
 caller-owned-toolkit-bench = ["retained-content", "cambium-rootstock/embedding-egui", "cambium-rootstock/embedding-iced", "dep:image"]
 moot-resources = ["web", "webrtc-join", "dep:cambium", "dep:moot", "dep:gemot", "dep:eidetic", "dep:muniment"]
@@ -167,6 +168,12 @@ personal-sync = [
 ]
 
 [dependencies]
+knot-editor-host = { workspace = true, optional = true }
+# Prototype source-owner dependency: only Woodshed's pure portable data/theory
+# crate, never its product, playback or native UI. Resolve beside this worktree
+# until the source model is ready for a family pin/publication.
+woodshedding = { path = "../../../woodshed-portable-fretboard/crates/woodshedding", optional = true }
+illume = { workspace = true, optional = true }
 genet-render-host = { workspace = true, optional = true }
 cambium = { workspace = true, optional = true }
 moot = { package = "mere-moot", path = "../moot", features = ["resource-view", "presentation"], optional = true }

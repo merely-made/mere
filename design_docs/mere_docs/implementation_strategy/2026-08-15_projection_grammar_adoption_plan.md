@@ -2663,3 +2663,140 @@ metrical patterns, rhyme schemes or bar grouping as new aspects in that existing
 sense. Check such a mapping against the canonical definition before proposing it;
 use concrete domain terms in the visual examples. No existing terminology ruling,
 new shared entity type or runtime behavior is changed by this clarification.
+
+
+### Graphshell editable blocks: rhyme first (2026-10-18)
+
+Mark asked to implement editable blocks, contextual commands and Swatch previews
+in Graphshell, exercising rhyme schemes before bar grouping and prompting on
+new decisions. The prototype now hosts the existing `KnotEditor`: one source
+buffer, its ordinary chronological text history, explicit Save, and workspace
+reopen through Muniment. Applying a scheme changes only the selected block's
+Djot declarations. Preview and Cancel do not write source; source changes
+invalidate an existing preview. Each conflicting line offers Keep local / Use
+update, initially keeping local authorship. Unknown pronunciation and stress
+remain unknown. This slice is a rhyme lens, not a complete scansion editor.
+
+The document can wrap selected complete lines as an attributed verse block,
+preserving the text and imposing no poetic form. Unrecognized blocks remain
+editable as source and disclose unavailable commands. This first rhyme adapter
+requires a leaf block; nested source is preserved rather than interpreted as
+verse lines. The compact Swatch expands into a Canvas presentation of the same
+preview; neither action modifies the enclosing graph's selection or layout.
+
+A source dependency check found that Nematic's native transport dependency
+prevented the browser from using its otherwise pure attributed-block helpers.
+Those helpers now live in Illume, alongside portable source structure, and
+Nematic re-exports the same public types and functions. No new crate, universal
+content schema or analysis taxonomy is introduced. Graphshell's product feature
+opts into editing; the read-only viewer does not acquire this editor dependency.
+
+The sparse rhyme codec uses `-` for an unset expectation. The prototype Knot
+adapter was updated to read it as absent rather than connect two unset lines.
+This is a provisional serialization convention; canonical app adoption is a
+separate gate. Save/reopen retains authored source, not a compiled scene copy.
+
+**Resolved source decision (2026-10-18):** Mark chose Woodshed’s structured
+arrangement as the editable source, with familiar bar-line plaintext as a
+separate export. Bars derive from an authored time-signature map; grouping
+follows those bars. No meter is imposed when that map is absent. The snapshot
+scene codec remains a presentation export, not musical source.
+
+**Resolved chrome decision (2026-10-18):** the active document shows its own
+commands in the scene toolbar. Returning to the graph restores graph controls.
+
+Run Graphshell's product web host at `tree.html?app=local`, then choose
+**Editable document** from the graph controls. The retained scenarios are
+`editable_rhyme_blocks.scn` and `editable_rhyme_blocks_reopen.scn`; qualification
+status is recorded separately after execution. No commit, integration or push
+is implied by this prototype checkpoint.
+
+Qualification: [rhyme-first receipt](../../../validation/graphshell-editable-blocks_20261018/qualification.json) records 18 document/rhyme/store cases, five Illume cases, 20 Djot compatibility cases, and four actual Knot adapter module cases through a local harness. The product Wasm build and port boundary check pass. Both reference-host scenarios pass with no page/gate errors, including fresh-page source reopen. Manual keyboard entry, accepting one conflicting label, and undo back to saved ABBA were checked. The first browser attempt exposed an omitted document-save busy check; the corrected owner wait passed on a fresh origin. Toolbar density, narrow-host acceptance, complete scansion presentation, bar source interpretation and canonical downstream adoption remain open.
+
+
+### Graphshell editable blocks: Woodshed bar grouping (2026-10-18)
+
+The second consumer now uses the same ordinary source editor, command menu,
+source-bound preview, per-proposal Keep local / Use update choice, one-step
+structural Apply, undo/redo, explicit Save and reopen as the rhyme example.
+The document toolbar replaces graph controls while active. Source/commands and
+Swatch occupy adjacent panes at desktop width; Canvas expands that preview.
+Unanalysed verse lines now retain visible source-text captions in the scene;
+those captions add no syllable, stress or rhyme-tail claims.
+Returning to the graph restores its controls without replacing the document.
+
+The progression block carries a versioned JSON object with the actual owning
+Woodshed `Set` and its `SavedProgressionArrangement`, in a `woodshed` Djot
+attribute. The body is a caption, not another musical authority. The adapter
+reads the typed owner source and patches only `bar_groups` in the retained JSON
+tree, preserving other source fields and unknown Set/envelope keys. The sample
+is generated through Woodshed’s real Stage/Set/save APIs, including distinct
+Card identities, selected voicings, and an explicit rest. Inserting this example
+is an ordinary independent document insertion and one history step.
+
+Woodshed’s pure `woodshedding` model now owns optional `time_signatures` and
+`bar_groups`. A time-signature change must land on a preceding bar boundary;
+an incomplete final bar is disclosed as partial. Old arrangements retain an
+empty map and acquire no implicit bars. Regrouping requires consecutive bars,
+positive counts covering the selection, and whole replacement of intersecting
+existing groups. The native draft preserves the map/groups when reconstructing
+ordinary span edits. Saved arrangement validation and scene export use the same
+owner bar validation. Grouping changes neither authored timing nor Set order,
+Card material, voicing, rest identity, playback or tuning.
+
+Plaintext export is a readable chart, deliberately not a second edit source.
+It marks authored rests, unspecified time, cross-bar continuations and partial
+bars; exact durations, voicings and identities stay in the structured source.
+Overlapping events or unaligned Cards refuse this limited chart rather than
+inventing a musical reading. Time-signature changes can currently be edited in
+the structured source; no dedicated meter-map form is claimed.
+
+This validates reuse of the existing buffer, source-bound preview, attribute
+mutation and scene surface. Music-specific selection and validation remain in
+the owner/adapter. No universal content-aspect registry, new editor history,
+shared music grammar or new crate is extracted. The prototype depends on the
+sibling Woodshed worktree’s pure `woodshedding` crate through an optional path;
+this must become an appropriate family pin/publication before integration.
+Qualification is recorded in `validation/graphshell-editable-blocks_20261018/`
+separately from the frozen rhyme-first receipt. Full native Woodshed UI and
+canonical downstream adoption remain distinct gates.
+
+
+Qualification: [bar/toolbar receipt](../../../validation/graphshell-editable-blocks_20261018/bars-qualification.json)
+records 21 editing/store cases, all 211 scene-library tests, five pure Woodshed
+bar-model cases, five actual saved-arrangement integration cases and one explicit
+meter/group owner roundtrip. All four final Graphshell browser scenarios pass
+with no page or gate errors at 435×1220 CSS pixels (DPR 2), including ordinary
+save/reopen for both blocks and return to graph controls. The product Wasm build,
+port boundary check and both worktree diff checks pass. Native Draft metadata
+preservation has a regression test added, but full Woodshed views/native execution
+is not claimed. Earlier capture/entry failures and superseded caption candidates
+remain identified in the receipt. No integration or publication is implied.
+
+
+### Time-signature controls and native bar grouping refinement (2026-10-18)
+
+The requested next slice is dedicated map controls in Graphshell followed by
+native Woodshed grouping on the same scene surface. The map controls must not
+silently settle musical editing policy. Four questions are pending Mark's
+answers: whether changing meter preserves absolute musical positions or bar-relative
+positions; whether existing groups preserve their musical passage or numbered
+bars; whether map changes are anchored to fixed musical positions or bar numbers;
+and whether undo while typing an unapplied proposal edits the proposal locally or
+the authored arrangement. No answer is inferred from the current index/tick schema.
+
+Preparation adds owner-validated map attribute patches that preserve unrelated
+Set JSON and exact no-op source text. This is source machinery, not completed
+map controls. Native grouping adds bar selection, count entry, source-bound
+preview, per-conflict Keep local / Use update, and Apply / Cancel against the
+ordinary arrangement draft and history. Native validation uses the explicit
+synthetic 4/4 Set exported for Graphshell; this does not add implicit meter to
+old or newly started ordinary arrangements. Twenty-two Graphshell editing cases
+pass, including exact no-op source preservation and refusal of invalid meter
+boundaries. Native Woodshed now passes grouping, conflict choices, undo/redo,
+Save and fresh-process sealed reopening at wide/compact widths: 306 presented
+frames and seven reviewed captures. Only group metadata changes, and the full
+Set and scene reopen exactly. The source ledger and verifier are in Woodshed
+`validation/native-bar-groups_20261018/`. New count-input targeting and scroll
+viewport regressions are recorded there. This does not qualify dedicated
+Graphshell map controls; those still await the four explicit decisions above.

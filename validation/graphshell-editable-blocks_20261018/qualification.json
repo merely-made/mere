@@ -1,0 +1,58 @@
+{
+  "status": "rhyme-first Graphshell prototype qualified; bar grouping awaits source decision",
+  "base": "7077ea440f926932714fb607bfafcbdf44b1343e",
+  "tests": {
+    "document_rhyme_store": 18,
+    "illume_blocks": 5,
+    "nematic_djot": 20,
+    "knot_actual_adapter_module_local_harness": 4
+  },
+  "browser": {
+    "editable_rhyme_blocks": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/browser/editable_rhyme_blocks/result.json"
+    },
+    "editable_rhyme_blocks_reopen": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/browser/editable_rhyme_blocks_reopen/result.json"
+    }
+  },
+  "manual_browser": {
+    "keyboard_scheme_entry": "pass through direct key events",
+    "per_line_conflict_choice": "accepted line 2 only: ABBA to AABA, then Undo returned to saved ABBA",
+    "typeText_and_paste_helpers": "did not enter text into retained fields; no clipboard qualification claimed"
+  },
+  "build": {
+    "product_wasm": "pass",
+    "port_boundaries": "pass",
+    "package": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/web/pkg",
+    "sha256": {
+      "graphshell_web_bg.wasm.d.ts": "8ddc8fcd67a0e3fcdd5c94e4bdf4d9b9a6a5ae61bc3a2dbafcf350ff81b9b4a2",
+      "graphshell_web_bg.wasm": "47cc239f9c12dd75fd35ce63c24cf3a479ef3b63aee296481cf364b6dc73eb77",
+      "graphshell_web.js": "784b968b79626542cc29bafe0dc1998239ee1d45b40a865abf84e29c033335f7",
+      "graphshell_web.d.ts": "964667855df7c39573f52c955c736ca07299838d8bbfa92088f30a386745c10c"
+    }
+  },
+  "excluded_attempt": {
+    "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/browser/editable_rhyme_blocks-before-save-wait-fix/result.json",
+    "reason": "initial wait did not include document save busy state; fixed and both scenarios rerun on fresh origin"
+  },
+  "limits": [
+    "No bar grouping implementation until source-format decision.",
+    "Existing graph toolbar remains visible pending active-document chrome choice.",
+    "Rhyme adapter currently requires leaf blocks; unfamiliar/nested source is preserved and unavailable behavior disclosed.",
+    "Rhyme preview makes no phonetic or scansion analysis; existing authored attributes remain in saved source.",
+    "No narrow-window, Firefox or Safari acceptance; headed reference is BrowserWebGpu in IAB at 1280x720 CSS px, DPR 2.",
+    "Knot module harness uses actual adapter source with local scene crates; canonical Knot dependency adoption and full native app are not qualified.",
+    "No commit, push or deployment."
+  ],
+  "local_review": {
+    "url": "http://127.0.0.1:8905/tree.html?app=local",
+    "server_session": 9106,
+    "tab": "IAB 4, retained as deliverable"
+  }
+}

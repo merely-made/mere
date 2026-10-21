@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.69s
+     Running unittests src/lib.rs (target/build/debug/deps/illume-ea2a10c8e9a5c450)
+
+running 5 tests
+test blocks::tests::nested_divs_keep_exact_source_ranges ... ok
+test blocks::tests::update_rejects_forged_target_and_multiline_attributes ... ok
+test blocks::tests::update_inserts_prefixed_attrs_without_rewriting_quote_body ... ok
+test blocks::tests::update_uses_parser_range_for_json_braces_and_keeps_body_and_unknown_attrs ... ok
+test blocks::tests::update_keeps_a_list_div_inside_its_parent_item ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 32 filtered out; finished in 0.04s
+

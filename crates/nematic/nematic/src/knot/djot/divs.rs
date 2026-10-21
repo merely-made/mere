@@ -3,67 +3,8 @@
 //! Attributed Djot containers. Domain attributes remain opaque and editable;
 //! parsing a container never grants it evaluation or source-write authority.
 use super::*;
-use std::{collections::BTreeMap, ops::Range};
-
-/// A source-bound div. Ranges include its attribute/opening and closing fences;
-/// the body range excludes them. Nested members keep their own source ranges.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Div {
-    pub range: Range<usize>,
-    pub body: Range<usize>,
-    pub attributes: BTreeMap<String, String>,
-    pub children: Vec<Div>,
-}
-
-/// Source structure, independent of domain rules or the current presentation.
-pub fn divs(source: &str) -> Vec<Div> {
-    let mut roots = Vec::new();
-    let mut stack: Vec<Div> = Vec::new();
-    let mut pending = None;
-    for (event, range) in Parser::new(source).into_offset_iter() {
-        match event {
-            Event::Attributes(_) => pending = Some(range.start),
-            Event::Start(Container::Div { class }, attrs) => {
-                let mut attributes: BTreeMap<_, _> = attrs
-                    .unique_pairs()
-                    .map(|(key, value)| (key.to_string(), value.to_string()))
-                    .collect();
-                if !class.is_empty() {
-                    let classes = attributes.entry("class".into()).or_default();
-                    if !classes
-                        .split_whitespace()
-                        .any(|value| value == class.as_ref())
-                    {
-                        if !classes.is_empty() {
-                            classes.push(' ');
-                        }
-                        classes.push_str(&class);
-                    }
-                }
-                stack.push(Div {
-                    range: pending.take().unwrap_or(range.start)..source.len(),
-                    body: range.end..source.len(),
-                    attributes,
-                    children: Vec::new(),
-                });
-            },
-            Event::End(Container::Div { .. }) => {
-                if let Some(mut div) = stack.pop() {
-                    div.body.end = range.start.max(div.body.start);
-                    div.range.end = range.end.max(div.body.end);
-                    if let Some(parent) = stack.last_mut() {
-                        parent.children.push(div);
-                    } else {
-                        roots.push(div);
-                    }
-                }
-                pending = None;
-            },
-            _ => pending = None,
-        }
-    }
-    roots
-}
+pub use illume::blocks::{Div, divs, update_opening, wrap};
+use std::collections::BTreeMap;
 
 pub(super) fn parse(source: &str) -> (Vec<Block>, Vec<DocumentDiagnostic>) {
     super::structure::parse(source)
@@ -74,42 +15,6 @@ pub(super) fn parse(source: &str) -> (Vec<Block>, Vec<DocumentDiagnostic>) {
 pub fn emit(attributes: &BTreeMap<String, String>, blocks: &[Block], out: &mut String) {
     let body = blocks_to_djot(blocks);
     out.push_str(&wrap(attributes, &body));
-}
-
-/// Wrap authored source without reparsing/reformatting its contents. Useful for
-/// applying domain declarations to existing text through an ordinary text edit.
-pub fn wrap(attributes: &BTreeMap<String, String>, body: &str) -> String {
-    let fence = ":".repeat(
-        body.lines()
-            .map(|line| line.trim_start().chars().take_while(|c| *c == ':').count())
-            .max()
-            .unwrap_or(0)
-            .saturating_add(1)
-            .max(3),
-    );
-    let mut out = String::new();
-    if !attributes.is_empty() {
-        out.push('{');
-        for (i, (key, value)) in attributes.iter().enumerate() {
-            if i > 0 {
-                out.push(' ');
-            }
-            out.push_str(key);
-            out.push_str("=\"");
-            out.push_str(&value.replace('\\', "\\\\").replace('"', "\\\""));
-            out.push('"');
-        }
-        out.push_str("}\n");
-    }
-    out.push_str(&fence);
-    out.push('\n');
-    out.push_str(body);
-    if !body.ends_with('\n') {
-        out.push('\n');
-    }
-    out.push_str(&fence);
-    out.push('\n');
-    out
 }
 
 pub(super) fn emit_inline(spans: &[InlineSpan], out: &mut String) {
@@ -197,5 +102,73 @@ mod tests {
         let tree = divs(&source);
         assert_eq!(tree[0].attributes, attrs);
         assert_eq!(&source[tree[0].body.clone()], body);
+    }
+
+    #[test]
+    fn opening_update_changes_only_target_declaration_and_keeps_parent_prefixes() {
+        let source = "> {#card owner=human}\n> ::: panel\n> α\n> :::\n";
+        let target = divs(source).remove(0);
+        let updated = update_opening(
+            source,
+            &target,
+            &BTreeMap::from([
+                ("id".into(), "card".into()),
+                ("owner".into(), "human".into()),
+                ("status".into(), "ready".into()),
+            ]),
+        )
+        .unwrap();
+        assert!(
+            updated.starts_with("> {id=\"card\" owner=\"human\" status=\"ready\"}\n> ::: panel\n"),
+            "updated source: {updated:?}; target range: {:?}, body start: {}",
+            target.range,
+            target.body.start
+        );
+        assert!(updated.ends_with("> α\n> :::\n"));
+
+        let source = "> ::: panel\n> α\n> :::\n";
+        let target = divs(source).remove(0);
+        let updated = update_opening(
+            source,
+            &target,
+            &BTreeMap::from([("label".into(), "quoted".into())]),
+        )
+        .unwrap();
+        assert!(updated.starts_with("> {label=\"quoted\"}\n> ::: panel\n"));
+        assert!(updated.ends_with("> α\n> :::\n"));
+    }
+
+    #[test]
+    fn opening_update_rejects_forged_targets_and_multiline_values() {
+        let source = "::: panel\nα\n:::\n";
+        let target = divs(source).remove(0);
+        let mut forged = target.clone();
+        forged.attributes.insert("id".into(), "other".into());
+        assert!(update_opening(source, &forged, &BTreeMap::new()).is_err());
+        assert!(
+            update_opening(
+                source,
+                &target,
+                &BTreeMap::from([("label".into(), "one\ntwo".into())]),
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn opening_update_uses_parser_range_for_braces_inside_quoted_json() {
+        let source = r#"{#card json="{\"quote\":\"a } { value\"}" custom="keep"}
+::: panel
+body { bytes } α
+:::
+"#;
+        let target = divs(source).remove(0);
+        let mut attributes = target.attributes.clone();
+        attributes.insert("status".into(), "ready".into());
+        let updated = update_opening(source, &target, &attributes).unwrap();
+        let updated_target = divs(&updated).remove(0);
+        assert_eq!(updated_target.attributes, attributes);
+        assert_eq!(&updated[updated_target.body.clone()], "body { bytes } α\n");
+        assert!(updated.contains("custom=\"keep\""));
     }
 }

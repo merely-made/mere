@@ -9,6 +9,9 @@
 //! G1 adds a native semantic view over the portable client state. Networking,
 //! product models, and source authority remain injected at the edge.
 
+#[cfg(feature = "editable-blocks")]
+pub mod block_editing;
+
 #[cfg(feature = "moot-resources")]
 pub mod moot_resources;
 #[cfg(feature = "query-views")]

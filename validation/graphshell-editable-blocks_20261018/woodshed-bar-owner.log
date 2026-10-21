@@ -1,0 +1,26 @@
+warning: skipping duplicate package `chartulary v0.2.2 (https://github.com/merely-made/mere.git?branch=main#55c479bc)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/chartulary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/55c479b/crates/eidetic/chartulary/Cargo.toml
+
+warning: skipping duplicate package `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#55c479bc)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/muniment/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/55c479b/crates/eidetic/muniment/Cargo.toml
+
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling woodshed-source-example-check v0.0.0 (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshed-source-harness)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.08s
+     Running bar_owner.rs (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshed-source-harness/target/build/debug/deps/bar_owner-3708e0a8292650b3)
+
+running 1 test
+test real_saved_owner_exports_and_reopens_authored_meter_and_groups ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
