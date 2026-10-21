@@ -756,3 +756,40 @@ fn flat_tree_tests_mirror_only_the_assigned_producer_and_its_action() {
             .any(|node| node.id == dom.opaque_id(decoy))
     );
 }
+
+#[test]
+fn content_origin_tests_mirror_offsets_from_the_padded_content_box_once() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerSemantics};
+    let (mut dom, _) = producer_fixture();
+    let leaf = element_with_id(&dom, dom.document(), "producer-slot").unwrap();
+    dom.set_attribute(leaf, layout_dom_api::QualName::new(None, Namespace::default(), LocalName::from("style")),
+        "position:absolute;display:block;left:20px;top:30px;width:80px;height:40px;padding:7px;border:5px solid black");
+    let layout =
+        cambium_rootstock::OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &Default::default());
+    let mirror = producer_plan_for(
+        &dom,
+        &layout,
+        ProducerSemantics {
+            children: vec![ProducerNode {
+                key: 40,
+                role: cambium_rootstock::ProducerRole::ListItem,
+                name: "Card".into(),
+                rect: [4.0, 5.0, 10.0, 20.0],
+                actions: vec![ProducerAction {
+                    id: "pin".into(),
+                    label: "Pin".into(),
+                    description: "Keep card".into(),
+                }],
+            }],
+            ..Default::default()
+        },
+        2.0,
+    );
+    assert_eq!(mirror[0].rect, Some([40.0, 60.0, 208.0, 128.0]));
+    assert_eq!(mirror[0].children[0].rect, Some([32.0, 34.0, 20.0, 40.0]));
+    assert_eq!(
+        mirror[0].children[0].children[0].rect,
+        Some([0.0, 0.0, 20.0, 40.0])
+    );
+    assert_eq!(produced_actions(&mirror).len(), 1);
+}

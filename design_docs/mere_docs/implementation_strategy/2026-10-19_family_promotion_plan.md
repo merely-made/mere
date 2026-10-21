@@ -312,6 +312,17 @@ pixels, fallback rebinding, retirement and native/browser action mapping.
 Full producer coordinate mapping, read-only semantic observations, target
 lifetimes and broader action routing remain separate migrations.
 
+Producer content-origin repair (2026-10-20, qualified): generated children and
+their action bounds now use Genet's content-box origin in the existing
+untransformed, scroll-adjusted observation space. This removes the border and
+padding displacement from rendered producer pixels. On integrated main
+`e94cb23e8`, 115 targeted native tests pass with five existing ignores, plus
+browser-host Wasm compilation. Sampled headless pixels, both scroll planes,
+native action bounds and scaled browser boxes receive the repair. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-content-origin-2026-10-20)
+keeps full forward transform/clip and flattened-ancestor mapping with the
+supplier; no duplicate CSS placement implementation is introduced in Mere.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse
