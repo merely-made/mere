@@ -1,0 +1,50 @@
+{
+  "receipt": "diagnostics-lifetimes-native-final.json",
+  "receipt_sha256": "cc098940d4bbd0431b0676b76e55b9e770ef6f64b98102242337fa41dee88747",
+  "passed": 270,
+  "ignored": 7,
+  "executed_binaries": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe",
+      "sha256": "6361949e24f89356214fb9cee0c4e8abaa154d2c53933ddf2579b2ebc30aaaa4",
+      "bytes": 19909120
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe",
+      "sha256": "84ac1c07868b666b34f7d19d15623df3c41ea64ba08da3f1a2d7ca574a65a9b5",
+      "bytes": 36676096
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe",
+      "sha256": "42f5085c18b4a10a250efcee208659ea731d0c665b3e88b7ecd3faaca78a811b",
+      "bytes": 16780800
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe",
+      "sha256": "b2ee99128f23a90416f5ef48f4d564329f793fb790930ab96346f1fd4b74db95",
+      "bytes": 16345088
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe",
+      "sha256": "944a7dfd082ec8ad502cc6ec5e6afc8641996f03671e787662453a13bfdc3dd4",
+      "bytes": 41666560
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe",
+      "sha256": "54f9faed5cba33fef5251c7ed03566ca4eac42786b77fe1c6fca6dc81da786ff",
+      "bytes": 17850368
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe",
+      "sha256": "91378e074f564e36e8312c32881f71b67ca9bdff7342d9683da1f240a9791467",
+      "bytes": 17552384
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe",
+      "sha256": "3e3fec40683944c1f8e9acec8a1470b0ce19647e1e008367b5461523c41660f9",
+      "bytes": 39027712
+    }
+  ],
+  "focused_controls_are_subset": true,
+  "source_seal": "diagnostics-lifetimes-source-final.json"
+}

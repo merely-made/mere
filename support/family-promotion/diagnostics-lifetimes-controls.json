@@ -1,0 +1,16 @@
+{
+  "command": [
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe",
+    "lifetime_tests",
+    "--nocapture"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-21T23:30:43.100065+00:00",
+  "finished": "2026-10-21T23:30:43.537953+00:00",
+  "exit_code": 0,
+  "results": [
+    "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 155 filtered out; finished in 0.17s"
+  ],
+  "diagnostic_tail": "\nrunning 5 tests\ntest accessibility_tests::lifetime_tests_queue_binding_distinguishes_mounts_in_one_live_document ... ok\ntest accessibility_tests::lifetime_tests_registration_added_after_queue_cannot_adopt_an_old_request ... ok\ntest accessibility_tests::lifetime_tests_disposal_and_drop_finish_pending_acknowledgements ... ok\ntest accessibility_tests::lifetime_tests_reused_producer_registration_refuses_old_queue_and_accepts_current_updates ... ok\ntest accessibility_tests::lifetime_tests_queued_document_and_host_replacement_refuse_foreign_owners ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 155 filtered out; finished in 0.17s\n\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

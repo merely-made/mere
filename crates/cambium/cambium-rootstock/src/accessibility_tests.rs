@@ -696,3 +696,249 @@ fn selector_tests_post_dispatch_semantic_requests_wait_for_the_next_batch() {
         Some(crate::A11yDispatch::Dispatched)
     );
 }
+
+// Leave the actual hook queue pending, as when an after-dispatch hook enqueues
+// work for the next event. Mutations below happen before the real host drain.
+fn defer_lifetime_request(
+    host: &mut Host<u32, CounterLogic, CounterChild>,
+    request: A11yRequest,
+) -> crate::A11yReceipt {
+    let saved = Rc::new(RefCell::new(None));
+    let reply = saved.clone();
+    if host.s.a11y_owner.get() {
+        host.hooks.after_frame = Box::new(|ctx| {
+            let node = ctx.runner.focusables()[0];
+            ctx.queue_a11y(A11yRequest::node(crate::A11yAction::Focus, node));
+        });
+        host.hooks.after_dispatch = Box::new(move |ctx| {
+            if reply.borrow().is_none() {
+                *reply.borrow_mut() = Some(ctx.queue_a11y(request.clone()));
+            }
+        });
+    } else {
+        host.hooks.after_frame = Box::new(move |ctx| {
+            *reply.borrow_mut() = Some(ctx.queue_a11y(request.clone()));
+        });
+    }
+    host.with_ctx(crate::Hook::AfterFrame);
+    host.hooks.after_frame = Box::new(|_| {});
+    host.hooks.after_dispatch = Box::new(|_| {});
+    saved.borrow_mut().take().unwrap()
+}
+
+fn lifetime_click(host: &Host<u32, CounterLogic, CounterChild>) -> A11yRequest {
+    A11yRequest::node(
+        crate::A11yAction::Click,
+        host.s.runner.as_ref().unwrap().focusables()[0],
+    )
+}
+
+#[test]
+fn lifetime_tests_queued_document_and_host_replacement_refuse_foreign_owners() {
+    use crate::{A11yDispatch as D, A11yRejection as R};
+    for replace_document in [false, true] {
+        let mut origin = counter_host();
+        let mut replacement = counter_host();
+        // Supplier DOM IDs already carry distinct arena namespaces. Generated
+        // actions, however, use local slot/child keys that can recur in either
+        // document. Keep the producer registration live while replacing DOM.
+        assert_ne!(lifetime_click(&origin), lifetime_click(&replacement));
+        let calls = Rc::new(std::cell::Cell::new(0));
+        let request = if replace_document {
+            origin
+                .s
+                .shared
+                .producers
+                .register(
+                    7,
+                    LifetimeBoard {
+                        calls: calls.clone(),
+                        revision: Rc::new(std::cell::Cell::new(0)),
+                    },
+                    &[],
+                )
+                .unwrap();
+            lifetime_produced()
+        } else {
+            lifetime_click(&origin)
+        };
+        let receipt = defer_lifetime_request(&mut origin, request);
+        assert_eq!(receipt.result(), None);
+        if replace_document {
+            // Keep the old document and registration live. A liveness-only
+            // weak check would accept the same local slot/child in the new DOM.
+            std::mem::swap(&mut origin.s.runner, &mut replacement.s.runner);
+            origin.drain_pointer();
+            assert_eq!(*origin.s.runner.as_ref().unwrap().state(), 0);
+        } else {
+            // Even moving the exact runner/document into another host cannot
+            // move the originating host authority with the queued request.
+            replacement.s.runner = origin.s.runner.take();
+            replacement
+                .s
+                .pending_a11y
+                .append(&mut origin.s.pending_a11y);
+            replacement.drain_pointer();
+            assert_eq!(*replacement.s.runner.as_ref().unwrap().state(), 0);
+        }
+        assert_eq!(receipt.result(), Some(D::Rejected(R::StaleTarget)));
+        assert_eq!(calls.get(), 0);
+    }
+}
+
+struct LifetimeBoard {
+    calls: Rc<std::cell::Cell<u32>>,
+    revision: Rc<std::cell::Cell<u32>>,
+}
+impl crate::TextureProducer for LifetimeBoard {
+    fn render(&mut self, _: &crate::ProducerContext<'_>) -> Option<crate::ProducedTexture> {
+        None
+    }
+    fn semantics(&self) -> Option<crate::ProducerSemantics> {
+        Some(crate::ProducerSemantics {
+            children: vec![crate::ProducerNode {
+                key: 40,
+                role: crate::ProducerRole::ListItem,
+                name: format!("Card revision {}", self.revision.get()),
+                rect: [0.0, 0.0, 10.0, 10.0],
+                actions: vec![crate::ProducerAction {
+                    id: "pin".into(),
+                    label: "Pin".into(),
+                    description: "Keep card".into(),
+                }],
+            }],
+            ..Default::default()
+        })
+    }
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        assert_eq!((key, id), (40, "pin"));
+        self.calls.set(self.calls.get() + 1);
+        true
+    }
+}
+fn lifetime_produced() -> A11yRequest {
+    A11yRequest::produced(
+        crate::A11yAction::Click,
+        crate::ProducedAction {
+            slot: 7,
+            key: 40,
+            id: "pin".into(),
+        },
+    )
+}
+
+#[test]
+fn lifetime_tests_reused_producer_registration_refuses_old_queue_and_accepts_current_updates() {
+    use crate::{A11yDispatch as D, A11yRejection as R};
+    for detach_registry in [false, true] {
+        let mut host = counter_host();
+        let calls = Rc::new(std::cell::Cell::new(0));
+        let revision = Rc::new(std::cell::Cell::new(0));
+        let board = || LifetimeBoard {
+            calls: calls.clone(),
+            revision: revision.clone(),
+        };
+        host.s.shared.producers.register(7, board(), &[]).unwrap();
+        let stale = defer_lifetime_request(&mut host, lifetime_produced());
+        // Both removal/re-registration and whole-registry replacement must reject,
+        // including while the detached old registry remains alive.
+        let old_registry = if detach_registry {
+            Some(std::mem::take(&mut host.s.shared.producers))
+        } else {
+            assert!(host.s.shared.producers.remove(7));
+            None
+        };
+        host.s.shared.producers.register(7, board(), &[]).unwrap();
+        host.drain_pointer();
+        assert_eq!(stale.result(), Some(D::Rejected(R::StaleTarget)));
+        assert_eq!(calls.get(), 0, "the replacement was not activated");
+        drop(old_registry);
+
+        let current = defer_lifetime_request(&mut host, lifetime_produced());
+        revision.set(1);
+        // Ordinary re-publication/layout cannot manufacture or revoke a life.
+        host.relayout(320.0, 240.0);
+        host.drain_pointer();
+        assert_eq!(current.result(), Some(D::Dispatched));
+        assert_eq!(calls.get(), 1);
+        drop(host);
+        assert_eq!(
+            current.result(),
+            Some(D::Dispatched),
+            "disposal preserves the result"
+        );
+    }
+}
+
+#[test]
+fn lifetime_tests_registration_added_after_queue_cannot_adopt_an_old_request() {
+    let mut host = counter_host();
+    let receipt = defer_lifetime_request(&mut host, lifetime_produced());
+    let calls = Rc::new(std::cell::Cell::new(0));
+    host.s
+        .shared
+        .producers
+        .register(
+            7,
+            LifetimeBoard {
+                calls: calls.clone(),
+                revision: Rc::new(std::cell::Cell::new(0)),
+            },
+            &[],
+        )
+        .unwrap();
+    host.drain_pointer();
+    assert_eq!(
+        receipt.result(),
+        Some(crate::A11yDispatch::Rejected(
+            crate::A11yRejection::StaleTarget
+        ))
+    );
+    assert_eq!(calls.get(), 0);
+}
+
+#[test]
+fn lifetime_tests_disposal_and_drop_finish_pending_acknowledgements() {
+    use crate::{A11yDispatch as D, A11yRejection as R};
+    for explicit_disposal in [false, true] {
+        let mut host = counter_host();
+        let request = lifetime_click(&host);
+        let dom = Rc::downgrade(&host.s.runner.as_ref().unwrap().dom());
+        let receipt = defer_lifetime_request(&mut host, request.clone());
+        if explicit_disposal {
+            drop(host.take_disposal());
+            assert_eq!(receipt.result(), Some(D::Rejected(R::Cancelled)));
+            let later = defer_lifetime_request(&mut host, request);
+            assert_eq!(later.result(), Some(D::Rejected(R::Cancelled)));
+            assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+        }
+        drop(host);
+        assert!(
+            dom.upgrade().is_none(),
+            "the acknowledgement retains no document"
+        );
+        assert_eq!(receipt.result(), Some(D::Rejected(R::Cancelled)));
+    }
+}
+
+#[test]
+fn lifetime_tests_queue_binding_distinguishes_mounts_in_one_live_document() {
+    let mut host = counter_host();
+    let request = lifetime_click(&host);
+    let receipt = defer_lifetime_request(&mut host, request);
+    let runner = host.s.runner.as_ref().unwrap();
+    let dom = runner.dom();
+    let mount = runner.mount();
+    let another_mount = runner.focusables()[0];
+    assert_ne!(mount, another_mount);
+    let queued = &host.s.pending_a11y[0];
+    assert!(queued.is_current(&host.s.a11y_owner, &dom, mount, &host.s.shared.producers));
+    assert!(!queued.is_current(
+        &host.s.a11y_owner,
+        &dom,
+        another_mount,
+        &host.s.shared.producers
+    ));
+    host.drain_pointer();
+    assert_eq!(receipt.result(), Some(crate::A11yDispatch::Dispatched));
+}

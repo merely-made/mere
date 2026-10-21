@@ -1,5 +1,86 @@
 # System Diagnostics and Accessibility Plan
 
+## Queued owner and registration lifetimes, 2026-10-21
+
+**Status:** bounded repairs on `8008eba7d`, received with site-publication main
+`a845b0b22`: 270 targeted native tests pass with seven existing ignores. Browser
+Wasm and embedding compilation pass. Receipts, source seals and their limits are
+recorded in `support/family-promotion/diagnostics-lifetimes-qualification.json`. This slice retains the existing Mere Cargo target and a
+10 MB receipt cap, with gates named in
+`support/family-promotion/diagnostics-lifetimes-brief.json`.
+
+Queued AppCtx actions now bind the originating host, the document allocation,
+the window mount and, for generated actions, the logical producer registration.
+These are weak bindings: an acknowledgement keeps neither the document nor a
+contributor alive. Producer registration lives are allocated by `register`,
+independent of GPU/image/device identities. Admission compares against the
+current registry, so even a still-live detached registry cannot lend its old
+authority to a replacement. Ordinary semantic reads, layout and state updates
+do not allocate or revoke these lives. Current semantic admission still runs
+for every request after its binding passes.
+
+Dropping a pending queue completes its acknowledgements as `Cancelled`.
+Independent-host `take_disposal` cancels pending requests immediately and closes
+that host's semantic queue; later enqueue attempts also acknowledge cancellation.
+A completed routing result survives subsequent disposal. A changed owner,
+document, mount or producer registration returns `StaleTarget`. The queue owner
+is logical input authority; existing CaptureOwner continues to own readbacks
+and appearance/context invalidation. Host disposal closes both, while graphics
+context recovery does not replace the logical semantic registration.
+
+The native mapper now refuses non-root tree requests before numeric ID lookup.
+The pinned Genet bridge's single-update `install`/`update` contract accepts only
+`TreeId::ROOT`; guest trees use its separate ordered-batch API. Both drained and
+public mapper requests use this same check. This repairs foreign-tree aliases,
+without claiming that a ROOT tree ID identifies a publication or document life.
+Browser mirror lookup also requires the event element to remain a descendant
+of that particular mirror; its numeric `data-node` attribute alone is insufficient.
+Browser runtime and human assistive-technology acceptance remain separate gates.
+
+Pinned Genet already namespaces DOM identities: NodeId's high 24 bits name
+an allocation arena and its low 40 bits are a non-reused serial. Independent
+DOMs do not produce equal complete node IDs. The initial test incorrectly
+assumed otherwise; its failed receipt is retained. The corrected owner controls
+use the same live DOM/runner transferred between hosts, and the same live
+producer registration with equal local slot/child keys across document
+replacement. Do not infer current ownership from the birth arena: supplier
+cross-document adoption preserves complete node identity.
+
+### Remaining target-life owners
+
+- **Authored producer children:** `ProducerNode::key` is unique within a
+  description, but carries no lifetime. A child removed and reintroduced between
+  descriptions can reuse its key. Allocate any child lifetime at the authored
+  model transition, with a matching activation check; observation must not
+  allocate generations. Graphshell retained content already owns keys over
+  session instance/generation/node identity in `refresh_semantic_keys`; preserve
+  that distinction and ordinary producer recreation. Remote board card keys are
+  scene IDs (or ordinal fallbacks), with no action buttons today; those are not
+  evidence of actionable child lifetime guarantees.
+- **Leaf replacement:** `LeafRegistry::insert` replaces the contributor at a key,
+  while `get_mut_as` updates a retained contributor. A DOM-target request can
+  still reach a replacement leaf at the same DOM slot. A future registration
+  contract must distinguish those operations at the registry, rather than
+  turning every value update into replacement.
+- **Platform ingress/publication:** native maps are rebuilt before draining
+  requests. Native ROOT IDs and browser current maps still lack the originating
+  document and contributor life. Raw `A11yRequest` constructors and direct
+  `apply_a11y_requests` remain current-context APIs; private queue binding cannot
+  recover provenance already lost before enqueue. Extend the shared request /
+  publication seam with owner-issued target lives, then receive it through both
+  native and browser ingress and automation. Do not create separate platform
+  lifetime catalogues or substitute a global presentation revision.
+- **Native installation/rebinding:** failed installation still sets the private
+  installed guard, and `attach` documents one-window use without an explicit
+  replacement protocol. Keep install success, permanent unsupported status,
+  bounded recovery and window replacement as distinct states. Actual headed
+  failure/recovery qualification is required before a retry policy is claimed.
+
+The broader target-life migration remains open until old platform requests,
+removed/reintroduced children and replaced leaves refuse across their actual
+receivers while ordinary updates remain valid. Wider Hest actions and supplier
+forward geometry remain queued after that migration.
+
 ## Shared selector receiving, 2026-10-21
 
 **Status:** shared observation/selector receiving qualified on the sealed
@@ -54,21 +135,24 @@ runtime, human AT or other external product acceptance.
 
 ### Next: owner and target lifetime admission
 
-The native mapper rebuilds its maps before translating queued requests, and
-currently drops the platform request's target-tree field. Browser events carry
-resolved DOM or `(slot, child, action)` targets without a registration lifetime.
+The native mapper still rebuilds its maps before translating queued requests.
+The bounded continuation above now checks the platform target tree, but a ROOT
+request still carries no originating publication life. Browser events are
+restricted to their owning mirror, yet resolve DOM or `(slot, child, action)`
+targets through current maps without a publication or contributor lifetime.
 `LeafRegistry::insert` replaces the boxed contributor at a key. Producer keys
 are unique within a description; the contract does not yet distinguish removal
 and replacement from an ordinary state update. Renderer registration identities
 exist, but are not automatically semantic target lifetimes.
 
-The next done-condition covers two DOM owners with colliding numeric IDs,
-window/provider replacement, removed-and-reintroduced child keys and disposal
-of queued acknowledgements. Old requests must be refused while current requests
-and ordinary republication remain valid. Audit actual caller replacement/update
+The remaining done-condition covers originating native/browser requests across
+document/window/provider replacement and removed-and-reintroduced child or leaf
+keys. The private queue repairs above do not recover lost ingress provenance.
+Old requests must be refused while current requests and ordinary republication
+remain valid. Audit actual caller replacement/update
 patterns before choosing tokens; do not allocate lifetimes from observation
-reads or substitute a global presentation revision. Native tree filtering must
-be qualified against the bridge's root/embedded-tree contract first.
+reads or substitute a global presentation revision. Native tree filtering is now qualified against the pinned bridge's
+root/embedded-tree contract; ROOT publication lifetime remains open.
 
 The native initial-install branch also sets its private installed guard after
 an error, preventing a later install retry in that object. This is separately

@@ -1,0 +1,22 @@
+{
+  "basis": "8008eba7d",
+  "scope": "Private queued semantic owner/document/mount and producer registration admission, native root-tree admission, browser mirror membership; preserve authored child/leaf life migration",
+  "required_receipts": [
+    "diagnostics-lifetimes-native.json",
+    "diagnostics-lifetimes-browser.json",
+    "diagnostics-lifetimes-controls.json",
+    "diagnostics-lifetimes-qualification.json"
+  ],
+  "retained_byte_cap": 10000000,
+  "done_conditions": [
+    "Foreign native tree IDs never resolve through host ROOT maps; ROOT current DOM and producer requests still map.",
+    "Pending actions refuse foreign host/document/mount and producer registration replacement. Ordinary current updates remain valid.",
+    "Disposed queued requests finish as Cancelled; routed acknowledgements retain their result.",
+    "Document child key reuse, leaf replacement, native last-publication ownership and install recovery gaps without claiming they are solved."
+  ],
+  "verification_limits": [
+    "No headed native accessibility or human assistive-technology acceptance.",
+    "Browser membership change receives Wasm compilation; browser runtime acceptance remains separate."
+  ],
+  "concurrent_work": "Existing site publication, resident site and lock changes belong to another lane and are excluded from this slice."
+}

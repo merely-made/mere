@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-winit-a11y",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "cambium-genet-web-host",
+    "-p",
+    "mesquite",
+    "--lib",
+    "--test",
+    "accessibility",
+    "--test",
+    "click_on_scroll",
+    "--test",
+    "e1a_sessions"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "started": "2026-10-21T23:17:31.690936+00:00",
+  "finished": "2026-10-21T23:17:32.945923+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: ports\\djinn\\Cargo.toml: can't find `moot_site` test at `tests\\moot_site.rs` or `tests\\moot_site\\main.rs`. Please specify test.path if you want to use a non-default path.",
+    "error: could not parse `djinn` (manifest) due to 1 previous error"
+  ],
+  "diagnostic_tail": "error: ports\\djinn\\Cargo.toml: can't find `moot_site` test at `tests\\moot_site.rs` or `tests\\moot_site\\main.rs`. Please specify test.path if you want to use a non-default path.\nerror: could not parse `djinn` (manifest) due to 1 previous error\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

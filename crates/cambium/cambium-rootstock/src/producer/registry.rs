@@ -208,6 +208,8 @@ pub struct ProducerImageIdentity {
 
 struct Entry {
     renderer_key: u64,
+    // Logical registration life, independent of image/device generations.
+    action_lifetime: Arc<()>,
     producer: Box<dyn TextureProducer>,
     properties: Vec<String>,
     owner: Option<NodeId>,
@@ -263,6 +265,7 @@ impl ProducerRegistry {
             key,
             Entry {
                 renderer_key,
+                action_lifetime: Arc::new(()),
                 producer: Box::new(producer),
                 properties: properties.iter().map(|s| (*s).to_owned()).collect(),
                 owner: None,
@@ -278,6 +281,10 @@ impl ProducerRegistry {
 
     pub fn contains(&self, key: u64) -> bool {
         self.entries.contains_key(&key)
+    }
+
+    pub(crate) fn action_lifetime(&self, key: u64) -> Option<Weak<()>> {
+        Some(Arc::downgrade(&self.entries.get(&key)?.action_lifetime))
     }
 
     pub fn image_identity(&self, key: u64) -> Option<ProducerImageIdentity> {

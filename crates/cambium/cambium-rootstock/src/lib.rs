@@ -306,6 +306,10 @@ pub enum A11yDispatch {
 pub enum A11yRejection {
     Unavailable,
     TargetAbsent,
+    /// The queued request's host, document, mount or producer was replaced.
+    StaleTarget,
+    /// Its owning queue was disposed before the host could route the request.
+    Cancelled,
     Disabled,
     Unsupported,
     InvalidValue,
@@ -313,6 +317,7 @@ pub enum A11yRejection {
 
 /// Routing acknowledgement for one queued semantic request. Only the host
 /// writes this result; `Dispatched` does not claim application completion.
+/// Dropping or disposing its pending queue completes it as `Cancelled`.
 #[derive(Clone)]
 pub struct A11yReceipt(std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>);
 impl A11yReceipt {
@@ -320,22 +325,8 @@ impl A11yReceipt {
         self.0.get()
     }
 }
-pub(crate) struct QueuedA11y {
-    pub request: A11yRequest,
-    pub reply: std::rc::Rc<std::cell::Cell<Option<A11yDispatch>>>,
-}
-impl QueuedA11y {
-    pub fn new(request: A11yRequest) -> (Self, A11yReceipt) {
-        let reply = std::rc::Rc::new(std::cell::Cell::new(None));
-        (
-            Self {
-                request,
-                reply: reply.clone(),
-            },
-            A11yReceipt(reply),
-        )
-    }
-}
+mod a11y_queue;
+pub(crate) use a11y_queue::QueuedA11y;
 
 /// One drained screen-reader request: which action, on what.
 #[derive(Clone, Debug, PartialEq)]
