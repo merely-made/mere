@@ -2,12 +2,11 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** H3 implementation is in progress under Mark's explicit
-commit-and-push authorization. Cambium 0.5.0 and canonical Turnstone H2
-adoption retain their recorded qualification. Hest 0.2.0 carries declarations; the frozen
-Hest 0.1.0 and `command-menu` 0.1.1 shim preserve the H1 compatibility line.
-All commits remain local. Push, publication and fresh remote-only resolution
-are deferred; native GUI and human AT acceptance remain separate.
+**Status (2026-10-20):** H3 is implemented and qualified through canonical
+Turnstone keys, Knot window verbs and a Chirograph wire round trip. Hest 0.2.0
+and Cambium 0.5.0 remain the prepared versions; frozen Hest 0.1.0 and the
+command-menu 0.1.1 shim are unchanged. Mark authorized commits and Git pushes;
+crate publication remains held. H4 is unstarted.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
@@ -91,8 +90,9 @@ The port law applies: a piece moves only when a second host exercises it. A pure
    must not follow that breaking release.
 4. **Delivery:** implement H1 as a pure move, run existing receipts and a shim
    compatibility check, identify two host exercises, and commit locally.
-   Do not push or publish yet. Future publication order is Hest first, shim
-   second, after separate authorization.
+   The original H1 instruction held Git pushes and publication. Mark's H3
+   authorization below lifts the Git hold. Publication remains held: its
+   future order is Hest first, shim second, after publication authorization.
 
 ## Risks
 
@@ -284,9 +284,9 @@ desktop/browser presentation and native restart were not exercised.
   and [receiving proof](../../../support/receipts/hest-h2-20261020/turnstone-source.json)
   retain the evidence. The original H1 receipts remain historical, with their
   original source basis; their 52-test total is not added to the H2 count.
-- H3 invocation/outcome and H4 scripting are unstarted. Push, publication,
-  facade release preparation, canonical Turnstone adoption and native/browser
-  presentation remain explicit delivery or later-phase gates.
+- At this H2 receipt, H3 invocation/outcome and H4 scripting were unstarted.
+  Push, publication, facade release preparation, canonical Turnstone adoption
+  and native/browser presentation were explicit later gates.
 
 - **Canonical adoption continuation (Mark, 2026-10-20):** reconcile, prepare
   Cambium's breaking version and adopt the qualified declarations in canonical
@@ -323,9 +323,9 @@ desktop/browser presentation and native restart were not exercised.
   and [dependency proof](../../../support/receipts/hest-cambium-adoption-20261020/turnstone-cohort.json)
   retain the actual canonical receiving evidence. The previous H1/H2 fixture
   receipts retain their original cohorts and are not represented as reruns.
-- Push/publication, remote-only delivery qualification and native GUI/human AT
-  remain held. H3/H4 remain unstarted; this adoption changes declarations and
-  registration, without adding invocation/outcome or execution authority.
+- At this adoption receipt, push/publication, remote-only delivery and native
+  GUI/human AT remained held. H3/H4 were unstarted; that adoption changed
+  declarations and registration, without adding invocation/outcome or authority.
 
 - **Final concurrent reconciliation:** preserved published Mere `d95e04bb4`
   (family promotion ownership notes), Knot `d30dff6` (separate supplier
@@ -363,8 +363,8 @@ desktop/browser presentation and native restart were not exercised.
   retained, without representing it as a fresh rerun.
   [Supplier reconciliation receipt](../../../support/receipts/hest-cambium-adoption-20261020/supplier-reconciliation-2/qualification.json)
   records the exact tree, checks, preservation and dependency consequence.
-  H3/H4 are unstarted. Push, publication, remote-only new-version receiving
-  and native GUI/human AT remain held or separate.
+  At that supplier reconciliation, H3/H4 were unstarted. Push, publication,
+  remote-only new-version receiving and native GUI/human AT were held or separate.
 
 
 ## H3 implementation and delivery (2026-10-20)
@@ -401,3 +401,50 @@ frozen 0.1 compatibility line.
 - Delivery order is the compatible Knot prerequisite, Mere supplier, then
   final Knot and Turnstone consumers. Canonical URLs and committed locks are
   preserved. No release publication is included in the push authorization.
+
+
+### H3 qualification
+
+- Supplier code `9ef5e3026` passes 545 tests with 3 existing ignores, including
+  Hest/Chirograph, rootstock, Cambium, ux-events, compact menu/accessibility,
+  actual Graphshell command declarations and the published-Cambium shim.
+  Hest has only serde as a normal dependency. H3 is additive on the prepared
+  0.2 line and leaves the frozen H1 API and shim untouched.
+- The standalone locked WebGPU/Wasm check exposed one incoming authored-block
+  command using the old constructor. `94f50b95f` adds its DomainTruth declaration;
+  the final Wasm check passes. Scoped strict Rustdoc for Hest, Chirograph,
+  Cambium and the shim passes. Expanding Rustdoc to all of rootstock finds
+  existing broken Harness links in unchanged host documentation; this is
+  recorded and is not represented as a clean whole-tree documentation audit.
+- Turnstone source `07c1a38` receives the canonical Mere supplier and compatible
+  embedded Knot `ebf10c741`. Its complete default library passes 1107 tests
+  with 15 existing ignores. Focused H3 (4), menu/sidecar (14), Inspector (15)
+  and embedded Knot (23; 5 existing ignores) checks overlap that full result.
+  Workspace all-targets and portable metadata pass. A first full run found
+  the existing session-marker fixture's clock-dependent ordering; explicit
+  fixture timestamps fix it without changing production session code, and
+  the complete rerun passes. Superseded failures remain in the owned receipt.
+- Knot source `3acb3d2` passes 342 desktop library cases (1 existing ignore),
+  9 actual command-chrome cases and 66 standalone unchanged document engine
+  cases (1 existing ignore). Workspace all-targets and locked metadata pass.
+  Its actual host queue accepts valid invocations and refuses malformed ones
+  without producing a false completion or bypassing application close policy.
+- The two independent host exercises are Turnstone's actual isometric canvas
+  key binding through its reducer (observed model change and Done), and Knot's
+  actual desktop caption/resize queue harness (admission remains pending).
+  Chirograph's real carrier vocabulary separately round-trips opaque command
+  bytes, schema/effect declarations and routing observation; Accepted never
+  becomes Done and Done cannot be encoded as dispatch acceptance.
+- Both consumers have one Hest 0.2, one Cambium 0.5, no command-menu and no
+  foreign path packages. Incoming NetRender `ec15eb26`, Genet `6ef3cd37` and
+  Murm `e2f19a3f` remain pinned. Measured preservation covers 1753 supplier,
+  1604 Turnstone and 1248 Knot unrelated package blocks; 238 unrelated
+  Turnstone and 150 Knot Rust files remain exact, and Turnstone's production
+  session prefix remains exact. Later Mere description/roster work is merged
+  without changing the tested H3 sources or dependency lock.
+- [H3 qualification](../../../support/receipts/hest-h3-20261020/qualification.json),
+  [supplier checks](../../../support/receipts/hest-h3-20261020/checks.json),
+  [owned receiver references](../../../support/receipts/hest-h3-20261020/receivers.json)
+  and [source preservation](../../../support/receipts/hest-h3-20261020/source-preservation.json)
+  retain the exact software basis. Git delivery is authorized. Crate
+  publication, H4 audit/scripting and native GUI/human AT are separate gates.
