@@ -302,6 +302,43 @@ async fn locking_while_the_confirmation_is_open_refuses_the_change() {
     let _ = server.await;
 }
 
+/// A separate headless process proves refusal before any native/console input.
+#[cfg(target_os = "linux")]
+#[tokio::test]
+#[ignore = "run with DISPLAY and WAYLAND_DISPLAY absent in a fresh process"]
+async fn absent_graphical_password_provider_refuses_without_changing_the_vault() {
+    assert!(std::env::var_os("DISPLAY").is_none());
+    assert!(std::env::var_os("WAYLAND_DISPLAY").is_none());
+    let backend = light_file_dialog::dialog::DialogBackend::query();
+    println!(
+        "password provider: {} (reported graphical: {})",
+        backend.name, backend.graphic
+    );
+    let dir = tempfile::tempdir().unwrap();
+    seed(dir.path(), true);
+    let k = keeper(
+        dir.path(),
+        true,
+        OLD,
+        Arc::new(SystemNativeIdentityUi::default()),
+    );
+    let endpoint = endpoint(dir.path());
+    let server = serve(k, endpoint.clone()).await;
+    let mut client = CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+        .await
+        .unwrap();
+    assert_eq!(
+        client.change_passphrase_native().await.unwrap(),
+        R::Rejected {
+            reason: F::UiUnavailable
+        }
+    );
+    assert!(open(dir.path(), true, NEW).is_err());
+    check_profiles(&*open(dir.path(), true, OLD).unwrap());
+    server.abort();
+    let _ = server.await;
+}
+
 /// Separate-process native host, selected only by an explicit ignored-test invocation.
 #[tokio::test]
 #[ignore = "owned synthetic headed fixture; never use with a personal vault"]
@@ -340,6 +377,15 @@ async fn headed_authentication_host() {
     }
     let ui: Arc<dyn NativeIdentityUi> =
         if std::env::var("D_AUTH_NATIVE").ok().as_deref() == Some("1") {
+            let backend = light_file_dialog::dialog::DialogBackend::query();
+            std::fs::write(
+                root.join("native-provider.json"),
+                serde_json::to_vec_pretty(
+                    &serde_json::json!({"name":backend.name,"graphic":backend.graphic}),
+                )
+                .unwrap(),
+            )
+            .unwrap();
             Arc::new(SystemNativeIdentityUi::default())
         } else {
             Arc::new(Ui::answers(&[
