@@ -1,0 +1,429 @@
+{
+  "verified_utc": "2026-10-21T01:56:34.648713+00:00",
+  "releases": [
+    {
+      "name": "hest",
+      "version": "0.1.0",
+      "api_url": "https://crates.io/api/v1/crates/hest/0.1.0",
+      "archive_url": "https://static.crates.io/crates/hest/hest-0.1.0.crate",
+      "checksum": "4e432638e84d2600c46ffe11617b058a5fcbb8a1bfb5e160bc1f3ef3b232ce8e",
+      "yanked": false,
+      "created_at": "2026-10-21T01:51:32.329145Z",
+      "rust_version": "1.97.1",
+      "vcs": {
+        "git": {
+          "sha1": "561188d5aaf5b98c5e18a845c56163f41a45ff23"
+        },
+        "path_in_vcs": "crates/cambium/hest-0_1"
+      },
+      "source_files_match_release_tree": [
+        {
+          "path": "src/catalogue.rs",
+          "sha256": "2b43216153a0b30a4d890b7b9aa224d92c1185d5842f76cb9520eaf056ce43cb"
+        },
+        {
+          "path": "src/lib.rs",
+          "sha256": "6b9e36092ec6ee3782dda08e6776b062739e398722a38af64f7635fbde2b7c72"
+        },
+        {
+          "path": "src/menu/mod.rs",
+          "sha256": "c8ed224fda0422cc81ae7a6e18c8a1ae7b1a86f8be92a2f6183ddbb0464ee86e"
+        },
+        {
+          "path": "src/menu/session.rs",
+          "sha256": "1bf3cd93ab0eaf6ea8dc570ce5ab6a3f822c2c013c1b9a43209c0aba41247583"
+        }
+      ]
+    },
+    {
+      "name": "command-menu",
+      "version": "0.1.1",
+      "api_url": "https://crates.io/api/v1/crates/command-menu/0.1.1",
+      "archive_url": "https://static.crates.io/crates/command-menu/command-menu-0.1.1.crate",
+      "checksum": "d153b136d820f9471906f7c91fa309b2e2118a84d498a122f412fedc213a0c48",
+      "yanked": false,
+      "created_at": "2026-10-21T01:52:28.630909Z",
+      "rust_version": "1.97.1",
+      "vcs": {
+        "git": {
+          "sha1": "561188d5aaf5b98c5e18a845c56163f41a45ff23"
+        },
+        "path_in_vcs": "crates/cambium/command-menu"
+      },
+      "source_files_match_release_tree": [
+        {
+          "path": "src/lib.rs",
+          "sha256": "94fba153edaada2c8012a90bed01c28e34862ffee583285f0f44233cb0efd908"
+        }
+      ]
+    },
+    {
+      "name": "hest",
+      "version": "0.2.0",
+      "api_url": "https://crates.io/api/v1/crates/hest/0.2.0",
+      "archive_url": "https://static.crates.io/crates/hest/hest-0.2.0.crate",
+      "checksum": "458b5c350a837d207b7092df90b575070ab54b326c269cf75ae1d59771b96050",
+      "yanked": false,
+      "created_at": "2026-10-21T01:52:42.664719Z",
+      "rust_version": "1.97.1",
+      "vcs": {
+        "git": {
+          "sha1": "561188d5aaf5b98c5e18a845c56163f41a45ff23"
+        },
+        "path_in_vcs": "crates/cambium/hest"
+      },
+      "source_files_match_release_tree": [
+        {
+          "path": "src/catalogue.rs",
+          "sha256": "ec51238a15945935b5c064081107060550e16a12fe60f99e2f410219239e0a7f"
+        },
+        {
+          "path": "src/invocation.rs",
+          "sha256": "ad32cbd82f6f436a9039accd44750be433ba7f82316bd4d1a5236939ce31df64"
+        },
+        {
+          "path": "src/lib.rs",
+          "sha256": "cb8cce4224de77db85f8a63d5076c46ec0b807f6182f8016846319fb5f627e3e"
+        },
+        {
+          "path": "src/menu/mod.rs",
+          "sha256": "8df52053783331139c8df9f3a919ca04f28c9ef409273762f701c0fe56913ea1"
+        },
+        {
+          "path": "src/menu/session.rs",
+          "sha256": "631eb9378be454e719fd573de5c24920aaf3af9fca8a1c8d877bb42e73f9cec9"
+        }
+      ]
+    },
+    {
+      "name": "cambium",
+      "version": "0.5.0",
+      "api_url": "https://crates.io/api/v1/crates/cambium/0.5.0",
+      "archive_url": "https://static.crates.io/crates/cambium/cambium-0.5.0.crate",
+      "checksum": "007032063f604e95803fadfc3359d8fad69e69f4a8e1b9285c35510c998f7f2d",
+      "yanked": false,
+      "created_at": "2026-10-21T01:55:52.620171Z",
+      "rust_version": "1.97.1",
+      "vcs": {
+        "git": {
+          "sha1": "615b35e2e2af5436825d154eea52ae6c167cbfb3"
+        },
+        "path_in_vcs": "crates/cambium/cambium"
+      },
+      "source_files_match_release_tree": [
+        {
+          "path": "src/action_list.rs",
+          "sha256": "ff73bc915e58a3b229fe1f07fc82cea09023b07979936f4298a1faac3723930c"
+        },
+        {
+          "path": "src/arrangement.rs",
+          "sha256": "52c1f77487a43c48c9db034ad1f2d7e110dfca3e406fe29c234d28594280f875"
+        },
+        {
+          "path": "src/atlas.rs",
+          "sha256": "de03d352f1c84cfdbbf10dbdccf6716df6e2b07b89c77801f607e72265be3bd5"
+        },
+        {
+          "path": "src/backdrop_scene.rs",
+          "sha256": "3ce036ef5b0b38b750f66e10b4160a1d74446d930f1ef4acfefee3449be0f00e"
+        },
+        {
+          "path": "src/command_menu_bar.rs",
+          "sha256": "6d3b95187bc818e3475e6b6356ebd66cfc43f8dd71f5988f762411dd6c8b2747"
+        },
+        {
+          "path": "src/command_surface.rs",
+          "sha256": "6066c9978406e1a0a7c50c1b5d02dd1eca9b728c0bc62bb48348d8a815a11536"
+        },
+        {
+          "path": "src/component.rs",
+          "sha256": "65337ab55f41cea3e42065d0c3366ad4ffb6de32fc3cc40215ed2a7c2db177be"
+        },
+        {
+          "path": "src/context.rs",
+          "sha256": "695c455c4ea859a8d51723a6edb0daff94d830825f7ddfa73df829b7de37ac6b"
+        },
+        {
+          "path": "src/controls/button.rs",
+          "sha256": "3fe743bd3bfbea91b9e30d3fb5e5c83796ff8b08d225f5fd3bd511d451c33631"
+        },
+        {
+          "path": "src/controls/field.rs",
+          "sha256": "1bba309c7da95f5d26c460dbe3e89c9db9cb8420ba20fa37978cfe7a5e46e062"
+        },
+        {
+          "path": "src/controls/text_input/command.rs",
+          "sha256": "8182582d1c325cf0d6c41ddd97863d689df4c754c1720244da5c3f536b91fe8d"
+        },
+        {
+          "path": "src/controls/text_input/core.rs",
+          "sha256": "a88ce2494a7aa939bba899030188a7024c0176fe9e010f507863a93ceb04c67c"
+        },
+        {
+          "path": "src/controls/text_input/multiline.rs",
+          "sha256": "8f75818862c76f7bcdade2eb8fe18adcfa066bf0a2ecbf5972b418bf782198af"
+        },
+        {
+          "path": "src/controls/text_input/word_motion.rs",
+          "sha256": "04ffbf17d0f166db6f526577d67ba9a975ae91c092a439f4d3af07828fa87bab"
+        },
+        {
+          "path": "src/controls/text_input.rs",
+          "sha256": "ee11a646bf80891310ac12d904e33b428481c3dcfae88e23486e9927d3edf31a"
+        },
+        {
+          "path": "src/controls/toggle.rs",
+          "sha256": "c79302e7e502ffdbd3a1689b34a312cf579d7bb5189f8abacb2ff9986b6e13a7"
+        },
+        {
+          "path": "src/controls.rs",
+          "sha256": "8188d965616e31a50bb24ce43c58d4f7937ecbd9f9f0d053f5c5241e6a9469de"
+        },
+        {
+          "path": "src/detail_panel.rs",
+          "sha256": "e862656f2942dae34444b18896d25f3edcf17a7a0c36ee10b618bb03679c2359"
+        },
+        {
+          "path": "src/detail_popover.rs",
+          "sha256": "50f03299493456cd211d19ede3cb8cc80cc09d30e345f9a04305ff1c78f244cf"
+        },
+        {
+          "path": "src/disclosure.rs",
+          "sha256": "377bf0df62dfbf3e8f1a98a30b51a8a29c466294ced82d26b7b914615c61b24f"
+        },
+        {
+          "path": "src/editor.rs",
+          "sha256": "abbd0cb6416caea7a9f0d916110a65f5b081189204236af80c6b415c1afa0642"
+        },
+        {
+          "path": "src/element.rs",
+          "sha256": "5c3d71f1c9543cd3b78c54371b3eb3af372b3bde7dedb1ca9b40c84339d87873"
+        },
+        {
+          "path": "src/event.rs",
+          "sha256": "f3f8d5824a1aa4b391271a6a68134958498439ded03ab25213ebf3c48b646229"
+        },
+        {
+          "path": "src/file.rs",
+          "sha256": "8867655171d9dc38098882ddad2b2e73014eba0f1263a00c2bd9605b6e6d2b17"
+        },
+        {
+          "path": "src/focus.rs",
+          "sha256": "c30fe2c254d756ef59f2cc5a1a72edd438d94fb2e806f9bb9d7310f0f0d60cb5"
+        },
+        {
+          "path": "src/focus_request.rs",
+          "sha256": "98c1904c4e565848707dd96e8d4a117a9962b139d19bce388a3c29d9598f0099"
+        },
+        {
+          "path": "src/focusable.rs",
+          "sha256": "069696d55bc08ad58ce6522951b0fa357201e887e42425b7b28c3ad91ac146c6"
+        },
+        {
+          "path": "src/fold_projection.rs",
+          "sha256": "de6c9cc01bf091c14859fc31bde3e2dcf6b32820d6a080570e7c34f6e94021b1"
+        },
+        {
+          "path": "src/frisket.rs",
+          "sha256": "b7f66f0ae8c11de91c89cc61144d68665b3660a4846df2f9e5276a2a8344fec7"
+        },
+        {
+          "path": "src/frisket_presentation.rs",
+          "sha256": "669314dc773a9f3df9dfac91f5b71dacbea538830eefda5a4ec480f97c353e0b"
+        },
+        {
+          "path": "src/graph_canvas.rs",
+          "sha256": "1eb3b23c3289c582fa6ca2534ee6b804f79550c34e7c9dd4c5cccafb4d09e430"
+        },
+        {
+          "path": "src/grid.rs",
+          "sha256": "f9931cb6e388c4ed40541c1cb969e8d233cc8e31797e27a1c415328b8d5eb53a"
+        },
+        {
+          "path": "src/highlight.rs",
+          "sha256": "73d750735ccb91af3e63619f65cdb793a091f1372ad24d63ce91059f79aa7ef6"
+        },
+        {
+          "path": "src/hover.rs",
+          "sha256": "530630d6384a77b3cdf76b2e0c7df0b4c97888a5940e79102602f5ce6a6e63f3"
+        },
+        {
+          "path": "src/instrument.css",
+          "sha256": "64bf04cc5345c91f877ad2a67932bdd6dc05a7d3681227e229ceba3172ed6510"
+        },
+        {
+          "path": "src/key.rs",
+          "sha256": "699ecafddfa6bf7c663de5453a9cd660e80d44ad33115527b6c58cc08ddd41ec"
+        },
+        {
+          "path": "src/keyed.rs",
+          "sha256": "d2b1cb5c459a09d0661030550664d14734cbd28d730333812ae4fa3fd951262d"
+        },
+        {
+          "path": "src/lib.rs",
+          "sha256": "56139bafffef830c350b7faa2c69ee4d6d979a38fd1c948ec89279e61073f9a6"
+        },
+        {
+          "path": "src/menu.rs",
+          "sha256": "f60b44994fa9173f88b6fd0192f725690b8007ee86721673f73e55affb91476f"
+        },
+        {
+          "path": "src/multi.rs",
+          "sha256": "b7d6e08eb86095aa4481d494fd93cc37a5738cac5aad7f29e2533905c9699d4f"
+        },
+        {
+          "path": "src/opened_link.rs",
+          "sha256": "ba738c23e2d67fc517330b79364174c54eed3d394afbfdc98133026b086fcc30"
+        },
+        {
+          "path": "src/optional_action.rs",
+          "sha256": "99aa939378a25a5c5c46b738cc5cbf603e477320d2303cd6fafed494aead7339"
+        },
+        {
+          "path": "src/overlay.rs",
+          "sha256": "901389e17a87f1ead2d4e2900ea6738746a00be56f4bdd8803f864d8d3b5f2da"
+        },
+        {
+          "path": "src/overlay_surface.rs",
+          "sha256": "5c8382290d697df9d4278378150e100bb112cbe816fca152d7ad6bb0a573435f"
+        },
+        {
+          "path": "src/pod.rs",
+          "sha256": "10b9d3e2238af0cf92a54f2378d0ed9a784147703fcc6577dd07945011d43795"
+        },
+        {
+          "path": "src/pointer.rs",
+          "sha256": "fb51ede1c45bed15d4641fd203430ef059ac0e12be5e895019781da815931dd8"
+        },
+        {
+          "path": "src/popover.rs",
+          "sha256": "14d81ed31ce20fa70dc4851496fca91f9e38027a2cb84e9231309fff4cf6b51f"
+        },
+        {
+          "path": "src/portable.rs",
+          "sha256": "3c1cfc21d436e9a0f994fd9ebc2aa3253e733965656d2620bfb7691c9c3989bb"
+        },
+        {
+          "path": "src/propagation.rs",
+          "sha256": "9f0c9015545d27e9d973f255df558e71a42934e25677371d39d032471fc0936f"
+        },
+        {
+          "path": "src/radio.rs",
+          "sha256": "b464783d0fea557ee7e51e78c7cfff5ae2dc6b6ca7f376796f158e00ffb2cb1d"
+        },
+        {
+          "path": "src/range_scrubber.rs",
+          "sha256": "e1adf877fe8537d9db292d2109049ed03ad4b84fea60c67d111db2ece9f3e0ec"
+        },
+        {
+          "path": "src/reorderable_list.rs",
+          "sha256": "9f967e1b95ae88e897c38821dfeef0840f6ef8413099036746862c8b12475cf5"
+        },
+        {
+          "path": "src/resize_handle.rs",
+          "sha256": "ca2b15b9b677dcb84cd80e330107b5859114c524d0035eabc01fddb105044fc4"
+        },
+        {
+          "path": "src/retained_mount.rs",
+          "sha256": "f17db3957b7b33d7f55ce3c648eff20137a185a4b87176ecd5e0a6bc1a403c48"
+        },
+        {
+          "path": "src/runner.rs",
+          "sha256": "2fd7e32fc655a84487c860bcbe1f18120e53561ebf8c92087757b09fb8bcb7b9"
+        },
+        {
+          "path": "src/sectioned_list.rs",
+          "sha256": "7c40ec58a8c2330f3648e3fdc95abab3058da77622633a439dff2980daa36dc6"
+        },
+        {
+          "path": "src/select.rs",
+          "sha256": "c1ad149ae9fb8ff5a4471b89f659f4f6c8e3b2f756e5368a5653782ff94861c9"
+        },
+        {
+          "path": "src/selection_bar.rs",
+          "sha256": "6cef514e4841a0127cadd0bdf4f6404d7fabb4699446ac1514f837be76d6cba7"
+        },
+        {
+          "path": "src/setting_row.rs",
+          "sha256": "06b2e9733ae62a6dee4de6efe0bce03db8b4ae0dda3969cd8c69bf314795e80d"
+        },
+        {
+          "path": "src/slider.rs",
+          "sha256": "7d3285cc8b9c4b8ddce05c0943f2301c682e4785da3e4e803281e188ddabb9b4"
+        },
+        {
+          "path": "src/splice.rs",
+          "sha256": "717592cd42722a21d18c7c77aa5ca86b250fbe076265516cc6b4844c7f6b22de"
+        },
+        {
+          "path": "src/split.rs",
+          "sha256": "da764e647225baeb273c1b1c3a16a74f065a7df500cdccc30f5af4740827bc7a"
+        },
+        {
+          "path": "src/status_bar.rs",
+          "sha256": "dc9f6ebfc347d107443df3ed956f2098be2d987c4ea012270fc91dabc2cffdf2"
+        },
+        {
+          "path": "src/styled_field.rs",
+          "sha256": "c4e61de4843358f583b2e29fa4ac271b3b761855f567c7e2d66f103e3608c6d8"
+        },
+        {
+          "path": "src/summary_body.rs",
+          "sha256": "98fdb6b850eddddcdf79ae8f844d23b8915224c7391d677b5104bdbce5415396"
+        },
+        {
+          "path": "src/surface.rs",
+          "sha256": "39f927a20ed2d1eef2d76cbf10a654e2a30fce83ab4bf02ddd877816fde166ba"
+        },
+        {
+          "path": "src/tabs.rs",
+          "sha256": "05b4a62abe941e5dd1cc3fabbb12f144a7ea1ac7f362a87a0cfeba88ed1e6998"
+        },
+        {
+          "path": "src/tags.rs",
+          "sha256": "f54eed873878e5e0b08abbf3b0f471c316dba44ede01d342fa8f89bd1c51baa4"
+        },
+        {
+          "path": "src/tests.rs",
+          "sha256": "634d36c13c4050f759fa86d538758000733434d9f2f0cc98d4aee515957ee125"
+        },
+        {
+          "path": "src/text.rs",
+          "sha256": "221c8b35fe1f739236409a9ee6556d13be884eca2888bc0c01e25f91aca46e7f"
+        },
+        {
+          "path": "src/title_bar.css",
+          "sha256": "96e1eccfa6a68423f7b080cdde08f564633493573ca1c46b0f16f33ac6e29f7b"
+        },
+        {
+          "path": "src/title_bar.rs",
+          "sha256": "b435a270b180a6cb969fd436c56e58fb50657a636b2fbf9f5576fd80a2c95a54"
+        },
+        {
+          "path": "src/value.rs",
+          "sha256": "dd7b973da183b2180e58711d7d1b03f2d0d5334a8bfa85f99a09853e038c5cd2"
+        },
+        {
+          "path": "src/wheel.rs",
+          "sha256": "417aa09bd47e8933cf39394e7335f7f3eb0d11f5902d18b96250c1abb1f5f1ed"
+        },
+        {
+          "path": "src/workspace.rs",
+          "sha256": "f2ba4d481e4e0cbdcfcd24207f7326e0f1bfa01ac091ae481fcf9fbc05744383"
+        },
+        {
+          "path": "src/workspace_chrome.rs",
+          "sha256": "bda64b94139b01aa6be6128d28d818c9522ee0203e39e4200c79c1a19d143515"
+        },
+        {
+          "path": "tests/fixtures/fretboard.json",
+          "sha256": "f39d0aaffd27e0211943c531417661f801b324812e5a097cf5508a07a9e46a8a"
+        },
+        {
+          "path": "tests/instrument.rs",
+          "sha256": "f86ad59ff7674fd482afb6b3dfc114592b5e5ee4638da21947e00fd30861cc62"
+        }
+      ]
+    }
+  ]
+}
