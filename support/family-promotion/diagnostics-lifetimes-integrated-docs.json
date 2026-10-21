@@ -1,0 +1,11 @@
+{
+  "error_count": 40,
+  "baseline_count": 40,
+  "new_errors": [],
+  "touched_documents": {
+    "design_docs/DOC_README.md": "dbae5669e22240fd9077049641eb90963cb1eebd883eeb103d57820ae351c7a4",
+    "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md": "eb9063d9ca5c09b69e0d8ca9389104fc7eb508217a44c3d9cad34b9cad38a00a",
+    "support/doc-audit/d2/batch_103_diagnostics_target_lifetime_receiving.md": "202e8b82bcb2536399ca3cf78d865f52c6764d9f4f234cf3c0bcb35b46fb8063"
+  },
+  "original_batch_102_unchanged": true
+}
