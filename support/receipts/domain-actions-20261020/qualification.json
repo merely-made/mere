@@ -1,0 +1,148 @@
+{
+  "status": "focused qualification passed for canonical integration",
+  "baseline_feature_commit": "ac099b385",
+  "upstream_commit": "4214af8025d8754cc7ed23359f17aeb27df6d074",
+  "total_tests": 128,
+  "tests": {
+    "native-tests": [
+      34
+    ],
+    "client-route-tests": [
+      78,
+      7
+    ],
+    "projection-tests": [
+      6,
+      3
+    ]
+  },
+  "toolchain": "Rust 1.99.1",
+  "environment": {
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_BUILD_JOBS": "4"
+  },
+  "commands": {
+    "native": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell-mere",
+      "--bin",
+      "graphshell_mere"
+    ],
+    "client_route": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell-client",
+      "-p",
+      "mere-overmap",
+      "--lib"
+    ],
+    "projection": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--test",
+      "bound_actions",
+      "--test",
+      "local_projection"
+    ],
+    "wasm": [
+      "cargo",
+      "check",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell-client",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "web_metadata": [
+      "cargo",
+      "metadata",
+      "--manifest-path",
+      "ports/graphshell/web/Cargo.toml",
+      "--locked",
+      "--offline",
+      "--format-version",
+      "1"
+    ],
+    "boundary": [
+      "python3",
+      "scripts/check_port_boundaries.py"
+    ]
+  },
+  "other_checks": {
+    "web_locked_offline_metadata": "passed",
+    "port_dependency_boundaries": "passed",
+    "source_formatting": "passed",
+    "diff_whitespace": "passed"
+  },
+  "source_sha256": {
+    "Cargo.lock": "7567baf1b31eed5c6306d221e9578e62ac5334d7ef9bb358ec70869d782fe1df",
+    "crates/cambium/mere-overmap/Cargo.toml": "116347bb20113cad344f7753f3c0634e40df9211e1f75b3d04b5a6b9330a0714",
+    "crates/cambium/mere-overmap/src/materialization.rs": "dccacf2ed10840735244b1b8a44d904417eb8dcd6a633b43766c7e8187671c32",
+    "crates/cambium/mere-overmap/src/route_session.rs": "1c827f762e79088bc6ca995643b289da0a50147b024deb712ac89ca2b964260f",
+    "crates/cambium/mere-overmap/src/wire.rs": "f047daff8689db586664b9e64b17e7ae8838beb31dd5dabba295e50ca0e0aa21",
+    "crates/graphshell/graphshell-client/Cargo.toml": "756a77f44110ccfa065576532900ed7288911abae58ef16fb857050434eee244",
+    "crates/graphshell/graphshell-client/src/core.rs": "561a066269235a462387b7b060d3edaee67e45a29bab9884f602cd3e2afe0f60",
+    "ports/djinn/tests/inference_route.rs": "e49c0363666328c1f7f5ab9ff735420f7b409dca6a1310f16d4cc791825cafe8",
+    "ports/graphshell/mere/Cargo.toml": "3720d8bcca177b8194f3bee2bdeeaea178855672cf2137fcf171193c7c992156",
+    "ports/graphshell/mere/src/app_tests.rs": "56f612b6e2130e1a2424bc5688655ed42dc37755eb8c981fdc921ed37ced7a4e",
+    "ports/graphshell/mere/src/command.rs": "ed149862fcf4482ca53469eafb69987fdda7026a7bc068cab638d7f4f61aeae7",
+    "ports/graphshell/mere/src/connection.rs": "435b4a0991804b026c1338a3c5a504ae836a7812115cff41898c3775ad56900d",
+    "ports/graphshell/mere/src/connection_tests.rs": "8c3aafb7a0ad54e2ee8c55fd323b8ad344fe540fc11f26612b69c806d98dc761",
+    "ports/graphshell/mere/src/main.rs": "35fd33212f2c8b4f9ed650f7111d46eb5f776311b861ebd42cc9c3662d342006",
+    "ports/graphshell/mere/src/owner_actions.rs": "594e099d02b554fe684a12dc94c36d1630b9a67d9c711d28dfcf0f1ab8409306",
+    "ports/graphshell/src/bound_actions.rs": "bb420a672e14d2c7c4970c6c3c5a96dba0b00249bb095d12212cc94e632c3e02",
+    "ports/graphshell/src/lib.rs": "cf419b37b326ffc761dd0531fd53f8355d3e50d64f734ba950a00257f93f06ec",
+    "ports/graphshell/tests/bound_actions.rs": "d0000a02ef83583bf71837263f4a2df8bb4df67c70c0c32fe7c4d59230a3e5ac",
+    "ports/graphshell/web/Cargo.lock": "73487c98f1fc189aa51784af1f0537dbb67ed829a0c238dc9d41f4893024e258"
+  },
+  "logs": {
+    "native-tests.log.gz": {
+      "sha256": "fabc1ecf8c99361cab30c361c167f6f5429c7d902b67cf2f4a25f21792a400b4",
+      "uncompressed_sha256": "de3ac8b1176d0382e12df8f384686f922d15f66314da57dad4dc3fcb99ae658f"
+    },
+    "client-route-tests.log.gz": {
+      "sha256": "6da3e54d96c025e3da495261658041c5b3a8288226437dd548328b8a6bf4ad8c",
+      "uncompressed_sha256": "8df4e3c699545dcbcddaffc2ab7eb89dec75afef8439180649c387dcb48ec825"
+    },
+    "projection-tests.log.gz": {
+      "sha256": "52d0a0db447d2d7e956c90f6f9668e4af3fd561139ca527f1c96de7c0b850ce4",
+      "uncompressed_sha256": "d8e4f757b5cda333f17c8e710f40338b8c40319171b48ee9e556a0c325214780"
+    },
+    "client-wasm.log.gz": {
+      "sha256": "4ff990be4186b40b59bbc818194006fd7b1f26cb6c31d5ecc45a32c844e25270",
+      "uncompressed_sha256": "79ee5f57e10d8541583cba072392d0126bdfc4b87f05cd3c5d3f7d89c7af8446"
+    },
+    "port-boundaries.log.gz": {
+      "sha256": "5a96a5f88d75301f7ad1c391eaa92fe6d7dcd916c7de90872241ca9eeb9251fe",
+      "uncompressed_sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186"
+    }
+  },
+  "integration": [
+    "Owner commands share the existing generation-tracked Hest worker envelope",
+    "Owner schemas are checked against their declarations and not recoded as Mere-view requests",
+    "Unrelated automatic readings cannot settle a pending owner command"
+  ],
+  "limits": [
+    "Headless Genet controls and protocol fixtures; no headed rendering or screen-reader acceptance",
+    "Resident record-handler registry remains empty; no configured live handler or native launch qualification",
+    "Generic imported projection tables do not discover an owner from source names",
+    "No live Woodshed owner integration or new recipe action grants"
+  ]
+}
