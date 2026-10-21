@@ -11,6 +11,7 @@
 //! differs is grafted on: an event source converts platform events into this
 //! crate's vocabulary and drives the methods below.
 
+use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -797,6 +798,7 @@ where
     /// returns, in order. See [`HostPointer`].
     pub pointer: &'a mut Vec<HostPointer>,
     pub(crate) a11y: &'a mut Vec<crate::QueuedA11y>,
+    pub(crate) a11y_owner: &'a Rc<std::cell::Cell<bool>>,
     /// Scroll requests for the next layout; queued through
     /// [`scroll_into_view`](Self::scroll_into_view).
     pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
@@ -906,9 +908,21 @@ where
     /// Queue a semantic action through the same current-target admission as
     /// platform accessibility. The host drains it after queued pointer input;
     /// observe the returned routing acknowledgement before claiming delivery.
+    /// The queue binds the current host, document, mount and producer
+    /// registration. Raw requests name the current context; child reuse within
+    /// a live producer and leaf replacement are not lifetime-qualified here.
     pub fn queue_a11y(&mut self, request: crate::A11yRequest) -> crate::A11yReceipt {
-        let (queued, receipt) = crate::QueuedA11y::new(request);
-        self.a11y.push(queued);
+        let (queued, receipt) = crate::QueuedA11y::new(
+            request,
+            self.a11y_owner,
+            &self.runner.dom(),
+            self.runner.mount(),
+            self.producers,
+        );
+        if self.a11y_owner.get() {
+            self.a11y.push(queued);
+        }
+        // Dropping an unqueued request acknowledges a disposed owner.
         receipt
     }
 
@@ -1309,6 +1323,7 @@ where
     /// drained through the real input path once the hook returns.
     pub pending_pointer: Vec<HostPointer>,
     pub(crate) pending_a11y: Vec<crate::QueuedA11y>,
+    pub(crate) a11y_owner: Rc<std::cell::Cell<bool>>,
     draining_a11y: bool,
     /// Scroll requests an application hook queued, resolved in order by the
     /// next [`relayout`](Host::relayout) once its layout is current.
@@ -1394,6 +1409,7 @@ where
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
             pending_a11y: Vec::new(),
+            a11y_owner: Rc::new(std::cell::Cell::new(true)),
             draining_a11y: false,
             pending_scroll: Vec::new(),
             caret_followed: None,
@@ -1456,6 +1472,8 @@ where
     /// disposing a window while lending a shared forest is not qualified.
     pub fn take_disposal(&mut self) -> HostDisposal {
         self.s.hidden = true;
+        self.s.a11y_owner.set(false);
+        self.s.pending_a11y.clear();
         self.s.needs_recovery_surface = false;
         self.s.last_redraw_presentation = None;
         self.s.pending_presentation_observer = None;
@@ -1720,6 +1738,7 @@ where
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 a11y: &mut self.s.pending_a11y,
+                a11y_owner: &self.s.a11y_owner,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1768,6 +1787,7 @@ where
             capture_paint: &mut self.s.pending_paint_capture,
             pointer: &mut self.s.pending_pointer,
             a11y: &mut self.s.pending_a11y,
+            a11y_owner: &self.s.a11y_owner,
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
             render_core: self.s.shared.render_core.as_ref(),
@@ -1862,6 +1882,7 @@ where
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 a11y: &mut self.s.pending_a11y,
+                a11y_owner: &self.s.a11y_owner,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1939,8 +1960,22 @@ where
         if !self.s.draining_a11y {
             self.s.draining_a11y = true;
             for queued in std::mem::take(&mut self.s.pending_a11y) {
-                let result = self.apply_a11y_requests(&[queued.request])[0];
-                queued.reply.set(Some(result));
+                let current = self.s.runner.as_ref().is_some_and(|runner| {
+                    queued.is_current(
+                        &self.s.a11y_owner,
+                        &runner.dom(),
+                        runner.mount(),
+                        &self.s.shared.producers,
+                    )
+                });
+                let result = if !self.s.a11y_owner.get() {
+                    crate::A11yDispatch::Rejected(crate::A11yRejection::Cancelled)
+                } else if current {
+                    self.apply_a11y_requests(std::slice::from_ref(&queued.request))[0]
+                } else {
+                    crate::A11yDispatch::Rejected(crate::A11yRejection::StaleTarget)
+                };
+                queued.finish(result);
             }
             self.s.draining_a11y = false;
         }

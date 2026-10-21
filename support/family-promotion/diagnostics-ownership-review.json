@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
-  "status": "Shared observation/selector receiving qualified on integrated main 5573500dc and Genet 206b80c2d62: 322 native tests across supplier, affected host suites and retained product; seven existing ignores. Three Wasm builds, embedding and resident compile pass. Target lifetimes, broader actions, forward geometry and external publication/receiving remain open.",
+  "status": "Shared selector receiving remains qualified. Bounded queued host/document/mount/producer registration lives, cancellation and native foreign-tree admission qualified on a845b0b22: 270 targeted native tests, seven existing ignores; browser Wasm and embedding compile pass. Authored child/leaf lifetimes and platform publication provenance remain open before broader actions and forward geometry.",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -337,9 +337,10 @@
     {
       "id": "diagnostics-native-target-tree-discarded",
       "source": "crates/cambium/cambium-winit-a11y/src/lib.rs:sync_inner/map_request/map_parts",
-      "status": "source-confirmed ownership gap; foreign-tree runtime admission control pending",
-      "evidence": "Native bridge requests carry a target tree, but the Mere mapper forwards only action/data/target_node into freshly replaced maps. Public map_request similarly ignores the request tree. The surrounding root-only bridge contract must be checked before adding a refusal rule.",
-      "owner": "target lifetime migration; preserve tree/window origin rather than infer it from a numeric node ID"
+      "status": "repaired and qualified by native foreign-tree DOM/producer controls; ROOT publication lifetime remains open",
+      "evidence": "Pinned Genet 206b80c components/genet-winit-host/src/a11y.rs:A11yPublication::replace_host; native lifetime_tests_foreign_tree_ids_cannot_alias_host_dom_or_producer_targets.",
+      "owner": "target lifetime migration; preserve tree/window origin rather than infer it from a numeric node ID",
+      "change": "Pass target_tree through both native ingress paths; refuse non-ROOT requests before host map lookup. Pinned Genet single-update bridge owns only ROOT; guest trees require its separate ordered batch protocol."
     },
     {
       "id": "diagnostics-native-a11y-install-state",
@@ -347,6 +348,24 @@
       "status": "source-confirmed failed-install retry/state gap; headed failure qualification remains open",
       "evidence": "The initial install Err branch logs failure, then sets installed=true unconditionally. Later syncs call update rather than retry install. This does not establish a public false-success result, but a later valid tree or transient adapter recovery has no install retry in this object.",
       "gate": "Classify permanent unsupported versus transient/invalid-tree failures, retain truthful state and bounded retry/fallback policy, then qualify an actual failed native installation and recovery. Do not replace this with an unconditional per-frame retry loop."
+    },
+    {
+      "id": "diagnostics-queued-owner-registration-alias",
+      "source": "crates/cambium/cambium-rootstock/src/a11y_queue.rs; host.rs:queue_a11y/drain_pointer; producer/registry.rs:register",
+      "status": "repaired and qualified by actual queued host/producer/disposal controls; see diagnostics-lifetimes-qualification.json",
+      "change": "Queue binds a weak originating host/document, mount and logical producer registration; compare current registry identity before existing per-request semantic admission. Detached old registries cannot lend authority to replacement slots. No GPU identity or read-side life allocation."
+    },
+    {
+      "id": "diagnostics-queued-acknowledgement-disposal",
+      "source": "crates/cambium/cambium-rootstock/src/a11y_queue.rs:Drop; host.rs:take_disposal/queue_a11y",
+      "status": "repaired and qualified by actual queued host/producer/disposal controls; see diagnostics-lifetimes-qualification.json",
+      "change": "Pending queue destruction acknowledges Cancelled. Independent-host disposal cancels immediately and closes later queue admission, while completed results remain unchanged."
+    },
+    {
+      "id": "diagnostics-browser-mirror-membership",
+      "source": "crates/cambium/cambium-genet-web-host/src/a11y.rs:MirrorHandle::request_target_of",
+      "status": "membership guard implemented and Wasm compiled; browser runtime unqualified",
+      "change": "Require the event element to remain in the owning mirror before mapping a numeric data-node attribute. This does not establish provider or child lifetime."
     }
   ],
   "ownership_migrations": [
@@ -532,7 +551,7 @@
     {
       "order": 2,
       "subject": "target generations",
-      "status": "next: originating owner and target lifetime audit, including platform tree maps, provider/key replacement and queued acknowledgement disposal"
+      "status": "partial: queued host/document/mount/producer registration lives, acknowledgement disposal and native foreign-tree admission qualified. Authored child and leaf lives plus platform publication/ingress provenance remain open."
     },
     {
       "order": 3,
@@ -559,7 +578,32 @@
       "disposition": "closed without production change",
       "evidence": "diagnostics-selectors-receiving-prepare.json; corrected receiving-controls cohort",
       "reason": "The test initially assumed completion on the acknowledgement turn. Taproot actually needs another scenario tick. Mesquite already waits for held clicks before ticking; the unchanged completion path is tested with a declined generated last action."
+    },
+    {
+      "id": "diagnostics-independent-dom-numeric-alias",
+      "disposition": "closed as an invalid fixture premise on the pinned supplier",
+      "evidence": "Genet 206b80c components/genet-scripted-dom/lib.rs:NodeId/next_arena_id; diagnostics-lifetimes-native-tests.json retained initial failing assertion.",
+      "reason": "Complete DOM NodeId already contains a unique 24-bit birth arena and monotonic 40-bit serial; independent documents do not mint the same complete ID. Adoption preserves IDs, so birth arena is not current storage ownership. The corrected owner control keeps the same producer registration and local slot/child keys live across DOM replacement, or transplants the exact runner into another host."
     }
   ],
-  "selector_initial_basis": "3af00fc90"
+  "selector_initial_basis": "3af00fc90",
+  "target_lifetime_brief": "diagnostics-lifetimes-brief.json",
+  "target_lifetime_remaining_owners": [
+    {
+      "owner": "TextureProducer child model and shared request/activation contract",
+      "gap": "Removed/reintroduced child keys within a live producer have no lifetime; observation cannot recover unobserved replacement. Preserve Graphshell retained-content owner keys across ordinary producer recreation.",
+      "gate": "Owner-issued child-life change at authored removal/replacement and atomic activation check; old requests refuse while ordinary updates/republication remain valid."
+    },
+    {
+      "owner": "Sprigging LeafRegistry and shared action ingress",
+      "gap": "insert replaces a boxed contributor, get_mut_as updates it. Current DOM node membership does not distinguish these lives.",
+      "gate": "Registry-issued replacement lifetime carried through real ingress; value updates preserve life."
+    },
+    {
+      "owner": "Accessibility publication and native/browser ingress",
+      "gap": "Native current maps replace publication maps before drain; ROOT and DOM numeric IDs do not identify owner life. Browser mirror current maps also lack originating provider/child life; direct raw A11yRequest remains current-context only.",
+      "gate": "One owner-issued target-life request/publication contract, received at native/browser/automation boundaries, with exact stale/foreign/reuse controls. Private queue bindings cannot repair provenance lost before enqueue."
+    }
+  ],
+  "target_lifetime_qualification": "diagnostics-lifetimes-qualification.json"
 }

@@ -1,0 +1,25 @@
+{
+  "basis": "a845b0b222431fc340ba3e8e59b9f77d44e4545a",
+  "initial_basis": "8008eba7d",
+  "source_sha256": {
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "9afa08fcb6febfa2982c0d354fef1b429dac8997f25420a8ea9a9d81647ab4d0",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "8850ac7bc1d76d8ce959417af6366f4a7871bba870de4861af21bc9d198a9a1e",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "95de1c0ca0dbe6b8a908266126f8011bb3cd2f0159a48f1ad18d8807393da454",
+    "crates/cambium/cambium-rootstock/src/host.rs": "64926dcdbb9ed5605cdbc49ee6e808894c7d43e8f6c927801f07198609d8fc90",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "85f92cedc34aa7d6d13c631fc013b1138b847e95e44a0b6841ef2c4b42981851",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "36014947bd7bdde541d5f716331b4c7ed099a3bc2b34566b62d6d3b1e92f5263",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "f18b02c66aa01ec53fe36445e45feec5538dae9e62eeda8b6efcc770add7fa2e",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "27fddf2eb90d7b5ab90af9eaf9a6debfce591045b11389550ff6df1cc0d1309a",
+    "Cargo.lock": "d5702303b7da535f9fbd451db378c8a2f0571859b55b7f0fd4ecc1514f36206c",
+    "Cargo.toml": "ff97806c858252765af770f33dc0ea29a1df1ae44068a8bd169479a5ef471fd7",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b",
+    "support/family-promotion/gate.py": "044799a77a4ca1a5f9f460d1369e1084aa519e3b435df757017b3f6a03046520"
+  },
+  "supplier": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "sealed_register_reference": "support/family-promotion/diagnostics-flat-discovery-source.json:sealed_register_sha256",
+  "sealed_register_count": 433,
+  "sealed_register_changes": [],
+  "retained_byte_cap": 10000000,
+  "previous_seal": "diagnostics-lifetimes-source.json",
+  "seal_change": "Add explicit removal/re-registration and mount binding controls before final native compilation."
+}

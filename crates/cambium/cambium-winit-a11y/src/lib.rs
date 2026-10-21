@@ -151,7 +151,9 @@ impl A11yHost {
         self.bridge
             .drain_actions()
             .into_iter()
-            .filter_map(|req| self.map_parts(req.action, req.data, req.target_node))
+            .filter_map(|req| {
+                self.map_parts(req.action, req.data, req.target_tree, req.target_node)
+            })
             .collect()
     }
 
@@ -172,7 +174,12 @@ impl A11yHost {
     /// "the app does it": a test can feed a request the same way the adapter
     /// does, without a screen reader.
     pub fn map_request(&self, request: &accesskit::ActionRequest) -> Option<A11yRequest> {
-        self.map_parts(request.action, request.data.clone(), request.target_node)
+        self.map_parts(
+            request.action,
+            request.data.clone(),
+            request.target_tree,
+            request.target_node,
+        )
     }
 
     /// The parts of a request, whichever type carried them.
@@ -180,8 +187,15 @@ impl A11yHost {
         &self,
         action: Action,
         data: Option<ActionData>,
+        tree: accesskit::TreeId,
         target: A11yNodeId,
     ) -> Option<A11yRequest> {
+        // This host publishes one ROOT tree through bridge.install/update.
+        // Embedded-tree routing belongs to the bridge's separate batch API;
+        // its numeric IDs cannot be resolved through these host-only maps.
+        if tree != accesskit::TreeId::ROOT {
+            return None;
+        }
         let action = match action {
             Action::Click => A11yAction::Click,
             Action::Focus => A11yAction::Focus,
@@ -315,6 +329,34 @@ mod dpi_tests {
             host.map_request(&request(Some(ActionData::NumericValue(f64::NAN)))),
             None,
         );
+    }
+
+    #[test]
+    fn lifetime_tests_foreign_tree_ids_cannot_alias_host_dom_or_producer_targets() {
+        let dom = ScriptedDom::new();
+        let node = dom.document();
+        let mut host = A11yHost::new(|| {});
+        host.action_map.insert(A11yNodeId(44), node);
+        let produced = ProducedAction {
+            slot: 7,
+            key: 40,
+            id: "pin".into(),
+        };
+        host.produced_map.insert(A11yNodeId(45), produced.clone());
+        for (target, expected) in [
+            (44, A11yRequest::node(A11yAction::Click, node)),
+            (45, A11yRequest::produced(A11yAction::Click, produced)),
+        ] {
+            let mut request = ActionRequest {
+                action: Action::Click,
+                target_tree: TreeId(accesskit::Uuid::from_u128(77)),
+                target_node: A11yNodeId(target),
+                data: None,
+            };
+            assert_eq!(host.map_request(&request), None);
+            request.target_tree = TreeId::ROOT;
+            assert_eq!(host.map_request(&request), Some(expected));
+        }
     }
 
     #[test]

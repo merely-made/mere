@@ -74,6 +74,11 @@ impl MirrorHandle {
     ) -> Option<cambium_rootstock::A11yTarget> {
         let element = event_target?.dyn_into::<Element>().ok()?;
         let element = element.closest(&format!("[{NODE_ATTR}]")).ok()??;
+        // Resolve only elements still belonging to this mirror. Detached or
+        // foreign elements can carry a numeric ID that the current map reuses.
+        if !self.root.contains(Some(element.as_ref())) {
+            return None;
+        }
         let id: u64 = element.get_attribute(NODE_ATTR)?.parse().ok()?;
         let shared = self.shared.borrow();
         if let Some(node) = shared.targets.get(&id) {
