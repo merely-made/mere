@@ -481,3 +481,10 @@ The released Cambium docs also correct a private-handler link and an HTML
 placeholder. These edits change documentation only. The incoming rootstock
 producer changes receive a fresh library run. Package verification and
 registry-only old/new API checks are required before marking delivery done.
+
+A packaged-crate test exposed an existing backdrop test's external fixture
+path, which cannot resolve outside the repository. Cambium now packages a
+byte-identical copy of the design-study fretboard fixture and refers to that
+package-local path. This changes test packaging only; runtime source and
+fixture semantics are unchanged. The failed attempt remains in the release
+evidence and a fresh packaged test run is required before the Cambium upload.
