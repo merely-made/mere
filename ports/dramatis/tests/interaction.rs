@@ -248,6 +248,22 @@ fn authentication_control_is_a_public_request_and_disabled_when_locked() {
 }
 
 #[test]
+fn authentication_can_retry_after_a_presented_busy_state_and_cancellation() {
+    let mut h = host(false, false, 860.);
+    let change = Selector::role("button").containing("Change passphrase");
+    assert!(h.click_on(&change));
+    h.update(|s| s.request = None);
+    h.layout_at(860., 720.);
+    assert!(h.state().busy);
+    h.update(|s| {
+        s.busy = false;
+        s.notice = "Passphrase change cancelled. Your passphrase is unchanged.".into();
+    });
+    assert!(h.click_on(&change));
+    assert!(matches!(h.state().request, Some(Request::ChangePassphrase)));
+}
+
+#[test]
 fn feedback_keeps_its_live_region_and_personae_heading_stable() {
     let mut h = host(false, false, 860.);
     let node = |h: &Harness<State, Logic, Child>, selector: Selector| {
