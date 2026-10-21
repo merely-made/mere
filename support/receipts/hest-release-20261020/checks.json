@@ -1,0 +1,462 @@
+[
+  {
+    "name": "cambium-dry-run",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--dry-run",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/cambium/Cargo.toml"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 5.35,
+    "finished_utc": "2026-10-21T01:53:15.092581+00:00",
+    "log": "cambium-dry-run.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "474646cc0d4cae6fa0a25f5dbb0513a83090e3ea53ccbb3dc600a003b144eb90",
+    "stored_log_sha256": "d2027cd552e944cebdf9b940a305a0859015afc1c04470ff4ffb0e4867ea945d",
+    "suites": []
+  },
+  {
+    "name": "cambium-fixed-dry-run",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--dry-run",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/cambium/Cargo.toml"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 4.69,
+    "finished_utc": "2026-10-21T01:54:29.480433+00:00",
+    "log": "cambium-fixed-dry-run.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "3a2d1561d402c8084ba1be61481c0d6f8323fa4d9b76d2fef44387a180e547de",
+    "stored_log_sha256": "0ba5f16c17166345dbc4a77f90e4a8413a8855d0fe305b5da5d21a9fcadf3ffa",
+    "suites": []
+  },
+  {
+    "name": "fixed-packaged-cambium-all-features",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "check",
+      "--locked",
+      "--all-features",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/packaged-fixed/cambium-0.5.0/Cargo.toml"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 9.89,
+    "finished_utc": "2026-10-21T01:55:29.739109+00:00",
+    "log": "fixed-packaged-cambium-all-features.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "c55bf00dc583bd8704aebe80151f40ba0a1c125bc290b27e624ad60ea0b4cb19",
+    "stored_log_sha256": "f95d6e193d83c54e70aa1080730739c99f002adad410028dfac022b6cdff6130",
+    "suites": []
+  },
+  {
+    "name": "fixed-packaged-cambium-tests",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/packaged-fixed/cambium-0.5.0/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 17.34,
+    "finished_utc": "2026-10-21T01:55:06.855308+00:00",
+    "log": "fixed-packaged-cambium-tests.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "c05c7533b97037a72b1e8fc34a7de80957331cf0d7e3bd7222e39950c24fd637",
+    "stored_log_sha256": "7c7b1347a0f559d1b4102b9d427107540165431675856a97fe6c64c00a0ba273",
+    "suites": [
+      {
+        "passed": 279,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "isolated-packaged-hest-0.1-tests",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/packaged/hest-0.1.0/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 4.77,
+    "finished_utc": "2026-10-21T01:51:59.956694+00:00",
+    "log": "isolated-packaged-hest-0.1-tests.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "79dc96b5789006f554478c8565548ccba750547f5e0330d77a1e2324957b3d89",
+    "stored_log_sha256": "05c25e6423e4b39f9a5fe32b6afba1f87a86d9505a260874f3eb19ea6c997789",
+    "suites": [
+      {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "isolated-packaged-hest-0.2-tests",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/packaged/hest-0.2.0/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 3.7,
+    "finished_utc": "2026-10-21T01:51:47.454119+00:00",
+    "log": "isolated-packaged-hest-0.2-tests.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "fc3b20457437b93ca32ad75c398581a36f38a70e70bccbef856d2e54a27d896d",
+    "stored_log_sha256": "c00a4c9d48fc5dcad3e38a6f44776c7349afe8062dcb27d9287c9867cd005c0e",
+    "suites": [
+      {
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "knot-receiving",
+    "cwd": "/Users/markik/Code/repos/knot-editor",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "knot-desktop",
+      "--test",
+      "command_chrome",
+      "--",
+      "--test-threads=1"
+    ],
+    "source_revision": "db929c8752c72749463bca775dfe0203489f0ee5",
+    "exit_code": 0,
+    "elapsed_seconds": 11.75,
+    "finished_utc": "2026-10-21T01:55:31.597963+00:00",
+    "log": "knot-receiving.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "b301c4a2d66dd6e09f26e7a0f0ddab96faa7136a7cc189ac79a94310c0a19691",
+    "stored_log_sha256": "e3ace75850bedaa33fde508374e6ec482bc529696ccb0c2389e35641e90aa912",
+    "suites": [
+      {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "publish-cambium",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/cambium/Cargo.toml"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 6.72,
+    "finished_utc": "2026-10-21T01:55:54.641303+00:00",
+    "log": "publish-cambium.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "af223d61365d1ba499e30222a8541ddad6ad7032213f5488b33d662a76524651",
+    "stored_log_sha256": "7e6d484db036fde8433a21beecc6ad645dd2323ee23127bc6dce92e822bf10c9",
+    "suites": []
+  },
+  {
+    "name": "publish-hest-0.1",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/hest-0_1/Cargo.toml"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 2.35,
+    "finished_utc": "2026-10-21T01:51:33.962652+00:00",
+    "log": "publish-hest-0.1.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "d728b26bb6b7797611be7e1e4959efbd7752692d507a58a19f10e62276fb07a6",
+    "stored_log_sha256": "03dcdb1ab4278ed2b04d01e5bf8ed3768fb006cfea66508a2a639ba6a7e0e23b",
+    "suites": []
+  },
+  {
+    "name": "publish-hest-0.2",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/hest/Cargo.toml"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 2.87,
+    "finished_utc": "2026-10-21T01:52:43.966425+00:00",
+    "log": "publish-hest-0.2.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "658309fb6dab70d8d7ba18bd85cb8f4fa72d8dd71202e3370c722895927734f1",
+    "stored_log_sha256": "5c64aeb5251db18a6a29853d5c9557c58674be11156d8dba28187a3ee5adfd7a",
+    "suites": []
+  },
+  {
+    "name": "publish-shim",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/command-menu/Cargo.toml"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 3.93,
+    "finished_utc": "2026-10-21T01:52:30.285293+00:00",
+    "log": "publish-shim.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "8ea92041f9e731423481e62d89ad26bf7c70c9a58b1e1e17ae6296353e5bca72",
+    "stored_log_sha256": "2ace42e6eaa22eb723abf4fb9a00f04b4dff25ed7fbff45971414506ac82df59",
+    "suites": []
+  },
+  {
+    "name": "registry-current-test",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/registry-current/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 11.19,
+    "finished_utc": "2026-10-21T01:56:44.252434+00:00",
+    "log": "registry-current-test.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "4a7cd3447cbec59fbcc284bcae362fd4bbb581aa0262527782ae8bcbfe605a25",
+    "stored_log_sha256": "f062fb20feddc4d83f62423868426ae5e6ca68eed55945b03a962787b7aaa3f4",
+    "suites": [
+      {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "registry-old-test",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "/Users/markik/Code/testing/mere/hest-release-20261020/registry-old/Cargo.toml",
+      "--lib"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 12.14,
+    "finished_utc": "2026-10-21T01:52:54.379897+00:00",
+    "log": "registry-old-test.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "98e83aa47ae12881b4ea1261774524ba0404c611b78cf372a0f365aa98f075ac",
+    "stored_log_sha256": "a624371938425f914eb8c03ab2126b0958879938d29d6893f9473d8ae8244880",
+    "suites": [
+      {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "shim-dry-run",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--dry-run",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/command-menu/Cargo.toml"
+    ],
+    "source_revision": "561188d5aaf5b98c5e18a845c56163f41a45ff23",
+    "exit_code": 0,
+    "elapsed_seconds": 4.44,
+    "finished_utc": "2026-10-21T01:51:58.499763+00:00",
+    "log": "shim-dry-run.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "0e9f3fafd05a42b4ad76798624104265eb2abbd0f917b9f9637556a35abb3164",
+    "stored_log_sha256": "81eb98e19201d4a2693dfcda7b8aec1b9f17057628ff8a0eb8b89e974a0e95ca",
+    "suites": []
+  },
+  {
+    "name": "strict-rustdoc",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "env",
+      "RUSTDOCFLAGS=-D rustdoc::broken_intra_doc_links -D rustdoc::private_intra_doc_links -D rustdoc::invalid_html_tags",
+      "cargo",
+      "doc",
+      "--locked",
+      "--offline",
+      "--no-deps",
+      "-p",
+      "hest@0.2.0",
+      "-p",
+      "chirograph",
+      "-p",
+      "cambium",
+      "-p",
+      "command-menu",
+      "-p",
+      "cambium-rootstock"
+    ],
+    "source_revision": "615b35e2e2af5436825d154eea52ae6c167cbfb3",
+    "exit_code": 0,
+    "elapsed_seconds": 4.87,
+    "finished_utc": "2026-10-21T01:58:15.902365+00:00",
+    "log": "strict-rustdoc.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "3dfae92f8be18c426247905802f169b57ee512c96b2e4e8531d6a317a3db7fac",
+    "stored_log_sha256": "890099095bf4be1ca947c0c15a7fe196fc9a062ce21e02ce3ced40c76cf0a792",
+    "suites": []
+  },
+  {
+    "name": "turnstone-receiving",
+    "cwd": "/Users/markik/Code/repos/turnstone",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--lib",
+      "hest_",
+      "--",
+      "--test-threads=1"
+    ],
+    "source_revision": "49e7928d84dca82311a2c681f3de7066e0e6d320",
+    "exit_code": 0,
+    "elapsed_seconds": 6.29,
+    "finished_utc": "2026-10-21T01:55:26.133671+00:00",
+    "log": "turnstone-receiving.log.gz",
+    "compression": "gzip",
+    "raw_log_sha256": "fb376d465fb9c0f988fa3555c1fe74067fbef51fd7c73c7c56f8bb6e5b1f9186",
+    "stored_log_sha256": "6116397b4861ecd4d491fdc54acbd539547fc5099a79db998053563477418cd8",
+    "suites": [
+      {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  {
+    "name": "rootstock",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "cambium-rootstock",
+      "--lib"
+    ],
+    "source_revision": "c5f3a4cd5dcc3cdd5c79cc5b553bfcf13237aa86",
+    "exit_code": 0,
+    "log": "rootstock.log.gz",
+    "exit_status_source": "observed completed exec tool result",
+    "source_note": "Incoming c5f3a4cd5 runtime with documentation-only repairs in progress; compiled runtime/tests unchanged by the subsequent repair commit.",
+    "compression": "gzip",
+    "raw_log_sha256": "4b53e7e4e093126b2cb6e8b46cb278a4fcb0106b0ff7dc25ddac842f76b735e6",
+    "stored_log_sha256": "7dd2bee406b4cbf776f0dec94c8fa43ae67abda66bc43e1504c8b45033598da5",
+    "suites": [
+      {
+        "passed": 141,
+        "failed": 0,
+        "ignored": 3
+      }
+    ]
+  },
+  {
+    "name": "hest-0.1-dry-run",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--dry-run",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/hest-0_1/Cargo.toml"
+    ],
+    "source_revision": "c5f3a4cd5dcc3cdd5c79cc5b553bfcf13237aa86",
+    "exit_code": 0,
+    "log": "hest-0.1-dry-run.log.gz",
+    "exit_status_source": "observed completed exec tool result",
+    "compression": "gzip",
+    "raw_log_sha256": "5676bfbcfc495ec896a0a9b80353f4d684499944a533b20b2db74f2f288d8fa2",
+    "stored_log_sha256": "c542749fce1d28fbbfedee9e0ba746962976ea1762fe8c405736fcf1e4e9dab9",
+    "suites": []
+  },
+  {
+    "name": "hest-0.2-dry-run",
+    "cwd": "/Users/markik/Code/repos/mere",
+    "command": [
+      "cargo",
+      "publish",
+      "--dry-run",
+      "--locked",
+      "--manifest-path",
+      "crates/cambium/hest/Cargo.toml"
+    ],
+    "source_revision": "c5f3a4cd5dcc3cdd5c79cc5b553bfcf13237aa86",
+    "exit_code": 0,
+    "log": "hest-0.2-dry-run.log.gz",
+    "exit_status_source": "observed completed exec tool result",
+    "compression": "gzip",
+    "raw_log_sha256": "7829131b69b4044fab9be18a9622e5a36befd7a89dc207b77b0bcd81deb79ac0",
+    "stored_log_sha256": "d5e88a3f779ff49dab8f7ae9b9659e10dd079731d0550d58205d14cf02c420b5",
+    "suites": []
+  }
+]

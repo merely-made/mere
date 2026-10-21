@@ -4,9 +4,10 @@
 
 **Status (2026-10-20):** H3 is implemented and qualified through canonical
 Turnstone keys, Knot window verbs and a Chirograph wire round trip. Hest 0.2.0
-and Cambium 0.5.0 remain the prepared versions; frozen Hest 0.1.0 and the
-command-menu 0.1.1 shim are unchanged. Mark authorized commits, pushes, merges,
-publication and scoped pruning. Release verification is in progress. H4 is unstarted.
+and Cambium 0.5.0 are published, along with frozen Hest 0.1.0 and the
+command-menu 0.1.1 shim. Downloads match registry checksums and committed
+sources; registry-only compatibility and current facade checks pass. Git
+delivery and scoped pruning are complete. H4 is unstarted.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
@@ -117,8 +118,8 @@ The port law applies: a piece moves only when a second host exercises it. A pure
   moved `CommandSet` or `MenuSession`. Kernel action and registry input tests
   are library receipts, not independent host exercises.
 - The compatibility fixture uses immutable registry Cambium 0.4.0 and local
-  candidate overrides for Hest and the shim only. This is a prepublication
-  check; a registry-only resolution of the new versions waits for publication.
+  candidate overrides for Hest and the shim only. At H1 this was a prepublication
+  check; the release qualification below now proves registry-only resolution.
 - The two independent host exercises are Graphshell's retained viewer command
   model (`viewer_commands::tests`, through the port's `web` feature) and
   Turnstone's actual palette (`app::palette::command_menu_tests`). The compact
@@ -256,12 +257,13 @@ desktop/browser presentation and native restart were not exercised.
 - H2 began on the 0.2.0 line. The 0.1.0 source is frozen in
   `crates/cambium/hest-0_1`, an excluded standalone package, while the active
   workspace Hest advances to 0.2.0. The shim continues to depend on 0.1.x.
-  This bounded compatibility source is needed until the two unpublished H1
-  candidates can be delivered without breaking published Cambium 0.4.0.
+  This bounded compatibility source was retained until the H1 candidates
+  could be delivered without breaking published Cambium 0.4.0. It remains
+  available to reproduce the original path-based receipts.
   H2's two exercises are the declaration-driven `ux-events` probe and an
   isolated Turnstone receiver; canonical Turnstone changes remain separate.
-- Push, publication, registry-only new-version resolution and native/browser
-  presentation remain deferred.
+- At that checkpoint push, publication, registry-only new-version resolution
+  and native/browser presentation remained deferred.
 
 - **Second reconciliation:** main advanced during qualification. Both local
   commits were rebased onto fetched Mere `b10ae5f88`; H1 is now `cea6d09b2`.
@@ -462,7 +464,8 @@ Git seeding; only registry downloads were reused. This is remote source
 availability and identity evidence, not a repeated native/runtime test.
 [Git delivery and fresh resolution](../../../support/receipts/hest-h3-20261020/delivery.json)
 records the exact pushed heads, commands, real exit statuses and source proof.
-No crate publication occurred. H4 and native GUI/human AT remain separate.
+At the H3 Git checkpoint no crate publication had occurred. The subsequent
+release below completes that delivery. H4 and native GUI/human AT remain separate.
 
 
 ### Release authorization and documentation repair
@@ -480,11 +483,52 @@ reverse dependency. Stale surface-boot and private-state links are corrected.
 The released Cambium docs also correct a private-handler link and an HTML
 placeholder. These edits change documentation only. The incoming rootstock
 producer changes receive a fresh library run. Package verification and
-registry-only old/new API checks are required before marking delivery done.
+registry-only old/new API checks subsequently passed as recorded below.
 
 A packaged-crate test exposed an existing backdrop test's external fixture
 path, which cannot resolve outside the repository. Cambium now packages a
 byte-identical copy of the design-study fretboard fixture and refers to that
 package-local path. This changes test packaging only; runtime source and
 fixture semantics are unchanged. The failed attempt remains in the release
-evidence and a fresh packaged test run is required before the Cambium upload.
+evidence and the fresh packaged test run passed before the Cambium upload.
+
+
+### Published release qualification
+
+All four uploads completed in dependency order: Hest 0.1.0, command-menu
+0.1.1, Hest 0.2.0, Cambium 0.5.0. The official registry reports each version
+as available and not yanked. Downloaded archives match the registry SHA256
+checksums; their VCS metadata and all 88 packaged source/test files match the
+committed release trees. Hest and shim sources remain exact since the H3
+supplier. The facade differs only in documentation and test packaging.
+
+- Frozen Hest 0.1 passes 13 packaged tests; Hest 0.2 passes 17.
+- Cambium 0.5 passes all 279 tests from its extracted package using published
+  dependencies, plus its all-features compile check. The packaged fretboard
+  fixture is byte-identical to the design-study original.
+- Three old-API compatibility tests pass using only registry packages:
+  immutable Cambium 0.4.0, command-menu 0.1.1 and Hest 0.1.0. Two current-API
+  tests pass using only Cambium 0.5.0 and Hest 0.2.0, including declarations,
+  opaque invocation bytes and terminal outcomes crossing the facade. Neither
+  registry fixture uses a local patch or Git dependency.
+- The fresh rootstock run passes 141 cases with 3 existing ignores, covering
+  incoming producer changes. Strict Rustdoc for Hest, Chirograph, Cambium,
+  command-menu and rootstock passes with broken links, private links and
+  invalid HTML treated as errors. The earlier expanded-rootstock failure is
+  superseded; no whole-tree documentation-cleanliness claim is made.
+- Fresh canonical receiving checks pass: Turnstone's four H3 cases and Knot's
+  nine command-chrome cases. Their code and locks remain at the already
+  qualified Git cohort; this release does not repin their suppliers.
+- Mere fast-forwarded the two incoming commits before the fixes, which were
+  committed and pushed on main. No Hest pull request remained to merge.
+  Pruning stale remote references and expired worktree metadata completed
+  across Mere, Turnstone and Knot. Nothing required removal; unrelated
+  branches and both other Mere worktrees remain intact.
+
+[Release qualification](../../../support/receipts/hest-release-20261020/qualification.json),
+[command receipts](../../../support/receipts/hest-release-20261020/checks.json),
+[registry download/source proof](../../../support/receipts/hest-release-20261020/registry-publication-proof.json)
+and the locked fixtures beside them retain reproducible evidence. The two
+superseded package-test attempts are retained separately. This completes H3
+publication. H4 audit/scripting, a fresh MSRV run and native GUI/human AT
+acceptance remain separate work.
