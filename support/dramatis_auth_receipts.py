@@ -2,7 +2,7 @@
 """Headed local authentication through Dramatis and an owned synthetic Djinn authority.
 The ignored-test host refuses existing seed roots and requires its fixture marker on reopen.
 """
-import argparse, hashlib, json, os, subprocess, time
+import argparse, getpass, hashlib, json, os, platform, subprocess, time
 from pathlib import Path
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -12,13 +12,34 @@ def wait_file(path, process, timeout=180):
         assert process.poll() is None, ('fixture exited', process.returncode)
         assert time.monotonic()<end, ('fixture readiness',str(path))
         time.sleep(.05)
+def desktop_environment():
+    """Use the existing Linux user session; never configure or unlock it."""
+    assert platform.system()=='Linux'
+    raw=subprocess.check_output(['systemctl','--user','show-environment'],text=True)
+    allowed={'DISPLAY','WAYLAND_DISPLAY','XDG_RUNTIME_DIR','XDG_SESSION_TYPE',
+             'XDG_CURRENT_DESKTOP','DBUS_SESSION_BUS_ADDRESS','XAUTHORITY'}
+    graphical={k:v for line in raw.splitlines() if '=' in line
+               for k,v in [line.split('=',1)] if k in allowed}
+    assert graphical.get('DISPLAY') or graphical.get('WAYLAND_DISPLAY'),'no graphical session'
+    session=subprocess.check_output(['loginctl','show-user',getpass.getuser(),'-p','Display','--value'],text=True).strip()
+    raw=subprocess.check_output(['loginctl','show-session',session,'-p','Name','-p','Active',
+        '-p','State','-p','Type','-p','Remote','-p','LockedHint'],text=True)
+    state=dict(line.split('=',1) for line in raw.splitlines() if '=' in line)
+    assert state.get('Active')=='yes' and state.get('LockedHint')=='no',state
+    return graphical,{'session':session,'state':state,'environment':graphical,
+        'hostname':platform.node(),'architecture':platform.machine(),'kernel':platform.release(),
+        'os_release':Path('/etc/os-release').read_text()}
 def main():
     p=argparse.ArgumentParser()
     for n in ['binary','host','runtime','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--native',action='store_true')
+    p.add_argument('--desktop',action='store_true',help='use the existing unlocked Linux user desktop')
     p.add_argument('--format',choices=['sealed','portable','both'],default='both')
     a=p.parse_args();a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
-    repo=Path(__file__).resolve().parents[1];processes=[];results=[]
+    repo=Path(__file__).resolve().parents[1];processes=[];results=[];graphical={}
+    if a.desktop:
+        graphical,desktop=desktop_environment()
+        (a.output/'desktop.json').write_text(json.dumps(desktop,indent=2)+'\n')
     for fmt in (['sealed','portable'] if a.format=='both' else [a.format]):
         root=a.runtime/fmt;out=(a.output/fmt).resolve();out.mkdir()
         for phase in ['seed','reopen']:
@@ -26,6 +47,7 @@ def main():
             env=os.environ.copy()
             for key in list(env):
                 if key.startswith(('DRAMATIS_','GRAPHSHELL_','PERSONAE_','MERE_','D_AUTH_')):env.pop(key)
+            env.update(graphical)
             env.update(D_AUTH_ROOT=str(root.resolve()),D_AUTH_FORMAT=fmt,D_AUTH_PHASE=phase,D_AUTH_NATIVE='1' if a.native else '0')
             host=subprocess.Popen([str(a.host.resolve()),'--ignored','--exact','headed_authentication_host','--nocapture'],cwd=repo,env=env,stdout=host_log,stderr=subprocess.STDOUT)
             try:
