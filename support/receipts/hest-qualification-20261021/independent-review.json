@@ -1,0 +1,14 @@
+{
+  "reviewer": "Luna high subagent",
+  "scope": "Published-package MSRV packet, artifact checksums, lock graphs, fixture source and counts",
+  "result": "No source or receipt integrity discrepancy found",
+  "archive_hashes_checked_against": "hest-release-20261020/registry-publication-proof.json",
+  "claim": "Four published archives and two registry-only fixtures on Linux Rust 1.97.1: 324 passed, zero failed, one ignored Cambium EditHistory doctest",
+  "excluded": [
+    "Whole-workspace MSRV",
+    "Native application runtime",
+    "Browser runtime",
+    "Fresh-process application reopen",
+    "Human AT"
+  ]
+}

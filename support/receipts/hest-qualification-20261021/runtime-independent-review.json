@@ -1,0 +1,14 @@
+{
+  "reviewer": "Luna high subagent",
+  "scope": "Read-only runtime packet, source provenance, hashes and qualification boundaries",
+  "result": "No concrete provenance or claim mismatch found",
+  "verified": [
+    "Frozen c66620ca runtime identity",
+    "Served Wasm and scenario hashes match receipts",
+    "Hest invoke reaches current host receiver and zoom-change assertions",
+    "Headed Chrome metadata and capped cgroup",
+    "Missing exported commands audit matches completion adapter source",
+    "Native, reopen, hardware GPU identity and human AT remain unqualified"
+  ],
+  "precision_note": "Invocation capture follows zoom-in and zoom-out; assertions before zoom-out establish the changed zoom state."
+}
