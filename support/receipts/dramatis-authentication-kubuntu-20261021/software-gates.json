@@ -1,0 +1,104 @@
+{
+  "built_on_this_host": false,
+  "source": "a58b8014e14829356d1d013f4abb7051e1717111",
+  "producer_manifest": "transfer.json",
+  "commands": [
+    {
+      "gate": "storage",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/storage-castellan",
+        "passphrase",
+        "--test-threads=1"
+      ],
+      "passed": 26,
+      "exit": 0,
+      "seconds": 54.66909742215648
+    },
+    {
+      "gate": "provider",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/provider-djinn",
+        "identity_ui::tests",
+        "--test-threads=1"
+      ],
+      "passed": 5,
+      "exit": 0,
+      "seconds": 2.37613096088171
+    },
+    {
+      "gate": "resident",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/authentication-host",
+        "--test-threads=1"
+      ],
+      "passed": 2,
+      "exit": 0,
+      "seconds": 18.997724045999348
+    },
+    {
+      "gate": "absent-provider",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/authentication-host",
+        "--ignored",
+        "--exact",
+        "absent_graphical_password_provider_refuses_without_changing_the_vault",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "passed": 1,
+      "exit": 0,
+      "seconds": 2.7793053770437837
+    },
+    {
+      "gate": "interaction",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/app-interaction",
+        "--test-threads=1"
+      ],
+      "passed": 10,
+      "exit": 0,
+      "seconds": 2.266572874970734
+    },
+    {
+      "gate": "state",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/app-state",
+        "--test-threads=1"
+      ],
+      "passed": 5,
+      "exit": 0,
+      "seconds": 0.006014376180246472
+    },
+    {
+      "gate": "app-library",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/app-dramatis_app",
+        "--test-threads=1"
+      ],
+      "passed": 0,
+      "exit": 0,
+      "seconds": 0.008736476069316268
+    },
+    {
+      "gate": "app-binary",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/app-dramatis_ui",
+        "--test-threads=1"
+      ],
+      "passed": 0,
+      "exit": 0,
+      "seconds": 0.0041035430040210485
+    },
+    {
+      "gate": "package-fixture",
+      "command": [
+        "/home/markik/Code/output/dauth-kubuntu21/frozen/app-package_feed",
+        "--test-threads=1"
+      ],
+      "passed": 0,
+      "exit": 0,
+      "seconds": 0.006516388850286603
+    }
+  ],
+  "passed": 49
+}
