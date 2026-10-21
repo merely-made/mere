@@ -234,3 +234,25 @@ recheck distinct from the immutable supplier/receiver qualification. Scoped
 reference and D2 audits have zero actionable Hest findings (20 claims hold).
 Pruning stale refs and expired worktree metadata found no task artifacts to
 remove; unrelated worktrees and branches are preserved.
+
+
+## Qualification follow-through, 2026-10-21
+
+Fresh Linux MSRV qualification is complete for the published Hest 0.1.0 and
+0.2.0, command-menu 0.1.1 and Cambium 0.5.0 packages. The downloaded archives
+match the publication checksums. Rust 1.97.1, shipped package locks and all
+features pass **324 tests in aggregate**, including the old/current registry
+compatibility fixtures, with one existing ignored Cambium doctest. The
+[qualification packet](../../../support/receipts/hest-qualification-20261021/README.md)
+retains commands, logs, exact locks and resource limits. This qualifies those
+published package graphs on Linux; it does not establish whole-workspace MSRV
+or native/browser/human AT acceptance. H4 remains the final defined phase.
+
+The same packet adds a limited headed Linux WebGL2 viewer pass at frozen source
+`c66620ca`: Hest scripting changes zoom, and the retained menu, disabled feedback,
+synthetic keyboard, pan/wheel and focus paths pass. Browser H4 audit acceptance
+remains open: Graphshell's completion report omits Mesquite's command audit
+records. Full-product browser packaging stalled at the unchanged 3 GiB cap;
+saved-choice fresh-process reopen, fresh native presentation and human AT remain
+unqualified. Upstream was pulled again through `b4ae63d82` before publication;
+the frozen browser result is not transferred to that newer host code.

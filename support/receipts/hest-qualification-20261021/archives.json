@@ -1,0 +1,26 @@
+[
+  {
+    "package": "hest-0.1.0",
+    "archive_sha256": "4e432638e84d2600c46ffe11617b058a5fcbb8a1bfb5e160bc1f3ef3b232ce8e",
+    "expected_checksum": "4e432638e84d2600c46ffe11617b058a5fcbb8a1bfb5e160bc1f3ef3b232ce8e",
+    "url": "https://static.crates.io/crates/hest/hest-0.1.0.crate"
+  },
+  {
+    "package": "command-menu-0.1.1",
+    "archive_sha256": "d153b136d820f9471906f7c91fa309b2e2118a84d498a122f412fedc213a0c48",
+    "expected_checksum": "d153b136d820f9471906f7c91fa309b2e2118a84d498a122f412fedc213a0c48",
+    "url": "https://static.crates.io/crates/command-menu/command-menu-0.1.1.crate"
+  },
+  {
+    "package": "hest-0.2.0",
+    "archive_sha256": "458b5c350a837d207b7092df90b575070ab54b326c269cf75ae1d59771b96050",
+    "expected_checksum": "458b5c350a837d207b7092df90b575070ab54b326c269cf75ae1d59771b96050",
+    "url": "https://static.crates.io/crates/hest/hest-0.2.0.crate"
+  },
+  {
+    "package": "cambium-0.5.0",
+    "archive_sha256": "007032063f604e95803fadfc3359d8fad69e69f4a8e1b9285c35510c998f7f2d",
+    "expected_checksum": "007032063f604e95803fadfc3359d8fad69e69f4a8e1b9285c35510c998f7f2d",
+    "url": "https://static.crates.io/crates/cambium/cambium-0.5.0.crate"
+  }
+]

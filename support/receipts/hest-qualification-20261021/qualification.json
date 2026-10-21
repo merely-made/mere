@@ -1,0 +1,47 @@
+{
+  "runtime_source_commit": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "publication_base_commit": "b4ae63d8234c9a6443060249023e394124b58348",
+  "upstream_reconciliation": {
+    "pulled_before_build": true,
+    "pulled_before_publication": true,
+    "unchanged_paths": [
+      "crates/cambium/hest",
+      "crates/cambium/hest-0_1",
+      "crates/cambium/command-menu",
+      "crates/cambium/mesquite/src/lib.rs",
+      "crates/cambium/mesquite/src/lane.rs"
+    ],
+    "runtime_claim_transferred_to_new_tip": false
+  },
+  "published_package_msrv": {
+    "rust": "1.97.1",
+    "passed": 324,
+    "failed": 0,
+    "ignored": 1,
+    "scope": "Four published archives and two registry-only compatibility fixtures, Linux"
+  },
+  "headed_viewer": {
+    "status": "limited pass",
+    "scenario": "hest_viewer_commands",
+    "gate_exit_code": 0,
+    "page_errors": 0,
+    "gate_failures": 0,
+    "scope": "Scripted Hest invocation, menu and disabled-command presentation, retained synthetic keyboard/pan/wheel/focus paths",
+    "browser_audit_export": "missing commands field and command audit log; H4 browser audit acceptance remains open",
+    "hardware_gpu_identity": "not established"
+  },
+  "open": [
+    "Browser command audit export",
+    "Full-product browser packaging under existing resource cap",
+    "Saved-choice fresh-process reopen",
+    "Fresh native host presentation",
+    "Human assistive-technology acceptance",
+    "Separate backend releases if required"
+  ],
+  "unrun_scenarios": [
+    "hest_commands_save",
+    "hest_commands_reopen"
+  ],
+  "production_source_changes": false,
+  "downstream_pin_changes_required": false
+}

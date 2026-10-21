@@ -1,0 +1,18 @@
+[1021/031402.213439:WARNING:chrome/app/chrome_main_linux.cc:84] Read channel stable from /var/lib/flatpak/app/com.google.Chrome/x86_64/stable/active/files/extra/CHROME_VERSION_EXTRA
+[2276025:2276025:1021/031402.511970:INFO:components/enterprise/browser/controller/chrome_browser_cloud_management_controller.cc:241] No machine level policy manager exists.
+
+DevTools listening on ws://127.0.0.1:20861/devtools/browser/17637ac6-7d28-442a-b1ea-2436e3df81b5
+[2276025:2276051:1021/031402.640283:WARNING:chrome/browser/apps/user_type_filter.cc:59] No user type filter specified for gphhapmejobijbbhgpjhcjognlahblep. Using default user type filter, please update the app.
+[2276073:2276073:1021/031402.808505:WARNING:sandbox/policy/linux/sandbox_linux.cc:405] InitializeSandbox() called with multiple threads in process gpu-process.
+[2276025:2276025:1021/031403.970659:INFO:CONSOLE:597] "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently", source: http://127.0.0.1:20860/pkg/graphshell_web.js (597)
+[2276025:2276057:1021/031406.506784:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[2276025:2276057:1021/031406.506957:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[2276025:2276057:1021/031406.514536:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: PHONE_REGISTRATION_ERROR
+[2276025:2276057:1021/031406.703506:ERROR:google_apis/gcm/engine/mcs_client.cc:702]   Error code: 401  Error message: Authentication Failed: wrong_secret
+[2276025:2276057:1021/031406.703545:ERROR:google_apis/gcm/engine/mcs_client.cc:704] Failed to log in to GCM, resetting connection.
+Created TensorFlow Lite XNNPACK delegate for CPU.
+[2276025:2276025:1021/031417.583571:WARNING:content/common/zygote/zygote_communication_linux.cc:323] Error reading message from zygote: Connection reset by peer (104)
+[2276025:2276025:1021/031417.584262:ERROR:content/common/zygote/zygote_communication_linux.cc:313] Failed to send GetTerminationStatus message to zygote
+[2276025:2276025:1021/031417.584282:WARNING:content/common/zygote/zygote_communication_linux.cc:325] Socket closed prematurely.
+[2276025:2276025:1021/031417.585177:ERROR:content/common/zygote/zygote_communication_linux.cc:313] Failed to send GetTerminationStatus message to zygote
+[2276025:2276025:1021/031417.585210:WARNING:content/common/zygote/zygote_communication_linux.cc:325] Socket closed prematurely.
