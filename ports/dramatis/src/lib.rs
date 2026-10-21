@@ -14,6 +14,7 @@ use graphshell_endpoint::door::quarantine::{
 };
 use personae::ProfileId;
 
+pub mod acceptance;
 pub mod views;
 pub mod worker;
 
@@ -24,6 +25,7 @@ pub enum Request {
     Review(ReviewRequest),
     Assign(AssignImportRequest),
     Unlock,
+    ChangePassphrase,
     Lock,
 }
 #[derive(Clone, Debug)]
@@ -57,6 +59,13 @@ impl State {
         self.snapshot = reply.snapshot;
         self.notice = reply.notice;
         self.busy = false;
+    }
+    /// A background reading refreshes state without erasing an acknowledged owner action.
+    pub fn adopt_refresh(&mut self, mut reply: Reply) {
+        if reply.snapshot.is_some() && reply.notice.is_empty() {
+            reply.notice = self.notice.clone();
+        }
+        self.adopt(reply);
     }
     pub fn selected_profile(&self) -> Option<ProfileId> {
         self.snapshot
@@ -105,15 +114,54 @@ pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
             };
         },
     };
+    let mut authentication_notice = None;
     let outcome = match request {
         Request::Refresh => Ok(()),
         Request::Select(profile) => client.choose_profile(profile).await,
         Request::Review(request) => client.review_quarantine(request).await,
         Request::Assign(request) => client.assign_import(request).await,
         Request::Unlock => client.unlock_native().await,
+        Request::ChangePassphrase => {
+            use dramatis::authentication::PassphraseChangeReceiptV1 as R;
+            let notice = match client.change_passphrase_native().await {
+                Ok(R::Changed) => {
+                    "Passphrase changed. Use the new passphrase next time you unlock.".to_string()
+                },
+                Ok(R::Cancelled) => {
+                    "Passphrase change cancelled. Your passphrase is unchanged.".into()
+                },
+                Ok(R::Rejected { reason }) => {
+                    use dramatis::authentication::PassphraseChangeFailureV1 as F;
+                    match reason {
+                        F::Locked => "Unlock the vault before changing its passphrase.",
+                        F::Unsupported => "This vault does not support passphrase change.",
+                        F::CurrentPassphraseRejected => {
+                            "The current passphrase was not accepted. Nothing changed."
+                        },
+                        F::InvalidNewPassphrase => {
+                            "The new passphrase cannot be empty. Nothing changed."
+                        },
+                        F::ConfirmationMismatch => {
+                            "The new passphrases did not match. Nothing changed."
+                        },
+                        F::UiUnavailable => {
+                            "Djinn could not open its native prompt. Nothing changed."
+                        },
+                        F::StorageFailure => {
+                            "Djinn could not save the new passphrase. Nothing changed."
+                        },
+                    }
+                    .to_string()
+                },
+                Err(e) => format!("Passphrase change was not confirmed: {e}."),
+            };
+            authentication_notice = Some(notice);
+            Ok(())
+        },
         Request::Lock => client.lock_vault().await,
     };
-    let notice = outcome.err().map(|e| e.to_string()).unwrap_or_default();
+    let notice = authentication_notice
+        .unwrap_or_else(|| outcome.err().map(|e| e.to_string()).unwrap_or_default());
     let read = async {
         let status = client.status().await?;
         let roster = client.roster().await?;
@@ -145,7 +193,11 @@ pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
         },
         Err(error) => Reply {
             snapshot: None,
-            notice: format!("Identity is pending or unavailable: {error}"),
+            notice: if notice.is_empty() {
+                format!("Identity is pending or unavailable: {error}")
+            } else {
+                format!("{notice} Identity is pending or unavailable: {error}")
+            },
         },
     }
 }

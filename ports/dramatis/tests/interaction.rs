@@ -185,8 +185,9 @@ fn older_import_assignment_names_the_destination_and_exact_revision() {
 fn focus_follow_preserves_manual_scrolling_until_focus_changes() {
     let mut h = host(false, false, 420.0);
     h.set_ui_zoom(2.0);
-    let delete =
-        h.with_dom(|dom| taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Delete"))[0]);
+    let delete = h.with_dom(|dom| {
+        taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Delete"))[0]
+    });
     for _ in 0..12 {
         if h.focus() == Some(delete) {
             break;
@@ -213,7 +214,10 @@ fn focus_follow_preserves_manual_scrolling_until_focus_changes() {
 fn locked_persona_controls_are_excluded_from_keyboard_order() {
     let mut h = host(true, false, 420.0);
     let disabled = h.with_dom(|dom| {
-        let mut nodes = taproot::matching_estimated_fixture(dom, &Selector::role("button").containing("Family"));
+        let mut nodes = taproot::matching_estimated_fixture(
+            dom,
+            &Selector::role("button").containing("Family"),
+        );
         nodes.extend(taproot::matching_estimated_fixture(
             dom,
             &Selector::role("button").containing("Work"),
@@ -226,5 +230,19 @@ fn locked_persona_controls_are_excluded_from_keyboard_order() {
             !disabled.contains(&h.focus().unwrap()),
             "locked choices are not keyboard stops"
         );
+    }
+}
+
+#[test]
+fn authentication_control_is_a_public_request_and_disabled_when_locked() {
+    for locked in [false, true] {
+        let mut h = host(locked, false, 860.);
+        let activated = h.click_on(&Selector::role("button").containing("Change passphrase"));
+        if !locked {
+            assert!(activated);
+            assert!(matches!(h.state().request, Some(Request::ChangePassphrase)));
+        } else {
+            assert!(h.state().request.is_none());
+        }
     }
 }
