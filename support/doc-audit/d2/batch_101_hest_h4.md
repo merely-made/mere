@@ -28,8 +28,8 @@ current phase; its publication receipts remain unchanged.
 
 ### Notes
 
-The sixteen current claims cover unchanged published Hest/facade/compatibility
-sources; the Mesquite default refusal hook and script bridge; compatibility of
+The sixteen current claims cover no H4 edits to published Hest/facade/compatibility
+sources (concurrent shell work has its own scope); the Mesquite default refusal hook and script bridge; compatibility of
 legacy act/fallback/receipts; argument-free bounded audit and visible loss;
 pending versus terminal outcomes; fresh local Graphshell ownership/declarations;
 schema/effect/argument rejection; observed synchronous completion and clamped
