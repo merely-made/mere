@@ -1,17 +1,19 @@
 # Shared site model extraction
 
-**Status (2026-10-20):** landed. First slice authorized by Mark: extract the
-shared model from Knot, adopt it in Knot and Djinn, preserve snapshot V1.
+**Status (2026-10-21):** extraction landed; optional saved-site revision storage
+in progress. Mark authorized the next slice: record, list and load checkpoints,
+with Knot as the first consumer and snapshot V1 unchanged.
 
 ## Scope and ownership
 
 `mere-site`, at `crates/domain/site`, owns the portable native-site profiles,
 page metadata, manifest validation, and `PublishedSnapshotV1` encoding and digest.
-It has no filesystem, listener, runtime, editor, identity or storage dependency.
+The default build has no filesystem, listener, runtime, editor, identity or
+storage dependency. Optional `history` uses Eidetic's Muniment backend seam.
 Knot keeps file access, drafts, templates, checked saves and protocol adapters.
 Djinn keeps custody, certificates, listener policy and resident lifecycle.
 
-Site identity, ancestry, revision logs, replication and new Errand/Armillary
+Network site identity, ancestry, replication and new Errand/Armillary
 adapters are subsequent work. Existing V1 limits and profile semantics remain
 unchanged. This slice does not invent a new publication or storage authority.
 
@@ -28,7 +30,40 @@ unchanged. This slice does not invent a new publication or storage authority.
    Retained receipt cap: 100 MB across repositories. Reuse approved stable
    repository targets. Any isolation is temporary and removed after integration.
 
-## Findings (2026-10-20)
+## Saved-site revision slice (2026-10-21)
+
+- Keep checkpoint metadata and the caller-assigned local history identity in a
+  separate V1 journal envelope. Immutable blobs retain exact snapshot V1 bytes.
+- Use `Journal<SiteRevision>` and `BlobStore` over a caller-supplied Muniment
+  backend. Journal commit checks both the previous journal and the blob inside
+  `Backend::transact`; unsupported transactions and competing writes refuse.
+  Failed journal persistence may leave an unreferenced blob. Collection policy
+  is deferred; no recorded revision is pruned implicitly.
+- Hosts configure journal byte and revision capacity. Hitting capacity refuses
+  the new checkpoint while retaining prior entries. Repeated explicit
+  checkpoints record separate occurrences while sharing identical blob bytes.
+- Knot supplies an optional history store and explicit saved-site checkpoint
+  command. Its folder binding identifies local history, not a public site or
+  persona. Checkpointing reads saved files, including hand edits, and does not
+  start a listener or write working files. A history browser/restore workflow,
+  draft keystroke log, forks, federation and serving actors are later slices.
+- Done when two distinct checkpoints survive backend close/reopen with exact
+  bytes and digests; failed blob/journal writes expose no new revision; corrupt
+  blobs refuse; competing writers cannot silently overwrite each other; Knot's
+  explicit command refuses unsaved work and works without local serving.
+- Receipt cap remains 100 MB across repositories. Reuse the stable repository
+  targets. Mere's concurrent root manifest/lock edits require the temporary
+  approved `Code/worktrees/mere-site-revisions` worktree, removed after integration.
+
+### Findings (2026-10-21)
+
+`muniment` at the existing Eidetic pin already supplies transactional directory
+and memory backends, immutable blobs and serializable journals. No Eidetic core
+change is required. Knot's `Site::publication` reopens saved manifest/source;
+that is the checkpoint capture boundary. Desktop source ownership and server
+policy remain in Knot and Djinn respectively.
+
+## Extraction findings (2026-10-20)
 
 - `knot-editor/crates/knot-site/src/lib.rs` combines portable records and validation
   with filesystem authority and protocol handlers. Its `PublishedSnapshotV1`
@@ -74,3 +109,9 @@ unchanged. This slice does not invent a new publication or storage authority.
   pass there. [Integrated receipt](../../../support/receipts/shared-site-model/integration.json).
   Revision logs and new persistence/Errand/Armillary adapters remain subsequent
   slices. Temporary isolation is removed after the scoped source commit.
+
+- 2026-10-21: optional history passes six persistence/failure/concurrency cases
+  and all three original V1 compatibility cases; the default feature-disabled
+  build also passes its three fixtures.
+  [Supplier receipt](../../../support/receipts/shared-site-revisions/supplier.json).
+  Knot consumer qualification remains in progress.
