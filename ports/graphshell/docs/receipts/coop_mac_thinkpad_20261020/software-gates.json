@@ -1,0 +1,183 @@
+{
+  "scope": "Final headed source 38bc62024 includes the qualified d4a4429a1 runtime plus release evidence and an unrelated inference integration test. All native executables and runtime inputs remain unchanged; publication-invariance.json records exact hashes and the snapshot delta. Software gates retain their actual d4a4429a1 provenance. Bounded checks, not full workspace or CI.",
+  "gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib",
+      "result": "339 passed; 6 existing ignored",
+      "exit": 0,
+      "log": "software/refresh-mac-core-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/refresh-mac-ui-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/refresh-mac-resident-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/refresh-thinkpad-ui-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/refresh-thinkpad-resident-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "10 passed",
+      "exit": 0,
+      "log": "software/refresh-thinkpad-coop-tests.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "owner",
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/refresh-boundaries.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "owner",
+      "command": "rustfmt +1.99.1 --check --edition 2024 ports/graphshell/mere/src/coop.rs ports/graphshell/mere/src/app_tests.rs",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/refresh-format.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p graphshell-mere --all-targets",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/refresh-mac-clippy.log.gz",
+      "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+      "reused": "Byte-identical native executables and unchanged compiled runtime sources/pins; docs and unrelated integration-test-only source refresh. See publication-invariance.json."
+    }
+  ],
+  "diagnostics": [
+    {
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p graphshell-mere --all-targets -- -D warnings",
+      "exit": 101,
+      "result": "Stopped on existing warnings in mere-forme and shared dependencies. Ordinary Clippy completes.",
+      "log": "diagnostics/strict-clippy.log.gz"
+    }
+  ],
+  "build_environment": {
+    "owner": {
+      "CARGO_TARGET_DIR": "/Users/markik/Code/output/graphshell-coop-thinkpad-20261020/artifacts",
+      "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/repos/mere/target/build",
+      "CARGO_PROFILE_DEV_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG": "0"
+    },
+    "guest": {
+      "CARGO_TARGET_DIR": "/home/markik/Code/output/graphshell-coop-thinkpad-20261020/artifacts",
+      "CARGO_BUILD_BUILD_DIR": "/home/markik/Code/repos/mere/target/build",
+      "CARGO_PROFILE_DEV_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG": "0"
+    }
+  },
+  "build_note": "Final clients built explicitly with -p graphshell-mere --bin graphshell_mere; owner helper with -p djinn --example coop_existing_graph; custodians last with -p djinn --bin djinn --features passphrase-fd. Freeze probes the test feature. Final frozen executable hashes identify the headed subjects.",
+  "earlier_gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib",
+      "result": "339 passed; 6 existing ignored",
+      "exit": 0,
+      "log": "software/mac-core-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "18 passed",
+      "exit": 0,
+      "log": "software/mac-ui-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/mac-resident-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "18 passed",
+      "exit": 0,
+      "log": "software/thinkpad-ui-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/thinkpad-resident-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "10 passed",
+      "exit": 0,
+      "log": "software/thinkpad-coop-current-tests.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 clippy --locked --offline -j2 -p graphshell-mere --all-targets",
+      "result": "completed with existing warnings",
+      "exit": 0,
+      "log": "software/mac-ui-current-clippy-normal.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "owner",
+      "command": "python3 scripts/check_port_boundaries.py",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/boundaries-current.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    },
+    {
+      "machine": "owner",
+      "command": "rustfmt +1.99.1 --check --edition 2024 ports/graphshell/mere/src/coop.rs ports/graphshell/mere/src/app_tests.rs",
+      "result": "passed",
+      "exit": 0,
+      "log": "software/format-current.log.gz",
+      "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4"
+    }
+  ]
+}

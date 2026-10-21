@@ -1,0 +1,14 @@
+await {"status": "ready", "attached": "675a3351-e14e-45c6-a7bc-e4eefb0a7ced"}
+wait 30000
+click role:button @data-session-step=switch:53265e7c-afd1-4104-9e18-d013bce040e0
+await {"attached": "53265e7c-afd1-4104-9e18-d013bce040e0"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-tp-20261020-05/local/evidence/private-before.png
+click role:button @data-session-step=switch:675a3351-e14e-45c6-a7bc-e4eefb0a7ced
+await {"attached": "675a3351-e14e-45c6-a7bc-e4eefb0a7ced"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-tp-20261020-05/local/evidence/existing-graph.png

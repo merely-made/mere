@@ -1,0 +1,58 @@
+{
+  "launcher_pid": 65600,
+  "machine": {
+    "role": "owner",
+    "machine_id": "a130d1b3a10c0eee3d070a07762521c98935b46b8a28a925f8b681a96269b844",
+    "hostname": "Q-PC.local",
+    "architecture": "x86_64",
+    "console_user": "markik",
+    "console_locked": false,
+    "console_present": true,
+    "operating_system": "Darwin",
+    "system_version": "15.8.1",
+    "addresses": [
+      "127.0.0.1",
+      "192.168.4.68",
+      "2603:6014:5d01:26d3:187a:6e60:eefa:9116",
+      "2603:6014:5d01:26d3:3d11:fc39:13a:bf14",
+      "2603:6014:5d01:26d3:3d2b:4b06:d8c1:9241",
+      "2603:6014:5d01:26d3:614f:78cc:abf:5f45",
+      "2603:6014:5d01:26d3:95ff:624b:b51c:8bd5",
+      "2603:6014:5d01:26d3:b899:64a9:c129:52f8",
+      "2603:6014:5d01:26d3:b906:7880:c570:87c0",
+      "2603:6014:5d01:26d3:f18e:673c:2f00:83e9",
+      "::1",
+      "fdac:1781:f09c:1:1831:ba6d:778e:a115",
+      "fe80::1%lo0",
+      "fe80::14ec:5af8:c218:4d4e%en1",
+      "fe80::3def:f768:c481:5b8%utun0",
+      "fe80::6bb3:a16:9b40:f4e4%utun7",
+      "fe80::7742:aac9:149f:d844%utun1",
+      "fe80::8ecb:16a3:3030:55d2%utun6",
+      "fe80::9b73:bd40:3719:95d0%utun2",
+      "fe80::ac02:bff:fe53:44b5%awdl0",
+      "fe80::ac02:bff:fe53:44b5%llw0",
+      "fe80::ac84:d0ff:fe0c:e5a1%ap1",
+      "fe80::aede:48ff:fe00:1122%en6",
+      "fe80::bcaa:9804:ad8b:7009%utun5",
+      "fe80::ce81:b1c:bd2c:69e%utun3",
+      "fe80::ed1e:715a:6f03:3f44%utun4"
+    ],
+    "desktop": {
+      "Type": "macOS console"
+    },
+    "graphical_environment": {},
+    "worker_pid": 65499,
+    "worker_sha256": "37a83a46b93df37678be82e0a6e952a9a96c8c0f8079632fcd602eb94f63d574",
+    "source_commit": "38bc62024bb998f5499178b52c1deb3f61e576b3",
+    "lock_sha256": "fc7e385cbc903be10a2f1a580bc777d7c7b3409fd615941ab38b537de7141c5f",
+    "binaries": {
+      "graphshell_mere": "8332a4289b3a8fc96dc51cf9559801e7579c9406439427a5c0be791dc80f18f0",
+      "djinn": "4d15e58aef23edb410501174d69e2ef37352870e5e4c7ea3f393c4c2c128ebe0",
+      "coop_existing_graph": "184129954cca12af972195348e6d2d4b8a04411f4b1d91aef1744fa1b4dca413"
+    },
+    "public": "/Users/markik/Code/output/gs-tp-20261020-05/local/evidence",
+    "private": "/Users/markik/Code/output/gs-tp-20261020-05/local/private"
+  },
+  "scenario": "owner-live.scn"
+}
