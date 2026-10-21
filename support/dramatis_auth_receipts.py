@@ -60,7 +60,7 @@ def main():
                 host_log.close()
                 processes.append({'kind':'djinn-fixture','pid':host.pid,'format':fmt,'phase':phase,'exit':host.returncode})
             assert host.returncode==0
-            for name in ['before-identities.json','cold-identities.json','old-rejected']:
+            for name in ['before-identities.json','cold-identities.json','old-rejected','native-provider.json']:
                 if (root/name).exists():(out/name).write_bytes((root/name).read_bytes())
             for name in ['ready','stop']:(root/name).unlink()
         before=json.loads((out/'before-identities.json').read_text());cold=json.loads((out/'cold-identities.json').read_text())

@@ -97,15 +97,43 @@ impl SystemNativeIdentityUi {
         }
     }
 
-    fn require_graphical_backend(&self) -> Result<(), NativeIdentityFailure> {
+    fn dialog_backend() -> DialogBackend {
         light_file_dialog::set_verbose(0);
         light_file_dialog::set_silent(1);
         light_file_dialog::set_force_console(0);
         DialogBackend::query()
+    }
+
+    fn require_graphical_backend(&self) -> Result<(), NativeIdentityFailure> {
+        Self::dialog_backend()
             .graphic
             .then_some(())
             .ok_or(NativeIdentityFailure::UiUnavailable)
     }
+
+    fn require_password_backend(&self) -> Result<(), NativeIdentityFailure> {
+        masked_input_backend(&Self::dialog_backend())
+            .then_some(())
+            .ok_or(NativeIdentityFailure::UiUnavailable)
+    }
+}
+
+// light-file-dialog 3.21.3's Unix input query delegates to its message-box
+// query, which can report dialog/whiptail as graphical. Its xmessage input
+// fallback also ignores password mode. Only admit providers with an actual
+// masked input implementation; an unknown provider must not collect a secret.
+fn masked_input_backend(backend: &DialogBackend) -> bool {
+    backend.graphic
+        && matches!(
+            backend.name.as_str(),
+            "windows_wchar"
+                | "applescript"
+                | "kdialog"
+                | "zenity"
+                | "yad"
+                | "python3-tkinter"
+                | "python2-tkinter"
+        )
 }
 
 impl NativeIdentityUi for SystemNativeIdentityUi {
@@ -154,7 +182,7 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
     fn prompt_ssh_private_key_passphrase(
         &self,
     ) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
-        self.require_graphical_backend()?;
+        self.require_password_backend()?;
         Ok(InputBox::new(
             "Graphshell",
             "Enter the passphrase for the selected SSH private key.",
@@ -193,7 +221,7 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         &self,
         message: &str,
     ) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
-        self.require_graphical_backend()?;
+        self.require_password_backend()?;
         Ok(InputBox::new("Identity vault", message)
             .password()
             .show()
@@ -406,6 +434,50 @@ mod tests {
     use ssh_key::{Algorithm, LineEnding};
 
     use super::*;
+
+    #[test]
+    fn password_input_refuses_console_unmasked_and_unknown_backends() {
+        for name in [
+            "dialog",
+            "whiptail",
+            "basicinput",
+            "gxmessage",
+            "xmessage",
+            "unknown",
+        ] {
+            assert!(
+                !masked_input_backend(&DialogBackend {
+                    graphic: true,
+                    name: name.into()
+                }),
+                "{name}"
+            );
+        }
+        for name in [
+            "windows_wchar",
+            "applescript",
+            "kdialog",
+            "zenity",
+            "yad",
+            "python3-tkinter",
+            "python2-tkinter",
+        ] {
+            assert!(
+                masked_input_backend(&DialogBackend {
+                    graphic: true,
+                    name: name.into()
+                }),
+                "{name}"
+            );
+            assert!(
+                !masked_input_backend(&DialogBackend {
+                    graphic: false,
+                    name: name.into()
+                }),
+                "{name}"
+            );
+        }
+    }
 
     struct ScriptedUi {
         path: PathBuf,
