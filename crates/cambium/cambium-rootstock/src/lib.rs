@@ -39,7 +39,7 @@ pub use sprigging::LeafRegistry;
 use genet_render::VisualMovement;
 
 mod semantics;
-pub use semantics::{SemanticProjection, project_semantics};
+pub use semantics::{ProducerSemanticIssue, SemanticProjection, project_semantics};
 
 mod files;
 pub use files::{FileAnswer, FileChooser};
@@ -353,8 +353,8 @@ impl A11yRequest {
 /// that is not a translation. AccessKit builds a *parallel* tree that the
 /// platform queries through a handle bound to a native window. A browser has no
 /// such handle, but needs a parallel tree all the same: Cambium presents onto a
-/// canvas, which a reader sees as one graphic, so the browser host mirrors
-/// [`document_projection`] into DOM elements carrying ARIA.
+/// canvas, which a reader sees as one graphic, so the browser host lowers
+/// [`project_semantics`] into DOM elements carrying ARIA.
 ///
 /// The signature is what both can honestly implement. Notably absent is the
 /// window: the winit implementation holds its own, and a browser has none to
@@ -393,10 +393,11 @@ pub trait Accessibility {
     ) -> Vec<A11yRequest>;
 }
 
-/// This frame's renderer-neutral accessibility projection, including
-/// Cambium's app-owned committed text for marked textboxes. A host without an
-/// AccessKit adapter lowers it to its platform tree; the browser host lowers
-/// it to ARIA. `focus` is the focused node's opaque id, as
+/// The renderer-neutral DOM observation used to seed host semantics, including
+/// Cambium's app-owned committed text for marked textboxes. Contributed leaf
+/// and producer semantics are added by [`project_semantics`], which native and
+/// browser publication consume. This read does not invoke those contributors.
+/// `focus` is the focused node's opaque id, as
 /// [`Accessibility::sync`] receives it.
 pub fn document_projection<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
     dom: &D,

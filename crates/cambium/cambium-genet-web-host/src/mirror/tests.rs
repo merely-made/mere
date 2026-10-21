@@ -793,3 +793,30 @@ fn content_origin_tests_mirror_offsets_from_the_padded_content_box_once() {
     );
     assert_eq!(produced_actions(&mirror).len(), 1);
 }
+
+#[test]
+fn identity_tests_browser_mirror_omits_ambiguous_producer_actions() {
+    use cambium_rootstock::{ProducerAction, ProducerNode, ProducerSemantics};
+    let action = ProducerAction {
+        id: "pin".into(),
+        label: "Pin".into(),
+        description: "Keep card".into(),
+    };
+    let child = ProducerNode {
+        key: 40,
+        role: cambium_rootstock::ProducerRole::ListItem,
+        name: "Card".into(),
+        rect: [0.0, 0.0, 10.0, 10.0],
+        actions: vec![action.clone(), action],
+    };
+    let mirror = producer_plan(
+        ProducerSemantics {
+            children: vec![child],
+            ..Default::default()
+        },
+        1.0,
+    );
+    assert!(produced_actions(&mirror).is_empty());
+    let ids: std::collections::HashSet<_> = flat(&mirror).into_iter().map(|node| node.id).collect();
+    assert_eq!(ids.len(), flat(&mirror).len());
+}

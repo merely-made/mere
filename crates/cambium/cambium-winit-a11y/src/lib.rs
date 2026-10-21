@@ -202,7 +202,8 @@ impl A11yHost {
 }
 
 /// Project a laid-out Cambium document into an AccessKit tree, with no window
-/// and no platform adapter: the half of [`A11yHost::sync`] that is pure.
+/// and no platform adapter. This invokes the shared mutable contributor
+/// callbacks; it is not a pure read or a presentation-revision snapshot.
 ///
 /// Returns the tree update and the AccessKit-id → DOM-node map a drained
 /// action is resolved through. Split out so the projection is assertable in an
@@ -772,5 +773,67 @@ mod dpi_tests {
             A11yRequest::produced(A11yAction::Click, expected.clone())
         );
         assert!(producers.act(&expected));
+    }
+
+    #[test]
+    fn identity_tests_native_tree_omits_ambiguous_producer_action_routes() {
+        use cambium_rootstock::{
+            ProducedTexture, ProducerAction, ProducerContext, ProducerNode, TextureProducer,
+        };
+        struct Board(ProducerSemantics);
+        impl TextureProducer for Board {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn semantics(&mut self) -> Option<ProducerSemantics> {
+                Some(self.0.clone())
+            }
+        }
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(
+            root,
+            "<custom-leaf key='7' style='display:block;width:80px;height:30px'></custom-leaf>",
+        );
+        let layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+        let action = ProducerAction {
+            id: "pin".into(),
+            label: "Pin".into(),
+            description: "Keep card".into(),
+        };
+        let child = ProducerNode {
+            key: 40,
+            role: ProducerRole::ListItem,
+            name: "Card".into(),
+            rect: [0.0, 0.0, 10.0, 10.0],
+            actions: vec![action.clone(), action],
+        };
+        let mut producers = ProducerRegistry::new();
+        producers
+            .register(
+                7,
+                Board(ProducerSemantics {
+                    children: vec![child],
+                    ..Default::default()
+                }),
+                &[],
+            )
+            .unwrap();
+        let (tree, _, produced) = project_tree_with_actions(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
+        assert!(produced.is_empty());
+        assert!(
+            !tree
+                .nodes
+                .iter()
+                .any(|(_, node)| node.label() == Some("Pin"))
+        );
+        let ids: std::collections::HashSet<_> = tree.nodes.iter().map(|(id, _)| id).collect();
+        assert_eq!(ids.len(), tree.nodes.len());
     }
 }

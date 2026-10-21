@@ -3,8 +3,8 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Bounded producer content-origin repair qualified; wider owner migrations open" - accurate: yes
-- claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
+- status line: "Contained producer identity validation qualified; wider owner migrations open" - accurate: yes
+- claims checked: 6 - holds: 6, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -47,7 +47,7 @@ offline all-target metadata preparation failure, and broader acceptance stays op
 
 - disposition: current
 - status line: "Execution/shutdown and contained observations/action evidence qualified; broader migrations open" - accurate: yes
-- claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
+- claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -123,3 +123,17 @@ Publication merge `7c9bc885e` preserves those tested sources/manifests while
 integrating unrelated live owner-action delivery and its product-only `url`
 dependency reference. The separate publication record does not claim a new
 test cohort.
+
+### Producer identity continuation, 2026-10-21
+
+Shared composition atomically refuses duplicate child keys, per-child action IDs
+and generated-ID collisions before slot overrides, tree nodes or action maps
+change. Valid sibling providers and stable targets after reorder survive. Three
+before-repair runtime failures and seven repaired controls are separate from the
+retained fixture preparation error. Frozen main `8942e3050` passes 122 targeted
+native tests/five existing ignores and browser-host Wasm compilation. Returned
+`producer_issues` are per-read refusal data; platform convenience API and product
+collector adoption remain open. Mutable composition is no longer documented as
+pure. Immutable observation, target generations, full geometry and native/browser
+runtime acceptance remain separate gates. The diagnostics index entry now links
+to these owner records rather than duplicating their historical test counts.

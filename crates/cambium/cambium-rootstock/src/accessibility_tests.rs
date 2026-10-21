@@ -406,6 +406,80 @@ fn current_producer_action_requires_a_present_slot_and_advertised_action() {
 }
 
 #[test]
+fn identity_tests_current_admission_refuses_ambiguous_producer_action_without_dispatch() {
+    use crate::*;
+    struct Ambiguous(Rc<RefCell<usize>>, Rc<RefCell<bool>>);
+    impl TextureProducer for Ambiguous {
+        fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+            None
+        }
+        fn semantics(&mut self) -> Option<ProducerSemantics> {
+            let action = ProducerAction {
+                id: "pin".into(),
+                label: "Pin".into(),
+                description: "Keep card".into(),
+            };
+            Some(ProducerSemantics {
+                children: vec![ProducerNode {
+                    key: 40,
+                    role: ProducerRole::ListItem,
+                    name: "Card".into(),
+                    rect: [0.0, 0.0, 10.0, 10.0],
+                    actions: if *self.1.borrow() {
+                        vec![action.clone(), action]
+                    } else {
+                        vec![action]
+                    },
+                }],
+                ..Default::default()
+            })
+        }
+        fn act(&mut self, _: u64, _: &str) -> bool {
+            *self.0.borrow_mut() += 1;
+            true
+        }
+    }
+    let mut host = counter_host();
+    let calls = Rc::new(RefCell::new(0));
+    let duplicate = Rc::new(RefCell::new(true));
+    host.s
+        .shared
+        .producers
+        .register(7, Ambiguous(calls.clone(), duplicate.clone()), &[])
+        .unwrap();
+    let request = A11yRequest::produced(
+        A11yAction::Click,
+        ProducedAction {
+            slot: 7,
+            key: 40,
+            id: "pin".into(),
+        },
+    );
+    assert_eq!(
+        host.apply_a11y_requests(&[request.clone()]),
+        [A11yDispatch::Rejected(A11yRejection::TargetAbsent)]
+    );
+    assert_eq!(*calls.borrow(), 0);
+    assert_eq!(host.s.runner.as_ref().unwrap().focus(), None);
+    *duplicate.borrow_mut() = false;
+    assert_eq!(
+        host.apply_a11y_requests(&[request.clone()]),
+        [A11yDispatch::Dispatched]
+    );
+    assert_eq!(*calls.borrow(), 1);
+    *duplicate.borrow_mut() = true;
+    assert_eq!(
+        host.apply_a11y_requests(&[request]),
+        [A11yDispatch::Rejected(A11yRejection::TargetAbsent)]
+    );
+    assert_eq!(
+        *calls.borrow(),
+        1,
+        "readmission uses the current declaration"
+    );
+}
+
+#[test]
 fn current_leaf_contribution_can_admit_a_numeric_action() {
     use crate::{A11yAction, A11yDispatch};
     let mut host = counter_host();
