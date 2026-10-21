@@ -1,0 +1,20 @@
+{
+  "command": [
+    "python3",
+    "scripts/mere_doc_audit.py",
+    "--json"
+  ],
+  "exit_code": 0,
+  "scope": "cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md",
+  "findings": {},
+  "informational": {
+    "ambiguous_known_root_paths": [
+      {
+        "source": "cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md",
+        "subject": "src/action/command_metadata.rs",
+        "detail": "bare src/tests/examples path has no crate context"
+      }
+    ]
+  },
+  "whole_tree_clean_claimed": false
+}
