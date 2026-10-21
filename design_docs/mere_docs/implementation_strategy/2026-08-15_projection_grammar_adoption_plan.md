@@ -2062,8 +2062,9 @@ viewer continues to exclude the musical packages.
 
 **Status (2026-10-20):** runtime adapter and native selected-record controls
 implemented and reconciled with the canonical Hest worker; 128 focused tests
-and portable-client checks passed for Git integration. Headed UI and a
-configured live product action remain separate acceptance gates.
+and portable-client checks passed for Git integration. The live Mere handler
+continuation below now qualifies one configured action through the native UI;
+other owners and platforms retain their own acceptance gates.
 
 The maintainer chose the owner's current actions for selected content first,
 leaving recipes unchanged. If an owner cannot identify the exact target for
@@ -2107,10 +2108,10 @@ worker, and preserves owner refusal/stale feedback. Acceptance is worded
 “Request accepted by the owner”, with no terminal completion claim.
 
 The domain-specific address action uses the existing `OpenAddressV1` schema;
-bounded forms retain the owner's fields and exact opaque choices. The resident
-currently constructs an empty `HandlerRegistry`, so ordinary graph records may
-offer no actions. The UI distinguishes that valid empty offer from an unavailable
-owner. This pass configures no handlers and adds no native application launch.
+bounded forms retain the owner's fields and exact opaque choices. The initial
+integration used an empty `HandlerRegistry`. The live continuation below adds
+opt-in web handlers while preserving that empty default. The UI distinguishes
+a valid empty offer from an unavailable owner.
 
 Qualification phases and done-conditions:
 
@@ -2179,3 +2180,74 @@ dependency boundaries, source formatting and whitespace checks also pass.
 The tracked [qualification receipt](../../../support/receipts/domain-actions-20261020/qualification.json)
 pins source hashes, commands and compressed final logs. It preserves the same
 headless/protocol and live-handler limits as the initial qualification.
+
+
+### Live Mere owner handler (2026-10-20)
+
+**Status (2026-10-20):** implemented and qualified on working source. The
+maintainer chose opening a web address in the receiving device's default
+browser only after owner acceptance. All 93 focused tests pass (39 native,
+31 resident Mere, 23 owner-settings tests). Three fresh native processes and
+three resident starts pass real macOS acceptance, including cold reopen and
+disabling the offer. This is source-hash qualification, not publication.
+
+**Findings (2026-10-20).** The resident previously supplied an empty
+`HandlerRegistry` for every session. `MereHost::invoke` already validates the
+open-address intent, handler, exact target, address, epoch and revision, then
+journals an access-history entry and returns `Accepted`. That result does not
+perform an operating-system launch. The web host separately attempts a browser
+open; the native Mere host currently has no equivalent dispatch. Enabling an
+“Open” offer alone would leave its visible behavior incomplete.
+
+Phases and done-conditions:
+
+1. Owner configuration: supply the existing ordered `HandlerRegistry` at route
+   composition; preserve the empty default and owner-side target checks. Prove
+   a configured offer reaches the exact record and a wrong address or stale
+   observation is refused without another access-history entry.
+2. Native action: implement the chosen host behavior using the existing
+   `OpenAddressV1` and owner response. Preserve refusal and unknown-outcome
+   feedback; an ordinary refreshed reading cannot authorize the action.
+3. Live acceptance: run an isolated real resident and native window, activate
+   the retained native control, inspect presented captures and verify the
+   resulting owner state through its admitted route. Reopen fresh processes
+   and check persistence; retain actual commands, source hashes and limits.
+
+No new recipe action grants, command language, graph-derived executable
+configuration or shared crate is part of this continuation.
+
+The resident's existing owner settings now accept
+`reservoir.open_web_addresses: true` (default false, read at startup). This
+composes the existing web-only `system.default` offer through
+`MereRoutes::with_handlers`; there are no graph-provided executable paths or
+shell commands. The native adapter compares the actual outbound invocation
+with the retained exact request and dispatches only on its typed `Accepted`
+response. Refusal, staleness, transport failure and ordinary readings cannot
+authorize a launch; reconnects and refreshes do not retry it. The native
+adapter validates HTTP/HTTPS URLs and bounds its platform handoff. Successful
+handoff is described as requested, not proof of page loading or terminal
+completion. Local handoff failures remain distinct from owner acceptance.
+The resident supplies a fresh owner timestamp for access-history writes,
+instead of the previous host-construction placeholder of zero.
+
+
+**Acceptance (2026-10-20).**
+`support/receipts/domain-actions-live-20261020/qualification.json` records the
+93 passing tests and links the native packet. The existing Mesquite lane
+activated the retained **Open in browser** control in a real native window.
+The owner accepted the exact selected record; macOS's default browser
+(Firefox in this run) visited a unique localhost page once. The owner saved
+one access-history entry with its handler, address and nonzero timestamp.
+Fresh resident and native processes preserved the same history and current
+offer without another browser visit. Disabling `open_web_addresses` and
+restarting removed the offer while preserving history. Four host-owned
+captures were reviewed. The native action retains both the button and honest
+handoff status after acceptance.
+
+The packet uses an isolated profile and synthetic graph; ordinary installed
+settings are unchanged. This qualifies the local admitted owner route on
+macOS, retained-control activation, native presentation and the observed
+browser visit. Linux/Windows runtime, physical pointer/keyboard input,
+assistive activation and general page-load completion remain unqualified.
+The access-history entry records the accepted handoff; it is not a page-load
+or successful application-completion receipt.

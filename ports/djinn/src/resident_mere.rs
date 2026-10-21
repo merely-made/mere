@@ -113,6 +113,7 @@ struct Routes {
     grants: AppRouteGrants,
     apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
+    handlers: HandlerRegistry,
     profile_lookup: Option<ProfileLookup>,
     /// The dialable projection host's catalog, when one serves these routes
     /// to remote peers (remote mere route admission note, §6).
@@ -177,6 +178,7 @@ impl MereRoutes {
                 grants,
                 apps,
                 validators: BTreeMap::new(),
+                handlers: HandlerRegistry::default(),
                 profile_lookup: None,
                 remote: None,
                 served: Mutex::new(BTreeMap::new()),
@@ -184,6 +186,16 @@ impl MereRoutes {
                 access_loaded: AtomicBool::new(false),
             }),
         }
+    }
+
+    /// Install the owner's ordered address offers before serving routes.
+    /// Offers use the existing open-address contract; native dispatch belongs
+    /// to the application host and is not an executable command in the graph.
+    pub fn with_handlers(mut self, handlers: HandlerRegistry) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("configure handlers before serving routes")
+            .handlers = handlers;
+        self
     }
 
     /// The daemon's own custody door. Embedded compositions that do not
@@ -342,6 +354,7 @@ impl MereRoutes {
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
             custody_endpoint: self.inner.custody_endpoint.clone(),
+            handlers: self.inner.handlers.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
             admission_validator: if domain == personal_facts::DOMAIN {
                 let lookup = self.inner.profile_lookup.clone();
@@ -661,6 +674,7 @@ type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 /// attached to.
 struct MereShared {
     custody_endpoint: Option<String>,
+    handlers: HandlerRegistry,
     domain: String,
     validator: Option<pandect::GraphValidator>,
     admission_validator: Option<pandect::GraphAdmissionValidator>,
@@ -743,7 +757,7 @@ impl MereShared {
                 persona: persona.clone(),
                 profile: "djinn".to_string(),
             },
-            HandlerRegistry::new(Vec::new()),
+            self.handlers.clone(),
             AccessContext {
                 persona,
                 device: "djinn".to_string(),
@@ -1732,6 +1746,17 @@ impl MereEndpoint {
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
+                host.set_access_context(AccessContext {
+                    persona: shared.persona_id(),
+                    device: "djinn".into(),
+                    at_ms: u64::try_from(
+                        SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap_or_default()
+                            .as_millis(),
+                    )
+                    .unwrap_or(u64::MAX),
+                });
                 let result = host.through(app.clone(), |host| host.invoke(intent));
                 let result = match result {
                     Ok(IntentResult::Accepted) => host
@@ -2122,6 +2147,23 @@ mod tests {
         validator: Option<pandect::GraphValidator>,
         remote: Option<graphshell_host::projection_host::SharedCatalog>,
     ) -> Fixture {
+        fixture_serving_handlers(
+            persona_n,
+            domain,
+            validator,
+            remote,
+            HandlerRegistry::default(),
+        )
+        .await
+    }
+
+    async fn fixture_serving_handlers(
+        persona_n: u128,
+        domain: &str,
+        validator: Option<pandect::GraphValidator>,
+        remote: Option<graphshell_host::projection_host::SharedCatalog>,
+        handlers: HandlerRegistry,
+    ) -> Fixture {
         let root = tempfile::tempdir().unwrap();
         let reservoir = ResidentReservoir::open(root.path(), Some(persona(persona_n)))
             .await
@@ -2134,7 +2176,8 @@ mod tests {
             catalog.clone(),
             grants.clone(),
             vec![AppId::new("turnstone"), AppId::new("knot-editor")],
-        );
+        )
+        .with_handlers(handlers);
         let storage = castellan::custody::InMemoryStorage::new();
         let profile = castellan::custody::Profile::new(
             personae::ProfileId("fixture-profile".into()),
@@ -2619,6 +2662,118 @@ mod tests {
                 "{fault}: durable session changed"
             );
         }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn configured_record_handlers_validate_targets_and_persist_access() {
+        use graphshell::handlers::{HandlerOffer, OpenAddressV1, intent_id};
+        let handler = HandlerOffer {
+            id: "configured-browser".into(),
+            label: "Open in browser".into(),
+            explanation: "Owner-configured address handoff".into(),
+            address_kinds: vec![kernel::address::AddressKind::Http],
+        };
+        let fixture = fixture_serving_handlers(
+            0xac71,
+            "handler-acceptance",
+            None,
+            None,
+            HandlerRegistry::new(vec![handler.clone()]),
+        )
+        .await;
+        let mut app = fixture.attach("turnstone").await;
+        let initial = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&initial, vec![node(1), node(2)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let current = graph(&mut app);
+        let target = current
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .find_map(|(id, item)| {
+                current.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .filter(|source| source.id == Uuid::from_u128(1).to_string())
+                    .map(|_| id)
+            })
+            .unwrap();
+        let binding = current
+            .presentation
+            .bindings
+            .iter()
+            .find(|b| b.instance == target)
+            .unwrap();
+        assert_eq!(
+            current.presentation.offers[&binding.key][0]
+                .semantics
+                .actions,
+            vec![handler.advertised_action()]
+        );
+        let request = |address: &str| IntentInvocation {
+            session: current.session.clone(),
+            target,
+            observed_epoch: current.scene.epoch,
+            observed_revision: current.scene.revision,
+            intent: intent_id(&handler.id),
+            payload: serde_json::to_vec(&OpenAddressV1 {
+                address: address.into(),
+                handler: handler.id.clone(),
+            })
+            .unwrap(),
+        };
+        assert!(matches!(
+            app.invoke(request("https://2.test/")).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        let accepted = request("https://1.test/");
+        assert_eq!(
+            app.invoke(accepted.clone()).unwrap(),
+            IntentResult::Accepted
+        );
+        assert!(matches!(
+            app.invoke(accepted).unwrap(),
+            IntentResult::Stale { .. }
+        ));
+        let saved = graph(&mut app);
+        let material = disclosed_graph(&mut app, &saved).into_graph().unwrap();
+        let key = material
+            .nodes()
+            .find(|(_, n)| n.id == Uuid::from_u128(1))
+            .unwrap()
+            .0;
+        let history = graphshell::access::access_history(&material, key).unwrap();
+        assert_eq!(history.records.len(), 1);
+        assert_eq!(history.records[0].handler, handler.id);
+        assert!(history.records[0].at_ms > 0);
+        // Reopen the durable session with a new host, not just another view.
+        drop(app);
+        let shared = fixture
+            .routes
+            .inner
+            .served
+            .lock()
+            .await
+            .values()
+            .next()
+            .unwrap()
+            .clone();
+        shared.hosts.lock().await.clear();
+        let mut reopened = fixture.attach("knot-editor").await;
+        let snapshot = graph(&mut reopened);
+        let material = disclosed_graph(&mut reopened, &snapshot)
+            .into_graph()
+            .unwrap();
+        let key = material
+            .nodes()
+            .find(|(_, n)| n.id == Uuid::from_u128(1))
+            .unwrap()
+            .0;
+        assert_eq!(
+            graphshell::access::access_history(&material, key).unwrap(),
+            history
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]
