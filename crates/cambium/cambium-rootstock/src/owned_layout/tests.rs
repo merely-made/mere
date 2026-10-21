@@ -311,3 +311,77 @@ fn later_text_fragments_contribute_beyond_short_formatting_lines() {
     layout.set_element_scroll(&dom, HashMap::from([(scroller, (0.0, 10_000.0))]));
     assert_eq!(layout.element_scroll()[&scroller], (0.0, expected));
 }
+
+#[test]
+fn host_generic_faces_reach_actual_paint_and_refuse_invalid_font_bytes() {
+    use paint_list_api::PaintList;
+    let bytes =
+        include_bytes!("../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf").to_vec();
+    let dom = ScriptedDom::from_serialized_document(
+        "<html><body><p style='font-family:sans-serif'>Sans</p><p style='font-family:serif'>Serif</p><p style='font-family:monospace'>Mono</p><p style='font-family:system-ui'>System</p><p style=\"font-family:'sans-serif'\">Quoted alias</p></body></html>",
+    );
+    let fonts: Vec<_> = ["sans-serif", "serif", "monospace", "system-ui"]
+        .into_iter()
+        .map(|family| crate::HostFont {
+            family: Some(family.into()),
+            bytes: bytes.clone(),
+        })
+        .collect();
+    let mut layout = OwnedLayout::new(
+        &dom,
+        &["p {font-size:16px}"],
+        300.0,
+        240.0,
+        &fonts,
+        &Default::default(),
+    );
+    assert!(layout.font_registration_errors().is_empty());
+    let list = layout.emit_paint_list_with_leaves(
+        &dom,
+        DeviceIntSize::new(300, 240),
+        None,
+        |_| None,
+        |_| None,
+    );
+    assert!(
+        list.commands()
+            .iter()
+            .filter(|op| matches!(op,PaintCmd::DrawText(run) if !run.glyphs.is_empty()))
+            .count()
+            >= 5
+    );
+    assert!(!list.fonts().is_empty());
+    assert!(
+        list.fonts()
+            .iter()
+            .all(|face| face.data.as_slice() == bytes)
+    );
+    layout.rebuild(&dom, 280.0, 240.0);
+    let list = layout.emit_paint_list_with_leaves(
+        &dom,
+        DeviceIntSize::new(280, 240),
+        None,
+        |_| None,
+        |_| None,
+    );
+    assert!(
+        list.fonts()
+            .iter()
+            .all(|face| face.data.as_slice() == bytes)
+    );
+    let invalid = OwnedLayout::new(
+        &dom,
+        &[""],
+        300.0,
+        240.0,
+        &[crate::HostFont {
+            family: Some("sans-serif".into()),
+            bytes: vec![0],
+        }],
+        &Default::default(),
+    );
+    assert_eq!(
+        invalid.font_registration_errors(),
+        &[genet_livery::GenericFontError::InvalidFont]
+    );
+}

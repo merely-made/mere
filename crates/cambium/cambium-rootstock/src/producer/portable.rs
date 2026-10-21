@@ -703,7 +703,7 @@ impl ProducerRegistry {
                 entry.active = false;
                 entry.image = None;
                 entry.owner = None;
-                self.pending_retire.push(key);
+                self.pending_retire.push(entry.renderer_key);
             }
         }
         for (key, slot) in plan.slots {

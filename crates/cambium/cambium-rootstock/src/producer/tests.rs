@@ -220,12 +220,13 @@ fn pixel(
         |key| registry.commands(key),
         |_| None,
     );
-    let translated = paint_list_render::translate_paint_cmd_stream(
+    let mut translated = paint_list_render::translate_paint_cmd_stream(
         list.viewport(),
         list.commands(),
         list.fonts(),
         list.images(),
     );
+    registry.remap_gpu_display_list(&mut translated).unwrap();
     let (texture, _) = surface.core().rasterize(
         &translated.scene,
         160,
@@ -392,6 +393,7 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     assert!(registry.commands(7).unwrap().is_empty());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
 
+    let removed_renderer_key = registry.image_identity(7).unwrap().renderer_key;
     dom.remove(node);
     layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     assert_eq!(
@@ -403,7 +405,7 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     assert!(
         !surface
             .renderer()
-            .unregister_external_image(netrender::external_image_key(7))
+            .unregister_external_image(removed_renderer_key)
     );
     let new_node = dom.create_element(name("custom-leaf"));
     dom.set_attribute(new_node, name("key"), "7");

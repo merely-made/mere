@@ -10,6 +10,9 @@
 #[cfg(all(feature = "native-host", not(target_arch = "wasm32")))]
 pub mod native_host;
 
+#[cfg(feature = "host-previews")]
+pub mod preview_bindings;
+
 pub mod fonts;
 mod graph;
 mod interchange;

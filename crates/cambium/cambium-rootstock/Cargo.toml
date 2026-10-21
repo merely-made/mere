@@ -14,6 +14,8 @@ publish = false
 
 [features]
 default = ["image-decode"]
+# Opt-in source-bound observation; no counters or branches in default builds.
+browser-frame-diagnostics = []
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
 image-decode = ["genet-livery/image-decode", "genet-render/image-decode"]
 

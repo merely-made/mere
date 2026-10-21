@@ -39,6 +39,17 @@ impl WebSurface {
         options: NetrenderOptions,
     ) -> Result<Self, String> {
         let core = Arc::new(RenderCore::boot_async(options).await?);
+        Self::from_core(canvas, core, width, height)
+    }
+
+    /// Configure the same canvas from an existing shared device owner.
+    /// Used both by additional mounts and after the all-host loss barrier.
+    pub fn from_core(
+        canvas: HtmlCanvasElement,
+        core: Arc<RenderCore>,
+        width: u32,
+        height: u32,
+    ) -> Result<Self, String> {
         // The one browser-specific line in the whole presentation path.
         let surface = core.create_surface(wgpu::SurfaceTarget::Canvas(canvas), width, height)?;
         Ok(Self { core, surface })
@@ -66,6 +77,10 @@ impl Surface for WebSurface {
 
     fn acquire(&self) -> Option<wgpu::SurfaceTexture> {
         self.surface.acquire(&self.core)
+    }
+
+    fn acquire_status(&self) -> genet_render_host::SurfaceAcquire {
+        self.surface.acquire_status(&self.core)
     }
 }
 

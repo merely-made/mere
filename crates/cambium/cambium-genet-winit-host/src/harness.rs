@@ -657,7 +657,8 @@ where
 
     /// Let go of Tab, leaving spatial focus navigation.
     pub fn release_tab(&mut self) {
-        self.host.s.tab_held = false;
+        self.host
+            .key_released(&crate::Key::Named(crate::NamedKey::Tab));
     }
 
     /// Whether spatial focus navigation is currently engaged.
