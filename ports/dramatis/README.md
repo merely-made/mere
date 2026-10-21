@@ -1,6 +1,6 @@
 # Dramatis
 
-The first native window for persona selection and quarantine review, on
+The native window for persona selection, local authentication and quarantine review, on
 Mere's shared Cambium/Genet host. Djinn owns the vault and every review decision.
 
 Run your Djinn resident first, then from the Mere workspace:
@@ -37,3 +37,20 @@ Djinn's `custody-receipt-host` feature, requires a new synthetic directory,
 and never opens your actual vault. Capture environment variables are receipt
 hooks, not custody or consent bypasses. See the canonical app plan for qualified
 platform evidence and remaining gates.
+
+## Local authentication
+
+Under **Authentication**, **Change passphrase…** asks Djinn to open its own
+masked prompts for the current passphrase, the replacement and confirmation.
+The action applies to this computer's existing vault. It preserves the vault
+root, personae, protocol keys and stored credentials. The app receives only a
+public completion receipt and retains the acknowledgement through background
+refreshes. A disconnected request is unconfirmed; it is not shown as success.
+
+Both wrapped-root storage and the portable encrypted-profile file support the
+operation. The portable file authenticates and re-encrypts every profile in one
+replacement, including legacy version-one files. Cancellation, a rejected
+current passphrase, empty replacement and mismatched confirmation leave the
+credential unchanged. A vault locked while its prompts are open refuses the
+commit. This operation requires the current passphrase; forgotten-passphrase
+recovery and updates to other computers remain separate capabilities.
