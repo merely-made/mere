@@ -68,6 +68,15 @@ class RelayMachine(base.Machine):
                         'launcher_sha256': base.sha(self.resident.binary)})
         return result
 
+    def launch(self, name, scenario, domain):
+        if name == 'guest-return':
+            # The connection starts immediately with the window. Record its
+            # outcome after the product's 15-second dial bound, before awaiting
+            # retained graph content, so a failed reconnect remains visible.
+            scenario = ('settle 1200\ncapture ' + str(self.public / 'guest-return-attempt.png')
+                        + '\n' + scenario)
+        return super().launch(name, scenario, domain)
+
     def finish(self, name):
         result = super().finish(name)
         if self.args.role == 'guest':
