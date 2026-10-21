@@ -13453,9 +13453,11 @@ dependencies = [
  "seiche",
  "serde",
  "serde_json",
+ "state-witness",
  "tinct",
  "tracing",
  "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -15723,9 +15725,11 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_path_to_error",
+ "state-witness",
  "toml 0.8.23",
  "tracing",
  "uuid",
+ "wasm-bindgen",
  "wgpu",
 ]
 
