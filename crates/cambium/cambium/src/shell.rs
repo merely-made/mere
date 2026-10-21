@@ -43,6 +43,8 @@ impl ShellDensity {
 pub struct ShellMetrics;
 
 impl ShellMetrics {
+    pub const ACTIVITY_RAIL_WIDTH: f32 = 56.0;
+    pub const DOCUMENT_NAV_WIDTH: f32 = 144.0;
     pub const DOCUMENT_ROW_HEIGHT: f32 = 24.0;
     pub const DOCUMENT_RAIL_MAX_WIDTH: f32 = 120.0;
 
@@ -73,9 +75,31 @@ where
     OA: OptionalAction<Action> + 'static,
     F: Fn(&mut State, PointerClick) -> OA + 'static,
 {
-    let mut view = el::<_, State, Action>("button", label.into())
-        .attr("class", "shell-control")
-        .attr("aria-label", accessible_name.into())
+    shell_button(
+        Box::new(el("span", label.into())),
+        accessible_name.into(),
+        "shell-control",
+        state,
+        handler,
+    )
+}
+
+fn shell_button<State, Action, OA, F>(
+    content: ShellSlot<State, Action>,
+    accessible_name: String,
+    class: &'static str,
+    state: ShellControl,
+    handler: F,
+) -> ShellSlot<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    OA: OptionalAction<Action> + 'static,
+    F: Fn(&mut State, PointerClick) -> OA + 'static,
+{
+    let mut view = el::<_, State, Action>("button", content)
+        .attr("class", class)
+        .attr("aria-label", accessible_name)
         .attr(
             "aria-disabled",
             if state.disabled { "true" } else { "false" },
@@ -98,6 +122,62 @@ where
     } else {
         Box::new(clickable(view, handler))
     }
+}
+
+/// A compact activity control with a visible caption and a decorative mark.
+/// The host owns its action and selected/expanded state, just as in a toolbar.
+pub fn shell_activity_control<State, Action, OA, F>(
+    mark: impl Into<String>,
+    label: impl Into<String>,
+    accessible_name: impl Into<String>,
+    state: ShellControl,
+    handler: F,
+) -> ShellSlot<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    OA: OptionalAction<Action> + 'static,
+    F: Fn(&mut State, PointerClick) -> OA + 'static,
+{
+    shell_button(
+        Box::new(el("span", (
+            el("span", mark.into()).attr("class", "shell-activity-mark").attr("aria-hidden", "true"),
+            el("span", label.into()).attr("class", "shell-activity-caption"),
+        )).attr("class", "shell-activity-content")),
+        accessible_name.into(),
+        "shell-control shell-activity-control",
+        state,
+        handler,
+    )
+}
+
+/// A vertical shell navigator. Projections and tools have independent states;
+/// the rail does not turn multiple visible panes into one selected tab.
+pub fn shell_activity_rail<State: 'static, Action: 'static>(
+    projections: Vec<ShellSlot<State, Action>>,
+    tools: Vec<ShellSlot<State, Action>>,
+    utilities: Vec<ShellSlot<State, Action>>,
+) -> ShellSlot<State, Action> {
+    Box::new(el("nav", (
+        el("div", projections).attr("class", "shell-activity-projections"),
+        el("div", tools).attr("class", "shell-activity-tools"),
+        el("div", utilities).attr("class", "shell-activity-utilities"),
+    )).attr("class", "cambium-activity-rail").attr("aria-label", "Views and tools"))
+}
+
+/// Documents grouped by their existing tile stacks. Each group can have its
+/// own active document. Ordinary buttons preserve native keyboard activation;
+/// the host activates the existing tile rather than flattening its layout.
+pub fn shell_document_rail<State: 'static, Action: 'static>(
+    groups: Vec<(String, Vec<ShellSlot<State, Action>>)>,
+) -> ShellSlot<State, Action> {
+    let groups = groups.into_iter().map(|(label, tabs)| {
+        el("div", (el("div", label.clone()).attr("class", "shell-document-group-title"), tabs))
+            .attr("class", "shell-document-group")
+            .attr("role", "group").attr("aria-label", label)
+    }).collect::<Vec<_>>();
+    Box::new(el("nav", groups).attr("class", "cambium-shell-documents")
+        .attr("aria-label", "Reading tiles"))
 }
 
 /// One row with a flexible identity/address slot between application-owned
