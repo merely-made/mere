@@ -1,5 +1,5 @@
 {
-  "launcher_pid": 33694,
+  "launcher_pid": 35269,
   "machine": {
     "role": "owner",
     "machine_id": "a130d1b3a10c0eee3d070a07762521c98935b46b8a28a925f8b681a96269b844",
@@ -37,17 +37,17 @@
     "console_user": "markik",
     "console_locked": false,
     "console_present": true,
-    "worker_pid": 33579,
+    "worker_pid": 35226,
     "worker_sha256": "50ee4c7c97f721636402537d6c8de460de47e21cd5c9d517660d70a9410dd904",
-    "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+    "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0",
     "lock_sha256": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
     "binaries": {
       "graphshell_mere": "83a66cee9b2489d756a2d9cf06e59e71e364fb0e99fe082eaf3a59f631831f27",
-      "djinn": "6025db81396b46f95e9abad01576a6baf67bba2417598844e61967cf0675cdab",
-      "coop_existing_graph": "07cdc55c1d5ac0735cb4ddcacf7e93dd4395341b30e9e547407fa0850956b7cf"
+      "djinn": "ebe10b88340cdde075399cbbf01a3e99c60005006497469960ed926d366254df",
+      "coop_existing_graph": "d48ffb55d37db14e5b0c8a064e2380f067cc10e6eda54334d1d84c4e998cddee"
     },
-    "public": "/Users/markik/Code/output/gs-c2-20261020-04/local/evidence",
-    "private": "/Users/markik/Code/output/gs-c2-20261020-04/local/private"
+    "public": "/Users/markik/Code/output/gs-c2-20261020-05/local/evidence",
+    "private": "/Users/markik/Code/output/gs-c2-20261020-05/local/private"
   },
   "scenario": "baseline.scn"
 }

@@ -4,45 +4,45 @@
       "badges": [],
       "media": [
         [
-          223,
-          174,
-          158,
-          75,
-          125,
-          176,
-          36,
-          171,
-          126,
-          135,
-          92,
-          14,
-          217,
-          238,
-          182,
-          248,
-          33,
-          236,
-          131,
-          228,
-          10,
+          208,
+          7,
+          246,
+          110,
           219,
-          229,
-          199,
+          221,
+          10,
+          204,
+          137,
+          22,
+          107,
+          51,
+          250,
+          25,
+          6,
+          164,
+          230,
+          183,
+          90,
+          46,
+          79,
+          59,
+          189,
+          153,
+          130,
           145,
-          201,
-          78,
+          213,
           210,
-          116,
-          144,
-          118,
-          49
+          234,
+          214,
+          113,
+          89
         ]
       ],
       "title": "Session",
       "values": [
         {
           "label": "Session",
-          "value": "9ab91a33-94ee-4d12-8be2-34f2ba16e647"
+          "value": "b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6"
         },
         {
           "label": "Changes",
@@ -53,11 +53,11 @@
     {
       "badges": [],
       "media": [],
-      "title": "https://shared.invalid/ordinary-owner",
+      "title": "Guest revised existing source",
       "values": [
         {
           "label": "Address",
-          "value": "https://shared.invalid/ordinary-owner"
+          "value": "https://shared.invalid/existing"
         },
         {
           "label": "Kind",
@@ -72,11 +72,11 @@
     {
       "badges": [],
       "media": [],
-      "title": "Owner after revoke",
+      "title": "https://shared.invalid/ordinary-owner",
       "values": [
         {
           "label": "Address",
-          "value": "https://shared.invalid/owner-after-revoke"
+          "value": "https://shared.invalid/ordinary-owner"
         },
         {
           "label": "Kind",
@@ -110,11 +110,11 @@
     {
       "badges": [],
       "media": [],
-      "title": "Guest revised existing source",
+      "title": "Owner after revoke",
       "values": [
         {
           "label": "Address",
-          "value": "https://shared.invalid/existing"
+          "value": "https://shared.invalid/owner-after-revoke"
         },
         {
           "label": "Kind",
@@ -133,28 +133,28 @@
       "epoch": 3,
       "facets": {
         "nodes": {
-          "a30531b9-a8e7-4e41-b978-4cb3fd66c16c": {
+          "125e4dca-10d5-4b1f-aa8f-d7f534d1a832": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792542946012
+              "last_visited_ms": 1792543419260
             }
           },
-          "b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0": {
+          "35c68dce-eeb1-41ec-8cf4-6c25ff2086a0": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792542959698
+              "last_visited_ms": 1792543441093
             }
           },
-          "cdf34d20-abe7-4d30-b69b-a5d97a0ac311": {
+          "5e140ad9-0ea7-4b66-909e-14e2ac4df28c": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792542942595
+              "last_visited_ms": 1792543437860
             }
           },
-          "d2935f46-9c55-46a9-8f39-9838fae978ef": {
+          "ec99306a-02cc-4fe4-81ff-65d9099907e5": {
             "visit.history": {
               "last_session_visited": 0,
-              "last_visited_ms": 1792542916003
+              "last_visited_ms": 1792543452487
             }
           }
         }
@@ -168,20 +168,20 @@
             "assertions": [
               {
                 "predicate": "https://mere.computer/ns/rel#cites",
-                "provenance_iri": "https://mere.computer/ns/agent#person/c026de0c-7c29-4453-bf63-f1920cfe0d0b",
+                "provenance_iri": "https://mere.computer/ns/agent#person/89e6ac03-2cca-4e3f-b00c-6d4dcc11e707",
                 "recognized_sub_kind": "Cites",
-                "statement_id": "01a15be2b2dc-90472e7b52f67786-0000000000000001"
+                "statement_id": "01a15bea40c5-4841d7d35f221ef8-0000000000000001"
               }
             ],
             "containment": null,
             "families": [
               "Semantic"
             ],
-            "from_node_id": "cdf34d20-abe7-4d30-b69b-a5d97a0ac311",
+            "from_node_id": "5e140ad9-0ea7-4b66-909e-14e2ac4df28c",
             "imported": null,
             "provenance": null,
             "semantic": null,
-            "to_node_id": "a30531b9-a8e7-4e41-b978-4cb3fd66c16c",
+            "to_node_id": "35c68dce-eeb1-41ec-8cf4-6c25ff2086a0",
             "traversal": null
           }
         ],
@@ -210,7 +210,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "d2935f46-9c55-46a9-8f39-9838fae978ef",
+            "node_id": "125e4dca-10d5-4b1f-aa8f-d7f534d1a832",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -241,7 +241,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "cdf34d20-abe7-4d30-b69b-a5d97a0ac311",
+            "node_id": "5e140ad9-0ea7-4b66-909e-14e2ac4df28c",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -272,7 +272,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "a30531b9-a8e7-4e41-b978-4cb3fd66c16c",
+            "node_id": "35c68dce-eeb1-41ec-8cf4-6c25ff2086a0",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -303,7 +303,7 @@
             "last_session_visited": 0,
             "mime_hint": null,
             "nested": null,
-            "node_id": "b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0",
+            "node_id": "ec99306a-02cc-4fe4-81ff-65d9099907e5",
             "properties": [],
             "session_state": {
               "form_draft": null,
@@ -333,12 +333,12 @@
         ],
         "shown_resources": [
           {
-            "resource_id": "a3d97c95-c789-5d9d-8d8d-9e60c9f61cb2",
-            "surface_id": "b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0"
+            "resource_id": "c3909d3b-4b6d-5ba0-8c6f-e15c0d2cc02e",
+            "surface_id": "5e140ad9-0ea7-4b66-909e-14e2ac4df28c"
           },
           {
-            "resource_id": "c3909d3b-4b6d-5ba0-8c6f-e15c0d2cc02e",
-            "surface_id": "cdf34d20-abe7-4d30-b69b-a5d97a0ac311"
+            "resource_id": "a3d97c95-c789-5d9d-8d8d-9e60c9f61cb2",
+            "surface_id": "ec99306a-02cc-4fe4-81ff-65d9099907e5"
           }
         ],
         "timestamp_secs": 0
@@ -346,7 +346,7 @@
       "read_only": false,
       "revision": 2,
       "schema": "mere.session.graph/v1",
-      "session": "9ab91a33-94ee-4d12-8be2-34f2ba16e647",
+      "session": "b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6",
       "views": {}
     }
   ],
@@ -360,64 +360,64 @@
       "bindings": [
         {
           "instance": 0,
-          "key": "mere.session:9ab91a33-94ee-4d12-8be2-34f2ba16e647"
+          "key": "mere.session:b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6"
         },
         {
           "instance": 1,
-          "key": "mere:b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0"
+          "key": "mere:ec99306a-02cc-4fe4-81ff-65d9099907e5"
         },
         {
           "instance": 2,
-          "key": "mere:a30531b9-a8e7-4e41-b978-4cb3fd66c16c"
+          "key": "mere:35c68dce-eeb1-41ec-8cf4-6c25ff2086a0"
         },
         {
           "instance": 3,
-          "key": "mere:cdf34d20-abe7-4d30-b69b-a5d97a0ac311"
+          "key": "mere:5e140ad9-0ea7-4b66-909e-14e2ac4df28c"
         },
         {
           "instance": 4,
-          "key": "mere:d2935f46-9c55-46a9-8f39-9838fae978ef"
+          "key": "mere:125e4dca-10d5-4b1f-aa8f-d7f534d1a832"
         }
       ],
       "offers": {
-        "mere.session:9ab91a33-94ee-4d12-8be2-34f2ba16e647": [
+        "mere.session:b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6": [
           {
-            "byte_size": 273,
+            "byte_size": 268,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              215,
               124,
-              45,
-              167,
-              203,
-              143,
-              139,
-              211,
-              182,
-              82,
-              41,
-              168,
-              210,
-              190,
-              186,
-              168,
-              202,
-              211,
+              220,
+              132,
+              149,
+              163,
               135,
-              65,
-              202,
-              31,
-              251,
-              87,
-              198,
-              10,
+              81,
+              231,
+              249,
               39,
-              13,
-              16,
-              49,
-              94,
-              196
+              226,
+              26,
+              62,
+              108,
+              164,
+              230,
+              92,
+              148,
+              181,
+              255,
+              7,
+              213,
+              231,
+              241,
+              225,
+              175,
+              199,
+              108,
+              7,
+              121,
+              169,
+              235
             ],
             "semantics": {
               "actions": [
@@ -456,7 +456,54 @@
             }
           }
         ],
-        "mere:a30531b9-a8e7-4e41-b978-4cb3fd66c16c": [
+        "mere:125e4dca-10d5-4b1f-aa8f-d7f534d1a832": [
+          {
+            "byte_size": 201,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              6,
+              161,
+              231,
+              243,
+              147,
+              248,
+              73,
+              50,
+              230,
+              130,
+              101,
+              198,
+              121,
+              38,
+              99,
+              232,
+              104,
+              4,
+              243,
+              12,
+              133,
+              123,
+              104,
+              123,
+              230,
+              142,
+              147,
+              247,
+              124,
+              24,
+              249,
+              163
+            ],
+            "semantics": {
+              "actions": [],
+              "bounds": "FillFootprint",
+              "label": "Guest revised existing source",
+              "role": "Article"
+            }
+          }
+        ],
+        "mere:35c68dce-eeb1-41ec-8cf4-6c25ff2086a0": [
           {
             "byte_size": 215,
             "codec": "PortableCardV1",
@@ -503,54 +550,7 @@
             }
           }
         ],
-        "mere:b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0": [
-          {
-            "byte_size": 200,
-            "codec": "PortableCardV1",
-            "requires": "PortableCard",
-            "resource": [
-              7,
-              158,
-              24,
-              64,
-              59,
-              243,
-              233,
-              167,
-              90,
-              33,
-              135,
-              88,
-              188,
-              146,
-              102,
-              242,
-              18,
-              21,
-              121,
-              216,
-              175,
-              81,
-              219,
-              219,
-              13,
-              33,
-              17,
-              52,
-              139,
-              207,
-              25,
-              12
-            ],
-            "semantics": {
-              "actions": [],
-              "bounds": "FillFootprint",
-              "label": "Owner after revoke",
-              "role": "Article"
-            }
-          }
-        ],
-        "mere:cdf34d20-abe7-4d30-b69b-a5d97a0ac311": [
+        "mere:5e140ad9-0ea7-4b66-909e-14e2ac4df28c": [
           {
             "byte_size": 181,
             "codec": "PortableCardV1",
@@ -597,49 +597,49 @@
             }
           }
         ],
-        "mere:d2935f46-9c55-46a9-8f39-9838fae978ef": [
+        "mere:ec99306a-02cc-4fe4-81ff-65d9099907e5": [
           {
-            "byte_size": 201,
+            "byte_size": 200,
             "codec": "PortableCardV1",
             "requires": "PortableCard",
             "resource": [
-              6,
-              161,
-              231,
-              243,
-              147,
-              248,
-              73,
-              50,
-              230,
-              130,
-              101,
-              198,
-              121,
-              38,
-              99,
-              232,
-              104,
-              4,
-              243,
-              12,
-              133,
-              123,
-              104,
-              123,
-              230,
-              142,
-              147,
-              247,
-              124,
+              7,
+              158,
               24,
-              249,
-              163
+              64,
+              59,
+              243,
+              233,
+              167,
+              90,
+              33,
+              135,
+              88,
+              188,
+              146,
+              102,
+              242,
+              18,
+              21,
+              121,
+              216,
+              175,
+              81,
+              219,
+              219,
+              13,
+              33,
+              17,
+              52,
+              139,
+              207,
+              25,
+              12
             ],
             "semantics": {
               "actions": [],
               "bounds": "FillFootprint",
-              "label": "Guest revised existing source",
+              "label": "Owner after revoke",
               "role": "Article"
             }
           }
@@ -803,8 +803,8 @@
             "from": 3,
             "kind": "link.surface",
             "link_key": {
-              "first": "a30531b9-a8e7-4e41-b978-4cb3fd66c16c",
-              "second": "cdf34d20-abe7-4d30-b69b-a5d97a0ac311",
+              "first": "35c68dce-eeb1-41ec-8cf4-6c25ff2086a0",
+              "second": "5e140ad9-0ea7-4b66-909e-14e2ac4df28c",
               "stratum": "surface"
             },
             "marks": {
@@ -831,23 +831,23 @@
         "sources": [
           {
             "adapter": "mere.session",
-            "id": "9ab91a33-94ee-4d12-8be2-34f2ba16e647"
+            "id": "b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6"
           },
           {
             "adapter": "mere.graph",
-            "id": "b6e5ef4e-fa55-4b6c-ab10-624cc5f283f0"
+            "id": "ec99306a-02cc-4fe4-81ff-65d9099907e5"
           },
           {
             "adapter": "mere.graph",
-            "id": "a30531b9-a8e7-4e41-b978-4cb3fd66c16c"
+            "id": "35c68dce-eeb1-41ec-8cf4-6c25ff2086a0"
           },
           {
             "adapter": "mere.graph",
-            "id": "cdf34d20-abe7-4d30-b69b-a5d97a0ac311"
+            "id": "5e140ad9-0ea7-4b66-909e-14e2ac4df28c"
           },
           {
             "adapter": "mere.graph",
-            "id": "d2935f46-9c55-46a9-8f39-9838fae978ef"
+            "id": "125e4dca-10d5-4b1f-aa8f-d7f534d1a832"
           }
         ],
         "spaces": [

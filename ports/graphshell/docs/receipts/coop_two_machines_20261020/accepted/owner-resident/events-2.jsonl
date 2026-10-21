@@ -1,7 +1,7 @@
-{"at_ms":1792542952616,"event":"started","installed":false,"pid":33831,"schema":"djinn.resident-events/v1","version":"0.0.2"}
-{"at_ms":1792542952617,"creating":false,"event":"waiting-for-unlock","pid":33831,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792542953074,"event":"unlocked-at-start","pid":33831,"schema":"djinn.resident-events/v1"}
-{"agent":"/Users/markik/Code/output/gs-c2-20261020-04/local/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-c2-20261020-04/local/private/owner/app.sock","at_ms":1792542953208,"browser":"/Users/markik/Code/output/gs-c2-20261020-04/local/private/owner/browser.sock","event":"listening","pid":33831,"schema":"djinn.resident-events/v1","ticket":null}
-{"at_ms":1792542953209,"event":"ready","pid":33831,"schema":"djinn.resident-events/v1"}
-{"at_ms":1792542968509,"event":"stopping","pid":33831,"reason":"stop intent","schema":"djinn.resident-events/v1"}
-{"at_ms":1792542968902,"event":"stopped","ok":true,"pid":33831,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792543446030,"event":"started","installed":false,"pid":35308,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792543446031,"creating":false,"event":"waiting-for-unlock","pid":35308,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792543446455,"event":"unlocked-at-start","pid":35308,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/gs-c2-20261020-05/local/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-c2-20261020-05/local/private/owner/app.sock","at_ms":1792543446586,"browser":"/Users/markik/Code/output/gs-c2-20261020-05/local/private/owner/browser.sock","event":"listening","pid":35308,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792543446586,"event":"ready","pid":35308,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792543460184,"event":"stopping","pid":35308,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792543460546,"event":"stopped","ok":true,"pid":35308,"reason":"stop intent","schema":"djinn.resident-events/v1"}

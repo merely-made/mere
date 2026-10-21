@@ -1,10 +1,10 @@
 {
   "result": "ok",
   "graphs": {
-    "chosen": "9ab91a33-94ee-4d12-8be2-34f2ba16e647",
-    "private": "5ec6391b-97dc-444d-9177-73f2af74844d"
+    "chosen": "b9e461fc-f89e-4d13-b4b2-d8c0b6a76ad6",
+    "private": "a2dedb28-a5e1-4a40-8213-7f639730118c"
   },
-  "existing_surface": "d2935f46-9c55-46a9-8f39-9838fae978ef",
+  "existing_surface": "125e4dca-10d5-4b1f-aa8f-d7f534d1a832",
   "machines": {
     "owner": {
       "role": "owner",
@@ -43,17 +43,17 @@
       "console_user": "markik",
       "console_locked": false,
       "console_present": true,
-      "worker_pid": 33579,
+      "worker_pid": 35226,
       "worker_sha256": "50ee4c7c97f721636402537d6c8de460de47e21cd5c9d517660d70a9410dd904",
-      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0",
       "lock_sha256": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
       "binaries": {
         "graphshell_mere": "83a66cee9b2489d756a2d9cf06e59e71e364fb0e99fe082eaf3a59f631831f27",
-        "djinn": "6025db81396b46f95e9abad01576a6baf67bba2417598844e61967cf0675cdab",
-        "coop_existing_graph": "07cdc55c1d5ac0735cb4ddcacf7e93dd4395341b30e9e547407fa0850956b7cf"
+        "djinn": "ebe10b88340cdde075399cbbf01a3e99c60005006497469960ed926d366254df",
+        "coop_existing_graph": "d48ffb55d37db14e5b0c8a064e2380f067cc10e6eda54334d1d84c4e998cddee"
       },
-      "public": "/Users/markik/Code/output/gs-c2-20261020-04/local/evidence",
-      "private": "/Users/markik/Code/output/gs-c2-20261020-04/local/private"
+      "public": "/Users/markik/Code/output/gs-c2-20261020-05/local/evidence",
+      "private": "/Users/markik/Code/output/gs-c2-20261020-05/local/private"
     },
     "guest": {
       "role": "guest",
@@ -97,60 +97,60 @@
         "fe80::820:6370:7015:90f2%en0",
         "fe80::94af:fef:7b2f:9854%utun6",
         "fe80::9e96:ed26:cb4a:8139%utun11",
+        "fe80::a8f5:29ff:feb7:9c77%awdl0",
+        "fe80::a8f5:29ff:feb7:9c77%llw0",
         "fe80::bcde:2767:c880:5a00%utun5",
         "fe80::bdb0:e07e:a817:c838%utun2",
         "fe80::c400:666d:50d0:a035%utun9",
         "fe80::c5c2:2c03:d627:9a6f%utun14",
         "fe80::ce81:b1c:bd2c:69e%utun10",
         "fe80::ce81:b1c:bd2c:69e%utun3",
-        "fe80::da14:690b:4d83:d23f%utun4",
-        "fe80::e448:beff:feeb:8ae%awdl0",
-        "fe80::e448:beff:feeb:8ae%llw0"
+        "fe80::da14:690b:4d83:d23f%utun4"
       ],
       "console_user": "markik",
       "console_locked": false,
       "console_present": true,
-      "worker_pid": 55596,
+      "worker_pid": 60100,
       "worker_sha256": "50ee4c7c97f721636402537d6c8de460de47e21cd5c9d517660d70a9410dd904",
-      "source_commit": "262fe3631acec3620020c08628bf567514d8ece6",
+      "source_commit": "763c28814382f055424da8795f37b0df4d0a3df0",
       "lock_sha256": "da856ae8bb88685b7dfab27a4eef146064f8d6611abb1a303e57fbc60db789a9",
       "binaries": {
         "graphshell_mere": "411c999eaa3389d1453e2dfdb5f643bf3cc34d69a62312e8c097caeea67999a0",
-        "djinn": "dc8ad63b906d3f9b48288a0dcb5ee538fb376da97d498b5e2bed70230fde4c24"
+        "djinn": "1bc8413af838c0c3dae59b9a3f054cd1fe5e54c74713c32214d220b81631b5a9"
       },
-      "public": "/Users/markik/Code/output/gs-c2-20261020-04/guest/evidence",
-      "private": "/Users/markik/Code/output/gs-c2-20261020-04/guest/private"
+      "public": "/Users/markik/Code/output/gs-c2-20261020-05/guest/evidence",
+      "private": "/Users/markik/Code/output/gs-c2-20261020-05/guest/private"
     },
     "ssh_use": "JSON control, empty barriers and public contact/invitation handoff only; no port forwarding or graph-state injection"
   },
   "native_processes": [
     {
       "machine": "owner",
-      "pid": 33694
+      "pid": 35269
     },
     {
       "machine": "owner",
-      "pid": 33753
+      "pid": 35284
     },
     {
       "machine": "owner",
-      "pid": 33849
+      "pid": 35318
     },
     {
       "machine": "owner",
-      "pid": 33892
+      "pid": 35327
     },
     {
       "machine": "guest",
-      "pid": 56017
+      "pid": 60176
     },
     {
       "machine": "guest",
-      "pid": 56152
+      "pid": 60226
     },
     {
       "machine": "guest",
-      "pid": 56422
+      "pid": 60248
     }
   ],
   "phases": {
@@ -166,8 +166,8 @@
       "guest-cold"
     ]
   },
-  "original_invitation_sha256": "7a14565be8688b366312a26e507ee9a91f570fe9892d5bafe4b2f1c7a93f0a9d",
-  "cold_invitation_sha256": "7a14565be8688b366312a26e507ee9a91f570fe9892d5bafe4b2f1c7a93f0a9d",
+  "original_invitation_sha256": "20a67b93befbff51e6ff1af49aedc7635c065477e669f22689eed655a71554de",
+  "cold_invitation_sha256": "20a67b93befbff51e6ff1af49aedc7635c065477e669f22689eed655a71554de",
   "custodian_launches": 4,
   "all_owned_processes_stopped": true,
   "controller_sha256": "372247ab167aab9136c15c6e052eeb3b1506fad4ef79c6c62ca7fa09c6223d5d",

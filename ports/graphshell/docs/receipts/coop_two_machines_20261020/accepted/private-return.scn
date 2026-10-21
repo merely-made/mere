@@ -1,8 +1,8 @@
 await {"status": "ready"}
 wait 30000
-click role:button @data-session-step=switch:5ec6391b-97dc-444d-9177-73f2af74844d
-await {"attached": "5ec6391b-97dc-444d-9177-73f2af74844d"}
+click role:button @data-session-step=switch:a2dedb28-a5e1-4a40-8213-7f639730118c
+await {"attached": "a2dedb28-a5e1-4a40-8213-7f639730118c"}
 wait 30000
 wheel 0 -10000 px on .coop-panel
 settle 2
-capture /Users/markik/Code/output/gs-c2-20261020-04/local/evidence/private-after.png
+capture /Users/markik/Code/output/gs-c2-20261020-05/local/evidence/private-after.png

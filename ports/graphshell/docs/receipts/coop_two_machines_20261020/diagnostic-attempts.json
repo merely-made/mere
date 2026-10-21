@@ -36,12 +36,22 @@
   },
   {
     "attempt": "gs-c2-20261020-04",
-    "result": "accepted",
+    "result": "successful earlier cohort, preserved at commit b9ab9755296e1d77ecb0063e378e1097bcd38664",
     "candidate": "frozen-05",
     "captures": 22,
     "native_processes": 7,
     "custodian_launches": 4,
     "carrier": "active direct 192.168.4.68:56242",
     "permission": "User allowed test app through macOS prompt; agent did not change firewall policy or use a personal signing identity"
+  },
+  {
+    "attempt": "gs-c2-20261020-05",
+    "result": "accepted",
+    "candidate": "frozen-06",
+    "source": "763c28814382f055424da8795f37b0df4d0a3df0",
+    "reason": "Main advanced to 18c3549b3 with a Djinn roster authority change. Rebuilt both architectures and repeated complete headed and cold qualification.",
+    "captures": 22,
+    "native_processes": 7,
+    "custodian_launches": 4
   }
 ]

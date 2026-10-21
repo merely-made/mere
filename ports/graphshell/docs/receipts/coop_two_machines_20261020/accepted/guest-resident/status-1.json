@@ -1,17 +1,17 @@
 {
   "schema": "djinn.resident-status/v1",
-  "pid": 55709,
-  "started_ms": 1792542914566,
+  "pid": 60117,
+  "started_ms": 1792543417709,
   "installed": false,
   "ready": true,
   "startup_unlock": "passphrase",
   "protection": "passphrase",
   "lock": "unlocked",
   "endpoints": {
-    "agent": "/Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/agent.sock",
+    "agent": "/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/agent.sock",
     "agent_listener": "receipt",
-    "browser": "/Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/browser.sock",
-    "app": "/Users/markik/Code/output/gs-c2-20261020-04/guest/private/guest/app.sock"
+    "browser": "/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/browser.sock",
+    "app": "/Users/markik/Code/output/gs-c2-20261020-05/guest/private/guest/app.sock"
   },
   "sync": null
 }
