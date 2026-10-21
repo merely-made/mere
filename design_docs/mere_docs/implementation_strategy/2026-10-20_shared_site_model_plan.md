@@ -1,8 +1,8 @@
 # Shared site model extraction
 
 **Status (2026-10-21):** extraction and optional saved-site revision storage
-landed. Mark authorized record, list and load checkpoints, with Knot as the
-first consumer and snapshot V1 unchanged.
+landed. The optional Moot publication binding is in qualification, with Gemini,
+Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
 
 ## Scope and ownership
 
@@ -10,12 +10,14 @@ first consumer and snapshot V1 unchanged.
 page metadata, manifest validation, and `PublishedSnapshotV1` encoding and digest.
 The default build has no filesystem, listener, runtime, editor, identity or
 storage dependency. Optional `history` uses Eidetic's Muniment backend seam.
+Optional `publication` composes Eidetic typed retention and Gemot's existing
+signed contributions and collection authority.
 Knot keeps file access, drafts, templates, checked saves and protocol adapters.
 Djinn keeps custody, certificates, listener policy and resident lifecycle.
 
-Network site identity, ancestry, replication and new Errand/Armillary
+Cross-Moot publication lineage, network delivery and new Errand/Armillary
 adapters are subsequent work. Existing V1 limits and profile semantics remain
-unchanged. This slice does not invent a new publication or storage authority.
+unchanged; the adapters reuse existing publication and storage authority.
 
 ## Phases and done-conditions
 
@@ -62,6 +64,49 @@ and memory backends, immutable blobs and serializable journals. No Eidetic core
 change is required. Knot's `Site::publication` reopens saved manifest/source;
 that is the checkpoint capture boundary. Desktop source ownership and server
 policy remain in Knot and Djinn respectively.
+
+## Moot publication binding (2026-10-21)
+
+**Status:** qualified locally; integration in progress. Gemini, Scroll and
+Micron are the first profiles.
+Optional `mere-site/publication` composes existing Gemot and Eidetic owners;
+the default model and local checkpoint feature stay independent.
+
+- Bind exact V1 bytes to Eidetic's existing schema and typed-content APIs for
+  explicit host retention. Verify retained bytes before authoring through Gemot's authorized
+  stable-identity contribution command. Collection selection remains an explicit
+  existing Gemot command, with its observed heads and capability checks.
+- Open an explicitly named contribution at an exact authorized collection
+  version. Refuse foreign, ineffective, stale, private, corrupt or unsupported
+  content. Recheck current selection after local content resolution. Return
+  native pages and metadata, including the profile's root index mapping.
+- Done when all three profiles retain exact fixture bytes and metadata after
+  backend reopen with the author absent; signed collection selection and forks
+  use existing Gemot history; unauthorized contribution, withdrawal and stale
+  selection refuse; the four original V1 fixtures still pass.
+- This is a local owner-composition gate. Network serving, peer acquisition,
+  hosting promises, signed cross-Moot publication lineage and actor lifecycle
+  remain separate gates. No timestamp-based latest-revision policy is added.
+- Retained receipt cap: 100 MB. Concurrent root manifest/lock work requires
+  `Code/worktrees/mere-site-moot-publication`; reuse the stable Mere target.
+
+### Publication findings (2026-10-21)
+
+- `gemot::moot` already supplies signed stable-identity contributions,
+  capability-gated causal collections, forks and withdrawal. Site publication
+  can cite those facts without a second community identity or ancestry log.
+  A collection may contain several sites; the host explicitly selects a share
+  at an observed version instead of inferring one from timestamps or titles.
+- `eidetic::typed::TypedPayload` supports a custom byte codec, so snapshots
+  retain their original canonical JSON and BLAKE3 identities. The schema includes
+  all four existing model profiles; only the publication adapter is limited to
+  the three selected initial profiles. Native metadata is never flattened.
+- Eidetic's `manifest:` and `blob:` keys do not fit the directory backend's
+  portable filename restrictions on Windows. Disk qualification uses redb;
+  local history's separate filesystem-safe keys remain unchanged.
+- Current selection is checked around content resolution, not held as an atomic
+  serving grant across owners. An opened site is a point-in-time read. Network
+  hosts must arrange their own revalidation/revocation behavior and hosting policy.
 
 ## Extraction findings (2026-10-20)
 
@@ -126,3 +171,12 @@ policy remain in Knot and Djinn respectively.
   The temporary supplier worktree was removed; ordinary stable Cargo targets
   were reused and no new isolated Cargo home was created. A history browser,
   restore UI, replication and serving adapters remain outside this slice.
+
+- 2026-10-21: optional publication binding passes five focused cases (including
+  three native profiles), all three original V1 compatibility cases, six local
+  history cases and the compiling Eidetic retention example. Repeated with
+  `serde_json/preserve_order` to qualify fixed schema identity; the feature-disabled
+  build also passes its three compatibility cases. Disk content reopens in redb
+  after author handles are dropped; signed community facts are admitted to a
+  separate in-process replica. This does not claim a new OS-process, network or
+  two-machine serving receipt. No supplier repins are required.

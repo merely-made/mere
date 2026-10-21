@@ -10176,11 +10176,17 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "blake3",
+ "eidetic",
+ "gemot",
  "language-tags",
+ "mere-proofs",
+ "mien",
  "muniment",
+ "personae",
  "pollster 0.4.0",
  "serde",
  "serde_json",
+ "servitor",
  "tempfile",
  "time",
 ]
