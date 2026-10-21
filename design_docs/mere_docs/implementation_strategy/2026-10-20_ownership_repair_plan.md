@@ -135,6 +135,8 @@ question for Mark (vendored code, upstream ledger first).
    per finding: Mark: **"Ledger only, out of this plan (Recommended)"**. L0 names them and
    stops; their fourteen findings go to the upstream ledger with the audit's evidence.
 
+L1 card round, 2026-10-20 (Mark's words, unnumbered): chartulary is now in repos/eidetic, pinned by rev: **"Branch in eidetic + repin (Recommended)"**. Current address on load: **"Stored node address (Recommended)"**. Adding an existing node id: **"Insert-if-missing live too (Recommended)"**. Creator after owner deletion: **"1, or 2 if no ancestor"** (re-parent to the deleted owner's creator, else clear).
+
 Still open, to be put when a lane reaches it: who owns L2 to L5's start order after L1's first
 slice lands.
 
@@ -147,3 +149,4 @@ slice lands.
 ## 7. Progress
 
 - 2026-10-20: drafted after Mark's answer; first round answered the same day (§5); L1 (kernel and chartulary) and L6 (receipts class) briefed as sessions, each in its own worktree, with the bar in §5.3.
+- 2026-10-20: L1 repaired Q013 (stored address wins on load, regression plus kernel suite 474/474, receipt `support/receipts/ownership-repair/l1/2026-10-20_l1_receipt.json`). Remaining in the slice: Q009, Q010, Q012, Q015, Q016, Q017, Q031, Q032 in the kernel, Q014 re-document only; Q001, Q002, Q003, Q019 wait on an eidetic branch and repin.
