@@ -524,7 +524,7 @@ where
 }
 
 /// A tab strip whose tabs can be closed: [`tab_strip_items`] plus, per tab, a
-/// `tab-close` control (`role="button"`, announced as "Close <label>").
+/// `tab-close` control (`role="button"`, announced as "Close {label}").
 ///
 /// Closing is the caller's business, so it bubbles: the control's click calls
 /// `on_close(index)` and stops propagation, so a close never also activates the
