@@ -16,7 +16,7 @@ import machine as base
 
 PASTA = ['pasta', '--foreground', '--quiet', '--config-net', '--no-udp',
          '-u', 'none', '-U', 'none', '-t', 'none', '-T', 'none', '-4',
-         '--address', '10.77.0.2', '--netmask', '24', '--gateway', '10.77.0.1']
+         '--address', '10.77.0.2', '--netmask', '24', '--gateway', '10.77.0.1', '--no-pidns']
 ENTRY = '''import json,os,socket,sys,time
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -45,6 +45,23 @@ def await_file(path, process):
         assert time.monotonic() < end, path
         time.sleep(.05)
     return json.loads(path.read_text())
+
+
+class NativeProcess:
+    """Own Pasta's lifecycle while observing its unchanged native child PID."""
+    def __init__(self, process, pid):
+        self.process, self.pid = process, pid
+    @property
+    def returncode(self):
+        return self.process.returncode
+    def poll(self):
+        return self.process.poll()
+    def wait(self, timeout=None):
+        return self.process.wait(timeout=timeout)
+    def terminate(self):
+        self.process.terminate()
+    def kill(self):
+        self.process.kill()
 
 
 class RelayMachine(base.Machine):
@@ -100,15 +117,13 @@ class RelayMachine(base.Machine):
                 control.sendto(b'host-control', receiver.getsockname())
             assert receiver.recv(1024) == b'host-control'
             with (self.public / (name + '.log')).open('w') as log:
-                process = subprocess.Popen(['unshare', '-Urn', sys.executable, str(entry),
+                proxy = subprocess.Popen(PASTA + [sys.executable, str(entry),
                                             str(rendezvous), url, str(receiver.getsockname()[1]),
                                             json.dumps(command)], env=env, stdout=log, stderr=log)
-            self.phases[name] = process
-            ready = await_file(rendezvous / 'ready.json', process)
-            assert ready['pid'] == process.pid
-            with (self.public / (name + '-pasta.log')).open('w') as log:
-                proxy = subprocess.Popen(PASTA + [str(process.pid)], stdout=log, stderr=log)
             self.proxies[name] = proxy
+            ready = await_file(rendezvous / 'ready.json', proxy)
+            process = NativeProcess(proxy, ready['pid'])
+            self.phases[name] = process
             probe = await_file(rendezvous / 'probe.json', process)
             assert probe['udp_send_accepted'] == len(b'namespace-relay-probe')
             try:
