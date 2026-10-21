@@ -14,5 +14,7 @@
   "receivers": "receivers.json",
   "total_supplier_and_receiver_tests": 203,
   "new_tests_including_receiver": 20,
-  "canonical_receiving_commit": "2cfe1d4a51bbbf54de4e47b20c46ff9456a3f416"
+  "canonical_receiving_commit": "2cfe1d4a51bbbf54de4e47b20c46ff9456a3f416",
+  "post_merge_checks": "post-merge-checks.json",
+  "delivery": "delivery.json"
 }

@@ -224,3 +224,13 @@ H4 findings. Source was reconciled with concurrent shell/canvas/co-op work in
 Git delivery uses immutable supplier `e94cb23e8` and Knot `2cfe1d4`. The actual
 TreeLane hook is Wasm-compiled; the receiving exercises are software tests,
 not a headed browser run, native window-manager or human AT acceptance.
+
+A final concurrent owner/producer merge through `52d235927` was preserved in
+`da805a080`. H4 adapters remained exact; Mesquite's 39 cases, Graphshell's
+12 command/pipeline cases and standalone Wasm passed again on that runtime.
+[Post-merge checks](../../../support/receipts/hest-h4-20261020/post-merge-checks.json)
+and [delivery](../../../support/receipts/hest-h4-20261020/delivery.json) keep this
+recheck distinct from the immutable supplier/receiver qualification. Scoped
+reference and D2 audits have zero actionable Hest findings (20 claims hold).
+Pruning stale refs and expired worktree metadata found no task artifacts to
+remove; unrelated worktrees and branches are preserved.
