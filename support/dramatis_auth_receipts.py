@@ -43,7 +43,7 @@ def main():
                     script+='settle 240\n'+capture('acknowledged-after-refresh')
                 else:script+=capture('cold-reopened')
                 scn=out/(phase+'.scn');scn.write_text(script)
-                shown=env|{'GRAPHSHELL_APP_ENDPOINT':endpoint,'DRAMATIS_SCENARIO':str(scn),'DRAMATIS_RECEIPT':str(out/(phase+'.json')),'DRAMATIS_JSON_RECEIPT':'1'}
+                shown=env|{'GRAPHSHELL_APP_ENDPOINT':endpoint,'DRAMATIS_SCENARIO':str(scn),'DRAMATIS_RECEIPT':str(out/(phase+'.json'))}
                 with (out/(phase+'-app.log')).open('w') as log:
                     app=subprocess.Popen([str(a.binary.resolve())],cwd=repo,env=shown,stdout=log,stderr=subprocess.STDOUT)
                     try:app.wait(timeout=600)
