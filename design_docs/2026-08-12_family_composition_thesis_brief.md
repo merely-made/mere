@@ -1307,10 +1307,17 @@ origin still uses an actual supported owner interface.
 
 #### Existing seams and the remaining host boundary
 
+**Native host clarification (2026-10-20):** the winit host can reuse a caller's
+render core and event loop, and the multi-window entry shares its core across
+windows. The [Cambium architecture note](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20)
+records those implemented choices. The embedding questions below concern
+adapting compatible caller-owned GPU contexts and targets across other host
+toolkits; they do not imply that native shared-core hosting is absent.
+
 | Existing seam | What it already separates | Remaining embedding question |
 |---|---|---|
 | Sprigging paint commands and Vello scene leaves | Custom paint production from its retained host | How another toolkit presents that output and forwards its semantics/input |
-| Conatus `HostDevice` and `DeviceNeeds` | A tenant's needs from host-owned GPU handles | How the whole native document/UI lane accepts a caller-owned context |
+| Conatus `HostDevice` and `DeviceNeeds` | A tenant's needs from host-owned GPU handles | How other host toolkits provide compatible contexts and targets beyond the native shared-`RenderCore` entry |
 | Cambium Rootstock `Surface` and host lifecycle | Platform events from shared document/UI behavior | Its current surface still exposes a `RenderCore` and acquires a `SurfaceTexture`; arbitrary target views need an explicit boundary |
 | Inker `SurfaceProducer` | Producer commands/events from raw native frames, format, synchronization and allocation epoch | Preserve native interop and backend/thread requirements while fitting another host's render schedule |
 | Mere view model and requests | Presentation from session/storage authority | Adapt toolkit input, focus and accessibility while retaining the same owner requests |
