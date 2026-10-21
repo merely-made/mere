@@ -288,11 +288,20 @@ where
             el(
                 "span",
                 (
-                    el("span", mode.clone()).attr("class", "shell-binding-mode"),
-                    el("span", source.clone()).attr("class", "shell-binding-source"),
+                    el(
+                        "span",
+                        (
+                            el("span", mode.clone()).attr("class", "shell-binding-mode"),
+                            el("span", source.clone()).attr("class", "shell-binding-source"),
+                        ),
+                    )
+                    .attr("class", "shell-binding-summary"),
+                    el("span", if expanded { "Close" } else { "Change" })
+                        .attr("class", "shell-binding-affordance")
+                        .attr("aria-hidden", "true"),
                 ),
             )
-            .attr("class", "shell-binding-summary"),
+            .attr("class", "shell-binding-content"),
         ),
         format!("Pane source: {mode}: {source}"),
         "shell-control shell-binding-control",

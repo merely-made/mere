@@ -10,6 +10,9 @@
 .shell-popup .shell-control { text-align:left; width:100%; min-height:var(--shell-row-height, 28px); flex-shrink:0; }
 .cambium-source-binding { --app-region:no-drag; box-sizing:border-box; flex-shrink:0; min-width:0; padding:3px 6px; color:var(--shell-foreground, inherit); border-bottom:1px solid var(--shell-rule, #637581); }
 .shell-binding-control { display:block; width:100%; text-align:left; }
+.shell-binding-content { display:flex; align-items:center; gap:8px; min-width:0; }
+.shell-binding-content .shell-binding-summary { flex:1 1 0; }
+.shell-binding-affordance { flex:0 0 auto; font-size:11px; opacity:.7; }
 .shell-binding-summary, .shell-navigation-content { display:flex; flex-direction:column; min-width:0; gap:2px; }
 .shell-binding-mode, .shell-navigation-detail { display:block; font-size:11px; opacity:.7; }
 .shell-binding-source, .shell-navigation-title { display:block; overflow:hidden; white-space:nowrap; }
