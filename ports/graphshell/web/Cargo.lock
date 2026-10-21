@@ -4389,8 +4389,10 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "illume",
  "inker",
  "insigne",
+ "knot-editor-host",
  "mere",
  "mere-document-lanes",
  "mere-fleece",
@@ -4416,6 +4418,7 @@ dependencies = [
  "url",
  "uuid",
  "wgpu",
+ "woodshedding",
  "workbench",
 ]
 
@@ -5124,6 +5127,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "illume"
+version = "0.0.2"
+dependencies = [
+ "jotdown",
+ "logos",
+]
+
+[[package]]
 name = "image"
 version = "0.25.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5699,6 +5710,15 @@ name = "khronos_api"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
+
+[[package]]
+name = "knot-editor-host"
+version = "0.1.1"
+dependencies = [
+ "cambium",
+ "illume",
+ "pulldown-cmark",
+]
 
 [[package]]
 name = "kurbo"
@@ -8866,6 +8886,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
+]
+
+[[package]]
+name = "pulldown-cmark"
+version = "0.13.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e9f068eba8e7071c5f9511831b44f32c740d5adf574e990f946ddb53db2f314e"
+dependencies = [
+ "bitflags 2.13.2",
+ "memchr",
+ "unicase",
 ]
 
 [[package]]
@@ -12477,6 +12508,13 @@ dependencies = [
  "thiserror 2.0.21",
  "windows",
  "windows-core",
+]
+
+[[package]]
+name = "woodshedding"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

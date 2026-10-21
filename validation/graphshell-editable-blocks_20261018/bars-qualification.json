@@ -1,0 +1,96 @@
+{
+  "status": "Graphshell rhyme and structured Woodshed bar grouping prototype qualified",
+  "decisions": {
+    "progression_source": "Actual Woodshed Set plus saved arrangement; bar-line plaintext is a separate lossy export",
+    "bars": "Authored time-signature map; no implicit meter",
+    "chrome": "Document commands while the document is active; graph controls when graph is active"
+  },
+  "tests": {
+    "graphshell_document_rhyme_bars_store": 21,
+    "scenomise_scene_library": 211,
+    "woodshed_actual_pure_bar_model_harness": 5,
+    "woodshed_actual_saved_arrangement_integration_harness": 5,
+    "woodshed_authored_meter_groups_owner_roundtrip_harness": 1
+  },
+  "browser": {
+    "editable_rhyme_blocks": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/qualified/browser/editable_rhyme_blocks/result.json"
+    },
+    "editable_rhyme_blocks_reopen": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/qualified/browser/editable_rhyme_blocks_reopen/result.json"
+    },
+    "editable_bar_blocks": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/qualified/browser/editable_bar_blocks/result.json"
+    },
+    "editable_bar_blocks_reopen": {
+      "state": "ok",
+      "errors": [],
+      "gate_failures": [],
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/qualified/browser/editable_bar_blocks_reopen/result.json"
+    }
+  },
+  "reference_host": {
+    "renderer": "BrowserWebGpu in IAB",
+    "viewport_css": [
+      435,
+      1220
+    ],
+    "device_pixel_ratio": 2
+  },
+  "build": {
+    "product_wasm": "pass",
+    "port_boundaries": "pass",
+    "git_diff_check": "pass in both worktrees",
+    "package": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/bars/web/pkg",
+    "source_and_package_hashes": "bars-source.json"
+  },
+  "shared_behavior": [
+    "One ordinary source buffer and chronological document history",
+    "Exact source snapshot and parser-target checks before structural apply",
+    "Preview/cancel do not mutate source",
+    "Conflicts keep local until explicitly accepted",
+    "Save/reopen retains structured source; Collect remains separate",
+    "Same existing Swatch/Canvas surface; domain validation stays with owner/adapter"
+  ],
+  "limits": [
+    "Prototype optional woodshedding dependency uses sibling worktree path; needs proper family source pin/publication before integration.",
+    "Meter map is editable in structured source, without a dedicated time-signature form.",
+    "Rhyme adapter is a leaf-block expectation lens, not complete scansion or phonetic analysis.",
+    "New native Woodshed Draft preservation regression is added but the full views crate/native UI was not built or run.",
+    "Woodshed harnesses compile actual owner sources against local scene crates; canonical dependency/lock adoption remains separate.",
+    "Current changed host is accepted at 435x1220 in IAB; no new wide-window, Firefox, Safari or native host acceptance claimed.",
+    "No commit, push, merge or deployment."
+  ],
+  "earlier_attempts": [
+    {
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/bars/browser/editable_rhyme_blocks-before-entry-fix/result.json",
+      "reason": "Narrow graph tools were collapsed; moved document entry into graph controls."
+    },
+    {
+      "receipt": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/bars/browser/editable_rhyme_blocks/result.json",
+      "reason": "First newly revealed scene capture was blank; retained capture waits and reran on fresh origin."
+    },
+    {
+      "directory": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/bars-final/browser",
+      "reason": "Successful earlier behavior checks, superseded by final package with complete line captions."
+    },
+    {
+      "directory": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/final/browser",
+      "reason": "Superseded after detecting and correcting whole-line caption clipping."
+    }
+  ],
+  "local_review": {
+    "url": "http://127.0.0.1:8909/tree.html?app=local",
+    "server_session": 24691,
+    "tab": "IAB 4, marked deliverable"
+  }
+}

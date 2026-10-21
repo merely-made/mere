@@ -1,0 +1,37 @@
+{
+  "repo": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops",
+  "base": "7077ea440f926932714fb607bfafcbdf44b1343e",
+  "files": {
+    "Cargo.lock": "f424afed92399feceb642b7c4ecfa1c3675970470841096cad9cd5103e4ccbd1",
+    "crates/nematic/illume/README.md": "492439102d1c1c7fd67839d6c2b862900f4496025fbdd9ba116430a586b94356",
+    "crates/nematic/illume/src/blocks.rs": "4d6d7edc62e78905d2fd20102e311248e59bd11997b544eeffdb7380e169eb15",
+    "crates/nematic/illume/src/lib.rs": "06f01791d4f70fe6c3cb468837d134aa540e89a93996a1da17f26b1bb3e05c25",
+    "crates/nematic/nematic/Cargo.toml": "48702016f5ce529ba277cab96f71753bfa25a1da4be28ad56cf6c0b2390afb69",
+    "crates/nematic/nematic/src/knot/djot/divs.rs": "65e47f12adaab283332719efdcb95d07f7d6f0e6f7744d74c5c9296a3ecdb57a",
+    "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md": "116515e5c65e6a4e3dae82d470e21dfebf3de368958831e8f630e842a9f3a2a3",
+    "ports/graphshell/Cargo.toml": "c1fe032150f435d586acd5ee45242ec449335aff314fcae6dbdd895ad461118c",
+    "ports/graphshell/src/block_editing.rs": "7151e5a9f677ab976be2eb57e1f297c753c07b4aa4c3976591bcabe6f661ff4c",
+    "ports/graphshell/src/block_editing/rhyme.rs": "eebcc06ca0a110d79b0a72bde7a1f464e319acd7bd3898355441613e8dc0f447",
+    "ports/graphshell/src/block_editing/store.rs": "78cbde3485dea1cb297fb61f0d0bf59152b22a90ec5a25c482e624b267a7519c",
+    "ports/graphshell/src/lib.rs": "97b364ad321e55d8941cc119b643abf38c815a95237344a24fd2b02f9588d1e8",
+    "ports/graphshell/src/web_tree.rs": "32805b9f131827f9d6d2a03133ab796f2c6087e582ce70f38edd29aa4c9dc498",
+    "ports/graphshell/src/web_tree/blocks.rs": "e62ca732b20df3cad9cd59d0cf21091c8dbfd062637aab4498b134891dcf266d",
+    "ports/graphshell/src/web_tree/lane.rs": "f59b8632964726c48064bbe7566302721f72c4f71e6a510ef8fb421c8852facd",
+    "ports/graphshell/web/Cargo.lock": "362d8d1fc2acfcde6e9c62d154913c736ddea9b2c03073aabcbfde8800d38468",
+    "ports/graphshell/web/Cargo.toml": "fa300fb242fce64ee235a8c5cdc58092078740301136b50b2a949248814b682f",
+    "ports/graphshell/web/scenarios/editable_rhyme_blocks.scn": "46b7cc5a4b1ae7dc63d638ee18856cdf8d46a8e1c4b5b391a59480a7aade64c7",
+    "ports/graphshell/web/scenarios/editable_rhyme_blocks_reopen.scn": "c6c3a1f219a37fa1f656677c9f5672b258935fc5bca4405d9af9435c902cee2a"
+  },
+  "commands": {
+    "native": "cargo test --locked --offline -p graphshell --no-default-features --features editable-blocks block_editing --lib",
+    "parser": "cargo test --locked --offline -p illume blocks::tests",
+    "djot": "cargo test --locked --offline -p nematic --no-default-features --lib knot::djot",
+    "browser_build": "cargo rustc --locked --offline --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu -- -C link-arg=-zstack-size=16777216"
+  },
+  "toolchain": "explicit rustup 1.99.1 for Wasm; native Homebrew rustc 1.99.0",
+  "knot_adapter": {
+    "file": "/Users/markik/Code/worktrees/knot-portable-metre/crates/knot-readings/src/metre_block.rs",
+    "sha256": "f195b818ad42e2ca832950cc6853e1cf6e37d9ab0ceee79fdfc3980643f9e395",
+    "base": "5349c89e72fd15de337a9cc78589640663be82c6"
+  }
+}

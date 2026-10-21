@@ -880,7 +880,12 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             .collect(),
     };
     draw_template(out, src, &template);
-    let right = template.x(max_syllables as f32) + 38.0;
+    // Source text stays visible even when syllable analysis is unavailable.
+    // Caption width reserves presentation space, not invented metrical units.
+    let caption_width = |line: &VerseLine| line.text.chars().count() as f32 * 11.0;
+    let text_right = grid.lines.iter().filter(|line| line.syllables.is_empty())
+        .map(|line| 48.0 + caption_width(line) + 38.0).fold(0.0_f32, f32::max);
+    let right = (template.x(max_syllables as f32) + 38.0).max(text_right);
     out.scene.bounds = Rect::new(
         Vec2::ZERO,
         Size2::new(right + 90.0, 42.0 + row * grid.lines.len().max(1) as f32),
@@ -911,6 +916,12 @@ fn compile_metre(out: &mut BackdropScene, src: sceno::SourceIx, grid: &MetreGrid
             size: Size2::new(36.0, 44.0),
         });
         rows.push(id);
+        if line.syllables.is_empty() {
+            out.guides.push(GuideLabel {
+                at: Vec2::new(48.0 + caption_width(line) / 2.0, y + 17.0),
+                text: line.text.clone(),
+            });
+        }
         for (j, syllable) in line.syllables.iter().enumerate() {
             let Some(span) = grid.placement(i, j) else {
                 out.unplaced.push(Unplaced {

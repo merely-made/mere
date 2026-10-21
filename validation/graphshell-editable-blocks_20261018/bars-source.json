@@ -1,0 +1,56 @@
+{
+  "mere": {
+    "base": "7077ea440f926932714fb607bfafcbdf44b1343e",
+    "root": "/Users/markik/Code/worktrees/mere-portable-scene-backdrops",
+    "sha256": {
+      "Cargo.lock": "90feeabc22fdf862eae6ded69b883d88ab6bc4ca589c33d1dc702740eccece1f",
+      "crates/cambium/scenes/scenomise/src/backdrops.rs": "fc0d6d8c117571911139eb3de1365c71d5938f5b1315de412e33f9d935f36cdb",
+      "crates/nematic/illume/README.md": "492439102d1c1c7fd67839d6c2b862900f4496025fbdd9ba116430a586b94356",
+      "crates/nematic/illume/src/lib.rs": "06f01791d4f70fe6c3cb468837d134aa540e89a93996a1da17f26b1bb3e05c25",
+      "crates/nematic/nematic/Cargo.toml": "48702016f5ce529ba277cab96f71753bfa25a1da4be28ad56cf6c0b2390afb69",
+      "crates/nematic/nematic/src/knot/djot/divs.rs": "65e47f12adaab283332719efdcb95d07f7d6f0e6f7744d74c5c9296a3ecdb57a",
+      "design_docs/mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md": "6a037e17c8819c09d784a2a10fcf8c5a5a738a7acb2918ac165a723a52fe1546",
+      "ports/graphshell/Cargo.toml": "680d4e5580580dc4d7604f55125ad823c37aac7060d2bd91b65085880118b50e",
+      "ports/graphshell/src/lib.rs": "97b364ad321e55d8941cc119b643abf38c815a95237344a24fd2b02f9588d1e8",
+      "ports/graphshell/src/web_tree.rs": "397f61b446c6448c7790556a28c2f608097a8f5e7b877d767392184401aa2078",
+      "ports/graphshell/src/web_tree/controls.rs": "8765f2e40f7c54bdf7be387ccbf6d9678daa24827fecbeb4b5eea853d1f4cdfb",
+      "ports/graphshell/src/web_tree/lane.rs": "24abac99dce9a6fcbc7af59782e549286a6acb7824f5ce4610357b1f4fe4cfe0",
+      "ports/graphshell/web/Cargo.lock": "544425de9e04efbe1c0a9a5a03a5821ebccf339eeee94499787ee56f2c5ef5a0",
+      "ports/graphshell/web/Cargo.toml": "fa300fb242fce64ee235a8c5cdc58092078740301136b50b2a949248814b682f",
+      "crates/nematic/illume/src/blocks.rs": "4d6d7edc62e78905d2fd20102e311248e59bd11997b544eeffdb7380e169eb15",
+      "ports/graphshell/src/block_editing.rs": "c8ea4b0707e01ac201bbe04c8bc270d4fe96606e642aca4790fff0b899111a07",
+      "ports/graphshell/src/block_editing/bars.rs": "36928a65fbe76f862efed439b01b282f72f853b9334ac03fa3c31514f37d2c82",
+      "ports/graphshell/src/block_editing/rhyme.rs": "c8b7c932bd8700cd6675e5dd2742343450d88b01216e334bc7d61ba8373be8b8",
+      "ports/graphshell/src/block_editing/store.rs": "78cbde3485dea1cb297fb61f0d0bf59152b22a90ec5a25c482e624b267a7519c",
+      "ports/graphshell/src/web_tree/blocks.rs": "ef25e0eff54f90cfe60c023c10f1124409e6c150bcc07d1df7a1d26c980f87b2",
+      "ports/graphshell/support/woodshed-block-example.json": "669af1781c646c8a153b7b84c31961166beeefa14cbcb14e0cbe3391e63fa35a",
+      "ports/graphshell/web/scenarios/editable_bar_blocks.scn": "42fbf54ac8a8c675058f9037f7c6d99be10c6d06d6dd3590b76daaf2a49a3d87",
+      "ports/graphshell/web/scenarios/editable_bar_blocks_reopen.scn": "0b11923e90109eec5d317f220df074e2d05a086e186123faef1a15a765f0e569",
+      "ports/graphshell/web/scenarios/editable_rhyme_blocks.scn": "a7effccabdbd1166153518ce3582a2f4cb4b6ef122d8f4f899eec04d738fda69",
+      "ports/graphshell/web/scenarios/editable_rhyme_blocks_reopen.scn": "dc9aef8257c90f6963d4597fbba3f1e1d0eabbea8f51d31f2c2c85d15a9005c3"
+    }
+  },
+  "woodshed": {
+    "base": "493197eba778869f6952cfff7f023898edc72c67",
+    "root": "/Users/markik/Code/worktrees/woodshed-portable-fretboard",
+    "sha256": {
+      "crates/woodshed-core/src/arrangement_scene.rs": "376968436ce4be06ce0320808cad741628d01197ebf3643160e571e9f25e9468",
+      "crates/woodshed-core/src/bin/woodshed-arrangement-scene.rs": "031ad4f56d22b487de180febac2b9f3b6dc18eed74a4fd15e4f1a288996c771d",
+      "crates/woodshed-core/src/saved_arrangements.rs": "5f323ca4837e3575f30f495571818da2d897a681a93940fd8e034ec2125b4a93",
+      "crates/woodshed-core/tests/saved_arrangements.rs": "9b700c226b9969d7a64aa39b32de699ab7458e748e6cc27ddcaf01a9ceacf7e4",
+      "crates/woodshed-views/src/stage/arrangement_editor.rs": "7b8b56baf21d2bfc660d1dd5aa25a0737e515b89b3f3a368ed6982f6337933e1",
+      "crates/woodshedding/src/rehearsal.rs": "77109e795d145a31238578094366931301362789867000543405bafbbfd20606",
+      "crates/woodshedding/src/rehearsal/arrangement.rs": "5c491075b5834464956398c16269a464b2e4a2c1e0cdd8ef9cd021bfe0452f07",
+      "crates/woodshed-core/src/bin/woodshed-block-example.rs": "cee8d65d6bb6623eee7a3e5c9ad054612bc1b4ebed77d37f15416bf3ba0ecbc7",
+      "crates/woodshedding/src/rehearsal/arrangement/bars.rs": "9a6f67291eee162f284397258b4ef13b4ba6854487aa90f5c393bce5753c2248"
+    }
+  },
+  "package_root": "/Users/markik/Code/output/graphshell-editable-blocks-20261018/bars/web/pkg",
+  "package_sha256": {
+    "graphshell_web_bg.wasm.d.ts": "8ddc8fcd67a0e3fcdd5c94e4bdf4d9b9a6a5ae61bc3a2dbafcf350ff81b9b4a2",
+    "graphshell_web_bg.wasm": "58e30776777c6ff65a4c7cc46ed164e8a58c431116532b7c1e0192df225ebbfe",
+    "graphshell_web.js": "bd9d4fa0a9234e1117811411e35432b9efb4d15d0887e55b81007b9b91e74511",
+    "graphshell_web.d.ts": "964667855df7c39573f52c955c736ca07299838d8bbfa92088f30a386745c10c",
+    "snippets/genet-render-host-3997a73541d04484/inline0.js": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee"
+  }
+}

@@ -1,0 +1,30 @@
+warning: skipping duplicate package `muniment v0.1.2 (https://github.com/merely-made/mere.git?branch=main#55c479bc)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/muniment/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/55c479b/crates/eidetic/muniment/Cargo.toml
+
+warning: skipping duplicate package `chartulary v0.2.2 (https://github.com/merely-made/mere.git?branch=main#55c479bc)`:
+  /Users/markik/Code/worktrees/mere-vello-release-adoption/crates/eidetic/chartulary/Cargo.toml
+in favor of /Users/markik/.cargo/git/checkouts/mere-9d8e871c24d9ba76/55c479b/crates/eidetic/chartulary/Cargo.toml
+
+warning: unused variable: `time_range`
+   --> /Users/markik/Code/worktrees/mere-portable-scene-backdrops/crates/cambium/scenes/scenomise/src/opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling woodshed-source-example-check v0.0.0 (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshed-source-harness)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.30s
+     Running /Users/markik/Code/worktrees/woodshed-portable-fretboard/crates/woodshed-core/tests/saved_arrangements.rs (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshed-source-harness/target/build/debug/deps/saved_arrangement_owner-d566f51986526da1)
+
+running 5 tests
+test unresolved_or_changed_data_is_retained_and_refused_without_mutation ... ok
+test snapshots_and_duplicates_remap_live_and_missing_alignment_without_aliasing ... ok
+test sealed_save_reopen_exports_same_ids_spans_and_voicings ... ok
+test navigation_and_working_set_switch_do_not_retarget_template ... ok
+test fresh_process_attach_and_export_support_each_owner_and_preserve_source_keys ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+

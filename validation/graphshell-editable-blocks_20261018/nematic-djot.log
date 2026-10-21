@@ -1,0 +1,55 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: unused imports: `BlockProvenanceMap`, `DocumentProvenance`, and `DocumentTrustState`
+  --> crates/nematic/nematic/src/knot/expand.rs:20:12
+   |
+20 |     Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, Engine, EngineInput,
+   |            ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `EngineDocument`
+ --> crates/nematic/nematic/src/knot/expand/build.rs:7:80
+  |
+7 | use inker::{Block, BlockProvenanceMap, DocumentProvenance, DocumentTrustState, EngineDocument};
+  |                                                                                ^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> crates/nematic/nematic/src/lib.rs:217:13
+    |
+217 |         let mut ids = vec![
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `nematic` (lib test) generated 3 warnings (run `cargo fix --lib -p nematic --tests` to apply 3 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.57s
+     Running unittests src/lib.rs (target/build/debug/deps/nematic-d313df15ea9ecbe2)
+
+running 20 tests
+test knot::djot::divs::tests::wrapper_preserves_authored_body_and_escaped_attributes ... ok
+test knot::djot::divs::tests::opening_update_changes_only_target_declaration_and_keeps_parent_prefixes ... ok
+test knot::djot::divs::tests::opening_update_uses_parser_range_for_braces_inside_quoted_json ... ok
+test knot::djot::divs::tests::opening_update_rejects_forged_targets_and_multiline_values ... ok
+test knot::djot::tests::description_list_becomes_metadata_rows ... ok
+test knot::djot::tests::heading_and_paragraph_map_structurally ... ok
+test knot::djot::tests::inline_link_sits_between_text_runs ... ok
+test knot::djot::tests::plain_inline_link_has_no_predicate ... ok
+test knot::djot::tests::inline_link_captures_destination_and_rel ... ok
+test knot::djot::tests::djot_engine_renders_frontmatter_and_body ... ok
+test knot::djot::tests::link_predicates_survive_the_inline_rewrite_pass ... ok
+test knot::djot::tests::unknown_div_class_preserves_its_structure_and_attributes ... ok
+test knot::djot::tests::djot_engine_expands_protocol_fences_for_parity ... ok
+test knot::djot::tests::badge_div_becomes_badge ... ok
+test knot::djot::tests::feed_entry_div_reads_attributes ... ok
+test knot::djot::tests::recognized_div_with_required_attrs_has_no_diagnostics ... ok
+test knot::djot::tests::feed_entry_missing_required_title_warns ... ok
+test knot::djot::divs::tests::nested_domain_attributes_and_content_round_trip_without_interpretation ... ok
+test knot::djot::structure::tests::lists_and_quotes_remain_parents_of_domain_blocks ... ok
+test knot::djot::tests::round_trip_preserves_semantic_blocks ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 221 filtered out; finished in 0.01s
+

@@ -22,6 +22,13 @@ illume takes source text and returns `(range, kind)` spans. It carries three pas
 It also folds jotdown's nested events into a **container tree**, giving section folds, a
 heading outline, and expand-to-enclosing structural selection.
 
+`blocks` exposes source-bound attributed Djot containers (`Div`, `divs`) and
+pure helpers for wrapping source or changing only a container's declaration.
+The caller owns the buffer, undo history and saving. Attribute values remain
+opaque: this source utility supplies no domain interpretation or execution.
+Nematic re-exports the same types at `knot::djot::divs`, so existing consumers
+and browser editors use one parser without importing native transports.
+
 illume is host- and toolkit-agnostic: it emits spans and knows nothing about colour or
 rendering. Pair it with a palette (e.g. [`tinct`](https://crates.io/crates/tinct)) for
 colour and a text surface for rendering. It builds for `wasm32-unknown-unknown` like any

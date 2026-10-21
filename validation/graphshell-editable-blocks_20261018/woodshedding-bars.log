@@ -1,0 +1,24 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling syn v3.0.9
+   Compiling serde_derive v1.0.229
+   Compiling woodshedding-harness v0.1.0 (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshedding-harness)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.27s
+     Running unittests /Users/markik/Code/worktrees/woodshed-portable-fretboard/crates/woodshedding/src/lib.rs (/Users/markik/Code/output/graphshell-editable-blocks-20261018/woodshedding-harness/target/build/debug/deps/woodshedding_harness-f01cb3ba5ede15fd)
+
+running 5 tests
+test rehearsal::arrangement::bars::tests::malformed_order_and_zero_extent_return_errors_without_panicking ... ok
+test rehearsal::arrangement::bars::tests::meter_changes_at_bar_boundary_and_partial_final_bar_is_explicit ... ok
+test rehearsal::arrangement::bars::tests::rejects_invalid_meters_and_overlapping_groups ... ok
+test rehearsal::arrangement::bars::tests::regroup_replaces_whole_groups_and_refuses_partial_overlap ... ok
+test rehearsal::arrangement::bars::tests::absent_meter_keeps_legacy_arrangements_without_bars ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 187 filtered out; finished in 0.00s
+
