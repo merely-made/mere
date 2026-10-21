@@ -17,7 +17,7 @@ default = ["view"]
 # graphshell-client's `SessionDriver`. Off, the crate is the wire vocabulary
 # alone, which a host that serves the route (Graphshell's `mere_host`) takes
 # without the view's Cambium cone.
-view = ["dep:mere-view", "dep:graphshell-client", "dep:cartography", "dep:sceno", "dep:uuid"]
+view = ["dep:mere-view", "dep:graphshell-client", "dep:hest", "dep:cartography", "dep:sceno", "dep:uuid"]
 
 resident = ["view", "dep:graphshell-endpoint"]
 
@@ -31,6 +31,7 @@ serde_json.workspace = true
 # The relation adapter id the graph projection's items name.
 cartography = { workspace = true, optional = true }
 graphshell-client = { workspace = true, optional = true }
+hest = { workspace = true, optional = true }
 graphshell-endpoint = { workspace = true, optional = true, features = ["door"] }
 mere-view = { workspace = true, optional = true }
 sceno = { workspace = true, optional = true }

@@ -90,6 +90,13 @@ Font adoption (2026-10-13): the [theme modes plan](mere_docs/implementation_stra
 
 Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
 
+Current owner actions (2026-10-20, local implementation): the
+[projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#current-owner-actions-on-bound-views-2026-10-20)
+records exact runtime source/target binding and native Mere selected-record
+controls through existing Hest/Chirograph contracts, with 113 focused tests and
+the portable client check passing. Recipes remain unchanged; headed rendering
+and a configured live handler retain their separate acceptance gates.
+
 Cross-domain continuation (2026-10-05): that plan records published shared
 relationship authoring/compiler and Knot UI/retention adoption, Woodshed's
 visible Woodshed host integration, and the shared horizontal reveal fix
