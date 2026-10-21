@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
 """Headed local authentication through Dramatis and an owned synthetic Djinn authority.
 The ignored-test host refuses existing seed roots and requires its fixture marker on reopen.
 """
@@ -33,9 +38,12 @@ def main():
     p=argparse.ArgumentParser()
     for n in ['binary','host','runtime','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--native',action='store_true')
+    p.add_argument('--native-cancel',action='store_true',help='cancel the first native prompt in each format before retrying')
     p.add_argument('--desktop',action='store_true',help='use the existing unlocked Linux user desktop')
     p.add_argument('--format',choices=['sealed','portable','both'],default='both')
-    a=p.parse_args();a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
+    a=p.parse_args()
+    assert not a.native_cancel or a.native,'--native-cancel requires --native'
+    a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
     repo=Path(__file__).resolve().parents[1];processes=[];results=[];graphical={}
     if a.desktop:
         graphical,desktop=desktop_environment()
@@ -58,7 +66,7 @@ def main():
                 script=await_({'ready':'true','profiles':'2','locked':'false'})
                 if phase=='seed':
                     script+=capture('before')
-                    cases=[] if a.native else [('cancelled','cancelled'),('wrong-current','current passphrase was not accepted'),('mismatch','did not match'),('empty','cannot be empty')]
+                    cases=([('cancelled','cancelled')] if a.native_cancel else []) if a.native else [('cancelled','cancelled'),('wrong-current','current passphrase was not accepted'),('mismatch','did not match'),('empty','cannot be empty')]
                     for name,notice in cases:
                         script+='click role:button Change passphrase…\n'+await_({'notice':'~'+notice})+capture(name)
                     script+='click role:button Change passphrase…\n'+await_({'notice':'~Passphrase changed.'})+capture('changed')
@@ -89,7 +97,7 @@ def main():
         assert before==cold and (out/'old-rejected').read_text()=='true'
         results.append({'format':fmt,'identities_preserved':True,'old_rejected_after_cold_reopen':True})
     result={'result':'ok','source':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),
-      'native_dialogs':a.native,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
+      'native_dialogs':a.native,'native_cancellation':a.native_cancel,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
       'binaries':{'app_sha256':sha(a.binary),'host_sha256':sha(a.host)},'controller_sha256':sha(Path(__file__))}
     (a.output/'qualification.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result),flush=True)
 if __name__=='__main__':main()
