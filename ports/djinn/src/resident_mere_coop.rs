@@ -102,7 +102,7 @@ impl Activities {
                 })
             }));
             let owner = Arc::new(SyncMutex::new(owner));
-            let transport = run(network::bind(&*identity))?;
+            let transport = run(network::bind_with_relays(&*identity, &shared.coop_relays))?;
             let contact = run(network::card(&*identity, graph, &transport))?;
             let mut host = network::host(owner.clone())?;
             let ledger = host.revocations().clone();

@@ -107,6 +107,7 @@ type ProfileLookup = Arc<dyn Fn(&personae::ProfileId) -> Result<bool, String> + 
 
 struct Routes {
     custody_endpoint: Option<String>,
+    coop_relays: Vec<transport::p2panda_transport::RelayUrl>,
     shared_root: PathBuf,
     persona: PersonaId,
     catalog: WeakAppEndpointCatalog,
@@ -171,6 +172,7 @@ impl MereRoutes {
         Self {
             inner: Arc::new(Routes {
                 custody_endpoint: None,
+                coop_relays: Vec::new(),
                 shared_root,
                 persona,
                 catalog: catalog.downgrade(),
@@ -193,6 +195,14 @@ impl MereRoutes {
         Arc::get_mut(&mut self.inner)
             .expect("compose custody before serving")
             .custody_endpoint = Some(endpoint);
+        self
+    }
+
+    /// Owner-selected reachability for co-op, composed before any routes open.
+    pub fn with_coop_relays(mut self, relays: Vec<transport::p2panda_transport::RelayUrl>) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("compose co-op relays before serving")
+            .coop_relays = relays;
         self
     }
 
@@ -342,6 +352,7 @@ impl MereRoutes {
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
             custody_endpoint: self.inner.custody_endpoint.clone(),
+            coop_relays: self.inner.coop_relays.clone(),
             validator: self.inner.validators.get(&domain).cloned(),
             admission_validator: if domain == personal_facts::DOMAIN {
                 let lookup = self.inner.profile_lookup.clone();
@@ -661,6 +672,7 @@ type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 /// attached to.
 struct MereShared {
     custody_endpoint: Option<String>,
+    coop_relays: Vec<transport::p2panda_transport::RelayUrl>,
     domain: String,
     validator: Option<pandect::GraphValidator>,
     admission_validator: Option<pandect::GraphAdmissionValidator>,

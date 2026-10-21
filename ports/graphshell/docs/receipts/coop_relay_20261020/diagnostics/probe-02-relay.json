@@ -1,0 +1,47 @@
+{
+  "exit": 0,
+  "sha256": "9a3d57c1ab0f65a60615190e487372ababe649bd4984e003f1c91be782b4ae08",
+  "events": [
+    {
+      "at_ms": 1792553457589,
+      "event": "ready",
+      "pid": 2218765,
+      "url": "http://192.168.4.32:41255/"
+    },
+    {
+      "accepts": 0,
+      "at_ms": 1792553457597,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 0,
+      "event": "snapshot",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2218765
+    },
+    {
+      "at_ms": 1792553481451,
+      "connection": "ConnectionId(0)",
+      "endpoint": "85bdf4f4c4d2ebb089a72d7db0a8d478c03775b0e1bbc8a50640f163b6fce5c5",
+      "event": "connect"
+    },
+    {
+      "accepts": 1,
+      "at_ms": 1792553514992,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 1,
+      "event": "final",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2218765
+    },
+    {
+      "at_ms": 1792553514993,
+      "event": "stopped",
+      "pid": 2218765
+    }
+  ],
+  "bind": "192.168.4.32:0",
+  "binary": "/home/markik/Code/output/graphshell-coop-relay-20261020/relay-frozen-02/relay"
+}
