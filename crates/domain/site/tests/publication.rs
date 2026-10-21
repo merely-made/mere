@@ -44,6 +44,202 @@ fn schema_identity_is_independent_of_json_map_order_features() {
     );
 }
 
+#[test]
+fn a_later_collection_refusal_reports_the_already_signed_contribution() {
+    pollster::block_on(async {
+        let f = Fixture::with_contributor(true).await;
+        let mut store = MemoryBackend::new();
+        let observed = f
+            .moot
+            .authorized_collection(COLLECTION, 10)
+            .await
+            .unwrap()
+            .unwrap()
+            .version;
+        let snapshot = PublishedSnapshotV1::decode(FIXTURES[0]).unwrap();
+        let error = publication::publish_public_snapshot(
+            &f.moot,
+            &f.reader,
+            &mut store,
+            &snapshot,
+            &observed,
+            None,
+            "Contributor".into(),
+            10,
+        )
+        .await
+        .unwrap_err();
+        let contribution = error
+            .contribution
+            .expect("the authorized share was authored");
+        assert!(error.collection_operations.is_empty());
+        assert!(
+            f.moot
+                .authorized_fauna(10)
+                .await
+                .unwrap()
+                .iter()
+                .any(|share| share.op_hash == contribution.share)
+        );
+        assert!(
+            f.moot
+                .authorized_collection(COLLECTION, 10)
+                .await
+                .unwrap()
+                .unwrap()
+                .effective_selected
+                .is_empty()
+        );
+    });
+}
+
+#[test]
+fn binding_follows_explicit_replacement_and_refuses_ambiguity_and_withdrawal() {
+    use publication::{SiteBindingV1, SiteRevisionPolicy};
+    pollster::block_on(async {
+        let f = Fixture::new().await;
+        let mut store = MemoryBackend::new();
+        let snapshot = PublishedSnapshotV1::decode(FIXTURES[0]).unwrap();
+        let version = f
+            .moot
+            .authorized_collection(COLLECTION, 10)
+            .await
+            .unwrap()
+            .unwrap()
+            .version;
+        let first = publication::publish_public_snapshot(
+            &f.moot,
+            &f.author,
+            &mut store,
+            &snapshot,
+            &version,
+            None,
+            "Garden".into(),
+            10,
+        )
+        .await
+        .unwrap();
+        let follow = SiteBindingV1 {
+            version: 1,
+            collection: version.collection,
+            revision: SiteRevisionPolicy::FollowCollection,
+        };
+        let pinned = SiteBindingV1 {
+            revision: SiteRevisionPolicy::Pinned {
+                contribution: first.selection.contribution,
+            },
+            ..follow.clone()
+        };
+        let mut edited = snapshot.clone();
+        edited
+            .pages
+            .get_mut("/index.gmi")
+            .unwrap()
+            .source
+            .extend_from_slice(b"\nSaved replacement\n");
+        let second = publication::publish_public_snapshot(
+            &f.moot,
+            &f.author,
+            &mut store,
+            &edited,
+            &first.selection.collection,
+            None,
+            "Second".into(),
+            11,
+        )
+        .await
+        .unwrap();
+        assert!(
+            publication::open_binding(&f.moot, &mut store, &follow, 12)
+                .await
+                .is_err()
+        );
+        assert_eq!(
+            publication::open_binding(&f.moot, &mut store, &pinned, 12)
+                .await
+                .unwrap()
+                .snapshot(),
+            &snapshot
+        );
+        let before = store.len();
+        let stale = publication::publish_public_snapshot(
+            &f.moot,
+            &f.author,
+            &mut store,
+            &edited,
+            &first.selection.collection,
+            None,
+            "Stale".into(),
+            12,
+        )
+        .await
+        .unwrap_err();
+        assert!(stale.contribution.is_none());
+        assert_eq!(store.len(), before);
+        let receipt = f
+            .moot
+            .set_collection_membership_for_identity(
+                &f.author,
+                version.collection,
+                second.selection.collection.frontier,
+                CollectionChange::SetMembership {
+                    contribution: first.selection.contribution,
+                    included: false,
+                },
+                13,
+            )
+            .await
+            .unwrap();
+        assert!(
+            publication::open_binding(&f.moot, &mut store, &pinned, 13)
+                .await
+                .is_err()
+        );
+        assert_eq!(
+            publication::open_binding(&f.moot, &mut store, &follow, 13)
+                .await
+                .unwrap()
+                .snapshot(),
+            &edited
+        );
+        let _ = receipt;
+        let third = publication::publish_public_snapshot(
+            &f.moot,
+            &f.author,
+            &mut store,
+            &snapshot,
+            &f.moot
+                .authorized_collection(COLLECTION, 14)
+                .await
+                .unwrap()
+                .unwrap()
+                .version,
+            Some(second.selection.contribution),
+            "Replace".into(),
+            14,
+        )
+        .await
+        .unwrap();
+        assert_eq!(third.collection_operations.len(), 2);
+        assert_eq!(
+            publication::open_binding(&f.moot, &mut store, &follow, 14)
+                .await
+                .unwrap()
+                .snapshot(),
+            &snapshot
+        );
+        f.moot
+            .withdraw_share_for_identity(&f.author, third.selection.contribution.share, 15)
+            .await
+            .unwrap();
+        assert!(
+            publication::open_binding(&f.moot, &mut store, &follow, 15)
+                .await
+                .is_err()
+        );
+    });
+}
+
 struct Fixture {
     author: InMemoryProvider,
     reader: InMemoryProvider,
@@ -53,6 +249,10 @@ struct Fixture {
 
 impl Fixture {
     async fn new() -> Self {
+        Self::with_contributor(false).await
+    }
+
+    async fn with_contributor(writer: bool) -> Self {
         let author = InMemoryProvider::from_seed([11; 32]);
         let reader = InMemoryProvider::from_seed([12; 32]);
         let root = author.master_public_key().to_bytes();
@@ -69,6 +269,16 @@ impl Fixture {
             expires_at_ms: Some(100),
             delegation_depth: 0,
         });
+        if writer {
+            rules.grant(CapabilityGrant {
+                id: [42; 32],
+                subject: reader.master_public_key().to_bytes(),
+                path_prefix: cap_path(&Cap::scope("moot/fauna").unwrap()),
+                not_before_ms: 1,
+                expires_at_ms: Some(100),
+                delegation_depth: 0,
+            });
+        }
         let retention = MootRetentionSettings {
             revision: PolicyRevision(Digest::blake3(b"site-publication-test")),
             availability: AvailabilityPolicy {
@@ -110,7 +320,11 @@ impl Fixture {
                         },
                         MootMember {
                             member: fixture.reader.master_public_key().to_bytes(),
-                            access: MootAccessLevel::Read,
+                            access: if writer {
+                                MootAccessLevel::Write
+                            } else {
+                                MootAccessLevel::Read
+                            },
                         },
                     ],
                 },

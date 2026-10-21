@@ -1,0 +1,98 @@
+{
+  "producer": "Fedora Linux 44 x86_64",
+  "producer_current_source": "a58b8014e14829356d1d013f4abb7051e1717111",
+  "frozen_app_host_source": "73b25d9ee71184a1a8e7bf53b774255815810727",
+  "final_app_tests_source": "9069774d7076283225db00b154bd36baf30bf501",
+  "binaries": {
+    "dramatis-ui": {
+      "sha256": "0b8fc20864d865f1001614cf764430c7fabce11732ac89219b0e109bcf49af41",
+      "bytes": 113397872,
+      "producer_path": "/home/markik/Code/output/dauth-fedora21/frozen/dramatis-ui"
+    },
+    "authentication-host": {
+      "sha256": "aac5043483468fc585df00707d1d0a74140ae5f396f4fb310d310832e8069ccd",
+      "bytes": 53778240,
+      "producer_path": "/home/markik/Code/output/dauth-fedora21/frozen/authentication-host"
+    },
+    "storage-castellan": {
+      "sha256": "b6d6439f24b64b1faa991454b0006a9f78d4cb13278d4352e6d31d910b78e10e",
+      "bytes": 24327208,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/castellan-c906b1f25e4f7a20"
+    },
+    "provider-djinn": {
+      "sha256": "4c53b7bf6941bbaf0d1abcd650467d0350a4571d12551ad1fe2f9827d4ea0477",
+      "bytes": 290204816,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/djinn-8f3331e7b64973e8"
+    },
+    "app-dramatis_app": {
+      "sha256": "11a7ed1fae1490e4c5fe012fe8f8f3bf73ed1d13ebaa1aeac84f42510a966659",
+      "bytes": 4059056,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/dramatis_app-2525a3b078f1d95a"
+    },
+    "app-dramatis_ui": {
+      "sha256": "def415cf981311854ce455fb1df44e2b34ec2fdb43951bb22297688f42392a8b",
+      "bytes": 1089680,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/dramatis_ui-b67a36603fe3b4ba"
+    },
+    "app-interaction": {
+      "sha256": "9c3774d3af4d1064983cf950f2f70f37cbd6e426de5b117175c1080fadc2b607",
+      "bytes": 42060696,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/interaction-1a8b02df86f9336b"
+    },
+    "app-package_feed": {
+      "sha256": "704bedbd0e8e60044f4e694b2d94b9954b83f2b667bd31ef759606da22febeb5",
+      "bytes": 14776816,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/package_feed-d612eed7e1d39c0e"
+    },
+    "app-state": {
+      "sha256": "295f54da46b25d1dad222bbf4d4eae32b18e6eaff615f7bd7198c7f8b1d5609a",
+      "bytes": 15506784,
+      "producer_path": "/home/markik/Code/repos/mere/target/build/debug/deps/state-6470809c4a294f29"
+    }
+  },
+  "additional_test_repository_inputs": {
+    "ports/djinn/castellan/src/authority_lock_tests.rs": "053150ab6b7108efaa6d805ee445358ba8f4b4e97ed18c95505ea62e7bd7fcc6",
+    "ports/djinn/castellan/src/custody/ssh_sign_tests.rs": "dff5332f187974eaa211e077ad798c975a7f1206c9cdf67a2bf9123f4099f695",
+    "ports/djinn/castellan/src/custody/vault/tests.rs": "0aa2963dc14f542aec66d4f5f75dfa57dd8a5e5964ffca3ad2bc8649a6a31c47",
+    "ports/djinn/castellan/src/custody/vault/lock_tests.rs": "c05d8e1e0be3b571b8dab7b5babe03705eb682a3b7f60e804abf99adc77a1a76",
+    "ports/djinn/castellan/src/custody/vault_commands/tests.rs": "78128b404c3a4ef2334ca7660424229097ce846f474d844a1a09011cceb251ae",
+    "ports/djinn/castellan/src/custody/wallet/revocation_tests.rs": "8a5c9509bc899bdf5709daa83f7568ff93fe1be0ac1e818121d0382a22e56de4",
+    "ports/djinn/castellan/src/custody/wallet/store_test_support.rs": "cf7bfe2bf77c30e88a1ca9560f06fd83cebd78ad91ac48223002fd2572932715",
+    "ports/djinn/castellan/src/custody/wallet/test_support.rs": "82605ed3ce8ce8d5548bc4592e5fb951a40919595f412ea8c1e19806cbede1c5",
+    "ports/djinn/castellan/src/custody/wallet/trust_tests.rs": "97dad3334056d8940ae5bfbb47ce869195693a14865328e57249f2a6b9e3f873",
+    "ports/djinn/castellan/src/custody/wallet/validate_tests.rs": "67a6066248374e2534d920a7002d51592d8cd828a8cb600f30dd44f7d21fba9b",
+    "ports/djinn/castellan/src/custody/passphrase_change_tests.rs": "8e7e15b6a87085eeeb4d05ad68a85b7a4421ef1af1474a44a7e0e03b355c47b6",
+    "ports/djinn/castellan/src/items/tests.rs": "b74bf7eb014e6a216d7f5649152ad5e954e219baa090c7de679d5b0755476055",
+    "ports/djinn/castellan/src/otp/admitted_tests.rs": "46144b85f5182c7ffcd94f20b4bc7b5aeef9b58a4001b1d5c3e1f49efc02db5a",
+    "ports/djinn/castellan/src/otp/item_tests.rs": "49f2e191c6cea4ebc894177299159975945371cfbe0d36030598f4bf9ca17d1d",
+    "ports/djinn/castellan/src/otp/release_concurrency_tests.rs": "917242bba1575542aad744204a9f1dba0188130fbc85aa0d2327a8c4db05208a",
+    "ports/djinn/castellan/src/otp/tests.rs": "cc121a9eddd32e64da80c98c222917489f51421a0c151167d37d3800364be4bb",
+    "ports/djinn/castellan/tests/fixtures/ssh/ed25519": "3107cc477aebb6050525691f1706dffffcf213ebf90bc6ff858e8d4e6b4df86a",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa2048": "9273704ad501dd5f10722a1d22f6a12fec4da9e98ee800a3bb8334da7230a95b",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa4096": "fc1782508ce3d1a72dfeb30e14ffa13e122d1c15c980b3ff1d15b51b1c3bae0b",
+    "ports/djinn/castellan/tests/fixtures/ssh/ecdsa256": "b685cd01a9c337f1ec83df408c71e30b392ccacd98227027f6d2bdff4de37f79",
+    "ports/djinn/castellan/tests/fixtures/ssh/ecdsa384": "a01f9fb2e621d39567e097f72cc2e4e7dbaf4d421dd0670daacc6c16bbb4923a",
+    "ports/djinn/castellan/tests/fixtures/ssh/ecdsa521": "7d724cd0f460c3490ab2b790706bd55e9c5461d523afaf5937a631358582b15e",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa1024": "d308a55b72aaf97dc97f9cc1c67eee8c3eea8c8e11f5386fb145237f3e639257",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa2560": "de6638355c813b309bd82af96af951d3a7a95f8e015a420c4d4db171d71d0861",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa8192": "692ca76f4aa05dc4f19a90b2e583e845e7f5665f931b8ba28a07e49bc00524ce",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa2048e3": "7cfef292a59de6bb3a0a4d20fb410332adb30aec199a867ab847199af024283d",
+    "ports/djinn/castellan/tests/fixtures/ssh/dsa": "0c439b501b1334fca9760e70d87682afda5b71371a962f44f3a0d7a28b6de825",
+    "ports/djinn/castellan/tests/fixtures/ssh/ed25519.slot.json": "fa46c47680b624d268c07fe921c79f9bead00ec1ccdc3598992f2cbc48ed89f3",
+    "ports/djinn/castellan/tests/fixtures/ssh/rsa3072": "3174c0b128d9e5324dfb4056a49d8c1843bf04cb27a169f63c14abdc60ca2c94",
+    "ports/djinn/src/door/app_broker_tests.rs": "feac66ad9e8ca99e1d7c21e1e38b1e0b709efe80fdb92ca457ee6baa78532efa",
+    "ports/djinn/src/door/identity_session_tests.rs": "49f0733678a1137610318b0a91c0899649f0319ce72ea9dde4071fd99fc97ae0",
+    "ports/djinn/src/resident_devices/tests.rs": "2a5e440ed0e73010b3b3b65bb0cefa36e25821f0eb0007f6049fa90f278736a1",
+    "ports/djinn/src/sync/carriage_host_tests.rs": "7f1ce82b516d65385591527eacbe0686fde3b423ee24df1cedb247e455e3b919",
+    "ports/djinn/src/sync/personal_sync_host/roster_tests.rs": "1309babe776500a8e48e50398762692dde25cdb4f1e18fdbef31acc6b46ff092",
+    "ports/djinn/tests/fixtures/natal-cap-finals2000a.txt": "3d9180e4c6b421eef034bbf64ef2d2658d0272782ecc3e23eeb78dcb9a266b28",
+    "ports/dramatis/tests/interaction.rs": "f2da482cfe958a41bb0bda5cddb6203719ebc836d6c61d4522d1f45ab119d9ea",
+    "ports/dramatis/tests/package_feed.rs": "86a6d9701d8d7e30e2c5ebf40c8a376b99135f33dc2a69489118933be6964eba",
+    "ports/dramatis/tests/state.rs": "9ac14fca4ddd96c1f612deb421e8c4015137cd730051ddef044e1452fba7b915"
+  },
+  "full_transfer_manifest_sha256": "766bb01a36c9512c40a9bcc996038ac97ecc26e5fe3a86c2d4c9564419650db8",
+  "inherited_build_inputs": "../dramatis-authentication-fedora-20261021/build-inputs.json",
+  "inherited_build_inputs_sha256": "30b1bed25fd471d8aa6de87a6cefb70f12e4d16f9aa668225357c094e44c5919",
+  "source_input_union_count": 1127,
+  "built_on_this_host": false
+}
