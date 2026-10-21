@@ -300,6 +300,18 @@ has 190 passes/seven existing ignores on its preserved pre-repin basis. Neutral 
 read/act boundaries, target lifetimes, broader Hest action routing and
 process-final diagnostic evidence remain open.
 
+Flattened producer discovery (2026-10-20, qualified): GPU preparation, portable
+capture, leaf size reads and semantic routing share Genet's flattened child
+selection through one Rootstock traversal. Shadow and assigned-slot producers
+now reach rendering/capture; masked fallback and unassigned light nodes cannot
+become competing owners. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#flattened-producer-discovery-2026-10-20)
+records 112 targeted native passes/five existing ignores and browser-host Wasm
+compilation on source-frozen main `24b079538`, including sampled headless GPU
+pixels, fallback rebinding, retirement and native/browser action mapping.
+Full producer coordinate mapping, read-only semantic observations, target
+lifetimes and broader action routing remain separate migrations.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

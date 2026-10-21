@@ -27,13 +27,9 @@ impl OwnedLayout {
         &self,
         dom: &D,
     ) -> Vec<(u64, NodeId)> {
-        let mut leaves = Vec::new();
-        walk(dom, dom.document(), &mut |node| {
-            if let Some(key) = custom_leaf_key(dom, node) {
-                leaves.push((key, node));
-            }
-        });
-        leaves
+        flat_nodes(dom)
+            .filter_map(|node| Some((custom_leaf_key(dom, node)?, node)))
+            .collect()
     }
 
     pub(crate) fn resolved_appearance(
