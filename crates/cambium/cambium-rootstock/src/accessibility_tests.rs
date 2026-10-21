@@ -44,8 +44,8 @@ impl Accessibility for Recording {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
-        _: &mut sprigging::LeafRegistry<u64>,
-        _: &mut ProducerRegistry,
+        _: &sprigging::LeafRegistry<u64>,
+        _: &ProducerRegistry,
         focus: Option<u64>,
         _: f64,
     ) -> Vec<A11yRequest> {
@@ -235,6 +235,39 @@ fn counter_host() -> Host<u32, CounterLogic, CounterChild> {
 }
 
 #[test]
+fn readonly_tests_app_context_observes_the_contributed_catalogue_without_activation() {
+    let mut host = counter_host();
+    host.s.shared.leaves.insert(
+        7,
+        Box::new(sprigging::Knob::new(sprigging::Size {
+            width: 80.0,
+            height: 30.0,
+        })),
+    );
+    let reads = Rc::new(RefCell::new(Vec::new()));
+    let output = reads.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let ctx = &*ctx;
+        let observed = ctx.semantic_projection().unwrap();
+        assert!(
+            observed
+                .tree
+                .nodes
+                .iter()
+                .any(|(_, node)| node.role() == accesskit::Role::Slider)
+        );
+        output.borrow_mut().push(observed.tree);
+        assert_eq!(*ctx.runner.state(), 0);
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    host.with_ctx(crate::Hook::AfterFrame);
+    let reads = reads.borrow();
+    assert_eq!(reads.len(), 2);
+    assert_eq!(reads[0], reads[1]);
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+}
+
+#[test]
 fn current_target_admission_rechecks_each_request_and_reports_refusals() {
     use crate::{A11yAction as Action, A11yDispatch as Dispatch, A11yRejection as Refusal};
     let mut host = counter_host();
@@ -302,7 +335,7 @@ fn current_producer_action_requires_a_present_slot_and_advertised_action() {
         fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
             None
         }
-        fn semantics(&mut self) -> Option<ProducerSemantics> {
+        fn semantics(&self) -> Option<ProducerSemantics> {
             Some(ProducerSemantics {
                 children: vec![ProducerNode {
                     key: 40,
@@ -413,7 +446,7 @@ fn identity_tests_current_admission_refuses_ambiguous_producer_action_without_di
         fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
             None
         }
-        fn semantics(&mut self) -> Option<ProducerSemantics> {
+        fn semantics(&self) -> Option<ProducerSemantics> {
             let action = ProducerAction {
                 id: "pin".into(),
                 label: "Pin".into(),
@@ -530,7 +563,7 @@ fn action_admission_gives_context_sensitive_leaf_the_published_seed() {
         fn paint_dirty(&self) -> bool {
             false
         }
-        fn accessibility(&mut self, node: &mut accesskit::Node) {
+        fn accessibility(&self, node: &mut accesskit::Node) {
             assert_eq!(node.label(), Some("Gain"));
             assert!(node.bounds().is_some());
             node.set_role(accesskit::Role::Slider);
@@ -568,4 +601,98 @@ fn action_admission_gives_context_sensitive_leaf_the_published_seed() {
         [A11yDispatch::Rejected(A11yRejection::TargetAbsent)]
     );
     assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
+}
+
+#[test]
+fn selector_tests_queued_actions_acknowledge_current_admission_per_request() {
+    let mut host = counter_host();
+    let replies = Rc::new(RefCell::new(Vec::new()));
+    let saved = replies.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        let node = p.dom_node(id.0).unwrap();
+        for _ in 0..2 {
+            let receipt = ctx.queue_a11y(crate::A11yRequest::node(crate::A11yAction::Click, node));
+            assert_eq!(receipt.result(), None, "queueing is not routing acceptance");
+            saved.borrow_mut().push(receipt);
+        }
+        assert_eq!(*ctx.runner.state(), 0);
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 1);
+    let replies = replies.borrow();
+    assert_eq!(replies[0].result(), Some(crate::A11yDispatch::Dispatched));
+    assert_eq!(
+        replies[1].result(),
+        Some(crate::A11yDispatch::Rejected(
+            crate::A11yRejection::Disabled
+        ))
+    );
+}
+
+#[test]
+fn selector_tests_post_dispatch_semantic_requests_wait_for_the_next_batch() {
+    let mut host = counter_host();
+    let replies = Rc::new(RefCell::new(Vec::new()));
+    let saved = replies.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        saved
+            .borrow_mut()
+            .push(ctx.queue_a11y(crate::A11yRequest::node(
+                crate::A11yAction::Focus,
+                p.dom_node(id.0).unwrap(),
+            )));
+    });
+    let saved = replies.clone();
+    let once = Rc::new(std::cell::Cell::new(false));
+    host.hooks.after_dispatch = Box::new(move |ctx| {
+        if once.replace(true) {
+            return;
+        }
+        let p = ctx.semantic_projection().unwrap();
+        let id = p
+            .tree
+            .nodes
+            .iter()
+            .find(|(_, n)| n.label() == Some("Once"))
+            .unwrap()
+            .0;
+        saved
+            .borrow_mut()
+            .push(ctx.queue_a11y(crate::A11yRequest::node(
+                crate::A11yAction::Focus,
+                p.dom_node(id.0).unwrap(),
+            )));
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    assert_eq!(replies.borrow().len(), 2);
+    assert_eq!(
+        replies.borrow()[0].result(),
+        Some(crate::A11yDispatch::Dispatched)
+    );
+    assert_eq!(
+        replies.borrow()[1].result(),
+        None,
+        "post-dispatch hooks cannot recursively drain semantic actions"
+    );
+    host.drain_pointer();
+    assert_eq!(
+        replies.borrow()[1].result(),
+        Some(crate::A11yDispatch::Dispatched)
+    );
 }

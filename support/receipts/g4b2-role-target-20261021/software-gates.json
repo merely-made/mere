@@ -1,0 +1,86 @@
+{
+  "core-tests-fixed": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "physics_controls"
+    ],
+    "exit": 0,
+    "seconds": 31.04,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "binding-grouped": {
+    "command": [
+      "/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build/debug/deps/pictograph-b53c81d3f6e8c3bb",
+      "canvas::tests::binding",
+      "canvas::tests::grouped",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 41.95,
+    "passed": 11,
+    "ignored": 1,
+    "built_by": "core-tests-fixed.json",
+    "binary_sha256": "afc799bee962385e746df17d2e9678031c827a9da89417ed71dba0dd308a1a75",
+    "debug": 0,
+    "incremental": 0
+  },
+  "graphshell-web-tests-ready": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 124.95,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "product-wasm-final": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,presentation-webgpu"
+    ],
+    "exit": 0,
+    "seconds": 36.64,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+}

@@ -41,18 +41,24 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
     }
 
     fn selector_target(&self, selector: &Selector) -> SelectorTarget {
-        let nodes = self
-            .ctx
-            .a11y_projection()
-            .map_or_else(Vec::new, |projection| {
-                taproot::matching_prefer_exact_with_projection(
-                    &self.ctx.runner.dom().borrow(),
-                    selector,
-                    &projection,
-                )
-            });
-        for node in nodes {
-            if let Some((x, y, width, height)) = self.ctx.painted_rect(node)
+        let Some(projection) = self.ctx.semantic_projection() else {
+            return SelectorTarget::Miss;
+        };
+        let lookup = taproot::AccessKitLookup::new(&projection.tree, |id| projection.dom_node(id));
+        let nodes = taproot::matching_prefer_exact_with_lookup(
+            &self.ctx.runner.dom().borrow(),
+            selector,
+            &lookup,
+        );
+        for target in nodes {
+            let taproot::SemanticTarget::Dom(owner) = target else {
+                // Virtual action buttons have an explicit command route, not
+                // a physical hit. Scope checks may still use click_target.
+                return SelectorTarget::Miss;
+            };
+            let placement = self.ctx.painted_rect(owner).map(|r| (owner, r));
+            if let Some((owner, (x, y, width, height))) = placement
+                && [x, y, width, height].iter().all(|v| v.is_finite())
                 && width > 0.0
                 && height > 0.0
             {
@@ -61,14 +67,10 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
                     point: self
                         .lane
                         .product
-                        .target_point(self.ctx, node, [x, y, width, height]),
+                        .target_point(self.ctx, owner, [x, y, width, height]),
                 });
             }
         }
-        self.lane
-            .misses
-            .borrow_mut()
-            .push(format!("no current DOM target for {selector:?}"));
         SelectorTarget::Miss
     }
 
@@ -95,7 +97,7 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
             self.lane
                 .misses
                 .borrow_mut()
-                .push(format!("no current DOM target for {selector:?}"));
+                .push(format!("selector click refused for {selector:?}"));
         }
         Some(accepted)
     }
@@ -191,7 +193,7 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                     crate::wheel::WheelAt::Point(x, y) => (*x, *y),
                     crate::wheel::WheelAt::Selector(selector) => {
                         self.resolve(selector)
-                            .ok_or_else(|| format!("no current DOM target for {selector:?}"))?
+                            .ok_or_else(|| format!("no current pointer target for {selector:?}"))?
                             .point
                     },
                 };

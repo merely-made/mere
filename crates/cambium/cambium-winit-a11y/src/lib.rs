@@ -48,8 +48,8 @@ impl Accessibility for A11yHost {
         &mut self,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -115,8 +115,8 @@ impl A11yHost {
         &mut self,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -202,8 +202,8 @@ impl A11yHost {
 }
 
 /// Project a laid-out Cambium document into an AccessKit tree, with no window
-/// and no platform adapter. This invokes the shared mutable contributor
-/// callbacks; it is not a pure read or a presentation-revision snapshot.
+/// and no platform adapter. Providers are read through shared borrows; this
+/// copied observation is not a presentation-revision snapshot or target lease.
 ///
 /// Returns the tree update and the AccessKit-id → DOM-node map a drained
 /// action is resolved through. Split out so the projection is assertable in an
@@ -212,8 +212,8 @@ impl A11yHost {
 pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> (TreeUpdate, HashMap<A11yNodeId, NodeId>) {
     let (tree, nodes, _) = project_tree_with_actions(dom, layout, leaves, producers, focus);
@@ -225,8 +225,8 @@ pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
 pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> (
     TreeUpdate,
@@ -470,7 +470,7 @@ mod dpi_tests {
             fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
                 None
             }
-            fn semantics(&mut self) -> Option<ProducerSemantics> {
+            fn semantics(&self) -> Option<ProducerSemantics> {
                 Some(ProducerSemantics {
                     role: Some(ProducerRole::List),
                     name: Some("Remote board".into()),
@@ -700,7 +700,7 @@ mod dpi_tests {
             fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
                 None
             }
-            fn semantics(&mut self) -> Option<ProducerSemantics> {
+            fn semantics(&self) -> Option<ProducerSemantics> {
                 Some(ProducerSemantics {
                     role: Some(ProducerRole::Group),
                     name: Some("Slotted board".into()),
@@ -785,7 +785,7 @@ mod dpi_tests {
             fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
                 None
             }
-            fn semantics(&mut self) -> Option<ProducerSemantics> {
+            fn semantics(&self) -> Option<ProducerSemantics> {
                 Some(self.0.clone())
             }
         }

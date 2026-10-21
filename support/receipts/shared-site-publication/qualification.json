@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-21T08:38:13.2553923Z",
+  "source_base": "3af00fc90",
+  "owner": "mere-site optional publication binding",
+  "source_sha256": {
+    "crates/domain/site/Cargo.toml": "f594512758b1c75d603828f4c077aff2b7a0c3c875625febe6ef199003d71a3e",
+    "crates/domain/site/src/lib.rs": "baf671090c1f42f3bba2d36d169776c4887fbe1eb79cf95a134edd7d89c1e9a6",
+    "crates/domain/site/src/publication.rs": "72a6459877413ee050f9a1253aa1c7b75fd9887e55b1a54277fcb276899ec2c9",
+    "crates/domain/site/src/snapshot-schema.json": "ad6d38f9b40ba15297364924a9a8bc9f00302bf6e6c403ab6dfc8c6338c0db4d",
+    "crates/domain/site/tests/publication.rs": "2fb3056a9c4fd2d16524e3e500324566b32c63d589a3bef9418c9680a81b0cea"
+  },
+  "lock_sha256": "c53d596b646328bd15101a0483b04d29045bfa51c724c10adc33389996eb73dd",
+  "supplier_revisions": {
+    "eidetic": "34105d63ec17826e0a58a5b461b65150357dd000",
+    "gemot": "4342aed4bd101e68b1e71d24e010190d81765201"
+  },
+  "commands": [
+    {
+      "compatibility": 3,
+      "exit_code": 0,
+      "command": "cargo test -p mere-site --no-default-features --offline --quiet"
+    },
+    {
+      "history": 6,
+      "exit_code": 0,
+      "compatibility": 3,
+      "doctest": 1,
+      "command": "cargo test -p mere-site --features publication,history,serde_json/preserve_order --offline --quiet",
+      "publication": 5
+    },
+    {
+      "command": "cargo clippy -p mere-site --all-targets --features publication,history --offline --no-deps -- -D warnings",
+      "exit_code": 0
+    }
+  ],
+  "qualified": [
+    "Gemini, Scroll, Micron exact native snapshots and metadata",
+    "redb content reopen with author handles dropped and separate in-process signed replica",
+    "current capability and collection-head refusal, contribution withdrawal and collection fork",
+    "private, corrupt, missing, foreign and unsupported content refusal",
+    "fixed schema identity with JSON map-order feature enabled"
+  ],
+  "limits": [
+    "No new OS-process or two-machine receipt",
+    "No listener, protocol-response adapter, peer acquisition or serving actor",
+    "No signed cross-Moot publication-revision envelope",
+    "Opened values are point-in-time reads, not atomic enduring grants"
+  ],
+  "receipt_cap_bytes": 100000000,
+  "target": "C:/t/cargo-targets/mere",
+  "isolated_cargo_home": "C:/t/cargo-homes/mere-site-publication"
+}

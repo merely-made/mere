@@ -313,6 +313,12 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             keeper.host().lock_vault().map_err(refused)?;
             Ok(CustodyAnswer::Done)
         },
+        CustodyCall::ChangePassphraseNative(_) => {
+            if app.as_str() != "dramatis" { return Err(CustodyRefusal::NotServed); }
+            let receipt = tokio::task::spawn_blocking(move || keeper.change_passphrase_native())
+                .await.map_err(failed)?;
+            Ok(CustodyAnswer::PassphraseChange { receipt })
+        },
         CustodyCall::UnlockNative => tokio::task::spawn_blocking(move || keeper.unlock_native())
             .await
             .map_err(failed)?,
@@ -570,6 +576,7 @@ fn call_name(call: &CustodyCall) -> &'static str {
         CustodyCall::Payload(_) => "retained_payload",
         CustodyCall::VaultCommand { .. } => "vault_command",
         CustodyCall::UnlockNative => "unlock_native",
+        CustodyCall::ChangePassphraseNative(_) => "change_passphrase_native",
         CustodyCall::UnassignedImports => "unassigned_imports",
         CustodyCall::AssignImport(_) => "assign_import",
         CustodyCall::LockVault => "lock_vault",

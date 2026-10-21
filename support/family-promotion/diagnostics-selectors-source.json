@@ -1,0 +1,27 @@
+{
+  "basis": "5573500dc1678c542ee5f60827d523961a7b4fcb",
+  "source_sha256": {
+    "Cargo.lock": "da8b4ac2e3ed8d05067612fb988ec2b6fad08eb9627831302cba36a685e2da03",
+    "Cargo.toml": "ff97806c858252765af770f33dc0ea29a1df1ae44068a8bd169479a5ef471fd7",
+    "crates/cambium/cambium-genet-web-host/src/mirror.rs": "f19887e43bac3809c159a74d1089d6e6d51a7d1a265fdb18050da01396192acf",
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "3d30bbfae22a64a521b2219ab7fbef4497af105ec5c8c7aea6e50de487ef202a",
+    "crates/cambium/cambium-genet-winit-host/tests/accessibility.rs": "17b0162e5edd2c496899d0f207fd7c77e763ce4e9b2556b155b77e7aa925bb23",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "696b42fc30584921bf961612f9bf0bf8a3ab6013a6762acefac414bf3a47de01",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "f709a1365e8a36a01adfe705c84f4a2647cdee70af039745ec257181a52554cd",
+    "crates/cambium/cambium-rootstock/src/host.rs": "0143d7525cda2b1db7c7c5556f6576c834069fab29baa3b30fb393bfd1cf4de1",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "f7452e8ea99e804bca6fc123966ac33fcbefadbd7740700b458858b07a7a0588",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "16bc537b1543185e9bfa89f40a8a1cb4a05e6c503ae6b331223d6bb015d21bcb",
+    "crates/cambium/mesquite/Cargo.toml": "d49a6b7868bd3750dda2d9716307bacf593a05b1dc9559245a552db8df151f57",
+    "crates/cambium/mesquite/src/clicks.rs": "573d9f7fe91caf6c99d0b1718b28efe56503918333d0b2c7e41e60aa05e5f8f9",
+    "crates/cambium/mesquite/src/probe.rs": "ffa2710fe14da056c6db363308691fa74cf0569ff2bcea67a065e81d5b634316",
+    "crates/cambium/mesquite/src/probe_tests.rs": "ba4a7f8ef3865d498436e2d0cf8242d558ee140a277d12a11e0a14cb197e56d3",
+    "ports/distillery/probe/Cargo.lock": "55fb505ae9cf2249ca0f5bdcfa3f5b239ad257d0ce59c50a74f029dc73902b89",
+    "ports/graphshell/web/Cargo.lock": "4e556941609cab6e78ccb897fb8407c2d73b2ae2ee50c3b2409e23beda7381c5",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b",
+    "support/family-promotion/gate.py": "044799a77a4ca1a5f9f460d1369e1084aa519e3b435df757017b3f6a03046520"
+  },
+  "supplier_source": "diagnostics-selectors-supplier-source.json",
+  "supplier_commit": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "sealed_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256",
+  "retained_byte_cap": 10000000
+}

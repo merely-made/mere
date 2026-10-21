@@ -333,6 +333,17 @@ compilation. The
 keeps immutable observations, target generations and report/collector adoption
 open; the stable ID hash is not a generation token or collision-free allocator.
 
+Read-only observation and selector continuation (2026-10-21): provider callbacks
+and composition use shared borrows; the content owner allocates retained keys.
+Taproot's borrowed lookup now receives leaf/producer contributions in the Harness
+and Mesquite, with explicit generated target identity and host-written routing
+acknowledgements. The browser and selector role-spelling duplication is retired
+through an optional contract bridge without adding a renderer dependency to
+Taproot. Exact qualification and remaining acceptance are recorded in the
+[shared selector receiving](2026-06-08_system_diagnostics_and_accessibility_plan.md#shared-selector-receiving-2026-10-21)
+section. Registry publication and other product adoption remain separate. Target
+lifetimes are next, followed by broader actions and supplier forward geometry.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

@@ -1,0 +1,29 @@
+{
+  "basis": "6ef3cd37a78",
+  "supplier_commit": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "files": {
+    "components/genet-render/Cargo.toml": "1a2997bbaa3d75fe32a4ea772eabf409167069867f87d5ad41bd46e7a381fc4d",
+    "components/genet-render/src/a11y.rs": "9cd9e48c086993eac89bc06ba7d8a0fb7f88a82b54922472ab0ebc4893593f1f",
+    "components/shared/document-session-api/Cargo.toml": "d2a03ed3ffffb561f49cfe04e64c466de1ec89e83b239a79ac23cbae8973678d",
+    "components/shared/document-session-api/src/a11y.rs": "30370c73360585b70719ea62e54f7242e4f2360ef7286d879920a81bd2879ea1",
+    "components/shared/document-session-api/src/a11y/accesskit_roles.rs": "950073a047773049bbfac022c8256020cf9ccff60111e0f734744208806c7f29",
+    "components/taproot/Cargo.toml": "12c36fddca8d0f6f12ce2f97634c9d70faa566e0156732bfcf4fe2c1ea10bb77",
+    "components/taproot/lib.rs": "284ceeb4bb9f5b9e58f2c6dbe30033c614d218ae84976c5ea81d0f6a766c7032",
+    "components/taproot/lookup.rs": "ac51903f807ba8bda1ea7797282ec32e07676a591ecc808840c49a0433dcad0a",
+    "components/taproot/projection.rs": "bab9d7ccc1e8200e4cad418df0338807b563422d38e959eee7314e78a6a8d075",
+    "design_docs/2026-09-26_accessible_names_plan.md": "8a312288dfc6aba14b4d012c1e0339ba539e080fc32e08b8f62fd1194650b996",
+    "design_docs/DOC_README.md": "e5f99bc56e687ef63c8f528f4d697c319ed81314caea7b871ba60187e262a6d5"
+  },
+  "lock": {
+    "path": "diagnostics-selectors-supplier.Cargo.lock",
+    "sha256": "c17e339ae1db201f32deee6604a956e8f406c0eba823505436e8d691b03992f3",
+    "bytes": 220006
+  },
+  "supplier_controls": [
+    "diagnostics-selectors-supplier-bridge.json",
+    "diagnostics-selectors-supplier-bridge-lean.json"
+  ],
+  "prior_supplier": "0d70f902d6e7574e9aff1dc3b3ff36f41c318a85",
+  "ownership": "Optional document-session-api role spelling bridge; Taproot has no renderer in its normal dependencies",
+  "retained_byte_cap": 10000000
+}

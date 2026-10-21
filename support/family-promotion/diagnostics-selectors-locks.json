@@ -1,0 +1,70 @@
+{
+  "basis": "3af00fc9031e6ceda74248a72e58d81d23c49ec2",
+  "supplier": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "locks": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "8e178d99518fca8424b971da1f4b5ce4ef78a9fccf3b9d19d00a40493cc37162",
+      "added_dependencies": [
+        {
+          "package": "document-session-api",
+          "added": [
+            "accesskit 0.25.1"
+          ]
+        },
+        {
+          "package": "mesquite",
+          "added": [
+            "sprigging"
+          ]
+        },
+        {
+          "package": "taproot",
+          "added": [
+            "accesskit 0.25.1"
+          ]
+        }
+      ],
+      "retained_unrelated_sources": true
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "4e556941609cab6e78ccb897fb8407c2d73b2ae2ee50c3b2409e23beda7381c5",
+      "added_dependencies": [
+        {
+          "package": "document-session-api",
+          "added": [
+            "accesskit"
+          ]
+        },
+        {
+          "package": "taproot",
+          "added": [
+            "accesskit"
+          ]
+        }
+      ],
+      "retained_unrelated_sources": true
+    },
+    {
+      "path": "ports/distillery/probe/Cargo.lock",
+      "sha256": "55fb505ae9cf2249ca0f5bdcfa3f5b239ad257d0ce59c50a74f029dc73902b89",
+      "added_dependencies": [
+        {
+          "package": "document-session-api",
+          "added": [
+            "accesskit"
+          ]
+        },
+        {
+          "package": "taproot",
+          "added": [
+            "accesskit"
+          ]
+        }
+      ],
+      "retained_unrelated_sources": true
+    }
+  ],
+  "policy": "Genet family cutover and required optional bridge/dev dependency edges only; incidental supplier and registry updates are declined"
+}

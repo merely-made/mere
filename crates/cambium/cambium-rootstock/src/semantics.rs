@@ -36,6 +36,14 @@ pub struct SemanticProjection {
     pub producer_issues: Vec<ProducerSemanticIssue>,
 }
 impl SemanticProjection {
+    /// Actual DOM membership, supplied by composition rather than inferred
+    /// from the numeric shape of a generated semantic ID.
+    pub fn dom_node(&self, id: u64) -> Option<NodeId> {
+        self.dom_targets.get(&A11yNodeId(id)).copied()
+    }
+    pub fn produced_action(&self, id: u64) -> Option<&ProducedAction> {
+        self.produced_targets.get(&A11yNodeId(id))
+    }
     /// Lower a DOM observation before optional contributions. The usual host
     /// entry point is `project_semantics`, which binds the current providers.
     pub fn from_document(projection: DocumentA11yProjection) -> Self {
@@ -68,8 +76,8 @@ impl SemanticProjection {
 pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> SemanticProjection {
     let mut result =
@@ -114,7 +122,7 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
                     },
                     Err(issue) => result.producer_issues.push(issue),
                 }
-            } else if let Some(leaf) = leaves.get_mut(&key) {
+            } else if let Some(leaf) = leaves.get(&key) {
                 let access = &mut result.tree.nodes[index].1;
                 let label = access.label().map(str::to_owned);
                 let bounds = access.bounds();

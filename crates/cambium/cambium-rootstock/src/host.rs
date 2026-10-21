@@ -796,6 +796,7 @@ where
     /// Pointer events for the host to deliver to itself once this hook
     /// returns, in order. See [`HostPointer`].
     pub pointer: &'a mut Vec<HostPointer>,
+    pub(crate) a11y: &'a mut Vec<crate::QueuedA11y>,
     /// Scroll requests for the next layout; queued through
     /// [`scroll_into_view`](Self::scroll_into_view).
     pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
@@ -900,6 +901,35 @@ where
         let view = crate::WindowDom::new(&dom, self.runner.mount());
         let focus = self.runner.focus().map(|node| view.opaque_id(node));
         Some(crate::document_projection(&view, layout, focus))
+    }
+
+    /// Queue a semantic action through the same current-target admission as
+    /// platform accessibility. The host drains it after queued pointer input;
+    /// observe the returned routing acknowledgement before claiming delivery.
+    pub fn queue_a11y(&mut self, request: crate::A11yRequest) -> crate::A11yReceipt {
+        let (queued, receipt) = crate::QueuedA11y::new(request);
+        self.a11y.push(queued);
+        receipt
+    }
+
+    /// Current contributed semantics, using the same composition as native and
+    /// browser publication. This shared-borrow read performs no layout, paint,
+    /// target allocation or action dispatch. It is not a presentation lease or
+    /// an atomic read/act transaction.
+    pub fn semantic_projection(&self) -> Option<crate::SemanticProjection> {
+        use layout_dom_api::LayoutDom as _;
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        let focus = self.runner.focus().map(|node| view.opaque_id(node));
+        Some(crate::project_semantics(
+            &view,
+            layout,
+            self.leaves,
+            self.producers,
+            focus,
+        ))
     }
 
     /// Ask the host to scroll `node` into view.
@@ -1278,6 +1308,8 @@ where
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
     pub pending_pointer: Vec<HostPointer>,
+    pub(crate) pending_a11y: Vec<crate::QueuedA11y>,
+    draining_a11y: bool,
     /// Scroll requests an application hook queued, resolved in order by the
     /// next [`relayout`](Host::relayout) once its layout is current.
     pub pending_scroll: Vec<ScrollIntoView>,
@@ -1361,6 +1393,8 @@ where
             last_redraw_presentation: None,
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
+            pending_a11y: Vec::new(),
+            draining_a11y: false,
             pending_scroll: Vec::new(),
             caret_followed: None,
             last_frame_profile: None,
@@ -1685,6 +1719,7 @@ where
                 capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
+                a11y: &mut self.s.pending_a11y,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1732,6 +1767,7 @@ where
             capture_stamped: &mut self.s.pending_stamped_capture,
             capture_paint: &mut self.s.pending_paint_capture,
             pointer: &mut self.s.pending_pointer,
+            a11y: &mut self.s.pending_a11y,
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
             render_core: self.s.shared.render_core.as_ref(),
@@ -1825,6 +1861,7 @@ where
                 capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
+                a11y: &mut self.s.pending_a11y,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1853,10 +1890,9 @@ where
     /// the events — each delivery runs its own, and the queue is taken whole so
     /// an event queued by that dispatch lands on the next drain rather than
     /// looping.
+    // Pointer gestures retain their existing order. Semantic requests follow
+    // through the same admission/dispatch path used by platform accessibility.
     pub fn drain_pointer(&mut self) {
-        if self.s.pending_pointer.is_empty() {
-            return;
-        }
         for event in std::mem::take(&mut self.s.pending_pointer) {
             match event {
                 HostPointer::Moved(x, y) => {
@@ -1897,6 +1933,16 @@ where
                     self.s.modifiers = held;
                 },
             }
+        }
+        // Post-dispatch hooks may enqueue another request. Reentrant hook
+        // drains must not consume it recursively within this batch.
+        if !self.s.draining_a11y {
+            self.s.draining_a11y = true;
+            for queued in std::mem::take(&mut self.s.pending_a11y) {
+                let result = self.apply_a11y_requests(&[queued.request])[0];
+                queued.reply.set(Some(result));
+            }
+            self.s.draining_a11y = false;
         }
     }
 

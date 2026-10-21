@@ -129,7 +129,7 @@ impl Leaf for Named {
 
     fn paint(&mut self, _cx: &mut PaintCx<'_>) {}
 
-    fn accessibility(&mut self, node: &mut Node) {
+    fn accessibility(&self, node: &mut Node) {
         node.set_label(self.0);
     }
 

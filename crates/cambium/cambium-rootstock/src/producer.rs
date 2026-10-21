@@ -159,10 +159,12 @@ pub trait TextureProducer {
     /// What the slot means to an assistive technology: a role and name for
     /// the slot itself, and the things drawn in it as child nodes with their
     /// rectangles. Read for host semantic publication and current-target action
-    /// admission; separate reads may occur between frames. `None`, the default,
+    /// admission; separate reads may occur between frames. Describe current
+    /// state without rendering, allocating identities, rebuilding action routes
+    /// or advancing application state. `None`, the default,
     /// leaves the slot's DOM/Sprigging semantics alone. Reading and activation
     /// are separate calls, without a snapshot or transaction guarantee.
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    fn semantics(&self) -> Option<ProducerSemantics> {
         None
     }
 
@@ -282,8 +284,8 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     fn retire(&mut self) {
         self.borrow_mut().retire();
     }
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
-        self.borrow_mut().semantics()
+    fn semantics(&self) -> Option<ProducerSemantics> {
+        self.borrow().semantics()
     }
     fn act(&mut self, key: u64, id: &str) -> bool {
         self.borrow_mut().act(key, id)

@@ -220,3 +220,18 @@ mod tests {
         );
     }
 }
+
+/// Bounded local authentication failure, without storage paths or credentials.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PassphraseChangeError {
+    /// The live vault must be unlocked.
+    Locked,
+    /// No existing passphrase can be changed on this backend.
+    Unsupported,
+    /// The current credential was not authenticated against this live vault.
+    IncorrectCurrent,
+    /// The replacement credential is empty.
+    InvalidNew,
+    /// Reading or replacing encrypted authentication state failed.
+    Storage,
+}

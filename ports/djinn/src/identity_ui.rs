@@ -235,6 +235,54 @@ where
     }
 }
 
+/// Local owner action. No caller supplies a credential, path, or prompt text.
+pub(crate) fn change_passphrase<S: IdentityStorage + 'static, U: NativeIdentityUi + ?Sized>(
+    host: &Arc<PersonaeHost<S>>,
+    ui: &U,
+) -> dramatis::authentication::PassphraseChangeReceiptV1 {
+    use castellan::custody::PassphraseChangeError as E;
+    use dramatis::authentication::{
+        PassphraseChangeFailureV1 as F, PassphraseChangeReceiptV1 as R,
+    };
+    let rejected = |reason| R::Rejected { reason };
+    if host.is_locked() {
+        return rejected(F::Locked);
+    }
+    let prompt = |message| match ui.ask_vault_passphrase(message) {
+        Ok(Some(secret)) => Ok(secret),
+        Ok(None) => Err(R::Cancelled),
+        Err(_) => Err(rejected(F::UiUnavailable)),
+    };
+    let old = match prompt("Change vault passphrase: enter the current passphrase.") {
+        Ok(v) => v,
+        Err(r) => return r,
+    };
+    let new = match prompt("Enter the new vault passphrase.") {
+        Ok(v) => v,
+        Err(r) => return r,
+    };
+    if new.is_empty() {
+        return rejected(F::InvalidNewPassphrase);
+    }
+    let confirmation = match prompt("Enter the new vault passphrase again.") {
+        Ok(v) => v,
+        Err(r) => return r,
+    };
+    if *new != *confirmation {
+        return rejected(F::ConfirmationMismatch);
+    }
+    match host.change_passphrase(old.as_bytes(), new.as_bytes()) {
+        Ok(()) => R::Changed,
+        Err(e) => rejected(match e {
+            E::Locked => F::Locked,
+            E::Unsupported => F::Unsupported,
+            E::IncorrectCurrent => F::CurrentPassphraseRejected,
+            E::InvalidNew => F::InvalidNewPassphrase,
+            E::Storage => F::StorageFailure,
+        }),
+    }
+}
+
 /// OS presence first, then the passphrase box; the credential stays here.
 fn unlock_vault<S, U>(host: &Arc<PersonaeHost<S>>, ui: &U) -> NativeIdentityResult
 where
