@@ -448,3 +448,17 @@ frozen 0.1 compatibility line.
   and [source preservation](../../../support/receipts/hest-h3-20261020/source-preservation.json)
   retain the exact software basis. Git delivery is authorized. Crate
   publication, H4 audit/scripting and native GUI/human AT are separate gates.
+
+
+### H3 Git delivery
+
+The qualified changes were pushed in dependency order: compatible Knot
+prerequisite, Mere supplier, final Knot receiver, then Turnstone receiver.
+Fresh remote checkouts match the tested source hashes and resolve their
+committed locks with one Hest 0.2, one Cambium 0.5, no command-menu and no
+foreign path packages. The Cargo Git cache began empty and received no local
+Git seeding; only registry downloads were reused. This is remote source
+availability and identity evidence, not a repeated native/runtime test.
+[Git delivery and fresh resolution](../../../support/receipts/hest-h3-20261020/delivery.json)
+records the exact pushed heads, commands, real exit statuses and source proof.
+No crate publication occurred. H4 and native GUI/human AT remain separate.
