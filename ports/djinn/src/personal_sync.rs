@@ -1119,7 +1119,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
     armillary::tasks::spawn_tracked(async move {
         loop {
             tokio::time::sleep(RECEIPT_POLL).await;
-            let waiting = match graphshell::receipts::pending(&inbox) {
+            let waiting = match graphshell::receipts::claim_pending(&inbox) {
                 Ok(waiting) if waiting.is_empty() => continue,
                 Ok(waiting) => waiting,
                 Err(error) => {
@@ -1127,54 +1127,18 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
                     continue;
                 },
             };
-            for receipt in waiting {
-                let events = receipt.events.len();
-                // Stage the capture bytes into the store that replicates
-                // BEFORE authoring. The events include availability facts
-                // saying this device holds these blobs, and a peer acts on
-                // those by fetching; authoring first would advertise captures
-                // no peer could ever receive. A capture that cannot be staged
-                // is fatal for this receipt rather than skipped, for the same
-                // reason: a half-staged receipt makes a claim it cannot meet.
-                match stage_captures(&host, &receipt).await {
-                    Ok(0) => {},
-                    Ok(staged) => tracing::info!(
-                        staged,
-                        path = %receipt.path.display(),
-                        "staged receipt captures into the replicating store"
+            for claim in waiting {
+                let path = claim.receipt().path.clone();
+                match author_receipt_claim(&host, claim).await {
+                    Ok(events) => tracing::info!(
+                        events,
+                        path = %path.display(),
+                        "authored a receipt into the personal graph"
                     ),
-                    Err(error) => {
-                        tracing::warn!(
-                            %error,
-                            path = %receipt.path.display(),
-                            "could not stage a receipt's captures; leaving it pending"
-                        );
-                        continue;
-                    },
-                }
-                match host.author(receipt.events).await {
-                    Ok(()) => {
-                        // Only now: a file cleared before the turn succeeded
-                        // would lose the receipt entirely, whereas one cleared
-                        // after a failure simply gets retried next poll.
-                        if let Err(error) = graphshell::receipts::mark_applied(&receipt.path) {
-                            tracing::warn!(
-                                %error,
-                                path = %receipt.path.display(),
-                                "authored a receipt but could not clear its file; \
-                                 it will be authored again next poll"
-                            );
-                        }
-                        tracing::info!(
-                            events,
-                            path = %receipt.path.display(),
-                            "authored a receipt into the personal graph"
-                        );
-                    },
                     Err(error) => tracing::warn!(
                         %error,
-                        path = %receipt.path.display(),
-                        "could not author a receipt; leaving it pending"
+                        path = %path.display(),
+                        "receipt intake incomplete; retaining claim for retry"
                     ),
                 }
             }
@@ -1182,9 +1146,158 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
     });
 }
 
+/// Stage, author, then acknowledge the same immutable hand-off. Leaving the
+/// claim on any failure also covers interruption at either await. A restart
+/// after authoring may replay the turn; it must never clear a newer deposit.
+async fn author_receipt_claim(
+    host: &PersonalSyncHost,
+    claim: graphshell::receipts::ClaimedReceipt,
+) -> Result<usize, String> {
+    let receipt = claim.receipt();
+    let events = receipt.events.len();
+    // Author only after all capture hashes have been checked and staged: the
+    // signed turn must not advertise bytes this device cannot serve.
+    stage_captures(host, receipt)
+        .await
+        .map_err(|error| format!("could not stage receipt captures: {error}"))?;
+    host.author(receipt.events.clone())
+        .await
+        .map_err(|error| format!("could not author receipt: {error}"))?;
+    claim.mark_applied().map_err(|error| {
+        format!(
+            "authored receipt but could not archive its claim; retry may repeat the turn: {error}"
+        )
+    })?;
+    Ok(events)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    async fn receipt_host() -> (tempfile::TempDir, PersonalSyncHost) {
+        let directory = tempfile::tempdir().unwrap();
+        let identity = personae::InMemoryProvider::from_seed([0x83; 32]);
+        let host = PersonalSyncHost::open(
+            &identity,
+            PersonalSyncHostConfig {
+                graph: [0x84; 32],
+                store_path: directory.path().join("receipts.redb"),
+                roster: SyncRoster::new([identity.master_public_key().to_bytes()]),
+                selection: SyncSelection::default(),
+                peer_tickets: Vec::new(),
+                peer_hints: Vec::new(),
+                paired_nodes: Vec::new(),
+                relay_urls: Vec::new(),
+            },
+        )
+        .await
+        .unwrap();
+        (directory, host)
+    }
+
+    fn receipt_events(id: uuid::Uuid, title: &str) -> Vec<PersonalGraphEvent> {
+        vec![
+            PersonalGraphEvent::AddNode {
+                id,
+                address: format!("https://receipt.test/{id}"),
+                title: title.into(),
+            },
+            PersonalGraphEvent::SetTitle {
+                node: id,
+                title: title.into(),
+            },
+        ]
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn receipt_authoring_acknowledges_only_the_claimed_version() {
+        let (directory, host) = receipt_host().await;
+        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let node = uuid::Uuid::from_u128(0x85);
+        graphshell::receipts::write_to_inbox(
+            &inbox,
+            node,
+            directory.path(),
+            &receipt_events(node, "original"),
+        )
+        .unwrap();
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        graphshell::receipts::write_to_inbox(
+            &inbox,
+            node,
+            directory.path(),
+            &receipt_events(node, "corrected"),
+        )
+        .unwrap();
+
+        assert_eq!(author_receipt_claim(&host, claim).await.unwrap(), 2);
+        let cards = host.supplemental_cards().await.unwrap();
+        assert!(cards.iter().any(|card| card.card.title == "original"));
+        assert!(!cards.iter().any(|card| card.card.title == "corrected"));
+        assert_eq!(graphshell::receipts::pending(&inbox).unwrap().len(), 1);
+
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        author_receipt_claim(&host, claim).await.unwrap();
+        assert!(
+            host.supplemental_cards()
+                .await
+                .unwrap()
+                .iter()
+                .any(|card| card.card.title == "corrected")
+        );
+        assert!(
+            graphshell::receipts::claim_pending(&inbox)
+                .unwrap()
+                .is_empty()
+        );
+        host.close().await.unwrap();
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn a_receipt_capture_failure_retains_the_claim_without_authoring() {
+        let (directory, host) = receipt_host().await;
+        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let node = uuid::Uuid::from_u128(0x86);
+        let mut events = receipt_events(node, "must not be authored");
+        events.push(PersonalGraphEvent::SetFacet {
+            node,
+            facet: graphshell::receipts::FACET_ARTIFACTS.into(),
+            value: serde_json::json!([{"name":"absent.png", "blake3":"42".repeat(32)}]),
+        });
+        graphshell::receipts::write_to_inbox(&inbox, node, directory.path(), &events).unwrap();
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        let path = claim.receipt().path.clone();
+        assert!(
+            author_receipt_claim(&host, claim)
+                .await
+                .unwrap_err()
+                .contains("could not stage")
+        );
+        assert!(path.exists());
+        assert!(
+            !host
+                .supplemental_cards()
+                .await
+                .unwrap()
+                .iter()
+                .any(|card| card.card.title == "must not be authored")
+        );
+        assert_eq!(
+            graphshell::receipts::claim_pending(&inbox).unwrap().len(),
+            1
+        );
+        host.close().await.unwrap();
+    }
 
     #[test]
     fn the_data_root_override_is_taken_as_given_and_skips_the_migration() {
