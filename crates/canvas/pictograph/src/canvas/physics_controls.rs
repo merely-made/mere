@@ -21,9 +21,13 @@ use kernel::graph::NodeKey;
 
 use scenotime::ProjectionClock;
 
-use super::dynamics_spec::Node;
+use super::channels::Channel;
+use super::dynamics_spec::{GroupRoles, Node, Target};
 use super::physics_catalog::PhysicsLaw;
-use super::{CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsOverlay};
+use super::{
+    CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsKindSource,
+    PhysicsOverlay, Role,
+};
 
 /// The arrangement picker's "no arrangement" choice: physics alone.
 pub const FREE_ARRANGEMENT: &str = "free";
@@ -156,6 +160,58 @@ pub fn apply_single_law(canvas: &mut Canvas, choice: &PhysicsChoice) -> Result<S
         Some(refusal) => format!("{status} · {}", refusal.reason),
         None => status,
     })
+}
+
+/// Set the target's default arrangement role through the canonical dynamics
+/// record. The Canvas resolves a missing target from its current live state.
+pub fn apply_role(canvas: &mut Canvas, role: Role) -> Result<String, String> {
+    edit_role_target(canvas, |target| target.default_role = role)?;
+    Ok(format!("Role set to {}", role.id()))
+}
+
+/// Read target group role overrides from the selected groups channel.
+pub fn apply_role_group_source(
+    canvas: &mut Canvas,
+    source: PhysicsKindSource,
+) -> Result<String, String> {
+    edit_role_target(canvas, |target| {
+        if target
+            .groups
+            .as_ref()
+            .is_some_and(|groups| groups.channel == Channel::Groups(source).id())
+        {
+            return;
+        }
+        let roles = target
+            .groups
+            .take()
+            .map(|groups| groups.roles)
+            .unwrap_or_default();
+        target.groups =
+            (source != PhysicsKindSource::Site || !roles.is_empty()).then(|| GroupRoles {
+                channel: Channel::Groups(source).id(),
+                roles,
+            });
+    })?;
+    Ok(format!("Group roles read from {}", source.id()))
+}
+
+fn edit_role_target(canvas: &mut Canvas, edit: impl FnOnce(&mut Target)) -> Result<(), String> {
+    let mut spec = canvas.dynamics_spec()?;
+    let mut target = spec
+        .target
+        .take()
+        .unwrap_or_else(|| canvas.running_target());
+    let resolved_before = target.clone();
+    edit(&mut target);
+    if target == resolved_before {
+        return Ok(());
+    }
+    spec.target = Some(target);
+    canvas
+        .set_dynamics_spec(&spec)
+        .map(|_| ())
+        .map_err(|error| error.to_string())
 }
 
 fn weighted_preset(law: PhysicsLaw, share: f64) -> Node {
@@ -707,6 +763,193 @@ mod tests {
             );
             assert_eq!(canvas.dynamics_spec().unwrap(), before);
         }
+    }
+
+    #[test]
+    fn role_edits_preserve_authored_root_and_every_other_spec_field() {
+        use crate::canvas::dynamics_spec::{Bar, GroupRoles, Observable, Realization, Target};
+        use crate::canvas::{Channel, Role};
+        use std::collections::BTreeMap;
+
+        let mut subject = canvas();
+        let ids: Vec<_> = subject
+            .graph()
+            .nodes()
+            .map(|(_, node)| node.id.to_string())
+            .collect();
+        let keys: Vec<_> = subject.graph().nodes().map(|(key, _)| key).collect();
+        let absent_id = uuid::Uuid::from_u128(u128::MAX).to_string();
+        assert!(
+            !ids.contains(&absent_id),
+            "absent override is not a fixture member"
+        );
+        let mut original = subject.dynamics_spec().unwrap();
+        original.root = Node::Mix {
+            parts: vec![
+                weighted_preset(PhysicsLaw::Springs, 0.1),
+                weighted_preset(PhysicsLaw::Charge, 0.3),
+            ],
+            weight: 1.0,
+            overlays: vec![],
+        };
+        original.seed = 918;
+        original.bars = vec![Bar {
+            observable: Observable::Overlaps,
+            at_least: Some(0.25),
+            at_most: Some(4.5),
+        }];
+        original.realization = Realization::Integrate {
+            damping: Some(0.375),
+        };
+        original.target = Some(Target {
+            arrangement: "authored-layout".into(),
+            anchored_pull: 0.271,
+            default_role: Role::Seeded,
+            groups: Some(GroupRoles {
+                channel: Channel::Groups(PhysicsKindSource::Cluster).id(),
+                roles: BTreeMap::from([("kept-label".into(), Role::Pinned)]),
+            }),
+            items: BTreeMap::from([(ids[0].clone(), Role::Seeded), (absent_id, Role::Pinned)]),
+        });
+        original
+            .channels
+            .insert("kind".into(), "kind.degree".into());
+        subject.set_dynamics_spec(&original).unwrap();
+
+        assert_eq!(
+            apply_role(&mut subject, Role::Anchored).unwrap(),
+            "Role set to anchored"
+        );
+        let edited = subject.dynamics_spec().unwrap();
+        assert_eq!(edited.root, original.root, "f64 mix shares remain authored");
+        assert_eq!(edited.seed, original.seed);
+        assert_eq!(edited.bars, original.bars);
+        assert_eq!(edited.realization, original.realization);
+        assert_eq!(edited.channels, original.channels);
+        let target = edited.target.unwrap();
+        let old_target = original.target.unwrap();
+        assert_eq!(target.arrangement, old_target.arrangement);
+        assert_eq!(target.anchored_pull, old_target.anchored_pull);
+        assert_eq!(target.default_role, Role::Anchored);
+        assert_eq!(target.groups, old_target.groups);
+        assert_eq!(target.items, old_target.items);
+        assert_eq!(
+            subject.arrangement_role_of(keys[0]),
+            Role::Seeded,
+            "item override wins"
+        );
+        assert_eq!(
+            subject.arrangement_role_of(keys[1]),
+            Role::Anchored,
+            "unmatched group label falls through to the default"
+        );
+
+        apply_role_group_source(&mut subject, PhysicsKindSource::Component).unwrap();
+        let source_edited = subject.dynamics_spec().unwrap();
+        assert_eq!(source_edited.root, original.root);
+        assert_eq!(source_edited.seed, original.seed);
+        assert_eq!(source_edited.bars, original.bars);
+        assert_eq!(source_edited.realization, original.realization);
+        assert_eq!(source_edited.channels, original.channels);
+        let source_target = source_edited.target.unwrap();
+        assert_eq!(source_target.arrangement, "authored-layout");
+        assert_eq!(source_target.anchored_pull, 0.271);
+        assert_eq!(source_target.default_role, Role::Anchored);
+        assert_eq!(
+            source_target.groups.unwrap(),
+            GroupRoles {
+                channel: Channel::Groups(PhysicsKindSource::Component).id(),
+                roles: old_target.groups.unwrap().roles,
+            }
+        );
+        assert_eq!(source_target.items, old_target.items);
+    }
+
+    #[test]
+    fn group_source_edits_materialize_resolved_target_and_keep_override_labels() {
+        use crate::canvas::Channel;
+        use crate::canvas::dynamics_spec::GroupRoles;
+
+        let mut subject = canvas();
+        // A missing authored target starts from the Canvas's resolved state
+        // after the setter applies the target-less spec.
+        let mut spec = subject.dynamics_spec().unwrap();
+        spec.target = None;
+        subject.set_dynamics_spec(&spec).unwrap();
+        let resolved = subject.running_target();
+        apply_role_group_source(&mut subject, PhysicsKindSource::Cluster).unwrap();
+        let switched = subject.dynamics_spec().unwrap();
+        assert_eq!(
+            switched.target.as_ref().unwrap().default_role,
+            resolved.default_role
+        );
+        assert_eq!(switched.target.as_ref().unwrap().items, resolved.items);
+        assert_eq!(
+            switched.target.unwrap().groups,
+            Some(GroupRoles {
+                channel: Channel::Groups(PhysicsKindSource::Cluster).id(),
+                roles: resolved
+                    .groups
+                    .as_ref()
+                    .map(|groups| groups.roles.clone())
+                    .unwrap_or_default(),
+            })
+        );
+
+        let mut no_op = canvas();
+        let default_role = no_op.running_target().default_role;
+        let mut targetless = no_op.dynamics_spec().unwrap();
+        targetless.target = None;
+        no_op.set_dynamics_spec(&targetless).unwrap();
+        apply_role(&mut no_op, default_role).unwrap();
+        assert!(no_op.dynamics_spec().unwrap().target.is_none());
+        apply_role_group_source(&mut no_op, PhysicsKindSource::Site).unwrap();
+        assert!(no_op.dynamics_spec().unwrap().target.is_none());
+
+        // Empty site overrides keep the compact Site representation; every
+        // other source must carry an explicit groups channel.
+        let mut empty = canvas();
+        assert!(
+            empty
+                .dynamics_spec()
+                .unwrap()
+                .target
+                .unwrap()
+                .groups
+                .is_none()
+        );
+        apply_role_group_source(&mut empty, PhysicsKindSource::Cluster).unwrap();
+        assert_eq!(
+            empty
+                .dynamics_spec()
+                .unwrap()
+                .target
+                .unwrap()
+                .groups
+                .unwrap()
+                .channel,
+            Channel::Groups(PhysicsKindSource::Cluster).id()
+        );
+        apply_role_group_source(&mut empty, PhysicsKindSource::Site).unwrap();
+        assert!(
+            empty
+                .dynamics_spec()
+                .unwrap()
+                .target
+                .unwrap()
+                .groups
+                .is_none()
+        );
+
+        let mut explicit_site = empty.dynamics_spec().unwrap();
+        explicit_site.target.as_mut().unwrap().groups = Some(GroupRoles {
+            channel: Channel::Groups(PhysicsKindSource::Site).id(),
+            roles: std::collections::BTreeMap::new(),
+        });
+        empty.set_dynamics_spec(&explicit_site).unwrap();
+        let explicit_site = empty.dynamics_spec().unwrap();
+        apply_role_group_source(&mut empty, PhysicsKindSource::Site).unwrap();
+        assert_eq!(empty.dynamics_spec().unwrap(), explicit_site);
     }
 
     #[test]
