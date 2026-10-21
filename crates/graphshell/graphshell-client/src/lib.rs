@@ -29,10 +29,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use chirograph::{
     AdvertisedAction, CachePolicy, CacheRetention, CapabilityProfile, ContentHash, EditableTextV1,
-    NativeGlyphV1, PortableCardV1, PresentationCapability, PresentationChange, PresentationCodec,
-    PresentationManifest, PresentationSemantics, ProjectionAck, ProjectionDiff, ProjectionSession,
-    ProjectionSnapshot, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
-    SemanticRole, SessionStatus,
+    NativeGlyphV1, PortableCardV1, PresentationChange, PresentationCodec, PresentationManifest,
+    PresentationSemantics, ProjectionAck, ProjectionDiff, ProjectionSession, ProjectionSnapshot,
+    ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest, SemanticRole, SessionStatus,
 };
 use sceno::InstanceId;
 use scenotime::{ApplyOutcome, DiffError, SceneSnapshot, SnapshotError};
@@ -790,28 +789,9 @@ impl ClientState {
 }
 
 fn validate_presentation(mounted: &MountedScene) -> Result<(), String> {
-    let mut instances = BTreeSet::new();
-    for binding in &mounted.presentation.bindings {
-        if mounted.scene.active_item(binding.instance).is_none() {
-            return Err(format!(
-                "binding for absent or tombstoned item {}",
-                binding.instance.0
-            ));
-        }
-        if !instances.insert(binding.instance.0) {
-            return Err(format!("duplicate binding for item {}", binding.instance.0));
-        }
-    }
+    chirograph::validate_presentation(&mounted.scene, &mounted.presentation)
+        .map_err(|error| error.to_string())?;
     for offer in mounted.presentation.offers.values().flatten() {
-        let expected = match offer.codec {
-            PresentationCodec::NativeGlyphV1 => PresentationCapability::NativeGlyph,
-            PresentationCodec::PortableCardV1 => PresentationCapability::PortableCard,
-            PresentationCodec::ImageV1 { .. } => PresentationCapability::Image,
-            PresentationCodec::EditableTextV1 => PresentationCapability::EditableText,
-        };
-        if offer.requires != expected {
-            return Err("presentation codec names the wrong required capability".into());
-        }
         if matches!(offer.codec, PresentationCodec::EditableTextV1)
             && (mounted.cache_policy.retention != CacheRetention::MemoryOnly
                 || !mounted.cache_policy.purge_on_revocation)
@@ -1339,6 +1319,49 @@ mod tests {
             client.mounted(&session).unwrap().status,
             SessionStatus::Live
         );
+    }
+
+    #[test]
+    fn invalid_presentation_diff_rolls_back_scene_and_presentation() {
+        let session = ProjectionSession("loopback:invalid-presentation".into());
+        let glyph = serde_json::to_vec(&NativeGlyphV1 {
+            label: "One".into(),
+            icon: None,
+            color: None,
+        })
+        .unwrap();
+        let mut client = ClientState::default();
+        client
+            .apply_snapshot(snapshot_with_offer(
+                &session,
+                PresentationCodec::NativeGlyphV1,
+                PresentationCapability::NativeGlyph,
+                semantics("One", SemanticRole::Graphic),
+                &glyph,
+                CacheRetention::MemoryOnly,
+            ))
+            .unwrap();
+        let before = client.clone();
+        let result = client.apply_diff(&ProjectionDiff {
+            version: ProtocolVersion::V1,
+            session,
+            scene: SceneDiff {
+                epoch: SceneEpoch(1),
+                base: Revision(4),
+                revision: Revision(5),
+                operations: Vec::new(),
+            },
+            presentation: vec![PresentationChange::Bind(PresentationBinding {
+                instance: InstanceId(99),
+                key: PresentationKey("missing:item".into()),
+            })],
+            status: Some(SessionStatus::Revoked),
+        });
+        assert!(matches!(
+            result,
+            Err(ClientDiffError::InvalidPresentation(_))
+        ));
+        assert_eq!(client, before);
     }
 
     #[test]
