@@ -1,0 +1,20 @@
+{
+  "resident": {
+    "sha256": "418f19584c300cf81bcd35a75599c5d114ebc397139f586084e41bf5508908b0",
+    "original_live_sha256": "4d22936ddb45f799e077348f25dd8ee383708acf539f4f45aeecdc62107d5994",
+    "matches_original_live": false,
+    "dependency_file_sha256": "f37942ac66d12cd46f58738d9dfc2eb105b33276cb1603e4b63c1fe2cabf829f"
+  },
+  "preparation_helper": {
+    "sha256": "999e951b8946299de84639e5e852fa32a23f2918f4e7be49ea0dcd4b87f9ab6d",
+    "original_live_sha256": "999e951b8946299de84639e5e852fa32a23f2918f4e7be49ea0dcd4b87f9ab6d",
+    "matches_original_live": true,
+    "dependency_file_sha256": "969ef4a8e54497bbafd93080c794d5d83bc969028333ecc130dac2540ffb205d"
+  },
+  "native_artifact": {
+    "sha256": "4807fbe731eab5d242d9cd38a9a765812737e09e00b64b3d4c557e89b7b6fd25",
+    "original_live_sha256": "4807fbe731eab5d242d9cd38a9a765812737e09e00b64b3d4c557e89b7b6fd25",
+    "matches_original_live": true,
+    "dependency_file_sha256": "39f4bbfc6b3c549186100239d5e154313e2971c3a63d26ff98be32284bee4e12"
+  }
+}
