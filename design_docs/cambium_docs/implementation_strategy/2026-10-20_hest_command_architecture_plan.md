@@ -191,7 +191,9 @@ Rhai request batch serialized through the same Hest envelope as Mesquite.
 The second receiving host is Knot's real consented block-evaluation endpoint;
 its canonical supplier repin and receiving checks are pending at this checkpoint.
 
-The released Hest/Cambium and frozen compatibility source remain exact. H4
+The H4 delta leaves released Hest/Cambium and frozen compatibility sources
+untouched. Concurrent main shell/canvas/co-op work is preserved separately;
+its new Cambium shell is not represented as the published 0.5 package. H4
 ships as Git adapters; no new Hest or Cambium publication is needed. Mesquite
 is already Git-only (`publish = false`). No unrelated backend or family release
 is included. Native presentation/human AT and MSRV remain separate evidence.
