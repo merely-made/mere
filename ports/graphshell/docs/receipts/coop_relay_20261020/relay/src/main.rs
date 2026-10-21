@@ -51,7 +51,7 @@ async fn main() {
     config.relay = Some(relay);
     let mut server = Server::spawn(config).await.expect("bind owned relay");
     emit(
-        json!({"event":"ready","pid":std::process::id(),"url":server.http_url().unwrap().to_string(),"at_ms":at_ms()}),
+        json!({"event":"ready","pid":std::process::id(),"url":format!("http://{}/",server.http_addr().unwrap()),"at_ms":at_ms()}),
     );
     let mut input = tokio::io::BufReader::new(tokio::io::stdin()).lines();
     loop {
