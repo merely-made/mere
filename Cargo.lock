@@ -7106,6 +7106,7 @@ dependencies = [
  "taproot",
  "tempfile",
  "tokio",
+ "url",
  "uuid",
 ]
 
