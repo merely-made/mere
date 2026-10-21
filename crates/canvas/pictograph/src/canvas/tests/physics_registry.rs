@@ -387,4 +387,35 @@ fn a_raw_terms_input_slot_resolves_against_the_registry_and_running_it_stays_ref
     let refused = canvas.set_dynamics_spec(&spec);
     assert!(refused.is_err(), "{refused:?}");
     assert_eq!(canvas.dynamics_spec(), before);
+
+    // A later refusal must leave an already admitted controller in place,
+    // including the live choice and role table that the canvas is running.
+    let admitted = DynamicsSpec::new(Node::preset(PhysicsLaw::Springs.id()));
+    canvas.set_dynamics_spec(&admitted).unwrap();
+    canvas.settle_physics(5);
+    canvas.step_dynamics_layout(false);
+    let before_ticks = canvas.physics.pace().ticks;
+    let before_clock = canvas.physics.field_clock();
+    let before_positions: Vec<_> = canvas.view.positions().collect();
+    let before_record = canvas.dynamics_spec().unwrap();
+    let before_view = canvas.view();
+    let before_roles = canvas.arrangement_roles().clone();
+    let mut unsupported_channel = admitted;
+    unsupported_channel
+        .channels
+        .insert("mass".into(), "mass.planet".into());
+    let refused = canvas.set_dynamics_spec(&unsupported_channel);
+    assert!(
+        matches!(refused, Err(BindError::Unbound { ref place, .. }) if place == "channels.mass"),
+        "{refused:?}"
+    );
+    assert_eq!(canvas.dynamics_spec().unwrap(), before_record);
+    assert_eq!(canvas.physics.pace().ticks, before_ticks);
+    assert_eq!(canvas.physics.field_clock(), before_clock);
+    assert_eq!(
+        canvas.view.positions().collect::<Vec<_>>(),
+        before_positions
+    );
+    assert_eq!(canvas.view(), before_view);
+    assert_eq!(canvas.arrangement_roles(), &before_roles);
 }
