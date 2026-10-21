@@ -28,10 +28,41 @@ Genet engine crates -X-> Cambium
 
 Genet remains independently usable without Cambium. Sprigging is an extension
 of Genet's neutral custom-leaf seam, not a second layout or input engine.
+Genet's supplied adapters and defaults still have explicit policies; independent
+use does not mean every default is suitable for every host. The
+[Genet compatibility note](genet-compatibility.md#engine-mechanisms-and-host-defaults-2026-10-20)
+describes the configurable UA stylesheet and input/texture assumptions.
 
 The published seam crates use Genet package names. Cambium's public backend
 types use `Genet*` names; deprecated `Serval*` aliases are temporary source
 compatibility shims.
+
+## Shared GPU and event-loop ownership (2026-10-20)
+
+The native desktop host supports both standalone operation and embedding in an
+existing winit application:
+
+- `run` creates and owns an event loop. Its host boots a render core on first
+  use when none has been supplied.
+- `run_windows` shares application state and its render core across window
+  hosts; each window has its own surface.
+- `WinitHost::with_shared_render_core` accepts an existing `Arc<RenderCore>` and
+  wake callback. `open` takes the caller's `ActiveEventLoop`; the caller routes
+  window events and lifecycle turns. This path reuses the supplied core without
+  booting another device. Pelt's appearance editor is a product consumer.
+
+These are supported ownership choices. Separately bootstrapped hosts can own
+separate devices; embedding in a shared core is not automatic across an entire
+application. Accepting that core and a winit event loop also does not establish
+compatibility with every toolkit, render target or GPU context.
+
+Source: [native host](../../../crates/cambium/cambium-genet-winit-host/src/lib.rs),
+[multi-window host](../../../crates/cambium/cambium-genet-winit-host/src/windows.rs),
+[shared window state](../../../crates/cambium/cambium-rootstock/src/multi_host.rs)
+and [Pelt appearance editor](../../../ports/pelt/desktop/appearance_editor.rs).
+Existing native/device-recovery evidence keeps its original bounds in the
+[shared-device recovery record](2026-10-11_shared_device_recovery_owner.md).
+This wording update adds no new native or physical-device qualification.
 
 ## Command menus (2026-09-30)
 

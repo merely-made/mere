@@ -12,11 +12,11 @@ built on it.
   <sub>Graphshell, Mere's reference host: a local graph arranged through the product's own search, relation, and scene controls.</sub>
 </p>
 
-## Status (2026-10-19)
+## Status (2026-10-20)
 
 Pre-release, under active development.
 
-- Cargo workspace of 90 explicit members. The `mere` facade exposes graph,
+- Cargo workspace of 92 explicit members. The `mere` facade exposes graph,
   linked-data, canvas, workbench and query capabilities.
 - Graphshell remains the complete reference graph host; Djinn supplies the local
   resident composition. Cambium and Conatus remain platform components here.
@@ -47,8 +47,8 @@ A graph becomes a picture through two grammars that share one binding.
 
 **Projection**: what is shown, and where.
 - *Projection grammar*: the reusable vocabulary and operations: selection, derivation, visual encoding, arrangements, backgrounds, interactions, and provenance.
-- *Scene recipe*: a particular composition of those choices, which can be saved, edited, and reused.
-- *Domain binding*: which disclosed facts and permitted actions supply that recipe.
+- *Scene recipe*: saved presentation choices: a source reading, visual encodings, an arrangement, and optional dynamics. Hosts can edit and reuse these definitions; execution supports a declared subset of the grammar.
+- *Domain binding*: the connection to a domain's disclosed facts and owner-provided operations. Today the saved binding identifies the authority, domain and resource. Action advertisement and permission checks use separate owner/host interfaces; saving a recipe grants no permission to change its source.
 
 So a timeline recipe isn't inherently a music feature or a writing feature. A domain supplies meaningful temporal facts; the recipe makes them legible. Likewise, a relationship layout can present lexical connections, musical relationships, or research references without treating those relationships as semantically identical.
 
@@ -57,9 +57,22 @@ So a timeline recipe isn't inherently a music feature or a writing feature. A do
 - *Dynamics recipe*: a particular composition of those terms, saved, edited, and reused like a scene recipe.
 - The same domain binding supplies both: a scene recipe names an arrangement and, optionally, a dynamics recipe.
 
-An arrangement is positions, not motion; physics acts on it. Each item's position is *seeded* (motion starts there), *pinned* (it stays) or *anchored* (it returns after a push or a drag), by the recipe's default or per item, seeded unless chosen. Meaning can live in the dynamics too: a semantic grouping becomes a pull among related items rather than a slot to return to.
+An arrangement defines intended positions; physics acts on them. Each item's position is *seeded* (motion starts there), *pinned* (it stays) or *anchored* (it returns after a push or a drag), by the recipe's default or per item, seeded unless chosen. Meaning can live in the dynamics too: a semantic grouping becomes a pull among related items rather than a slot to return to.
+
+Authored dynamics, role choices and intentional placements can be saved. Knot,
+for example, retains those choices and placement traces as immutable versions.
+Live simulation state and execution handles remain runtime-owned. Executing a
+saved dynamics specification requires host validation and a runtime binding.
 
 A workbench's own structure of frames, tiles, and splits is a *forme*, not an arrangement. A physics simulation's bodies, joints, fields, and emitters are a *world*, not a scene.
+
+The implemented [scene pipeline](crates/cambium/scenes/README.md) compiles supported
+recipes and disclosed facts into layout instructions and a projected scene;
+the host draws it and supplies interaction. A renderer's drawing, such as a
+Vello scene, is a different object from that projected scene or a physics world.
+Cambium's [desktop host](design_docs/cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20)
+supports a shared GPU render core and a caller-owned event loop; using the
+standalone entry point does not establish one device across independent hosts.
 
 ## Use
 
