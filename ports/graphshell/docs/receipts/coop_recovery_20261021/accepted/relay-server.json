@@ -1,0 +1,236 @@
+{
+  "exit": 0,
+  "sha256": "9a3d57c1ab0f65a60615190e487372ababe649bd4984e003f1c91be782b4ae08",
+  "segments": [
+    {
+      "events": [
+        {
+          "at_ms": 1792556997051,
+          "event": "ready",
+          "pid": 2235549,
+          "url": "http://192.168.4.32:40895/"
+        },
+        {
+          "accepts": 0,
+          "at_ms": 1792556997057,
+          "bytes_recv": 0,
+          "bytes_sent": 0,
+          "disconnects": 0,
+          "event": "snapshot",
+          "packets_recv": 0,
+          "packets_sent": 0,
+          "pid": 2235549
+        },
+        {
+          "at_ms": 1792557025868,
+          "connection": "ConnectionId(0)",
+          "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+          "event": "connect"
+        },
+        {
+          "at_ms": 1792557030679,
+          "connection": "ConnectionId(1)",
+          "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+          "event": "connect"
+        },
+        {
+          "at_ms": 1792557039120,
+          "connection": "ConnectionId(2)",
+          "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+          "event": "connect"
+        },
+        {
+          "accepts": 3,
+          "at_ms": 1792557040657,
+          "bytes_recv": 92319,
+          "bytes_sent": 92282,
+          "disconnects": 1,
+          "event": "final",
+          "packets_recv": 163,
+          "packets_sent": 162,
+          "pid": 2235549
+        },
+        {
+          "at_ms": 1792557040661,
+          "event": "stopped",
+          "pid": 2235549
+        }
+      ],
+      "log": "gs-recovery-20261021-01-relay-1.log",
+      "exit": 0
+    },
+    {
+      "events": [
+        {
+          "at_ms": 1792557051337,
+          "event": "ready",
+          "pid": 2236116,
+          "url": "http://192.168.4.32:40895/"
+        },
+        {
+          "accepts": 0,
+          "at_ms": 1792557051342,
+          "bytes_recv": 0,
+          "bytes_sent": 0,
+          "disconnects": 0,
+          "event": "snapshot",
+          "packets_recv": 0,
+          "packets_sent": 0,
+          "pid": 2236116
+        },
+        {
+          "at_ms": 1792557051449,
+          "connection": "ConnectionId(0)",
+          "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+          "event": "connect"
+        },
+        {
+          "at_ms": 1792557054296,
+          "connection": "ConnectionId(1)",
+          "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+          "event": "connect"
+        },
+        {
+          "at_ms": 1792557066555,
+          "connection": "ConnectionId(2)",
+          "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+          "event": "connect"
+        },
+        {
+          "at_ms": 1792557071525,
+          "connection": "ConnectionId(3)",
+          "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+          "event": "connect"
+        },
+        {
+          "accepts": 4,
+          "at_ms": 1792557079116,
+          "bytes_recv": 69545,
+          "bytes_sent": 64424,
+          "disconnects": 4,
+          "event": "final",
+          "packets_recv": 120,
+          "packets_sent": 114,
+          "pid": 2236116
+        },
+        {
+          "at_ms": 1792557079120,
+          "event": "stopped",
+          "pid": 2236116
+        }
+      ],
+      "log": "gs-recovery-20261021-01-relay-2.log",
+      "exit": 0
+    }
+  ],
+  "events": [
+    {
+      "at_ms": 1792556997051,
+      "event": "ready",
+      "pid": 2235549,
+      "url": "http://192.168.4.32:40895/"
+    },
+    {
+      "accepts": 0,
+      "at_ms": 1792556997057,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 0,
+      "event": "snapshot",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2235549
+    },
+    {
+      "at_ms": 1792557025868,
+      "connection": "ConnectionId(0)",
+      "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792557030679,
+      "connection": "ConnectionId(1)",
+      "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792557039120,
+      "connection": "ConnectionId(2)",
+      "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+      "event": "connect"
+    },
+    {
+      "accepts": 3,
+      "at_ms": 1792557040657,
+      "bytes_recv": 92319,
+      "bytes_sent": 92282,
+      "disconnects": 1,
+      "event": "final",
+      "packets_recv": 163,
+      "packets_sent": 162,
+      "pid": 2235549
+    },
+    {
+      "at_ms": 1792557040661,
+      "event": "stopped",
+      "pid": 2235549
+    },
+    {
+      "at_ms": 1792557051337,
+      "event": "ready",
+      "pid": 2236116,
+      "url": "http://192.168.4.32:40895/"
+    },
+    {
+      "accepts": 0,
+      "at_ms": 1792557051342,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 0,
+      "event": "snapshot",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2236116
+    },
+    {
+      "at_ms": 1792557051449,
+      "connection": "ConnectionId(0)",
+      "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792557054296,
+      "connection": "ConnectionId(1)",
+      "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792557066555,
+      "connection": "ConnectionId(2)",
+      "endpoint": "e1c7f0137c64f1f21193ed6db0e62ddc8a6149a56a6f880e78e161f4a8f0e965",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792557071525,
+      "connection": "ConnectionId(3)",
+      "endpoint": "a3116146e4d037fe7585214733b99acc2ea5872921fb6d738dc201ed36a4216c",
+      "event": "connect"
+    },
+    {
+      "accepts": 4,
+      "at_ms": 1792557079116,
+      "bytes_recv": 69545,
+      "bytes_sent": 64424,
+      "disconnects": 4,
+      "event": "final",
+      "packets_recv": 120,
+      "packets_sent": 114,
+      "pid": 2236116
+    },
+    {
+      "at_ms": 1792557079120,
+      "event": "stopped",
+      "pid": 2236116
+    }
+  ]
+}
