@@ -3,7 +3,7 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Shared leaf/producer host composition qualified; wider owner migrations open" - accurate: yes
+- status line: "Flattened producer discovery qualified; wider owner migrations open" - accurate: yes
 - claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -21,7 +21,9 @@ Apparatus retains observations, and host submission is distinct from pixels.
 Host current-target admission, the optional collector bridge, shared DOM
 construction and one explicitly sampled resident lifecycle source/reader are
 qualified in their named historical cohorts. Shared leaf/producer host composition
-now has one qualified host implementation. Retain neutral provider
+now has one qualified host implementation. Flattened producer discovery is also
+qualified across portable, sampled headless GPU and native/browser semantic
+receiving. Retain full producer coordinate mapping, neutral provider
 contracts, target/session/lifetime identity, mutable read/act boundaries, broader
 command routing, other product sources, final process evidence, selector grammar,
 keyboard route and presentation correlation migrations.
@@ -80,6 +82,23 @@ pure observation, atomic activation or target-generation migration. The source
 seal and final receiving gates are recorded separately from development
 failures: the broad pre-repin cohort passes 190 tests/seven existing ignores;
 70 affected current-main receiving tests pass/four existing ignores and Wasm
-compilation succeeds. Read-only selectors and renderer placement/discovery
-remain explicit owner migrations. Whole-tree D2 had 40 pre-existing errors at this refreshed basis;
+compilation succeeds. Read-only selectors and renderer placement
+remain explicit owner migrations; the discovery gap is superseded below.
+Whole-tree D2 had 40 pre-existing errors at this refreshed basis;
 this pass owns only the two named plan records.
+
+### Flattened producer discovery continuation, 2026-10-20
+
+One Rootstock traversal consumes Genet's flat children for producer discovery
+and semantic routing, preserving the separate DOM-text offset contract. The
+before-repair gate passes browser semantics while six producer runtime controls
+fail, demonstrating the misleading advertised-owner path. Eight repaired
+controls pass. Final source-frozen receiving on main `24b079538` passes 112
+targeted native tests/five existing ignores and browser-host Wasm compilation.
+Actual sampled headless RGBA receiving covers assigned source, fallback
+replacement and retirement; portable capture covers nested shadows, duplicate
+refusal and WindowDom containment. Native action mapping and browser mirror
+plans select the assigned owner. Full producer content-origin/transform/scroll/
+clip mapping, read-only semantic observations, action vocabulary and lifetime
+tokens remain open. These receipts do not qualify browser runtime, headed or
+human AT acceptance. The sealed audit registers remain unchanged.

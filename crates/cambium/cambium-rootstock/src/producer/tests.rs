@@ -607,3 +607,85 @@ fn gpu_a_closed_windows_producers_retire() {
     assert_eq!(retired, 1);
     assert!(!registry.contains(7) && registry.contains(8));
 }
+
+#[test]
+fn gpu_flat_tree_tests_receive_shadow_and_slotted_pixels_and_retire_removed_slots() {
+    use layout_dom_api::ShadowRootInit;
+    let surface = surface();
+    for slotted in [false, true] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let host = dom.create_element(name("section"));
+        dom.append_child(root, host);
+        let decoy = leaf_under(&mut dom, host, "7");
+        dom.set_attribute(decoy, name("slot"), "not-offered");
+        let shadow = dom.attach_shadow_unchecked(host, ShadowRootInit::default(), false);
+        let (leaf, fallback) = if slotted {
+            let slot = dom.create_element(name("slot"));
+            dom.set_attribute(slot, name("name"), "scene");
+            dom.append_child(shadow, slot);
+            let fallback = leaf_under(&mut dom, slot, "7");
+            dom.set_attribute(
+                fallback,
+                name("style"),
+                "display:block;width:8px;height:6px;color:rgb(200,32,80)",
+            );
+            let assigned = leaf_under(&mut dom, host, "7");
+            dom.set_attribute(assigned, name("slot"), "scene");
+            assert_eq!(dom.assigned_nodes(slot), [assigned]);
+            (assigned, Some(fallback))
+        } else {
+            (leaf_under(&mut dom, shadow, "7"), None)
+        };
+        dom.set_attribute(
+            leaf,
+            name("style"),
+            "display:block;width:8px;height:6px;color:rgb(64,128,192)",
+        );
+        let build = |dom: &ScriptedDom| {
+            OwnedLayout::new(dom, &[SHEET], 160.0, 120.0, &[], &Default::default())
+        };
+        let mut layout = build(&dom);
+        let producer = Rc::new(RefCell::new(Producer::default()));
+        let mut registry = ProducerRegistry::new();
+        registry.register(7, producer.clone(), &["color"]).unwrap();
+        let frame = registry.prepare(&surface, &layout, &dom, 1.0);
+        assert_eq!(
+            (frame.render_calls, frame.stages, frame.invalid_frames),
+            (1, 1, 0)
+        );
+        let identity = registry.image_identity(7).expect("shadow image was staged");
+        assert_eq!(identity.owner, Some(leaf));
+        assert_eq!(producer.borrow().frames.len(), 1);
+        assert_eq!(
+            pixel(&surface, &registry, &dom, &mut layout),
+            [64, 128, 192, 255]
+        );
+        dom.remove(leaf);
+        layout = build(&dom);
+        if let Some(fallback) = fallback {
+            registry.prepare(&surface, &layout, &dom, 1.0);
+            let rebound = registry.image_identity(7).unwrap();
+            assert_eq!(rebound.owner, Some(fallback));
+            assert_ne!(rebound.stamp, identity.stamp);
+            assert_eq!(
+                pixel(&surface, &registry, &dom, &mut layout),
+                [200, 32, 80, 255]
+            );
+            assert_eq!(producer.borrow().retired, 1);
+            dom.remove(fallback);
+            layout = build(&dom);
+        }
+        let retired = registry.prepare(&surface, &layout, &dom, 1.0);
+        assert_eq!(retired.retirements, 1);
+        assert!(
+            !registry.contains(7),
+            "an unassigned light child must not become the replacement owner"
+        );
+        assert_eq!(producer.borrow().retired, if slotted { 2 } else { 1 });
+        assert_eq!(
+            pixel(&surface, &registry, &dom, &mut layout),
+            [0, 0, 0, 255]
+        );
+    }
+}

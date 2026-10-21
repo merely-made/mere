@@ -1,7 +1,7 @@
 {
   "date": "2026-10-20",
-  "basis": "21deb0cb",
-  "status": "contained shared leaf/producer host composition qualified: 70 current-main native receiving passes/four existing ignores and Wasm compile; broader 190-test cohort preserved; provider/selector/geometry/lifetime migrations open",
+  "basis": "24b0795382b1fc1fe72968cd5dbf27685c004e45",
+  "status": "flattened producer discovery qualified: 112 targeted native passes/five existing ignores and Wasm compile; full coordinates, provider/selector/read-only observation/lifetime/action migrations open; historical cohorts preserved",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -198,9 +198,21 @@
         "crates/cambium/cambium-rootstock/src/producer/registry.rs:prepare",
         "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics"
       ],
-      "status": "source-confirmed boundary gaps; rendered shadow/padding/transform reproduction open",
-      "evidence": "Producer render discovery still uses a light-DOM walk while semantic discovery is flattened. Render/input use Genet ElementGeometry content size/origin with transforms and clips, while generated semantic child bounds still offset the projected slot rectangle. Padded/transformed/clipped receiving equivalence is not established by this consolidation.",
-      "why_deferred": "Qualify one Genet placement/paint mapping across renderer, native AccessKit and browser ARIA, plus shadow/slotted producer ownership and retirement; a new offset or traversal shim alone would leave the other authority gaps intact."
+      "status": "flattened discovery repaired; broader producer coordinate mapping remains open",
+      "evidence": "The old light-versus-flat discovery split is retired by shared flat_nodes and custom_leaf_key. Initial receiving controls cover nested shadow/assigned/fallback ownership, portable capture and headless sampled pixels. Render/input still use Genet content geometry while semantic children offset the projected slot rectangle; padding, transforms, scroll and clips need their own mapping/receiving gate.",
+      "why_deferred": "A full placement authority must map content coordinates through ancestor transforms, scroll, clips and shadow/slot ancestry into native AccessKit and ARIA. Discovery and axis-aligned samples do not establish those geometric guarantees."
+    },
+    {
+      "id": "diagnostics-flat-producer-discovery",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/owned_layout.rs:flat_nodes",
+        "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs:custom_leaf_nodes",
+        "crates/cambium/cambium-rootstock/src/semantics.rs:project_semantics"
+      ],
+      "change": "GPU preparation, portable capture, custom-leaf size reads and semantic routing now share Genet flat-child traversal and the existing key parser. Assigned nodes occur once, masked fallback and unassigned light children are excluded, and nested shadow producers retain their current window scope. Light-DOM text-offset walks remain separate.",
+      "verification": "baseline browser semantic control passed while six producer discovery/capture/GPU controls failed; fixed controls pass including sampled headless RGBA readback, fallback rebinding, removal retirement, duplicate refusal before callbacks, window scope and native/browser action maps",
+      "status": "repaired and qualified by 112 targeted native passes/five existing ignores and browser-host Wasm compile",
+      "qualification": "diagnostics-flat-discovery-qualification.json; immutable source/manifest seal, executed native binary hashes, sampled headless GPU RGBA and portable/native/browser receiving; full coordinate/browser-runtime/human AT acceptance remains open"
     }
   ],
   "ownership_migrations": [
@@ -253,6 +265,11 @@
       "audit_ids": [],
       "state": "contained host composition centralized; neutral provider contract and lifetimes open",
       "decision": "Rootstock composes existing AccessKit-shaped contributors for native publication, browser lowering and current-target admission. Genet owns DOM projection; products own contributor meaning and actual effects. No new universal semantic revision or outcome authority."
+    },
+    {
+      "audit_ids": [],
+      "state": "shared flattened producer discovery repaired; geometry qualification remains open",
+      "decision": "Genet owns flat-child selection; Rootstock shares one preorder traversal and key parser for producer discovery and semantic routing. Layout geometry still decides CSS visibility/suspension after discovery. This is not proof of arbitrary coordinate or target-lifetime equivalence."
     }
   ],
   "large_effect_followups": [
@@ -299,7 +316,7 @@
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Cross-window producer owners, reused provider/child keys, duplicate action IDs and generated hash collisions remain unqualified. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Render discovery is still light-DOM while semantics are flattened; generated child bounds do not consume the full content-origin/transform/clip placement authority.",
+      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Cross-window producer owners, reused provider/child keys, duplicate action IDs and generated hash collisions remain unqualified. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Producer discovery and semantics now share flat traversal. Generated semantic child bounds still do not consume the full content-origin/transform/clip placement authority, including shadow/slot ancestor mapping.",
       "gate": "Supplier-qualified neutral contributor contract, explicit observation/effect and target-lifetime rules, Hest-coordinated catalogue/invocation/result migration, and actual native/browser runtime receiving.",
       "why_deferred": "A supplier API and target lifecycle migration crosses products, platform adapters and command ownership; do not silently choose new identity or completion semantics in this repair slice."
     }
@@ -333,5 +350,6 @@
     "diagnostics-contributed-current-platform.json",
     "diagnostics-contributed-wasm.json",
     "diagnostics-contributed-qualification.json"
-  ]
+  ],
+  "flattened_discovery_qualification": "diagnostics-flat-discovery-qualification.json"
 }
