@@ -91,3 +91,34 @@ fn density_tracks_caption_reservations_and_zoom() {
         assert_eq!(ShellDensity::for_width(width * 2.0, 2.0), density);
     }
 }
+
+#[test]
+fn activity_buttons_keep_keyboard_activation_and_independent_tool_state() {
+    let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+    let mut runner = GenetAppRunner::<_, _, _, ()>::new(dom.clone(), |state: &(bool, bool)| {
+        shell_activity_rail(vec![shell_activity_control("◇", "Map", "Map", ShellControl { pressed: Some(state.0), ..Default::default() }, |s: &mut (bool, bool), _| s.0 = !s.0)],
+            vec![shell_activity_control("ⓘ", "Inspect", "Inspector", ShellControl { pressed: Some(state.1), ..Default::default() }, |s: &mut (bool, bool), _| s.1 = !s.1)], vec![])
+    }, (true, false));
+    let buttons = dom.borrow().all_with_class(runner.root(), "shell-activity-control");
+    runner.set_focus(Some(buttons[1]));
+    runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Enter)));
+    assert_eq!(*runner.state(), (true, true), "tools do not deselect the main projection");
+    assert_eq!(attribute(&dom, buttons[1], "aria-pressed").as_deref(), Some("true"));
+    let marks = dom.borrow().all_with_class(runner.root(), "shell-activity-mark");
+    assert_eq!(attribute(&dom, marks[0], "aria-hidden").as_deref(), Some("true"));
+}
+
+#[test]
+fn document_rail_keeps_one_selected_member_per_tile_and_dispatches_exact_target() {
+    let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+    let mut runner = GenetAppRunner::<_, _, _, ()>::new(dom.clone(), |selected: &[usize; 2]| {
+        shell_document_rail((0..2).map(|tile| (format!("Tile {}", tile + 1), (0..2).map(|tab| {
+            shell_control(format!("Document {tile}:{tab}"), format!("Document {tile}:{tab}"), ShellControl { pressed: Some(selected[tile] == tab), ..Default::default() }, move |s: &mut [usize; 2], _| s[tile] = tab)
+        }).collect())).collect())
+    }, [0, 0]);
+    let buttons = dom.borrow().all_with_class(runner.root(), "shell-control");
+    runner.dispatch_click(buttons[1], PointerClick::at((0.0, 0.0)));
+    assert_eq!(*runner.state(), [1, 0]);
+    assert_eq!(attribute(&dom, buttons[1], "aria-pressed").as_deref(), Some("true"));
+    assert_eq!(attribute(&dom, buttons[2], "aria-pressed").as_deref(), Some("true"));
+}
