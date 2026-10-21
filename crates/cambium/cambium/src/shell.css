@@ -8,6 +8,13 @@
 .shell-control:focus-visible { outline:1px solid currentColor; outline-offset:-1px; }
 .shell-popup { --app-region:no-drag; display:flex; flex-direction:column; box-sizing:border-box; padding:8px; gap:0; max-height:70vh; overflow-y:auto; background:var(--shell-background, #17232b); color:var(--shell-foreground, #dce3e8); border:1px solid var(--shell-rule, #637581); border-radius:6px; }
 .shell-popup .shell-control { text-align:left; width:100%; min-height:var(--shell-row-height, 28px); flex-shrink:0; }
+.cambium-source-binding { --app-region:no-drag; box-sizing:border-box; flex-shrink:0; min-width:0; padding:3px 6px; color:var(--shell-foreground, inherit); border-bottom:1px solid var(--shell-rule, #637581); }
+.shell-binding-control { display:block; width:100%; text-align:left; }
+.shell-binding-summary, .shell-navigation-content { display:flex; flex-direction:column; min-width:0; gap:2px; }
+.shell-binding-mode, .shell-navigation-detail { display:block; font-size:11px; opacity:.7; }
+.shell-binding-source, .shell-navigation-title { display:block; overflow:hidden; white-space:nowrap; }
+.cambium-source-binding[data-source-available=false] .shell-binding-source { opacity:.65; }
+.shell-navigation-item { min-width:0; }
 .cambium-document-rail .tablist { box-sizing:border-box; height:24px; padding:0; }
 .cambium-document-rail .tab { box-sizing:border-box; font-size:12px; padding:4px 9px; white-space:nowrap; }
 .cambium-document-rail .frisket-tabbar { flex-basis:24px; }
