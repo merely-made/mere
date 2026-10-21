@@ -85,6 +85,7 @@ pub enum ProjectionCaptureError {
         found: u16,
     },
     InvalidScene(String),
+    InvalidPresentation(String),
     /// The captured score is newer than this reader's sceno.
     NewerScore(ScoreVersionError),
     /// The captured score and authority disagree about the input generation.
@@ -104,6 +105,12 @@ impl fmt::Display for ProjectionCaptureError {
                 write!(formatter, "unsupported projection-capture version {found}")
             },
             Self::InvalidScene(error) => write!(formatter, "invalid projection capture: {error}"),
+            Self::InvalidPresentation(error) => {
+                write!(
+                    formatter,
+                    "invalid projection-capture presentation: {error}"
+                )
+            },
             Self::NewerScore(error) => write!(formatter, "projection capture score: {error}"),
             Self::GenerationMismatch { score, authority } => write!(
                 formatter,
@@ -146,7 +153,9 @@ impl CaptureWire for ProjectionCaptureV1 {
 
     fn validate(&self) -> Result<(), ProjectionCaptureError> {
         require_version(self.version, Self::VERSION)?;
-        validate_scene(&self.scene)
+        validate_scene(&self.scene)?;
+        crate::validate_presentation(&self.scene, &self.presentation)
+            .map_err(|error| ProjectionCaptureError::InvalidPresentation(error.to_string()))
     }
 }
 
@@ -160,6 +169,8 @@ impl CaptureWire for ProjectionCaptureV2 {
     fn validate(&self) -> Result<(), ProjectionCaptureError> {
         require_version(self.version, Self::VERSION)?;
         validate_scene(&self.scene)?;
+        crate::validate_presentation(&self.scene, &self.presentation)
+            .map_err(|error| ProjectionCaptureError::InvalidPresentation(error.to_string()))?;
         if let Some(score) = &self.score
             && score.version > SCORE_VERSION
         {
@@ -263,7 +274,7 @@ impl ProjectionCaptureV1 {
         presentation_resources(&self.presentation)
     }
 
-    /// Reject malformed tables before disclosure or persistence.
+    /// Reject malformed scene and presentation tables before disclosure or persistence.
     pub fn validate(&self) -> Result<(), ProjectionCaptureError> {
         CaptureWire::validate(self)
     }
@@ -315,7 +326,7 @@ impl ProjectionCaptureV2 {
         presentation_resources(&self.presentation)
     }
 
-    /// Reject malformed tables, a score newer than this reader, and a score
+    /// Reject malformed scene/presentation tables, a score newer than this reader, and a score
     /// whose generation disagrees with its authority's.
     pub fn validate(&self) -> Result<(), ProjectionCaptureError> {
         CaptureWire::validate(self)
