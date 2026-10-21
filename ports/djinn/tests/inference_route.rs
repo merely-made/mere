@@ -1270,7 +1270,8 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
     let checkpoint: serde_json::Value = serde_json::from_slice(&checkpoint).unwrap();
     let prompt = checkpoint["request"]["prompt"].as_str().unwrap();
     assert!(prompt.contains(text_a));
-    assert!(prompt.contains(&supplied.passage.version));
+    assert!(!prompt.contains(&supplied.passage.version));
+    assert!(!prompt.contains(&supplied.passage.source.source));
     assert!(prompt.contains("[1]"));
     assert!(!prompt.contains(text_b));
     let source_revision_before = lane.generation();
@@ -1600,20 +1601,34 @@ async fn serve_trained_model_for_headed_turnstone() {
             .unwrap()
             .unwrap();
         grants.grant(AppId::new("turnstone"), route);
+        // Opt-in receiving fixture: the same broker supplies the normal
+        // wallet-backed clip custody route alongside inference. Both cold
+        // processes use this marked wallet; no host-side fallback key exists.
+        let keeper = Arc::new(djinn::keeper::Keeper::new(keeper_host()));
+        if let Some(root) = std::env::var_os("DJINN_HEADED_CLIP_CUSTODY") {
+            let root = std::path::PathBuf::from(root);
+            assert_eq!(
+                std::fs::read_to_string(root.join("fixture-marker")).unwrap(),
+                "retained-embedding-20261020\n"
+            );
+            let persona = pandect::PersonaId::from_uuid(uuid::Uuid::from_u128(0xe1de_2026_1020));
+            castellan::custody::wallet::ensure_wallet_state(
+                &root,
+                persona,
+                "Retained recall fixture",
+            )
+            .unwrap();
+            keeper
+                .configure_payload_custody(personae::ProfileId("default".into()), persona, root)
+                .unwrap();
+            djinn::custody::grant(&grants).unwrap();
+        }
         let server = {
             let endpoint = endpoint.clone();
             let grants = grants.clone();
             let catalog = catalog.clone();
             tokio::spawn(async move {
-                let _ = serve_app_broker(
-                    &endpoint,
-                    Arc::new(djinn::keeper::Keeper::new(keeper_host())),
-                    grants,
-                    1_200_000,
-                    None,
-                    catalog,
-                )
-                .await;
+                let _ = serve_app_broker(&endpoint, keeper, grants, 1_200_000, None, catalog).await;
             })
         };
         // Prove the application endpoint is accepting before announcing readiness.
