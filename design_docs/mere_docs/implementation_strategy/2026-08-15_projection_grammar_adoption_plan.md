@@ -2251,3 +2251,14 @@ browser visit. Linux/Windows runtime, physical pointer/keyboard input,
 assistive activation and general page-load completion remain unqualified.
 The access-history entry records the accepted handoff; it is not a page-load
 or successful application-completion receipt.
+
+
+**Git integration qualification (2026-10-20).** The live handler checkpoint is
+`c2db56559`; `3b73f15c8` reconciles it with main `1797a2eed`. The integration
+packet at `support/receipts/domain-actions-live-20261020/integration/` records
+93 passing focused tests on the combined source. Rebuilt native and helper
+binaries match the original live artifacts; the rebuilt resident differs after
+upstream's retained-recall change, so the full native acceptance was repeated
+with frozen binaries. The new browser visit, durable history, cold reopen,
+disabled offer and four reviewed captures all pass. The original 50 receipt
+files remain unchanged. This integration adds no new product decisions.
