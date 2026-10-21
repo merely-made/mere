@@ -1,0 +1,10 @@
+{
+  "publication_basis": "ad6c725e82c27959cb3c29dc478f475c44fa501c",
+  "tested_basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "source_seal": "diagnostics-identity-source.json",
+  "tested_sources_manifests_and_lock_unchanged": true,
+  "integration": "Preserve concurrent native co-op relay recovery qualification and shared fixture tooling; no tested Cambium or Cargo lock changes.",
+  "new_test_cohort_claimed": false,
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": []
+}

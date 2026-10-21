@@ -1,0 +1,191 @@
+[
+  {
+    "capture": "private-before.png",
+    "sha256": "b7af2d4e32b55ae8777b9ef243da5d7d948511b162ff1f8dcb164c1b5e9539a4",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Ordinary owner view displays the private sibling and its owner-only address before co-op."
+  },
+  {
+    "capture": "existing-graph.png",
+    "sha256": "0deb43bf28b73cb09ef6050929cff0d9933d5174b23b729725d127fa92c9e42a",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Ordinary owner view displays the chosen existing source before co-op is enabled."
+  },
+  {
+    "capture": "owner-existing.png",
+    "sha256": "bef86aaa547ebd515aad5dfbf0381e212c2e40c0eb762519b257870684c5cab2",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Co-op controls reference the same existing graph and one original node."
+  },
+  {
+    "capture": "owner-invited.png",
+    "sha256": "56401f8e8c0b0038dedd3f97f1f467ddcae2e4b8178cf43810f5632bda5f2361",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Chosen graph shows editor access for the named guest; graph remains the original source."
+  },
+  {
+    "capture": "owner-saw-guest.png",
+    "sha256": "05ccdaacdcc6f6bad11698f85ba02c4be57da025430bbb9eab573ba6bc4a39c7",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner canvas now shows the guest source beside the original source."
+  },
+  {
+    "capture": "owner-private-during-coop.png",
+    "sha256": "556a9963964a69cd9b1bacd4d0c46c1c231df50125eb3dddee608b55471650ba",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner switched to private sibling; co-op controls clear and ask for explicit graph choice."
+  },
+  {
+    "capture": "owner-returned-to-chosen.png",
+    "sha256": "7fd77147f2be622ba9b2301e38fd400fff2d429eff55db6ff010562a87cb3025",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Explicit return restores chosen graph, two sources and the same editor identity."
+  },
+  {
+    "capture": "owner-ordinary-push.png",
+    "sha256": "ee44dfcf4a7fe2d81de3abbba4a50dc0dd866a6d29e9a2948b7971bc2054d032",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner canvas displays three sources and the new relationship from an ordinary resident write."
+  },
+  {
+    "capture": "owner-revoked.png",
+    "sha256": "3b39e5a1d47148b8a44e879201999be553edc3682b895ea7bb77f5cc6247233b",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner panel shows revoked access and retains the guest-revised existing source."
+  },
+  {
+    "capture": "owner-cold-retained.png",
+    "sha256": "c95fc155e81dedd5bfb9262503716301e7686ab1b5c2a966a3347b72a3f62e91",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Fresh native owner window after both custodians restart retains three sources, relationship, guest title and revoked access."
+  },
+  {
+    "capture": "owner-cold-edited.png",
+    "sha256": "bf2fe6920f7654f432a81f908f2e3f89f87f27087ccfb37b5897a0adfe566022",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner saves a fourth source while the persisted guest grant remains revoked."
+  },
+  {
+    "capture": "owner-cold-refused.png",
+    "sha256": "bfa6a837f865b4431195009745641e587ca420aa839458e05805af52095fdc57",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Owner remains editable with four sources after the fresh guest has been refused."
+  },
+  {
+    "capture": "private-after.png",
+    "sha256": "762b7d61481df1f1320aac4ac254ff2221d9ac47017cfb97201e6d479c8cb98f",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Private sibling is visible with its original owner-only source after all co-op and cold-reopen phases."
+  },
+  {
+    "capture": "guest-start.png",
+    "sha256": "526c3350bacd9055f8089f6c8e33ae1f1d483d8281ea3368b1b905c9a66395fc",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Real Linux client already displays the admitted chosen existing source at its first capture."
+  },
+  {
+    "capture": "guest-joined.png",
+    "sha256": "40cc05161de917da55de072bc17fad43b3ef6bc5c844047cd1d271408724095f",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Guest canvas and editor panel show only the invited graph, with no owner sessions or archive."
+  },
+  {
+    "capture": "guest-added.png",
+    "sha256": "1bca57780174d27aade4eff7b78d928c20bbf06eff7d024425f25f289e77f33a",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Guest source appears and status reads Saved with owner acknowledgement; saved activity names the guest persona."
+  },
+  {
+    "capture": "guest-still-scoped.png",
+    "sha256": "5018e9aebc08f2dd0c7e7c152d9c8756c4d1ab4f1f2494b1dbd55b035d176086",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Guest retains the chosen two-source graph while owner has switched to private sibling."
+  },
+  {
+    "capture": "guest-push.png",
+    "sha256": "f3a5b8f9cc225b801362e34e22d923816ec0cad885d5fa2dd0a94c0b23675b8f",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Guest receives the third source and relationship produced by ordinary owner APIs."
+  },
+  {
+    "capture": "guest-renamed.png",
+    "sha256": "d04f2e53021d8ad5a768daa60f6bbd6f99820e5a4a63403484b0ba8bada654d5",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Selected original source has the guest-revised title in canvas and record details; status confirms save acknowledgement and activity names the guest."
+  },
+  {
+    "capture": "guest-return.png",
+    "sha256": "d56932ec2bb4674411731d74c2833ff6393747d9a933a436f3f4d3826e78d81c",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Fresh guest process reads the three sources, relationship and revised title before revocation."
+  },
+  {
+    "capture": "guest-before-relay-loss.png",
+    "sha256": "eceb0bcef5a95a89039c2299b3b13f17d3ae4e5c5e9e8ceede70b312c37a95c9",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Existing source selected with the unsaved replacement title prepared; revision is unchanged."
+  },
+  {
+    "capture": "guest-save-pending.png",
+    "sha256": "672e984485c52de6effd5fd92f59e356a9d4c7f7128dc3058b59444842ae8533",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Guest displays Working while the relay is absent; existing graph content remains unchanged."
+  },
+  {
+    "capture": "guest-save-failed.png",
+    "sha256": "c3ac6708ce36bcc2100bd9a0b81e42b63413974c35d9d2848464447362991aa1",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Unavailable state clears the guest graph and record details after the failed save."
+  },
+  {
+    "capture": "guest-relay-restored.png",
+    "sha256": "e51890e518e666d4cad2de9bfdf3c235a51854f2307fda4bf8351e913aaf5579",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Same guest window reconnects and recovers the prior revision and original saved title."
+  },
+  {
+    "capture": "guest-save-retried.png",
+    "sha256": "38f35d80423a43f994f305cb5796a3d94bac433bc9b9b411970765996b0a0bea",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Explicit retry receives the owner save acknowledgement and displays the replacement title."
+  },
+  {
+    "capture": "guest-withdrawn.png",
+    "sha256": "c4f481d362cedcd5b432270b97ec8f35e73ec4aafdf54ece9119ef2b6fb76769",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Live guest clears graph and record content and shows unavailable after access ends."
+  },
+  {
+    "capture": "guest-cold-denied.png",
+    "sha256": "a974f5225c572150ef306b60265d724dae1e721d6dd74c41644cd2f78f2cff1d",
+    "reviewed": true,
+    "method": "Four headed contact sheets; failure, retry and cold denial also at original resolution.",
+    "observation": "Fresh guest after both custodians restart has an empty canvas and record, with explicit Delegation(Revoked) refusal."
+  }
+]

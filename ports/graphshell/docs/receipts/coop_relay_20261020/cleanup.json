@@ -1,0 +1,31 @@
+{
+  "accepted_cohort": "gs-relay-20261020-04",
+  "owner": {
+    "subject_pids": [
+      83836,
+      83853,
+      83910,
+      83985,
+      83776,
+      83882
+    ],
+    "remaining": []
+  },
+  "guest": {
+    "subject_pids": [
+      2223159,
+      2223241,
+      2223416,
+      2223047,
+      2223317,
+      2223157,
+      2223239,
+      2223414,
+      2222770
+    ],
+    "remaining": []
+  },
+  "native_and_custodian_exit": "Seven native exits and four ordinary custodian stop events passed. Three Pasta forwarders and the relay exited. Independent local/SSH process inspection found none of these subjects remaining.",
+  "checkout_scope": "Task source worktrees only. Primary working files were not edited. The local primary retains concurrent active work; the remote primary stays clean at d4756e0fb6a759746e97d71b3e9a8eb8c2d0e9cf. Shared ignored build caches and task-owned outputs were used.",
+  "ssh": "Task-owned control master; no data-plane or personal agent forwarding. Close after remote committed verification."
+}

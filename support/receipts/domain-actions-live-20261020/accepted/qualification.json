@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "source_commit": "a1f860d03210f0434a046aa46ee6351b24980feb",
+  "source_state": "working source qualified by hashes; not a published commit",
+  "source_sha256": {
+    "Cargo.lock": "e307b8cafafb60dd0d746f583d75a13ebad8bc758903471bdd862f8a8117610a",
+    "ports/djinn/src/bin/djinn.rs": "50e1151b916c5b18457dc00a256415131019e787e915ce38df78731854e881b9",
+    "ports/djinn/src/resident_mere.rs": "ed93db9b4955d7d42684fca665ee62fbd161bbfd74e06dbd7474f691997ed475",
+    "ports/djinn/src/settings.rs": "669b3973a39d19f8020eb907d1987b9861a33034d4309640f99557574e7de337",
+    "ports/graphshell/mere/Cargo.toml": "b71b3294f7154bb71f8e3b6744075cd41e4a7a530a93ff4114ecce0429cdaff6",
+    "ports/graphshell/mere/src/browser.rs": "33c3876497df7cb9d237c2a595f61a6bfb79279ed66139c7cab48cd60805df85",
+    "ports/graphshell/mere/src/connection.rs": "549729e077a5e92246c1a346b46ea1d37af5eee3b66aca3a479f8f1244e8e9ab",
+    "ports/graphshell/mere/src/connection_tests.rs": "6691cb3f1904ebaec42619065b9e2f7a2ee5db82baec93cf11cbaf4f79e36109",
+    "ports/graphshell/mere/src/main.rs": "6c2bfbc00ce16e7888e2649357cbb791529f3ad4d5b7ed1e3f93d780d9ba6213",
+    "ports/graphshell/src/handlers.rs": "dc7280538262f4f2651ba1367695bf1158f6d37c1fb3ea0f6ecc9d0cc3a85452",
+    "support/receipts/domain-actions-live-20261020/run.py": "ad60f8ec879060a7377334554ececdae1f197191b4b01130b3dcd0b9b92a0ea8"
+  },
+  "binaries": {
+    "native_artifact": "4807fbe731eab5d242d9cd38a9a765812737e09e00b64b3d4c557e89b7b6fd25",
+    "native_signed_bundle": "16aba206e173822798a48e8c74c8e9ae9e3f46f56648071ddd60aeee39e5e018",
+    "preparation_helper": "999e951b8946299de84639e5e852fa32a23f2918f4e7be49ea0dcd4b87f9ab6d",
+    "resident": "4d22936ddb45f799e077348f25dd8ee383708acf539f4f45aeecdc62107d5994"
+  },
+  "platform": "macOS-15.8.1-x86_64-i386-64bit-Mach-O",
+  "architecture": "x86_64",
+  "real_unlocked_console": true,
+  "phases": [
+    {
+      "name": "open",
+      "pid": 80624,
+      "exit_code": 0
+    },
+    {
+      "name": "reopen",
+      "pid": 80657,
+      "exit_code": 0
+    },
+    {
+      "name": "disabled",
+      "pid": 80671,
+      "exit_code": 0
+    }
+  ],
+  "resident_starts": 3,
+  "address": "http://127.0.0.1:60469/owner-action/129bca7644824b8cad6b23d08952fc2e",
+  "node": "4bcfb806-bc8e-4d2b-9f1a-a40339475b81",
+  "session": "1d85ee25-eeed-4714-82dd-920c1c801e38",
+  "browser_visits": [
+    {
+      "path": "/owner-action/129bca7644824b8cad6b23d08952fc2e",
+      "at_ns": 1792552852324866000,
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0"
+    }
+  ],
+  "checks": [
+    "real native retained control",
+    "exact accepted owner request",
+    "one system browser visit",
+    "one persisted access-history entry",
+    "cold native and resident reopen without redispatch",
+    "disabled owner setting removes offer without changing access history"
+  ],
+  "limits": [
+    "macOS only; no Linux or Windows runtime qualification",
+    "retained native harness activation; no physical pointer, keyboard or screen-reader qualification",
+    "system handoff and observed local browser visit; no general page-load or application completion contract"
+  ]
+}

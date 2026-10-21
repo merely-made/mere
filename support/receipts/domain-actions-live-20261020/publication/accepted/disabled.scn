@@ -1,0 +1,8 @@
+await {"status":"ready","attached":"1befcd28-0921-4d6a-9660-579c72818594"}
+wait 30000
+click role:button @data-key=11919941-2545-4759-b470-86ce7d89294f
+await {"selected":"11919941-2545-4759-b470-86ce7d89294f"}
+wait 30000
+wheel 0 10000 px on .mere-record
+settle 2
+capture /Users/markik/Code/output/live-owner-actions-delivery-20261020/acceptance-publication/disabled.png

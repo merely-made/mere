@@ -1,0 +1,40 @@
+{
+  "runtime_source_commit": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "headed_source_commit": "b58967c7926d0321c700eb225b6de783769830d9",
+  "source_note": "The shared Python harness commit adds no Rust, manifest or lockfile changes to refreshed main. Fresh native builds and bounded test gates used this runtime; no older software test results are relabeled as current.",
+  "gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "exit": 0,
+      "passed": 39,
+      "log": "software/mac-ui-tests.log.gz"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "exit": 0,
+      "passed": 39,
+      "log": "software/guest-ui-tests.log.gz"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "exit": 0,
+      "passed": 11,
+      "log": "software/mac-coop-tests.log.gz"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "exit": 0,
+      "passed": 11,
+      "log": "software/guest-coop-tests.log.gz"
+    }
+  ],
+  "shared_verifier_regression": {
+    "receipt": "ports/graphshell/docs/receipts/coop_relay_20261020",
+    "commit": "95420eb67b93910407658b386bd1452ac39087c0",
+    "result": "ok; 22 captures; 7 native processes; 4 custodians; exact relay"
+  }
+}

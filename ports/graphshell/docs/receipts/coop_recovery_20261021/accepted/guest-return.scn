@@ -1,0 +1,48 @@
+await {"coop-nodes": "3", "coop": "~Guest revised existing source"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-return.png
+click role:button @data-key=d04a1803-6b29-433d-a79a-18d600f4f6de
+await {"selected": "d04a1803-6b29-433d-a79a-18d600f4f6de"}
+wait 30000
+click role:textbox @id=coop-field-1
+input-text Guest retry after relay recovery
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-before-relay-loss.png
+await {"file": "/home/markik/Code/output/tp-recovery-20261021-01/guest/private/markers/attempt-offline"}
+wait 30000
+click role:button @id=coop-title
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-save-pending.png
+await {"coop-available": "false", "nodes": "0"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-save-failed.png
+await {"file": "/home/markik/Code/output/tp-recovery-20261021-01/guest/private/markers/relay-restored"}
+wait 30000
+click role:button Reconnect
+await {"coop-nodes": "3", "coop": "~active relay "}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-relay-restored.png
+click role:button @data-key=d04a1803-6b29-433d-a79a-18d600f4f6de
+await {"selected": "d04a1803-6b29-433d-a79a-18d600f4f6de"}
+wait 30000
+click role:textbox @id=coop-field-1
+input-text Guest retry after relay recovery
+click role:button @id=coop-title
+await {"coop-status": "~Saved", "coop": "~Guest retry after relay recovery"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-save-retried.png
+await {"coop-available": "false", "nodes": "0", "selected": ""}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /home/markik/Code/output/tp-recovery-20261021-01/guest/evidence/guest-withdrawn.png

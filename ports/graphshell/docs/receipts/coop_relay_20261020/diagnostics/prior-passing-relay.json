@@ -1,0 +1,71 @@
+{
+  "exit": 0,
+  "sha256": "9a3d57c1ab0f65a60615190e487372ababe649bd4984e003f1c91be782b4ae08",
+  "events": [
+    {
+      "at_ms": 1792553726471,
+      "event": "ready",
+      "pid": 2221317,
+      "url": "http://192.168.4.32:38395/"
+    },
+    {
+      "accepts": 0,
+      "at_ms": 1792553726478,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 0,
+      "event": "snapshot",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2221317
+    },
+    {
+      "at_ms": 1792553754968,
+      "connection": "ConnectionId(0)",
+      "endpoint": "ad18c4517c41c7600df35b1d90f1e10f1b84861c4332636547a1ad7f6dcbe19c",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553759428,
+      "connection": "ConnectionId(1)",
+      "endpoint": "1c02bd88279f79b392a9986bff7b68689d41f8cff2e6b9487132456119ae02fe",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553768193,
+      "connection": "ConnectionId(2)",
+      "endpoint": "1c02bd88279f79b392a9986bff7b68689d41f8cff2e6b9487132456119ae02fe",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553779648,
+      "connection": "ConnectionId(3)",
+      "endpoint": "ad18c4517c41c7600df35b1d90f1e10f1b84861c4332636547a1ad7f6dcbe19c",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553784799,
+      "connection": "ConnectionId(4)",
+      "endpoint": "1c02bd88279f79b392a9986bff7b68689d41f8cff2e6b9487132456119ae02fe",
+      "event": "connect"
+    },
+    {
+      "accepts": 5,
+      "at_ms": 1792553793624,
+      "bytes_recv": 111195,
+      "bytes_sent": 111123,
+      "disconnects": 5,
+      "event": "final",
+      "packets_recv": 193,
+      "packets_sent": 191,
+      "pid": 2221317
+    },
+    {
+      "at_ms": 1792553793628,
+      "event": "stopped",
+      "pid": 2221317
+    }
+  ],
+  "bind": "192.168.4.32:0",
+  "binary": "/home/markik/Code/output/graphshell-coop-relay-20261020/relay-frozen-04/relay"
+}

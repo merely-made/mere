@@ -1,0 +1,12 @@
+[
+  {
+    "command": "CARGO_BUILD_JOBS=3 cargo test --locked --offline -p script-rhai --lib command::tests",
+    "exit_code": 101,
+    "tests_passed": 3,
+    "tests_failed": 4,
+    "source_sha256": "768cd6d81d876663fd31983856f42c0431d07d8be6a1baaadc47f9af4fc91de9",
+    "failure": "Test fixture syntax: Rhai does not accept \\0 escapes or catch (_) names. Production adapter compiled successfully. Tool transcript contains raw compiler and test output.",
+    "raw_log_available_in_packet": false,
+    "scope": "Superseded test-fixture syntax failure; passing final suite in adapters-final."
+  }
+]

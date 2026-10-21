@@ -385,6 +385,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "apparatus-core"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6983,6 +6991,7 @@ dependencies = [
  "scenograph",
  "scenomise",
  "scenotime",
+ "script-rhai",
  "serde",
  "serde_json",
  "servitor",
@@ -7105,6 +7114,7 @@ dependencies = [
  "taproot",
  "tempfile",
  "tokio",
+ "url",
  "uuid",
 ]
 
@@ -9743,8 +9753,9 @@ name = "mere-apparatus"
 version = "0.0.1"
 dependencies = [
  "accesskit 0.25.1",
+ "apparatus-core",
  "mere-registry",
- "serde",
+ "serde_json",
  "tracing",
  "uxtree",
 ]
@@ -13452,9 +13463,11 @@ dependencies = [
  "seiche",
  "serde",
  "serde_json",
+ "state-witness",
  "tinct",
  "tracing",
  "uuid",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -15524,11 +15537,13 @@ name = "script-rhai"
 version = "0.0.1"
 dependencies = [
  "getrandom 0.3.4",
+ "hest 0.2.0",
  "inker",
  "libm",
  "rhai",
  "scenograph",
  "script-engine-api",
+ "serde_json",
  "wasm-bindgen",
 ]
 
@@ -15722,9 +15737,11 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_path_to_error",
+ "state-witness",
  "toml 0.8.23",
  "tracing",
  "uuid",
+ "wasm-bindgen",
  "wgpu",
 ]
 

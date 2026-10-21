@@ -1,0 +1,91 @@
+{
+  "source": "da805a080041b4f372621c04d6ec921694044eec",
+  "checks": [
+    {
+      "name": "final-mesquite",
+      "cwd": "/Users/markik/Code/repos/mere",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "mesquite",
+        "--lib"
+      ],
+      "source_revision": "da805a080041b4f372621c04d6ec921694044eec",
+      "exit_code": 0,
+      "elapsed_seconds": 13.21,
+      "finished_utc": "2026-10-21T03:59:04.945453+00:00",
+      "log": "final-mesquite.log.gz",
+      "compression": "gzip",
+      "raw_log_sha256": "3954710b0951293d77044767b647e0269e1bbd20a26820385787d93468acbeb4",
+      "stored_log_sha256": "3afe9f2f289891f9809a48a4cdba07d6865a6e80fcf674fdd99300c130ff7c61",
+      "suites": [
+        {
+          "passed": 39,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "final-commands",
+      "cwd": "/Users/markik/Code/repos/mere",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib",
+        "command",
+        "--",
+        "--test-threads=1"
+      ],
+      "source_revision": "da805a080041b4f372621c04d6ec921694044eec",
+      "exit_code": 0,
+      "elapsed_seconds": 23.55,
+      "finished_utc": "2026-10-21T03:59:15.281180+00:00",
+      "log": "final-commands.log.gz",
+      "compression": "gzip",
+      "raw_log_sha256": "08f275a02b6b45c1161713fc904178ef441c67936bfa891d59bf58bb05e99d3b",
+      "stored_log_sha256": "bc025d0da4cad9e764859a55ecdf0c5ed7be0e2df2af03cdb6bed4ca2825b3ea",
+      "suites": [
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "final-wasm",
+      "cwd": "/Users/markik/Code/repos/mere",
+      "command": [
+        "cargo",
+        "check",
+        "--manifest-path",
+        "ports/graphshell/web/Cargo.toml",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--locked",
+        "--offline"
+      ],
+      "source_revision": "da805a080041b4f372621c04d6ec921694044eec",
+      "exit_code": 0,
+      "elapsed_seconds": 6.59,
+      "finished_utc": "2026-10-21T03:58:58.326409+00:00",
+      "log": "final-wasm.log.gz",
+      "compression": "gzip",
+      "raw_log_sha256": "054aff1ca6ef92000cbbbc6dcafca795edeaaadb2a177cade7bceb87340c5928",
+      "stored_log_sha256": "9f625f6340e74ce85b54aab9f45cf923b62b0dd746ec130194bbab534c27a7c0",
+      "suites": []
+    }
+  ],
+  "counts_overlap_primary_qualification": true
+}

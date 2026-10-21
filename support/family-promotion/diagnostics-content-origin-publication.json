@@ -1,0 +1,23 @@
+{
+  "publication_merge": "7c9bc885eba8728d2994619d092ddc3a63220bca",
+  "implementation": "d5cad7b52",
+  "tested_basis": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "integrated_source_seal": "diagnostics-content-origin-source-integrated.json",
+  "tested_sources_and_manifests_unchanged": true,
+  "changed_seal_paths": [
+    "Cargo.lock"
+  ],
+  "lock_change": {
+    "package": "graphshell-mere 0.0.2",
+    "change": "Adds existing url dependency reference; package versions and all other package entries unchanged",
+    "sha256": "4c14cf927d8a4a6e8bc8da31500d50d7344876b815fcfd92f7202fdd6fa897e2"
+  },
+  "sealed_audit_registers_unchanged": true,
+  "whole_tree_preexisting_d2_errors": 40,
+  "changed_plan_d2_errors": [],
+  "git_diff_check": 0,
+  "new_test_cohort_claimed": false,
+  "retained_byte_cap": 10000000,
+  "diagnostics_retained_bytes_before_this_record": 1043031,
+  "isolated_outputs_created": []
+}

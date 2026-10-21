@@ -1,0 +1,117 @@
+{
+  "protocol": 1,
+  "base_commit": "a1f860d03210f0434a046aa46ee6351b24980feb",
+  "platform": "macOS-15.8.1-x86_64-i386-64bit-Mach-O",
+  "node_arch": "x64",
+  "node": "v26.12.0",
+  "wasm_bindgen": "wasm-bindgen 0.2.129",
+  "cases": {
+    "binding": {
+      "accepted_ticks": 600,
+      "witnesses": 600,
+      "native_sha256": "d1d91c1918fa613d157f81148bfbef070be3949e73767d187198a86ddf689037",
+      "wasm_sha256": "da2ebbaddae54d04506395847c28b8d14e0a622f027d4571cee18bb9d45f0d4e",
+      "executed_wasm_sha256": "7478257caf428b4216061af1815c3131230cf23483967f7a710adcb48418c66d",
+      "wasm_glue_sha256": "4ca2475a125fcee1cd5adb997802dfd895b76dab5d5a7e54e1374bbf0a460c0d",
+      "fixture_sha256": "22d7d2fe5a93b4dddf11f6752628cca6de47ef4d38ab5bd184f41226aa4db7ac",
+      "differences": {
+        "native_processes": null,
+        "wasm_processes": null,
+        "native_wasm": null
+      },
+      "controls": {
+        "dt-control-native": {
+          "position_divergence": {
+            "tick": 7,
+            "label": "position:amber/x-bits",
+            "left": 13859544967838438227,
+            "right": 8017892241343393635
+          },
+          "state_witness_divergence": {
+            "tick": 7,
+            "divergence": {
+              "label": "clock:elapsed-f64-bits",
+              "left": 18376027366781248631,
+              "right": 5412665435615815106
+            }
+          }
+        },
+        "dt-control-wasm": {
+          "position_divergence": {
+            "tick": 7,
+            "label": "position:amber/x-bits",
+            "left": 13859544967838438227,
+            "right": 8017892241343393635
+          },
+          "state_witness_divergence": {
+            "tick": 7,
+            "divergence": {
+              "label": "clock:elapsed-f64-bits",
+              "left": 18376027366781248631,
+              "right": 5412665435615815106
+            }
+          }
+        },
+        "unsupported-spec-native": {
+          "refused": "spec",
+          "exit": 1
+        },
+        "unsupported-spec-wasm": {
+          "refused": "spec",
+          "exit": 1
+        }
+      }
+    },
+    "occurrence": {
+      "accepted_ticks": 12,
+      "witnesses": 13,
+      "native_sha256": "760bf93d6b1b130c91b31f785c184483c005949a5f4752ac27a27b6b33a84178",
+      "wasm_sha256": "102934dbb0346721903ac0785e24fcc73694d45b267e99bce9e729b3db26bbd0",
+      "executed_wasm_sha256": "67df95d3eba6de1ff267b1bc5bfcbfe87bb50f60d98767d93c2b4dac2a33a1ee",
+      "wasm_glue_sha256": "074e661608ed66292cb4426dd8093a21d6565c7dac71ce9afa96759bc54e09ae",
+      "fixture_sha256": "759bf8abac8ef406db2e85180df444536b1285b2bf1e578dd420d9647b88ed37",
+      "differences": {
+        "native_processes": null,
+        "wasm_processes": null,
+        "native_wasm": null
+      },
+      "controls": {
+        "edge-free-native": {
+          "tick": 1,
+          "label": "position-bits:b",
+          "left": 15250609625816032923,
+          "right": 16497682078337015678
+        },
+        "edge-free-wasm": {
+          "tick": 1,
+          "label": "position-bits:b",
+          "left": 15250609625816032923,
+          "right": 16497682078337015678
+        },
+        "channels-refusal-native": {
+          "refused": "channels",
+          "exit": 1
+        },
+        "channels-refusal-wasm": {
+          "refused": "channels",
+          "exit": 1
+        },
+        "target-refusal-native": {
+          "refused": "dynamics.spec.target.arrangement",
+          "exit": 1
+        },
+        "target-refusal-wasm": {
+          "refused": "dynamics.spec.target.arrangement",
+          "exit": 1
+        }
+      }
+    }
+  },
+  "failures": [],
+  "qualified": true,
+  "limits": [
+    "Fresh-start replay for these fixtures on this native host and Node Wasm runtime.",
+    "No checkpoint restoration, cross-OS, browser UI, actor replay or consumer repin qualification.",
+    "Occurrence witnesses cover public positions, roles and source identities; Seiche witnesses also cover velocities and field time."
+  ]
+}

@@ -1,0 +1,7 @@
+{"at_ms":1792554772761,"event":"started","installed":false,"pid":87013,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792554772762,"creating":false,"event":"waiting-for-unlock","pid":87013,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792554773193,"event":"unlocked-at-start","pid":87013,"schema":"djinn.resident-events/v1"}
+{"agent":"/private/tmp/moa-xl_edhex/owner/agent.sock","app":"/private/tmp/moa-xl_edhex/owner/app.sock","at_ms":1792554773324,"browser":"/private/tmp/moa-xl_edhex/owner/browser.sock","event":"listening","pid":87013,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792554773325,"event":"ready","pid":87013,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792554776024,"event":"stopping","pid":87013,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792554776449,"event":"stopped","ok":true,"pid":87013,"reason":"stop intent","schema":"djinn.resident-events/v1"}

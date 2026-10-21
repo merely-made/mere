@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-20",
-  "basis": "24b0795382b1fc1fe72968cd5dbf27685c004e45",
-  "status": "flattened producer discovery qualified: 112 targeted native passes/five existing ignores and Wasm compile; full coordinates, provider/selector/read-only observation/lifetime/action migrations open; historical cohorts preserved",
+  "date": "2026-10-21",
+  "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "status": "contained semantic identity validation qualified: 122 targeted native passes/five existing ignores and Wasm compile; read-only observation, provider contracts, target generations, action vocabulary, full forward placement and issue/collector adoption remain open",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -193,14 +193,21 @@
     {
       "id": "diagnostics-render-projection-tree-and-coordinate-gap",
       "source": [
-        "crates/cambium/cambium-rootstock/src/owned_layout.rs:walk",
-        "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs:custom_leaf_nodes/local_coordinates",
-        "crates/cambium/cambium-rootstock/src/producer/registry.rs:prepare",
-        "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics"
+        "crates/cambium/cambium-rootstock/src/owned_layout.rs:painted_rect/ancestor_scroll",
+        "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs:scrolled_content_origin/local_coordinates",
+        "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics",
+        "crates/cambium/cambium-genet-web-host/src/mirror.rs:lower"
       ],
-      "status": "flattened discovery repaired; broader producer coordinate mapping remains open",
-      "evidence": "The old light-versus-flat discovery split is retired by shared flat_nodes and custom_leaf_key. Initial receiving controls cover nested shadow/assigned/fallback ownership, portable capture and headless sampled pixels. Render/input still use Genet content geometry while semantic children offset the projected slot rectangle; padding, transforms, scroll and clips need their own mapping/receiving gate.",
-      "why_deferred": "A full placement authority must map content coordinates through ancestor transforms, scroll, clips and shadow/slot ancestry into native AccessKit and ARIA. Discovery and axis-aligned samples do not establish those geometric guarantees."
+      "status": "flattened discovery and bounded border/padding origin repaired; full forward transform/clip and flat-ancestor mapping remains open",
+      "evidence": "Shared flat discovery and Genet content-box origin now serve producer receiving. Native/browser/action composition and sampled headless pixels receive pixel border/padding and existing scroll adjustment. No forward transform/path clipping or flattened ancestor placement query is established by this repair.",
+      "why_deferred": "The bounded border/padding origin repair is qualified. Full forward placement crosses Genet projection and both platform adapters; rebuilding transforms or polygon clipping in Mere would add a competing authority.",
+      "supplier_evidence": {
+        "revision": "6ef3cd37a785a395670d3b472fb3573665497f29",
+        "source": "genet/components/genet-livery/src/placement.rs:ElementGeometry/element_geometry",
+        "gap": "Content rect and inverse pointer mapping exist; forward semantic bounds/clip projection is not exposed. Ancestor collection uses dom.parent while paint traverses flat_children. Rootstock document observations and browser mirror keep untransformed boxes.",
+        "next_done_condition": "Supplier-owned forward mapping over actual flattened paint scopes, defined rectangular/path clipping behavior, and native/browser runtime receiving with padded, transformed, nested-scroll and shadow/slot controls.",
+        "evidence_level": "pinned-source inspection; broader geometry runtime receiving remains pending"
+      }
     },
     {
       "id": "diagnostics-flat-producer-discovery",
@@ -213,6 +220,42 @@
       "verification": "baseline browser semantic control passed while six producer discovery/capture/GPU controls failed; fixed controls pass including sampled headless RGBA readback, fallback rebinding, removal retirement, duplicate refusal before callbacks, window scope and native/browser action maps",
       "status": "repaired and qualified by 112 targeted native passes/five existing ignores and browser-host Wasm compile",
       "qualification": "diagnostics-flat-discovery-qualification.json; immutable source/manifest seal, executed native binary hashes, sampled headless GPU RGBA and portable/native/browser receiving; full coordinate/browser-runtime/human AT acceptance remains open"
+    },
+    {
+      "id": "diagnostics-producer-border-versus-content-origin",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/semantics.rs:add_producer_semantics",
+        "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs",
+        "crates/cambium/cambium-rootstock/src/producer.rs:ProducerNode::rect"
+      ],
+      "status": "repaired and qualified by 115 targeted native passes/five existing ignores and browser-host Wasm compile",
+      "evidence": "Producer textures and pointer coordinates use Genet content_box_rect through ElementGeometry; generated semantic children add their local coordinates to the border-box bounds, losing border/padding offsets.",
+      "authority": "Genet content-box interpretation plus existing Rootstock untransformed scroll observation",
+      "change": "Use the supplier content origin in the same existing scroll-adjusted observation space; clarify ProducerNode rect content-local contract. This does not qualify transforms/clips or flattened ancestor geometry.",
+      "verification": "Before-repair runtime gates fail by 12 layout pixels (24 browser CSS pixels at 2x scale); actual headless GPU samples already reach the correct content image. Three repaired controls pass for sampled pixels, nested/document scroll and browser relative boxes; native padded receiving fixture is part of final platform suite.",
+      "qualification": "diagnostics-content-origin-qualification.json; frozen integrated source/lock, executed native binary hashes, sampled headless GPU pixels, both scroll planes and native/browser receiving"
+    },
+    {
+      "id": "diagnostics-producer-semantic-identities",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/semantics.rs:reserve_producer_ids/add_producer_semantics",
+        "crates/cambium/cambium-rootstock/src/producer.rs:ProducerNode/ProducerAction"
+      ],
+      "authority": "One shared composition preflight for native publication, browser lowering and current-target admission",
+      "change": "Require unique child keys and per-child action IDs; reserve generated IDs against every base DOM and already accepted generated ID before mutating slot overrides, children or route maps. Refuse a whole invalid contribution and report ProducerSemanticIssue in the shared projection. Stable valid IDs and rendering are unchanged.",
+      "verification": "Three pre-repair runtime failures; seven repair controls cover native/browser maps, no dispatch, current declaration recovery/rejection, atomic node/action collision refusal, valid siblings, and stable reordered children with repeated action names across distinct keys.",
+      "status": "repaired and qualified by 122 targeted native passes/five existing ignores and browser-host Wasm compile",
+      "qualification": "diagnostics-identity-qualification.json; frozen source/lock, executed native binary hashes, native/browser receiving and actual current admission; per-read identity only"
+    },
+    {
+      "id": "diagnostics-false-pure-projection-comments",
+      "source": [
+        "crates/cambium/cambium-winit-a11y/src/lib.rs:project_tree",
+        "crates/cambium/cambium-rootstock/src/lib.rs:document_projection/Accessibility"
+      ],
+      "change": "Retire the false pure-read claim on native composition and the stale claim that browser publication lowers only the DOM projection. Document the actual DOM seed, shared contributed composition and mutable callback boundary.",
+      "verification": "Source trace across native project_tree_with_actions, browser plan and Rootstock project_semantics; documentation repair, not a purity guarantee.",
+      "status": "repaired; read-only provider migration remains open"
     }
   ],
   "ownership_migrations": [
@@ -270,6 +313,24 @@
       "audit_ids": [],
       "state": "shared flattened producer discovery repaired; geometry qualification remains open",
       "decision": "Genet owns flat-child selection; Rootstock shares one preorder traversal and key parser for producer discovery and semantic routing. Layout geometry still decides CSS visibility/suspension after discovery. This is not proof of arbitrary coordinate or target-lifetime equivalence."
+    },
+    {
+      "owner": "Genet placement and projection; Cambium native/browser consumers",
+      "status": "bounded content-origin repair qualified; forward bounds and flattened paint-scope migration open",
+      "gap": "ElementGeometry exposes inverse mapping with private matrix/clips, not a forward semantic mapping. DOM-parent ancestry does not establish correspondence to flattened shadow/slot paint scopes. Rectangular semantic bounds require an explicit policy for transformed/polygon-clipped coverage.",
+      "done_condition": "One supplier-owned forward placement query consumed by host composition and both platform lowerings; qualify real producer pixels/pointer mapping against semantic geometry across transforms, scroll, clips and shadow/slot ancestors."
+    },
+    {
+      "owner": "Sprigging/producer observation contracts and Rootstock read-only consumers",
+      "status": "open; mutable callbacks are explicit, not pure observations",
+      "source": [
+        "crates/cambium/sprigging/src/lib.rs:Leaf::accessibility",
+        "crates/cambium/cambium-rootstock/src/producer.rs:TextureProducer::semantics",
+        "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
+        "crates/cambium/mesquite/src/probe.rs:selector_target"
+      ],
+      "gap": "AppCtx/Harness and Taproot/Mesquite still read the DOM catalogue. Contributed reads require mutable callbacks; simply calling them through an immutable facade, or adding an unqualified cache, does not establish one read-only authority. ProducerSemanticIssue is returned by shared composition; platform convenience APIs and product collector integration do not yet expose that report.",
+      "done_condition": "Define a provider-owned observation boundary, qualify side-effect and target-lifetime rules, then adopt one contributed observation in AppCtx/Harness, selector resolution and diagnostics readers without a second role/name implementation."
     }
   ],
   "large_effect_followups": [
@@ -316,7 +377,7 @@
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Cross-window producer owners, reused provider/child keys, duplicate action IDs and generated hash collisions remain unqualified. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Producer discovery and semantics now share flat traversal. Generated semantic child bounds still do not consume the full content-origin/transform/clip placement authority, including shadow/slot ancestor mapping.",
+      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Within-read duplicate child keys/action IDs and generated-ID collisions now refuse the complete contribution before publication or admission. Cross-window producer owners and reused provider/child keys across generations remain unqualified; the stable hash is not a collision-free allocator or lifetime token. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Producer discovery and semantics now share flat traversal. The bounded content-origin repair uses Genet content-box interpretation in the existing untransformed scroll observation. Full forward transforms/clips and shadow/slot ancestor mapping still need supplier-owned placement and qualified platform lowering.",
       "gate": "Supplier-qualified neutral contributor contract, explicit observation/effect and target-lifetime rules, Hest-coordinated catalogue/invocation/result migration, and actual native/browser runtime receiving.",
       "why_deferred": "A supplier API and target lifecycle migration crosses products, platform adapters and command ownership; do not silently choose new identity or completion semantics in this repair slice."
     }
@@ -351,5 +412,7 @@
     "diagnostics-contributed-wasm.json",
     "diagnostics-contributed-qualification.json"
   ],
-  "flattened_discovery_qualification": "diagnostics-flat-discovery-qualification.json"
+  "flattened_discovery_qualification": "diagnostics-flat-discovery-qualification.json",
+  "content_origin_qualification": "diagnostics-content-origin-qualification.json",
+  "semantic_identity_qualification": "diagnostics-identity-qualification.json"
 }
