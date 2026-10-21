@@ -139,9 +139,16 @@ where
     OA: OptionalAction<Action> + 'static,
     F: Fn(&mut State, PointerClick) -> OA + 'static,
 {
+    let mark = mark.into();
+    let kind = match mark.as_str() {
+        "▤" => "read", "◇" => "map", "ⓘ" => "inspect", "↶" => "trail",
+        "⌕" => "search", "▥" => "tabs", "⌖" => "fit", _ => "custom",
+    };
+    let parts = (0..5).map(|part| el::<_, State, Action>("span", ())
+        .attr("class", format!("shell-icon-part shell-icon-part-{part}"))).collect::<Vec<_>>();
     shell_button(
         Box::new(el("span", (
-            el("span", mark.into()).attr("class", "shell-activity-mark").attr("aria-hidden", "true"),
+            el("span", parts).attr("class", format!("shell-activity-mark shell-mark-{kind}")).attr("aria-hidden", "true"),
             el("span", label.into()).attr("class", "shell-activity-caption"),
         )).attr("class", "shell-activity-content")),
         accessible_name.into(),
