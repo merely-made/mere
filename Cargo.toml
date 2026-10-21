@@ -382,7 +382,7 @@ layout-dom-api = { version = "=0.1.1", git = "https://github.com/merely-made/gen
 layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false }
 # Named genet-probe until genet 7baa554c (2026-09-14); same crate, new name.
-taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false }
+taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false, features = ["accesskit"] }
 genet-static-dom = { git = "https://github.com/merely-made/genet.git", branch = "main" }
 # The application half of the former `genet-host-api` — the settings
 # projection and the surface admission vocabulary. Genet's P1 split it out as

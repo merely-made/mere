@@ -439,31 +439,37 @@ where
         }])
     }
 
-    /// Resolve a semantic selector to the centre of the matching element,
+    /// Resolve a DOM semantic target to its physical centre. Generated action
+    /// buttons use `click_on`'s explicit route and have no invented pointer point.
     /// using the host's own live layout. The probe's independent re-layout is
     /// deliberately not used for coordinates: its font resolution can disagree
     /// with the shipping layout's, and a receipt must click where the real
     /// window actually painted the control.
     pub fn resolve(&self, selector: &Selector) -> Option<(f32, f32)> {
-        let node = self.resolve_node(selector)?;
-        self.painted_rect(node)
-            .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0))
+        match self.resolve_target(selector)? {
+            taproot::SemanticTarget::Dom(node) => self
+                .painted_rect(node)
+                .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0)),
+            taproot::SemanticTarget::Contributed(_) => None,
+        }
     }
 
-    /// The first element `selector` matches that is rendered and paints.
-    fn resolve_node(&self, selector: &Selector) -> Option<NodeId> {
-        let dom = self.runner().dom();
-        let dom_ref = dom.borrow();
+    fn resolve_target(&self, selector: &Selector) -> Option<taproot::SemanticTarget> {
         let layout = self.host.s.layout.as_ref()?;
-        let projection = cambium_rootstock::document_projection(
-            &cambium_rootstock::WindowDom::document(&dom_ref),
-            layout,
-            self.host.s.last_focus,
-        );
-        taproot::matching_prefer_exact_with_projection(&dom_ref, selector, &projection)
+        let projection = self.semantic_projection();
+        let dom = self.runner().dom();
+        let dom = dom.borrow();
+        let lookup = taproot::AccessKitLookup::new(&projection.tree, |id| projection.dom_node(id));
+        taproot::matching_prefer_exact_with_lookup(&dom, selector, &lookup)
             .into_iter()
-            .filter(|node| layout.rendered_visible(&*dom_ref, *node))
-            .find(|node| self.painted_rect(*node).is_some())
+            .find(|target| match target {
+                taproot::SemanticTarget::Dom(node) => {
+                    layout.rendered_visible(&*dom, *node) && self.painted_rect(*node).is_some()
+                },
+                taproot::SemanticTarget::Contributed(id) => {
+                    projection.produced_action(*id).is_some()
+                },
+            })
     }
 
     /// Move the cursor: hover restyle, Enter/Leave, captured-drag tracking.
@@ -504,10 +510,13 @@ where
     /// a test fails on the miss rather than on its consequence. The
     /// [`click_on`](Self::click_on) of the secondary button.
     pub fn right_click_on(&mut self, selector: &Selector) -> bool {
-        let Some((x, y)) = self.resolve(selector) else {
+        let Some(taproot::SemanticTarget::Dom(node)) = self.resolve_target(selector) else {
             return false;
         };
-        self.right_click_at(x, y);
+        let Some((x, y, width, height)) = self.painted_rect(node) else {
+            return false;
+        };
+        self.right_click_at(x + width / 2.0, y + height / 2.0);
         true
     }
 
@@ -546,8 +555,25 @@ where
     /// pane clips lands on whatever paints there; an element taller than its
     /// pane is clicked where it shows, not at its hidden centre.
     pub fn click_on(&mut self, selector: &Selector) -> bool {
-        let Some(node) = self.resolve_node(selector) else {
+        let Some(target) = self.resolve_target(selector) else {
             return false;
+        };
+        let node = match target {
+            taproot::SemanticTarget::Dom(node) => node,
+            taproot::SemanticTarget::Contributed(id) => {
+                let projection = self.semantic_projection();
+                let Some(action) = projection.produced_action(id) else {
+                    return false;
+                };
+                let result =
+                    self.host
+                        .apply_a11y_requests(&[cambium_rootstock::A11yRequest::produced(
+                            cambium_rootstock::A11yAction::Click,
+                            action.clone(),
+                        )]);
+                self.relayout();
+                return result == [cambium_rootstock::A11yDispatch::Dispatched];
+            },
         };
         self.host.s.pending_scroll.push(ScrollIntoView {
             node,

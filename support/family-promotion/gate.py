@@ -21,8 +21,11 @@ receipt = here / (name + '.json')
 if receipt.exists():
     raise SystemExit('Receipt exists; use a distinct gate name')
 env = os.environ.copy()
-env['CARGO_TARGET_DIR'] = r'C:\t\cargo-targets\mere'
-env['CARGO_BUILD_BUILD_DIR'] = r'C:\t\cargo-targets\mere\build'
+repo = env.get('MERE_AUDIT_TARGET_REPO', 'mere')
+if repo not in ('mere', 'genet'):
+    raise SystemExit('Only approved Mere/Genet target roots are supported')
+env['CARGO_TARGET_DIR'] = rf'C:\t\cargo-targets\{repo}'
+env['CARGO_BUILD_BUILD_DIR'] = env['CARGO_TARGET_DIR'] + r'\build'
 env['CARGO_BUILD_JOBS'] = '4'
 started = datetime.now(timezone.utc).isoformat()
 tail = deque(maxlen=240)

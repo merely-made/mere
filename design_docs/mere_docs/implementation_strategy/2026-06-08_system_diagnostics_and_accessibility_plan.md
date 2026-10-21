@@ -1,10 +1,86 @@
 # System Diagnostics and Accessibility Plan
 
+## Shared selector receiving, 2026-10-21
+
+**Status:** shared observation/selector receiving qualified on the sealed
+current family: 264 affected native tests, 46 supplier tests and 12 retained
+product tests pass, with seven existing ignores. Core browser, actual Graphshell
+and Distillery probe Wasm builds, embedding and resident lib/binary checks pass.
+Owner/target lifetime admission is the next migration. This continuation
+starts on Mere `3af00fc90`; the final receiving seal uses integrated main
+`5573500dc` and Genet `206b80c2d62`. It retains the 10 MB receipt cap
+and the existing Mere/Genet Cargo targets.
+
+Taproot owns one matcher over borrowed semantic lookup views. Its DOM adapter
+uses flattened traversal; its composed adapter reads the complete published
+semantic tree and skips hidden subtrees. Exact-name preference, supported role
+aliases, shallow class matching and DOM attribute filters retain their stated
+contracts. Generated semantic objects are distinct targets. They do not inherit
+arbitrary DOM attributes from the producer slot.
+
+Harness and Mesquite now read the existing shared contributed composition,
+including leaf-only roles and producer action buttons. DOM target coordinates
+retain the existing product hook. Virtual action buttons have no invented
+pointer or secondary-click route. Point-only queries may miss while an explicit
+semantic click is available; querying must not record a false interaction failure.
+Generated activation uses the owner-supplied
+`ProducedAction` through the existing host accessibility admission path. The
+Harness observes the dispatch result directly. Mesquite queues the request and
+checks an immutable routing acknowledgement before spending another scenario
+step. Producer refusal and a withdrawn offer are failures; queueing is not an
+application-completion claim. Requests made by post-dispatch hooks wait for a
+later drain rather than recursively consuming the semantic queue.
+
+The browser mirror's independent role-spelling table is retired. The optional
+`document-session-api/accesskit` bridge supplies the same spellings to Taproot
+and `genet-render`'s host export. Taproot's normal dependencies do not acquire a
+renderer. The default document contract remains neutral. This is a spelling
+bridge for existing contributor vocabulary, not a new universal semantic model.
+
+`support/family-promotion/diagnostics-selectors-qualification.json` records the
+final gates and their exact source. Temporary Cargo checkout/update attempts and
+the corrected scenario-test tick assumption remain preparation evidence. Normal
+scenario completion already takes another tick after the last command; this
+continuation makes no claim of repairing an existing last-step completion bug.
+
+This observation/selector slice does not bind an invocation to a provider life.
+Queued targets still use the existing DOM or `(slot, child, action)` identities.
+The next migration must audit platform tree/window identity, host queue disposal,
+provider replacement and key reuse before choosing lifetime tokens. Ordinary
+republication must keep valid targets, and replacement must refuse old requests.
+Broader Hest actions and full supplier-owned transform/scroll/clip placement
+remain subsequent gates. This receiving does not establish new headed, browser
+runtime, human AT or other external product acceptance.
+
+### Next: owner and target lifetime admission
+
+The native mapper rebuilds its maps before translating queued requests, and
+currently drops the platform request's target-tree field. Browser events carry
+resolved DOM or `(slot, child, action)` targets without a registration lifetime.
+`LeafRegistry::insert` replaces the boxed contributor at a key. Producer keys
+are unique within a description; the contract does not yet distinguish removal
+and replacement from an ordinary state update. Renderer registration identities
+exist, but are not automatically semantic target lifetimes.
+
+The next done-condition covers two DOM owners with colliding numeric IDs,
+window/provider replacement, removed-and-reintroduced child keys and disposal
+of queued acknowledgements. Old requests must be refused while current requests
+and ordinary republication remain valid. Audit actual caller replacement/update
+patterns before choosing tokens; do not allocate lifetimes from observation
+reads or substitute a global presentation revision. Native tree filtering must
+be qualified against the bridge's root/embedded-tree contract first.
+
+The native initial-install branch also sets its private installed guard after
+an error, preventing a later install retry in that object. This is separately
+tracked as a state/recovery gap, not new evidence of a successful native adapter.
+Transient failure, permanent unsupported status and bounded retry/fallback need
+an actual headed failure/recovery gate before a policy repair is claimed.
+
 ## Ordered ownership migrations, 2026-10-21
 
-**Status:** first migration provider/accessor foundation implemented on refreshed
-main `4232d5622`; current-cohort qualification is recorded below. Selector
-adoption remains open, so the first migration is not yet complete.
+**Foundation cohort:** provider/accessor work was implemented on refreshed main
+`4232d5622`. Its qualification below leaves selector adoption open at that basis;
+the later shared-selector continuation above records its own receiving gates.
 Proceed in order: read-only observations, target generations, broader actions,
 then supplier-owned forward geometry. Existing receipts retain their bases;
 this continuation keeps the 10 MB cap and reusable Cargo target.
@@ -68,15 +144,11 @@ the affected resident, retained-product and actual Graphshell Wasm gates on the
 merged basis. It supplements the original 537-test cohort rather than replacing
 its source seal or claiming a repeat of every unchanged family test.
 
-### Remaining ordered gates
+### Ordered gates and current disposition
 
-1. Finish selector adoption within the observation migration. The pinned Taproot
-   matcher accepts only `DocumentA11yProjection` and walks `dom_children`, while
-   contributed publication follows the flat tree. Add a supplier-owned read-only
-   semantic lookup and flat-tree traversal, then consume it in Mesquite and the
-   Harness. Preserve class/attribute matching and exact-name preference. Explicitly
-   distinguish generated producer targets from DOM targets; do not fabricate DOM
-   node IDs or maintain another role/name catalogue in Mere.
+1. The current shared observation/selector receiving is described above.
+   Other external product intake and registry publication remain separate;
+   neither is inferred from this shared-host qualification.
 2. Bind requests to the originating owner and target life. Receiving must refuse
    stale requests after window/session/provider/child replacement, while retaining
    valid targets across ordinary republication. Audit the actual platform queue
@@ -111,14 +183,11 @@ Repeated generated IDs cannot represent two distinct semantic objects. The
 existing FNV allocator is stable, not collision-proof; a HashMap insertion is
 not evidence of an unambiguous action binding.
 
-The read-only migration remains open: Sprigging `Leaf::accessibility` and
-`TextureProducer::semantics` require mutable callbacks, including wrapped
-`RefCell` access. `AppCtx`/Harness observations and Taproot/Mesquite selectors
-currently consume the read-only DOM projection, not the contributed catalogue.
-Changing that contract requires provider observation rules and consumer adoption;
-silently invoking mutable callbacks or caching them without lifetime rules would
-introduce another semantic authority. Forward geometry remains supplier-owned
-as described in the preceding content-origin cohort below.
+At this identity-validation cohort, contributor callbacks still required
+mutable access and selector observations still used the DOM seed. The later
+read-only foundation and selector receiving above supersede those gaps. The
+identity cohort's original test counts and source basis remain unchanged;
+target lifetimes and full forward geometry remain separate migrations.
 
 ### Repair and qualification
 
@@ -338,16 +407,13 @@ nonfinite or negative producer rectangles produce no accessibility bounds.
 
 ### Remaining ownership migrations
 
-- The contributor vocabulary is still AccessKit-shaped, with mutable callbacks.
-  Separate publication and admission reads can observe different state; no
-  observation-purity, transaction or atomic read/act contract is established.
-  Admission composes providers in the current window; this is not a provider
-  cache or presentation-revision authority.
-- `AppCtx::a11y_projection` and `Harness::a11y_projection` remain DOM-only
-  read-only observations; Mesquite selectors consume those roles/names, not
-  the contributed platform catalogue. A leaf-only slider role or generated
-  producer action is not thereby selectable. Migrating those readers requires
-  a defined read-only observation/snapshot contract instead of hidden mutation.
+- This original composition cohort left mutable callbacks and DOM-only selector
+  intake open. The later shared observation/selector receiving above resolves
+  those gaps. The contributor vocabulary remains AccessKit-shaped, and separate
+  reads are not an atomic read/act transaction or presentation-revision lease.
+- `a11y_projection` deliberately remains the DOM seed. Current consumers use
+  `semantic_projection` and the shared Taproot lookup for contributed roles and
+  actions; the narrow DOM API is not a second contributed catalogue.
 - Requests still lack originating document/window/session/revision lifetime
   tokens. Within-window duplicate producer DOM bindings now refuse; cross-window
   producer ownership, reused registry/child keys, duplicate semantic keys/action

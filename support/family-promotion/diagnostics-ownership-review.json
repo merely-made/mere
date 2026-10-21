@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
-  "status": "Read-only provider/accessor foundation qualified: 537 native passes/seven existing ignores, core and actual Graphshell Wasm compile, embedding and resident lib/binary checks. Selector adoption remains open within migration one; target lifetimes, broader actions and supplier geometry follow.",
+  "status": "Shared observation/selector receiving qualified on integrated main 5573500dc and Genet 206b80c2d62: 322 native tests across supplier, affected host suites and retained product; seven existing ignores. Three Wasm builds, embedding and resident compile pass. Target lifetimes, broader actions, forward geometry and external publication/receiving remain open.",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -275,9 +275,10 @@
         "crates/cambium/mesquite/src/clicks.rs",
         "crates/cambium/cambium-genet-winit-host/src/harness.rs:resolve_node"
       ],
-      "status": "source-confirmed receiving gap; full first observation migration remains open",
-      "evidence": "The pinned Taproot matcher accepts DocumentA11yProjection and walks dom_children. It cannot consume the AccessKit-shaped contributed catalogue, and its role matching does not follow the flat tree used by publication. AppCtx/Harness semantic_projection now expose the shared contributed observation but selector consumers still use the DOM seed.",
-      "gate": "Supplier-owned generic read-only semantic lookup and flat-tree selector traversal; then Mesquite/Harness adoption without another role/name implementation. Generated producer targets require explicit target/action delivery rather than inventing DOM NodeIds."
+      "status": "repaired and qualified; diagnostics-selectors-qualification.json",
+      "evidence": "Before-consumer runtime controls reproduce a missing leaf-only slider role in the Harness and a read-only point miss mutating the Probe failure verdict. Current consumers use Taproot borrowed views over shared contributed composition; exact native and Wasm receiving are named in diagnostics-selectors-qualification.json.",
+      "gate": "Supplier-owned generic read-only semantic lookup and flat-tree selector traversal; then Mesquite/Harness adoption without another role/name implementation. Generated producer targets require explicit target/action delivery rather than inventing DOM NodeIds.",
+      "change": "Taproot supplies borrowed document/composed lookup adapters, flat traversal, shared name/role preference and explicit DOM/contributed targets. Harness and Mesquite use the shared composition; generated actions route through existing host admission with a routing acknowledgement."
     },
     {
       "id": "diagnostics-release-family-split",
@@ -302,6 +303,50 @@
       "status": "source-confirmed control-flow lead; harmful runtime effect not yet reproduced",
       "evidence": "The loop sets dispatched=true after every admitted request, including ProducerDeclined, then invokes hover and after_dispatch. The returned result remains ProducerDeclined; this is not evidence of a false terminal-success report.",
       "gate": "Qualify declined-producer effects and owner invalidation requirements before deciding whether after_dispatch should run only after A11yDispatch::Dispatched. Do not conflate provider refusal, routing acceptance and application completion."
+    },
+    {
+      "id": "diagnostics-browser-selector-role-spelling-duplication",
+      "authority": "Optional document-session-api/accesskit spelling bridge",
+      "source": [
+        "genet/components/shared/document-session-api/src/a11y/accesskit_roles.rs",
+        "genet/components/taproot/lookup.rs",
+        "crates/cambium/cambium-genet-web-host/src/mirror.rs"
+      ],
+      "change": "Retire the independent browser role-spelling table; selectors and browser lowering share supported spellings while preserving semantic-only window/text/label distinctions. Taproot does not need a normal renderer dependency.",
+      "status": "repaired and qualified; diagnostics-selectors-qualification.json"
+    },
+    {
+      "id": "diagnostics-queued-semantic-action-acknowledgement",
+      "authority": "Existing Host current-target accessibility admission and dispatch",
+      "source": [
+        "crates/cambium/cambium-rootstock/src/host.rs:queue_a11y/drain_pointer",
+        "crates/cambium/mesquite/src/clicks.rs"
+      ],
+      "change": "Generated selector buttons use an explicit route and host-written routing acknowledgement, rather than a guessed pointer gesture or an unobserved queue-success claim. Callback-queued requests are not recursively drained.",
+      "verification": "Focused native controls cover decline, earlier-request mutation, post-dispatch queuing and actual lane completion; final family gate follows.",
+      "status": "qualified current-target admission and acknowledgements; originating-owner/provider-life binding remains migration two"
+    },
+    {
+      "id": "diagnostics-selector-read-miss-mutates-verdict",
+      "source": "crates/cambium/mesquite/src/probe.rs:selector_target",
+      "authority": "Read-only target query versus attempted interaction",
+      "change": "A point-only query no longer appends a failed-interaction record on a miss. Virtual action targets deliberately have no pointer point; scoped logical clicks still route through click_target and host admission. Actual click refusals and wheel failures remain reported by their operation paths.",
+      "verification": "Read-miss immutability and accepted/declined scoped last-action scenarios; before-consumer regression controls and final receiving follow.",
+      "status": "repaired and qualified; diagnostics-selectors-qualification.json"
+    },
+    {
+      "id": "diagnostics-native-target-tree-discarded",
+      "source": "crates/cambium/cambium-winit-a11y/src/lib.rs:sync_inner/map_request/map_parts",
+      "status": "source-confirmed ownership gap; foreign-tree runtime admission control pending",
+      "evidence": "Native bridge requests carry a target tree, but the Mere mapper forwards only action/data/target_node into freshly replaced maps. Public map_request similarly ignores the request tree. The surrounding root-only bridge contract must be checked before adding a refusal rule.",
+      "owner": "target lifetime migration; preserve tree/window origin rather than infer it from a numeric node ID"
+    },
+    {
+      "id": "diagnostics-native-a11y-install-state",
+      "source": "crates/cambium/cambium-winit-a11y/src/lib.rs:sync_inner",
+      "status": "source-confirmed failed-install retry/state gap; headed failure qualification remains open",
+      "evidence": "The initial install Err branch logs failure, then sets installed=true unconditionally. Later syncs call update rather than retry install. This does not establish a public false-success result, but a later valid tree or transient adapter recovery has no install retry in this object.",
+      "gate": "Classify permanent unsupported versus transient/invalid-tree failures, retain truthful state and bounded retry/fallback policy, then qualify an actual failed native installation and recovery. Do not replace this with an unconditional per-frame retry loop."
     }
   ],
   "ownership_migrations": [
@@ -368,14 +413,14 @@
     },
     {
       "owner": "Sprigging/producer observation contracts and Rootstock read-only consumers",
-      "status": "shared-borrow provider boundary and full AppCtx/Harness accessors implemented; selector and external receiver adoption remain open",
+      "status": "shared observation/accessor/selector receiving qualified; provider-neutral contracts and external receiving remain open",
       "source": [
         "crates/cambium/sprigging/src/lib.rs:Leaf::accessibility",
         "crates/cambium/cambium-rootstock/src/producer.rs:TextureProducer::semantics",
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Workspace Leaf/TextureProducer descriptions and composition now take shared borrows. Known Graphshell identity allocation moved to ContentSlot frame admission and activation no longer depends on a last-read map. DOM a11y_projection stays deliberately narrow; semantic_projection returns the same complete host composition and refusal report used by publication. Mesquite/Taproot selector consumers still use the DOM seed and need supplier lookup/traversal adoption. Shared receivers do not mechanically prove arbitrary third-party interior code pure or establish read/act atomicity.",
+      "gap": "The default DOM observation remains narrow. Harness/Mesquite now consume the shared contributed observation through Taproot. Shared receivers do not prove arbitrary third-party interior purity or read/act atomicity. Other external product callback adoption, registry publication and provider-neutral contracts remain separate.",
       "done_condition": "Define a provider-owned observation boundary, qualify side-effect and target-lifetime rules, then adopt one contributed observation in AppCtx/Harness, selector resolution and diagnostics readers without a second role/name implementation."
     },
     {
@@ -388,6 +433,12 @@
         "diagnostics-readonly-qualification.json",
         "diagnostics-readonly-resident-retained-cohort.json"
       ]
+    },
+    {
+      "owner": "Genet document-session-api/Taproot registry release",
+      "status": "Git-source receiving only; registry publication not attempted",
+      "gap": "The optional role-spelling feature and borrowed selector APIs are qualified on Genet 206b80c2d62. This does not establish availability in the existing registry releases.",
+      "gate": "Prepare coordinated supplier versions/dependency requirements and registry consumer receiving before publication; do not infer registry readiness from Git-source tests."
     }
   ],
   "large_effect_followups": [
@@ -434,7 +485,7 @@
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped. Prepared workspace descriptions now use shared borrows, but that is not a proof of arbitrary interior purity, atomic read/act behavior, caching or presentation-revision identity. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Within-read duplicate child keys/action IDs and generated-ID collisions now refuse the complete contribution before publication or admission. Cross-window producer owners and reused provider/child keys across generations remain unqualified; the stable hash is not a collision-free allocator or lifetime token. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness now offer the full contributed semantic_projection through read-only accessors; their a11y_projection API remains the DOM seed. Mesquite/Taproot selectors still consume that narrower seed; supplier lookup/traversal adoption remains part of the first migration. Producer discovery and semantics now share flat traversal. The bounded content-origin repair uses Genet content-box interpretation in the existing untransformed scroll observation. Full forward transforms/clips and shadow/slot ancestor mapping still need supplier-owned placement and qualified platform lowering.",
+      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped. Prepared workspace descriptions now use shared borrows, but that is not a proof of arbitrary interior purity, atomic read/act behavior, caching or presentation-revision identity. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Within-read duplicate child keys/action IDs and generated-ID collisions now refuse the complete contribution before publication or admission. Cross-window producer owners and reused provider/child keys across generations remain unqualified; the stable hash is not a collision-free allocator or lifetime token. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness now offer the full contributed semantic_projection through read-only accessors; their a11y_projection API remains the DOM seed. Harness/Mesquite now consume the contributed observation through the supplier lookup. Virtual action buttons use explicit admission and acknowledgement rather than a fabricated pointer target. Producer discovery and semantics now share flat traversal. The bounded content-origin repair uses Genet content-box interpretation in the existing untransformed scroll observation. Full forward transforms/clips and shadow/slot ancestor mapping still need supplier-owned placement and qualified platform lowering.",
       "gate": "Supplier-qualified neutral contributor contract, explicit observation/effect and target-lifetime rules, Hest-coordinated catalogue/invocation/result migration, and actual native/browser runtime receiving.",
       "why_deferred": "A supplier API and target lifecycle migration crosses products, platform adapters and command ownership; do not silently choose new identity or completion semantics in this repair slice."
     }
@@ -476,12 +527,12 @@
     {
       "order": 1,
       "subject": "read-only observations",
-      "status": "provider/accessor foundation and actual Knot/resident family repair qualified; supplier selector adoption and other external receivers remain open"
+      "status": "shared provider/accessor/selector receiving qualified; registry and other product intake remain separate"
     },
     {
       "order": 2,
       "subject": "target generations",
-      "status": "queued after first observation migration"
+      "status": "next: originating owner and target lifetime audit, including platform tree maps, provider/key replacement and queued acknowledgement disposal"
     },
     {
       "order": 3,
@@ -498,5 +549,17 @@
   "readonly_observation_basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
   "readonly_observation_integration_qualification": "diagnostics-readonly-integration-qualification.json",
   "readonly_observation_integration_basis": "d7fd54d71",
-  "integration_note": "Subsequent main authentication work intentionally receives Dramatis 7d498c27. The frozen 537-native cohort retained earlier suppliers; affected resident/product/Wasm integration gates supplement it without changing the semantic source seal."
+  "integration_note": "Subsequent main authentication work intentionally receives Dramatis 7d498c27. The frozen 537-native cohort retained earlier suppliers; affected resident/product/Wasm integration gates supplement it without changing the semantic source seal.",
+  "selector_qualification": "diagnostics-selectors-qualification.json",
+  "selector_basis": "5573500dc1678c542ee5f60827d523961a7b4fcb",
+  "selector_supplier": "206b80c2d6219cdefa2519a773197d4566f2d54c",
+  "investigated_leads": [
+    {
+      "id": "diagnostics-last-step-completion",
+      "disposition": "closed without production change",
+      "evidence": "diagnostics-selectors-receiving-prepare.json; corrected receiving-controls cohort",
+      "reason": "The test initially assumed completion on the acknowledgement turn. Taproot actually needs another scenario tick. Mesquite already waits for held clicks before ticking; the unchanged completion path is tested with a declined generated last action."
+    }
+  ],
+  "selector_initial_basis": "3af00fc90"
 }
