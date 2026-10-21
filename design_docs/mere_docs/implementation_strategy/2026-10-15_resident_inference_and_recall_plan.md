@@ -1759,3 +1759,27 @@ receipt does not promote those pending product gates to passes.
   retained-source/cold/foreign-space gate and measured recall comparison above
   pass; the receipt keeps the fixed fusion weakness and actual allocation costs
   visible. Existing lexical-only routes pass with embedding absent.
+
+- **2026-10-20, headed embedding continuation qualified on macOS.** The existing
+  ignored trained-model Turnstone fixture accepts an explicit local MiniLM
+  model directory and records the private projection's envelope and index
+  identity. The consumer gate uses ordinary retained captures and the Answers
+  surface, then a fresh product/resident pair and a new ask. Its additional
+  assertions require matching projection reuse, exact retained passages and
+  immutable historical sealed evidence. The default lexical fixture remains
+  independently selectable. Turnstone owns the headed receiving receipt.
+
+  Turnstone's `docs/receipts/embedding_recall_20261020/qualification.json` now
+  records two independent app/resident pairs with real MiniLM retrieval and
+  SmolLM2 GPU generation. Both headed phases pass, including exact saved-source
+  reading before resident startup, historical sealed evidence, and a new cold
+  ask whose envelope/index and passage identities match. All 13 native captures
+  and the archived public packet pass independent review/verification. The
+  projection is 384-dimensional, 3/4 KiB of allocated vector capacity when built/
+  reopened, and 11,784 persisted bytes under the 8 MiB owner ceiling. Seven
+  focused client tests and both existing resident routes pass. The test marker
+  now freezes a terminal admitted citation once; publisher disconnect still
+  withdraws live heads normally. The model artifact audit derives the canonical
+  configuration bytes admitted by ModelLibrary and compares ESP's consumed
+  config/tokenizer/weight digests. Broader source kinds and platforms remain
+  separately scoped; the earlier frozen ranking comparison is unchanged.

@@ -1499,9 +1499,57 @@ async fn serve_trained_model_for_headed_turnstone() {
         std::fs::write(&row_file, serde_json::to_vec(&row).unwrap()).unwrap();
         row
     };
+    // Optional embedding qualification uses the same ordinary headed fixture,
+    // source publication and private journal as trained lexical recall.
+    let embedding = std::env::var_os("DJINN_HEADED_EMBEDDING_DIR").map(|directory| {
+        assert!(cfg!(feature = "inference-embedding"));
+        assert!(
+            private_root.is_some(),
+            "embedding gate requires a retained root"
+        );
+        let file = output.join("embedding-model.json");
+        let model: eidetic::ManifestId = if phase == Some(1) {
+            serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap()
+        } else {
+            let directory = std::path::PathBuf::from(directory);
+            let path =
+                djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+            let mut store = muniment::RedbBackend::open(path).unwrap();
+            let model = pollster::block_on(eidetic::ModelLibrary::save_model_with_components(
+                &mut store,
+                "sentence-transformers/all-MiniLM-L6-v2",
+                "bert",
+                "Apache-2.0",
+                serde_json::from_slice(&std::fs::read(directory.join("config.json")).unwrap())
+                    .unwrap(),
+                &std::fs::read(directory.join("model.safetensors")).unwrap(),
+                &std::fs::read(directory.join("tokenizer.json")).unwrap(),
+                vec![],
+                vec![],
+                eidetic::PrivacyClass::LocalOnly,
+                eidetic::ProvenanceRecord::self_imported(
+                    "headed retained-source embedding qualification",
+                ),
+                eidetic::TrustEnvelope::self_asserted(),
+                eidetic::Timestamp::ZERO,
+            ))
+            .unwrap();
+            std::fs::write(&file, serde_json::to_vec(&model).unwrap()).unwrap();
+            model
+        };
+        distillery::inference::recall::EmbeddingRecallSettings {
+            provider: distillery::inference::recall::EmbeddingRecallProvider::Library {
+                model: model.to_string(),
+            },
+            max_index_bytes: 8 * 1024 * 1024,
+            lexical_weight: 1,
+            vector_weight: 1,
+            rrf_k: 60,
+        }
+    });
     let settings = OwnerSettings {
         inference: Some(InferenceLaneSettings {
-            embedding: None,
+            embedding: embedding.clone(),
             recall: distillery::inference::recall::RecallConfig {
                 max_passages: 1,
                 ..Default::default()
@@ -1631,6 +1679,20 @@ async fn serve_trained_model_for_headed_turnstone() {
                     )
                     .unwrap();
                 }
+                if phase == 1
+                    && !output.join("embedding-cold-ask.json").exists()
+                    && run.state == RunStateV1::Finished
+                    && run.recall.as_ref().is_some_and(|r| {
+                        !r.citations.is_empty()
+                            && r.embedding.as_ref().is_some_and(|e| e.cache == "reopened")
+                    })
+                {
+                    std::fs::write(
+                        output.join("embedding-cold-ask.json"),
+                        serde_json::to_vec_pretty(run).unwrap(),
+                    )
+                    .unwrap();
+                }
                 if run.state == RunStateV1::Cancelled && !output.join("cancelled.json").exists() {
                     std::fs::write(
                         output.join("cancelled.json"),
@@ -1672,7 +1734,23 @@ async fn serve_trained_model_for_headed_turnstone() {
                         .unwrap()
                         .cmp(b["record"]["run"].as_str().unwrap())
                 });
-                snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence}));
+                let projections = std::collections::BTreeMap::<String, serde_json::Value>::new();
+                #[cfg(feature = "inference-embedding")]
+                let mut projections = projections;
+                #[cfg(feature = "inference-embedding")]
+                for run in &runs.runs {
+                    if let Some(e) = run.recall.as_ref().and_then(|r| r.embedding.as_ref()) {
+                        let bytes = journal
+                            .load_embedding_projection(e.envelope, 8 * 1024 * 1024)
+                            .unwrap()
+                            .unwrap();
+                        assert_eq!(eidetic::ManifestId::of_blob(&bytes), e.index);
+                        let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+                        assert_eq!(value["envelope"]["space"]["dimensions"], 384);
+                        projections.insert(e.envelope.to_string(), serde_json::json!({"index":e.index,"envelope":value["envelope"],"persisted_bytes":bytes.len()}));
+                    }
+                }
+                snapshots.push(serde_json::json!({"phase":phase,"runs":runs,"evidence":evidence,"embedding_projections":projections}));
                 break;
             }
             assert!(
@@ -1708,6 +1786,74 @@ async fn serve_trained_model_for_headed_turnstone() {
         serde_json::to_vec_pretty(&receipt).unwrap(),
     )
     .unwrap();
+    if embedding.is_some() {
+        let first = snapshots[0]["runs"]["runs"].as_array().unwrap();
+        let warm = first.iter().find(|r| r["state"] == "finished").unwrap();
+        let cold = snapshots[1]["runs"]["runs"].as_array().unwrap();
+        let restored = cold.iter().find(|r| r["run"] == warm["run"]).unwrap();
+        assert_eq!(
+            restored, warm,
+            "cold reopen preserves the historical answer and exact citations"
+        );
+        let new = cold
+            .iter()
+            .find(|r| r["state"] == "finished" && r["run"] != warm["run"])
+            .unwrap();
+        assert_eq!(warm["recall"]["embedding"]["cache"], "built");
+        assert_eq!(new["recall"]["embedding"]["cache"], "reopened");
+        for field in ["envelope", "index"] {
+            assert_eq!(
+                new["recall"]["embedding"][field],
+                warm["recall"]["embedding"][field]
+            );
+        }
+        assert_eq!(new["recall"]["passages"], warm["recall"]["passages"]);
+        // The app has exited before these snapshots: its publisher withdraws
+        // live heads. Validate citation admission from the live observations,
+        // while comparing the immutable historical evidence below separately.
+        let live_warm: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(output.join("finished.json")).unwrap()).unwrap();
+        let live_cold: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(output.join("embedding-cold-ask.json")).unwrap())
+                .unwrap();
+        assert!(
+            !live_warm["recall"]["citations"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        assert!(
+            !live_cold["recall"]["citations"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(
+            live_warm["recall"]["passages"],
+            live_cold["recall"]["passages"]
+        );
+        assert_eq!(
+            snapshots[0]["embedding_projections"],
+            snapshots[1]["embedding_projections"]
+        );
+        let old = snapshots[0]["evidence"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["record"]["run"] == warm["run"])
+            .unwrap();
+        let restored = snapshots[1]["evidence"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["record"]["run"] == warm["run"])
+            .unwrap();
+        assert_eq!(
+            old, restored,
+            "historical sealed source and prompt evidence is immutable"
+        );
+        return;
+    }
     assert!(saw_stream && saw_pause);
     let first = &snapshots[0]["runs"]["runs"];
     let finished = first
