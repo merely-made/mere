@@ -1,0 +1,156 @@
+[
+  {
+    "capture": "private-before.png",
+    "sha256": "0cc79e97749ff89733e09ccb51a2298d5721fbcdab8dec992e42f4fd5c9a7871",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Ordinary owner view displays the private sibling and its owner-only address before co-op."
+  },
+  {
+    "capture": "existing-graph.png",
+    "sha256": "f0b4be1a906a5e4aba1916a0ba4074ac951fdd43ad285c3f753ad1952f8c09f4",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Ordinary owner view displays the chosen existing source before co-op is enabled."
+  },
+  {
+    "capture": "owner-existing.png",
+    "sha256": "2834c50784f232457394814c9a9b2e1e639e877ea5ff6af213bbe3ab813662d9",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Co-op controls reference the same existing graph and one original node."
+  },
+  {
+    "capture": "owner-invited.png",
+    "sha256": "d63f90d85c96445e6a26dbda5b8fb3b2579cb2c1ccc12f945c245898079fae58",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Chosen graph shows editor access for the named guest; graph remains the original source."
+  },
+  {
+    "capture": "owner-saw-guest.png",
+    "sha256": "e837cd8ce2276b17105e6cd54cae6095ae995c8b9f17272aa2709cf9571360b8",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner canvas now shows the guest source beside the original source."
+  },
+  {
+    "capture": "owner-private-during-coop.png",
+    "sha256": "01676566d5f6eb0dcce8aa225959d0e6212efaa83cef486428cc5b7c7dfd7ef3",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner switched to private sibling; co-op controls clear and ask for explicit graph choice."
+  },
+  {
+    "capture": "owner-returned-to-chosen.png",
+    "sha256": "0362ac6adf630c17e06269af81debf32482955fb61ba019af919be60b5009106",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Explicit return restores chosen graph, two sources and the same editor identity."
+  },
+  {
+    "capture": "owner-ordinary-push.png",
+    "sha256": "a59ea497975780dc4cb206fc809a651abb341b716905624557d084c60cce0480",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner canvas displays three sources and the new relationship from an ordinary resident write."
+  },
+  {
+    "capture": "owner-revoked.png",
+    "sha256": "8d07b5d45fd5a551931f854ce5a210b1d3d984f3252005eac1df23302c528977",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner panel shows revoked access and retains the guest-revised existing source."
+  },
+  {
+    "capture": "owner-cold-retained.png",
+    "sha256": "41593d5e2cb1221b1e424eb2a36525274fd95b627fd1e9415bafabce8592a5a6",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Fresh native owner window after both custodians restart retains three sources, relationship, guest title and revoked access."
+  },
+  {
+    "capture": "owner-cold-edited.png",
+    "sha256": "d84b7c2466427aebbbf5453749ebff66c72ddaed8874682057290a8beba50ebe",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner saves a fourth source while the persisted guest grant remains revoked."
+  },
+  {
+    "capture": "owner-cold-refused.png",
+    "sha256": "7897fdca58c41b0d9a5f4b5f03384e4379ad9067ec58ff390fd18027781c74e0",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Owner remains editable with four sources after the fresh guest has been refused."
+  },
+  {
+    "capture": "private-after.png",
+    "sha256": "1d136dd6c1545649810127e027799e2aca6b29ba2c4963ce7e0db738682100af",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Private sibling is visible with its original owner-only source after all co-op and cold-reopen phases."
+  },
+  {
+    "capture": "guest-start.png",
+    "sha256": "1b0e5e8b6e8d1ced91553299bb47693db3c5a2c70371ddb20afd5675f3166107",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Real Linux client already displays the admitted chosen existing source at its first capture."
+  },
+  {
+    "capture": "guest-joined.png",
+    "sha256": "7ea1dc63fc2a3bce8b9075dc6be849d2c2b82d91330c239a8679f5a2c5eb043c",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Guest canvas and editor panel show only the invited graph, with no owner sessions or archive."
+  },
+  {
+    "capture": "guest-added.png",
+    "sha256": "da76296939dd1f6bddbd513b05b1d6a2750df72d802eabce00c1d187621d259f",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Guest source appears and status reads Saved with owner acknowledgement; saved activity names the guest persona."
+  },
+  {
+    "capture": "guest-still-scoped.png",
+    "sha256": "d771239c1646562a8b388e5ada8d5a4704767b540d8b031a99ec0e1f830d168e",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Guest retains the chosen two-source graph while owner has switched to private sibling."
+  },
+  {
+    "capture": "guest-push.png",
+    "sha256": "44331be3b59329c18dd070ef728ddf5e180c813df143fc98fd6821d0be2dc523",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Guest receives the third source and relationship produced by ordinary owner APIs."
+  },
+  {
+    "capture": "guest-renamed.png",
+    "sha256": "a60f69ed4b6baabc172cfde6a6d99fd5a75a6d377da02d50772d40005c69c241",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Selected original source has the guest-revised title in canvas and record details; status confirms save acknowledgement and activity names the guest."
+  },
+  {
+    "capture": "guest-return.png",
+    "sha256": "8537fc9d7c8634d4e42839a741658fcfe7915a3570d6b738807fadbe006660cc",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Fresh guest process reads the three sources, relationship and revised title before revocation."
+  },
+  {
+    "capture": "guest-withdrawn.png",
+    "sha256": "446cd68e1bc83d2e707acb36e1d7c165ceb3f4af8221df6fd68844b229f79630",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Live guest clears graph and record content and shows unavailable after access ends."
+  },
+  {
+    "capture": "guest-cold-denied.png",
+    "sha256": "84f8259f10bdf448950c31dfe153f6e36ec0cb68b2b32c61806aa7c3402e28b5",
+    "reviewed": true,
+    "method": "Three inspected headed contact sheets; guest-renamed and guest-cold-denied also inspected individually at original resolution.",
+    "observation": "Fresh guest after both custodians restart has an empty canvas and record, with explicit Delegation(Revoked) refusal."
+  }
+]

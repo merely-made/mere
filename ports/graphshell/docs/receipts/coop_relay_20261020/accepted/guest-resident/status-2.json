@@ -1,0 +1,17 @@
+{
+  "schema": "djinn.resident-status/v1",
+  "pid": 2223317,
+  "started_ms": 1792554041727,
+  "installed": false,
+  "ready": true,
+  "startup_unlock": "passphrase",
+  "protection": "passphrase",
+  "lock": "unlocked",
+  "endpoints": {
+    "agent": "/home/markik/Code/output/tp-relay-20261020-04/guest/private/guest/agent.sock",
+    "agent_listener": "receipt",
+    "browser": "/home/markik/Code/output/tp-relay-20261020-04/guest/private/guest/browser.sock",
+    "app": "/home/markik/Code/output/tp-relay-20261020-04/guest/private/guest/app.sock"
+  },
+  "sync": null
+}
