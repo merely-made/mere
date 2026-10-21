@@ -1,0 +1,47 @@
+[
+  {
+    "attempt": "preflight-01",
+    "result": "rejected",
+    "cause": "ioreg Root plist returned a dict, not a list",
+    "fix": "normalize either plist shape before reading console state"
+  },
+  {
+    "attempt": "preflight-02",
+    "result": "bounded preflight passed",
+    "scope": "owner baseline headed captures and independent M4 custody/contact only; M4 screen was still locked"
+  },
+  {
+    "attempt": "gs-c2-20261020-01",
+    "result": "rejected",
+    "cause": "open -W returned 0 before native PID was available, controller ended run too soon",
+    "fix": "launch the owned bundle executable directly; assert actual native PID and exit status"
+  },
+  {
+    "attempt": "gs-c2-20261020-02",
+    "result": "rejected",
+    "cause": "guest connection timed out; no completed guest receipt",
+    "fix": "add early guest capture and isolate underlying carrier"
+  },
+  {
+    "attempt": "gs-c2-20261020-03",
+    "result": "rejected",
+    "cause": "diagnostic native guest reported projection carrier backend connect timeout; minimal Murm round trip also failed",
+    "observations": [
+      "192.168.4.58 and 192.168.4.68 exchanged UDP in both directions, including 1250 byte payloads",
+      "Filtering ticket to one LAN candidate did not fix timeout",
+      "macOS ALF logged unsigned Intel probe PID 30236: Designated requirement not obtained for flow, dropping flow",
+      "Ad-hoc signing exposed a native firewall permission prompt; user allowed the test app"
+    ],
+    "fix": "freeze ad-hoc signed native bundles and executables, preserve hashes, and rerun all phases with fresh profiles"
+  },
+  {
+    "attempt": "gs-c2-20261020-04",
+    "result": "accepted",
+    "candidate": "frozen-05",
+    "captures": 22,
+    "native_processes": 7,
+    "custodian_launches": 4,
+    "carrier": "active direct 192.168.4.68:56242",
+    "permission": "User allowed test app through macOS prompt; agent did not change firewall policy or use a personal signing identity"
+  }
+]

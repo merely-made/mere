@@ -1,0 +1,8 @@
+{
+  "accepted_cohort": "gs-c2-20261020-04",
+  "owner_owned_subjects_remaining": [],
+  "guest_owned_subjects_remaining": [],
+  "native_and_custodian_exit": "All seven native exits and four ordinary custodian stop events passed in the controller and verifier. Independent ps check found no accepted subjects remaining.",
+  "checkout_scope": "Task source worktrees only; primary working files were not edited by this task. Remote primary remains at 8ab6f2f0 with separate active work.",
+  "ssh": "Task-owned control master retained only through publication, then closed. No forwarding or personal agent forwarding."
+}
