@@ -197,6 +197,7 @@ fn the_territory_field_claims_ground_by_site_beneath_the_graph() {
     }
     canvas.set_physics_paused(true);
     canvas.set_territory_field(true);
+    canvas.set_camera(crate::canvas::CameraView { offset: (400.0, 300.0), zoom: 1.0 });
     canvas.frame(VIEW.0, VIEW.1);
     let runs = canvas.territory_runs();
     let mut domains: Vec<usize> = runs.iter().map(|r| r.domain).collect();
@@ -211,6 +212,37 @@ fn the_territory_field_claims_ground_by_site_beneath_the_graph() {
     assert_eq!(canvas.territory_commands().len(), runs.len());
     crate::canvas::controls::CanvasCommand::ToggleTerritory.apply(&mut canvas, VIEW);
     assert!(!canvas.territory_field());
+}
+
+#[test]
+fn territory_fills_the_current_view_after_pan_zoom_rotation_and_resize() {
+    let (mut canvas, _) = canvas();
+    canvas.set_physics_paused(true);
+    let snapshot = serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap();
+    canvas.set_territory_field(true);
+    for (w, h, yaw, zoom) in [(1200, 300, 0.0, 0.4), (300, 900, 0.7, 2.0)] {
+        canvas.resize(w, h);
+        let mut view = canvas.viewport();
+        view.offset = (-700.0, 400.0);
+        view.zoom = zoom;
+        view.yaw = yaw;
+        view.tilt = 0.6;
+        canvas.set_viewport(view);
+        let runs = canvas.territory_runs();
+        let area: f64 = runs
+            .iter()
+            .map(|r| f64::from(r.max.x - r.min.x) * f64::from(r.max.y - r.min.y))
+            .sum();
+        assert!(
+            (area - f64::from(w) * f64::from(h)).abs() < 0.1,
+            "viewport must have no uncovered strip"
+        );
+        assert_eq!(canvas.territory_commands().len(), runs.len());
+    }
+    assert_eq!(
+        snapshot,
+        serde_json::to_value(canvas.graph().to_snapshot_at(0)).unwrap()
+    );
 }
 
 #[test]

@@ -19,7 +19,8 @@ use paint_list_api::{ColorF, CommonPlacement, LayoutPoint, LayoutRect, PaintCmd,
 
 use super::Canvas;
 
-/// Grid columns across the claimed ground; rows follow the aspect.
+/// Maximum cells on either grid axis. The shorter axis follows the aspect,
+/// bounding the number of samples even for a very tall or wide viewport.
 const COLUMNS: usize = 48;
 /// The three tiers' fill alphas (`--g-tier-1…3`).
 pub const TIER_ALPHA: [f32; 3] = [0.06, 0.11, 0.17];
@@ -27,7 +28,9 @@ pub const TIER_ALPHA: [f32; 3] = [0.06, 0.11, 0.17];
 /// rows × nodes each frame.
 pub const MAX_TERRITORY_NODES: usize = 2000;
 
-/// One run of grid cells in world space that one domain claims at one tier.
+/// One run of grid cells in the sampling plane, claimed by one domain.
+/// [`territory`] returns world coordinates; the canvas samples its viewport
+/// in screen coordinates while measuring claims through the inverse camera.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct TerritoryRun {
     pub min: PortablePoint,
@@ -51,20 +54,51 @@ pub fn territory(sites: &[(PortablePoint, usize)], margin: f32, unit: f32) -> Ve
         (x0, y0, x1, y1) = (x0.min(p.x), y0.min(p.y), x1.max(p.x), y1.max(p.y));
     }
     let (x0, y0, x1, y1) = (x0 - margin, y0 - margin, x1 + margin, y1 + margin);
-    let cell = ((x1 - x0) / COLUMNS as f32).max(f32::EPSILON);
-    let rows = ((y1 - y0) / cell).ceil().max(1.0) as usize;
+    territory_in_rect(sites, [x0, y0, x1, y1], unit, |x, y| (x, y))
+}
+
+fn territory_in_rect(
+    sites: &[(PortablePoint, usize)],
+    [x0, y0, x1, y1]: [f32; 4],
+    unit: f32,
+    to_world: impl Fn(f32, f32) -> (f32, f32),
+) -> Vec<TerritoryRun> {
+    let (width, height) = (x1 - x0, y1 - y0);
+    if sites.is_empty()
+        || !width.is_finite()
+        || !height.is_finite()
+        || width <= 0.0
+        || height <= 0.0
+    {
+        return Vec::new();
+    }
+    let cell = width.max(height) / COLUMNS as f32;
+    let columns = (width / cell).ceil().clamp(1.0, COLUMNS as f32) as usize;
+    let rows = (height / cell).ceil().clamp(1.0, COLUMNS as f32) as usize;
     let unit = unit.max(f32::EPSILON);
     let domains = sites.iter().map(|(_, d)| d + 1).max().unwrap_or(1);
     let mut best = vec![f32::INFINITY; domains];
     let mut runs: Vec<TerritoryRun> = Vec::new();
     for row in 0..rows {
-        let y = y0 + (row as f32 + 0.5) * cell;
+        let bottom = if row + 1 == rows {
+            y1
+        } else {
+            (y0 + (row + 1) as f32 * cell).min(y1)
+        };
+        let top = y0 + row as f32 * cell;
+        let y = (top + bottom) * 0.5;
         let mut open: Option<TerritoryRun> = None;
-        for column in 0..COLUMNS {
-            let x = x0 + (column as f32 + 0.5) * cell;
+        for column in 0..columns {
+            let left = x0 + column as f32 * cell;
+            let right = if column + 1 == columns {
+                x1
+            } else {
+                (x0 + (column + 1) as f32 * cell).min(x1)
+            };
+            let (x, y) = to_world((left + right) * 0.5, y);
             let claim = claim_at(sites, x, y, unit, &mut best);
-            let lo = PortablePoint::new(x0 + column as f32 * cell, y0 + row as f32 * cell);
-            let hi = PortablePoint::new(lo.x + cell, lo.y + cell);
+            let lo = PortablePoint::new(left, top);
+            let hi = PortablePoint::new(right, bottom);
             match (&mut open, claim) {
                 (Some(run), (domain, tier)) if run.domain == domain && run.tier == tier => {
                     run.max = hi;
@@ -131,8 +165,9 @@ impl Canvas {
         self.territory_field
     }
 
-    /// The field's runs for the current positions, domains as sites in
-    /// sorted order (so a domain keeps its colour).
+    /// Cover the entire visible viewport. Runs are in screen coordinates;
+    /// nearest-domain distances are measured in world coordinates, so pan,
+    /// zoom and camera rotation retain the same underlying spatial field.
     pub(crate) fn territory_runs(&mut self) -> Vec<TerritoryRun> {
         if !self.territory_field || self.graph.nodes().count() > MAX_TERRITORY_NODES {
             return Vec::new();
@@ -153,20 +188,26 @@ impl Canvas {
             })
             .collect();
         let body = seiche::NODE_BODY_RADIUS;
-        territory(&placed, body * 6.0, body * 2.0)
+        territory_in_rect(
+            &placed,
+            [0.0, 0.0, self.view_w as f32, self.view_h as f32],
+            body * 2.0,
+            |x, y| {
+                let world = self.screen_to_world((x, y));
+                (world.x, world.y)
+            },
+        )
     }
 
     pub(crate) fn territory_commands(&mut self) -> Vec<PaintCmd> {
         self.territory_runs()
             .into_iter()
             .map(|run| {
-                let (ax, ay) = self.camera.to_screen(run.min);
-                let (bx, by) = self.camera.to_screen(run.max);
                 let (r, g, b) = self.category_rgb(run.domain);
                 PaintCmd::DrawRect(RectItem {
                     placement: CommonPlacement::new(LayoutRect::new(
-                        LayoutPoint::new(ax.min(bx), ay.min(by)),
-                        LayoutPoint::new(ax.max(bx), ay.max(by)),
+                        LayoutPoint::new(run.min.x, run.min.y),
+                        LayoutPoint::new(run.max.x, run.max.y),
                     )),
                     color: ColorF::new(r, g, b, TIER_ALPHA[run.tier as usize - 1]),
                 })
@@ -178,6 +219,47 @@ impl Canvas {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn viewport_sampling_covers_all_edges_and_stays_bounded_at_extreme_aspects() {
+        let sites = [
+            (PortablePoint::new(-2000.0, 0.0), 0),
+            (PortablePoint::new(2000.0, 0.0), 1),
+        ];
+        for (width, height) in [(1200.0, 300.0), (90.0, 900.0), (1.0, 10000.0)] {
+            let runs = territory_in_rect(&sites, [0.0, 0.0, width, height], 20.0, |x, y| (x, y));
+            assert!(runs.len() <= COLUMNS * COLUMNS);
+            let area: f64 = runs
+                .iter()
+                .map(|r| f64::from(r.max.x - r.min.x) * f64::from(r.max.y - r.min.y))
+                .sum();
+            assert!((area - f64::from(width) * f64::from(height)).abs() < 0.1);
+            assert!(runs.iter().all(|r| r.min.x >= 0.0
+                && r.min.y >= 0.0
+                && r.max.x <= width
+                && r.max.y <= height));
+            assert!(runs.iter().any(|r| r.max.x == width && r.max.y == height));
+        }
+    }
+
+    #[test]
+    fn viewport_sampling_measures_claims_through_the_inverse_camera() {
+        let sites = [
+            (PortablePoint::new(-100.0, 0.0), 0),
+            (PortablePoint::new(100.0, 0.0), 1),
+        ];
+        let runs = territory_in_rect(&sites, [0.0, 0.0, 800.0, 600.0], 20.0, |x, y| {
+            (x - 600.0, y - 300.0)
+        });
+        for (x, domain) in [(100.0, 0), (550.0, 0), (700.0, 1)] {
+            let run = runs
+                .iter()
+                .find(|r| r.min.x <= x && x < r.max.x && r.min.y <= 300.0 && 300.0 < r.max.y)
+                .unwrap();
+            assert_eq!(run.domain, domain);
+        }
+        assert!(territory_in_rect(&sites, [0.0; 4], 20.0, |x, y| (x, y)).is_empty());
+    }
 
     #[test]
     fn each_domain_claims_its_side_most_clearly_far_from_the_border() {
