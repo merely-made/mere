@@ -5,11 +5,15 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Portable native-site manifests and the canonical published snapshot V1.
+
 //!
 //! This is the shared data contract for authoring and resident consumers. It owns
 //! validation, exact bytes and content identity. Hosts supply file access,
 //! publication authority, storage, protocol adapters and execution lifetimes.
 //! V1 field order, native metadata and limits are preserved from Knot.
+
+#[cfg(feature = "history")]
+pub mod history;
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
