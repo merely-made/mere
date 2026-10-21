@@ -1783,3 +1783,26 @@ receipt does not promote those pending product gates to passes.
   configuration bytes admitted by ModelLibrary and compares ESP's consumed
   config/tokenizer/weight digests. Broader source kinds and platforms remain
   separately scoped; the earlier frozen ranking comparison is unchanged.
+
+- **2026-10-20, retained-clip receiving fixture continuation in progress.**
+  The existing real-model process fixture accepts optional
+  `DJINN_HEADED_CLIP_CUSTODY`, a marked synthetic wallet root, and registers the
+  ordinary custody route on the same broker as inference. Each process binds
+  the persisted wallet through Keeper; Turnstone receives no fallback key. The
+  default capture-only fixture and lexical routes retain their prior behavior.
+  Turnstone owns the new Knot-selection/Redshank-text receiving packet and
+  independent product/resident cold gates.
+
+  The short Knot receiving probe exposed a generation-context defect: the
+  opaque source tuple dominated a four-scalar passage and was repeated by the
+  small model. The formatter now sends the numeric handle and exact passage
+  text to generation. Full source/version/hash/Unicode-selector identity stays
+  in `SuppliedPassage`, its passage ID and the sealed run evidence; citation
+  admission still rechecks that evidence and current owner heads. This changes
+  generation context, not the embedding envelope or selected body. A short
+  Unicode regression checks both content presentation and retained authority.
+
+  Focused gates pass: 14 recall/embedding cases and both ordinary resident
+  app-route cases. The real-model process fixture compiles with GPU and
+  embedding enabled. Turnstone pin refresh and new native receiving/cold
+  qualification remain in progress; the earlier capture-only receipt is frozen.

@@ -13,6 +13,9 @@ use scenomise::projection::{
 };
 use seiche::Role;
 
+#[path = "../../examples/support/occurrence_replay.rs"]
+mod occurrence_replay_harness;
+
 fn fixture() -> (ProjectionDefinition, CompiledRelationshipProjection) {
     let source = SourceBinding {
         authority: "fixture".into(),
@@ -181,6 +184,77 @@ fn repeated_source_occurrences_take_independent_roles_and_fixed_tick_is_reproduc
     assert!(a.scene().items.iter().all(
         |item| item.transform.translate.x.is_finite() && item.transform.translate.y.is_finite()
     ));
+}
+
+#[test]
+fn serialized_occurrence_case_is_shared_with_the_native_and_wasm_replay_harness() {
+    let input = occurrence_replay_harness::canonical_case().unwrap();
+    let first: serde_json::Value =
+        serde_json::from_str(&occurrence_replay_harness::run(&input).unwrap()).unwrap();
+    let second: serde_json::Value =
+        serde_json::from_str(&occurrence_replay_harness::run(&input).unwrap()).unwrap();
+    assert_eq!(first, second);
+    assert_eq!(first["relationship_ids"], serde_json::json!(["rhyme:a-b"]));
+    assert_eq!(first["ticks"], 12);
+
+    let mut edge_free: serde_json::Value = serde_json::from_str(&input).unwrap();
+    edge_free["include_relationships"] = serde_json::json!(false);
+    let edge_free: serde_json::Value =
+        serde_json::from_str(&occurrence_replay_harness::run(&edge_free.to_string()).unwrap())
+            .unwrap();
+    assert_eq!(edge_free["relationship_ids"], serde_json::json!([]));
+    let linked_trace: state_witness::Trace =
+        serde_json::from_value(first["trace"].clone()).unwrap();
+    let edge_free_trace: state_witness::Trace =
+        serde_json::from_value(edge_free["trace"].clone()).unwrap();
+    let divergence = state_witness::first_trace_divergence(&linked_trace, &edge_free_trace)
+        .expect("the disclosed spring edge changes the replay");
+    assert!(
+        divergence
+            .divergence
+            .as_ref()
+            .unwrap()
+            .label
+            .starts_with("position-bits:"),
+        "{divergence:?}"
+    );
+
+    let mut named_channel: serde_json::Value = serde_json::from_str(&input).unwrap();
+    let mut spec: serde_json::Value =
+        serde_json::from_str(named_channel["spec"].as_str().unwrap()).unwrap();
+    spec["channels"] = serde_json::json!({"mass":"mass.planet"});
+    named_channel["spec"] = serde_json::json!(spec.to_string());
+    assert!(
+        occurrence_replay_harness::run(&named_channel.to_string())
+            .unwrap_err()
+            .contains("channels")
+    );
+
+    let mut wrong_arrangement: serde_json::Value = serde_json::from_str(&input).unwrap();
+    let mut spec: serde_json::Value =
+        serde_json::from_str(wrong_arrangement["spec"].as_str().unwrap()).unwrap();
+    spec["target"] = serde_json::json!({"arrangement":"arrangement.unsupported"});
+    wrong_arrangement["spec"] = serde_json::json!(spec.to_string());
+    assert!(occurrence_replay_harness::run(&wrong_arrangement.to_string()).is_err());
+
+    let mut pinned_default: serde_json::Value = serde_json::from_str(&input).unwrap();
+    let mut spec: serde_json::Value =
+        serde_json::from_str(pinned_default["spec"].as_str().unwrap()).unwrap();
+    spec["target"] = serde_json::json!({"arrangement":"grid.default", "default_role":"pinned"});
+    pinned_default["spec"] = serde_json::json!(spec.to_string());
+    pinned_default["tick_batches"] = serde_json::json!([1]);
+    let output: serde_json::Value =
+        serde_json::from_str(&occurrence_replay_harness::run(&pinned_default.to_string()).unwrap())
+            .unwrap();
+    let trace: state_witness::Trace = serde_json::from_value(output["trace"].clone()).unwrap();
+    assert_eq!(
+        trace.get(0).unwrap().get("role:b"),
+        Some(state_witness::hash_value("pinned").unwrap())
+    );
+    assert_eq!(
+        trace.get(0).unwrap().get("role:repeat"),
+        Some(state_witness::hash_value("seeded").unwrap())
+    );
 }
 
 #[test]
