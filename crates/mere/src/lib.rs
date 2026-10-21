@@ -47,6 +47,8 @@ pub use platen;
 #[cfg(feature = "graph")]
 pub mod roster;
 #[cfg(feature = "graph")]
+pub mod navigation;
+#[cfg(feature = "graph")]
 pub mod trail;
 #[cfg(feature = "workbench")]
 pub use workbench;
