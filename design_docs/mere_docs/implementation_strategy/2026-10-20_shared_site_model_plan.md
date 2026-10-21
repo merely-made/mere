@@ -1,7 +1,7 @@
 # Shared site model extraction
 
 **Status (2026-10-21):** extraction and optional saved-site revision storage
-landed. The optional Moot publication binding is in qualification, with Gemini,
+landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
 
 ## Scope and ownership
@@ -67,7 +67,7 @@ policy remain in Knot and Djinn respectively.
 
 ## Moot publication binding (2026-10-21)
 
-**Status:** qualified locally; integration in progress. Gemini, Scroll and
+**Status:** landed and qualified on integrated main. Gemini, Scroll and
 Micron are the first profiles.
 Optional `mere-site/publication` composes existing Gemot and Eidetic owners;
 the default model and local checkpoint feature stay independent.
@@ -180,3 +180,14 @@ the default model and local checkpoint feature stay independent.
   after author handles are dropped; signed community facts are admitted to a
   separate in-process replica. This does not claim a new OS-process, network or
   two-machine serving receipt. No supplier repins are required.
+- 2026-10-21: source `943f3f564` is integrated and pushed on Mere main, preserving
+  the concurrent root dependency and diagnostics work. The locked receiving
+  gate passes 14 tests and the retention doctest with map ordering enabled;
+  strict no-deps Clippy also passes on the supplier. Gemot's owner plan records
+  the boundary at `6485b8c`. [Qualification](../../../support/receipts/shared-site-publication/qualification.json)
+  and [integration](../../../support/receipts/shared-site-publication/integration.json)
+  retain exact scopes. The temporary worktree and branch are removed. Cargo-home
+  cache junctions are removed; automatic approval review rejected deletion of
+  its 110,906 metadata bytes as "blocked by policy." No isolated target remains.
+  Live protocol serving and peer acquisition, host revalidation/revocation,
+  actor wiring and cross-Moot signed publication lineage stay open.
