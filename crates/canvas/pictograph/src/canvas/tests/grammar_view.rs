@@ -109,7 +109,13 @@ fn retained_and_suggested_nodes_carry_their_marks() {
         ..Default::default()
     });
     canvas.set_suggested_members([id(&canvas, keys[4])]);
-    canvas.frame(800, 600);
+    let (scene, _) = canvas.frame(800, 600);
+    assert_eq!(
+        canvas.last_translation_error(),
+        None,
+        "a retained-node decoration must not refuse the graph scene"
+    );
+    assert!(!scene.ops.is_empty());
     let hub = class_of(&canvas, keys[0]);
     assert!(
         hub.contains("gnode-retained") && !hub.contains("gnode-quiet"),
