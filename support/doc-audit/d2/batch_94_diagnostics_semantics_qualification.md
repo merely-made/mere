@@ -3,8 +3,8 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Flattened producer discovery qualified; wider owner migrations open" - accurate: yes
-- claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
+- status line: "Bounded producer content-origin repair qualified; wider owner migrations open" - accurate: yes
+- claims checked: 5 - holds: 5, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -23,7 +23,8 @@ construction and one explicitly sampled resident lifecycle source/reader are
 qualified in their named historical cohorts. Shared leaf/producer host composition
 now has one qualified host implementation. Flattened producer discovery is also
 qualified across portable, sampled headless GPU and native/browser semantic
-receiving. Retain full producer coordinate mapping, neutral provider
+receiving. The content-origin repair qualifies pixel border/padding in existing
+scroll-adjusted observation space. Retain full forward producer placement, neutral provider
 contracts, target/session/lifetime identity, mutable read/act boundaries, broader
 command routing, other product sources, final process evidence, selector grammar,
 keyboard route and presentation correlation migrations.
@@ -46,7 +47,7 @@ offline all-target metadata preparation failure, and broader acceptance stays op
 
 - disposition: current
 - status line: "Execution/shutdown and contained observations/action evidence qualified; broader migrations open" - accurate: yes
-- claims checked: 3 - holds: 3, stale: 0, unverifiable: 0
+- claims checked: 4 - holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -102,3 +103,19 @@ plans select the assigned owner. Full producer content-origin/transform/scroll/
 clip mapping, read-only semantic observations, action vocabulary and lifetime
 tokens remain open. These receipts do not qualify browser runtime, headed or
 human AT acceptance. The sealed audit registers remain unchanged.
+
+### Producer content-origin continuation, 2026-10-20
+
+The generated child/action offset now uses Genet's content origin, preserving
+the existing untransformed scroll observation instead of adding another CSS
+placement implementation. Three before-repair runtime failures demonstrate the
+border/padding displacement; GPU samples already paint at the correct position.
+Final receiving passes 115 targeted native tests/five existing ignores and
+browser-host Wasm compilation on integrated main `e94cb23e8`, preserving the
+shared-shell/Hest scripting changes. Both ancestor/document scroll, padded
+native action bounds and scaled relative browser boxes receive the repair.
+The earlier `1797a2eed` cohort has the same counts and is not added again.
+Supplier source inspection identifies the missing forward bounds query and
+DOM-parent versus flattened paint-scope gap; full transform/path clipping,
+flattened-ancestor geometry and native/browser runtime acceptance remain open.
+Source seals and executed native binary hashes qualify only the named cohorts.
