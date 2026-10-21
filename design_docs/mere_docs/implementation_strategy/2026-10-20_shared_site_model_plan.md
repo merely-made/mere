@@ -1,8 +1,8 @@
 # Shared site model extraction
 
-**Status (2026-10-21):** extraction landed; optional saved-site revision storage
-in progress. Mark authorized the next slice: record, list and load checkpoints,
-with Knot as the first consumer and snapshot V1 unchanged.
+**Status (2026-10-21):** extraction and optional saved-site revision storage
+landed. Mark authorized record, list and load checkpoints, with Knot as the
+first consumer and snapshot V1 unchanged.
 
 ## Scope and ownership
 
@@ -115,3 +115,14 @@ policy remain in Knot and Djinn respectively.
   build also passes its three fixtures.
   [Supplier receipt](../../../support/receipts/shared-site-revisions/supplier.json).
   Knot consumer qualification remains in progress.
+
+- 2026-10-21: revision storage and the Knot consumer are landed. Knot source
+  `5297224` and receiving record `e24ee9e` are published; the combined Hest/Cambium
+  receiving cohort retains every upstream Git source outside the exact portable
+  model contract. Six shared history controls, three original V1 fixtures,
+  18 standalone site cases, the desktop checkpoint case and all nine launch
+  cases pass. The normal default-feature desktop check also passes.
+  [Consumer qualification](../../../support/receipts/shared-site-revisions/consumer.json).
+  The temporary supplier worktree was removed; ordinary stable Cargo targets
+  were reused and no new isolated Cargo home was created. A history browser,
+  restore UI, replication and serving adapters remain outside this slice.
