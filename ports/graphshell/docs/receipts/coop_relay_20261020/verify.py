@@ -129,9 +129,9 @@ def main():
                 assert path.stem not in captures
                 captures[path.stem] = capture['fields']
                 capture_roles[path.stem] = role
-    assert len(custodians) == 4 and len(captures) == 22
+    assert len(custodians) == 4 and len(captures) == 23
     cleanup = read(HERE / 'cleanup.json')
-    assert cleanup['accepted_cohort'] == 'gs-relay-20261020-01'
+    assert cleanup['accepted_cohort'] == Path(machines['owner']['public']).parents[1].name
     assert all(not cleanup[role]['remaining'] for role in ['owner', 'guest'])
     chosen, private = q['graphs']['chosen'], q['graphs']['private']
     assert chosen != private
@@ -173,12 +173,12 @@ def main():
     assert final['packets_sent'] > 0 and final['packets_recv'] > 0
     connections = [e for e in relay['events'] if e['event'] == 'connect']
     assert len(connections) >= 5 and len({e['endpoint'] for e in connections}) == 2
-    cold_ready = []
-    for role in ['owner', 'guest']:
-        events = [json.loads(line) for line in (evidence / (role + '-resident') /
-                  'events-2.jsonl').read_text().splitlines()]
-        cold_ready.append(next(e['at_ms'] for e in events if e['event'] == 'ready'))
-    assert len([e for e in connections if e['at_ms'] >= max(cold_ready)]) >= 2
+    # Guest custody and relay share a clock. The controller restarts both
+    # custodians before launching either cold client; do not compare host clocks.
+    guest_events = [json.loads(line) for line in (evidence / 'guest-resident' /
+                    'events-2.jsonl').read_text().splitlines()]
+    cold_ready = next(e['at_ms'] for e in guest_events if e['event'] == 'ready')
+    assert len([e for e in connections if e['at_ms'] >= cold_ready]) >= 2
     for launch in [1, 2]:
         constraint = read(evidence / ('owner-network-constraint-' + str(launch) + '.json'))
         assert constraint['probe'] == {'ipv4': 'denied', 'ipv6': 'denied', 'relay_tcp': 'connected'}
@@ -230,7 +230,7 @@ def main():
     assert all(r['reviewed'] and r['observation']
                and sha(evidence / r['capture']) == r['sha256'] for r in review)
     print(json.dumps({'result': 'ok', 'machines': 2, 'native_processes': 7,
-                      'custodians': 4, 'captures': 22, 'active_routes': sorted(active_routes),
+                      'custodians': 4, 'captures': 23, 'active_routes': sorted(active_routes),
                       'source_files': len(inputs['owner']['files']), 'commit': args.commit}, indent=2))
 
 
