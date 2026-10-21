@@ -1,0 +1,121 @@
+{
+  "scope": "Bounded software gates at the relay product implementation commit; final source integrates current main. Both native clients and custodians were rebuilt on final source and all frozen executable hashes stayed identical. Runtime-relevant co-op code and pins are unchanged. This is not a full workspace suite or CI.",
+  "gates": [
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib",
+      "result": "340 passed; 6 existing ignored",
+      "exit": 0,
+      "log": "software/mac-core-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "11 passed",
+      "exit": 0,
+      "log": "software/mac-coop-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib settings::tests",
+      "result": "23 passed",
+      "exit": 0,
+      "log": "software/mac-settings-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p djinn --features passphrase-fd --lib resident_mere::tests -- --test-threads=2",
+      "result": "30 passed",
+      "exit": 0,
+      "log": "software/mac-resident-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "owner",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "36 passed",
+      "exit": 0,
+      "log": "software/mac-ui-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell-mere",
+      "result": "36 passed",
+      "exit": 0,
+      "log": "software/guest-ui-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    },
+    {
+      "machine": "guest",
+      "command": "cargo +1.99.1 test --locked --offline -j2 -p graphshell --no-default-features --features coop --lib coop::",
+      "result": "11 passed",
+      "exit": 0,
+      "log": "software/guest-coop-tests.log.gz",
+      "source_commit": "7ddbb7ecc11e4e2d87959eff8c8ead98da821aa0"
+    }
+  ],
+  "final_source": "166d0aefdb520599612c137c63764427ab51cb54",
+  "native_binaries_unchanged": true,
+  "source_snapshot_delta": {
+    "Cargo.lock": {
+      "before": "7567baf1b31eed5c6306d221e9578e62ac5334d7ef9bb358ec70869d782fe1df",
+      "after": "7c4ece8bfc422abfd6b42e8f4d839f00065cc5bd748a0c2da72e54850ba8fdfc"
+    },
+    "crates/canvas/pictograph/Cargo.toml": {
+      "before": "1b5ae0de54c4b53f0b9e527d24e62c4976ac344f884162c2915217f3fdd0d667",
+      "after": "9120afcd97d8a1aeeb12af16d08eea7b29afae7fcee0ea14a8e02ef31ab9b6bc"
+    },
+    "crates/canvas/pictograph/examples/occurrence_replay.rs": {
+      "before": null,
+      "after": "36543d4aee325edd342866a6924644b22f9c82ceb4c6e5ae1bb3c582358d4f9c"
+    },
+    "crates/canvas/pictograph/examples/occurrence_replay_wasm.rs": {
+      "before": null,
+      "after": "47f266a9d273e9adb7485558f8483d5cb03b0163666b13138bab0d3b64dc0e08"
+    },
+    "crates/canvas/pictograph/examples/support/occurrence_replay.rs": {
+      "before": null,
+      "after": "c2dec2a1f29f9d9b291e6fc1b74fd5bf1dc4256c12bb54043b2ed5dcd07758d5"
+    },
+    "crates/canvas/pictograph/src/canvas/projection_dynamics_tests.rs": {
+      "before": "7fa6bdc571fe2781350cbf417a6b1b8b5cd4e1515e15d4d5c1656d3601e76d30",
+      "after": "624c2bd66257da3eaf42462173bff7320e6e71628a71593690fbd2f16d87338d"
+    },
+    "crates/canvas/pictograph/src/canvas/tests/physics_registry.rs": {
+      "before": "9c3a8841f2013517fea5334eafc309a78d627488c38afa0676f402bd0180f16e",
+      "after": "81e30926d32f4adcb9ac8fd4dd1b1251db8a451e0580b154939ef586667fc898"
+    },
+    "crates/conatus/seiche/Cargo.toml": {
+      "before": "0b55a175d85bf78c7c502cda191e5fef0f0ab663847557a139be3145f8d2bb88",
+      "after": "6e355e9fe9e4cbe8eec92082a0a17efdaa7e240cd2a3dd551a2908afa6afedf7"
+    },
+    "crates/conatus/seiche/examples/binding_replay.rs": {
+      "before": null,
+      "after": "6d384aaa3bfe15c17053bae212eca5c073c7c861d64566c8ffcf7e94dca3d09d"
+    },
+    "crates/conatus/seiche/examples/binding_replay_wasm.rs": {
+      "before": null,
+      "after": "260a48be336eea47ecc05cb7b9bf223fb0adfc61723ef7c037b591a86ac814de"
+    },
+    "crates/conatus/seiche/examples/support/binding_replay.rs": {
+      "before": null,
+      "after": "0f682304beee95f8d4922f70f631d2b5899f01aae86fad032fa65e39e649948f"
+    },
+    "crates/conatus/seiche/src/runtime/pause_tests.rs": {
+      "before": "c1cc2a4953402d3e7301c4a7d3f853321c9123f48c8852984451e91d7787d9f6",
+      "after": "64649262401cfc00e0ed203962f0ab8cc22b7bebf221b31e6925646d67e4c581"
+    },
+    "ports/distillery/src/inference/recall.rs": {
+      "before": "491b6eba05b543ecaaaec0f50b4d115f90cb5dab4d693f4c27c4037bfee67a46",
+      "after": "c12b109a36c0f7e0316f9de2bf27d71af158d48dd6e507239488953d0ff10f63"
+    },
+    "ports/djinn/tests/inference_route.rs": {
+      "before": "111c5dd3fdcd980d09f70c665822e748004ea3a066f2d13dbf28016a6d40b1d2",
+      "after": "77a35480918d804c3a76b96eb92507579b2af2d4ba8b5874e7dcd5088991619b"
+    }
+  }
+}
