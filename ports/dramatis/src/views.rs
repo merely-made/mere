@@ -33,11 +33,12 @@ pub fn root(state: &State) -> Child {
         Box::new(el("h1", text("Dramatis"))),
         line("Your personae and imported credentials"),
     ];
-    if !state.notice.is_empty() {
-        body.push(Box::new(
-            el("p", text(state.notice.clone())).attr("role", "status"),
-        ));
-    }
+    // Keep the live region and following controls stable across acknowledgements.
+    body.push(Box::new(
+        el("p", text(state.notice.clone()))
+            .attr("role", "status")
+            .attr("class", "authentication-status"),
+    ));
     body.push(action("Reconnect", Request::Refresh, state.busy));
     match &state.snapshot {
         None => body.push(line(
@@ -70,7 +71,9 @@ pub fn root(state: &State) -> Child {
                 Request::ChangePassphrase,
                 state.busy || locked,
             ));
-            body.push(Box::new(el("h2", text("Personae"))));
+            body.push(Box::new(
+                el("h2", text("Personae")).attr("class", "personae-heading"),
+            ));
             if snapshot.roster.entries.is_empty() {
                 body.push(line(
                     "No personae yet. Create one with Djinn's personae-vault tool.",

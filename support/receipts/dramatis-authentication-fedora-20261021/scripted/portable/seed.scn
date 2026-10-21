@@ -1,0 +1,25 @@
+await {"ready": "true", "profiles": "2", "locked": "false"}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/before.png
+click role:button Change passphrase…
+await {"notice": "~cancelled"}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/cancelled.png
+click role:button Change passphrase…
+await {"notice": "~current passphrase was not accepted"}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/wrong-current.png
+click role:button Change passphrase…
+await {"notice": "~did not match"}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/mismatch.png
+click role:button Change passphrase…
+await {"notice": "~cannot be empty"}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/empty.png
+click role:button Change passphrase…
+await {"notice": "~Passphrase changed."}
+wait 300000
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/changed.png
+settle 240
+capture /home/markik/Code/output/dauth-fedora21/scripted/portable/acknowledged-after-refresh.png

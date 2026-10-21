@@ -263,7 +263,9 @@ Required acceptance:
 
 Pool admission and worker retirement are separate named repairs: Q112's idle
 reservation can strand queued actors, and Q113's workers survive all public pool
-handles. Fix either when it is a prerequisite for this slice's acceptance;
+handles. Source repair and standalone Git receiving are qualified in the
+[pool continuation below](#pool-admission-and-worker-retirement-2026-10-21);
+the product dependency cohort remains a separate intake. Fix either when it is a prerequisite for this slice's acceptance;
 otherwise retain it as an open pool gate. Do not claim bounded worker lifetime
 from an actor-completion repair. The existing Q217 inference-disconnection
 counterexamples are receiving gates: exposing a join error is insufficient if
@@ -745,3 +747,46 @@ unchanged. Cargo also reselected an already-present Windows dependency in 16
 lock entries; this is recorded in the receiving receipt, with no unrelated
 package-version or source changes. The qualified code pins remain fixed as
 later documentation-only records are published; no recursive repin is needed.
+
+
+### Pool admission and worker retirement, 2026-10-21
+
+Q112 and Q113 are repaired in Armillary
+`92d5b15cf39aaac40a3f2d863ffee69c9be11bfc`. Queue demand now reserves waiting
+and starting capacity under one mutex. Two submissions made before a notified
+worker reacquires that mutex cannot both depend on its one unit of capacity.
+Public pool handles own a separate lifetime from the workers' execution state.
+The last handle wakes all waiters; admitted jobs finish and workers then retire.
+
+Pool drop remains nonblocking. It does not cancel jobs or join OS threads.
+An actor's existing completion handle still owns the completion observation;
+a job that does not return, or retains a pool clone, can keep workers alive.
+`workers()` counts threads ever spawned and is not a shutdown-completion signal.
+No async runtime dependency or host shutdown policy was added.
+
+The source controls fail at their intended assertions before repair: a second
+queued job cannot start while the first is held, and dropping the last pool
+handle does not produce worker thread-local teardown. After repair, tests also
+cover all idle workers releasing shared state, sequential reuse, concurrent
+jobs, immediate drop with admitted work, nonblocking drop with a live actor,
+and final-handle drop from inside a worker. Supplier default coverage passes
+38 tests; all features pass 43 on Rust 1.99.1 and 1.97.1, including the unchanged
+18 Apparatus tests. An independent Intel Mac checkout of the published revision
+also passes all 43 tests on Rust 1.99.1. The supplier receipt records existing broad strict-Clippy
+findings separately from passing focused pool lint/format checks.
+
+The existing `support/fixtures/armillary-consumer` receives that canonical Git
+revision, with no local source patch. Its five tests pass on Rust 1.99.1 and
+1.97.1, including actor completion after pool drop followed by actual worker
+thread-local teardown. Its executable, strict Clippy and formatting pass; the
+normal dependency graph remains Tokio-free. This new public consumer control
+also fails against the old `e67c5def` supplier. Exact commands, source hashes and
+receipt/log hashes are in `support/family-promotion/pool-lifetime-20261021.json`.
+
+The product root remains on its previously qualified Armillary pin. Its current
+source uses dedicated actors; the standalone fixture is the current pool caller.
+A root-only repin would duplicate Armillary because ESP still directly pins the
+old revision. Knot also directly pins that ESP revision, so a clean product
+intake must proceed through ESP, Knot and then the Mere/product dependency
+cohort together. This continuation does not claim that broader intake, fresh
+native UI acceptance, or changes to the separate Knot checkpoint feature.

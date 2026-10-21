@@ -1,0 +1,62 @@
+{
+  "qualification_source": "a58b8014e14829356d1d013f4abb7051e1717111",
+  "desktop": {
+    "session": "3",
+    "state": {
+      "Name": "markik",
+      "Remote": "no",
+      "Type": "wayland",
+      "Active": "yes",
+      "State": "active",
+      "LockedHint": "no"
+    },
+    "environment": {
+      "XDG_RUNTIME_DIR": "/run/user/1000",
+      "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+      "DISPLAY": ":0",
+      "WAYLAND_DISPLAY": "wayland-0",
+      "XAUTHORITY": "/run/user/1000/xauth_dNmIxn",
+      "XDG_CURRENT_DESKTOP": "KDE",
+      "XDG_SESSION_TYPE": "wayland"
+    },
+    "hostname": "S-PC",
+    "architecture": "x86_64",
+    "kernel": "7.0.0-38-generic",
+    "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n"
+  },
+  "providers": {
+    "kdialog": {
+      "path": "/usr/bin/kdialog",
+      "version": "kdialog 25.12.3",
+      "stderr": "QThreadStorage: entry 1 destroyed before end of thread 0x5af03191cc20\nQThreadStorage: entry 0 destroyed before end of thread 0x5af03191cc20\n",
+      "sha256": "8e83dd70ddee5dd6c31adc9277d2250977a0df7a143492a21027606928aa4e96"
+    },
+    "zenity": {
+      "path": "/usr/bin/zenity",
+      "version": "4.2.1",
+      "stderr": "",
+      "sha256": "ff7eda21951baf259e75c30d53a79813fef7358717a5dab89c0af00c6f2fa9c2"
+    }
+  },
+  "screen_saver": "(false,)",
+  "primary_before": {
+    "head": "4d8bd7037df4f15b3b0270d54eac49b86b06edf9",
+    "tracked_status": ""
+  },
+  "frozen_source_inputs_verified": 1089,
+  "additional_test_input_count": 143,
+  "union_source_input_count": 1127,
+  "dynamic_dependencies": {
+    "dramatis-ui": "\tlinux-vdso.so.1 (0x0000760a4ec3f000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x0000760a4aa00000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x0000760a4ebf9000)\n\tlibfontconfig.so.1 => /usr/lib/x86_64-linux-gnu/libfontconfig.so.1 (0x0000760a4eba6000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x0000760a4eb78000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x0000760a4acda000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000760a4a600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000760a4ec41000)\n\tlibfreetype.so.6 => /usr/lib/x86_64-linux-gnu/libfreetype.so.6 (0x0000760a4a92b000)\n\tlibexpat.so.1 => /usr/lib/x86_64-linux-gnu/libexpat.so.1 (0x0000760a4eb48000)\n\tlibbz2.so.1.0 => /usr/lib/x86_64-linux-gnu/libbz2.so.1.0 (0x0000760a4eb33000)\n\tlibpng16.so.16 => /usr/lib/x86_64-linux-gnu/libpng16.so.16 (0x0000760a4eaf9000)\n\tlibbrotlidec.so.1 => /usr/lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x0000760a4accb000)\n\tlibbrotlicommon.so.1 => /usr/lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x0000760a4aca8000)\n",
+    "authentication-host": "\tlinux-vdso.so.1 (0x00007c2a5cbdd000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007c2a5ac00000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007c2a5afb0000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x00007c2a5aada000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007c2a5a800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007c2a5cbdf000)\n",
+    "storage-castellan": "\tlinux-vdso.so.1 (0x000075e4207b7000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000075e420761000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x000075e42063b000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000075e41f400000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000075e4207b9000)\n",
+    "provider-djinn": "\tlinux-vdso.so.1 (0x0000763710682000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x0000763706a00000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000076371062c000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x0000763706cda000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000763706600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000763710684000)\n",
+    "app-dramatis_app": "\tlinux-vdso.so.1 (0x0000706beb30c000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x0000706beb2b6000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000706beac00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000706beb30e000)\n",
+    "app-dramatis_ui": "\tlinux-vdso.so.1 (0x00007ec57ea6b000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007ec57e940000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007ec57e600000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ec57ea6d000)\n",
+    "app-interaction": "\tlinux-vdso.so.1 (0x0000737ff56f4000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x0000737ff3c00000)\n\tlibz.so.1 => /usr/lib/x86_64-linux-gnu/libz.so.1 (0x0000737ff56ae000)\n\tlibfontconfig.so.1 => /usr/lib/x86_64-linux-gnu/libfontconfig.so.1 (0x0000737ff565b000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x0000737ff562d000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x0000737ff3eda000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000737ff3800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000737ff56f6000)\n\tlibfreetype.so.6 => /usr/lib/x86_64-linux-gnu/libfreetype.so.6 (0x0000737ff3b2b000)\n\tlibexpat.so.1 => /usr/lib/x86_64-linux-gnu/libexpat.so.1 (0x0000737ff55fd000)\n\tlibbz2.so.1.0 => /usr/lib/x86_64-linux-gnu/libbz2.so.1.0 (0x0000737ff55e8000)\n\tlibpng16.so.16 => /usr/lib/x86_64-linux-gnu/libpng16.so.16 (0x0000737ff3ea0000)\n\tlibbrotlidec.so.1 => /usr/lib/x86_64-linux-gnu/libbrotlidec.so.1 (0x0000737ff55d7000)\n\tlibbrotlicommon.so.1 => /usr/lib/x86_64-linux-gnu/libbrotlicommon.so.1 (0x0000737ff3b08000)\n",
+    "app-package_feed": "\tlinux-vdso.so.1 (0x000079b7ced2e000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000079b7cecd8000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x000079b7ce2da000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000079b7ce000000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079b7ced30000)\n",
+    "app-state": "\tlinux-vdso.so.1 (0x000077cabbd64000)\n\tlibstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x000077cabb000000)\n\tlibgcc_s.so.1 => /usr/lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000077cabbd0e000)\n\tlibm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x000077cabb2da000)\n\tlibc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000077cabac00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077cabbd66000)\n"
+  },
+  "built_on_this_host": false,
+  "rust_toolchain_available": "rustc 1.98.1 (48a229cea 2026-09-01)"
+}

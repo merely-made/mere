@@ -1,0 +1,396 @@
+{
+  "captures": [
+    {
+      "path": "scripted/sealed/before.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/cancelled.png",
+      "sha256": "e0be2d9f2f3ed9e36d73b29733674129cb8c2ff63d36a4092b536802913ab449",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/wrong-current.png",
+      "sha256": "25c19c960216895d4f35eea6cabdf7a2f98a7d0d1e7deecc9e85bf3baf07c3dc",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/mismatch.png",
+      "sha256": "5fa687fdf729436df2793bff9b5f7bb75f48df22eca1dbdb655b32a50417e26e",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/empty.png",
+      "sha256": "f400b9ac5af12d441184facfc7ad65d0766612ca48691dfa58ef75ab25cff511",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/changed.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/acknowledged-after-refresh.png",
+      "sha256": "3a0ef772ad9660fc4c1a0463deb546cec4a777330eb1f4884c30966feed0f936",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1534352",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/sealed/cold-reopened.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1534420",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/before.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/cancelled.png",
+      "sha256": "e0be2d9f2f3ed9e36d73b29733674129cb8c2ff63d36a4092b536802913ab449",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/wrong-current.png",
+      "sha256": "25c19c960216895d4f35eea6cabdf7a2f98a7d0d1e7deecc9e85bf3baf07c3dc",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/mismatch.png",
+      "sha256": "5fa687fdf729436df2793bff9b5f7bb75f48df22eca1dbdb655b32a50417e26e",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/empty.png",
+      "sha256": "f400b9ac5af12d441184facfc7ad65d0766612ca48691dfa58ef75ab25cff511",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/changed.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/acknowledged-after-refresh.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1534447",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "scripted/portable/cold-reopened.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1534487",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/sealed/before.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1535045",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/sealed/cancelled.png",
+      "sha256": "adac431998cfbe0f04290366d4e3168204bbe853c65a305b75d0e8cd5d1cdb2b",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "1535045",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/sealed/changed.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535045",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/sealed/acknowledged-after-refresh.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535045",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/sealed/cold-reopened.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1535482",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/portable/before.png",
+      "sha256": "be0d22c30a75b8133ed967250ee614755b5899162d7a6637d2f250c28c9dec44",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/portable/cancelled.png",
+      "sha256": "e0be2d9f2f3ed9e36d73b29733674129cb8c2ff63d36a4092b536802913ab449",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/portable/changed.png",
+      "sha256": "36618eda2a440dad3aefbc926b4c00353ade773d548435e9745526bd795b0932",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/portable/acknowledged-after-refresh.png",
+      "sha256": "bf165375dbb8f7d4126b0a18fe567eeb77ee56e166b3afde95c2b61f28d02ff1",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    },
+    {
+      "path": "native/portable/cold-reopened.png",
+      "sha256": "9e5ddfa80adbc4ab4963ea09b3a4f99314ce87407e7716454d2fe537a13aa30f",
+      "width": 1290,
+      "height": 1080,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1535689",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Ordinary app capture reviewed; feedback, controls and headings legible. No native prompt pixels captured."
+    }
+  ],
+  "native_prompt_pixels_captured": false,
+  "source_inputs_unchanged": 1127
+}

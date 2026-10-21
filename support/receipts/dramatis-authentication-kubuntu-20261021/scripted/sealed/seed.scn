@@ -1,0 +1,25 @@
+await {"ready": "true", "profiles": "2", "locked": "false"}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/before.png
+click role:button Change passphrase…
+await {"notice": "~cancelled"}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/cancelled.png
+click role:button Change passphrase…
+await {"notice": "~current passphrase was not accepted"}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/wrong-current.png
+click role:button Change passphrase…
+await {"notice": "~did not match"}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/mismatch.png
+click role:button Change passphrase…
+await {"notice": "~cannot be empty"}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/empty.png
+click role:button Change passphrase…
+await {"notice": "~Passphrase changed."}
+wait 300000
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/changed.png
+settle 240
+capture /home/markik/Code/output/dauth-kubuntu21/scripted/sealed/acknowledged-after-refresh.png

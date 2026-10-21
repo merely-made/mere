@@ -10291,7 +10291,6 @@ dependencies = [
 name = "mesquite"
 version = "0.1.0"
 dependencies = [
- "sprigging",
  "cambium",
  "cambium-rootstock",
  "genet-scripted-dom",
@@ -10301,6 +10300,7 @@ dependencies = [
  "postcard",
  "serde",
  "serde_json",
+ "sprigging",
  "taproot",
 ]
 
