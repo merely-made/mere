@@ -456,9 +456,22 @@ pub struct ReservoirLaneSettings {
     /// The wallet persona whose reservoir this resident holds. Unset means the
     /// sole persona wallet under the shared root.
     pub persona: Option<personae::PersonaId>,
+    /// Offer web-address handoff to the receiving device's default browser.
+    /// Profile-local, opt-in and read at resident startup; no executable paths.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub open_web_addresses: bool,
 }
 
 impl ReservoirLaneSettings {
+    pub fn handlers(&self) -> graphshell::handlers::HandlerRegistry {
+        graphshell::handlers::HandlerRegistry::new(
+            self.open_web_addresses
+                .then(graphshell::handlers::web_browser_handler)
+                .into_iter()
+                .collect(),
+        )
+    }
+
     pub fn is_default(&self) -> bool {
         self == &Self::default()
     }
@@ -469,6 +482,7 @@ impl Default for ReservoirLaneSettings {
         Self {
             enabled: true,
             persona: None,
+            open_web_addresses: false,
         }
     }
 }
@@ -1049,6 +1063,37 @@ mod tests {
             "a misspelled lane key must fail loudly; silently ignoring it \
              would leave the owner believing a lane was configured"
         );
+    }
+
+    #[test]
+    fn browser_handoff_is_explicit_and_round_trips_in_owner_settings() {
+        assert!(
+            OwnerSettings::default()
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::Http)
+                .is_empty()
+        );
+        let settings: OwnerSettings =
+            serde_json::from_str(r#"{"reservoir":{"open_web_addresses":true}}"#).unwrap();
+        assert_eq!(
+            settings
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::Http),
+            vec![graphshell::handlers::web_browser_handler().advertised_action()]
+        );
+        assert!(
+            settings
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::File)
+                .is_empty()
+        );
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("owner.json");
+        settings.save(&path).unwrap();
+        assert_eq!(OwnerSettings::load(&path).unwrap(), settings);
     }
 
     #[test]

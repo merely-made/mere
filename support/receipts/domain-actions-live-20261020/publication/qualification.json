@@ -1,0 +1,22 @@
+{
+  "status": "passed for main integration",
+  "tested_commit": "0dacf49a29077bec315fe30065dc8ae9cc123cfe",
+  "original_feature_commit": "c2db56559c661ebad82fe47eba81dcdc144b964d",
+  "upstream_commit": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "tests": {
+    "native-tests": 39,
+    "resident-tests": 31,
+    "settings-tests": 24
+  },
+  "total_tests": 94,
+  "native_acceptance": "accepted/qualification.json",
+  "compiled_repository_inputs": 974,
+  "earlier_receipt_files_unchanged": 95,
+  "conflict_resolution": "Retained both independent MereShared fields and initializers: handler registry and co-op relays. Default policy and existing contracts remain unchanged.",
+  "earlier_relay_acceptance": "The full 4db51224f acceptance and frozen binaries remain outside Git under output/live-owner-actions-delivery-20261020/.",
+  "limits": [
+    "macOS only; no Linux or Windows runtime qualification",
+    "retained native harness activation; no physical pointer, keyboard or screen-reader qualification",
+    "system handoff and observed local browser visit; no general page-load or application completion contract"
+  ]
+}

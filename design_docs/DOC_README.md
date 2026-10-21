@@ -94,8 +94,12 @@ Current owner actions (2026-10-20): the
 [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#current-owner-actions-on-bound-views-2026-10-20)
 records exact runtime source/target binding and native Mere selected-record
 controls through existing Hest/Chirograph contracts and the canonical native
-worker, with 128 focused tests and the portable client check passing. Recipes remain unchanged; headed rendering
-and a configured live handler retain their separate acceptance gates.
+worker, with its original focused tests and portable client checks passing.
+The [live Mere handler continuation](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#live-mere-owner-handler-2026-10-20)
+adds opt-in web handoff after exact owner acceptance: 93 focused tests and
+native macOS controls, a real default-browser visit, cold reopen and disabled
+offers pass on working source. Recipes remain unchanged; other owners,
+platforms and physical/assistive input retain separate gates.
 
 Cross-domain continuation (2026-10-05): that plan records published shared
 relationship authoring/compiler and Knot UI/retention adoption, Woodshed's
