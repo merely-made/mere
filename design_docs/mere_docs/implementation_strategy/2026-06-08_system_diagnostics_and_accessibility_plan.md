@@ -65,6 +65,12 @@ This qualifies pixel border/padding, sampled headless RGBA, native action
 mapping and browser mirror plans. It does not qualify browser runtime, headed
 interaction, human AT or the supplier forward-placement migration above.
 
+Publication integration preserves concurrent live owner-action delivery at
+merge `7c9bc885e`. The tested source/manifests still match the integrated seal;
+the sole later lock change adds the existing `url` dependency to the separate
+`graphshell-mere` product. `diagnostics-content-origin-publication.json` records
+that comparison separately; it does not replace or recount the test cohorts.
+
 ## Flattened producer discovery, 2026-10-20
 
 **Status:** flattened discovery qualified on source-frozen main `24b079538`.
