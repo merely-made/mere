@@ -1,0 +1,22 @@
+[
+  {
+    "repository": "https://github.com/merely-made/turnstone.git",
+    "receipt_commit": "49e7928d84dca82311a2c681f3de7066e0e6d320",
+    "tested_source_commit": "07c1a38a3fc9b1f761190d09ee89941e6ea694dd",
+    "receipt": "docs/receipts/hest-h3-20261020/qualification.json",
+    "host_exercise": "The actual canvas isometric key binding forms an invocation, reaches the existing reducer and reports Done only after observing its synchronous model change.",
+    "checks": "docs/receipts/hest-h3-20261020/checks.json",
+    "passed": 1107,
+    "existing_ignored": 15
+  },
+  {
+    "repository": "https://github.com/merely-made/knot-editor.git",
+    "receipt_commit": "db929c8752c72749463bca775dfe0203489f0ee5",
+    "tested_source_commit": "3acb3d219b633dce05c9be0e002aaaf899bb3bf1",
+    "receipt": "docs/receipts/hest-h3-20261020/qualification.json",
+    "host_exercise": "Actual Knot desktop caption controls and its shared host-supplied window queue; resize invocation admission is pending, malformed contracts leave the queue empty.",
+    "checks": "docs/receipts/hest-h3-20261020/checks.json",
+    "passed": 417,
+    "existing_ignored": 2
+  }
+]
