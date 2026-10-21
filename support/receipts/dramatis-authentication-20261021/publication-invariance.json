@@ -1,0 +1,10 @@
+{
+  "tested_source": "576061da39c91f0f210a2f473c5c04c85630d982",
+  "current_code_commit": "9d6f7e2c9e47a24e79396bc9cad99be91032b33c",
+  "all_1027_frozen_inputs_unchanged": true,
+  "build_inputs_manifest_sha256": "1b89e194672af6fc3ac3ee57a22275c9151b9a735899bb8ee549d5b8f1555e2d",
+  "later_upstream_changes": [
+    "License headers in uncompiled optional history implementation and test"
+  ],
+  "publication_changes": "Receipt and README link only"
+}
