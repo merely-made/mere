@@ -37,7 +37,10 @@ use eidetic::manifest::{load_manifest, resolve_blob};
 use eidetic::schema_def::SchemaDefinition;
 use eidetic::typed::TypedPayload;
 use eidetic::{BlobSource, ManifestId, NoFetcher, PrivacyClass, SchemaRef, Store};
-use gemot::moot::{CollectionVersion, ContributionRef, Moot, MootCommandReceipt, MootError};
+use gemot::moot::{
+    CollectionChange, CollectionRef, CollectionVersion, ContributionRef, Moot, MootCommandReceipt,
+    MootError,
+};
 use muniment::Backend;
 use personae::IdentityProvider;
 use serde::{Deserialize, Serialize};
@@ -75,6 +78,87 @@ impl TypedPayload for PublishedSnapshotV1 {
 pub struct SiteSelection {
     pub collection: CollectionVersion,
     pub contribution: ContributionRef,
+}
+
+/// Explicit endpoint behavior. Following requires exactly one currently
+/// effective site contribution in the collection; ambiguity refuses.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SiteRevisionPolicy {
+    Pinned { contribution: ContributionRef },
+    FollowCollection,
+}
+
+/// The host persists this separately from immutable content and site files.
+/// It conveys no membership, hosting promise or authority of its own.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SiteBindingV1 {
+    pub version: u8,
+    pub collection: CollectionRef,
+    pub revision: SiteRevisionPolicy,
+}
+
+impl SiteBindingV1 {
+    pub fn validate(&self) -> Result<(), PublicationError> {
+        if self.version != 1 {
+            return Err(refuse("Unsupported site binding version"));
+        }
+        if let SiteRevisionPolicy::Pinned { contribution } = &self.revision
+            && contribution.moot_id != self.collection.moot_id
+        {
+            return Err(refuse("The pinned contribution belongs to another Moot"));
+        }
+        Ok(())
+    }
+}
+
+/// Resolve policy against current authority, then qualify the exact observed
+/// version through `open`. Pinned content still requires effective selection:
+/// pinning cannot override withdrawal, collection removal or revoked authority.
+pub async fn open_binding<B: Backend + Clone>(
+    moot: &Moot<B>,
+    store: &mut dyn Store,
+    binding: &SiteBindingV1,
+    at_ms: u64,
+) -> Result<OpenedSite, PublicationError> {
+    binding.validate()?;
+    if binding.collection.moot_id != moot.moot_id().0 {
+        return Err(refuse("The endpoint binding belongs to another Moot"));
+    }
+    let view = moot
+        .authorized_collection(binding.collection.collection_id, at_ms)
+        .await?
+        .ok_or_else(|| refuse("The site collection has no authorized view"))?;
+    let contribution = match &binding.revision {
+        SiteRevisionPolicy::Pinned { contribution } => *contribution,
+        SiteRevisionPolicy::FollowCollection => {
+            let fauna = moot.authorized_fauna(at_ms).await?;
+            let mut sites = view.effective_selected.iter().filter(|reference| {
+                fauna.iter().any(|share| {
+                    share.op_hash == reference.share && share.schema_id == SNAPSHOT_SCHEMA_ID
+                })
+            });
+            let site = *sites
+                .next()
+                .ok_or_else(|| refuse("The site collection is empty"))?;
+            if sites.next().is_some() {
+                return Err(refuse(
+                    "The site collection contains more than one effective site",
+                ));
+            }
+            site
+        },
+    };
+    open(
+        moot,
+        store,
+        &SiteSelection {
+            collection: view.version,
+            contribution,
+        },
+        at_ms,
+    )
+    .await
 }
 
 #[derive(Debug)]
@@ -172,6 +256,144 @@ pub async fn contribute<B: Backend + Clone, P: IdentityProvider + ?Sized>(
             at_ms,
         )
         .await?)
+}
+
+#[derive(Clone, Debug)]
+pub struct SitePublishReceipt {
+    pub selection: SiteSelection,
+    pub collection_operations: Vec<[u8; 32]>,
+}
+
+/// Publication spans retained-content and signed-log owners. A later refusal
+/// must report any already-authored contribution/operations for inspection and
+/// explicit recovery; it cannot claim those durable effects were rolled back.
+#[derive(Debug)]
+pub struct SitePublishError {
+    pub reason: String,
+    pub contribution: Option<ContributionRef>,
+    pub collection_operations: Vec<[u8; 32]>,
+}
+impl std::fmt::Display for SitePublishError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.reason)
+    }
+}
+impl std::error::Error for SitePublishError {}
+
+/// Explicitly retain a saved snapshot publicly, contribute it, and select it
+/// against the caller's observed collection version. Replacing a contribution
+/// uses existing signed membership operations; concurrent or intermediate
+/// ambiguous state refuses serving instead of inventing a latest revision.
+#[allow(clippy::too_many_arguments)]
+pub async fn publish_public_snapshot<B: Backend + Clone, P: IdentityProvider + ?Sized>(
+    moot: &Moot<B>,
+    identity: &P,
+    store: &mut dyn Store,
+    snapshot: &PublishedSnapshotV1,
+    observed: &CollectionVersion,
+    replace: Option<ContributionRef>,
+    title: String,
+    at_ms: u64,
+) -> Result<SitePublishReceipt, SitePublishError> {
+    let mut authored = None;
+    let mut operations = Vec::new();
+    let outcome = async {
+        snapshot.validate().map_err(PublicationError::Refused)?;
+        if !matches!(
+            snapshot.format,
+            SiteFormat::Gemini | SiteFormat::Scroll | SiteFormat::Micron
+        ) || observed.collection.moot_id != moot.moot_id().0
+        {
+            return Err(refuse("Unsupported site profile or foreign collection"));
+        }
+        let view = moot
+            .authorized_collection(observed.collection.collection_id, at_ms)
+            .await?
+            .ok_or_else(|| refuse("The collection has no authorized view"))?;
+        if view.version != *observed
+            || replace.is_some_and(|old| !view.effective_selected.contains(&old))
+        {
+            return Err(refuse(
+                "The publication target changed; refresh before publishing",
+            ));
+        }
+        eidetic::schema_def::bootstrap_meta_schema(store).await?;
+        eidetic::schema_def::save_schema(
+            store,
+            &snapshot_schema(),
+            PrivacyClass::PublicPortable,
+            eidetic::ProvenanceRecord::self_imported("mere-site schema"),
+            eidetic::TrustEnvelope::self_asserted(),
+            eidetic::Timestamp(at_ms),
+        )
+        .await?;
+        let manifest = eidetic::typed::save_typed(
+            store,
+            snapshot,
+            vec![],
+            PrivacyClass::PublicPortable,
+            eidetic::ProvenanceRecord::self_imported("explicit saved-site publication"),
+            eidetic::TrustEnvelope::self_asserted(),
+            eidetic::Timestamp(at_ms),
+        )
+        .await?;
+        let share = contribute(moot, identity, store, manifest, title, at_ms).await?;
+        let contribution = ContributionRef {
+            moot_id: moot.moot_id().0,
+            share: share.operation,
+        };
+        authored = Some(contribution);
+        let included = moot
+            .set_collection_membership_for_identity(
+                identity,
+                observed.collection,
+                observed.frontier.clone(),
+                CollectionChange::SetMembership {
+                    contribution,
+                    included: true,
+                },
+                at_ms,
+            )
+            .await?;
+        operations.push(included.operation);
+        if let Some(old) = replace {
+            let removed = moot
+                .set_collection_membership_for_identity(
+                    identity,
+                    observed.collection,
+                    vec![included.operation],
+                    CollectionChange::SetMembership {
+                        contribution: old,
+                        included: false,
+                    },
+                    at_ms,
+                )
+                .await?;
+            operations.push(removed.operation);
+        }
+        let view = moot
+            .authorized_collection(observed.collection.collection_id, at_ms)
+            .await?
+            .ok_or_else(|| refuse("The publication collection lost authority"))?;
+        let selection = SiteSelection {
+            collection: view.version,
+            contribution,
+        };
+        open(moot, store, &selection, at_ms).await?;
+        Ok::<_, PublicationError>(selection)
+    }
+    .await;
+    match outcome {
+        Ok(selection) => Ok(SitePublishReceipt {
+            selection,
+            collection_operations: operations,
+        }),
+        Err(error) => Err(SitePublishError {
+            reason: error.to_string(),
+            contribution: authored,
+            collection_operations: operations,
+        }),
+    }
 }
 
 /// A native site read qualified at the returned collection version. Exact
