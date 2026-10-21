@@ -35,7 +35,9 @@ pub fn root(state: &State) -> Child {
     ];
     // Keep the live region and following controls stable across acknowledgements.
     body.push(Box::new(
-        el("p", text(state.notice.clone())).attr("role", "status"),
+        el("p", text(state.notice.clone()))
+            .attr("role", "status")
+            .attr("class", "authentication-status"),
     ));
     body.push(action("Reconnect", Request::Refresh, state.busy));
     match &state.snapshot {
@@ -69,7 +71,9 @@ pub fn root(state: &State) -> Child {
                 Request::ChangePassphrase,
                 state.busy || locked,
             ));
-            body.push(Box::new(el("h2", text("Personae"))));
+            body.push(Box::new(
+                el("h2", text("Personae")).attr("class", "personae-heading"),
+            ));
             if snapshot.roster.entries.is_empty() {
                 body.push(line(
                     "No personae yet. Create one with Djinn's personae-vault tool.",
