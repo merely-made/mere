@@ -1044,3 +1044,5 @@ Shared resident materialization [qualification](mere_docs/receipts/shared_reside
 
 
 Family promotion (2026-10-19): [Foundation family promotion](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md) owns extraction, independent library validation and source cutover for Eidetic, Armillary, ESP, Gemot and the continuing Errand/Smolweb family. Its [boundary-consolidation continuation](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md#boundary-consolidation-scope-2026-10-19) records the qualified execution/shutdown slice, then shared observations and semantic action evidence and a separate custody process design; repository naming stays secondary.
+
+Mixed-source recall qualification (2026-10-21): the [resident inference plan](mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md#mixed-source-recall-qualification-2026-10-21) records actual published-index lexical/vector/fused explanations and Turnstone's passed four-source headed/cold receiving gate, with generated-reference and exact native-cut limits explicit.

@@ -841,6 +841,45 @@ impl InferenceLane {
             .rankings(question, scope)
     }
 
+    /// Host-side explanation of an app's current published recall index.
+    /// The explicit scope must stay within one live owner. This does not
+    /// create an app route or grant access to another publisher's material.
+    #[cfg(feature = "inference-model")]
+    pub fn published_recall_rankings(
+        &self,
+        owner: &str,
+        question: &str,
+        scope: &[eidetic::models::recall::RecallSourceId],
+    ) -> Result<recall::RecallRankings, String> {
+        let table = self.shared.table();
+        if table.locked {
+            return Err("inference.ask is locked".into());
+        }
+        if scope.is_empty()
+            || scope
+                .iter()
+                .any(|source| source.owner.as_deref() != Some(owner))
+        {
+            return Err("ranking scope must explicitly name this source owner".into());
+        }
+        let mut published = self.shared.published.lock().unwrap();
+        let slot = published
+            .owners
+            .get_mut(owner)
+            .ok_or("retained source owner is unavailable")?;
+        if slot.binding.index.is_none() {
+            slot.binding.index = Some(
+                self.shared
+                    .build_recall(slot.binding.corpus.clone(), slot.binding.config.clone())?,
+            );
+        }
+        slot.binding
+            .index
+            .as_ref()
+            .unwrap()
+            .rankings(question, scope)
+    }
+
     #[cfg(feature = "inference-model")]
     pub fn ask_recalled(
         &self,
@@ -2566,6 +2605,80 @@ mod publication_tests {
                 text: text.into(),
             }],
         }
+    }
+    #[test]
+    fn published_rankings_follow_explicit_scope_republication_lock_and_withdrawal() {
+        let lane = InferenceLane::open(|| Box::new(StubInferenceProvider::new()));
+        let mut endpoint = lane.endpoint(ProjectionSession("publisher".into()));
+        let mut request = publication("turnstone/one", "retained nebula amberstone");
+        let first = request.sources[0].source.clone();
+        let mut second = request.sources[0].clone();
+        second.source.source.push_str("/second");
+        second.text = "retained nebula indigo".into();
+        second.version = eidetic::Hash::of(second.text.as_bytes()).to_string();
+        let second_id = second.source.clone();
+        request.sources.push(second);
+        endpoint.publish(request).unwrap();
+        let old = lane
+            .published_recall_rankings("turnstone/one", "nebula", &[first.clone()])
+            .unwrap();
+        assert_eq!(old.lexical.len(), 1);
+        assert_eq!(old.fused, old.lexical);
+        assert!(old.vector.is_empty());
+        assert!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[])
+                .is_err()
+        );
+        let mut foreign = first.clone();
+        foreign.owner = Some("turnstone/two".into());
+        assert!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[foreign])
+                .is_err()
+        );
+        assert_eq!(
+            lane.published_recall_rankings(
+                "turnstone/one",
+                "nebula",
+                &[first.clone(), second_id.clone()]
+            )
+            .unwrap()
+            .lexical
+            .len(),
+            2
+        );
+        lane.configure_published_recall(Default::default()).unwrap();
+        assert_eq!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[first.clone()])
+                .unwrap()
+                .lexical,
+            old.lexical
+        );
+        endpoint
+            .publish(publication("turnstone/one", "retained nebula violet"))
+            .unwrap();
+        let changed = lane
+            .published_recall_rankings("turnstone/one", "nebula", &[first.clone()])
+            .unwrap();
+        assert_eq!(changed.lexical.len(), 1);
+        assert_ne!(changed.lexical, old.lexical);
+        assert!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[second_id])
+                .unwrap()
+                .lexical
+                .is_empty()
+        );
+        lane.set_locked(true).unwrap();
+        assert!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[first.clone()])
+                .is_err()
+        );
+        lane.set_locked(false).unwrap();
+        drop(endpoint);
+        assert!(
+            lane.published_recall_rankings("turnstone/one", "nebula", &[first])
+                .is_err()
+        );
+        lane.close().unwrap();
     }
     #[test]
     fn publishers_cannot_replace_another_live_owner_and_disconnect_withdraws_heads() {
