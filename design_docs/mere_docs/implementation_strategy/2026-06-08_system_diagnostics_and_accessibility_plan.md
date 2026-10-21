@@ -45,7 +45,8 @@ Sprigging 0.3.0 and Cambium 0.6.0 are prepared source versions, not registry
 publications. The resident gate exposed a real split: Knot's range excluded
 0.6 while its shared editor host returned 0.6 types. Knot `b8d0e2f` widens the
 unchanged embedded widget API's range; the current Mere lock now has one
-Cambium/Sprigging family. Existing Murm and Dramatis source cohorts are retained.
+Cambium/Sprigging family. That frozen test cohort retained the existing Murm
+and Dramatis source revisions.
 `diagnostics-readonly-final-resident.json` preserves the original four type
 errors. The later retained-cohort resident check passes both lib and binary;
 other external product adoption, including Woodshed's older Leaf callback,
@@ -58,6 +59,14 @@ receiving cohort. Automated native and Wasm gates do not establish headed,
 human assistive-technology or cross-product acceptance. Taproot selector intake
 below is a supplier/consumer migration, so it is documented here rather than
 adding a second role/name catalogue in Mere.
+
+Publication integration `d7fd54d71` receives main's subsequent local-passphrase
+work and its intentional Dramatis `7d498c27` intake. All sealed semantic sources
+remain unchanged; the root lock adds the authentication dependencies and that
+supplier revision. `diagnostics-readonly-integration-qualification.json` records
+the affected resident, retained-product and actual Graphshell Wasm gates on the
+merged basis. It supplements the original 537-test cohort rather than replacing
+its source seal or claiming a repeat of every unchanged family test.
 
 ### Remaining ordered gates
 
