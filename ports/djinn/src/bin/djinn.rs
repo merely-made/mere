@@ -1046,6 +1046,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         keeper.configure_payload_custody(profile_id.clone(), persona, data_root.clone())?;
     }
     #[cfg(feature = "personal-sync")]
+    let address_handlers = owner.reservoir.handlers();
+    #[cfg(feature = "personal-sync")]
     let mut resident = DjinnResident::open_deferred_inference(
         personae.as_ref(),
         &data_root,
@@ -1258,6 +1260,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                     grants.clone(),
                     first_party.clone(),
                 )
+                .with_handlers(address_handlers.clone())
                 .with_custody_endpoint(args.app_endpoint.clone())
                 .with_coop_relays(coop_relays.clone())
                 .with_profile_subject_authority(personae.clone())

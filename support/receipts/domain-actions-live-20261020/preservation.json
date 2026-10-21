@@ -1,0 +1,6 @@
+{
+  "primary_exact_match": true,
+  "primary_head": "99b489bc713b3446c794035d57e4b4f607918fe5",
+  "files_hashed": 233,
+  "scope": "HEAD, status and all dirty/untracked source file hashes; before/after snapshots retained outside this checkout."
+}
