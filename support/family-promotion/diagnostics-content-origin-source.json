@@ -1,0 +1,25 @@
+{
+  "basis": "1797a2eed829def9d155af7a7c75a738f133675a",
+  "source_sha256": {
+    "Cargo.lock": "eba4ed4034d83e3cc70c6d34f4dbbea902fbe902e2e3b166ea424595b1525080",
+    "Cargo.toml": "aa885fe59726cc95171c8acbe536c578cce236fc2968c1a3c8f35fcaddc505cc",
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": "485cdb620bc9cc7533845f2abbf1b85d596e92443e6b0546121a1e2a567f2f21",
+    "crates/cambium/cambium-genet-web-host/src/mirror.rs": "6f41233f2d1aa134b14b7aca79ef6af75cf623956b857465ab017831219b0b9c",
+    "crates/cambium/cambium-genet-web-host/src/mirror/tests.rs": "8ff90ee72896dabcf36981eadfa8af969c64708d46c78b05e43bc462e765af8c",
+    "crates/cambium/cambium-genet-winit-host/Cargo.toml": "97b46304f4ab276b0414b7ca082c482567d7fe55d19e5b8882fe552bef0d9d68",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "008a60d09e66251a1316ac3e0e87af6e06a117deaabc93a32c48ca0e4c7c918d",
+    "crates/cambium/cambium-rootstock/src/host.rs": "ddfecc2de3e9dbc1752bc5fb15691c8babde1e2c9a958148c8ccf171fe2933f6",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "f2f471c7c10cb81200572a1901646a54fd5848a85e7c0c132e370cbdcadf9ca2",
+    "crates/cambium/cambium-rootstock/src/owned_layout.rs": "fdee29e8afd8ec16d588cc5647747cd952c3efbd1f8d8e348f661aabf61786a3",
+    "crates/cambium/cambium-rootstock/src/owned_layout/producer.rs": "f6d258e60cdf9137550f15d08a0d2a6cfe54b4801a293cadc7f82752f2715a01",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "5c8d0b893ed6b79206742928c73d81c069aa2df55ea10e3fdacc02e96bdc4e81",
+    "crates/cambium/cambium-rootstock/src/producer/tests.rs": "28de2b508e30ca4ff9dc07f5aef8db517c387e8af1edad907c310cc5a6006480",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "8bf3ef5af9b02367adc7fdf740f10a66a3dfecb60f22c67403aff25874dc5c05",
+    "crates/cambium/cambium-rootstock/src/semantics/tests.rs": "4fae1a4978c08f725976c8dcadbedeb254f35faa54f1a71f1892b6fbaca658d4",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "00dbaa37e777c0be0f15d541541171f83baf7cdc2ed87016020684698d581c8d",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "40021b817568fdfe90d8159c9662b38c0694102bc6383b2fef3ccee24d0119e3",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b"
+  },
+  "sealed_audit_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256",
+  "sealed_registers_match": true
+}

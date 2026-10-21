@@ -164,7 +164,14 @@ fn producer_without_slot_geometry_does_not_invent_screen_coordinates() {
         tree_id: accesskit::TreeId::ROOT,
         focus: slot,
     };
-    add_producer_semantics(&mut tree, slot, 7, board(), &mut HashMap::new());
+    add_producer_semantics(
+        &mut tree,
+        slot,
+        7,
+        board(),
+        Some((0.0, 0.0)),
+        &mut HashMap::new(),
+    );
     assert!(tree.nodes.iter().all(|(_, node)| node.bounds().is_none()));
 }
 #[test]
@@ -184,6 +191,7 @@ fn invalid_producer_rectangle_does_not_reach_accessibility_bounds() {
             A11yNodeId(dom.opaque_id(slot)),
             7,
             semantics,
+            Some((0.0, 0.0)),
             &mut HashMap::new(),
         );
         assert!(
@@ -265,4 +273,51 @@ fn duplicate_producer_dom_bindings_do_not_publish_actionable_children() {
             .iter()
             .any(|(_, node)| node.label() == Some("Board") || node.label() == Some("Pin"))
     );
+}
+
+#[test]
+fn content_origin_tests_padded_bounds_follow_content_and_both_scroll_planes() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(root, "<main style='display:block;width:800px;height:800px'><section style='position:absolute;left:20px;top:30px;width:120px;height:70px;overflow:scroll'><custom-leaf key='7' style='position:absolute;left:50px;top:60px;display:block;width:80px;height:40px;padding:7px;border:5px solid black'></custom-leaf><div style='width:400px;height:400px'></div></section></main>");
+    let mut layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+    let slot = layout.custom_leaf_nodes(&dom)[0].1;
+    let scroller = dom.parent(slot).unwrap();
+    layout.set_element_scroll(&dom, HashMap::from([(scroller, (3.0, 4.0))]));
+    layout.set_viewport_scroll((5.0, 6.0));
+    assert_eq!(layout.element_scroll()[&scroller], (3.0, 4.0));
+    assert_eq!(layout.viewport_scroll(), (5.0, 6.0));
+    let fragment = layout.fragments().get(slot).unwrap();
+    let expected = Rect::new(
+        f64::from(fragment.x + 12.0 - 3.0 - 5.0 + 4.0),
+        f64::from(fragment.y + 12.0 - 4.0 - 6.0 + 5.0),
+        f64::from(fragment.x + 12.0 - 3.0 - 5.0 + 14.0),
+        f64::from(fragment.y + 12.0 - 4.0 - 6.0 + 25.0),
+    );
+    let mut producers = ProducerRegistry::new();
+    producers.register(7, Board, &[]).unwrap();
+    let projection = project_semantics(
+        &dom,
+        &layout,
+        &mut LeafRegistry::new(),
+        &mut producers,
+        None,
+    );
+    let children: Vec<_> = projection
+        .tree
+        .nodes
+        .iter()
+        .filter(|(_, n)| matches!(n.label(), Some("Card" | "Pin")))
+        .collect();
+    assert_eq!(children.len(), 2);
+    for (_, node) in children {
+        assert_eq!(node.bounds(), Some(expected));
+    }
+    assert_eq!(projection.produced_targets.len(), 1);
+    let local = layout
+        .element_geometry(&dom, slot)
+        .unwrap()
+        .map_to_local(expected.x0 as f32 + 5.0, expected.y0 as f32 + 6.0)
+        .unwrap();
+    assert_eq!(local, (4.0, 5.0));
 }
