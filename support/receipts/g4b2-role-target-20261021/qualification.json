@@ -1,0 +1,71 @@
+{
+  "qualified_at_utc": "2026-10-21T07:24:07.397804+00:00",
+  "base_commit": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "branch": "codex/g4b2-role-target-20261021",
+  "status": "Qualified bounded role-target consolidation and role-group source authoring",
+  "build_settings": {
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "locked": true,
+    "offline": true
+  },
+  "native_host": "x86_64-apple-darwin",
+  "wasm_target": "wasm32-unknown-unknown",
+  "tests": {
+    "shared_controls": {
+      "passed": 11,
+      "ignored": 0
+    },
+    "existing_binding_grouped": {
+      "passed": 11,
+      "ignored": 1
+    },
+    "graphshell_web_library": {
+      "passed": 326,
+      "ignored": 6
+    },
+    "total": {
+      "passed": 348,
+      "ignored": 7
+    }
+  },
+  "headed": {
+    "role_source_save_reopen": "ok",
+    "existing_mix_composition_regression": "ok",
+    "negative_control": "Expected assertion failure: role-group-source site vs actual cluster after Apply role groups",
+    "package_wasm_sha256": "7c9f04c3974a33c1a33cd03f53432a5e837f516ac1178f10e5f97292d216cd0b",
+    "renderer": "BrowserWebGpu",
+    "results": "headed-results.json.gz",
+    "scope": "Current Graphshell Web on this macOS IAB browser; scene reopen within the running page, no browser-restart durability claim"
+  },
+  "source_manifest": "source-manifest.json.gz",
+  "software_gates": "software-gates.json",
+  "primary_preserved": true,
+  "primary_comparison": {
+    "head": true,
+    "status": true,
+    "tracked_dirty_hashes": true
+  },
+  "full_local_evidence": "/Users/markik/Code/output/mere-g4b2-role-target-20261021",
+  "preservation_receipt": "/Users/markik/Code/output/mere-g4b2-role-target-20261021/preservation-after.json",
+  "assessment": "Three gpt-6-luna implementation lanes plus parent gate execution and final read-only review",
+  "resolved_diagnostics": [
+    "New tests initially used HashMap where portable target maps are BTreeMap; corrected before final gates.",
+    "Absent-item test UUID initially collided with the deterministic sample fixture; replaced with an asserted absent UUID.",
+    "New host test held a borrowed facet across a re-save; copied it for the comparison.",
+    "Wrong-family channel refusal is owned by Seiche at target.groups, while unknown groups id refusal is owned by Canvas at target.groups.channel; tests now assert the actual contracts.",
+    "Initial headed test used an obsolete Graph status selector; replaced with current imported-node owner readback and reran.",
+    "Final review removed duplicate panel-role-group-source diagnostic entry; rebuilt and reran headed scenarios on final package."
+  ],
+  "limits": [
+    "No new native UI, cross-OS, checkpoint, actor replay or downstream consumer adoption qualification.",
+    "This pass does not rerun or broaden native/Node-Wasm trajectory-bit equality; it qualifies the typed target edit through native tests and current browser/Wasm controls.",
+    "Imported fixture supplies nonempty role overrides; no group-role override editor was added."
+  ],
+  "separate_passes": [
+    "Raw-term execution",
+    "Checkpoint design and restore",
+    "Render dependency narrowing"
+  ]
+}

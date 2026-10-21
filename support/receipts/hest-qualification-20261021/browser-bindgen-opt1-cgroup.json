@@ -1,0 +1,11 @@
+{
+  "memory.current": "3221225472\n",
+  "memory.peak": "3221225472\n",
+  "memory.events": "low 0\nhigh 0\nmax 219632\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n",
+  "memory.swap.current": "0\n",
+  "cpu.max": "150000 100000\n",
+  "cpu_observation": {
+    "user_seconds": 3.63,
+    "system_seconds": 67.75
+  }
+}

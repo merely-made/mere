@@ -153,6 +153,17 @@ impl CustodyClient {
     pub async fn unlock_native(&mut self) -> Result<(), CustodyClientError> {
         expect_done(self.call(CustodyCall::UnlockNative).await?)
     }
+    pub async fn change_passphrase_native(
+        &mut self,
+    ) -> Result<dramatis::authentication::PassphraseChangeReceiptV1, CustodyClientError> {
+        match self
+            .call(CustodyCall::ChangePassphraseNative(Default::default()))
+            .await?
+        {
+            CustodyAnswer::PassphraseChange { receipt } => Ok(receipt),
+            other => Err(mismatch("passphrase change", &other)),
+        }
+    }
     pub async fn lock_vault(&mut self) -> Result<(), CustodyClientError> {
         expect_done(self.call(CustodyCall::LockVault).await?)
     }
@@ -387,6 +398,7 @@ impl BlockingCustodyClient {
 
 fn answer_name(answer: &CustodyAnswer) -> &'static str {
     match answer {
+        CustodyAnswer::PassphraseChange { .. } => "a passphrase change receipt",
         CustodyAnswer::Payload { .. } => "a retained payload",
         CustodyAnswer::VaultOutput { .. } => "vault output",
         CustodyAnswer::VaultEnrollment { .. } => "vault enrollment",

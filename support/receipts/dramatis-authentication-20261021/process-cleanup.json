@@ -1,0 +1,119 @@
+{
+  "all_owned_processes_exited": true,
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 17254,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17253,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17304,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17302,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17307,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17306,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17360,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17359,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17443,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17442,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17904,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17901,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 17958,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 17928,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 18337,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 18323,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    }
+  ],
+  "personal_resident_or_apps_replaced": false,
+  "private_stores_sockets_binaries_in_public_receipt": false
+}

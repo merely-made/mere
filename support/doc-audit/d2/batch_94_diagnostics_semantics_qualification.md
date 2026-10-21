@@ -3,8 +3,8 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Contained producer identity validation qualified; wider owner migrations open" - accurate: yes
-- claims checked: 6 - holds: 6, stale: 0, unverifiable: 0
+- status line: "Shared observation and selector intake qualified; lifetimes, broader actions and geometry open" - accurate: yes
+- claims checked: 9 - holds: 9, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -137,3 +137,58 @@ collector adoption remain open. Mutable composition is no longer documented as
 pure. Immutable observation, target generations, full geometry and native/browser
 runtime acceptance remain separate gates. The diagnostics index entry now links
 to these owner records rather than duplicating their historical test counts.
+
+### Read-only observation continuation, 2026-10-21
+
+The provider callback boundary and composed AppCtx/Harness observations now use
+shared borrows. Retained-content key allocation belongs to the admitted owner
+frame; reads reuse those keys and activation no longer needs a priming read.
+The owner table retires keys absent from the current session projection. This
+is not proof against arbitrary interior mutation or an atomic observation/action
+lease. The DOM seed remains a deliberately narrower API.
+
+Knot's excluded 0.6 range caused four real resident type errors. The failure is
+retained separately; Knot b8d0e2f admits the unchanged widget API and the resident
+lib/binary receiving check passes with one prepared Cambium/Sprigging family.
+The temporary worktree and branch are removed, preserving the dirty primary
+Knot checkout. Murm/Dramatis incidental updates were declined. Registry
+publication and Woodshed's older callback intake remain separate gates.
+
+The final source seal and qualification record name current native, retained
+product, embedding and Wasm gates. Earlier passing cohorts and the failed
+resident integration are not substituted for final receiving. Supplier-owned
+selector lookup/flat traversal remains within the first migration; target
+lifetimes, broader Hest action routing and full forward geometry remain ordered
+behind it. No complete first-migration or four-migration claim is made.
+
+Publication integration d7fd54d71 preserves those semantic sources while receiving
+main's intentional Dramatis 7d498c27 authentication cohort and its lock changes.
+A separate integration record qualifies the affected resident, retained product
+and actual Graphshell Wasm entry point; it does not relabel the original 537
+native passes as a rerun on the merged lock. Historical narrow-lock evidence
+remains valid for its frozen cohort, not a promise to hold later main repins.
+
+### Shared selector intake, 2026-10-21
+
+Taproot owns borrowed lookup adapters over the DOM seed and complete contributed
+observation. The former follows flat traversal and the latter publication child
+order. Consumers retain exact-name preference, aliases and shallow DOM class
+semantics. Generated targets have no fabricated DOM identity or inherited slot
+attributes. Harness and Mesquite use shared composition and current host action
+admission; a producer refusal or withdrawn offer is observed through the routing
+result, not inferred from successful queueing.
+
+One optional document-session-api spelling bridge replaces the independent
+browser table and serves the selector adapter. Taproot's normal dependencies
+remain independent of the renderer. The first attempted supplier placement was
+narrowed before final Mere receiving to preserve this boundary. Shared receivers
+are not a proof against arbitrary interior mutation, provider lifetime leases,
+full forward geometry or application completion.
+
+Supplier and consumer preparation, negative controls and final source-frozen
+qualification are named separately in diagnostics-selectors-qualification.json.
+The scenario fixture initially assumed a wrong tick count; the existing normal
+completion path is preserved. There is no claimed last-step completion repair.
+The original read-only and earlier identity cohorts retain their source identities.
+Cross-product registry publication, target generations, broader Hest routing,
+full supplier placement, headed/browser-runtime and human AT gates remain open.

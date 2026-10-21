@@ -29,7 +29,7 @@ image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
 [dependencies]
 # The stock this is grafted onto. Everything below is what a browser adds.
 cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
-cambium = { version = "0.5.0", path = "../cambium" }
+cambium = { version = "0.6.0", path = "../cambium" }
 genet-render-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
 netrender = { workspace = true }
@@ -37,7 +37,7 @@ paint_list_render = { workspace = true, features = ["resource-bundle"] }
 paint_list_api = { workspace = true }
 wgpu = { workspace = true }
 # The accessibility mirror lowers Rootstock's composed host projection to ARIA.
-document-session-api = { workspace = true }
+document-session-api = { workspace = true, features = ["accesskit"] }
 accesskit.workspace = true
 # DOM and layout fixture vocabulary.
 layout_dom_api = { workspace = true }
@@ -80,7 +80,7 @@ web-sys = { version = "0.3", features = [
 
 # The mirror's tests lay the example page out without a window.
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-sprigging = { version = "0.2.2", path = "../sprigging" }
+sprigging = { version = "0.3.0", path = "../sprigging" }
 cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-host" }
 netrender = { workspace = true, features = ["vello-cpu"] }
 

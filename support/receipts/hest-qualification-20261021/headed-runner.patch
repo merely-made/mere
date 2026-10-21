@@ -1,0 +1,20 @@
+--- /home/markik/Code/repos/mere/ports/graphshell/web/tests/run-headed-receipt.py
++++ /home/markik/Code/testing/mere/hest-qualification-20261021/site/tests/run-headed-receipt.py
+@@ -107,13 +107,16 @@
+                         raise RuntimeError('sink did not start')
+                     time.sleep(.25)
+             url = (origin + '/' + args.page + '?scenario=scenarios/' + args.scenario + '.scn&sink=http://127.0.0.1:' + str(args.port) + '/scenario-receipt&' + args.query)
+-            command = ['flatpak', 'run', '--filesystem=' + str(args.out), '--filesystem=' + str(profile), 'com.google.Chrome', '--user-data-dir=' + str(profile), '--remote-debugging-port=' + str(args.port + 1), '--no-first-run', '--no-default-browser-check', '--enable-logging=stderr', '--ozone-platform=wayland', '--disable-features=CalculateNativeWinOcclusion', '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--new-window', '--window-size=1400,900']
++            command = ['/var/lib/flatpak/app/com.google.Chrome/x86_64/stable/active/files/extra/chrome', '--user-data-dir=' + str(profile), '--remote-debugging-port=' + str(args.port + 1), '--no-first-run', '--no-default-browser-check', '--enable-logging=stderr', '--ozone-platform=x11', '--use-gl=angle', '--use-angle=gl', '--disable-features=CalculateNativeWinOcclusion', '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--new-window', '--window-size=1400,900']
+             if args.unsafe_webgpu:
+                 command.append('--enable-unsafe-webgpu')
+             command.extend(args.chrome_arg)
+             command.append(url)
+             metadata['command'] = command
+             chrome = subprocess.Popen(command, stdout=chrome_log, stderr=chrome_log, env=env, start_new_session=True)
++            metadata['browser_pid'] = chrome.pid
++            metadata['cgroup'] = pathlib.Path(f'/proc/{chrome.pid}/cgroup').read_text().strip()
++            assert metadata['cgroup'] == pathlib.Path('/proc/self/cgroup').read_text().strip(), 'browser escaped resource scope'
+             host_input = subprocess.Popen([
+                 str(args.node), str(pathlib.Path(__file__).with_name('host-input.mjs')),
+                 str(args.port + 1), origin + '/', str(args.out),

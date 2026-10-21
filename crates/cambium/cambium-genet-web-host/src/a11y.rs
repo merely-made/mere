@@ -310,8 +310,8 @@ impl Accessibility for DomAccessibility {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut cambium_rootstock::ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &cambium_rootstock::ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
