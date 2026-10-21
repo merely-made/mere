@@ -236,7 +236,7 @@ impl Canvas {
         Ok(spec)
     }
 
-    fn running_target(&self) -> Target {
+    pub(super) fn running_target(&self) -> Target {
         let table = self.arrangement_roles();
         let source = self.role_group_source();
         Target {
