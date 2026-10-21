@@ -233,7 +233,8 @@ pub use tags::*;
 pub use text::text;
 pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
 pub use shell::{shell_activity_control, shell_activity_rail, shell_document_rail, SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot,
-    shell_control, shell_popup, shell_projection_switch, shell_toolbar};
+    shell_control, shell_popup, shell_projection_switch, shell_toolbar,
+    shell_source_binding, shell_navigation_item};
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{

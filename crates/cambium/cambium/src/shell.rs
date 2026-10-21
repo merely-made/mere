@@ -141,16 +141,34 @@ where
 {
     let mark = mark.into();
     let kind = match mark.as_str() {
-        "▤" => "read", "◇" => "map", "ⓘ" => "inspect", "↶" => "trail",
-        "⌕" => "search", "▥" => "tabs", "⌖" => "fit", _ => "custom",
+        "▤" => "read",
+        "◇" => "map",
+        "ⓘ" => "inspect",
+        "↶" => "trail",
+        "⌕" => "search",
+        "▥" => "tabs",
+        "⌖" => "fit",
+        _ => "custom",
     };
-    let parts = (0..5).map(|part| el::<_, State, Action>("span", ())
-        .attr("class", format!("shell-icon-part shell-icon-part-{part}"))).collect::<Vec<_>>();
+    let parts = (0..5)
+        .map(|part| {
+            el::<_, State, Action>("span", ())
+                .attr("class", format!("shell-icon-part shell-icon-part-{part}"))
+        })
+        .collect::<Vec<_>>();
     shell_button(
-        Box::new(el("span", (
-            el("span", parts).attr("class", format!("shell-activity-mark shell-mark-{kind}")).attr("aria-hidden", "true"),
-            el("span", label.into()).attr("class", "shell-activity-caption"),
-        )).attr("class", "shell-activity-content")),
+        Box::new(
+            el(
+                "span",
+                (
+                    el("span", parts)
+                        .attr("class", format!("shell-activity-mark shell-mark-{kind}"))
+                        .attr("aria-hidden", "true"),
+                    el("span", label.into()).attr("class", "shell-activity-caption"),
+                ),
+            )
+            .attr("class", "shell-activity-content"),
+        ),
         accessible_name.into(),
         "shell-control shell-activity-control",
         state,
@@ -165,11 +183,18 @@ pub fn shell_activity_rail<State: 'static, Action: 'static>(
     tools: Vec<ShellSlot<State, Action>>,
     utilities: Vec<ShellSlot<State, Action>>,
 ) -> ShellSlot<State, Action> {
-    Box::new(el("nav", (
-        el("div", projections).attr("class", "shell-activity-projections"),
-        el("div", tools).attr("class", "shell-activity-tools"),
-        el("div", utilities).attr("class", "shell-activity-utilities"),
-    )).attr("class", "cambium-activity-rail").attr("aria-label", "Views and tools"))
+    Box::new(
+        el(
+            "nav",
+            (
+                el("div", projections).attr("class", "shell-activity-projections"),
+                el("div", tools).attr("class", "shell-activity-tools"),
+                el("div", utilities).attr("class", "shell-activity-utilities"),
+            ),
+        )
+        .attr("class", "cambium-activity-rail")
+        .attr("aria-label", "Views and tools"),
+    )
 }
 
 /// Documents grouped by their existing tile stacks. Each group can have its
@@ -178,13 +203,26 @@ pub fn shell_activity_rail<State: 'static, Action: 'static>(
 pub fn shell_document_rail<State: 'static, Action: 'static>(
     groups: Vec<(String, Vec<ShellSlot<State, Action>>)>,
 ) -> ShellSlot<State, Action> {
-    let groups = groups.into_iter().map(|(label, tabs)| {
-        el("div", (el("div", label.clone()).attr("class", "shell-document-group-title"), tabs))
+    let groups = groups
+        .into_iter()
+        .map(|(label, tabs)| {
+            el(
+                "div",
+                (
+                    el("div", label.clone()).attr("class", "shell-document-group-title"),
+                    tabs,
+                ),
+            )
             .attr("class", "shell-document-group")
-            .attr("role", "group").attr("aria-label", label)
-    }).collect::<Vec<_>>();
-    Box::new(el("nav", groups).attr("class", "cambium-shell-documents")
-        .attr("aria-label", "Reading tiles"))
+            .attr("role", "group")
+            .attr("aria-label", label)
+        })
+        .collect::<Vec<_>>();
+    Box::new(
+        el("nav", groups)
+            .attr("class", "cambium-shell-documents")
+            .attr("aria-label", "Reading tiles"),
+    )
 }
 
 /// One row with a flexible identity/address slot between application-owned
@@ -222,6 +260,94 @@ pub fn shell_popup<State: 'static, Action: 'static>(
             .attr("class", "shell-popup")
             .attr("role", "group")
             .attr("aria-label", label.into()),
+    )
+}
+
+/// A host-owned source binding made visible at the head of a projection.
+/// `mode` describes the rule (following or pinned); `source` names its current
+/// resolution, including an honest unavailable state. This is presentation,
+/// not a source registry. The host supplies disclosure state and choices.
+pub fn shell_source_binding<State, Action, OA, F>(
+    mode: impl Into<String>,
+    source: impl Into<String>,
+    available: bool,
+    expanded: bool,
+    choices: Vec<ShellSlot<State, Action>>,
+    disclose: F,
+) -> ShellSlot<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    OA: OptionalAction<Action> + 'static,
+    F: Fn(&mut State, PointerClick) -> OA + 'static,
+{
+    let mode = mode.into();
+    let source = source.into();
+    let summary = shell_button(
+        Box::new(
+            el(
+                "span",
+                (
+                    el("span", mode.clone()).attr("class", "shell-binding-mode"),
+                    el("span", source.clone()).attr("class", "shell-binding-source"),
+                ),
+            )
+            .attr("class", "shell-binding-summary"),
+        ),
+        format!("Pane source: {mode}: {source}"),
+        "shell-control shell-binding-control",
+        ShellControl {
+            expanded: Some(expanded),
+            ..Default::default()
+        },
+        disclose,
+    );
+    let mut children = vec![summary];
+    if expanded {
+        children.push(shell_popup("Choose pane source", choices));
+    }
+    Box::new(
+        el("div", children)
+            .attr("class", "cambium-source-binding")
+            .attr(
+                "data-source-available",
+                if available { "true" } else { "false" },
+            ),
+    )
+}
+
+/// A relationship or navigation choice with a primary identity and a second
+/// line explaining why it is offered. The caller supplies both strings and
+/// the action, so relation vocabulary and graph identity remain host-owned.
+pub fn shell_navigation_item<State, Action, OA, F>(
+    title: impl Into<String>,
+    detail: impl Into<String>,
+    state: ShellControl,
+    activate: F,
+) -> ShellSlot<State, Action>
+where
+    State: 'static,
+    Action: 'static,
+    OA: OptionalAction<Action> + 'static,
+    F: Fn(&mut State, PointerClick) -> OA + 'static,
+{
+    let title = title.into();
+    let detail = detail.into();
+    shell_button(
+        Box::new(
+            el(
+                "span",
+                (
+                    el("span", title.clone()).attr("class", "shell-navigation-title"),
+                    el("span", detail.clone()).attr("class", "shell-navigation-detail"),
+                ),
+            )
+            .attr("class", "shell-navigation-content"),
+        ),
+        format!("{detail}: {title}"),
+        "shell-control shell-navigation-item",
+        state,
+        activate,
     )
 }
 
