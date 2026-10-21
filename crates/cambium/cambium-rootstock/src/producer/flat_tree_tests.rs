@@ -108,7 +108,7 @@ impl TextureProducer for SceneSource {
             encoding: SourceEncoding::Srgb,
         })
     }
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    fn semantics(&self) -> Option<ProducerSemantics> {
         Some(ProducerSemantics {
             role: Some(ProducerRole::Group),
             name: Some("Scene".into()),

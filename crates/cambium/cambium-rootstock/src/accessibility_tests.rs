@@ -44,8 +44,8 @@ impl Accessibility for Recording {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
-        _: &mut sprigging::LeafRegistry<u64>,
-        _: &mut ProducerRegistry,
+        _: &sprigging::LeafRegistry<u64>,
+        _: &ProducerRegistry,
         focus: Option<u64>,
         _: f64,
     ) -> Vec<A11yRequest> {
@@ -235,6 +235,39 @@ fn counter_host() -> Host<u32, CounterLogic, CounterChild> {
 }
 
 #[test]
+fn readonly_tests_app_context_observes_the_contributed_catalogue_without_activation() {
+    let mut host = counter_host();
+    host.s.shared.leaves.insert(
+        7,
+        Box::new(sprigging::Knob::new(sprigging::Size {
+            width: 80.0,
+            height: 30.0,
+        })),
+    );
+    let reads = Rc::new(RefCell::new(Vec::new()));
+    let output = reads.clone();
+    host.hooks.after_frame = Box::new(move |ctx| {
+        let ctx = &*ctx;
+        let observed = ctx.semantic_projection().unwrap();
+        assert!(
+            observed
+                .tree
+                .nodes
+                .iter()
+                .any(|(_, node)| node.role() == accesskit::Role::Slider)
+        );
+        output.borrow_mut().push(observed.tree);
+        assert_eq!(*ctx.runner.state(), 0);
+    });
+    host.with_ctx(crate::Hook::AfterFrame);
+    host.with_ctx(crate::Hook::AfterFrame);
+    let reads = reads.borrow();
+    assert_eq!(reads.len(), 2);
+    assert_eq!(reads[0], reads[1]);
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+}
+
+#[test]
 fn current_target_admission_rechecks_each_request_and_reports_refusals() {
     use crate::{A11yAction as Action, A11yDispatch as Dispatch, A11yRejection as Refusal};
     let mut host = counter_host();
@@ -302,7 +335,7 @@ fn current_producer_action_requires_a_present_slot_and_advertised_action() {
         fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
             None
         }
-        fn semantics(&mut self) -> Option<ProducerSemantics> {
+        fn semantics(&self) -> Option<ProducerSemantics> {
             Some(ProducerSemantics {
                 children: vec![ProducerNode {
                     key: 40,
@@ -413,7 +446,7 @@ fn identity_tests_current_admission_refuses_ambiguous_producer_action_without_di
         fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
             None
         }
-        fn semantics(&mut self) -> Option<ProducerSemantics> {
+        fn semantics(&self) -> Option<ProducerSemantics> {
             let action = ProducerAction {
                 id: "pin".into(),
                 label: "Pin".into(),
@@ -530,7 +563,7 @@ fn action_admission_gives_context_sensitive_leaf_the_published_seed() {
         fn paint_dirty(&self) -> bool {
             false
         }
-        fn accessibility(&mut self, node: &mut accesskit::Node) {
+        fn accessibility(&self, node: &mut accesskit::Node) {
             assert_eq!(node.label(), Some("Gain"));
             assert!(node.bounds().is_some());
             node.set_role(accesskit::Role::Slider);

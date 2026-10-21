@@ -23,12 +23,14 @@ use serde::{Deserialize, Serialize};
 mod command_effect;
 mod command_invocation;
 pub mod line;
+mod presentation;
 pub mod titulus;
 pub use titulus::{
     ActionFormChoiceV1, ActionFormError, ActionFormFieldV1, ActionFormV1, CardValueV1, ContentHash,
     ContentReferenceError, PortableCardV1, PortableContentRefV1, Sha256NamedInformation,
 };
 
+pub use presentation::{PresentationValidationError, validate_presentation};
 pub use scenotime::{Revision, SceneDiff, SceneEpoch, SceneSnapshot};
 
 // Portable projection captures, apart from the live wire they snapshot.

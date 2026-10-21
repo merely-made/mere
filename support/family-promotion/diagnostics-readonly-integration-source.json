@@ -1,0 +1,11 @@
+{
+  "basis": "d7fd54d71dfb38dfdb84976a45c18bafd90e3332",
+  "qualified_commit": "8a910926a",
+  "previous_source_seal": "diagnostics-readonly-source-receiving.json",
+  "qualified_source_differences": [
+    "Cargo.lock"
+  ],
+  "lock_sha256": "fcf69ff874f5e34bed928055c0d74e1a347d3b2e2690aa33ca6ebae574ad5ebe",
+  "integration": "Current main authentication admission and intentional Dramatis 7d498c27 cohort; semantic source unchanged",
+  "gates": "integrated-resident, integrated-product and integrated-graphshell-browser follow"
+}

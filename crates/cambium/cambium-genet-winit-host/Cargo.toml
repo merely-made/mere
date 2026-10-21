@@ -27,13 +27,13 @@ accesskit.workspace = true
 # open dialog, through the crate Graphshell's desktop already uses.
 light-file-dialog = "3.21.3"
 meristem = { version = "0.2.0", path = "../meristem" }
-cambium = { version = "0.5.0", path = "../cambium" }
+cambium = { version = "0.6.0", path = "../cambium" }
 # The windowing-neutral half. This crate is now the winit event source for
 # it: it converts winit input into the neutral vocabulary and routes.
 cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "../cambium-winit-a11y", default-features = false }
-sprigging = { version = "0.2.2", path = "../sprigging" }
+sprigging = { version = "0.3.0", path = "../sprigging" }
 # The semantic-selector resolver the headless `Harness` drives applications by,
 # so a host test targets a control by role and label rather than by pixel.
 # Named genet-probe until genet 7baa554c (2026-09-14).

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "-p",
+    "sprigging",
+    "-p",
+    "cambium"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/mere/ports/graphshell/web",
+  "started": "2026-10-21T06:27:52.338241+00:00",
+  "finished": "2026-10-21T06:28:04.688953+00:00",
+  "exit_code": 0,
+  "results": [],
+  "diagnostic_tail": "     Locking 2 packages to highest Rust 1.97.1 compatible versions\n    Updating cambium v0.5.0 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium) -> v0.6.0\n    Updating sprigging v0.2.2 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\sprigging) -> v0.3.0\nnote: pass `--verbose` to see 72 unchanged dependencies behind latest\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

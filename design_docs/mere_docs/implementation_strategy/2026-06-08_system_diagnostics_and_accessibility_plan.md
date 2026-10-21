@@ -1,5 +1,96 @@
 # System Diagnostics and Accessibility Plan
 
+## Ordered ownership migrations, 2026-10-21
+
+**Status:** first migration provider/accessor foundation implemented on refreshed
+main `4232d5622`; current-cohort qualification is recorded below. Selector
+adoption remains open, so the first migration is not yet complete.
+Proceed in order: read-only observations, target generations, broader actions,
+then supplier-owned forward geometry. Existing receipts retain their bases;
+this continuation keeps the 10 MB cap and reusable Cargo target.
+
+First done-condition: contributor descriptions use shared borrows; reading a
+description does not allocate target identities, rebuild activation routes,
+render or advance application state. Graphshell retained-content identities
+move to the content owner's frame update; activation resolves against the
+current document. AppCtx and Harness expose the same contributed composition
+through read-only accessors. This is a borrowing/observation contract, not a
+read/act transaction or presentation-revision lease. Selector catalogue adoption
+and immutable observation receiving must be named explicitly before this first
+migration is called complete. Preserve the DOM observation API's narrower
+contract rather than inventing another role/name lowering.
+
+The public Sprigging callback change is breaking. Prepare a new Sprigging minor
+and matching Cambium minor in source; publication and receiving against existing
+external product pins remain separate gates. Do not introduce a mutable
+compatibility callback or hide identity allocation behind interior mutation.
+
+### Read-only foundation and receiving
+
+Sprigging descriptions and `TextureProducer::semantics` now take `&self`.
+The registry, shared composition, native/browser adapters and embedding view
+preserve shared provider borrows. `AppCtx::semantic_projection` and
+`Harness::semantic_projection` return that same contributed tree, owner maps
+and refusal report. Their existing `a11y_projection` remains the DOM seed.
+A shared receiver is a provider contract, not proof against arbitrary interior
+mutation by a third-party implementation or an atomic read/act transaction.
+
+Graphshell's retained content owner allocates keys after an admitted document
+frame, preserving live keys across ordinary frames and producer recreation and
+retiring keys absent from the current session projection. Description reads no
+longer allocate keys or rebuild activation routes. An unobserved producer can
+activate a current advertised target through the owner; retired sources refuse.
+
+Sprigging 0.3.0 and Cambium 0.6.0 are prepared source versions, not registry
+publications. The resident gate exposed a real split: Knot's range excluded
+0.6 while its shared editor host returned 0.6 types. Knot `b8d0e2f` widens the
+unchanged embedded widget API's range; the current Mere lock now has one
+Cambium/Sprigging family. That frozen test cohort retained the existing Murm
+and Dramatis source revisions.
+`diagnostics-readonly-final-resident.json` preserves the original four type
+errors. The later retained-cohort resident check passes both lib and binary;
+other external product adoption, including Woodshed's older Leaf callback,
+remains a separate receiving gate.
+
+The qualification record is
+`support/family-promotion/diagnostics-readonly-qualification.json`; it separates
+initial preparation and failed integration from the final source-sealed
+receiving cohort. Automated native and Wasm gates do not establish headed,
+human assistive-technology or cross-product acceptance. Taproot selector intake
+below is a supplier/consumer migration, so it is documented here rather than
+adding a second role/name catalogue in Mere.
+
+Publication integration `d7fd54d71` receives main's subsequent local-passphrase
+work and its intentional Dramatis `7d498c27` intake. All sealed semantic sources
+remain unchanged; the root lock adds the authentication dependencies and that
+supplier revision. `diagnostics-readonly-integration-qualification.json` records
+the affected resident, retained-product and actual Graphshell Wasm gates on the
+merged basis. It supplements the original 537-test cohort rather than replacing
+its source seal or claiming a repeat of every unchanged family test.
+
+### Remaining ordered gates
+
+1. Finish selector adoption within the observation migration. The pinned Taproot
+   matcher accepts only `DocumentA11yProjection` and walks `dom_children`, while
+   contributed publication follows the flat tree. Add a supplier-owned read-only
+   semantic lookup and flat-tree traversal, then consume it in Mesquite and the
+   Harness. Preserve class/attribute matching and exact-name preference. Explicitly
+   distinguish generated producer targets from DOM targets; do not fabricate DOM
+   node IDs or maintain another role/name catalogue in Mere.
+2. Bind requests to the originating owner and target life. Receiving must refuse
+   stale requests after window/session/provider/child replacement, while retaining
+   valid targets across ordinary republication. Audit the actual platform queue
+   and source lifetimes before choosing token representation.
+3. Route the broader advertised action set through its current owner/Hest
+   boundary. Keep focus distinct from activation, numeric validation and
+   restrictive state shared, and routing acceptance distinct from terminal
+   effects. Declined or unsupported requests must not claim success.
+4. Finish forward geometry in Genet, including flattened paint-scope ancestry,
+   transforms, scroll and explicit clipping semantics. Native/browser lowering
+   must consume that mapping and qualify real producer pixels and input against
+   semantic bounds. The current untransformed content-origin repair is not this
+   full mapping.
+
 ## Producer semantic identities, 2026-10-21
 
 **Status:** contained identity validation qualified on frozen main `8942e3050`, preserving Hest H4

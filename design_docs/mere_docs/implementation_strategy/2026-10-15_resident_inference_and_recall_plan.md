@@ -1784,7 +1784,7 @@ receipt does not promote those pending product gates to passes.
   config/tokenizer/weight digests. Broader source kinds and platforms remain
   separately scoped; the earlier frozen ranking comparison is unchanged.
 
-- **2026-10-20, retained-clip receiving fixture continuation in progress.**
+- **2026-10-20/21, retained-clip receiving continuation qualified.**
   The existing real-model process fixture accepts optional
   `DJINN_HEADED_CLIP_CUSTODY`, a marked synthetic wallet root, and registers the
   ordinary custody route on the same broker as inference. Each process binds
@@ -1804,5 +1804,39 @@ receipt does not promote those pending product gates to passes.
 
   Focused gates pass: 14 recall/embedding cases and both ordinary resident
   app-route cases. The real-model process fixture compiles with GPU and
-  embedding enabled. Turnstone pin refresh and new native receiving/cold
-  qualification remain in progress; the earlier capture-only receipt is frozen.
+  embedding enabled. Turnstone refreshed SDK `eb1244ccf` and qualified both retained-text
+  receiving lanes; the earlier capture-only receipt is frozen.
+
+  The opt-in headed fixture additionally writes revision-changed
+  `live-runs-{phase}.json` observations, so a receiving driver can distinguish
+  generation, terminal refusal and a product presentation interruption without
+  waiting only for a success marker. This is explicit synthetic-fixture
+  observation, with no installed resident logging change.
+
+  Turnstone's `retained_clip_embedding_20261020` packet, committed in
+  `8ebf9197cedfe1afb18f064e0ba2e37665921540`, passes both one-source native
+  warm/cold pairs with real MiniLM retrieval and GPU generation, normal wallet
+  custody, source paths absent throughout, and transfer packages removed before
+  the independent cold processes. Exact local citation readers, unchanged sealed
+  historical evidence, compatible index reuse and selected-only cold export
+  all pass the independent verifier. It records 59 focused software passes and
+  24 reviewed captures, including a fresh 46-scalar embedded Knot selection.
+  The existing Redshank note remains a selected 70-scalar text body with its
+  original timed anchor and an unavailable source recording.
+
+  The four-scalar `café` probe can answer correctly without a model marker,
+  leaving it below the unchanged 32-character automatic quote threshold.
+  Numeric-marker requests were also unreliable. The final sentence-length
+  selection qualifies ordinary exact quotation; no citation or owner/version
+  validation was relaxed. Final Turnstone shared-shell and Apparatus-core integration receives SDK
+  `7edfe3b09` in source cut `a048adcc36eef8597ed913940d83103b9eae1633`.
+  Native/libtest builds and all 43 focused Turnstone cases pass on Rust 1.99.1.
+  Its four native warm/cold phases also pass with twenty reviewed captures,
+  exact local citations, compatible reuse, immutable historical evidence and
+  selected-only cold export. The full recall implementation is byte-identical
+  across the repair, the frozen `c6540a4b7` GPU fixture and receiving SDK cuts.
+  [The final integration packet](https://github.com/merely-made/turnstone/tree/main/docs/receipts/retained_clip_embedding_integration_20261021)
+  records raw/public independent verification and Git-blob source proofs.
+  The fixture binary remains explicitly bound to its compiled source cut; this
+  is not qualification of every current-main resident configuration or a
+  personal installation.

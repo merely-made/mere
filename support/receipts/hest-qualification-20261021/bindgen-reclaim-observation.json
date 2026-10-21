@@ -1,0 +1,11 @@
+{
+  "pid": 2262877,
+  "gate": "browser-bindgen-no-names",
+  "source": "/proc/2262877/stat while running",
+  "user_seconds": 3.44,
+  "system_seconds": 105.53,
+  "major_faults": 15557,
+  "minor_faults": 953271,
+  "memory_observation": "browser-bindgen-no-names-cgroup.json",
+  "decision": "Stop reclaim thrashing; rebuild same features at opt-level 1 under same resource caps."
+}

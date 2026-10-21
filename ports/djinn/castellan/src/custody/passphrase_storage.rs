@@ -38,8 +38,7 @@
 //!   over different paths to partition.
 //! - **Whole-file rewrites on every save.** Atomic writes via tempfile
 //!   + rename. Acceptable for the expected vault sizes (kilobytes).
-//! - **No re-encrypt on passphrase change.** Add `change_passphrase`
-//!   when a UX surface needs it.
+//! Passphrase changes authenticate every profile and atomically replace the entire encrypted file.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -118,6 +117,7 @@ fn random_bytes(n: usize) -> Vec<u8> {
 pub struct PassphraseEncryptedStorage {
     path: PathBuf,
     inner: Arc<Mutex<Inner>>,
+    operations: Mutex<()>,
 }
 
 struct Inner {
@@ -167,6 +167,7 @@ impl PassphraseEncryptedStorage {
 
         Ok(Self {
             path,
+            operations: Mutex::new(()),
             inner: Arc::new(Mutex::new(Inner {
                 salt,
                 kek: Some(kek),
@@ -219,20 +220,7 @@ impl PassphraseEncryptedStorage {
     }
 
     fn save_file(&self, file: &EncryptedFile) -> Result<(), IdentityError> {
-        let bytes = serde_json::to_vec(file)
-            .map_err(|e| IdentityError::Backend(format!("serialize vault file: {e}")))?;
-        // Atomic write via temp + rename to avoid corruption on partial
-        // writes. Same dir as final to keep the rename atomic on the
-        // same filesystem.
-        let dir = self.path.parent().ok_or_else(|| {
-            IdentityError::Backend(format!("vault path has no parent: {:?}", self.path))
-        })?;
-        let tmp = tempfile_in_dir(dir)?;
-        std::fs::write(&tmp, &bytes)
-            .map_err(|e| IdentityError::Backend(format!("write tmp: {e}")))?;
-        std::fs::rename(&tmp, &self.path)
-            .map_err(|e| IdentityError::Backend(format!("rename tmp: {e}")))?;
-        Ok(())
+        super::atomic_secret_file::write_json(&self.path, file)
     }
 }
 
@@ -293,26 +281,9 @@ fn encrypt_profile(
     Ok(EncryptedProfile { nonce, ciphertext })
 }
 
-fn tempfile_in_dir(dir: &Path) -> Result<PathBuf, IdentityError> {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let n = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|e| IdentityError::Backend(format!("time: {e}")))?
-        .as_nanos();
-    let mut rand = [0u8; 8];
-    getrandom::fill(&mut rand).expect("OS randomness available");
-    // Render `rand` as lowercase hex without pulling in the `hex` crate.
-    let mut hex = String::with_capacity(16);
-    for b in rand {
-        use std::fmt::Write;
-        let _ = write!(&mut hex, "{:02x}", b);
-    }
-    let suffix = format!(".vault-{}-{}.tmp", n, hex);
-    Ok(dir.join(suffix))
-}
-
 impl IdentityStorage for PassphraseEncryptedStorage {
     fn load_profile(&self, id: &ProfileId) -> Result<Profile, IdentityError> {
+        let _operation = self.operations.lock().unwrap();
         self.ensure_unlocked()?;
         let file = self.load_file()?;
         let entry = file
@@ -338,6 +309,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     }
 
     fn save_profile(&self, profile: &Profile) -> Result<(), IdentityError> {
+        let _operation = self.operations.lock().unwrap();
         self.ensure_unlocked()?;
         let plain = PlaintextProfile {
             display_name: profile.display_name.clone(),
@@ -371,6 +343,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     }
 
     fn delete_profile(&self, id: &ProfileId) -> Result<(), IdentityError> {
+        let _operation = self.operations.lock().unwrap();
         self.ensure_unlocked()?;
         let mut file = self.load_file()?;
         file.profiles.remove(&id.0);
@@ -378,6 +351,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     }
 
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {
+        let _operation = self.operations.lock().unwrap();
         self.ensure_unlocked()?;
         let file = self.load_file()?;
         let mut out = Vec::with_capacity(file.profiles.len());
@@ -398,6 +372,50 @@ impl IdentityStorage for PassphraseEncryptedStorage {
         Ok(out)
     }
 
+    fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        use super::unlock::PassphraseChangeError as E;
+        let _operation = self.operations.lock().unwrap();
+        if new.is_empty() {
+            return Err(E::InvalidNew);
+        }
+        if self.inner.lock().unwrap().kek.is_none() {
+            return Err(E::Locked);
+        }
+        let mut file = self.load_file().map_err(|_| E::Storage)?;
+        if file.profiles.is_empty() {
+            return Err(E::Unsupported);
+        }
+        let old_key = derive_kek(old, &file.salt).map_err(|_| E::Storage)?;
+        let held = self.inner.lock().unwrap();
+        if !constant_time_eq::constant_time_eq(
+            old_key.as_ref(),
+            held.kek.as_ref().ok_or(E::Locked)?.as_ref(),
+        ) {
+            return Err(E::IncorrectCurrent);
+        }
+        drop(held);
+        let old_cipher = ChaCha20Poly1305::new(<&Key>::try_from(old_key.as_slice()).unwrap());
+        let salt = random_bytes(ARGON2_SALT_LEN);
+        let new_key = derive_kek(new, &salt).map_err(|_| E::Storage)?;
+        let new_cipher = ChaCha20Poly1305::new(<&Key>::try_from(new_key.as_slice()).unwrap());
+        for (id, entry) in &mut file.profiles {
+            let plaintext = decrypt_profile(&old_cipher, file.version, id, entry)
+                .map_err(|_| E::IncorrectCurrent)?;
+            *entry = encrypt_profile(&new_cipher, id, &plaintext).map_err(|_| E::Storage)?;
+        }
+        file.version = FILE_VERSION;
+        file.salt = salt.clone();
+        self.save_file(&file).map_err(|_| E::Storage)?;
+        let mut inner = self.inner.lock().unwrap();
+        inner.salt = salt;
+        inner.kek = Some(new_key);
+        Ok(())
+    }
+
     fn unlock_methods(&self) -> UnlockMethods {
         UnlockMethods {
             passphrase: true,
@@ -406,6 +424,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     }
 
     fn lock(&self) {
+        let _operation = self.operations.lock().unwrap();
         self.inner.lock().unwrap().kek = None;
     }
 
@@ -416,6 +435,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     /// Re-derives the KEK (Argon2id's cost is the only throttle, ruling 19)
     /// and checks it against a stored profile before keeping it.
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        let _operation = self.operations.lock().unwrap();
         let UnlockMethod::Passphrase(passphrase) = method else {
             return Err(IdentityError::Backend(
                 "a passphrase vault unlocks only by its passphrase".to_string(),
@@ -436,6 +456,58 @@ mod tests {
         CredentialLineage, IdentitySlot, IdentityVault, ProtocolKey, SecretBytes, UnlockTier,
     };
     use tempfile::tempdir;
+
+    #[test]
+    fn changing_a_legacy_file_authenticates_and_upgrades_every_profile() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("legacy.json");
+        let storage = PassphraseEncryptedStorage::open(&path, b"old").unwrap();
+        for (id, byte) in [("one", 41), ("two", 42)] {
+            storage
+                .save_profile(&Profile::new(
+                    ProfileId(id.into()),
+                    id,
+                    Ed25519Keypair::from_seed([byte; 32]),
+                ))
+                .unwrap();
+        }
+        let mut file = storage.load_file().unwrap();
+        storage
+            .with_cipher(|cipher| {
+                for (id, entry) in &mut file.profiles {
+                    let plain = decrypt_profile(cipher, FILE_VERSION, id, entry).unwrap();
+                    let nonce = random_bytes(NONCE_LEN);
+                    entry.ciphertext = cipher
+                        .encrypt(
+                            <&Nonce>::try_from(nonce.as_slice()).unwrap(),
+                            Payload {
+                                msg: &plain,
+                                aad: &profile_aad(1, id),
+                            },
+                        )
+                        .unwrap();
+                    entry.nonce = nonce;
+                }
+            })
+            .unwrap();
+        file.version = 1;
+        storage.save_file(&file).unwrap();
+        storage.change_passphrase(b"old", b"new").unwrap();
+        drop(storage);
+        assert!(PassphraseEncryptedStorage::open(&path, b"old").is_err());
+        let storage = PassphraseEncryptedStorage::open(&path, b"new").unwrap();
+        assert_eq!(storage.load_file().unwrap().version, FILE_VERSION);
+        for (id, byte) in [("one", 41), ("two", 42)] {
+            assert_eq!(
+                storage
+                    .load_profile(&ProfileId(id.into()))
+                    .unwrap()
+                    .master
+                    .to_seed(),
+                [byte; 32]
+            );
+        }
+    }
 
     #[test]
     fn saving_a_legacy_vault_upgrades_every_profile_without_changing_keys() {

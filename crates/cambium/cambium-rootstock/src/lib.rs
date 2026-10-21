@@ -386,8 +386,8 @@ pub trait Accessibility {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
-        leaves: &mut LeafRegistry<u64>,
-        producers: &mut ProducerRegistry,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest>;

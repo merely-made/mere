@@ -1,0 +1,33 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-genet-web-host",
+    "-p",
+    "cambium-winit-a11y",
+    "-p",
+    "cambium-genet-winit-host",
+    "--lib",
+    "semantics::tests",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/mere",
+  "started": "2026-10-21T06:18:05.737264+00:00",
+  "finished": "2026-10-21T06:19:21.863210+00:00",
+  "exit_code": 101,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/armillary.git`",
+    "Updating git repository `https://github.com/merely-made/genet.git`",
+    "Updating git repository `https://github.com/mark-ik/vello`",
+    "Updating git repository `https://github.com/merely-made/netrender.git`",
+    "Updating git repository `https://github.com/merely-made/mere.git`",
+    "error: cannot update the lock file C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.lock because --locked was passed to prevent this"
+  ],
+  "diagnostic_tail": "    Updating crates.io index\n    Updating git repository `https://github.com/merely-made/armillary.git`\n    Updating git repository `https://github.com/merely-made/genet.git`\n    Updating git repository `https://github.com/mark-ik/vello`\n    Updating git repository `https://github.com/merely-made/netrender.git`\n    Updating git repository `https://github.com/merely-made/mere.git`\nerror: cannot update the lock file C:\\Users\\mark_\\Code\\repos\\mere\\Cargo.lock because --locked was passed to prevent this\nhelp: to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

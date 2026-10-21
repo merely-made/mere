@@ -13,3 +13,14 @@ serde_json.workspace = true
 blake3.workspace = true
 language-tags = "0.3"
 time = { version = "0.3", features = ["parsing"] }
+muniment = { workspace = true, optional = true }
+
+[features]
+default = []
+history = ["dep:muniment"]
+
+[dev-dependencies]
+async-trait = "0.1"
+pollster = "0.4"
+tempfile = "3"
+muniment = { workspace = true, features = ["directory"] }

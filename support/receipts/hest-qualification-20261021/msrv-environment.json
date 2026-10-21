@@ -1,0 +1,13 @@
+{
+  "platform": "Linux-7.2.10-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: x86_64-unknown-linux-gnu\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)\n",
+  "locked_inputs": {
+    "packages/cambium-0.5.0/Cargo.lock": "d093d231cfb0de21d0c8713eb7a429bf6b19469bf8b75d452df764e1d8812755",
+    "packages/command-menu-0.1.1/Cargo.lock": "18536caa93e6e4f9ab937acea59a847656b9b3818b94adca3701209543077f21",
+    "packages/hest-0.1.0/Cargo.lock": "2bd3f4318c61eb4fa7522e239b30724f773780952af443e8f51624d26bf2660e",
+    "packages/hest-0.2.0/Cargo.lock": "c6d7e71b0810496950175019a30bbac9c515ce99c5cd84a80a2420bfe5fd9d8a",
+    "fixtures/registry-current/Cargo.lock": "ad2ecc51758acdbcc612446e5fda6ef407a7734ad946e2caf1d6069e36e0944a",
+    "fixtures/registry-old/Cargo.lock": "cc1b9a044b75ac1b0741ff74efae9db9c336d93535809afa4fa9583a4d1c6db5"
+  }
+}

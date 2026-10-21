@@ -235,10 +235,12 @@ pub trait Leaf: std::any::Any {
 
     /// Contribute to the host-seeded AccessKit node (a knob announces as a
     /// slider). Rootstock uses this for publication and current-target admission;
-    /// separate reads may occur between frames. Host geometry, tree edges,
+    /// separate reads may occur between frames. This must only describe current
+    /// state: do not advance application state, allocate identities or prepare
+    /// action routes while reading. Host geometry, tree edges,
     /// authored labels and restrictive state retain host policy. Default: no
     /// contribution. A callback read is not an activation transaction.
-    fn accessibility(&mut self, _node: &mut accesskit::Node) {}
+    fn accessibility(&self, _node: &mut accesskit::Node) {}
 
     /// Retention gate: has paint output changed since last frame?
     fn paint_dirty(&self) -> bool;
@@ -273,6 +275,11 @@ impl<K: Eq + Hash> LeafRegistry<K> {
 
     pub fn insert(&mut self, key: K, leaf: Box<dyn Leaf>) {
         self.leaves.insert(key, leaf);
+    }
+
+    /// Read a retained contributor without granting mutation of leaf state.
+    pub fn get(&self, key: &K) -> Option<&(dyn Leaf + 'static)> {
+        self.leaves.get(key).map(|leaf| leaf.as_ref())
     }
 
     pub fn get_mut(&mut self, key: &K) -> Option<&mut (dyn Leaf + 'static)> {
@@ -486,7 +493,7 @@ impl Leaf for Swatch {
     /// carrying the color it shows, which is the one fact assistive tech cannot
     /// recover from the pixels. Presentational on its own: the host decides
     /// whether a swatch is pickable and labels it, so no action is declared here.
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::ColorWell);
         node.set_color_value(access_color(self.color));
     }

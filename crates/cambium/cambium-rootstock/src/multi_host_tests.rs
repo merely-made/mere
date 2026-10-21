@@ -380,8 +380,8 @@ impl crate::Accessibility for Recording {
         &mut self,
         dom: &WindowDom<'_>,
         layout: &crate::OwnedLayout,
-        _: &mut sprigging::LeafRegistry<u64>,
-        _: &mut crate::ProducerRegistry,
+        _: &sprigging::LeafRegistry<u64>,
+        _: &crate::ProducerRegistry,
         focus: Option<u64>,
         _: f64,
     ) -> Vec<crate::A11yRequest> {
