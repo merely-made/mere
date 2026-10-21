@@ -141,7 +141,7 @@ impl DimensionLine {
 }
 
 impl Leaf for DimensionLine {
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::GraphicsObject);
     }
 

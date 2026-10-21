@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "-p",
+    "sprigging",
+    "-p",
+    "cambium"
+  ],
+  "cwd": "C:/Users/mark_/Code/repos/mere",
+  "started": "2026-10-21T06:17:58.522172+00:00",
+  "finished": "2026-10-21T06:18:05.533406+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: failed to get `apparatus-core` as a dependency of package `mere-apparatus v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus)`"
+  ],
+  "diagnostic_tail": "error: failed to get `apparatus-core` as a dependency of package `mere-apparatus v0.0.1 (C:\\Users\\mark_\\Code\\repos\\mere\\crates\\domain\\apparatus)`\n\nCaused by:\n  failed to load source for dependency `apparatus-core`\n\nCaused by:\n  unable to update https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1\n\nCaused by:\n  can't checkout from 'https://github.com/merely-made/armillary.git': you are in the offline mode (--offline)\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

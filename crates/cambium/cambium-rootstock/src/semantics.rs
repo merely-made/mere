@@ -68,8 +68,8 @@ impl SemanticProjection {
 pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &OwnedLayout,
-    leaves: &mut LeafRegistry<u64>,
-    producers: &mut ProducerRegistry,
+    leaves: &LeafRegistry<u64>,
+    producers: &ProducerRegistry,
     focus: Option<u64>,
 ) -> SemanticProjection {
     let mut result =
@@ -114,7 +114,7 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
                     },
                     Err(issue) => result.producer_issues.push(issue),
                 }
-            } else if let Some(leaf) = leaves.get_mut(&key) {
+            } else if let Some(leaf) = leaves.get(&key) {
                 let access = &mut result.tree.nodes[index].1;
                 let label = access.label().map(str::to_owned);
                 let bounds = access.bounds();

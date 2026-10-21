@@ -902,6 +902,26 @@ where
         Some(crate::document_projection(&view, layout, focus))
     }
 
+    /// Current contributed semantics, using the same composition as native and
+    /// browser publication. This shared-borrow read performs no layout, paint,
+    /// target allocation or action dispatch. It is not a presentation lease or
+    /// an atomic read/act transaction.
+    pub fn semantic_projection(&self) -> Option<crate::SemanticProjection> {
+        use layout_dom_api::LayoutDom as _;
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        let focus = self.runner.focus().map(|node| view.opaque_id(node));
+        Some(crate::project_semantics(
+            &view,
+            layout,
+            self.leaves,
+            self.producers,
+            focus,
+        ))
+    }
+
     /// Ask the host to scroll `node` into view.
     ///
     /// Resolved on the host's next layout against the node's painted rect
