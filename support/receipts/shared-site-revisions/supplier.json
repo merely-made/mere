@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-21",
+  "tested_base": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "commands": [
+    {
+      "command": "cargo test -p mere-site --features history --locked --offline -j 2",
+      "passed": true,
+      "compatibility_tests": 3,
+      "history_tests": 6
+    },
+    {
+      "command": "cargo test -p mere-site --locked --offline -j 2",
+      "passed": true,
+      "compatibility_tests": 3,
+      "history_feature_disabled": true
+    }
+  ],
+  "model_v1_sha256": "c522e670f9f3e02f061d8015fc22f3c4625b2e91c37d6882171d0fbf0ae526e7",
+  "history_sha256": "2b480343eec0b2f0d25fc793e6254d23af619d12ec771f641843ad422bf373bf",
+  "bounds": "Automated native local storage tests; no headed, actor, replication or public-serving claim",
+  "receipt_budget_bytes": 100000000,
+  "temporary_worktree": "Code/worktrees/mere-site-revisions: concurrent main Cargo manifest/lock collision; remove after integration",
+  "targets": [
+    "C:/t/cargo-targets/mere"
+  ],
+  "cargo_home": "default shared home; no isolated home created"
+}
