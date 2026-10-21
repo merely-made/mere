@@ -28,6 +28,18 @@ use pandect::{SessionId, ViewIntent};
 use scenotime::{Revision, SceneEpoch};
 use serde::{Deserialize, Serialize};
 
+/// The media on an explicit session card is its scoped graph envelope. Unlike
+/// other material cards, an explicit session must name exactly one envelope.
+#[cfg(feature = "view")]
+pub(crate) fn session_media(
+    card: &chirograph::PortableCardV1,
+) -> Result<chirograph::ContentHash, String> {
+    if card.media.len() != 1 {
+        return Err("The explicit session must disclose its scoped graph material with exactly one media resource.".into());
+    }
+    Ok(card.media[0])
+}
+
 /// Complete owner-disclosed graph material for an explicit attached session.
 /// The session card names this resource in `media`. It is an ephemeral read
 /// cache, not a client-owned persistence format. Facets are separate because

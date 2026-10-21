@@ -29,6 +29,47 @@ static NEXT_TEMP_ID: AtomicU64 = AtomicU64::new(0);
 /// the target absent with its old contents in the backup. A stale backup is
 /// removed as part of a successful replacement.
 pub fn write_bytes_with_backup(target: &Path, contents: &[u8]) -> io::Result<()> {
+    let temporary = stage_bytes(target, contents)?;
+    let backup = target.with_extension(format!(
+        "{}.previous",
+        target
+            .extension()
+            .and_then(|extension| extension.to_str())
+            .unwrap_or_default()
+    ));
+    replace_temporary_with_backup(target, &temporary, &backup, |from, to| fs::rename(from, to))
+}
+
+/// Fully write and sync `contents` to a uniquely created sibling temporary file,
+/// then install it with one direct rename to `target`.
+///
+/// On a filesystem where rename can replace an existing destination, readers
+/// observe either the old complete file or the new complete file. If the
+/// platform cannot replace an existing destination, this returns the rename
+/// error and leaves the old target in place. Staging cleanup is best-effort on
+/// ordinary errors. This guarantees atomic visibility only on rename-capable
+/// filesystems; it does not sync the containing directory or guarantee survival
+/// across power loss.
+pub fn write_bytes_atomic(target: &Path, contents: &[u8]) -> io::Result<()> {
+    write_bytes_atomic_with(target, contents, |from, to| fs::rename(from, to))
+}
+
+fn write_bytes_atomic_with(
+    target: &Path,
+    contents: &[u8],
+    mut rename: impl FnMut(&Path, &Path) -> io::Result<()>,
+) -> io::Result<()> {
+    let temporary = stage_bytes(target, contents)?;
+    match rename(&temporary, target) {
+        Ok(()) => Ok(()),
+        Err(error) => {
+            let _ = fs::remove_file(&temporary);
+            Err(error)
+        },
+    }
+}
+
+fn stage_bytes(target: &Path, contents: &[u8]) -> io::Result<PathBuf> {
     let directory = target.parent().ok_or_else(|| {
         io::Error::new(
             io::ErrorKind::InvalidInput,
@@ -44,14 +85,7 @@ pub fn write_bytes_with_backup(target: &Path, contents: &[u8]) -> io::Result<()>
         let _ = fs::remove_file(&temporary);
         return Err(error);
     }
-    let backup = target.with_extension(format!(
-        "{}.previous",
-        target
-            .extension()
-            .and_then(|extension| extension.to_str())
-            .unwrap_or_default()
-    ));
-    replace_temporary_with_backup(target, &temporary, &backup, |from, to| fs::rename(from, to))
+    Ok(temporary)
 }
 
 fn create_temporary_file(target: &Path) -> io::Result<(PathBuf, File)> {
@@ -307,6 +341,73 @@ mod tests {
         );
         assert_eq!(fs::read(&temporary).expect("read our temp"), b"ours");
         drop(file);
+        fs::remove_dir_all(directory).expect("remove scratch");
+    }
+
+    #[test]
+    fn atomic_write_failure_preserves_target_and_cleans_staging_file() {
+        let directory = scratch("atomic-failure");
+        let target = directory.join("receipt.json");
+        fs::create_dir_all(&directory).expect("create scratch");
+        fs::write(&target, b"old complete receipt").expect("write old target");
+
+        let error = write_bytes_atomic_with(&target, b"new complete receipt", |from, to| {
+            assert_eq!(to, target);
+            assert!(from.starts_with(&directory));
+            assert_eq!(
+                fs::read(&target).expect("read before install"),
+                b"old complete receipt"
+            );
+            Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "simulated rename failure",
+            ))
+        })
+        .expect_err("install fails");
+
+        assert_eq!(error.kind(), io::ErrorKind::PermissionDenied);
+        assert_eq!(
+            fs::read(&target).expect("old target remains"),
+            b"old complete receipt"
+        );
+        assert_eq!(
+            fs::read_dir(&directory).expect("list scratch").count(),
+            1,
+            "failed installation removes its staging file"
+        );
+        fs::remove_dir_all(directory).expect("remove scratch");
+    }
+
+    #[test]
+    fn atomic_write_exposes_old_contents_until_direct_rename_then_new_contents() {
+        let directory = scratch("atomic-visibility");
+        let target = directory.join("receipt.json");
+        fs::create_dir_all(&directory).expect("create scratch");
+        fs::write(&target, b"old complete receipt").expect("write old target");
+
+        write_bytes_atomic_with(&target, b"new complete receipt", |from, to| {
+            assert_eq!(to, target);
+            assert_eq!(
+                fs::read(&target).expect("old file is visible before rename"),
+                b"old complete receipt"
+            );
+            assert_eq!(
+                fs::read(from).expect("staged file is complete"),
+                b"new complete receipt"
+            );
+            fs::rename(from, to)
+        })
+        .expect("install staged file");
+
+        assert_eq!(
+            fs::read(&target).expect("new file is visible after rename"),
+            b"new complete receipt"
+        );
+        assert_eq!(
+            fs::read_dir(&directory).expect("list scratch").count(),
+            1,
+            "successful installation consumes the staging file"
+        );
         fs::remove_dir_all(directory).expect("remove scratch");
     }
 }
