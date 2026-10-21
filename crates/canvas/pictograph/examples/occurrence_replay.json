@@ -1,0 +1,60 @@
+{
+  "source": {
+    "authority": "fixture",
+    "domain": "relationships",
+    "resource": "copied",
+    "adapter": "knot.document"
+  },
+  "revision": "source:1",
+  "spec": "{\"version\":1,\"seed\":104375397257316,\"root\":{\"node\":\"preset\",\"id\":\"spring.rapier\"},\"realization\":{\"integrate\":{}}}",
+  "occurrences": [
+    {
+      "occurrence_id": "a",
+      "source_id": "same",
+      "label": "a",
+      "order": 0.0,
+      "x": 0.0,
+      "y": 0.0
+    },
+    {
+      "occurrence_id": "b",
+      "source_id": "other",
+      "label": "b",
+      "order": 1.0,
+      "x": 250.0,
+      "y": 40.0
+    },
+    {
+      "occurrence_id": "repeat",
+      "source_id": "same",
+      "label": "repeat",
+      "order": 2.0,
+      "x": 500.0,
+      "y": 80.0
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rhyme:a-b",
+      "from_occurrence": "a",
+      "to_occurrence": "b",
+      "kind": "rhyme",
+      "label": "Rhyme",
+      "explanation": "Copied fixture disclosure",
+      "evidence_source_ids": [
+        "same"
+      ]
+    }
+  ],
+  "roles": {
+    "a": "pinned",
+    "repeat": "seeded"
+  },
+  "tick_batches": [
+    2,
+    3,
+    1,
+    6
+  ],
+  "include_relationships": true
+}
