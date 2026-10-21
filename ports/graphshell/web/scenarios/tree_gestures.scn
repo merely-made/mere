@@ -1,0 +1,46 @@
+# The plain viewer leaves the page its gestures (mer3ly site canvas plan, P2
+# parity with the sandbox). Run on any viewer page, for example
+#   dataset.html?dataset=fixtures/site-repository-host-history.json
+# Each gesture is a synthetic browser event through the page's listeners.
+# A plain wheel over the graph stays the page's (its default is kept, so a
+# real one scrolls); Ctrl or Meta zooms. One finger on empty canvas is
+# withheld from the canvas and keeps its default (the page scrolls); one on
+# a node drags it. Two fingers pinch-zoom.
+assert snap ready == true
+settle 3
+click role:button Pause physics
+set-zoom 1
+settle 2
+wheel-graph 100
+settle 2
+assert snap gesture == wheel kept true
+assert snap wheel-use == Some(Page)
+assert snap zoom == 1
+wheel-graph -100 ctrl
+settle 2
+assert snap gesture == wheel kept false
+assert snap wheel-use == Some(Zoom)
+assert snap zoom >= 1.1
+wheel-graph 100 meta
+settle 2
+assert snap gesture == wheel kept false
+set-zoom 1
+settle 1
+pinch 2
+settle 2
+assert snap gesture == pinch prevented true
+assert snap touch-use == Some(TwoFinger)
+assert snap zoom >= 1.9
+set-zoom 1
+settle 1
+touch-graph 4 4
+settle 2
+assert snap gesture == touch withheld true prevented false
+assert snap touch-use == Some(Page)
+click role:button Fit graph
+settle 3
+touch-node urn:host-dataset:mere
+settle 2
+assert snap gesture == touch withheld false prevented true
+assert snap touch-use == Some(Drag)
+log gesture receipt complete
