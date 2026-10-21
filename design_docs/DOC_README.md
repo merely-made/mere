@@ -23,7 +23,7 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
-- [Shared site model and optional revision storage](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; opt-in saved-site checkpoint storage and Knot consumer qualification.
+- [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints and Gemini/Scroll/Micron publication through existing Eidetic and Gemot owners.
 
 Native shadow-mask admission (2026-10-16): the [browser presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md#native-shadow-mask-admission-continuation-2026-10-16) records the Rootstock producer remapper correction exposed by Woodshed Rehearsal. Translator-owned shadow images retain their keys, physical producer allocations stay below their range, and exact draw boundaries preserve colliding authored IDs. Six focused controls and 307 Rootstock/native-host tests pass with zero failures and six existing ignores; [source and lock receipt](../support/receipts/producer-shadow-20261016/qualification.json). Woodshed's bounded receiving gate passes on Mere `6575075057e`: fourteen reviewed native captures, exact fresh-process Set/voicing reopening, default/narrow controls and final-binary save-refusal close behavior; [receiving closure](../support/receipts/producer-shadow-20261016/woodshed-receiving.json). Physical audio and portable shadow-mask composition remain separate.
 
@@ -902,6 +902,13 @@ is historical evidence, not the current path or ownership inventory. For the wor
 [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md).
 
 ## Working principles
+
+- **Native site publication (2026-10-21):** a site is a publication profile over
+  explicitly selected contributions in an existing Moot collection. Retain native
+  metadata and canonical bytes through Eidetic; keep community authority and
+  ancestry in Gemot's signed contribution/collection history. A public reader
+  need not become a member. A resolved snapshot is a point-in-time read, not an
+  enduring hosting grant. See the [shared site plan](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md#moot-publication-binding-2026-10-21).
 
 - **Retained recall context (2026-10-20):** generation receives numbered passage text; full owner/version/selector identity stays in sealed run evidence and current-head citation admission. Fourteen focused recall cases and both ordinary resident routes pass; the combined custody/inference fixture qualifies both Knot-selection and Redshank-note native receiving/cold pairs in Turnstone. The final merged-shell SDK `7edfe3b09` also passes both native warm/cold pairs; the fixed-question and short-word citation/model bounds remain explicit under the [resident I10 gate](mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md#i10-the-envelope-and-a-vector-lane).
 - **Embedding compatibility (2026-10-20):** bind exact loaded provider artifacts/transforms, chunker and source revisions before reopening a derived index. Keep source authority with the retained owner and use the existing private journal for projections. Enforce memory against actual allocated vector capacity as well as persisted bytes; a 384-value vector may reserve more capacity after deserialization. Qualify fixed-revision supplier type identity through a real receiving compile; root metadata and direct pins alone can hide parallel upstream types. See the [resident I10 gate](mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md#i10-the-envelope-and-a-vector-lane).
