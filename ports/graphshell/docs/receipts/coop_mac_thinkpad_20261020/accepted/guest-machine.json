@@ -1,0 +1,51 @@
+{
+  "role": "guest",
+  "machine_id": "8bdcfe9ba1f8a022ba777d1657727a0d8351fb3bf97c3b2fe26d69757e4b4ff8",
+  "hostname": "thinkpad-l14-f",
+  "architecture": "x86_64",
+  "console_user": "markik",
+  "console_locked": false,
+  "console_present": true,
+  "operating_system": "Linux",
+  "system_version": "Fedora Linux 44 (Workstation Edition)",
+  "kernel": "7.2.10-200.fc44.x86_64",
+  "physical_model": "20U6S1CW00",
+  "desktop": {
+    "Name": "markik",
+    "Seat": "seat0",
+    "Remote": "no",
+    "Type": "wayland",
+    "Active": "yes",
+    "State": "active",
+    "LockedHint": "no",
+    "session_id": "8",
+    "gnome_screensaver": "(false,)"
+  },
+  "graphical_environment": {
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+    "DISPLAY": ":0",
+    "WAYLAND_DISPLAY": "/run/user/1000/wayland-0",
+    "XAUTHORITY": "/run/user/1000/.mutter-Xwaylandauth.2TCAX3",
+    "XDG_CURRENT_DESKTOP": "GNOME",
+    "XDG_SESSION_TYPE": "wayland",
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+  },
+  "addresses": [
+    "127.0.0.1",
+    "192.168.4.32",
+    "2603:6014:5d01:26d3:4e7f:e0e4:3d8a:677f",
+    "::1",
+    "fdac:1781:f09c:1:26b8:379f:5c56:3f2b",
+    "fe80::3d0d:7a98:a3ac:e550"
+  ],
+  "worker_pid": 2202903,
+  "worker_sha256": "37a83a46b93df37678be82e0a6e952a9a96c8c0f8079632fcd602eb94f63d574",
+  "source_commit": "38bc62024bb998f5499178b52c1deb3f61e576b3",
+  "lock_sha256": "fc7e385cbc903be10a2f1a580bc777d7c7b3409fd615941ab38b537de7141c5f",
+  "binaries": {
+    "graphshell_mere": "d7ddd54e89288e5ea8751c21a1be3479f06b8c8aad7e21ba269a0437f5315606",
+    "djinn": "79f28e426a7bf89a5e0ad1b08e0e8e399de5b3b7b0337a9c465123708d720fb7"
+  },
+  "public": "/home/markik/Code/output/tp-c2-20261020-05/guest/evidence",
+  "private": "/home/markik/Code/output/tp-c2-20261020-05/guest/private"
+}

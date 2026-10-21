@@ -9,6 +9,7 @@ description = "Transport-independent local curation state for Graphshell."
 
 [dependencies]
 chirograph.workspace = true
+hest.workspace = true
 sceno.workspace = true
 uxtree = { workspace = true, optional = true }
 accesskit = { workspace = true, optional = true }

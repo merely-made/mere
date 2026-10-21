@@ -7,7 +7,7 @@
 use super::*;
 use mere_view::ArchiveRequest;
 
-fn app() -> (
+pub(super) fn app() -> (
     App,
     mpsc::Sender<WorkerReply>,
     mpsc::Receiver<WorkerCommand>,
@@ -34,6 +34,10 @@ fn app() -> (
             view_saved: false,
             read_only: false,
             persistent_refusal: None,
+            owner_offers: Default::default(),
+            owner_form: Default::default(),
+            owner_record: None,
+            owner_waiting: false,
         },
         answers,
         requests,
@@ -73,6 +77,7 @@ fn reading(selected: Option<&str>) -> Reading {
         read_only: true,
         selected: selected.map(str::to_owned),
         view_saved: selected.is_some(),
+        owner_offers: Default::default(),
     }
 }
 
@@ -403,4 +408,248 @@ fn busy_refusal_preserves_the_last_reading_and_does_not_claim_done() {
     assert_eq!(app.graph_epoch, epoch);
     assert!(app.cards.contains_key("same-record"));
     assert!(app.pending);
+}
+
+fn owner_reading(bounded: bool) -> Reading {
+    let mut reading = reading(Some("same-record"));
+    reading
+        .cards
+        .get_mut("same-record")
+        .unwrap()
+        .values
+        .push(chirograph::CardValueV1 {
+            label: "Address".into(),
+            value: "https://owner.test/record".into(),
+        });
+    let mut action = graphshell::handlers::HandlerOffer {
+        id: "fixture".into(),
+        label: "Open with fixture".into(),
+        explanation: "Owner supplied".into(),
+        address_kinds: vec![],
+    }
+    .advertised_action();
+    if bounded {
+        action.intent = chirograph::IntentReference("fixture:choose".into());
+        action.payload_schema = "fixture.choose/v1".into();
+        action.input_form = Some(
+            chirograph::ActionFormV1::new("fixture.choose/v1").with_field(
+                chirograph::ActionFormFieldV1::choice(
+                    "choice",
+                    "Choice",
+                    [chirograph::ActionFormChoiceV1::new(
+                        "owner-value",
+                        "Owner choice",
+                    )],
+                ),
+            ),
+        );
+    }
+    reading.owner_offers.insert(
+        "same-record".into(),
+        (
+            graphshell_client::ActionDraftTarget {
+                session: chirograph::ProjectionSession("mere.graph".into()),
+                target: sceno::InstanceId(42),
+                observed_epoch: scenotime::SceneEpoch(7),
+                observed_revision: scenotime::Revision(9),
+            },
+            vec![action],
+        ),
+    );
+    reading
+}
+
+#[test]
+fn selected_owner_action_uses_existing_address_contract_and_exact_target() {
+    let (mut app, answers, requests) = app();
+    answers.send(reply(None, Ok(owner_reading(false)))).unwrap();
+    app.drain();
+    app.open_owner_action("graphshell.address.open/fixture");
+    let WorkerCommand {
+        owner:
+            Some(OwnerActionTarget {
+                key,
+                target,
+                action,
+            }),
+        invocation: command,
+        ..
+    } = requests.try_recv().unwrap()
+    else {
+        panic!("owner request")
+    };
+    assert_eq!(key, "same-record");
+    assert_eq!(target.target, sceno::InstanceId(42));
+    assert_eq!(target.observed_revision, scenotime::Revision(9));
+    assert_eq!(command.id, action.intent.0);
+    assert_eq!(command.schema_id, graphshell::handlers::OPEN_ADDRESS_SCHEMA);
+    let payload: graphshell::handlers::OpenAddressV1 =
+        serde_json::from_slice(&command.arguments).unwrap();
+    assert_eq!(payload.address, "https://owner.test/record");
+    assert_eq!(payload.handler, "fixture");
+    assert!(app.owner_waiting);
+    let mut reply = owner_reading(false);
+    reply.model.notice = Some("Request accepted by the owner.".into());
+    answers
+        .send(super::reply(app.pending_generation, Ok(reply)))
+        .unwrap();
+    app.drain();
+    assert!(!app.owner_waiting);
+    assert_eq!(app.owner_form.status, "Request accepted by the owner.");
+}
+
+#[test]
+fn owner_form_requires_exact_choices_and_does_not_follow_a_changed_target() {
+    let (mut app, answers, requests) = app();
+    answers.send(reply(None, Ok(owner_reading(true)))).unwrap();
+    app.drain();
+    app.open_owner_action("fixture:choose");
+    app.submit_owner_action();
+    assert!(requests.try_recv().is_err());
+    let draft = app.owner_form.draft.as_mut().unwrap();
+    assert!(draft.choose("choice", "invented").is_err());
+    draft.choose("choice", "owner-value").unwrap();
+    let mut changed = owner_reading(true);
+    changed
+        .owner_offers
+        .get_mut("same-record")
+        .unwrap()
+        .0
+        .observed_epoch = scenotime::SceneEpoch(8);
+    answers.send(reply(None, Ok(changed))).unwrap();
+    app.drain();
+    app.submit_owner_action();
+    assert!(requests.try_recv().is_err());
+    assert!(app.owner_form.status.contains("changed"));
+    assert_eq!(
+        app.owner_form.draft.as_ref().unwrap().values()["choice"],
+        "owner-value"
+    );
+}
+
+#[test]
+fn native_owner_controls_route_real_genet_clicks_through_the_existing_form() {
+    use genet_scripted_dom::{NodeId, ScriptedDom};
+    use layout_dom_api::{LayoutDom, Namespace};
+
+    fn text(dom: &ScriptedDom, node: NodeId) -> String {
+        let mut content = dom.text(node).unwrap_or("").to_owned();
+        for child in dom.dom_children(node) {
+            content.push_str(&text(dom, child));
+        }
+        content
+    }
+    fn find(dom: &ScriptedDom, attribute: Option<(&str, &str)>, label: Option<&str>) -> NodeId {
+        let mut nodes = vec![dom.document()];
+        while let Some(node) = nodes.pop() {
+            let attr_matches = attribute.is_none_or(|(name, value)| {
+                dom.attribute(node, &Namespace::from(""), &name.into()) == Some(value)
+            });
+            if dom
+                .element_name(node)
+                .is_some_and(|name| name.local.to_string() == "button")
+                && attr_matches
+                && label.is_none_or(|label| text(dom, node) == label)
+            {
+                return node;
+            }
+            nodes.extend(dom.dom_children(node));
+        }
+        panic!("owner control not found: {attribute:?} {label:?}")
+    }
+
+    let (mut app, answers, requests) = app();
+    answers.send(reply(None, Ok(owner_reading(true)))).unwrap();
+    app.drain();
+    let dom: cambium::DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+    let mut runner =
+        cambium::GenetAppRunner::new(dom.clone(), owner_actions::view as fn(&App) -> Child, app);
+    let action = find(
+        &dom.borrow(),
+        Some(("data-owner-action", "fixture:choose")),
+        None,
+    );
+    let _ = runner.dispatch_click(action, cambium::PointerClick::at((1., 1.)));
+    assert!(
+        requests.try_recv().is_err(),
+        "opening a form invokes nothing"
+    );
+    let choice = find(&dom.borrow(), None, Some("Owner choice"));
+    let _ = runner.dispatch_click(choice, cambium::PointerClick::at((1., 1.)));
+    let submit = find(&dom.borrow(), Some(("data-owner-submit", "true")), None);
+    let _ = runner.dispatch_click(submit, cambium::PointerClick::at((1., 1.)));
+    let WorkerCommand {
+        owner: Some(OwnerActionTarget { target, .. }),
+        invocation: command,
+        ..
+    } = requests.try_recv().unwrap()
+    else {
+        panic!("owner command")
+    };
+    assert_eq!(target.target, sceno::InstanceId(42));
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&command.arguments).unwrap()["choice"],
+        "owner-value"
+    );
+    assert!(runner.state().owner_waiting);
+}
+
+#[test]
+fn owner_pending_action_waits_for_its_matching_worker_generation() {
+    let (mut app, answers, requests) = app();
+    answers.send(reply(None, Ok(owner_reading(false)))).unwrap();
+    app.drain();
+    app.open_owner_action("graphshell.address.open/fixture");
+    let command = requests.try_recv().unwrap();
+    assert!(command.owner.is_some());
+    answers.send(reply(None, Ok(owner_reading(false)))).unwrap();
+    app.drain();
+    assert!(app.pending && app.owner_waiting);
+    assert_eq!(app.pending_generation, Some(command.generation));
+    assert_eq!(app.owner_form.status, "Requesting action from owner…");
+    let mut reading = owner_reading(false);
+    reading.model.notice = Some("Request accepted by the owner.".into());
+    let answer = reply(Some(command.generation), Ok(reading));
+    assert!(
+        answer.outcome.is_none(),
+        "a reading cannot claim terminal completion"
+    );
+    answers.send(answer).unwrap();
+    app.drain();
+    assert!(!app.pending && !app.owner_waiting);
+    assert_eq!(app.owner_form.status, "Request accepted by the owner.");
+}
+
+#[test]
+fn owner_worker_commands_keep_the_owner_declaration_and_refuse_mismatches() {
+    let (mut app, answers, requests) = app();
+    answers.send(reply(None, Ok(owner_reading(false)))).unwrap();
+    app.drain();
+    app.open_owner_action("graphshell.address.open/fixture");
+    let packet = requests.try_recv().unwrap();
+    assert!(matches!(
+        decode_worker_command(&packet),
+        Ok(WorkerRequest::Owner { .. })
+    ));
+    assert!(
+        decode_invocation(&packet.invocation).is_err(),
+        "owner data is not recoded as a local view command"
+    );
+    for field in 0..3 {
+        let mut invocation = packet.invocation.clone();
+        match field {
+            0 => invocation.id.push_str("-wrong"),
+            1 => invocation.schema_id.push_str("-wrong"),
+            _ => invocation.effect = cambium::EffectClass::DomainTruth,
+        }
+        let invalid = WorkerCommand {
+            generation: packet.generation,
+            invocation,
+            owner: packet.owner.clone(),
+        };
+        assert!(matches!(
+            decode_worker_command(&invalid),
+            Err(Outcome::Refused { .. })
+        ));
+    }
 }

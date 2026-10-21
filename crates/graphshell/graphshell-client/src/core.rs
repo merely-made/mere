@@ -338,42 +338,22 @@ impl SessionCore {
         action: &AdvertisedAction,
         payload: &T,
     ) -> Result<Progress<Outcome>, String> {
-        let advertised = self
-            .client
-            .mounted(session)
-            .and_then(|mounted| mounted.presentation.offers_for(target))
-            .and_then(|offers| {
-                offers
-                    .iter()
-                    .find(|offer| self.profile.supports(offer.requires))
-            })
-            .is_some_and(|offer| {
-                offer
-                    .semantics
-                    .actions
-                    .iter()
-                    .any(|candidate| candidate == action)
-            });
-        if !advertised {
-            return Err("intent was not advertised for the selected presentation".into());
-        }
         let ack = self
             .client
             .acknowledgement(session)
             .ok_or_else(|| format!("Graphshell did not acknowledge {}", session.0))?;
         let payload = serde_json::to_vec(payload)
             .map_err(|error| format!("could not encode intent payload: {error}"))?;
-        Ok(self.begin(
-            Pending::Intent,
-            CarrierRequestBody::Intent(IntentInvocation {
+        self.submit_command(
+            &ActionDraftTarget {
                 session: session.clone(),
                 target,
                 observed_epoch: ack.epoch,
                 observed_revision: ack.revision,
-                intent: action.intent.0.clone(),
-                payload,
-            }),
-        ))
+            },
+            action,
+            &action.command_invocation(payload),
+        )
     }
 
     /// Submit a draft composed from endpoint-advertised values.
@@ -385,13 +365,73 @@ impl SessionCore {
         target: &ActionDraftTarget,
         draft: &mut ActionDraft,
     ) -> Result<Progress<Outcome>, String> {
-        if !self.mounted.contains(&target.session) {
-            return Err(format!("Graphshell did not mount {}", target.session.0));
-        }
-        let invocation = draft
+        let composed = draft
             .invocation(target)
             .map_err(|error| format!("could not compose advertised action: {error}"))?;
+        self.submit_command(
+            target,
+            draft.action(),
+            &draft.action().command_invocation(composed.payload),
+        )
+    }
+
+    /// Submit an existing owner command, including domain-specific payloads
+    /// composed by that domain's adapter. No routing or grant is inferred from
+    /// the command ID, schema or effect. The original observation is preserved.
+    pub fn submit_command(
+        &mut self,
+        target: &ActionDraftTarget,
+        offered: &AdvertisedAction,
+        command: &hest::Invocation,
+    ) -> Result<Progress<Outcome>, String> {
+        if self.is_awaiting() {
+            return Err("Graphshell is awaiting the endpoint's answer".into());
+        }
+        let advertised = self
+            .current_actions(&target.session, target.target)?
+            .into_iter()
+            .find(|candidate| candidate == offered)
+            .ok_or("action is no longer advertised for the selected presentation")?;
+        let invocation = IntentInvocation::from_command(
+            command,
+            &advertised,
+            target.session.clone(),
+            target.target,
+            target.observed_epoch,
+            target.observed_revision,
+        )
+        .map_err(|error| format!("could not bind advertised command: {error:?}"))?;
         Ok(self.begin(Pending::Intent, CarrierRequestBody::Intent(invocation)))
+    }
+
+    /// Current endpoint actions for one exact, active item. Cached scenes and
+    /// unsupported presentation fallbacks remain readable, but offer no live
+    /// actions here. Viewer-local actions have their separate dispatch path.
+    pub fn current_actions(
+        &self,
+        session: &ProjectionSession,
+        target: InstanceId,
+    ) -> Result<Vec<AdvertisedAction>, String> {
+        if !self.mounted.contains(session) {
+            return Err(format!("Graphshell did not mount {}", session.0));
+        }
+        let mounted = self.client.mounted(session).ok_or("owner is unavailable")?;
+        if mounted.status != chirograph::SessionStatus::Live {
+            return Err("owner projection is not live".into());
+        }
+        if mounted.scene.active_item(target).is_none() {
+            return Err("owner action target is unavailable".into());
+        }
+        let offer = mounted
+            .presentation
+            .offers_for(target)
+            .and_then(|offers| {
+                offers
+                    .iter()
+                    .find(|offer| self.profile.supports(offer.requires))
+            })
+            .ok_or("owner target has no supported presentation")?;
+        Ok(offer.semantics.actions.clone())
     }
 
     /// Open one endpoint-advertised bounded action form at the client's current
