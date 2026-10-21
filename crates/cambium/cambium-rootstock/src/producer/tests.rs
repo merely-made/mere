@@ -707,7 +707,7 @@ fn gpu_content_origin_tests_semantic_child_sits_on_the_padded_producer_pixels() 
         fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
             self.0.borrow_mut().render(cx)
         }
-        fn semantics(&mut self) -> Option<ProducerSemantics> {
+        fn semantics(&self) -> Option<ProducerSemantics> {
             Some(ProducerSemantics {
                 children: vec![ProducerNode {
                     key: 40,

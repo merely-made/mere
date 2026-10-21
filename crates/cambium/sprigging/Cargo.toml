@@ -1,6 +1,6 @@
 [package]
 name = "sprigging"
-version = "0.2.2"
+version = "0.3.0"
 description = "Retained custom-paint leaves and arrangement helpers for Rust GUI hosts"
 edition.workspace = true
 

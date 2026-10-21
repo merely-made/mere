@@ -676,14 +676,12 @@ where
     /// resolves through. No adapter, so no screen reader is required to assert
     /// what one would be told.
     pub fn a11y_tree(
-        &mut self,
+        &self,
     ) -> (
         accesskit::TreeUpdate,
         std::collections::HashMap<accesskit::NodeId, NodeId>,
     ) {
-        // One explicit reborrow of the core: field borrows split inside a
-        // struct, but not across the wrapper's Deref.
-        let core = &mut self.host.core;
+        let core = &self.host.core;
         let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
             panic!("a11y_tree needs a laid-out harness: call layout_at first");
         };
@@ -692,14 +690,14 @@ where
         cambium_winit_a11y::project_tree(
             &*dom_ref,
             layout,
-            &mut core.s.shared.leaves,
-            &mut core.s.shared.producers,
+            &core.s.shared.leaves,
+            &core.s.shared.producers,
             core.s.last_focus,
         )
     }
 
-    /// Project this frame's layout into genet's neutral accessibility
-    /// projection, as the browser host does before lowering it to ARIA.
+    /// Read the current DOM seed. Contributed publication is exposed by
+    /// `semantic_projection`; this narrower observation does not call providers.
     pub fn a11y_projection(&self) -> cambium_rootstock::DocumentA11yProjection {
         let core = &self.host.core;
         let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
@@ -710,6 +708,24 @@ where
         cambium_rootstock::document_projection(
             &cambium_rootstock::WindowDom::document(&dom_ref),
             layout,
+            core.s.last_focus,
+        )
+    }
+
+    /// Current contributed semantics through shared provider borrows, with the
+    /// same owner maps and refusal report as native/browser publication.
+    pub fn semantic_projection(&self) -> cambium_rootstock::SemanticProjection {
+        let core = &self.host.core;
+        let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
+            panic!("semantic_projection needs a laid-out harness: call layout_at first");
+        };
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        cambium_rootstock::project_semantics(
+            &cambium_rootstock::WindowDom::document(&dom),
+            layout,
+            &core.s.shared.leaves,
+            &core.s.shared.producers,
             core.s.last_focus,
         )
     }

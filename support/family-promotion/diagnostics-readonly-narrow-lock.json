@@ -1,0 +1,17 @@
+{
+  "basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "restored": [
+    {
+      "supplier": "dramatis",
+      "retained": "git+https://github.com/merely-made/dramatis.git?branch=main#0c537848dbd2ba3f29810555eaa4df716050c2f3",
+      "declined_incidental_update": "git+https://github.com/merely-made/dramatis.git?branch=main#7d498c27df8076dacccb74ba4a05f863f9f48c76"
+    },
+    {
+      "supplier": "murm",
+      "retained": "git+https://github.com/merely-made/murm.git?branch=main#e2f19a3f3b42012951c4a820f9a53cb90d9bacd6",
+      "declined_incidental_update": "git+https://github.com/merely-made/murm.git?branch=main#64d47ac4d83f0a202054fe68a92b3bd4e1d4a62c"
+    }
+  ],
+  "lock_sha256": "c54a65a9fb0be819d2be6724db680831b5ebc00d162685d9ddffaef742dc3eec",
+  "status": "retain existing unrelated supplier cohorts; receiving follows"
+}

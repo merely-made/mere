@@ -355,7 +355,7 @@ illume = { version = "0.0.3", path = "crates/nematic/illume" }
 # Workspace members, so path deps. None of the eleven may appear in
 # .cargo/config.toml's genet patch table: patching a git source at a path that
 # is also a workspace member is a hard lockfile collision.
-cambium = { version = "0.5.0", path = "crates/cambium/cambium" }
+cambium = { version = "0.6.0", path = "crates/cambium/cambium" }
 cambium-rootstock = { version = "0.1.0", path = "crates/cambium/cambium-rootstock", default-features = false }
 mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
@@ -365,7 +365,7 @@ command-menu = { version = "0.1.1", path = "crates/cambium/command-menu" }
 hest = { version = "0.2.0", path = "crates/cambium/hest" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
-sprigging = { version = "0.2.2", path = "crates/cambium/sprigging" }
+sprigging = { version = "0.3.0", path = "crates/cambium/sprigging" }
 # The three engine adapters, unpublished. Their version was genet's
 # workspace 0.2.0, inlined on landing because mere's workspace version is
 # 0.0.1 and the move is not a version decision.
