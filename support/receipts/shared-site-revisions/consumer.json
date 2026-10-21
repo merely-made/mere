@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-21",
+  "model_supplier": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "knot_source": "52972246372c6b16769bba2bb14eff3607727e13",
+  "knot_receiving_record": "e24ee9e5856f20ef74b9bdb51763f3b5979a17ec",
+  "knot_receipt": "knot-editor/support/receipts/shared-site-revisions/integration.json",
+  "knot_receipt_sha256": "a98c7c77c29b5f7812f543de83298be35b2bcf954b5fe1658f1b7b87494963f4",
+  "tests": {
+    "shared_v1_compatibility": 3,
+    "shared_history": 6,
+    "standalone_site": 18,
+    "desktop_checkpoint": 1,
+    "launch_options": 9
+  },
+  "normal_default_desktop_check_passed": true,
+  "receiving_mere_cohort": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "preserved_upstream_sources": true,
+  "one_model_identity": true,
+  "snapshot_format_v1_changed": false,
+  "scope": "Automated native storage, file-only desktop state/worker, CLI tests and normal default-feature compilation. No new headed, retention runtime, replication or public-serving claim.",
+  "temporary_worktree_removed": "Code/worktrees/mere-site-revisions",
+  "new_isolated_cargo_home": null,
+  "prior_slice_metadata_retained": {
+    "path": "C:/t/cargo-homes/knot-editor-site-model",
+    "owner": "Earlier shared-site extraction qualification in this chat",
+    "bytes": 168089,
+    "reason": "Automatic approval review rejected deletion as blocked by policy. Its cache junctions were safely removed in the earlier slice."
+  },
+  "receipt_budget_bytes": 100000000
+}
