@@ -55,6 +55,14 @@ def main():
             until('snapshot')
             sys.argv = [str(HERE / 'run.py'), *remaining]
             base.HERE = HERE
+            worker_type = base.Worker
+            class RelayWorker(worker_type):
+                def __init__(self, role, command, log, trace):
+                    if role == 'guest':
+                        command = [*command[:-1], shlex.join(['env',
+                            'GRAPHSHELL_RELAY_ACCEPTANCE_URL=' + ready['url']]) + ' ' + command[-1]]
+                    super().__init__(role, command, log, trace)
+            base.Worker = RelayWorker
             base.main()
             accepted = True
         finally:

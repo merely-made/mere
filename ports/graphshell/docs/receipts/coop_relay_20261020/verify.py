@@ -129,7 +129,7 @@ def main():
                 assert path.stem not in captures
                 captures[path.stem] = capture['fields']
                 capture_roles[path.stem] = role
-    assert len(custodians) == 4 and len(captures) == 23
+    assert len(custodians) == 4 and len(captures) == 22
     cleanup = read(HERE / 'cleanup.json')
     assert cleanup['accepted_cohort'] == Path(machines['owner']['public']).parents[1].name
     assert all(not cleanup[role]['remaining'] for role in ['owner', 'guest'])
@@ -179,13 +179,17 @@ def main():
                     'events-2.jsonl').read_text().splitlines()]
     cold_ready = next(e['at_ms'] for e in guest_events if e['event'] == 'ready')
     assert len([e for e in connections if e['at_ms'] >= cold_ready]) >= 2
-    for launch in [1, 2]:
-        constraint = read(evidence / ('owner-network-constraint-' + str(launch) + '.json'))
-        assert constraint['probe'] == {'ipv4': 'denied', 'ipv6': 'denied', 'relay_tcp': 'connected'}
-        assert constraint['policy'] == machines['owner']['custodian_network_policy']
-        events = [json.loads(line) for line in (evidence / 'owner-resident' /
-                  ('events-' + str(launch) + '.jsonl')).read_text().splitlines()]
-        assert constraint['custodian_pid'] == next(e['pid'] for e in events if e['event'] == 'ready')
+    for name in q['phases']['guest']:
+        constraint = read(evidence / (name + '-network.json'))
+        assert constraint['native_pid'] == int(read(evidence / (name + '.json'))['final']['pid'])
+        assert constraint['probe']['pid'] == constraint['native_pid']
+        assert constraint['probe']['netns'] != constraint['host_netns']
+        assert constraint['probe']['relay_tcp'] == 'connected'
+        assert constraint['probe']['udp_send_accepted'] == len(b'namespace-relay-probe')
+        assert constraint['host_udp_control_received'] and not constraint['host_received_guest_udp']
+        assert '--no-udp' in constraint['pasta_command']
+        stopped_proxy = read(evidence / (name + '-network-stop.json'))
+        assert stopped_proxy['stopped'] and stopped_proxy['proxy_pid'] == constraint['proxy_pid']
     relay_build = read(HERE / 'build/relay/build-inputs.json')
     assert relay_build['sha256'] == relay['sha256']
     assert relay_build['source_commit'] == machines['guest']['source_commit']
@@ -230,7 +234,7 @@ def main():
     assert all(r['reviewed'] and r['observation']
                and sha(evidence / r['capture']) == r['sha256'] for r in review)
     print(json.dumps({'result': 'ok', 'machines': 2, 'native_processes': 7,
-                      'custodians': 4, 'captures': 23, 'active_routes': sorted(active_routes),
+                      'custodians': 4, 'captures': 22, 'active_routes': sorted(active_routes),
                       'source_files': len(inputs['owner']['files']), 'commit': args.commit}, indent=2))
 
 

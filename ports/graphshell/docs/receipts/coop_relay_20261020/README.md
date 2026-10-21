@@ -3,9 +3,12 @@
 This receipt reuses the complete seven-phase Mac-to-ThinkPad controller and
 native machine owner. The wrappers add one temporary, owned Iroh 1.3 relay on
 the ThinkPad, persisted `coop_relay_urls` in the Mac's isolated Djinn profile,
-and a process-local macOS sandbox denying outbound UDP for that custodian.
-Both IPv4 and IPv6 UDP refusal and TCP relay reachability are probed before
-each custodian launch. Neither machine's firewall policy is changed.
+and an isolated user/network namespace for each native guest process. The
+installed rootless Pasta forwarder allows TCP and drops UDP; IPv6 forwarding
+is disabled. A successful UDP send, an empty outside receiver, a working
+outside control receiver and TCP relay reachability are checked before each
+native exec. Neither machine's firewall policy is changed. The native PID is
+preserved through exec and bound to both the namespace proof and headed receipt.
 
 The shared native workflow qualifies one existing chosen graph, one owner and
 one invited editor: private sibling isolation, owner/guest writes and saved
