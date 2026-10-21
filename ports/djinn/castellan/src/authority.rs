@@ -444,6 +444,11 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         Ok(self.lock.unlock(method)?)
     }
 
+    /// The vault mutex serializes replacement with signing, writes and lock transitions.
+    pub fn change_passphrase(&self, old: &[u8], new: &[u8]) -> Result<(), crate::custody::PassphraseChangeError> {
+        self.vault.lock().unwrap().change_passphrase(old, new)
+    }
+
     /// Whether the vault is locked.
     pub fn is_locked(&self) -> bool {
         self.vault.lock().unwrap().is_locked()

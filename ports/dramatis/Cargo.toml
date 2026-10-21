@@ -6,7 +6,7 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Persona selection and quarantine review through the Djinn resident."
+description = "Persona selection, local authentication and quarantine review through the Djinn resident."
 
 [package.metadata.packager]
 product-name = "Dramatis"
@@ -29,6 +29,8 @@ path = "src/main.rs"
 
 [dependencies]
 cambium.workspace = true
+mesquite.workspace = true
+taproot.workspace = true
 cambium-genet-winit-host.workspace = true
 persona-picker.workspace = true
 # The custody client and quarantine types, without the Graphshell port

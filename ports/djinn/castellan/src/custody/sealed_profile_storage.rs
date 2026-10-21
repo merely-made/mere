@@ -232,6 +232,36 @@ impl IdentityStorage for SealedProfileStorage {
         self.records.unlock(*root, None)
     }
 
+    fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        use super::unlock::PassphraseChangeError as E;
+        if new.is_empty() {
+            return Err(E::InvalidNew);
+        }
+        self.records
+            .with_key(|held| {
+                let root = zeroize::Zeroizing::new(
+                    crate::custody::load_passphrase_root(self.root.join(PASSPHRASE_ROOT_FILE), old)
+                        .map_err(|_| E::IncorrectCurrent)?
+                        .ok_or(E::Unsupported)?,
+                );
+                // Verify that the current credential names this live vault root.
+                if !constant_time_eq::constant_time_eq(root.as_ref(), held) {
+                    return Err(E::IncorrectCurrent);
+                }
+                crate::custody::save_passphrase_root(
+                    self.root.join(PASSPHRASE_ROOT_FILE),
+                    held,
+                    new,
+                )
+                .map_err(|_| E::Storage)
+            })
+            .map_err(|_| E::Locked)?
+    }
+
     /// Wrap the root this storage holds under `passphrase`, beside the
     /// profiles: the same root, never a new one (see `passphrase_root`).
     fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {

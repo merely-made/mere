@@ -46,8 +46,10 @@ fn main() {
             if !replies.is_empty() {
                 ctx.runner.update(|s| {
                     for (reply, owned) in replies {
-                        if owned || !s.busy {
+                        if owned {
                             s.adopt(reply);
+                        } else if !s.busy {
+                            s.adopt_refresh(reply);
                         }
                     }
                 });
@@ -115,6 +117,19 @@ fn main() {
                 *sink.borrow_mut() = Some(capture.expect("presented frame capture refused"));
             }));
         });
+    }
+    // Reuse the stack's presented-frame driver; requests still pass through
+    // retained controls, the app worker, and the admitted custody route.
+    if let Some(config) = mesquite::LaneConfig::from_env("DRAMATIS") {
+        let mut lane = mesquite::Lane::from_config(
+            config,
+            dramatis_app::acceptance::Acceptance::default(),
+            cambium_genet_winit_host::read_file,
+        )
+        .expect("Dramatis scenario")
+        .with_presentation_timeout(std::time::Duration::from_secs(60));
+        hooks.frame = Box::new(|_| true);
+        hooks.after_frame = Box::new(move |ctx| lane.after_frame(ctx));
     }
     let initial_logical_size = if std::env::var_os("DRAMATIS_CAPTURE").is_some() {
         std::env::var("DRAMATIS_CAPTURE_SIZE")

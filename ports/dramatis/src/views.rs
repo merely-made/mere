@@ -63,6 +63,13 @@ pub fn root(state: &State) -> Child {
                 },
                 state.busy,
             ));
+            body.push(Box::new(el("h2", text("Authentication"))));
+            body.push(line("Change the passphrase for this computer’s vault. Djinn asks for the current and new passphrases in its own native prompts."));
+            body.push(action(
+                "Change passphrase…",
+                Request::ChangePassphrase,
+                state.busy || locked,
+            ));
             body.push(Box::new(el("h2", text("Personae"))));
             if snapshot.roster.entries.is_empty() {
                 body.push(line(
