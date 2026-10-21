@@ -131,3 +131,6 @@ ports/distillery/tests/fixtures/circuit/
 
 # Claude Code agent worktrees (machine-local)
 .claude/
+
+# Reproducible independent consumer of the extracted observation core.
+!support/fixtures/apparatus-core-consumer/Cargo.lock

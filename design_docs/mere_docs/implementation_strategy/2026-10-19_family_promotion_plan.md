@@ -352,9 +352,9 @@ Their CPU receipts do not establish headed product completion or pixel causality
 
 **Command-contract owner:** the
 [Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
-owns shared declaration, invocation and outcome vocabulary. Its H1/H2 and
-Cambium 0.5 receiving work are a separate, locally committed delivery cohort;
-H3 remains the invocation/result gate. This diagnostics continuation consumes
+owns shared declaration, invocation and outcome vocabulary. H1–H4 now have
+their own published delivery/receiving cohorts, including H3's nonterminal
+acceptance and H4's script/automation adapters. This diagnostics continuation consumes
 that owner instead of defining another command catalogue or outcome protocol.
 Keep Hest independent of Chirograph, Apparatus and application runtimes.
 
@@ -680,3 +680,35 @@ the compiled behavioral qualification is the resident I10 gate. They do not
 assert unfiltered standalone application suites. Later manifest/lock commits
 carry the same code and SDK/artifact revisions as the qualified receiving
 closure. Frozen earlier promotion and native receipts remain unchanged.
+
+
+### Apparatus portable-core extraction, 2026-10-21
+
+The portable bounded observation store and renderer-independent inspection data
+now have one implementation in `apparatus-core`, a sibling crate in Armillary
+at `75643df1f178757bb7b6386913af1a39353f3069`. Its default library uses only
+`std`; optional Serde is its only library dependency. It does not depend on
+Armillary's actor package, Tokio, Mere, Registry, AccessKit or UxTree.
+
+Mere retains `mere-apparatus` as its integration facade: existing public types
+are re-exported, the `serde` feature forwards to the shared core, and the
+Registry collector, structural accessibility projection and default projection
+behavior remain in Mere. The old store and portable inspection implementations
+are removed from Mere. Hest vocabulary, command admission/execution, producer
+redaction, retention/export decisions and persistence authority are unchanged.
+Armillary's existing execution package pin is independent and stays qualified;
+adding this sibling crate does not require an actor-source migration.
+
+The donor is Mere `8942e30503f2fa91fdefe879ec5268ee42a5241a`. Source hashes
+prove the observation implementation/tests were moved verbatim; inspection
+removes only its Mere projection blocks and the resulting blank seam. All 18
+portable tests move with their implementation. Receiving proof checks shared
+Rust type identity and the original serialized batch/cursor values, including
+Unicode payload bytes, eviction and scoped cause metadata. The independent
+Git consumer exercises the default core without the Mere facade or a runtime.
+
+Compact source, command and publication evidence belongs in
+`support/family-promotion/apparatus-core-extraction.json`. These source/CPU
+checks do not establish new native UI, physical-device or durable audit-log
+qualification. The shared core remains a bounded observation copy; products
+retain authoritative execution results and persistence.

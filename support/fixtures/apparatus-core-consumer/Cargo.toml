@@ -1,0 +1,12 @@
+[package]
+name = "apparatus-core-consumer"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.97.1"
+license = "MPL-2.0"
+publish = false
+
+[workspace]
+
+[dependencies]
+apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "75643df1f178757bb7b6386913af1a39353f3069", default-features = false }

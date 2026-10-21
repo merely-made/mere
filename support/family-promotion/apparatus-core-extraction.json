@@ -1,0 +1,493 @@
+{
+  "donor_revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+  "core_git_revision": "75643df1f178757bb7b6386913af1a39353f3069",
+  "core_repository": "https://github.com/merely-made/armillary.git",
+  "source_split": {
+    "src/observation.rs": "2b2da68af36fac22cce5f93abe5da044d455f12452407a37db0fad7081e37fba",
+    "src/observation/tests.rs": "9664498d06bb0f7f8ad1f0ef86d58083c7a65bf52dd855175ffc3ceeb04373e3",
+    "src/inspection.rs": {
+      "sha256": "1648c7111468796de11c60c52946c6153d0df7fe325073446a4bcbf8e32e7758",
+      "change": "Removed only accessibility projection and its feature-gated test; retained portable implementation and four tests verbatim. Removed the resulting blank line before the closing module brace for rustfmt."
+    }
+  },
+  "donor_sources": {
+    "repository": "merely-made/mere",
+    "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+    "files": {
+      "Cargo.toml": "e4ccd4a283f6b7a970261e3ea7a6b0c1b77989f1f935ed0b811f3af22b2e8b7d",
+      "README.md": "295be6279244e574cbc6973e4a3b3ab5542f06742b1b984b6b777bbbfe662f59",
+      "src/collector.rs": "d4f3572ad1ba07601c2478438fbf7893da6e619083a2dea4eb9a0de6b4e65693",
+      "src/lib.rs": "0727eff8dccb8f115f538da460c255bbc8f17d3720cc32792a614cf52ad5a47f",
+      "src/observation.rs": "2b2da68af36fac22cce5f93abe5da044d455f12452407a37db0fad7081e37fba",
+      "src/inspection.rs": "2c4ee0ac6100920a64b5c60dd5682af564ead89a19a0f21c878013aecdbb2d4c",
+      "src/collector/tests.rs": "53380a6735377b280205ba848e9bfe21be5e5f1d03da180f559115f0ca4d61d7",
+      "src/observation/tests.rs": "9664498d06bb0f7f8ad1f0ef86d58083c7a65bf52dd855175ffc3ceeb04373e3"
+    }
+  },
+  "receiving_source_sha256": {
+    ".gitignore": "4d50e66a062cb9bacb138533d1122938dfc30b5b6c39803738e9fc774b907610",
+    "Cargo.lock": "dbc1222819b409e98f9823b665e112cdbc496aef0c5f3c250837f9cf43ab9508",
+    "crates/domain/apparatus/Cargo.toml": "1b0669a52a66bf91c9bd03d7f404074cfc970ad98e6303395fc9bfde3051d39e",
+    "crates/domain/apparatus/README.md": "b130caa5671e4673b23c119740307109f67654d1c4d87ae76998622b76be728d",
+    "crates/domain/apparatus/src/inspection.rs": "50a73c1e2d7c2f3bf933d99a2455c3a189faff550144441473d5776d06c71f5c",
+    "crates/domain/apparatus/src/lib.rs": "0ab77e23435fbf8f6238c309baf55702a8d31ae67a7eff2fbf4bcf35338ecb1b",
+    "design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md": "101185285008c73d1916d9e77dcf80d172f77bb9c4ec8fce87b59537566feef4",
+    "ports/distillery/probe/Cargo.lock": "f9535f20fa2a677da221144b0d5a0acfbc15f9b2277c9bcd70123260b5036783",
+    "ports/graphshell/web/Cargo.lock": "b2d7f235c400e6572d73fbdb16e8935366c8c493e5898229a2864c4e8868487c",
+    "crates/domain/apparatus/tests/core_identity.rs": "2d224c4ecb2afcc297d6a11bc3c0285be34fb6b79a86c967b27d34614b16e370",
+    "crates/domain/apparatus/tests/donor-wire-v1.json": "245bf3b132f28d63bff710d60c874250d708e76429340990108b08579b306d14",
+    "support/fixtures/apparatus-core-consumer/Cargo.toml": "db66be59dea6cc8e9b428166b5acc579510277c9fe6fd3851b491577e6b04f15",
+    "support/fixtures/apparatus-core-consumer/Cargo.lock": "b549fc07f9bcf1643e087181a56f10fff5cee49fb32e3b839a6079fc2a1760ce",
+    "support/fixtures/apparatus-core-consumer/src/main.rs": "8aadcd9d961d0e98ec54ced5aec1f314b792002d608df94acac5fed4ea49e0e2"
+  },
+  "removed_donor_paths": [
+    "crates/domain/apparatus/src/observation.rs",
+    "crates/domain/apparatus/src/observation/tests.rs"
+  ],
+  "checks": {
+    "donor-apparatus-all-features": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "mere-apparatus",
+        "--all-features"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:26:07.898220+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:26:15.427375+00:00",
+      "log_sha256": "81b5a5e8e8f360dbd15c90390ee8f9eb4409759720a4dbe560c912d0fa5340fc",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 28,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    "mere-facade-locked": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "mere-apparatus",
+        "--all-features"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:32:10.679354+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:32:16.679946+00:00",
+      "log_sha256": "8dec8cb27016e8871cdd29cf0e09b04fb51f84c90a088f36ab9d2af604b78487",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    "mere-facade-lean": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "mere-apparatus",
+        "--no-default-features"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:35:00.998721+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/README.md\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md\n M ports/distillery/probe/Cargo.lock\n M ports/graphshell/web/Cargo.lock\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:35:27.859567+00:00",
+      "log_sha256": "3a5daa9e1d5f5008bb92c567c074a275066ba5d51b88625643ca899f60dbeb97",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    "mere-worker": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "distillery",
+        "--features",
+        "inference",
+        "--lib",
+        "--test",
+        "inference_observations",
+        "--test",
+        "inference_shutdown"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:32:10.679356+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:33:24.202708+00:00",
+      "log_sha256": "a391cc14fb6781ce5152ceb6abef5ca9325df90d372a393c1ee3cd8db6bddd17",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 42,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        },
+        {
+          "result": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    "mere-collector": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "djinn",
+        "--lib",
+        "resident_events::tests"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:32:10.679351+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:35:23.980678+00:00",
+      "log_sha256": "312c325b6e5531b74fb929992a295149ce1afd54c41e41280a9a11f6cc995297",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 229
+        }
+      ]
+    },
+    "mere-mesquite": {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/repos/mere/target",
+        "-j2",
+        "-p",
+        "mesquite",
+        "--lib"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:32:10.679351+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:32:33.271937+00:00",
+      "log_sha256": "2c50a0a11b8610cb53bc23a3f03679dd7e0444a2c3c66523eb514e758adadf97",
+      "suites": [
+        {
+          "result": "ok",
+          "passed": 39,
+          "failed": 0,
+          "ignored": 0,
+          "measured": 0,
+          "filtered_out": 0
+        }
+      ]
+    },
+    "independent-locked": {
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "run",
+        "--locked",
+        "--offline",
+        "--quiet",
+        "-j2"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/support/fixtures/apparatus-core-consumer",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:35:00.998715+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/README.md\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md\n M ports/distillery/probe/Cargo.lock\n M ports/graphshell/web/Cargo.lock\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:35:05.055440+00:00",
+      "log_sha256": "8bb9899e1781de3d59ed83eb57c301dc3a140054cc564dea4411650ce13e5d53",
+      "suites": []
+    },
+    "independent-tree": {
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "tree",
+        "--locked",
+        "--offline",
+        "--edges",
+        "normal"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017/support/fixtures/apparatus-core-consumer",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:35:00.998767+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/README.md\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md\n M ports/distillery/probe/Cargo.lock\n M ports/graphshell/web/Cargo.lock\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:35:04.772050+00:00",
+      "log_sha256": "8002ba5a890978478e8b11e6fb8cccacb3c191f9e4de1693bb694ea1a7049fbf",
+      "suites": []
+    },
+    "port-boundaries": {
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "cwd": "/Users/markik/Code/worktrees/mere-ordinary-responsive-links-20261017",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:35:00.998823+00:00",
+      "status_before": " M Cargo.lock\n M crates/domain/apparatus/Cargo.toml\n M crates/domain/apparatus/README.md\n M crates/domain/apparatus/src/inspection.rs\n M crates/domain/apparatus/src/lib.rs\n D crates/domain/apparatus/src/observation.rs\n D crates/domain/apparatus/src/observation/tests.rs\n M design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md\n M ports/distillery/probe/Cargo.lock\n M ports/graphshell/web/Cargo.lock\n?? crates/domain/apparatus/tests/\n?? support/fixtures/apparatus-core-consumer/\n",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:35:05.306528+00:00",
+      "log_sha256": "24393869caf3ee5857aefd29b1e0f04c91d614b71d72b7cc8f849bcf3238b494",
+      "suites": []
+    },
+    "donor-wire": {
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "run",
+        "--offline",
+        "--quiet",
+        "-j2"
+      ],
+      "cwd": "/Users/markik/Code/testing/apparatus-extraction-20261021/donor-wire",
+      "revision": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
+      "started": "2026-10-21T04:29:36.131886+00:00",
+      "status_before": "",
+      "process_started": true,
+      "exit_code": 0,
+      "finished": "2026-10-21T04:29:39.903590+00:00",
+      "log_sha256": "be383faea8c860e349139224403472a41a48e667d9c3ac4a84005b469295f45b",
+      "suites": []
+    }
+  },
+  "locked_metadata": [
+    {
+      "root": ".",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "metadata_sha256": "154079165a7d8e609f7e10c3fbc8f0544d13ba219147d91a25591eb12effbcb3",
+      "core_packages": [
+        {
+          "id": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#apparatus-core@0.1.0",
+          "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+        }
+      ],
+      "outside_local_overrides": []
+    },
+    {
+      "root": "ports/distillery/probe",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "metadata_sha256": "63de27baf41ebfb8cdd1df8587165c11de0e3cfcba3ff0df748a1a4326ef1edc",
+      "core_packages": [],
+      "outside_local_overrides": []
+    },
+    {
+      "root": "ports/graphshell/web",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "metadata_sha256": "78f2a3764460d433372c12f2aaccbb4c901331cf2fad3d224a447807267dd783",
+      "core_packages": [
+        {
+          "id": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#apparatus-core@0.1.0",
+          "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+        }
+      ],
+      "outside_local_overrides": []
+    },
+    {
+      "root": "support/fixtures/apparatus-core-consumer",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "metadata_sha256": "17547b238937662b9f99f66ef049a3dd59afa34944e28895a8aced435d5a7bbd",
+      "core_packages": [
+        {
+          "id": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#apparatus-core@0.1.0",
+          "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+        }
+      ],
+      "outside_local_overrides": []
+    }
+  ],
+  "source_identity": "One apparatus-core source per active graph, canonical Git URL/revision, no outside path override. Existing Armillary actor source pins are unchanged because the sibling core has no actor dependency.",
+  "lock_note": "The affected Distillery probe lock was stale against current workspace manifests: Cargo also aligns its local Cambium0.5/Hest0.2 and Rootstock AccessKit rows. No product code or first-party Git heads were changed by that repair.",
+  "external_receiver": "Turnstone diagnostics/projection qualification is the next receiving checkpoint after this supplier is pushed; no result claimed here.",
+  "limits": [
+    "Core MSRV1.97.1 tests and CPU receiving checks only.",
+    "No new native UI, human AT, hardware, durable audit-journal or registry-package publication claim.",
+    "Products retain outcome truth, redaction, policy, persistence and export authority."
+  ]
+}
