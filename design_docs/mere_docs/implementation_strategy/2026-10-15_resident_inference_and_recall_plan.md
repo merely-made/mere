@@ -1840,3 +1840,39 @@ receipt does not promote those pending product gates to passes.
   The fixture binary remains explicitly bound to its compiled source cut; this
   is not qualification of every current-main resident configuration or a
   personal installation.
+
+## Mixed-source recall qualification, 2026-10-21
+
+**Status:** bounded four-source publication, retrieval, citation identity/routing
+and cold-reopen qualification passed on the recorded native cut. Turnstone's
+`docs/receipts/mixed_source_recall_20261021/` contains 52 presented captures,
+twelve resident asks, six historical reopen paths and eighteen target-citation
+activations across independent lexical/fused warm/cold pairs. The origin and
+producer/transfer files are absent before cold reopen, while selected package
+contents and anchors remain equal on export. Original producer receipts stay
+frozen; these are receiving/recall cases.
+
+`InferenceLane::published_recall_rankings` explains the actual live publication
+binding with explicit owner/scope, lock, invalidation and withdrawal checks. It
+adds no application route or grant and does not reconstruct a second evaluation
+corpus. The opt-in headed fixture accepts three frozen target questions and eight
+ranking questions, observes each completed run and historical revival, and raises
+its passage limit to three only for this mixed case. The ordinary fixture and
+32-character quote threshold remain unchanged.
+
+On the eight predeclared questions, lexical MRR/top-1/recall@3 are 0.875; real
+MiniLM vector and fused values are 1.0. The note's audio-reminder paraphrase is the
+lexical miss. Independent passage-ID/RRF reconstruction agrees with the live
+index; cold reopening retains all rankings and the same four-source,
+384-dimensional envelope/index identity. Nineteen focused supplier cases pass.
+This small fixture is not a general relevance benchmark; its combined question
+measures retrieval, not a composed generated answer.
+
+**Open quality boundary:** the stock SmolLM2 note answer repeats the requested
+body and adds other-source references. Identity/range validation and a valid
+model-authored marker do not certify semantic support. The final fused UI recipe
+acknowledges each native selection through the persisted source set; rapid-click
+behavior is not signed off. Runtime inputs, excluded attempts and per-mode
+recipes are retained. The native product is Turnstone `a048adcc36` with SDK
+`7edfe3b09`; later concurrent main-line changes are not relabeled as fresh headed
+qualification. Publication integration checks are recorded separately.
