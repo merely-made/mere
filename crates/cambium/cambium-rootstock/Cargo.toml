@@ -30,7 +30,7 @@ iced_wgpu = { git = "https://github.com/iced-rs/iced", rev = "ab336f6d6403d7206d
 # The neutral key vocabulary this crate lowers into when it dispatches to a
 # runner. Named here so the conversion lives on this side of the seam rather
 # than in each event-source adapter.
-cambium = { version = "0.5.0", path = "../cambium" }
+cambium = { version = "0.6.0", path = "../cambium" }
 # Retained Livery/Buckram layout and its visual caret vocabulary are core host
 # machinery, not an event-source concern.
 genet-livery = { workspace = true }
@@ -42,7 +42,7 @@ document-session-api = { workspace = true }
 # custom-paint leaf describes itself through. Both are host machinery, not
 # event-source concerns.
 genet-scripted-dom = { workspace = true }
-sprigging = { version = "0.2.2", path = "../sprigging" }
+sprigging = { version = "0.3.0", path = "../sprigging" }
 # The present core, which is already windowing-neutral: `SurfaceHost` is a
 # `RenderCore` plus a window surface, and the browser presenter assembles
 # the same pair by hand against a canvas.

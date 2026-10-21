@@ -37,7 +37,7 @@
 //! - The root never touches disk unsealed; intermediate plaintext is held in
 //!   [`Zeroizing`] buffers.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
@@ -161,7 +161,7 @@ pub fn save_passphrase_root(
     passphrase: &[u8],
 ) -> Result<(), IdentityError> {
     let file = wrap_vault_root(root, passphrase)?;
-    save_json_atomic(path.as_ref(), &file)
+    super::atomic_secret_file::write_json(path.as_ref(), &file)
 }
 
 /// Load and unseal the vault root at `path`, or `None` when the file is absent.
@@ -203,44 +203,6 @@ fn random_bytes(n: usize) -> Vec<u8> {
     let mut buf = vec![0u8; n];
     getrandom::fill(&mut buf).expect("OS randomness available");
     buf
-}
-
-fn save_json_atomic<T>(path: &Path, value: &T) -> Result<(), IdentityError>
-where
-    T: Serialize,
-{
-    let bytes = serde_json::to_vec(value)
-        .map_err(|err| IdentityError::Backend(format!("serialize {path:?}: {err}")))?;
-    let parent = path.parent().ok_or_else(|| {
-        IdentityError::Backend(format!(
-            "passphrase vault-root path has no parent: {path:?}"
-        ))
-    })?;
-    std::fs::create_dir_all(parent)
-        .map_err(|err| IdentityError::Backend(format!("create dir {parent:?}: {err}")))?;
-    let tmp = tempfile_in_dir(parent)?;
-    std::fs::write(&tmp, &bytes)
-        .map_err(|err| IdentityError::Backend(format!("write tmp {tmp:?}: {err}")))?;
-    std::fs::rename(&tmp, path)
-        .map_err(|err| IdentityError::Backend(format!("rename tmp {tmp:?} -> {path:?}: {err}")))?;
-    Ok(())
-}
-
-fn tempfile_in_dir(dir: &Path) -> Result<PathBuf, IdentityError> {
-    use std::time::{SystemTime, UNIX_EPOCH};
-
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|err| IdentityError::Backend(format!("time: {err}")))?
-        .as_nanos();
-    let mut rand = [0u8; 8];
-    getrandom::fill(&mut rand).expect("OS randomness available");
-    let mut hex = String::with_capacity(16);
-    for byte in rand {
-        use std::fmt::Write as _;
-        let _ = write!(&mut hex, "{byte:02x}");
-    }
-    Ok(dir.join(format!(".passphrase-root-{now}-{hex}.tmp")))
 }
 
 #[cfg(test)]

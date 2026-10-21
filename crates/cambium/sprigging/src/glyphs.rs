@@ -310,7 +310,7 @@ impl Leaf for GraphCanvas {
     /// link preview, and a breadcrumb thumbnail, so the author who placed it knows
     /// what it depicts and says so with `aria-label`; a generic self-description
     /// must never overwrite that.
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::GraphicsObject);
         if node.label().is_none() {
             node.set_label(format!(
@@ -545,7 +545,7 @@ impl Leaf for Meter {
     /// A level meter announces as [`accesskit::Role::Meter`] carrying its normalized level.
     /// Read-only: a meter reports, it is not actuated, so it declares no action
     /// and never lands in the host's routable set.
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::Meter);
         node.set_numeric_value(self.value as f64);
         node.set_min_numeric_value(0.0);
@@ -650,7 +650,7 @@ impl Leaf for Knob {
     /// declares the actions assistive tech and automation invoke on a slider.
     /// Declaring them here is what puts the knob in the host's routable set, so
     /// a leaf interior is actuated through the same path a `<button>` is.
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         node.set_role(accesskit::Role::Slider);
         node.set_numeric_value(self.value as f64);
         node.set_min_numeric_value(0.0);

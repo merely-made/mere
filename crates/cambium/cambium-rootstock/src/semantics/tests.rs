@@ -24,7 +24,7 @@ impl Leaf for Describer {
     fn paint_dirty(&self) -> bool {
         false
     }
-    fn accessibility(&mut self, node: &mut accesskit::Node) {
+    fn accessibility(&self, node: &mut accesskit::Node) {
         *self.0.borrow_mut() += 1;
         assert_eq!(node.label(), Some("Author"), "a fully seeded callback");
         assert!(node.bounds().is_some());
@@ -45,16 +45,57 @@ impl TextureProducer for Board {
     fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
         None
     }
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    fn semantics(&self) -> Option<ProducerSemantics> {
         Some(board())
     }
+}
+
+#[test]
+fn readonly_tests_composition_accepts_live_shared_provider_borrows() {
+    let (mut dom, _, _) = fixture("");
+    let root = dom.document();
+    let knob = dom.create_element(cambium::attr_qual("custom-leaf"));
+    dom.set_attribute(knob, cambium::attr_qual("key"), "8");
+    dom.set_attribute(
+        knob,
+        cambium::attr_qual("style"),
+        "display:block;width:80px;height:30px",
+    );
+    dom.append_child(root, knob);
+    let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+    let source = Rc::new(RefCell::new(Described(board())));
+    let mut producers = ProducerRegistry::new();
+    producers.register(7, source.clone(), &[]).unwrap();
+    let mut leaves = LeafRegistry::new();
+    leaves.insert(
+        8,
+        Box::new(sprigging::Knob::new(Size {
+            width: 80.0,
+            height: 30.0,
+        })),
+    );
+    let held = source.borrow();
+    let first = project_semantics(&dom, &layout, &leaves, &producers, None);
+    let second = project_semantics(&dom, &layout, &leaves, &producers, None);
+    assert_eq!(first.tree, second.tree);
+    assert_eq!(first.produced_targets, second.produced_targets);
+    assert_eq!(held.0, board());
+    assert_eq!(first.produced_targets.len(), 1);
+    assert!(
+        first
+            .tree
+            .nodes
+            .iter()
+            .any(|(_, node)| node.role() == Role::Slider && node.numeric_value().is_some())
+    );
+    assert!(first.producer_issues.is_empty());
 }
 struct Described(ProducerSemantics);
 impl TextureProducer for Described {
     fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
         None
     }
-    fn semantics(&mut self) -> Option<ProducerSemantics> {
+    fn semantics(&self) -> Option<ProducerSemantics> {
         Some(self.0.clone())
     }
 }
@@ -230,7 +271,7 @@ fn hidden_leaf_retires_its_route_and_falls_back_from_hidden_focus() {
         fn paint_dirty(&self) -> bool {
             false
         }
-        fn accessibility(&mut self, node: &mut accesskit::Node) {
+        fn accessibility(&self, node: &mut accesskit::Node) {
             node.set_hidden();
         }
     }

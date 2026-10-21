@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
-  "status": "contained semantic identity validation qualified: 122 targeted native passes/five existing ignores and Wasm compile; read-only observation, provider contracts, target generations, action vocabulary, full forward placement and issue/collector adoption remain open",
+  "status": "Read-only provider/accessor foundation qualified: 537 native passes/seven existing ignores, core and actual Graphshell Wasm compile, embedding and resident lib/binary checks. Selector adoption remains open within migration one; target lifetimes, broader actions and supplier geometry follow.",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -256,6 +256,52 @@
       "change": "Retire the false pure-read claim on native composition and the stale claim that browser publication lowers only the DOM projection. Document the actual DOM seed, shared contributed composition and mutable callback boundary.",
       "verification": "Source trace across native project_tree_with_actions, browser plan and Rootstock project_semantics; documentation repair, not a purity guarantee.",
       "status": "repaired; read-only provider migration remains open"
+    },
+    {
+      "id": "diagnostics-retained-observation-mutates-action-identity",
+      "source": [
+        "ports/graphshell/src/retained_content/producer.rs:ContentProducer::semantics/act",
+        "ports/graphshell/src/retained_content.rs:ContentSlot::frame/refresh_semantic_keys"
+      ],
+      "authority": "Retained content owner allocates session-qualified keys after a successful document frame; read-only producer descriptions reuse those keys",
+      "change": "Remove producer-local key allocation and last-read action-map rebuilding. The owner frame preserves live session-qualified keys and retires keys absent from the current session projection. Shared reads reuse owner keys; activation resolves and revalidates the current owner/session/document projection without a priming description read.",
+      "status": "repaired and qualified by shared-borrow controls and current-cohort retained-content receiving (12 tests)"
+    },
+    {
+      "id": "diagnostics-taproot-catalogue-adoption",
+      "source": [
+        "genet/components/taproot/projection.rs:matching_with_projection",
+        "crates/cambium/mesquite/src/probe.rs:selector_target",
+        "crates/cambium/mesquite/src/clicks.rs",
+        "crates/cambium/cambium-genet-winit-host/src/harness.rs:resolve_node"
+      ],
+      "status": "source-confirmed receiving gap; full first observation migration remains open",
+      "evidence": "The pinned Taproot matcher accepts DocumentA11yProjection and walks dom_children. It cannot consume the AccessKit-shaped contributed catalogue, and its role matching does not follow the flat tree used by publication. AppCtx/Harness semantic_projection now expose the shared contributed observation but selector consumers still use the DOM seed.",
+      "gate": "Supplier-owned generic read-only semantic lookup and flat-tree selector traversal; then Mesquite/Harness adoption without another role/name implementation. Generated producer targets require explicit target/action delivery rather than inventing DOM NodeIds."
+    },
+    {
+      "id": "diagnostics-release-family-split",
+      "authority": "One Cambium/Sprigging family across the resident and shared Knot editor host",
+      "source": [
+        "Cargo.lock",
+        "knot-editor/crates/knot-document/Cargo.toml"
+      ],
+      "evidence": "diagnostics-readonly-final-resident.json records four real E0308 errors: Knot TextInput/CaretSelection/TextCommand came from old Cambium while its shared editor host returned prepared 0.6 types. This was a failed integration gate, not a passing source audit.",
+      "change": "Knot b8d0e2f admits the unchanged embedded widget API through Cambium 0.6. Mere consumes that portable Git source and removes the older Cambium/Sprigging copies. Incidental Murm/Dramatis updates are declined, preserving their existing source cohorts.",
+      "verification": [
+        "diagnostics-readonly-knot-cutover.json",
+        "diagnostics-readonly-narrow-lock.json",
+        "diagnostics-readonly-resident-retained-cohort.json"
+      ],
+      "status": "resident lib and binary compile on the narrowed current cohort; registry publication and other product receiving remain open"
+    },
+    {
+      "id": "diagnostics-declined-producer-after-dispatch",
+      "source": "crates/cambium/cambium-rootstock/src/frame.rs:Host::apply_a11y_requests",
+      "owner": "broader action routing migration",
+      "status": "source-confirmed control-flow lead; harmful runtime effect not yet reproduced",
+      "evidence": "The loop sets dispatched=true after every admitted request, including ProducerDeclined, then invokes hover and after_dispatch. The returned result remains ProducerDeclined; this is not evidence of a false terminal-success report.",
+      "gate": "Qualify declined-producer effects and owner invalidation requirements before deciding whether after_dispatch should run only after A11yDispatch::Dispatched. Do not conflate provider refusal, routing acceptance and application completion."
     }
   ],
   "ownership_migrations": [
@@ -322,15 +368,26 @@
     },
     {
       "owner": "Sprigging/producer observation contracts and Rootstock read-only consumers",
-      "status": "open; mutable callbacks are explicit, not pure observations",
+      "status": "shared-borrow provider boundary and full AppCtx/Harness accessors implemented; selector and external receiver adoption remain open",
       "source": [
         "crates/cambium/sprigging/src/lib.rs:Leaf::accessibility",
         "crates/cambium/cambium-rootstock/src/producer.rs:TextureProducer::semantics",
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "AppCtx/Harness and Taproot/Mesquite still read the DOM catalogue. Contributed reads require mutable callbacks; simply calling them through an immutable facade, or adding an unqualified cache, does not establish one read-only authority. ProducerSemanticIssue is returned by shared composition; platform convenience APIs and product collector integration do not yet expose that report.",
+      "gap": "Workspace Leaf/TextureProducer descriptions and composition now take shared borrows. Known Graphshell identity allocation moved to ContentSlot frame admission and activation no longer depends on a last-read map. DOM a11y_projection stays deliberately narrow; semantic_projection returns the same complete host composition and refusal report used by publication. Mesquite/Taproot selector consumers still use the DOM seed and need supplier lookup/traversal adoption. Shared receivers do not mechanically prove arbitrary third-party interior code pure or establish read/act atomicity.",
       "done_condition": "Define a provider-owned observation boundary, qualify side-effect and target-lifetime rules, then adopt one contributed observation in AppCtx/Harness, selector resolution and diagnostics readers without a second role/name implementation."
+    },
+    {
+      "owner": "Sprigging/Cambium release family and external product receivers",
+      "status": "prepared Sprigging 0.3.0/Cambium 0.6.0; actual Knot/resident compile qualified; registry publication and other product receiving held",
+      "gap": "The resident split was reproduced and repaired through receiver-owned Knot b8d0e2f; its lock now retains one Cambium/Sprigging identity. Woodshed still implements the older Leaf callback against its own existing pin, which this continuation does not change.",
+      "gate": "Adopt the new source API in receiver-owned repositories and pins, qualify integration, then release/cut over and remove the older family identity. Do not claim family-wide deduplication before that receiving gate.",
+      "evidence": [
+        "diagnostics-readonly-family-inventory.json (initial split, superseded for current inventory)",
+        "diagnostics-readonly-qualification.json",
+        "diagnostics-readonly-resident-retained-cohort.json"
+      ]
     }
   ],
   "large_effect_followups": [
@@ -377,7 +434,7 @@
         "crates/cambium/cambium-rootstock/src/host.rs:AppCtx::a11y_projection",
         "crates/cambium/mesquite/src/probe.rs:selector_target"
       ],
-      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped and mutable; separate publication/admission reads are not pure, atomic, cached or presentation-revision scoped. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Within-read duplicate child keys/action IDs and generated-ID collisions now refuse the complete contribution before publication or admission. Cross-window producer owners and reused provider/child keys across generations remain unqualified; the stable hash is not a collision-free allocator or lifetime token. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness and Mesquite selectors still expose DOM-only observations through read-only APIs; they are not a complete contributed semantic catalogue. Producer discovery and semantics now share flat traversal. The bounded content-origin repair uses Genet content-box interpretation in the existing untransformed scroll observation. Full forward transforms/clips and shadow/slot ancestor mapping still need supplier-owned placement and qualified platform lowering.",
+      "gap": "Independent host contribution assembly is retired. The provider API remains AccessKit-shaped. Prepared workspace descriptions now use shared borrows, but that is not a proof of arbitrary interior purity, atomic read/act behavior, caching or presentation-revision identity. Host A11yAction routes only Click, Focus and numeric SetValue, despite advertised Increment/Decrement/ScrollIntoView. Within-window duplicate producer DOM keys now refuse semantic bindings. Within-read duplicate child keys/action IDs and generated-ID collisions now refuse the complete contribution before publication or admission. Cross-window producer owners and reused provider/child keys across generations remain unqualified; the stable hash is not a collision-free allocator or lifetime token. ARIA covers known roles; arbitrary roles, clipping and human AT remain separate receiving gates. AppCtx/Harness now offer the full contributed semantic_projection through read-only accessors; their a11y_projection API remains the DOM seed. Mesquite/Taproot selectors still consume that narrower seed; supplier lookup/traversal adoption remains part of the first migration. Producer discovery and semantics now share flat traversal. The bounded content-origin repair uses Genet content-box interpretation in the existing untransformed scroll observation. Full forward transforms/clips and shadow/slot ancestor mapping still need supplier-owned placement and qualified platform lowering.",
       "gate": "Supplier-qualified neutral contributor contract, explicit observation/effect and target-lifetime rules, Hest-coordinated catalogue/invocation/result migration, and actual native/browser runtime receiving.",
       "why_deferred": "A supplier API and target lifecycle migration crosses products, platform adapters and command ownership; do not silently choose new identity or completion semantics in this repair slice."
     }
@@ -414,5 +471,32 @@
   ],
   "flattened_discovery_qualification": "diagnostics-flat-discovery-qualification.json",
   "content_origin_qualification": "diagnostics-content-origin-qualification.json",
-  "semantic_identity_qualification": "diagnostics-identity-qualification.json"
+  "semantic_identity_qualification": "diagnostics-identity-qualification.json",
+  "ordered_migrations": [
+    {
+      "order": 1,
+      "subject": "read-only observations",
+      "status": "provider/accessor foundation and actual Knot/resident family repair qualified; supplier selector adoption and other external receivers remain open"
+    },
+    {
+      "order": 2,
+      "subject": "target generations",
+      "status": "queued after first observation migration"
+    },
+    {
+      "order": 3,
+      "subject": "broader actions",
+      "status": "queued after target generations"
+    },
+    {
+      "order": 4,
+      "subject": "supplier forward geometry",
+      "status": "queued after broader actions"
+    }
+  ],
+  "readonly_observation_qualification": "diagnostics-readonly-qualification.json",
+  "readonly_observation_basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "readonly_observation_integration_qualification": "diagnostics-readonly-integration-qualification.json",
+  "readonly_observation_integration_basis": "d7fd54d71",
+  "integration_note": "Subsequent main authentication work intentionally receives Dramatis 7d498c27. The frozen 537-native cohort retained earlier suppliers; affected resident/product/Wasm integration gates supplement it without changing the semantic source seal."
 }

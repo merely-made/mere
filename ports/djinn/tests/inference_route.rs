@@ -1646,8 +1646,14 @@ async fn serve_trained_model_for_headed_turnstone() {
         )
         .unwrap();
         let deadline = tokio::time::Instant::now() + Duration::from_secs(1200);
+        let mut last_observation = Vec::new();
         loop {
             let runs = lane.runs();
+            let observation = serde_json::to_vec_pretty(&runs).unwrap();
+            if observation != last_observation {
+                std::fs::write(output.join(format!("live-runs-{phase}.json")), &observation).unwrap();
+                last_observation = observation;
+            }
             if runs.runs.len() >= 2
                 && runs
                     .runs

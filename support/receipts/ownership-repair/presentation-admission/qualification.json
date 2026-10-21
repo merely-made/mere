@@ -1,0 +1,83 @@
+{
+  "base_commit": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "source_sha256": {
+    "crates/chirograph/src/lib.rs": "b60b4bda0fc25e90584289405719707602b83ba29bf546d796e14f51c5216d36",
+    "crates/chirograph/src/capture.rs": "dda237c24803a941694f806b70278bf73b5be9a0004f45f9196611fef2658464",
+    "crates/chirograph/src/presentation.rs": "25cfc63a8de6581c2adbcc2811d19c60a77e9981a54f2cef337621829191c119",
+    "crates/graphshell/graphshell-client/src/lib.rs": "75a30ac1f3a716f759745f7b4d0761b78355703bb258dbf9b1c2cc86a2f3c78e",
+    "crates/graphshell/graphshell-client/tests/presentation_admission.rs": "d040f4c6760af29c4bc2229f4f06e9d566b6359cd1f47091fcffaf9c98661ced",
+    "Cargo.lock": "dbc1222819b409e98f9823b665e112cdbc496aef0c5f3c250837f9cf43ab9508"
+  },
+  "sealed_probe_sha256": "f977ded295311d0b8797ac3344c63dd3151d672dd3acf14b15ea6a77ace1379c",
+  "date": "2026-10-21",
+  "finding": "Q067",
+  "authority": "A064",
+  "status": "repaired and locally verified",
+  "owner": "chirograph::validate_presentation",
+  "resource_limits": {
+    "memory_max": "5G",
+    "memory_swap_max": 0,
+    "cpu_quota": "150%",
+    "cargo_jobs": 1,
+    "test_threads": 1,
+    "gate_timeout_seconds": 600,
+    "shared_lock": "/home/markik/Code/testing/machine-heavy.lock"
+  },
+  "coverage": {
+    "passed": 151,
+    "failed": 0,
+    "ignored": 0,
+    "scope": "Chirograph and Graphshell client default-feature library and integration suites, including adapted Q067 public API probe; no browser/network/runtime GPU qualification."
+  },
+  "notes": [
+    "Fetched current upstream before choosing the cut. NetRender and Genet retained their current main revisions; Mere fast-forwarded to the recorded base.",
+    "Sealed Q067 probe retained unchanged. Its capture/live valid control and three malformed presentation cases are carried into presentation_admission.rs with repaired expectations; unrelated Q068 and chunk assembly cases are outside this successor.",
+    "Initial offline gate failed before compilation because the newly pinned apparatus-core supplier was not cached. The locked online retry downloaded the exact dependency graph and passed.",
+    "Live editable-text retention/purge policy stays with Graphshell. Capture identity remains session-policy-free.",
+    "Shared lock waits did not start parallel builds or alter another session."
+  ],
+  "gates": [
+    {
+      "log": "/home/markik/Code/testing/audits/mere-ownership-20261021/presentation-admission/retained.log",
+      "sha256": "9cb9718d5915511ee83405a2ce052d39fec49e3ff69d13ab6e0f48615aab7ef7",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --offline --locked -j1 -p chirograph -p graphshell-client --lib --tests --no-fail-fast -- --test-threads=1"
+      ],
+      "summaries": [],
+      "exit_status": [
+        "101"
+      ],
+      "peak_process_rss_kib": [
+        "50360"
+      ],
+      "swaps": [
+        "0"
+      ]
+    },
+    {
+      "log": "/home/markik/Code/testing/audits/mere-ownership-20261021/presentation-admission/retained-online.log",
+      "sha256": "bd424a262145386f24684ded36a552d6996a11f5524db8faa885c887e202089b",
+      "command": [
+        "timeout --signal=TERM --kill-after=10s 600s cargo test --locked -j1 -p chirograph -p graphshell-client --lib --tests --no-fail-fast -- --test-threads=1"
+      ],
+      "summaries": [
+        "test result: ok. 56 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+        "test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ],
+      "exit_status": [
+        "0"
+      ],
+      "peak_process_rss_kib": [
+        "442300"
+      ],
+      "swaps": [
+        "0"
+      ]
+    }
+  ]
+}

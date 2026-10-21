@@ -1,0 +1,12 @@
+{
+  "files": {
+    "graphshell_web_bg.wasm": "b16cc3a5218e2b79e5f1496634862b621d52d11e2461d2a8fbb66ba392432c5e",
+    "graphshell_web.js": "e6be215a754898e1dee740c1d19183374ce1f387e00f1acb165091774775b8bd",
+    "graphshell_web.d.ts": "dc0a32bf3eb68feff7162fa1e5f573f5369c0cbdfbc2c2bfebaa3924016037b5",
+    "graphshell_web_bg.wasm.d.ts": "fae6fafabf003440ae18219998b844a107409dcb64035b9fd66e9d0ea3615f20",
+    "snippets/genet-render-host-3997a73541d04484/inline0.js": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee"
+  },
+  "wasm_bindgen": "0.2.129",
+  "features": "presentation-webgl2,without-classic-vello; no defaults",
+  "profile": "dev opt-level=1 debug=0; not release budget qualification"
+}

@@ -27,6 +27,22 @@ struct App {
     value: f64,
 }
 
+#[test]
+fn readonly_tests_harness_observation_matches_native_tree_through_shared_reference() {
+    let mut harness = Harness::new(
+        "button {display:block;width:120px;height:40px}",
+        App::default(),
+        root as fn(&App) -> Child,
+    );
+    harness.layout_at(320.0, 240.0);
+    let shared = &harness;
+    let observed = shared.semantic_projection();
+    let native = shared.a11y_tree();
+    assert_eq!(observed.tree, native.0);
+    assert_eq!(observed.dom_targets, native.1);
+    assert!(observed.producer_issues.is_empty());
+}
+
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
 
 fn place(x: i32, y: i32, w: i32, h: i32) -> String {

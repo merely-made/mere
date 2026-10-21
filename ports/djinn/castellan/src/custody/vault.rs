@@ -238,6 +238,15 @@ pub trait IdentityStorage: Send + Sync {
     /// the storage locked.
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError>;
 
+    /// Replace a passphrase after fresh verification; never enroll or rotate identity.
+    fn change_passphrase(
+        &self,
+        _old: &[u8],
+        _new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        Err(super::unlock::PassphraseChangeError::Unsupported)
+    }
+
     /// Enrol a passphrase that can unlock this storage (ruling 39). Needs
     /// the storage unlocked; an existing enrolment is refused, not replaced.
     /// Backends that hold no OS-wrapped root refuse.
@@ -284,6 +293,14 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for &T {
         (**self).unlock(method)
     }
 
+    fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        (**self).change_passphrase(old, new)
+    }
+
     fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
         (**self).enroll_passphrase(passphrase)
     }
@@ -322,6 +339,14 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
 
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
         (**self).unlock(method)
+    }
+
+    fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        (**self).change_passphrase(old, new)
     }
 
     fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
@@ -450,6 +475,18 @@ impl<S: IdentityStorage> IdentityVault<S> {
     /// Which unlock methods this device offers for this vault now.
     pub fn unlock_methods(&self) -> UnlockMethods {
         self.storage.unlock_methods()
+    }
+
+    /// Freshly authenticate and change this vault’s passphrase, preserving identities.
+    pub fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), super::unlock::PassphraseChangeError> {
+        if self.current.is_none() {
+            return Err(super::unlock::PassphraseChangeError::Locked);
+        }
+        self.storage.change_passphrase(old, new)
     }
 
     /// Enrol a passphrase over the vault's root (ruling 39), so a device

@@ -1,0 +1,14 @@
+{
+  "repository": "/home/markik/Code/repos/mere",
+  "head": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "status": "",
+  "purpose": "Hest MSRV and headed command qualification",
+  "limits": {
+    "memory_max": "3G",
+    "memory_swap_max": 0,
+    "cpu_quota": "150%",
+    "cargo_jobs": 1,
+    "test_threads": 1,
+    "gate_timeout_seconds": 600
+  }
+}

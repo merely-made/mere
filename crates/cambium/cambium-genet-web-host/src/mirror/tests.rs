@@ -28,7 +28,7 @@ impl cambium_rootstock::TextureProducer for Board {
     ) -> Option<cambium_rootstock::ProducedTexture> {
         None
     }
-    fn semantics(&mut self) -> Option<cambium_rootstock::ProducerSemantics> {
+    fn semantics(&self) -> Option<cambium_rootstock::ProducerSemantics> {
         Some(self.0.clone())
     }
 }
@@ -459,7 +459,7 @@ fn registered_knob_keeps_its_numeric_semantics_and_author_name() {
         &dom,
         &layout,
         &mut leaves,
-        &mut cambium_rootstock::ProducerRegistry::new(),
+        &cambium_rootstock::ProducerRegistry::new(),
         None,
     );
     let mirror = plan(&projection, 1.0);

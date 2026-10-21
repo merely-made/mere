@@ -1,0 +1,69 @@
+{
+  "basis": "4232d56229428b7d3f6b1f7260b45d427618ddc4",
+  "scope": "Read-only provider/accessor foundation; first migration selector receiving remains open",
+  "source_sha256": {
+    "Cargo.lock": "c54a65a9fb0be819d2be6724db680831b5ebc00d162685d9ddffaef742dc3eec",
+    "Cargo.toml": "c28ea30493105004f2a20aebfe71013ad19b49ee359b3aef10292e0d2328b5eb",
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": "6e7473f7ea5ef4e672e31822368219f9f2e1b36caf245ab432fe08c36c68d9a0",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "6481665b2e56a4556cee85cc2f153cf4a43491b195583debc7a4a48e511415e8",
+    "crates/cambium/cambium-genet-web-host/src/mirror/tests.rs": "c94792b06952cc375edecfd792032dacf72456eb49adc00edae02cb9da058f57",
+    "crates/cambium/cambium-genet-winit-host/Cargo.toml": "149f85d5415cd004b5c48e0425e19f6ddef64b2c99a9c4a6a582f9e0c8e7c660",
+    "crates/cambium/cambium-genet-winit-host/src/harness.rs": "f0a583b80bd84c0e184f395108a64bf35f65ae3260eedfe36d80d959b58a8aa7",
+    "crates/cambium/cambium-genet-winit-host/tests/accessibility.rs": "a45f2cf192dc5eec35bef401d3e71eeeab7bd8172d863aa5bef35c521e472a8e",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "a3442d4121d97c2c6b58628afdb4acd66bf5df5b90be7760a181d56e5ad3fe2d",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "f0ffeae320e34b72e92cd0b3448309ed5540eb4ef37866c02e3e8b118162bc01",
+    "crates/cambium/cambium-rootstock/src/embedding.rs": "1fc150529b506fb4300e448fffed67a0978088da973b4f8250dc32b94211c6d7",
+    "crates/cambium/cambium-rootstock/src/host.rs": "1f93542c7cc56d05e53dbb2bdd51b97b0265329dbb18d480d4eff3053fc97ce9",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "3ac1c74fe3d0b05661ce8d93fb5ebaa179268a341a3cdff9a5def7419b301f9b",
+    "crates/cambium/cambium-rootstock/src/multi_host_tests.rs": "bd8b363f3b235addc063b033bf395162d6bdeb1161544c8787c834bf4b5dc544",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "7cacc2484de7c09cb5eae287bb6ab18620ca0a03e4071250da7608b78f6256db",
+    "crates/cambium/cambium-rootstock/src/producer/flat_tree_tests.rs": "868374afcc2c92d6760a25743114d821a92b4db470c888726c035934faec0659",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "180c9cab1fbcde2afbb1a2764aaf481296990f4b5b2f181f764f6dc1e5d4dd08",
+    "crates/cambium/cambium-rootstock/src/producer/tests.rs": "6354e89767fa55043076b00a76871fce69e345253ddab5fb7b2fe89f59e8d8c8",
+    "crates/cambium/cambium-rootstock/src/scene_producer.rs": "8f88b6c3e5a45c13997bdbe0199070a50d751a35afb34d0280ae88da6c979c4a",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "3d26afcb5d7a3929ca79c902386e0e7171bc6b12b79248388d5c6e18c6268ae0",
+    "crates/cambium/cambium-rootstock/src/semantics/tests.rs": "f37fd42ce54e90064b80446b720ecc1cd50058879b5f864e591df74d64f27316",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "0d1eb5ec1c9d533a7566c885dcd173f46a367fc2b5610ef6bfa65eebfd8a95db",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "50a64613399d2451322bbe7e955845ad8c1d22c5703d665cb6ac32a3009ccbbd",
+    "crates/cambium/cambium-winit-a11y/tests/e1a_sessions.rs": "4cc96ed14565b106d35062872a2bf7b29884fd814499b2805bd2add41fc9fbad",
+    "crates/cambium/cambium-winit/Cargo.toml": "e87e31a2b126f02c7bc951bb706c2bc26f68ffadc644807a79134d797ae3ba49",
+    "crates/cambium/cambium/Cargo.toml": "482a5324aed8c1afd9bd6a5b29f398c286934f785e93f98513a0f815c227686a",
+    "crates/cambium/mesquite/Cargo.toml": "5d294d66a58ff19f3b407e18b86bc032c14c05217f5d5b5fcb976689a7844ed1",
+    "crates/cambium/sprigging/Cargo.toml": "494d853885c949ea3846b448be716dddc9f7da9dcfde1f1e9642a9300b19bc27",
+    "crates/cambium/sprigging/src/angle.rs": "b1b9c4fad25e8b66dfac4187c07f4834f5550d2c4398b9bd890e43a8cd6e6566",
+    "crates/cambium/sprigging/src/dimension.rs": "09eb3991d8f6207cf08d424d691fb73caca86842f65c9a39032af65e551f47aa",
+    "crates/cambium/sprigging/src/glyphs.rs": "560c62518e13cc5b88d5b6883ef3c71764125e25f9a1317ecf8d1c75fa18a48d",
+    "crates/cambium/sprigging/src/lib.rs": "276f06506da79c50270525721c916f1f7189f9e35679d5471f13e5c28aec59a3",
+    "ports/distillery/probe/Cargo.lock": "b774aa13d8c5263c0c1aaed3c5fb6532c878109c2b7f45babe06cf3e4d70adbd",
+    "ports/graphshell/src/canvas_reader/tests.rs": "0d081014380c8acedb7e0b7b119a64376155352eae90c941c2e6943594e3f685",
+    "ports/graphshell/src/retained_content.rs": "52c0412a69b26eeec6b3ddc7ba8d34ae26c7bae08c68585a62af92bfaa4e8554",
+    "ports/graphshell/src/retained_content/producer.rs": "cb4e0fb9a1cef2e0866bd42d491b1ba8e3a5e779339d3ce6a0c348c2dc032307",
+    "ports/graphshell/src/retained_content/tests.rs": "d8df32f72ea8ffae8c725962726af8bbdbe4391293d4897ebb36970d058a746f",
+    "ports/graphshell/src/web_tree.rs": "7381018ee28be2dd36b91e5fb2de7dfa2d3d01f52c66223c023b66d2c7637f5c",
+    "ports/graphshell/web/Cargo.lock": "c59481bd6e095a84239d29b13a0398a47e085d86196b452ae42b6b8d807527f2",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b"
+  },
+  "previous_seal": "diagnostics-readonly-source.json",
+  "changes_since_previous": {
+    "Cargo.lock": {
+      "before": "e29bd89873c41e62ab81f35fbaacf131019983a19012313ade749613ea0de023",
+      "after": "c54a65a9fb0be819d2be6724db680831b5ebc00d162685d9ddffaef742dc3eec"
+    },
+    "ports/graphshell/src/retained_content.rs": {
+      "before": "58d5c99a89f727cd03d8883a5351b4cd083069801688269875e78a11d9454689",
+      "after": "52c0412a69b26eeec6b3ddc7ba8d34ae26c7bae08c68585a62af92bfaa4e8554"
+    },
+    "ports/graphshell/src/retained_content/tests.rs": {
+      "before": "a46e7733b8fe983d371b706357ab69d762b9dd1b20e6232f28acc6bc47b33629",
+      "after": "d8df32f72ea8ffae8c725962726af8bbdbe4391293d4897ebb36970d058a746f"
+    }
+  },
+  "knot_receiver": "b8d0e2fd5f090a8edde5a2ddef09b784ecdf5f75",
+  "unrelated_supplier_cohorts_retained": "diagnostics-readonly-narrow-lock.json",
+  "sealed_audit_register_reference": "diagnostics-flat-discovery-source.json:sealed_register_sha256",
+  "prepared_not_published": [
+    "sprigging 0.3.0",
+    "cambium 0.6.0"
+  ],
+  "retained_byte_cap": 10000000
+}

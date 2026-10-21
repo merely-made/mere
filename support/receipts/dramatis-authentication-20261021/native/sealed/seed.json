@@ -1,0 +1,146 @@
+{
+  "captures": [
+    {
+      "digest": "d7a227b6fa8f5349",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth21/native/sealed/before.png",
+      "path": "/Users/markik/Code/output/dauth21/native/sealed/before.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "79fdc6a96f5dde6f",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth21/native/sealed/changed.png",
+      "path": "/Users/markik/Code/output/dauth21/native/sealed/changed.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "79fdc6a96f5dde6f",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "17443",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth21/native/sealed/acknowledged-after-refresh.png",
+      "path": "/Users/markik/Code/output/dauth21/native/sealed/acknowledged-after-refresh.png",
+      "viewport": null,
+      "width": 1720
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 0,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 0,
+        "layout_rebuilt": 0,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 1505,
+        "acquire_us": 969,
+        "capture_us": 0,
+        "clear_us": 508,
+        "compose_us": 6110,
+        "content_extent_us": 0,
+        "dirty_tile_rebuild_us": 1,
+        "emit_scene_us": 937,
+        "excluding_acquire_present_capture_us": 35356,
+        "frame_hook_us": 23,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 0,
+        "layout_tick_us": 0,
+        "layout_update_us": 101,
+        "layout_with_text_us": 0,
+        "leaf_boxes_us": 35,
+        "leaf_fragments_us": 4,
+        "leaf_render_us": 0,
+        "master_compose_us": 38,
+        "pointer_us": 0,
+        "present_us": 218,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 4895,
+        "raster_us": 26038,
+        "relayout_us": 138,
+        "shadows_us": 0,
+        "style_resolve_us": 0,
+        "tile_invalidate_us": 112,
+        "total_us": 36543,
+        "vello_render_us": 4727
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "busy": "false",
+    "locked": "false",
+    "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+    "pid": "17443",
+    "profiles": "2",
+    "ready": "true"
+  },
+  "frames": 2297,
+  "kind": "dramatis",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 2302,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "captured /Users/markik/Code/output/dauth21/native/sealed/before.png",
+    "waited 2046 frames",
+    "captured /Users/markik/Code/output/dauth21/native/sealed/changed.png",
+    "captured /Users/markik/Code/output/dauth21/native/sealed/acknowledged-after-refresh.png"
+  ],
+  "unpresented_redraws": 5
+}

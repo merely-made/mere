@@ -18,6 +18,11 @@ fn refusal(error: impl std::fmt::Display) -> CustodyRefusal {
     }
 }
 impl<S: IdentityStorage + 'static> Keeper<S> {
+    pub(crate) fn change_passphrase_native(
+        &self,
+    ) -> dramatis::authentication::PassphraseChangeReceiptV1 {
+        crate::identity_ui::change_passphrase(&self.host, self.ui.as_ref())
+    }
     pub(crate) fn unlock_native(&self) -> Result<CustodyAnswer, CustodyRefusal> {
         match apply_native_identity_action(
             &self.host,

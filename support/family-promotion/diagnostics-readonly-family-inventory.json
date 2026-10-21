@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-21",
+  "basis": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "packages": [
+    {
+      "name": "cambium",
+      "version": "0.5.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#c66620cae016a856bd8cdae7dca189293bf295b6"
+    },
+    {
+      "name": "cambium",
+      "version": "0.6.0",
+      "source": "workspace"
+    },
+    {
+      "name": "sprigging",
+      "version": "0.2.2",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#c66620cae016a856bd8cdae7dca189293bf295b6"
+    },
+    {
+      "name": "sprigging",
+      "version": "0.3.0",
+      "source": "workspace"
+    }
+  ],
+  "known_old_family_consumer": "knot-document 0.0.1 -> knot-editor 0.0.3 at ebf10c74 -> djinn; existing Knot source requires Cambium 0.5 from Mere git",
+  "prepared_versions": "Sprigging 0.3.0 and Cambium 0.6.0; not published",
+  "cutover_gate": "Adopt new family in external Knot/Woodshed source and qualify receiver pins before publication; current source preparation does not claim one family identity across those pins.",
+  "live_companion_locks_refreshed": [
+    "ports/graphshell/web/Cargo.lock",
+    "ports/distillery/probe/Cargo.lock"
+  ],
+  "historical_receipt_locks_edited": false,
+  "retained_byte_cap": 10000000
+}

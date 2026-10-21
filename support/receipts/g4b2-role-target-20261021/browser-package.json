@@ -1,0 +1,10 @@
+{
+  "raw_sha256": "f549ed0e80327057743db0910727e69252c13dedea0c9fa2cab66bc903f7ed77",
+  "files": {
+    "graphshell_web.d.ts": "0ca1a259cd21ab3d27348a3a75166213467d394cfd2567e39edc844ceb8b6a56",
+    "graphshell_web.js": "243f99182522e8db5ce3284a175b2272d684b62746bcaa289dfc36c9adb8491a",
+    "graphshell_web_bg.wasm": "7c9f04c3974a33c1a33cd03f53432a5e837f516ac1178f10e5f97292d216cd0b",
+    "graphshell_web_bg.wasm.d.ts": "a9c0070ff09c67a312af13610f6db0df8837eb3c5a7db09db7d176e5ac98773b",
+    "snippets/genet-render-host-3997a73541d04484/inline0.js": "6b6e0a83cb8c25ad3aa36935ee4925cdfaf13764c3ef308f3c4a241b7b9a28ee"
+  }
+}

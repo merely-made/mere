@@ -3,7 +3,7 @@
 ## mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md
 
 - disposition: current
-- status line: "Contained producer identity validation qualified; wider owner migrations open" - accurate: yes
+- status line: "Read-only provider/accessor foundation implemented; first selector gate and later migrations open" - accurate: yes
 - claims checked: 6 - holds: 6, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -137,3 +137,33 @@ collector adoption remain open. Mutable composition is no longer documented as
 pure. Immutable observation, target generations, full geometry and native/browser
 runtime acceptance remain separate gates. The diagnostics index entry now links
 to these owner records rather than duplicating their historical test counts.
+
+### Read-only observation continuation, 2026-10-21
+
+The provider callback boundary and composed AppCtx/Harness observations now use
+shared borrows. Retained-content key allocation belongs to the admitted owner
+frame; reads reuse those keys and activation no longer needs a priming read.
+The owner table retires keys absent from the current session projection. This
+is not proof against arbitrary interior mutation or an atomic observation/action
+lease. The DOM seed remains a deliberately narrower API.
+
+Knot's excluded 0.6 range caused four real resident type errors. The failure is
+retained separately; Knot b8d0e2f admits the unchanged widget API and the resident
+lib/binary receiving check passes with one prepared Cambium/Sprigging family.
+The temporary worktree and branch are removed, preserving the dirty primary
+Knot checkout. Murm/Dramatis incidental updates were declined. Registry
+publication and Woodshed's older callback intake remain separate gates.
+
+The final source seal and qualification record name current native, retained
+product, embedding and Wasm gates. Earlier passing cohorts and the failed
+resident integration are not substituted for final receiving. Supplier-owned
+selector lookup/flat traversal remains within the first migration; target
+lifetimes, broader Hest action routing and full forward geometry remain ordered
+behind it. No complete first-migration or four-migration claim is made.
+
+Publication integration d7fd54d71 preserves those semantic sources while receiving
+main's intentional Dramatis 7d498c27 authentication cohort and its lock changes.
+A separate integration record qualifies the affected resident, retained product
+and actual Graphshell Wasm entry point; it does not relabel the original 537
+native passes as a rerun on the merged lock. Historical narrow-lock evidence
+remains valid for its frozen cohort, not a promise to hold later main repins.

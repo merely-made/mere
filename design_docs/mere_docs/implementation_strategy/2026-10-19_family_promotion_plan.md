@@ -333,6 +333,16 @@ compilation. The
 keeps immutable observations, target generations and report/collector adoption
 open; the stable ID hash is not a generation token or collision-free allocator.
 
+Read-only observation foundation (2026-10-21): contributor callbacks and shared
+composition now use shared borrows. AppCtx/Harness expose the same contributed
+projection, and Graphshell's content owner allocates keys during admitted frames
+rather than during reads. The real Knot/resident split is repaired through Knot
+`b8d0e2f`, keeping one prepared Cambium 0.6/Sprigging 0.3 family. Publication and
+other product adoption remain separate. The
+[ordered migration gates](2026-06-08_system_diagnostics_and_accessibility_plan.md#ordered-ownership-migrations-2026-10-21)
+retain supplier selector intake, target lifetimes, broader action routing and
+forward geometry; the first migration is not yet complete.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse

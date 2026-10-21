@@ -183,3 +183,33 @@ async fn native_consent_receipt() {
         assert_eq!(reply.snapshot.unwrap().cards, snapshot.cards);
     }
 }
+
+#[test]
+fn an_acknowledged_action_survives_background_refresh_but_not_loss_of_the_resident() {
+    let mut state = State::default();
+    let snapshot = Snapshot {
+        lock: VaultLockView::Unlocked,
+        roster: Roster {
+            entries: vec![],
+            chosen: ProfileId("family".into()),
+            description: String::new(),
+        },
+        cards: vec![],
+        unassigned: vec![],
+    };
+    state.adopt(Reply {
+        snapshot: Some(snapshot.clone()),
+        notice: "Passphrase changed.".into(),
+    });
+    state.adopt_refresh(Reply {
+        snapshot: Some(snapshot),
+        notice: String::new(),
+    });
+    assert_eq!(state.notice, "Passphrase changed.");
+    state.adopt_refresh(Reply {
+        snapshot: None,
+        notice: "Djinn unavailable".into(),
+    });
+    assert!(state.snapshot.is_none());
+    assert_eq!(state.notice, "Djinn unavailable");
+}

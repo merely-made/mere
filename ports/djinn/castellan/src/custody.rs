@@ -66,3 +66,10 @@ pub use unlock::{OsPresence, UnlockMethod, UnlockMethods};
 pub use vault::{
     IdentitySlot, IdentityStorage, IdentityVault, InMemoryStorage, Profile, SecretBytes, SlotMap,
 };
+
+pub use unlock::PassphraseChangeError;
+
+mod atomic_secret_file;
+
+#[cfg(test)]
+mod passphrase_change_tests;

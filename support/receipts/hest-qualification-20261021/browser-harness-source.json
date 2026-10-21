@@ -1,0 +1,9 @@
+{
+  "site/tests/run-headed-receipt.py": "53a0d8894f461dcf6c1ba7fc1d3dfeabdecbbd0b6fa63821edf381a2f3cdcd0e",
+  "site/tests/receipt_sink.py": "c2d3cc5ba7afb8cb09e088ca3ecb02f4dfe5853621c7c7242a197cc1acaa0feb",
+  "site/tests/host-input.mjs": "6b091d46f70cf789ea9327796a84ba751d127e8d0134455ebf2cccad0d882385",
+  "site/tests/capture-page.mjs": "46883b115d0ccd3cd3cb223a939ab744afa06fb46c28414148e1ddc89cb5ee78",
+  "site/scenarios/hest_viewer_commands.scn": "46c72e4c8f44e9452089827b75b50c7829e6a177c4256e0f52b7ca847c920aa6",
+  "site/scenarios/hest_commands_save.scn": "259e30565cfcdc64c30f446a691b20065a6da88a78d9c6d04d21a2b9b3c5ab6a",
+  "site/scenarios/hest_commands_reopen.scn": "d5a8d931ff511c04fb64c1882358d4843110022852afc4b4bb87b169eaba5b57"
+}
