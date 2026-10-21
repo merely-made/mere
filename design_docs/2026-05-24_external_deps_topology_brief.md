@@ -142,6 +142,34 @@ woodshed's one) were replayed with a plain text merge and matched, apart from
 one hand-resolved conflict. The text below is the original record and describes
 weave as it stood before this amendment.
 
+**Mergiraf on trial (Mark, 2026-10-15: "zdiff3 + rerere, then trial
+Mergiraf").** Mergiraf 0.20.0, a syntax-aware merge driver, is registered
+globally on the Mac (Homebrew, 2026-10-15) and on the Windows laptop
+(`cargo install`, 2026-10-20), and enabled only through this checkout's
+uncommitted `.git/info/attributes` on each machine, for `*.rs`, `*.toml`,
+`*.json`, `*.yml`/`*.yaml` and `*.md`. No committed `.gitattributes` names
+it. zdiff3 and rerere are set globally on both machines (the laptop's on
+2026-10-20). Checked so far: installation, `git check-attr`, and a smoke
+merge where plain git conflicted on two methods added at the end of one
+`impl` and Mergiraf kept both (dropping the blank line between them).
+
+Replayed 2026-10-20 against plain git on 38 real merges (mere's 35 of
+2026-10-15, woodshed's first three after the drop), each compared with the
+committed tree; report and receipts in
+`Code/testing/mere/mergiraf-replay-2026-10-20/`. It never changed a file
+plain git merged correctly and added no conflicts. Of 15 files plain git
+left conflicted it resolved 7, all Rust or TOML: 4 equal to the commit, 2
+equal but for a `use` line's position, and 1 wrong. In `resident_mere.rs`
+one side had replaced a `graphshell::session_item` import with
+`mere_overmap::wire as session_item`; Mergiraf kept both, a clean result
+that cannot compile (E0252). It left every Markdown conflict as it was.
+Mark, 2026-10-20: "Keep it on trial, compile after every merge
+(Recommended)". The scope stays as above on both machines; the standing
+compile-after-merge rule is what catches its failure mode, and this replay
+is the baseline any further wrong resolution is added to. The import bug is
+ledgered with an eight-line reproduction in that report's `repro/`, not
+reported upstream (Mark, 2026-10-20).
+
 Two agent-native dev tools are in use across `repos/`. Both are
 **non-authoritative** — they understand structural entities (via tree-sitter),
 not program semantics or project invariants, and **never replace compile/test
