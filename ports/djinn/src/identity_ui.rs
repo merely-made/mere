@@ -22,7 +22,9 @@ use std::sync::Arc;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, OsPresence, UnlockMethod};
-use light_file_dialog::dialog::{Dialog, DialogBackend, InputBox, OpenFileDialog};
+#[cfg(not(target_os = "linux"))]
+use light_file_dialog::dialog::InputBox;
+use light_file_dialog::dialog::{Dialog, DialogBackend, OpenFileDialog};
 use ssh_key::PrivateKey;
 use zeroize::Zeroizing;
 
@@ -111,10 +113,26 @@ impl SystemNativeIdentityUi {
             .ok_or(NativeIdentityFailure::UiUnavailable)
     }
 
-    fn require_password_backend(&self) -> Result<(), NativeIdentityFailure> {
-        masked_input_backend(&Self::dialog_backend())
-            .then_some(())
-            .ok_or(NativeIdentityFailure::UiUnavailable)
+    fn password_input(
+        &self,
+        title: &str,
+        message: &str,
+    ) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
+        let backend = Self::dialog_backend();
+        if !masked_input_backend(&backend) {
+            return Err(NativeIdentityFailure::UiUnavailable);
+        }
+        #[cfg(target_os = "linux")]
+        {
+            linux_password_input(&backend.name, title, message)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            Ok(InputBox::new(title, message)
+                .password()
+                .show()
+                .map(Zeroizing::new))
+        }
     }
 }
 
@@ -126,14 +144,63 @@ fn masked_input_backend(backend: &DialogBackend) -> bool {
     backend.graphic
         && matches!(
             backend.name.as_str(),
-            "windows_wchar"
-                | "applescript"
-                | "kdialog"
-                | "zenity"
-                | "yad"
-                | "python3-tkinter"
-                | "python2-tkinter"
+            "windows_wchar" | "applescript" | "kdialog" | "zenity" | "yad"
         )
+}
+
+// The library's Unix helpers return `echo 1$szAnswer` through a shell. That
+// changes spaces and expands globs in the secret. Invoke the selected masked
+// helper with separate arguments and read its exact output instead.
+#[cfg(target_os = "linux")]
+fn linux_password_input(
+    backend: &str,
+    title: &str,
+    message: &str,
+) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
+    let mut command = match backend {
+        "zenity" | "yad" => {
+            let mut command = std::process::Command::new(backend);
+            command.args([
+                "--entry",
+                "--hide-text",
+                "--title",
+                title,
+                "--text",
+                message,
+            ]);
+            command
+        },
+        "kdialog" => {
+            let mut command = std::process::Command::new("kdialog");
+            command.args(["--password", message, "--title", title]);
+            command
+        },
+        _ => return Err(NativeIdentityFailure::UiUnavailable),
+    };
+    let output = command
+        .output()
+        .map_err(|_| NativeIdentityFailure::UiUnavailable)?;
+    let _stderr = Zeroizing::new(output.stderr);
+    linux_password_answer(output.status.code(), output.stdout)
+}
+
+#[cfg(target_os = "linux")]
+fn linux_password_answer(
+    status: Option<i32>,
+    bytes: Vec<u8>,
+) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
+    let mut bytes = Zeroizing::new(bytes);
+    match status {
+        Some(0) => {},
+        Some(1) => return Ok(None),
+        _ => return Err(NativeIdentityFailure::UiUnavailable),
+    }
+    // These single-line input helpers append one LF. Preserve every other byte.
+    if bytes.last() == Some(&b'\n') {
+        bytes.pop();
+    }
+    let value = std::str::from_utf8(&bytes).map_err(|_| NativeIdentityFailure::UiUnavailable)?;
+    Ok(Some(Zeroizing::new(value.to_owned())))
 }
 
 impl NativeIdentityUi for SystemNativeIdentityUi {
@@ -182,14 +249,10 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
     fn prompt_ssh_private_key_passphrase(
         &self,
     ) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
-        self.require_password_backend()?;
-        Ok(InputBox::new(
+        self.password_input(
             "Graphshell",
             "Enter the passphrase for the selected SSH private key.",
         )
-        .password()
-        .show()
-        .map(Zeroizing::new))
     }
 
     /// Windows Hello through personae's gate, which alone mints the proof.
@@ -221,11 +284,7 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         &self,
         message: &str,
     ) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
-        self.require_password_backend()?;
-        Ok(InputBox::new("Identity vault", message)
-            .password()
-            .show()
-            .map(Zeroizing::new))
+        self.password_input("Identity vault", message)
     }
 }
 
@@ -443,6 +502,8 @@ mod tests {
             "basicinput",
             "gxmessage",
             "xmessage",
+            "python3-tkinter",
+            "python2-tkinter",
             "unknown",
         ] {
             assert!(
@@ -453,15 +514,7 @@ mod tests {
                 "{name}"
             );
         }
-        for name in [
-            "windows_wchar",
-            "applescript",
-            "kdialog",
-            "zenity",
-            "yad",
-            "python3-tkinter",
-            "python2-tkinter",
-        ] {
+        for name in ["windows_wchar", "applescript", "kdialog", "zenity", "yad"] {
             assert!(
                 masked_input_backend(&DialogBackend {
                     graphic: true,
@@ -477,6 +530,38 @@ mod tests {
                 "{name}"
             );
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn linux_password_output_preserves_spaces_quotes_globs_and_unicode() {
+        let value = "  New  local fixture * ' \" $() \\ café  ";
+        let answer = linux_password_answer(Some(0), format!("{value}\n").into_bytes())
+            .unwrap()
+            .unwrap();
+        assert_eq!(answer.as_str(), value);
+        assert_eq!(
+            linux_password_answer(Some(0), b"\n".to_vec())
+                .unwrap()
+                .unwrap()
+                .as_str(),
+            ""
+        );
+        assert!(
+            linux_password_answer(Some(1), b"discarded".to_vec())
+                .unwrap()
+                .is_none()
+        );
+        for status in [Some(2), None] {
+            assert!(matches!(
+                linux_password_answer(status, vec![]),
+                Err(NativeIdentityFailure::UiUnavailable)
+            ));
+        }
+        assert!(matches!(
+            linux_password_answer(Some(0), vec![255]),
+            Err(NativeIdentityFailure::UiUnavailable)
+        ));
     }
 
     struct ScriptedUi {

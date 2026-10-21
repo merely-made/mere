@@ -33,7 +33,8 @@ use std::{
 };
 use zeroize::Zeroizing;
 const OLD: &str = "Old local fixture";
-const NEW: &str = "New local fixture";
+// Deliberately exercise exact Linux helper output, including two spaces and a glob.
+const NEW: &str = "New  local fixture * ' café";
 struct Ui(
     Mutex<VecDeque<Option<String>>>,
     Mutex<Option<Box<dyn FnOnce() + Send>>>,
