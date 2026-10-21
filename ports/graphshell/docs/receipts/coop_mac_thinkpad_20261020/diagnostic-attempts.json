@@ -1,0 +1,102 @@
+[
+  {
+    "attempt": "Linux native render preflight",
+    "result": "bounded pass",
+    "scope": "Real Fedora GNOME Wayland client, native Radeon Vulkan, host capture; identity pending, no co-op claim."
+  },
+  {
+    "attempt": "Mac owner preflight",
+    "result": "bounded pass",
+    "scope": "Isolated encrypted custodian, existing graph, native Use graph control and ordinary owned process exits."
+  },
+  {
+    "attempt": "gs-tp-20261020-01",
+    "result": "rejected",
+    "source_commit": "125df8df614ba503307cdacdba6150781bcea908",
+    "observation": "Guest joined, edited and returned. Owner run timed out waiting for owner-revoked.png; no completed owner-live receipt.",
+    "analysis": "Source inspection found that End guest access could silently return while an unrelated ordinary graph read was pending. The exact pending value at the first timeout was not instrumented, so it is not established as that attempt's cause.",
+    "evidence": [
+      "diagnostics/run-01.log.gz",
+      "diagnostics/run-01-guest-live.json.gz"
+    ]
+  },
+  {
+    "attempt": "gs-tp-diagnostic01",
+    "result": "diagnostic only; not an accepted cohort",
+    "source_commit": "125df8df614ba503307cdacdba6150781bcea908 plus temporary callback logging",
+    "observation": "All seven native phases completed, including live withdrawal and cold Delegation(Revoked). Callback logged same_graph=true pending=false. Public collection completed, but the relocated diagnostic controller failed final qualification assembly because it looked for run.py beside diagnostic-run.py.",
+    "evidence": [
+      "diagnostics/diagnostic-run.log.gz",
+      "diagnostics/diagnostic-owner-live.log.gz",
+      "diagnostics/diagnostic-guest-cold.json.gz"
+    ],
+    "disposition": "Temporary callback logging removed. Final acceptance uses the normal committed-path controller and fixed matching source."
+  },
+  {
+    "attempt": "deterministic native-view regression",
+    "result": "failed before fix; passes after fix",
+    "observation": "With app.pending=true, the original guard discards the explicit revoke request. Removing that dependency and validating both attached and panel graph identities delivers the command while rejecting stale controls.",
+    "evidence": [
+      "diagnostics/revoke-before-fix.log.gz"
+    ]
+  },
+  {
+    "attempt": "gs-tp-20261020-02",
+    "result": "rejected before headed launch",
+    "observation": "Owner custodian exited 2: unknown argument --passphrase-fd. Both combined package builds had produced custodians without the explicit test feature. No native co-op phases ran.",
+    "fix": "Build each custodian explicitly with -p djinn --bin djinn --features passphrase-fd. Freeze now asserts the feature through a harmless invalid argument probe before accepting a binary.",
+    "evidence": [
+      "diagnostics/run-02.log.gz"
+    ]
+  },
+  {
+    "attempt": "gs-tp-20261020-03",
+    "result": "successful earlier cohort; superseded by current-stack rerun",
+    "source_commit": "9169d061acf3ad12f07ec55d780012628cb738e4",
+    "candidate": {
+      "owner": "frozen-03",
+      "guest": "frozen-04"
+    },
+    "captures": 22,
+    "native_processes": 7,
+    "custodian_launches": 4,
+    "scope": "Complete standard controller run with fixed UI, current shared rendering/semantics stack and explicit harness custodians.",
+    "reason": "Main advanced with native Hest routing, explicit-session material validation, shared host changes and immutable receipt intake. Source integrated and both hosts rebuilt for a complete repeat.",
+    "evidence": [
+      "diagnostics/cohort-03-qualification.json.gz",
+      "diagnostics/cohort-03-owner-build-inputs.json.gz",
+      "diagnostics/cohort-03-guest-build-inputs.json.gz"
+    ]
+  },
+  {
+    "attempt": "gs-tp-20261020-04",
+    "result": "successful current-runtime cohort; superseded by final source-snapshot refresh",
+    "source_commit": "d4a4429a18b9b56ed0a3c031a73c1bc241b8a952",
+    "candidate": {
+      "owner": "frozen-04",
+      "guest": "frozen-05"
+    },
+    "captures": 22,
+    "native_processes": 7,
+    "custodian_launches": 4,
+    "reason": "Later main advance adds release evidence and an unrelated inference integration test. Actual native runtime inputs unchanged; binaries rebuilt/frozen and the complete controller repeated to align all tracked source snapshots with publication.",
+    "evidence": [
+      "diagnostics/cohort-04-qualification.json.gz",
+      "diagnostics/cohort-04-owner-build-inputs.json.gz",
+      "diagnostics/cohort-04-guest-build-inputs.json.gz"
+    ]
+  },
+  {
+    "attempt": "gs-tp-20261020-05",
+    "result": "accepted",
+    "source_commit": "38bc62024bb998f5499178b52c1deb3f61e576b3",
+    "candidate": {
+      "owner": "frozen-05",
+      "guest": "frozen-06"
+    },
+    "captures": 22,
+    "native_processes": 7,
+    "custodian_launches": 4,
+    "reason": "Final full repeat on reconciled publication source; all native executable hashes unchanged from the fully qualified d4a4429a1 runtime."
+  }
+]
