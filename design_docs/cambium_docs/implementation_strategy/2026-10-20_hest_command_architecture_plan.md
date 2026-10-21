@@ -523,7 +523,11 @@ supplier. The facade differs only in documentation and test packaging.
   committed and pushed on main. No Hest pull request remained to merge.
   Pruning stale remote references and expired worktree metadata completed
   across Mere, Turnstone and Knot. Nothing required removal; unrelated
-  branches and both other Mere worktrees remain intact.
+  branches and both other Mere worktrees remain intact. Before final receipt
+  delivery, concurrent native Graphshell Hest routing/material/receipt work
+  through `02477e04e` was preserved in merge `9fe4a7ef0`. All four released
+  package trees remain exact against release source `615b35e2e`; consumer
+  locks are unchanged. The incoming lane retains its own qualification scope.
 
 [Release qualification](../../../support/receipts/hest-release-20261020/qualification.json),
 [command receipts](../../../support/receipts/hest-release-20261020/checks.json),
