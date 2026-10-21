@@ -1,0 +1,435 @@
+{
+  "kind": "Q112/Q113 supplier repair and standalone Git consumer qualification",
+  "supplier_revision": "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc",
+  "supplier_receipt": "armillary/support/receipts/pool-lifetime-20261021.json",
+  "supplier_receipt_sha256": "6cc6ef0de5481b1b4985255349bde710cc662a2398c34b9e536f65af12ddf6eb",
+  "mere_base_revision": "408d1559b7712d579743d1e9b84d6efb1b98a9fb",
+  "m4_host": "m4-imac.lan",
+  "m4_architecture": "arm64",
+  "source_sha256": {
+    "support/fixtures/armillary-consumer/Cargo.toml": "2f935f1d8b153004b2b1e700566b996e43e7a9ae3643902ce18255abf2ceb1ee",
+    "support/fixtures/armillary-consumer/Cargo.lock": "090fe50ae57876c0a8fadacbd362f1dc9e5d5897db62c8fec46fad18343415e3",
+    "support/fixtures/armillary-consumer/src/main.rs": "54b29032a67b1012efae834094a9c24155235766852f5f865d3a238c7e8f0081"
+  },
+  "supplier_gates": [
+    {
+      "label": "supplier-default",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "test",
+        "--locked",
+        "--workspace",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 5.94,
+      "log_sha256": "3672bbe3fbf686da5be96a530ed8a3184a30b9bf065f8b566887b082b6022419",
+      "results": [
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+      ]
+    },
+    {
+      "label": "supplier-all-features",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 3.41,
+      "log_sha256": "c7a8c898423d22a5340a5f7d308b89d83637b78a455b9076ace092149858f143",
+      "results": [
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ]
+    },
+    {
+      "label": "supplier-msrv",
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 7.66,
+      "log_sha256": "620fd2a20994f4e2ff623954f9f0c169af51d6001f9b4c0a5127058e99bf3dc0",
+      "results": [
+        "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+      ]
+    },
+    {
+      "label": "supplier-clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 1.33,
+      "log_sha256": "629f2e022190f5052dc782cb6f438558aa1ea42c0202ac1cdef2ce2fa04523a5",
+      "results": []
+    },
+    {
+      "label": "supplier-focused-clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::collapsible_if"
+      ],
+      "exit_code": 101,
+      "seconds": 0.36,
+      "log_sha256": "50fd33403908740777eae170bea3962551b1947bf953916da3814bf041ef00c6"
+    },
+    {
+      "label": "supplier-format",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "supplier-lean-tree",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "tree",
+        "--locked",
+        "-p",
+        "armillary",
+        "--no-default-features",
+        "-e",
+        "normal"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04,
+      "log_sha256": "d0f50efec94d1fc4887c506016cb0a4b9dffd40947356769f9ea03eef4017fdd"
+    },
+    {
+      "label": "supplier-pool-clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/build\"",
+        "clippy",
+        "--locked",
+        "-p",
+        "armillary",
+        "--lib",
+        "--test",
+        "pool_lifetime",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings",
+        "-A",
+        "clippy::collapsible_if"
+      ],
+      "exit_code": 0,
+      "log_sha256": "d406543f224718b237022a6f718b7b5c4163f285ff7b447252247fd16fb99e75"
+    }
+  ],
+  "supplier_before_controls": [
+    {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "armillary",
+        "--lib",
+        "pool::tests::queued_jobs_do_not_share_one_idle_reservation",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 101,
+      "log": "before-0.log",
+      "log_sha256": "43f2bf1ad1291a62bc5a33114ef4176ac87f51a3b75ded87e036e9e655b627ae"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "-p",
+        "armillary",
+        "--test",
+        "pool_lifetime",
+        "workers_retire_after_the_last_pool_handle_drops",
+        "--",
+        "--exact"
+      ],
+      "exit_code": 101,
+      "log": "before-1.log",
+      "log_sha256": "8995d18dedaec97d636ade6d5763c621ca1595780ac75c430899de6ac364f58c"
+    }
+  ],
+  "consumer_before_control": {
+    "command": [
+      "cargo",
+      "+1.99.1",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-before-build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "--manifest-path",
+      "/Users/markik/Code/testing/armillary-pool-20261021/consumer-before/Cargo.toml",
+      "last_pool_drop_preserves_actor_completion_then_retires_the_worker",
+      "--",
+      "--exact",
+      "tests::last_pool_drop_preserves_actor_completion_then_retires_the_worker"
+    ],
+    "exit_code": 101,
+    "supplier": "e67c5def1c735be047492a867bcdc8b41fba22b8",
+    "log_sha256": "9b9c465f8e6b594a71435c281db11ae938fae58864c823ea7ed0f0578f41cdcf"
+  },
+  "consumer_gates": [
+    {
+      "label": "consumer-test",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "test",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 3.86,
+      "log_sha256": "7fc6ac508109c812a64cd181741b6762b030d5303a547656f1084fdfbdf5db6a",
+      "results": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s"
+      ]
+    },
+    {
+      "label": "consumer-msrv",
+      "command": [
+        "cargo",
+        "+1.97.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "test",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 4.36,
+      "log_sha256": "13c95d141aca1b15ed290df2e8953e4f8fc331bae5db9fadd52eb747cb175915",
+      "results": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s"
+      ]
+    },
+    {
+      "label": "consumer-run",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "run",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 0.4,
+      "log_sha256": "a83b6a6751aa331e32457f6cf75f712975c91c688d5e3e76e8b49203a513d3d3",
+      "results": []
+    },
+    {
+      "label": "consumer-clippy",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "clippy",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 3.09,
+      "log_sha256": "3a9851f43a57bde8d3aeabb7d5a86991c615e407f0b71fd2a180f6bf2c305b6a",
+      "results": []
+    },
+    {
+      "label": "consumer-tree",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "tree",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-e",
+        "normal"
+      ],
+      "exit_code": 0,
+      "seconds": 0.04,
+      "log_sha256": "2351888d9c69154687ac9e2f12846786ecd879a367c1c63f99f197300fa353b9",
+      "results": []
+    },
+    {
+      "label": "consumer-metadata",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "metadata",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.03,
+      "log_sha256": "231aa6fd29c988905a7dedbba754dd4b9f7d08960af96186ade4c5113f052821",
+      "results": []
+    },
+    {
+      "label": "consumer-format",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/repos/armillary/target/consumer-build\"",
+        "fmt",
+        "--manifest-path",
+        "support/fixtures/armillary-consumer/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "results": []
+    }
+  ],
+  "independent_intel_supplier": {
+    "host": "Q-PC.local",
+    "architecture": "x86_64",
+    "revision": "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc",
+    "cwd": "/Users/markik/Code/testing/armillary-pool-20261021/supplier",
+    "command": [
+      "/Users/markik/.cargo/bin/cargo",
+      "+1.99.1",
+      "test",
+      "--locked",
+      "--workspace",
+      "--all-features",
+      "-j1"
+    ],
+    "exit_code": 0,
+    "seconds": 35.64,
+    "log_path": "/Users/markik/Code/testing/armillary-pool-20261021/supplier-all-features.log",
+    "log_sha256": "5d272690b53610e51fe8109554605de18ea951ee6324b127ab6bf23278d3c2ee",
+    "results": [
+      "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s"
+    ],
+    "source_sha256": {
+      "crates/armillary/src/pool.rs": "0699ee691f76b11300f6a6fe2ec68bca2d3af1a102e07ead64b8319bcd752555",
+      "crates/armillary/tests/pool_lifetime.rs": "46c8e64682078f5d395212bd18d178108fae21d46e1a3fcf62274514aa987a5e"
+    }
+  },
+  "scope": {
+    "product_pins": "unchanged; root, standalone product manifests and their locks retain the qualified cohort",
+    "product_cohort_follow_up": "ESP directly pins the old Armillary revision and Knot directly pins that ESP revision. Repin ESP, then Knot, then Mere/product consumers together to avoid duplicate Git package identities.",
+    "pool_callers": "Current Mere production Rust source has no spawn_on/spawn_named_on or Armillary Pool caller. Its standalone consumer fixture exercises the pooled public API.",
+    "normal_graph": "One canonical immutable Armillary Git identity in the qualified fixture; no local patch and no Tokio in its normal dependency tree.",
+    "evidence_boundary": "CPU/process and thread-lifetime observations; no new native UI, GPU, physical-device or Knot checkpoint feature acceptance."
+  },
+  "local_log_directory": "/Users/markik/Code/testing/armillary-pool-20261021"
+}
