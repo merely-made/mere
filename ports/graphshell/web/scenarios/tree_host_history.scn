@@ -1,0 +1,58 @@
+# S3 (mer3ly site canvas plan, Rulings 144-148): a host history in the plain
+# viewer, stepped by checkpoint. Run with the site's published history:
+#   dataset.html?dataset=fixtures/site-repository-host-history.json
+# The history has 15 checkpoints and compares label, class, status and
+# pushed_at (Ruling 145) and relationship endpoints and kind (Ruling 146).
+# The viewer opens on the last; each node's title carries its change's mark
+# (+ added, ~ updated, · stable), and the History region tells every change,
+# removed occurrences included, with the checkpoint as the slider's value.
+assert snap ready == true
+settle 3
+assert snap dataset == loaded
+assert snap history-checkpoints == 15
+assert snap history-index == 15
+assert snap nodes == 21
+assert snap edges == 30
+assert snap reader-checkpoint ~ Checkpoint 15 of 15
+assert snap history-summary ~ 16 updated
+assert snap reader-changes >= 21
+assert snap reader-change-labels ~ Mere: updated (pushed_at)
+assert snap reader-item-names ~ ~ Mere
+assert snap reader-item-names ~ · Wavicle
+# The buttons step one checkpoint.
+click role:button Earlier checkpoint
+settle 2
+assert snap history-index == 14
+assert snap reader-checkpoint ~ Checkpoint 14 of 15
+assert snap history-summary ~ 13 stable
+assert snap reader-change-labels ~ Cleromancy: updated (class, label, relations)
+# A press on the slider picks the checkpoint under it: the middle of 15.
+click role:slider
+settle 2
+assert snap history-index == 8
+assert snap nodes == 19
+# The keys: Home and End go to the ends, the arrows step.
+key Home
+settle 2
+assert snap history-index == 1
+assert snap nodes == 1
+assert snap edges == 0
+assert snap reader-item-names ~ + Graphshell
+key ArrowRight
+key ArrowRight
+key ArrowRight
+key ArrowRight
+settle 2
+assert snap history-index == 5
+assert snap nodes == 3
+assert snap history-summary ~ 1 removed
+assert snap reader-change-labels ~ Graphshell: removed
+assert snap reader-item-names ~ ~ Mere
+capture tree_host_history_removed
+key End
+settle 2
+assert snap history-index == 15
+assert snap nodes == 21
+capture tree_host_history
+wait
+log host history viewer receipt complete

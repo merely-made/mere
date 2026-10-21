@@ -1073,6 +1073,17 @@ is that objective's assessment.
   or removed between revisions, and cartography's `adapters/changes.rs`
   reads it. It stays apart from `SceneTrace`. Landed by the mer3ly site
   session as its S3, `1a53836b` to `1adedb50`.
+- *Added 2026-10-09 (site Rulings 157 and 162):* the plain viewer reads
+  that history. `graphshell::host_history_view` selects one checkpoint as a
+  one-dataset envelope for the shared `host_dataset_view` constructor and
+  marks each node with its change; the one-tree page steps checkpoints with
+  a keyboard slider, lists every change for a reader, leaves a plain wheel
+  and a one-finger touch to the embedding page (`canvas_gestures`), honours
+  reduced motion, and mounts from `web/viewer.js` without the receipt
+  harness. `ports/graphshell/web/Cargo.lock` is tracked with a pinned
+  release profile. Landed by the mer3ly site session on branch
+  `viewer-cutover`; receipts `tree_host_history.scn` and
+  `tree_gestures.scn`.
 
 ## Progress
 

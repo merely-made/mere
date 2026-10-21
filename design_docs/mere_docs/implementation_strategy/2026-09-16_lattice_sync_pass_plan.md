@@ -764,3 +764,13 @@ wrong source. Report to Mark; change nothing.
   command on the machine for about that long. The network prompt is a
   separate, recurring cost: each new test-binary path raises it again, and
   Mark has to clear it by hand.
+- **2026-10-09. The browser viewer's nested lock is tracked.**
+  `ports/graphshell/web/Cargo.lock` is opted in by a `.gitignore` negation,
+  as the three WASI guests' locks are, so a host builds the plain viewer
+  with `cargo build --release --locked --target wasm32-unknown-unknown
+  --no-default-features` from that directory (mer3ly site canvas plan,
+  Ruling 157). It was seeded from the portable root lock and resolved by
+  bare Cargo: 896 packages, no path package from outside the repository.
+  Its `[profile.release]` pins P0's measured settings. Local mode still
+  redirects it to `.cargo/local/Cargo.lock`; its portable CI gate is not
+  added yet.
