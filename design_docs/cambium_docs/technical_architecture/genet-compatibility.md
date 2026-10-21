@@ -1,8 +1,8 @@
 # Genet compatibility
 
-Cambium consumes Genet through published seam packages. `cambium-nematic`
-adds reactive projections over Errand's portable smolweb ASTs. Genet's
-engine-side Livery and Scripted document runtime remains in `genet-documents`;
+Cambium consumes Genet through published DOM, style, layout, paint, input and
+accessibility interfaces. Genet's engine-side Livery and Scripted document
+runtime remains in `genet-documents`;
 Mere's application-facing reader and smolweb lanes live in
 `mere-document-lanes`.
 
@@ -12,6 +12,28 @@ Mere's application-facing reader and smolweb lanes live in
 [smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
 WS4, R0): smolweb renders through `mere-document-lanes` only. The published
 `cambium-nematic` 0.3.1 stays on crates.io; its table row is history.
+
+## Engine mechanisms and host defaults (2026-10-20)
+
+Genet is independently usable, with explicit host presets and adapters.
+`genet-livery::StyleSet::cambium` selects the built-in `CAMBIUM_UA_DEFAULTS`
+stylesheet for Cambium's bounded structural lane. `StyleSet::parse` and
+`parse_resolved` accept a caller-supplied UA stylesheet. A Cambium preset inside
+the integration layer does not make that preset mandatory for all embedders.
+
+The winit wheel helpers declare their line/pixel units, direction and display
+scale handling. External texture intake maps generic DOM node identities to
+opaque renderer keys. These interfaces can be reused by other hosts, which
+must still honor those contracts. Their availability does not establish an
+adapter for every host policy or rendering backend.
+
+Source homes in the pinned Genet supplier are
+`genet/components/genet-livery/src/style.rs`,
+`genet/components/genet-livery/src/lib.rs`,
+`genet/components/genet-livery/src/paint.rs` and
+`genet/components/genet-winit-host/src/lib.rs`. Cambium's actual native
+device/event-loop choices are documented in
+[the architecture note](2026-09-03_cambium_architecture.md#shared-gpu-and-event-loop-ownership-2026-10-20).
 
 ## Historical verified Genet seam set (2026-07-22)
 
