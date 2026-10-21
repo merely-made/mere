@@ -57,3 +57,9 @@ recovery and updates to other computers remain separate capabilities.
 
 The [macOS qualification receipt](../../support/receipts/dramatis-authentication-20261021/README.md)
 records both formats, native prompts, failure controls and independent cold reopens.
+
+Linux password prompts require an available masked graphical provider: Zenity,
+Yad or KDialog in the resident's desktop session. Console, unmasked and unknown
+providers are refused. Djinn invokes the selected Linux helper directly and
+preserves the entered spaces, punctuation and Unicode through replacement and
+reopen.
