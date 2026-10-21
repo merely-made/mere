@@ -139,6 +139,15 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
     }
 
     fn app_step(&mut self, line: &str) -> Result<(), String> {
+        if let Some(invocation) = crate::command::parse(line) {
+            let invocation = invocation?;
+            let outcome = self.lane.product.invoke(self.ctx, &invocation);
+            self.lane
+                .commands
+                .get_or_insert_with(Default::default)
+                .record(&invocation, outcome.as_ref());
+            return crate::command::step_result(outcome.as_ref());
+        }
         if let Some(argument) = line.strip_prefix("file ")
             && let Some(files) = &mut self.lane.script_files
         {
