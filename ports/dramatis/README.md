@@ -63,3 +63,7 @@ Yad or KDialog in the resident's desktop session. Console, unmasked and unknown
 providers are refused. Djinn invokes the selected Linux helper directly and
 preserves the entered spaces, punctuation and Unicode through replacement and
 reopen.
+
+The [Fedora qualification receipt](../../support/receipts/dramatis-authentication-fedora-20261021/README.md)
+records both formats with Zenity, exact input preservation, native cancellation
+and retry, failure controls and cold reopens.

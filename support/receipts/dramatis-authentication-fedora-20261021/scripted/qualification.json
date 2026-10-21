@@ -1,0 +1,82 @@
+{
+  "result": "ok",
+  "source": "73b25d9ee71184a1a8e7bf53b774255815810727",
+  "native_dialogs": false,
+  "native_cancellation": false,
+  "public_synthetic_vaults_only": true,
+  "formats": [
+    {
+      "format": "sealed",
+      "identities_preserved": true,
+      "old_rejected_after_cold_reopen": true
+    },
+    {
+      "format": "portable",
+      "identities_preserved": true,
+      "old_rejected_after_cold_reopen": true
+    }
+  ],
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 2393436,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 2393150,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 2393509,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 2393504,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 2393540,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 2393538,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 2393581,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 2393579,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    }
+  ],
+  "binaries": {
+    "app_sha256": "0b8fc20864d865f1001614cf764430c7fabce11732ac89219b0e109bcf49af41",
+    "host_sha256": "aac5043483468fc585df00707d1d0a74140ae5f396f4fb310d310832e8069ccd"
+  },
+  "controller_sha256": "54e3ddf9289480c2dcba1bf99e46fc7d4ec6ae807760a7335c479b9a9fd5c0d6"
+}
