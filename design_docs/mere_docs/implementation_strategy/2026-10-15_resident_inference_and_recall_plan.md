@@ -1806,3 +1806,9 @@ receipt does not promote those pending product gates to passes.
   app-route cases. The real-model process fixture compiles with GPU and
   embedding enabled. Turnstone pin refresh and new native receiving/cold
   qualification remain in progress; the earlier capture-only receipt is frozen.
+
+  The opt-in headed fixture additionally writes revision-changed
+  `live-runs-{phase}.json` observations, so a receiving driver can distinguish
+  generation, terminal refusal and a product presentation interruption without
+  waiting only for a success marker. This is explicit synthetic-fixture
+  observation, with no installed resident logging change.
