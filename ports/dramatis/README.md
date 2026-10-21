@@ -64,6 +64,9 @@ providers are refused. Djinn invokes the selected Linux helper directly and
 preserves the entered spaces, punctuation and Unicode through replacement and
 reopen.
 
-The [Fedora qualification receipt](../../support/receipts/dramatis-authentication-fedora-20261021/README.md)
-records both formats with Zenity, exact input preservation, native cancellation
-and retry, failure controls and cold reopens.
+The Linux qualification receipts cover [Fedora with Zenity](../../support/receipts/dramatis-authentication-fedora-20261021/README.md)
+and [Kubuntu with KDialog](../../support/receipts/dramatis-authentication-kubuntu-20261021/README.md).
+Both record exact input preservation, native cancellation and retry, failure
+controls and cold reopens for both vault formats. The Kubuntu run reuses the
+verified Fedora-built Linux executables; build provenance is recorded separately
+from runtime qualification.
