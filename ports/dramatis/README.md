@@ -54,3 +54,6 @@ current passphrase, empty replacement and mismatched confirmation leave the
 credential unchanged. A vault locked while its prompts are open refuses the
 commit. This operation requires the current passphrase; forgotten-passphrase
 recovery and updates to other computers remain separate capabilities.
+
+The [macOS qualification receipt](../../support/receipts/dramatis-authentication-20261021/README.md)
+records both formats, native prompts, failure controls and independent cold reopens.
