@@ -1,0 +1,48 @@
+{
+  "attempts": [
+    {
+      "cohort": "gs-relay-20261020-01",
+      "result": "rejected",
+      "reason": "Initial join and writes succeeded, but warm reconnect timed out under the earlier macOS UDP-denial sandbox.",
+      "log": "diagnostics/run-01.log.gz",
+      "relay": "diagnostics/run-01-relay.json"
+    },
+    {
+      "cohort": "gs-relay-20261020-02",
+      "result": "rejected",
+      "reason": "Initial native guest did not receive a projection under the earlier macOS UDP-denial sandbox.",
+      "log": "diagnostics/run-02.log.gz",
+      "relay": "diagnostics/run-02-relay.json"
+    },
+    {
+      "cohort": "gs-relay-probe01",
+      "result": "diagnostic only",
+      "reason": "Unconditional native capture reported carrier connect timeout under the macOS UDP-denial sandbox.",
+      "log": "diagnostics/probe-01.log.gz",
+      "relay": "diagnostics/probe-01-relay.json"
+    },
+    {
+      "cohort": "gs-relay-probe02",
+      "result": "rejected harness setup",
+      "reason": "Pasta could not attach to the separately created network namespace; no guest native process was launched.",
+      "log": "diagnostics/probe-02.log.gz",
+      "relay": "diagnostics/probe-02-relay.json"
+    },
+    {
+      "cohort": "gs-relay-probe03",
+      "result": "diagnostic only",
+      "reason": "Initial and fresh native guest both joined through the selected relay after Pasta owned namespace creation. Deliberate diagnostic stop after captures; not a complete acceptance run.",
+      "log": "diagnostics/probe-03.log.gz",
+      "relay": "diagnostics/probe-03-relay.json"
+    }
+  ],
+  "interpretation": "The macOS deny-UDP sandbox was an unsuitable intermittent forced-route constraint. These results do not establish a lower-stack root cause. The final acceptance instead isolates the Linux guest network with TCP forwarding and successful-but-dropped UDP probes. Product binaries were unchanged during these diagnostic iterations.",
+  "prior_full_pass": {
+    "cohort": "gs-relay-20261020-03",
+    "result": "ok",
+    "source": "400ccd181b1f37a29468d844c9692b125ca68878",
+    "qualification": "diagnostics/prior-passing-qualification.json",
+    "relay": "diagnostics/prior-passing-relay.json",
+    "reason_for_repeat": "Integrated concurrent main replay-test/example additions and repeated acceptance on the current source; native binaries stayed byte-identical."
+  }
+}
