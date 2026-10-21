@@ -81,5 +81,40 @@ mod tests {
     fn actor_handles_retain_the_sync_contract() {
         fn assert_send_sync<T: Send + Sync>() {}
         assert_send_sync::<ActorHandle<()>>();
+        assert_send_sync::<Pool>();
+    }
+
+    #[test]
+    fn last_pool_drop_preserves_actor_completion_then_retires_the_worker() {
+        use std::cell::RefCell;
+
+        struct ExitProbe(mpsc::Sender<()>);
+        impl Drop for ExitProbe {
+            fn drop(&mut self) {
+                let _ = self.0.send(());
+            }
+        }
+        thread_local! {
+            static EXIT: RefCell<Option<ExitProbe>> = const { RefCell::new(None) };
+        }
+
+        let pool = Pool::new();
+        let (exited, exit) = mpsc::channel();
+        let (started, ready) = mpsc::channel();
+        let (actor, updates) =
+            actor::spawn_on::<u32, u32, _>(&pool, Arc::new(|| {}), move |commands, out| {
+                EXIT.with(|probe| *probe.borrow_mut() = Some(ExitProbe(exited)));
+                started.send(()).unwrap();
+                while let Ok(value) = commands.recv() {
+                    out.emit(value + 1);
+                }
+            });
+        ready.recv_timeout(Duration::from_secs(5)).unwrap();
+        drop(pool);
+        assert!(actor.command(41));
+        actor.join().unwrap();
+        assert_eq!(updates.into_iter().collect::<Vec<_>>(), vec![42]);
+        exit.recv_timeout(Duration::from_secs(5))
+            .expect("last public pool handle must release its worker");
     }
 }

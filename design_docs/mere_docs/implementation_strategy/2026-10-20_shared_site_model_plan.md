@@ -108,6 +108,36 @@ the default model and local checkpoint feature stay independent.
   serving grant across owners. An opened site is a point-in-time read. Network
   hosts must arrange their own revalidation/revocation behavior and hosting policy.
 
+## Gemini publication runtime (2026-10-21)
+
+**Status:** in progress. Host authority and native snapshot V1 stay unchanged.
+
+1. Add a versioned endpoint binding with explicit pinned-contribution and
+   follow-single-site-collection modes. Re-resolve current collection authority
+   on each request; empty/ambiguous collections, withdrawal, missing public
+   content and lost authority refuse. No timestamp chooses a revision.
+2. Add Knot's saved-site publication command over host-supplied Moot/identity
+   and Eidetic retention. Preserve drafts and report any contribution already
+   authored if a later collection update refuses. Replacement uses existing
+   collection operations and may transiently refuse while membership changes.
+3. Extend Djinn's existing Gemini listener with Errand's Source adapter and
+   Armillary ResidentTasks. Persist the endpoint binding and certificate,
+   honor explicit restart policy, and join connection work on shutdown.
+4. Done when an independent resident process reopens the binding and retained
+   owners with Knot absent, serves exact saved bytes through real Gemini/TLS,
+   preserves its certificate, reflects replacement/withdrawal, and refuses
+   ambiguous/private/stale/foreign state. Preserve the original snapshot and
+   resident tests. Retain compact receipts under 100 MB total, using stable
+   Mere and Knot targets. No new worktree without a concrete collision.
+
+### Runtime findings (2026-10-21)
+
+Knot already supplies saved-file capture and native protocol replies. Djinn's
+listener already owns loopback/TLS/certificate and connection ceilings. Errand
+has a generic Source plus a Gemini Handler adapter; the native Scroll metadata
+gap need not block Gemini. Armillary's current pin already supplies scoped
+task admission, cancellation, joining and shutdown reports.
+
 ## Extraction findings (2026-10-20)
 
 - `knot-editor/crates/knot-site/src/lib.rs` combines portable records and validation
