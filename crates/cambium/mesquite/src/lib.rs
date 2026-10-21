@@ -35,6 +35,13 @@
 //! and its own bounded grace period. The product receives pixels through
 //! `Product::inspect` and publishes its receipt through `Product::complete`.
 //!
+//! `invoke <JSON Invocation>` passes Hest's [`cambium::Invocation`] through
+//! [`Product::invoke`]. The product validates and enacts it; the lane records
+//! bounded command metadata without argument bytes. Pending work remains a null
+//! outcome, distinct from terminal [`cambium::Outcome::Done`]. The optional
+//! `commands` receipt section appears only after use or explicit
+//! [`Lane::set_command_audit_limits`]. Legacy `act` labels keep their own path.
+//!
 //! `MESQUITE_CAPTURE_PAINT=1` or [`Lane::set_paint_capture`] adds a postcard
 //! `.paintlist` beside each saved PNG, with full font/image payloads and a
 //! `paint_path` in JSON receipts. Both come from the same presented frame.
@@ -68,6 +75,8 @@ pub use scenario::{CaptureRecord, LaneConfig};
 mod checkpoints;
 mod clicks;
 pub use clicks::Clicks;
+mod command;
+pub use command::CommandAuditLimits;
 mod cost;
 mod lane;
 mod pixels;
@@ -144,6 +153,23 @@ pub trait Product: Sized {
     fn act(&mut self, ctx: &mut Ctx<'_, Self>, label: &str) -> bool {
         let _ = (ctx, label);
         false
+    }
+
+    /// Receive `invoke <JSON Invocation>` from a scenario. The product checks
+    /// the current declaration, schema, effect, arguments and authority before
+    /// enactment. `Some(Done)` requires an observed terminal result; `None`
+    /// means admitted work is pending, never that it completed successfully.
+    /// The lane records bounded metadata without opaque argument bytes. Hosts
+    /// must redact refusal reasons before returning them for receipt export.
+    /// This hook does not translate the legacy [`Self::act`] boolean.
+    fn invoke(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+        _invocation: &cambium::Invocation,
+    ) -> Option<cambium::Outcome> {
+        Some(cambium::Outcome::Refused {
+            reason: "this product does not support command invocation".into(),
+        })
     }
 
     /// Whether the product still has work the next scenario step must not

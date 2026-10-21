@@ -1,0 +1,8 @@
+2026-10-21T03:52:53.193637Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /private/tmp/moa-xl_edhex/owner/vault/vault.json
+2026-10-21T03:52:53.195967Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-21T03:52:53.279718Z  INFO djinn: resident reservoir open persona=ec876f21-b08b-4993-9d43-c02f6200dbb9
+2026-10-21T03:52:53.280420Z  INFO djinn: SSH agent listening endpoint="/private/tmp/moa-xl_edhex/owner/agent.sock"
+2026-10-21T03:52:53.280655Z  INFO djinn::personal_sync: owner settings path=/private/tmp/moa-xl_edhex/owner/local/graphshell/settings/LiveOwnerActions.json configured=false
+2026-10-21T03:52:53.324260Z  INFO djinn: mere route open route="mere/owner-actions-acceptance"
+2026-10-21T03:52:56.024176Z  INFO djinn: stop requested on the control route
+2026-10-21T03:52:56.176620Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 10, cancelled: 0, panicked: 0, rejected: 0 }

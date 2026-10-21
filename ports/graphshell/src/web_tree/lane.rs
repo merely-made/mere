@@ -923,7 +923,28 @@ impl Product for TreeLane {
             });
         let step = canvas.elapsed_step_report().unwrap_or_default();
         let snapshot = self.remote_fields(ctx, self.physics_fields(ctx, ProbeSnapshot::default()));
+        #[cfg(feature = "product")]
+        let snapshot = snapshot
+            .with_field("shell-panes-open", page.instrument.panes_open.to_string())
+            .with_field("shell-inspector-open", page.tools_open.to_string())
+            .with_field(
+                "shell-graph-controls",
+                page.instrument.graph_controls.to_string(),
+            )
+            .with_field(
+                "shell-document-controls",
+                page.instrument.document_controls.to_string(),
+            )
+            .with_field(
+                "shell-projection",
+                if page.forme.as_ref().is_some_and(|pane| pane.workbench) {
+                    "Read"
+                } else {
+                    "Map"
+                },
+            );
         let snapshot = super::speed::fields(snapshot, &canvas, &self.shared);
+        let snapshot = snapshot.with_field("territory", canvas.territory_field().to_string());
         let snapshot = snapshot.with_field(
             "painted-overlay-geometry",
             overlay_observation::observe(ctx, &self.shared).to_string(),
@@ -2080,6 +2101,37 @@ impl Product for TreeLane {
             handled = page.command(command);
         });
         handled
+    }
+
+    fn invoke(
+        &mut self,
+        ctx: &mut mesquite::Ctx<'_, Self>,
+        invocation: &cambium::Invocation,
+    ) -> Option<cambium::Outcome> {
+        let mut outcome = cambium::Outcome::Stale;
+        ctx.runner.update(|page| {
+            if page.resident_mere_shown() || page.shared.remote_shown.get() {
+                outcome = cambium::Outcome::Refused {
+                    reason: "Viewer commands require the local canvas.".into(),
+                };
+                return;
+            }
+            let declarations = commands::catalog(page);
+            outcome = graphshell::command_invocation::invoke(
+                &mut page.shared.canvas.borrow_mut(),
+                page.size,
+                &declarations,
+                invocation,
+            );
+            if outcome == cambium::Outcome::Done {
+                page.shared.dirty.set(true);
+                page.shared
+                    .events
+                    .borrow_mut()
+                    .push(format!("command {}", invocation.id));
+            }
+        });
+        Some(outcome)
     }
 
     /// Events emitted by the same command owners as the visible controls.

@@ -109,6 +109,11 @@ pub enum OwnerSettingsError {
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct OwnerSettings {
+    /// Relays explicitly trusted for invited Graphshell co-op. Empty keeps
+    /// co-op LAN-only. This profile-local choice takes effect on restart;
+    /// invitation and graph authority remain separate from reachability.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub coop_relay_urls: Vec<String>,
     /// Absent means personal sync stays off for this profile.
     pub sync: Option<SyncSettings>,
     /// Absent means this device host does not compose a resident Knot route.
@@ -451,9 +456,22 @@ pub struct ReservoirLaneSettings {
     /// The wallet persona whose reservoir this resident holds. Unset means the
     /// sole persona wallet under the shared root.
     pub persona: Option<personae::PersonaId>,
+    /// Offer web-address handoff to the receiving device's default browser.
+    /// Profile-local, opt-in and read at resident startup; no executable paths.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub open_web_addresses: bool,
 }
 
 impl ReservoirLaneSettings {
+    pub fn handlers(&self) -> graphshell::handlers::HandlerRegistry {
+        graphshell::handlers::HandlerRegistry::new(
+            self.open_web_addresses
+                .then(graphshell::handlers::web_browser_handler)
+                .into_iter()
+                .collect(),
+        )
+    }
+
     pub fn is_default(&self) -> bool {
         self == &Self::default()
     }
@@ -464,6 +482,7 @@ impl Default for ReservoirLaneSettings {
         Self {
             enabled: true,
             persona: None,
+            open_web_addresses: false,
         }
     }
 }
@@ -631,6 +650,14 @@ pub struct LaneSettings {
 }
 
 impl OwnerSettings {
+    pub fn coop_relays(
+        &self,
+    ) -> Result<Vec<transport::p2panda_transport::RelayUrl>, transport::TransportError> {
+        transport::P2pandaHostPolicy::parse_relay_urls(
+            self.coop_relay_urls.iter().map(String::as_str),
+        )
+    }
+
     /// Read the settings for a profile. A missing file is not an error: it
     /// means this profile has no stored preferences yet. Malformed content is
     /// an error, because silently falling back to defaults would quietly turn
@@ -982,6 +1009,29 @@ mod tests {
     use super::*;
 
     #[test]
+    fn co_op_relays_are_explicit_persisted_and_invalid_choices_are_refused() {
+        let default: OwnerSettings = serde_json::from_str("{}").unwrap();
+        assert!(default.coop_relays().unwrap().is_empty());
+        assert!(
+            serde_json::to_value(&default)
+                .unwrap()
+                .get("coop_relay_urls")
+                .is_none()
+        );
+        let chosen: OwnerSettings =
+            serde_json::from_str(r#"{"coop_relay_urls":["http://127.0.0.1:3340/"]}"#).unwrap();
+        let reopened: OwnerSettings =
+            serde_json::from_slice(&serde_json::to_vec(&chosen).unwrap()).unwrap();
+        assert_eq!(
+            reopened.coop_relays().unwrap()[0].to_string(),
+            "http://127.0.0.1:3340/"
+        );
+        let invalid: OwnerSettings =
+            serde_json::from_str(r#"{"coop_relay_urls":["not a relay URL"]}"#).unwrap();
+        assert!(invalid.coop_relays().is_err());
+    }
+
+    #[test]
     fn a_missing_file_is_empty_settings_but_a_malformed_one_is_an_error() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("settings").join("default.json");
@@ -1016,10 +1066,42 @@ mod tests {
     }
 
     #[test]
+    fn browser_handoff_is_explicit_and_round_trips_in_owner_settings() {
+        assert!(
+            OwnerSettings::default()
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::Http)
+                .is_empty()
+        );
+        let settings: OwnerSettings =
+            serde_json::from_str(r#"{"reservoir":{"open_web_addresses":true}}"#).unwrap();
+        assert_eq!(
+            settings
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::Http),
+            vec![graphshell::handlers::web_browser_handler().advertised_action()]
+        );
+        assert!(
+            settings
+                .reservoir
+                .handlers()
+                .actions_for(kernel::address::AddressKind::File)
+                .is_empty()
+        );
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("owner.json");
+        settings.save(&path).unwrap();
+        assert_eq!(OwnerSettings::load(&path).unwrap(), settings);
+    }
+
+    #[test]
     fn settings_round_trip_and_the_write_replaces_the_previous_file() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("settings").join("work.json");
         let mut settings = OwnerSettings {
+            coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),
                 lanes: LaneSettings {

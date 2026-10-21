@@ -10,18 +10,21 @@
 //!
 //! The storage core has no renderer or runtime dependency. Producers supply
 //! redacted payloads and monotonic receipt times; products retain authority over
-//! operation outcomes, persistence and actionable controls. The default
+//! operation outcomes, persistence and actionable controls. Portable values are
+//! re-exported from `apparatus-core` in Armillary; Registry and accessibility
+//! integration remain here. The default
 //! `projection` feature preserves the earlier placeholder inspection tree.
 
 #![doc(html_root_url = "https://docs.rs/mere-apparatus/0.0.1")]
 
-mod observation;
-pub use observation::*;
+pub use apparatus_core::*;
 #[cfg(feature = "registry")]
 pub mod collector;
 
+#[cfg(feature = "projection")]
 mod inspection;
-pub use inspection::*;
+#[cfg(feature = "projection")]
+pub use inspection::project_inspection;
 
 #[cfg(feature = "projection")]
 use accesskit::{Node, Role};

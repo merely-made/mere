@@ -192,11 +192,16 @@ pub struct ProducerSemantics {
 pub struct ProducerNode {
     /// The producer's stable name for the node, so a reader's request
     /// reaches it however the list is ordered when the reader acts.
+    /// Keys must be unique within one `ProducerSemantics` description.
     pub key: u64,
     pub role: ProducerRole,
     pub name: String,
     /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
-    /// (layout) pixels, from the slot's top-left corner.
+    /// (layout) pixels, from the content-box top-left corner, matching
+    /// `ProducerFrameInfo::logical_size` and content-local pointer coordinates.
+    /// The host currently publishes untransformed, scroll-adjusted bounds;
+    /// forward CSS transform/clip and flattened-ancestor placement remain
+    /// unqualified.
     pub rect: [f32; 4],
     /// What a reader may do to it, each lowered to a button of its own
     /// ([`TextureProducer::act`] carries one out).
@@ -208,6 +213,8 @@ pub struct ProducerNode {
 /// [`TextureProducer::act`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProducerAction {
+    /// Unique within this child's actions. Other child keys may use the same
+    /// action ID. Ambiguous contributions are refused by shared host composition.
     pub id: String,
     /// The button's name.
     pub label: String,

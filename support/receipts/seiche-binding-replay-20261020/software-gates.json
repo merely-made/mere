@@ -1,0 +1,168 @@
+{
+  "seiche-lib": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "seiche",
+      "--features",
+      "serde",
+      "--lib"
+    ],
+    "exit": 0,
+    "seconds": 115.58,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "test_counts": {
+      "passed": 219,
+      "failed": 0,
+      "ignored": 10
+    }
+  },
+  "projection-current-binary": {
+    "command": [
+      "/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build/debug/deps/pictograph-b53c81d3f6e8c3bb",
+      "projection_dynamics"
+    ],
+    "exit": 0,
+    "seconds": 0.5380348758772016,
+    "built_by": "registry-tests.json",
+    "debug": 0,
+    "incremental": 0,
+    "test_counts": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "registry-tests": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "physics_registry"
+    ],
+    "exit": 0,
+    "seconds": 35.35,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "test_counts": {
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "binding-native": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--features",
+      "serde",
+      "--example",
+      "binding_replay"
+    ],
+    "exit": 0,
+    "seconds": 20.57,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "binding-wasm": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "seiche",
+      "--no-default-features",
+      "--features",
+      "serde",
+      "--example",
+      "binding_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 69.74,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "occurrence-native": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "occurrence_replay"
+    ],
+    "exit": 0,
+    "seconds": 16.07,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "occurrence-wasm": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "occurrence_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 111.19,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+}

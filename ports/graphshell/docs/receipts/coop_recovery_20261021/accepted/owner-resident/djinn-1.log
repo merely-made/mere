@@ -1,0 +1,10 @@
+2026-10-21T04:30:07.147718Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /Users/markik/Code/output/gs-recovery-20261021-01/local/private/owner/vault/vault.json
+2026-10-21T04:30:07.153315Z  WARN djinn: selected profile was created profile=CrossGraphOwner
+2026-10-21T04:30:07.157238Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-21T04:30:07.459188Z  INFO djinn: resident reservoir open persona=44e392ab-278c-43f5-838c-3bfec528d696
+2026-10-21T04:30:07.460018Z  INFO djinn: SSH agent listening endpoint="/Users/markik/Code/output/gs-recovery-20261021-01/local/private/owner/agent.sock"
+2026-10-21T04:30:07.460409Z  INFO djinn::personal_sync: owner settings path=/Users/markik/Code/output/gs-recovery-20261021-01/local/private/owner/local/graphshell/settings/CrossGraphOwner.json configured=false
+2026-10-21T04:30:22.673070Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-21T04:30:57.490778Z  INFO djinn: stop requested on the control route
+2026-10-21T04:30:57.493456Z ERROR iroh::socket: Endpoint dropped without calling `Endpoint::close`. Aborting ungracefully.
+2026-10-21T04:30:57.683024Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 31, cancelled: 3, panicked: 0, rejected: 0 }

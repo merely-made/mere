@@ -1,0 +1,59 @@
+{
+  "exit": 0,
+  "sha256": "9a3d57c1ab0f65a60615190e487372ababe649bd4984e003f1c91be782b4ae08",
+  "events": [
+    {
+      "at_ms": 1792553584693,
+      "event": "ready",
+      "pid": 2219994,
+      "url": "http://192.168.4.32:36975/"
+    },
+    {
+      "accepts": 0,
+      "at_ms": 1792553584699,
+      "bytes_recv": 0,
+      "bytes_sent": 0,
+      "disconnects": 0,
+      "event": "snapshot",
+      "packets_recv": 0,
+      "packets_sent": 0,
+      "pid": 2219994
+    },
+    {
+      "at_ms": 1792553609234,
+      "connection": "ConnectionId(0)",
+      "endpoint": "ef68f19d77186268a2ab5b219a425b284ab27be36cba014f395b4c3abd8ee895",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553613748,
+      "connection": "ConnectionId(1)",
+      "endpoint": "23c6f86acb0442496508a62b0c6b29d0a18e0ba051cc31bda2d9dcd11ee52e93",
+      "event": "connect"
+    },
+    {
+      "at_ms": 1792553644978,
+      "connection": "ConnectionId(2)",
+      "endpoint": "23c6f86acb0442496508a62b0c6b29d0a18e0ba051cc31bda2d9dcd11ee52e93",
+      "event": "connect"
+    },
+    {
+      "accepts": 3,
+      "at_ms": 1792553674228,
+      "bytes_recv": 51612,
+      "bytes_sent": 51612,
+      "disconnects": 3,
+      "event": "final",
+      "packets_recv": 131,
+      "packets_sent": 131,
+      "pid": 2219994
+    },
+    {
+      "at_ms": 1792553674231,
+      "event": "stopped",
+      "pid": 2219994
+    }
+  ],
+  "bind": "192.168.4.32:0",
+  "binary": "/home/markik/Code/output/graphshell-coop-relay-20261020/relay-frozen-02/relay"
+}

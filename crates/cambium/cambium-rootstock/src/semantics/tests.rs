@@ -49,6 +49,15 @@ impl TextureProducer for Board {
         Some(board())
     }
 }
+struct Described(ProducerSemantics);
+impl TextureProducer for Described {
+    fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+        None
+    }
+    fn semantics(&mut self) -> Option<ProducerSemantics> {
+        Some(self.0.clone())
+    }
+}
 fn board() -> ProducerSemantics {
     ProducerSemantics {
         role: Some(ProducerRole::List),
@@ -164,7 +173,16 @@ fn producer_without_slot_geometry_does_not_invent_screen_coordinates() {
         tree_id: accesskit::TreeId::ROOT,
         focus: slot,
     };
-    add_producer_semantics(&mut tree, slot, 7, board(), &mut HashMap::new());
+    add_producer_semantics(
+        &mut tree,
+        slot,
+        7,
+        board(),
+        Some((0.0, 0.0)),
+        &mut HashMap::new(),
+        &mut HashSet::from([slot]),
+    )
+    .unwrap();
     assert!(tree.nodes.iter().all(|(_, node)| node.bounds().is_none()));
 }
 #[test]
@@ -184,8 +202,11 @@ fn invalid_producer_rectangle_does_not_reach_accessibility_bounds() {
             A11yNodeId(dom.opaque_id(slot)),
             7,
             semantics,
+            Some((0.0, 0.0)),
             &mut HashMap::new(),
-        );
+            &mut HashSet::from([A11yNodeId(dom.opaque_id(slot))]),
+        )
+        .unwrap();
         assert!(
             tree.nodes
                 .iter()
@@ -264,5 +285,233 @@ fn duplicate_producer_dom_bindings_do_not_publish_actionable_children() {
             .nodes
             .iter()
             .any(|(_, node)| node.label() == Some("Board") || node.label() == Some("Pin"))
+    );
+}
+
+#[test]
+fn content_origin_tests_padded_bounds_follow_content_and_both_scroll_planes() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    dom.set_inner_html(root, "<main style='display:block;width:800px;height:800px'><section style='position:absolute;left:20px;top:30px;width:120px;height:70px;overflow:scroll'><custom-leaf key='7' style='position:absolute;left:50px;top:60px;display:block;width:80px;height:40px;padding:7px;border:5px solid black'></custom-leaf><div style='width:400px;height:400px'></div></section></main>");
+    let mut layout = OwnedLayout::new(&dom, &[""], 160.0, 120.0, &[], &HashMap::new());
+    let slot = layout.custom_leaf_nodes(&dom)[0].1;
+    let scroller = dom.parent(slot).unwrap();
+    layout.set_element_scroll(&dom, HashMap::from([(scroller, (3.0, 4.0))]));
+    layout.set_viewport_scroll((5.0, 6.0));
+    assert_eq!(layout.element_scroll()[&scroller], (3.0, 4.0));
+    assert_eq!(layout.viewport_scroll(), (5.0, 6.0));
+    let fragment = layout.fragments().get(slot).unwrap();
+    let expected = Rect::new(
+        f64::from(fragment.x + 12.0 - 3.0 - 5.0 + 4.0),
+        f64::from(fragment.y + 12.0 - 4.0 - 6.0 + 5.0),
+        f64::from(fragment.x + 12.0 - 3.0 - 5.0 + 14.0),
+        f64::from(fragment.y + 12.0 - 4.0 - 6.0 + 25.0),
+    );
+    let mut producers = ProducerRegistry::new();
+    producers.register(7, Board, &[]).unwrap();
+    let projection = project_semantics(
+        &dom,
+        &layout,
+        &mut LeafRegistry::new(),
+        &mut producers,
+        None,
+    );
+    let children: Vec<_> = projection
+        .tree
+        .nodes
+        .iter()
+        .filter(|(_, n)| matches!(n.label(), Some("Card" | "Pin")))
+        .collect();
+    assert_eq!(children.len(), 2);
+    for (_, node) in children {
+        assert_eq!(node.bounds(), Some(expected));
+    }
+    assert_eq!(projection.produced_targets.len(), 1);
+    let local = layout
+        .element_geometry(&dom, slot)
+        .unwrap()
+        .map_to_local(expected.x0 as f32 + 5.0, expected.y0 as f32 + 6.0)
+        .unwrap();
+    assert_eq!(local, (4.0, 5.0));
+}
+
+#[test]
+fn identity_tests_duplicate_child_keys_and_action_ids_publish_no_partial_contribution() {
+    let mut duplicate_key = board();
+    duplicate_key
+        .children
+        .push(duplicate_key.children[0].clone());
+    let mut duplicate_action = board();
+    let action = duplicate_action.children[0].actions[0].clone();
+    duplicate_action.children[0].actions.push(action);
+    // A valid first child must not leak out when a later child is invalid.
+    let mut later_invalid = board();
+    let mut later = duplicate_action.children[0].clone();
+    later.key = 41;
+    later_invalid.children.push(later);
+    for (semantics, issue) in [
+        (
+            duplicate_key,
+            ProducerSemanticIssue::DuplicateChildKey {
+                producer: 7,
+                key: 40,
+            },
+        ),
+        (
+            duplicate_action,
+            ProducerSemanticIssue::DuplicateActionId {
+                producer: 7,
+                key: 40,
+                id: "pin".into(),
+            },
+        ),
+        (
+            later_invalid,
+            ProducerSemanticIssue::DuplicateActionId {
+                producer: 7,
+                key: 41,
+                id: "pin".into(),
+            },
+        ),
+    ] {
+        let (dom, layout, _) = fixture("");
+        let mut producers = ProducerRegistry::new();
+        producers.register(7, Described(semantics), &[]).unwrap();
+        let projection = project_semantics(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        );
+        assert!(
+            projection.produced_targets.is_empty(),
+            "ambiguous declarations must not activate"
+        );
+        assert!(projection.producer_slots.is_empty());
+        assert_eq!(projection.producer_issues, [issue]);
+        assert!(
+            !projection
+                .tree
+                .nodes
+                .iter()
+                .any(|(_, node)| node.label() == Some("Board"))
+        );
+        let ids: std::collections::HashSet<_> =
+            projection.tree.nodes.iter().map(|(id, _)| id).collect();
+        assert_eq!(ids.len(), projection.tree.nodes.len());
+    }
+}
+
+#[test]
+fn identity_tests_existing_node_and_action_id_collisions_preserve_the_original_tree() {
+    let slot = A11yNodeId(3);
+    for claimed in [
+        produced_node_id(slot, 40, None),
+        produced_node_id(slot, 40, Some("pin")),
+    ] {
+        let mut parent = accesskit::Node::new(Role::Group);
+        parent.set_label("DOM owner");
+        parent.set_children(vec![claimed]);
+        let mut existing = accesskit::Node::new(Role::Button);
+        existing.set_label("Existing target");
+        let mut tree = TreeUpdate {
+            nodes: vec![(slot, parent), (claimed, existing)],
+            tree: Some(accesskit::TreeInfo::new(slot)),
+            tree_id: accesskit::TreeId::ROOT,
+            focus: claimed,
+        };
+        let before = tree.clone();
+        let mut reserved = HashSet::from([slot, claimed]);
+        let before_ids = reserved.clone();
+        let mut targets = HashMap::new();
+        let result = add_producer_semantics(
+            &mut tree,
+            slot,
+            7,
+            board(),
+            Some((0.0, 0.0)),
+            &mut targets,
+            &mut reserved,
+        );
+        assert_eq!(
+            result,
+            Err(ProducerSemanticIssue::NodeIdCollision {
+                producer: 7,
+                id: claimed
+            })
+        );
+        assert_eq!(tree, before);
+        assert!(targets.is_empty());
+        assert_eq!(
+            reserved, before_ids,
+            "a rejected prefix must not consume IDs"
+        );
+    }
+}
+
+#[test]
+fn identity_tests_reordered_children_keep_distinct_targets_with_the_same_action_name() {
+    let (dom, layout, _) = fixture("");
+    let mut semantics = board();
+    let mut child = semantics.children[0].clone();
+    child.key = 41;
+    child.name = "Second card".into();
+    semantics.children.push(child);
+    let project = |semantics| {
+        let mut producers = ProducerRegistry::new();
+        producers.register(7, Described(semantics), &[]).unwrap();
+        project_semantics(
+            &dom,
+            &layout,
+            &mut LeafRegistry::new(),
+            &mut producers,
+            None,
+        )
+    };
+    let before = project(semantics.clone());
+    semantics.children.reverse();
+    let after = project(semantics);
+    assert_eq!(before.produced_targets.len(), 2);
+    assert_eq!(before.produced_targets, after.produced_targets);
+    assert!(before.producer_issues.is_empty() && after.producer_issues.is_empty());
+    let ids: HashSet<_> = after.tree.nodes.iter().map(|(id, _)| id).collect();
+    assert_eq!(ids.len(), after.tree.nodes.len());
+}
+
+#[test]
+fn identity_tests_invalid_producer_does_not_block_a_valid_sibling() {
+    let (mut dom, _, _) = fixture("");
+    let root = dom.document();
+    let other = dom.create_element(cambium::attr_qual("custom-leaf"));
+    dom.set_attribute(other, cambium::attr_qual("key"), "8");
+    dom.set_attribute(
+        other,
+        cambium::attr_qual("style"),
+        "display:block;width:80px;height:30px",
+    );
+    dom.append_child(root, other);
+    let layout = OwnedLayout::new(&dom, &[""], 320.0, 200.0, &[], &HashMap::new());
+    let mut invalid = board();
+    let action = invalid.children[0].actions[0].clone();
+    invalid.children[0].actions.push(action);
+    let mut producers = ProducerRegistry::new();
+    producers.register(7, Described(invalid), &[]).unwrap();
+    producers.register(8, Board, &[]).unwrap();
+    let projection = project_semantics(
+        &dom,
+        &layout,
+        &mut LeafRegistry::new(),
+        &mut producers,
+        None,
+    );
+    assert_eq!(projection.producer_issues.len(), 1);
+    assert_eq!(projection.producer_slots, HashMap::from([(8, other)]));
+    assert_eq!(projection.produced_targets.len(), 1);
+    assert!(
+        projection
+            .produced_targets
+            .values()
+            .all(|target| target.slot == 8)
     );
 }

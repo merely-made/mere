@@ -1,0 +1,38 @@
+{
+  "native_pid": 2236256,
+  "proxy_pid": 2236254,
+  "probe": {
+    "pid": 2236256,
+    "netns": "net:[4026532851]",
+    "udp_send_accepted": 21,
+    "relay_tcp": "connected",
+    "uid": 0
+  },
+  "host_netns": "net:[4026531833]",
+  "host_udp_control_received": true,
+  "host_received_guest_udp": false,
+  "pasta_command": [
+    "pasta",
+    "--foreground",
+    "--quiet",
+    "--config-net",
+    "--no-udp",
+    "-u",
+    "none",
+    "-U",
+    "none",
+    "-t",
+    "none",
+    "-T",
+    "none",
+    "-4",
+    "--address",
+    "10.77.0.2",
+    "--netmask",
+    "24",
+    "--gateway",
+    "10.77.0.1",
+    "--no-pidns"
+  ],
+  "pasta_version": "pasta 0^20261002.gcba3570-1.fc44.x86_64\nCopyright Red Hat\nGNU General Public License, version 2 or later\n  <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
+}

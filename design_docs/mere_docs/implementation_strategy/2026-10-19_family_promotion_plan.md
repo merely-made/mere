@@ -312,6 +312,27 @@ pixels, fallback rebinding, retirement and native/browser action mapping.
 Full producer coordinate mapping, read-only semantic observations, target
 lifetimes and broader action routing remain separate migrations.
 
+Producer content-origin repair (2026-10-20, qualified): generated children and
+their action bounds now use Genet's content-box origin in the existing
+untransformed, scroll-adjusted observation space. This removes the border and
+padding displacement from rendered producer pixels. On integrated main
+`e94cb23e8`, 115 targeted native tests pass with five existing ignores, plus
+browser-host Wasm compilation. Sampled headless pixels, both scroll planes,
+native action bounds and scaled browser boxes receive the repair. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-content-origin-2026-10-20)
+keeps full forward transform/clip and flattened-ancestor mapping with the
+supplier; no duplicate CSS placement implementation is introduced in Mere.
+
+Producer semantic identity validation (2026-10-21, qualified): one shared
+preflight refuses duplicate child keys, per-child action IDs and platform-ID
+collisions before mutating any contribution or route. Native/browser publication
+and current-target admission receive the same policy. Frozen main `8942e3050`
+passes 122 targeted native tests/five existing ignores and browser-host Wasm
+compilation. The
+[diagnostics plan](2026-06-08_system_diagnostics_and_accessibility_plan.md#producer-semantic-identities-2026-10-21)
+keeps immutable observations, target generations and report/collector adoption
+open; the stable ID hash is not a generation token or collision-free allocator.
+
 Continue the existing
 [diagnostics/accessibility plan](2026-06-08_system_diagnostics_and_accessibility_plan.md),
 which remains the owner of its detailed implementation and acceptance. Reuse
@@ -331,9 +352,9 @@ Their CPU receipts do not establish headed product completion or pixel causality
 
 **Command-contract owner:** the
 [Hest plan](../../cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md)
-owns shared declaration, invocation and outcome vocabulary. Its H1/H2 and
-Cambium 0.5 receiving work are a separate, locally committed delivery cohort;
-H3 remains the invocation/result gate. This diagnostics continuation consumes
+owns shared declaration, invocation and outcome vocabulary. H1–H4 now have
+their own published delivery/receiving cohorts, including H3's nonterminal
+acceptance and H4's script/automation adapters. This diagnostics continuation consumes
 that owner instead of defining another command catalogue or outcome protocol.
 Keep Hest independent of Chirograph, Apparatus and application runtimes.
 
@@ -659,3 +680,57 @@ the compiled behavioral qualification is the resident I10 gate. They do not
 assert unfiltered standalone application suites. Later manifest/lock commits
 carry the same code and SDK/artifact revisions as the qualified receiving
 closure. Frozen earlier promotion and native receipts remain unchanged.
+
+
+### Apparatus portable-core extraction, 2026-10-21
+
+The portable bounded observation store and renderer-independent inspection data
+now have one implementation in `apparatus-core`, a sibling crate in Armillary
+at `75643df1f178757bb7b6386913af1a39353f3069`. Its default library uses only
+`std`; optional Serde is its only library dependency. It does not depend on
+Armillary's actor package, Tokio, Mere, Registry, AccessKit or UxTree.
+
+Mere retains `mere-apparatus` as its integration facade: existing public types
+are re-exported, the `serde` feature forwards to the shared core, and the
+Registry collector, structural accessibility projection and default projection
+behavior remain in Mere. The old store and portable inspection implementations
+are removed from Mere. Hest vocabulary, command admission/execution, producer
+redaction, retention/export decisions and persistence authority are unchanged.
+Armillary's existing execution package pin is independent and stays qualified;
+adding this sibling crate does not require an actor-source migration.
+
+The donor is Mere `8942e30503f2fa91fdefe879ec5268ee42a5241a`. Source hashes
+prove the observation implementation/tests were moved verbatim; inspection
+removes only its Mere projection blocks and the resulting blank seam. All 18
+portable tests move with their implementation. Receiving proof checks shared
+Rust type identity and the original serialized batch/cursor values, including
+Unicode payload bytes, eviction and scoped cause metadata. The independent
+Git consumer exercises the default core without the Mere facade or a runtime.
+
+Compact source, command and publication evidence belongs in
+`support/family-promotion/apparatus-core-extraction.json`. These source/CPU
+checks do not establish new native UI, physical-device or durable audit-log
+qualification. The shared core remains a bounded observation copy; products
+retain authoritative execution results and persistence.
+
+
+Apparatus extraction receiving qualification is complete. Armillary's default
+and Serde configurations pass the 18 transferred core tests on Rust 1.97.1;
+its existing 19 execution tests also pass. Mere passes ten retained projection/
+collector tests plus two public-type/wire controls, Distillery's 42 library and
+five observation/shutdown tests, Djinn's four resident-event tests, and
+Mesquite's 39 library tests. The standalone Git consumer runs on Rust 1.97.1
+with no normal dependency beyond `apparatus-core`. Four selected locked roots
+revalidate; the optional Distillery probe does not consume the core in its
+default resolved graph.
+
+The supplier core is pushed at Armillary `75643df1`. Mere's integration is
+pushed at `7edfe3b0`, preserving concurrent producer-identity refusal and native
+co-op/save-recovery work. The final facade rerun passes on that integrated
+source. Turnstone's actual diagnostics, redaction and projection paths pass 16
+focused tests against the canonical Git supplier, and its receiving lock/receipt
+are pushed at `fc7a3e49`. Its product sources and dependency declarations are
+unchanged. Cargo also reselected an already-present Windows dependency in 16
+lock entries; this is recorded in the receiving receipt, with no unrelated
+package-version or source changes. The qualified code pins remain fixed as
+later documentation-only records are published; no recursive repin is needed.

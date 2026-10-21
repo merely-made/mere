@@ -1,0 +1,17 @@
+{
+  "schema": "djinn.resident-status/v1",
+  "pid": 86975,
+  "started_ms": 1792554769410,
+  "installed": false,
+  "ready": true,
+  "startup_unlock": "passphrase",
+  "protection": "passphrase",
+  "lock": "unlocked",
+  "endpoints": {
+    "agent": "/private/tmp/moa-xl_edhex/owner/agent.sock",
+    "agent_listener": "receipt",
+    "browser": "/private/tmp/moa-xl_edhex/owner/browser.sock",
+    "app": "/private/tmp/moa-xl_edhex/owner/app.sock"
+  },
+  "sync": null
+}

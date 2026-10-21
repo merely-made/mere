@@ -1,11 +1,13 @@
 # apparatus
 
-Shared diagnostics home for [mere](https://crates.io/crates/mere).
-Package `mere-apparatus`, library `apparatus`. The September 29 ruling assigns
-bounded observations and inspection to this crate; the current implementation
-provides a renderer-independent bounded record store and read-only inspection
-data, and retains the earlier
-peripheral system-inspector skeleton behind its default `projection` feature.
+Shared diagnostic integration for [mere](https://crates.io/crates/mere).
+Package `mere-apparatus`, library `apparatus`. Its existing public observation
+and inspection values are re-exported from `apparatus-core`, an independent
+sibling crate in [Armillary](https://github.com/merely-made/armillary).
+One portable implementation supplies bounded storage and read-only inspection
+data. This crate retains the Registry collector, accessibility projections and
+the earlier system-inspector skeleton behind its default `projection` feature.
+Existing `apparatus::` imports and feature names remain supported.
 
 See the [diagnostics plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 for the accepted ownership boundaries, qualified bounded-core consumers and
@@ -120,9 +122,11 @@ Node ids come from `uxtree::node_id_for_path`: `apparatus` for the root,
 
 ## Dependencies
 
-The storage core uses only `std`. Disable default features for core-only consumers.
+The shared storage core uses only `std` and has no actor/runtime dependency.
+Disable default features for core-only consumers.
 `projection` enables `accesskit`, `uxtree`, `tracing` and `project_skeleton`;
-it is enabled by default to preserve the earlier API. Optional `serde` enables
+it is enabled by default to preserve the earlier API. Optional `serde` forwards
+to `apparatus-core/serde` and enables
 envelope, metadata, payload batch, statistics and cursor serialization; opaque
 cursors cannot be deserialized/restored into another store. Optional `registry`
 adds the diagnostics-only `mere-registry` dependency for the collector bridge.

@@ -1040,9 +1040,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     let owner =
         owner_settings::OwnerSettings::load(&owner_settings::settings_path(&app_dir, &profile_id))?;
     #[cfg(feature = "personal-sync")]
+    let coop_relays = owner.coop_relays()?;
+    #[cfg(feature = "personal-sync")]
     if let Some(persona) = owner.content.retained_persona {
         keeper.configure_payload_custody(profile_id.clone(), persona, data_root.clone())?;
     }
+    #[cfg(feature = "personal-sync")]
+    let address_handlers = owner.reservoir.handlers();
     #[cfg(feature = "personal-sync")]
     let mut resident = DjinnResident::open_deferred_inference(
         personae.as_ref(),
@@ -1256,7 +1260,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                     grants.clone(),
                     first_party.clone(),
                 )
+                .with_handlers(address_handlers.clone())
                 .with_custody_endpoint(args.app_endpoint.clone())
+                .with_coop_relays(coop_relays.clone())
                 .with_profile_subject_authority(personae.clone())
                 .with_divination_authority()
             });
