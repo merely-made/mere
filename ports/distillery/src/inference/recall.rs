@@ -458,10 +458,10 @@ impl RecallIndex {
                 break;
             }
             let handle = evidence.passages.len() as u32 + 1;
-            let address =
-                serde_json::to_string(&(&passage.source, &passage.version, &passage.selector))
-                    .map_err(|e| e.to_string())?;
-            let rendered = format!("\n[{handle}] {address}\n{}\n", passage.text);
+            // Citation authority stays in SuppliedPassage and its sealed run
+            // record. Opaque owner/manifest JSON overwhelms short selections
+            // in a generation prompt and is not needed to use a numeric handle.
+            let rendered = format!("\n[{handle}]\n{}\n", passage.text);
             if context.chars().count() + rendered.chars().count() > self.config.max_context_chars {
                 continue;
             }
@@ -514,7 +514,9 @@ mod tests {
             eidetic::Hash::of("élan 🦉 nebula orange".as_bytes())
         );
         assert_eq!(passage.version, passage.text_hash.to_string());
-        assert!(context.contains(&passage.version));
+        assert!(context.contains(&format!("[1]\n{}", passage.text)));
+        assert!(!context.contains(&passage.version));
+        assert!(!context.contains(&passage.source.source));
         let mut changed = passage.clone();
         changed.selector.end += 1;
         assert_ne!(changed.id(), passage.id());
@@ -645,12 +647,30 @@ mod tests {
         assert!(evidence.stale[0].error.is_some());
     }
     #[test]
+    fn short_passage_context_contains_content_and_keeps_identity_in_evidence() {
+        let backend = Arc::new(MemoryBackend::new());
+        let store = PageTextStore::new(backend.as_ref());
+        let reference =
+            pollster::block_on(store.put("https://retained.test/private-metadata", "café", 1))
+                .unwrap();
+        let index =
+            RecallIndex::build(Arc::new(PageTextCorpus(backend)), Default::default()).unwrap();
+        let (evidence, context) = index.prepare("café", &[]).unwrap();
+        assert!(context.ends_with("\n[1]\ncafé\n"));
+        assert!(!context.contains("private-metadata"));
+        let passage = &evidence.passages[0].passage;
+        assert_eq!(passage.source.source, "https://retained.test/private-metadata");
+        assert_eq!(passage.version, format!("blake3:{reference}"));
+        assert_eq!(passage.selector, PassageSelector { start: 0, end: 4 });
+        assert_eq!(passage.text_hash, eidetic::Hash::of("café".as_bytes()));
+    }
+    #[test]
     fn budgets_never_clip_a_citable_passage() {
         let (_, corpus) = fixture();
         let index = RecallIndex::build(
             corpus.clone(),
             RecallConfig {
-                max_context_chars: 220,
+                max_context_chars: 205,
                 ..Default::default()
             },
         )
