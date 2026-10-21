@@ -1,0 +1,6 @@
+{
+  "launcher_pid": 9675,
+  "role": "guest",
+  "binary_sha256": "5ad9690bd7c2d288f3a3cf7054d47ff092cc8b4b27d0735729ee1ddd00cc889d",
+  "scenario": "guest-cold.scn"
+}

@@ -1,0 +1,18 @@
+{
+  "basis": "67964c3eab5c063fc0bcd87563b0aa268ffb4851",
+  "source_and_lock_match_integrated_seal": true,
+  "sealed_audit_registers_unchanged": true,
+  "git_diff_check": 0,
+  "changed_plan_d2_errors": [],
+  "whole_tree_d2_errors": 40,
+  "diagnostics_retained_bytes_before_this_check": 742441,
+  "retained_byte_cap": 10000000,
+  "isolated_outputs_created": [],
+  "parallel_dirty_paths_excluded": [
+    "crates/domain/site/tests/compatibility.rs",
+    "design_docs/2026-05-24_external_deps_topology_brief.md",
+    "design_docs/mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md",
+    "design_docs/mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md",
+    "ports/djinn/src/resident_site.rs"
+  ]
+}

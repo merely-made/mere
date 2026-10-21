@@ -106,7 +106,7 @@ pub use atlas::{
 };
 // The command set lives in its own crate so hosts without Cambium share it (SE45 to SE48).
 pub use hest::catalogue;
-pub use hest::EffectClass;
+pub use hest::{EffectClass, Invocation, Outcome};
 pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,

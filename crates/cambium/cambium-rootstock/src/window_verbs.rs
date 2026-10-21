@@ -15,6 +15,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+mod invocation;
+
 /// What a hit landed on, as far as the window frame is concerned.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum AppRegion {
@@ -85,7 +87,7 @@ pub enum WindowCommand {
 /// The host holds the other end and drains the queue after each dispatch, so
 /// no window verb ever becomes a field the host has to know about.
 #[derive(Clone, Default)]
-pub struct WindowCommands(Rc<RefCell<Vec<WindowCommand>>>);
+pub struct WindowCommands(Rc<RefCell<Vec<cambium::Invocation>>>);
 
 impl WindowCommands {
     /// A fresh, empty queue.
@@ -95,7 +97,15 @@ impl WindowCommands {
 
     /// Queue a verb.
     pub fn push(&self, command: WindowCommand) {
-        self.0.borrow_mut().push(command);
+        self.0.borrow_mut().push(command.invocation());
+    }
+
+    /// Validate and queue a shared invocation. `Ok(())` means queued, not
+    /// completed: the event source and application close policy still decide
+    /// whether the window operation can be honoured.
+    pub fn invoke(&self, invocation: &cambium::Invocation) -> Result<(), cambium::Outcome> {
+        self.push(WindowCommand::from_invocation(invocation)?);
+        Ok(())
     }
 
     /// Reveal a window previously hidden by a close policy.
@@ -131,6 +141,12 @@ impl WindowCommands {
     /// Take everything queued, leaving the queue empty.
     pub fn drain(&self) -> Vec<WindowCommand> {
         std::mem::take(&mut *self.0.borrow_mut())
+            .iter()
+            .map(|invocation| {
+                WindowCommand::from_invocation(invocation)
+                    .expect("window invocation was validated before queuing")
+            })
+            .collect()
     }
 
     /// Whether anything is queued (for tests).

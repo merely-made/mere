@@ -505,6 +505,13 @@ the resident release gate or the earlier phases above.
 
 ### Verified composition seams
 
+**2026-10-20 shared-model extraction:** portable site configuration, native page
+metadata and canonical `PublishedSnapshotV1` records move from `knot-site` to
+`mere-site` (`crates/domain/site`). Djinn imports those records directly; Knot
+retains file-source and protocol adapters. Existing snapshot bytes, digests,
+custody, certificate identity and listener policy stay unchanged. Scope and
+receipts: [shared site model plan](2026-10-20_shared_site_model_plan.md).
+
 `ports/djinn/src/resident.rs::DjinnResident` already composes device lifetime,
 resident Knot, identity and Distillery. `resident_knot.rs::ResidentKnot` keeps
 one source and optional personal sync host alive. `resident_blobs.rs` provides
