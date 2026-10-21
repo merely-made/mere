@@ -119,3 +119,7 @@ Supplier source inspection identifies the missing forward bounds query and
 DOM-parent versus flattened paint-scope gap; full transform/path clipping,
 flattened-ancestor geometry and native/browser runtime acceptance remain open.
 Source seals and executed native binary hashes qualify only the named cohorts.
+Publication merge `7c9bc885e` preserves those tested sources/manifests while
+integrating unrelated live owner-action delivery and its product-only `url`
+dependency reference. The separate publication record does not claim a new
+test cohort.
