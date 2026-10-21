@@ -2,10 +2,11 @@
 
 **Date:** 2026-10-20.
 
-**Status (2026-10-20):** H4 adapters are implemented and supplier-qualified.
-Canonical Knot receiving is pending. Hest 0.1/0.2, command-menu 0.1.1 and
-Cambium 0.5 remain published and unchanged; H4 uses the existing Hest data
-contract. Git delivery of H4 is in progress.
+**Status (2026-10-20):** H4 is implemented and software-qualified through
+Mesquite/Graphshell receiving and canonical Knot/Rhai command-producing fences.
+Hest 0.1/0.2, command-menu 0.1.1 and Cambium 0.5 remain published; H4 uses their
+existing command data contract and ships as Git adapters. Native acceptance
+and backend package publication remain separate.
 
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
@@ -188,8 +189,15 @@ Supplier checks pass: 39 Mesquite, 33 Rhai, 12 Graphshell command/pipeline,
 standalone Graphshell Web Wasm and scoped strict Rustdoc also pass. The
 Graphshell fixture uses the real graph-backed canvas reducer, including a
 Rhai request batch serialized through the same Hest envelope as Mesquite.
-The second receiving host is Knot's real consented block-evaluation endpoint;
-its canonical supplier repin and receiving checks are pending at this checkpoint.
+The second receiving host is Knot's real consented block-evaluation endpoint,
+pinned to canonical Mere `e94cb23e8`. Three new H4 cases, both existing
+consent/freshness and runaway-budget cases, nine command-chrome cases,
+workspace all-targets and locked metadata pass. The two host exercises have
+different authority: Graphshell enacts the validated synchronous request;
+Knot only derives request data after consent. Neither script success nor
+Knot admission is command completion. Excluded languages have no advertised
+run action; runtime/budget failures preserve the source fence; edited source
+makes the old request stale.
 
 The H4 delta leaves released Hest/Cambium and frozen compatibility sources
 untouched. Concurrent main shell/canvas/co-op work is preserved separately;
@@ -197,3 +205,22 @@ its new Cambium shell is not represented as the published 0.5 package. H4
 ships as Git adapters; no new Hest or Cambium publication is needed. Mesquite
 is already Git-only (`publish = false`). No unrelated backend or family release
 is included. Native presentation/human AT and MSRV remain separate evidence.
+
+
+[H4 qualification](../../../support/receipts/hest-h4-20261020/qualification.json),
+[supplier checks](../../../support/receipts/hest-h4-20261020/checks.json),
+[owned receiver references](../../../support/receipts/hest-h4-20261020/receivers.json)
+and [source preservation](../../../support/receipts/hest-h4-20261020/source-preservation.json)
+record the exact software basis. The receiver owns its complete logs at
+`knot-editor/docs/receipts/hest-h4-20261020/qualification.json`; root does not
+duplicate them. Knot preserves 1,246 unrelated package blocks and 150 other
+Rust files; endpoint production logic is exact. The initial Rhai fixture
+syntax attempt and Knot's incorrect denied-language expectation are retained
+as superseded evidence beside their passing replacements.
+
+Subagent implementation and independent review found no remaining actionable
+H4 findings. Source was reconciled with concurrent shell/canvas/co-op work in
+`4927aae86`; command receiving and standalone Wasm passed again on that merge.
+Git delivery uses immutable supplier `e94cb23e8` and Knot `2cfe1d4`. The actual
+TreeLane hook is Wasm-compiled; the receiving exercises are software tests,
+not a headed browser run, native window-manager or human AT acceptance.

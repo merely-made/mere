@@ -1,0 +1,18 @@
+{
+  "status": "H4 software-qualified across two hosts",
+  "checks": "checks.json",
+  "tested_source": "tested-source.json",
+  "source_preservation": "source-preservation.json",
+  "review": "independent-review.json",
+  "supplier": "e94cb23e88c8989355eb128b893f6cdbe559e074",
+  "passing_tests": 189,
+  "new_tests": 17,
+  "second_host": "Knot actual consented endpoint; shared invocation data is derived without enactment",
+  "hest_and_cambium_versions_unchanged_by_h4": true,
+  "publication": "Git adapter delivery; no additional crate release",
+  "native_acceptance_claimed": false,
+  "receivers": "receivers.json",
+  "total_supplier_and_receiver_tests": 203,
+  "new_tests_including_receiver": 20,
+  "canonical_receiving_commit": "2cfe1d4a51bbbf54de4e47b20c46ff9456a3f416"
+}

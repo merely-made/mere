@@ -1,0 +1,30 @@
+{
+  "reviewers": [
+    {
+      "agent": "mesquite_trace",
+      "scope": [
+        "Rhai collector and tests",
+        "Graphshell receiver and real TreeLane hook",
+        "legacy mapping preservation",
+        "Mesquite parser and audit"
+      ],
+      "actionable_findings": []
+    },
+    {
+      "agent": "rhai_trace",
+      "scope": [
+        "Knot actual consented endpoint tests",
+        "test-only module hook",
+        "Cambium dev dependency"
+      ],
+      "actionable_findings": []
+    }
+  ],
+  "boundary_notes": [
+    "No command execution while Rhai collects requests.",
+    "No partial batch on unhandled evaluation failure or rejected collection.",
+    "Successful collection is not an execution transaction.",
+    "Only observed requested Graphshell model change establishes Done.",
+    "Ordinary Rhai note fences retain their pure default."
+  ]
+}
