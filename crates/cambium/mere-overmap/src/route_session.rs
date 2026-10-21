@@ -28,6 +28,12 @@ enum Task {
     Mount(usize),
     Resolve(ProjectionSession, InstanceId, ContentHash),
     Invoke(MereViewRequest),
+    RecordAction {
+        key: String,
+        target: graphshell_client::ActionDraftTarget,
+        action: chirograph::AdvertisedAction,
+        command: hest::Invocation,
+    },
     Media(ProjectionSession, InstanceId),
     /// A pending merge card's material in the sessions projection.
     MergeMedia(ProjectionSession, InstanceId),
@@ -198,6 +204,76 @@ impl MereRouteSession {
                     .any(|value| value.label == "Address" && &value.value == focus)
             })
             .map(|(key, _)| key)
+    }
+
+    /// Current actions on one exact disclosed graph record. A record key is
+    /// not an endpoint item ID; repeated appearances do not select a first
+    /// match. This uses the already admitted route, never source-name lookup.
+    pub fn record_actions(
+        &self,
+        key: &str,
+    ) -> Result<
+        (
+            graphshell_client::ActionDraftTarget,
+            Vec<chirograph::AdvertisedAction>,
+        ),
+        String,
+    > {
+        if self.closed || self.in_flight() || !self.records.contains_key(key) {
+            return Err("The record's owner actions are unavailable.".into());
+        }
+        let core = self.driver.core().ok_or("The route is closed.")?;
+        let mounted = core
+            .client()
+            .mounted(&self.graph)
+            .ok_or("The graph is not mounted.")?;
+        let targets: Vec<_> = mounted
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .filter(|(_, item)| {
+                mounted.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .is_some_and(|source| {
+                        source.adapter == cartography::MERE_GRAPH_ADAPTER && source.id == key
+                    })
+            })
+            .map(|(instance, _)| instance)
+            .collect();
+        let [instance] = targets.as_slice() else {
+            return Err(
+                "The owner has not supplied one exact action target for this record.".into(),
+            );
+        };
+        let target = graphshell_client::ActionDraftTarget {
+            session: self.graph.clone(),
+            target: *instance,
+            observed_epoch: mounted.scene.epoch,
+            observed_revision: mounted.scene.revision,
+        };
+        Ok((target, core.current_actions(&self.graph, *instance)?))
+    }
+
+    /// A selected-record command uses the existing owner contract and exact
+    /// observed target. The owner still authorizes and enacts it.
+    pub fn invoke_record_command(
+        &mut self,
+        key: String,
+        target: graphshell_client::ActionDraftTarget,
+        action: chirograph::AdvertisedAction,
+        command: hest::Invocation,
+    ) -> Result<(), String> {
+        if self.focus_key().as_deref() != Some(&key) || self.record_actions(&key)?.0 != target {
+            return Err("The selected record changed; reopen its owner action.".into());
+        }
+        self.notice = None;
+        self.tasks.push_back(Task::RecordAction {
+            key,
+            target,
+            action,
+            command,
+        });
+        self.advance()
     }
     pub fn primary(&self) -> Option<&MountedScene> {
         if self.closed {
@@ -458,6 +534,20 @@ impl MereRouteSession {
                     .core_mut()
                     .ok_or("The route is closed.")?
                     .media_resource(session, *instance, 0)?,
+                Task::RecordAction {
+                    key,
+                    target,
+                    action,
+                    command,
+                } => {
+                    if self.focus_key().as_deref() != Some(key) {
+                        return Err("The selected record changed; reopen its owner action.".into());
+                    }
+                    self.driver
+                        .core_mut()
+                        .ok_or("The route is closed.")?
+                        .submit_command(target, action, command)?
+                },
                 Task::Invoke(request) => {
                     let sessions = self.snapshot(&self.sessions)?;
                     let invocation = self
@@ -708,6 +798,19 @@ impl MereRouteSession {
                         if matches!(request, MereViewRequest::Layout(_)) {
                             self.transient_layout = None;
                         }
+                        self.tasks
+                            .extend(self.indices.iter().copied().map(Task::Mount));
+                    },
+                    (Task::RecordAction { .. }, Outcome::Intent(result)) => {
+                        self.notice = Some(match *result {
+                            chirograph::IntentResult::Accepted => {
+                                "Request accepted by the owner.".into()
+                            },
+                            chirograph::IntentResult::Rejected { reason } => reason,
+                            chirograph::IntentResult::Stale { .. } => {
+                                "The record changed; read it again.".into()
+                            },
+                        });
                         self.tasks
                             .extend(self.indices.iter().copied().map(Task::Mount));
                     },
