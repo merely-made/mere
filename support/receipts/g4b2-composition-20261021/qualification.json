@@ -1,0 +1,80 @@
+{
+  "qualified_at_utc": "2026-10-21T06:35:34.252437+00:00",
+  "base_commit": "c66620cae016a856bd8cdae7dca189293bf295b6",
+  "branch": "codex/g4b2-composition-authoring-20261021",
+  "status": "Qualified bounded two-law authoring, canonical scene reopen, and three fresh-start replay fixtures",
+  "build_settings": {
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "locked": true,
+    "offline": true
+  },
+  "native_host": "x86_64-apple-darwin",
+  "wasm_target": "wasm32-unknown-unknown",
+  "tests": {
+    "pictograph_canvas": {
+      "passed": 581,
+      "ignored": 18
+    },
+    "graphshell_web_library": {
+      "passed": 325,
+      "ignored": 6
+    },
+    "physics_controls_subset": {
+      "passed": 9,
+      "included_in_pictograph_canvas": true
+    }
+  },
+  "headed": {
+    "positive": "p4_tree_composition_save_reopen",
+    "result": "ok",
+    "negative": "p4_tree_composition_control",
+    "negative_expected_failure": "FAIL: assert snap physics-composition Eq 'none': got 'mix'",
+    "package": "browser-package.json",
+    "results": "headed-results.json.gz",
+    "renderer": "BrowserWebGpu",
+    "viewport": [
+      1280,
+      720
+    ],
+    "device_pixel_ratio": 2,
+    "environment": "macOS IAB Chromium 155",
+    "saved_state": "saved",
+    "scope": "Scene reopen action within the running Graphshell page; no browser restart durability claim",
+    "busy_wait_messages": "Physics was deliberately running; bounded wait exhaustion did not fail the state assertions or saved operation result",
+    "executed_wasm_sha256": "6e997113b7b3819b8a9e66b0cc325820a13dfa73aa5d987837d940fc05b57011",
+    "assertions_include": "Canonical v4 root/spec and restored shares, sources, running state and current physics status"
+  },
+  "runtime_matrix": "replay-results.json",
+  "source_manifest": "source-manifest.json.gz",
+  "primary_preserved": true,
+  "primary_preservation": {
+    "head": "99b489bc713b3446c794035d57e4b4f607918fe5",
+    "head_matches_before": true,
+    "porcelain_matches_before": true,
+    "tracked_dirty_hashes_match_before": true
+  },
+  "full_local_evidence": "/Users/markik/Code/output/mere-g4b2-composition-20261021",
+  "preservation_receipt": "/Users/markik/Code/output/mere-g4b2-composition-20261021/preservation-after.json",
+  "resolved_diagnostics": [
+    "Initial replay helper partial move fixed before native/Wasm builds.",
+    "Initial text field closure/import build errors fixed before product-wasm-ready.",
+    "Initial headed run found unnamed share inputs; explicit accessible labels added and current package reran successfully.",
+    "Actual reopened capture retained earlier single-law status; successful scene reopen now updates it, and the final headed scenario asserts the restored status."
+  ],
+  "limits": [
+    "Native/Wasm trajectory equality is bounded to these fixtures and this native host plus Node Wasm runtime.",
+    "Recipe replay starts from the same authored initial state; no evolving force/RNG state checkpoint restoration.",
+    "Headed qualification uses current Graphshell Web on one macOS browser; no fresh native UI, cross-OS, actor replay or consumer repin qualification.",
+    "The editor authors one two-law Mix; unsupported authored shapes are disclosed rather than represented as exact readback."
+  ],
+  "separate_passes": [
+    "Raw-term execution",
+    "Checkpoint design and restore",
+    "Render dependency narrowing",
+    "Recursive composition/group/schedule editor",
+    "World RNG and cross-OS qualification"
+  ],
+  "final_product_build": "product-wasm-reopen-status"
+}

@@ -111,11 +111,11 @@ pub fn run(input: &str) -> Result<String, String> {
         return Err(format!("tick batch count must be at most {MAX_TICKS}"));
     }
     let source = SourceBinding {
-        authority: case.source.authority,
-        domain: case.source.domain,
-        resource: case.source.resource,
+        authority: case.source.authority.clone(),
+        domain: case.source.domain.clone(),
+        resource: case.source.resource.clone(),
     };
-    let revision = scenograph::PublicSourceRevision::new(case.revision);
+    let revision = scenograph::PublicSourceRevision::new(case.revision.clone());
     let recipe = relationship_recipe(
         "occurrence-replay",
         "Occurrence replay",
@@ -249,6 +249,16 @@ pub fn run(input: &str) -> Result<String, String> {
     }
 
     let slot = DynamicsSlot::from_json(1, &case.spec)?;
+    // A DynamicsSlot is the saved recipe carrier. Reopen that serialized
+    // carrier and run the same public projection binder from the reopened
+    // canonical spec; this is recipe replay, not checkpoint restoration.
+    let saved_slot = serde_json::to_string(&slot).map_err(|error| error.to_string())?;
+    let reopened_slot: DynamicsSlot =
+        serde_json::from_str(&saved_slot).map_err(|error| error.to_string())?;
+    reopened_slot.validate()?;
+    if reopened_slot != slot {
+        return Err("saved dynamics recipe changed during reopen".into());
+    }
     let bound_spec =
         pictograph_slot(&slot, &definition.arrangement.kind).map_err(|error| error.to_string())?;
     if bound_spec
@@ -279,17 +289,54 @@ pub fn run(input: &str) -> Result<String, String> {
         .collect::<Result<_, String>>()?;
     let mut run = ProjectionDynamics::new_relationship(&definition, &compiled, &slot, &roles)
         .map_err(|error| error.to_string())?;
+    let trace = replay_trace(
+        &mut run,
+        &compiled,
+        &case,
+        &roles,
+        default_role,
+        total_ticks,
+    )?;
+    let mut reopened =
+        ProjectionDynamics::new_relationship(&definition, &compiled, &reopened_slot, &roles)
+            .map_err(|error| error.to_string())?;
+    let reopened_trace = replay_trace(
+        &mut reopened,
+        &compiled,
+        &case,
+        &roles,
+        default_role,
+        total_ticks,
+    )?;
+    serde_json::to_string(&json!({
+        "trace": trace,
+        "reopened_trace": reopened_trace,
+        "saved_recipe": saved_slot,
+        "relationship_ids": run.relationship_ids(),
+        "ticks": run.ticks(),
+    }))
+    .map_err(|error| error.to_string())
+}
+
+fn replay_trace(
+    run: &mut ProjectionDynamics,
+    compiled: &scenomise::projection::CompiledRelationshipProjection,
+    case: &Case,
+    roles: &BTreeMap<String, Role>,
+    default_role: Role,
+    total_ticks: u32,
+) -> Result<Trace, String> {
     let mut trace = Trace::new();
     trace
         .push(
             0,
-            capture(&run, &compiled, &case.occurrences, &roles, default_role)?,
+            capture(run, compiled, &case.occurrences, roles, default_role)?,
         )
         .map_err(|error| error.to_string())?;
-    for bound in case.tick_batches {
-        for offset in 0..bound {
+    for bound in &case.tick_batches {
+        for offset in 0..*bound {
             let continuing = run.tick().map_err(|error| error.to_string())?;
-            if !continuing && (offset + 1 < bound || run.ticks() < total_ticks as u64) {
+            if !continuing && (offset + 1 < *bound || run.ticks() < total_ticks as u64) {
                 return Err(format!(
                     "settle ended before requested tick {}",
                     run.ticks() + 1
@@ -298,17 +345,12 @@ pub fn run(input: &str) -> Result<String, String> {
             trace
                 .push(
                     run.ticks(),
-                    capture(&run, &compiled, &case.occurrences, &roles, default_role)?,
+                    capture(run, compiled, &case.occurrences, roles, default_role)?,
                 )
                 .map_err(|error| error.to_string())?;
         }
     }
-    serde_json::to_string(&json!({
-        "trace": trace,
-        "relationship_ids": run.relationship_ids(),
-        "ticks": run.ticks(),
-    }))
-    .map_err(|error| error.to_string())
+    Ok(trace)
 }
 
 fn capture(

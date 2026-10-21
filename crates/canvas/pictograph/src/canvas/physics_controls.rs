@@ -21,6 +21,8 @@ use kernel::graph::NodeKey;
 
 use scenotime::ProjectionClock;
 
+use super::dynamics_spec::Node;
+use super::physics_catalog::PhysicsLaw;
 use super::{CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsOverlay};
 
 /// The arrangement picker's "no arrangement" choice: physics alone.
@@ -82,6 +84,86 @@ pub fn apply_physics(canvas: &mut Canvas, choice: &PhysicsChoice) -> String {
         (Ok(()), Some(refusal)) => format!("{status} · {}", refusal.reason),
         (Ok(()), None) => status,
     }
+}
+
+/// A bounded two-law composition with explicit force shares. Shares must be
+/// finite. The dynamics grammar remains responsible for its own admission
+/// rules for force weights.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TwoLawMix {
+    pub first: PhysicsLaw,
+    pub second: PhysicsLaw,
+    pub first_share: f64,
+    pub second_share: f64,
+}
+
+/// Replace the spec root with one admitted two-law force mix. The existing
+/// spec remains the authority for channels, target, seed, bars and
+/// realization; root overlays are carried onto the mix.
+pub fn apply_mix(canvas: &mut Canvas, mix: &TwoLawMix) -> Result<String, String> {
+    for (index, share) in [mix.first_share, mix.second_share].into_iter().enumerate() {
+        let runtime = share as f32;
+        if !share.is_finite() || !runtime.is_finite() || (share != 0.0 && runtime == 0.0) {
+            return Err(format!(
+                "root.parts[{index}].weight: share must be finite and within the runtime weight range"
+            ));
+        }
+    }
+    let mut spec = canvas.dynamics_spec()?;
+    let overlays = spec.root.overlays().to_vec();
+    spec.root = Node::Mix {
+        parts: vec![
+            weighted_preset(mix.first, mix.first_share),
+            weighted_preset(mix.second, mix.second_share),
+        ],
+        weight: 1.0,
+        overlays,
+    };
+    // Canvas owns admission and refuses before changing its live state.
+    canvas
+        .set_dynamics_spec(&spec)
+        .map_err(|error| error.to_string())?;
+    canvas.set_view_follow(true);
+    Ok(format!(
+        "Physics mix set to {} + {}",
+        mix.first.label(),
+        mix.second.label()
+    ))
+}
+
+/// Explicitly replace the root with `choice`'s single law, even when its law
+/// and overlays equal the current flat view. Use [`apply_physics`] for edits
+/// that should retain a running composition when only sources change.
+pub fn apply_single_law(canvas: &mut Canvas, choice: &PhysicsChoice) -> Result<String, String> {
+    let (choice, refused) = choice.clone().admitted();
+    let mut spec = canvas.dynamics_spec()?;
+    spec.channels = choice.sources().channels();
+    spec.root = weighted_preset(choice.law, 1.0);
+    if let Node::Preset { overlays, .. } = &mut spec.root {
+        overlays.extend(
+            choice
+                .overlays
+                .iter()
+                .map(|overlay| Node::preset(overlay.id())),
+        );
+    }
+    canvas
+        .set_dynamics_spec(&spec)
+        .map_err(|error| error.to_string())?;
+    canvas.set_view_follow(true);
+    let status = with_overlays(format!("Physics set to {}", choice.law.label()), canvas);
+    Ok(match refused {
+        Some(refusal) => format!("{status} · {}", refusal.reason),
+        None => status,
+    })
+}
+
+fn weighted_preset(law: PhysicsLaw, share: f64) -> Node {
+    let mut node = Node::preset(law.id());
+    if let Node::Preset { weight, .. } = &mut node {
+        *weight = share;
+    }
+    node
 }
 
 /// Apply a named profile's law and overlays. Sources are left as they are.
@@ -505,6 +587,126 @@ mod tests {
         let mut canvas = Canvas::with_sample_graph();
         canvas.resize(800, 600);
         canvas
+    }
+
+    #[test]
+    fn typed_mix_is_canonical_and_source_edits_keep_it_until_explicit_replacement() {
+        use crate::canvas::dynamics_spec::{Bar, Observable, Realization, Target};
+
+        let mut subject = canvas();
+        let mut original = subject.dynamics_spec().unwrap();
+        original.seed = 73;
+        original.bars = vec![Bar {
+            observable: Observable::Overlaps,
+            at_least: None,
+            at_most: Some(3.0),
+        }];
+        original.realization = Realization::Integrate {
+            damping: Some(0.35),
+        };
+        original
+            .channels
+            .insert("kind".into(), "kind.degree".into());
+        // Keep a target on the record through the composition write.
+        original.target = Some(Target {
+            arrangement: "grid.default".into(),
+            anchored_pull: 0.3,
+            default_role: seiche::Role::Anchored,
+            groups: None,
+            items: Default::default(),
+        });
+        subject.set_dynamics_spec(&original).unwrap();
+
+        apply_mix(
+            &mut subject,
+            &TwoLawMix {
+                first: PhysicsLaw::Springs,
+                second: PhysicsLaw::Charge,
+                first_share: 0.25,
+                second_share: 2.0,
+            },
+        )
+        .unwrap();
+        let mixed = subject.dynamics_spec().unwrap();
+        let Node::Mix { parts, .. } = &mixed.root else {
+            panic!("typed action writes a mix root")
+        };
+        assert_eq!(parts[0].weight(), 0.25);
+        assert_eq!(parts[1].weight(), 2.0);
+        assert_eq!(mixed.seed, original.seed);
+        assert_eq!(mixed.bars, original.bars);
+        assert_eq!(mixed.target, original.target);
+        assert_eq!(mixed.realization, original.realization);
+        assert_eq!(mixed.channels, original.channels);
+
+        // A source-only edit through the existing picker keeps the mix.
+        let mut choice = PhysicsChoice::live(&subject);
+        choice.kind = PhysicsKindSource::Component;
+        apply_physics(&mut subject, &choice);
+        let edited = subject.dynamics_spec().unwrap();
+        assert_eq!(edited.root, mixed.root);
+        assert_eq!(edited.channels["kind"], "kind.component");
+
+        // A save and reopen round trip preserves the authored spec.
+        let mut reopened = canvas();
+        reopened.set_dynamics_spec(&edited).unwrap();
+        assert_eq!(reopened.dynamics_spec().unwrap(), edited);
+
+        // The explicit single-law action clears a composition even though
+        // the flat law picker still shows Springs.
+        let choice = PhysicsChoice::live(&subject);
+        apply_single_law(&mut subject, &choice).unwrap();
+        assert!(matches!(
+            subject.dynamics_spec().unwrap().root,
+            Node::Preset { .. }
+        ));
+    }
+
+    #[test]
+    fn refused_mix_is_atomic_for_the_record_and_live_positions() {
+        let mut canvas = canvas();
+        let before = canvas.dynamics_spec().unwrap();
+        let mut positions: Vec<_> = canvas.view.positions().collect();
+        positions.sort_by_key(|(key, _)| key.index());
+        let result = apply_mix(
+            &mut canvas,
+            &TwoLawMix {
+                first: PhysicsLaw::Anneal,
+                second: PhysicsLaw::Springs,
+                first_share: 1.0,
+                second_share: 1.0,
+            },
+        );
+        let refusal = result.unwrap_err();
+        assert!(
+            refusal.contains("root.parts[0]"),
+            "exact refusal path: {refusal}"
+        );
+        assert_eq!(canvas.dynamics_spec().unwrap(), before);
+        let mut after: Vec<_> = canvas.view.positions().collect();
+        after.sort_by_key(|(key, _)| key.index());
+        assert_eq!(after, positions);
+
+        for (first_share, second_share) in [
+            (f64::NAN, 1.0),
+            (1.0, f64::INFINITY),
+            (1e300, 1.0),
+            (1.0, 1e-300),
+        ] {
+            assert!(
+                apply_mix(
+                    &mut canvas,
+                    &TwoLawMix {
+                        first: PhysicsLaw::Springs,
+                        second: PhysicsLaw::Charge,
+                        first_share,
+                        second_share,
+                    }
+                )
+                .is_err()
+            );
+            assert_eq!(canvas.dynamics_spec().unwrap(), before);
+        }
     }
 
     #[test]
