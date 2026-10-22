@@ -14,8 +14,8 @@ impl Canvas {
     /// cartography sidecar (the counterpart of the workbench's `TreeGeometry`). Reads
     /// the live seiche positions, so it captures whatever is shown (force-directed or a
     /// picked layout strategy). (Position sidecar.)
-    pub fn cartography_geometry(&self) -> crate::canvas::geometry::CartographyGeometry {
-        crate::canvas::geometry::CartographyGeometry::from_positions(
+    pub fn cartography_geometry(&self) -> pandect::CartographyGeometry {
+        pandect::CartographyGeometry::from_positions(
             self.view
                 .positions()
                 .filter_map(|(key, p)| self.graph.get_node(key).map(|node| (node.id, (p.x, p.y)))),

@@ -1550,3 +1550,15 @@ fast-forward of local main; nothing built).**
   `a_micron_submission_redraw_keeps_the_scrolled_preview...`. The fork keeps rev
   `276b4664` in the family's `[patch]` rows (same code, old package names); they
   move to the renamed fork revision at the next vello repin.
+- 2026-10-22 (scene shapes): the saved-scene envelope (`SavedSceneV3`, the
+  version 2 reader shape, `SavedDynamics`, the `graphshell.saved-scene/v4` facet
+  constants) and the cartography geometry left the port for `pandect`
+  (`saved_scene`, `cartography_geometry`), and capture, restore, validation, the
+  version 2/3 conversion and the member remap for copies left it for
+  pictograph's `canvas::saved_scene`, so Turnstone holds the same scene on its
+  container node. `personal_sync` now imports the facet constants from
+  `pandect`, which removes the scene types from what keeps it in the port; what
+  still keeps it there is the rest of its product-facet reading. Its
+  facet-name check (`validate_facet_name`) refuses any name containing "seed",
+  so a facet named like `arrangement.seed` cannot sync; the scene facet holds its
+  seed inside the value and is unaffected.
