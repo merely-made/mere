@@ -1,0 +1,36 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "sprigging",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-winit-a11y",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "cambium-genet-web-host",
+    "-p",
+    "mesquite",
+    "--lib",
+    "--test",
+    "accessibility",
+    "--test",
+    "click_on_scroll",
+    "--test",
+    "e1a_sessions"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-audit-integration",
+  "started": "2026-10-22T19:27:03.831408+00:00",
+  "finished": "2026-10-22T19:27:14.900121+00:00",
+  "exit_code": 101,
+  "results": [
+    "Updating git repository `https://github.com/merely-made/knot-editor.git`",
+    "error: cannot update the lock file C:\\Users\\mark_\\Code\\worktrees\\mere-audit-integration\\Cargo.lock because --locked was passed to prevent this"
+  ],
+  "diagnostic_tail": "    Updating git repository `https://github.com/merely-made/knot-editor.git`\nerror: cannot update the lock file C:\\Users\\mark_\\Code\\worktrees\\mere-audit-integration\\Cargo.lock because --locked was passed to prevent this\nhelp: to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

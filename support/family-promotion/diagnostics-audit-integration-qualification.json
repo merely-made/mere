@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-22",
+  "status": "Affected functional and compile gates passed on the merged source; global documentation audit retains its 40 pre-existing errors.",
+  "audit_commit": "137c4fd4ccf2df22724563ba439cfdc904aa0c3b",
+  "integrated_main": "3dc450a6b962c6da60902f7243668961511f575d",
+  "merge_commit": "09145847be28f494ce7211e19197c9a9fea0632a",
+  "source": "diagnostics-audit-integration-source.json",
+  "distinct_targeted_passes": 336,
+  "passes_by_gate": {
+    "native-locked": 306,
+    "canvas": 6,
+    "product": 14,
+    "product-canvas": 10,
+    "browser": 0,
+    "embedding": 0
+  },
+  "existing_ignores": 7,
+  "browser": "Wasm compilation only; actual event/proxy/focus/disposal and human AT remain unqualified.",
+  "embedding": "Compilation passed.",
+  "lock_repair": "Only missing retinue dependency entry for already committed Djinn source; package versions unchanged.",
+  "failed_attempts": {
+    "native": "Offline cache lacked pinned knot-editor checkout; fetched exact locked source.",
+    "native-fetch": "Locked resolution rejected missing Djinn retinue lockfile entry; repaired and all gates rerun locked/offline."
+  },
+  "documentation": {
+    "baseline_errors": 40,
+    "final_errors": 40,
+    "new_errors": 0,
+    "supplement": "support/doc-audit/d2/batch_106_diagnostics_audit_main_integration.md"
+  },
+  "preservation": "17 original staged paths retained; non-owned working-file bytes matched the pre-commit snapshot. Djinn source commit and separate documentation/runtime WIP preserved.",
+  "remaining_ownership_migrations": [
+    "Late native OS event numeric-ID reuse and complete AccessKit node-reference remapping",
+    "Host-owner identity for publication transferred with identical document and mount",
+    "Producer actor transaction, legacy None child token contract, and action meaning lifetime",
+    "Canvas raw callback same-UUID remove/recreate visibility",
+    "Rootstock intrinsic sizing and Path-B leaf raster receiving",
+    "Native failed install/reattach and browser proxy/focus/disposal runtime; human AT"
+  ],
+  "receipts_sha256": {
+    "support/family-promotion/diagnostics-audit-integration-brief.json": "fd28181a590b5b567464b2769bbb15a6cf3415e1418f49903729783e779f716e",
+    "support/family-promotion/diagnostics-audit-integration-browser.json": "c5b33f4423e1eb507bb9fd397329adfed0ea37e8c566eddf42cbfc3ea1ae39ff",
+    "support/family-promotion/diagnostics-audit-integration-canvas.json": "7064eb29d82420bef0882a1a7e82e9a5f1e3e44ce56d2f2516918187a2d4b9aa",
+    "support/family-promotion/diagnostics-audit-integration-docs-baseline.json": "0ac3f48439176ca8f19e194803073c2f8cbb55042117a87f6a1b65b43a3318d4",
+    "support/family-promotion/diagnostics-audit-integration-docs-final.json": "3ce1404910d845f4461ca3f14dc1d6bfc20971fb7e906f343f5753f89c112994",
+    "support/family-promotion/diagnostics-audit-integration-embedding.json": "bda723eb8d62c357bccbff17cee56c3aadb6769f05d64645e725d6f0054430a7",
+    "support/family-promotion/diagnostics-audit-integration-lock.json": "d522122a0d074edc87fef84821e0e63a2f79d6d24d80c9f9f41936a8bc7c2ac4",
+    "support/family-promotion/diagnostics-audit-integration-native-evidence.json": "0af29326d95a5ec3601c5c04e51fa2f73d62dc25f54d69ba3ea7764c44d75650",
+    "support/family-promotion/diagnostics-audit-integration-native-fetch.json": "7e66bc40693db2128d0b33940bfb24815f3666ad1c5b082a31191fcca9a98ce6",
+    "support/family-promotion/diagnostics-audit-integration-native-locked.json": "4d843e5465a17b6f1b79f0f6e685eff104f5c50c24ee7eefe541c3c4287b2e32",
+    "support/family-promotion/diagnostics-audit-integration-native.json": "9a2ead5561a20d2227593123826649d13d6cb97c5c9d2f354c4004687a697f4f",
+    "support/family-promotion/diagnostics-audit-integration-preservation.json": "4b78fc514f3b5350bde4e7775983647dc525e17a61a54bbdcc39d6f2881431d7",
+    "support/family-promotion/diagnostics-audit-integration-product-canvas.json": "1dae4c2d5055a09d13eefd83e7780ca41218f18ee6ed05eb81fc42b5e08fd13f",
+    "support/family-promotion/diagnostics-audit-integration-product-evidence.json": "768da1878b4ab51a1b11adbda729715144b5c6d642cf2256f85a587a1abb1518",
+    "support/family-promotion/diagnostics-audit-integration-product.json": "59e33cd2f28b0c15cf65a023b97dd2d3856f054076eabf9a0e17f756cf681b81",
+    "support/family-promotion/diagnostics-audit-integration-source.json": "447d82cd47c3bf18f5e2698d08dd11b395e86e4272d33e0bcc4134727a0c7f5a",
+    "support/doc-audit/d2/batch_106_diagnostics_audit_main_integration.md": "787d2ec5a43849b5cbef92b241c7a474f0b662f37dd80b5c431ef7ea4eb7024f"
+  },
+  "retained_bytes_before_qualification": 131827,
+  "retained_byte_cap": 10000000,
+  "outputs": "Reused C:/t/cargo-targets/mere; no isolated Cargo target/home. Temporary integration worktree removed after receiving into primary main."
+}

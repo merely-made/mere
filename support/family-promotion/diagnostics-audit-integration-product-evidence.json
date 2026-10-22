@@ -1,0 +1,23 @@
+{
+  "captured": "2026-10-22T19:40:00.309672+00:00",
+  "binaries": [
+    {
+      "gate": "canvas",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pictograph-533aaa1e2a7b00a6.exe",
+      "sha256_at_receipt_close": "4881efb7cb9f5f202f763fc7082935d1c11d9f0e23e1b8a863bf70ed1935fd0b",
+      "bytes": 56828928
+    },
+    {
+      "gate": "product",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-00f2f4b2f5b4094a.exe",
+      "sha256_at_receipt_close": "c1a1a246e03cc16920bfa933d2f6192d67d198f0972fa05ec33ef4f326caf7ec",
+      "bytes": 92004864
+    },
+    {
+      "gate": "product-canvas",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-00f2f4b2f5b4094a.exe",
+      "sha256_at_receipt_close": "c1a1a246e03cc16920bfa933d2f6192d67d198f0972fa05ec33ef4f326caf7ec",
+      "bytes": 92004864
+    }
+  ]
+}

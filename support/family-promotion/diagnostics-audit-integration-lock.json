@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "--workspace"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-audit-integration",
+  "started": "2026-10-22T19:27:25.414521+00:00",
+  "finished": "2026-10-22T19:27:34.199971+00:00",
+  "exit_code": 0,
+  "results": [],
+  "diagnostic_tail": "     Locking 0 packages to highest compatible versions\nnote: pass `--verbose` to see 129 unchanged dependencies behind latest\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
