@@ -3,7 +3,10 @@
 
 //! Reading controls shared by native and Web hosts. Persistence, font intent,
 //! document search and the editable field belong to their existing owners.
-use crate::{OptionalAction, ShellControl, ShellSlot, el, shell_control};
+use crate::{
+    ReadEvent, ReadFind, ShellControl, ShellSlot, el, find_field, find_row,
+    is_find_shortcut, on_key, shell_control,
+};
 use std::rc::Rc;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -19,15 +22,15 @@ pub enum ReadCommand {
     CloseFind,
 }
 
-pub fn read_toolbar<State: 'static, Action: 'static, OA: OptionalAction<Action> + 'static>(
+pub fn read_toolbar<State: 'static, Action: 'static>(
     text_size: u16,
     column_em: u16,
     text_controls: bool,
-    find_open: bool,
-    find: Option<ShellSlot<State, Action>>,
-    handler: impl Fn(&mut State, ReadCommand) -> OA + 'static,
+    find: Option<&ReadFind>,
+    handler: impl Fn(&mut State, ReadEvent) + 'static,
 ) -> ShellSlot<State, Action> {
     let handler = Rc::new(handler);
+    let find_open = find.is_some_and(|find| find.open);
     let mut controls: Vec<ShellSlot<State, Action>> = Vec::new();
     for (label, name, command, disabled) in [
         (
@@ -84,7 +87,7 @@ pub fn read_toolbar<State: 'static, Action: 'static, OA: OptionalAction<Action> 
                 expanded: (command == ReadCommand::Find).then_some(find_open),
                 ..Default::default()
             },
-            move |state, _| handler(state, command),
+            move |state, _| handler(state, ReadEvent::Command(command)),
         ));
     }
     let mut rows: Vec<ShellSlot<State, Action>> = vec![Box::new(
@@ -93,27 +96,22 @@ pub fn read_toolbar<State: 'static, Action: 'static, OA: OptionalAction<Action> 
             .attr("role", "toolbar")
             .attr("aria-label", "Read"),
     )];
-    if let Some(find) = find.filter(|_| find_open) {
-        let mut controls = vec![find];
-        for (label, name, command) in [
-            ("↑", "Previous reading match", ReadCommand::Previous),
-            ("↓", "Next reading match", ReadCommand::Next),
-            ("×", "Close reading Find", ReadCommand::CloseFind),
-        ] {
-            let handler = handler.clone();
-            controls.push(shell_control(
-                label,
-                name,
-                ShellControl::default(),
-                move |s, _| handler(s, command),
-            ));
-        }
-        rows.push(Box::new(
-            el("div", controls)
-                .attr("class", "read-find")
-                .attr("role", "search")
-                .attr("aria-label", "Find in reading"),
+    if let Some(find) = find.filter(|find| find.open) {
+        let commands = handler.clone();
+        rows.push(find_row(
+            find_field(find, handler.clone()),
+            Rc::new(move |state: &mut State, command| commands(state, ReadEvent::Command(command))),
         ));
     }
-    Box::new(el("div", rows).attr("class", "cambium-read-toolbar"))
+    let shortcut = handler;
+    Box::new(on_key(
+        el("div", rows).attr("class", "cambium-read-toolbar"),
+        move |state: &mut State, event: crate::KeyEvent| {
+            if is_find_shortcut(&event) {
+                event.prevent_default();
+                event.stop_propagation();
+                shortcut(state, ReadEvent::Command(ReadCommand::Find));
+            }
+        },
+    ))
 }
