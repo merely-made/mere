@@ -82,3 +82,6 @@
 .read-query { min-width:64px; flex:1 1 96px; max-width:240px; min-height:28px; box-sizing:border-box; padding:3px 6px; border:1px solid currentColor; border-radius:4px; }
 .read-result { font-size:12px; padding:0 4px; white-space:nowrap; }
 .read-find-input { display:flex; align-items:center; min-width:0; flex:1 1 140px; max-width:360px; }
+
+/* Render a thin caret without requiring a block-element glyph in UI fonts. */
+.read-query .field-caret { display:inline-block; width:0; height:1em; overflow:hidden; border-left:1px solid currentColor; vertical-align:text-bottom; }
