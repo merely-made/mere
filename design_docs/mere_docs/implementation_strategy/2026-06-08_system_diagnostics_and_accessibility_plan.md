@@ -1,5 +1,32 @@
 # System Diagnostics and Accessibility Plan
 
+## Main integration receiving, 2026-10-22
+
+The child/leaf and producer/publication repairs are committed in `137c4fd4c`.
+Fetched main `3dc450a6b` is integrated by `09145847b`, retaining the Djinn lane's
+committed source and its separate uncommitted documentation/runtime work.
+All 336 targeted tests passed with seven existing ignores; browser-host Wasm
+and embedding compilation passed. The global D2 audit retains 40 pre-existing
+errors. Concurrent Djinn commit `121a17b23` was also received without changing
+the tested source or lockfile; see `diagnostics-audit-integration-final-receiving.json`.
+The exact combined source and receiving gates are recorded in
+`support/family-promotion/diagnostics-audit-integration-qualification.json`.
+This receiving section supersedes earlier latest-main-pending notes below;
+earlier receipts remain historical and are not relabeled.
+
+A missing `retinue` entry in Djinn's lockfile dependency list was repaired
+without changing package versions. Original staged receiving edits and receipt
+removals remain separate from this audit. The temporary integration worktree
+uses the existing Mere Cargo target; retained receipt cap is 10 MB.
+
+The remaining ownership work is unchanged: native late-event numeric IDs need
+complete publication/reference remapping, and host transfer needs host-issued
+owner life. Optional producer child tokens do not establish an atomic actor
+transaction or prove legacy nonreuse. Canvas raw callbacks can hide same-UUID
+replacement. Rootstock intrinsic sizing and Path-B raster receiving remain
+unfinished. Wasm compilation and headless tests do not qualify browser proxy,
+focus/disposal, native install/reattach recovery or human assistive technology.
+
 ## Producer children and publication bindings, 2026-10-22
 
 **Status:** bounded repairs qualified on this checkout: 287 distinct targeted

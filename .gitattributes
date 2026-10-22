@@ -89,3 +89,5 @@ support/doc-audit/d2/batch_105_producer_publication_lifetimes.md -text
 support/family-promotion/diagnostics-child-leaf-*.json -text
 support/family-promotion/diagnostics-publication-*.json -text
 support/family-promotion/diagnostics-audit-integration-*.json -text
+
+support/doc-audit/d2/batch_106_diagnostics_audit_main_integration.md -text
