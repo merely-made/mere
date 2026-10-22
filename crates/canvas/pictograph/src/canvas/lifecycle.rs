@@ -61,6 +61,8 @@ impl Canvas {
             self.physics.unpin(key);
         }
         self.graph = graph;
+        // A graph switch ends every child life, even if member UUIDs recur.
+        self.described_keys = Default::default();
         // NodeKeys do not survive a graph swap; an exact scope resolves its
         // authored IDs again against the replacement.
         if let Some(roster) = self.exact_scope.clone() {
@@ -152,7 +154,7 @@ impl Canvas {
         );
         let mut canvas = Self {
             graph,
-            described_keys: std::sync::Mutex::new(Default::default()),
+            described_keys: Default::default(),
             physics,
             #[cfg(feature = "gpu")]
             physics_device: None,
@@ -280,6 +282,7 @@ impl Canvas {
             fold_redo: Vec::new(),
             render_gnodes_as_dom: false,
         };
+        canvas.described_keys.reconcile(&canvas.graph);
         // Construction establishes the footprint baseline before any layout is cached.
         canvas.strategy_footprints = canvas
             .graph
@@ -422,6 +425,7 @@ impl Canvas {
     /// selection, or restart the settle; callers do that as they need. The pool
     /// is structural, so it is rebuilt, not grown incrementally.
     pub(crate) fn reconcile_derived(&mut self) {
+        self.described_keys.reconcile(&self.graph);
         // The registry's facts gate on `Graph::revision` — bumped at the kernel mutation source, so
         // a spurious reconcile (e.g. a selection change) cannot invalidate them. (Graph signals.)
         // New bodies spawn at the origin (positions are no longer graph truth, S2);

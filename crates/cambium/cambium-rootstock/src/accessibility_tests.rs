@@ -6,6 +6,8 @@
 
 //! Accessibility focus follows the runner, independently of hover restyling.
 
+mod publication_tests;
+
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -513,6 +515,59 @@ fn identity_tests_current_admission_refuses_ambiguous_producer_action_without_di
 }
 
 #[test]
+fn lifetime_tests_leaf_replacement_refuses_queued_values_but_updates_keep_the_life() {
+    use crate::{A11yAction, A11yDispatch as D, A11yRejection as R};
+    for replacement in 0..4 {
+        let mut host = counter_host();
+        let knob = || {
+            Box::new(sprigging::Knob::new(sprigging::Size {
+                width: 80.0,
+                height: 30.0,
+            }))
+        };
+        if replacement != 3 {
+            host.s.shared.leaves.insert(7, knob());
+        }
+        let runner = host.s.runner.as_ref().unwrap();
+        let dom = runner.dom();
+        let slot = host
+            .s
+            .layout
+            .as_ref()
+            .unwrap()
+            .custom_leaf_nodes(&WindowDom::new(&dom.borrow(), runner.mount()))[0]
+            .1;
+        let request = A11yRequest::node(A11yAction::SetValue(4.0), slot);
+        let stale = defer_lifetime_request(&mut host, request.clone());
+        let detached = match replacement {
+            1 => {
+                host.s.shared.leaves.remove(&7);
+                None
+            },
+            2 => Some(std::mem::take(&mut host.s.shared.leaves)),
+            _ => None,
+        };
+        host.s.shared.leaves.insert(7, knob());
+        host.drain_pointer();
+        assert_eq!(stale.result(), Some(D::Rejected(R::StaleTarget)));
+        assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+        drop(detached);
+
+        let current = defer_lifetime_request(&mut host, request);
+        host.s
+            .shared
+            .leaves
+            .get_mut_as::<sprigging::Knob>(&7)
+            .unwrap()
+            .set_value(2.0);
+        host.relayout(320.0, 240.0);
+        host.drain_pointer();
+        assert_eq!(current.result(), Some(D::Dispatched));
+        assert_eq!(*host.s.runner.as_ref().unwrap().state(), 4);
+    }
+}
+
+#[test]
 fn current_leaf_contribution_can_admit_a_numeric_action() {
     use crate::{A11yAction, A11yDispatch};
     let mut host = counter_host();
@@ -932,12 +987,19 @@ fn lifetime_tests_queue_binding_distinguishes_mounts_in_one_live_document() {
     let another_mount = runner.focusables()[0];
     assert_ne!(mount, another_mount);
     let queued = &host.s.pending_a11y[0];
-    assert!(queued.is_current(&host.s.a11y_owner, &dom, mount, &host.s.shared.producers));
+    assert!(queued.is_current(
+        &host.s.a11y_owner,
+        &dom,
+        mount,
+        &host.s.shared.producers,
+        &host.s.shared.leaves
+    ));
     assert!(!queued.is_current(
         &host.s.a11y_owner,
         &dom,
         another_mount,
-        &host.s.shared.producers
+        &host.s.shared.producers,
+        &host.s.shared.leaves
     ));
     host.drain_pointer();
     assert_eq!(receipt.result(), Some(crate::A11yDispatch::Dispatched));

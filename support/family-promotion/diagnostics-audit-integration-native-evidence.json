@@ -1,0 +1,51 @@
+{
+  "gate": "diagnostics-audit-integration-native-locked.json",
+  "captured": "2026-10-22T19:32:00.627294+00:00",
+  "binaries": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-70ac79d7e1852ac0.exe",
+      "sha256_at_receipt_close": "9c576640558adb977c644020835e203f24358a17cd9b771b6107dbdd7c560f63",
+      "bytes": 20703232
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-30dcb494f18a4ee9.exe",
+      "sha256_at_receipt_close": "bdbd97e2a104f60df62db97fcfaa1349bc93df68d7c2dea2be1fa64c47f3fc86",
+      "bytes": 36842496
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-59b97eea58b8e633.exe",
+      "sha256_at_receipt_close": "5f497a265f78791fbbbfca91adc2ca3df4679c68d434d2c7e777a7e932db8dc8",
+      "bytes": 16901632
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-5c87ca964df23e58.exe",
+      "sha256_at_receipt_close": "711fea9776bab1ff0850723fbd09f29c1f4d89dc7e8cb6a3004dcbd219238268",
+      "bytes": 16461824
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-cd9828bf85067e40.exe",
+      "sha256_at_receipt_close": "3e4e19be0ffa4f363d6cddecd27878b3bc456a0659eae3e18d4809c5392321f1",
+      "bytes": 41719296
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-6d72c731b3f4ab7a.exe",
+      "sha256_at_receipt_close": "eaaac7e1d8880e35188ebe14c74e875a57c1f4a3320a0f472a2f18979ad1068e",
+      "bytes": 18692096
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-df1e5473a0145524.exe",
+      "sha256_at_receipt_close": "30c1ffccd1e23b2fa6cec889fe5c4e7fb24e2e0dbbf6861636bf3a12d85ce547",
+      "bytes": 17564160
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-51a4de650d4099b7.exe",
+      "sha256_at_receipt_close": "40ce1147a99974081d0e62efc0171a0dfaa067d6adce40639ab8432495ef152f",
+      "bytes": 39048704
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\sprigging-6a4615d00f698574.exe",
+      "sha256_at_receipt_close": "0bf4c8c4c18af2b463d9ed69610f5c6cc5f8c006ae58a94a676e29ff4c17da83",
+      "bytes": 1214976
+    }
+  ]
+}

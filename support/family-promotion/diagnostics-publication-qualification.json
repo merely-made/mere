@@ -1,0 +1,39 @@
+{
+  "status": "Bounded recorded-checkout qualification; latest-main receiving pending",
+  "distinct_targeted_passes": 287,
+  "native_cohort_passes": 274,
+  "existing_ignores": 7,
+  "focused_controls": {
+    "passed": 4,
+    "already_in_native_cohort": 3,
+    "additional": 1
+  },
+  "product_final_passes": 12,
+  "browser": "Wasm compile only; event/focus/disposal runtime unqualified",
+  "embedding": "compile passed",
+  "receipts_sha256": {
+    "support/family-promotion/diagnostics-publication-native.json": "84ef72e5861e771793e6781fb17c2d70836677b10a5c8921f33915326eae2249",
+    "support/family-promotion/diagnostics-publication-native-controls-fixed.json": "763150e8f01e736610c103e4c15a4e694b5d44eac6f267c54177e0b539b4e3cf",
+    "support/family-promotion/diagnostics-publication-browser-final.json": "ccd580c0e02f4992fd9e833361ada7c8ea582dce6a57e4f07dc5bf9a119ff74a",
+    "support/family-promotion/diagnostics-publication-embedding.json": "da4a4b51b9cdc66fe5825892aae3267a61fef89a0a3c9356a56212a606fed63f",
+    "support/family-promotion/diagnostics-publication-product-final.json": "8eeff18e8411ba6155fdbdf7fbb57d3d52cf9978be51abf60eeaf95d7bb4a04f",
+    "support/family-promotion/diagnostics-publication-source.json": "fe59aa4bfecf5fc6d93cbfea1d5e94af0c2b49b48a5e39398f5de0863db14957",
+    "support/family-promotion/diagnostics-publication-review.json": "19e733496b5aaf912038a330134d4ce033313566231a4b1bb2831814854a9907",
+    "support/family-promotion/diagnostics-publication-brief.json": "85f280361be3a1d7454a95a8abde530342b8d71bb91130dbc6ff69c915dd2b2f",
+    "support/family-promotion/diagnostics-publication-docs-final.json": "9d561b4d5815cbb8f7ef3c7f77fec5ad055c9f915333e2670d70fff83f6597b3",
+    "support/family-promotion/diagnostics-publication-native-evidence.json": "8bccc9cef80d8333d1ac65c8d8920c9e38ff62115f46c5e96445afd34105acc3",
+    "support/family-promotion/diagnostics-publication-upstream.json": "057fc053133493bf4ed7619bd9464fe7bab09134f1de1d2733ae514170bee36a",
+    "support/doc-audit/d2/batch_105_producer_publication_lifetimes.md": "83edc946ddcea4ffe98a6cc1758ac6ecf747ac001af09bacf3fdc62478bf50eb"
+  },
+  "failed_attempts": [
+    {
+      "receipt": "diagnostics-publication-native-controls.json",
+      "reason": "New mapper fixture omitted LayoutDomMut import for set_inner_html; fixed and four focused controls passed."
+    }
+  ],
+  "source_history": "Initial product/browser receipts precede final weak-index and focus replacements. Final receipts receive those changes; do not sum repeated gates.",
+  "docs": "40 pre-existing errors unchanged; no new batch105 errors.",
+  "remaining": "See diagnostics-publication-review.json: late native numeric IDs, host ownership transfer, legacy child contract/atomic activation, platform runtime and latest-main receiving.",
+  "working_state": "Uncommitted in shared main checkout. Existing staged receiving edits and earlier child/leaf/resident/site WIP preserved. No worktree or isolated Cargo target/home created.",
+  "retained_byte_cap": 10000000
+}

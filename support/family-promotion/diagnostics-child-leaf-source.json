@@ -1,0 +1,17 @@
+{
+  "basis": "0606dfaada848e464a8dc86de74ab72221f92fe7",
+  "working_source_sha256": {
+    "crates/cambium/sprigging/src/lib.rs": "8de23f144229beb80c875d436d165d0803082263474216ff01d0eb8b8a294c82",
+    "crates/cambium/sprigging/src/slot.rs": "9eb5049af58f3bd38e0db5af8702051bec53f233dd1369b4ab79f63f4fe69725",
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "03b590792f05aafef8d14211aab224d267586ac68b7f69259f47544fc54c02ea",
+    "crates/cambium/cambium-rootstock/src/host.rs": "d197a451f01e4d4cce3c90c7d6ea62a6f17463e675b607e028d2292fac1bff7e",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "ef0d0b82d30d2269db5d2ca268075ed1cce5198007f21a358943ab4c60b9c404",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "7ff2d860ed7c3128e2cfdceb5c915880eba19de431252fd920bdc53f24b8c62a",
+    "crates/canvas/pictograph/src/canvas.rs": "6a072a691f13c26f4bf98d934df59ddc64d2487e2b9262cc7387d63104463cd3",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "5ae6986ecbb1f7b6012655caabbccf291cee12b9d9ed8f43470648eec6baf916",
+    "crates/canvas/pictograph/src/canvas/reader.rs": "9f3ab4bc150360c370bf9ed6d689bcea50531f937cbdd4b7db9f78a40a98573d",
+    "crates/canvas/pictograph/src/canvas/tests/reader.rs": "c3b7d7a5abd70182318a6819f07d48ff382affcd5786c87f3aa13017984e6a88",
+    "Cargo.lock": "c25f5cb1d996b3ce01a32940ec891604fa8b410c0dfe14f054974d803dc11694"
+  },
+  "note": "Source snapshot while gates wait on shared Cargo locks. Cargo.lock includes concurrent fetch dev dependencies and is recorded, not owned by this change. Shared checkout contains unrelated staged diagnostics metadata edits."
+}

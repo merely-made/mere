@@ -42,6 +42,59 @@ fn member(canvas: &Canvas, key: NodeKey) -> uuid::Uuid {
     canvas.graph().get_node(key).unwrap().id
 }
 
+#[test]
+fn child_lifetimes_are_authored_before_reads_and_withdrawn_between_reads() {
+    let (mut canvas, keys, _) = row(2);
+    let id = member(&canvas, keys[0]);
+    // Construction has assigned every live member a key, without a reader.
+    let original = canvas.described_keys.by_member[&id];
+    let untouched = canvas.described_keys.by_member[&member(&canvas, keys[1])];
+    let before = canvas.described_keys.by_member.clone();
+    let description = canvas.describe_items(DESCRIBED_ITEMS);
+    canvas.describe_items(1);
+    canvas.describe_items(DESCRIBED_ITEMS);
+    assert_eq!(
+        canvas.described_keys.by_member, before,
+        "reads never author routes"
+    );
+    assert!(description.items.iter().any(|item| item.key == original));
+
+    assert!(canvas.ingest_graph(|graph| graph.remove_node(keys[0])));
+    assert_eq!(canvas.member_of_described(original), None);
+    assert!(canvas.ingest_graph(|graph| {
+        graph.add_node_with_id(id, "https://restored.example".into(), PortablePoint::zero());
+        true
+    }));
+    // No description occurred during removal/restoration of the SAME UUID.
+    let restored = canvas.described_keys.by_member[&id];
+    assert_ne!(restored, original);
+    assert_eq!(canvas.member_of_described(original), None);
+    assert_eq!(canvas.member_of_described(restored), Some(id));
+    assert_eq!(
+        canvas.described_keys.by_member[&member(&canvas, keys[1])],
+        untouched
+    );
+
+    let same_graph = canvas.graph().clone();
+    assert!(canvas.refresh_same_topology_graph(&same_graph).is_ok());
+    assert_eq!(
+        canvas.described_keys.by_member[&id], restored,
+        "metadata refresh keeps the life"
+    );
+    canvas.set_graph(same_graph.clone());
+    assert_eq!(
+        canvas.member_of_described(restored),
+        None,
+        "graph switch ends the life"
+    );
+    assert_ne!(canvas.described_keys.by_member[&id], restored);
+    let other = Canvas::with_graph(same_graph);
+    assert_ne!(
+        other.described_keys.by_member[&id],
+        canvas.described_keys.by_member[&id]
+    );
+}
+
 /// Every item on screen is described, named by its caption's label, placed
 /// where it is drawn, with drag and pin; the slot says "N of M shown".
 /// Panned off, an item leaves the description; the focused one stays.

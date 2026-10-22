@@ -36,6 +36,9 @@ use layout_dom_api::LayoutDom;
 use sprigging::LeafRegistry;
 use winit::window::Window;
 
+#[cfg(test)]
+mod publication_tests;
+
 /// The screen-reader request vocabulary, re-exported from the neutral seam.
 ///
 /// It lives there rather than here because it never named winit or AccessKit:
@@ -74,12 +77,8 @@ pub struct A11yHost {
     window: Option<std::sync::Arc<Window>>,
     bridge: AccessKitBridge,
     installed: bool,
-    /// AccessKit node id -> its DOM node, rebuilt each frame, so a screen
-    /// reader's action on a node routes back to the element it came from.
-    action_map: HashMap<A11yNodeId, NodeId>,
-    /// AccessKit node id -> the drawn node's action its button stands for,
-    /// rebuilt each frame, so a reader's click reaches the producer.
-    produced_map: HashMap<A11yNodeId, ProducedAction>,
+    /// Last-published requests retain contributor provenance through dispatch.
+    requests: HashMap<A11yNodeId, A11yRequest>,
 }
 
 impl A11yHost {
@@ -91,8 +90,7 @@ impl A11yHost {
             window: None,
             bridge: AccessKitBridge::new(wake),
             installed: false,
-            action_map: HashMap::new(),
-            produced_map: HashMap::new(),
+            requests: HashMap::new(),
         }
     }
 
@@ -124,37 +122,46 @@ impl A11yHost {
             // No window yet: nothing to install against, and no reader to ask.
             return Vec::new();
         };
-        let (mut tree, action_map, produced_map) =
-            project_tree_with_actions(dom, layout, leaves, producers, focus);
-        self.action_map = action_map;
-        self.produced_map = produced_map;
-        scale_tree_to_window(&mut tree, dom, layout_scale);
-        let node_count = tree.nodes.len();
-
-        if !self.installed {
-            match self.bridge.install(&window, tree) {
-                Ok(()) => eprintln!(
-                    "[cambium-winit] accessibility {:?}, {node_count} nodes projected",
-                    self.bridge.status()
-                ),
-                Err(e) => eprintln!("[cambium-winit] accessibility install failed: {e}"),
-            }
-            self.installed = true;
-            window.set_visible(true);
-            return Vec::new();
-        }
-
-        self.bridge.update(tree);
-        // Route a screen reader's requests back to their DOM nodes, or to the
-        // producer whose drawn node's button was pressed, each still carrying
-        // the action it asked for.
-        self.bridge
+        // Resolve queued events through the publication they could have seen,
+        // before reading contributors or replacing the published maps.
+        let requests = self
+            .bridge
             .drain_actions()
             .into_iter()
             .filter_map(|req| {
                 self.map_parts(req.action, req.data, req.target_tree, req.target_node)
             })
-            .collect()
+            .collect();
+        let projection =
+            cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
+        let next = projection
+            .publication_requests(dom, leaves, producers)
+            .into_iter()
+            .map(|(id, request)| (A11yNodeId(id), request))
+            .collect();
+        let mut tree = projection.tree;
+        scale_tree_to_window(&mut tree, dom, layout_scale);
+        let node_count = tree.nodes.len();
+        if !self.installed {
+            match self.bridge.install(&window, tree) {
+                Ok(()) => {
+                    self.installed = true;
+                    self.requests = next;
+                    eprintln!(
+                        "[cambium-winit] accessibility {:?}, {node_count} nodes projected",
+                        self.bridge.status()
+                    );
+                },
+                Err(e) => eprintln!("[cambium-winit] accessibility install failed: {e}"),
+            }
+            // Keep the app usable on adapter failure; retry installation on the
+            // next sync rather than claiming that a failed install succeeded.
+            window.set_visible(true);
+        } else {
+            self.bridge.update(tree);
+            self.requests = next;
+        }
+        requests
     }
 
     /// Give the host the window AccessKit installs against.
@@ -207,11 +214,9 @@ impl A11yHost {
             },
             _ => return None,
         };
-        if let Some(node) = self.action_map.get(&target) {
-            return Some(A11yRequest::node(action, *node));
-        }
-        let produced = self.produced_map.get(&target)?;
-        Some(A11yRequest::produced(action, produced.clone()))
+        let mut request = self.requests.get(&target)?.clone();
+        request.action = action;
+        Some(request)
     }
 }
 
@@ -313,7 +318,8 @@ mod dpi_tests {
         let node = dom.document();
         let target = A11yNodeId(44);
         let mut host = A11yHost::new(|| {});
-        host.action_map.insert(target, node);
+        host.requests
+            .insert(target, A11yRequest::node(A11yAction::Focus, node));
         let request = |data| ActionRequest {
             action: Action::SetValue,
             target_tree: TreeId::ROOT,
@@ -336,13 +342,17 @@ mod dpi_tests {
         let dom = ScriptedDom::new();
         let node = dom.document();
         let mut host = A11yHost::new(|| {});
-        host.action_map.insert(A11yNodeId(44), node);
+        host.requests
+            .insert(A11yNodeId(44), A11yRequest::node(A11yAction::Focus, node));
         let produced = ProducedAction {
             slot: 7,
             key: 40,
             id: "pin".into(),
         };
-        host.produced_map.insert(A11yNodeId(45), produced.clone());
+        host.requests.insert(
+            A11yNodeId(45),
+            A11yRequest::produced(A11yAction::Focus, produced.clone()),
+        );
         for (target, expected) in [
             (44, A11yRequest::node(A11yAction::Click, node)),
             (45, A11yRequest::produced(A11yAction::Click, produced)),
@@ -608,7 +618,10 @@ mod dpi_tests {
         // A reader's click on it maps to the drawn node's action and reaches
         // the producer, which carries it out; the card itself is no button.
         let mut host = A11yHost::new(|| {});
-        host.produced_map = produced_map;
+        host.requests = produced_map
+            .into_iter()
+            .map(|(id, action)| (id, A11yRequest::produced(A11yAction::Focus, action)))
+            .collect();
         let click = |target_node| ActionRequest {
             action: Action::Click,
             target_tree: TreeId::ROOT,
@@ -801,7 +814,10 @@ mod dpi_tests {
         let (&button, target) = produced.iter().next().unwrap();
         let expected = target.clone();
         let mut host = A11yHost::new(|| {});
-        host.produced_map = produced;
+        host.requests = produced
+            .into_iter()
+            .map(|(id, action)| (id, A11yRequest::produced(A11yAction::Focus, action)))
+            .collect();
         let request = host
             .map_request(&ActionRequest {
                 action: Action::Click,

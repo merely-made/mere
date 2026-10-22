@@ -1,0 +1,49 @@
+{
+  "status": "bounded repairs qualified",
+  "unique_targeted_native_canvas_product_passes": 317,
+  "existing_ignores": 7,
+  "repeated_subset_passes": 30,
+  "browser": "Wasm compile passed; no browser runtime claim",
+  "embedding": "compile passed",
+  "receipts_sha256": {
+    "support/family-promotion/diagnostics-child-leaf-native-fixed.json": "222fc9d68ad5029a7eef277c7372efbb3459d67445be8cca625f6e037d5b8439",
+    "support/family-promotion/diagnostics-child-leaf-canvas.json": "a462b7135fc412ea30d54e82bd948d107320ee80e5b8e827f70fb2005f5c7276",
+    "support/family-promotion/diagnostics-child-leaf-product.json": "fbdd7046ed3ed7e0708d5caa7ada5f2b453634808bcf3f103febb9ea99cf5059",
+    "support/family-promotion/diagnostics-child-leaf-browser.json": "9b84376c2baa974e49c4f38f42441c8b62e65ad02b108ee0861aacd165fb59c7",
+    "support/family-promotion/diagnostics-child-leaf-embedding.json": "2f27750ebaa9c2adc23025b820adfb223bd934c0308bf0f2b7c17ab37d6222f1",
+    "support/family-promotion/diagnostics-child-leaf-final-cache.json": "736a267822ecc8e80654edc4a63a66382ac587b19ab475eac24294ba17769821",
+    "support/family-promotion/diagnostics-child-leaf-native-evidence.json": "9de250ef2eb09c2477340f9c763093d8fa58aa80423cb9bbac071c3530ee5bce",
+    "support/family-promotion/diagnostics-child-leaf-product-evidence.json": "f3d858d19c5947b9c3be046e8ec9ea6b062038f3c33d93154564c7ac685aafea",
+    "support/family-promotion/diagnostics-child-leaf-docs-final.json": "d4f2f73af836e16e7849bd2a16a15183010bfc47674bb4b4c684283274a4ac72",
+    "support/family-promotion/diagnostics-child-leaf-final-source.json": "5e66062582c37c1608618053e94390078a7744583f8762ce2b9bd890a8b018f0",
+    "support/family-promotion/diagnostics-child-leaf-upstream.json": "83b5b792baf637d457b79a6b7090a697deb3c274ae50cf0163920db07d568dc6",
+    "support/family-promotion/diagnostics-child-leaf-review.json": "7d96da37d70ad53803bff41ede9b44e4570fee1025b5ab0d7ca2dae0d0ed5846",
+    "support/family-promotion/diagnostics-child-leaf-brief.json": "d1af4ee6209a8227d82df044705f309551495b692c5f24fb6908283fccc37fd9",
+    "support/doc-audit/d2/batch_104_child_leaf_lifetimes.md": "9e9eb95748c1086eeb6093b01a3431d2e8b30e4842ff56ae537e878fd710049a"
+  },
+  "final_cache_executed_binaries": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\sprigging-99fdbb6ae6da9a20.exe",
+      "sha256": "b896a50304d05f915d5a988652763ccc292bf2f107d8bbcee11b4b302b8d8822",
+      "bytes": 1175040
+    }
+  ],
+  "retained_failures": [
+    {
+      "receipt": "diagnostics-child-leaf-native.json",
+      "reason": "Initial compilation caught two old mount-fixture is_current calls missing the new leaf registry argument; updated, then native-fixed passed."
+    }
+  ],
+  "superseded_source_snapshot": "diagnostics-child-leaf-source.json records an intermediate source state, not the final receiving source.",
+  "docs": "40 existing D2 errors unchanged; no new batch104 errors. Source claims about full leaf integration corrected.",
+  "working_state": "Changes left uncommitted in place. Original staged diagnostics receiving edits, fetch/site WIP and lock changes preserved.",
+  "limits": [
+    "Generic producer child contract compliance and atomic activation remain unqualified.",
+    "Raw native/browser/current-context requests still lack originating publication lives.",
+    "Canvas raw ingest callbacks can conceal transitions within one call.",
+    "No headed native, browser runtime or human assistive-technology receipt.",
+    "No complete Rootstock custom-leaf sizing or Path-B raster receiving."
+  ],
+  "retained_byte_cap": 10000000,
+  "isolated_outputs": []
+}

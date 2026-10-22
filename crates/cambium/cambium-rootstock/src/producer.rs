@@ -17,6 +17,8 @@ use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
 pub use netrender::SourceAlpha;
 
 mod bridge;
+mod child_lifetime;
+pub use child_lifetime::{ProducerChildLifetime, ProducerChildToken};
 pub(crate) mod registry;
 pub use paint_list_render::bundle::{PortablePaintCapture, ProducerSource};
 pub use registry::PortableCaptureError;
@@ -168,6 +170,13 @@ pub trait TextureProducer {
         None
     }
 
+    /// Observe an authored child life when numeric keys can recur. `None`
+    /// retains the nonreused-key contract of `ProducerNode::key`; it does not
+    /// prove arbitrary key reuse safe. No identity allocation on this read.
+    fn child_lifetime(&self, _key: u64) -> Option<ProducerChildToken> {
+        None
+    }
+
     /// A reader invoked action `id` of the drawn node `key` (a
     /// [`ProducerNode`]'s own [`ProducerAction`]). Returns whether the producer
     /// carried it out; `false`, the default, for one it does not know.
@@ -194,7 +203,12 @@ pub struct ProducerSemantics {
 pub struct ProducerNode {
     /// The producer's stable name for the node, so a reader's request
     /// reaches it however the list is ordered when the reader acts.
-    /// Keys must be unique within one `ProducerSemantics` description.
+    /// Keys must be unique within one `ProducerSemantics` description and must
+    /// not be reused for a different child life within a live registration.
+    /// Assign them at authored model transitions, including removal/restoration
+    /// between semantic reads. Reading a description must not allocate keys or
+    /// reconcile their lifetimes. Ordinary value, order and geometry updates
+    /// keep the key. The host cannot infer an unobserved removal from snapshots.
     pub key: u64,
     pub role: ProducerRole,
     pub name: String,
@@ -286,6 +300,9 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     }
     fn semantics(&self) -> Option<ProducerSemantics> {
         self.borrow().semantics()
+    }
+    fn child_lifetime(&self, key: u64) -> Option<ProducerChildToken> {
+        self.borrow().child_lifetime(key)
     }
     fn act(&mut self, key: u64, id: &str) -> bool {
         self.borrow_mut().act(key, id)

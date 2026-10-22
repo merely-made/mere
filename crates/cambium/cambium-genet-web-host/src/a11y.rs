@@ -56,11 +56,10 @@ pub(crate) struct MirrorHandle {
 
 #[derive(Default)]
 struct Shared {
-    /// Each mirrored node's DOM node, as of the last sync.
-    targets: HashMap<u64, NodeId>,
-    /// Each drawn node's action button, by its mirror id, as of the last
-    /// sync: the action a reader's click on it names.
-    produced: HashMap<u64, cambium_rootstock::ProducedAction>,
+    /// Frozen publication requests, shared with native/queue admission.
+    requests: HashMap<u64, A11yRequest>,
+    /// Exact proxy elements: a numeric attribute alone cannot impersonate one.
+    elements: HashMap<u64, HtmlElement>,
     /// The tree's focus as of the last sync, and its element when mirrored.
     focused: Option<HtmlElement>,
 }
@@ -68,10 +67,11 @@ struct Shared {
 impl MirrorHandle {
     /// What a reader's request on the mirror element an event reached lands
     /// on: its DOM node, or the drawn node's action its button stands for.
-    pub fn request_target_of(
+    pub fn request_of(
         &self,
         event_target: Option<web_sys::EventTarget>,
-    ) -> Option<cambium_rootstock::A11yTarget> {
+        action: cambium_rootstock::A11yAction,
+    ) -> Option<A11yRequest> {
         let element = event_target?.dyn_into::<Element>().ok()?;
         let element = element.closest(&format!("[{NODE_ATTR}]")).ok()??;
         // Resolve only elements still belonging to this mirror. Detached or
@@ -81,14 +81,16 @@ impl MirrorHandle {
         }
         let id: u64 = element.get_attribute(NODE_ATTR)?.parse().ok()?;
         let shared = self.shared.borrow();
-        if let Some(node) = shared.targets.get(&id) {
-            return Some(cambium_rootstock::A11yTarget::Node(*node));
+        if !shared
+            .elements
+            .get(&id)?
+            .is_same_node(Some(element.as_ref()))
+        {
+            return None;
         }
-        shared
-            .produced
-            .get(&id)
-            .cloned()
-            .map(cambium_rootstock::A11yTarget::Produced)
+        let mut request = shared.requests.get(&id)?.clone();
+        request.action = action;
+        Some(request)
     }
 
     /// Put DOM focus in the mirror: on the focused node's element, or on the
@@ -135,6 +137,10 @@ pub struct DomAccessibility {
 impl Drop for DomAccessibility {
     fn drop(&mut self) {
         self.handle.root.remove();
+        let mut shared = self.handle.shared.borrow_mut();
+        shared.requests.clear();
+        shared.elements.clear();
+        shared.focused = None;
     }
 }
 
@@ -322,11 +328,7 @@ impl Accessibility for DomAccessibility {
     ) -> Vec<A11yRequest> {
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
-        let targets = projection
-            .dom_targets
-            .iter()
-            .map(|(id, node)| (id.0, *node))
-            .collect();
+        let requests = projection.publication_requests(dom, leaves, producers);
         let device = web_sys::window().map_or(1.0, |window| window.device_pixel_ratio());
         let scale = (layout_scale / device) as f32;
         let plan = mirror::plan(&projection, scale);
@@ -340,6 +342,26 @@ impl Accessibility for DomAccessibility {
         let held_before = active_before.as_ref().is_some_and(|active| {
             active.is_same_node(Some(self.canvas.as_ref())) || root.contains(Some(active.as_ref()))
         });
+        // Reusing an element would let an old event handle acquire the new
+        // contributor's authority. Ordinary updates retain the same element.
+        let mut focused_proxy_replaced = false;
+        {
+            let shared = self.handle.shared.borrow();
+            for (id, old) in &shared.requests {
+                if requests
+                    .get(id)
+                    .is_none_or(|new| !old.same_publication_target(new))
+                {
+                    if let Some(old) = self.elements.remove(id) {
+                        focused_proxy_replaced |= shared
+                            .focused
+                            .as_ref()
+                            .is_some_and(|focused| old.element.contains(Some(focused.as_ref())));
+                        old.element.remove();
+                    }
+                }
+            }
+        }
         let mut live = HashSet::new();
         self.write(&root, &plan, &mut live);
         self.elements.retain(|id, mirrored| {
@@ -354,11 +376,18 @@ impl Accessibility for DomAccessibility {
         let focused = focus.and_then(|id| self.elements.get(&id).map(|m| m.element.clone()));
         {
             let mut shared = self.handle.shared.borrow_mut();
-            shared.targets = targets;
-            shared.produced = mirror::produced_actions(&plan).into_iter().collect();
+            shared.elements = requests
+                .keys()
+                .filter_map(|id| {
+                    self.elements
+                        .get(id)
+                        .map(|element| (*id, element.element.clone()))
+                })
+                .collect();
+            shared.requests = requests;
             shared.focused = focused;
         }
-        if focus != self.focus {
+        if focus != self.focus || focused_proxy_replaced {
             self.focus = focus;
             // Only while the application holds the page's focus: a reader
             // elsewhere on the page is not pulled back into it.
