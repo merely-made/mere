@@ -4719,6 +4719,7 @@ dependencies = [
  "pollster 0.4.0",
  "rand_core 0.6.4",
  "rcgen 0.13.2",
+ "retinue",
  "rpassword",
  "rustls",
  "safetensors 0.4.5",
