@@ -14,7 +14,7 @@ categories = ["command-line-utilities", "authentication"]
 default = ["personal-sync", "cxf"]
 cxf = ["personal-sync", "castellan/cxf"]
 personal-sync = []
-moot-site = ["site-model/publication", "dep:gemot", "dep:errand", "dep:pollster"]
+moot-site = ["site-model/publication", "dep:gemot", "dep:errand", "dep:pollster", "dep:scroll-protocol", "dep:url"]
 # `--passphrase-fd 0` for the harness and its receipts (vault lock ruling 65):
 # a passphrase read once from standard input, never the environment. Tests turn
 # it on through the dev-dependency on this package below; release builds keep
@@ -74,6 +74,8 @@ required-features = ["custody-receipt-host"]
 site-model.workspace = true
 gemot = { workspace = true, optional = true }
 errand = { workspace = true, optional = true, features = ["serve"] }
+scroll-protocol = { workspace = true, optional = true, features = ["server"] }
+url = { version = "2.5", optional = true }
 pollster = { version = "0.4", optional = true }
 # Local redacted lifecycle diagnostics, without the projection/rendering feature.
 apparatus = { workspace = true, features = ["registry", "serde"] }

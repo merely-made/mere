@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-22",
+  "receipt_cap_bytes": 100000000,
+  "scope": "Windows native same-machine processes; explicit signed local handoff; independent retained community/content owners; raw trusted loopback Gemini and Scroll TLS",
+  "source": {
+    "runtime": "e3ddbedcdb1fd3a1c6e9421f9a930367289c9a4b",
+    "receiving_build": "42b68310881f3741e15401015c2b9e03cb899f20",
+    "incoming_main": "27f7aaf2eca569462f288b671ebfca0dfa28d6c4",
+    "knot_receiver": "2ca5ca882086f0e429b32d1f799e9f3f9c35ba43",
+    "errand": "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab",
+    "model_source": "a07a375ed9f49d31bb757c4dd516a0fa7af33fde"
+  },
+  "source_sha256": {
+    "Cargo.toml": "da9c5f101d15e7a0286527a3dc9c14e645beceba5ee7b173597df2c02c83a800",
+    "Cargo.lock": "b8b3fbec2b541350246d19a02b119456251bdf63261fecfddbf7eb6bd9693b54",
+    "ports/djinn/Cargo.toml": "8acb0bddabe1a8ca637cd64d447f2524dac53539c892e47b4d234b8c116acb95",
+    "ports/djinn/src/moot_site.rs": "69207c9cada7dfea970a45b15efd24df43bca6e54d9d9a4e689c163873797739",
+    "ports/djinn/src/resident_site.rs": "097308a90f118b999fdf3a9f4393e2b04b7c65d7565f69b473341cd9e74b4f91",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "f6f08fe8a400090576e7cd30e162505d8e5452dcecbea03f08a547fa89060f2b"
+  },
+  "resident_binary_sha256": "b7dbb2992f601e89495242cd1aaddb1799b377894b66e91b9ac694a8795d6120",
+  "receiving_build": {
+    "command": "cargo build --locked --offline -p djinn --no-default-features --features moot-site --bin djinn-moot-site",
+    "exit_code": 0,
+    "profile": "dev",
+    "warnings": "Existing diagnostics outside the owned change; no source error"
+  },
+  "host_tests": "host-tests.json",
+  "product_process_receipt": "knot-editor/support/receipts/scroll-publication-runtime/process.json",
+  "results": {
+    "publication_host_controls": 5,
+    "original_resident_controls": 8,
+    "gemini_process_fixtures": 1,
+    "scroll_process_fixtures": 1,
+    "failed": 0,
+    "scroll_publishers": 2,
+    "scroll_residents": 3
+  },
+  "verified": [
+    "Legacy Gemini descriptors serialize without the new default transport field; omitted CLI transport retains Gemini",
+    "Persisted Scroll transport must match current profile during configure, start and every full or abstract read",
+    "Authorized import is independent of endpoint transport and cannot retarget a live listener",
+    "Exact native metadata and body bytes survive publisher exit and resident reopen while the authored site path is unavailable",
+    "UDC, language, Unicode author, both dates, CRLF full/abstract bytes and snapshot V1 remain exact",
+    "1024-byte Unicode author and valid 5000-digit fractional UTC date remain servable within existing model bounds",
+    "Static requests with foreign origin/port, userinfo, query, fragment or semicolon parameters refuse",
+    "Signed replacement, current membership removal/restoration and withdrawal affect subsequent reads; withdrawn restart refuses",
+    "TLS certificate survives restart; a TLS-admitted incomplete request is cancelled and joined before shutdown reply",
+    "Both original Gemini process fixture and new Scroll fixture pass against the same receiving executable"
+  ],
+  "cohort": {
+    "all_incoming_git_sources_preserved": true,
+    "root_manifest_identical_to_incoming": true,
+    "root_lock_delta": "Exactly two Djinn dependency links: scroll-protocol and url",
+    "knot_root_and_renderer": "Upstream7057632 retained without manifest/root lock edits from this lane",
+    "standalone_model": "Ignored standalone lock migrates only canonical model source identity to branchmain at a07a375e; no production repin is introduced by the test lane"
+  },
+  "qualification_limits": [
+    "Raw trusted TLS host qualification; current Scroll client response-line cap remains4096, so the long-date test does not qualify that client or browser",
+    "Inline bounded local disk/JSON operations cannot be preempted by network deadlines",
+    "SnapshotV1 has one declared language per path; request preferences do not add variant negotiation",
+    "Main-broker attachment, browser adoption/MIME/certificate/trust, Micron listener, peer acquisition, hosting promises, protected delivery and signed cross-Moot lineage remain separately owned",
+    "No installed-binary, cross-machine, browser-headed or remote-network claim"
+  ],
+  "attempt_history": [
+    {
+      "phase": "Governed unit fixture",
+      "failure": "NoCapability",
+      "repair": "Canonical scope/moot capability path"
+    },
+    {
+      "phase": "Governed unit fixture",
+      "failure": "BelowThreshold",
+      "repair": "Established MembersOnly admission and explicit Manage membership; final five controls pass"
+    },
+    {
+      "phase": "Receiving source availability",
+      "failure": "First offline attempt lacked pinned Armillary92 checkout",
+      "repair": "Fetched pinned sources; earlier resolver attempts were interrupted and supply no completion claim; the later clean locked/offline build is the qualified result"
+    },
+    {
+      "phase": "Standalone model source migration",
+      "failure": "Stale branch cache initially reported publication feature missing; first source-identity update chose current branch head",
+      "repair": "Refresh and precise update to a07a375e; only that accepted lock is used by final locked/offline process gates"
+    }
+  ],
+  "resources": {
+    "target": "C:\\t\\cargo-targets\\mere",
+    "build_dir": "C:\\t\\cargo-targets\\mere\\build",
+    "consumer_target": "C:\\t\\cargo-targets\\knot-editor",
+    "new_isolated_target": false,
+    "new_cargo_home": false,
+    "temporary_worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-scroll-resident",
+    "reason": "Primary checkout contains unrelated staged receipt removals/replacements and active source changes; integration must preserve them",
+    "cleanup_condition": "Remove the clean temporary worktree and branch after publishing; final closeout reports observed removal"
+  },
+  "retention": "Compact JSON only; no copied logs, binaries, private identities or snapshot captures. Receipts for this slice remain below the shared100MB cap."
+}
