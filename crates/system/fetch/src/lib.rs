@@ -867,7 +867,12 @@ fn smolweb_content_type(url: &url::Url, response: &errand::Response) -> String {
         Some(errand::Scheme::Nex) => "application/x-nex".to_string(),
         Some(errand::Scheme::Guppy) => "application/x-guppy".to_string(),
         Some(errand::Scheme::Titan) => "application/x-titan".to_string(),
-        _ => response.mime().unwrap_or("text/gemini").to_string(),
+        // MIME routing strips parameters only when it compares types. Keep the
+        // complete success value here so response language/charset survive the
+        // host's existing content_type seam.
+        _ => response
+            .mime()
+            .map_or_else(|| "text/gemini".to_string(), |_| response.meta.clone()),
     }
 }
 
