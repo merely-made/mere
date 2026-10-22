@@ -60,7 +60,7 @@ pub fn read_toolbar<State: 'static, Action: 'static, OA: OptionalAction<Action> 
             ReadCommand::Reset,
             text_size == 18 && column_em == 36,
         ),
-        ("Find", "Find in reading", ReadCommand::Find, false),
+        ("Find", "Find in reading", ReadCommand::Find, find.is_none()),
     ] {
         if !text_controls && command != ReadCommand::Find {
             continue;
