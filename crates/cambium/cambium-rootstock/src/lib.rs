@@ -325,6 +325,8 @@ impl A11yReceipt {
         self.0.get()
     }
 }
+mod a11y_owner;
+pub use a11y_owner::A11yOwner;
 mod a11y_provenance;
 mod a11y_queue;
 pub(crate) use a11y_queue::QueuedA11y;
@@ -358,16 +360,18 @@ impl A11yRequest {
     }
 
     /// Bind a publication's document/window subtree and contributors. This retains no
-    /// document or contributor. Platform event generations and host ownership
-    /// are separate: a raw numeric OS ID does not carry this binding by itself.
+    /// document, contributor or host. The owner is the publishing host lifetime;
+    /// a raw numeric OS ID still does not carry an event generation by itself.
     pub fn bind_publication(
         mut self,
+        owner: &A11yOwner,
         dom: &WindowDom<'_>,
         leaves: &LeafRegistry<u64>,
         producers: &ProducerRegistry,
     ) -> Self {
         if self.provenance.is_none() {
             self.provenance = Some(a11y_provenance::A11yProvenance::capture(
+                owner,
                 &self.target,
                 dom,
                 leaves,
@@ -390,13 +394,14 @@ impl A11yRequest {
 
     pub(crate) fn publication_is_current(
         &self,
+        owner: &A11yOwner,
         dom: &WindowDom<'_>,
         leaves: &LeafRegistry<u64>,
         producers: &ProducerRegistry,
     ) -> bool {
         self.provenance
             .as_ref()
-            .is_none_or(|binding| binding.is_current(&self.target, dom, leaves, producers))
+            .is_none_or(|binding| binding.is_current(owner, &self.target, dom, leaves, producers))
     }
 
     /// A request on a DOM node.
@@ -443,11 +448,15 @@ pub trait Accessibility {
     /// `producers` is asked for each texture-producer slot's own semantics
     /// ([`TextureProducer::semantics`]), which a host writes under the slot.
     ///
+    /// `owner` is the publishing host lifetime. Freeze it with publication
+    /// requests; never replace an old request's owner at event dispatch.
+    ///
     /// `dom` is this window's subtree of the document: the whole document for
     /// a single window, its window-root's subtree under a forest.
     #[allow(clippy::too_many_arguments)]
     fn sync(
         &mut self,
+        owner: &A11yOwner,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &LeafRegistry<u64>,

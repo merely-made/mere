@@ -91,3 +91,7 @@ support/family-promotion/diagnostics-publication-*.json -text
 support/family-promotion/diagnostics-audit-integration-*.json -text
 
 support/doc-audit/d2/batch_106_diagnostics_audit_main_integration.md -text
+
+# Owner lifetime receiving preserves the recorded receipt bytes.
+support/family-promotion/diagnostics-owner-*.json -text
+support/doc-audit/d2/batch_107_native_publication_owner_lifetimes.md -text

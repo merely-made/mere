@@ -1032,7 +1032,7 @@ where
         let size = window.inner_size();
         let surface = self.boot_surface(window.clone(), size.width.max(1), size.height.max(1))?;
         let mut a11y = A11yHost::new(self.a11y_waker());
-        a11y.attach(window.clone());
+        a11y.attach(window.clone())?;
         self.s.a11y = Some(Box::new(a11y));
         self.s.files = Some(Box::new(DialogFileChooser));
         self.native_window = Some(window.clone());

@@ -319,6 +319,7 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
 impl Accessibility for DomAccessibility {
     fn sync(
         &mut self,
+        owner: &cambium_rootstock::A11yOwner,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &LeafRegistry<u64>,
@@ -328,7 +329,7 @@ impl Accessibility for DomAccessibility {
     ) -> Vec<A11yRequest> {
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
-        let requests = projection.publication_requests(dom, leaves, producers);
+        let requests = projection.publication_requests(owner, dom, leaves, producers);
         let device = web_sys::window().map_or(1.0, |window| window.device_pixel_ratio());
         let scale = (layout_scale / device) as f32;
         let plan = mirror::plan(&projection, scale);

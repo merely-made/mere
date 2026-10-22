@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-22",
+  "basis": "4fa253865d59adb0b76fc770db631f6de35e9072",
+  "scope": "Host-qualified semantic publication and native ID/reference ownership audit. Fix bounded admission/lifetime issues; document full native remapping and platform lifecycle migrations.",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "diagnostics-owner-native.json",
+    "diagnostics-owner-browser.json",
+    "diagnostics-owner-embedding.json",
+    "diagnostics-owner-qualification.json",
+    "diagnostics-owner-native-window.json"
+  ],
+  "done_conditions": [
+    "Host owner reaches native/browser publication through the shared Accessibility contract.",
+    "Foreign owner with identical live document/mount cannot activate a published request; requeue cannot rebind it.",
+    "Disposed host refuses direct/raw semantic activation; owner tokens retain no host.",
+    "Native ID migration documents full reference and guest boundaries without claiming it fixed.",
+    "Affected native tests and Wasm/embedding compilation pass; failed gates retained.",
+    "Concurrent WIP preserved; committed prior audit pushed; own temporary worktree removed after integration.",
+    "Native attachment rejects another handle without changing the original; the same handle is idempotent, and native host creation propagates attachment errors."
+  ]
+}
