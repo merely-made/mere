@@ -12,6 +12,40 @@ when they use persona-held state.
 
 ## Run
 
+### Explicit Moot site endpoint
+
+Feature `moot-site` adds a local public Gemini endpoint over supplied Gemot and
+Eidetic owners:
+
+```text
+cargo run -p djinn --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
+```
+
+The versioned owners file names `moot_id`, `moot_directory`, `content_database`,
+`retention_revision`, `availability` and `erasure`. Governance is reopened from
+signed genesis. It contains no author signing key. This standalone caller uses
+redb; an embedding supplies existing owner handles to `MootSiteService`.
+
+Stdin accepts one JSON command per line: `configure` with a `SiteBindingV1` and
+`GeminiListenerPolicyV1`, `import` with local signed-record and optional snapshot
+paths, `start`, `status`, `stop`, or `shutdown`. Replies describe success, refusal
+and endpoint status. Import is explicit local delivery, with signature and
+content verification; admission and retention span separate owners and a later
+failure does not roll back facts already admitted. Ordinary requests acquire
+nothing. An empty or ambiguous selection, lost authority or withdrawal refuses
+subsequent requests once the signed updates have been admitted locally.
+
+The binding and TLS identity survive restart. Restart serving requires the
+configured opt-in policy and a currently valid selection. `stop` durably clears
+the running intent; shutdown/EOF joins listener and connection work while
+preserving it. Armillary records actual task outcomes. Local disk I/O and bounded
+snapshot decoding run inline and are not preempted by network deadlines.
+Desktop publishing controls, the main resident broker's owner attachment,
+remote acquisition, hosting promises and Scroll/Micron listeners remain later
+consumer gates. The earlier `djinn-site` snapshot-handoff command stays available.
+
+### Personal resident
+
 ```text
 cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root> \
   --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>

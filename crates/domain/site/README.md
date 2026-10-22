@@ -35,6 +35,17 @@ operation with Gemot's existing collection command and observed heads.
 Anonymous public readers do not need Moot membership. `OpenedSite::page("/")`
 maps to the native index and returns complete native metadata and bytes.
 
+`SiteBindingV1` supplies explicit endpoint policy: pin a contribution, or follow
+a collection with exactly one effective site. `open_binding` observes current
+authority before opening the exact version. Pinning still requires effective
+collection membership; it cannot override withdrawal or revoked authority.
+Following refuses empty or ambiguous collections and never chooses by timestamp.
+
+`publish_public_snapshot` explicitly retains public bytes, authors the signed
+contribution and selects it against observed heads. Optional replacement uses
+existing collection operations. A later refusal returns already-authored
+contribution/operation references; it does not claim those effects rolled back.
+
 Opening is a point-in-time read. Hosts revalidate when their serving policy
 requires current authority. This feature supplies neither a listener nor a
 hosting promise, actor, automatic latest-version rule or cross-Moot signed
