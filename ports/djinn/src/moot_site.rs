@@ -891,6 +891,74 @@ mod tests {
         );
     }
 
+    #[cfg(not(feature = "moot-site-nomadnet"))]
+    #[tokio::test]
+    async fn disabled_nomadnet_backend_refuses_configure_and_saved_descriptor() {
+        use gemot::moot::KeepBound;
+        use muniment::MemoryBackend;
+
+        let directory = tempfile::tempdir().unwrap();
+        let moot = Arc::new(Moot::in_memory(
+            MootId([1; 32]),
+            [2; 32],
+            MootRetentionSettings {
+                revision: serde_json::from_value(
+                    serde_json::json!({ "alg":"Blake3", "bytes":vec![3u8; 32] }),
+                )
+                .unwrap(),
+                availability: AvailabilityPolicy {
+                    promised_floor: KeepBound::Forever,
+                },
+                erasure: ErasurePolicy {
+                    history_ceiling: KeepBound::UntilCheckpoint,
+                },
+            },
+        ));
+        let mut service =
+            MootSiteService::open(directory.path(), moot.clone(), MemoryBackend::new())
+                .await
+                .unwrap();
+        assert!(
+            service
+                .configure_nomadnet(
+                    descriptor().binding.clone(),
+                    NomadNetListenerPolicyV1::default()
+                )
+                .await
+                .unwrap_err()
+                .contains("moot-site-nomadnet")
+        );
+        assert!(service.status().transport.is_none());
+        let saved = Descriptor::NomadNet(NomadNetDescriptor {
+            version: 1,
+            transport: NativeTransport::Nomadnet,
+            binding: descriptor().binding,
+            policy: NomadNetListenerPolicyV1::default(),
+            destination: [8; 16],
+            running: false,
+        });
+        save_json_atomic(&directory.path().join(DESCRIPTOR), &saved).unwrap();
+        assert!(
+            MootSiteService::open(directory.path(), moot, MemoryBackend::new())
+                .await
+                .err()
+                .unwrap()
+                .contains("moot-site-nomadnet")
+        );
+        assert!(
+            !directory
+                .path()
+                .join("published-site-identity.json")
+                .exists()
+        );
+        assert!(
+            !directory
+                .path()
+                .join("moot-site-nomadnet-identity.json")
+                .exists()
+        );
+    }
+
     #[test]
     fn transport_does_not_infer_or_accept_another_profile() {
         assert!(

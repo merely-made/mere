@@ -84,7 +84,6 @@ mod native {
     use rand_core::RngCore;
     use retinue::{
         endpoint::{Endpoint, InboundLinkLimits, ResourceSession, ResourceTransferConfig},
-        hash::AddressHash,
         identity::PrivateIdentity,
         nomadnet::StaticNode,
         request::Request,
@@ -151,6 +150,59 @@ mod native {
     #[cfg(test)]
     mod tests {
         use super::*;
+
+        #[tokio::test]
+        async fn native_interface_capacity_recovers_and_stalled_sessions_meet_deadlines() {
+            for session_deadline in [false, true] {
+                let private = PrivateIdentity::from_secret_bytes(&[0x42; 64]);
+                let peer = *private.public();
+                let destination = StaticNode::new().destination(&peer);
+                let policy = NomadNetListenerPolicyV1 {
+                    max_connections: 1,
+                    request_timeout_ms: if session_deadline { 2_000 } else { 500 },
+                    session_timeout_ms: if session_deadline { 500 } else { 2_000 },
+                    ..Default::default()
+                };
+                let mut running = start(|_| Vec::new(), |_| (), &policy, private).unwrap();
+                running.activate();
+                let first = std::net::TcpStream::connect(running.address).unwrap();
+                let mut refused = std::net::TcpStream::connect(running.address).unwrap();
+                refused
+                    .set_read_timeout(Some(Duration::from_secs(2)))
+                    .unwrap();
+                assert_eq!(std::io::Read::read(&mut refused, &mut [0u8; 1]).unwrap(), 0);
+                drop(refused);
+                drop(first);
+
+                let deadline = std::time::Instant::now() + Duration::from_secs(5);
+                let (client, mut session) = loop {
+                    let client = Endpoint::new(PrivateIdentity::from_secret_bytes(&[0x43; 64]));
+                    let attempt = tokio::time::timeout(Duration::from_millis(500), async {
+                        client.attach_tcp_client(running.address).await?;
+                        client.open_resource(destination, peer).await
+                    })
+                    .await;
+                    if let Ok(Ok(session)) = attempt {
+                        break (client, session);
+                    }
+                    client.close();
+                    assert!(
+                        std::time::Instant::now() < deadline,
+                        "carrier admission must recover after release"
+                    );
+                };
+                let closed =
+                    tokio::time::timeout(Duration::from_secs(3), session.receive_raw_request())
+                        .await
+                        .expect("stalled admitted link must close at its deadline");
+                assert!(closed.is_err());
+                drop(session);
+                client.close();
+                let report = running.close_and_join().unwrap();
+                assert!(report.is_clean());
+                assert!(report.completed >= 1);
+            }
+        }
 
         #[test]
         fn persistent_destination_reopens_and_refuses_key_loss_or_replacement() {
@@ -311,11 +363,6 @@ mod native {
                         tokio::select! {
                             biased;
                             _ = stopped.changed() => break,
-                            accepted = listener.accept() => match accepted {
-                                Ok((stream, _)) if endpoint.interface_count() < usize::from(policy.max_connections) => { endpoint.attach_stream(stream); },
-                                Ok(_) => {},
-                                Err(error) => tracing::warn!(%error, "NomadNet interface accept failed"),
-                            },
                             accepted = endpoint.accept_resource() => {
                                 let Ok(accepted) = accepted else { break; };
                                 if accepted.destination != destination { continue; }
@@ -329,6 +376,12 @@ mod native {
                                     let _ = tokio::time::timeout(Duration::from_millis(policy.session_timeout_ms), serve(accepted.session, reply, refuse, ready, policy)).await;
                                 });
                             }
+                            accepted = listener.accept() => match accepted {
+                                Ok((stream, _)) if endpoint.interface_count() < usize::from(policy.max_connections) => { endpoint.attach_stream(stream); },
+                                Ok(_) => {},
+                                Err(error) => tracing::warn!(%error, "NomadNet interface accept failed"),
+                            },
+
                         }
                     }
                     drop(listener);
