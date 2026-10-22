@@ -23,7 +23,12 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
-- [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints, governed publication and native Gemini resident qualification through existing Eidetic, Gemot, Errand and Armillary owners.
+- [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints, governed publication and native Gemini resident qualification, with wider Errand/smolweb coverage tracked separately for routing, rendering, serving and effects.
+
+Small-web integrations preserve native metadata and keep content, transport and
+host lifecycle separately owned. Ordinary page acquisition and redirects require
+explicit Submit before Titan or Spartan submission exchanges; protocol support
+alone grants no submission authority.
 
 Native shadow-mask admission (2026-10-16): the [browser presentation plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md#native-shadow-mask-admission-continuation-2026-10-16) records the Rootstock producer remapper correction exposed by Woodshed Rehearsal. Translator-owned shadow images retain their keys, physical producer allocations stay below their range, and exact draw boundaries preserve colliding authored IDs. Six focused controls and 307 Rootstock/native-host tests pass with zero failures and six existing ignores; [source and lock receipt](../support/receipts/producer-shadow-20261016/qualification.json). Woodshed's bounded receiving gate passes on Mere `6575075057e`: fourteen reviewed native captures, exact fresh-process Set/voicing reopening, default/narrow controls and final-binary save-refusal close behavior; [receiving closure](../support/receipts/producer-shadow-20261016/woodshed-receiving.json). Physical audio and portable shadow-mask composition remain separate.
 
