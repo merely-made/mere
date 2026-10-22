@@ -17,23 +17,18 @@ file hashes; only Windows GUI source differs. Unix implementation bytes are
 unchanged. `initial-failure/` retains the earlier incomplete run, separately
 from passing evidence.
 
-Reading, governed Scroll and Knot checkpoint changes landed during qualification. They are
-integrated at `12d9efff8fde93de1586434afbc718ce5eee51ad`; `build-inputs.json` records `1117`
+Reading, governed Scroll, Knot checkpoint, optional NomadNet hosting and smolweb MIME changes landed during qualification. They are integrated at
+`c349cea642f0cca0d6a43b6e40d961812446de0b`; `build-inputs.json` records `1117`
 repository inputs and the freshly rebuilt app/host. Affected custody/app tests and
 scripted headed acceptance passed again. The byte-identical Castellan and
-identity-provider gates were reused from their recorded component source cut. Copies of the same native-changed
-vaults then passed additional headed cold reopens with the current binaries.
-`source-joins.json` verifies 107 byte-identical authentication inputs across
-the source cuts, including native UI, custody, storage, endpoints and Dramatis
-source. Human prompt receipts remain explicitly scoped to their recorded
-native source; current integration does not claim another human input round.
-
-The later publication integration at `96a7d76d7089247b432623f3c7135493e38f9b4e`
-adds a disabled optional NomadNet hosting feature. Only two recorded inputs
-differ: Cargo.lock and Djinn’s manifest. `source-equivalence.json` verifies
-1,115 unchanged inputs, unchanged active dependency trees, and the exact
-optional-only metadata differences. Binaries and headed receipts remain bound
-to their actual build source; that metadata integration did not rebuild them.
+identity-provider gates were reused from their recorded component source cut.
+Copies of the same native-changed vaults then passed additional headed cold
+reopens with the current binaries. `source-joins.json` verifies 107 byte-identical
+authentication inputs across the source cuts, including native UI, custody,
+storage, endpoints and Dramatis source. Human prompt receipts remain explicitly
+scoped to their recorded native source; current integration does not claim
+another human input round. All frozen repository inputs match the publication
+archive, without metadata exceptions. The optional hosting feature was not enabled.
 
 | Gate | Result |
 | --- | --- |
@@ -45,6 +40,9 @@ to their actual build source; that metadata integration did not rebuild them.
 | Human native prompts, both formats | 10 reviewed captures; cancellation, retry, acknowledgement and two cold reopens |
 | Current scripted headed flow, both formats | 16 reviewed captures; cancellation, wrong current value, mismatch, empty replacement, retry, acknowledgement and two cold reopens |
 | Current reopen of native-changed vault copies | 2 reviewed captures; two further cold reopens, no input collected |
+
+The scoped software gates total 47 Rust tests (18 current and 29 reused from
+byte-identical components), plus three current Python tests.
 
 All six retained cold reopens rejected the old value, accepted the new one,
 and preserved both master identities and private fixture slots. Acknowledgements
