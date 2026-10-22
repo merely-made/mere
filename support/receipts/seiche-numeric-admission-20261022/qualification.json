@@ -1,0 +1,36 @@
+{
+  "pass": "numeric admission",
+  "native_core_passed": 22,
+  "graphshell_web_passed": 332,
+  "ignored": 6,
+  "red_proof": "1e300 bound as infinite runtime Mix weight before fix",
+  "field_placements": [
+    "root mix",
+    "root grouping",
+    "target anchored pull",
+    "damping",
+    "mix stage under root schedule",
+    "grouped stage under root schedule"
+  ],
+  "host_path": "actual v4 codicil export/open; no graph, session, Canvas geometry or saved-facet mutation on refusal",
+  "roundtrip_values": [
+    "zero",
+    "minimum positive f32 subnormal",
+    "exact authored 0.1"
+  ],
+  "build_settings": {
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "locked": true,
+    "offline": true
+  },
+  "limits": [
+    "Native focused gates; later passes compile the same admission in Wasm",
+    "No raw execution/checkpoint/render/runnability expansion"
+  ],
+  "resolved_diagnostics": [
+    "Locked dependency fetch filled missing pinned Knot cache without lockfile changes",
+    "One host-test borrowed JSON comparison corrected before final green gate"
+  ]
+}

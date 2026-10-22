@@ -1,0 +1,14 @@
+{
+  "base": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+  "source_sha256": {
+    "Cargo.toml": "0d91398fe21da2925a20b2dd7c2df41f101bd7694786bdfcfab61580ce7e7d23",
+    "Cargo.lock": "3e5d6a0e5e51426b7f556065b567c5b0d2e4e0f64760d3dc67f218c5f5402656",
+    "crates/canvas/pictograph/Cargo.toml": "9120afcd97d8a1aeeb12af16d08eea7b29afae7fcee0ea14a8e02ef31ab9b6bc",
+    "crates/canvas/pictograph/src/canvas/dynamics_spec.rs": "682f992a19c107a661300d535cecc6cfa72422cbe499feaa40e971b8201df517",
+    "crates/canvas/pictograph/src/canvas/physics_controls.rs": "71eda895d0036f23b94dd960751816d7738b3ec00236a4bc468e8062d284f632",
+    "crates/canvas/pictograph/src/canvas/tests/binding.rs": "4a17d399d0083b180b7a4c4342de27889db6520f5e89c3a9ce11ec0cfdb31c60",
+    "ports/graphshell/src/canvas_physics_tests.rs": "21cd9e217e2406c74903419429d29911dfc9cb181025f896b9e6d6271074424c",
+    "crates/conatus/seiche/src/spec.rs": "3bc1702cf2c3166e78f209eca033e5975dd52046eee381a57fe55c32ad8a08af",
+    "crates/conatus/seiche/src/weighted.rs": "73142b93fba2b509fb429b7fcdcc15111683c92c1fe146db7821f417cf1e4fc8"
+  }
+}
