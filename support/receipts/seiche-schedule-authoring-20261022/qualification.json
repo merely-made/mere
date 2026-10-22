@@ -1,0 +1,19 @@
+{
+  "qualified": true,
+  "core_tests": 28,
+  "graphshell_tests": 333,
+  "graphshell_ignored": 6,
+  "positive_scenario": "ok",
+  "expected_negative_failures": [
+    "FAIL: assert snap actual-schedule-stage Eq '1': got '0'"
+  ],
+  "browser_scope": "In-page v4 save/reopen/resave on current compiled WebGPU product; no browser-restart durability claim.",
+  "native_scope": "Stage transition/capture, source and role edits retaining paused progress, refusal, exact v4 dynamics roundtrip.",
+  "diagnostic_attempt": "Initial scenario redundantly toggled the already-open Scenes and transfers closed; preserved under /Users/markik/Code/output/mere-seiche-three-passes-20261022/schedule/browser. Corrected navigation rerun on fresh port8785. No product code changed for this correction.",
+  "excluded": [
+    "raw-term execution",
+    "checkpoint restoration/design",
+    "render dependency narrowing"
+  ],
+  "primary_preserved": true
+}
