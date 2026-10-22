@@ -1,0 +1,50 @@
+{
+  "receipt": "diagnostics-lifetimes-integrated-native.json",
+  "receipt_sha256": "51bb2c51f378c3904f01b90d91461450c47d61c333aa5bf3096c358cb2814173",
+  "basis": "60daf11dc",
+  "passed": 270,
+  "ignored": 7,
+  "executed_binaries": [
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe",
+      "sha256": "69cdb1fcfcb233d47bef7fa63f455ec92090ca810ea83e892126f65cea32d7a0",
+      "bytes": 19909120
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe",
+      "sha256": "089a225d46f5fcdb41e6ae8f22ad767f923100ffdee77f9b45d9c5f7faf35773",
+      "bytes": 36676096
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe",
+      "sha256": "58dbb5ba3f049ef106e96ed9e27b8308e5d0f9f57726a91e989bd657993e9963",
+      "bytes": 16780800
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe",
+      "sha256": "d084df814ae00d53196b51ac72b6450c7442ba4c4a617682751cbfbc3804622c",
+      "bytes": 16345088
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe",
+      "sha256": "25c4ca20f13658c48dfdd1529e96c41b130c992e3e9a661693562b6aba791235",
+      "bytes": 41666560
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe",
+      "sha256": "0eda1777d690304404511e9c557b12e1258c5ab1bb7424563359cc17ca681d96",
+      "bytes": 17850368
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe",
+      "sha256": "ad72bcd6746d0d5c5092fee39b1dca324afe7e3810f84ce908eafa726e9e9f0b",
+      "bytes": 17552384
+    },
+    {
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe",
+      "sha256": "1477907b12fa0151cb910a441551af05ea0f855204e4904f155cae273030ea1c",
+      "bytes": 39027712
+    }
+  ],
+  "source_seal": "diagnostics-lifetimes-integrated-source.json"
+}

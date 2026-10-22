@@ -1,0 +1,13 @@
+{
+  "scope": "Separate upstream dependency repair, not additional action-lifetime test coverage",
+  "upstream_commit": "4a69ec4d6",
+  "receipt": "support/receipts/ownership-repair/l1/2026-10-20_l1_receipt.json",
+  "receipt_sha256": "cdba7fc0dddd246b05c8d5f9550da72feb24ebe80ce0a249eb07a81f0b40637d",
+  "native_tests_reported_upstream": 474,
+  "failed_reported_upstream": 0,
+  "current_dependency_blobs_equal_upstream": {
+    "crates/graph/graph-kernel/src/graph/snapshot/from.rs": "10e01516efdbcec6c0865eb27e6eaec54eed648c",
+    "crates/graph/graph-kernel/src/graph/snapshot/tests.rs": "892655ac848b7cfd3c7f6e9da99bca60932f83a7"
+  },
+  "dependency_boundary": "graph-kernel is reached through native-host workbench development fixtures; Rootstock normal runtime sources/manifests are unchanged. The upstream snapshot test cohort remains separately attributable."
+}

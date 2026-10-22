@@ -1,0 +1,34 @@
+{
+  "basis": "e1412c46d31f68e16219b574aed03ad44a65ec4e",
+  "incoming_main": "53b115c6deb4160ccea02852751c44a167aa05f4",
+  "prior_qualified_basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f",
+  "implementation_commit": "8d4864d91",
+  "source_sha256": {
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "9afa08fcb6febfa2982c0d354fef1b429dac8997f25420a8ea9a9d81647ab4d0",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "8850ac7bc1d76d8ce959417af6366f4a7871bba870de4861af21bc9d198a9a1e",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "95de1c0ca0dbe6b8a908266126f8011bb3cd2f0159a48f1ad18d8807393da454",
+    "crates/cambium/cambium-rootstock/src/host.rs": "ac1c191bbba48ca761d727aa345a77600c1f2f6991000a3f7dc43aa080b94774",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "c08632320e6a1836e0f7b2e47e83043a31532ebd541ac0f4b26da181827ee50b",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "8d03c663befe74f5d68f61a0512833cfc7db41c66258811446a42bf8ef5c76e9",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "f18b02c66aa01ec53fe36445e45feec5538dae9e62eeda8b6efcc770add7fa2e",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "ced7697b06b5cd8dfe051350dc56fc2732cd7a956db9b6184857feb671c9328c",
+    "Cargo.lock": "d57960fb2d6ef8886378e205ced0f1c157eafb2d475424bb62f16e310df2ee59",
+    "Cargo.toml": "ff97806c858252765af770f33dc0ea29a1df1ae44068a8bd169479a5ef471fd7",
+    "rust-toolchain.toml": "9e29b10e80f6eaa21b6855ab8bbf647ff0c8f6f001830248031bdee898de795b",
+    "support/family-promotion/gate.py": "a4650434b45d57f4e9984194b1fac948c386ebb8ce995fa19b7b10d21501ca8b",
+    "crates/graph/graph-kernel/src/graph/snapshot/from.rs": "d42ec1eea20fc843a28916f9d26c311d28d5ff221a2e5428c219831de7525d6f",
+    "crates/graph/graph-kernel/src/graph/snapshot/tests.rs": "8f680f3610e4dd9d96ea1067c7dfe5455a13a9dacab12df7705e31e26094f985"
+  },
+  "diagnostic_implementation_unchanged": true,
+  "changed_dependency_sources": [
+    "crates/graph/graph-kernel/src/graph/snapshot/from.rs",
+    "crates/graph/graph-kernel/src/graph/snapshot/tests.rs"
+  ],
+  "reason": "Main advanced with Q013 graph snapshot loading and residue-verdict repairs while integration ran. Qualified runtime code/lock unchanged; receive changed dependency with six focused lifetime controls and Wasm/embedding compile, preserving the earlier 270-test cohort.",
+  "required_gates": [
+    "diagnostics-lifetimes-main-controls.json",
+    "diagnostics-lifetimes-main-browser.json",
+    "diagnostics-lifetimes-main-embedding.json"
+  ],
+  "retained_byte_cap": 10000000
+}
