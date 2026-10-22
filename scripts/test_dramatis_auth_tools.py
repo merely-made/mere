@@ -18,6 +18,34 @@ spec.loader.exec_module(freeze)
 
 
 class AuthenticationArtifactTests(unittest.TestCase):
+    def test_generated_build_sources_inside_the_checkout_are_separate_from_tracked_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory).resolve()
+            roots = {"build": repo / "target/build", "artifacts": repo / "target"}
+            self.assertEqual(
+                freeze.classify_build_input(repo / "src/lib.rs", repo, {"src/lib.rs"}, roots),
+                ("repository", "src/lib.rs"),
+            )
+            self.assertEqual(
+                freeze.classify_build_input(repo / "target/build/debug/build/crate/out/lib.rs", repo, set(), roots),
+                ("generated", "build/debug/build/crate/out/lib.rs"),
+            )
+            with self.assertRaisesRegex(AssertionError, "untracked repository build input"):
+                freeze.classify_build_input(repo / "src/untracked.rs", repo, set(), roots)
+
+    def test_external_generated_inputs_are_recorded_and_overbroad_build_roots_are_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory).resolve()
+            repo = base / "repo"
+            roots = {"build": base / "cache/build", "artifacts": base / "cache"}
+            self.assertEqual(
+                freeze.classify_build_input(base / "cache/build/debug/build/crate/out/lib.rs", repo, set(), roots),
+                ("generated", "build/debug/build/crate/out/lib.rs"),
+            )
+            self.assertIsNone(freeze.classify_build_input(base / "registry/lib.rs", repo, set(), roots))
+            with self.assertRaisesRegex(AssertionError, "build root contains repository"):
+                freeze.classify_build_input(repo / "src/untracked.rs", repo, set(), {"build": base})
+
     def test_windows_drive_paths_keep_their_backslashes_and_make_escaped_spaces(self):
         source = r"C:\t\app.exe: C:\Users\mark_\main.rs C:\Program\ Files\café\lib.rs" + "\n"
         self.assertEqual(

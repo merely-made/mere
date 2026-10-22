@@ -24,6 +24,19 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def classify_build_input(path, repo, tracked, build_roots):
+    """Keep generated cache inputs separate without accepting untracked source."""
+    relative = path.relative_to(repo).as_posix() if path.is_relative_to(repo) else None
+    if relative in tracked:
+        return "repository", relative
+    for label, root in build_roots.items():
+        assert root != repo and not repo.is_relative_to(root), "build root contains repository source"
+        if path.is_relative_to(root):
+            return "generated", label + "/" + path.relative_to(root).as_posix()
+    assert relative is None, ("untracked repository build input", relative)
+    return None
+
+
 def depfile_sources(source):
     """Read rustc's Make escapes without treating Windows separators as escapes."""
     rule = source.replace("\\\n", " ").splitlines()[0]
@@ -122,13 +135,22 @@ def main():
             depfile = args.build_dir / "debug/deps" / (stem + ".d")
             if depfile.is_file():
                 depfiles.add(depfile)
+    tracked = set(run("git", "ls-files").splitlines())
+    build_roots = {"build": args.build_dir.resolve(), "artifacts": args.artifacts.resolve()}
+    generated = {}
     for depfile in depfiles:
         for name in depfile_sources(depfile.read_text(encoding="utf-8")):
             path = Path(name)
             path = (path if path.is_absolute() else repo / path).resolve()
-            if path.is_relative_to(repo) and path.is_file():
-                files.add(path.relative_to(repo).as_posix())
-    tracked = set(run("git", "ls-files").splitlines())
+            if not path.is_file():
+                continue
+            entry = classify_build_input(path, repo, tracked, build_roots)
+            if entry is not None:
+                kind, name = entry
+                if kind == "repository":
+                    files.add(name)
+                else:
+                    generated[name] = sha(path)
     assert files <= tracked, ("untracked repository build inputs", sorted(files - tracked))
 
     metadata = json.loads(run(cargo, "+" + args.toolchain, "metadata", "--locked", "--offline", "--format-version", "1"))
@@ -164,6 +186,8 @@ def main():
         }
     value = {"source_commit": run("git", "rev-parse", "HEAD"), "build_info": info,
              "files": {name: sha(repo / name) for name in sorted(files)}, "binaries": binaries,
+             "generated_build_inputs": {"roots": {name: str(root) for name, root in build_roots.items()},
+                                        "files": dict(sorted(generated.items()))},
              "git_suppliers": suppliers, "uncompiled_external_path_packages": external_paths,
              "rustc": run(compiler, "+" + args.toolchain, "-Vv"), "depfiles_read": len(depfiles),
              "supplier_scope": "Resolved Git checkouts; tracked Rust/TOML/lock/WGSL/C/C++ only. Untracked and asset-only supplier changes excluded.",
