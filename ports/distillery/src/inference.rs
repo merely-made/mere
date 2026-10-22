@@ -59,6 +59,7 @@ mod gpu;
 #[cfg(feature = "inference-gpu")]
 pub use gpu::{
     discrete_gpu_inference_device, open_gpu_library_lane, open_gpu_library_lane_with_journal,
+    open_gpu_library_lane_with_journal_and_cache,
 };
 
 #[cfg(feature = "inference-model")]

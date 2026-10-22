@@ -76,10 +76,9 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
     let (base_model_ref, tokenizer_ref, corpus_ref, row) = {
         let mut store = muniment::RedbBackend::open(&path).unwrap();
         let (model, tokenizer, corpus) = author_fixture(&mut store, "inference-reclaim").await;
-        let mut template = PromptTemplate::from_bytes(include_bytes!(
-            "fixtures/esp/smollm2-instruct-v1.json"
-        ))
-        .unwrap();
+        let mut template =
+            PromptTemplate::from_bytes(include_bytes!("fixtures/esp/smollm2-instruct-v1.json"))
+                .unwrap();
         template.system_prompt.clear();
         template.bos.clear();
         template.user.prefix.clear();
@@ -99,6 +98,7 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
         embedding: None,
         recall: Default::default(),
         model: InferenceModelSettings::Library {
+            weight_cache: None,
             row: row.to_string(),
             device: InferenceDeviceSettings::Gpu,
             max_tokens: 4,
