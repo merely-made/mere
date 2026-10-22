@@ -9,6 +9,7 @@ fn published(host: &Host<u32, CounterLogic, CounterChild>, request: A11yRequest)
     let runner = host.s.runner.as_ref().unwrap();
     let dom = runner.dom();
     request.bind_publication(
+        &crate::A11yOwner::new(&host.s.a11y_owner),
         &WindowDom::new(&dom.borrow(), runner.mount()),
         &host.s.shared.leaves,
         &host.s.shared.producers,
@@ -176,4 +177,76 @@ fn publication_binding_refuses_leaf_replacement_and_retains_mutable_updates() {
         .set_value(2.);
     assert!(current.same_publication_target(&published(&host, request)));
     assert_eq!(host.apply_a11y_requests(&[current]), [D::Dispatched]);
+}
+
+#[test]
+fn publication_owner_cannot_follow_identical_document_and_mount_to_another_host() {
+    let mut first = counter_host();
+    let node = first.s.runner.as_ref().unwrap().focusables()[0];
+    let raw = A11yRequest::node(crate::A11yAction::Click, node);
+    let old = published(&first, raw.clone());
+    let mut second = counter_host();
+    // Transfer the actual runner/document/mount and layout, so only host owner
+    // changes. Contributor or document rejection cannot mask the owner check.
+    second.s.runner = first.s.runner.take();
+    second.s.layout = first.s.layout.take();
+    assert!(first.s.a11y_owner.get(), "old owner still lives");
+    assert_eq!(
+        second.apply_a11y_requests(&[old.clone()]),
+        [D::Rejected(R::StaleTarget)]
+    );
+    let queued = defer_lifetime_request(&mut second, old.clone());
+    second.drain_pointer();
+    assert_eq!(queued.result(), Some(D::Rejected(R::StaleTarget)));
+    assert_eq!(*second.s.runner.as_ref().unwrap().state(), 0);
+    let current = published(&second, raw);
+    assert!(!old.same_publication_target(&current));
+    assert_eq!(second.apply_a11y_requests(&[current]), [D::Dispatched]);
+    assert_eq!(*second.s.runner.as_ref().unwrap().state(), 1);
+}
+
+#[test]
+fn disposed_host_refuses_direct_bound_and_raw_actions_and_stops_publication() {
+    let mut host = counter_host();
+    let samples = Rc::new(RefCell::new(Vec::new()));
+    host.s.a11y = Some(Box::new(Recording(samples.clone())));
+    host.sync_a11y();
+    let node = host.s.runner.as_ref().unwrap().focusables()[0];
+    let raw = A11yRequest::node(crate::A11yAction::Click, node);
+    let bound = published(&host, raw.clone());
+    let guard = host.take_disposal();
+    assert!(
+        host.s.runner.is_some() && host.s.layout.is_some(),
+        "retained CPU state is still present"
+    );
+    assert_eq!(
+        host.apply_a11y_requests(&[raw, bound]),
+        [D::Rejected(R::Cancelled), D::Rejected(R::Cancelled)]
+    );
+    assert_eq!(*host.s.runner.as_ref().unwrap().state(), 0);
+    assert!(host.sync_a11y().is_empty());
+    assert_eq!(samples.borrow().len(), 1, "disposed host cannot republish");
+    drop(guard);
+}
+
+#[test]
+fn publication_owner_is_weak_and_disposal_ends_it_even_with_a_retained_marker() {
+    let mut host = counter_host();
+    let marker = host.s.a11y_owner.clone();
+    let owner = crate::A11yOwner::new(&marker);
+    let strong = Rc::strong_count(&marker);
+    let node = host.s.runner.as_ref().unwrap().focusables()[0];
+    let request = published(&host, A11yRequest::node(crate::A11yAction::Focus, node));
+    assert_eq!(Rc::strong_count(&marker), strong);
+    assert!(owner.is_live());
+    assert!(request.same_publication_target(&published(&host, request.clone())));
+    let guard = host.take_disposal();
+    assert!(!owner.is_live());
+    drop(host);
+    drop(guard);
+    assert!(!owner.is_live());
+    assert_eq!(Rc::strong_count(&marker), 1);
+    drop(request);
+    drop(marker);
+    assert!(!owner.is_live());
 }

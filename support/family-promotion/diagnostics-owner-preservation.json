@@ -1,0 +1,27 @@
+{
+  "staged_paths": [
+    "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md",
+    "support/doc-audit/d2/batch_103_diagnostics_target_lifetime_receiving.md",
+    "support/family-promotion/diagnostics-lifetimes-integrated-browser.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-docs.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-embedding.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-native-evidence.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-native.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-qualification.json",
+    "support/family-promotion/diagnostics-lifetimes-integrated-source.json",
+    "support/family-promotion/diagnostics-lifetimes-main-browser.json",
+    "support/family-promotion/diagnostics-lifetimes-main-controls.json",
+    "support/family-promotion/diagnostics-lifetimes-main-docs.json",
+    "support/family-promotion/diagnostics-lifetimes-main-embedding.json",
+    "support/family-promotion/diagnostics-lifetimes-main-qualification.json",
+    "support/family-promotion/diagnostics-lifetimes-main-source.json",
+    "support/family-promotion/diagnostics-lifetimes-main-upstream.json",
+    "support/family-promotion/diagnostics-ownership-review.json"
+  ],
+  "original_staged_delta_unchanged": true,
+  "nonowned_working_files_hash_verified": 79,
+  "canonical_additions": "Only new top owner section and additive owner ledger continuation; original staged canonical intent verified.",
+  "concurrent_djinn_source": "Retained through merged/pushed main; no Djinn paths edited.",
+  "temporary_worktree": "C:/Users/mark_/Code/worktrees/mere-publication-ownership; required by staged-index collision; removed after integration.",
+  "outputs": "Reused existing C:/t/cargo-targets/mere; no isolated target/home."
+}

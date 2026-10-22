@@ -1,0 +1,89 @@
+{
+  "captured": "2026-10-22T23:42:42.251787+00:00",
+  "binaries": [
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-c2224cc0fb88b1fb.exe",
+      "sha256_at_receipt_close": "ca06a893e11bcddce97bf6b7d519102ac9c7742b21cb1ca41ac158bd7b3e0380",
+      "bytes": 20709888
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-b2a5d6d8a7272f54.exe",
+      "sha256_at_receipt_close": "d5a258e7dc7b0bb629dd73e129e3378ab5044178cf034fdfa2deb2ad7067e613",
+      "bytes": 36849152
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-819f89b6137cba87.exe",
+      "sha256_at_receipt_close": "2148f6627cb143db82b32893df93debc03b4b0bc00058cf55994fcb7fa03677a",
+      "bytes": 16904192
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-307ed8d359d35f3e.exe",
+      "sha256_at_receipt_close": "66a44e839998e0dce69e8bfb7e71fc659110d96fafed79ffebe6f2297c9b3e60",
+      "bytes": 16462848
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-cd9828bf85067e40.exe",
+      "sha256_at_receipt_close": "e1eb7d9dd4d1fc361bb14ae67dbe309e59d4cd9adc93c2807117b428aa69bc86",
+      "bytes": 41736192
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-6d72c731b3f4ab7a.exe",
+      "sha256_at_receipt_close": "9d1c0aaf05607271029c594d24ae0560a9ba97b154a03dd6c31a22021ae1b0e6",
+      "bytes": 18698752
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-df1e5473a0145524.exe",
+      "sha256_at_receipt_close": "69213a9d2b890bfb38fe47a9f7c5e0a8707606d84e0272b98abd56eb988ba87f",
+      "bytes": 17564160
+    },
+    {
+      "gate": "native-final",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-51a4de650d4099b7.exe",
+      "sha256_at_receipt_close": "2bd22b14f8ebbdf4b3ec1a904024ff580e4faf9c0ff57cd2a309f5acfc9285f4",
+      "bytes": 39051776
+    },
+    {
+      "gate": "native-window",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-6b57ad17ffab1256.exe",
+      "sha256_at_receipt_close": "722d8f94b218a15fde9386ab76bced6a42160ec4038f9a3ad39b232c1be369ff",
+      "bytes": 36638208
+    },
+    {
+      "gate": "native-window",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-c5dc3afe4dd30676.exe",
+      "sha256_at_receipt_close": "95f1511715cfd30702ee499691de53627294420018edcee2788d01caccddea6d",
+      "bytes": 16810496
+    },
+    {
+      "gate": "native-window",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-06b7824497c633b4.exe",
+      "sha256_at_receipt_close": "f071303626af834b7e2d0e175b1811f53e370ce90659d4cfeea5a955cacd9a49",
+      "bytes": 16372736
+    },
+    {
+      "gate": "native-window",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-bf1e013afeb17e92.exe",
+      "sha256_at_receipt_close": "249e8b8b13e6b92cca0fdbd89faebbc52e17823ca974163bcb7f55983fe06bbf",
+      "bytes": 18721280
+    },
+    {
+      "gate": "native-window",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-105706c98c68edee.exe",
+      "sha256_at_receipt_close": "7cc654a8de7f4be52f4403e1d8bf8acfd6ef68cee59a503152bf3ceb40371721",
+      "bytes": 17566720
+    },
+    {
+      "gate": "product",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-222f9576f0cf0b7f.exe",
+      "sha256_at_receipt_close": "12db625662ceee58795a1c7bb65f5cfa2772dd1996a14a634af9929d781e1e08",
+      "bytes": 92166144
+    }
+  ]
+}

@@ -41,6 +41,7 @@ impl SemanticProjection {
     /// when an event arrives. The action is supplied by the event later.
     pub fn publication_requests(
         &self,
+        owner: &crate::A11yOwner,
         dom: &crate::WindowDom<'_>,
         leaves: &LeafRegistry<u64>,
         producers: &ProducerRegistry,
@@ -59,7 +60,7 @@ impl SemanticProjection {
                     crate::A11yRequest::produced(crate::A11yAction::Focus, target.clone()),
                 )
             }))
-            .map(|(id, request)| (id, request.bind_publication(dom, leaves, producers)))
+            .map(|(id, request)| (id, request.bind_publication(owner, dom, leaves, producers)))
             .collect()
     }
     /// Actual DOM membership, supplied by composition rather than inferred

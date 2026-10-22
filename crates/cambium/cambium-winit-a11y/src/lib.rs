@@ -49,6 +49,7 @@ pub use cambium_rootstock::{A11yAction, A11yRequest, A11yTarget, Accessibility};
 impl Accessibility for A11yHost {
     fn sync(
         &mut self,
+        owner: &cambium_rootstock::A11yOwner,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &LeafRegistry<u64>,
@@ -56,7 +57,7 @@ impl Accessibility for A11yHost {
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
-        self.sync_inner(dom, layout, leaves, producers, focus, layout_scale)
+        self.sync_inner(owner, dom, layout, leaves, producers, focus, layout_scale)
     }
 }
 
@@ -111,6 +112,7 @@ impl A11yHost {
     /// tree, so a stale id never points the reader at nothing.
     fn sync_inner(
         &mut self,
+        owner: &cambium_rootstock::A11yOwner,
         dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &LeafRegistry<u64>,
@@ -135,7 +137,7 @@ impl A11yHost {
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
         let next = projection
-            .publication_requests(dom, leaves, producers)
+            .publication_requests(owner, dom, leaves, producers)
             .into_iter()
             .map(|(id, request)| (A11yNodeId(id), request))
             .collect();
@@ -166,11 +168,13 @@ impl A11yHost {
 
     /// Give the host the window AccessKit installs against.
     ///
-    /// Call once, as soon as the window exists. Before this the host projects
-    /// nothing; after it, the first [`sync`](Accessibility::sync) installs the
-    /// tree and reveals the window.
-    pub fn attach(&mut self, window: std::sync::Arc<Window>) {
-        self.window = Some(window);
+    /// Call as soon as the window exists. Reattaching the same handle is
+    /// harmless; another window requires a fresh host. Refusal leaves the
+    /// original window and installed adapter together. Before attachment the
+    /// host projects nothing; the first [`sync`](Accessibility::sync) then
+    /// installs the tree and reveals the window.
+    pub fn attach(&mut self, window: std::sync::Arc<Window>) -> Result<(), String> {
+        attach_window(&mut self.window, window)
     }
 
     /// Map a raw AccessKit request to a typed one against the tree that was
@@ -218,6 +222,22 @@ impl A11yHost {
         request.action = action;
         Some(request)
     }
+}
+
+fn attach_window<W>(
+    current: &mut Option<std::sync::Arc<W>>,
+    requested: std::sync::Arc<W>,
+) -> Result<(), String> {
+    if let Some(window) = current {
+        if !std::sync::Arc::ptr_eq(window, &requested) {
+            return Err(
+                "accessibility host already owns another window; create a fresh host".into(),
+            );
+        }
+    } else {
+        *current = Some(requested);
+    }
+    Ok(())
 }
 
 /// Project a laid-out Cambium document into an AccessKit tree, with no window
