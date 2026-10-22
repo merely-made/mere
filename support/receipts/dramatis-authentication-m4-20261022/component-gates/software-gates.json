@@ -1,0 +1,52 @@
+{
+  "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16",
+  "commands": [
+    {
+      "name": "storage-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "castellan",
+        "--features",
+        "keeper",
+        "--lib",
+        "passphrase",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 67.23267312499999,
+      "passed": 26,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "provider-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "djinn",
+        "--lib",
+        "identity_ui::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 82.32715616699998,
+      "passed": 4,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    }
+  ],
+  "reason": "Storage and native-provider sources/tests are byte-identical; current custody/app and headed integration run again."
+}

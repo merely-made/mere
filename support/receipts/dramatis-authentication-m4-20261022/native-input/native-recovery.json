@@ -1,0 +1,12 @@
+{
+  "original_failure": [
+    "native presentation stalled for 60000 ms (4873 redraws, 1207 presented frames)"
+  ],
+  "native_change_acknowledged_before_failure": true,
+  "original_frozen_app_and_host_absent": true,
+  "stale_marker_files_removed_after_process_exit": [
+    "portable/ready",
+    "portable/stop"
+  ],
+  "recovery": "Cold reopen the same native-changed synthetic vaults without collecting input"
+}

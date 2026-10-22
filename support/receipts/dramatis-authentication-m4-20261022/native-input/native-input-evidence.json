@@ -1,0 +1,83 @@
+{
+  "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "both_native_changes_acknowledged": true,
+  "both_recovered_cold_reopens_passed": true,
+  "old_rejected_new_accepted": true,
+  "identities_and_private_slots_preserved": true,
+  "original_portable_scenario_passed": false,
+  "original_portable_presentation_error": [
+    "native presentation stalled for 60000 ms (4873 redraws, 1207 presented frames)"
+  ],
+  "no_owned_app_or_host_processes": true,
+  "captures": [
+    {
+      "path": "native/sealed/before.png",
+      "sha256": "41c87443e7113a3b2d926b82ae6486257d2c7c812ee9ef416f5fc7ba3dc629b0",
+      "classification": "passing native scenario"
+    },
+    {
+      "path": "native/sealed/cold-reopened.png",
+      "sha256": "08fc56edf999cca076ebffb01e259da52b8fa0b9ec2c3fa33a29ba0df9503923",
+      "classification": "passing native scenario"
+    },
+    {
+      "path": "native/sealed/cancelled.png",
+      "sha256": "f5d2e47d9849e1d415f34435927474f63cb5304e5083e8842bdc36df47128cf8",
+      "classification": "passing native scenario"
+    },
+    {
+      "path": "native/sealed/changed.png",
+      "sha256": "a94fa06bafe3325ea07fce0c9d04f7276ccafdf367e6fa452f67b1952292b1d3",
+      "classification": "passing native scenario"
+    },
+    {
+      "path": "native/sealed/acknowledged-after-refresh.png",
+      "sha256": "7209528874aba169bf0dfad22315f7cee7df13da19faff5c36cba872625bda12",
+      "classification": "passing native scenario"
+    },
+    {
+      "path": "native-cold/sealed/cold-reopened.png",
+      "sha256": "f798aea2e07c98ef5df965276de85587238b2e214705469d7d0861080dc7a72b",
+      "classification": "passing recovered native cold reopen"
+    },
+    {
+      "path": "native/portable/before.png",
+      "sha256": "9a4e90f0cc4aeedda3704ce78efd905f8be068e00d025edacd80e9cf96ce9100",
+      "classification": "checkpoint in interrupted presentation scenario"
+    },
+    {
+      "path": "native/portable/cancelled.png",
+      "sha256": "3fa4247d141744dfdc271c275c8e60fc81d4db97f49d37568af8898d6838833f",
+      "classification": "checkpoint in interrupted presentation scenario"
+    },
+    {
+      "path": "native/portable/changed.png",
+      "sha256": "627718901e9eb741a597681641d72461e7de17e8bf0be044eebb15953d461e65",
+      "classification": "checkpoint in interrupted presentation scenario"
+    },
+    {
+      "path": "native-cold/portable/cold-reopened.png",
+      "sha256": "280aa68bb110f44fe5b0d822d9cc03dc52d6c741d7464aac9465e08eabd5d5b3",
+      "classification": "passing recovered native cold reopen"
+    }
+  ],
+  "native_changed_encrypted_files": {
+    "sealed/vault/passphrase-root.json": {
+      "sha256": "9e9a8f8df8316b1607392e716771b29bb777aeec4b40670ae3f7ae71b47b25b0",
+      "bytes": 364
+    },
+    "sealed/vault/profiles/d7794f6d361f411d44237771f4d4f9aad74e442e8055ca75eada32c270e5ce4b.json": {
+      "sha256": "053bdddd831bcdd87978040c6060e457029bd0657156629b7a6cc22edc415c43",
+      "bytes": 1832
+    },
+    "sealed/vault/profiles/9456b757701dbeb0d154659e41b3251b1f70400b61866ae8f5fce5228fa9be99.json": {
+      "sha256": "43c336d65542c533848422bc0e24774d77fde034a7ebff29cdea60f1f75e35be",
+      "bytes": 1853
+    },
+    "portable/vault.json": {
+      "sha256": "5289a2a82bd3b513d9909b15c4a95fba2061518a62346cdc3213eaac52a33b66",
+      "bytes": 3538
+    }
+  },
+  "scope": "Native input/change evidence and recovered cold reopens. The interrupted portable seed presentation is retained as a failure, not claimed as a passing complete scenario."
+}

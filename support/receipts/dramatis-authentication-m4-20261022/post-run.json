@@ -1,0 +1,420 @@
+{
+  "source": "8d8f7baff76e9d484106134c213fd9c89316f6e1",
+  "capture_files": [
+    {
+      "path": "scripted/sealed/cold-reopened.png",
+      "sha256": "08fc56edf999cca076ebffb01e259da52b8fa0b9ec2c3fa33a29ba0df9503923",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "8941",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/before.png",
+      "sha256": "38d854641558f463ec3f2f9137b3685c79a8c51e09c7bfe4352765b5239647ac",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/cancelled.png",
+      "sha256": "998e9f406e50828f4f3237f2f6f7f5a3b6a4c63bbcb9bb6504095c969839f3c6",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/wrong-current.png",
+      "sha256": "a8192debb44087c9338eff5af27b377027cb29b0f392b8818d22824befededc3",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/mismatch.png",
+      "sha256": "52e593005bae67e618868e69cafc7cd59a7dd06b57d35c70346bb244e5057482",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/empty.png",
+      "sha256": "3704136bc82e48eb581bc619633e0a37a5e1b0938684556820ddff29fe00fd12",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/changed.png",
+      "sha256": "45428d79b39b5084bc54efb67fd15338b2ea47a580c37666fc64bf7f81a6be63",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/sealed/acknowledged-after-refresh.png",
+      "sha256": "369d885f9289b6a9145165ac2d3ee8a2d52340766d5922033fd950e24046f4a1",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "8917",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/cold-reopened.png",
+      "sha256": "08fc56edf999cca076ebffb01e259da52b8fa0b9ec2c3fa33a29ba0df9503923",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "8965",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/before.png",
+      "sha256": "38d854641558f463ec3f2f9137b3685c79a8c51e09c7bfe4352765b5239647ac",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/cancelled.png",
+      "sha256": "0227a72c2ec40289e1d24a51cf67a3c8606a38d980a7ad0c35bb989fd0d1635a",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/wrong-current.png",
+      "sha256": "41b492c104d3de4520784c8cf89048334780e7ed5cc48603c26528dac7e7845e",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/mismatch.png",
+      "sha256": "618eb0375f57363adf5e93b9b4b6e0e8b2d7ab0f6254943c11f60ca7331e996d",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/empty.png",
+      "sha256": "4c72d4e139dc437197ae16e06842dae83532b07effaa8bfd30175141150eea3f",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/changed.png",
+      "sha256": "a94fa06bafe3325ea07fce0c9d04f7276ccafdf367e6fa452f67b1952292b1d3",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "scripted/portable/acknowledged-after-refresh.png",
+      "sha256": "beed04672dbe28dc17dd19a3918afd20f715ba79d710eb3ca444e1203e0a4c43",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "8946",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "native-cold/sealed/cold-reopened.png",
+      "sha256": "9a4e90f0cc4aeedda3704ce78efd905f8be068e00d025edacd80e9cf96ce9100",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "9016",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    },
+    {
+      "path": "native-cold/portable/cold-reopened.png",
+      "sha256": "08fc56edf999cca076ebffb01e259da52b8fa0b9ec2c3fa33a29ba0df9503923",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "9022",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Reviewed current contact sheets: expected notices and controls are visible and legible; no overlap or clipping."
+    }
+  ],
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 8917,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 8911,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 8941,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 8939,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 8946,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 8944,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 8965,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 8964,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 9016,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 9012,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 9022,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 9018,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    }
+  ],
+  "gui_jobs": [
+    {
+      "mode": "scripted",
+      "last_exit": 0,
+      "running": false
+    },
+    {
+      "mode": "native-cold",
+      "last_exit": 0,
+      "running": false
+    }
+  ],
+  "acknowledgement_delays": [
+    {
+      "format": "sealed",
+      "seconds": 4.388394542
+    },
+    {
+      "format": "portable",
+      "seconds": 4.330454145
+    }
+  ],
+  "no_owned_app_or_host_processes": true,
+  "source_inputs_verified": 1111,
+  "generated_inputs_verified": 15,
+  "binaries_reverified": 2,
+  "native_changed_encrypted_files_reverified": {
+    "sealed/vault/passphrase-root.json": {
+      "sha256": "9e9a8f8df8316b1607392e716771b29bb777aeec4b40670ae3f7ae71b47b25b0",
+      "bytes": 364
+    },
+    "sealed/vault/profiles/d7794f6d361f411d44237771f4d4f9aad74e442e8055ca75eada32c270e5ce4b.json": {
+      "sha256": "053bdddd831bcdd87978040c6060e457029bd0657156629b7a6cc22edc415c43",
+      "bytes": 1832
+    },
+    "sealed/vault/profiles/9456b757701dbeb0d154659e41b3251b1f70400b61866ae8f5fce5228fa9be99.json": {
+      "sha256": "43c336d65542c533848422bc0e24774d77fde034a7ebff29cdea60f1f75e35be",
+      "bytes": 1853
+    },
+    "portable/vault.json": {
+      "sha256": "5289a2a82bd3b513d9909b15c4a95fba2061518a62346cdc3213eaac52a33b66",
+      "bytes": 3538
+    }
+  },
+  "native_dialog_pixels_captured": false,
+  "scope": "Current scripted headed acceptance and cold reopens of exact prior native-changed vault bytes; these runs collect no new native input.",
+  "capture_review": "capture-review.json"
+}

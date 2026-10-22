@@ -1,0 +1,8 @@
+{
+  "primary_head_when_preflight_refused": "d0249124c7bc6e15a646c65708b1b722099ede1b",
+  "primary_was_clean": true,
+  "primary_was_not_reset": true,
+  "qualified_source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "isolated_worktree": "/Users/markik/Code/worktrees/mere-authentication-m4",
+  "reason": "Primary advanced concurrently after freeze; native cohort remains source-bound, followed by current-stack integration."
+}
