@@ -3,7 +3,8 @@
 **Status (2026-10-22):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
-The Gemini and Scroll runtime continuations are landed and qualified through native processes.
+The Gemini, Scroll and Micron runtime continuations are implemented and qualified
+through native processes.
 Native Scroll replies now live in Errand and Knot uses them with unchanged V1
 fixtures. Both shared read loaders require explicit Submit for Titan and Spartan
 submission URLs; focused native tests qualify that rule.
@@ -17,7 +18,7 @@ storage dependency. Optional `history` uses Eidetic's Muniment backend seam.
 Optional `publication` composes Eidetic typed retention and Gemot's existing
 signed contributions and collection authority.
 Knot keeps file access, drafts, templates, checked saves and protocol adapters.
-Djinn keeps custody, certificates, listener policy and resident lifecycle.
+Djinn keeps custody, host identity, certificates, listener policy and resident lifecycle.
 
 Cross-Moot publication lineage and peer acquisition are subsequent work.
 The Gemini resident uses existing Errand and Armillary seams. Existing V1 limits and profile semantics remain
@@ -35,6 +36,61 @@ unchanged; the adapters reuse existing publication and storage authority.
 3. Update canonical ownership docs and record compact validation results.
    Retained receipt cap: 100 MB across repositories. Reuse approved stable
    repository targets. Any isolation is temporary and removed after integration.
+
+## Governed Micron resident (2026-10-22)
+
+**Status:** implemented and native process qualified on integrated source
+`1f660dcb4`. Browser receiving and client limits keep their own gates.
+Micron remains a saved native profile; NomadNet over Reticulum
+is its transport. Retinue owns the native link and Resource exchange. Errand's
+Gemini/Scroll projection and TLS identity do not participate in this adapter.
+
+Djinn owns an optional `moot-site-nomadnet` backend, explicit native listener
+policy and a separate persistent host identity. `configure_nomadnet` binds a
+Micron publication to that identity. Every request reopens current collection
+authority and retained content, including on a reused link. Native page paths
+are the hashes of `/page` plus the canonical saved path. Nil and empty binary
+request data read static pages; maps and nonempty data refuse with an empty byte
+response. Missing or unavailable publications use the same reusable-link refusal.
+Transport errors close the session without sending a second response. Retinue's
+existing request parser also retains its historical empty-string and trailing-byte
+tolerance; this host does not introduce a second MessagePack grammar. Configured
+Resource limits apply to incoming transfers; outgoing pages retain the shared
+snapshot page-size bound.
+
+Done when native process tests preserve exact V1 bytes, large Resource content,
+stable destination on restart, signed replacement, membership removal and
+restoration, withdrawal and idle-session shutdown. Bound TCP interfaces, inbound
+links, requests, Resources and session lifetime through host policy. Armillary
+joins application sessions; endpoint shutdown and dedicated runtime destruction
+finish transport work before the OS worker joins. Existing Gemini/Scroll process
+fixtures must still pass. Python/Go, browser, radio and cross-machine acceptance
+remain independent. Retain at most 100 MB of compact receipts across repositories,
+reuse stable Cargo targets, and remove temporary integration isolation afterward.
+
+Nine native host controls, eight existing resident controls, eight backend-disabled
+controls and the disabled CLI check pass on the integrated source. The unchanged
+Gemini/Scroll fixtures and new Micron fixture
+all pass against executable SHA-256
+`d2ee5884c925d91118efaee712237ab00d78d2c38b02d0684ec6b89f347c5055`.
+Micron uses two actual Knot publisher processes and three resident processes,
+checks exact 128 KiB Resource bytes and V1 identity, unavailable author paths,
+stable destination/public key, and replacement, membership removal/restoration
+and withdrawal on one link. Its admitted idle session is cancelled and joined;
+the listener closes before acknowledgment/process exit. Authority refuses after
+restart following withdrawal. Native interface-cap recovery and both request
+and session deadlines have focused runtime coverage; oversized-request and flood
+acceptance are not claimed by these fixtures.
+
+The receiving merge preserves the separately qualified Knot checkpoint cohort
+at `98d5212b`; its site library is unchanged. All other supplier pins stay fixed.
+Initial and combined process proofs are retained separately in
+[Knot's receiving receipt](https://github.com/merely-made/knot-editor/blob/main/support/receipts/micron-publication-runtime/integrated-process.json).
+Strict Clippy remains blocked by 20 pre-existing Djinn diagnostics outside the three
+changed host files. The [native receipt](../../../support/receipts/micron-publication-runtime/native.json)
+records exact source, lock, executable, gate results and limits. The temporary
+integration checkout is removed after publication; stable Mere/Knot targets are
+reused and no isolated Cargo home or target is created.
 
 ## Saved-site revision slice (2026-10-21)
 
