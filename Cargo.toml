@@ -153,6 +153,7 @@ members = [
     "crates/cambium/tinct",
 ]
 exclude = [
+    "support/patches/light-file-dialog",
     "crates/cambium/hest-0_1",
     "crates/probes",
     # The unpublished browser host carries Git-only Genet presentation deps.
@@ -737,6 +738,8 @@ uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
 [patch.crates-io]
+# Reuse the Windows password class across cancellation and sequential prompts.
+light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.
 armillary = { git = "https://github.com/merely-made/armillary.git", rev = "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
