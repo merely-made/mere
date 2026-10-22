@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "merge": "b91864193",
+  "published_source": "af5c3ba85a19fe3eddbabc283b6fab7572fc1cf3",
+  "primary_receiving_source": "1a3aa562d360589838550792d02edc333baf7d4e",
+  "primary_tree_unchanged": true,
+  "primary_tree": "59d72efb6c8289055734017b730a6df119cfb2f0",
+  "native_host_model_and_lock_identical_to_qualified_host": true,
+  "host_source": "1f660dcb4a9171b2867451d22fadd1a2ad50d174",
+  "foreign_staged_entries_preserved": [
+    "M\tdesign_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md",
+    "D\tsupport/doc-audit/d2/batch_103_diagnostics_target_lifetime_receiving.md",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-browser.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-docs.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-embedding.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-native-evidence.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-native.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-qualification.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-integrated-source.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-browser.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-controls.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-docs.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-embedding.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-qualification.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-source.json",
+    "D\tsupport/family-promotion/diagnostics-lifetimes-main-upstream.json",
+    "M\tsupport/family-promotion/diagnostics-ownership-review.json"
+  ],
+  "foreign_index_sha256": "1cd1cf1ad604d49d62a8d89fa3d4c78a4c2b3a10a62bc5559e7e53af050770d7",
+  "source_supplier_excludes_unpublished_foreign_diagnostics": true,
+  "retained_worktree": "Temporary until final receiving receipts published",
+  "receipt_cap_bytes": 100000000
+}

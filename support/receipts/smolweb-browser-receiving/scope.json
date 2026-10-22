@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "task": "Browser receiving after governed Micron hosting",
+  "retained_byte_cap": 100000000,
+  "source": "MIME-preserving shared sessions and consumer adoption; native product receiving from governed Djinn",
+  "unchanged": "Client page/resource caps, deadline settings/defaults, Retinue native implementation and snapshotV1",
+  "limits_evidence": "Retinue bd8fe1e5 and5b1c5cac crates/retinue tree both d80e420d75809798401207655021812763d8664c",
+  "receipts_required": [
+    "Shared supplied-body/bodyless/streaming MIME and nativeScroll construct tests",
+    "Fetch/RemoteFetcher explicitSubmit regressions",
+    "Turnstone browser controller native receiving and nativeScroll controls",
+    "Live Knot publisher -> governed Djinn -> Turnstone receiving process proof",
+    "Coherent source/lock closure and exact hashes"
+  ],
+  "targets": [
+    "C:\\t\\cargo-targets\\mere",
+    "C:\\t\\cargo-targets\\turnstone",
+    "C:\\t\\cargo-targets\\knot-editor"
+  ],
+  "isolation": "Code\\worktrees\\mere-browser-receiving, because primary Mere foreign index prevents upstream integration",
+  "browser_ui": "Native retained browser pipeline first; headed evidence must be named separately",
+  "excluded": [
+    "Client limits work",
+    "new protocol aliases",
+    "new generic metadata bag",
+    "Scroll author/date/UDC/trust projection",
+    "independent Python/Go/radio acceptance"
+  ]
+}
