@@ -1,0 +1,22 @@
+{
+  "lane": "L1",
+  "slice": "graph-kernel and chartulary",
+  "recorded": "2026-10-20",
+  "base_commit": "c25c2d441",
+  "supersedes_status_of": ["Q013"],
+  "rulings_asked": "owner-decision card round, 2026-10-20; Mark's words in the plan section 5 addendum",
+  "operations": [
+    {
+      "id": "Q013",
+      "authority": ["A001"],
+      "owner": "stored node address wins on load; the navigation cursor never rewrites it",
+      "change": "removed the cursor-derived address rewrite in graph/snapshot/from.rs",
+      "regression": "graph::snapshot::tests::recorded_load_keeps_a_set_node_url_over_the_navigation_cursor",
+      "audit_probe": "kernel_snapshot.rs restored_navigation_overrides_a_successful_url_write_and_leaves_both_index_entries (asserts the defect; its assertions are inverted in the regression)",
+      "kernel_suite_after": {"passed": 474, "failed": 0, "includes_new": 1},
+      "old_passes_retained": "473 prior lib tests all still pass"
+    }
+  ],
+  "unrepaired_so_far": ["Q009", "Q010", "Q012", "Q014", "Q015", "Q016", "Q017", "Q031", "Q032", "Q001", "Q002", "Q003", "Q019"],
+  "notes": "Q014 is already documentation-corrected in the sealed register; chartulary now lives in repos/eidetic, pinned rev 34105d6; its findings need an eidetic branch and a repin."
+}

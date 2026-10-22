@@ -711,3 +711,26 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
         ResourceSnapshotError::InvalidUuid { .. }
     ));
 }
+
+/// Q013: the saved node address owns the current address on load; a stale
+/// navigation cursor must not undo a successful `SetNodeUrl`.
+#[test]
+fn recorded_load_keeps_a_set_node_url_over_the_navigation_cursor() {
+    use crate::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    let mut graph = Graph::new();
+    let id = Uuid::from_u128(1);
+    let key = add_node(&mut graph, Some(id), "https://audit.test/old".into(), Default::default());
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::NavigateNode { key, url: "https://audit.test/old".into() },
+    );
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::SetNodeUrl { key, new_url: "https://audit.test/new".into() },
+    );
+    let restored = Graph::try_from_recorded_snapshot(&graph.to_snapshot()).unwrap();
+    let key = restored.get_node_key_by_id(id).unwrap();
+    assert_eq!(restored.get_node(key).unwrap().url(), "https://audit.test/new");
+    assert_eq!(restored.get_nodes_by_url("https://audit.test/new"), vec![key]);
+    assert!(restored.get_nodes_by_url("https://audit.test/old").is_empty());
+}
