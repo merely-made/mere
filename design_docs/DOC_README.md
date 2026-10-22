@@ -23,7 +23,7 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
-- [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints, governed publication and native Gemini resident qualification, with wider Errand/smolweb coverage tracked separately for routing, rendering, serving and effects.
+- [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints, governed publication and native Gemini/Scroll resident qualification, with wider Errand/smolweb coverage tracked separately for routing, rendering, serving and effects.
 
 Small-web integrations preserve native metadata and keep content, transport and
 host lifecycle separately owned. Ordinary page acquisition and redirects require
