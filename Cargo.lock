@@ -8863,7 +8863,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8871,7 +8871,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8891,7 +8891,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "cambium",
  "illume",
@@ -8908,7 +8908,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8978,7 +8978,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -8991,7 +8991,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
 dependencies = [
  "blake3",
  "gemini-protocol",
