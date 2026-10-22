@@ -1,0 +1,14 @@
+{
+  "purpose": "Windows local authentication qualification; public synthetic vaults only",
+  "source": "a2ca81e35033b7f5132254e60324aed7d435aaa1",
+  "required_receipts": [
+    "software-gates.json",
+    "build-inputs.json",
+    "scripted and native captures/receipts for both formats",
+    "cold-reopen identity facts",
+    "post-run.json",
+    "manifest.json"
+  ],
+  "retained_receipt_byte_cap": 100000000,
+  "temporary_generated_outputs_removed_after_archive": "frozen executables, fixture stores, task scripts and worktree; preserve the shared Cargo cache"
+}
