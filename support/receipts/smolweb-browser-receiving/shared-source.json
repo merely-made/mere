@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "primary_source_commit": "1a3aa562d360589838550792d02edc333baf7d4e",
+  "qualified_worktree_commit": "af5c3ba85a19fe3eddbabc283b6fab7572fc1cf3",
+  "source_sha256": {
+    "crates/system/document-lanes/src/remote.rs": "beb09d70d2b970336b9ab411474617e31141ccc6991b5710615fb0bc0d0185e7",
+    "crates/system/document-lanes/src/session.rs": "ee93f20c5146738858dd290d7b38afc7c348ff2168b3373c1834f1ba655261ae",
+    "crates/system/document-lanes/src/smolweb.rs": "162c224ef4f2d96424dab809b28735df118612f8582e54d30405aefc20eba06f",
+    "crates/system/fetch/src/lib.rs": "75ffb1fb6dc4886fe924a3c9b0556c41a837c143c9c4eceaca7d954e85cd5ce6",
+    "crates/system/fetch/src/tests.rs": "f9e29438851945bed92c5c851146bb121a4ee5f02e32df1a8d68191df68bbb16"
+  },
+  "lock_sha256": "38f3c83b10800d687d9312e1812f14a55e70f34c1fddb786e6105138b691433d",
+  "host_executable_sha256": "d2ee5884c925d91118efaee712237ab00d78d2c38b02d0684ec6b89f347c5055",
+  "note": "Source-only receiving patch cherry-picked onto published Micron host; host executable from prior exact integrated host qualification. Foreign diagnostics staging preserved."
+}

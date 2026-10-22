@@ -55,11 +55,19 @@ pub enum ActionId {
     FoldSelection,
     FoldCollapseDescendants,
     FoldExpand,
+    ArrangementResetToSeed,
+    ArrangementSetSeed,
+    ArrangementRestoreRecipeSeed,
+    ArrangementDismissRetained,
+    NodeForegroundPin,
+    TileGrow,
+    TileShrink,
+    ViewTerritory,
 }
 
 impl ActionId {
     /// Every variant, in the catalogue's order.
-    pub const ALL: [Self; 36] = [
+    pub const ALL: [Self; 44] = [
         Self::NodeNew,
         Self::NodeDelete,
         Self::NodeEdit,
@@ -96,6 +104,14 @@ impl ActionId {
         Self::FoldSelection,
         Self::FoldCollapseDescendants,
         Self::FoldExpand,
+        Self::ArrangementResetToSeed,
+        Self::ArrangementSetSeed,
+        Self::ArrangementRestoreRecipeSeed,
+        Self::ArrangementDismissRetained,
+        Self::NodeForegroundPin,
+        Self::TileGrow,
+        Self::TileShrink,
+        Self::ViewTerritory,
     ];
 
     /// The shared id, `namespace:name`.
@@ -137,6 +153,14 @@ impl ActionId {
             Self::FoldSelection => ids::FOLD_SELECTION,
             Self::FoldCollapseDescendants => ids::FOLD_COLLAPSE_DESCENDANTS,
             Self::FoldExpand => ids::FOLD_EXPAND,
+            Self::ArrangementResetToSeed => ids::ARRANGEMENT_RESET_TO_SEED,
+            Self::ArrangementSetSeed => ids::ARRANGEMENT_SET_SEED,
+            Self::ArrangementRestoreRecipeSeed => ids::ARRANGEMENT_RESTORE_RECIPE_SEED,
+            Self::ArrangementDismissRetained => ids::ARRANGEMENT_DISMISS_RETAINED,
+            Self::NodeForegroundPin => ids::NODE_FOREGROUND_PIN,
+            Self::TileGrow => ids::TILE_GROW,
+            Self::TileShrink => ids::TILE_SHRINK,
+            Self::ViewTerritory => ids::VIEW_TERRITORY,
         }
     }
 

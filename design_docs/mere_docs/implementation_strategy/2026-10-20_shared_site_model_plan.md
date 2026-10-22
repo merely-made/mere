@@ -37,6 +37,97 @@ unchanged; the adapters reuse existing publication and storage authority.
    Retained receipt cap: 100 MB across repositories. Reuse approved stable
    repository targets. Any isolation is temporary and removed after integration.
 
+## Browser receiving (2026-10-22)
+
+**Status:** shared receiving and native browser qualification are landed.
+Client limits remain a separate lane.
+Turnstone already has native NomadNet receiving through Retinue and explicit
+Micron sessions; this continuation adopts the shared read-admission changes,
+preserves response MIME through document construction and replacement, and
+qualifies the existing product path against governed Djinn hosting.
+
+Mere owns the MIME-preserving `EngineInput` lowering and session adapters.
+Caller-supplied content must never trigger a fetch. Body-less loads retain the
+fetcher's MIME, and streamed prefixes use explicit interpretation metadata.
+Legacy same-address replacement retains known MIME; changing addresses clears
+it. Native Scroll grammar must remain distinct from Gemtext, including a
+level-five heading and a semantic Citation link. Text/plain stays literal.
+Existing fields suffice; this does not add a generic protocol-metadata bag or
+claim Scroll author/date/UDC retention or trust projection.
+
+Turnstone owns source acquisition, request correlation, route/controller setup,
+retained browser interactions and its coherent SDK receiving cohort. Native
+NomadNet stays a destination and opaque path, with absent MIME; an empty byte
+response cannot distinguish an empty page from a host refusal. Client caps,
+deadline settings/defaults and cap ordering stay unchanged. The complete Retinue
+crate at existing `bd8fe1e5` and qualified `5b1c5cac` has the same Git tree,
+`d80e420d75809798401207655021812763d8664c`.
+
+Done when focused shared tests cover supplied-body, response-MIME and replacement
+paths; product tests retain the native Scroll construct and explicit Submit
+admission; and a real Knot publisher/governed Djinn/Turnstone process proof
+fetches native Micron into the ordinary browser controller, retains exact saved
+bytes, frames the page and follows its qualified link. Reload, Stop/stale
+completion, Resource content and honest empty-page handling need product controls.
+Native retained-controller evidence and headed UI evidence must be named
+separately. The native fixture calls the ordinary acquisition helper and hands
+its completion through the product pipeline; Stop verifies late-result rejection.
+Fetch-actor dispatch and transport cancellation execution need separate evidence.
+Snapshot V1 stays unchanged. Whole-task receipts are capped at 100 MB
+across repositories. Reuse stable Mere, Turnstone and Knot targets. The temporary
+`Code/worktrees/mere-browser-receiving` checkout isolates the primary Mere's
+foreign staged work and is removed after integration and publication.
+
+Shared receiving source `af5c3ba85` passes 63 document unit tests, the streaming
+integration test and 41 fetch controls, including the native Scroll grammar,
+response MIME and explicit-Submit boundaries. Receipts live under
+`support/receipts/smolweb-browser-receiving/`. Turnstone adopts that exact supplier
+with its coherent published dependency cohort before product qualification.
+
+Turnstone source `cab743c11` passes 69 focused product checks. The live
+Knot `3596dce3` fixture passes against the governed Djinn host `1f660dcb4`:
+the ordinary native acquisition helper receives the exact 57-byte index and
+131,072-byte Resource, passes request correlation and the product reducer,
+frames the registered Micron controller, and follows its qualified same-node
+link. Existing V1, reused-link authority transitions and restart proofs pass
+in the same fixture. Receipt:
+`knot-editor/support/receipts/smolweb-browser-receiving/process-graceful.json`.
+
+The first live attempt exposed premature client teardown: dropping an Endpoint
+aborted its writer before queued Resource proof and LINKCLOSE packets drained,
+holding remote admission until the existing request deadline. Ordinary page
+fetches now use Retinue's existing graceful shutdown inside the unchanged outer
+deadline, matching the submission path. The fixture handoff uses its existing
+selected shutdown grace. The local receiver regression now requires sender-side
+completion and joins every response task. First-phase host shutdown joins all
+three sessions without cancellation. The original failed attempt is preserved.
+Abrupt disconnect/actor-cancellation execution and headed interaction remain
+separate gates.
+
+The isolated older Turnstone checkpoint also required AccessKit type alignment and bounded API adoption;
+59 of the product checks cover those affected areas, separately from ten
+receiving/Micron checks. Micron and existing shared smolweb caps and deadlines
+are unchanged. Existing upstream HTTP referrer/security changes arrive with the
+broader SDK selection; this is not a claim that every browser policy is unchanged.
+Existing buffered smolweb allocation limitations remain in the client-limits lane.
+
+Final publication is based on current Turnstone `8eebb5a3`, preserving its
+reading, navigation and exhaustive command metadata. Receiving source
+`a622c9607` changes only the four receiving files and 62 canonical Mere revision
+entries in the lockfile. Its manifest, package versions, dependency tables,
+registry entries and other supplier pins are unchanged. The older checkpoint's
+compatibility repairs and HTTP-policy uptake are historical evidence; they are
+not reapplied to this current-code port.
+
+The integrated build and 70 focused product checks pass, including existing
+reading-state and toolbar navigation controls. The live process fixture passes
+again with exact browser executable `4ef1b302…61757`, unchanged governed host
+`d2ee5884…5055`, exact index/Resource bytes and all three first-phase sessions
+joined without cancellation. Final receipt:
+`knot-editor/support/receipts/smolweb-browser-receiving/process-integrated.json`.
+Current SDK/build/test records live under
+`turnstone/docs/receipts/native_browser_receiving_20261022/`.
+
 ## Governed Micron resident (2026-10-22)
 
 **Status:** implemented and native process qualified on integrated source

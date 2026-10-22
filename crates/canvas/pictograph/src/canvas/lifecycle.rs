@@ -316,6 +316,12 @@ impl Canvas {
         self.view_h = new_h;
     }
 
+    /// The viewport size the canvas culls and centers against, as the host
+    /// last set it: what a `CanvasCommand::apply` wants.
+    pub fn view_size(&self) -> (u32, u32) {
+        (self.view_w, self.view_h)
+    }
+
     /// Put the world origin at the viewport center **at zoom 1** — the graph is
     /// laid out around `(0, 0)`, so this frames it. Resets the zoom too (a drifted
     /// zoom would otherwise leave the graph a speck or off-screen even after the
