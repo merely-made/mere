@@ -19,8 +19,8 @@ pub fn read_toolbar<State: 'static, Action: 'static, OA: OptionalAction<Action> 
     for (label, name, command, disabled) in [
         ("A−", "Smaller reading text", ReadCommand::Smaller, text_size <= 14),
         ("A+", "Larger reading text", ReadCommand::Larger, text_size >= 28),
-        ("↤", "Narrower reading column", ReadCommand::Narrower, column_em <= 24),
-        ("↦", "Wider reading column", ReadCommand::Wider, column_em >= 48),
+        ("Narrow", "Narrower reading column", ReadCommand::Narrower, column_em <= 24),
+        ("Wide", "Wider reading column", ReadCommand::Wider, column_em >= 48),
         ("Reset", "Reset reading preferences", ReadCommand::Reset, text_size == 18 && column_em == 36),
         ("Find", "Find in reading", ReadCommand::Find, false),
     ] {
