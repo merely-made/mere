@@ -406,8 +406,8 @@ async fn headed_authentication_host() {
         };
     let k = keeper(&root, portable, password, ui);
     let endpoint = endpoint(&root);
-    let server = serve(k, endpoint).await;
-    std::fs::write(root.join("ready"), "ready").unwrap();
+    let server = serve(k, endpoint.clone()).await;
+    std::fs::write(root.join("ready"), endpoint.as_bytes()).unwrap();
     let end = tokio::time::Instant::now() + Duration::from_secs(600);
     while !root.join("stop").exists() {
         assert!(tokio::time::Instant::now() < end, "fixture timeout");
