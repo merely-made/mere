@@ -77,6 +77,9 @@ impl Default for SmolwebInlineMediaPolicy {
 pub struct SmolwebDocument {
     document: Arc<EngineDocument>,
     style: DocumentStyleSheet,
+    display_scale: f32,
+    reading: Option<tabard::ReadingPreferences>,
+    find: crate::reading_find::ReadingFind,
     background: [f32; 4],
     images: HashMap<String, DecodedImage>,
     inline_media: SmolwebInlineMediaPolicy,
@@ -250,6 +253,9 @@ impl SmolwebDocument {
         Self {
             document,
             style,
+            display_scale: 1.0,
+            reading: None,
+            find: Default::default(),
             background,
             images: HashMap::new(),
             inline_media,
@@ -286,6 +292,43 @@ impl SmolwebDocument {
         self.style = style;
         self.invalidate_layout();
         true
+    }
+
+    pub fn source_document(&self) -> Arc<EngineDocument> { self.document.clone() }
+    /// Fresh viewport/search/reading state over the same source and held fonts.
+    pub fn new_appearance(&self) -> Self {
+        let mut appearance = Self::from_shared_document(self.document.clone(), self.style.clone(), self.background, self.inline_media);
+        appearance.fonts = self.fonts.clone();
+        appearance.generic_fonts = self.generic_fonts.clone();
+        appearance.dictionaries = self.dictionaries.clone();
+        appearance.images = self.images.clone();
+        appearance
+    }
+    pub fn reading_preferences(&self) -> tabard::ReadingPreferences { self.reading.unwrap_or_default() }
+    pub fn set_reading_preferences(&mut self, value: tabard::ReadingPreferences) -> Result<bool, String> {
+        value.validate()?;
+        if Some(value) == self.reading { return Ok(false); }
+        self.reading = Some(value);
+        self.invalidate_layout();
+        Ok(true)
+    }
+    pub fn document_find(&mut self, query: &inker::DocumentFindQuery) -> inker::DocumentFindState {
+        self.ensure_layout(self.size.0.max(1), self.size.1.max(1));
+        self.find.replace(query.clone(), &self.layout.as_ref().unwrap().searchable);
+        self.reveal_find();
+        self.find.state()
+    }
+    pub fn document_find_step(&mut self, direction: inker::DocumentFindDirection) -> inker::DocumentFindState {
+        self.ensure_layout(self.size.0.max(1), self.size.1.max(1));
+        self.find.step(direction);
+        self.reveal_find();
+        self.find.state()
+    }
+    pub fn clear_document_find(&mut self) { self.find = Default::default(); }
+    fn reveal_find(&mut self) {
+        if let Some(y) = self.find.current_y() {
+            self.scroll_y = (y - 24.0 * self.display_scale).clamp(0.0, self.max_scroll());
+        }
     }
 
     pub fn document(&self) -> &EngineDocument {
@@ -335,6 +378,7 @@ impl SmolwebDocument {
         let retained_images: HashSet<_> = image_urls(&document.blocks).into_iter().collect();
         self.images
             .retain(|url, _| retained_images.contains(url.as_str()));
+        self.find = Default::default();
         self.document = Arc::new(document);
         self.pending_reveal = None;
         self.invalidate_layout();
@@ -611,10 +655,25 @@ impl SmolwebDocument {
         true
     }
 
-    /// Fonts supplied by the embedding host, never fetched by this view.
+    /// Physical pixels per logical reading pixel, independent of a producer's
+    /// raster scale. Each retained appearance owns this presentation value.
+    pub fn display_scale(&self) -> f32 { self.display_scale }
+    pub fn set_display_scale(&mut self, scale: f32) -> bool {
+        let scale = if scale.is_finite() { scale.clamp(0.5, 4.0) } else { 1.0 };
+        if self.display_scale == scale { return false; }
+        self.display_scale = scale;
+        self.layout = None;
+        self.presented = false;
+        true
+    }
+
+    /// The host's reading face. Code and column-aligned menu formats retain
+    /// their monospace role. A supplied sans-serif generic can fill glyphs
+    /// missing from the prose face; all font bytes remain host-owned.
     pub fn set_font_family(&mut self, family: &str) {
-        self.style.body_font_family = family.into();
-        self.style.mono_font_family = family.into();
+        if !FIXED_WIDTH_MENU_TYPES.contains(&self.document.content_type.as_str()) {
+            self.style.body_font_family = format!("{family}, sans-serif, monospace");
+        }
         self.layout = None;
         self.presented = false;
     }
@@ -688,7 +747,10 @@ impl SmolwebDocument {
             document_canvas::layout::layout_document_with_folds_and_font_resources(
                 &self.document,
                 Viewport::new(size.0 as f32, size.1 as f32),
-                &self.style,
+                &self.reading.map_or_else(
+                    || crate::typography::document_style_at_display_scale(&self.style, self.display_scale),
+                    |preferences|crate::typography::document_style_for_reading(&self.style, preferences, self.display_scale),
+                ),
                 &self.folds,
                 &self.fonts,
                 &self.generic_fonts,
@@ -696,12 +758,13 @@ impl SmolwebDocument {
             )
             .expect("admitted generic font ledger"),
         );
+        self.find.reflow(&self.layout.as_ref().unwrap().searchable);
         self.size = size;
         self.scroll_x = self.scroll_x.min(self.max_scroll_x());
         self.scroll_y = self.scroll_y.min(self.max_scroll());
         if let Some(block) = self.pending_reveal.take() {
             self.scroll_to_block(block);
-        }
+        } else { self.reveal_find(); }
     }
 
     fn max_scroll_x(&self) -> f32 {
@@ -746,6 +809,7 @@ impl SmolwebDocument {
                 return Err(error.to_string());
             },
         };
+        self.find.paint(&mut scene, self.scroll_x, self.scroll_y, self.size);
         self.paint_focus(&mut scene);
         scene.push_rect(
             0.0,
@@ -1159,12 +1223,20 @@ fn style_for_theme(
     style.body_font_family = if FIXED_WIDTH_MENU_TYPES.contains(&content_type) {
         style.mono_font_family.clone()
     } else {
-        "serif".into()
+        "serif, sans-serif, monospace".into()
     };
-    style.body_font_size = 16.0;
-    style.line_height_ratio = 1.5;
-    style.horizontal_padding = 32.0;
-    style.max_content_width = Some(720.0);
+    // Reader, small-web and normalized document projections share a prose
+    // baseline. This does not restyle an authored HTML browser session.
+    style.body_font_size = 18.0;
+    style.line_height_ratio = 1.6;
+    style.horizontal_padding = 24.0;
+    // About 65-75 Latin characters with the ordinary proportional faces.
+    // The layout always clamps this to the current appearance's viewport.
+    style.max_content_width = Some(36.0 * style.body_font_size);
+    style.roles.heading.sizes = [32.0, 26.0, 22.0, 20.0, 18.0, 18.0];
+    style.roles.heading.line_height_ratio = Some(1.25);
+    style.roles.code.size = document_canvas::SizeSpec::ScaleOfBody(0.85);
+    style.roles.metadata.size = document_canvas::SizeSpec::ScaleOfBody(0.75);
     style.vertical_padding = 24.0;
     style.colors = ColorVocabulary {
         body_text: foreground,
@@ -1689,7 +1761,7 @@ mod tests {
         // A prose format keeps the body serif: gemtext is not column-aligned.
         for content_type in ["text/gemini", "text/plain"] {
             let (style, _) = style_for_theme(&SmolwebTheme::Dark, "gemini://x.test/", content_type);
-            assert_eq!(style.body_font_family, "serif", "{content_type} is prose");
+            assert_eq!(style.body_font_family, "serif, sans-serif, monospace", "{content_type} keeps prose and glyph fallback roles");
         }
     }
 
@@ -1714,6 +1786,63 @@ mod tests {
 #[cfg(test)]
 mod typography_tests {
     use super::*;
+    #[test]
+    fn prose_measure_reflows_to_the_appearance_without_changing_its_source() {
+        let source = Arc::new(EngineDocument {
+            address: "mere://reading/test".into(),
+            title: Some("Reading".into()),
+            content_type: "text/plain".into(),
+            lang: None,
+            provenance: Default::default(),
+            trust: Default::default(),
+            diagnostics: Vec::new(),
+            navigation: Default::default(),
+            blocks: vec![Block::Paragraph {
+                spans: vec![inker::InlineSpan::Text("A measured line keeps the next sentence in reach. ".repeat(80))],
+            }],
+        });
+        let mut doc = SmolwebDocument::from_shared_document_with_theme(source.clone(), SmolwebTheme::Plain);
+        let code = doc.style_sheet().resolve(document_canvas::BlockRole::Code);
+        doc.set_font_family("serif");
+        assert_eq!(doc.style_sheet().resolve(document_canvas::BlockRole::Code), code,
+            "a prose face cannot replace the code role");
+        doc.frame(1200, 600);
+        let wide = doc.layout.as_ref().unwrap().packet.clone();
+        let paragraph = &wide.blocks[0].bounds;
+        assert!(paragraph.origin.x > 200.0, "wide reading is centered with a bounded measure");
+        assert!(paragraph.size.width < 750.0);
+        doc.frame(320, 600);
+        let narrow = &doc.layout.as_ref().unwrap().packet;
+        assert!(narrow.content_bounds.size.height > wide.content_bounds.size.height, "narrow reading must reflow");
+        for block in &narrow.blocks {
+            assert!(block.bounds.origin.x >= 0.0);
+            assert!(block.bounds.origin.x + block.bounds.size.width <= 320.1, "prose does not require horizontal scrolling");
+        }
+        assert!(Arc::ptr_eq(&source, &doc.document));
+    }
+
+    #[test]
+    fn display_density_reflows_physical_viewports_without_rewriting_style_intent() {
+        let source = Arc::new(EngineDocument {
+            address: "mere://reading/density".into(), title: None,
+            content_type: "text/plain".into(), lang: None,
+            provenance: Default::default(), trust: Default::default(),
+            diagnostics: Vec::new(), navigation: Default::default(),
+            blocks: vec![Block::Paragraph { spans: vec![inker::InlineSpan::Text("The same source at a readable logical size. ".repeat(70))] }],
+        });
+        let mut doc = SmolwebDocument::from_shared_document_with_theme(source.clone(), SmolwebTheme::Plain);
+        let intent = doc.style_sheet().clone();
+        doc.frame(1000, 600);
+        let one = doc.layout.as_ref().unwrap().packet.content_bounds.size.height;
+        assert!(doc.set_display_scale(2.0));
+        doc.frame(1000, 600);
+        assert!(doc.layout.as_ref().unwrap().packet.content_bounds.size.height > one * 2.0,
+            "Retina density must scale text and reflow in the physical aperture");
+        assert_eq!(doc.style_sheet(), &intent);
+        assert!(Arc::ptr_eq(&source, &doc.document));
+        assert!(!doc.set_display_scale(2.0), "an unchanged display does not invalidate layout");
+    }
+
     #[test]
     fn restyling_reflows_without_replacing_source_or_session_state() {
         let source = Arc::new(EngineDocument {
@@ -1773,6 +1902,16 @@ mod typography_tests {
                 .height
                 > old_height
         );
+        let body_size = |doc: &SmolwebDocument| doc.layout.as_ref().unwrap().packet.blocks.iter().find_map(|block| match &block.kind {
+            document_canvas::RenderedBlockKind::Text{glyph_runs}=>glyph_runs.first().map(|run|run.font_size), _=>None,
+        }).unwrap();
+        assert_eq!(body_size(&doc),24.0,"hosts which did not opt into reading controls retain explicit styles");
+        let mut other=doc.new_appearance();
+        let mut preferences=tabard::ReadingPreferences::default(); preferences.step_text(true);
+        doc.set_reading_preferences(preferences).unwrap();
+        doc.frame(300,200); other.frame(300,200);
+        assert_eq!(body_size(&doc),20.0);
+        assert_eq!(body_size(&other),24.0,"a fresh projection retains the host baseline until it selects reading intent");
         assert!(!doc.set_style_sheet(style));
     }
 }

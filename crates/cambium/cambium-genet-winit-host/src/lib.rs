@@ -63,6 +63,7 @@ mod files;
 mod harness;
 #[cfg(test)]
 mod headed_tests;
+mod key_admission;
 mod scene_producer;
 mod windows;
 #[cfg(target_os = "windows")]
@@ -73,13 +74,13 @@ pub use windows_snap::SnapLayoutBridge;
 mod x11_frame;
 
 pub use cambium_rootstock::{
-    HOST_WHEEL_LINE_PX, AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CaptureFrame, CloseDisposition,
+    AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CaptureFrame, CloseDisposition,
     CloseRequest, CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook,
-    FrameProfile, Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake,
-    HostWindow, IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey,
-    PaintCaptureFn, RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WheelUnit,
-    WindowCommand, WindowCommands, WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom,
-    ladder_step, read_frame,
+    FrameProfile, HOST_WHEEL_LINE_PX, Host, HostFont, HostHooks, HostImage, HostOptions,
+    HostPointer, HostWake, HostWindow, IdlePolicy, Init, Key, KeyInterceptHook, KeyPress,
+    Modifiers, NamedKey, PaintCaptureFn, RelayoutProfile, Runner, ScrollAlign, ScrollIntoView,
+    Surface, WheelUnit, WindowCommand, WindowCommands, WindowFrame, WindowGeometry, WindowTree,
+    ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use caption_controls::{CaptionLabels, platform_caption_controls, window_caption_controls};
 pub use files::{DialogFileChooser, choose_save_path, read_file};
@@ -1209,7 +1210,12 @@ where
                 self.wheel(dx, dy);
             },
             WindowEvent::Ime(ime) => self.ime(cambium_winit::composition_from_winit(&ime)),
-            WindowEvent::KeyboardInput { event, .. } => match event.state {
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } => match event.state {
+                ElementState::Pressed if !key_admission::fresh_key_press(is_synthetic) => {},
                 ElementState::Pressed => {
                     let press = key_press_from_winit(&event, self.core.s.modifiers);
                     self.key(&press);
