@@ -1,0 +1,3 @@
+await {"ready": "true", "profiles": "2", "locked": "false"}
+wait 300000
+capture C:\t\cargo-targets\mere\dramatis-authentication\scripted\portable\cold-reopened.png

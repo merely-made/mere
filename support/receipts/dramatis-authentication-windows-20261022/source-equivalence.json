@@ -1,0 +1,37 @@
+{
+  "qualified_build_source": "12d9efff8fde93de1586434afbc718ce5eee51ad",
+  "publication_integration_source": "96a7d76d7089247b432623f3c7135493e38f9b4e",
+  "unchanged_frozen_inputs": 1115,
+  "metadata_differences": {
+    "Cargo.lock": {
+      "qualified_sha256": "65653ce09ce53de7c3e073431bc925a294cdb75841569df525e9458773af6567",
+      "publication_sha256": "33d71c4435b36c73f3ccd0e5e418ba0bc7c793ef3dc647675fd0c640267977dc"
+    },
+    "ports/djinn/Cargo.toml": {
+      "qualified_sha256": "ef69f8236d58d0a8ba895ab3f91c2da37ed5f2752b1f0b5a210e02f099afc9d6",
+      "publication_sha256": "ece2d36774fa830a0a234dce327fd1e32f14d6ea8372350b6dfeba9482e2f4f9"
+    }
+  },
+  "manifest_difference": "Only adds optional retinue and disabled moot-site-nomadnet feature; existing manifest semantics unchanged.",
+  "lock_difference": "Only adds optional retinue dependency edge to djinn; every resolved package and other edge unchanged.",
+  "qualified_djinn_features": [
+    [
+      "cxf",
+      "default",
+      "passphrase-fd",
+      "personal-sync"
+    ]
+  ],
+  "active_dependency_trees": {
+    "dramatis-app": {
+      "sha256": "893c0531cd20e359969fb99cc5f934eeb83193488bb777808890ed27c22cfc6c",
+      "unchanged": true
+    },
+    "djinn": {
+      "sha256": "4594ae0c76cdb9f3a8f50b7b13d7dc2112261f95dc9b9d217f70156facb85827",
+      "unchanged": true
+    }
+  },
+  "rebuild_performed": false,
+  "scope": "Binaries and headed receipts retain their qualified_build_source. This verifies active-input equivalence for the recorded defaults/custody-receipt-host features; it does not qualify the new optional hosting feature."
+}
