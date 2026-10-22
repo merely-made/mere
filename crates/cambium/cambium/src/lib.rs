@@ -88,6 +88,7 @@ mod tabs;
 mod tags;
 mod text;
 mod title_bar;
+mod paged_list;
 mod shell;
 mod value;
 mod wheel;
@@ -234,6 +235,7 @@ pub use tabs::{
 pub use tags::*;
 pub use text::text;
 pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
+pub use paged_list::{PagedWindow, shell_paged_list};
 pub use shell::{shell_activity_control, shell_activity_rail, shell_document_rail, SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot,
     shell_control, shell_popup, shell_projection_switch, shell_toolbar,
     shell_source_binding, shell_navigation_item};
@@ -292,7 +294,13 @@ pub fn attr_qual(local: &str) -> QualName {
     QualName::new(None, Namespace::from(""), LocalName::from(local))
 }
 
+mod reading_find;
 mod reading_toolbar;
-pub use reading_toolbar::{read_toolbar, ReadCommand};
+pub use reading_find::{
+    ReadEvent, ReadFind, find_failed, find_field, find_field_display, find_key, find_row,
+    find_status,
+    is_find_shortcut,
+};
+pub use reading_toolbar::{ReadCommand, read_toolbar};
 mod native_style;
 pub use native_style::stylesheet_at_display_scale;
