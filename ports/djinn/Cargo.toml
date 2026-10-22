@@ -265,6 +265,8 @@ path = "src/bin/distillery_chronicle_receipt_host.rs"
 required-features = ["distillery-chronicle-receipt-host"]
 
 [dev-dependencies]
+# The bounded cross-source fixture imports a pinned layered checkpoint.
+esp.workspace = true
 # Knot's overmap layer over the mere route (`mere_overlay`), driven through the
 # first-party door in `resident_mere`'s archive round trip.
 knot-editor = { workspace = true, features = ["mere-overlay"] }

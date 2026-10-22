@@ -84,6 +84,20 @@ pub use crate::inference_protocol::recall::*;
 impl RecallEvidence {
     /// Citations require a supplied current passage. Keep model-authored markers
     /// distinct from host annotations of a complete verbatim passage match.
+    /// Pure projection over immutable output and supplied evidence; also sealed
+    /// as a typed artifact when the completed run commits.
+    pub fn assess_answer(&self, text: &str) -> Option<eidetic::models::answer::AnswerSupport> {
+        (self.answer_format == AnswerFormat::ClaimSupportV1).then(|| {
+            eidetic::models::answer::AnswerSupport::assess(
+                text,
+                &self
+                    .passages
+                    .iter()
+                    .map(|p| (p.handle, &p.passage))
+                    .collect::<Vec<_>>(),
+            )
+        })
+    }
     pub fn validate(&mut self, text: &str, corpus: Option<&dyn RecallCorpus>) {
         self.citations.clear();
         self.unknown_citations.clear();
@@ -150,6 +164,30 @@ impl RecallEvidence {
                 self.unknown_citations.push(handle);
             }
         }
+        if let Some(support) = &self.support {
+            for link in support.claims.iter().flat_map(|c| &c.evidence) {
+                if link.error.is_some() || link.selector.is_none() {
+                    continue;
+                }
+                if let Some(supplied) = valid
+                    .iter()
+                    .find(|p| p.handle == link.handle && Some(p.passage.id()) == link.passage)
+                {
+                    if !self.citations.iter().any(|c| c.handle == link.handle) {
+                        let Some(answer_selector) = json_quote_selector(text, &link.quote) else {
+                            continue;
+                        };
+                        self.citations.push(Citation {
+                            handle: link.handle,
+                            passage: supplied.passage.id(),
+                            basis: CitationBasis::ClaimQuotation,
+                            // Exact encoded JSON string, including alternative escapes.
+                            answer_selector,
+                        });
+                    }
+                }
+            }
+        }
         for supplied in valid {
             if self.config.min_quote_chars == 0
                 || supplied.passage.text.trim().chars().count() < self.config.min_quote_chars
@@ -174,6 +212,46 @@ impl RecallEvidence {
         }
     }
 }
+/// Locate a decoded quotation without assuming the model used serde's escaping.
+fn json_quote_selector(text: &str, wanted: &str) -> Option<PassageSelector> {
+    let bytes = text.as_bytes();
+    let mut at = 0;
+    while at < bytes.len() {
+        if bytes[at] != b'"' {
+            at += 1;
+            continue;
+        }
+        let start = at;
+        at += 1;
+        let mut escaped = false;
+        while at < bytes.len() {
+            let value = bytes[at];
+            at += 1;
+            if escaped {
+                escaped = false;
+                continue;
+            }
+            if value == 92 {
+                escaped = true;
+                continue;
+            }
+            if value == b'"' {
+                if let Ok(decoded) = serde_json::from_str::<String>(&text[start..at]) {
+                    let decoded = zeroize::Zeroizing::new(decoded);
+                    if decoded.as_str() == wanted {
+                        return Some(PassageSelector {
+                            start: text[..start].chars().count(),
+                            end: text[..at].chars().count(),
+                        });
+                    }
+                }
+                break;
+            }
+        }
+    }
+    None
+}
+
 fn stale(passage: &InferencePassage, result: Result<Option<String>, String>) -> StalePassage {
     StalePassage {
         source: passage.source.clone(),
@@ -414,6 +492,8 @@ impl RecallIndex {
     ) -> Result<(RecallEvidence, String), String> {
         let observed = self.observe_heads(scope);
         let mut evidence = RecallEvidence {
+            answer_format: AnswerFormat::Prose,
+            support: None,
             embedding: None,
             owner: None,
             scope: scope.to_vec(),
@@ -493,6 +573,61 @@ mod tests {
         .unwrap();
         let corpus = Arc::new(PageTextCorpus(backend.clone()));
         (backend, corpus)
+    }
+    #[test]
+    fn structured_quote_anchors_accept_alternative_json_unicode_escapes() {
+        let raw = r#"{"quote":"A caf\u00e9 observatory is retained."}"#;
+        let selector = json_quote_selector(raw, "A café observatory is retained.").unwrap();
+        let encoded: String = raw
+            .chars()
+            .skip(selector.start)
+            .take(selector.end - selector.start)
+            .collect();
+        assert_eq!(
+            serde_json::from_str::<String>(&encoded).unwrap(),
+            "A café observatory is retained."
+        );
+    }
+    #[test]
+    fn structured_claim_quotes_keep_historical_support_but_withdraw_stale_inspection() {
+        let source = RecallSourceId {
+            kind: RecallSourceKind::Clip,
+            owner: Some("owner".into()),
+            source: "selected-note".into(),
+            node: None,
+        };
+        let text = "The launch is on Thursday.";
+        let corpus = Arc::new(PublishedCorpus(vec![RetainedSourceText {
+            source: source.clone(),
+            version: "v1".into(),
+            title: None,
+            text: text.into(),
+        }]));
+        let index = RecallIndex::build(corpus.clone(), RecallConfig::default()).unwrap();
+        let (mut evidence, _) = index.prepare("launch", &[source.clone()]).unwrap();
+        evidence.answer_format = AnswerFormat::ClaimSupportV1;
+        let raw = r#"{"claims":[{"status":"supported","text":"Thursday launch","evidence":[{"handle":1,"quote":"The launch is on Thursday."}]}]}"#;
+        evidence.support = evidence.assess_answer(raw);
+        let support = evidence.support.clone();
+        evidence.validate(raw, Some(corpus.as_ref()));
+        assert_eq!(evidence.citations.len(), 1);
+        assert_eq!(evidence.citations[0].basis, CitationBasis::ClaimQuotation);
+        assert!(
+            evidence.citations[0].answer_selector.end > evidence.citations[0].answer_selector.start
+        );
+        let changed = PublishedCorpus(vec![RetainedSourceText {
+            source,
+            version: "v2".into(),
+            title: None,
+            text: "Different text".into(),
+        }]);
+        evidence.validate(raw, Some(&changed));
+        assert!(evidence.citations.is_empty());
+        assert!(!evidence.stale.is_empty());
+        assert_eq!(evidence.support, support);
+        evidence.validate(raw, None);
+        assert!(evidence.citations.is_empty());
+        assert_eq!(evidence.support, support);
     }
     #[test]
     fn unicode_selectors_and_passage_ids_bind_exact_retained_bytes() {
@@ -659,7 +794,10 @@ mod tests {
         assert!(context.ends_with("\n[1]\ncafé\n"));
         assert!(!context.contains("private-metadata"));
         let passage = &evidence.passages[0].passage;
-        assert_eq!(passage.source.source, "https://retained.test/private-metadata");
+        assert_eq!(
+            passage.source.source,
+            "https://retained.test/private-metadata"
+        );
         assert_eq!(passage.version, format!("blake3:{reference}"));
         assert_eq!(passage.selector, PassageSelector { start: 0, end: 4 });
         assert_eq!(passage.text_hash, eidetic::Hash::of("café".as_bytes()));
@@ -801,6 +939,7 @@ mod tests {
         lane.configure_recall(corpus, Default::default()).unwrap();
         let error = lane
             .ask_recalled(RecallAskRequestV1 {
+                answer_format: AnswerFormat::Prose,
                 ask: super::super::AskRequestV1 {
                     run: "stub".into(),
                     question: "nebula".into(),
