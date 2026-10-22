@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-22",
+  "receipt_cap_bytes": 100000000,
+  "source_basis": "0606dfaada848e464a8dc86de74ab72221f92fe7",
+  "scope": "Native Scroll supplier and Knot encoder adoption; explicit Submit admission at both shared Mere read loaders",
+  "user_ruling": "Require explicit Submit for Titan uploads and Spartan submissions, including read redirects",
+  "source_sha256": {
+    "Cargo.lock": "c25f5cb1d996b3ce01a32940ec891604fa8b410c0dfe14f054974d803dc11694",
+    "crates/system/fetch/Cargo.toml": "f91f076673777e62fe6d82ebae8df75ef2450344a05ea074353e19011465b3a3",
+    "crates/system/fetch/src/lib.rs": "c730c84ab766f7a88f791ce4fd7bcb2fbafc12009d0a24246a0ad455ad79084c",
+    "crates/system/fetch/src/tests.rs": "589544b016ea576bac1b3e0405309f79f00665e9354775ee37e266d4d48cd672",
+    "crates/system/document-lanes/src/remote.rs": "b11430a0cf9a820166df4bde64843abd7ffb5739abf9757e5e911d49f09e855d"
+  },
+  "source_hash_scope": "Raw qualified working-file bytes; Git source comparison at integration handles checkout line-ending normalization.",
+  "supplier": {
+    "repository": "smolweb (errand)",
+    "source": "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab",
+    "record": "74a25241794dee199f5dd76b3d21556d8e1bab86",
+    "receipt": "smolweb/support/receipts/native-scroll-server/supplier.json"
+  },
+  "consumer": {
+    "repository": "knot-editor",
+    "source": "02c5a2d162599a580d667fc86af09e911eb8736c",
+    "receipt": "knot-editor/support/receipts/native-scroll-server/consumer.json",
+    "snapshot_v1_unchanged": true,
+    "donor_wire_fixture_unchanged": true
+  },
+  "gates": [
+    {
+      "command": "cargo test -p mere-fetch --no-default-features --features actor,smolweb --lib --locked --offline --quiet",
+      "passed": 40,
+      "failed": 0,
+      "ignored": 0,
+      "additional_isolated_trace_child_passed": 1,
+      "scope": "Final source; parent tracing case invokes one isolated child to avoid parallel global callsite-cache interference"
+    },
+    {
+      "command": "cargo clippy -p mere-fetch --no-default-features --features actor,smolweb --lib --tests --locked --offline --quiet --no-deps -- -D warnings",
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "command": "cargo test -p mere-document-lanes --features smolweb --lib remote::smolweb_tests --locked --offline --quiet",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 45,
+      "diagnostics": "Existing unused imports outside remote.rs only"
+    },
+    {
+      "command": "cargo test -p mere-fetch --lib --locked --offline --quiet",
+      "passed": 39,
+      "failed": 0,
+      "scope": "Earlier source before isolated tracing regression was added; not a final-source default-feature claim"
+    }
+  ],
+  "verified_behaviors": [
+    "Titan and Spartan query targets (including empty query) refuse before a connection across shared read entry points",
+    "Shared read redirects recheck effect admission at every hop",
+    "Queryless Spartan reads retain exact binary body bytes",
+    "Explicit Spartan and Titan submissions retain exact bytes, MIME/token and selected TLS identity; submission receipt redirects are not auto-followed",
+    "Actual rejected-read trace events omit userinfo, query/fragment and Titan path parameters while leaving the real Submit URL unchanged",
+    "RemoteFetcher preserves None on refusal and existing non-following redirect behavior",
+    "Knot native full/abstract wire donor fixtures retain metadata, long valid dates, maximum author and snapshot V1"
+  ],
+  "dependency_scope": "Mere lock adds only three existing-version test dependencies to mere-fetch; no supplier repin. Knot's non-Errand Git suppliers remain unchanged; ordinary root retains older transitive Errand behind its existing Mere cohort.",
+  "open_gates": [
+    "Turnstone owner adoption and qualification of this Mere supplier",
+    "Scroll MIME propagation through document session construction and a native-only render construct",
+    "Scroll client-certificate/trust projection through browser owner APIs",
+    "Governed Scroll resident binding, current authority, restart, TLS identity and joined cancellation",
+    "Other family adapters, held sessions/transfers, mail and language selection remain owner-specific later slices"
+  ],
+  "resources": {
+    "cargo_target": "C:\\t\\cargo-targets\\mere",
+    "cargo_build_dir": "C:\\t\\cargo-targets\\mere\\build",
+    "new_isolated_cargo_home": false,
+    "new_isolated_target": false,
+    "temporary_integration_worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-smolweb-lanes",
+    "isolation_reason": "Primary Mere has unrelated staged receipt removals/replacements that collide with upstream integration; preserve its index and active source work",
+    "cleanup_condition": "Remove the clean integration worktree and branch after publishing; do not remove unrelated worktrees or prior receipts"
+  },
+  "retention": "Compact JSON only; no copied build logs or binaries. Total retained receipts for this orchestration remain below 100 MB."
+}

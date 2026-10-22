@@ -19,11 +19,13 @@
 //!
 //! Smolweb: the same actor also speaks the small web. A page request is routed by
 //! scheme, http(s) runs through netfetcher (WHATWG Fetch) and gemini / gopher /
-//! finger / spartan / nex / guppy / titan run through the [`errand`] transport
+//! finger / spartan / nex / guppy run through the [`errand`] transport
 //! crate. Either way the result is the same [`Fetched`] (decoded body +
 //! content-type), so the render side (nematic engines) is unchanged.
 //! Subresources use the same scheme routing and Gemini trust store as pages,
 //! while retaining raw bytes for images and other binary media.
+//! Titan uploads and Spartan query/data submissions require explicit Submit,
+//! including when a read redirects to a submission target.
 
 #[cfg(feature = "actor")]
 use std::collections::HashMap;
@@ -643,6 +645,16 @@ where
 fn url_without_query(raw: &str) -> String {
     url::Url::parse(raw)
         .map(|mut parsed| {
+            // Diagnostic copy only: never retain URL credentials or Titan's
+            // upload parameters in a read-attempt trace.
+            let _ = parsed.set_password(None);
+            let _ = parsed.set_username("");
+            if parsed.scheme() == "titan"
+                && let Some((path, _)) = parsed.path().split_once(';')
+            {
+                let path = path.to_string();
+                parsed.set_path(&path);
+            }
             parsed.set_query(None);
             parsed.set_fragment(None);
             parsed.to_string()
@@ -721,6 +733,9 @@ where
 /// Fetch a successful smolweb response without decoding its body. Page loads
 /// and binary subresources share redirect, timeout, certificate, and protocol
 /// status handling through this one path.
+/// Titan targets and Spartan URLs with any query component (including an empty
+/// `?`) require explicit Submit. Reads refuse these before transport at every
+/// redirect hop, rather than sending an upload through ordinary acquisition.
 #[cfg(feature = "smolweb")]
 async fn smolweb_fetch_response<F>(
     url: &str,
@@ -733,6 +748,22 @@ where
     let mut current =
         url::Url::parse(url).map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
     for _ in 0..MAX_REDIRECTS {
+        // These exchanges have submission semantics even with an empty body.
+        // Check every redirect before transport, so read acquisition never
+        // borrows the authority of the separate explicit Submit command.
+        match current.scheme() {
+            "titan" => {
+                return Err(FetchFailure::Failed(
+                    "Titan uploads require explicit Submit".into(),
+                ));
+            },
+            "spartan" if current.query().is_some() => {
+                return Err(FetchFailure::Failed(
+                    "Spartan submissions require explicit Submit".into(),
+                ));
+            },
+            _ => {},
+        }
         let response_url = current.clone();
         let response = if current.scheme() == "gemini" {
             match identity.filter(|identity| identity.applies_to(&current)) {
@@ -943,10 +974,10 @@ where
         bytes,
         body,
     };
-    if !page_load::is_download_response(&fetched) {
-        if let Some(final_url) = final_url.as_ref() {
-            on_complete(final_url, fetched.content_type.as_deref(), &fetched.bytes);
-        }
+    if !page_load::is_download_response(&fetched)
+        && let Some(final_url) = final_url.as_ref()
+    {
+        on_complete(final_url, fetched.content_type.as_deref(), &fetched.bytes);
     }
     Ok(fetched)
 }
