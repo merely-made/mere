@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- Draw the checkbox, toggle and radio indicators in the shell sheet, and give
+  hosts what they were copying. Wrong before: the checkbox / toggle element held
+  `[x]` / `[ ]` text and the radio put `(o) ` / `( ) ` inside its label's text
+  node, so no stylesheet could replace them and hosts showed "( ) Genet" and
+  "[ ]Hub room". Now the checkbox / toggle is an empty `control-mark` child inside
+  the control, the radio row is a `radio-indicator` span beside a `radio-label`
+  span, and `SHELL_CSS` draws all three from `currentColor`. `radio_options` takes
+  `RadioOption`s (label, `disabled`, host attributes) with `aria-disabled`,
+  arrow / Home / End movement over the enabled options, and a disabled saved
+  selection that stays checked; `radio_group` is its label-only door.
+  `checkbox_disabled` is an inert checkbox with `aria-disabled`. `status_note` /
+  `status_note_labelled` give the `role="status"` note its base class and
+  optional accessible name. `disclosure_trigger` is the disclosure button alone
+  for hosts that keep the content elsewhere, and `RangeScrubber::with_value_text`
+  names the value in words. Still open: the drawn radio dot and checkbox fill
+  use `box-shadow` / `visibility`, so a renderer without them shows a solid
+  indicator; a toggle has no disabled constructor yet.
 - Publish the Cambium chain (Mark, 2026-10-19): `command-menu` 0.1.0 (the name
   is free on crates.io and stays; `alembic` is held by a third party), `mere-surface-api`
   0.1.0, `meristem` 0.2.0, `tinct` 0.2.0, `illume` 0.0.3, `sprigging` 0.2.2 and

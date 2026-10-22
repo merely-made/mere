@@ -6,6 +6,17 @@
 //! Direction and kind are retained even when several relations share a member.
 use kernel::graph::{Graph, RelationKind, SemanticSubKind};
 
+/// How hosts list relationship rows: one page size and one wording, so the
+/// same document reads the same in every Related list.
+pub const RELATIONSHIPS_PAGE_SIZE: usize = 6;
+pub const RELATIONSHIPS_NOUN: &str = "relationships";
+pub const NO_RELATIONSHIPS: &str = "No relationships recorded for this document";
+
+/// A relationship row's second line: how the other document relates, and where it is.
+pub fn relationship_detail<G>(row: &RelationshipRow<G>) -> String {
+    format!("{} · {}", row.relationship, row.address)
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct RelationshipTarget<G = uuid::Uuid> {
     pub graph: G,
@@ -58,7 +69,7 @@ pub fn relationships<G: Copy + Eq + std::hash::Hash>(
         if seen.insert(target) {
             rows.push(RelationshipRow {
                 target,
-                title: document_label(graph, other),
+                title: graph.node_display_label(other),
                 address: node.url().to_string(),
                 relationship: relationship_label(relation.kind, target.incoming),
             });
@@ -71,23 +82,6 @@ pub fn relationships<G: Copy + Eq + std::hash::Hash>(
             .then(a.target.member.cmp(&b.target.member))
     });
     rows
-}
-
-/// Keep an unloaded or host-only title useful when several members share a
-/// domain. Loaded document titles retain the kernel's ordinary presentation.
-pub fn document_label(graph: &Graph, key: kernel::graph::NodeKey) -> String {
-    let Some(node) = graph.get_node(key) else {
-        return "Document unavailable".into();
-    };
-    let title = node.title.trim();
-    let host_only = kernel::address::cached_host_from_url(node.url())
-        .map(|host| host == title)
-        .unwrap_or(false);
-    if title.is_empty() || title == node.url() || host_only {
-        node.url().into()
-    } else {
-        graph.node_display_label(key)
-    }
 }
 
 fn relationship_label(kind: RelationKind, incoming: bool) -> String {
@@ -143,6 +137,7 @@ fn words(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::{
         EdgeAssertion, SemanticSubKind,
         apply::{add_node, assert_relation},
@@ -195,5 +190,30 @@ mod tests {
         assert!(relationships(42u64, &graph, uuid::Uuid::nil()).is_empty());
         assert_eq!(graph.node_count(), 2);
         assert_eq!(graph.projected_relations().count(), before);
+    }
+
+    #[test]
+    fn a_document_has_one_name_in_every_row() {
+        let mut graph = Graph::new();
+        let a = add_node(&mut graph, Some(uuid::Uuid::from_u128(1)), "https://same.test/a".into(), Default::default());
+        let b = add_node(&mut graph, Some(uuid::Uuid::from_u128(2)), "https://same.test/b".into(), Default::default());
+        let c = add_node(&mut graph, Some(uuid::Uuid::from_u128(3)), "https://same.test/c".into(), Default::default());
+        graph.get_node_mut(c).unwrap().title = "Third".into();
+        for to in [b, c] {
+            assert_relation(&mut graph, a, to, EdgeAssertion::Semantic { sub_kind: SemanticSubKind::Cites, label: None }).unwrap();
+        }
+        let rows = relationships(0u8, &graph, uuid::Uuid::from_u128(1));
+        for (key, title) in [(b, "same.test/b"), (c, "Third")] {
+            let row = rows
+                .iter()
+                .find(|r| Some(r.target.member) == graph.get_node(key).map(|n| n.id))
+                .unwrap();
+            assert_eq!(row.title, title);
+            assert_eq!(row.title, graph.node_display_label(key));
+        }
+        assert_eq!(
+            relationship_detail(rows.iter().find(|r| r.title == "Third").unwrap()),
+            "Cites · https://same.test/c"
+        );
     }
 }

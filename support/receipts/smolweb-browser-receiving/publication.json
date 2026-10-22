@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "scope": "Append-only publication hash convention for qualified-current.json references",
+  "convention": "Recorded SHA256 values identify the UTF-8 native checkpoint bytes. Git text normalization may store LF and a Windows checkout may materialize CRLF. The original frozen byte form is reconstructible and has identical JSON data; existing receipts are unchanged.",
+  "references": [
+    {
+      "receipt": "turnstone/docs/receipts/native_browser_receiving_20261022/product-integrated-build.json",
+      "native_checkpoint_sha256": "6f6807d0b92624e6fa078a069a3bec6dbd5efb0a502d7af16bd3962ea47c8f99",
+      "git_blob_sha256": "1c139a67dcef8a92f1f1a80bc7ad843799f3d224ddba34f2e9b46c09944dcf0e",
+      "native_byte_form_matches": [
+        "utf8_crlf"
+      ],
+      "decoded_json_identical": true
+    },
+    {
+      "receipt": "turnstone/docs/receipts/native_browser_receiving_20261022/product-integrated-tests.json",
+      "native_checkpoint_sha256": "67ab417a511e6a023b9a40878c91dcb9c25b0a8a39a6c3f9287106ec3baadd40",
+      "git_blob_sha256": "2a45f2d5d46887206e3b8f6818214c4746decaef549da06f5ff87a46bd8267e4",
+      "native_byte_form_matches": [
+        "utf8_crlf"
+      ],
+      "decoded_json_identical": true
+    },
+    {
+      "receipt": "turnstone/docs/receipts/native_browser_receiving_20261022/integrated-sdk.json",
+      "native_checkpoint_sha256": "1575bb1bd91b992fc958d53943ecf839313dc550c7f87c6ec409254b749fe14f",
+      "git_blob_sha256": "1575bb1bd91b992fc958d53943ecf839313dc550c7f87c6ec409254b749fe14f",
+      "native_byte_form_matches": [
+        "git_blob",
+        "utf8_lf"
+      ],
+      "decoded_json_identical": true
+    },
+    {
+      "receipt": "knot-editor/support/receipts/smolweb-browser-receiving/process-integrated.json",
+      "native_checkpoint_sha256": "9e704454232c539821f6bcdc0fd44eec9f6395b8f3ecbf30fcd871a3504e9dbb",
+      "git_blob_sha256": "5e584596e1074f09e5c1470c9766fc68384afd9a7e021d81281eb3f2f82517ea",
+      "native_byte_form_matches": [
+        "utf8_crlf"
+      ],
+      "decoded_json_identical": true
+    }
+  ],
+  "cleanup": {
+    "temporary_receiving_worktrees_removed": true,
+    "new_isolated_cargo_homes": null,
+    "new_isolated_targets": null,
+    "stable_targets_reused": [
+      "C:/t/cargo-targets/mere",
+      "C:/t/cargo-targets/turnstone",
+      "C:/t/cargo-targets/knot-editor"
+    ]
+  },
+  "foreign_mere_staged_entries_and_blob_ids_preserved": true,
+  "receipt_budget_bytes": 100000000
+}
