@@ -1,9 +1,12 @@
 # Shared site model extraction
 
-**Status (2026-10-21):** extraction and optional saved-site revision storage
+**Status (2026-10-22):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
 The Gemini runtime continuation is landed and qualified through native processes.
+Native Scroll replies now live in Errand and Knot uses them with unchanged V1
+fixtures. Both shared read loaders require explicit Submit for Titan and Spartan
+submission URLs; focused native tests qualify that rule.
 
 ## Scope and ownership
 
@@ -155,6 +158,112 @@ admitted responses may finish. Record/content import spans owners and may leave
 accepted facts when later content retention refuses. Such incomplete delivery
 refuses serving until explicitly repaired.
 
+## Wider Errand and smolweb coverage (2026-10-21)
+
+The three initial publication profiles and the Gemini resident are starting
+points. Track the rest of the family by capability; a wire crate, a fetch route,
+a document engine and a durable resident each establish different coverage.
+Errand's continuing repository is locally checked out as `smolweb`.
+
+| Surface | Current source boundary | Publication continuation |
+| --- | --- | --- |
+| Errand scheme routing | Gemini, Gopher, Finger, Spartan, Nex, Guppy, Titan and Scroll in `errand::Scheme` | Inspect existing clients and protocol handlers before adding adapters; a fetch route does not establish resident serving. |
+| Existing `errand::serve` adapters | Gemini, Gopher and Finger over `Source`; structural listings have native projections | Reuse these seams where faithful. Native documents retain their source format; a listing projection does not imply document conversion. |
+| Further native serving | Scroll metadata/language/abstracts, Spartan request bodies, Nex and Guppy transport behavior | Preserve each native request/response contract and qualify it independently. Micron is a document format with a Murm/Reticulum transport path, not an Errand URL scheme. |
+| Writes and conversations | Titan upload, Spartan submission and Misfin mail have effects; DICT has sessions | Give writes their own explicit authorization and host lifecycle. Read-publication selection alone grants no submission or mailbox authority. |
+| Other family crates | DICT, FSP, Kepler, Scorpion, Text Protocol and Misfin exist independently of the scheme router | Inventory their actual APIs and consumer needs before choosing fetch, serving, transfer or session integration. Preserve cache, range, negotiation and interaction semantics where applicable. |
+
+`SiteFormat` currently names Scroll, Gemini, Spartan and Micron. It is not a
+catalog of every transport. Keep content profiles, transport selection and
+endpoint policy distinct; extend the shared model only for demonstrated native
+content requirements, with compatibility fixtures. Eidetic retention and Gemot
+authority remain optional owners regardless of transport. Errand owns wire
+behavior and protocol projection; Djinn owns endpoint custody/policy and
+Armillary owns scoped execution. The native source adapter's local synchronous
+I/O constraint remains visible when considering other host backends.
+
+Rendering, browser routing, input/certificate conversations and trust projection
+continue through the existing
+[smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
+and `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`.
+Nematic lowers native documents; browser registration or rendering does not
+qualify the publication host. Finger's separate WebFinger support is HTTP and
+does not expand Errand's non-HTTP fetch router.
+
+Before the next adapter slice, compare the consumer with the protocol crate's
+existing request/response and server APIs. Its done-condition names exact
+native bytes and metadata, request effects, current authority/refusal, and
+resident restart/cancellation behavior as applicable. Preserve snapshot V1 and
+qualify each capability actually added. This section records scope, not new
+protocol implementation or acceptance evidence.
+
+### Lane orchestration (2026-10-21)
+
+Three bounded read-only lanes inspected serving, effects/sessions and browser
+integration before implementation. Source basis: Mere `0606dfaad`, Errand's
+local `smolweb` checkout `50702b440` and Turnstone `9c8420d5` (locked Mere
+`500bc78a`). The Errand crate sources match the current `dce1f085` receiving pin.
+Research retained source references only; the entire orchestration retains at
+most 100 MB of compact receipts. Stable repository targets are reused.
+
+| Lane | Owner and bounded files | Next done-condition |
+| --- | --- | --- |
+| Native Scroll supplier, landed | Errand `scroll-protocol` wire encoder, optional connection exchange and focused tests; coordinator owns supplier plan/index and source publication | Exact native headers/body, ordered request languages/abstract flag, bounds, header-injection refusal, caller timeout and cancellation; no listener or spawned tasks. Source `3d2ce3a5`. Canonical supplier plan: `smolweb/design_docs/implementation_strategy/2026-10-21_native_scroll_server_plan.md`. |
+| Existing Knot receiver, landed | A test lane owns only `crates/knot-site/tests/scroll_wire.rs`; coordinator owns encoder adoption, supplier pins/locks and receiving docs | Unchanged literal full/abstract fixtures and real local TLS tests pass before/after extraction, including saved replacement, refusal and stop. Snapshot V1, host policy and renderer suppliers preserved. Source `02c5a2d`; 22 standalone cases, root check and strict Clippy pass. |
+| Effect admission, qualified | Mere fetch actor and existing submission controls; worker owns the fetch crate source/tests, coordinator owns plan/source integration | Initial/redirected Titan and Spartan query reads refuse before contact. Exact explicit submission bytes, identity presentation and trace redaction pass in the 40-case suite plus one isolated trace child; strict Clippy passes. Existing `SmolwebSubmission` remains the write path. |
+| Document read admission, qualified | A separate worker owns only `document-lanes/src/remote.rs` and its existing smolweb test module | The direct Errand read loader refuses submission targets before trust setup or transport. Five focused cases pass, including zero contact, exact queryless Spartan bytes and unchanged `None`/redirect behavior. MIME, session and accessibility work stays with its existing owner. |
+| Browser receiving, existing owner queue | Mere fidelity S1/WS2 and Turnstone unusual-protocols SC5/S8/SC6; no files acquired by this publication lane | A Scroll-only construct must reach the native lowerer through retained MIME. Preserve the existing accessibility/source/build queue; certificate-gated Scroll and trust projection have separate gates. |
+
+Findings that constrain the next slices:
+
+- At the research baseline, Scroll's wire crate had native request/header
+  parsing and stream-generic client exchange but no native server seam. The
+  shared encoder and connection exchange are now landed; Knot retains its
+  blocking TLS host. Its one-page-per-path language behavior stays unchanged by
+  extraction; multilingual selection/fallback remains a named design checkpoint.
+- Gopher's generic adapter drops Plus request facts; Finger's drops verbosity.
+  A shared source does not establish native completeness. Existing Spartan and
+  Misfin accept loops spawn tasks whose join is not proven by listener shutdown;
+  host qualification must account for admitted connection work explicitly.
+- Errand's Titan fetch emits a zero-byte upload, Spartan query fetch emits a
+  request body, and Mere's read redirect loop can cross into either path
+  (`crates/system/fetch/src/lib.rs`). Turnstone intercepts an initial Titan
+  address, which does not establish redirect admission. The policy checkpoint
+  was resolved directly by Mark: **Require explicit Submit**. Apply the rule
+  before every initial or redirected read exchange, preserving the separate
+  typed submission path and protocol wire semantics.
+- A second review found `document-lanes::RemoteFetcher` calling Errand directly
+  for body-less document loads. Its admission guard follows the same rule;
+  browser/image routing beyond that confirmed call graph is not inferred.
+  Fetch trace addresses also need userinfo and Titan path parameters removed,
+  in addition to query/fragment redaction. Qualify actual rejected-read trace
+  events while preserving the real submission target and credentials.
+- `document-lanes` session spawning drops `SessionSpawnRequest.content_type`;
+  its smolweb engine builds `EngineInput` without MIME, while Scroll lowering
+  uses MIME to distinguish scrolltext. A heading/link-only browser test cannot
+  establish this fidelity. Turnstone's identity-origin code permits Gemini and
+  Titan, not Scroll; Nematic trust still defaults to `Unknown` despite durable
+  TOFU at the browser host. These remain browser-owner findings.
+- DICT and FSP need held session/transfer consumers; Kepler needs native cache
+  facts and a separately qualified TLS posture; Scorpion R/M needs binary/range
+  preservation while S/I remain incomplete; Text has no Errand route yet.
+  Misfin already has mailbox/storage/identity APIs, with Comms read integration
+  but no established product send/server composition. These are separate future
+  owner slices rather than additions to `PublishedSnapshotV1`.
+
+The Scroll consumer review found that valid UTC timestamps can retain more than
+1024 fractional digits. The encoder's line cap now derives from validated
+metadata within the existing snapshot bound; a new arbitrary date-length limit
+would reject existing V1 content. Regression coverage includes both long dates
+and a 1024-byte Unicode author. Supplier and consumer receipts live with their
+owners at `smolweb/support/receipts/native-scroll-server/supplier.json` and
+`knot-editor/support/receipts/native-scroll-server/consumer.json`.
+
+The implemented effects rule is qualified on the shared fetch supplier; a
+Turnstone cohort still pinned to an earlier Mere does not gain that behavior
+until its browser owner adopts and qualifies the supplier. This lane leaves the
+existing browser source/accessibility/build queue intact.
+
 ## Extraction findings (2026-10-20)
 
 - `knot-editor/crates/knot-site/src/lib.rs` combines portable records and validation
@@ -167,6 +276,18 @@ refuses serving until explicitly repaired.
   does not express the complete Scroll metadata contract.
 
 ## Progress
+
+- 2026-10-22: the three research lanes led to two bounded implementation slices.
+  Errand `3d2ce3a5` adds native Scroll replies and a caller-owned connection
+  exchange; Knot `02c5a2d` adopts the encoder with the exact donor wire fixtures
+  and snapshot V1 retained. Mere's fetch actor and direct document loader now
+  apply Mark's explicit-Submit ruling before transport, including redirect hops
+  in the shared fetch loop. The fetch suite passes 40 cases plus one isolated
+  trace child and strict Clippy; the document-loader gate passes five cases.
+  [Lane qualification](../../../support/receipts/smolweb-lanes/qualification.json)
+  records hashes, commands, ownership limits and supplier/consumer evidence.
+  Turnstone adoption, retained Scroll MIME, certificate/trust projection and a
+  governed Scroll resident remain separate receiving and host gates.
 
 - 2026-10-20: reviewed current source, dependency roots and clean checkout state;
   started the pre-extraction V1 compatibility gate.
