@@ -8,8 +8,11 @@
 //! group is a single index) deselects the rest. The group owns the WAI-ARIA
 //! radio pattern's Space activation, wrapping Arrow-key movement, roving
 //! `tabindex`, and focus transfer. `Home` and `End` are retained as Cambium
-//! extensions. ARIA roles expose the component's semantics; the generic runner
+//! extensions. Options may be disabled ([`RadioOption`]); navigation skips
+//! them. The indicator is its own element, drawn by the shell sheet. ARIA roles expose the component's semantics; the generic runner
 //! does not infer behavior from them.
+
+use std::rc::Rc;
 
 use crate::pod::GenetElement;
 use crate::{GenetCtx, Key, NamedKey, View, el, on_click, on_key, request_focus};
@@ -49,14 +52,42 @@ impl Default for RadioGroup {
     }
 }
 
-/// A radio group over a [`RadioGroup`] and option labels: one row per option,
-/// clicking a row selects it (and only it).
+/// One option of a [`radio_options`] group.
 ///
-/// Each row is a `radio` (or `radio selected`) element with `role="radio"` and
-/// `aria-checked`, an ASCII `(o)` / `( )` indicator before the label (so it
-/// reads without special fonts), inside a `role="radiogroup"` container. The
-/// host styles the classes. `+ use<>` keeps the opaque type from borrowing
-/// `state` / `options` (the labels are cloned in).
+/// A disabled option keeps its place and its saved selection but cannot be
+/// activated, focused or reached by arrow keys; it exposes
+/// `aria-disabled="true"`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RadioOption {
+    pub label: String,
+    pub disabled: bool,
+    /// Extra attributes for the option's element (host test hooks, ids).
+    pub attrs: Vec<(String, String)>,
+}
+
+impl RadioOption {
+    pub fn new(label: impl Into<String>) -> Self {
+        Self {
+            label: label.into(),
+            disabled: false,
+            attrs: Vec::new(),
+        }
+    }
+
+    pub fn disabled(mut self, disabled: bool) -> Self {
+        self.disabled = disabled;
+        self
+    }
+
+    pub fn with_attr(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        self.attrs.push((name.into(), value.into()));
+        self
+    }
+}
+
+/// A radio group over a [`RadioGroup`] and option labels: one row per option,
+/// clicking a row selects it (and only it). See [`radio_options`] for disabled
+/// options.
 pub fn radio_group<OptionLabel>(
     state: &RadioGroup,
     options: &[OptionLabel],
@@ -64,53 +95,108 @@ pub fn radio_group<OptionLabel>(
 where
     OptionLabel: AsRef<str>,
 {
-    let option_count = options.len();
-    let active = if state.selected < option_count {
-        state.selected
+    let options: Vec<RadioOption> = options
+        .iter()
+        .map(|label| RadioOption::new(label.as_ref()))
+        .collect();
+    radio_options(state, &options)
+}
+
+/// A radio group whose options may be disabled.
+///
+/// Each row is a `role="radio"` element (`radio`, `radio selected`,
+/// `radio disabled`) with `aria-checked` and `aria-disabled`, holding a
+/// `radio-indicator` span the shell sheet draws and a `radio-label` span with
+/// the text, inside a `role="radiogroup"` container. Arrow keys wrap over the
+/// enabled options; `Home` / `End` jump to the first / last enabled one; Space
+/// activates the focused one. Exactly one enabled option is a tab stop: the
+/// selected one, else the first enabled. A disabled selection stays selected
+/// (it is saved state) but is not focusable. `+ use<>` keeps the opaque type
+/// from borrowing `state` / `options` (the options are cloned in).
+pub fn radio_options(
+    state: &RadioGroup,
+    options: &[RadioOption],
+) -> impl View<RadioGroup, (), GenetCtx, Element = GenetElement> + use<> {
+    let enabled: Rc<Vec<usize>> = Rc::new(
+        options
+            .iter()
+            .enumerate()
+            .filter_map(|(index, option)| (!option.disabled).then_some(index))
+            .collect(),
+    );
+    let active = if enabled.contains(&state.selected) {
+        Some(state.selected)
     } else {
-        0
+        enabled.first().copied()
     };
     // One clickable row per option. The per-option closures share one type (one
     // closure definition capturing a `usize`), so the `Vec` is homogeneous.
     let items: Vec<_> = options
         .iter()
         .enumerate()
-        .map(|(i, label)| {
-            let selected = i == state.selected;
-            let active = i == active;
-            let indicator = if selected { "(o) " } else { "( ) " };
-            let label = label.as_ref();
-            let item = on_click(
-                el::<_, RadioGroup, ()>("div", format!("{indicator}{label}"))
-                    .attr("role", "radio")
-                    .attr("aria-checked", if selected { "true" } else { "false" })
-                    .attr("tabindex", if active { "0" } else { "-1" })
-                    .attr("class", if selected { "radio selected" } else { "radio" }),
-                move |s: &mut RadioGroup, _| {
-                    s.selected = i;
-                    s.focus_request = None;
+        .map(|(index, option)| {
+            let selected = index == state.selected;
+            let disabled = option.disabled;
+            let tab_stop = active == Some(index);
+            let enabled = enabled.clone();
+            let mut row = el::<_, RadioGroup, ()>(
+                "div",
+                (
+                    el::<_, RadioGroup, ()>("span", ()).attr("class", "radio-indicator"),
+                    el::<_, RadioGroup, ()>("span", option.label.clone())
+                        .attr("class", "radio-label"),
+                ),
+            )
+            .attr("role", "radio")
+            // The text sits in the label span; naming the row keeps it findable
+            // by shallow class-and-text selectors as well as by role and name.
+            .attr("aria-label", option.label.clone())
+            .attr("aria-checked", if selected { "true" } else { "false" })
+            .attr("aria-disabled", if disabled { "true" } else { "false" })
+            .attr("tabindex", if tab_stop { "0" } else { "-1" })
+            .attr(
+                "class",
+                match (selected, disabled) {
+                    (true, false) => "radio selected",
+                    (false, false) => "radio",
+                    (true, true) => "radio selected disabled",
+                    (false, true) => "radio disabled",
                 },
             );
+            for (name, value) in &option.attrs {
+                row = row.attr(name.clone(), value.clone());
+            }
+            let item = on_click(row, move |s: &mut RadioGroup, _| {
+                if !disabled {
+                    s.selected = index;
+                    s.focus_request = None;
+                }
+            });
             let keyboard = on_key(item, move |state: &mut RadioGroup, event| {
+                let Some(position) = enabled.iter().position(|candidate| *candidate == index)
+                else {
+                    return;
+                };
+                let count = enabled.len();
                 let next = match event.key {
                     Key::Named(NamedKey::ArrowLeft | NamedKey::ArrowUp) => {
-                        (i + option_count - 1) % option_count
+                        enabled[(position + count - 1) % count]
                     },
                     Key::Named(NamedKey::ArrowRight | NamedKey::ArrowDown) => {
-                        (i + 1) % option_count
+                        enabled[(position + 1) % count]
                     },
                     // Cambium extensions retained from the original runner behavior.
-                    Key::Named(NamedKey::Home) => 0,
-                    Key::Named(NamedKey::End) => option_count - 1,
-                    Key::Named(NamedKey::Space) => i,
+                    Key::Named(NamedKey::Home) => enabled[0],
+                    Key::Named(NamedKey::End) => enabled[count - 1],
+                    Key::Named(NamedKey::Space) => index,
                     _ => return,
                 };
                 state.selected = next;
                 state.focus_request = Some(next);
                 event.prevent_default();
             })
-            .focusable(active);
-            request_focus(keyboard, state.focus_request == Some(i))
+            .focusable(tab_stop);
+            request_focus(keyboard, state.focus_request == Some(index) && !disabled)
         })
         .collect();
     el::<_, RadioGroup, ()>("div", items)

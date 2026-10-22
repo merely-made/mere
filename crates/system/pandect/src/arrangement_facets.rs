@@ -42,10 +42,10 @@
 
 use std::collections::BTreeSet;
 
-use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use uuid::Uuid;
 
+use crate::cartography_geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
 use crate::facet_store::{AcceptAll, FacetId, NodeFacetStore};
 
 /// Facet id of a node's durable world position. Payload: `{"x": f32, "y": f32}`
@@ -77,30 +77,12 @@ pub const ARRANGEMENT_FACE: &str = "arrangement.face";
 pub const ARRANGEMENT_SEED: &str = "arrangement.seed";
 
 /// Facet id of the regions the active arrangement drew. Payload: an array of
-/// [`ArrangementRegion`]. Carried by the scene's container node.
+/// [`SavedRegion`]. Carried by the scene's container node.
 pub const ARRANGEMENT_REGIONS: &str = "arrangement.regions";
 
 /// Facet id of the person's Mosaic arrangement. Payload: an
-/// [`ArrangementMosaic`]. Carried by the scene's container node.
+/// [`SavedMosaic`]. Carried by the scene's container node.
 pub const ARRANGEMENT_MOSAIC: &str = "arrangement.mosaic";
-
-/// One region an arrangement drew, in world coordinates, its members by id
-/// (the canvas's `SavedRegion`).
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-pub struct ArrangementRegion {
-    pub contour: Vec<(f32, f32)>,
-    pub label: Option<String>,
-    pub members: Vec<Uuid>,
-}
-
-/// The person's Mosaic arrangement by member (the canvas's `SavedMosaic`).
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-pub struct ArrangementMosaic {
-    pub group_of: Vec<(Uuid, String)>,
-    pub group_order: Vec<String>,
-    pub member_order: Vec<Uuid>,
-    pub scale: Vec<(Uuid, f32)>,
-}
 
 /// The [`ARRANGEMENT_POSITION`] facet id, constructed.
 pub fn arrangement_position_facet() -> FacetId {
@@ -344,7 +326,7 @@ pub fn read_arrangement_seed(store: &NodeFacetStore) -> Option<Vec<(Uuid, (f32, 
 pub fn write_arrangement_regions(
     store: &mut NodeFacetStore,
     container: Uuid,
-    regions: &[ArrangementRegion],
+    regions: &[SavedRegion],
 ) {
     let entries = match regions {
         [] => Vec::new(),
@@ -356,8 +338,8 @@ pub fn write_arrangement_regions(
 /// Load-time read of [`ARRANGEMENT_REGIONS`] from `container`, in drawn order.
 /// A malformed payload or any non-finite contour point yields no regions: a
 /// partial set is a wrong picture of the arrangement.
-pub fn read_arrangement_regions(store: &NodeFacetStore, container: Uuid) -> Vec<ArrangementRegion> {
-    let regions: Option<Vec<ArrangementRegion>> = store
+pub fn read_arrangement_regions(store: &NodeFacetStore, container: Uuid) -> Vec<SavedRegion> {
+    let regions: Option<Vec<SavedRegion>> = store
         .get(&container, &FacetId::new(ARRANGEMENT_REGIONS))
         .and_then(|value| serde_json::from_value(value.clone()).ok());
     regions
@@ -376,7 +358,7 @@ pub fn read_arrangement_regions(store: &NodeFacetStore, container: Uuid) -> Vec<
 pub fn write_arrangement_mosaic(
     store: &mut NodeFacetStore,
     container: Uuid,
-    mosaic: Option<&ArrangementMosaic>,
+    mosaic: Option<&SavedMosaic>,
 ) {
     rewrite_family(
         store,
@@ -393,8 +375,8 @@ pub fn write_arrangement_mosaic(
 pub fn read_arrangement_mosaic(
     store: &NodeFacetStore,
     container: Uuid,
-) -> Option<ArrangementMosaic> {
-    let mosaic: ArrangementMosaic = serde_json::from_value(
+) -> Option<SavedMosaic> {
+    let mosaic: SavedMosaic = serde_json::from_value(
         store
             .get(&container, &FacetId::new(ARRANGEMENT_MOSAIC))?
             .clone(),
@@ -405,6 +387,45 @@ pub fn read_arrangement_mosaic(
         .iter()
         .all(|(_, factor)| factor.is_finite())
         .then_some(mosaic)
+}
+
+/// The whole family as one [`CartographyGeometry`]: how a session saved
+/// before the saved scene (`saved_scene`) keeps its layout, read once to be
+/// carried into one. The container-keyed members (regions, mosaic) read from
+/// `container` when there is one.
+pub fn read_arrangement_geometry(
+    store: &NodeFacetStore,
+    container: Option<Uuid>,
+) -> CartographyGeometry {
+    CartographyGeometry::from_positions(read_arrangement_positions(store))
+        .with_sizes(read_arrangement_sizes(store))
+        .with_sprites(read_arrangement_sprites(store))
+        .with_sprite_hulls(read_arrangement_sprite_hulls(store))
+        .with_materials(read_arrangement_materials(store))
+        .with_faces(read_arrangement_faces(store))
+        .with_seed(read_arrangement_seed(store))
+        .with_regions(
+            container
+                .map(|container| read_arrangement_regions(store, container))
+                .unwrap_or_default(),
+        )
+        .with_mosaic(container.and_then(|container| read_arrangement_mosaic(store, container)))
+}
+
+/// Remove every `arrangement.*` facet the family writes, once a saved scene
+/// holds what they did.
+pub fn clear_arrangement(store: &mut NodeFacetStore, container: Option<Uuid>) {
+    write_arrangement_positions(store, []);
+    write_arrangement_sizes(store, []);
+    write_arrangement_sprites(store, Vec::<(Uuid, String)>::new());
+    write_arrangement_sprite_hulls(store, []);
+    write_arrangement_materials(store, []);
+    write_arrangement_faces(store, Vec::<(Uuid, String)>::new());
+    write_arrangement_seed(store, None::<Vec<(Uuid, (f32, f32))>>);
+    if let Some(container) = container {
+        write_arrangement_regions(store, container, &[]);
+        write_arrangement_mosaic(store, container, None);
+    }
 }
 
 /// Drop every facet of every node not in `present` — the load-time reconcile,
@@ -611,14 +632,14 @@ mod tests {
         );
     }
 
-    fn sample_regions() -> Vec<ArrangementRegion> {
+    fn sample_regions() -> Vec<SavedRegion> {
         vec![
-            ArrangementRegion {
+            SavedRegion {
                 contour: vec![(0.0, 0.0), (10.0, 0.0), (5.0, 8.0)],
                 label: Some("Reading".into()),
                 members: vec![Uuid::from_u128(1), Uuid::from_u128(2)],
             },
-            ArrangementRegion {
+            SavedRegion {
                 contour: vec![(20.0, 20.0), (30.0, 25.0)],
                 label: None,
                 members: vec![Uuid::from_u128(3)],
@@ -664,8 +685,8 @@ mod tests {
         );
     }
 
-    fn sample_mosaic() -> ArrangementMosaic {
-        ArrangementMosaic {
+    fn sample_mosaic() -> SavedMosaic {
+        SavedMosaic {
             group_of: vec![(Uuid::from_u128(1), "docs".into())],
             group_order: vec!["docs".into(), "news".into()],
             member_order: vec![Uuid::from_u128(2), Uuid::from_u128(1)],

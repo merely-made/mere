@@ -13488,6 +13488,7 @@ dependencies = [
  "numen",
  "paint_list_api",
  "paint_list_render",
+ "pandect",
  "petgraph 0.8.3",
  "sceno",
  "scenograph",

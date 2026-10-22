@@ -128,6 +128,33 @@ pub fn read_scene_facets(store: &NodeFacetStore, container: Uuid) -> SceneFacets
     }
 }
 
+/// Whether `container` carries any `scene.*` facet.
+pub fn has_scene_facets(store: &NodeFacetStore, container: Uuid) -> bool {
+    store.facets_of(&container).is_some_and(|facets| {
+        [
+            SCENE_SIZE_BY_DEGREE,
+            SCENE_SIZE_BY_IMPORTANCE,
+            SCENE_IMPORTANCE_METRIC,
+            SCENE_PHYSICS_DAMPING,
+        ]
+        .iter()
+        .any(|id| facets.get(&FacetId::new(*id)).is_some())
+    })
+}
+
+/// Remove `container`'s `scene.*` facets, once a saved scene holds what they
+/// did.
+pub fn clear_scene_facets(store: &mut NodeFacetStore, container: Uuid) {
+    for id in [
+        SCENE_SIZE_BY_DEGREE,
+        SCENE_SIZE_BY_IMPORTANCE,
+        SCENE_IMPORTANCE_METRIC,
+        SCENE_PHYSICS_DAMPING,
+    ] {
+        store.remove(&container, &FacetId::new(id));
+    }
+}
+
 /// Carry the donor container's `scene.*` facets onto the fork's container —
 /// the scene half of the fork's facet-carry (tear-out G4-R R1; the per-node
 /// half is `facet_store::copy_node_facets`). The fork opens with the donor's
