@@ -45,8 +45,11 @@ pub struct ShellMetrics;
 impl ShellMetrics {
     pub const ACTIVITY_RAIL_WIDTH: f32 = 56.0;
     pub const DOCUMENT_NAV_WIDTH: f32 = 144.0;
-    pub const DOCUMENT_ROW_HEIGHT: f32 = 24.0;
+    pub const DOCUMENT_ROW_HEIGHT: f32 = 26.0;
     pub const DOCUMENT_RAIL_MAX_WIDTH: f32 = 120.0;
+    /// Logical CSS pixels at UI zoom 1.0; document prose has its own scale.
+    pub const INTERFACE_FONT_SIZE: f32 = 13.0;
+    pub const LABEL_FONT_SIZE: f32 = 12.0;
 
     pub fn toolbar_height(zoom: f32) -> f32 {
         24.0 + 16.0 * zoom
