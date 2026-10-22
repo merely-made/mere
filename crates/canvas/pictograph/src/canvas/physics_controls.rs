@@ -22,8 +22,9 @@ use kernel::graph::NodeKey;
 use scenotime::ProjectionClock;
 
 use super::channels::Channel;
-use super::dynamics_spec::{GroupRoles, Node, Target};
+use super::dynamics_spec::{GroupRoles, Node, Target, schedule_node};
 use super::physics_catalog::PhysicsLaw;
+use super::schedule::{PhysicsStage, StageStop};
 use super::{
     CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsKindSource,
     PhysicsOverlay, Role,
@@ -111,6 +112,24 @@ pub struct TwoLawGrouping {
     pub outer_share: f64,
 }
 
+/// The editable parts of one law stage in a two-stage schedule.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct StageDraft {
+    pub law: PhysicsLaw,
+    pub stop: StageStop,
+    pub capture: Option<Role>,
+}
+
+/// The schedule form this control can read and write canonically. Its shared
+/// overlays are unique and ordered like `PhysicsOverlay::ALL`, as the editor
+/// checkboxes present them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TwoStageSchedule {
+    pub first: StageDraft,
+    pub second: StageDraft,
+    pub overlays: Vec<PhysicsOverlay>,
+}
+
 /// Replace the spec root with one admitted two-law force mix. The existing
 /// spec remains the authority for channels, target, seed, bars and
 /// realization; root overlays are carried onto the mix.
@@ -160,6 +179,161 @@ pub fn apply_grouping(canvas: &mut Canvas, grouping: &TwoLawGrouping) -> Result<
         grouping.outer.label(),
         grouping.inner.label()
     ))
+}
+
+/// Replace the spec root with two law stages that share one explicit overlay
+/// list. Canvas binding admits the whole recipe before changing live state.
+/// Applying an already-authored identical schedule restarts it at stage zero.
+pub fn apply_two_stage_schedule(
+    canvas: &mut Canvas,
+    schedule: &TwoStageSchedule,
+) -> Result<String, String> {
+    for (name, draft) in [("first", schedule.first), ("second", schedule.second)] {
+        if draft.stop == StageStop::Frames(0) {
+            return Err(format!("{name}.stop must use a positive frame count"));
+        }
+    }
+    let mut previous = None;
+    for overlay in &schedule.overlays {
+        let index = PhysicsOverlay::ALL
+            .iter()
+            .position(|candidate| candidate == overlay)
+            .expect("a PhysicsOverlay is always in its catalog");
+        if let Some(previous) = previous {
+            if index == previous {
+                return Err(format!("duplicate schedule overlay {}", overlay.id()));
+            }
+            if index < previous {
+                return Err("schedule overlays must use catalog order".into());
+            }
+        }
+        previous = Some(index);
+    }
+    let stage = |draft: StageDraft| PhysicsStage {
+        law: draft.law,
+        overlays: schedule.overlays.clone(),
+        composition: None,
+        stop: draft.stop,
+        capture: draft.capture,
+    };
+    let stages = vec![stage(schedule.first), stage(schedule.second)];
+    let root = schedule_node(&stages)?;
+    let mut spec = canvas.dynamics_spec()?;
+    let restart = spec.root == root;
+    spec.root = root;
+    canvas
+        .set_dynamics_spec(&spec)
+        .map_err(|error| error.to_string())?;
+    if restart {
+        canvas.run_physics_schedule(stages);
+    }
+    canvas.set_view_follow(true);
+    Ok(format!(
+        "Two-stage schedule set to {} then {}",
+        schedule.first.law.label(),
+        schedule.second.law.label()
+    ))
+}
+
+/// Read a full canvas spec when its schedule is exactly the two-stage form
+/// this control edits. Other roots return `Ok(None)`; a richer schedule shape
+/// returns a reason for the host form to show.
+pub fn read_two_stage_schedule(canvas: &Canvas) -> Result<Option<TwoStageSchedule>, String> {
+    let spec = canvas.dynamics_spec()?;
+    let Node::Schedule {
+        stages,
+        weight,
+        overlays: root_overlays,
+    } = spec.root
+    else {
+        return Ok(None);
+    };
+    if weight != 1.0 || !root_overlays.is_empty() {
+        return Err("schedule root has unsupported weight or overlays".into());
+    }
+    if stages.len() != 2 {
+        return Err("schedule must have exactly two stages".into());
+    }
+
+    fn read_stage(
+        stage: &seiche::spec::Stage,
+    ) -> Result<(StageDraft, Vec<PhysicsOverlay>), String> {
+        let Node::Preset {
+            id,
+            weight,
+            terms,
+            rung,
+            overlays,
+        } = &stage.node
+        else {
+            return Err("schedule stage must be a plain law preset".into());
+        };
+        if *weight != 1.0 || !terms.is_empty() || rung.is_some() {
+            return Err("schedule stage has unsupported weight, overrides, or rung".into());
+        }
+        let law =
+            PhysicsLaw::parse(id).ok_or_else(|| format!("unknown schedule law preset {id}"))?;
+        let mut parsed_overlays = Vec::with_capacity(overlays.len());
+        let mut previous_catalog_index = None;
+        for overlay in overlays {
+            let Node::Preset {
+                id,
+                weight,
+                terms,
+                rung,
+                overlays,
+            } = overlay
+            else {
+                return Err("schedule overlays must be plain overlay presets".into());
+            };
+            if *weight != 1.0 || !terms.is_empty() || rung.is_some() || !overlays.is_empty() {
+                return Err("schedule overlay has unsupported fields".into());
+            }
+            let overlay = PhysicsOverlay::parse(id)
+                .ok_or_else(|| format!("unknown schedule overlay preset {id}"))?;
+            let catalog_index = PhysicsOverlay::ALL
+                .iter()
+                .position(|candidate| *candidate == overlay)
+                .expect("a parsed PhysicsOverlay is in its catalog");
+            if let Some(previous) = previous_catalog_index {
+                if catalog_index == previous {
+                    return Err(format!("duplicate schedule overlay {}", overlay.id()));
+                }
+                if catalog_index < previous {
+                    return Err("schedule overlays must use catalog order".into());
+                }
+            }
+            previous_catalog_index = Some(catalog_index);
+            parsed_overlays.push(overlay);
+        }
+        let stop = match stage.stop {
+            seiche::spec::Stop::Rest => StageStop::Rest,
+            seiche::spec::Stop::Frames(0) => {
+                return Err("schedule frame stop must use a positive count".into());
+            },
+            seiche::spec::Stop::Frames(n) => StageStop::Frames(n),
+            seiche::spec::Stop::LawDone => StageStop::LawDone,
+        };
+        Ok((
+            StageDraft {
+                law,
+                stop,
+                capture: stage.capture,
+            },
+            parsed_overlays,
+        ))
+    }
+
+    let (first, overlays) = read_stage(&stages[0])?;
+    let (second, second_overlays) = read_stage(&stages[1])?;
+    if overlays != second_overlays {
+        return Err("schedule stages must share the same overlay list".into());
+    }
+    Ok(Some(TwoStageSchedule {
+        first,
+        second,
+        overlays,
+    }))
 }
 
 /// Explicitly replace the root with `choice`'s single law, even when its law
@@ -1436,5 +1610,222 @@ mod tests {
         assert_eq!(field(&same, "layout-cv-fell"), "false");
         assert_eq!(field(&same, "law-start-mass-area-rank"), "0.20");
         assert_eq!(field(&same, "law-start-density-cv"), "0.400");
+    }
+
+    fn two_stage(overlays: Vec<PhysicsOverlay>) -> TwoStageSchedule {
+        TwoStageSchedule {
+            first: StageDraft {
+                law: PhysicsLaw::Springs,
+                stop: StageStop::Frames(12),
+                capture: Some(Role::Anchored),
+            },
+            second: StageDraft {
+                law: PhysicsLaw::Charge,
+                stop: StageStop::LawDone,
+                capture: None,
+            },
+            overlays,
+        }
+    }
+
+    #[test]
+    fn two_stage_schedule_replaces_only_the_root_and_reads_back() {
+        use crate::canvas::dynamics_spec::{Bar, Observable, Realization};
+
+        let mut subject = canvas();
+        let mut original = subject.dynamics_spec().unwrap();
+        original.seed = 73;
+        original.bars = vec![Bar {
+            observable: Observable::Overlaps,
+            at_least: Some(1.0),
+            at_most: Some(4.0),
+        }];
+        original.realization = Realization::Integrate {
+            damping: Some(0.35),
+        };
+        original
+            .channels
+            .insert("kind".into(), "kind.degree".into());
+        subject.set_dynamics_spec(&original).unwrap();
+
+        let schedule = two_stage(vec![PhysicsOverlay::GravityLocus]);
+        apply_two_stage_schedule(&mut subject, &schedule).unwrap();
+        let applied = subject.dynamics_spec().unwrap();
+        assert_eq!(applied.seed, original.seed);
+        assert_eq!(applied.bars, original.bars);
+        assert_eq!(applied.realization, original.realization);
+        assert_eq!(applied.channels, original.channels);
+        assert_eq!(applied.target, original.target);
+        assert!(matches!(
+            &applied.root,
+            Node::Schedule {
+                weight: 1.0,
+                overlays,
+                stages,
+            } if overlays.is_empty()
+                && stages.len() == 2
+                && stages.iter().all(|stage| stage.node.overlays().len() == 1)
+        ));
+        assert_eq!(read_two_stage_schedule(&subject).unwrap(), Some(schedule));
+    }
+
+    #[test]
+    fn refused_shared_overlay_is_atomic_for_spec_and_positions() {
+        let mut subject = canvas();
+        let before = subject.dynamics_spec().unwrap();
+        let mut positions: Vec<_> = subject.view.positions().collect();
+        positions.sort_by_key(|(key, _)| key.index());
+        let mut schedule = two_stage(vec![PhysicsOverlay::GridSnap]);
+        schedule.second.law = PhysicsLaw::Density;
+
+        let error = apply_two_stage_schedule(&mut subject, &schedule).unwrap_err();
+        assert!(
+            error.contains("overlay") || error.contains("Density"),
+            "the shared overlay refusal is surfaced: {error}"
+        );
+        assert_eq!(subject.dynamics_spec().unwrap(), before);
+        let mut after: Vec<_> = subject.view.positions().collect();
+        after.sort_by_key(|(key, _)| key.index());
+        assert_eq!(after, positions);
+    }
+
+    #[test]
+    fn editor_rejects_zero_frames_and_noncanonical_overlays_atomically() {
+        let mut subject = canvas();
+        subject.set_view_follow(false);
+        subject.set_physics_paused(true);
+        let before = subject.dynamics_spec().unwrap();
+        let mut positions: Vec<_> = subject.view.positions().collect();
+        positions.sort_by_key(|(key, _)| key.index());
+
+        let mut zero_frames = two_stage(Vec::new());
+        zero_frames.first.stop = StageStop::Frames(0);
+        let duplicate = two_stage(vec![
+            PhysicsOverlay::GravityLocus,
+            PhysicsOverlay::GravityLocus,
+        ]);
+        let reversed = two_stage(vec![
+            PhysicsOverlay::Skeleton,
+            PhysicsOverlay::DegreeRepulsion,
+        ]);
+        for schedule in [zero_frames, duplicate, reversed] {
+            assert!(apply_two_stage_schedule(&mut subject, &schedule).is_err());
+            assert_eq!(subject.dynamics_spec().unwrap(), before);
+            assert!(subject.physics_paused());
+            assert!(!subject.view_follows());
+            assert_eq!(subject.physics_schedule_stage(), None);
+            let mut after: Vec<_> = subject.view.positions().collect();
+            after.sort_by_key(|(key, _)| key.index());
+            assert_eq!(after, positions);
+        }
+    }
+
+    #[test]
+    fn schedule_apply_starts_and_source_or_role_edits_keep_progress() {
+        let mut subject = canvas();
+        subject.set_physics_paused(true);
+        let mut schedule = two_stage(Vec::new());
+        schedule.first.stop = StageStop::Frames(1);
+        schedule.second.stop = StageStop::Frames(10_000);
+        apply_two_stage_schedule(&mut subject, &schedule).unwrap();
+        assert_eq!(subject.physics_schedule_stage(), Some(0));
+        assert!(!subject.physics_paused(), "Apply and run starts ticking");
+        subject.step_layout();
+        assert_eq!(subject.physics_schedule_stage(), Some(1));
+
+        subject.set_physics_paused(true);
+        let mut choice = PhysicsChoice::live(&subject);
+        choice.kind = PhysicsKindSource::Degree;
+        apply_physics(&mut subject, &choice);
+        assert_eq!(subject.physics_schedule_stage(), Some(1));
+        assert!(subject.physics_paused());
+        apply_role(&mut subject, Role::Pinned).unwrap();
+        assert_eq!(subject.physics_schedule_stage(), Some(1));
+        assert!(subject.physics_paused());
+
+        apply_two_stage_schedule(&mut subject, &schedule).unwrap();
+        assert_eq!(subject.physics_schedule_stage(), Some(0));
+        assert!(
+            !subject.physics_paused(),
+            "reapplying restarts the schedule"
+        );
+    }
+
+    #[test]
+    fn schedule_reader_refuses_richer_schedule_shapes_without_mutation() {
+        use crate::canvas::dynamics_spec::{Node, Stage, Stop};
+
+        let mut subject = canvas();
+        let mut spec = subject.dynamics_spec().unwrap();
+        spec.root = Node::Schedule {
+            stages: vec![
+                Stage {
+                    node: Node::preset(PhysicsLaw::Springs.id()),
+                    stop: Stop::Rest,
+                    capture: None,
+                },
+                Stage {
+                    node: Node::preset(PhysicsLaw::Charge.id()),
+                    stop: Stop::Frames(12),
+                    capture: None,
+                },
+                Stage {
+                    node: Node::preset(PhysicsLaw::Stress.id()),
+                    stop: Stop::LawDone,
+                    capture: None,
+                },
+            ],
+            weight: 1.0,
+            overlays: Vec::new(),
+        };
+        subject.set_dynamics_spec(&spec).unwrap();
+        let before = subject.dynamics_spec().unwrap();
+        let error = read_two_stage_schedule(&subject).unwrap_err();
+        assert!(error.contains("exactly two"), "{error}");
+        assert_eq!(subject.dynamics_spec().unwrap(), before);
+        assert_eq!(read_two_stage_schedule(&canvas()).unwrap(), None);
+    }
+
+    #[test]
+    fn schedule_reader_rejects_zero_frames_and_non_catalog_overlay_order() {
+        use crate::canvas::dynamics_spec::{Node, Stage, Stop};
+
+        let mut subject = canvas();
+        let make_root = |first_stop, overlay_ids: &[PhysicsOverlay]| Node::Schedule {
+            stages: [PhysicsLaw::Springs, PhysicsLaw::Charge]
+                .into_iter()
+                .enumerate()
+                .map(|(i, law)| {
+                    let mut node = Node::preset(law.id());
+                    node.overlays_mut()
+                        .extend(overlay_ids.iter().map(|overlay| Node::preset(overlay.id())));
+                    Stage {
+                        node,
+                        stop: if i == 0 { first_stop } else { Stop::Rest },
+                        capture: None,
+                    }
+                })
+                .collect(),
+            weight: 1.0,
+            overlays: Vec::new(),
+        };
+        for (root, expected_error) in [
+            (make_root(Stop::Frames(0), &[]), "positive count"),
+            (
+                make_root(
+                    Stop::Rest,
+                    &[PhysicsOverlay::Skeleton, PhysicsOverlay::DegreeRepulsion],
+                ),
+                "catalog order",
+            ),
+        ] {
+            let mut spec = subject.dynamics_spec().unwrap();
+            spec.root = root;
+            subject.set_dynamics_spec(&spec).unwrap();
+            let before = subject.dynamics_spec().unwrap();
+            let error = read_two_stage_schedule(&subject).unwrap_err();
+            assert!(error.contains(expected_error), "{error}");
+            assert_eq!(subject.dynamics_spec().unwrap(), before);
+        }
     }
 }
