@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "qualified": true,
+  "mere_shared_receiving_source": "af5c3ba85a19fe3eddbabc283b6fab7572fc1cf3",
+  "turnstone_source": "cab743c11fe91073c99ec012f4800577aca4cd0d",
+  "knot_fixture_source": "3596dce3cb44fc4748d311f3edd42c5acf66513c",
+  "governed_host_source": "1f660dcb4a9171b2867451d22fadd1a2ad50d174",
+  "shared_tests": "63 document unit+1streaming integration+41fetch",
+  "focused_product_passed": 69.0,
+  "native_live_process_passed": true,
+  "native_index_bytes": 57,
+  "native_resource_bytes": 131072,
+  "snapshot_v1_unchanged": true,
+  "micron_and_shared_smolweb_limits_unchanged": true,
+  "broader_sdk_http_policy_update": "Existing upstream HTTP security/referrer changes included; see turnstone/support/receipts/smolweb-browser-receiving/limits-boundary.json",
+  "receipt_sha256": {
+    "turnstone/docs/receipts/native_browser_receiving_20261022/product-graceful-build.json": "e3e32ef1b95699f7308ac517d7037121f26a1c2162a31a4aab521b5f82a2a7af",
+    "turnstone/docs/receipts/native_browser_receiving_20261022/product-graceful-tests.json": "207a5264144296ceb4ef1a9743afbbc51e5f5a51012a47226843b4807d43b6a8",
+    "knot-editor/support/receipts/smolweb-browser-receiving/process-graceful.json": "51421931e615aab0ec2d6d224f56297395dc1cfec0b18ad8e1dbacb1cc1e52d4"
+  },
+  "native_host_executable_sha256": "d2ee5884c925d91118efaee712237ab00d78d2c38b02d0684ec6b89f347c5055",
+  "native_browser_test_executable_sha256": "fa47564f009b188574307647448ae5914ec86324bcc377e4c1c9df35f6bbf18d",
+  "first_host_shutdown": {
+    "cancelled": 0,
+    "joined": 3,
+    "panicked": 0,
+    "rejected": 0
+  },
+  "excluded": [
+    "Headed window/GPU presentation and physical AT",
+    "Fetch actor dispatch/concurrency and transport cancellation",
+    "Independent Python/Go/radio interoperability",
+    "Client-limit and buffered allocation repair"
+  ],
+  "lint": "Strict production document library and fetch lib/tests pass; two unchanged pre-existing document navigation test lint findings retained",
+  "receipt_cap_bytes": 100000000
+}
