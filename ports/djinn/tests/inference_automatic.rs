@@ -61,10 +61,9 @@ async fn save_library(data: &std::path::Path, root: &std::path::Path) -> eidetic
     )
     .await
     .unwrap();
-    let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "fixtures/esp/smollm2-instruct-v1.json"
-    ))
-    .unwrap();
+    let mut template =
+        PromptTemplate::from_bytes(include_bytes!("fixtures/esp/smollm2-instruct-v1.json"))
+            .unwrap();
     template.bos.clear();
     template.eos.clear();
     template.system_prompt.clear();
@@ -210,6 +209,7 @@ async fn exercise_inner(native: bool) {
             let mut prior = settings.clone();
             prior.sync = None;
             prior.inference.as_mut().unwrap().model = InferenceModelSettings::Library {
+                weight_cache: None,
                 row: selected.to_string(),
                 device: if native {
                     InferenceDeviceSettings::Gpu

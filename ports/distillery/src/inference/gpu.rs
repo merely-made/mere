@@ -49,6 +49,20 @@ pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
     access: GpuAccess,
     journal: Option<Arc<dyn super::RunJournal>>,
 ) -> Result<InferenceLane, String> {
+    open_gpu_library_lane_with_journal_and_cache(library, row, max_tokens, access, journal, 0, 0)
+}
+
+/// Explicit owner budgets. Host buffer capacity and additional dense device
+/// layer payload are separate; shared weights/KV/workspace need their own room.
+pub fn open_gpu_library_lane_with_journal_and_cache<B: eidetic::Store + Send + 'static>(
+    library: Arc<tokio::sync::Mutex<B>>,
+    row: eidetic::ManifestId,
+    max_tokens: usize,
+    access: GpuAccess,
+    journal: Option<Arc<dyn super::RunJournal>>,
+    host_cache_bytes: usize,
+    device_layer_cache_bytes: u64,
+) -> Result<InferenceLane, String> {
     let loading = access.request();
     InferenceLane::try_open_with_journal(
         max_tokens,
@@ -70,7 +84,10 @@ pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
             };
             // Facts come from the same explicit adapter selection as the device.
             eprintln!("resident inference GPU: {facts}");
-            let layer_source = super::library_layer_source(library, &resolved);
+            // Only verified immutable host bytes outlive a generation guard.
+            let layer_source = super::library_layer_source(library, &resolved).map(|source| {
+                esp::infer::decoder::streaming::cache_verified_layers(source, host_cache_bytes)
+            });
             Ok(Box::new(GpuLibraryProvider {
                 resolved,
                 device,
@@ -79,6 +96,7 @@ pub fn open_gpu_library_lane_with_journal<B: eidetic::Store + Send + 'static>(
                 capability,
                 identity,
                 layer_source,
+                device_layer_cache_bytes,
             }))
         },
         journal,
@@ -93,6 +111,7 @@ struct GpuLibraryProvider {
     capability: ModelCapability,
     identity: SessionIdentity,
     layer_source: Option<Arc<dyn esp::infer::decoder::streaming::LayerSource>>,
+    device_layer_cache_bytes: u64,
 }
 
 impl InferenceProvider for GpuLibraryProvider {
@@ -114,13 +133,21 @@ impl InferenceProvider for GpuLibraryProvider {
             return resume.cloned().ok_or(InferError::Interrupted);
         };
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let provider = self.resolved.load_with_layer_source(
+            let provider = self.resolved.load_with_layer_cache(
                 &self.device,
                 "burn-wgpu",
                 self.max_tokens,
                 super::borrow_layer_source(&self.layer_source),
+                self.device_layer_cache_bytes,
             )?;
-            provider.generate_checkpointed(request, resume, commit, stop)
+            let mut observed_commit = |checkpoint: &esp::infer::provider::GenerationCheckpoint| {
+                let result = commit(checkpoint);
+                if checkpoint.complete || (!checkpoint.token_ids.is_empty() && checkpoint.token_ids.len().is_multiple_of(32)) {
+                    tracing::debug!(tokens = checkpoint.token_ids.len(), stats = ?provider.bound().provider().streaming_stats(), "inference layer cache");
+                }
+                result
+            };
+            provider.generate_checkpointed(request, resume, &mut observed_commit, stop)
         }))
         .unwrap_or_else(|_| {
             Err(InferError::Backend(
@@ -130,6 +157,9 @@ impl InferenceProvider for GpuLibraryProvider {
         self.device
             .sync()
             .map_err(|error| InferError::Backend(format!("GPU synchronize: {error}")))?;
+        if self.device_layer_cache_bytes > 0 {
+            self.device.memory_cleanup();
+        }
         result
     }
 
@@ -159,11 +189,12 @@ impl InferenceProvider for GpuLibraryProvider {
             return Ok(String::new());
         };
         let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let provider = self.resolved.load_with_layer_source(
+            let provider = self.resolved.load_with_layer_cache(
                 &self.device,
                 "burn-wgpu",
                 self.max_tokens,
                 super::borrow_layer_source(&self.layer_source),
+                self.device_layer_cache_bytes,
             )?;
             provider.generate_streaming_controlled(request, on_token, cancelled)
         }))
@@ -175,6 +206,9 @@ impl InferenceProvider for GpuLibraryProvider {
         self.device
             .sync()
             .map_err(|error| InferError::Backend(format!("GPU synchronize: {error}")))?;
+        if self.device_layer_cache_bytes > 0 {
+            self.device.memory_cleanup();
+        }
         result
         // `provider` drops before `_guard`, including on failure or unwind.
     }

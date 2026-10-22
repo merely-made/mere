@@ -11,6 +11,7 @@ keywords = ["inference", "embedding", "mesh", "harness", "compute"]
 categories = ["concurrency"]
 
 [dependencies]
+tracing = { workspace = true, optional = true }
 stickleback = { workspace = true, optional = true }
 p2panda-store = { version = "0.7.0", default-features = false, optional = true }
 chacha20poly1305 = { version = "0.11", optional = true }
@@ -72,7 +73,7 @@ flora = ["dep:eidetic", "dep:esp", "esp/decoder-lora", "dep:safetensors"]
 # model runtime: the host supplies the provider.
 inference = ["dep:esp", "esp/actor", "dep:apparatus"]
 inference-embedding = ["inference-model", "esp/persistence", "esp/bert"]
-inference-gpu = ["inference-model", "esp/decoder-wgpu"]
+inference-gpu = ["inference-model", "esp/decoder-wgpu", "dep:tracing"]
 inference-stages = ["inference-model", "dep:notochord", "tokio/io-util"]
 inference-wire = ["dep:eidetic"]
 inference-model = ["inference-wire","dep:eidetic-search", "inference", "esp/decoder-flex", "esp/model-session", "dep:eidetic", "dep:pollster", "dep:stickleback", "dep:p2panda-store", "dep:chacha20poly1305", "dep:rand_core", "dep:zeroize"]

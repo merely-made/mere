@@ -214,6 +214,32 @@ another loader. The native I6 decoder rows qualify a model exceeding GPU
 memory and bounded long prefill; the plan records those measurements and the
 resident composition regressions separately.
 
+An indexed GPU row can also carry an explicit `weight_cache` block:
+
+```json
+{"host_bytes":3221225472,"device_layer_bytes":4294967296}
+```
+
+These illustrative numbers are owner limits, not detected free memory. The
+optional block belongs inside `library`; absence preserves uncached streaming.
+`host_bytes` bounds the retained capacity of verified immutable encoded layer
+buffers (at most 128 entries). `device_layer_bytes` bounds additional retained
+dense f32 layer-tensor payload during a generation. The owner must separately
+reserve shared weights, KV, one transient streamed layer, execution workspace,
+allocator overhead and other applications. These limits are not RSS or total
+VRAM bounds. Nonzero cache settings are refused for CPU library execution;
+device-layer caching currently refuses MoE and reduced-precision rows.
+
+Caches admit a first-fit subset instead of evicting every layer on a cyclic
+sweep. Remaining layers still stream. Host hits share their verified allocation;
+source errors are not cached and tighter byte limits are rechecked. Device
+weights stay inside the inference foreground guard and are dropped before that
+guard is released; host buffers belong to the lane and can serve later asks.
+Both caches are ephemeral. They change placement and repeated work, while the
+original format, prompt, token sampling, checkpoint/session identity and model
+content references remain the same. Debug cache counters report logical reads,
+hits and payload/capacity bounds without recording prompt or answer text.
+
 A GPU ask preempts the GPU trainer through owner reclaim. The offer is
 withdrawn while inference waits or runs; inference loads device tensors for
 each ask and releases them before returning the GPU. CPU inference retains

@@ -159,6 +159,18 @@ pub struct InferenceLaneSettings {
     pub model: InferenceModelSettings,
 }
 
+/// Explicit local GPU weight-cache budgets. These are buffer capacity and
+/// tensor payload bounds, not process RSS or total VRAM bounds. The owner must
+/// leave room for shared weights, KV, a transient streamed layer and workspace.
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct InferenceWeightCacheSettings {
+    #[serde(default)]
+    pub host_bytes: u64,
+    #[serde(default)]
+    pub device_layer_bytes: u64,
+}
+
 /// The models the inference lane can be told to run.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
@@ -174,6 +186,9 @@ pub enum InferenceModelSettings {
         device: InferenceDeviceSettings,
         /// Maximum generated tokens per ask, stated by the owner.
         max_tokens: usize,
+        /// Optional explicit GPU-only placement. Absent settings keep streaming.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        weight_cache: Option<InferenceWeightCacheSettings>,
     },
     /// Whole-model residence, discovered keyed stages, then local streaming.
     Automatic {
@@ -192,6 +207,7 @@ impl InferenceModelSettings {
                 row,
                 device,
                 max_tokens,
+                ..
             }
             | Self::Automatic {
                 row,

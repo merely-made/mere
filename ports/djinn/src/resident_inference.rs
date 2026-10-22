@@ -45,6 +45,20 @@ pub fn validate(owner: &OwnerSettings) -> Result<(), String> {
         );
     }
     owner.inference.as_ref().unwrap().recall.validate()?;
+    if let crate::settings::InferenceModelSettings::Library {
+        device,
+        weight_cache: Some(cache),
+        ..
+    } = &owner.inference.as_ref().unwrap().model
+    {
+        usize::try_from(cache.host_bytes).map_err(|_| "host cache budget exceeds address space")?;
+        if *device != crate::settings::InferenceDeviceSettings::Gpu
+            && (cache.host_bytes != 0 || cache.device_layer_bytes != 0)
+        {
+            return Err("weight caching requires the GPU library lane".into());
+        }
+    }
+
     if let Some(embedding) = &owner.inference.as_ref().unwrap().embedding {
         if !cfg!(feature = "inference-embedding") {
             return Err("embedding recall requires the inference-embedding feature".into());
@@ -208,7 +222,8 @@ mod lane {
                     row,
                     max_tokens,
                     device: crate::settings::InferenceDeviceSettings::Gpu,
-                } => distillery::inference::open_gpu_library_lane_with_journal(
+                    weight_cache,
+                } => distillery::inference::open_gpu_library_lane_with_journal_and_cache(
                     library.expect("resident opens the model library first"),
                     distillery::inference::parse_model_row(row).expect("validated model row"),
                     *max_tokens,
@@ -216,20 +231,32 @@ mod lane {
                     journal.as_ref().map(|journal| {
                         journal.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
                     }),
+                    usize::try_from(weight_cache.as_ref().map_or(0, |c| c.host_bytes))
+                        .map_err(|_| "host cache budget exceeds address space")?,
+                    weight_cache.as_ref().map_or(0, |c| c.device_layer_bytes),
                 )?,
                 InferenceModelSettings::Library {
                     row,
                     max_tokens,
                     device: crate::settings::InferenceDeviceSettings::Cpu,
-                } => distillery::inference::open_library_lane_with_journal(
-                    library.expect("resident opens the model library first"),
-                    distillery::inference::parse_model_row(row)
-                        .expect("validated before opening lanes"),
-                    *max_tokens,
-                    journal.as_ref().map(|journal| {
-                        journal.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
-                    }),
-                )?,
+                    weight_cache,
+                } => {
+                    if weight_cache
+                        .as_ref()
+                        .is_some_and(|c| c.host_bytes != 0 || c.device_layer_bytes != 0)
+                    {
+                        return Err("weight caching requires the GPU library lane".into());
+                    }
+                    distillery::inference::open_library_lane_with_journal(
+                        library.expect("resident opens the model library first"),
+                        distillery::inference::parse_model_row(row)
+                            .expect("validated before opening lanes"),
+                        *max_tokens,
+                        journal.as_ref().map(|journal| {
+                            journal.clone() as std::sync::Arc<dyn distillery::inference::RunJournal>
+                        }),
+                    )?
+                },
                 #[cfg(not(feature = "inference-gpu"))]
                 InferenceModelSettings::Library {
                     device: crate::settings::InferenceDeviceSettings::Gpu,
@@ -398,6 +425,46 @@ mod tests {
         assert_eq!(validate(&OwnerSettings::default()), Ok(()));
     }
 
+    #[test]
+    fn weight_cache_is_explicit_and_legacy_settings_keep_their_shape() {
+        let raw = serde_json::json!({"library":{"row":"blake3:0000000000000000000000000000000000000000000000000000000000000000","device":"gpu","max_tokens":32}});
+        let model: InferenceModelSettings = serde_json::from_value(raw.clone()).unwrap();
+        assert_eq!(serde_json::to_value(model).unwrap(), raw);
+        let mut configured = raw.clone();
+        configured["library"]["weight_cache"] = serde_json::json!({"host_bytes":3 * 1024_u64.pow(3),"device_layer_bytes":4 * 1024_u64.pow(3)});
+        let model: InferenceModelSettings = serde_json::from_value(configured.clone()).unwrap();
+        assert_eq!(serde_json::to_value(model).unwrap(), configured);
+        configured["library"]["weight_cache"]["unbounded"] = true.into();
+        assert!(serde_json::from_value::<InferenceModelSettings>(configured).is_err());
+    }
+
+    #[cfg(feature = "inference")]
+    #[test]
+    fn cpu_cache_budgets_are_refused_before_opening_any_lane() {
+        let model = InferenceModelSettings::Library {
+            row: format!("blake3:{}", "00".repeat(32)),
+            device: crate::settings::InferenceDeviceSettings::Cpu,
+            max_tokens: 4,
+            weight_cache: Some(crate::settings::InferenceWeightCacheSettings {
+                host_bytes: 1,
+                device_layer_bytes: 1,
+            }),
+        };
+        let owner = OwnerSettings {
+            inference: Some(InferenceLaneSettings {
+                embedding: None,
+                recall: Default::default(),
+                model,
+            }),
+            ..Default::default()
+        };
+        assert!(
+            validate(&owner)
+                .unwrap_err()
+                .contains("weight caching requires the GPU")
+        );
+    }
+
     #[cfg(feature = "inference")]
     #[test]
     fn the_lane_without_a_distillery_lane_is_refused() {
@@ -480,6 +547,7 @@ mod tests {
                 embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
+                    weight_cache: None,
                     row,
                     device,
                     max_tokens,

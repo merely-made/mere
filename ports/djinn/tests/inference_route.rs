@@ -147,6 +147,7 @@ async fn exercise_route(library_model: bool) {
                 embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
+                    weight_cache: None,
                     row: row.to_string(),
                     device: djinn::settings::InferenceDeviceSettings::Cpu,
                     max_tokens: 4,
@@ -372,6 +373,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
             embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 8,
@@ -1108,6 +1110,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
             embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: 64,
@@ -1594,6 +1597,10 @@ async fn save_cross_source_answer_model(data_root: &std::path::Path) -> eidetic:
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "requires ESP_SMOLLM2_DIR, DJINN_HEADED_DIR and headed Turnstone"]
 async fn serve_trained_model_for_headed_turnstone() {
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter("distillery::inference::gpu=debug")
+        .with_ansi(false)
+        .try_init();
     let output =
         std::path::PathBuf::from(std::env::var_os("DJINN_HEADED_DIR").expect("DJINN_HEADED_DIR"));
     std::fs::create_dir_all(&output).unwrap();
@@ -1705,6 +1712,12 @@ async fn serve_trained_model_for_headed_turnstone() {
                 ..Default::default()
             },
             model: InferenceModelSettings::Library {
+                weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
+                    djinn::settings::InferenceWeightCacheSettings {
+                        host_bytes: 3 * 1024_u64.pow(3),
+                        device_layer_bytes: 4 * 1024_u64.pow(3),
+                    }
+                }),
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: if mixed.as_ref().is_some_and(|v| v["claim_support"] == true) {
@@ -2225,6 +2238,10 @@ async fn serve_trained_model_for_headed_turnstone() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "requires pinned ESP_SMOLLM2_DIR and CROSS_SOURCE_CASES/OUTPUT"]
 async fn probe_bounded_cross_source_answers() {
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter("distillery::inference::gpu=debug")
+        .with_ansi(false)
+        .try_init();
     use distillery::inference::recall::{
         AnswerFormat, PageTextCorpus, RecallAskRequestV1, RecallConfig,
     };
@@ -2249,6 +2266,12 @@ async fn probe_bounded_cross_source_answers() {
             embedding: None,
             recall: config.clone(),
             model: InferenceModelSettings::Library {
+                weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
+                    djinn::settings::InferenceWeightCacheSettings {
+                        host_bytes: 3 * 1024_u64.pow(3),
+                        device_layer_bytes: 4 * 1024_u64.pow(3),
+                    }
+                }),
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: 1024,
@@ -2287,6 +2310,7 @@ async fn probe_bounded_cross_source_answers() {
         assert!(tokio::time::Instant::now() < deadline);
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
+    let mut incomplete = Vec::new();
     for case in cases["asks"].as_array().unwrap() {
         let id = case["id"].as_str().unwrap();
         let keys: &[&str] = match id {
@@ -2311,12 +2335,13 @@ async fn probe_bounded_cross_source_answers() {
                 .collect(),
         })
         .unwrap();
-        let deadline = tokio::time::Instant::now()
-            + Duration::from_secs(if std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some() {
-                900
-            } else {
-                300
-            });
+        let seconds = if std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some() {
+            900
+        } else {
+            300
+        };
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(seconds);
+        let mut cancel_deadline = None;
         loop {
             let runs = lane.runs();
             let run = runs.runs.iter().find(|r| r.run == id).unwrap();
@@ -2331,12 +2356,28 @@ async fn probe_bounded_cross_source_answers() {
                     serde_json::to_vec_pretty(run).unwrap(),
                 )
                 .unwrap();
-                assert_eq!(run.state, RunStateV1::Finished, "{:?}", run);
+                if run.state != RunStateV1::Finished || cancel_deadline.is_some() {
+                    incomplete.push((id.to_owned(), run.state));
+                }
                 break;
             }
-            assert!(tokio::time::Instant::now() < deadline);
+            let now = tokio::time::Instant::now();
+            if let Some(until) = cancel_deadline {
+                assert!(
+                    now < until,
+                    "timed-out case did not cancel within 30 seconds"
+                );
+            } else if now >= deadline {
+                std::fs::write(output.join(format!("{id}.timeout.json")), serde_json::to_vec_pretty(&serde_json::json!({"limit_seconds":seconds,"last_state":run.state,"last_tokens":run.tokens,"reason":"generation_deadline"})).unwrap()).unwrap();
+                lane.cancel(&CancelRequestV1 { run: id.into() }).unwrap();
+                cancel_deadline = Some(now + Duration::from_secs(30));
+            }
             tokio::time::sleep(Duration::from_millis(100)).await;
         }
     }
     resident.shutdown().await.unwrap();
+    assert!(
+        incomplete.is_empty(),
+        "incomplete frozen cases: {incomplete:?}"
+    );
 }

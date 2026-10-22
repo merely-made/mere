@@ -191,6 +191,7 @@ async fn resident_embedding_process_fixture() {
                 ..Default::default()
             },
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: generation.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 2,
