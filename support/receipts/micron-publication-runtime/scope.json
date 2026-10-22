@@ -1,0 +1,13 @@
+{
+  "scope": "governed native Micron hosting",
+  "retained_byte_cap": 100000000,
+  "baseline_head": "01a3a273d66b9591477cc3f425ca43e0f76f037d",
+  "incoming_head": "931a4ec8d2a83655a7cb4518088b0d487b04f990",
+  "foreign_index_entries": [
+    "100644 b05a21ffe384b9530e7a06be87b41e14161682c3 0\tdesign_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md",
+    "100644 3602fb278e6235760fe1d1ccba60508fce1ff387 0\tsupport/family-promotion/diagnostics-ownership-review.json"
+  ],
+  "build_target": "C:\\t\\cargo-targets\\mere",
+  "browser_receiving": "separate gate",
+  "client_limits": "separate gate"
+}

@@ -500,11 +500,22 @@ release:
 **Status:** ordinary saved-snapshot service implemented; local resident retrieval
 and restart acceptance passed. Knot's in-process serving remains available. Djinn now has a separate
 owner-controlled Gemini publication route and CLI, described below. The separate
-governed Gemini/Scroll caller has native process qualification; main-broker
+governed Gemini/Scroll/Micron caller has native process qualification; main-broker
 attachment and peer acquisition retain their own gates. This does not complete
 the resident release gate or the earlier phases above.
 
 ### Verified composition seams
+
+**2026-10-22 governed Micron continuation:** the separate caller
+adds the optional `moot-site-nomadnet` backend with a persistent host destination,
+explicit bounded policy and per-request publication authority. Retinue owns
+transport; Armillary owns application task shutdown. Native controls and the
+Gemini, Scroll and Micron process fixtures pass on integrated source `1f660dcb4`,
+with exact bytes, restart identity, reused-link authority changes and joined
+shutdown. Scope, exact evidence and done-conditions
+live in the [shared site plan](2026-10-20_shared_site_model_plan.md#governed-micron-resident-2026-10-22).
+Browser receiving, client limits and external Python/Go/radio qualification stay
+separate.
 
 **2026-10-20 shared-model extraction:** portable site configuration, native page
 metadata and canonical `PublishedSnapshotV1` records move from `knot-site` to

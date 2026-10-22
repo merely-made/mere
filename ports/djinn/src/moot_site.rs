@@ -32,6 +32,10 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+#[path = "micron_site.rs"]
+mod micron_site;
+pub use micron_site::NomadNetListenerPolicyV1;
+
 const DESCRIPTOR: &str = "moot-site.json";
 const MAX_BINDING_BYTES: usize = 16 * 1024;
 
@@ -43,6 +47,8 @@ pub enum MootSiteTransport {
     #[default]
     Gemini,
     Scroll,
+    #[serde(rename = "nomadnet")]
+    NomadNet,
 }
 
 impl MootSiteTransport {
@@ -54,6 +60,7 @@ impl MootSiteTransport {
         match self {
             Self::Gemini => SiteFormat::Gemini,
             Self::Scroll => SiteFormat::Scroll,
+            Self::NomadNet => SiteFormat::Micron,
         }
     }
 
@@ -124,7 +131,7 @@ fn now_ms() -> Result<u64, String> {
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Descriptor {
+struct TlsDescriptor {
     version: u8,
     #[serde(default, skip_serializing_if = "MootSiteTransport::is_gemini")]
     transport: MootSiteTransport,
@@ -132,6 +139,104 @@ struct Descriptor {
     policy: GeminiListenerPolicyV1,
     certificate_sha256: [u8; 32],
     running: bool,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum NativeTransport {
+    Nomadnet,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct NomadNetDescriptor {
+    version: u8,
+    transport: NativeTransport,
+    binding: SiteBindingV1,
+    policy: NomadNetListenerPolicyV1,
+    destination: [u8; 16],
+    running: bool,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+enum Descriptor {
+    NomadNet(NomadNetDescriptor),
+    Tls(TlsDescriptor),
+}
+
+impl Descriptor {
+    fn binding(&self) -> &SiteBindingV1 {
+        match self {
+            Self::Tls(d) => &d.binding,
+            Self::NomadNet(d) => &d.binding,
+        }
+    }
+    fn transport(&self) -> MootSiteTransport {
+        match self {
+            Self::Tls(d) => d.transport,
+            Self::NomadNet(_) => MootSiteTransport::NomadNet,
+        }
+    }
+    fn running(&self) -> bool {
+        match self {
+            Self::Tls(d) => d.running,
+            Self::NomadNet(d) => d.running,
+        }
+    }
+    fn set_running(&mut self, running: bool) {
+        match self {
+            Self::Tls(d) => d.running = running,
+            Self::NomadNet(d) => d.running = running,
+        }
+    }
+    fn resume(&self) -> bool {
+        match self {
+            Self::Tls(d) => d.policy.resume_on_restart,
+            Self::NomadNet(d) => d.policy.resume_on_restart,
+        }
+    }
+    fn certificate(&self) -> Option<[u8; 32]> {
+        match self {
+            Self::Tls(d) => Some(d.certificate_sha256),
+            Self::NomadNet(_) => None,
+        }
+    }
+    fn destination(&self) -> Option<[u8; 16]> {
+        match self {
+            Self::Tls(_) => None,
+            Self::NomadNet(d) => Some(d.destination),
+        }
+    }
+}
+
+enum RunningNative {
+    Tls(RunningGemini),
+    #[cfg(feature = "moot-site-nomadnet")]
+    NomadNet(micron_site::RunningNomadNet),
+}
+impl RunningNative {
+    fn activate(&self) {
+        match self {
+            Self::Tls(r) => r.activate(),
+            #[cfg(feature = "moot-site-nomadnet")]
+            Self::NomadNet(r) => r.activate(),
+        }
+    }
+    fn address(&self) -> SocketAddr {
+        match self {
+            Self::Tls(r) => r.address,
+            #[cfg(feature = "moot-site-nomadnet")]
+            Self::NomadNet(r) => r.address,
+        }
+    }
+    fn close_and_join(&mut self) -> Result<armillary::tasks::TaskReport, String> {
+        match self {
+            Self::Tls(r) => r.close_and_join(),
+            #[cfg(feature = "moot-site-nomadnet")]
+            Self::NomadNet(r) => r.close_and_join(),
+        }
+    }
 }
 
 struct NativeSource<M, C> {
@@ -218,6 +323,39 @@ where
         })
     }
 
+    #[cfg(feature = "moot-site-nomadnet")]
+    fn nomadnet_reply(&self, request: &retinue::request::Request) -> Vec<u8> {
+        let result = (|| {
+            if !request.data.is_empty() {
+                return Err("Static Micron pages reject submission data".to_string());
+            }
+            if self.transport != MootSiteTransport::NomadNet {
+                return Err("This source is not a NomadNet endpoint".to_string());
+            }
+            let site = pollster::block_on(self.open())?;
+            site.snapshot()
+                .pages
+                .iter()
+                .find_map(|(path, page)| {
+                    (retinue::nomadnet::page_path_hash(format!("/page{path}").as_bytes())
+                        == request.path_hash)
+                        .then(|| page.source.clone())
+                })
+                .ok_or_else(|| "Micron page is not published".to_string())
+        })();
+        let mut refusal = self.refusal.lock().expect("site refusal mutex poisoned");
+        match result {
+            Ok(body) => {
+                *refusal = None;
+                body
+            },
+            Err(reason) => {
+                *refusal = Some(reason);
+                Vec::new()
+            },
+        }
+    }
+
     fn scroll_reply(&self, request: &scroll_protocol::Request) -> scroll_protocol::Reply {
         // Same inline local-owner read boundary as the Gemini Source below.
         let result = pollster::block_on(self.read_scroll(request));
@@ -295,6 +433,8 @@ pub struct MootSiteStatus {
     pub transport: Option<MootSiteTransport>,
     pub address: Option<SocketAddr>,
     pub certificate_sha256: Option<[u8; 32]>,
+    pub destination: Option<[u8; 16]>,
+    pub public_identity: Option<Vec<u8>>,
     pub last_refusal: Option<String>,
 }
 
@@ -306,7 +446,7 @@ pub struct MootSiteService<M, C> {
     content: C,
     descriptor: Option<Descriptor>,
     source: Option<Arc<NativeSource<M, C>>>,
-    running: Option<RunningGemini>,
+    running: Option<RunningNative>,
     startup_refusal: Option<String>,
 }
 
@@ -319,19 +459,33 @@ where
         std::fs::create_dir_all(root).map_err(|e| e.to_string())?;
         let descriptor = if root.join(DESCRIPTOR).exists() {
             let descriptor = load_json::<Descriptor>(&root.join(DESCRIPTOR), MAX_BINDING_BYTES)?;
-            if descriptor.version != 1 {
-                return Err("Unsupported Moot endpoint version".into());
+            descriptor.binding().validate().map_err(|e| e.to_string())?;
+            match &descriptor {
+                Descriptor::Tls(d) => {
+                    if d.version != 1 || d.transport == MootSiteTransport::NomadNet {
+                        return Err("Unsupported TLS endpoint descriptor".into());
+                    }
+                    d.policy.validate()?;
+                    persistent_gemini_identity(root, Some(d.certificate_sha256))?;
+                },
+                Descriptor::NomadNet(d) => {
+                    if d.version != 1 {
+                        return Err("Unsupported NomadNet endpoint version".into());
+                    }
+                    d.policy.validate()?;
+                    #[cfg(feature = "moot-site-nomadnet")]
+                    micron_site::identity(root, Some(d.destination))?;
+                    #[cfg(not(feature = "moot-site-nomadnet"))]
+                    return Err("NomadNet hosting requires the moot-site-nomadnet feature".into());
+                },
             }
-            descriptor.binding.validate().map_err(|e| e.to_string())?;
-            descriptor.policy.validate()?;
-            persistent_gemini_identity(root, Some(descriptor.certificate_sha256))?;
             Some(descriptor)
         } else {
             None
         };
         let resume = descriptor
             .as_ref()
-            .is_some_and(|d| d.running && d.policy.resume_on_restart);
+            .is_some_and(|d| d.running() && d.resume());
         let mut service = Self {
             root: root.into(),
             moot,
@@ -367,6 +521,9 @@ where
         if self.running.is_some() {
             return Err("Stop the endpoint before changing its binding".into());
         }
+        if transport == MootSiteTransport::NomadNet {
+            return Err("Use configure_nomadnet with native NomadNet policy".into());
+        }
         policy.validate()?;
         let site = open_binding(&self.moot, &mut self.content.clone(), &binding, now_ms()?)
             .await
@@ -374,20 +531,59 @@ where
         transport.require_format(site.snapshot().format)?;
         let identity = persistent_gemini_identity(
             &self.root,
-            self.descriptor.as_ref().map(|d| d.certificate_sha256),
+            self.descriptor.as_ref().and_then(Descriptor::certificate),
         )?;
-        let next = Descriptor {
+        let next = Descriptor::Tls(TlsDescriptor {
             version: 1,
             transport,
             binding,
             policy,
             certificate_sha256: identity_fingerprint(&identity)?,
             running: false,
-        };
+        });
         save_json_atomic(&self.root.join(DESCRIPTOR), &next)?;
         self.descriptor = Some(next);
         self.startup_refusal = None;
         Ok(())
+    }
+
+    pub async fn configure_nomadnet(
+        &mut self,
+        binding: SiteBindingV1,
+        policy: NomadNetListenerPolicyV1,
+    ) -> Result<(), String> {
+        #[cfg(not(feature = "moot-site-nomadnet"))]
+        {
+            let _ = (binding, policy);
+            Err("NomadNet hosting requires the moot-site-nomadnet feature".into())
+        }
+        #[cfg(feature = "moot-site-nomadnet")]
+        {
+            if self.running.is_some() {
+                return Err("Stop the endpoint before changing its binding".into());
+            }
+            policy.validate()?;
+            let site = open_binding(&self.moot, &mut self.content.clone(), &binding, now_ms()?)
+                .await
+                .map_err(|e| e.to_string())?;
+            MootSiteTransport::NomadNet.require_format(site.snapshot().format)?;
+            let identity = micron_site::identity(
+                &self.root,
+                self.descriptor.as_ref().and_then(Descriptor::destination),
+            )?;
+            let next = Descriptor::NomadNet(NomadNetDescriptor {
+                version: 1,
+                transport: NativeTransport::Nomadnet,
+                binding,
+                policy,
+                destination: micron_site::destination(&identity),
+                running: false,
+            });
+            save_json_atomic(&self.root.join(DESCRIPTOR), &next)?;
+            self.descriptor = Some(next);
+            self.startup_refusal = None;
+            Ok(())
+        }
     }
 
     pub async fn start(&mut self) -> Result<MootSiteStatus, String> {
@@ -404,61 +600,91 @@ where
         let source = Arc::new(NativeSource {
             moot: self.moot.clone(),
             content: self.content.clone(),
-            binding: next.binding.clone(),
-            transport: next.transport,
+            binding: next.binding().clone(),
+            transport: next.transport(),
             refusal: Mutex::new(None),
         });
         source.open().await?;
-        let identity = persistent_gemini_identity(&self.root, Some(next.certificate_sha256))?;
         let handler_source = source.clone();
-        let runtime = match next.transport {
-            MootSiteTransport::Gemini => start_gemini_handler(
-                move |_| errand::serve::adapt::gemini(handler_source),
-                &next.policy,
-                &identity,
-            )?,
-            MootSiteTransport::Scroll => {
-                let timeout = Duration::from_millis(next.policy.request_timeout_ms);
-                start_tls_handler(
-                    move |port| {
-                        move |mut tls, _peer, ready: Arc<std::sync::atomic::AtomicBool>| {
-                            let source = handler_source.clone();
-                            async move {
-                                let handler = move |request: scroll_protocol::Request| {
-                                    let reply = if !ready.load(Ordering::Acquire) {
-                                        scroll_status(44, "Publication not committed")
-                                    } else if valid_scroll_target(&request.uri, port) {
-                                        source.scroll_reply(&request)
-                                    } else {
-                                        scroll_status(59, "Invalid static-site request")
-                                    };
-                                    std::future::ready(reply)
-                                };
-                                scroll_protocol::server::serve_connection(
-                                    &mut tls,
-                                    &handler,
-                                    &scroll_protocol::server::ServerConfig {
-                                        max_request_bytes: 4096,
-                                        response_limits: scroll_protocol::ResponseLimits {
-                                            // Existing validated snapshot bounds include even
-                                            // long valid fractional timestamp metadata.
-                                            max_header_line_bytes: MAX_ENCODED_SNAPSHOT_BYTES,
-                                            max_body_bytes: MAX_PAGE_BYTES,
-                                        },
-                                        timeout,
-                                    },
-                                )
-                                .await?;
-                                tokio::io::AsyncWriteExt::shutdown(&mut tls).await
-                            }
-                        }
+        let runtime = match &next {
+            Descriptor::NomadNet(d) => {
+                #[cfg(feature = "moot-site-nomadnet")]
+                {
+                    let identity = micron_site::identity(&self.root, Some(d.destination))?;
+                    let refusal_source = source.clone();
+                    RunningNative::NomadNet(micron_site::start(
+                        move |request| handler_source.nomadnet_reply(request),
+                        move |reason| {
+                            *refusal_source
+                                .refusal
+                                .lock()
+                                .expect("site refusal mutex poisoned") = Some(reason.to_string())
+                        },
+                        &d.policy,
+                        identity,
+                    )?)
+                }
+                #[cfg(not(feature = "moot-site-nomadnet"))]
+                {
+                    let _ = d;
+                    return Err("NomadNet hosting requires the moot-site-nomadnet feature".into());
+                }
+            },
+            Descriptor::Tls(d) => {
+                let identity = persistent_gemini_identity(&self.root, Some(d.certificate_sha256))?;
+                let runtime = match d.transport {
+                    MootSiteTransport::Gemini => start_gemini_handler(
+                        move |_| errand::serve::adapt::gemini(handler_source),
+                        &d.policy,
+                        &identity,
+                    )?,
+                    MootSiteTransport::Scroll => {
+                        let timeout = Duration::from_millis(d.policy.request_timeout_ms);
+                        start_tls_handler(
+                            move |port| {
+                                move |mut tls, _peer, ready: Arc<std::sync::atomic::AtomicBool>| {
+                                    let source = handler_source.clone();
+                                    async move {
+                                        let handler = move |request: scroll_protocol::Request| {
+                                            let reply = if !ready.load(Ordering::Acquire) {
+                                                scroll_status(44, "Publication not committed")
+                                            } else if valid_scroll_target(&request.uri, port) {
+                                                source.scroll_reply(&request)
+                                            } else {
+                                                scroll_status(59, "Invalid static-site request")
+                                            };
+                                            std::future::ready(reply)
+                                        };
+                                        scroll_protocol::server::serve_connection(
+                                            &mut tls,
+                                            &handler,
+                                            &scroll_protocol::server::ServerConfig {
+                                                max_request_bytes: 4096,
+                                                response_limits: scroll_protocol::ResponseLimits {
+                                                    // Existing validated snapshot bounds include even
+                                                    // long valid fractional timestamp metadata.
+                                                    max_header_line_bytes:
+                                                        MAX_ENCODED_SNAPSHOT_BYTES,
+                                                    max_body_bytes: MAX_PAGE_BYTES,
+                                                },
+                                                timeout,
+                                            },
+                                        )
+                                        .await?;
+                                        tokio::io::AsyncWriteExt::shutdown(&mut tls).await
+                                    }
+                                }
+                            },
+                            &d.policy,
+                            &identity,
+                        )?
                     },
-                    &next.policy,
-                    &identity,
-                )?
+                    MootSiteTransport::NomadNet => return Err("Use native NomadNet policy".into()),
+                };
+                RunningNative::Tls(runtime)
             },
         };
-        next.running = true;
+        next.set_running(true);
         save_json_atomic(&self.root.join(DESCRIPTOR), &next)?;
         runtime.activate();
         self.descriptor = Some(next);
@@ -470,10 +696,27 @@ where
 
     pub fn status(&self) -> MootSiteStatus {
         MootSiteStatus {
-            binding: self.descriptor.as_ref().map(|d| d.binding.clone()),
-            transport: self.descriptor.as_ref().map(|d| d.transport),
-            address: self.running.as_ref().map(|r| r.address),
-            certificate_sha256: self.descriptor.as_ref().map(|d| d.certificate_sha256),
+            binding: self.descriptor.as_ref().map(|d| d.binding().clone()),
+            transport: self.descriptor.as_ref().map(Descriptor::transport),
+            address: self.running.as_ref().map(RunningNative::address),
+            certificate_sha256: self.descriptor.as_ref().and_then(Descriptor::certificate),
+            destination: self.descriptor.as_ref().and_then(Descriptor::destination),
+            public_identity: {
+                #[cfg(feature = "moot-site-nomadnet")]
+                {
+                    self.descriptor
+                        .as_ref()
+                        .and_then(Descriptor::destination)
+                        .and_then(|destination| {
+                            micron_site::identity(&self.root, Some(destination)).ok()
+                        })
+                        .map(|identity| identity.public().to_public_bytes().to_vec())
+                }
+                #[cfg(not(feature = "moot-site-nomadnet"))]
+                {
+                    None
+                }
+            },
             last_refusal: self
                 .source
                 .as_ref()
@@ -495,8 +738,11 @@ where
             .await
             .map_err(|e| e.to_string())?;
         if let Some(snapshot) = snapshot {
-            if !matches!(snapshot.format, SiteFormat::Gemini | SiteFormat::Scroll) {
-                return Err("This endpoint imports Gemini or Scroll sites".into());
+            if !matches!(
+                snapshot.format,
+                SiteFormat::Gemini | SiteFormat::Scroll | SiteFormat::Micron
+            ) {
+                return Err("This endpoint imports Gemini, Scroll or Micron sites".into());
             }
             let bytes = snapshot.encode()?;
             let manifest = eidetic::ManifestId::of_blob(&bytes);
@@ -545,7 +791,7 @@ where
     pub fn stop(&mut self) -> Result<(), String> {
         let joined = self.shutdown();
         let mut next = self.descriptor.clone().ok_or("No configured endpoint")?;
-        next.running = false;
+        next.set_running(false);
         save_json_atomic(&self.root.join(DESCRIPTOR), &next)?;
         self.descriptor = Some(next);
         joined?;
@@ -569,8 +815,8 @@ mod tests {
     use gemot::moot::{CollectionId, CollectionRef};
     use site_model::publication::SiteRevisionPolicy;
 
-    fn descriptor() -> Descriptor {
-        Descriptor {
+    fn descriptor() -> TlsDescriptor {
+        TlsDescriptor {
             version: 1,
             transport: MootSiteTransport::Gemini,
             binding: SiteBindingV1 {
@@ -597,7 +843,7 @@ mod tests {
             serde_json::to_string(&descriptor.certificate_sha256).unwrap(),
         );
         let reopened: Descriptor = serde_json::from_str(&legacy).unwrap();
-        assert_eq!(reopened.transport, MootSiteTransport::Gemini);
+        assert_eq!(reopened.transport(), MootSiteTransport::Gemini);
         assert_eq!(serde_json::to_string(&reopened).unwrap(), legacy);
     }
 
@@ -607,10 +853,110 @@ mod tests {
         descriptor.transport = MootSiteTransport::Scroll;
         let bytes = serde_json::to_vec(&descriptor).unwrap();
         let reopened: Descriptor = serde_json::from_slice(&bytes).unwrap();
-        assert_eq!(reopened.transport, MootSiteTransport::Scroll);
+        assert_eq!(reopened.transport(), MootSiteTransport::Scroll);
         let mut value = serde_json::to_value(descriptor).unwrap();
         value["transport"] = serde_json::json!("gopher");
         assert!(serde_json::from_value::<Descriptor>(value).is_err());
+    }
+
+    #[test]
+    fn nomadnet_descriptor_uses_native_policy_and_identity() {
+        let descriptor = Descriptor::NomadNet(NomadNetDescriptor {
+            version: 1,
+            transport: NativeTransport::Nomadnet,
+            binding: descriptor().binding,
+            policy: NomadNetListenerPolicyV1::default(),
+            destination: [8; 16],
+            running: false,
+        });
+        let value = serde_json::to_value(&descriptor).unwrap();
+        assert_eq!(value["transport"], "nomadnet");
+        assert!(value.get("certificate_sha256").is_none());
+        let reopened: Descriptor = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(reopened.destination(), Some([8; 16]));
+        assert_eq!(reopened.transport(), MootSiteTransport::NomadNet);
+        assert_eq!(reopened.certificate(), None);
+        let mut invalid = value;
+        invalid["certificate_sha256"] = serde_json::json!(vec![0; 32]);
+        assert!(serde_json::from_value::<Descriptor>(invalid).is_err());
+        assert!(
+            MootSiteTransport::NomadNet
+                .require_format(SiteFormat::Micron)
+                .is_ok()
+        );
+        assert!(
+            MootSiteTransport::NomadNet
+                .require_format(SiteFormat::Gemini)
+                .is_err()
+        );
+    }
+
+    #[cfg(not(feature = "moot-site-nomadnet"))]
+    #[tokio::test]
+    async fn disabled_nomadnet_backend_refuses_configure_and_saved_descriptor() {
+        use gemot::moot::KeepBound;
+        use muniment::MemoryBackend;
+
+        let directory = tempfile::tempdir().unwrap();
+        let moot = Arc::new(Moot::in_memory(
+            MootId([1; 32]),
+            [2; 32],
+            MootRetentionSettings {
+                revision: serde_json::from_value(
+                    serde_json::json!({ "alg":"Blake3", "bytes":vec![3u8; 32] }),
+                )
+                .unwrap(),
+                availability: AvailabilityPolicy {
+                    promised_floor: KeepBound::Forever,
+                },
+                erasure: ErasurePolicy {
+                    history_ceiling: KeepBound::UntilCheckpoint,
+                },
+            },
+        ));
+        let mut service =
+            MootSiteService::open(directory.path(), moot.clone(), MemoryBackend::new())
+                .await
+                .unwrap();
+        assert!(
+            service
+                .configure_nomadnet(
+                    descriptor().binding.clone(),
+                    NomadNetListenerPolicyV1::default()
+                )
+                .await
+                .unwrap_err()
+                .contains("moot-site-nomadnet")
+        );
+        assert!(service.status().transport.is_none());
+        let saved = Descriptor::NomadNet(NomadNetDescriptor {
+            version: 1,
+            transport: NativeTransport::Nomadnet,
+            binding: descriptor().binding,
+            policy: NomadNetListenerPolicyV1::default(),
+            destination: [8; 16],
+            running: false,
+        });
+        save_json_atomic(&directory.path().join(DESCRIPTOR), &saved).unwrap();
+        assert!(
+            MootSiteService::open(directory.path(), moot, MemoryBackend::new())
+                .await
+                .err()
+                .unwrap()
+                .contains("moot-site-nomadnet")
+        );
+        assert!(
+            !directory
+                .path()
+                .join("published-site-identity.json")
+                .exists()
+        );
+        assert!(
+            !directory
+                .path()
+                .join("moot-site-nomadnet-identity.json")
+                .exists()
+        );
     }
 
     #[test]
