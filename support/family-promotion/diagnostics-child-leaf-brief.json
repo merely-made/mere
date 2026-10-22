@@ -1,0 +1,24 @@
+{
+  "basis": "0606dfaad",
+  "scope": "Registry-owned leaf cache and queued action lifetimes; authored canvas child keys outside semantic reads",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "diagnostics-child-leaf-native-fixed.json",
+    "diagnostics-child-leaf-canvas.json",
+    "diagnostics-child-leaf-product.json",
+    "diagnostics-child-leaf-browser.json",
+    "diagnostics-child-leaf-embedding.json",
+    "diagnostics-child-leaf-final-cache.json",
+    "diagnostics-child-leaf-qualification.json"
+  ],
+  "done_conditions": [
+    "Same-key clean replacement paints fresh output; scene replacement cannot inherit old scene; cache removal cannot alias retained host epochs.",
+    "Queued leaf values refuse replaced, removed/reinserted, detached and newly inserted contributors; mutable updates remain valid.",
+    "Canvas keys are authored at model reconciliation, stable across reads and metadata refresh, withdrawn on removal/restoration and graph switch.",
+    "Document generic producer and native/browser publication provenance gaps without claiming runtime or assistive-technology qualification."
+  ],
+  "concurrent_work": "Preserve staged diagnostics receiving cleanup, system fetch/site publication and Cargo.lock changes; new audit record avoids their document collision.",
+  "retained_failure_receipts": [
+    "diagnostics-child-leaf-native.json"
+  ]
+}

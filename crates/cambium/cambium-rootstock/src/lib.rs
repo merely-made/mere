@@ -58,11 +58,11 @@ pub mod producer;
 mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
-    ProducedScene, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
-    ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats, ProducerGpuRemapError,
-    ProducerImageIdentity, ProducerNode, ProducerRegistrationError, ProducerRegistry,
-    ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource, ResolvedAppearance,
-    SourceAlpha, SourceEncoding, TextureProducer,
+    ProducedScene, ProducedTexture, ProducerAction, ProducerChildLifetime, ProducerChildToken,
+    ProducerContext, ProducerError, ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats,
+    ProducerGpuRemapError, ProducerImageIdentity, ProducerNode, ProducerRegistrationError,
+    ProducerRegistry, ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource,
+    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
 };
 pub use scene_producer::SceneProducer;
 
@@ -325,6 +325,7 @@ impl A11yReceipt {
         self.0.get()
     }
 }
+mod a11y_provenance;
 mod a11y_queue;
 pub(crate) use a11y_queue::QueuedA11y;
 
@@ -333,6 +334,7 @@ pub(crate) use a11y_queue::QueuedA11y;
 pub struct A11yRequest {
     pub action: A11yAction,
     pub target: A11yTarget,
+    provenance: Option<a11y_provenance::A11yProvenance>,
 }
 
 /// What a reader's request lands on.
@@ -346,20 +348,65 @@ pub enum A11yTarget {
 }
 
 impl A11yRequest {
-    /// A request on a DOM node.
-    pub fn node(action: A11yAction, node: NodeId) -> Self {
+    /// A raw request naming the current context, without publication provenance.
+    pub fn new(action: A11yAction, target: A11yTarget) -> Self {
         Self {
             action,
-            target: A11yTarget::Node(node),
+            target,
+            provenance: None,
         }
+    }
+
+    /// Bind a publication's document/window subtree and contributors. This retains no
+    /// document or contributor. Platform event generations and host ownership
+    /// are separate: a raw numeric OS ID does not carry this binding by itself.
+    pub fn bind_publication(
+        mut self,
+        dom: &WindowDom<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> Self {
+        if self.provenance.is_none() {
+            self.provenance = Some(a11y_provenance::A11yProvenance::capture(
+                &self.target,
+                dom,
+                leaves,
+                producers,
+            ));
+        }
+        self
+    }
+
+    /// Whether two bound observations name the same target life. Ordinary
+    /// value/layout updates keep it; an unbound request makes no such claim.
+    pub fn same_publication_target(&self, other: &Self) -> bool {
+        self.target == other.target
+            && self
+                .provenance
+                .as_ref()
+                .zip(other.provenance.as_ref())
+                .is_some_and(|(a, b)| a == b)
+    }
+
+    pub(crate) fn publication_is_current(
+        &self,
+        dom: &WindowDom<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> bool {
+        self.provenance
+            .as_ref()
+            .is_none_or(|binding| binding.is_current(&self.target, dom, leaves, producers))
+    }
+
+    /// A request on a DOM node.
+    pub fn node(action: A11yAction, node: NodeId) -> Self {
+        Self::new(action, A11yTarget::Node(node))
     }
 
     /// A request on a drawn node's action button.
     pub fn produced(action: A11yAction, produced: ProducedAction) -> Self {
-        Self {
-            action,
-            target: A11yTarget::Produced(produced),
-        }
+        Self::new(action, A11yTarget::Produced(produced))
     }
 }
 

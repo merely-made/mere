@@ -8,9 +8,10 @@
 //! app-coupled (meerkat's orrery: graph, camera, layout strategies, gnode
 //! pool). The build stays host-side; the slot carries the built scene through
 //! the leaf contract, so it gains the retention gates (`paint_dirty`, size),
-//! the epoch-gated host rasterize loop (`RenderedLeaves::scenes`), and the
-//! spliced `DrawExternalTexture` placement, without copying app state into a
-//! leaf. Widgets that own their inputs outright (a waveform over a sample
+//! an epoch-tagged scene iterator (`RenderedLeaves::scenes`), and the spliced
+//! `DrawExternalTexture` placement. A host must consume the iterator and own
+//! rasterization/retirement; Rootstock does not yet wire that path. Widgets
+//! that own their inputs outright (a waveform over a sample
 //! buffer) implement [`Leaf`] directly and paint into `cx.scene()` instead.
 
 use crate::{Leaf, PaintCx, Size, SizeHint};
@@ -124,19 +125,21 @@ mod tests {
                     && (et.placement.bounds.max.x - 48.0).abs() < 0.01
         ));
         let (key, _scene, epoch, size) = out.scenes().next().expect("scene awaiting rasterize");
-        assert_eq!((key, epoch), (77, 2));
+        assert_eq!(key, 77);
+        let first_epoch = epoch;
         assert_eq!(size, size48());
 
         // Unchanged frame: no repaint, epoch stable (host skips rasterize).
         assert_eq!(reg.render_into(sized, &mut out), 0);
-        assert_eq!(out.scenes().next().unwrap().2, 2, "epoch stable");
+        assert_eq!(out.scenes().next().unwrap().2, first_epoch, "epoch stable");
 
         // New scene: repaint, epoch bumps (host re-rasterizes).
         reg.get_mut_as::<SceneSlot>(&77)
             .unwrap()
             .set_scene(a_scene());
         assert_eq!(reg.render_into(sized, &mut out), 1);
-        assert_eq!(out.scenes().next().unwrap().2, 3, "epoch moved");
+        let next_epoch = out.scenes().next().unwrap().2;
+        assert!(next_epoch > first_epoch, "epoch moved");
 
         // Size-only repaint (relayout, no new scene): the prior scene carries
         // forward, the splice re-sizes, the epoch bumps so the host
@@ -149,7 +152,7 @@ mod tests {
         };
         assert_eq!(reg.render_into(bigger, &mut out), 1);
         let (_, scene, epoch, size) = out.scenes().next().unwrap();
-        assert_eq!(epoch, 4);
+        assert!(epoch > next_epoch);
         assert_eq!(size.width, 64.0);
         assert!(!scene.encoding().is_empty(), "prior scene carried forward");
         let splice = out.get(77).unwrap();

@@ -616,5 +616,16 @@
   "target_lifetime_integration_qualification": "diagnostics-lifetimes-integrated-qualification.json",
   "target_lifetime_integration_basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f",
   "target_lifetime_main_qualification": "diagnostics-lifetimes-main-qualification.json",
-  "target_lifetime_main_basis": "e1412c46d31f68e16219b574aed03ad44a65ec4e"
+  "target_lifetime_main_basis": "e1412c46d31f68e16219b574aed03ad44a65ec4e",
+  "child_leaf_lifetime_continuation": {
+    "review": "support/family-promotion/diagnostics-child-leaf-review.json",
+    "brief": "support/family-promotion/diagnostics-child-leaf-brief.json",
+    "qualification": "support/family-promotion/diagnostics-child-leaf-qualification.json",
+    "status": "Leaf registry/cache/queue and authored canvas repairs qualified: 317 passes, seven existing ignores, Wasm and embedding compile. Generic producer child and platform publication lives remain open. Existing staged receiving edits preserved."
+  },
+  "producer_publication_continuation": {
+    "review": "support/family-promotion/diagnostics-publication-review.json",
+    "qualification": "support/family-promotion/diagnostics-publication-qualification.json",
+    "status": "Bounded contributor/child publication repairs qualified on recorded checkout: 287 passes, seven existing ignores, Wasm and embedding compile. Native late numeric IDs, foreign host owner and latest-main receiving remain open. Existing staged and earlier lane work preserved."
+  }
 }

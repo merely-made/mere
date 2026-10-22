@@ -1,0 +1,71 @@
+{
+  "executed_binaries": [
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe",
+      "sha256_at_receipt_close": "ecb40fe983e8aa197fd7f0d2110ead29aaf5382649f82533d0924f83cdb31b2a",
+      "bytes": 19913216
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe",
+      "sha256_at_receipt_close": "f1aecd0af9537f630380955e8d1c7c64f5a6fd538dc6a42609e92905b2c9bf94",
+      "bytes": 36703744
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe",
+      "sha256_at_receipt_close": "fa330b774af708fce9a9fe325ed686a285bc0f86a0540a1995ec08bd28abad1c",
+      "bytes": 16796160
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe",
+      "sha256_at_receipt_close": "98f4302afa9529edb22d3730ffbdce3aab763167225f58d05435e82cee1cfd06",
+      "bytes": 16354304
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe",
+      "sha256_at_receipt_close": "03f95063c5605415d9ec7835ce813f066b2c27e4e3c9f442f0985f3d7d7815d2",
+      "bytes": 41714176
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe",
+      "sha256_at_receipt_close": "ba273578a5e9518620a643bdf0be58595b2a582500dfb2f176c6eeb48275c311",
+      "bytes": 17870336
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe",
+      "sha256_at_receipt_close": "e46323c252b9496434434dab55cd3c5b7bf1a966e9716edfd86350b09a2e3a8a",
+      "bytes": 17552896
+    },
+    {
+      "gate": "diagnostics-publication-native.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe",
+      "sha256_at_receipt_close": "b19556f9ece969ac7ebf4a1e770d6e50c61581e48b4b8c616b48026860f30287",
+      "bytes": 39039488
+    },
+    {
+      "gate": "diagnostics-publication-native-controls-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-18329591f5a3711e.exe",
+      "sha256_at_receipt_close": "0d200a3206a92efd9a27e0ac6a9a3802fee5d224beabd2685d452e50d096cca8",
+      "bytes": 41647616
+    },
+    {
+      "gate": "diagnostics-publication-native-controls-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-840eda1f324ecad4.exe",
+      "sha256_at_receipt_close": "34bd62eb34b4e3b4992445a1c79cf088802c0158b722544575205691d6525125",
+      "bytes": 18705920
+    },
+    {
+      "gate": "diagnostics-publication-product-final.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-e62422efbd66e353.exe",
+      "sha256_at_receipt_close": "9e60fc5fb192b19dbdbce49eb43a853a61f6fa8952c34dad3480aaf401cafa58",
+      "bytes": 90628608
+    }
+  ],
+  "boundary": "Hashes recorded at lane receipt closing in reused target; no executables copied. Not headed, browser-runtime or human AT evidence."
+}

@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-22",
+  "scope": "Commit child/leaf and producer/publication audit changes, preserve Djinn WIP and existing staged receiving edits, integrate current main, rerun affected checks.",
+  "basis": "6d7ac5e8a6d3d87a1b4a89b73b19530b5a7b0c07",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "diagnostics-audit-integration-native.json",
+    "diagnostics-audit-integration-canvas.json",
+    "diagnostics-audit-integration-product.json",
+    "diagnostics-audit-integration-browser.json",
+    "diagnostics-audit-integration-embedding.json",
+    "diagnostics-audit-integration-qualification.json"
+  ],
+  "done_conditions": [
+    "Audit changes committed without pre-existing staged removals or Djinn changes.",
+    "Current fetched main merged and received; conflicts preserve both owners.",
+    "Affected native, producer/leaf, canvas, retained-content, browser Wasm and embedding checks pass; failures retained.",
+    "Prior source/gate receipts remain immutable; current docs record receiving and explicit remaining ownership limits.",
+    "No unneeded isolated worktree, Cargo target or home remains."
+  ]
+}

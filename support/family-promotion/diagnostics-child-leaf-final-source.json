@@ -1,0 +1,27 @@
+{
+  "head": "0606dfaada848e464a8dc86de74ab72221f92fe7",
+  "source_sha256": {
+    "crates/cambium/sprigging/src/lib.rs": "524ece326121f89d9c3d6844ab1f40a65b2f9aea6f81f8569e5da75b58b7d113",
+    "crates/cambium/sprigging/src/slot.rs": "1ddd1e92a5899291076964947a1c4b354ba3603953d7cf1d2d09bddc7c80cf6d",
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "03b590792f05aafef8d14211aab224d267586ac68b7f69259f47544fc54c02ea",
+    "crates/cambium/cambium-rootstock/src/host.rs": "d197a451f01e4d4cce3c90c7d6ea62a6f17463e675b607e028d2292fac1bff7e",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "ef0d0b82d30d2269db5d2ca268075ed1cce5198007f21a358943ab4c60b9c404",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "27a5477d642dbda1e0cd3ad230a607f7a731e78b2e3ec8e9da00b96ce7472e6c",
+    "crates/canvas/pictograph/src/canvas.rs": "6a072a691f13c26f4bf98d934df59ddc64d2487e2b9262cc7387d63104463cd3",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "5ae6986ecbb1f7b6012655caabbccf291cee12b9d9ed8f43470648eec6baf916",
+    "crates/canvas/pictograph/src/canvas/reader.rs": "9f3ab4bc150360c370bf9ed6d689bcea50531f937cbdd4b7db9f78a40a98573d",
+    "crates/canvas/pictograph/src/canvas/tests/reader.rs": "c3b7d7a5abd70182318a6819f07d48ff382affcd5786c87f3aa13017984e6a88",
+    "ports/graphshell/src/canvas_reader/tests.rs": "685c983f84a0d9ac4adce5c68cb593b2b912642a0a7177154708727823593c72",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "36014947bd7bdde541d5f716331b4c7ed099a3bc2b34566b62d6d3b1e92f5263",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "16bc537b1543185e9bfa89f40a8a1cb4a05e6c503ae6b331223d6bb015d21bcb",
+    "Cargo.lock": "c25f5cb1d996b3ce01a32940ec891604fa8b410c0dfe14f054974d803dc11694",
+    "Cargo.toml": "ff97806c858252765af770f33dc0ea29a1df1ae44068a8bd169479a5ef471fd7",
+    "crates/cambium/sprigging/Cargo.toml": "494d853885c949ea3846b448be716dddc9f7da9dcfde1f1e9642a9300b19bc27",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "a3442d4121d97c2c6b58628afdb4acd66bf5df5b90be7760a181d56e5ad3fe2d",
+    "crates/canvas/pictograph/Cargo.toml": "fb7b8ee8652f98a1e6257552a7eff65cf530fd145d259fb3feb1027077fe95bc",
+    "ports/graphshell/Cargo.toml": "2b880c498dbde05567ea9631f2767a80b15a123432ca6f53e04d87f74781dc62"
+  },
+  "scope": "Modified sources, immediate manifests, existing semantic/producer owners and current lock; not a seal of every transitive source in this shared workspace.",
+  "boundary": "Source docs in Sprigging were corrected after the native cohort; final-cache receives those comment-only corrections. Functional changes were present in native-fixed. Product receipt includes the new same-member restoration test. Cargo.lock has unrelated preserved fetch dev dependencies.",
+  "new_isolated_outputs": []
+}

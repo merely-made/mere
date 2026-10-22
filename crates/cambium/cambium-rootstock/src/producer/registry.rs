@@ -315,6 +315,14 @@ impl ProducerRegistry {
         self.entries.get(&key)?.producer.semantics()
     }
 
+    pub(crate) fn child_lifetime(
+        &self,
+        slot: u64,
+        child: u64,
+    ) -> Option<super::ProducerChildToken> {
+        self.entries.get(&slot)?.producer.child_lifetime(child)
+    }
+
     /// Hand a reader's invoked action to the producer that drew the node.
     /// Whether it carried it out; `false` for an unknown slot.
     pub fn act(&mut self, action: &super::ProducedAction) -> bool {
