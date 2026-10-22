@@ -11,7 +11,7 @@ description = "Real PEFT LoRA receipt for ESP's immutable ModelSession seam."
 
 [dependencies]
 eidetic = { default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { features = ["decoder-lora"], git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+esp = { features = ["decoder-lora"], git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
 half = "2"
 muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 ndarray = "0.17"
@@ -26,7 +26,7 @@ sha2 = "0.11"
 # Canonical promoted families; keep registry and Git consumers type-identical.
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
 muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 # Match the stable runtime policy of the other Distillery fixtures.
 cubecl-runtime = { path = "../../../../support/patches/cubecl-runtime" }
@@ -37,11 +37,11 @@ rust-version = "1.97.1"
 [patch."https://github.com/merely-made/mere.git"]
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
 muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 
 [patch."https://www.github.com/merely-made/mere.git"]
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
 muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
