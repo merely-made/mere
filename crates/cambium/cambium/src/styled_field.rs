@@ -139,7 +139,7 @@ pub const FIELD_CARET_CLASS: &str = "field-caret";
 pub const FIELD_PREEDIT_CLASS: &str = "field-preedit";
 
 /// The one field body, with or without a rendered caret. `show_caret` splices a
-/// `<span class="field-caret">▍</span>` at the caret split, *after* the preedit
+/// `<span class="field-caret">|</span>` at the caret split, *after* the preedit
 /// (composition text lands before the caret, matching platform IME fields).
 fn field_children_impl<State: 'static, Action: 'static>(
     input: &TextInput,
@@ -172,7 +172,9 @@ fn field_children_impl<State: 'static, Action: 'static>(
     }
     if show_caret {
         kids.push(Box::new(
-            el::<_, State, Action>("span", "▍").attr("class", FIELD_CARET_CLASS),
+            // Basic Latin is present in the host's UI font, including the
+            // small font bundles used by retained native/Web renderers.
+            el::<_, State, Action>("span", "|").attr("class", FIELD_CARET_CLASS),
         ));
     }
     if !preedit[preedit_caret..].is_empty() {
@@ -234,7 +236,7 @@ pub fn styled_text_field(input: &TextInput, styles: &[StyleRange]) -> crate::Tex
     )
 }
 
-/// A single-line field that renders its own caret: the `▍` glyph as an in-flow
+/// A single-line field that renders its own caret: the `|` glyph as an in-flow
 /// `<span class="field-caret">` at the caret split (after any preedit), themed by
 /// the host through [`FIELD_CARET_CLASS`]. For hosts that paint the whole scene
 /// from the DOM (no overlay layer) — turnstone's omnibar is the first consumer.
@@ -389,7 +391,7 @@ mod tests {
         assert_eq!(classes, vec!["outer", "inner", "outer"]);
     }
 
-    /// The caret field mounts with the `▍` span *at the split*: text-before,
+    /// The caret field mounts with the `|` span *at the split*: text-before,
     /// `<span class="field-caret">`, text-after — the in-flow caret a
     /// scene-painting host renders instead of an overlay.
     #[test]
@@ -424,6 +426,8 @@ mod tests {
             Some(super::FIELD_CARET_CLASS)
         );
         assert_eq!(dom.text(kids[2]), Some("cd"));
+        let caret_text = dom.dom_children(kids[1]).next().unwrap();
+        assert_eq!(dom.text(caret_text), Some("|"));
     }
 
     #[test]
