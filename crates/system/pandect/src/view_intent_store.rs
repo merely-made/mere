@@ -135,6 +135,11 @@ pub struct ViewIntent {
     /// version 1 record migrates as it loads (Ruling 164).
     #[serde(default)]
     pub folds: Vec<FoldRecord>,
+    /// Fold records this host could not apply (another scope, a newer
+    /// version, a member since gone), kept as written so a host that can
+    /// apply them finds them intact after this one saves.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub retained_folds: Vec<serde_json::Value>,
     /// Substrate camera snapshot (pan + zoom). `None` when the pane
     /// has no saved camera (fresh pane → host falls back to
     /// `CameraSnapshot::IDENTITY`). Save path uses `None` for
@@ -179,6 +184,7 @@ impl ViewIntent {
             && self.hidden_links.is_empty()
             && self.hidden_assertions.is_empty()
             && self.folds.is_empty()
+            && self.retained_folds.is_empty()
             && self.camera.is_none()
             && self.focus.is_none()
             && self.strategy.is_none()

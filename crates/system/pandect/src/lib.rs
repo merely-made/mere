@@ -77,6 +77,7 @@ pub mod facet_store;
 // first; size/sprite/hull/material/face follow) as facets in facets.json —
 // born as facets, since the bespoke cartography sidecar was never wired.
 pub mod arrangement_facets;
+pub mod cartography_geometry;
 // Recoverable replacement mechanics shared by product-owned settings stores.
 // Paths, schemas, and validation remain with the configured product.
 pub mod atomic_file;
@@ -84,6 +85,7 @@ pub mod atomic_file;
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
 pub mod engine_profile_store;
+pub mod saved_scene;
 pub mod scene_facets;
 // Freeze/thaw a live graph into an immutable, content-addressed graph codicil over
 // an eidetic Store (the Alembic memory spine; wasm-clean — store-agnostic, not
@@ -157,14 +159,14 @@ pub use application_settings_store::{
 pub use arrangement_facets::{
     ARRANGEMENT_FACE, ARRANGEMENT_MATERIAL, ARRANGEMENT_MOSAIC, ARRANGEMENT_POSITION,
     ARRANGEMENT_REGIONS, ARRANGEMENT_SEED, ARRANGEMENT_SIZE, ARRANGEMENT_SPRITE,
-    ARRANGEMENT_SPRITE_HULL, ArrangementMosaic, ArrangementRegion, arrangement_position_facet,
+    ARRANGEMENT_SPRITE_HULL, arrangement_position_facet,
     read_arrangement_faces, read_arrangement_materials, read_arrangement_mosaic,
     read_arrangement_positions, read_arrangement_regions, read_arrangement_seed,
     read_arrangement_sizes, read_arrangement_sprite_hulls, read_arrangement_sprites,
     retain_present_nodes, write_arrangement_faces, write_arrangement_materials,
     write_arrangement_mosaic, write_arrangement_positions, write_arrangement_regions,
     write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
-    write_arrangement_sprites,
+    write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
 };
 pub use atomic_file::write_bytes_with_backup;
 pub use codicil_seal::WalletEpochSealer;
@@ -231,10 +233,16 @@ pub use reservoir::{
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use reservoir::{open_mere_archive_backend, open_mere_backend, open_reservoir_backend};
+pub use cartography_geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
+pub use saved_scene::{
+    DEFAULT_ARRANGEMENT, SAVED_SCENE_FACET, SAVED_SCENE_FACET_V2, SAVED_SCENE_FACET_V3,
+    SavedDynamics, SavedRolesV1, SavedSceneV2, SavedSceneV3, StoredScene, stored_scene,
+    write_saved_scene,
+};
 pub use scene_facets::{
     DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
-    SCENE_SIZE_BY_IMPORTANCE, SceneFacets, copy_scene_facets, read_scene_facets,
-    write_scene_facets,
+    SCENE_SIZE_BY_IMPORTANCE, SceneFacets, clear_scene_facets, copy_scene_facets,
+    has_scene_facets, read_scene_facets, write_scene_facets,
 };
 #[cfg(not(target_arch = "wasm32"))]
 pub use script_bindings_store::{SCRIPT_BINDINGS_FILENAME, ScriptBinding};
