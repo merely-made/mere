@@ -1,0 +1,98 @@
+[
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "--",
+      "physics_controls",
+      "canvas::tests::binding",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 134.76,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 355.08,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "authored_two_stage_schedule_survives_v4_reopen_capture_progress_and_refusal",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 129.64,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/ports/graphshell/web/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--no-default-features",
+      "--features",
+      "product,presentation-webgpu"
+    ],
+    "exit": 0,
+    "seconds": 79.61,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+]
