@@ -127,13 +127,28 @@ pub fn sessions_with_presentation<Fetch: ResourceFetcher + Send + Sync + 'static
     fonts: Vec<Vec<u8>>,
     family: Option<String>,
 ) -> SessionRegistry<Scene> {
+    sessions_with_generic_fonts(resources, fonts, family.into_iter().collect(), Vec::new())
+}
+
+/// Explicit generic roles accompany the host's fonts. No ambient browser or
+/// platform font acquisition is introduced; the portable lanes retain this
+/// ledger when they reflow.
+pub fn sessions_with_generic_fonts<Fetch: ResourceFetcher + Send + Sync + 'static>(
+    resources: Fetch,
+    fonts: Vec<Vec<u8>>,
+    families: Vec<String>,
+    generic_fonts: Vec<(String, Vec<u8>)>,
+) -> SessionRegistry<Scene> {
+    // Quote each family separately so commas in a family name cannot change
+    // the host-chosen fallback order. The same stack serves HTML and lanes.
+    let family = (!families.is_empty()).then(|| {
+        families.iter().map(|name| serde_json::to_string(name).unwrap())
+            .collect::<Vec<_>>().join(", ")
+    });
     let sheets = family
         .as_ref()
         .map(|family| {
-            format!(
-                "* {{font-family:{} !important;}}",
-                serde_json::to_string(family).unwrap()
-            )
+            format!("* {{font-family:{family} !important;}}")
         })
         .into_iter()
         .collect::<Vec<_>>();
@@ -151,6 +166,7 @@ pub fn sessions_with_presentation<Fetch: ResourceFetcher + Send + Sync + 'static
             inner,
             fonts: fonts.clone(),
             family: family.clone(),
+            generic_fonts: generic_fonts.clone(),
         }));
     }
 
@@ -207,6 +223,7 @@ struct FontEngine {
     inner: Box<dyn SessionEngine<Scene>>,
     fonts: Vec<Vec<u8>>,
     family: Option<String>,
+    generic_fonts: Vec<(String, Vec<u8>)>,
 }
 impl SessionEngine<Scene> for FontEngine {
     fn engine_id(&self) -> &str {
@@ -217,7 +234,7 @@ impl SessionEngine<Scene> for FontEngine {
         request: &SessionSpawnRequest,
     ) -> Result<Box<dyn inker::DocumentSession<Scene>>, SessionError> {
         let mut session = self.inner.spawn(request)?;
-        if self.fonts.is_empty() {
+        if self.fonts.is_empty() && self.generic_fonts.is_empty() {
             return Ok(session);
         }
         if let Some(doc) = session
@@ -225,6 +242,8 @@ impl SessionEngine<Scene> for FontEngine {
             .downcast_mut::<mere_document_lanes::SmolwebDocumentSession>()
         {
             doc.document_mut().set_fonts(self.fonts.clone());
+            doc.document_mut().set_generic_fonts(self.generic_fonts.clone())
+                .map_err(|error| SessionError::SpawnFailed(format!("Invalid host font roles: {error:?}")))?;
             if let Some(family) = &self.family {
                 doc.document_mut().set_font_family(family);
             }
@@ -233,6 +252,8 @@ impl SessionEngine<Scene> for FontEngine {
             .downcast_mut::<mere_document_lanes::ReaderDocumentSession>()
         {
             doc.set_fonts(self.fonts.clone());
+            doc.set_generic_fonts(self.generic_fonts.clone())
+                .map_err(|error| SessionError::SpawnFailed(format!("Invalid host font roles: {error:?}")))?;
             if let Some(family) = &self.family {
                 doc.set_font_family(family);
             }
