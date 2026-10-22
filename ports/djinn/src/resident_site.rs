@@ -14,7 +14,7 @@
 use std::net::{Ipv4Addr, SocketAddr};
 use std::path::{Path, PathBuf};
 use std::sync::{
-    Arc, RwLock,
+    Arc,
     atomic::{AtomicBool, Ordering},
 };
 use std::thread;
@@ -85,7 +85,7 @@ impl Default for GeminiListenerPolicyV1 {
 }
 
 impl GeminiListenerPolicyV1 {
-    fn validate(&self) -> Result<(), String> {
+    pub(super) fn validate(&self) -> Result<(), String> {
         if self.max_connections == 0 || self.max_connections > MAX_CONNECTIONS {
             return Err(format!(
                 "Gemini max_connections must be 1–{MAX_CONNECTIONS}"
@@ -113,7 +113,7 @@ struct PublishedSiteDescriptorV1 {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct GeminiIdentityV1 {
+pub(super) struct GeminiIdentityV1 {
     version: u8,
     certificate_der: Vec<u8>,
     private_key_der: Vec<u8>,
@@ -151,22 +151,40 @@ pub struct PublishedSiteStatusV1 {
     pub retained_custody: Option<[u8; 32]>,
 }
 
-struct RunningGemini {
-    address: SocketAddr,
-    certificate_sha256: [u8; 32],
+pub(super) struct RunningGemini {
+    pub(super) address: SocketAddr,
+    pub(super) certificate_sha256: [u8; 32],
     ready: Arc<AtomicBool>,
     shutdown: Option<watch::Sender<bool>>,
-    worker: Option<thread::JoinHandle<()>>,
+    worker: Option<thread::JoinHandle<armillary::tasks::TaskReport>>,
 }
 
 impl Drop for RunningGemini {
     fn drop(&mut self) {
+        if let Err(error) = self.close_and_join() {
+            tracing::warn!(%error, "Gemini task shutdown failed");
+        }
+    }
+}
+
+impl RunningGemini {
+    pub(super) fn close_and_join(&mut self) -> Result<armillary::tasks::TaskReport, String> {
         if let Some(shutdown) = self.shutdown.take() {
             let _ = shutdown.send(true);
         }
-        if let Some(worker) = self.worker.take() {
-            let _ = worker.join();
+        let report = match self.worker.take() {
+            Some(worker) => worker
+                .join()
+                .map_err(|_| "Gemini worker panicked".to_string())?,
+            None => armillary::tasks::TaskReport::default(),
+        };
+        if !report.is_clean() {
+            return Err(format!(
+                "Gemini tasks joined with {} panics and {} refused admissions",
+                report.panicked, report.rejected
+            ));
         }
+        Ok(report)
     }
 }
 
@@ -904,30 +922,10 @@ impl PublishedSiteService {
     }
 
     fn identity_for_publish(&self) -> Result<GeminiIdentityV1, String> {
-        let path = self.root.join(IDENTITY);
-        if path.exists() {
-            let identity = self.load_identity()?;
-            if let Some(descriptor) = self.descriptor.as_ref()
-                && identity_fingerprint(&identity)? != descriptor.certificate_sha256
-            {
-                return Err("published-site Gemini identity does not match its descriptor".into());
-            }
-            return Ok(identity);
-        }
-        if self.descriptor.is_some() {
-            return Err(
-                "published-site identity is missing; restore requires its original key".into(),
-            );
-        }
-        let cert = rcgen::generate_simple_self_signed(vec!["localhost".into(), "127.0.0.1".into()])
-            .map_err(|error| format!("could not create persistent Gemini identity: {error}"))?;
-        let identity = GeminiIdentityV1 {
-            version: 1,
-            certificate_der: cert.cert.der().as_ref().to_vec(),
-            private_key_der: cert.key_pair.serialize_der(),
-        };
-        save_json_atomic(&path, &identity)?;
-        Ok(identity)
+        persistent_gemini_identity(
+            &self.root,
+            self.descriptor.as_ref().map(|d| d.certificate_sha256),
+        )
     }
 
     fn load_identity(&self) -> Result<GeminiIdentityV1, String> {
@@ -952,7 +950,7 @@ fn with_cleanup_error(primary: String, cleanup: Option<String>) -> String {
     }
 }
 
-fn identity_fingerprint(identity: &GeminiIdentityV1) -> Result<[u8; 32], String> {
+pub(super) fn identity_fingerprint(identity: &GeminiIdentityV1) -> Result<[u8; 32], String> {
     if identity.version != 1
         || identity.certificate_der.is_empty()
         || identity.private_key_der.is_empty()
@@ -964,7 +962,40 @@ fn identity_fingerprint(identity: &GeminiIdentityV1) -> Result<[u8; 32], String>
     Ok(sha2::Sha256::digest(&identity.certificate_der).into())
 }
 
-fn load_json<T: for<'de> Deserialize<'de>>(path: &Path, limit: usize) -> Result<T, String> {
+pub(super) fn persistent_gemini_identity(
+    root: &Path,
+    expected: Option<[u8; 32]>,
+) -> Result<GeminiIdentityV1, String> {
+    let path = root.join(IDENTITY);
+    let identity = if path.exists() {
+        load_json::<GeminiIdentityV1>(&path, MAX_IDENTITY_BYTES)?
+    } else {
+        if expected.is_some() {
+            return Err(
+                "published-site identity is missing; restore requires its original key".into(),
+            );
+        }
+        let cert = rcgen::generate_simple_self_signed(vec!["localhost".into(), "127.0.0.1".into()])
+            .map_err(|error| format!("could not create persistent Gemini identity: {error}"))?;
+        let identity = GeminiIdentityV1 {
+            version: 1,
+            certificate_der: cert.cert.der().as_ref().to_vec(),
+            private_key_der: cert.key_pair.serialize_der(),
+        };
+        save_json_atomic(&path, &identity)?;
+        identity
+    };
+    let fingerprint = identity_fingerprint(&identity)?;
+    if expected.is_some_and(|expected| fingerprint != expected) {
+        return Err("published-site Gemini identity does not match its descriptor".into());
+    }
+    Ok(identity)
+}
+
+pub(super) fn load_json<T: for<'de> Deserialize<'de>>(
+    path: &Path,
+    limit: usize,
+) -> Result<T, String> {
     use std::io::Read;
 
     let mut bytes = Vec::with_capacity(limit.min(4096));
@@ -980,7 +1011,7 @@ fn load_json<T: for<'de> Deserialize<'de>>(path: &Path, limit: usize) -> Result<
         .map_err(|error| format!("could not decode {}: {error}", path.display()))
 }
 
-fn save_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
+pub(super) fn save_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<(), String> {
     let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     bytes.push(b'\n');
     let temporary = path.with_extension("tmp");
@@ -1002,6 +1033,26 @@ fn start_gemini(
     policy: &GeminiListenerPolicyV1,
     identity: &GeminiIdentityV1,
 ) -> Result<RunningGemini, String> {
+    start_gemini_handler(
+        move |port| {
+            move |request: gemini_protocol::server::Request| {
+                std::future::ready(publication.gemini_reply(&request.url, port))
+            }
+        },
+        policy,
+        identity,
+    )
+}
+
+pub(super) fn start_gemini_handler<F, H>(
+    make_handler: F,
+    policy: &GeminiListenerPolicyV1,
+    identity: &GeminiIdentityV1,
+) -> Result<RunningGemini, String>
+where
+    F: FnOnce(u16) -> H,
+    H: gemini_protocol::server::Handler,
+{
     policy.validate()?;
     let certificate_sha256 = identity_fingerprint(identity)?;
     let listener = std::net::TcpListener::bind((Ipv4Addr::LOCALHOST, policy.port))
@@ -1022,7 +1073,7 @@ fn start_gemini(
         .enable_all()
         .build()
         .map_err(|error| error.to_string())?;
-    let publication = Arc::new(RwLock::new(publication));
+    let handler = Arc::new(make_handler(address.port()));
     let (shutdown, shutdown_rx) = watch::channel(false);
     let ready = Arc::new(AtomicBool::new(false));
     let (ready_tx, ready_rx) = std::sync::mpsc::sync_channel(1);
@@ -1036,11 +1087,12 @@ fn start_gemini(
                     Ok(listener) => listener,
                     Err(error) => {
                         let _ = ready_tx.send(Err(error.to_string()));
-                        return;
+                        return armillary::tasks::TaskReport::default();
                     },
                 };
                 let _ = ready_tx.send(Ok(()));
                 let permits = Arc::new(tokio::sync::Semaphore::new(capacity));
+                let tasks = armillary::tasks::ResidentTasks::new();
                 let mut shutdown_rx = shutdown_rx;
                 loop {
                     tokio::select! {
@@ -1052,9 +1104,9 @@ fn start_gemini(
                                     continue;
                                 };
                                 let acceptor = acceptor.clone();
-                                let publication = Arc::clone(&publication);
+                                let handler = Arc::clone(&handler);
                                 let ready = Arc::clone(&ready);
-                                tokio::spawn(async move {
+                                tasks.spawn(async move {
                                     let _permit = permit;
                                     let _ = tokio::time::timeout(
                                         timeout,
@@ -1062,7 +1114,7 @@ fn start_gemini(
                                             stream,
                                             peer,
                                             acceptor,
-                                            publication,
+                                            handler,
                                             ready,
                                             address.port(),
                                             timeout,
@@ -1075,7 +1127,8 @@ fn start_gemini(
                         },
                     }
                 }
-            });
+                tasks.close_and_join().await
+            })
         }
     });
     ready_rx.recv().map_err(|error| error.to_string())??;
@@ -1088,11 +1141,11 @@ fn start_gemini(
     })
 }
 
-async fn serve_gemini_connection(
+async fn serve_gemini_connection<H: gemini_protocol::server::Handler>(
     stream: tokio::net::TcpStream,
     peer: SocketAddr,
     acceptor: tokio_rustls::TlsAcceptor,
-    publication: Arc<RwLock<Publication>>,
+    handler: Arc<H>,
     ready: Arc<AtomicBool>,
     public_port: u16,
     timeout: Duration,
@@ -1124,13 +1177,21 @@ async fn serve_gemini_connection(
         gemini_protocol::server::Reply::header(44, "Publication not committed")
     } else {
         match gemini_protocol::server::parse_request(&line) {
-            Ok(url) => publication
-                .read()
-                .map_err(|_| ())
-                .map(|snapshot| snapshot.gemini_reply(&url, public_port))
-                .unwrap_or_else(|_| {
-                    gemini_protocol::server::Reply::header(40, "Service state unavailable")
-                }),
+            Ok(url)
+                if url.scheme() == "gemini"
+                    && matches!(url.host_str(), Some("localhost" | "127.0.0.1"))
+                    && url.port().unwrap_or(1965) == public_port
+                    && url.username().is_empty()
+                    && url.password().is_none()
+                    && url.query().is_none()
+                    && url.fragment().is_none()
+                    && !url.path().contains(';') =>
+            {
+                handler
+                    .handle(gemini_protocol::server::Request { url, peer })
+                    .await
+            },
+            Ok(_) => gemini_protocol::server::Reply::header(59, "Invalid static-site request"),
             Err(reason) => gemini_protocol::server::Reply::header(59, reason),
         }
     };
@@ -1153,7 +1214,7 @@ async fn write_gemini_reply(
 }
 
 impl RunningGemini {
-    fn activate(&self) {
+    pub(super) fn activate(&self) {
         self.ready.store(true, Ordering::Release);
     }
 }
