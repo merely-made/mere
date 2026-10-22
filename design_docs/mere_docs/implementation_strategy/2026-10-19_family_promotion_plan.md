@@ -823,6 +823,17 @@ the already-qualified Errand `3d2ce3a` family as one source; the older Mere
 override omitted the `Reply` and `ResponseLimits` types used by Knot. This
 continuation changes receiving pins, with no Scroll implementation change.
 
+Actual Cleromancy receiving through published Git sources also exposes a public
+snapshot type split hidden by Mere's workspace self-patch. Knot's site adapter
+had pinned the portable `mere-site` model to an independent exact source, while
+Djinn used the SDK branch source. The Rust model and manifest are byte-identical
+at those revisions, but Cargo treats their selectors as different types. The
+owning correction aligns Knot's model dependency with the canonical SDK branch,
+retaining its portable dependency graph and semantic version. The failed real
+consumer build is retained as a control; final receiving must show one
+`mere-site` package identity as well as one Armillary and ESP identity. No
+snapshot conversion or product workaround is introduced.
+
 Woodshed's temporary desktop-host snapshot prevents current Cambium/Sprigging
 intake. Its audit verifies all 48 recorded upstream file hashes and 46 unchanged
 originals; the only behavioral patch suppresses synthesized held-key presses at
