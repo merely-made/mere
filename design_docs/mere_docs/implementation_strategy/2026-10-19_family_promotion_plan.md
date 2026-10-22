@@ -818,6 +818,11 @@ source workspace was byte-verified against the supplier. Actual Knot receiving
 then compiles the canonical Git supplier and passes its existing provider/index
 reopen tests. This does not claim a full JS/browser or Genet workspace sweep.
 
+Knot intake also requires its existing Scroll response contract. Mere receives
+the already-qualified Errand `3d2ce3a` family as one source; the older Mere
+override omitted the `Reply` and `ResponseLimits` types used by Knot. This
+continuation changes receiving pins, with no Scroll implementation change.
+
 Woodshed's temporary desktop-host snapshot prevents current Cambium/Sprigging
 intake. Its audit verifies all 48 recorded upstream file hashes and 46 unchanged
 originals; the only behavioral patch suppresses synthesized held-key presses at
