@@ -4683,9 +4683,11 @@ dependencies = [
  "djinn-testkit",
  "dramatis",
  "eidetic",
+ "errand",
  "futures-util",
  "gaz",
  "gemini-protocol",
+ "gemot",
  "graphshell",
  "graphshell-client",
  "graphshell-endpoint",
@@ -5698,6 +5700,7 @@ name = "finger-protocol"
 version = "0.1.1"
 source = "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
 dependencies = [
+ "log",
  "tokio",
  "url",
 ]
@@ -6888,6 +6891,7 @@ name = "gopher-protocol"
 version = "0.2.0"
 source = "git+https://github.com/merely-made/errand.git?rev=dce1f08546b8475e42a5a01ca1ea18794c6e9b97#dce1f08546b8475e42a5a01ca1ea18794c6e9b97"
 dependencies = [
+ "log",
  "tokio",
  "url",
 ]
@@ -10291,7 +10295,6 @@ dependencies = [
 name = "mesquite"
 version = "0.1.0"
 dependencies = [
- "sprigging",
  "cambium",
  "cambium-rootstock",
  "genet-scripted-dom",
@@ -10301,6 +10304,7 @@ dependencies = [
  "postcard",
  "serde",
  "serde_json",
+ "sprigging",
  "taproot",
 ]
 

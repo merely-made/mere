@@ -14,6 +14,7 @@ categories = ["command-line-utilities", "authentication"]
 default = ["personal-sync", "cxf"]
 cxf = ["personal-sync", "castellan/cxf"]
 personal-sync = []
+moot-site = ["site-model/publication", "dep:gemot", "dep:errand", "dep:pollster"]
 # `--passphrase-fd 0` for the harness and its receipts (vault lock ruling 65):
 # a passphrase read once from standard input, never the environment. Tests turn
 # it on through the dev-dependency on this package below; release builds keep
@@ -71,6 +72,9 @@ required-features = ["custody-receipt-host"]
 
 [dependencies]
 site-model.workspace = true
+gemot = { workspace = true, optional = true }
+errand = { workspace = true, optional = true, features = ["serve"] }
+pollster = { version = "0.4", optional = true }
 # Local redacted lifecycle diagnostics, without the projection/rendering feature.
 apparatus = { workspace = true, features = ["registry", "serde"] }
 registry = { workspace = true, features = ["diagnostics"] }
@@ -214,6 +218,11 @@ required-features = ["personal-sync"]
 name = "djinn-site"
 path = "src/bin/djinn_site.rs"
 required-features = ["personal-sync"]
+
+[[bin]]
+name = "djinn-moot-site"
+path = "src/bin/djinn_moot_site.rs"
+required-features = ["moot-site"]
 
 [[bin]]
 name = "djinn-devices"

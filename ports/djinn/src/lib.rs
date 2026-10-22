@@ -39,6 +39,8 @@ pub mod resident_mere;
 pub mod resident_projection;
 pub mod resident_reservoir;
 pub mod resident_site;
+#[cfg(feature = "moot-site")]
+pub mod moot_site;
 pub mod resident_status;
 pub mod settings;
 pub mod startup_vault;

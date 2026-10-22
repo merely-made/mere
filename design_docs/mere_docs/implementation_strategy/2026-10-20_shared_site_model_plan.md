@@ -3,6 +3,8 @@
 **Status (2026-10-21):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
+The Gemini runtime continuation has a native cross-process receipt; integration
+and final source recording are in progress.
 
 ## Scope and ownership
 
@@ -110,7 +112,8 @@ the default model and local checkpoint feature stay independent.
 
 ## Gemini publication runtime (2026-10-21)
 
-**Status:** in progress. Host authority and native snapshot V1 stay unchanged.
+**Status:** native qualified; integration in progress. Host authority and native
+snapshot V1 stay unchanged.
 
 1. Add a versioned endpoint binding with explicit pinned-contribution and
    follow-single-site-collection modes. Re-resolve current collection authority
@@ -137,6 +140,21 @@ listener already owns loopback/TLS/certificate and connection ceilings. Errand
 has a generic Source plus a Gemini Handler adapter; the native Scroll metadata
 gap need not block Gemini. Armillary's current pin already supplies scoped
 task admission, cancellation, joining and shutdown reports.
+
+The first Knot product caller is `knot-site-publish`, with an existing Moot and
+an explicitly provisioned identity on stdin. Its saved snapshot and signed drop
+are imported explicitly into separate resident stores; no editor folder or author
+key reaches the resident. Desktop controls and main-broker owner attachment are
+separate consumer gates. The process receipt lives with the Knot command at
+`knot-editor/crates/knot-site/tests/moot_site_runtime.rs` and is opt-in through
+`runtime-acceptance` plus `DJINN_MOOT_SITE_EXE`.
+
+The native synchronous backend reads complete inline before Errand's Send ready
+future is returned. Local I/O/JSON work is bounded by content limits but not
+preempted by network timeouts. Publication is revalidated per request; already
+admitted responses may finish. Record/content import spans owners and may leave
+accepted facts when later content retention refuses. Such incomplete delivery
+refuses serving until explicitly repaired.
 
 ## Extraction findings (2026-10-20)
 
