@@ -1,7 +1,7 @@
 {
   "date": "2026-10-21",
   "basis": "8942e30503f2fa91fdefe879ec5268ee42a5241a",
-  "status": "Queued owner/document/mount/producer registration lives, cancellation and native foreign-tree admission qualified again after integrating current main at 60daf11dc: 270 targeted native tests, seven existing ignores; browser Wasm and embedding compile pass. Authored child/leaf lifetimes (including the source-confirmed leaf paint-cache replacement lead) and platform publication provenance remain open before broader actions and forward geometry.",
+  "status": "Bounded queued owner/document/mount/producer lives, cancellation and native foreign-tree admission qualified in original and integrated 270-native-test cohorts (seven existing ignores). After another main dependency repair at e1412c46d, six focused lifetime controls and browser Wasm/embedding compile pass; original cohorts and upstream graph tests remain separately attributable. Authored child/leaf lives, stale leaf paint-cache replacement and platform publication provenance remain open.",
   "retained_byte_cap": 10000000,
   "sealed_registers_edited": false,
   "findings": [
@@ -614,5 +614,7 @@
   ],
   "target_lifetime_qualification": "diagnostics-lifetimes-qualification.json",
   "target_lifetime_integration_qualification": "diagnostics-lifetimes-integrated-qualification.json",
-  "target_lifetime_integration_basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f"
+  "target_lifetime_integration_basis": "60daf11dc54ac0e3079281b172bcea3d634a5c0f",
+  "target_lifetime_main_qualification": "diagnostics-lifetimes-main-qualification.json",
+  "target_lifetime_main_basis": "e1412c46d31f68e16219b574aed03ad44a65ec4e"
 }

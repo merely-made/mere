@@ -17,6 +17,14 @@ source and receipt hashes are in
 No diagnostic runtime source changed during the merge. The temporary receiving
 worktree preserves concurrent Djinn/lock work in the primary checkout.
 
+Later main receiving at `e1412c46d` includes the Q013 graph-snapshot repair.
+The lifetime implementation and its lock inputs remain unchanged; six focused
+native lifetime controls plus browser Wasm and embedding checks pass on that
+merge. `support/family-promotion/diagnostics-lifetimes-main-qualification.json`
+records this delta. The upstream graph owner's 474-test receipt remains
+separately attributable; the six lifetime controls are a subset of the earlier
+270-test cohorts, not additional unique tests or broad product acceptance.
+
 Queued AppCtx actions now bind the originating host, the document allocation,
 the window mount and, for generated actions, the logical producer registration.
 These are weak bindings: an acknowledgement keeps neither the document nor a
