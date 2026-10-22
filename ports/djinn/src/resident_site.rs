@@ -1053,6 +1053,38 @@ where
     F: FnOnce(u16) -> H,
     H: gemini_protocol::server::Handler,
 {
+    let timeout = Duration::from_millis(policy.request_timeout_ms);
+    start_tls_handler(
+        move |port| {
+            let handler = Arc::new(make_handler(port));
+            move |tls, peer, ready| {
+                serve_gemini_connection(tls, peer, Arc::clone(&handler), ready, port, timeout)
+            }
+        },
+        policy,
+        identity,
+    )
+}
+
+/// Host-owned TLS acceptance and task scope shared by native site protocols.
+/// The callback owns exactly one admitted TLS connection; no work is detached.
+pub(super) fn start_tls_handler<F, H, Fut>(
+    make_handler: F,
+    policy: &GeminiListenerPolicyV1,
+    identity: &GeminiIdentityV1,
+) -> Result<RunningGemini, String>
+where
+    F: FnOnce(u16) -> H,
+    H: Fn(
+            tokio_rustls::server::TlsStream<tokio::net::TcpStream>,
+            SocketAddr,
+            Arc<AtomicBool>,
+        ) -> Fut
+        + Send
+        + Sync
+        + 'static,
+    Fut: std::future::Future<Output = std::io::Result<()>> + Send + 'static,
+{
     policy.validate()?;
     let certificate_sha256 = identity_fingerprint(identity)?;
     let listener = std::net::TcpListener::bind((Ipv4Addr::LOCALHOST, policy.port))
@@ -1110,15 +1142,10 @@ where
                                     let _permit = permit;
                                     let _ = tokio::time::timeout(
                                         timeout,
-                                        serve_gemini_connection(
-                                            stream,
-                                            peer,
-                                            acceptor,
-                                            handler,
-                                            ready,
-                                            address.port(),
-                                            timeout,
-                                        ),
+                                        async move {
+                                            let tls = acceptor.accept(stream).await?;
+                                            handler(tls, peer, ready).await
+                                        },
                                     )
                                     .await;
                                 });
@@ -1142,9 +1169,8 @@ where
 }
 
 async fn serve_gemini_connection<H: gemini_protocol::server::Handler>(
-    stream: tokio::net::TcpStream,
+    mut tls: tokio_rustls::server::TlsStream<tokio::net::TcpStream>,
     peer: SocketAddr,
-    acceptor: tokio_rustls::TlsAcceptor,
     handler: Arc<H>,
     ready: Arc<AtomicBool>,
     public_port: u16,
@@ -1152,9 +1178,6 @@ async fn serve_gemini_connection<H: gemini_protocol::server::Handler>(
 ) -> std::io::Result<()> {
     use tokio::io::AsyncReadExt;
 
-    let mut tls = tokio::time::timeout(timeout, acceptor.accept(stream))
-        .await
-        .map_err(|_| std::io::Error::new(std::io::ErrorKind::TimedOut, "tls handshake"))??;
     let mut line = Vec::with_capacity(64);
     let mut byte = [0_u8; 1];
     loop {

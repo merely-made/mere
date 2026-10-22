@@ -9,7 +9,7 @@
 
 use crate::resident_site::{
     GeminiListenerPolicyV1, RunningGemini, identity_fingerprint, load_json,
-    persistent_gemini_identity, save_json_atomic, start_gemini_handler,
+    persistent_gemini_identity, save_json_atomic, start_gemini_handler, start_tls_handler,
 };
 use errand::{
     Scheme,
@@ -22,18 +22,51 @@ use gemot::moot::{
 use muniment::Backend;
 use serde::{Deserialize, Serialize};
 use site_model::{
-    SiteFormat,
-    publication::{SiteBindingV1, open_binding},
+    MAX_ENCODED_SNAPSHOT_BYTES, MAX_PAGE_BYTES, SiteFormat,
+    publication::{OpenedSite, SiteBindingV1, open_binding},
 };
 use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
-    time::{SystemTime, UNIX_EPOCH},
+    sync::{Arc, Mutex, atomic::Ordering},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 const DESCRIPTOR: &str = "moot-site.json";
 const MAX_BINDING_BYTES: usize = 16 * 1024;
+
+/// The wire endpoint is chosen explicitly, independently of a retained profile.
+/// Missing transport fields in existing V1 descriptors and commands mean Gemini.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MootSiteTransport {
+    #[default]
+    Gemini,
+    Scroll,
+}
+
+impl MootSiteTransport {
+    fn is_gemini(&self) -> bool {
+        *self == Self::Gemini
+    }
+
+    fn format(self) -> SiteFormat {
+        match self {
+            Self::Gemini => SiteFormat::Gemini,
+            Self::Scroll => SiteFormat::Scroll,
+        }
+    }
+
+    fn require_format(self, format: SiteFormat) -> Result<(), String> {
+        if format != self.format() {
+            return Err(format!(
+                "This endpoint requires a {} site",
+                self.format().label()
+            ));
+        }
+        Ok(())
+    }
+}
 
 /// Explicit local owner locations and the governed retention settings supplied
 /// by the embedding host. The founder is recovered from signed Moot genesis.
@@ -93,6 +126,8 @@ fn now_ms() -> Result<u64, String> {
 #[serde(deny_unknown_fields)]
 struct Descriptor {
     version: u8,
+    #[serde(default, skip_serializing_if = "MootSiteTransport::is_gemini")]
+    transport: MootSiteTransport,
     binding: SiteBindingV1,
     policy: GeminiListenerPolicyV1,
     certificate_sha256: [u8; 32],
@@ -103,6 +138,7 @@ struct NativeSource<M, C> {
     moot: Arc<Moot<M>>,
     content: C,
     binding: SiteBindingV1,
+    transport: MootSiteTransport,
     refusal: Mutex<Option<String>>,
 }
 
@@ -112,20 +148,13 @@ where
     C: Backend + Clone,
 {
     async fn read(&self, request: &SourceRequest) -> Result<Option<Item>, String> {
-        if request.scheme != Scheme::Gemini || request.query.is_some() {
+        if self.transport != MootSiteTransport::Gemini
+            || request.scheme != Scheme::Gemini
+            || request.query.is_some()
+        {
             return Ok(None);
         }
-        let site = open_binding(
-            &self.moot,
-            &mut self.content.clone(),
-            &self.binding,
-            now_ms()?,
-        )
-        .await
-        .map_err(|e| e.to_string())?;
-        if site.snapshot().format != SiteFormat::Gemini {
-            return Err("This resident endpoint requires a Gemini site".into());
-        }
+        let site = self.open().await?;
         Ok(site.page(&request.path).map(|page| {
             let mut mime = "text/gemini;charset=utf-8".to_string();
             if !page.metadata.language.is_empty() {
@@ -138,6 +167,96 @@ where
             }
         }))
     }
+
+    async fn open(&self) -> Result<OpenedSite, String> {
+        let site = open_binding(
+            &self.moot,
+            &mut self.content.clone(),
+            &self.binding,
+            now_ms()?,
+        )
+        .await
+        .map_err(|e| e.to_string())?;
+        self.transport.require_format(site.snapshot().format)?;
+        Ok(site)
+    }
+
+    async fn read_scroll(
+        &self,
+        request: &scroll_protocol::Request,
+    ) -> Result<scroll_protocol::Reply, String> {
+        if self.transport != MootSiteTransport::Scroll {
+            return Err("This source is not a Scroll endpoint".into());
+        }
+        let site = self.open().await?;
+        let uri = url::Url::parse(&request.uri).map_err(|error| error.to_string())?;
+        // Snapshot V1 declares one language per path. As in Knot's native
+        // publisher, preferences do not select a variant or rewrite its tag.
+        Ok(match site.page(uri.path()) {
+            Some(page) => {
+                let mut mime = "text/scroll;charset=utf-8".to_string();
+                if !page.metadata.language.is_empty() {
+                    mime.push_str(";lang=");
+                    mime.push_str(&page.metadata.language);
+                }
+                scroll_protocol::Reply {
+                    header: scroll_protocol::Header::Success(scroll_protocol::SuccessHeader {
+                        code: 20 + page.metadata.classification,
+                        mimetype: mime,
+                        author: Some(page.metadata.author.clone()),
+                        published: Some(page.metadata.published.clone()),
+                        modified: Some(page.metadata.modified.clone()),
+                    }),
+                    body: if request.metadata {
+                        page.metadata.abstract_source.as_bytes().to_vec()
+                    } else {
+                        page.source.clone()
+                    },
+                }
+            },
+            None => scroll_status(51, "Not published"),
+        })
+    }
+
+    fn scroll_reply(&self, request: &scroll_protocol::Request) -> scroll_protocol::Reply {
+        // Same inline local-owner read boundary as the Gemini Source below.
+        let result = pollster::block_on(self.read_scroll(request));
+        let mut refusal = self.refusal.lock().expect("site refusal mutex poisoned");
+        match result {
+            Ok(reply) => {
+                *refusal = None;
+                reply
+            },
+            Err(reason) => {
+                *refusal = Some(reason);
+                scroll_status(51, "Not published")
+            },
+        }
+    }
+}
+
+fn scroll_status(code: u8, meta: &str) -> scroll_protocol::Reply {
+    scroll_protocol::Reply {
+        header: scroll_protocol::Header::Meta {
+            code,
+            status: scroll_protocol::Status::from_code(code).expect("static Scroll status"),
+            meta: meta.into(),
+        },
+        body: Vec::new(),
+    }
+}
+
+fn valid_scroll_target(uri: &str, port: u16) -> bool {
+    url::Url::parse(uri).is_ok_and(|url| {
+        url.scheme() == "scroll"
+            && matches!(url.host_str(), Some("localhost" | "127.0.0.1"))
+            && url.port().unwrap_or(5699) == port
+            && url.username().is_empty()
+            && url.password().is_none()
+            && url.query().is_none()
+            && url.fragment().is_none()
+            && !url.path().contains(';')
+    })
 }
 
 impl<M, C> Source for NativeSource<M, C>
@@ -172,6 +291,8 @@ where
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MootSiteStatus {
     pub binding: Option<SiteBindingV1>,
+    #[serde(default)]
+    pub transport: Option<MootSiteTransport>,
     pub address: Option<SocketAddr>,
     pub certificate_sha256: Option<[u8; 32]>,
     pub last_refusal: Option<String>,
@@ -233,6 +354,16 @@ where
         binding: SiteBindingV1,
         policy: GeminiListenerPolicyV1,
     ) -> Result<(), String> {
+        self.configure_transport(binding, policy, MootSiteTransport::Gemini)
+            .await
+    }
+
+    pub async fn configure_transport(
+        &mut self,
+        binding: SiteBindingV1,
+        policy: GeminiListenerPolicyV1,
+        transport: MootSiteTransport,
+    ) -> Result<(), String> {
         if self.running.is_some() {
             return Err("Stop the endpoint before changing its binding".into());
         }
@@ -240,15 +371,14 @@ where
         let site = open_binding(&self.moot, &mut self.content.clone(), &binding, now_ms()?)
             .await
             .map_err(|e| e.to_string())?;
-        if site.snapshot().format != SiteFormat::Gemini {
-            return Err("This endpoint requires a Gemini site".into());
-        }
+        transport.require_format(site.snapshot().format)?;
         let identity = persistent_gemini_identity(
             &self.root,
             self.descriptor.as_ref().map(|d| d.certificate_sha256),
         )?;
         let next = Descriptor {
             version: 1,
+            transport,
             binding,
             policy,
             certificate_sha256: identity_fingerprint(&identity)?,
@@ -262,6 +392,9 @@ where
 
     pub async fn start(&mut self) -> Result<MootSiteStatus, String> {
         if self.running.is_some() {
+            if let Some(source) = &self.source {
+                source.open().await?;
+            }
             return Ok(self.status());
         }
         let mut next = self
@@ -272,22 +405,59 @@ where
             moot: self.moot.clone(),
             content: self.content.clone(),
             binding: next.binding.clone(),
+            transport: next.transport,
             refusal: Mutex::new(None),
         });
-        source
-            .read(&SourceRequest {
-                scheme: Scheme::Gemini,
-                path: "/".into(),
-                query: None,
-            })
-            .await?;
+        source.open().await?;
         let identity = persistent_gemini_identity(&self.root, Some(next.certificate_sha256))?;
         let handler_source = source.clone();
-        let runtime = start_gemini_handler(
-            move |_| errand::serve::adapt::gemini(handler_source),
-            &next.policy,
-            &identity,
-        )?;
+        let runtime = match next.transport {
+            MootSiteTransport::Gemini => start_gemini_handler(
+                move |_| errand::serve::adapt::gemini(handler_source),
+                &next.policy,
+                &identity,
+            )?,
+            MootSiteTransport::Scroll => {
+                let timeout = Duration::from_millis(next.policy.request_timeout_ms);
+                start_tls_handler(
+                    move |port| {
+                        move |mut tls, _peer, ready: Arc<std::sync::atomic::AtomicBool>| {
+                            let source = handler_source.clone();
+                            async move {
+                                let handler = move |request: scroll_protocol::Request| {
+                                    let reply = if !ready.load(Ordering::Acquire) {
+                                        scroll_status(44, "Publication not committed")
+                                    } else if valid_scroll_target(&request.uri, port) {
+                                        source.scroll_reply(&request)
+                                    } else {
+                                        scroll_status(59, "Invalid static-site request")
+                                    };
+                                    std::future::ready(reply)
+                                };
+                                scroll_protocol::server::serve_connection(
+                                    &mut tls,
+                                    &handler,
+                                    &scroll_protocol::server::ServerConfig {
+                                        max_request_bytes: 4096,
+                                        response_limits: scroll_protocol::ResponseLimits {
+                                            // Existing validated snapshot bounds include even
+                                            // long valid fractional timestamp metadata.
+                                            max_header_line_bytes: MAX_ENCODED_SNAPSHOT_BYTES,
+                                            max_body_bytes: MAX_PAGE_BYTES,
+                                        },
+                                        timeout,
+                                    },
+                                )
+                                .await?;
+                                tokio::io::AsyncWriteExt::shutdown(&mut tls).await
+                            }
+                        }
+                    },
+                    &next.policy,
+                    &identity,
+                )?
+            },
+        };
         next.running = true;
         save_json_atomic(&self.root.join(DESCRIPTOR), &next)?;
         runtime.activate();
@@ -301,6 +471,7 @@ where
     pub fn status(&self) -> MootSiteStatus {
         MootSiteStatus {
             binding: self.descriptor.as_ref().map(|d| d.binding.clone()),
+            transport: self.descriptor.as_ref().map(|d| d.transport),
             address: self.running.as_ref().map(|r| r.address),
             certificate_sha256: self.descriptor.as_ref().map(|d| d.certificate_sha256),
             last_refusal: self
@@ -324,8 +495,8 @@ where
             .await
             .map_err(|e| e.to_string())?;
         if let Some(snapshot) = snapshot {
-            if snapshot.format != SiteFormat::Gemini {
-                return Err("This endpoint requires a Gemini site".into());
+            if !matches!(snapshot.format, SiteFormat::Gemini | SiteFormat::Scroll) {
+                return Err("This endpoint imports Gemini or Scroll sites".into());
             }
             let bytes = snapshot.encode()?;
             let manifest = eidetic::ManifestId::of_blob(&bytes);
@@ -389,5 +560,274 @@ where
         };
         self.source = None;
         joined
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gemot::moot::{CollectionId, CollectionRef};
+    use site_model::publication::SiteRevisionPolicy;
+
+    fn descriptor() -> Descriptor {
+        Descriptor {
+            version: 1,
+            transport: MootSiteTransport::Gemini,
+            binding: SiteBindingV1 {
+                version: 1,
+                collection: CollectionRef {
+                    moot_id: [1; 32],
+                    collection_id: CollectionId([2; 32]),
+                },
+                revision: SiteRevisionPolicy::FollowCollection,
+            },
+            policy: GeminiListenerPolicyV1::default(),
+            certificate_sha256: [9; 32],
+            running: true,
+        }
+    }
+
+    #[test]
+    fn legacy_descriptor_defaults_to_gemini_and_retains_serialized_bytes() {
+        let descriptor = descriptor();
+        let legacy = format!(
+            "{{\"version\":1,\"binding\":{},\"policy\":{},\"certificate_sha256\":{},\"running\":true}}",
+            serde_json::to_string(&descriptor.binding).unwrap(),
+            serde_json::to_string(&descriptor.policy).unwrap(),
+            serde_json::to_string(&descriptor.certificate_sha256).unwrap(),
+        );
+        let reopened: Descriptor = serde_json::from_str(&legacy).unwrap();
+        assert_eq!(reopened.transport, MootSiteTransport::Gemini);
+        assert_eq!(serde_json::to_string(&reopened).unwrap(), legacy);
+    }
+
+    #[test]
+    fn scroll_descriptor_persists_transport_and_rejects_unknown_transport() {
+        let mut descriptor = descriptor();
+        descriptor.transport = MootSiteTransport::Scroll;
+        let bytes = serde_json::to_vec(&descriptor).unwrap();
+        let reopened: Descriptor = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(reopened.transport, MootSiteTransport::Scroll);
+        let mut value = serde_json::to_value(descriptor).unwrap();
+        value["transport"] = serde_json::json!("gopher");
+        assert!(serde_json::from_value::<Descriptor>(value).is_err());
+    }
+
+    #[test]
+    fn transport_does_not_infer_or_accept_another_profile() {
+        assert!(
+            MootSiteTransport::Scroll
+                .require_format(SiteFormat::Scroll)
+                .is_ok()
+        );
+        assert!(
+            MootSiteTransport::Gemini
+                .require_format(SiteFormat::Gemini)
+                .is_ok()
+        );
+        for format in [SiteFormat::Gemini, SiteFormat::Spartan, SiteFormat::Micron] {
+            assert!(MootSiteTransport::Scroll.require_format(format).is_err());
+        }
+        assert!(
+            MootSiteTransport::Gemini
+                .require_format(SiteFormat::Scroll)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn scroll_target_is_loopback_and_actual_port_with_no_static_site_effects() {
+        for uri in [
+            "scroll://localhost:1234/",
+            "scroll://127.0.0.1:1234/index.scroll",
+            "scroll://localhost:1234/a%20b.scroll",
+        ] {
+            assert!(valid_scroll_target(uri, 1234), "{uri}");
+        }
+        assert!(valid_scroll_target("scroll://localhost/", 5699));
+        for uri in [
+            "gemini://localhost:1234/",
+            "scroll://elsewhere:1234/",
+            "scroll://localhost:1235/",
+            "scroll://localhost/",
+            "scroll://user@localhost:1234/",
+            "scroll://user:password@localhost:1234/",
+            "scroll://localhost:1234/?",
+            "scroll://localhost:1234/?input",
+            "scroll://localhost:1234/#fragment",
+            "scroll://localhost:1234/a;effect.scroll",
+            "invalid",
+        ] {
+            assert!(!valid_scroll_target(uri, 1234), "{uri}");
+        }
+    }
+
+    #[tokio::test]
+    async fn selected_profile_change_refuses_configure_start_and_current_read() {
+        use gemot::moot::constitution::{CapabilityGrant, ConstitutionRules};
+        use gemot::moot::{KeepBound, MootAccessLevel, MootMember, MootMembershipAction};
+        use muniment::MemoryBackend;
+        use personae::{IdentityProvider, InMemoryProvider};
+
+        let directory = tempfile::tempdir().unwrap();
+        let author = InMemoryProvider::from_seed([81; 32]);
+        let root = author.master_public_key().to_bytes();
+        let retention_digest = vec![82u8; 32];
+        let retention = MootRetentionSettings {
+            revision: serde_json::from_value(serde_json::json!({
+                "alg": "Blake3", "bytes": retention_digest,
+            }))
+            .unwrap(),
+            availability: AvailabilityPolicy {
+                promised_floor: KeepBound::Forever,
+            },
+            erasure: ErasurePolicy {
+                history_ceiling: KeepBound::UntilCheckpoint,
+            },
+        };
+        let moot = Arc::new(Moot::in_memory(MootId([83; 32]), root, retention));
+        let mut rules = ConstitutionRules::founder_only(root);
+        // The closed, admitted-member fixture does not depend on Standing.
+        rules.admission = serde_json::from_value(serde_json::json!({
+            "MembersOnly": { "rate_limit": 100, "rate_window_ms": 1000 },
+        }))
+        .unwrap();
+        rules.grant(CapabilityGrant {
+            id: [84; 32],
+            subject: root,
+            // Native servitor encoding of Cap::scope("moot").
+            path_prefix: "scope/moot".into(),
+            not_before_ms: 0,
+            expires_at_ms: None,
+            delegation_depth: 0,
+        });
+        moot.found(author.master_keypair().to_seed(), None, None, rules, 1)
+            .await
+            .unwrap();
+        moot.update_membership_for_identity(
+            &author,
+            MootMembershipAction::Create {
+                initial_members: vec![MootMember {
+                    member: root,
+                    access: MootAccessLevel::Manage,
+                }],
+            },
+        )
+        .await
+        .unwrap();
+        let collection_id = CollectionId([85; 32]);
+        moot.declare_collection_for_identity(
+            &author,
+            collection_id,
+            "Native profile test".into(),
+            None,
+            now_ms().unwrap(),
+        )
+        .await
+        .unwrap();
+        let mut store = MemoryBackend::new();
+        let scroll =
+            knot_site::Site::create_for(&directory.path().join("scroll"), SiteFormat::Scroll)
+                .unwrap()
+                .publication()
+                .unwrap()
+                .to_snapshot_v1()
+                .unwrap();
+        let version = moot
+            .authorized_collection(collection_id, now_ms().unwrap())
+            .await
+            .unwrap()
+            .unwrap()
+            .version;
+        let first = site_model::publication::publish_public_snapshot(
+            &moot,
+            &author,
+            &mut store,
+            &scroll,
+            &version,
+            None,
+            "Scroll".into(),
+            now_ms().unwrap(),
+        )
+        .await
+        .unwrap();
+        let binding = SiteBindingV1 {
+            version: 1,
+            collection: version.collection,
+            revision: SiteRevisionPolicy::FollowCollection,
+        };
+        let mut service = MootSiteService::open(
+            &directory.path().join("resident"),
+            moot.clone(),
+            store.clone(),
+        )
+        .await
+        .unwrap();
+        assert!(
+            service
+                .configure(binding.clone(), GeminiListenerPolicyV1::default())
+                .await
+                .unwrap_err()
+                .contains("Gemini")
+        );
+        assert!(service.status().transport.is_none());
+        service
+            .configure_transport(
+                binding.clone(),
+                GeminiListenerPolicyV1::default(),
+                MootSiteTransport::Scroll,
+            )
+            .await
+            .unwrap();
+        service.start().await.unwrap();
+        let source = service.source.as_ref().unwrap().clone();
+        let request = scroll_protocol::Request {
+            uri: "scroll://localhost/".into(),
+            languages: vec!["de".into()],
+            metadata: false,
+        };
+        assert!(matches!(
+            source.scroll_reply(&request).header,
+            scroll_protocol::Header::Success(_)
+        ));
+
+        let gemini =
+            knot_site::Site::create_for(&directory.path().join("gemini"), SiteFormat::Gemini)
+                .unwrap()
+                .publication()
+                .unwrap()
+                .to_snapshot_v1()
+                .unwrap();
+        site_model::publication::publish_public_snapshot(
+            &moot,
+            &author,
+            &mut store,
+            &gemini,
+            &first.selection.collection,
+            Some(first.selection.contribution),
+            "Gemini replacement".into(),
+            now_ms().unwrap(),
+        )
+        .await
+        .unwrap();
+        assert!(service.start().await.unwrap_err().contains("Scroll"));
+        assert!(matches!(
+            source.scroll_reply(&request).header,
+            scroll_protocol::Header::Meta { code: 51, .. }
+        ));
+        assert!(service.status().last_refusal.unwrap().contains("Scroll"));
+        assert_eq!(service.status().transport, Some(MootSiteTransport::Scroll));
+        service.stop().unwrap();
+        assert!(service.start().await.unwrap_err().contains("Scroll"));
+        assert!(service.status().address.is_none());
+        service
+            .configure_transport(
+                binding,
+                GeminiListenerPolicyV1::default(),
+                MootSiteTransport::Gemini,
+            )
+            .await
+            .unwrap();
+        assert_eq!(service.status().transport, Some(MootSiteTransport::Gemini));
     }
 }
