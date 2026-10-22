@@ -1,0 +1,276 @@
+{
+  "status": "qualified bounded Mere/Djinn checkpoint confidentiality receiving",
+  "date": "2026-10-22",
+  "base_revision": "931a4ec8d2a83655a7cb4518088b0d487b04f990",
+  "source_revision": "98aa158d0b26264c7e0a55a06cd9033fb0aa74b1",
+  "source_url": "https://github.com/merely-made/mere/commit/98aa158d0b26264c7e0a55a06cd9033fb0aa74b1",
+  "supplier_revision": "98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b",
+  "previous_supplier_revision": "f44259964cd0b6ff27c21ab368ea7830fc11e0fe",
+  "supplier_receipt": "https://github.com/merely-made/knot-editor/blob/98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b/docs/receipts/2026-10-22_checkpoint_confidentiality/qualification.json",
+  "receiver_contract": {
+    "owner": "Djinn releases keys through existing custody, imports Knot StartupUnlockedPersonalVault, and exposes the existing resident route only after startup succeeds",
+    "diagnostic": "Only completed rewrites emit old/new checkpoint digests and preserved-key count before startup authority is consumed; no new custody key or receipt is retained by Djinn",
+    "receiving_profile": "PersonalVaultV1; communal protection remains qualified by the separate Knot supplier receipt",
+    "legacy": "Authenticated signed-history rebuild into fresh active database; stale checkpoint cannot overwrite a later signed document; missing history/keys require recovery"
+  },
+  "graph": {
+    "knot_packages": [
+      {
+        "name": "knot-capture",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      },
+      {
+        "name": "knot-composition",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      },
+      {
+        "name": "knot-document",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      },
+      {
+        "name": "knot-editor",
+        "version": "0.0.3",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      },
+      {
+        "name": "knot-file-catalog",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      },
+      {
+        "name": "knot-site",
+        "version": "0.0.1",
+        "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+      }
+    ],
+    "root_lock_sha256": "db2c69fd66b62d4c4ea97a6ba79555abb095ccec47ed497e11d23458a196d913",
+    "delta": "Exactly six canonical Knot source hashes change; package versions, dependency edges and every unrelated source remain byte-identical to base",
+    "tracked_lockfiles": 50,
+    "other_lockfiles_unchanged": 49,
+    "manifests_unchanged": 156,
+    "unchanged_inventory_sha256": "87e832b0dc92a16bb993027310b2447522fe711cdeb74b0d86537d5f0fd21525",
+    "inventory_encoding": "SHA-256 of compact JSON with sorted relative-path keys mapped to file SHA-256 for all tracked Cargo.toml and *Cargo.lock except root Cargo.lock; all entries also compare byte-identical to base",
+    "historical_lock": "support/family-promotion/source-Cargo.lock preserved as evidence; no active nested Knot graph requires relocking",
+    "metadata_packages": 1624,
+    "foreign_packages_for_path_patched_names": [],
+    "patch_coverage": "Existing embedded Mere contract path patches are sufficient; no manifest or patch row added. Unchanged fixed older mere-source-edit cohort retains its separate source.",
+    "cargo_update_method": "Online and offline precise Cargo updates emitted unwanted unrelated mutable-branch and registry changes. The six generated Knot records were verified equal to their base records except source; only those source-line changes were retained. Full locked/offline metadata and receiving gates then validated this bounded graph."
+  },
+  "gates": [
+    {
+      "label": "baseline-metadata",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 3.27,
+      "host": "Apple M4 Mac, macOS arm64",
+      "architecture": "arm64",
+      "log_sha256": "c37c8499f8b8898a8c10f3d67b1bb8807c6f2a141b0a814f475b76f8f97ea223",
+      "results": [],
+      "raw_log": {
+        "name": "baseline-metadata.log",
+        "availability": "local only; exact SHA-256 recorded"
+      }
+    },
+    {
+      "label": "scoped-metadata",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 2.99,
+      "host": "Apple M4 Mac, macOS arm64",
+      "architecture": "arm64",
+      "log_sha256": "08bade035b45ab2fd3b3f916d6e4a0b286ecbf6fba92b6daaacd8ecf8e5b4eae",
+      "results": [],
+      "raw_log": {
+        "name": "scoped-metadata.log",
+        "availability": "local only; exact SHA-256 recorded"
+      }
+    },
+    {
+      "label": "djinn-all-targets-r2",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"<isolated-target>/build\"",
+        "check",
+        "-p",
+        "djinn",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "<isolated-target>",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 133.69,
+      "host": "Apple M4 Mac, macOS arm64",
+      "architecture": "arm64",
+      "log_sha256": "0c0cfe712b3a2bcd8e1ff0acdcc299ca6c6052b2c097b0ef4cd8f74d342d6f70",
+      "results": [],
+      "raw_log": {
+        "name": "djinn-all-targets-r2.log",
+        "availability": "local only; exact SHA-256 recorded"
+      }
+    },
+    {
+      "label": "djinn-knot-receiving",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"<isolated-target>/build\"",
+        "test",
+        "-p",
+        "djinn",
+        "--test",
+        "knot_checkpoint_receiving",
+        "--test",
+        "knot_relation_intake",
+        "--test",
+        "knot_app_route",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "<isolated-target>",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 178.18,
+      "host": "Apple M4 Mac, macOS arm64",
+      "architecture": "arm64",
+      "log_sha256": "82da40384ee52cbfd45fd80f79a26a74699e861eec1625b6aaa7c50921053be9",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.19s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.01s",
+        "test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.75s"
+      ],
+      "raw_log": {
+        "name": "djinn-knot-receiving.log",
+        "availability": "local only; exact SHA-256 recorded"
+      }
+    },
+    {
+      "label": "djinn-resident-knot",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"<isolated-target>/build\"",
+        "test",
+        "-p",
+        "djinn",
+        "--lib",
+        "resident_knot::tests",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "<isolated-target>",
+        "-j2"
+      ],
+      "exit_code": 0,
+      "seconds": 20.06,
+      "host": "Apple M4 Mac, macOS arm64",
+      "architecture": "arm64",
+      "log_sha256": "12c229b7bf8fc447bad3895df4d08d098898e8faebfe6ba26d59e0eb015a6c31",
+      "results": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.38s"
+      ],
+      "raw_log": {
+        "name": "djinn-resident-knot.log",
+        "availability": "local only; exact SHA-256 recorded"
+      }
+    }
+  ],
+  "environment": {
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "TMPDIR": "/tmp",
+    "target": "isolated task-owned build directory"
+  },
+  "runtime_cases": {
+    "top_level_passed": 8,
+    "top_level_failed": 0,
+    "by_target": {
+      "knot_checkpoint_receiving": 1,
+      "knot_relation_intake": 5,
+      "knot_app_route": 1,
+      "resident_knot::tests": 1
+    },
+    "child_process_helpers": 2,
+    "counting": "The two helpers are ignored in ordinary discovery and explicitly executed by their parent cases. The existing relation helper inherits stdout and adds a result line to the raw log; that line is not added again to the eight top-level cases. The new checkpoint child is captured and checked by its parent.",
+    "observations": [
+      "Actual Djinn epoch-key release and existing ResidentKnot::open owner path; no fixture key passed through environment or arguments",
+      "Real stale plaintext checkpoint before-control; later signed document remains authoritative after repair",
+      "Exact signed document head and full projection preserved; regenerated checkpoint digest differs from stale cut",
+      "Raw active database lacks private UTF-8 fields and JSON body byte arrays after replacement",
+      "Fresh process independently reopens custody and registered owner route; ordinary Save is reobserved from disk with exact next sequence and previous backlink",
+      "Existing signed assertion identity, retraction chronology, refusal atomicity and durable fresh-process intake cases retained",
+      "Existing app-door admission and joined sync/pairing authority cases pass at the receiving revision"
+    ]
+  },
+  "code_sha256": {
+    "Cargo.lock": "db2c69fd66b62d4c4ea97a6ba79555abb095ccec47ed497e11d23458a196d913",
+    "ports/djinn/src/resident_knot.rs": "278cedca3b74533265a4f14d4c9a163f64504003fc989ca9071c4b842bea80bf",
+    "ports/djinn/tests/knot_checkpoint_receiving.rs": "42de022ceaeaea340a034e5a8de7dac1fe5d96f1df3b6c5e04f658eee05e77c2"
+  },
+  "independent_review": {
+    "mode": "Read-only separate agent; no reviewer Cargo commands, edits or commits",
+    "checked": [
+      "50-lock inventory and embedded contract closure",
+      "Minimal source-only lock delta after discarding unrelated Cargo updates",
+      "Custody-before-repair-before-route ordering",
+      "No duplicate authority or retained key/receipt",
+      "Exact observable persistence and signed continuation rather than accepted-only status",
+      "Process handle release and child key release",
+      "Unix support bound"
+    ],
+    "resolved_finding": "Successful legacy receiving fixture is Unix-only; file and child helper now explicitly cfg(unix)",
+    "remaining_blocking_findings": 0
+  },
+  "superseded_attempts": [
+    {
+      "label": "knot-relock",
+      "outcome": "Cargo succeeded but broadened unrelated suppliers/registry edges; generated graph discarded"
+    },
+    {
+      "label": "djinn-all-targets",
+      "outcome": "Before compilation, locked check refused that generated graph; superseded by scoped metadata and all-targets-r2"
+    },
+    {
+      "label": "knot-relock-offline",
+      "outcome": "Offline Cargo still selected newer cached branch candidates; retained only verified six Knot source changes from generated output"
+    }
+  ],
+  "limits": [
+    "Bounded receiving tests and all-target compilation, not the full Mere or Djinn runtime suite",
+    "Legacy replacement exercised on Unix/macOS only; non-Unix refusal is a supplier contract, not an executed receiving scenario here",
+    "New receiving case uses an explicit synthetic admitted context through the real registered owner route. The separate existing app-door case proves its own fixture admission; no native unlock UI or new end-to-end OS admission claim follows.",
+    "Synthetic signed stores and custody fixtures, not bulk migration of existing user stores or replacement/restart of a running resident binary",
+    "Fresh process is on the same Mac; no independent second-host or physical-peer/device qualification",
+    "Active-file replacement does not erase backups, snapshots, device remnants or prior encrypted key pages. Older writers and raw backend writes can bypass the clean-storage owner contract.",
+    "No communal Djinn lane acceptance, downstream product repin, declared-MSRV run, optional inference/GPU or Moot-site native acceptance claimed",
+    "Existing compiler warnings remain; no unrelated warning or formatting sweep"
+  ]
+}

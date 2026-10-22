@@ -285,6 +285,35 @@ fn recipe(member: uuid::Uuid) -> DynamicsSpec {
     spec
 }
 
+/// A composition weight the spec admits still has to fit the canvas's f32
+/// runtime field. Direct binding refuses overflow and nonzero underflow at
+/// their authored path.
+#[test]
+fn bind_rejects_mix_weights_outside_the_runtime_f32_range() {
+    for (weight, place) in [
+        (1.0e300, "root.parts[0].weight"),
+        (1.0e-300, "root.parts[0].weight"),
+    ] {
+        let mut part = Node::preset(PhysicsLaw::Springs.id());
+        if let Node::Preset {
+            weight: authored, ..
+        } = &mut part
+        {
+            *authored = weight;
+        }
+        let spec = DynamicsSpec::new(Node::Mix {
+            parts: vec![part, Node::preset(PhysicsLaw::Energy.id())],
+            weight: 1.0,
+            overlays: Vec::new(),
+        });
+        let error = bind(&spec).unwrap_err().to_string();
+        assert!(
+            error.contains(&format!("at {place}:")),
+            "authored value {weight}: {error}"
+        );
+    }
+}
+
 /// F146: a spec opened and not edited reads back byte for byte; a picker
 /// edit rewrites the root, keeping the seed, bars and target, and its
 /// weights come back on the f32 grid the canvas runs.

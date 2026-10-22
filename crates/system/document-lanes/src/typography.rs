@@ -65,6 +65,47 @@ pub fn document_style_with_typography(
     Ok(style)
 }
 
+/// Resolve logical reading lengths in a host whose viewport uses physical
+/// pixels. This changes presentation geometry, leaving authored intent, source
+/// identity, leading ratios, font families and color roles unchanged.
+pub fn document_style_at_display_scale(
+    baseline: &DocumentStyleSheet,
+    scale: f32,
+) -> DocumentStyleSheet {
+    let scale = if scale.is_finite() { scale.clamp(0.5, 4.0) } else { 1.0 };
+    let mut style = baseline.clone();
+    style.body_font_size *= scale;
+    style.horizontal_padding *= scale;
+    style.vertical_padding *= scale;
+    style.indent_per_level *= scale;
+    style.max_content_width = style.max_content_width.map(|width| width * scale);
+    for role in [&mut style.roles.body, &mut style.roles.code, &mut style.roles.metadata, &mut style.roles.badge] {
+        if let SizeSpec::Absolute(size) = &mut role.size { *size *= scale; }
+        role.spacing_above *= scale;
+        role.spacing_below *= scale;
+    }
+    for size in &mut style.roles.heading.sizes { *size *= scale; }
+    style.roles.heading.spacing_above *= scale;
+    style.roles.heading.spacing_below *= scale;
+    style
+}
+
+/// Reading controls adjust a projection's logical type and measure. Font
+/// custody and baseline roles survive, and display density is applied once.
+pub fn document_style_for_reading(
+    baseline: &DocumentStyleSheet, preferences: tabard::ReadingPreferences, display_scale: f32,
+) -> DocumentStyleSheet {
+    let ratio = f32::from(preferences.text_size) / 18.0;
+    let scaled = document_style_at_display_scale(baseline, ratio);
+    let mut style = document_style_with_typography(&scaled, &preferences.typography())
+        .expect("validated projection reading preferences");
+    // Gutters do not grow with text size; line length does.
+    style.horizontal_padding = baseline.horizontal_padding;
+    style.vertical_padding = baseline.vertical_padding;
+    style.max_content_width = Some(preferences.width_px());
+    document_style_at_display_scale(&style, display_scale)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
