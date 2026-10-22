@@ -23,7 +23,9 @@
 //!   humanized `@type` → a short id.
 //! - **Real resource** (an addressable URL): real title → filename (a URL's last
 //!   path segment when it carries an extension, e.g. `Rust_logo.svg`) →
-//!   cached host → humanized `@type` → the scheme-stripped URL.
+//!   humanized `@type` → the scheme-stripped URL. A title that is only the
+//!   node's host counts as untitled: several documents share a host, so the
+//!   address tells them apart where the host would not.
 //!
 //! It is presentation-neutral (deterministic graph-derived text, no theme/host
 //! types) and recomputed on read, so ingest stays faithful and the label is free
@@ -49,7 +51,7 @@ impl Graph {
         // A real title (one that is not just the seeded copy of the URL) is always
         // the best label: a page's `<title>`, or an entity's `schema:name`.
         let title = node.title.trim();
-        if !title.is_empty() && title != url {
+        if !title.is_empty() && title != url && host_of(url).as_deref() != Some(title) {
             return title.to_string();
         }
 
@@ -60,12 +62,23 @@ impl Graph {
                 .or_else(|| first_type_term(self, key))
                 .unwrap_or_else(|| short_blank_id(stripped))
         } else {
-            // Addressable resource: a filename, else its derived host, else its
-            // type, else the scheme-stripped URL.
+            // Addressable resource: a filename, else its type, else the
+            // scheme-stripped URL.
             url_filename(url)
-                .or_else(|| host_of(url))
                 .or_else(|| first_type_term(self, key))
                 .unwrap_or_else(|| scheme_stripped(url))
+        }
+    }
+
+    /// The document's label with its host appended (`label  ·  host`) when the
+    /// label does not already name it: the at-rest "where am I" caption. The
+    /// one label with a host added, not a second derivation.
+    pub fn node_display_caption(&self, key: NodeKey) -> String {
+        let label = self.node_display_label(key);
+        let host = self.get_node(key).and_then(|node| host_of(node.url()));
+        match host {
+            Some(host) if !label.contains(&host) => format!("{label}  \u{00b7}  {host}"),
+            _ => label,
         }
     }
 
@@ -150,7 +163,7 @@ fn humanize_term(term: &str) -> String {
 
 /// A fetchable URL's filename: its last non-empty path segment when that segment
 /// carries a file extension (`…/Rust_logo.svg` → `Rust_logo.svg`). `None` for a
-/// directory URL or an extensionless page slug (which falls through to the host).
+/// directory URL or an extensionless page slug (which falls through to the type or URL).
 fn url_filename(url: &str) -> Option<String> {
     let parsed = url::Url::parse(url).ok()?;
     let last = parsed
@@ -166,8 +179,7 @@ fn url_filename(url: &str) -> Option<String> {
     }
 }
 
-/// The host of a URL (`https://en.wikipedia.org/wiki/Foo` → `en.wikipedia.org`),
-/// for a node whose `cached_host` was never computed (an ingested resource node).
+/// The host of a URL (`https://en.wikipedia.org/wiki/Foo` → `en.wikipedia.org`).
 fn host_of(url: &str) -> Option<String> {
     url::Url::parse(url).ok()?.host_str().map(str::to_string)
 }
@@ -289,22 +301,30 @@ mod tests {
     }
 
     #[test]
-    fn extensionless_page_falls_to_its_host() {
+    fn untitled_page_is_named_by_its_address_not_its_host() {
         let mut g = Graph::new();
-        let page = add(
-            &mut g,
-            "https://en.wikipedia.org/wiki/Rust_(programming_language)",
+        let url = "https://en.wikipedia.org/wiki/Rust";
+        let page = add(&mut g, url);
+        assert_eq!(
+            g.node_display_label(page),
+            "en.wikipedia.org/wiki/Rust"
         );
-        // No extension on the slug, so the derived host wins.
-        assert_eq!(g.node_display_label(page), "en.wikipedia.org");
+        // A title that is only the host is no more specific than no title.
+        g.get_node_mut(page).unwrap().title = "en.wikipedia.org".to_string();
+        assert_eq!(
+            g.node_display_label(page),
+            "en.wikipedia.org/wiki/Rust"
+        );
     }
 
     #[test]
-    fn resource_host_is_derived_from_url() {
+    fn caption_adds_the_host_only_when_the_label_lacks_it() {
         let mut g = Graph::new();
-        let url = "https://en.wikipedia.org/wiki/Rust_(programming_language)";
-        let key = add(&mut g, url);
-        assert_eq!(g.node_display_label(key), "en.wikipedia.org");
+        let page = add(&mut g, "https://ex.test/article");
+        g.get_node_mut(page).unwrap().title = "Article".to_string();
+        assert_eq!(g.node_display_caption(page), "Article  \u{00b7}  ex.test");
+        let bare = add(&mut g, "https://ex.test/other");
+        assert_eq!(g.node_display_caption(bare), g.node_display_label(bare));
     }
 
     #[test]
