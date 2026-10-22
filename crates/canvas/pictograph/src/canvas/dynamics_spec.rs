@@ -131,6 +131,63 @@ fn unbound(place: impl Into<String>, reason: impl Into<String>) -> BindError {
     }
 }
 
+/// Admit a value to an `f32` runtime field while leaving its authored `f64`
+/// in the spec record. A finite nonzero input that rounds all the way to zero
+/// is refused; representable subnormals and an explicit zero are accepted.
+fn runtime_f32(value: f64, place: &str) -> Result<f32, BindError> {
+    let runtime = value as f32;
+    if !value.is_finite() || !runtime.is_finite() || (value != 0.0 && runtime == 0.0) {
+        return Err(unbound(
+            place,
+            "value cannot be represented by the canvas runtime",
+        ));
+    }
+    Ok(runtime)
+}
+
+/// Check the `f64` fields this canvas actually narrows. Run this before
+/// Seiche derive so even its non-finite refusals retain the authored field
+/// path, and from `bind_shape` for callers that already have a derived spec.
+fn validate_runtime_fields(spec: &DynamicsSpec) -> Result<(), BindError> {
+    fn flat_node(node: &Node, place: &str) -> Result<(), BindError> {
+        match node {
+            Node::Mix { parts, .. } => {
+                for (i, part) in parts.iter().enumerate() {
+                    if let Node::Preset { weight, .. } = part {
+                        runtime_f32(*weight, &format!("{place}.parts[{i}].weight"))?;
+                    }
+                }
+            },
+            Node::Grouped { outer, .. } => {
+                if let Node::Preset { weight, .. } = outer.as_ref() {
+                    runtime_f32(*weight, &format!("{place}.outer.weight"))?;
+                }
+            },
+            // Derive owns nested-schedule depth and shape admission. The
+            // numeric preflight deliberately does not recurse into them.
+            Node::Schedule { .. } | Node::Preset { .. } | Node::Raw { .. } => {},
+        }
+        Ok(())
+    }
+
+    match &spec.root {
+        Node::Schedule { stages, .. } => {
+            for (i, stage) in stages.iter().enumerate() {
+                flat_node(&stage.node, &format!("root.stages[{i}].node"))?;
+            }
+        },
+        root => flat_node(root, "root")?,
+    }
+    if let Some(target) = &spec.target {
+        runtime_f32(target.anchored_pull, "target.anchored_pull")?;
+    }
+    let Realization::Integrate { damping } = spec.realization;
+    if let Some(damping) = damping {
+        runtime_f32(damping, "realization.damping")?;
+    }
+    Ok(())
+}
+
 /// The four sources a spec's slots resolve to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct BoundSources {
@@ -358,8 +415,9 @@ fn bind_node(
                 .iter()
                 .enumerate()
                 .map(|(i, part)| {
-                    preset_law(part, &format!("{place}.parts[{i}]"))
-                        .map(|(law, weight)| (law, weight as f32))
+                    let part_place = format!("{place}.parts[{i}]");
+                    let (law, weight) = preset_law(part, &part_place)?;
+                    Ok((law, runtime_f32(weight, &format!("{part_place}.weight"))?))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             Ok((laws[0].0, Some(PhysicsComposition::Mix(laws)), overlays))
@@ -372,6 +430,7 @@ fn bind_node(
         } => {
             let groups = groups_source(partition, &format!("{place}.partition"))?;
             let (outer, outer_weight) = preset_law(outer, &format!("{place}.outer"))?;
+            let outer_weight = runtime_f32(outer_weight, &format!("{place}.outer.weight"))?;
             let (inner, _) = preset_law(inner, &format!("{place}.inner"))?;
             Ok((
                 outer,
@@ -379,7 +438,7 @@ fn bind_node(
                     groups: GroupSource::Channel(groups),
                     outer,
                     inner,
-                    outer_weight: outer_weight as f32,
+                    outer_weight,
                 })),
                 overlays,
             ))
@@ -429,9 +488,10 @@ fn bind_target(target: &Target) -> Result<BoundTarget, BindError> {
                 })
         })
         .collect::<Result<Vec<_>, _>>()?;
+    let anchored_pull = runtime_f32(target.anchored_pull, "target.anchored_pull")?;
     Ok(BoundTarget {
         arrangement: target.arrangement.clone(),
-        anchored_pull: target.anchored_pull as f32,
+        anchored_pull,
         default_role: target.default_role,
         group_source,
         groups,
@@ -442,12 +502,14 @@ fn bind_target(target: &Target) -> Result<BoundTarget, BindError> {
 /// Read `spec` into what the canvas runs (see the module docs); graph-free,
 /// so a host checks a scene's spec before it opens anything.
 pub fn bind(spec: &DynamicsSpec) -> Result<Bound, BindError> {
+    validate_runtime_fields(spec)?;
     derive(spec).map_err(BindError::Refused)?;
     bind_shape(spec)
 }
 
 /// [`bind`] past derive: the channels, the root's shape and the target.
 pub(crate) fn bind_shape(spec: &DynamicsSpec) -> Result<Bound, BindError> {
+    validate_runtime_fields(spec)?;
     let sources = resolve_channels(&spec.channels)?;
     let root = match &spec.root {
         Node::Schedule { stages, .. } => BoundRoot::Schedule(
