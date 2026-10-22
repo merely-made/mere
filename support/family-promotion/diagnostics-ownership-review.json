@@ -627,5 +627,15 @@
     "review": "support/family-promotion/diagnostics-publication-review.json",
     "qualification": "support/family-promotion/diagnostics-publication-qualification.json",
     "status": "Bounded contributor/child publication repairs qualified on recorded checkout: 287 passes, seven existing ignores, Wasm and embedding compile. Native late numeric IDs, foreign host owner and latest-main receiving remain open. Existing staged and earlier lane work preserved."
+  },
+  "audit_main_receiving": {
+    "date": "2026-10-22",
+    "audit_commit": "137c4fd4ccf2df22724563ba439cfdc904aa0c3b",
+    "integrated_main": "3dc450a6b962c6da60902f7243668961511f575d",
+    "merge_commit": "09145847be28f494ce7211e19197c9a9fea0632a",
+    "qualification": "support/family-promotion/diagnostics-audit-integration-qualification.json",
+    "status": "336 distinct targeted passes, seven existing ignores, browser-host Wasm and embedding compilation passed. D2 retains 40 pre-existing errors. Earlier latest-main-pending notes are historical; platform runtime and larger ownership migrations remain open.",
+    "preservation": "Original staged edits/removals and uncommitted Djinn documentation/runtime receipts retained separately.",
+    "concurrent_djinn_receiving": "support/family-promotion/diagnostics-audit-integration-final-receiving.json"
   }
 }
