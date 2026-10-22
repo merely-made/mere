@@ -68,10 +68,13 @@ where
     let mut slots: Vec<ShellSlot<State, Action>> =
         items[window.start..window.end].iter().map(&mut row).collect();
     if window.is_paged() {
-        slots.push(Box::new(el(
-            "p",
-            format!("{}–{} of {}", window.start + 1, window.end, window.total),
-        )));
+        slots.push(Box::new(
+            el(
+                "p",
+                format!("{}–{} of {}", window.start + 1, window.end, window.total),
+            )
+            .attr("class", "shell-paged-range"),
+        ));
         for (label, enabled, target) in [
             (
                 format!("Previous {noun}"),

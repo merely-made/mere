@@ -10,14 +10,16 @@
 //! decomposition: this is graph-scene material (member-keyed world positions
 //! plus the per-member representation overrides), so it lives with the canvas;
 //! platen keeps the Tree (pane) geometry. The host persists it as the
-//! `arrangement.*` facet family (pandect `arrangement_facets`, in
-//! `facets.json`) — the planned bespoke sidecar file was obviated by the facet
-//! convergence before any host wired it.
+//! `arrangement.*` facet family (`arrangement_facets`, in `facets.json`) or,
+//! whole, inside a saved scene (`saved_scene`). Moved from pictograph's canvas
+//! when the scene shapes left Graphshell, so both hosts and the canvas read one
+//! shape; pictograph depends on this crate for it.
 
-use forme::GraphMemberId;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
 /// The geometry of the **Cartography** projection (the canvas): each member's world
-/// position, member-keyed. The cartography counterpart of [`TreeGeometry`] for the
+/// position, member-keyed. The cartography counterpart of `TreeGeometry` for the
 /// Tree projection — "canonical world positions (cartography)" per the composition
 /// spine (§9). Positions are *world* coordinates (the semantic geometry), not
 /// pixels, so they render responsively at any zoom.
@@ -29,13 +31,13 @@ use serde::{Deserialize, Serialize};
 /// `arrangement_facets`), one facet id per field group below.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CartographyGeometry {
-    positions: Vec<(GraphMemberId, (f32, f32))>,
+    positions: Vec<(Uuid, (f32, f32))>,
     /// Per-member face-size overrides (px) — the sizing counterpart of the positions, for
     /// members the user sized explicitly. A member absent here falls back to size-by-degree
     /// or the default at render time, so only deliberate overrides persist. Serde-defaulted,
     /// so a pre-sizing sidecar still loads. (Node-rep — size persistence.)
     #[serde(default)]
-    sizes: Vec<(GraphMemberId, f32)>,
+    sizes: Vec<(Uuid, f32)>,
     /// Whether the scene's size-by-degree mode (faces grow with undirected degree) was on at
     /// save time. Serde-defaulted to `false`. (Node-rep — size persistence.)
     #[serde(default)]
@@ -57,28 +59,28 @@ pub struct CartographyGeometry {
     /// add bulk to the sidecar — acceptable for a handful of faces (a future optimization
     /// could externalize the blobs). (Node-rep — sprite persistence.)
     #[serde(default)]
-    sprites: Vec<(GraphMemberId, String)>,
+    sprites: Vec<(Uuid, String)>,
     /// Per-member sprite collider hulls: the opaque region as a face-normalized convex
     /// polygon ([-0.5, 0.5]), persisted beside the sprite so the traced-to-image collider
     /// survives a reload without re-decoding the image. Serde-defaulted. (Node-rep — sprite hull.)
     #[serde(default)]
-    sprite_hulls: Vec<(GraphMemberId, Vec<(f32, f32)>)>,
+    sprite_hulls: Vec<(Uuid, Vec<(f32, f32)>)>,
     /// Per-member physical material overrides `(restitution, friction, density)` on the Body
     /// axis, so a node tuned heavier / bouncier / grippier re-opens that way. Stored as a plain
     /// tuple to keep this crate seiche-free; the canvas maps it to/from `seiche::NodeMaterial`.
     /// Serde-defaulted. (Node body & face — material.)
     #[serde(default)]
-    materials: Vec<(GraphMemberId, (f32, f32, f32))>,
+    materials: Vec<(Uuid, (f32, f32, f32))>,
     /// Per-member **face** overrides on the Face axis, as a string code (`favicon` / `derived` /
     /// `sprite` / `bare`), so a node's chosen texture re-opens that way. Stored as a string to keep this
     /// crate canvas-free; the canvas maps it to/from `crate::canvas::Face`. Serde-defaulted. (Node body
     /// & face — face persistence.)
     #[serde(default)]
-    faces: Vec<(GraphMemberId, String)>,
+    faces: Vec<(Uuid, String)>,
     /// The saved seed (graph grammar, *Reset and seed*): `None` resets to the
     /// recipe seed. Serde-defaulted.
     #[serde(default)]
-    seed: Option<Vec<(GraphMemberId, (f32, f32))>>,
+    seed: Option<Vec<(Uuid, (f32, f32))>>,
     /// The regions the active arrangement drew (Partition, Sets, Mosaic), so a
     /// restored scene draws them without re-projecting. Serde-defaulted.
     #[serde(default)]
@@ -93,10 +95,10 @@ pub struct CartographyGeometry {
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct SavedMosaic {
-    pub group_of: Vec<(GraphMemberId, String)>,
+    pub group_of: Vec<(Uuid, String)>,
     pub group_order: Vec<String>,
-    pub member_order: Vec<GraphMemberId>,
-    pub scale: Vec<(GraphMemberId, f32)>,
+    pub member_order: Vec<Uuid>,
+    pub scale: Vec<(Uuid, f32)>,
 }
 
 /// One region an arrangement drew, in world coordinates, its members by id.
@@ -104,13 +106,13 @@ pub struct SavedMosaic {
 pub struct SavedRegion {
     pub contour: Vec<(f32, f32)>,
     pub label: Option<String>,
-    pub members: Vec<GraphMemberId>,
+    pub members: Vec<Uuid>,
 }
 
 impl CartographyGeometry {
     /// Collect a member-keyed position set (e.g. the canvas's live node positions).
     pub fn from_positions(
-        positions: impl IntoIterator<Item = (GraphMemberId, (f32, f32))>,
+        positions: impl IntoIterator<Item = (Uuid, (f32, f32))>,
     ) -> Self {
         Self {
             positions: positions.into_iter().collect(),
@@ -118,9 +120,9 @@ impl CartographyGeometry {
         }
     }
 
-    /// Attach per-member size overrides (chainable after [`from_positions`]).
+    /// Attach per-member size overrides (chainable after [`Self::from_positions`]).
     /// (Node-rep — size persistence.)
-    pub fn with_sizes(mut self, sizes: impl IntoIterator<Item = (GraphMemberId, f32)>) -> Self {
+    pub fn with_sizes(mut self, sizes: impl IntoIterator<Item = (Uuid, f32)>) -> Self {
         self.sizes = sizes.into_iter().collect();
         self
     }
@@ -147,7 +149,7 @@ impl CartographyGeometry {
     /// Attach per-member sprite faces (chainable). (Node-rep — sprite persistence.)
     pub fn with_sprites(
         mut self,
-        sprites: impl IntoIterator<Item = (GraphMemberId, String)>,
+        sprites: impl IntoIterator<Item = (Uuid, String)>,
     ) -> Self {
         self.sprites = sprites.into_iter().collect();
         self
@@ -156,7 +158,7 @@ impl CartographyGeometry {
     /// Attach per-member sprite collider hulls (chainable). (Node-rep — sprite hull.)
     pub fn with_sprite_hulls(
         mut self,
-        hulls: impl IntoIterator<Item = (GraphMemberId, Vec<(f32, f32)>)>,
+        hulls: impl IntoIterator<Item = (Uuid, Vec<(f32, f32)>)>,
     ) -> Self {
         self.sprite_hulls = hulls.into_iter().collect();
         self
@@ -166,7 +168,7 @@ impl CartographyGeometry {
     /// (chainable). (Node body & face — material.)
     pub fn with_materials(
         mut self,
-        materials: impl IntoIterator<Item = (GraphMemberId, (f32, f32, f32))>,
+        materials: impl IntoIterator<Item = (Uuid, (f32, f32, f32))>,
     ) -> Self {
         self.materials = materials.into_iter().collect();
         self
@@ -174,18 +176,18 @@ impl CartographyGeometry {
 
     /// Attach per-member face overrides (string codes `favicon` / `derived` / `sprite` / `bare`)
     /// (chainable). (Node body & face — face persistence.)
-    pub fn with_faces(mut self, faces: impl IntoIterator<Item = (GraphMemberId, String)>) -> Self {
+    pub fn with_faces(mut self, faces: impl IntoIterator<Item = (Uuid, String)>) -> Self {
         self.faces = faces.into_iter().collect();
         self
     }
 
     /// The `(member, (x, y))` pairs, in insertion order.
-    pub fn iter(&self) -> impl Iterator<Item = (GraphMemberId, (f32, f32))> + '_ {
+    pub fn iter(&self) -> impl Iterator<Item = (Uuid, (f32, f32))> + '_ {
         self.positions.iter().copied()
     }
 
     /// The `(member, size)` overrides, in insertion order. (Node-rep — size persistence.)
-    pub fn size_iter(&self) -> impl Iterator<Item = (GraphMemberId, f32)> + '_ {
+    pub fn size_iter(&self) -> impl Iterator<Item = (Uuid, f32)> + '_ {
         self.sizes.iter().copied()
     }
 
@@ -206,38 +208,38 @@ impl CartographyGeometry {
     }
 
     /// The `(member, data-URI)` sprite faces, in insertion order. (Node-rep — sprite persistence.)
-    pub fn sprite_iter(&self) -> impl Iterator<Item = (GraphMemberId, &str)> + '_ {
+    pub fn sprite_iter(&self) -> impl Iterator<Item = (Uuid, &str)> + '_ {
         self.sprites.iter().map(|(m, uri)| (*m, uri.as_str()))
     }
 
     /// The `(member, hull)` sprite collider hulls, in insertion order (owned clones, for the
     /// host to apply via `apply_cartography_sprite_hulls`). (Node-rep — sprite hull.)
-    pub fn sprite_hull_iter(&self) -> impl Iterator<Item = (GraphMemberId, Vec<(f32, f32)>)> + '_ {
+    pub fn sprite_hull_iter(&self) -> impl Iterator<Item = (Uuid, Vec<(f32, f32)>)> + '_ {
         self.sprite_hulls.iter().map(|(m, h)| (*m, h.clone()))
     }
 
     /// The `(member, (restitution, friction, density))` material overrides, in insertion order
     /// (for the host to apply via `apply_cartography_materials`). (Node body & face — material.)
-    pub fn material_iter(&self) -> impl Iterator<Item = (GraphMemberId, (f32, f32, f32))> + '_ {
+    pub fn material_iter(&self) -> impl Iterator<Item = (Uuid, (f32, f32, f32))> + '_ {
         self.materials.iter().map(|(m, mat)| (*m, *mat))
     }
 
     /// The `(member, code)` face overrides, in insertion order (for the host to apply via
     /// `apply_cartography_faces`). (Node body & face — face persistence.)
-    pub fn face_iter(&self) -> impl Iterator<Item = (GraphMemberId, &str)> + '_ {
+    pub fn face_iter(&self) -> impl Iterator<Item = (Uuid, &str)> + '_ {
         self.faces.iter().map(|(m, code)| (*m, code.as_str()))
     }
 
     /// Attach the saved seed (chainable); `None` is the recipe seed.
     pub fn with_seed(
         mut self,
-        seed: Option<impl IntoIterator<Item = (GraphMemberId, (f32, f32))>>,
+        seed: Option<impl IntoIterator<Item = (Uuid, (f32, f32))>>,
     ) -> Self {
         self.seed = seed.map(|seed| seed.into_iter().collect());
         self
     }
 
-    pub fn seed(&self) -> Option<&[(GraphMemberId, (f32, f32))]> {
+    pub fn seed(&self) -> Option<&[(Uuid, (f32, f32))]> {
         self.seed.as_deref()
     }
 
@@ -262,14 +264,14 @@ impl CartographyGeometry {
     }
 
     /// [`Self::retain_members`], chainable.
-    pub fn retaining_members(mut self, keep: impl Fn(&GraphMemberId) -> bool) -> Self {
+    pub fn retaining_members(mut self, keep: impl Fn(&Uuid) -> bool) -> Self {
         self.retain_members(keep);
         self
     }
 
     /// Keep only what belongs to members `keep` admits, across every
     /// member-keyed field; a region keeps its contour with its kept members.
-    pub fn retain_members(&mut self, keep: impl Fn(&GraphMemberId) -> bool) {
+    pub fn retain_members(&mut self, keep: impl Fn(&Uuid) -> bool) {
         self.positions.retain(|(id, _)| keep(id));
         self.sizes.retain(|(id, _)| keep(id));
         self.sprites.retain(|(id, _)| keep(id));
@@ -294,7 +296,7 @@ impl CartographyGeometry {
     }
 
     /// The members carrying a position.
-    pub fn members(&self) -> Vec<GraphMemberId> {
+    pub fn members(&self) -> Vec<Uuid> {
         self.positions.iter().map(|(m, _)| *m).collect()
     }
 

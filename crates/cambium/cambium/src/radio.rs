@@ -148,6 +148,9 @@ pub fn radio_options(
                 ),
             )
             .attr("role", "radio")
+            // The text sits in the label span; naming the row keeps it findable
+            // by shallow class-and-text selectors as well as by role and name.
+            .attr("aria-label", option.label.clone())
             .attr("aria-checked", if selected { "true" } else { "false" })
             .attr("aria-disabled", if disabled { "true" } else { "false" })
             .attr("tabindex", if tab_stop { "0" } else { "-1" })

@@ -256,7 +256,7 @@ fn a_saved_scene_carries_the_seed_and_the_regions() {
     let regions = canvas.strategy_regions().to_vec();
     let json = serde_json::to_string(&canvas.cartography_geometry()).unwrap();
 
-    let geometry: crate::canvas::geometry::CartographyGeometry =
+    let geometry: pandect::CartographyGeometry =
         serde_json::from_str(&json).unwrap();
     let mut restored = Canvas::with_graph(canvas.graph().clone());
     restored.resize(VIEW.0, VIEW.1);
@@ -282,7 +282,7 @@ fn a_saved_scene_carries_the_seed_and_the_regions() {
             .all(|r| r.members.iter().all(|m| *m == kept))
     );
 
-    let old: crate::canvas::geometry::CartographyGeometry =
+    let old: pandect::CartographyGeometry =
         serde_json::from_str(r#"{"positions": []}"#).unwrap();
     assert!(
         old.seed().is_none() && old.regions().is_empty(),
