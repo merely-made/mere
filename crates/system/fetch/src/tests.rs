@@ -75,7 +75,26 @@ fn smolweb_content_type_tags_fixed_schemes_and_passes_others_through() {
         meta: "text/gemini; charset=utf-8".into(),
         body: Vec::new(),
     };
-    assert_eq!(smolweb_content_type(&gem, &gem_resp), "text/gemini");
+    assert_eq!(
+        smolweb_content_type(&gem, &gem_resp),
+        "text/gemini; charset=utf-8"
+    );
+}
+
+#[test]
+fn scroll_success_keeps_complete_mime_without_inventing_native_metadata() {
+    let url = url::Url::parse("scroll://source.test/page").unwrap();
+    let mime = "text/scroll;charset=utf-8;lang=fr";
+    let response = errand::Response {
+        url: url.clone(),
+        status: errand::Status::Success,
+        raw_status: Some(27),
+        meta: mime.to_string(),
+        body: b"##### Native\r\n".to_vec(),
+    };
+    assert_eq!(smolweb_content_type(&url, &response), mime);
+    assert_eq!(response.raw_status, Some(27));
+    assert_eq!(response.body, b"##### Native\r\n");
 }
 
 #[test]
