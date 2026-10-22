@@ -1,0 +1,279 @@
+{
+  "native_source": "2eb8aa09340f7f64739349c7ee08c05902f10f87",
+  "integration_source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
+  "unchanged_authentication_input_count": 107,
+  "unchanged_authentication_inputs": {
+    "crates/graphshell/graphshell-endpoint/Cargo.toml": "5bbc072c62de1789576c5e5d37eb89d062820bf29f1b600ac6da5bc28bc11858",
+    "crates/graphshell/graphshell-endpoint/src/door/app_admission.rs": "c2061b06bade4e8caf195a4ac270fb5ffd8a3c030eb46f37ca6a1ef1b247991a",
+    "crates/graphshell/graphshell-endpoint/src/door/app_client.rs": "f949d6b13a3ef283879432186922f3fdfafbab54e16d49b6f495dcabe83cfc31",
+    "crates/graphshell/graphshell-endpoint/src/door/custody.rs": "aba6a167e958eeccdfe4705a559f3e08ba3b81faa8b50cf413cd5e34deed5137",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs": "4cf6e06f941dbedf5c4d8a98d67783a77ab730b30d956dbbc7b0bbcc3bb62a36",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs": "5e92cf3fffaa76b75f8fb5d594d01d4bd08c43461aa80126583c1bbba9062fff",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_payload.rs": "b2dd9be0d55af6273fc71d4afc809771e7d90eb6452127e78480a95bffa0fff2",
+    "crates/graphshell/graphshell-endpoint/src/door/frame.rs": "0faf8219964dbf7f47f910ad48a6bd36a894b3145735ae93e5ffc5aac8b89e66",
+    "crates/graphshell/graphshell-endpoint/src/door/identity.rs": "2a9b5a1e2c9784829290169a7d92eddca1c717b8c9a042db02e36c604ab3b787",
+    "crates/graphshell/graphshell-endpoint/src/door/local_endpoint.rs": "2bd24e097f5077686aa9d50327bb0a1b5fd9630c8b1d403d5a7d0d59a30e0512",
+    "crates/graphshell/graphshell-endpoint/src/door/mod.rs": "a03493b0e11769b74f6182750cceaa76e7dacca220e57e218ce77fb7e7797421",
+    "crates/graphshell/graphshell-endpoint/src/door/profile.rs": "bbddd787ef60ff5a2a936876e41118c8f74f9ada8128f7ae4e8010a5010e032b",
+    "crates/graphshell/graphshell-endpoint/src/door/quarantine.rs": "65f85e8edb11c5ac563f664bfcc4c1ab41191580901b430062d76e03229d62c1",
+    "crates/graphshell/graphshell-endpoint/src/door/resident_mere_proxy.rs": "a9c845f82bc730cb85e63eb12777fd9ba05be06fe8c7d2e63d9ef218a1da77f7",
+    "crates/graphshell/graphshell-endpoint/src/door/route.rs": "529e268918d0f90886af10352fc5a4d106cf552844cecde344a1b0ad99156855",
+    "crates/graphshell/graphshell-endpoint/src/door/wire.rs": "4ccefa6d3d3bb6ee06abf47cc463344699d478578e4278f9e08c2c6ff078c9c1",
+    "crates/graphshell/graphshell-endpoint/src/lib.rs": "384ea43dbd3ca37ba5d74ddd0a9a97e25326d8336a0842141f4622a771cfb942",
+    "crates/graphshell/graphshell-endpoint/src/network.rs": "b70e46df83b06732571a249237d4b416141a6729538b88e8a6eecacfd1e503df",
+    "crates/graphshell/graphshell-endpoint/src/stdio.rs": "c6bbe6e9a2f133093ddec362acb0669eef4dfa9bb6ee57477adeb544dc9bb168",
+    "ports/djinn/castellan/Cargo.toml": "05e4d01373014fadedb9f9a4e1fcfd2842d8d0fe5e268c3ba9f5e842896db9aa",
+    "ports/djinn/castellan/src/authority.rs": "4ee6413d99b51ec0427d466c3dd3d9ac6b8bce467e03ee3acb137754705e2f86",
+    "ports/djinn/castellan/src/custody.rs": "e2b99058e772cda56e0ea10438540fcd79f43cadc3842057c419be93c8498ec1",
+    "ports/djinn/castellan/src/custody/agent.rs": "932b870c677d7e5d2269da29d4ad70f0e6e12ca961ddcec8c61c30f68811ec82",
+    "ports/djinn/castellan/src/custody/atomic_secret_file.rs": "7cefb3902c26d0797fe37537c4b43dfa9615c833addd4ae52a08d2af34ca251c",
+    "ports/djinn/castellan/src/custody/bootstrap.rs": "09ed351ff16b23dd707b367d4d996512ded9f10cd304a8ea4f4b5f83ff276464",
+    "ports/djinn/castellan/src/custody/broker.rs": "b2b28f17cb8668a42b5a77708cd0899a7e967592118abc4a4360036f42cbc3d8",
+    "ports/djinn/castellan/src/custody/passphrase_root.rs": "16a8d7d0c9f2dbb4a498d0661575e4e1593c8345f86725554d7fad1bc79f7473",
+    "ports/djinn/castellan/src/custody/passphrase_storage.rs": "19bb641514cd75bf0ee7a16fdecbe19c624c8228022a07cce14a02f2d4638dc9",
+    "ports/djinn/castellan/src/custody/profile_wire.rs": "fe8db03cbda617706762b3812db28a4c2c508e5202ed4342c545d575a7547637",
+    "ports/djinn/castellan/src/custody/roster.rs": "002c82a8d2c7d465450a01e1f84e41d6b6b8ba91a32a9ced9a3af8e06404eff9",
+    "ports/djinn/castellan/src/custody/sealed_profile_storage.rs": "a2d20f9feff6a3d9db0c3cbddc3f7d6ceb3198d226bb1913b1fd63d56cfc1921",
+    "ports/djinn/castellan/src/custody/sealed_provider.rs": "6112de84857f7e2c560f8ee420848c1832f4e9e58be1547119be58c575d9a818",
+    "ports/djinn/castellan/src/custody/ssh_face.rs": "92c1109ce986424db023af688671ea96b4d881f005ee47bc854236f7a245ea54",
+    "ports/djinn/castellan/src/custody/ssh_krl.rs": "d80dd52b6ddc560895ff4647d6a5138ddcd8dbaf22c23d3eeb19a6371ffab47e",
+    "ports/djinn/castellan/src/custody/ssh_sign.rs": "ed7b5ff6ddd8168c288390f8a14f880eee7072329f3344e859ef36b746b8e115",
+    "ports/djinn/castellan/src/custody/ssh_slot.rs": "4d71ddc191b20f96da4df993b6fa8e21e2d8b7bf68fb720228dfcea85b07a0e9",
+    "ports/djinn/castellan/src/custody/startup_unlock.rs": "3e44f7ca45f5ab8b67f7cecedc9a72ab572574a4e3fc49bbfe2b84f33acfe36c",
+    "ports/djinn/castellan/src/custody/unlock.rs": "a5c4b4e66e30a1b55301f4e51d30cba5f37f5b99158f89500ee50ff28e7c3716",
+    "ports/djinn/castellan/src/custody/vault.rs": "129a9056d1eb130e33e0ff172bad74e8f5ae8ca22ee2e058bb624a6b2baf52f2",
+    "ports/djinn/castellan/src/custody/vault/slot_map.rs": "3639e6492e3184acca60f32063051c20a38228b78699c04782791d1df05c13cf",
+    "ports/djinn/castellan/src/custody/vault_commands/certs.rs": "314db7777bf93fe3c2ebda47de66f92bff35fdbc3626330f5faae7039d9fc217",
+    "ports/djinn/castellan/src/custody/vault_commands/mod.rs": "ac4e1204a038104962251d708d09029dffb3ca79ca4938e72ba7a0dd2b411c0e",
+    "ports/djinn/castellan/src/custody/wallet.rs": "c3801eb026ee74e70ef6d530f9ac43688dea4f633e9f384493868fcf02e24517",
+    "ports/djinn/castellan/src/custody/wallet/bootstrap.rs": "c9b40dc4c8ccad4e69e1350a32696d5eb9944e8b709f7369218b7aa2f6100d6a",
+    "ports/djinn/castellan/src/custody/wallet/devices.rs": "6fd62ca4252de90db47596f9b1e7cf8964c64262f48900f9894c864c7cac26f9",
+    "ports/djinn/castellan/src/custody/wallet/enroll.rs": "944ca9fccb3ea94f1930bc46350b255cdd6e1b8e3ca61cfb38623e04f6d16beb",
+    "ports/djinn/castellan/src/custody/wallet/epochs.rs": "6999ba61f1291031789afad275be11159fa9ec8e11e586dc26aead5d1a271217",
+    "ports/djinn/castellan/src/custody/wallet/issue.rs": "297f1004ae94454adfc44a0e5a9fd8de415de4527f3fa23ca3797ed46e475cbe",
+    "ports/djinn/castellan/src/custody/wallet/migrate.rs": "d98f987116b9aadba48d588e77079dd78c68ed42da5d3e843d438e40a0912ee2",
+    "ports/djinn/castellan/src/custody/wallet/refresh.rs": "f0147a08a4a634bb59c079a2738700e28e2eb2cee620df9b0c7d28c74ba3b115",
+    "ports/djinn/castellan/src/custody/wallet/revoke.rs": "96d2715374bcb3fd1c21ed37e69305909489f0bf308efa377ff13b9bb870cd3b",
+    "ports/djinn/castellan/src/custody/wallet/sealer.rs": "152c8a610e79d90843076a183267ff06d779fd8b61db089c3b029533f65cb0f7",
+    "ports/djinn/castellan/src/custody/wallet/secrets.rs": "8bbb07424dfe252f5ffc5a0903a7ce8205ab3c6f2d17da2e5a9cedce58814e64",
+    "ports/djinn/castellan/src/custody/wallet/wrapping.rs": "e0f059b712ad4e5ab8141b41b9e647fb294e39a0bc50813ad04ed548839fb014",
+    "ports/djinn/castellan/src/cxf/commit.rs": "18a9d876722794d488493c203d1cf67aebb641608ec00ca7346cc065b804b461",
+    "ports/djinn/castellan/src/cxf/erase.rs": "7f75e80a8a932d10d3f544372d2c15ce67029c2654239f1c63433ea6a5c295e2",
+    "ports/djinn/castellan/src/cxf/mod.rs": "b462dd3522310bf2dbf619a7671f4f42fd4616833bb8872426e0b76489d8fa50",
+    "ports/djinn/castellan/src/cxf/parse.rs": "a36c5c59fdacc167ecfdf8b0dcba218bb05ab90bdda87886897935b70bcec27a",
+    "ports/djinn/castellan/src/cxf/ssh.rs": "90aecad9921d5fba05da9bd9b5dacf05f205e1f301adc156f4d71e7b62402483",
+    "ports/djinn/castellan/src/items.rs": "8c24ddedb7f9a6d36757912742207708c3091aeb7cf301b5ac91c273e32dccb5",
+    "ports/djinn/castellan/src/items/records.rs": "fa4735e79a8b1624f570851fa0e34ea25906ef927fbea67acb3fb191f978aecd",
+    "ports/djinn/castellan/src/items/transaction.rs": "f1836211dadae54335f12f2a859f7d781d49783149bdbc28cc149101883c6690",
+    "ports/djinn/castellan/src/lib.rs": "ce71838cf542144d1a2912ab4b6fed9241dc7e1c018ea3309eef07b7f884aaa2",
+    "ports/djinn/castellan/src/lock.rs": "137f869051b4956ea013a3378f75b819100e6eca5a88b161c64408acb89b6d2b",
+    "ports/djinn/castellan/src/otp/admitted.rs": "71275d722deb79b16c5bc2ba610a95ce76e8b8d607ad1c7eb3fb621318284b2a",
+    "ports/djinn/castellan/src/otp/base32.rs": "6e022f7104574e668a7adaea9f4c8af11061c2dcbc61ac4c02a25c1ab04e33a0",
+    "ports/djinn/castellan/src/otp/item.rs": "e6d750a873b59973b16d56fd33721b7f4e42d56efa63b386fd118233d9c0586e",
+    "ports/djinn/castellan/src/otp/mod.rs": "4c945a85aac64dfb4276e83a72340a88e5bca131d31527a0929a160e2eebae64",
+    "ports/djinn/castellan/src/otp/participant.rs": "d4ce7dd1e76576a1dd290a90a1c4a2cac5e609deaa0bbb1e4b95eaaafbbc6ba4",
+    "ports/djinn/castellan/src/otp/release.rs": "6d61090b94bfb5915c288aba729cdd32eaa92ea3de7912c81df93e9bae4087c0",
+    "ports/djinn/castellan/src/otp/steam_guard.rs": "61cc286d46e00c99e16849f1dbce7c5662694017a502269f8977c22999f6a490",
+    "ports/djinn/castellan/src/otp/uri.rs": "9e55ddcd83d87ea34ec4091808c7e389e97542bdae42a6d7d0c46da1d333075d",
+    "ports/djinn/castellan/src/resident.rs": "203d8e98abe5fdaa38a7d5b55558e00a2d3b34cbb6798f6d27c61f8198bdbd9b",
+    "ports/djinn/castellan/src/review.rs": "7472fe52f1d902454508bdd21c94e54bce2cb84f6c5f3e3cab18a365ec382887",
+    "ports/djinn/castellan/src/sealed_storage.rs": "4184b7f1205f7baf80313b0f790f54237dfb74ca16931c3814567a81a085ff4b",
+    "ports/djinn/castellan/src/view.rs": "e4d5c9c7e14f5ec69444c96c57e9ef3bbc87ff7955bc2c5f49c39b8c06d0e959",
+    "ports/djinn/src/custody.rs": "b18d147826046f81e7057113adbea6f02bccb9d4fd9fc374712edcd1d30909ea",
+    "ports/djinn/src/custody/payload.rs": "40d21ff21b1bf61357df74d585a8cd27a7a9aa97f7790130f9882b8173c12c0a",
+    "ports/djinn/src/door/app_broker.rs": "054ed6da077c3af61f45d205f1fb8e45fb3e1ff03edbe0a06f58306f2460700c",
+    "ports/djinn/src/door/browser_carrier.rs": "34f855c9f7a0df6fdfd7786a4981a288c3e9f98f61bfd00a290447f6e38c1c82",
+    "ports/djinn/src/door/browser_host.rs": "fcb1d4a7a6b6c1a95eac41c7720cc035130443ac08277aee526b994063515ec6",
+    "ports/djinn/src/door/device_broker.rs": "2f91ff841c317676d129016370465ad48b66b80100791e407d9b5d2bde5f7d52",
+    "ports/djinn/src/door/identity_endpoint.rs": "0ce7497aec1aa7b2bf359f8a83243fda0095eb8df9e51f77a61d43ad914719c0",
+    "ports/djinn/src/door/identity_projection.rs": "c3282c030c3c38b2edd9aa6f66042834a7be3ceb0afe62b6f51592aca771797c",
+    "ports/djinn/src/door/local_session.rs": "0b4cbdaf061530962293a95b30b3a387149727ef7c4d85662d4d267752462fbe",
+    "ports/djinn/src/door/mod.rs": "7a690b18f87b8b38653e1a80ea0c013216bbec133454780447de82f323f5b719",
+    "ports/djinn/src/door/resident_identity.rs": "dde9f52f8edbed4993d2e80f396e7efcdc16557e38b7336762e3ef3b0d5ddf9b",
+    "ports/djinn/src/identity_ui.rs": "a579d038458849dfd169d48937c2edb352872fbca33f97d2b0afe586f280db16",
+    "ports/djinn/src/identity_ui/windows_presence.rs": "c142fa640d6fe86b6b7f2e8c38e80fbb3eaa1e0fe684c0c20aa76918bf2b93f1",
+    "ports/djinn/src/keeper.rs": "3b61759b24938f87c8ee23154afc9ff998ee8527a8905efc07c973519316d398",
+    "ports/djinn/src/keeper/review.rs": "8ad3725352c753aa30a06eeaf840fc6e694143692fba83474cfe8e31b79c473e",
+    "ports/dramatis/src/acceptance.rs": "a8e7bdbece97c0254c9bd66c2a21575b026acbea6a53ce8e5f1e559d1e22c16c",
+    "ports/dramatis/src/lib.rs": "52acf8e075964be3a60de9eabc5c2aab2f0d15e17ed626448748ab8681dcdfd4",
+    "ports/dramatis/src/main.rs": "e156555f3d4108f37a3208c30a06ad9c0739ef7abb662d15fbee67434d9ea28c",
+    "ports/dramatis/src/views.rs": "1aa986b2d16087575c71890846a73aa511405c5686c08f11522ca0ffbf5bb1a4",
+    "ports/dramatis/src/worker.rs": "772548b5d0a821f4a9e28893877374b554a49ea14bd819a74e7aba4de40710f0",
+    "support/patches/light-file-dialog/Cargo.toml": "b5fa8aa14dc68d71abd95e6e2efdbb0fcb3979a8f05e7196aedf3ec892b0870a",
+    "support/patches/light-file-dialog/src/dialog.rs": "702b645133e818b52ff3f806dfe6fa0d9ac39ada575f5e9683eab8868c7ce514",
+    "support/patches/light-file-dialog/src/helpers.rs": "4e06295be3beedd0acf2886436197f906d5390e44efd46cbdad8fa8ce9db259c",
+    "support/patches/light-file-dialog/src/lib.rs": "38bd5520139cbeeae4975f974c5c436f54fd40afe339326de64560a1d5208a8f",
+    "support/patches/light-file-dialog/src/state.rs": "125d26e0d8448fa3cd7b37c9269dcd3fa69054168f16a4bbd5b2d3687cfaf60f",
+    "support/patches/light-file-dialog/src/types.rs": "f35f30d3fd2316fcf7e5441b105425ed2cb6b414869a65b20cd3f917e03fe62a",
+    "support/patches/light-file-dialog/src/windows/basic_input.rs": "8ee4bdccaf350bf6bd8931f391f1634ea1f4ad11bff95a032176daef0a5636a0",
+    "support/patches/light-file-dialog/src/windows/console.rs": "34a1c690050011e06a318621bbef8aad4cecba88c8435af85a826546e8b03507",
+    "support/patches/light-file-dialog/src/windows/gui.rs": "502c46f8793ab3d483bcdc5dd426076c363c54557922c310b98eca1fbeeb530a",
+    "support/patches/light-file-dialog/src/windows/mod.rs": "5a97b57ac72a923520cd33cb48e50078fdf5c0aad96564d28c4af31d82982cea",
+    "support/patches/light-file-dialog/src/windows/utf.rs": "b0d30da0387f0507214ff8560450015a10d5e59a7b7c65ef10b6f0bda5c6a626"
+  },
+  "changed_previous_build_inputs": {
+    "Cargo.lock": {
+      "native": "1d450798530c0714f5aea915f4178e6b56c6aaf25bb9bef4510ac3a1754d2c53",
+      "integration": "33d71c4435b36c73f3ccd0e5e418ba0bc7c793ef3dc647675fd0c640267977dc"
+    },
+    "crates/cambium/cambium/src/lib.rs": {
+      "native": "40c832f2e120fe5c1fca01f49ac1fccacbfa9544b12b7d368a105c23e6b09071",
+      "integration": "8e6c1a1a2e9c94fe3dca4e614b2662a90894a6f17fb57e28b485724e274b2a6d"
+    },
+    "crates/cambium/cambium/src/shell.css": {
+      "native": "c43cf641be1abf7bccaeaa25f6663c6e64999f9d99ef7714069cbf8b81d6cf50",
+      "integration": "bd9cba547e2ef2f6b5a9f30e7250a0afc3ac222bf0cd6d903385618728c54362"
+    },
+    "crates/cambium/cambium/src/styled_field.rs": {
+      "native": "c4e61de4843358f583b2e29fa4ac271b3b761855f567c7e2d66f103e3608c6d8",
+      "integration": "8ed07b0f1b7c80613cebf7d6f6545829ffd858c42d407bcc9088225bbd9f1760"
+    },
+    "crates/inker/document-canvas/src/layout.rs": {
+      "native": "b2ea4b060019577186523c06f14c3c784ebec23d909f25308a70b63b3bcefffa",
+      "integration": "32ee736897d2048103f4d84260bfc361856acfd2cb87dd31377231d0a778d052"
+    },
+    "crates/inker/document-canvas/src/text.rs": {
+      "native": "27ad20a5735509d2688e4db5c4011df148d0bba19b617c88e2cd0a0e60b22434",
+      "integration": "8ae81c7cff57b6ff0851dacb27da706a7b405b59aad3ce5ae3f448f16d2abcaa"
+    },
+    "crates/system/document-lanes/src/lib.rs": {
+      "native": "9ae83180f5afb77cbd76dab0c8b27d39040fa1f2795f35144bf73f86b9b88a5c",
+      "integration": "379ddc41ee7217543a263a9bd26eb0337cbff5aec7ce5962c07587bd92c9827a"
+    },
+    "crates/system/document-lanes/src/reader.rs": {
+      "native": "f6837a2cee0c5e01b4b2e10f64491b54999a0b7bc7971ae395e2bd3a5bbc11a5",
+      "integration": "e02742fb9cb8ee5967b39c3181a9ce067c74404caa2715088296c628160d28c9"
+    },
+    "crates/system/document-lanes/src/remote.rs": {
+      "native": "b11430a0cf9a820166df4bde64843abd7ffb5739abf9757e5e911d49f09e855d",
+      "integration": "669295639dd65adff97eea02732a188b8ad53634607470cb008b2888f0a7d97a"
+    },
+    "crates/system/document-lanes/src/session.rs": {
+      "native": "e1c86e9450c8a3e93d8afdbfb35a2a52ce550e2f62b4a30a63418780e6214a15",
+      "integration": "3937da1ade488dca2ab8dfcb6cda3285b1868db59559cd349ae41aa982f2e235"
+    },
+    "crates/system/document-lanes/src/smolweb.rs": {
+      "native": "573d12e922ff58502ea7e4d9211757028bb18c1e3b81070aaabcba8875db6f19",
+      "integration": "ee58d8a16979ca30c110f2b11a55bd07101e032ac552d0c9a1c9c9479440746b"
+    },
+    "crates/system/document-lanes/src/smolweb/a11y.rs": {
+      "native": "5aeee389befac9f3220eca20c447d6f01ad14df528ab7e3e192002be50b07156",
+      "integration": "b9aeb28239406f9de6855a7a4330a7b82b1ad9e257fb855e7ec9377c1827e3a0"
+    },
+    "crates/system/document-lanes/src/typography.rs": {
+      "native": "de67ea937cee6c2fcbe64d9944dceb8d3fc0b10ab0e7c923fc57f3728a2201cc",
+      "integration": "6685217a098b75e8d8b3135792a43bd22ec2121877e0e88955b137bb52758440"
+    },
+    "crates/system/fetch/src/lib.rs": {
+      "native": "c89226ffec530c70249721c9c458d685aabfcc87a4cbbd91e100ef743fc6cc7a",
+      "integration": "7db87a9bb2a8c391165ddcaad1afa37757f3981390eaa8e6c24d9e6ccb277c6c"
+    },
+    "crates/system/tabard/src/lib.rs": {
+      "native": "14e6d2f7dced4dc2f4d964ecbf2d22205dc5098512727b0d8dcd943a31e40493",
+      "integration": "c0ee67a9b719096b8220eec3ca22749397f3183fa40d17e95f6b6c6961345f0c"
+    },
+    "ports/djinn/Cargo.toml": {
+      "native": "5e1beca79c459b2c56c2fa459fb63528f6906ef6cd13f97e9ad2f5d51a300c16",
+      "integration": "ece2d36774fa830a0a234dce327fd1e32f14d6ea8372350b6dfeba9482e2f4f9"
+    },
+    "ports/djinn/src/resident_knot.rs": {
+      "native": "0a8c215a849ace3c4191fa05d0a421632256ce79d33c90a76d450c4d2e6d51b3",
+      "integration": "278cedca3b74533265a4f14d4c9a163f64504003fc989ca9071c4b842bea80bf"
+    },
+    "ports/djinn/src/resident_site.rs": {
+      "native": "5ff4469e0ca0d5158a4f91114784befafa39944786759cc00ae35bf28a031cca",
+      "integration": "50ec6e7917152d21136c5979927ee7f8c2fe1575bdf83fc7a1eabd2cb95e52bc"
+    },
+    "ports/graphshell/Cargo.toml": {
+      "native": "7c522159e258e1bcd692b178bb6e6b8cc25b4e78e8f990b4b4323fb15daaad65",
+      "integration": "c609fbe83b49aa873b956679e42ea92ef4b60d44caeb6bd0762cafe70940bac7"
+    },
+    "ports/graphshell/src/forme_session.rs": {
+      "native": "6ea3b8fb9c3f0c6bd8cec3adbf3f38b76c11f02a756f5c525e726fde16f14fad",
+      "integration": "aebdd5fb9477f07501722590c0b7bae19beb72f6877972bf830a02f50d4be436"
+    },
+    "ports/graphshell/src/forme_workspace.rs": {
+      "native": "1d7707fd5ea1976b577d9a2fe5f37bd9487787163c6b5968ae448f60621c5a6d",
+      "integration": "c2457b67f08c098457d0fd7800b007a4c237d4f77df4a3a267ed12297c6b83e3"
+    },
+    "ports/graphshell/src/retained_content.rs": {
+      "native": "7d1f41115b2f877e40bded5a32bf855d8280e816184dcb8faf6ddc9dbc539e33",
+      "integration": "2219edc99588255ed8b8a637a2b84ee6828803771004577a7179567524fe1779"
+    },
+    "support/dramatis_auth_receipts.py": {
+      "native": "8b2347be9132e312d1bd676fe54b1f36ec5fb711b3817fdd9983544809fd9913",
+      "integration": "fd84e8667ea5cf65314f5c34d6425ef199cff8be80ef92b15cb2a3ed5400289a"
+    }
+  },
+  "scope": "Native-provider, custody, storage, endpoint and Dramatis app sources are byte-identical. Human prompts remain qualified at native_source; current-source software/headed integration and cold reopens are separate receipts. Machine code is rebuilt, not claimed identical.",
+  "resolved_package_identities_unchanged": false,
+  "added_resolved_packages": [
+    [
+      "knot-capture",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ],
+    [
+      "knot-composition",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ],
+    [
+      "knot-document",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ],
+    [
+      "knot-editor",
+      "0.0.3",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ],
+    [
+      "knot-file-catalog",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ],
+    [
+      "knot-site",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b"
+    ]
+  ],
+  "removed_resolved_packages": [
+    [
+      "knot-capture",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ],
+    [
+      "knot-composition",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ],
+    [
+      "knot-document",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ],
+    [
+      "knot-editor",
+      "0.0.3",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ],
+    [
+      "knot-file-catalog",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ],
+    [
+      "knot-site",
+      "0.0.1",
+      "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+    ]
+  ],
+  "component_gate_source": "5641d2fb0c1caef09267dc6e5cb7bcc1976635bf",
+  "reused_component_scope": [
+    "ports/djinn/castellan",
+    "ports/djinn/src/identity_ui.rs"
+  ]
+}

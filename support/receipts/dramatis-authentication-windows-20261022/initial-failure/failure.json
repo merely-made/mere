@@ -1,0 +1,9 @@
+﻿{
+    "stoppedAppPids":  [
+                           143244
+                       ],
+    "source":  "a3d3c5aec4f0521f0a9391e9ce7a49f720a0d348",
+    "reason":  "Native retry returned cancellation without a second window; human confirmed enabled button and cancellation notice",
+    "syntheticOnly":  true,
+    "timestampUtc":  "2026-10-22T18:39:48.5182100Z"
+}

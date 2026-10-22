@@ -1,0 +1,28 @@
+{
+    "currentUser":  "O-PC\\mark_",
+    "sshSession":  0,
+    "gpus":  [
+                 {
+                     "Name":  "AMD Radeon 780M Graphics",
+                     "DriverVersion":  "31.0.14084.3001"
+                 },
+                 {
+                     "Name":  "NVIDIA GeForce RTX 4060 Laptop GPU",
+                     "DriverVersion":  "32.0.16.1088"
+                 }
+             ],
+    "desktopSessions":  [
+                            {
+                                "Id":  7076,
+                                "SessionId":  1
+                            }
+                        ],
+    "retainedReceiptByteCap":  100000000,
+    "temporaryInteractiveTask":  "Mere-Dramatis-Authentication",
+    "os":  {
+               "Caption":  "Microsoft Windows 11 Home Insider Preview",
+               "Version":  "10.0.26220",
+               "BuildNumber":  "26220",
+               "OSArchitecture":  "64-bit"
+           }
+}

@@ -1,0 +1,2 @@
+# Receipt hashes cover exact serialized bytes, including Windows CRLF output.
+* -text -whitespace

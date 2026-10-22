@@ -1,0 +1,50 @@
+{
+  "source": "5641d2fb0c1caef09267dc6e5cb7bcc1976635bf",
+  "commands": [
+    {
+      "name": "storage-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "-j1",
+        "-p",
+        "castellan",
+        "--features",
+        "keeper",
+        "--lib",
+        "passphrase",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 97.51600000000326,
+      "passed": 25,
+      "ignored": 0,
+      "log_path": "component-gates/storage-tests.log.gz"
+    },
+    {
+      "name": "provider-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "-j1",
+        "-p",
+        "djinn",
+        "--lib",
+        "identity_ui::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 353.14000000001397,
+      "passed": 4,
+      "ignored": 0,
+      "log_path": "component-gates/provider-tests.log.gz"
+    }
+  ],
+  "reason": "Castellan and identity_ui sources, their tests and authentication dependency versions are unchanged; the subsequent update changes Knot checkpoint receiving. Current custody/app tests and headed integration run again."
+}

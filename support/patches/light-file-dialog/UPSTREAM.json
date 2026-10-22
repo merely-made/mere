@@ -1,0 +1,30 @@
+{
+  "crate": "light-file-dialog",
+  "version": "3.21.3",
+  "registry_checksum": "e0ff68a194d2c895e07893a1651c2babd69cf7301b297a5d5ad3e25e684a0d13",
+  "upstream_repository": "https://github.com/wengchengjian/light-file-dialog",
+  "upstream_vcs": {
+    "git": {
+      "sha1": "d982e0a7fa5783065172293e567f4c4eb4eb3454"
+    },
+    "path_in_vcs": ""
+  },
+  "copied_files_sha256": {
+    "Cargo.toml": "b5fa8aa14dc68d71abd95e6e2efdbb0fcb3979a8f05e7196aedf3ec892b0870a",
+    "README.md": "2654a3e2ea2ed6556d080efe10908f9002058f7d2b631d6c63c04c775d49286f",
+    "examples/hello.rs": "585762cd7a49850a2fd544c4932e86d6a3c0e2fedc977c52ee0b2429bfac447f",
+    "src/dialog.rs": "702b645133e818b52ff3f806dfe6fa0d9ac39ada575f5e9683eab8868c7ce514",
+    "src/helpers.rs": "4e06295be3beedd0acf2886436197f906d5390e44efd46cbdad8fa8ce9db259c",
+    "src/lib.rs": "38bd5520139cbeeae4975f974c5c436f54fd40afe339326de64560a1d5208a8f",
+    "src/state.rs": "125d26e0d8448fa3cd7b37c9269dcd3fa69054168f16a4bbd5b2d3687cfaf60f",
+    "src/types.rs": "f35f30d3fd2316fcf7e5441b105425ed2cb6b414869a65b20cd3f917e03fe62a",
+    "src/unix/detect.rs": "7794521cb4f51f31a7e99144d0d1403396e4501924f48acf577a6b0b635b5773",
+    "src/unix/mod.rs": "7204867614d082077b493788cb71066e1bdeff83597e167004583b79118c309a",
+    "src/windows/basic_input.rs": "8ee4bdccaf350bf6bd8931f391f1634ea1f4ad11bff95a032176daef0a5636a0",
+    "src/windows/console.rs": "34a1c690050011e06a318621bbef8aad4cecba88c8435af85a826546e8b03507",
+    "src/windows/gui.rs": "55aa13bedffb2721f570925f1bc63d341f1d6e69a508ccdc8af6400220ec9377",
+    "src/windows/mod.rs": "5a97b57ac72a923520cd33cb48e50078fdf5c0aad96564d28c4af31d82982cea",
+    "src/windows/utf.rs": "b0d30da0387f0507214ff8560450015a10d5e59a7b7c65ef10b6f0bda5c6a626"
+  },
+  "patch": "Register the Windows password window class once per process, so cancellation, retry and the current/new/confirmation sequence can reuse it. Unix implementation unchanged."
+}
