@@ -80,6 +80,7 @@ mod slider;
 mod splice;
 mod split;
 mod status_bar;
+mod status_note;
 mod styled_field;
 mod summary_body;
 mod surface;
@@ -124,7 +125,7 @@ pub use detail_popover::{
 };
 pub use disclosure::{
     AccordionConfig, AccordionItem, AccordionMode, AccordionState, DisclosureState, TreeItem,
-    TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_with,
+    TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_trigger, disclosure_with,
     tree_view,
 };
 pub use editor::{EditHistory, History, pair_close, wrap_selection};
@@ -144,9 +145,9 @@ pub use setting_row::setting_row;
 // needs no second direct `sprigging` dependency. The grid widget's home
 // is here; its column model rides along.
 pub use controls::{
-    CaretAffinity, CaretMove, CaretPosition, CaretSelection, Checkbox, Composition,
+    CaretAffinity, CaretMove, CaretPosition, CaretSelection, CheckElement, Checkbox, Composition,
     SINGLE_LINE_FIELD_STYLE, TextCommand, TextField, TextFieldMode, TextInput, button, button_with,
-    checkbox, checkbox_typed, text_command_from_key, text_field, text_field_typed, textarea,
+    checkbox, checkbox_disabled, checkbox_typed, text_command_from_key, text_field, text_field_typed, textarea,
     textarea_typed, toggle,
 };
 pub use element::{El, Element, ElementView, el};
@@ -178,7 +179,8 @@ pub use portable::{PortableKeyed, PortableKeyedState};
 mod retained_mount;
 pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use propagation::Propagation;
-pub use radio::{RadioGroup, radio_group};
+pub use radio::{RadioGroup, RadioOption, radio_group, radio_options};
+pub use status_note::{status_note, status_note_labelled};
 pub use range_scrubber::{RangeScrubber, RangeScrubberEvent, RangeScrubberPin, range_scrubber};
 pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,

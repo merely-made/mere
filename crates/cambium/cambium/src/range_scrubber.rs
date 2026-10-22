@@ -52,6 +52,8 @@ pub struct RangeScrubber {
     pub pins: Vec<RangeScrubberPin>,
     /// A disabled explanation. An invalid range is disabled regardless.
     pub disabled_reason: Option<String>,
+    /// Spoken value in place of the number (`aria-valuetext`).
+    pub value_text: Option<String>,
 }
 
 impl RangeScrubber {
@@ -67,6 +69,7 @@ impl RangeScrubber {
             label: "Value".into(),
             pins: Vec::new(),
             disabled_reason: None,
+            value_text: None,
         }
     }
 
@@ -80,6 +83,13 @@ impl RangeScrubber {
     /// Set the accessible name.
     pub fn with_label(mut self, label: impl Into<String>) -> Self {
         self.label = label.into();
+        self
+    }
+
+    /// Describe the current value in words (`aria-valuetext`), for ranges whose
+    /// number is an index into something the reader names.
+    pub fn with_value_text(mut self, text: impl Into<String>) -> Self {
+        self.value_text = Some(text.into());
         self
     }
 
@@ -246,7 +256,10 @@ where
     .attr("aria-valuemin", number(aria_min))
     .attr("aria-valuemax", number(aria_max))
     .attr("aria-valuenow", number(current))
-    .attr("aria-valuetext", number(current))
+    .attr(
+        "aria-valuetext",
+        props.value_text.clone().unwrap_or_else(|| number(current)),
+    )
     .attr("aria-disabled", disabled.to_string())
     .attr("aria-description", reason.clone())
     .attr("data-step", number(aria_step))
