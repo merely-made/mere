@@ -143,3 +143,48 @@ pub fn resolve_theme_choice(
         diagnostics,
     })
 }
+
+/// The palette a presentation stands for in `mode`. An authored stylesheet
+/// carries none of its own, so it borrows the built-in `fallback_theme_id`
+/// in the same mode (a custom mode borrows its dark form); both hosts defaulted
+/// differently before this was one function.
+pub fn presentation_palette(
+    presentation: &ThemePresentation,
+    mode: &Mode,
+    fallback_theme_id: &str,
+) -> ModePalette {
+    match presentation {
+        ThemePresentation::Derived(palette) => palette.clone(),
+        ThemePresentation::AuthoredStylesheet(_) => {
+            let mode = if matches!(mode, Mode::Custom(_)) { Mode::Dark } else { mode.clone() };
+            let built_in = resolve_theme_choice(
+                &ThemeRegistry::default(),
+                &ThemeChoice::new(fallback_theme_id, Some(mode)),
+            )
+            .expect("built-in fallback resolves");
+            match built_in.presentation {
+                ThemePresentation::Derived(palette) => palette,
+                ThemePresentation::AuthoredStylesheet(_) => {
+                    unreachable!("built-in themes author no sheets")
+                },
+            }
+        },
+    }
+}
+
+/// `presentation` as a stylesheet in `mode`: the palette's custom properties
+/// (the fallback's, under authored rules), then `roles` (the host's role
+/// rules), then the exact authored rules, which stay authoritative.
+pub fn presentation_stylesheet(
+    presentation: &ThemePresentation,
+    mode: &Mode,
+    fallback_theme_id: &str,
+    roles: &str,
+) -> String {
+    let defaults = presentation_palette(presentation, mode, fallback_theme_id).css_custom_properties();
+    let authored = match presentation {
+        ThemePresentation::Derived(_) => String::new(),
+        ThemePresentation::AuthoredStylesheet(rules) => rules.join("\n"),
+    };
+    format!("{defaults}\n{roles}\n{authored}")
+}

@@ -5,6 +5,7 @@
 //! document or a theme. Display scale and temporary Find state are separate.
 use crate::{FontRole, ThemeFontStyle, Typography};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "ReadingWire")]
@@ -87,6 +88,113 @@ impl ReadingPreferences {
     }
 }
 
+/// Reading intent by projection, the one persisted shape both hosts save
+/// through their own stores. A projection with default intent holds no entry.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReadingProjections<K: Ord>(BTreeMap<K, ReadingPreferences>);
+impl<K: Ord> Default for ReadingProjections<K> {
+    fn default() -> Self {
+        Self(BTreeMap::new())
+    }
+}
+#[derive(Serialize, Deserialize)]
+struct Choice<K> {
+    target: K,
+    preferences: ReadingPreferences,
+}
+impl<K: Ord> ReadingProjections<K> {
+    pub const MAX_PROJECTIONS: usize = 1024;
+    pub const MAX_BYTES: usize = 256 * 1024;
+    pub fn get(&self, target: &K) -> ReadingPreferences {
+        self.0.get(target).copied().unwrap_or_default()
+    }
+    pub fn contains(&self, target: &K) -> bool {
+        self.0.contains_key(target)
+    }
+    /// Records `value`, dropping the entry when it is the default.
+    pub fn set(&mut self, target: K, value: ReadingPreferences) {
+        if value == ReadingPreferences::default() {
+            self.0.remove(&target);
+        } else {
+            self.0.insert(target, value);
+        }
+    }
+    pub fn keys(&self) -> impl Iterator<Item = &K> {
+        self.0.keys()
+    }
+    pub fn iter(&self) -> impl Iterator<Item = (&K, &ReadingPreferences)> {
+        self.0.iter()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+    /// Bounds and per-entry limits; a host adds its own check that each
+    /// projection still exists.
+    pub fn validate(&self) -> Result<(), String> {
+        if self.0.len() > Self::MAX_PROJECTIONS {
+            return Err("Too many reading projections".into());
+        }
+        self.0.values().try_for_each(ReadingPreferences::validate)
+    }
+}
+impl<K: Ord + Serialize> ReadingProjections<K> {
+    pub fn to_json(&self) -> Result<Vec<u8>, String> {
+        serde_json::to_vec_pretty(&self).map_err(|e| e.to_string())
+    }
+}
+impl<K: Ord + for<'de> Deserialize<'de>> ReadingProjections<K> {
+    pub fn from_json(bytes: &[u8]) -> Result<Self, String> {
+        if bytes.len() > Self::MAX_BYTES {
+            return Err("Reading preferences exceed size limit".into());
+        }
+        serde_json::from_slice(bytes).map_err(|e| e.to_string())
+    }
+}
+impl<K: Ord + Serialize> Serialize for ReadingProjections<K> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_seq(self.0.iter().map(|(target, preferences)| Choice {
+            target,
+            preferences: *preferences,
+        }))
+    }
+}
+impl<'de, K: Ord + Deserialize<'de>> Deserialize<'de> for ReadingProjections<K> {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::{Error, MapAccess, SeqAccess, Visitor};
+        struct Projections<K>(std::marker::PhantomData<K>);
+        impl<'de, K: Ord + Deserialize<'de>> Visitor<'de> for Projections<K> {
+            type Value = ReadingProjections<K>;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("reading projections")
+            }
+            fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+                let mut map = BTreeMap::new();
+                while let Some(Choice { target, preferences }) = seq.next_element::<Choice<K>>()? {
+                    if map.len() >= ReadingProjections::<K>::MAX_PROJECTIONS {
+                        return Err(A::Error::custom("Too many reading projections"));
+                    }
+                    if map.insert(target, preferences).is_some() {
+                        return Err(A::Error::custom("Duplicate reading projection"));
+                    }
+                }
+                Ok(ReadingProjections(map))
+            }
+            // Workspaces saved before the list shape keyed a map by projection.
+            fn visit_map<A: MapAccess<'de>>(self, mut access: A) -> Result<Self::Value, A::Error> {
+                let mut map = BTreeMap::new();
+                while let Some((target, preferences)) = access.next_entry::<K, ReadingPreferences>()? {
+                    if map.len() >= ReadingProjections::<K>::MAX_PROJECTIONS {
+                        return Err(A::Error::custom("Too many reading projections"));
+                    }
+                    map.insert(target, preferences);
+                }
+                Ok(ReadingProjections(map))
+            }
+        }
+        deserializer.deserialize_any(Projections(std::marker::PhantomData))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -118,5 +226,32 @@ mod tests {
             a.step_column(false);
         }
         assert_eq!((a.text_size, a.column_em), (28, 24));
+    }
+    #[test]
+    fn projections_roundtrip_drop_defaults_and_read_the_older_map() {
+        let mut stepped = ReadingPreferences::default();
+        stepped.step_text(true);
+        let mut projections = ReadingProjections::<u32>::default();
+        projections.set(7, stepped);
+        projections.set(8, ReadingPreferences::default());
+        assert!(projections.contains(&7) && !projections.contains(&8));
+        let wire = projections.to_json().unwrap();
+        assert_eq!(ReadingProjections::<u32>::from_json(&wire).unwrap(), projections);
+        let older = br#"{"7":{"text_size":20,"column_em":36}}"#;
+        assert_eq!(ReadingProjections::<u32>::from_json(older).unwrap(), projections);
+        assert_eq!(projections.get(&9), ReadingPreferences::default());
+    }
+    #[test]
+    fn projections_refuse_duplicates_invalid_intent_and_excess() {
+        let duplicate = br#"[{"target":1,"preferences":{}},{"target":1,"preferences":{}}]"#;
+        assert!(ReadingProjections::<u32>::from_json(duplicate).is_err());
+        let invalid = br#"[{"target":1,"preferences":{"text_size":0}}]"#;
+        assert!(ReadingProjections::<u32>::from_json(invalid).is_err());
+        let many = format!(
+            "[{}]",
+            (0..1025).map(|i| format!(r#"{{"target":{i},"preferences":{{}}}}"#)).collect::<Vec<_>>().join(",")
+        );
+        assert!(ReadingProjections::<u32>::from_json(many.as_bytes()).is_err());
+        assert!(ReadingProjections::<u32>::from_json(&vec![b' '; 256 * 1024 + 1]).is_err());
     }
 }

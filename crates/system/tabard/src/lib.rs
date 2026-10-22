@@ -29,11 +29,12 @@ pub mod typography;
 pub mod workshop;
 pub use theme_styles::{ThemeFontStyle, Typography};
 mod reading;
-pub use reading::ReadingPreferences;
+pub use reading::{ReadingPreferences, ReadingProjections};
 pub use typography::{FontFamily, FontPreferences, FontRole, ResolvedFontRole};
 
 pub use appearance::{
-    ResolvedThemeChoice, ThemeChoiceDiagnostic, ThemePresentation, resolve_theme_choice,
+    ResolvedThemeChoice, ThemeChoiceDiagnostic, ThemePresentation, presentation_palette,
+    presentation_stylesheet, resolve_theme_choice,
 };
 pub use artifact::{DtcgModeDocument, DtcgModeProvenance, ModeExportError, ModePalette};
 
