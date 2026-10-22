@@ -67,16 +67,28 @@ impl DerivedFacePalette {
     /// authored role colors. No seed derivation runs here. Node activation
     /// accents and deterministic face bytes remain separate Canvas state.
     pub fn from_palette(palette: &Palette) -> Self {
-        let companion = palette.text;
+        Self::from_roles(
+            [palette.primary, palette.secondary, palette.tertiary],
+            [palette.success, palette.danger],
+            palette.text,
+        )
+    }
+
+    /// The same mapping from individually resolved roles, for hosts whose
+    /// roles come from a cascade rather than a [`Palette`]: the three accents,
+    /// the two statuses, and the `companion` text each accent is mixed toward.
+    pub fn from_roles(accents: [ThemeColor; 3], status: [ThemeColor; 2], companion: ThemeColor) -> Self {
+        let [primary, secondary, tertiary] = accents;
+        let [success, danger] = status;
         Self::new([
-            palette.primary.to_array(),
-            palette.secondary.to_array(),
-            palette.tertiary.to_array(),
-            palette.success.to_array(),
-            palette.danger.to_array(),
-            mix(palette.primary, companion, 0.28).to_array(),
-            mix(palette.secondary, companion, 0.28).to_array(),
-            mix(palette.tertiary, companion, 0.28).to_array(),
+            primary.to_array(),
+            secondary.to_array(),
+            tertiary.to_array(),
+            success.to_array(),
+            danger.to_array(),
+            mix(primary, companion, 0.28).to_array(),
+            mix(secondary, companion, 0.28).to_array(),
+            mix(tertiary, companion, 0.28).to_array(),
         ])
     }
 

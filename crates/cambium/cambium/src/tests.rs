@@ -1803,9 +1803,10 @@ mod controls {
 
     use crate::{
         AnyView, DomHandle, GenetAppRunner, GenetCtx, GenetElement, Key, KeyEvent, Modifiers,
-        NamedKey, PointerClick, PointerEvent, PointerPhase, RadioGroup, SelectState, Slider,
-        TextInput, View, WheelEvent, button, checkbox, el, focusable, lens, on_click, on_pointer,
-        on_wheel, overlay_at, overlay_rect, radio_group, select, slider, text_field,
+        NamedKey, PointerClick, PointerEvent, PointerPhase, RadioGroup, RadioOption, SelectState,
+        Slider, TextInput, View, WheelEvent, button, checkbox, checkbox_disabled, el, focusable,
+        lens, on_click, on_pointer, on_wheel, overlay_at, overlay_rect, radio_group, radio_options,
+        select, slider, text_field,
     };
 
     /// The text data of the single text child under `node`, if any.
@@ -2480,6 +2481,158 @@ mod controls {
         runner.update(|state| state.selected = 1);
         assert_eq!(runner.state().selected, 1);
         assert_eq!(runner.focus(), None);
+    }
+
+    /// Disabled radio options keep their place but cannot be clicked, focused
+    /// or reached by arrows, `Home` or `End`; the indicator is its own element
+    /// beside the label text, so the option's text is the label alone.
+    #[test]
+    fn radio_options_skip_disabled_and_draw_a_separate_indicator() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |s: &RadioGroup| {
+                radio_options(
+                    s,
+                    &[
+                        RadioOption::new("Auto"),
+                        RadioOption::new("Reader")
+                            .disabled(true)
+                            .with_attr("data-id", "reader"),
+                        RadioOption::new("Genet"),
+                        RadioOption::new("Servo").disabled(true),
+                    ],
+                )
+            },
+            RadioGroup::new(0),
+        );
+        let root = runner.root();
+        let option = |i: usize| dom.borrow().dom_children(root).nth(i).expect("option");
+        let (auto, reader, genet, servo) = (option(0), option(1), option(2), option(3));
+
+        assert_eq!(
+            attr(&dom.borrow(), reader, "aria-disabled").as_deref(),
+            Some("true")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), reader, "class").as_deref(),
+            Some("radio disabled")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), reader, "data-id").as_deref(),
+            Some("reader")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), reader, "aria-label").as_deref(),
+            Some("Reader")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), auto, "class").as_deref(),
+            Some("radio selected")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), reader, "tabindex").as_deref(),
+            Some("-1")
+        );
+        assert_eq!(attr(&dom.borrow(), auto, "tabindex").as_deref(), Some("0"));
+
+        let parts: Vec<_> = dom.borrow().dom_children(genet).collect();
+        assert_eq!(parts.len(), 2, "indicator and label are separate nodes");
+        assert_eq!(
+            attr(&dom.borrow(), parts[0], "class").as_deref(),
+            Some("radio-indicator")
+        );
+        let label = dom
+            .borrow()
+            .dom_children(parts[1])
+            .next()
+            .expect("label text");
+        assert_eq!(dom.borrow().text(label).as_deref(), Some("Genet"));
+
+        runner.dispatch_click(reader, PointerClick::at((0.0, 0.0)));
+        runner.dispatch_click(servo, PointerClick::at((0.0, 0.0)));
+        assert_eq!(runner.state().selected, 0, "disabled options ignore clicks");
+
+        runner.set_focus(Some(auto));
+        runner.dispatch_key(named(NamedKey::ArrowRight));
+        assert_eq!(runner.state().selected, 2, "arrows skip disabled options");
+        assert_eq!(runner.focus(), Some(genet));
+        runner.dispatch_key(named(NamedKey::End));
+        assert_eq!(
+            runner.state().selected,
+            2,
+            "End stops at the last enabled option"
+        );
+        runner.dispatch_key(named(NamedKey::Home));
+        assert_eq!(
+            runner.state().selected,
+            0,
+            "Home goes to the first enabled option"
+        );
+        runner.set_focus(Some(reader));
+        runner.dispatch_key(named(NamedKey::Space));
+        assert_eq!(
+            runner.state().selected,
+            0,
+            "a disabled option cannot be activated"
+        );
+    }
+
+    /// A saved selection that has become disabled stays checked, and the first
+    /// enabled option becomes the tab stop.
+    #[test]
+    fn radio_options_keep_a_disabled_selection_but_move_the_tab_stop() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |s: &RadioGroup| {
+                radio_options(
+                    s,
+                    &[RadioOption::new("a"), RadioOption::new("b").disabled(true)],
+                )
+            },
+            RadioGroup::new(1),
+        );
+        let root = runner.root();
+        let b = dom.borrow().dom_children(root).nth(1).expect("b");
+        let a = dom.borrow().dom_children(root).next().expect("a");
+        assert_eq!(
+            attr(&dom.borrow(), b, "aria-checked").as_deref(),
+            Some("true")
+        );
+        assert_eq!(attr(&dom.borrow(), b, "tabindex").as_deref(), Some("-1"));
+        assert_eq!(attr(&dom.borrow(), a, "tabindex").as_deref(), Some("0"));
+    }
+
+    /// The checkbox draws through an empty `control-mark` child and a disabled
+    /// one is announced and inert.
+    #[test]
+    fn checkbox_mark_is_a_child_and_disabled_is_inert() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |c: &bool| checkbox_disabled::<bool, ()>(*c),
+            true,
+        );
+        let cb = runner.root();
+        assert_eq!(
+            attr(&dom.borrow(), cb, "aria-disabled").as_deref(),
+            Some("true")
+        );
+        assert_eq!(
+            attr(&dom.borrow(), cb, "class").as_deref(),
+            Some("checkbox checked disabled")
+        );
+        let mark = dom.borrow().dom_children(cb).next().expect("mark");
+        assert_eq!(
+            attr(&dom.borrow(), mark, "class").as_deref(),
+            Some("control-mark")
+        );
+        assert!(
+            dom.borrow().dom_children(mark).next().is_none(),
+            "no glyph text"
+        );
+        assert_eq!(attr(&dom.borrow(), cb, "tabindex"), None);
     }
 
     /// ARIA roles expose semantics; they do not opt arbitrary nodes into

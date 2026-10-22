@@ -220,7 +220,7 @@ fn the_persons_mosaic_survives_a_saved_scene() {
     let arranged = canvas.strategy_regions().to_vec();
     let json = serde_json::to_string(&canvas.cartography_geometry()).unwrap();
 
-    let geometry: crate::canvas::geometry::CartographyGeometry =
+    let geometry: pandect::CartographyGeometry =
         serde_json::from_str(&json).unwrap();
     let mut restored = Canvas::with_graph(canvas.graph().clone());
     restored.resize(VIEW.0, VIEW.1);

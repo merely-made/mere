@@ -3,6 +3,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 //! [`checkbox`] / [`toggle`]: a `bool`-backed control flipped on click.
+//!
+//! The control is a `span` carrying the role, ARIA state and a class; its one
+//! `control-mark` child is the check fill or switch thumb. [`SHELL_CSS`]
+//! (crate::SHELL_CSS) draws both, so there is no glyph or bracket text for a
+//! stylesheet to fight and the label stays a separate node beside the control.
 
 use crate::{El, Focusable, OnClick, PointerClick, clickable, el};
 
@@ -11,54 +16,56 @@ fn flip(checked: &mut bool, _: PointerClick) {
     *checked = !*checked;
 }
 
+/// The element a checkbox / toggle draws: the box or track, holding its mark.
+pub type CheckElement<State, Action> = El<El<(), State, Action>, State, Action>;
+
 /// The concrete view type a checkbox / toggle produces: an `on_click`-wrapped
 /// element reflecting the checked state.
 pub type Checkbox =
-    Focusable<OnClick<El<&'static str, bool, ()>, bool, (), fn(&mut bool, PointerClick)>>;
+    Focusable<OnClick<CheckElement<bool, ()>, bool, (), fn(&mut bool, PointerClick)>>;
 
-/// Build a checkbox-style control with the given `kind` class (`"checkbox"` /
-/// `"toggle"`), reflecting `checked` as a textual indicator, an ARIA state, and
-/// a `checked` class for styling.
-fn build_check(kind: &'static str, checked: bool) -> Checkbox {
-    // ASCII indicator (reliably renders without special fonts); the host styles
-    // the `kind` / `checked` classes for the real look.
-    let indicator = if checked { "[x]" } else { "[ ]" };
-    let class = if checked { kind_checked(kind) } else { kind };
-    let aria = if checked { "true" } else { "false" };
-    let role = if kind == "toggle" {
-        "switch"
-    } else {
-        "checkbox"
+/// Build the element for `kind` (`"checkbox"` / `"toggle"`).
+fn check_element<State: 'static, Action: 'static>(
+    kind: &'static str,
+    checked: bool,
+    disabled: bool,
+) -> CheckElement<State, Action> {
+    let toggle = kind == "toggle";
+    let class = match (toggle, checked, disabled) {
+        (false, false, false) => "checkbox",
+        (false, true, false) => "checkbox checked",
+        (false, false, true) => "checkbox disabled",
+        (false, true, true) => "checkbox checked disabled",
+        (true, false, false) => "toggle",
+        (true, true, false) => "toggle checked",
+        (true, false, true) => "toggle disabled",
+        (true, true, true) => "toggle checked disabled",
     };
-    let label = if kind == "toggle" {
-        "Toggle"
-    } else {
-        "Checkbox"
-    };
-    let handler: fn(&mut bool, PointerClick) = flip;
-    clickable(
-        el::<_, bool, ()>("span", indicator)
-            .attr("role", role)
-            .attr("aria-label", label)
-            .attr("aria-checked", aria)
-            .attr("class", class),
-        handler,
+    let element = el::<_, State, Action>(
+        "span",
+        el::<_, State, Action>("span", ()).attr("class", "control-mark"),
     )
+    .attr("role", if toggle { "switch" } else { "checkbox" })
+    .attr("aria-label", if toggle { "Toggle" } else { "Checkbox" })
+    .attr("aria-checked", if checked { "true" } else { "false" })
+    .attr("class", class);
+    if disabled {
+        element.attr("aria-disabled", "true")
+    } else {
+        element
+    }
 }
 
-/// `"checkbox checked"` / `"toggle checked"` — the class string for a checked
-/// control of the given `kind`.
-fn kind_checked(kind: &'static str) -> &'static str {
-    match kind {
-        "toggle" => "toggle checked",
-        _ => "checkbox checked",
-    }
+fn build_check(kind: &'static str, checked: bool) -> Checkbox {
+    let handler: fn(&mut bool, PointerClick) = flip;
+    clickable(check_element(kind, checked, false), handler)
 }
 
 /// A reusable checkbox whose state *is* a `bool`. Clicking it toggles the bool;
 /// it reflects the state as `role="checkbox"` + `aria-checked` (for the a11y
-/// tree) and a `checkbox` / `checkbox checked` class (for host styling), with an
-/// ASCII `[x]` / `[ ]` fallback indicator. Composes onto an app's bool field via
+/// tree) and a `checkbox` / `checkbox checked` class. The shell sheet draws the
+/// box and its fill; the element holds no text, so the label is the caller's
+/// own sibling node. Composes onto an app's bool field via
 /// [`lens`](crate::lens), like [`text_field`](crate::text_field) onto a
 /// [`TextInput`](crate::TextInput).
 pub fn checkbox(checked: bool) -> Checkbox {
@@ -72,8 +79,19 @@ pub fn checkbox_typed(checked: bool) -> Checkbox {
     build_check("checkbox", checked)
 }
 
+/// A checkbox that cannot be flipped: `aria-disabled="true"` and a `disabled`
+/// class for the dimmed look, with no click handler and no tab stop. `checked`
+/// still shows the held value. Generic over the caller's state because it has
+/// no handler to bind it to a `bool`.
+pub fn checkbox_disabled<State: 'static, Action: 'static>(
+    checked: bool,
+) -> CheckElement<State, Action> {
+    check_element("checkbox", checked, true)
+}
+
 /// A toggle switch — behaviourally a [`checkbox`] (a `bool`, flipped on click),
-/// distinguished only by a `toggle` class so the host styles it as a switch.
+/// distinguished only by a `toggle` class so the shell sheet draws it as a
+/// switch.
 pub fn toggle(checked: bool) -> Checkbox {
     build_check("toggle", checked)
 }

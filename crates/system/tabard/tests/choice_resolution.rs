@@ -170,3 +170,25 @@ fn font_requests_survive_theme_fallback_without_entering_the_definition() {
             .contains("Missing face")
     );
 }
+
+#[test]
+fn presentation_stylesheet_is_one_function_for_derived_and_authored() {
+    let registry = ThemeRegistry::default();
+    let derived = resolve_theme_choice(&registry, &ThemeChoice::new(THEME_ID_DEFAULT, Some(Mode::Light))).unwrap();
+    let sheet = tabard::presentation_stylesheet(&derived.presentation, &Mode::Light, THEME_ID_DEFAULT, ".role{}");
+    let ThemePresentation::Derived(palette) = &derived.presentation else { panic!() };
+    assert_eq!(sheet, format!("{}\n.role{{}}\n", palette.css_custom_properties()));
+
+    let authored = ThemePresentation::AuthoredStylesheet(vec![":root{--tabard-color-bg:#123456}".into()]);
+    let light = tabard::presentation_palette(&authored, &Mode::Light, THEME_ID_DEFAULT);
+    let dark = tabard::presentation_palette(&authored, &Mode::Dark, THEME_ID_DEFAULT);
+    assert_ne!(light.palette.bg, dark.palette.bg, "the fallback follows the resolved mode");
+    assert_eq!(
+        tabard::presentation_palette(&authored, &Mode::Custom("garden".into()), THEME_ID_DEFAULT),
+        dark,
+        "a custom mode borrows the dark fallback"
+    );
+    let sheet = tabard::presentation_stylesheet(&authored, &Mode::Light, THEME_ID_DEFAULT, ".role{}");
+    assert!(sheet.starts_with(&light.css_custom_properties()));
+    assert!(sheet.ends_with(".role{}\n:root{--tabard-color-bg:#123456}"));
+}
