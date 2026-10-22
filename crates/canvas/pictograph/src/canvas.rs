@@ -153,6 +153,9 @@ pub use geometry::CartographyGeometry;
 /// The node accent palette every representation of a node tints from.
 pub mod palette;
 pub use palette::DerivedFacePalette;
+/// The Map's theme roles, resolved once for every host.
+pub mod theme;
+pub use theme::{CanvasRoles, CanvasTheme};
 
 mod area_share;
 /// Query similarity over the canvas: the embedding→numen field bridge and the

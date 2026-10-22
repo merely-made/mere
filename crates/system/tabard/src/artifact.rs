@@ -35,6 +35,12 @@ pub struct ModePalette {
 }
 
 impl ModePalette {
+    /// Tinct's gated roles for this mode, with the theme's category overrides
+    /// applied: the success, danger and category colours the stylesheet emits.
+    pub fn gated_roles(&self) -> crate::GatedRoles {
+        crate::gated_roles(&self.palette, &self.categories)
+    }
+
     /// Emit this already-derived mode as base and syntax properties at `:root`.
     /// This avoids deriving and validating again when a retained preview holds
     /// the exact palette for its current seeds, harmony and selected mode.
