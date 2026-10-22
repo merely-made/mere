@@ -1,0 +1,248 @@
+{
+  "source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
+  "built_on_this_host": true,
+  "frozen_source_inputs_unchanged": 1117,
+  "binaries_reverified": 2,
+  "capture_files": {
+    "scripted/sealed/acknowledged-after-refresh.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792701473855227100,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/before.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701465123971800,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/cancelled.png": {
+      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
+      "mtime_ns": 1792701465491443200,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/changed.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792701469057932400,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701477494496900,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/empty.png": {
+      "sha256": "fe0f3b0a4c719a1bf2b3e9eb8f640b8ebc0d5e197882ebb55d3d7c4e76585b6b",
+      "mtime_ns": 1792701467351858800,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/mismatch.png": {
+      "sha256": "abe11724ae66f077e52ca810d3c72e8c686655753d7bd86bbe3cbeaf813ba11c",
+      "mtime_ns": 1792701466909455600,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/sealed/wrong-current.png": {
+      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
+      "mtime_ns": 1792701466471836300,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/acknowledged-after-refresh.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792701488405799000,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/before.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701480646454600,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/cancelled.png": {
+      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
+      "mtime_ns": 1792701480999767500,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/changed.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792701484326001500,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701491453386500,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/empty.png": {
+      "sha256": "fe0f3b0a4c719a1bf2b3e9eb8f640b8ebc0d5e197882ebb55d3d7c4e76585b6b",
+      "mtime_ns": 1792701482657454200,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/mismatch.png": {
+      "sha256": "62da3e038a3613c84baeeea11b92064d6a5b70b17a84faa628c040cfc03df090",
+      "mtime_ns": 1792701482286932400,
+      "width": 1720,
+      "height": 1440
+    },
+    "scripted/portable/wrong-current.png": {
+      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
+      "mtime_ns": 1792701481937889000,
+      "width": 1720,
+      "height": 1440
+    },
+    "native-cold/sealed/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701567898529300,
+      "width": 1720,
+      "height": 1440
+    },
+    "native-cold/portable/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792701571058485700,
+      "width": 1720,
+      "height": 1440
+    }
+  },
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 119324,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 191940,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 176280,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 142160,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 168172,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 157704,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 128688,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 213740,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "scripted"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 62816,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 54028,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 174340,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 231688,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native-cold"
+    }
+  ],
+  "refresh_intervals": [
+    {
+      "mode": "scripted",
+      "format": "sealed",
+      "acknowledgement_after_refresh_seconds": 4.7972947
+    },
+    {
+      "mode": "scripted",
+      "format": "portable",
+      "acknowledgement_after_refresh_seconds": 4.0797975
+    }
+  ],
+  "process_check": {
+    "query": "read-only Win32_Process; exact frozen executable paths",
+    "task": {
+      "TaskName": "Mere-Dramatis-Authentication",
+      "State": 3
+    },
+    "ownedTestProcesses": [],
+    "timestampUtc": "2026-10-22T20:40:34.7640946Z"
+  },
+  "primary_before": {
+    "head": "e3ddbedcdb1fd3a1c6e9421f9a930367289c9a4b",
+    "status_lines": 64,
+    "status_sha256": "b6973b211f8854530c524bf8b03e0443161c6d1aad33f87211af451b6d5eeed1"
+  },
+  "primary_after": {
+    "head": "b91864193ae0015d65263e40948ac0d3a8d376c0",
+    "status_lines": 35,
+    "status_sha256": "e01eb1f5a55b5de07c55e095aa19c406c9aa2894f70fbac9942bfd28620dac40"
+  },
+  "primary_status_unchanged": false,
+  "primary_preservation_scope": "Task used an isolated worktree and did not write primary files. Concurrent primary changes are retained; status is not a content-hash preservation proof.",
+  "retained_receipt_byte_cap": 100000000
+}

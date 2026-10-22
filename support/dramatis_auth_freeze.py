@@ -16,13 +16,48 @@ import os
 from pathlib import Path
 import platform
 import plistlib
-import shlex
 import shutil
 import subprocess
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def depfile_sources(source):
+    """Read rustc's Make escapes without treating Windows separators as escapes."""
+    rule = source.replace("\\\n", " ").splitlines()[0]
+    dependencies = rule.split(": ", 1)[1]
+    names, word = [], []
+    index = 0
+    while index < len(dependencies):
+        char = dependencies[index]
+        if char == "\\" and index + 1 < len(dependencies) and dependencies[index + 1] in " \\#:":
+            word.append(dependencies[index + 1])
+            index += 2
+            continue
+        if char.isspace():
+            if word:
+                names.append("".join(word))
+                word = []
+        else:
+            word.append(char)
+        index += 1
+    if word:
+        names.append("".join(word))
+    return names
+
+
+def binary_format(path):
+    if platform.system() != "Windows":
+        return subprocess.check_output(["file", "-b", str(path)], text=True).strip()
+    data = path.read_bytes()
+    assert data[:2] == b"MZ" and len(data) >= 64, "not a Windows executable"
+    offset = int.from_bytes(data[60:64], "little")
+    assert data[offset:offset + 4] == b"PE\0\0", "missing PE header"
+    assert int.from_bytes(data[offset + 4:offset + 6], "little") == 0x8664, "unqualified PE architecture"
+    assert int.from_bytes(data[offset + 24:offset + 26], "little") == 0x20b, "not PE32+"
+    return "PE32+ x86-64 Windows executable"
 
 
 def main():
@@ -34,13 +69,14 @@ def main():
     repo = args.repo.resolve()
     output = args.output.resolve()
     output.mkdir(mode=0o700)
-    assert platform.system() in {"Linux", "Darwin"}, "unqualified native format"
+    assert platform.system() in {"Linux", "Darwin", "Windows"}, "unqualified native format"
+    suffix = ".exe" if platform.system() == "Windows" else ""
 
     def run(*command, cwd=repo):
-        return subprocess.check_output(command, cwd=cwd, text=True).strip()
+        return subprocess.check_output(command, cwd=cwd, text=True, encoding="utf-8").strip()
 
-    cargo = str(Path.home() / ".cargo/bin/cargo")
-    compiler = str(Path.home() / ".cargo/bin/rustc")
+    cargo = str(Path.home() / (".cargo/bin/cargo" + suffix))
+    compiler = str(Path.home() / (".cargo/bin/rustc" + suffix))
     if platform.system() == "Darwin":
         bundle = output / "Dramatis.app"
         app = bundle / "Contents/MacOS/dramatis-ui"
@@ -51,14 +87,14 @@ def main():
                           "CFBundleExecutable": "dramatis-ui", "CFBundlePackageType": "APPL",
                           "NSHighResolutionCapable": True}, stream)
     else:
-        app = output / "dramatis-ui"
-    shutil.copy2(args.artifacts / "debug/dramatis-ui", app)
-    artifacts = [json.loads(line) for line in args.host_build.read_text().splitlines()
+        app = output / ("dramatis-ui" + suffix)
+    shutil.copy2(args.artifacts / ("debug/dramatis-ui" + suffix), app)
+    artifacts = [json.loads(line) for line in args.host_build.read_text(encoding="utf-8").splitlines()
                  if line.startswith("{")]
     artifacts = [a for a in artifacts if a.get("reason") == "compiler-artifact"]
     host_source = next(a["executable"] for a in artifacts
                        if a["target"]["name"] == "passphrase_change" and a.get("executable"))
-    host = output / "authentication-host"
+    host = output / ("authentication-host" + suffix)
     shutil.copy2(host_source, host)
     if platform.system() == "Darwin":
         for path in [bundle, host]:
@@ -67,32 +103,31 @@ def main():
 
     info = json.loads(run(str(app), "--build-info"))
     names = {"Cargo.lock", "Cargo.toml", "ports/dramatis/Cargo.toml", "ports/dramatis/build.rs"}
-    names.update(str(p.relative_to(repo)) for p in (repo / "ports/dramatis/src").glob("*.rs"))
+    names.update(p.relative_to(repo).as_posix() for p in (repo / "ports/dramatis/src").glob("*.rs"))
     digest = hashlib.sha256()
     for name in sorted(names):
-        digest.update(name.encode() + b"\0" + (repo / name).read_text().replace("\r\n", "\n").encode() + b"\0")
+        digest.update(name.encode() + b"\0" + (repo / name).read_text(encoding="utf-8").replace("\r\n", "\n").encode() + b"\0")
     assert digest.hexdigest() == info["source_sha256"], "app source digest mismatch"
 
     files = set(names)
     files.update(["support/dramatis_auth_receipts.py", "support/dramatis_auth_freeze.py",
-                  "ports/djinn/tests/passphrase_change.rs"])
+                  "ports/djinn/tests/passphrase_change.rs", "scripts/test_dramatis_auth_tools.py"])
     depfiles = {args.artifacts / "debug/dramatis-ui.d"}
     for artifact in artifacts:
         manifest = Path(artifact["manifest_path"]).resolve()
         if manifest.is_relative_to(repo):
-            files.add(str(manifest.relative_to(repo)))
+            files.add(manifest.relative_to(repo).as_posix())
         for filename in artifact["filenames"]:
             stem = Path(filename).stem.removeprefix("lib")
             depfile = args.build_dir / "debug/deps" / (stem + ".d")
             if depfile.is_file():
                 depfiles.add(depfile)
     for depfile in depfiles:
-        rule = depfile.read_text().split(": ", 1)[1].split("\n\n", 1)[0].replace("\\\n", "")
-        for name in shlex.split(rule):
+        for name in depfile_sources(depfile.read_text(encoding="utf-8")):
             path = Path(name)
             path = (path if path.is_absolute() else repo / path).resolve()
             if path.is_relative_to(repo) and path.is_file():
-                files.add(str(path.relative_to(repo)))
+                files.add(path.relative_to(repo).as_posix())
     tracked = set(run("git", "ls-files").splitlines())
     assert files <= tracked, ("untracked repository build inputs", sorted(files - tracked))
 
@@ -117,15 +152,15 @@ def main():
             external_paths.append({"name": package["name"], "manifest": str(manifest)})
     for package in ["dramatis-app", "djinn"]:
         tree = run(cargo, "+" + args.toolchain, "tree", "--locked", "--offline", "-p", package, "--edges", "normal,build")
-        (output / (package + "-tree.txt")).write_text(tree + "\n")
+        (output / (package + "-tree.txt")).write_text(tree + "\n", encoding="utf-8")
         if package == "dramatis-app":
             assert "castellan v" not in tree, "secret custody entered the app dependency cone"
     binaries = {}
     for path in [app, host]:
-        binaries[str(path.relative_to(output))] = {
+        binaries[path.relative_to(output).as_posix()] = {
             "sha256": sha(path), "bytes": path.stat().st_size,
-            "format": run("file", "-b", str(path)),
-            "signing": "ad-hoc; timestamp none" if platform.system() == "Darwin" else "native ELF; no signing step",
+            "format": binary_format(path),
+            "signing": "ad-hoc; timestamp none" if platform.system() == "Darwin" else "native executable; no signing step",
         }
     value = {"source_commit": run("git", "rev-parse", "HEAD"), "build_info": info,
              "files": {name: sha(repo / name) for name in sorted(files)}, "binaries": binaries,
@@ -133,7 +168,7 @@ def main():
              "rustc": run(compiler, "+" + args.toolchain, "-Vv"), "depfiles_read": len(depfiles),
              "supplier_scope": "Resolved Git checkouts; tracked Rust/TOML/lock/WGSL/C/C++ only. Untracked and asset-only supplier changes excluded.",
              "environment": {key: os.environ.get(key) for key in ["CARGO_TARGET_DIR", "CARGO_BUILD_BUILD_DIR", "CARGO_PROFILE_DEV_DEBUG", "CARGO_PROFILE_TEST_DEBUG"]}}
-    (output / "build-inputs.json").write_text(json.dumps(value, indent=2) + "\n")
+    (output / "build-inputs.json").write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"source": value["source_commit"], "files": len(files), "git_suppliers": len(suppliers), "binaries": binaries}))
 
 

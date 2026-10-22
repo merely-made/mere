@@ -1,0 +1,111 @@
+{
+  "captures": [
+    {
+      "digest": "d2f169f086595ecc",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "238848",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\sealed\\cold-reopened.png",
+      "path": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\sealed\\cold-reopened.png",
+      "viewport": null,
+      "width": 1720
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 1,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 23,
+        "layout_rebuilt": 1,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 1647,
+        "acquire_us": 169,
+        "capture_us": 0,
+        "clear_us": 605,
+        "compose_us": 930,
+        "content_extent_us": 26,
+        "dirty_tile_rebuild_us": 225,
+        "emit_scene_us": 863,
+        "excluding_acquire_present_capture_us": 31987,
+        "frame_hook_us": 4,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 14522,
+        "layout_tick_us": 0,
+        "layout_update_us": 14534,
+        "layout_with_text_us": 11654,
+        "leaf_boxes_us": 27,
+        "leaf_fragments_us": 5,
+        "leaf_render_us": 1,
+        "master_compose_us": 15,
+        "pointer_us": 4,
+        "present_us": 302,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 8260,
+        "raster_us": 13273,
+        "relayout_us": 14566,
+        "shadows_us": 0,
+        "style_resolve_us": 2785,
+        "tile_invalidate_us": 109,
+        "total_us": 32458,
+        "vello_render_us": 7895
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "busy": "false",
+    "locked": "false",
+    "notice": "",
+    "pid": "238848",
+    "profiles": "2",
+    "ready": "true"
+  },
+  "frames": 4,
+  "kind": "dramatis",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 4,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "captured C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\sealed\\cold-reopened.png"
+  ],
+  "unpresented_redraws": 0
+}

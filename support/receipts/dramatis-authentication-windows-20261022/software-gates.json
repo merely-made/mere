@@ -1,0 +1,199 @@
+{
+  "source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
+  "environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "RUSTUP_TOOLCHAIN": "1.99.1"
+  },
+  "commands": [
+    {
+      "name": "locked-metadata-fetch",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit": 0,
+      "seconds": 79.64100000000326,
+      "passed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "tool-tests",
+      "command": [
+        "C:\\Users\\mark_\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "scripts/test_dramatis_auth_tools.py"
+      ],
+      "exit": 0,
+      "seconds": 1.375,
+      "passed": 3,
+      "ignored": 0
+    },
+    {
+      "name": "dialog-lifecycle-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "light-file-dialog",
+        "--lib",
+        "password_windows_can_be_created_again_after_cancellation",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 100.14100000000326,
+      "passed": 1,
+      "ignored": 0
+    },
+    {
+      "name": "resident-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "-j1",
+        "-p",
+        "djinn",
+        "--test",
+        "passphrase_change",
+        "--message-format=json",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 243.67199999996228,
+      "passed": 2,
+      "ignored": 1
+    },
+    {
+      "name": "app-tests",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "-j1",
+        "-p",
+        "dramatis-app",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 40.73399999999674,
+      "passed": 15,
+      "ignored": 3
+    },
+    {
+      "name": "boundary",
+      "command": [
+        "C:\\Users\\mark_\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit": 0,
+      "seconds": 5.639999999955762,
+      "passed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "app-final-build",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "dramatis-app",
+        "--bin",
+        "dramatis-ui"
+      ],
+      "exit": 0,
+      "seconds": 13.297000000020489,
+      "passed": 0,
+      "ignored": 0
+    },
+    {
+      "name": "freeze",
+      "command": [
+        "C:\\Users\\mark_\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "support/dramatis_auth_freeze.py",
+        "--repo",
+        "C:\\Users\\mark_\\Code\\worktrees\\mere-authentication",
+        "--artifacts",
+        "C:/t/cargo-targets/mere",
+        "--build-dir",
+        "C:/t/cargo-targets/mere/build",
+        "--host-build",
+        "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\host-build.jsonl",
+        "--output",
+        "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\frozen"
+      ],
+      "exit": 0,
+      "seconds": 71.31199999997625,
+      "passed": 0,
+      "ignored": 0
+    }
+  ],
+  "reused_component_gates": {
+    "source": "5641d2fb0c1caef09267dc6e5cb7bcc1976635bf",
+    "commands": [
+      {
+        "name": "storage-tests",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "test",
+          "--locked",
+          "-j1",
+          "-p",
+          "castellan",
+          "--features",
+          "keeper",
+          "--lib",
+          "passphrase",
+          "--",
+          "--test-threads=1"
+        ],
+        "exit": 0,
+        "seconds": 97.51600000000326,
+        "passed": 25,
+        "ignored": 0,
+        "log_path": "component-gates/storage-tests.log.gz"
+      },
+      {
+        "name": "provider-tests",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "test",
+          "--locked",
+          "-j1",
+          "-p",
+          "djinn",
+          "--lib",
+          "identity_ui::tests",
+          "--",
+          "--test-threads=1"
+        ],
+        "exit": 0,
+        "seconds": 353.14000000001397,
+        "passed": 4,
+        "ignored": 0,
+        "log_path": "component-gates/provider-tests.log.gz"
+      }
+    ],
+    "reason": "Castellan and identity_ui sources, their tests and authentication dependency versions are unchanged; the subsequent update changes Knot checkpoint receiving. Current custody/app tests and headed integration run again."
+  }
+}

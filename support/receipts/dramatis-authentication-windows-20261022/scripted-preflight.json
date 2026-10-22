@@ -1,0 +1,18 @@
+{
+  "mode": "scripted",
+  "source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
+  "session_id": 1,
+  "active_console_session": 1,
+  "input_desktop": "Default",
+  "hostname": "O-PC",
+  "windows_version": [
+    "11",
+    "10.0.26220",
+    "SP0",
+    "Multiprocessor Free"
+  ],
+  "pid": 180660,
+  "controller_sha256": "fd84e8667ea5cf65314f5c34d6425ef199cff8be80ef92b15cb2a3ed5400289a",
+  "interactive_task": true,
+  "gpu_backend": "native host default"
+}

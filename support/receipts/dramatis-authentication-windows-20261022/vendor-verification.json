@@ -1,0 +1,30 @@
+{
+  "registry_checksum_verified": "e0ff68a194d2c895e07893a1651c2babd69cf7301b297a5d5ad3e25e684a0d13",
+  "copied_files_compared_to_published_archive": 15,
+  "unchanged_files": [
+    "Cargo.toml",
+    "README.md",
+    "examples/hello.rs",
+    "src/dialog.rs",
+    "src/helpers.rs",
+    "src/lib.rs",
+    "src/state.rs",
+    "src/types.rs",
+    "src/unix/detect.rs",
+    "src/unix/mod.rs",
+    "src/windows/basic_input.rs",
+    "src/windows/console.rs",
+    "src/windows/mod.rs",
+    "src/windows/utf.rs"
+  ],
+  "changed_files": [
+    "src/windows/gui.rs"
+  ],
+  "modified_windows_gui_sha256": "502c46f8793ab3d483bcdc5dd426076c363c54557922c310b98eca1fbeeb530a",
+  "upstream_vcs": {
+    "git": {
+      "sha1": "d982e0a7fa5783065172293e567f4c4eb4eb3454"
+    },
+    "path_in_vcs": ""
+  }
+}
