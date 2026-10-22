@@ -127,8 +127,6 @@ pub use types::{
 pub mod cartography_scene;
 /// Visual couplings → paint overlays (the numen field paint pass).
 pub mod coupling_paint;
-/// Cartography geometry: the settled-layout sidecar the host persists.
-pub mod geometry;
 /// Render a cartography `Projection` into a `paint_list_api` paint list.
 pub mod scene_paint;
 
@@ -148,11 +146,13 @@ pub use cartography_scene::{
     project_canvas_strategy_with_score, project_canvas_strategy_with_score_for_view,
     project_canvas_subgraph, project_with, signal_overlays,
 };
-pub use geometry::CartographyGeometry;
 
 /// The node accent palette every representation of a node tints from.
 pub mod palette;
 pub use palette::DerivedFacePalette;
+/// The Map's theme roles, resolved once for every host.
+pub mod theme;
+pub use theme::{CanvasRoles, CanvasTheme};
 
 mod area_share;
 /// Query similarity over the canvas: the embedding→numen field bridge and the
@@ -183,6 +183,8 @@ mod folds;
 pub mod gestures;
 /// Arrangement and physics actions a host's controls apply.
 pub mod physics_controls;
+/// The scene both hosts persist, captured from and restored onto the canvas.
+pub mod saved_scene;
 pub use folds::FoldBadge;
 mod frame;
 mod frame_profile;

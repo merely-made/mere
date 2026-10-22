@@ -13,7 +13,7 @@ use forme::GraphMemberId;
 use kernel::geometry::PortablePoint;
 
 use super::Canvas;
-use super::geometry::{CartographyGeometry, SavedMosaic, SavedRegion};
+use pandect::{CartographyGeometry, SavedMosaic, SavedRegion};
 use super::mosaic::MosaicState;
 
 impl Canvas {

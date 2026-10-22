@@ -1782,7 +1782,7 @@ mod tests {
         let landed = canvas.cartography_geometry();
         let slots = canvas.arrangement_roles().clone();
         assert_eq!(slots.default, Role::Anchored);
-        let seeded_at = |geometry: &crate::canvas::CartographyGeometry| {
+        let seeded_at = |geometry: &pandect::CartographyGeometry| {
             geometry
                 .iter()
                 .find(|(id, _)| *id == seeded)
