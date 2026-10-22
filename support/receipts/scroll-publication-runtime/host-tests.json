@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-22T18:46:31.8789473Z",
+  "basis": "42b68310881f3741e15401015c2b9e03cb899f20",
+  "lock_sha256": "b8b3fbec2b541350246d19a02b119456251bdf63261fecfddbf7eb6bd9693b54",
+  "gates": [
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --lib moot_site::tests --quiet",
+      "exit_code": 0,
+      "summary": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 239 filtered out; finished in 8.34s"
+      ]
+    },
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --lib resident_site::tests --quiet",
+      "exit_code": 0,
+      "summary": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 236 filtered out; finished in 0.26s"
+      ]
+    }
+  ]
+}
