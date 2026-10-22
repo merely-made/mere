@@ -45,6 +45,7 @@ def main():
     assert not a.native_cancel or a.native,'--native-cancel requires --native'
     a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
     repo=Path(__file__).resolve().parents[1];processes=[];results=[];graphical={}
+    child_options={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
     if a.desktop:
         graphical,desktop=desktop_environment()
         (a.output/'desktop.json').write_text(json.dumps(desktop,indent=2)+'\n',encoding='utf-8')
@@ -57,7 +58,7 @@ def main():
                 if key.startswith(('DRAMATIS_','GRAPHSHELL_','PERSONAE_','MERE_','D_AUTH_')):env.pop(key)
             env.update(graphical)
             env.update(D_AUTH_ROOT=str(root.resolve()),D_AUTH_FORMAT=fmt,D_AUTH_PHASE=phase,D_AUTH_NATIVE='1' if a.native else '0')
-            host=subprocess.Popen([str(a.host.resolve()),'--ignored','--exact','headed_authentication_host','--nocapture'],cwd=repo,env=env,stdout=host_log,stderr=subprocess.STDOUT)
+            host=subprocess.Popen([str(a.host.resolve()),'--ignored','--exact','headed_authentication_host','--nocapture'],cwd=repo,env=env,stdout=host_log,stderr=subprocess.STDOUT,**child_options)
             try:
                 wait_file(root/'ready',host)
                 endpoint=(root/'ready').read_text(encoding='utf-8')
@@ -75,7 +76,7 @@ def main():
                 scn=out/(phase+'.scn');scn.write_text(script,encoding='utf-8')
                 shown=env|{'GRAPHSHELL_APP_ENDPOINT':endpoint,'DRAMATIS_SCENARIO':str(scn),'DRAMATIS_RECEIPT':str(out/(phase+'.json'))}
                 with (out/(phase+'-app.log')).open('w',encoding='utf-8') as log:
-                    app=subprocess.Popen([str(a.binary.resolve())],cwd=repo,env=shown,stdout=log,stderr=subprocess.STDOUT)
+                    app=subprocess.Popen([str(a.binary.resolve())],cwd=repo,env=shown,stdout=log,stderr=subprocess.STDOUT,**child_options)
                     try:app.wait(timeout=600)
                     finally:
                         if app.poll() is None:app.terminate();app.wait(timeout=15)
