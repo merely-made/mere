@@ -2523,6 +2523,10 @@ mod controls {
             Some("reader")
         );
         assert_eq!(
+            attr(&dom.borrow(), reader, "aria-label").as_deref(),
+            Some("Reader")
+        );
+        assert_eq!(
             attr(&dom.borrow(), auto, "class").as_deref(),
             Some("radio selected")
         );
