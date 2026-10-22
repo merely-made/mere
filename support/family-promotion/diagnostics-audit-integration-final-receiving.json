@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-22",
+  "qualification": "diagnostics-audit-integration-qualification.json",
+  "qualification_sha256": "f93ff83bf445633a90686f8b8f087f0e27a7bd4690311be01fd39e37229f28ef",
+  "concurrent_djinn_commit": "121a17b23036360a0e16248bf49c0064fbe220c9",
+  "receiving_merge": "f711a698030ab7f86e44e36242c17636732005e0",
+  "tested_source_hashes_unchanged": 27,
+  "cargo_lock_unchanged": true,
+  "locked_offline_metadata": {
+    "exit_code": 0,
+    "workspace_members": 92
+  },
+  "scope": "Concurrent changes confined to Djinn source; the existing affected-test results cover identical audited source, workspace manifest and Cargo.lock. No claim of testing the new optional Djinn backend.",
+  "cleanup": "Own integration worktree removed after primary receiving; shared target retained."
+}
