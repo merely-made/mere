@@ -41,17 +41,27 @@ def main():
     p.add_argument('--native-cancel',action='store_true',help='cancel the first native prompt in each format before retrying')
     p.add_argument('--desktop',action='store_true',help='use the existing unlocked Linux user desktop')
     p.add_argument('--format',choices=['sealed','portable','both'],default='both')
+    p.add_argument('--reopen-only',action='store_true',help='cold reopen already changed, marker-owned synthetic fixtures without collecting input')
     a=p.parse_args()
     assert not a.native_cancel or a.native,'--native-cancel requires --native'
-    a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
+    assert not a.reopen_only or not a.native_cancel,'cold reopens do not prompt'
+    formats=['sealed','portable'] if a.format=='both' else [a.format]
+    if a.reopen_only:
+        for fmt in formats:
+            root=a.runtime/fmt
+            assert (root/'.authentication-fixture').read_text(encoding='utf-8')=='public synthetic authentication'
+            assert not (root/'ready').exists() and not (root/'stop').exists(),'fixture is still active'
+    else:
+        a.runtime.mkdir(mode=0o700,parents=True)
+    a.output.mkdir(parents=True)
     repo=Path(__file__).resolve().parents[1];processes=[];results=[];graphical={}
     child_options={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
     if a.desktop:
         graphical,desktop=desktop_environment()
         (a.output/'desktop.json').write_text(json.dumps(desktop,indent=2)+'\n',encoding='utf-8')
-    for fmt in (['sealed','portable'] if a.format=='both' else [a.format]):
+    for fmt in formats:
         root=a.runtime/fmt;out=(a.output/fmt).resolve();out.mkdir()
-        for phase in ['seed','reopen']:
+        for phase in (['reopen'] if a.reopen_only else ['seed','reopen']):
             host_log=(out/(phase+'-host.log')).open('w',encoding='utf-8')
             env=os.environ.copy()
             for key in list(env):
@@ -98,7 +108,7 @@ def main():
         assert before==cold and (out/'old-rejected').read_text(encoding='utf-8')=='true'
         results.append({'format':fmt,'identities_preserved':True,'old_rejected_after_cold_reopen':True})
     result={'result':'ok','source':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),
-      'native_dialogs':a.native,'native_cancellation':a.native_cancel,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
+      'native_dialogs':a.native and not a.reopen_only,'native_provider_selected':a.native,'native_cancellation':a.native_cancel,'reopen_only':a.reopen_only,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
       'binaries':{'app_sha256':sha(a.binary),'host_sha256':sha(a.host)},'controller_sha256':sha(Path(__file__))}
     (a.output/'qualification.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result),flush=True)
 if __name__=='__main__':main()
