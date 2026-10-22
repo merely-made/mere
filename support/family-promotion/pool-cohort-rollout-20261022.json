@@ -1,0 +1,368 @@
+{
+  "kind": "Coordinated Q112/Q113 receiving rollout",
+  "date": "2026-10-22",
+  "supplier_repair_receipt": "pool-lifetime-20261021.json",
+  "suppliers": {
+    "armillary": "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc",
+    "esp": "6d6ad84b773c9baf2390bd7807a21ca9887e6efd",
+    "knot": "a38f4253663845515bbf67ccfc04b26d7f6b715d",
+    "genet": "7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
+    "murm": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
+    "errand": "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab",
+    "apparatus_core_independent_pin": "75643df1f178757bb7b6386913af1a39353f3069"
+  },
+  "sdk_bootstrap": {
+    "revision": "639e78fc5e903895ff6bf49bde2cbde01deb6738",
+    "purpose": "Published staging ancestor breaks the Mere/Knot SDK receiving cycle. Final main preserves this ancestor; no source selector alias or local override."
+  },
+  "published_receivers": {
+    "esp": {
+      "revision": "6d6ad84b773c9baf2390bd7807a21ca9887e6efd",
+      "tests": "94 default passes, one existing ignored measurement; 88 actor passes on Rust 1.99.1 and 1.97.1",
+      "receipt_local_only": "/Users/markik/Code/testing/armillary-pool-20261021/esp-evidence/qualification.json"
+    },
+    "isocosm": {
+      "revision": "3e3654002421090d2bc9936ab8f70a6cf2b61a76",
+      "tests": "3 actual session-bridge tests pass; root has one repaired Armillary; fixed WWW Mere cohort and all nine nested locks preserved",
+      "receipt_local_only": "/Users/markik/Code/testing/isocosm/armillary-pool-20261021/qualification.json"
+    },
+    "genet": {
+      "revision": "7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
+      "tests": "98 Netfetcher tests including 15 loopback WebSocket cases in byte-verified two-crate source workspace; actual Knot and Mere receiving compile canonical Git source",
+      "receipt": "genet/design_docs/receipts/2026-10-21_netfetcher_websocket_cohort/qualification.json",
+      "limit": "Full Genet workspace not exercised; unrelated Bole resolution blocked standalone full workspace."
+    },
+    "knot": {
+      "revision": "a38f4253663845515bbf67ccfc04b26d7f6b715d",
+      "tests": "2 provider/index identity tests, including refusal, reopen and rebuild, pass",
+      "receipt": "knot-editor/docs/receipts/2026-10-21_armillary_pool_intake/qualification.json"
+    }
+  },
+  "mere": {
+    "source_revision_before_receipt": "fb047fb6e453ee80b737585975766bfea2824b0c",
+    "graphs": [
+      {
+        "lock": "Cargo.lock",
+        "sha256": "d7a9f1553413f28356bb90ea4406726f5393cce3351a9c8aa9cd077d99dcc6fe",
+        "packages": [
+          {
+            "name": "apparatus-core",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+          },
+          {
+            "name": "armillary",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=92d5b15cf39aaac40a3f2d863ffee69c9be11bfc#92d5b15cf39aaac40a3f2d863ffee69c9be11bfc"
+          },
+          {
+            "name": "errand",
+            "version": "0.4.0",
+            "source": "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+          },
+          {
+            "name": "esp",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          },
+          {
+            "name": "esp-test-support",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          },
+          {
+            "name": "knot-editor",
+            "version": "0.0.3",
+            "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#a38f4253663845515bbf67ccfc04b26d7f6b715d"
+          },
+          {
+            "name": "murm-wire",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+          },
+          {
+            "name": "netfetcher",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8"
+          },
+          {
+            "name": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+          },
+          {
+            "name": "scroll-protocol",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+          }
+        ]
+      },
+      {
+        "lock": "ports/graphshell/web/Cargo.lock",
+        "sha256": "19a33f1e5597aaf4ad19abf3438b776b3a31762216d75706aab78885d87546da",
+        "packages": [
+          {
+            "name": "apparatus-core",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+          },
+          {
+            "name": "armillary",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=92d5b15cf39aaac40a3f2d863ffee69c9be11bfc#92d5b15cf39aaac40a3f2d863ffee69c9be11bfc"
+          },
+          {
+            "name": "esp",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          },
+          {
+            "name": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
+          }
+        ]
+      },
+      {
+        "lock": "ports/distillery/probe/Cargo.lock",
+        "sha256": "66d82638f32fccebd19b5a9b95a55c9b1b3960e4ca5b2c5448c44153ff50f0fd",
+        "packages": [
+          {
+            "name": "apparatus-core",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1f178757bb7b6386913af1a39353f3069"
+          },
+          {
+            "name": "esp",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          },
+          {
+            "name": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#d92050146768357ead4e4e42967866be7061262e"
+          }
+        ]
+      },
+      {
+        "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
+        "sha256": "b253c09dd16b319a9cee38f2c9a6b6b44f4d8c22452c3bc96cf98880f99bb87f",
+        "packages": [
+          {
+            "name": "armillary",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/armillary.git?rev=92d5b15cf39aaac40a3f2d863ffee69c9be11bfc#92d5b15cf39aaac40a3f2d863ffee69c9be11bfc"
+          },
+          {
+            "name": "esp",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          }
+        ]
+      },
+      {
+        "lock": "ports/distillery/probe/session-fixture/Cargo.lock",
+        "sha256": "728cdcd2a5779580fe99999493f3a781974620cad933d65d260bc2a86b13f670",
+        "packages": [
+          {
+            "name": "esp",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b773c9baf2390bd7807a21ca9887e6efd"
+          }
+        ]
+      }
+    ],
+    "gates": [
+      {
+        "label": "mere-bootstrap-boundary",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "python3",
+          "scripts/check_port_boundaries.py"
+        ],
+        "exit_code": 0,
+        "seconds": 3.06,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "ed6e8e6214358ac43d6f72e8549446b5ce8170b62a9813b557dc1d130eb24186",
+        "results": []
+      },
+      {
+        "label": "shared-key-admission",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "/Users/markik/Code/testing/pool-cohort-20261021/key-admission-test"
+        ],
+        "exit_code": 0,
+        "seconds": 0.17,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "67f1a18eb3faf4fec5bdf621afeecb35b7c8c5d2b115ee70ad6583928289c10a",
+        "results": [
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      {
+        "label": "mere-final-host",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+          "test",
+          "--locked",
+          "--offline",
+          "--target-dir",
+          "/Users/markik/Code/repos/mere/target",
+          "-j1",
+          "-p",
+          "cambium-genet-winit-host",
+          "--lib",
+          "--test",
+          "input_routing",
+          "--test",
+          "lifecycle"
+        ],
+        "exit_code": 0,
+        "seconds": 28.42,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "df529f06ccb3eba98ba6d4362e5bfe9d5cb973e6f7f12f92d6b260562966e4e6",
+        "results": [
+          "test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s",
+          "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      },
+      {
+        "label": "mere-distillery-receiving",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+          "test",
+          "--locked",
+          "--offline",
+          "--target-dir",
+          "/Users/markik/Code/repos/mere/target",
+          "-j1",
+          "-p",
+          "distillery",
+          "--features",
+          "inference",
+          "--lib",
+          "--test",
+          "inference_shutdown",
+          "--test",
+          "lifecycle",
+          "--test",
+          "resident"
+        ],
+        "exit_code": 0,
+        "seconds": 193.42,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "bf1b1237875bbdbab6add7c0af042bc7b719dd911fd77736309322763f548d2e",
+        "results": [
+          "test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s"
+        ]
+      },
+      {
+        "label": "mere-endpoint-receiving",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+          "test",
+          "--locked",
+          "--offline",
+          "--target-dir",
+          "/Users/markik/Code/repos/mere/target",
+          "-j1",
+          "-p",
+          "graphshell-endpoint",
+          "--features",
+          "door",
+          "--lib"
+        ],
+        "exit_code": 0,
+        "seconds": 45.13,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "68b0297a195f4b6de0e93518ef41403a709923faf1df8ecf5e1a5e34bd8e428e",
+        "results": [
+          "test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s"
+        ]
+      },
+      {
+        "label": "mere-djinn-and-knot-route-final",
+        "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/repos/mere/target/build\"",
+          "test",
+          "--locked",
+          "--offline",
+          "--target-dir",
+          "/Users/markik/Code/repos/mere/target",
+          "-j1",
+          "-p",
+          "djinn",
+          "--bin",
+          "djinn",
+          "--test",
+          "resident_tasks",
+          "--test",
+          "distillery_lane",
+          "--test",
+          "knot_app_route"
+        ],
+        "exit_code": 0,
+        "seconds": 118.29,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "5f5ed6df447d0119de949915d4fbc4bccb1eef32e35780cabd5936599dd39fce",
+        "results": [
+          "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+          "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+          "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        ]
+      }
+    ]
+  },
+  "compatibility": {
+    "websocket": "Genet optional tokio-tungstenite 0.29 -> 0.30 receives already-published Murm 0.30 boundary; no Rust source change.",
+    "scroll": "Receive existing Knot-qualified Errand 3d2ce3a family to expose Scroll Reply/ResponseLimits; older Mere override could not compile Knot site adapter. No protocol behavior edit in this rollout.",
+    "storage": "Standalone probes and Woodshed receiving use current Eidetic 34105d63 to keep public storage types identical with ESP.",
+    "netrender": "Preserve prior ec15eb26 mutable-branch lock where accepted, avoiding unrelated browser renderer intake."
+  },
+  "shared_host_guard": {
+    "donor": "woodshed@97bb21e5b265b76284ed715f975e4b0b18181a24",
+    "recorded_upstream": "mere@7de937d0e708db24d9a325cbff3fbe5beb3a4d3c",
+    "audit": "All 48 recorded original hashes verified; 46 originals byte-identical, one expanded manifest and event-guard lib delta. Guard/test transferred verbatim to native event owner.",
+    "guard_sha256": "46427d1209f323bcad89d9e5d39e187493a1eee025c8599fb51acba32b192669",
+    "host_lib_sha256": "0d9343fb2c11ec48e18566bec90ad4c2ba9d42fd076127173ce84e623ea3804f",
+    "donor_snapshot_files": 52,
+    "donor_snapshot_lines": 13288,
+    "retirement": "Pending published shared SDK receipt in Woodshed before removing its patch and snapshot."
+  },
+  "pending_product_receivers": [
+    "Turnstone",
+    "Cleromancy root and core",
+    "Woodshed root, Hocket, Redshank and relationship recipe",
+    "Murm Signalman desktop"
+  ],
+  "scope": "CPU/process/source receiving qualification. No new native UI, GPU, physical-device, heavy-model or Knot checkpoint feature acceptance. Pool Drop remains nonblocking and drains admitted jobs; retained public handles or long-lived actors may retain workers. workers() is total spawned, not live/joined count.",
+  "local_only_raw_evidence": "/Users/markik/Code/testing/pool-cohort-20261021"
+}
