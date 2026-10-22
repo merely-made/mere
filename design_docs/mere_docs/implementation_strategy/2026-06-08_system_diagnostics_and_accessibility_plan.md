@@ -9,6 +9,22 @@ recorded in `support/family-promotion/diagnostics-lifetimes-qualification.json`.
 10 MB receipt cap, with gates named in
 `support/family-promotion/diagnostics-lifetimes-brief.json`.
 
+**Current main receiving:** implementation `8d4864d91` is integrated over
+`49f0e197e` at merge `60daf11dc`. The merged cohort again passes 270 native tests
+with seven existing ignores, browser Wasm and embedding compilation. Its exact
+source and receipt hashes are in
+`support/family-promotion/diagnostics-lifetimes-integrated-qualification.json`.
+No diagnostic runtime source changed during the merge. The temporary receiving
+worktree preserves concurrent Djinn/lock work in the primary checkout.
+
+Later main receiving at `e1412c46d` includes the Q013 graph-snapshot repair.
+The lifetime implementation and its lock inputs remain unchanged; six focused
+native lifetime controls plus browser Wasm and embedding checks pass on that
+merge. `support/family-promotion/diagnostics-lifetimes-main-qualification.json`
+records this delta. The upstream graph owner's 474-test receipt remains
+separately attributable; the six lifetime controls are a subset of the earlier
+270-test cohorts, not additional unique tests or broad product acceptance.
+
 Queued AppCtx actions now bind the originating host, the document allocation,
 the window mount and, for generated actions, the logical producer registration.
 These are weak bindings: an acknowledgement keeps neither the document nor a
@@ -61,7 +77,15 @@ cross-document adoption preserves complete node identity.
   while `get_mut_as` updates a retained contributor. A DOM-target request can
   still reach a replacement leaf at the same DOM slot. A future registration
   contract must distinguish those operations at the registry, rather than
-  turning every value update into replacement.
+  turning every value update into replacement. The paint cache has the same
+  missing distinction: `LeafRegistry::render_into` gates on key/size/dirty and
+  carries a prior cached scene through `take_scene().or(prior_scene)` without
+  checking contributor replacement. Source inspection therefore identifies a
+  stale-cache path when a different leaf reuses a slot, especially Path B to
+  Path A. Runtime qualification is pending. One registry-owned replacement life
+  should serve paint reuse and action admission; test both clean replacements
+  and changed render paths at unchanged size, while retained value updates
+  keep their existing cache behavior.
 - **Platform ingress/publication:** native maps are rebuilt before draining
   requests. Native ROOT IDs and browser current maps still lack the originating
   document and contributor life. Raw `A11yRequest` constructors and direct
