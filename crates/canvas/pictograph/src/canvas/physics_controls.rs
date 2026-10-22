@@ -115,9 +115,6 @@ pub struct TwoLawGrouping {
 /// spec remains the authority for channels, target, seed, bars and
 /// realization; root overlays are carried onto the mix.
 pub fn apply_mix(canvas: &mut Canvas, mix: &TwoLawMix) -> Result<String, String> {
-    for (index, share) in [mix.first_share, mix.second_share].into_iter().enumerate() {
-        validate_runtime_share(share, &format!("root.parts[{index}].weight"))?;
-    }
     let mut spec = canvas.dynamics_spec()?;
     let overlays = spec.root.overlays().to_vec();
     spec.root = Node::Mix {
@@ -144,7 +141,6 @@ pub fn apply_mix(canvas: &mut Canvas, mix: &TwoLawMix) -> Result<String, String>
 /// spec remains the authority for channels, target, seed, bars and realization;
 /// root overlays are carried onto the grouping.
 pub fn apply_grouping(canvas: &mut Canvas, grouping: &TwoLawGrouping) -> Result<String, String> {
-    validate_runtime_share(grouping.outer_share, "root.outer.weight")?;
     let mut spec = canvas.dynamics_spec()?;
     let overlays = spec.root.overlays().to_vec();
     spec.root = Node::Grouped {
@@ -164,16 +160,6 @@ pub fn apply_grouping(canvas: &mut Canvas, grouping: &TwoLawGrouping) -> Result<
         grouping.outer.label(),
         grouping.inner.label()
     ))
-}
-
-fn validate_runtime_share(share: f64, path: &str) -> Result<(), String> {
-    let runtime = share as f32;
-    if !share.is_finite() || !runtime.is_finite() || (share != 0.0 && runtime == 0.0) {
-        return Err(format!(
-            "{path}: share must be finite and within the runtime weight range"
-        ));
-    }
-    Ok(())
 }
 
 /// Explicitly replace the root with `choice`'s single law, even when its law
