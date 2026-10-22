@@ -1,0 +1,131 @@
+{
+  "recorded_at": "2026-10-22T19:48:59.2469647Z",
+  "version": 1,
+  "gates": [
+    {
+      "exit_code": 0,
+      "name": "integrated native binary build",
+      "command": "cargo build -p djinn --no-default-features --features moot-site-nomadnet --bin djinn-moot-site --offline --locked --quiet",
+      "elapsed_seconds": 208.83
+    },
+    {
+      "exit_code": 0,
+      "summary": [
+        "running 9 tests",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 239 filtered out; finished in 9.45s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site-nomadnet --lib moot_site --offline --locked --quiet",
+      "elapsed_seconds": 113.37,
+      "owned_path_diagnostics": [],
+      "name": "integrated native host controls"
+    },
+    {
+      "exit_code": 0,
+      "summary": [
+        "running 8 tests",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 240 filtered out; finished in 0.17s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site-nomadnet --lib resident_site --offline --locked --quiet",
+      "elapsed_seconds": 9.32,
+      "owned_path_diagnostics": [],
+      "name": "integrated existing resident controls"
+    },
+    {
+      "exit_code": 0,
+      "summary": [
+        "running 8 tests",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 239 filtered out; finished in 7.99s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site --lib moot_site --offline --locked --quiet",
+      "elapsed_seconds": 73.96,
+      "owned_path_diagnostics": [],
+      "name": "integrated disabled backend controls"
+    },
+    {
+      "exit_code": 0,
+      "summary": [],
+      "command": "cargo check -p djinn --no-default-features --features moot-site --bin djinn-moot-site --offline --locked --quiet",
+      "elapsed_seconds": 25.52,
+      "owned_path_diagnostics": [],
+      "name": "integrated disabled backend CLI check"
+    },
+    {
+      "exit_code": 101,
+      "diagnostics": [
+        "error: unused import: `Graph`\n  --> ports\\djinn\\src\\knot_relation_intake.rs:19:20\n   |\n19 |     CapturedDelta, Graph, SemanticStatement, apply::GraphDelta, sub_kind_from_iri,\n   |                    ^^^^^",
+        "error: unused import: `Hash`\n  --> ports\\djinn\\src\\sync\\carriage_host.rs:30:26\n   |\n30 | use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};\n   |                          ^^^^",
+        "error: unused import: `HeldLease`\n  --> ports\\djinn\\src\\sync\\carriage_host_commissioning.rs:42:64\n   |\n42 | use super::{CarriageCeilings, CarriageHost, CarriageHostError, HeldLease, now_ms};\n   |                                                                ^^^^^^^^^",
+        "error: variable does not need to be mutable\n   --> ports\\djinn\\src\\resident_distillery.rs:875:24\n    |\n875 |     pub async fn close(mut self) -> Result<(), String> {\n    |                        ----^^^^",
+        "error: function `refusal` is never used\n  --> ports\\djinn\\src\\keeper\\review.rs:15:4\n   |\n15 | fn refusal(error: impl std::fmt::Display) -> CustodyRefusal {\n   |    ^^^^^^^",
+        "error: field `ceilings` is never read\n  --> ports\\djinn\\src\\sync\\carriage_host.rs:72:5\n   |\n62 | pub struct CarriageHost {\n   |            ------------ field in this struct",
+        "error: this function has too many arguments (8/7)\n   --> ports\\djinn\\src\\door\\app_broker.rs:259:1\n    |\n259 | / async fn serve_admitted_app<A, R, W>(\n260 | |     reader: &mut R,",
+        "error: this function has too many arguments (8/7)\n   --> ports\\djinn\\src\\door\\browser_carrier.rs:470:1\n    |\n470 | / pub async fn admit_browser_session<P: IdentityProvider>(\n471 | |     identity: &P,",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\embedded_reservoir.rs:141:21\n    |\n141 | /                     if let Some(expected) = options.persona {\n142 | |                         if persona != expected {",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\knot_relation_intake.rs:194:13\n    |\n194 | /             if let Some(previous) = seen_retractions.insert(retraction.operation, retraction) {\n195 | |                 if previous != retraction {",
+        "error: this function has too many arguments (10/7)\n   --> ports\\djinn\\src\\personal_sync.rs:133:1\n    |\n133 | / pub async fn start<P: IdentityProvider + ?Sized>(\n134 | |     identity: &P,",
+        "error: redundant closure\n   --> ports\\djinn\\src\\personal_sync.rs:185:18\n    |\n185 |         .map_err(|error| PersonalSyncHostError::Transport(error))?;\n    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace the closure with the tuple variant itself: `PersonalSyncHostError::Transport`",
+        "error: very complex type used. Consider factoring parts into `type` definitions\n   --> ports\\djinn\\src\\personal_sync.rs:608:28\n    |\n608 |     let authority_changes: Vec<([u8; 32], Option<[u8; 32]>, Option<[u8; 32]>)> = desired\n    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\resident_events\\diagnostics.rs:167:9\n    |\n167 | /         if self.failure.is_none() {\n168 | |             if let Err(error) = self.collector.collect(self.started.elapsed(), 1, |packet| {",
+        "error: field assignment outside of initializer for an instance created with Default::default()\n   --> ports\\djinn\\src\\resident_knot.rs:314:9\n    |\n314 |         rosette.max_source_bytes = config.max_source_bytes;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\resident_mere.rs:552:17\n    |\n552 | /                 if binding.instance != InstanceId(0) {\n553 | |                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {",
+        "error: the borrowed expression implements the required traits\n   --> ports\\djinn\\src\\resident_site.rs:835:53\n    |\n835 |         BlobLease::new(self.scope, LEASE_NAMESPACE, &digest)\n    |                                                     ^^^^^^^ help: change this to: `digest`",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\sync\\carriage_host.rs:487:17\n    |\n487 | /                 if operation.header.payload_hash == Some(current.payload) {\n488 | |                     if let Some(body) = operation.body {",
+        "error: using `chunks_exact` with a constant chunk size\n  --> ports\\djinn\\src\\sync\\personal_sync_host.rs:55:62\n   |\n55 |     for (slot, pair) in node.iter_mut().zip(value.as_bytes().chunks_exact(2)) {\n   |                                                              ^^^^^^^^^^^^^^^",
+        "error: this expression creates a reference which is immediately dereferenced by the compiler\n    --> ports\\djinn\\src\\sync\\personal_sync_host.rs:1219:17\n     |\n1219 |                 &node.url(),\n     |                 ^^^^^^^^^^^ help: change this to: `node.url()`",
+        "error: could not compile `djinn` (lib) due to 20 previous errors"
+      ],
+      "summary": [
+        "error: unused import: `Graph`",
+        "error: unused import: `Hash`",
+        "error: unused import: `HeldLease`",
+        "error: variable does not need to be mutable",
+        "error: function `refusal` is never used",
+        "error: field `ceilings` is never read",
+        "error: this function has too many arguments (8/7)",
+        "error: this function has too many arguments (8/7)",
+        "error: this `if` statement can be collapsed",
+        "error: this `if` statement can be collapsed",
+        "error: this function has too many arguments (10/7)",
+        "error: redundant closure",
+        "error: very complex type used. Consider factoring parts into `type` definitions",
+        "error: this `if` statement can be collapsed",
+        "error: field assignment outside of initializer for an instance created with Default::default()",
+        "error: this `if` statement can be collapsed",
+        "error: the borrowed expression implements the required traits",
+        "error: this `if` statement can be collapsed",
+        "error: using `chunks_exact` with a constant chunk size",
+        "error: this expression creates a reference which is immediately dereferenced by the compiler",
+        "error: could not compile `djinn` (lib) due to 20 previous errors"
+      ],
+      "command": "cargo clippy -p djinn --no-default-features --features moot-site-nomadnet --lib --bin djinn-moot-site --offline --locked --quiet --no-deps -- -D warnings",
+      "elapsed_seconds": 17.73,
+      "owned_path_diagnostics": [],
+      "name": "integrated strict no-deps clippy"
+    }
+  ],
+  "receiving_source": "1f660dcb4a9171b2867451d22fadd1a2ad50d174",
+  "scope": "Integrated dependency cohort requalification; host source and browser/client scope unchanged",
+  "previous_receiving_source": "7eec3720240fe788fc35073d6f4351e78759e831",
+  "native_binary_sha256": "d2ee5884c925d91118efaee712237ab00d78d2c38b02d0684ec6b89f347c5055",
+  "cargo_lock_sha256": "38f3c83b10800d687d9312e1812f14a55e70f34c1fddb786e6105138b691433d",
+  "retinue_supplier": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
+  "native_binary": "C:\\t\\cargo-targets\\mere\\debug\\djinn-moot-site.exe",
+  "lock_delta": "Six Knot package Git sources f44259964cd0b6ff27c21ab368ea7830fc11e0fe to98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b; no host manifest or other supplier update",
+  "strict_clippy_owned_path_diagnostic_count": 0,
+  "native_binary_bytes": 17853952,
+  "host_source_and_manifest_unchanged_from_previous_qualification": true,
+  "qualified_inputs_unchanged": true,
+  "frozen_at": "2026-10-22T19:57:50.7963475Z",
+  "knot_supplier": "98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b",
+  "source_sha256": {
+    "Cargo.lock": "38f3c83b10800d687d9312e1812f14a55e70f34c1fddb786e6105138b691433d",
+    "ports/djinn/Cargo.toml": "b367de1607bb9b696fb532cd4ad96eeecb97be793b6b2c83b627f21eac4b4d40",
+    "ports/djinn/src/moot_site.rs": "8213c0de5a8094e0f920ff03e43a210e4b7141dd56bdb9159a4d137fd4dfbd12",
+    "ports/djinn/src/micron_site.rs": "5a3c47681b02f909f849f41c2ecfca8fe75f926efc343ea160d8c2abd1d21405",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "6d524a56b157189c81669b9268edd12d75ee4526cfb23255a073678b74b00b9d"
+  },
+  "strict_clippy_baseline_same_messages_and_paths": true,
+  "strict_clippy_note": "Same20 existing diagnostics. Incoming resident_knot telemetry shifts its existing field_reassign_with_default location from305 to314; no new lint messages or host diagnostics.",
+  "native_binary_sha256_unchanged_after_tests_and_clippy": true,
+  "strict_clippy_existing_error_count": 20
+}
