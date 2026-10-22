@@ -74,3 +74,11 @@
 .cambium-shell-panel .list-row { box-sizing:border-box; font-size:var(--tabard-font-interface-size, 13px); line-height:1.4; padding:4px 10px; white-space:normal; overflow-wrap:anywhere; }
 .cambium-shell-panel .radio { box-sizing:border-box; min-height:26px; font-size:var(--tabard-font-interface-size, 13px); line-height:1.4; padding:3px 10px; overflow-wrap:anywhere; }
 .cambium-shell-panel button { box-sizing:border-box; min-height:28px; font-family:var(--tabard-font-interface, sans-serif); font-size:var(--tabard-font-interface-size, 13px); line-height:1.35; padding:4px 7px; }
+
+.cambium-read-toolbar { flex-shrink:0; color:inherit; font-size:13px; line-height:1.35; }
+.read-controls, .read-find { display:flex; align-items:center; flex-wrap:wrap; gap:2px; min-height:32px; }
+.read-value { font-size:12px; white-space:nowrap; padding:0 4px; }
+.read-find { padding-top:2px; }
+.read-query { min-width:64px; flex:1 1 96px; max-width:240px; min-height:28px; box-sizing:border-box; padding:3px 6px; border:1px solid currentColor; border-radius:4px; }
+.read-result { font-size:12px; padding:0 4px; white-space:nowrap; }
+.read-find-input { display:flex; align-items:center; min-width:0; flex:1 1 140px; max-width:360px; }
