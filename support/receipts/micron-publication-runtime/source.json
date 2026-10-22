@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "receiving_source": "7eec3720240fe788fc35073d6f4351e78759e831",
+  "primary_source": "121a17b23036360a0e16248bf49c0064fbe220c9",
+  "upstream_basis": "931a4ec8d2a83655a7cb4518088b0d487b04f990",
+  "receiving_retinue": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
+  "knot_fixture_source": "c282ef4",
+  "source_sha256": {
+    "Cargo.toml": "da9c5f101d15e7a0286527a3dc9c14e645beceba5ee7b173597df2c02c83a800",
+    "Cargo.lock": "4492caff62035e9140a7d7c36c6908a425055c832eec8f3d8765f7da1cf9d80a",
+    "ports/djinn/Cargo.toml": "b367de1607bb9b696fb532cd4ad96eeecb97be793b6b2c83b627f21eac4b4d40",
+    "ports/djinn/src/moot_site.rs": "8213c0de5a8094e0f920ff03e43a210e4b7141dd56bdb9159a4d137fd4dfbd12",
+    "ports/djinn/src/micron_site.rs": "5a3c47681b02f909f849f41c2ecfca8fe75f926efc343ea160d8c2abd1d21405",
+    "ports/djinn/src/resident_site.rs": "097308a90f118b999fdf3a9f4393e2b04b7c65d7565f69b473341cd9e74b4f91",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "6d524a56b157189c81669b9268edd12d75ee4526cfb23255a073678b74b00b9d"
+  },
+  "lock_delta": "One direct retinue dependency edge under djinn; no supplier source changes",
+  "concurrent_work": "Primary diagnostics source commit137c4fd4c preserved; scoped commits contain only owned paths; final source commit preserved exact foreign staged raw diff",
+  "shared_model": "No shared snapshot source or schema changes"
+}
