@@ -1,0 +1,325 @@
+{
+ "schema": "mere.ownership-repair.l6.v1",
+ "date": "2026-10-20",
+ "lane": "L6 misleading-success class",
+ "basis": {
+  "main": "c25c2d441",
+  "register": "support/receipts/authority-success-audit/review_notes.json",
+  "register_sha256": "00938d81a34fdcf374bcba5a3812c815190ef53c632752cd4d26581e05009b39",
+  "register_edited": false
+ },
+ "method": "all 465 finding titles read; evidence and triage read for 106 candidates; replaces the 2026-10-20 keyword count of 57",
+ "rulings_recorded_mark_words": {
+  "first_crate": "djinn-testkit first (Recommended)",
+  "moved_code": "Record and hand off (Recommended)",
+  "historical_scripts": "Re-document, keep bytes (Recommended)",
+  "gpu_patches": "Ledger all 11 (Recommended)",
+  "q052": "Narrow claim, report all (Recommended)"
+ },
+ "class": {
+  "total": 95,
+  "production_in_mere": {
+   "count": 30,
+   "by_crate": {
+    "ports/djinn": [
+     "Q044",
+     "Q047"
+    ],
+    "crates/forme/forme": [
+     "Q126",
+     "Q127"
+    ],
+    "crates/cambium/workbench": [
+     "Q138",
+     "Q139"
+    ],
+    "crates/platen/platen": [
+     "Q132",
+     "Q137"
+    ],
+    "crates/conatus/tenant": [
+     "Q116"
+    ],
+    "crates/conatus/conatus": [
+     "Q119"
+    ],
+    "crates/inker/inker": [
+     "Q145",
+     "Q150",
+     "Q151"
+    ],
+    "crates/fleece": [
+     "Q212"
+    ],
+    "crates/cambium/backstep": [
+     "Q320"
+    ],
+    "crates/cambium/scenes/scenotime": [
+     "Q069"
+    ],
+    "crates/system/registry": [
+     "Q388"
+    ],
+    "ports/distillery/src": [
+     "Q217",
+     "Q219",
+     "Q220"
+    ],
+    "ports/graphshell/src": [
+     "Q248",
+     "Q257",
+     "Q274",
+     "Q276",
+     "Q277",
+     "Q284",
+     "Q285"
+    ],
+    "ports/gazette": [
+     "Q397"
+    ],
+    "ports/pelt": [
+     "Q408",
+     "Q416"
+    ]
+   }
+  },
+  "tooling_in_mere": {
+   "count": 39,
+   "by_crate": {
+    "crates/system/djinn-testkit": [
+     "Q054"
+    ],
+    "ports/djinn/tests": [
+     "Q052"
+    ],
+    "crates/graphshell/graphshell-host": [
+     "Q058"
+    ],
+    "crates/script/app-host,document-host": [
+     "Q371"
+    ],
+    "crates/cambium/cambium-genet-winit-host": [
+     "Q311",
+     "Q312",
+     "Q317",
+     "Q318"
+    ],
+    "crates/cambium/examples/genet_web_smoke": [
+     "Q327"
+    ],
+    "crates/mesh/mesh/examples": [
+     "Q197"
+    ],
+    "crates/probes/mesh-lexical-wasm": [
+     "Q366"
+    ],
+    "ports/distillery/probe": [
+     "Q224",
+     "Q225",
+     "Q227",
+     "Q228"
+    ],
+    "ports/graphshell/web+bins+tests": [
+     "Q262",
+     "Q265",
+     "Q266",
+     "Q281",
+     "Q282"
+    ],
+    "ports/muniment-opfs-probe": [
+     "Q400",
+     "Q401",
+     "Q402",
+     "Q403"
+    ],
+    "ports/pelt/desktop": [
+     "Q409",
+     "Q410",
+     "Q411",
+     "Q414",
+     "Q415"
+    ],
+    "scripts": [
+     "Q419"
+    ],
+    "support+testing": [
+     "Q422",
+     "Q463",
+     "Q464",
+     "Q465"
+    ],
+    "historical_receipt_scripts": [
+     "Q272",
+     "Q273",
+     "Q394",
+     "Q395",
+     "Q396"
+    ]
+   }
+  },
+  "gpu_patch_ledger_only": {
+   "count": 11,
+   "ids": [
+    "Q427",
+    "Q432",
+    "Q433",
+    "Q435",
+    "Q440",
+    "Q445",
+    "Q453",
+    "Q454",
+    "Q456",
+    "Q458",
+    "Q462"
+   ]
+  },
+  "source_left_mere": {
+   "count": 15,
+   "by_repo": {
+    "eidetic": [
+     "Q229",
+     "Q231",
+     "Q233",
+     "Q237",
+     "Q383",
+     "Q384",
+     "Q385",
+     "Q380"
+    ],
+    "esp": [
+     "Q342",
+     "Q343",
+     "Q344",
+     "Q348",
+     "Q382"
+    ],
+    "gemot": [
+     "Q363"
+    ],
+    "errand": [
+     "Q177"
+    ]
+   }
+  },
+  "handed_to_other_lanes_not_in_class": {
+   "count": 12,
+   "by_lane": {
+    "L1": [
+     "Q017",
+     "Q283"
+    ],
+    "L2": [
+     "Q089"
+    ],
+    "L3": [
+     "Q125",
+     "Q206",
+     "Q253"
+    ],
+    "L4": [
+     "Q041",
+     "Q043"
+    ],
+    "L5": [
+     "Q183",
+     "Q187",
+     "Q245"
+    ],
+    "registry-ownership": [
+     "Q387"
+    ]
+   }
+  }
+ },
+ "status": {
+  "repaired_on_branch": [
+   {
+    "id": "Q052",
+    "how": "verdict extracted to ports/djinn/tests/residue_verdict; every host block the verdict does not judge is printed as unjudged with its reason; final line states only what was judged",
+    "regression": "ports/djinn/tests/residue_verdict_classifier.rs, 5 tests, persistent-unique block as positive control",
+    "control": "unjudged() stubbed to return nothing: 4 of 5 fail, positive control passes",
+    "audit_probe_rerun": "the audit's four classifier tests verbatim against the live module, plus one added: 5 passed"
+   }
+  ],
+  "already_repaired_on_main": [
+   {
+    "id": "Q054",
+    "commit": "2e683fcfc",
+    "verified": "cargo test -p djinn-testkit --locked in the L6 worktree: 14 passed (unit 6, controls 8); controls cover missing evidence, receipt and summary path collision, tampered evidence"
+   }
+  ],
+  "ledgered": {
+   "ids": [
+    "Q427",
+    "Q432",
+    "Q433",
+    "Q435",
+    "Q440",
+    "Q445",
+    "Q453",
+    "Q454",
+    "Q456",
+    "Q458",
+    "Q462"
+   ],
+   "where": "design_docs/mere_docs/research/2026-10-03_upstream_candidates_ledger.md item 14"
+  },
+  "stays_with_reason": {
+   "ids": [
+    "Q272",
+    "Q273",
+    "Q394",
+    "Q395",
+    "Q396"
+   ],
+   "reason": "historical receipt scripts; recorded runs not invalidated; bytes kept"
+  },
+  "handed_off_out_of_repo": {
+   "eidetic": [
+    "Q229",
+    "Q231",
+    "Q233",
+    "Q237",
+    "Q383",
+    "Q384",
+    "Q385",
+    "Q380"
+   ],
+   "esp": [
+    "Q342",
+    "Q343",
+    "Q344",
+    "Q348",
+    "Q382"
+   ],
+   "gemot": [
+    "Q363"
+   ],
+   "errand": [
+    "Q177"
+   ]
+  }
+ },
+ "not_run": [
+  "full knot_residue run (heavy: knot-editor, iroh, p2panda); its verdict is unchanged by construction, only reporting was added"
+ ],
+ "gates": {
+  "cargo check -p djinn --tests --locked --offline": "exit 0, warnings only in untouched files",
+  "cargo test -p djinn --test residue_verdict_classifier": "5 passed",
+  "cargo test -p djinn-testkit --locked": "14 passed"
+ },
+ "files_changed_sha256": {
+  "ports/djinn/tests/residue_verdict/mod.rs": "5350629569a6f44b642e6631fe78746e7956beba60a17d0f1106ca7a1d0fd1c6",
+  "ports/djinn/tests/residue_verdict_classifier.rs": "b88d9fa68ba1e2c310b7177f74b14603de645157bb50533357b5fbf945ec1310",
+  "ports/djinn/tests/knot_residue.rs": "0c8dab016df78a4019507ae53c996cf4034c436f8027f115c491712e3c334914",
+  "design_docs/mere_docs/research/2026-10-03_upstream_candidates_ledger.md": "72c241a31c57458b5b4253c87ab955193c2d85043b523bf98c4e92da83f9151b"
+ },
+ "remaining_order": [
+  "support/testing runners Q422 Q463 Q464 Q465",
+  "script-host build.rs Q371",
+  "cambium-genet-winit-host receipts Q311 Q312 Q317 Q318 Q327",
+  "pelt Q408-Q416 and graphshell receipt paths",
+  "production crates: forme, workbench, platen, inker, conatus, distillery, graphshell, gazette, registry",
+  "probes: distillery, opfs, mesh-lexical, scripts"
+ ]
+}
