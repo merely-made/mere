@@ -94,6 +94,15 @@ The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,
 pairing records, and content-store migrations, not an additional resident.
 
+An enabled personal Knot lane obtains its keys from custody before opening its
+store. Knot startup repairs legacy checkpoint storage from authenticated signed
+history before Djinn exposes the route. A completed rewrite logs the previous
+and rebuilt checkpoint IDs and preserved-key count. Missing history or keys
+require recovery; the lane refuses to open. Legacy replacement currently
+supports Unix. The [receiving receipt](../../support/family-promotion/knot-checkpoint-intake-20261022.json)
+records the imported source and qualification; backups and filesystem snapshots
+retain their own cleanup requirements.
+
 ## Installation and SSH
 
 On Linux, `install-linux.sh` takes prebuilt Djinn and `personae-vault`
