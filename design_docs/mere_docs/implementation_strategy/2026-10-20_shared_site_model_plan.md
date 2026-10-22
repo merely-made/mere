@@ -3,7 +3,7 @@
 **Status (2026-10-22):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
-The Gemini runtime continuation is landed and qualified through native processes.
+The Gemini and Scroll runtime continuations are landed and qualified through native processes.
 Native Scroll replies now live in Errand and Knot uses them with unchanged V1
 fixtures. Both shared read loaders require explicit Submit for Titan and Spartan
 submission URLs; focused native tests qualify that rule.
@@ -158,6 +158,47 @@ admitted responses may finish. Record/content import spans owners and may leave
 accepted facts when later content retention refuses. Such incomplete delivery
 refuses serving until explicitly repaired.
 
+## Governed Scroll resident (2026-10-22)
+
+**Status:** landed and native qualified on integrated `42b683108`.
+The [native receipt](../../../support/receipts/scroll-publication-runtime/native.json)
+links the exact build, focused host tests and independent product process gates.
+
+- Extend the existing explicit `djinn-moot-site` caller with a persisted transport
+  choice. Omitted transport keeps existing Gemini descriptors and commands
+  compatible. The selected transport must match the snapshot profile on configure,
+  start and every request; selecting a different profile cannot retarget a live
+  listener. Explicit authorized content import remains separate from configuration.
+- Reuse Djinn's loopback TLS identity, bounded connection admission and Armillary
+  cancellation/join scope. Errand's native Scroll connection exchange owns request
+  parsing and reply encoding; the host validates the requested loopback origin,
+  rejects static-site query/credential/parameter targets, and reopens current
+  publication authority before resolving a page.
+- Preserve native full/abstract body bytes, declared language, UDC class, author
+  and both dates. The existing single page per path remains the selection model;
+  request language preferences do not introduce variant negotiation or fallback.
+  Long dates accepted by snapshot V1 remain encodable within existing site bounds.
+- Done when actual Knot publisher and independent resident processes serve exact
+  native Scroll/TLS bytes with author files absent, retain transport/certificate
+  across reopen, reflect replacement/current-authority loss and restoration,
+  refuse withdrawal on restart, and cancel/join an admitted incomplete request
+  before shutdown acknowledgment. Preserve the existing Gemini native gate and
+  original resident/snapshot compatibility tests.
+- Runtime, independent native process tests and read-only review occupy separate
+  file lanes. The coordinator owns supplier repins, locks, integration and docs.
+  Retain compact receipts below 100 MB across repositories; reuse stable Mere and
+  Knot targets. Existing staged receipt collisions may require a temporary
+  integration worktree under `Code/worktrees`, removed after publication.
+
+Browser adoption, MIME/certificate/trust projection, main-broker attachment,
+peer acquisition, hosting promises, protected delivery and signed cross-Moot
+publication lineage retain their existing owners and acceptance gates.
+The metadata-boundary receipt reads raw trusted TLS: Errand's current client
+still caps each response line at 4096 bytes. Serving a valid V1 date beyond
+that cap preserves the host/model contract but does not qualify the current
+Errand or browser client for that content. Caller-configurable client bounds
+are a separate receiving continuation.
+
 ## Wider Errand and smolweb coverage (2026-10-21)
 
 The three initial publication profiles and the Gemini resident are starting
@@ -276,6 +317,20 @@ existing browser source/accessibility/build queue intact.
   does not express the complete Scroll metadata contract.
 
 ## Progress
+
+- 2026-10-22: governed Scroll source `e3ddbedcd` is integrated with current
+  upstream `27f7aaf2e`, retaining its complete SDK/renderer supplier cohort.
+  The clean receiving resident builds locked/offline; five publication-host
+  controls and eight original resident controls pass. Both native product
+  fixtures pass against that exact executable, with the original Gemini test
+  unchanged. Scroll uses two publisher and three resident processes, preserves
+  literal full/abstract bytes and long metadata, reopens the same certificate,
+  follows signed replacement/current membership, refuses withdrawal on restart,
+  and reports one cancelled admitted request with zero task panics/rejections.
+  [Receiving receipt](../../../support/receipts/scroll-publication-runtime/native.json).
+  Browser adoption/client bounds, Micron hosting and main-broker attachment
+  retain their separate gates. Stable repository targets are reused; the
+  temporary integration checkout is removed after publishing the receipts.
 
 - 2026-10-22: the three research lanes led to two bounded implementation slices.
   Errand `3d2ce3a5` adds native Scroll replies and a caller-owned connection
