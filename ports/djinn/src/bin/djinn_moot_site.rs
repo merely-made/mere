@@ -9,7 +9,7 @@
 //! retaining the configured restart intent. `stop` durably disables that intent.
 
 use djinn::{
-    moot_site::{MootSiteOwnersV1, MootSiteTransport, open_owned},
+    moot_site::{MootSiteOwnersV1, MootSiteTransport, NomadNetListenerPolicyV1, open_owned},
     resident_site::GeminiListenerPolicyV1,
 };
 use serde::Deserialize;
@@ -27,6 +27,10 @@ enum Command {
         policy: GeminiListenerPolicyV1,
         #[serde(default)]
         transport: MootSiteTransport,
+    },
+    ConfigureNomadnet {
+        binding: SiteBindingV1,
+        policy: NomadNetListenerPolicyV1,
     },
     Start,
     Status,
@@ -93,6 +97,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 service
                     .configure_transport(binding, policy, transport)
                     .await
+            },
+            Command::ConfigureNomadnet { binding, policy } => {
+                service.configure_nomadnet(binding, policy).await
             },
             Command::Start => service.start().await.map(|_| ()),
             Command::Stop => service.stop(),
