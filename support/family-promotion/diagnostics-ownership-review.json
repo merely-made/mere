@@ -637,5 +637,15 @@
     "status": "336 distinct targeted passes, seven existing ignores, browser-host Wasm and embedding compilation passed. D2 retains 40 pre-existing errors. Earlier latest-main-pending notes are historical; platform runtime and larger ownership migrations remain open.",
     "preservation": "Original staged edits/removals and uncommitted Djinn documentation/runtime receipts retained separately.",
     "concurrent_djinn_receiving": "support/family-promotion/diagnostics-audit-integration-final-receiving.json"
+  },
+  "native_publication_owner_continuation": {
+    "date": "2026-10-22",
+    "status": "Bounded host publication owner and disposed direct-activation repairs; native ID namespace/reference remapping remains open.",
+    "authority": "Existing HostState a11y_owner marker observed weakly by A11yOwner and shared A11yProvenance; queue duplicate owner field removed.",
+    "compatibility": "Accessibility::sync and publication_requests/bind_publication require owner. All four workspace implementations migrated; raw constructors retain current-live-context semantics.",
+    "review": "support/family-promotion/diagnostics-owner-review.json",
+    "qualification": "support/family-promotion/diagnostics-owner-qualification.json",
+    "remaining": "Full published-node identity including structural producer children; schema-owned native reference remapper, late-event ingress and guest/physical-surface lifecycle; producer atomic activation and platform runtime qualification.",
+    "native_attachment": "A11yHost::attach now returns Result and refuses another window handle without changing its original attachment. Same handle is idempotent; native host creation propagates the result. Platform recovery remains open."
   }
 }

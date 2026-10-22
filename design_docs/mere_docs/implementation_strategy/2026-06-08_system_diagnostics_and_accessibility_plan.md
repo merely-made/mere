@@ -1,5 +1,50 @@
 # System Diagnostics and Accessibility Plan
 
+## Native publication IDs and host ownership, 2026-10-22
+
+**Status:** bounded host-owner and disposal repairs; native ID remapping remains
+open. Exact source, gates and limits are in
+`support/family-promotion/diagnostics-owner-qualification.json`; the pinned
+native reference inventory and migration conditions are in
+`support/family-promotion/diagnostics-owner-review.json`.
+
+Published requests now capture a weak `A11yOwner` issued from the existing host
+marker, alongside document/mount and contributor lives. The shared queue uses
+that binding instead of retaining a separate owner-identity field. Moving the
+same live runner, document and mount to a different host cannot transfer a
+published request's authority; re-enqueueing never rebinds it. Raw constructors
+continue to name the current live context. Direct raw and bound requests after
+host disposal return `Cancelled`, and disposed hosts stop publishing even while
+CPU runner/layout state remains inspectable.
+
+`Accessibility::sync`, `publication_requests` and `bind_publication` now require
+an owner argument. All four workspace implementations are migrated. Native and
+browser publishers freeze it through the same projection contract. A custom
+host must retain its marker while live, end it on disposal and use a fresh
+marker for another lifetime. The weak token does not retain the host, validate
+an installed physical window/canvas, or establish an atomic producer transaction.
+
+The native numeric-ID gap is still open. A late OS event after map replacement
+can select the new binding for the same number. The projection's action maps do
+not identify every producer structural child, so allocating IDs from those maps
+alone is incomplete. Complete publication identity must precede a native
+namespace that preserves ordinary updates and never recycles ended lives.
+Its schema-owned remapper must cover eight vector relations, seven scalar
+relations, both text-selection positions, tree root and focus. Host/guest TreeId
+ownership and install/replay remain separate obligations; bridge activation
+epochs do not identify the originating target life. A children-only rewrite or
+another maintained property list in Mere does not finish this migration.
+
+Native `A11yHost::attach` now returns a result: a different window handle is
+refused without replacing the original; attaching the same handle is idempotent.
+Native host creation propagates that refusal. This headless handle guard does
+not qualify actual platform installation or partial-install recovery.
+
+Native install/reattach, late-event behavior, actual browser proxy/focus/disposal
+and human assistive technology remain separately unqualified. Earlier host-owner
+open lists are historical for the bounded request-binding repair, not evidence
+that native publication IDs or physical surface ownership have been resolved.
+
 ## Main integration receiving, 2026-10-22
 
 The child/leaf and producer/publication repairs are committed in `137c4fd4c`.
