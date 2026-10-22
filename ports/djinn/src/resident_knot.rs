@@ -231,6 +231,15 @@ impl ResidentKnot {
         let keys = PersonalVaultKeys::from_released(&released)?;
         let startup =
             StartupUnlockedPersonalVault::open(data_root, persona, keys, authority.writers())?;
+        let repair = startup.checkpoint_repair();
+        if repair.rewritten {
+            tracing::info!(
+                previous_checkpoint = ?repair.previous_checkpoint.as_ref().map(knot_editor::hex32),
+                checkpoint = ?repair.checkpoint.as_ref().map(knot_editor::hex32),
+                preserved_keys = repair.preserved_keys,
+                "repaired Knot checkpoint storage from authenticated retained history"
+            );
+        }
         // Held across the awaits below, so cleared on drop (vault lock ruling 49).
         let signing_seed = zeroize::Zeroizing::new(*startup.signing_seed());
         let store = startup.store().clone();
