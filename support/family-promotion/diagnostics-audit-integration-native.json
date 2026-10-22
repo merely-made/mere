@@ -1,0 +1,36 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "sprigging",
+    "-p",
+    "cambium-rootstock",
+    "-p",
+    "cambium-winit-a11y",
+    "-p",
+    "cambium-genet-winit-host",
+    "-p",
+    "cambium-genet-web-host",
+    "-p",
+    "mesquite",
+    "--lib",
+    "--test",
+    "accessibility",
+    "--test",
+    "click_on_scroll",
+    "--test",
+    "e1a_sessions"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-audit-integration",
+  "started": "2026-10-22T19:26:44.572389+00:00",
+  "finished": "2026-10-22T19:26:48.249580+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: failed to get `knot-editor` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\worktrees\\mere-audit-integration\\ports\\djinn)`"
+  ],
+  "diagnostic_tail": "error: failed to get `knot-editor` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\worktrees\\mere-audit-integration\\ports\\djinn)`\n\nCaused by:\n  failed to load source for dependency `knot-editor`\n\nCaused by:\n  unable to update https://github.com/merely-made/knot-editor.git?branch=main#98d5212b\n\nCaused by:\n  can't checkout from 'https://github.com/merely-made/knot-editor.git': you are in the offline mode (--offline)\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
