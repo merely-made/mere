@@ -50,6 +50,14 @@ pub mod ids {
     pub const FOLD_SELECTION: &str = "fold:selection";
     pub const FOLD_COLLAPSE_DESCENDANTS: &str = "fold:collapse_descendants";
     pub const FOLD_EXPAND: &str = "fold:expand";
+    pub const ARRANGEMENT_RESET_TO_SEED: &str = "arrangement:reset_to_seed";
+    pub const ARRANGEMENT_SET_SEED: &str = "arrangement:set_seed";
+    pub const ARRANGEMENT_RESTORE_RECIPE_SEED: &str = "arrangement:restore_recipe_seed";
+    pub const ARRANGEMENT_DISMISS_RETAINED: &str = "arrangement:dismiss_retained";
+    pub const NODE_FOREGROUND_PIN: &str = "node:foreground_pin";
+    pub const TILE_GROW: &str = "tile:grow";
+    pub const TILE_SHRINK: &str = "tile:shrink";
+    pub const VIEW_TERRITORY: &str = "view:territory";
 }
 
 /// A shared id, its label, and its declared semantic effect.
@@ -260,6 +268,39 @@ pub const CATALOGUE: &[Entry] = &[
         EffectClass::Curation,
         false,
     ),
+    entry(
+        ids::ARRANGEMENT_RESET_TO_SEED,
+        "Reset to seed",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::ARRANGEMENT_SET_SEED,
+        "Set seed",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::ARRANGEMENT_RESTORE_RECIPE_SEED,
+        "Restore recipe seed",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::ARRANGEMENT_DISMISS_RETAINED,
+        "Dismiss retained",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(
+        ids::NODE_FOREGROUND_PIN,
+        "Foreground pin",
+        EffectClass::Curation,
+        false,
+    ),
+    entry(ids::TILE_GROW, "Grow tiles", EffectClass::Curation, false),
+    entry(ids::TILE_SHRINK, "Shrink tiles", EffectClass::Curation, false),
+    entry(ids::VIEW_TERRITORY, "Territory", EffectClass::Curation, false),
 ];
 
 /// The label for a shared id.
@@ -324,7 +365,11 @@ mod tests {
 
     #[test]
     fn every_id_is_well_formed_unique_and_labelled() {
-        assert_eq!(CATALOGUE.len(), 36, "F13's 33 and Ruling 165's three");
+        assert_eq!(
+            CATALOGUE.len(),
+            44,
+            "F13's 33, Ruling 165's three and the eight canvas verbs both hosts offer"
+        );
         for (index, entry) in CATALOGUE.iter().enumerate() {
             assert!(is_well_formed(entry.id), "{}", entry.id);
             assert!(!entry.label.is_empty(), "{}", entry.id);

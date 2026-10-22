@@ -26,8 +26,8 @@ use super::dynamics_spec::{GroupRoles, Node, Target, schedule_node};
 use super::physics_catalog::PhysicsLaw;
 use super::schedule::{PhysicsStage, StageStop};
 use super::{
-    CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, PhysicsChoice, PhysicsKindSource,
-    PhysicsOverlay, Role,
+    CANVAS_LAYOUT_STRATEGIES, Canvas, LayoutStats, OverlayRefusal, PhysicsChoice,
+    PhysicsKindSource, PhysicsOverlay, Role, Speed,
 };
 
 /// The arrangement picker's "no arrangement" choice: physics alone.
@@ -61,15 +61,22 @@ pub fn ticked_overlays(ticked: impl Fn(PhysicsOverlay) -> bool) -> Vec<PhysicsOv
         .collect()
 }
 
-/// Apply physics: the picked law, overlays and sources written into the
-/// canvas's spec and set as one change (dynamics grammar plan, F162), and the
-/// camera follows the layout while it plays (ruled 2026-10-03, "Follow while
-/// playing"). Overlays the law refuses are left out, and the status gives
-/// the law's reason.
-pub fn apply_physics(canvas: &mut Canvas, choice: &PhysicsChoice) -> String {
-    let (choice, refused) = choice.clone().admitted();
+/// What writing a physics choice into a canvas came to: the overlays the law
+/// refused (left out of the write) and the error if the canvas refused the
+/// spec.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct PhysicsWrite {
+    pub refusal: Option<OverlayRefusal>,
+    pub error: Option<String>,
+}
+
+/// Write `choice`, admitted, into the canvas's spec as one change (dynamics
+/// grammar plan, F162). The one write both [`apply_physics`] and
+/// [`edit_physics`] make.
+pub fn write_physics(canvas: &mut Canvas, choice: &PhysicsChoice) -> PhysicsWrite {
+    let (choice, refusal) = choice.clone().admitted();
     let running = PhysicsChoice::live(canvas);
-    let applied = canvas
+    let error = canvas
         .dynamics_spec()
         .map_err(|error| error.to_string())
         .and_then(|mut spec| {
@@ -78,17 +85,95 @@ pub fn apply_physics(canvas: &mut Canvas, choice: &PhysicsChoice) -> String {
                 .set_dynamics_spec(&spec)
                 .map(|_| ())
                 .map_err(|error| error.to_string())
-        });
+        })
+        .err();
+    PhysicsWrite { refusal, error }
+}
+
+/// Change the running flat view and write it back as one spec change, for a
+/// host whose controls edit one field at a time. The camera is left alone;
+/// [`apply_physics`] is the form's Apply, which also follows the layout.
+pub fn edit_physics(canvas: &mut Canvas, edit: impl FnOnce(&mut PhysicsChoice)) -> PhysicsWrite {
+    let mut choice = PhysicsChoice::live(canvas);
+    edit(&mut choice);
+    write_physics(canvas, &choice)
+}
+
+/// Apply physics: the picked law, overlays and sources written into the
+/// canvas's spec and set as one change (dynamics grammar plan, F162), and the
+/// camera follows the layout while it plays (ruled 2026-10-03, "Follow while
+/// playing"). Overlays the law refuses are left out, and the status gives
+/// the law's reason.
+pub fn apply_physics(canvas: &mut Canvas, choice: &PhysicsChoice) -> String {
+    let PhysicsWrite { refusal, error } = write_physics(canvas, choice);
     canvas.set_view_follow(true);
     let status = with_overlays(
         format!("Physics set to {}", PhysicsChoice::live(canvas).law.label()),
         canvas,
     );
-    match (applied, refused) {
-        (Err(error), _) => format!("{status} · {error}"),
-        (Ok(()), Some(refusal)) => format!("{status} · {}", refusal.reason),
-        (Ok(()), None) => status,
+    match (error, refusal) {
+        (Some(error), _) => format!("{status} · {error}"),
+        (None, Some(refusal)) => format!("{status} · {}", refusal.reason),
+        (None, None) => status,
     }
+}
+
+/// The simulation-speed presets, `(id, label)`: the id is the factor, or
+/// [`MAX_SPEED`] for as fast as the host's step budget allows.
+pub const SPEED_PRESETS: [(&str, &str); 8] = [
+    ("0.2", "0.2x"),
+    ("0.5", "0.5x"),
+    ("1", "1x"),
+    ("2", "2x"),
+    ("5", "5x"),
+    ("10", "10x"),
+    ("50", "50x"),
+    (MAX_SPEED, "Max"),
+];
+/// The preset a canvas runs at unless its host says otherwise: 1x.
+pub const DEFAULT_SPEED_PRESET: usize = 2;
+/// The uncapped preset's id.
+pub const MAX_SPEED: &str = "max";
+
+/// The preset showing the canvas's speed; a host may have set any speed, and
+/// the nearest preset answers for it.
+pub fn speed_preset(canvas: &Canvas) -> usize {
+    let speed = canvas.physics_speed();
+    if speed == Speed::UNCAPPED {
+        return SPEED_PRESETS.len() - 1;
+    }
+    let factor = speed.factor();
+    SPEED_PRESETS[..SPEED_PRESETS.len() - 1]
+        .iter()
+        .enumerate()
+        .min_by(|(_, (a, _)), (_, (b, _))| {
+            let distance = |id: &str| (id.parse::<f32>().unwrap_or(1.0).ln() - factor.ln()).abs();
+            distance(a).total_cmp(&distance(b))
+        })
+        .map_or(DEFAULT_SPEED_PRESET, |(index, _)| index)
+}
+
+/// A speed as a person reads it: "2x", "0.2x", "3.7x", "Max".
+pub fn speed_label(speed: Speed) -> String {
+    if speed == Speed::UNCAPPED {
+        return "Max".into();
+    }
+    let text = format!("{:.3}", speed.factor());
+    format!("{}x", text.trim_end_matches('0').trim_end_matches('.'))
+}
+
+/// Run the canvas at the preset `id` names; the status line to show.
+pub fn apply_speed(canvas: &mut Canvas, id: &str) -> Result<String, String> {
+    let (id, label) = SPEED_PRESETS
+        .iter()
+        .find(|(known, _)| *known == id)
+        .ok_or_else(|| format!("unknown speed {id}"))?;
+    canvas.set_physics_speed(if *id == MAX_SPEED {
+        Speed::UNCAPPED
+    } else {
+        Speed::from_factor(id.parse().map_err(|_| format!("unknown speed {id}"))?)
+    });
+    Ok(format!("Speed set to {label}"))
 }
 
 /// A bounded two-law composition with explicit force shares. Shares must be
@@ -233,6 +318,87 @@ pub fn apply_two_stage_schedule(
         schedule.first.law.label(),
         schedule.second.law.label()
     ))
+}
+
+/// A plain law preset a bounded editor can faithfully expose. Per-part
+/// overlays, terms and rungs need richer controls and must not be hidden.
+fn plain_part(node: &Node) -> Option<(PhysicsLaw, f64)> {
+    match node {
+        Node::Preset {
+            id,
+            weight,
+            terms,
+            rung,
+            overlays,
+        } if terms.is_empty() && rung.is_none() && overlays.is_empty() => {
+            Some((PhysicsLaw::parse(id)?, *weight))
+        },
+        _ => None,
+    }
+}
+
+/// Read the authored root when it is exactly the two-law mix
+/// [`apply_mix`] writes. Other roots return `Ok(None)`; a mix with richer
+/// parts returns a reason for the host form to show, as
+/// [`read_two_stage_schedule`] does.
+pub fn read_two_law_mix(canvas: &Canvas) -> Result<Option<TwoLawMix>, String> {
+    let spec = canvas.dynamics_spec()?;
+    let Node::Mix { parts, weight, .. } = &spec.root else {
+        return Ok(None);
+    };
+    if *weight != 1.0 {
+        return Err("root weight".into());
+    }
+    let [first, second] = parts.as_slice() else {
+        return Err("part count".into());
+    };
+    let (Some((first, first_share)), Some((second, second_share))) =
+        (plain_part(first), plain_part(second))
+    else {
+        return Err("part data".into());
+    };
+    Ok(Some(TwoLawMix {
+        first,
+        second,
+        first_share,
+        second_share,
+    }))
+}
+
+/// Read the authored root when it is exactly the grouped form
+/// [`apply_grouping`] writes; the same three outcomes as [`read_two_law_mix`].
+pub fn read_two_law_grouping(canvas: &Canvas) -> Result<Option<TwoLawGrouping>, String> {
+    let spec = canvas.dynamics_spec()?;
+    let Node::Grouped {
+        partition,
+        outer,
+        inner,
+        weight,
+        ..
+    } = &spec.root
+    else {
+        return Ok(None);
+    };
+    if *weight != 1.0 {
+        return Err("root weight".into());
+    }
+    let Some(Channel::Groups(partition)) = Channel::parse(partition) else {
+        return Err("partition".into());
+    };
+    let (Some((outer, outer_share)), Some((inner, inner_share))) =
+        (plain_part(outer), plain_part(inner))
+    else {
+        return Err("law data".into());
+    };
+    if inner_share != 1.0 {
+        return Err("inner weight".into());
+    }
+    Ok(Some(TwoLawGrouping {
+        partition,
+        outer,
+        inner,
+        outer_share,
+    }))
 }
 
 /// Read a full canvas spec when its schedule is exactly the two-stage form
@@ -844,6 +1010,72 @@ mod tests {
         let mut canvas = Canvas::with_sample_graph();
         canvas.resize(800, 600);
         canvas
+    }
+
+    #[test]
+    fn edit_physics_changes_the_running_view_without_following_the_layout() {
+        let mut canvas = canvas();
+        canvas.set_view_follow(false);
+        let write = edit_physics(&mut canvas, |choice| choice.law = PhysicsLaw::Charge);
+        assert_eq!(write, PhysicsWrite::default());
+        assert_eq!(PhysicsChoice::live(&canvas).law, PhysicsLaw::Charge);
+        assert!(!canvas.view_follows(), "an edit leaves the camera alone");
+    }
+
+    #[test]
+    fn edit_physics_reports_the_overlays_the_law_refuses() {
+        let mut canvas = canvas();
+        let refused = PhysicsOverlay::ALL.into_iter().find_map(|overlay| {
+            let mut choice = PhysicsChoice::live(&canvas);
+            choice.overlays = vec![overlay];
+            choice.admitted().1.map(|_| overlay)
+        });
+        let Some(overlay) = refused else { return };
+        let write = edit_physics(&mut canvas, |choice| choice.overlays = vec![overlay]);
+        assert!(write.refusal.is_some());
+        assert!(write.error.is_none());
+        assert!(!PhysicsChoice::live(&canvas).overlays.contains(&overlay));
+    }
+
+    #[test]
+    fn mix_and_grouping_read_back_what_apply_wrote() {
+        let mut canvas = canvas();
+        assert_eq!(read_two_law_mix(&canvas), Ok(None));
+        assert_eq!(read_two_law_grouping(&canvas), Ok(None));
+        let mix = TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 0.75,
+            second_share: 2.0,
+        };
+        apply_mix(&mut canvas, &mix).unwrap();
+        assert_eq!(read_two_law_mix(&canvas), Ok(Some(mix)));
+        assert_eq!(read_two_law_grouping(&canvas), Ok(None));
+        let grouping = TwoLawGrouping {
+            partition: PhysicsKindSource::ALL[0],
+            outer: PhysicsLaw::Charge,
+            inner: PhysicsLaw::Springs,
+            outer_share: 1.5,
+        };
+        apply_grouping(&mut canvas, &grouping).unwrap();
+        assert_eq!(read_two_law_grouping(&canvas), Ok(Some(grouping)));
+        assert_eq!(read_two_law_mix(&canvas), Ok(None));
+    }
+
+    #[test]
+    fn speed_presets_round_trip_through_the_canvas() {
+        let mut canvas = canvas();
+        for (index, (id, label)) in SPEED_PRESETS.iter().enumerate() {
+            assert_eq!(
+                apply_speed(&mut canvas, id).unwrap(),
+                format!("Speed set to {label}")
+            );
+            assert_eq!(speed_preset(&canvas), index);
+            assert_eq!(speed_label(canvas.physics_speed()), *label);
+        }
+        assert!(apply_speed(&mut canvas, "3").is_err());
+        canvas.set_physics_speed(Speed::from_factor(3.7));
+        assert_eq!(speed_label(canvas.physics_speed()), "3.7x");
     }
 
     #[test]
