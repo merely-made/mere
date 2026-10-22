@@ -1,0 +1,26 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 6f0271feb..f11c27db7 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -16499,7 +16499,7 @@ dependencies = [
+  "regex",
+  "rustc-hash 2.1.3",
+  "sha1 0.11.0",
+- "sha2 0.10.9",
++ "sha2 0.11.0",
+  "sparesults",
+  "spargebra",
+  "sparopt",
+diff --git a/ports/graphshell/web/Cargo.lock b/ports/graphshell/web/Cargo.lock
+index 5d0eba802..0b1df9af0 100644
+--- a/ports/graphshell/web/Cargo.lock
++++ b/ports/graphshell/web/Cargo.lock
+@@ -9161,7 +9161,7 @@ dependencies = [
+  "regex",
+  "rustc-hash 2.1.3",
+  "sha1",
+- "sha2 0.10.9",
++ "sha2 0.11.0",
+  "sparesults",
+  "spargebra",
+  "sparopt",

@@ -5,7 +5,7 @@
   "suppliers": {
     "armillary": "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc",
     "esp": "6d6ad84b773c9baf2390bd7807a21ca9887e6efd",
-    "knot": "a38f4253663845515bbf67ccfc04b26d7f6b715d",
+    "knot": "f44259964cd0b6ff27c21ab368ea7830fc11e0fe",
     "genet": "7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
     "murm": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
     "errand": "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab",
@@ -30,20 +30,144 @@
       "revision": "7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
       "tests": "98 Netfetcher tests including 15 loopback WebSocket cases in byte-verified two-crate source workspace; actual Knot and Mere receiving compile canonical Git source",
       "receipt": "genet/design_docs/receipts/2026-10-21_netfetcher_websocket_cohort/qualification.json",
-      "limit": "Full Genet workspace not exercised; unrelated Bole resolution blocked standalone full workspace."
+      "limit": "Full Genet workspace not exercised; unrelated Bole resolution blocked standalone full workspace.",
+      "concurrent_owner_main": {
+        "revision": "768eb8d059997e0e21dbcdf7140579e20b0e70c8",
+        "scope": "Separate dependency-currency owner merge preserves qualified7d ancestor; receiving locks remain on tested7d. Clean canonical checkout fast-forwarded; no current-head qualification inferred."
+      }
     },
     "knot": {
-      "revision": "a38f4253663845515bbf67ccfc04b26d7f6b715d",
       "tests": "2 provider/index identity tests, including refusal, reopen and rebuild, pass",
-      "receipt": "knot-editor/docs/receipts/2026-10-21_armillary_pool_intake/qualification.json"
+      "receipt": "knot-editor/docs/receipts/2026-10-21_armillary_pool_intake/qualification.json",
+      "initial_pool_intake_revision": "a38f4253663845515bbf67ccfc04b26d7f6b715d",
+      "code_revision": "f44259964cd0b6ff27c21ab368ea7830fc11e0fe",
+      "root_lock_closure_revision": "70576320dffc2c5b4e6d4ab7a31304b348267caf",
+      "site_model_tests": "23 default cases pass, including 2 literal/snapshot/TLS Scroll wire cases",
+      "site_model_receipt_local_only": "/Users/markik/Code/testing/knot-editor/site-model-source-20261022/qualification.json",
+      "retinue_lock_only": "Optional Retinue entry converged to Murm5b; package and inherited manifest byte-identical to older source; frozen resolution passes. Consumers retain code f442."
+    },
+    "turnstone": {
+      "revision": "cfb2904486f926d1a14a59c282f5ed4357616eeb",
+      "mere_sdk": "a01a22d02cd3e9437da6724e0c34fa6eef885478",
+      "preserved_gui_owner_base": "dfe5955",
+      "tests": "20 passes: 16 diagnostic, 3 download, 1 actual actor session-release/reopen. Earlier controls excluded from final count.",
+      "receipt": "turnstone/docs/receipts/2026-10-22_pool_lifetime/qualification.json"
+    },
+    "murm": {
+      "revision": "ada9d0e2dadf6af8ef9f9ccbb4f93c2b2ec55dce",
+      "mere_sdk": "a07a375ed9f49d31bb757c4dd516a0fa7af33fde",
+      "tests": "58 passes: desktop45, management6, network7; one existing isolated keeper test ignored",
+      "scope_note": "murm/design_docs/2026-08-09_signalman_cambium_desktop_scope.md",
+      "protected_locks": "Root/native/wire byte-identical; no Knot or ESP in the desktop cone",
+      "receipt_local_only": "/Users/markik/Code/output/murm-pool-intake-20261021/qualification.json"
+    },
+    "woodshed": {
+      "revision": "80f2d4eb6dd6b30e3e38b4fae610250f7842b96e",
+      "mere_sdk": "a07a375ed9f49d31bb757c4dd516a0fa7af33fde",
+      "qualified_source_revision": "cbda7166f3efe65c6629873507a5d672f1fe2bc8",
+      "receipt": "woodshed/validation/stack-family_20261011/pool-cohort-20261022.json",
+      "total_successful_gate_executions": {
+        "passed": 1086,
+        "ignored": 11,
+        "note": "Earlier failed compile and empty-filter attempt are controls, excluded from totals."
+      },
+      "compatibility": "Four existing read-only accessibility hooks now use the Sprigging0.3 shared Leaf receiver &self; method bodies are unchanged. Notation/fretboard and graph-wrapper leaves preserve their labels and readings.",
+      "protected_ringdown_lock_sha256": "5011ad21e2f4673966cb040fb3d190b4d8d804451c62f781ff6bdb0e4a8b1dd8",
+      "gate_summary": [
+        {
+          "gate": "woodshed-core-graph",
+          "passed": 333,
+          "ignored": 0
+        },
+        {
+          "gate": "woodshed-hocket",
+          "passed": 139,
+          "ignored": 2
+        },
+        {
+          "gate": "woodshed-redshank",
+          "passed": 295,
+          "ignored": 8
+        },
+        {
+          "gate": "woodshed-relationship-recipe-final",
+          "passed": 11,
+          "ignored": 1
+        },
+        {
+          "gate": "woodshed-leaf-libraries",
+          "passed": 307,
+          "ignored": 0
+        },
+        {
+          "gate": "woodshed-desktop-leaf-final",
+          "passed": 1,
+          "ignored": 0
+        }
+      ],
+      "receipt_sha256": "1520e6134f17a185f15f445340553a6cfdb9a266294e24a58d9b74275b3926a3"
+    },
+    "cleromancy": {
+      "revision": "5a9218eb6d9c90eba9b5fad74db1a2754c03e4b7",
+      "runtime_qualified_code_revision": "56f434eb12f26378fc8af3a421b2b16ef0f5515e",
+      "mere_sdk": "a07a375ed9f49d31bb757c4dd516a0fa7af33fde",
+      "receipt_local_only": "/Users/markik/Code/testing/cleromancy/pool-cohort-20261022/qualification.json",
+      "receipt_sha256": "c0cc5ad4bdf9d35d3f7194520a49571cb1f0e63f6b3fa85c9142efc34b8e684a",
+      "gate_summary": [
+        {
+          "gate": "default runtime",
+          "passed": 151,
+          "ignored": 1,
+          "qualification": "Runtime cases pass; original whole command exit1 in trailing rustdoc E0463 phase. Separate focused doc retry exited0 with0examples after metadata rebuild; no source workaround."
+        },
+        {
+          "gate": "expanded",
+          "features": "legacy-receipts,personal-sync,graphshell-admission",
+          "passed": 192,
+          "ignored": 1,
+          "exit_code": 0,
+          "documentation_phase": "passed;0examples"
+        },
+        {
+          "gate": "standalone core",
+          "passed": 60,
+          "ignored": 0,
+          "exit_code": 0,
+          "documentation_phase": "passed;0examples"
+        }
+      ],
+      "historical_receipt_preservation": {
+        "paths": 1357,
+        "changed": 0
+      },
+      "test_only_helper": "Normalize only GraphSnapshot capture-envelope timestamp_secs to0 before truth comparison; all graph/facet/node/visit values retained.",
+      "lock_only_closure": {
+        "changed_source_lines": 2,
+        "packages": [
+          "genet-taffy0.14.0",
+          "gpu-allocator0.28.0"
+        ],
+        "from_genet": "4987cdf895cd1b6ddc0bdd060bf1522893392494",
+        "to_genet": "7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
+        "equivalence": "Both complete package trees and manifests byte-identical, no workspace inheritance. Final root lock differs only by these two source lines; dependency edges and registry packages unchanged. Locked offline metadata passes; no runtime repetition required.",
+        "equivalence_local_only": "/Users/markik/Code/testing/cleromancy/pool-cohort-20261022/genet-lock-closure-equivalence.json",
+        "full_lock_before_control_local_only": "/Users/markik/Code/testing/pool-cohort-20261021/cleromancy-full-lock-before.json"
+      },
+      "tracked_hashes": {
+        "Cargo.toml": "2260059d7b84c1c2de11f25c50a081811ee8533d9253478288b5959ed40709f3",
+        "Cargo.lock": "179514251ce71edf6fadf4d56233df974f332a22bd951c1bdc7526b2a89154e4",
+        "core/Cargo.lock": "5a2f27b0f2d3526e9a560af748b815e9b59511b67f7818a5b88414b0c3dce243",
+        "tests/support/mod.rs": "f2f7859a3ba13c3f9a41401ab20d707fd21e15349d7aa85b4d85c28575dc0c87"
+      },
+      "limits": "CPU/source receiving only; explicit real-model probe remains ignored; native/checkpoint/device acceptance stays separate."
     }
   },
   "mere": {
-    "source_revision_before_receipt": "fb047fb6e453ee80b737585975766bfea2824b0c",
+    "source_revision_before_receipt": "7f6c8cb39bff99864c919145285fb977bf42bb91",
     "graphs": [
       {
         "lock": "Cargo.lock",
-        "sha256": "d7a9f1553413f28356bb90ea4406726f5393cce3351a9c8aa9cd077d99dcc6fe",
+        "sha256": "3e5d6a0e5e51426b7f556065b567c5b0d2e4e0f64760d3dc67f218c5f5402656",
         "packages": [
           {
             "name": "apparatus-core",
@@ -73,7 +197,11 @@
           {
             "name": "knot-editor",
             "version": "0.0.3",
-            "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#a38f4253663845515bbf67ccfc04b26d7f6b715d"
+            "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#f44259964cd0b6ff27c21ab368ea7830fc11e0fe"
+          },
+          {
+            "name": "mere-site",
+            "version": "0.1.0"
           },
           {
             "name": "murm-wire",
@@ -99,7 +227,7 @@
       },
       {
         "lock": "ports/graphshell/web/Cargo.lock",
-        "sha256": "19a33f1e5597aaf4ad19abf3438b776b3a31762216d75706aab78885d87546da",
+        "sha256": "bf18a7dffa88c26f29505c51e5efeae2385f72a62ff0d9e52fa42f180102f0a4",
         "packages": [
           {
             "name": "apparatus-core",
@@ -125,7 +253,7 @@
       },
       {
         "lock": "ports/distillery/probe/Cargo.lock",
-        "sha256": "66d82638f32fccebd19b5a9b95a55c9b1b3960e4ca5b2c5448c44153ff50f0fd",
+        "sha256": "41afe8548625bf21f16660d36a7ac63700d51d4ad4d2c1fd05ea5f7886084b28",
         "packages": [
           {
             "name": "apparatus-core",
@@ -140,13 +268,13 @@
           {
             "name": "netrender",
             "version": "0.1.2",
-            "source": "git+https://github.com/merely-made/netrender.git?branch=main#d92050146768357ead4e4e42967866be7061262e"
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#ec15eb269855c798467c93a6d10031100fdfdf65"
           }
         ]
       },
       {
         "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
-        "sha256": "b253c09dd16b319a9cee38f2c9a6b6b44f4d8c22452c3bc96cf98880f99bb87f",
+        "sha256": "39a6fdb5a61024193368efa4eb0feb83c5c0eb4af40046873589aedf76ccc00f",
         "packages": [
           {
             "name": "armillary",
@@ -303,7 +431,7 @@
         ]
       },
       {
-        "label": "mere-djinn-and-knot-route-final",
+        "label": "mere-djinn-route-current-stack",
         "cwd": "/Users/markik/Code/worktrees/mere-pool-cohort-20261021",
         "command": [
           "cargo",
@@ -328,24 +456,31 @@
           "knot_app_route"
         ],
         "exit_code": 0,
-        "seconds": 118.29,
+        "seconds": 169.43,
         "host": "m4-imac.lan",
         "architecture": "arm64",
-        "log_sha256": "5f5ed6df447d0119de949915d4fbc4bccb1eef32e35780cabd5936599dd39fce",
+        "log_sha256": "f845c869bb82fd0da5e51a42a83b6a09f2b17ed67d61a89894b4a8ca79e95dba",
         "results": [
           "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
-          "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s",
-          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+          "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s",
+          "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
           "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
         ]
       }
-    ]
+    ],
+    "root_closure_revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+    "initial_code_sdk": "a07a375ed9f49d31bb757c4dd516a0fa7af33fde",
+    "merged_gui_owner_sdk_extension": "a01a22d02cd3e9437da6724e0c34fa6eef885478",
+    "gate_scope": "Host40, Distillery46 and endpoint45 qualify initial SDK compiled closures. Route10 is repeated on the merged current stack with final Knot code and GUI owner extension; repeats are not distinct cases. Nested probe/web roots have locked Mac resolution/source checks, without browser/runtime acceptance."
   },
   "compatibility": {
     "websocket": "Genet optional tokio-tungstenite 0.29 -> 0.30 receives already-published Murm 0.30 boundary; no Rust source change.",
     "scroll": "Receive existing Knot-qualified Errand 3d2ce3a family to expose Scroll Reply/ResponseLimits; older Mere override could not compile Knot site adapter. No protocol behavior edit in this rollout.",
     "storage": "Standalone probes and Woodshed receiving use current Eidetic 34105d63 to keep public storage types identical with ESP.",
-    "netrender": "Preserve prior ec15eb26 mutable-branch lock where accepted, avoiding unrelated browser renderer intake."
+    "netrender": "Preserve prior ec15eb26 mutable-branch lock where accepted, avoiding unrelated browser renderer intake.",
+    "site_model": "Real Cleromancy Git receiving exposed two byte-identical mere-site implementations with different Cargo selectors. Knot now uses canonical SDK branch source for shared public snapshot types. No conversion or runtime model change.",
+    "site_model_before_control_local_only": "/Users/markik/Code/testing/cleromancy/pool-cohort-20261022/site-model-unification-before.json",
+    "gui_owner_extension": "Turnstone requires the concurrent GUI supplier extension. Its qualified a01 SDK merges that owner work with a07; other tested products retain a07 rather than unneeded receipt-only repins."
   },
   "shared_host_guard": {
     "donor": "woodshed@97bb21e5b265b76284ed715f975e4b0b18181a24",
@@ -355,14 +490,148 @@
     "host_lib_sha256": "0d9343fb2c11ec48e18566bec90ad4c2ba9d42fd076127173ce84e623ea3804f",
     "donor_snapshot_files": 52,
     "donor_snapshot_lines": 13288,
-    "retirement": "Pending published shared SDK receipt in Woodshed before removing its patch and snapshot."
+    "retirement": "Completed in Woodshed 80f2d4eb6dd6b30e3e38b4fae610250f7842b96e: shared SDK a07 supplies the exact guard and test; the root path patch and all 52 snapshot files are removed."
   },
-  "pending_product_receivers": [
-    "Turnstone",
-    "Cleromancy root and core",
-    "Woodshed root, Hocket, Redshank and relationship recipe",
-    "Murm Signalman desktop"
-  ],
+  "pending_product_receivers": [],
   "scope": "CPU/process/source receiving qualification. No new native UI, GPU, physical-device, heavy-model or Knot checkpoint feature acceptance. Pool Drop remains nonblocking and drains admitted jobs; retained public handles or long-lived actors may retain workers. workers() is total spawned, not live/joined count.",
-  "local_only_raw_evidence": "/Users/markik/Code/testing/pool-cohort-20261021"
+  "local_only_raw_evidence": "/Users/markik/Code/testing/pool-cohort-20261021",
+  "status": "complete; all scoped receiving checkpoints published",
+  "independent_review": {
+    "local_only": "/Users/markik/Code/testing/pool-cohort-20261021/independent-review.json",
+    "sha256": "fc5f0ecc68c710779ff10e105a483bf06fbe19ae58efccd5dc39406c12ca4b63",
+    "result": "Only optional Retinue residue, now closed; no additional Mere/Woodshed source repair."
+  },
+  "manifest_only_aligned_roots": {
+    "paths": [
+      "crates/cambium/examples/genet_web_smoke/Cargo.toml",
+      "ports/distillery/probe/native-fixture/Cargo.toml",
+      "ports/muniment-opfs-probe/Cargo.toml"
+    ],
+    "limit": "No committed locks or new frozen execution claim."
+  },
+  "frozen_published_lock_audit": {
+    "result": "pass",
+    "graph_count": 19,
+    "method": "Parse every package in committed full lockfiles, including inactive targets. Armillary/ESP have at most one identity and the exact repaired revision; participating mutable Genet/Netrender/Murm/Knot families have at most one identity and the qualified revision. Shared public mere-site and mutable Mere SDK sources have at most one identity per graph. Independent fixed sources and preserved older host cohorts remain intentional.",
+    "local_only": "/Users/markik/Code/testing/pool-cohort-20261021/published-lock-audit.json",
+    "sha256": "51bdc658c366b5144fabe492f5d569a5ddeedab22883ff52e5d2678a339753ce",
+    "graphs": [
+      {
+        "repository": "esp",
+        "revision": "6d6ad84b773c9baf2390bd7807a21ca9887e6efd",
+        "lock": "Cargo.lock",
+        "sha256": "51980cf56826a9f2e8f90518353cbbbc210ee71df28d6b1e5f13b4cf095139b2"
+      },
+      {
+        "repository": "knot",
+        "revision": "70576320dffc2c5b4e6d4ab7a31304b348267caf",
+        "lock": "Cargo.lock",
+        "sha256": "a0d052768f2fdfd1e243395ef330c283a92223f071bf422592bf7d720c4c4b1b"
+      },
+      {
+        "repository": "isocosm",
+        "revision": "3e3654002421090d2bc9936ab8f70a6cf2b61a76",
+        "lock": "Cargo.lock",
+        "sha256": "404e08382e7507c79756060a30821305bf686aebcd4520b30ebe65e9695e56c2"
+      },
+      {
+        "repository": "murm",
+        "revision": "ada9d0e2dadf6af8ef9f9ccbb4f93c2b2ec55dce",
+        "lock": "apps/signalman-desktop/Cargo.lock",
+        "sha256": "a8029e523d97956c5451d646eb2132ff9d487a54ee1d7d1a3172a993d8e5bd68"
+      },
+      {
+        "repository": "murm",
+        "revision": "ada9d0e2dadf6af8ef9f9ccbb4f93c2b2ec55dce",
+        "lock": "Cargo.lock",
+        "sha256": "e01860c84c0c943866dc83140a4f692fa4e1ab1221a3c47b16445ad10c2eead3"
+      },
+      {
+        "repository": "murm",
+        "revision": "ada9d0e2dadf6af8ef9f9ccbb4f93c2b2ec55dce",
+        "lock": "native/Cargo.lock",
+        "sha256": "48b59a13be2a6ce24ddc058e121ea31d52cde51c92b57062d32155eebdf26496"
+      },
+      {
+        "repository": "murm",
+        "revision": "ada9d0e2dadf6af8ef9f9ccbb4f93c2b2ec55dce",
+        "lock": "wire/Cargo.lock",
+        "sha256": "4e86d6da4e85465d3a1f8657daf97c141fbc64c82584fd1d01450b8c3a37f650"
+      },
+      {
+        "repository": "mere",
+        "revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+        "lock": "Cargo.lock",
+        "sha256": "3e5d6a0e5e51426b7f556065b567c5b0d2e4e0f64760d3dc67f218c5f5402656"
+      },
+      {
+        "repository": "mere",
+        "revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+        "lock": "ports/graphshell/web/Cargo.lock",
+        "sha256": "bf18a7dffa88c26f29505c51e5efeae2385f72a62ff0d9e52fa42f180102f0a4"
+      },
+      {
+        "repository": "mere",
+        "revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+        "lock": "ports/distillery/probe/Cargo.lock",
+        "sha256": "41afe8548625bf21f16660d36a7ac63700d51d4ad4d2c1fd05ea5f7886084b28"
+      },
+      {
+        "repository": "mere",
+        "revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+        "lock": "ports/distillery/probe/remote-fixture/Cargo.lock",
+        "sha256": "39a6fdb5a61024193368efa4eb0feb83c5c0eb4af40046873589aedf76ccc00f"
+      },
+      {
+        "repository": "mere",
+        "revision": "7f6c8cb39bff99864c919145285fb977bf42bb91",
+        "lock": "ports/distillery/probe/session-fixture/Cargo.lock",
+        "sha256": "728cdcd2a5779580fe99999493f3a781974620cad933d65d260bc2a86b13f670"
+      },
+      {
+        "repository": "turnstone",
+        "revision": "cfb2904486f926d1a14a59c282f5ed4357616eeb",
+        "lock": "Cargo.lock",
+        "sha256": "c8885ff2c7bb25040524699058dbb80fded090a776b86f685584cc259d0127ac"
+      },
+      {
+        "repository": "woodshed",
+        "revision": "80f2d4eb6dd6b30e3e38b4fae610250f7842b96e",
+        "lock": "Cargo.lock",
+        "sha256": "e54b5b4e09c19b27c6b90f58207cf13b85764f594023e2d0b66034a6b45f5432"
+      },
+      {
+        "repository": "woodshed",
+        "revision": "80f2d4eb6dd6b30e3e38b4fae610250f7842b96e",
+        "lock": "ports/hocket/Cargo.lock",
+        "sha256": "6f0f999893f2d9511249a287f043e8bda16cc6844c759748f0b5101a7fc3c48c"
+      },
+      {
+        "repository": "woodshed",
+        "revision": "80f2d4eb6dd6b30e3e38b4fae610250f7842b96e",
+        "lock": "ports/redshank/Cargo.lock",
+        "sha256": "f318dd829914682eb5b9142f1337ec0e5452d6c0d9fe8ba6302994e6eaedc15b"
+      },
+      {
+        "repository": "woodshed",
+        "revision": "80f2d4eb6dd6b30e3e38b4fae610250f7842b96e",
+        "lock": "validation/relationship-recipe/Cargo.lock",
+        "sha256": "1a0adae11b179c0f34486275629501f7949ae2682840cd807330fb5e1b32e3b0"
+      },
+      {
+        "repository": "cleromancy",
+        "revision": "5a9218eb6d9c90eba9b5fad74db1a2754c03e4b7",
+        "lock": "Cargo.lock",
+        "sha256": "179514251ce71edf6fadf4d56233df974f332a22bd951c1bdc7526b2a89154e4"
+      },
+      {
+        "repository": "cleromancy",
+        "revision": "5a9218eb6d9c90eba9b5fad74db1a2754c03e4b7",
+        "lock": "core/Cargo.lock",
+        "sha256": "5a2f27b0f2d3526e9a560af748b815e9b59511b67f7818a5b88414b0c3dce243"
+      }
+    ],
+    "limit": "Static committed-lock identity audit; receiving test execution and locked metadata are separate per-repository evidence."
+  },
+  "publication_model": "Products retain their tested SDK inputs: a07, or Turnstone owner extension a01. Knot code f442 and Murm transport code5b stay qualified inputs despite subsequent root-lock/desktop receiving commits. Mere staging bootstrap639 remains an ancestor of main; its temporary remote branch has been retired. Receipt-only commits do not cause recursive supplier repins."
 }

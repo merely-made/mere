@@ -37,6 +37,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--target-dir', type=pathlib.Path, required=True)
     parser.add_argument('--output', type=pathlib.Path, required=True)
+    parser.add_argument('--case', action='append', choices=['binding', 'occurrence', 'occurrence-mix', 'grouped'],
+                        help='run only this case; repeat to select several (default: all)')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -54,13 +56,18 @@ def main():
         for path in results['source_sha256']:
             archive.add(ROOT / path, arcname=path)
     failures = []
-
-    for name, relative, export in [
+    case_matrix = [
         ('binding', 'crates/conatus/seiche/examples/binding_replay.json', 'run_replay'),
         ('occurrence', 'crates/canvas/pictograph/examples/occurrence_replay.json', 'run_occurrence_replay'),
         ('occurrence-mix', 'crates/canvas/pictograph/examples/occurrence_mix_replay.json', 'run_occurrence_replay'),
-    ]:
-        example = 'binding_replay' if name == 'binding' else 'occurrence_replay'
+        ('grouped', 'crates/canvas/pictograph/examples/grouped_replay.json', 'run_grouped_replay'),
+    ]
+    selected = set(args.case or [name for name, _, _ in case_matrix])
+    for name, relative, export in case_matrix:
+        if name not in selected:
+            continue
+        example = {'binding': 'binding_replay', 'occurrence': 'occurrence_replay',
+                   'occurrence-mix': 'occurrence_replay', 'grouped': 'grouped_replay'}[name]
         native = target / 'debug/examples' / example
         wasm = target / 'wasm32-unknown-unknown/debug/examples' / (example + '_wasm.wasm')
         pkg = out / (name + '-wasm')
@@ -88,7 +95,12 @@ def main():
         n2 = run('native-2', wire)
         w1 = run('wasm-1', wire, True)
         w2 = run('wasm-2', wire, True)
-        expected_ticks = list(range(1, len(fixture['ticks']) + 1)) if name == 'binding' else list(range(sum(fixture['tick_batches']) + 1))
+        if name == 'binding':
+            expected_ticks = list(range(1, len(fixture['ticks']) + 1))
+        elif name == 'grouped':
+            expected_ticks = list(range(fixture['ticks'] + 1))
+        else:
+            expected_ticks = list(range(sum(fixture['tick_batches']) + 1))
         for label, value in [('native-1', n1), ('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
             if [tick for tick, _ in value['trace']] != expected_ticks:
                 raise AssertionError(f'{name}/{label}: trace omitted or added ticks')
@@ -103,15 +115,31 @@ def main():
                 for field in ('relationship_ids', 'ticks'):
                     if n1[field] != candidate[field]:
                         failures.append(f'{name}/{label}/{field}: metadata differs')
-        if name == 'occurrence-mix':
+        if name in ('occurrence-mix', 'grouped'):
             for label, candidate in [('native-1', n1), ('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
                 difference = first_difference(candidate['trace'], candidate['reopened_trace'])
                 if difference:
                     failures.append(f'{name}/{label}/saved-recipe-reopen: {difference}')
-            for label, candidate in [('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
-                for field in ('relationship_ids', 'ticks'):
-                    if n1[field] != candidate[field]:
-                        failures.append(f'{name}/{label}/{field}: metadata differs')
+                if [tick for tick, _ in candidate['reopened_trace']] != expected_ticks:
+                    failures.append(f'{name}/{label}/reopened trace omitted or added ticks')
+            if name == 'occurrence-mix':
+                for label, candidate in [('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                    for field in ('relationship_ids', 'ticks'):
+                        if n1[field] != candidate[field]:
+                            failures.append(f'{name}/{label}/{field}: metadata differs')
+            else:
+                authored_spec = json.loads(fixture['spec'])
+                for label, candidate in [('native-1', n1), ('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                    if candidate['saved_spec'] != authored_spec:
+                        failures.append(f'{name}/{label}/saved spec differs from authored recipe')
+                    if candidate['saved_spec']['root']['outer']['weight'] != 16.0:
+                        failures.append(f'{name}/{label}/outer weight did not retain authored 16.0 f64')
+                    if candidate['initial_group_sizes'] != [2, 2]:
+                        failures.append(f'{name}/{label}/Canvas groups are not two groups of two')
+                for label, candidate in [('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                    for field in ('ticks', 'partition', 'saved_spec', 'initial_group_sizes'):
+                        if n1[field] != candidate[field]:
+                            failures.append(f'{name}/{label}/{field}: metadata differs')
         controls = {}
         if name == 'binding':
             changed = copy.deepcopy(fixture)
@@ -128,7 +156,7 @@ def main():
             for runtime in (False, True):
                 label = 'unsupported-spec-' + ('wasm' if runtime else 'native')
                 controls[label] = run(label, json.dumps(changed), runtime, refusal='spec')
-        else:
+        elif name in ('occurrence', 'occurrence-mix'):
             changed = copy.deepcopy(fixture)
             changed['include_relationships'] = False
             for runtime in (False, True):
@@ -181,6 +209,48 @@ def main():
                 for runtime in (False, True):
                     label = 'kinematic-mix-refusal-' + ('wasm' if runtime else 'native')
                     controls[label] = run(label, json.dumps(changed), runtime, refusal='root.parts[1]')
+        elif name == 'grouped':
+            for runtime, baseline in ((False, n1), (True, w1)):
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['partition'] = 'groups.coloring'
+                changed['spec'] = json.dumps(spec)
+                label = 'partition-divergence-' + ('wasm' if runtime else 'native')
+                value = run(label, json.dumps(changed), runtime)
+                difference = first_difference(baseline['trace'], value['trace'], 'position-bits:')
+                if difference is None:
+                    raise AssertionError(f'{label}: changed Canvas groups channel must alter positions')
+                controls[label] = difference
+
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['inner']['id'] = 'stress.kamada-kawai'
+                changed['spec'] = json.dumps(spec)
+                label = 'law-divergence-' + ('wasm' if runtime else 'native')
+                value = run(label, json.dumps(changed), runtime)
+                difference = first_difference(baseline['trace'], value['trace'], 'position-bits:')
+                if difference is None:
+                    raise AssertionError(f'{label}: changed grouped inner law must alter positions')
+                controls[label] = difference
+
+            changed = copy.deepcopy(fixture)
+            spec = json.loads(changed['spec'])
+            spec['root']['partition'] = 'groups.bridges'
+            changed['spec'] = json.dumps(spec)
+            for runtime in (False, True):
+                label = 'unsupported-partition-' + ('wasm' if runtime else 'native')
+                controls[label] = run(label, json.dumps(changed), runtime, refusal='root.partition')
+
+            # Malformed extreme f64s exercise the authored direct-spec guard in
+            # both compiled runtimes. They must be rejected before Canvas runs.
+            for weight in (1e300, 1e-300):
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['outer']['weight'] = weight
+                changed['spec'] = json.dumps(spec)
+                for runtime in (False, True):
+                    label = 'outer-weight-refusal-' + format(weight, '.0e') + '-' + ('wasm' if runtime else 'native')
+                    controls[label] = run(label, json.dumps(changed), runtime, refusal='root.outer.weight')
         results['cases'][name] = {"accepted_ticks": expected_ticks[-1], "witnesses": len(n1['trace']), "input_sha256": sha(out / (name + '-input.json')), "native_sha256": sha(native), "wasm_sha256": sha(wasm),
                                   "executed_wasm_sha256": sha(pkg / 'replay_bg.wasm'), "wasm_glue_sha256": sha(pkg / 'replay.js'),
                                   "fixture_sha256": sha(fixture_path), "differences": differences, "controls": controls}
@@ -189,7 +259,8 @@ def main():
     results['limits'] = ['Fresh-start replay for these fixtures on this native host and Node Wasm runtime.',
                          'The occurrence Mix case round-trips the serialized DynamicsSlot recipe before replay; this does not qualify Graphshell v4 persistence or checkpoint restoration.',
                          'No checkpoint restoration, cross-OS, browser UI, actor replay or consumer repin qualification.',
-                         'Occurrence witnesses cover public positions, roles and source identities; Seiche witnesses also cover velocities and field time.']
+                         'Occurrence witnesses cover public positions, roles and source identities; Seiche witnesses also cover velocities and field time.',
+                         'The direct Canvas grouped witness covers public groups-channel membership, roles and position bits only; it does not witness velocities, clocks or checkpoint state.']
     (out / 'replay-results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(json.dumps(results, indent=2))
     return bool(failures)
