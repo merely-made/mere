@@ -839,9 +839,13 @@ intake. Its audit verifies all 48 recorded upstream file hashes and 46 unchanged
 originals; the only behavioral patch suppresses synthesized held-key presses at
 the existing native event owner. That guard and its test move verbatim to Mere's
 shared host, whose guarded library source matches the donor byte for byte.
-Woodshed can then remove the source patch and 52-file, 13,288-line snapshot when
-it receives the qualified shared revision. Real presses and the existing
-release/Tab-navigation path retain their behavior.
+Woodshed `80f2d4eb` receives the qualified shared revision and removes the source
+patch and 52-file, 13,288-line snapshot. Real presses and the existing
+release/Tab-navigation path retain their behavior. Its four receiving roots and
+affected leaf libraries pass 1,086 CPU test executions, with 11 existing ignores.
+Four existing read-only accessibility hooks adopt Sprigging's shared `&self`
+receiver without changing their bodies. This adds no native-focus or audio
+acceptance claim.
 
 The canonical source/receiving ledger is
 `support/family-promotion/pool-cohort-rollout-20261022.json`. It records exact
@@ -849,3 +853,10 @@ published code inputs, per-root source identities, commands, results and
 qualification limits as each receiving checkpoint is delivered. Native UI,
 physical devices, heavy models and the Knot checkpoint feature retain their
 separate owners and acceptance records.
+
+The scoped receiving checkpoints are published. The final audit parses all
+package entries in 19 committed locks, including inactive targets. It closes
+two byte-identical Genet package residues in Cleromancy that actual-platform
+metadata omitted. Runtime-qualified code and later lock-only evidence remain
+distinct; products retain their tested SDK inputs instead of following
+receipt-only commits through another recursive repin.
