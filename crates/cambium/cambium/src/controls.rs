@@ -28,4 +28,4 @@ pub use text_input::{
     CaretAffinity, CaretMove, CaretPosition, CaretSelection, Composition, TextCommand,
     TextFieldMode, TextInput, text_command_from_key,
 };
-pub use toggle::{Checkbox, checkbox, checkbox_typed, toggle};
+pub use toggle::{CheckElement, Checkbox, checkbox, checkbox_disabled, checkbox_typed, toggle};

@@ -121,6 +121,30 @@ where
         .attr("class", "disclosure")
 }
 
+/// A disclosure's trigger alone, for a host that keeps the disclosed content
+/// elsewhere in its own tree (a toolbar button for a region further down, or
+/// content it builds only while open). The button announces `aria-expanded` and
+/// toggles through `on_toggle`; the label may change with the state ("Show
+/// …" / "Hide …"). Where the content follows the trigger directly, prefer
+/// [`disclosure`].
+pub fn disclosure_trigger<State, Action, Label, Toggle>(
+    label: Label,
+    expanded: bool,
+    on_toggle: Toggle,
+) -> impl View<State, Action, GenetCtx, Element = GenetElement> + use<State, Action, Label, Toggle>
+where
+    State: 'static,
+    Action: 'static,
+    Label: ViewSequence<State, Action, GenetCtx, GenetElement>,
+    Toggle: Fn(&mut State) + 'static,
+{
+    let control = el::<_, State, Action>("button", label)
+        .attr("class", "disclosure-trigger")
+        .attr("type", "button")
+        .attr("aria-expanded", if expanded { "true" } else { "false" });
+    disclosure_control(control, None, expanded, false, true, false, on_toggle)
+}
+
 /// Whether an accordion permits one or many expanded panels.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum AccordionMode {
@@ -911,6 +935,31 @@ mod tests {
             Some("grace"),
             "collapsing the panel does not reach into the application's state"
         );
+    }
+
+    #[test]
+    fn trigger_announces_state_and_toggles_host_state_with_the_keyboard() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |open: &bool| {
+                disclosure_trigger(
+                    if *open { "Hide list" } else { "Show list" },
+                    *open,
+                    |open: &mut bool| *open = !*open,
+                )
+            },
+            false,
+        );
+        let trigger = runner.root();
+        assert_eq!(attr(&dom.borrow(), trigger, "aria-expanded"), Some("false"));
+        assert_eq!(attr(&dom.borrow(), trigger, "tabindex"), None);
+        runner.dispatch_click(trigger, PointerClick::at((1.0, 1.0)));
+        assert!(*runner.state());
+        assert_eq!(attr(&dom.borrow(), trigger, "aria-expanded"), Some("true"));
+        runner.set_focus(Some(trigger));
+        runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Space)));
+        assert!(!*runner.state(), "Space toggles the trigger like a button");
     }
 
     fn accordion_items() -> Vec<AccordionItem<&'static str>> {
