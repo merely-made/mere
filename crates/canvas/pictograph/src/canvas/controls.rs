@@ -54,6 +54,39 @@ pub enum CanvasCommand {
 }
 
 impl CanvasCommand {
+    /// The plain label a host's button or command row shows, one per verb
+    /// (as `ArrangementAction::label` is
+    /// for the item actions). A host that knows more may say more: the page
+    /// names Fit by whether its graph is hosted, and Play or Pause by the
+    /// state it reads, both through the variants here.
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Pan { dx, .. } if dx < 0.0 => "Pan left",
+            Self::Pan { dx, .. } if dx > 0.0 => "Pan right",
+            Self::Pan { dy, .. } if dy < 0.0 => "Pan up",
+            Self::Pan { .. } => "Pan down",
+            Self::Zoom { delta } if delta >= 0.0 => "Zoom in",
+            Self::Zoom { .. } => "Zoom out",
+            Self::SetZoom { .. } => "Set zoom",
+            Self::Fit => "Fit graph",
+            Self::FitVisible => "Fit visible graph",
+            Self::FitSelection => "Fit selection",
+            Self::RestoreArrangement => "Restore arrangement",
+            Self::SetPhysicsPaused(true) => "Pause physics",
+            Self::SetPhysicsPaused(false) => "Play physics",
+            Self::TogglePhysics => "Pause or resume physics",
+            Self::ResetToSeed => "Reset to seed",
+            Self::SetSeed => "Set seed",
+            Self::RestoreRecipeSeed => "Restore recipe seed",
+            Self::DismissRetained => "Dismiss retained",
+            Self::ToggleForegroundPin => "Foreground pin",
+            Self::GrowTiles => "Grow tiles",
+            Self::ShrinkTiles => "Shrink tiles",
+            Self::ToggleTerritory => "Territory",
+            Self::ToggleSuggestions => "Suggestions",
+        }
+    }
+
     /// Carry the command out on any host that offers the verbs it needs; the
     /// canvas is one. `viewport` is the host's logical size in px.
     pub fn apply<H: FitHost>(self, host: &mut H, viewport: (u32, u32)) {
@@ -111,6 +144,40 @@ impl CanvasCommand {
 mod tests {
     use super::*;
     use crate::canvas::Canvas;
+
+    #[test]
+    fn every_verb_has_one_distinct_label() {
+        let verbs = [
+            CanvasCommand::Pan { dx: -1.0, dy: 0.0 },
+            CanvasCommand::Pan { dx: 1.0, dy: 0.0 },
+            CanvasCommand::Pan { dx: 0.0, dy: -1.0 },
+            CanvasCommand::Pan { dx: 0.0, dy: 1.0 },
+            CanvasCommand::Zoom { delta: 1.0 },
+            CanvasCommand::Zoom { delta: -1.0 },
+            CanvasCommand::SetZoom { zoom: 1.0 },
+            CanvasCommand::Fit,
+            CanvasCommand::FitVisible,
+            CanvasCommand::FitSelection,
+            CanvasCommand::RestoreArrangement,
+            CanvasCommand::SetPhysicsPaused(true),
+            CanvasCommand::SetPhysicsPaused(false),
+            CanvasCommand::TogglePhysics,
+            CanvasCommand::ResetToSeed,
+            CanvasCommand::SetSeed,
+            CanvasCommand::RestoreRecipeSeed,
+            CanvasCommand::DismissRetained,
+            CanvasCommand::ToggleForegroundPin,
+            CanvasCommand::GrowTiles,
+            CanvasCommand::ShrinkTiles,
+            CanvasCommand::ToggleTerritory,
+            CanvasCommand::ToggleSuggestions,
+        ];
+        let mut labels: Vec<_> = verbs.iter().map(|verb| verb.label()).collect();
+        labels.sort_unstable();
+        labels.dedup();
+        assert_eq!(labels.len(), verbs.len());
+        assert_eq!(CanvasCommand::ResetToSeed.label(), "Reset to seed");
+    }
 
     #[test]
     fn set_zoom_lands_exactly_and_keeps_the_centre_world_point() {
