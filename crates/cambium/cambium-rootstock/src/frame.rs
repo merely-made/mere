@@ -1044,6 +1044,9 @@ where
     /// cursor here" and only moves focus. Collapsing them would fire every
     /// control a reader navigates across.
     pub fn sync_a11y(&mut self) -> Vec<crate::A11yDispatch> {
+        if !self.s.a11y_owner.get() {
+            return Vec::new();
+        }
         // A screen reader is told physical client pixels, and the tree it is
         // told them about is laid out in layout pixels: the transform between
         // them is the layout scale, zoom included. A reader that read the
@@ -1064,6 +1067,7 @@ where
             };
             // The window is the adapter's own now, so the seam does not carry it.
             a11y.sync(
+                &crate::A11yOwner::new(&self.s.a11y_owner),
                 &view,
                 layout,
                 &mut self.s.shared.leaves,
@@ -1136,14 +1140,17 @@ where
 
     /// Admission belongs to the host, not to a platform's last-synced ID map.
     /// Layout visibility is the retained host view. Bound publications also
-    /// check document/mount and contributor lives; raw requests name the current
-    /// context. Neither form establishes an atomic presentation transaction.
+    /// check host owner, document/mount and contributor lives. Raw requests name
+    /// the current context. Neither form establishes an atomic presentation transaction.
     fn admit_a11y_request(
         &mut self,
         request: &crate::A11yRequest,
     ) -> Result<crate::NodeId, crate::A11yRejection> {
         use crate::A11yRejection as Refusal;
         use layout_dom_api::LayoutDom as _;
+        if !self.s.a11y_owner.get() {
+            return Err(Refusal::Cancelled);
+        }
         if matches!(request.action, A11yAction::SetValue(value) if !value.is_finite()) {
             return Err(Refusal::InvalidValue);
         }
@@ -1153,7 +1160,12 @@ where
         let dom = runner.dom();
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, runner.mount());
-        if !request.publication_is_current(&view, &self.s.shared.leaves, &self.s.shared.producers) {
+        if !request.publication_is_current(
+            &crate::A11yOwner::new(&self.s.a11y_owner),
+            &view,
+            &self.s.shared.leaves,
+            &self.s.shared.producers,
+        ) {
             return Err(Refusal::StaleTarget);
         }
         if let crate::A11yTarget::Node(node) = request.target {
@@ -1216,7 +1228,12 @@ where
         }
         // A contributor callback is required to be observational. Recheck its
         // authored life even if interior mutation violated that contract.
-        if !request.publication_is_current(&view, &self.s.shared.leaves, &self.s.shared.producers) {
+        if !request.publication_is_current(
+            &crate::A11yOwner::new(&self.s.a11y_owner),
+            &view,
+            &self.s.shared.leaves,
+            &self.s.shared.producers,
+        ) {
             return Err(Refusal::StaleTarget);
         }
         Ok(node)

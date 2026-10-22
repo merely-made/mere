@@ -1,0 +1,22 @@
+{
+  "basis": "4fa253865d59adb0b76fc770db631f6de35e9072",
+  "source_normalization": "CRLF normalized to LF",
+  "source_sha256": {
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "0a7ee720270a867cf8c32390926981aecfaab70af419fb990a2fdbaeb0f7277c",
+    "crates/cambium/cambium-genet-winit-host/src/lib.rs": "8ca652e890e40a4b71123236ed7e318d84ed257590506a4fbd968ae001679708",
+    "crates/cambium/cambium-rootstock/src/a11y_provenance.rs": "6fb1ca1883915302ef0331598d5cf97dabab9939651fc62ea9b834d60abb04b7",
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "3b37e1f704475e473389d67046d460809891b64f5c44fb1a9e48144aa08443c3",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "944323e0cd8cacdd6140ab55a781a18d88d5ae02f6647acb4c26464cdfbbf428",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests/publication_tests.rs": "5ae1ea9025f924ba38dce629f7273acd083b5b42514ead5d8a937be3b7387113",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "643503dd3a1f6b1dcdee11bcc453d9c566727e7b7b8b2cadced04d6f6ec1b096",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "76d139f93d2f544e8a9e4e55746830c6c82caf8b7eaa008c501ca6227e69ee76",
+    "crates/cambium/cambium-rootstock/src/multi_host_tests.rs": "c411a20c534607227b48f2772d937211f5452144747299bf55b0d3d0bb01b085",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "f12e995b6d37483f469c07461602f56afdf218561325d7e142a307967ffd2c36",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "273a6e8445b2f72b67e74920ec868ee4194f00e78b647a0875988627665207ba",
+    "crates/cambium/cambium-winit-a11y/src/publication_tests.rs": "095aa1669df8fb716fde454b50951e4b1e4215a1f88467e31d9e821e8d4bff82",
+    "crates/cambium/cambium-rootstock/src/a11y_owner.rs": "87e5288624ef07892b2b3df101032b5c1a36e0ef1c65ce9962ec1cb1faa93492",
+    "Cargo.toml": "67dc652e4c2999a3f431afaa6e7958150debdc0eaab358570c8333d5f0b27b01",
+    "Cargo.lock": "156384ca0fe672fe4fb0f4aa9f7c7444442d31f36c9b29fad0c5f735728043e4"
+  },
+  "gate_boundary": "Full native-final cohort and final Wasm/embedding receive the owner/disposal repair. Subsequent native-window gate receives only the attachment guard, its native caller and regression; other audited source is unchanged. Product tests receive owner contract. Earlier native/browser/embedding gates are repeats, not extra passes."
+}

@@ -378,6 +378,7 @@ struct Recording(Rc<std::cell::RefCell<HashSet<u64>>>);
 impl crate::Accessibility for Recording {
     fn sync(
         &mut self,
+        _: &crate::A11yOwner,
         dom: &WindowDom<'_>,
         layout: &crate::OwnedLayout,
         _: &sprigging::LeafRegistry<u64>,

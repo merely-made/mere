@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-22",
+  "status": "Bounded owner/disposal/native attachment repairs qualified; full native publication ID migration remains open.",
+  "distinct_targeted_passes": 295,
+  "full_native_final": 280,
+  "focused_native_window": {
+    "passes": 57,
+    "already_in_full_native": 56,
+    "additional": 1
+  },
+  "product_passes": 14,
+  "existing_ignores": 7,
+  "browser": "Wasm compilation passed; actual proxy/event/focus/disposal and human AT unqualified.",
+  "embedding": "Compilation passed.",
+  "native_window": "Headless exact handle-admission helper plus native host compilation/tests; actual platform installation/reattach recovery unqualified.",
+  "documentation": "Same 40 pre-existing D2 errors; no additional errors.",
+  "source": "diagnostics-owner-source.json",
+  "review": "diagnostics-owner-review.json",
+  "remaining": "Full all-node native publication identity, schema-owned complete reference remapping and host/guest lifecycle; physical surface handoff, actor transactions, canvas same-call replacement, full leaf sizing/raster and platform runtime acceptance.",
+  "repeated_gates": "Initial native/browser/embedding repeat final gates; do not sum them. Final native-window receives attachment-only change after the full cohort.",
+  "retained_byte_cap": 10000000,
+  "receipts_sha256": {
+    "support/family-promotion/diagnostics-owner-brief.json": "3cd9a379ea123801fdbf91859a30423225372fe3f942f23c41ca74b4d1b0aaf0",
+    "support/family-promotion/diagnostics-owner-browser-final.json": "e8d52407ff8e724d2185ce07fd9dad58ab72921f15fc4cbb94966ff3461715f8",
+    "support/family-promotion/diagnostics-owner-browser.json": "7badc1656912c831e4849f893afce4e45364d8e3e0d4d9eec5261e5ab319f0b9",
+    "support/family-promotion/diagnostics-owner-docs-baseline.json": "5f3ac898c0fe2d9d35f2b946b9586082acbe0d5bfa4f493ac8fec640d59ebb8b",
+    "support/family-promotion/diagnostics-owner-docs-final.json": "e5d8ded87d84952439db51a71cdd3152da1675138e25af0a939400d22b7e1b2f",
+    "support/family-promotion/diagnostics-owner-docs-qualified.json": "a83d76b96adb5181c8504c6178944c2a80c09899994dfa8bab1e708a0d65151a",
+    "support/family-promotion/diagnostics-owner-embedding-final.json": "805cf40df338bc118badee51f772f6b8682b1d90ea2d282a3c826e04eda54af8",
+    "support/family-promotion/diagnostics-owner-embedding.json": "eab4659111b06dd7bdc28222822cf8c322edc2180d57b8ec002f43de775cee92",
+    "support/family-promotion/diagnostics-owner-evidence.json": "7389d5f29f52bb191a72a111214dbe86daf2dff644aa528095751f16b04d56c3",
+    "support/family-promotion/diagnostics-owner-native-final.json": "520001c9b805804664fcc25a5d6b08b1ca5a7e37f0aaf21dc5927d959e2c3c62",
+    "support/family-promotion/diagnostics-owner-native-window.json": "d8b62b0a13e9f25ba81cdd366a5845329068dc259349edceb2e1d840d07cb76f",
+    "support/family-promotion/diagnostics-owner-native.json": "79e4d79c8057e291405c2cf1bf7a6fa0c5658d3ffaa1ded2974a1b2bf59d2be4",
+    "support/family-promotion/diagnostics-owner-preservation.json": "a348617010a6aef97509fff6cf6da7517139462c72dd28329b584e2ff27daff2",
+    "support/family-promotion/diagnostics-owner-product.json": "aac1800cc41cfe93c08d64f037d04253be12eb85ccc409d359303fe0f2041efa",
+    "support/family-promotion/diagnostics-owner-review.json": "daae4d1e7942ba9cecdbb7d0d039978616993c8a8994e1cd33c73b522d3a19be",
+    "support/family-promotion/diagnostics-owner-source.json": "427253e9d7d4e809a89ba993897a23d6d62ac503391b19f1f8cb4a58ae8b26ea",
+    "support/doc-audit/d2/batch_107_native_publication_owner_lifetimes.md": "d90747233925d48d9ea79e4a20d59bfbad090957e61f8deba2810b3dd3e2ec58"
+  }
+}
