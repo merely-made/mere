@@ -1,0 +1,23 @@
+{
+  "source": "2eb8aa09340f7f64739349c7ee08c05902f10f87",
+  "public_synthetic_only": true,
+  "native_changed_vault_files_copied_exactly": {
+    "sealed/vault/passphrase-root.json": {
+      "sha256": "bea89f7bcaee16b577f23ef8c555f9aa4bf08f89243059bb6ed5cbf9d123ae5f",
+      "bytes": 364
+    },
+    "sealed/vault/profiles/9456b757701dbeb0d154659e41b3251b1f70400b61866ae8f5fce5228fa9be99.json": {
+      "sha256": "103b50c63375eaaf06549918afc0fed963811189edd5f594027876c64e6c6107",
+      "bytes": 1878
+    },
+    "sealed/vault/profiles/d7794f6d361f411d44237771f4d4f9aad74e442e8055ca75eada32c270e5ce4b.json": {
+      "sha256": "0ffdc9dce923ac1e5d1b2ad37f1cbb53a66dfcd054ef52ebfc6139ab7071d381",
+      "bytes": 1837
+    },
+    "portable/vault.json": {
+      "sha256": "c77d3d9912396865c1fe9dad90df9f22218e3233122bb0c85a6754eba63a6c6f",
+      "bytes": 3556
+    }
+  },
+  "destination": "owned cold runtime; full ciphertext and credentials excluded from public receipts"
+}

@@ -33,7 +33,7 @@ def desktop_environment():
     assert state.get('Active')=='yes' and state.get('LockedHint')=='no',state
     return graphical,{'session':session,'state':state,'environment':graphical,
         'hostname':platform.node(),'architecture':platform.machine(),'kernel':platform.release(),
-        'os_release':Path('/etc/os-release').read_text()}
+        'os_release':Path('/etc/os-release').read_text(encoding='utf-8')}
 def main():
     p=argparse.ArgumentParser()
     for n in ['binary','host','runtime','output']:p.add_argument('--'+n,type=Path,required=True)
@@ -41,26 +41,37 @@ def main():
     p.add_argument('--native-cancel',action='store_true',help='cancel the first native prompt in each format before retrying')
     p.add_argument('--desktop',action='store_true',help='use the existing unlocked Linux user desktop')
     p.add_argument('--format',choices=['sealed','portable','both'],default='both')
+    p.add_argument('--reopen-only',action='store_true',help='cold reopen already changed, marker-owned synthetic fixtures without collecting input')
     a=p.parse_args()
     assert not a.native_cancel or a.native,'--native-cancel requires --native'
-    a.runtime.mkdir(mode=0o700,parents=True);a.output.mkdir(parents=True)
+    assert not a.reopen_only or not a.native_cancel,'cold reopens do not prompt'
+    formats=['sealed','portable'] if a.format=='both' else [a.format]
+    if a.reopen_only:
+        for fmt in formats:
+            root=a.runtime/fmt
+            assert (root/'.authentication-fixture').read_text(encoding='utf-8')=='public synthetic authentication'
+            assert not (root/'ready').exists() and not (root/'stop').exists(),'fixture is still active'
+    else:
+        a.runtime.mkdir(mode=0o700,parents=True)
+    a.output.mkdir(parents=True)
     repo=Path(__file__).resolve().parents[1];processes=[];results=[];graphical={}
+    child_options={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
     if a.desktop:
         graphical,desktop=desktop_environment()
-        (a.output/'desktop.json').write_text(json.dumps(desktop,indent=2)+'\n')
-    for fmt in (['sealed','portable'] if a.format=='both' else [a.format]):
+        (a.output/'desktop.json').write_text(json.dumps(desktop,indent=2)+'\n',encoding='utf-8')
+    for fmt in formats:
         root=a.runtime/fmt;out=(a.output/fmt).resolve();out.mkdir()
-        for phase in ['seed','reopen']:
-            host_log=(out/(phase+'-host.log')).open('w')
+        for phase in (['reopen'] if a.reopen_only else ['seed','reopen']):
+            host_log=(out/(phase+'-host.log')).open('w',encoding='utf-8')
             env=os.environ.copy()
             for key in list(env):
                 if key.startswith(('DRAMATIS_','GRAPHSHELL_','PERSONAE_','MERE_','D_AUTH_')):env.pop(key)
             env.update(graphical)
             env.update(D_AUTH_ROOT=str(root.resolve()),D_AUTH_FORMAT=fmt,D_AUTH_PHASE=phase,D_AUTH_NATIVE='1' if a.native else '0')
-            host=subprocess.Popen([str(a.host.resolve()),'--ignored','--exact','headed_authentication_host','--nocapture'],cwd=repo,env=env,stdout=host_log,stderr=subprocess.STDOUT)
+            host=subprocess.Popen([str(a.host.resolve()),'--ignored','--exact','headed_authentication_host','--nocapture'],cwd=repo,env=env,stdout=host_log,stderr=subprocess.STDOUT,**child_options)
             try:
                 wait_file(root/'ready',host)
-                endpoint=str((root/'app.sock').resolve())
+                endpoint=(root/'ready').read_text(encoding='utf-8')
                 def await_(fields):return 'await '+json.dumps(fields)+'\nwait 300000\n'
                 def capture(name):return 'capture '+str(out/(name+'.png'))+'\n'
                 script=await_({'ready':'true','profiles':'2','locked':'false'})
@@ -72,15 +83,15 @@ def main():
                     script+='click role:button Change passphrase…\n'+await_({'notice':'~Passphrase changed.'})+capture('changed')
                     script+='settle 240\n'+capture('acknowledged-after-refresh')
                 else:script+=capture('cold-reopened')
-                scn=out/(phase+'.scn');scn.write_text(script)
+                scn=out/(phase+'.scn');scn.write_text(script,encoding='utf-8')
                 shown=env|{'GRAPHSHELL_APP_ENDPOINT':endpoint,'DRAMATIS_SCENARIO':str(scn),'DRAMATIS_RECEIPT':str(out/(phase+'.json'))}
-                with (out/(phase+'-app.log')).open('w') as log:
-                    app=subprocess.Popen([str(a.binary.resolve())],cwd=repo,env=shown,stdout=log,stderr=subprocess.STDOUT)
+                with (out/(phase+'-app.log')).open('w',encoding='utf-8') as log:
+                    app=subprocess.Popen([str(a.binary.resolve())],cwd=repo,env=shown,stdout=log,stderr=subprocess.STDOUT,**child_options)
                     try:app.wait(timeout=600)
                     finally:
                         if app.poll() is None:app.terminate();app.wait(timeout=15)
                 assert app.returncode==0,('native app failed',fmt,phase,app.returncode)
-                receipt=json.loads((out/(phase+'.json')).read_text());assert receipt['ok'] and not receipt['errors'],receipt
+                receipt=json.loads((out/(phase+'.json')).read_text(encoding='utf-8'));assert receipt['ok'] and not receipt['errors'],receipt
                 assert int(receipt['final']['pid'])==app.pid
                 processes.append({'kind':'dramatis','pid':app.pid,'format':fmt,'phase':phase,'exit':app.returncode})
             finally:
@@ -93,11 +104,11 @@ def main():
             for name in ['before-identities.json','cold-identities.json','old-rejected','native-provider.json']:
                 if (root/name).exists():(out/name).write_bytes((root/name).read_bytes())
             for name in ['ready','stop']:(root/name).unlink()
-        before=json.loads((out/'before-identities.json').read_text());cold=json.loads((out/'cold-identities.json').read_text())
-        assert before==cold and (out/'old-rejected').read_text()=='true'
+        before=json.loads((out/'before-identities.json').read_text(encoding='utf-8'));cold=json.loads((out/'cold-identities.json').read_text(encoding='utf-8'))
+        assert before==cold and (out/'old-rejected').read_text(encoding='utf-8')=='true'
         results.append({'format':fmt,'identities_preserved':True,'old_rejected_after_cold_reopen':True})
     result={'result':'ok','source':subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip(),
-      'native_dialogs':a.native,'native_cancellation':a.native_cancel,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
+      'native_dialogs':a.native and not a.reopen_only,'native_provider_selected':a.native,'native_cancellation':a.native_cancel,'reopen_only':a.reopen_only,'public_synthetic_vaults_only':True,'formats':results,'processes':processes,
       'binaries':{'app_sha256':sha(a.binary),'host_sha256':sha(a.host)},'controller_sha256':sha(Path(__file__))}
-    (a.output/'qualification.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result),flush=True)
+    (a.output/'qualification.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result),flush=True)
 if __name__=='__main__':main()

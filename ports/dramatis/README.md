@@ -70,3 +70,8 @@ Both record exact input preservation, native cancellation and retry, failure
 controls and cold reopens for both vault formats. The Kubuntu run reuses the
 verified Fedora-built Linux executables; build provenance is recorded separately
 from runtime qualification.
+
+The [Windows qualification receipt](../../support/receipts/dramatis-authentication-windows-20261022/README.md)
+records masked Win32 prompts, exact input and cold reopens for both formats,
+the shared password-window reuse repair, and separate current-stack integration
+checks against the native-changed fixture vaults.

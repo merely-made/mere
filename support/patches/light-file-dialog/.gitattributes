@@ -1,0 +1,6 @@
+# Preserve the published archive's bytes, including upstream CRLF and whitespace.
+* -text -whitespace
+# Local edits retain ordinary checks and LF bytes.
+src/windows/gui.rs text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab
+UPSTREAM.json text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab
+.gitattributes text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab
