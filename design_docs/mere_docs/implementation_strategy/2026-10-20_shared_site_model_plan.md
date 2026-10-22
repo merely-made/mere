@@ -3,8 +3,7 @@
 **Status (2026-10-21):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
-The Gemini runtime continuation has a native cross-process receipt; integration
-and final source recording are in progress.
+The Gemini runtime continuation is landed and qualified through native processes.
 
 ## Scope and ownership
 
@@ -17,8 +16,8 @@ signed contributions and collection authority.
 Knot keeps file access, drafts, templates, checked saves and protocol adapters.
 Djinn keeps custody, certificates, listener policy and resident lifecycle.
 
-Cross-Moot publication lineage, network delivery and new Errand/Armillary
-adapters are subsequent work. Existing V1 limits and profile semantics remain
+Cross-Moot publication lineage and peer acquisition are subsequent work.
+The Gemini resident uses existing Errand and Armillary seams. Existing V1 limits and profile semantics remain
 unchanged; the adapters reuse existing publication and storage authority.
 
 ## Phases and done-conditions
@@ -112,7 +111,7 @@ the default model and local checkpoint feature stay independent.
 
 ## Gemini publication runtime (2026-10-21)
 
-**Status:** native qualified; integration in progress. Host authority and native
+**Status:** landed and native qualified. Host authority and native
 snapshot V1 stay unchanged.
 
 1. Add a versioned endpoint binding with explicit pinned-contribution and
@@ -239,3 +238,21 @@ refuses serving until explicitly repaired.
   its 110,906 metadata bytes as "blocked by policy." No isolated target remains.
   Live protocol serving and peer acquisition, host revalidation/revocation,
   actor wiring and cross-Moot signed publication lineage stay open.
+
+- 2026-10-21: Gemini runtime source `0a00e4c2e`, shared binding supplier
+  `a845b0b22`, and Knot publisher `b37be4f` are integrated through Mere
+  `b775eae24`. The final locked resident binary is built at `527136589`;
+  resident sources, manifests and lock are identical on the receiving head.
+  The native process gate passes with two actual Knot publisher processes,
+  three resident processes and independent retained owners. It checks exact
+  full Gemini/TLS wire bytes, certificate continuity, replacement, current
+  membership removal/restoration, withdrawal and refusal on restart. A stalled
+  TLS-admitted request is cancelled and joined before shutdown acknowledgment.
+  The existing eight resident cases, shared 16 cases plus doctest, Knot's 18
+  site cases, ordinary root check and strict shared/Knot Clippy pass.
+  [Native receipt](../../../support/receipts/gemini-publication-runtime/native.json).
+  The CLI is the first product caller. Desktop controls/main broker attachment,
+  Scroll/Micron runtime serving, peer acquisition, hosting-promise integration,
+  protected delivery and signed cross-Moot publication lineage remain open.
+  Isolation was required by the concurrent root-lock collision; stable Mere and
+  Knot targets were reused and no new isolated Cargo home was created.

@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "recorded_at": "2026-10-22T00:10:08Z",
+  "receipt_cap_bytes": 100000000,
+  "scope": "Windows native same-machine product processes; explicit signed local handoff; independent community and content stores; real loopback Gemini/TLS",
+  "source": {
+    "contract_supplier": "a845b0b222431fc340ba3e8e59b9f77d44e4545a",
+    "runtime_source": "0a00e4c2e",
+    "resident_build_basis": "527136589b8658a62452c82515c928cccb9c710a",
+    "mere_integration": "b775eae24343bf0756ec70366a4aaa5ce2ac138b",
+    "knot_publisher": "b37be4f7c24bb98083626ba4eacf0057e6655a67",
+    "receiving_equality": "No diff between resident build basis and Mere integration for resident source, manifests or Cargo.lock"
+  },
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "source_sha256": {
+    "mere/ports/djinn/Cargo.toml": "80f8bbafe46d33561b38b8e52ec3246b36dbecfcad0830f71157e683930e4584",
+    "mere/ports/djinn/src/resident_site.rs": "b9618aac5367b59820a323a1144d5983fa1949dcd5995034e6cb1315d08f03fb",
+    "mere/ports/djinn/src/moot_site.rs": "63a368b3652c14f5f738405afb1e5db617e919ccddc28f97d2900efa527cf377",
+    "mere/ports/djinn/src/bin/djinn_moot_site.rs": "1a55967563205afd2026364e9330e4ef7e009c86c83faa3d107610d37689e8c9",
+    "mere/ports/djinn/src/lib.rs": "289fe092f548488519af000e5d26c238492f09dfd3c57f6271ac56835e533699",
+    "mere/crates/domain/site/src/publication.rs": "139a9828ea23cd7406addab898188a4a71463ee49b5b7c829965dd2c76915716",
+    "mere/crates/domain/site/tests/publication.rs": "40b3fe6e58965169b9a4b248cee3908c9f1731cdb1c34245c17112a631e1dfb9",
+    "mere/Cargo.lock": "3f29b3a92f49736beade1f1db92905af4f60beb18e75670fb0388cb61a7f3987",
+    "knot-editor/crates/knot-site/tests/moot_site_runtime.rs": "f3776992a13d3a545efdc8e6e661188a9e4bd6f64a162a04493b3cba329e9a9b",
+    "knot-editor/crates/knot-site/Cargo.lock": "86bc2dab014a4be4b46544bfbc97ea01368aad20277d88ab13407490bc410045"
+  },
+  "binary_sha256": {
+    "resident": "e8a0699ea7d233c670cd927607250359b2c673601aa2bf6a5cb241e1bb2616ef",
+    "publisher": "3bf4b445e231ae46623abee0ab11aae57c4d5ff0738d863f40af3c9d34b97249"
+  },
+  "gates": [
+    {
+      "command": "cargo build --locked --offline -p djinn --no-default-features --features moot-site --bin djinn-moot-site --quiet",
+      "basis": "527136589",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo test --locked --offline --manifest-path crates/knot-site/Cargo.toml --features runtime-acceptance --test moot_site_runtime -- --ignored --nocapture",
+      "environment": {
+        "DJINN_MOOT_SITE_EXE": "C:\\t\\cargo-targets\\mere\\debug\\djinn-moot-site.exe",
+        "CARGO_TARGET_DIR": "C:\\t\\cargo-targets\\knot-editor",
+        "CARGO_BUILD_BUILD_DIR": "C:\\t\\cargo-targets\\knot-editor\\build"
+      },
+      "passed": 1,
+      "failed": 0,
+      "test_seconds": 35.04,
+      "exit_code": 0
+    },
+    {
+      "suite": "mere-site publication + history with serde_json/preserve_order",
+      "compatibility": 3,
+      "history": 6,
+      "publication": 7,
+      "doctests": 1,
+      "failed": 0
+    },
+    {
+      "command": "cargo clippy -p mere-site --features publication,history --all-targets --offline --no-deps -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "suite": "Existing Djinn resident-site unit tests on runtime source before formatting",
+      "passed": 8,
+      "filtered": 231,
+      "failed": 0
+    },
+    {
+      "suite": "Knot standalone publication/history, ordinary root check and strict Clippy",
+      "receipt": "knot-editor/support/receipts/gemini-publication-runtime/publisher.json"
+    }
+  ],
+  "process_proof": {
+    "certificate_sha256": [
+      18,
+      102,
+      81,
+      84,
+      130,
+      147,
+      123,
+      80,
+      52,
+      75,
+      98,
+      58,
+      143,
+      13,
+      164,
+      187,
+      168,
+      94,
+      25,
+      153,
+      217,
+      68,
+      111,
+      163,
+      72,
+      252,
+      47,
+      213,
+      19,
+      85,
+      220,
+      109
+    ],
+    "publisher_processes": 2,
+    "resident_processes": 3,
+    "first_shutdown": {
+      "cancelled": 0,
+      "joined": 1,
+      "panicked": 0,
+      "rejected": 0
+    },
+    "final_shutdown": {
+      "cancelled": 1,
+      "joined": 8,
+      "panicked": 0,
+      "rejected": 0
+    },
+    "checks": [
+      "Exact full Gemini response bytes including saved CRLF and native language metadata",
+      "Publisher exited before independent resident serving",
+      "Durable endpoint binding and same TLS certificate after resident restart",
+      "Missing page 51 and forbidden query 59",
+      "Replacement reflected by running resident",
+      "Membership removal refuses and restoration resumes",
+      "Withdrawal refuses; restarted resident remains stopped with refusal",
+      "Changing a running binding refuses",
+      "TLS-admitted stalled request cancelled and joined before shutdown acknowledgment"
+    ]
+  },
+  "boundaries": [
+    "CLI is the first product consumer; desktop controls, identity picker and main broker attachment remain open",
+    "Public Gemini only for new resident; Scroll/Micron profiles remain retained and tested but new transport/lifecycle receipts are separate",
+    "Native local I/O and bounded decoding execute inline and cannot be preempted by network deadlines",
+    "Authorization is rechecked at request admission; an admitted response may finish",
+    "Explicit local import may accept signed facts before content retention fails; reads refuse incomplete delivery",
+    "Peer acquisition, protected serving, full hosting-promise integration, signed cross-Moot publication lineage and two-machine evidence remain open"
+  ],
+  "resources": {
+    "cargo_targets": [
+      "C:\\t\\cargo-targets\\mere",
+      "C:\\t\\cargo-targets\\knot-editor"
+    ],
+    "new_isolated_cargo_homes": 0,
+    "temporary_worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-gemini-runtime",
+    "reason": "Actual concurrent Cargo.lock/source integration collision; branch integrated into main"
+  }
+}
