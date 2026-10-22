@@ -1,0 +1,139 @@
+{
+  "scope": "Private loopback native host; browser receiving and client limits excluded",
+  "gates": [
+    {
+      "command": "cargo build -p djinn --no-default-features --features moot-site-nomadnet --bin djinn-moot-site --offline --quiet",
+      "phase": "initial source before bounded controls",
+      "notes": "Preexisting Djinn warnings and one owned unused import, scheduled for removal",
+      "exit_code": 0
+    },
+    {
+      "seconds": 9.98,
+      "phase": "bounded controls before retry robustness adjustment",
+      "tests_passed": 9,
+      "command": "cargo test -p djinn --no-default-features --features moot-site-nomadnet --lib moot_site --offline --locked --quiet",
+      "exit_code": 0
+    },
+    {
+      "exit_code": 0,
+      "phase": "final source",
+      "summary": [
+        "running 9 tests",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 239 filtered out; finished in 9.00s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site-nomadnet --lib moot_site --offline --locked --quiet",
+      "name": "native host controls",
+      "elapsed_seconds": 248.95
+    },
+    {
+      "exit_code": 0,
+      "phase": "final source",
+      "summary": [
+        "running 8 tests",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 240 filtered out; finished in 0.18s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site-nomadnet --lib resident_site --offline --locked --quiet",
+      "name": "existing resident controls",
+      "elapsed_seconds": 15.62
+    },
+    {
+      "exit_code": 0,
+      "phase": "final source",
+      "summary": [
+        "running 8 tests",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 239 filtered out; finished in 8.95s"
+      ],
+      "command": "cargo test -p djinn --no-default-features --features moot-site --lib moot_site --offline --locked --quiet",
+      "name": "disabled backend host controls",
+      "elapsed_seconds": 135.82
+    },
+    {
+      "exit_code": 0,
+      "phase": "final source",
+      "summary": [],
+      "command": "cargo check -p djinn --no-default-features --features moot-site --bin djinn-moot-site --offline --locked --quiet",
+      "name": "disabled backend binary check",
+      "elapsed_seconds": 90.96
+    },
+    {
+      "exit_code": 0,
+      "phase": "final source",
+      "summary": [],
+      "command": "cargo build -p djinn --no-default-features --features moot-site-nomadnet --bin djinn-moot-site --offline --locked --quiet",
+      "name": "final native binary",
+      "elapsed_seconds": 45.83
+    },
+    {
+      "exit_code": 101,
+      "command": "cargo clippy -p djinn --no-default-features --features moot-site-nomadnet --lib --bin djinn-moot-site --offline --locked --quiet --no-deps -- -D warnings",
+      "diagnostics": [
+        "error: unused import: `Graph`\n  --> ports\\djinn\\src\\knot_relation_intake.rs:19:20\n   |\n19 |     CapturedDelta, Graph, SemanticStatement, apply::GraphDelta, sub_kind_from_iri,\n   |                    ^^^^^",
+        "error: unused import: `Hash`\n  --> ports\\djinn\\src\\sync\\carriage_host.rs:30:26\n   |\n30 | use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};\n   |                          ^^^^",
+        "error: unused import: `HeldLease`\n  --> ports\\djinn\\src\\sync\\carriage_host_commissioning.rs:42:64\n   |\n42 | use super::{CarriageCeilings, CarriageHost, CarriageHostError, HeldLease, now_ms};\n   |                                                                ^^^^^^^^^",
+        "error: variable does not need to be mutable\n   --> ports\\djinn\\src\\resident_distillery.rs:875:24\n    |\n875 |     pub async fn close(mut self) -> Result<(), String> {\n    |                        ----^^^^",
+        "error: function `refusal` is never used\n  --> ports\\djinn\\src\\keeper\\review.rs:15:4\n   |\n15 | fn refusal(error: impl std::fmt::Display) -> CustodyRefusal {\n   |    ^^^^^^^",
+        "error: field `ceilings` is never read\n  --> ports\\djinn\\src\\sync\\carriage_host.rs:72:5\n   |\n62 | pub struct CarriageHost {\n   |            ------------ field in this struct",
+        "error: this function has too many arguments (8/7)\n   --> ports\\djinn\\src\\door\\app_broker.rs:259:1\n    |\n259 | / async fn serve_admitted_app<A, R, W>(\n260 | |     reader: &mut R,",
+        "error: this function has too many arguments (8/7)\n   --> ports\\djinn\\src\\door\\browser_carrier.rs:470:1\n    |\n470 | / pub async fn admit_browser_session<P: IdentityProvider>(\n471 | |     identity: &P,",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\embedded_reservoir.rs:141:21\n    |\n141 | /                     if let Some(expected) = options.persona {\n142 | |                         if persona != expected {",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\knot_relation_intake.rs:194:13\n    |\n194 | /             if let Some(previous) = seen_retractions.insert(retraction.operation, retraction) {\n195 | |                 if previous != retraction {",
+        "error: this function has too many arguments (10/7)\n   --> ports\\djinn\\src\\personal_sync.rs:133:1\n    |\n133 | / pub async fn start<P: IdentityProvider + ?Sized>(\n134 | |     identity: &P,",
+        "error: redundant closure\n   --> ports\\djinn\\src\\personal_sync.rs:185:18\n    |\n185 |         .map_err(|error| PersonalSyncHostError::Transport(error))?;\n    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace the closure with the tuple variant itself: `PersonalSyncHostError::Transport`",
+        "error: very complex type used. Consider factoring parts into `type` definitions\n   --> ports\\djinn\\src\\personal_sync.rs:608:28\n    |\n608 |     let authority_changes: Vec<([u8; 32], Option<[u8; 32]>, Option<[u8; 32]>)> = desired\n    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\resident_events\\diagnostics.rs:167:9\n    |\n167 | /         if self.failure.is_none() {\n168 | |             if let Err(error) = self.collector.collect(self.started.elapsed(), 1, |packet| {",
+        "error: field assignment outside of initializer for an instance created with Default::default()\n   --> ports\\djinn\\src\\resident_knot.rs:305:9\n    |\n305 |         rosette.max_source_bytes = config.max_source_bytes;\n    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\resident_mere.rs:552:17\n    |\n552 | /                 if binding.instance != InstanceId(0) {\n553 | |                     if let Some(offers) = snapshot.presentation.offers.get_mut(&binding.key) {",
+        "error: the borrowed expression implements the required traits\n   --> ports\\djinn\\src\\resident_site.rs:835:53\n    |\n835 |         BlobLease::new(self.scope, LEASE_NAMESPACE, &digest)\n    |                                                     ^^^^^^^ help: change this to: `digest`",
+        "error: this `if` statement can be collapsed\n   --> ports\\djinn\\src\\sync\\carriage_host.rs:487:17\n    |\n487 | /                 if operation.header.payload_hash == Some(current.payload) {\n488 | |                     if let Some(body) = operation.body {",
+        "error: using `chunks_exact` with a constant chunk size\n  --> ports\\djinn\\src\\sync\\personal_sync_host.rs:55:62\n   |\n55 |     for (slot, pair) in node.iter_mut().zip(value.as_bytes().chunks_exact(2)) {\n   |                                                              ^^^^^^^^^^^^^^^",
+        "error: this expression creates a reference which is immediately dereferenced by the compiler\n    --> ports\\djinn\\src\\sync\\personal_sync_host.rs:1219:17\n     |\n1219 |                 &node.url(),\n     |                 ^^^^^^^^^^^ help: change this to: `node.url()`",
+        "error: could not compile `djinn` (lib) due to 20 previous errors"
+      ],
+      "elapsed_seconds": 45.64,
+      "phase": "final source",
+      "name": "strict no-deps clippy",
+      "owned_path_diagnostics": []
+    }
+  ],
+  "worktree": "C:\\Users\\mark_\\Code\\worktrees\\mere-micron-resident",
+  "lock_delta": "Adds direct retinue edge under djinn only; existing supplier pins unchanged",
+  "receiving_base": "a931e2c5e",
+  "recorded_at": "2026-10-22T19:23:50.7193743Z",
+  "version": 1,
+  "final_receiving_source": "7eec3720240fe788fc35073d6f4351e78759e831",
+  "retinue_supplier": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
+  "native_binary_sha256": "074b442e629fec9ae9becc61bf9ec665fa392f7ad69ecd195ee2620c691e2f0e",
+  "native_binary": "C:\\t\\cargo-targets\\mere\\debug\\djinn-moot-site.exe",
+  "receiving_worktree_clean": true,
+  "source_sha256": {
+    "Cargo.lock": "4492caff62035e9140a7d7c36c6908a425055c832eec8f3d8765f7da1cf9d80a",
+    "ports/djinn/Cargo.toml": "b367de1607bb9b696fb532cd4ad96eeecb97be793b6b2c83b627f21eac4b4d40",
+    "ports/djinn/src/moot_site.rs": "8213c0de5a8094e0f920ff03e43a210e4b7141dd56bdb9159a4d137fd4dfbd12",
+    "ports/djinn/src/micron_site.rs": "5a3c47681b02f909f849f41c2ecfca8fe75f926efc343ea160d8c2abd1d21405",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "6d524a56b157189c81669b9268edd12d75ee4526cfb23255a073678b74b00b9d"
+  },
+  "strict_clippy_preexisting_error_count": 20,
+  "native_binary_sha256_unchanged_after_clippy": true,
+  "strict_clippy_preexisting_paths_unchanged": true,
+  "strict_clippy_owned_path_diagnostic_count": 0,
+  "existing_git_supplier_sources_unchanged": true,
+  "evidence_scope": {
+    "parser": "Existing Retinue request decoder unchanged, including historical empty-string and trailing-byte tolerance",
+    "qualified": [
+      "native interface capacity one: second carrier refused and admission recovers",
+      "stalled admitted request deadline and whole-session deadline produce peer-visible closure",
+      "native9 and existingresident8 controls",
+      "disabledbackend8 controls and CLI check"
+    ],
+    "task_report": "Armillary counts host session tasks; Retinue internal interface/router tasks end through endpoint shutdown and dedicated runtime teardown before OS worker join",
+    "unrun": [
+      "continuous TCP flood",
+      "live oversized request/resource receive",
+      "independent Python/Go clients",
+      "browser receiving/client limits",
+      "radio"
+    ]
+  },
+  "frozen_at": "2026-10-22T19:45:42.8658565Z",
+  "native_binary_bytes": 17853952
+}
