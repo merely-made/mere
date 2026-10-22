@@ -1,6 +1,6 @@
 # Bounded binding and replay qualification
 
-Two diagnostic examples share their implementation between a native executable
+Diagnostic examples share their implementation between a native executable
 and a wasm-bindgen library. `run.py` executes each in fresh native processes and
 fresh Node Wasm processes, compares the existing `state-witness` entries, and
 retains the exact input and output documents. Node transports the Rust JSON as a
@@ -18,6 +18,14 @@ rounding.
   Each accepted tick records public position bits, source identity and role
   labels. This adapter does not expose velocities; no diagnostic accessor was
   added to production code.
+- Pictograph's `grouped_replay.json` uses the public Canvas with four stable
+  nodes, two components, a flat Grouped root and nondefault roles. It records
+  actual groups-channel membership, role labels and public position bits for
+  ticks 0 through 24, then rebuilds from the exact serialized recipe and the
+  original graph/layout. Changing only the partition or inner law must change
+  position bits at tick 1. An unsupported partition and outer weights that
+  overflow or underflow runtime f32 must refuse at their exact paths in both
+  native and Wasm. This fixture does not widen the occurrence adapter contract.
 - A changed `dt` at tick 7 must change physical state at tick 7. Removing the
   disclosed relationship must change the occurrence position trace. Named
   channels and an incompatible arrangement must refuse with the expected path.
@@ -27,7 +35,8 @@ rounding.
 Build the examples with the repository toolchain and lockfile. Keep debug
 information and incremental compilation off. Set `CARGO_TARGET_DIR` to a
 suitable shared cache if desired; the commands below use the default `target`.
-The installed `wasm-bindgen` CLI must match the locked Rust package version.
+Pass the final Cargo target directory to the runner, even when a separate
+`build.build-dir` holds intermediate artifacts. The installed `wasm-bindgen` CLI must match the locked Rust package version.
 
 ```sh
 export CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_INCREMENTAL=0 CARGO_BUILD_JOBS=4
@@ -35,8 +44,13 @@ cargo build --locked -p seiche --no-default-features --features serde --example 
 cargo build --locked -p seiche --no-default-features --features serde --example binding_replay_wasm --target wasm32-unknown-unknown
 cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay
 cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay_wasm --target wasm32-unknown-unknown
+cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay
+cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay_wasm --target wasm32-unknown-unknown
 python3 support/seiche-replay/run.py --target-dir target --output /tmp/seiche-replay
 ```
+
+Use `--case grouped` (or repeat `--case` with other case names) for a focused
+run. Without `--case`, the runner checks every fixture.
 
 The runner records mismatches as qualification failures and preserves the first
 differing tick and witness label. Equal traces qualify these fresh-start
