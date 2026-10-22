@@ -1,6 +1,6 @@
 {
   "result": "ok",
-  "source": "12d9efff8fde93de1586434afbc718ce5eee51ad",
+  "source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
   "native_dialogs": false,
   "native_provider_selected": true,
   "native_cancellation": false,
@@ -21,36 +21,36 @@
   "processes": [
     {
       "kind": "dramatis",
-      "pid": 50296,
+      "pid": 62816,
       "format": "sealed",
       "phase": "reopen",
       "exit": 0
     },
     {
       "kind": "djinn-fixture",
-      "pid": 263364,
+      "pid": 54028,
       "format": "sealed",
       "phase": "reopen",
       "exit": 0
     },
     {
       "kind": "dramatis",
-      "pid": 172572,
+      "pid": 174340,
       "format": "portable",
       "phase": "reopen",
       "exit": 0
     },
     {
       "kind": "djinn-fixture",
-      "pid": 271372,
+      "pid": 231688,
       "format": "portable",
       "phase": "reopen",
       "exit": 0
     }
   ],
   "binaries": {
-    "app_sha256": "b956f33d4da5bcff5c2c9ae5f8050b87180eb4208fda0de2a13f631b8f49930b",
-    "host_sha256": "803dca8215588310ac77d8040d72fab55254be92a0ff8d47ae1e5c0f58fb73cb"
+    "app_sha256": "ca1d5e0ed6ba1588b2fd1e8024b571b44fccf613da2b3b14f76968522a2b8e75",
+    "host_sha256": "e5579cc9feb48cfa446ef75414210ca22e7986d54abb1d14e83c47d145aa1ace"
   },
   "controller_sha256": "fd84e8667ea5cf65314f5c34d6425ef199cff8be80ef92b15cb2a3ed5400289a"
 }

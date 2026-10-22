@@ -1,6 +1,6 @@
 {
   "native_source": "2eb8aa09340f7f64739349c7ee08c05902f10f87",
-  "integration_source": "12d9efff8fde93de1586434afbc718ce5eee51ad",
+  "integration_source": "c349cea642f0cca0d6a43b6e40d961812446de0b",
   "unchanged_authentication_input_count": 107,
   "unchanged_authentication_inputs": {
     "crates/graphshell/graphshell-endpoint/Cargo.toml": "5bbc072c62de1789576c5e5d37eb89d062820bf29f1b600ac6da5bc28bc11858",
@@ -114,7 +114,7 @@
   "changed_previous_build_inputs": {
     "Cargo.lock": {
       "native": "1d450798530c0714f5aea915f4178e6b56c6aaf25bb9bef4510ac3a1754d2c53",
-      "integration": "65653ce09ce53de7c3e073431bc925a294cdb75841569df525e9458773af6567"
+      "integration": "33d71c4435b36c73f3ccd0e5e418ba0bc7c793ef3dc647675fd0c640267977dc"
     },
     "crates/cambium/cambium/src/lib.rs": {
       "native": "40c832f2e120fe5c1fca01f49ac1fccacbfa9544b12b7d368a105c23e6b09071",
@@ -144,13 +144,17 @@
       "native": "f6837a2cee0c5e01b4b2e10f64491b54999a0b7bc7971ae395e2bd3a5bbc11a5",
       "integration": "e02742fb9cb8ee5967b39c3181a9ce067c74404caa2715088296c628160d28c9"
     },
+    "crates/system/document-lanes/src/remote.rs": {
+      "native": "b11430a0cf9a820166df4bde64843abd7ffb5739abf9757e5e911d49f09e855d",
+      "integration": "669295639dd65adff97eea02732a188b8ad53634607470cb008b2888f0a7d97a"
+    },
     "crates/system/document-lanes/src/session.rs": {
       "native": "e1c86e9450c8a3e93d8afdbfb35a2a52ce550e2f62b4a30a63418780e6214a15",
-      "integration": "6bfca25f83e4a73cab726d27a7d7cd72f8bb9695da3a9cdc07b9b4ae7b89c7f5"
+      "integration": "3937da1ade488dca2ab8dfcb6cda3285b1868db59559cd349ae41aa982f2e235"
     },
     "crates/system/document-lanes/src/smolweb.rs": {
       "native": "573d12e922ff58502ea7e4d9211757028bb18c1e3b81070aaabcba8875db6f19",
-      "integration": "2e842625581beea7c23582abe61ed28177b2ef49e3c42095a1e143f06c301c6f"
+      "integration": "ee58d8a16979ca30c110f2b11a55bd07101e032ac552d0c9a1c9c9479440746b"
     },
     "crates/system/document-lanes/src/smolweb/a11y.rs": {
       "native": "5aeee389befac9f3220eca20c447d6f01ad14df528ab7e3e192002be50b07156",
@@ -160,13 +164,17 @@
       "native": "de67ea937cee6c2fcbe64d9944dceb8d3fc0b10ab0e7c923fc57f3728a2201cc",
       "integration": "6685217a098b75e8d8b3135792a43bd22ec2121877e0e88955b137bb52758440"
     },
+    "crates/system/fetch/src/lib.rs": {
+      "native": "c89226ffec530c70249721c9c458d685aabfcc87a4cbbd91e100ef743fc6cc7a",
+      "integration": "7db87a9bb2a8c391165ddcaad1afa37757f3981390eaa8e6c24d9e6ccb277c6c"
+    },
     "crates/system/tabard/src/lib.rs": {
       "native": "14e6d2f7dced4dc2f4d964ecbf2d22205dc5098512727b0d8dcd943a31e40493",
       "integration": "c0ee67a9b719096b8220eec3ca22749397f3183fa40d17e95f6b6c6961345f0c"
     },
     "ports/djinn/Cargo.toml": {
       "native": "5e1beca79c459b2c56c2fa459fb63528f6906ef6cd13f97e9ad2f5d51a300c16",
-      "integration": "ef69f8236d58d0a8ba895ab3f91c2da37ed5f2752b1f0b5a210e02f099afc9d6"
+      "integration": "ece2d36774fa830a0a234dce327fd1e32f14d6ea8372350b6dfeba9482e2f4f9"
     },
     "ports/djinn/src/resident_knot.rs": {
       "native": "0a8c215a849ace3c4191fa05d0a421632256ce79d33c90a76d450c4d2e6d51b3",

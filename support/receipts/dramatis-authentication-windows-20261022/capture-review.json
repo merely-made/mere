@@ -151,6 +151,21 @@
       "visual_review": "Complete native format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
+      "path": "scripted/sealed/acknowledged-after-refresh.png",
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "119324",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
       "path": "scripted/sealed/before.png",
       "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
       "width": 1720,
@@ -159,11 +174,11 @@
         "busy": "false",
         "locked": "false",
         "notice": "",
-        "pid": "248632",
+        "pid": "119324",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "scripted/sealed/cancelled.png",
@@ -174,56 +189,11 @@
         "busy": "false",
         "locked": "false",
         "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
-        "pid": "248632",
+        "pid": "119324",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/sealed/wrong-current.png",
-      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "The current passphrase was not accepted. Nothing changed.",
-        "pid": "248632",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/sealed/mismatch.png",
-      "sha256": "62da3e038a3613c84baeeea11b92064d6a5b70b17a84faa628c040cfc03df090",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "The new passphrases did not match. Nothing changed.",
-        "pid": "248632",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/sealed/empty.png",
-      "sha256": "fe0f3b0a4c719a1bf2b3e9eb8f640b8ebc0d5e197882ebb55d3d7c4e76585b6b",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "The new passphrase cannot be empty. Nothing changed.",
-        "pid": "248632",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "scripted/sealed/changed.png",
@@ -234,26 +204,11 @@
         "busy": "false",
         "locked": "false",
         "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
-        "pid": "248632",
+        "pid": "119324",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/sealed/acknowledged-after-refresh.png",
-      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
-        "pid": "248632",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "scripted/sealed/cold-reopened.png",
@@ -264,74 +219,14 @@
         "busy": "false",
         "locked": "false",
         "notice": "",
-        "pid": "172116",
+        "pid": "176280",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
-      "path": "scripted/portable/before.png",
-      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "",
-        "pid": "271344",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/portable/cancelled.png",
-      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
-        "pid": "271344",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/portable/wrong-current.png",
-      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "The current passphrase was not accepted. Nothing changed.",
-        "pid": "271344",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/portable/mismatch.png",
-      "sha256": "abe11724ae66f077e52ca810d3c72e8c686655753d7bd86bbe3cbeaf813ba11c",
-      "width": 1720,
-      "height": 1440,
-      "public_fields": {
-        "busy": "false",
-        "locked": "false",
-        "notice": "The new passphrases did not match. Nothing changed.",
-        "pid": "271344",
-        "profiles": "2",
-        "ready": "true"
-      },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
-    },
-    {
-      "path": "scripted/portable/empty.png",
+      "path": "scripted/sealed/empty.png",
       "sha256": "fe0f3b0a4c719a1bf2b3e9eb8f640b8ebc0d5e197882ebb55d3d7c4e76585b6b",
       "width": 1720,
       "height": 1440,
@@ -339,26 +234,41 @@
         "busy": "false",
         "locked": "false",
         "notice": "The new passphrase cannot be empty. Nothing changed.",
-        "pid": "271344",
+        "pid": "119324",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
-      "path": "scripted/portable/changed.png",
-      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "path": "scripted/sealed/mismatch.png",
+      "sha256": "abe11724ae66f077e52ca810d3c72e8c686655753d7bd86bbe3cbeaf813ba11c",
       "width": 1720,
       "height": 1440,
       "public_fields": {
         "busy": "false",
         "locked": "false",
-        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
-        "pid": "271344",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "119324",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/sealed/wrong-current.png",
+      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "119324",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "scripted/portable/acknowledged-after-refresh.png",
@@ -369,11 +279,56 @@
         "busy": "false",
         "locked": "false",
         "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
-        "pid": "271344",
+        "pid": "168172",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/before.png",
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/cancelled.png",
+      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/changed.png",
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "scripted/portable/cold-reopened.png",
@@ -384,41 +339,86 @@
         "busy": "false",
         "locked": "false",
         "notice": "",
-        "pid": "99160",
+        "pid": "128688",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/empty.png",
+      "sha256": "fe0f3b0a4c719a1bf2b3e9eb8f640b8ebc0d5e197882ebb55d3d7c4e76585b6b",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrase cannot be empty. Nothing changed.",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/mismatch.png",
+      "sha256": "62da3e038a3613c84baeeea11b92064d6a5b70b17a84faa628c040cfc03df090",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The new passphrases did not match. Nothing changed.",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+    },
+    {
+      "path": "scripted/portable/wrong-current.png",
+      "sha256": "1121462a32b2349abfb2f4d5b4920cd69ee9c799bf8aef76b63fb9d7a413b1d7",
+      "width": 1720,
+      "height": 1440,
+      "public_fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "The current passphrase was not accepted. Nothing changed.",
+        "pid": "168172",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "native-cold/sealed/cold-reopened.png",
-      "sha256": "f41af1c7157eaab2ab89bed353640541617049ff4594f04afc04f0a5103f1724",
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
       "width": 1720,
       "height": 1440,
       "public_fields": {
         "busy": "false",
         "locked": "false",
         "notice": "",
-        "pid": "50296",
+        "pid": "62816",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     },
     {
       "path": "native-cold/portable/cold-reopened.png",
-      "sha256": "f41af1c7157eaab2ab89bed353640541617049ff4594f04afc04f0a5103f1724",
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
       "width": 1720,
       "height": 1440,
       "public_fields": {
         "busy": "false",
         "locked": "false",
         "notice": "",
-        "pid": "172572",
+        "pid": "174340",
         "profiles": "2",
         "ready": "true"
       },
-      "visual_review": "Complete format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
+      "visual_review": "Complete current format contact sheet reviewed; feedback, controls and headings legible. App pixels only."
     }
   ],
   "native_prompt_pixels_captured": false,

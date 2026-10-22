@@ -1,13 +1,13 @@
 {
-  "source_commit": "12d9efff8fde93de1586434afbc718ce5eee51ad",
+  "source_commit": "c349cea642f0cca0d6a43b6e40d961812446de0b",
   "build_info": {
     "product": "Dramatis",
-    "source_sha256": "35dbc59f2a2a70b0835e5fb79a6bf081f0b6fc90476be690bbb8d8cc8b6ac10c",
+    "source_sha256": "cc66880cfcdda1fcaf2889705d0b8d4e231ee3307ef654d385881516f38d96d3",
     "target": "x86_64-pc-windows-msvc",
     "version": "0.0.1"
   },
   "files": {
-    "Cargo.lock": "65653ce09ce53de7c3e073431bc925a294cdb75841569df525e9458773af6567",
+    "Cargo.lock": "33d71c4435b36c73f3ccd0e5e418ba0bc7c793ef3dc647675fd0c640267977dc",
     "Cargo.toml": "67dc652e4c2999a3f431afaa6e7958150debdc0eaab358570c8333d5f0b27b01",
     "crates/cambium/backstep/Cargo.toml": "eda71b1726b42fd4a933aa738b28eee963676de2ff58431e883841435da8a1ae",
     "crates/cambium/backstep/src/lib.rs": "be552a519506a54cf2136642429ccc57b662348f9b5b934675d6e1dbf300f518",
@@ -776,10 +776,10 @@
     "crates/system/document-lanes/src/lib.rs": "379ddc41ee7217543a263a9bd26eb0337cbff5aec7ce5962c07587bd92c9827a",
     "crates/system/document-lanes/src/reader.rs": "e02742fb9cb8ee5967b39c3181a9ce067c74404caa2715088296c628160d28c9",
     "crates/system/document-lanes/src/reading_find.rs": "a4b64ba1735f489e6cd68376654e2ed6ee7835873de46ef17fbed41a3f43e56e",
-    "crates/system/document-lanes/src/remote.rs": "b11430a0cf9a820166df4bde64843abd7ffb5739abf9757e5e911d49f09e855d",
+    "crates/system/document-lanes/src/remote.rs": "669295639dd65adff97eea02732a188b8ad53634607470cb008b2888f0a7d97a",
     "crates/system/document-lanes/src/retained_clip.rs": "0049ee3161b93b65c08c067057f4685774361d643685be19e2509d2e6c082727",
-    "crates/system/document-lanes/src/session.rs": "6bfca25f83e4a73cab726d27a7d7cd72f8bb9695da3a9cdc07b9b4ae7b89c7f5",
-    "crates/system/document-lanes/src/smolweb.rs": "2e842625581beea7c23582abe61ed28177b2ef49e3c42095a1e143f06c301c6f",
+    "crates/system/document-lanes/src/session.rs": "3937da1ade488dca2ab8dfcb6cda3285b1868db59559cd349ae41aa982f2e235",
+    "crates/system/document-lanes/src/smolweb.rs": "ee58d8a16979ca30c110f2b11a55bd07101e032ac552d0c9a1c9c9479440746b",
     "crates/system/document-lanes/src/smolweb/a11y.rs": "b9aeb28239406f9de6855a7a4330a7b82b1ad9e257fb855e7ec9377c1827e3a0",
     "crates/system/document-lanes/src/typography.rs": "6685217a098b75e8d8b3135792a43bd22ec2121877e0e88955b137bb52758440",
     "crates/system/fetch/Cargo.toml": "04890a522c68065c806f1e52c9237771d0171eb943dfdbecdda8f30ed0e8b06f",
@@ -788,7 +788,7 @@
     "crates/system/fetch/src/cookies_persist.rs": "adb8a0464c086805c06d7cba005dce25b96cc76f036549e2567d3e7bc72855de",
     "crates/system/fetch/src/crawler.rs": "0e0676df4d8331f5d0486f558054d0bcfd08a39eddc4e2b2cdc2969913677e46",
     "crates/system/fetch/src/handle.rs": "720eceb128177d72c69426eaef5f494689189b28d1314d186e0a4e90e855a96e",
-    "crates/system/fetch/src/lib.rs": "c89226ffec530c70249721c9c458d685aabfcc87a4cbbd91e100ef743fc6cc7a",
+    "crates/system/fetch/src/lib.rs": "7db87a9bb2a8c391165ddcaad1afa37757f3981390eaa8e6c24d9e6ccb277c6c",
     "crates/system/page-load/Cargo.toml": "889652496d7592b05950f5acc8741340e64f157c1ff474980f2a4c962a523043",
     "crates/system/page-load/src/lib.rs": "bd532977cd34de3bfa03666875798d45156e43c7c77b03a52b67ab4e5790b605",
     "crates/system/pandect/Cargo.toml": "b0fc3851c3832ec5f46e058344a7946663b6c43c0274dcd35ebd4802fb83b710",
@@ -906,7 +906,7 @@
     "ports/distillery/src/mesh_host/sense.rs": "c47e97339d8edfe7637c3af6355590184243c3530e1feb06a94ceabf6fe2a934",
     "ports/distillery/src/resident.rs": "74fd12f777b8a1eb716956c6f5134be66a3f00e4cfcc0509648f8ebb274e6760",
     "ports/distillery/src/surface.rs": "022c0b51a86ab376b8a2700674fc226ea6c79618b209cf779b4e8a592751c49c",
-    "ports/djinn/Cargo.toml": "ef69f8236d58d0a8ba895ab3f91c2da37ed5f2752b1f0b5a210e02f099afc9d6",
+    "ports/djinn/Cargo.toml": "ece2d36774fa830a0a234dce327fd1e32f14d6ea8372350b6dfeba9482e2f4f9",
     "ports/djinn/castellan/Cargo.toml": "05e4d01373014fadedb9f9a4e1fcfd2842d8d0fe5e268c3ba9f5e842896db9aa",
     "ports/djinn/castellan/src/authority.rs": "4ee6413d99b51ec0427d466c3dd3d9ac6b8bce467e03ee3acb137754705e2f86",
     "ports/djinn/castellan/src/custody.rs": "e2b99058e772cda56e0ea10438540fcd79f43cadc3842057c419be93c8498ec1",
@@ -1127,13 +1127,13 @@
   },
   "binaries": {
     "dramatis-ui.exe": {
-      "sha256": "b956f33d4da5bcff5c2c9ae5f8050b87180eb4208fda0de2a13f631b8f49930b",
+      "sha256": "ca1d5e0ed6ba1588b2fd1e8024b571b44fccf613da2b3b14f76968522a2b8e75",
       "bytes": 43990528,
       "format": "PE32+ x86-64 Windows executable",
       "signing": "native executable; no signing step"
     },
     "authentication-host.exe": {
-      "sha256": "803dca8215588310ac77d8040d72fab55254be92a0ff8d47ae1e5c0f58fb73cb",
+      "sha256": "e5579cc9feb48cfa446ef75414210ca22e7986d54abb1d14e83c47d145aa1ace",
       "bytes": 21389312,
       "format": "PE32+ x86-64 Windows executable",
       "signing": "native executable; no signing step"
