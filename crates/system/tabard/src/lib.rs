@@ -28,6 +28,8 @@ pub mod theme_styles;
 pub mod typography;
 pub mod workshop;
 pub use theme_styles::{ThemeFontStyle, Typography};
+mod reading;
+pub use reading::ReadingPreferences;
 pub use typography::{FontFamily, FontPreferences, FontRole, ResolvedFontRole};
 
 pub use appearance::{

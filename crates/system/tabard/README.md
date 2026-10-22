@@ -150,3 +150,9 @@ The new reader accepts existing color-only files, while old hosts refuse the
 new version rather than silently losing fonts. Theme drafts, forks, history,
 conflict checks and library persistence retain the role map. Typed DTCG tokens
 remain color-only; explicit-mode provenance retains the complete definition.
+
+`ReadingPreferences` carries bounded, projection-owned text size (14–28 logical
+pixels) and column measure (24–48 em, default 18 px / 36 em). Its Reading role
+uses the same `Typography` contract; native density and temporary Find state are
+separate. Hosts serialize it with the reading access or pane, so two projections
+of one source can retain different choices without editing the source or theme.
