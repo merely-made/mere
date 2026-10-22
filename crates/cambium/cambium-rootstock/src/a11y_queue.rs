@@ -11,8 +11,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::{Rc, Weak};
 
 use crate::{
-    A11yDispatch, A11yReceipt, A11yRejection, A11yRequest, A11yTarget, NodeId, ProducerRegistry,
-    ScriptedDom,
+    A11yDispatch, A11yReceipt, A11yRejection, A11yRequest, NodeId, ProducerRegistry, ScriptedDom,
 };
 
 pub(crate) struct QueuedA11y {
@@ -21,7 +20,6 @@ pub(crate) struct QueuedA11y {
     owner: Weak<Cell<bool>>,
     dom: Weak<RefCell<ScriptedDom>>,
     mount: NodeId,
-    producer: Option<std::sync::Weak<()>>,
 }
 
 impl QueuedA11y {
@@ -31,10 +29,11 @@ impl QueuedA11y {
         dom: &Rc<RefCell<ScriptedDom>>,
         mount: NodeId,
         producers: &ProducerRegistry,
+        leaves: &sprigging::LeafRegistry<u64>,
     ) -> (Self, A11yReceipt) {
-        let producer = match &request.target {
-            A11yTarget::Produced(action) => producers.action_lifetime(action.slot),
-            A11yTarget::Node(_) => None,
+        let request = {
+            let document = dom.borrow();
+            request.bind_publication(&crate::WindowDom::new(&document, mount), leaves, producers)
         };
         let reply = Rc::new(Cell::new(None));
         (
@@ -44,7 +43,6 @@ impl QueuedA11y {
                 owner: Rc::downgrade(owner),
                 dom: Rc::downgrade(dom),
                 mount,
-                producer,
             },
             A11yReceipt(reply),
         )
@@ -56,20 +54,19 @@ impl QueuedA11y {
         dom: &Rc<RefCell<ScriptedDom>>,
         mount: NodeId,
         producers: &ProducerRegistry,
+        leaves: &sprigging::LeafRegistry<u64>,
     ) -> bool {
         owner.get()
             && self.owner.ptr_eq(&Rc::downgrade(owner))
             && self.dom.ptr_eq(&Rc::downgrade(dom))
             && self.mount == mount
-            && match &self.request.target {
-                A11yTarget::Node(_) => true,
-                // Compare against the current registry too: a detached old
-                // registry may remain live while another owns this slot.
-                A11yTarget::Produced(action) => self.producer.as_ref().is_some_and(|life| {
-                    producers
-                        .action_lifetime(action.slot)
-                        .is_some_and(|current| life.ptr_eq(&current))
-                }),
+            && {
+                let document = dom.borrow();
+                self.request.publication_is_current(
+                    &crate::WindowDom::new(&document, mount),
+                    leaves,
+                    producers,
+                )
             }
     }
 

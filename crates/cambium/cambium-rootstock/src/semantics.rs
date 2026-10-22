@@ -36,6 +36,32 @@ pub struct SemanticProjection {
     pub producer_issues: Vec<ProducerSemanticIssue>,
 }
 impl SemanticProjection {
+    /// Freeze routing bindings alongside this observation. Both platform
+    /// adapters use these requests rather than reconstructing current targets
+    /// when an event arrives. The action is supplied by the event later.
+    pub fn publication_requests(
+        &self,
+        dom: &crate::WindowDom<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> HashMap<u64, crate::A11yRequest> {
+        self.dom_targets
+            .iter()
+            .map(|(id, node)| {
+                (
+                    id.0,
+                    crate::A11yRequest::node(crate::A11yAction::Focus, *node),
+                )
+            })
+            .chain(self.produced_targets.iter().map(|(id, target)| {
+                (
+                    id.0,
+                    crate::A11yRequest::produced(crate::A11yAction::Focus, target.clone()),
+                )
+            }))
+            .map(|(id, request)| (id, request.bind_publication(dom, leaves, producers)))
+            .collect()
+    }
     /// Actual DOM membership, supplied by composition rather than inferred
     /// from the numeric shape of a generated semantic ID.
     pub fn dom_node(&self, id: u64) -> Option<NodeId> {

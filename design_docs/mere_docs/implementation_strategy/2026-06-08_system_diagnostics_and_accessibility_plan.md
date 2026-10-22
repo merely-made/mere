@@ -1,5 +1,118 @@
 # System Diagnostics and Accessibility Plan
 
+## Main integration receiving, 2026-10-22
+
+The child/leaf and producer/publication repairs are committed in `137c4fd4c`.
+Fetched main `3dc450a6b` is integrated by `09145847b`, retaining the Djinn lane's
+committed source and its separate uncommitted documentation/runtime work.
+All 336 targeted tests passed with seven existing ignores; browser-host Wasm
+and embedding compilation passed. The global D2 audit retains 40 pre-existing
+errors. Concurrent Djinn commit `121a17b23` was also received without changing
+the tested source or lockfile; see `diagnostics-audit-integration-final-receiving.json`.
+The exact combined source and receiving gates are recorded in
+`support/family-promotion/diagnostics-audit-integration-qualification.json`.
+This receiving section supersedes earlier latest-main-pending notes below;
+earlier receipts remain historical and are not relabeled.
+
+A missing `retinue` entry in Djinn's lockfile dependency list was repaired
+without changing package versions. Original staged receiving edits and receipt
+removals remain separate from this audit. The temporary integration worktree
+uses the existing Mere Cargo target; retained receipt cap is 10 MB.
+
+The remaining ownership work is unchanged: native late-event numeric IDs need
+complete publication/reference remapping, and host transfer needs host-issued
+owner life. Optional producer child tokens do not establish an atomic actor
+transaction or prove legacy nonreuse. Canvas raw callbacks can hide same-UUID
+replacement. Rootstock intrinsic sizing and Path-B raster receiving remain
+unfinished. Wasm compilation and headless tests do not qualify browser proxy,
+focus/disposal, native install/reattach recovery or human assistive technology.
+
+## Producer children and publication bindings, 2026-10-22
+
+**Status:** bounded repairs qualified on this checkout: 287 distinct targeted
+passes, seven existing ignores, browser-host Wasm and embedding compilation.
+Receipts: `support/family-promotion/diagnostics-publication-qualification.json`.
+The findings and larger migrations are recorded in
+`support/family-promotion/diagnostics-publication-review.json`. The lane retains
+at most 10 MB of receipts and reuses the existing Mere Cargo target.
+
+Publication and queue admission now share one contributor binding. It records
+the document root, window mount, target, producer registration, optional authored
+child token and applicable leaf registration. Native and browser adapters freeze
+these requests from the same semantic projection. Re-enqueueing preserves an
+existing binding; editing the target cannot transplant its authority. Raw
+constructors continue to name the current context. Existing fields stay readable;
+external struct-literal callers must use `A11yRequest::new/node/produced` because
+the provenance field is private. The two workspace literal callers are migrated.
+
+`TextureProducer::child_lifetime` observes optional model-owned child lives.
+`None` relies on the existing nonreused-key contract, not a guarantee that an
+arbitrary producer satisfies it. Retained-content key entries own these tokens:
+frames and producer recreation preserve them; close/source replacement retires
+them. A weak derived lookup avoids scanning the full key map for each action.
+Host admission rechecks after semantic composition, catching child replacement
+by an impure read without claiming an atomic callback transaction.
+
+Native sync drains against the last publication before replacing its maps.
+Failed installation leaves the installed flag false and withholds new routes.
+Browser routing checks exact proxy identity, replaces proxies on lifetime change,
+preserves them for ordinary updates, restores held focus after proxy replacement,
+and clears routes on disposal. Browser behavior is Wasm-compiled, not newly
+qualified in a browser or with human assistive technology.
+
+The earlier open-target lists below are historical for these bounded repairs.
+A late native event still has no generation when a numeric target ID recurs;
+this requires an authoritative ID and node-reference publication migration.
+Direct publication requests moved with the exact document/mount to a foreign
+host still lack host-owner provenance. Generic child/action activation needs an
+owner-side transaction, and native failed-install/reattach recovery needs headed
+receiving. Canvas same-call mutation visibility and full Sprigging host receiving
+remain separate. Do not substitute a frame epoch, observed-description counter
+or hand-rewritten subset of AccessKit node references for these owners.
+
+Latest-main receiving remains open: fetched main advanced 50 commits to
+`931a4ec8d`, including retained-content methods, tests and supplier pins. The
+relevant upstream differences were inspected, but the shared staged/dirty
+checkout was preserved. These receipts qualify the recorded local source, not
+that newer dependency and consumer cohort.
+
+## Child and leaf lifetime continuation, 2026-10-21
+
+**Status:** bounded repairs qualified by 317 native/canvas/product passes with
+seven existing ignores, plus browser-host Wasm and embedding compilation.
+The final 30-test Sprigging rerun is a subset, not additional unique passes.
+Receipts and source boundaries:
+`support/family-promotion/diagnostics-child-leaf-qualification.json`.
+The additive findings and remaining gates are in
+`support/family-promotion/diagnostics-child-leaf-review.json`; retained receipt
+cap: 10 MB, using the existing Mere Cargo target.
+
+Sprigging now owns one insertion lifetime, observed weakly by both its paint
+cache and Rootstock's semantic queue. Replacement at the same key drops former
+commands and scenes before size/dirty gating, including without layout size.
+Removal/reinsertion or a detached live registry cannot authorize an old queued
+leaf value. Ordinary mutable updates keep the registration. Paint epochs remain
+fresh after cache removal, so host fragments cannot alias a reset generation.
+
+Canvas child keys are now assigned and pruned at construction/model
+reconciliation rather than during semantic reads under a mutex. Removal and
+restoration between reads receive a fresh key; graph switches and replacement
+canvases also end old child authority. Metadata refresh and ordinary reads keep
+live keys. Graphshell retained-document keys retain their existing model owner.
+
+The earlier remaining-target list below is historical for these repaired leaf
+and canvas portions. Generic producer child compliance, atomic activation and
+native/browser publication provenance remain open. A raw canvas mutation
+callback can still hide same-UUID removal/recreation inside one admitted call.
+Private queue binding cannot recover provenance lost before enqueue.
+
+A source scan also finds unfinished Sprigging host integration: Rootstock does
+not receive `Leaf::measure`/`layout_dirty`, and `RenderedLeaves::scenes` has only
+test consumers in this repository. The cache controls do not qualify full
+custom-leaf sizing or Path-B rasterization. Maintained supplier contracts and
+actual host receiving remain separate work, as do headed/browser-runtime and
+human assistive-technology acceptance.
+
 ## Queued owner and registration lifetimes, 2026-10-21
 
 **Status:** bounded repairs on `8008eba7d`, received with site-publication main

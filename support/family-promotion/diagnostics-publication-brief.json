@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-22",
+  "basis": "e3ddbedcd",
+  "scope": "Shared contributor publication binding, authored producer child tokens and retained-content adoption; native drain/install bookkeeping and browser exact proxy identity",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "diagnostics-publication-native.json",
+    "diagnostics-publication-native-controls-fixed.json",
+    "diagnostics-publication-browser-final.json",
+    "diagnostics-publication-embedding.json",
+    "diagnostics-publication-product-final.json",
+    "diagnostics-publication-qualification.json"
+  ],
+  "done_conditions": [
+    "Publication and queue share contributor binding; old bindings cannot be recaptured into new authority; current updates retain identity.",
+    "Authored child replacement, even between reads and while old marker lives, rejects stale published/queued actions.",
+    "Native queued events resolve before current map replacement; failed install does not mark installed.",
+    "Browser checks exact proxy identity and replaces proxy on contributor lifetime change; Wasm compilation only unless runtime receipt is separately obtained.",
+    "Document late native numeric alias, host ownership transfer, legacy producers, atomic model activation and runtime acceptance gates."
+  ],
+  "concurrent_work": "Earlier child/leaf WIP, staged diagnostics receiving changes and resident/site work preserved. Work in main, existing target only.",
+  "retained_failed_attempts": [
+    "diagnostics-publication-native-controls.json"
+  ]
+}

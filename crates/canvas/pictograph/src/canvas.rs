@@ -393,7 +393,7 @@ pub struct Canvas {
     /// Stable opaque keys exposed to accessibility producers. Graph node slots
     /// can be reused after removal, so reader actions must name member identity
     /// rather than a current NodeKey index.
-    described_keys: std::sync::Mutex<reader::DescribedKeyRegistry>,
+    described_keys: reader::DescribedKeyRegistry,
     /// The force-directed layout backend — in-thread (tests / wasm) or an
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.

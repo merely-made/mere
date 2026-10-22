@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-21",
+  "basis": "0606dfaad",
+  "status": "Bounded leaf cache/queue and authored canvas child repairs qualified: 317 native/canvas/product passes, seven existing ignores, Wasm and embedding compile; final 30 Sprigging passes repeat a subset. Generic producer and platform lives remain open.",
+  "retained_byte_cap": 10000000,
+  "supersedes_only": [
+    "diagnostics-leaf-replacement-paint-cache: cache registration and queue leaf binding portion",
+    "target_lifetime_remaining_owners: authored canvas child portion"
+  ],
+  "findings": [
+    {
+      "id": "diagnostics-leaf-replacement-paint-cache",
+      "authority": "Sprigging LeafRegistry insertion lifetime, shared by paint cache and Rootstock queued action binding",
+      "change": "Insert allocates one weakly observable registration marker. Rendered cache drops entries from replaced or removed registrations, even without layout size. Clean same-key replacements paint, and cannot inherit prior contributor scenes. Paint epochs do not repeat when cache entries or entire caches are discarded. Ordinary get_mut/get_mut_as updates preserve registration.",
+      "verification": "Sprigging cache and SceneSlot controls plus actual Rootstock queued SetValue controls; gate status recorded by qualification receipt."
+    },
+    {
+      "id": "diagnostics-queued-leaf-replacement",
+      "authority": "Same LeafRegistry insertion marker as paint reuse",
+      "change": "Queue captures custom-slot key and optional current leaf registration, including absence. Drain compares against current document slot and current registry, refusing replacement, remove/reinsert, detached-registry and late registration aliases. Mutable value updates remain admissible.",
+      "boundary": "Only provenance captured at AppCtx enqueue. Direct raw requests and native/browser requests mapped before enqueue still name current context."
+    },
+    {
+      "id": "diagnostics-canvas-read-authored-child-keys",
+      "authority": "Canvas authored model reconciliation",
+      "evidence": "describe_items(&self) formerly pruned key mappings and allocated them under Mutex. Removal and restoration between reads, or set_graph with overlapping member UUIDs, retained former key authority. New canvases also restarted key numbering.",
+      "change": "Construction and derived-model reconciliation assign/prune keys. Graph switch ends all child keys. Process-unique nonreused keys avoid alias across canvas replacement. Descriptions and activation read immutable maps; per-read locking retired. Existing retained-document authored keys remain unchanged.",
+      "verification": "Actual Canvas test removes/restores the same UUID between reads, tests graph replacement, separate canvases, immutable reads, and ordinary metadata refresh. Graphshell receiving also replays a captured pin after same-member restoration without publication refresh."
+    }
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "TextureProducer authored children and shared request/activation contract",
+      "gap": "ProducerNode key lifetime is now explicit contract, but arbitrary producers may violate it. No generic lease is carried by ProducedAction, no atomic snapshot/act transaction is established. Remote board IDs/ordinal fallback currently carry no actions.",
+      "done_condition": "Owner-issued child life at authored transitions with matched activation, native/browser/automation receiving, stale replacement controls and current-update controls. Do not infer unobserved removal from observed snapshots."
+    },
+    {
+      "owner": "Canvas raw graph mutation boundary",
+      "gap": "ingest_graph trusts callback changed=true and reconciles final state. A callback that removes and recreates the same UUID within a single mutation can hide the intermediate transition; callback changed=false can also conceal changes.",
+      "done_condition": "Typed admitted structural changes or kernel-authored child life facts received at each mutation; preserve metadata refresh and current model keys."
+    },
+    {
+      "owner": "Native/browser accessibility publication and ingress",
+      "gap": "Current maps and raw constructors do not preserve originating publication owner/provider/child/leaf life. Private queue qualification cannot restore provenance already lost before enqueue.",
+      "done_condition": "One shared target-life publication/request seam, then both platform adapters and automation receiving; native installation/rebinding recovery separately qualified."
+    },
+    {
+      "owner": "Sprigging host integration",
+      "gap": "Source scan finds Leaf::measure/layout_dirty definitions without Rootstock receiving, and RenderedLeaves::scenes consumers only in tests. Rootstock relayout reads custom boxes and Path-A fragments; no complete custom-leaf intrinsic-size or Path-B scene raster receiving is established.",
+      "evidence_level": "Source-confirmed unfinished wiring, not a headed rendering failure receipt. Cache tests qualify the cache contract only.",
+      "done_condition": "Decide the maintained host contract and wire supplier-owned sizing/scene preparation and retirement with actual native/browser rendering controls; do not claim full four-pass integration from cache unit tests."
+    }
+  ],
+  "verification_limits": [
+    "No native headed, browser runtime or human assistive-technology qualification.",
+    "Unrelated fetch Cargo.lock, staged diagnostics cleanup and site work remain preserved.",
+    "No new Cargo target, isolated Cargo home or worktree."
+  ],
+  "qualification": "support/family-promotion/diagnostics-child-leaf-qualification.json"
+}
