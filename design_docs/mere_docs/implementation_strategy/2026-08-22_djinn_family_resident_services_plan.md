@@ -499,8 +499,9 @@ release:
 
 **Status:** ordinary saved-snapshot service implemented; local resident retrieval
 and restart acceptance passed. Knot's in-process serving remains available. Djinn now has a separate
-owner-controlled Gemini publication route and CLI, described below. Public
-binding and governed replication retain their own gates; this does not complete
+owner-controlled Gemini publication route and CLI, described below. The separate
+governed Gemini/Scroll caller has native process qualification; main-broker
+attachment and peer acquisition retain their own gates. This does not complete
 the resident release gate or the earlier phases above.
 
 ### Verified composition seams
@@ -512,6 +513,16 @@ retains file-source and protocol adapters. Existing snapshot bytes, digests,
 custody, certificate identity and listener policy stay unchanged. Scope and
 receipts: [shared site model plan](2026-10-20_shared_site_model_plan.md).
 
+**2026-10-22 governed Scroll continuation:** the separate `djinn-moot-site`
+caller extends the already qualified Gemini publication composition with an
+explicit persisted Scroll transport, native Errand replies and the same
+per-request collection authority/TLS/task scope. The integrated receiving build,
+13 focused host controls and both native product process fixtures pass. Exact
+source/binary identities and ownership limits are tracked in the
+[shared site plan](2026-10-20_shared_site_model_plan.md#governed-scroll-resident-2026-10-22).
+This does not change the ordinary snapshot-handoff route, release gates or
+main-broker attachment.
+
 `ports/djinn/src/resident.rs::DjinnResident` already composes device lifetime,
 resident Knot, identity and Distillery. `resident_knot.rs::ResidentKnot` keeps
 one source and optional personal sync host alive. `resident_blobs.rs` provides
@@ -519,7 +530,7 @@ scoped blob custody and rebinds serving leases after restart. These are useful
 existing services. The bounded Gemini service below composes them without
 turning Djinn into a general application server.
 
-`crates/system/errand/src/serve` separates content through `Source` and
+Errand's external `serve` module separates content through `Source` and
 `Item::Document` from protocol projection. `gemini-protocol::server` and
 `spartan-protocol::serve` own wire transactions. Knot's site model supplies
 bounded, immutable native bytes; it cannot hand a server an arbitrary script
