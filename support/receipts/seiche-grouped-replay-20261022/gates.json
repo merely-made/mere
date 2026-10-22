@@ -1,0 +1,50 @@
+[
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "grouped_replay"
+    ],
+    "exit": 0,
+    "seconds": 26.3,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "grouped_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 76.09,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+]
