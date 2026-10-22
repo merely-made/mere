@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "receiving_source": "1f660dcb4a9171b2867451d22fadd1a2ad50d174",
+  "previous_qualified_source": "7eec3720240fe788fc35073d6f4351e78759e831",
+  "incoming_source": "3dc450a6b962c6da60902f7243668961511f575d",
+  "incoming_change": "Qualified Knot checkpoint receiving: six Knot package source references f4425996 to98d5212b and9lines resident telemetry; checkpoint tests/docs/evidence",
+  "host_source_change": "None",
+  "retinue_supplier": "5b1c5cac2f5d0e275ead94ae4b8b25c65a183694",
+  "knot_supplier": "98d5212bfe2f773ba9375e4f1a74b47b5aecdb6b",
+  "source_sha256": {
+    "Cargo.toml": "da9c5f101d15e7a0286527a3dc9c14e645beceba5ee7b173597df2c02c83a800",
+    "Cargo.lock": "38f3c83b10800d687d9312e1812f14a55e70f34c1fddb786e6105138b691433d",
+    "ports/djinn/Cargo.toml": "b367de1607bb9b696fb532cd4ad96eeecb97be793b6b2c83b627f21eac4b4d40",
+    "ports/djinn/src/moot_site.rs": "8213c0de5a8094e0f920ff03e43a210e4b7141dd56bdb9159a4d137fd4dfbd12",
+    "ports/djinn/src/micron_site.rs": "5a3c47681b02f909f849f41c2ecfca8fe75f926efc343ea160d8c2abd1d21405",
+    "ports/djinn/src/resident_site.rs": "097308a90f118b999fdf3a9f4393e2b04b7c65d7565f69b473341cd9e74b4f91",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "6d524a56b157189c81669b9268edd12d75ee4526cfb23255a073678b74b00b9d"
+  },
+  "model": "Snapshot V1 and all shared model source unchanged",
+  "previous_receipts": "Initial host-tests.json/source.json and Knot process.json retained without overwrite"
+}
