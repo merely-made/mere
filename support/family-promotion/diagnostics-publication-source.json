@@ -1,0 +1,33 @@
+{
+  "head": "01a3a273d66b9591477cc3f425ca43e0f76f037d",
+  "source_sha256": {
+    "crates/cambium/cambium-rootstock/src/lib.rs": "e18cdf866c3b5c2bc45596426333b515a38f41d3d022ae28d05cdfbcd9d3e0ce",
+    "crates/cambium/cambium-rootstock/src/host.rs": "50f12a493fcbe249ff735955e7d46613e4361221e3b63cc345c057e33882855a",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "ebbd0bb0759503d0a903af35f2d87402ab7a0dc289945ee7ab5f7c5bc0937192",
+    "crates/cambium/cambium-rootstock/src/a11y_queue.rs": "49df22ac3d281e56b96b55e1c1cd50eb945c0d336191c7cebd0041ed237c5046",
+    "crates/cambium/cambium-rootstock/src/a11y_provenance.rs": "ec4d5c3d0bc827b4d0553767c1da7b1845a971894cf99570a25ab4936188b667",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "9597ea7e2e23ca7e8397f1dbb13a239181f388bfff5411621e7ef8398d02f4df",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests/publication_tests.rs": "855c0680d24b812f1b98d2d0a18a750d24b1e309c5c28d997f903e3190a3bb00",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "c092f29c2976e38478310aab5e45b12eddda6a680ab510596b7d4e02df13d1cf",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "ae0670145570a97fe908b3e51ffe9c6c599b8be4efee9da375434ecf24e7800c",
+    "crates/cambium/cambium-rootstock/src/producer/child_lifetime.rs": "a7e88bbc7ed6c2c3cfa94021ac9263efb88fbba1221f1473577a123557024865",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "8a8f525405b3c9d9d5e2a598542184b7147521f8f57b1c374e69aceac39a842a",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "59d25b886e2280582f7ea97aae39eb3c56cf1915019a5cf17efa634d2b05ebf0",
+    "crates/cambium/cambium-winit-a11y/src/publication_tests.rs": "b2a0f3979e30c3f41e66ea7c4d91d03541de3a909647821d49e988e3621120ab",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "d2938be24c99772427c9871d47cecd5c14ea983fe138d6da9bdbe506cf8c0ae4",
+    "crates/cambium/cambium-genet-web-host/src/events.rs": "c664f88e88d268e20f118cba841818b47393ffc162f71fb7f1997bfb95024f98",
+    "ports/graphshell/src/retained_content.rs": "781d32e65168282b7ebe623dbfbf7c1b66bb90c49d1c678af1818be107ae93fb",
+    "ports/graphshell/src/retained_content/producer.rs": "953c7e123c5bc9342c3f8e3b3a7a67fd641dabfd9e4cbea9d340efcf275afa00",
+    "ports/graphshell/src/retained_content/tests.rs": "d61c21c58682ae4bd92ef12210081f4587cc1586357b0147d15234a038a79958",
+    "crates/cambium/sprigging/src/lib.rs": "524ece326121f89d9c3d6844ab1f40a65b2f9aea6f81f8569e5da75b58b7d113",
+    "Cargo.toml": "a0774497f7170955acaed835bad271af182e79acfca66d99ffaf38ee1d50482d",
+    "Cargo.lock": "c50317706460b0e2551560ea589a2e56d8393393a90862b164e15596adc644e6",
+    "ports/graphshell/Cargo.toml": "2b880c498dbde05567ea9631f2767a80b15a123432ca6f53e04d87f74781dc62",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "a3442d4121d97c2c6b58628afdb4acd66bf5df5b90be7760a181d56e5ad3fe2d",
+    "crates/cambium/cambium-genet-web-host/Cargo.toml": "c04956b0a4abc17ab2e71b94400020abb6188286b2ec305d093da1fd690b8e43",
+    "crates/cambium/cambium-winit-a11y/Cargo.toml": "0d1eb5ec1c9d533a7566c885dcd173f46a367fc2b5610ef6bfa65eebfd8a95db"
+  },
+  "scope": "Modified sources, existing leaf owner and immediate manifests/lock. Not a whole transitive-source seal. Earlier leaf/cache/canvas WIP is retained in this checkout.",
+  "verification_note": "Core native cohort predates comment-only host/frame documentation edits and the added native mapper test; final focused native controls compile those final sources and execute the new mapper test. Browser-final includes proxy focus replacement. Product-final includes the weak lookup index.",
+  "isolated_outputs": []
+}

@@ -6,17 +6,17 @@
 
 //! Sprigging supplies retained custom-paint leaves for GUI hosts.
 //!
-//! A small, sharp contract that lets an imperative custom-paint widget (a knob,
-//! meter, waveform, graph canvas) live as one first-class Genet element,
-//! plugging into Genet's four existing passes rather than standing up a second
-//! UI engine. Design and rationale:
+//! A contract for an imperative custom-paint widget (a knob, meter, waveform,
+//! graph canvas) to live as one Genet element. It supplies sizing, paint and
+//! semantic hooks; each host must receive the hooks it supports. Design:
 //! `design_docs/cambium_docs/implementation_strategy/2026-07-07_chisel_widget_leaf_design.md`.
 //!
 //! This is the Path-A scaffold: a leaf paints by pushing common `PaintCmd`s
 //! (portable, tile-cached) which Genet splices into its paint list at the
-//! leaf's box. Path B (a leaf renders its own `vello::Scene` which the host
-//! rasterizes to a texture and places via `DrawExternalTexture`) lands with the
-//! first imperative consumer (the meerkat orrery port).
+//! leaf's box. Path B retains a leaf's `vello::Scene` for a host to rasterize
+//! and place via `DrawExternalTexture`. Rootstock currently receives Path A
+//! and semantics; its intrinsic-size hooks and Path-B scene rasterization are
+//! not wired by this crate's cache or its unit tests.
 //!
 //! Sprigging is engine-neutral: it targets the paint seam (`paint_list_api`) and
 //! accesskit, not the Genet engine concretely. The retained per-leaf state
@@ -25,6 +25,8 @@
 
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, Weak};
 
 use paint_list_api::items::PathItem;
 use paint_list_api::{CommonPlacement, LayoutPoint, LayoutRect, RectItem};
@@ -219,11 +221,11 @@ pub struct LeafAction;
 /// [`LeafRegistry::get_mut_as`] (a meter fed each frame, a glyph fed on model
 /// change), so the registry can hand back the concrete type.
 pub trait Leaf: std::any::Any {
-    /// Intrinsic sizing. Feeds Genet's replaced-element `replaced_intrinsic_size`
-    /// (a custom leaf is a replaced element, like `<img>` / `<external-texture>`).
+    /// Intrinsic sizing hook for a host's replaced-element layout. Rootstock
+    /// currently takes its custom-leaf boxes from DOM layout without this hook.
     fn measure(&mut self, known: SizeHint, available: SizeHint) -> Size;
 
-    /// Paint. Path A: push [`PaintCmd`]s via `cx`. (Path B lands later.)
+    /// Paint. Push common [`PaintCmd`]s or provide a retained scene via `cx`.
     fn paint(&mut self, cx: &mut PaintCx<'_>);
 
     /// Genet hit-test forwards here. Internal interaction mutates `self` and
@@ -257,8 +259,27 @@ pub trait Leaf: std::any::Any {
 /// retained struct lives here rather than in the ephemeral view tree. Generic
 /// over the host's node key so Sprigging stays engine-neutral.
 pub struct LeafRegistry<K: Eq + Hash> {
-    leaves: HashMap<K, Box<dyn Leaf>>,
+    leaves: HashMap<K, LeafEntry>,
 }
+
+struct LeafEntry {
+    leaf: Box<dyn Leaf>,
+    lifetime: Arc<()>,
+}
+
+/// Identity of one registry insertion. Reading or cloning it retains neither
+/// the leaf nor its registration. Compare with the current registry's token:
+/// an old, detached registry can still be alive. Ordinary mutable access keeps
+/// this identity; insertion, including replacement at the same key, changes it.
+#[derive(Clone, Debug)]
+pub struct LeafLifetime(Weak<()>);
+
+impl PartialEq for LeafLifetime {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.ptr_eq(&other.0)
+    }
+}
+impl Eq for LeafLifetime {}
 
 impl<K: Eq + Hash> Default for LeafRegistry<K> {
     fn default() -> Self {
@@ -274,16 +295,29 @@ impl<K: Eq + Hash> LeafRegistry<K> {
     }
 
     pub fn insert(&mut self, key: K, leaf: Box<dyn Leaf>) {
-        self.leaves.insert(key, leaf);
+        self.leaves.insert(
+            key,
+            LeafEntry {
+                leaf,
+                lifetime: Arc::new(()),
+            },
+        );
+    }
+
+    /// Observe the registration without advancing state or retaining the leaf.
+    pub fn lifetime(&self, key: &K) -> Option<LeafLifetime> {
+        self.leaves
+            .get(key)
+            .map(|entry| LeafLifetime(Arc::downgrade(&entry.lifetime)))
     }
 
     /// Read a retained contributor without granting mutation of leaf state.
     pub fn get(&self, key: &K) -> Option<&(dyn Leaf + 'static)> {
-        self.leaves.get(key).map(|leaf| leaf.as_ref())
+        self.leaves.get(key).map(|entry| entry.leaf.as_ref())
     }
 
     pub fn get_mut(&mut self, key: &K) -> Option<&mut (dyn Leaf + 'static)> {
-        self.leaves.get_mut(key).map(|b| b.as_mut())
+        self.leaves.get_mut(key).map(|entry| entry.leaf.as_mut())
     }
 
     /// Typed access to a registered leaf (trait upcast to `Any`, then
@@ -292,11 +326,11 @@ impl<K: Eq + Hash> LeafRegistry<K> {
     pub fn get_mut_as<T: Leaf>(&mut self, key: &K) -> Option<&mut T> {
         self.leaves
             .get_mut(key)
-            .and_then(|b| (b.as_mut() as &mut dyn std::any::Any).downcast_mut::<T>())
+            .and_then(|entry| (entry.leaf.as_mut() as &mut dyn std::any::Any).downcast_mut::<T>())
     }
 
     pub fn remove(&mut self, key: &K) -> Option<Box<dyn Leaf>> {
-        self.leaves.remove(key)
+        self.leaves.remove(key).map(|entry| entry.leaf)
     }
 
     /// Retain only leaves whose keys satisfy `keep`.
@@ -315,18 +349,19 @@ impl<K: Eq + Hash> LeafRegistry<K> {
 /// Rendered Path-A command buffers, keyed by leaf key. This is the **leaf-tier
 /// paint cache**: the third of the four retention gates (retained view diff,
 /// `IncrementalLayout`, this, genet-render tile cache). A leaf re-renders only when
-/// it reports `paint_dirty` or has no buffer yet; an unchanged leaf keeps its
+/// it reports `paint_dirty`, changes registration/size, or has no buffer yet; an unchanged leaf keeps its
 /// cached commands. Neutral: only `paint_list_api` types, so a Genet-side
 /// adapter can expose it through the layout engine's `LeafPaintSource`.
 /// One leaf's rendered output: the splice commands (Path A: the leaf's own
 /// stream; Path B: one `DrawExternalTexture` at the box), plus the scene and
 /// its epoch for Path-B leaves.
 struct RenderedLeaf {
+    lifetime: LeafLifetime,
     size: Size,
     splice: Vec<PaintCmd>,
     /// Path-B only: the leaf's encoded vello scene, awaiting host rasterize.
     scene: Option<vello::Scene>,
-    /// Bumped on every repaint of this entry; the host re-rasterizes a scene
+    /// Fresh on every repaint, including after cache removal; the host re-rasterizes a scene
     /// only when its `(epoch, size)` moved — the retention chain extended
     /// through the GPU handoff.
     epoch: u64,
@@ -388,13 +423,14 @@ impl RenderedLeaves {
 impl LeafRegistry<u64> {
     /// Re-render leaves into `out`, keyed by leaf key, running each leaf's
     /// `paint` when it is `paint_dirty`, has no cached buffer yet, **or** its box
-    /// size changed since the cached buffer was painted — the leaf-tier retention
+    /// size or registry insertion changed since the cached buffer was painted — the leaf-tier retention
     /// gate. The size check catches container-driven relayouts (percentage / flex
     /// width, window resize) that resize the box without the leaf flipping
     /// `paint_dirty`. `size_of` supplies each leaf's content-box size from the
     /// host's completed layout; a leaf with no size (not laid out this frame) is
-    /// skipped. Returns the count of leaves actually (re)painted, so the host can
-    /// tell whether the paint list changed.
+    /// skipped; stale output from removed/replaced registrations is dropped even
+    /// without a layout size. Returns the count of leaves actually (re)painted;
+    /// removing stale output alone is not counted.
     pub fn render_into(
         &mut self,
         size_of: impl Fn(u64) -> Option<Size>,
@@ -402,7 +438,16 @@ impl LeafRegistry<u64> {
     ) -> usize {
         use paint_list_api::items::ExternalTextureItem;
         let mut painted = 0;
-        for (key, leaf) in self.leaves.iter_mut() {
+        // Hosts retain fragments/textures independently of this cache. Epochs
+        // must not alias after an entry (or the whole cache) is discarded.
+        static NEXT_PAINT_EPOCH: AtomicU64 = AtomicU64::new(1);
+        out.map.retain(|key, cached| {
+            self.leaves
+                .get(key)
+                .is_some_and(|entry| cached.lifetime.0.as_ptr() == Arc::as_ptr(&entry.lifetime))
+        });
+        for (key, entry) in self.leaves.iter_mut() {
+            let leaf = &mut entry.leaf;
             let Some(size) = size_of(*key) else {
                 continue;
             };
@@ -411,8 +456,13 @@ impl LeafRegistry<u64> {
             if !leaf.paint_dirty() && cached_size == Some(size) {
                 continue;
             }
-            let prior_epoch = prior.map(|r| r.epoch).unwrap_or(0);
+            let lifetime = LeafLifetime(Arc::downgrade(&entry.lifetime));
             let prior_scene = out.map.remove(key).and_then(|r| r.scene);
+            let epoch = NEXT_PAINT_EPOCH
+                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+                    epoch.checked_add(1)
+                })
+                .expect("leaf paint epoch exhausted");
             let mut cmds = Vec::new();
             let mut cx = PaintCx::new(&mut cmds, size);
             leaf.paint(&mut cx);
@@ -422,6 +472,7 @@ impl LeafRegistry<u64> {
             let scene = cx.take_scene().or(prior_scene);
             let entry = match scene {
                 Some(scene) => RenderedLeaf {
+                    lifetime,
                     size,
                     // Path B splices one external-texture draw at the box; the
                     // texture key is the leaf key (the host registers its
@@ -436,13 +487,14 @@ impl LeafRegistry<u64> {
                         content_generation: None,
                     })],
                     scene: Some(scene),
-                    epoch: prior_epoch + 1,
+                    epoch,
                 },
                 None => RenderedLeaf {
+                    lifetime,
                     size,
                     splice: cmds,
                     scene: None,
-                    epoch: prior_epoch + 1,
+                    epoch,
                 },
             };
             out.map.insert(*key, entry);
@@ -622,6 +674,68 @@ mod tests {
         reg.retain(|key| *key == 4);
         assert!(!reg.contains(&3));
         assert!(reg.contains(&4));
+    }
+
+    #[test]
+    fn replacement_repaints_even_when_clean_and_cannot_inherit_a_scene() {
+        let size = Size {
+            width: 8.0,
+            height: 8.0,
+        };
+        let sized = |_| Some(size);
+        let mut reg = LeafRegistry::new();
+        let mut scene = SceneSlot::new(size);
+        scene.set_scene(vello::Scene::new());
+        reg.insert(3, Box::new(scene));
+        let mut out = RenderedLeaves::new();
+        assert_eq!(reg.render_into(sized, &mut out), 1);
+        let scene_epoch = out.scenes().next().unwrap().2;
+        let old_life = reg.lifetime(&3).unwrap();
+
+        for dirty in [false, true] {
+            reg.insert(
+                3,
+                Box::new(FlagLeaf {
+                    dirty: Rc::new(Cell::new(dirty)),
+                }),
+            );
+            assert_ne!(reg.lifetime(&3).as_ref(), Some(&old_life));
+            assert_eq!(reg.render_into(sized, &mut out), 1);
+            assert_eq!(out.scenes().count(), 0, "no former contributor scene");
+            assert!(matches!(out.get(3).unwrap(), [PaintCmd::DrawRect(_)]));
+            assert!(out.path_a_entries().next().unwrap().1 > scene_epoch);
+            assert_eq!(reg.render_into(sized, &mut out), 0);
+        }
+        let current = reg.lifetime(&3).unwrap();
+        reg.get_mut_as::<FlagLeaf>(&3).unwrap().dirty.set(true);
+        assert_eq!(reg.lifetime(&3).as_ref(), Some(&current));
+        assert_eq!(reg.render_into(sized, &mut out), 1);
+
+        // A detached old registry must not authorize a new insertion.
+        let old = std::mem::take(&mut reg);
+        reg.insert(
+            3,
+            Box::new(FlagLeaf {
+                dirty: Rc::new(Cell::new(false)),
+            }),
+        );
+        assert_ne!(reg.lifetime(&3), old.lifetime(&3));
+        assert_eq!(reg.render_into(|_| None, &mut out), 0);
+        assert!(
+            out.get(3).is_none(),
+            "replacement without layout drops stale paint"
+        );
+        assert_eq!(reg.render_into(sized, &mut out), 1);
+        let epoch = out.path_a_entries().next().unwrap().1;
+        out = RenderedLeaves::new();
+        assert_eq!(reg.render_into(sized, &mut out), 1);
+        assert!(
+            out.path_a_entries().next().unwrap().1 > epoch,
+            "cache reset cannot alias a host fragment epoch"
+        );
+        reg.remove(&3);
+        assert_eq!(reg.render_into(sized, &mut out), 0);
+        assert!(out.is_empty());
     }
 
     #[test]

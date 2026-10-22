@@ -909,8 +909,9 @@ where
     /// platform accessibility. The host drains it after queued pointer input;
     /// observe the returned routing acknowledgement before claiming delivery.
     /// The queue binds the current host, document, mount and producer
-    /// registration. Raw requests name the current context; child reuse within
-    /// a live producer and leaf replacement are not lifetime-qualified here.
+    /// registration, leaf insertion and any authored producer child token.
+    /// Existing publication provenance is preserved. Child keys must either
+    /// never recur or carry a token assigned by the model, not semantic reads.
     pub fn queue_a11y(&mut self, request: crate::A11yRequest) -> crate::A11yReceipt {
         let (queued, receipt) = crate::QueuedA11y::new(
             request,
@@ -918,6 +919,7 @@ where
             &self.runner.dom(),
             self.runner.mount(),
             self.producers,
+            self.leaves,
         );
         if self.a11y_owner.get() {
             self.a11y.push(queued);
@@ -1966,6 +1968,7 @@ where
                         &runner.dom(),
                         runner.mount(),
                         &self.s.shared.producers,
+                        &self.s.shared.leaves,
                     )
                 });
                 let result = if !self.s.a11y_owner.get() {

@@ -26,11 +26,12 @@ use super::actions::{AdvertisedAction, ArrangementAction};
 pub const DESCRIBED_ITEMS: usize = 200;
 
 /// Stable action keys for members described to a reader. Keys are never reused
-/// during a canvas lifetime, even when the graph reuses a petgraph slot.
+/// across canvases, even when the graph reuses a petgraph slot or a member is
+/// removed and later restored. Model reconciliation authors these identities;
+/// describing or activating an item only reads them.
 #[derive(Default)]
 pub(super) struct DescribedKeyRegistry {
-    next: u64,
-    by_member: std::collections::HashMap<uuid::Uuid, u64>,
+    pub(super) by_member: std::collections::HashMap<uuid::Uuid, u64>,
     by_key: std::collections::HashMap<u64, uuid::Uuid>,
 }
 
@@ -41,11 +42,13 @@ impl DescribedKeyRegistry {
         }
         // Zero is reserved for the initial/unset value. Exhaustion is not
         // recoverable without risking stale-action aliasing, so fail closed.
-        self.next = self
-            .next
-            .checked_add(1)
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static NEXT_KEY: AtomicU64 = AtomicU64::new(1);
+        let key = NEXT_KEY
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+                key.checked_add(1)
+            })
             .expect("described action key space exhausted");
-        let key = self.next;
         self.by_member.insert(member, key);
         self.by_key.insert(key, member);
         key
@@ -55,13 +58,21 @@ impl DescribedKeyRegistry {
         self.by_member.retain(|member, _| live.contains(member));
         self.by_key.retain(|_, member| live.contains(member));
     }
+
+    pub(super) fn reconcile(&mut self, graph: &kernel::graph::Graph) {
+        let live = graph.nodes().map(|(_, node)| node.id).collect();
+        self.retain_live(&live);
+        for (_, node) in graph.nodes() {
+            self.key_for(node.id);
+        }
+    }
 }
 
 /// One item as a reader is told it.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DescribedItem {
-    /// Opaque stable identity for the member during this canvas's life. It is
-    /// independent of the graph slot and remains stable across descriptions.
+    /// Opaque identity for this live member. Independent of graph slots and
+    /// descriptions; removal or graph replacement ends its life.
     pub key: u64,
     pub member: uuid::Uuid,
     /// The label its caption shows.
@@ -100,12 +111,6 @@ impl Canvas {
     /// always among them (it takes the last place when the cap would leave it
     /// out), each with its actions.
     pub fn describe_items(&self, cap: usize) -> CanvasDescription {
-        let live: std::collections::HashSet<_> =
-            self.graph.nodes().map(|(_, node)| node.id).collect();
-        self.described_keys
-            .lock()
-            .expect("described action key registry poisoned")
-            .retain_live(&live);
         let focused = self.focused_key();
         let (width, height) = (self.view_w as f32, self.view_h as f32);
         let mut total = 0;
@@ -138,11 +143,7 @@ impl Canvas {
             .into_iter()
             .filter_map(|(key, rect)| {
                 let node = self.graph.get_node(key)?;
-                let action_key = self
-                    .described_keys
-                    .lock()
-                    .expect("described action key registry poisoned")
-                    .key_for(node.id);
+                let action_key = *self.described_keys.by_member.get(&node.id)?;
                 Some(DescribedItem {
                     key: action_key,
                     member: node.id,
@@ -158,12 +159,7 @@ impl Canvas {
 
     /// The member a described item's key names.
     pub fn member_of_described(&self, key: u64) -> Option<uuid::Uuid> {
-        let member = *self
-            .described_keys
-            .lock()
-            .expect("described action key registry poisoned")
-            .by_key
-            .get(&key)?;
+        let member = *self.described_keys.by_key.get(&key)?;
         self.graph.get_node_key_by_id(member)?;
         Some(member)
     }

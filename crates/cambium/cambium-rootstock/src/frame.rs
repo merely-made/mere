@@ -1135,8 +1135,9 @@ where
     }
 
     /// Admission belongs to the host, not to a platform's last-synced ID map.
-    /// Layout visibility is the retained host view; this does not establish a
-    /// presentation revision or distinguish reuse of producer keys across lives.
+    /// Layout visibility is the retained host view. Bound publications also
+    /// check document/mount and contributor lives; raw requests name the current
+    /// context. Neither form establishes an atomic presentation transaction.
     fn admit_a11y_request(
         &mut self,
         request: &crate::A11yRequest,
@@ -1152,6 +1153,9 @@ where
         let dom = runner.dom();
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, runner.mount());
+        if !request.publication_is_current(&view, &self.s.shared.leaves, &self.s.shared.producers) {
+            return Err(Refusal::StaleTarget);
+        }
         if let crate::A11yTarget::Node(node) = request.target {
             if !view.contains(node) {
                 return Err(Refusal::TargetAbsent);
@@ -1209,6 +1213,11 @@ where
         };
         if !semantic.supports_action(action) {
             return Err(Refusal::Unsupported);
+        }
+        // A contributor callback is required to be observational. Recheck its
+        // authored life even if interior mutation violated that contract.
+        if !request.publication_is_current(&view, &self.s.shared.leaves, &self.s.shared.producers) {
+            return Err(Refusal::StaleTarget);
         }
         Ok(node)
     }

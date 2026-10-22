@@ -292,9 +292,8 @@ where
         "click",
         web_sys::MouseEvent,
         move |e: web_sys::MouseEvent| {
-            if let Some(target) = m.request_target_of(e.target()) {
-                let action = A11yAction::Click;
-                reader_act(&h, A11yRequest { action, target });
+            if let Some(request) = m.request_of(e.target(), A11yAction::Click) {
+                reader_act(&h, request);
             }
         }
     );
@@ -313,9 +312,8 @@ where
             if m.moving.get() {
                 return;
             }
-            if let Some(target) = m.request_target_of(e.target()) {
-                let action = A11yAction::Focus;
-                reader_act(&h, A11yRequest { action, target });
+            if let Some(request) = m.request_of(e.target(), A11yAction::Focus) {
+                reader_act(&h, request);
             }
         });
     let callback = focus_listener.as_ref().clone();

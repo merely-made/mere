@@ -1,0 +1,65 @@
+{
+  "executed_binaries": [
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-1295043566ba48a9.exe",
+      "sha256": "db284145447f7642bcdff2d96059fee074a760ed7c66f284bc94a93410643a07",
+      "bytes": 19911680
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-ef4d97502741a80a.exe",
+      "sha256": "77acbede4a7a1af0284b07d476f54562bd1ba7c510ee6e9cb3657dfdff5655a7",
+      "bytes": 36681216
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-71082f7d7ae6c047.exe",
+      "sha256": "caedb563145beafc5ea6fbb5d0b08035816ee713f5428ec74f4b589647981b64",
+      "bytes": 16785920
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-1b86fb89203501b2.exe",
+      "sha256": "dc7e8de7b765368324d9cc412bdd730c9b1c60e1413d6e9eaf93673496f6a832",
+      "bytes": 16350720
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-6d6ab7d2ede704bf.exe",
+      "sha256": "37f7fb7e5416d368c345820bcb540770bb94a9ea55b74a6fbeb63dec808abd20",
+      "bytes": 41682432
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-f3129e5889631b1a.exe",
+      "sha256": "d2558ae9907b41222fd0edaf972db458f242b1fbc12ee6ee5343d955acdb50c6",
+      "bytes": 17850368
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-c3db17256526c0e6.exe",
+      "sha256": "cc3a951d96f44303376ef792930cf69d55f807008d8d749fecd342f1381082d7",
+      "bytes": 17552384
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-6eca62857dafbb4a.exe",
+      "sha256": "48898f182557609fa34f0b8ff1535dfd305956743fb1d425aec520400d3e36ea",
+      "bytes": 39035904
+    },
+    {
+      "gate": "diagnostics-child-leaf-native-fixed.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\sprigging-6a4615d00f698574.exe",
+      "sha256": "042b1f80f85726dfbaad6df8e52435c1ba93c6e149f311aedb16eb5df7ac6ab8",
+      "bytes": 1214976
+    },
+    {
+      "gate": "diagnostics-child-leaf-canvas.json",
+      "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\pictograph-d83979e2b75eeba1.exe",
+      "sha256": "81dc45d9e5ce63819df396d9abb747ba313e209fdf6aa811570d4d1859c190aa",
+      "bytes": 56703488
+    }
+  ],
+  "note": "Hashes only; no binaries copied into retained receipts. These tests do not establish headed native, browser-runtime or human AT acceptance."
+}

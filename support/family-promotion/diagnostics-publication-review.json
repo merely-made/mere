@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-22",
+  "basis": "e3ddbedcd",
+  "status": "Bounded repairs qualified on recorded checkout: 287 distinct targeted passes, seven existing ignores, Wasm and embedding compilation. Browser/headed runtime and latest-main receiving remain open.",
+  "retained_byte_cap": 10000000,
+  "findings": [
+    {
+      "id": "diagnostics-producer-child-life",
+      "authority": "Authored producer model, observed through TextureProducer::child_lifetime",
+      "change": "Optional weak child token supports reusable child keys. Semantic reads do not mint it. Publication and queue bindings compare it against the current producer. Rootstock checks again after composition to detect an impure read that replaced a child. Retained-content model key entries own these lives; ordinary frames and producer recreation preserve them; close/replacement retires them. A weak derived key lookup avoids a per-action full model scan.",
+      "verification": "Actual Rootstock queued and published child reuse controls, retained old-marker control, impure-read refusal, and retained-content producer recreation/close controls."
+    },
+    {
+      "id": "diagnostics-publication-contributor-binding",
+      "authority": "One A11yProvenance shared by adapters and private queue admission",
+      "change": "A11yRequest preserves document root/mount, target identity and contributor registration/leaf/child bindings from publication to dispatch. Re-enqueue preserves an existing binding. Edited target fields cannot transplant it. Raw constructors explicitly remain current-context. Native and browser consume SemanticProjection::publication_requests instead of constructing independent current maps.",
+      "compatibility": "A11yRequest fields remain readable, but provenance is private. Workspace search found only two struct literal callers, both migrated to the browser publication route. External struct-literal callers must use A11yRequest::new/node/produced."
+    },
+    {
+      "id": "diagnostics-native-publication-drain-order",
+      "change": "Drain requests through the last published bindings before reading contributors or replacing maps. Keep install=false and withhold new bindings when installation fails, permitting a later retry.",
+      "verification": "Headless mapping binding control and native compilation; actual adapter drain timing and failed-install recovery are source-confirmed repairs without headed qualification."
+    },
+    {
+      "id": "diagnostics-browser-proxy-life",
+      "change": "Resolve an event only through the exact proxy element for the published ID. Replace that element when target life changes, retaining it through ordinary value/layout updates. Preserve request binding through listener dispatch, restore held focus when proxy replacement detaches it, and clear shared routes on mirror disposal.",
+      "verification": "Shared binding controls plus Wasm compilation. Browser event/focus/disposal runtime and human AT remain unqualified."
+    }
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "Native publication IDs and supplier tree-reference rewriting",
+      "gap": "A late OS event received after maps are replaced still carries only TreeId/NodeId. Reused numeric IDs can select the new binding. Draining earlier closes the existing pending-map mixup, not this late-arrival ambiguity.",
+      "done_condition": "Never reuse native target IDs across owner/contributor/child lives, or carry originating generation through ingress. Receive all AccessKit node-reference properties and guest/ROOT routing through an authoritative remapper rather than ad hoc children-only rewriting. Pinned AccessKit 0.25.1 exposes no generic node-reference remapper in the inspected source."
+    },
+    {
+      "owner": "Host publication owner context",
+      "gap": "Bindings capture document/mount and contributors; a direct published request moved with the identical document and mount into a foreign host is not owner-qualified. Private queued requests retain their separate existing host/document weak binding.",
+      "done_condition": "Pass host-issued owner life through the shared Accessibility publication contract and both adapters. Preserve explicit raw current-context constructors; do not smuggle host lifetime into generic DOM/layout ownership."
+    },
+    {
+      "owner": "Generic producer actor transaction and legacy implementations",
+      "gap": "child_lifetime=None relies on the existing nonreused-key contract. Arbitrary legacy producers can violate it, and rechecks do not create an atomic actor transaction. An action that changes meaning must retire its ID/child life at the model.",
+      "done_condition": "Coordinated contributor/actor request and activation contract with owner-side lifetime check in the same model transaction; deterministic withdrawn/reintroduced child/action and concurrent-update receiving."
+    },
+    {
+      "owner": "Platform runtime qualification and install ownership",
+      "gap": "No new browser runtime, headed native or human assistive-technology acceptance. A11yHost::attach still relies on its one-window contract; install retry bookkeeping does not establish recovery from partial platform installation.",
+      "done_condition": "Actual old proxy/event/focus/disposal controls in a browser and native queued/late ID, failed install, reattach and guest routing controls."
+    },
+    {
+      "owner": "Latest-main receiving",
+      "gap": "origin/main advanced 50 commits to 931a4ec8d while shared checkout remained dirty, including retained-content and supplier changes. Current-base receipts cannot be relabeled latest-main.",
+      "done_condition": "Integrate this patch and earlier child/leaf WIP with current main while preserving the staged receiving work; rerun affected dependency and consumer gates."
+    }
+  ],
+  "previous_open_work": [
+    "Canvas raw ingest can hide same-UUID removal/recreation inside one callback.",
+    "Rootstock intrinsic-size and Path-B leaf scene raster receiving remain separate."
+  ],
+  "qualification": "support/family-promotion/diagnostics-publication-qualification.json",
+  "isolated_outputs": [],
+  "upstream_receiving": "support/family-promotion/diagnostics-publication-upstream.json"
+}
