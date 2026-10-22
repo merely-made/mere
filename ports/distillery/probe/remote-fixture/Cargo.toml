@@ -14,10 +14,10 @@ burn = { version = "=0.22.0", default-features = false, features = ["remote", "s
 burn-wgpu = { version = "=0.22.0", default-features = false, features = ["std"] }
 cubecl = { version = "=0.11.0", default-features = false }
 distillery = { path = "../..", features = ["remote"] }
-esp = { features = ["bert"], git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
+esp = { features = ["bert"], git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
 identity = { package = "personae", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 mesh = { package = "mere-mesh", path = "../../../../crates/mesh/mesh" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
@@ -33,13 +33,13 @@ fusion-autotune = ["fusion", "autotune"]
 
 [patch.crates-io]
 # Canonical promoted families; keep registry and Git consumers type-identical.
-armillary = { git = "https://github.com/merely-made/armillary.git", rev = "e67c5def1c735be047492a867bcdc8b41fba22b8" }
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
-mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
+armillary = { git = "https://github.com/merely-made/armillary.git", rev = "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
+mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
 # Match the root's render source policy; patches are not inherited by this workspace.
 burn-remote = { path = "../../../../support/patches/burn-remote" }
 cubecl-runtime = { path = "../../../../support/patches/cubecl-runtime" }
@@ -57,19 +57,19 @@ rust-version = "1.97.1"
 # Keep the imported carrier and local actor graph on one shared leaf source.
 [patch."https://github.com/merely-made/mere.git"]
 # Promoted sources shared with immutable older Mere suppliers.
-armillary = { git = "https://github.com/merely-made/armillary.git", rev = "e67c5def1c735be047492a867bcdc8b41fba22b8" }
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
+armillary = { git = "https://github.com/merely-made/armillary.git", rev = "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
 
 [patch."https://www.github.com/merely-made/mere.git"]
-armillary = { git = "https://github.com/merely-made/armillary.git", rev = "e67c5def1c735be047492a867bcdc8b41fba22b8" }
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "809deb6be341d3b6eeaad9534d9d162bd3105f4a" }
-mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
-stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "738ef15956a29a125820b2d6c2280d39a6214f8e" }
+armillary = { git = "https://github.com/merely-made/armillary.git", rev = "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
+mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }

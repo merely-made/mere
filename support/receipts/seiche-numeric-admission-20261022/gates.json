@@ -1,0 +1,77 @@
+{
+  "direct-bind-red-ready": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "canvas::tests::binding::bind_rejects_mix_weights_outside_the_runtime_f32_range",
+      "--",
+      "--exact"
+    ],
+    "exit": 101,
+    "seconds": 47.67,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "core-numeric-ready": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "--",
+      "canvas::tests::binding",
+      "physics_controls",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 255.15,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "graphshell-numeric-ready": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "graphshell",
+      "--no-default-features",
+      "--features",
+      "web",
+      "--lib",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 167.56,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  }
+}
