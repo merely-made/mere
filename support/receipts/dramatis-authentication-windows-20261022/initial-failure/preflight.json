@@ -1,0 +1,18 @@
+{
+  "mode": "native",
+  "source": "a3d3c5aec4f0521f0a9391e9ce7a49f720a0d348",
+  "session_id": 1,
+  "active_console_session": 1,
+  "input_desktop": "Default",
+  "hostname": "O-PC",
+  "windows_version": [
+    "11",
+    "10.0.26220",
+    "SP0",
+    "Multiprocessor Free"
+  ],
+  "pid": 207512,
+  "controller_sha256": "8b2347be9132e312d1bd676fe54b1f36ec5fb711b3817fdd9983544809fd9913",
+  "interactive_task": true,
+  "gpu_backend": "native host default"
+}

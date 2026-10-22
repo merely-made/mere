@@ -1,0 +1,169 @@
+{
+  "source": "2eb8aa09340f7f64739349c7ee08c05902f10f87",
+  "frozen_source_inputs_unchanged": 1113,
+  "binaries_reverified": 2,
+  "built_on_this_host": true,
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 90228,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 255692,
+      "format": "sealed",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 238848,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 64044,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 156272,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 263412,
+      "format": "portable",
+      "phase": "seed",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "dramatis",
+      "pid": 115556,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native"
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 185052,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0,
+      "mode": "native"
+    }
+  ],
+  "refresh_intervals": [
+    {
+      "mode": "native",
+      "format": "sealed",
+      "acknowledgement_after_refresh_seconds": 7.5170713
+    },
+    {
+      "mode": "native",
+      "format": "portable",
+      "acknowledgement_after_refresh_seconds": 6.3930175
+    }
+  ],
+  "capture_files": {
+    "sealed/acknowledged-after-refresh.png": {
+      "sha256": "1f621b083e90d174dfa5db4614a76a2e232f64d7eecb2730052aa3345c92656d",
+      "mtime_ns": 1792696131729151700,
+      "width": 1720,
+      "height": 1440
+    },
+    "sealed/before.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792696076268279700,
+      "width": 1720,
+      "height": 1440
+    },
+    "sealed/cancelled.png": {
+      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
+      "mtime_ns": 1792696090580208300,
+      "width": 1720,
+      "height": 1440
+    },
+    "sealed/changed.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792696124212080400,
+      "width": 1720,
+      "height": 1440
+    },
+    "sealed/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792696143889653600,
+      "width": 1720,
+      "height": 1440
+    },
+    "portable/acknowledged-after-refresh.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792696174142524400,
+      "width": 1720,
+      "height": 1440
+    },
+    "portable/before.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792696147858208800,
+      "width": 1720,
+      "height": 1440
+    },
+    "portable/cancelled.png": {
+      "sha256": "0b739e765af5185f038036badace2d56a547bd3ea03011d0b2d81b0789dcd7f9",
+      "mtime_ns": 1792696151786952100,
+      "width": 1720,
+      "height": 1440
+    },
+    "portable/changed.png": {
+      "sha256": "1ec59bf08ee5e03f3fca31859bdbbad1c4d7d4aa5337793453c9efede84ee3a3",
+      "mtime_ns": 1792696167749506900,
+      "width": 1720,
+      "height": 1440
+    },
+    "portable/cold-reopened.png": {
+      "sha256": "3a6394585ef724f815e40375829c61668d0557159717e0981ded504bcfda6f22",
+      "mtime_ns": 1792696178193581200,
+      "width": 1720,
+      "height": 1440
+    }
+  },
+  "retained_receipt_byte_cap": 100000000,
+  "no_owned_app_or_host_processes": true,
+  "process_query": {
+    "query": "read-only Win32_Process; exact frozen executable paths",
+    "task": {
+      "TaskName": "Mere-Dramatis-Authentication",
+      "State": 3
+    },
+    "ownedTestProcesses": [],
+    "timestampUtc": "2026-10-22T19:11:20.8218175Z"
+  },
+  "primary_before": {
+    "head": "e3ddbedcdb1fd3a1c6e9421f9a930367289c9a4b",
+    "status_lines": 64,
+    "status_sha256": "b6973b211f8854530c524bf8b03e0443161c6d1aad33f87211af451b6d5eeed1"
+  },
+  "primary_after": {
+    "head": "01a3a273d66b9591477cc3f425ca43e0f76f037d",
+    "status_lines": 92,
+    "status_sha256": "bc77bb103c0e955d8139e609735a7a3b855cc8d21209feb8129910ee5b3462a1"
+  },
+  "primary_status_unchanged": false,
+  "primary_preservation_scope": "Task used a separate worktree and did not write primary files; this records Git status, not file-content hashes. Concurrent work may change the primary independently."
+}

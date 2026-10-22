@@ -1,0 +1,18 @@
+{
+  "exit": 0,
+  "source": "2eb8aa09340f7f64739349c7ee08c05902f10f87",
+  "command": [
+    "C:\\Users\\mark_\\AppData\\Local\\Programs\\Python\\Python312\\pythonw.exe",
+    "C:\\Users\\mark_\\Code\\worktrees\\mere-authentication\\support\\dramatis_auth_receipts.py",
+    "--binary",
+    "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\frozen\\dramatis-ui.exe",
+    "--host",
+    "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\frozen\\authentication-host.exe",
+    "--runtime",
+    "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\n",
+    "--output",
+    "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native",
+    "--native",
+    "--native-cancel"
+  ]
+}

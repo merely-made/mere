@@ -1,0 +1,164 @@
+{
+  "captures": [
+    {
+      "digest": "d2f169f086595ecc",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "156272",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\before.png",
+      "path": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\before.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "1a2ba52aae9021c1",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "156272",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\cancelled.png",
+      "path": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\cancelled.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "22bf18deeed7fbfc",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "156272",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\changed.png",
+      "path": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\changed.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "22bf18deeed7fbfc",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "156272",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\acknowledged-after-refresh.png",
+      "path": "C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\acknowledged-after-refresh.png",
+      "viewport": null,
+      "width": 1720
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 1,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 23,
+        "layout_rebuilt": 1,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 1767,
+        "acquire_us": 171,
+        "capture_us": 0,
+        "clear_us": 613,
+        "compose_us": 984,
+        "content_extent_us": 25,
+        "dirty_tile_rebuild_us": 257,
+        "emit_scene_us": 804,
+        "excluding_acquire_present_capture_us": 32893,
+        "frame_hook_us": 2,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 13031,
+        "layout_tick_us": 0,
+        "layout_update_us": 13039,
+        "layout_with_text_us": 10339,
+        "leaf_boxes_us": 28,
+        "leaf_fragments_us": 5,
+        "leaf_render_us": 1,
+        "master_compose_us": 19,
+        "pointer_us": 4,
+        "present_us": 369,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 10497,
+        "raster_us": 15550,
+        "relayout_us": 13073,
+        "shadows_us": 0,
+        "style_resolve_us": 2619,
+        "tile_invalidate_us": 116,
+        "total_us": 33433,
+        "vello_render_us": 10088
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "busy": "false",
+    "locked": "false",
+    "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+    "pid": "156272",
+    "profiles": "2",
+    "ready": "true"
+  },
+  "frames": 1105,
+  "kind": "dramatis",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 1105,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "captured C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\before.png",
+    "waited 181 frames",
+    "captured C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\cancelled.png",
+    "waited 670 frames",
+    "captured C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\changed.png",
+    "captured C:\\t\\cargo-targets\\mere\\dramatis-authentication\\native\\portable\\acknowledged-after-refresh.png"
+  ],
+  "unpresented_redraws": 0
+}
