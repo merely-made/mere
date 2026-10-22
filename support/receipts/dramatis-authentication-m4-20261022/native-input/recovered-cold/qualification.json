@@ -1,0 +1,56 @@
+{
+  "result": "ok",
+  "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "native_dialogs": false,
+  "native_provider_selected": true,
+  "native_cancellation": false,
+  "reopen_only": true,
+  "public_synthetic_vaults_only": true,
+  "formats": [
+    {
+      "format": "sealed",
+      "identities_preserved": true,
+      "old_rejected_after_cold_reopen": true
+    },
+    {
+      "format": "portable",
+      "identities_preserved": true,
+      "old_rejected_after_cold_reopen": true
+    }
+  ],
+  "processes": [
+    {
+      "kind": "dramatis",
+      "pid": 5374,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 5370,
+      "format": "sealed",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "dramatis",
+      "pid": 5384,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    },
+    {
+      "kind": "djinn-fixture",
+      "pid": 5380,
+      "format": "portable",
+      "phase": "reopen",
+      "exit": 0
+    }
+  ],
+  "binaries": {
+    "app_sha256": "09e9dbdcc9dff0568588694efe8da7922cf955403d7fbe36b8b2fee7b2e07c3a",
+    "host_sha256": "e5a2242ae427e4497606665a5305f2cd13bca3b16d542112d05c0301b149b9a5"
+  },
+  "controller_sha256": "fd84e8667ea5cf65314f5c34d6425ef199cff8be80ef92b15cb2a3ed5400289a"
+}

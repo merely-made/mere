@@ -57,6 +57,9 @@ recovery and updates to other computers remain separate capabilities.
 
 The [macOS qualification receipt](../../support/receipts/dramatis-authentication-20261021/README.md)
 records both formats, native prompts, failure controls and independent cold reopens.
+The [Apple M4 receipt](../../support/receipts/dramatis-authentication-m4-20261022/README.md)
+adds native input and cold reopens on arm64, with separate current-stack checks
+and the retained interrupted portable presentation.
 
 Linux password prompts require an available masked graphical provider: Zenity,
 Yad or KDialog in the resident's desktop session. Console, unmasked and unknown

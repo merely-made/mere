@@ -1,0 +1,18 @@
+{
+  "exit": 1,
+  "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/markik/Code/worktrees/mere-authentication-m4/support/dramatis_auth_receipts.py",
+    "--binary",
+    "/Users/markik/Code/output/dauth-m4-20261022/frozen/Dramatis.app/Contents/MacOS/dramatis-ui",
+    "--host",
+    "/Users/markik/Code/output/dauth-m4-20261022/frozen/authentication-host",
+    "--runtime",
+    "/Users/markik/Code/output/dauth-m4-20261022/n",
+    "--output",
+    "/Users/markik/Code/output/dauth-m4-20261022/native",
+    "--native",
+    "--native-cancel"
+  ]
+}

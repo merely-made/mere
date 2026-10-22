@@ -1,0 +1,149 @@
+{
+  "captures": [
+    {
+      "digest": "d0b84ddd4a4246ea",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "4683",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/before.png",
+      "path": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/before.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "0fb485d3b07b07c7",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "4683",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/cancelled.png",
+      "path": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/cancelled.png",
+      "viewport": null,
+      "width": 1720
+    },
+    {
+      "digest": "b16e31089d49f628",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "4683",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1440,
+      "name": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/changed.png",
+      "path": "/Users/markik/Code/output/dauth-m4-20261022/native/portable/changed.png",
+      "viewport": null,
+      "width": 1720
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 1,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 23,
+        "layout_rebuilt": 1,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 940,
+        "acquire_us": 1035,
+        "capture_us": 0,
+        "clear_us": 379,
+        "compose_us": 2946,
+        "content_extent_us": 10,
+        "dirty_tile_rebuild_us": 112,
+        "emit_scene_us": 474,
+        "excluding_acquire_present_capture_us": 47770,
+        "frame_hook_us": 11,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 6772,
+        "layout_tick_us": 0,
+        "layout_update_us": 6835,
+        "layout_with_text_us": 5680,
+        "leaf_boxes_us": 18,
+        "leaf_fragments_us": 2,
+        "leaf_render_us": 1,
+        "master_compose_us": 7,
+        "pointer_us": 5,
+        "present_us": 70,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 2814,
+        "raster_us": 36091,
+        "relayout_us": 6857,
+        "shadows_us": 0,
+        "style_resolve_us": 1067,
+        "tile_invalidate_us": 58,
+        "total_us": 48875,
+        "vello_render_us": 2630
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [
+    "native presentation stalled for 60000 ms (4873 redraws, 1207 presented frames)"
+  ],
+  "final": {
+    "busy": "false",
+    "locked": "false",
+    "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+    "pid": "4683",
+    "profiles": "2",
+    "ready": "true"
+  },
+  "frames": 1207,
+  "kind": "dramatis",
+  "ok": false,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 4873,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "captured /Users/markik/Code/output/dauth-m4-20261022/native/portable/before.png",
+    "waited 126 frames",
+    "captured /Users/markik/Code/output/dauth-m4-20261022/native/portable/cancelled.png",
+    "waited 898 frames",
+    "captured /Users/markik/Code/output/dauth-m4-20261022/native/portable/changed.png"
+  ],
+  "unpresented_redraws": 3666
+}

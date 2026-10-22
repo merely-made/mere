@@ -1,0 +1,10 @@
+{
+  "rust_test_source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16",
+  "freeze_and_headed_source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "unchanged_source_inputs_from_rust_tests": 1103,
+  "tool_only_delta": [
+    "scripts/test_dramatis_auth_tools.py",
+    "support/dramatis_auth_freeze.py"
+  ],
+  "scope": "All frozen tracked repository inputs except the two Python tool files are byte-identical from Rust tests to headed qualification. Generated Cargo input hashes are verified separately on the M4."
+}

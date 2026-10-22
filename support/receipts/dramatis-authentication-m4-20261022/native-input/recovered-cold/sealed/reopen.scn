@@ -1,0 +1,3 @@
+await {"ready": "true", "profiles": "2", "locked": "false"}
+wait 300000
+capture /Users/markik/Code/output/dauth-m4-20261022/native-cold/sealed/cold-reopened.png

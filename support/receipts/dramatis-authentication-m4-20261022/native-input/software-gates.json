@@ -1,0 +1,225 @@
+{
+  "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/markik/Code/repos/mere/target",
+    "CARGO_BUILD_BUILD_DIR": "/Users/markik/Code/repos/mere/target/build",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "RUSTUP_TOOLCHAIN": "1.99.1"
+  },
+  "commands": [
+    {
+      "name": "locked-metadata-fetch",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit": 0,
+      "seconds": 3.240619958,
+      "passed": 0,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "storage-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "castellan",
+        "--features",
+        "keeper",
+        "--lib",
+        "passphrase",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 67.23267312499999,
+      "passed": 26,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "provider-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "djinn",
+        "--lib",
+        "identity_ui::tests",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 82.32715616699998,
+      "passed": 4,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "resident-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "djinn",
+        "--test",
+        "passphrase_change",
+        "--message-format=json",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 25.31736975000001,
+      "passed": 2,
+      "ignored": 1,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "app-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "dramatis-app",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 62.149497707999984,
+      "passed": 15,
+      "ignored": 3,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "boundary",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit": 0,
+      "seconds": 2.6198422499999765,
+      "passed": 0,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    },
+    {
+      "name": "tool-tests",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "scripts/test_dramatis_auth_tools.py"
+      ],
+      "exit": 0,
+      "seconds": 0.06253929100000002,
+      "passed": 5,
+      "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27"
+    },
+    {
+      "name": "app-final-build",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j2",
+        "-p",
+        "dramatis-app",
+        "--bin",
+        "dramatis-ui"
+      ],
+      "exit": 0,
+      "seconds": 2.503725667,
+      "passed": 0,
+      "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27"
+    },
+    {
+      "name": "freeze",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "support/dramatis_auth_freeze.py",
+        "--repo",
+        "/Users/markik/Code/repos/mere",
+        "--artifacts",
+        "/Users/markik/Code/repos/mere/target",
+        "--build-dir",
+        "/Users/markik/Code/repos/mere/target/build",
+        "--host-build",
+        "/Users/markik/Code/output/dauth-m4-20261022/host-build.jsonl",
+        "--output",
+        "/Users/markik/Code/output/dauth-m4-20261022/frozen"
+      ],
+      "exit": 0,
+      "seconds": 6.194883040999999,
+      "passed": 0,
+      "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27"
+    }
+  ],
+  "preliminary_attempts": [
+    {
+      "name": "freeze",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "support/dramatis_auth_freeze.py",
+        "--repo",
+        "/Users/markik/Code/repos/mere",
+        "--artifacts",
+        "/Users/markik/Code/repos/mere/target",
+        "--build-dir",
+        "/Users/markik/Code/repos/mere/target/build",
+        "--host-build",
+        "/Users/markik/Code/output/dauth-m4-20261022/host-build.jsonl",
+        "--output",
+        "/Users/markik/Code/output/dauth-m4-20261022/frozen"
+      ],
+      "exit": 1,
+      "seconds": 2.0803807499999607,
+      "passed": 0,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16",
+      "log_path": "freeze-initial.log.gz"
+    }
+  ],
+  "superseded_tool_gate": [
+    {
+      "name": "tool-tests",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "scripts/test_dramatis_auth_tools.py"
+      ],
+      "exit": 0,
+      "seconds": 0.10368208299999537,
+      "passed": 3,
+      "ignored": 0,
+      "source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16"
+    }
+  ],
+  "rust_gate_source": "b09af10e1b751f2c4d6974e67ae61319a3f50a16",
+  "tool_only_source_delta": [
+    "scripts/test_dramatis_auth_tools.py",
+    "support/dramatis_auth_freeze.py"
+  ],
+  "rust_sources_unchanged": true
+}

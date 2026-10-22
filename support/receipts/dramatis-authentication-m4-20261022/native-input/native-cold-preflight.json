@@ -1,0 +1,23 @@
+{
+  "hostname": "m4-imac.lan",
+  "architecture": "arm64",
+  "macos": "26.5.1",
+  "console_user": "markik",
+  "console_present": true,
+  "console_locked": false,
+  "uid": 502,
+  "controller_user": "markik",
+  "launchctl_gui_available": true,
+  "chip": "Apple M4",
+  "hardware_model": "Mac16,3",
+  "memory_bytes": 17179869184,
+  "python_version": "3.9.6",
+  "bootstrap_manager": "Aqua",
+  "mode": "native-cold",
+  "source": "cfbdaa88a464613c929b2b172c1c2c22866b5a27",
+  "pid": 5358,
+  "controller_sha256": "fd84e8667ea5cf65314f5c34d6425ef199cff8be80ef92b15cb2a3ed5400289a",
+  "native_prompt_pixels_captured": false,
+  "renderer": "native host default; no GPU backend claim",
+  "environment_has_ssh_variables": false
+}
