@@ -239,6 +239,10 @@ Both caches are ephemeral. They change placement and repeated work, while the
 original format, prompt, token sampling, checkpoint/session identity and model
 content references remain the same. Debug cache counters report logical reads,
 hits and payload/capacity bounds without recording prompt or answer text.
+Performance qualification also needs an optimized tensor/backend build: an
+unoptimized development backend can spend most of its time constructing and
+submitting kernels even when the caches hit. Cache counters establish reuse;
+measure generation separately from artifact verification, import and prefill.
 
 A GPU ask preempts the GPU trainer through owner reclaim. The offer is
 withdrawn while inference waits or runs; inference loads device tensors for

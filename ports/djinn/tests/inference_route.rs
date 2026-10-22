@@ -1729,6 +1729,12 @@ async fn serve_trained_model_for_headed_turnstone() {
         }),
         ..owner(Some(lane()))
     };
+    // Four independently bounded asks plus native inspection and shutdown.
+    let headed_seconds = if std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some() {
+        4200
+    } else {
+        1200
+    };
     let endpoint_file = output.join("endpoint.txt");
     let endpoint = std::fs::read_to_string(&endpoint_file).unwrap_or_else(|_| endpoint_name());
     std::fs::write(endpoint_file, &endpoint).unwrap();
@@ -1794,7 +1800,15 @@ async fn serve_trained_model_for_headed_turnstone() {
             let grants = grants.clone();
             let catalog = catalog.clone();
             tokio::spawn(async move {
-                let _ = serve_app_broker(&endpoint, keeper, grants, 1_200_000, None, catalog).await;
+                let _ = serve_app_broker(
+                    &endpoint,
+                    keeper,
+                    grants,
+                    headed_seconds * 1000,
+                    None,
+                    catalog,
+                )
+                .await;
             })
         };
         // Prove the application endpoint is accepting before announcing readiness.
@@ -1811,7 +1825,7 @@ async fn serve_trained_model_for_headed_turnstone() {
             serde_json::to_vec_pretty(&lane.runs()).unwrap(),
         )
         .unwrap();
-        let deadline = tokio::time::Instant::now() + Duration::from_secs(1200);
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(headed_seconds);
         let mut last_observation = Vec::new();
         loop {
             let runs = lane.runs();
@@ -1856,8 +1870,14 @@ async fn serve_trained_model_for_headed_turnstone() {
                                 };
                                 if !output.join(&name).exists()
                                     && (!historical
-                                        || !recall.citations.is_empty()
-                                        || mixed["claim_support"] == true)
+                                        || if mixed["claim_support"] == true {
+                                            // Wait for retained source publication before
+                                            // freezing the historical live observation.
+                                            recall.stale.is_empty()
+                                                && recall.unknown_citations.is_empty()
+                                        } else {
+                                            !recall.citations.is_empty()
+                                        })
                                 {
                                     std::fs::write(
                                         output.join(name),
@@ -2034,6 +2054,53 @@ async fn serve_trained_model_for_headed_turnstone() {
     )
     .unwrap();
     if let Some(mixed) = &mixed {
+        if mixed["claim_support"] == true {
+            // This scenario reopens every historical answer and generates one
+            // fresh cross-source answer. Insufficient answers correctly have
+            // no citations; the independent frozen rubric checks semantics.
+            assert_eq!(snapshots.len(), 2);
+            let load = |name: String| -> serde_json::Value {
+                serde_json::from_slice(&std::fs::read(output.join(name)).unwrap()).unwrap()
+            };
+            for case in mixed["asks"].as_array().unwrap() {
+                let id = case["id"].as_str().unwrap();
+                let warm = load(format!("mixed-0-{id}.json"));
+                assert_eq!(warm, load(format!("history-1-{id}.json")));
+                let retained = |snapshot: &serde_json::Value| {
+                    snapshot["evidence"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|e| e["record"]["run"] == warm["run"])
+                        .unwrap()
+                        .clone()
+                };
+                assert_eq!(retained(&snapshots[0]), retained(&snapshots[1]));
+            }
+            let warm = load("mixed-0-cross.json".into());
+            let fresh = load("mixed-1-cross.json".into());
+            assert_eq!(fresh["state"], "finished");
+            assert_ne!(warm["run"], fresh["run"]);
+            assert_eq!(warm["question"], fresh["question"]);
+            for field in ["scope", "passages"] {
+                assert_eq!(warm["recall"][field], fresh["recall"][field]);
+            }
+            if embedding.is_some() {
+                assert_eq!(warm["recall"]["embedding"]["cache"], "built");
+                assert_eq!(fresh["recall"]["embedding"]["cache"], "reopened");
+                for field in ["envelope", "index"] {
+                    assert_eq!(
+                        warm["recall"]["embedding"][field],
+                        fresh["recall"]["embedding"][field]
+                    );
+                }
+                assert_eq!(
+                    snapshots[0]["embedding_projections"],
+                    snapshots[1]["embedding_projections"]
+                );
+            }
+            return;
+        }
         for case in mixed["asks"].as_array().unwrap() {
             let id = case["id"].as_str().unwrap();
             let load = |name: String| -> serde_json::Value {
