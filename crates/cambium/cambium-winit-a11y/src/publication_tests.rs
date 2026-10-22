@@ -8,6 +8,8 @@ use layout_dom_api::LayoutDomMut;
 
 #[test]
 fn publication_tests_mapper_preserves_the_published_binding_until_maps_are_replaced() {
+    let marker = std::rc::Rc::new(std::cell::Cell::new(true));
+    let owner = cambium_rootstock::A11yOwner::new(&marker);
     let mut dom = ScriptedDom::new();
     let root = dom.document();
     dom.set_inner_html(
@@ -26,15 +28,15 @@ fn publication_tests_mapper_preserves_the_published_binding_until_maps_are_repla
         }))
     };
     leaves.insert(7, knob());
-    let publish = |leaves: &LeafRegistry<u64>| {
+    let publish = |owner: &cambium_rootstock::A11yOwner, leaves: &LeafRegistry<u64>| {
         cambium_rootstock::project_semantics(&view, &layout, leaves, &producers, None)
-            .publication_requests(&view, leaves, &producers)
+            .publication_requests(owner, &view, leaves, &producers)
             .into_iter()
             .map(|(id, request)| (A11yNodeId(id), request))
             .collect::<HashMap<_, _>>()
     };
     let mut host = A11yHost::new(|| {});
-    host.requests = publish(&leaves);
+    host.requests = publish(&owner, &leaves);
     let target = A11yNodeId(view.opaque_id(node));
     let old = host
         .map_parts(
@@ -45,7 +47,7 @@ fn publication_tests_mapper_preserves_the_published_binding_until_maps_are_repla
         )
         .unwrap();
     leaves.insert(7, knob());
-    let next = publish(&leaves);
+    let next = publish(&owner, &leaves);
     let pending = host
         .map_parts(Action::Click, None, accesskit::TreeId::ROOT, target)
         .unwrap();
@@ -59,4 +61,26 @@ fn publication_tests_mapper_preserves_the_published_binding_until_maps_are_repla
                 .unwrap()
         )
     );
+}
+
+#[test]
+fn publication_owner_tokens_do_not_keep_the_host_marker_alive() {
+    let marker = std::rc::Rc::new(std::cell::Cell::new(true));
+    let owner = cambium_rootstock::A11yOwner::new(&marker);
+    assert!(owner.is_live());
+    drop(marker);
+    assert!(!owner.is_live());
+}
+
+#[test]
+fn window_attachment_refuses_another_handle_without_replacing_the_original() {
+    use std::sync::Arc;
+    let original = Arc::new(());
+    let other = Arc::new(());
+    let mut window = None;
+    attach_window(&mut window, original.clone()).unwrap();
+    attach_window(&mut window, original.clone()).unwrap();
+    assert!(attach_window(&mut window, other.clone()).is_err());
+    assert!(Arc::ptr_eq(window.as_ref().unwrap(), &original));
+    assert_eq!(Arc::strong_count(&other), 1);
 }

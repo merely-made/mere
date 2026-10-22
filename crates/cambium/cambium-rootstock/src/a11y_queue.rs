@@ -17,7 +17,6 @@ use crate::{
 pub(crate) struct QueuedA11y {
     pub request: A11yRequest,
     reply: Rc<Cell<Option<A11yDispatch>>>,
-    owner: Weak<Cell<bool>>,
     dom: Weak<RefCell<ScriptedDom>>,
     mount: NodeId,
 }
@@ -33,14 +32,18 @@ impl QueuedA11y {
     ) -> (Self, A11yReceipt) {
         let request = {
             let document = dom.borrow();
-            request.bind_publication(&crate::WindowDom::new(&document, mount), leaves, producers)
+            request.bind_publication(
+                &crate::A11yOwner::new(owner),
+                &crate::WindowDom::new(&document, mount),
+                leaves,
+                producers,
+            )
         };
         let reply = Rc::new(Cell::new(None));
         (
             Self {
                 request,
                 reply: reply.clone(),
-                owner: Rc::downgrade(owner),
                 dom: Rc::downgrade(dom),
                 mount,
             },
@@ -56,18 +59,15 @@ impl QueuedA11y {
         producers: &ProducerRegistry,
         leaves: &sprigging::LeafRegistry<u64>,
     ) -> bool {
-        owner.get()
-            && self.owner.ptr_eq(&Rc::downgrade(owner))
-            && self.dom.ptr_eq(&Rc::downgrade(dom))
-            && self.mount == mount
-            && {
-                let document = dom.borrow();
-                self.request.publication_is_current(
-                    &crate::WindowDom::new(&document, mount),
-                    leaves,
-                    producers,
-                )
-            }
+        owner.get() && self.dom.ptr_eq(&Rc::downgrade(dom)) && self.mount == mount && {
+            let document = dom.borrow();
+            self.request.publication_is_current(
+                &crate::A11yOwner::new(owner),
+                &crate::WindowDom::new(&document, mount),
+                leaves,
+                producers,
+            )
+        }
     }
 
     pub fn finish(&self, result: A11yDispatch) {

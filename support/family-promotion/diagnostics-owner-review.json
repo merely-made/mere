@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-22",
+  "scope": "Bounded owner repair and native publication ID migration inventory; audit snapshot only, not a replacement runtime property schema.",
+  "fixed": [
+    {
+      "id": "publication-host-owner",
+      "authority": "Existing HostState a11y_owner marker, observed weakly by A11yOwner in shared A11yProvenance",
+      "change": "Accessibility::sync and publication_requests/bind_publication require owner. Native/browser freeze it at publication. Queue preserves existing bindings and removes its separate owner-identity field. Foreign requests cannot acquire new owner at re-enqueue.",
+      "compatibility": "Implementers and bind_publication/publication_requests callers must pass the host owner. All four workspace Accessibility implementations migrated. Raw constructors still name the current live context."
+    },
+    {
+      "id": "disposed-direct-activation",
+      "authority": "Rootstock host lifecycle",
+      "change": "Direct bound/raw requests now return Cancelled after take_disposal even while runner/layout remain inspectable. Disposed host stops invoking Accessibility::sync."
+    },
+    {
+      "id": "native-window-attachment",
+      "authority": "A11yHost one-window attachment boundary",
+      "change": "attach returns Result; a different Arc window handle is refused before changing the stored window, while the same handle is idempotent. Native host creation propagates failure.",
+      "verification": "Headless handle-admission regression using the exact attachment helper. No claim of headed platform installation or recovery."
+    }
+  ],
+  "native_id_migration": {
+    "status": "Open; intentionally exceeds this bounded repair. Owner-bound requests do not make reused raw OS numeric IDs safe.",
+    "cause": "Native map_parts resolves TreeId/NodeId through last published requests. An old OS event arriving after replacement can still select a new binding. Shared published request binding contains no OS originating generation.",
+    "full_node_identity_gap": "SemanticProjection publication_requests covers DOM targets and producer action buttons. Producer structural children are separate generated tree nodes without routing entries; an action-map-only allocator does not cover all published node identities.",
+    "pinned_accesskit_version": "0.25.1",
+    "pinned_accesskit_source_sha256": "f77ed125614c6e735141bdc5fe8551cfc8dbc2d16ffccf4d52880c2c2bdfeffd",
+    "node_id_vector_properties": [
+      "Children",
+      "Controls",
+      "Details",
+      "DescribedBy",
+      "FlowTo",
+      "LabelledBy",
+      "Owns",
+      "RadioGroup"
+    ],
+    "node_id_scalar_properties": [
+      "ActiveDescendant",
+      "ErrorMessage",
+      "InPageLinkTarget",
+      "MemberOf",
+      "NextOnLine",
+      "PreviousOnLine",
+      "PopupFor"
+    ],
+    "additional_references": [
+      "Node.text_selection.anchor.node",
+      "Node.text_selection.focus.node",
+      "TreeInfo.root",
+      "TreeUpdate.focus"
+    ],
+    "guest_boundary": "Node.tree_id and TreeUpdate.tree_id are tree identities; never rewrite host/guest node IDs through an unqualified shared numeric map. Current Cambium A11yHost routes only ROOT; embedded batch routing is separate.",
+    "pinned_bridge": "git+https://github.com/merely-made/genet.git?branch=main#7d1d89dbe729a853cf59c7b3f43ee3d8e494fde8",
+    "pinned_bridge_source_sha256": "0a9d68e40370f211d638ab8e2e08d2f2486c4e050aaedf6f385d1c48a9c14a34",
+    "ingress": "A11yActionRequest preserves action/tree/node/data, not originating publication life. Bridge activation epochs govern activation/replay, not target lifetime.",
+    "done_conditions": [
+      "Shared projection provides owner/contributor/child identity for every published node, including structural and non-action nodes.",
+      "One native publication namespace assigns nonreused IDs per authored life; ordinary frames preserve IDs and unaffected focus.",
+      "Rewrite all typed references using an authoritative schema-owned remapper; receive all eight vectors, seven scalar relations, both text selection positions, root and focus.",
+      "Preserve TreeId ownership through root/guest install and ingress, including selection references if selection routing is added.",
+      "Actual old/late native event after replacement refuses; normal value updates preserve identity; install/reset/reattach and guest cases have headed receipts."
+    ],
+    "rejected_shortcuts": [
+      "Children-only or children/focus-only remapping",
+      "Deriving complete publication identity from action route maps alone",
+      "Treating bridge activation epochs as target-life generations",
+      "Fresh ID for every frame or a second maintained Node property schema in Mere"
+    ]
+  },
+  "remaining_ownership_migrations": [
+    "Adapter-to-host/window/canvas handoff remains separately governed. A11yHost now refuses replacing its attached handle, but this does not qualify physical installation, partial failure/reset recovery, or moving an adapter to another host with the same surface.",
+    "Custom hosts must keep marker alive while live, dispose it once, and create a fresh marker for a new lifetime; reviving a disposed marker violates the contract.",
+    "Generic producer actor activation is not atomic with semantic observation; optional child tokens still rely on legacy nonreuse.",
+    "Canvas raw callback same-UUID remove/recreate visibility.",
+    "Rootstock intrinsic sizing and Path-B scene raster wiring.",
+    "Actual browser proxy/focus/disposal, native install/late-event/reattach behavior and human AT remain unqualified."
+  ],
+  "qualification": "diagnostics-owner-qualification.json",
+  "retained_byte_cap": 10000000
+}

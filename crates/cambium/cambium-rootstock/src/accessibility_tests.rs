@@ -44,6 +44,7 @@ struct Recording(Rc<RefCell<Vec<FocusSample>>>);
 impl Accessibility for Recording {
     fn sync(
         &mut self,
+        _: &crate::A11yOwner,
         dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         _: &sprigging::LeafRegistry<u64>,
