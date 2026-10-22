@@ -290,7 +290,13 @@ pub fn attr_qual(local: &str) -> QualName {
     QualName::new(None, Namespace::from(""), LocalName::from(local))
 }
 
+mod reading_find;
 mod reading_toolbar;
-pub use reading_toolbar::{read_toolbar, ReadCommand};
+pub use reading_find::{
+    ReadEvent, ReadFind, find_failed, find_field, find_field_display, find_key, find_row,
+    find_status,
+    is_find_shortcut,
+};
+pub use reading_toolbar::{ReadCommand, read_toolbar};
 mod native_style;
 pub use native_style::stylesheet_at_display_scale;
