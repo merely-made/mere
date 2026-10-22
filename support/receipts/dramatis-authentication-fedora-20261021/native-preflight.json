@@ -1,0 +1,33 @@
+{
+  "desktop": {
+    "session": "8",
+    "state": {
+      "Name": "markik",
+      "Remote": "no",
+      "Type": "wayland",
+      "Active": "yes",
+      "State": "active",
+      "LockedHint": "no"
+    },
+    "environment": {
+      "XDG_RUNTIME_DIR": "/run/user/1000",
+      "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+      "DISPLAY": ":0",
+      "WAYLAND_DISPLAY": "wayland-0",
+      "XAUTHORITY": "/run/user/1000/.mutter-Xwaylandauth.2TCAX3",
+      "XDG_CURRENT_DESKTOP": "GNOME",
+      "XDG_SESSION_TYPE": "wayland"
+    },
+    "hostname": "thinkpad-l14-f",
+    "architecture": "x86_64",
+    "kernel": "7.2.10-200.fc44.x86_64",
+    "os_release": "NAME=\"Fedora Linux\"\nVERSION=\"44 (Workstation Edition)\"\nRELEASE_TYPE=stable\nID=fedora\nVERSION_ID=44\nVERSION_CODENAME=\"\"\nPRETTY_NAME=\"Fedora Linux 44 (Workstation Edition)\"\nANSI_COLOR=\"0;38;2;60;110;180\"\nLOGO=fedora-logo-icon\nCPE_NAME=\"cpe:/o:fedoraproject:fedora:44\"\nDEFAULT_HOSTNAME=\"fedora\"\nHOME_URL=\"https://fedoraproject.org/\"\nDOCUMENTATION_URL=\"https://docs.fedoraproject.org/en-US/fedora/f44/\"\nSUPPORT_URL=\"https://ask.fedoraproject.org/\"\nBUG_REPORT_URL=\"https://bugzilla.redhat.com/\"\nREDHAT_BUGZILLA_PRODUCT=\"Fedora\"\nREDHAT_BUGZILLA_PRODUCT_VERSION=44\nREDHAT_SUPPORT_PRODUCT=\"Fedora\"\nREDHAT_SUPPORT_PRODUCT_VERSION=44\nSUPPORT_END=2027-05-19\nVARIANT=\"Workstation Edition\"\nVARIANT_ID=workstation\n"
+  },
+  "gnome_screen_saver": "(false,)",
+  "zenity_version": "4.2.2",
+  "zenity_binary_sha256": "3866c69131c9d19704cdafedab62e19b0023714fc0c48fdf08e0246661ad5ed6",
+  "vk_driver_files": "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json",
+  "physical_model": "20U6S1CW00",
+  "controller_sha256": "54e3ddf9289480c2dcba1bf99e46fc7d4ec6ae807760a7335c479b9a9fd5c0d6",
+  "source": "73b25d9ee71184a1a8e7bf53b774255815810727"
+}

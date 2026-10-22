@@ -1,0 +1,55 @@
+{
+  "schema": "mere.g4b2-grouping-qualification/v1",
+  "base_commit": "67ed725ae908925b6381c583b9775594f16ee2f7",
+  "branch": "codex/g4b2-grouping-authoring-20261021",
+  "implementation_committed": false,
+  "settings": {
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4,
+    "locked": true,
+    "offline": true
+  },
+  "tests": {
+    "shared_controls": {
+      "passed": 13,
+      "ignored": 0
+    },
+    "existing_binding_grouped": {
+      "passed": 11,
+      "ignored": 1
+    },
+    "current_graphshell_web": {
+      "passed": 327,
+      "ignored": 6
+    }
+  },
+  "wasm_build": "passed",
+  "headed_positive": [
+    "p4_tree_grouping",
+    "p4_tree_role_groups",
+    "p4_tree_composition_save_reopen"
+  ],
+  "expected_negative": {
+    "scenario": "p4_tree_grouping_wrong_partition",
+    "only_failure": "FAIL: assert snap grouping-partition Eq 'groups.site': got 'groups.cluster'"
+  },
+  "package_wasm_sha256": "26bcb04b151bc307c9ee655b10ac36c7f74fbcf05728277dd682515a1555dc52",
+  "primary_preserved": true,
+  "publication": {
+    "feature_commit": "f8b9b2161542a45788a676aad76eae834f252aa0",
+    "merged_and_pushed": "6b8eb1d6967204911035c7bb793bf4461ca1d102",
+    "current_upstream_contains_publication": true
+  },
+  "limits": [
+    "Scene reopen within running app; no browser restart durability qualification",
+    "Headed grouping fixture is paused; existing binding/grouped tests exercise runtime",
+    "No new replay, raw execution, checkpoints, nested execution or render narrowing qualification"
+  ],
+  "resolved_diagnostics": [
+    "An initial core command omitted canvas feature and was interrupted before qualification",
+    "A borrowed String comparison in a new test was corrected; final gates pass",
+    "Final source formatting and non-overlapping upstream shell changes preceded current host and Wasm gates"
+  ],
+  "evidence_directory": "/Users/markik/Code/output/mere-g4b2-grouping-20261021"
+}

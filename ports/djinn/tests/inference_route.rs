@@ -1500,6 +1500,26 @@ async fn serve_trained_model_for_headed_turnstone() {
         std::fs::write(&row_file, serde_json::to_vec(&row).unwrap()).unwrap();
         row
     };
+    // Explicit mixed-source qualification. The ordinary single-source fixture
+    // remains unchanged; this file supplies questions, never source bodies.
+    let mixed: Option<serde_json::Value> = std::env::var_os("DJINN_HEADED_MIXED_QUERIES")
+        .map(|path| serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap());
+    if let Some(mixed) = &mixed {
+        assert!(phase.is_some() && private_root.is_some());
+        let asks = mixed["asks"].as_array().unwrap();
+        assert_eq!(asks.len(), 3);
+        let mut ids = std::collections::BTreeSet::new();
+        for case in asks {
+            let id = case["id"].as_str().unwrap();
+            assert!(
+                !id.is_empty()
+                    && id.len() <= 48
+                    && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+            );
+            assert!(ids.insert(id));
+            assert!(!case["question"].as_str().unwrap().is_empty());
+        }
+    }
     // Optional embedding qualification uses the same ordinary headed fixture,
     // source publication and private journal as trained lexical recall.
     let embedding = std::env::var_os("DJINN_HEADED_EMBEDDING_DIR").map(|directory| {
@@ -1552,7 +1572,7 @@ async fn serve_trained_model_for_headed_turnstone() {
         inference: Some(InferenceLaneSettings {
             embedding: embedding.clone(),
             recall: distillery::inference::recall::RecallConfig {
-                max_passages: 1,
+                max_passages: if mixed.is_some() { 3 } else { 1 },
                 ..Default::default()
             },
             model: InferenceModelSettings::Library {
@@ -1566,7 +1586,7 @@ async fn serve_trained_model_for_headed_turnstone() {
     let endpoint_file = output.join("endpoint.txt");
     let endpoint = std::fs::read_to_string(&endpoint_file).unwrap_or_else(|_| endpoint_name());
     std::fs::write(endpoint_file, &endpoint).unwrap();
-    let mut snapshots = vec![];
+    let mut snapshots: Vec<serde_json::Value> = vec![];
     if phase == Some(1) {
         snapshots.push(
             serde_json::from_slice(&std::fs::read(output.join("snapshot-0.json")).unwrap())
@@ -1664,6 +1684,57 @@ async fn serve_trained_model_for_headed_turnstone() {
                 std::fs::write(output.join("second-started.json"), b"started").unwrap();
             }
             for run in &runs.runs {
+                if let Some(mixed) = &mixed {
+                    if run.state == RunStateV1::Finished {
+                        let recall = run.recall.as_ref().unwrap();
+                        assert_eq!(
+                            recall.scope.len(),
+                            4,
+                            "mixed scope remains explicit and complete"
+                        );
+                        for case in mixed["asks"].as_array().unwrap() {
+                            if case["question"].as_str().unwrap() == run.question {
+                                let historical = phase == 1
+                                    && snapshots[0]["runs"]["runs"]
+                                        .as_array()
+                                        .unwrap()
+                                        .iter()
+                                        .any(|old| old["run"] == run.run);
+                                let name = if historical {
+                                    format!("history-1-{}.json", case["id"].as_str().unwrap())
+                                } else {
+                                    format!("mixed-{phase}-{}.json", case["id"].as_str().unwrap())
+                                };
+                                if !output.join(&name).exists()
+                                    && (!historical || !recall.citations.is_empty())
+                                {
+                                    std::fs::write(
+                                        output.join(name),
+                                        serde_json::to_vec_pretty(run).unwrap(),
+                                    )
+                                    .unwrap();
+                                }
+                            }
+                        }
+                        let file = output.join(format!("mixed-rankings-{phase}.json"));
+                        if !file.exists() && !recall.citations.is_empty() {
+                            let owner = recall.owner.as_deref().unwrap();
+                            let mut rows = Vec::new();
+                            for case in mixed["rankings"].as_array().unwrap() {
+                                let question = case["question"].as_str().unwrap();
+                                let ranked = lane
+                                    .published_recall_rankings(owner, question, &recall.scope)
+                                    .unwrap();
+                                rows.push(serde_json::json!({"id":case["id"],"question":question,
+                                    "lexical":ranked.lexical,"vector":ranked.vector,"fused":ranked.fused}));
+                            }
+                            std::fs::write(file, serde_json::to_vec_pretty(&serde_json::json!({
+                                "owner":owner,"scope":recall.scope,"config":recall.config,"rows":rows,
+                                "boundary":"actual live published binding; same scoped current-version/provider path as generation"
+                            })).unwrap()).unwrap();
+                        }
+                    }
+                }
                 if run.state == RunStateV1::Running && run.tokens > 0 {
                     saw_stream = true;
                     std::fs::write(
@@ -1807,6 +1878,68 @@ async fn serve_trained_model_for_headed_turnstone() {
         serde_json::to_vec_pretty(&receipt).unwrap(),
     )
     .unwrap();
+    if let Some(mixed) = &mixed {
+        for case in mixed["asks"].as_array().unwrap() {
+            let id = case["id"].as_str().unwrap();
+            let load = |name: String| -> serde_json::Value {
+                serde_json::from_slice(&std::fs::read(output.join(name)).unwrap()).unwrap()
+            };
+            let warm = load(format!("mixed-0-{id}.json"));
+            let cold = load(format!("mixed-1-{id}.json"));
+            let history = load(format!("history-1-{id}.json"));
+            assert_eq!(
+                warm, history,
+                "live historical source/citation state is restored"
+            );
+            assert_ne!(warm["run"], cold["run"]);
+            assert_eq!(warm["recall"]["scope"], cold["recall"]["scope"]);
+            assert_eq!(warm["recall"]["passages"], cold["recall"]["passages"]);
+            for run in [&warm, &cold] {
+                assert_eq!(run["state"], "finished");
+                assert!(!run["recall"]["citations"].as_array().unwrap().is_empty());
+                assert!(run["recall"]["stale"].as_array().unwrap().is_empty());
+            }
+            if embedding.is_some() {
+                assert_eq!(warm["recall"]["embedding"]["cache"], "built");
+                assert_eq!(cold["recall"]["embedding"]["cache"], "reopened");
+                for field in ["envelope", "index"] {
+                    assert_eq!(
+                        warm["recall"]["embedding"][field],
+                        cold["recall"]["embedding"][field]
+                    );
+                }
+            } else {
+                assert!(
+                    warm["recall"]["embedding"].is_null() && cold["recall"]["embedding"].is_null()
+                );
+            }
+            let old = snapshots[0]["evidence"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|e| e["record"]["run"] == warm["run"])
+                .unwrap();
+            let restored = snapshots[1]["evidence"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|e| e["record"]["run"] == warm["run"])
+                .unwrap();
+            assert_eq!(
+                old, restored,
+                "sealed historical record/passages/checkpoint remain immutable"
+            );
+        }
+        assert_eq!(
+            snapshots[0]["embedding_projections"],
+            snapshots[1]["embedding_projections"]
+        );
+        assert_eq!(
+            std::fs::read(output.join("mixed-rankings-0.json")).unwrap(),
+            std::fs::read(output.join("mixed-rankings-1.json")).unwrap()
+        );
+        return;
+    }
     if embedding.is_some() {
         let first = snapshots[0]["runs"]["runs"].as_array().unwrap();
         let warm = first.iter().find(|r| r["state"] == "finished").unwrap();
