@@ -1,0 +1,164 @@
+{
+  "captures": [
+    {
+      "digest": "44956c878cc4bd8b",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1080,
+      "name": "/home/markik/Code/output/dauth-kubuntu21/native/portable/before.png",
+      "path": "/home/markik/Code/output/dauth-kubuntu21/native/portable/before.png",
+      "viewport": null,
+      "width": 1290
+    },
+    {
+      "digest": "457990faf5fe0c04",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase change cancelled. Your passphrase is unchanged.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1080,
+      "name": "/home/markik/Code/output/dauth-kubuntu21/native/portable/cancelled.png",
+      "path": "/home/markik/Code/output/dauth-kubuntu21/native/portable/cancelled.png",
+      "viewport": null,
+      "width": 1290
+    },
+    {
+      "digest": "1b4127f5951b4f1e",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1080,
+      "name": "/home/markik/Code/output/dauth-kubuntu21/native/portable/changed.png",
+      "path": "/home/markik/Code/output/dauth-kubuntu21/native/portable/changed.png",
+      "viewport": null,
+      "width": 1290
+    },
+    {
+      "digest": "c8584aa8da1630f7",
+      "fields": {
+        "busy": "false",
+        "locked": "false",
+        "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+        "pid": "1535529",
+        "profiles": "2",
+        "ready": "true"
+      },
+      "height": 1080,
+      "name": "/home/markik/Code/output/dauth-kubuntu21/native/portable/acknowledged-after-refresh.png",
+      "path": "/home/markik/Code/output/dauth-kubuntu21/native/portable/acknowledged-after-refresh.png",
+      "viewport": null,
+      "width": 1290
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 0,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 0,
+        "layout_rebuilt": 0,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 1897,
+        "acquire_us": 120,
+        "capture_us": 2,
+        "clear_us": 669,
+        "compose_us": 753,
+        "content_extent_us": 0,
+        "dirty_tile_rebuild_us": 5,
+        "emit_scene_us": 948,
+        "excluding_acquire_present_capture_us": 35092,
+        "frame_hook_us": 11,
+        "ime_us": 10,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 0,
+        "layout_tick_us": 2,
+        "layout_update_us": 29,
+        "layout_with_text_us": 0,
+        "leaf_boxes_us": 62,
+        "leaf_fragments_us": 20,
+        "leaf_render_us": 5,
+        "master_compose_us": 62,
+        "pointer_us": 8,
+        "present_us": 380,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 9043,
+        "raster_us": 30490,
+        "relayout_us": 111,
+        "shadows_us": 2,
+        "style_resolve_us": 0,
+        "tile_invalidate_us": 61,
+        "total_us": 35594,
+        "vello_render_us": 8878
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "busy": "false",
+    "locked": "false",
+    "notice": "Passphrase changed. Use the new passphrase next time you unlock.",
+    "pid": "1535529",
+    "profiles": "2",
+    "ready": "true"
+  },
+  "frames": 591,
+  "kind": "dramatis",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 591,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "captured /home/markik/Code/output/dauth-kubuntu21/native/portable/before.png",
+    "waited 64 frames",
+    "captured /home/markik/Code/output/dauth-kubuntu21/native/portable/cancelled.png",
+    "waited 273 frames",
+    "captured /home/markik/Code/output/dauth-kubuntu21/native/portable/changed.png",
+    "captured /home/markik/Code/output/dauth-kubuntu21/native/portable/acknowledged-after-refresh.png"
+  ],
+  "unpresented_redraws": 0
+}

@@ -57,3 +57,16 @@ recovery and updates to other computers remain separate capabilities.
 
 The [macOS qualification receipt](../../support/receipts/dramatis-authentication-20261021/README.md)
 records both formats, native prompts, failure controls and independent cold reopens.
+
+Linux password prompts require an available masked graphical provider: Zenity,
+Yad or KDialog in the resident's desktop session. Console, unmasked and unknown
+providers are refused. Djinn invokes the selected Linux helper directly and
+preserves the entered spaces, punctuation and Unicode through replacement and
+reopen.
+
+The Linux qualification receipts cover [Fedora with Zenity](../../support/receipts/dramatis-authentication-fedora-20261021/README.md)
+and [Kubuntu with KDialog](../../support/receipts/dramatis-authentication-kubuntu-20261021/README.md).
+Both record exact input preservation, native cancellation and retry, failure
+controls and cold reopens for both vault formats. The Kubuntu run reuses the
+verified Fedora-built Linux executables; build provenance is recorded separately
+from runtime qualification.

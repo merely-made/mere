@@ -101,17 +101,22 @@ pub struct TwoLawMix {
     pub second_share: f64,
 }
 
+/// A bounded two-law grouping: `outer` acts between groups and `inner` acts
+/// within each group. The outer share is a force multiplier, not a percentage.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TwoLawGrouping {
+    pub partition: PhysicsKindSource,
+    pub outer: PhysicsLaw,
+    pub inner: PhysicsLaw,
+    pub outer_share: f64,
+}
+
 /// Replace the spec root with one admitted two-law force mix. The existing
 /// spec remains the authority for channels, target, seed, bars and
 /// realization; root overlays are carried onto the mix.
 pub fn apply_mix(canvas: &mut Canvas, mix: &TwoLawMix) -> Result<String, String> {
     for (index, share) in [mix.first_share, mix.second_share].into_iter().enumerate() {
-        let runtime = share as f32;
-        if !share.is_finite() || !runtime.is_finite() || (share != 0.0 && runtime == 0.0) {
-            return Err(format!(
-                "root.parts[{index}].weight: share must be finite and within the runtime weight range"
-            ));
-        }
+        validate_runtime_share(share, &format!("root.parts[{index}].weight"))?;
     }
     let mut spec = canvas.dynamics_spec()?;
     let overlays = spec.root.overlays().to_vec();
@@ -133,6 +138,42 @@ pub fn apply_mix(canvas: &mut Canvas, mix: &TwoLawMix) -> Result<String, String>
         mix.first.label(),
         mix.second.label()
     ))
+}
+
+/// Replace the spec root with one admitted flat two-law grouping. The current
+/// spec remains the authority for channels, target, seed, bars and realization;
+/// root overlays are carried onto the grouping.
+pub fn apply_grouping(canvas: &mut Canvas, grouping: &TwoLawGrouping) -> Result<String, String> {
+    validate_runtime_share(grouping.outer_share, "root.outer.weight")?;
+    let mut spec = canvas.dynamics_spec()?;
+    let overlays = spec.root.overlays().to_vec();
+    spec.root = Node::Grouped {
+        partition: Channel::Groups(grouping.partition).id(),
+        outer: Box::new(weighted_preset(grouping.outer, grouping.outer_share)),
+        inner: Box::new(weighted_preset(grouping.inner, 1.0)),
+        weight: 1.0,
+        overlays,
+    };
+    // Canvas owns admission and refuses before changing its live state.
+    canvas
+        .set_dynamics_spec(&spec)
+        .map_err(|error| error.to_string())?;
+    canvas.set_view_follow(true);
+    Ok(format!(
+        "Physics grouping set to {} between groups and {} within groups",
+        grouping.outer.label(),
+        grouping.inner.label()
+    ))
+}
+
+fn validate_runtime_share(share: f64, path: &str) -> Result<(), String> {
+    let runtime = share as f32;
+    if !share.is_finite() || !runtime.is_finite() || (share != 0.0 && runtime == 0.0) {
+        return Err(format!(
+            "{path}: share must be finite and within the runtime weight range"
+        ));
+    }
+    Ok(())
 }
 
 /// Explicitly replace the root with `choice`'s single law, even when its law
@@ -763,6 +804,194 @@ mod tests {
             );
             assert_eq!(canvas.dynamics_spec().unwrap(), before);
         }
+    }
+
+    #[test]
+    fn typed_grouping_is_canonical_and_keeps_its_partition_across_source_edits() {
+        use crate::canvas::dynamics_spec::{Bar, GroupRoles, Observable, Realization, Target};
+        use crate::canvas::{Channel, PhysicsOverlay, Role};
+        use std::collections::BTreeMap;
+
+        let mut subject = canvas();
+        let mut original = subject.dynamics_spec().unwrap();
+        original.seed = 91;
+        original.bars = vec![Bar {
+            observable: Observable::Overlaps,
+            at_least: None,
+            at_most: Some(4.0),
+        }];
+        original.realization = Realization::Integrate {
+            damping: Some(0.27),
+        };
+        original
+            .channels
+            .insert("kind".into(), "kind.degree".into());
+        original
+            .channels
+            .insert("groups".into(), "groups.degree".into());
+        original.target = Some(Target {
+            arrangement: "grid.default".into(),
+            anchored_pull: 0.3,
+            default_role: Role::Anchored,
+            groups: Some(GroupRoles {
+                channel: Channel::Groups(PhysicsKindSource::Site).id(),
+                roles: BTreeMap::from([("groups.site#example".into(), Role::Pinned)]),
+            }),
+            items: BTreeMap::from([(
+                "00000000-0000-0000-0000-000000000001".into(),
+                Role::Anchored,
+            )]),
+        });
+        original.root = Node::preset(PhysicsLaw::Springs.id());
+        original
+            .root
+            .overlays_mut()
+            .push(Node::preset(PhysicsOverlay::GravityLocus.id()));
+        subject.set_dynamics_spec(&original).unwrap();
+
+        let share = 0.100_000_000_000_000_02_f64;
+        apply_grouping(
+            &mut subject,
+            &TwoLawGrouping {
+                partition: PhysicsKindSource::Cluster,
+                outer: PhysicsLaw::Charge,
+                inner: PhysicsLaw::Springs,
+                outer_share: share,
+            },
+        )
+        .unwrap();
+
+        let grouped = subject.dynamics_spec().unwrap();
+        let Node::Grouped {
+            partition,
+            outer,
+            inner,
+            weight,
+            overlays,
+        } = &grouped.root
+        else {
+            panic!("typed action writes a flat grouped root")
+        };
+        assert_eq!(partition, &Channel::Groups(PhysicsKindSource::Cluster).id());
+        assert_eq!(outer.weight(), share, "authored f64 share is retained");
+        assert_eq!(inner.weight(), 1.0);
+        assert_eq!(*weight, 1.0);
+        assert_eq!(overlays, original.root.overlays());
+        assert_eq!(grouped.seed, original.seed);
+        assert_eq!(grouped.bars, original.bars);
+        assert_eq!(grouped.target, original.target);
+        assert_eq!(grouped.realization, original.realization);
+        assert_eq!(grouped.channels, original.channels);
+
+        // The group's partition, Group pull source and role-group source are
+        // independent. Changing the latter two leaves the authored grouping
+        // and role target intact.
+        let mut choice = PhysicsChoice::live(&subject);
+        choice.groups = PhysicsKindSource::Component;
+        choice.kind = PhysicsKindSource::Component;
+        apply_physics(&mut subject, &choice);
+        let edited = subject.dynamics_spec().unwrap();
+        assert_eq!(edited.root, grouped.root);
+        assert_eq!(
+            edited
+                .target
+                .as_ref()
+                .unwrap()
+                .groups
+                .as_ref()
+                .unwrap()
+                .channel,
+            Channel::Groups(PhysicsKindSource::Site).id()
+        );
+        assert_eq!(edited.channels["groups"], "groups.component");
+
+        let mut reopened = canvas();
+        reopened.set_dynamics_spec(&edited).unwrap();
+        assert_eq!(reopened.dynamics_spec().unwrap(), edited);
+
+        // The explicit single-law action clears a grouping, even though the
+        // flat law picker continues to show its outer law.
+        let choice = PhysicsChoice::live(&subject);
+        apply_single_law(&mut subject, &choice).unwrap();
+        assert!(matches!(
+            subject.dynamics_spec().unwrap().root,
+            Node::Preset { .. }
+        ));
+    }
+
+    #[test]
+    fn refused_grouping_is_atomic_for_the_record_and_live_positions() {
+        let mut subject = canvas();
+        let before = subject.dynamics_spec().unwrap();
+        let mut positions: Vec<_> = subject.view.positions().collect();
+        positions.sort_by_key(|(key, _)| key.index());
+
+        let refusal = apply_grouping(
+            &mut subject,
+            &TwoLawGrouping {
+                partition: PhysicsKindSource::Site,
+                outer: PhysicsLaw::Anneal,
+                inner: PhysicsLaw::Springs,
+                outer_share: 16.0,
+            },
+        )
+        .unwrap_err();
+        assert!(
+            refusal.contains("root.outer"),
+            "exact refusal path: {refusal}"
+        );
+        assert_eq!(subject.dynamics_spec().unwrap(), before);
+
+        let refusal = apply_grouping(
+            &mut subject,
+            &TwoLawGrouping {
+                partition: PhysicsKindSource::Site,
+                outer: PhysicsLaw::Charge,
+                inner: PhysicsLaw::Anneal,
+                outer_share: 16.0,
+            },
+        )
+        .unwrap_err();
+        assert!(
+            refusal.contains("root.inner"),
+            "exact refusal path: {refusal}"
+        );
+        assert_eq!(subject.dynamics_spec().unwrap(), before);
+
+        let refusal = apply_grouping(
+            &mut subject,
+            &TwoLawGrouping {
+                partition: PhysicsKindSource::Site,
+                outer: PhysicsLaw::Charge,
+                inner: PhysicsLaw::Springs,
+                outer_share: -1.0,
+            },
+        )
+        .unwrap_err();
+        assert!(
+            refusal.contains("root.outer"),
+            "exact refusal path: {refusal}"
+        );
+        assert_eq!(subject.dynamics_spec().unwrap(), before);
+
+        for outer_share in [f64::NAN, f64::INFINITY, 1e300, 1e-300] {
+            let error = apply_grouping(
+                &mut subject,
+                &TwoLawGrouping {
+                    partition: PhysicsKindSource::Site,
+                    outer: PhysicsLaw::Charge,
+                    inner: PhysicsLaw::Springs,
+                    outer_share,
+                },
+            )
+            .unwrap_err();
+            assert!(error.contains("root.outer.weight"), "{error}");
+            assert_eq!(subject.dynamics_spec().unwrap(), before);
+        }
+
+        let mut after: Vec<_> = subject.view.positions().collect();
+        after.sort_by_key(|(key, _)| key.index());
+        assert_eq!(after, positions);
     }
 
     #[test]

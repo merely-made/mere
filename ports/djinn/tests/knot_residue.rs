@@ -14,9 +14,11 @@
 //! the seed, freed uncleared or still live. The sync host's runs (open,
 //! close, drop) are judged as mere-transport's `seed_residue.rs` judges the
 //! transport: a block, freed or live, whose size is in every host run and in
-//! no baseline run fails. The baselines are iroh alone, p2panda-net alone,
-//! and the sync host's own bind and join with the seed held by this test
-//! (ruling 59); their blocks are reported, never failed on (the upstream
+//! no baseline run fails. A host block in only some runs, or of a size a
+//! baseline also shows, is listed as unjudged rather than failed: size and
+//! presence cannot attribute it (Q052). The baselines are iroh alone,
+//! p2panda-net alone, and the sync host's own bind and join with the seed
+//! held by this test (ruling 59); their blocks are reported, never failed on (the upstream
 //! candidates ledger, items 10 and 11; ruling 60 for the overlay host's).
 //! A block exactly the size of a run's own future is that run's outer frame,
 //! whose size changes with nesting, so it is compared by presence.
@@ -28,8 +30,8 @@
 
 #[path = "../castellan/tests/residue/mod.rs"]
 mod residue;
+mod residue_verdict;
 
-use std::collections::BTreeSet;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
@@ -44,6 +46,7 @@ use p2panda_net::address_book::AddressBookStoreHandle;
 use p2panda_net::gossip::Gossip;
 use p2panda_net::{AddressBook, Endpoint};
 use residue::*;
+use residue_verdict::{Run, own_blocks, unjudged};
 use stickleback::MunimentAddressBook;
 
 const RUNS: usize = 5;
@@ -57,19 +60,6 @@ type Seed = &'static [u8; 32];
 fn lend(seed: Seed) -> &'static [u8; 32] {
     seed
 }
-
-/// One armed run: the sizes of blocks freed uncleared, and of blocks still
-/// live at disarm, that held the seed.
-struct Run {
-    freed: Vec<usize>,
-    live: Vec<usize>,
-    /// The measured future's size: a block exactly this size is the run's
-    /// own outer frame, whatever the nesting made it (ruling 59).
-    frame: usize,
-}
-
-/// A run's outer frame, compared across runs by presence, not size.
-const OUTER_FRAME: usize = usize::MAX;
 
 fn measure<F>(rt: &tokio::runtime::Runtime, name: &str, mut work: impl FnMut(usize) -> F) -> Vec<Run>
 where
@@ -275,27 +265,6 @@ async fn iroh_alone(seed: Seed) {
     endpoint.close().await;
 }
 
-/// Blocks, `(live, size)`, in every run and in no baseline run.
-fn own_blocks(runs: &[Run], baseline: &[&[Run]]) -> BTreeSet<(bool, usize)> {
-    let blocks = |run: &Run| -> BTreeSet<(bool, usize)> {
-        let outer = |size: usize| if size == run.frame { OUTER_FRAME } else { size };
-        let freed = run.freed.iter().map(|&size| (false, outer(size)));
-        freed
-            .chain(run.live.iter().map(|&size| (true, outer(size))))
-            .collect()
-    };
-    let seen: BTreeSet<(bool, usize)> = baseline
-        .iter()
-        .flat_map(|runs| runs.iter())
-        .flat_map(blocks)
-        .collect();
-    let mut always = blocks(&runs[0]);
-    for run in &runs[1..] {
-        always = always.intersection(&blocks(run)).copied().collect();
-    }
-    always.difference(&seen).copied().collect()
-}
-
 fn main() {
     let seed: [u8; 32] = canary_bytes(0);
     positive_control(&seed);
@@ -379,14 +348,23 @@ fn main() {
 
     // Ruling 59: the sync host against the same bind and join with the seed
     // held by this test, so what is left is Knot's handling of the seed.
-    let own = own_blocks(&host, &[&iroh, &net, &joined]);
+    let baselines: [&[Run]; 3] = [&iroh, &net, &joined];
+    let own = own_blocks(&host, &baselines);
     println!("knot residue sync host: blocks (live, size) beyond the join baseline {own:?}");
     if !own.is_empty() {
         failures.push(format!("sync host: Knot's own blocks {own:?}"));
+    }
+    let unjudged = unjudged(&host, &baselines);
+    for block in &unjudged {
+        println!("knot residue sync host: unjudged {block}");
     }
     if !failures.is_empty() {
         println!("knot residue: FAILED {failures:?}");
         std::process::exit(1);
     }
-    println!("knot residue: Knot leaves no copy of the seed beyond what it binds and joins on");
+    println!(
+        "knot residue: no seed-bearing block (live, size) is in all {RUNS} sync-host runs and \
+         absent from every baseline run; {} host block(s) unjudged, listed above",
+        unjudged.len()
+    );
 }

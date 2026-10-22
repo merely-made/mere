@@ -134,3 +134,6 @@ ports/distillery/tests/fixtures/circuit/
 
 # Reproducible independent consumer of the extracted observation core.
 !support/fixtures/apparatus-core-consumer/Cargo.lock
+
+# Installed JavaScript tooling dependencies are reproducible local output.
+node_modules/

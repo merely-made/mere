@@ -1,0 +1,9 @@
+{
+  "public_fixture_only": true,
+  "dependency": "light-file-dialog 3.21.3",
+  "input": "New  local fixture * ' caf\u00e9",
+  "unquoted_shell_result": "New local fixture public-marker ' caf\u00e9",
+  "changed": true,
+  "dependency_source_sha256": "7204867614d082077b493788cb71066e1bdeff83597e167004583b79118c309a",
+  "repair": "Direct helper arguments and exact stdout; no shell secret expansion"
+}

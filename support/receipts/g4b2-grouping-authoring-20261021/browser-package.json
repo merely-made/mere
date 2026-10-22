@@ -1,0 +1,20 @@
+{
+  "base_commit": "67ed725ae908925b6381c583b9775594f16ee2f7",
+  "command": [
+    "/Users/markik/.cargo/bin/wasm-bindgen",
+    "/Users/markik/Code/output/mere-g4b2-grouping-20261021/graphshell_web-source.wasm",
+    "--target",
+    "web",
+    "--out-dir",
+    "/Users/markik/Code/output/mere-g4b2-grouping-20261021/package",
+    "--out-name",
+    "graphshell_web"
+  ],
+  "raw_sha256": "579896a48650b6def7702b833218f5f4f26d4a67a2a486ff21d79f7deffff1d9",
+  "package_sha256": {
+    "graphshell_web.d.ts": "0ca1a259cd21ab3d27348a3a75166213467d394cfd2567e39edc844ceb8b6a56",
+    "graphshell_web.js": "70decb96a8efc5a2330bb27b00f23e87a11ad998ce27ac3d55a4a2beae5b3eab",
+    "graphshell_web_bg.wasm": "26bcb04b151bc307c9ee655b10ac36c7f74fbcf05728277dd682515a1555dc52",
+    "graphshell_web_bg.wasm.d.ts": "a9c0070ff09c67a312af13610f6db0df8837eb3c5a7db09db7d176e5ac98773b"
+  }
+}
