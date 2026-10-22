@@ -364,6 +364,7 @@ async fn resident_embedding_process_fixture() {
         let ranks = json!({"lexical":rank(&rankings.lexical),"vector":rank(&rankings.vector),"fused":rank(&rankings.fused)});
         let run = format!("{phase}-query-{i}");
         let ask = RecallAskRequestV1 {
+            answer_format: Default::default(),
             ask: AskRequestV1 {
                 run: run.clone(),
                 question: query["question"].as_str().unwrap().into(),

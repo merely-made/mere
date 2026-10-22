@@ -16,6 +16,15 @@ pub const CHUNKER_VERSION: &str = "mere.unicode-chunks/v1";
 /// Bound an inline publication below the application frame cap; reject rather than truncate.
 pub const MAX_PUBLISHED_CORPUS_BYTES: usize = 128 * 1024;
 
+/// Explicit opt-in; existing asks keep their prose contract.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AnswerFormat {
+    #[default]
+    Prose,
+    ClaimSupportV1,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PublishCorpusRequestV1 {
@@ -53,6 +62,8 @@ impl Default for RecallConfig {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecallAskRequestV1 {
+    #[serde(default, skip_serializing_if = "is_prose")]
+    pub answer_format: AnswerFormat,
     pub ask: super::AskRequestV1,
     #[serde(default)]
     pub scope: Vec<RecallSourceId>,
@@ -83,9 +94,17 @@ pub struct Citation {
 pub enum CitationBasis {
     ModelMarker,
     VerbatimPassage,
+    /// Exact quote in a structured claim; source selector lives in support.
+    ClaimQuotation,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RecallEvidence {
+    #[serde(default, skip_serializing_if = "is_prose")]
+    pub answer_format: AnswerFormat,
+    /// Reproducible retained assessment; current availability is reported by
+    /// `stale` and must never overwrite this historical evidence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub support: Option<eidetic::models::answer::AnswerSupport>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub embedding: Option<EmbeddingRecallEvidence>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -105,6 +124,8 @@ pub struct RecallEvidence {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PublishedAskRequestV1 {
+    #[serde(default, skip_serializing_if = "is_prose")]
+    pub answer_format: AnswerFormat,
     pub owner: String,
     pub ask: super::AskRequestV1,
     #[serde(default)]
@@ -187,4 +208,23 @@ pub struct EmbeddingRecallEvidence {
     pub lexical_weight: u32,
     pub vector_weight: u32,
     pub rrf_k: u32,
+}
+
+fn is_prose(format: &AnswerFormat) -> bool {
+    *format == AnswerFormat::Prose
+}
+
+#[cfg(test)]
+mod answer_wire_tests {
+    use super::*;
+    #[test]
+    fn existing_prose_asks_keep_their_wire_shape() {
+        let raw = r#"{"owner":"one","ask":{"run":"r","question":"q"},"scope":[]}"#;
+        let request: PublishedAskRequestV1 = serde_json::from_str(raw).unwrap();
+        assert_eq!(request.answer_format, AnswerFormat::Prose);
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(raw).unwrap(),
+            serde_json::to_value(request).unwrap()
+        );
+    }
 }
