@@ -61,6 +61,7 @@ layout_dom_api = { workspace = true }
 # std time would pass every type check and die on its first frame. web_time
 # re-exports std on native and uses performance.now() on wasm.
 web-time = "1"
+serde = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 # AC7's mount probe discovers the `<style>` elements a document and its shadow

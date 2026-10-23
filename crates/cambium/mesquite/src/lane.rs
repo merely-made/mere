@@ -80,6 +80,13 @@ pub(crate) struct Diagnostics {
     batch: crate::DiagnosticBatch,
 }
 
+#[derive(Serialize)]
+pub(crate) struct PublicationObservation {
+    /// Sampling time only, not the frame whose semantics were published.
+    sampled_at_lane_frame: u64,
+    snapshot: cambium_rootstock::A11yPublicationSnapshot,
+}
+
 /// The scenario lane, generic over one [`Product`].
 pub struct Lane<P: Product> {
     pub(crate) product: P,
@@ -112,6 +119,7 @@ pub struct Lane<P: Product> {
     capture_backend: Box<dyn CaptureBackend>,
     capture_paint: bool,
     pub(crate) diagnostics: Option<Diagnostics>,
+    pub(crate) a11y_publication: Option<PublicationObservation>,
     pub(crate) commands: Option<crate::command::CommandAudit>,
     projection_limits: crate::CaptureProjectionLimits,
     projection_bytes: usize,
@@ -163,6 +171,7 @@ impl<P: Product> Lane<P> {
             capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
             diagnostics: None,
+            a11y_publication: None,
             commands: None,
             projection_limits: crate::CaptureProjectionLimits::default(),
             projection_bytes: 0,
@@ -305,6 +314,9 @@ impl<P: Product> Lane<P> {
         });
         if let Some(diagnostics) = &self.diagnostics {
             receipt["diagnostics"] = serde_json::json!(diagnostics);
+        }
+        if let Some(publication) = &self.a11y_publication {
+            receipt["a11y_publication"] = serde_json::json!(publication);
         }
         if let Some(commands) = &self.commands {
             receipt["commands"] = serde_json::json!(commands);
@@ -803,7 +815,7 @@ impl<P: Product> Lane<P> {
         ))
     }
 
-    fn text_receipt(&self, ok: bool) -> String {
+    pub(crate) fn text_receipt(&self, ok: bool) -> String {
         let mut lines = vec![if ok { "RESULT ok" } else { "RESULT fail" }.to_string()];
         lines.extend(
             self.outcome
@@ -856,6 +868,12 @@ impl<P: Product> Lane<P> {
             // the shared write path reports actual export/I/O failures.
             lines.push(format!("diagnostics {}", serde_json::json!(diagnostics)));
         }
+        if let Some(publication) = &self.a11y_publication {
+            lines.push(format!(
+                "a11y-publication {}",
+                serde_json::json!(publication)
+            ));
+        }
         if let Some(commands) = &self.commands {
             lines.push(format!("commands {}", serde_json::json!(commands)));
         }
@@ -892,6 +910,7 @@ impl<P: Product> Lane<P> {
         if let Err(error) = self.product.complete(ctx, &completion) {
             self.errors.push(format!("product completion: {error}"));
         }
+        self.collect_a11y_publication(ctx.a11y_publication());
         let attachment = self.product.diagnostic_attachment(ctx);
         self.collect_diagnostics(attachment);
         let outcome = self.outcome.as_ref().expect("completion requested");
@@ -930,10 +949,24 @@ impl<P: Product> Lane<P> {
         *ctx.close |= self.product.close_on_completion();
     }
 
+    /// Copy the host's latest observation. This neither syncs accessibility nor
+    /// decides product success. Receipts retain one bounded latest sample.
+    pub fn collect_a11y_publication(
+        &mut self,
+        snapshot: cambium_rootstock::A11yPublicationSnapshot,
+    ) {
+        self.a11y_publication = Some(PublicationObservation {
+            sampled_at_lane_frame: self.frames,
+            snapshot,
+        });
+    }
+
     pub(crate) fn collect_diagnostics(
         &mut self,
         attachment: Result<Option<crate::DiagnosticBatch>, String>,
     ) {
+        // Each sample replaces the previous one, including absence or failure.
+        self.diagnostics = None;
         match attachment {
             Ok(Some(batch)) => {
                 self.diagnostics = Some(Diagnostics {

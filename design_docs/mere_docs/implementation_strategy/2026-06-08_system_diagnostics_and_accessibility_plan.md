@@ -1,5 +1,60 @@
 # System Diagnostics and Accessibility Plan
 
+## Shared publication outcomes and collectors, 2026-10-23
+
+**Status (2026-10-23):** implementation in progress; qualification pending.
+Continuation review: `support/family-promotion/diagnostics-outcomes-review.json`.
+
+### Phases and done-conditions
+
+1. Return a shared publisher observation alongside drained requests. Report
+   physical adapter state separately from skipped/refused/native-submitted/
+   browser-mirrored publication. Count producer contribution issues explicitly.
+2. Rootstock stamps sync observations with the host and an independent sequence.
+   Missing adapter/runner/layout and ended owners replace prior success. Disposal
+   emits an ended-owner observation. Reads neither reproject nor advance sequence.
+3. Expose copied observations to application contexts and an opt-in observer.
+   Products retain redaction, bounded history, clock and export policy. Mesquite
+   samples the latest observation in both receipt formats, separately from
+   product diagnostics and acceptance. A failed/absent diagnostic read clears
+   the previous exported batch.
+4. Receive transition and independent-history controls, the real Mesquite finish
+   path, native detached/ended-owner controls, native cohort and Wasm/embedding/
+   standalone consumer compilation. Keep platform/runtime qualification separate.
+
+### Findings and progress
+
+`BridgeStatus` describes physical adapter installation. The pinned bridge's
+`update` returns no acceptance acknowledgement, so native publication reports
+**submitted**, never consumed or announced. Browser **mirrored** records completed
+DOM writes; focus transfer and human AT behavior remain separate. Failed browser
+writes clear proxy routes and cached elements so a retry cannot reuse partial
+written state. Detached canvas/mirror pairs refuse publication.
+
+The shared `A11ySync` contract replaces the action-only return value. Rootstock
+owns the latest copied observation and notification, rather than each collector
+inferring success from an installed adapter or an empty action vector. This is
+not a semantic tree, target lease, presented-frame receipt, action-admission
+result or actor-completion authority. Exported errors use fixed refusal codes;
+contributor content and platform error strings are excluded.
+
+### Remaining ownership migrations, in order
+
+1. Promote the AccessKit traversal API and coordinate root patch/lock intake in
+   external native consumers before advancing those consumer pins.
+2. Make producer activation and child/action lifetime validation atomic at the
+   model owner. Receive same-call canvas replacement and legacy authored nonreuse.
+3. Give guest compositors owner-qualified namespaces and install/reset/replay/
+   selection ingress receiving. This publisher remains ROOT-only.
+4. Qualify native bridge acceptance, actual old platform events, partial install
+   recovery, browser DOM failure/focus/disposal, and physical host handoff through
+   headed platform controls. Submitted/mirrored observations do not close these.
+5. Receive full Rootstock intrinsic sizing and Path-B raster integration.
+
+Collector history retention/export stays product-owned. The resident lifecycle
+collector does not gain UI authority or receive semantic contributor content.
+This lane retains at most 10 MB and reuses the shared Mere target.
+
 ## Native publication ID remapping, 2026-10-23
 
 **Status (2026-10-23):** native ROOT remapping implemented. Exact receiving
@@ -68,8 +123,9 @@ This publisher owns ROOT only and explicitly refuses guest grafts/trees. Existin
 TreeId-qualified compositor/guest paths remain separately owned. Selection
 reference properties are rewritten, but SetTextSelection ingress is unsupported.
 Publication refusal is logged; BridgeStatus describes physical installation,
-not acceptance of the latest tree. Shared typed publication outcomes and
-collector wiring remain separate from actor completion.
+not acceptance of the latest tree. The shared-outcome continuation above
+receives typed publication observations and collector wiring; actor completion
+remains separately owned.
 Guest namespaces and guest install/reset/replay, physical window/canvas handoff,
 actual late platform events, partial-install recovery and human AT need their
 own receiving. Producer activation is not an atomic model transaction, and

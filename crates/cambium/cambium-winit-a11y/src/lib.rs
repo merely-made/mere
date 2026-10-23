@@ -48,8 +48,16 @@ mod publication_tests;
 /// an action and a DOM node are the same two things whichever platform asked.
 /// Re-exported so callers that already import it from this crate keep working.
 pub use cambium_rootstock::{A11yAction, A11yRequest, A11yTarget, Accessibility};
+use cambium_rootstock::{
+    A11yAdapterState, A11yPublication, A11yPublicationOutcome, A11yPublicationRefusal,
+    A11yPublicationSkip, A11ySync,
+};
 
 impl Accessibility for A11yHost {
+    fn adapter_state(&self) -> A11yAdapterState {
+        self.adapter_state()
+    }
+
     fn sync(
         &mut self,
         owner: &cambium_rootstock::A11yOwner,
@@ -59,7 +67,7 @@ impl Accessibility for A11yHost {
         producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
-    ) -> Vec<A11yRequest> {
+    ) -> A11ySync {
         self.sync_inner(owner, dom, layout, leaves, producers, focus, layout_scale)
     }
 }
@@ -100,7 +108,7 @@ impl A11yHost {
         }
     }
 
-    /// Whether the platform adapter is live.
+    /// Physical adapter installation only; this does not report latest tree publication.
     pub fn status(&self) -> BridgeStatus {
         self.bridge.status()
     }
@@ -124,10 +132,27 @@ impl A11yHost {
         producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
-    ) -> Vec<A11yRequest> {
+    ) -> A11ySync {
+        if !owner.is_live() {
+            self.requests.clear();
+            self.namespace.clear();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::skipped(
+                    self.adapter_state(),
+                    A11yPublicationSkip::OwnerEnded,
+                ),
+            };
+        }
         let Some(window) = self.window.clone() else {
             // No window yet: nothing to install against, and no reader to ask.
-            return Vec::new();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::skipped(
+                    A11yAdapterState::Detached,
+                    A11yPublicationSkip::NoWindow,
+                ),
+            };
         };
         // Resolve queued events through the publication they could have seen,
         // before reading contributors or replacing the published maps.
@@ -141,15 +166,21 @@ impl A11yHost {
             .collect();
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
+        let contribution_issues = projection.producer_issues.len();
         let bindings = projection.publication_bindings(owner, dom, leaves, producers);
         let mut tree = projection.tree;
         scale_tree_to_window(&mut tree, dom, layout_scale);
         let publication = bindings
-            .map_err(|issue| format!("{issue:?}"))
+            .map_err(|issue| {
+                (
+                    A11yPublicationRefusal::InvalidBindings,
+                    format!("{issue:?}"),
+                )
+            })
             .and_then(|bindings| {
                 self.namespace
                     .prepare(tree, bindings)
-                    .map_err(|issue| format!("{issue:?}"))
+                    .map_err(|issue| (A11yPublicationRefusal::InvalidTree, format!("{issue:?}")))
             });
         let publication::Prepared {
             tree,
@@ -157,17 +188,24 @@ impl A11yHost {
             requests: next,
         } = match publication {
             Ok(candidate) => candidate,
-            Err(issue) => {
+            Err((reason, issue)) => {
                 self.requests.clear();
                 self.namespace.clear();
                 eprintln!("[cambium-winit] accessibility publication refused: {issue}");
                 // Match install failure: a rejected accessibility tree must not
                 // leave the application hidden. A later sync may retry.
                 window.set_visible(true);
-                return Vec::new();
+                return A11ySync {
+                    requests: Vec::new(),
+                    publication: A11yPublication::refused(self.adapter_state(), reason),
+                };
             },
         };
         let node_count = tree.nodes.len();
+        let mut outcome = A11yPublicationOutcome::Submitted {
+            nodes: node_count,
+            contribution_issues,
+        };
         if !self.installed {
             match self.bridge.install(&window, tree) {
                 Ok(()) => {
@@ -179,7 +217,14 @@ impl A11yHost {
                         self.bridge.status()
                     );
                 },
-                Err(e) => eprintln!("[cambium-winit] accessibility install failed: {e}"),
+                Err(e) => {
+                    self.requests.clear();
+                    self.namespace.clear();
+                    outcome = A11yPublicationOutcome::Refused {
+                        reason: A11yPublicationRefusal::AdapterInstall,
+                    };
+                    eprintln!("[cambium-winit] accessibility install failed: {e}");
+                },
             }
             // Keep the app usable on adapter failure; retry installation on the
             // next sync rather than claiming that a failed install succeeded.
@@ -189,7 +234,23 @@ impl A11yHost {
             self.requests = next;
             self.namespace = namespace;
         }
-        requests
+        A11ySync {
+            requests,
+            publication: A11yPublication {
+                adapter: self.adapter_state(),
+                outcome,
+            },
+        }
+    }
+
+    fn adapter_state(&self) -> A11yAdapterState {
+        if self.window.is_none() {
+            return A11yAdapterState::Detached;
+        }
+        match self.bridge.status() {
+            BridgeStatus::Installed => A11yAdapterState::Installed,
+            BridgeStatus::Unavailable => A11yAdapterState::Unavailable,
+        }
     }
 
     /// Give the host the window AccessKit installs against.

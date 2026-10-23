@@ -415,6 +415,11 @@ where
                 pointer: &mut self.s.pending_pointer,
                 a11y: &mut self.s.pending_a11y,
                 a11y_owner: &self.s.a11y_owner,
+                a11y_publication: crate::A11yPublicationSnapshot {
+                    host: self.s.presentation_host,
+                    sequence: self.s.a11y_publication_sequence,
+                    publication: self.s.a11y_publication,
+                },
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1033,6 +1038,28 @@ where
         self.s.last_frame_profile = Some(profile);
     }
 
+    /// Latest owner-stamped publication observation; reading does not sync.
+    pub fn a11y_publication(&self) -> crate::A11yPublicationSnapshot {
+        crate::A11yPublicationSnapshot {
+            host: self.s.presentation_host,
+            sequence: self.s.a11y_publication_sequence,
+            publication: self.s.a11y_publication,
+        }
+    }
+
+    pub(crate) fn record_a11y_publication(&mut self, publication: crate::A11yPublication) {
+        self.s.a11y_publication = publication;
+        self.s.a11y_publication_sequence = self
+            .s
+            .a11y_publication_sequence
+            .checked_add(1)
+            .expect("accessibility observation sequence exhausted");
+        let snapshot = self.a11y_publication();
+        if let Some(observer) = &mut self.s.a11y_publication_observer {
+            observer(snapshot);
+        }
+    }
+
     /// Hand this frame to the accessibility host: build/install/update the
     /// tree, and route the screen reader's requests back into the retained DOM.
     /// Called after `redraw`, once this frame's layout exists. The first sync
@@ -1044,7 +1071,28 @@ where
     /// cursor here" and only moves focus. Collapsing them would fire every
     /// control a reader navigates across.
     pub fn sync_a11y(&mut self) -> Vec<crate::A11yDispatch> {
-        if !self.s.a11y_owner.get() {
+        use crate::{
+            A11yAdapterState as Adapter, A11yPublication as Publication,
+            A11yPublicationSkip as Skip,
+        };
+        let skip = if !self.s.a11y_owner.get() {
+            Some(Skip::OwnerEnded)
+        } else if self.s.a11y.is_none() {
+            Some(Skip::NoAdapter)
+        } else if self.s.runner.is_none() {
+            Some(Skip::NoRunner)
+        } else if self.s.layout.is_none() {
+            Some(Skip::NoLayout)
+        } else {
+            None
+        };
+        if let Some(reason) = skip {
+            let adapter = self
+                .s
+                .a11y
+                .as_ref()
+                .map_or(Adapter::NotConfigured, |a11y| a11y.adapter_state());
+            self.record_a11y_publication(Publication::skipped(adapter, reason));
             return Vec::new();
         }
         // A screen reader is told physical client pixels, and the tree it is
@@ -1076,7 +1124,8 @@ where
                 layout_scale,
             )
         };
-        self.apply_a11y_requests(&requests)
+        self.record_a11y_publication(requests.publication);
+        self.apply_a11y_requests(&requests.requests)
     }
 
     /// Route drained screen-reader requests into the retained DOM. Split out of

@@ -799,6 +799,7 @@ where
     pub pointer: &'a mut Vec<HostPointer>,
     pub(crate) a11y: &'a mut Vec<crate::QueuedA11y>,
     pub(crate) a11y_owner: &'a Rc<std::cell::Cell<bool>>,
+    pub(crate) a11y_publication: crate::A11yPublicationSnapshot,
     /// Scroll requests for the next layout; queued through
     /// [`scroll_into_view`](Self::scroll_into_view).
     pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
@@ -926,6 +927,11 @@ where
         }
         // Dropping an unqueued request acknowledges a disposed owner.
         receipt
+    }
+
+    /// Latest publisher observation. It does not invoke contributors or certify actor work.
+    pub fn a11y_publication(&self) -> crate::A11yPublicationSnapshot {
+        self.a11y_publication
     }
 
     /// Current contributed semantics, using the same composition as native and
@@ -1282,6 +1288,11 @@ where
     /// this field is ready to move with the struct; a browser event source
     /// supplies a projection onto the live document instead.
     pub a11y: Option<Box<dyn Accessibility>>,
+    /// Opt-in observer. Products choose retention, redaction and export policy.
+    /// Called on each sync observation and disposal, never by semantic reads.
+    pub a11y_publication_observer: Option<Box<dyn FnMut(crate::A11yPublicationSnapshot)>>,
+    pub(crate) a11y_publication: crate::A11yPublication,
+    pub(crate) a11y_publication_sequence: u64,
     pub(crate) a11y_wake: Arc<AtomicBool>,
     /// The platform's file chooser, which answers a view's file request.
     pub files: Option<Box<dyn crate::FileChooser>>,
@@ -1390,6 +1401,9 @@ where
             last_hover_hit: None,
             anim_base: crate::Instant::now(),
             a11y: None,
+            a11y_publication_observer: None,
+            a11y_publication: crate::A11yPublication::default(),
+            a11y_publication_sequence: 0,
             files: None,
             file_answers: Default::default(),
             a11y_wake: Arc::new(AtomicBool::new(false)),
@@ -1475,6 +1489,22 @@ where
     pub fn take_disposal(&mut self) -> HostDisposal {
         self.s.hidden = true;
         self.s.a11y_owner.set(false);
+        if !matches!(
+            self.s.a11y_publication.outcome,
+            crate::A11yPublicationOutcome::NotAttempted {
+                reason: crate::A11yPublicationSkip::OwnerEnded
+            }
+        ) {
+            self.record_a11y_publication(crate::A11yPublication::skipped(
+                self.s
+                    .a11y
+                    .as_ref()
+                    .map_or(crate::A11yAdapterState::NotConfigured, |a11y| {
+                        a11y.adapter_state()
+                    }),
+                crate::A11yPublicationSkip::OwnerEnded,
+            ));
+        }
         self.s.pending_a11y.clear();
         self.s.needs_recovery_surface = false;
         self.s.last_redraw_presentation = None;
@@ -1741,6 +1771,11 @@ where
                 pointer: &mut self.s.pending_pointer,
                 a11y: &mut self.s.pending_a11y,
                 a11y_owner: &self.s.a11y_owner,
+                a11y_publication: crate::A11yPublicationSnapshot {
+                    host: self.s.presentation_host,
+                    sequence: self.s.a11y_publication_sequence,
+                    publication: self.s.a11y_publication,
+                },
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),
@@ -1790,6 +1825,11 @@ where
             pointer: &mut self.s.pending_pointer,
             a11y: &mut self.s.pending_a11y,
             a11y_owner: &self.s.a11y_owner,
+            a11y_publication: crate::A11yPublicationSnapshot {
+                host: self.s.presentation_host,
+                sequence: self.s.a11y_publication_sequence,
+                publication: self.s.a11y_publication,
+            },
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
             render_core: self.s.shared.render_core.as_ref(),
@@ -1885,6 +1925,11 @@ where
                 pointer: &mut self.s.pending_pointer,
                 a11y: &mut self.s.pending_a11y,
                 a11y_owner: &self.s.a11y_owner,
+                a11y_publication: crate::A11yPublicationSnapshot {
+                    host: self.s.presentation_host,
+                    sequence: self.s.a11y_publication_sequence,
+                    publication: self.s.a11y_publication,
+                },
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 render_core: self.s.shared.render_core.as_ref(),

@@ -437,3 +437,165 @@ fn selector_tests_probe_routes_generated_actions_and_observes_declines() {
         }
     }
 }
+
+#[test]
+fn publication_collector_receives_host_transitions_and_independent_receipt_reads() {
+    use cambium_rootstock::{
+        A11yAdapterState as Adapter, A11yPublication, A11yPublicationOutcome as Phase,
+        A11yPublicationRefusal as Refusal, A11yPublicationSnapshot, A11ySync, Accessibility,
+    };
+    struct Publisher(Rc<Cell<A11yPublication>>);
+    impl Accessibility for Publisher {
+        fn adapter_state(&self) -> Adapter {
+            self.0.get().adapter
+        }
+
+        fn sync(
+            &mut self,
+            _: &cambium_rootstock::A11yOwner,
+            _: &cambium_rootstock::WindowDom<'_>,
+            _: &cambium_rootstock::OwnedLayout,
+            _: &sprigging::LeafRegistry<u64>,
+            _: &cambium_rootstock::ProducerRegistry,
+            _: Option<u64>,
+            _: f64,
+        ) -> A11ySync {
+            A11ySync {
+                requests: vec![],
+                publication: self.0.get(),
+            }
+        }
+    }
+    let history = Rc::new(RefCell::new(
+        ObservationStore::<A11yPublicationSnapshot>::new(
+            "publication-run".into(),
+            "ui-publisher".into(),
+            RetentionLimits {
+                max_records: 8,
+                max_bytes: 16384,
+                max_age: Duration::from_secs(60),
+            },
+        ),
+    ));
+    let mut inspector = history.borrow().cursor();
+    let mut receipt_cursor = history.borrow().cursor();
+    let application = Rc::new(RefCell::new(ObservationStore::new(
+        "application-run".into(),
+        "wheel".into(),
+        RetentionLimits {
+            max_records: 8,
+            max_bytes: 4096,
+            max_age: Duration::from_secs(60),
+        },
+    )));
+    let product = WheelProduct {
+        receipt: application.borrow().cursor(),
+        store: application.clone(),
+    };
+    let lane = Rc::new(RefCell::new(Lane::new(
+        product,
+        None,
+        None,
+        None,
+        Rc::new(Cell::new(0)),
+    )));
+    let mut state = HostState::<State, Logic, View>::new();
+    state.shared.sheet = lane.borrow().product.sheet().into();
+    state.runner = Some(Runner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        view as Logic,
+        State {
+            delivered: 0,
+            store: application,
+        },
+    ));
+    let reported = Rc::new(Cell::new(A11yPublication {
+        adapter: Adapter::Installed,
+        outcome: Phase::Submitted {
+            nodes: 4,
+            contribution_issues: 1,
+        },
+    }));
+    state.a11y = Some(Box::new(Publisher(reported.clone())));
+    let sink = history.clone();
+    state.a11y_publication_observer = Some(Box::new(move |snapshot| {
+        let bytes = serde_json::to_vec(&snapshot).unwrap().len();
+        sink.borrow_mut()
+            .record(
+                snapshot,
+                bytes,
+                ObservationMetadata::default(),
+                Duration::ZERO,
+            )
+            .unwrap();
+    }));
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let mut hooks = HostHooks::inert();
+    let collecting = lane.clone();
+    hooks.after_frame = Box::new(move |ctx| collecting.borrow_mut().after_frame(ctx));
+    let mut host = Host::new(HostOptions::default(), None, hooks, state, wake);
+    host.set_surface_size(200.0, 200.0);
+    host.relayout(200.0, 200.0);
+    host.sync_a11y();
+    reported.set(A11yPublication::refused(
+        Adapter::Installed,
+        Refusal::InvalidTree,
+    ));
+    host.sync_a11y();
+    let inspection = history
+        .borrow_mut()
+        .read(&mut inspector, Duration::ZERO, 8)
+        .unwrap();
+    assert_eq!(inspection.records.len(), 2);
+    let exported = history
+        .borrow_mut()
+        .read(&mut receipt_cursor, Duration::ZERO, 8)
+        .unwrap();
+    assert_eq!(
+        exported.records.len(),
+        2,
+        "inspection never drains receipt history"
+    );
+    lane.borrow_mut().collect_diagnostics(Ok(Some(
+        exported.map_payload(|value| serde_json::to_value(value).unwrap()),
+    )));
+    lane.borrow_mut().request_close();
+    host.with_ctx(Hook::AfterFrame); // real completion path automatically samples AppCtx
+    let value = lane.borrow().receipt_value(false, &BTreeMap::new());
+    assert_eq!(
+        value["a11y_publication"]["snapshot"]["publication"]["outcome"]["phase"],
+        "refused"
+    );
+    assert_eq!(value["a11y_publication"]["snapshot"]["sequence"], 2);
+    assert_eq!(host.s.runner.as_ref().unwrap().state().delivered, 0);
+    assert!(
+        value.get("diagnostics").is_some(),
+        "product completion sampled its separate diagnostics"
+    );
+    reported.set(A11yPublication {
+        adapter: Adapter::Installed,
+        outcome: Phase::Submitted {
+            nodes: 5,
+            contribution_issues: 0,
+        },
+    });
+    host.sync_a11y();
+    drop(host.take_disposal());
+    let later = history
+        .borrow_mut()
+        .read(&mut inspector, Duration::ZERO, 8)
+        .unwrap();
+    assert_eq!(later.records.len(), 2);
+    assert!(matches!(
+        later.records[1].payload.publication.outcome,
+        Phase::NotAttempted {
+            reason: cambium_rootstock::A11yPublicationSkip::OwnerEnded
+        }
+    ));
+    assert!(
+        later
+            .records
+            .iter()
+            .all(|record| record.envelope.metadata.presented_frame.is_none())
+    );
+}

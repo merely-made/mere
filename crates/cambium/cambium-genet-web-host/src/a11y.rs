@@ -40,6 +40,10 @@ use wasm_bindgen::JsCast;
 use web_sys::{Document, Element, HtmlCanvasElement, HtmlElement, Text};
 
 use crate::mirror::{self, MirrorNode};
+use cambium_rootstock::{
+    A11yAdapterState, A11yPublication, A11yPublicationOutcome, A11yPublicationRefusal,
+    A11yPublicationSkip, A11ySync,
+};
 
 /// The attribute naming each element's node, which the listeners route by.
 pub(crate) const NODE_ATTR: &str = "data-node";
@@ -155,10 +159,14 @@ impl DomAccessibility {
             .create_element("div")
             .map_err(|_| "could not create the mirror")?
             .unchecked_into();
-        let _ = root.set_attribute("role", "region");
-        let _ = root.set_attribute("aria-label", &label.into());
-        let _ = root.set_attribute("tabindex", "-1");
-        let _ = root.set_attribute("data-cambium-mirror", "");
+        root.set_attribute("role", "region")
+            .map_err(|_| "could not configure the mirror")?;
+        root.set_attribute("aria-label", &label.into())
+            .map_err(|_| "could not configure the mirror")?;
+        root.set_attribute("tabindex", "-1")
+            .map_err(|_| "could not configure the mirror")?;
+        root.set_attribute("data-cambium-mirror", "")
+            .map_err(|_| "could not configure the mirror")?;
         // Transparent and pointer-blind: the canvas draws and takes the
         // pointer, the mirror is there for a reader. Clip without a scrolling
         // box: browser focus must not shift its controls away from the canvas.
@@ -173,7 +181,10 @@ impl DomAccessibility {
             .insert_before(&root, canvas.next_sibling().as_ref())
             .map_err(|_| "could not place the mirror")?;
         // The mirror speaks for the canvas now.
-        let _ = canvas.set_attribute("aria-hidden", "true");
+        if canvas.set_attribute("aria-hidden", "true").is_err() {
+            root.remove();
+            return Err("could not configure the canvas accessibility".into());
+        }
         Ok(Self {
             canvas,
             document,
@@ -193,21 +204,38 @@ impl DomAccessibility {
     }
 
     /// Keep the mirror's box on the canvas's, wherever the page has put it.
-    fn cover_canvas(&self) {
+    fn clear_publication(&mut self) {
+        for (_, old) in self.elements.drain() {
+            old.element.remove();
+        }
+        let mut shared = self.handle.shared.borrow_mut();
+        shared.requests.clear();
+        shared.elements.clear();
+        shared.focused = None;
+        self.focus = None;
+    }
+
+    fn cover_canvas(&self) -> Result<(), wasm_bindgen::JsValue> {
         let root = &self.handle.root;
         let canvas = self.canvas.get_bounding_client_rect();
         let here = root.get_bounding_client_rect();
         let style = root.style();
         let left = root.offset_left() as f64 + canvas.left() - here.left();
         let top = root.offset_top() as f64 + canvas.top() - here.top();
-        let _ = style.set_property("left", &format!("{left}px"));
-        let _ = style.set_property("top", &format!("{top}px"));
-        let _ = style.set_property("width", &format!("{}px", canvas.width()));
-        let _ = style.set_property("height", &format!("{}px", canvas.height()));
+        style.set_property("left", &format!("{left}px"))?;
+        style.set_property("top", &format!("{top}px"))?;
+        style.set_property("width", &format!("{}px", canvas.width()))?;
+        style.set_property("height", &format!("{}px", canvas.height()))?;
+        Ok(())
     }
 
     /// Write `nodes` as the children of `parent`, in order, after its text.
-    fn write(&mut self, parent: &HtmlElement, nodes: &[MirrorNode], live: &mut HashSet<u64>) {
+    fn write(
+        &mut self,
+        parent: &HtmlElement,
+        nodes: &[MirrorNode],
+        live: &mut HashSet<u64>,
+    ) -> Result<(), wasm_bindgen::JsValue> {
         let text_node = |element: &HtmlElement| {
             element
                 .first_child()
@@ -219,7 +247,7 @@ impl DomAccessibility {
         };
         for node in nodes {
             live.insert(node.id);
-            let mirrored = mirrored(&mut self.elements, &self.document, node.id);
+            let mirrored = mirrored(&mut self.elements, &self.document, node.id)?;
             let element = mirrored.element.clone();
             let wanted = Written {
                 attrs: node.attrs.clone(),
@@ -228,18 +256,19 @@ impl DomAccessibility {
                 focusable: node.focusable,
             };
             if mirrored.written != wanted {
-                update(&self.document, mirrored, &wanted);
+                update(&self.document, mirrored, &wanted)?;
                 mirrored.written = wanted;
             }
             let in_place = cursor
                 .as_ref()
                 .is_some_and(|at| at.is_same_node(Some(element.as_ref())));
             if !in_place {
-                let _ = parent.insert_before(&element, cursor.as_ref());
+                parent.insert_before(&element, cursor.as_ref())?;
             }
             cursor = element.next_sibling();
-            self.write(&element, &node.children, live);
+            self.write(&element, &node.children, live)?;
         }
+        Ok(())
     }
 }
 
@@ -248,31 +277,33 @@ fn mirrored<'a>(
     elements: &'a mut HashMap<u64, Mirrored>,
     document: &Document,
     id: u64,
-) -> &'a mut Mirrored {
-    elements.entry(id).or_insert_with(|| {
-        let element: HtmlElement = document
-            .create_element("div")
-            .expect("a document creates a div")
-            .unchecked_into();
-        let _ = element.set_attribute(NODE_ATTR, &id.to_string());
-        let _ = element
+) -> Result<&'a mut Mirrored, wasm_bindgen::JsValue> {
+    if let std::collections::hash_map::Entry::Vacant(entry) = elements.entry(id) {
+        let element: HtmlElement = document.create_element("div")?.unchecked_into();
+        element.set_attribute(NODE_ATTR, &id.to_string())?;
+        element
             .style()
             .set_css_text("position:absolute;margin:0;padding:0;");
-        Mirrored {
+        entry.insert(Mirrored {
             element,
             text: None,
             written: Written::default(),
-        }
-    })
+        });
+    }
+    Ok(elements.get_mut(&id).expect("inserted mirror element"))
 }
 
 /// Bring one element to `wanted`, touching only what differs.
-fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
+fn update(
+    document: &Document,
+    mirrored: &mut Mirrored,
+    wanted: &Written,
+) -> Result<(), wasm_bindgen::JsValue> {
     let element = &mirrored.element;
     let old = &mirrored.written;
     for (name, _) in &old.attrs {
         if !wanted.attrs.iter().any(|(key, _)| key == name) {
-            let _ = element.remove_attribute(name);
+            element.remove_attribute(name)?;
         }
     }
     for (name, value) in &wanted.attrs {
@@ -281,7 +312,7 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
             .iter()
             .any(|(key, old)| key == name && old == value)
         {
-            let _ = element.set_attribute(name, value);
+            element.set_attribute(name, value)?;
         }
     }
     if old.text != wanted.text {
@@ -289,11 +320,11 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
             (Some(node), Some(text)) => node.set_data(text),
             (None, Some(text)) => {
                 let node = document.create_text_node(text);
-                let _ = element.insert_before(&node, element.first_child().as_ref());
+                element.insert_before(&node, element.first_child().as_ref())?;
                 mirrored.text = Some(node);
             },
             (Some(node), None) => {
-                let _ = element.remove_child(node);
+                element.remove_child(node)?;
                 mirrored.text = None;
             },
             (None, None) => {},
@@ -302,21 +333,37 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
     if old.rect != wanted.rect {
         let [x, y, width, height] = wanted.rect.unwrap_or_default();
         let style = element.style();
-        let _ = style.set_property("left", &format!("{x}px"));
-        let _ = style.set_property("top", &format!("{y}px"));
-        let _ = style.set_property("width", &format!("{width}px"));
-        let _ = style.set_property("height", &format!("{height}px"));
+        style.set_property("left", &format!("{x}px"))?;
+        style.set_property("top", &format!("{y}px"))?;
+        style.set_property("width", &format!("{width}px"))?;
+        style.set_property("height", &format!("{height}px"))?;
     }
     if old.focusable != wanted.focusable {
         if wanted.focusable {
-            let _ = element.set_attribute("tabindex", "-1");
+            element.set_attribute("tabindex", "-1")?;
         } else {
-            let _ = element.remove_attribute("tabindex");
+            element.remove_attribute("tabindex")?;
         }
     }
+    Ok(())
 }
 
 impl Accessibility for DomAccessibility {
+    fn adapter_state(&self) -> A11yAdapterState {
+        if self.canvas.is_connected()
+            && self.handle.root.is_connected()
+            && self
+                .canvas
+                .parent_node()
+                .zip(self.handle.root.parent_node())
+                .is_some_and(|(canvas, root)| canvas.is_same_node(Some(&root)))
+        {
+            A11yAdapterState::Installed
+        } else {
+            A11yAdapterState::Detached
+        }
+    }
+
     fn sync(
         &mut self,
         owner: &cambium_rootstock::A11yOwner,
@@ -326,28 +373,61 @@ impl Accessibility for DomAccessibility {
         producers: &cambium_rootstock::ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
-    ) -> Vec<A11yRequest> {
+    ) -> A11ySync {
+        let attached = self.adapter_state() == A11yAdapterState::Installed;
+        if !owner.is_live() {
+            self.clear_publication();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::skipped(
+                    if attached {
+                        A11yAdapterState::Installed
+                    } else {
+                        A11yAdapterState::Detached
+                    },
+                    A11yPublicationSkip::OwnerEnded,
+                ),
+            };
+        }
+        if !attached {
+            self.clear_publication();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::refused(
+                    A11yAdapterState::Detached,
+                    A11yPublicationRefusal::DetachedMirror,
+                ),
+            };
+        }
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
         let requests = match projection.publication_bindings(owner, dom, leaves, producers) {
             Ok(bindings) => bindings.requests,
             Err(_) => {
-                for (_, old) in self.elements.drain() {
-                    old.element.remove();
-                }
-                let mut shared = self.handle.shared.borrow_mut();
-                shared.requests.clear();
-                shared.elements.clear();
-                shared.focused = None;
-                self.focus = None;
-                return Vec::new();
+                self.clear_publication();
+                return A11ySync {
+                    requests: Vec::new(),
+                    publication: A11yPublication::refused(
+                        A11yAdapterState::Installed,
+                        A11yPublicationRefusal::InvalidBindings,
+                    ),
+                };
             },
         };
         let device = web_sys::window().map_or(1.0, |window| window.device_pixel_ratio());
         let scale = (layout_scale / device) as f32;
         let plan = mirror::plan(&projection, scale);
 
-        self.cover_canvas();
+        if self.cover_canvas().is_err() {
+            self.clear_publication();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::refused(
+                    A11yAdapterState::Installed,
+                    A11yPublicationRefusal::DomWrite,
+                ),
+            };
+        }
         let root = self.handle.root.clone();
         // Removing a focused proxy (for example a dismissed search field)
         // makes Chrome focus body. Remember ownership before that mutation,
@@ -377,7 +457,16 @@ impl Accessibility for DomAccessibility {
             }
         }
         let mut live = HashSet::new();
-        self.write(&root, &plan, &mut live);
+        if self.write(&root, &plan, &mut live).is_err() {
+            self.clear_publication();
+            return A11ySync {
+                requests: Vec::new(),
+                publication: A11yPublication::refused(
+                    A11yAdapterState::Installed,
+                    A11yPublicationRefusal::DomWrite,
+                ),
+            };
+        }
         self.elements.retain(|id, mirrored| {
             let keep = live.contains(id);
             if !keep {
@@ -414,6 +503,15 @@ impl Accessibility for DomAccessibility {
                 self.handle.take_focus();
             }
         }
-        Vec::new()
+        A11ySync {
+            requests: Vec::new(),
+            publication: A11yPublication {
+                adapter: A11yAdapterState::Installed,
+                outcome: A11yPublicationOutcome::Mirrored {
+                    nodes: live.len(),
+                    contribution_issues: projection.producer_issues.len(),
+                },
+            },
+        }
     }
 }
