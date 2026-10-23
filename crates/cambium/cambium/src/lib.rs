@@ -291,6 +291,10 @@ pub fn attr_qual(local: &str) -> QualName {
 }
 
 mod reading_toolbar;
-pub use reading_toolbar::{read_toolbar, ReadCommand};
+pub use reading_toolbar::{RelationshipPreviewCommand, relationship_preview, read_toolbar, ReadCommand};
 mod native_style;
 pub use native_style::stylesheet_at_display_scale;
+
+mod choice_indicator;
+pub use choice_indicator::{ChoiceIndicator,choice_indicator};
+pub mod scope_navigation;
