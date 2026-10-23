@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-23",
+  "status": "Qualified for kernel/Canvas runtime membership and existing automated receiving boundaries",
+  "source_commit": "b9b3548854b81a171f6cfab368b407cfb73f1a81",
+  "documentation_commit": "7fbc129c8b5afaafb9d86582a25c611f284b22ec",
+  "source_snapshot": "diagnostics-canvas-life-source.json",
+  "source_normalization": "CRLF normalized to LF",
+  "behavior": "Original same-call old Pin and Drag refuse after member recreation; new Pin dispatches. Ordinary edits, upserts, graph clones and unrelated members retain their runtime/action identities.",
+  "red_green": {
+    "red": "diagnostics-canvas-life-red.json",
+    "green": "diagnostics-canvas-life-green.json",
+    "historical_patch": "diagnostics-activation-canvas-aba.patch",
+    "interpretation": "Original failure reproduced before lifetime wiring; permanent regression now passes. Historical red evidence is retained, not an outstanding Canvas Pin defect."
+  },
+  "tests": {
+    "distinct_passed": 830,
+    "existing_ignored": 8,
+    "kernel": 477,
+    "canvas_reader": 9,
+    "graphshell_reader": 12,
+    "retained_content": {
+      "passed": 15,
+      "existing_ignored": 1
+    },
+    "native_hosts_and_producers": {
+      "passed": 295,
+      "existing_ignored": 7
+    },
+    "owner_refresh": 22,
+    "kernel_controls": "3 repeated subset, excluded from distinct total"
+  },
+  "compile_gates": {
+    "canvas-wasm": "diagnostics-canvas-life-canvas-wasm.json",
+    "browser": "diagnostics-canvas-life-browser.json",
+    "consumer": "diagnostics-canvas-life-consumer.json",
+    "embedding": "diagnostics-canvas-life-embedding.json"
+  },
+  "documentation_audit": {
+    "before": "diagnostics-canvas-life-docs-baseline.json",
+    "after": "diagnostics-canvas-life-docs-final.json",
+    "exit_code": 1,
+    "pre_existing_errors": 40,
+    "exact_error_array_unchanged": true,
+    "disposition": "Not a clean documentation audit; this slice introduces no new audit errors"
+  },
+  "remaining_ownership_migrations": "diagnostics-canvas-life-review.json",
+  "limits": [
+    "Process-local membership observations; durable UUIDs and snapshot schema unchanged. Snapshot materialization begins new runtime lives.",
+    "Action routing and seed placement qualify this slice, not every retained physics/selection/Forme/render cache, rollback or disposal boundary.",
+    "Custom/deeper producer owner intake, supplier promotion, guest ingress/selection, full leaf raster/intrinsic sizing, terminal actor outcomes, headed AT and physical handoff remain open."
+  ],
+  "preservation": "diagnostics-canvas-life-preservation.json",
+  "receipt_budget_bytes": 10000000,
+  "target": "C:/t/cargo-targets/mere",
+  "isolated_cargo_home": null,
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-canvas-life-brief.json": "9af73090502cf70c38ff4c8ba72de78d5887df5f4431583a16f3c353c12c5155",
+    "support/family-promotion/diagnostics-canvas-life-browser.json": "483ea9a6449da686df3f5348292605322affae7d975e9656b39241b134594102",
+    "support/family-promotion/diagnostics-canvas-life-canvas-wasm.json": "67c82f0ba4ea8ba28fe427cff4d6481505865823fe84fd642bd8c86fafddf947",
+    "support/family-promotion/diagnostics-canvas-life-consumer.json": "3ecf064f7d250ffba145b9e9e1ead642fb33caf033fe421c4a03ecae2cd9cc37",
+    "support/family-promotion/diagnostics-canvas-life-docs-baseline.json": "f369ac62a73232cea379f74e6527c18db22687b65f792d96c0fb2299126161c9",
+    "support/family-promotion/diagnostics-canvas-life-docs-final.json": "bc5b45e5f077a3a2b12ac4ee5abaa9f1c57f77f6794f8980738878886f0a550f",
+    "support/family-promotion/diagnostics-canvas-life-embedding.json": "96e8ab8e36c4daf4197969080c2149f38c1048d286e0de00d2b79684077a7ea0",
+    "support/family-promotion/diagnostics-canvas-life-green.json": "77311fd4e720cce12027724d95559bdac6d36d4a6ba9f7ebdd447854dff295c3",
+    "support/family-promotion/diagnostics-canvas-life-kernel-controls.json": "a587b7f60b754315f0f77ef7720ec2d178a903dc1c70977db9ad0bc7921b8709",
+    "support/family-promotion/diagnostics-canvas-life-kernel.json": "f2709f952e71be0a224034e56c99a2072855fc8a1a0ff334dbe346d8f2bc2bb9",
+    "support/family-promotion/diagnostics-canvas-life-native.json": "727a32bde79e8e5e9b0ead51af2458f10acbe6ec5aa7090fb65a77dcdf11f9cf",
+    "support/family-promotion/diagnostics-canvas-life-owner-refresh.json": "897fe7e91bfc94ef2ebb92d4971b0f97cfc7e4f586e06f9b2603e50035c9f1a1",
+    "support/family-promotion/diagnostics-canvas-life-preservation.json": "5a09bd944895b695dcd811317c7e0a7d82f0a78b7aa8fccc1b51782a46b39f5d",
+    "support/family-promotion/diagnostics-canvas-life-product.json": "ee3279f532f86127b0d28b074edd8ce02b4968eeccf6efce10f07e3b73bada9d",
+    "support/family-promotion/diagnostics-canvas-life-reader.json": "923a04f388e745eecbc2c3424ebb0367f53aa1c8666747071bf6bcfef836efc4",
+    "support/family-promotion/diagnostics-canvas-life-red.json": "4912af6827ce8f50b68005947303b0004d031f6fa59977c423e815bfcc20a9a9",
+    "support/family-promotion/diagnostics-canvas-life-review.json": "f6f3b8b079faa6dac9191d28ac53c6bd5a3e8dc6d3735fd66b7dea58e025606b",
+    "support/family-promotion/diagnostics-canvas-life-source.json": "cb63ae0f538ff230b105c1c96d1434fbd6c600835ac18a4dbeb26697d0c60f76",
+    "support/doc-audit/d2/batch_112_canvas_membership_lifetimes.md": "569e7b2b392b92b14374d32e6623ab9b312ad3d215f2480d68ca8b565663c4fc"
+  },
+  "retained_bytes_excluding_this_qualification": 213744
+}
