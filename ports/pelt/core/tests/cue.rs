@@ -166,6 +166,77 @@ fn semantic_publication_retires_on_input_and_replacement_changes_scope() {
     assert!((0..256).filter_map(|_|controller.poll_cue_event()).any(|event| matches!(event.event,Event::Completed{request,result:Err(Error::Retired)} if request==cancelled)));
 }
 #[test]
+fn hidden_retained_input_refuses_mutation_while_commands_still_advance() {
+    let mut controller = controller();
+    controller.try_frame(128, 96).unwrap();
+    let projection = controller.session().accessibility_projection().unwrap();
+    let field = projection
+        .nodes()
+        .iter()
+        .find(|node| node.value.as_deref() == Some("hello"))
+        .unwrap();
+    assert!(
+        controller
+            .session_mut()
+            .dispatch_accessibility_action(&DocumentA11yActionRequest {
+                revision: projection.revision(),
+                target: field.id,
+                action: inker::DocumentA11yAction::Focus,
+                data: None,
+            })
+    );
+    let surface = controller.cue_surface_mut();
+    surface.set_visible(false).unwrap();
+    assert!(matches!(
+        surface.input(Input::Document(SessionInput::Text("hidden".into()))),
+        Err(Error::Invalid(_))
+    ));
+    assert!(matches!(
+        surface.dispatch(SessionInput::Text("hidden".into())),
+        Err(Error::Invalid(_))
+    ));
+    assert!(
+        surface.poll_event().is_none(),
+        "refused input must not emit a result"
+    );
+    let request = surface.request(RequestId(1), Command::Reload).unwrap();
+    surface.advance(Duration::ZERO).unwrap();
+    assert!(matches!(
+        surface.poll_event().unwrap().event,
+        Event::NavigationRequested { .. }
+    ));
+    assert!(
+        matches!(surface.poll_event().unwrap().event, Event::Completed { request: actual, result: Ok(Reply::Dispatched) } if actual == request)
+    );
+    surface.set_visible(true).unwrap();
+    surface.try_frame(128, 96).unwrap();
+    let projection = surface.as_ref().accessibility_projection().unwrap();
+    assert!(
+        projection
+            .nodes()
+            .iter()
+            .any(|node| node.value.as_deref() == Some("hello"))
+    );
+    surface
+        .input(Input::Document(SessionInput::Focus(true)))
+        .unwrap();
+    assert!(matches!(
+        surface.poll_event().unwrap().event,
+        Event::DocumentInput(_)
+    ));
+    surface.set_visible(false).unwrap();
+    surface.retire().unwrap();
+    assert!(matches!(
+        surface.input(Input::Document(SessionInput::Focus(true))),
+        Err(Error::Retired)
+    ));
+    assert!(matches!(
+        surface.dispatch(SessionInput::Focus(true)),
+        Err(Error::Retired)
+    ));
+}
+
+#[test]
 fn atomic_input_backpressure_does_not_mutate_the_retained_receiver() {
     let mut controller = controller();
     controller.try_frame(128, 96).unwrap();
