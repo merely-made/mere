@@ -13,7 +13,11 @@
     "Browser writer propagates DOM write errors and clears partial caches/routes",
     "Detached mirror refuses new routes",
     "Missing layout/runner/adapter and disposal replace prior publication success",
-    "Mesquite absent/failed diagnostic collection removes prior exported batch"
+    "Mesquite absent/failed diagnostic collection removes prior exported batch",
+    "Unsampled adapter state is explicitly unobserved instead of claiming no adapter",
+    "Skipped sync observes current adapter attachment instead of carrying the old installed status",
+    "Disposal records its final observation immediately but defers collector notification through the existing disposal guard; host reentry is tested",
+    "One Rootstock stamping function owns host/sequence transitions for sync and disposal"
   ],
   "remaining_migrations": [
     {
@@ -48,5 +52,25 @@
     }
   ],
   "qualification": "diagnostics-outcomes-qualification.json",
-  "retained_byte_cap": 10000000
+  "retained_byte_cap": 10000000,
+  "main_intake": {
+    "remote_main": "9004dee69",
+    "merge": "017fb8f81830ea5809fdb680978c35722f6dcf3c",
+    "scope": "Shared-surface and scope-navigation changes received; native cohort and affected product gate rerun. Genet source pin unchanged. Root AccessKit patch retained.",
+    "standalone_lock": "Fixture receives new direct serde entries for Cambium and Rootstock; no supplier packages repinned."
+  },
+  "status": "implemented; automated receiving qualified within stated boundaries",
+  "receiving": {
+    "native_distinct_passes": 292,
+    "native_existing_ignored": 7,
+    "graphshell_passes": 15,
+    "graphshell_existing_ignored": 1,
+    "compilation": [
+      "browser-final (Wasm)",
+      "embedding-final",
+      "consumer-final (locked standalone workspace)"
+    ],
+    "browser_runtime": "DOM write refusal and detached-mirror checks are source-reviewed/Wasm-compiled; actual browser failure/focus/disposal and human AT unqualified",
+    "observer_receiving": "Actual Rootstock sequence/skip/refusal/retry and deferred disposal reentry; injected adapter to bounded Apparatus store with independent cursors; actual Mesquite finish path"
+  }
 }

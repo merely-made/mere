@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "support/family-promotion/native-id-consumer/Cargo.toml"
+  ],
+  "cwd": "C:\\Users\\mark_\\Code\\worktrees\\mere-publication-outcomes",
+  "started": "2026-10-23T17:40:04.092353+00:00",
+  "finished": "2026-10-23T17:40:08.329858+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: cannot update the lock file C:\\Users\\mark_\\Code\\worktrees\\mere-publication-outcomes\\support\\family-promotion\\native-id-consumer\\Cargo.lock because --locked was passed to prevent this"
+  ],
+  "diagnostic_tail": "error: cannot update the lock file C:\\Users\\mark_\\Code\\worktrees\\mere-publication-outcomes\\support\\family-promotion\\native-id-consumer\\Cargo.lock because --locked was passed to prevent this\nhelp: to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

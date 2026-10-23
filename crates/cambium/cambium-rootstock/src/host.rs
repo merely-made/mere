@@ -1166,6 +1166,8 @@ pub struct HostDisposal {
     capture: Option<CaptureFn>,
     stamped: Option<StampedCaptureFn>,
     paint: Option<PaintCaptureFn>,
+    a11y_observer: Option<Box<dyn FnMut(crate::A11yPublicationSnapshot)>>,
+    a11y_notice: Option<crate::A11yPublicationSnapshot>,
 }
 impl Drop for HostDisposal {
     fn drop(&mut self) {
@@ -1195,6 +1197,11 @@ impl Drop for HostDisposal {
         }
         if let Some(capture) = self.paint.take() {
             capture(Err(CaptureRefusal::HostDisposed));
+        }
+        if let (Some(mut observer), Some(notice)) =
+            (self.a11y_observer.take(), self.a11y_notice.take())
+        {
+            observer(notice);
         }
     }
 }
@@ -1289,7 +1296,9 @@ where
     /// supplies a projection onto the live document instead.
     pub a11y: Option<Box<dyn Accessibility>>,
     /// Opt-in observer. Products choose retention, redaction and export policy.
-    /// Called on each sync observation and disposal, never by semantic reads.
+    /// Sync callbacks run in the host call and must not reenter it. Disposal
+    /// notification runs when its guard is dropped outside the host borrow.
+    /// Never invoked by semantic reads.
     pub a11y_publication_observer: Option<Box<dyn FnMut(crate::A11yPublicationSnapshot)>>,
     pub(crate) a11y_publication: crate::A11yPublication,
     pub(crate) a11y_publication_sequence: u64,
@@ -1489,13 +1498,13 @@ where
     pub fn take_disposal(&mut self) -> HostDisposal {
         self.s.hidden = true;
         self.s.a11y_owner.set(false);
-        if !matches!(
+        let a11y_notice = if !matches!(
             self.s.a11y_publication.outcome,
             crate::A11yPublicationOutcome::NotAttempted {
                 reason: crate::A11yPublicationSkip::OwnerEnded
             }
         ) {
-            self.record_a11y_publication(crate::A11yPublication::skipped(
+            let publication = crate::A11yPublication::skipped(
                 self.s
                     .a11y
                     .as_ref()
@@ -1503,8 +1512,11 @@ where
                         a11y.adapter_state()
                     }),
                 crate::A11yPublicationSkip::OwnerEnded,
-            ));
-        }
+            );
+            Some(self.stamp_a11y_publication(publication))
+        } else {
+            None
+        };
         self.s.pending_a11y.clear();
         self.s.needs_recovery_surface = false;
         self.s.last_redraw_presentation = None;
@@ -1523,6 +1535,8 @@ where
             capture: self.s.pending_capture.take(),
             stamped: self.s.pending_stamped_capture.take(),
             paint: self.s.pending_paint_capture.take(),
+            a11y_observer: self.s.a11y_publication_observer.take(),
+            a11y_notice,
         }
     }
 

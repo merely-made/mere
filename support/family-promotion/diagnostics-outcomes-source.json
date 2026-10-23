@@ -1,0 +1,29 @@
+{
+  "basis": "017fb8f81830ea5809fdb680978c35722f6dcf3c",
+  "integrated_main": "9004dee69c42ad47ef4dce5a61122ae46c586b36",
+  "normalization": "CRLF normalized to LF",
+  "source_sha256": {
+    ".gitattributes": "a1d9e9ced32903fd832d83cd4be977f1511c167b3306c0f5595ecb3a904d937e",
+    "Cargo.lock": "a635da109a37a24e2dded8ea72eb1819ed962fb2c99bf3e4f91cabdd4ef3e241",
+    "Cargo.toml": "32cb52c0be9d7b8fe8dae119507b46d55dff470baa758cbc7b73b6015e5f756f",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "adacde51e819829822aacd66999c7a64c51a49716e4282977a7787b19e080137",
+    "crates/cambium/cambium-rootstock/Cargo.toml": "6c7b47cac3b2e5cc7d50bc847336293f2cd36369a78d5e35fccd6cfed4cdaa08",
+    "crates/cambium/cambium-rootstock/src/a11y_publication.rs": "71608822a5ea23f2c9e98052cd32b9770c74634beb8ce333465a81cde108fc9f",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "32e2aa8459f238b9e0ce2546af6e4b5f626bac8fdd5ce0947c402a433bae12f1",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests/outcome_tests.rs": "fb32bcc25e2fd38ad271c18814709a975a9ce54e762a178cde7bbc30910b9303",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "94675aa4e716ec487af07241efb780984c54d145057380aaafdc2d2179152533",
+    "crates/cambium/cambium-rootstock/src/host.rs": "7bfec84c7040717d8d614591bdfea214b4aad3581ab591b2306b6214a273d91f",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "57027635a26c7a3fd56816b073127b4d8d6c57539497db608289a06c3b538af3",
+    "crates/cambium/cambium-rootstock/src/multi_host_tests.rs": "9d50d1c3ae8e89fc9d7dbe3123751272b2b145cda893ba15a42860fbb01d1364",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "71d3036d7e21e3c59b79dd0dfc250ce2a84aa106c3f6d7289e37acf12066540f",
+    "crates/cambium/cambium-winit-a11y/src/namespace_tests.rs": "bc10c51fe1ca58c15451445b160703bee624a20f4b0dc3361a498a01d20a8b61",
+    "crates/cambium/mesquite/src/lane.rs": "804d808f43b47572cd0922610809503829283d58be7a1bcb03e301b23f7e15a3",
+    "crates/cambium/mesquite/src/probe_tests.rs": "cea106796f27ce3da3640665ce0970cda2479f8cdaa6bd8d963fc9d742a197e7",
+    "crates/cambium/mesquite/src/tests.rs": "ffef1920bf9b320a0d0eaa8aef4278b9ff4c72d6dc246df665aa937e2a9c0cbb",
+    "support/family-promotion/native-id-consumer/Cargo.lock": "18e8749f5283372e7e6322446287bfb7baee7d32c96d94bfba7854ce76ca113a",
+    "support/family-promotion/native-id-consumer/Cargo.toml": "01e51bd3e0a58a88c623a897b50679bab97c056f123709fb854ab6a62cc71445",
+    "support/family-promotion/native-id-consumer/src/lib.rs": "86131afba9ea74e76cde7888b1ea5cdf44c676a64f71aff5d4721eb5e62db777",
+    "support/patches/accesskit/src/lib.rs": "d43ed410beffc1f4eea9442ab5a24846990acee0b25c757d213bb0343ad8d05c"
+  },
+  "scope": "Exact audited publisher/host/collector files, manifests, locks and unchanged supplier traversal hook; the integrated commit supplies remaining workspace source."
+}
