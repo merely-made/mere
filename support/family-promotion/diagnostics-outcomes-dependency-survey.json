@@ -1,0 +1,17 @@
+{
+  "roots": [
+    "cambium-genet-web-host",
+    "cambium-genet-winit-host",
+    "cambium-rootstock",
+    "cambium-winit-a11y",
+    "graphshell",
+    "mesquite"
+  ],
+  "packages": 1385,
+  "pelt_hits": [
+    {
+      "name": "pelt-core",
+      "path": "C:\\Users\\mark_\\Code\\worktrees\\mere-publication-outcomes\\ports\\pelt\\core\\Cargo.toml"
+    }
+  ]
+}
