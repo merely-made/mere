@@ -294,6 +294,11 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                     .then(|| (id.clone(), p.generation))
             });
             let previous = self.presentation.get(&key).cloned();
+            // Focus loss and pointer cancellation belong to the admitted receiver,
+            // before its shared input plane becomes hidden.
+            if !visible && previous.as_ref().is_some_and(|state| state.1.is_some()) {
+                self.contents.get_mut(&key).unwrap().focus(false);
+            }
             if previous.as_ref().map(|state| state.0) != Some(visible) {
                 self.contents.get_mut(&key).unwrap().set_hidden(!visible);
             }
@@ -304,10 +309,12 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                         delivered_focus = None;
                     }
                 }
-                self.contents
-                    .get_mut(&key)
-                    .unwrap()
-                    .focus(delivered_focus.is_some());
+                if visible {
+                    self.contents
+                        .get_mut(&key)
+                        .unwrap()
+                        .focus(delivered_focus.is_some());
+                }
             }
             self.presentation.insert(key, (visible, delivered_focus));
         }
@@ -325,6 +332,22 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                 && self.contents.contains_key(&p.value.content)
         })
     }
+    /// Lend the exact prepared receiver for shared presentation. The same
+    /// placement admission and semantic revalidation apply as for legacy frames.
+    #[cfg(feature = "cue")]
+    pub fn cue_content_mut(&mut self, id: &P) -> Result<&mut PeltContent<F>, String> {
+        self.prepare(id)?;
+        let key = &self
+            .placements
+            .get(id)
+            .expect("prepare admitted placement")
+            .value
+            .content;
+        self.contents
+            .get_mut(key)
+            .ok_or_else(|| "placement content was retired".into())
+    }
+
     pub fn frame(&mut self, id: &P) -> Option<PeltLayer<F>> {
         self.try_frame(id).ok().flatten()
     }

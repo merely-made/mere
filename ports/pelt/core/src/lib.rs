@@ -795,7 +795,7 @@ impl<F: 'static> PeltController<F> {
     /// work that only contributes to a visible frame.
     pub fn set_hidden(&mut self, hidden: bool) {
         self.framed = None;
-        self.session.as_mut().set_hidden(hidden);
+        let _ = inker::webcue::Surface::set_visible(&mut self.session, !hidden);
     }
 
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
