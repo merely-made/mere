@@ -115,6 +115,8 @@ struct Args {
     unlock: bool,
     /// With `--unlock`: have the resident show its own prompt instead.
     native: bool,
+    /// Prefer an enrolled passphrase over OS presence in native unlock prompts.
+    prefer_passphrase: bool,
     /// `--passphrase-fd 0`: the harness's passphrase on standard input
     /// (vault lock ruling 65).
     #[cfg(feature = "passphrase-fd")]
@@ -154,6 +156,12 @@ struct PairRequest {
     label: String,
     /// Relayed for a device that cannot announce itself.
     prekey: Option<String>,
+}
+
+impl Args {
+    fn native_identity_ui(&self) -> SystemNativeIdentityUi {
+        SystemNativeIdentityUi::default().with_passphrase_preference(self.prefer_passphrase)
+    }
 }
 
 #[tokio::main(flavor = "multi_thread")]
@@ -387,6 +395,7 @@ fn parse_args() -> Result<Args, String> {
     let mut enroll_passphrase = false;
     let mut unlock = false;
     let mut native = false;
+    let mut prefer_passphrase = false;
     #[cfg(feature = "passphrase-fd")]
     let mut passphrase_fd = None;
     #[cfg(feature = "personal-sync")]
@@ -483,6 +492,7 @@ fn parse_args() -> Result<Args, String> {
             "--enroll-passphrase" => enroll_passphrase = true,
             "--unlock" => unlock = true,
             "--native" => native = true,
+            "--prefer-passphrase" => prefer_passphrase = true,
             #[cfg(feature = "passphrase-fd")]
             "--passphrase-fd" => {
                 let fd = argv.next().ok_or("--passphrase-fd needs a value")?;
@@ -625,6 +635,7 @@ fn parse_args() -> Result<Args, String> {
         enroll_passphrase,
         unlock,
         native,
+        prefer_passphrase,
         #[cfg(feature = "passphrase-fd")]
         passphrase_fd,
         #[cfg(feature = "personal-sync")]
@@ -778,7 +789,7 @@ fn usage() -> &'static str {
      [--agent-endpoint <standard-endpoint>] \
      [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
      [--log-file <path>] [--log-filter <directives>] [--events-file <path>] [--diagnostics-config <path>] [--resident-diagnostics] \
-     [--installed]\n\
+     [--installed] [--prefer-passphrase]\n\
      personal sync: [--sync-graph <name>] [--sync-store <path>] \
      [--sync-root <64-hex-public-root>] [--sync-peer-node <64-hex-node-id>] \
      [--sync-peer <ticket>] [--sync-relay <url>] \
@@ -801,7 +812,7 @@ fn usage() -> &'static str {
     "usage: djinn [--dir <vault-dir>] [--profile <name>] \
      [--agent-endpoint <standard-endpoint>] \
      [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
-     [--log-file <path>]\n\
+     [--log-file <path>] [--prefer-passphrase]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
 
@@ -847,6 +858,7 @@ async fn start_vault(args: &Args, events: &EventLog) -> Result<startup_vault::St
     let given = given_passphrase(args)?;
     let choice = startup_vault::choose(&args.vault_dir, given.is_some());
     let vault_dir = args.vault_dir.clone();
+    let native_ui = args.native_identity_ui();
     let events = events.clone();
     // A dialog or a terminal read blocks; it gets a thread of its own.
     tokio::task::spawn_blocking(move || {
@@ -863,9 +875,7 @@ async fn start_vault(args: &Args, events: &EventLog) -> Result<startup_vault::St
             None => startup_vault::open(
                 &vault_dir,
                 choice,
-                &mut startup_vault::NativeOrTerminal {
-                    native: SystemNativeIdentityUi::default(),
-                },
+                &mut startup_vault::NativeOrTerminal { native: native_ui },
                 &mut waiting,
                 &mut sleep,
             ),
@@ -977,7 +987,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // plan, D15): the host, its native surface and its wallet root.
     let keeper = Arc::new(
         Keeper::new(Arc::clone(&personae))
-            .with_ui(Arc::new(SystemNativeIdentityUi::default()))
+            .with_ui(Arc::new(args.native_identity_ui()))
             .with_wallet_root(args.data_root.clone()),
     );
     // The status follows the lock (ruling 31's watch channel; harness H4).
@@ -999,11 +1009,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // `djinn --unlock --native` shows the resident's own prompt (ruling 47).
     let native_unlocker: resident_status::NativeUnlocker = {
         let personae = Arc::clone(&personae);
+        let native_ui = args.native_identity_ui();
         Arc::new(move || {
             let prompt = || {
                 djinn::identity_ui::apply_native_identity_action(
                     &personae,
-                    &SystemNativeIdentityUi::default(),
+                    &native_ui,
                     djinn::door::browser_carrier::NativeIdentityAction::UnlockVault,
                 )
             };
