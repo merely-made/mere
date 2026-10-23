@@ -25,10 +25,13 @@ use super::actions::{AdvertisedAction, ArrangementAction};
 /// The most items the canvas describes at once (F67).
 pub const DESCRIBED_ITEMS: usize = 200;
 
-/// Stable action keys for members described to a reader. Keys are never reused
-/// across canvases, even when the graph reuses a petgraph slot or a member is
-/// removed and later restored. Model reconciliation authors these identities;
-/// describing or activating an item only reads them.
+/// Action keys allocated from a process-wide nonreused sequence. A member keeps
+/// its key until reconciliation observes its removal. Separate removal/restoration
+/// boundaries receive a new key, including when graph slots are reused.
+/// Removal/recreation of the same member hidden inside one `ingest_graph` closure
+/// is not yet witnessed; it can retain the old key. See the diagnostics activation
+/// review and its retained Canvas ABA reproduction before claiming that boundary.
+/// Reconciliation authors identities; describing/activating only reads them.
 #[derive(Default)]
 pub(super) struct DescribedKeyRegistry {
     pub(super) by_member: std::collections::HashMap<uuid::Uuid, u64>,

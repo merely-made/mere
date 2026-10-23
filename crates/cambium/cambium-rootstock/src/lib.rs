@@ -67,11 +67,12 @@ pub mod producer;
 mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
-    ProducedScene, ProducedTexture, ProducerAction, ProducerChildLifetime, ProducerChildToken,
-    ProducerContext, ProducerError, ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats,
-    ProducerGpuRemapError, ProducerImageIdentity, ProducerNode, ProducerRegistrationError,
-    ProducerRegistry, ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource,
-    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
+    ProducedScene, ProducedTexture, ProducerAction, ProducerActionDispatch, ProducerChildLifetime,
+    ProducerChildToken, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFramePurpose,
+    ProducerFrameStats, ProducerGpuRemapError, ProducerImageIdentity, ProducerNode,
+    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
+    ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
+    TextureProducer,
 };
 pub use scene_producer::SceneProducer;
 

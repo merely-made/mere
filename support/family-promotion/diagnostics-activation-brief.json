@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-23",
+  "basis": "fcc483e49eba1feced106653b662c26ddb299bbe",
+  "scope": "Expired child tokens, checked producer activation and owner-borrowed retained-content dispatch; keep custom model/action and guest migrations explicit",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "Native host/producer cohort and ABA/expired-token controls",
+    "Graphshell retained-content and canvas owner controls",
+    "Wasm browser host, embedding and standalone native consumer checks",
+    "Source and qualification hashes, documentation baseline/final and WIP preservation"
+  ],
+  "done_conditions": [
+    "Expired weak children cannot publish/admit/activate even if cached tokens compare equal",
+    "Raw operation captures entry context once; published and queued requests retain original life",
+    "Host passes admitted child life into checked activation; Rc wrapper keeps the mutable producer borrow",
+    "Retained ContentSlot validates child identity and dispatches under one model borrow",
+    "Stale/refused activation is not reported Dispatched or sent through after-dispatch",
+    "Custom interior model/action ABA, guest and platform receiving remain tracked"
+  ]
+}

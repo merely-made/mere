@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-23",
+  "ownership": {
+    "Rootstock": "Freeze raw entry context once; preserve published/queued bindings; semantic admission and current contributor liveness; typed dispatch result",
+    "Producer registry": "Delegate the admitted child token to checked activation; no new identity capture at dispatch",
+    "Rc<RefCell<P>>": "One mutable P borrow around checked validation and dispatch",
+    "ContentProducer/ContentSlot": "One slot borrow across live-token comparison and existing revision-qualified semantic activation; raw/checked entry share one implementation",
+    "Pictograph": "Authored described-key registry; endpoint reconciliation cannot observe arbitrary same-call removal/restoration"
+  },
+  "fixed_bugs": [
+    "Expired cached weak child tokens could compare equal and pass publication/admission; explicit liveness now rejects them",
+    "Final admission callbacks could replace a child after returning its old token; checked activation refuses that old life",
+    "Raw requests now freeze operation-entry contributor identity before callbacks instead of following a replacement",
+    "Stale activation and producer decline no longer run after-dispatch hooks as if dispatched"
+  ],
+  "boundaries": [
+    "Default checked method assumes observational child reads and a directly owned model. Deeper shared models must override under their real mutable owner borrow.",
+    "No host check can recover hidden model transitions or make a lying/impure contributor truthful.",
+    "ProducerActionDispatch is dispatch/refusal, not durable or asynchronous completion. Trusted current-context act remains available; host ingress uses act_checked.",
+    "Optional child None keeps the explicit never-reused-key contract. Cached expired Some is never treated as legacy None."
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "Canvas graph mutation lifetime witness",
+      "gap": "ingest_graph reconciles described keys after a caller closure. Same UUID removal/recreation hidden inside that closure can preserve an old described key. Existing between-call controls do not cover this.",
+      "done_condition": "Kernel/model emits an incarnation or removal witness at mutation time and all Canvas ingestion paths receive it; retain live identities on ordinary updates. Do not blanket-invalidate unrelated children.",
+      "evidence": "diagnostics-activation-canvas-aba.patch and diagnostics-activation-canvas-aba-red.json; lifecycle.rs::ingest_graph and reader.rs::DescribedKeyRegistry::reconcile"
+    },
+    {
+      "owner": "Custom producer/model and action lifetime intake",
+      "gap": "Internal shared owners must override checked activation; reassigning an action ID within an unchanged child life needs an owner-checked action revision or a new child life.",
+      "done_condition": "Inventory action-bearing adapters; receive real owner borrow/transaction and action ABA controls per adapter"
+    },
+    {
+      "owner": "Supplier and external consumer intake",
+      "gap": "Local AccessKit traversal patch still requires consumer root patch/lock intake.",
+      "done_condition": "Promote supplier API and coordinate external pins"
+    },
+    {
+      "owner": "Guest namespace and platform runtime",
+      "gap": "ROOT-only namespace, guest/selection ingress and headed AT/window/canvas lifecycle remain separate.",
+      "done_condition": "Owner-qualified guest IDs and exact-pin install/reset/replay/late-event/physical handoff controls"
+    },
+    {
+      "owner": "Full leaf rendering and actor outcomes",
+      "gap": "Intrinsic sizing/Path-B raster and actor terminal outcomes remain independently owned.",
+      "done_condition": "Receive those concrete paths without relabeling dispatch/publication as completion"
+    }
+  ],
+  "qualification": "diagnostics-activation-qualification.json",
+  "retained_byte_cap": 10000000,
+  "status": "Bounded checked activation implemented and automated receiving qualified; same-call Canvas ABA remains reproduced and open",
+  "known_open_failure": {
+    "receipt": "diagnostics-activation-canvas-aba-red.json",
+    "patch": "diagnostics-activation-canvas-aba.patch",
+    "assertion": "Old captured Pin must not act on same-call member recreation; actual recreated member is Pinned",
+    "scope": "Red reproduction is retained as an unapplied source patch, not ignored or included among passing acceptance tests. The temporary test source was restored byte-for-byte.",
+    "next_owner_work": "Mutation-time member incarnation/removal witness across kernel graph and Canvas ingestion; action-ID/shared-owner intake follows.",
+    "false_claim_repair": "Pictograph reader comments now state the reconciliation boundary and known same-call limitation; this post-gate change is documentation only."
+  },
+  "acceptance": {
+    "native_passed": 295,
+    "native_existing_ignored": 7,
+    "retained_content_passed": 15,
+    "retained_content_existing_ignored": 1,
+    "canvas_reader_passed": 10,
+    "compile": [
+      "browser Wasm",
+      "embedding",
+      "standalone native consumer"
+    ]
+  }
+}

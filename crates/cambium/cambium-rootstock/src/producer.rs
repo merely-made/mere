@@ -19,6 +19,14 @@ pub use netrender::SourceAlpha;
 mod bridge;
 mod child_lifetime;
 pub use child_lifetime::{ProducerChildLifetime, ProducerChildToken};
+
+/// Producer dispatch, not durable or asynchronous operation completion.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProducerActionDispatch {
+    Dispatched,
+    Declined,
+    StaleTarget,
+}
 pub(crate) mod registry;
 pub use paint_list_render::bundle::{PortablePaintCapture, ProducerSource};
 pub use registry::PortableCaptureError;
@@ -179,10 +187,31 @@ pub trait TextureProducer {
 
     /// A reader invoked action `id` of the drawn node `key` (a
     /// [`ProducerNode`]'s own [`ProducerAction`]). Returns whether the producer
-    /// carried it out; `false`, the default, for one it does not know.
+    /// dispatched it; `false`, the default, for one it does not know. This is
+    /// current-context ingress; the host uses `act_checked` for admitted requests.
     fn act(&mut self, key: u64, id: &str) -> bool {
         let _ = (key, id);
         false
+    }
+
+    /// Validate the admitted child's life at activation. Producers whose model
+    /// is behind another shared handle must override this and hold that model's
+    /// mutable borrow across validation and dispatch. This default covers a
+    /// directly owned model; it cannot make arbitrary interior state atomic.
+    fn act_checked(
+        &mut self,
+        key: u64,
+        id: &str,
+        expected: Option<&ProducerChildToken>,
+    ) -> ProducerActionDispatch {
+        if !ProducerChildToken::matches_current(expected, self.child_lifetime(key).as_ref()) {
+            return ProducerActionDispatch::StaleTarget;
+        }
+        if self.act(key, id) {
+            ProducerActionDispatch::Dispatched
+        } else {
+            ProducerActionDispatch::Declined
+        }
     }
 }
 
@@ -306,6 +335,14 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     }
     fn act(&mut self, key: u64, id: &str) -> bool {
         self.borrow_mut().act(key, id)
+    }
+    fn act_checked(
+        &mut self,
+        key: u64,
+        id: &str,
+        expected: Option<&ProducerChildToken>,
+    ) -> ProducerActionDispatch {
+        self.borrow_mut().act_checked(key, id, expected)
     }
 }
 
