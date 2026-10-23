@@ -78,6 +78,18 @@ fn title(graph: &Graph, node: Uuid) -> Option<String> {
         .map(|(_, node)| node.title.clone())
 }
 
+async fn backend_snapshot(backend: &MemoryBackend) -> BTreeMap<String, Vec<u8>> {
+    let mut keys = backend.list("").await.unwrap();
+    keys.sort();
+    let mut snapshot = BTreeMap::new();
+    for key in keys {
+        if let Some(value) = backend.get(&key).await.unwrap() {
+            snapshot.insert(key, value);
+        }
+    }
+    snapshot
+}
+
 fn related(graph: &Graph, from: Uuid, to: Uuid) -> bool {
     match (graph.get_node_by_id(from), graph.get_node_by_id(to)) {
         (Some((from, _)), Some((to, _))) => !graph.persisted_edges_between(from, to).is_empty(),
@@ -827,6 +839,252 @@ fn redoing_an_undone_merge_marks_the_source_again() {
             .merged
             .clone();
         assert_eq!(mark.map(|mark| mark.into), Some(target.id()));
+    });
+}
+
+// Exercise the transaction boundary, not just the held handle's cached
+// `manifest.merged`: target redo persists merged.json without advancing the
+// source logs, so a handle opened after undo must refuse atomically.
+#[test]
+fn source_transaction_refuses_after_another_handle_redoes_merge() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(other(), vec![retitle(id(1), "Branch")])
+            .await
+            .unwrap();
+        // `branch_at` currently creates an unqualified copy regardless of
+        // its parent's placement. Reopen the durable source, qualify its full
+        // journal through the supported legacy receipt path, and prove the
+        // fixture can prepare an addressable publication before merging it.
+        let mut branch = mere.open(branch.id()).await.unwrap();
+        let cutoff = branch.journal().live_cursor();
+        branch.qualify_legacy(cutoff, vec![]).await.unwrap();
+        assert!(branch.prepare_resident_publication().is_ok());
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        mere.apply_merge(&mut target, &mut branch, plan, &BTreeMap::new(), person())
+            .await
+            .unwrap();
+
+        // Persist target undo, which removes merged.json from the source.
+        target.undo_now(person()).unwrap().unwrap();
+        let undone = target.pending(wall_clock_now()).unwrap();
+        assert!(
+            undone
+                .ops()
+                .iter()
+                .any(|op| matches!(op, WriteOp::Delete { key } if key.ends_with("/merged.json")))
+        );
+        mere.backend.apply(undone.ops()).await.unwrap();
+        target.stored(undone);
+        let mut held = mere.open(branch.id()).await.unwrap();
+        assert!(held.manifest().merged.is_none());
+        let source_title_before = title(held.graph(), id(1));
+        let journal_before = held.journal().live_cursor();
+        let changes_before = held.changes().len();
+
+        // Redo writes the marker to the backend, without updating `held`.
+        target.redo(person()).await.unwrap().unwrap();
+        let reopened_after_redo = mere.open(branch.id()).await.unwrap();
+        assert_eq!(
+            reopened_after_redo
+                .manifest()
+                .merged
+                .as_ref()
+                .map(|mark| mark.into),
+            Some(target.id())
+        );
+        assert!(held.manifest().merged.is_none());
+        let durable_before_refusal = backend_snapshot(&store).await;
+
+        let key = held.graph().get_node_by_id(id(1)).unwrap().0;
+        let result = held
+            .transact_deltas(
+                person(),
+                vec![GraphDelta::SetNodeTitle {
+                    key,
+                    title: "stale write".into(),
+                }],
+                wall_clock_now(),
+            )
+            .await;
+        assert!(
+            matches!(result, Err(SessionError::ReadOnly(session)) if session == held.id()),
+            "a durably merged source must reject transact_deltas; got {result:?}"
+        );
+        assert_eq!(
+            backend_snapshot(&store).await,
+            durable_before_refusal,
+            "refused stale write must leave every persisted key and byte unchanged"
+        );
+        let published_result = held
+            .transact_deltas_published(
+                person(),
+                vec![GraphDelta::SetNodeTitle {
+                    key,
+                    title: "stale published write".into(),
+                }],
+                wall_clock_now(),
+            )
+            .await;
+        assert!(
+            matches!(published_result, Err(SessionError::ReadOnly(session)) if session == held.id()),
+            "a durably merged source must reject published transactions; got {published_result:?}"
+        );
+        assert_eq!(
+            backend_snapshot(&store).await,
+            durable_before_refusal,
+            "refused published transaction must leave every persisted key and byte unchanged"
+        );
+
+        // Refusal is atomic from both the caller's handle and durable reopen:
+        // no candidate graph or history entries become visible.
+        assert_eq!(title(held.graph(), id(1)), source_title_before);
+        assert_eq!(held.journal().live_cursor(), journal_before);
+        assert_eq!(held.changes().len(), changes_before);
+        let reopened_after_refusal = mere.open(branch.id()).await.unwrap();
+        assert_eq!(
+            title(reopened_after_refusal.graph(), id(1)),
+            source_title_before
+        );
+        assert_eq!(
+            reopened_after_refusal.journal().live_cursor(),
+            journal_before
+        );
+        assert_eq!(reopened_after_refusal.changes().len(), changes_before);
+        assert_eq!(
+            reopened_after_refusal
+                .manifest()
+                .merged
+                .as_ref()
+                .map(|mark| mark.into),
+            Some(target.id())
+        );
+    });
+}
+
+// Positive control: after undo removes the durable marker, the held source
+// handle is legitimately writable and a real transaction persists its edit.
+#[test]
+fn source_transaction_after_undo_without_redo_is_allowed() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(other(), vec![retitle(id(1), "Branch")])
+            .await
+            .unwrap();
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        mere.apply_merge(&mut target, &mut branch, plan, &BTreeMap::new(), person())
+            .await
+            .unwrap();
+
+        target.undo_now(person()).unwrap().unwrap();
+        let undone = target.pending(wall_clock_now()).unwrap();
+        mere.backend.apply(undone.ops()).await.unwrap();
+        target.stored(undone);
+        let mut held = mere.open(branch.id()).await.unwrap();
+        assert!(held.manifest().merged.is_none());
+        let key = held.graph().get_node_by_id(id(1)).unwrap().0;
+        held.transact_deltas(
+            person(),
+            vec![GraphDelta::SetNodeTitle {
+                key,
+                title: "undo control write".into(),
+            }],
+            wall_clock_now(),
+        )
+        .await
+        .unwrap();
+        let reopened = mere.open(branch.id()).await.unwrap();
+        assert_eq!(
+            title(reopened.graph(), id(1)).as_deref(),
+            Some("undo control write")
+        );
+        assert!(reopened.manifest().merged.is_none());
+    });
+}
+
+// A fresh open sees the marker written by redo and refuses through the same
+// actual transaction API; this separates stale-handle admission from normal
+// read-only enforcement.
+#[test]
+fn freshly_opened_source_transaction_after_redo_is_refused() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(other(), vec![retitle(id(1), "Branch")])
+            .await
+            .unwrap();
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        mere.apply_merge(&mut target, &mut branch, plan, &BTreeMap::new(), person())
+            .await
+            .unwrap();
+
+        target.undo_now(person()).unwrap().unwrap();
+        let undone = target.pending(wall_clock_now()).unwrap();
+        mere.backend.apply(undone.ops()).await.unwrap();
+        target.stored(undone);
+        target.redo(person()).await.unwrap().unwrap();
+
+        let mut fresh = mere.open(branch.id()).await.unwrap();
+        assert_eq!(
+            fresh.manifest().merged.as_ref().map(|mark| mark.into),
+            Some(target.id())
+        );
+        let key = fresh.graph().get_node_by_id(id(1)).unwrap().0;
+        assert!(matches!(
+            fresh
+                .transact_deltas(
+                    person(),
+                    vec![GraphDelta::SetNodeTitle {
+                        key,
+                        title: "fresh stale write".into(),
+                    }],
+                    wall_clock_now(),
+                )
+                .await,
+            Err(SessionError::ReadOnly(session)) if session == fresh.id()
+        ));
+    });
+}
+
+// Reload control for a long-lived source handle: an explicit marker refresh
+// restores the existing cached read-only policy after target redo.
+#[test]
+fn reloading_source_merged_mark_after_redo_restores_read_only_policy() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut target = parent(&mere).await;
+        let mut branch = branch_of(&mere, &target).await;
+        branch
+            .apply(other(), vec![retitle(id(1), "Branch")])
+            .await
+            .unwrap();
+        let plan = mere.merge_in(&target, &branch).await.unwrap();
+        mere.apply_merge(&mut target, &mut branch, plan, &BTreeMap::new(), person())
+            .await
+            .unwrap();
+
+        target.undo_now(person()).unwrap().unwrap();
+        let undone = target.pending(wall_clock_now()).unwrap();
+        mere.backend.apply(undone.ops()).await.unwrap();
+        target.stored(undone);
+        let mut held = mere.open(branch.id()).await.unwrap();
+        target.redo(person()).await.unwrap().unwrap();
+        assert!(held.manifest().merged.is_none());
+        held.reload_merged_mark().await.unwrap();
+        assert_eq!(
+            held.manifest().merged.as_ref().map(|mark| mark.into),
+            Some(target.id())
+        );
+        assert!(held.ensure_writable().is_err());
     });
 }
 
