@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-23T05:08:21.563534+00:00",
+  "source_commit": "79ad65194898d25ee8fc0ad3d58873a1552de424",
+  "base_commit": "a6d44855b24de92ef060e16059cdacbe95135a19",
+  "cue_source_commit": "94ba59574838a70c8283d3f5d3cf3ddbb838cfc5",
+  "checks": [
+    {
+      "log": "receiving-tests.log",
+      "passed": 273
+    },
+    {
+      "log": "pelt-gpu.log",
+      "passed": 2
+    },
+    {
+      "log": "graphshell-tests-and-gpu.log",
+      "passed": 16
+    }
+  ],
+  "clippy": "passed with existing workspace warnings; no warnings in the new adapter modules",
+  "doc_audit": {
+    "global_result": "failed, baseline snapshot digest mismatch and 39 missing records unchanged",
+    "new_plan": "covered by batch_109_shared_surface_receiving.md"
+  },
+  "platform": "macOS, AMD Radeon Pro Vega 56, Metal, Rust 1.99.1",
+  "scope": [
+    "shared canonical input/IME dispatch and ordered observations",
+    "accepted request correlation, bounded backpressure, retirement and cancellation retention",
+    "semantic publication invalidation and actual retained IME commit/value",
+    "two producers plus independent shell renderer on one device",
+    "retained scope/revisions and monotonic allocation epochs through renderer rebind",
+    "actual Genet pixels in Pelt Presenter and Graphshell shared TextureSource",
+    "all three native engine adapter unit suites preserved"
+  ],
+  "limits": [
+    "retained Genet Livery receiving; not full web-platform feature acceptance",
+    "native candidate-window placement and human OS assistive technology unqualified",
+    "same-scope renderer rebind; no physical GPU reset qualification",
+    "Servo/CEF/native-WebView concrete frame bindings remain engine/host integration",
+    "windowing, Windows/Linux runtime and browser WebGPU receiving remain separate"
+  ],
+  "files": {
+    "clippy.log": "11b954c0b7f74daea7721f022ce7417722ae55c61f5e3aa209388c45711bd1d9",
+    "doc-audit-initial-baseline.log": "42e5ea0af3f64023d3e0cdbc3f829f8614d8f9b41ece92fe510f316c03f60fa2",
+    "doc-audit.log": "2f49476e79b38013540d0c8683e22cfdc618685e42f2b75ea6cecf1057629a79",
+    "graphshell-tests-and-gpu.log": "7f9cda938ec2830b3d4dd9c271463662ea4b069a353fd14f81b18aefcfca933c",
+    "pelt-gpu.log": "d164a7ba850a887fc707cfefb934257e0865b5984c4bf55d56263c11283993d8",
+    "receiving-tests.log": "3950ae071014663b631d935abda32da8fee8601a65c1a7cfed2cee88966c6fbb",
+    "type-identity.json": "665e9ca3d6b012ec872bf15718786f725b53a13148212488863fdd850467a9b4",
+    "integration-receiving-tests.log": "9fe8d037df8af854d3a2dccf37f4fcd8eeb4e1e470b8fbf50d86d4f3ccf8595f",
+    "integration-pelt-gpu.log": "69c2c4a130b8bd29743ddf9cc1bc21c14bd5410b6a27ffdad134cccdc92af0af",
+    "integration-graphshell-tests-and-gpu.log": "51f056a5ff02665c8b2dd2e7cd09ba2219cf707cda3e04fdebca512db3755193"
+  },
+  "source_files": {
+    "crates/inker/inker/src/cue.rs": "47656bde42b005b14db3ef834b38ec0b03c3d88f3f33c45ea05a58fbbee45d07",
+    "crates/inker/inker/src/cue_browser.rs": "25e6eb052f3b3ebdc9ce8c15d16ac7f962946235a377273408247e0f8bb09592",
+    "ports/pelt/core/src/cue.rs": "8e483cab4af2b674df104573a23e29b6bfa0eb3ea0fa9587e83431a0505f3f85",
+    "ports/pelt/core/src/lib.rs": "95407a23e2400f0064708a709d58ce6f77dab64d1f3decd0864901a159d59bb8",
+    "ports/graphshell/src/retained_content/producer.rs": "22d0db11329f8f90988f78d46a49cc198ea31b90953378eb33aa36e3c5b8b0f9",
+    "ports/graphshell/src/retained_content.rs": "094b0b6f1ff2e73f3faeed6cfd7e3ded4a55359971928d007c6a956b25e21792",
+    "Cargo.toml": "32cb52c0be9d7b8fe8dae119507b46d55dff470baa758cbc7b73b6015e5f756f",
+    "Cargo.lock": "57db239ec41843782506c69e11fff96cfa669072da7df04440b991b7929b8419"
+  },
+  "combined_main": "Native namespace remapping/AccessKit patch and Cue document-API patch retained together; all receiving checks repeated after rebase.",
+  "supplier_preservation": {
+    "before": {
+      "primary": "1e88d4028570df99ac5a0bb2983d060b94abcfb6",
+      "worktree": "694d8d20d2acb375f4abfb0bfe58c5e5f3ee6092"
+    },
+    "after": {
+      "primary": "694d8d20d2acb375f4abfb0bfe58c5e5f3ee6092",
+      "status": ""
+    },
+    "implementation_worktree_removed": true
+  },
+  "final_integration": {
+    "commit": "7039ba3860b9f5a5811b8c7b5f62e4cee90f4ab7",
+    "upstream_base": "f76758b6bb36d153d4704fe927a25c518830d5d5",
+    "qualified_at": "2026-10-23T05:16:08.020482+00:00",
+    "checks": [
+      {
+        "log": "integration-receiving-tests.log",
+        "passed": 274
+      },
+      {
+        "log": "integration-pelt-gpu.log",
+        "passed": 2
+      },
+      {
+        "log": "integration-graphshell-tests-and-gpu.log",
+        "passed": 16
+      }
+    ],
+    "note": "Merged current-main Pelt physical-to-layout input conversion and removal of display-scale rewrites. Adapter source files and dependency lock unchanged; all receiving suites repeated on the merged source."
+  }
+}

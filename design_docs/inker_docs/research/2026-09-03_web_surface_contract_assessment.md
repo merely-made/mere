@@ -446,16 +446,75 @@ observed acceleration. Turnstone's inspector
 `WebSurfaceCapabilities` fields, so the full report is not yet the taxonomy
 users see.
 
-## Open decisions
+## Recorded choices and remaining cues
 
-- Whether the wgpu-free contract needs a separate `webcue` core package
-  within the `wgpu-cue` project (names chosen in the 2026-10-22 cues).
-- The crate's home: Genet, the Graft repository, a repository of its own, or
-  Inker (see the 2026-10-22 cues).
-- Whether one contract names both frame directions, owned native frame and
-  host-lent device, or whether `TextureProducer` stays a separate in-device
-  contract beside it.
-- Whether synchronous compatibility helpers live in adapter crates only or in
-  the API crate as explicitly blocking convenience functions.
-- Whether CPU snapshot and native child overlay outputs are first-class v1 frame
-  transports or deliberately deferred until a consumer needs them.
+- **The name and home are settled.** `wgpu-cue` lives in its own repository;
+  `webcue` is its published wgpu-free core. Genet and Inker supply adapters.
+  Keeping these choices visible avoids reopening package placement as a missing
+  architecture decision.
+- **Both frame directions are in the contract.** `TextureSource` renders on the
+  host's device; `FrameSource` hands over move-owned native or CPU frames.
+  The host's presenter checks scope, extent, device identity and revisions.
+  CPU RGBA is implemented; native child overlays still need an explicit host
+  lifecycle rather than an invented compositable texture.
+- **Synchronous conveniences still need a deliberate home.** Moving blocking
+  capture/import helpers into an adapter keeps a shared UI call from silently
+  acquiring a device wait. Any convenience API that blocks needs to say so.
+- **Reports describe the installed binding.** The full supplier API, the
+  shared subset and native extensions can differ. A complete live report makes
+  those limits inspectable without treating an engine name as a feature promise.
+
+## Shared-contract receiving (2026-10-23)
+
+- **The retained session stays with its owner.** Inker's `SessionSurface`
+  adapts the canonical document session already held by Pelt. Genet keeps its
+  admitted resources, fonts and document state; acquisition, routing and history
+  stay with the host. Another static HTML session would have lost those owners.
+- **Retained input has one dispatch and observation mapping.** Webcue supplies
+  the canonical dispatch plus ordered input-result, cursor, navigation and form
+  observations. Inker and the standalone Genet adapter use those functions.
+  Input results preserve capture and editability; dedicated navigation/form
+  events carry host policy once. Unrepresentable modifiers are refused.
+- **Both frame directions reach Pelt's shared-content API.** Its source is a
+  native frame reader or a host-device texture producer behind the same control
+  object. Inker's browser binding requires an explicit owned frame conversion
+  from the engine/host pair. Existing native browser extensions remain explicit;
+  the shared subset reports unsupported operations rather than inheriting a
+  supplier's theoretical capabilities.
+- **Private quality state makes the host device shareable.** Genet and
+  Graphshell use a private retained renderer on the host's existing device.
+  Producers and the shell cannot consume one another's quality results. This
+  adds renderer cache cost, while removing the synchronous checked raster wait
+  from the migrated producer path. Content revisions stay with the retained
+  receiver; allocation epochs survive renderer reconstruction.
+- **A replacement has a final stream.** Pelt reserves bounded space for the old
+  scope's accepted-request cancellations before replacing its session. A failed
+  reservation retains the actual receiver. Semantic mutations invalidate old
+  publication keys before another frame, and qualified GPU frames advance the
+  capability report from constructed to observed.
+- **Publication and qualification have separate bounds.** `webcue` and
+  `wgpu-cue` 0.1.1 are published; `wgpu-cue-netrender` is a source adapter pinned
+  to Cue `94ba59574838a70c8283d3f5d3cf3ddbb838cfc5`. Retained Genet input/IME,
+  semantic invalidation and Metal pixels are exercised through Pelt and
+  Graphshell. Native candidate-window placement, human OS AT, physical device
+  loss and CEF/native-WebView frame bindings retain their own qualification.
+  Concrete Servo and Genet have since passed the finite headed and offscreen
+  Metal receiver on one host device; see the receiving plan and Turnstone's
+  `docs/receipts/servo_cue_20261023/`. That receiver is separate from complete
+  Turnstone product adoption and Linux/Vulkan qualification.
+
+- **The placement pool can lend its retained receiver to Cue.** Pelt's shared
+  renderer now borrows the controller already admitted by the pool. Routing,
+  host loading, history, independent Reader appearances and semantic admission
+  retain their owners. Rendering no longer requires consuming that controller
+  into a second content container; private renderer cache cost remains visible.
+- **Visibility belongs to the shared input boundary too.** Pool focus loss and
+  pointer cancellation precede hiding. Hidden retained surfaces reject late
+  shared input, while reopening the placement preserves the session and gives
+  the appearance a new admission. A renderer cache never owns that lifetime.
+
+- **A pending frame must not consume a later mutation's redraw.** The retained
+  pool exposes a visual revision distinct from receiver lifetime and placement
+  admission. Input, mutable resource access, runnable work and exact due timers
+  can require a follow-up frame after an older submission completes. Idle
+  layout preparation does not continually invalidate that submission.

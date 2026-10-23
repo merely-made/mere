@@ -71,6 +71,8 @@ pub struct PeltControllerPool<K, P, F> {
     placements: HashMap<P, Placement<K>>,
     order: Vec<P>,
     generation: u64,
+    paint_epoch: u64,
+    paint_revisions: HashMap<K, u64>,
     captures: HashMap<i32, Capture<P>>,
     last_pump: Option<(u64, bool)>,
     pending: HashSet<K>,
@@ -94,6 +96,8 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             placements: HashMap::new(),
             order: Vec::new(),
             generation: 0,
+            paint_epoch: 0,
+            paint_revisions: HashMap::new(),
             captures: HashMap::new(),
             last_pump: None,
             pending: HashSet::new(),
@@ -101,10 +105,26 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             presentation: HashMap::new(),
         }
     }
+    /// Revision of host-observed visual mutations. A receiver scope identifies
+    /// lifetime; this value lets asynchronous presenters arrange a final redraw
+    /// when input/resource/timer work arrives during an older pending frame.
+    pub fn paint_revision(&self, key: &K) -> Option<u64> {
+        self.paint_revisions.get(key).copied()
+    }
+    pub fn invalidate_paint(&mut self, key: &K) {
+        if self.contents.contains_key(key) {
+            self.paint_epoch = self
+                .paint_epoch
+                .checked_add(1)
+                .expect("paint revision exhausted");
+            self.paint_revisions.insert(key.clone(), self.paint_epoch);
+        }
+    }
     pub fn content(&self, key: &K) -> Option<&PeltContent<F>> {
         self.contents.get(key)
     }
     pub fn content_mut(&mut self, key: &K) -> Option<&mut PeltContent<F>> {
+        self.invalidate_paint(key);
         self.last_pump = None;
         self.prepared.remove(key);
         self.a11y_invalidate(key);
@@ -126,6 +146,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             old.set_hidden(true);
         }
         let old = self.contents.insert(key.clone(), content);
+        self.invalidate_paint(&key);
         for id in placements {
             self.generation = self
                 .generation
@@ -161,6 +182,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             content.focus(false);
             content.set_hidden(true);
         }
+        self.paint_revisions.remove(key);
         self.contents.remove(key)
     }
     pub fn keys(&self) -> impl Iterator<Item = &K> {
@@ -294,6 +316,11 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                     .then(|| (id.clone(), p.generation))
             });
             let previous = self.presentation.get(&key).cloned();
+            // Focus loss and pointer cancellation belong to the admitted receiver,
+            // before its shared input plane becomes hidden.
+            if !visible && previous.as_ref().is_some_and(|state| state.1.is_some()) {
+                self.contents.get_mut(&key).unwrap().focus(false);
+            }
             if previous.as_ref().map(|state| state.0) != Some(visible) {
                 self.contents.get_mut(&key).unwrap().set_hidden(!visible);
             }
@@ -304,10 +331,15 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                         delivered_focus = None;
                     }
                 }
-                self.contents
-                    .get_mut(&key)
-                    .unwrap()
-                    .focus(delivered_focus.is_some());
+                if visible {
+                    self.contents
+                        .get_mut(&key)
+                        .unwrap()
+                        .focus(delivered_focus.is_some());
+                }
+            }
+            if previous != Some((visible, delivered_focus.clone())) {
+                self.invalidate_paint(&key);
             }
             self.presentation.insert(key, (visible, delivered_focus));
         }
@@ -325,6 +357,22 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                 && self.contents.contains_key(&p.value.content)
         })
     }
+    /// Lend the exact prepared receiver for shared presentation. The same
+    /// placement admission and semantic revalidation apply as for legacy frames.
+    #[cfg(feature = "cue")]
+    pub fn cue_content_mut(&mut self, id: &P) -> Result<&mut PeltContent<F>, String> {
+        self.prepare(id)?;
+        let key = &self
+            .placements
+            .get(id)
+            .expect("prepare admitted placement")
+            .value
+            .content;
+        self.contents
+            .get_mut(key)
+            .ok_or_else(|| "placement content was retired".into())
+    }
+
     pub fn frame(&mut self, id: &P) -> Option<PeltLayer<F>> {
         self.try_frame(id).ok().flatten()
     }
@@ -411,7 +459,8 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             self.a11y_observe(key);
         }
         let mut more = false;
-        self.pending.clear();
+        let previously_pending = std::mem::take(&mut self.pending);
+        let mut painted = Vec::new();
         for (key, content) in &mut self.contents {
             if content.lane() == PeltLane::Document
                 || self
@@ -419,11 +468,18 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                     .values()
                     .any(|p| &p.value.content == key && p.value.admits())
             {
-                if content.pump() {
+                let pending = content.pump();
+                if pending || previously_pending.contains(key) {
+                    painted.push(key.clone());
+                }
+                if pending {
                     more = true;
                     self.pending.insert(key.clone());
                 }
             }
+        }
+        for key in painted {
+            self.invalidate_paint(&key);
         }
         for key in &keys {
             self.a11y_observe(key);
@@ -550,7 +606,9 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             return false;
         };
         if let Some(p) = self.placements.get(&capture.placement) {
-            if let Some(content) = self.contents.get_mut(&p.value.content) {
+            let key = p.value.content.clone();
+            self.invalidate_paint(&key);
+            if let Some(content) = self.contents.get_mut(&key) {
                 if content.receiver_identity() == capture.receiver {
                     let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
                 }
@@ -701,6 +759,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             }
         }
         self.last_pump = None;
+        self.invalidate_paint(&p.content);
         let Some(content) = self.contents.get_mut(&p.content) else {
             return PeltHostEffect::default();
         };

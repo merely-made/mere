@@ -301,6 +301,5 @@ pub use reading_find::{
     find_status,
     is_find_shortcut,
 };
-pub use reading_toolbar::{ReadCommand, read_toolbar};
-mod native_style;
-pub use native_style::stylesheet_at_display_scale;
+pub use reading_toolbar::{ReadCommand, read_toolbar, RelationshipPreviewCommand, relationship_preview};
+pub mod scope_navigation;

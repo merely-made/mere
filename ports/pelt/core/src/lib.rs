@@ -30,6 +30,8 @@ use inker::{
 };
 
 pub use content::{PeltContent, PeltLane, PeltLayer};
+#[cfg(feature = "cue")]
+pub mod cue;
 pub use page_load::{
     FetchFailure, FetchOutcome, FetchRequestId, Fetched, LoadPhase, LoadedDocument, PageProgress,
 };
@@ -296,7 +298,8 @@ pub struct PeltController<F> {
     session_engines: Arc<SessionRegistry<F>>,
     surface_engines: Arc<SurfaceEngineRegistry>,
     engine_id: String,
-    session: Box<dyn DocumentSession<F>>,
+    session: inker::cue::SessionSurface<F>,
+    retired_surface_events: std::collections::VecDeque<inker::webcue::Envelope>,
     history: Vec<HistoryEntry>,
     history_index: usize,
     viewport: (u32, u32),
@@ -405,6 +408,25 @@ impl<F: 'static> PeltController<F> {
     ) -> Self {
         let engine_id = config.engine_id;
         let viewport = config.request.viewport;
+        let instance_id = next_controller_instance_id();
+        let session = inker::cue::SessionSurface::new(
+            session,
+            inker::webcue::Scope {
+                owner: instance_id.into(),
+                generation: 1,
+            },
+            engine_id.clone(),
+            config.request.address.clone(),
+            inker::webcue::Viewport {
+                width: viewport.0.max(1),
+                height: viewport.1.max(1),
+                scale: 1.,
+            },
+            session_engines
+                .get(&engine_id)
+                .is_some_and(|e| !matches!(e.a11y_capability(), A11yCapability::Opaque)),
+        )
+        .expect("validated retained session surface");
         Self {
             session_engines,
             surface_engines,
@@ -414,12 +436,13 @@ impl<F: 'static> PeltController<F> {
             }],
             engine_id,
             session,
+            retired_surface_events: Default::default(),
             history_index: 0,
             viewport,
             framed: None,
             clock,
             document_state: PeltDocumentState::Ready,
-            instance_id: next_controller_instance_id(),
+            instance_id,
             // Generation zero is reserved as "no successfully opened
             // session" for hosts that retain child trees across tiles.
             session_generation: 1,
@@ -515,11 +538,14 @@ impl<F: 'static> PeltController<F> {
     }
 
     pub fn title(&self) -> Option<String> {
-        self.session.inspect().and_then(|report| report.title)
+        self.session
+            .as_ref()
+            .inspect()
+            .and_then(|report| report.title)
     }
 
     pub fn inspect(&self) -> Option<ContentReport> {
-        self.session.inspect()
+        self.session.as_ref().inspect()
     }
 
     /// The current host-neutral document presentation state.
@@ -546,11 +572,26 @@ impl<F: 'static> PeltController<F> {
         }
     }
 
-    /// The active session's neutral seam, for host features this controller
-    /// does not wrap yet (document find, subresource delivery, a host's own
-    /// pointer path). Loading, navigation and history belong to the
-    /// controller ([`Self::input`], [`Self::command`], [`Self::open`]); a host
-    /// that drives the session directly owns any navigation that results.
+    /// Shared control plane for this installed producer. The embedding host is
+    /// the sole event drainer. Session replacement retires its scope.
+    /// Drain final old-scope events before the installed scope's stream. A
+    /// replacement preserves accepted request cancellations in this bounded queue.
+    pub fn poll_cue_event(&mut self) -> Option<inker::webcue::Envelope> {
+        self.retired_surface_events
+            .pop_front()
+            .or_else(|| inker::webcue::Surface::poll_event(&mut self.session))
+    }
+    pub fn cue_surface(&self) -> &inker::cue::SessionSurface<F> {
+        &self.session
+    }
+    pub fn cue_surface_mut(&mut self) -> &mut inker::cue::SessionSurface<F> {
+        self.session.host_address(self.address().to_owned());
+        self.framed = None;
+        &mut self.session
+    }
+
+    /// Canonical document extensions: resources, clips and engine-specific
+    /// reading controls. Loading/history stay with this controller.
     pub fn session(&self) -> &dyn DocumentSession<F> {
         self.session.as_ref()
     }
@@ -569,7 +610,7 @@ impl<F: 'static> PeltController<F> {
     /// [`Self::session_identity`] so retained host state never aliases a
     /// successful replacement or reconstructed controller.
     pub fn session_as_any_ref(&self) -> &dyn std::any::Any {
-        self.session.as_any_ref()
+        self.session.as_ref().as_any_ref()
     }
 
     /// The active document session's narrowly scoped concrete mutation surface.
@@ -580,7 +621,7 @@ impl<F: 'static> PeltController<F> {
     /// replacement or reconstructed session.
     pub fn session_as_any_mut(&mut self) -> &mut dyn std::any::Any {
         self.framed = None;
-        self.session.as_any()
+        self.session.as_mut().as_any()
     }
 
     /// Request an engine-owned page zoom through Pelt's neutral session seam.
@@ -589,7 +630,7 @@ impl<F: 'static> PeltController<F> {
     /// neither chooses a zoom policy nor reaches into an engine concrete type.
     pub fn set_page_zoom(&mut self, factor: f32) -> Result<DocumentZoomState, SessionError> {
         self.framed = None;
-        self.session.set_page_zoom(factor)
+        self.session.as_mut().set_page_zoom(factor)
     }
 
     /// Mark a successfully replaced document as visibly composed by its host.
@@ -619,7 +660,7 @@ impl<F: 'static> PeltController<F> {
     /// Its support metadata describes the currently retained semantics more
     /// precisely than the engine registration's pre-spawn capability.
     pub fn accessibility_projection(&self) -> Option<DocumentA11yProjection> {
-        self.session.accessibility_projection()
+        self.session.as_ref().accessibility_projection()
     }
 
     /// Revalidate a projected clickable target against the live session.
@@ -629,13 +670,13 @@ impl<F: 'static> PeltController<F> {
         &self,
         target: DocumentA11yNodeId,
     ) -> Option<DocumentA11yClickTarget> {
-        self.session.accessibility_click_target(target)
+        self.session.as_ref().accessibility_click_target(target)
     }
 
     /// Dispatch one non-pointer accessibility action through the active
     /// document session after the host has checked its tile/session identity.
     pub fn dispatch_accessibility_action(&mut self, request: &DocumentA11yActionRequest) -> bool {
-        let handled = self.session.dispatch_accessibility_action(request);
+        let handled = self.session.as_mut().dispatch_accessibility_action(request);
         if handled {
             self.framed = None;
         }
@@ -647,20 +688,20 @@ impl<F: 'static> PeltController<F> {
     /// Product receipts use this to verify engine-owned selection without
     /// reaching through the controller to a concrete document session.
     pub fn clip(&self) -> Option<inker::DocumentClip> {
-        self.session.clip()
+        self.session.as_ref().clip()
     }
 
     /// Links in the current retained frame, in document-local coordinates.
     /// Product hosts use this for semantic receipts and accessibility-driven
     /// activation without reaching through the controller to a concrete engine.
     pub fn links(&self) -> Vec<inker::SessionLink> {
-        self.session.links()
+        self.session.as_ref().links()
     }
 
     /// Resolve retained text to document-local pointer endpoints without
     /// exposing the concrete document engine's DOM or layout identities.
     pub fn text_target(&self, text: &str) -> Option<inker::SessionTextTarget> {
-        self.session.text_target(text)
+        self.session.as_ref().text_target(text)
     }
 
     pub fn can_go_back(&self) -> bool {
@@ -701,15 +742,15 @@ impl<F: 'static> PeltController<F> {
     /// requests another frame because the session has not settled.
     pub fn pump(&mut self) -> bool {
         self.framed = None;
-        self.session.pump(self.clock.now_ms());
-        !self.session.settled()
+        self.session.as_mut().pump(self.clock.now_ms());
+        !self.session.as_mut().settled()
     }
 
     /// Observe scheduled work without advancing time or retiring prepared
     /// geometry and semantic publications. Future timers are independent of
     /// the session's script-visible completion handshake.
     pub fn pending_work(&mut self) -> inker::session_engine::SessionPendingWork {
-        self.session.pending_work()
+        self.session.as_mut().pending_work()
     }
 
     pub fn frame(&mut self, width: u32, height: u32) -> F {
@@ -736,17 +777,17 @@ impl<F: 'static> PeltController<F> {
 
     pub fn scroll_by(&mut self, dx: f32, dy: f32) -> bool {
         self.framed = None;
-        self.session.scroll_by(dx, dy)
+        self.session.as_mut().scroll_by(dx, dy)
     }
 
     pub fn scroll_at(&mut self, x: f32, y: f32, dx: f32, dy: f32) -> bool {
         self.framed = None;
-        self.session.scroll_at(x, y, dx, dy)
+        self.session.as_mut().scroll_at(x, y, dx, dy)
     }
 
     pub fn scroll_for_key(&mut self, key: SessionScrollKey) -> bool {
         self.framed = None;
-        self.session.scroll_for_key(key)
+        self.session.as_mut().scroll_for_key(key)
     }
 
     /// Tell the retained session whether its tile is currently visible.
@@ -754,7 +795,7 @@ impl<F: 'static> PeltController<F> {
     /// work that only contributes to a visible frame.
     pub fn set_hidden(&mut self, hidden: bool) {
         self.framed = None;
-        self.session.set_hidden(hidden);
+        let _ = inker::webcue::Surface::set_visible(&mut self.session, !hidden);
     }
 
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
@@ -782,7 +823,15 @@ impl<F: 'static> PeltController<F> {
             cursor,
             capture,
             editable,
-        } = self.session.input(input);
+        } = match self.session.dispatch(input) {
+            Ok(result) => result,
+            Err(error) => {
+                return PeltHostEffect {
+                    error: Some(error.to_string()),
+                    ..Default::default()
+                };
+            },
+        };
         // Remember admission before following an input-driven navigation: its
         // successful session install must cancel this exact old receiver.
         if let Some((id, phase, button)) = pointer {
@@ -874,7 +923,10 @@ impl<F: 'static> PeltController<F> {
                 let HistoryEntry { engine_id, request } = self.history[self.history_index].clone();
                 match self.spawn_with(&engine_id, &request) {
                     Ok(session) => {
-                        self.install_session_from(engine_id, session);
+                        if let Err(error) = self.install_session_from(engine_id, session) {
+                            self.document_error(request.address, error, &mut host_effect);
+                            return host_effect;
+                        }
                         self.document_state = PeltDocumentState::Loading {
                             address: request.address.clone(),
                         };
@@ -1110,7 +1162,7 @@ impl<F: 'static> PeltController<F> {
             None => self.document_route(&request)?,
         };
         let session = self.spawn_with(&engine_id, &request)?;
-        self.install_session_from(engine_id.clone(), session);
+        self.install_session_from(engine_id.clone(), session)?;
         if route.is_some() {
             self.route = route;
         }
@@ -1261,7 +1313,9 @@ impl<F: 'static> PeltController<F> {
         match self.spawn_with(&engine_id, &request) {
             Ok(session) => {
                 let address = request.address.clone();
-                self.install_session_from(engine_id.clone(), session);
+                if let Err(error) = self.install_session_from(engine_id.clone(), session) {
+                    return self.document_error(request.address, error, host_effect);
+                }
                 if route.is_some() {
                     self.route = route;
                 }
@@ -1280,7 +1334,9 @@ impl<F: 'static> PeltController<F> {
         let HistoryEntry { engine_id, request } = self.history[index].clone();
         match self.spawn_with(&engine_id, &request) {
             Ok(session) => {
-                self.install_session_from(engine_id, session);
+                if let Err(error) = self.install_session_from(engine_id, session) {
+                    return self.document_error(request.address, error, host_effect);
+                }
                 self.history_index = index;
                 self.document_state = PeltDocumentState::Loading {
                     address: request.address.clone(),
@@ -1342,21 +1398,49 @@ impl<F: 'static> PeltController<F> {
         }
     }
 
-    fn install_session_from(&mut self, engine_id: String, session: Box<dyn DocumentSession<F>>) {
-        self.engine_id = engine_id;
-        self.install_session(session);
-    }
-
-    /// Install a session only after its factory has completed successfully.
-    /// Failed replacement attempts retain both this session and its generation.
-    fn install_session(&mut self, session: Box<dyn DocumentSession<F>>) {
-        self.cancel_pointer_capture();
-        self.framed = None;
-        self.session = session;
-        self.session_generation = self
+    fn install_session_from(
+        &mut self,
+        engine_id: String,
+        session: Box<dyn DocumentSession<F>>,
+    ) -> Result<(), String> {
+        // Reserve the entire old final stream before touching its receiver.
+        if self.retired_surface_events.len() + self.session.retirement_len() > 256 {
+            return Err(
+                "drain shared surface events before replacing the retained receiver".into(),
+            );
+        }
+        let generation = self
             .session_generation
             .checked_add(1)
-            .expect("Pelt session generation exhausted");
+            .ok_or("Pelt session generation exhausted")?;
+        let next = inker::cue::SessionSurface::new(
+            session,
+            inker::webcue::Scope {
+                owner: self.instance_id.into(),
+                generation,
+            },
+            engine_id.clone(),
+            self.address().to_owned(),
+            inker::webcue::Viewport {
+                width: self.viewport.0.max(1),
+                height: self.viewport.1.max(1),
+                scale: 1.,
+            },
+            self.session_engines
+                .get(&engine_id)
+                .is_some_and(|engine| !matches!(engine.a11y_capability(), A11yCapability::Opaque)),
+        )
+        .map_err(|error| error.to_string())?;
+        self.cancel_pointer_capture();
+        inker::webcue::Surface::retire(&mut self.session).map_err(|error| error.to_string())?;
+        while let Some(event) = inker::webcue::Surface::poll_event(&mut self.session) {
+            self.retired_surface_events.push_back(event);
+        }
+        self.session = next;
+        self.session_generation = generation;
+        self.engine_id = engine_id;
+        self.framed = None;
+        Ok(())
     }
 
     /// Retire admitted input while the old receiver is still alive. Do not
@@ -1365,7 +1449,7 @@ impl<F: 'static> PeltController<F> {
         if !self.pointer_buttons.is_empty() {
             self.pointer_buttons.clear();
             self.framed = None;
-            let _ = self.session.input(SessionInput::Cancel);
+            let _ = self.session.dispatch(SessionInput::Cancel);
         }
     }
 

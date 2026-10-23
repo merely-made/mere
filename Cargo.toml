@@ -184,6 +184,9 @@ authors = ["Mark AB (markik)"]
 # `~/.claude/.../memory/feedback_workspace_pins_drive_probes.md`: workspace
 # pins canonically, probes adapt; pick once with the user, don't churn.
 [workspace.dependencies]
+wgpu-cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", rev = "94ba59574838a70c8283d3f5d3cf3ddbb838cfc5" }
+webcue = "=0.1.1"
+wgpu-cue = "=0.1.1"
 # ─── Workspace-internal path deps ────────────────────────────────────────────
 # Every workspace member listed here; consumers do `dep.workspace = true`
 # so only the root Cargo.toml knows where each crate lives. Package names
@@ -741,6 +744,8 @@ workbench = { path = "crates/cambium/workbench" }
 [patch.crates-io]
 # Schema-owned complete NodeId traversal for native publication namespaces.
 accesskit = { path = "support/patches/accesskit" }
+# Registry Webcue and native Genet sessions share one canonical input vocabulary.
+document-session-api = { git = "https://github.com/merely-made/genet.git", branch = "main" }
 # Reuse the Windows password class across cancellation and sequential prompts.
 light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.
