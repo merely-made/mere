@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-23",
+  "status": "Shared publication outcomes and collector wiring implemented and qualified within the stated automated boundaries",
+  "source_commit": "389e4535df414300f495567f34223237bbaccf11",
+  "canonical_document_commit": "f9dea73bead1d626df4adde69748bf5b8b7ed364",
+  "source_snapshot": "diagnostics-outcomes-source.json",
+  "integrated_main": "9004dee69c42ad47ef4dce5a61122ae46c586b36",
+  "distinct_test_passes": 307,
+  "existing_ignored": 8,
+  "count_basis": {
+    "native_cohort": {
+      "passed": 292,
+      "ignored": 7
+    },
+    "graphshell_retained_content": {
+      "passed": 15,
+      "ignored": 1
+    }
+  },
+  "passing_gates": [
+    "native-final",
+    "browser-final",
+    "embedding-final",
+    "consumer-final",
+    "product"
+  ],
+  "repeat_accounting": "native-fixed/native-main are earlier 291-pass cohorts; final includes the extra disposal reentry test. Do not add repeats. Earlier browser/embedding/consumer gates are repeated receiving, not more tests.",
+  "retained_failures": {
+    "native": "Older multi-window test adapter returned Vec and text-receipt test access was private; both fixed and final cohort passes.",
+    "consumer": "Locked fixture needed dependency-record regeneration. Final diff adds serde for Cambium and Rootstock only; final locked offline gate passes."
+  },
+  "ownership_received": [
+    "Physical adapter attachment separately observed from publication; unsampled state explicitly unobserved",
+    "Native submitted and browser mirrored do not claim reader delivery, acceptance, actor completion or presentation",
+    "Missing adapter/runner/layout and ended owners replace prior success with typed skip/refusal",
+    "One Rootstock stamping authority supplies read-only host/sequence snapshots and optional notification",
+    "Disposal observer moves through existing guard and permits reentry after host borrow ends",
+    "Mesquite actual finish path copies latest observation to text/JSON receipts; absent/failed diagnostic reads clear old exports",
+    "Injected publisher to bounded Apparatus history retains independent inspector/receipt cursors"
+  ],
+  "open_migrations": "diagnostics-outcomes-review.json",
+  "verification_limits": [
+    "No new headed OS/platform adapter or human AT qualification",
+    "Browser DOM error cleanup, attachment and focus paths are source-reviewed/Wasm-compiled; browser runtime failure injection remains open",
+    "Native bridge update API returns no acceptance acknowledgement; submitted is the strongest report",
+    "External products not repinned; local AccessKit root patch remains required",
+    "Observer retention/run/clock/export policy belongs to products; resident lifecycle collector retains its separate scope",
+    "Atomic producer activation, guest namespaces/selection ingress and full leaf sizing/raster remain open"
+  ],
+  "documentation": {
+    "baseline_errors": 40,
+    "final_errors": 40,
+    "identical_errors": true,
+    "new_d2_claims": 14
+  },
+  "preservation": "diagnostics-outcomes-preservation.json",
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-outcomes-brief.json": "261156c30e380b3178f8daeb41e84834a4f6db31c7af98f3615d50fbd44f4def",
+    "support/family-promotion/diagnostics-outcomes-browser-final.json": "ac10b9bba393c795e2bff607295ee7c2aa42db472ca40355e811462d33492fff",
+    "support/family-promotion/diagnostics-outcomes-browser.json": "caea08c52e686114b37488467cbb380e1a9c85c1c5a637d23c707011a35916d1",
+    "support/family-promotion/diagnostics-outcomes-consumer-final.json": "77b62705c9e4d1b2e46356ee02dacc8ae89fb5d5a3244fcb088b37c250f8433d",
+    "support/family-promotion/diagnostics-outcomes-consumer-lock.json": "e446774d111aec099dfd81060e4004824578788cb0ef85f6bc077afcd49d3bff",
+    "support/family-promotion/diagnostics-outcomes-consumer.json": "6bc81d1e22981288270b41eca537c794139dd73a4ba798fb3850df77849e8a50",
+    "support/family-promotion/diagnostics-outcomes-docs-baseline.json": "4fb475562bc776a8e3d5b4d07093dcacabdee9848efee73a6d26fa4207dedf4c",
+    "support/family-promotion/diagnostics-outcomes-docs-final.json": "d4c7e36f7db4fd09f5fadfe833ab50cd3c88f45e4a8eb05c7e65ff148f16b4e5",
+    "support/family-promotion/diagnostics-outcomes-docs-main.json": "aae7590921522c7dcae6126eeba1487b37c7b3ca33569edec2970bcd7a5b35d3",
+    "support/family-promotion/diagnostics-outcomes-embedding-final.json": "ea49282ab115016dced7664ce6a342e6465a32ba0a2caf0b132c5d55a738f3e6",
+    "support/family-promotion/diagnostics-outcomes-embedding.json": "76f2b0312f630ee00cd78a97cf86294d5d92950bc05ce715f49c5b166500bca1",
+    "support/family-promotion/diagnostics-outcomes-native-final.json": "0c056c6ed7acc7d65f2ae260630502e6218a5e17aaa8a2f93689443b986203ad",
+    "support/family-promotion/diagnostics-outcomes-native-fixed.json": "41bc1df2c14fe874771917621993fd303f676992ba43cc9d04333272a8a2c898",
+    "support/family-promotion/diagnostics-outcomes-native-main.json": "1aeda7c3a3553ab35828de0ac9e80a9fb1dbfff683f910d87557d3eb0882a97f",
+    "support/family-promotion/diagnostics-outcomes-native.json": "6a177b6ea6308e9bb5df99973d9fcdd50a53e958705fe60ea44b5e3a487d0212",
+    "support/family-promotion/diagnostics-outcomes-preservation.json": "5e38805301b643f17fb4925dbed144b16dbccc0083dfbfd1d19031fddb554511",
+    "support/family-promotion/diagnostics-outcomes-product.json": "15972c7c60363a4320891cebb295477d1f1609806023beb846e97fe5dc2b22b5",
+    "support/family-promotion/diagnostics-outcomes-review.json": "384bea60a14289835412354e62176e3fc49be515b1cb8aad1d80d2275c905244",
+    "support/family-promotion/diagnostics-outcomes-source.json": "03015341708a1d7ed6eaffe821b796b7a33792c198337de975a2dfad253353a5",
+    "support/doc-audit/d2/batch_110_publication_outcomes.md": "e2873374a70a8eff1635b1f7865b6e2985d87868544269834a51fe68ecf3570c"
+  },
+  "retained_receipt_bytes_excluding_this_manifest": 217946,
+  "retained_byte_cap": 10000000
+}
