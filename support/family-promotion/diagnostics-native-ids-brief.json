@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-22",
+  "basis": "c39b43b3fe7231bc45334955df872af51c71225b",
+  "scope": "Schema-owned node-reference traversal, complete shared published-node identity and nonreused native ROOT publication IDs.",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "diagnostics-native-ids-schema.json",
+    "diagnostics-native-ids-native.json",
+    "diagnostics-native-ids-browser.json",
+    "diagnostics-native-ids-embedding.json",
+    "diagnostics-native-ids-qualification.json"
+  ],
+  "done_conditions": [
+    "All native published nodes have shared authored identities, including non-action producer children.",
+    "Same live identity preserves IDs across ordinary updates; ended/withdrawn/replaced/foreign-owner lives cannot reuse native IDs.",
+    "All AccessKit node references are rewritten through one schema-owned traversal; invalid references/duplicate source IDs/foreign trees refuse publication before installing routes.",
+    "Native map and tree advance together only after installation succeeds; old late IDs cannot select new bindings.",
+    "Focused schema and real native mapping/consumer tests plus Wasm/embedding compilation pass.",
+    "Existing shared WIP preserved; vendor patch provenance and standalone consumer intake, guest and platform runtime limits documented."
+  ]
+}

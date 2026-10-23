@@ -39,7 +39,11 @@ pub use sprigging::LeafRegistry;
 use genet_render::VisualMovement;
 
 mod semantics;
-pub use semantics::{ProducerSemanticIssue, SemanticProjection, project_semantics};
+pub use a11y_provenance::SemanticNodeIdentity;
+pub use semantics::{
+    ProducerSemanticIssue, PublicationBindings, PublicationIssue, SemanticProjection,
+    project_semantics,
+};
 
 mod files;
 pub use files::{FileAnswer, FileChooser};

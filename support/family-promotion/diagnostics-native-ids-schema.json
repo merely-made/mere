@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "accesskit@0.25.1",
+    "--lib"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-native-publication",
+  "started": "2026-10-23T03:54:41.110532+00:00",
+  "finished": "2026-10-23T03:55:03.882892+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: cannot find macro `vec` in this scope",
+    "error: cannot find macro `vec` in this scope",
+    "error: could not compile `accesskit` (lib test) due to 2 previous errors"
+  ],
+  "diagnostic_tail": "   Compiling serde v1.0.229\n   Compiling accesskit v0.25.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-native-publication\\support\\patches\\accesskit)\nerror: cannot find macro `vec` in this scope\n    --> support\\patches\\accesskit\\src\\lib.rs:3812:27\n     |\n3812 |         node.set_controls(vec![NodeId(4)]);\n     |                           ^^^\n     |\nhelp: consider importing one of these macros\n     |\n3784 +     use crate::reference_mapping_tests::alloc::vec;\n     |\n3784 +     use alloc::vec;\n     |\n\nerror: cannot find macro `vec` in this scope\n    --> support\\patches\\accesskit\\src\\lib.rs:1420:30\n     |\n1420 |                   node.$setter(vec![NodeId(4), NodeId(8)]);\n     |                                ^^^\n...\n2107 | / node_id_vec_property_methods! {\n2108 | |     /// The ordered list of this node's direct children in the tree. The order\n2109 | |     /// should match the intended reading and navigation order.\n2110 | |     (Children, children, set_children, push_child, clear_children),\n...    |\n2148 | |     (RadioGroup, radio_group, set_radio_group, push_to_radio_group, clear_radio_group)\n2149 | | }\n     | |_- in this macro invocation\n     |\n     = help: consider importing this macro:\n             alloc::vec\n     = note: this error originates in the macro `node_id_vec_property_methods` (in Nightly builds, run with -Z macro-backtrace for more info)\n\nerror: could not compile `accesskit` (lib test) due to 2 previous errors\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

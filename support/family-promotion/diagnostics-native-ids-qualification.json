@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-23",
+  "status": "Native ROOT ID remapping implemented and qualified within stated automated boundaries",
+  "source_snapshot": "diagnostics-native-ids-source-final.json",
+  "integrated_remote_main": "8e1b3132186640db755f9295f18b31a9997d8710",
+  "distinct_test_passes": 675,
+  "existing_ignored": 7,
+  "count_basis": {
+    "accesskit_schema": 374,
+    "native_packages_and_integration": 287,
+    "graphshell_retained_content": 14
+  },
+  "passing_gates": [
+    "schema-fixed",
+    "native-final",
+    "native-current",
+    "browser",
+    "embedding",
+    "product-main",
+    "consumer-current",
+    "main-check"
+  ],
+  "repeated_gates": "controls, native-qualified, native-current and product/main reruns are not added to distinct counts. native-qualified included a subsequently retired old mapper fixture.",
+  "retained_failed_attempts": {
+    "schema": "no_std vec macro in new fixtures; fixed by schema-fixed",
+    "native": "three old helper fixtures needed new argument; fixed",
+    "native-fixed": "borrow conflict in new negative fixture; fixed"
+  },
+  "main_receiving": "First main intake changes only Pictograph/Graphshell; 1092-package native dependency closure excludes both and product rerun passes. Latest main widens Muniment manifest range with unchanged lock and changes documentation policy; main-check passes.",
+  "documentation": {
+    "baseline_errors": 40,
+    "final_errors": 40,
+    "same_errors": true,
+    "new_d2_claims": 13
+  },
+  "open_boundaries": [
+    "AccessKit schema API promotion and external native consumer root patch/lock intake",
+    "Guest/compositor namespace and selection action ingress",
+    "Headed platform AT and surface handoff/install/reset/recovery",
+    "Atomic producer activation and authored legacy child lifetimes",
+    "Rootstock intrinsic sizing and Path-B raster integration",
+    "Typed publication outcomes and collector wiring"
+  ],
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-native-ids-binary-evidence.json": "90e836dd32c3a242f043a930b6e6b4af07e1537a5007e53e2307a9082fddb1e5",
+    "support/family-promotion/diagnostics-native-ids-brief.json": "95b84a37339467d3be2425f162950b2f7799fb704faa292fe69774cf5b3d3805",
+    "support/family-promotion/diagnostics-native-ids-browser.json": "12218aee6cf80ccd719283ea9aee3c6fdc138bcebd385db040819117a3ad6c35",
+    "support/family-promotion/diagnostics-native-ids-consumer-current.json": "c6ba40ef093387b3a03505e20e42ef0bccd229bc56f25d4dcf7d492f39468bee",
+    "support/family-promotion/diagnostics-native-ids-consumer-lock.json": "dcd2394aea7364089b273bc6487bc9c596e99fb3140925372be91895fe4e473a",
+    "support/family-promotion/diagnostics-native-ids-consumer.json": "11e7ae0270ddbc9b9773742f3542c62d6277df9f3db2c5c0767ed3ef3765729a",
+    "support/family-promotion/diagnostics-native-ids-controls.json": "59e6819ac8fd70464046de5b87102cd219b62a738f091bfb9d4be87f5cca28b1",
+    "support/family-promotion/diagnostics-native-ids-docs-baseline.json": "725ed6988bf8bf29290e2310ad795a67a0d37e3c78a636f916c2e2237d6ea415",
+    "support/family-promotion/diagnostics-native-ids-docs-final.json": "1e02442981044822f72d3325c7e19e89b6ba5baf1907a7da0d658fb723e40b7d",
+    "support/family-promotion/diagnostics-native-ids-docs-qualified.json": "8549331d6a3a12925cd1d75cc527ab31a2849d8b01eca1e26c2d4d4824942d78",
+    "support/family-promotion/diagnostics-native-ids-embedding.json": "712cb34689dd0c5ea9314027525405fcd6fcdf8a55133dd9932d6bc45eed176e",
+    "support/family-promotion/diagnostics-native-ids-lock.json": "caa3e98e8abff55ea95c589c9c4fae0e19544602c11e59be5272e50dab887b89",
+    "support/family-promotion/diagnostics-native-ids-main-check.json": "33606afd503d80421ba26902750846b26d1aa21dd885ee193d1f402b6008537e",
+    "support/family-promotion/diagnostics-native-ids-main-receiving.json": "a8c3c7539e6bfe6cd65f66700c1e11479cce527148dbf83843592adc9ce7dbdc",
+    "support/family-promotion/diagnostics-native-ids-native-current.json": "7f1865d01ec74a5c4dfdfdae1a0b88eab78e1721a127c565f22027ec90ecfa57",
+    "support/family-promotion/diagnostics-native-ids-native-final.json": "45145131f1c584fbeeea66a1502ca71a4b7a8a700ed610022872e33c14d0fc39",
+    "support/family-promotion/diagnostics-native-ids-native-fixed.json": "2e9540f15e904f5663616ca0d99723638a2d8b1694eb9ee2296f34b8e396b513",
+    "support/family-promotion/diagnostics-native-ids-native-qualified.json": "65f080b9a8783db7325e854b21968293414c47786dd1e003b6f198eff4f85d65",
+    "support/family-promotion/diagnostics-native-ids-native.json": "8eb13cd47715fdcf385ecb306bed9bceec83aae5a592cf8d3738f10c6584904a",
+    "support/family-promotion/diagnostics-native-ids-preservation.json": "6d2fbab64adb8dde2a16ea8bbeb90f898c4eac48c56410ab30dc37cadf05a03b",
+    "support/family-promotion/diagnostics-native-ids-product-main.json": "530102b8e8b98a8cbff65c21b60196e678e36deac01a90ab38ae3422a4c67208",
+    "support/family-promotion/diagnostics-native-ids-product.json": "06fa520eb733aabf2a4e35fb2d0533c01c495c27f78329b1dbb1fd3665cabe07",
+    "support/family-promotion/diagnostics-native-ids-review.json": "d77c6b425b94ede1a5ee1c10deb817385e4edfbaae6136dfbbdfee1fd21997a4",
+    "support/family-promotion/diagnostics-native-ids-schema-fixed.json": "eb1736757d08a19b3c4b5a7a6d1f5339672c641e29d88f5a96fbdbd0de0a426e",
+    "support/family-promotion/diagnostics-native-ids-schema.json": "a5b5af9a5073930e63446a66792bb1f16da50f64338829ec3e44f2d7c4a53fd8",
+    "support/family-promotion/diagnostics-native-ids-source-before-main.json": "490a1ed4b28007b967522b4726da22b98004434af748dcdac524872ad1b6ad7b",
+    "support/family-promotion/diagnostics-native-ids-source-final.json": "488364cd09be24b97b9fd7b6a401f2c1826fc94f28470d58858af976ba4d7c6c",
+    "support/doc-audit/d2/batch_108_native_publication_ids.md": "7e86074da0a1970b30adc5bcfa736ad243f3f51cc20f6d46e53c84e855be6333"
+  },
+  "retained_receipt_bytes_excluding_this_manifest": 274384,
+  "retained_byte_cap": 10000000,
+  "preservation": "diagnostics-native-ids-preservation.json"
+}

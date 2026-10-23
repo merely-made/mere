@@ -647,5 +647,14 @@
     "qualification": "support/family-promotion/diagnostics-owner-qualification.json",
     "remaining": "Full published-node identity including structural producer children; schema-owned native reference remapper, late-event ingress and guest/physical-surface lifecycle; producer atomic activation and platform runtime qualification.",
     "native_attachment": "A11yHost::attach now returns Result and refuses another window handle without changing its original attachment. Same handle is idempotent; native host creation propagates the result. Platform recovery remains open."
+  },
+  "native_id_remapping_continuation": {
+    "date": "2026-10-23",
+    "status": "Native ROOT remapper implemented; supplier API promotion, external native intake, guest namespaces and headed runtime remain open.",
+    "authority": "AccessKit typed schema traversal, Rootstock shared all-node weak identity, native publication namespace, Genet platform bridge.",
+    "compatibility": "publication_bindings replaces action-only publication_requests; standalone native intake needs the AccessKit patch at its root. Existing source projection helpers remain explicitly unremapped composition observations.",
+    "review": "support/family-promotion/diagnostics-native-ids-review.json",
+    "qualification": "support/family-promotion/diagnostics-native-ids-qualification.json",
+    "remaining": "Schema hook promotion and product patch/lock receiving; guest/reset/selection ingress; physical surface and AT runtime; actor transaction, legacy child reuse, raw canvas mutation visibility and full leaf sizing/raster."
   }
 }
