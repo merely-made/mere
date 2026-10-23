@@ -2,7 +2,7 @@
 
 ## Shared publication outcomes and collectors, 2026-10-23
 
-**Status (2026-10-23):** implementation in progress; qualification pending.
+**Status (2026-10-23):** implemented; automated receiving qualified within the boundaries below.
 Continuation review: `support/family-promotion/diagnostics-outcomes-review.json`.
 
 ### Phases and done-conditions
@@ -12,7 +12,8 @@ Continuation review: `support/family-promotion/diagnostics-outcomes-review.json`
    browser-mirrored publication. Count producer contribution issues explicitly.
 2. Rootstock stamps sync observations with the host and an independent sequence.
    Missing adapter/runner/layout and ended owners replace prior success. Disposal
-   emits an ended-owner observation. Reads neither reproject nor advance sequence.
+   records an ended-owner observation; its notification runs from the disposal
+   guard after the host borrow ends. Reads neither reproject nor advance sequence.
 3. Expose copied observations to application contexts and an opt-in observer.
    Products retain redaction, bounded history, clock and export policy. Mesquite
    samples the latest observation in both receipt formats, separately from
@@ -54,6 +55,8 @@ contributor content and platform error strings are excluded.
 Collector history retention/export stays product-owned. The resident lifecycle
 collector does not gain UI authority or receive semantic contributor content.
 This lane retains at most 10 MB and reuses the shared Mere target.
+Exact source, gates, retained failed attempts and qualification boundaries are
+in `support/family-promotion/diagnostics-outcomes-qualification.json`.
 
 ## Native publication ID remapping, 2026-10-23
 
