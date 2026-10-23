@@ -14,15 +14,13 @@ fn flip(checked: &mut bool, _: PointerClick) {
 /// The concrete view type a checkbox / toggle produces: an `on_click`-wrapped
 /// element reflecting the checked state.
 pub type Checkbox =
-    Focusable<OnClick<El<&'static str, bool, ()>, bool, (), fn(&mut bool, PointerClick)>>;
+    Focusable<OnClick<El<crate::ChoiceIndicator<bool,()>, bool, ()>, bool, (), fn(&mut bool, PointerClick)>>;
 
 /// Build a checkbox-style control with the given `kind` class (`"checkbox"` /
-/// `"toggle"`), reflecting `checked` as a textual indicator, an ARIA state, and
+/// `"toggle"`), reflecting `checked` as a geometric indicator, an ARIA state, and
 /// a `checked` class for styling.
 fn build_check(kind: &'static str, checked: bool) -> Checkbox {
-    // ASCII indicator (reliably renders without special fonts); the host styles
-    // the `kind` / `checked` classes for the real look.
-    let indicator = if checked { "[x]" } else { "[ ]" };
+    let indicator = crate::choice_indicator::<bool,()>(checked,false);
     let class = if checked { kind_checked(kind) } else { kind };
     let aria = if checked { "true" } else { "false" };
     let role = if kind == "toggle" {
@@ -57,8 +55,8 @@ fn kind_checked(kind: &'static str) -> &'static str {
 
 /// A reusable checkbox whose state *is* a `bool`. Clicking it toggles the bool;
 /// it reflects the state as `role="checkbox"` + `aria-checked` (for the a11y
-/// tree) and a `checkbox` / `checkbox checked` class (for host styling), with an
-/// ASCII `[x]` / `[ ]` fallback indicator. Composes onto an app's bool field via
+/// tree) and a `checkbox` / `checkbox checked` class (for host styling), with a
+/// font-independent geometric indicator. Composes onto an app's bool field via
 /// [`lens`](crate::lens), like [`text_field`](crate::text_field) onto a
 /// [`TextInput`](crate::TextInput).
 pub fn checkbox(checked: bool) -> Checkbox {

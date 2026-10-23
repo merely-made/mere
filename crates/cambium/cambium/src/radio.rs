@@ -53,8 +53,7 @@ impl Default for RadioGroup {
 /// clicking a row selects it (and only it).
 ///
 /// Each row is a `radio` (or `radio selected`) element with `role="radio"` and
-/// `aria-checked`, an ASCII `(o)` / `( )` indicator before the label (so it
-/// reads without special fonts), inside a `role="radiogroup"` container. The
+/// `aria-checked`, a geometric indicator beside the label, independent of font coverage, inside a `role="radiogroup"` container. The
 /// host styles the classes. `+ use<>` keeps the opaque type from borrowing
 /// `state` / `options` (the labels are cloned in).
 pub fn radio_group<OptionLabel>(
@@ -78,10 +77,9 @@ where
         .map(|(i, label)| {
             let selected = i == state.selected;
             let active = i == active;
-            let indicator = if selected { "(o) " } else { "( ) " };
             let label = label.as_ref();
             let item = on_click(
-                el::<_, RadioGroup, ()>("div", format!("{indicator}{label}"))
+                el::<_, RadioGroup, ()>("div", (crate::choice_indicator::<RadioGroup,()>(selected,true), el("span",label.to_owned())))
                     .attr("role", "radio")
                     .attr("aria-checked", if selected { "true" } else { "false" })
                     .attr("tabindex", if active { "0" } else { "-1" })
