@@ -18,6 +18,44 @@ struct Fixture {
     producers: ProducerRegistry,
     marker: Rc<Cell<bool>>,
 }
+
+#[test]
+fn detached_native_publisher_reports_no_window_and_revoked_owner_clears_routes() {
+    let f = Fixture::new();
+    let mut host = A11yHost::new(|| {});
+    f.publish(&mut host);
+    let sync = host.sync(
+        &f.owner(),
+        &WindowDom::document(&f.dom),
+        &f.layout,
+        &f.leaves,
+        &f.producers,
+        None,
+        1.0,
+    );
+    assert!(sync.requests.is_empty());
+    assert_eq!(
+        sync.publication,
+        A11yPublication::skipped(A11yAdapterState::Detached, A11yPublicationSkip::NoWindow)
+    );
+    f.marker.set(false);
+    let sync = host.sync(
+        &f.owner(),
+        &WindowDom::document(&f.dom),
+        &f.layout,
+        &f.leaves,
+        &f.producers,
+        None,
+        1.0,
+    );
+    assert_eq!(
+        sync.publication.outcome,
+        A11yPublicationOutcome::NotAttempted {
+            reason: A11yPublicationSkip::OwnerEnded
+        }
+    );
+    assert!(host.requests.is_empty());
+}
 impl Fixture {
     fn new() -> Self {
         let mut dom = ScriptedDom::new();

@@ -376,6 +376,10 @@ fn native_form_metadata_notifications_reach_only_the_owning_window() {
 struct Recording(Rc<std::cell::RefCell<HashSet<u64>>>);
 
 impl crate::Accessibility for Recording {
+    fn adapter_state(&self) -> crate::A11yAdapterState {
+        crate::A11yAdapterState::Unavailable
+    }
+
     fn sync(
         &mut self,
         _: &crate::A11yOwner,
@@ -385,14 +389,17 @@ impl crate::Accessibility for Recording {
         _: &crate::ProducerRegistry,
         focus: Option<u64>,
         _: f64,
-    ) -> Vec<crate::A11yRequest> {
+    ) -> crate::A11ySync {
         let projection = crate::document_projection(dom, layout, focus);
         *self.0.borrow_mut() = projection
             .nodes()
             .iter()
             .map(|node| node.id.get())
             .collect();
-        Vec::new()
+        crate::A11ySync {
+            requests: Vec::new(),
+            publication: crate::A11yPublication::default(),
+        }
     }
 }
 

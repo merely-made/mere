@@ -200,6 +200,20 @@ fn diagnostic_export_carries_loss_without_inventing_success_or_frame_causality()
         value["ok"], true,
         "diagnostics do not decide domain outcomes"
     );
+    lane.collect_diagnostics(Ok(None));
+    assert!(
+        lane.receipt_value(true, &BTreeMap::new())
+            .get("diagnostics")
+            .is_none()
+    );
+    let empty = store.read(&mut cursor, Duration::ZERO, 1).unwrap();
+    lane.collect_diagnostics(Ok(Some(empty)));
+    lane.collect_diagnostics(Err("read failed".into()));
+    assert!(
+        lane.receipt_value(true, &BTreeMap::new())
+            .get("diagnostics")
+            .is_none()
+    );
 }
 
 #[test]
@@ -216,6 +230,56 @@ fn requested_diagnostic_failure_is_visible_and_absent_hook_preserves_receipt_sha
         lane.errors,
         ["diagnostic attachment: bounded batch unavailable"]
     );
+}
+
+#[test]
+fn publication_samples_replace_success_without_deciding_product_outcomes() {
+    use cambium_rootstock::{
+        A11yAdapterState as Adapter, A11yPublication as Publication,
+        A11yPublicationOutcome as Phase, A11yPublicationRefusal as Refusal,
+        A11yPublicationSnapshot,
+    };
+    let mut lane = lane(None, None);
+    let mut sample = A11yPublicationSnapshot {
+        host: 7,
+        sequence: 1,
+        publication: Publication {
+            adapter: Adapter::Installed,
+            outcome: Phase::Submitted {
+                nodes: 8,
+                contribution_issues: 2,
+            },
+        },
+    };
+    lane.collect_a11y_publication(sample);
+    assert_eq!(
+        lane.receipt_value(true, &BTreeMap::new())["a11y_publication"]["snapshot"]["publication"]["outcome"]
+            ["phase"],
+        "submitted"
+    );
+    sample.sequence += 1;
+    sample.publication = Publication::refused(Adapter::Installed, Refusal::InvalidTree);
+    lane.collect_a11y_publication(sample);
+    let receipt = lane.receipt_value(true, &BTreeMap::new());
+    assert_eq!(
+        receipt["ok"], true,
+        "publisher observations do not decide domain success"
+    );
+    let record = &receipt["a11y_publication"];
+    assert_eq!(record["sampled_at_lane_frame"], 0);
+    assert_eq!(record["snapshot"]["sequence"], 2);
+    assert_eq!(record["snapshot"]["publication"]["adapter"], "installed");
+    assert_eq!(
+        record["snapshot"]["publication"]["outcome"]["phase"],
+        "refused"
+    );
+    assert_eq!(
+        record["snapshot"]["publication"]["outcome"]["reason"],
+        "invalid_tree"
+    );
+    assert!(record["snapshot"].get("presented_frame").is_none());
+    lane.request_close();
+    assert!(lane.text_receipt(false).contains("a11y-publication "));
 }
 
 #[test]

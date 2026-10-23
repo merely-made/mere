@@ -38,8 +38,13 @@ pub use sprigging::LeafRegistry;
 
 use genet_render::VisualMovement;
 
+mod a11y_publication;
 mod semantics;
 pub use a11y_provenance::SemanticNodeIdentity;
+pub use a11y_publication::{
+    A11yAdapterState, A11yPublication, A11yPublicationOutcome, A11yPublicationRefusal,
+    A11yPublicationSkip, A11yPublicationSnapshot, A11ySync,
+};
 pub use semantics::{
     ProducerSemanticIssue, PublicationBindings, PublicationIssue, SemanticProjection,
     project_semantics,
@@ -437,8 +442,12 @@ impl A11yRequest {
 /// with the host, which owns the activation and focus paths, rather than
 /// splitting it across two implementations that would then have to agree.
 pub trait Accessibility {
+    /// Current physical adapter/mirror attachment, independent of tree acceptance.
+    fn adapter_state(&self) -> A11yAdapterState;
+
     /// Publish the current tree and drain what the reader asked for since the
-    /// last call.
+    /// last call. Report the publisher outcome separately from action requests;
+    /// neither the adapter state nor this outcome certifies actor completion.
     ///
     /// `focus` is the focused DOM node's opaque id, used as the tree's focus
     /// only when that node is really in the tree, so a stale id never points
@@ -467,7 +476,7 @@ pub trait Accessibility {
         producers: &ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
-    ) -> Vec<A11yRequest>;
+    ) -> A11ySync;
 }
 
 /// The renderer-neutral DOM observation used to seed host semantics, including

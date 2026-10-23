@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-23",
+  "basis": "a6d44855b",
+  "ownership": {
+    "AccessKit": "Typed node-reference schema; existing local patch unchanged",
+    "Rootstock": "Shared publisher outcomes, host/sequence observation, opt-in notification and action admission remain distinct",
+    "Native publisher": "Detached/ended-owner/refusal/install-failure and submitted observations; physical status from bridge",
+    "Browser publisher": "Attached mirror, fallible DOM write outcome, fail-closed routes and clean retry",
+    "Mesquite": "One latest sampled observation in text/JSON receipts; product success/diagnostic history separately owned",
+    "Apparatus": "Existing bounded history/cursors; no new store or global diagnostic sink"
+  },
+  "no_brainer_fixes": [
+    "Browser writer propagates DOM write errors and clears partial caches/routes",
+    "Detached mirror refuses new routes",
+    "Missing layout/runner/adapter and disposal replace prior publication success",
+    "Mesquite absent/failed diagnostic collection removes prior exported batch"
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "Supplier promotion and consumer intake",
+      "gap": "Local AccessKit patch does not propagate through Cargo dependency roots",
+      "done_condition": "Promote API or governed supplier, coordinate receiving patch/locks before external repins"
+    },
+    {
+      "owner": "Producer activation transaction",
+      "gap": "Admission and activation are distinct calls; optional legacy child tokens require authored nonreuse",
+      "done_condition": "Same owner/model transaction validates and activates; receive same-call canvas replacement"
+    },
+    {
+      "owner": "Guest compositor namespace",
+      "gap": "Native publisher remains ROOT-only; selection ingress unsupported",
+      "done_condition": "Owner-qualified per-tree IDs plus guest install/reset/replay and action reference translation"
+    },
+    {
+      "owner": "Bridge acknowledgement and platform runtime",
+      "gap": "Native update returns no acceptance receipt. Browser DOM/focus/late events and headed AT are not qualified by compilation or injected adapters",
+      "done_condition": "Supplier acknowledgement/epoch receipt where available plus headed exact-pin refusal/recovery/old-handle controls"
+    },
+    {
+      "owner": "Full leaf integration",
+      "gap": "Rootstock intrinsic sizing and Path-B raster remain separate",
+      "done_condition": "Receive real sizing and raster paths with their own product evidence"
+    },
+    {
+      "owner": "Product retention policy",
+      "gap": "Observer is opt-in; native/browser latest observation is not a durable history or process-wide registry installation",
+      "done_condition": "Products configure bounded store/run/clock/export policy without inferring actor outcomes"
+    }
+  ],
+  "qualification": "diagnostics-outcomes-qualification.json",
+  "retained_byte_cap": 10000000
+}

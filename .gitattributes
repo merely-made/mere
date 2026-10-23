@@ -99,3 +99,7 @@ support/doc-audit/d2/batch_107_native_publication_owner_lifetimes.md -text
 # Native publication receipts retain exact qualified bytes.
 support/family-promotion/diagnostics-native-ids-*.json -text
 support/doc-audit/d2/batch_108_native_publication_ids.md -text
+
+# Publication outcome receiving retains exact receipt bytes.
+support/family-promotion/diagnostics-outcomes-*.json -text
+support/doc-audit/d2/batch_109_publication_outcomes.md -text

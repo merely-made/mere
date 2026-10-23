@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-23",
+  "basis": "a6d44855b24de92ef060e16059cdacbe95135a19",
+  "scope": "Shared publisher outcomes, Rootstock observation and bounded Mesquite/consumer collection. Preserve actor, guest, supplier and platform ownership migrations.",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "native tests including publisher refusal and observer transition controls",
+    "browser-host Wasm compilation",
+    "embedding compilation",
+    "independent native consumer compilation",
+    "documentation baseline and final errors comparison",
+    "source and qualification manifest"
+  ],
+  "done_conditions": [
+    "Adapter state and latest publication outcome reported independently from requests and actor completion",
+    "Refusal, skipped sync, retry and disposal cannot retain stale success",
+    "Browser failed DOM writes refuse and clear routes",
+    "Collectors consume owner-reported snapshots without semantic reprojection",
+    "Unrelated staged and working changes preserved"
+  ]
+}

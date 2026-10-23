@@ -6,6 +6,7 @@
 
 //! Accessibility focus follows the runner, independently of hover restyling.
 
+mod outcome_tests;
 mod publication_tests;
 
 use std::cell::RefCell;
@@ -42,6 +43,10 @@ struct FocusSample {
 struct Recording(Rc<RefCell<Vec<FocusSample>>>);
 
 impl Accessibility for Recording {
+    fn adapter_state(&self) -> crate::A11yAdapterState {
+        crate::A11yAdapterState::Unavailable
+    }
+
     fn sync(
         &mut self,
         _: &crate::A11yOwner,
@@ -51,7 +56,7 @@ impl Accessibility for Recording {
         _: &ProducerRegistry,
         focus: Option<u64>,
         _: f64,
-    ) -> Vec<A11yRequest> {
+    ) -> crate::A11ySync {
         let projection = crate::document_projection(dom, layout, focus);
         self.0.borrow_mut().push(FocusSample {
             reported: focus,
@@ -62,7 +67,10 @@ impl Accessibility for Recording {
                 .map(|node| node.id.get())
                 .collect(),
         });
-        Vec::new()
+        crate::A11ySync {
+            requests: Vec::new(),
+            publication: crate::A11yPublication::default(),
+        }
     }
 }
 
