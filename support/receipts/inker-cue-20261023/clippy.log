@@ -1,0 +1,604 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+    Checking accesskit v0.25.1 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/support/patches/accesskit)
+    Checking tinct v0.2.0 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/cambium/tinct)
+    Checking mere-page-load v0.0.1 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/system/page-load)
+    Checking workbench v0.1.0 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/cambium/workbench)
+    Checking mere-fleece v0.0.1 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/fleece)
+    Checking tabard v0.0.2 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/system/tabard)
+warning: this `if` statement can be collapsed
+   --> crates/fleece/src/portable_clip.rs:183:5
+    |
+183 | /     if let Some(manifest) = eidetic::manifest::load_manifest(store, id).await? {
+184 | |         if manifest.byte_size != bytes.len() as u64 {
+185 | |             return Err(invalid("existing object size differs"));
+186 | |         }
+187 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-W clippy::collapsible-if` implied by `-W clippy::all`
+    = help: to override `-W clippy::all` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+183 ~     if let Some(manifest) = eidetic::manifest::load_manifest(store, id).await?
+184 ~         && manifest.byte_size != bytes.len() as u64 {
+185 |             return Err(invalid("existing object size differs"));
+186 ~         }
+    |
+
+warning: `mere-fleece` (lib) generated 1 warning (run `cargo clippy --fix --lib -p mere-fleece -- ` to apply 1 suggestion)
+warning: doc list item without indentation
+   --> crates/system/tabard/src/theme/registry.rs:122:9
+    |
+122 |     /// maintains contrast on any theme.
+    |         ^
+    |
+    = help: if this is supposed to be its own paragraph, add a blank line
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#doc_lazy_continuation
+    = note: `#[warn(clippy::doc_lazy_continuation)]` on by default
+help: indent this line
+    |
+122 |     ///   maintains contrast on any theme.
+    |         ++
+
+warning: large size difference between variants
+  --> crates/system/tabard/src/workshop.rs:38:1
+   |
+38 | / pub enum Preview {
+39 | |     Tokens(ThemeTokenSet),
+   | |     --------------------- the largest variant contains at least 368 bytes
+40 | |     Stylesheet(Vec<String>),
+   | |     ----------------------- the second-largest variant contains at least 24 bytes
+41 | | }
+   | |_^ the entire enum is at least 368 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+   = note: `#[warn(clippy::large_enum_variant)]` on by default
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+39 -     Tokens(ThemeTokenSet),
+39 +     Tokens(Box<ThemeTokenSet>),
+   |
+
+warning: usage of `bool::then` in `filter_map`
+   --> crates/system/tabard/src/lib.rs:430:14
+    |
+430 |               .filter_map(|(role, labels)| {
+    |  ______________^
+431 | |                 (labels.len() > 1).then(|| LagrangePaletteDiagnostic::CollapsedRole {
+432 | |                     source_role: role,
+433 | |                     labels: labels.clone(),
+434 | |                 })
+435 | |             })
+    | |______________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#filter_map_bool_then
+    = note: `#[warn(clippy::filter_map_bool_then)]` on by default
+help: use `filter` then `map` instead
+    |
+430 ~             .filter(|&(role, labels)| (labels.len() > 1)).map(|(role, labels)| LagrangePaletteDiagnostic::CollapsedRole {
+431 +                     source_role: role,
+432 +                     labels: labels.clone(),
+433 +                 })
+    |
+
+warning: `tabard` (lib) generated 3 warnings (run `cargo clippy --fix --lib -p tabard -- ` to apply 1 suggestion)
+    Checking webcue v0.1.1
+    Checking inker v0.1.1 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/inker/inker)
+    Checking wgpu-cue v0.1.1
+    Checking wgpu-cue-netrender v0.1.1 (https://github.com/merely-made/wgpu-cue.git?rev=94ba59574838a70c8283d3f5d3cf3ddbb838cfc5#94ba5957)
+warning: draining all elements of a collection into a new collection of the same type
+   --> crates/inker/inker/src/document.rs:336:23
+    |
+336 |                 text: run.drain(..).collect::<Vec<_>>().join("\n"),
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use `mem::take` to avoid creating a new allocation: `std::mem::take(run)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#drain_collect
+    = note: `#[warn(clippy::drain_collect)]` on by default
+
+warning: unsafe function's docs are missing a `# Safety` section
+    --> crates/inker/inker/src/surface_engine.rs:1046:5
+     |
+1046 |     unsafe fn rehost(&mut self, _host: NativeSurfaceHost) -> Result<(), SurfaceError> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#missing_safety_doc
+     = note: `#[warn(clippy::missing_safety_doc)]` on by default
+
+warning: this `if` statement can be collapsed
+   --> crates/inker/inker/src/flip/scry.rs:146:17
+    |
+146 | /                 if success {
+147 | |                     if let Some(js) = self.restore_script() {
+148 | |                         if let Err(err) = surface.run_script(&js) {
+149 | |                             tracing_warn(&format!("scry flip: restore script failed: {err}"));
+...   |
+152 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `#[warn(clippy::collapsible_if)]` on by default
+help: collapse nested if block
+    |
+146 ~                 if success
+147 ~                     && let Some(js) = self.restore_script() {
+148 |                         if let Err(err) = surface.run_script(&js) {
+149 |                             tracing_warn(&format!("scry flip: restore script failed: {err}"));
+150 |                         }
+151 ~                     }
+    |
+
+warning: this `if` statement can be collapsed
+   --> crates/inker/inker/src/flip/scry.rs:147:21
+    |
+147 | /                     if let Some(js) = self.restore_script() {
+148 | |                         if let Err(err) = surface.run_script(&js) {
+149 | |                             tracing_warn(&format!("scry flip: restore script failed: {err}"));
+150 | |                         }
+151 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+147 ~                     if let Some(js) = self.restore_script()
+148 ~                         && let Err(err) = surface.run_script(&js) {
+149 |                             tracing_warn(&format!("scry flip: restore script failed: {err}"));
+150 ~                         }
+    |
+
+warning: `inker` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p inker -- ` to apply 3 suggestions)
+    Checking document-canvas v0.1.0 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/inker/document-canvas)
+warning: an array of `Range` that is only one element
+   --> crates/inker/inker/src/document/navigation.rs:298:47
+    |
+298 |         assert_eq!(state.hidden(&navigation), [1..4], "authored: outer closed");
+    |                                               ^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#single_range_in_vec_init
+    = note: `#[warn(clippy::single_range_in_vec_init)]` on by default
+help: if you wanted a `Vec` that contains the entire range, try
+    |
+298 -         assert_eq!(state.hidden(&navigation), [1..4], "authored: outer closed");
+298 +         assert_eq!(state.hidden(&navigation), (1..4).collect::<std::vec::Vec<usize>>(), "authored: outer closed");
+    |
+help: if you wanted an array of len 4, try
+    |
+298 -         assert_eq!(state.hidden(&navigation), [1..4], "authored: outer closed");
+298 +         assert_eq!(state.hidden(&navigation), [1; 4], "authored: outer closed");
+    |
+
+warning: an array of `Range` that is only one element
+   --> crates/inker/inker/src/document/navigation.rs:302:13
+    |
+302 |             [1..4],
+    |             ^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#single_range_in_vec_init
+help: if you wanted a `Vec` that contains the entire range, try
+    |
+302 -             [1..4],
+302 +             (1..4).collect::<std::vec::Vec<usize>>(),
+    |
+help: if you wanted an array of len 4, try
+    |
+302 -             [1..4],
+302 +             [1; 4],
+    |
+
+warning: an array of `Range` that is only one element
+   --> crates/inker/inker/src/document/navigation.rs:308:13
+    |
+308 |             [2..3],
+    |             ^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#single_range_in_vec_init
+help: if you wanted a `Vec` that contains the entire range, try
+    |
+308 -             [2..3],
+308 +             (2..3).collect::<std::vec::Vec<usize>>(),
+    |
+help: if you wanted an array of len 3, try
+    |
+308 -             [2..3],
+308 +             [2; 3],
+    |
+
+warning: `inker` (lib test) generated 7 warnings (4 duplicates)
+warning: the loop variable `column` is used to index `column_widths`
+   --> crates/inker/document-canvas/src/layout.rs:758:27
+    |
+758 |             for column in 0..column_count {
+    |                           ^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+    = note: `#[warn(clippy::needless_range_loop)]` on by default
+help: consider using an iterator and enumerate()
+    |
+758 -             for column in 0..column_count {
+758 +             for (column, <item>) in column_widths.iter().enumerate().take(column_count) {
+    |
+
+warning: this function has too many arguments (9/7)
+    --> crates/inker/document-canvas/src/layout.rs:1094:5
+     |
+1094 | /     fn render_feed_entry(
+1095 | |         &mut self,
+1096 | |         source_index: usize,
+1097 | |         indent_level: u32,
+...    |
+1103 | |         source_url: Option<&str>,
+1104 | |     ) -> RenderedBlock {
+     | |______________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+     = note: `#[warn(clippy::too_many_arguments)]` on by default
+
+warning: this function has too many arguments (8/7)
+   --> crates/inker/document-canvas/src/text.rs:370:1
+    |
+370 | / pub fn layout_text_block(
+371 | |     env: &mut LayoutEnvironment,
+372 | |     flattened: &Flattened,
+373 | |     base: &TextBaseStyle,
+...   |
+378 | |     fonts: &mut FontInterner,
+379 | | ) -> LaidOutText {
+    | |________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+warning: this function has too many arguments (9/7)
+   --> crates/inker/document-canvas/src/text.rs:396:1
+    |
+396 | / pub(crate) fn layout_text_block_with_link_identity_base(
+397 | |     env: &mut LayoutEnvironment,
+398 | |     flattened: &Flattened,
+399 | |     base: &TextBaseStyle,
+...   |
+405 | |     link_identity_base: SemanticInteractionId,
+406 | | ) -> LaidOutText {
+    | |________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+warning: called `expect` on `brush.foreground` after checking its variant with `is_some`
+   --> crates/inker/document-canvas/src/text.rs:541:21
+    |
+540 |             let run_color = if source_colors && brush.foreground.is_some() {
+    |                                                 -------------------------- the check is happening here
+541 |                 rgb(brush.foreground.expect("checked above"))
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: try using `if let` or `match`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_unwrap
+    = note: `#[warn(clippy::unnecessary_unwrap)]` on by default
+
+warning: this `if` statement can be collapsed
+   --> crates/inker/document-canvas/src/types.rs:388:17
+    |
+388 | /                 if let RenderedBlockKind::Group { children } = &b.kind {
+389 | |                     if let Some(child) = deepest(children, x, y) {
+390 | |                         return Some(child);
+391 | |                     }
+392 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `#[warn(clippy::collapsible_if)]` on by default
+help: collapse nested if block
+    |
+388 ~                 if let RenderedBlockKind::Group { children } = &b.kind
+389 ~                     && let Some(child) = deepest(children, x, y) {
+390 |                         return Some(child);
+391 ~                     }
+    |
+
+warning: `document-canvas` (lib) generated 6 warnings (run `cargo clippy --fix --lib -p document-canvas -- ` to apply 1 suggestion)
+    Checking mere-document-lanes v0.1.0 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/crates/system/document-lanes)
+    Checking pelt-core v0.2.0 (/Users/markik/Code/worktrees/mere-inker-cue-20261022/ports/pelt/core)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> ports/pelt/core/src/pool_a11y.rs:65:18
+   |
+65 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+65 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+65 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> ports/pelt/core/src/lib.rs:208:10
+    |
+208 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+208 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+208 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+    |
+
+warning: items after a test module
+   --> ports/pelt/core/src/native.rs:46:1
+    |
+ 46 |   mod held_resource_contract {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 62 |   pub const DOCUMENT_ENGINE_ID: &str = "mere.document";
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 66 |   pub struct DocumentSessionEngine;
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 67 |   impl SessionEngine<Scene> for DocumentSessionEngine {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 86 |   fn serde_document(request: &SessionSpawnRequest) -> Result<EngineDocument, SessionError> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+105 |   pub fn sessions() -> SessionRegistry<Scene> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+108 |   pub fn sessions_with_resources(resources: HeldResources) -> SessionRegistry<Scene> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+111 | / pub fn sessions_with_fetcher<Fetch: ResourceFetcher + Send + Sync + 'static>(
+112 | |     resources: Fetch,
+113 | | ) -> SessionRegistry<Scene> {
+    | |___________________________^
+...
+117 | / pub fn sessions_with_fetcher_and_fonts<Fetch: ResourceFetcher + Send + Sync + 'static>(
+118 | |     resources: Fetch,
+119 | |     fonts: Vec<Vec<u8>>,
+120 | | ) -> SessionRegistry<Scene> {
+    | |___________________________^
+...
+125 | / pub fn sessions_with_presentation<Fetch: ResourceFetcher + Send + Sync + 'static>(
+126 | |     resources: Fetch,
+127 | |     fonts: Vec<Vec<u8>>,
+128 | |     family: Option<String>,
+129 | | ) -> SessionRegistry<Scene> {
+    | |___________________________^
+...
+136 | / pub fn sessions_with_generic_fonts<Fetch: ResourceFetcher + Send + Sync + 'static>(
+137 | |     resources: Fetch,
+138 | |     fonts: Vec<Vec<u8>>,
+139 | |     families: Vec<String>,
+140 | |     generic_fonts: Vec<(String, Vec<u8>)>,
+141 | | ) -> SessionRegistry<Scene> {
+    | |___________________________^
+...
+176 |   pub fn route_policy() -> EngineRoutePolicy {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+205 | / pub fn registries(
+206 | |     workspace_id: impl Into<String>,
+207 | |     policy: EngineRoutePolicy,
+208 | |     profile: EngineProfileBinding,
+209 | | ) -> PeltRegistries<Scene> {
+    | |__________________________^
+...
+222 |   struct FontEngine {
+    |   ^^^^^^^^^^^^^^^^^
+...
+228 |   impl SessionEngine<Scene> for FontEngine {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `#[warn(clippy::items_after_test_module)]` on by default
+    = help: move the items to before the test module was defined
+
+warning: large size difference between variants
+  --> ports/pelt/core/src/content.rs:66:1
+   |
+66 | / enum Lane<F> {
+67 | |     Document(PeltController<F>),
+   | |     --------------------------- the largest variant contains at least 1712 bytes
+68 | |     Surface(PeltSurface),
+   | |     -------------------- the second-largest variant contains at least 184 bytes
+69 | | }
+   | |_^ the entire enum is at least 1712 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+   = note: `#[warn(clippy::large_enum_variant)]` on by default
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+67 -     Document(PeltController<F>),
+67 +     Document(Box<PeltController<F>>),
+   |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/input.rs:161:5
+    |
+161 | /     if event.key_code == 0 && event.pressed {
+162 | |         if let Some(text) = event.text.as_ref() {
+163 | |             return Ok(SessionInput::Ime(SessionIme::Commit(text.clone())));
+164 | |         }
+165 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `#[warn(clippy::collapsible_if)]` on by default
+help: collapse nested if block
+    |
+161 ~     if event.key_code == 0 && event.pressed
+162 ~         && let Some(text) = event.text.as_ref() {
+163 |             return Ok(SessionInput::Ime(SessionIme::Commit(text.clone())));
+164 ~         }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/pool.rs:302:17
+    |
+302 | /                 if let Some((id, _)) = &focused {
+303 | |                     if self.prepare(id).is_err() {
+304 | |                         delivered_focus = None;
+305 | |                     }
+306 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+302 ~                 if let Some((id, _)) = &focused
+303 ~                     && self.prepare(id).is_err() {
+304 |                         delivered_focus = None;
+305 ~                     }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/pool.rs:416:13
+    |
+416 | /             if content.lane() == PeltLane::Document
+417 | |                 || self
+418 | |                     .placements
+419 | |                     .values()
+...   |
+426 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+416 ~             if (content.lane() == PeltLane::Document
+417 |                 || self
+418 |                     .placements
+419 |                     .values()
+420 ~                     .any(|p| &p.value.content == key && p.value.admits())
+421 ~                     .any(|p| &p.value.content == key && p.value.admits()))
+422 |             {
+423 ~                 && content.pump() {
+424 |                     more = true;
+425 |                     self.pending.insert(key.clone());
+426 ~                 }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/pool.rs:498:9
+    |
+498 | /         if let Some((epoch, more)) = self.last_pump {
+499 | |             if epoch == epoch_ms.to_bits() {
+500 | |                 return more;
+501 | |             }
+502 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+498 ~         if let Some((epoch, more)) = self.last_pump
+499 ~             && epoch == epoch_ms.to_bits() {
+500 |                 return more;
+501 ~             }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/pool.rs:552:9
+    |
+552 | /         if let Some(p) = self.placements.get(&capture.placement) {
+553 | |             if let Some(content) = self.contents.get_mut(&p.value.content) {
+554 | |                 if content.receiver_identity() == capture.receiver {
+555 | |                     let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
+...   |
+558 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+552 ~         if let Some(p) = self.placements.get(&capture.placement)
+553 ~             && let Some(content) = self.contents.get_mut(&p.value.content) {
+554 |                 if content.receiver_identity() == capture.receiver {
+555 |                     let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
+556 |                 }
+557 ~             }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/pool.rs:553:13
+    |
+553 | /             if let Some(content) = self.contents.get_mut(&p.value.content) {
+554 | |                 if content.receiver_identity() == capture.receiver {
+555 | |                     let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
+556 | |                 }
+557 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+553 ~             if let Some(content) = self.contents.get_mut(&p.value.content)
+554 ~                 && content.receiver_identity() == capture.receiver {
+555 |                     let _ = content.input_event(capture.last.cancel(), capture.scale_factor);
+556 ~                 }
+    |
+
+warning: manual implementation of `.is_multiple_of()`
+  --> ports/pelt/core/src/surface_policy.rs:48:16
+   |
+48 |             && frame_index % (policy.refresh_every_n_frames as u64) == 0
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `frame_index.is_multiple_of(policy.refresh_every_n_frames as u64)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/workspace.rs:589:9
+    |
+589 | /         if matches!(input.pointer(), Some((_, inker::PointerPhase::Down, _))) {
+590 | |             if let Some(tile) = self.contents.input_target(0, &input) {
+591 | |                 self.focus(tile);
+592 | |             }
+593 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+589 ~         if matches!(input.pointer(), Some((_, inker::PointerPhase::Down, _)))
+590 ~             && let Some(tile) = self.contents.input_target(0, &input) {
+591 |                 self.focus(tile);
+592 ~             }
+    |
+
+warning: this `if` statement can be collapsed
+   --> ports/pelt/core/src/workspace.rs:798:13
+    |
+798 | /             if let TileEvent::Activated(id) = event {
+799 | |                 if active_tiles(self.workbench.tree()).contains(id) && self.has_content(*id) {
+800 | |                     focus_changed = self.focused != Some(*id);
+801 | |                     self.focus(*id);
+802 | |                 }
+803 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+798 ~             if let TileEvent::Activated(id) = event
+799 ~                 && active_tiles(self.workbench.tree()).contains(id) && self.has_content(*id) {
+800 |                     focus_changed = self.focused != Some(*id);
+801 |                     self.focus(*id);
+802 ~                 }
+    |
+
+warning: `pelt-core` (lib test) generated 13 warnings (4 duplicates) (run `cargo clippy --fix --lib -p pelt-core --tests -- ` to apply 8 suggestions)
+warning: `pelt-core` (lib) generated 12 warnings (8 duplicates) (run `cargo clippy --fix --lib -p pelt-core -- ` to apply 4 suggestions)
+warning: very complex type used. Consider factoring parts into `type` definitions
+   --> ports/pelt/core/tests/pool.rs:884:22
+    |
+884 | fn overlap_pool() -> (PeltControllerPool<u64, u64, String>, [Arc<Mutex<Probe>>; 2]) {
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+    = note: `#[warn(clippy::type_complexity)]` on by default
+
+warning: `pelt-core` (test "pool") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 41s
