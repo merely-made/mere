@@ -100,10 +100,7 @@ fn visible_fit_includes_fold_summary_instead_of_hidden_member_extents() {
     canvas.selected.extend(keys[..2].iter().copied());
     canvas.fold_selected("framing-test").unwrap();
     assert!(canvas.fit_visible());
-    assert_eq!(
-        canvas.camera.zoom, 1.0,
-        "hidden extents do not shrink the summary"
-    );
+    assert!(canvas.camera.zoom>1.0,"hidden extents do not shrink the summary");
     let summary = canvas.screen_point_of((0.0, 0.0));
     assert!((0.0..800.0).contains(&summary.0));
     inside(&canvas, keys[2]);
@@ -191,7 +188,7 @@ fn member_stand_ins_remain_visible_and_selectable_for_framing() {
     assert!(canvas.fit_visible());
     inside(&canvas, keys[0]);
     inside(&canvas, keys[2]);
-    assert_eq!(canvas.camera.zoom, 1.0);
+    assert!(canvas.camera.zoom>1.0 && canvas.camera.zoom<=MAX_ZOOM);
     canvas.selected.extend([keys[0], keys[1]]);
     assert!(canvas.can_fit_selection());
     assert!(canvas.fit_selection());
@@ -230,4 +227,16 @@ fn a_scope_hides_a_fold_without_losing_its_record_or_partial_members() {
     );
     canvas.clear_scope();
     assert_eq!(canvas.fold_projections().len(), 1);
+}
+
+#[test]
+fn small_graph_fit_magnifies_with_padding_and_preserves_source_geometry() {
+    let (mut canvas,keys)=placed(&[(-30.0,0.0),(30.0,0.0)]);
+    let positions:Vec<_>=keys.iter().map(|key|canvas.view.position_of(*key)).collect();
+    canvas.fit_to_content();
+    assert!(canvas.camera.zoom>1.0 && canvas.camera.zoom<=MAX_ZOOM);
+    for key in &keys {inside(&canvas,*key);}
+    assert_eq!(positions,keys.iter().map(|key|canvas.view.position_of(*key)).collect::<Vec<_>>());
+    assert!(canvas.fit_selection()==false);assert!(canvas.fit_visible());
+    assert!(canvas.camera.zoom>1.0);
 }

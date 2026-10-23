@@ -301,4 +301,5 @@ pub use reading_find::{
     find_status,
     is_find_shortcut,
 };
-pub use reading_toolbar::{ReadCommand, read_toolbar};
+pub use reading_toolbar::{ReadCommand, read_toolbar, RelationshipPreviewCommand, relationship_preview};
+pub mod scope_navigation;
