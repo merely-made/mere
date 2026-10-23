@@ -1,0 +1,89 @@
+{
+  "native-build": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "schedule_replay"
+    ],
+    "exit": 0,
+    "seconds": 227.24,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "wasm-build": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--example",
+      "schedule_replay_wasm",
+      "--target",
+      "wasm32-unknown-unknown"
+    ],
+    "exit": 0,
+    "seconds": 178.43,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "schedule-tests": {
+    "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+    "command": [
+      "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+      "--config",
+      "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+      "test",
+      "--locked",
+      "--offline",
+      "-p",
+      "pictograph",
+      "--no-default-features",
+      "--features",
+      "canvas",
+      "--lib",
+      "schedule",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 38.95,
+    "debug": 0,
+    "incremental": 0,
+    "jobs": 4
+  },
+  "runner": {
+    "command": [
+      "python3",
+      "support/seiche-replay/run.py",
+      "--case",
+      "schedule",
+      "--target-dir",
+      "/Users/markik/Code/targets/mere-next-crop",
+      "--output",
+      "/Users/markik/Code/output/mere-next-crop-implementation/schedule/matrix"
+    ],
+    "exit": 0,
+    "seconds": 15.31
+  }
+}
