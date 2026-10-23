@@ -537,7 +537,7 @@ identity = { package = "personae", version = "0.3.0", git = "https://github.com/
 servitor = { version = "0.0.2", git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
 # Path + version: the path is used for local workspace builds, the version lets
 # a publishable dependent (stickleback) record the crates.io dependency.
-muniment = { version = "0.1.2", git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+muniment = { version = ">=0.1.2, <0.3", git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
 # The directory port. Promoted from `crates/dramatis/` to `ports/` 2026-08-23
 # (suite census 7.3): the three senses of the word were always the roadmap —
 # an index, being gazetted, and the paper you read — so the resolver grows
