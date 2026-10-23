@@ -1147,9 +1147,22 @@ where
         let mut results = Vec::with_capacity(requests.len());
         let mut dispatched = false;
         for request in requests {
+            // Raw calls name this operation's entry context. Freeze once before
+            // contributor callbacks; bound publications retain their original life.
+            let mut request = request.clone();
+            if let Some(runner) = self.s.runner.as_ref() {
+                let dom = runner.dom();
+                let dom = dom.borrow();
+                request = request.bind_publication(
+                    &crate::A11yOwner::new(&self.s.a11y_owner),
+                    &crate::WindowDom::new(&dom, runner.mount()),
+                    &self.s.shared.leaves,
+                    &self.s.shared.producers,
+                );
+            }
             // Recompute against the current DOM for each request: a previous
             // callback in this batch may have removed or disabled its target.
-            let node = match self.admit_a11y_request(request) {
+            let node = match self.admit_a11y_request(&request) {
                 Ok(node) => node,
                 Err(reason) => {
                     results.push(A11yDispatch::Rejected(reason));
@@ -1160,11 +1173,20 @@ where
             let result = match &request.target {
                 crate::A11yTarget::Produced(produced) => {
                     if request.action == A11yAction::Click {
-                        if self.s.shared.producers.act(produced) {
-                            runner.set_focus(Some(node));
-                            A11yDispatch::Dispatched
-                        } else {
-                            A11yDispatch::ProducerDeclined
+                        match self.s.shared.producers.act_checked(
+                            produced,
+                            request.provenance.as_ref().and_then(|p| p.child()),
+                        ) {
+                            crate::ProducerActionDispatch::Dispatched => {
+                                runner.set_focus(Some(node));
+                                A11yDispatch::Dispatched
+                            },
+                            crate::ProducerActionDispatch::Declined => {
+                                A11yDispatch::ProducerDeclined
+                            },
+                            crate::ProducerActionDispatch::StaleTarget => {
+                                A11yDispatch::Rejected(crate::A11yRejection::StaleTarget)
+                            },
                         }
                     } else {
                         runner.set_focus(Some(node));
@@ -1184,7 +1206,7 @@ where
                     A11yDispatch::Dispatched
                 },
             };
-            dispatched = true;
+            dispatched |= result == A11yDispatch::Dispatched;
             results.push(result);
         }
         if dispatched {

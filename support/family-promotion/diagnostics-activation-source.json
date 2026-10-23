@@ -1,0 +1,27 @@
+{
+  "basis": "fcc483e49eba1feced106653b662c26ddb299bbe",
+  "normalization": "CRLF normalized to LF",
+  "source_sha256": {
+    ".gitattributes": "217995fdab75ce84cc58db22d9a195bc4ed8555a03f1337045d3fe7c8767aad2",
+    "Cargo.lock": "a635da109a37a24e2dded8ea72eb1819ed962fb2c99bf3e4f91cabdd4ef3e241",
+    "Cargo.toml": "32cb52c0be9d7b8fe8dae119507b46d55dff470baa758cbc7b73b6015e5f756f",
+    "crates/cambium/cambium-rootstock/src/a11y_provenance.rs": "58fb6293c1ad73cfaf89a75bb5b8e39ddbd7fb077e92627e3934ad4784373f48",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests.rs": "c44a5a590c5367cd98f2b29a2c33004f6a74a25e22eb08c8e8d9948569ea16cd",
+    "crates/cambium/cambium-rootstock/src/accessibility_tests/activation_tests.rs": "798a7925e27807d0dba81e0de5ead6b0e4c10fb3f6baa82833697193a0890325",
+    "crates/cambium/cambium-rootstock/src/frame.rs": "ae0c2c7b485196eeb68cb4afe433a63d1d8aee02e0385ad99e3cfdf9db7122df",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "0fceb9ce0576fb0c439290fcb3b9c932fbf9a029af569b1edf62a9adf6178ce1",
+    "crates/cambium/cambium-rootstock/src/producer.rs": "461897ad1ee6e22bd8d4e22f21f12ad6139a8528f4b981269fb4867fb54fd641",
+    "crates/cambium/cambium-rootstock/src/producer/child_lifetime.rs": "3e7b9e6bf311d6713648fd40a63b8bd2e7a75fe4118a28671b5a587cf091a644",
+    "crates/cambium/cambium-rootstock/src/producer/registry.rs": "333c1ecc3d330cbbe4fc7627c5fa0a3d0cbfe6a40790607db898ea18776f6066",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "ec77a5c9c712f7afb13561e5a62b135616d6cc2bdac6f629c772b3d5786e3f89",
+    "crates/canvas/pictograph/src/canvas/reader.rs": "c603c79efad1c92646be0ce58b1967d85b14e59474f0df08a014f2c2e02925fe",
+    "ports/graphshell/src/retained_content/producer.rs": "addf3c5bd7ec971e1e11598aecf88184a1ee1ad0c880430175d7734fe9f00504",
+    "ports/graphshell/src/retained_content/tests.rs": "5fc13e860899e8a66a49f91ef81f7d8193bb2553988372ad7ddb044a2b945d31",
+    "support/family-promotion/native-id-consumer/Cargo.lock": "18e8749f5283372e7e6322446287bfb7baee7d32c96d94bfba7854ce76ca113a",
+    "support/family-promotion/native-id-consumer/Cargo.toml": "01e51bd3e0a58a88c623a897b50679bab97c056f123709fb854ab6a62cc71445"
+  },
+  "post_gate_documentation_only": [
+    "crates/canvas/pictograph/src/canvas/reader.rs"
+  ],
+  "known_red_source": "diagnostics-activation-canvas-aba.patch; not applied to qualified source"
+}
