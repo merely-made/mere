@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-23",
+  "receiving_merge": "811c87a07d8d3435347d4280bf45511f55b3aa28",
+  "new_main": "86796a2447d68b3e6538d0ceff9f387a5d56e29c",
+  "upstream_changed_paths": [
+    "ports/pelt/core/src/pool.rs",
+    "ports/pelt/core/tests/cue.rs"
+  ],
+  "qualification_sha256": "6e77dc81884749f56a7b8611a02903329a5fbe69dcbff6c8a1c8d1e6ea5d06ae",
+  "audited_source_hashes_unchanged": true,
+  "native_dependency_closure": {
+    "roots": [
+      "cambium-genet-web-host",
+      "cambium-genet-winit-host",
+      "cambium-rootstock",
+      "cambium-winit-a11y",
+      "mesquite"
+    ],
+    "packages": 1075,
+    "includes_dev_dependencies": true,
+    "pelt_core_reachable": false
+  },
+  "product_dependency": "Graphshell retained-content reaches Pelt; original six-root survey retained separately. Its affected gate was rerun.",
+  "product_gate": {
+    "receipt": "diagnostics-outcomes-product-tail.json",
+    "sha256": "da54b8cf1fe898b8fd80990455392895602781d1fd56a31ea2b7ada4415e9ee5",
+    "passed": 15,
+    "existing_ignored": 1
+  },
+  "receiving": "Native closure, manifests/locks, publisher/collector/schema source and all sealed raw receipts unchanged. Product rerun passes. Distinct counts remain 307 passed and 8 existing ignored; repeats are not added."
+}
