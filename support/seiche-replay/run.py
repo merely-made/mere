@@ -37,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--target-dir', type=pathlib.Path, required=True)
     parser.add_argument('--output', type=pathlib.Path, required=True)
-    parser.add_argument('--case', action='append', choices=['binding', 'occurrence', 'occurrence-mix', 'grouped'],
+    parser.add_argument('--case', action='append', choices=['binding', 'occurrence', 'occurrence-mix', 'grouped', 'schedule'],
                         help='run only this case; repeat to select several (default: all)')
     args = parser.parse_args()
     out = args.output.resolve()
@@ -61,13 +61,15 @@ def main():
         ('occurrence', 'crates/canvas/pictograph/examples/occurrence_replay.json', 'run_occurrence_replay'),
         ('occurrence-mix', 'crates/canvas/pictograph/examples/occurrence_mix_replay.json', 'run_occurrence_replay'),
         ('grouped', 'crates/canvas/pictograph/examples/grouped_replay.json', 'run_grouped_replay'),
+        ('schedule', 'crates/canvas/pictograph/examples/schedule_replay.json', 'run_schedule_replay'),
     ]
     selected = set(args.case or [name for name, _, _ in case_matrix])
     for name, relative, export in case_matrix:
         if name not in selected:
             continue
         example = {'binding': 'binding_replay', 'occurrence': 'occurrence_replay',
-                   'occurrence-mix': 'occurrence_replay', 'grouped': 'grouped_replay'}[name]
+                   'occurrence-mix': 'occurrence_replay', 'grouped': 'grouped_replay',
+                   'schedule': 'schedule_replay'}[name]
         native = target / 'debug/examples' / example
         wasm = target / 'wasm32-unknown-unknown/debug/examples' / (example + '_wasm.wasm')
         pkg = out / (name + '-wasm')
@@ -97,7 +99,7 @@ def main():
         w2 = run('wasm-2', wire, True)
         if name == 'binding':
             expected_ticks = list(range(1, len(fixture['ticks']) + 1))
-        elif name == 'grouped':
+        elif name in ('grouped', 'schedule'):
             expected_ticks = list(range(fixture['ticks'] + 1))
         else:
             expected_ticks = list(range(sum(fixture['tick_batches']) + 1))
@@ -209,6 +211,57 @@ def main():
                 for runtime in (False, True):
                     label = 'kinematic-mix-refusal-' + ('wasm' if runtime else 'native')
                     controls[label] = run(label, json.dumps(changed), runtime, refusal='root.parts[1]')
+        elif name == 'schedule':
+            expected_stages = [0] * 8 + [1] * 16 + [None]
+            for label, candidate in [('native-1', n1), ('native-2', n2), ('wasm-1', w1), ('wasm-2', w2)]:
+                if candidate['stage_indices'] != expected_stages:
+                    failures.append(f'{name}/{label}: stage transition differs: {candidate["stage_indices"]}')
+                if candidate['reopened_stage_indices'] != expected_stages:
+                    failures.append(f'{name}/{label}/fresh-reopen: stage transition differs')
+                if [tick for tick, _ in candidate['reopened_trace']] != expected_ticks:
+                    failures.append(f'{name}/{label}/fresh-reopen: trace omitted or added ticks')
+                if candidate['saved_spec'] != json.loads(fixture['spec']):
+                    failures.append(f'{name}/{label}: saved schedule differs from authored recipe')
+                difference = first_difference(candidate['trace'], candidate['reopened_trace'])
+                if difference:
+                    failures.append(f'{name}/{label}/fresh-reopen: {difference}')
+            for runtime, baseline in ((False, n1), (True, w1)):
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['stages'][0]['stop']['frames'] = 9
+                changed['spec'] = json.dumps(spec)
+                label = 'stop-shift-' + ('wasm' if runtime else 'native')
+                value = run(label, json.dumps(changed), runtime)
+                expected_shift = [0] * 9 + [1] * 16
+                if value['stage_indices'] != expected_shift:
+                    raise AssertionError(f'{label}: changed stop must move stage transition from tick 8 to tick 9')
+                controls[label] = {'baseline_stage_indices': baseline['stage_indices'], 'changed_stage_indices': value['stage_indices'], 'first_shift_tick': 8}
+
+                changed = copy.deepcopy(fixture)
+                spec = json.loads(changed['spec'])
+                spec['root']['stages'][0]['capture'] = 'pinned'
+                changed['spec'] = json.dumps(spec)
+                label = 'capture-control-' + ('wasm' if runtime else 'native')
+                value = run(label, json.dumps(changed), runtime)
+                role_difference = first_difference(baseline['trace'], value['trace'], 'role:')
+                position_difference = first_difference(baseline['trace'], value['trace'], 'position-bits:')
+                if role_difference is None or role_difference['tick'] < 8:
+                    raise AssertionError(f'{label}: changed capture must alter roles at/after tick 8: {role_difference}')
+                if position_difference is None or position_difference['tick'] <= 8:
+                    raise AssertionError(f'{label}: changed capture must alter subsequent positions: {position_difference}')
+                controls[label] = {'role_divergence': role_difference, 'subsequent_position_divergence': position_difference}
+
+            changed = copy.deepcopy(fixture)
+            spec = json.loads(changed['spec'])
+            spec['root']['stages'][0]['node'] = {
+                'node': 'grouped', 'partition': 'groups.bridges',
+                'outer': {'node': 'preset', 'id': 'charge.barnes-hut'},
+                'inner': {'node': 'preset', 'id': 'spring.rapier'}
+            }
+            changed['spec'] = json.dumps(spec)
+            for runtime in (False, True):
+                label = 'unsupported-stage-partition-' + ('wasm' if runtime else 'native')
+                controls[label] = run(label, json.dumps(changed), runtime, refusal='root.stages[0].node.partition')
         elif name == 'grouped':
             for runtime, baseline in ((False, n1), (True, w1)):
                 changed = copy.deepcopy(fixture)
@@ -260,7 +313,8 @@ def main():
                          'The occurrence Mix case round-trips the serialized DynamicsSlot recipe before replay; this does not qualify Graphshell v4 persistence or checkpoint restoration.',
                          'No checkpoint restoration, cross-OS, browser UI, actor replay or consumer repin qualification.',
                          'Occurrence witnesses cover public positions, roles and source identities; Seiche witnesses also cover velocities and field time.',
-                         'The direct Canvas grouped witness covers public groups-channel membership, roles and position bits only; it does not witness velocities, clocks or checkpoint state.']
+                         'The direct Canvas grouped witness covers public groups-channel membership, roles and position bits only; it does not witness velocities, clocks or checkpoint state.',
+                         'The direct Canvas schedule witness covers public positions, roles and schedule-stage readback only; it does not witness velocities, clocks or checkpoint state.']
     (out / 'replay-results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(json.dumps(results, indent=2))
     return bool(failures)

@@ -26,6 +26,15 @@ rounding.
   position bits at tick 1. An unsupported partition and outer weights that
   overflow or underflow runtime f32 must refuse at their exact paths in both
   native and Wasm. This fixture does not widen the occurrence adapter contract.
+- Pictograph's `schedule_replay.json` runs a two-stage Schedule: Charge for
+  8 frames, capture as anchored, then Springs for 16 frames, capture as pinned.
+  It records public position bits, roles, and `physics_schedule_stage()` for
+  ticks 0 through 24, then reconstructs a fresh Canvas from the exact recipe
+  read back before running and the original graph/layout. The runner compares
+  two fresh native processes and two fresh Node-Wasm processes. Controls move
+  the first stop by one frame, change its capture role, and require Canvas to
+  refuse an unsupported nested partition at `root.stages[0].node.partition`.
+  This is fresh-start recipe replay; it transfers no running physics state.
 - A changed `dt` at tick 7 must change physical state at tick 7. Removing the
   disclosed relationship must change the occurrence position trace. Named
   channels and an incompatible arrangement must refuse with the expected path.
@@ -46,10 +55,12 @@ cargo build --locked -p pictograph --no-default-features --features canvas --exa
 cargo build --locked -p pictograph --no-default-features --features canvas --example occurrence_replay_wasm --target wasm32-unknown-unknown
 cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay
 cargo build --locked -p pictograph --no-default-features --features canvas --example grouped_replay_wasm --target wasm32-unknown-unknown
+cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay
+cargo build --locked -p pictograph --no-default-features --features canvas --example schedule_replay_wasm --target wasm32-unknown-unknown
 python3 support/seiche-replay/run.py --target-dir target --output /tmp/seiche-replay
 ```
 
-Use `--case grouped` (or repeat `--case` with other case names) for a focused
+Use `--case schedule` or `--case grouped` (or repeat `--case` with other case names) for a focused
 run. Without `--case`, the runner checks every fixture.
 
 The runner records mismatches as qualification failures and preserves the first

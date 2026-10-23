@@ -1,0 +1,663 @@
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused import: `AddressKind`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:33:31
+   |
+33 | use crate::address::{Address, AddressKind, address_from_url, cached_host_from_url, detect_mime};
+   |                               ^^^^^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> crates/graph/graph-kernel/src/graph/legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> crates/graph/graph-kernel/src/graph/node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `RelationSelector`
+  --> crates/graph/graph-kernel/src/graph/query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `address_from_url` and `detect_mime`
+  --> crates/graph/graph-kernel/src/graph/snapshot/from.rs:18:22
+   |
+18 | use crate::address::{address_from_url, detect_mime};
+   |                      ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `EdgeRef`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> crates/graph/graph-kernel/src/graph/mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `key`
+    --> crates/graph/graph-kernel/src/graph/assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> crates/graph/graph-kernel/src/graph/identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: methods `append_node_property`, `add_node_classification`, `remove_node_classification`, `set_node_classification_status`, and `set_node_primary_classification` are never used
+   --> crates/graph/graph-kernel/src/graph/resource_content.rs:96:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `replay_assert_relation_by_ids`, `replay_set_edge_semantic_predicate_by_ids`, `dissolve_remove_node_collect_traversals`, `assert_surface_persisted_semantic_statement`, `replay_retract_relations`, and `set_edge_semantic_predicate` are never used
+   --> crates/graph/graph-kernel/src/graph/edge_ops.rs:421:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+421 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+437 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+506 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+728 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+825 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+964 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `mere-kernel` (lib) generated 19 warnings (run `cargo fix --lib -p mere-kernel` to apply 10 suggestions)
+   Compiling pandect v0.1.1 (/Users/markik/Code/worktrees/mere-palette-writers-native-route/crates/system/pandect)
+warning: unused import: `async_trait::async_trait`
+   --> crates/system/pandect/src/graph_codicil.rs:844:9
+    |
+844 |     use async_trait::async_trait;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::collections::HashMap`
+   --> crates/system/pandect/src/graph_codicil.rs:849:9
+    |
+849 |     use std::collections::HashMap;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::super::*`
+   --> crates/system/pandect/src/wallet_grant/epochs.rs:170:9
+    |
+170 |     use super::super::*;
+    |         ^^^^^^^^^^^^^^^
+
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `super::super::*`
+   --> crates/system/pandect/src/wallet_grant/pairing.rs:132:9
+    |
+132 |     use super::super::*;
+    |         ^^^^^^^^^^^^^^^
+
+warning: unused import: `std::io`
+  --> crates/system/pandect/src/wallet_grant/records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> crates/system/pandect/src/wallet_grant/records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> crates/system/pandect/src/wallet_grant/records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> crates/system/pandect/src/wallet_grant/types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> crates/system/pandect/src/wallet_grant/types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> crates/system/pandect/src/graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused `Result` that must be used
+    --> crates/system/pandect/src/graph_session.rs:2637:13
+     |
+2637 | /             session.edit_now(modern.clone(), |graph| {
+2638 | |                 graph
+2639 | |                     .declare_predicate(predicate, kernel::graph::GraphStratum::Surface)
+2640 | |                     .unwrap()
+2641 | |             });
+     | |______________^
+     |
+     = note: this `Result` may be an `Err` variant, which should be handled
+     = note: `#[warn(unused_must_use)]` (part of `#[warn(unused)]`) on by default
+help: use `let _ = ...` to ignore the resulting value
+     |
+2637 |             let _ = session.edit_now(modern.clone(), |graph| {
+     |             +++++++
+
+warning: unused `Result` that must be used
+    --> crates/system/pandect/src/graph_session.rs:2654:13
+     |
+2654 | /             session.edit_now(modern.clone(), |graph| {
+2655 | |                 graph
+2656 | |                     .declare_predicate(predicate, kernel::graph::GraphStratum::Resource)
+2657 | |                     .unwrap()
+2658 | |             });
+     | |______________^
+     |
+     = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+     |
+2654 |             let _ = session.edit_now(modern.clone(), |graph| {
+     |             +++++++
+
+warning: `pandect` (lib test) generated 13 warnings (run `cargo fix --lib -p pandect --tests` to apply 11 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 25.39s
+     Running unittests src/lib.rs (target/build/debug/deps/pandect-492b378aed12190b)
+
+running 340 tests
+test application_settings_store::tests::older_json_receives_safe_recall_defaults ... ok
+test application_settings_store::tests::path_is_application_scoped ... ok
+test application_settings_store::tests::save_then_load_round_trips ... ok
+test application_settings_store::tests::stored_theme_fields_read_into_the_choice ... ok
+test arrangement_facets::tests::a_facet_set_from_before_seed_regions_and_mosaic_still_loads ... ok
+test arrangement_facets::tests::a_hull_with_a_malformed_point_is_skipped_whole ... ok
+test arrangement_facets::tests::a_malformed_mosaic_reads_none ... ok
+test arrangement_facets::tests::a_malformed_seed_place_is_skipped_and_all_malformed_reads_none ... ok
+test arrangement_facets::tests::a_rewrite_clears_positions_absent_from_the_new_set ... ok
+test arrangement_facets::tests::a_rewrite_leaves_other_namespaces_untouched ... ok
+test arrangement_facets::tests::each_family_rewrite_clears_only_its_own_facet ... ok
+test arrangement_facets::tests::every_family_member_round_trips ... ok
+test arrangement_facets::tests::malformed_and_non_finite_payloads_are_skipped ... ok
+test arrangement_facets::tests::malformed_regions_fall_back_to_none_without_touching_other_groups ... ok
+test arrangement_facets::tests::mosaic_round_trips_and_none_clears_it ... ok
+test arrangement_facets::tests::regions_round_trip_in_order_and_a_rewrite_clears_them ... ok
+test arrangement_facets::tests::retain_present_drops_departed_nodes_entirely ... ok
+test arrangement_facets::tests::seed_round_trips_and_none_is_the_recipe_seed ... ok
+test arrangement_facets::tests::the_new_groups_rewrite_independently_of_the_rest_of_the_family ... ok
+test arrangement_facets::tests::write_then_read_round_trips ... ok
+test atomic_file::tests::a_completed_write_cleans_a_backup_left_by_an_interrupted_earlier_write ... ok
+test atomic_file::tests::a_failed_replacement_restores_the_previous_document ... ok
+test atomic_file::tests::a_non_destination_conflict_does_not_trigger_backup_fallback ... ok
+test atomic_file::tests::a_second_write_replaces_the_document_and_cleans_up ... ok
+test atomic_file::tests::atomic_write_exposes_old_contents_until_direct_rename_then_new_contents ... ok
+test atomic_file::tests::atomic_write_failure_preserves_target_and_cleans_staging_file ... ok
+test atomic_file::tests::overwrite_uses_one_direct_rename_when_supported ... ok
+test atomic_file::tests::temporary_creation_skips_a_name_already_created_by_another_writer ... ok
+test browser_node_state::tests::a_legacy_sidecar_still_loads ... ok
+test browser_node_state::tests::absent_node_reads_as_no_state ... ok
+test browser_node_state::tests::absorb_legacy_seeds_unseen_nodes_only ... ok
+test browser_node_state::tests::load_returns_none_when_no_file ... ok
+test browser_node_state::tests::malformed_json_returns_invalid_data_error ... ok
+test browser_node_state::tests::migrates_legacy_graph_json_session_state_once ... ok
+test codicil_seal::tests::a_different_epoch_key_fails_to_unseal ... ok
+test codicil_seal::tests::a_host_scope_keeps_the_canonical_hash_and_refuses_other_lanes ... ok
+test codicil_seal::tests::another_persona_cannot_unseal_even_with_the_same_epoch_secret ... ok
+test codicil_seal::tests::reads_a_pre_rotation_epoch_via_with_epoch ... ok
+test codicil_seal::tests::seal_then_unseal_round_trips ... ok
+test codicil_seal::tests::tampered_ciphertext_is_rejected ... ok
+test denizen_facets::tests::a_legacy_binding_reads_its_nested_log_but_never_writes_it_back ... ok
+test denizen_facets::tests::a_malformed_payload_reads_as_not_a_denizen ... ok
+test denizen_facets::tests::an_empty_binding_writes_as_a_remove ... ok
+test denizen_facets::tests::non_denizen_node_reads_as_none ... ok
+test denizen_facets::tests::rebind_replaces ... ok
+test denizen_facets::tests::remove_un_resides ... ok
+test denizen_facets::tests::unknown_kind_loads_forward ... ok
+test denizen_facets::tests::write_then_read_round_trips ... ok
+test device_settings_store::tests::a_duplicate_resource_id_is_refused_on_load ... ok
+test device_settings_store::tests::a_resource_id_with_whitespace_is_refused_on_load ... ok
+test device_settings_store::tests::absent_stated_signals_deserialize_as_none ... ok
+test device_settings_store::tests::an_invalid_block_is_also_refused_on_save ... ok
+test device_settings_store::tests::an_invalid_network_string_is_refused_on_load ... ok
+test device_settings_store::tests::an_old_format_file_without_the_mesh_block_still_loads ... ok
+test device_settings_store::tests::an_out_of_range_quiet_hour_is_refused_on_load ... ok
+test device_settings_store::tests::an_unknown_checkpoint_string_is_refused_on_load ... ok
+test device_settings_store::tests::path_is_device_scoped ... ok
+test device_settings_store::tests::save_then_load_round_trips_mesh_lending_with_stated_fallbacks ... ok
+test device_settings_store::tests::save_then_load_round_trips_unlock_policy ... ok
+test engine_profile_store::tests::binding_maps_to_scope_in_all_three_cases ... ok
+test engine_profile_store::tests::convenience_wrapper_routes_through_manifest_fields ... ok
+test engine_profile_store::tests::engine_id_segment_is_used_verbatim ... ok
+test engine_profile_store::tests::graph_scope_composes_under_graphs_subdir ... ok
+test engine_profile_store::tests::graph_scope_without_graph_id_returns_none ... ok
+test engine_profile_store::tests::graph_scope_without_session_id_returns_none ... ok
+test engine_profile_store::tests::persona_scope_composes_under_personas_root ... ok
+test engine_profile_store::tests::session_scope_composes_under_sessions_root ... ok
+test engine_profile_store::tests::session_scope_without_session_id_returns_none ... ok
+test facet_store::tests::a_foreign_facet_survives_the_round_trip ... ok
+test facet_store::tests::a_recorded_cascade_replays_identically_across_expiry ... ok
+test facet_store::tests::copy_node_facets_carries_the_whole_record_through_the_remap ... ok
+test facet_store::tests::load_returns_none_when_no_file ... ok
+test facet_store::tests::malformed_json_returns_invalid_data_error ... ok
+test facet_store::tests::save_then_load_round_trips ... ok
+test facet_store::tests::the_reader_filters_at_the_revision_boundary_without_mutating_storage ... ok
+test graph_codicil::p6_migration_tests::schema_ids_keep_v1_v2_v3_inputs_distinct_from_v4_outputs ... ok
+test graph_codicil::p6_migration_tests::v3_json_codicil_upgrades_legacy_sidecar_once_and_v4_reopen_keeps_id_and_unknown_time ... ok
+test graph_codicil::tests::an_opened_codicil_names_its_source_and_the_codicil ... ok
+test graph_codicil::tests::codicil_profiles_are_explicit_and_legacy_inputs_require_qualified_replay ... ok
+test graph_codicil::tests::codicil_recorded_profile_survives_thaw_and_composition_with_unqualified_controls ... ok
+test graph_codicil::tests::codicil_surface_sidecars_cannot_reuse_resource_handles ... ok
+test graph_codicil::tests::codicil_survives_a_store_close_and_reopen ... ok
+test graph_codicil::tests::compose_of_an_empty_id_list_is_none ... ok
+test graph_codicil::tests::compose_unions_two_codicils_and_records_the_upstream_lineage ... ok
+test graph_codicil::tests::default_redaction_strips_private_fields ... ok
+test graph_codicil::tests::default_redaction_strips_private_web_facets_but_keeps_other_facets ... ok
+test graph_codicil::tests::include_all_keeps_private_fields ... ok
+test graph_codicil::tests::invalid_resource_codicil_open_and_compose_fail_with_valid_control ... ok
+test graph_codicil::tests::legacy_v1_codicil_loads_and_imports_its_inline_metadata ... ok
+test graph_codicil::tests::list_graph_codicils_finds_saved_codicils_tagged_with_the_schema ... ok
+test graph_codicil::tests::open_unknown_id_returns_none ... ok
+test graph_codicil::tests::save_then_open_round_trips_the_graph ... ok
+test graph_placement::legacy_receipt_compat_tests::old_json_translation_receipt_keeps_checksum_and_reopens_semantic_records ... ok
+test graph_placement::tests::cutover_and_origin_choices_are_exact_and_missing_cursor_is_empty ... ok
+test graph_placement::tests::explicit_profile_dispatch_preserves_held_claims_and_never_infers_legacy ... ok
+test graph_placement::tests::frozen_materialization_checks_active_sidecar_handles_and_preserves_retained_notes ... ok
+test graph_placement::tests::frozen_surface_edge_records_ignore_slots_but_preserve_exact_contents_and_multiplicity ... ok
+test graph_placement::tests::recorded_receipt_preserves_same_host_resource_containment_without_surface_duplicates ... ok
+test graph_placement::tests::translation_receipt_validates_exact_frozen_data_before_replay ... ok
+test graph_session::content_tests::unknown_tags_require_original_mere_and_reopen_preserves_that_namespace ... ok
+test graph_session::merge::tests::a_branch_of_a_merged_branch_merges_into_the_same_target ... ok
+test graph_session::merge::tests::a_branch_round_trips_into_its_parent_and_is_kept_merged ... ok
+test graph_session::merge::tests::a_conflict_waits_for_a_choice_and_takes_either_side_or_a_hand_edit ... ok
+test graph_session::merge::tests::a_fork_never_merges_in ... ok
+test graph_session::merge::tests::a_new_plan_carries_the_choices_that_still_apply_and_says_why_others_dropped ... ok
+test graph_session::merge::tests::a_part_picked_before_the_pick_record_merges_as_a_pick ... ok
+test graph_session::merge::tests::a_pick_of_a_pick_merges_into_the_original ... ok
+test graph_session::merge::tests::a_picked_node_the_target_deleted_can_be_added_as_new ... ok
+test graph_session::merge::tests::a_picked_off_part_merges_back_by_derivation ... ok
+test graph_session::merge::tests::a_plan_goes_stale_when_either_side_moves ... ok
+test graph_session::merge::tests::deletions_merge_three_way_against_the_base ... ok
+test graph_session::merge::tests::freshly_opened_source_transaction_after_redo_is_refused ... ok
+test graph_session::merge::tests::merge_in_and_compose_join_resource_facets_by_one_rule ... ok
+test graph_session::merge::tests::redoing_an_undone_merge_marks_the_source_again ... ok
+test graph_session::merge::tests::reloading_source_merged_mark_after_redo_restores_read_only_policy ... ok
+test graph_session::merge::tests::resource_facets_merge_by_the_rules_compose_uses ... ok
+test graph_session::merge::tests::source_transaction_after_undo_without_redo_is_allowed ... ok
+test graph_session::merge::tests::source_transaction_refuses_after_another_handle_redoes_merge ... ok
+test graph_session::pending_tests::an_unsupported_retained_cache_version_is_refused ... ok
+test graph_session::pending_tests::cache_observations_are_revised_and_only_retained_entries_are_dirty ... ok
+test graph_session::pending_tests::cache_returning_to_saved_state_still_writes_after_an_older_batch ... ok
+test graph_session::pending_tests::frozen_resource_selection_and_annotations_survive_recorded_save_reopen ... ok
+test graph_session::pending_tests::retained_cache_batches_track_post_batch_edits_and_reversed_receipts ... ok
+test graph_session::pending_tests::session_only_history_and_reopen_release_inputs_without_losing_truth ... ok
+test graph_session::pending_tests::until_purged_reopens_and_purge_stores_only_a_cache_change ... ok
+test graph_session::tests::a_batch_that_never_commits_stays_pending_until_one_does ... ok
+test graph_session::tests::a_checkpoint_and_its_tail_load_the_same_graph_as_the_baseline_and_journal ... ok
+test graph_session::tests::a_component_fork_takes_only_the_seed_s_component ... ok
+test graph_session::tests::a_fork_at_a_cursor_starts_from_the_parent_there_and_diverges ... ok
+test graph_session::tests::a_session_begun_in_memory_is_stored_whole_by_its_first_flush ... ok
+test graph_session::tests::a_session_journals_its_edits_under_their_authors_and_reopens ... ok
+test graph_session::tests::a_session_opens_only_if_its_mere_holds_it ... ok
+test graph_session::tests::a_view_keeps_its_own_stream_scrubbable_by_journal_cursor ... ok
+test graph_session::tests::a_view_set_now_waits_for_the_next_batch ... ok
+test graph_session::tests::admission_policy_checks_transitions_preserves_history_and_follows_forks ... ok
+test graph_session::tests::an_edit_without_a_replay_form_is_refused_whole ... ok
+test graph_session::tests::archive_compose_retains_both_sources_and_checks_before_writing ... ok
+test graph_session::tests::archive_reopens_exactly_and_public_writes_require_a_fork ... ok
+test graph_session::tests::assertion_author_version_and_source_survive_session_replay ... ok
+test graph_session::tests::checked_snapshot_session_load_reports_baseline_and_checkpoint_corruption ... ok
+test graph_session::tests::derived_names_start_from_one_base_and_name_their_source_whole ... ok
+test graph_session::tests::facet_floats_replay_and_reopen_without_changing_bits ... ok
+test graph_session::tests::in_process_hosts_apply_graph_deltas_by_key ... ok
+test graph_session::tests::legacy_exact_assertions_keep_minting_authors_across_checkpointed_withdrawals ... ok
+test graph_session::tests::legacy_translation_qualification_rejects_a_changed_open_source_before_writing ... ok
+test graph_session::tests::legacy_translation_receipt_preserves_first_handles_history_undo_and_modern_suffix ... ok
+test graph_session::tests::legacy_translation_receipt_rejects_source_profile_and_receipt_damage_atomically ... ok
+test graph_session::tests::placement_is_explicit_and_recorded_sessions_keep_held_surface_claims ... ok
+test graph_session::tests::prepared_translation_transaction_rechecks_every_retained_input ... ok
+test graph_session::tests::profiled_archive_retains_placement_and_redaction_omits_private_history ... ok
+test graph_session::tests::qualification_commit_refuses_raced_source_and_unsupported_backend_atomically ... ok
+test graph_session::tests::replayed_session_handles_are_checked_before_open_and_historical_publication ... ok
+test graph_session::tests::sealed_legacy_receipt_activation_history_undo_and_corruption_are_exact ... ok
+test graph_session::tests::the_latest_live_session_is_the_one_changed_last ... ok
+test graph_session::tests::the_replay_check_compares_equal_across_a_second_tick ... ok
+test graph_session::tests::translated_checkpoint_rejects_valid_truth_changes_before_admission ... ok
+test graph_session::tests::trash_marks_the_manifest_and_restore_clears_it ... ok
+test graph_session::tests::undo_and_redo_order_survives_a_reopen ... ok
+test graph_session::tests::undo_keeps_what_another_author_changed_and_says_who ... ok
+test graph_session::tests::undo_steps_back_through_an_author_s_own_changes_and_redo_returns ... ok
+test graph_session::tests::whole_graph_validation_refuses_without_graph_history_or_storage_changes ... ok
+test image_store::tests::a_legacy_snapshot_externalizes_and_keeps_no_pixels ... ok
+test image_store::tests::an_unencodable_favicon_is_left_behind_not_dropped ... ok
+test image_store::tests::delete_drops_the_blob ... ok
+test image_store::tests::distinct_bytes_get_distinct_keys ... ok
+test image_store::tests::identical_bytes_dedup_to_one_blob ... ok
+test image_store::tests::save_then_load_round_trips_the_bytes ... ok
+test live_view::tests::content_addressed_record_round_trips_curation_and_source_cursor ... ok
+test live_view::tests::malformed_source_and_stale_fold_are_refused_before_storage ... ok
+test live_view::tests::source_refusals_are_explicit_and_never_open_an_empty_snapshot ... ok
+test manifest::tests::a_part_picked_before_the_pick_record_still_loads_with_its_fork_fields ... ok
+test manifest::tests::default_persona_is_stable_across_calls ... ok
+test manifest::tests::lineage_and_the_merged_mark_round_trip ... ok
+test manifest::tests::manifest_loads_minimal_legacy_shape_via_serde_default ... ok
+test manifest::tests::manifest_new_carries_schema_version_and_ids ... ok
+test manifest::tests::manifest_reads_the_legacy_consolidated_engrams_field ... ok
+test manifest::tests::manifest_round_trips_through_serde_json ... ok
+test manifest::tests::record_consolidation_bumps_last_consolidated_at ... ok
+test manifest::tests::touch_advances_updated_at ... ok
+test manifest_store::tests::consolidation_receipts_round_trip_through_disk ... ok
+test manifest_store::tests::flush_without_root_returns_error ... ok
+test manifest_store::tests::flush_writes_dirty_manifests_to_disk ... ok
+test manifest_store::tests::insert_marks_dirty_and_iter_returns_inserted ... ok
+test manifest_store::tests::load_from_disk_records_malformed_manifests_without_panicking ... ok
+test manifest_store::tests::load_from_disk_recovers_what_flush_wrote ... ok
+test manifest_store::tests::move_to_trash_relocates_directory_and_drops_memory_entry ... ok
+test manifest_store::tests::restore_never_clobbers_a_live_session ... ok
+test manifest_store::tests::trash_lists_and_restores_with_identity_intact ... ok
+test manifest_store::tests::update_returns_false_for_missing_session ... ok
+test manifest_store::tests::update_runs_closure_and_marks_dirty ... ok
+test merge_rules::tests::a_facet_without_a_rule_merges_only_when_both_sides_agree ... ok
+test merge_rules::tests::canonical_assertion_handle_collisions_are_checked_across_pairs ... ok
+test notochord_policy_store::tests::a_second_save_replaces_the_policy_document ... ok
+test notochord_policy_store::tests::an_unsupported_document_is_neither_loaded_nor_saved ... ok
+test notochord_policy_store::tests::owner_policy_survives_restart_without_live_session_state ... ok
+test persona_settings_store::tests::load_returns_none_when_no_file ... ok
+test persona_settings_store::tests::path_composes_under_personas_settings_root ... ok
+test persona_settings_store::tests::save_then_load_round_trips_menu_actions ... ok
+test reservoir::tests::a_domain_has_exactly_one_mere ... ok
+test reservoir::tests::a_durable_reservoir_reopens_and_refuses_a_second_owner ... ok
+test reservoir::tests::a_mere_keeps_its_sessions_in_its_own_directory ... ok
+test reservoir::tests::a_tampered_record_is_refused ... ok
+test reservoir::tests::access_defaults_migrate_and_failed_writes_change_no_decision ... ok
+test reservoir::tests::another_persona_cannot_open_the_index ... ok
+test reservoir::tests::derived_ids_are_stable_and_distinct ... ok
+test reservoir::tests::domain_ids_follow_the_naming_rule ... ok
+test reservoir::tests::the_index_survives_reopening_the_backend ... ok
+test reservoir::tests::the_reservoir_sits_beside_the_persona ... ok
+test resource_content_merge_tests::composition_preserves_classification_variants_origins_and_literal_handles ... ok
+test resource_content_merge_tests::conflicting_literal_handle_refuses_composition_without_selecting_a_survivor ... ok
+test saved_scene::tests::a_scene_round_trips_through_the_facet_and_replaces_older_ones ... ok
+test saved_scene::tests::dynamics_ride_as_the_value_they_were_written ... ok
+test scene_facets::tests::a_malformed_field_falls_back_to_its_default_not_the_whole_bundle ... ok
+test scene_facets::tests::absent_container_reads_defaults ... ok
+test scene_facets::tests::copy_scene_facets_carries_donor_settings_to_the_fork_container ... ok
+test scene_facets::tests::scene_facets_do_not_collide_with_a_leaf_nodes_facets ... ok
+test scene_facets::tests::write_then_read_round_trips ... ok
+test script_bindings_store::tests::load_returns_none_when_absent ... ok
+test script_bindings_store::tests::save_then_load_round_trips ... ok
+test session_graph_store::tests::absent_file_loads_to_none ... ok
+test session_graph_store::tests::checked_snapshot_file_load_rejects_invalid_resources_and_preserves_input ... ok
+test session_graph_store::tests::explicit_file_profiles_and_bare_resource_inputs_remain_distinct ... ok
+test session_graph_store::tests::native_recorded_profile_preserves_held_edges_with_legacy_and_absent_controls ... ok
+test session_graph_store::tests::round_trips_a_graph_through_json ... ok
+test session_graph_store::tests::session_graph_path_follows_the_sessions_convention ... ok
+test session_service_runner::tests::in_memory_runner_supports_explicitly_declared_kinds ... ok
+test session_service_runner::tests::null_runner_rejects_everything ... ok
+test session_service_runner::tests::start_then_stop_releases_handle ... ok
+test session_service_runner::tests::stop_unknown_handle_errors_cleanly ... ok
+test session_service_runner::tests::two_sessions_can_run_the_same_kind ... ok
+test session_service_runner::tests::worker_kind_serde_round_trips_for_every_variant ... ok
+test session_service_runner::tests::worker_status_carries_state_running_after_start ... ok
+test session_service_runner::tests::workers_for_filters_by_session ... ok
+test settings_store::tests::exists_reflects_save_state ... ok
+test settings_store::tests::legacy_application_and_device_fields_are_exposed_for_migration ... ok
+test settings_store::tests::load_returns_none_when_no_file ... ok
+test settings_store::tests::malformed_json_returns_invalid_data_error ... ok
+test settings_store::tests::missing_field_takes_its_default ... ok
+test settings_store::tests::save_overwrites_atomically_with_no_tmp_left ... ok
+test settings_store::tests::save_then_load_round_trips ... ok
+test settings_store::tests::settings_path_composition ... ok
+test shared_root::tests::a_fresh_install_adopts_nothing_and_says_so ... ok
+test shared_root::tests::adopting_twice_is_a_no_op_rather_than_an_error ... ok
+test shared_root::tests::an_apps_identity_moves_to_the_shared_root_on_first_access ... ok
+test shared_root::tests::shared_identity_is_never_overwritten_by_a_legacy_one ... ok
+test shared_root::tests::the_override_wins_so_a_scenario_can_use_a_scratch_profile ... ok
+test snapshot_merge::tests::a_shared_handle_cannot_pick_a_payload_during_composition ... ok
+test snapshot_merge::tests::conflicting_declaration_handles_reject_atomically_with_distinct_handle_control ... ok
+test snapshot_merge::tests::conflicting_declarations_retain_origins_and_claims_until_explicit_selection ... ok
+test snapshot_merge::tests::dedups_a_relation_asserted_in_both ... ok
+test snapshot_merge::tests::equal_and_disjoint_declarations_remain_unambiguous_during_composition ... ok
+test snapshot_merge::tests::keeps_edge_endpoints_on_the_original_surface ... ok
+test snapshot_merge::tests::legacy_surface_handle_conflicts_stop_with_distinct_and_duplicate_controls ... ok
+test snapshot_merge::tests::mixed_legacy_and_canonical_snapshots_merge_without_losing_claims_or_placement ... ok
+test snapshot_merge::tests::orphan_surface_rows_stay_retained_without_owning_active_assertion_handles ... ok
+test snapshot_merge::tests::preserves_distinct_surfaces_showing_the_same_url ... ok
+test snapshot_merge::tests::resource_conflicts_return_errors_with_equal_and_disjoint_controls ... ok
+test snapshot_merge::tests::shared_resources_keep_surface_associations_metadata_and_distinct_handles ... ok
+test snapshot_merge::tests::surface_tags_stay_on_their_own_identity ... ok
+test station_grant::tests::a_signed_grant_with_extra_authority_is_not_a_sited_station_grant ... ok
+test station_grant::tests::a_station_grant_can_only_be_renewed_with_a_later_expiry ... ok
+test station_grant::tests::another_personas_wallet_cannot_commission_the_station ... ok
+test switcher_thumbnail::tests::cap_drops_edges_whose_endpoints_were_culled ... ok
+test switcher_thumbnail::tests::empty_graph_yields_empty_thumbnail_with_dimensions_preserved ... ok
+test switcher_thumbnail::tests::fit_preserves_aspect_ratio ... ok
+test switcher_thumbnail::tests::hyperlink_edge_yields_family_tag_for_semantic ... ok
+test switcher_thumbnail::tests::max_nodes_cap_strides_deterministically ... ok
+test switcher_thumbnail::tests::multi_node_fit_keeps_nodes_inside_thumbnail_box ... ok
+test switcher_thumbnail::tests::multi_relation_pair_yields_distinct_family_tags ... ok
+test switcher_thumbnail::tests::resource_content_lifts_to_each_alias_and_respects_the_node_cap ... ok
+test switcher_thumbnail::tests::self_loops_are_filtered_out ... ok
+test switcher_thumbnail::tests::single_node_lands_at_thumbnail_center ... ok
+test view_intent_store::tests::a_saved_version_one_fold_migrates_on_load ... ok
+test view_intent_store::tests::empty_intent_round_trips_identically ... ok
+test view_intent_store::tests::exact_assertion_hides_round_trip_independently_and_compose_with_other_hides ... ok
+test view_intent_store::tests::exists_reflects_save_state ... ok
+test view_intent_store::tests::focus_round_trips_and_counts_as_nonempty ... ok
+test view_intent_store::tests::folds_round_trip_as_durable_view_state ... ok
+test view_intent_store::tests::intent_path_composition_matches_spec ... ok
+test view_intent_store::tests::legacy_view_without_link_hides_loads_empty_link_set ... ok
+test view_intent_store::tests::link_hide_round_trips_and_counts_as_nonempty ... ok
+test view_intent_store::tests::load_returns_none_when_no_file ... ok
+test view_intent_store::tests::malformed_json_returns_invalid_data_error ... ok
+test view_intent_store::tests::mirror_tiles_round_trip_and_count_as_nonempty ... ok
+test view_intent_store::tests::relation_tag_round_trips_through_disk ... ok
+test view_intent_store::tests::save_creates_views_and_frame_subdirectories ... ok
+test view_intent_store::tests::save_overwrites_existing_intent_atomically ... ok
+test view_intent_store::tests::save_then_load_round_trips_intent ... ok
+test view_intent_store::tests::strategy_round_trips_and_counts_as_nonempty ... ok
+test wallet_grant::certificate::tests::a_certificate_round_trips_through_storage ... ok
+test wallet_grant::certificate::tests::a_mixed_set_round_trips_with_every_member ... ok
+test wallet_grant::certificate::tests::a_private_read_grant_with_matching_material_passes ... ok
+test wallet_grant::certificate::tests::a_private_read_grant_without_epoch_material_is_refused ... ok
+test wallet_grant::certificate::tests::a_station_set_round_trips_through_storage ... ok
+test wallet_grant::certificate::tests::a_transport_only_grant_needs_no_epoch_material ... ok
+test wallet_grant::certificate::tests::an_absent_certificate_reads_as_none ... ok
+test wallet_grant::certificate::tests::an_unknown_device_loads_as_an_empty_set ... ok
+test wallet_grant::certificate::tests::appending_an_epoch_leaves_the_certificate_untouched ... ok
+test wallet_grant::certificate::tests::the_set_ref_tracks_every_member ... ok
+test wallet_grant::enroll::tests::remote_auth_enrollment_bundle_round_trips_through_cbor ... ok
+test wallet_grant::epochs::tests::a_blinded_index_is_stable_for_one_device ... ok
+test wallet_grant::epochs::tests::blinded_slots_do_not_link_devices_and_stay_stable_per_device ... ok
+test wallet_grant::epochs::tests::the_index_separates_personas_and_epochs ... ok
+test wallet_grant::epochs::tests::two_devices_blind_the_same_persona_differently ... ok
+test wallet_grant::epochs::tests::wrap_private_epoch_material_round_trips ... ok
+test wallet_grant::epochs::tests::wrapped_epoch_aad_binds_persona_and_epoch_identity ... ok
+test wallet_grant::epochs::tests::wrapped_private_epoch_rejects_unknown_format ... ok
+test wallet_grant::epochs::tests::wrapped_private_epoch_rejects_wrong_key ... ok
+test wallet_grant::pairing::tests::pairing_code_rejects_non_hex_digits ... ok
+test wallet_grant::pairing::tests::pairing_code_rejects_wrong_length ... ok
+test wallet_grant::pairing::tests::pairing_code_round_trips ... ok
+test wallet_grant::pairing::tests::pairing_material_changes_with_device_identity ... ok
+test wallet_grant::pairing::tests::pairing_material_is_deterministic ... ok
+test wallet_grant::pairing::tests::pairing_material_rejects_empty_secret ... ok
+test wallet_grant::pairing::tests::pairing_ticket_round_trips_through_cbor ... ok
+test wallet_sealed_backend::tests::batches_seal_values_and_keep_the_backend_key_contract ... ok
+test wallet_sealed_backend::tests::epoch_history_is_explicit_and_different_personas_or_keys_are_refused ... ok
+test wallet_sealed_backend::tests::malformed_tampered_and_transplanted_envelopes_stay_refused_and_untouched ... ok
+test wallet_sealed_backend::tests::transaction_reader_io_errors_poison_even_when_caught ... ok
+test wallet_sealed_backend::tests::transaction_seal_failure_discards_the_whole_batch_with_valid_control ... ok
+test wallet_sealed_backend::tests::transactions_refuse_caught_authentication_errors_without_any_writes ... ok
+test wallet_sealed_backend::tests::unsupported_transactions_do_not_run_the_caller_or_write ... ok
+test wallet_store::devices::tests::opaque_device_grant_round_trips ... ok
+test wallet_store::io::tests::save_bytes_atomic_replaces_wallet_bytes_and_cleans_backup ... ok
+test wallet_store::manifests::tests::device_roster_round_trips ... ok
+test wallet_store::manifests::tests::identity_wallet_round_trips ... ok
+test wallet_store::manifests::tests::missing_wallet_files_return_none ... ok
+test wallet_store::manifests::tests::persona_wallet_round_trips ... ok
+test wallet_store::paths::tests::identity_paths_compose_under_identity_root ... ok
+test wallet_store::paths::tests::listing_personas_counts_wallets_not_directories ... ok
+test wallet_store::paths::tests::persona_wallet_path_composes_under_persona_root ... ok
+test wallet_store::paths::tests::resolving_a_persona_takes_the_sole_wallet_or_says_what_exists ... ok
+test wallet_store::tests::carry_ref_repr_matches_eidetic_hash_repr ... ok
+test wallet_store::tests::derived_chain_root_matches_provider_derivation ... ok
+test wallet_store::tests::device_public_key_round_trips_through_identity_type ... ok
+test wallet_store::tests::persona_wallet_salt_matches_known_vector ... ok
+test web_facets::tests::a_malformed_field_defaults_without_losing_the_rest ... ok
+test web_facets::tests::a_rewrite_clears_stale_web_state_but_not_other_namespaces ... ok
+test web_facets::tests::default_fields_write_no_facet ... ok
+test web_facets::tests::write_then_read_round_trips ... ok
+
+test result: ok. 340 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.41s
+
