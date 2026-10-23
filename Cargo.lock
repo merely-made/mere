@@ -5208,7 +5208,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "az",
  "byteorder",
@@ -5220,7 +5220,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "az",
  "byteorder",
@@ -5450,7 +5450,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "errand"
 version = "0.4.0"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "finger-protocol",
  "gemini-protocol",
@@ -5701,7 +5701,7 @@ checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
 [[package]]
 name = "finger-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "tokio",
@@ -6126,7 +6126,7 @@ dependencies = [
 [[package]]
 name = "gemini-protocol"
 version = "0.1.7"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "ring",
@@ -6892,7 +6892,7 @@ dependencies = [
 [[package]]
 name = "gopher-protocol"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "tokio",
@@ -7164,7 +7164,7 @@ dependencies = [
 [[package]]
 name = "guppy-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "percent-encoding",
@@ -10226,7 +10226,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10272,7 +10272,7 @@ dependencies = [
 [[package]]
 name = "mere-webrtc-carrier"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -10422,7 +10422,7 @@ dependencies = [
 [[package]]
 name = "misfin"
 version = "0.0.4"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "rcgen 0.13.2",
@@ -10578,7 +10578,7 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "async-trait",
  "blake3",
@@ -10601,7 +10601,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11132,7 +11132,7 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 [[package]]
 name = "nex-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "log",
  "percent-encoding",
@@ -12323,7 +12323,7 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "hkdf 0.13.0",
  "retinue",
@@ -13855,7 +13855,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -14330,7 +14330,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "embedded-graphics",
 ]
@@ -14338,7 +14338,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -14994,7 +14994,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -15624,7 +15624,7 @@ dependencies = [
 [[package]]
 name = "scroll-protocol"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "gemini-protocol",
  "tokio",
@@ -15802,7 +15802,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 
 [[package]]
 name = "semver"
@@ -15823,7 +15823,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -16536,7 +16536,7 @@ dependencies = [
 [[package]]
 name = "spartan-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab"
+source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
 dependencies = [
  "idna",
  "log",
@@ -17930,7 +17930,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#5b1c5cac2f5d0e275ead94ae4b8b25c65a183694"
+source = "git+https://github.com/merely-made/murm.git?branch=main#36bad79bcc0199d20a2ad127a9801ac8a062f123"
 dependencies = [
  "selvage",
  "serial2-tokio",

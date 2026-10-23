@@ -1,0 +1,28 @@
+{
+  "schema": "client-limits-attempt-v1",
+  "owner": "mere-document-lanes",
+  "date": "2026-10-22",
+  "worktree_baseline": "4fa253865d59adb0b76fc770db631f6de35e9072",
+  "command": "cargo test -p mere-document-lanes --lib --features smolweb,netfetch --locked --offline --message-format=json -- --test-threads=1",
+  "elapsed_seconds": 63.422,
+  "compile_errors": 0,
+  "passed": 73,
+  "failed": 2,
+  "result": "failed",
+  "reason": "New held-response fixtures inherited nonblocking socket mode on Windows; an immediate WouldBlock panic closed the server prematurely, invalidating the held-EOF assertion",
+  "failed_test_executable_sha256": "7b1f56ae177f661b81d822805f87635a6a01e7827916c75d7b1f58fe399ef7c4",
+  "source_native_sha256": {
+    "remote": "1d9c27264b3788c07ce8e1bc141f869ae38cac1ce8ad0058d8157f3e4f8a2ac2",
+    "remote_client_limits_tests": "e4b4d400fcf4f78255ea500e692d9294583de33c2f2039c91727243bfefadfda"
+  },
+  "native_lock_sha256": "dbee6df4ec9ec2c47f2e22c9d75419277549dd794d476108cd5ed0ae9e193873",
+  "repair": "Accepted fixture sockets explicitly enter blocking mode; explicit release channel prevents the server closing its body before the caller returns. No production change.",
+  "final_doc_gate": {
+    "passed": 75,
+    "failed": 0,
+    "elapsed_seconds": 13.615,
+    "executable_sha256": "f128bd57b3263cb9b42dfa89ed41a7b6f4bd58adcd4236e3815ea8cff8247642"
+  },
+  "evidence_scope": "Compact identities/results captured by lane owner; failed source bytes and executable not copied. See final consumer receipt for complete passing cohort.",
+  "receipt_byte_convention": "UTF-8 JSON, -text attribute; Git and native receipt bytes identical"
+}

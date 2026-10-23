@@ -1,0 +1,25 @@
+{
+  "schema": "client-limits-attempt-v1",
+  "owner": "mere-fetch",
+  "date": "2026-10-22",
+  "worktree_baseline": "4fa253865d59adb0b76fc770db631f6de35e9072",
+  "command": "cargo test -p mere-fetch --lib --locked --offline --message-format=json -- --test-threads=1",
+  "elapsed_seconds": 59.066,
+  "compile_errors": 0,
+  "passed": 46,
+  "failed": 1,
+  "result": "failed",
+  "reason": "Existing isolated pollster trace-refusal regression: constructing tokio timeout before Titan initial read admission requires a reactor and panics instead of returning pure no-contact refusal",
+  "failed_test_executable": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\fetch-6ed6c271c9a97ca2.exe",
+  "failed_test_executable_sha256": "d8e3fc7f2fc3b482484f74483c3bbf4824f37320d5fc3bd6915bfa2bb40244a5",
+  "source_native_sha256": {
+    "lib": "fc8f9e6b168bd4330f813e5a451d7533f6ece60dfaa82db68c0ba5e1c13841ad",
+    "policy": "667012c8320585903dec32ee321a720beba4681add07c8920703089fb1fc0863",
+    "tests": "d22ce6db8a6ec92868d605acfa32de5b86358e4b2ad8093c1e653ff9c2e4b012",
+    "limits_tests": "ef18969a16c17751a1279e71a0a63046fce6383ae840ce4da8798416f835642f"
+  },
+  "native_lock_sha256": "dbee6df4ec9ec2c47f2e22c9d75419277549dd794d476108cd5ed0ae9e193873",
+  "repair": "Run initial target read admission and pure validation before timer construction; retain same admission predicate at every redirect",
+  "evidence_scope": "Identity and compact failure summary captured by lane owner. Failed dirty source bytes and test executable are not copied; stable build path may be reused.",
+  "receipt_byte_convention": "UTF-8 JSON, -text attribute; Git and native receipt bytes identical"
+}
