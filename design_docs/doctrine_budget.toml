@@ -1,0 +1,10 @@
+# The doctrine's size budget: DOC_POLICY.md, core §11, rule 5. Set on
+# 2026-10-22 when the doctrine began with five statements ("'The stack', 1-5,
+# budget 7"), by isocosm's rule: statements per area today's count +25%, at
+# least 1, rounded up; body lines per statement 18. A statement's body counts;
+# its fields line and notes (paragraphs opening with `*`) do not.
+
+lines_per_statement = 18
+
+[statements]
+"The stack" = 7                             # 5
