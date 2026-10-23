@@ -108,3 +108,7 @@ support/doc-audit/d2/batch_110_publication_outcomes.md -text
 support/family-promotion/diagnostics-activation-*.json -text
 support/family-promotion/diagnostics-activation-*.patch -text
 support/doc-audit/d2/batch_111_producer_activation.md -text
+
+# Canvas membership receiving retains exact receipt bytes.
+support/family-promotion/diagnostics-canvas-life-*.json -text
+support/doc-audit/d2/batch_112_canvas_membership_lifetimes.md -text

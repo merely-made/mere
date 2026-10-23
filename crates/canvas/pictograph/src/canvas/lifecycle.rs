@@ -385,9 +385,7 @@ impl Canvas {
         let (w, h) = (self.view_w as f32, self.view_h as f32);
         let span_w = (max.0 - min.0) + MARGIN * 2.0;
         let span_h = (max.1 - min.1) + MARGIN * 2.0;
-        let zoom = (w / span_w)
-            .min(h / span_h)
-            .clamp(MIN_ZOOM, MAX_ZOOM);
+        let zoom = (w / span_w).min(h / span_h).clamp(MIN_ZOOM, MAX_ZOOM);
         let center = ((min.0 + max.0) / 2.0, (min.1 + max.1) / 2.0);
         Some(CameraView {
             offset: (w / 2.0 - center.0 * zoom, h / 2.0 - center.1 * zoom),
@@ -636,7 +634,8 @@ impl Canvas {
 
     /// Apply a structural mutation to the session graph and reconcile every derived
     /// view, so externally-ingested nodes/edges (e.g. a linked-data merge) join the
-    /// spatial field. `mutate` returns whether it changed the graph; on a change,
+    /// spatial field. Kernel structural/membership changes require reconciliation
+    /// even when `mutate` reports false. On a reported or observed change,
     /// the newly-added nodes are fanned out around the current selection (they are
     /// minted at the origin, which the force sim must not stack), and the settle
     /// restarts. Returns whether the graph changed.
@@ -644,8 +643,20 @@ impl Canvas {
     /// canvas-host stays free of the linked-data bridge: the host passes the merge
     /// in as a closure over [`Graph`].
     pub fn ingest_graph<F: FnOnce(&mut Graph) -> bool>(&mut self, mutate: F) -> bool {
-        let before: HashSet<NodeKey> = self.graph.nodes().map(|(k, _)| k).collect();
-        if !mutate(&mut self.graph) {
+        // A reused graph slot is not the same live member. The kernel authors
+        // these witnesses during each mutation, including within this closure.
+        let before: std::collections::HashMap<_, _> = self
+            .graph
+            .nodes()
+            .map(|(key, node)| (key, self.graph.surface_node_lifetime(node.id)))
+            .collect();
+        let revision = self.graph.revision();
+        let claimed_change = mutate(&mut self.graph);
+        let memberships_changed = self.graph.node_count() != before.len()
+            || self.graph.nodes().any(|(key, node)| {
+                before.get(&key) != Some(&self.graph.surface_node_lifetime(node.id))
+            });
+        if !claimed_change && self.graph.revision() == revision && !memberships_changed {
             return false;
         }
         self.reconcile_derived();
@@ -659,8 +670,10 @@ impl Canvas {
         let seeds: Vec<_> = self
             .graph
             .nodes()
-            .map(|(k, _)| k)
-            .filter(|k| !before.contains(k))
+            .filter(|(key, node)| {
+                before.get(key) != Some(&self.graph.surface_node_lifetime(node.id))
+            })
+            .map(|(key, _)| key)
             .enumerate()
             .map(|(i, k)| {
                 let col = (i % 6) as f32;
@@ -686,10 +699,11 @@ impl Canvas {
     /// refresh, this rebuilds derived data without restarting the settled layout.
     pub fn refresh_same_topology_graph(&mut self, source: &Graph) -> Result<(), String> {
         if self.graph.node_count() != source.node_count()
-            || self
-                .graph
-                .nodes()
-                .any(|(key, node)| source.get_node(key).is_none_or(|next| next.id != node.id))
+            || self.graph.nodes().any(|(key, node)| {
+                source.get_node(key).is_none_or(|next| next.id != node.id)
+                    || source.surface_node_lifetime(node.id)
+                        != self.graph.surface_node_lifetime(node.id)
+            })
         {
             return Err("owner metadata changes the canvas node topology".into());
         }

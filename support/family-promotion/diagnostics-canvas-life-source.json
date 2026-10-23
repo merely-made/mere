@@ -1,0 +1,20 @@
+{
+  "basis": "f632bf3a333c660660e7021d6d0b7df5463aa472",
+  "normalization": "CRLF normalized to LF",
+  "source_sha256": {
+    ".gitattributes": "2acd8138cd6fdda9e3f02892bde39999534f41701993763b8aae31337ac233ed",
+    "Cargo.lock": "a635da109a37a24e2dded8ea72eb1819ed962fb2c99bf3e4f91cabdd4ef3e241",
+    "Cargo.toml": "32cb52c0be9d7b8fe8dae119507b46d55dff470baa758cbc7b73b6015e5f756f",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "188867844661d302ba9e842f9cddeaf81d4af9d4c4d75d3047c21b961d78b80d",
+    "crates/canvas/pictograph/src/canvas/reader.rs": "1fcfa87193c8148426b3081147962a10ea13ed60e1530f366733b54ca626ba57",
+    "crates/canvas/pictograph/src/canvas/tests/reader.rs": "83a48ae6a05c7a152831c52d7d01198300d77c2dd3a883f91e3d5397d4093578",
+    "crates/graph/graph-kernel/src/graph/cross_graph.rs": "6ac7f2eb2141b9ae508179c89113fa25085ff7c095b8f299e546512389bb47d1",
+    "crates/graph/graph-kernel/src/graph/membership.rs": "782d4923ed2a2cbd0f667f170228534cbf80c7558f4b15bd074ead23d5001bca",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "6120235de861add86aeb3365e83e3708729f1ba083ed656eb40cb4d08e02d4c0",
+    "ports/graphshell/src/canvas_reader/tests.rs": "88219c22858590f9bfe46ce45445bbc2aa71effb66b717b70c245d62ae8146c7",
+    "support/family-promotion/native-id-consumer/Cargo.lock": "18e8749f5283372e7e6322446287bfb7baee7d32c96d94bfba7854ce76ca113a",
+    "support/family-promotion/native-id-consumer/Cargo.toml": "01e51bd3e0a58a88c623a897b50679bab97c056f123709fb854ab6a62cc71445"
+  },
+  "write_path_inventory": "One active inner.insert surface call, inside Graph::insert_surface_node; ordinary add/copy use it, snapshot loader uses add_node_with_id; one successful surface removal path drops the witness. Resource stratum remains separately owned.",
+  "red_basis": "Starting commit plus retained diagnostics-activation-canvas-aba.patch, before wiring membership.rs into the kernel. Original Pin failure reproduced, then made permanent with new Pin/Drag controls."
+}

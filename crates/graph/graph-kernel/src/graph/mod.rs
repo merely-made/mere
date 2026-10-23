@@ -88,6 +88,8 @@ pub mod filter;
 pub mod fixtures;
 pub mod history;
 pub mod identity;
+mod membership;
+pub use membership::SurfaceNodeLifetime;
 pub mod import_records;
 pub mod merge;
 pub mod node;
@@ -328,6 +330,8 @@ pub struct Graph {
     /// structural caches. Reads reach petgraph algorithms through
     /// [`chartulary::Graph::inner`]. (Graph signals.)
     pub(crate) inner: chartulary::Graph<Node, EdgePayload>,
+    /// Runtime membership witnesses; cloned with candidates, never snapshotted.
+    surface_node_lifetimes: HashMap<Uuid, SurfaceNodeLifetime>,
 
     /// Resource truth beneath surfaces, indexed by the prepared identity IRI.
     pub(crate) resources: chartulary::Graph<ResourceNode, EdgePayload>,
@@ -418,6 +422,7 @@ impl Graph {
     pub fn new() -> Self {
         Self {
             inner: chartulary::Graph::new(),
+            surface_node_lifetimes: HashMap::new(),
             resources: chartulary::Graph::new(),
             resource_facets: chartulary::FacetStore::new(),
             shown_resources: BTreeMap::new(),
@@ -598,7 +603,7 @@ impl Graph {
             .with_address_record(primary_address)
             .with_title(url.clone());
         container.media_type = detect_mime(&url, None);
-        let key = self.inner.insert(Node {
+        let key = self.insert_surface_node(Node {
             container,
             images: std::collections::BTreeMap::new(),
         });
@@ -625,6 +630,7 @@ impl Graph {
                 self.remove_url_mapping(address.as_url_str(), key);
             }
             let node_id = node.id;
+            self.surface_node_lifetimes.remove(&node_id);
             self.shown_resources.remove(&node_id);
             self.remove_facets_for_node(node_id);
             let removed_id = node_id.to_string();

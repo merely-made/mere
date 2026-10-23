@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-23",
+  "status": "Implemented and qualified: original Pin failure received; 830 distinct tests passed, eight existing ignores; Canvas/browser Wasm, embedding and standalone consumer compile gates passed",
+  "ownership": {
+    "Kernel Graph": "SurfaceNodeLifetime authored by one insertion helper and removed at successful deletion; all ordinary/copy/snapshot insertion paths route through it",
+    "Chartulary": "Existing UUID-to-slot topology store; no supplier patch or new persistence schema",
+    "Canvas": "Derived nonreused action IDs track kernel membership witness; semantic reads and actions compare it without allocating",
+    "Rootstock/native/browser": "Existing request provenance and checked dispatch consume changed producer keys; native namespace and publisher outcome contracts unchanged"
+  },
+  "repairs": [
+    "Same UUID/slot recreation in one ingest callback receives a new action key; old Pin/Drag cannot resolve to the replacement",
+    "Ordinary edits, upserts, relation edits, and graph clones retain live-member witnesses and action keys",
+    "Unrelated members keep their keys",
+    "False callback report cannot suppress kernel-observed membership/structural changes",
+    "Metadata-only refresh refuses recreated memberships even when UUIDs/slots match; structural ingest receives the fresh life",
+    "Newly captured Pin still dispatches"
+  ],
+  "runtime_boundary": [
+    "Witnesses are process-local runtime observations, not durable identity, authorization leases or revisions",
+    "Graph cloning deliberately preserves witnesses for detached candidates and ordinary refresh; snapshot materialization creates fresh runtime lives",
+    "Graph removal drops live witness entries; no unbounded tombstone/history log",
+    "Explicit graph replacement still retires all Canvas action identities",
+    "Historical failing patch/receipt remains unchanged; its original Pin case is now a permanent active regression test"
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "Other Canvas derived-owner lifetimes",
+      "gap": "Physics bodies, selection/drag, Forme holds and render caches have their own ownership; fresh action IDs and seed placement are not blanket qualification of every retained cache",
+      "done_condition": "Receive kernel membership witnesses at each retained-cache/hold boundary, preserving ordinary edits and independently testing replacement/rollback"
+    },
+    {
+      "owner": "Custom producer and action lifetimes",
+      "gap": "Deeper shared models still need checked activation under the actual owner; action ID reassignment needs explicit child/action revision",
+      "done_condition": "Per-adapter owner transaction and action ABA controls"
+    },
+    {
+      "owner": "Durable/history and substrate intake",
+      "gap": "Runtime witnesses are deliberately excluded from snapshots. Historical/reconstructed graphs start new runtime lives; broader lifetime policy and promotion to a shared substrate need consumer evidence",
+      "done_condition": "Receive any additional consumer explicitly without interpreting runtime witnesses as durable IDs or copying identity allocation to semantic reads"
+    },
+    {
+      "owner": "Supplier, guest and platform boundaries",
+      "gap": "AccessKit supplier promotion/consumer root patch intake, guest namespaces/selection ingress, headed AT and physical handoff remain open",
+      "done_condition": "Exact receiving at those existing owner boundaries"
+    },
+    {
+      "owner": "Full leaf and actor outcomes",
+      "gap": "Intrinsic sizing/Path-B raster and terminal actor outcomes remain independent",
+      "done_condition": "Qualify those actual rendering and completion paths"
+    }
+  ],
+  "qualification": "diagnostics-canvas-life-qualification.json",
+  "retained_byte_cap": 10000000,
+  "historical_failure_received": {
+    "original_receipt": "diagnostics-activation-canvas-aba-red.json",
+    "original_patch": "diagnostics-activation-canvas-aba.patch",
+    "fresh_red": "diagnostics-canvas-life-red.json",
+    "green": "diagnostics-canvas-life-green.json",
+    "active_regressions": [
+      "same_call_recreation_must_retire_old_pin",
+      "same_call_recreation_retires_old_drag_and_keeps_other_members_actions"
+    ],
+    "result": "Old Pin/Drag refuse after same-call recreation; new Pin dispatches and unrelated members keep keys."
+  },
+  "test_counts": {
+    "distinct_passed": 830,
+    "existing_ignored": 8,
+    "focused_kernel_controls": "3 repeated subset, not additional"
+  }
+}
