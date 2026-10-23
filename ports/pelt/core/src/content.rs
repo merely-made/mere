@@ -60,6 +60,9 @@ pub(crate) enum PeltReceiverIdentity {
     Surface(u64),
 }
 
+#[cfg(feature = "cue")]
+type NativeCueLane = (Box<dyn SurfaceProducer>, (u32, u32), u64);
+
 enum Lane<F> {
     Document(PeltController<F>),
     Surface(PeltSurface),
@@ -145,6 +148,14 @@ impl<F: 'static> PeltContent<F> {
         match &mut self.lane {
             Lane::Surface(surface) => Some(surface.producer.as_mut()),
             Lane::Document(_) => None,
+        }
+    }
+
+    #[cfg(feature = "cue")]
+    pub(crate) fn into_cue_lane(self) -> Result<PeltController<F>, NativeCueLane> {
+        match self.lane {
+            Lane::Document(controller) => Ok(controller),
+            Lane::Surface(surface) => Err((surface.producer,surface.viewport,surface.instance_id)),
         }
     }
 

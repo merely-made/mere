@@ -730,6 +730,9 @@ engine adapters.
 
 ### inker_docs/implementation_strategy/
 
+- [Shared surface receiving](inker_docs/implementation_strategy/2026-10-22_shared_surface_receiving_plan.md): Inker, Pelt and Graphshell adoption of Webcue controls and both frame directions; in progress.
+
+
 - [engine_picker_and_pluggability_plan](inker_docs/implementation_strategy/2026-06-15_engine_picker_and_pluggability_plan.md)
   (**Phases 0–3 landed in meerkat and retired with it 2026-07-18**; `EngineRoutePolicy`, `is_surface_engine` and the graft/weld `SurfaceEngine` impls survive — route → activate → manage → pick. The
   user-facing engine **picker** as an inker affordance, distinct from verso's
