@@ -196,39 +196,65 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
+        enum TransactionRejection {
+            ReadOnly(SessionId),
+            Validation(String),
+        }
+
+        let session_id = self.id();
+        let merged = self.keys.at(MERGED);
         let rejection = Arc::new(Mutex::new(None));
         let rejected = rejection.clone();
         let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
-            let check = || -> Result<(), String> {
+            let check = || -> Result<(), TransactionRejection> {
+                // The merged marker can change independently of the source
+                // logs when another handle undoes or redoes a merge. Read it
+                // in this same backend transaction as the candidate writes.
+                match reader.get(&merged) {
+                    Ok(Some(_)) => return Err(TransactionRejection::ReadOnly(session_id)),
+                    Ok(None) => {},
+                    Err(error) => {
+                        return Err(TransactionRejection::Validation(error.to_string()));
+                    },
+                }
                 if reader
                     .list(&format!("{journal}/"))
-                    .map_err(|e| e.to_string())?
+                    .map_err(|e| TransactionRejection::Validation(e.to_string()))?
                     .len() as u64
                     != expected_journal.0
                     || reader
                         .list(&format!("{changes}/"))
-                        .map_err(|e| e.to_string())?
+                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
                         .len() as u64
                         != expected_changes.0
                 {
-                    return Err("Session changed before commit; draft retained".into());
+                    return Err(TransactionRejection::Validation(
+                        "Session changed before commit; draft retained".into(),
+                    ));
                 }
                 for (log, expected) in view_heads {
                     if reader
                         .list(&format!("{log}/"))
-                        .map_err(|e| e.to_string())?
+                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
                         .len() as u64
                         != expected.0
                     {
-                        return Err("Session view changed before commit; draft retained".into());
+                        return Err(TransactionRejection::Validation(
+                            "Session view changed before commit; draft retained".into(),
+                        ));
                     }
                 }
                 for op in tails {
                     if let WriteOp::Put { key, value } = op {
-                        if reader.get(&key).map_err(|e| e.to_string())?.as_ref() != Some(&value) {
-                            return Err(
-                                "Session log head changed before commit; draft retained".into()
-                            );
+                        if reader
+                            .get(&key)
+                            .map_err(|e| TransactionRejection::Validation(e.to_string()))?
+                            .as_ref()
+                            != Some(&value)
+                        {
+                            return Err(TransactionRejection::Validation(
+                                "Session log head changed before commit; draft retained".into(),
+                            ));
                         }
                     }
                 }
@@ -242,8 +268,11 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             }
         });
         self.slots.backend().transact(transaction).await?;
-        if let Some(error) = rejection.lock().expect("transaction rejection").take() {
-            return Err(SessionError::Validation(error));
+        if let Some(rejection) = rejection.lock().expect("transaction rejection").take() {
+            return Err(match rejection {
+                TransactionRejection::ReadOnly(session_id) => SessionError::ReadOnly(session_id),
+                TransactionRejection::Validation(error) => SessionError::Validation(error),
+            });
         }
         candidate.stored(pending);
         *self = candidate;
