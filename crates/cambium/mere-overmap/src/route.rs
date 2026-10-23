@@ -388,6 +388,39 @@ pub fn merge_cards(sessions: &ProjectionSnapshot) -> Vec<InstanceId> {
         .collect()
 }
 
+/// Admit zero or one pending merge card; multiple cards make the owner's
+/// current merge ambiguous.
+pub(crate) fn unique_merge_card(
+    sessions: &ProjectionSnapshot,
+) -> Result<Option<InstanceId>, String> {
+    let mut cards = merge_cards(sessions).into_iter();
+    let first = cards.next();
+    if cards.next().is_some() {
+        return Err("Multiple pending merge cards.".into());
+    }
+    Ok(first)
+}
+
+/// The pending merge material is the first resource advertised by its card.
+pub(crate) fn pending_merge_media(
+    card: &chirograph::PortableCardV1,
+) -> Result<ContentHash, String> {
+    card.media
+        .first()
+        .copied()
+        .ok_or_else(|| "The material card must advertise a media resource.".into())
+}
+
+/// Decode the owner's pending merge representation and enforce its version.
+pub(crate) fn decode_pending_merge(bytes: &[u8]) -> Result<PendingMergeV1, String> {
+    let pending: PendingMergeV1 = serde_json::from_slice(bytes)
+        .map_err(|error| format!("Invalid pending merge material: {error}"))?;
+    if pending.schema != crate::wire::PENDING_MERGE_SCHEMA {
+        return Err("The pending merge material has another schema.".into());
+    }
+    Ok(pending)
+}
+
 /// A conflict's stable key: its part, as the wire spells it.
 pub fn conflict_key(part: &Part) -> String {
     serde_json::to_string(part).expect("a part encodes")
