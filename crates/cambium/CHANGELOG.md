@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove `stylesheet_at_display_scale`. A native host composes at one layout
+  scale, as the rootstock host does: sheets stay in layout pixels, layout runs
+  at `physical / scale`, and the scene is rasterized at `scale`, so no host
+  rewrites CSS lengths for a dense display.
 - Draw the checkbox, toggle and radio indicators in the shell sheet, and give
   hosts what they were copying. Wrong before: the checkbox / toggle element held
   `[x]` / `[ ]` text and the radio put `(o) ` / `( ) ` inside its label's text

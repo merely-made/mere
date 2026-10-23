@@ -302,5 +302,3 @@ pub use reading_find::{
     is_find_shortcut,
 };
 pub use reading_toolbar::{ReadCommand, read_toolbar};
-mod native_style;
-pub use native_style::stylesheet_at_display_scale;
