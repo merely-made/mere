@@ -86,16 +86,31 @@ impl RecallEvidence {
     /// distinct from host annotations of a complete verbatim passage match.
     /// Pure projection over immutable output and supplied evidence; also sealed
     /// as a typed artifact when the completed run commits.
-    pub fn assess_answer(&self, text: &str) -> Option<eidetic::models::answer::AnswerSupport> {
+    pub fn assess_answer(
+        &self,
+        text: &str,
+        question: &str,
+    ) -> Option<eidetic::models::answer::AnswerSupport> {
         (self.answer_format == AnswerFormat::ClaimSupportV1).then(|| {
-            eidetic::models::answer::AnswerSupport::assess(
+            let mut support = eidetic::models::answer::AnswerSupport::assess(
                 text,
                 &self
                     .passages
                     .iter()
                     .map(|p| (p.handle, &p.passage))
                     .collect::<Vec<_>>(),
-            )
+            );
+            if let Some(contract) = &self.answer_contract {
+                let expected = super::answer_contract::prepare(question, self);
+                if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
+                    support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
+                    support.claims.clear();
+                } else if support.claims.len() > contract.max_claims {
+                    support.error = Some("Answer exceeds the retained contract's claim bound.".into());
+                    support.claims.clear();
+                }
+            }
+            support
         })
     }
     pub fn validate(&mut self, text: &str, corpus: Option<&dyn RecallCorpus>) {
@@ -493,6 +508,7 @@ impl RecallIndex {
         let observed = self.observe_heads(scope);
         let mut evidence = RecallEvidence {
             answer_format: AnswerFormat::Prose,
+            answer_contract: None,
             support: None,
             embedding: None,
             owner: None,
@@ -607,7 +623,7 @@ mod tests {
         let (mut evidence, _) = index.prepare("launch", &[source.clone()]).unwrap();
         evidence.answer_format = AnswerFormat::ClaimSupportV1;
         let raw = r#"{"claims":[{"status":"supported","text":"Thursday launch","evidence":[{"handle":1,"quote":"The launch is on Thursday."}]}]}"#;
-        evidence.support = evidence.assess_answer(raw);
+        evidence.support = evidence.assess_answer(raw, "launch");
         let support = evidence.support.clone();
         evidence.validate(raw, Some(corpus.as_ref()));
         assert_eq!(evidence.citations.len(), 1);
