@@ -38,6 +38,9 @@ pub struct AnswerContract {
     /// Hash of the exact enforced decoding grammar; absent on historical tasks.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_grammar: Option<eidetic::ManifestId>,
+    /// Ordered exact question excerpts; absent on historical contracts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requested_facts: Option<eidetic::models::requested::RequestedFactSet>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

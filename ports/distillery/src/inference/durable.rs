@@ -162,7 +162,16 @@ struct Delta {
     answer_support: Option<eidetic::ManifestId>,
 }
 fn required_semantics(record: &RunRecord) -> Option<&'static str> {
-    if record.request.output_grammar.is_some() {
+    if record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+        .and_then(|c| c.requested_facts.as_ref())
+        .is_some()
+    {
+        Some("recall/requested-fact-set-v1")
+    } else if record.request.output_grammar.is_some() {
         Some("recall/constrained-answer-v1")
     } else if record
         .view
@@ -199,6 +208,7 @@ impl Delta {
                 && value != "recall/claim-support-v1"
                 && value != "recall/requested-facts-v1"
                 && value != "recall/constrained-answer-v1"
+                && value != "recall/requested-fact-set-v1"
         }) {
             return Err("unsupported inference checkpoint semantics".into());
         }
@@ -228,6 +238,28 @@ fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
         .as_ref()
         .and_then(|r| r.answer_contract.as_ref())
     {
+        if contract.method == "distillery.requested-facts/v5" || contract.requested_facts.is_some()
+        {
+            let facts = contract
+                .requested_facts
+                .as_ref()
+                .ok_or("retained requested-fact contract is missing its fact set")?;
+            facts.validate(&record.view.question)?;
+            let recall = record.view.recall.as_ref().unwrap();
+            let (expected, prompt, context) = super::answer_contract::prepare_for_method(
+                &record.view.question,
+                recall,
+                &contract.method,
+            )?;
+            if &expected != contract
+                || prompt != record.request.prompt
+                || context != record.request.context
+            {
+                return Err(
+                    "retained requested facts do not match the exact generation task".into(),
+                );
+            }
+        }
         if contract.question != eidetic::ManifestId::of_blob(record.view.question.as_bytes())
             || contract.prompt != eidetic::ManifestId::of_blob(record.request.prompt.as_bytes())
             || contract.context != eidetic::ManifestId::of_blob(record.request.context.as_bytes())
@@ -625,6 +657,39 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
             .map_err(|e| e.to_string())?;
         if stored.as_ref() != Some(&support) {
             return Err("sealed answer support is missing or inconsistent".into());
+        }
+        Ok(stored)
+    }
+    pub fn retained_requested_facts(
+        &self,
+        run: &str,
+    ) -> Result<Option<eidetic::models::requested::RequestedFactSet>, String> {
+        let record = self
+            .load()?
+            .into_iter()
+            .find(|r| r.view.run == run)
+            .ok_or("unknown retained run")?;
+        let Some(facts) = record
+            .view
+            .recall
+            .as_ref()
+            .and_then(|r| r.answer_contract.as_ref())
+            .and_then(|c| c.requested_facts.as_ref())
+        else {
+            return Ok(None);
+        };
+        facts.validate(&record.view.question)?;
+        let mut backend = self.store.backend().clone();
+        let stored: Option<eidetic::models::requested::RequestedFactSet> =
+            pollster::block_on(eidetic::typed::load_typed_sealed(
+                &mut backend,
+                &mut eidetic::NoFetcher,
+                Some(self),
+                facts.id(),
+            ))
+            .map_err(|e| e.to_string())?;
+        if stored.as_ref() != Some(facts) {
+            return Err("sealed requested-fact set is missing or inconsistent".into());
         }
         Ok(stored)
     }
@@ -1188,6 +1253,17 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
                 }
             }
         }
+        if delta.record.is_some() {
+            if let Some(facts) = record
+                .view
+                .recall
+                .as_ref()
+                .and_then(|r| r.answer_contract.as_ref())
+                .and_then(|c| c.requested_facts.as_ref())
+            {
+                self.save_evidence(facts)?;
+            }
+        }
         if delta.record.is_some() || delta.complete {
             delta.evidence = Some(Self::evidence(record)?);
             delta.evidence_schema =
@@ -1302,15 +1378,15 @@ mod tests {
         };
         let (contract, prompt, context) =
             super::super::answer_contract::prepare(&record.view.question, &evidence).unwrap();
+        evidence.answer_contract = Some(contract.clone());
         record.request.output_grammar =
             super::super::answer_contract::grammar(&evidence, &contract.method).unwrap();
-        evidence.answer_contract = Some(contract.clone());
         record.request.prompt = prompt;
         record.request.context = context;
         record.view.recall = Some(evidence);
         assert_eq!(
             required_semantics(&record),
-            Some("recall/constrained-answer-v1")
+            Some("recall/requested-fact-set-v1")
         );
         journal.append(&record).unwrap();
         assert!(
@@ -1319,8 +1395,12 @@ mod tests {
                 .unwrap()
                 .is_none()
         );
+        assert_eq!(
+            journal.retained_requested_facts(&record.view.run).unwrap(),
+            contract.requested_facts
+        );
         record.view.state = RunStateV1::Finished;
-        record.view.text = r#"{"claims":[{"status":"insufficient","text":"No retained budget is supplied.","evidence":[]}]}"#.into();
+        record.view.text = serde_json::json!({"claims":[{"fact":contract.requested_facts.as_ref().unwrap().facts[0],"status":"insufficient","text":"No retained budget is supplied.","evidence":[]}]}).to_string();
         journal.append(&record).unwrap();
         let support = journal
             .retained_answer_support(&record.view.run)
@@ -1351,8 +1431,39 @@ mod tests {
         let restored = reopened.load().unwrap();
         assert_eq!(
             restored[0].view.recall.as_ref().unwrap().answer_contract,
-            Some(contract)
+            Some(contract.clone())
         );
+        assert_eq!(
+            reopened.retained_requested_facts(&record.view.run).unwrap(),
+            contract.requested_facts
+        );
+        let mut altered = record.clone();
+        altered
+            .view
+            .recall
+            .as_mut()
+            .unwrap()
+            .answer_contract
+            .as_mut()
+            .unwrap()
+            .requested_facts
+            .as_mut()
+            .unwrap()
+            .facts[0]
+            .text
+            .push_str(" altered");
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered
+            .view
+            .recall
+            .as_mut()
+            .unwrap()
+            .answer_contract
+            .as_mut()
+            .unwrap()
+            .requested_facts = None;
+        assert!(reopened.append(&altered).is_err());
         let mut altered = record.clone();
         altered
             .request
@@ -1375,6 +1486,7 @@ mod tests {
         });
         assert!(check_answer_contract(&altered).is_err());
         reopened.lock();
+        assert!(reopened.retained_requested_facts(&record.view.run).is_err());
         assert!(reopened.retained_answer_support(&record.view.run).is_err());
         reopened.unlock([9; 32]);
         assert_eq!(

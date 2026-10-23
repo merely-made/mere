@@ -906,6 +906,34 @@ impl InferenceLane {
         )
     }
 
+    /// Explicit, question-anchored fact order for compound requests outside the
+    /// conservative question-only notation. The authenticated host chooses it.
+    #[cfg(feature = "inference-model")]
+    pub fn ask_recalled_with_facts(
+        &self,
+        request: recall::RecallAskRequestV1,
+        facts: eidetic::models::requested::RequestedFactSet,
+    ) -> Result<(), InferenceLaneError> {
+        if request.answer_format != recall::AnswerFormat::ClaimSupportV1 {
+            return Err(InferenceLaneError::Recall(
+                "requested facts require structured answers".into(),
+            ));
+        }
+        facts
+            .validate(&request.ask.question)
+            .map_err(InferenceLaneError::Recall)?;
+        let generation = GenerationRequest {
+            max_tokens: self.shared.max_tokens,
+            ..Default::default()
+        };
+        self.ask_internal_planned(
+            request.ask,
+            generation,
+            Some(RecallSelection::Local(request.scope, request.answer_format)),
+            Some(facts),
+        )
+    }
+
     /// Host-selected recall bounds for app-owned publications.
     #[cfg(feature = "inference-model")]
     pub fn configure_published_recall(&self, config: recall::RecallConfig) -> Result<(), String> {
@@ -927,8 +955,26 @@ impl InferenceLane {
     fn ask_internal(
         &self,
         request: AskRequestV1,
+        generation: GenerationRequest,
+        #[cfg(feature = "inference-model")] recall_scope: Option<RecallSelection>,
+    ) -> Result<(), InferenceLaneError> {
+        self.ask_internal_planned(
+            request,
+            generation,
+            #[cfg(feature = "inference-model")]
+            recall_scope,
+            #[cfg(feature = "inference-model")]
+            None,
+        )
+    }
+    fn ask_internal_planned(
+        &self,
+        request: AskRequestV1,
         mut generation: GenerationRequest,
         #[cfg(feature = "inference-model")] recall_scope: Option<RecallSelection>,
+        #[cfg(feature = "inference-model")] requested_facts: Option<
+            eidetic::models::requested::RequestedFactSet,
+        >,
     ) -> Result<(), InferenceLaneError> {
         generation.prompt = request.question.clone();
         generation.max_tokens = generation.max_tokens.min(self.shared.max_tokens);
@@ -1026,12 +1072,19 @@ impl InferenceLane {
             evidence.owner = owner;
             evidence.answer_format = answer_format;
             if answer_format == recall::AnswerFormat::ClaimSupportV1 {
-                let (contract, prompt, supplied_context) =
-                    answer_contract::prepare(&request.question, &evidence)
-                        .map_err(InferenceLaneError::Recall)?;
-                generation.output_grammar = answer_contract::grammar(&evidence, &contract.method)
-                    .map_err(InferenceLaneError::Recall)?;
+                let (contract, prompt, supplied_context) = match requested_facts.as_ref() {
+                    Some(facts) => {
+                        answer_contract::prepare_with_facts(&request.question, &evidence, facts)
+                    },
+                    None => answer_contract::prepare(&request.question, &evidence),
+                }
+                .map_err(InferenceLaneError::Recall)?;
                 evidence.answer_contract = Some(contract);
+                generation.output_grammar = answer_contract::grammar(
+                    &evidence,
+                    &evidence.answer_contract.as_ref().unwrap().method,
+                )
+                .map_err(InferenceLaneError::Recall)?;
                 generation.prompt = prompt;
                 context = supplied_context;
             }

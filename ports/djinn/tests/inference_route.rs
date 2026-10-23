@@ -1988,10 +1988,11 @@ async fn serve_trained_model_for_headed_turnstone() {
                         .unwrap()
                     });
                     let support = journal.retained_answer_support(&run.run).unwrap();
+                    let requested_facts = journal.retained_requested_facts(&run.run).unwrap();
                     if let Some(expected) = run.recall.as_ref().and_then(|r| r.support.as_ref()) {
                         assert_eq!(support.as_ref(), Some(expected));
                     }
-                    evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint,"answer_support":support}));
+                    evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint,"answer_support":support,"requested_facts":requested_facts}));
                 }
                 // Store enumeration order may change across OS processes.
                 // Compare every sealed field under the stable run identity.

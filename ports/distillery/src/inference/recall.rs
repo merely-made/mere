@@ -92,20 +92,21 @@ impl RecallEvidence {
         question: &str,
     ) -> Option<eidetic::models::answer::AnswerSupport> {
         (self.answer_format == AnswerFormat::ClaimSupportV1).then(|| {
-            let mut support = eidetic::models::answer::AnswerSupport::assess(
+            let mut support = eidetic::models::answer::AnswerSupport::assess_requested(
                 text,
                 &self
                     .passages
                     .iter()
                     .map(|p| (p.handle, &p.passage))
                     .collect::<Vec<_>>(),
+                self.answer_contract.as_ref().and_then(|c|c.requested_facts.as_ref()),
             );
             if let Some(contract) = &self.answer_contract {
                 let expected = super::answer_contract::prepare_for_method(question, self, &contract.method);
                 if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
                     support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
                     support.claims.clear();
-                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4") && !super::answer_contract::matches_policy(text, self) {
+                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4" | "distillery.requested-facts/v5") && !super::answer_contract::matches_policy(text, self) {
                     support.error = Some("Answer does not satisfy the retained constrained-output policy.".into());
                     support.claims.clear();
                 } else if support.claims.len() > contract.max_claims {
