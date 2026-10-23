@@ -1,5 +1,89 @@
 # System Diagnostics and Accessibility Plan
 
+## Native publication ID remapping, 2026-10-23
+
+**Status (2026-10-23):** native ROOT remapping implemented. Exact receiving
+source, gates and limits are recorded in
+`support/family-promotion/diagnostics-native-ids-qualification.json`.
+The ownership and supplier-intake continuation is in
+`support/family-promotion/diagnostics-native-ids-review.json`.
+
+### Phases and done-conditions
+
+1. Freeze complete authored node identity, including producer structural nodes
+   without actions. The shared `PublicationBindings` contains weak identities
+   and routes from one composition; it is not another semantic tree. Unknown
+   nodes, duplicate IDs and inconsistent source/route metadata refuse capture.
+2. Assign native IDs from one process-wide nonreused sequence. Ordinary updates
+   preserve an unchanged life; child/leaf/registration/host replacement and
+   withdrawal receive new IDs. Draft preparation does not modify installed
+   bindings. Routes and namespace advance only after installation succeeds or
+   the validated full ROOT update is sent to the bridge.
+3. Rewrite every node-reference property through AccessKit's schema-owned
+   `Node::try_map_node_ids`, then root and focus through the same map. The local
+   pinned 0.25.1 patch matches typed property values exhaustively; it has no
+   second list of relation properties in Mere. Malformed child graphs, dangling
+   references and foreign tree/graft publication refuse before native routing.
+4. Receive producer/leaf replacement, ordinary updates, pending and late IDs,
+   structural withdrawal, host recreation, typed references and consumer tree
+   updates. Receive native cohort, Wasm, embedding, retained-content and an
+   independent-workspace native consumer. Platform runtime remains a separate gate.
+
+### Findings, 2026-10-23
+
+`semantics.rs` now records the authored source for structural producer children
+as well as action buttons. `publication_bindings` replaces the action-only
+`publication_requests` API; callers consume its fallible result. It freezes
+request bindings from the same node identities used by native publication.
+The browser consumes this contract too and clears invalid proxy routes.
+
+`cambium-winit-a11y/src/publication.rs` owns native IDs; Rootstock owns authored
+identity; AccessKit owns typed reference traversal; the Genet bridge owns
+installation/replay. The pinned supplier lowers DOM projection nodes one-to-one
+from opaque DOM IDs. An action-route map alone was incomplete for producer
+structural nodes. Source projection helpers still return source IDs for
+composition and now say so explicitly; they do not expose installed native IDs.
+
+The native publisher drains pending events through its last committed bindings.
+A late old numeric ID after replacement no longer resolves to a new target.
+Rejected publications clear routes and the current namespace; failed first
+installation never commits the draft. Recovery cannot recycle the draft/old IDs.
+Publication refusal reveals the application window, matching install failure,
+so malformed accessibility data cannot strand the first frame hidden. This is
+a source-confirmed guard, with headed visibility/recovery still unqualified.
+The old source-ID-only mapper fixture was retired; its pending-drain assertion
+now uses the real namespace and AccessKit consumer.
+
+### Remaining ownership migrations
+
+The AccessKit hook is a local pinned supplier patch with upstream provenance and
+licenses under `support/patches/accesskit`. Cargo patch tables do not propagate
+through dependencies: a standalone native consumer receiving this Mere source
+must declare the same patch at its own root. The independent
+`support/family-promotion/native-id-consumer` fixture checks that recipe.
+Upstream API promotion and coordinated external product patch/lock intake remain
+open; existing external pins are not repinned by this pass.
+
+This publisher owns ROOT only and explicitly refuses guest grafts/trees. Existing
+TreeId-qualified compositor/guest paths remain separately owned. Selection
+reference properties are rewritten, but SetTextSelection ingress is unsupported.
+Publication refusal is logged; BridgeStatus describes physical installation,
+not acceptance of the latest tree. Shared typed publication outcomes and
+collector wiring remain separate from actor completion.
+Guest namespaces and guest install/reset/replay, physical window/canvas handoff,
+actual late platform events, partial-install recovery and human AT need their
+own receiving. Producer activation is not an atomic model transaction, and
+legacy missing child tokens still require authored nonreuse. Same-call canvas
+replacement and full leaf sizing/Path-B raster work also remain open.
+
+### Progress, 2026-10-23
+
+Schema traversal, complete weak identity, native namespace and source/route
+validation are implemented and covered by named gates. Earlier native-ID-open
+notes are historical for the ROOT remapper; they do not establish guest or
+headed platform acceptance. The lane retains at most 10 MB, reuses the existing
+Mere Cargo target, and preserves concurrent staged/receipt work.
+
 ## Native publication IDs and host ownership, 2026-10-22
 
 **Status:** bounded host-owner and disposal repairs; native ID remapping remains
