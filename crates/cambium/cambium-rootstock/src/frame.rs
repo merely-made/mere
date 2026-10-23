@@ -1047,14 +1047,21 @@ where
         }
     }
 
-    pub(crate) fn record_a11y_publication(&mut self, publication: crate::A11yPublication) {
+    pub(crate) fn stamp_a11y_publication(
+        &mut self,
+        publication: crate::A11yPublication,
+    ) -> crate::A11yPublicationSnapshot {
         self.s.a11y_publication = publication;
         self.s.a11y_publication_sequence = self
             .s
             .a11y_publication_sequence
             .checked_add(1)
             .expect("accessibility observation sequence exhausted");
-        let snapshot = self.a11y_publication();
+        self.a11y_publication()
+    }
+
+    pub(crate) fn record_a11y_publication(&mut self, publication: crate::A11yPublication) {
+        let snapshot = self.stamp_a11y_publication(publication);
         if let Some(observer) = &mut self.s.a11y_publication_observer {
             observer(snapshot);
         }

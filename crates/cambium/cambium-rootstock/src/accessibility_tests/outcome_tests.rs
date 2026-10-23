@@ -69,6 +69,10 @@ fn publication_observer_tracks_refusal_retry_skips_and_disposal_without_dispatch
     publication.set(first.publication);
     host.sync_a11y();
     assert_eq!(host.a11y_publication().publication, first.publication);
+    publication.set(Publication {
+        adapter: Adapter::Detached,
+        ..first.publication
+    });
     host.s.layout = None;
     host.sync_a11y();
     assert_eq!(
@@ -76,6 +80,11 @@ fn publication_observer_tracks_refusal_retry_skips_and_disposal_without_dispatch
         Outcome::NotAttempted {
             reason: Skip::NoLayout
         }
+    );
+    assert_eq!(
+        host.a11y_publication().publication.adapter,
+        Adapter::Detached,
+        "skips read current attachment, not an older installed report"
     );
     host.s.runner = None;
     host.sync_a11y();
@@ -114,4 +123,30 @@ fn publication_observer_tracks_refusal_retry_skips_and_disposal_without_dispatch
         assert_eq!(sample.sequence, i as u64 + 1);
     }
     assert_ne!(counter_host().a11y_publication().host, first.host);
+}
+
+#[test]
+fn disposal_publication_observer_runs_after_the_host_borrow_is_released() {
+    let host = Rc::new(RefCell::new(counter_host()));
+    let weak = Rc::downgrade(&host);
+    let called = Rc::new(Cell::new(false));
+    let observed = called.clone();
+    host.borrow_mut().s.a11y_publication_observer = Some(Box::new(move |snapshot| {
+        let host = weak.upgrade().unwrap();
+        let loan = host
+            .try_borrow_mut()
+            .expect("disposal notification must permit host reentry");
+        assert_eq!(loan.a11y_publication(), snapshot);
+        assert_eq!(
+            snapshot.publication.outcome,
+            Outcome::NotAttempted {
+                reason: Skip::OwnerEnded
+            }
+        );
+        observed.set(true);
+    }));
+    let disposal = host.borrow_mut().take_disposal();
+    assert!(!called.get());
+    drop(disposal);
+    assert!(called.get());
 }

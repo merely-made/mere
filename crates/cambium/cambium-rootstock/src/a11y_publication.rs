@@ -8,6 +8,7 @@ use serde::Serialize;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum A11yAdapterState {
+    Unobserved,
     NotConfigured,
     Detached,
     Unavailable,
@@ -68,7 +69,7 @@ pub struct A11yPublication {
 impl Default for A11yPublication {
     fn default() -> Self {
         Self::skipped(
-            A11yAdapterState::NotConfigured,
+            A11yAdapterState::Unobserved,
             A11yPublicationSkip::NotSynced,
         )
     }
