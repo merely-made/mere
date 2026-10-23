@@ -127,6 +127,17 @@ enum SharedProducer {
     Browser(Box<inker::cue_browser::BrowserSurface>),
 }
 impl PeltSharedContent {
+    /// Embed an already-bound native browser with its concrete capability
+    /// report and scope. Routing policy stays with the caller.
+    pub fn from_browser(
+        route: crate::PeltRoute,
+        producer: inker::cue_browser::BrowserSurface,
+    ) -> Self {
+        Self {
+            route,
+            producer: SharedProducer::Browser(Box::new(producer)),
+        }
+    }
     /// A browser lane requires its concrete non-blocking frame binding. A
     /// retained Genet lane uses the supplied host device and ignores that option.
     pub fn from_content(
