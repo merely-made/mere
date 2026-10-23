@@ -324,13 +324,13 @@ records the source cutover and validation boundaries.
 
 ### Decisions and doctrine
 
-Core §11 governs, from 2026-10-22. Mere keeps no case record, so it has
-no decisions configuration; its earlier rulings are
-numbered within each plan, and a later pass reviews them into the doctrine.
-The doctrine, `doctrine.md`, began on 2026-10-22 with five statements moved
-from isocosm's, citing isocosm's cases as `isocosm:<n>`. Until the decisions
-tool moves into the stack (isocosm's decision-links plan, L6e), it is
-isocosm's `shared/wing-decisions`, run from this repository's root: `regen
---stage` after a change to the doctrine or to a plan's Decisions, `check`, and
-`lookup`. *The doctrine* here is `doctrine.md`; the data-oriented doctrine
-brief names a representational discipline.
+Core §11 governs, from 2026-10-22. Mere keeps no case record, so it has no
+decisions configuration; its earlier rulings are numbered within each plan,
+and a later pass reviews them into the doctrine. The doctrine, `doctrine.md`,
+began on 2026-10-22 with five statements moved from isocosm's, citing
+isocosm's cases as `isocosm:<n>`. The decisions tool is eidetic's
+`wing-decisions`, run from this repository's root (for example `cargo run
+--release --manifest-path ../eidetic/Cargo.toml -p wing-decisions -- check`):
+`regen --stage` after a change to the doctrine or to a plan's Decisions,
+`check`, and `lookup`. *The doctrine* here is `doctrine.md`; the data-oriented
+doctrine brief names a representational discipline.
