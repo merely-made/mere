@@ -1,5 +1,61 @@
 # System Diagnostics and Accessibility Plan
 
+## Producer activation and child lifetimes, 2026-10-23
+
+**Status (2026-10-23):** bounded checked activation implemented; automated receiving qualified within the boundaries below.
+Review and remaining migrations: `support/family-promotion/diagnostics-activation-review.json`.
+Exact gates and source: `support/family-promotion/diagnostics-activation-qualification.json`.
+
+### Phases and done-conditions
+
+1. Refuse expired child tokens in publication, queue and host admission. Pointer
+   equality of two cached weak tokens does not establish a live authored child.
+2. Freeze raw operation-entry context before contributor callbacks. Preserve all
+   earlier publication/queue bindings. Pass that admitted child token to checked
+   activation rather than resolving a new child life for an old request.
+3. Delegate checked activation under one mutable producer borrow. Rc adapters
+   lend the same P across validation/dispatch; ContentProducer holds its actual
+   ContentSlot borrow through token validation and revision-qualified activation.
+   Raw and checked retained-content entry share one owner-borrowed implementation.
+4. Receive expired cached tokens, raw/bound late admission replacement, shared
+   mutable borrow, actual retained-content activation/retirement, canvas controls,
+   native hosts, Wasm, embedding and a standalone consumer. Dispatch and refusal
+   remain distinct from publication, terminal actor completion and durability.
+
+### Findings and progress
+
+Expired child tokens previously compared equal to cached copies. Admission now
+checks liveness; full publication refuses ContributorEnded. The registry forwards
+checked activation to the contributor instead of calling raw act after admission.
+A replacement during the final admission callback cannot gain the old request's
+child life. Refused activation and producer decline do not run after-dispatch
+hooks or move focus as though an action dispatched.
+
+The default checked method covers a directly owned model and observational child
+reads. Adapters with deeper shared owners must override under that real model's
+borrow/transaction. Optional None still requires never-reused authored keys;
+a cached expired Some is not equivalent to None. Action IDs retain their meaning
+within a child life, or need an owner-checked action revision/new child life.
+
+### Remaining ownership migrations, in order
+
+1. Canvas same-call removal/restoration needs a mutation-time lifetime witness.
+   ingest_graph reconciles after an arbitrary closure; endpoint UUID comparison
+   cannot observe a removal/recreation hidden inside it. Existing separate-call
+   removal/restoration controls do not establish this guarantee. Track the red
+   reproduction separately from passing acceptance gates; do not invalidate all
+   unrelated live keys merely to avoid tracking the actual mutation.
+2. Receive checked activation in every custom/deeper shared producer and explicit
+   action-ID reuse. A trait default cannot make arbitrary interior state atomic.
+3. Promote the AccessKit hook and coordinate standalone native consumer intake.
+4. Receive guest namespaces/selection ingress and headed platform/AT handoff,
+   installation, recovery and late events. This pass adds no such runtime claim.
+5. Complete Rootstock intrinsic sizing/Path-B raster and owner-reported terminal
+   actor outcomes through their separately qualified paths.
+
+The lane retains at most 10 MB, reuses the stable Mere target, and preserves
+pre-existing staged changes and concurrent receipt edits.
+
 ## Shared publication outcomes and collectors, 2026-10-23
 
 **Status (2026-10-23):** implemented; automated receiving qualified within the boundaries below.
