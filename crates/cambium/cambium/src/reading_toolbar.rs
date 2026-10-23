@@ -34,12 +34,12 @@ pub fn read_toolbar<State: 'static, Action: 'static>(
     handler: impl Fn(&mut State, ReadEvent) + 'static,
 ) -> ShellSlot<State, Action> {
     let handler = Rc::new(handler);
-    let find_open = find.is_some_and(|find| find.open);
+    let find_open = find.is_some_and(|find| find.open && find.available);
     let appearance_open = find.is_some_and(|ui| ui.appearance_open);
     let mut header = Vec::new();
     for (label, name, command, disabled, expanded) in [
         ("Aa", "Reading appearance", ReadCommand::Appearance, !text_controls, appearance_open),
-        ("Find", "Find in reading", ReadCommand::Find, find.is_none(), find_open),
+        ("Find", "Find in reading", ReadCommand::Find, find.is_none_or(|find| !find.available), find_open),
     ] {
         let handler = handler.clone();
         header.push(shell_control(label, name, ShellControl { disabled, expanded: Some(expanded), ..Default::default() },
@@ -112,7 +112,7 @@ pub fn read_toolbar<State: 'static, Action: 'static>(
     if appearance_open && text_controls {
         rows.push(Box::new(el("div", controls).attr("class", "read-controls").attr("role", "group").attr("aria-label", "Reading appearance")));
     }
-    if let Some(find) = find.filter(|find| find.open) {
+    if let Some(find) = find.filter(|find| find.open && find.available) {
         let commands = handler.clone();
         rows.push(find_row(
             find_field(find, handler.clone()),
