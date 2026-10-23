@@ -658,7 +658,7 @@
     "remaining": "Schema hook promotion and product patch/lock receiving; guest/reset/selection ingress; physical surface and AT runtime; actor transaction, legacy child reuse, raw canvas mutation visibility and full leaf sizing/raster."
   },
   "publication_outcomes_continuation": {
-    "status": "implementation in progress; qualification pending",
+    "status": "implemented; automated receiving qualified; supplier, actor, guest and platform migrations open",
     "review": "diagnostics-outcomes-review.json",
     "qualification": "diagnostics-outcomes-qualification.json",
     "scope": "Shared publisher observations and Rootstock/Mesquite collection; actor, supplier, guest and headed migrations remain separately tracked."
