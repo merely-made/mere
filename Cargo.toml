@@ -153,6 +153,7 @@ members = [
     "crates/cambium/tinct",
 ]
 exclude = [
+    "support/patches/accesskit",
     "support/patches/light-file-dialog",
     "crates/cambium/hest-0_1",
     "crates/probes",
@@ -738,6 +739,8 @@ uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
 [patch.crates-io]
+# Schema-owned complete NodeId traversal for native publication namespaces.
+accesskit = { path = "support/patches/accesskit" }
 # Reuse the Windows password class across cancellation and sequential prompts.
 light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.

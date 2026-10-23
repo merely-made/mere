@@ -37,6 +37,9 @@ use sprigging::LeafRegistry;
 use winit::window::Window;
 
 #[cfg(test)]
+mod namespace_tests;
+mod publication;
+#[cfg(test)]
 mod publication_tests;
 
 /// The screen-reader request vocabulary, re-exported from the neutral seam.
@@ -78,8 +81,9 @@ pub struct A11yHost {
     window: Option<std::sync::Arc<Window>>,
     bridge: AccessKitBridge,
     installed: bool,
-    /// Last-published requests retain contributor provenance through dispatch.
+    /// Native publication IDs map to the last published contributor bindings.
     requests: HashMap<A11yNodeId, A11yRequest>,
+    namespace: publication::NativeIds,
 }
 
 impl A11yHost {
@@ -92,6 +96,7 @@ impl A11yHost {
             bridge: AccessKitBridge::new(wake),
             installed: false,
             requests: HashMap::new(),
+            namespace: publication::NativeIds::default(),
         }
     }
 
@@ -136,19 +141,36 @@ impl A11yHost {
             .collect();
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
-        let next = projection
-            .publication_requests(owner, dom, leaves, producers)
-            .into_iter()
-            .map(|(id, request)| (A11yNodeId(id), request))
-            .collect();
+        let bindings = projection.publication_bindings(owner, dom, leaves, producers);
         let mut tree = projection.tree;
         scale_tree_to_window(&mut tree, dom, layout_scale);
+        let publication = bindings
+            .map_err(|issue| format!("{issue:?}"))
+            .and_then(|bindings| {
+                self.namespace
+                    .prepare(tree, bindings)
+                    .map_err(|issue| format!("{issue:?}"))
+            });
+        let publication::Prepared {
+            tree,
+            namespace,
+            requests: next,
+        } = match publication {
+            Ok(candidate) => candidate,
+            Err(issue) => {
+                self.requests.clear();
+                self.namespace.clear();
+                eprintln!("[cambium-winit] accessibility publication refused: {issue}");
+                return Vec::new();
+            },
+        };
         let node_count = tree.nodes.len();
         if !self.installed {
             match self.bridge.install(&window, tree) {
                 Ok(()) => {
                     self.installed = true;
                     self.requests = next;
+                    self.namespace = namespace;
                     eprintln!(
                         "[cambium-winit] accessibility {:?}, {node_count} nodes projected",
                         self.bridge.status()
@@ -162,6 +184,7 @@ impl A11yHost {
         } else {
             self.bridge.update(tree);
             self.requests = next;
+            self.namespace = namespace;
         }
         requests
     }
@@ -244,8 +267,8 @@ fn attach_window<W>(
 /// and no platform adapter. Providers are read through shared borrows; this
 /// copied observation is not a presentation-revision snapshot or target lease.
 ///
-/// Returns the tree update and the AccessKit-id → DOM-node map a drained
-/// action is resolved through. Split out so the projection is assertable in an
+/// Returns semantic source IDs and their DOM routes for composition. These
+/// are not the native IDs installed by A11yHost or accepted by map_request. Split out so the projection is assertable in an
 /// ordinary test — an accessibility regression that only a screen reader can
 /// catch is one nobody catches.
 pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
@@ -259,8 +282,8 @@ pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
     (tree, nodes)
 }
 
-/// [`project_tree`], also returning which drawn node's action each produced
-/// button stands for, the map a reader's click on one resolves through.
+/// [`project_tree`], also returning semantic source routes for produced actions.
+/// Native publication remaps the complete tree before installing its own routes.
 pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
@@ -280,7 +303,8 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     )
 }
 
-/// Stamp the host's layout scale on the tree root.
+/// Stamp the host's layout scale on the semantic source tree root. Apply this
+/// before native ID remapping.
 ///
 /// Layout bounds are layout-space CSS pixels, and AccessKit expects the final
 /// transformed coordinates to be the platform's physical client pixels. The

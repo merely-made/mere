@@ -9,10 +9,37 @@ use layout_dom_api::LayoutDom;
 use sprigging::{LeafLifetime, LeafRegistry};
 use std::sync::Weak;
 
+/// Authorship of every published node, including non-action producer children.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum NodeTarget {
+    Node(NodeId),
+    Produced {
+        slot: u64,
+        key: u64,
+        action: Option<String>,
+    },
+}
+impl From<&A11yTarget> for NodeTarget {
+    fn from(target: &A11yTarget) -> Self {
+        match target {
+            A11yTarget::Node(node) => Self::Node(*node),
+            A11yTarget::Produced(action) => Self::Produced {
+                slot: action.slot,
+                key: action.key,
+                action: Some(action.id.clone()),
+            },
+        }
+    }
+}
+
+/// A weak authored identity, retaining no host, document, leaf or producer.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SemanticNodeIdentity(pub(crate) A11yProvenance);
+
 #[derive(Clone, Debug)]
 pub(crate) struct A11yProvenance {
     owner: A11yOwner,
-    target: A11yTarget,
+    target: NodeTarget,
     document: NodeId,
     mount: NodeId,
     producer: Option<Weak<()>>,
@@ -36,7 +63,13 @@ impl PartialEq for A11yProvenance {
     }
 }
 
+impl Eq for A11yProvenance {}
+
 impl A11yProvenance {
+    pub(crate) fn target_matches(&self, target: &A11yTarget) -> bool {
+        self.target == NodeTarget::from(target)
+    }
+
     pub fn capture(
         owner: &A11yOwner,
         target: &A11yTarget,
@@ -44,27 +77,37 @@ impl A11yProvenance {
         leaves: &LeafRegistry<u64>,
         producers: &ProducerRegistry,
     ) -> Self {
-        let slot = match target {
-            A11yTarget::Produced(action) => Some(action.slot),
-            A11yTarget::Node(node) => dom
+        Self::capture_node(owner, NodeTarget::from(target), dom, leaves, producers)
+    }
+
+    pub(crate) fn capture_node(
+        owner: &A11yOwner,
+        target: NodeTarget,
+        dom: &WindowDom<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> Self {
+        let slot = match &target {
+            NodeTarget::Produced { slot, .. } => Some(*slot),
+            NodeTarget::Node(node) => dom
                 .contains(*node)
                 .then(|| crate::owned_layout::custom_leaf_key(dom, *node))
                 .flatten(),
         };
         Self {
             owner: owner.clone(),
-            target: target.clone(),
             document: dom.dom().document(),
             mount: dom.document(),
             producer: slot.and_then(|key| producers.action_lifetime(key)),
-            child: match target {
-                A11yTarget::Produced(action) => producers.child_lifetime(action.slot, action.key),
+            child: match &target {
+                NodeTarget::Produced { slot, key, .. } => producers.child_lifetime(*slot, *key),
                 _ => None,
             },
-            leaf: match target {
-                A11yTarget::Node(_) => slot.map(|key| (key, leaves.lifetime(&key))),
+            leaf: match &target {
+                NodeTarget::Node(_) => slot.map(|key| (key, leaves.lifetime(&key))),
                 _ => None,
             },
+            target,
         }
     }
 

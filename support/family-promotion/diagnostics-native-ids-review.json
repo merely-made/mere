@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-23",
+  "scope": "Native ROOT publication remapping and complete authored node identity; platform event transport and guest/compositor namespaces remain separately owned.",
+  "authorities": {
+    "accesskit": "Vendored 0.25.1 typed property schema owns try_map_node_ids; exhaustive PropertyValue match and macro-generated relation tests avoid a second property schema in Mere.",
+    "rootstock": "One weak A11yProvenance for DOM, structural producer nodes and action nodes; PublicationBindings freezes all identities and routes once, checks source/route agreement and rejects duplicate/unknown nodes.",
+    "native_publisher": "NativeIds owns a process-wide nonreused ID sequence and current authored-identity map. Stable lives keep IDs, removed lives are pruned, and replacement/recreation cannot reuse numbers.",
+    "bridge": "Existing Genet AccessKitBridge owns platform installation, action queue and replay. Native IDs are translated before this boundary; activation epoch is not treated as target life."
+  },
+  "repairs": [
+    "All producer structural children receive identity even without actions; action routes reuse the same frozen binding metadata.",
+    "Complete Node references, selection positions, tree root and focus remapped through one native candidate map.",
+    "Native pending events drain through last committed bindings; late old IDs after replacement no longer resolve.",
+    "Malformed references, duplicates, invalid child graphs and foreign tree/graft publication refuse before routes advance.",
+    "Invalid publication clears native routes/current namespace; a later recovery allocates fresh IDs. Failed first install never commits draft IDs/routes.",
+    "Browser consumes the same fallible shared binding contract and clears invalid mirror routes/proxies.",
+    "Public source projection helpers now explicitly describe source IDs, not installed native IDs; obsolete source-ID-only mapper fixture retired in favor of real namespace/consumer controls."
+  ],
+  "supplier_patch": {
+    "version": "0.25.1",
+    "upstream_commit": "ce8164ba92995cfa86005b6259115e08c8244253",
+    "registry_lib_sha256": "f77ed125614c6e735141bdc5fe8551cfc8dbc2d16ffccf4d52880c2c2bdfeffd",
+    "local_hook": "support/patches/accesskit/src/lib.rs::Node::try_map_node_ids",
+    "normalized_source_delta": {
+      "added": 120,
+      "removed": 0
+    },
+    "license_files": [
+      "LICENSE-MIT",
+      "LICENSE-APACHE"
+    ],
+    "consumer_rule": "Cargo patches do not propagate through dependencies. Standalone native intake must declare the AccessKit patch at its own workspace root. The native-id-consumer fixture receives this contract separately. Existing external pins are not repinned by this pass."
+  },
+  "remaining_migrations": [
+    {
+      "owner": "Supplier API promotion and standalone native product intake",
+      "gap": "Local AccessKit patch supplies the traversal API. External native consumers receiving this Mere revision need the same root patch until an upstream release/fork supplies it.",
+      "done_condition": "Promote the schema hook upstream or a governed supplier revision, coordinate affected consumer patch/lock intake and remove the vendor only after those builds receive it."
+    },
+    {
+      "owner": "Guest/compositor namespace and selection ingress",
+      "gap": "A11yHost publishes ROOT only and rejects guest tree IDs/grafts. Existing public composition helpers and E1a guest pipelines retain their own TreeId ownership. Selection action ingress is unsupported; only focus/click/numeric value route here.",
+      "done_condition": "Owner-qualified per-tree namespace and complete guest install/reset/replay/ingress receiving; translate selection node references if SetTextSelection is admitted."
+    },
+    {
+      "owner": "Platform runtime and surface lifecycle",
+      "gap": "Consumer trees and mapping are headless; actual late Windows/macOS/Linux AT events, partial install recovery, reattach and host/window/canvas handoff remain unqualified.",
+      "done_condition": "Headed platform controls at exact shipped pins, including old handle after replacement, focus continuity, installation failure/reset, window disposal and guest activation."
+    },
+    {
+      "owner": "Producer actor transaction and custom contributor compliance",
+      "gap": "Optional child token None still assumes nonreused authored keys; no observer can recover same-key removal/recreation hidden between snapshots. Contributor/action mutation and activation are not atomic.",
+      "done_condition": "Owner-side transaction checking in the same model activation, authored lifetimes for reusable child/action keys and same-call canvas transition receiving."
+    },
+    {
+      "owner": "Full Rootstock leaf integration",
+      "gap": "Intrinsic sizing and Path-B scene raster wiring remain separate from this namespace repair.",
+      "done_condition": "Receive those actual render/sizing paths without relabeling semantics or mapping receipts."
+    }
+  ],
+  "qualification": "diagnostics-native-ids-qualification.json",
+  "retained_byte_cap": 10000000
+}
