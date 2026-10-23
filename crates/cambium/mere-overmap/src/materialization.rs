@@ -221,20 +221,6 @@ async fn cards(
     Ok(())
 }
 
-fn media(
-    snapshot: &ProjectionSnapshot,
-    instance: InstanceId,
-    cards: &HashMap<ContentHash, Vec<u8>>,
-) -> Result<ContentHash, String> {
-    let hash = card_hash(snapshot, instance)?;
-    let bytes = cards.get(&hash).ok_or("Missing material card resource.")?;
-    let card: PortableCardV1 = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-    card.media
-        .first()
-        .copied()
-        .ok_or_else(|| "The material card must advertise a media resource.".into())
-}
-
 /// Read fresh projections and validate every fetched resource before decoding.
 /// Only Complete fetches graph cards and the scoped graph envelope; projection
 /// reads still fetch sessions/archive cards and any advertised pending merge.
@@ -266,19 +252,17 @@ pub async fn read(
     if let Some(archive) = &result.archive {
         cards(source, archive, &mut result.cards).await?;
     }
-    let merges = route::merge_cards(&result.sessions);
-    if merges.len() > 1 {
-        return Err("Multiple pending merge cards.".into());
-    }
-    if let Some(&instance) = merges.first() {
-        let hash = media(&result.sessions, instance, &result.cards)?;
+    if let Some(instance) = route::unique_merge_card(&result.sessions)? {
+        let card_hash = card_hash(&result.sessions, instance)?;
+        let bytes = result
+            .cards
+            .get(&card_hash)
+            .ok_or("Missing material card resource.")?;
+        let card: PortableCardV1 =
+            serde_json::from_slice(bytes).map_err(|error| error.to_string())?;
+        let hash = route::pending_merge_media(&card)?;
         let bytes = resource(source, &result.sessions.session, hash).await?;
-        let pending: wire::PendingMergeV1 = serde_json::from_slice(&bytes)
-            .map_err(|e| format!("Invalid pending merge material: {e}"))?;
-        if pending.schema != wire::PENDING_MERGE_SCHEMA {
-            return Err("The pending merge material has another schema.".into());
-        }
-        result.pending_merge = Some(pending);
+        result.pending_merge = Some(route::decode_pending_merge(&bytes)?);
     }
     if graph_read == GraphRead::Complete {
         cards(source, &result.graph, &mut result.cards).await?;
@@ -759,6 +743,13 @@ mod tests {
     }
 
     #[test]
+    fn no_pending_merge_cards_is_a_valid_materialization() {
+        let (mut fake, _) = fixture(&envelope());
+        let material = read_complete(&mut fake).unwrap();
+        assert!(material.pending_merge.is_none());
+    }
+
+    #[test]
     fn pending_merge_uses_its_first_media_resource() {
         let (mut fake, _) = fixture(&envelope());
         let hash = add_merge(&mut fake, wire::PENDING_MERGE_SCHEMA, 2);
@@ -801,6 +792,42 @@ mod tests {
             read_complete(&mut fake)
                 .unwrap_err()
                 .contains("content hash")
+        );
+    }
+
+    #[test]
+    fn pending_merge_admission_rejects_multiple_cards_and_malformed_material() {
+        let (mut fake, _) = fixture(&envelope());
+        let hash = add_merge(&mut fake, wire::PENDING_MERGE_SCHEMA, 1);
+        let sessions = snapshot_fixture(
+            wire::MERE_SESSIONS,
+            &[
+                (wire::MERGE_SOURCE, "merge-a".into(), vec![hash]),
+                (wire::MERGE_SOURCE, "merge-b".into(), vec![hash]),
+            ],
+            &mut fake.resources,
+        );
+        fake.snapshots.insert(wire::MERE_SESSIONS.into(), sessions);
+        assert!(
+            read_complete(&mut fake)
+                .unwrap_err()
+                .contains("Multiple pending merge cards")
+        );
+
+        let (mut fake, _) = fixture(&envelope());
+        let malformed = b"not json".to_vec();
+        let hash = ContentHash::of(&malformed);
+        let sessions = snapshot_fixture(
+            wire::MERE_SESSIONS,
+            &[(wire::MERGE_SOURCE, "merge".into(), vec![hash])],
+            &mut fake.resources,
+        );
+        fake.resources.insert(hash, malformed);
+        fake.snapshots.insert(wire::MERE_SESSIONS.into(), sessions);
+        assert!(
+            read_complete(&mut fake)
+                .unwrap_err()
+                .contains("Invalid pending merge material")
         );
     }
 

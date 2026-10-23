@@ -688,6 +688,9 @@ impl MereRouteSession {
                 match (task, outcome) {
                     (Task::Mount(_), Outcome::Mounted(session)) => {
                         let snapshot = self.snapshot(&session)?;
+                        if session == self.sessions {
+                            mere_route::unique_merge_card(&snapshot)?;
+                        }
                         let mut resolves = Vec::new();
                         for binding in &snapshot.presentation.bindings {
                             if let Some(offer) = snapshot
@@ -727,7 +730,8 @@ impl MereRouteSession {
                             }
                             let is_merge = session == self.sessions
                                 && mere_route::merge_cards(&snapshot).contains(&instance);
-                            if is_merge && !card.media.is_empty() {
+                            if is_merge {
+                                mere_route::pending_merge_media(&card)?;
                                 self.tasks.push_front(Task::MergeMedia(session, instance));
                             }
                             self.cards.insert(
@@ -774,12 +778,7 @@ impl MereRouteSession {
                         self.material = Some(material);
                     },
                     (Task::MergeMedia(..), Outcome::MediaResource(resource)) => {
-                        let merge: crate::wire::PendingMergeV1 =
-                            serde_json::from_slice(&resource.bytes)
-                                .map_err(|e| format!("Invalid pending merge material: {e}"))?;
-                        if merge.schema != crate::wire::PENDING_MERGE_SCHEMA {
-                            return Err("The pending merge material has another schema.".into());
-                        }
+                        let merge = mere_route::decode_pending_merge(&resource.bytes)?;
                         mere_route::adopt_merge(&mut self.merge_choices, &merge);
                         self.merge = Some(merge);
                     },
@@ -967,6 +966,205 @@ mod busy_tests {
             presentation,
             cache_policy: Default::default(),
         }
+    }
+
+    fn sessions_snapshot(merge_cards: &[Vec<ContentHash>]) -> ProjectionSnapshot {
+        let mut scene = Scene::new();
+        let mut bindings = Vec::new();
+        let mut offers = BTreeMap::new();
+        for (index, media) in merge_cards.iter().enumerate() {
+            let source = scene.intern_source(SourceRef::new(
+                crate::wire::MERGE_SOURCE,
+                &format!("pending-{index}"),
+            ));
+            scene.items.push(ProjectedItem {
+                source,
+                space: Scene::WORLD,
+                transform: Transform2::translation(index as f32 * 16.0, 0.0),
+                footprint: Footprint::Circle { radius: 8.0 },
+                representation: Representation::Card,
+                layer: 0,
+                visible: true,
+                hit: None,
+                channels: vec![],
+            });
+            let key = PresentationKey(format!("merge-card-{index}"));
+            let card = chirograph::PortableCardV1 {
+                title: format!("pending merge {index}"),
+                values: vec![],
+                badges: vec![],
+                media: media.clone(),
+            };
+            let bytes = serde_json::to_vec(&card).unwrap();
+            let hash = ContentHash::of(&bytes);
+            bindings.push(PresentationBinding {
+                instance: InstanceId(index as u32),
+                key: key.clone(),
+            });
+            offers.insert(
+                key,
+                vec![PresentationOffer {
+                    codec: PresentationCodec::PortableCardV1,
+                    resource: hash,
+                    byte_size: bytes.len() as u64,
+                    requires: PresentationCapability::PortableCard,
+                    semantics: PresentationSemantics {
+                        label: "pending merge".into(),
+                        role: SemanticRole::Graphic,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
+                }],
+            );
+        }
+        ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession(MERE_SESSIONS.into()),
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap(),
+            presentation: PresentationManifest { bindings, offers },
+            cache_policy: Default::default(),
+        }
+    }
+
+    fn pending_merge_bytes() -> Vec<u8> {
+        serde_json::to_vec(&crate::wire::PendingMergeV1 {
+            schema: crate::wire::PENDING_MERGE_SCHEMA.into(),
+            source: pandect::SessionId(uuid::Uuid::from_u128(9)),
+            source_name: "source".into(),
+            target: pandect::SessionId(uuid::Uuid::from_u128(10)),
+            target_name: "target".into(),
+            conflicts: vec![],
+            carried: vec![],
+            dropped: vec![],
+        })
+        .unwrap()
+    }
+
+    fn mount_empty_route_with_merges(
+        merge_media: &[Vec<ContentHash>],
+        pending_bytes: &[u8],
+    ) -> MereRouteSession {
+        let mut panel = panel();
+        let empty = SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap();
+        let graph = ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession(MERE_GRAPH.into()),
+            scene: empty,
+            presentation: PresentationManifest::default(),
+            cache_policy: Default::default(),
+        };
+        let mut resources = HashMap::new();
+        for (index, media) in merge_media.iter().enumerate() {
+            let card = chirograph::PortableCardV1 {
+                title: format!("pending merge {index}"),
+                values: vec![],
+                badges: vec![],
+                media: media.clone(),
+            };
+            let bytes = serde_json::to_vec(&card).unwrap();
+            resources.insert(ContentHash::of(&bytes), bytes);
+        }
+        resources.insert(ContentHash::of(pending_bytes), pending_bytes.to_vec());
+        seed_partial_state(&mut panel);
+        while !panel.outbox.is_empty() && !panel.closed {
+            let outgoing = panel.take_outgoing();
+            assert_eq!(outgoing.len(), 1);
+            let request: CarrierRequest = serde_json::from_str(&outgoing[0]).unwrap();
+            let body = match request.body {
+                chirograph::CarrierRequestBody::Snapshot(snapshot)
+                    if snapshot.session.0 == MERE_SESSIONS =>
+                {
+                    CarrierResponseBody::Snapshot(Box::new(sessions_snapshot(merge_media)))
+                },
+                chirograph::CarrierRequestBody::Snapshot(snapshot)
+                    if snapshot.session.0 == MERE_GRAPH =>
+                {
+                    CarrierResponseBody::Snapshot(Box::new(graph.clone()))
+                },
+                chirograph::CarrierRequestBody::Resource(resource) => {
+                    let bytes = resources.get(&resource.resource).unwrap_or_else(|| {
+                        panic!("unexpected resource request: {:?}", resource.resource)
+                    });
+                    CarrierResponseBody::Resource(chirograph::ResourceResponse::new(
+                        resource.session,
+                        bytes.clone(),
+                    ))
+                },
+                other => panic!("unexpected carrier request: {other:?}"),
+            };
+            let line = chirograph::line::encode(&CarrierOutput::Response(CarrierResponse {
+                id: request.id,
+                body: Ok(body),
+            }))
+            .unwrap();
+            panel.on_line(&line);
+        }
+        panel
+    }
+
+    #[test]
+    fn carrier_admits_zero_or_one_pending_merge_with_first_media() {
+        let pending_bytes = pending_merge_bytes();
+        let pending_hash = ContentHash::of(&pending_bytes);
+
+        let zero = mount_empty_route_with_merges(&[], &pending_bytes);
+        assert!(!zero.closed, "no pending merge should be healthy");
+        assert!(matches!(zero.model.status, ViewStatus::Ready));
+        assert!(zero.merge.is_none());
+
+        let ignored_second = ContentHash::of(b"ignored second merge media");
+        let one =
+            mount_empty_route_with_merges(&[vec![pending_hash, ignored_second]], &pending_bytes);
+        assert!(
+            !one.closed,
+            "one pending merge with first media should be healthy"
+        );
+        assert!(matches!(one.model.status, ViewStatus::Ready));
+        assert_eq!(one.merge, serde_json::from_slice(&pending_bytes).ok());
+    }
+
+    #[test]
+    fn carrier_rejects_pending_merge_without_media_and_purges_partial_state() {
+        let pending_bytes = pending_merge_bytes();
+        let missing = mount_empty_route_with_merges(&[vec![]], &pending_bytes);
+        assert!(
+            missing.closed,
+            "a pending merge without media must be rejected"
+        );
+        assert!(
+            matches!(&missing.model.status, ViewStatus::Unavailable(note) if note.message.contains("media resource"))
+        );
+        assert!(missing.cards.is_empty());
+        assert!(missing.records.is_empty());
+        assert!(missing.inspected.is_none());
+        assert!(missing.transient_layout.is_none());
+        assert!(missing.merge_choices.is_empty());
+        assert!(missing.merge.is_none());
+        assert!(missing.material.is_none());
+    }
+
+    #[test]
+    fn carrier_rejects_multiple_pending_merge_cards_and_purges_partial_state() {
+        let pending_bytes = pending_merge_bytes();
+        let pending_hash = ContentHash::of(&pending_bytes);
+        let multiple = mount_empty_route_with_merges(
+            &[vec![pending_hash], vec![pending_hash]],
+            &pending_bytes,
+        );
+        assert!(
+            multiple.closed,
+            "multiple pending merge cards must be rejected"
+        );
+        assert!(
+            matches!(&multiple.model.status, ViewStatus::Unavailable(note) if note.message.contains("Multiple pending merge cards"))
+        );
+        assert!(multiple.cards.is_empty());
+        assert!(multiple.records.is_empty());
+        assert!(multiple.inspected.is_none());
+        assert!(multiple.transient_layout.is_none());
+        assert!(multiple.merge_choices.is_empty());
+        assert!(multiple.merge.is_none());
+        assert!(multiple.material.is_none());
     }
 
     #[test]
