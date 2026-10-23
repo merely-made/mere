@@ -46,7 +46,10 @@
     "graphshell-tests-and-gpu.log": "7f9cda938ec2830b3d4dd9c271463662ea4b069a353fd14f81b18aefcfca933c",
     "pelt-gpu.log": "d164a7ba850a887fc707cfefb934257e0865b5984c4bf55d56263c11283993d8",
     "receiving-tests.log": "3950ae071014663b631d935abda32da8fee8601a65c1a7cfed2cee88966c6fbb",
-    "type-identity.json": "665e9ca3d6b012ec872bf15718786f725b53a13148212488863fdd850467a9b4"
+    "type-identity.json": "665e9ca3d6b012ec872bf15718786f725b53a13148212488863fdd850467a9b4",
+    "integration-receiving-tests.log": "9fe8d037df8af854d3a2dccf37f4fcd8eeb4e1e470b8fbf50d86d4f3ccf8595f",
+    "integration-pelt-gpu.log": "69c2c4a130b8bd29743ddf9cc1bc21c14bd5410b6a27ffdad134cccdc92af0af",
+    "integration-graphshell-tests-and-gpu.log": "51f056a5ff02665c8b2dd2e7cd09ba2219cf707cda3e04fdebca512db3755193"
   },
   "source_files": {
     "crates/inker/inker/src/cue.rs": "47656bde42b005b14db3ef834b38ec0b03c3d88f3f33c45ea05a58fbbee45d07",
@@ -69,5 +72,25 @@
       "status": ""
     },
     "implementation_worktree_removed": true
+  },
+  "final_integration": {
+    "commit": "7039ba3860b9f5a5811b8c7b5f62e4cee90f4ab7",
+    "upstream_base": "f76758b6bb36d153d4704fe927a25c518830d5d5",
+    "qualified_at": "2026-10-23T05:16:08.020482+00:00",
+    "checks": [
+      {
+        "log": "integration-receiving-tests.log",
+        "passed": 274
+      },
+      {
+        "log": "integration-pelt-gpu.log",
+        "passed": 2
+      },
+      {
+        "log": "integration-graphshell-tests-and-gpu.log",
+        "passed": 16
+      }
+    ],
+    "note": "Merged current-main Pelt physical-to-layout input conversion and removal of display-scale rewrites. Adapter source files and dependency lock unchanged; all receiving suites repeated on the merged source."
   }
 }
