@@ -662,5 +662,10 @@
     "review": "diagnostics-outcomes-review.json",
     "qualification": "diagnostics-outcomes-qualification.json",
     "scope": "Shared publisher observations and Rootstock/Mesquite collection; actor, supplier, guest and headed migrations remain separately tracked."
+  },
+  "producer_activation_continuation": {
+    "status": "bounded checked activation implemented; custom/action and same-call Canvas migrations remain open",
+    "review": "diagnostics-activation-review.json",
+    "qualification": "diagnostics-activation-qualification.json"
   }
 }
