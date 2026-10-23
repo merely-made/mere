@@ -25,23 +25,23 @@ use super::actions::{AdvertisedAction, ArrangementAction};
 /// The most items the canvas describes at once (F67).
 pub const DESCRIBED_ITEMS: usize = 200;
 
-/// Action keys allocated from a process-wide nonreused sequence. A member keeps
-/// its key until reconciliation observes its removal. Separate removal/restoration
-/// boundaries receive a new key, including when graph slots are reused.
-/// Removal/recreation of the same member hidden inside one `ingest_graph` closure
-/// is not yet witnessed; it can retain the old key. See the diagnostics activation
-/// review and its retained Canvas ABA reproduction before claiming that boundary.
-/// Reconciliation authors identities; describing/activating only reads them.
+/// Nonreused action keys for kernel-authored membership lifetimes. Reconciliation
+/// retains ordinary edits and graph clones, but retires a removed/recreated
+/// member even when its UUID and graph slot recur inside one mutation callback.
+/// Semantic reads and activation only compare witnesses; they never mint keys.
 #[derive(Default)]
 pub(super) struct DescribedKeyRegistry {
     pub(super) by_member: std::collections::HashMap<uuid::Uuid, u64>,
-    by_key: std::collections::HashMap<u64, uuid::Uuid>,
+    by_key: std::collections::HashMap<u64, (uuid::Uuid, kernel::graph::SurfaceNodeLifetime)>,
 }
 
 impl DescribedKeyRegistry {
-    fn key_for(&mut self, member: uuid::Uuid) -> u64 {
+    fn key_for(&mut self, member: uuid::Uuid, life: kernel::graph::SurfaceNodeLifetime) -> u64 {
         if let Some(key) = self.by_member.get(&member) {
-            return *key;
+            if self.by_key.get(key) == Some(&(member, life)) {
+                return *key;
+            }
+            self.by_key.remove(key);
         }
         // Zero is reserved for the initial/unset value. Exhaustion is not
         // recoverable without risking stale-action aliasing, so fail closed.
@@ -53,20 +53,22 @@ impl DescribedKeyRegistry {
             })
             .expect("described action key space exhausted");
         self.by_member.insert(member, key);
-        self.by_key.insert(key, member);
+        self.by_key.insert(key, (member, life));
         key
     }
 
     fn retain_live(&mut self, live: &std::collections::HashSet<uuid::Uuid>) {
         self.by_member.retain(|member, _| live.contains(member));
-        self.by_key.retain(|_, member| live.contains(member));
+        self.by_key.retain(|_, (member, _)| live.contains(member));
     }
 
     pub(super) fn reconcile(&mut self, graph: &kernel::graph::Graph) {
         let live = graph.nodes().map(|(_, node)| node.id).collect();
         self.retain_live(&live);
         for (_, node) in graph.nodes() {
-            self.key_for(node.id);
+            if let Some(life) = graph.surface_node_lifetime(node.id) {
+                self.key_for(node.id, life);
+            }
         }
     }
 }
@@ -147,6 +149,7 @@ impl Canvas {
             .filter_map(|(key, rect)| {
                 let node = self.graph.get_node(key)?;
                 let action_key = *self.described_keys.by_member.get(&node.id)?;
+                self.member_of_described(action_key)?;
                 Some(DescribedItem {
                     key: action_key,
                     member: node.id,
@@ -162,9 +165,8 @@ impl Canvas {
 
     /// The member a described item's key names.
     pub fn member_of_described(&self, key: u64) -> Option<uuid::Uuid> {
-        let member = *self.described_keys.by_key.get(&key)?;
-        self.graph.get_node_key_by_id(member)?;
-        Some(member)
+        let (member, life) = *self.described_keys.by_key.get(&key)?;
+        (self.graph.surface_node_lifetime(member) == Some(life)).then_some(member)
     }
 
     /// Where `key` is drawn, in the canvas's logical px.

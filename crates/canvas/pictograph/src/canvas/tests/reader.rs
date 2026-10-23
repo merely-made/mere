@@ -282,3 +282,108 @@ fn the_boards_keyboard_move_nudges_drops_and_escapes_back() {
     assert!(board.end_key_move(true), "Enter");
     assert!(!board.key_move_by(0.0, 60.0), "ended");
 }
+
+#[test]
+fn same_call_recreation_retires_only_that_members_actions_and_ordinary_edits_keep_keys() {
+    let (mut canvas, keys, _) = row(3);
+    let ids: Vec<_> = keys.iter().map(|key| member(&canvas, *key)).collect();
+    let old = canvas.described_keys.by_member.clone();
+    assert!(canvas.ingest_graph(|graph| {
+        graph.set_node_title(keys[1], "Ordinary title edit".into());
+        graph.assert_relation(keys[1], keys[2], crate::canvas::build::hyperlink());
+        assert!(graph.remove_node(keys[0]));
+        graph.add_node_with_id(
+            ids[0],
+            "https://same-call.example".into(),
+            PortablePoint::zero(),
+        );
+        true
+    }));
+    let recreated = canvas.described_keys.by_member[&ids[0]];
+    assert_ne!(recreated, old[&ids[0]]);
+    assert_eq!(canvas.member_of_described(old[&ids[0]]), None);
+    for id in &ids[1..] {
+        assert_eq!(canvas.described_keys.by_member[id], old[id]);
+    }
+    assert!(canvas.ingest_graph(|graph| {
+        graph.add_node_with_id(
+            ids[0],
+            "https://ordinary-upsert.example".into(),
+            PortablePoint::zero(),
+        );
+        true
+    }));
+    assert_eq!(
+        canvas.described_keys.by_member[&ids[0]], recreated,
+        "upserts keep live membership"
+    );
+    let mut owner = canvas.graph().clone();
+    owner.set_node_title(keys[1], "Accepted owner metadata".into());
+    assert!(canvas.refresh_same_topology_graph(&owner).is_ok());
+    assert_eq!(canvas.described_keys.by_member[&ids[0]], recreated);
+    for id in &ids[1..] {
+        assert_eq!(canvas.described_keys.by_member[id], old[id]);
+    }
+    let stable = canvas.described_keys.by_member.clone();
+    for _ in 0..3 {
+        canvas.describe_items(DESCRIBED_ITEMS);
+    }
+    assert_eq!(
+        canvas.described_keys.by_member, stable,
+        "reads cannot mint lives"
+    );
+}
+
+#[test]
+fn false_mutation_report_cannot_hide_same_call_recreation() {
+    let (mut canvas, keys, _) = row(2);
+    let id = member(&canvas, keys[0]);
+    let old = canvas.described_keys.by_member[&id];
+    assert!(
+        canvas.ingest_graph(|graph| {
+            assert!(graph.remove_node(keys[0]));
+            graph.add_node_with_id(
+                id,
+                "https://false-report.example".into(),
+                PortablePoint::zero(),
+            );
+            false
+        }),
+        "kernel mutation wins over the callback's report"
+    );
+    assert_eq!(canvas.member_of_described(old), None);
+    assert_ne!(canvas.described_keys.by_member[&id], old);
+    assert!(!canvas.ingest_graph(|_| false));
+}
+
+#[test]
+fn same_topology_refresh_refuses_recreated_members_and_structural_ingest_receives_their_lives() {
+    let (mut canvas, keys, _) = row(2);
+    let id = member(&canvas, keys[0]);
+    let other = member(&canvas, keys[1]);
+    let old = canvas.described_keys.by_member[&id];
+    let untouched = canvas.described_keys.by_member[&other];
+    let mut owner = canvas.graph().clone();
+    assert!(owner.remove_node(keys[0]));
+    let reused = owner.add_node_with_id(
+        id,
+        "https://owner-recreation.example".into(),
+        PortablePoint::zero(),
+    );
+    assert_eq!(reused, keys[0]);
+    assert!(
+        canvas.refresh_same_topology_graph(&owner).is_err(),
+        "same UUID/slot cannot claim metadata-only continuity"
+    );
+    assert_eq!(
+        canvas.described_keys.by_member[&id], old,
+        "refusal is atomic"
+    );
+    assert!(canvas.ingest_graph(|graph| {
+        *graph = owner;
+        true
+    }));
+    assert_eq!(canvas.member_of_described(old), None);
+    assert_ne!(canvas.described_keys.by_member[&id], old);
+    assert_eq!(canvas.described_keys.by_member[&other], untouched);
+}
