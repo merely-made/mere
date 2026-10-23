@@ -168,7 +168,10 @@ async fn main() {
     // Enrolment edits the vault directory and reports; it hosts nothing.
     if args.enroll_passphrase {
         let result = if args.native {
-            djinn::enrollment::enroll_passphrase_native(&args.vault_dir, &SystemNativeIdentityUi)
+            djinn::enrollment::enroll_passphrase_native(
+                &args.vault_dir,
+                &SystemNativeIdentityUi::default(),
+            )
         } else {
             djinn::enrollment::enroll_passphrase(
                 &args.vault_dir,

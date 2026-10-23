@@ -94,25 +94,33 @@ mod tests {
 
     struct NativeAnswer(
         std::sync::Mutex<
-            Option<Result<Option<Zeroizing<String>>, crate::identity_ui::NativeIdentityFailure>>,
+            Option<
+                Result<
+                    Option<Zeroizing<String>>,
+                    crate::door::browser_carrier::NativeIdentityFailure,
+                >,
+            >,
         >,
     );
 
     impl crate::identity_ui::NativeIdentityUi for NativeAnswer {
         fn pick_ssh_private_key(
             &self,
-        ) -> Result<Option<std::path::PathBuf>, crate::identity_ui::NativeIdentityFailure> {
+        ) -> Result<Option<std::path::PathBuf>, crate::door::browser_carrier::NativeIdentityFailure>
+        {
             unreachable!()
         }
         fn prompt_ssh_private_key_passphrase(
             &self,
-        ) -> Result<Option<Zeroizing<String>>, crate::identity_ui::NativeIdentityFailure> {
+        ) -> Result<Option<Zeroizing<String>>, crate::door::browser_carrier::NativeIdentityFailure>
+        {
             unreachable!()
         }
         fn ask_vault_passphrase(
             &self,
             _: &str,
-        ) -> Result<Option<Zeroizing<String>>, crate::identity_ui::NativeIdentityFailure> {
+        ) -> Result<Option<Zeroizing<String>>, crate::door::browser_carrier::NativeIdentityFailure>
+        {
             self.0.lock().unwrap().take().unwrap()
         }
     }
@@ -141,7 +149,7 @@ mod tests {
             io::ErrorKind::Interrupted
         );
         let ui = NativeAnswer(std::sync::Mutex::new(Some(Err(
-            crate::identity_ui::NativeIdentityFailure::UiUnavailable,
+            crate::door::browser_carrier::NativeIdentityFailure::UiUnavailable,
         ))));
         assert_eq!(
             read_from_native(&ui, "New vault passphrase: ")
@@ -159,21 +167,27 @@ mod tests {
         impl crate::identity_ui::NativeIdentityUi for Twice {
             fn pick_ssh_private_key(
                 &self,
-            ) -> Result<Option<std::path::PathBuf>, crate::identity_ui::NativeIdentityFailure>
-            {
+            ) -> Result<
+                Option<std::path::PathBuf>,
+                crate::door::browser_carrier::NativeIdentityFailure,
+            > {
                 unreachable!()
             }
             fn prompt_ssh_private_key_passphrase(
                 &self,
-            ) -> Result<Option<Zeroizing<String>>, crate::identity_ui::NativeIdentityFailure>
-            {
+            ) -> Result<
+                Option<Zeroizing<String>>,
+                crate::door::browser_carrier::NativeIdentityFailure,
+            > {
                 unreachable!()
             }
             fn ask_vault_passphrase(
                 &self,
                 _: &str,
-            ) -> Result<Option<Zeroizing<String>>, crate::identity_ui::NativeIdentityFailure>
-            {
+            ) -> Result<
+                Option<Zeroizing<String>>,
+                crate::door::browser_carrier::NativeIdentityFailure,
+            > {
                 self.0.fetch_add(1, Ordering::SeqCst);
                 Ok(Some(Zeroizing::new(" New  native * ' café ".into())))
             }
