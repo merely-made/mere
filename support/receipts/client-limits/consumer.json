@@ -1,0 +1,139 @@
+{
+  "schema": "client-limits-qualification-v1",
+  "owner": "mere",
+  "date": "2026-10-22",
+  "qualified_source": "faa6f1fb3b5e522efd22a087c12dd9872b5eb5c9",
+  "integrated_upstream": "06429154399dba0aaa83261970d0c17f77e74f55",
+  "earlier_fetch_document_baseline": "4fa253865d59adb0b76fc770db631f6de35e9072",
+  "upstream_integration_scope": "Fetch/document/site sources and manifests/lock unchanged upstream; native semantic owner and Dramatis work preserved",
+  "source_files": [
+    {
+      "path": "crates/system/fetch/src/lib.rs",
+      "git_blob": "b81f56c1b2662484a7f2306311a63b075b978457",
+      "native_sha256": "410c0883b2d855708a4fbf8762dc2fdc5f308fc227e9599c6e2eb5ff020305e2"
+    },
+    {
+      "path": "crates/system/fetch/src/policy.rs",
+      "git_blob": "c78fc0c0a33f1c778dc1daaaef99bd6c9cc5c841",
+      "native_sha256": "667012c8320585903dec32ee321a720beba4681add07c8920703089fb1fc0863"
+    },
+    {
+      "path": "crates/system/fetch/src/tests.rs",
+      "git_blob": "f923c7d3f861d783d8fba4c27a0a93f3c47b30aa",
+      "native_sha256": "d22ce6db8a6ec92868d605acfa32de5b86358e4b2ad8093c1e653ff9c2e4b012"
+    },
+    {
+      "path": "crates/system/fetch/src/client_limits_tests.rs",
+      "git_blob": "965fb5cf2690b3c041b5a793281738eabd956bba",
+      "native_sha256": "48c018cc0d1d3a7bb9d02aa68b75409eace5e230079550d1406c5a28810fd370"
+    },
+    {
+      "path": "crates/system/document-lanes/src/remote.rs",
+      "git_blob": "e7d131a8650d8d32eff01c65e7098af3211ea564",
+      "native_sha256": "1d9c27264b3788c07ce8e1bc141f869ae38cac1ce8ad0058d8157f3e4f8a2ac2"
+    },
+    {
+      "path": "crates/system/document-lanes/src/remote_client_limits_tests.rs",
+      "git_blob": "2a8de9fd0ab75bf5dc38c98ca1db2a36f1030e96",
+      "native_sha256": "6bc4862221f5a2885ff1e371e80b4c33bb2a3ee94b625231847ea7f95ac4e682"
+    }
+  ],
+  "target": "C:\\t\\cargo-targets\\mere",
+  "build_dir": "C:\\t\\cargo-targets\\mere\\build",
+  "native_lock_sha256": "dbee6df4ec9ec2c47f2e22c9d75419277549dd794d476108cd5ed0ae9e193873",
+  "supplier_sources": {
+    "errand": "1155897e6debc61102ea219cced245d0abccb658",
+    "murm": "36bad79bcc0199d20a2ad127a9801ac8a062f123"
+  },
+  "source_only_lock_delta": {
+    "errand_source_lines": 9,
+    "murm_source_lines": 14,
+    "registry_versions_unchanged": true,
+    "all_other_package_blocks_unchanged": true
+  },
+  "acquisition": {
+    "command": "cargo fetch --locked",
+    "exit_code": 0,
+    "elapsed_seconds": 44.183,
+    "scope": "Only canonical Murm/Errand Git updates reported; no registry/platform download lines; lock unchanged"
+  },
+  "commands": [
+    {
+      "command": "cargo test -p mere-fetch --lib --locked --offline --message-format=json -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 48,
+      "failed": 0,
+      "elapsed_seconds": 11.96,
+      "executable_sha256": "56e44bcfa1864f6201814c26a7154084ac0a668aa4a4fb305fd0102bfa0610b5"
+    },
+    {
+      "command": "cargo test -p mere-document-lanes --lib --features smolweb,netfetch --locked --offline --message-format=json -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 75,
+      "failed": 0,
+      "elapsed_seconds": 13.615,
+      "executable_sha256": "f128bd57b3263cb9b42dfa89ed41a7b6f4bd58adcd4236e3815ea8cff8247642"
+    },
+    {
+      "command": "cargo check -p mere-fetch --no-default-features --locked --offline --message-format=json",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo check -p mere-document-lanes --no-default-features --features smolweb --locked --offline --message-format=json",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo test -p mere-site --no-default-features --locked --offline --message-format=json",
+      "exit_code": 0,
+      "passed": 3,
+      "failed": 0,
+      "elapsed_seconds": 54.631,
+      "executable_sha256": "df28ef04fc139ec80166030a301ac795b6c9e1f694fee25a1b5cc8245113c265"
+    },
+    {
+      "command": "cargo clippy -p mere-fetch --lib --locked --offline --message-format=json --no-deps -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo clippy -p mere-document-lanes --lib --features smolweb,netfetch --locked --offline --message-format=json --no-deps -- -D warnings",
+      "exit_code": 0
+    }
+  ],
+  "role_defaults": {
+    "page_bytes": 67108864,
+    "subresource_bytes": 33554432,
+    "submitted_body_bytes": 67108864,
+    "submission_reply_bytes": 67108864,
+    "smolweb_header_bytes": 4096,
+    "whole_operation_ms": 30000,
+    "followed_smolweb_redirects": 4,
+    "followed_http_redirects": 20,
+    "bodyless_bytes": 8388608,
+    "bodyless_ms": 15000,
+    "shared_bodyless_concurrency": 6
+  },
+  "compatibility": [
+    "literal snapshotV1 bytes/digests and fallback retained",
+    "Some(empty) body remains local parse, never fetch",
+    "MIME retained",
+    "initial read refusal before reactor/timer and repeated perredirect",
+    "explicit Submit redirects return without replaying mutation",
+    "identity remains origin-scoped",
+    "bodyless smolweb redirects remain unfollowed"
+  ],
+  "unqualified": [
+    "aggregate browser memory/traffic budget",
+    "general fetch-actor task-count cap",
+    "HTTP wire-header cap",
+    "physical radio",
+    "independent readers",
+    "headed UI",
+    "installed product",
+    "new actor cancellation guarantee"
+  ],
+  "earlier_failures": [
+    "consumer-preflight-failure.json",
+    "consumer-held-fixture-failure.json"
+  ],
+  "receipt_byte_convention": "UTF-8 JSON, -text attribute; Git and native receipt bytes identical"
+}
