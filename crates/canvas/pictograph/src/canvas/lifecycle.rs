@@ -387,7 +387,6 @@ impl Canvas {
         let span_h = (max.1 - min.1) + MARGIN * 2.0;
         let zoom = (w / span_w)
             .min(h / span_h)
-            .min(1.0)
             .clamp(MIN_ZOOM, MAX_ZOOM);
         let center = ((min.0 + max.0) / 2.0, (min.1 + max.1) / 2.0);
         Some(CameraView {

@@ -2143,6 +2143,7 @@ dependencies = [
  "sceno",
  "scenograph",
  "scenomise",
+ "serde",
  "sprigging",
  "tinct",
  "workbench",

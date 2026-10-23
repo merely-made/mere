@@ -25,6 +25,7 @@ pub enum ReadEvent {
 /// Retained find field state; one per reading appearance.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ReadFind {
+    pub appearance_open: bool,
     pub open: bool,
     pub input: TextInput,
     pub status: String,

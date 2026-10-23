@@ -83,8 +83,8 @@ fn fit_to_content_frames_a_far_restored_graph() {
         "fit_to_content frames the restored positions"
     );
     assert!(
-        (canvas.camera().zoom - 1.0).abs() < f32::EPSILON,
-        "a lone node is framed at natural size, not zoomed in"
+        canvas.camera().zoom > 1.0 && canvas.camera().zoom <= MAX_ZOOM,
+        "a small graph is magnified within the camera range"
     );
 }
 
