@@ -167,10 +167,15 @@ async fn main() {
     };
     // Enrolment edits the vault directory and reports; it hosts nothing.
     if args.enroll_passphrase {
-        match djinn::enrollment::enroll_passphrase(
-            &args.vault_dir,
-            &mut djinn::enrollment::read_from_terminal,
-        ) {
+        let result = if args.native {
+            djinn::enrollment::enroll_passphrase_native(&args.vault_dir, &SystemNativeIdentityUi)
+        } else {
+            djinn::enrollment::enroll_passphrase(
+                &args.vault_dir,
+                &mut djinn::enrollment::read_from_terminal,
+            )
+        };
+        match result {
             Ok(message) => {
                 println!("{message}");
                 return;
@@ -783,7 +788,7 @@ fn usage() -> &'static str {
      seed a node at start: [--seed-node <address> <title>]\n\
      blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
      a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
-     enrol a vault passphrase at the terminal: --enroll-passphrase [--dir <vault-dir>]\n\
+     enrol a vault passphrase: --enroll-passphrase [--native] [--dir <vault-dir>]\n\
      unlock a running resident at the terminal: --unlock [--native] [--app-endpoint <endpoint>]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
