@@ -147,7 +147,11 @@ impl InferenceProvider for GpuLibraryProvider {
                 }
                 result
             };
-            provider.generate_checkpointed(request, resume, &mut observed_commit, stop)
+            let result = provider.generate_checkpointed(request, resume, &mut observed_commit, stop);
+            tracing::debug!(prompt_hash = %eidetic::ManifestId::of_blob(request.prompt.as_bytes()),
+                score_health = ?provider.bound().provider().score_health(),
+                "inference numerical score health");
+            result
         }))
         .unwrap_or_else(|_| {
             Err(InferError::Backend(
