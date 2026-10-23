@@ -465,6 +465,39 @@ existing browser source/accessibility/build queue intact.
 
 ## Progress
 
+- 2026-10-22: fetch receiving now passes all 48 cases, including pure initial
+  refusal without a Tokio reactor. Bodyless receiving passes all 75 cases with
+  an explicit held-open server fixture. The first document attempt's two
+  Windows fixture failures are [retained separately](../../../support/receipts/client-limits/consumer-held-fixture-failure.json):
+  inherited nonblocking mode closed the server prematurely; a release channel
+  now proves the client returns before EOF. Production behavior required no
+  change for that fixture issue. Current upstream `064291543` is integrated,
+  preserving its native semantic owner and Dramatis qualification work;
+  covered fetch/document/site source and manifests were unchanged upstream.
+
+- 2026-10-22: the first consumer gate compiled successfully and passed 46 of
+  47 fetch cases. The existing isolated `pollster` trace refusal exposed timer
+  construction before initial read admission: a Titan refusal incorrectly
+  required a Tokio reactor. Initial target admission now precedes timer
+  construction and remains repeated at redirect hops. The [failed attempt](../../../support/receipts/client-limits/consumer-preflight-failure.json)
+  preserves source/executable identities and the compact result; passing
+  qualification will be recorded separately.
+
+- 2026-10-22: client-limit implementation is now a separate owner-coordinated
+  slice. Errand bounds native reads before append/callback; Murm bounds encoded
+  and decoded Resource admission; Mere and Turnstone propagate host policy for
+  pages, subresources, bodyless document loads and explicit Submit responses.
+  Request bytes, header-line bytes, body bytes and the whole deadline remain
+  distinct. The default shared fetch deadline becomes 30 seconds for the whole
+  redirect chain (previously 30 seconds per hop). HTTP retains its separate
+  20-redirect default; smolweb retains four followed redirects. Native 16 MiB
+  convenience defaults stay intact; explicit browser policy supplies 64 MiB
+  pages and 32 MiB subresources, replacing the smaller implicit native caps
+  where applicable. Snapshot V1 and explicit Submit authority are unchanged.
+  Canonical scope, required receipts and
+  standalone protocol follow-ups:
+  `smolweb/design_docs/implementation_strategy/2026-10-22_client_limits_plan.md`.
+
 - 2026-10-22: governed Scroll source `e3ddbedcd` is integrated with current
   upstream `27f7aaf2e`, retaining its complete SDK/renderer supplier cohort.
   The clean receiving resident builds locked/offline; five publication-host

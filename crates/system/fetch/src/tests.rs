@@ -411,9 +411,16 @@ mod read_effects {
             let (listener, url) = unopened_effect_target(scheme, query);
             let mut progress = false;
             assert_eq!(
-                fetch_page_interactive_capped(&url, 1024, None, &stores, |_, _, _| {
-                    progress = true;
-                })
+                fetch_page_interactive_capped(
+                    &url,
+                    1024,
+                    None,
+                    &stores,
+                    ClientFetchPolicy::default(),
+                    |_, _, _| {
+                        progress = true;
+                    }
+                )
                 .await,
                 Err(FetchFailure::Failed(message.into()))
             );
@@ -424,7 +431,10 @@ mod read_effects {
                 Err(message.into())
             );
             assert_eq!(fetch_page_crawler(&url).await, Err(message.into()));
-            assert_eq!(fetch_bytes(&url, &stores).await, Err(message.into()));
+            assert_eq!(
+                fetch_bytes(&url, &stores, ClientFetchPolicy::default()).await,
+                Err(message.into())
+            );
             assert_uncontacted(&listener);
         }
     }
@@ -474,10 +484,13 @@ mod read_effects {
         let (url, server) = spartan_fixture(b"3 /receipt\r\n".to_vec()).await;
         let target = format!("{url}?ignored%20query");
         let body = b"saved\r\n\0\xff".to_vec();
-        let result = submit_smolweb(SmolwebSubmission::Spartan {
-            url: target,
-            body: body.clone(),
-        })
+        let result = submit_smolweb(
+            SmolwebSubmission::Spartan {
+                url: target,
+                body: body.clone(),
+            },
+            ClientFetchPolicy::default(),
+        )
         .await
         .unwrap();
         let receipt = url::Url::parse(&url).unwrap().join("/receipt").unwrap();
@@ -550,13 +563,16 @@ mod read_effects {
                 .await
                 .expect("Titan fixture timed out")
             });
-            let response = submit_smolweb(SmolwebSubmission::Titan {
-                url: target.clone(),
-                body: body.clone(),
-                mime: "application/octet-stream".into(),
-                token: Some("fixture-token".into()),
-                identity: Some(identity),
-            })
+            let response = submit_smolweb(
+                SmolwebSubmission::Titan {
+                    url: target.clone(),
+                    body: body.clone(),
+                    mime: "application/octet-stream".into(),
+                    token: Some("fixture-token".into()),
+                    identity: Some(identity),
+                },
+                ClientFetchPolicy::default(),
+            )
             .await
             .unwrap();
             let SubmissionAnswer::Success(receipt) = response else {

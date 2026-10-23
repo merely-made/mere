@@ -33,7 +33,6 @@ use std::sync::atomic::{AtomicBool, Ordering};
 #[cfg(feature = "actor")]
 use std::sync::mpsc::Receiver;
 use std::sync::{Arc, OnceLock};
-#[cfg(feature = "smolweb")]
 use std::time::Duration;
 
 #[cfg(feature = "actor")]
@@ -47,24 +46,14 @@ use zeroize::Zeroizing;
 #[cfg(feature = "smolweb")]
 pub use errand::TofuStore as SmolwebTofuStore;
 
-/// The most redirects a smolweb fetch will follow before giving up.
-#[cfg(feature = "smolweb")]
-const MAX_REDIRECTS: usize = 5;
-
-/// Per-hop timeout for smolweb fetches. Applied to each request in a redirect
-/// chain independently so a chain of N slow hops can take up to N × this value.
-#[cfg(feature = "smolweb")]
-const SMOLWEB_TIMEOUT: Duration = Duration::from_secs(30);
+mod policy;
+pub use policy::ClientFetchPolicy;
 
 /// Host-side cap on a fetched page body (§A5): a hard ceiling enforced *while*
 /// streaming the body, so a malicious or runaway server cannot OOM the host by
 /// sending an unbounded response. Generous for a real page; a script `net.fetch`
 /// passes a tighter cap (the body is copied into the guest's mem-quota'd memory).
 const PAGE_BODY_CAP: usize = 64 * 1024 * 1024;
-
-/// The subresource counterpart (a page's images / CSS): generous but bounded.
-#[cfg(feature = "actor")]
-const SUBRESOURCE_BODY_CAP: usize = 32 * 1024 * 1024;
 
 /// The fetch vocabulary lives in `page-load` so a controller can speak it
 /// without linking this actor's transport. Re-exported unchanged.
@@ -345,6 +334,16 @@ pub fn spawn_fetcher_with(
     wake: Wake,
     stores: Stores,
 ) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
+    spawn_fetcher_with_policy(wake, stores, ClientFetchPolicy::default())
+}
+
+/// Spawn with host-selected byte budgets and one deadline per operation.
+#[cfg(feature = "actor")]
+pub fn spawn_fetcher_with_policy(
+    wake: Wake,
+    stores: Stores,
+    policy: ClientFetchPolicy,
+) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
     spawn(wake, move |commands, out: Emitter<FetchUpdate>| {
         let runtime = Builder::new_multi_thread()
             .enable_all()
@@ -368,9 +367,10 @@ pub fn spawn_fetcher_with(
                         let request_url = url.clone();
                         let result = fetch_page_interactive_capped(
                             &url,
-                            PAGE_BODY_CAP,
+                            policy.max_page_bytes,
                             identity.as_ref(),
                             &stores,
+                            policy,
                             move |response_url, content_type, bytes| {
                                 progress_out.emit(FetchUpdate::PageProgress(PageProgress {
                                     request,
@@ -406,7 +406,7 @@ pub fn spawn_fetcher_with(
                     let out = out.clone();
                     let stores = stores.clone();
                     runtime.spawn(async move {
-                        let result = fetch_bytes(&url, &stores).await;
+                        let result = fetch_bytes(&url, &stores, policy).await;
                         out.emit(FetchUpdate::Subresource(SubresourceOutcome { url, result }));
                     });
                 },
@@ -416,7 +416,7 @@ pub fn spawn_fetcher_with(
                     runtime.spawn(async move {
                         out.emit(FetchUpdate::Favicon(FaviconOutcome {
                             request,
-                            result: fetch_bytes(&url, &stores).await,
+                            result: fetch_bytes(&url, &stores, policy).await,
                         }));
                     });
                 },
@@ -428,7 +428,7 @@ pub fn spawn_fetcher_with(
                     runtime.spawn(async move {
                         let url = submission.url().to_string();
                         #[cfg(feature = "smolweb")]
-                        let result = submit_smolweb(submission).await;
+                        let result = submit_smolweb(submission, policy).await;
                         #[cfg(not(feature = "smolweb"))]
                         let result = Err(FetchFailure::Failed(
                             "small-web submissions are not built into this host".to_string(),
@@ -447,14 +447,19 @@ pub fn spawn_fetcher_with(
 
 // A write is only ever asked for through the actor.
 #[cfg(all(feature = "smolweb", feature = "actor"))]
-async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswer, FetchFailure> {
+async fn submit_smolweb(
+    submission: SmolwebSubmission,
+    policy: ClientFetchPolicy,
+) -> Result<SubmissionAnswer, FetchFailure> {
+    policy.validate().map_err(FetchFailure::Failed)?;
     if match &submission {
         SmolwebSubmission::Titan { body, .. } | SmolwebSubmission::Spartan { body, .. } => {
-            body.len() > PAGE_BODY_CAP
+            body.len() > policy.max_submission_bytes
         },
     } {
         return Err(FetchFailure::Failed(format!(
-            "submission exceeds the {PAGE_BODY_CAP}-byte cap"
+            "submission exceeds the {}-byte cap",
+            policy.max_submission_bytes
         )));
     }
 
@@ -466,6 +471,13 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
             token,
             identity,
         } => {
+            let options = policy
+                .smolweb_options(
+                    policy.max_submission_response_bytes,
+                    policy.timeout,
+                    body.len(),
+                )
+                .map_err(FetchFailure::Failed)?;
             let parsed = url::Url::parse(&url)
                 .map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
             if parsed.scheme() != "titan" {
@@ -479,25 +491,42 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
                     .filter(|identity| identity.applies_to(&parsed))
                 {
                     Some(identity) => {
-                        errand::titan_upload_with_identity(
+                        errand::titan_upload_with_identity_and_options(
                             &parsed,
                             &body,
                             &mime,
                             token.as_deref(),
                             identity.errand_view(),
+                            &options,
                         )
                         .await
                     },
-                    None => errand::titan_upload(&parsed, &body, &mime, token.as_deref()).await,
+                    None => {
+                        errand::titan_upload_with_options(
+                            &parsed,
+                            &body,
+                            &mime,
+                            token.as_deref(),
+                            &options,
+                        )
+                        .await
+                    },
                 }
             };
-            let response = tokio::time::timeout(SMOLWEB_TIMEOUT, exchange)
+            let response = tokio::time::timeout(policy.timeout, exchange)
                 .await
                 .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
                 .map_err(|error| smolweb_transport_failure(&parsed, error))?;
             (parsed, response)
         },
         SmolwebSubmission::Spartan { url, body } => {
+            let options = policy
+                .smolweb_options(
+                    policy.max_submission_response_bytes,
+                    policy.timeout,
+                    body.len(),
+                )
+                .map_err(FetchFailure::Failed)?;
             let parsed = url::Url::parse(&url)
                 .map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
             if parsed.scheme() != "spartan" {
@@ -505,11 +534,13 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
                     "Spartan submission requires a spartan:// URL".to_string(),
                 ));
             }
-            let response =
-                tokio::time::timeout(SMOLWEB_TIMEOUT, errand::spartan_submit(&parsed, &body))
-                    .await
-                    .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
-                    .map_err(|error| smolweb_transport_failure(&parsed, error))?;
+            let response = tokio::time::timeout(
+                policy.timeout,
+                errand::spartan_submit_with_options(&parsed, &body, &options),
+            )
+            .await
+            .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
+            .map_err(|error| smolweb_transport_failure(&parsed, error))?;
             (parsed, response)
         },
     };
@@ -571,12 +602,33 @@ pub async fn fetch_page(url: &str) -> Result<Fetched, String> {
 
 /// Fetch a page, routing by scheme: smolweb schemes go through [`errand`], every
 /// other (http(s)) address through netfetcher's WHATWG Fetch. `max_bytes` caps the
-/// body (§A5): the http path enforces it *while streaming* (no OOM); smolweb is
-/// already buffered by errand, so it is checked post-hoc (errand bounds its own read).
+/// body while acquiring it, including Errand's buffered protocol paths.
 pub async fn fetch_page_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    fetch_page_interactive_capped(url, max_bytes, None, session_stores(), |_, _, _| {})
-        .await
-        .map_err(|error| error.to_string())
+    fetch_page_with_policy(
+        url,
+        ClientFetchPolicy {
+            max_page_bytes: max_bytes,
+            ..ClientFetchPolicy::default()
+        },
+    )
+    .await
+}
+
+/// Fetch with host-selected budgets, including one whole-operation deadline.
+pub async fn fetch_page_with_policy(
+    url: &str,
+    policy: ClientFetchPolicy,
+) -> Result<Fetched, String> {
+    fetch_page_interactive_capped(
+        url,
+        policy.max_page_bytes,
+        None,
+        session_stores(),
+        policy,
+        |_, _, _| {},
+    )
+    .await
+    .map_err(|error| error.to_string())
 }
 
 /// Fetch one page while preserving protocol responses that require host
@@ -587,58 +639,114 @@ async fn fetch_page_interactive_capped<F>(
     max_bytes: usize,
     identity: Option<&GeminiClientIdentity>,
     stores: &Stores,
+    policy: ClientFetchPolicy,
     mut on_progress: F,
 ) -> Result<Fetched, FetchFailure>
 where
     F: FnMut(&url::Url, Option<&str>, &[u8]),
 {
-    #[cfg(not(feature = "smolweb"))]
-    let _ = (identity, &mut on_progress);
-    #[cfg(feature = "smolweb")]
-    if let Some(scheme) = scheme_of(url).and_then(errand::Scheme::parse) {
-        {
-            let log_url = url_without_query(url);
-            tracing::info!(url = %log_url, ?scheme, "smolweb fetch");
-            let mut streamed_bytes = 0_usize;
-            let result = smolweb_fetch(url, identity, |response_url, content_type, bytes| {
-                streamed_bytes = streamed_bytes.saturating_add(bytes.len());
-                if streamed_bytes <= max_bytes {
-                    on_progress(response_url, content_type, bytes);
+    policy.validate().map_err(FetchFailure::Failed)?;
+    preflight_read(url)?;
+    let operation = async {
+        #[cfg(not(feature = "smolweb"))]
+        let _ = (identity, &mut on_progress);
+        #[cfg(feature = "smolweb")]
+        if let Some(scheme) = scheme_of(url).and_then(errand::Scheme::parse) {
+            {
+                let log_url = url_without_query(url);
+                tracing::info!(url = %log_url, ?scheme, "smolweb fetch");
+                let mut streamed_bytes = 0_usize;
+                let result = smolweb_fetch(
+                    url,
+                    identity,
+                    max_bytes,
+                    policy,
+                    |response_url, content_type, bytes| {
+                        streamed_bytes = streamed_bytes.saturating_add(bytes.len());
+                        if streamed_bytes <= max_bytes {
+                            on_progress(response_url, content_type, bytes);
+                        }
+                    },
+                )
+                .await
+                .and_then(|fetched| {
+                    if fetched.bytes.len() > max_bytes {
+                        Err(FetchFailure::Failed(format!(
+                            "response exceeds the {max_bytes}-byte cap"
+                        )))
+                    } else {
+                        Ok(fetched)
+                    }
+                });
+                match &result {
+                    Ok(fetched) => tracing::info!(
+                        url = %log_url,
+                        content_type = ?fetched.content_type,
+                        bytes = fetched.bytes.len(),
+                        "smolweb ok",
+                    ),
+                    Err(error) => tracing::warn!(url = %log_url, %error, "smolweb failed"),
                 }
-            })
-            .await
-            .and_then(|fetched| {
-                if fetched.bytes.len() > max_bytes {
-                    Err(FetchFailure::Failed(format!(
-                        "response exceeds the {max_bytes}-byte cap"
-                    )))
-                } else {
-                    Ok(fetched)
-                }
-            });
-            match &result {
-                Ok(fetched) => tracing::info!(
-                    url = %log_url,
-                    content_type = ?fetched.content_type,
-                    bytes = fetched.bytes.len(),
-                    "smolweb ok",
-                ),
-                Err(error) => tracing::warn!(url = %log_url, %error, "smolweb failed"),
+                return result;
             }
-            return result;
         }
+        do_fetch_ua_with_context_observed(
+            url,
+            max_bytes,
+            None,
+            &stores
+                .context()
+                .with_redirect_limit(policy.max_http_redirects),
+            |response_url, content_type, bytes| {
+                on_progress(response_url, content_type, bytes);
+            },
+        )
+        .await
+        .map_err(FetchFailure::Failed)
+    };
+    tokio::time::timeout(policy.timeout, operation)
+        .await
+        .map_err(|_| FetchFailure::Failed(request_timeout_message(policy.timeout)))?
+}
+
+fn request_timeout_message(timeout: Duration) -> String {
+    format!("request timed out after {}ms", timeout.as_millis())
+}
+
+fn preflight_read(url: &str) -> Result<(), FetchFailure> {
+    let parsed =
+        url::Url::parse(url).map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
+    #[cfg(feature = "smolweb")]
+    if is_smolweb(url) {
+        if let Err(error) = admit_smolweb_read(&parsed) {
+            let log_url = url_without_query(url);
+            tracing::info!(url = %log_url, scheme = %parsed.scheme(), "smolweb fetch");
+            tracing::warn!(url = %log_url, %error, "smolweb failed");
+            return Err(error);
+        }
+        return Ok(());
     }
-    do_fetch_ua_with_context_observed(
-        url,
-        max_bytes,
-        None,
-        &stores.context(),
-        |response_url, content_type, bytes| {
-            on_progress(response_url, content_type, bytes);
-        },
-    )
-    .await
-    .map_err(FetchFailure::Failed)
+    if matches!(parsed.scheme(), "http" | "https") {
+        Ok(())
+    } else {
+        Err(FetchFailure::Failed(format!(
+            "unsupported fetch scheme: {}",
+            parsed.scheme()
+        )))
+    }
+}
+
+#[cfg(feature = "smolweb")]
+fn admit_smolweb_read(current: &url::Url) -> Result<(), FetchFailure> {
+    match current.scheme() {
+        "titan" => Err(FetchFailure::Failed(
+            "Titan uploads require explicit Submit".into(),
+        )),
+        "spartan" if current.query().is_some() => Err(FetchFailure::Failed(
+            "Spartan submissions require explicit Submit".into(),
+        )),
+        _ => Ok(()),
+    }
 }
 
 #[cfg(feature = "smolweb")]
@@ -670,11 +778,32 @@ fn url_without_query(raw: &str) -> String {
 /// Gemini should install one explicitly with
 /// [`install_in_memory_smolweb_tofu`] or its own durable store.
 pub async fn fetch_page_anonymous_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
+    fetch_page_anonymous_with_policy(
+        url,
+        ClientFetchPolicy {
+            max_page_bytes: max_bytes,
+            ..ClientFetchPolicy::default()
+        },
+    )
+    .await
+}
+
+pub async fn fetch_page_anonymous_with_policy(
+    url: &str,
+    policy: ClientFetchPolicy,
+) -> Result<Fetched, String> {
+    policy.validate()?;
+    preflight_read(url).map_err(|error| error.to_string())?;
     if is_smolweb(url) {
-        return fetch_page_capped(url, max_bytes).await;
+        return fetch_page_with_policy(url, policy).await;
     }
-    let cx = netfetcher::FetchContext::permissive();
-    do_fetch_ua_with_context(url, max_bytes, None, &cx).await
+    let cx = netfetcher::FetchContext::permissive().with_redirect_limit(policy.max_http_redirects);
+    tokio::time::timeout(
+        policy.timeout,
+        do_fetch_ua_with_context(url, policy.max_page_bytes, None, &cx),
+    )
+    .await
+    .map_err(|_| request_timeout_message(policy.timeout))?
 }
 
 /// Pin Gemini certificates for the lifetime of this process. This is stronger
@@ -699,26 +828,46 @@ pub fn install_smolweb_tofu(store: Arc<dyn SmolwebTofuStore>) {
 /// its UA). The crawl actor fetches every page (and robots.txt) through this, so a
 /// site sees an honest, contactable bot rather than a masquerading browser.
 pub async fn fetch_page_crawler(url: &str) -> Result<Fetched, String> {
+    fetch_page_crawler_with_policy(url, ClientFetchPolicy::default()).await
+}
+
+pub async fn fetch_page_crawler_with_policy(
+    url: &str,
+    policy: ClientFetchPolicy,
+) -> Result<Fetched, String> {
+    policy.validate()?;
+    preflight_read(url).map_err(|error| error.to_string())?;
     if is_smolweb(url) {
-        return fetch_page_capped(url, PAGE_BODY_CAP).await;
+        return fetch_page_with_policy(url, policy).await;
     }
-    do_fetch_ua(url, PAGE_BODY_CAP, Some(CRAWLER_USER_AGENT)).await
+    let cx = session_stores()
+        .context()
+        .with_redirect_limit(policy.max_http_redirects);
+    tokio::time::timeout(
+        policy.timeout,
+        do_fetch_ua_with_context(url, policy.max_page_bytes, Some(CRAWLER_USER_AGENT), &cx),
+    )
+    .await
+    .map_err(|_| request_timeout_message(policy.timeout))?
 }
 
 /// Fetch a smolweb URL through [`errand`], following redirects up to
-/// [`MAX_REDIRECTS`], and fold the response into a [`Fetched`] the nematic engines
+/// the caller's redirect budget, and fold the response into a [`Fetched`] the nematic engines
 /// render. Input and certificate statuses stay typed so the host can continue
 /// the protocol conversation; terminal failures remain displayable prose.
 #[cfg(feature = "smolweb")]
 async fn smolweb_fetch<F>(
     url: &str,
     identity: Option<&GeminiClientIdentity>,
+    max_bytes: usize,
+    policy: ClientFetchPolicy,
     mut on_progress: F,
 ) -> Result<Fetched, FetchFailure>
 where
     F: FnMut(&url::Url, Option<&str>, &[u8]),
 {
-    let (current, response) = smolweb_fetch_response(url, identity, &mut on_progress).await?;
+    let (current, response) =
+        smolweb_fetch_response(url, identity, max_bytes, policy, &mut on_progress).await?;
     let content_type = smolweb_content_type(&current, &response);
     let bytes = response.body;
     let body = String::from_utf8_lossy(&bytes).into_owned();
@@ -740,6 +889,8 @@ where
 async fn smolweb_fetch_response<F>(
     url: &str,
     identity: Option<&GeminiClientIdentity>,
+    max_bytes: usize,
+    policy: ClientFetchPolicy,
     on_progress: &mut F,
 ) -> Result<(url::Url, errand::Response), FetchFailure>
 where
@@ -747,37 +898,37 @@ where
 {
     let mut current =
         url::Url::parse(url).map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
-    for _ in 0..MAX_REDIRECTS {
+    let deadline = tokio::time::Instant::now()
+        .checked_add(policy.timeout)
+        .ok_or_else(|| FetchFailure::Failed("client request deadline overflow".into()))?;
+    for _ in 0..=policy.max_redirects {
         // These exchanges have submission semantics even with an empty body.
         // Check every redirect before transport, so read acquisition never
         // borrows the authority of the separate explicit Submit command.
-        match current.scheme() {
-            "titan" => {
-                return Err(FetchFailure::Failed(
-                    "Titan uploads require explicit Submit".into(),
-                ));
-            },
-            "spartan" if current.query().is_some() => {
-                return Err(FetchFailure::Failed(
-                    "Spartan submissions require explicit Submit".into(),
-                ));
-            },
-            _ => {},
-        }
+        admit_smolweb_read(&current)?;
         let response_url = current.clone();
+        let remaining = deadline.saturating_duration_since(tokio::time::Instant::now());
+        if remaining.is_zero() {
+            return Err(FetchFailure::Failed(request_timeout_message(
+                policy.timeout,
+            )));
+        }
+        let options = policy
+            .smolweb_options(max_bytes, remaining, 0)
+            .map_err(FetchFailure::Failed)?;
         let response = if current.scheme() == "gemini" {
             match identity.filter(|identity| identity.applies_to(&current)) {
                 Some(identity) => {
-                    errand::fetch_gemini_url_streaming_timeout_with_identity(
+                    errand::fetch_gemini_url_streaming_with_identity_and_options(
                         &current,
-                        identity.errand_view(),
-                        SMOLWEB_TIMEOUT,
+                        Some(identity.errand_view()),
+                        &options,
                         |chunk| on_progress(&response_url, chunk.content_type, chunk.bytes),
                     )
                     .await
                 },
                 None => {
-                    errand::fetch_gemini_url_streaming_timeout(&current, SMOLWEB_TIMEOUT, |chunk| {
+                    errand::fetch_gemini_url_streaming_with_options(&current, &options, |chunk| {
                         on_progress(&response_url, chunk.content_type, chunk.bytes)
                     })
                     .await
@@ -786,14 +937,14 @@ where
         } else {
             match identity.filter(|identity| identity.applies_to(&current)) {
                 Some(identity) => {
-                    errand::fetch_url_timeout_with_identity(
+                    errand::fetch_url_with_identity_and_options(
                         &current,
-                        identity.errand_view(),
-                        SMOLWEB_TIMEOUT,
+                        Some(identity.errand_view()),
+                        &options,
                     )
                     .await
                 },
-                None => errand::fetch_url_timeout(&current, SMOLWEB_TIMEOUT).await,
+                None => errand::fetch_url_with_options(&current, &options).await,
             }
         }
         .map_err(|error| smolweb_transport_failure(&current, error))?;
@@ -895,7 +1046,7 @@ async fn read_capped(
     let mut buf: Vec<u8> = Vec::new();
     while let Some(chunk) = body.next_chunk().await {
         let chunk = chunk.map_err(|e| format!("read error: {e}"))?;
-        if buf.len() + chunk.len() > max_bytes {
+        if buf.len().saturating_add(chunk.len()) > max_bytes {
             return Err(format!("response exceeds the {max_bytes}-byte cap"));
         }
         buf.extend_from_slice(&chunk);
@@ -909,18 +1060,6 @@ async fn read_capped(
 /// shape is the conventional crawler form (cf. Googlebot).
 pub const CRAWLER_USER_AGENT: &str =
     "Mozilla/5.0 (compatible; merebot/0.1; +https://mere.computer/bot)";
-
-/// One WHATWG-Fetch GET in the process session, body as text, bounded by
-/// `max_bytes` (§A5). An explicit `user_agent` is the crawler identifying itself;
-/// `None` lets netfetcher add its default browser UA.
-async fn do_fetch_ua(
-    url: &str,
-    max_bytes: usize,
-    user_agent: Option<&str>,
-) -> Result<Fetched, String> {
-    let cx = session_stores().context();
-    do_fetch_ua_with_context(url, max_bytes, user_agent, &cx).await
-}
 
 async fn do_fetch_ua_with_context(
     url: &str,
@@ -988,33 +1127,61 @@ where
 }
 
 /// Fetch raw response bytes through the same scheme and trust routing as a page,
-/// bounded by [`SUBRESOURCE_BODY_CAP`].
+/// bounded by the caller's binary resource budget and whole deadline.
 #[cfg(feature = "actor")]
-async fn fetch_bytes(url: &str, stores: &Stores) -> Result<Vec<u8>, String> {
-    #[cfg(feature = "smolweb")]
-    if is_smolweb(url) {
-        let (_final_url, response) = smolweb_fetch_response(url, None, &mut |_, _, _| {})
+async fn fetch_bytes(
+    url: &str,
+    stores: &Stores,
+    policy: ClientFetchPolicy,
+) -> Result<Vec<u8>, String> {
+    policy.validate()?;
+    preflight_read(url).map_err(|error| error.to_string())?;
+    let operation = async {
+        #[cfg(feature = "smolweb")]
+        if is_smolweb(url) {
+            let (_final_url, response) = smolweb_fetch_response(
+                url,
+                None,
+                policy.max_subresource_bytes,
+                policy,
+                &mut |_, _, _| {},
+            )
             .await
             .map_err(|error| error.to_string())?;
-        if response.body.len() > SUBRESOURCE_BODY_CAP {
-            return Err(format!(
-                "response exceeds the {SUBRESOURCE_BODY_CAP}-byte cap"
-            ));
+            if response.body.len() > policy.max_subresource_bytes {
+                return Err(format!(
+                    "response exceeds the {}-byte cap",
+                    policy.max_subresource_bytes
+                ));
+            }
+            return Ok(response.body);
         }
-        return Ok(response.body);
-    }
 
-    let parsed = url::Url::parse(url).map_err(|error| format!("bad URL: {error}"))?;
-    let cx = stores.context();
-    let response = netfetcher::fetch(netfetcher::Request::get(parsed), &cx).await;
-    if response.is_network_error() || !(200..300).contains(&response.status) {
-        return Err(format!("subresource request failed ({})", response.status));
-    }
-    read_capped(response.body, SUBRESOURCE_BODY_CAP).await
+        let parsed = url::Url::parse(url).map_err(|error| format!("bad URL: {error}"))?;
+        let cx = stores
+            .context()
+            .with_redirect_limit(policy.max_http_redirects);
+        let response = netfetcher::fetch(netfetcher::Request::get(parsed), &cx).await;
+        if response.is_network_error() || !(200..300).contains(&response.status) {
+            return Err(format!("subresource request failed ({})", response.status));
+        }
+        read_capped(response.body, policy.max_subresource_bytes).await
+    };
+    tokio::time::timeout(policy.timeout, operation)
+        .await
+        .map_err(|_| request_timeout_message(policy.timeout))?
 }
 
 #[cfg(all(test, feature = "smolweb", feature = "actor"))]
 mod tests;
+
+#[cfg(all(
+    test,
+    feature = "smolweb",
+    feature = "actor",
+    not(target_arch = "wasm32")
+))]
+mod client_limits_tests;
 
 #[cfg(all(test, not(target_arch = "wasm32")))]
 mod http_progress_tests {
