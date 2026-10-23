@@ -667,5 +667,11 @@
     "status": "bounded checked activation implemented; custom/action and same-call Canvas migrations remain open",
     "review": "diagnostics-activation-review.json",
     "qualification": "diagnostics-activation-qualification.json"
+  },
+  "canvas_lifetime_continuation": {
+    "status": "Canvas action identity now follows kernel-authored member lifetimes; original same-call Pin failure received",
+    "review": "diagnostics-canvas-life-review.json",
+    "qualification": "diagnostics-canvas-life-qualification.json",
+    "remaining": "Other retained Canvas caches, custom/action owner intake, supplier, guest/platform and full-leaf/terminal-actor paths remain open"
   }
 }
