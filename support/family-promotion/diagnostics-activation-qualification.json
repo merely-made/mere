@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-23",
+  "status": "Bounded producer activation and child-liveness repairs qualified; one separately reproduced Canvas lifetime failure remains open",
+  "source_commit": "59e00086fe5946cdee11eefa7ed33c4c02d5f33c",
+  "canonical_document_commit": "4e5811d5a0efa4bdb56dcde73d65087e34eac5b7",
+  "integrated_main": "fcc483e49eba1feced106653b662c26ddb299bbe",
+  "source_snapshot": "diagnostics-activation-source.json",
+  "acceptance_tests": {
+    "distinct_passed": 320,
+    "existing_ignored": 8,
+    "native": {
+      "passed": 295,
+      "ignored": 7
+    },
+    "retained_content": {
+      "passed": 15,
+      "ignored": 1
+    },
+    "canvas_reader": {
+      "passed": 10,
+      "ignored": 0
+    },
+    "repeat_accounting": "Three focused controls are included in the native cohort, not added again."
+  },
+  "compilation_passed": [
+    "browser Wasm",
+    "embedding",
+    "locked offline independent native consumer"
+  ],
+  "known_open_failure": {
+    "receipt": "diagnostics-activation-canvas-aba-red.json",
+    "unapplied_patch": "diagnostics-activation-canvas-aba.patch",
+    "failed_tests": 1,
+    "actual_behavior": "Same UUID removal/recreation in one ingest_graph closure retains an old key; old Pin dispatches to recreated member",
+    "next_done_condition": "Mutation-time membership incarnation/removal witness received by every Canvas ingestion path; preserve ordinary live keys",
+    "boundary": "Temporary reproduction test was restored byte-for-byte and remains as an unapplied patch. It is not ignored, fixed or included among passing acceptance tests."
+  },
+  "received": [
+    "Expired cached child tokens refuse publication, queued and raw/bound admission",
+    "Raw operation captures entry life once, keeping existing publication/queue bindings",
+    "Registry delegates admitted token into checked activation",
+    "Rc adapter holds one mutable producer borrow; ContentSlot holds its real owner borrow for validation and dispatch",
+    "Late-admission child replacement refuses without action/focus/after-dispatch",
+    "Retained-content source retirement refuses old life and current checked action dispatches",
+    "Existing separate-call Canvas restoration/replacement controls pass"
+  ],
+  "open_migrations": "diagnostics-activation-review.json",
+  "limits": [
+    "Default checked activation cannot make arbitrary deeper/interior models atomic; such producers must override under their actual owner",
+    "None child tokens still require authored never-reused keys; action reassignment needs child/action revision",
+    "Same-call Canvas ABA remains reproduced and open",
+    "No new headed platform/AT, guest/selection ingress, physical handoff or full leaf sizing/raster qualification",
+    "Dispatch is not durable or asynchronous completion; external consumers not repinned"
+  ],
+  "documentation": {
+    "baseline_errors": 40,
+    "final_errors": 40,
+    "identical_errors": true,
+    "d2_claims": 14,
+    "post_gate_documentation_only": [
+      "crates/canvas/pictograph/src/canvas/reader.rs"
+    ]
+  },
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-activation-brief.json": "c10dbfa870927ea633cc982a7d31ee29b5415019329934bf19389cdee05f7870",
+    "support/family-promotion/diagnostics-activation-browser.json": "307c8f3ba64c7c1336ab9876e3232c44ac2ab8e003f760661aa057d74cb84c79",
+    "support/family-promotion/diagnostics-activation-canvas-aba-red.json": "c4bd8ef4a849e5f4c5b52205e7e3e1707cecb6236055903e8028a611b76a8e1f",
+    "support/family-promotion/diagnostics-activation-canvas-aba.patch": "a90bf5c0294a15d8eda3db36a5e4b5371a02e1c33c397d8bbf24dd545ddf450b",
+    "support/family-promotion/diagnostics-activation-canvas.json": "15a9382bdfe8ba5070e444c8c736e0458fdd3dde0595c7931a9ea766cdfd8044",
+    "support/family-promotion/diagnostics-activation-consumer.json": "6bd0a187452cf88abc3b68aa4116350b23d01f4114c7a0713ae59f81b3b265ce",
+    "support/family-promotion/diagnostics-activation-controls.json": "ddac65c4613586f8aeef0e32354d326b1db20e01e80a34514dc1af42ecd4cc95",
+    "support/family-promotion/diagnostics-activation-docs-baseline.json": "61cb89d998d3f31884ac56473a5c84a5875cbabbad9c872f11ba7551f44888a1",
+    "support/family-promotion/diagnostics-activation-docs-final.json": "94833809f493efd0d480c8f5902a895dc3ebd4c7adac3ff5d224ff71968cf406",
+    "support/family-promotion/diagnostics-activation-embedding.json": "0b55b750287584b37f7b11a627605575bd2503abc2f9f9bb9ecf8f347110c6a1",
+    "support/family-promotion/diagnostics-activation-native.json": "d8dfce9c6f22ef0af05fee4aa04dfa576a7f34525a05a319dd3d3de6d26989be",
+    "support/family-promotion/diagnostics-activation-preservation.json": "b335d536607e50cac0fd9f6999c2e44354a1187164652931c65b4031ed983c6b",
+    "support/family-promotion/diagnostics-activation-product.json": "f147c55834d6b9af49f64553b4a11a54117751b704208f9124d1f36a6af68f94",
+    "support/family-promotion/diagnostics-activation-review.json": "212f75b1feadde904fdcd484e19fca6f8e307ddf2c511a29747d567f2510d7d9",
+    "support/family-promotion/diagnostics-activation-source.json": "d9ddc3e86d4632f7edef0065cbc421e36cc114ba1e13e89237c504f71c6fc2a3",
+    "support/doc-audit/d2/batch_111_producer_activation.md": "f8258fe890a81d1637e0df425cb3328fd5369e00ca6154b586fac5b0bfe83176"
+  },
+  "retained_bytes_excluding_manifest": 152884,
+  "retained_byte_cap": 10000000,
+  "preservation": "diagnostics-activation-preservation.json"
+}
