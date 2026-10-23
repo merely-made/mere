@@ -166,6 +166,13 @@ fn required_semantics(record: &RunRecord) -> Option<&'static str> {
         .view
         .recall
         .as_ref()
+        .is_some_and(|e| e.answer_contract.is_some())
+    {
+        Some("recall/requested-facts-v1")
+    } else if record
+        .view
+        .recall
+        .as_ref()
         .is_some_and(|e| e.answer_format == recall::AnswerFormat::ClaimSupportV1)
     {
         Some("recall/claim-support-v1")
@@ -188,6 +195,7 @@ impl Delta {
             value != "recall/v1"
                 && value != "recall/published-v1"
                 && value != "recall/claim-support-v1"
+                && value != "recall/requested-facts-v1"
         }) {
             return Err("unsupported inference checkpoint semantics".into());
         }
@@ -195,9 +203,29 @@ impl Delta {
             if required_semantics(record) != self.required_semantics.as_deref() {
                 return Err("checkpoint recall semantics do not match its retained inputs".into());
             }
+            check_answer_contract(record)?;
         }
         Ok(())
     }
+}
+
+fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
+    if let Some(contract) = record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+    {
+        if contract.question != eidetic::ManifestId::of_blob(record.view.question.as_bytes())
+            || contract.prompt != eidetic::ManifestId::of_blob(record.request.prompt.as_bytes())
+            || contract.context != eidetic::ManifestId::of_blob(record.request.context.as_bytes())
+        {
+            return Err(
+                "checkpoint answer contract does not match its exact generation inputs".into(),
+            );
+        }
+    }
+    Ok(())
 }
 #[derive(Serialize, Deserialize)]
 struct Sealed {
@@ -560,7 +588,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
             .view
             .recall
             .as_ref()
-            .and_then(|r| r.assess_answer(&record.view.text))
+            .and_then(|r| r.assess_answer(&record.view.text, &record.view.question))
         else {
             return Ok(None);
         };
@@ -746,7 +774,9 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         }
         if record.view.state == RunStateV1::Finished {
             if let Some(recall) = &record.view.recall {
-                if let Some(support) = recall.assess_answer(&record.view.text) {
+                if let Some(support) =
+                    recall.assess_answer(&record.view.text, &record.view.question)
+                {
                     self.save_evidence(&support)?;
                 }
             }
@@ -903,7 +933,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
                         .view
                         .recall
                         .as_ref()
-                        .and_then(|r| r.assess_answer(&record.view.text))
+                        .and_then(|r| r.assess_answer(&record.view.text, &record.view.question))
                 } else {
                     None
                 };
@@ -1079,6 +1109,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
         Ok(runs)
     }
     fn append(&self, record: &RunRecord) -> Result<(), String> {
+        check_answer_contract(record)?;
         let _writer = self.writer.lock().unwrap();
         let mut heads = self.heads.lock().unwrap();
         let previous = heads.get(&record.view.run);
@@ -1142,7 +1173,9 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
         }
         if record.view.state == RunStateV1::Finished {
             if let Some(recall) = &record.view.recall {
-                if let Some(support) = recall.assess_answer(&record.view.text) {
+                if let Some(support) =
+                    recall.assess_answer(&record.view.text, &record.view.question)
+                {
                     delta.answer_support = Some(self.save_evidence(&support)?);
                 }
             }
@@ -1232,8 +1265,9 @@ mod tests {
         let journal = journal("a");
         let mut record = paused();
         record.view.state = RunStateV1::Queued;
-        let evidence = recall::RecallEvidence {
+        let mut evidence = recall::RecallEvidence {
             answer_format: recall::AnswerFormat::ClaimSupportV1,
+            answer_contract: None,
             support: None,
             embedding: None,
             owner: None,
@@ -1244,7 +1278,16 @@ mod tests {
             citations: vec![],
             unknown_citations: vec![],
         };
+        let (contract, prompt, context) =
+            super::super::answer_contract::prepare(&record.view.question, &evidence).unwrap();
+        evidence.answer_contract = Some(contract.clone());
+        record.request.prompt = prompt;
+        record.request.context = context;
         record.view.recall = Some(evidence);
+        assert_eq!(
+            required_semantics(&record),
+            Some("recall/requested-facts-v1")
+        );
         journal.append(&record).unwrap();
         assert!(
             journal
@@ -1259,6 +1302,7 @@ mod tests {
             .retained_answer_support(&record.view.run)
             .unwrap()
             .unwrap();
+        assert!(support.error.is_none());
         assert_eq!(
             support.raw_output,
             eidetic::ManifestId::of_blob(record.view.text.as_bytes())
@@ -1280,6 +1324,17 @@ mod tests {
             reopened.retained_answer_support(&record.view.run).unwrap(),
             Some(support.clone())
         );
+        let restored = reopened.load().unwrap();
+        assert_eq!(
+            restored[0].view.recall.as_ref().unwrap().answer_contract,
+            Some(contract)
+        );
+        let mut altered = record.clone();
+        altered
+            .request
+            .context
+            .push_str("different generation evidence");
+        assert!(reopened.append(&altered).is_err());
         reopened.lock();
         assert!(reopened.retained_answer_support(&record.view.run).is_err());
         reopened.unlock([9; 32]);

@@ -25,6 +25,18 @@ pub enum AnswerFormat {
     ClaimSupportV1,
 }
 
+/// The exact bounded task given to the model, independent of its claimed truth.
+/// Absent on historical v1 answers and ordinary prose asks.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AnswerContract {
+    pub method: String,
+    pub question: eidetic::ManifestId,
+    pub prompt: eidetic::ManifestId,
+    pub context: eidetic::ManifestId,
+    pub max_claims: usize,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PublishCorpusRequestV1 {
@@ -101,6 +113,8 @@ pub enum CitationBasis {
 pub struct RecallEvidence {
     #[serde(default, skip_serializing_if = "is_prose")]
     pub answer_format: AnswerFormat,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub answer_contract: Option<AnswerContract>,
     /// Reproducible retained assessment; current availability is reported by
     /// `stale` and must never overwrite this historical evidence.
     #[serde(default, skip_serializing_if = "Option::is_none")]
