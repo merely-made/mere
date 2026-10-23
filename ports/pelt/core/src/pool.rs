@@ -120,6 +120,23 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
             self.paint_revisions.insert(key.clone(), self.paint_epoch);
         }
     }
+    /// Drain control observations without granting visual/session mutation or
+    /// revoking document semantic publications on every event-loop wake.
+    #[cfg(feature = "cue")]
+    pub fn poll_cue_event(&mut self, key: &K) -> Option<inker::webcue::Envelope> {
+        self.contents.get_mut(key)?.poll_cue_event()
+    }
+    #[cfg(feature = "cue")]
+    pub fn advance_cue_browser(
+        &mut self,
+        key: &K,
+        now: std::time::Duration,
+    ) -> inker::webcue::Result<()> {
+        self.contents
+            .get_mut(key)
+            .ok_or(inker::webcue::Error::Stale)?
+            .advance_cue_browser(now)
+    }
     pub fn content(&self, key: &K) -> Option<&PeltContent<F>> {
         self.contents.get(key)
     }
@@ -197,6 +214,7 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
         let keys: Vec<K> = self.contents.keys().cloned().collect();
         for key in keys {
             self.a11y_invalidate(&key);
+            self.invalidate_paint(&key);
         }
         self.contents.iter_mut()
     }

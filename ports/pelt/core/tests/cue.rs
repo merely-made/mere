@@ -694,6 +694,13 @@ fn pool_visual_mutations_have_revisions_independent_of_layout_admission() {
         },
     )]);
     let revision = pool.paint_revision(&1).unwrap();
+    while pool.poll_cue_event(&1).is_some() {}
+    pool.advance_cue_browser(&1, Duration::ZERO).unwrap();
+    assert_eq!(
+        pool.paint_revision(&1),
+        Some(revision),
+        "control drains cannot force a new paint or invalidate semantic admission"
+    );
     pool.prepare(&7).unwrap();
     assert_eq!(
         pool.paint_revision(&1),
