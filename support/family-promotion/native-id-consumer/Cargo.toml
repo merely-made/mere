@@ -1,0 +1,13 @@
+[package]
+name = "native-id-consumer"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+cambium-winit-a11y = { path = "../../../crates/cambium/cambium-winit-a11y", default-features = false }
+
+[patch.crates-io]
+accesskit = { path = "../../patches/accesskit" }

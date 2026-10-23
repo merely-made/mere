@@ -1,9 +1,11 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 
-//! The find field both hosts mount: one key map, one status wording, one
+//! The find field every host mounts: one key map, one status wording, one
 //! row. Document search itself stays with the host's engine; this owns what
-//! the person sees and which command a key means.
+//! the person sees and which command a key means. A host whose keys arrive
+//! as winit events converts them to `KeyEvent`s and dispatches them into the
+//! mounted field; it keeps no key map of its own.
 use crate::{
     Key, KeyEvent, NamedKey, OptionalAction, ReadCommand, SINGLE_LINE_FIELD_STYLE, ShellControl,
     ShellSlot, TextFieldMode, TextInput, caret_field_children, el, on_key, request_focus,
@@ -92,32 +94,19 @@ fn status_view<State: 'static, Action: 'static>(status: &str) -> ShellSlot<State
     )
 }
 
-/// The field and its status with no key handling, for a host whose key
-/// routing sits above the view.
-pub fn find_field_display<State: 'static, Action: 'static>(
-    input: &TextInput,
-    status: &str,
-) -> ShellSlot<State, Action> {
-    Box::new(
-        el(
-            "div",
-            (field_body::<State, Action>(input), status_view::<State, Action>(status)),
-        )
-        .attr("class", "read-find-input"),
-    )
-}
-
-/// The field with the shared key map; focus follows `find.open`.
-pub fn find_field<State: 'static, Action: 'static>(
+/// The field with the shared key map; focus follows `find.open`. Every host
+/// mounts this one field: the handler may mutate state, return an action, or
+/// both.
+pub fn find_field<State: 'static, Action: 'static, OA: OptionalAction<Action> + 'static>(
     find: &ReadFind,
-    handler: Rc<impl Fn(&mut State, ReadEvent) + 'static>,
+    handler: Rc<impl Fn(&mut State, ReadEvent) -> OA + 'static>,
 ) -> ShellSlot<State, Action> {
     let input = find.input.clone();
     let query = request_focus(
         on_key(field_body::<State, Action>(&find.input), move |state: &mut State, event: KeyEvent| {
-            handler(state, find_key(&input, &event));
             event.prevent_default();
             event.stop_propagation();
+            handler(state, find_key(&input, &event))
         }),
         find.open,
     );
@@ -188,6 +177,96 @@ mod tests {
         };
         assert_eq!(edited.text(), "abc");
         assert_eq!(input.text(), "ab");
+    }
+
+    #[derive(Default)]
+    struct Host {
+        find: ReadFind,
+        seen: Vec<ReadEvent>,
+    }
+
+    fn host_view(host: &Host) -> ShellSlot<Host, ()> {
+        find_field(
+            &host.find,
+            Rc::new(|host: &mut Host, event: ReadEvent| {
+                if let ReadEvent::Query(input) = &event {
+                    host.find.input = input.clone();
+                }
+                host.seen.push(event);
+            }),
+        )
+    }
+
+    fn mounted() -> crate::GenetAppRunner<
+        Host,
+        fn(&Host) -> ShellSlot<Host, ()>,
+        ShellSlot<Host, ()>,
+        (),
+    > {
+        let dom: crate::DomHandle = Rc::new(std::cell::RefCell::new(genet_scripted_dom::ScriptedDom::new()));
+        let mut host = Host::default();
+        host.find.open = true;
+        crate::GenetAppRunner::new(dom, host_view as fn(&Host) -> ShellSlot<Host, ()>, host)
+    }
+
+    #[test]
+    fn the_mounted_field_applies_the_shared_map_with_a_working_caret() {
+        let mut runner = mounted();
+        let press = |runner: &mut crate::GenetAppRunner<_, _, _, ()>, key: Key, shift: bool| {
+            runner.dispatch_key(self::key(key, shift));
+        };
+        for text in ["a", "b", "d"] {
+            press(&mut runner, Key::Character(text.into()), false);
+        }
+        press(&mut runner, Key::Named(NamedKey::ArrowLeft), false);
+        press(&mut runner, Key::Character("c".into()), false);
+        assert_eq!(runner.state().find.input.text(), "abcd", "mid-string insert");
+        press(&mut runner, Key::Named(NamedKey::Home), false);
+        press(&mut runner, Key::Named(NamedKey::Delete), false);
+        assert_eq!(runner.state().find.input.text(), "bcd", "Home then forward delete");
+        press(&mut runner, Key::Named(NamedKey::End), false);
+        press(&mut runner, Key::Named(NamedKey::ArrowLeft), true);
+        press(&mut runner, Key::Named(NamedKey::ArrowLeft), true);
+        assert_eq!(runner.state().find.input.selected_text(), "cd");
+        press(&mut runner, Key::Character("x".into()), false);
+        assert_eq!(runner.state().find.input.text(), "bx", "typing replaces the selection");
+        press(&mut runner, Key::Named(NamedKey::Backspace), false);
+        assert_eq!(runner.state().find.input.text(), "b");
+    }
+
+    #[test]
+    fn the_mounted_field_reports_what_find_key_maps() {
+        let mut runner = mounted();
+        runner.update(|host| host.find.input = TextInput::new("ab"));
+        for (key_event, expected) in [
+            (key(Key::Named(NamedKey::Enter), false), ReadEvent::Command(ReadCommand::Next)),
+            (key(Key::Named(NamedKey::Enter), true), ReadEvent::Command(ReadCommand::Previous)),
+            (key(Key::Named(NamedKey::Escape), false), ReadEvent::Command(ReadCommand::CloseFind)),
+        ] {
+            assert_eq!(find_key(&runner.state().find.input, &key_event), expected);
+            let before = runner.state().seen.len();
+            runner.dispatch_key(key_event);
+            assert_eq!(runner.state().seen[before..], [expected]);
+        }
+        assert_eq!(runner.state().find.input.text(), "ab", "commands leave the text alone");
+    }
+
+    impl crate::optional_action::Action for ReadEvent {}
+
+    #[test]
+    fn a_host_handler_may_return_the_action() {
+        let dom: crate::DomHandle = Rc::new(std::cell::RefCell::new(genet_scripted_dom::ScriptedDom::new()));
+        let mut find = ReadFind::default();
+        find.open = true;
+        let mut runner = crate::GenetAppRunner::<ReadFind, _, _, ReadEvent>::new(
+            dom,
+            |find: &ReadFind| -> ShellSlot<ReadFind, ReadEvent> {
+                find_field(find, Rc::new(|_: &mut ReadFind, event: ReadEvent| Some(event)))
+            },
+            find,
+        );
+        let actions = runner.dispatch_key(key(Key::Named(NamedKey::Enter), true));
+        assert_eq!(actions, [ReadEvent::Command(ReadCommand::Previous)]);
     }
 
     #[test]

@@ -221,6 +221,7 @@ fn producer_without_slot_geometry_does_not_invent_screen_coordinates() {
         board(),
         Some((0.0, 0.0)),
         &mut HashMap::new(),
+        &mut HashMap::new(),
         &mut HashSet::from([slot]),
     )
     .unwrap();
@@ -244,6 +245,7 @@ fn invalid_producer_rectangle_does_not_reach_accessibility_bounds() {
             7,
             semantics,
             Some((0.0, 0.0)),
+            &mut HashMap::new(),
             &mut HashMap::new(),
             &mut HashSet::from([A11yNodeId(dom.opaque_id(slot))]),
         )
@@ -473,6 +475,7 @@ fn identity_tests_existing_node_and_action_id_collisions_preserve_the_original_t
             board(),
             Some((0.0, 0.0)),
             &mut targets,
+            &mut HashMap::new(),
             &mut reserved,
         );
         assert_eq!(

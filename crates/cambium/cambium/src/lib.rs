@@ -297,7 +297,7 @@ pub fn attr_qual(local: &str) -> QualName {
 mod reading_find;
 mod reading_toolbar;
 pub use reading_find::{
-    ReadEvent, ReadFind, find_failed, find_field, find_field_display, find_key, find_row,
+    ReadEvent, ReadFind, find_failed, find_field, find_key, find_row,
     find_status,
     is_find_shortcut,
 };

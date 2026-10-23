@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-23",
+  "source_commit": "59a146b06f08a07b4b7acadec8c49007aa11b023",
+  "merge_commit": "4f5753026899061a9517a71827741c0b4dcc4bbd",
+  "integrated_main": "0817fa1f363610663870bbe8eb950e4b46220830",
+  "audited_source_hashes_unchanged": 22,
+  "workspace_manifest_and_lock_unchanged": true,
+  "native_dependency_closure": {
+    "packages": 1092,
+    "pictograph_or_graphshell_present": false,
+    "basis": "Locked/offline full Cargo metadata including workspace dev dependencies; native five-package roots."
+  },
+  "upstream_changes": [
+    "crates/canvas/pictograph/src/canvas.rs",
+    "crates/canvas/pictograph/src/canvas/physics_form.rs",
+    "crates/canvas/pictograph/src/canvas/tests.rs",
+    "crates/canvas/pictograph/src/canvas/tests/physics_form.rs",
+    "design_docs/mere_docs/implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md",
+    "ports/graphshell/src/web_tree/lane.rs",
+    "ports/graphshell/src/web_tree/physics.rs"
+  ],
+  "receiving": "Native, schema, browser-host, embedding and standalone native gates retain identical audited source/dependency closure. Graphshell retained-content gate rerun after intake; no blanket qualification of upstream physics or UI work."
+}

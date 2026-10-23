@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "update",
+    "--offline",
+    "-p",
+    "accesskit@0.25.1"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-native-publication",
+  "started": "2026-10-23T03:51:44.338276+00:00",
+  "finished": "2026-10-23T03:52:11.592427+00:00",
+  "exit_code": 0,
+  "results": [],
+  "diagnostic_tail": "     Locking 1 package to highest compatible version\n      Adding accesskit v0.25.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-native-publication\\support\\patches\\accesskit)\n    Removing accesskit v0.25.1\nnote: pass `--verbose` to see 146 unchanged dependencies behind latest\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}
