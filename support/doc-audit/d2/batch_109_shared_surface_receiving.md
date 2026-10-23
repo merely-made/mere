@@ -3,12 +3,12 @@
 ## inker_docs/implementation_strategy/2026-10-22_shared_surface_receiving_plan.md
 
 - disposition: current
-- status line: "in progress" - accurate: yes
-- claims checked: 3 - holds: 3, stale: 0, unverifiable: 0
+- status line: "bounded Genet/Pelt/Graphshell receiving landed; concrete native browser integration and platform qualification remain open" - accurate: yes
+- claims checked: 11 - holds: 11, stale: 0, unverifiable: 0
 
 ### Stale claims
 
-None. Implementation and validation are explicitly in progress.
+None. Bounded receiving and publication are qualified; broader native integration and platform qualification remain explicit.
 
 ### Contradictions
 
@@ -17,7 +17,7 @@ by the host/engine pair. The shared adapter does not claim all browser operation
 
 ### Recommended action
 
-Record receiving results and exact remaining host qualification boundaries.
+Keep the concrete native browser/frame bindings and OS qualification boundaries separate from the completed retained receiving proof.
 
 ### Notes
 
