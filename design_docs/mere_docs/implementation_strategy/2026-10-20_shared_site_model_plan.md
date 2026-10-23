@@ -465,6 +465,20 @@ existing browser source/accessibility/build queue intact.
 
 ## Progress
 
+- 2026-10-22: Turnstone receiving is published as source `6737085d` and
+  qualification `0283e312`, selecting Mere `faa6f1fb3`, Errand `1155897e` and
+  Murm `36bad79bcc0`. Its native library build needs no API compatibility repair
+  and passes all 78 focused checks, including eight Read/Submit Resource budget
+  scenarios, launch settings, original receiving/controller behavior and
+  current reading/command/owner regressions. Existing external-host/R3 tests
+  remain ignored. The exact code/lock/executable and all filters are recorded
+  in `turnstone/support/receipts/client-limits/consumer.json`. No registry
+  version or unrelated supplier changes are introduced; the immutable
+  source-edit exception remains. The client-limit lane is complete for routed
+  Errand and native Micron consumers. Standalone session follow-ups remain
+  named in Errand's plan. Temporary worktrees are removed; no isolated target
+  or Cargo home remains from this lane.
+
 - 2026-10-22: Mere source `faa6f1fb3` qualifies the client-policy slice on current
   upstream `064291543`. All 48 fetch, 75 document and three original V1 fixture
   cases pass. Fetch without default features, smolweb-only documents and both
