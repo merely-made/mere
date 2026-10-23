@@ -162,7 +162,9 @@ struct Delta {
     answer_support: Option<eidetic::ManifestId>,
 }
 fn required_semantics(record: &RunRecord) -> Option<&'static str> {
-    if record
+    if record.request.output_grammar.is_some() {
+        Some("recall/constrained-answer-v1")
+    } else if record
         .view
         .recall
         .as_ref()
@@ -196,6 +198,7 @@ impl Delta {
                 && value != "recall/published-v1"
                 && value != "recall/claim-support-v1"
                 && value != "recall/requested-facts-v1"
+                && value != "recall/constrained-answer-v1"
         }) {
             return Err("unsupported inference checkpoint semantics".into());
         }
@@ -210,6 +213,15 @@ impl Delta {
 }
 
 fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
+    if record
+        .checkpoint
+        .as_ref()
+        .is_some_and(|cp| cp.request.output_grammar != record.request.output_grammar)
+    {
+        return Err(
+            "checkpoint decoding grammar differs from its retained generation request".into(),
+        );
+    }
     if let Some(contract) = record
         .view
         .recall
@@ -219,6 +231,16 @@ fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
         if contract.question != eidetic::ManifestId::of_blob(record.view.question.as_bytes())
             || contract.prompt != eidetic::ManifestId::of_blob(record.request.prompt.as_bytes())
             || contract.context != eidetic::ManifestId::of_blob(record.request.context.as_bytes())
+            || contract.output_grammar
+                != record
+                    .request
+                    .output_grammar
+                    .as_ref()
+                    .map(|g| {
+                        serde_json::to_vec(g).map(|bytes| eidetic::ManifestId::of_blob(&bytes))
+                    })
+                    .transpose()
+                    .map_err(|e| e.to_string())?
         {
             return Err(
                 "checkpoint answer contract does not match its exact generation inputs".into(),
@@ -1280,13 +1302,15 @@ mod tests {
         };
         let (contract, prompt, context) =
             super::super::answer_contract::prepare(&record.view.question, &evidence).unwrap();
+        record.request.output_grammar =
+            super::super::answer_contract::grammar(&evidence, &contract.method).unwrap();
         evidence.answer_contract = Some(contract.clone());
         record.request.prompt = prompt;
         record.request.context = context;
         record.view.recall = Some(evidence);
         assert_eq!(
             required_semantics(&record),
-            Some("recall/requested-facts-v1")
+            Some("recall/constrained-answer-v1")
         );
         journal.append(&record).unwrap();
         assert!(
@@ -1335,6 +1359,21 @@ mod tests {
             .context
             .push_str("different generation evidence");
         assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered.request.output_grammar = None;
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered.checkpoint = Some(GenerationCheckpoint {
+            placements: vec![],
+            session: None,
+            request: GenerationRequest::default(),
+            prompt_ids: vec![],
+            token_ids: vec![],
+            draws: 0,
+            text: String::new(),
+            complete: false,
+        });
+        assert!(check_answer_contract(&altered).is_err());
         reopened.lock();
         assert!(reopened.retained_answer_support(&record.view.run).is_err());
         reopened.unlock([9; 32]);

@@ -35,6 +35,9 @@ pub struct AnswerContract {
     pub prompt: eidetic::ManifestId,
     pub context: eidetic::ManifestId,
     pub max_claims: usize,
+    /// Hash of the exact enforced decoding grammar; absent on historical tasks.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_grammar: Option<eidetic::ManifestId>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
