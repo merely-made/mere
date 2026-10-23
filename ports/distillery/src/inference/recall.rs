@@ -105,7 +105,7 @@ impl RecallEvidence {
                 if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
                     support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
                     support.claims.clear();
-                } else if contract.method == "distillery.requested-facts/v3" && !super::answer_contract::matches_policy(text, self) {
+                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4") && !super::answer_contract::matches_policy(text, self) {
                     support.error = Some("Answer does not satisfy the retained constrained-output policy.".into());
                     support.claims.clear();
                 } else if support.claims.len() > contract.max_claims {
