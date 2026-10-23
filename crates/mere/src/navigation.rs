@@ -6,6 +6,26 @@
 //! Direction and kind are retained even when several relations share a member.
 use kernel::graph::{Graph, RelationKind, SemanticSubKind};
 
+/// A bounded, live one-hop neighborhood over canonical projected relations.
+/// A missing root is refused; an isolated root remains a one-member scope.
+pub fn neighborhood_members(graph: &Graph, root: uuid::Uuid) -> Option<Vec<uuid::Uuid>> {
+    let (key, _) = graph.get_node_by_id(root)?;
+    let mut members = std::collections::BTreeSet::from([root]);
+    for (_, relation) in graph.projected_relations() {
+        let other = if relation.from == key {
+            relation.to
+        } else if relation.to == key {
+            relation.from
+        } else {
+            continue;
+        };
+        if let Some(node) = graph.get_node(other) {
+            members.insert(node.id);
+        }
+    }
+    Some(members.into_iter().collect())
+}
+
 /// How hosts list relationship rows: one page size and one wording, so the
 /// same document reads the same in every Related list.
 pub const RELATIONSHIPS_PAGE_SIZE: usize = 6;

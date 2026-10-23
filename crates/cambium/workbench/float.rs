@@ -215,6 +215,12 @@ impl Workspace {
         })
     }
 
+    /// Host-owned presentation updates at either station, preserving custody.
+    pub fn tile_mut(&mut self,id:TileId)->Option<&mut Tile> {
+        if self.tiled.find(id).is_some() {self.tiled.tile_mut(id)}
+        else {self.floating.iter_mut().find(|float|float.tile.id==id).map(|float|&mut float.tile)}
+    }
+
     /// Every tile at either station.
     pub fn tiles(&self) -> Vec<&Tile> {
         let mut out = self.tiled.tiles();
@@ -433,6 +439,19 @@ mod tests {
 
     /// One tile id walks tiled → float → nested split → float → another
     /// workspace → back → tab, and is at exactly one station throughout.
+    #[test]
+    fn host_title_updates_preserve_tiles_at_both_stations() {
+        let mut workspace=two_up();
+        workspace.apply(&FloatEvent::Float{tile:TileId(2),rect:rect()}.into());
+        let geometry=workspace.floating()[0].rect;
+        workspace.tile_mut(TileId(1)).unwrap().title="Map".into();
+        workspace.tile_mut(TileId(2)).unwrap().title="Inspect".into();
+        assert_eq!(workspace.find(TileId(1)).unwrap().title,"Map");
+        assert_eq!(workspace.find(TileId(2)).unwrap().title,"Inspect");
+        assert_eq!(workspace.floating()[0].rect,geometry);
+        assert!(workspace.tile_mut(TileId(99)).is_none());
+    }
+
     #[test]
     fn a_tile_moves_through_every_station_and_is_at_one_station_throughout() {
         let mut primary = two_up();

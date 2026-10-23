@@ -67,6 +67,44 @@ impl PeltInput {
         }
     }
 
+    /// Express a host input measured in physical pixels in layout pixels:
+    /// positions, wheel deltas and pointer contact sizes divided by `scale`,
+    /// the layout scale the placements were registered at. Placements carry
+    /// logical rects, so a host that receives physical pointers converts once
+    /// here rather than at each producer.
+    pub fn to_layout(&mut self, scale: f32) {
+        if !(scale.is_finite() && scale > 0.0) {
+            return;
+        }
+        match self {
+            Self::Pointer(event) => {
+                event.position.x /= scale;
+                event.position.y /= scale;
+                event.width /= scale;
+                event.height /= scale;
+            },
+            Self::Drag(event) => {
+                event.position.x /= scale;
+                event.position.y /= scale;
+            },
+            Self::Wheel {
+                position, delta, ..
+            } => {
+                position.x /= scale;
+                position.y /= scale;
+                delta.0 /= scale;
+                delta.1 /= scale;
+            },
+            Self::Session(
+                SessionInput::PointerMoved { x, y, .. } | SessionInput::PointerButton { x, y, .. },
+            ) => {
+                *x /= scale;
+                *y /= scale;
+            },
+            _ => {},
+        }
+    }
+
     pub(crate) fn pointer(&self) -> Option<(i32, inker::PointerPhase, Option<inker::MouseButton>)> {
         use inker::{MouseButton, PointerPhase, SessionButtonState, SessionPointerButton};
         match self {
@@ -204,4 +242,46 @@ pub(crate) fn document_keyboard(event: inker::KeyboardEvent) -> Result<SessionIn
         },
         repeat: false,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn physical_pointers_and_wheels_become_layout_pixels() {
+        let mut pointer = PeltInput::Pointer(mouse_pointer(
+            1,
+            inker::PointerPhase::Move,
+            PhysicalPosition { x: 200.0, y: 100.0 },
+            None,
+            inker::PointerButtons::NONE,
+            SessionModifiers::default(),
+        ));
+        pointer.to_layout(2.0);
+        assert_eq!(pointer.position(), Some((100.0, 50.0)));
+        let mut wheel = PeltInput::Wheel {
+            position: PhysicalPosition { x: 40.0, y: 20.0 },
+            delta: (8.0, -16.0),
+            modifiers: SessionModifiers::default(),
+        };
+        wheel.to_layout(2.0);
+        let PeltInput::Wheel {
+            position, delta, ..
+        } = wheel
+        else {
+            unreachable!()
+        };
+        assert_eq!((position.x, position.y, delta), (20.0, 10.0, (4.0, -8.0)));
+        let mut key = PeltInput::Session(SessionInput::Cancel);
+        key.to_layout(2.0);
+        assert!(matches!(key, PeltInput::Session(SessionInput::Cancel)));
+        let mut unchanged = PeltInput::Session(SessionInput::PointerMoved {
+            x: 6.0,
+            y: 8.0,
+            modifiers: SessionModifiers::default(),
+        });
+        unchanged.to_layout(0.0);
+        assert_eq!(unchanged.position(), Some((6.0, 8.0)));
+    }
 }

@@ -13,8 +13,8 @@ impl Canvas {
     /// an arrangement or moving a node. Preserves the camera's yaw and tilt;
     /// stops following and pan inertia when a finite placement can be framed.
     /// An empty view leaves the viewport unchanged and returns `false`.
-    /// Like `fit_to_content`, pads by 160 projected units and never magnifies
-    /// above natural size. The usual zoom limits still apply to very large views.
+    /// Pads by 160 projected units. Small graphs may magnify up to the normal
+    /// camera limit; large graphs retain the usual minimum zoom.
     pub fn fit_visible(&mut self) -> bool {
         let mut points = self.framing_points(false);
         points.extend(self.fold_summary_centers());
@@ -85,7 +85,6 @@ impl Canvas {
         let (w, h) = (self.view_w as f32, self.view_h as f32);
         let zoom = (w / (max.0 - min.0 + 2.0 * MARGIN))
             .min(h / (max.1 - min.1 + 2.0 * MARGIN))
-            .min(1.0)
             .clamp(MIN_ZOOM, MAX_ZOOM);
         let center = (min.0 * 0.5 + max.0 * 0.5, min.1 * 0.5 + max.1 * 0.5);
         self.set_camera(CameraView {

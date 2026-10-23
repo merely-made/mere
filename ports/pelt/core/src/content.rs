@@ -60,6 +60,9 @@ pub(crate) enum PeltReceiverIdentity {
     Surface(u64),
 }
 
+#[cfg(feature = "cue")]
+type NativeCueLane = (PeltBrowser, (u32, u32), u64);
+
 enum Lane<F> {
     Document(PeltController<F>),
     Surface(PeltSurface),
@@ -125,13 +128,14 @@ impl<F: 'static> PeltContent<F> {
     ) -> Self {
         Self {
             lane: Lane::Surface(PeltSurface {
-                producer,
+                producer: producer.into(),
                 instance_id: crate::next_controller_instance_id(),
                 pointers: HashMap::new(),
                 viewport,
                 offset: None,
                 last_pointer: None,
                 buttons: 0,
+                next_request: 0,
             }),
             route,
             routed: None,
@@ -146,6 +150,99 @@ impl<F: 'static> PeltContent<F> {
             Lane::Surface(surface) => Some(surface.producer.as_mut()),
             Lane::Document(_) => None,
         }
+    }
+
+    #[cfg(feature = "cue")]
+    pub(crate) fn into_cue_lane(self) -> Result<PeltController<F>, NativeCueLane> {
+        match self.lane {
+            Lane::Document(controller) => Ok(controller),
+            Lane::Surface(surface) => {
+                Err((surface.producer, surface.viewport, surface.instance_id))
+            },
+        }
+    }
+
+    /// Install an already-bound shared browser without moving the pool or
+    /// its placement, capture, routing and accessibility authority.
+    #[cfg(feature = "cue")]
+    pub fn from_browser(surface: inker::cue_browser::BrowserSurface, route: PeltRoute) -> Self {
+        let viewport = surface.viewport();
+        Self {
+            lane: Lane::Surface(PeltSurface {
+                producer: PeltBrowser::Shared(surface),
+                instance_id: crate::next_controller_instance_id(),
+                pointers: HashMap::new(),
+                viewport: (viewport.width, viewport.height),
+                offset: None,
+                last_pointer: None,
+                buttons: 0,
+                next_request: 0,
+            }),
+            route,
+            routed: None,
+        }
+    }
+    #[cfg(feature = "cue")]
+    pub fn cue_surface(&self) -> Option<&dyn inker::webcue::Surface> {
+        match &self.lane {
+            Lane::Document(controller) => Some(controller.cue_surface()),
+            Lane::Surface(surface) => match &surface.producer {
+                PeltBrowser::Shared(surface) => Some(surface),
+                _ => None,
+            },
+        }
+    }
+    #[cfg(feature = "cue")]
+    pub fn cue_surface_mut(&mut self) -> Option<&mut dyn inker::webcue::Surface> {
+        match &mut self.lane {
+            Lane::Document(controller) => Some(controller.cue_surface_mut()),
+            Lane::Surface(surface) => match &mut surface.producer {
+                PeltBrowser::Shared(surface) => Some(surface),
+                _ => None,
+            },
+        }
+    }
+    #[cfg(feature = "cue")]
+    pub fn cue_browser_mut(&mut self) -> Option<&mut inker::cue_browser::BrowserSurface> {
+        match &mut self.lane {
+            Lane::Surface(PeltSurface {
+                producer: PeltBrowser::Shared(surface),
+                ..
+            }) => Some(surface),
+            _ => None,
+        }
+    }
+    #[cfg(feature = "cue")]
+    pub fn poll_cue_event(&mut self) -> Option<inker::webcue::Envelope> {
+        match &mut self.lane {
+            Lane::Document(controller) => controller.poll_cue_event(),
+            Lane::Surface(PeltSurface {
+                producer: PeltBrowser::Shared(surface),
+                ..
+            }) => inker::webcue::Surface::poll_event(surface),
+            _ => None,
+        }
+    }
+    /// Spend request ids from the same owner as navigation controls. Hosts
+    /// using this bridge submit every browser command through this method.
+    #[cfg(feature = "cue")]
+    pub fn request_cue_browser(
+        &mut self,
+        command: inker::webcue::Command,
+    ) -> inker::webcue::Result<inker::webcue::RequestKey> {
+        match &mut self.lane {
+            Lane::Surface(surface) => surface.request_cue(command),
+            _ => Err(inker::webcue::Error::Unsupported(
+                "content is not a shared browser".into(),
+            )),
+        }
+    }
+    #[cfg(feature = "cue")]
+    pub fn advance_cue_browser(&mut self, now: std::time::Duration) -> inker::webcue::Result<()> {
+        if let Some(surface) = self.cue_browser_mut() {
+            inker::webcue::Surface::advance(surface, now)?;
+        }
+        Ok(())
     }
 
     pub fn lane(&self) -> PeltLane {
@@ -341,8 +438,15 @@ impl<F: 'static> PeltContent<F> {
     }
 
     pub fn set_hidden(&mut self, hidden: bool) {
-        if let Some(controller) = self.document_mut() {
-            controller.set_hidden(hidden);
+        match &mut self.lane {
+            Lane::Document(controller) => controller.set_hidden(hidden),
+            Lane::Surface(surface) =>
+            {
+                #[cfg(feature = "cue")]
+                if let PeltBrowser::Shared(surface) = &mut surface.producer {
+                    let _ = inker::webcue::Surface::set_visible(surface, !hidden);
+                }
+            },
         }
     }
 
@@ -352,7 +456,7 @@ impl<F: 'static> PeltContent<F> {
                 let _ = controller.input(SessionInput::Focus(focused));
             },
             Lane::Surface(surface) => {
-                let _ = surface.producer.set_focus(focused);
+                let _ = surface_input(surface, SessionInput::Focus(focused), 1.);
             },
         }
     }
@@ -556,6 +660,10 @@ impl<F: 'static> PeltContent<F> {
         let Lane::Surface(surface) = &mut self.lane else {
             return Ok(None);
         };
+        #[cfg(feature = "cue")]
+        if matches!(surface.producer, PeltBrowser::Shared(_)) {
+            return Err("shared browser events must be drained through Cue".into());
+        }
         surface
             .producer
             .as_web_surface()
@@ -679,6 +787,29 @@ impl<F: 'static> PeltContent<F> {
         let Lane::Surface(surface) = &mut self.lane else {
             unreachable!("surface_command runs on a surface lane");
         };
+        #[cfg(feature = "cue")]
+        if matches!(surface.producer, PeltBrowser::Shared(_)) {
+            use inker::webcue::Command;
+            let command = match command {
+                SessionNavigationCommand::Address(address) => Command::Navigate { address },
+                SessionNavigationCommand::Reload => Command::Reload,
+                SessionNavigationCommand::Back => Command::Back,
+                SessionNavigationCommand::Forward => Command::Forward,
+                SessionNavigationCommand::Stop => Command::Stop,
+            };
+            return match surface.request_cue(command) {
+                Ok(_) => PeltHostEffect {
+                    handled: true,
+                    redraw: true,
+                    navigated: true,
+                    ..Default::default()
+                },
+                Err(error) => PeltHostEffect {
+                    error: Some(error.to_string()),
+                    ..Default::default()
+                },
+            };
+        }
         let web = surface.producer.as_web_surface();
         let result = web
             .ok_or_else(|| "surface has no web navigation plane".to_owned())
@@ -801,13 +932,14 @@ fn open_lane<F: 'static>(
                 })?;
             Ok((
                 Lane::Surface(PeltSurface {
-                    producer,
+                    producer: producer.into(),
                     instance_id: crate::next_controller_instance_id(),
                     pointers: HashMap::new(),
                     viewport,
                     offset: None,
                     last_pointer: None,
                     buttons: 0,
+                    next_request: 0,
                 }),
                 route,
             ))
@@ -825,9 +957,46 @@ fn retained_source_address(canonical_uri: &str, requested_address: &str) -> Stri
     )
 }
 
+/// A shared browser retains the same platform extension owner; callbacks are
+/// drained only through Cue once it is installed.
+pub(crate) enum PeltBrowser {
+    Platform(Box<dyn SurfaceProducer>),
+    #[cfg(feature = "cue")]
+    Shared(inker::cue_browser::BrowserSurface),
+}
+impl From<Box<dyn SurfaceProducer>> for PeltBrowser {
+    fn from(producer: Box<dyn SurfaceProducer>) -> Self {
+        Self::Platform(producer)
+    }
+}
+impl PeltBrowser {
+    pub(crate) fn as_mut(&mut self) -> &mut (dyn SurfaceProducer + 'static) {
+        match self {
+            Self::Platform(producer) => producer.as_mut(),
+            #[cfg(feature = "cue")]
+            Self::Shared(surface) => surface.platform_mut(),
+        }
+    }
+}
+impl std::ops::Deref for PeltBrowser {
+    type Target = dyn SurfaceProducer;
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Platform(producer) => producer.as_ref(),
+            #[cfg(feature = "cue")]
+            Self::Shared(surface) => surface.platform(),
+        }
+    }
+}
+impl std::ops::DerefMut for PeltBrowser {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut()
+    }
+}
+
 /// A live composited surface producer and the geometry it was last given.
 pub(crate) struct PeltSurface {
-    pub(crate) producer: Box<dyn SurfaceProducer>,
+    pub(crate) producer: PeltBrowser,
     instance_id: u64,
     // Accepted button masks are independent of physical buttons; retain each
     // gesture with the envelope and scale used at the producer boundary.
@@ -836,9 +1005,24 @@ pub(crate) struct PeltSurface {
     offset: Option<(i32, i32)>,
     last_pointer: Option<inker::PointerEvent>,
     buttons: u16,
+    next_request: u64,
 }
 
 impl PeltSurface {
+    #[cfg(feature = "cue")]
+    fn request_cue(
+        &mut self,
+        command: inker::webcue::Command,
+    ) -> inker::webcue::Result<inker::webcue::RequestKey> {
+        use inker::webcue::{Error, RequestId, Surface};
+        let PeltBrowser::Shared(browser) = &mut self.producer else {
+            return Err(Error::Unsupported(
+                "browser has no shared control binding".into(),
+            ));
+        };
+        self.next_request = self.next_request.checked_add(1).ok_or(Error::Exhausted)?;
+        browser.request(RequestId(self.next_request), command)
+    }
     fn frame(
         &mut self,
         rect: WorkspaceRect,
@@ -979,6 +1163,27 @@ fn surface_input(
     input: SessionInput,
     scale_factor: f32,
 ) -> PeltHostEffect {
+    #[cfg(feature = "cue")]
+    if matches!(
+        &input,
+        SessionInput::Text(_)
+            | SessionInput::KeyboardText(_)
+            | SessionInput::Ime(_)
+            | SessionInput::Focus(_)
+    ) && let PeltBrowser::Shared(browser) = &mut surface.producer
+    {
+        return match inker::webcue::Surface::input(browser, inker::webcue::Input::Document(input)) {
+            Ok(()) => PeltHostEffect {
+                handled: true,
+                redraw: true,
+                ..Default::default()
+            },
+            Err(error) => PeltHostEffect {
+                error: Some(error.to_string()),
+                ..Default::default()
+            },
+        };
+    }
     match input {
         SessionInput::PointerMoved { x, y, modifiers } => {
             let event = crate::mouse_pointer(

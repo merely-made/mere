@@ -255,3 +255,89 @@ mod tests {
         assert!(ReadingProjections::<u32>::from_json(&vec![b' '; 256 * 1024 + 1]).is_err());
     }
 }
+
+/// A bounded text quote at the leading visible line. Geometry is only a fallback
+/// for the identical source revision; a changed source must resolve the quote.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ReadingAnchor {
+    pub source: String,
+    pub revision: u64,
+    pub text: usize,
+    pub offset: usize,
+    pub exact: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub line_offset: f32,
+    pub fallback_y: f32,
+}
+impl ReadingAnchor {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.source.len() > 8192 || self.exact.len() > 512 || self.prefix.len() > 128
+            || self.suffix.len() > 128 || self.exact.is_empty()
+            || !self.line_offset.is_finite() || !(-2.0..=2.0).contains(&self.line_offset)
+            || !self.fallback_y.is_finite() || self.fallback_y < 0.0 {
+            return Err("Invalid reading anchor".into());
+        }
+        Ok(())
+    }
+}
+/// A projection's visit trail, separate from content lineage and layout undo.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ReadingTrail<T> {
+    entries: Vec<T>,
+    #[serde(default)]
+    anchors: Vec<Option<ReadingAnchor>>,
+    cursor: usize,
+}
+impl<T> Default for ReadingTrail<T> {
+    fn default() -> Self { Self { entries: Vec::new(), anchors:Vec::new(), cursor: 0 } }
+}
+impl<T: Clone + PartialEq> ReadingTrail<T> {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.anchors.len()>self.entries.len() {return Err("Invalid reading trail anchors".into());}
+        for anchor in self.anchors.iter().flatten() {anchor.validate()?;}
+        if self.entries.len() > 128 || (!self.entries.is_empty() && self.cursor >= self.entries.len()) || (self.entries.is_empty() && self.cursor != 0) {
+            return Err("Invalid reading trail".into());
+        }
+        Ok(())
+    }
+    pub fn current_anchor(&self)->Option<&ReadingAnchor> {self.anchors.get(self.cursor).and_then(Option::as_ref)}
+    pub fn anchor_current(&mut self,anchor:ReadingAnchor) {
+        if self.current().is_some() {self.anchors.resize(self.entries.len(),None);self.anchors[self.cursor]=Some(anchor);}
+    }
+    pub fn current(&self) -> Option<&T> { self.entries.get(self.cursor) }
+    pub fn can_back(&self) -> bool { self.cursor > 0 }
+    pub fn can_forward(&self) -> bool { self.cursor + 1 < self.entries.len() }
+    pub fn visit(&mut self, value: T) {
+        if self.current() == Some(&value) { return; }
+        self.entries.truncate(if self.entries.is_empty() { 0 } else { self.cursor + 1 });
+        self.anchors.resize(self.entries.len(),None);
+        self.anchors.push(None);
+        self.entries.push(value);
+        if self.entries.len() > 128 { self.entries.remove(0); self.anchors.remove(0); }
+        self.cursor = self.entries.len() - 1;
+    }
+    pub fn step(&mut self, forward: bool) -> Option<T> {
+        if forward { if !self.can_forward() { return None; } self.cursor += 1; }
+        else { if !self.can_back() { return None; } self.cursor -= 1; }
+        self.current().cloned()
+    }
+}
+#[cfg(test)]
+mod trail_tests {
+    use super::*;
+    #[test]
+    fn visits_branch_and_roundtrip_without_confusing_layout_history() {
+        let mut trail = ReadingTrail::default();
+        trail.visit(1); trail.visit(2); trail.visit(2); trail.visit(3);
+        assert_eq!(trail.step(false), Some(2));
+        let mut cold: ReadingTrail<i32> = serde_json::from_str(&serde_json::to_string(&trail).unwrap()).unwrap();
+        cold.validate().unwrap();
+        assert_eq!(cold.step(false), Some(1));
+        assert_eq!(cold.step(true), Some(2));
+        cold.visit(4); assert!(!cold.can_forward());
+        for i in 0..200 { cold.visit(i); }
+        cold.validate().unwrap(); assert_eq!(cold.entries.len(),128);
+        assert!(serde_json::from_str::<ReadingTrail<i32>>(r#"{"entries":[1],"cursor":90}"#).unwrap().validate().is_err());
+    }
+}

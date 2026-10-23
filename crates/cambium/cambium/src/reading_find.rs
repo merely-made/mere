@@ -23,11 +23,18 @@ pub enum ReadEvent {
 }
 
 /// Retained find field state; one per reading appearance.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ReadFind {
+    /// The host has a current document-search supplier. Appearance controls remain independent.
+    pub available: bool,
+    pub appearance_open: bool,
     pub open: bool,
     pub input: TextInput,
     pub status: String,
+}
+
+impl Default for ReadFind {
+    fn default() -> Self { Self { available: true, appearance_open: false, open: false, input: Default::default(), status: String::new() } }
 }
 
 /// The one status wording. `searching` is for engines that answer later.

@@ -79,9 +79,9 @@ pub struct SmolwebDocument {
     /// Supplied response MIME, distinct from the lowerer's canonical output type.
     source_content_type: Option<String>,
     style: DocumentStyleSheet,
-    display_scale: f32,
     reading: Option<tabard::ReadingPreferences>,
     find: crate::reading_find::ReadingFind,
+    pending_reading: Option<tabard::ReadingAnchor>,
     background: [f32; 4],
     images: HashMap<String, DecodedImage>,
     inline_media: SmolwebInlineMediaPolicy,
@@ -288,9 +288,9 @@ impl SmolwebDocument {
             document,
             source_content_type: None,
             style,
-            display_scale: 1.0,
             reading: None,
             find: Default::default(),
+            pending_reading: None,
             background,
             images: HashMap::new(),
             inline_media,
@@ -345,6 +345,18 @@ impl SmolwebDocument {
         appearance.images = self.images.clone();
         appearance
     }
+    pub fn reading_anchor(&self) -> Option<tabard::ReadingAnchor> {
+        let layout = self.layout.as_ref()?;
+        crate::reading_anchor::capture(&self.document.address, &layout.searchable, self.scroll_y, 1.0)
+    }
+    /// Applied once after layout. A stale quote never jumps to unrelated text.
+    pub fn restore_reading_anchor(&mut self, anchor: tabard::ReadingAnchor) {
+        self.pending_reading = Some(anchor);
+        self.invalidate_layout();
+    }
+    fn retain_reading_anchor(&mut self) {
+        if self.pending_reading.is_none() { self.pending_reading = self.reading_anchor(); }
+    }
     pub fn reading_preferences(&self) -> tabard::ReadingPreferences { self.reading.unwrap_or_default() }
     pub fn set_reading_preferences(&mut self, value: tabard::ReadingPreferences) -> Result<bool, String> {
         value.validate()?;
@@ -368,7 +380,7 @@ impl SmolwebDocument {
     pub fn clear_document_find(&mut self) { self.find = Default::default(); }
     fn reveal_find(&mut self) {
         if let Some(y) = self.find.current_y() {
-            self.scroll_y = (y - 24.0 * self.display_scale).clamp(0.0, self.max_scroll());
+            self.scroll_y = (y - 24.0).clamp(0.0, self.max_scroll());
         }
     }
 
@@ -422,6 +434,7 @@ impl SmolwebDocument {
     /// reconciled by heading key, so it survives streamed prefixes and drops
     /// only for an edited heading; a new address starts fresh.
     pub fn replace_document(&mut self, document: EngineDocument) {
+        self.pending_reading = if document.address == self.document.address { self.reading_anchor() } else { None };
         self.source_content_type = None;
         if document.address == self.document.address {
             self.folds.reconcile(&document.navigation);
@@ -435,10 +448,12 @@ impl SmolwebDocument {
         self.find = Default::default();
         self.document = Arc::new(document);
         self.pending_reveal = None;
+        self.layout=None;
         self.invalidate_layout();
     }
 
     fn invalidate_layout(&mut self) {
+        self.retain_reading_anchor();
         self.layout = None;
         self.presented = false;
     }
@@ -709,18 +724,6 @@ impl SmolwebDocument {
         true
     }
 
-    /// Physical pixels per logical reading pixel, independent of a producer's
-    /// raster scale. Each retained appearance owns this presentation value.
-    pub fn display_scale(&self) -> f32 { self.display_scale }
-    pub fn set_display_scale(&mut self, scale: f32) -> bool {
-        let scale = if scale.is_finite() { scale.clamp(0.5, 4.0) } else { 1.0 };
-        if self.display_scale == scale { return false; }
-        self.display_scale = scale;
-        self.layout = None;
-        self.presented = false;
-        true
-    }
-
     /// The host's reading face. Code and column-aligned menu formats retain
     /// their monospace role. A supplied sans-serif generic can fill glyphs
     /// missing from the prose face; all font bytes remain host-owned.
@@ -792,6 +795,7 @@ impl SmolwebDocument {
         if self.layout.is_some() && self.size == size {
             return;
         }
+        self.retain_reading_anchor();
         // A new viewport produces new geometry. Do not let a sizing, click,
         // or content-height query publish that geometry under the preceding
         // frame; `frame` marks it present only after painting completes.
@@ -802,8 +806,8 @@ impl SmolwebDocument {
                 &self.document,
                 Viewport::new(size.0 as f32, size.1 as f32),
                 &self.reading.map_or_else(
-                    || crate::typography::document_style_at_display_scale(&self.style, self.display_scale),
-                    |preferences|crate::typography::document_style_for_reading(&self.style, preferences, self.display_scale),
+                    || self.style.clone(),
+                    |preferences| crate::typography::document_style_for_reading(&self.style, preferences),
                 ),
                 &self.folds,
                 &self.fonts,
@@ -817,8 +821,13 @@ impl SmolwebDocument {
         self.scroll_x = self.scroll_x.min(self.max_scroll_x());
         self.scroll_y = self.scroll_y.min(self.max_scroll());
         if let Some(block) = self.pending_reveal.take() {
+            self.pending_reading=None;
             self.scroll_to_block(block);
-        } else { self.reveal_find(); }
+        } else if let Some(anchor) = self.pending_reading.take() {
+            if let Some(y) = crate::reading_anchor::resolve(&self.document.address, &self.layout.as_ref().unwrap().searchable, &anchor, 1.0) {
+                self.scroll_y = y.clamp(0.0, self.max_scroll());
+            }
+        }
     }
 
     fn max_scroll_x(&self) -> f32 {
@@ -1988,28 +1997,6 @@ mod typography_tests {
     }
 
     #[test]
-    fn display_density_reflows_physical_viewports_without_rewriting_style_intent() {
-        let source = Arc::new(EngineDocument {
-            address: "mere://reading/density".into(), title: None,
-            content_type: "text/plain".into(), lang: None,
-            provenance: Default::default(), trust: Default::default(),
-            diagnostics: Vec::new(), navigation: Default::default(),
-            blocks: vec![Block::Paragraph { spans: vec![inker::InlineSpan::Text("The same source at a readable logical size. ".repeat(70))] }],
-        });
-        let mut doc = SmolwebDocument::from_shared_document_with_theme(source.clone(), SmolwebTheme::Plain);
-        let intent = doc.style_sheet().clone();
-        doc.frame(1000, 600);
-        let one = doc.layout.as_ref().unwrap().packet.content_bounds.size.height;
-        assert!(doc.set_display_scale(2.0));
-        doc.frame(1000, 600);
-        assert!(doc.layout.as_ref().unwrap().packet.content_bounds.size.height > one * 2.0,
-            "Retina density must scale text and reflow in the physical aperture");
-        assert_eq!(doc.style_sheet(), &intent);
-        assert!(Arc::ptr_eq(&source, &doc.document));
-        assert!(!doc.set_display_scale(2.0), "an unchanged display does not invalidate layout");
-    }
-
-    #[test]
     fn restyling_reflows_without_replacing_source_or_session_state() {
         let source = Arc::new(EngineDocument {
             address: "gemini://x.test/".into(),
@@ -2079,5 +2066,35 @@ mod typography_tests {
         assert_eq!(body_size(&doc),20.0);
         assert_eq!(body_size(&other),24.0,"a fresh projection retains the host baseline until it selects reading intent");
         assert!(!doc.set_style_sheet(style));
+    }
+}
+
+#[cfg(test)]
+mod reading_anchor_tests {
+    use super::*;
+    #[test]
+    fn passage_survives_type_width_and_cold_appearance() {
+        let body=(0..60).map(|i|format!("Paragraph {i}: a distinct passage about graph projections and the relationship between the map and reading.\n\n")).collect::<String>();
+        let mut doc=SmolwebDocument::from_document_with_theme(EngineDocument {
+            address: "gemini://example.test/anchors".into(), title: None, content_type: "text/plain".into(), lang: None,
+            provenance: Default::default(), trust: Default::default(), diagnostics: Vec::new(), navigation: Default::default(),
+            blocks: body.split("\n\n").filter(|s|!s.is_empty()).map(|text| Block::Paragraph {spans:vec![inker::InlineSpan::Text(text.into())]}).collect(),
+        },SmolwebTheme::default());
+        let _=doc.frame(700,300); doc.scroll_to(1500.);
+        let anchor=doc.reading_anchor().expect("a laid-out passage");
+        doc.set_reading_preferences(tabard::ReadingPreferences{text_size:24,column_em:28}).unwrap();
+        let _=doc.frame(440,300);
+        let resolved=crate::reading_anchor::resolve(&doc.document.address,&doc.layout.as_ref().unwrap().searchable,&anchor,1.).unwrap();
+        assert!((doc.scroll_y()-resolved).abs()<1.0);
+        let after=doc.reading_anchor().unwrap();
+        let _=doc.frame(880,600);
+        let resolved=crate::reading_anchor::resolve(&doc.document.address,&doc.layout.as_ref().unwrap().searchable,&after,1.).unwrap();
+        assert!((doc.scroll_y()-resolved).abs()<1.0);
+        let saved=doc.reading_anchor().unwrap();
+        let mut cold=doc.new_appearance();
+        cold.set_reading_preferences(doc.reading_preferences()).unwrap();
+        cold.restore_reading_anchor(saved);let _=cold.frame(880,600);
+        assert!((cold.scroll_y()-doc.scroll_y()).abs()<1.0);
+        assert!(std::sync::Arc::ptr_eq(&doc.source_document(),&cold.source_document()));
     }
 }

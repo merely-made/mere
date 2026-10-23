@@ -730,6 +730,9 @@ engine adapters.
 
 ### inker_docs/implementation_strategy/
 
+- [Shared surface receiving](inker_docs/implementation_strategy/2026-10-22_shared_surface_receiving_plan.md): Inker/Pelt/Graphshell shared controls and both frame directions, qualified retained Genet receiving; broader native platform bindings remain open.
+
+
 - [engine_picker_and_pluggability_plan](inker_docs/implementation_strategy/2026-06-15_engine_picker_and_pluggability_plan.md)
   (**Phases 0–3 landed in meerkat and retired with it 2026-07-18**; `EngineRoutePolicy`, `is_surface_engine` and the graft/weld `SurfaceEngine` impls survive — route → activate → manage → pick. The
   user-facing engine **picker** as an inker affordance, distinct from verso's
@@ -908,6 +911,13 @@ is historical evidence, not the current path or ownership inventory. For the wor
 [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md).
 
 ## Working principles
+
+- **Shared surface receiving (2026-10-23):** keep canonical document types on
+  one source within each receiving graph, and keep frame revisions with the
+  retained receiver across renderer reconstruction. Reserve an old scope's final
+  stream before replacing its owner. GPU quality polling needs private renderer
+  state when producers share the host device. The [receiving plan](inker_docs/implementation_strategy/2026-10-22_shared_surface_receiving_plan.md)
+  records the actual Metal/IME/semantic proof and the separate platform gates.
 
 - **Native site publication (2026-10-21):** a site is a publication profile over
   explicitly selected contributions in an existing Moot collection. Retain native

@@ -29,7 +29,7 @@ pub mod typography;
 pub mod workshop;
 pub use theme_styles::{ThemeFontStyle, Typography};
 mod reading;
-pub use reading::{ReadingPreferences, ReadingProjections};
+pub use reading::{ReadingPreferences, ReadingProjections, ReadingAnchor, ReadingTrail};
 pub use typography::{FontFamily, FontPreferences, FontRole, ResolvedFontRole};
 
 pub use appearance::{
