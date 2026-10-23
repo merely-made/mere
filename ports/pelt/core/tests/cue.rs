@@ -548,3 +548,111 @@ fn canonical_ime_composition_changes_the_same_retained_pelt_value() {
         "IME commit did not reach the owned session"
     );
 }
+
+#[test]
+#[ignore = "requires a real wgpu adapter; run explicitly"]
+fn pool_lends_the_exact_receiver_for_shared_frames_and_revokes_hidden_admission() {
+    use pelt_core::cue::PeltSceneRenderer;
+    use pelt_core::{
+        PeltContent, PeltControllerPool, PeltPlacement, PeltTileRequest, WorkspaceRect,
+    };
+    use std::sync::Arc;
+    use wgpu_cue::{GpuHost, Imported, NativeImporter, Presenter, RenderContext, Source};
+    struct NoNative;
+    impl NativeImporter for NoNative {
+        fn try_import(&mut self, _: &RenderContext<'_>, _: NativeFrame) -> Result<Imported> {
+            panic!("retained source must not call native importer")
+        }
+    }
+    let core = genet_render_host::RenderCore::boot(netrender::NetrenderOptions {
+        enable_vello: true,
+        tile_cache_size: Some(256),
+        ..Default::default()
+    })
+    .unwrap();
+    let content = PeltContent::routed(
+        pelt_core::native::registries(
+            "cue-pool",
+            pelt_core::native::route_policy(),
+            inker::EngineProfileBinding {
+                user_data_dir: String::new(),
+            },
+        ),
+        PeltTileRequest::from_request(
+            SessionSpawnRequest::new("https://held.example/")
+                .with_body(HTML)
+                .with_content_type("text/html")
+                .with_viewport(128, 96),
+        ),
+        Arc::new(|| Box::new(Clock)),
+    )
+    .unwrap();
+    let identity = content.session_identity();
+    let scope = content.cue_surface().unwrap().scope();
+    let mut pool = PeltControllerPool::<u8, u8, netrender::Scene>::new();
+    pool.insert(1, content);
+    let placement = PeltPlacement {
+        content: 1,
+        window: 0,
+        rect: WorkspaceRect::new(0., 0., 128., 96.),
+        visible: true,
+        focused: true,
+        scale_factor: 1.,
+    };
+    pool.set_placements([(7, placement.clone())]);
+    let admission = pool.placement_generation(&7).unwrap();
+    let mut renderer = PeltSceneRenderer::new(core.renderer().wgpu_device.core.clone()).unwrap();
+    let host = GpuHost::new(core.device().clone(), core.queue().clone()).unwrap();
+    let mut presenter = Presenter::default();
+    let viewport = Viewport {
+        width: 128,
+        height: 96,
+        scale: 1.,
+    };
+    let deadline = std::time::Instant::now() + Duration::from_secs(20);
+    loop {
+        let controller = pool.cue_content_mut(&7).unwrap().document_mut().unwrap();
+        assert_eq!(controller.session_identity(), identity.unwrap());
+        let mut source = renderer.bind(controller);
+        if let Some(frame) = presenter
+            .present(
+                &host,
+                Source::HostDevice(&mut source),
+                viewport,
+                &mut NoNative,
+            )
+            .unwrap()
+        {
+            assert_eq!(frame.stamp.scope, scope);
+            let pixels = core.read_rgba8_texture(frame.texture, 128, 96).unwrap();
+            assert_eq!(
+                &pixels.rgba[(80 * 128 + 8) * 4..(80 * 128 + 8) * 4 + 4],
+                &[255, 0, 0, 255]
+            );
+            break;
+        }
+        assert!(std::time::Instant::now() < deadline);
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    pool.set_placements([]);
+    assert!(!pool.admits(&7, admission));
+    assert!(pool.cue_content_mut(&7).is_err());
+    assert!(matches!(
+        pool.content_mut(&1)
+            .unwrap()
+            .cue_surface_mut()
+            .unwrap()
+            .input(Input::Document(SessionInput::Text("late".into()))),
+        Err(Error::Invalid(_))
+    ));
+    pool.set_placements([(7, placement)]);
+    assert_ne!(pool.placement_generation(&7), Some(admission));
+    assert_eq!(
+        pool.cue_content_mut(&7).unwrap().session_identity(),
+        identity
+    );
+    assert_eq!(
+        pool.content(&1).unwrap().cue_surface().unwrap().scope(),
+        scope
+    );
+}
