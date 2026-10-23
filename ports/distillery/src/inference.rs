@@ -1029,6 +1029,8 @@ impl InferenceLane {
                 let (contract, prompt, supplied_context) =
                     answer_contract::prepare(&request.question, &evidence)
                         .map_err(InferenceLaneError::Recall)?;
+                generation.output_grammar = answer_contract::grammar(&evidence, &contract.method)
+                    .map_err(InferenceLaneError::Recall)?;
                 evidence.answer_contract = Some(contract);
                 generation.prompt = prompt;
                 context = supplied_context;

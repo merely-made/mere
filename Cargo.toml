@@ -231,9 +231,9 @@ chartulary = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
 numen = { version = "0.2.0", path = "crates/conatus/numen" }
-esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "b9f050b2947822aa0e5908a9aaedfc47a4f23930" }
+esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "aaae5d19365adcfa0b0292137eddd71edcb39337" }
 # Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
-esp-test-support = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "b9f050b2947822aa0e5908a9aaedfc47a4f23930" }
+esp-test-support = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "aaae5d19365adcfa0b0292137eddd71edcb39337" }
 mora = "0.1.0"
 mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
@@ -665,7 +665,7 @@ cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
 chirograph = { path = "crates/chirograph" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "b9f050b2947822aa0e5908a9aaedfc47a4f23930" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "aaae5d19365adcfa0b0292137eddd71edcb39337" }
 mere-fetch = { path = "crates/system/fetch" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "f27cb1aa5c79f0a178bd7cd99f468cbcc66892a2" }
 graphshell = { path = "ports/graphshell" }
@@ -743,7 +743,7 @@ chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "44f066
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "f27cb1aa5c79f0a178bd7cd99f468cbcc66892a2" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "b9f050b2947822aa0e5908a9aaedfc47a4f23930" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "aaae5d19365adcfa0b0292137eddd71edcb39337" }
 finger-protocol = { git = "https://github.com/merely-made/errand.git", rev = "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab" }
 gemini-protocol = { git = "https://github.com/merely-made/errand.git", rev = "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "f27cb1aa5c79f0a178bd7cd99f468cbcc66892a2" }
@@ -886,7 +886,7 @@ chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "44f066
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "f27cb1aa5c79f0a178bd7cd99f468cbcc66892a2" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "b9f050b2947822aa0e5908a9aaedfc47a4f23930" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "aaae5d19365adcfa0b0292137eddd71edcb39337" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "f27cb1aa5c79f0a178bd7cd99f468cbcc66892a2" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
 mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "44f0664748238d7a96603925a0268caf60e091aa" }
