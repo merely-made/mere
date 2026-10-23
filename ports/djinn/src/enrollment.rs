@@ -205,12 +205,12 @@ mod tests {
             ))
             .unwrap();
         let root_before =
-            std::fs::read(dir.path().join(crate::custody::AUTO_UNLOCK_ROOT_FILE)).unwrap();
+            std::fs::read(dir.path().join(castellan::custody::AUTO_UNLOCK_ROOT_FILE)).unwrap();
         let ui = Twice(AtomicUsize::new(0));
         enroll_passphrase_native(dir.path(), &ui).unwrap();
         assert_eq!(ui.0.load(Ordering::SeqCst), 2);
         assert_eq!(
-            std::fs::read(dir.path().join(crate::custody::AUTO_UNLOCK_ROOT_FILE)).unwrap(),
+            std::fs::read(dir.path().join(castellan::custody::AUTO_UNLOCK_ROOT_FILE)).unwrap(),
             root_before
         );
         drop(storage);
