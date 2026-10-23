@@ -329,7 +329,20 @@ impl Accessibility for DomAccessibility {
     ) -> Vec<A11yRequest> {
         let projection =
             cambium_rootstock::project_semantics(dom, layout, leaves, producers, focus);
-        let requests = projection.publication_requests(owner, dom, leaves, producers);
+        let requests = match projection.publication_bindings(owner, dom, leaves, producers) {
+            Ok(bindings) => bindings.requests,
+            Err(_) => {
+                for (_, old) in self.elements.drain() {
+                    old.element.remove();
+                }
+                let mut shared = self.handle.shared.borrow_mut();
+                shared.requests.clear();
+                shared.elements.clear();
+                shared.focused = None;
+                self.focus = None;
+                return Vec::new();
+            },
+        };
         let device = web_sys::window().map_or(1.0, |window| window.device_pixel_ratio());
         let scale = (layout_scale / device) as f32;
         let plan = mirror::plan(&projection, scale);
