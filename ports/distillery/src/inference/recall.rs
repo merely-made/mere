@@ -101,7 +101,7 @@ impl RecallEvidence {
                     .collect::<Vec<_>>(),
             );
             if let Some(contract) = &self.answer_contract {
-                let expected = super::answer_contract::prepare(question, self);
+                let expected = super::answer_contract::prepare_for_method(question, self, &contract.method);
                 if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
                     support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
                     support.claims.clear();
