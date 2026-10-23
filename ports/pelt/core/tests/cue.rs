@@ -656,3 +656,66 @@ fn pool_lends_the_exact_receiver_for_shared_frames_and_revokes_hidden_admission(
         scope
     );
 }
+
+#[test]
+fn pool_visual_mutations_have_revisions_independent_of_layout_admission() {
+    use pelt_core::{
+        PeltContent, PeltControllerPool, PeltPlacement, PeltTileRequest, WorkspaceRect,
+    };
+    use std::sync::Arc;
+    let content = PeltContent::routed(
+        pelt_core::native::registries(
+            "paint-revision",
+            pelt_core::native::route_policy(),
+            inker::EngineProfileBinding {
+                user_data_dir: String::new(),
+            },
+        ),
+        PeltTileRequest::from_request(
+            SessionSpawnRequest::new("https://held.example/")
+                .with_body(HTML)
+                .with_content_type("text/html")
+                .with_viewport(128, 96),
+        ),
+        Arc::new(|| Box::new(Clock)),
+    )
+    .unwrap();
+    let mut pool = PeltControllerPool::<u8, u8, netrender::Scene>::new();
+    pool.insert(1, content);
+    pool.set_placements([(
+        7,
+        PeltPlacement {
+            content: 1,
+            window: 0,
+            rect: WorkspaceRect::new(0., 0., 128., 96.),
+            visible: true,
+            focused: true,
+            scale_factor: 1.,
+        },
+    )]);
+    let revision = pool.paint_revision(&1).unwrap();
+    pool.prepare(&7).unwrap();
+    assert_eq!(
+        pool.paint_revision(&1),
+        Some(revision),
+        "layout preparation alone cannot perpetually dirty a pending frame"
+    );
+    pool.input(
+        &7,
+        pelt_core::PeltInput::Session(SessionInput::Focus(false)),
+    );
+    let after_input = pool.paint_revision(&1).unwrap();
+    assert!(after_input > revision);
+    pool.content_mut(&1)
+        .unwrap()
+        .document_mut()
+        .unwrap()
+        .set_page_zoom(1.25)
+        .unwrap();
+    let after_extension = pool.paint_revision(&1).unwrap();
+    assert!(after_extension > after_input);
+    pool.invalidate_paint(&1); // Exact due timer work is observed by the host.
+    assert!(pool.paint_revision(&1).unwrap() > after_extension);
+    pool.remove_content(&1);
+    assert!(pool.paint_revision(&1).is_none());
+}
