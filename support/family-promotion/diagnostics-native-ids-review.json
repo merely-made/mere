@@ -14,7 +14,8 @@
     "Malformed references, duplicates, invalid child graphs and foreign tree/graft publication refuse before routes advance.",
     "Invalid publication clears native routes/current namespace; a later recovery allocates fresh IDs. Failed first install never commits draft IDs/routes.",
     "Browser consumes the same fallible shared binding contract and clears invalid mirror routes/proxies.",
-    "Public source projection helpers now explicitly describe source IDs, not installed native IDs; obsolete source-ID-only mapper fixture retired in favor of real namespace/consumer controls."
+    "Public source projection helpers now explicitly describe source IDs, not installed native IDs; obsolete source-ID-only mapper fixture retired in favor of real namespace/consumer controls.",
+    "Publication refusal reveals the application window just as install failure does; malformed accessibility data cannot strand the first frame hidden. Source-confirmed guard; headed visibility/recovery remains unqualified."
   ],
   "supplier_patch": {
     "version": "0.25.1",
@@ -56,6 +57,11 @@
       "owner": "Full Rootstock leaf integration",
       "gap": "Intrinsic sizing and Path-B scene raster wiring remain separate from this namespace repair.",
       "done_condition": "Receive those actual render/sizing paths without relabeling semantics or mapping receipts."
+    },
+    {
+      "owner": "Publication outcome and diagnostics contract",
+      "gap": "Accessibility::sync returns drained requests, not a publication receipt. Native refusal clears routes and logs; BridgeStatus describes physical adapter installation, not acceptance of the latest semantic tree.",
+      "done_condition": "Shared typed publication outcome and collector wiring, distinguishing physical installation, semantic publication/admission and actor completion."
     }
   ],
   "qualification": "diagnostics-native-ids-qualification.json",

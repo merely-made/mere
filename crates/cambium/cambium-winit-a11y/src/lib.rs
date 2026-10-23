@@ -161,6 +161,9 @@ impl A11yHost {
                 self.requests.clear();
                 self.namespace.clear();
                 eprintln!("[cambium-winit] accessibility publication refused: {issue}");
+                // Match install failure: a rejected accessibility tree must not
+                // leave the application hidden. A later sync may retry.
+                window.set_visible(true);
                 return Vec::new();
             },
         };

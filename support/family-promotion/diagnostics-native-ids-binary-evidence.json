@@ -1,0 +1,82 @@
+{
+  "retained_binaries": false,
+  "shared_target": "C:/t/cargo-targets/mere",
+  "executables": {
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accesskit-e4f20e4e2e55782d.exe": {
+      "sha256": "28f84525e7c4b19722f0c24397213421be85f11db73007f06472ed9ad6846f68",
+      "size": 1240064,
+      "gate": "schema-fixed"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_web_host-8cfd580f72f7967f.exe": {
+      "sha256": "7c9445b87b7a65472a81a306edca8277a98aae6f345a2de852a0af2a70e7eee9",
+      "size": 19940352,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-bc148f32988a2b0c.exe": {
+      "sha256": "532353aa248741243a3cf8c4f7aaceecb7b35234fe483a8a5416ca6f6fa14337",
+      "size": 36767232,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-282d19b62089a9ed.exe": {
+      "sha256": "83172236164239ea089560e04292a06f32ca8338b9b0c0dc5386ecacc1456960",
+      "size": 16821248,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-df8ef7d95cbcb565.exe": {
+      "sha256": "8ad5077356ff9e8c4eae83d3719bdad3c23b0232555566e8748563c940dac1a0",
+      "size": 16379392,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_rootstock-04f01e47eabfe8cd.exe": {
+      "sha256": "f10f5e49d9ecf69470f27ee9f90a62f389430d6154ad250fde976a4b7f28887e",
+      "size": 41748992,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-84eccc3540716b79.exe": {
+      "sha256": "7d860aa5f6f7caab2b78d721945ecab1234bbd1d45842e11e20bec3e01230a5e",
+      "size": 19058688,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-16303ed15a3a82c4.exe": {
+      "sha256": "2ead2e37b9d841d722c3425818f76d757c6a823a4a2b97fdd24ba18be4b99403",
+      "size": 17567744,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\mesquite-3f85a10b3a2a5105.exe": {
+      "sha256": "264646e765f27105ebd97874da798cc97f78b4ec8330f8bc16e215c6db57c0c8",
+      "size": 39052800,
+      "gate": "native-final"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_genet_winit_host-1232a3d76346ba24.exe": {
+      "sha256": "7305ad9113374979fc14a03dd2daa0febba2ee901258c11e93d9e99f67729837",
+      "size": 36685312,
+      "gate": "native-current"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\accessibility-17d3f1a8d8e747a7.exe": {
+      "sha256": "2ecc628a6475436c1489389a6e1c9d5dae860de72305dfed8c695b29f68d889a",
+      "size": 16819712,
+      "gate": "native-current"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\click_on_scroll-170dc49d1de3ef96.exe": {
+      "sha256": "ee2457c70e890ce2bb4b68a27e679cb138aee9f13d1d8d3e17f1de98402aa12f",
+      "size": 16379392,
+      "gate": "native-current"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\cambium_winit_a11y-597ab3f729da7b91.exe": {
+      "sha256": "ad2c2136b48efc0dcc26654f490e29d03ceaadfb36c08a00b86ea7dff4a97d45",
+      "size": 19065856,
+      "gate": "native-current"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\e1a_sessions-7631ce811933f8a6.exe": {
+      "sha256": "024109ffb771e0511a83eb86cc2c453293eaece68fceb0d3f4e0b2e6e6f3817f",
+      "size": 17575424,
+      "gate": "native-current"
+    },
+    "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\graphshell-36ce17e1d387599c.exe": {
+      "sha256": "86cf8f8bf40bbab8964c9797386f5d3c4dd88e8eca79b8b21e8c0a359ecf40e0",
+      "size": 92240896,
+      "gate": "product-main"
+    }
+  },
+  "boundary": "Hashes identify inspected shared-target binaries at qualification time; builds may replace them. No headed acceptance."
+}

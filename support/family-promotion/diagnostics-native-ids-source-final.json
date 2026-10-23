@@ -1,0 +1,30 @@
+{
+  "source_basis": "11bec853ffc8a6877d0100356327b460740c43c7",
+  "normalization": "CRLF normalized to LF for source hashes",
+  "source_sha256": {
+    ".gitattributes": "fca8c691f1d96cc33247b52a1bcf8f1f327c2d49c886f2c279840abaeaba0ee1",
+    "Cargo.lock": "b72c338ec1492b0a1622409d664456fb0ad43a1dfff001a62738db11d8d0e07b",
+    "Cargo.toml": "10f04f8f3c9b2a7d477d4722f00e400f021540c42a884d1ce8f64e0260eba617",
+    "crates/cambium/cambium-genet-web-host/src/a11y.rs": "7362e28d1acbe5313a218515c93b593341212e8239f052ddc5d0fe8081214d89",
+    "crates/cambium/cambium-rootstock/src/a11y_provenance.rs": "fe501a726bc6ec87900c0549a0842525a722f07e31bd9040f26c4d3501ad2d7b",
+    "crates/cambium/cambium-rootstock/src/lib.rs": "080e8bd3c8de17914f8b66a3b04a4a4a01b1033d61a2b10de0a79a17f16f2f4e",
+    "crates/cambium/cambium-rootstock/src/semantics.rs": "efbfe8ca7c9064d4a0b09275daad1abd31b0ba7bad1b5bd60e2b97226e52057f",
+    "crates/cambium/cambium-rootstock/src/semantics/tests.rs": "b35cef577863b90785521a6c3b9bd1dc4ae24243b9f0fbc737e071a21d7b57bc",
+    "crates/cambium/cambium-winit-a11y/src/lib.rs": "62bd82aec854d90b5018b995a9b25dcde22e55d55c1aedb5bd3dbbb750b3d630",
+    "crates/cambium/cambium-winit-a11y/src/publication_tests.rs": "d45f7c38b51971a621296f886384f6565b01835e41d2c216c609cc892fd9ee8d",
+    "crates/cambium/cambium-winit-a11y/src/publication.rs": "111fe8f1a14438ed1646b55f3e314bf232b4ea94dcbe2e8c391fbdf9a4468978",
+    "crates/cambium/cambium-winit-a11y/src/namespace_tests.rs": "97f2e05eb877862a08f3911ca0d0a33e4d13c832f4247016a44eb394c69e0f25",
+    "support/patches/accesskit/Cargo.toml": "4622b7e8e02906e376ac9f4eb5d954237d35477ed760476cc0f97188a56da1a5",
+    "support/patches/accesskit/CHANGELOG.md": "ed90bab5113e9bc8aa0aa9da8824aea47922b513bf8c27e73e9b4cdce0f06499",
+    "support/patches/accesskit/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+    "support/patches/accesskit/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "support/patches/accesskit/README.md": "ffe115e775441eb17d4c7cc7b705a32ed0c697cf88d33cce72f8959b7f29e225",
+    "support/patches/accesskit/src/geometry.rs": "2f2c37da6a856f1463c593bd2c01d07f237951556c3f72594cb05a2561afa7ed",
+    "support/patches/accesskit/src/lib.rs": "d43ed410beffc1f4eea9442ab5a24846990acee0b25c757d213bb0343ad8d05c",
+    "support/family-promotion/native-id-consumer/Cargo.lock": "9e44849a346337c99516b519c0624d6338096955b93c6cbdd8ca11eb2d279673",
+    "support/family-promotion/native-id-consumer/Cargo.toml": "01e51bd3e0a58a88c623a897b50679bab97c056f123709fb854ab6a62cc71445",
+    "support/family-promotion/native-id-consumer/src/lib.rs": "86131afba9ea74e76cde7888b1ea5cdf44c676a64f71aff5d4721eb5e62db777"
+  },
+  "changes_after_initial_source": "Window reveal on refused publication; main relaxed Muniment requirement with unchanged locked supplier revision. Native subset, standalone consumer and latest-main native check pass.",
+  "integrated_remote_main": "8e1b3132186640db755f9295f18b31a9997d8710"
+}
