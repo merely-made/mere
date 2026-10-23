@@ -465,6 +465,18 @@ existing browser source/accessibility/build queue intact.
 
 ## Progress
 
+- 2026-10-22: Mere source `faa6f1fb3` qualifies the client-policy slice on current
+  upstream `064291543`. All 48 fetch, 75 document and three original V1 fixture
+  cases pass. Fetch without default features, smolweb-only documents and both
+  production strict Clippy gates pass. The [consumer receipt](../../../support/receipts/client-limits/consumer.json)
+  records exact code, lock, executable and command identities, and separates
+  the two repaired failed attempts. Canonical Errand `1155897e` and clean Murm
+  `36bad79bcc0` are coherently selected; every registry version and other lock
+  package block is preserved. Remote HTTP/smolweb documents share concurrency
+  admission and an absolute deadline including queue/runtime/trust setup.
+  The fetch actor's task-count policy and aggregate memory/traffic limits are
+  unchanged. Turnstone receiving qualification follows on this published SDK.
+
 - 2026-10-22: fetch receiving now passes all 48 cases, including pure initial
   refusal without a Tokio reactor. Bodyless receiving passes all 75 cases with
   an explicit held-open server fixture. The first document attempt's two
