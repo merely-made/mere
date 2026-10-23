@@ -1562,3 +1562,19 @@ fast-forward of local main; nothing built).**
   facet-name check (`validate_facet_name`) refuses any name containing "seed",
   so a facet named like `arrangement.seed` cannot sync; the scene facet holds its
   seed inside the value and is unaffected.
+- 2026-10-23 (physics form): the Map's composing controls (role, role groups,
+  two-law mix, grouping, two-stage schedule, speed) are one model in
+  pictograph, `canvas::physics_form`, next to `physics_controls`: `FieldId`
+  and `Field` (id, label, choices, current value, whether it matters now),
+  `Section` (title, notes, grouped fields, buttons), `Readback` (what the
+  canvas authored, with the note a form that cannot show it gives),
+  `PhysicsForm` (defaults, follow, edit by field, the typed request or its
+  refusal) and `FormAction` (run through `physics_controls`, with the status
+  worded once). Graphshell's `web_tree/physics.rs` and Turnstone's Arrange
+  pane only draw it; the hand-built mix, grouping, schedule and role state in
+  the tree (`mix_*`, `group_*`, `schedule_*`, `role`, `role_groups`, the notes
+  and `schedule_draft`) is gone, and the tree's scenario hooks
+  (`data-physics-*`, the `panel-*` probe fields) are drawn from the field ids.
+  Cues: the flat law, overlay and source form still has a draft here and
+  applies at once in Turnstone; the speed pick is not in the saved scene in
+  either host.

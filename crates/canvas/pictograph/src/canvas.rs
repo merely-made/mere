@@ -183,6 +183,9 @@ mod folds;
 pub mod gestures;
 /// Arrangement and physics actions a host's controls apply.
 pub mod physics_controls;
+/// The physics composition form both hosts render: fields, choices,
+/// read-back, validation and the edit they ask for.
+pub mod physics_form;
 /// The scene both hosts persist, captured from and restored onto the canvas.
 pub mod saved_scene;
 pub use folds::FoldBadge;
