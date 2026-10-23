@@ -14,11 +14,14 @@ description = "Window-neutral retained-session controller for the Pelt reference
 readme = "README.md"
 
 [features]
+cue = ["genet", "dep:wgpu-cue", "dep:wgpu-cue-netrender"]
 default = []
 genet = ["dep:genet-document-resources","dep:genet-documents", "dep:mere-document-lanes", "dep:netrender", "dep:serde_json"]
 image-decode = ["genet-documents?/image-decode"]
 
 [dependencies]
+wgpu-cue = { workspace = true, optional = true }
+wgpu-cue-netrender = { workspace = true, optional = true }
 genet-document-resources = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 genet-documents = { workspace = true, features = ["livery"], optional = true }
@@ -29,3 +32,6 @@ workbench = { workspace = true }
 inker = { workspace = true }
 page-load = { workspace = true }
 url = "2.5"
+
+[dev-dependencies]
+genet-render-host.workspace = true
