@@ -329,8 +329,8 @@ decisions configuration; its earlier rulings are numbered within each plan,
 and a later pass reviews them into the doctrine. The doctrine, `doctrine.md`,
 began on 2026-10-22 with five statements moved from isocosm's, citing
 isocosm's cases as `isocosm:<n>`. The decisions tool is eidetic's
-`wing-decisions`, run from this repository's root (for example `cargo run
---release --manifest-path ../eidetic/Cargo.toml -p wing-decisions -- check`):
+`responsa`, run from this repository's root (for example `cargo run
+--release --manifest-path ../eidetic/Cargo.toml -p responsa -- check`):
 `regen --stage` after a change to the doctrine or to a plan's Decisions,
 `check`, and `lookup`. *The doctrine* here is `doctrine.md`; the data-oriented
 doctrine brief names a representational discipline.
