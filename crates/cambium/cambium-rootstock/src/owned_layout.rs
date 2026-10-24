@@ -755,7 +755,7 @@ impl OwnedLayout {
                     .collect(),
             })
         });
-        list.translated(-self.viewport_scroll.0, -self.viewport_scroll.1)
+        list.scrolled(-self.viewport_scroll.0, -self.viewport_scroll.1)
     }
 
     pub(crate) fn append_scrollbars<D: LayoutDom<NodeId = NodeId>>(
