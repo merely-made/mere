@@ -2133,6 +2133,7 @@ name = "cambium"
 version = "0.6.0"
 dependencies = [
  "backstep",
+ "chartulary",
  "genet-scripted-dom",
  "genet-text",
  "hest 0.2.0",
@@ -2144,6 +2145,7 @@ dependencies = [
  "scenograph",
  "scenomise",
  "serde",
+ "serde_json",
  "sprigging",
  "tinct",
  "workbench",

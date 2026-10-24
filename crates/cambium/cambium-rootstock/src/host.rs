@@ -719,6 +719,25 @@ pub struct ScrollIntoView {
     pub align: ScrollAlign,
 }
 
+/// A deferred scroll request resolved against the next retained layout.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ScrollRequest {
+    /// Reveal an element's painted box.
+    IntoView(ScrollIntoView),
+    /// Reveal a byte position in a node's text without moving an editor caret.
+    Text {
+        node: NodeId,
+        byte: usize,
+        align: ScrollAlign,
+    },
+}
+
+impl From<ScrollIntoView> for ScrollRequest {
+    fn from(request: ScrollIntoView) -> Self {
+        Self::IntoView(request)
+    }
+}
+
 /// What the application sees inside a hook. One shape for every hook so the
 /// application-side plumbing stays boring.
 pub struct AppCtx<'a, State: 'static, Logic, V, T = Runner<State, Logic, V>>
@@ -802,7 +821,7 @@ where
     pub(crate) a11y_publication: crate::A11yPublicationSnapshot,
     /// Scroll requests for the next layout; queued through
     /// [`scroll_into_view`](Self::scroll_into_view).
-    pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
+    pub(crate) scroll: &'a mut Vec<ScrollRequest>,
     /// The window-verb seam, for a hook that wants to minimize/maximize/close
     /// without routing through application state. The same handle `init`
     /// received.
@@ -870,6 +889,19 @@ where
         self.layout.map(OwnedLayout::viewport_scroll)
     }
 
+    /// Observe a rendered element's own scroll offset. A rendered element at
+    /// rest returns zero; an absent layout or retired element is unavailable.
+    /// Hosts can compare this cheap observation before capturing a semantic
+    /// reading anchor, including changes from the scrollbar or caret follow.
+    pub fn element_scroll(&self, node: NodeId) -> Option<(f32, f32)> {
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout.painted_rect(&view, node)?;
+        Some(layout.element_scroll().get(&node).copied().unwrap_or_default())
+    }
+
     /// A computed value from the retained layout's own style set. No layout
     /// or absent property is unavailable, rather than a synthesized default.
     /// This observes an existing layout and never triggers style or layout work.
@@ -888,6 +920,21 @@ where
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, self.runner.mount());
         layout.hit_test(&view, x, y)
+    }
+
+    /// Read the UTF-8 byte position in `node`'s laid-out text at a logical
+    /// viewport point. This does not alter focus, caret, or selection.
+    pub fn text_position_at(&self, node: NodeId, point: (f32, f32)) -> Option<usize> {
+        if !point.0.is_finite() || !point.1.is_finite() {
+            return None;
+        }
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout
+            .caret_position_at_point(&view, node, point.0, point.1)
+            .map(|caret| caret.byte)
     }
 
     /// Names and roles from the same retained document projection the host
@@ -967,7 +1014,15 @@ where
     /// longer exists or does not paint is a no-op; requests queued together
     /// resolve in order.
     pub fn scroll_into_view(&mut self, node: NodeId, align: ScrollAlign) {
-        self.scroll.push(ScrollIntoView { node, align });
+        self.scroll
+            .push(ScrollRequest::IntoView(ScrollIntoView { node, align }));
+    }
+
+    /// Queue a text byte position to become visible after the next layout.
+    /// The host scrolls the retained text geometry and never touches an
+    /// editor's caret or selection state.
+    pub fn scroll_text_position(&mut self, node: NodeId, byte: usize, align: ScrollAlign) {
+        self.scroll.push(ScrollRequest::Text { node, byte, align });
     }
 }
 
@@ -1349,7 +1404,7 @@ where
     draining_a11y: bool,
     /// Scroll requests an application hook queued, resolved in order by the
     /// next [`relayout`](Host::relayout) once its layout is current.
-    pub pending_scroll: Vec<ScrollIntoView>,
+    pub pending_scroll: Vec<ScrollRequest>,
     /// The focused field and caret byte the last relayout scrolled into view.
     /// A caret that has not moved since is left where the user scrolled it.
     pub caret_followed: Option<(NodeId, usize)>,

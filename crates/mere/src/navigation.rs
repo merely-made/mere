@@ -4,6 +4,8 @@
 //! Shared, read-only relationship navigation over the kernel's canonical projection.
 //! Hosts retain navigation admission, actions, graph ownership and persistence.
 //! Direction and kind are retained even when several relations share a member.
+pub mod browser;
+
 use kernel::graph::{Graph, RelationKind, SemanticSubKind};
 
 /// A bounded, live one-hop neighborhood over canonical projected relations.

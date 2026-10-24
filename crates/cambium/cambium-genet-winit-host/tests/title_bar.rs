@@ -10,7 +10,8 @@
 use cambium::{TITLE_BAR_CSS, TitleBarSlot, button, el, title_bar};
 use cambium_genet_winit_host::{
     AppRegion, CaptionLabels, Harness, HostOptions, WindowCommand, WindowCommands,
-    platform_caption_controls, window_caption_controls,
+    WindowFrame, caption_controls_for_frame, platform_caption_controls, platform_window_frame,
+    window_caption_controls,
 };
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
@@ -22,6 +23,8 @@ struct App {
     labels: CaptionLabels,
     save_clicks: usize,
     platform_policy: bool,
+    frame_policy: bool,
+    frame: WindowFrame,
 }
 
 type Child = TitleBarSlot<App>;
@@ -29,7 +32,9 @@ type Logic = fn(&App) -> Child;
 type TestHost = Harness<App, Logic, Child>;
 
 fn root(state: &App) -> Child {
-    let captions = if state.platform_policy {
+    let captions = if state.frame_policy {
+        caption_controls_for_frame(&state.window, &state.labels, state.frame)
+    } else if state.platform_policy {
         platform_caption_controls(&state.window, &state.labels)
     } else {
         window_caption_controls(&state.window, &state.labels)
@@ -70,6 +75,8 @@ fn harness(extra_css: &str) -> TestHost {
         labels: CaptionLabels::default(),
         save_clicks: 0,
         platform_policy: false,
+        frame_policy: false,
+        frame: WindowFrame::Host,
     });
     host.layout_at(600.0, 250.0);
     host
@@ -245,4 +252,42 @@ fn platform_policy_keeps_native_mac_controls_and_adds_explicit_controls_elsewher
     let minimize = node_with_attr(&dom, host.runner().root(), "data-window-action", "minimize");
     assert_eq!(minimize.is_none(), cfg!(target_os = "macos"));
     assert!(host.performed().is_empty());
+}
+
+#[test]
+fn selected_frame_gets_controls_only_when_this_platform_draws_them_in_app() {
+    assert_eq!(
+        platform_window_frame(),
+        if cfg!(target_os = "windows") {
+            WindowFrame::App
+        } else {
+            WindowFrame::Host
+        }
+    );
+    let mut host = harness("");
+    host.update(|state| {
+        state.frame_policy = true;
+        state.frame = WindowFrame::Host;
+    });
+    host.relayout();
+    assert!(node_with_attr(
+        &host.runner().dom().borrow(),
+        host.runner().root(),
+        "data-window-action",
+        "close"
+    )
+    .is_none());
+
+    host.update(|state| state.frame = WindowFrame::App);
+    host.relayout();
+    let dom = host.runner().dom();
+    let dom = dom.borrow();
+    let close = node_with_attr(&dom, host.runner().root(), "data-window-action", "close");
+    assert_eq!(close.is_some(), !cfg!(target_os = "macos"));
+    if let Some(close) = close {
+        let (x, y, _, _) = host.painted_rect(close).unwrap();
+        assert_eq!(host.app_region_at(x + 1.0, y + 1.0), AppRegion::NoDrag);
+        let (title_x, title_y) = center(&host, "id", "title");
+        assert_eq!(host.app_region_at(title_x, title_y), AppRegion::Drag);
+    }
 }

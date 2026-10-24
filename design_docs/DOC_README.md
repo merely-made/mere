@@ -23,6 +23,8 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
+- [Application-defined contextual navigation](mere_docs/implementation_strategy/2026-10-23_contextual_navigation_plan.md): shared Cambium history and controls received by Woodshed and Knot; app-owned ancestry and restoration preserve playback and live edits, with native qualification tracked separately.
+
 - [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints and governed native Gemini/Scroll/Micron hosting; MIME-preserving receiving and Turnstone's native browser/controller proof are qualified, with client limits and headed interaction separate.
 
 Small-web integrations preserve native metadata and keep content, transport and

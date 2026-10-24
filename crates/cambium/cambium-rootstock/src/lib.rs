@@ -1324,7 +1324,7 @@ pub use host::{
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
     FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
     HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
-    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView, ScrollRequest,
     StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
     ladder_step,
 };

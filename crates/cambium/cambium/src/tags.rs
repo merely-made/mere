@@ -170,9 +170,9 @@ mod tests {
         let d = dom.borrow();
         let root = runner.root();
         assert_eq!(d.kind(root), NodeKind::Element);
-        assert_eq!(d.element_name(root).unwrap().local.as_ref(), "div");
+        assert_eq!(AsRef::<str>::as_ref(&d.element_name(root).unwrap().local), "div");
         let child = d.dom_children(root).next().expect("div has a child");
-        assert_eq!(d.element_name(child).unwrap().local.as_ref(), "span");
+        assert_eq!(AsRef::<str>::as_ref(&d.element_name(child).unwrap().local), "span");
     }
 
     /// `external_texture(7, 320, 240)` builds an `<external-texture>` element carrying
@@ -191,7 +191,7 @@ mod tests {
         let d = dom.borrow();
         let root = runner.root();
         assert_eq!(
-            d.element_name(root).unwrap().local.as_ref(),
+            AsRef::<str>::as_ref(&d.element_name(root).unwrap().local),
             "external-texture",
             "the view names the reserved element",
         );
@@ -224,7 +224,7 @@ mod tests {
         let d = dom.borrow();
         let root = runner.root();
         assert_eq!(
-            d.element_name(root).unwrap().local.as_ref(),
+            AsRef::<str>::as_ref(&d.element_name(root).unwrap().local),
             "custom-leaf",
             "the view names the reserved element",
         );
@@ -306,7 +306,7 @@ mod tests {
             "the host-owned child survives the sibling insert"
         );
         assert_eq!(
-            d.element_name(kids[0]).unwrap().local.as_ref(),
+            AsRef::<str>::as_ref(&d.element_name(kids[0]).unwrap().local),
             "kid",
             "the same host-owned descendant is still under the pool",
         );
