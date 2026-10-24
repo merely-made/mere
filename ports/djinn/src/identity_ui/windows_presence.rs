@@ -12,9 +12,9 @@ use personae::IdentityError;
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{
     CW_USEDEFAULT, CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, MSG,
-    PostMessageW, PostQuitMessage, RegisterClassW, SW_SHOW, SetForegroundWindow, ShowWindow,
-    TranslateMessage, WINDOW_EX_STYLE, WM_CLOSE, WM_DESTROY, WNDCLASSW, WS_CAPTION, WS_OVERLAPPED,
-    WS_SYSMENU,
+    PostMessageW, PostQuitMessage, RegisterClassW, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER,
+    SWP_SHOWWINDOW, SetForegroundWindow, SetWindowPos, TranslateMessage, WINDOW_EX_STYLE, WM_CLOSE,
+    WM_DESTROY, WNDCLASSW, WS_CAPTION, WS_OVERLAPPED, WS_SYSMENU,
 };
 use windows::core::w;
 
@@ -86,7 +86,17 @@ impl Parent {
                     },
                 };
                 unsafe {
-                    let _ = ShowWindow(hwnd, SW_SHOW);
+                    // Native consent must be visible even when the resident
+                    // was started with a hidden-window launch state.
+                    let _ = SetWindowPos(
+                        hwnd,
+                        None,
+                        0,
+                        0,
+                        0,
+                        0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW,
+                    );
                     let _ = SetForegroundWindow(hwnd);
                 }
                 if send.send(Ok(hwnd.0 as isize)).is_err() {
