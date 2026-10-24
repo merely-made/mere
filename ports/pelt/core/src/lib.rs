@@ -596,6 +596,11 @@ impl<F: 'static> PeltController<F> {
         self.session.as_ref()
     }
 
+    /// Latest text-input geometry published by the shared retained surface.
+    pub fn text_input_state(&self) -> Option<&inker::webcue::TextInputState> {
+        self.session.text_input_state()
+    }
+
     /// Mutable access to the active session's neutral seam. See
     /// [`Self::session`].
     pub fn session_mut(&mut self) -> &mut dyn DocumentSession<F> {
@@ -1403,8 +1408,12 @@ impl<F: 'static> PeltController<F> {
         engine_id: String,
         session: Box<dyn DocumentSession<F>>,
     ) -> Result<(), String> {
-        // Reserve the entire old final stream before touching its receiver.
-        if self.retired_surface_events.len() + self.session.retirement_len() > 256 {
+        // A legacy document host has not accepted asynchronous controls or
+        // observed this stream. Its unsolicited observations can expire with
+        // the installation instead of filling a retired-event backlog.
+        let preserve_stream = self.session.shared_stream_claimed();
+        // Claimed streams retain every accepted outcome and final observation.
+        if preserve_stream && self.retired_surface_events.len() + self.session.retirement_len() > 256 {
             return Err(
                 "drain shared surface events before replacing the retained receiver".into(),
             );
@@ -1434,7 +1443,14 @@ impl<F: 'static> PeltController<F> {
         self.cancel_pointer_capture();
         inker::webcue::Surface::retire(&mut self.session).map_err(|error| error.to_string())?;
         while let Some(event) = inker::webcue::Surface::poll_event(&mut self.session) {
-            self.retired_surface_events.push_back(event);
+            if preserve_stream {
+                self.retired_surface_events.push_back(event);
+            } else {
+                debug_assert!(!matches!(event.event,
+                    inker::webcue::Event::Completed { .. }
+                    | inker::webcue::Event::DocumentInput(_)
+                    | inker::webcue::Event::NavigationRequested { .. }));
+            }
         }
         self.session = next;
         self.session_generation = generation;
