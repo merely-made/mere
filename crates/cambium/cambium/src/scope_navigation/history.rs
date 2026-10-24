@@ -166,6 +166,34 @@ impl<P: ScopeValue, A: ScopeValue> ScopeNavigation<P, A> {
         Ok(())
     }
 
+    /// Refresh mutable visit and remembered-place bookmarks while retaining the
+    /// immutable encounter lineage, branches, and owner cursor verbatim.
+    ///
+    /// Use this for live presentation changes. [`Self::try_map`] also maps the
+    /// encounter contexts and is intended for admission or format migration.
+    /// An error leaves this navigation unchanged.
+    pub fn try_map_bookmarks(
+        &self,
+        mut map: impl FnMut(&ScopeVisit<P, A>) -> Result<ScopeVisit<P, A>, String>,
+    ) -> Result<Self, String> {
+        let bookmarks = self
+            .bookmarks
+            .iter()
+            .map(&mut map)
+            .collect::<Result<Vec<_>, _>>()?;
+        let remembered = self
+            .remembered
+            .iter()
+            .map(&mut map)
+            .collect::<Result<Vec<_>, _>>()?;
+        validate_wire_state(&self.lineage, &bookmarks, &remembered)?;
+        Ok(Self {
+            lineage: self.lineage.clone(),
+            bookmarks,
+            remembered,
+        })
+    }
+
     /// Map every retained visit and bookmark while keeping the Stemma's exact
     /// entry, parent, child, owner, and cursor structure. Mapping is staged in
     /// fresh values; an error leaves this navigation untouched.
@@ -756,7 +784,10 @@ mod tests {
         for (path, replacement) in cases {
             let mut damaged = wire.clone();
             *damaged.pointer_mut(path).unwrap() = replacement;
-            assert!(serde_json::from_value::<Navigation>(damaged).is_err(), "{path}");
+            assert!(
+                serde_json::from_value::<Navigation>(damaged).is_err(),
+                "{path}"
+            );
         }
     }
 
@@ -827,6 +858,71 @@ mod tests {
         });
 
         assert_eq!(result.unwrap_err(), "runtime place is unavailable");
+        assert_eq!(nav, before);
+    }
+
+    #[test]
+    fn live_bookmark_mapping_preserves_exact_immutable_encounters_and_branches() {
+        let mut nav = Navigation::default();
+        nav.visit(visit("a", "a anchor"));
+        nav.visit(visit("b", "b anchor"));
+        assert!(nav.step(false));
+        nav.visit(visit("c", "c anchor"));
+        nav.remember(visit("separate remembered place", "remembered anchor"));
+        let before = nav.clone();
+
+        let mut mapped = nav
+            .try_map_bookmarks(|visit| {
+                let mut bookmark = visit.clone();
+                bookmark.anchor = visit
+                    .anchor
+                    .as_ref()
+                    .map(|anchor| format!("{anchor}:closed"));
+                Ok(bookmark)
+            })
+            .unwrap();
+
+        assert_eq!(nav, before);
+        assert_eq!(mapped.lineage, before.lineage);
+        assert!(mapped.visits().all(|visit| {
+            visit
+                .anchor
+                .as_deref()
+                .is_some_and(|anchor| anchor.ends_with(":closed"))
+        }));
+        assert_eq!(
+            mapped.current().unwrap().anchor.as_deref(),
+            Some("c anchor:closed")
+        );
+        assert_eq!(
+            mapped.lineage.visits[1].context.anchor.as_deref(),
+            Some("b anchor")
+        );
+        let restored: Navigation =
+            serde_json::from_value(serde_json::to_value(&mapped).unwrap()).unwrap();
+        assert_eq!(restored, mapped);
+        assert!(mapped.step(false));
+        assert_eq!(mapped.current().unwrap().place, "a");
+        assert_eq!(mapped.destination(true).unwrap().place, "c");
+        assert_eq!(mapped.lineage.visits[0].children.len(), 2);
+    }
+
+    #[test]
+    fn failed_live_bookmark_mapping_leaves_original_state_intact() {
+        let mut nav = Navigation::default();
+        nav.visit(visit("a", "a anchor"));
+        nav.visit(visit("b", "b anchor"));
+        let before = nav.clone();
+        let result = nav.try_map_bookmarks(|visit| {
+            if visit.place == "b" {
+                Err("view is unavailable".into())
+            } else {
+                let mut bookmark = visit.clone();
+                bookmark.anchor = None;
+                Ok(bookmark)
+            }
+        });
+        assert_eq!(result.unwrap_err(), "view is unavailable");
         assert_eq!(nav, before);
     }
 }
