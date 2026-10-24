@@ -22,7 +22,11 @@ fn wire(value: &impl serde::Serialize) -> String {
     serde_json::to_string(value).unwrap()
 }
 
-pub(super) fn grammar(e: &RecallEvidence, facts: &RequestedFactSet) -> Result<G, String> {
+pub(super) fn grammar(
+    e: &RecallEvidence,
+    facts: &RequestedFactSet,
+    quoted: bool,
+) -> Result<G, String> {
     facts.validate_identity()?;
     if e.passages.len() > 8
         || e.passages
@@ -41,12 +45,37 @@ pub(super) fn grammar(e: &RecallEvidence, facts: &RequestedFactSet) -> Result<G,
             ))
         })
         .collect();
+    if quoted {
+        for (i, a) in e.passages.iter().enumerate() {
+            if wire(&a.passage.text).len() > 386 {
+                return Err("extractive answers require candidate text within the 384-byte claim bound; use shorter retained passages".into());
+            }
+            for b in &e.passages[i + 1..] {
+                if a.passage.source != b.passage.source
+                    && wire(&conflict_text(&a.passage.text, &b.passage.text)).len() > 386
+                {
+                    return Err("extractive conflict text exceeds the 384-byte claim bound; use shorter retained passages".into());
+                }
+            }
+        }
+    }
+    fn extractive(agreement: &str, status: &str, text: &str, links: Vec<G>) -> G {
+        seq(vec![
+            lit(format!(
+                "],\"agreement\":\"{agreement}\"}},\"status\":\"{status}\",\"text\":{},\"evidence\":[",
+                wire(&text)
+            )),
+            seq(links),
+            lit("]}"),
+        ])
+    }
     fn decisions(
         e: &RecallEvidence,
         cs: &[G],
         at: usize,
         chosen: &mut Vec<usize>,
         fact: &str,
+        quoted: bool,
     ) -> G {
         if at < e.passages.len() {
             let mut branches = vec![];
@@ -54,20 +83,70 @@ pub(super) fn grammar(e: &RecallEvidence, facts: &RequestedFactSet) -> Result<G,
                 if answers {
                     chosen.push(at);
                 }
-                let next = decisions(e, cs, at + 1, chosen, fact);
+                let next = decisions(e, cs, at + 1, chosen, fact, quoted);
                 if answers {
                     chosen.pop();
                 }
                 branches.push(seq(vec![
                     lit(format!(
-                        "{}{{\"handle\":{},\"answers\":{answers}}}",
+                        "{}{{\"handle\":{},{}\"answers\":{answers}}}",
                         if at == 0 { "" } else { "," },
-                        e.passages[at].handle
+                        e.passages[at].handle,
+                        if quoted {
+                            format!(
+                                "\"requested\":{},\"quote\":{},",
+                                wire(&fact),
+                                wire(&e.passages[at].passage.text)
+                            )
+                        } else {
+                            String::new()
+                        },
                     )),
                     next,
                 ]));
             }
             return choice(branches);
+        }
+        if quoted {
+            if chosen.is_empty() {
+                return extractive(
+                    "none",
+                    "insufficient",
+                    &format!("The supplied evidence does not state {fact}."),
+                    vec![],
+                );
+            }
+            let agreement = if chosen.len() == 1 { "single" } else { "same" };
+            let supported = choice(
+                chosen
+                    .iter()
+                    .map(|i| {
+                        extractive(
+                            agreement,
+                            "supported",
+                            &e.passages[*i].passage.text,
+                            vec![cs[*i].clone()],
+                        )
+                    })
+                    .collect(),
+            );
+            let mut alternatives = vec![supported];
+            for (at, i) in chosen.iter().enumerate() {
+                for j in &chosen[at + 1..] {
+                    if e.passages[*i].passage.source != e.passages[*j].passage.source {
+                        alternatives.push(extractive(
+                            "different",
+                            "conflicting",
+                            &conflict_text(
+                                &e.passages[*i].passage.text,
+                                &e.passages[*j].passage.text,
+                            ),
+                            vec![cs[*i].clone(), lit(","), cs[*j].clone()],
+                        ));
+                    }
+                }
+            }
+            return choice(alternatives);
         }
         let body = |agreement: &str, status: &str, links: G| {
             seq(vec![
@@ -130,7 +209,7 @@ pub(super) fn grammar(e: &RecallEvidence, facts: &RequestedFactSet) -> Result<G,
                 "{{\"fact\":{},\"review\":{{\"candidates\":[",
                 wire(fact)
             )),
-            decisions(e, &candidates, 0, &mut vec![], &fact.text),
+            decisions(e, &candidates, 0, &mut vec![], &fact.text, quoted),
         ]));
     }
     items.push(lit("]}"));
@@ -167,4 +246,8 @@ pub(super) fn grammar(e: &RecallEvidence, facts: &RequestedFactSet) -> Result<G,
         return Err("candidate review exceeds the constrained grammar resource bound".into());
     }
     Ok(grammar)
+}
+
+pub(super) fn conflict_text(a: &str, b: &str) -> String {
+    format!("The supplied sources disagree: {a} / {b}")
 }

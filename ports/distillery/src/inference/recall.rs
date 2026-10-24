@@ -106,14 +106,14 @@ impl RecallEvidence {
                 if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
                     support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
                     support.claims.clear();
-                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4" | "distillery.requested-facts/v5" | "distillery.candidate-review/v6") && !super::answer_contract::matches_policy(text, self) {
+                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4" | "distillery.requested-facts/v5" | "distillery.candidate-review/v6" | "distillery.quoted-review/v7") && !super::answer_contract::matches_policy(text, self) {
                     support.error = Some("Answer does not satisfy the retained constrained-output policy.".into());
                     support.claims.clear();
                 } else if support.claims.len() > contract.max_claims {
                     support.error = Some("Answer exceeds the retained contract's claim bound.".into());
                     support.claims.clear();
                 }
-                if support.error.is_none() && support.claims.iter().any(|c| c.review.is_some() != (contract.method == "distillery.candidate-review/v6")) {
+                if support.error.is_none() && support.claims.iter().any(|c| c.review.is_some() != matches!(contract.method.as_str(),"distillery.candidate-review/v6" | "distillery.quoted-review/v7") || c.review.as_ref().is_some_and(|r|r.candidates.iter().any(|d|d.quote.is_some() != (contract.method=="distillery.quoted-review/v7") || d.requested.is_some() != (contract.method=="distillery.quoted-review/v7")))) {
                     support.error = Some("Candidate review presence differs from the retained answer method.".into());
                     support.claims.clear();
                 }
@@ -153,63 +153,77 @@ impl RecallEvidence {
                 }
             }
         }
-        let bytes = text.as_bytes();
-        for start in 0..bytes.len() {
-            if bytes[start] != b'[' {
-                continue;
-            }
-            let mut end = start + 1;
-            while end < bytes.len() && bytes[end].is_ascii_digit() {
-                end += 1;
-            }
-            if end == start + 1 || bytes.get(end) != Some(&b']') {
-                continue;
-            }
-            let Ok(handle) = text[start + 1..end].parse::<u32>() else {
-                continue;
-            };
-            if let Some(supplied) = valid.iter().find(|p| p.handle == handle) {
-                let citation = Citation {
-                    handle,
-                    passage: supplied.passage.id(),
-                    basis: CitationBasis::ModelMarker,
-                    answer_selector: PassageSelector {
-                        start: text[..start].chars().count(),
-                        end: text[..end + 1].chars().count(),
-                    },
-                };
-                if !self.citations.iter().any(|c| c.handle == handle) {
-                    self.citations.push(citation);
+        if self.answer_format == AnswerFormat::Prose {
+            let bytes = text.as_bytes();
+            for start in 0..bytes.len() {
+                if bytes[start] != b'[' {
+                    continue;
                 }
-            } else if !self.passages.iter().any(|p| p.handle == handle)
-                && !self.unknown_citations.contains(&handle)
-            {
-                self.unknown_citations.push(handle);
+                let mut end = start + 1;
+                while end < bytes.len() && bytes[end].is_ascii_digit() {
+                    end += 1;
+                }
+                if end == start + 1 || bytes.get(end) != Some(&b']') {
+                    continue;
+                }
+                let Ok(handle) = text[start + 1..end].parse::<u32>() else {
+                    continue;
+                };
+                if let Some(supplied) = valid.iter().find(|p| p.handle == handle) {
+                    let citation = Citation {
+                        handle,
+                        passage: supplied.passage.id(),
+                        basis: CitationBasis::ModelMarker,
+                        answer_selector: PassageSelector {
+                            start: text[..start].chars().count(),
+                            end: text[..end + 1].chars().count(),
+                        },
+                    };
+                    if !self.citations.iter().any(|c| c.handle == handle) {
+                        self.citations.push(citation);
+                    }
+                } else if !self.passages.iter().any(|p| p.handle == handle)
+                    && !self.unknown_citations.contains(&handle)
+                {
+                    self.unknown_citations.push(handle);
+                }
             }
         }
         if let Some(support) = &self.support {
-            for link in support.claims.iter().flat_map(|c| &c.evidence) {
-                if link.error.is_some() || link.selector.is_none() {
-                    continue;
-                }
-                if let Some(supplied) = valid
-                    .iter()
-                    .find(|p| p.handle == link.handle && Some(p.passage.id()) == link.passage)
-                {
-                    if !self.citations.iter().any(|c| c.handle == link.handle) {
-                        let Some(answer_selector) = json_quote_selector(text, &link.quote) else {
-                            continue;
-                        };
-                        self.citations.push(Citation {
-                            handle: link.handle,
-                            passage: supplied.passage.id(),
-                            basis: CitationBasis::ClaimQuotation,
-                            // Exact encoded JSON string, including alternative escapes.
-                            answer_selector,
-                        });
+            for (claim_index, claim) in support.claims.iter().enumerate() {
+                for link in &claim.evidence {
+                    if link.error.is_some() || link.selector.is_none() {
+                        continue;
+                    }
+                    if let Some(supplied) = valid
+                        .iter()
+                        .find(|p| p.handle == link.handle && Some(p.passage.id()) == link.passage)
+                    {
+                        if !self.citations.iter().any(|c| c.handle == link.handle) {
+                            let Some(answer_selector) = json_claim_quote_selector(
+                                text,
+                                claim_index,
+                                link.handle,
+                                &link.quote,
+                            ) else {
+                                continue;
+                            };
+                            self.citations.push(Citation {
+                                handle: link.handle,
+                                passage: supplied.passage.id(),
+                                basis: CitationBasis::ClaimQuotation,
+                                // Exact encoded JSON string, including alternative escapes.
+                                answer_selector,
+                            });
+                        }
                     }
                 }
             }
+        }
+        // Review quotations and claim prose are not independently asserted
+        // citation links in a structured answer.
+        if self.answer_format == AnswerFormat::ClaimSupportV1 {
+            return;
         }
         for supplied in valid {
             if self.config.min_quote_chars == 0
@@ -235,6 +249,88 @@ impl RecallEvidence {
         }
     }
 }
+/// Locate a claim's evidence quotation, excluding equal text in its review or
+/// prose. Typed support has already checked the document and link identity.
+fn json_claim_quote_selector(
+    text: &str,
+    claim_index: usize,
+    handle: u32,
+    wanted: &str,
+) -> Option<PassageSelector> {
+    let bytes = text.as_bytes();
+    let mut at = 0;
+    let mut claim = 0;
+    while at < bytes.len() {
+        if bytes[at] != b'"' {
+            at += 1;
+            continue;
+        }
+        let start = at;
+        at += 1;
+        let mut escaped = false;
+        while at < bytes.len() {
+            let b = bytes[at];
+            at += 1;
+            if escaped {
+                escaped = false;
+            } else if b == b'\\' {
+                escaped = true;
+            } else if b == b'"' {
+                break;
+            }
+        }
+        let decoded =
+            zeroize::Zeroizing::new(serde_json::from_str::<String>(&text[start..at]).ok()?);
+        if decoded.as_str() != "evidence" {
+            continue;
+        }
+        let mut value = at;
+        while bytes.get(value).is_some_and(u8::is_ascii_whitespace) {
+            value += 1;
+        }
+        if bytes.get(value) != Some(&b':') {
+            continue;
+        }
+        value += 1;
+        while bytes.get(value).is_some_and(u8::is_ascii_whitespace) {
+            value += 1;
+        }
+        if bytes.get(value) != Some(&b'[') {
+            continue;
+        }
+        if claim != claim_index {
+            claim += 1;
+            continue;
+        }
+        value += 1;
+        loop {
+            while bytes
+                .get(value)
+                .is_some_and(|b| b.is_ascii_whitespace() || *b == b',')
+            {
+                value += 1;
+            }
+            if bytes.get(value) != Some(&b'{') {
+                return None;
+            }
+            let mut stream = serde_json::Deserializer::from_str(&text[value..])
+                .into_iter::<eidetic::models::answer::ClaimEvidence>();
+            let object = stream.next()?.ok()?;
+            let end = value + stream.byte_offset();
+            if object.handle == handle && object.quote == wanted {
+                let relative = json_quote_selector(&text[value..end], wanted)?;
+                let offset = text[..value].chars().count();
+                return Some(PassageSelector {
+                    start: offset + relative.start,
+                    end: offset + relative.end,
+                });
+            }
+            value = end;
+        }
+    }
+    None
+}
+
 /// Locate a decoded quotation without assuming the model used serde's escaping.
 fn json_quote_selector(text: &str, wanted: &str) -> Option<PassageSelector> {
     let bytes = text.as_bytes();
@@ -611,6 +707,100 @@ mod tests {
             serde_json::from_str::<String>(&encoded).unwrap(),
             "A café observatory is retained."
         );
+    }
+    #[test]
+    fn reviewed_quotes_are_data_and_citation_anchors_name_only_claim_evidence() {
+        let sources: Vec<_> = [
+            ("a", "The café orchard crop is pears; [99] is quoted data."),
+            (
+                "b",
+                "The ship departs on Monday, as recorded in the schedule.",
+            ),
+        ]
+        .into_iter()
+        .map(|(name, text)| RetainedSourceText {
+            source: RecallSourceId {
+                kind: RecallSourceKind::Clip,
+                owner: Some("owner".into()),
+                source: name.into(),
+                node: None,
+            },
+            version: "v1".into(),
+            title: None,
+            text: text.into(),
+        })
+        .collect();
+        let corpus = Arc::new(PublishedCorpus(sources));
+        let index = RecallIndex::build(corpus.clone(), RecallConfig::default()).unwrap();
+        let (base, _) = index.prepare("orchard ship", &[]).unwrap();
+        assert_eq!(base.passages.len(), 2);
+        for supported in [false, true] {
+            let mut e = base.clone();
+            e.answer_format = AnswerFormat::ClaimSupportV1;
+            let q = if supported {
+                "What is the café orchard crop?"
+            } else {
+                "What is the orchard owner's birthday?"
+            };
+            let (contract, _, _) = super::super::answer_contract::prepare(q, &e).unwrap();
+            let fact = contract.requested_facts.as_ref().unwrap().facts[0].clone();
+            e.answer_contract = Some(contract);
+            let selected = e
+                .passages
+                .iter()
+                .find(|p| p.passage.source.source == "a")
+                .unwrap()
+                .clone();
+            let review = serde_json::json!({"candidates":e.passages.iter().map(|p|serde_json::json!({"handle":p.handle,"requested":fact.text,"quote":p.passage.text,"answers":supported && p.handle==selected.handle})).collect::<Vec<_>>(),"agreement":if supported {"single"} else {"none"}});
+            let text = if supported {
+                selected.passage.text.clone()
+            } else {
+                format!("The supplied evidence does not state {}.", fact.text)
+            };
+            let links = if supported {
+                vec![serde_json::json!({"handle":selected.handle,"quote":selected.passage.text})]
+            } else {
+                vec![]
+            };
+            // Match constrained field order: the review precedes asserted links.
+            let raw = format!(
+                "{{\"claims\":[{{\"fact\":{},\"review\":{},\"status\":\"{}\",\"text\":{},\"evidence\":{}}}]}}",
+                serde_json::to_string(&fact).unwrap(),
+                review,
+                if supported {
+                    "supported"
+                } else {
+                    "insufficient"
+                },
+                serde_json::to_string(&text).unwrap(),
+                serde_json::to_string(&links).unwrap()
+            );
+            e.support = e.assess_answer(&raw, q);
+            assert!(e.support.as_ref().unwrap().error.is_none());
+            e.validate(&raw, Some(corpus.as_ref()));
+            assert!(e.unknown_citations.is_empty());
+            if supported {
+                assert_eq!(e.citations.len(), 1);
+                let citation = &e.citations[0];
+                assert_eq!(citation.handle, selected.handle);
+                assert_eq!(citation.basis, CitationBasis::ClaimQuotation);
+                assert!(
+                    citation.answer_selector.start
+                        > raw[..raw.find(",\"evidence\":[").unwrap()].chars().count()
+                );
+                let encoded: String = raw
+                    .chars()
+                    .skip(citation.answer_selector.start)
+                    .take(citation.answer_selector.end - citation.answer_selector.start)
+                    .collect();
+                assert_eq!(
+                    serde_json::from_str::<String>(&encoded).unwrap(),
+                    selected.passage.text
+                );
+            } else {
+                assert!(e.citations.is_empty());
+            }
+        }
     }
     #[test]
     fn structured_claim_quotes_keep_historical_support_but_withdraw_stale_inspection() {
