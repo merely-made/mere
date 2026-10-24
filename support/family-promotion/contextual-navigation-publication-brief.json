@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "date": "2026-10-24",
-  "status": "in-progress",
+  "status": "complete",
   "objective": "Qualify Woodshed native custody-backed navigation reopen, publish shared Cambium and portable app intake, then add independent Knot pane bookmarks and adapt platform chrome.",
   "order": [
     "woodshed-native-custody-reopen",
@@ -33,7 +33,7 @@
       "source commits and consumer pins",
       "platform chrome checks and scoped native captures"
     ],
-    "capture_policy": "At most two small captures per native acceptance flow; retain compact exploratory summaries. Existing receipts and source recovery evidence stay unchanged."
+    "capture_policy": "Preserve existing captures. Knot toolbar acceptance retains its two rejected captures and permits one final capture only after native rectangle observations prove the fix. Knot independent-pane acceptance permits at most two small captures; portable Woodshed adds none. Keep exploratory observations compact."
   },
   "targets": [
     "C:/t/cargo-targets/mere",
@@ -42,10 +42,12 @@
   ],
   "preserve_prior_receipts": true,
   "isolated_cargo_homes": [],
-  "worktrees": [
+  "worktrees": [],
+  "worktree_reason": "Remote main advanced17/3/3 commits while primary checkouts retain shared dirty/staged work; isolated integration preserves those checkouts.",
+  "capture_policy_revision_reason": "Headless caption checks passed while two native1000px captures clipped the Close outline; actual native viewport/rectangles and one final visual acceptance are required.",
+  "completed_worktrees_removed": [
     "C:/Users/mark_/Code/worktrees/mere-context-navigation-publication",
     "C:/Users/mark_/Code/worktrees/woodshed-context-navigation-publication",
     "C:/Users/mark_/Code/worktrees/knot-editor-context-navigation-publication"
-  ],
-  "worktree_reason": "Remote main advanced17/3/3 commits while primary checkouts retain shared dirty/staged work; isolated integration preserves those checkouts."
+  ]
 }

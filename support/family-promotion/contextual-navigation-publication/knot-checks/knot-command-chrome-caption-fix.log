@@ -1,0 +1,44 @@
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: usage of an `unsafe` block
+warning: `knot-document` (lib) generated 1 warning
+warning: unused variable: `faults`
+warning: variant `Verification` is never constructed
+70 | pub(crate) enum MigrationError {
+   = note: `MigrationError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+warning: enum `MigrationStep` is never used
+warning: methods `at` and `copy_value` are never used
+warning: struct `StageFile` is never constructed
+warning: associated function `create` is never used
+262 |     fn create(parent: &Path) -> Result<Self, MigrationError> {
+warning: `knot-editor` (lib) generated 6 warnings (run `cargo fix --lib -p knot-editor` to apply 1 suggestion)
+warning: unused variable: `document`
+warning: unused variable: `address`
+warning: unused variable: `root`
+warning: unused variable: `root`
+warning: unused variable: `document`
+warning: unused variable: `address`
+warning: unused variable: `root`
+warning: unused variable: `document`
+warning: `knot-desktop` (lib) generated 8 warnings (run `cargo fix --lib -p knot-desktop` to apply 8 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 8.35s
+     Running tests\command_chrome.rs (C:/t/cargo-targets/knot-editor/build\debug\deps\command_chrome-2e1e1ea2b5ebffac.exe)
+running 11 tests
+test default_command_chrome_matches_the_platform_frame ... ok
+test hest_window_invocation_uses_knots_actual_host_queue_without_claiming_completion ... ok
+test title_is_draggable_but_menu_and_document_are_not ... ok
+test plain_row_has_palette_but_no_client_caption_controls ... ok
+test client_caption_controls_queue_verbs_without_dragging ... ok
+test dirty_caption_close_uses_the_existing_unsaved_guard ... ok
+test palette_keyboard_filter_escape_and_focus_return_do_not_edit_source ... ok
+test client_caption_buttons_remain_fully_inside_the_window_at_supported_widths ... ok
+test palette_query_stays_authoritative_after_tab_and_enter_activates_the_filtered_command ... ok
+test client_menu_collapses_and_reopens_safely_after_resize ... ok
+test palette_arrow_selection_reveals_long_list_without_scrolling_workspace ... ok
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.75s

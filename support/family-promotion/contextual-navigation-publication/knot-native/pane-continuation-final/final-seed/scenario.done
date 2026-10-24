@@ -1,0 +1,4 @@
+RESULT ok
+frames: 0 captured, 0 blank, 0 distinct digests
+presentation: 72 frames, 72 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":72,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":93,"phase":"submitted"}},"sequence":73}}

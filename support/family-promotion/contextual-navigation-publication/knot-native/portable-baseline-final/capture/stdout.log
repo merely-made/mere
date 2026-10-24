@@ -1,0 +1,3 @@
+knot: FAIL: assert snap preview_open Eq 'true': got 'false'
+knot: captured nested-context-full-menu
+knot: RESULT fail (29 frames, 1 captures)

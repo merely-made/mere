@@ -1,7 +1,8 @@
 # Application-defined contextual navigation
 
-**Status (2026-10-23): local native prototypes qualified on Windows.** Woodshed
-and Knot receive the generic Cambium contract from the Turnstone GUI lane. Its
+**Status (2026-10-24): shared navigation and both portable applications published
+and qualified on Windows, including independent Knot pane bookmarks.** Woodshed and Knot receive the
+generic Cambium contract from the Turnstone GUI lane. Its
 minimal browser compatibility migration is also received here; reading chrome
 remains owned by that lane.
 
@@ -208,3 +209,57 @@ This source qualification is recorded at
 The subsequent custody reopen, publication revisions and app intake are recorded
 by the publication lane. Its new-artifact cap is 30 MB and combined retained cap
 is 55 MB; earlier receipts remain unchanged.
+
+The shared implementation is published at `3e305d118`; its historical receipt
+archive is `7632bbd32`, the Mere pin used by both published app baselines. Woodshed source
+is published at `de7b8dc` and its receipt-link follow-up at `91b2dd5`. Its portable
+Windows binary passed a fresh isolated unlocked-Keeper seed/reopen pair at
+212/171 presented frames: the exact owning Set/Card route, stored music and
+view reopened with playback stopped. Back restored the newer Overview at zoom
+1.25 and the earlier visit at 1.00. All 174 audio tests pass on the portable graph.
+
+Knot's portable baseline is published at `8ab5268`. The native caption probe
+found an eight-pixel overflow that the headless layout did not reproduce;
+the application now reserves the caption edge explicitly. Native rectangle
+checks and a reviewed final Windows image confirm containment. Twelve focused
+chrome tests include narrow viewports and a user-selected full-menu threshold
+with the actual Show/Hide following Preview wording. The final image's scenario
+setup failed after capture; separate successful zero-capture navigation and
+full-menu/Preview runs qualify behavior. Failed receipts remain intact.
+
+The independent-pane intake adds `ScopeNavigation::try_map_bookmarks` at
+`9e91c7c95`. Live pane changes map only mutable visit and remembered-place
+bookmarks; the complete immutable Stemma encounter lineage, branches and owner
+cursor remain unchanged. Full `try_map` remains the admission/migration path.
+All 19 shared scope-navigation tests pass with the current Genet `4532fe0`
+supplier graph, including exact encounter preservation and failed-map atomicity.
+The earlier silent intake attempts were Cargo materializing Genet's 187,911
+tracked files. Their interruption records remain preserved; the completed
+intake passes both locked online and locked offline gates.
+
+Knot's independent-pane implementation is published at `1766bf2`, using Mere
+`9e91c7c95` and Genet `4532fe0`. The final serial library gate passes 362 tests
+with one existing diagnostic ignored. Source and Preview retain separate
+semantic positions, explicit pane presence, and the last active view. Scrolling
+an inactive pane does not move focus. Source and rendered-text digests guard
+restoration; old single-position anchors migrate without retaining runtime tile
+or DOM identity. Pin/close refreshes update mutable bookmarks, and restoration
+preserves foreign pinned readers instead of opening a replacement over them.
+
+The final Windows native binary passes seed, reopen/close, closed-pane restart,
+and explicit Preview reopen at 72, 20, 7, and 30 presented frames. Preview byte
+2427 restores exactly. The saved Source target 8133 remains inside the live
+rendered viewport after the split; its first-visible sample normalizes to 8063
+when text wraps differently. The visibility witness reads DOM/layout geometry
+independently of saved navigation metadata and does not change text or selection.
+Fixture bytes remain unchanged throughout those runs. The reviewed two-pane
+image belongs to the immediately preceding binary; the final postimage is
+qualified by the no-image native runs. Full tile-layout persistence and native
+macOS/Linux visual qualification remain separate gates.
+
+Current publication and retained-environment details:
+`support/family-promotion/contextual-navigation-publication/qualification.json`.
+The primary checkouts receive the published work with unrelated staged and
+working changes preserved. The three temporary publication worktrees are
+removed; private fixture/recovery artifacts remain in ignored repository-local
+folders and stable Cargo targets remain reusable.

@@ -1,0 +1,12 @@
+RESULT fail
+FAIL: assert snap context_source_scroll_position Eq '8275': got '8202'
+FAIL: assert snap context_view Eq 'preview': got 'source'
+FAIL: assert snap preview_open Eq 'true': got 'false'
+FAIL: assert snap context_preview_present Eq 'true': got 'false'
+FAIL: assert snap context_source_scroll_position Eq '8275': got '8202'
+FAIL: assert snap context_scroll_kind Eq 'preview-byte': got 'source-byte'
+FAIL: assert snap context_scroll_position Eq '2427': got '8202'
+frames: 0 captured, 0 blank, 0 distinct digests
+presentation: 23 frames, 23 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":23,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":67,"phase":"submitted"}},"sequence":24}}
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("aria-label", "Show following Preview")) }

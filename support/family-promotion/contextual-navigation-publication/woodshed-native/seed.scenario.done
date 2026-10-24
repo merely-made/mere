@@ -1,0 +1,5 @@
+RESULT ok
+Two-Set contextual route seeded; normal close follows
+frames: 0 captured, 0 blank, 0 distinct digests
+presentation: 212 frames, 212 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":212,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":297,"phase":"submitted"}},"sequence":213}}

@@ -1,0 +1,233 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "status": "qualified and source published",
+  "objective": "Persistent app-defined navigation in Woodshed and Knot, independent Knot pane bookmarks, playback/edit separation, and platform frame ownership.",
+  "source_publication": {
+    "shared_initial": "3e305d1186d8c89441edfc66c9208664e016dd11",
+    "historical_receipts": "7632bbd32a00891b858335209a39f36f5777c0ae",
+    "shared_bookmark_only_mapper": "9e91c7c952a2cd06f23eefe5af4351f4ab398fb6",
+    "upstream_preserved": "91d4086e79a366fb74d1f865252f549893728cf5",
+    "receipt_commit": "See this file in Git history; receipt identity is separate from source qualification.",
+    "latest_upstream_preserved_before_receipt_commit": "9b782950ce8ba9ca21ef31eb994315283ad5cc1c"
+  },
+  "shared": {
+    "current_scope_tests": 19,
+    "current_genet": "4532fe03755bdb61eee7847ebeb8ad47bda37d96",
+    "bookmark_only_gate": {
+      "path": "support/family-promotion/contextual-navigation-publication/shared-checks/bookmark-only-history.json",
+      "bytes": 2816,
+      "sha256": "cfc91bc01323b90128fa14abe41661fc04a156f9ccdefec79f5438cd367ae819"
+    },
+    "initial_qualified_graph": {
+      "mere": "7632bbd32a00891b858335209a39f36f5777c0ae",
+      "genet": "2b5c01811e6051ecd815cb407ff1ec9b40724fc9",
+      "scope_history": 17,
+      "host_input": 19,
+      "titlebar_integration": 7,
+      "platform_policy": 2,
+      "browser_compatibility": 50,
+      "standalone_browser_wasm": "passed"
+    },
+    "history_authority": "Chartulary/Stemma immutable encounters, branches and cursor; mutable view bookmarks stay separate. App scopes/routes/admission and storage remain app-owned."
+  },
+  "apps": {
+    "woodshed": {
+      "head": "91b2dd5b905b190ad38295cdad8576196cf3970e",
+      "lock_git_blob": "678f9925d44a0c4a1287fb4b9793fc4be80e3999",
+      "primary_lock_bytes_sha256": "3d149ab86ba8ec53ffdd6c44814cb96a9246c6e1fca1e3cc5fd6bb6a41ad3115",
+      "branch_main_identities": {
+        "mere": "git+https://github.com/merely-made/mere.git?branch=main#7632bbd32a00891b858335209a39f36f5777c0ae",
+        "genet": "git+https://github.com/merely-made/genet.git?branch=main#2b5c01811e6051ecd815cb407ff1ec9b40724fc9"
+      },
+      "qualified_source_commit": "de7b8dc2339c5b4c87ef1845f22bccd7974d58e4",
+      "qualification": {
+        "path": "support/family-promotion/contextual-navigation-publication/woodshed-native/portable-attempt-01/portable-qualification.json",
+        "bytes": 3587,
+        "sha256": "72551a3a6819a71601cb2c26aa494c996870202c8112ef56500e667701855fc6"
+      },
+      "tests": {
+        "navigation": 9,
+        "card_context": 1,
+        "storage": 1,
+        "frame": 2,
+        "audio_library": 174,
+        "locked_metadata": "passed",
+        "native_build": "passed"
+      },
+      "native": "Real isolated synthetic unlocked Djinn Keeper; 212-frame seed and 171-frame fresh-process reopen restore exact owner-qualified Card/music/camera with stopped playback. Back restores newer Overview zoom1.25, older1.0, then the other owner.",
+      "binary": {
+        "path": "C:/t/cargo-targets/woodshed/debug/woodshed-genet.exe",
+        "sha256": "d0d0548dfd57856c6cc3eacbf5239fea58b2323863e2a0adb8bc2f723473923d"
+      }
+    },
+    "knot": {
+      "head": "1766bf2119571b482f2007bc811966f629dcf160",
+      "lock_git_blob": "c97448700823a5ed5056ed0f3b48d3fe9c33ddcd",
+      "primary_lock_bytes_sha256": "0a15d4cf9803334c59d5fb9f40b65767f4efb81cdeded749fd6aeb84b6ddcad6",
+      "branch_main_identities": {
+        "mere": "git+https://github.com/merely-made/mere.git?branch=main#9e91c7c952a2cd06f23eefe5af4351f4ab398fb6",
+        "genet": "git+https://github.com/merely-made/genet.git?branch=main#4532fe03755bdb61eee7847ebeb8ad47bda37d96"
+      },
+      "baseline_commit": "8ab52681ec94e63050a04ead969a188c03e3a616",
+      "tests": {
+        "serial_library": {
+          "passed": 362,
+          "failed": 0,
+          "ignored": 1,
+          "ignored_scope": "Existing long-outline diagnostic."
+        },
+        "scenario_integration": 1,
+        "topology_and_migration": 4,
+        "focused_per_pane_focus_and_pinned_reader": "passed; overlaps library total",
+        "locked_online_metadata": "passed",
+        "locked_offline_metadata": "passed",
+        "native_build": "passed"
+      },
+      "portable_metadata_verification": {
+        "mere_packages": 51,
+        "genet_packages": 25,
+        "all_branch_main_manifests_from_exact_cargo_git_checkout": true,
+        "private_full_metadata": "knot-editor/.cargo/local/context-publication-worktree-recovery/.cargo/local/context-continuation-metadata-locked-offline.log"
+      },
+      "binary": {
+        "path": "C:/t/cargo-targets/knot-editor/debug/knot.exe",
+        "sha256": "aad0ccce52f08e7938907e46a7c56b4ff188ab1418e267f1dfe1788de8f6658c"
+      },
+      "native_runs": [
+        {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/final-seed/scenario.done",
+          "bytes": 304,
+          "sha256": "680ab5b9c73fbb49e5cbf7aaa9d20d57b2053787b9f9015283ac2c64114939ac",
+          "result": "passed",
+          "presented_frames": 72
+        },
+        {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/final-reopen-close/scenario.done",
+          "bytes": 304,
+          "sha256": "3166152677c1a34207a8b08804c408f7bf8e7d1de0e94df75d74d9c2e4e4c959",
+          "result": "passed",
+          "presented_frames": 20
+        },
+        {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/final-closed-preview-reopen/scenario.done",
+          "bytes": 300,
+          "sha256": "e760703daccd7b2f85c8b1f2509bc5eea107e1b0b6c938f12f7ab9add18c1ca1",
+          "result": "passed",
+          "presented_frames": 7
+        },
+        {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/explicit-preview-reopen-postimage/scenario.done",
+          "bytes": 304,
+          "sha256": "e6b447e8b7efe302d3aee65466e66d22fb97916e77961d6af4f3fb55db6b889d",
+          "result": "passed",
+          "presented_frames": 30
+        }
+      ],
+      "restoration": {
+        "source_semantic_target_byte": 8133,
+        "source_sample_after_reflow": 8063,
+        "source_target_inside_independent_rendered_visible_range": true,
+        "preview_byte": 2427,
+        "preview_exact": true,
+        "both_panes_restored": true,
+        "closed_preview_stays_closed_until_explicit_open": true,
+        "last_active_view_restored": true,
+        "inactive_scroll_keeps_focus": true,
+        "pinned_reader_identity_and_presentation_preserved": true,
+        "source_and_rendered_digests_checked": true,
+        "runtime_dom_and_tile_ids_persisted": false,
+        "source_body_in_navigation": false,
+        "explicit_open_recipe": {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/explicit-preview-reopen-postimage/acceptance.scn",
+          "bytes": 948,
+          "sha256": "7c38d132f2a05f64435c887774a74b4944bd29a1b140c09ba9a616083553d364"
+        }
+      },
+      "fixture": {
+        "path": "knot-editor/scenarios/fixtures/context_scroll.djot",
+        "sha256": "1af8c05d3fe7c801cb11bb9bff53d3ee2c973830aee92365d56f7c78ee3efcc5",
+        "unchanged_across_native_runs": true,
+        "historical_normalization": "The initial published baseline removed one trailing space and used the Windows checkout line endings. Historical bc93b9b4 receipts remain unchanged; current fixture hash is the one recorded here."
+      },
+      "visual": {
+        "accepted_capture": {
+          "path": "support/family-promotion/contextual-navigation-publication/knot-native/pane-continuation-final/reopen-close-preview/capture/reopened-preview-scroll.png",
+          "bytes": 1505513,
+          "sha256": "2026267d342b029668c86e3566ae67279063c19ecab33812d48702d05f6a1e89"
+        },
+        "capture_binary_sha256": "85fd1a3b77908370f2f816465db5aac313498982c2e3894fe529a7b54aa80aa2",
+        "scope": "Both panes visibly deep and full caption controls contained. The final binary is separately qualified without additional PNGs.",
+        "pane_flow_png_count": 2,
+        "failed_setup_image_retained": true
+      }
+    }
+  },
+  "platform_chrome": {
+    "defaults": {
+      "windows": "application frame and shared explicit captions",
+      "macos": "host frame and native controls",
+      "linux": "host frame and native controls"
+    },
+    "override": "HostOptions retains explicit frame selection; Knot keeps configurable compact/full-menu threshold.",
+    "windows_checks": "Pure platform policy plus headless540/700/1000 bounds, full-menu1150 and user-threshold1000 checks, native caption geometry and reviewed Windows captures.",
+    "knot_native_caption_edge": "Native1000px group originally ended1008; app-local12px reservation ends996.",
+    "preview_labels": [
+      "Show following Preview",
+      "Hide following Preview"
+    ],
+    "macos_linux_headed": "not run"
+  },
+  "workspace_preservation": {
+    "all_three_primary_checkouts_integrated": true,
+    "mere_unrelated_staged_patch_preserved_exactly": true,
+    "mere_staged_patch_sha256": "98e7f78073a107ac759653591eda5914d3630d1f13e2c9ae052857a41ac46af1",
+    "woodshed_and_knot_source_clean": true,
+    "private_artifacts_relocated_with_hash_checks": true,
+    "temporary_worktrees_removed": [
+      "C:/Users/mark_/Code/worktrees/mere-context-navigation-publication",
+      "C:/Users/mark_/Code/worktrees/woodshed-context-navigation-publication",
+      "C:/Users/mark_/Code/worktrees/knot-editor-context-navigation-publication"
+    ],
+    "isolated_cargo_homes": [],
+    "isolated_targets_retained": [],
+    "all_owned_app_keeper_and_cargo_processes_stopped": true
+  },
+  "retained_environment": {
+    "stable_targets": {
+      "mere": "C:/t/cargo-targets/mere",
+      "woodshed": "C:/t/cargo-targets/woodshed",
+      "knot-editor": "C:/t/cargo-targets/knot-editor"
+    },
+    "target_owner": "Existing repository build caches reused.",
+    "private_recovery_roots": [
+      "mere/.cargo/local/context-publication-primary-integration",
+      "woodshed/.cargo/local/context-publication-worktree-recovery",
+      "knot-editor/.cargo/local/context-publication-worktree-recovery",
+      "knot-editor/.cargo/local/context-publication-runtime/portable-baseline-profile"
+    ],
+    "reason": "Preserve private synthetic fixture state, exact metadata, failed receipts, receiving locks and source recovery without publishing persona data.",
+    "generated_cache_cleanup": "Stopped marker-verified2.147GB Woodshed preflight build cache removed; reproducible Git-blob/duplicate dry-run caches and completed alternate indices removed with hash records."
+  },
+  "limits": [
+    "Native evidence is Windows; macOS/Linux native visual qualification remains open.",
+    "Knot stores two pane positions/presence and active view, not the complete workspace tile layout.",
+    "Source anchors may normalize to wrapped line starts after reflow; the saved target remains in the measured visible range.",
+    "Woodshed custody acceptance uses a synthetic isolated persona; physical audio quality/latency are separate.",
+    "Retention/pruning and branch-selection UI remain host policy; restored snapshots retain the100000-visit guard.",
+    "Failed setup/camera-expectation runs, exact-byte assumptions across reflow, parallel recovery-timer failure and interrupted supplier materialization attempts are retained and are not counted as passes."
+  ],
+  "receipt_budget": {
+    "basis": "Windows working-file bytes immediately before final publication. Includes historical/public receipts, both app .cargo trees conservatively, receiving locks and private recovery. Source checkouts and reusable targets are excluded. Temporary alternate-index caches are removed after publication.",
+    "previous_measured_bytes": 22268482,
+    "combined_measured_bytes": 50680779,
+    "new_measured_bytes": 28412297,
+    "reserved_final_publication_metadata_bytes": 500000,
+    "combined_upper_bound_bytes": 51180779,
+    "new_upper_bound_bytes": 28912297,
+    "combined_cap_bytes": 55000000,
+    "new_cap_bytes": 30000000,
+    "files": 787,
+    "within_both_caps": true
+  }
+}

@@ -1,0 +1,2 @@
+woodshed-genet: Two-Set contextual route seeded; normal close follows
+woodshed-genet: RESULT ok (212 frames, 0 captures)
