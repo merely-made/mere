@@ -124,6 +124,19 @@ available to other clients. An active resident or another owner's unit is
 preserved; a stopped unit's stale socket is removed only after checking its
 type, owner, inode and absence of a listener.
 
+An existing Windows OS-protected vault without a passphrase uses
+`djinn --enroll-passphrase --native` for first enrollment. It asks twice in
+masked native prompts, preserves the existing root and profiles, and refuses
+cancellation, unavailable UI or an already-enrolled vault without a terminal
+fallback. A persisted lock must first be opened with Windows Hello. Subsequent
+changes use Dramatis's **Change passphrase…** action.
+
+When native authentication is needed, an installed resident may use
+`--prefer-passphrase` to open the vault-passphrase box directly, including during
+cold startup and Dramatis unlocks. This requires an already-enrolled passphrase for an OS-protected vault;
+it does not unlock storage or bypass verification. Without the option, native
+unlocks continue to offer OS presence first.
+
 `personae-vault generate-ssh <comment>` creates an Ed25519 SSH key inside
 Djinn and prints only its public half. The existing persona master remains
 unchanged. The key uses session unlock, is held in the encrypted vault, and

@@ -38,13 +38,13 @@ use windows_sys::Win32::UI::Input::KeyboardAndMouse::SetFocus;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetForegroundWindow,
     GetMessageW, GetWindowTextW, GetWindowTextLengthW, MessageBoxW, PostQuitMessage,
-    RegisterClassExW, SendMessageW, SetForegroundWindow, ShowWindow, TranslateMessage,
+    RegisterClassExW, SendMessageW, SetForegroundWindow, SetWindowPos, TranslateMessage,
     CREATESTRUCTW, MSG, WNDCLASSEXW, WS_OVERLAPPED, WS_CAPTION, WS_SYSMENU, WS_VISIBLE, WS_CHILD,
     WS_TABSTOP, WS_EX_DLGMODALFRAME, WS_EX_TOPMOST, WS_EX_TOOLWINDOW, CW_USEDEFAULT, ES_PASSWORD,
     ES_AUTOHSCROLL, MB_DEFBUTTON1, MB_DEFBUTTON2, MB_DEFBUTTON3, MB_ICONERROR, MB_ICONINFORMATION,
     MB_ICONQUESTION, MB_ICONWARNING, MB_OK, MB_OKCANCEL, MB_TOPMOST, MB_YESNO, MB_YESNOCANCEL,
     WM_COMMAND, WM_CREATE, WM_CLOSE, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC, WM_DESTROY, WM_SETFONT,
-    WM_SETFOCUS, IDNO, IDOK, IDYES, SW_SHOW,
+    WM_SETFOCUS, IDNO, IDOK, IDYES, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW,
 };
 
 use crate::helpers;
@@ -589,7 +589,12 @@ fn password_dialog(title: &str, message: &str) -> Option<String> {
         return None;
     }
     unsafe {
-        ShowWindow(hwnd, SW_SHOW);
+        // A hidden resident launch can suppress ShowWindow's initial show.
+        // Show this explicitly requested prompt without inheriting that state.
+        SetWindowPos(
+            hwnd, std::ptr::null_mut(), 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW,
+        );
         SetForegroundWindow(hwnd);
         // 焦点由 WM_SETFOCUS 处理转给 Edit 控件。
     }
@@ -905,6 +910,108 @@ fn colorref_to_rgb(val: u32) -> RgbColor {
 #[cfg(test)]
 mod password_tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires an interactive Windows desktop; public prompts auto-cancel"]
+    fn hidden_launch_does_not_hide_password_prompt() {
+        use windows_sys::Win32::Foundation::{CloseHandle, WAIT_OBJECT_0};
+        use windows_sys::Win32::System::Threading::{
+            CreateProcessW, GetExitCodeProcess, PROCESS_INFORMATION, STARTF_USESHOWWINDOW,
+            STARTUPINFOW, TerminateProcess, WaitForSingleObject,
+        };
+        let executable = std::env::current_exe().unwrap();
+        let executable = to_wide_z(executable.to_str().unwrap());
+        let mut command = to_wide_z(
+            "fixture --exact windows::gui::password_tests::hidden_launch_password_child --ignored --nocapture",
+        );
+        let mut startup: STARTUPINFOW = unsafe { std::mem::zeroed() };
+        startup.cb = std::mem::size_of::<STARTUPINFOW>() as u32;
+        startup.dwFlags = STARTF_USESHOWWINDOW;
+        startup.wShowWindow = 0; // The installed launcher's SW_HIDE.
+        let mut process: PROCESS_INFORMATION = unsafe { std::mem::zeroed() };
+        unsafe {
+            assert_ne!(
+                CreateProcessW(
+                    executable.as_ptr(),
+                    command.as_mut_ptr(),
+                    std::ptr::null(),
+                    std::ptr::null(),
+                    0,
+                    CREATE_NO_WINDOW,
+                    std::ptr::null(),
+                    std::ptr::null(),
+                    &startup,
+                    &mut process
+                ),
+                0
+            );
+            let waited = WaitForSingleObject(process.hProcess, 15000);
+            if waited != WAIT_OBJECT_0 {
+                TerminateProcess(process.hProcess, 124);
+                WaitForSingleObject(process.hProcess, 5000);
+            }
+            let mut exit = 0;
+            let got_exit = GetExitCodeProcess(process.hProcess, &mut exit);
+            CloseHandle(process.hThread);
+            CloseHandle(process.hProcess);
+            assert_eq!(waited, WAIT_OBJECT_0, "owned fixture timed out");
+            assert_ne!(got_exit, 0);
+            assert_eq!(exit, 0, "fixture failed: 41=hidden, 42=unmasked");
+        }
+    }
+
+    #[test]
+    #[ignore = "child of the bounded hidden-launch desktop test; never collects input"]
+    fn hidden_launch_password_child() {
+        use std::time::{Duration, Instant};
+        use windows_sys::Win32::UI::WindowsAndMessaging::{
+            FindWindowW, GWL_STYLE, GetDlgItem, GetWindowLongW, IsWindowVisible, PostMessageW,
+        };
+        for attempt in 0..2 {
+            let title = format!(
+                "Public hidden-startup fixture {} {attempt}",
+                std::process::id()
+            );
+            let observer_title = title.clone();
+            let observer = std::thread::spawn(move || {
+                let deadline = Instant::now() + Duration::from_secs(5);
+                loop {
+                    let hwnd = unsafe {
+                        FindWindowW(
+                            to_wide_z("tinyfd_password").as_ptr(),
+                            to_wide_z(&observer_title).as_ptr(),
+                        )
+                    };
+                    if !hwnd.is_null() {
+                        let visible = unsafe { IsWindowVisible(hwnd) != 0 };
+                        if visible || Instant::now() >= deadline {
+                            let edit = unsafe { GetDlgItem(hwnd, ID_EDIT as i32) };
+                            let masked = !edit.is_null()
+                                && unsafe { GetWindowLongW(edit, GWL_STYLE) } & ES_PASSWORD as i32
+                                    != 0;
+                            unsafe {
+                                PostMessageW(hwnd, WM_CLOSE, 0, 0);
+                            }
+                            return (visible, masked);
+                        }
+                    }
+                    assert!(
+                        Instant::now() < deadline + Duration::from_secs(1),
+                        "fixture window missing"
+                    );
+                    std::thread::sleep(Duration::from_millis(20));
+                }
+            });
+            assert!(password_dialog(&title, "Public fixture; automatically cancelled").is_none());
+            let (visible, masked) = observer.join().unwrap();
+            if !visible {
+                std::process::exit(41);
+            }
+            if !masked {
+                std::process::exit(42);
+            }
+        }
+    }
 
     #[test]
     fn password_windows_can_be_created_again_after_cancellation() {

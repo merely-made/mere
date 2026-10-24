@@ -89,6 +89,7 @@ pub trait NativeIdentityUi: Send + Sync {
 #[derive(Clone, Debug, Default)]
 pub struct SystemNativeIdentityUi {
     picker_start: Option<PathBuf>,
+    prefer_passphrase: bool,
 }
 
 impl SystemNativeIdentityUi {
@@ -96,7 +97,15 @@ impl SystemNativeIdentityUi {
     pub fn with_picker_start(path: PathBuf) -> Self {
         Self {
             picker_start: Some(path),
+            ..Self::default()
         }
+    }
+
+    /// Choose the enrolled passphrase directly for native vault unlocks.
+    /// This changes prompt selection only; the storage still verifies the credential.
+    pub fn with_passphrase_preference(mut self, prefer: bool) -> Self {
+        self.prefer_passphrase = prefer;
+        self
     }
 
     fn dialog_backend() -> DialogBackend {
@@ -257,6 +266,9 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
 
     /// Windows Hello through personae's gate, which alone mints the proof.
     fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
+        if self.prefer_passphrase {
+            return Ok(None);
+        }
         tracing::debug!("checking native presence availability");
         let availability = castellan::custody::unlock::presence_availability();
         tracing::debug!(?availability, "native presence availability answered");
@@ -562,6 +574,24 @@ mod tests {
             linux_password_answer(Some(0), vec![255]),
             Err(NativeIdentityFailure::UiUnavailable)
         ));
+    }
+
+    #[test]
+    fn preferred_passphrase_does_not_wait_for_os_consent() {
+        let (send, receive) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let result = SystemNativeIdentityUi::default()
+                .with_passphrase_preference(true)
+                .verify_presence();
+            send.send(result).unwrap();
+        });
+        assert!(
+            receive
+                .recv_timeout(std::time::Duration::from_secs(2))
+                .expect("passphrase selection must not wait for an OS consent dialog")
+                .unwrap()
+                .is_none()
+        );
     }
 
     struct ScriptedUi {
