@@ -184,9 +184,9 @@ authors = ["Mark AB (markik)"]
 # `~/.claude/.../memory/feedback_workspace_pins_drive_probes.md`: workspace
 # pins canonically, probes adapt; pick once with the user, don't churn.
 [workspace.dependencies]
-wgpu-cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", rev = "94ba59574838a70c8283d3f5d3cf3ddbb838cfc5" }
+wgpu-cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", rev = "e18584a80e5cf23268ea0330ee70386b01e25de8" }
 webcue = "=0.1.1"
-wgpu-cue = "=0.1.1"
+wgpu-cue = "=0.1.2"
 # ─── Workspace-internal path deps ────────────────────────────────────────────
 # Every workspace member listed here; consumers do `dep.workspace = true`
 # so only the root Cargo.toml knows where each crate lives. Package names
