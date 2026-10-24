@@ -1,0 +1,773 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-24T07:37:13.7350827Z",
+  "status": "implementation-qualified-with-receipt-budget-overrun",
+  "objective": "Persist app-defined contextual navigation in Woodshed and Knot, restore Knot reading positions, then repair valid-tone audio admission.",
+  "ordering": "Phase-one focused and native gates passed before audio implementation. Final broader checks then hardened browser ownership and Knot outline/layout behavior.",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "host": "x86_64-pc-windows-msvc",
+  "source_publication": {
+    "state": "Local uncommitted changes on main; no publication or portable app repin.",
+    "app_portable_locks": "Unchanged from prior qualification, verified SHA-256.",
+    "mere_portable_locks": "Root and web locks each add the direct Cambium chartulary and serde_json dependency names.",
+    "shared_workspace": "Mere includes pre-existing concurrent WIP. Source hashes include current modified Rust and Cargo files for receiving identity; unrelated work was preserved."
+  },
+  "architecture": {
+    "history": "Eidetic Chartulary/Stemma owns visits, branches, owner cursor and immutable encounter contexts; mutable view bookmarks remain separate. Existing app stores persist snapshots.",
+    "woodshed": "Overview, owning Set and Card occurrence remain application-defined. Existing persisted session stores opaque navigation JSON. Cold encrypted FsBackend reopen is tested; navigation does not reactivate playback.",
+    "knot": "Site, admitted document and recursive headings remain application-defined. Existing atomic preferences store stable addresses and source-bound anchors; runtime document/tile IDs are rebound only to already admitted documents.",
+    "knot_scroll": "Source UTF-8 byte and Preview rendered-text byte anchors restore through shared retained-layout query/reveal hooks. Digests refuse stale anchors; heading/block fallbacks remain for other previews.",
+    "rejected_data": "Both apps preserve rejected navigation bytes through unrelated saves until an accepted explicit route replaces them.",
+    "audio": "Bounded integer-cycle PCM remains the fast path. Otherwise-valid tones may use a 4096-frame periodic table, Q64 phase and linear interpolation. Preparation preserves 1 ppm phase-step admission, 65536 per-tone frames, 16777216 aggregate frames and 256 tones/voices. Callback work has no allocation, freeing or trigonometry."
+  },
+  "tests": {
+    "shared_history": {
+      "passed": 17,
+      "log": "shared-history-validation.log"
+    },
+    "shared_input_routing": {
+      "passed": 19,
+      "log": "shared-input-routing-observation.log"
+    },
+    "browser_compatibility": {
+      "passed": 50,
+      "log": "forme-owner-graph-guard.log",
+      "new_regression": "Foreign immutable visit context cannot be masked by a valid owner-graph bookmark."
+    },
+    "browser_wasm": {
+      "result": "pass",
+      "target": "wasm32-unknown-unknown",
+      "features": [
+        "product",
+        "presentation-webgpu"
+      ],
+      "log": "browser-product-owner-graph-guard-wasm.log"
+    },
+    "woodshed": {
+      "navigation": 8,
+      "owner_switch": 1,
+      "memory_session_roundtrip": 1,
+      "encrypted_fresh_handle_roundtrip": 1,
+      "audio_library": 174,
+      "native_build": "pass"
+    },
+    "knot": {
+      "library_serial": {
+        "passed": 357,
+        "failed": 0,
+        "ignored": "Existing outline long-document diagnostic timing probe.",
+        "seconds": 249.83,
+        "log": "context-continuation-library-serial1.log"
+      },
+      "post_snapshot_sharing": {
+        "outline_focus": 1,
+        "stale_outline": 1,
+        "contextual_history": 3,
+        "route_bookmarks": 3
+      },
+      "preview_filter": 28,
+      "native_build": "pass",
+      "overlap": "Focused filters overlap the library suite and are not added to its total."
+    }
+  },
+  "native": [
+    {
+      "name": "woodshed-phase-one-native",
+      "result": "pass",
+      "presented_frames": 186,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/woodshed-phase-one-native/scenario.done",
+        "bytes": 662,
+        "sha256": "80595af35635bb088da7c8d463c2a87393e24e4bbcb0689f4f2d44ded86f3b51"
+      },
+      "captures": [
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/woodshed-phase-one-native/01_card_occurrence_with_owner_running.png",
+          "bytes": 495205,
+          "sha256": "3f468c735f9808ffb2ae69dbc47ff319fa9a2c35a35c00717ce3cab9b0c0ac21"
+        }
+      ]
+    },
+    {
+      "name": "knot-text-native",
+      "result": "pass",
+      "presented_frames": 65,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-native/scenario.done",
+        "bytes": 550,
+        "sha256": "7686c24e2edef51c4380ab80c70fde9d4fade6f6b71241a020dbcbb423743846"
+      },
+      "captures": [
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-native/source-and-preview-return.png",
+          "bytes": 1803853,
+          "sha256": "4233f8d0671a94911c05dcfa91b9ad6ea138f33697e1e58cd2d7f1fe11828a51"
+        }
+      ]
+    },
+    {
+      "name": "knot-text-reopen-native",
+      "result": "pass",
+      "presented_frames": 6,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-reopen-native/scenario.done",
+        "bytes": 547,
+        "sha256": "5a393d05bb6450261a42285cdeb6739f86980381fdeb9819c073fa8b8c720c0c"
+      },
+      "captures": [
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-reopen-native/reopened-preview-scroll.png",
+          "bytes": 1683046,
+          "sha256": "136ce2884b8c5243b8bc36db7e1c88f8f36f4dcbfa2a00a10b970ea483dfebff"
+        }
+      ]
+    },
+    {
+      "name": "knot-text-stable-native",
+      "result": "pass",
+      "presented_frames": 12,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-stable-native/scenario.done",
+        "bytes": 551,
+        "sha256": "f44b3f2808281c88d03f64a32ecd7e8bcf50b48ebbd83a94ebca56442df8bc77"
+      },
+      "captures": [
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-stable-native/reopened-preview-scroll.png",
+          "bytes": 1683047,
+          "sha256": "c512fbbd99d70acfa6312f8afaf058870aec497ab7730c694e922751d1b451f5"
+        }
+      ]
+    },
+    {
+      "name": "woodshed-audio-native",
+      "result": "pass",
+      "presented_frames": 136,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/woodshed-audio-native/scenario.done",
+        "bytes": 896,
+        "sha256": "f81fc93473a1ae463b6418da9c8dde01ab63c06d8b8e3135de2ed32865ea98e2"
+      },
+      "captures": [
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/woodshed-audio-native/01_card2_playing.png",
+          "bytes": 578218,
+          "sha256": "ef1c7b0ebe630ac7457b6e232583527c7497d2b2027852c261a8edbad2961575"
+        },
+        {
+          "path": "mere/support/family-promotion/contextual-navigation-continuation/woodshed-audio-native/02_set_complete_stopped.png",
+          "bytes": 508891,
+          "sha256": "fc1ecbfe875c09f77730708c810d178ad0dcd0056e3a15e6997a903270692cdc"
+        }
+      ]
+    },
+    {
+      "name": "knot-final-native",
+      "result": "pass",
+      "presented_frames": 64,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-final-native/scenario.done",
+        "bytes": 304,
+        "sha256": "5671471dde898ce769ae53ad40de49b885b76108af229dd5f33356f106b6dc42"
+      },
+      "captures": []
+    },
+    {
+      "name": "knot-final-reopen-native",
+      "result": "pass",
+      "presented_frames": 11,
+      "receipt": {
+        "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-final-reopen-native/scenario.done",
+        "bytes": 304,
+        "sha256": "b9656f4f849b62f199cb6af9723ac34129072d9cb9b99cc74e112a91036c4aac"
+      },
+      "captures": []
+    }
+  ],
+  "native_observations": {
+    "woodshed_card2": {
+      "program": {
+        "active_frames": 27342,
+        "bpm": 240,
+        "card_frames": 27342,
+        "card_index": 1,
+        "card_token": 2,
+        "device_frame": 501946,
+        "event_index": 7,
+        "event_token": 7,
+        "status": "Playing"
+      },
+      "rehearsal_paused": false,
+      "rehearsal_running": true,
+      "sample_rate": 44100
+    },
+    "woodshed_complete": {
+      "program": {
+        "active_frames": 44100,
+        "bpm": 240,
+        "card_frames": 44100,
+        "card_index": 2,
+        "card_token": 3,
+        "device_frame": 649681,
+        "event_index": 4,
+        "event_token": 4,
+        "status": "Complete"
+      },
+      "rehearsal_paused": false,
+      "rehearsal_running": false,
+      "sample_rate": 44100
+    },
+    "knot_exact_restart": {
+      "expected_preview_byte": 2761,
+      "view": "Preview",
+      "fixture_sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0"
+    },
+    "visual_review": "Phase-one Woodshed, Knot Source/Preview and initial reopen rasters were reviewed. Both audio rasters were reviewed. Final Knot hardening reruns omitted captures and passed 64 and 11 frames.",
+    "woodshed_persistence": "Native isolated vault was locked. Save/reopen evidence is the real encrypted filesystem backend with fresh handles and isolated fixture persona, not live-custody UI persistence.",
+    "knot_final": "Final native binary passed Source and Preview Back restoration, then a fresh process at the exact saved Preview byte 2761. Fixture bytes stayed unchanged."
+  },
+  "fixture": {
+    "path": "knot-editor/scenarios/fixtures/context_scroll.djot",
+    "bytes": 9609,
+    "sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0"
+  },
+  "source_identity": {
+    "sources": {
+      "mere": {
+        "head": "4c13036a42c38342a65f4b628eb86a4233191072",
+        "branch": "main",
+        "files": [
+          {
+            "path": "mere/Cargo.lock",
+            "bytes": 505579,
+            "sha256": "d0f102a272fafc8f17c76b88faef0b4ae113f36dc45c46e61170f0f6a4d14e74"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-genet-winit-host/src/harness.rs",
+            "bytes": 35466,
+            "sha256": "29863a82cd8d46410c49fb889903e7601c22a1b94824dfd281c02ec0e1029674"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-genet-winit-host/tests/input_routing.rs",
+            "bytes": 26704,
+            "sha256": "8fef5e452bb4b1d71662f503276d12e809d5fb1ac6156bd1ff1f539a5e65f570"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/a11y_publication.rs",
+            "bytes": 3023,
+            "sha256": "a5672834a606eff33edf65147053dac31da5d8e13eab7b734b0081204ade5edc"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/embedding/egui_input.rs",
+            "bytes": 7023,
+            "sha256": "bdbaed19f986f64a27bab4961bf78f8b83bc1a96346655cb76085e2149c19f9d"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/embedding/iced_input.rs",
+            "bytes": 6865,
+            "sha256": "1bfbd0dee4b2435cded2b50fd7c34c3c1b0c2602244a51e32be7ae19464b37cc"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/embedding/tests.rs",
+            "bytes": 10268,
+            "sha256": "16e4637297d605b34693183eb703150d2aadce928c7f8ca1fbe4f592aec8d170"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/frame.rs",
+            "bytes": 58405,
+            "sha256": "a37db394f6c779e8279e16c7a57f64fdde6a0c66e841ea40ab36b2456de7afe7"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/host.rs",
+            "bytes": 98231,
+            "sha256": "2b0e468dd8e5dd4f8dc1e1ea5f4b3c767eaaeab6809c3064c1f336174f05e2b3"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/lib.rs",
+            "bytes": 49940,
+            "sha256": "569f4227247ac0979e8740632dd33080cacf6fe103bd8dac03a622d6e4bd7e19"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/mount_probe_tests.rs",
+            "bytes": 15386,
+            "sha256": "cf74c6be215b343a6dc78fb536549b230ac96d0b96c458cb44af1779867ab266"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/owned_layout.rs",
+            "bytes": 55543,
+            "sha256": "a2321035ac42069795c634726a3ac66eeed588190a29f601877e06f855473cd6"
+          },
+          {
+            "path": "mere/crates/cambium/cambium-rootstock/src/owned_layout/tests.rs",
+            "bytes": 19265,
+            "sha256": "502b2c2a44cf9d6decee3e9d0830263b61db291e6fc0a3b413ff60f9c5df769b"
+          },
+          {
+            "path": "mere/crates/cambium/cambium/Cargo.toml",
+            "bytes": 1496,
+            "sha256": "974721eeef11900813fc62c0e60600a99d8e1519d618e54239fb8f6eced95b45"
+          },
+          {
+            "path": "mere/crates/cambium/cambium/src/scope_navigation.rs",
+            "bytes": 19660,
+            "sha256": "fbac874e0f66174834eaf723a30170b16a63897e1c8e948f069c9e0df5e0fea6"
+          },
+          {
+            "path": "mere/crates/cambium/cambium/src/scope_navigation/history.rs",
+            "bytes": 31145,
+            "sha256": "0f2d39e0cf08b8458d40ccb11bded2672faef4271b0ee090e2bff3ce8323f0c3"
+          },
+          {
+            "path": "mere/crates/mere/src/navigation.rs",
+            "bytes": 9779,
+            "sha256": "efca1c9c5d67bcb9835cd8435b52aadb9b89895d5ce9347f8fa8f2053245bb27"
+          },
+          {
+            "path": "mere/crates/mere/src/navigation/browser.rs",
+            "bytes": 11079,
+            "sha256": "1513f3408ae45cf97277289a65d204174f8f32486f4fcea30066ebdb2c09d4c0"
+          },
+          {
+            "path": "mere/design_docs/mere_docs/implementation_strategy/2026-10-23_contextual_navigation_plan.md",
+            "bytes": 11395,
+            "sha256": "657b777029abc6015a095c2bcc5c272db0251060e0c5a2b89c8730b9d07d3efc"
+          },
+          {
+            "path": "mere/ports/graphshell/src/forme_session.rs",
+            "bytes": 51358,
+            "sha256": "7b09936bd7be1e6d04d54463d85f1844e696b23375222bcee018ba9434ebbe15"
+          },
+          {
+            "path": "mere/ports/graphshell/src/forme_workspace.rs",
+            "bytes": 18451,
+            "sha256": "30244fb6183787a984a3e1860c31e0c3feb8b39cc49abaf275e8ab821b4b5649"
+          },
+          {
+            "path": "mere/ports/graphshell/src/forme_workspace/tests.rs",
+            "bytes": 11224,
+            "sha256": "6c4cba4e8d2ab5aa27146a81298a26e28a9230831600ade6b0cd45de4f07ea4b"
+          },
+          {
+            "path": "mere/ports/graphshell/src/lib.rs",
+            "bytes": 4162,
+            "sha256": "db5a6eff4e2d7e4d2b0ea84a2c7e272570608a92cbeb2bfa907b6590f0d18932"
+          },
+          {
+            "path": "mere/ports/graphshell/src/scope_policy.rs",
+            "bytes": 762,
+            "sha256": "150580a06727e64da46ff012cd9149b27ef9d2c2960d8456756a918ab89635be"
+          },
+          {
+            "path": "mere/ports/graphshell/src/web_tree/forme.rs",
+            "bytes": 50998,
+            "sha256": "b17b7eb70f82908b810754d81e5d53cbff524e34efcbba51788dced66cb1d7b4"
+          },
+          {
+            "path": "mere/ports/graphshell/src/web_tree/scope_navigation.rs",
+            "bytes": 15097,
+            "sha256": "9a4f9ce5fe98662db4380a7581bfee62c2bf70be76b918922dad8c7db7770286"
+          },
+          {
+            "path": "mere/ports/graphshell/web/Cargo.lock",
+            "bytes": 286932,
+            "sha256": "b524061b8cc1e880633bbb3f2aa568e7497506a5c51f863920d525d80a1bb409"
+          },
+          {
+            "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-final-native/scroll.scn",
+            "bytes": 1102,
+            "sha256": "fa72f0814b70580defa29e4e877c62ec60e163e8f2f673275f777932aea34225"
+          },
+          {
+            "path": "mere/support/family-promotion/contextual-navigation-continuation/knot-text-stable-native/reopen-exact.scn",
+            "bytes": 271,
+            "sha256": "2c0f310611a737c6cd36fd8f07bacad16a7ef2623f0de8de2dd966eaf594f190"
+          }
+        ]
+      },
+      "woodshed": {
+        "head": "3ce93675179098b7d1c81da20cb4f63caa75e6b5",
+        "branch": "main",
+        "files": [
+          {
+            "path": "woodshed/crates/woodshed-audio/src/output_runtime/clock.rs",
+            "bytes": 21986,
+            "sha256": "9869cac30bc5d3f55d3a98c3788a15df1b3f55bfc21d385483fca86c3d352856"
+          },
+          {
+            "path": "woodshed/crates/woodshed-audio/src/output_runtime/processor.rs",
+            "bytes": 95696,
+            "sha256": "845b947975a5cdf8960ecec2bacbce3a47dc9e6fda478d7c4cfdbdf16c3f182c"
+          },
+          {
+            "path": "woodshed/crates/woodshed-audio/src/output_runtime/tests.rs",
+            "bytes": 82808,
+            "sha256": "800e8c501cfc098db5e6892ed26a078b5aa8cacac6204ba21c45d4660580464e"
+          },
+          {
+            "path": "woodshed/crates/woodshed-core/src/storage.rs",
+            "bytes": 56651,
+            "sha256": "a84cd2c256adfcbeabf88c13cb737f1b751658aebf1f250b30d983d37ce5acd4"
+          },
+          {
+            "path": "woodshed/crates/woodshed-genet/src/paths.rs",
+            "bytes": 3349,
+            "sha256": "6ada0b1b96108450945e0d7c812b533a054ca4934ae2cdcedbc8bffb31755903"
+          },
+          {
+            "path": "woodshed/crates/woodshed-genet/src/scenario.rs",
+            "bytes": 189391,
+            "sha256": "2fc4b105e773047046872f7f9766470a03a1bc2caf63c612b820e4a1039c2914"
+          },
+          {
+            "path": "woodshed/crates/woodshed-genet/src/scenario/guided_rehearsal.rs",
+            "bytes": 10850,
+            "sha256": "1d9ac01242689dadd793b9a96ecc36772fed440c444b739d286e1b448aded96f"
+          },
+          {
+            "path": "woodshed/crates/woodshed-genet/src/storage.rs",
+            "bytes": 58770,
+            "sha256": "2c3ac162fdf6df9e8c88fcdbe3ac13510033d00838b132bad184bbb17ccae093"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/stage.rs",
+            "bytes": 200648,
+            "sha256": "02a28ee70a252cc267677c78606829bd9407f19a3b971a6b9193f4465d9a7054"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/stage/contextual_navigation.rs",
+            "bytes": 36066,
+            "sha256": "c0442411e26c7ce8f6cc34b389eff65e6dc0289b73ac0c78cf895086d4abe15a"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/stage/instances.rs",
+            "bytes": 23515,
+            "sha256": "c4c57344c7dda6310fd5e7b352646894b8a08bbbb6627aa894d30a9e4d53ce48"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/stage/music_editor.rs",
+            "bytes": 65824,
+            "sha256": "bc308607e0b8dcd1e494a0d2d65bee24faf6546e9cf80fa989d3ed127cce104b"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/stage/overview.rs",
+            "bytes": 77758,
+            "sha256": "4287968d8b8425cbb487a20af1a5e26ceb3c580f44a0d9e8d82cab3e304d39ea"
+          },
+          {
+            "path": "woodshed/crates/woodshed-views/src/theme.rs",
+            "bytes": 46955,
+            "sha256": "04aa7126302d240cd180b10c778436d7ec7e51f811893fc7e017dc3e7bcf2504"
+          },
+          {
+            "path": "woodshed/design_docs/2026-10-23_contextual_navigation_plan.md",
+            "bytes": 7840,
+            "sha256": "703a627946fa0727e09ffda96ba1de668f91108f9b7e86621689edd2b0f8ae59"
+          },
+          {
+            "path": "woodshed/scenarios/context_navigation.scn",
+            "bytes": 1418,
+            "sha256": "c3d89585366c71b545c10bd02ebbd5e7c73a1f68502fac441b08da780e54a040"
+          },
+          {
+            "path": "woodshed/scenarios/stage_p6_card2_audio.scn",
+            "bytes": 1003,
+            "sha256": "5dc4a03f5c7a945729c2553d7c21866372b3c5b026ae0cef36061d99433f998e"
+          }
+        ]
+      },
+      "knot-editor": {
+        "head": "4dafff1f591c18a5b4d20e987054722d01406613",
+        "branch": "main",
+        "files": [
+          {
+            "path": "knot-editor/apps/desktop/src/context_navigation.rs",
+            "bytes": 8815,
+            "sha256": "1e9d7953239e655f8e5241e94754bac792ecc33efe5742a6ebe02262ad0b3914"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/document_preview.rs",
+            "bytes": 20996,
+            "sha256": "d071382d5ae93c43f3d7061a4415e72dfc3a55e16673823ee8df7f297ee4db69"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/documents.rs",
+            "bytes": 36342,
+            "sha256": "91f328b115c11acf24b9d36699b9eb03843d6bd61577b23c7cf4eacabdbc9464"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/lib.rs",
+            "bytes": 11215,
+            "sha256": "896139b7c0334fdbe8c70bcd5c42272a4c7020dac72c58e2e49113ed725229b5"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/preferences.rs",
+            "bytes": 24997,
+            "sha256": "ac6e24d954e9c280392eb88e9819856f21c3f472789fad1cda9f5c846bf84d7f"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/scroll_site.rs",
+            "bytes": 212783,
+            "sha256": "2376ed72ae07cb935dad1fb9650f1c2e813056fc952fa728885affcd709d4fa4"
+          },
+          {
+            "path": "knot-editor/apps/desktop/src/workspace.rs",
+            "bytes": 522336,
+            "sha256": "18bc1b454b00e3c38754af0e0b5f9846d85db702f4e491e17ca9b23206eb59f9"
+          },
+          {
+            "path": "knot-editor/apps/desktop/tests/scenario_lane.rs",
+            "bytes": 24524,
+            "sha256": "47fc7a2b6ea79ba4c1085114f1987ca335c066d707fa111eacec655a432e1c3c"
+          },
+          {
+            "path": "knot-editor/design_docs/2026-10-23_knot_context_navigation.md",
+            "bytes": 8870,
+            "sha256": "3b90b03f7a86c0dad97e5709cd14bfd9eb79acc35061a57e7a969ce3068bbfe8"
+          },
+          {
+            "path": "knot-editor/scenarios/context_navigation.scn",
+            "bytes": 1044,
+            "sha256": "6e835ef22f546748711998a28d804074834793f295077962328a111bcc33aa92"
+          },
+          {
+            "path": "knot-editor/scenarios/context_scroll_reopen.scn",
+            "bytes": 211,
+            "sha256": "15c1c8da41dbf6e870a6768444b3f9157fe1ba83c4f2e06a3cd948b2518f2bd3"
+          },
+          {
+            "path": "knot-editor/scenarios/context_scroll.scn",
+            "bytes": 1106,
+            "sha256": "8e3ae533e096f66c05883daab26cbc634ece87dea3f86b48da8466dd544fa907"
+          },
+          {
+            "path": "knot-editor/scenarios/fixtures/context_navigation.djot",
+            "bytes": 220,
+            "sha256": "eeb62129c64b381047b1fd12dfb57f215a0ff9baea2f1cb523437f17fe960b43"
+          },
+          {
+            "path": "knot-editor/scenarios/fixtures/context_scroll.djot",
+            "bytes": 9609,
+            "sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0"
+          }
+        ]
+      }
+    },
+    "receiving": [
+      {
+        "path": "mere/.cargo/scope-navigation/Cargo.lock",
+        "bytes": 484490,
+        "sha256": "68557af34c1a531fd5dc46700f7c15d20cea80e5f093a49544d1c29957937f1d"
+      },
+      {
+        "path": "mere/.cargo/scope-navigation/web/Cargo.lock",
+        "bytes": 275224,
+        "sha256": "95eb059f45596850ce4b2e69c2ad371b8c9f824241f73903658fd508642a347f"
+      },
+      {
+        "path": "woodshed/.cargo/scope-navigation-local.toml",
+        "bytes": 5249,
+        "sha256": "44d25e452a0dc003bc94e8c3d5d4aef68edad4d11d2f294b0dd4f0fa9fc73dcd"
+      },
+      {
+        "path": "woodshed/.cargo/local/Cargo.lock",
+        "bytes": 218538,
+        "sha256": "3a391380698db267bb3279a13e7a1fa4f059b4f5dd2dddfd105fdc2d878f9ea5"
+      },
+      {
+        "path": "knot-editor/.cargo/scope-navigation-local.toml",
+        "bytes": 8397,
+        "sha256": "0f8e611389e9ed34d2455f7225a1b0264de8e79cb2a08a566330f07d0f58a75d"
+      },
+      {
+        "path": "knot-editor/.cargo/local/Cargo.lock",
+        "bytes": 347440,
+        "sha256": "e4e8d27bd3179fba619101e342c348d0faf5ff54f959b501d61a455e01b5bfdf"
+      },
+      {
+        "path": "woodshed/Cargo.lock",
+        "bytes": 229518,
+        "sha256": "a67697fbdefca14acbb24b9ac46805bd720305f90e112ba9bdc607b1b15a7c19"
+      },
+      {
+        "path": "knot-editor/Cargo.lock",
+        "bytes": 361530,
+        "sha256": "b9225ea66b5ce9c480bbc90f67df19f4a398529f0785af1e9b21fa465c0748ba"
+      }
+    ],
+    "binaries": [
+      {
+        "path": "C:\\t\\cargo-targets\\woodshed\\debug\\woodshed-genet.exe",
+        "bytes": 102567424,
+        "sha256": "abbd831c270b8a3b6be50a50a0562c3fd223aac1fd6d96c289781fe71bdd2e8e",
+        "built_utc": "2026-10-24T07:10:24.0884222Z"
+      },
+      {
+        "path": "C:\\t\\cargo-targets\\knot-editor\\debug\\knot.exe",
+        "bytes": 114059776,
+        "sha256": "84213d7913511445dd725190b77781072d0228ad22bff110dad6c5fb3c485d9d",
+        "built_utc": "2026-10-24T07:30:43.4372535Z"
+      }
+    ]
+  },
+  "required_log_identity": [
+    {
+      "path": "mere/support/family-promotion/contextual-navigation-continuation/shared-history-validation.log",
+      "bytes": 10319,
+      "sha256": "b0753a32a82c821b3e30d33e3bd8486269dd2e625bcaea4a8ada0058576233aa"
+    },
+    {
+      "path": "mere/support/family-promotion/contextual-navigation-continuation/shared-input-routing-observation.log",
+      "bytes": 13375,
+      "sha256": "e662e3d6c395b623c8dd5436aaed9fb9485b365a7f71b74f3f56b8d791fafc0a"
+    },
+    {
+      "path": "mere/support/family-promotion/contextual-navigation-continuation/forme-owner-graph-guard.log",
+      "bytes": 2445,
+      "sha256": "c3a4dbaaec93e96e41a69f1d359e5284dc67a362466ee9826fba639fa0c55ff2"
+    },
+    {
+      "path": "mere/support/family-promotion/contextual-navigation-continuation/browser-product-owner-graph-guard-wasm.log",
+      "bytes": 660,
+      "sha256": "78d8c0065e6f8cb22b0a698624e14c83807cba5b6ea07287d427b3102fc4ddd4"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-woodshed-navigation4.log",
+      "bytes": 33861,
+      "sha256": "46d1824ed7c09523ddd83ea4a2c2cef250b9a3d973e1faa32e29ccd0a5db9f6b"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-scope-set-switch.log",
+      "bytes": 31865,
+      "sha256": "5bd1e5ea13102aea6cd456f38eeb88c0d55ea1b5d61f68654b13da5dc2ae51d6"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-core-storage.log",
+      "bytes": 8282,
+      "sha256": "37569eec55ce70fbbee7f1e82885b1d4c4c9c3449d83e9b68dc1976625c84d47"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-genet-storage3.log",
+      "bytes": 35028,
+      "sha256": "3ba16a3917447beeeda23bcd2d6ea39ac8fae58e5a2d0fbdb6d679add27ee8c2"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-audio-tests.log",
+      "bytes": 23509,
+      "sha256": "86b5638bc92152efbb507edc55d5a24fa0169ff3b8187c696b1f72e502874689"
+    },
+    {
+      "path": "woodshed/.cargo/local/context-continuation-audio-build.log",
+      "bytes": 35240,
+      "sha256": "ca443454d7df2c72f0ee7bfd1f9f1f9243dfcd01c360fbdc7fe2b3f6648bbc95"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-preview-all2.log",
+      "bytes": 46250,
+      "sha256": "2a21cc067b711983943515cb42e60b314efd09f4d964e97f511f568555d57846"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-scroll-scenario1.log",
+      "bytes": 43328,
+      "sha256": "31fc07cf08abfbf8e70da75d7dfc16d4f78407aed7a39311a31b8d2956cdf73b"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-library-final.log",
+      "bytes": 80532,
+      "sha256": "7896f0f2a147456366d30023480c546f3334dcaf88fc414ff163e9bba22f7a47"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-library-final2.log",
+      "bytes": 563,
+      "sha256": "315a2bc56a75d38d59e50604592c252fed087da2f33c8d08af06d65949c70a3e"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-library-serial1.log",
+      "bytes": 134,
+      "sha256": "ae614072ca05f4a09a866331879a4213a9ab31873c507ef2e53ea304ac3ef8f6"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-recovery-runtime-only1.log",
+      "bytes": 194,
+      "sha256": "dfb3bd3e88e83045bca10a1f303115ffdc33c282e4a0b6984b08254610b5a9ae"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-outline-after-arc1.log",
+      "bytes": 214,
+      "sha256": "9d081557e959f2e15d0acb82a3ea24314df360e3c00809ed05582b041e336db2"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-stale-outline-after-arc1.log",
+      "bytes": 212,
+      "sha256": "a02b898ef43c6c4d247e93d2245c8691080967ddf16bf10ec70d9185a464ec8e"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-contextual-after-arc1.log",
+      "bytes": 428,
+      "sha256": "6305a36dc1f1aa91626dfa31c91a39e9ab915e62f2578e959ca99278ce746148"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-topology-after-arc1.log",
+      "bytes": 472,
+      "sha256": "5caa5bf71550ea6730b8ac12fb4632c746213374bf75a2ccd8ca9bb29367b979"
+    },
+    {
+      "path": "knot-editor/.cargo/local/context-continuation-native-build2.log",
+      "bytes": 177,
+      "sha256": "426f44b57fad1f6dec1eef3152baf33376682912b157c4925d431fbafbfbdd36"
+    }
+  ],
+  "previous_qualification": {
+    "path": "mere/support/family-promotion/contextual-navigation/qualification.json",
+    "bytes": 14918,
+    "sha256": "f55facb7095698bfab88628e885852b54d851d123d41c91be6745d42422ef912"
+  },
+  "retained_failures": [
+    "Original prototype failures remain in their original receipt directory.",
+    "Knot heading-generic selectors collided with the new compass; retained rows now have specific selectors and captured source validation.",
+    "Knot Preview heading-only expectation was replaced by a rendered-byte expectation for its measurable fixture; short-height compact navigation and source readability were repaired.",
+    "Knot first broad run:353 passed,4 failed,1 ignored. Repaired parallel run:356 passed,1 failed,1 ignored at the existing recovery-runtime timing assertion. That test passed alone; all357 passed serially. Recovery runtime source was unchanged.",
+    "Shared test compile/lifecycle failures, source-resolution attempts and interrupted exploratory cases remain in distinct logs.",
+    "Browser standalone web test command ran zero tests and is not counted; setup failures remain in the compact guard log."
+  ],
+  "limits": [
+    "Knot persists the active view bookmark; every inactive pane viewport is not restored simultaneously.",
+    "Read-only source selection uses the existing forward-range normalization; editable selections retain direction and affinity.",
+    "Woodshed live-custody UI save/reopen, physical audio quality and latency remain unqualified.",
+    "The recorded Windows rasters and compact headless viewport checks do not constitute a full responsive or cross-platform matrix.",
+    "The existing recovery-runtime parallel timing test remains timing-sensitive; the clean aggregate gate was serial.",
+    "Host-owned retention/pruning and branch-selection UI remain outside this slice; restored input is guarded at 100,000 visits.",
+    "The 20 MB receipt cap was exceeded. Earlier accounting omitted some local receiving files. Existing evidence and source recovery backups remain preserved."
+  ],
+  "retained_environment": {
+    "stable_targets": [
+      "C:/t/cargo-targets/mere",
+      "C:/t/cargo-targets/woodshed",
+      "C:/t/cargo-targets/knot-editor"
+    ],
+    "target_owner": "Existing repository targets reused.",
+    "isolated_worktrees": [],
+    "isolated_cargo_homes": [],
+    "profiles": [
+      "woodshed/.cargo/local/context-navigation-runtime",
+      "knot-editor/.cargo/local/context-navigation-runtime",
+      "knot-editor/.cargo/local/context-continuation-runtime",
+      "knot-editor/.cargo/local/context-continuation-reading-runtime",
+      "knot-editor/.cargo/local/context-continuation-text-runtime",
+      "knot-editor/.cargo/local/context-continuation-final-runtime"
+    ],
+    "reason": "Parent-owned isolated app profiles, receiving configs/locks, failed receipts and source recovery/audit backups retained for reproducing the local intake. All owned native scenario processes exited or were stopped.",
+    "source_recovery_paths": [
+      "knot-editor/.cargo/local/knot-before-recovery.json",
+      "knot-editor/.cargo/local/knot-recovery-events.json",
+      "knot-editor/.cargo/local/context-continuation-workspace-format-audit"
+    ],
+    "artifact_owner": "Contextual navigation continuation lane (parent task)."
+  },
+  "receipt_budget": {
+    "cap_bytes": 20000000,
+    "retained_bytes": 22268482,
+    "overrun_bytes": 2268482,
+    "scope": "Original and continuation receipt directories, both app .cargo trees conservatively, Mere receiving locks and both lane briefs. Stable reusable build targets are excluded.",
+    "result": "exceeded"
+  }
+}

@@ -1,0 +1,956 @@
+    Blocking waiting for file lock on package cache
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#64d47ac4)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\hagiograph)` was not used in the crate graph
+warning: patch `impresa v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\impresa)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\luggage)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\proofs)` was not used in the crate graph
+warning: patch `responsa v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\responsa)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\servitor)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\stickleback)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling serde_core v1.0.229
+   Compiling foldhash v0.2.0
+   Compiling memchr v2.8.3
+   Compiling windows v0.62.2
+   Compiling indexmap v2.14.2
+   Compiling winnow v1.0.4
+   Compiling windows-sys v0.61.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling bytes v1.12.1
+   Compiling either v1.18.0
+   Compiling num-integer v0.1.47
+   Compiling futures-sink v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling num-complex v0.4.6
+   Compiling portable-atomic v1.15.0
+   Compiling tokio-macros v2.7.2
+   Compiling hashbrown v0.17.1
+   Compiling hashbrown v0.16.1
+   Compiling futures-channel v0.3.34
+   Compiling rayon v1.12.0
+   Compiling portable-atomic-util v0.2.8
+   Compiling audio-codec-algorithms v0.8.1
+   Compiling futures-util v0.3.34
+   Compiling naga-types v30.0.1
+   Compiling wuff v0.2.9
+   Compiling audioadapter-sample v5.2.0
+   Compiling windows-sys v0.59.0
+   Compiling windows-sys v0.52.0
+   Compiling naga v30.0.1
+   Compiling rkyv v0.8.18
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling audioadapter v5.0.0
+   Compiling wuff-capi v0.2.0
+   Compiling winnow v0.7.15
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling fontsan v0.7.0
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling audioadapter-buffers v5.2.0
+   Compiling simba v0.10.2
+   Compiling toml v1.1.6+spec-1.1.0
+   Compiling toml_edit v0.25.15+spec-1.1.0
+   Compiling image v0.25.10
+   Compiling num-rational v0.4.2
+   Compiling serde v1.0.229
+   Compiling uuid v1.27.0
+   Compiling serde_json v1.0.151
+   Compiling smallvec v1.16.2
+   Compiling euclid v0.22.14
+   Compiling serde_bytes v0.11.19
+   Compiling accesskit v0.25.1 (C:\Users\mark_\Code\repos\mere\support\patches\accesskit)
+   Compiling color v0.3.3
+   Compiling parking_lot_core v0.9.12
+   Compiling linebender_resource_handle v0.1.1
+   Compiling icu_normalizer v2.3.0
+   Compiling kurbo v0.13.1
+   Compiling parking_lot v0.12.5
+   Compiling wgpu-types v30.0.1
+   Compiling string_cache v0.9.0
+   Compiling guillotiere v0.7.0
+   Compiling idna_adapter v1.2.2
+   Compiling futures-intrusive v0.5.0
+   Compiling web_atoms v0.2.6
+   Compiling idna v1.1.0
+   Compiling mere-curation v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\forme\curation)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling sceno v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling hest v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\hest)
+   Compiling peniko v0.6.1
+   Compiling markup5ever v0.39.0
+   Compiling url v2.5.8
+   Compiling vello_encoding v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling heapless v0.7.17
+   Compiling xml5ever v0.39.0
+   Compiling html5ever v0.39.0
+   Compiling tinct v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+   Compiling app_units v0.7.8
+   Compiling postcard v1.1.3
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling petgraph v0.8.3
+   Compiling encoding_rs v0.8.42
+   Compiling muniment v0.2.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment)
+   Compiling scenograph v0.0.5 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenograph)
+   Compiling harfrust v0.12.0
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling icu_segmenter v2.3.0
+   Compiling slotmap v1.1.1
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling cssparser v0.37.0
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling stacker v0.1.25
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling chartulary v0.2.2 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling scenomise v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise)
+   Compiling serde_spanned v1.1.1
+   Compiling tokio v1.53.2
+   Compiling audio-pattern v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\audio-pattern)
+   Compiling vello_shaders v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling audio-packs v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\audio-packs)
+   Compiling taffy v0.11.0-experimental-cache-fix.3
+   Compiling numen v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\conatus\numen)
+   Compiling ciborium v0.2.2
+warning: unused variable: `time_range`
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling wgpu-naga-bridge v30.0.1
+   Compiling cfb v0.7.3
+   Compiling mere-forme v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\forme\forme)
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling toml_edit v0.23.10+spec-1.0.0
+   Compiling bevy_macro_utils v0.19.1
+   Compiling ringbuf v0.5.3
+   Compiling infer v0.19.0
+   Compiling windows-result v0.1.2
+   Compiling windows-interface v0.57.0
+   Compiling windows-implement v0.57.0
+   Compiling spin v0.10.1
+   Compiling winit v0.30.13
+   Compiling bevy_platform v0.19.1
+   Compiling mere-kernel v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel)
+   Compiling firewheel-macros v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+   Compiling nalgebra v0.35.0
+   Compiling windows-core v0.57.0
+   Compiling futures-executor v0.3.34
+   Compiling num-complex v0.2.4
+   Compiling thunderdome v0.6.1
+   Compiling midir v0.11.0
+   Compiling spade v2.15.1
+   Compiling windows v0.57.0
+warning: unused imports: `astar`, `dijkstra`, `has_path_connecting`, and `kosaraju_scc`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:21:22
+   |
+21 | use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
+   |                      ^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `Archived`, `Place`, and `Resolver`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:21
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                     ^^^^^^^^               ^^^^^  ^^^^^^^^
+
+warning: unused import: `HashSet`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:26:43
+   |
+26 | use std::collections::{BTreeMap, HashMap, HashSet};
+   |                                           ^^^^^^^
+
+warning: unused import: `AddressKind`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:33:31
+   |
+33 | use crate::address::{Address, AddressKind, address_from_url, cached_host_from_url, detect_mime};
+   |                               ^^^^^^^^^^^
+
+warning: unused imports: `GraphSnapshot`, `PersistedAddress`, `PersistedArrangementEdgeData`, `PersistedArrangementSubKind`, `PersistedContainmentEdgeData`, `PersistedContainmentSubKind`, `PersistedEdgeFamily`, `PersistedEdge`, `PersistedImportedEdgeData`, `PersistedImportedSubKind`, `PersistedNavigationTrigger`, `PersistedNodeSessionState`, `PersistedNode`, `PersistedProvenanceEdgeData`, `PersistedProvenanceSubKind`, `PersistedSemanticEdgeData`, `PersistedSemanticSubKind`, `PersistedTraversalEdgeData`, `PersistedTraversalMetrics`, and `PersistedTraversalRecord`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:35:5
+   |
+35 |     GraphSnapshot, PersistedAddress, PersistedArrangementEdgeData, PersistedArrangementSubKind,
+   |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+36 |     PersistedContainmentEdgeData, PersistedContainmentSubKind, PersistedEdge, PersistedEdgeFamily,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+37 |     PersistedImportedEdgeData, PersistedImportedSubKind, PersistedNavigationTrigger, PersistedNode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+38 |     PersistedNodeSessionState, PersistedProvenanceEdgeData, PersistedProvenanceSubKind,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+39 |     PersistedSemanticEdgeData, PersistedSemanticSubKind, PersistedTraversalEdgeData,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     PersistedTraversalMetrics, PersistedTraversalRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `PersistedContainmentEdgeData`, `PersistedImportedEdgeData`, and `PersistedProvenanceEdgeData`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\legacy_resource_migration.rs:23:20
+   |
+23 |     GraphSnapshot, PersistedContainmentEdgeData, PersistedEdge, PersistedImportedEdgeData,
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+24 |     PersistedProvenanceEdgeData, PersistedResourceFacet, PersistedResourceRecord,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NodeTagPresentationState`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\node_facets.rs:17:54
+   |
+17 | use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling firewheel-core v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+warning: unused import: `RelationSelector`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\query.rs:26:63
+   |
+26 | use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
+   |                                                               ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `address_from_url` and `detect_mime`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\snapshot\from.rs:18:22
+   |
+18 | use crate::address::{address_from_url, detect_mime};
+   |                      ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+
+   Compiling futures v0.3.34
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling roxmltree v0.21.1
+   Compiling ndarray v0.13.1
+   Compiling cpal v0.18.2
+   Compiling strength_reduce v0.2.4
+   Compiling woodshedding v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshedding)
+   Compiling transpose v0.2.3
+   Compiling fleece v0.5.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\membership.rs:21:18
+   |
+21 |             NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+   |                  ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+21 -             NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+21 +             NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+   |
+
+   Compiling armillary v0.1.1 (https://github.com/merely-made/armillary.git?rev=92d5b15cf39aaac40a3f2d863ffee69c9be11bfc#92d5b15c)
+   Compiling hocket-model v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\hocket-model)
+warning: unused import: `EdgeRef`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:24:23
+   |
+24 | use petgraph::visit::{EdgeRef, IntoEdgeReferences};
+   |                       ^^^^^^^
+
+warning: unused import: `rancor::Fallible`
+  --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:25:72
+   |
+25 | use rkyv::{Archive, Archived, Deserialize, Place, Resolver, Serialize, rancor::Fallible};
+   |                                                                        ^^^^^^^^^^^^^^^^
+
+   Compiling eidetic v0.0.2 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core)
+   Compiling ble-peripheral-rust v0.2.0 (C:\Users\mark_\Code\repos\woodshed\vendor\ble-peripheral-rust)
+   Compiling notochord v0.1.1 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+warning: unused variable: `key`
+    --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\assertion_write.rs:1011:19
+     |
+1011 |         let Some((key, current)) = self.find_semantic_statement(statement_id) else {
+     |                   ^^^ help: if this is intentional, prefix it with an underscore: `_key`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling glamx v0.3.1
+   Compiling gaz v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling accesskit_consumer v0.39.1
+   Compiling parry2d v0.31.1
+   Compiling incipit v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\incipit)
+   Compiling csv-core v0.1.13
+   Compiling primal-check v0.3.4
+   Compiling matrixmultiply v0.2.4
+   Compiling triple_buffer v9.0.0
+   Compiling approx v0.3.2
+   Compiling ryu v1.0.23
+   Compiling anyhow v1.0.104
+warning: methods `navigate_node`, `branch_history`, `node_history_back`, and `node_history_forward` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\mod.rs:728:19
+    |
+420 | impl Graph {
+    | ---------- methods in this implementation
+...
+728 |     pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
+    |                   ^^^^^^^^^^^^^
+...
+742 |     pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
+    |                   ^^^^^^^^^^^^^^
+...
+754 |     pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+764 |     pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `upsert_persisted_statement` and `remove_statements_with_sub_kind` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_data.rs:485:19
+    |
+340 | impl SemanticData {
+    | ----------------- methods in this implementation
+...
+485 |     pub(crate) fn upsert_persisted_statement(&mut self, mut statement: SemanticStatement) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |     pub(crate) fn remove_statements_with_sub_kind(&mut self, sub_kind: SemanticSubKind) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_data.rs:783:19
+    |
+782 | impl ContainmentData {
+    | -------------------- methods in this implementation
+783 |     pub(crate) fn insert(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+787 |     pub(crate) fn remove(&mut self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^
+...
+791 |     pub(crate) fn contains(&self, sub_kind: ContainmentSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+795 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `insert`, `remove`, `contains`, and `is_empty` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_data.rs:801:19
+    |
+800 | impl ArrangementData {
+    | -------------------- methods in this implementation
+801 |     pub(crate) fn insert(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+805 |     pub(crate) fn remove(&mut self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^
+...
+809 |     pub(crate) fn contains(&self, sub_kind: ArrangementSubKind) -> bool {
+    |                   ^^^^^^^^
+...
+813 |     pub(crate) fn is_empty(&self) -> bool {
+    |                   ^^^^^^^^
+
+warning: methods `assert_semantic_predicate`, `assert_semantic_relation_in_scope`, `assert_semantic_predicate_in_scope`, `withdraw_semantic_statement`, and `upsert_persisted_semantic_statement` are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_payload.rs:183:19
+    |
+ 67 | impl EdgePayload {
+    | ---------------- methods in this implementation
+...
+183 |     pub(crate) fn assert_semantic_predicate(&mut self, predicate: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+186 |     pub(crate) fn assert_semantic_relation_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+201 |     pub(crate) fn assert_semantic_predicate_in_scope(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+215 |     pub(crate) fn withdraw_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     pub(crate) fn upsert_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LogIdAsString` is never constructed
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\identity.rs:160:19
+    |
+160 | pub(crate) struct LogIdAsString;
+    |                   ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\resource_content.rs:90:19
+    |
+ 89 | impl Graph {
+    | ---------- methods in this implementation
+ 90 |     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 93 |     pub(crate) fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+...
+ 96 |     pub(crate) fn append_node_property(&mut self, key: NodeKey, property: NodeProperty) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+...
+ 99 |     pub(crate) fn add_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub(crate) fn remove_node_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub(crate) fn set_node_classification_status(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+135 |     pub(crate) fn set_node_primary_classification(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\edge_ops.rs:350:19
+    |
+ 33 | impl Graph {
+    | ---------- methods in this implementation
+...
+350 |     pub(crate) fn assert_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+421 |     pub(crate) fn replay_assert_relation_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+437 |     pub(crate) fn replay_set_edge_semantic_predicate_by_ids(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+506 |     pub(crate) fn dissolve_remove_node_collect_traversals(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+728 |     pub(crate) fn assert_surface_persisted_semantic_statement(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+825 |     pub(crate) fn replay_retract_relations(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+964 |     pub(crate) fn set_edge_semantic_predicate(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_node_mut` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\graph\graph-kernel\src\graph\query.rs:194:19
+    |
+187 | impl Graph {
+    | ---------- method in this implementation
+...
+194 |     pub(crate) fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node> {
+    |                   ^^^^^^^^^^^^
+
+   Compiling dasp_sample v0.11.0
+   Compiling chirograph v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\chirograph)
+   Compiling csv v1.4.0
+   Compiling rustfft v6.4.1
+   Compiling firewheel-graph v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+   Compiling dramatis v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling hocket-project v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\hocket-project)
+   Compiling rapier2d v0.36.0
+   Compiling mere-fleece v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\fleece)
+   Compiling fixed-resample v0.13.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling mere-alembic v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\distillery\alembic)
+   Compiling fitting v0.3.0
+   Compiling pandect v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\system\pandect)
+   Compiling mere-cartography v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\canvas\cartography)
+   Compiling hocket-recorder v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\hocket-recorder)
+   Compiling peak_finder v1.0.1
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling woodshed-graph v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-graph)
+   Compiling firewheel-nodes v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+   Compiling apparatus-core v0.1.0 (https://github.com/merely-made/armillary.git?rev=75643df1f178757bb7b6386913af1a39353f3069#75643df1)
+   Compiling esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)
+warning: unused import: `std::io`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\pairing.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::io`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:10:5
+   |
+10 | use std::io;
+   |     ^^^^^^^
+
+warning: unused import: `std::path::Path`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:11:5
+   |
+11 | use std::path::Path;
+   |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `Ed25519Keypair`, `IdentityProvider`, `InMemoryProvider`, and `PersonaId`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\records.rs:13:16
+   |
+13 | use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
+   |                ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `Ed25519Signature`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\types.rs:14:16
+   |
+14 | use identity::{Ed25519Signature, PersonaId};
+   |                ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `DEVICE_GRANT_SCHEMA_VERSION` and `DeviceGrantError`
+  --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\wallet_grant\types.rs:19:5
+   |
+19 |     DEVICE_GRANT_SCHEMA_VERSION, DeviceExposure, DeviceGrantError, DeviceId, DevicePublicKey,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^
+
+   Compiling itertools v0.10.5
+   Compiling getrandom v0.2.17
+   Compiling apodize v1.0.0
+   Compiling bitflags v1.3.2
+   Compiling rfd v0.17.2
+   Compiling png v0.17.16
+   Compiling rand_core v0.6.4
+warning: variable does not need to be mutable
+   --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\graph_session_merge.rs:689:13
+    |
+689 |         let mut add = |scratch: &mut Graph, more: Vec<CapturedDelta>, edits: &mut Vec<_>| {
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling mere-apparatus v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\domain\apparatus)
+   Compiling pitch-detection v0.3.0
+   Compiling gpu-allocator v0.28.0
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling grafting-frame v0.1.1
+   Compiling wgpu-hal v30.0.1
+   Compiling webcue v0.1.1
+   Compiling accesskit_windows v0.35.1
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling inker v0.1.1 (C:\Users\mark_\Code\repos\mere\crates\inker\inker)
+   Compiling woodshed-instrument v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-instrument)
+   Compiling pitch-detector v0.3.1
+warning: method `into_graph` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\system\pandect\src\graph_codicil.rs:185:19
+    |
+184 | impl GraphCodicil {
+    | ----------------- method in this implementation
+185 |     pub(crate) fn into_graph(self) -> Result<Graph> {
+    |                   ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling firewheel-cpal v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+   Compiling seiche v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\conatus\seiche)
+   Compiling firewheel v0.14.0 (https://github.com/mark-ik/firewheel.git?rev=2b03846d2e0dcc6ded2a85367bb8c5071ae99cdc#2b03846d)
+   Compiling woodshed-core v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-core)
+   Compiling light-file-dialog v3.21.3
+   Compiling chatelaine v0.0.3 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling rtrb v0.3.5
+   Compiling fastrand v2.5.0
+   Compiling woodshed-audio v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-audio)
+   Compiling directories v5.0.1
+   Compiling tempfile v3.27.0
+   Compiling graphshell-endpoint v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\graphshell\graphshell-endpoint)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\woodshed-audio\src\capture_feed.rs:33:14
+   |
+33 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+33 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+33 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |generation| {
+   |
+
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\woodshed-audio\src\output_runtime.rs:552:14
+    |
+552 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+552 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+552 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\woodshed-audio\src\output_runtime.rs:600:14
+    |
+600 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+600 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+600 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\woodshed-audio\src\output_runtime.rs:621:14
+    |
+621 |             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |              ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+621 -             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+621 +             .try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+    |
+
+   Compiling wgpu-core-deps-windows-linux-android v30.0.1
+   Compiling wgpu-core v30.0.1
+warning: `mere-kernel` (lib) generated 22 warnings (run `cargo fix --lib -p mere-kernel` to apply 11 suggestions)
+warning: `woodshed-audio` (lib) generated 4 warnings (run `cargo fix --lib -p woodshed-audio` to apply 4 suggestions)
+   Compiling wgpu v30.0.1
+   Compiling netrender-vello v0.11.0 (https://github.com/mark-ik/vello?rev=276b46648c08f3d2062e70559afa999842e1873c#276b4664)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+warning: `pandect` (lib) generated 8 warnings (run `cargo fix --lib -p pandect` to apply 7 suggestions)
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling sprigging v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\sprigging\src\lib.rs:462:18
+    |
+462 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+462 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+462 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |
+
+   Compiling cambium v0.6.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium)
+   Compiling woodshed-notation v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-notation)
+warning: `sprigging` (lib) generated 1 warning (run `cargo fix --lib -p sprigging` to apply 1 suggestion)
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#ec15eb26)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#7d1d89db)
+   Compiling document-canvas v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\inker\document-canvas)
+   Compiling pictograph v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit)
+   Compiling mere-persona-picker v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\dramatis\persona-picker)
+   Compiling hocket-views v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\hocket-views)
+   Compiling audio-pack-views v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\audio-pack-views)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock)
+   Compiling mere-document-lanes v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\system\document-lanes)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\reader.rs:51:14
+   |
+51 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+51 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+51 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\producer\registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\host.rs:117:10
+    |
+117 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+117 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+117 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: unused import: `LayoutDom`
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\lib.rs:494:26
+    |
+494 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+    |                          ^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `layout_dom_api::LayoutDom`
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\lib.rs:643:9
+    |
+643 |     use layout_dom_api::LayoutDom as _;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-rootstock\src\producer\registry.rs:707:13
+    |
+707 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+707 -             drop(renderer);
+707 +             let _ = renderer;
+    |
+
+warning: function `build_affinity_spring` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas.rs:68:4
+   |
+68 | fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpring {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `len` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\seiche_bridge.rs:104:19
+    |
+ 93 | impl VisibleRelationTopology {
+    | ---------------------------- method in this implementation
+...
+104 |     pub(crate) fn len(&self) -> usize {
+    |                   ^^^
+
+warning: function `visible_link_appearances` is never used
+  --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:31:15
+   |
+31 | pub(crate) fn visible_link_appearances(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:550:15
+    |
+550 | pub(crate) fn link_hit_test(
+    |               ^^^^^^^^^^^^^
+
+warning: function `link_hit_test_with_assertion_hides` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:573:15
+    |
+573 | pub(crate) fn link_hit_test_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:598:15
+    |
+598 | pub(crate) fn self_link_hit_test(
+    |               ^^^^^^^^^^^^^^^^^^
+
+warning: function `self_link_hit_test_with_assertion_hides` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:621:15
+    |
+621 | pub(crate) fn self_link_hit_test_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test_where` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:646:4
+    |
+646 | fn link_hit_test_where(
+    |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_hit_test_segments` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:674:15
+    |
+674 | pub(crate) fn link_hit_test_segments(
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:711:15
+    |
+711 | pub(crate) fn links_in_rect(
+    |               ^^^^^^^^^^^^^
+
+warning: function `links_in_rect_with_assertion_hides` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:732:15
+    |
+732 | pub(crate) fn links_in_rect_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `links_in_rect_segments` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:756:15
+    |
+756 | pub(crate) fn links_in_rect_segments(
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `link_overlay` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:790:15
+    |
+790 | pub(crate) fn link_overlay(
+    |               ^^^^^^^^^^^^
+
+warning: function `link_overlay_with_assertion_hides` is never used
+   --> C:\Users\mark_\Code\repos\mere\crates\canvas\pictograph\src\canvas\edge_cells.rs:812:15
+    |
+812 | pub(crate) fn link_overlay_with_assertion_hides(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling tabard-workshop v0.0.1 (C:\Users\mark_\Code\repos\mere\crates\cambium\tabard-workshop)
+   Compiling cambium-winit-a11y v0.3.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit-a11y)
+   Compiling mesquite v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\mesquite)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-winit-a11y\src\publication.rs:43:14
+   |
+43 |         NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+43 -         NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+43 +         NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+   Compiling cambium-genet-winit-host v0.1.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\cambium-genet-winit-host)
+   Compiling woodshed-views v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-views)
+warning: `cambium-winit-a11y` (lib) generated 1 warning (run `cargo fix --lib -p cambium-winit-a11y` to apply 1 suggestion)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\woodshed-views\src\stage\music_editor\practice.rs:98:14
+   |
+98 |             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+98 -             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+98 +             .try_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+   |
+
+warning: `cambium-rootstock` (lib) generated 6 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+warning: type `WoodshedScopePlace` is more private than the item `stage::UiState::scope_navigation`
+    --> crates\woodshed-views\src\stage.rs:1156:5
+     |
+1156 |     pub(crate) scope_navigation: contextual_navigation::Navigation,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `stage::UiState::scope_navigation` is reachable at visibility `pub(crate)`
+     |
+note: but type `WoodshedScopePlace` is only usable at visibility `pub(in crate::stage)`
+    --> crates\woodshed-views\src\stage\contextual_navigation.rs:17:1
+     |
+  17 | pub(super) enum WoodshedScopePlace {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `WoodshedScopeAnchor` is more private than the item `stage::UiState::scope_navigation`
+    --> crates\woodshed-views\src\stage.rs:1156:5
+     |
+1156 |     pub(crate) scope_navigation: contextual_navigation::Navigation,
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `stage::UiState::scope_navigation` is reachable at visibility `pub(crate)`
+     |
+note: but type `WoodshedScopeAnchor` is only usable at visibility `pub(in crate::stage)`
+    --> crates\woodshed-views\src\stage\contextual_navigation.rs:30:1
+     |
+  30 | pub(super) enum WoodshedScopeAnchor {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `pictograph` (lib) generated 15 warnings (run `cargo fix --lib -p pictograph` to apply 1 suggestion)
+warning: `woodshed-views` (lib) generated 3 warnings (run `cargo fix --lib -p woodshed-views` to apply 1 suggestion)
+   Compiling woodshed-genet v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-genet)
+warning: method `is_busy` is never used
+  --> crates\woodshed-genet\src\capture_persistence.rs:60:12
+   |
+53 | impl CapturePersistence {
+   | ----------------------- method in this implementation
+...
+60 |     pub fn is_busy(&self) -> bool {
+   |            ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `admit_card` is never used
+   --> crates\woodshed-genet\src\drive.rs:227:8
+    |
+226 | pub(crate) trait CardPreviewAdmission: AudioBackend {
+    |                  -------------------- method in this trait
+227 |     fn admit_card(
+    |        ^^^^^^^^^^
+
+warning: function `reset_for_persona` is never used
+   --> crates\woodshed-genet\src\persona.rs:402:4
+    |
+402 | fn reset_for_persona(ui: &mut woodshed_views::stage::UiState) {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: method `directory` is never used
+  --> crates\woodshed-genet\src\storage.rs:65:12
+   |
+56 | impl StoreBinding {
+   | ----------------- method in this implementation
+...
+65 |     pub fn directory(&self) -> PathBuf {
+   |            ^^^^^^^^^
+
+warning: methods `protected_export_paths` and `protected_export_directories` are never used
+   --> crates\woodshed-genet\src\storage.rs:521:12
+    |
+494 | impl FsBackend {
+    | -------------- methods in this implementation
+...
+521 |     pub fn protected_export_paths(&self) -> Vec<PathBuf> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+528 |     pub fn protected_export_directories(&self) -> Vec<PathBuf> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `woodshed-genet` (bin "woodshed-genet") generated 5 warnings
+    Finished `dev` profile [unoptimized] target(s) in 4m 32s

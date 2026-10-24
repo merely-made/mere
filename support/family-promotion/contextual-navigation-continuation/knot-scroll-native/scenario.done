@@ -1,0 +1,11 @@
+RESULT fail
+FAIL: no current pointer target for Selector { surface: None, matcher: Class("knot-document-preview"), text: None, attr: None }
+FAIL: assert snap context_scroll_kind Eq 'preview-heading': got 'source-byte'
+FAIL: assert snap context_view Eq 'preview': got 'source'
+FAIL: assert snap context_scroll_kind Eq 'preview-heading': got 'source-byte'
+captured source-and-preview-return
+capture source-and-preview-return 2464x1504 digest=8df32ab3d05faf34 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-continuation\knot-scroll-native\source-and-preview-return.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 63 frames, 63 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":63,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":67,"phase":"submitted"}},"sequence":64}}
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: Some("Show Preview"), attr: None }

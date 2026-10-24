@@ -1,0 +1,12 @@
+RESULT ok
+waited 5 frames
+captured 01_card2_playing
+waited 9 frames
+captured 02_set_complete_stopped
+waited 0 frames
+P6 one-shot guided Set, Card 2 audio admission and natural completion
+capture 01_card2_playing 2200x1500 digest=10f728a888747c86 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-continuation\woodshed-audio-native\01_card2_playing.png
+capture 02_set_complete_stopped 2200x1500 digest=c5ed5fd4eb2dbf87 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-continuation\woodshed-audio-native\02_set_complete_stopped.png
+frames: 2 captured, 0 blank, 2 distinct digests
+presentation: 136 frames, 136 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":136,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":156,"phase":"submitted"}},"sequence":137}}

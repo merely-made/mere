@@ -1,0 +1,14 @@
+[woodshed] identity pending: practice is not being saved
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[cambium-winit] accessibility Installed, 307 nodes projected
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("aria-label", "Down: Guided chord")) }
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("aria-label", "Up: Working Set 1")) }
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.

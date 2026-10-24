@@ -1,0 +1,15 @@
+woodshed-genet: FAIL: assert snap practice-saved Eq 'true': got 'false'
+woodshed-genet: waited 395 frames
+woodshed-genet: FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+woodshed-genet: FAIL: assert snap runner-set-id Eq '1': got '0'
+woodshed-genet: FAIL: assert snap runner-set-id Eq '1': got '0'
+woodshed-genet: FAIL: assert snap scope-panel Eq 'Practice': got 'Set'
+woodshed-genet: FAIL: assert snap runner-set-id Eq '1': got '0'
+woodshed-genet: FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+woodshed-genet: captured 01_card_occurrence_with_owner_running
+woodshed-genet: FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+woodshed-genet: FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+woodshed-genet: FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+woodshed-genet: FAIL: assert snap runner-set-id Eq '1': got '0'
+woodshed-genet: Contextual navigation scope/history complete
+woodshed-genet: RESULT fail (561 frames, 1 captures)

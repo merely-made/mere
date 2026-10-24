@@ -1,0 +1,25 @@
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=3d2ce3a568ffd63a98c0057fc5c798f3c999d2ab#3d2ce3a5)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\errand-22a5c66f8a0a2658\1155897\crates\errand
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=6d6ad84b773c9baf2390bd7807a21ca9887e6efd#6d6ad84b)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\esp-45bbaf8e1db2afe3\f27bee8\crates\esp
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\luggage
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\proofs
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph

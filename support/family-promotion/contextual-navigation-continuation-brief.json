@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "status": "implementation-qualified-with-receipt-budget-overrun",
+  "objective": "Persist Woodshed and Knot navigation through existing Eidetic lineage and app storage, restore Knot reading positions, then repair the native tone admission failure.",
+  "order": [
+    "persistent-navigation-and-knot-scroll",
+    "audio-admission"
+  ],
+  "owners": {
+    "cambium": "Stemma adapter, snapshot migration and validation, shared controls; app definitions remain local.",
+    "woodshed": "Session save/reopen of owner-qualified navigation, then audio preparation repair.",
+    "knot": "Durable document/site routes, live-session rebinding and source-bound scroll anchors."
+  },
+  "done_conditions": [
+    "One Stemma visit authority preserves back, forward and alternate branches across serialization, with explicit legacy migration and malformed-input refusal.",
+    "Woodshed navigation survives save/reopen without replaying practice or altering authored Sets.",
+    "Knot navigation rebinds stable addresses only to admitted open documents and validates source revisions before restoring editor and reading positions.",
+    "Knot source and Preview return to their remembered visible reading anchors after navigation and restart.",
+    "Native gates for the first two changes pass before audio implementation starts.",
+    "Valid scale pitches prepare at the device sample rate without unbounded realtime work, and the formerly failing mixed Set completes the native scenario."
+  ],
+  "receipts": {
+    "directory": "support/family-promotion/contextual-navigation-continuation",
+    "retained_byte_cap_including_prior_prototype": 20000000,
+    "required": [
+      "focused test and build results",
+      "native save/reopen and scroll receipts",
+      "reproduced audio failure and repair",
+      "source and receiving-lock hashes"
+    ],
+    "budget_deviation": "Original accounting omitted some retained local receiving files. Final total exceeds 20 MB; evidence and source recovery backups are preserved."
+  },
+  "targets": [
+    "C:/t/cargo-targets/mere",
+    "C:/t/cargo-targets/woodshed",
+    "C:/t/cargo-targets/knot-editor"
+  ],
+  "preserve_prior_receipts": true,
+  "qualification": "support/family-promotion/contextual-navigation-continuation/qualification.json"
+}

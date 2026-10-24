@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-24T02:34:53.3166728Z",
+  "status": "local-native-prototypes-qualified",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "host": "x86_64-pc-windows-msvc",
+  "source_publication": "Uncommitted local prototype; portable locks unchanged; local receiving overrides retained.",
+  "handoff": {
+    "shared_commit": "7cb8e4e08d482c59b906b8597c8a098df4a0d6c5",
+    "shared_original_sha256": "4052594473f0cd1a936345b060b12b8582a76b7bb579d7ff8cbbb0a806f8e862",
+    "browser_commit": "6a49cf419d6cf03683747ae31a837192b473000f",
+    "browser_patch_sha256": "038ca3659598eb036ae3fcfb6a541e7e95439f2a3d189c2b8c2afaa39f827bbd",
+    "local_additions": "Optional noneditable current trail crumb plus keyboard and trail regression tests."
+  },
+  "sources": {
+    "mere": {
+      "head": "4c13036a42c38342a65f4b628eb86a4233191072",
+      "files": [
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\cambium\\cambium\\src\\scope_navigation.rs",
+          "bytes": 22904,
+          "sha256": "24e3694530d1f06d0e00f3ea36603630640bd641e024a54156616d93378ffdd9"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mere\\src\\navigation.rs",
+          "bytes": 9779,
+          "sha256": "efca1c9c5d67bcb9835cd8435b52aadb9b89895d5ce9347f8fa8f2053245bb27"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\mere\\src\\navigation\\browser.rs",
+          "bytes": 11079,
+          "sha256": "1513f3408ae45cf97277289a65d204174f8f32486f4fcea30066ebdb2c09d4c0"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\scope_policy.rs",
+          "bytes": 762,
+          "sha256": "150580a06727e64da46ff012cd9149b27ef9d2c2960d8456756a918ab89635be"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\lib.rs",
+          "bytes": 4162,
+          "sha256": "db5a6eff4e2d7e4d2b0ea84a2c7e272570608a92cbeb2bfa907b6590f0d18932"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\forme_session.rs",
+          "bytes": 51358,
+          "sha256": "7b09936bd7be1e6d04d54463d85f1844e696b23375222bcee018ba9434ebbe15"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\forme_workspace.rs",
+          "bytes": 18423,
+          "sha256": "77675a7298175fd661ad7b1a9daf02079f9118b56ea54d7179cc22f406236a89"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\web_tree\\forme.rs",
+          "bytes": 50998,
+          "sha256": "b17b7eb70f82908b810754d81e5d53cbff524e34efcbba51788dced66cb1d7b4"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\mere\\ports\\graphshell\\src\\web_tree\\scope_navigation.rs",
+          "bytes": 15097,
+          "sha256": "9a4f9ce5fe98662db4380a7581bfee62c2bf70be76b918922dad8c7db7770286"
+        }
+      ]
+    },
+    "woodshed": {
+      "head": "3ce93675179098b7d1c81da20cb4f63caa75e6b5",
+      "files": [
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\stage\\contextual_navigation.rs",
+          "bytes": 28698,
+          "sha256": "741b1f968138556fe9f2204b1bc49c5a8e4602fdb44336933a7483ab763784c4"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\stage.rs",
+          "bytes": 199813,
+          "sha256": "bb5d1c95cf924205ff0a9bff0bb903b5d1987e0083cd565a368b37df02e16c55"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\stage\\instances.rs",
+          "bytes": 23515,
+          "sha256": "c4c57344c7dda6310fd5e7b352646894b8a08bbbb6627aa894d30a9e4d53ce48"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\stage\\music_editor.rs",
+          "bytes": 65824,
+          "sha256": "bc308607e0b8dcd1e494a0d2d65bee24faf6546e9cf80fa989d3ed127cce104b"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\stage\\overview.rs",
+          "bytes": 77758,
+          "sha256": "4287968d8b8425cbb487a20af1a5e26ceb3c580f44a0d9e8d82cab3e304d39ea"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-views\\src\\theme.rs",
+          "bytes": 46887,
+          "sha256": "e6b72f78181c11ae995532f32fa5400de98a08614eb8d573eabfff3e3c4f8f9f"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-genet\\src\\paths.rs",
+          "bytes": 3349,
+          "sha256": "6ada0b1b96108450945e0d7c812b533a054ca4934ae2cdcedbc8bffb31755903"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-genet\\src\\storage.rs",
+          "bytes": 56493,
+          "sha256": "aefd8baf20c882755a8c3edc63e03d149d942b655494ec734c4049c705798e48"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\crates\\woodshed-genet\\src\\scenario.rs",
+          "bytes": 189391,
+          "sha256": "2fc4b105e773047046872f7f9766470a03a1bc2caf63c612b820e4a1039c2914"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\scenarios\\context_navigation.scn",
+          "bytes": 1418,
+          "sha256": "c3d89585366c71b545c10bd02ebbd5e7c73a1f68502fac441b08da780e54a040"
+        }
+      ]
+    },
+    "knot-editor": {
+      "head": "4dafff1f591c18a5b4d20e987054722d01406613",
+      "files": [
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\apps\\desktop\\src\\context_navigation.rs",
+          "bytes": 4963,
+          "sha256": "096930c2c214fcd7d936095bd71df01ac5279c5c74e1688baeb95db7a47b2671"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\apps\\desktop\\src\\documents.rs",
+          "bytes": 36342,
+          "sha256": "91f328b115c11acf24b9d36699b9eb03843d6bd61577b23c7cf4eacabdbc9464"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\apps\\desktop\\src\\lib.rs",
+          "bytes": 11101,
+          "sha256": "9366990fd1e262d73abfdfb07fc0d8e6ae82059f9f5d0a1cd3e00dae81783d7e"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\apps\\desktop\\src\\workspace.rs",
+          "bytes": 452053,
+          "sha256": "7a356865be6614c0885024084ae6affb54e879f4c8f0e43dfb03e0a624fbc872"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\apps\\desktop\\tests\\scenario_lane.rs",
+          "bytes": 23589,
+          "sha256": "1b291e42c6e1bfc9b0d8d5d3d3cd5c70e1909f36c5484cff000662873473c120"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\scenarios\\context_navigation.scn",
+          "bytes": 1044,
+          "sha256": "6e835ef22f546748711998a28d804074834793f295077962328a111bcc33aa92"
+        },
+        {
+          "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\scenarios\\fixtures\\context_navigation.djot",
+          "bytes": 220,
+          "sha256": "eeb62129c64b381047b1fd12dfb57f215a0ff9baea2f1cb523437f17fe960b43"
+        }
+      ]
+    }
+  },
+  "receiving_files": [
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\.cargo\\scope-navigation\\Cargo.lock",
+      "bytes": 505547,
+      "sha256": "32b1b29e3b27dfff9ad862aa361c16bb3af0d3f40c03d3a0c6c7028bf2213603"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\mere\\.cargo\\scope-navigation\\web\\Cargo.lock",
+      "bytes": 275194,
+      "sha256": "a3951a24fb9959b4b7d233d2544f652449ef4990d39744cd2d924457ed0ad61f"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\.cargo\\scope-navigation-local.toml",
+      "bytes": 5249,
+      "sha256": "44d25e452a0dc003bc94e8c3d5d4aef68edad4d11d2f294b0dd4f0fa9fc73dcd"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\.cargo\\local\\Cargo.lock",
+      "bytes": 218508,
+      "sha256": "9cc17c1a5226377b83839e1af1660c8f21d3a0355eba1064a59ab319f60e4632"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\Cargo.lock",
+      "bytes": 229518,
+      "sha256": "a67697fbdefca14acbb24b9ac46805bd720305f90e112ba9bdc607b1b15a7c19"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\.cargo\\scope-navigation-local.toml",
+      "bytes": 8397,
+      "sha256": "0f8e611389e9ed34d2455f7225a1b0264de8e79cb2a08a566330f07d0f58a75d"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\.cargo\\local\\Cargo.lock",
+      "bytes": 347410,
+      "sha256": "42c21fffdd5b0b67be1e4faaf4ce6cb3a2394359ae8e7c7edd064511b7405413"
+    },
+    {
+      "path": "C:\\Users\\mark_\\Code\\repos\\knot-editor\\Cargo.lock",
+      "bytes": 361530,
+      "sha256": "b9225ea66b5ce9c480bbc90f67df19f4a398529f0785af1e9b21fa465c0748ba"
+    }
+  ],
+  "gates": [
+    {
+      "name": "Cambium library baseline",
+      "result": "pass",
+      "tests": 308,
+      "log": "cambium-tests.log"
+    },
+    {
+      "name": "Cambium final scope controls",
+      "result": "pass",
+      "tests": 8,
+      "log": "cambium-controls-tests-fixed.log"
+    },
+    {
+      "name": "Mere browser policy",
+      "result": "pass",
+      "tests": 4,
+      "log": "browser-policy-tests.log"
+    },
+    {
+      "name": "Graphshell forme compatibility",
+      "result": "pass",
+      "tests": 49,
+      "log": "graphshell-compatibility.log"
+    },
+    {
+      "name": "Browser product WebAssembly",
+      "result": "pass",
+      "features": "product,presentation-webgpu",
+      "log": "browser-product-check-fixed.log",
+      "receiving_fix": "Local browser lock aligns md-5 0.10.6 and sha1 0.10.7 with sha2 0.10.9 for spareval."
+    },
+    {
+      "name": "Woodshed navigation",
+      "result": "pass",
+      "tests": 7,
+      "logs": [
+        "woodshed-logs/contextual-navigation-test2.log",
+        "woodshed-logs/scope-set-switch-test.log"
+      ]
+    },
+    {
+      "name": "Woodshed Windows paths and configuration",
+      "result": "pass",
+      "tests": 4,
+      "log": "woodshed-logs/paths-test.log"
+    },
+    {
+      "name": "Woodshed final native build",
+      "result": "pass",
+      "log": "woodshed-logs/woodshed-genet-build-paths.log"
+    },
+    {
+      "name": "Knot focused checks",
+      "result": "pass",
+      "tests": 11,
+      "logs": [
+        "knot-logs/knot-scope-navigation-test-attempt5.log",
+        "knot-logs/knot-scope-navigation-test-attempt6.log",
+        "knot-logs/knot-scope-navigation-test-attempt7.log",
+        "knot-logs/knot-scope-navigation-test-attempt9.log",
+        "knot-logs/knot-scope-navigation-test-attempt11.log",
+        "knot-logs/knot-scope-navigation-test-attempt12.log"
+      ],
+      "note": "Attempt5 passes three contextual-history and one closed-document filter; its Site failure is corrected and passes in attempt6."
+    },
+    {
+      "name": "Knot final native build",
+      "result": "pass",
+      "log": "knot-logs/knot-scope-navigation-build-attempt16.log"
+    }
+  ],
+  "native": {
+    "woodshed": {
+      "result": "pass",
+      "receipt": "woodshed-native-card-loop/scenario.done",
+      "frames": 175,
+      "capture": {
+        "path": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\family-promotion\\contextual-navigation\\woodshed-native-card-loop\\01_card_occurrence_with_owner_running.png",
+        "bytes": 495205,
+        "sha256": "37dbd13ef8c9e8e72eae09eaad4f2586458992ce5426e149728b9d7ba171d7ee"
+      },
+      "visual_review": "passed",
+      "scope": "Card-loop rehearsal stays running under Set1 through Down, Up, Back and Forward; isolated vault locked, no persistence qualification.",
+      "binary": {
+        "path": "C:\\t\\cargo-targets\\woodshed\\debug\\woodshed-genet.exe",
+        "bytes": 102118912,
+        "sha256": "aa1b5db46210305f0f93b1c9f7b6420885628f236285aff118a2ef113b8ab762"
+      }
+    },
+    "knot": {
+      "result": "pass",
+      "receipt": "knot-native-final/scenario.done",
+      "frames": 32,
+      "capture": {
+        "path": "C:\\Users\\mark_\\Code\\repos\\mere\\support\\family-promotion\\contextual-navigation\\knot-native-final\\nested-context.png",
+        "bytes": 348150,
+        "sha256": "84f3ecb0b42fc86cceaaf511b723b8713f1a9d687ef66ff20ca15ace371083bc"
+      },
+      "visual_review": "passed",
+      "scope": "Nested headings including skipped level, Up/Back/Forward, visible trail and compact native menu; fixture source bytes unchanged.",
+      "fixture_sha256": "eeb62129c64b381047b1fd12dfb57f215a0ff9baea2f1cb523437f17fe960b43",
+      "binary": {
+        "path": "C:\\t\\cargo-targets\\knot-editor\\debug\\knot.exe",
+        "bytes": 113419264,
+        "sha256": "b104d8307f1c583fb96d962048d9a285774be789aef6ef811473edd992a446a3"
+      }
+    }
+  },
+  "retained_failures": [
+    "Woodshed original unsupported selector grammar and fixture tone admission: woodshed-native.",
+    "Woodshed mixed-Set Card2 tone admission and runner-dependent label: woodshed-native-supported-fixture.",
+    "Knot initial and compact captures passed scenario assertions but failed visual review (vertical menu; hidden trail); knot-native-row and final visually pass.",
+    "Knot attempt15 linker access denied while parent-owned native process held the binary; retry16 passed.",
+    "Supplier resolution, source/test compilation and scenario-selector failures remain in distinct logs."
+  ],
+  "limits": [
+    "Navigation history is in-memory.",
+    "Knot scroll offsets are not restored; read-only selection restores byte range with forward direction and standard affinity.",
+    "Native layout was reviewed at the recorded desktop rasters, not a responsive-size matrix.",
+    "Native playback covers first-Card looping; broader mixed-Set audio admission, physical audio quality and persistence are not qualified."
+  ],
+  "retained_environment": {
+    "targets": [
+      "C:/t/cargo-targets/mere",
+      "C:/t/cargo-targets/woodshed",
+      "C:/t/cargo-targets/knot-editor"
+    ],
+    "target_ownership": "Existing stable repository targets reused.",
+    "isolated_worktrees": [],
+    "isolated_cargo_homes": [],
+    "profiles": [
+      "woodshed/.cargo/local/context-navigation-runtime",
+      "knot-editor/.cargo/local/context-navigation-runtime"
+    ],
+    "reason": "Local receiving configs, locks, recovery backups and isolated app profiles retained for reruns; owned native processes stopped after receipts."
+  },
+  "retained_byte_cap": 10000000,
+  "retained_bytes_including_local_receiving_files": 7325517.0
+}
