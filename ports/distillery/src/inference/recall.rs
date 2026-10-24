@@ -106,11 +106,15 @@ impl RecallEvidence {
                 if expected.as_ref().map(|(expected, _, _)| expected) != Ok(contract) {
                     support.error = Some("Retained answer contract does not match the question and supplied evidence.".into());
                     support.claims.clear();
-                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4" | "distillery.requested-facts/v5") && !super::answer_contract::matches_policy(text, self) {
+                } else if matches!(contract.method.as_str(), "distillery.requested-facts/v3" | "distillery.requested-facts/v4" | "distillery.requested-facts/v5" | "distillery.candidate-review/v6") && !super::answer_contract::matches_policy(text, self) {
                     support.error = Some("Answer does not satisfy the retained constrained-output policy.".into());
                     support.claims.clear();
                 } else if support.claims.len() > contract.max_claims {
                     support.error = Some("Answer exceeds the retained contract's claim bound.".into());
+                    support.claims.clear();
+                }
+                if support.error.is_none() && support.claims.iter().any(|c| c.review.is_some() != (contract.method == "distillery.candidate-review/v6")) {
+                    support.error = Some("Candidate review presence differs from the retained answer method.".into());
                     support.claims.clear();
                 }
             }

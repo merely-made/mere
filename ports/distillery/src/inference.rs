@@ -40,6 +40,7 @@ mod observations;
 pub use observations::InferenceObservation;
 #[cfg(feature = "inference-model")]
 mod answer_contract;
+mod candidate_review;
 #[cfg(feature = "inference-model")]
 pub mod durable;
 #[cfg(feature = "inference-model")]

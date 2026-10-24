@@ -167,6 +167,15 @@ fn required_semantics(record: &RunRecord) -> Option<&'static str> {
         .recall
         .as_ref()
         .and_then(|r| r.answer_contract.as_ref())
+        .is_some_and(|c| c.method == "distillery.candidate-review/v6")
+    {
+        return Some("recall/candidate-review-v1");
+    }
+    if record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
         .and_then(|c| c.requested_facts.as_ref())
         .is_some()
     {
@@ -209,6 +218,7 @@ impl Delta {
                 && value != "recall/requested-facts-v1"
                 && value != "recall/constrained-answer-v1"
                 && value != "recall/requested-fact-set-v1"
+                && value != "recall/candidate-review-v1"
         }) {
             return Err("unsupported inference checkpoint semantics".into());
         }
@@ -238,7 +248,10 @@ fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
         .as_ref()
         .and_then(|r| r.answer_contract.as_ref())
     {
-        if contract.method == "distillery.requested-facts/v5" || contract.requested_facts.is_some()
+        if matches!(
+            contract.method.as_str(),
+            "distillery.requested-facts/v5" | "distillery.candidate-review/v6"
+        ) || contract.requested_facts.is_some()
         {
             let facts = contract
                 .requested_facts
@@ -1386,7 +1399,7 @@ mod tests {
         record.view.recall = Some(evidence);
         assert_eq!(
             required_semantics(&record),
-            Some("recall/requested-fact-set-v1")
+            Some("recall/candidate-review-v1")
         );
         journal.append(&record).unwrap();
         assert!(
@@ -1400,13 +1413,21 @@ mod tests {
             contract.requested_facts
         );
         record.view.state = RunStateV1::Finished;
-        record.view.text = serde_json::json!({"claims":[{"fact":contract.requested_facts.as_ref().unwrap().facts[0],"status":"insufficient","text":"No retained budget is supplied.","evidence":[]}]}).to_string();
+        record.view.text = serde_json::json!({"claims":[{"fact":contract.requested_facts.as_ref().unwrap().facts[0],"review":{"candidates":[],"agreement":"none"},"status":"insufficient","text":"No retained budget is supplied.","evidence":[]}]}).to_string();
         journal.append(&record).unwrap();
         let support = journal
             .retained_answer_support(&record.view.run)
             .unwrap()
             .unwrap();
         assert!(support.error.is_none());
+        assert_eq!(
+            support.claims[0].review.as_ref().unwrap().candidates.len(),
+            0
+        );
+        assert_eq!(
+            support.claims[0].review.as_ref().unwrap().agreement,
+            eidetic::models::answer::CandidateAgreement::None
+        );
         assert_eq!(
             support.raw_output,
             eidetic::ManifestId::of_blob(record.view.text.as_bytes())
