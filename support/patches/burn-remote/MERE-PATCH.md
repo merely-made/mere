@@ -1,7 +1,7 @@
 # Mere burn-remote patch
 
-Source: crates.io `burn-remote 0.22.0`, upstream Burn commit
-`b8d75ad07f426537594a5beb9309d62d916bcf05`.
+Source: crates.io `burn-remote 0.22.1`, upstream Burn commit
+`907ab111a02c2dea47bc41633754f095c6b2220e`.
 License: MIT OR Apache-2.0, unchanged from upstream.
 
 The released server authorizes an Iroh session only at admission. Removing a
@@ -14,7 +14,7 @@ interval. `IrohRemoteProtocol::sessions` exposes reserved or active session IDs
 and opaque credentials; `close_session` targets one pump. Client close uses the
 same teardown. The public exports include `ServedSession` and `SessionId`.
 
-Rebased on 2026-10-06 onto pristine stable source. Stable connection errors,
+The earlier 0.22.0 rebase on 2026-10-06 used pristine stable source. Stable connection errors,
 credential types, public server builder, hosted-device ID translation, FIFO
 worker admission, response cancellation and global shutdown are preserved.
 The patch adds a public `IrohRemoteProtocol::from_endpoint` constructor for
@@ -57,3 +57,11 @@ uses it to check that a clean session closes `Ok` while a faulted one reports
 the failure. It exists only in this crate's own test build; the public API is
 unchanged. Remove this part with the rest of the patch, or earlier if an
 upstream release waits for teardown completion and reports its failures.
+
+## 0.22.1 cohort rebase (2026-10-24)
+
+Released archives were checksum-verified before a three-way rebase. Existing
+local source and regression deltas are preserved, including changes added
+after the original stable-release receipt. New upstream source changes are
+retained. Executable qualification remains in progress in the Burn migration
+plan, section 13.48; this provenance update alone is not an acceptance pass.

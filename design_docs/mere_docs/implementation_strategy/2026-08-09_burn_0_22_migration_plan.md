@@ -1,5 +1,11 @@
 # Burn 0.22 Migration Plan
 
+**Status (2026-10-24, patch qualification in progress):** receive Burn
+`0.22.1`, CubeCL `0.11.1` and Cubek `0.3.1` in isolated Mere and ESP
+worktrees. Section 13.48 owns patch review and the affected numerical,
+native/browser, durable-generation and remote-reclaim gates. The qualified
+0.22.0 baseline below remains the rollback source; no old receipt is relabeled.
+
 **Status (2026-10-06, stable):** the active Burn family is migrated to
 Burn `0.22.0`, CubeCL `0.11.0` and Cubek `0.3.0` (§13.47). ESP, Conatus,
 Numen, Seiche and Distillery use stable APIs; native GPU, browser embedding
@@ -5116,3 +5122,61 @@ A stale cached Workbench artifact initially hid exports present in the
 checked-out source; rebuilding Workbench cleared that failure without a
 source change. All five primary migration trees are integrated into main
 and pushed directly, with the two older API backport branches retained.
+
+
+### 13.48 Burn 0.22.1 patch qualification (2026-10-24)
+
+**Status:** in progress, authorized by Mark after the patch-release review.
+Mere starts at `003f9b3505ab6ac321f7644ae16dd5fef966b136`; ESP starts at
+`f27bee8eb5152618ab91fa8676d62c72ebfcb4fc`. Work is isolated from the
+uncommitted Alembic documentation in the primary Mere checkout.
+
+**Feature targets and done conditions:**
+
+1. Compare released archives for the runtime persistence, packed-Q4 matmul,
+   remote session-control and browser extrema patches. Retire a patch only
+   with its existing feature-tree/execution proof; otherwise carry the exact
+   remaining delta and update provenance/licenses.
+2. Receive one Burn 0.22.1 / CubeCL 0.11.1 / Cubek 0.3.1 graph in ESP, Mere
+   and the affected standalone fixtures. Preserve independent feature gates
+   and canonical supplier identities. Historical locks/receipts remain intact.
+3. Run existing numerical CPU/autodiff/native GPU checks, exact durable
+   generation/resume, bounded packed-weight rows, browser embedding/extrema
+   and remote two-lease close/reclaim/recovery. Record each executed feature,
+   source and platform; preserve old oracles and fail-closed controls.
+4. Inspect the integrated dependency graph and docs, preserve qualification
+   output, and distinguish prepared, locally committed and published state.
+   Product/fleet/platform rows not executed remain explicitly unqualified.
+
+**Findings (2026-10-24):** the starting root holds the released 0.22.0 cohort.
+Its active patches are cubecl-runtime, cubek-matmul and burn-remote; browser
+fixtures additionally select cubek-reduce. CubeCL 0.11.1 changes optional
+compiler feature forwarding, a candidate for retiring the persistence patch
+after actual resolution. Backend persistence is unrelated to agent durability.
+
+**Progress:** checksum-verified registry archives for Burn Remote, Cubek matmul
+and reduction have been compared and rebased using the previous released
+archives as the three-way merge base. Remote upstream source is unchanged;
+matmul's released plane selector/tests and reduction's empty-output handling
+are retained alongside all carried local deltas. The reduction README now
+corrects its stale sole-delta description: later NaN/top-k/tie fixes exist.
+
+The root and both browser reproducer locks now hold one Burn 0.22.1 / CubeCL
+0.11.1 / Cubek 0.3.1 cohort. Targeted resolution preserves Genet's existing
+`2b5c01811e6051ecd815cb407ff1ec9b40724fc9` cut; an unconstrained refresh
+would move an unrelated document API. Selected Conatus native and browser
+wasm feature trees use released `cubecl-runtime` without `persistence`, so the
+manifest-only runtime patch is removed from active roots. Its historical
+source remains intact. This is a backend cache feature result, not a journal
+or agent-durability change.
+
+The first CPU pass completed 295 tests, zero failures and 12 existing ignores.
+That preparatory pass used Homebrew Rust 1.99.0 and an intermediate lock, so
+it is not the final cohort receipt. Final builds explicitly use the pinned
+Rust 1.99.1 shim; its installed wasm standard library also resolves the initial
+browser setup failure. CPU/GPU/autodiff, headed browser, remote-reclaim and
+remaining standalone-workspace gates are in progress.
+
+Full working logs and archive checksums are retained under the task's
+`output/burn-0221-20261024` directory. Local ESP path overrides are confined to
+qualification config there and are not a published supplier pin.

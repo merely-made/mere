@@ -12,3 +12,13 @@ require an explicit feature request.
 
 Remove this patch when upstream makes persistence optional without a forcing
 default dependency edge. This source rebase is not a remote lifecycle receipt.
+
+## Retired from active roots (2026-10-24)
+
+The Burn 0.22.1 / CubeCL 0.11.1 cohort no longer selects this patch. Released
+CubeCL corrects default-feature forwarding on optional compiler dependencies.
+The selected Conatus native Burn and browser-extrema wasm feature trees use
+registry `cubecl-runtime 0.11.1` with `std`/`toml`, without `persistence`.
+The historical source remains for prior receipts; it must not be rebased or
+substituted into a current lock. Execution gates are recorded in migration
+plan section 13.48. This says nothing about application checkpoint durability.

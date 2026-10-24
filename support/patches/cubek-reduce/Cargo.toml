@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "cubek-reduce"
-version = "0.3.0"
+version = "0.3.1"
 authors = [
     "nathanielsimard <nathaniel.simard.42@gmail.com>",
     "louisfd <louisfd94@gmail.com>",
@@ -66,15 +66,15 @@ name = "lib"
 path = "tests/lib.rs"
 
 [dependencies.cubecl]
-version = "0.11.0"
+version = "0.11.1"
 default-features = false
 
 [dependencies.cubek-std]
-version = "0.3.0"
+version = "0.3.1"
 default-features = false
 
 [dependencies.cubek-test-utils]
-version = "0.3.0"
+version = "0.3.1"
 optional = true
 default-features = false
 
@@ -105,16 +105,16 @@ version = "2"
 default-features = false
 
 [dev-dependencies.cubecl]
-version = "0.11.0"
+version = "0.11.1"
 features = ["test-runtime"]
 default-features = false
 
 [dev-dependencies.cubecl-common]
-version = "0.11.0"
+version = "0.11.1"
 default-features = false
 
 [dev-dependencies.cubek-test-utils]
-version = "0.3.0"
+version = "0.3.1"
 default-features = false
 
 [lints.clippy]

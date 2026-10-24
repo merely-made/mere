@@ -1,13 +1,13 @@
-# cubek-matmul 0.3.0: packed Q4 unit-stage memory
+# cubek-matmul 0.3.1: packed Q4 unit-stage memory
 
 Upstream: `tracel-ai/cubek`, commit
-`b6ac1f2ee54c773f345c0bfbd9f330c9022cc3a8`, `crates/cubek-matmul`.
+`245851cc83e95e179b91bc145c2b3a1e305bfdba`, `crates/cubek-matmul`.
 The registry archive SHA-256 is
-`59816f7d5baf51ca06f417899ee194d46d76f633541907c94091163b4ade20ff`.
+`11362e390ac15e89a9dad87645a0869e0fa73998c26fc62dfffbca62893b0f28`.
 Sources and tests come from that archive. The licenses come from that commit's
-repository root. Cargo.toml adds a standalone workspace and the same local
-cubecl-runtime patch used by Mere, for the patch regression gate. Its lockfile
-pins that standalone gate. Embedding hosts must restate this patch at their
+repository root. Cargo.toml adds a standalone workspace for its patch
+regression gate. CubeCL now resolves upstream; its defaults forwarding is
+qualified separately. Its lockfile pins that standalone gate. Embedding hosts must restate this patch at their
 own Cargo root; dependency manifests do not propagate Cargo patches.
 
 Mere changes `src/multi_level/routines/selector/unit.rs`. The original selector
@@ -26,3 +26,11 @@ The pure selector regression pins the failing footprint and its reduction to
 128 working units. ESP also tests 960-wide Q4 projections at 30-token prefill
 and one-token decode shapes, alongside the full SmolLM2 format fixture.
 Remove this patch when upstream selection passes these same rows and limits.
+
+## 0.22.1 cohort rebase (2026-10-24)
+
+Released archives were checksum-verified before a three-way rebase. Existing
+local source and regression deltas are preserved, including changes added
+after the original stable-release receipt. New upstream source changes are
+retained. Executable qualification remains in progress in the Burn migration
+plan, section 13.48; this provenance update alone is not an acceptance pass.

@@ -1,5 +1,12 @@
 # Burn browser shared-input binary reproducer
 
+**Current cohort (2026-10-24):** Burn 0.22.1, CubeCL 0.11.1 and Cubek 0.3.1
+are under qualification in the Burn migration plan, section 13.48. The
+`burn-cubecl` selector remains upstream; the runtime persistence manifest
+patch is retired. The historical comparisons below describe their original
+source cuts and are not receipts for this patch cohort.
+
+
 **2026-09-29 pre.4 comparison:** the native comparison passes. In the current
 in-app browser, all ten graph and eleven embedding cases pass both with Mere's
 backport and with pristine upstream `burn-cubecl 0.22.0-pre.4`. The upstream
@@ -19,7 +26,7 @@ controls that already pass and adds a model-free causal ladder:
 - the resulting variance and LayerNorm;
 - an `8 x 384` BERT-width LayerNorm checked against host arithmetic.
 
-On the published Burn/CubeCL row, scalar multiplication and independent tensor
+On the historical pre.2 Burn/CubeCL row, scalar multiplication and independent tensor
 operands pass. `tensor.clone() * tensor` fails, and both exact-unit and
 BERT-width LayerNorm return their input unchanged. WebGPU validation scopes stay
 empty.
@@ -32,7 +39,8 @@ Three patch experiments distinguish the cause:
    input zero, and using a separate output passes every graph and embedding
    case.
 
-The third form is carried by Mere's `support/patches/burn-cubecl` backport.
+The third form was carried by Mere's `support/patches/burn-cubecl` backport,
+which was subsequently retired under ruling 410.
 The before/after headed result is recorded in
 [the binary-alias receipt](receipts/2026-08-22_binary_alias_iab.json). A native
 WGPU test in this crate checks the shared multiply and exact LayerNorm as a

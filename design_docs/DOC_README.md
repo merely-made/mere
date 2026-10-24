@@ -1,3 +1,5 @@
+Burn 0.22.1 qualification (2026-10-24, in progress): the [Burn migration plan](mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md#1348-burn-0221-patch-qualification-2026-10-24) records the isolated ESP/Mere patch cohort, existing vendor-delta review, numerical/model, browser and remote-reclaim gates. This does not change Alembic ownership or qualify another platform.
+
 Turnstone R4 resident process fixture (2026-10-18, bounded macOS qualification passed): the
 [resident inference plan](mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md#turnstone-r4-process-acceptance-fixture--2026-10-18)
 records opt-in independent OS-process phases in the existing real-model headed

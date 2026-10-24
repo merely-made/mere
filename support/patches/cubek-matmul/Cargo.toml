@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "cubek-matmul"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["louisfd <louisfd94@gmail.com>"]
 build = false
 autolib = false
@@ -70,31 +70,31 @@ path = "tests/lib.rs"
 version = "1.16.1"
 
 [dependencies.cubecl]
-version = "0.11.0"
+version = "0.11.1"
 features = ["stdlib"]
 default-features = false
 
 [dependencies.cubecl-common]
-version = "0.11.0"
+version = "0.11.1"
 default-features = false
 
 [dependencies.cubek-quant]
-version = "0.3.0"
+version = "0.3.1"
 features = ["kernels"]
 optional = true
 default-features = false
 
 [dependencies.cubek-std]
-version = "0.3.0"
+version = "0.3.1"
 default-features = false
 
 [dependencies.cubek-test-utils]
-version = "0.3.0"
+version = "0.3.1"
 optional = true
 default-features = false
 
 [dependencies.cubek-tile]
-version = "0.3.0"
+version = "0.3.1"
 optional = true
 default-features = false
 
@@ -117,17 +117,17 @@ features = [
 default-features = false
 
 [dev-dependencies.cubecl]
-version = "0.11.0"
+version = "0.11.1"
 features = ["test-runtime"]
 default-features = false
 
 [dev-dependencies.cubek-quant]
-version = "0.3.0"
+version = "0.3.1"
 features = ["kernels"]
 default-features = false
 
 [dev-dependencies.cubek-test-utils]
-version = "0.3.0"
+version = "0.3.1"
 default-features = false
 
 [lints.clippy]
@@ -136,5 +136,4 @@ redundant_field_names = "allow"
 # Standalone patch regression gate, sharing Mere's cache policy.
 [workspace]
 [patch.crates-io]
-cubecl-runtime = { path = "../cubecl-runtime" }
 cubek-matmul = { path = "." }
