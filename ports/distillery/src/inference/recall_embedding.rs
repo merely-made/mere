@@ -267,6 +267,107 @@ mod tests {
             reads: AtomicUsize::new(0),
         })
     }
+    #[test]
+    fn ranking_ties_and_answer_inputs_ignore_source_identity_permutations() {
+        let texts = [
+            "The orchard opening day is Monday.",
+            "The orchard opening day is Friday.",
+            "The harbor access code is blue.",
+            "The saved listener note is warm.",
+        ];
+        let question = "What is the orchard opening day?";
+        let mut expected = None;
+        for a in 0..4 {
+            for b in 0..4 {
+                for c in 0..4 {
+                    for d in 0..4 {
+                        let ids = [a, b, c, d];
+                        if ids.iter().collect::<std::collections::BTreeSet<_>>().len() != 4 {
+                            continue;
+                        }
+                        let corpus = Arc::new(Corpus {
+                            sources: Mutex::new(
+                                texts
+                                    .iter()
+                                    .zip(ids)
+                                    .map(|(text, id)| RetainedSourceText {
+                                        source: RecallSourceId {
+                                            kind: RecallSourceKind::PageText,
+                                            owner: Some(format!("owner-{id}")),
+                                            source: format!("source-{id}"),
+                                            node: None,
+                                        },
+                                        version: "v1".into(),
+                                        title: None,
+                                        text: (*text).into(),
+                                    })
+                                    .collect(),
+                            ),
+                            reads: AtomicUsize::new(0),
+                        });
+                        let config = RecallConfig {
+                            max_passages: 4,
+                            ..Default::default()
+                        };
+                        let lexical = RecallIndex::build(corpus.clone(), config.clone()).unwrap();
+                        let runtime = runtime(Arc::new(Cache::default()));
+                        let fused =
+                            RecallIndex::build_with_embedding(corpus, config, &runtime).unwrap();
+                        let mut views = Vec::new();
+                        for index in [&lexical, &fused] {
+                            let ranks = index.rankings(question, &[]).unwrap();
+                            let (mut evidence, _) = index.prepare(question, &[]).unwrap();
+                            let by_id: std::collections::BTreeMap<_, _> = evidence
+                                .passages
+                                .iter()
+                                .map(|p| (p.passage.id().to_string(), p.passage.text.clone()))
+                                .collect();
+                            let text_order = |keys: &[String]| {
+                                keys.iter()
+                                    .map(|key| by_id[key].clone())
+                                    .collect::<Vec<_>>()
+                            };
+                            evidence.answer_format = AnswerFormat::ClaimSupportV1;
+                            let (contract, prompt, context) =
+                                super::super::answer_contract::prepare(question, &evidence)
+                                    .unwrap();
+                            evidence.answer_contract = Some(contract);
+                            let grammar = super::super::answer_contract::grammar(
+                                &evidence,
+                                "distillery.quoted-review/v7",
+                            )
+                            .unwrap();
+                            // Provenance still follows its actual source; only equal-score
+                            // presentation must ignore arbitrary owner and source identities.
+                            for p in &evidence.passages {
+                                let slot = texts
+                                    .iter()
+                                    .position(|text| *text == p.passage.text)
+                                    .unwrap();
+                                assert_eq!(
+                                    p.passage.source.source,
+                                    format!("source-{}", ids[slot])
+                                );
+                            }
+                            views.push((
+                                text_order(&ranks.lexical),
+                                text_order(&ranks.vector),
+                                text_order(&ranks.fused),
+                                prompt,
+                                context,
+                                grammar,
+                            ));
+                        }
+                        if let Some(expected) = &expected {
+                            assert_eq!(&views, expected, "source identity permutation {ids:?}");
+                        } else {
+                            expected = Some(views);
+                        }
+                    }
+                }
+            }
+        }
+    }
     fn options() -> EmbeddingRecallSettings {
         EmbeddingRecallSettings {
             provider: EmbeddingRecallProvider::LexicalSparse {

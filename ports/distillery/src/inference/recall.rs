@@ -552,16 +552,21 @@ impl RecallIndex {
                 allowed.insert(key.clone());
             }
         }
-        let lexical: Vec<_> = self
+        let mut lexical_hits: Vec<_> = self
             .index
             .search(question, self.index.len())
             .into_iter()
-            .map(|h| h.key)
-            .filter(|k| allowed.contains(k))
+            .filter(|h| allowed.contains(&h.key))
             .collect();
+        lexical_hits.sort_by(|a, b| {
+            b.score
+                .total_cmp(&a.score)
+                .then_with(|| self.content_tie_order(&a.key, &b.key))
+        });
+        let lexical: Vec<_> = lexical_hits.into_iter().map(|h| h.key).collect();
         #[cfg(feature = "inference-embedding")]
         if let Some(embedding) = &self.embedding {
-            let vector: Vec<_> = if embedding.search.is_empty() {
+            let mut vector_hits: Vec<_> = if embedding.search.is_empty() {
                 vec![]
             } else {
                 embedding
@@ -579,19 +584,26 @@ impl RecallIndex {
                                 eidetic::models::embedding::EmbeddingMetric::DotProduct => true,
                             }
                     })
-                    .map(|(key, _)| key)
                     .collect()
             };
+            vector_hits.sort_by(|a, b| {
+                b.1.total_cmp(&a.1)
+                    .then_with(|| self.content_tie_order(&a.0, &b.0))
+            });
+            let vector: Vec<_> = vector_hits.into_iter().map(|(key, _)| key).collect();
             let e = &embedding.evidence;
-            let fused = eidetic_search::fuse(
+            let mut fused_hits = eidetic_search::fuse(
                 &lexical,
                 &vector,
                 e.rrf_k as f64,
                 (e.lexical_weight as f64, e.vector_weight as f64),
-            )
-            .into_iter()
-            .map(|h| h.url)
-            .collect();
+            );
+            fused_hits.sort_by(|a, b| {
+                b.score
+                    .total_cmp(&a.score)
+                    .then_with(|| self.content_tie_order(&a.url, &b.url))
+            });
+            let fused = fused_hits.into_iter().map(|h| h.url).collect();
             return Ok(RecallRankings {
                 lexical,
                 vector,
@@ -603,6 +615,16 @@ impl RecallIndex {
             lexical,
             vector: vec![],
         })
+    }
+    // Scores retain priority. Exact passage text breaks ties in descending
+    // order before a provenance-dependent manifest ID. Freshly admitted copies
+    // must not change answer inputs merely because their owner/node IDs changed.
+    // Identical texts retain their distinct source identities and final ID tie.
+    fn content_tie_order(&self, a: &str, b: &str) -> std::cmp::Ordering {
+        self.passages[b]
+            .text
+            .cmp(&self.passages[a].text)
+            .then_with(|| a.cmp(b))
     }
     pub fn prepare(
         &self,
