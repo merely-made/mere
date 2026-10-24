@@ -1,0 +1,24 @@
+{
+  "source": "217d666a4570c2c2953068e76dfc683698765b2f",
+  "other_checkout_heads_and_git_statuses_unchanged": false,
+  "other_checkout_changes_observed": [
+    {
+      "before": {
+        "path": "/Users/markik/Code/worktrees/mere-servo-cue-20261023",
+        "head": "35d5d35cbd84e123ac55ae18e12a4d094a95fd21",
+        "status": "",
+        "branch": "codex/servo-cue-report-20261023"
+      },
+      "after": {
+        "path": "/Users/markik/Code/worktrees/mere-servo-cue-20261023",
+        "head": "72b445c634bfe7335160daef7aac6e31b7c048c6",
+        "status": "",
+        "branch": "codex/servo-cue-report-20261023"
+      }
+    }
+  ],
+  "basis": "Before/after HEAD, branch and porcelain status. Source mutations confined to the owned qualification checkout; shared ignored build caches were reused.",
+  "personal_vaults_and_installed_apps_unchanged": true,
+  "primary_checkout_head_and_git_status_unchanged": true,
+  "other_activity_assessment": "Another active worktree independently advanced to the documentation-only published main commit 72b445c634bfe7335160daef7aac6e31b7c048c6. It was left untouched; this integration will receive that main commit."
+}

@@ -1,0 +1,17 @@
+{
+  "source": "cb33fe747dec3a428343bf636a425140e801faf3",
+  "result": "failed",
+  "failed_checkpoint": "guest-save-retried.png",
+  "controller_wait_seconds": 120,
+  "relay_listener_ready_at_ms": 1792863710739,
+  "reconnect_marker_released_at_ms": 1792863710752,
+  "relay_endpoint_registrations": {
+    "89fe28b5ad43d5daab11b2d3de905c29e77e1851ddbcec348806dee5f1df8938": 1792863710853,
+    "908ffca16a9f9cff3fecbc275bc3a436aefbe2aa91a53c08c3058c6171a22560": 1792863718152
+  },
+  "last_endpoint_registration_after_marker_ms": 7400,
+  "owner_before_and_after_failed_save_byte_identical": true,
+  "no_save_acknowledgement_observed": true,
+  "interpretation": "The controller released Reconnect before both endpoints had rejoined. Fresh qualification will require endpoint readiness; product behavior is unchanged.",
+  "owned_process_cleanup": "run-01-cleanup.json"
+}

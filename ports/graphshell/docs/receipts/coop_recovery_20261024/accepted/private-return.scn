@@ -1,0 +1,8 @@
+await {"status": "ready"}
+wait 30000
+click role:button @data-session-step=switch:5be25525-4ba8-491d-9ffa-46eed5425590
+await {"attached": "5be25525-4ba8-491d-9ffa-46eed5425590"}
+wait 30000
+wheel 0 -10000 px on .coop-panel
+settle 2
+capture /Users/markik/Code/output/gs-recovery-20261024-02/local/evidence/private-after.png

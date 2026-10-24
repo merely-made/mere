@@ -1,0 +1,10 @@
+2026-10-24T17:52:44.283391Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /home/markik/Code/output/tp-recovery-20261024-02/private/guest/vault/vault.json
+2026-10-24T17:52:44.331959Z  WARN djinn: selected profile was created profile=CrossGraphGuest
+2026-10-24T17:52:44.333284Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-24T17:52:44.343222Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /home/markik/Code/output/tp-recovery-20261024-02/private/guest/mere yet; pair this device first, or name a persona
+2026-10-24T17:52:44.343596Z  INFO djinn: SSH agent listening endpoint="/home/markik/Code/output/tp-recovery-20261024-02/private/guest/agent.sock"
+2026-10-24T17:52:44.343762Z  INFO djinn::personal_sync: owner settings path=/home/markik/Code/output/tp-recovery-20261024-02/private/guest/local/graphshell/settings/CrossGraphGuest.json configured=false
+2026-10-24T17:53:05.165484Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-24T17:53:13.896962Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-24T17:53:38.393201Z  INFO djinn: stop requested on the control route
+2026-10-24T17:53:38.393800Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 7, cancelled: 3, panicked: 0, rejected: 0 }

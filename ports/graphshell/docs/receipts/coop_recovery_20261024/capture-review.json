@@ -1,0 +1,191 @@
+[
+  {
+    "capture": "private-before.png",
+    "sha256": "e9f05f1fa9f2f8f65c6a157375d014acc1f56dc992d78217a3830243cd7a9de5",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner ordinary view displays only the private sibling and its owner-only address."
+  },
+  {
+    "capture": "existing-graph.png",
+    "sha256": "5b749bc374485ad88abca0c433ac7cc9ccb2669cc5ce27f442a1975ea750568c",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner ordinary view displays the chosen existing source before enabling co-op."
+  },
+  {
+    "capture": "owner-existing.png",
+    "sha256": "daf9b97e29cfd1320ab00861896438c1f34685d1f5ca9af9ec4bc614cfb9b1ac",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Co-op refers to the chosen existing graph and its original node."
+  },
+  {
+    "capture": "owner-invited.png",
+    "sha256": "74daf9d69268ff3c9c329879d246fddb3d24873cb8ed4f8a00ff028e76a001ad",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Chosen graph shows editor access for the named guest."
+  },
+  {
+    "capture": "owner-saw-guest.png",
+    "sha256": "ada9bf73814f9418a794831fdbe422e87e437223b3a8a11e2fc80263f79b498d",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner canvas shows the guest source beside the original source."
+  },
+  {
+    "capture": "owner-private-during-coop.png",
+    "sha256": "b4d30f67c7f37f1a5694665e2858a37aee1000d9b7dac61e4927f0d3bc2d8a2d",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Switching to the private sibling clears the co-op graph and asks for explicit sharing choice."
+  },
+  {
+    "capture": "owner-returned-to-chosen.png",
+    "sha256": "325b5939726141cabadca51e17337cefdc3eea1719a184090fd0aa2063d675cc",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Returning explicitly restores the chosen graph, two sources and the editor identity."
+  },
+  {
+    "capture": "owner-ordinary-push.png",
+    "sha256": "5fa34e386f1067048ecfe9599312c3db6427cf2089fb5e0ccb4e4ed3fdfe21a3",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner canvas shows three sources and the relationship from an ordinary resident write."
+  },
+  {
+    "capture": "owner-revoked.png",
+    "sha256": "50458491805cf524f3c42cdabf98a8780271942fbe0efb4570fe964cfe2f62b8",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner view retains the retried guest title and shows revoked access."
+  },
+  {
+    "capture": "owner-cold-retained.png",
+    "sha256": "1b7b57efd73692e55c88d9fec0a2884781c0c4eea25818ced9cd33490a5a55ba",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Cold owner view retains the three sources, relationship and retried title with access revoked."
+  },
+  {
+    "capture": "owner-cold-edited.png",
+    "sha256": "d0625bdc75ca4bcc6e4c635ebe7aaa70211ffb9b50df929780faac501e720fa8",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "After cold reopen, the owner can add a fourth source while guest access stays revoked."
+  },
+  {
+    "capture": "owner-cold-refused.png",
+    "sha256": "405c5f751a1e5f9762dc89884774a4a6d9df25e29b0abdfb0b284d9d53e7375b",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Owner retains its fourth source after the cold guest admission is refused."
+  },
+  {
+    "capture": "private-after.png",
+    "sha256": "9e68cde94963d2cfc672576b99883eae2d07b50a7bc44cdd2b0e6817f933ac62",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Private sibling still displays the same owner-only source after the complete co-op run."
+  },
+  {
+    "capture": "guest-start.png",
+    "sha256": "60b46a26cc44d106a53a5c8f15bb163ed6e4b2ea74b7ef7f343ca80ea3ab0c5f",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest opens the invited graph with its one original source and no session roster."
+  },
+  {
+    "capture": "guest-joined.png",
+    "sha256": "cfbc074c361788e644377904446b6d8e5ce28e9224a4aca54b3966632a0ed4b9",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest view displays the chosen existing source with editor access."
+  },
+  {
+    "capture": "guest-added.png",
+    "sha256": "b7d367bd1343a4da482e6abce652a182dccd4ba94aa71c224c1ee65c23603e78",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest sees its new source with owner acknowledgement and admitted guest authorship."
+  },
+  {
+    "capture": "guest-still-scoped.png",
+    "sha256": "7e765cdfbf0fd04ee013c55abb4c583f46482d1aa8c00cfcde8f4fbfd6d13777",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest remains on the chosen graph while the owner displays the private sibling."
+  },
+  {
+    "capture": "guest-push.png",
+    "sha256": "542ffb7c14722bce6f5e497c9dfe38dbac529f2c06ad5a241ad489adea54395f",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest receives the third source and relationship pushed from the owner."
+  },
+  {
+    "capture": "guest-renamed.png",
+    "sha256": "7360bfa27f9a89bf65b391b7b4d1e610e6b9a30ba07266da7a921187bd4bf43b",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Guest-selected original source shows the acknowledged revised title and matching detail pane."
+  },
+  {
+    "capture": "guest-return.png",
+    "sha256": "c1de16289a562263a90e7e0a9a99a9e986c3aeeb75eaa572d7ce073ff46221f6",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "A reopened guest window retains the chosen graph and previously saved title."
+  },
+  {
+    "capture": "guest-before-relay-loss.png",
+    "sha256": "e18b6dd32ae50c0dd73e0c57d52197a1cc718eaf17170aced2340892d1db5b03",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Draft retry title is in the input while graph and selected-record title still show the saved value."
+  },
+  {
+    "capture": "guest-save-pending.png",
+    "sha256": "a6fac779742334dfd8345d684c42f443c5f90d1c4466df772edb38eb34ef18fc",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Working is visible; graph and detail pane retain the saved title without a new save acknowledgement."
+  },
+  {
+    "capture": "guest-save-failed.png",
+    "sha256": "a6ce3dcc53821ab1dcb4e67773db8475ddbcd7606fe39bc0774cc747b4856de7",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Unavailable is visible with empty graph and cleared detail pane; Reconnect is offered."
+  },
+  {
+    "capture": "guest-relay-restored.png",
+    "sha256": "28fb57a226943920dacfff3d9b4ab21a23e2dde4a11cfb1e173fcf00549eeccb",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Reconnect restores the three-source graph with the old saved title; the retry remains unsaved."
+  },
+  {
+    "capture": "guest-save-retried.png",
+    "sha256": "954463d0603da9c70f41f4329402216661bc736997dbb7d3abc7f5a19ddbe846",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Saved owner acknowledgement appears and both graph and detail pane show the explicitly retried title."
+  },
+  {
+    "capture": "guest-withdrawn.png",
+    "sha256": "2ae01c448651cd6cf6adc8bf0c6af1535b3bcffd2b81cf819d4a3be9e1b4ef54",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Live withdrawal clears the graph, selection and details and leaves an unavailable state."
+  },
+  {
+    "capture": "guest-cold-denied.png",
+    "sha256": "2cfc3801ed0b78f6abd86ba1a54c62e1e169d205dbbbac492ee3941e28ea0373",
+    "reviewed": true,
+    "method": "Four contact sheets; pending, failure, restoration, retry, cold denial and retained owner also inspected individually at full size.",
+    "observation": "Cold guest admission is explicitly refused as Delegation(Revoked), with empty graph and details."
+  }
+]

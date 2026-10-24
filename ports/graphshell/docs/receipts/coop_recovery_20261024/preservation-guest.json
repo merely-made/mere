@@ -1,0 +1,7 @@
+{
+  "source": "217d666a4570c2c2953068e76dfc683698765b2f",
+  "other_checkout_heads_and_git_statuses_unchanged": true,
+  "other_checkout_changes_observed": [],
+  "basis": "Before/after HEAD, branch and porcelain status. Source mutations confined to the owned qualification checkout; shared ignored build caches were reused.",
+  "personal_vaults_and_installed_apps_unchanged": true
+}

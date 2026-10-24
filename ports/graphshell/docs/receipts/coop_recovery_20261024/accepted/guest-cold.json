@@ -1,0 +1,160 @@
+{
+  "a11y_publication": {
+    "sampled_at_lane_frame": 12,
+    "snapshot": {
+      "host": 1,
+      "publication": {
+        "adapter": "installed",
+        "outcome": {
+          "contribution_issues": 0,
+          "nodes": 21,
+          "phase": "submitted"
+        }
+      },
+      "sequence": 13
+    }
+  },
+  "captures": [
+    {
+      "digest": "4374db51b52def6c",
+      "fields": {
+        "archives": "0",
+        "attached": "",
+        "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Unavailable: admission refused: Delegation(Revoked)\",\"connection\":[]}",
+        "coop-access": "",
+        "coop-available": "false",
+        "coop-graph": "",
+        "coop-nodes": "",
+        "coop-status": "Unavailable: admission refused: Delegation(Revoked)",
+        "epoch": "0",
+        "graph-labels": "",
+        "layout": "",
+        "nodes": "0",
+        "notice": "",
+        "pid": "196055",
+        "read-only": "false",
+        "record": "",
+        "record-data": "",
+        "relations": "0",
+        "saved-focus": "",
+        "selected": "",
+        "sessions": "0",
+        "status": "unavailable",
+        "view-saved": "false"
+      },
+      "height": 666,
+      "name": "/home/markik/Code/output/tp-recovery-20261024-02/evidence/guest-cold-denied.png",
+      "path": "/home/markik/Code/output/tp-recovery-20261024-02/evidence/guest-cold-denied.png",
+      "viewport": null,
+      "width": 1100
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 0,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 0,
+        "layout_rebuilt": 0,
+        "leaf_repaints": 0,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 2669,
+        "acquire_us": 199,
+        "capture_us": 0,
+        "clear_us": 756,
+        "compose_us": 1322,
+        "content_extent_us": 0,
+        "dirty_tile_rebuild_us": 1,
+        "emit_scene_us": 1287,
+        "excluding_acquire_present_capture_us": 21404,
+        "frame_hook_us": 75,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 0,
+        "layout_tick_us": 0,
+        "layout_update_us": 10,
+        "layout_with_text_us": 0,
+        "leaf_boxes_us": 58,
+        "leaf_fragments_us": 7,
+        "leaf_render_us": 4,
+        "master_compose_us": 40,
+        "pointer_us": 4,
+        "present_us": 359,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 9437,
+        "raster_us": 15101,
+        "relayout_us": 75,
+        "shadows_us": 0,
+        "style_resolve_us": 0,
+        "tile_invalidate_us": 85,
+        "total_us": 21962,
+        "vello_render_us": 9304
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "archives": "0",
+    "attached": "",
+    "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Unavailable: admission refused: Delegation(Revoked)\",\"connection\":[]}",
+    "coop-access": "",
+    "coop-available": "false",
+    "coop-graph": "",
+    "coop-nodes": "",
+    "coop-status": "Unavailable: admission refused: Delegation(Revoked)",
+    "epoch": "0",
+    "graph-labels": "",
+    "layout": "",
+    "nodes": "0",
+    "notice": "",
+    "pid": "196055",
+    "read-only": "false",
+    "record": "",
+    "record-data": "",
+    "relations": "0",
+    "saved-focus": "",
+    "selected": "",
+    "sessions": "0",
+    "status": "unavailable",
+    "view-saved": "false"
+  },
+  "frames": 12,
+  "kind": "graphshell-mere",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 12,
+  "scenario": true,
+  "scenario_log": [
+    "waited 4 frames",
+    "captured /home/markik/Code/output/tp-recovery-20261024-02/evidence/guest-cold-denied.png"
+  ],
+  "unpresented_redraws": 0
+}

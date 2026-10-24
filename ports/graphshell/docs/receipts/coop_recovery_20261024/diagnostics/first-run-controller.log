@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/markik/Code/worktrees/mere-graphshell-coop/support/graphshell-coop/run.py", line 329, in <module>
+    main()
+    ~~~~^^
+  File "/Users/markik/Code/worktrees/mere-graphshell-coop/support/graphshell-coop/run.py", line 321, in main
+    workflow(args, relay)
+    ~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/markik/Code/worktrees/mere-graphshell-coop/support/graphshell-coop/run.py", line 240, in workflow
+    guest.wait('guest-return', 'guest-save-retried.png', seconds=120)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/markik/Code/worktrees/mere-graphshell-coop/support/graphshell-coop/run.py", line 90, in wait
+    raise TimeoutError((self.role, phase, capture))
+TimeoutError: ('guest', 'guest-return', 'guest-save-retried.png')

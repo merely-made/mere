@@ -1,0 +1,731 @@
+{
+  "cards": [
+    {
+      "badges": [],
+      "media": [
+        [
+          241,
+          157,
+          35,
+          88,
+          50,
+          66,
+          112,
+          254,
+          136,
+          203,
+          25,
+          10,
+          155,
+          132,
+          89,
+          117,
+          234,
+          145,
+          216,
+          170,
+          218,
+          164,
+          225,
+          214,
+          112,
+          170,
+          23,
+          122,
+          175,
+          45,
+          45,
+          52
+        ]
+      ],
+      "title": "Session",
+      "values": [
+        {
+          "label": "Session",
+          "value": "6fd810a3-3293-450a-8421-f829136fed65"
+        },
+        {
+          "label": "Changes",
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "badges": [],
+      "media": [],
+      "title": "Guest source",
+      "values": [
+        {
+          "label": "Address",
+          "value": "https://shared.invalid/guest"
+        },
+        {
+          "label": "Kind",
+          "value": "web"
+        },
+        {
+          "label": "Accesses",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "badges": [],
+      "media": [],
+      "title": "https://shared.invalid/ordinary-owner",
+      "values": [
+        {
+          "label": "Address",
+          "value": "https://shared.invalid/ordinary-owner"
+        },
+        {
+          "label": "Kind",
+          "value": "web"
+        },
+        {
+          "label": "Accesses",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "badges": [],
+      "media": [],
+      "title": "Guest revised existing source",
+      "values": [
+        {
+          "label": "Address",
+          "value": "https://shared.invalid/existing"
+        },
+        {
+          "label": "Kind",
+          "value": "web"
+        },
+        {
+          "label": "Accesses",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "graphs": [
+    {
+      "application": "graphshell",
+      "epoch": 2,
+      "facets": {
+        "nodes": {
+          "14831004-2b92-4645-b327-dbbad228a4ad": {
+            "visit.history": {
+              "last_session_visited": 0,
+              "last_visited_ms": 1792864386570
+            }
+          },
+          "50c54fc4-9d3f-4b3f-859c-b0a2929192b4": {
+            "visit.history": {
+              "last_session_visited": 0,
+              "last_visited_ms": 1792864390155
+            }
+          },
+          "a404b775-7499-4b07-8d6b-a81ddbf08476": {
+            "visit.history": {
+              "last_session_visited": 0,
+              "last_visited_ms": 1792864365653
+            }
+          }
+        }
+      },
+      "graph": {
+        "assertion_schema": 1,
+        "couplings": [],
+        "edges": [
+          {
+            "arrangement": null,
+            "assertions": [
+              {
+                "predicate": "https://mere.computer/ns/rel#cites",
+                "provenance_iri": "https://mere.computer/ns/agent#person/5a184463-a12b-4fac-a214-9279cc159f79",
+                "recognized_sub_kind": "Cites",
+                "statement_id": "01a16f0b8c0b-e64024f8a7410c5e-0000000000000001"
+              }
+            ],
+            "containment": null,
+            "families": [
+              "Semantic"
+            ],
+            "from_node_id": "14831004-2b92-4645-b327-dbbad228a4ad",
+            "imported": null,
+            "provenance": null,
+            "semantic": null,
+            "to_node_id": "50c54fc4-9d3f-4b3f-859c-b0a2929192b4",
+            "traversal": null
+          }
+        ],
+        "fields": [],
+        "import_records": [],
+        "navigation": {
+          "snapshot": {
+            "entries": [],
+            "owners": [],
+            "visits": []
+          }
+        },
+        "nodes": [
+          {
+            "address": {
+              "Http": "https://shared.invalid/existing"
+            },
+            "body": null,
+            "cached_host": null,
+            "classifications": [],
+            "derivations": [],
+            "frame_layout_hints": [],
+            "frame_split_offer_suppressed": false,
+            "import_provenance": [],
+            "is_pinned": false,
+            "last_session_visited": 0,
+            "mime_hint": null,
+            "nested": null,
+            "node_id": "a404b775-7499-4b07-8d6b-a81ddbf08476",
+            "properties": [],
+            "session_state": {
+              "form_draft": null,
+              "last_visited_ms": null,
+              "scroll_x": null,
+              "scroll_y": null
+            },
+            "tag_presentation": {
+              "icon_overrides": {},
+              "ordered_tags": []
+            },
+            "tags": [],
+            "title": "Guest revised existing source",
+            "url": "https://shared.invalid/existing"
+          },
+          {
+            "address": {
+              "Http": "https://shared.invalid/guest"
+            },
+            "body": null,
+            "cached_host": null,
+            "classifications": [],
+            "derivations": [],
+            "frame_layout_hints": [],
+            "frame_split_offer_suppressed": false,
+            "import_provenance": [],
+            "is_pinned": false,
+            "last_session_visited": 0,
+            "mime_hint": null,
+            "nested": null,
+            "node_id": "14831004-2b92-4645-b327-dbbad228a4ad",
+            "properties": [],
+            "session_state": {
+              "form_draft": null,
+              "last_visited_ms": null,
+              "scroll_x": null,
+              "scroll_y": null
+            },
+            "tag_presentation": {
+              "icon_overrides": {},
+              "ordered_tags": []
+            },
+            "tags": [],
+            "title": "Guest source",
+            "url": "https://shared.invalid/guest"
+          },
+          {
+            "address": {
+              "Http": "https://shared.invalid/ordinary-owner"
+            },
+            "body": null,
+            "cached_host": null,
+            "classifications": [],
+            "derivations": [],
+            "frame_layout_hints": [],
+            "frame_split_offer_suppressed": false,
+            "import_provenance": [],
+            "is_pinned": false,
+            "last_session_visited": 0,
+            "mime_hint": null,
+            "nested": null,
+            "node_id": "50c54fc4-9d3f-4b3f-859c-b0a2929192b4",
+            "properties": [],
+            "session_state": {
+              "form_draft": null,
+              "last_visited_ms": null,
+              "scroll_x": null,
+              "scroll_y": null
+            },
+            "tag_presentation": {
+              "icon_overrides": {},
+              "ordered_tags": []
+            },
+            "tags": [],
+            "title": "https://shared.invalid/ordinary-owner",
+            "url": "https://shared.invalid/ordinary-owner"
+          }
+        ],
+        "resource_edges": [],
+        "resources": [
+          {
+            "canonical_iri": "https://shared.invalid/guest",
+            "facets": []
+          }
+        ],
+        "shown_resources": [
+          {
+            "resource_id": "c3909d3b-4b6d-5ba0-8c6f-e15c0d2cc02e",
+            "surface_id": "14831004-2b92-4645-b327-dbbad228a4ad"
+          }
+        ],
+        "timestamp_secs": 0
+      },
+      "read_only": false,
+      "revision": 5,
+      "schema": "mere.session.graph/v1",
+      "session": "6fd810a3-3293-450a-8421-f829136fed65",
+      "views": {}
+    }
+  ],
+  "snapshot": {
+    "cache_policy": {
+      "expires_at_ms": null,
+      "purge_on_revocation": true,
+      "retention": "MemoryOnly"
+    },
+    "presentation": {
+      "bindings": [
+        {
+          "instance": 0,
+          "key": "mere.session:6fd810a3-3293-450a-8421-f829136fed65"
+        },
+        {
+          "instance": 1,
+          "key": "mere:50c54fc4-9d3f-4b3f-859c-b0a2929192b4"
+        },
+        {
+          "instance": 2,
+          "key": "mere:14831004-2b92-4645-b327-dbbad228a4ad"
+        },
+        {
+          "instance": 3,
+          "key": "mere:a404b775-7499-4b07-8d6b-a81ddbf08476"
+        }
+      ],
+      "offers": {
+        "mere.session:6fd810a3-3293-450a-8421-f829136fed65": [
+          {
+            "byte_size": 270,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              214,
+              182,
+              51,
+              27,
+              211,
+              179,
+              169,
+              78,
+              150,
+              203,
+              136,
+              41,
+              171,
+              245,
+              251,
+              227,
+              160,
+              129,
+              58,
+              103,
+              126,
+              65,
+              61,
+              60,
+              57,
+              89,
+              65,
+              209,
+              81,
+              2,
+              86,
+              168
+            ],
+            "semantics": {
+              "actions": [
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Apply edits in stable-id form to this session as one change, under your name.",
+                  "intent": "mere.session.apply",
+                  "label": "Apply edits",
+                  "payload_schema": "mere.session.apply/v1"
+                },
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Undo your latest change still in effect; what others changed since stays.",
+                  "intent": "mere.session.undo",
+                  "label": "Undo",
+                  "payload_schema": "mere.session.step/v1"
+                },
+                {
+                  "effect": "DomainTruth",
+                  "explanation": "Redo your most recent undo.",
+                  "intent": "mere.session.redo",
+                  "label": "Redo",
+                  "payload_schema": "mere.session.step/v1"
+                },
+                {
+                  "effect": "Curation",
+                  "explanation": "Keep one of your views of this session: its folds, camera and layout.",
+                  "intent": "mere.session.view",
+                  "label": "Change a view",
+                  "payload_schema": "mere.session.view/v1"
+                }
+              ],
+              "bounds": "FillFootprint",
+              "label": "Session",
+              "role": "Article"
+            }
+          }
+        ],
+        "mere:14831004-2b92-4645-b327-dbbad228a4ad": [
+          {
+            "byte_size": 181,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              51,
+              4,
+              156,
+              53,
+              98,
+              139,
+              128,
+              242,
+              89,
+              108,
+              72,
+              160,
+              118,
+              244,
+              70,
+              135,
+              12,
+              112,
+              67,
+              233,
+              173,
+              56,
+              212,
+              123,
+              38,
+              134,
+              87,
+              22,
+              109,
+              62,
+              67,
+              176
+            ],
+            "semantics": {
+              "actions": [],
+              "bounds": "FillFootprint",
+              "label": "Guest source",
+              "role": "Article"
+            }
+          }
+        ],
+        "mere:50c54fc4-9d3f-4b3f-859c-b0a2929192b4": [
+          {
+            "byte_size": 215,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              107,
+              133,
+              88,
+              174,
+              220,
+              44,
+              110,
+              173,
+              199,
+              43,
+              225,
+              171,
+              40,
+              69,
+              116,
+              25,
+              114,
+              238,
+              99,
+              132,
+              217,
+              233,
+              124,
+              86,
+              6,
+              90,
+              184,
+              42,
+              71,
+              254,
+              6,
+              174
+            ],
+            "semantics": {
+              "actions": [],
+              "bounds": "FillFootprint",
+              "label": "https://shared.invalid/ordinary-owner",
+              "role": "Article"
+            }
+          }
+        ],
+        "mere:a404b775-7499-4b07-8d6b-a81ddbf08476": [
+          {
+            "byte_size": 201,
+            "codec": "PortableCardV1",
+            "requires": "PortableCard",
+            "resource": [
+              6,
+              161,
+              231,
+              243,
+              147,
+              248,
+              73,
+              50,
+              230,
+              130,
+              101,
+              198,
+              121,
+              38,
+              99,
+              232,
+              104,
+              4,
+              243,
+              12,
+              133,
+              123,
+              104,
+              123,
+              230,
+              142,
+              147,
+              247,
+              124,
+              24,
+              249,
+              163
+            ],
+            "semantics": {
+              "actions": [],
+              "bounds": "FillFootprint",
+              "label": "Guest revised existing source",
+              "role": "Article"
+            }
+          }
+        ]
+      }
+    },
+    "scene": {
+      "epoch": 2,
+      "revision": 5,
+      "tables": {
+        "backdrops": [],
+        "bounds": {
+          "origin": {
+            "x": -403.1496887207031,
+            "y": -820.9786376953125
+          },
+          "size": {
+            "h": 1136.366943359375,
+            "w": 570.6270751953125
+          }
+        },
+        "generation": 5,
+        "honored_holds": [],
+        "item_order": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "items": [
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Card",
+            "source": 0,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": -283.1496887207031,
+                "y": -764.9786376953125
+              }
+            },
+            "visible": true
+          },
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Card",
+            "source": 1,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "visible": true
+          },
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Card",
+            "source": 2,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": -283.1496887207031,
+                "y": 259.38824462890625
+              }
+            },
+            "visible": true
+          },
+          {
+            "channels": [],
+            "footprint": {
+              "Rect": {
+                "size": {
+                  "h": 112.0,
+                  "w": 240.0
+                }
+              }
+            },
+            "hit": null,
+            "layer": 0,
+            "representation": "Glyph",
+            "source": 3,
+            "space": 0,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 47.47739791870117,
+                "y": -540.9786376953125
+              }
+            },
+            "visible": true
+          }
+        ],
+        "regions": [],
+        "relations": [
+          {
+            "from": 2,
+            "kind": "link.surface",
+            "link_key": {
+              "first": "14831004-2b92-4645-b327-dbbad228a4ad",
+              "second": "50c54fc4-9d3f-4b3f-859c-b0a2929192b4",
+              "stratum": "surface"
+            },
+            "marks": {
+              "forward": true,
+              "opposed": false,
+              "reverse": false
+            },
+            "points": [
+              {
+                "x": -283.1496887207031,
+                "y": 259.38824462890625
+              },
+              {
+                "x": 0.0,
+                "y": 0.0
+              }
+            ],
+            "space": 0,
+            "strength": 1.0,
+            "to": 1,
+            "weight": 1.0
+          }
+        ],
+        "sources": [
+          {
+            "adapter": "mere.session",
+            "id": "6fd810a3-3293-450a-8421-f829136fed65"
+          },
+          {
+            "adapter": "mere.graph",
+            "id": "50c54fc4-9d3f-4b3f-859c-b0a2929192b4"
+          },
+          {
+            "adapter": "mere.graph",
+            "id": "14831004-2b92-4645-b327-dbbad228a4ad"
+          },
+          {
+            "adapter": "mere.graph",
+            "id": "a404b775-7499-4b07-8d6b-a81ddbf08476"
+          }
+        ],
+        "spaces": [
+          {
+            "name": "world",
+            "parent": null,
+            "transform": {
+              "rotate": 0.0,
+              "scale": 1.0,
+              "translate": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            }
+          }
+        ],
+        "unmet_holds": []
+      }
+    },
+    "session": "djinn.mere/v1/graph",
+    "version": {
+      "major": 1,
+      "minor": 3
+    }
+  }
+}

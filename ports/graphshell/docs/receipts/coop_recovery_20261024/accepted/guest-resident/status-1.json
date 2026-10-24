@@ -1,0 +1,17 @@
+{
+  "schema": "djinn.resident-status/v1",
+  "pid": 195653,
+  "started_ms": 1792864364332,
+  "installed": false,
+  "ready": true,
+  "startup_unlock": "passphrase",
+  "protection": "passphrase",
+  "lock": "unlocked",
+  "endpoints": {
+    "agent": "/home/markik/Code/output/tp-recovery-20261024-02/private/guest/agent.sock",
+    "agent_listener": "receipt",
+    "browser": "/home/markik/Code/output/tp-recovery-20261024-02/private/guest/browser.sock",
+    "app": "/home/markik/Code/output/tp-recovery-20261024-02/private/guest/app.sock"
+  },
+  "sync": null
+}
