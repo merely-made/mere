@@ -1523,7 +1523,7 @@ fn semantic_activation_matches(dom: &ScriptedDom, node: NodeId, key: &Key) -> bo
         (Some("button"), Key::Named(NamedKey::Enter | NamedKey::Space)) => true,
         (None, Key::Named(NamedKey::Enter | NamedKey::Space)) => {
             dom.element_name(node)
-                .is_some_and(|name| name.local.as_ref() == "button")
+                .is_some_and(|name| &*name.local == "button")
                 || !dom
                     .element_name(node)
                     .is_some_and(|name| matches!(name.local.as_ref(), "input" | "textarea"))
