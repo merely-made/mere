@@ -26,5 +26,5 @@
     "src/windows/mod.rs": "5a97b57ac72a923520cd33cb48e50078fdf5c0aad96564d28c4af31d82982cea",
     "src/windows/utf.rs": "b0d30da0387f0507214ff8560450015a10d5e59a7b7c65ef10b6f0bda5c6a626"
   },
-  "patch": "Register the Windows password window class once per process, so cancellation, retry and the current/new/confirmation sequence can reuse it. Unix implementation unchanged."
+  "patch": "Register the Windows password window class once per process, so cancellation, retry and the current/new/confirmation sequence can reuse it. Explicitly show requested password prompts after a hidden resident launch. The opt-in desktop regression uses a bounded synthetic child process with STARTF_USESHOWWINDOW/SW_HIDE and checks visible masked prompts before and after cancellation. Unix implementation unchanged."
 }
