@@ -1,0 +1,305 @@
+{
+  "schema": "mere.burn-patch-qualification/v1",
+  "status": "qualified_local",
+  "date": "2026-10-24",
+  "cohort": {
+    "burn": "0.22.1",
+    "cubecl": "0.11.1",
+    "cubek": "0.3.1"
+  },
+  "source": {
+    "mere_base": "003f9b3505ab6ac321f7644ae16dd5fef966b136",
+    "runtime_commit": "75cc86493498142d68d560fc028c5a8cfbe364f8",
+    "full_probe_receiving_commit": "fcbf7fba5d8af40e6a369e43810ebf4ea938398e",
+    "esp_commit": "cd73d12cefd2c2719f9afdf99ac5666ee8bc045c",
+    "publication": "local commits; not pushed by this task",
+    "supplier_resolution": "canonical Git pins; no external supplier path override in final receiving graph; local Git objects seeded for the unpublished ESP commit"
+  },
+  "platform": {
+    "os": "macOS 15.8.1",
+    "target": "x86_64-apple-darwin",
+    "wasm_target": "wasm32-unknown-unknown",
+    "rust": "1.99.1",
+    "cpu": "Intel Xeon W-2140B",
+    "native_gpu": "Radeon Pro Vega 56 / Metal",
+    "browser": "in-app browser / BrowserWebGPU"
+  },
+  "rust_tests": {
+    "passed": 804,
+    "failed": 0,
+    "gates": [
+      {
+        "gate": "esp-qualified-tests",
+        "passed": 307,
+        "failed": 0,
+        "ignored": 23,
+        "log_sha256": "6195b7d3d8707effbf9d31aac2c6eba37f6169ce4eecb165e88497cb3953cd38"
+      },
+      {
+        "gate": "esp-gpu-architecture",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "c0468ad044621fc5f519839d1879bb852def486b479c8da2a725e484d0ad827a"
+      },
+      {
+        "gate": "esp-real-minilm",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "2c32c485f15b245db178f6b1e53b7dba958ed2ba81815a50669234c4687f403f"
+      },
+      {
+        "gate": "matmul-selector-tests",
+        "passed": 41,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "5b3cf173235db4f06ce54fea585f577705290106bba0d241a50eab29fcf3792e"
+      },
+      {
+        "gate": "reduce-unit-tests",
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "3ed78818f7836c0147707dd988bfb4f2728f6294d471c2a78b401c0ae8552e62"
+      },
+      {
+        "gate": "conatus-resident-tests",
+        "passed": 14,
+        "failed": 0,
+        "ignored": 2,
+        "log_sha256": "4b7eaa45ce1b84544766f2f08a6b0bade8d031fa50786ccc39a0337934e03819"
+      },
+      {
+        "gate": "conatus-lib-tests",
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "1e668249477e1926cb5b237f17e290134fc9d767ad440187749dccb0630222d0"
+      },
+      {
+        "gate": "numen-final-tests",
+        "passed": 90,
+        "failed": 0,
+        "ignored": 1,
+        "log_sha256": "812f76c59705e05a11686fb18f93cd432abf5b2d8c2da8ab2748daeaa7e2ec0f"
+      },
+      {
+        "gate": "seiche-final-tests",
+        "passed": 222,
+        "failed": 0,
+        "ignored": 11,
+        "log_sha256": "bb8cc00ce7247fa33bec96e50c4bc965d494bbbb9a6430156fcbea69efa0c410"
+      },
+      {
+        "gate": "launcher-native-tests",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "2582db1f9202b6cf30531fe61f218faaa763eb12bece093ddaec01451c279a0b"
+      },
+      {
+        "gate": "remote-qualified-tests",
+        "passed": 74,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "501376c4525e2012c7e5008a0e6e26c7b952688687675529a7621581f168ef71"
+      },
+      {
+        "gate": "distillery-final-tests",
+        "passed": 30,
+        "failed": 0,
+        "ignored": 0,
+        "log_sha256": "9d1f6afa9d3d704737e15d4dd92beabaa222c16dcd596666984c6823d997dbb5"
+      }
+    ],
+    "ignored_note": "Main ESP run has 23 ignores; two relevant GPU rows were explicitly invoked and passed. Other artifact, timing and diagnostic rows keep their original gates."
+  },
+  "browser": {
+    "normal_cases_passed": 25,
+    "graph_cases": 10,
+    "embedding_cases": 11,
+    "extrema_cases": 4,
+    "normal_gpu_errors": 0,
+    "normal_page_gate_errors": 0,
+    "negative_controls": {
+      "planted_page_error": "correctly refused despite all numerical cases matching",
+      "planted_unhandled_rejection": "correctly refused despite all numerical cases matching"
+    },
+    "full_model_probe": "wasm release compilation passed; headed full-model/product acceptance not claimed",
+    "receipts": [
+      {
+        "path": "ports/distillery/probe/repros/burn_browser_embedding/receipts/2026-10-24_burn_0221_iab.json",
+        "sha256": "74e16726c6d4699572d80a7b36f42f619db08c1c9e68054c145f988e500b6433"
+      },
+      {
+        "path": "ports/distillery/probe/repros/burn_browser_embedding/receipts/2026-10-24_burn_0221_page_error_control.json",
+        "sha256": "7245e9249c9290314f0dd45ff0dbbc334d3e5bce2f48aad6becb09adf9cbb4d6"
+      },
+      {
+        "path": "ports/distillery/probe/repros/cubek_browser_extrema/receipts/2026-10-24_burn_0221_iab.json",
+        "sha256": "de80f3f0cd86ddbd9a6f60d47e5ec376dc765ff6f9ebd589f6fa502f5790e32a"
+      },
+      {
+        "path": "ports/distillery/probe/repros/cubek_browser_extrema/receipts/2026-10-24_burn_0221_rejection_control.json",
+        "sha256": "c3c29ab95c56ea3001f06458f534de1ec32c434116f701827afa49833d6fa47b"
+      }
+    ]
+  },
+  "remote": {
+    "receipt": "ports/distillery/probe/receipts/2026-10-24_stable_0221_remote_minilm.json",
+    "sha256": "f4daf679603a18a2d7d828f2637f31e67b5ede5c3dd3f7003097ab25c40dfc78",
+    "passes": true,
+    "topology": "two distinct application-owned Iroh endpoints on this Mac",
+    "model_weights_sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+    "final_live_bytes": 0,
+    "final_live_allocations": 0,
+    "reserved_pool_bytes": 16384,
+    "driver_vram_measured": false,
+    "kept_lease": "preserved through targeted close; exact post-close numerical behavior"
+  },
+  "patches": {
+    "cubecl-runtime": "retired from active roots; canonical native and wasm feature trees do not select persistence",
+    "cubek-matmul": "rebased to 0.3.1; all local deltas retained; 41 unit tests and native packed-Q4 rows pass",
+    "cubek-reduce": "rebased to 0.3.1; infinity, NaN/top-k/tie deltas retained; 15 unit and four browser cases pass; pristine 0.3.1 browser behavior not claimed",
+    "burn-remote": "rebased to 0.22.1; all local control/teardown deltas retained; 47 library, 27 Iroh and real-model reclaim/recovery gates pass"
+  },
+  "receiving_repairs": {
+    "graphshell": "existing manifest already requested wgpu-cue e18584a8, while its old lock named 94ba5957; untouched baseline locked metadata also refuses",
+    "browser_probe": "untouched baseline reproduces E0599 at cambium-rootstock/owned_layout.rs:758; its Genet 7d1d89db lock lacks LiveryPaintList::scrolled. Align to owning root Genet 2b5c0181 and required Netrender 8a3d289a; successful aligned build recorded separately"
+  },
+  "locks": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "9b5ff6fed7fd84ee53c10d31d81a8462c656a25601e00c1619200fcd9a77e03c"
+    },
+    {
+      "path": "ports/distillery/probe/Cargo.lock",
+      "sha256": "7f740b50587a01813fe294971cb69101e66cf11c8da7f1884975f506d5068ee7"
+    },
+    {
+      "path": "ports/distillery/probe/remote-fixture/Cargo.lock",
+      "sha256": "67b1f38067a81f82e1480d6139fc0a9439d8a053e476e34836e5c42bec8996fe"
+    },
+    {
+      "path": "ports/distillery/probe/session-fixture/Cargo.lock",
+      "sha256": "ee554fc05e35d50a54469bc4918689bc629608ba6103ffc4d375dd1bd296d774"
+    },
+    {
+      "path": "ports/distillery/probe/repros/burn_browser_embedding/Cargo.lock",
+      "sha256": "2c445a3967b04923b0451477d0186093d309482111550e1cedb1114e1e02cef9"
+    },
+    {
+      "path": "ports/distillery/probe/repros/cubek_browser_extrema/Cargo.lock",
+      "sha256": "00635a4301d490846836072222a742c672798979aaca04cea28f8d01e1683ffd"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "sha256": "33c3d35a374be5d02513155d702bda070be20e422a4ef77008b2b88ac0b2c9ea"
+    },
+    {
+      "path": "support/patches/cubek-matmul/Cargo.lock",
+      "sha256": "900b6d8cf84287793ed66582c587ba05cba1e80e7713d0efb7fbc1038de4d09f"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "ports/distillery/probe/repros/burn_browser_embedding/web/pkg/burn_browser_embedding_repro_bg.wasm",
+      "sha256": "4db8bacdd593a6af33dc03674d3dc1f3fb224b4e1c4b7dccfd24b83798889a47"
+    },
+    {
+      "path": "ports/distillery/probe/repros/cubek_browser_extrema/web/pkg/cubek_browser_extrema_repro_bg.wasm",
+      "sha256": "d6b95ca503731c8c4836ade071546585ed6be6e0fbef5019ca2be1fa63c50bab"
+    },
+    {
+      "path": "/Users/markik/Code/targets/burn-0221-browser/wasm32-unknown-unknown/release/distillery_model_probe.wasm",
+      "sha256": "27eea80a250a90b1fc97f436202e12d248a1112b232426342fda527116b04895",
+      "build_source_commit": "fcbf7fba5d8af40e6a369e43810ebf4ea938398e",
+      "worktree_dirty": false,
+      "qualification": "compile_only"
+    }
+  ],
+  "verified_archives": [
+    {
+      "name": "burn-remote",
+      "version": "0.22.0",
+      "checksum": "12bcefaa20b2c5b06e53b76f4a7548d8d2647e8c8284ac3dfaca29a19aa17385",
+      "download_url": "https://crates.io/api/v1/crates/burn-remote/0.22.0/download"
+    },
+    {
+      "name": "burn-remote",
+      "version": "0.22.1",
+      "checksum": "1b1787a505a6d352991e1f5e1ef0f225889bdf067f334f23235ec569b8070d6d",
+      "download_url": "https://crates.io/api/v1/crates/burn-remote/0.22.1/download"
+    },
+    {
+      "name": "cubek-matmul",
+      "version": "0.3.0",
+      "checksum": "59816f7d5baf51ca06f417899ee194d46d76f633541907c94091163b4ade20ff",
+      "download_url": "https://crates.io/api/v1/crates/cubek-matmul/0.3.0/download"
+    },
+    {
+      "name": "cubek-matmul",
+      "version": "0.3.1",
+      "checksum": "11362e390ac15e89a9dad87645a0869e0fa73998c26fc62dfffbca62893b0f28",
+      "download_url": "https://crates.io/api/v1/crates/cubek-matmul/0.3.1/download"
+    },
+    {
+      "name": "cubek-reduce",
+      "version": "0.3.0",
+      "checksum": "8399d538e16409cd476be0e7382423e2e238010183c5e3c897f72adcedbfe210",
+      "download_url": "https://crates.io/api/v1/crates/cubek-reduce/0.3.0/download"
+    },
+    {
+      "name": "cubek-reduce",
+      "version": "0.3.1",
+      "checksum": "c422c126ad6b0662941278cc294a077a3089c715893ae223cc84a4756120acfd",
+      "download_url": "https://crates.io/api/v1/crates/cubek-reduce/0.3.1/download"
+    },
+    {
+      "name": "cubecl-runtime",
+      "version": "0.11.1",
+      "checksum": "c0a7aab25ed7220e3c0b173a959403136b3b4f1479a1d39c83d00d3f085ca42c",
+      "download_url": "https://crates.io/api/v1/crates/cubecl-runtime/0.11.1/download"
+    }
+  ],
+  "limits": [
+    "Windows and Linux execution not qualified",
+    "Full headed products and other receiving repositories retain separate acceptance gates",
+    "Large decoder artifact and performance rows not executed",
+    "Allocator accounting is not process/driver VRAM telemetry"
+  ],
+  "local_evidence_directory": "/Users/markik/Code/output/burn-0221-20261024",
+  "feature_graphs": [
+    {
+      "gate": "conatus-runtime",
+      "runtime_features": [
+        "std",
+        "toml"
+      ],
+      "log_sha256": "38a1d080bc49a3c7275ae100aa1f95efdc954d5f34de189001ae855dfbc56cfe"
+    },
+    {
+      "gate": "distillery-runtime",
+      "runtime_features": [
+        "std",
+        "toml"
+      ],
+      "log_sha256": "06db76ca7c9d37902bf0467e5a792c2df054a7f39369dbba2265bb45f20389d0"
+    },
+    {
+      "gate": "browser-runtime",
+      "runtime_features": [
+        "std",
+        "toml"
+      ],
+      "log_sha256": "faf20c9ea8b894a0de0535e6c732a7b9fcc33bf07f4f975765f8b55a40bafea5"
+    }
+  ],
+  "portable_root_metadata": {
+    "status": "passed",
+    "packages": 1687,
+    "log_sha256": "aca5793b25f68c198c20b00ee1d620404008363d413ee4ed83b838e1b6df533b",
+    "root_lock_sha256": "9b5ff6fed7fd84ee53c10d31d81a8462c656a25601e00c1619200fcd9a77e03c"
+  }
+}

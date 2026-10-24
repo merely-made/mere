@@ -1,7 +1,7 @@
 # Burn browser shared-input binary reproducer
 
 **Current cohort (2026-10-24):** Burn 0.22.1, CubeCL 0.11.1 and Cubek 0.3.1
-are under qualification in the Burn migration plan, section 13.48. The
+are qualified for this reproducer in the Burn migration plan, section 13.48. The
 `burn-cubecl` selector remains upstream; the runtime persistence manifest
 patch is retired. The historical comparisons below describe their original
 source cuts and are not receipts for this patch cohort.
@@ -82,3 +82,12 @@ See [the native comparison](receipts/2026-09-29_launcher_retirement.json).
 The historical same-view guard remains in vendored source for provenance;
 the test's six-field predicate checks fixture construction only. Remaining
 migration gates and main promotion are separate from this bounded acceptance.
+
+## 2026-10-24 released patch cohort
+
+The [normal browser receipt](receipts/2026-10-24_burn_0221_iab.json) passes with no WebGPU
+validation or page-gate errors. The [planted-error control](receipts/2026-10-24_burn_0221_page_error_control.json)
+correctly refuses even though its numerical cases match. The current
+qualification record and source/lock/bundle hashes live in migration plan
+section 13.48. These receipts do not relabel older comparisons or qualify
+other browser versions and full products.

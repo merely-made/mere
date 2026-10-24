@@ -45,3 +45,12 @@ plan, section 13.48. Older receipts retain their original prerelease versions.
 [`UPSTREAM_ISSUE.md`](UPSTREAM_ISSUE.md) contains an issue-ready extraction of
 the failure, the generated WGSL before and after materialization, and the exact
 validation boundary.
+
+## 2026-10-24 released patch cohort
+
+The [normal browser receipt](receipts/2026-10-24_burn_0221_iab.json) passes with no WebGPU
+validation or page-gate errors. The [planted-error control](receipts/2026-10-24_burn_0221_rejection_control.json)
+correctly refuses even though its numerical cases match. The current
+qualification record and source/lock/bundle hashes live in migration plan
+section 13.48. These receipts do not relabel older comparisons or qualify
+other browser versions and full products.

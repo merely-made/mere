@@ -63,5 +63,6 @@ upstream release waits for teardown completion and reports its failures.
 Released archives were checksum-verified before a three-way rebase. Existing
 local source and regression deltas are preserved, including changes added
 after the original stable-release receipt. New upstream source changes are
-retained. Executable qualification remains in progress in the Burn migration
-plan, section 13.48; this provenance update alone is not an acceptance pass.
+retained. Selected execution gates pass in the Burn migration plan, section 13.48.
+The bounded macOS receipt and remaining platform/model limits are recorded
+there; the source rebase alone is not a wider acceptance claim.

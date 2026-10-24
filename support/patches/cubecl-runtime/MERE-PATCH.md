@@ -1,4 +1,4 @@
-# Mere stable CubeCL runtime patch
+# Historical CubeCL runtime patch — retired 2026-10-24
 
 Source: published `cubecl-runtime 0.11.0`, CubeCL commit
 `52c5086d3c5e73e56b3ee4cb711bdda495a360f0`.
