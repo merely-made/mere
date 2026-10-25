@@ -37,7 +37,7 @@ cambium-desktop = { workspace = true, optional = true }
 netrender = { workspace = true, features = ["vello-cpu"] }
 postcard = { version = "1", features = ["alloc"] }
 serde_json = "1"
-genet-render-host.workspace = true
+genet-presenter.workspace = true
 cambium-desktop.workspace = true
 taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
 genet-scripted-dom.workspace = true

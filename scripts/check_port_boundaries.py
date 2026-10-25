@@ -22,7 +22,7 @@ PORTS = (ROOT / "ports").resolve()
 WASM_TARGET = "wasm32-unknown-unknown"
 FORBIDDEN_GRAPHSHELL_WEB_PACKAGES = {
     "turnstone",
-    "genet-winit-host",
+    "genet-winit",
     "grafting",
     "scrying",
     "welding",

@@ -40,7 +40,7 @@ implement `Carrier`.
 | feature `door` | adds `dramatis`, `personae`, `insigne`, `chatelaine`, `pandect`, `serde`, `serde_json`, `base64`, `rand_core`, `thiserror`, `tracing`, `uuid`, `zeroize`, Tokio (adds `net`, `sync`, `time`) and, on Windows, `windows-sys` |
 | `graphshell-host` | `chirograph`, `graphshell-client`, `graphshell-endpoint`, `sceno`, `scenotime`, `serde_json` |
 | feature `admission` | adds `notochord`, `personae`, `insigne` |
-| feature `webrtc-join` (default) | adds `admission`, `mere-webrtc-carrier` (its wasm-clean core), `serde`, `thiserror`, `getrandom` |
+| feature `webrtc-join` (default) | adds `admission`, `murm-webrtc` (its wasm-clean core), `serde`, `thiserror`, `getrandom` |
 | feature `native` | adds `webrtc-join`, `graphshell-endpoint` (`door`, `network`), `mere-transport` (`notochord`), `pandect`, `base64`, `rand_core`, Tokio |
 | feature `webrtc-session` | adds `native` and `mere-webrtc-carrier/native` (str0m) |
 
