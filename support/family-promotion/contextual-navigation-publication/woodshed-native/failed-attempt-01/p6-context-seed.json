@@ -1,0 +1,1197 @@
+{
+  "active_working_set_id": 2,
+  "active_working_set_name": "Working Set 2",
+  "cross_process": null,
+  "music": {
+    "catalog_explorations": {
+      "active_id": 1,
+      "active_name": "Catalog exploration 1",
+      "inactive": [],
+      "next_id": 1
+    },
+    "loop_captures": null,
+    "looper": null,
+    "musical_context": {
+      "entries": [],
+      "next_id": 0
+    },
+    "practice_history": {
+      "entries": [],
+      "owners": [],
+      "visits": []
+    },
+    "retained_sets": {
+      "entries": [],
+      "next_id": 0
+    },
+    "sets_by_owner": [
+      {
+        "id": 1,
+        "name": "Working Set 1",
+        "set": {
+          "cards": [
+            {
+              "from": null,
+              "id": 1,
+              "label": "Guided chord",
+              "material": {
+                "Chord": {
+                  "name": "Major",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Bars": 1
+                }
+              },
+              "touch": "Block"
+            },
+            {
+              "from": null,
+              "id": 2,
+              "label": "Guided scale",
+              "material": {
+                "Scale": {
+                  "name": "Minor Pentatonic",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Seconds": 2.0
+                }
+              },
+              "touch": "Walk"
+            },
+            {
+              "from": null,
+              "id": 3,
+              "label": "Guided arpeggio",
+              "material": {
+                "Chord": {
+                  "name": "Major",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Reps": 1
+                }
+              },
+              "touch": {
+                "Arpeggiate": {
+                  "direction": "UpDown",
+                  "inversion": 0
+                }
+              }
+            }
+          ],
+          "cursor": 0,
+          "last_card_id": 3,
+          "loop_mode": "Off"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Working Set 2",
+        "set": {
+          "cards": [
+            {
+              "from": null,
+              "id": 1,
+              "label": "Guided chord",
+              "material": {
+                "Chord": {
+                  "name": "Major",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Bars": 1
+                }
+              },
+              "touch": "Block"
+            },
+            {
+              "from": null,
+              "id": 2,
+              "label": "Guided scale",
+              "material": {
+                "Scale": {
+                  "name": "Minor Pentatonic",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Seconds": 2.0
+                }
+              },
+              "touch": "Walk"
+            },
+            {
+              "from": null,
+              "id": 3,
+              "label": "Guided arpeggio",
+              "material": {
+                "Chord": {
+                  "name": "Major",
+                  "root": 9
+                }
+              },
+              "setting": {
+                "capo": null,
+                "fret_window": null,
+                "instrument": "Guitar",
+                "mark_mode": "Off",
+                "marked": [],
+                "tuning": "Standard",
+                "voicing_fingerprint": null,
+                "voicing_idx": null,
+                "voicing_profile": null
+              },
+              "timing": {
+                "bpm": 240.0,
+                "hold": {
+                  "Reps": 1
+                }
+              },
+              "touch": {
+                "Arpeggiate": {
+                  "direction": "UpDown",
+                  "inversion": 0
+                }
+              }
+            }
+          ],
+          "cursor": 0,
+          "last_card_id": 3,
+          "loop_mode": "Off"
+        }
+      }
+    ],
+    "song": {
+      "bars": [],
+      "click": true,
+      "name": "",
+      "one_shot": false
+    }
+  },
+  "overview_presentation": {
+    "atmosphere": {
+      "kind": "None",
+      "seed": 1
+    },
+    "background": [],
+    "focus": {
+      "Artifact": {
+        "WorkingSetInstance": 2
+      }
+    },
+    "folds": [],
+    "motion": false,
+    "pan": [
+      0.0,
+      0.0
+    ],
+    "positions": [
+      [
+        {
+          "Artifact": {
+            "WorkingSetInstance": 1
+          }
+        },
+        [
+          0.41791046,
+          0.111111104
+        ]
+      ],
+      [
+        {
+          "Artifact": {
+            "WorkingSetInstance": 2
+          }
+        },
+        [
+          0.58208954,
+          0.111111104
+        ]
+      ],
+      [
+        {
+          "Artifact": {
+            "Exploration": 1
+          }
+        },
+        [
+          0.74626863,
+          0.111111104
+        ]
+      ],
+      [
+        {
+          "Artifact": "Song"
+        },
+        [
+          0.08955222,
+          0.111111104
+        ]
+      ],
+      [
+        {
+          "Artifact": "History"
+        },
+        [
+          0.25373134,
+          0.111111104
+        ]
+      ],
+      [
+        {
+          "View": "1464811858"
+        },
+        [
+          0.74626863,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "View": "1464814917"
+        },
+        [
+          0.08955222,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "View": "1464815698"
+        },
+        [
+          0.25373134,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "View": "1464816197"
+        },
+        [
+          0.58208954,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "View": "1464816453"
+        },
+        [
+          0.41791046,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "View": "1464816455"
+        },
+        [
+          0.9104478,
+          0.3611111
+        ]
+      ],
+      [
+        {
+          "Catalog": "woodshed-catalog"
+        },
+        [
+          0.08955222,
+          0.8611111
+        ]
+      ]
+    ],
+    "reduced_motion": true,
+    "roles": [],
+    "version": 3,
+    "zoom": 1.25
+  },
+  "overview_zoom": 1.25,
+  "phase": "seed",
+  "practice_saved": true,
+  "route": {
+    "bookmarks": [
+      {
+        "value": {
+          "anchor": {
+            "OverviewNode": {
+              "Artifact": {
+                "WorkingSetInstance": 1
+              }
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.0
+          },
+          "place": "Overview"
+        },
+        "visit": 0
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 1
+            }
+          },
+          "camera": null,
+          "place": {
+            "WorkingSet": {
+              "owner": 1,
+              "panel": "set"
+            }
+          }
+        },
+        "visit": 1
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 1
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.0
+          },
+          "place": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 1
+            }
+          }
+        },
+        "visit": 2
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 1
+            }
+          },
+          "camera": null,
+          "place": {
+            "WorkingSet": {
+              "owner": 1,
+              "panel": "set"
+            }
+          }
+        },
+        "visit": 3
+      },
+      {
+        "value": {
+          "anchor": {
+            "OverviewNode": {
+              "Artifact": {
+                "WorkingSetInstance": 2
+              }
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.0
+          },
+          "place": "Overview"
+        },
+        "visit": 4
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          },
+          "camera": null,
+          "place": {
+            "WorkingSet": {
+              "owner": 2,
+              "panel": "set"
+            }
+          }
+        },
+        "visit": 5
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.0
+          },
+          "place": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          }
+        },
+        "visit": 6
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          },
+          "camera": null,
+          "place": {
+            "WorkingSet": {
+              "owner": 2,
+              "panel": "set"
+            }
+          }
+        },
+        "visit": 7
+      },
+      {
+        "value": {
+          "anchor": {
+            "OverviewNode": {
+              "Artifact": {
+                "WorkingSetInstance": 2
+              }
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.25
+          },
+          "place": "Overview"
+        },
+        "visit": 8
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          },
+          "camera": null,
+          "place": {
+            "WorkingSet": {
+              "owner": 2,
+              "panel": "set"
+            }
+          }
+        },
+        "visit": 9
+      },
+      {
+        "value": {
+          "anchor": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          },
+          "camera": {
+            "x": 0.0,
+            "y": 0.0,
+            "zoom": 1.0
+          },
+          "place": {
+            "CardOccurrence": {
+              "card": 1,
+              "owner": 2
+            }
+          }
+        },
+        "visit": 10
+      }
+    ],
+    "lineage": {
+      "entries": [
+        {
+          "first_seen_at_ms": 0,
+          "key": 0,
+          "last_seen_at_ms": 0,
+          "payload": null,
+          "privacy": "LocalOnly",
+          "visit_count": 3
+        },
+        {
+          "first_seen_at_ms": 0,
+          "key": 1,
+          "last_seen_at_ms": 0,
+          "payload": null,
+          "privacy": "LocalOnly",
+          "visit_count": 2
+        },
+        {
+          "first_seen_at_ms": 0,
+          "key": 2,
+          "last_seen_at_ms": 0,
+          "payload": null,
+          "privacy": "LocalOnly",
+          "visit_count": 1
+        },
+        {
+          "first_seen_at_ms": 0,
+          "key": 3,
+          "last_seen_at_ms": 0,
+          "payload": null,
+          "privacy": "LocalOnly",
+          "visit_count": 3
+        },
+        {
+          "first_seen_at_ms": 0,
+          "key": 4,
+          "last_seen_at_ms": 0,
+          "payload": null,
+          "privacy": "LocalOnly",
+          "visit_count": 2
+        }
+      ],
+      "owners": [
+        {
+          "creator": null,
+          "current": 10,
+          "identity": "contextual-navigation",
+          "origin": 0,
+          "owned_visits": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "pending_origin_parent": null
+        }
+      ],
+      "visits": [
+        {
+          "bindings": [
+            {
+              "forward_child": 1,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            1
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 1
+                }
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": "Overview"
+          },
+          "created_at_ms": 0,
+          "entry": 0,
+          "inbound": null,
+          "parent": null
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 2,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            2
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 1
+                }
+              }
+            },
+            "camera": null,
+            "place": {
+              "WorkingSet": {
+                "owner": 1,
+                "panel": "set"
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 1,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 0
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 3,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            3
+          ],
+          "context": {
+            "anchor": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 1
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 1
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 2,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 1
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 4,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            4
+          ],
+          "context": {
+            "anchor": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 1
+              }
+            },
+            "camera": null,
+            "place": {
+              "WorkingSet": {
+                "owner": 1,
+                "panel": "set"
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 1,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 2
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 5,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            5
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 1
+                }
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": "Overview"
+          },
+          "created_at_ms": 0,
+          "entry": 0,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 3
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 6,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            6
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 2
+                }
+              }
+            },
+            "camera": null,
+            "place": {
+              "WorkingSet": {
+                "owner": 2,
+                "panel": "set"
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 3,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 4
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 7,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            7
+          ],
+          "context": {
+            "anchor": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 2
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 2
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 4,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 5
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 8,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            8
+          ],
+          "context": {
+            "anchor": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 2
+              }
+            },
+            "camera": null,
+            "place": {
+              "WorkingSet": {
+                "owner": 2,
+                "panel": "set"
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 3,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 6
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 9,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            9
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 2
+                }
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": "Overview"
+          },
+          "created_at_ms": 0,
+          "entry": 0,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 7
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": 10,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [
+            10
+          ],
+          "context": {
+            "anchor": {
+              "OverviewNode": {
+                "Artifact": {
+                  "WorkingSetInstance": 2
+                }
+              }
+            },
+            "camera": null,
+            "place": {
+              "WorkingSet": {
+                "owner": 2,
+                "panel": "set"
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 3,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 8
+        },
+        {
+          "bindings": [
+            {
+              "forward_child": null,
+              "last_accessed_at_ms": 0,
+              "owner": 0
+            }
+          ],
+          "children": [],
+          "context": {
+            "anchor": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 2
+              }
+            },
+            "camera": {
+              "x": 0.0,
+              "y": 0.0,
+              "zoom": 1.0
+            },
+            "place": {
+              "CardOccurrence": {
+                "card": 1,
+                "owner": 2
+              }
+            }
+          },
+          "created_at_ms": 0,
+          "entry": 4,
+          "inbound": {
+            "at_ms": 0,
+            "kind": "Unknown"
+          },
+          "parent": 9
+        }
+      ]
+    },
+    "remembered": [
+      {
+        "anchor": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 1
+          }
+        },
+        "camera": {
+          "x": 0.0,
+          "y": 0.0,
+          "zoom": 1.0
+        },
+        "place": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 1
+          }
+        }
+      },
+      {
+        "anchor": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 1
+          }
+        },
+        "camera": null,
+        "place": {
+          "WorkingSet": {
+            "owner": 1,
+            "panel": "set"
+          }
+        }
+      },
+      {
+        "anchor": {
+          "OverviewNode": {
+            "Artifact": {
+              "WorkingSetInstance": 2
+            }
+          }
+        },
+        "camera": {
+          "x": 0.0,
+          "y": 0.0,
+          "zoom": 1.25
+        },
+        "place": "Overview"
+      },
+      {
+        "anchor": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 2
+          }
+        },
+        "camera": null,
+        "place": {
+          "WorkingSet": {
+            "owner": 2,
+            "panel": "set"
+          }
+        }
+      },
+      {
+        "anchor": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 2
+          }
+        },
+        "camera": {
+          "x": 0.0,
+          "y": 0.0,
+          "zoom": 1.0
+        },
+        "place": {
+          "CardOccurrence": {
+            "card": 1,
+            "owner": 2
+          }
+        }
+      }
+    ],
+    "version": 1
+  },
+  "runner": {
+    "paused": false,
+    "playback_stopped": true,
+    "program_status": "Stopped",
+    "running": false
+  },
+  "same_card_occurrences_in_both_sets": true,
+  "sealed": true,
+  "stored_matches_live": true,
+  "working_set_count": 2,
+  "workspace": {
+    "active_panel": "practice",
+    "tree": {
+      "stack": {
+        "active": 1,
+        "tabs": [
+          {
+            "content_id": "overview",
+            "id": 1464814917,
+            "kind": "woodshed.overview",
+            "panel": "overview",
+            "title": "Mere"
+          },
+          {
+            "content_id": "stage",
+            "id": 1464815698,
+            "kind": "woodshed.practice",
+            "panel": "practice",
+            "title": "Practice"
+          },
+          {
+            "content_id": "rehearsal",
+            "id": 1464816453,
+            "kind": "woodshed.set",
+            "panel": "set",
+            "title": "Set"
+          },
+          {
+            "content_id": "stage",
+            "id": 1464816197,
+            "kind": "woodshed.related",
+            "panel": "related",
+            "title": "Related"
+          },
+          {
+            "content_id": "stage",
+            "id": 1464811858,
+            "kind": "woodshed.arrangement",
+            "panel": "arrangement",
+            "title": "Arrangement"
+          },
+          {
+            "content_id": "settings",
+            "id": 1464816455,
+            "kind": "woodshed.settings",
+            "panel": "settings",
+            "title": "Settings"
+          }
+        ]
+      }
+    }
+  }
+}

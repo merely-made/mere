@@ -24,7 +24,7 @@ use paint_list_api::{DeviceIntSize, PaintEnvelope};
 
 use crate::input::to_visual_caret;
 use crate::meristem_bounds::RootView;
-use crate::{AppCtx, Host};
+use crate::{AppCtx, Host, ScrollRequest};
 
 fn elapsed_us(elapsed: crate::Duration) -> u64 {
     elapsed.as_micros().min(u64::MAX as u128) as u64
@@ -570,7 +570,15 @@ where
             let layout = self.s.layout.as_mut().expect("layout just ensured");
             let now = crate::Instant::now();
             for request in std::mem::take(&mut self.s.pending_scroll) {
-                for target in layout.scroll_into_view(&view, request.node, request.align) {
+                let moved = match request {
+                    ScrollRequest::IntoView(request) => {
+                        layout.scroll_into_view(&view, request.node, request.align)
+                    },
+                    ScrollRequest::Text { node, byte, align } => {
+                        layout.scroll_text_position(&view, node, byte, align)
+                    },
+                };
+                for target in moved {
                     self.s.scrollbar_fade.note(target, now);
                 }
             }

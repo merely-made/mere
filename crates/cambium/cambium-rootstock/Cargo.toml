@@ -46,7 +46,7 @@ sprigging = { version = "0.3.0", path = "../sprigging" }
 # The present core, which is already windowing-neutral: `SurfaceHost` is a
 # `RenderCore` plus a window surface, and the browser presenter assembles
 # the same pair by hand against a canvas.
-genet-render-host = { workspace = true }
+genet-presenter = { workspace = true }
 netrender = { workspace = true }
 wgpu = { workspace = true }
 # The view layer the host runs, its overlay-scrollbar fade clock, and the paint

@@ -16,12 +16,13 @@
 //! The view below is laid out with absolute positions so every coordinate in
 //! the assertions is arithmetic rather than a guess.
 
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use cambium::{
-    AnyView, GenetCtx, GenetElement, HoverPhase, PointerButton, PointerEvent, PointerPhase,
-    TextInput, WheelEvent, clickable, el, focusable, on_hover, on_key, on_pointer, on_wheel, text,
+    AnyView, CaretAffinity, CaretPosition, CaretSelection, GenetCtx, GenetElement, HoverPhase,
+    PointerButton, PointerEvent, PointerPhase, TextInput, WheelEvent, clickable, el, focusable,
+    on_hover, on_key, on_pointer, on_wheel, text,
 };
 use cambium_genet_winit_host::{FocusedTextSlot, Harness, HostHooks, Init, Modifiers, inert_hooks};
 use layout_dom_api::LayoutDom as _;
@@ -578,4 +579,170 @@ fn the_caret_defaults_run_through_the_focused_text_seam() {
         h.state().text.caret_position().byte > after_click,
         "the host's visual caret default moved the caret forward",
     );
+}
+
+#[test]
+fn text_byte_scroll_restores_the_first_visible_line_without_moving_editor_selection() {
+    struct SourceApp {
+        source: TextInput,
+    }
+    type SourceChild = Box<dyn AnyView<SourceApp, (), GenetCtx, GenetElement>>;
+    fn source_root(_state: &SourceApp) -> SourceChild {
+        Box::new(
+            el(
+                "div",
+                (
+                    clickable(
+                        el("button", text("Restore source")).attr(
+                            "style",
+                            "position:absolute;left:250px;top:0px;width:120px;height:28px;",
+                        ),
+                        |_: &mut SourceApp, _| {},
+                    ),
+                    el(
+                        "div",
+                        el(
+                            "div",
+                            cambium::lens(
+                                |source: &mut TextInput| cambium::textarea(source),
+                                |app: &mut SourceApp| &mut app.source,
+                            ),
+                        )
+                        .attr("class", "source-text")
+                        .attr("style", "width:210px;font-size:16px;line-height:20px;"),
+                    )
+                    .attr("class", "source-pane")
+                    .attr(
+                        "style",
+                        "position:absolute;left:10px;top:40px;width:220px;height:80px;overflow:auto;",
+                    ),
+                ),
+            )
+            .attr("style", "position:relative;width:400px;height:200px;"),
+        )
+    }
+
+    let source_text = (0..100)
+        .map(|line| {
+            format!("{line:03}: source passage with enough words to wrap across the pane\n")
+        })
+        .collect::<String>();
+    let mut source = TextInput::new(source_text);
+    let selection = CaretSelection {
+        anchor: CaretPosition {
+            byte: 8,
+            affinity: CaretAffinity::Downstream,
+        },
+        focus: CaretPosition {
+            byte: 0,
+            affinity: CaretAffinity::Downstream,
+        },
+    };
+    source.set_caret_selection(selection);
+
+    let sample = Rc::new(Cell::new(false));
+    let sample_hook = sample.clone();
+    let restore = Rc::new(Cell::new(false));
+    let restore_hook = restore.clone();
+    let positions = Rc::new(RefCell::new(Vec::new()));
+    let positions_hook = positions.clone();
+    let hooks: HostHooks<SourceApp, fn(&SourceApp) -> SourceChild, SourceChild> = HostHooks {
+        after_dispatch: Box::new(move |ctx| {
+            let restoring = restore_hook.replace(false);
+            if !sample_hook.replace(false) && !restoring {
+                return;
+            }
+            let (pane, source) = {
+                let dom = ctx.runner.dom();
+                let dom = dom.borrow();
+                let pane = dom
+                    .all_with_class(dom.document(), "source-pane")
+                    .into_iter()
+                    .next();
+                let source = dom
+                    .all_with_class(dom.document(), "source-text")
+                    .into_iter()
+                    .next();
+                (pane, source)
+            };
+            let (Some(pane), Some(source)) = (pane, source) else {
+                return;
+            };
+            if restoring {
+                let byte = positions_hook.borrow()[0];
+                ctx.scroll_text_position(
+                    source,
+                    byte,
+                    cambium_genet_winit_host::ScrollAlign::Start,
+                );
+                return;
+            }
+            let Some((x, y, _, _)) = ctx.painted_rect(pane) else {
+                return;
+            };
+            let Some(byte) = ctx.text_position_at(source, (x + 8.0, y + 10.0)) else {
+                return;
+            };
+            assert!(ctx.element_scroll(pane).is_some_and(|offset| offset.1 > 0.0));
+            positions_hook.borrow_mut().push(byte);
+        }),
+        ..inert_hooks()
+    };
+    let mut h = Harness::with_hooks(
+        Init {
+            state: SourceApp { source },
+            logic: source_root as fn(&SourceApp) -> SourceChild,
+            sheet: String::new(),
+            fonts: Vec::new(),
+            images: Vec::new(),
+        },
+        hooks,
+    );
+    h.layout_at(400.0, 200.0);
+    let pane = h.with_dom(|dom| {
+        dom.all_with_class(dom.document(), "source-pane")
+            .into_iter()
+            .next()
+            .unwrap()
+    });
+    let (x, y, _, _) = h.painted_rect(pane).unwrap();
+    h.move_to(x + 10.0, y + 10.0);
+    h.wheel(0.0, 900.0);
+    let scrolled = h.element_scroll(pane).1;
+    assert!(
+        scrolled > 0.0,
+        "the nested source pane scrolled away from its start"
+    );
+
+    let selection_before = h.state().source.caret_selection();
+    assert_eq!(
+        selection_before, selection,
+        "the editor caret begins at byte zero"
+    );
+    sample.set(true);
+    h.click_at(270.0, 12.0);
+    assert_eq!(positions.borrow().len(), 1);
+    let first_visible_byte = positions.borrow()[0];
+    assert!(
+        first_visible_byte > 0,
+        "the byte query follows the manually scrolled view"
+    );
+    h.move_to(x + 10.0, y + 10.0);
+    h.wheel(0.0, -10_000.0);
+    assert_eq!(h.element_scroll(pane).1, 0.0);
+    restore.set(true);
+    h.click_at(270.0, 12.0);
+    // The windowless harness models dispatch and layout as separate steps;
+    // the queued byte reveal resolves on the next layout.
+    h.relayout();
+    assert!(
+        h.element_scroll(pane).1 > 0.0,
+        "restore must return from the top to the saved reading line"
+    );
+    assert_eq!(h.state().source.caret_selection(), selection_before);
+
+    sample.set(true);
+    h.click_at(270.0, 12.0);
+    assert_eq!(positions.borrow().get(1), Some(&first_visible_byte));
+    assert_eq!(h.state().source.caret_selection(), selection_before);
 }

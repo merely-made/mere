@@ -1,0 +1,6 @@
+RESULT ok
+captured nested-context
+capture nested-context 2464x1504 digest=2ade421ef1d8e0a8 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation\knot-native-row\nested-context.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 32 frames, 32 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":32,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":71,"phase":"submitted"}},"sequence":33}}

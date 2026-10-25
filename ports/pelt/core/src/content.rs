@@ -223,6 +223,17 @@ impl<F: 'static> PeltContent<F> {
             _ => None,
         }
     }
+    /// The current receiver's published text-input observation. Replacement,
+    /// hiding and retirement clear the producer's ordered state; no host-side
+    /// cache can accidentally carry geometry into another receiver or scope.
+    #[cfg(feature = "cue")]
+    pub fn text_input_state(&self) -> Option<&inker::webcue::TextInputState> {
+        match &self.lane {
+            Lane::Document(controller) => controller.text_input_state(),
+            Lane::Surface(PeltSurface { producer: PeltBrowser::Shared(surface), .. }) => surface.text_input_state(),
+            _ => None,
+        }
+    }
     /// Spend request ids from the same owner as navigation controls. Hosts
     /// using this bridge submit every browser command through this method.
     #[cfg(feature = "cue")]

@@ -13,6 +13,7 @@ one feature each on `graphshell-endpoint`.
 | `graphshell-endpoint::local` (feature `local`) | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
 | `graphshell-endpoint::network` (feature `network`) | `NetworkCarrier`, `CarrierRuntime`: NDJSON over any `AsyncRead + AsyncWrite` |
 | `graphshell-host` | The serving half: `admission` (the action triple, the hello builders, the sans-I/O admission and its action check), `carrier` (accept, `admit_accepted_session`, `admit_stream`), `line` (the codec over Tokio streams), `lifecycle` (`SessionAuthority`, `AdmittedEndpointContext`, `BindAdmittedSession`), `session_loop`, `session_notices`, `endpoint_catalog` (`ResidentEndpointCatalog`), `projection_host` (`ResidentProjectionHost`), `network_carrier` (dialling), `policy_projection`, `canary`, `resume` and `live_endpoint` (fixture endpoints), `view` and `sessions` (the projection receipt views and session switcher), and the WebRTC door (`webrtc_door`, `webrtc_join`, `webrtc_session`) |
+| [`graphshell-mcp`](graphshell-mcp) | A stdio MCP server over one admitted route: projections as resources, advertised intents through one invoke tool. Library over any `Carrier`; the `mere-mcp` binary (feature `door`) dials djinn's application door as a named app, holds no key and mints no grant |
 | `graphshell-endpoint::door` (feature `door`, native only) | The application side of the first-party door: `app_admission` (hello, `AppId`, route grants), `route` (`ResidentEndpointRoute`), `wire` and `frame` (the envelope and native-messaging frames both halves speak), `app_client` (`AppBrokerClient`, `AppRouteCarrier`), `resident_mere_proxy` (an endpoint that forwards over the door), `custody`, `custody_client`, `custody_identity`, `quarantine`, `local_endpoint`, `tasks`, `identity` (the `dramatis::view` types) and `profile` (`GraphshellIdentity`, `env_profile`) |
 
 The carriers were the separate `graphshell-stdio`, `graphshell-local` and
@@ -39,7 +40,7 @@ implement `Carrier`.
 | feature `door` | adds `dramatis`, `personae`, `insigne`, `chatelaine`, `pandect`, `serde`, `serde_json`, `base64`, `rand_core`, `thiserror`, `tracing`, `uuid`, `zeroize`, Tokio (adds `net`, `sync`, `time`) and, on Windows, `windows-sys` |
 | `graphshell-host` | `chirograph`, `graphshell-client`, `graphshell-endpoint`, `sceno`, `scenotime`, `serde_json` |
 | feature `admission` | adds `notochord`, `personae`, `insigne` |
-| feature `webrtc-join` (default) | adds `admission`, `mere-webrtc-carrier` (its wasm-clean core), `serde`, `thiserror`, `getrandom` |
+| feature `webrtc-join` (default) | adds `admission`, `murm-webrtc` (its wasm-clean core), `serde`, `thiserror`, `getrandom` |
 | feature `native` | adds `webrtc-join`, `graphshell-endpoint` (`door`, `network`), `mere-transport` (`notochord`), `pandect`, `base64`, `rand_core`, Tokio |
 | feature `webrtc-session` | adds `native` and `mere-webrtc-carrier/native` (str0m) |
 

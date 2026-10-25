@@ -1,0 +1,1480 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 11bdf0cde..000709b16 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2133,6 +2133,7 @@ name = "cambium"
+ version = "0.6.0"
+ dependencies = [
+  "backstep",
++ "chartulary",
+  "genet-scripted-dom",
+  "genet-text",
+  "hest 0.2.0",
+@@ -2144,6 +2145,7 @@ dependencies = [
+  "scenograph",
+  "scenomise",
+  "serde",
++ "serde_json",
+  "sprigging",
+  "tinct",
+  "workbench",
+diff --git a/crates/cambium/cambium-genet-winit-host/src/harness.rs b/crates/cambium/cambium-genet-winit-host/src/harness.rs
+index 0aeb23c72..d5cae473f 100644
+--- a/crates/cambium/cambium-genet-winit-host/src/harness.rs
++++ b/crates/cambium/cambium-genet-winit-host/src/harness.rs
+@@ -575,10 +575,13 @@ where
+                 return result == [cambium_rootstock::A11yDispatch::Dispatched];
+             },
+         };
+-        self.host.s.pending_scroll.push(ScrollIntoView {
+-            node,
+-            align: ScrollAlign::Nearest,
+-        });
++        self.host.s.pending_scroll.push(
++            ScrollIntoView {
++                node,
++                align: ScrollAlign::Nearest,
++            }
++            .into(),
++        );
+         self.relayout();
+         let Some((x, y, width, height)) = self.visible_rect(node) else {
+             return false;
+diff --git a/crates/cambium/cambium-genet-winit-host/tests/input_routing.rs b/crates/cambium/cambium-genet-winit-host/tests/input_routing.rs
+index 8e2a0ee85..6f567e893 100644
+--- a/crates/cambium/cambium-genet-winit-host/tests/input_routing.rs
++++ b/crates/cambium/cambium-genet-winit-host/tests/input_routing.rs
+@@ -16,12 +16,13 @@
+ //! The view below is laid out with absolute positions so every coordinate in
+ //! the assertions is arithmetic rather than a guess.
+ 
+-use std::cell::RefCell;
++use std::cell::{Cell, RefCell};
+ use std::rc::Rc;
+ 
+ use cambium::{
+-    AnyView, GenetCtx, GenetElement, HoverPhase, PointerButton, PointerEvent, PointerPhase,
+-    TextInput, WheelEvent, clickable, el, focusable, on_hover, on_key, on_pointer, on_wheel, text,
++    AnyView, CaretAffinity, CaretPosition, CaretSelection, GenetCtx, GenetElement, HoverPhase,
++    PointerButton, PointerEvent, PointerPhase, TextInput, WheelEvent, clickable, el, focusable,
++    on_hover, on_key, on_pointer, on_wheel, text,
+ };
+ use cambium_genet_winit_host::{FocusedTextSlot, Harness, HostHooks, Init, Modifiers, inert_hooks};
+ use layout_dom_api::LayoutDom as _;
+@@ -579,3 +580,169 @@ fn the_caret_defaults_run_through_the_focused_text_seam() {
+         "the host's visual caret default moved the caret forward",
+     );
+ }
++
++#[test]
++fn text_byte_scroll_restores_the_first_visible_line_without_moving_editor_selection() {
++    struct SourceApp {
++        source: TextInput,
++    }
++    type SourceChild = Box<dyn AnyView<SourceApp, (), GenetCtx, GenetElement>>;
++    fn source_root(_state: &SourceApp) -> SourceChild {
++        Box::new(
++            el(
++                "div",
++                (
++                    clickable(
++                        el("button", text("Restore source")).attr(
++                            "style",
++                            "position:absolute;left:250px;top:0px;width:120px;height:28px;",
++                        ),
++                        |_: &mut SourceApp, _| {},
++                    ),
++                    el(
++                        "div",
++                        el(
++                            "div",
++                            cambium::lens(
++                                |source: &mut TextInput| cambium::textarea(source),
++                                |app: &mut SourceApp| &mut app.source,
++                            ),
++                        )
++                        .attr("class", "source-text")
++                        .attr("style", "width:210px;font-size:16px;line-height:20px;"),
++                    )
++                    .attr("class", "source-pane")
++                    .attr(
++                        "style",
++                        "position:absolute;left:10px;top:40px;width:220px;height:80px;overflow:auto;",
++                    ),
++                ),
++            )
++            .attr("style", "position:relative;width:400px;height:200px;"),
++        )
++    }
++
++    let source_text = (0..100)
++        .map(|line| {
++            format!("{line:03}: source passage with enough words to wrap across the pane\n")
++        })
++        .collect::<String>();
++    let mut source = TextInput::new(source_text);
++    let selection = CaretSelection {
++        anchor: CaretPosition {
++            byte: 8,
++            affinity: CaretAffinity::Downstream,
++        },
++        focus: CaretPosition {
++            byte: 0,
++            affinity: CaretAffinity::Downstream,
++        },
++    };
++    source.set_caret_selection(selection);
++
++    let sample = Rc::new(Cell::new(false));
++    let sample_hook = sample.clone();
++    let restore = Rc::new(Cell::new(false));
++    let restore_hook = restore.clone();
++    let positions = Rc::new(RefCell::new(Vec::new()));
++    let positions_hook = positions.clone();
++    let hooks: HostHooks<SourceApp, fn(&SourceApp) -> SourceChild, SourceChild> = HostHooks {
++        after_dispatch: Box::new(move |ctx| {
++            let restoring = restore_hook.replace(false);
++            if !sample_hook.replace(false) && !restoring {
++                return;
++            }
++            let (pane, source) = {
++                let dom = ctx.runner.dom();
++                let dom = dom.borrow();
++                let pane = dom
++                    .all_with_class(dom.document(), "source-pane")
++                    .into_iter()
++                    .next();
++                let source = dom
++                    .all_with_class(dom.document(), "source-text")
++                    .into_iter()
++                    .next();
++                (pane, source)
++            };
++            let (Some(pane), Some(source)) = (pane, source) else {
++                return;
++            };
++            if restoring {
++                let byte = positions_hook.borrow()[0];
++                ctx.scroll_text_position(
++                    source,
++                    byte,
++                    cambium_genet_winit_host::ScrollAlign::Start,
++                );
++                return;
++            }
++            let Some((x, y, _, _)) = ctx.painted_rect(pane) else {
++                return;
++            };
++            let Some(byte) = ctx.text_position_at(source, (x + 8.0, y + 10.0)) else {
++                return;
++            };
++            assert!(ctx.element_scroll(pane).is_some_and(|offset| offset.1 > 0.0));
++            positions_hook.borrow_mut().push(byte);
++        }),
++        ..inert_hooks()
++    };
++    let mut h = Harness::with_hooks(
++        Init {
++            state: SourceApp { source },
++            logic: source_root as fn(&SourceApp) -> SourceChild,
++            sheet: String::new(),
++            fonts: Vec::new(),
++            images: Vec::new(),
++        },
++        hooks,
++    );
++    h.layout_at(400.0, 200.0);
++    let pane = h.with_dom(|dom| {
++        dom.all_with_class(dom.document(), "source-pane")
++            .into_iter()
++            .next()
++            .unwrap()
++    });
++    let (x, y, _, _) = h.painted_rect(pane).unwrap();
++    h.move_to(x + 10.0, y + 10.0);
++    h.wheel(0.0, 900.0);
++    let scrolled = h.element_scroll(pane).1;
++    assert!(
++        scrolled > 0.0,
++        "the nested source pane scrolled away from its start"
++    );
++
++    let selection_before = h.state().source.caret_selection();
++    assert_eq!(
++        selection_before, selection,
++        "the editor caret begins at byte zero"
++    );
++    sample.set(true);
++    h.click_at(270.0, 12.0);
++    assert_eq!(positions.borrow().len(), 1);
++    let first_visible_byte = positions.borrow()[0];
++    assert!(
++        first_visible_byte > 0,
++        "the byte query follows the manually scrolled view"
++    );
++    h.move_to(x + 10.0, y + 10.0);
++    h.wheel(0.0, -10_000.0);
++    assert_eq!(h.element_scroll(pane).1, 0.0);
++    restore.set(true);
++    h.click_at(270.0, 12.0);
++    // The windowless harness models dispatch and layout as separate steps;
++    // the queued byte reveal resolves on the next layout.
++    h.relayout();
++    assert!(
++        h.element_scroll(pane).1 > 0.0,
++        "restore must return from the top to the saved reading line"
++    );
++    assert_eq!(h.state().source.caret_selection(), selection_before);
++
++    sample.set(true);
++    h.click_at(270.0, 12.0);
++    assert_eq!(positions.borrow().get(1), Some(&first_visible_byte));
++    assert_eq!(h.state().source.caret_selection(), selection_before);
++}
+diff --git a/crates/cambium/cambium-rootstock/src/frame.rs b/crates/cambium/cambium-rootstock/src/frame.rs
+index e17fa7cba..9fc63f4d3 100644
+--- a/crates/cambium/cambium-rootstock/src/frame.rs
++++ b/crates/cambium/cambium-rootstock/src/frame.rs
+@@ -24,7 +24,7 @@ use paint_list_api::{DeviceIntSize, PaintEnvelope};
+ 
+ use crate::input::to_visual_caret;
+ use crate::meristem_bounds::RootView;
+-use crate::{AppCtx, Host};
++use crate::{AppCtx, Host, ScrollRequest};
+ 
+ fn elapsed_us(elapsed: crate::Duration) -> u64 {
+     elapsed.as_micros().min(u64::MAX as u128) as u64
+@@ -570,7 +570,15 @@ where
+             let layout = self.s.layout.as_mut().expect("layout just ensured");
+             let now = crate::Instant::now();
+             for request in std::mem::take(&mut self.s.pending_scroll) {
+-                for target in layout.scroll_into_view(&view, request.node, request.align) {
++                let moved = match request {
++                    ScrollRequest::IntoView(request) => {
++                        layout.scroll_into_view(&view, request.node, request.align)
++                    },
++                    ScrollRequest::Text { node, byte, align } => {
++                        layout.scroll_text_position(&view, node, byte, align)
++                    },
++                };
++                for target in moved {
+                     self.s.scrollbar_fade.note(target, now);
+                 }
+             }
+diff --git a/crates/cambium/cambium-rootstock/src/host.rs b/crates/cambium/cambium-rootstock/src/host.rs
+index e1a1a37b8..cb5387727 100644
+--- a/crates/cambium/cambium-rootstock/src/host.rs
++++ b/crates/cambium/cambium-rootstock/src/host.rs
+@@ -719,6 +719,25 @@ pub struct ScrollIntoView {
+     pub align: ScrollAlign,
+ }
+ 
++/// A deferred scroll request resolved against the next retained layout.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ScrollRequest {
++    /// Reveal an element's painted box.
++    IntoView(ScrollIntoView),
++    /// Reveal a byte position in a node's text without moving an editor caret.
++    Text {
++        node: NodeId,
++        byte: usize,
++        align: ScrollAlign,
++    },
++}
++
++impl From<ScrollIntoView> for ScrollRequest {
++    fn from(request: ScrollIntoView) -> Self {
++        Self::IntoView(request)
++    }
++}
++
+ /// What the application sees inside a hook. One shape for every hook so the
+ /// application-side plumbing stays boring.
+ pub struct AppCtx<'a, State: 'static, Logic, V, T = Runner<State, Logic, V>>
+@@ -802,7 +821,7 @@ where
+     pub(crate) a11y_publication: crate::A11yPublicationSnapshot,
+     /// Scroll requests for the next layout; queued through
+     /// [`scroll_into_view`](Self::scroll_into_view).
+-    pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
++    pub(crate) scroll: &'a mut Vec<ScrollRequest>,
+     /// The window-verb seam, for a hook that wants to minimize/maximize/close
+     /// without routing through application state. The same handle `init`
+     /// received.
+@@ -870,6 +889,19 @@ where
+         self.layout.map(OwnedLayout::viewport_scroll)
+     }
+ 
++    /// Observe a rendered element's own scroll offset. A rendered element at
++    /// rest returns zero; an absent layout or retired element is unavailable.
++    /// Hosts can compare this cheap observation before capturing a semantic
++    /// reading anchor, including changes from the scrollbar or caret follow.
++    pub fn element_scroll(&self, node: NodeId) -> Option<(f32, f32)> {
++        let layout = self.layout?;
++        let dom = self.runner.dom();
++        let dom = dom.borrow();
++        let view = crate::WindowDom::new(&dom, self.runner.mount());
++        layout.painted_rect(&view, node)?;
++        Some(layout.element_scroll().get(&node).copied().unwrap_or_default())
++    }
++
+     /// A computed value from the retained layout's own style set. No layout
+     /// or absent property is unavailable, rather than a synthesized default.
+     /// This observes an existing layout and never triggers style or layout work.
+@@ -890,6 +922,21 @@ where
+         layout.hit_test(&view, x, y)
+     }
+ 
++    /// Read the UTF-8 byte position in `node`'s laid-out text at a logical
++    /// viewport point. This does not alter focus, caret, or selection.
++    pub fn text_position_at(&self, node: NodeId, point: (f32, f32)) -> Option<usize> {
++        if !point.0.is_finite() || !point.1.is_finite() {
++            return None;
++        }
++        let layout = self.layout?;
++        let dom = self.runner.dom();
++        let dom = dom.borrow();
++        let view = crate::WindowDom::new(&dom, self.runner.mount());
++        layout
++            .caret_position_at_point(&view, node, point.0, point.1)
++            .map(|caret| caret.byte)
++    }
++
+     /// Names and roles from the same retained document projection the host
+     /// exposes to accessibility. No layout means no semantic observation yet.
+     /// This observes the current DOM and layout without computing another layout
+@@ -967,7 +1014,15 @@ where
+     /// longer exists or does not paint is a no-op; requests queued together
+     /// resolve in order.
+     pub fn scroll_into_view(&mut self, node: NodeId, align: ScrollAlign) {
+-        self.scroll.push(ScrollIntoView { node, align });
++        self.scroll
++            .push(ScrollRequest::IntoView(ScrollIntoView { node, align }));
++    }
++
++    /// Queue a text byte position to become visible after the next layout.
++    /// The host scrolls the retained text geometry and never touches an
++    /// editor's caret or selection state.
++    pub fn scroll_text_position(&mut self, node: NodeId, byte: usize, align: ScrollAlign) {
++        self.scroll.push(ScrollRequest::Text { node, byte, align });
+     }
+ }
+ 
+@@ -1349,7 +1404,7 @@ where
+     draining_a11y: bool,
+     /// Scroll requests an application hook queued, resolved in order by the
+     /// next [`relayout`](Host::relayout) once its layout is current.
+-    pub pending_scroll: Vec<ScrollIntoView>,
++    pub pending_scroll: Vec<ScrollRequest>,
+     /// The focused field and caret byte the last relayout scrolled into view.
+     /// A caret that has not moved since is left where the user scrolled it.
+     pub caret_followed: Option<(NodeId, usize)>,
+diff --git a/crates/cambium/cambium-rootstock/src/lib.rs b/crates/cambium/cambium-rootstock/src/lib.rs
+index 1cff39bb4..8e194fa85 100644
+--- a/crates/cambium/cambium-rootstock/src/lib.rs
++++ b/crates/cambium/cambium-rootstock/src/lib.rs
+@@ -1324,7 +1324,7 @@ pub use host::{
+     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
+     FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
+     HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
+-    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
++    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView, ScrollRequest,
+     StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+     ladder_step,
+ };
+diff --git a/crates/cambium/cambium-rootstock/src/owned_layout.rs b/crates/cambium/cambium-rootstock/src/owned_layout.rs
+index 075497bf3..1c4920065 100644
+--- a/crates/cambium/cambium-rootstock/src/owned_layout.rs
++++ b/crates/cambium/cambium-rootstock/src/owned_layout.rs
+@@ -504,6 +504,50 @@ impl OwnedLayout {
+         })
+     }
+ 
++    /// Reveal a byte position in retained text without changing an editor's
++    /// selection. Unlike `caret_rect_at` callers, this accepts only a real
++    /// UTF-8 boundary in text that has a laid-out caret rectangle; it does not
++    /// use the empty-field fallback rectangle.
++    pub(crate) fn scroll_text_position<D: LayoutDom<NodeId = NodeId>>(
++        &mut self,
++        dom: &D,
++        node: NodeId,
++        byte: usize,
++        align: ScrollAlign,
++    ) -> Vec<ScrollTarget> {
++        if self.fragments.get(node).is_none() {
++            return Vec::new();
++        }
++        let text = node_text(dom, node);
++        if byte > text.len() || !text.is_char_boundary(byte) {
++            return Vec::new();
++        }
++        let positions = text_positions(dom, node, byte);
++        if positions.is_empty()
++            || !positions
++                .iter()
++                .any(|(text_node, local)| self.fragments.caret_rect(*text_node, *local).is_some())
++        {
++            return Vec::new();
++        }
++
++        let own = scroll_axes(&self.styles, node)
++            .1
++            .then(|| element_scroll_range(dom, &self.styles, &self.fragments, node).1)
++            .filter(|range| *range > 0.0);
++        let first = match own {
++            Some(range) => Some((node, range)),
++            None => self.vertical_scroll_container(dom, node),
++        };
++        self.follow_out(dom, first, align, |layout, dom| {
++            let rect = layout.caret_rect_at(dom, node, byte)?;
++            Some((
++                rect.y - layout.content_scroll(dom, node).1,
++                rect.height.max(1.0),
++            ))
++        })
++    }
++
+     /// Every scroll that moves `node`'s own content: the viewport's, each
+     /// enclosing container's, and `node`'s own when it scrolls.
+     fn content_scroll<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> (f32, f32) {
+diff --git a/crates/cambium/cambium/Cargo.toml b/crates/cambium/cambium/Cargo.toml
+index ccf82cdd2..e2ffe0dfa 100644
+--- a/crates/cambium/cambium/Cargo.toml
++++ b/crates/cambium/cambium/Cargo.toml
+@@ -14,6 +14,9 @@ highlight = ["dep:illume", "dep:tinct"]
+ 
+ [dependencies]
+ serde = { workspace = true, features = ["derive"] }
++# Owner-scoped navigation lineage and its persisted snapshot, shared with Eidetic.
++chartulary = { workspace = true }
++serde_json = { workspace = true }
+ # The generic undo History; EditHistory is the text field's instance of it.
+ backstep = { workspace = true }
+ # The command set, the person's choices and a palette's state (SE45 to SE48).
+diff --git a/crates/cambium/cambium/src/scope_navigation.rs b/crates/cambium/cambium/src/scope_navigation.rs
+index 171c1a01a..28ac8c67e 100644
+--- a/crates/cambium/cambium/src/scope_navigation.rs
++++ b/crates/cambium/cambium/src/scope_navigation.rs
+@@ -2,7 +2,8 @@
+ // SPDX-License-Identifier: MPL-2.0
+ 
+ //! Structural scope and temporal history are independent. Hosts resolve actual
+-//! graph membership, reading anchors and destinations before accepting a visit.
++//! identities, contextual routes, reading anchors and destinations before accepting
++//! a visit. Controls and history do not prescribe an application taxonomy.
+ use crate::{
+     FocusPhase, HoverPhase, OptionalAction, ShellSlot, clickable, el, on_focus, on_hover,
+     shell_control,
+@@ -10,78 +11,97 @@ use crate::{
+ use serde::{Deserialize, Serialize};
+ use std::rc::Rc;
+ 
+-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+-pub enum ScopeLevel {
+-    Document,
+-    Neighborhood,
+-    #[default]
+-    Graph,
+-    Overmap,
++/// Release-based activation shared by graph hosts. Drags, modified gestures,
++/// different members and a third click cannot accidentally open a reading.
++#[derive(Clone, Debug)]
++pub struct NodeActivation<M> {
++    press: Option<(M, (f32, f32))>,
++    last: Option<(M, (f32, f32), f64)>,
+ }
+-impl ScopeLevel {
+-    pub fn label(self) -> &'static str {
+-        match self {
+-            Self::Document => "Document",
+-            Self::Neighborhood => "Neighborhood",
+-            Self::Graph => "Graph",
+-            Self::Overmap => "Meres",
++impl<M> Default for NodeActivation<M> {
++    fn default() -> Self {
++        Self {
++            press: None,
++            last: None,
+         }
+     }
+ }
+-
+-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+-pub struct ScopePlace<G, M> {
+-    pub level: ScopeLevel,
+-    pub graph: G,
+-    /// The root of the chosen neighborhood, independent of its selected child.
+-    pub root: Option<M>,
+-    pub focus: Option<M>,
+-}
+-impl<G: Clone + PartialEq, M: Clone + PartialEq> ScopePlace<G, M> {
+-    pub fn up(&self) -> Option<Self> {
+-        let level = match self.level {
+-            ScopeLevel::Document => ScopeLevel::Neighborhood,
+-            ScopeLevel::Neighborhood => ScopeLevel::Graph,
+-            ScopeLevel::Graph => ScopeLevel::Overmap,
+-            ScopeLevel::Overmap => return None,
+-        };
+-        Some(Self {
+-            level,
+-            ..self.clone()
+-        })
++impl<M: Clone + PartialEq> NodeActivation<M> {
++    pub fn cancel(&mut self) {
++        self.press = None;
++        self.last = None;
+     }
+-    pub fn down(&self) -> Option<Self> {
+-        let level = match self.level {
+-            ScopeLevel::Overmap => ScopeLevel::Graph,
+-            ScopeLevel::Graph if self.root.is_some() || self.focus.is_some() => {
+-                ScopeLevel::Neighborhood
+-            },
+-            ScopeLevel::Neighborhood if self.focus.is_some() => ScopeLevel::Document,
+-            _ => return None,
++    pub fn press(&mut self, member: Option<M>, at: (f32, f32), modified: bool) {
++        self.press = if modified {
++            None
++        } else {
++            member.map(|m| (m, at))
+         };
+-        let root = self.root.clone().or_else(|| self.focus.clone());
+-        Some(Self {
+-            level,
+-            root,
+-            ..self.clone()
+-        })
++        if self.press.is_none() {
++            self.last = None;
++        }
+     }
+-    /// A deliberate new graph selection names a new neighborhood to enter.
+-    pub fn select(&mut self, focus: M) {
+-        if self.focus.as_ref() != Some(&focus) && self.level == ScopeLevel::Graph {
+-            self.root = Some(focus.clone());
++    pub fn moved(&mut self, at: (f32, f32)) {
++        if self
++            .press
++            .as_ref()
++            .is_some_and(|(_, p)| (p.0 - at.0).abs() > 4.0 || (p.1 - at.1).abs() > 4.0)
++        {
++            self.cancel();
+         }
+-        self.focus = Some(focus);
+     }
+-    pub fn same_scope(&self, other: &Self) -> bool {
+-        self.level == other.level
+-            && self.graph == other.graph
+-            && match self.level {
+-                ScopeLevel::Document => self.focus == other.focus,
+-                ScopeLevel::Neighborhood => self.root == other.root,
+-                _ => true,
+-            }
++    pub fn release(&mut self, member: Option<M>, at: (f32, f32), now_ms: f64) -> Option<M> {
++        let Some((pressed, start)) = self.press.take() else {
++            self.last = None;
++            return None;
++        };
++        let near =
++            |a: (f32, f32), b: (f32, f32)| (a.0 - b.0).abs() <= 4.0 && (a.1 - b.1).abs() <= 4.0;
++        if member.as_ref() != Some(&pressed) || !near(start, at) || !now_ms.is_finite() {
++            self.last = None;
++            return None;
++        }
++        let doubled = self.last.as_ref().is_some_and(|(m, p, time)| {
++            *m == pressed && near(*p, at) && (0.0..=500.0).contains(&(now_ms - time))
++        });
++        self.last = if doubled {
++            None
++        } else {
++            Some((pressed.clone(), at, now_ms))
++        };
++        doubled.then_some(pressed)
++    }
++}
++
++/// Closing a background reading keeps focus. Closing the current one chooses
++/// its next neighbor, falling back to the previous reading at the end.
++pub fn reading_after_close<M: Clone + PartialEq>(
++    members: &[M],
++    focus: Option<&M>,
++    closing: &M,
++) -> Option<M> {
++    if let Some(focus) = focus.filter(|m| *m != closing && members.contains(m)) {
++        return Some(focus.clone());
+     }
++    let index = members.iter().position(|m| m == closing)?;
++    members
++        .get(index + 1)
++        .or_else(|| index.checked_sub(1).and_then(|i| members.get(i)))
++        .cloned()
++}
++
++/// A close chooses another tab in its own tiled stack before crossing cells.
++pub fn reading_after_close_in_stack<M: Clone + PartialEq>(
++    members: &[M],
++    stack: &[M],
++    focus: Option<&M>,
++    closing: &M,
++) -> Option<M> {
++    if let Some(focus) = focus.filter(|m| *m != closing && members.contains(m)) {
++        return Some(focus.clone());
++    }
++    reading_after_close(stack, focus, closing)
++        .or_else(|| reading_after_close(members, focus, closing))
+ }
+ 
+ #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+@@ -96,111 +116,14 @@ impl ScopeCamera {
+     }
+ }
+ #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+-pub struct ScopeVisit<G, M, A> {
+-    pub place: ScopePlace<G, M>,
++pub struct ScopeVisit<P, A> {
++    pub place: P,
+     pub camera: Option<ScopeCamera>,
+     pub anchor: Option<A>,
+ }
+ 
+-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+-pub struct ScopeNavigation<G, M, A> {
+-    entries: Vec<ScopeVisit<G, M, A>>,
+-    cursor: usize,
+-    remembered: Vec<ScopeVisit<G, M, A>>,
+-}
+-impl<G, M, A> Default for ScopeNavigation<G, M, A> {
+-    fn default() -> Self {
+-        Self {
+-            entries: Vec::new(),
+-            cursor: 0,
+-            remembered: Vec::new(),
+-        }
+-    }
+-}
+-impl<G: Clone + PartialEq, M: Clone + PartialEq, A: Clone> ScopeNavigation<G, M, A> {
+-    pub fn current(&self) -> Option<&ScopeVisit<G, M, A>> {
+-        self.entries.get(self.cursor)
+-    }
+-    pub fn visits(&self) -> impl Iterator<Item = &ScopeVisit<G, M, A>> {
+-        self.entries.iter().chain(&self.remembered)
+-    }
+-    pub fn destination(&self, forward: bool) -> Option<&ScopeVisit<G, M, A>> {
+-        let index = if forward {
+-            self.cursor.checked_add(1)?
+-        } else {
+-            self.cursor.checked_sub(1)?
+-        };
+-        self.entries.get(index)
+-    }
+-    pub fn remember(&mut self, visit: ScopeVisit<G, M, A>) {
+-        self.remembered
+-            .retain(|v| !v.place.same_scope(&visit.place));
+-        self.remembered.push(visit);
+-        if self.remembered.len() > 64 {
+-            self.remembered.remove(0);
+-        }
+-    }
+-    pub fn saved(&self, place: &ScopePlace<G, M>) -> Option<&ScopeVisit<G, M, A>> {
+-        self.remembered
+-            .iter()
+-            .rev()
+-            .find(|v| v.place.same_scope(place))
+-    }
+-    pub fn capture(&mut self, visit: ScopeVisit<G, M, A>) {
+-        self.remember(visit.clone());
+-        if self.entries.is_empty() {
+-            self.entries.push(visit);
+-            self.cursor = 0;
+-        } else {
+-            self.entries[self.cursor] = visit;
+-        }
+-    }
+-    pub fn visit(&mut self, visit: ScopeVisit<G, M, A>) {
+-        if self.current().is_some_and(|v| v.place == visit.place) {
+-            self.capture(visit);
+-            return;
+-        }
+-        self.entries.truncate(self.cursor + 1);
+-        self.entries.push(visit.clone());
+-        if self.entries.len() > 128 {
+-            self.entries.remove(0);
+-        }
+-        self.cursor = self.entries.len() - 1;
+-        self.remember(visit);
+-    }
+-    /// Call only after the host admits and restores destination().
+-    pub fn step(&mut self, forward: bool) -> bool {
+-        if self.destination(forward).is_none() {
+-            return false;
+-        }
+-        if forward {
+-            self.cursor += 1;
+-        } else {
+-            self.cursor -= 1;
+-        }
+-        true
+-    }
+-    pub fn validate(&self, valid_anchor: impl Fn(&A) -> bool) -> Result<(), String> {
+-        if self.entries.len() > 128
+-            || self.remembered.len() > 64
+-            || (self.entries.is_empty() && self.cursor != 0)
+-            || (!self.entries.is_empty() && self.cursor >= self.entries.len())
+-        {
+-            return Err("Invalid scope navigation history".into());
+-        }
+-        if self.entries.iter().chain(&self.remembered).any(|v| {
+-            v.camera.is_some_and(|c| !c.valid())
+-                || v.anchor.as_ref().is_some_and(|a| !valid_anchor(a))
+-                || (matches!(
+-                    v.place.level,
+-                    ScopeLevel::Document | ScopeLevel::Neighborhood
+-                ) && v.place.focus.is_none())
+-        }) {
+-            return Err("Invalid scope navigation visit".into());
+-        }
+-        Ok(())
+-    }
+-}
++mod history;
++pub use history::{ScopeNavigation, ScopeValue};
+ 
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub enum ScopeDirection {
+@@ -210,9 +133,11 @@ pub enum ScopeDirection {
+     Down,
+ }
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+-pub enum ScopeCommand {
++pub enum ScopeCommand<T = ()> {
+     Navigate(ScopeDirection),
+-    To(ScopeLevel),
++    To(T),
++    /// Edit the current graph location without recording a visit until accepted.
++    EditLocation,
+     Hint(Option<ScopeDirection>),
+ }
+ #[derive(Clone, Debug, Default)]
+@@ -223,9 +148,9 @@ pub struct ScopeControls {
+     pub down: Option<String>,
+     pub hint: Option<ScopeDirection>,
+ }
+-pub fn scope_controls<S: 'static, A: 'static, O: OptionalAction<A> + 'static>(
++pub fn scope_controls<S: 'static, A: 'static, T: 'static, O: OptionalAction<A> + 'static>(
+     controls: ScopeControls,
+-    handler: impl Fn(&mut S, ScopeCommand) -> O + 'static,
++    handler: impl Fn(&mut S, ScopeCommand<T>) -> O + 'static,
+ ) -> ShellSlot<S, A> {
+     let handler = Rc::new(handler);
+     let mut children = Vec::new();
+@@ -309,14 +234,29 @@ pub fn scope_controls<S: 'static, A: 'static, O: OptionalAction<A> + 'static>(
+ }
+ 
+ #[derive(Clone, Debug)]
+-pub struct ScopeCrumb {
++pub struct ScopeCrumb<T = ()> {
+     pub label: String,
+-    pub level: ScopeLevel,
++    pub target: T,
+     pub current: bool,
+ }
+-pub fn scope_trail<S: 'static, A: 'static, O: OptionalAction<A> + 'static>(
+-    crumbs: Vec<ScopeCrumb>,
+-    handler: impl Fn(&mut S, ScopeCommand) -> O + 'static,
++pub fn scope_trail<S: 'static, A: 'static, T: Clone + 'static, O: OptionalAction<A> + 'static>(
++    crumbs: Vec<ScopeCrumb<T>>,
++    handler: impl Fn(&mut S, ScopeCommand<T>) -> O + 'static,
++) -> ShellSlot<S, A> {
++    scope_trail_with_location_edit(crumbs, true, handler)
++}
++
++/// Hosts without a location editor render the current place as text. Ancestor
++/// destinations stay actionable; the current label does not claim an edit action.
++pub fn scope_trail_with_location_edit<
++    S: 'static,
++    A: 'static,
++    T: Clone + 'static,
++    O: OptionalAction<A> + 'static,
++>(
++    crumbs: Vec<ScopeCrumb<T>>,
++    editable: bool,
++    handler: impl Fn(&mut S, ScopeCommand<T>) -> O + 'static,
+ ) -> ShellSlot<S, A> {
+     let handler = Rc::new(handler);
+     let mut children: Vec<ShellSlot<S, A>> = Vec::new();
+@@ -324,17 +264,28 @@ pub fn scope_trail<S: 'static, A: 'static, O: OptionalAction<A> + 'static>(
+         if index > 0 {
+             children.push(Box::new(el("span", "›").attr("aria-hidden", "true")));
+         }
+-        if crumb.current {
++        if crumb.current && !editable {
+             children.push(Box::new(
+-                el("span", crumb.label).attr("aria-current", "location"),
++                el("span", crumb.label)
++                    .attr("class", "scope-location-current")
++                    .attr("aria-current", "location"),
+             ));
++        } else if crumb.current {
++            let click = handler.clone();
++            children.push(Box::new(clickable(
++                el("button", crumb.label.clone())
++                    .attr("class", "shell-control scope-location-edit")
++                    .attr("aria-current", "location")
++                    .attr("aria-label", format!("Edit location: {}", crumb.label)),
++                move |s, _| click(s, ScopeCommand::EditLocation),
++            )));
+         } else {
+             let click = handler.clone();
+             children.push(shell_control(
+                 crumb.label.clone(),
+                 format!("Scope: {}", crumb.label),
+                 Default::default(),
+-                move |s, _| click(s, ScopeCommand::To(crumb.level)),
++                move |s, _| click(s, ScopeCommand::To(crumb.target.clone())),
+             ));
+         }
+     }
+@@ -345,72 +296,29 @@ pub fn scope_trail<S: 'static, A: 'static, O: OptionalAction<A> + 'static>(
+     )
+ }
+ 
++/// One location slot: the quiet trail at rest, the host's existing editable
++/// field while active. Text ownership and destination admission stay with hosts.
++pub fn scope_location<
++    S: 'static,
++    A: 'static,
++    T: Clone + 'static,
++    O: OptionalAction<A> + 'static,
++>(
++    crumbs: Vec<ScopeCrumb<T>>,
++    field: Option<ShellSlot<S, A>>,
++    handler: impl Fn(&mut S, ScopeCommand<T>) -> O + 'static,
++) -> ShellSlot<S, A> {
++    Box::new(
++        el("div", field.unwrap_or_else(|| scope_trail(crumbs, handler)))
++            .attr("class", "cambium-scope-location"),
++    )
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+-    fn visit(level: ScopeLevel, focus: u8) -> ScopeVisit<u8, u8, u8> {
+-        ScopeVisit {
+-            place: ScopePlace {
+-                level,
+-                graph: 1,
+-                root: Some(2),
+-                focus: Some(focus),
+-            },
+-            camera: None,
+-            anchor: Some(9),
+-        }
+-    }
+-    #[test]
+-    fn down_enters_focus_and_history_can_go_outward() {
+-        let mut nav = ScopeNavigation::default();
+-        nav.visit(visit(ScopeLevel::Document, 2));
+-        nav.visit(visit(ScopeLevel::Neighborhood, 2));
+-        nav.visit(visit(ScopeLevel::Graph, 2));
+-        let mut place = nav.current().unwrap().place.clone();
+-        place.select(3);
+-        let neighborhood = place.down().unwrap();
+-        assert_eq!(neighborhood.root, Some(3));
+-        nav.visit(ScopeVisit {
+-            place: neighborhood,
+-            ..visit(ScopeLevel::Neighborhood, 3)
+-        });
+-        assert_eq!(
+-            nav.destination(false).unwrap().place.level,
+-            ScopeLevel::Graph
+-        );
+-        assert_eq!(
+-            nav.current().unwrap().place.down().unwrap().level,
+-            ScopeLevel::Document
+-        );
+-        assert_eq!(nav.current().unwrap().place.down().unwrap().focus, Some(3));
+-        assert_eq!(nav.current().unwrap().anchor, Some(9));
+-    }
+-    #[test]
+-    fn route_keeps_context_when_reading_another_member() {
+-        let place = visit(ScopeLevel::Neighborhood, 3).place.down().unwrap();
+-        assert_eq!(place.up().unwrap().root, Some(2));
+-        assert!(place.down().is_none());
+-        assert!(visit(ScopeLevel::Overmap, 2).place.up().is_none());
+-    }
+-    #[test]
+-    fn new_visit_cuts_forward_history_but_keeps_scope_camera() {
+-        let mut nav = ScopeNavigation::default();
+-        let mut graph = visit(ScopeLevel::Graph, 2);
+-        graph.camera = Some(ScopeCamera {
+-            x: 120.0,
+-            y: 10.0,
+-            zoom: 2.0,
+-        });
+-        nav.visit(graph.clone());
+-        nav.visit(visit(ScopeLevel::Neighborhood, 2));
+-        assert!(nav.step(false));
+-        nav.visit(visit(ScopeLevel::Document, 3));
+-        assert!(nav.destination(true).is_none());
+-        assert_eq!(nav.saved(&graph.place).unwrap().camera, graph.camera);
+-        assert!(nav.validate(|_| true).is_ok());
+-    }
+     #[test]
+-    fn compass_keeps_keyboard_focus_and_exposes_destination_hints() {
++    fn compass_keeps_keyboard_focus_and_exposes_application_destination_hints() {
+         use crate::{DomHandle, GenetAppRunner, Key, KeyEvent, NamedKey, PointerClick};
+         use genet_scripted_dom::ScriptedDom;
+         use layout_dom_api::{LayoutDom, LocalName, Namespace};
+@@ -426,11 +334,11 @@ mod tests {
+             |s: &State| {
+                 scope_controls(
+                     ScopeControls {
+-                        up: Some("Neighborhood of notes".into()),
++                        up: Some("Owning Set".into()),
+                         hint: s.hint,
+                         ..Default::default()
+                     },
+-                    |s: &mut State, c| match c {
++                    |s: &mut State, c: ScopeCommand<()>| match c {
+                         ScopeCommand::Hint(h) => s.hint = h,
+                         ScopeCommand::Navigate(d) => s.commands.push(d),
+                         _ => {},
+@@ -445,28 +353,189 @@ mod tests {
+                 .attribute(node, &Namespace::from(""), &LocalName::from("aria-label"))
+                 .map(|s| s.to_string())
+         };
+-        let up = buttons
+-            .iter()
+-            .copied()
+-            .find(|n| name(*n).as_deref() == Some("Up: Neighborhood of notes"))
+-            .unwrap();
+-        let down = buttons
+-            .iter()
+-            .copied()
+-            .find(|n| name(*n).as_deref() == Some("Down"))
+-            .unwrap();
++        let up = buttons.iter().copied()
++            .find(|n| name(*n).as_deref() == Some("Up: Owning Set")).unwrap();
++        let down = buttons.iter().copied()
++            .find(|n| name(*n).as_deref() == Some("Down")).unwrap();
+         runner.set_focus(Some(up));
+         assert_eq!(runner.state().hint, Some(ScopeDirection::Up));
+-        assert_eq!(
+-            dom.borrow()
+-                .all_with_class(runner.root(), "scope-tooltip")
+-                .len(),
+-            1
+-        );
++        assert_eq!(dom.borrow().all_with_class(runner.root(), "scope-tooltip").len(), 1);
+         runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Enter)));
+         assert_eq!(runner.state().commands, vec![ScopeDirection::Up]);
+         assert_eq!(runner.focus(), Some(up));
+         runner.dispatch_click(down, PointerClick::at((0.0, 0.0)));
+         assert_eq!(runner.state().commands.len(), 1);
+     }
++
++    #[test]
++    fn location_only_trail_keeps_ancestors_actionable() {
++        use crate::{DomHandle, GenetAppRunner, PointerClick};
++        use genet_scripted_dom::ScriptedDom;
++        use layout_dom_api::LayoutDom;
++        use std::cell::RefCell;
++        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
++        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
++            dom.clone(),
++            |_: &Vec<u8>| scope_trail_with_location_edit(
++                vec![
++                    ScopeCrumb { label: "Set".into(), target: 1, current: false },
++                    ScopeCrumb { label: "Card".into(), target: 2, current: true },
++                ],
++                false,
++                |state: &mut Vec<u8>, command| {
++                    if let ScopeCommand::To(target) = command { state.push(target); }
++                },
++            ),
++            Vec::new(),
++        );
++        assert!(dom.borrow().all_with_class(runner.root(), "scope-location-edit").is_empty());
++        let current = dom.borrow().all_with_class(runner.root(), "scope-location-current")[0];
++        runner.dispatch_click(current, PointerClick::at((0.0, 0.0)));
++        assert!(runner.state().is_empty());
++        let ancestors = dom.borrow().all_with_class(runner.root(), "shell-control");
++        assert_eq!(ancestors.len(), 1);
++        runner.dispatch_click(ancestors[0], PointerClick::at((0.0, 0.0)));
++        assert_eq!(runner.state(), &[1]);
++    }
++
++    #[test]
++    fn double_activation_requires_two_unmodified_clicks_on_the_same_member() {
++        let mut activation = NodeActivation::default();
++        activation.press(Some(1), (4., 5.), false);
++        assert_eq!(activation.release(Some(1), (4., 5.), 100.), None);
++        activation.press(Some(1), (5., 5.), false);
++        assert_eq!(activation.release(Some(1), (5., 5.), 300.), Some(1));
++        activation.press(Some(1), (5., 5.), false);
++        assert_eq!(
++            activation.release(Some(1), (5., 5.), 350.),
++            None,
++            "a third click starts again"
++        );
++        activation.press(Some(2), (5., 5.), false);
++        assert_eq!(activation.release(Some(2), (5., 5.), 400.), None);
++        activation.press(Some(2), (5., 5.), true);
++        assert_eq!(activation.release(Some(2), (5., 5.), 450.), None);
++        activation.press(Some(2), (5., 5.), false);
++        activation.moved((30., 5.));
++        assert_eq!(
++            activation.release(Some(2), (5., 5.), 500.),
++            None,
++            "dragging out and back is not a click"
++        );
++        activation.press(Some(2), (5., 5.), false);
++        assert_eq!(activation.release(Some(2), (5., 5.), 600.), None);
++        activation.press(Some(2), (5., 5.), false);
++        assert_eq!(
++            activation.release(Some(2), (5., 5.), 1200.),
++            None,
++            "slow clicks do not open"
++        );
++    }
++    #[test]
++    fn closing_readings_preserves_background_focus_and_selects_an_adjacent_view() {
++        assert_eq!(reading_after_close(&[1, 2, 3], Some(&3), &1), Some(3));
++        assert_eq!(reading_after_close(&[1, 2, 3], Some(&2), &2), Some(3));
++        assert_eq!(reading_after_close(&[1, 2, 3], Some(&3), &3), Some(2));
++        assert_eq!(reading_after_close(&[1], Some(&1), &1), None);
++        assert_eq!(
++            reading_after_close_in_stack(&[1, 2, 3], &[1, 2], Some(&2), &2),
++            Some(1)
++        );
++        assert_eq!(
++            reading_after_close_in_stack(&[1, 2, 3], &[1, 2], Some(&3), &1),
++            Some(3)
++        );
++        assert_eq!(
++            reading_after_close_in_stack(&[1, 2, 3], &[3], Some(&3), &3),
++            Some(2)
++        );
++    }
++    #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
++    struct Place {
++        route: Vec<String>,
++        focus: u8,
++    }
++    fn visit(route: &[&'static str], focus: u8) -> ScopeVisit<Place, u8> {
++        ScopeVisit {
++            place: Place {
++                route: route.iter().map(|part| (*part).to_owned()).collect(),
++                focus,
++            },
++            camera: None,
++            anchor: Some(9),
++        }
++    }
++    #[test]
++    fn hosts_supply_nested_skipped_and_ambiguous_contexts_without_a_fixed_ladder() {
++        let mut nav = ScopeNavigation::default();
++        nav.visit(visit(&["concert", "set", "section", "measure"], 2));
++        nav.visit(visit(&["concert", "section", "measure"], 2));
++        nav.visit(visit(&["practice", "measure"], 2));
++        assert_eq!(
++            nav.destination(false).unwrap().place.route,
++            ["concert", "section", "measure"]
++        );
++        assert!(nav.step(false));
++        assert_eq!(nav.current().unwrap().place.focus, 2);
++        assert!(nav.destination(true).is_some());
++        assert!(
++            nav.saved_matching(|p| p.route == ["practice", "measure"])
++                .is_some()
++        );
++        assert_eq!(
++            nav.saved_matching(|p| p.route == ["concert", "set", "section", "measure"])
++                .unwrap()
++                .anchor,
++            Some(9)
++        );
++        assert!(nav.validate(|p| !p.route.is_empty(), |_| true).is_ok());
++    }
++    #[test]
++    fn capture_restores_a_visit_without_accepting_or_advancing_another_one() {
++        let mut nav = ScopeNavigation::default();
++        nav.visit(visit(&["world", "region"], 1));
++        nav.visit(visit(&["world", "region", "room"], 2));
++        nav.capture(ScopeVisit {
++            camera: Some(ScopeCamera {
++                x: 4.,
++                y: 8.,
++                zoom: 2.,
++            }),
++            ..visit(&["world", "region", "room"], 3)
++        });
++        assert_eq!(nav.destination(false).unwrap().place.focus, 1);
++        assert!(nav.step(false));
++        assert_eq!(nav.destination(true).unwrap().camera.unwrap().zoom, 2.);
++        nav.visit(visit(&["world", "elsewhere"], 4));
++        assert!(nav.destination(true).is_none());
++    }
++    #[test]
++    fn validation_belongs_to_the_host_and_camera_sanity_to_the_history() {
++        let mut nav = ScopeNavigation::default();
++        nav.visit(visit(&[], 1));
++        assert!(nav.validate(|p| !p.route.is_empty(), |_| true).is_err());
++        nav.capture(ScopeVisit {
++            camera: Some(ScopeCamera {
++                x: 0.,
++                y: 0.,
++                zoom: f32::NAN,
++            }),
++            ..visit(&["root"], 1)
++        });
++        assert!(nav.validate(|_| true, |_| true).is_err());
++    }
++    #[test]
++    fn activation_can_bind_to_a_live_instance_independently_of_durable_document_identity() {
++        let mut activation = NodeActivation::default();
++        activation.press(Some((10, "same-document")), (0., 0.), false);
++        assert_eq!(
++            activation.release(Some((10, "same-document")), (0., 0.), 10.),
++            None
++        );
++        activation.press(Some((11, "same-document")), (0., 0.), false);
++        assert_eq!(
++            activation.release(Some((11, "same-document")), (0., 0.), 100.),
++            None
++        );
++    }
+ }
+diff --git a/crates/mere/src/navigation.rs b/crates/mere/src/navigation.rs
+index 70253c10a..e5d7635bb 100644
+--- a/crates/mere/src/navigation.rs
++++ b/crates/mere/src/navigation.rs
+@@ -4,6 +4,8 @@
+ //! Shared, read-only relationship navigation over the kernel's canonical projection.
+ //! Hosts retain navigation admission, actions, graph ownership and persistence.
+ //! Direction and kind are retained even when several relations share a member.
++pub mod browser;
++
+ use kernel::graph::{Graph, RelationKind, SemanticSubKind};
+ 
+ /// A bounded, live one-hop neighborhood over canonical projected relations.
+diff --git a/design_docs/DOC_README.md b/design_docs/DOC_README.md
+index 8d25d5d1d..caf60134c 100644
+--- a/design_docs/DOC_README.md
++++ b/design_docs/DOC_README.md
+@@ -23,6 +23,8 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption
+ 
+ # Mere Documentation Index
+ 
++- [Application-defined contextual navigation](mere_docs/implementation_strategy/2026-10-23_contextual_navigation_plan.md): shared Cambium history and controls received by Woodshed and Knot; app-owned ancestry and restoration preserve playback and live edits, with native qualification tracked separately.
++
+ - [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints and governed native Gemini/Scroll/Micron hosting; MIME-preserving receiving and Turnstone's native browser/controller proof are qualified, with client limits and headed interaction separate.
+ 
+ Small-web integrations preserve native metadata and keep content, transport and
+diff --git a/ports/graphshell/src/forme_session.rs b/ports/graphshell/src/forme_session.rs
+index 0ae0cabe5..d14a5ca17 100644
+--- a/ports/graphshell/src/forme_session.rs
++++ b/ports/graphshell/src/forme_session.rs
+@@ -127,7 +127,7 @@ pub enum SaveKind {
+     Redo,
+     InspectorSource(crate::pane_source::InspectorSource),
+     Visibility,
+-    Scope(cambium::scope_navigation::ScopeNavigation<Uuid,Uuid,tabard::ReadingAnchor>),
++    Scope(crate::scope_policy::ScopeNavigation<tabard::ReadingAnchor>),
+     Reading(Uuid, tabard::ReadingPreferences),
+     ReadingProgress(std::collections::BTreeMap<Uuid,tabard::ReadingAnchor>, tabard::ReadingTrail<Uuid>),
+ }
+@@ -428,7 +428,7 @@ impl FormeSession {
+                 to.push(current);
+                 state.restore(&mut next.workspace);
+             },
+-            SaveKind::Scope(nav) => { nav.validate(|a|a.validate().is_ok())?; next.workspace.scope_navigation=nav; },
++            SaveKind::Scope(nav) => { nav.validate(|place|place.valid(), |a|a.validate().is_ok())?; next.workspace.scope_navigation=nav; },
+             SaveKind::Reading(access, value) => {
+                 value.validate()?;
+                 if next.workspace.tile_for_member(access).is_none() { return Err("Reading projection is no longer present".into()); }
+@@ -750,12 +750,12 @@ mod tests {
+     #[test]
+     fn scope_route_saves_independently_of_layout_drafts_and_reopens_with_its_anchor() {
+         pollster::block_on(async {
+-            use cambium::scope_navigation::*;
++            use crate::scope_policy::*;
+             let (graph,mut session,[a,_,c])=fixture();let backend=MemoryBackend::new();let owner=session.committed().document.graph_id;
+             let document=serde_json::to_value(&session.committed().document).unwrap();
+             session.committed().save(backend.clone()).await.unwrap();session.unlock().unwrap();session.edit(None,1,|w|w.open(c,&graph)).unwrap();
+             let anchor=tabard::ReadingAnchor{source:"mere://reading/a".into(),revision:42,text:3,offset:0,exact:"A retained passage".into(),prefix:String::new(),suffix:String::new(),line_offset:0.0,fallback_y:600.0};
+-            let mut nav=ScopeNavigation::default();let place=ScopePlace{level:ScopeLevel::Document,graph:owner,root:Some(a),focus:Some(a)};
++            let mut nav=ScopeNavigation::default();let place=ScopePlace{contexts:None,level:ScopeLevel::Document,graph:owner,root:Some(a),focus:Some(a)};
+             nav.visit(ScopeVisit{place:place.clone(),camera:None,anchor:Some(anchor.clone())});
+             nav.visit(ScopeVisit{place:place.up().unwrap(),camera:Some(ScopeCamera{x:100.0,y:80.0,zoom:2.0}),anchor:None});
+             save(&mut session,backend.clone(),SaveKind::Scope(nav.clone())).await;
+@@ -768,9 +768,9 @@ mod tests {
+     }
+     #[test]
+     fn scope_write_failure_keeps_acknowledged_route_and_foreign_graph_is_refused() {
+-        use cambium::scope_navigation::*;
++        use crate::scope_policy::*;
+         let (_,mut session,[a,_,_])=fixture();let owner=session.committed().document.graph_id;
+-        let mut nav=ScopeNavigation::default();nav.visit(ScopeVisit{place:ScopePlace{level:ScopeLevel::Graph,graph:owner,root:Some(a),focus:Some(a)},camera:None,anchor:None});
++        let mut nav=ScopeNavigation::default();nav.visit(ScopeVisit{place:ScopePlace{contexts:None,level:ScopeLevel::Graph,graph:owner,root:Some(a),focus:Some(a)},camera:None,anchor:None});
+         let proposal=session.prepare_save(SaveKind::Scope(nav.clone()),1).unwrap();assert!(session.finish_save(proposal,Err("offline".into())).is_err());
+         assert!(session.committed().scope_navigation.current().is_none());
+         let mut foreign=nav.current().unwrap().clone();foreign.place.graph=Uuid::nil();nav.visit(foreign);
+diff --git a/ports/graphshell/src/forme_workspace.rs b/ports/graphshell/src/forme_workspace.rs
+index 6fd67270d..803cdf91c 100644
+--- a/ports/graphshell/src/forme_workspace.rs
++++ b/ports/graphshell/src/forme_workspace.rs
+@@ -44,7 +44,7 @@ pub struct FormeWorkspace {
+     #[serde(default)]
+     pub reading_trail: tabard::ReadingTrail<Uuid>,
+     #[serde(default)]
+-    pub scope_navigation: cambium::scope_navigation::ScopeNavigation<Uuid,Uuid,tabard::ReadingAnchor>,
++    pub scope_navigation: crate::scope_policy::ScopeNavigation<tabard::ReadingAnchor>,
+     tile_ids: BTreeMap<Uuid, u64>,
+ }
+ 
+@@ -281,8 +281,14 @@ impl FormeWorkspace {
+     }
+     pub fn validate(&self, graph_id: Uuid) -> Result<(), String> {
+         self.reading_trail.validate()?;
+-        self.scope_navigation.validate(|a|a.validate().is_ok())?;
+-        if self.scope_navigation.visits().any(|v|v.place.graph!=graph_id) {return Err("Scope route belongs to another graph".into());}
++        self.scope_navigation.validate(
++            |place| {
++                place.valid()
++                    && place.graph == graph_id
++                    && place.parents().iter().all(|parent| parent.graph == graph_id)
++            },
++            |anchor| anchor.validate().is_ok(),
++        )?;
+         if self.reading_anchors.len()>1024 {return Err("Too many reading anchors".into());}
+         for (access,anchor) in &self.reading_anchors { if !self.tile_ids.contains_key(access) {return Err("Reading anchor has no projection".into());} anchor.validate()?; }
+         self.reading_preferences.validate()?;
+diff --git a/ports/graphshell/src/forme_workspace/tests.rs b/ports/graphshell/src/forme_workspace/tests.rs
+index 9e5c5d79d..4569cbd24 100644
+--- a/ports/graphshell/src/forme_workspace/tests.rs
++++ b/ports/graphshell/src/forme_workspace/tests.rs
+@@ -25,6 +25,41 @@ fn graph() -> (Graph, Uuid, Uuid) {
+     );
+     (g, a, b)
+ }
++
++#[test]
++fn validation_checks_immutable_scope_contexts_against_the_owner_graph() {
++    let graph_id = Uuid::from_u128(10);
++    let mut workspace = FormeWorkspace::new(graph_id);
++    workspace.scope_navigation.visit(crate::scope_policy::ScopeVisit {
++        place: mere::navigation::browser::ScopePlace {
++            level: mere::navigation::browser::ScopeLevel::Graph,
++            graph: graph_id,
++            root: None,
++            focus: None,
++            contexts: None,
++        },
++        camera: None,
++        anchor: None,
++    });
++
++    // Model a captured bookmark moving to the owning graph while the
++    // immutable lineage context still names a different graph.
++    let mut wire = serde_json::to_value(&workspace.scope_navigation).unwrap();
++    wire["lineage"]["visits"][0]["context"]["place"]["graph"] =
++        serde_json::json!(Uuid::from_u128(20));
++    workspace.scope_navigation = serde_json::from_value(wire).unwrap();
++
++    assert!(workspace.scope_navigation.visits().all(|visit| {
++        visit.place.graph == graph_id
++            && visit
++                .place
++                .parents()
++                .iter()
++                .all(|parent| parent.graph == graph_id)
++    }));
++    assert!(workspace.validate(graph_id).is_err());
++}
++
+ #[test]
+ fn two_accesses_share_resource_but_keep_separate_tiles_and_regions() {
+     let (g, a, b) = graph();
+@@ -173,6 +208,7 @@ fn persistence_reconciles_removed_access_and_rejects_foreign_session() {
+         assert!(w.validate(Uuid::from_u128(20)).is_err());
+     });
+ }
++
+ #[test]
+ fn malformed_geometry_is_refused_before_any_install_or_write() {
+     let (g, a, _) = graph();
+diff --git a/ports/graphshell/src/lib.rs b/ports/graphshell/src/lib.rs
+index a1a5dbac8..563cf305e 100644
+--- a/ports/graphshell/src/lib.rs
++++ b/ports/graphshell/src/lib.rs
+@@ -135,3 +135,7 @@ pub mod webrtc_browser;
+ pub use chirograph as protocol;
+ pub use graphshell_client as client;
+ pub use graphshell_endpoint as endpoint;
++
++/// Graph browser policy shared by the product projections.
++#[cfg(feature="web")]
++pub mod scope_policy;
+diff --git a/ports/graphshell/src/web_tree/forme.rs b/ports/graphshell/src/web_tree/forme.rs
+index 7a5680c3c..3cdd8bd11 100644
+--- a/ports/graphshell/src/web_tree/forme.rs
++++ b/ports/graphshell/src/web_tree/forme.rs
+@@ -415,7 +415,7 @@ pub(super) fn open_selected(page: &mut TreePage) {
+ /// first Read with an empty arrangement admits the already-selected members.
+ pub(super) fn show_projection(page: &mut TreePage, map: bool) {
+     if map {
+-        super::scope_navigation::command(page,cambium::scope_navigation::ScopeCommand::To(cambium::scope_navigation::ScopeLevel::Graph));
++        super::scope_navigation::command(page,graphshell::scope_policy::ScopeCommand::To(graphshell::scope_policy::ScopeLevel::Graph.into()));
+     } else {
+         let member=page.shared.canvas.borrow().focused_member().or_else(||page.forme.as_ref().and_then(|p|p.current().focused_reading));
+         if let Some(member)=member {read_related(page,member);} else {open_selected(page);}
+diff --git a/ports/graphshell/src/web_tree/scope_navigation.rs b/ports/graphshell/src/web_tree/scope_navigation.rs
+index 49c8942f4..76bd67276 100644
+--- a/ports/graphshell/src/web_tree/scope_navigation.rs
++++ b/ports/graphshell/src/web_tree/scope_navigation.rs
+@@ -3,10 +3,10 @@
+ 
+ //! A small host adapter for Cambium's shared scope route and visit history.
+ use super::*;
+-use cambium::scope_navigation::*;
++use graphshell::scope_policy::*;
+ use uuid::Uuid;
+-type Navigation = ScopeNavigation<Uuid, Uuid, tabard::ReadingAnchor>;
+-type Visit = ScopeVisit<Uuid, Uuid, tabard::ReadingAnchor>;
++type Navigation = ScopeNavigation<tabard::ReadingAnchor>;
++type Visit = ScopeVisit<tabard::ReadingAnchor>;
+ #[derive(Default)]
+ pub(super) struct State {
+     owner: Option<Uuid>,
+@@ -29,7 +29,7 @@ pub(super) fn place(page: &TreePage) -> Option<ScopePlace<Uuid, Uuid>> {
+         .current()
+         .map(|v| v.place.clone())
+         .filter(|p| p.graph == graph)
+-        .unwrap_or(ScopePlace {
++        .unwrap_or(ScopePlace { contexts:None,
+             level: ScopeLevel::Graph,
+             graph,
+             root: None,
+@@ -38,21 +38,12 @@ pub(super) fn place(page: &TreePage) -> Option<ScopePlace<Uuid, Uuid>> {
+     if pane.workbench {
+         let focus = pane.current().focused_reading;
+         if focus.is_none() {
+-            place.level = ScopeLevel::Graph;
+-            place.focus = None;
++            place=place.project(ScopeLevel::Graph,None,None);
+             return Some(place);
+         }
+-        if place.level != ScopeLevel::Document || place.focus != focus {
+-            if place.level != ScopeLevel::Neighborhood {
+-                place.root = focus;
+-            }
+-            place.level = ScopeLevel::Document;
+-            place.focus = focus;
+-        }
++        if place.level!=ScopeLevel::Document || place.focus!=focus {place=place.reading(graph,focus.unwrap());}
+     } else if place.level != ScopeLevel::Overmap {
+-        if place.level == ScopeLevel::Document {
+-            place.level = ScopeLevel::Graph;
+-        }
++        if place.level == ScopeLevel::Document {place=place.project(ScopeLevel::Graph,None,place.focus);}
+         if let Some(focus) = page.shared.canvas.borrow().focused_member() {
+             place.select(focus);
+         }
+@@ -127,16 +118,7 @@ pub(super) fn record_reading(page: &mut TreePage, member: Uuid) {
+     let Some(mut visit) = capture(page) else {
+         return;
+     };
+-    visit.place.root = page
+-        .instrument
+-        .scope
+-        .navigation
+-        .current()
+-        .filter(|v| v.place.level == ScopeLevel::Neighborhood)
+-        .and_then(|v| v.place.root)
+-        .or(Some(member));
+-    visit.place.level = ScopeLevel::Document;
+-    visit.place.focus = Some(member);
++    visit.place=page.instrument.scope.navigation.current().map(|v|v.place.reading(visit.place.graph,member)).unwrap_or_else(||visit.place.reading(visit.place.graph,member));
+     visit.anchor = super::reading::capture_progress(page)
+         .0
+         .get(&member)
+@@ -211,32 +193,16 @@ pub(super) fn controls(page: &TreePage) -> Child {
+ }
+ pub(super) fn trail(page: &TreePage) -> Option<Child> {
+     let place = place(page)?;
+-    let crumbs = [
+-        ScopeLevel::Overmap,
+-        ScopeLevel::Graph,
+-        ScopeLevel::Neighborhood,
+-        ScopeLevel::Document,
+-    ]
+-    .into_iter()
+-    .filter(|l| *l as u8 >= place.level as u8)
+-    .map(|level| ScopeCrumb {
+-        label: if level == ScopeLevel::Neighborhood {
+-            "Neighborhood".into()
+-        } else {
+-            label(
+-                page,
+-                &ScopePlace {
+-                    level,
+-                    ..place.clone()
+-                },
+-            )
+-        },
+-        level,
+-        current: level == place.level,
+-    })
+-    .collect();
+-    Some(cambium::scope_navigation::scope_trail(crumbs, command))
++    let trail=place.trail();let nested=trail.iter().filter(|p|p.level==ScopeLevel::Neighborhood).count()>1;let last=trail.len().saturating_sub(1);
++    let crumbs=trail.into_iter().enumerate().map(|(index,destination)|ScopeCrumb {
++        label:if destination.level==ScopeLevel::Neighborhood && !nested {"Neighborhood".into()} else {label(page,&destination)},
++        target:ScopeDestination::Place(destination),current:index==last,
++    }).collect();
++    // This supplier's browser shell has no location editor yet. The GUI lane
++    // adds that editor; the compatibility adapter keeps its current crumb text.
++    Some(cambium::scope_navigation::scope_trail_with_location_edit(crumbs,false,command))
+ }
++
+ pub(super) fn command(page: &mut TreePage, command: ScopeCommand) {
+     if let ScopeCommand::Hint(hint) = command {
+         page.instrument.scope.hint = hint;
+@@ -276,14 +242,11 @@ pub(super) fn command(page: &mut TreePage, command: ScopeCommand) {
+         let place = match command {
+             ScopeCommand::Navigate(ScopeDirection::Up) => origin.place.up(),
+             ScopeCommand::Navigate(ScopeDirection::Down) => origin.place.down(),
+-            ScopeCommand::To(level) if level != origin.place.level => Some(ScopePlace {
+-                level,
+-                ..origin.place.clone()
+-            }),
++            ScopeCommand::To(ref destination) => destination.resolve(&origin.place).filter(|p|p!=&origin.place),
+             _ => None,
+         };
+         place.map(|place| {
+-            let saved = page.instrument.scope.navigation.saved(&place);
++            let saved = page.instrument.scope.navigation.saved_matching(|p|p.same_scope(&place));
+             ScopeVisit {
+                 camera: saved.and_then(|v| v.camera),
+                 anchor: saved.and_then(|v| v.anchor.clone()),
+diff --git a/ports/graphshell/web/Cargo.lock b/ports/graphshell/web/Cargo.lock
+index d7b839f74..c4ac200e6 100644
+--- a/ports/graphshell/web/Cargo.lock
++++ b/ports/graphshell/web/Cargo.lock
+@@ -896,6 +896,7 @@ name = "cambium"
+ version = "0.6.0"
+ dependencies = [
+  "backstep",
++ "chartulary",
+  "genet-scripted-dom",
+  "genet-text",
+  "hest",
+@@ -906,6 +907,7 @@ dependencies = [
+  "scenograph",
+  "scenomise",
+  "serde",
++ "serde_json",
+  "sprigging",
+  "workbench",
+ ]

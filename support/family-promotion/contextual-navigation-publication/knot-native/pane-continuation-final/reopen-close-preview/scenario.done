@@ -1,0 +1,6 @@
+RESULT ok
+captured reopened-preview-scroll
+capture reopened-preview-scroll 2400x1400 digest=45b56caa5c71e8b6 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-publication\knot-native\pane-continuation-final\reopen-close-preview\capture\reopened-preview-scroll.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 21 frames, 21 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":21,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":67,"phase":"submitted"}},"sequence":22}}

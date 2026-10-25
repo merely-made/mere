@@ -11,6 +11,51 @@ use cambium::{TitleBarSlot, button, el};
 
 use crate::WindowCommands;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CaptionPlatform {
+    Windows,
+    MacOs,
+    Linux,
+    Other,
+}
+
+fn current_caption_platform() -> CaptionPlatform {
+    if cfg!(target_os = "windows") {
+        CaptionPlatform::Windows
+    } else if cfg!(target_os = "macos") {
+        CaptionPlatform::MacOs
+    } else if cfg!(target_os = "linux") {
+        CaptionPlatform::Linux
+    } else {
+        CaptionPlatform::Other
+    }
+}
+
+fn default_window_frame(platform: CaptionPlatform) -> crate::WindowFrame {
+    match platform {
+        CaptionPlatform::Windows => crate::WindowFrame::App,
+        CaptionPlatform::MacOs | CaptionPlatform::Linux | CaptionPlatform::Other => {
+            crate::WindowFrame::Host
+        }
+    }
+}
+
+fn uses_explicit_caption_controls(
+    platform: CaptionPlatform,
+    frame: crate::WindowFrame,
+) -> bool {
+    frame == crate::WindowFrame::App && platform != CaptionPlatform::MacOs
+}
+
+/// The desktop host's suggested frame policy for this platform.
+///
+/// Applications can still override this through [`crate::HostOptions::window_frame`].
+/// Windows defaults to an application frame; macOS and Linux default to the
+/// platform-owned frame.
+pub fn platform_window_frame() -> crate::WindowFrame {
+    default_window_frame(current_caption_platform())
+}
+
 /// Accessible names for the three window controls.
 ///
 /// `maximize` must equal [`crate::HostOptions::maximize_control_label`] so the
@@ -69,8 +114,10 @@ pub fn window_caption_controls<State: 'static>(
     )
 }
 
-/// The usual native frame policy: macOS retains its traffic lights and receives
-/// an empty caption slot; other platforms receive the explicit controls.
+/// Platform caption controls for an application-drawn frame: macOS retains its
+/// traffic lights and receives an empty slot; other platforms receive explicit
+/// controls. When the selected frame may be host-owned, use
+/// [`caption_controls_for_frame`] instead.
 pub fn platform_caption_controls<State: 'static>(
     commands: &WindowCommands,
     labels: &CaptionLabels,
@@ -79,5 +126,63 @@ pub fn platform_caption_controls<State: 'static>(
         Box::new(String::new())
     } else {
         window_caption_controls(commands, labels)
+    }
+}
+
+/// Caption controls appropriate for the selected frame on this platform.
+///
+/// Host frames keep their native caption controls. App frames use explicit
+/// controls except on macOS, where the host retains the native traffic lights
+/// even when the content extends into the titlebar area.
+pub fn caption_controls_for_frame<State: 'static>(
+    commands: &WindowCommands,
+    labels: &CaptionLabels,
+    frame: crate::WindowFrame,
+) -> TitleBarSlot<State> {
+    if uses_explicit_caption_controls(current_caption_platform(), frame) {
+        window_caption_controls(commands, labels)
+    } else {
+        Box::new(String::new())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{CaptionPlatform, default_window_frame, uses_explicit_caption_controls};
+    use crate::WindowFrame;
+
+    #[test]
+    fn platform_frame_defaults_are_explicit_for_desktop_targets() {
+        assert_eq!(
+            default_window_frame(CaptionPlatform::Windows),
+            WindowFrame::App
+        );
+        for platform in [
+            CaptionPlatform::MacOs,
+            CaptionPlatform::Linux,
+            CaptionPlatform::Other,
+        ] {
+            assert_eq!(default_window_frame(platform), WindowFrame::Host);
+        }
+    }
+
+    #[test]
+    fn frame_caption_policy_preserves_native_controls_where_the_host_owns_them() {
+        for platform in [
+            CaptionPlatform::Windows,
+            CaptionPlatform::Linux,
+            CaptionPlatform::Other,
+        ] {
+            assert!(!uses_explicit_caption_controls(platform, WindowFrame::Host));
+            assert!(uses_explicit_caption_controls(platform, WindowFrame::App));
+        }
+        assert!(!uses_explicit_caption_controls(
+            CaptionPlatform::MacOs,
+            WindowFrame::Host
+        ));
+        assert!(!uses_explicit_caption_controls(
+            CaptionPlatform::MacOs,
+            WindowFrame::App
+        ));
     }
 }

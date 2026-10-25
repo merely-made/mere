@@ -1,0 +1,4 @@
+Mere 9e91c7; Genet 4532fe0; rustc 1.99.1. Canonical lock unchanged.
+test scope_navigation::history::tests::failed_live_bookmark_mapping_leaves_original_state_intact ... ok
+test scope_navigation::history::tests::live_bookmark_mapping_preserves_exact_immutable_encounters_and_branches ... ok
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 302 filtered out; finished in 0.00s

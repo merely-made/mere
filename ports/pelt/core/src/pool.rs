@@ -375,6 +375,23 @@ impl<K: Eq + Hash + Clone, P: Eq + Hash + Clone, F: 'static> PeltControllerPool<
                 && self.contents.contains_key(&p.value.content)
         })
     }
+    /// Published text-input geometry only when this exact appearance owns the
+    /// current prepared receiver layout. Another appearance of the same content
+    /// may have prepared a different viewport, even within the same native window.
+    #[cfg(feature = "cue")]
+    pub fn text_input_state(&self, id: &P) -> Option<&inker::webcue::TextInputState> {
+        let placement = self.placements.get(id)?;
+        if !placement.value.admits() { return None; }
+        let content = self.contents.get(&placement.value.content)?;
+        let prepared = self.prepared.get(&placement.value.content)?;
+        if prepared.placement != *id || prepared.generation != placement.generation
+            || prepared.identity != content.session_identity()
+        {
+            return None;
+        }
+        content.text_input_state()
+    }
+
     /// Lend the exact prepared receiver for shared presentation. The same
     /// placement admission and semantic revalidation apply as for legacy frames.
     #[cfg(feature = "cue")]

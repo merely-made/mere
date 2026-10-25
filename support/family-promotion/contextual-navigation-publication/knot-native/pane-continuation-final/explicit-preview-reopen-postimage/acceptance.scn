@@ -1,0 +1,21 @@
+assert snap context_location == context_scroll.djot
+assert snap context_view == source
+assert snap preview_open == false
+assert snap context_preview_present == false
+assert snap context_preview_scroll_position == 2427
+assert snap context_source_scroll_position >= 500
+assert snap context_source_live_byte_start <= 8133
+assert snap context_source_live_byte_end >= 8133
+click role:button @data-command-id=view.preview
+settle 8
+assert snap context_view == preview
+assert snap preview_open == true
+assert snap context_preview_present == true
+assert snap context_source_present == true
+assert snap context_preview_scroll_position == 2427
+assert snap context_scroll_kind == preview-byte
+assert snap context_scroll_position == 2427
+assert snap context_source_live_byte_start <= 8133
+assert snap context_source_live_byte_end >= 8133
+assert snap context_preview_live_byte_start <= 2427
+assert snap context_preview_live_byte_end >= 2427

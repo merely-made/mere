@@ -35,7 +35,7 @@ fn host(state: WorkshopState) -> Host {
 
 fn attr<'a>(dom: &'a ScriptedDom, node: NodeId, name: &str) -> Option<&'a str> {
     dom.attributes(node)
-        .find(|attr| attr.name.local.as_ref() == name)
+        .find(|attr| &*attr.name.local == name)
         .map(|attr| attr.value)
 }
 
@@ -98,7 +98,7 @@ fn workshop_code_is_actual_readonly_rust_with_illume_runs() {
     let mut host = host(WorkshopState::in_memory());
     let code = by_id(&host, "syntax-code");
     let subtree = host.with_dom(|dom| {
-        assert_eq!(dom.element_name(code).unwrap().local.as_ref(), "pre");
+        assert_eq!(&*dom.element_name(code).unwrap().local, "pre");
         assert_eq!(attr(dom, code, "data-language"), Some("rust"));
         assert_eq!(text(dom, code), WORKSHOP_CODE_SAMPLE);
         for (class, lexeme) in [
@@ -123,7 +123,7 @@ fn workshop_code_is_actual_readonly_rust_with_illume_runs() {
             assert_ne!(attr(dom, *node, "role"), Some("textbox"));
             assert!(attr(dom, *node, "tabindex").is_none_or(|index| index == "-1"));
             if let Some(name) = dom.element_name(*node) {
-                assert!(!matches!(name.local.as_ref(), "input" | "textarea"));
+                assert!(!matches!(&*name.local, "input" | "textarea"));
             }
         }
         nodes
@@ -244,7 +244,7 @@ fn reader_mount_keeps_the_extracted_source_across_modes_and_seed_edits() {
         );
         host.with_dom(|dom| {
             assert_eq!(
-                dom.element_name(node).unwrap().local.as_ref(),
+                &*dom.element_name(node).unwrap().local,
                 "custom-leaf"
             );
             assert_eq!(

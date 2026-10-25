@@ -5937,4 +5937,6 @@ mod tests {
             );
         }
     }
+
+    mod mcp;
 }

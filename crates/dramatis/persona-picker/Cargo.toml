@@ -1,6 +1,6 @@
 [package]
 rust-version = "1.97.1"
-name = "mere-persona-picker"
+name = "persona-picker"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

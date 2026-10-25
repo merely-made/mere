@@ -1,0 +1,15 @@
+RESULT fail
+FAIL: no current pointer target for Selector { surface: None, matcher: Class("frisket-content"), text: None, attr: Some(("data-tile", "2")) }
+FAIL: assert snap context_scroll_kind Eq 'preview-byte': got 'source-byte'
+FAIL: assert snap context_preview_present Eq 'true': got 'false'
+FAIL: assert snap context_preview_scroll_position Ge '500': got ''
+FAIL: assert snap context_view Eq 'preview': got 'source'
+FAIL: assert snap context_scroll_kind Eq 'preview-byte': got 'source-byte'
+FAIL: assert snap context_preview_present Eq 'true': got 'false'
+FAIL: assert snap context_preview_scroll_position Ge '500': got ''
+captured source-and-preview-return
+capture source-and-preview-return 2000x1400 digest=373e7b7252f7888f file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-publication\knot-native\pane-continuation-final\seed\capture\source-and-preview-return.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 73 frames, 73 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":73,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":63,"phase":"submitted"}},"sequence":74}}
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("data-command-id", "view.preview")) }

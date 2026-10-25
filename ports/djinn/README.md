@@ -12,6 +12,11 @@ when they use persona-held state.
 
 ## Run
 
+The default build links no Reticulum-licensed code. Features
+`knot-site-nomadnet` and `moot-site-nomadnet` add NomadNet serving through
+retinue and tulle, whose license bars any use that contributes to training or
+developing a model.
+
 ### Explicit Moot site endpoint
 
 Feature `moot-site` adds a local public Gemini or Scroll endpoint over supplied

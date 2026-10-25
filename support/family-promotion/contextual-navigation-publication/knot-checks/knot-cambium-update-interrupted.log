@@ -1,0 +1,1 @@
+Portable `cargo update -p cambium --precise 7632bbd32a00891b858335209a39f36f5777c0ae` was stopped after about 7 minutes of dependency solving. Rustup Cargo had reached ~470 CPU seconds and ~1.5 GB RSS; the portable Cargo.lock remained unchanged at 362,189 bytes. Retry plan: start from current coherent upstream Knot lock, align Genet 2b5c018 first, then update Mere 7632bbd.

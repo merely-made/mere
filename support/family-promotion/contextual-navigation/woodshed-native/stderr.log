@@ -1,0 +1,15 @@
+[woodshed] identity pending: practice is not being saved
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[cambium-winit] accessibility Installed, 307 nodes projected
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-down"), text: Some("button.shell-control"), attr: None }
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-up"), text: Some("button.shell-control"), attr: None }
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-up"), text: Some("button.shell-control"), attr: None }
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-back"), text: Some("button.shell-control"), attr: None }
+woodshed-genet: FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-forward"), text: Some("button.shell-control"), attr: None }
+[woodshed] could not persist settings: backend: Identity pending: this session is not being saved.

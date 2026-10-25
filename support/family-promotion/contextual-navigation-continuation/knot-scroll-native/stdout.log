@@ -1,0 +1,6 @@
+knot: FAIL: no current pointer target for Selector { surface: None, matcher: Class("knot-document-preview"), text: None, attr: None }
+knot: FAIL: assert snap context_scroll_kind Eq 'preview-heading': got 'source-byte'
+knot: FAIL: assert snap context_view Eq 'preview': got 'source'
+knot: FAIL: assert snap context_scroll_kind Eq 'preview-heading': got 'source-byte'
+knot: captured source-and-preview-return
+knot: RESULT fail (63 frames, 1 captures)

@@ -1,0 +1,8 @@
+RESULT ok
+waited 20 frames
+captured 01_card_occurrence_with_owner_running
+Contextual navigation scope/history complete
+capture 01_card_occurrence_with_owner_running 2200x1328 digest=7a21d8791c54c2d7 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-continuation\woodshed-phase-one-native\01_card_occurrence_with_owner_running.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 186 frames, 186 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":186,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":170,"phase":"submitted"}},"sequence":187}}

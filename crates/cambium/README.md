@@ -11,7 +11,7 @@ remain for source compatibility during consumer migration.
 
 - `meristem`: renderer-independent reactive diff and message core
 - `cambium`: Genet backend, application runner, controls, and composition
-- `cambium-genet-winit-host`: native lifecycle, reusable scene producers,
+- `cambium-desktop`: native lifecycle, reusable scene producers,
   caption controls and a windowless acceptance harness
 - `cambium-winit`: winit keyboard translation for Cambium applications
 - `sprigging`: engine-neutral custom leaves and arrangement geometry
@@ -47,7 +47,7 @@ the native title-bar inset and form a drag region; interactive content belongs
 in actions or captions, which exclude dragging. There is no second theme model.
 
 For a native app frame, pass `platform_caption_controls(&commands, &labels)`
-from `cambium-genet-winit-host` as the caption slot. macOS keeps its native
+from `cambium-desktop` as the caption slot. macOS keeps its native
 traffic lights; other platforms receive Minimize, Maximize and Close buttons.
 Use `WindowFrame::App`, and set `HostOptions.maximize_control_label` to
 `labels.maximize` so Windows Snap can find a localized Maximize control. Hosts

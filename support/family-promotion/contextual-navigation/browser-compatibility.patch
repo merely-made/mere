@@ -1,0 +1,575 @@
+diff --git a/crates/mere/src/navigation.rs b/crates/mere/src/navigation.rs
+index 70253c10a..e5d7635bb 100644
+--- a/crates/mere/src/navigation.rs
++++ b/crates/mere/src/navigation.rs
+@@ -4,6 +4,8 @@
+ //! Shared, read-only relationship navigation over the kernel's canonical projection.
+ //! Hosts retain navigation admission, actions, graph ownership and persistence.
+ //! Direction and kind are retained even when several relations share a member.
++pub mod browser;
++
+ use kernel::graph::{Graph, RelationKind, SemanticSubKind};
+ 
+ /// A bounded, live one-hop neighborhood over canonical projected relations.
+diff --git a/crates/mere/src/navigation/browser.rs b/crates/mere/src/navigation/browser.rs
+new file mode 100644
+index 000000000..57fd6f50c
+--- /dev/null
++++ b/crates/mere/src/navigation/browser.rs
+@@ -0,0 +1,311 @@
++// Copyright 2026 Mark Alan Boykin
++// SPDX-License-Identifier: MPL-2.0
++
++//! Browser navigation policy used by Turnstone and Graphshell. Applications
++//! outside this graph browser family supply their own identities and routes.
++//! An explicit contextual route can nest neighborhoods or skip default levels.
++use serde::{Deserialize, Serialize};
++
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
++pub enum ScopeLevel {
++    Document,
++    Neighborhood,
++    #[default]
++    Graph,
++    Overmap,
++}
++impl ScopeLevel {
++    pub fn label(self) -> &'static str {
++        match self {
++            Self::Document => "Document",
++            Self::Neighborhood => "Neighborhood",
++            Self::Graph => "Graph",
++            Self::Overmap => "Meres",
++        }
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++pub struct ScopeContext<G, M> {
++    pub level: ScopeLevel,
++    pub graph: G,
++    pub root: Option<M>,
++}
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++pub struct ScopePlace<G, M> {
++    pub level: ScopeLevel,
++    pub graph: G,
++    pub root: Option<M>,
++    pub focus: Option<M>,
++    /// Outer-to-inner parents. None admits legacy browser defaults; Some([])
++    /// explicitly names a root. Context identity stays separate from focus.
++    #[serde(default, skip_serializing_if = "Option::is_none")]
++    pub contexts: Option<Vec<ScopeContext<G, M>>>,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub enum ScopeDestination<G, M> {
++    Level(ScopeLevel),
++    Place(ScopePlace<G, M>),
++}
++impl<G, M> From<ScopeLevel> for ScopeDestination<G, M> {
++    fn from(level: ScopeLevel) -> Self {
++        Self::Level(level)
++    }
++}
++impl<G: Clone + PartialEq, M: Clone + PartialEq> ScopePlace<G, M> {
++    fn context(&self) -> ScopeContext<G, M> {
++        ScopeContext {
++            level: self.level,
++            graph: self.graph.clone(),
++            root: if self.level == ScopeLevel::Neighborhood {
++                self.root.clone()
++            } else {
++                None
++            },
++        }
++    }
++    pub fn parents(&self) -> Vec<ScopeContext<G, M>> {
++        self.contexts.clone().unwrap_or_else(|| {
++            let levels: &[ScopeLevel] = match self.level {
++                ScopeLevel::Document => &[
++                    ScopeLevel::Overmap,
++                    ScopeLevel::Graph,
++                    ScopeLevel::Neighborhood,
++                ],
++                ScopeLevel::Neighborhood => &[ScopeLevel::Overmap, ScopeLevel::Graph],
++                ScopeLevel::Graph => &[ScopeLevel::Overmap],
++                ScopeLevel::Overmap => &[],
++            };
++            levels
++                .iter()
++                .map(|level| ScopeContext {
++                    level: *level,
++                    graph: self.graph.clone(),
++                    root: if *level == ScopeLevel::Neighborhood {
++                        self.root.clone().or_else(|| self.focus.clone())
++                    } else {
++                        None
++                    },
++                })
++                .collect()
++        })
++    }
++    pub fn up(&self) -> Option<Self> {
++        let mut contexts = self.parents();
++        let parent = contexts.pop()?;
++        Some(Self {
++            level: parent.level,
++            graph: parent.graph,
++            root: parent.root,
++            focus: self.focus.clone(),
++            contexts: Some(contexts),
++        })
++    }
++    pub fn enter(&self, level: ScopeLevel) -> Self {
++        let mut contexts = self.parents();
++        contexts.push(self.context());
++        Self {
++            level,
++            root: self.root.clone().or_else(|| self.focus.clone()),
++            contexts: Some(contexts),
++            ..self.clone()
++        }
++    }
++    pub fn down(&self) -> Option<Self> {
++        let level = match self.level {
++            ScopeLevel::Overmap => ScopeLevel::Graph,
++            ScopeLevel::Graph if self.root.is_some() || self.focus.is_some() => {
++                ScopeLevel::Neighborhood
++            },
++            ScopeLevel::Neighborhood if self.focus.is_some() => ScopeLevel::Document,
++            _ => return None,
++        };
++        Some(self.enter(level))
++    }
++    pub fn select(&mut self, focus: M) {
++        if self.focus.as_ref() != Some(&focus) && self.level == ScopeLevel::Graph {
++            self.root = Some(focus.clone());
++        }
++        self.focus = Some(focus);
++    }
++    pub fn same_scope(&self, other: &Self) -> bool {
++        self.level == other.level
++            && self.graph == other.graph
++            && self.parents() == other.parents()
++            && match self.level {
++                ScopeLevel::Document => self.focus == other.focus,
++                ScopeLevel::Neighborhood => self.root == other.root,
++                _ => true,
++            }
++    }
++    pub fn valid(&self) -> bool {
++        (!matches!(self.level, ScopeLevel::Document | ScopeLevel::Neighborhood)
++            || self.focus.is_some())
++            && self.contexts.as_ref().is_none_or(|path| {
++                path.len() <= 64
++                    && path.iter().all(|p| {
++                        p.level != ScopeLevel::Document
++                            && (p.level != ScopeLevel::Neighborhood || p.root.is_some())
++                    })
++            })
++    }
++    pub fn trail(&self) -> Vec<Self> {
++        let mut trail = vec![self.clone()];
++        let mut current = self.clone();
++        while let Some(parent) = current.up() {
++            trail.push(parent.clone());
++            current = parent;
++        }
++        trail.reverse();
++        trail
++    }
++    /// Reconcile an external projection change with its real ancestor route.
++    /// A graph projection cannot keep a document's child contexts as parents.
++    pub fn project(&self, level: ScopeLevel, root: Option<M>, focus: Option<M>) -> Self {
++        let mut place = self
++            .trail()
++            .into_iter()
++            .rev()
++            .find(|p| p.level == level && (level != ScopeLevel::Neighborhood || p.root == root))
++            .unwrap_or(Self {
++                level,
++                graph: self.graph.clone(),
++                root: root.clone(),
++                focus: focus.clone(),
++                contexts: None,
++            });
++        place.focus = focus;
++        if level == ScopeLevel::Neighborhood {
++            place.root = root;
++        }
++        place
++    }
++    pub fn at_level(&self, level: ScopeLevel) -> Option<Self> {
++        if self.level == level {
++            return Some(self.clone());
++        }
++        if let Some(parent) = self.trail().into_iter().rev().find(|p| p.level == level) {
++            return Some(parent);
++        }
++        let mut child = self.clone();
++        while let Some(next) = child.down() {
++            if next.level == level {
++                return Some(next);
++            }
++            child = next;
++        }
++        None
++    }
++    pub fn reading(&self, graph: G, member: M) -> Self {
++        if self.graph == graph && self.level == ScopeLevel::Neighborhood {
++            let mut next = self.enter(ScopeLevel::Document);
++            next.focus = Some(member);
++            return next;
++        }
++        if self.graph == graph && self.level == ScopeLevel::Document {
++            return Self {
++                focus: Some(member),
++                ..self.clone()
++            };
++        }
++        if self.graph == graph && self.level == ScopeLevel::Graph {
++            let mut graph = self.clone();
++            graph.select(member);
++            return graph
++                .enter(ScopeLevel::Neighborhood)
++                .enter(ScopeLevel::Document);
++        }
++        Self {
++            level: ScopeLevel::Document,
++            graph,
++            root: Some(member.clone()),
++            focus: Some(member),
++            contexts: None,
++        }
++    }
++}
++impl<G: Clone + PartialEq, M: Clone + PartialEq> ScopeDestination<G, M> {
++    pub fn resolve(&self, origin: &ScopePlace<G, M>) -> Option<ScopePlace<G, M>> {
++        match self {
++            Self::Level(level) => origin.at_level(*level),
++            Self::Place(place) => place.valid().then(|| place.clone()),
++        }
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn doc() -> ScopePlace<u8, u8> {
++        ScopePlace {
++            level: ScopeLevel::Document,
++            graph: 1,
++            root: Some(2),
++            focus: Some(3),
++            contexts: None,
++        }
++    }
++    #[test]
++    fn contextual_up_preserves_nested_roots_and_down_enters_current_focus() {
++        let mut place = doc();
++        place.root=Some(4);
++        place.contexts = Some(vec![
++            ScopeContext {
++                level: ScopeLevel::Graph,
++                graph: 1,
++                root: Some(2),
++            },
++            ScopeContext {
++                level: ScopeLevel::Neighborhood,
++                graph: 1,
++                root: Some(2),
++            },
++            ScopeContext {
++                level: ScopeLevel::Neighborhood,
++                graph: 1,
++                root: Some(4),
++            },
++        ]);
++        let inner = place.up().unwrap();
++        assert_eq!(inner.root, Some(4));
++        assert_eq!(inner.focus, Some(3));
++        let outer = inner.up().unwrap();
++        assert_eq!(outer.root, Some(2));
++        assert_eq!(outer.down().unwrap().focus, Some(3));
++        assert_eq!(inner.down().unwrap(), place);
++    }
++    #[test]
++    fn a_route_can_skip_levels_and_the_same_document_can_have_multiple_contexts() {
++        let mut a = doc();
++        a.contexts = Some(vec![ScopeContext {
++            level: ScopeLevel::Graph,
++            graph: 1,
++            root: Some(2),
++        }]);
++        assert_eq!(a.up().unwrap().level, ScopeLevel::Graph);
++        assert_eq!(a.trail().len(), 2);
++        let mut b = a.clone();
++        b.contexts.as_mut().unwrap()[0].root = Some(4);
++        assert!(!a.same_scope(&b));
++        assert_eq!(a.focus, b.focus);
++    }
++    #[test]
++    fn changing_projection_uses_the_real_ancestor_and_rejects_incomplete_contexts() {
++        let place = doc();
++        let graph = place.project(ScopeLevel::Graph, None, Some(3));
++        assert_eq!(graph.trail().len(), 2);
++        assert_eq!(graph.up().unwrap().level, ScopeLevel::Overmap);
++        let mut invalid = doc();
++        invalid.contexts = Some(vec![ScopeContext {
++            level: ScopeLevel::Neighborhood,
++            graph: 1,
++            root: None,
++        }]);
++        assert!(!invalid.valid());
++    }
++    #[test]
++    fn legacy_routes_have_browser_defaults_without_serializing_new_fields() {
++        let old = r#"{"level":"Document","graph":1,"root":2,"focus":3}"#;
++        let place: ScopePlace<u8, u8> = serde_json::from_str(old).unwrap();
++        assert_eq!(place.up().unwrap().level, ScopeLevel::Neighborhood);
++        assert!(!serde_json::to_string(&place).unwrap().contains("contexts"));
++    }
++}
+diff --git a/ports/graphshell/src/forme_session.rs b/ports/graphshell/src/forme_session.rs
+index 0ae0cabe5..d14a5ca17 100644
+--- a/ports/graphshell/src/forme_session.rs
++++ b/ports/graphshell/src/forme_session.rs
+@@ -127,7 +127,7 @@ pub enum SaveKind {
+     Redo,
+     InspectorSource(crate::pane_source::InspectorSource),
+     Visibility,
+-    Scope(cambium::scope_navigation::ScopeNavigation<Uuid,Uuid,tabard::ReadingAnchor>),
++    Scope(crate::scope_policy::ScopeNavigation<tabard::ReadingAnchor>),
+     Reading(Uuid, tabard::ReadingPreferences),
+     ReadingProgress(std::collections::BTreeMap<Uuid,tabard::ReadingAnchor>, tabard::ReadingTrail<Uuid>),
+ }
+@@ -428,7 +428,7 @@ impl FormeSession {
+                 to.push(current);
+                 state.restore(&mut next.workspace);
+             },
+-            SaveKind::Scope(nav) => { nav.validate(|a|a.validate().is_ok())?; next.workspace.scope_navigation=nav; },
++            SaveKind::Scope(nav) => { nav.validate(|place|place.valid(), |a|a.validate().is_ok())?; next.workspace.scope_navigation=nav; },
+             SaveKind::Reading(access, value) => {
+                 value.validate()?;
+                 if next.workspace.tile_for_member(access).is_none() { return Err("Reading projection is no longer present".into()); }
+@@ -750,12 +750,12 @@ mod tests {
+     #[test]
+     fn scope_route_saves_independently_of_layout_drafts_and_reopens_with_its_anchor() {
+         pollster::block_on(async {
+-            use cambium::scope_navigation::*;
++            use crate::scope_policy::*;
+             let (graph,mut session,[a,_,c])=fixture();let backend=MemoryBackend::new();let owner=session.committed().document.graph_id;
+             let document=serde_json::to_value(&session.committed().document).unwrap();
+             session.committed().save(backend.clone()).await.unwrap();session.unlock().unwrap();session.edit(None,1,|w|w.open(c,&graph)).unwrap();
+             let anchor=tabard::ReadingAnchor{source:"mere://reading/a".into(),revision:42,text:3,offset:0,exact:"A retained passage".into(),prefix:String::new(),suffix:String::new(),line_offset:0.0,fallback_y:600.0};
+-            let mut nav=ScopeNavigation::default();let place=ScopePlace{level:ScopeLevel::Document,graph:owner,root:Some(a),focus:Some(a)};
++            let mut nav=ScopeNavigation::default();let place=ScopePlace{contexts:None,level:ScopeLevel::Document,graph:owner,root:Some(a),focus:Some(a)};
+             nav.visit(ScopeVisit{place:place.clone(),camera:None,anchor:Some(anchor.clone())});
+             nav.visit(ScopeVisit{place:place.up().unwrap(),camera:Some(ScopeCamera{x:100.0,y:80.0,zoom:2.0}),anchor:None});
+             save(&mut session,backend.clone(),SaveKind::Scope(nav.clone())).await;
+@@ -768,9 +768,9 @@ mod tests {
+     }
+     #[test]
+     fn scope_write_failure_keeps_acknowledged_route_and_foreign_graph_is_refused() {
+-        use cambium::scope_navigation::*;
++        use crate::scope_policy::*;
+         let (_,mut session,[a,_,_])=fixture();let owner=session.committed().document.graph_id;
+-        let mut nav=ScopeNavigation::default();nav.visit(ScopeVisit{place:ScopePlace{level:ScopeLevel::Graph,graph:owner,root:Some(a),focus:Some(a)},camera:None,anchor:None});
++        let mut nav=ScopeNavigation::default();nav.visit(ScopeVisit{place:ScopePlace{contexts:None,level:ScopeLevel::Graph,graph:owner,root:Some(a),focus:Some(a)},camera:None,anchor:None});
+         let proposal=session.prepare_save(SaveKind::Scope(nav.clone()),1).unwrap();assert!(session.finish_save(proposal,Err("offline".into())).is_err());
+         assert!(session.committed().scope_navigation.current().is_none());
+         let mut foreign=nav.current().unwrap().clone();foreign.place.graph=Uuid::nil();nav.visit(foreign);
+diff --git a/ports/graphshell/src/forme_workspace.rs b/ports/graphshell/src/forme_workspace.rs
+index 6fd67270d..0ff145414 100644
+--- a/ports/graphshell/src/forme_workspace.rs
++++ b/ports/graphshell/src/forme_workspace.rs
+@@ -44,7 +44,7 @@ pub struct FormeWorkspace {
+     #[serde(default)]
+     pub reading_trail: tabard::ReadingTrail<Uuid>,
+     #[serde(default)]
+-    pub scope_navigation: cambium::scope_navigation::ScopeNavigation<Uuid,Uuid,tabard::ReadingAnchor>,
++    pub scope_navigation: crate::scope_policy::ScopeNavigation<tabard::ReadingAnchor>,
+     tile_ids: BTreeMap<Uuid, u64>,
+ }
+ 
+@@ -281,8 +281,8 @@ impl FormeWorkspace {
+     }
+     pub fn validate(&self, graph_id: Uuid) -> Result<(), String> {
+         self.reading_trail.validate()?;
+-        self.scope_navigation.validate(|a|a.validate().is_ok())?;
+-        if self.scope_navigation.visits().any(|v|v.place.graph!=graph_id) {return Err("Scope route belongs to another graph".into());}
++        self.scope_navigation.validate(|place|place.valid(), |a|a.validate().is_ok())?;
++        if self.scope_navigation.visits().any(|v|v.place.graph!=graph_id || v.place.parents().iter().any(|p|p.graph!=graph_id)) {return Err("Scope route belongs to another graph".into());}
+         if self.reading_anchors.len()>1024 {return Err("Too many reading anchors".into());}
+         for (access,anchor) in &self.reading_anchors { if !self.tile_ids.contains_key(access) {return Err("Reading anchor has no projection".into());} anchor.validate()?; }
+         self.reading_preferences.validate()?;
+diff --git a/ports/graphshell/src/lib.rs b/ports/graphshell/src/lib.rs
+index a1a5dbac8..563cf305e 100644
+--- a/ports/graphshell/src/lib.rs
++++ b/ports/graphshell/src/lib.rs
+@@ -135,3 +135,7 @@ pub mod webrtc_browser;
+ pub use chirograph as protocol;
+ pub use graphshell_client as client;
+ pub use graphshell_endpoint as endpoint;
++
++/// Graph browser policy shared by the product projections.
++#[cfg(feature="web")]
++pub mod scope_policy;
+diff --git a/ports/graphshell/src/scope_policy.rs b/ports/graphshell/src/scope_policy.rs
+new file mode 100644
+index 000000000..9a7e0c239
+--- /dev/null
++++ b/ports/graphshell/src/scope_policy.rs
+@@ -0,0 +1,12 @@
++// Copyright 2026 Mark Alan Boykin
++// SPDX-License-Identifier: MPL-2.0
++
++//! Graphshell's opt-in graph browser policy and generic Cambium mechanics.
++pub use cambium::scope_navigation::{ScopeCamera, ScopeControls, ScopeDirection};
++pub use mere::navigation::browser::{ScopeContext, ScopeDestination, ScopeLevel, ScopePlace};
++pub type Place = ScopePlace<uuid::Uuid, uuid::Uuid>;
++pub type Destination = ScopeDestination<uuid::Uuid, uuid::Uuid>;
++pub type ScopeCommand = cambium::scope_navigation::ScopeCommand<Destination>;
++pub type ScopeCrumb = cambium::scope_navigation::ScopeCrumb<Destination>;
++pub type ScopeVisit<A> = cambium::scope_navigation::ScopeVisit<Place, A>;
++pub type ScopeNavigation<A> = cambium::scope_navigation::ScopeNavigation<Place, A>;
+diff --git a/ports/graphshell/src/web_tree/forme.rs b/ports/graphshell/src/web_tree/forme.rs
+index 7a5680c3c..3cdd8bd11 100644
+--- a/ports/graphshell/src/web_tree/forme.rs
++++ b/ports/graphshell/src/web_tree/forme.rs
+@@ -415,7 +415,7 @@ pub(super) fn open_selected(page: &mut TreePage) {
+ /// first Read with an empty arrangement admits the already-selected members.
+ pub(super) fn show_projection(page: &mut TreePage, map: bool) {
+     if map {
+-        super::scope_navigation::command(page,cambium::scope_navigation::ScopeCommand::To(cambium::scope_navigation::ScopeLevel::Graph));
++        super::scope_navigation::command(page,graphshell::scope_policy::ScopeCommand::To(graphshell::scope_policy::ScopeLevel::Graph.into()));
+     } else {
+         let member=page.shared.canvas.borrow().focused_member().or_else(||page.forme.as_ref().and_then(|p|p.current().focused_reading));
+         if let Some(member)=member {read_related(page,member);} else {open_selected(page);}
+diff --git a/ports/graphshell/src/web_tree/scope_navigation.rs b/ports/graphshell/src/web_tree/scope_navigation.rs
+index 49c8942f4..76bd67276 100644
+--- a/ports/graphshell/src/web_tree/scope_navigation.rs
++++ b/ports/graphshell/src/web_tree/scope_navigation.rs
+@@ -3,10 +3,10 @@
+ 
+ //! A small host adapter for Cambium's shared scope route and visit history.
+ use super::*;
+-use cambium::scope_navigation::*;
++use graphshell::scope_policy::*;
+ use uuid::Uuid;
+-type Navigation = ScopeNavigation<Uuid, Uuid, tabard::ReadingAnchor>;
+-type Visit = ScopeVisit<Uuid, Uuid, tabard::ReadingAnchor>;
++type Navigation = ScopeNavigation<tabard::ReadingAnchor>;
++type Visit = ScopeVisit<tabard::ReadingAnchor>;
+ #[derive(Default)]
+ pub(super) struct State {
+     owner: Option<Uuid>,
+@@ -29,7 +29,7 @@ pub(super) fn place(page: &TreePage) -> Option<ScopePlace<Uuid, Uuid>> {
+         .current()
+         .map(|v| v.place.clone())
+         .filter(|p| p.graph == graph)
+-        .unwrap_or(ScopePlace {
++        .unwrap_or(ScopePlace { contexts:None,
+             level: ScopeLevel::Graph,
+             graph,
+             root: None,
+@@ -38,21 +38,12 @@ pub(super) fn place(page: &TreePage) -> Option<ScopePlace<Uuid, Uuid>> {
+     if pane.workbench {
+         let focus = pane.current().focused_reading;
+         if focus.is_none() {
+-            place.level = ScopeLevel::Graph;
+-            place.focus = None;
++            place=place.project(ScopeLevel::Graph,None,None);
+             return Some(place);
+         }
+-        if place.level != ScopeLevel::Document || place.focus != focus {
+-            if place.level != ScopeLevel::Neighborhood {
+-                place.root = focus;
+-            }
+-            place.level = ScopeLevel::Document;
+-            place.focus = focus;
+-        }
++        if place.level!=ScopeLevel::Document || place.focus!=focus {place=place.reading(graph,focus.unwrap());}
+     } else if place.level != ScopeLevel::Overmap {
+-        if place.level == ScopeLevel::Document {
+-            place.level = ScopeLevel::Graph;
+-        }
++        if place.level == ScopeLevel::Document {place=place.project(ScopeLevel::Graph,None,place.focus);}
+         if let Some(focus) = page.shared.canvas.borrow().focused_member() {
+             place.select(focus);
+         }
+@@ -127,16 +118,7 @@ pub(super) fn record_reading(page: &mut TreePage, member: Uuid) {
+     let Some(mut visit) = capture(page) else {
+         return;
+     };
+-    visit.place.root = page
+-        .instrument
+-        .scope
+-        .navigation
+-        .current()
+-        .filter(|v| v.place.level == ScopeLevel::Neighborhood)
+-        .and_then(|v| v.place.root)
+-        .or(Some(member));
+-    visit.place.level = ScopeLevel::Document;
+-    visit.place.focus = Some(member);
++    visit.place=page.instrument.scope.navigation.current().map(|v|v.place.reading(visit.place.graph,member)).unwrap_or_else(||visit.place.reading(visit.place.graph,member));
+     visit.anchor = super::reading::capture_progress(page)
+         .0
+         .get(&member)
+@@ -211,32 +193,16 @@ pub(super) fn controls(page: &TreePage) -> Child {
+ }
+ pub(super) fn trail(page: &TreePage) -> Option<Child> {
+     let place = place(page)?;
+-    let crumbs = [
+-        ScopeLevel::Overmap,
+-        ScopeLevel::Graph,
+-        ScopeLevel::Neighborhood,
+-        ScopeLevel::Document,
+-    ]
+-    .into_iter()
+-    .filter(|l| *l as u8 >= place.level as u8)
+-    .map(|level| ScopeCrumb {
+-        label: if level == ScopeLevel::Neighborhood {
+-            "Neighborhood".into()
+-        } else {
+-            label(
+-                page,
+-                &ScopePlace {
+-                    level,
+-                    ..place.clone()
+-                },
+-            )
+-        },
+-        level,
+-        current: level == place.level,
+-    })
+-    .collect();
+-    Some(cambium::scope_navigation::scope_trail(crumbs, command))
++    let trail=place.trail();let nested=trail.iter().filter(|p|p.level==ScopeLevel::Neighborhood).count()>1;let last=trail.len().saturating_sub(1);
++    let crumbs=trail.into_iter().enumerate().map(|(index,destination)|ScopeCrumb {
++        label:if destination.level==ScopeLevel::Neighborhood && !nested {"Neighborhood".into()} else {label(page,&destination)},
++        target:ScopeDestination::Place(destination),current:index==last,
++    }).collect();
++    // This supplier's browser shell has no location editor yet. The GUI lane
++    // adds that editor; the compatibility adapter keeps its current crumb text.
++    Some(cambium::scope_navigation::scope_trail_with_location_edit(crumbs,false,command))
+ }
++
+ pub(super) fn command(page: &mut TreePage, command: ScopeCommand) {
+     if let ScopeCommand::Hint(hint) = command {
+         page.instrument.scope.hint = hint;
+@@ -276,14 +242,11 @@ pub(super) fn command(page: &mut TreePage, command: ScopeCommand) {
+         let place = match command {
+             ScopeCommand::Navigate(ScopeDirection::Up) => origin.place.up(),
+             ScopeCommand::Navigate(ScopeDirection::Down) => origin.place.down(),
+-            ScopeCommand::To(level) if level != origin.place.level => Some(ScopePlace {
+-                level,
+-                ..origin.place.clone()
+-            }),
++            ScopeCommand::To(ref destination) => destination.resolve(&origin.place).filter(|p|p!=&origin.place),
+             _ => None,
+         };
+         place.map(|place| {
+-            let saved = page.instrument.scope.navigation.saved(&place);
++            let saved = page.instrument.scope.navigation.saved_matching(|p|p.same_scope(&place));
+             ScopeVisit {
+                 camera: saved.and_then(|v| v.camera),
+                 anchor: saved.and_then(|v| v.anchor.clone()),

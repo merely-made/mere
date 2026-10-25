@@ -79,7 +79,7 @@ inference-model = ["inference-wire","dep:eidetic-search", "inference", "esp/deco
 
 [dev-dependencies]
 # Supplier-owned tiny models and templates; enabled only for test targets.
-esp-test-support = { workspace = true }
+esp-testkit = { workspace = true }
 safetensors = "0.4"
 notochord = { workspace = true, features = ["tokio"] }
 stickleback.workspace = true

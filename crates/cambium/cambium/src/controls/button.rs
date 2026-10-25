@@ -84,7 +84,7 @@ mod tests {
     fn child_named(dom: &ScriptedDom, node: NodeId, name: &str) -> Option<NodeId> {
         dom.dom_children(node).into_iter().find(|&c| {
             dom.element_name(c)
-                .is_some_and(|q| q.local.as_ref() == name)
+                .is_some_and(|q| AsRef::<str>::as_ref(&q.local) == name)
         })
     }
 

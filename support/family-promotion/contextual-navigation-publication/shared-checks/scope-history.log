@@ -1,0 +1,447 @@
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `muniment v0.2.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `muniment v0.2.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling sceno v0.0.6 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\scenes\sceno)
+   Compiling mere-curation v0.1.1 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\forme\curation)
+   Compiling accesskit v0.25.1 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\support\patches\accesskit)
+   Compiling genet-text v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling regress v0.11.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8a3d289a)
+   Compiling workbench v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\workbench)
+   Compiling chartulary v0.2.2 (https://www.github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling hest v0.2.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\hest)
+   Compiling meristem v0.2.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\meristem)
+   Compiling backstep v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\backstep)
+   Compiling mere-surface-api v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\system\surface-api)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling sprigging v0.3.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\sprigging)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling scenograph v0.0.5 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\scenes\scenograph)
+   Compiling scenomise v0.0.6 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\scenes\scenomise)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\sprigging\src\lib.rs:462:18
+    |
+462 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+462 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+462 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |
+
+warning: `sprigging` (lib) generated 1 warning (run `cargo fix --lib -p sprigging` to apply 1 suggestion)
+warning: unused variable: `time_range`
+   --> crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling cambium v0.6.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium)
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\component.rs:434:33
+    |
+434 |                 } if name.local.as_ref() == COMPONENT_PROBE_ATTR => Some(old_value.as_deref()),
+    |                                 ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+434 -                 } if name.local.as_ref() == COMPONENT_PROBE_ATTR => Some(old_value.as_deref()),
+434 +                 } if <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&name.local) == COMPONENT_PROBE_ATTR => Some(old_value.as_deref()),
+    |
+
+error[E0283]: type annotations needed
+  --> crates\cambium\cambium\src\controls\button.rs:87:42
+   |
+87 |                 .is_some_and(|q| q.local.as_ref() == name)
+   |                                          ^^^^^^
+   |
+   = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+           - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+             where Static: string_cache::static_sets::StaticAtomSet;
+           - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+             where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+   |
+87 -                 .is_some_and(|q| q.local.as_ref() == name)
+87 +                 .is_some_and(|q| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&q.local) == name)
+   |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\hover.rs:262:56
+    |
+262 |                         .is_some_and(|name| name.local.as_ref() == "span")
+    |                                                        ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+262 -                         .is_some_and(|name| name.local.as_ref() == "span")
+262 +                         .is_some_and(|name| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&name.local) == "span")
+    |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\tags.rs:173:56
+    |
+173 |         assert_eq!(d.element_name(root).unwrap().local.as_ref(), "div");
+    |                                                        ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+173 -         assert_eq!(d.element_name(root).unwrap().local.as_ref(), "div");
+173 +         assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&d.element_name(root).unwrap().local), "div");
+    |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\tags.rs:175:57
+    |
+175 |         assert_eq!(d.element_name(child).unwrap().local.as_ref(), "span");
+    |                                                         ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+175 -         assert_eq!(d.element_name(child).unwrap().local.as_ref(), "span");
+175 +         assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&d.element_name(child).unwrap().local), "span");
+    |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\tags.rs:194:49
+    |
+194 |             d.element_name(root).unwrap().local.as_ref(),
+    |                                                 ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+194 -             d.element_name(root).unwrap().local.as_ref(),
+194 +             <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&d.element_name(root).unwrap().local),
+    |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\tags.rs:227:49
+    |
+227 |             d.element_name(root).unwrap().local.as_ref(),
+    |                                                 ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+227 -             d.element_name(root).unwrap().local.as_ref(),
+227 +             <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&d.element_name(root).unwrap().local),
+    |
+
+error[E0283]: type annotations needed
+   --> crates\cambium\cambium\src\tags.rs:309:52
+    |
+309 |             d.element_name(kids[0]).unwrap().local.as_ref(),
+    |                                                    ^^^^^^
+    |
+    = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+            - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+            - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+              where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+    |
+309 -             d.element_name(kids[0]).unwrap().local.as_ref(),
+309 +             <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&d.element_name(kids[0]).unwrap().local),
+    |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:1040:46
+     |
+1040 |                     .is_some_and(|q| q.local.as_ref() == name)
+     |                                              ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+1040 -                     .is_some_and(|q| q.local.as_ref() == name)
+1040 +                     .is_some_and(|q| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&q.local) == name)
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:1203:42
+     |
+1203 |                 .is_some_and(|q| q.local.as_ref() == name)
+     |                                          ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+1203 -                 .is_some_and(|q| q.local.as_ref() == name)
+1203 +                 .is_some_and(|q| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&q.local) == name)
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:1843:42
+     |
+1843 |                 .is_some_and(|q| q.local.as_ref() == name)
+     |                                          ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+1843 -                 .is_some_and(|q| q.local.as_ref() == name)
+1843 +                 .is_some_and(|q| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&q.local) == name)
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2185:59
+     |
+2185 |             dom.borrow().element_name(btn).unwrap().local.as_ref(),
+     |                                                           ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2185 -             dom.borrow().element_name(btn).unwrap().local.as_ref(),
+2185 +             <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.borrow().element_name(btn).unwrap().local),
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2213:59
+     |
+2213 |             dom.borrow().element_name(btn).unwrap().local.as_ref(),
+     |                                                           ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2213 -             dom.borrow().element_name(btn).unwrap().local.as_ref(),
+2213 +             <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.borrow().element_name(btn).unwrap().local),
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2238:65
+     |
+2238 |         assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+     |                                                                 ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2238 -         assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+2238 +         assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.borrow().element_name(ov).unwrap().local), "div");
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2259:65
+     |
+2259 |         assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+     |                                                                 ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2259 -         assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+2259 +         assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.borrow().element_name(ov).unwrap().local), "div");
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2357:63
+     |
+2357 |             assert_eq!(dom.element_name(root0).unwrap().local.as_ref(), "div");
+     |                                                               ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2357 -             assert_eq!(dom.element_name(root0).unwrap().local.as_ref(), "div");
+2357 +             assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.element_name(root0).unwrap().local), "div");
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:2369:63
+     |
+2369 |             assert_eq!(dom.element_name(root1).unwrap().local.as_ref(), "span");
+     |                                                               ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+2369 -             assert_eq!(dom.element_name(root1).unwrap().local.as_ref(), "span");
+2369 +             assert_eq!(<string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&dom.element_name(root1).unwrap().local), "span");
+     |
+
+error[E0283]: type annotations needed
+    --> crates\cambium\cambium\src\tests.rs:3343:42
+     |
+3343 |                 .is_some_and(|q| q.local.as_ref() == name)
+     |                                          ^^^^^^
+     |
+     = note: multiple `impl`s satisfying `string_cache::atom::Atom<web_atoms::LocalNameStaticSet>: AsRef<_>` found in the `string_cache` crate:
+             - impl<Static> AsRef<[u8]> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+             - impl<Static> AsRef<str> for string_cache::atom::Atom<Static>
+               where Static: string_cache::static_sets::StaticAtomSet;
+help: try using a fully qualified path to specify the expected types
+     |
+3343 -                 .is_some_and(|q| q.local.as_ref() == name)
+3343 +                 .is_some_and(|q| <string_cache::atom::Atom<web_atoms::LocalNameStaticSet> as AsRef<T>>::as_ref(&q.local) == name)
+     |
+
+For more information about this error, try `rustc --explain E0283`.
+error: could not compile `cambium` (lib test) due to 18 previous errors

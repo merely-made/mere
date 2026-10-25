@@ -1,0 +1,7 @@
+cargo test --locked --offline -p cambium-genet-winit-host --lib caption_controls
+exit_code=0
+    Finished `test` profile [unoptimized] target(s) in 1m 31s
+running 2 tests
+test caption_controls::tests::frame_caption_policy_preserves_native_controls_where_the_host_owns_them ... ok
+test caption_controls::tests::platform_frame_defaults_are_explicit_for_desktop_targets ... ok
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.00s

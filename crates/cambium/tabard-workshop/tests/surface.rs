@@ -76,7 +76,7 @@ fn selected_node(host: &Host, selector: &Selector) -> NodeId {
 fn attribute(host: &Host, node: NodeId, name: &str) -> String {
     host.with_dom(|dom| {
         dom.attributes(node)
-            .find(|attr| attr.name.local.as_ref() == name)
+            .find(|attr| &*attr.name.local == name)
             .unwrap_or_else(|| panic!("node {node:?} needs {name}"))
             .value
             .to_owned()
@@ -88,7 +88,7 @@ fn specimen(host: &Host, id: &str) -> NodeId {
         fn visit(dom: &genet_scripted_dom::ScriptedDom, node: NodeId, id: &str) -> Option<NodeId> {
             if dom
                 .attributes(node)
-                .any(|attr| attr.name.local.as_ref() == "id" && attr.value == id)
+                .any(|attr| &*attr.name.local == "id" && attr.value == id)
             {
                 return Some(node);
             }

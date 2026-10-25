@@ -24,13 +24,13 @@ image-decode = ["genet-livery?/image-decode", "genet-render?/image-decode", "gen
 # Engine-neutral headed presentation. Both engines can produce a `Scene`; this
 # feature owns only the winit/wgpu shell that presents one.
 present = [
-    "dep:netrender", "dep:genet-winit-host", "dep:inker", "dep:wgpu",
+    "dep:netrender", "dep:genet-winit", "dep:inker", "dep:wgpu",
     "dep:raw-window-handle", "dep:image",
 ]
 # Registry-routed owned static engine plus the engine-neutral present shell.
 livery = [
-    "present", "dep:genet-documents", "genet-documents/livery", "dep:mere-document-lanes", "dep:inker",
-    "dep:cambium", "dep:cambium-genet-winit-host", "dep:genet-livery", "dep:genet-scripted-dom",
+    "present", "dep:genet-documents", "genet-documents/livery", "dep:mere-lanes", "dep:inker",
+    "dep:cambium", "dep:cambium-desktop", "dep:genet-livery", "dep:genet-scripted-dom",
     "dep:genet-render", "dep:accesskit", "dep:layout-dom-api", "dep:paint_list_render", "dep:url",
     "dep:windows", "dep:dpi", "dep:scrying-engine",
     "dep:tabard-workshop", "dep:cambium-rootstock", "dep:mesquite", "dep:taproot", "dep:dirs",
@@ -43,7 +43,7 @@ tabard-preview = ["livery", "dep:tinct"]
 tabard-reader-preview = ["livery", "reader", "dep:tinct"]
 # Shared fleece reader lane over the portable document canvas.
 reader = [
-    "present", "dep:genet-documents", "dep:mere-document-lanes", "dep:inker",
+    "present", "dep:genet-documents", "dep:mere-lanes", "dep:inker",
 ]
 # The scripted profile (V4): a live `ScriptedDom` document whose inline `<script>`
 # runs through `script-runtime-api` on a JS engine, mutating the DOM, rendered each
@@ -54,8 +54,8 @@ reader = [
 scripted = [
     "present", "livery", "genet-documents/scripted",
     "dep:genet-scripted",
-    "dep:script-runtime-api", "dep:script-engine-api",
-    "dep:script-engine-boa",
+    "dep:genet-runtime", "dep:script-engine-api",
+    "dep:genet-bole",
     "dep:fleece",
 ]
 # Compatibility feature spelling; the scripted route is already Livery/Buckram.
@@ -64,14 +64,14 @@ livery-scripted = ["scripted", "genet-documents/livery-scripted"]
 # Off by default; enabling
 # it links a second engine, which on Windows can exceed the linker's image-size limit
 # alongside wgpu — build it on Linux/macOS, or Windows without the present stack.
-scripted-nova = ["scripted", "dep:script-engine-nova"]
+scripted-nova = ["scripted", "dep:genet-vano"]
 # Remote document loading (V1's http(s) half): the `LocalFetcher` gains an http(s)
 # branch backed by the netfetcher engine (the sibling Fetch network engine; the same
 # wiring genet-wpt's `fetch()` uses). Default-on so the reference browser visibly
 # exercises real pages; `--no-default-features` remains the light contracts build.
 # The host owns networking here (pelt is the reference shell), matching meerkat
 # driving netfetcher in the product; genet's engine components stay byte-consuming.
-netfetch = ["dep:mere-document-lanes", "mere-document-lanes/netfetch"]
+netfetch = ["dep:mere-lanes", "mere-lanes/netfetch"]
 # Smolweb document loading (the `smolweb` feature): the `LocalFetcher` gains a
 # gemini/gopher/nex/finger/spartan/guppy branch backed by the errand transport (the
 # sibling smolweb engine), bridged onto the sync `ResourceFetcher` through the same
@@ -80,7 +80,7 @@ netfetch = ["dep:mere-document-lanes", "mere-document-lanes/netfetch"]
 # The host owns networking (pelt is the reference shell), matching meerkat driving
 # errand in the product; genet's engine components stay byte-consuming. errand pulls
 # its own tokio net/time/io-util features, which unify with the `rt` runtime here.
-smolweb = ["livery", "dep:mere-document-lanes", "mere-document-lanes/smolweb"]
+smolweb = ["livery", "dep:mere-lanes", "mere-lanes/smolweb"]
 netrender = ["dep:netrender", "dep:webgl_wgpu", "dep:wgpu"]
 # Headed presentation through genet's `WindowsDxgiBackend`. Drives
 # the netrender renderer through the C4 DCOMP composition swapchain
@@ -126,7 +126,7 @@ linux-present = [
 # path (`../../../components/...`) is now a workspace-declared git pin on
 # genet.git at the one revision the root manifest states.
 cambium = { workspace = true, optional = true }
-cambium-genet-winit-host = { workspace = true, optional = true }
+cambium-desktop = { workspace = true, optional = true }
 cambium-rootstock = { workspace = true, optional = true }
 tabard-workshop = { workspace = true, optional = true, features = ["native-host"] }
 mesquite = { workspace = true, optional = true }
@@ -139,7 +139,7 @@ image = { version = "0.25", default-features = false, features = ["png"], option
 paint = { workspace = true, optional = true }
 genet-host-api = { workspace = true }
 mere-surface-api = { workspace = true }
-mere-document-lanes = { workspace = true, optional = true }
+mere-lanes = { workspace = true, optional = true }
 workbench = { workspace = true }
 genet-documents = { workspace = true, optional = true, default-features = false }
 genet-livery = { workspace = true, optional = true }
@@ -161,7 +161,7 @@ paint_list_render = { workspace = true, optional = true }
 # The render-free extraction lane: extract a PageExtract from the live post-JS DOM
 # (the headless-scripted-DOM scrape path for SPAs). Depends only on layout-dom-api.
 fleece = { workspace = true, optional = true }
-genet-winit-host = { workspace = true, optional = true }
+genet-winit = { workspace = true, optional = true }
 # Spec `data:` URL decoding for the LocalFetcher (percent-encoded + base64 bodies).
 
 # Remote document loading (behind the `netfetch` feature): the netfetcher engine
@@ -179,12 +179,12 @@ url = { version = "2.5", optional = true }
 # live mutable DOM, and the JS engines. `script-engine-api` supplies the
 # `ScriptEngine` trait bound the engine-generic `ScriptedDocument<E>` is written
 # against; Boa is the default backend, Nova the gated one (`scripted-nova`).
-script-runtime-api = { workspace = true, optional = true }
+genet-runtime = { workspace = true, optional = true }
 script-engine-api = { workspace = true, optional = true }
 genet-scripted-dom = { workspace = true, optional = true }
 genet-scripted = { workspace = true, optional = true, default-features = false }
-script-engine-boa = { workspace = true, optional = true }
-script-engine-nova = { workspace = true, optional = true }
+genet-bole = { workspace = true, optional = true }
+genet-vano = { workspace = true, optional = true }
 # The `LayoutDom` trait (for the inline-`<script>` DOM walk) + QualName parts.
 layout-dom-api = { workspace = true, optional = true }
 # `encoding_rs` (`<script charset>`) and `base64` (`<script integrity>`) served the

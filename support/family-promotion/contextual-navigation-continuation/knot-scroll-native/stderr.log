@@ -1,0 +1,2 @@
+[cambium-winit] accessibility Installed, 67 nodes projected
+knot: FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: Some("Show Preview"), attr: None }

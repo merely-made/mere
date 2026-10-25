@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "status": "complete; source and final receipts published and integrated",
+  "shared_source_commit": "3e305d1186d8c89441edfc66c9208664e016dd11",
+  "historical_receipt_commit": "7632bbd32a00891b858335209a39f36f5777c0ae",
+  "published": true,
+  "integration_bases": {
+    "mere": "003f9b3505ab6ac321f7644ae16dd5fef966b136",
+    "woodshed": "da66d6c047fc2d9a9b06833395846510d35f6bd8",
+    "knot_editor": "38fc774"
+  },
+  "worktrees": [],
+  "shared_gates": {
+    "scope_history": 17,
+    "host_input_routing": 19,
+    "titlebar_integration": 7,
+    "platform_policy_units": 2,
+    "browser_compatibility": 50,
+    "standalone_browser_product_wasm_locked": "pass"
+  },
+  "supplier_alignment": {
+    "genet": "2b5c01811e6051ecd815cb407ff1ec9b40724fc9",
+    "eidetic": "aa94fe22eea29e9b54e01ed21e6991536ed4f208",
+    "windows": "GPU allocator uses 0.62.2; Woodshed BLE may retain its separate 0.57 dependency.",
+    "prepublication_receivers": "Ignored .cargo/context-publication-local.toml and .cargo/local/Cargo.lock in each app worktree; portable intake follows shared publication."
+  },
+  "woodshed": {
+    "custody": "Real isolated synthetic unlocked Djinn Keeper; private fixture roots stay outside public receipts.",
+    "initial_reopen": "Exact owner-qualified Card route, view, source models and stopped playback passed; full script initially failed because both historical Overview visits were expected at zoom1.25, while the older visit correctly retains1.0.",
+    "presentation": "A read-only owner-qualified Card/material context summary clarifies the separate Stage catalog. It has no controls or model/transport mutations.",
+    "final_attempt": "attempt-04 two-process acceptance PASS; attempt-05 fresh pair PASS with one reviewed Card-context PNG. All owned apps/Keepers stopped.",
+    "primary_source": "Scenario helper/scripts were frozen before intake; subsequent work is isolated in the publication worktree.",
+    "receiving_binary_sha256": "0b732666dabfeaef711e926e0925d8d983f4cd52789d080891baedd4306a86a3",
+    "published_commit": "de7b8dc2339c5b4c87ef1845f22bccd7974d58e4",
+    "portable_qualification": "Pass: locked metadata/tests/build plus212-frame seed and171-frame fresh-process reopen; real isolated unlocked Keeper; exact route/cameras and stopped playback.",
+    "primary_and_cleanup": "Primary main integrated and clean; worktree removed; private fixture/recovery data retained under primary .cargo/local/context-publication-worktree-recovery; stopped2.1GB preflight build cache removed after marker/owner checks."
+  },
+  "knot": {
+    "chrome": "Uses platform frame policy and frame-aware caption helper; primary source remains untouched.",
+    "preflight": "Final portable graph passes metadata, build, focused gates and 362 serial library tests with one existing diagnostic ignored.",
+    "per_pane_implementation": "Qualified: independent slots, legacy migration, explicit presence, focus preservation and foreign pinned-reader fallback.",
+    "preview_decision": "Keep following-reader toggle behavior and individual document-bound pane close controls; label the toggle Show/Hide following Preview.",
+    "published_commit": "1766bf2119571b482f2007bc811966f629dcf160",
+    "native": "Final 72/20/7/30-frame no-image flows pass; both panes restore, closed Preview stays closed and explicit reopen restores Preview byte2427 while Source target8133 remains visibly in range after reflow."
+  },
+  "remaining": [],
+  "shared_main_commit": "7632bbd32a00891b858335209a39f36f5777c0ae",
+  "shared_bookmark_api_commit": "9e91c7c952a2cd06f23eefe5af4351f4ab398fb6"
+}

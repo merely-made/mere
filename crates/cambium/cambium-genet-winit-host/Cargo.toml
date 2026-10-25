@@ -1,5 +1,5 @@
 [package]
-name = "cambium-genet-winit-host"
+name = "cambium-desktop"
 version = "0.1.0"
 description = "The single-root Cambium desktop host: winit lifecycle, Livery/Buckram layout and paint, input routing, and AccessKit sync over one GenetAppRunner"
 edition.workspace = true
@@ -13,10 +13,13 @@ repository.workspace = true
 # published crate. Consumers take this from genet.git by branch.
 publish = false
 
+[lib]
+name = "cambium_genet_winit_host"
+
 [features]
 default = ["image-decode"]
 # Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
-image-decode = ["taproot/image-decode", "cambium-rootstock/image-decode", "cambium-winit-a11y/image-decode"]
+image-decode = ["taproot/image-decode", "cambium-rootstock/image-decode", "cambium-a11y/image-decode"]
 
 [dependencies]
 parley.workspace = true
@@ -32,14 +35,14 @@ cambium = { version = "0.6.0", path = "../cambium" }
 # it: it converts winit input into the neutral vocabulary and routes.
 cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
-cambium-winit-a11y = { version = "0.3.0", path = "../cambium-winit-a11y", default-features = false }
+cambium-a11y = { version = "0.3.0", path = "../cambium-winit-a11y", default-features = false }
 sprigging = { version = "0.3.0", path = "../sprigging" }
 # The semantic-selector resolver the headless `Harness` drives applications by,
 # so a host test targets a control by role and label rather than by pixel.
 # Named genet-probe until genet 7baa554c (2026-09-14).
 taproot = { workspace = true }
 genet-scripted-dom = { workspace = true }
-genet-winit-host = { workspace = true }
+genet-winit = { workspace = true }
 layout_dom_api = { workspace = true }
 netrender = { workspace = true }
 paint_list_api = { workspace = true }
@@ -47,7 +50,7 @@ paint_list_render = { workspace = true }
 wgpu = { workspace = true }
 # Named directly for the `Surface` implementation's return type; it already
 # arrived transitively through genet-winit-host.
-genet-render-host = { workspace = true }
+genet-presenter = { workspace = true }
 winit = { workspace = true }
 
 [dev-dependencies]
