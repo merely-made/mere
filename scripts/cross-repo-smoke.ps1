@@ -116,8 +116,8 @@ $web        = Join-Path $mere "ports\graphshell\web"
 Step "netrender (netrender + text + lowering)" $netrender @(
     "check", "-p", "netrender", "-p", "netrender_text", "-p", "paint_list_render")
 Step "genet components (layout/render/render-host/winit-host/scripted-dom)" $genet @(
-    "check", "-p", "genet-layout", "-p", "genet-render", "-p", "genet-render-host",
-    "-p", "genet-winit-host", "-p", "genet-scripted-dom")
+    "check", "-p", "genet-layout", "-p", "genet-render", "-p", "genet-presenter",
+    "-p", "genet-winit", "-p", "genet-scripted-dom")
 Step "genet pelt (default member)" $genet @("check", "-p", "pelt")
 Step "mere graphshell (resident host, full sync cone)" $mere @(
     "check", "-p", "graphshell", "--features", "personal-sync")
@@ -143,9 +143,9 @@ Step "mere-canvas bin (required-features)" $mere @(
 Step "graphshell-web (wasm32)" $web @("check", "--target", "wasm32-unknown-unknown")
 Step "turnstone (the app; consumes genet + mere)" $turnstone @("check")
 
-Assert-Local "graphshell-web" $web "genet-render-host" @("--target", "wasm32-unknown-unknown")
+Assert-Local "graphshell-web" $web "genet-presenter" @("--target", "wasm32-unknown-unknown")
 Assert-Local "graphshell-web" $web "netrender" @("--target", "wasm32-unknown-unknown")
-Assert-Local "turnstone" $turnstone "genet-winit-host"
+Assert-Local "turnstone" $turnstone "genet-winit"
 
 if ($Tests) {
     # Sequential on purpose (one cargo test invocation at a time).
