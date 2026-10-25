@@ -27,7 +27,6 @@ members = [
     "crates/forme/uxtree",
     "crates/domain/apparatus",
     "crates/domain/personal-facts",
-    "crates/domain/personal-facts/shim",
     "crates/domain/site",
     "crates/platen/platen",
     "crates/fleece",
@@ -665,9 +664,7 @@ all = "warn"
 mere-site = { path = "crates/domain/site" }
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
-# Cleromancy cores before its rename name the facts crate by its old
-# package name; the shim re-exports `mere-facts` so both resolve to one type.
-mere-personal-facts = { path = "crates/domain/personal-facts/shim" }
+mere-facts = { path = "crates/domain/personal-facts" }
 murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
