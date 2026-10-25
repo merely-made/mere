@@ -1,240 +1,173 @@
-# The agent harness (the run loop for models/agents)
+# The agent harness: decision drivers in the Alembic workshop
 
-**Date**: 2026-07-03
-**Status**: Design brief, revised 2026-09-20. The proposed shared loop now lives
-in Servitor under the [resident/run redesign](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20).
-That plan owns the current boundaries and R1-R3 sequence; this brief retains
-the model-guided loop rationale. R1a admission, the R1b reducer and the Turnstone adapter have source implementations with static review; executable receipts remain pending under the Cargo hold.
-The original brief binds the layer between two seams that already
-exist: the model runtime seam (the [local models harness brief](2026-06-24_local_models_harness_brief.md))
-and the typed actuation seam (the D7 agent harness in
-[`meerkat/src/agent_harness.rs`](../../../crates/meerkat/src/agent_harness.rs) *(historical citation)* <!-- doc-audit: historical-link -->). Neither owns
-the loop that puts a model behind the actions. This doc is that loop.
+**Date:** 2026-07-03
+**Status (2026-10-24):** model-guided design rationale reconciled with the
+[Alembic workshop plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24).
+Alembic/Athanor own workshop composition. The [Servitor redesign](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
+owns reusable admission/run semantics; Servitor remains in Eidetic.
+R1a/R1b and the Turnstone adapter have executable receipts. The workshop's
+two-host workflow and model-guided decisions remain unimplemented.
 
-**Related (the agentic lane):**
+## 1. The composition
 
-- [local models harness brief](2026-06-24_local_models_harness_brief.md) — `InferenceProvider` /
-  `AdapterLoader`, backends by target, the inference actor. The brain seam. This doc consumes it.
-- [system diagnostics plan, D7](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md) —
-  the landed typed harness: `AgentObservation` (surfaces, enabled actions, diagnostics, a11y) +
-  `AgentAction` incl. the by-id `Invoke(String)` registry seam. The hands seam. This doc consumes it.
-- [command registry plan](../../archive_docs/2026-09-02_retired_plans/2026-06-21_command_registry_configurable_menus_plan.md) —
-  the one action id-space (palette, omnibar, a11y, harness). The tool vocabulary.
-- [mcp_native_graph plan](../implementation_strategy/2026-06-26_mcp_native_graph_plan.md) — the
-  external boundary, both directions. Expose rides the registry; consume is a tool ring here.
-- [knot plan, agent nodes](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md) —
-  the durable home of a standing agent: a node whose body is its policy, whose edges are its
-  materialized results.
-- [geist models brief](2026-05-10_geist_models_brief.md) — the model architecture (base + adapter
-  engrams). A geist is what sits behind the provider; this doc does not re-derive it.
-- [capability gate catalogue](2026-05-14_capability_gate_catalogue_brief.md) +
-  [persona model brief](2026-05-14_persona_model_brief.md) — the gate spine and the scope axis.
-- [operator presence overlay plan](../implementation_strategy/2026-06-25_operator_presence_overlay_plan.md) —
-  the agent as one of the three operator sources; a run renders presence ("watch your AI think").
+Alembic is the workshop where a person creates, grants, runs, observes,
+interrupts and dissolves a helper. Athanor owns its domain logic inside
+Distillery. A decision driver can be a script, deterministic algorithm or
+model; its proposed work passes through independently enforced authority.
 
----
+Servitor supplies resident binding, admission and recorded-event run
+reduction. It performs no I/O and produces no executable requests. Athanor's
+host driver persists intents, dispatches admitted work and records observed
+results. Armillary supplies actors/tasks, messages, cancellation and execution
+completion. A synchronous scenario can drive the same reducer without
+Armillary, ESP or Djinn. ESP supplies model execution when selected.
 
-## 1. The gap
+Product owners still authorize, commit and acknowledge their own effects.
+Djinn composes the workshop service and its lifetime; it supplies neither a
+second run state machine nor new domain authority. Eidetic retains artifacts
+and journals using the schemas their interpreting owners define.
 
-The lane has a brain seam and a hands seam, and both are the right shape:
+## 2. A model decision turn
 
-- **Model execution**: ESP's `InferenceProvider` supplies generation, streaming
-  and deterministic stub providers today. Model execution is separate from
-  deciding what a resident does next.
-- **Host actions**: Turnstone's script/component lanes evaluate participant
-  bodies and lower accepted actions through the host. The D7 harness cited
-  above is historical context; it is not a current runtime receipt for this redesign.
+This is design for a later driver, not a receipt for an integrated tool loop.
 
-What neither owns: the loop that assembles context, calls the model, parses a tool call, gates it,
-dispatches it, records what happened, and goes around again. The MCP plan calls this "the agent
-runtime" and defers it; the D7 plan stops at "let a Gemma-class model sit behind that typed loop"
-without saying how. This doc says how.
+1. **Collect authorized context.** Recheck read authority, select exact source
+   versions and record the selected behavior revision, observations and
+   context references. Retrieval is bounded by configured source/token limits.
+2. **Obtain a decision.** Invoke the selected ESP provider with explicit
+   limits. Retain provider/session identity and observed usage. Shared Alembic
+   controls show actual progress; worker completion is separately observable.
+3. **Validate and dispatch.** Parse against the selected domain operation
+   schemas, recheck live authority and preconditions, persist intent, then
+   dispatch. Persist actual results before publishing their disposition.
+4. **Advance or stop.** Apply recorded events through Servitor. Check claimed
+   success against observations. A durable proposal can finish generation
+   while the workshop goal still awaits review or destination application.
 
----
+Armillary does not choose whether an action is safe to retry. An interrupted
+consequential operation remains unresolved until the owning adapter supplies
+evidence. Restarting a worker cannot establish that its effect failed or
+authorize redispatch.
 
-## 2. The loop
+## 3. Owner-defined semantic operations
 
-A run is a Servitor state machine driven by host-supplied observations and
-results. An Armillary actor is one possible execution adapter; deterministic
-drivers use the same transitions without allocating a thread per run. Hosts
-expose progress and cancellation through their operation surfaces. Per turn:
+The original brief assumed a shared ActionRegistry/Command::ALL. That
+substrate was retired, as the [MCP plan](../implementation_strategy/2026-06-26_mcp_native_graph_plan.md)
+records. The retained invariant is that human controls, scripts and protocol
+adapters invoke the same domain validation and commit paths.
 
-1. **Assemble context**: the current `AgentObservation`, RAG retrieval over capability-scoped
-   engrams (persona/moot scope, per the persona brief), the agent's own policy body (for a
-   standing agent node), and the transcript so far.
-2. **Infer**: hand the assembled prompt to the `InferenceProvider`; stream tokens back as actor
-   messages. Steward shows real status (turn count, current action, budget remaining), never a
-   placebo spinner.
-3. **Act**: parse the model's output into the internal call representation (§3), gate-check it,
-   dispatch it, observe the result (the D7 `AgentStep` already returns result + fresh
-   observation), append both to the transcript.
-4. **Stop** when the model declares done, an action is blocked and the policy says defer to the
-   user, or the budget (turns/tokens) runs out. Every terminal state is recorded in the run
-   engram (§4) with its reason.
+Each owner supplies versioned operation descriptors: checked arguments,
+scope, current availability, preconditions, effect class, result evidence
+and reconciliation behavior. Discoverability is not permission. Human menus
+and model tool lists may present these operations differently.
 
-Servitor owns sequencing, transcript, budgets, retry eligibility and pause/resume
-semantics. Armillary carries messages; ESP implements provider calls and streaming.
-Capability checks remain independently callable, and the host registry supplies
-the tool catalog. In particular, an actor retry must never silently repeat an
-external effect whose outcome is unknown. The redesign plan specifies reconciliation.
+The useful families are domain actions, capability-scoped graph/source reads,
+and later external tools. The app-host action envelope is a stable ABI;
+it does not supply semantic schemas or prove effect completion. Provider
+adapters may translate structured calls or validate a strict JSON form.
+Malformed output becomes an observed refusal/failure within the run budget.
 
----
+MCP exposure/consumption remains an optional adapter with its own transport,
+disclosure and authorization contract. The workshop's first workflow does
+not depend on it or establish a universal action registry.
 
-## 3. One tool vocabulary
+## 4. Retained work, proposals and accepted effects
 
-The commitment: **the model's tool list is the observation's `enabled_actions`, rendered as
-schemas.** Palette, menus, a11y, the MCP server, and the model all address the same registry ids.
-There is never a parallel "agent tools" catalog to drift out of sync.
+Retain causally related identities rather than collapsing work into one
+record: installed helper, versioned definition, goal, run, proposal,
+acceptance operation, model invocation, mesh job and observation. A graph
+projection can make those relationships inspectable without turning every
+runtime message into graph truth.
 
-Three rings, one representation:
+Product mutations retain proposing resident/run attribution and the
+applicable accepting authority through the product's own journal. Recording
+an external effect neither reverses it nor makes it safe to repeat.
 
-- **Registry actions** (in-app): `Invoke(id)` plus the typed D7 actions. Enablement, labels, and
-  ids come from the observation, so the model only sees actions that are currently invokable.
-- **Graph reads** (context): scoped node/subgraph/query reads, the same read surface the MCP
-  expose half plans to offer as resources. Read scope is a capability, not a prompt convention.
-- **Outbound MCP** (external): the consume half of the MCP plan, surfaced to the model as more
-  tools in the same list, gated per server.
+Two postures remain useful:
 
-Internally a tool call is one enum shaped like `AgentAction` plus the read and MCP variants.
-Per-provider adapters translate: an API model's native structured tool-calling maps directly; a
-small local model gets a strict JSON grammar over the same ids, validated, with a rejected parse
-returned to the model as a turn result rather than crashing the run (illustrative shape only; no
-signatures proposed here).
+- **Direct, gated:** an operation has the required live authority,
+  preconditions, stable identity and completion/recovery contract.
+- **Proposal/apply:** the helper emits a durable proposal. Human acceptance
+  is a distinct authorized operation with its own durable outcome.
 
----
+The first workflow uses the second posture. Its generation run may be
+complete while the goal awaits review. A queued port request or a successful
+worker return must not be presented as a committed product change.
 
-## 4. Runs are graph material
+## 5. Interactive and standing helpers
 
-A run is an engram: transcript, actions taken, results, terminal state, provider/adapter identity
-(which geist, which backing model). Every mutation the run performs asserts a provenance edge
-pointing at the run, per the borrowed-ideas rule the MCP plan already adopts
-(assert-on-every-agent-mutation). Records support attribution and reconstruction;
-undo requires operation-specific compensation or reversible commits. Recording
-an external effect cannot make it reversible or safe to repeat.
+Interactive work begins through an explicit invocation and can request review
+through the shared workshop surface. User presence permits asking; it is not
+a grant. Standing helpers additionally need explicit trigger, overlap,
+backlog and unattended-action policies.
 
-Two mutation postures:
+Servitor watches, ticks, cascades and deadbands have existing consumers.
+Connecting them to slow asynchronous work must preserve cursor/disposition
+durability and yield rather than holding a synchronous cascade drain.
+The initial Alembic workflow is manual; automatic scheduling remains a
+separate extension. Procedure learning and evaluated adoption remain R2/R3.
 
-- **Direct, gated**: small actions dispatch through the registry with per-action gating, exactly
-  as if the user had invoked them, plus the provenance edge.
-- **Proposal/apply**: batch or heavy mutations follow the Athanor split
-  ([alembic plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md)): the run
-  emits a changeset engram; adoption is a separate, human, gated act.
+## 6. Provider and target differences
 
-The agent node is the durable policy; runs are events under it. An interactive session's run
-hangs off the session instead. Either way the transcript is queryable graph history, not app
-state.
+Local and remote execution can share decision-driver contracts. Provider
+selection also changes disclosure, credentials, costs and continuation
+capabilities. Remote API adapters remain planned; their network placement
+follows the owning host's transport policy.
 
----
+A different provider cannot pretend to resume a native exact-token checkpoint.
+Unsupported continuation refuses or starts an explicitly new decision step.
+Recovery depends on the operation/effect contract, not merely on whether the
+provider is remote.
 
-## 5. Two duty cycles, one loop
+The reducer is portable sequencing and data. Each host must declare its actual
+execution, storage and action capabilities. Browser execution and persistence
+need their own receipts; the first workshop gate is native desktop.
 
-- **Interactive session**: summoned (omnibar `>` verb or a command), user present, chat-shaped.
-  User presence is the consent context: gated actions can prompt per-action. Lean: the session is
-  a node from its first turn (consistent with representations carrying node identity), and its
-  transcript renders wherever the host puts conversation surfaces; the exact surface (comms
-  thread, gloss card, dedicated pane) is a host choice and a user setting, not bound here.
-- **Standing agent**: an agent node whose policy body defines trigger (graph signal, schedule,
-  manual poke) and scope. No user present, so the posture tightens: pre-granted scoped
-  capabilities only, mutations default to proposal/apply, results materialize as the node's
-  edges with provenance. This is the Tinderbox-agent-made-spatial from the knot plan, with the
-  loop behind it.
+## 7. First workflow and future guidance
 
-Same loop, same transcript shape, same gates; only trigger and consent posture differ. A run in
-either cycle emits operator presence (the agent is one of the three operator sources), so watching
-an agent work is the presence overlay, not a new UI.
+The Alembic plan's W0–W3 specify an evidence brief from selected retained
+passages in Turnstone and Graphshell: one versioned helper definition,
+separate installation grants, shared controls/domain logic, exact citations,
+review, destination-owned application and cold reopen. That plan is the
+single detailed workflow and acceptance specification.
 
----
+Existing Servitor tests cover reduction and admission, not this new effect
+path. The two product adapters must prove real persistence acknowledgement,
+stable acceptance identity, refusal, interruption and reconciliation.
+A deterministic body is sufficient for that proof.
 
-## 6. Remote models are a provider, not an architecture
+Later R2 compares optional procedural guidance against flat context with the
+same tasks and budgets. R3 evaluates candidates on held-out tasks and checks
+authorized, versioned adoption. Servitor defines reusable validation
+invariants; Athanor records the owner's adoption decision and selected
+revision. Procedure text cannot confer authority or certify its own success.
 
-The local models brief binds local runtimes. One extension, stated here so it lands in the seam
-and not around it: a remote API model (Claude-class, or any hosted endpoint) is just another
-`InferenceProvider` backend over HTTPS, reachable from wasm and native alike. Capability
-descriptors already carry context window and loader identity; a remote backend adds an endpoint +
-credential, gated like any other outbound capability. Local vs. remote becomes provider choice
-per agent, a user setting, with the same loop, transcript, gates, and provenance either way.
+## Related owners and research
 
----
-
-## 7. wasm vs native
-
-The loop itself is portable: it is sequencing + data, no OS surface. The split it inherits is the
-brain's (the local models brief §4: in-browser = RAG + small-model inference via Burn-wgpu;
-heavier runtimes native) plus remote providers everywhere. The hands seam is host-provided, so
-the browser lane's harness exposes whatever action surface that host has (the orrery browser lane
-has a smaller registry than meerkat; the loop does not care).
-
----
-
-## 8. Where it lives
-
-Proposed home: modules in the existing Servitor crate, preserving host-free
-data and transition logic and independently usable participant authority APIs.
-The [redesign plan](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
-owns the module boundaries. ESP supplies model execution, Chartulary/Eidetic
-store records, and host adapters supply actions and effects. A separate agent
-crate is not the starting assumption. Procedural guidance is one optional
-decision driver alongside scripts and deterministic fixtures.
-
----
-
-## 9. First slice (no model required)
-
-R1a in the redesign plan supplies resident binding, lifecycle and run admission
-with the existing Turnstone consumer; its source changes await executable
-validation and the portable dependency pin. R1b supplies source for the shared
-run reducer, a deterministic provider fixture and the Turnstone adapter.
-Executable acceptance gates remain pending and include
-cancellation, revocation, stale replies, uncertain effects and replay, alongside
-call validation and attribution. A real model is unnecessary for that contract
-proof. R2 measures optional procedural guidance;
-R3 evaluates and adopts procedure revisions. Their done-conditions live in the
-plan rather than in a second implementation checklist here.
-
----
-
-## 10. Owned elsewhere
-
-- **Model architecture, adapters, governance**: geist brief.
-- **Runtime backends, training, wasm inference ceiling**: local models harness brief.
-- **MCP transport/auth and the exposed tool split**: mcp_native_graph plan.
-- **Agent-node authoring UX** (the `=query` promotion, editor): knot plan.
-- **Presence rendering + agent-transparency grants**: operator presence overlay plan.
-- **Marketplace/compute**: communal-compute + resource-coordination briefs.
-
----
-
-## 11. Open questions
-
-- **Constrained decode for small local models.** API models emit structured calls natively; a
-  Gemma-class model via Burn-wgpu needs grammar-constrained decoding (logit masking) or
-  validate-and-retry over the strict JSON grammar. Lean validate-and-retry first (cheap, provider-
-  agnostic); constrained decode is a Burn-side follow-up once a real local model is wired.
-- **Context budget policy.** How much observation + RAG + transcript fits a small model's window;
-  what gets summarized vs dropped. Empirical, per-provider, rides the capability descriptor.
-- **Standing-agent integration.** Servitor watches, ticks, cascades and deadbands
-  already have Turnstone consumers. The redesign must connect those primitives
-  to resumable runs, including overlap policy and slow model completions, without
-  blocking a cascade drain or replaying an effect.
-- **The interactive surface.** Comms thread vs gloss card vs pane; a user setting per the
-  configurability doctrine, but the default needs picking when the session slice lands.
-- **Multi-agent.** Runs spawning runs (an agent invoking another agent node) is representable
-  (a run engram pointing at a child run) but deliberately unbound here; revisit once single runs
-  are real.
-
----
+- [Alembic implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md)
+  — workshop composition, first workflow and current acceptance gates.
+- [Graph behaviors plan](../implementation_strategy/2026-08-13_graph_behaviors_plan.md)
+  — watches, admission, run contracts and proposed R2/R3.
+- [Local models harness brief](2026-06-24_local_models_harness_brief.md)
+  — model-execution and adapter rationale; current resident qualification is
+  in the [inference plan](../implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+- [Diagnostics plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+  — current owner observations and semantic action evidence. The retired
+  Meerkat D7 harness is historical prior art, not today's action catalog.
+- [Persona model](2026-05-14_persona_model_brief.md), [geist models](2026-05-10_geist_models_brief.md)
+  and [MCP plan](../implementation_strategy/2026-06-26_mcp_native_graph_plan.md)
+  — identity/context, model research and planned protocol adapters.
 
 ## Progress
 
-- 2026-09-20: proposed Servitor as the shared resident/run owner, replacing the
-  unassigned standalone-agent-crate assumption. Reconciled actor versus run
-  policy, current trigger consumers, historical D7 citations, and audit versus
-  undo. The graph behaviors plan owns the design and pending R1-R3 gates.
-
-- 2026-07-03: Brief drafted from a design conversation with Mark ("a harness for models/agents,
-  how should that look"). Grounded against the landed D7 harness code (`agent_harness.rs`:
-  `AgentObservation` / `AgentAction::Invoke(id)` / `AgentStep` / `StopFocusedOperation`), the
-  local models harness brief, the MCP plan, and the knot plan's agent nodes. Core commitments:
-  one tool vocabulary (registry ids, never a parallel catalog), runs as provenanced graph
-  material with the Athanor proposal/apply split for heavy mutations, two duty cycles over one
-  loop, remote models as a provider choice inside the same seam. No code proposed.
+- **2026-10-24:** reconciled the workshop with Alembic/Athanor and retained
+  Servitor in Eidetic. Replaced the retired registry assumption, corrected
+  pending-test claims, separated proposals from accepted effects, and made
+  the Alembic two-host workflow the single acceptance specification. This
+  documentation change implements no workshop, model loop or protocol adapter.
+- **2026-09-20:** proposed the shared Servitor resident/run contract and
+  separated actor delivery from run policy, historical D7 citations, and
+  audit from undo. The graph behaviors plan retains its source/evidence record.
+- **2026-07-03:** drafted after Mark's harness discussion, connecting model
+  execution with typed actions, attributed work and interactive/standing
+  duty cycles. Later ownership and substrate corrections are applied above.

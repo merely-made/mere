@@ -248,12 +248,16 @@ workflow, and authority — the anti-shell receipt — each with a headed
 genet-probe receipt, one Tab order, one AccessKit tree, and the table
 alternate reachable in both. Turnstone is the third host, not the second.
 
-**W5. Alembic's work-runs.** Once the Alembic move is ruled and executed, its
-bounded-actor runs join the board Chronicle as a second job kind: same
-recipe, one more entity kind, no new scene.
+**W5. Alembic's work-runs.** Its bounded-actor runs join the Chronicle as
+another work entity kind: same recipe, no new scene. Preserve workshop-run,
+proposal, acceptance-operation and compute-job identities; sharing a reading
+does not turn their lifecycles into one mesh job state machine.
 *Gate:* the move is executed (2026-09-02, `ports/distillery/{alembic,athanor}`
 founded); what remains is Alembic's workshop implemented far enough to emit
-runs onto the board. Not opened before that.
+runs for this reading. The [Alembic plan's first workflow](2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+now owns that implementation gate. Its durable proposal, pending review and
+destination-acknowledged result must remain distinguishable in the Chronicle.
+This projection gate does not implement or qualify the workshop.
 
 ## 5. Boundaries
 
