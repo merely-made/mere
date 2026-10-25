@@ -681,6 +681,7 @@ inker = { path = "crates/inker/inker" }
 insigne = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+mere-source-edit = { path = "crates/system/source-edit" }
 mere-surface-api = { path = "crates/system/surface-api" }
 mere-transport = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 mora-cmudict = { path = "crates/intel/mora-cmudict" }

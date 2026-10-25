@@ -2685,7 +2685,7 @@ dependencies = [
 [[package]]
 name = "cleromancy-core-acceptance"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/cleromancy.git?branch=main#69ed4554285a0fcc6b9d5dfd550eb3481aa1c9c2"
+source = "git+https://github.com/merely-made/cleromancy.git?branch=main#d31260f54bdd66a4e27c76ffb197f5f67c988dca"
 dependencies = [
  "blake3",
  "chartulary",
@@ -2707,9 +2707,7 @@ dependencies = [
  "serde_json",
  "servitor",
  "thiserror 2.0.21",
- "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b)",
- "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802)",
- "turquet 0.17.0 (git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306)",
+ "turquet",
 ]
 
 [[package]]
@@ -8885,7 +8883,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8893,7 +8891,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -8913,13 +8911,13 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "cambium",
  "illume",
  "inker",
  "knot-editor-host",
- "mere-source-edit 0.1.0 (git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f)",
+ "mere-source-edit",
  "mere-surface-api",
  "nematic",
  "same-file",
@@ -8930,7 +8928,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9000,7 +8998,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9013,7 +9011,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#1766bf2119571b482f2007bc811966f629dcf160"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10227,14 +10225,6 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "mere-source-edit"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -17982,25 +17972,7 @@ dependencies = [
 [[package]]
 name = "turquet"
 version = "0.17.0"
-source = "git+https://github.com/merely-made/turquet.git?rev=30875f30e83909f3030bc01237a5046e14cde29b#30875f30e83909f3030bc01237a5046e14cde29b"
-dependencies = [
- "hifitime",
- "sofars",
-]
-
-[[package]]
-name = "turquet"
-version = "0.17.0"
 source = "git+https://github.com/merely-made/turquet.git?rev=8e3755bbd0d40343eb4750b072801c941ff32802#8e3755bbd0d40343eb4750b072801c941ff32802"
-dependencies = [
- "hifitime",
- "sofars",
-]
-
-[[package]]
-name = "turquet"
-version = "0.17.0"
-source = "git+https://github.com/merely-made/turquet.git?rev=e2f65c021a6bf744ab5fe77121e0441a46b47306#e2f65c021a6bf744ab5fe77121e0441a46b47306"
 dependencies = [
  "hifitime",
  "sofars",
