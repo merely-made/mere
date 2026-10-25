@@ -95,7 +95,7 @@ Coordinator-only commands under the serialized Cargo lease:
 
 ```sh
 RUSTFLAGS='--cfg getrandom_backend="wasm_js"' cargo build --locked \
-  -p cambium-genet-web-host --example shared_recovery \
+  -p cambium-web --example shared_recovery \
   --target wasm32-unknown-unknown -j2
 wasm-bindgen --target web --no-typescript --out-name shared_recovery \
   --out-dir <owned-output>/pkg \

@@ -1,6 +1,6 @@
 [package]
 rust-version = "1.97.1"
-name = "mere-linked-data"
+name = "mere-rdf"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

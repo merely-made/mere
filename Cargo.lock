@@ -2152,43 +2152,35 @@ dependencies = [
 ]
 
 [[package]]
-name = "cambium-genet-web-host"
-version = "0.1.0"
+name = "cambium-a11y"
+version = "0.3.0"
 dependencies = [
  "accesskit 0.25.1",
- "cambium",
- "cambium-genet-winit-host",
- "cambium-rootstock",
- "console_error_panic_hook",
- "document-session-api",
- "genet-render-host",
- "genet-scripted-dom",
- "js-sys",
- "layout-dom-api",
- "mesquite",
- "netrender",
- "paint_list_api",
- "paint_list_render",
- "serde_json",
- "sha2 0.11.0",
- "sprigging",
- "tabard",
- "tabard-workshop",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "wgpu",
-]
-
-[[package]]
-name = "cambium-genet-winit-host"
-version = "0.1.0"
-dependencies = [
- "accesskit 0.25.1",
+ "accesskit_consumer",
+ "accesskit_winit",
  "cambium",
  "cambium-rootstock",
  "cambium-winit",
- "cambium-winit-a11y",
+ "document-session-api",
+ "genet-render",
+ "genet-scripted-dom",
+ "genet-winit-host",
+ "layout-dom-api",
+ "mere-surface-api",
+ "sprigging",
+ "uxtree",
+ "winit",
+]
+
+[[package]]
+name = "cambium-desktop"
+version = "0.1.0"
+dependencies = [
+ "accesskit 0.25.1",
+ "cambium",
+ "cambium-a11y",
+ "cambium-rootstock",
+ "cambium-winit",
  "genet-parley",
  "genet-render-host",
  "genet-scripted-dom",
@@ -2241,32 +2233,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "cambium-web"
+version = "0.1.0"
+dependencies = [
+ "accesskit 0.25.1",
+ "cambium",
+ "cambium-desktop",
+ "cambium-rootstock",
+ "console_error_panic_hook",
+ "document-session-api",
+ "genet-render-host",
+ "genet-scripted-dom",
+ "js-sys",
+ "layout-dom-api",
+ "mesquite",
+ "netrender",
+ "paint_list_api",
+ "paint_list_render",
+ "serde_json",
+ "sha2 0.11.0",
+ "sprigging",
+ "tabard",
+ "tabard-workshop",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "wgpu",
+]
+
+[[package]]
 name = "cambium-winit"
 version = "0.3.0"
 dependencies = [
  "cambium",
  "web-time",
- "winit",
-]
-
-[[package]]
-name = "cambium-winit-a11y"
-version = "0.3.0"
-dependencies = [
- "accesskit 0.25.1",
- "accesskit_consumer",
- "accesskit_winit",
- "cambium",
- "cambium-rootstock",
- "cambium-winit",
- "document-session-api",
- "genet-render",
- "genet-scripted-dom",
- "genet-winit-host",
- "layout-dom-api",
- "mere-surface-api",
- "sprigging",
- "uxtree",
  "winit",
 ]
 
@@ -2954,7 +2954,7 @@ dependencies = [
  "js-sys",
  "linebender_resource_handle",
  "mere-kernel",
- "mere-linked-data",
+ "mere-rdf",
  "netrender",
  "paint_list_render",
  "postcard",
@@ -4891,14 +4891,14 @@ name = "dramatis-app"
 version = "0.0.1"
 dependencies = [
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "chatelaine",
  "dramatis",
  "graphshell-endpoint",
  "image",
  "luggage",
- "mere-persona-picker",
  "mesquite",
+ "persona-picker",
  "personae",
  "serde_json",
  "sha2 0.11.0",
@@ -6970,9 +6970,9 @@ dependencies = [
  "base64 0.22.1",
  "blake3",
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-a11y",
+ "cambium-desktop",
  "cambium-rootstock",
- "cambium-winit-a11y",
  "chartulary",
  "chatelaine",
  "chirograph",
@@ -6994,8 +6994,8 @@ dependencies = [
  "knot-editor-host",
  "layout-dom-api",
  "mere",
- "mere-document-lanes",
  "mere-fleece",
+ "mere-lanes",
  "mere-mesh",
  "mere-moot",
  "mere-overmap",
@@ -7132,7 +7132,7 @@ name = "graphshell-mere"
 version = "0.0.2"
 dependencies = [
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "cambium-rootstock",
  "chirograph",
  "genet-scripted-dom",
@@ -8931,7 +8931,7 @@ dependencies = [
  "illume",
  "inker",
  "knot-editor-host",
- "mere-source-edit 0.1.0 (git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f)",
+ "mere-source-edit",
  "mere-surface-api",
  "nematic",
  "same-file",
@@ -9764,7 +9764,7 @@ dependencies = [
  "mere-fleece",
  "mere-forme",
  "mere-kernel",
- "mere-linked-data",
+ "mere-rdf",
  "netrender",
  "pictograph",
  "platen",
@@ -9863,31 +9863,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-document-lanes"
+name = "mere-edit"
 version = "0.1.0"
 dependencies = [
- "bytes",
- "document-canvas",
- "document-session-api",
- "eidetic",
- "errand",
- "genet-host-api",
- "genet-static-dom",
- "image",
- "inker",
- "mere-fleece",
- "mockito",
- "nematic",
- "netfetcher",
- "netrender",
- "pollster 0.4.0",
  "serde",
  "serde_json",
- "tabard",
- "tempfile",
- "tokio",
- "url",
- "wgpu",
 ]
 
 [[package]]
@@ -9902,7 +9882,7 @@ dependencies = [
  "futures-util",
  "genet-host-api",
  "inker",
- "mere-page-load",
+ "mere-pageload",
  "mere-transport",
  "mockito",
  "netfetcher",
@@ -9935,7 +9915,7 @@ dependencies = [
  "incipit",
  "inker",
  "mere-fetch",
- "mere-linked-data",
+ "mere-rdf",
  "mere-transport",
  "muniment",
  "nematic",
@@ -10006,22 +9986,31 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-linked-data"
-version = "0.0.1"
+name = "mere-lanes"
+version = "0.1.0"
 dependencies = [
- "getrandom 0.2.17",
- "getrandom 0.3.4",
+ "bytes",
+ "document-canvas",
+ "document-session-api",
+ "eidetic",
+ "errand",
+ "genet-host-api",
+ "genet-static-dom",
+ "image",
  "inker",
- "mere-kernel",
- "oxjsonld",
- "oxrdf",
- "oxsdatatypes",
- "oxttl",
+ "mere-fleece",
+ "mockito",
+ "nematic",
+ "netfetcher",
+ "netrender",
+ "pollster 0.4.0",
+ "serde",
  "serde_json",
- "spareval",
- "spargebra",
- "time",
- "uuid",
+ "tabard",
+ "tempfile",
+ "tokio",
+ "url",
+ "wgpu",
 ]
 
 [[package]]
@@ -10130,17 +10119,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-page-load"
+name = "mere-pageload"
 version = "0.0.1"
-
-[[package]]
-name = "mere-persona-picker"
-version = "0.0.1"
-dependencies = [
- "cambium",
- "dramatis",
- "personae",
-]
 
 [[package]]
 name = "mere-personal-facts"
@@ -10164,6 +10144,25 @@ dependencies = [
  "blake3",
  "serde",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "mere-rdf"
+version = "0.0.1"
+dependencies = [
+ "getrandom 0.2.17",
+ "getrandom 0.3.4",
+ "inker",
+ "mere-kernel",
+ "oxjsonld",
+ "oxrdf",
+ "oxsdatatypes",
+ "oxttl",
+ "serde_json",
+ "spareval",
+ "spargebra",
+ "time",
+ "uuid",
 ]
 
 [[package]]
@@ -10236,14 +10235,6 @@ dependencies = [
 [[package]]
 name = "mere-source-edit"
 version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "mere-source-edit"
-version = "0.1.0"
 source = "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
 dependencies = [
  "serde",
@@ -10286,7 +10277,7 @@ name = "mere-view"
 version = "0.1.0"
 dependencies = [
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "genet-scripted-dom",
  "incipit",
  "layout-dom-api",
@@ -13150,8 +13141,8 @@ dependencies = [
  "genet-host-api",
  "genet-render-host",
  "inker",
- "mere-document-lanes",
- "mere-page-load",
+ "mere-lanes",
+ "mere-pageload",
  "netrender",
  "serde_json",
  "url",
@@ -13168,7 +13159,7 @@ dependencies = [
  "ash",
  "base64 0.22.1",
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "cambium-rootstock",
  "dirs 6.0.0",
  "dpi",
@@ -13185,8 +13176,8 @@ dependencies = [
  "image",
  "inker",
  "layout-dom-api",
- "mere-document-lanes",
  "mere-fleece",
+ "mere-lanes",
  "mere-surface-api",
  "mesquite",
  "mockito",
@@ -13271,6 +13262,15 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+
+[[package]]
+name = "persona-picker"
+version = "0.0.1"
+dependencies = [
+ "cambium",
+ "dramatis",
+ "personae",
+]
 
 [[package]]
 name = "personae"
@@ -17122,7 +17122,7 @@ name = "tabard-desktop"
 version = "0.1.0"
 dependencies = [
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "cambium-rootstock",
  "dirs 5.0.1",
  "genet-render-host",
@@ -17143,7 +17143,7 @@ version = "0.0.1"
 dependencies = [
  "accesskit 0.25.1",
  "cambium",
- "cambium-genet-winit-host",
+ "cambium-desktop",
  "cambium-rootstock",
  "document-canvas",
  "genet-livery",
@@ -17152,7 +17152,7 @@ dependencies = [
  "inker",
  "layout-dom-api",
  "livery",
- "mere-document-lanes",
+ "mere-lanes",
  "netrender",
  "paint_list_render",
  "postcard",
