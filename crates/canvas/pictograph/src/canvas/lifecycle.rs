@@ -441,6 +441,13 @@ impl Canvas {
             .retain(|key| self.graph.get_node(*key).is_some());
         self.mosaic
             .retain(|key| self.graph.get_node(*key).is_some());
+        // Per-node overrides key by member, so a reused slot starts clean (lifetime brief §7.7).
+        let live = |id: &uuid::Uuid| self.graph.get_node_key_by_id(*id).is_some();
+        self.node_faces.retain(|id, _| live(id));
+        self.node_sizes.retain(|id, _| live(id));
+        self.node_sprites.retain(|id, _| live(id));
+        self.node_sprite_hulls.retain(|id, _| live(id));
+        self.node_materials.retain(|id, _| live(id));
         for positions in [&mut self.strategy_positions, &mut self.paused_positions]
             .into_iter()
             .flatten()
@@ -531,7 +538,7 @@ impl Canvas {
         let half = size / 2.0;
         // A custom hull (sprite-traced or hand-authored) collides at that hull, scaled to the
         // face. Independent of the face texture — the body is its own axis.
-        if let Some(hull) = self.node_sprite_hulls.get(&key).filter(|h| h.len() >= 3) {
+        if let Some(hull) = self.node_sprite_hull(key).filter(|h| h.len() >= 3) {
             let points = hull
                 .iter()
                 .map(|&(nx, ny)| (nx * size, ny * size))

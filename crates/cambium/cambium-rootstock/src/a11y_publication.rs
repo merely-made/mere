@@ -68,10 +68,7 @@ pub struct A11yPublication {
 
 impl Default for A11yPublication {
     fn default() -> Self {
-        Self::skipped(
-            A11yAdapterState::Unobserved,
-            A11yPublicationSkip::NotSynced,
-        )
+        Self::skipped(A11yAdapterState::Unobserved, A11yPublicationSkip::NotSynced)
     }
 }
 

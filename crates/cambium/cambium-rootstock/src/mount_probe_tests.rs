@@ -155,16 +155,16 @@ fn build(boundary: Boundary, guest_sheet: GuestSheet) -> World {
             let root = attach(&dom, host);
             dom.borrow_mut().insert_before(root, mount.node(), None);
             (root, mount.node())
-        }
+        },
         Boundary::OwnerIsHost => {
             dom.borrow_mut().insert_before(host, mount.node(), None);
             let root = attach(&dom, mount.node());
             (root, root)
-        }
+        },
         Boundary::PlainDiv => {
             dom.borrow_mut().insert_before(host, mount.node(), None);
             (host, mount.node())
-        }
+        },
     };
     {
         let mut document = dom.borrow_mut();
@@ -174,7 +174,7 @@ fn build(boundary: Boundary, guest_sheet: GuestSheet) -> World {
             GuestSheet::WithMount => {
                 let first = document.dom_children(container).next();
                 document.insert_before(container, style, first);
-            }
+            },
             GuestSheet::InDocument => document.append_child(root, style),
         }
     }

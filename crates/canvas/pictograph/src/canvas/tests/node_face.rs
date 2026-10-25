@@ -220,3 +220,63 @@ fn node_face_override_round_trips_through_cartography() {
         assert_eq!(canvas.node_face(key), face);
     }
 }
+
+#[test]
+fn removed_node_overrides_do_not_follow_its_reused_slot() {
+    use kernel::graph::apply::{GraphDelta, GraphDeltaResult, add_node, apply_graph_delta};
+    let mut graph = Graph::new();
+    graph.add_node(
+        "https://old.example".to_string(),
+        PortablePoint::new(0.0, 0.0),
+    );
+    let mut canvas = Canvas::with_graph(graph);
+    let (old_key, old_id) = {
+        let (key, node) = canvas
+            .graph()
+            .get_node_by_url("https://old.example")
+            .unwrap();
+        (key, node.id)
+    };
+    canvas.set_node_sprite(old_id, "data:image/png;base64,AAAA".to_string());
+    canvas.set_node_material(
+        old_id,
+        NodeMaterial {
+            restitution: 0.6,
+            ..NodeMaterial::default()
+        },
+    );
+    assert_eq!(canvas.node_face(old_key), Face::Sprite);
+
+    // The host path: remove, then add, inside one structural ingest.
+    let replacement = uuid::Uuid::from_u128(0x7265_7573_6564_5f73_6c6f_745f_6e6f_6465);
+    let mut new_key = None;
+    assert!(canvas.ingest_graph(|graph| {
+        assert!(matches!(
+            apply_graph_delta(graph, GraphDelta::RemoveNode { key: old_key }),
+            GraphDeltaResult::NodeRemoved(true)
+        ));
+        new_key = Some(add_node(
+            graph,
+            Some(replacement),
+            "https://new.example".to_string(),
+            PortablePoint::new(0.0, 0.0),
+        ));
+        true
+    }));
+    let new_key = new_key.unwrap();
+    assert_eq!(new_key, old_key, "graph slot reused");
+
+    // (sprite, face, default material, sprite exported, material exported) for the new member.
+    let geom = canvas.cartography_geometry();
+    assert_eq!(
+        (
+            canvas.node_sprite(new_key),
+            canvas.node_face(new_key),
+            canvas.node_material(new_key) == NodeMaterial::default(),
+            geom.sprite_iter().any(|(id, _)| id == replacement),
+            geom.material_iter().any(|(id, _)| id == replacement),
+        ),
+        (None, Face::Derived, true, false, false),
+        "the removed node's overrides followed its reused slot"
+    );
+}

@@ -23,40 +23,34 @@ impl Canvas {
         // Persist the deliberate per-node size overrides + the size-by-degree scene flag
         // alongside the positions, so a sized graph re-opens sized. Only explicit overrides
         // travel; degree-derived sizes recompute from the flag. (Node-rep — size persistence.)
-        .with_sizes(
-            self.node_sizes
-                .iter()
-                .filter_map(|(&key, &size)| self.graph.get_node(key).map(|node| (node.id, size))),
-        )
+        .with_sizes(self.node_sizes.iter().map(|(&id, &size)| (id, size)))
         .with_size_by_degree(self.size_by_degree)
         .with_size_by_importance(self.size_by_importance)
         .with_importance_metric(self.importance_metric.as_code())
         // Persist the custom sprite faces (the imported image as a data-URI) so a node textured
         // with one re-opens textured, not reverted to its default face. (Node-rep — sprite persistence.)
-        .with_sprites(
-            self.node_sprites.iter().filter_map(|(&key, uri)| {
-                self.graph.get_node(key).map(|node| (node.id, uri.clone()))
-            }),
-        )
+        .with_sprites(self.node_sprites.iter().map(|(&id, uri)| (id, uri.clone())))
         // Persist each sprite's collider hull alongside it, so the traced-to-image collider
         // survives a reload without re-decoding the image. (Node-rep — sprite hull persistence.)
-        .with_sprite_hulls(self.node_sprite_hulls.iter().filter_map(|(&key, hull)| {
-            self.graph.get_node(key).map(|node| (node.id, hull.clone()))
-        }))
+        .with_sprite_hulls(
+            self.node_sprite_hulls
+                .iter()
+                .map(|(&id, hull)| (id, hull.clone())),
+        )
         // Persist the per-node physical material overrides (restitution / friction / density),
         // so a node tuned heavier / bouncier re-opens that way. (Node body & face — material.)
-        .with_materials(self.node_materials.iter().filter_map(|(&key, mat)| {
-            self.graph
-                .get_node(key)
-                .map(|node| (node.id, (mat.restitution, mat.friction, mat.density)))
-        }))
+        .with_materials(
+            self.node_materials
+                .iter()
+                .map(|(&id, mat)| (id, (mat.restitution, mat.friction, mat.density))),
+        )
         // Persist the per-node face overrides (favicon / sprite / bare), so a node's chosen
         // texture re-opens that way (the body persists separately). (Node body & face — face.)
-        .with_faces(self.node_faces.iter().filter_map(|(&key, &face)| {
-            self.graph
-                .get_node(key)
-                .map(|node| (node.id, face.as_code().to_string()))
-        }))
+        .with_faces(
+            self.node_faces
+                .iter()
+                .map(|(&id, &face)| (id, face.as_code().to_string())),
+        )
         // The graph grammar's saved seed and the arrangement's regions
         // (`scene_state.rs`).
         .with_seed(self.saved_seed())
@@ -127,7 +121,8 @@ impl Canvas {
     /// [`Favicon`](Face::Favicon) once it does. Independent of the body (the collider hull).
     /// (Node body & face — the Face axis.)
     pub fn node_face(&self, key: NodeKey) -> Face {
-        self.node_faces.get(&key).copied().unwrap_or_else(|| {
+        let explicit = self.member_of(key).and_then(|id| self.node_faces.get(&id));
+        explicit.copied().unwrap_or_else(|| {
             self.graph.get_node(key).map_or(Face::default(), |node| {
                 if node.favicon().is_some() {
                     Face::Favicon
@@ -136,6 +131,12 @@ impl Canvas {
                 }
             })
         })
+    }
+
+    /// The member a slot holds now. Per-node overrides key by member, never by the slot, which
+    /// the graph reuses after a removal (lifetime brief §7.7).
+    pub(crate) fn member_of(&self, key: NodeKey) -> Option<uuid::Uuid> {
+        self.graph.get_node(key).map(|node| node.id)
     }
 
     /// Render the on-screen gnodes as host chrome-DOM elements instead of in-scene Scene
@@ -196,8 +197,8 @@ impl Canvas {
         // encoding.)
         self.size_by_importance = size_by_importance;
         for (id, size) in sizes {
-            if let Some((key, _)) = self.graph.get_node_by_id(id) {
-                self.node_sizes.insert(key, size.clamp(16.0, 160.0));
+            if self.graph.get_node_key_by_id(id).is_some() {
+                self.node_sizes.insert(id, size.clamp(16.0, 160.0));
             }
         }
         self.push_node_geometry();
@@ -306,8 +307,8 @@ impl Canvas {
     /// override is held on the canvas; persisting it is a follow-up (it joins the cartography
     /// sidecar). A no-op for an unknown id. (Node body & face — the Face axis.)
     pub fn set_node_face(&mut self, id: uuid::Uuid, face: Face) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_faces.insert(key, face);
+        if self.graph.get_node_key_by_id(id).is_some() {
+            self.node_faces.insert(id, face);
         }
     }
 
@@ -316,9 +317,7 @@ impl Canvas {
     /// Leaves the body and any sprite image intact. Keyed by node
     /// UUID; a no-op for an unknown id. (Node body & face — the Face axis.)
     pub fn clear_node_face(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_faces.remove(&key);
-        }
+        self.node_faces.remove(&id);
     }
 
     /// Reset a node's **body** to its content-type silhouette: drop any custom hull (sprite-traced
@@ -326,10 +325,8 @@ impl Canvas {
     /// untouched. Pushes the new geometry to physics. Keyed by node UUID; a no-op for an unknown
     /// id. (Node body & face — the Body axis.)
     pub fn clear_node_body(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            if self.node_sprite_hulls.remove(&key).is_some() {
-                self.push_node_geometry();
-            }
+        if self.node_sprite_hulls.remove(&id).is_some() {
+            self.push_node_geometry();
         }
     }
 
@@ -339,9 +336,9 @@ impl Canvas {
     /// [`set_node_sprite_hull`] to trace the body hull; this backs the drag-and-drop image
     /// import. (Node body & face — sprite face.)
     pub fn set_node_sprite(&mut self, id: uuid::Uuid, data_uri: String) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_sprites.insert(key, data_uri);
-            self.node_faces.insert(key, Face::Sprite);
+        if self.graph.get_node_key_by_id(id).is_some() {
+            self.node_sprites.insert(id, data_uri);
+            self.node_faces.insert(id, Face::Sprite);
         }
     }
 
@@ -350,11 +347,9 @@ impl Canvas {
     /// hull is the node's own shape once traced. Keyed by node UUID; a no-op for an unknown id.
     /// (Node body & face — sprite face.)
     pub fn clear_node_sprite(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_sprites.remove(&key);
-            if self.node_faces.get(&key) == Some(&Face::Sprite) {
-                self.node_faces.remove(&key);
-            }
+        self.node_sprites.remove(&id);
+        if self.node_faces.get(&id) == Some(&Face::Sprite) {
+            self.node_faces.remove(&id);
         }
     }
 
@@ -362,7 +357,8 @@ impl Canvas {
     /// the face image when [`node_face`](Self::node_face) is [`Sprite`](Face::Sprite).
     /// (Node body & face — sprite face.)
     pub fn node_sprite(&self, key: NodeKey) -> Option<&str> {
-        self.node_sprites.get(&key).map(String::as_str)
+        let id = self.member_of(key)?;
+        self.node_sprites.get(&id).map(String::as_str)
     }
 
     /// Set a node's sprite collider hull: the sprite's opaque region as a convex polygon in
@@ -371,11 +367,11 @@ impl Canvas {
     /// (the node falls back to its silhouette collider). Pushes the new geometry to physics.
     /// Keyed by node UUID; a no-op for an unknown id. (Node representation P2 — sprite hull.)
     pub fn set_node_sprite_hull(&mut self, id: uuid::Uuid, hull: Vec<(f32, f32)>) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
+        if self.graph.get_node_key_by_id(id).is_some() {
             if hull.len() >= 3 {
-                self.node_sprite_hulls.insert(key, hull);
+                self.node_sprite_hulls.insert(id, hull);
             } else {
-                self.node_sprite_hulls.remove(&key);
+                self.node_sprite_hulls.remove(&id);
             }
             self.push_node_geometry();
         }
@@ -384,7 +380,8 @@ impl Canvas {
     /// A node's sprite collider hull (face-normalized convex polygon), if it has one.
     /// (Node representation P2 — sprite hull.)
     pub fn node_sprite_hull(&self, key: NodeKey) -> Option<&[(f32, f32)]> {
-        self.node_sprite_hulls.get(&key).map(Vec::as_slice)
+        let id = self.member_of(key)?;
+        self.node_sprite_hulls.get(&id).map(Vec::as_slice)
     }
 
     /// Seed a node with a default editable body hull — a square covering most of the face — so a
@@ -392,10 +389,8 @@ impl Canvas {
     /// body beyond tracing a sprite). A no-op if it already has a hull. Pushes geometry to
     /// physics. Keyed by node UUID; a no-op for an unknown id. (Node body & face — the Body axis.)
     pub fn seed_node_body(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            if self.node_sprite_hulls.contains_key(&key) {
-                return;
-            }
+        if self.node_sprite_hulls.contains_key(&id) {
+            return;
         }
         self.set_node_sprite_hull(
             id,
@@ -407,7 +402,9 @@ impl Canvas {
     /// default [`seiche::NodeMaterial`] (the spawn restitution / friction / density).
     /// (Node body & face — material.)
     pub fn node_material(&self, key: NodeKey) -> seiche::NodeMaterial {
-        self.node_materials.get(&key).copied().unwrap_or_default()
+        self.member_of(key)
+            .and_then(|id| self.node_materials.get(&id).copied())
+            .unwrap_or_default()
     }
 
     /// Set a node's physical material (restitution / friction / density) and push it to the
@@ -416,8 +413,8 @@ impl Canvas {
     /// node UUID; a no-op for an unknown id. Persisted in the cartography sidecar. (Node body
     /// & face — material.)
     pub fn set_node_material(&mut self, id: uuid::Uuid, material: seiche::NodeMaterial) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_materials.insert(key, material);
+        if let Some(key) = self.graph.get_node_key_by_id(id) {
+            self.node_materials.insert(id, material);
             self.physics.set_node_materials(vec![(key, material)]);
         }
     }
@@ -425,11 +422,11 @@ impl Canvas {
     /// Reset a node's physical material to the default (drop its override) and push the default
     /// back to the live body. Keyed by node UUID; a no-op for an unknown id. (Node body & face.)
     pub fn clear_node_material(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            if self.node_materials.remove(&key).is_some() {
-                self.physics
-                    .set_node_materials(vec![(key, seiche::NodeMaterial::default())]);
-            }
+        if self.node_materials.remove(&id).is_some()
+            && let Some(key) = self.graph.get_node_key_by_id(id)
+        {
+            self.physics
+                .set_node_materials(vec![(key, seiche::NodeMaterial::default())]);
         }
     }
 
@@ -440,7 +437,7 @@ impl Canvas {
     pub fn node_size(&self, key: NodeKey) -> f32 {
         const DEFAULT: f32 = 36.0;
         const MAX: f32 = 88.0;
-        if let Some(&s) = self.node_sizes.get(&key) {
+        if let Some(&s) = self.member_of(key).and_then(|id| self.node_sizes.get(&id)) {
             return s;
         }
         // Size by importance (the signal-driven channel) wins over size-by-degree: normalized
@@ -476,8 +473,8 @@ impl Canvas {
     /// range. Wins over size-by-degree / the default until [`clear_node_size`]; a no-op for
     /// an unknown id. (P0 resize.)
     pub fn set_node_size(&mut self, id: uuid::Uuid, size: f32) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_sizes.insert(key, size.clamp(16.0, 160.0));
+        if self.graph.get_node_key_by_id(id).is_some() {
+            self.node_sizes.insert(id, size.clamp(16.0, 160.0));
             self.resettle_for_size();
         }
     }
@@ -485,8 +482,8 @@ impl Canvas {
     /// Clear a node's footprint override, reverting it to size-by-degree / the default.
     /// Keyed by node UUID; a no-op for an unknown id. (P0 resize.)
     pub fn clear_node_size(&mut self, id: uuid::Uuid) {
-        if let Some((key, _)) = self.graph.get_node_by_id(id) {
-            self.node_sizes.remove(&key);
+        if self.graph.get_node_key_by_id(id).is_some() {
+            self.node_sizes.remove(&id);
             self.resettle_for_size();
         }
     }

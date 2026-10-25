@@ -201,7 +201,11 @@ fn document_extent_nested_recorder_repeated_wheel_stays_in_child() {
     let mut dom = ScriptedDom::new();
     let root = dom.document();
     let workspace = div(&mut dom, root, "width:280px;height:320px;overflow:auto;");
-    let recorder = div(&mut dom, workspace, "width:260px;height:200px;overflow:auto;");
+    let recorder = div(
+        &mut dom,
+        workspace,
+        "width:260px;height:200px;overflow:auto;",
+    );
     let content = div(&mut dom, recorder, "width:900px;height:400px;");
     div(&mut dom, content, "width:900px;height:120px;");
     div(&mut dom, content, "width:900px;height:120px;");
@@ -324,7 +328,11 @@ fn document_extent_preserves_visible_outer_overflow_and_boundary_border_box() {
             layout.scroll_at_target(&dom, 20.0, 20.0, 10_000.0, 10_000.0),
             Some(ScrollTarget::Document),
         );
-        assert_eq!(layout.viewport_scroll(), (300.0, 300.0), "bounded:{bounded}");
+        assert_eq!(
+            layout.viewport_scroll(),
+            (300.0, 300.0),
+            "bounded:{bounded}"
+        );
         assert_eq!(
             layout.scroll_at_target(&dom, 20.0, 20.0, -10_000.0, -10_000.0),
             Some(ScrollTarget::Document),

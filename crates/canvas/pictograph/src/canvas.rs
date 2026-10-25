@@ -515,7 +515,7 @@ pub struct Canvas {
     /// Per-node **face** overrides (the user's per-node texture choice on the Face axis). A node
     /// absent here derives a face until it has a favicon source, so this holds only explicit
     /// overrides, never the whole graph. Independent of the body (the collider hull).
-    node_faces: HashMap<NodeKey, Face>,
+    node_faces: HashMap<uuid::Uuid, Face>,
     /// Theme-derived colors resolved while decoding pictograph bytes. This can change without
     /// invalidating the deterministic byte cache.
     derived_face_palette: DerivedFacePalette,
@@ -524,17 +524,17 @@ pub struct Canvas {
     derived_face_cache: HashMap<(u32, String), Vec<u8>>,
     /// Per-node face footprint overrides (px). A node absent here takes size-by-degree
     /// (when on) or the uniform default, so this holds only explicit resizes. (P0 resize.)
-    node_sizes: HashMap<NodeKey, f32>,
+    node_sizes: HashMap<uuid::Uuid, f32>,
     /// Per-node custom sprite faces: the imported image as a PNG data-URI. A node here
     /// renders with [`Face::Sprite`] (set together via [`set_node_sprite`]); absent means no
     /// sprite. Persisted in the cartography sidecar. (Node body & face — sprite face.)
-    node_sprites: HashMap<NodeKey, String>,
+    node_sprites: HashMap<uuid::Uuid, String>,
     /// Per-node sprite collider hulls: the sprite's opaque region as a convex polygon, in
     /// face-normalized coords ([-0.5, 0.5], scaled to `node_size` at collider time). The host
     /// traces it from the image at import, or the user authors it in the shape editor; a node
     /// with one collides at its hull rather than its silhouette, regardless of its face.
     /// Persisted in the cartography sidecar. (Node body & face — the Body axis.)
-    node_sprite_hulls: HashMap<NodeKey, Vec<(f32, f32)>>,
+    node_sprite_hulls: HashMap<uuid::Uuid, Vec<(f32, f32)>>,
     /// Scene-prop sprite textures, keyed by the opaque handle a [`seiche::SceneBodySpec`] carries:
     /// raw RGBA8 (straight alpha) plus dimensions, the [`PaintCmd::DrawImage`] shape (as favicons
     /// use). A scene prop whose `sprite` handle resolves here paints as a textured billboard instead
@@ -575,7 +575,7 @@ pub struct Canvas {
     /// axis. A node absent here takes the default [`seiche::NodeMaterial`] (the spawn values), so
     /// this holds only deliberate overrides. Pushed to physics and persisted in the cartography
     /// sidecar. (Node body & face — material.)
-    node_materials: HashMap<NodeKey, seiche::NodeMaterial>,
+    node_materials: HashMap<uuid::Uuid, seiche::NodeMaterial>,
     /// Scene toggle: when on, a node's face grows with its undirected degree (capped),
     /// so the spatial map reads connection weight at a glance. Default off (uniform).
     /// (P0 resize — size-by-degree.)

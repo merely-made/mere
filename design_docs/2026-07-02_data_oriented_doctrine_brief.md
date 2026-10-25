@@ -4,7 +4,7 @@
 already follows, grounds it in the code, and answers the "should we build one
 literal substrate?" question (no; the doctrine is the unit of reuse, plus a
 short list of cheap cross-cutting instruments that are worth sharing).
-**Date:** 2026-07-02.
+**Date:** 2026-07-02. **Amended:** 2026-10-25, §7 the lifetime axis.
 **Scope:** cross-cutting. Companion to the
 [substrate/parallelism composition brief](2026-06-21_substrate_parallelism_composition_brief.md)
 (which owns the serialization seams this brief leans on) and the
@@ -236,7 +236,211 @@ shared core.
    unconfirmed until Mere's own scripted tiles are shown to run a
    prelude-shaped cost of their own.
 
-## 7. Anti-goals
+## 7. The lifetime axis
+
+Clauses 1 to 6 say what shape a table takes. They say nothing about when its
+rows die, and the stack's tables die on very different schedules. This
+section is the time axis. It began as a note Mark bottled after a
+conversation on 2026-10-25 ("Lifetime Domains for Mere / Vano") and was filed
+here the same day with three corrections the code supplied: the device-epoch
+row (§7.2), death kinds (§7.3) and the crossing rule (§7.4). Its working rule
+is doctrine as [Stack 6](doctrine.md), drawing on the first ruling that
+applied it, `node-body-face-model D1` (§7.7).
+
+### 7.1 Working rule
+
+Classify data by what makes it dead, not mainly by how many milliseconds or
+minutes it exists. Then choose the storage and ownership strategy that makes
+that death condition cheap, explicit, and difficult to violate.
+
+The note read "what *event* makes it dead". It was widened because two of the
+stack's central tables, Nova's heap and the scripted DOM, kill rows by
+unreachability, which no event names (§7.3).
+
+### 7.2 Domains: when it dies
+
+| Domain | Dies when | Typical examples | Good strategies |
+|---|---|---|---|
+| Scratch | A function, traversal, parse, or computation phase ends | parser state, traversal stacks, layout intermediates | stack allocation, small vectors, bump arenas |
+| Task | An operation completes or is cancelled | request state, async commands, protocol operations | owned values, RAII, task-local arenas |
+| Frame | CPU/GPU work associated with a frame is finished | draw lists, upload slices, extracted render state | ring buffers, frame arenas, fences |
+| Device epoch | The GPU device is lost or replaced | buffers, textures, pipelines, bind groups, configured surfaces | tag with the device generation; rebuild on recovery, never reattach |
+| Document / Scene | Individual entities are removed while the containing world remains | DOM-like nodes, graph entities, active projections | generational arenas, slabs, sparse sets, never-reused ids; tracing where death is by reachability |
+| Session | A browsing context, peer session, or similar higher-level activity ends | history, connections, caches, shared runtime state | keyed stores, ref counting, pools, explicit eviction |
+| Durable | A semantic delete or persistent-state transition occurs | graph history, personas, settings, bookmarks, documents | persistent storage, logs, databases; in-memory structures become caches or projections (§6 item 5: persist the log) |
+| Process | Application shutdown | global registries, allocator infrastructure, the wgpu instance | process-owned resources, explicit shutdown |
+
+The device-epoch row is new. The note put the GPU device under Process, but
+cambium-rootstock carries a device generation through every embedding and a
+recovery path that refuses to reattach a lost surface
+([recovery.rs](../crates/cambium/cambium-rootstock/src/recovery.rs),
+[embedding/gpu.rs](../crates/cambium/cambium-rootstock/src/embedding/gpu.rs)).
+Device loss is a death event in the middle of a process, and everything
+allocated against the old device dies with it.
+
+The web-platform resonance holds as the note drew it: function / microtask,
+task, animation frame, document, browsing context / session, persistent
+origin state, browser process. Device loss sits beside it as WebGPU's own
+`GPUDevice.lost`. The mapping need not be exact; the useful property is that
+the stack's lifetime boundaries resemble boundaries the web platform already
+exposes. It is a resemblance, not a nesting (§7.4).
+
+### 7.3 Death kinds: how it dies
+
+The domain says when. The death kind says how, and it is the death kind that
+picks the mechanism.
+
+| Death kind | What happens | Mechanism | Where |
+|---|---|---|---|
+| Collective, at a boundary | Everything in the domain dies at once | bump arena, ring, frame arena: freeing all of it is O(1) | scratch, task, frame, device epoch |
+| Individual, by event | A known removal kills one row; the container lives | slab, generational arena, never-reused ids | document / scene entities; session resources under eviction |
+| Individual, by reachability | Nothing names the death; a collector finds it | tracing GC, reference counting | Nova's heap; the scripted DOM's `collect`, which marks from the document root plus host pins |
+
+The note's caution stands: several domains may share one mechanism (a bump
+arena serves parser scratch and frame construction alike), so the semantic
+boundary comes first and the allocator follows.
+
+### 7.4 The crossing rule
+
+The domains do not nest. A task spans many frames and a frame holds many
+tasks; an entity dies inside its document; a durable record outlives every
+session that touched it. Bugs live at the crossings: frame-arena data held by
+an async task, a scene handle used as the key of durable state (§7.7).
+
+Data that crosses a domain boundary is copied, promoted, or re-acquired
+through a handle of the domain it crosses into. It is never borrowed across.
+Where Rust allows, the shorter domain carries a lifetime parameter, so a
+holder in the longer domain fails to compile. Nova does this already: an
+unrooted `Value<'gc>` is bound to its `GcScope` and dies at the next point
+that may collect, `Scoped<'a, T>` lives until its scope ends, and `Global<T>`
+until it is released (`vano:nova_vm/src/engine/rootable/`, and
+`vano:GARBAGE_COLLECTOR.md`). That is the working rule's "difficult to
+violate", done by the borrow checker.
+
+### 7.5 Identity and its projections
+
+The note's arena / ECS split is clauses 1 and 4 read along the time axis.
+Stable identity lives in an arena and is answered by a handle: *what thing is
+this?* Specialized representations (sparse sets, struct-of-arrays, archetype
+chunks, adjacency stores, render extraction) answer *how should this
+subsystem process it efficiently?* That keeps the arena from becoming the
+entire ECS; it is §5's "no generic substrate" seen from the other side.
+
+One entity holds several lifetimes at once. For one graph node:
+
+```
+persistent identity        → durable
+active graph entity        → document / scene
+layout component           → scene or cache lifetime
+render extraction          → frame
+network serialization      → task
+temporary traversal record → scratch
+```
+
+Prefer *identity is stable; representations are projections with their own
+lifetimes* over *every subsystem must share one ownership and storage model*.
+That lets ECS-style dense processing run where it helps without asking the
+DOM, graph, renderer, networking stack and persistent state to behave like
+one giant ECS.
+
+The graph already holds the first two lines apart. Durable identity is
+`Node.id: Uuid`; the scene handle `NodeKey` is a petgraph `NodeIndex`
+([identity.rs](../crates/graph/graph-kernel/src/graph/identity.rs)). The
+captured delta stream is Uuid-keyed (`ReplayRemoveNodeById` and its kin in
+[capture.rs](../crates/graph/graph-kernel/src/graph/capture.rs)), so the
+durable log never holds a scene handle.
+
+### 7.6 Two meanings of "generation"
+
+The word already does two jobs in this repository. A design says which it
+means.
+
+- **Slot generation** guards identity against reuse. A handle carries it, and
+  a stale handle fails to resolve. The kernel's per-member
+  `SurfaceNodeLifetime` witness
+  ([membership.rs](../crates/graph/graph-kernel/src/graph/membership.rs)) and
+  cambium's `create_generational_view_id` are this kind.
+- **Revision** fences staleness. A cache records it, and a mismatch means
+  rebuild. `Graph::revision`, sceno's scene and score `generation` (the
+  generation of inputs a scene was computed from), cambium-rootstock's device
+  generation and armillary's `Generations`
+  (`armillary:crates/armillary/src/message.rs`) are this kind.
+
+The stack's other answer to slot reuse is to never reuse: the scripted DOM's
+monotonic ids with a document tag in the high bits, cambium's projection
+slots ([multi.rs](../crates/cambium/cambium/src/multi.rs)), and scenotime's
+tombstoned slots.
+
+### 7.7 Case: scene handles keying per-node overrides
+
+petgraph 0.8.3's `StableGraph` puts a removed node's slot at the head of its
+free list and hands it to the next `add_node`, with no generation
+(`stable_graph/mod.rs`, `remove_node` and `add_node`). graphshell's
+`recycled_slot_fixture`
+([canvas_reader/tests.rs](../ports/graphshell/src/canvas_reader/tests.rs))
+asserts the reuse at runtime, and the accessibility path guards against it: a
+produced action carries the member's Uuid beside its key.
+
+pictograph's canvas held five per-node override maps keyed by `NodeKey`:
+`node_faces`, `node_sprites`, `node_sprite_hulls`, `node_materials` and
+`node_sizes`. Their setters took a Uuid and converted it to the key on insert
+([cartography.rs](../crates/canvas/pictograph/src/canvas/cartography.rs)).
+Traced on 2026-10-25, then confirmed by a failing run of
+`removed_node_overrides_do_not_follow_its_reused_slot`
+([tests/node_face.rs](../crates/canvas/pictograph/src/canvas/tests/node_face.rs)).
+Before the fix:
+
+- Nothing prunes these maps when a node is removed; only a full reset clears
+  them ([lifecycle.rs](../crates/canvas/pictograph/src/canvas/lifecycle.rs)).
+  `reconcile_derived` prunes other maps (pins, grammar, mosaic, positions) by
+  presence, which a reused slot passes.
+- The `clear_*` setters resolve by Uuid, so once a node is gone its entries
+  cannot be cleared by name.
+- `ingest_graph` sees a reused slot through the lifetime witness, but uses it
+  only to seed positions.
+- `cartography_geometry` exports the maps by mapping each key to
+  `graph.get_node(key).id`. An orphan is filtered out while its slot is empty.
+  Once the slot is reused, it exports under the new member's Uuid into the
+  cartography sidecar.
+
+Observed failure: remove a node that has a sprite face and a material, add a
+node through `ingest_graph`, and the new node takes the reused slot with the
+old sprite, the `Sprite` face and the old material, while
+`cartography_geometry` exports the sprite and the material under the new
+node's Uuid. That is the crossing rule broken in a concrete case, a scene
+handle keying state that is promoted into the durable domain. Paths that
+reached it included any host removal through `ingest_graph` (the fixture's
+own path) and the link-suggestion pass, which removes stale derived nodes and
+adds seeds in the same pass.
+
+Ruling, 2026-10-25, recorded as `node-body-face-model D1` in the
+[node body & face plan](mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md):
+"Uuid keys, pruned", over keeping `NodeKey` and pruning by the lifetime
+witness. The five maps now key by member Uuid, reads go slot to
+member through `member_of`, and `reconcile_derived` drops members that left;
+the sidecar export no longer translates. The test passes, with pictograph's
+canvas lib suite (619 passed, 18 ignored). `node_shapes` is still
+`NodeKey`-keyed: the host replaces it wholesale on each push, so a reused slot
+can carry the old silhouette only until the next push. Not fixed.
+
+### 7.8 Practical default
+
+```
+scratch computation   → bump / stack
+async operation       → owned task state
+frame pipeline        → ring
+device resources      → device-generation tag, rebuilt on recovery
+active entities       → generational arena, or never-reused ids
+hot component loops   → sparse-set / SoA / archetypes
+reachability-bound    → tracing collector over named roots
+session resources     → keyed ownership + eviction
+durable state         → persistent store + projections
+```
+
+The storage strategy follows the data's death condition and access pattern,
+not allegiance to a particular allocator or paradigm.
+
+## 8. Anti-goals
 
 - No generic substrate crate; no porting existing layers onto one (§5).
 - No editing or serializing a derived `out` index anywhere; if a design needs
