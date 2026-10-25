@@ -66,6 +66,7 @@ members = [
     "crates/graphshell/graphshell-client",
     "crates/graphshell/graphshell-endpoint",
     "crates/graphshell/graphshell-host",
+    "crates/graphshell/graphshell-mcp",
     "ports/graphshell",
     "ports/graphshell/mere",
     "ports/djinn",

@@ -7114,6 +7114,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "graphshell-mcp"
+version = "0.0.1"
+dependencies = [
+ "chirograph",
+ "graphshell-endpoint",
+ "sceno",
+ "scenotime",
+ "serde_json",
+]
+
+[[package]]
 name = "graphshell-mere"
 version = "0.0.2"
 dependencies = [
