@@ -44,9 +44,9 @@ with `cargo tree -p djinn`.
 | emissary, arti | absent | absent | absent | absent | `emissary` only in Murm's `murm-i2p`; no manifest in the family repos read names `arti` | none needed |
 | mere-transport, iroh, iroh-blobs, snow, quinn | linked | linked | linked | **absent** | `turnstone`, `distillery`, `graphshell-host`, `mere-mesh`, `knot-editor`, `djinn` | `Transport` trait with an in-memory implementation |
 | mere-p2panda-net | linked | linked | linked | absent | `stickleback`, `mere-transport`, `mere-mesh`, `knot-editor` | `stickleback` without its net half |
-| murm-webrtc (`mere-webrtc-carrier` before the 2026-10-25 rename; Turnstone and Knot still lock the old name) | linked | linked | linked | absent | `graphshell-host` (default `webrtc-join`) | `graphshell-host` carriers as features |
-| netfetcher, reqwest, hyper | linked | linked | linked | **absent** | `mere-fetch` (unconditional), `mere-document-lanes` | netfetcher as the HTTP contract, behind `mere-fetch`'s own feature |
-| errand and every smolweb protocol client | linked | linked | linked | linked | `nematic`, `mere-fetch`, `mere-document-lanes`, `turnstone` (`feed.rs`) | errand split into grammar and clients |
+| murm-webrtc (`mere-webrtc-carrier` before the 2026-10-25 rename) | linked | linked | linked | absent | `graphshell-host` (default `webrtc-join`) | `graphshell-host` carriers as features |
+| netfetcher, reqwest, hyper | linked | linked | linked | **absent** | `mere-fetch` (unconditional), `mere-lanes` (was `mere-document-lanes`) | netfetcher as the HTTP contract, behind `mere-fetch`'s own feature |
+| errand and every smolweb protocol client | linked | linked | linked | linked | `nematic`, `mere-fetch`, `mere-lanes` (was `mere-document-lanes`), `turnstone` (`feed.rs`) | errand split into grammar and clients |
 | gemini-protocol (server), spartan, rustls, rcgen | linked | linked | linked | linked | `knot-site`, `djinn` | a loopback `serve` feature in `knot-site` |
 | script engines (boa, nova/vano, piccolo) | absent unless `piccolo` | absent | absent | absent | `script-engine-api` adapters | already behind `script-engine-api` |
 | CEF, WebView2, Servo | absent unless `weld` / `scry` / `servo` | absent | absent | absent | inker adapters | already behind inker's reader routing |
