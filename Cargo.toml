@@ -27,6 +27,7 @@ members = [
     "crates/forme/uxtree",
     "crates/domain/apparatus",
     "crates/domain/personal-facts",
+    "crates/domain/personal-facts/shim",
     "crates/domain/site",
     "crates/platen/platen",
     "crates/fleece",
@@ -481,7 +482,7 @@ uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
 site-model = { package = "mere-site", version = "0.1.0", path = "crates/domain/site" }
-personal-facts = { package = "mere-personal-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
+personal-facts = { package = "mere-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus", default-features = false }
 eidetic = { version = "0.0.2", default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
@@ -664,7 +665,9 @@ all = "warn"
 mere-site = { path = "crates/domain/site" }
 # Promoted sources shared with immutable older Mere suppliers.
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
-mere-personal-facts = { path = "crates/domain/personal-facts" }
+# Cleromancy cores before its rename name the facts crate by its old
+# package name; the shim re-exports `mere-facts` so both resolve to one type.
+mere-personal-facts = { path = "crates/domain/personal-facts/shim" }
 murm = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 cambium = { path = "crates/cambium/cambium" }
 cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
