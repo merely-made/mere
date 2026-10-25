@@ -1,9 +1,16 @@
 # alembic
 
-Founding reservation for **Alembic**, the recall and workshop component of
+**Alembic** is the recall and workshop component of
 Distillery, the Mere platform's works. Ruled a port of its own 2026-08-22 and
 re-ruled into Distillery 2026-09-02; the distinction survives as a component
 boundary.
+
+**Status (2026-10-24):** the recall memory-level model is implemented; the
+workshop remains a design. The [Alembic plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+owns its first workflow: assemble an evidence brief from retained passages in
+Turnstone and Graphshell, review it, and apply it through each destination's
+owner. Servitor remains in Eidetic and supplies admission/run semantics;
+Armillary supplies execution. No two-host workshop acceptance is claimed.
 
 An alembic is the still that sits on the athanor's constant low heat: what
 distils is what the furnace has been holding. This port is that pair for your

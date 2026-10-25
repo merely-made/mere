@@ -1,6 +1,6 @@
 # athanor
 
-Founding reservation for **Athanor**, the distillation furnace of Distillery,
+**Athanor** is the distillation furnace of Distillery,
 the Mere platform's works.
 
 An athanor is the furnace that holds a constant low heat for as long as the
@@ -27,7 +27,15 @@ works themselves. It sits beside Alembic as `ports/distillery/athanor`; the
 package is `mere-athanor` and the library keeps the name.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
-`ports/distillery/athanor`. No implementation yet.
+`ports/distillery/athanor`.
+
+**Status (2026-10-24):** forgetting, consolidation, image-reference cleanup
+and retirement proposal logic are implemented. The general workshop service,
+its driver and two-host controls remain unbuilt. The [Alembic plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+owns their integration and the first retained-passage evidence-brief workflow.
+Athanor persists domain decisions and drives Servitor's existing reducer;
+an Armillary adapter performs admitted work and reports execution completion.
+Each destination owner separately acknowledges its accepted effects.
 
 ## License
 

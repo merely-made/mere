@@ -1,6 +1,12 @@
 # Graph Behaviors Plan: watches, cascades, and the reactive participant
 
 **Date:** 2026-08-13
+**Workshop reconciliation (2026-10-24):** [Alembic section 5](2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+owns workshop composition and the first retained-passage evidence-brief
+workflow in Turnstone and Graphshell. Servitor remains in Eidetic; this plan
+owns reusable admission/run semantics and the later R2/R3 contracts. Armillary
+executes work without owning permission, retry or reconciliation decisions.
+The new workshop workflow is specified, not implemented or qualified.
 **Redesign status (2026-10-06):** the Servitor resident/run design in
 [section 8](#8-servitor-resident-and-run-redesign-2026-09-20) extends the landed
 behavior primitives. R1a admission, the R1b reducer and the Turnstone adapter
@@ -485,9 +491,10 @@ not automation).
 
 ## 8. Servitor resident and run redesign (2026-09-20)
 
-**Status:** proposed design, grounded in current consumers. The user reopened
-crate boundaries after the procedural-graphs discussion; this section records
-the recommended design rather than treating the old boundaries as fixed.
+**Status (2026-10-24):** R1a/R1b are implemented; R2/R3 remain proposed.
+Servitor now lives in Eidetic and stays there. The user reopened crate
+boundaries after the procedural-graphs discussion; the design below retains
+runtime-free semantics and independent authority consumers.
 *Participant* names admission through the gate; *servitor* names a resident
 helper. *Denizen* belongs to the Isometry simulation family.
 
@@ -498,7 +505,7 @@ exist at mere `535bca11`).
 
 ### 8.1 Findings and the boundary to move
 
-The current `crates/servitor/src/lib.rs` exports authority, watch, tick,
+The current `repos/eidetic/crates/servitor/src/lib.rs` exports authority, watch, tick,
 cascade and deadband primitives. The cascade's runner closure leaves body
 execution to the host. Turnstone's `turnstone/src/denizen.rs` owns resident bindings and
 reconstruction; `turnstone/src/app/denizen_arms.rs` selects a script/component, evaluates
@@ -506,12 +513,14 @@ it, applies the deadband, and lowers returned actions. Its
 `turnstone/src/app/palette.rs` attributes those actions to the participant. These are
 real script consumers, not proof of a durable model-driven run.
 
-Move **the meaning and state of a resident run** into Servitor: its cause,
+Servitor owns **the meaning and state of a resident run**: its cause,
 version bindings, decision/effect sequencing, pause and termination reasons,
 budgets, and procedure adoption. The host supplies observation, execution,
 persistence, and product actions through explicit adapters. A pure reducer
-consumes recorded inputs and produces requests; it does not own a thread or
-perform I/O. Armillary can drive it, as can a deterministic scenario harness.
+consumes recorded inputs and reconstructs state; it produces no executable
+request and performs no I/O. A host driver using Armillary can drive it, as
+can a deterministic scenario harness. Alembic/Athanor own the workshop's
+installed definitions, lifecycle persistence, review and orchestration.
 
 Two recovery seams need attention before resumable automation: Turnstone's
 `turnstone/src/behaviors.rs` advances the graph cursor before running bodies, and
@@ -523,16 +532,17 @@ distinguishable before R1 admits resumed work.
 
 | Owner | Responsibility after the proposed change |
 | --- | --- |
-| Servitor | Resident and run records; trigger/run coordination; procedure schema and local retrieval; optional guidance protocol; candidate evaluation requirements and adoption rules |
+| Servitor | Resident/run contracts and recorded-event reduction; trigger semantics; optional procedure schema/retrieval, evaluation contracts and adoption invariants |
 | Servitor authority modules | Existing participant checks and Chartulary petition adapter, independently callable by scripts and peers |
 | Personae / capability | Identity, signed delegation, revocation and permission algebra |
-| Chartulary / Eidetic | Graph and journal primitives, artifact storage, provenance and retrieval substrates; Servitor defines its record semantics |
-| Armillary | Actor threads, channels and message delivery; Servitor decides whether retrying or accepting a late result is valid |
+| Chartulary / Eidetic | Graph and journal primitives, artifact storage, provenance and retrieval substrates; Servitor defines generic run semantics and the workshop defines its domain records |
+| Armillary | Actor threads, channels, message delivery, task cancellation and completion; Servitor decides whether retrying or accepting a late result is valid |
 | ESP | Model execution and provider-specific streaming/cancellation; it supplies neither resident authority nor run policy |
-| Host / Djinn | Product registry and effect handlers, graph adapters, installation, settings, process lifetime and storage composition |
+| Alembic / Athanor | Workshop definitions and installed bindings, owner decisions, selected revisions, persisted lifecycle/run records, proposals and host driver composition; target owners retain effect authority |
+| Host / Djinn | Product action/effect adapters, process lifetime, service scheduling and storage composition; no duplicate workshop run policy |
 | Distillery | Optional compute for refinement/evaluation jobs; the resident's owner determines the adoption policy |
 
-Start with module boundaries in the existing Servitor crate. Authority-only
+Keep module boundaries in the existing Servitor crate in Eidetic. Authority-only
 consumers such as Gemot and document-host must not acquire an ESP, model,
 thread-runtime or host dependency. Feature-gate integration adapters if they
 become necessary. Extract another crate only when dependency direction or a
@@ -653,8 +663,10 @@ Refinement creates an inert candidate artifact citing its base version and
 supporting runs. Servitor defines a versioned evaluation request and result
 schema: task/fixture set, provider and registry identities, settings, success,
 refusal, repetition and resource measurements. Distillery may execute it;
-Eidetic retains evidence. The host's adopted policy chooses explicit review or
-bounded automatic adoption with declared thresholds. Compare-and-adopt checks
+Eidetic retains evidence. The owner's adopted policy chooses explicit review or
+bounded automatic adoption with declared thresholds. In the workshop,
+Athanor persists that choice and the selected revision; Servitor specifies
+the reusable validation invariants. Compare-and-adopt checks
 the current binding version, evidence applicability and adoption authority.
 Rejection remains recorded; a delayed result cannot overwrite a newer adopted
 version. Active runs keep their pinned versions. Adoption cannot rewrite grants
@@ -687,10 +699,10 @@ or bypass the independently enforced authority path.
    evaluation is outstanding. Never claim statistical improvement from one
    deterministic fixture or reuse validation tasks as the final test set.
 
-R1a and R1b are the current source implementation slices. R2/R3 describe the extension
-points it must leave available, not requirements to implement all learning
-machinery before one resident runs. Executable gates remain pending the user's
-existing Cargo and process hold.
+R1a and R1b are implemented and have executable receipts recorded below;
+correlated effect completion and graph durability remain consumer boundaries.
+R2/R3 describe later extension points. They do not gate the deterministic
+two-host workshop workflow specified in the Alembic plan.
 
 ### 8.6 R1a source implementation and remaining gates
 
@@ -799,6 +811,13 @@ regression execution held here have since run (mere `0e031fa5`; Turnstone
 `5d2c910` and `f3f8e3d`; see §8.6).
 
 ## Progress
+
+- **2026-10-24:** reconciled the shared admission/run boundary with the
+  Alembic workshop. Servitor stays in Eidetic; Athanor owns persisted workshop
+  decisions and composes an Armillary host driver. The Alembic plan owns the
+  first two-host workflow and its new acceptance gates. Corrected the reducer
+  description to recorded-state reduction without executable requests; no
+  source or prior qualification scope changes are claimed.
 
 - **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
   mere 535bca11, from the D2 record in
