@@ -23,6 +23,8 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
+- [Stack modularity map](mere_docs/technical_architecture/2026-10-25_stack_modularity_map.md): which concrete transports and engines Turnstone, Djinn and Knot link by default, the contract each should sit behind, and what is wrong with the seams; Turnstone's Retinue link is now the opt-in `nomadnet` feature and Knot desktop's offline profile is checked in CI.
+
 - [Application-defined contextual navigation](mere_docs/implementation_strategy/2026-10-23_contextual_navigation_plan.md): shared Cambium history and controls received by Woodshed and Knot; app-owned ancestry and restoration preserve playback and live edits, with native qualification tracked separately.
 
 - [Shared site model, revision storage and Moot publication](mere_docs/implementation_strategy/2026-10-20_shared_site_model_plan.md): portable V1 snapshots shared by Knot and Djinn; optional checkpoints and governed native Gemini/Scroll/Micron hosting; MIME-preserving receiving and Turnstone's native browser/controller proof are qualified, with client limits and headed interaction separate.
