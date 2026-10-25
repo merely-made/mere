@@ -36,7 +36,7 @@ fn wide_and_narrow_frames_keep_real_theme_identity_and_mode_controls() {
                 let root = roots[0];
                 assert!(
                     dom.attributes(root)
-                        .any(|a| a.name.local.as_ref() == "data-theme-definition" && a.value == id)
+                        .any(|a| &*a.name.local == "data-theme-definition" && a.value == id)
                 );
                 assert_eq!(dom.all_with_class(root, "workspace-pane-header").len(), 6);
                 root

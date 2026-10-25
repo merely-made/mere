@@ -1614,7 +1614,7 @@ fn collect_class(dom: &ScriptedDom, node: NodeId, class: &str, out: &mut Vec<Nod
 fn collect_named(dom: &ScriptedDom, node: NodeId, name: &str, out: &mut Vec<NodeId>) {
     if dom
         .element_name(node)
-        .is_some_and(|qualified| qualified.local.as_ref() == name)
+        .is_some_and(|qualified| &*qualified.local == name)
     {
         out.push(node);
     }
@@ -2023,7 +2023,7 @@ fn assert_initial_surface(dom: &ScriptedDom, root: NodeId, width: CatalogWidth) 
         assert!(
             find_where(dom, angle_strip, &|dom, node| {
                 dom.element_name(node)
-                    .is_some_and(|name| name.local.as_ref() == "p")
+                    .is_some_and(|name| &*name.local == "p")
                     && node_text(dom, node) == caption
             })
             .is_some(),
