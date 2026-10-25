@@ -1062,7 +1062,7 @@ dependencies = [
  "bitflags 2.13.2",
  "cexpr",
  "clang-sys",
- "itertools 0.12.1",
+ "itertools 0.11.0",
  "log",
  "prettyplease 0.2.37",
  "proc-macro2",
@@ -2759,7 +2759,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4572,7 +4572,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5211,7 +5211,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "az",
  "byteorder",
@@ -5223,7 +5223,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "az",
  "byteorder",
@@ -5453,7 +5453,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "errand"
 version = "0.4.0"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "finger-protocol",
  "gemini-protocol",
@@ -5478,7 +5478,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5704,7 +5704,7 @@ checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
 [[package]]
 name = "finger-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "tokio",
@@ -6129,7 +6129,7 @@ dependencies = [
 [[package]]
 name = "gemini-protocol"
 version = "0.1.7"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "ring",
@@ -6972,7 +6972,7 @@ dependencies = [
 [[package]]
 name = "gopher-protocol"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "tokio",
@@ -7271,7 +7271,7 @@ dependencies = [
 [[package]]
 name = "guppy-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "percent-encoding",
@@ -8417,7 +8417,7 @@ dependencies = [
  "bytes",
  "cfg_aliases",
  "chrono",
- "constant_time_eq 0.4.2",
+ "constant_time_eq 0.1.5",
  "data-encoding",
  "derive_more",
  "genawaiter",
@@ -8974,15 +8974,28 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
 dependencies = [
- "knot-file-catalog",
+ "knot-catalog",
+]
+
+[[package]]
+name = "knot-catalog"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+dependencies = [
+ "muniment",
+ "pollster 0.4.0",
+ "serde",
+ "serde_json",
+ "uuid",
+ "zeroize",
 ]
 
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9002,13 +9015,13 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
 dependencies = [
  "cambium",
  "illume",
  "inker",
  "knot-editor-host",
- "mere-source-edit",
+ "mere-edit",
  "mere-surface-api",
  "nematic",
  "same-file",
@@ -9019,7 +9032,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9033,9 +9046,9 @@ dependencies = [
  "insigne",
  "jotdown",
  "knot-capture",
+ "knot-catalog",
  "knot-composition",
  "knot-document",
- "knot-file-catalog",
  "mere-fetch",
  "mere-overmap",
  "mere-p2panda-net",
@@ -9087,22 +9100,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "knot-file-catalog"
-version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
-dependencies = [
- "muniment",
- "pollster 0.4.0",
- "serde",
- "serde_json",
- "uuid",
- "zeroize",
-]
-
-[[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#4dafff1f591c18a5b4d20e987054722d01406613"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10310,14 +10310,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-source-edit"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/mere.git?rev=70deef2c8cf3d3410ae35b496a9396514070b24f#70deef2c8cf3d3410ae35b496a9396514070b24f"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "mere-surface-api"
 version = "0.1.0"
 dependencies = [
@@ -10327,7 +10319,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10506,7 +10498,7 @@ dependencies = [
 [[package]]
 name = "misfin"
 version = "0.0.4"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "rcgen 0.13.2",
@@ -10662,7 +10654,7 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "async-trait",
  "blake3",
@@ -10685,7 +10677,7 @@ dependencies = [
 [[package]]
 name = "murm-webrtc"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -10702,7 +10694,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11233,7 +11225,7 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 [[package]]
 name = "nex-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "log",
  "percent-encoding",
@@ -11460,7 +11452,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -12424,7 +12416,7 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "hkdf 0.13.0",
  "retinue",
@@ -13729,7 +13721,7 @@ dependencies = [
  "combine",
  "downcast-rs 2.0.2",
  "dyn-clone",
- "hashbrown 0.17.1",
+ "hashbrown 0.13.2",
  "hi_sparse_bitset",
  "indexmap",
  "inventory",
@@ -13968,7 +13960,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -14396,7 +14388,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -14443,7 +14435,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "embedded-graphics",
 ]
@@ -14451,7 +14443,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -15107,7 +15099,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -15397,7 +15389,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -15465,7 +15457,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -15687,7 +15679,7 @@ dependencies = [
 [[package]]
 name = "scroll-protocol"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "gemini-protocol",
  "tokio",
@@ -15865,7 +15857,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 
 [[package]]
 name = "semver"
@@ -15886,7 +15878,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -16580,7 +16572,7 @@ dependencies = [
 [[package]]
 name = "spartan-protocol"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e6debc61102ea219cced245d0abccb658"
+source = "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
 dependencies = [
  "idna",
  "log",
@@ -17253,7 +17245,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -17299,7 +17291,7 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8c27177b12a6399ffc08b98f76f7c9a1f4fe9fc967c784c5a071fa8d93cf7e1"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -17974,7 +17966,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#a51d3bbb52f3d3793ab49dd075ceb778eb5de018"
+source = "git+https://github.com/merely-made/murm.git?branch=main#6a5ba40b40b6bf781285fd2824eac7c956c5a000"
 dependencies = [
  "selvage",
  "serial2-tokio",
@@ -19702,7 +19694,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
