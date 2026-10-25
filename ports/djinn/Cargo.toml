@@ -292,6 +292,8 @@ insigne = { workspace = true, features = ["verify"] }
 # The identity endpoint's tests read its cards back as a client does; the
 # dialable host's tests drive the route panel over the native line pump.
 graphshell-client = { workspace = true, features = ["pump"] }
+# The MCP adapter, served over a live mere route in `resident_mere`'s tests.
+graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 # The route adapter's test in `resident_mere`: `mere-overmap`'s route panel, the
 # mere view's model it fills, and the kernel's relations to fill it with.
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }

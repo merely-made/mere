@@ -89,5 +89,11 @@ outbound half of the same boundary.
   observed epoch and revision. The server holds no key: `mere-mcp --app <id> --route
   mere/<domain>` is admitted by djinn's door, which attributes accepted edits to the persona
   via that app. 17 tests against a route that behaves like djinn's; `claude mcp list`
-  connects. Not yet run against a live resident. Prompts, subscriptions and HTTP are not
+  connects. Prompts, subscriptions and HTTP are not
   built. The consume half is untouched.
+- **2026-10-25, served over djinn's real mere route.** `resident_mere::tests::mcp` (3 tests)
+  runs the adapter over the reservoir, route grants and session item: an unadmitted app
+  reaches no mere; an admitted agent applies an edit through `mere_invoke`, reads it back and
+  undoes it, with the stored change naming the app the door admitted; a malformed edit is
+  refused and changes nothing; the ambient route advertises no edit. The socket path
+  (`AppRouteCarrier` to a running djinn) and a model-driven session are still unrun.

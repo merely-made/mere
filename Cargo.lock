@@ -4694,6 +4694,7 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
+ "graphshell-mcp",
  "incipit",
  "insigne",
  "iroh",
