@@ -210,6 +210,9 @@ fn hidden_retained_input_refuses_mutation_while_commands_still_advance() {
     );
     surface.set_visible(true).unwrap();
     surface.try_frame(128, 96).unwrap();
+    let resumed: Vec<_> = std::iter::from_fn(|| surface.poll_event()).collect();
+    assert!(resumed.iter().any(|event| matches!(event.event, Event::TextInput(Some(_)))),
+        "reopened retained editor publishes its geometry");
     let projection = surface.as_ref().accessibility_projection().unwrap();
     assert!(
         projection
@@ -220,10 +223,9 @@ fn hidden_retained_input_refuses_mutation_while_commands_still_advance() {
     surface
         .input(Input::Document(SessionInput::Focus(true)))
         .unwrap();
-    assert!(matches!(
-        surface.poll_event().unwrap().event,
-        Event::DocumentInput(_)
-    ));
+    let focused: Vec<_> = std::iter::from_fn(|| surface.poll_event()).collect();
+    assert!(focused.iter().any(|event| matches!(event.event, Event::DocumentInput(_))),
+        "geometry observations cannot hide the accepted input outcome");
     surface.set_visible(false).unwrap();
     surface.retire().unwrap();
     assert!(matches!(
@@ -725,4 +727,140 @@ fn pool_visual_mutations_have_revisions_independent_of_layout_admission() {
     assert!(pool.paint_revision(&1).unwrap() > after_extension);
     pool.remove_content(&1);
     assert!(pool.paint_revision(&1).is_none());
+}
+
+
+/// Exercise the real retained producer with semantic publication disabled.
+/// Hosts may read the published observation without consuming events twice.
+#[test]
+fn retained_text_input_geometry_publishes_without_semantics_and_retires_in_order() {
+    fn drain(controller: &mut PeltController<netrender::Scene>) -> Vec<Envelope> {
+        std::iter::from_fn(|| controller.poll_cue_event()).collect()
+    }
+    fn focus(controller: &mut PeltController<netrender::Scene>) {
+        let projection = controller.session().accessibility_projection().unwrap();
+        let field = projection.nodes().iter().find(|node| node.value.as_deref() == Some("hello")).unwrap();
+        assert!(controller.session_mut().dispatch_accessibility_action(&DocumentA11yActionRequest {
+            revision: projection.revision(), target: field.id,
+            action: inker::DocumentA11yAction::Focus, data: None,
+        }));
+    }
+    let mut controller = controller();
+    controller.try_frame(300, 200).unwrap();
+    assert!(controller.text_input_state().is_none());
+    focus(&mut controller);
+    controller.try_frame(300, 200).unwrap();
+    let initial = controller.text_input_state().unwrap().clone();
+    assert!(initial.caret.width > 0.0 && initial.caret.height > 0.0);
+    let events = drain(&mut controller);
+    assert!(events.iter().any(|e| matches!(&e.event, Event::TextInput(Some(s)) if s == &initial)));
+    assert!(!events.iter().any(|e| matches!(e.event, Event::Semantics { .. })));
+    controller.cue_surface_mut().try_frame(300, 200).unwrap();
+    assert!(drain(&mut controller).is_empty(), "unchanged geometry is deduplicated");
+    controller.cue_surface_mut().dispatch(SessionInput::Ime(SessionIme::Preedit {
+        text: "仮".into(), selection: Some((0, 3)),
+    })).unwrap();
+    assert!(controller.text_input_state().is_none());
+    controller.try_frame(300, 200).unwrap();
+    assert_eq!(controller.text_input_state().unwrap().selection_utf16, initial.selection_utf16);
+    drain(&mut controller);
+    controller.cue_surface_mut().dispatch(SessionInput::Ime(SessionIme::Commit("😀".into()))).unwrap();
+    assert!(controller.text_input_state().is_none());
+    controller.try_frame(300, 200).unwrap();
+    assert_eq!(controller.text_input_state().unwrap().selection_utf16.0, initial.selection_utf16.0 + 2);
+    drain(&mut controller);
+    controller.cue_surface_mut().set_viewport(Viewport { width: 600, height: 400, scale: 2.0 }).unwrap();
+    assert!(controller.text_input_state().is_none());
+    controller.cue_surface_mut().try_frame(300, 200).unwrap();
+    let logical = controller.text_input_state().unwrap().clone();
+    drain(&mut controller);
+    let request = controller.cue_surface_mut().request(RequestId(1), Command::Zoom(2.0)).unwrap();
+    controller.cue_surface_mut().advance(Duration::ZERO).unwrap();
+    assert!(controller.text_input_state().is_none());
+    controller.try_frame(300, 200).unwrap();
+    assert!((controller.text_input_state().unwrap().caret.height - logical.caret.height * 2.0).abs() < 1.0);
+    assert!(drain(&mut controller).iter().any(|e| matches!(e.event, Event::Completed { request: r, .. } if r == request)));
+    controller.cue_surface_mut().set_visible(false).unwrap();
+    assert!(controller.text_input_state().is_none());
+    assert!(drain(&mut controller).iter().any(|e| matches!(e.event, Event::TextInput(None))));
+    controller.cue_surface_mut().set_visible(true).unwrap();
+    // A hidden receiver's old geometry cannot reappear without a new frame.
+    assert!(controller.text_input_state().is_none());
+    controller.cue_surface_mut().try_frame(300, 200).unwrap();
+    drain(&mut controller);
+    let scope = controller.cue_surface().scope();
+    // Focus is retained by this producer's visibility operation; if usable,
+    // retirement must clear it before settling accepted requests.
+    let had_editor = controller.text_input_state().is_some();
+    let pending = controller.cue_surface_mut().request(RequestId(2), Command::Reload).unwrap();
+    controller.cue_surface_mut().retire().unwrap();
+    assert!(controller.text_input_state().is_none());
+    let retired = drain(&mut controller);
+    assert!(retired.iter().all(|e| e.scope == scope));
+    assert!(retired.windows(2).all(|e| e[0].sequence < e[1].sequence));
+    if had_editor { assert!(matches!(retired.first().unwrap().event, Event::TextInput(None))); }
+    assert!(matches!(retired.last().unwrap().event, Event::Completed { request, result: Err(Error::Retired) } if request == pending));
+}
+
+#[test]
+fn legacy_retained_typing_does_not_stall_when_shared_observations_are_unconsumed() {
+    let mut controller = controller();
+    controller.try_frame(300, 200).unwrap();
+    let projection = controller.session().accessibility_projection().unwrap();
+    let field = projection.nodes().iter().find(|node| node.value.as_deref() == Some("hello")).unwrap();
+    assert!(controller.session_mut().dispatch_accessibility_action(&DocumentA11yActionRequest {
+        revision: projection.revision(), target: field.id,
+        action: inker::DocumentA11yAction::Focus, data: None,
+    }));
+    controller.try_frame(300, 200).unwrap();
+    for _ in 0..150 {
+        assert!(controller.input(SessionInput::Text("x".into())).handled);
+        controller.try_frame(300, 200).unwrap();
+    }
+    let projection = controller.session().accessibility_projection().unwrap();
+    assert!(projection.nodes().iter().any(|node| node.value.as_deref()
+        .is_some_and(|value| value == format!("{}hello", "x".repeat(150)))));
+    assert!(controller.text_input_state().is_none(), "unavailable publication cannot retain old geometry");
+    let events: Vec<_> = std::iter::from_fn(|| controller.poll_cue_event()).collect();
+    assert!(events.iter().any(|event| matches!(event.event, Event::TextInput(None))));
+    assert_eq!(controller.text_input_state().unwrap().selection_utf16, (150,150));
+}
+
+
+#[test]
+fn unclaimed_legacy_observations_expire_but_accepted_requests_keep_their_final_stream() {
+    fn focus(controller: &mut PeltController<netrender::Scene>) {
+        controller.try_frame(300, 200).unwrap();
+        let projection = controller.session().accessibility_projection().unwrap();
+        let field = projection.nodes().iter().find(|node| node.value.as_deref() == Some("hello")).unwrap();
+        assert!(controller.session_mut().dispatch_accessibility_action(&DocumentA11yActionRequest {
+            revision: projection.revision(), target: field.id,
+            action: inker::DocumentA11yAction::Focus, data: None,
+        }));
+        controller.try_frame(300, 200).unwrap();
+        assert!(controller.text_input_state().is_some());
+    }
+    fn replace(controller: &mut PeltController<netrender::Scene>, address: &str) {
+        controller.open(SessionSpawnRequest::new(address).with_body(HTML).with_content_type("text/html"));
+    }
+    let mut controller = controller();
+    // The legacy host has neither requested a control nor polled an event.
+    for n in 0..20 {
+        focus(&mut controller);
+        assert!(!controller.cue_surface().shared_stream_claimed());
+        replace(&mut controller, &format!("https://held.example/{n}"));
+    }
+    assert!(controller.poll_cue_event().is_none(), "unseen retired metadata cannot accumulate behind legacy navigation");
+    focus(&mut controller);
+    let scope = controller.cue_surface().scope();
+    let request = controller.cue_surface_mut().request(RequestId(1), Command::Reload).unwrap();
+    // Acceptance claims the stream even before the caller's first poll.
+    replace(&mut controller, "https://held.example/claimed");
+    let events: Vec<_> = std::iter::from_fn(|| controller.poll_cue_event()).collect();
+    assert!(events.iter().all(|event| event.scope == scope));
+    assert!(events.iter().any(|event| matches!(event.event, Event::TextInput(Some(_)))));
+    assert!(events.iter().any(|event| matches!(event.event, Event::TextInput(None))));
+    assert!(matches!(events.last().unwrap().event, Event::Completed {
+        request: completed, result: Err(Error::Retired),
+    } if completed == request));
 }

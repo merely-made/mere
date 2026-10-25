@@ -1,0 +1,7 @@
+{"at_ms":1792864362626,"event":"started","installed":false,"pid":76231,"schema":"djinn.resident-events/v1","version":"0.0.2"}
+{"at_ms":1792864362628,"creating":true,"event":"waiting-for-unlock","pid":76231,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792864363050,"event":"vault-created","pid":76231,"schema":"djinn.resident-events/v1"}
+{"agent":"/Users/markik/Code/output/gs-recovery-20261024-02/local/private/owner/agent.sock","app":"/Users/markik/Code/output/gs-recovery-20261024-02/local/private/owner/app.sock","at_ms":1792864363383,"browser":"/Users/markik/Code/output/gs-recovery-20261024-02/local/private/owner/browser.sock","event":"listening","pid":76231,"schema":"djinn.resident-events/v1","ticket":null}
+{"at_ms":1792864363384,"event":"ready","pid":76231,"schema":"djinn.resident-events/v1"}
+{"at_ms":1792864417704,"event":"stopping","pid":76231,"reason":"stop intent","schema":"djinn.resident-events/v1"}
+{"at_ms":1792864418203,"event":"stopped","ok":true,"pid":76231,"reason":"stop intent","schema":"djinn.resident-events/v1"}

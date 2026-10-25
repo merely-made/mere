@@ -122,104 +122,8 @@ pub struct ScopeVisit<P, A> {
     pub anchor: Option<A>,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ScopeNavigation<P, A> {
-    entries: Vec<ScopeVisit<P, A>>,
-    cursor: usize,
-    remembered: Vec<ScopeVisit<P, A>>,
-}
-impl<P, A> Default for ScopeNavigation<P, A> {
-    fn default() -> Self {
-        Self {
-            entries: Vec::new(),
-            cursor: 0,
-            remembered: Vec::new(),
-        }
-    }
-}
-impl<P: Clone + PartialEq, A: Clone> ScopeNavigation<P, A> {
-    pub fn current(&self) -> Option<&ScopeVisit<P, A>> {
-        self.entries.get(self.cursor)
-    }
-    pub fn visits(&self) -> impl Iterator<Item = &ScopeVisit<P, A>> {
-        self.entries.iter().chain(&self.remembered)
-    }
-    pub fn destination(&self, forward: bool) -> Option<&ScopeVisit<P, A>> {
-        let index = if forward {
-            self.cursor.checked_add(1)?
-        } else {
-            self.cursor.checked_sub(1)?
-        };
-        self.entries.get(index)
-    }
-    pub fn remember(&mut self, visit: ScopeVisit<P, A>) {
-        self.remembered.retain(|v| v.place != visit.place);
-        self.remembered.push(visit);
-        if self.remembered.len() > 64 {
-            self.remembered.remove(0);
-        }
-    }
-    /// The host defines restoration identity. A context can share a document's
-    /// durable anchor while retaining a different camera or contextual parent.
-    pub fn saved_matching(&self, same_scope: impl Fn(&P) -> bool) -> Option<&ScopeVisit<P, A>> {
-        self.remembered.iter().rev().find(|v| same_scope(&v.place))
-    }
-    pub fn capture(&mut self, visit: ScopeVisit<P, A>) {
-        self.remember(visit.clone());
-        if self.entries.is_empty() {
-            self.entries.push(visit);
-            self.cursor = 0;
-        } else {
-            self.entries[self.cursor] = visit;
-        }
-    }
-    pub fn visit(&mut self, visit: ScopeVisit<P, A>) {
-        if self.current().is_some_and(|v| v.place == visit.place) {
-            self.capture(visit);
-            return;
-        }
-        self.entries.truncate(self.cursor + 1);
-        self.entries.push(visit.clone());
-        if self.entries.len() > 128 {
-            self.entries.remove(0);
-        }
-        self.cursor = self.entries.len() - 1;
-        self.remember(visit);
-    }
-    /// Call only after the host admits and restores destination().
-    pub fn step(&mut self, forward: bool) -> bool {
-        if self.destination(forward).is_none() {
-            return false;
-        }
-        if forward {
-            self.cursor += 1;
-        } else {
-            self.cursor -= 1;
-        }
-        true
-    }
-    pub fn validate(
-        &self,
-        valid_place: impl Fn(&P) -> bool,
-        valid_anchor: impl Fn(&A) -> bool,
-    ) -> Result<(), String> {
-        if self.entries.len() > 128
-            || self.remembered.len() > 64
-            || (self.entries.is_empty() && self.cursor != 0)
-            || (!self.entries.is_empty() && self.cursor >= self.entries.len())
-        {
-            return Err("Invalid scope navigation history".into());
-        }
-        if self.entries.iter().chain(&self.remembered).any(|v| {
-            v.camera.is_some_and(|c| !c.valid())
-                || v.anchor.as_ref().is_some_and(|a| !valid_anchor(a))
-                || !valid_place(&v.place)
-        }) {
-            return Err("Invalid scope navigation visit".into());
-        }
-        Ok(())
-    }
-}
+mod history;
+pub use history::{ScopeNavigation, ScopeValue};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScopeDirection {
@@ -342,8 +246,8 @@ pub fn scope_trail<S: 'static, A: 'static, T: Clone + 'static, O: OptionalAction
     scope_trail_with_location_edit(crumbs, true, handler)
 }
 
-/// Hosts without a location editor keep the current crumb as plain text;
-/// accepted ancestor destinations use the same contextual payloads.
+/// Hosts without a location editor render the current place as text. Ancestor
+/// destinations stay actionable; the current label does not claim an edit action.
 pub fn scope_trail_with_location_edit<
     S: 'static,
     A: 'static,
@@ -414,58 +318,86 @@ pub fn scope_location<
 mod tests {
     use super::*;
     #[test]
-    fn a_current_crumb_without_an_editor_has_no_inert_button_and_ancestors_still_navigate() {
+    fn compass_keeps_keyboard_focus_and_exposes_application_destination_hints() {
+        use crate::{DomHandle, GenetAppRunner, Key, KeyEvent, NamedKey, PointerClick};
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::{LayoutDom, LocalName, Namespace};
+        use std::cell::RefCell;
+        #[derive(Default)]
+        struct State {
+            hint: Option<ScopeDirection>,
+            commands: Vec<ScopeDirection>,
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |s: &State| {
+                scope_controls(
+                    ScopeControls {
+                        up: Some("Owning Set".into()),
+                        hint: s.hint,
+                        ..Default::default()
+                    },
+                    |s: &mut State, c: ScopeCommand<()>| match c {
+                        ScopeCommand::Hint(h) => s.hint = h,
+                        ScopeCommand::Navigate(d) => s.commands.push(d),
+                        _ => {},
+                    },
+                )
+            },
+            State::default(),
+        );
+        let buttons = dom.borrow().all_with_class(runner.root(), "shell-control");
+        let name = |node| {
+            dom.borrow()
+                .attribute(node, &Namespace::from(""), &LocalName::from("aria-label"))
+                .map(|s| s.to_string())
+        };
+        let up = buttons.iter().copied()
+            .find(|n| name(*n).as_deref() == Some("Up: Owning Set")).unwrap();
+        let down = buttons.iter().copied()
+            .find(|n| name(*n).as_deref() == Some("Down")).unwrap();
+        runner.set_focus(Some(up));
+        assert_eq!(runner.state().hint, Some(ScopeDirection::Up));
+        assert_eq!(dom.borrow().all_with_class(runner.root(), "scope-tooltip").len(), 1);
+        runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Enter)));
+        assert_eq!(runner.state().commands, vec![ScopeDirection::Up]);
+        assert_eq!(runner.focus(), Some(up));
+        runner.dispatch_click(down, PointerClick::at((0.0, 0.0)));
+        assert_eq!(runner.state().commands.len(), 1);
+    }
+
+    #[test]
+    fn location_only_trail_keeps_ancestors_actionable() {
         use crate::{DomHandle, GenetAppRunner, PointerClick};
         use genet_scripted_dom::ScriptedDom;
         use layout_dom_api::LayoutDom;
         use std::cell::RefCell;
-        struct State {
-            events: Vec<ScopeCommand<String>>,
-        }
-        fn view(_: &State) -> ShellSlot<State> {
-            scope_trail_with_location_edit(
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            |_: &Vec<u8>| scope_trail_with_location_edit(
                 vec![
-                    ScopeCrumb {
-                        label: "Set".into(),
-                        target: "set-a".into(),
-                        current: false,
-                    },
-                    ScopeCrumb {
-                        label: "Measure".into(),
-                        target: "measure-a".into(),
-                        current: true,
-                    },
+                    ScopeCrumb { label: "Set".into(), target: 1, current: false },
+                    ScopeCrumb { label: "Card".into(), target: 2, current: true },
                 ],
                 false,
-                |state: &mut State, event| state.events.push(event),
-            )
-        }
-        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
-        let mut runner = GenetAppRunner::new(
-            dom.clone(),
-            view as fn(&State) -> ShellSlot<State>,
-            State { events: Vec::new() },
+                |state: &mut Vec<u8>, command| {
+                    if let ScopeCommand::To(target) = command { state.push(target); }
+                },
+            ),
+            Vec::new(),
         );
-        let root = runner.root();
-        let buttons = dom.borrow().all_with_class(root, "shell-control");
-        assert_eq!(buttons.len(), 1);
-        assert_eq!(
-            dom.borrow()
-                .all_with_class(root, "scope-location-current")
-                .len(),
-            1
-        );
-        assert!(
-            dom.borrow()
-                .all_with_class(root, "scope-location-edit")
-                .is_empty()
-        );
-        runner.dispatch_click(buttons[0], PointerClick::at((1., 1.)));
-        assert_eq!(
-            runner.state().events,
-            vec![ScopeCommand::To("set-a".into())]
-        );
+        assert!(dom.borrow().all_with_class(runner.root(), "scope-location-edit").is_empty());
+        let current = dom.borrow().all_with_class(runner.root(), "scope-location-current")[0];
+        runner.dispatch_click(current, PointerClick::at((0.0, 0.0)));
+        assert!(runner.state().is_empty());
+        let ancestors = dom.borrow().all_with_class(runner.root(), "shell-control");
+        assert_eq!(ancestors.len(), 1);
+        runner.dispatch_click(ancestors[0], PointerClick::at((0.0, 0.0)));
+        assert_eq!(runner.state(), &[1]);
     }
+
     #[test]
     fn double_activation_requires_two_unmodified_clicks_on_the_same_member() {
         let mut activation = NodeActivation::default();
@@ -518,15 +450,15 @@ mod tests {
             Some(2)
         );
     }
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
     struct Place {
-        route: Vec<&'static str>,
+        route: Vec<String>,
         focus: u8,
     }
     fn visit(route: &[&'static str], focus: u8) -> ScopeVisit<Place, u8> {
         ScopeVisit {
             place: Place {
-                route: route.to_vec(),
+                route: route.iter().map(|part| (*part).to_owned()).collect(),
                 focus,
             },
             camera: None,

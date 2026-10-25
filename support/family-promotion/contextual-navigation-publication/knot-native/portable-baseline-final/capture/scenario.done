@@ -1,0 +1,8 @@
+RESULT fail
+FAIL: assert snap preview_open Eq 'true': got 'false'
+captured nested-context-full-menu
+capture nested-context-full-menu 2000x1400 digest=eacfb6fef5a3d32c file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-publication\knot-native\portable-baseline-final\capture\nested-context-full-menu.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 29 frames, 29 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":29,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":67,"phase":"submitted"}},"sequence":30}}
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("data-command-id", "view.preview")) }

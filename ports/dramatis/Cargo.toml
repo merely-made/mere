@@ -31,7 +31,7 @@ path = "src/main.rs"
 cambium.workspace = true
 mesquite.workspace = true
 taproot.workspace = true
-cambium-genet-winit-host.workspace = true
+cambium-desktop.workspace = true
 persona-picker.workspace = true
 # The custody client and quarantine types, without the Graphshell port
 # (stack lift plan, L1).

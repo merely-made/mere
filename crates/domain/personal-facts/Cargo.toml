@@ -1,5 +1,5 @@
 [package]
-name = "mere-personal-facts"
+name = "mere-facts"
 version = "0.1.0"
 edition.workspace = true
 rust-version = "1.97.1"

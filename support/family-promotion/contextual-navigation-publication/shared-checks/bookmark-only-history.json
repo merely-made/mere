@@ -1,0 +1,50 @@
+{
+  "source_commit": "9e91c7c952a2cd06f23eefe5af4351f4ab398fb6",
+  "path": "crates/cambium/cambium/src/scope_navigation/history.rs",
+  "git_blob": "8c8894a92c60a3ff992e75f5cdca45a8630a92d3",
+  "git_blob_bytes_sha256": "5c5be8266d7cc9fbcc1a6e245fb9335070466cd6c62227c28106b70fb432ffcb",
+  "api": "ScopeNavigation::try_map_bookmarks",
+  "behavior": "Maps mutable visit and remembered-place bookmarks; retains exact immutable encounter lineage, owner cursor and branches. Full try_map remains available for format migration/admission.",
+  "unit_gate": {
+    "result": "passed",
+    "passed": 19,
+    "command": "cargo --config build.build-dir=C:/t/cargo-targets/mere/build test --locked --offline -p cambium scope_navigation --lib",
+    "tested_mere_base": "7632bbd32a00891b858335209a39f36f5777c0ae",
+    "tested_genet": "2b5c01811e6051ecd815cb407ff1ec9b40724fc9",
+    "tested_eidetic": "aa94fe22eea29e9b54e01ed21e6991536ed4f208",
+    "scope": "Exact method tested before publication; subsequent upstream Inker/Pelt supplier intake does not change the history implementation."
+  },
+  "newer_workspace_attempt": {
+    "status": "bounded resolver interrupted before compilation",
+    "reason": "Current upstream workspace supplier resolution consumed CPU without producing output; original qualified2b5 cohort passed19 tests for this exact mapper",
+    "processes": [
+      {
+        "ProcessId": 241016,
+        "ParentProcessId": 58448,
+        "CommandLine": "\"C:\\Users\\mark_\\.rustup\\toolchains\\1.99.1-x86_64-pc-windows-msvc\\bin\\cargo.exe\" --config build.build-dir=\\\"C:/t/cargo-targets/mere/build\\\" test --locked --offline -p cambium scope_navigation --lib"
+      }
+    ],
+    "sample": {
+      "Id": 241016,
+      "CPU": 205.28125,
+      "WorkingSet64": 1432039424
+    },
+    "test_count": 0,
+    "tests_executed": false
+  },
+  "consumer_qualification": "Final Knot receiving graph and native proof are recorded separately in the final publication qualification.",
+  "current_workspace_gate": {
+    "result": "passed",
+    "passed": 19,
+    "source_commit": "9e91c7c952a2cd06f23eefe5af4351f4ab398fb6",
+    "genet": "4532fe03755bdb61eee7847ebeb8ad47bda37d96",
+    "modes": [
+      "locked online after exact missing supplier fetch",
+      "locked offline repeat"
+    ],
+    "canonical_cargo_lock_unchanged": true,
+    "full_log_sha256": "3f397a9ff155194006821af99343a8898a360afc40ff178d9231e848f8904350",
+    "compact_log": "bookmark-only-current-cohort.log"
+  },
+  "intake_diagnostic_correction": "Earlier silent attempts were interrupted while Cargo reset/materialized the Genet checkout, which contains 187,911 tracked files. After the checkout and exact missing suppliers completed, the current shared gate passed locked online and locked offline."
+}

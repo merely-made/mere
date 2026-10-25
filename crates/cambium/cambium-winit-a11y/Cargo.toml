@@ -1,5 +1,5 @@
 [package]
-name = "cambium-winit-a11y"
+name = "cambium-a11y"
 version = "0.3.0"
 description = "AccessKit hosting for genet-backed Cambium applications on winit"
 edition.workspace = true
@@ -14,6 +14,9 @@ repository.workspace = true
 # key-translation half is publishable and reachable from a registry consumer.
 # Split out of cambium-winit 2026-07-26; the code is unchanged.
 publish = false
+
+[lib]
+name = "cambium_winit_a11y"
 
 [features]
 default = ["image-decode"]
@@ -30,7 +33,7 @@ cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-
 winit = "0.30.13"
 accesskit.workspace = true
 genet-render = { workspace = true }
-genet-winit-host = { workspace = true }
+genet-winit = { workspace = true }
 genet-scripted-dom = { workspace = true }
 layout-dom-api = { workspace = true }
 

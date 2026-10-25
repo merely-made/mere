@@ -1,0 +1,8 @@
+RESULT ok
+captured 02_card_context_reopened
+Older Overview history restored its original camera
+Fresh-process contextual route and cross-Set Back history restored
+capture 02_card_context_reopened 2200x1328 digest=f68feec68ece2c8c file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-publication\woodshed-native\attempt-05\02_card_context_reopened.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 172 frames, 172 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":172,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":302,"phase":"submitted"}},"sequence":173}}

@@ -504,6 +504,50 @@ impl OwnedLayout {
         })
     }
 
+    /// Reveal a byte position in retained text without changing an editor's
+    /// selection. Unlike `caret_rect_at` callers, this accepts only a real
+    /// UTF-8 boundary in text that has a laid-out caret rectangle; it does not
+    /// use the empty-field fallback rectangle.
+    pub(crate) fn scroll_text_position<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        byte: usize,
+        align: ScrollAlign,
+    ) -> Vec<ScrollTarget> {
+        if self.fragments.get(node).is_none() {
+            return Vec::new();
+        }
+        let text = node_text(dom, node);
+        if byte > text.len() || !text.is_char_boundary(byte) {
+            return Vec::new();
+        }
+        let positions = text_positions(dom, node, byte);
+        if positions.is_empty()
+            || !positions
+                .iter()
+                .any(|(text_node, local)| self.fragments.caret_rect(*text_node, *local).is_some())
+        {
+            return Vec::new();
+        }
+
+        let own = scroll_axes(&self.styles, node)
+            .1
+            .then(|| element_scroll_range(dom, &self.styles, &self.fragments, node).1)
+            .filter(|range| *range > 0.0);
+        let first = match own {
+            Some(range) => Some((node, range)),
+            None => self.vertical_scroll_container(dom, node),
+        };
+        self.follow_out(dom, first, align, |layout, dom| {
+            let rect = layout.caret_rect_at(dom, node, byte)?;
+            Some((
+                rect.y - layout.content_scroll(dom, node).1,
+                rect.height.max(1.0),
+            ))
+        })
+    }
+
     /// Every scroll that moves `node`'s own content: the viewport's, each
     /// enclosing container's, and `node`'s own when it scrolls.
     fn content_scroll<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> (f32, f32) {
@@ -755,7 +799,7 @@ impl OwnedLayout {
                     .collect(),
             })
         });
-        list.translated(-self.viewport_scroll.0, -self.viewport_scroll.1)
+        list.scrolled(-self.viewport_scroll.0, -self.viewport_scroll.1)
     }
 
     pub(crate) fn append_scrollbars<D: LayoutDom<NodeId = NodeId>>(

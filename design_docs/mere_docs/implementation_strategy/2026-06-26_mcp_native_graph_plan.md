@@ -32,6 +32,9 @@ F2, over djinn's authenticated agent door.
 **Open, raised by the S14 pass (2026-10-06):** which substrate does the expose half ride
 now? Options: Graphshell's intent grammar (H9's adapter); djinn's authenticated agent
 door (F2's adapter).
+**Answered 2026-10-25:** both, as one adapter. [`graphshell-mcp`](../../../crates/graphshell/graphshell-mcp/README.md)
+serves any admitted Graphshell route as stdio MCP and dials djinn's owner-only
+application door, so the grant, the admission and the attribution stay djinn's.
 
 **Consume: internal agents reach external MCP servers.** Agent nodes and the harness
 gain an MCP client, so an agent node's policy can call out to external MCP tools. The
@@ -79,3 +82,18 @@ outbound half of the same boundary.
   D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md (the status line held): the
   retired command-registry substrate annotated, the Graphshell H9 and djinn F2 adapters
   named, and the expose half's substrate written in as an open question.
+- **2026-10-25, expose half built (stdio, local).** `crates/graphshell/graphshell-mcp`: a
+  stdio MCP server, MCP 2026-07-28 plus the handshake revisions, over one admitted
+  Graphshell route. Projections are resources; the route's advertised actions are listed by
+  `mere_actions` and invoked through one envelope tool, `mere_invoke`, carrying the
+  observed epoch and revision. The server holds no key: `mere-mcp --app <id> --route
+  mere/<domain>` is admitted by djinn's door, which attributes accepted edits to the persona
+  via that app. 17 tests against a route that behaves like djinn's; `claude mcp list`
+  connects. Prompts, subscriptions and HTTP are not
+  built. The consume half is untouched.
+- **2026-10-25, served over djinn's real mere route.** `resident_mere::tests::mcp` (3 tests)
+  runs the adapter over the reservoir, route grants and session item: an unadmitted app
+  reaches no mere; an admitted agent applies an edit through `mere_invoke`, reads it back and
+  undoes it, with the stored change naming the app the door admitted; a malformed edit is
+  refused and changes nothing; the ambient route advertises no edit. The socket path
+  (`AppRouteCarrier` to a running djinn) and a model-driven session are still unrun.

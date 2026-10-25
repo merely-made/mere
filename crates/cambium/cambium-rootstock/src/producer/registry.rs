@@ -331,6 +331,20 @@ impl ProducerRegistry {
             .is_some_and(|entry| entry.producer.act(action.key, &action.id))
     }
 
+    /// The host uses this after semantic admission, preserving the captured
+    /// child token instead of acquiring a new life for an old request.
+    pub fn act_checked(
+        &mut self,
+        action: &super::ProducedAction,
+        expected: Option<&super::ProducerChildToken>,
+    ) -> super::ProducerActionDispatch {
+        self.entries
+            .get_mut(&action.slot)
+            .map_or(super::ProducerActionDispatch::StaleTarget, |entry| {
+                entry.producer.act_checked(action.key, &action.id, expected)
+            })
+    }
+
     pub fn error(&self, key: u64) -> Option<ProducerError> {
         self.entries.get(&key)?.error
     }

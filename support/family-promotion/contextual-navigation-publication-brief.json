@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "status": "complete",
+  "objective": "Qualify Woodshed native custody-backed navigation reopen, publish shared Cambium and portable app intake, then add independent Knot pane bookmarks and adapt platform chrome.",
+  "order": [
+    "woodshed-native-custody-reopen",
+    "shared-publication-and-portable-app-pins",
+    "knot-pane-bookmarks-and-preview-control"
+  ],
+  "added_scope": "Inspect and adapt title, tool and location bar ornamentation to platform frame/menu ownership, using existing Cambium host seams.",
+  "ownership": {
+    "cambium": "Shared controls, platform frame/caption capabilities, semantic reading-position mechanics; no application scope policy.",
+    "woodshed": "Exact owning Set/Card route and camera, product storage and playback authority.",
+    "knot": "Per-pane reading bookmarks, source validation, Preview commands and document authority."
+  },
+  "done_conditions": [
+    "A real isolated unlocked custody-backed Woodshed process saves navigation across two Sets; a fresh process restores the exact route and viewport with playback stopped.",
+    "Only authorized source and documentation changes are committed and published, preserving unrelated staged and working changes.",
+    "Both apps resolve the published shared revision through portable manifests and locks, with no receiving-only patch required for Cambium.",
+    "Knot Source and Preview each restore their own source-bound reading positions across Back and fresh-process reopening without text edits or playback effects.",
+    "Preview control wording reflects its actual following or document-bound pane action.",
+    "Chrome uses one platform-appropriate window-control owner, reserves native caption space, and preserves input/drag behavior; platform evidence is reported separately."
+  ],
+  "receipts": {
+    "directory": "support/family-promotion/contextual-navigation-publication",
+    "new_artifact_cap_bytes": 30000000,
+    "combined_retained_cap_bytes_including_prior_lanes": 55000000,
+    "previous_measured_bytes": 22268482,
+    "required": [
+      "compact tests and portable intake results",
+      "native custody-backed two-process reopen observations",
+      "source commits and consumer pins",
+      "platform chrome checks and scoped native captures"
+    ],
+    "capture_policy": "Preserve existing captures. Knot toolbar acceptance retains its two rejected captures and permits one final capture only after native rectangle observations prove the fix. Knot independent-pane acceptance permits at most two small captures; portable Woodshed adds none. Keep exploratory observations compact."
+  },
+  "targets": [
+    "C:/t/cargo-targets/mere",
+    "C:/t/cargo-targets/woodshed",
+    "C:/t/cargo-targets/knot-editor"
+  ],
+  "preserve_prior_receipts": true,
+  "isolated_cargo_homes": [],
+  "worktrees": [],
+  "worktree_reason": "Remote main advanced17/3/3 commits while primary checkouts retain shared dirty/staged work; isolated integration preserves those checkouts.",
+  "capture_policy_revision_reason": "Headless caption checks passed while two native1000px captures clipped the Close outline; actual native viewport/rectangles and one final visual acceptance are required.",
+  "completed_worktrees_removed": [
+    "C:/Users/mark_/Code/worktrees/mere-context-navigation-publication",
+    "C:/Users/mark_/Code/worktrees/woodshed-context-navigation-publication",
+    "C:/Users/mark_/Code/worktrees/knot-editor-context-navigation-publication"
+  ]
+}

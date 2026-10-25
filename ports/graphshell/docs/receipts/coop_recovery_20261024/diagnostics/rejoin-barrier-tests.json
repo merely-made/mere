@@ -1,0 +1,8 @@
+{
+  "source": "217d666a4570c2c2953068e76dfc683698765b2f",
+  "positive_same_two_endpoints": true,
+  "duplicate_and_other_endpoint_cannot_satisfy_barrier": true,
+  "negative_incomplete_peer_sets": 4,
+  "expired_deadline_refused": true,
+  "passed_checks": 6
+}

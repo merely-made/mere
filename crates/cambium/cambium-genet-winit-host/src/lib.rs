@@ -82,7 +82,10 @@ pub use cambium_rootstock::{
     Surface, WheelUnit, WindowCommand, WindowCommands, WindowFrame, WindowGeometry, WindowTree,
     ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
-pub use caption_controls::{CaptionLabels, platform_caption_controls, window_caption_controls};
+pub use caption_controls::{
+    CaptionLabels, caption_controls_for_frame, platform_caption_controls, platform_window_frame,
+    window_caption_controls,
+};
 pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
 pub use scene_producer::SceneProducer;

@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-24T20:00:40.7133918Z",
+  "status": "shared-source-qualified; full native custody gate precedes push",
+  "base_commit": "003f9b3505ab6ac321f7644ae16dd5fef966b136",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "source": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 505610,
+      "sha256": "005665ca0c7daadd7de971a1143a36d7869e6aa32a360bef383c79f9704ff3e1",
+      "git_blob": "8645508501ce6873d2e98b5424020ede9125bd29"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/src/caption_controls.rs",
+      "bytes": 6289,
+      "sha256": "ae1d9b4877899a509f14c63ad48fb521b75fa8b8098e339659d424556940034a",
+      "git_blob": "21f599453e7145197e50fb9a708e06957da501e4"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/src/harness.rs",
+      "bytes": 35466,
+      "sha256": "29863a82cd8d46410c49fb889903e7601c22a1b94824dfd281c02ec0e1029674",
+      "git_blob": "d5cae473f4781c3b0be41d46cd782f5d4f163595"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/src/lib.rs",
+      "bytes": 55905,
+      "sha256": "aa6b4aceb3cfa203ec0d13b7bdf0a2e24562575f8d4fb4fce209a71d1becb722",
+      "git_blob": "16fa14b9d76b41f3166ccdb5c3c78e1c45af7c6b"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/tests/input_routing.rs",
+      "bytes": 26704,
+      "sha256": "8fef5e452bb4b1d71662f503276d12e809d5fb1ac6156bd1ff1f539a5e65f570",
+      "git_blob": "6f567e89364e65478b293dedd788aba9cb41dc39"
+    },
+    {
+      "path": "crates/cambium/cambium-genet-winit-host/tests/title_bar.rs",
+      "bytes": 9871,
+      "sha256": "44287aa6e3ae803626c8e3851e5f485316a5b5c72a7859840d5dc9cd4f2c627b",
+      "git_blob": "dd185bd29ebfb91f5a683bdef65cb1a276113b68"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/frame.rs",
+      "bytes": 58405,
+      "sha256": "a37db394f6c779e8279e16c7a57f64fdde6a0c66e841ea40ab36b2456de7afe7",
+      "git_blob": "9fc63f4d3ee0b80841d3f15328d0d6306648012b"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/host.rs",
+      "bytes": 98231,
+      "sha256": "2b0e468dd8e5dd4f8dc1e1ea5f4b3c767eaaeab6809c3064c1f336174f05e2b3",
+      "git_blob": "cb5387727ac5f63fa3ef39cc016c207cdf0d0293"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/lib.rs",
+      "bytes": 49940,
+      "sha256": "569f4227247ac0979e8740632dd33080cacf6fe103bd8dac03a622d6e4bd7e19",
+      "git_blob": "8e194fa85f7c6aa8591117c20aa507df566a5f00"
+    },
+    {
+      "path": "crates/cambium/cambium-rootstock/src/owned_layout.rs",
+      "bytes": 54055,
+      "sha256": "6c78f1e006b868873fd03b409866b100232559308b45079ebec36b8101b327a4",
+      "git_blob": "40ece5b37fafb955ce175ecd2c9d05e20e33f8f3"
+    },
+    {
+      "path": "crates/cambium/cambium/Cargo.toml",
+      "bytes": 1496,
+      "sha256": "974721eeef11900813fc62c0e60600a99d8e1519d618e54239fb8f6eced95b45",
+      "git_blob": "e2ffe0dfa12984c82235793b93c21ec5c02ea8d6"
+    },
+    {
+      "path": "crates/cambium/cambium/src/component.rs",
+      "bytes": 18382,
+      "sha256": "6741bf1c9fa19b03077df3231aa95abc53d1c697dbbbbd9cfc0b7c7c8e1b563e",
+      "git_blob": "4726372bdcc0fbc6c3e25ad461f4dc707a23625f"
+    },
+    {
+      "path": "crates/cambium/cambium/src/controls/button.rs",
+      "bytes": 4804,
+      "sha256": "6dc90ce3c7879409e3bc1febfbbfa590d4ee5db74d0bbe965d59cf1d68d419f9",
+      "git_blob": "308ffae0573154459da6535f0ec3b51c208ca6cd"
+    },
+    {
+      "path": "crates/cambium/cambium/src/hover.rs",
+      "bytes": 9020,
+      "sha256": "23d702a626bfd6dbcd03623e3cbd4b924bb0d03243a0bd0c8cf94a5183ccc277",
+      "git_blob": "1f4eea82ffac2646230a6e9849facd5d3df3cf9b"
+    },
+    {
+      "path": "crates/cambium/cambium/src/scope_navigation.rs",
+      "bytes": 19660,
+      "sha256": "fbac874e0f66174834eaf723a30170b16a63897e1c8e948f069c9e0df5e0fea6",
+      "git_blob": "28ac8c67e95b4ba4fa25e598ad83a4bac3e75652"
+    },
+    {
+      "path": "crates/cambium/cambium/src/scope_navigation/history.rs",
+      "bytes": 31145,
+      "sha256": "0f2d39e0cf08b8458d40ccb11bded2672faef4271b0ee090e2bff3ce8323f0c3",
+      "git_blob": "a296be374c625cbbfd8dd1a55d62c5add79fc201"
+    },
+    {
+      "path": "crates/cambium/cambium/src/tags.rs",
+      "bytes": 11357,
+      "sha256": "07133c66a0681dad6d1e62f556b3afd18bf1b625dcab6cc08297783256a6aa9d",
+      "git_blob": "708c716c0184fb3e4b09e8209dd72b6cafca3323"
+    },
+    {
+      "path": "crates/cambium/cambium/src/tests.rs",
+      "bytes": 137748,
+      "sha256": "df2e59ed404a7ed4a9cc0c0c85ae0d0941a28ef4990c37ec80633c599897f4a4",
+      "git_blob": "16de8f95fc8db53c51b688903fa787ce12910472"
+    },
+    {
+      "path": "crates/mere/src/navigation.rs",
+      "bytes": 9779,
+      "sha256": "efca1c9c5d67bcb9835cd8435b52aadb9b89895d5ce9347f8fa8f2053245bb27",
+      "git_blob": "e5d7635bbcd96110b232633757fd55f4e59b23e7"
+    },
+    {
+      "path": "crates/mere/src/navigation/browser.rs",
+      "bytes": 11079,
+      "sha256": "1513f3408ae45cf97277289a65d204174f8f32486f4fcea30066ebdb2c09d4c0",
+      "git_blob": "57fd6f50c09d0df99cb336de66c53918b1453a41"
+    },
+    {
+      "path": "ports/graphshell/src/forme_session.rs",
+      "bytes": 51358,
+      "sha256": "7b09936bd7be1e6d04d54463d85f1844e696b23375222bcee018ba9434ebbe15",
+      "git_blob": "d14a5ca179a0e152cd7a07ed7236f08ffa7f35cf"
+    },
+    {
+      "path": "ports/graphshell/src/forme_workspace.rs",
+      "bytes": 18451,
+      "sha256": "30244fb6183787a984a3e1860c31e0c3feb8b39cc49abaf275e8ab821b4b5649",
+      "git_blob": "803cdf91c3e6071dae434ed91e6e207f623a569a"
+    },
+    {
+      "path": "ports/graphshell/src/forme_workspace/tests.rs",
+      "bytes": 11224,
+      "sha256": "6c4cba4e8d2ab5aa27146a81298a26e28a9230831600ade6b0cd45de4f07ea4b",
+      "git_blob": "4569cbd24b016cbf08e0f16cd91639c6f72407cf"
+    },
+    {
+      "path": "ports/graphshell/src/lib.rs",
+      "bytes": 4162,
+      "sha256": "db5a6eff4e2d7e4d2b0ea84a2c7e272570608a92cbeb2bfa907b6590f0d18932",
+      "git_blob": "563cf305e57d35ccb5b875f3bc79e564c1c29b51"
+    },
+    {
+      "path": "ports/graphshell/src/scope_policy.rs",
+      "bytes": 762,
+      "sha256": "150580a06727e64da46ff012cd9149b27ef9d2c2960d8456756a918ab89635be",
+      "git_blob": "9a7e0c23919c0a1e4992f60e4baf4588c3174e9c"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/forme.rs",
+      "bytes": 50998,
+      "sha256": "b17b7eb70f82908b810754d81e5d53cbff524e34efcbba51788dced66cb1d7b4",
+      "git_blob": "3cdd8bd114e72e7cae086f738322b94c20cb64a5"
+    },
+    {
+      "path": "ports/graphshell/src/web_tree/scope_navigation.rs",
+      "bytes": 15097,
+      "sha256": "9a4f9ce5fe98662db4380a7581bfee62c2bf70be76b918922dad8c7db7770286",
+      "git_blob": "76bd672768cd6230d52d08d29c00b1bd971e36c3"
+    },
+    {
+      "path": "ports/graphshell/web/Cargo.lock",
+      "bytes": 275305,
+      "sha256": "3b3ee723199d65f21947c57204cbf9a30944f3c736105c5d1437c2609281cc63",
+      "git_blob": "c283b57557f482bec62c4003c577dfcfb94674e6"
+    }
+  ],
+  "genet_revision": "2b5c01811e6051ecd815cb407ff1ec9b40724fc9",
+  "tests": {
+    "scope_history": 17,
+    "host_input_routing": 19,
+    "titlebar_input": 7,
+    "platform_policy_units": 2,
+    "browser_compatibility": 50,
+    "standalone_browser_product_wasm": "pass"
+  },
+  "commands": [
+    "cargo test --locked --offline -p cambium --lib scope_navigation",
+    "cargo test --locked --offline -p cambium-genet-winit-host --test input_routing --test title_bar",
+    "cargo test --locked --offline -p cambium-genet-winit-host --lib caption_controls",
+    "cargo test --locked --offline -p graphshell --no-default-features --features web --lib forme_",
+    "cd ports/graphshell/web; cargo check --locked --offline --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu"
+  ],
+  "build_location": "C:/t/cargo-targets/mere (build-dir C:/t/cargo-targets/mere/build)",
+  "platform_policy": {
+    "windows": "App frame",
+    "macos": "Host frame",
+    "linux": "Host frame",
+    "override": "HostOptions.window_frame remains explicit; Mac native lights remain authoritative even for App frames"
+  },
+  "changes": [
+    "App-defined Stemma navigation and semantic text-byte view restoration",
+    "Browser-specific policy owns graph scope admission for immutable encounters and mutable bookmarks",
+    "Host-owned platform/frame caption policy",
+    "Narrow explicit Atom-to-str annotations for the current Genet cohort",
+    "Standalone web lock aligned to current Genet and compatible digest packages"
+  ],
+  "prior_receipts": "Retained unchanged historical local-intake snapshots; their source/publication statements apply to their recorded runs.",
+  "limits": [
+    "Windows-native tests and pure simulated platform policy; macOS/Linux headed layout is not newly qualified.",
+    "Product custody reopen and per-pane bookmark continuation are recorded separately.",
+    "Private local receiving profiles/locks and source recovery backups are retained outside the published receipt tree."
+  ],
+  "source_commit": "3e305d1186d8c89441edfc66c9208664e016dd11",
+  "hash_basis": "SHA-256 fields describe tested Windows working-tree bytes; git_blob identifies the portable committed content independent of checkout line endings."
+}

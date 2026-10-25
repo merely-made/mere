@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-23",
+  "basis": "f632bf3a333c660660e7021d6d0b7df5463aa472",
+  "scope": "Kernel-authored runtime surface membership lifetimes received by Canvas action-key reconciliation; preserve ordinary edits/clones and retire recreated members",
+  "retained_byte_cap": 10000000,
+  "required_receipts": [
+    "Existing Pin reproduction red then green",
+    "Kernel lifetime/write-path and snapshot/clone controls",
+    "Canvas ordinary edits/unrelated members/recreation/refresh controls",
+    "Graphshell reader and owner lifecycle tests",
+    "Native package, Wasm, embedding and independent consumer receiving",
+    "Source/receipt hashes, canonical docs and WIP preservation"
+  ],
+  "done_conditions": [
+    "Lifetime authored once per live kernel membership through all insertion paths",
+    "Ordinary edits, upserts and graph clones preserve membership identity",
+    "Removal/recreation retires only affected action keys even inside one ingest callback",
+    "Old Pin/Drag fail and new actions dispatch; unrelated members retain IDs",
+    "No lifetime minting on semantic reads and no persisted runtime witness",
+    "Larger cache, owner/actor, supplier, guest and platform migrations remain documented"
+  ]
+}

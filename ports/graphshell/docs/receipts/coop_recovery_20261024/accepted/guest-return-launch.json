@@ -1,0 +1,57 @@
+{
+  "launcher_pid": 195846,
+  "machine": {
+    "role": "guest",
+    "machine_id": "8bdcfe9ba1f8a022ba777d1657727a0d8351fb3bf97c3b2fe26d69757e4b4ff8",
+    "hostname": "thinkpad-l14-f",
+    "architecture": "x86_64",
+    "console_user": "markik",
+    "console_locked": false,
+    "console_present": true,
+    "operating_system": "Linux",
+    "system_version": "Fedora Linux 44 (Workstation Edition)",
+    "kernel": "7.2.11-200.fc44.x86_64",
+    "physical_model": "20U6S1CW00",
+    "desktop": {
+      "Name": "markik",
+      "Seat": "seat0",
+      "Remote": "no",
+      "Type": "wayland",
+      "Active": "yes",
+      "State": "active",
+      "LockedHint": "no",
+      "session_id": "8",
+      "gnome_screensaver": "(false,)"
+    },
+    "graphical_environment": {
+      "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+      "DISPLAY": ":0",
+      "WAYLAND_DISPLAY": "/run/user/1000/wayland-0",
+      "XAUTHORITY": "/run/user/1000/.mutter-Xwaylandauth.1MJHX3",
+      "XDG_CURRENT_DESKTOP": "GNOME",
+      "XDG_SESSION_TYPE": "wayland",
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+    },
+    "addresses": [
+      "127.0.0.1",
+      "192.168.4.32",
+      "2603:6014:5d01:26d3:4e7f:e0e4:3d8a:677f",
+      "::1",
+      "fdac:1781:f09c:1:26b8:379f:5c56:3f2b",
+      "fe80::3d0d:7a98:a3ac:e550"
+    ],
+    "worker_pid": 195557,
+    "worker_sha256": "84020a7154a5f4ce3ded691d54218e328ffebf651156099e2a5c636744469dbf",
+    "source_commit": "217d666a4570c2c2953068e76dfc683698765b2f",
+    "lock_sha256": "dcab0b473b6005fe6ef778d6baf603d50f4474c92f61ca39148a4cf68522bece",
+    "binaries": {
+      "graphshell_mere": "2fc9506c3f35fc86c80168ce12dc53bafd2521e2ccb2be030fe6f9bdb3ee5748",
+      "djinn": "b5b73212548017444d0aaaae18cca76af6cf56db0c511ae0ada2c4c703d049af"
+    },
+    "public": "/home/markik/Code/output/tp-recovery-20261024-02/evidence",
+    "private": "/home/markik/Code/output/tp-recovery-20261024-02/private",
+    "base_worker_sha256": "865985043e09495452bac19b6b9b2bbeda14f2caa0f5247791d10a8f86cc3505",
+    "co_op_relay": "http://192.168.4.32:38487/"
+  },
+  "scenario": "guest-return.scn"
+}

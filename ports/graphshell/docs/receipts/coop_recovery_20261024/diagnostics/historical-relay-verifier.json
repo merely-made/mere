@@ -1,0 +1,12 @@
+{
+  "result": "ok",
+  "machines": 2,
+  "native_processes": 7,
+  "custodians": 4,
+  "captures": 22,
+  "active_routes": [
+    "active relay http://192.168.4.32:32867/"
+  ],
+  "source_files": 3325,
+  "commit": "95420eb67b93910407658b386bd1452ac39087c0"
+}

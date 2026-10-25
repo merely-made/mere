@@ -1,0 +1,161 @@
+{
+  "a11y_publication": {
+    "sampled_at_lane_frame": 11,
+    "snapshot": {
+      "host": 1,
+      "publication": {
+        "adapter": "installed",
+        "outcome": {
+          "contribution_issues": 0,
+          "nodes": 52,
+          "phase": "submitted"
+        }
+      },
+      "sequence": 18
+    }
+  },
+  "captures": [
+    {
+      "digest": "b4cdb169a4aad948",
+      "fields": {
+        "archives": "0",
+        "attached": "5be25525-4ba8-491d-9ffa-46eed5425590",
+        "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Choose the graph in Sessions, then enable its co-op controls.\",\"connection\":[]}",
+        "coop-access": "",
+        "coop-available": "false",
+        "coop-graph": "",
+        "coop-nodes": "",
+        "coop-status": "Choose the graph in Sessions, then enable its co-op controls.",
+        "epoch": "4",
+        "graph-labels": "https://private.invalid/owner-only",
+        "layout": "spectral.default",
+        "nodes": "1",
+        "notice": "",
+        "pid": "77357",
+        "read-only": "false",
+        "record": "",
+        "record-data": "",
+        "relations": "0",
+        "saved-focus": "",
+        "selected": "",
+        "sessions": "2",
+        "status": "ready",
+        "view-saved": "false"
+      },
+      "height": 1600,
+      "name": "/Users/markik/Code/output/gs-recovery-20261024-02/local/evidence/private-after.png",
+      "path": "/Users/markik/Code/output/gs-recovery-20261024-02/local/evidence/private-after.png",
+      "viewport": null,
+      "width": 2200
+    }
+  ],
+  "checkpoints": {},
+  "cost": {
+    "budget_exceeded": false,
+    "eligibility": "profile available, no active producer error, no capture pending; the host callback does not prove successful presentation or GPU completion per sample",
+    "first_document": {
+      "capture": false,
+      "counts": {
+        "actual_scene_redraws": 0,
+        "dirty_tiles": 0,
+        "instance_upload_bytes": 0,
+        "layout_mutations": 0,
+        "layout_rebuilt": 0,
+        "leaf_repaints": 1,
+        "mesh_upload_bytes": 0,
+        "producer_calls": 0,
+        "producer_invalid_frames": 0,
+        "producer_retirements": 0,
+        "producer_stages": 0,
+        "producer_suspensions": 0
+      },
+      "frame": 1,
+      "times_us": {
+        "a11y_us": 7437,
+        "acquire_us": 1511,
+        "capture_us": 0,
+        "clear_us": 536,
+        "compose_us": 6610,
+        "content_extent_us": 0,
+        "dirty_tile_rebuild_us": 2,
+        "emit_scene_us": 4599,
+        "excluding_acquire_present_capture_us": 51058,
+        "frame_hook_us": 123,
+        "ime_us": 0,
+        "layout_apply_us": 0,
+        "layout_rebuild_us": 0,
+        "layout_tick_us": 0,
+        "layout_update_us": 141,
+        "layout_with_text_us": 0,
+        "leaf_boxes_us": 236,
+        "leaf_fragments_us": 40,
+        "leaf_render_us": 33,
+        "master_compose_us": 78,
+        "pointer_us": 3,
+        "present_us": 165,
+        "producer_render_us": 0,
+        "producer_stage_us": 0,
+        "raster_total_us": 7552,
+        "raster_us": 31197,
+        "relayout_us": 413,
+        "shadows_us": 0,
+        "style_resolve_us": 0,
+        "tile_invalidate_us": 319,
+        "total_us": 52734,
+        "vello_render_us": 7132
+      },
+      "valid": true
+    },
+    "first_frame_policy": "first_document is the first observed host frame; first_populated is the first successful scene redraw with body geometry; neither measures process startup or asynchronous generation latency",
+    "first_populated": null,
+    "limits": {
+      "phases": 32,
+      "samples": 4096
+    },
+    "phases": [],
+    "schema": 1,
+    "scope": "every scene the product owns; actual redraw and upload deltas distinguish retained producer calls",
+    "summary_policy": "capture and invalid frames excluded; steady excludes the first eligible frame per phase; p95 is nearest rank; stage timings overlap and must not be summed",
+    "timing": "CPU wall-time microseconds on the native host thread, not GPU durations",
+    "unfinished": null
+  },
+  "errors": [],
+  "final": {
+    "archives": "0",
+    "attached": "5be25525-4ba8-491d-9ffa-46eed5425590",
+    "coop": "{\"acknowledged\":0,\"data\":null,\"status\":\"Choose the graph in Sessions, then enable its co-op controls.\",\"connection\":[]}",
+    "coop-access": "",
+    "coop-available": "false",
+    "coop-graph": "",
+    "coop-nodes": "",
+    "coop-status": "Choose the graph in Sessions, then enable its co-op controls.",
+    "epoch": "4",
+    "graph-labels": "https://private.invalid/owner-only",
+    "layout": "spectral.default",
+    "nodes": "1",
+    "notice": "",
+    "pid": "77357",
+    "read-only": "false",
+    "record": "",
+    "record-data": "",
+    "relations": "0",
+    "saved-focus": "",
+    "selected": "",
+    "sessions": "2",
+    "status": "ready",
+    "view-saved": "false"
+  },
+  "frames": 11,
+  "kind": "graphshell-mere",
+  "ok": true,
+  "pixel_checks": [],
+  "product_log": [],
+  "redraws": 17,
+  "scenario": true,
+  "scenario_log": [
+    "waited 0 frames",
+    "waited 0 frames",
+    "captured /Users/markik/Code/output/gs-recovery-20261024-02/local/evidence/private-after.png"
+  ],
+  "unpresented_redraws": 6
+}

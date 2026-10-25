@@ -1,0 +1,8 @@
+RESULT fail
+captured 02_card_context_reopened
+FAIL: assert snap overview-zoom Eq '1.25': got '1.00'
+Fresh-process contextual route and cross-Set Back history restored
+capture 02_card_context_reopened 2200x1400 digest=27923c099203f000 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-publication\woodshed-native\current-cohort\02_card_context_reopened.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 168 frames, 168 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":168,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":298,"phase":"submitted"}},"sequence":169}}

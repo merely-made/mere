@@ -15,13 +15,20 @@ Reconnect and explicitly retries its edit. Only an owner acknowledgement is a
 save. A later live withdrawal and full cold reopen prove that recovery did not
 widen scope or restore a revoked grant.
 
-`machine.py` composes the frozen desktop/custodian provider and optional Linux
-network-namespace provider from the original receipts. `freeze.py` records all
-executed provider hashes along with current binaries, workspace inputs and
-resolved suppliers. Historical receipts retain their exact scripts and hashes;
-new modes and shared checks belong here rather than in another dated script
-copy. The verifier also accepts the original relay packet for regression checks.
-New receipts contain evidence, provenance and run-specific observations.
+After the listener restarts, the controller waits for both original endpoints
+to rejoin it before releasing Reconnect. Listener readiness alone is not peer
+readiness; the owner's relay reconnect can still be backing off. This observation
+does not retry an application edit or extend its deadline.
+
+`machine.py` selects the shared native desktop/custodian and optional Linux
+network-namespace providers. Those providers, the isolated resident lifetime
+helper, artifact freezing and the locked relay fixture all live in this directory.
+`freeze.py` records every executed provider alongside current binaries,
+workspace inputs and resolved suppliers. Historical receipt packets retain
+their exact source and hashes for verification; active execution does not import
+them. New receipts contain evidence, provenance and run-specific observations.
+The verifier also accepts the original relay and recovery packets for regression
+checks.
 
 The relay is a short-lived private-LAN fixture, using the original locked Iroh
 relay executable. Relay modes check that the guest has no UDP egress, while

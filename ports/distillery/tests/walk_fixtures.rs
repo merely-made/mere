@@ -584,7 +584,7 @@ fn workspace_graph_fixture_is_a_dag_over_named_packages() {
     // A stale or empty graph is caught here rather than by the DAG walk, which
     // is happy to succeed over nothing. These four are load-bearing members of
     // the boundary work the Circuit recipe renders.
-    for member in ["pelt", "knot-editor-host", "tabard", "mere-document-lanes"] {
+    for member in ["pelt", "knot-editor-host", "tabard", "mere-lanes"] {
         assert!(
             graph.packages.iter().any(|name| name == member),
             "the generated graph does not name `{member}`, so it is stale or empty"

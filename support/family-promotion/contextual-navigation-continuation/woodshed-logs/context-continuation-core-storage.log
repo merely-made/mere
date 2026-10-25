@@ -1,0 +1,130 @@
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\eidetic-core
+warning: patch `muniment v0.1.2 (https://github.com/merely-made/eidetic.git?rev=34105d63ec17826e0a58a5b461b65150357dd000#34105d63)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment
+warning: patch `mere-webrtc-carrier v0.0.1 (https://github.com/merely-made/murm.git?branch=main#64d47ac4)` was not used in the crate graph
+warning: patch `hagiograph v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\hagiograph)` was not used in the crate graph
+warning: patch `impresa v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\impresa)` was not used in the crate graph
+warning: patch `luggage v0.1.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\luggage)` was not used in the crate graph
+warning: patch `mere-proofs v0.1.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\proofs)` was not used in the crate graph
+warning: patch `responsa v0.0.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\responsa)` was not used in the crate graph
+warning: patch `servitor v0.0.2 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\servitor)` was not used in the crate graph
+warning: patch `stickleback v0.1.1 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\stickleback)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling serde_json v1.0.151
+   Compiling cc v1.6.0
+   Compiling simdutf8 v0.1.5
+   Compiling hashbrown v0.17.1
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling indexmap v2.14.2
+   Compiling blake3 v1.8.7
+   Compiling serde_derive v1.0.229
+   Compiling ptr_meta_derive v0.3.2
+   Compiling bytecheck_derive v0.8.3
+   Compiling async-trait v0.1.92
+   Compiling rkyv_derive v0.8.18
+   Compiling tokio-macros v2.7.2
+   Compiling ptr_meta v0.3.2
+   Compiling tokio v1.53.2
+   Compiling rancor v0.1.3
+   Compiling bytecheck v0.8.3
+   Compiling zeroize_derive v1.5.0
+   Compiling munge_macro v0.4.7
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling thiserror-impl v1.0.69
+   Compiling rend v0.5.4
+   Compiling munge v0.4.7
+   Compiling zeroize v1.9.0
+   Compiling curve25519-dalek v5.0.0
+   Compiling chacha20 v0.10.2
+   Compiling thiserror v1.0.69
+   Compiling chacha20poly1305 v0.11.0
+   Compiling serde v1.0.229
+   Compiling ed25519-dalek v3.0.0
+   Compiling muniment v0.2.0 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\muniment)
+   Compiling slotmap v1.1.1
+   Compiling petgraph v0.8.3
+   Compiling audio-pattern v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\audio-pattern)
+   Compiling tinct v0.2.0 (C:\Users\mark_\Code\repos\mere\crates\cambium\tinct)
+   Compiling woodshedding v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshedding)
+   Compiling sceno v0.0.6 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\sceno)
+   Compiling woodshed-instrument v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-instrument)
+   Compiling insigne v0.0.2 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling audio-packs v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\audio-packs)
+   Compiling tabard v0.0.2 (C:\Users\mark_\Code\repos\mere\crates\system\tabard)
+   Compiling personae v0.3.0 (https://github.com/merely-made/dramatis.git?branch=main#7d498c27)
+   Compiling rkyv v0.8.18
+   Compiling scenotime v0.0.4 (C:\Users\mark_\Code\repos\mere\crates\cambium\scenes\scenotime)
+   Compiling chartulary v0.2.2 (C:\Users\mark_\.cargo\git\checkouts\eidetic-da5f5f1bff0a3046\aa94fe2\crates\chartulary)
+   Compiling woodshed-graph v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-graph)
+   Compiling woodshed-core v0.1.0 (C:\Users\mark_\Code\repos\woodshed\crates\woodshed-core)
+    Finished `test` profile [unoptimized] target(s) in 29.36s
+     Running unittests src\lib.rs (C:/t/cargo-targets/woodshed/build\debug\deps\woodshed_core-891149a98a6ec914.exe)
+
+running 1 test
+test storage::tests::session_store_roundtrips_opaque_scope_navigation_bytes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 315 filtered out; finished in 0.00s
+
+     Running unittests src\bin\woodshed-block-example.rs (C:/t/cargo-targets/woodshed/build\debug\deps\woodshed_block_example-a75b515fe4c2eb18.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\card_loop.rs (C:/t/cargo-targets/woodshed/build\debug\deps\card_loop-8448063cabed92dd.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests\saved_arrangements.rs (C:/t/cargo-targets/woodshed/build\debug\deps\saved_arrangements-2fa73484ade669a8.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\stage_backdrop.rs (C:/t/cargo-targets/woodshed/build\debug\deps\stage_backdrop-7f55e2424b2c4d66.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+

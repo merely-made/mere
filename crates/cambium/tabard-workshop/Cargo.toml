@@ -12,14 +12,14 @@ readme = "README.md"
 [features]
 default = []
 host-previews = ["dep:cambium-rootstock"]
-native-host = ["dep:cambium-genet-winit-host", "host-previews"]
+native-host = ["dep:cambium-desktop", "host-previews"]
 
 [dependencies]
 tabard.workspace = true
 tinct.workspace = true
 cambium = { workspace = true, features = ["highlight"] }
 sprigging.workspace = true
-mere-document-lanes.workspace = true
+mere-lanes.workspace = true
 document-canvas.workspace = true
 inker.workspace = true
 netrender.workspace = true
@@ -31,14 +31,14 @@ livery.workspace = true
 cambium-rootstock = { workspace = true, optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-cambium-genet-winit-host = { workspace = true, optional = true }
+cambium-desktop = { workspace = true, optional = true }
 
 [dev-dependencies]
 netrender = { workspace = true, features = ["vello-cpu"] }
 postcard = { version = "1", features = ["alloc"] }
 serde_json = "1"
-genet-render-host.workspace = true
-cambium-genet-winit-host.workspace = true
+genet-presenter.workspace = true
+cambium-desktop.workspace = true
 taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
 genet-scripted-dom.workspace = true
 layout-dom-api.workspace = true

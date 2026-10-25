@@ -1,0 +1,96 @@
+{
+  "scope": "Frozen primary app prototype files owned by this lane; later work occurs in isolated publication worktrees.",
+  "files": [
+    {
+      "path": "woodshed/crates/woodshed-views/src/stage/contextual_navigation.rs",
+      "bytes": 36066,
+      "sha256": "c0442411e26c7ce8f6cc34b389eff65e6dc0289b73ac0c78cf895086d4abe15a",
+      "historical_sha256": "c0442411e26c7ce8f6cc34b389eff65e6dc0289b73ac0c78cf895086d4abe15a",
+      "historical_match": true
+    },
+    {
+      "path": "woodshed/design_docs/2026-10-23_contextual_navigation_plan.md",
+      "bytes": 7840,
+      "sha256": "703a627946fa0727e09ffda96ba1de668f91108f9b7e86621689edd2b0f8ae59",
+      "historical_sha256": "703a627946fa0727e09ffda96ba1de668f91108f9b7e86621689edd2b0f8ae59",
+      "historical_match": true
+    },
+    {
+      "path": "woodshed/scenarios/context_navigation.scn",
+      "bytes": 1418,
+      "sha256": "c3d89585366c71b545c10bd02ebbd5e7c73a1f68502fac441b08da780e54a040",
+      "historical_sha256": "c3d89585366c71b545c10bd02ebbd5e7c73a1f68502fac441b08da780e54a040",
+      "historical_match": true
+    },
+    {
+      "path": "woodshed/scenarios/contextual_navigation_native_reopen.scn",
+      "bytes": 1099,
+      "sha256": "f36ef57c17be719f391728034a81f6acd8de53f472b6345d12def2d8edc71a6f",
+      "historical_sha256": null,
+      "historical_match": null
+    },
+    {
+      "path": "woodshed/scenarios/contextual_navigation_native_seed.scn",
+      "bytes": 1314,
+      "sha256": "404b02da5b914ad68cd41e130a3c491009d4cc5816c59cd4fb439820e8fca2ff",
+      "historical_sha256": null,
+      "historical_match": null
+    },
+    {
+      "path": "woodshed/scenarios/stage_p6_card2_audio.scn",
+      "bytes": 1003,
+      "sha256": "5dc4a03f5c7a945729c2553d7c21866372b3c5b026ae0cef36061d99433f998e",
+      "historical_sha256": "5dc4a03f5c7a945729c2553d7c21866372b3c5b026ae0cef36061d99433f998e",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/apps/desktop/src/context_navigation.rs",
+      "bytes": 8815,
+      "sha256": "1e9d7953239e655f8e5241e94754bac792ecc33efe5742a6ebe02262ad0b3914",
+      "historical_sha256": "1e9d7953239e655f8e5241e94754bac792ecc33efe5742a6ebe02262ad0b3914",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/design_docs/2026-10-23_knot_context_navigation.md",
+      "bytes": 8870,
+      "sha256": "3b90b03f7a86c0dad97e5709cd14bfd9eb79acc35061a57e7a969ce3068bbfe8",
+      "historical_sha256": "3b90b03f7a86c0dad97e5709cd14bfd9eb79acc35061a57e7a969ce3068bbfe8",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/scenarios/context_navigation.scn",
+      "bytes": 1044,
+      "sha256": "6e835ef22f546748711998a28d804074834793f295077962328a111bcc33aa92",
+      "historical_sha256": "6e835ef22f546748711998a28d804074834793f295077962328a111bcc33aa92",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/scenarios/context_scroll.scn",
+      "bytes": 1106,
+      "sha256": "8e3ae533e096f66c05883daab26cbc634ece87dea3f86b48da8466dd544fa907",
+      "historical_sha256": "8e3ae533e096f66c05883daab26cbc634ece87dea3f86b48da8466dd544fa907",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/scenarios/context_scroll_reopen.scn",
+      "bytes": 211,
+      "sha256": "15c1c8da41dbf6e870a6768444b3f9157fe1ba83c4f2e06a3cd948b2518f2bd3",
+      "historical_sha256": "15c1c8da41dbf6e870a6768444b3f9157fe1ba83c4f2e06a3cd948b2518f2bd3",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/scenarios/fixtures/context_navigation.djot",
+      "bytes": 220,
+      "sha256": "eeb62129c64b381047b1fd12dfb57f215a0ff9baea2f1cb523437f17fe960b43",
+      "historical_sha256": "eeb62129c64b381047b1fd12dfb57f215a0ff9baea2f1cb523437f17fe960b43",
+      "historical_match": true
+    },
+    {
+      "path": "knot-editor/scenarios/fixtures/context_scroll.djot",
+      "bytes": 9609,
+      "sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0",
+      "historical_sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0",
+      "historical_match": true
+    }
+  ]
+}

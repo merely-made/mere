@@ -1,0 +1,290 @@
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `muniment v0.2.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `muniment v0.2.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/esp.git
+warning: patch `luggage v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)` was not used in the crate graph
+  |
+  = help: perhaps you meant one of the following:
+          	https://www.github.com/merely-made/eidetic.git
+   Compiling phf_macros v0.14.0
+   Compiling phf v0.14.0
+   Compiling web_atoms v0.3.0
+   Compiling paint_list_api v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8a3d289a)
+   Compiling genet-paint-types v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling windows-sys v0.61.2
+   Compiling cssparser v0.38.0
+   Compiling livery v0.0.5 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling netrender_device v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8a3d289a)
+   Compiling genet-css-flow v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-fontique v0.10.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-taffy v0.14.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-host-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling chartulary v0.2.2 (https://www.github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling scenomise v0.0.6 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\scenes\scenomise)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling accesskit_consumer v0.39.1
+   Compiling mere-apparatus v0.0.1 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\domain\apparatus)
+   Compiling engine-observables-api v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling markup5ever v0.40.0
+   Compiling sprigging v0.3.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\sprigging)
+   Compiling accesskit_windows v0.35.1
+   Compiling layout-dom-api v0.1.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling html5ever v0.40.1
+   Compiling xml5ever v0.40.0
+   Compiling cadency v0.0.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-document-resources v0.2.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-static-dom v0.1.1 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-parley v0.10.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-scripted-dom v0.1.2 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+warning: unused variable: `time_range`
+   --> crates\cambium\scenes\scenomise\src\opened_link.rs:599:9
+    |
+599 |     let time_range = timeline_range(pending);
+    |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_range`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\sprigging\src\lib.rs:462:18
+    |
+462 |                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |                  ^^^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+    |
+462 -                 .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+462 +                 .try_update(Ordering::Relaxed, Ordering::Relaxed, |epoch| {
+    |
+
+   Compiling netrender v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8a3d289a)
+warning: `sprigging` (lib) generated 1 warning (run `cargo fix --lib -p sprigging` to apply 1 suggestion)
+   Compiling stacker v0.1.25
+   Compiling light-file-dialog v3.21.3 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\support\patches\light-file-dialog)
+   Compiling cambium v0.6.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium)
+   Compiling buckram v0.0.3 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+warning: unused import: `ScopeCamera`
+ --> crates\cambium\cambium\src\scope_navigation\history.rs:6:13
+  |
+6 | use super::{ScopeCamera, ScopeVisit};
+  |             ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling paint_list_render v0.1.2 (https://github.com/merely-made/netrender.git?branch=main#8a3d289a)
+   Compiling genet-render-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-livery v0.0.4 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+warning: `scenomise` (lib) generated 1 warning (run `cargo fix --lib -p scenomise` to apply 1 suggestion)
+   Compiling cambium-winit v0.3.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium-winit)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+warning: `cambium` (lib) generated 1 warning (run `cargo fix --lib -p cambium` to apply 1 suggestion)
+   Compiling cambium-rootstock v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium-rootstock)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\producer\registry.rs:47:10
+   |
+47 |     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |          ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+47 -     next.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+47 +     next.try_update(Ordering::Relaxed, Ordering::Relaxed, |key| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-rootstock\src\scene_producer.rs:25:10
+   |
+25 |         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |          ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+25 -         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+25 +         .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+   --> crates\cambium\cambium-rootstock\src\host.rs:117:10
+    |
+117 |     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+117 -     NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+117 +     NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+    |
+
+warning: unused import: `LayoutDom`
+   --> crates\cambium\cambium-rootstock\src\lib.rs:494:26
+    |
+494 |     use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+    |                          ^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `layout_dom_api::LayoutDom`
+   --> crates\cambium\cambium-rootstock\src\lib.rs:643:9
+    |
+643 |     use layout_dom_api::LayoutDom as _;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: calls to `std::mem::drop` with a reference instead of an owned value does nothing
+   --> crates\cambium\cambium-rootstock\src\producer\registry.rs:707:13
+    |
+707 |             drop(renderer);
+    |             ^^^^^--------^
+    |                  |
+    |                  argument has type `&Renderer`
+    |
+    = note: `#[warn(dropping_references)]` on by default
+help: use `let _ = ...` to ignore the expression or result
+    |
+707 -             drop(renderer);
+707 +             let _ = renderer;
+    |
+
+   Compiling cambium-winit-a11y v0.3.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium-winit-a11y)
+   Compiling mesquite v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\mesquite)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> crates\cambium\cambium-winit-a11y\src\publication.rs:43:14
+   |
+43 |         NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+43 -         NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+43 +         NEXT.try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+   |
+
+   Compiling cambium-genet-winit-host v0.1.0 (C:\Users\mark_\Code\worktrees\mere-context-navigation-publication\crates\cambium\cambium-genet-winit-host)
+warning: `cambium-winit-a11y` (lib) generated 1 warning (run `cargo fix --lib -p cambium-winit-a11y` to apply 1 suggestion)
+warning: `cambium-rootstock` (lib) generated 6 warnings (run `cargo fix --lib -p cambium-rootstock` to apply 3 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 34.35s
+     Running tests\input_routing.rs (C:/t/cargo-targets/mere/build\debug\deps\input_routing-21f8b6411fa74df5.exe)
+
+running 19 tests
+test a_secondary_press_reaches_the_pointer_handler_without_capturing ... ok
+test captured_motion_holds_hover_on_the_drag_target ... ok
+test a_secondary_press_off_the_handler_reaches_no_one ... ok
+test enter_activates_the_focused_control ... ok
+test an_injected_chord_is_not_typed ... ok
+test a_press_outside_a_pointer_element_starts_no_drag ... ok
+test a_view_can_prevent_the_tab_default ... ok
+test a_press_clicks_the_element_under_it ... ok
+test a_drag_carries_the_captured_elements_local_coordinates ... ok
+test a_wheel_notch_reaches_the_view_handler_first ... ok
+test right_click_on_resolves_a_selector_through_the_live_layout ... ok
+test a_control_can_be_clicked_by_role_and_label ... ok
+test injected_text_types_even_though_the_key_is_unnamed ... ok
+test the_caret_defaults_run_through_the_focused_text_seam ... ok
+test a_wheel_line_delta_is_the_same_distance_at_any_scale ... ok
+test tab_is_routed_before_it_traverses ... ok
+test a_wheel_handler_can_cancel_the_scrolling_default ... ok
+test a_trackpad_pixel_delta_arrives_in_logical_pixels ... ok
+test text_byte_scroll_restores_the_first_visible_line_without_moving_editor_selection ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests\title_bar.rs (C:/t/cargo-targets/mere/build\debug\deps\title_bar-7bb1befcd8b0fa4c.exe)
+
+running 7 tests
+test native_caption_area_reserves_both_sides_and_its_minimum_height ... ok
+test caption_accessible_names_are_configurable_and_match_the_snap_contract ... ok
+test platform_policy_keeps_native_mac_controls_and_adds_explicit_controls_elsewhere ... ok
+test tab_enter_and_space_activate_existing_caption_buttons_in_order ... ok
+test caption_clicks_use_the_host_queue_without_dragging_the_frame ... ok
+test selected_frame_gets_controls_only_when_this_platform_draws_them_in_app ... ok
+test slot_content_keeps_drag_regions_and_controls_carve_out_no_drag ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

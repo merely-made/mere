@@ -1,0 +1,6 @@
+RESULT ok
+captured source-and-preview-return
+capture source-and-preview-return 2464x1504 digest=f374c1f958c23564 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation-continuation\knot-text-native\source-and-preview-return.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 65 frames, 65 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":65,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":93,"phase":"submitted"}},"sequence":66}}

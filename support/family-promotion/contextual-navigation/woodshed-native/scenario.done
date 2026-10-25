@@ -1,0 +1,24 @@
+RESULT fail
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap scope-panel Eq 'Practice': got 'Set'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+captured 01_card_occurrence_with_owner_running
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap overview-active Eq 'true': got 'false'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap overview-active Eq 'true': got 'false'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+Contextual navigation scope/history complete
+capture 01_card_occurrence_with_owner_running 2200x1328 digest=28d2e0052ef980fe file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation\woodshed-native\01_card_occurrence_with_owner_running.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 77 frames, 77 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":77,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":128,"phase":"submitted"}},"sequence":78}}
+FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-down"), text: Some("button.shell-control"), attr: None }
+FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-up"), text: Some("button.shell-control"), attr: None }
+FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-up"), text: Some("button.shell-control"), attr: None }
+FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-back"), text: Some("button.shell-control"), attr: None }
+FAIL: selector click refused for Selector { surface: None, matcher: Class("scope-control.scope-forward"), text: Some("button.shell-control"), attr: None }

@@ -1,0 +1,8 @@
+Command: cargo --config resolver.lockfile-path="C:/Users/mark_/Code/repos/mere/.cargo/scope-navigation/web/Cargo.lock" --config build.build-dir="C:/t/cargo-targets/mere/build" check --offline --manifest-path Cargo.toml --target wasm32-unknown-unknown --no-default-features --features product,presentation-webgpu
+Working directory: ports/graphshell/web (loads the committed wasm Rust flags)
+CARGO_TARGET_DIR=C:\t\cargo-targets\mere
+Exit code: 0
+    Checking graphshell v0.0.2
+    Checking graphshell-web v0.1.0
+    Finished `dev` profile [unoptimized]
+Root Cargo.lock SHA-256 after gate: D0F102A272FAFC8F17C76B88FAEF0B4AE113F36DC45C46E61170F0F6A4D14E74

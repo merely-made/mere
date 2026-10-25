@@ -1,0 +1,8 @@
+2026-10-24T17:53:40.207469Z  INFO djinn: Personae storage open storage=passphrase-encrypted vault at /home/markik/Code/output/tp-recovery-20261024-02/private/guest/vault/vault.json
+2026-10-24T17:53:40.210283Z  INFO djinn::lock_triggers::host: lock triggers settings=LockSettings { session_lock: true, suspend: true, idle: true, idle_minutes: 15 }
+2026-10-24T17:53:40.227379Z  WARN djinn: resident reservoir unavailable reason=no persona wallet exists under /home/markik/Code/output/tp-recovery-20261024-02/private/guest/mere yet; pair this device first, or name a persona
+2026-10-24T17:53:40.227790Z  INFO djinn: SSH agent listening endpoint="/home/markik/Code/output/tp-recovery-20261024-02/private/guest/agent.sock"
+2026-10-24T17:53:40.227898Z  INFO djinn::personal_sync: owner settings path=/home/markik/Code/output/tp-recovery-20261024-02/private/guest/local/graphshell/settings/CrossGraphGuest.json configured=false
+2026-10-24T17:53:54.109267Z  INFO djinn::custody: released derived keys app=graphshell keys=1 source=Persona
+2026-10-24T17:54:02.763978Z  INFO djinn: stop requested on the control route
+2026-10-24T17:54:02.764444Z  INFO djinn: resident task shutdown report ended=TaskReport { completed: 5, cancelled: 1, panicked: 0, rejected: 0 }

@@ -1,0 +1,5 @@
+ Downgrading md-5 v0.11.0 -> v0.10.6
+note: pass `--verbose` to see 106 unchanged dependencies behind latest
+    Blocking waiting for file lock on package cache
+ Downgrading sha1 v0.11.0 -> v0.10.7
+note: pass `--verbose` to see 106 unchanged dependencies behind latest

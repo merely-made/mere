@@ -1,0 +1,21 @@
+RESULT fail
+FAIL: assert snap practice-saved Eq 'true': got 'false'
+waited 395 frames
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap scope-panel Eq 'Practice': got 'Set'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+captured 01_card_occurrence_with_owner_running
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap rehearsal-running Eq 'true': got 'false'
+FAIL: assert snap runner-set-id Eq '1': got '0'
+Contextual navigation scope/history complete
+capture 01_card_occurrence_with_owner_running 2200x1328 digest=a5202352a2007873 file=C:\Users\mark_\Code\repos\mere\support\family-promotion\contextual-navigation\woodshed-native-supported-fixture\01_card_occurrence_with_owner_running.png
+frames: 1 captured, 0 blank, 1 distinct digests
+presentation: 561 frames, 561 redraws, 0 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":561,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":165,"phase":"submitted"}},"sequence":562}}
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("aria-label", "Down: Guided chord")) }
+FAIL: selector click refused for Selector { surface: None, matcher: Role("button"), text: None, attr: Some(("aria-label", "Up: Working Set 1")) }

@@ -79,7 +79,7 @@ impl Graph {
         // would leave two nodes bearing one world file.
         container.nested = None;
 
-        let key = self.inner.insert(Node {
+        let key = self.insert_surface_node(Node {
             // --- container content: cloned from the source ---
             container,
             // References copy freely: the blob is content-addressed and shared,

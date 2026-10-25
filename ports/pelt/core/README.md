@@ -97,3 +97,24 @@ retain their producer mailbox contract.
 family; the caller chooses whether authored font choices or its reading face
 wins. These choices affect presentation only. Browser hosts must supply fonts
 because they have no system-face access.
+
+
+A controller exposes `text_input_state()` from its shared session producer.
+`PeltContent::text_input_state()` exposes the same successfully published
+observation for the current receiver, so a window host need not drain the
+ordered event stream a second time or downcast Genet. Window hosts use
+`PeltControllerPool::text_input_state(placement)` to require the exact prepared
+appearance and receiver identity, including when the same content appears in
+two viewports. Read it after frame
+preparation. The caret includes document scroll and page zoom in logical
+viewport coordinates; add the admitted placement offset and apply device scale
+once. Mutating the session, changing its viewport, hiding it or retiring it
+revokes the observation until usable geometry is published again. Semantic
+snapshot publication need not be enabled for text-input observations.
+
+Legacy synchronous document hosts keep producing frames when text observations
+are unconsumed. Their unclaimed observations expire with the installed session.
+Async controls or event polling claim the shared stream; that owner must drain
+it, including its final old-scope observations and accepted-request outcomes.
+The snapshot getter reads this same publication authority and introduces no
+second event consumer.

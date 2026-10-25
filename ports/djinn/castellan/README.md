@@ -59,11 +59,13 @@ Implemented:
   transactions across independent views, and checks a separately rooted keyed
   freshness ledger before releasing restored HOTP state.
 - feature `secret-service` — the Freedesktop Secret Service 0.2 object tree on
-  Linux. The resident owns `org.freedesktop.secrets` without replacement,
+  Linux. The adapter requests `org.freedesktop.secrets` without replacement,
   implements the recommended `plain` transfer session, binds sessions to D-Bus
   callers, and delegates every operation to a host policy over bus credentials
   and `/proc` executable identity. A `secret-tool` store/lookup/clear receipt
-  runs under a disposable session bus.
+  runs under a disposable session bus. Djinn does not enable this feature:
+  apps keep the platform's keyring, and the Secret Service plan is parked
+  (ruling SS8), with its own-bus-name design (SS5) kept for later.
 - The Reticulum station derivation that began here is `personae::reticulum`
   now, and the station grant policy `pandect::station_grant` (DR-C, D17).
 - feature `keeper` — moved home from graphshell where it first grew: `view`

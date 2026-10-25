@@ -431,7 +431,9 @@ mod tests {
             .filter_map(|mutation| match mutation {
                 DomMutation::AttributeChanged {
                     name, old_value, ..
-                } if name.local.as_ref() == COMPONENT_PROBE_ATTR => Some(old_value.as_deref()),
+                } if AsRef::<str>::as_ref(&name.local) == COMPONENT_PROBE_ATTR => {
+                    Some(old_value.as_deref())
+                },
                 _ => None,
             })
             .collect()

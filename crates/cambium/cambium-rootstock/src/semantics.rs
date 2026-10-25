@@ -48,6 +48,7 @@ pub enum PublicationIssue {
     UnknownNode(A11yNodeId),
     DuplicateNode(A11yNodeId),
     RouteMismatch(A11yNodeId),
+    ContributorEnded(A11yNodeId),
 }
 impl SemanticProjection {
     /// Freeze all node identities and action routes from one authored read.
@@ -77,6 +78,9 @@ impl SemanticProjection {
             let identity = SemanticNodeIdentity(A11yProvenance::capture_node(
                 owner, target, dom, leaves, producers,
             ));
+            if !identity.0.contributors_live() {
+                return Err(PublicationIssue::ContributorEnded(*id));
+            }
             if identities.insert(*id, identity).is_some() {
                 return Err(PublicationIssue::DuplicateNode(*id));
             }

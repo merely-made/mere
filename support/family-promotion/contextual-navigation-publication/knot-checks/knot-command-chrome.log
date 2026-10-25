@@ -1,0 +1,120 @@
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `errand v0.4.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+warning: patch `nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)` was not used in the crate graph
+   Compiling accesskit v0.25.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling muniment v0.2.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling sceno v0.0.6 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-curation v0.1.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling hest v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling chartulary v0.2.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling tinct v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling document-session-api v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling scenograph v0.0.5 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling workbench v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling meristem v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling illume v0.0.3 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling sprigging v0.3.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling backstep v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-surface-api v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling numen v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling webcue v0.1.1
+   Compiling mere-forme v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling inker v0.1.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling tabard v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling scenotime v0.0.4 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling scenomise v0.0.6 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling eidetic v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling misfin v0.0.4 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling nex-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling gopher-protocol v0.2.0 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling guppy-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling finger-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling incipit v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-kernel v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling scroll-protocol v0.1.0 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling errand v0.4.0 (https://github.com/merely-made/errand.git?rev=1155897e6debc61102ea219cced245d0abccb658#1155897e)
+   Compiling chirograph v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling seiche v0.0.6 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling genet-render v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling accesskit_consumer v0.39.1
+   Compiling esp v0.1.0 (https://github.com/merely-made/esp.git?rev=f27bee8eb5152618ab91fa8676d62c72ebfcb4fc#f27bee8e)
+   Compiling knot-file-catalog v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-file-catalog)
+   Compiling mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling mere-source-edit v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mora-cmudict v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling mere-fleece v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling taproot v0.1.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling reference-data v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling accesskit_windows v0.35.1
+   Compiling knot-capture v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-capture)
+   Compiling mere-page-load v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-site v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-apparatus v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling nematic v0.1.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling script-rhai v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling genet-winit-host v0.2.0 (https://github.com/merely-made/genet.git?branch=main#2b5c0181)
+   Compiling document-canvas v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22)
+   Compiling gemini-protocol v0.1.7 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)
+   Compiling spartan-protocol v0.1.1 (https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963)
+   Compiling graphshell-client v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling cambium v0.6.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling knot-site v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-site)
+   Compiling knot-composition v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-composition)
+   Compiling mere-document-lanes v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-transport v0.0.2 (https://github.com/merely-made/murm.git?branch=main#9ea81db3)
+   Compiling cambium-winit v0.3.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling knot-editor-host v0.1.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling tabard-workshop v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling cambium-rootstock v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling knot-document v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-document)
+warning: usage of an `unsafe` block
+   Compiling knot-readings v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-readings)
+   Compiling cambium-winit-a11y v0.3.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mesquite v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling cambium-genet-winit-host v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+warning: `knot-document` (lib) generated 1 warning
+   Compiling mere-alembic v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-cartography v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling pandect v0.1.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling pictograph v0.2.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling graphshell-endpoint v0.0.2 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-fetch v0.0.1 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-view v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling mere-overmap v0.1.0 (https://github.com/merely-made/mere.git?branch=main#7632bbd3)
+   Compiling knot-editor v0.0.3 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\crates\knot-editor)
+warning: unused variable: `faults`
+warning: variant `Verification` is never constructed
+70 | pub(crate) enum MigrationError {
+   = note: `MigrationError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+warning: enum `MigrationStep` is never used
+warning: methods `at` and `copy_value` are never used
+warning: struct `StageFile` is never constructed
+warning: associated function `create` is never used
+262 |     fn create(parent: &Path) -> Result<Self, MigrationError> {
+   Compiling knot-desktop v0.0.1 (C:\Users\mark_\Code\worktrees\knot-editor-context-navigation-publication\apps\desktop)
+warning: unused variable: `document`
+warning: unused variable: `address`
+warning: unused variable: `root`
+warning: unused variable: `root`
+warning: unused variable: `document`
+warning: unused variable: `address`
+warning: unused variable: `root`
+warning: unused variable: `document`
+warning: `knot-editor` (lib) generated 6 warnings (run `cargo fix --lib -p knot-editor` to apply 1 suggestion)
+warning: `knot-desktop` (lib) generated 8 warnings (run `cargo fix --lib -p knot-desktop` to apply 8 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 1m 08s
+     Running tests\command_chrome.rs (C:/t/cargo-targets/knot-editor/build\debug\deps\command_chrome-2e1e1ea2b5ebffac.exe)
+running 10 tests
+test default_command_chrome_matches_the_platform_frame ... ok
+test title_is_draggable_but_menu_and_document_are_not ... ok
+test client_caption_controls_queue_verbs_without_dragging ... ok
+test client_menu_collapses_and_reopens_safely_after_resize ... ok
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.08s

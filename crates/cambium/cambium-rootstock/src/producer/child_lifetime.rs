@@ -31,6 +31,22 @@ impl Eq for ProducerChildLifetime {}
 #[derive(Clone, Debug)]
 pub struct ProducerChildToken(Weak<()>);
 
+impl ProducerChildToken {
+    pub fn is_live(&self) -> bool {
+        self.0.upgrade().is_some()
+    }
+
+    /// Check within the mutable model borrow that will dispatch the action.
+    /// Two absent tokens preserve the explicit nonreused-key contract.
+    pub fn matches_current(expected: Option<&Self>, current: Option<&Self>) -> bool {
+        match (expected, current) {
+            (None, None) => true,
+            (Some(a), Some(b)) => a.is_live() && b.is_live() && a == b,
+            _ => false,
+        }
+    }
+}
+
 impl PartialEq for ProducerChildToken {
     fn eq(&self, other: &Self) -> bool {
         self.0.ptr_eq(&other.0)

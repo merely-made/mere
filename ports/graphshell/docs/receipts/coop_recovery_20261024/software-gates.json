@@ -1,0 +1,185 @@
+{
+  "runtime_inputs_commit": "ea5c50966e69c495751a45e275c804ea0ac73748",
+  "headed_source_commit": "217d666a4570c2c2953068e76dfc683698765b2f",
+  "source_note": "Both machines used current-main product Rust and root lockfile inputs. The two qualification commits change only shared harness code and fixture locations. Artifact source-file hashes and executable hashes are identical across the readiness change. No historical software results are relabeled as current.",
+  "gates": [
+    {
+      "machine": "owner",
+      "step": "ui-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell-mere"
+      ],
+      "exit": 0,
+      "seconds": 517.96,
+      "log": "software/owner-ui-tests.log.gz",
+      "passed": 39,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "machine": "owner",
+      "step": "coop-tests",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "coop",
+        "--lib",
+        "coop::"
+      ],
+      "exit": 0,
+      "seconds": 353.71,
+      "log": "software/owner-coop-tests.log.gz",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "machine": "owner",
+      "step": "native-build",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell-mere",
+        "--bin",
+        "graphshell_mere",
+        "--message-format=json"
+      ],
+      "exit": 0,
+      "seconds": 160.28,
+      "log": "software/owner-native-build.log.gz"
+    },
+    {
+      "machine": "owner",
+      "step": "resident-build",
+      "command": [
+        "/Users/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "djinn",
+        "--features",
+        "passphrase-fd",
+        "--bin",
+        "djinn",
+        "--example",
+        "coop_existing_graph",
+        "--message-format=json"
+      ],
+      "exit": 0,
+      "seconds": 9.01,
+      "log": "software/owner-resident-build.log.gz"
+    },
+    {
+      "machine": "guest",
+      "step": "ui-tests",
+      "command": [
+        "/home/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell-mere"
+      ],
+      "exit": 0,
+      "seconds": 228.37,
+      "log": "software/guest-ui-tests.log.gz",
+      "passed": 39,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "machine": "guest",
+      "step": "coop-tests",
+      "command": [
+        "/home/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "test",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "coop",
+        "--lib",
+        "coop::"
+      ],
+      "exit": 0,
+      "seconds": 137.44,
+      "log": "software/guest-coop-tests.log.gz",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "machine": "guest",
+      "step": "native-build",
+      "command": [
+        "/home/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "graphshell-mere",
+        "--bin",
+        "graphshell_mere",
+        "--message-format=json"
+      ],
+      "exit": 0,
+      "seconds": 10.67,
+      "log": "software/guest-native-build.log.gz"
+    },
+    {
+      "machine": "guest",
+      "step": "resident-build",
+      "command": [
+        "/home/markik/.cargo/bin/cargo",
+        "+1.99.1",
+        "build",
+        "--locked",
+        "--offline",
+        "-j1",
+        "-p",
+        "djinn",
+        "--features",
+        "passphrase-fd",
+        "--bin",
+        "djinn",
+        "--example",
+        "coop_existing_graph",
+        "--message-format=json"
+      ],
+      "exit": 0,
+      "seconds": 222.68,
+      "log": "software/guest-resident-build.log.gz"
+    }
+  ]
+}

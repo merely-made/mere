@@ -1,0 +1,1019 @@
+diff --git a/crates/woodshed-audio/src/output_runtime/clock.rs b/crates/woodshed-audio/src/output_runtime/clock.rs
+index 661f321..990c921 100644
+--- a/crates/woodshed-audio/src/output_runtime/clock.rs
++++ b/crates/woodshed-audio/src/output_runtime/clock.rs
+@@ -13,6 +13,14 @@ pub const PROGRAM_TICKS_PER_BEAT: u64 = 960;
+ pub const BEAT_TICKS: u64 = PROGRAM_TICKS_PER_BEAT;
+ pub const MAX_PROGRAM_TONE_FRAMES: usize = 65_536;
+ pub const MAX_PROGRAM_TONES: usize = 256;
++/// Short periodic table used only when no integer-cycle loop meets the normal
++/// frame and pitch-error bounds. Playback advances through it with a fixed
++/// point phase accumulator and linear interpolation.
++pub const FALLBACK_PERIODIC_WAVE_FRAMES: usize = 4096;
++pub(super) const FALLBACK_PHASE_INDEX_BITS: u32 = 12;
++pub(super) const FALLBACK_PHASE_FRACTION_BITS: u32 = 52;
++const _: () = assert!(FALLBACK_PERIODIC_WAVE_FRAMES == 1usize << FALLBACK_PHASE_INDEX_BITS);
++const _: () = assert!(FALLBACK_PHASE_INDEX_BITS + FALLBACK_PHASE_FRACTION_BITS == 64);
+ 
+ /// Caller-owned ephemeral identity. It is not persisted or interpreted here.
+ pub type ProgramToken = u64;
+@@ -179,7 +187,11 @@ pub(super) struct PreparedEvent {
+ #[derive(Debug)]
+ pub(super) struct PreparedTone {
+     pub pcm: SampleBuffer,
++    pub requested_frequency_hz: f64,
+     pub actual_frequency_hz: f64,
++    /// Present only for the short fractional-phase table. The ordinary
++    /// integer-cycle PCM path keeps its exact one-frame stepping behavior.
++    pub phase_step_q64: Option<u64>,
+     #[cfg(test)]
+     pub cycles: usize,
+ }
+@@ -471,9 +483,9 @@ fn prepare_tone(frequency: f64, rate: u32) -> Result<PreparedTone, OutputError>
+             break;
+         }
+     }
+-    let (frames, cycles, actual_frequency_hz) = selected.ok_or_else(|| {
+-        err("program tone cannot be represented by a bounded integer-cycle PCM loop")
+-    })?;
++    let Some((frames, cycles, actual_frequency_hz)) = selected else {
++        return prepare_fractional_tone(frequency, rate);
++    };
+     let mut pcm = Vec::with_capacity(frames);
+     for frame in 0..frames {
+         let phase = std::f64::consts::TAU * cycles as f64 * frame as f64 / frames as f64;
+@@ -486,8 +498,43 @@ fn prepare_tone(frequency: f64, rate: u32) -> Result<PreparedTone, OutputError>
+     }
+     Ok(PreparedTone {
+         pcm: SampleBuffer::new(pcm, rate),
++        requested_frequency_hz: frequency,
+         actual_frequency_hz,
++        phase_step_q64: None,
+         #[cfg(test)]
+         cycles,
+     })
+ }
++
++fn prepare_fractional_tone(frequency: f64, rate: u32) -> Result<PreparedTone, OutputError> {
++    // The callback cannot synthesize or allocate, so prepare one cycle of the
++    // existing Woodshed waveform here and move through it at the requested
++    // output rate. A rounded Q64 step has much finer resolution than the
++    // existing 1 ppm admission limit; keep that limit as an explicit guard.
++    let phase_step_q64 = (frequency / rate as f64 * 18_446_744_073_709_551_616.0).round() as u64;
++    let actual_frequency_hz = phase_step_q64 as f64 / 18_446_744_073_709_551_616.0
++        * rate as f64;
++    if phase_step_q64 == 0
++        || !actual_frequency_hz.is_finite()
++        || (actual_frequency_hz - frequency).abs() / frequency > 1.0e-6
++    {
++        return Err(err("program tone exceeds the bounded frequency error"));
++    }
++
++    let mut pcm = Vec::with_capacity(FALLBACK_PERIODIC_WAVE_FRAMES);
++    for frame in 0..FALLBACK_PERIODIC_WAVE_FRAMES {
++        let phase = std::f64::consts::TAU * frame as f64 / FALLBACK_PERIODIC_WAVE_FRAMES as f64;
++        pcm.push((phase.sin() + (phase * 2.0).sin() * 0.25 + (phase * 3.0).sin() * 0.12) as f32);
++    }
++    if pcm.iter().any(|sample| !sample.is_finite()) {
++        return Err(err("program tone synthesis produced a nonfinite sample"));
++    }
++    Ok(PreparedTone {
++        pcm: SampleBuffer::new(pcm, rate),
++        requested_frequency_hz: frequency,
++        actual_frequency_hz,
++        phase_step_q64: Some(phase_step_q64),
++        #[cfg(test)]
++        cycles: 0,
++    })
++}
+diff --git a/crates/woodshed-audio/src/output_runtime/processor.rs b/crates/woodshed-audio/src/output_runtime/processor.rs
+index e5a84f7..d17b609 100644
+--- a/crates/woodshed-audio/src/output_runtime/processor.rs
++++ b/crates/woodshed-audio/src/output_runtime/processor.rs
+@@ -1,7 +1,7 @@
+ use super::clock::{
+-    PreparedProgram, PreparedTone, ProgramDuration, ProgramEnd, ProgramEndReason, ProgramEpoch,
+-    ProgramLoop, ProgramPosition, ProgramSnapshot, ProgramStatus, ProgramTransition,
+-    ProgramTransitionKind,
++    FALLBACK_PHASE_FRACTION_BITS, PreparedProgram, PreparedTone, ProgramDuration, ProgramEnd,
++    ProgramEndReason, ProgramEpoch, ProgramLoop, ProgramPosition, ProgramSnapshot, ProgramStatus,
++    ProgramTransition, ProgramTransitionKind,
+ };
+ use super::*;
+ use crate::capture_feed::CaptureFeedConsumer;
+@@ -855,6 +855,7 @@ struct Processor {
+ struct ProgramVoice {
+     tone: ArcGc<PreparedTone>,
+     position: usize,
++    phase_q64: u64,
+     age: u64,
+     gate: ProgramDuration,
+     gate_end: u64,
+@@ -1413,6 +1414,7 @@ impl Processor {
+             self.program_voices[slot_index] = Some(ProgramVoice {
+                 tone,
+                 position: 0,
++                phase_q64: 0,
+                 age: 0,
+                 gate: event.gate,
+                 gate_end: match event.gate {
+@@ -1546,11 +1548,24 @@ impl Processor {
+                 *slot = None;
+                 continue;
+             }
+-            let sample = voice.tone.pcm.data[voice.position];
+-            voice.position += 1;
+-            if voice.position == voice.tone.pcm.len() {
+-                voice.position = 0;
+-            }
++            let sample = if let Some(step) = voice.tone.phase_step_q64 {
++                const PHASE_FRACTION_MASK: u64 = (1u64 << FALLBACK_PHASE_FRACTION_BITS) - 1;
++                let index = (voice.phase_q64 >> FALLBACK_PHASE_FRACTION_BITS) as usize;
++                let next = (index + 1) % voice.tone.pcm.len();
++                let fraction = (voice.phase_q64 & PHASE_FRACTION_MASK) as f32
++                    / (1u64 << FALLBACK_PHASE_FRACTION_BITS) as f32;
++                let first = voice.tone.pcm.data[index];
++                let second = voice.tone.pcm.data[next];
++                voice.phase_q64 = voice.phase_q64.wrapping_add(step);
++                first + (second - first) * fraction
++            } else {
++                let sample = voice.tone.pcm.data[voice.position];
++                voice.position += 1;
++                if voice.position == voice.tone.pcm.len() {
++                    voice.position = 0;
++                }
++                sample
++            };
+             let attack_gain = (voice.age as f32 / attack as f32).min(1.0);
+             let release_gain = if voice.released {
+                 (1.0 - voice.release_age as f32 / release as f32).max(0.0)
+diff --git a/crates/woodshed-audio/src/output_runtime/tests.rs b/crates/woodshed-audio/src/output_runtime/tests.rs
+index 00b0837..6f9851c 100644
+--- a/crates/woodshed-audio/src/output_runtime/tests.rs
++++ b/crates/woodshed-audio/src/output_runtime/tests.rs
+@@ -487,12 +487,145 @@ fn prepared_integer_cycle_tone_meets_frequency_error_and_has_bounded_loop_seam()
+ }
+ 
+ #[test]
+-fn unrepresentable_future_tone_becomes_a_per_card_refusal_sentinel() {
++fn fallback_g2_tone_is_admitted_at_common_device_rates_without_changing_fast_path() {
++    let frequency = 97.998_855_590_820_31;
++    for rate in [44_100, 48_000, 96_000] {
++        let mut plan = program_with_card_count(1, ProgramEnd::DeviceFrames(100), 120.0);
++        plan.cards[0].events[0].frequency_hz = frequency;
++        let prepared = PreparedProgram::prepare(plan, rate).unwrap();
++        let tone = &prepared.tones[0];
++        assert!(tone.pcm.len() <= clock::MAX_PROGRAM_TONE_FRAMES);
++        assert_eq!(tone.requested_frequency_hz, frequency);
++        assert!((tone.actual_frequency_hz - frequency).abs() / frequency <= 1.0e-6);
++        if rate == 44_100 {
++            assert!(tone.phase_step_q64.is_some());
++            assert_eq!(tone.pcm.len(), clock::FALLBACK_PERIODIC_WAVE_FRAMES);
++            assert_eq!(tone.cycles, 0);
++            assert!((tone.pcm.data[1024] - 0.88).abs() < 1.0e-6);
++        } else {
++            assert_eq!(tone.phase_step_q64, None);
++            assert!(tone.cycles > 0);
++            assert!(tone.pcm.len() <= clock::MAX_PROGRAM_TONE_FRAMES);
++        }
++    }
++}
++
++#[test]
++fn fractional_phase_fallback_preserves_pitch_and_waveform_across_blocks() {
++    const RATE: u32 = 44_100;
++    const FREQUENCY: f64 = 97.998_855_590_820_31;
++    fn started() -> OutputRuntime {
++        let mut runtime = OutputRuntime::offline(RATE).unwrap();
++        render(&mut runtime, 1);
++        runtime.service().unwrap();
++        let mut plan = program_with_card_count(1, ProgramEnd::DeviceFrames(88_200), 120.0);
++        plan.cards[0].events[0].frequency_hz = FREQUENCY;
++        let prepared = runtime.prepare_program(plan).unwrap();
++        runtime.start_program(prepared).unwrap();
++        runtime.service().unwrap();
++        runtime
++    }
++
++    let mut whole = started();
++    let all = render(&mut whole, 66_000);
++    let mono = all.chunks_exact(2).map(|frame| frame[0]).collect::<Vec<_>>();
++    let rising = (2_000..mono.len() - 1)
++        .filter(|index| mono[*index - 1] < 0.0 && mono[*index] >= 0.0)
++        .collect::<Vec<_>>();
++    let first = *rising.first().unwrap() as f64;
++    let last = *rising.last().unwrap() as f64;
++    let measured = (rising.len() - 1) as f64 * RATE as f64 / (last - first);
++    assert!((measured - FREQUENCY).abs() < 0.2, "measured {measured} Hz");
++    assert!(mono.iter().any(|sample| sample.abs() > 1.0e-4));
++
++    let mut chunked = started();
++    let mut pieces = Vec::new();
++    for count in [1, 17, 128, 4093, 257, 8191, 2_000, 51_313] {
++        let block = render(&mut chunked, count);
++        pieces.extend(block);
++    }
++    assert_eq!(pieces, all);
++}
++
++#[test]
++fn fractional_phase_program_clear_stops_at_next_callback_boundary() {
++    let mut runtime = OutputRuntime::offline(44_100).unwrap();
++    render(&mut runtime, 1);
++    runtime.service().unwrap();
++    let mut plan = program_with_card_count(1, ProgramEnd::DeviceFrames(64), 120.0);
++    plan.cards[0].events[0].frequency_hz = 97.998_855_590_820_31;
++    let epoch = runtime
++        .start_program(runtime.prepare_program(plan).unwrap())
++        .unwrap();
++    runtime.service().unwrap();
++    assert!(render(&mut runtime, 16).iter().any(|sample| sample.abs() > 1.0e-4));
++    runtime.clear_session().unwrap();
++    runtime.service().unwrap();
++    assert!(render(&mut runtime, 8).iter().all(|sample| *sample == 0.0));
++    assert_eq!(runtime.snapshot().program.status, ProgramStatus::Stopped);
++    assert!(runtime.drain_program_transitions().iter().any(|transition| {
++        transition.epoch == epoch
++            && transition.kind == ProgramTransitionKind::Ended(ProgramEndReason::Stop)
++    }));
++}
++
++#[test]
++fn fractional_phase_program_honors_device_duration_and_ends_silent() {
++    let mut runtime = OutputRuntime::offline(44_100).unwrap();
++    render(&mut runtime, 1);
++    runtime.service().unwrap();
++    let plan = ProgramPlan {
++        cards: vec![ProgramCard {
++            token: 1,
++            bpm: 120.0,
++            end: ProgramEnd::DeviceFrames(64),
++            events: vec![ProgramEvent {
++                token: 1,
++                onset: ProgramPosition::DeviceFrames(0),
++                onset_offset_frames: 0,
++                gate: ProgramDuration::DeviceFrames(64),
++                frequency_hz: 97.998_855_590_820_31,
++                amplitude: 0.5,
++            }],
++        }],
++        start_index: 0,
++        loop_mode: ProgramLoop::Once,
++    };
++    runtime
++        .start_program(runtime.prepare_program(plan).unwrap())
++        .unwrap();
++    runtime.service().unwrap();
++    assert!(render(&mut runtime, 63).iter().any(|sample| sample.abs() > 1.0e-5));
++    assert_eq!(runtime.snapshot().program.card_frames, 63);
++    assert_eq!(runtime.snapshot().program.status, ProgramStatus::Playing);
++    render(&mut runtime, 1);
++    assert_eq!(runtime.snapshot().program.card_frames, 64);
++    assert_eq!(runtime.snapshot().program.status, ProgramStatus::Complete);
++    let tail = render(&mut runtime, 11_100);
++    assert!(tail[tail.len() - 256..].iter().all(|sample| *sample == 0.0));
++    assert_eq!(runtime.snapshot().program.status, ProgramStatus::Complete);
++}
++
++#[test]
++fn invalid_and_nyquist_program_tones_remain_refused_without_fallback() {
++    for frequency in [0.0, -10.0, f64::NAN, f64::INFINITY, 22_050.0, 30_000.0] {
++        let mut plan = program_with_card_count(1, ProgramEnd::DeviceFrames(100), 120.0);
++        plan.cards[0].events[0].frequency_hz = frequency;
++        let prepared = PreparedProgram::prepare(plan, 44_100).unwrap();
++        assert_eq!(prepared.cards[0].end, ProgramEnd::Refusal(1));
++        assert!(prepared.refusal_reason(0).is_some());
++        assert!(prepared.tones.is_empty());
++    }
++}
++
++#[test]
++fn low_frequency_valid_tone_uses_fallback_instead_of_refusal() {
+     let mut plan = program_with_card_count(2, ProgramEnd::DeviceFrames(100), 120.0);
+     plan.cards[0].events[0].frequency_hz = 0.01;
+     let prepared = PreparedProgram::prepare(plan, 1000).unwrap();
+-    assert_eq!(prepared.cards[0].end, ProgramEnd::Refusal(1));
+-    assert!(prepared.refusal_reason(0).is_some());
++    assert_eq!(prepared.cards[0].end, ProgramEnd::DeviceFrames(100));
++    assert!(prepared.refusal_reason(0).is_none());
++    assert!(prepared.tones[0].phase_step_q64.is_some());
+     assert_eq!(prepared.cards[1].end, ProgramEnd::DeviceFrames(100));
+ }
+ 
+diff --git a/crates/woodshed-core/src/storage.rs b/crates/woodshed-core/src/storage.rs
+index 89d46ae..9073c8c 100644
+--- a/crates/woodshed-core/src/storage.rs
++++ b/crates/woodshed-core/src/storage.rs
+@@ -421,6 +421,10 @@ pub struct PersistedSession {
+     /// session slot without learning the shared Workbench schema.
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub workspace_json: Option<String>,
++    /// Woodshed-owned contextual route history. The core preserves this opaque
++    /// payload so the view layer can validate durable owner and Card ids.
++    #[serde(default, skip_serializing_if = "Option::is_none")]
++    pub scope_navigation_json: Option<String>,
+     /// Shared relational recipe snapshot plus its bounded disclosed evidence.
+     /// An embedding validates this payload through the shared compiler when
+     /// mounting it. Persistence retains the opaque bytes beside the owner's
+@@ -473,6 +477,7 @@ impl PersistedSession {
+             loop_captures: LoopCaptureManifest::default(),
+             practice_history: practice_history.clone(),
+             workspace_json: None,
++            scope_navigation_json: None,
+             relationship_reading_json: None,
+             overview_presentation_json: None,
+             personal_relations: None,
+@@ -597,6 +602,21 @@ mod tests {
+         assert!(decode_session(&invalid.to_string()).is_err());
+     }
+ 
++    #[test]
++    fn session_store_roundtrips_opaque_scope_navigation_bytes() {
++        let store = SessionStore::new(muniment::MemoryBackend::default());
++        let mut session = PersistedSession::default();
++        let route = r#"{"future_scope_payload":{"owner":"opaque","camera":[0.2,-0.1,1.4]}}"#;
++        session.scope_navigation_json = Some(route.into());
++        let written = serde_json::to_string(&session).unwrap();
++        store.try_save(&written).unwrap();
++
++        let read = store.try_load().unwrap().unwrap();
++        assert_eq!(read, written);
++        let reopened = decode_session(&read).unwrap().session;
++        assert_eq!(reopened.scope_navigation_json.as_deref(), Some(route));
++    }
++
+     #[test]
+     fn missing_session_initializes_but_unreadable_slot_quarantines_every_clone() {
+         let inner = muniment::MemoryBackend::default();
+diff --git a/crates/woodshed-genet/src/paths.rs b/crates/woodshed-genet/src/paths.rs
+index 55c6e38..77220ea 100644
+--- a/crates/woodshed-genet/src/paths.rs
++++ b/crates/woodshed-genet/src/paths.rs
+@@ -19,6 +19,10 @@ pub(crate) fn absolute(path: &Path) -> Result<PathBuf, String> {
+             Component::ParentDir => {
+                 resolved.pop();
+             },
++            // On Windows a Prefix by itself (for example, `C:` or a UNC
++            // share) is not the absolute root. Probing it can resolve as a
++            // drive-relative path. Keep it lexical until RootDir arrives.
++            Component::Prefix(prefix) => resolved.push(prefix.as_os_str()),
+             other => {
+                 resolved.push(other.as_os_str());
+                 match std::fs::symlink_metadata(&resolved) {
+@@ -54,6 +58,18 @@ mod tests {
+         assert!(absolute(Path::new("")).is_err());
+     }
+ 
++    #[test]
++    #[cfg(windows)]
++    fn windows_root_prefix_survives_future_children() {
++        let directory = tempfile::tempdir().unwrap();
++        let root = directory.path().canonicalize().unwrap();
++        assert!(root.is_absolute());
++
++        let path = root.join("scope-navigation-future/../private/session");
++        assert_eq!(absolute(&path).unwrap(), root.join("private/session"));
++        assert!(!root.join("scope-navigation-future").exists());
++    }
++
+     #[test]
+     #[cfg(unix)]
+     fn symlink_is_resolved_before_parent_for_live_and_future_destinations() {
+diff --git a/crates/woodshed-genet/src/scenario.rs b/crates/woodshed-genet/src/scenario.rs
+index 4b259c6..b2b1860 100644
+--- a/crates/woodshed-genet/src/scenario.rs
++++ b/crates/woodshed-genet/src/scenario.rs
+@@ -1860,6 +1860,13 @@ impl Snapshot<'_, '_> {
+                 (ui.working_sets.inactive.len() + 1).to_string(),
+             )
+             .with_field("working-set-id", ui.working_sets.active_id.0.to_string())
++            .with_field(
++                "scope-panel",
++                ui.workspace
++                    .active_panel()
++                    .map_or("none", |panel| panel.label())
++                    .to_string(),
++            )
+             .with_field(
+                 "explorations",
+                 (ui.catalog_explorations.inactive.len() + 1).to_string(),
+diff --git a/crates/woodshed-genet/src/scenario/guided_rehearsal.rs b/crates/woodshed-genet/src/scenario/guided_rehearsal.rs
+index 0c2baaa..8a9b57f 100644
+--- a/crates/woodshed-genet/src/scenario/guided_rehearsal.rs
++++ b/crates/woodshed-genet/src/scenario/guided_rehearsal.rs
+@@ -46,6 +46,24 @@ pub(super) fn act(ctx: &mut Ctx<'_>, shared: &Rc<RefCell<Shared>>, label: &str)
+         ctx.runner.update(seed);
+         return Some(true);
+     }
++    if label == "p6-context-native-seed" {
++        ctx.runner.update(seed_two_context_sets);
++        return Some(true);
++    }
++    if let Some(name) = label.strip_prefix("p6-context-observation ") {
++        return Some(write_context_observation(
++            ctx.runner.state(),
++            &shared.borrow(),
++            name,
++        ));
++    }
++    if let Some(name) = label.strip_prefix("p6-audio-observation ") {
++        return Some(write_audio_observation(
++            ctx.runner.state(),
++            &shared.borrow(),
++            name,
++        ));
++    }
+     if let Some(name) = label.strip_prefix("p6-checkpoint ") {
+         return Some(checkpoint(ctx.runner.state(), &shared.borrow(), name));
+     }
+@@ -55,6 +73,50 @@ pub(super) fn act(ctx: &mut Ctx<'_>, shared: &Rc<RefCell<Shared>>, label: &str)
+     None
+ }
+ 
++fn write_audio_observation(ui: &UiState, shared: &Shared, name: &str) -> bool {
++    let Some(path) = path(name) else {
++        return false;
++    };
++    let Some(backend) = shared.backend.as_ref() else {
++        return false;
++    };
++    let Some(sample_rate) = backend.output_sample_rate() else {
++        return false;
++    };
++    let Some(snapshot) = backend.output_snapshot() else {
++        return false;
++    };
++    let program = snapshot.program;
++    let value = json!({
++        "sample_rate": sample_rate,
++        "rehearsal_running": ui.rehearsal_running,
++        "rehearsal_paused": ui.rehearsal_paused,
++        "program": {
++            "status": format!("{:?}", program.status),
++            "card_index": program.card_index,
++            "card_token": program.card_token,
++            "event_index": program.event_index,
++            "event_token": program.event_token,
++            "device_frame": program.device_frame,
++            "card_frames": program.card_frames,
++            "active_frames": program.active_frames,
++            "bpm": f64::from_bits(program.bpm_bits),
++        }
++    });
++    let Ok(bytes) = serde_json::to_vec_pretty(&value) else {
++        return false;
++    };
++    let Ok(mut file) = std::fs::OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(path)
++    else {
++        return false;
++    };
++    use std::io::Write;
++    file.write_all(&bytes).is_ok()
++}
++
+ fn seed(ui: &mut UiState) {
+     ui.stop_rehearsal();
+     ui.set = Set::default();
+@@ -85,6 +147,202 @@ fn seed(ui: &mut UiState) {
+     ui.select_app_section(woodshed_core::storage::AppSection::Rehearsal);
+ }
+ 
++fn seed_two_context_sets(ui: &mut UiState) {
++    seed(ui);
++    let shared_material = ui.set.clone();
++    ui.working_sets
++        .create(&mut ui.set, "Working Set 2", shared_material);
++    ui.set.cursor = 0;
++    ui.set.loop_mode = LoopMode::Off;
++    ui.select_app_section(woodshed_core::storage::AppSection::Rehearsal);
++}
++
++/// Read the actual sealed session and current product projection at a native
++/// scenario checkpoint. This does not save or alter the session.
++fn write_context_observation(ui: &UiState, shared: &Shared, name: &str) -> bool {
++    if !matches!(name, "seed" | "reopened" | "returned")
++        || !ui.practice_saved
++        || !matches!(
++            shared.seal.as_ref(),
++            Some(woodshed_views::persona::PracticeSeal::Sealed { .. })
++        )
++        || ui.working_sets.inactive.len() + 1 != 2
++    {
++        return false;
++    }
++    let Some(inactive) = ui.working_sets.inactive.first() else {
++        return false;
++    };
++    let same_card_occurrences = ui.set.cards.len() == inactive.set.cards.len()
++        && ui
++            .set
++            .cards
++            .iter()
++            .zip(&inactive.set.cards)
++            .all(|(active, inactive)| active.id == inactive.id);
++    if !same_card_occurrences {
++        return false;
++    }
++    let Some(storage) = shared.storage.as_ref() else {
++        return false;
++    };
++    let Some(stored_bytes) = storage.load() else {
++        return false;
++    };
++    let Ok(stored) = woodshed_core::storage::decode_session(&stored_bytes) else {
++        return false;
++    };
++    let live = ui.to_persisted();
++    let Ok(live_value) = serde_json::to_value(&live) else {
++        return false;
++    };
++    let Ok(stored_value) = serde_json::to_value(&stored.session) else {
++        return false;
++    };
++
++    let music = serde_json::json!({
++        "sets_by_owner": persisted_set_bank(&live_value),
++        "retained_sets": live_value["retained_sets"].clone(),
++        "catalog_explorations": live_value["catalog_explorations"].clone(),
++        "song": live_value["song"].clone(),
++        "musical_context": live_value["musical_context"].clone(),
++        "looper": live_value["looper"].clone(),
++        "loop_captures": live_value["loop_captures"].clone(),
++        "practice_history": live_value["practice_history"].clone(),
++    });
++    let stored_music = serde_json::json!({
++        "sets_by_owner": persisted_set_bank(&stored_value),
++        "retained_sets": stored_value["retained_sets"].clone(),
++        "catalog_explorations": stored_value["catalog_explorations"].clone(),
++        "song": stored_value["song"].clone(),
++        "musical_context": stored_value["musical_context"].clone(),
++        "looper": stored_value["looper"].clone(),
++        "loop_captures": stored_value["loop_captures"].clone(),
++        "practice_history": stored_value["practice_history"].clone(),
++    });
++    let fields = [
++        "set",
++        "working_sets",
++        "retained_sets",
++        "catalog_explorations",
++        "song",
++        "musical_context",
++        "looper",
++        "loop_captures",
++        "practice_history",
++        "workspace_json",
++        "scope_navigation_json",
++        "overview_presentation_json",
++    ];
++    let stored_matches_live = fields
++        .iter()
++        .all(|field| live_value[*field] == stored_value[*field]);
++    let route: serde_json::Value = live
++        .scope_navigation_json
++        .as_deref()
++        .and_then(|value| serde_json::from_str(value).ok())
++        .unwrap_or(serde_json::Value::Null);
++    let workspace: serde_json::Value = live
++        .workspace_json
++        .as_deref()
++        .and_then(|value| serde_json::from_str(value).ok())
++        .unwrap_or(serde_json::Value::Null);
++    let overview_presentation: serde_json::Value = live
++        .overview_presentation_json
++        .as_deref()
++        .and_then(|value| serde_json::from_str(value).ok())
++        .unwrap_or(serde_json::Value::Null);
++    let program = shared
++        .backend
++        .as_ref()
++        .and_then(|backend| backend.output_snapshot())
++        .map(|snapshot| snapshot.program);
++    let program_status = program.map(|snapshot| format!("{:?}", snapshot.status));
++    let playback_stopped = !ui.rehearsal_running
++        && !ui.rehearsal_paused
++        && program_status.as_deref() == Some("Stopped");
++
++    let mut cross_process = serde_json::Value::Null;
++    if name != "seed" {
++        let Some(expected_path) = path("context-seed") else {
++            return false;
++        };
++        let expected = std::fs::read(expected_path)
++            .ok()
++            .and_then(|bytes| serde_json::from_slice::<serde_json::Value>(&bytes).ok());
++        let Some(expected) = expected else {
++            return false;
++        };
++        let same_music = expected.get("music") == Some(&music);
++        let same_route = expected.get("route") == Some(&route);
++        let same_view = expected.get("workspace") == Some(&workspace)
++            && expected.get("overview_presentation") == Some(&overview_presentation);
++        cross_process = serde_json::json!({
++            "seed_music_exact": same_music,
++            "seed_route_exact": same_route,
++            "seed_view_exact": same_view,
++        });
++        if !same_music || (name == "reopened" && (!same_route || !same_view)) {
++            return false;
++        }
++    }
++
++    let report = serde_json::json!({
++        "phase": name,
++        "sealed": true,
++        "practice_saved": ui.practice_saved,
++        "stored_matches_live": stored_matches_live,
++        "music": music,
++        "route": route,
++        "workspace": workspace,
++        "overview_presentation": overview_presentation,
++        "active_working_set_id": ui.working_sets.active_id.0,
++        "active_working_set_name": ui.working_sets.active_name,
++        "working_set_count": ui.working_sets.inactive.len() + 1,
++        "same_card_occurrences_in_both_sets": same_card_occurrences,
++        "overview_zoom": ui.overview_viewport.zoom,
++        "runner": {
++            "running": ui.rehearsal_running,
++            "paused": ui.rehearsal_paused,
++            "program_status": program_status,
++            "playback_stopped": playback_stopped,
++        },
++        "cross_process": cross_process,
++    });
++    let Ok(bytes) = serde_json::to_vec_pretty(&report) else {
++        return false;
++    };
++    let Some(path) = path(&format!("context-{name}")) else {
++        return false;
++    };
++    let Ok(mut file) = std::fs::OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(path)
++    else {
++        return false;
++    };
++    use std::io::Write;
++    if file.write_all(&bytes).is_err() {
++        return false;
++    }
++    stored_matches_live && playback_stopped && !route.is_null() && same_card_occurrences
++}
++
++fn persisted_set_bank(session: &serde_json::Value) -> Vec<serde_json::Value> {
++    let working_sets = &session["working_sets"];
++    let mut sets = vec![serde_json::json!({
++        "id": working_sets["active_id"].clone(),
++        "name": working_sets["active_name"].clone(),
++        "set": session["set"].clone(),
++    })];
++    if let Some(inactive) = working_sets["inactive"].as_array() {
++        sets.extend(inactive.iter().cloned());
++    }
++    sets.sort_by_key(|set| set["id"].as_u64().unwrap_or_default());
++    sets
++}
++
+ fn path(name: &str) -> Option<PathBuf> {
+     if name.is_empty() || !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+         return None;
+diff --git a/crates/woodshed-genet/src/storage.rs b/crates/woodshed-genet/src/storage.rs
+index 241eecd..477999b 100644
+--- a/crates/woodshed-genet/src/storage.rs
++++ b/crates/woodshed-genet/src/storage.rs
+@@ -1046,6 +1046,7 @@ mod capture_tests {
+ mod persona_store_tests {
+     use super::*;
+     use personae::InMemoryProvider;
++    use woodshed_views::stage::UiState;
+ 
+     fn sealed_at(
+         root: &Path,
+@@ -1153,6 +1154,59 @@ mod persona_store_tests {
+         assert!(!root.path().join("genet-state.json").exists());
+     }
+ 
++    #[test]
++    fn scope_navigation_payload_reopens_from_filesystem_and_corrupt_route_bytes_are_retained() {
++        let root = tempfile::tempdir().unwrap();
++        let provider = InMemoryProvider::from_seed([13; 32]);
++        let store = open_fixture(root.path(), &provider);
++        let ui = UiState::new();
++        let saved = ui.to_persisted();
++        let route = saved.scope_navigation_json.clone().unwrap();
++        let bytes = serde_json::to_string(&saved).unwrap();
++        store.try_save(&bytes).unwrap();
++        drop(store);
++
++        let reopened_store = open_fixture(root.path(), &provider);
++        let reopened_bytes = reopened_store.try_load().unwrap().unwrap();
++        assert_eq!(reopened_bytes, bytes);
++        let reopened_session = woodshed_core::storage::decode_session(&reopened_bytes)
++            .unwrap()
++            .session;
++        assert_eq!(
++            reopened_session.scope_navigation_json.as_deref(),
++            Some(route.as_str())
++        );
++        let mut reopened_ui = UiState::new();
++        reopened_ui.apply_persisted(&reopened_session, Default::default());
++        assert_eq!(
++            reopened_ui.to_persisted().scope_navigation_json.as_deref(),
++            Some(route.as_str())
++        );
++
++        let mut corrupt_session = reopened_session;
++        corrupt_session.scope_navigation_json = Some("{".into());
++        let corrupt_bytes = serde_json::to_string(&corrupt_session).unwrap();
++        reopened_store.try_save(&corrupt_bytes).unwrap();
++        drop(reopened_store);
++
++        let fresh_store = open_fixture(root.path(), &provider);
++        let retained_corrupt_bytes = fresh_store.try_load().unwrap().unwrap();
++        let mut fresh_ui = UiState::new();
++        let corrupt_loaded = woodshed_core::storage::decode_session(&retained_corrupt_bytes)
++            .unwrap()
++            .session;
++        fresh_ui.apply_persisted(&corrupt_loaded, Default::default());
++        assert_eq!(
++            fresh_ui.to_persisted().scope_navigation_json.as_deref(),
++            Some("{")
++        );
++        assert_eq!(
++            fresh_store.try_load().unwrap().as_deref(),
++            Some(corrupt_bytes.as_str())
++        );
++        assert_eq!(retained_corrupt_bytes, corrupt_bytes);
++    }
++
+     #[test]
+     fn owner_initialization_authenticates_schema_identity_and_is_immutable() {
+         let provider = InMemoryProvider::from_seed([3; 32]);
+@@ -1383,7 +1437,14 @@ mod persona_store_tests {
+             "relative" => {
+                 let root = configured_root().unwrap();
+                 assert!(root.is_absolute());
+-                assert_eq!(root, std::env::current_dir().unwrap().join("isolated-root"));
++                assert_eq!(
++                    root,
++                    std::env::current_dir()
++                        .unwrap()
++                        .canonicalize()
++                        .unwrap()
++                        .join("isolated-root")
++                );
+             },
+             "obsolete-state" | "obsolete-settings" => {
+                 let name = if mode == "obsolete-state" {
+diff --git a/crates/woodshed-views/src/stage.rs b/crates/woodshed-views/src/stage.rs
+index 3706a3e..0e281a3 100644
+--- a/crates/woodshed-views/src/stage.rs
++++ b/crates/woodshed-views/src/stage.rs
+@@ -57,6 +57,7 @@ mod connected_scales;
+ mod context;
+ #[cfg(test)]
+ mod context_tests;
++mod contextual_navigation;
+ mod instances;
+ mod looper;
+ pub mod music_editor;
+@@ -811,8 +812,10 @@ pub fn set_graph_swatch_from_snapshot(
+         swatch.show_labels = false;
+     }
+     swatch.selected = ui
+-        .set
+-        .cursor_id()
++        .scope_card_anchors
++        .get(&ui.working_sets.active_id)
++        .copied()
++        .or_else(|| ui.set.cursor_id())
+         .and_then(|card| snapshot.instance_ref_of(card));
+     swatch.focus = ui
+         .context_focus
+@@ -1149,6 +1152,13 @@ pub struct UiState {
+     pub music_editor: music_editor::MusicEditor,
+     pub overview_focus: Option<woodshed_core::session_overview::OverviewNodeId>,
+     pub overview_notice: Option<String>,
++    /// In-memory scope visits name existing owners and Card occurrences only.
++    pub(super) scope_navigation: contextual_navigation::Navigation,
++    pub(crate) scope_navigation_hint: Option<cambium::scope_navigation::ScopeDirection>,
++    pub(crate) scope_navigation_notice: Option<String>,
++    pub(super) scope_navigation_rejected_json: Option<String>,
++    /// Visual Card anchors are separate from the runner's Set cursor.
++    pub(crate) scope_card_anchors: BTreeMap<woodshed_core::working_sets::WorkingSetId, CardId>,
+     pub overview_folds: overview_folds::OverviewFolds,
+     pub overview_viewport: GraphViewport,
+     /// View-local cameras for the Related graph and relationship editor.
+@@ -1446,6 +1456,11 @@ impl UiState {
+             music_editor: Default::default(),
+             overview_focus: None,
+             overview_notice: None,
++            scope_navigation: Default::default(),
++            scope_navigation_hint: None,
++            scope_navigation_notice: None,
++            scope_navigation_rejected_json: None,
++            scope_card_anchors: Default::default(),
+             overview_folds: Default::default(),
+             overview_viewport: GraphViewport::default(),
+             related_viewport: GraphViewport::default(),
+@@ -1693,6 +1708,7 @@ impl UiState {
+                 if !self.set.select_id(id) {
+                     return;
+                 }
++                self.remember_card_scope(id);
+                 self.set_graph_relation = None;
+                 self.set_graph_opened_link = None;
+                 self.set_graph_card_expanded = if was_selected {
+@@ -2586,6 +2602,10 @@ impl UiState {
+                 .to_snapshot_json()
+                 .expect("Woodshed only persists canonical workspace events"),
+         );
++        session.scope_navigation_json = Some(
++            self.persist_scope_navigation()
++                .expect("Woodshed scope navigation has a serializable session schema"),
++        );
+         session
+     }
+ 
+@@ -2739,6 +2759,7 @@ impl UiState {
+             }
+         });
+         if matches!(self.section, AppSection::Looper | AppSection::Tools) {
++            self.restore_scope_navigation(session.scope_navigation_json.as_deref());
+             return workspace_error;
+         }
+         if workspace_error.is_none() && session.workspace_json.is_some() {
+@@ -2748,6 +2769,7 @@ impl UiState {
+         } else {
+             self.select_app_section(session.section);
+         }
++        self.restore_scope_navigation(session.scope_navigation_json.as_deref());
+         workspace_error
+     }
+ }
+@@ -2784,7 +2806,22 @@ fn workspace_strip(ui: &UiState) -> UiChild {
+             )) as UiChild
+         })
+         .collect();
+-    Box::new(el("div", panels).attr("class", "workspace-strip"))
++    Box::new(
++        el(
++            "div",
++            (
++                panels,
++                ui.scope_navigation_widget(),
++                ui.scope_trail_widget(),
++                ui.scope_navigation_notice.as_ref().map(|notice| {
++                    el("span", text(notice.clone()))
++                        .attr("class", "scope-navigation-notice")
++                        .attr("role", "alert")
++                }),
++            ),
++        )
++        .attr("class", "workspace-strip"),
++    )
+ }
+ 
+ fn header(ui: &UiState) -> UiChild {
+diff --git a/crates/woodshed-views/src/stage/instances.rs b/crates/woodshed-views/src/stage/instances.rs
+index 1c98a86..0ac0d7f 100644
+--- a/crates/woodshed-views/src/stage/instances.rs
++++ b/crates/woodshed-views/src/stage/instances.rs
+@@ -163,6 +163,21 @@ impl UiState {
+         self.activate_workspace_panel(WorkspacePanel::Set);
+         true
+     }
++    /// Select a Set as a view destination without transferring or stopping a
++    /// MusicXML practice run that remains bound to its original owner.
++    pub(super) fn activate_working_set_for_scope(&mut self, id: WorkingSetId) -> bool {
++        if self.working_sets.get(id, &self.set).is_none() {
++            return false;
++        }
++        if id != self.working_sets.active_id {
++            self.sync_card_rename();
++            self.leave_music_owner_view();
++            self.park_set_presentation();
++            self.working_sets.activate(id, &mut self.set);
++            self.restore_set_presentation();
++        }
++        true
++    }
+     pub fn rehearsal_set(&self) -> &Set {
+         self.rehearsal_owner
+             .and_then(|owner| self.working_sets.get(owner, &self.set))
+diff --git a/crates/woodshed-views/src/stage/music_editor.rs b/crates/woodshed-views/src/stage/music_editor.rs
+index fa7cebd..2648928 100644
+--- a/crates/woodshed-views/src/stage/music_editor.rs
++++ b/crates/woodshed-views/src/stage/music_editor.rs
+@@ -165,6 +165,11 @@ fn view_label(view: NotationView) -> &'static str {
+ impl UiState {
+     pub fn leave_music_owner(&mut self) {
+         self.music_editor.practice.stop();
++        self.leave_music_owner_view();
++    }
++    /// Leave owner-local editing gestures while a navigation route selects a
++    /// different Set. The captured practice run remains bound to its owner.
++    pub(super) fn leave_music_owner_view(&mut self) {
+         self.music_editor.active_tone = None;
+         self.music_editor.fret_gesture = None;
+         self.music_editor.picking_preview = None;
+@@ -1501,6 +1506,28 @@ mod tests {
+         ui
+     }
+     #[test]
++    fn scope_set_switch_clears_owner_gestures_without_stopping_bound_practice() {
++        let mut ui = fixture(false);
++        let owner = ui.working_sets.active_id;
++        ui.practice_music();
++        assert!(ui.music_practice_requested());
++        let run_epoch = ui.music_editor.practice.run_epoch();
++        let other = ui
++            .working_sets
++            .create(&mut ui.set, "Other Set", Default::default());
++        assert!(ui.working_sets.activate(owner, &mut ui.set));
++        ui.preview_music_pattern(pattern::PickingPattern::EighthUpDown);
++        ui.music_editor.active_tone = Some(FrettedNote { string: 1, fret: 3 });
++        assert!(ui.music_preview_active());
++        assert!(ui.activate_working_set_for_scope(other));
++        assert_eq!(ui.working_sets.active_id, other);
++        assert_eq!(ui.music_editor.practice.owner(), Some(owner));
++        assert_eq!(ui.music_editor.practice.run_epoch(), run_epoch);
++        assert!(ui.music_practice_requested());
++        assert!(!ui.music_preview_active());
++        assert_eq!(ui.music_editor.active_tone, None);
++    }
++    #[test]
+     fn musical_edits_share_one_history_across_views_save_and_reopen() {
+         let mut ui = fixture(true);
+         ui.save_music();
+diff --git a/crates/woodshed-views/src/stage/overview.rs b/crates/woodshed-views/src/stage/overview.rs
+index 2a74e48..78db2cb 100644
+--- a/crates/woodshed-views/src/stage/overview.rs
++++ b/crates/woodshed-views/src/stage/overview.rs
+@@ -507,7 +507,15 @@ impl UiState {
+                 self.open_relationship_recipe()
+             },
+             OverviewNodeId::Artifact(SessionArtifactId::WorkingSetInstance(id)) => {
+-                self.activate_working_set(id);
++                self.visit_scope(
++                    super::contextual_navigation::WoodshedScopePlace::WorkingSet {
++                        owner: id,
++                        panel: WorkspacePanel::Set,
++                    },
++                    Some(super::contextual_navigation::WoodshedScopeAnchor::OverviewNode(
++                        OverviewNodeId::Artifact(SessionArtifactId::WorkingSetInstance(id)),
++                    )),
++                );
+             },
+             OverviewNodeId::Artifact(SessionArtifactId::Exploration(id)) => {
+                 self.activate_exploration(id);
+diff --git a/crates/woodshed-views/src/theme.rs b/crates/woodshed-views/src/theme.rs
+index 8d5f621..0bc02d7 100644
+--- a/crates/woodshed-views/src/theme.rs
++++ b/crates/woodshed-views/src/theme.rs
+@@ -232,7 +232,10 @@ fn stage_css_with_roles(p: &Palette, authored_roles: bool) -> String {
+ .pills {{ display: flex; margin-bottom: 10px; }}
+ .pill {{ padding: 6px 14px; margin-right: 6px; border-radius: 14px; color: {text_dim}; }}
+ .pill-active {{ background-color: {surface_2}; color: {tertiary}; font-weight: 600; }}
+-.workspace-strip {{ display: flex; gap: 4px; margin-bottom: 8px; }}
++.workspace-strip {{ display: flex; align-items: center; gap: 4px; margin-bottom: 8px; min-width: 0; }}
++.workspace-strip .cambium-scope-location {{ flex: 1 1 auto; min-width: 0; }}
++.workspace-strip .cambium-scope-trail {{ min-width: 0; overflow: hidden; }}
++.scope-navigation-notice {{ font-size: 11px; color: {text_dim}; }}
+ .workspace-panel {{ padding: 3px 9px; border-radius: 7px; color: {text_dim}; font-size: 12px; }}
+ .workspace-panel-active {{ background-color: {surface_2}; color: {tertiary}; font-weight: 600; }}
+ .nav-spacer {{ flex-grow: 1; }}
+@@ -679,7 +682,8 @@ fn stage_css_with_roles(p: &Palette, authored_roles: bool) -> String {
+ "#
+     );
+     format!(
+-        "{}\n{}\n{}\n{themed}\n.woodshed-recorder-mount {{ width:100%; min-width:0; }}\n.woodshed-recorder-mount .hocket-recorder {{ --ground:{bg}; --surface:{surface}; --surface-2:{surface_2}; --raised:{surface_hover}; --line:{text_disabled}; --line-soft:{surface_2}; --text:{text}; --text-dim:{text_dim}; --text-faint:{text_disabled}; --voice-amber:{secondary}; --record:{danger}; }}",
++        "{}\n{}\n{}\n{}\n{themed}\n.woodshed-recorder-mount {{ width:100%; min-width:0; }}\n.woodshed-recorder-mount .hocket-recorder {{ --ground:{bg}; --surface:{surface}; --surface-2:{surface_2}; --raised:{surface_hover}; --line:{text_disabled}; --line-soft:{surface_2}; --text:{text}; --text-dim:{text_dim}; --text-faint:{text_disabled}; --voice-amber:{secondary}; --record:{danger}; }}",
++        cambium::SHELL_CSS,
+         cambium::GRAPH_CANVAS_SWATCH_CSS,
+         cambium::RESIZE_HANDLE_CSS,
+         hocket_views::theme::sheet(),
+diff --git a/design_docs/DOC_README.md b/design_docs/DOC_README.md
+index 45fe909..a34576f 100644
+--- a/design_docs/DOC_README.md
++++ b/design_docs/DOC_README.md
+@@ -6,6 +6,16 @@
+ 
+ # design_docs Index
+ 
++- [Contextual navigation in Woodshed](2026-10-23_contextual_navigation_plan.md)
++  — Native Back/Forward and Up/Down navigation across Session Mere, working
++  Set, and Card occurrence routes is qualified. Session-persistent history is
++  software-qualified through fresh encrypted storage handles; headed cold
++  reopen remains open. The Card 2 G2 tone admission fallback is covered by
++  174 passing Woodshed audio tests and a headed one-shot Card 2/full-Set run at
++  the actual 44.1 kHz device rate. Physical audio quality/latency and live-
++  custody saving remain open. Playback, edits, and audio capture remain
++  separately owned.
++
+ Rust policy (2026-10-13): working toolchain 1.99.0 and shared MSRV 1.97.1, qualified separately. Canonical policy: `mere/design_docs/2026-08-12_family_composition_thesis_brief.md`, section "Shared Rust toolchain and minimum version".
+ 
+ Murm source adoption (2026-10-13) is tracked in

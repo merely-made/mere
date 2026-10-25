@@ -575,10 +575,13 @@ where
                 return result == [cambium_rootstock::A11yDispatch::Dispatched];
             },
         };
-        self.host.s.pending_scroll.push(ScrollIntoView {
-            node,
-            align: ScrollAlign::Nearest,
-        });
+        self.host.s.pending_scroll.push(
+            ScrollIntoView {
+                node,
+                align: ScrollAlign::Nearest,
+            }
+            .into(),
+        );
         self.relayout();
         let Some((x, y, width, height)) = self.visible_rect(node) else {
             return false;

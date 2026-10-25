@@ -1,0 +1,16 @@
+{
+  "program": {
+    "active_frames": 27342,
+    "bpm": 240.0,
+    "card_frames": 27342,
+    "card_index": 1,
+    "card_token": 2,
+    "device_frame": 501946,
+    "event_index": 7,
+    "event_token": 7,
+    "status": "Playing"
+  },
+  "rehearsal_paused": false,
+  "rehearsal_running": true,
+  "sample_rate": 44100
+}

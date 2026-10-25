@@ -67,11 +67,12 @@ pub mod producer;
 mod scene_producer;
 pub use producer::{
     PortableCaptureError, PortablePaintCapture, PortableProducerError, ProducedAction,
-    ProducedScene, ProducedTexture, ProducerAction, ProducerChildLifetime, ProducerChildToken,
-    ProducerContext, ProducerError, ProducerFrameInfo, ProducerFramePurpose, ProducerFrameStats,
-    ProducerGpuRemapError, ProducerImageIdentity, ProducerNode, ProducerRegistrationError,
-    ProducerRegistry, ProducerRenderFailure, ProducerRole, ProducerSemantics, ProducerSource,
-    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
+    ProducedScene, ProducedTexture, ProducerAction, ProducerActionDispatch, ProducerChildLifetime,
+    ProducerChildToken, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFramePurpose,
+    ProducerFrameStats, ProducerGpuRemapError, ProducerImageIdentity, ProducerNode,
+    ProducerRegistrationError, ProducerRegistry, ProducerRenderFailure, ProducerRole,
+    ProducerSemantics, ProducerSource, ResolvedAppearance, SourceAlpha, SourceEncoding,
+    TextureProducer,
 };
 pub use scene_producer::SceneProducer;
 
@@ -1323,7 +1324,7 @@ pub use host::{
     CloseDisposition, CloseRequest, CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook,
     FrameProfile, HOST_WHEEL_LINE_PX, Hook, Host, HostDisposal, HostFont, HostHooks, HostImage,
     HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook, PaintCaptureFn,
-    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView, ScrollRequest,
     StampedCaptureFn, StampedCaptureFrame, WheelUnit, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
     ladder_step,
 };

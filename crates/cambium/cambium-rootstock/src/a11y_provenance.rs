@@ -66,6 +66,17 @@ impl PartialEq for A11yProvenance {
 impl Eq for A11yProvenance {}
 
 impl A11yProvenance {
+    pub(crate) fn child(&self) -> Option<&ProducerChildToken> {
+        self.child.as_ref()
+    }
+
+    pub(crate) fn contributors_live(&self) -> bool {
+        self.child.as_ref().is_none_or(ProducerChildToken::is_live)
+            && self
+                .producer
+                .as_ref()
+                .is_none_or(|producer| producer.upgrade().is_some())
+    }
     pub(crate) fn target_matches(&self, target: &A11yTarget) -> bool {
         self.target == NodeTarget::from(target)
     }
@@ -121,6 +132,7 @@ impl A11yProvenance {
     ) -> bool {
         // An absent registration cannot lend authority to a later producer.
         self.owner.is_live()
+            && self.contributors_live()
             && (!matches!(target, A11yTarget::Produced(_)) || self.producer.is_some())
             && *self == Self::capture(owner, target, dom, leaves, producers)
     }

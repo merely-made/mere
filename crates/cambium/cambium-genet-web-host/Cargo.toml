@@ -1,5 +1,5 @@
 [package]
-name = "cambium-genet-web-host"
+name = "cambium-web"
 version = "0.1.0"
 description = "The browser event source for a Cambium application host: DOM events and a canvas, grafted onto cambium-rootstock"
 edition.workspace = true
@@ -11,6 +11,9 @@ repository.workspace = true
 # Livery/Buckram host integration, which remains unpublished. Consumers take it
 # from genet.git by branch.
 publish = false
+
+[lib]
+name = "cambium_genet_web_host"
 
 [features]
 default = ["image-decode", "webgpu"]
@@ -30,7 +33,7 @@ image-decode = ["cambium-rootstock/image-decode", "mesquite/image-decode"]
 # The stock this is grafted onto. Everything below is what a browser adds.
 cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 cambium = { version = "0.6.0", path = "../cambium" }
-genet-render-host = { workspace = true }
+genet-presenter = { workspace = true }
 genet-scripted-dom = { workspace = true }
 netrender = { workspace = true }
 paint_list_render = { workspace = true, features = ["resource-bundle"] }
@@ -81,7 +84,7 @@ web-sys = { version = "0.3", features = [
 # The mirror's tests lay the example page out without a window.
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 sprigging = { version = "0.3.0", path = "../sprigging" }
-cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-host" }
+cambium-desktop = { version = "0.1.0", path = "../cambium-genet-winit-host" }
 netrender = { workspace = true, features = ["vello-cpu"] }
 
 # The accessibility page, mounted in a browser.

@@ -1,5 +1,113 @@
 # System Diagnostics and Accessibility Plan
 
+## Canvas same-call member lifetimes, 2026-10-23
+
+**Status (2026-10-23):** implemented; the retained Pin failure now passes, with ordinary-edit identity controls and automated receiving qualified within the boundaries below.
+Review and remaining migrations: `support/family-promotion/diagnostics-canvas-life-review.json`.
+Exact source and gates: `support/family-promotion/diagnostics-canvas-life-qualification.json`.
+
+### Phases and done-conditions
+
+1. Kernel Graph authors SurfaceNodeLifetime at one surface insertion boundary.
+   Ordinary insertion, copy insertion and snapshot materialization use it. Upserts
+   and graph clones preserve live membership; removal drops its witness and a
+   recreated member gets a fresh witness even with the same UUID and graph slot.
+2. Canvas keeps view-local action IDs against that kernel witness. Reconciliation
+   retires only changed lives; reading or activating compares the witness and
+   never allocates identities. Ordinary edits and unrelated members retain IDs.
+3. Structural ingest checks actual kernel revision/membership as well as the
+   callback's report. Same-call recreation is reconciled even after false reports.
+   Recreated slots are seeded as new members. Metadata-only refresh refuses a
+   recreated membership; the existing structural-ingest path receives it.
+4. Make the retained Pin reproduction a permanent passing regression, including
+   a usable new Pin. Receive old Drag refusal, unrelated/ordinary-edit/upsert/
+   clone identity, owner refresh, false reports, snapshot and copy boundaries,
+   kernel/native/product tests and Wasm/embedding/standalone compilation.
+
+### Findings and progress
+
+UUID and slot equality were insufficient to prove that a live membership survived
+an arbitrary ingest callback. The kernel now supplies a runtime witness at the
+actual mutation boundary. The Graph map retains only live memberships; there is
+no tombstone history. Graph clones deliberately preserve witnesses for detached
+candidates and ordinary metadata refresh. Restoring a snapshot starts new runtime
+lives while retaining durable UUIDs. The witness is not persisted, a structural
+revision, an authorization lease or a terminal actor outcome.
+
+Canvas's nonreused action keys remain derived view identities. The original red
+patch and receipts are retained unchanged as historical evidence; their Pin case
+is now active and passing. This continuation closes the same-call Pin/Drag gap
+recorded in the producer-activation audit without invalidating unrelated nodes.
+
+### Remaining ownership migrations
+
+- Receive witnesses in other retained Canvas state, including physics/selection,
+  Forme holds and render caches. Action routing and seed placement do not qualify
+  every cache's replacement, disposal or rollback behavior.
+- Receive checked activation and action-ID reassignment in deeper shared/custom
+  producer owners. A trait default cannot make arbitrary interior state atomic.
+- Promote supplier APIs and coordinate external consumer patches/pins; receive
+  guest namespaces/selection ingress and headed platform/AT handoff separately.
+- Complete Rootstock intrinsic sizing/Path-B raster and owner-reported terminal
+  actor outcomes through their own concrete qualification paths.
+
+This lane retains at most 10 MB, reuses the stable Mere target and preserves
+pre-existing staged changes and concurrent receipt edits.
+
+## Producer activation and child lifetimes, 2026-10-23
+
+**Status (2026-10-23):** bounded checked activation implemented; automated receiving qualified within the boundaries below.
+Review and remaining migrations: `support/family-promotion/diagnostics-activation-review.json`.
+Exact gates and source: `support/family-promotion/diagnostics-activation-qualification.json`.
+
+### Phases and done-conditions
+
+1. Refuse expired child tokens in publication, queue and host admission. Pointer
+   equality of two cached weak tokens does not establish a live authored child.
+2. Freeze raw operation-entry context before contributor callbacks. Preserve all
+   earlier publication/queue bindings. Pass that admitted child token to checked
+   activation rather than resolving a new child life for an old request.
+3. Delegate checked activation under one mutable producer borrow. Rc adapters
+   lend the same P across validation/dispatch; ContentProducer holds its actual
+   ContentSlot borrow through token validation and revision-qualified activation.
+   Raw and checked retained-content entry share one owner-borrowed implementation.
+4. Receive expired cached tokens, raw/bound late admission replacement, shared
+   mutable borrow, actual retained-content activation/retirement, canvas controls,
+   native hosts, Wasm, embedding and a standalone consumer. Dispatch and refusal
+   remain distinct from publication, terminal actor completion and durability.
+
+### Findings and progress
+
+Expired child tokens previously compared equal to cached copies. Admission now
+checks liveness; full publication refuses ContributorEnded. The registry forwards
+checked activation to the contributor instead of calling raw act after admission.
+A replacement during the final admission callback cannot gain the old request's
+child life. Refused activation and producer decline do not run after-dispatch
+hooks or move focus as though an action dispatched.
+
+The default checked method covers a directly owned model and observational child
+reads. Adapters with deeper shared owners must override under that real model's
+borrow/transaction. Optional None still requires never-reused authored keys;
+a cached expired Some is not equivalent to None. Action IDs retain their meaning
+within a child life, or need an owner-checked action revision/new child life.
+
+### Remaining ownership migrations, in order
+
+1. Canvas same-call removal/restoration is received by the membership-lifetime
+   continuation above. Its historical red patch/receipt remain retained; the
+   original Pin case and old Drag refusal now pass without retiring unrelated
+   live keys. Other retained-cache lifetime boundaries remain separately tracked.
+2. Receive checked activation in every custom/deeper shared producer and explicit
+   action-ID reuse. A trait default cannot make arbitrary interior state atomic.
+3. Promote the AccessKit hook and coordinate standalone native consumer intake.
+4. Receive guest namespaces/selection ingress and headed platform/AT handoff,
+   installation, recovery and late events. This pass adds no such runtime claim.
+5. Complete Rootstock intrinsic sizing/Path-B raster and owner-reported terminal
+   actor outcomes through their separately qualified paths.
+
+The lane retains at most 10 MB, reuses the stable Mere target, and preserves
+pre-existing staged changes and concurrent receipt edits.
+
 ## Shared publication outcomes and collectors, 2026-10-23
 
 **Status (2026-10-23):** implemented; automated receiving qualified within the boundaries below.

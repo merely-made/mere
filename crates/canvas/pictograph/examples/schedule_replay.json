@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    {"id":"00000000-0000-4000-8000-000000000001","url":"https://schedule.example/a","x":-220.0,"y":-80.0},
+    {"id":"00000000-0000-4000-8000-000000000002","url":"https://schedule.example/b","x":-70.0,"y":180.0},
+    {"id":"00000000-0000-4000-8000-000000000003","url":"https://schedule.example/c","x":240.0,"y":-190.0},
+    {"id":"00000000-0000-4000-8000-000000000004","url":"https://schedule.example/d","x":310.0,"y":130.0}
+  ],
+  "edges": [
+    {"from":"00000000-0000-4000-8000-000000000001","to":"00000000-0000-4000-8000-000000000002"},
+    {"from":"00000000-0000-4000-8000-000000000003","to":"00000000-0000-4000-8000-000000000004"}
+  ],
+  "spec": "{\"version\":1,\"seed\":104375397257316,\"root\":{\"node\":\"schedule\",\"stages\":[{\"node\":{\"node\":\"preset\",\"id\":\"charge.barnes-hut\"},\"stop\":{\"frames\":8},\"capture\":\"anchored\"},{\"node\":{\"node\":\"preset\",\"id\":\"spring.rapier\"},\"stop\":{\"frames\":16},\"capture\":\"pinned\"}]},\"realization\":{\"integrate\":{}},\"target\":{\"arrangement\":\"free\",\"anchored_pull\":0.4,\"default_role\":\"seeded\",\"items\":{\"00000000-0000-4000-8000-000000000003\":\"anchored\",\"00000000-0000-4000-8000-000000000004\":\"pinned\"}}}",
+  "ticks": 24
+}

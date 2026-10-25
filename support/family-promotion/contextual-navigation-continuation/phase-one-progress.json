@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "stage": "persistent-navigation-and-reading-position",
+  "status": "qualified; final hardening and native restart checks passed",
+  "shared_history_tests": 17,
+  "shared_input_routing_tests": 19,
+  "browser_compatibility_tests": 50,
+  "browser_wasm_check": "pass",
+  "woodshed_tests": {
+    "navigation": 8,
+    "owner_switch": 1,
+    "storage_memory": 1,
+    "encrypted_filesystem_reopen": 1
+  },
+  "woodshed_native": {
+    "receipt": "woodshed-phase-one-native/scenario.done",
+    "result": "pass",
+    "frames": 186,
+    "vault": "locked; native run does not claim live-custody persistence",
+    "cold_store_test": "fresh encrypted filesystem handles with isolated fixture persona"
+  },
+  "receipts_unchanged": "../contextual-navigation/qualification.json",
+  "ordering": "Phase-one focused/native gates passed before audio implementation. Final broader checks then hardened browser ownership and Knot outline/layout behavior.",
+  "knot_tests": {
+    "serial_library_passed": 357,
+    "ignored_diagnostic": 1,
+    "post_snapshot_sharing_filters_passed": 8
+  },
+  "knot_native": {
+    "source_and_preview_frames": 65,
+    "initial_reopen_frames": 6,
+    "exact_reopen_frames": 12,
+    "final_binary_return_frames": 64,
+    "final_binary_exact_reopen_frames": 11,
+    "exact_preview_byte": 2761,
+    "fixture_sha256": "bc93b9b441a3f14af104071f20635686b5757c7e994e5b84edfd49d6a16a1ec0"
+  }
+}

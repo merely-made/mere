@@ -1037,7 +1037,7 @@ mod composition {
             if dom.kind(node) == NodeKind::Element
                 && dom
                     .element_name(node)
-                    .is_some_and(|q| q.local.as_ref() == name)
+                    .is_some_and(|q| AsRef::<str>::as_ref(&q.local) == name)
             {
                 out.push(node);
             }
@@ -1200,7 +1200,7 @@ mod keyboard {
         if dom.kind(node) == NodeKind::Element
             && dom
                 .element_name(node)
-                .is_some_and(|q| q.local.as_ref() == name)
+                .is_some_and(|q| AsRef::<str>::as_ref(&q.local) == name)
         {
             return Some(node);
         }
@@ -1840,7 +1840,7 @@ mod controls {
         if dom.kind(node) == NodeKind::Element
             && dom
                 .element_name(node)
-                .is_some_and(|q| q.local.as_ref() == name)
+                .is_some_and(|q| AsRef::<str>::as_ref(&q.local) == name)
         {
             return Some(node);
         }
@@ -2182,7 +2182,7 @@ mod controls {
         let btn = runner.root();
 
         assert_eq!(
-            dom.borrow().element_name(btn).unwrap().local.as_ref(),
+            AsRef::<str>::as_ref(&dom.borrow().element_name(btn).unwrap().local),
             "button"
         );
         assert_eq!(text_child(&dom.borrow(), btn).as_deref(), Some("inc"));
@@ -2210,7 +2210,7 @@ mod controls {
         let btn = runner.root();
 
         assert_eq!(
-            dom.borrow().element_name(btn).unwrap().local.as_ref(),
+            AsRef::<str>::as_ref(&dom.borrow().element_name(btn).unwrap().local),
             "button"
         );
         assert_eq!(
@@ -2235,7 +2235,10 @@ mod controls {
         );
         let ov = runner.root();
 
-        assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+        assert_eq!(
+            AsRef::<str>::as_ref(&dom.borrow().element_name(ov).unwrap().local),
+            "div"
+        );
         assert_eq!(text_child(&dom.borrow(), ov).as_deref(), Some("menu"));
         assert_eq!(
             attr(&dom.borrow(), ov, "style").as_deref(),
@@ -2256,7 +2259,10 @@ mod controls {
         );
         let ov = runner.root();
 
-        assert_eq!(dom.borrow().element_name(ov).unwrap().local.as_ref(), "div");
+        assert_eq!(
+            AsRef::<str>::as_ref(&dom.borrow().element_name(ov).unwrap().local),
+            "div"
+        );
         assert_eq!(text_child(&dom.borrow(), ov).as_deref(), Some("card"));
         assert_eq!(
             attr(&dom.borrow(), ov, "style").as_deref(),
@@ -2354,7 +2360,7 @@ mod controls {
         let root0 = runner.root();
         {
             let dom = dom.borrow();
-            assert_eq!(dom.element_name(root0).unwrap().local.as_ref(), "div");
+            assert_eq!(AsRef::<str>::as_ref(&dom.element_name(root0).unwrap().local), "div");
             assert_eq!(text_child(&dom, root0).as_deref(), Some("off"));
             assert!(dom.dom_children(dom.document()).any(|c| c == root0));
         }
@@ -2366,7 +2372,7 @@ mod controls {
         assert_ne!(root0, root1, "a type change swaps the node");
         {
             let dom = dom.borrow();
-            assert_eq!(dom.element_name(root1).unwrap().local.as_ref(), "span");
+            assert_eq!(AsRef::<str>::as_ref(&dom.element_name(root1).unwrap().local), "span");
             assert_eq!(
                 dom.dom_children(root1).count(),
                 2,
@@ -3340,7 +3346,7 @@ mod capture {
         if dom.kind(node) == NodeKind::Element
             && dom
                 .element_name(node)
-                .is_some_and(|q| q.local.as_ref() == name)
+                .is_some_and(|q| AsRef::<str>::as_ref(&q.local) == name)
         {
             return Some(node);
         }

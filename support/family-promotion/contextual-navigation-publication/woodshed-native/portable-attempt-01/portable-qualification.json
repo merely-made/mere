@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "qualification": "Portable Woodshed contextual-navigation two-process native qualification",
+  "base_commit": "da66d6c047fc2d9a9b06833395846510d35f6bd8",
+  "source_manifest_sha256": "76018435e5f2fe8f9cb8142bf8105b0cc78fa47f5c7b5e6b94dece122bc0fefd",
+  "portable_suppliers": {
+    "mere_branch_main": "7632bbd32a00891b858335209a39f36f5777c0ae",
+    "genet_branch_main": "2b5c01811e6051ecd815cb407ff1ec9b40724fc9",
+    "eidetic_promoted": "aa94fe22eea29e9b54e01ed21e6991536ed4f208"
+  },
+  "portable_hashes": {
+    "cargo_toml_sha256": "6695e6f6c7a02b92890e6cd907f9ad8d498c8d71641930ebca5f84a93943660f",
+    "cargo_lock_sha256": "1071b97ccab70aa762af80ddea184fec904bf9297c6a10d25874f1beb3cf82a4",
+    "binary_sha256": "d0d0548dfd57856c6cc3eacbf5239fea58b2323863e2a0adb8bc2f723473923d",
+    "binary_path": "C:\\t\\cargo-targets\\woodshed\\debug\\woodshed-genet.exe",
+    "keeper_sha256": "0e2cb09f9932926f32b56f33c962ef1ca20c8faa3abf69080d21de1ab2fad773"
+  },
+  "locked_gates": [
+    {
+      "result": "passed",
+      "command": "cargo metadata --offline --locked --format-version 1"
+    },
+    {
+      "filter": "contextual_navigation",
+      "package": "woodshed-views",
+      "passed": 9
+    },
+    {
+      "filter": "card_context",
+      "package": "woodshed-views",
+      "passed": 1
+    },
+    {
+      "filter": "session_store_roundtrips_opaque_scope_navigation_bytes",
+      "package": "woodshed-core",
+      "passed": 1
+    },
+    {
+      "filter": "native_frame_owns_window_ornamentation",
+      "package": "woodshed-genet",
+      "passed": 1
+    },
+    {
+      "filter": "shared_title_bar_fills_viewport_and_keeps_editor_below_it",
+      "package": "woodshed-genet",
+      "passed": 1
+    },
+    {
+      "passed": 174,
+      "package": "woodshed-audio"
+    },
+    {
+      "result": "passed",
+      "command": "cargo build --offline --locked -p woodshed-genet"
+    }
+  ],
+  "native": {
+    "keeper": "fresh isolated synthetic Djinn Keeper, unlocked",
+    "keeper_process_stopped": true,
+    "app_processes_exited_normally": true,
+    "seed": {
+      "frames": 212,
+      "captures": 0,
+      "owner_id": 2,
+      "card_id": 1,
+      "visit_ordinal": 10,
+      "overview_zoom": 1.25,
+      "sealed": true,
+      "stored_matches_live": true,
+      "playback_stopped": true
+    },
+    "reopen": {
+      "frames": 171,
+      "captures": 0,
+      "owner_id": 2,
+      "card_id": 1,
+      "visit_ordinal": 10,
+      "overview_zoom": 1.25,
+      "card_context": "Guided chord / A Major / Working Set 2",
+      "sealed": true,
+      "stored_matches_live": true,
+      "playback_stopped": true
+    },
+    "history": {
+      "newer_overview_ordinal": 8,
+      "newer_overview_zoom": 1.25,
+      "older_overview_ordinal": 4,
+      "older_overview_zoom": 1.0,
+      "returned_owner_id": 1,
+      "returned_card_id": 1,
+      "music_sha256": "fbb2bddbe3da5e92efcbb07bfe97998edfe7ab4e9dbce8441842a3fdb9d9408c6",
+      "playback_stopped": true
+    },
+    "checkpoints": [
+      "p6-context-seed.json",
+      "p6-context-reopened.json",
+      "p6-context-back-overview.json",
+      "p6-context-back-older-overview.json",
+      "p6-context-returned.json"
+    ],
+    "results": [
+      "seed-result.txt",
+      "reopen-result.txt"
+    ],
+    "scenario_results": [
+      "seed RESULT ok; 212 frames, zero captures",
+      "reopen RESULT ok; 171 frames, zero captures"
+    ]
+  },
+  "app_commit": "de7b8dc2339c5b4c87ef1845f22bccd7974d58e4",
+  "published_branch": "main"
+}

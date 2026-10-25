@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "qualification": "Preportable local receiving build, real isolated synthetic unlocked Djinn Keeper",
+  "receiving_binary_sha256": "0b732666dabfeaef711e926e0925d8d983f4cd52789d080891baedd4306a86a3",
+  "private_traces_preserved": true,
+  "processes_stopped": true,
+  "results": [
+    {
+      "attempt": "attempt-04",
+      "phase": "seed",
+      "private_trace_relative": "attempt-04/seed.stdout.log",
+      "trace_sha256": "0c4937fff3699af12af8314df5c21052d835682ba687e9987f2ace3cabd62412",
+      "results": [
+        "woodshed-genet: Two-Set contextual route seeded; normal close follows",
+        "woodshed-genet: RESULT ok (212 frames, 0 captures)"
+      ]
+    },
+    {
+      "attempt": "attempt-04",
+      "phase": "reopen",
+      "private_trace_relative": "attempt-04/reopen.stdout.log",
+      "trace_sha256": "a06c9a0901d7c181cb607bf7b0dfdb2ee622fd35ae5e6ef3c85b58673a80a640",
+      "results": [
+        "woodshed-genet: Older Overview history restored its original camera",
+        "woodshed-genet: Fresh-process contextual route and cross-Set Back history restored",
+        "woodshed-genet: RESULT ok (171 frames, 0 captures)"
+      ]
+    },
+    {
+      "attempt": "attempt-05",
+      "phase": "seed",
+      "private_trace_relative": "attempt-05/seed.stdout.log",
+      "trace_sha256": "0c4937fff3699af12af8314df5c21052d835682ba687e9987f2ace3cabd62412",
+      "results": [
+        "woodshed-genet: Two-Set contextual route seeded; normal close follows",
+        "woodshed-genet: RESULT ok (212 frames, 0 captures)"
+      ]
+    },
+    {
+      "attempt": "attempt-05",
+      "phase": "reopen",
+      "private_trace_relative": "attempt-05/reopen.stdout.log",
+      "trace_sha256": "b0121867b9646a85ac788e46da912425cf188213b7f549d505d812e6658e85fe",
+      "results": [
+        "woodshed-genet: Older Overview history restored its original camera",
+        "woodshed-genet: Fresh-process contextual route and cross-Set Back history restored",
+        "woodshed-genet: RESULT ok (172 frames, 1 captures)"
+      ]
+    }
+  ]
+}

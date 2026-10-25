@@ -259,7 +259,7 @@ mod tests {
             dom.dom_children(root)
                 .find(|&node| {
                     dom.element_name(node)
-                        .is_some_and(|name| name.local.as_ref() == "span")
+                        .is_some_and(|name| AsRef::<str>::as_ref(&name.local) == "span")
                 })
                 .expect("hover child")
         };

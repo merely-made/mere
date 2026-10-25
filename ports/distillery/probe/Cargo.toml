@@ -20,8 +20,8 @@ serde_json = "1"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 blake3 = "1.5"
 burn = { version = "=0.22.0", default-features = false, features = ["std", "wgpu"] }
-eidetic = { default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-esp = { features = ["bert-validation", "bert-wgpu", "decoder-wgpu"], git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
+eidetic = { default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+esp = { features = ["bert-validation", "bert-wgpu", "decoder-wgpu"], git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
 # The module start runs the static constructors once (rulings 532, 533, 536).
 cambium-genet-web-host = { path = "../../../crates/cambium/cambium-genet-web-host" }
 # One wasm-bindgen family with graphshell-web and cambium-genet-web-host
@@ -30,7 +30,7 @@ cambium-genet-web-host = { path = "../../../crates/cambium/cambium-genet-web-hos
 # as an error, and wgpu 30.0.1 decodes it through `JsNullable` instead (burn
 # plan 13.37). cambium-genet-web-host's workspace wgpu requires 30.0.1.
 js-sys = "=0.3.106"
-muniment = { features = ["indexeddb"], git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+muniment = { features = ["indexeddb"], git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 wasm-bindgen = "=0.2.129"
 wasm-bindgen-futures = "=0.4.79"
 web-sys = { version = "=0.3.106", features = [
@@ -40,10 +40,10 @@ web-sys = { version = "=0.3.106", features = [
 
 [patch.crates-io]
 # Canonical promoted families; keep registry and Git consumers type-identical.
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 # cambium-genet-web-host rides Genet; [patch] is not inherited, so these rows
 # restate graphshell-web's, at the same immutable Genet revision.
 taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
@@ -60,13 +60,13 @@ cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
 rust-version = "1.97.1"
 
 [patch."https://github.com/merely-made/mere.git"]
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 
 [patch."https://www.github.com/merely-made/mere.git"]
-chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "6d6ad84b773c9baf2390bd7807a21ca9887e6efd" }
-muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "34105d63ec17826e0a58a5b461b65150357dd000" }
+chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
+muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }

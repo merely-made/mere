@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "date": "2026-10-23",
+  "status": "local-native-prototypes-qualified",
+  "objective": "Prototype application-defined contextual navigation in Woodshed and Knot with shared Cambium history and controls.",
+  "owners": {
+    "cambium": "Generic place and anchor history, reusable navigation controls. Browser scope policy stays in the GUI chat's browser migration.",
+    "woodshed": "Overview, owning Set and Card occurrence routes; presentation restoration independent of practice and rehearsal.",
+    "knot": "Site, live document and recursive section routes; source validation and selection restoration independent of editing history."
+  },
+  "done_conditions": [
+    "Shared controls accept arbitrary application destinations without a fixed scope ladder.",
+    "Woodshed distinguishes the same material in different Sets and restores the actual entry context.",
+    "Woodshed navigation preserves playback owner, transport and rehearsal cursor.",
+    "Knot traverses nested sections including skipped heading levels and returns to the live buffer.",
+    "Knot navigation does not revert unsaved text or edit history and rejects stale source locations.",
+    "Both native app targets compile and focused regressions pass against the same shared source.",
+    "Documentation records exact qualification limits and remaining native interaction gates."
+  ],
+  "receipts": {
+    "retained_byte_cap": 10000000,
+    "required": ["source and lock hashes", "compact test results", "app compilation results"],
+    "optional": ["bounded native screenshots if a usable local fixture is available"],
+    "directory": "support/family-promotion/contextual-navigation"
+  },
+  "targets": {
+    "mere": "C:/t/cargo-targets/mere",
+    "woodshed": "C:/t/cargo-targets/woodshed",
+    "knot": "C:/t/cargo-targets/knot-editor"
+  },
+  "portable_lock_baselines": {
+    "woodshed": "a67697fbdefca14acbb24b9ac46805bd720305f90e112ba9bdc607b1b15a7c19",
+    "knot-editor": "b9225ea66b5ce9c480bbc90f67df19f4a398529f0785af1e9b21fa465c0748ba"
+  }
+}

@@ -1,50 +1,64 @@
 # Web Surface Contract Assessment
 
-**Status (2026-10-05):** assessment complete; the neutral browser-control
-extraction remains open. `mere-surface-api` is the separately landed
-application discovery/settings contract, not the browser protocol proposed
-here. Ordered Scry/Weld completions and owned native-frame delivery have
-advanced; the local B0 capability corrections pass their focused tests.
+**Status (2026-10-24):** the neutral contract is implemented and published as
+`webcue` 0.1.1 and `wgpu-cue` 0.1.2 in the `wgpu-cue` repository. Inker, Pelt and
+Graphshell use the shared receiving boundary. Genet and Servo have finite
+headed and offscreen Metal receiving evidence. Turnstone's retained and
+Servo/Metal product pool, main/lens presentation, mixed-engine cards and live
+Inspector now have bounded product receiving evidence through that boundary.
+Retained Genet/Reader and native Servo also have hardware Vulkan and native
+Wayland receiving evidence on the ThinkPad, including simultaneous frame
+directions on one device. Physical IBus Typing Booster composition also has
+operator and native-event evidence in Turnstone's address field, retained Genet
+document, document lens and repaired Sky contributed field on the ThinkPad.
+The dated physical receiving cues below retain its two executable cohorts and
+evidence limits. Other concrete native browser bindings, physical CJK methods,
+human accessibility and physical device-loss qualification retain their own
+bounds. The Genet canvas-background defect exposed
+by positive scrolling is repaired, with a separate before/after source-raster
+gate on the ThinkPad. `mere-surface-api` remains the separate application
+discovery/settings contract.
+
 The [2026-10-22 cues](#four-producers-and-two-frame-directions-2026-10-22)
-add native Genet as a fourth producer and record that Inker's
-`SurfaceProducer` and Cambium's `TextureProducer` move frames in opposite
-directions.
+explain the fourth producer and two frame directions; the
+[recorded choices](#recorded-choices-and-remaining-cues) and
+[October 23 receiving findings](#shared-contract-receiving-2026-10-23) describe
+the implemented boundary. The original sections below preserve the September 3
+source assessment. Their mismatches and candidate names are historical evidence,
+rather than an uncompleted extraction plan.
 
-The original assessment sections below describe the September 3 source
-snapshot. Dated findings and migration progress record later repairs and
-remaining gates; historical mismatches are not claims about today's source.
+<a id="verdict"></a>
 
-## Verdict
+## Original verdict (September 3 snapshot)
 
-Extracting a neutral contract is useful, but not before the contract is made
-fully honest about asynchronous browser operations and resource ownership. The
-right order is:
-
-1. keep the current publish train unblocked;
-2. repair capability honesty and sync/async mismatches in the existing crates;
-3. extract a small neutral surface-contract crate only after the event and
-   request model is stable enough to be a public semver surface.
-
-The assessment should not block `grafting` 0.6.0, `scrying` 0.7.0, or
-`welding` 0.14.0. It should block any stronger public claim that these crates
-already form a complete browser replacement platform.
+- **Capability honesty protects a shared API.** Explicit limitations and
+  correlated asynchronous outcomes would keep extraction from turning several
+  incompatible promises into one public promise.
+- **Ownership belongs below the browser protocol.** Correct native image
+  custody would prevent a safe public surface from inheriting copyable consumed
+  descriptors or guessed ownership.
+- **The release train and broader qualification have different bounds.** The
+  assessment did not block `grafting` 0.6.0, `scrying` 0.7.0 or `welding` 0.14.0.
+  It rejected a stronger claim that those releases already constituted a
+  complete browser replacement platform. The later shared-contract publication
+  does not remove those qualification limits.
 
 ## Architectural ruling
 
 There are three distinct layers, and combining them would recreate the present
 translation problem in a public crate:
 
-1. **Native image custody and import.** Graft owns OS/GPU resource lifetime,
+- **Native image custody and import.** Graft owns OS/GPU resource lifetime,
    synchronization, and adoption by the host's wgpu device. Its owned transport
    types eventually need a wgpu-free package/module boundary so a neutral
    surface protocol can use them without selecting the host's wgpu major.
-2. **One browser surface protocol.** A small neutral contract owns
+- **One browser surface protocol.** A small neutral contract owns
    non-blocking frame acquisition, input/focus, correlated commands, one ordered
    event stream, settings outcomes, and runtime capability evidence.
-3. **Host orchestration.** Inker owns engine registration and choice, profile
+- **Host orchestration.** Inker owns engine registration and choice, profile
    binding, fallback, document/graph integration, and application routing.
 
-Only layer 2 is an extraction candidate. Graft stays below it, including
+The browser surface protocol was the extraction candidate. Graft stays below it, including
 authority over any later transport-only package factored from its workspace.
 Inker stays above it. This is also the dependency direction: the neutral types
 must not depend on Mere, Inker registries, or a specific wgpu version.
@@ -121,13 +135,15 @@ unsupported while describing a working feature-enabled WPE path. Weld's static
 probe must account for `cef-runtime`. A neutral contract that copies those
 answers would become a shared lie.
 
-## Recommended public shape
+<a id="recommended-public-shape"></a>
 
-A future neutral surface-contract crate should be wgpu-free and
-producer-neutral. The 2026-10-22 naming decision chooses `wgpu-cue` for the
-project and wgpu-facing crate, with `webcue` for a separate wgpu-free core if
-needed (see the dated cues below).
-It should contain:
+## Public shape considered in the original snapshot
+
+The original proposal below named a renderer-free, producer-neutral browser
+protocol. Its candidate type names are retained for comparison; the implemented
+`webcue::Surface`, correlated requests, complete capability reports and
+`wgpu-cue` frame sources are described in the dated receiving findings.
+The September candidate included:
 
 - `SurfaceFrame` as an owned transport frame from Graft's wgpu-free boundary,
   plus an explicit CPU frame and an explicit native-overlay outcome. It should
@@ -446,6 +462,8 @@ observed acceleration. Turnstone's inspector
 `WebSurfaceCapabilities` fields, so the full report is not yet the taxonomy
 users see.
 
+<a id="open-decisions"></a>
+
 ## Recorded choices and remaining cues
 
 - **The name and home are settled.** `wgpu-cue` lives in its own repository;
@@ -500,8 +518,9 @@ users see.
   loss and CEF/native-WebView frame bindings retain their own qualification.
   Concrete Servo and Genet have since passed the finite headed and offscreen
   Metal receiver on one host device; see the receiving plan and Turnstone's
-  `docs/receipts/servo_cue_20261023/`. That receiver is separate from complete
-  Turnstone product adoption and Linux/Vulkan qualification.
+  `docs/receipts/servo_cue_20261023/`. That finite receiver and the product
+  receiving below have different scopes. Linux retained host-device receiving
+  is qualified below; the native-frame direction remains a platform gap.
 
 - **The placement pool can lend its retained receiver to Cue.** Pelt's shared
   renderer now borrows the controller already admitted by the pool. Routing,
@@ -518,3 +537,241 @@ users see.
   admission. Input, mutable resource access, runnable work and exact due timers
   can require a follow-up frame after an older submission completes. Idle
   layout preparation does not continually invalidate that submission.
+
+- **The real host now consumes the boundary.** Turnstone implementation
+  `5e9e3bfea88e9e9b9133d01ec9486ed7fd056322` uses Cue for retained and
+  Servo/Metal main/lens content presentation. Its mixed case renders Genet and
+  Servo side by side on one device. Per-card selection, reading resources and
+  host loading stay with their existing owners. The
+  [product receipt](https://github.com/merely-made/turnstone/tree/86ccb619ba506d2a17d3fea0f26d0cf82566abd0/docs/receipts/cue_ui_20261023)
+  records 1,183 passing library tests, 17 explicit ignores and the complete
+  native UI cases; it retains failed and incomplete runs.
+- **Taxonomy reaches the live Inspector.** All 28 feature answers, platform,
+  frame direction, evidence and semantic protocol are visible for the installed
+  shared producer. Existing viewer selection remains separate from capability
+  evidence. Servo's report is still `Constructed`: an explicit host-import
+  feedback seam would let the report itself reflect the observed receiving.
+- **A browser traversal is different from a new visit.** A matching actual
+  Back/Forward commit moves Turnstone's existing history cursor. An ordinary
+  link to an old address still grows history. Correlated refusals and duplicate
+  callbacks must preserve that distinction; otherwise sharing event types
+  alone still loses Forward.
+- **Control observation must not look like document mutation.** Dedicated
+  pool event drains preserve retained semantic publications. Unrestricted
+  mutable iteration invalidates them; using it for every event-loop wake had
+  needlessly revoked the accessibility admission the host was about to use.
+- **A nonblank host window does not prove a document frame.** The lens gate
+  now requires a sampled shared-content entry as well as a composed capture.
+  Transient non-admitted geometry skips presentation without becoming an engine
+  failure. The earlier weaker receipt remains evidence of that distinction.
+- **Polling is still a separate cost.** Native browser work remains runnable
+  in the pool's bounded polling policy. The mixed receipt's global idle wait
+  reaches its bound even though both producers present correctly. A wake/work
+  signal would distinguish a quiet browser from work requiring another turn.
+- **Product adoption does not fill every platform binding.** Concrete
+  Weld/Scry shared-native adapters and fresh Windows receiving,
+  native Servo IME/semantic exposure, physical candidate-window input, human AT,
+  physical device loss and transparent native colour/alpha acceptance keep
+  their own gaps and qualification bounds.
+
+- **A platform result needs a frame direction.** Retained Genet/Reader reaches
+  Turnstone's primary and lens windows on the ThinkPad's hardware Vulkan device
+  in a native GNOME Wayland session. Actual source-raster observations name RADV
+  Renoir and `IntegratedGpu`; the driver rejects CPU Vulkan and another backend.
+  The unchanged retained consumer also passes the pending-frame mutation test.
+  This qualifies the host-device direction without implying Linux native-frame
+  import or an X11/Xwayland run.
+- **Linux native frames need an adapter as well as lower import primitives.**
+  At the 0.1.1 receiving checkpoint, the published crate exposes the Metal
+  importer, Turnstone uses a refusing importer outside macOS, and its concrete
+  Servo registration is Windows/macOS-only. Graft's Vulkan/DMA-BUF support is a lower building block.
+  Supplying the shared importer and a concrete producer binding would let the
+  other frame direction earn the same product receiving evidence.
+- **A live Linux report is narrower than blanket engine support.** The native
+  Inspector exposes `linux`, `HostDevice`, `Observed`, `DocumentSnapshot` and all
+  28 feature answers. Effective 110% zoom, scrolling and a replacement scope on
+  close/reopen have receiving evidence; native candidate windows and human AT
+  do not. The canonical IME tests pass with an ICU4X complex-script segmentation
+  diagnostic, so they also leave CJK segmentation quality unqualified.
+- **Successful receiving can reveal an incorrect producer image.** The first
+  receiving run with a positive scroll moved the article but left a lower viewport band without its beige
+  canvas background. The producer raster is already transparent there before
+  host staging. Pinned Genet's cached paint-list translation includes the
+  viewport-sized canvas fill; keeping that fill anchored would preserve opaque
+  coverage and readable text while the document moves. That first receipt
+  preserves the failed appearance check; the repair and its separate receiving
+  evidence are recorded below.
+
+The [ThinkPad Vulkan/Wayland receipt](https://github.com/merely-made/turnstone/tree/f45db39f117bc41315de1ffc2e7c95d631a89f14/docs/receipts/cue_ui_linux_20261023)
+binds the initial receiving and the refreshed Turnstone `b4628119` dependency
+cohort to separate binary identities. Both native cases and the focused checks
+pass on that refreshed cohort. Its producer-background finding remains a
+historical failed appearance check, separate from successful transport, controls
+and lifecycle receiving; physical IME and human AT remain unqualified.
+
+- **Canvas colour belongs to the viewport while document paint scrolls.**
+  Genet `621aa33c` introduces a document-scroll operation that leaves the
+  propagated canvas colour outside the scroll transform. Cached frames, fresh
+  retained repaint, the scripted owner and Rootstock use that operation. Full
+  surface placement and page scale still move the complete result. Ordinary
+  element backgrounds and child/text/host slots remain in document coordinates;
+  a transparent canvas stays transparent. Five CPU pixel regressions cover those
+  boundaries, and the full Livery suite passes 725 tests with eight explicit
+  ignores. Background-image emission is unchanged by this repair.
+- **Appearance has a receiving gate independent of transport success.**
+  The repaired ThinkPad source raster keeps opaque beige at `(8,469)` after a
+  positive 120-pixel scroll at 110% zoom. All 477 rows of the sampled canvas
+  margin match the expected colour, and the centre follows the 120-pixel content
+  translation on the same producer scope. The same checker rejects the original
+  raster with 120 transparent lower rows. The new
+  [scroll repair receipt](https://github.com/merely-made/turnstone/tree/3372dab898d1148bd5132d69768006216c58c4a1/docs/receipts/cue_scroll_repair_20261023)
+  binds the before/after observations to their sources and executables. This
+  closes the observed colour-fill defect without extending the separate native
+  frame, physical IME, human AT or OS-compositor qualification bounds.
+
+
+## Completed Linux snapshots and shared Vulkan import (2026-10-23)
+
+- **A completed producer snapshot makes the no-wait boundary concrete.** Graft
+  0.6.1 exports its own top-left, single-plane linear DMA-BUF allocation from
+  the Servo pre-present hook. A zero-timeout fence poll keeps unfinished work
+  private to the producer. Only completed work crosses with no remaining sync
+  object; flushing GL alone does not earn that declaration. The GL fixture
+  repaints the source and destroys the producer before checking the imported
+  orientation, pixels and half alpha.
+- **One host device needs native import requirements at construction.** Genet
+  `2b5c0181` lets the host adopt explicitly provisioned wgpu handles. That keeps
+  retained rendering, primary/lens composition and native acquisition on one
+  device and queue, while preserving the refusal to silently replace a device
+  underneath registered native producers.
+- **An importer has a narrower promise than its envelope.** Published
+  `wgpu-cue` 0.1.2 adds the Vulkan importer over Graft 0.6.1; Webcue and
+  `grafting-frame` remain 0.1.1. It requires completed snapshots, declared
+  modifiers and matching shape/format/alpha. It refuses external semaphore
+  synchronization rather than interpreting an opaque Vulkan semaphore as a
+  Linux sync file. Twelve shared-contract/importer tests and nine Pelt
+  Linux/Vulkan receiving tests pass on the ThinkPad.
+- **A frame direction needs actual product pixels.** Turnstone `a2655c6e`
+  receives Servo native frames on the ThinkPad's RADV Renoir device in a native
+  GNOME Wayland session. Navigation using real page input, deletion, reload,
+  Back/Forward, 110% zoom, lens sizing, return/dock and close/reopen pass.
+  Seven native source rasters retain the fixture's red top, white centre and
+  blue bottom. A separate mixed-card run captures both native Servo and
+  retained Genet rasters at the same checkpoint, on the same device generation.
+- **A useful refusal can expose missing evidence plumbing.** The first full
+  native scenario passes its controls and shows the page in the lens, but the
+  receiving driver rejects the absent lens source-raster diagnostic. Wiring
+  that same asynchronous diagnostic into lens composition lets the repeated
+  run pass without weakening the driver. Matching captured surface IDs to live
+  direction reports also prevents cached entries from qualifying mixed frames.
+- **Correct frames do not establish a quiet browser.** The Linux mixed case's
+  two global idle waits reach their 240-frame bounds while both current source
+  rasters and the following controls pass. A producer work/wake signal would
+  separate a quiet browser from the host's bounded polling cost.
+
+The [canonical implementation record](https://github.com/merely-made/wgpu-graft/blob/main/design_docs/2026-10-23_linux_native_cue_plan.md)
+records the producer, importer and device-construction seams. The
+[Linux native product receipt](https://github.com/merely-made/turnstone/tree/main/docs/receipts/cue_native_linux_20261023)
+binds the exact source cohort and executable to those native controls, lens and
+mixed-card results. Physical IME, human AT, physical device loss, external
+semaphore transport, transparent native colour/alpha, X11/Xwayland and physical
+compositor correlation retain separate bounds.
+
+## Physical IME receiving cues (2026-10-24)
+
+- **A canonical composition type does not enable the OS input method.** The
+  ThinkPad exercise exposed missing host admission for retained document
+  editors and contributed panes. Sky's ordinary field dispatch existed, but
+  the shell omitted that field from IME enablement and candidate geometry.
+  Turnstone `16df175` now follows the focused editor and its actual window,
+  synchronizes admission and exposes contributed caret geometry. Sky also
+  needed legible field text, borders, caret and preedit styling for an operator
+  to observe edits.
+- **Physical evidence includes the operator's view of the OS.** The address
+  field, Genet document and document lens have positive physical typing,
+  preedit, candidate, commit, cancellation and focus-switch observations on
+  one executable. The repaired Sky field has the same seven positive checks
+  on a second executable, corroborated by 65 nonempty native preedit events
+  and three commits. The
+  [physical receipt](https://github.com/merely-made/turnstone/tree/main/docs/receipts/cue_ime_linux_20261024)
+  binds both binaries, source patches, native window IDs and settings
+  restoration. App captures cannot qualify OS popup pixels, and these results
+  do not constitute a full four-stage run on the repaired binary.
+- **A receiving claim retains its harness failures.** Both original scenarios
+  remain marked failed: an unsupported setup shortcut and a wheel step aimed
+  at the wrong pane kind preceded the physical exercises. The first collector
+  watched stderr while native diagnostics went to stdout; intact timestamps
+  and readiness markers recover those stage observations. Corrected collection
+  and a passing automated Sky setup check close those harness gaps without
+  relabelling the original outcomes or asking the operator to repeat successful
+  typing.
+- **Physical placement and shared publication are separate evidence.** At the
+  physical receipt's source, Genet did not publish the neutral `TextInput`
+  geometry event. The host could use its retained editor and the operator
+  observed candidate placement in that configuration. The shared observable
+  is now implemented and tested in the cues below; the earlier physical Latin
+  Typing Booster result retains its original binaries and does not upgrade
+  Servo IME availability, physical CJK methods, human AT or physical device loss.
+
+
+## Shared Genet text-input publication cues (2026-10-24)
+
+- **One native observation now reaches the shared control plane.** Genet's
+  renderer-free `document-session-api` 0.1.1 owns text-control metadata and the
+  logical caret rectangle; Webcue 0.1.2 reexports those types and Wgpu Cue 0.1.3
+  carries the updated control plane. All three packages are published. Static
+  and Boa-scripted sessions query completed current layout without causing
+  layout from the getter. Coordinates include document scroll and page zoom;
+  the host adds placement and applies device scale once. Selection uses UTF-16
+  while preedit retains its separate UTF-8 offsets. Values and document/native
+  identities do not enter this observation.
+- **Text input does not depend on semantic publication.** The standalone Genet
+  adapter and Inker's retained session adapter publish refreshed state after
+  frame preparation even with semantic snapshots disabled. Layout invalidation,
+  edits, blur, hiding and retirement revoke old geometry. Ignored input preserves
+  an unchanged current observation, including a publication retry that was
+  deferred by backpressure. Field removal also exposed a stale native editor
+  access; Genet now revokes that editor before the next frame reads it.
+- **A full mailbox can revoke geometry without stopping legacy frames.** A
+  published editor reserves its clearing event and sequence number, alongside
+  accepted-request completion reservations. Unchanged observations deduplicate.
+  With semantics disabled, a document host that does not consume the shared
+  stream continues producing frames; unavailable metadata clears and retries
+  when the host drains. A real Pelt fixture types and frames 150 edits without
+  consuming observations, then receives the current selection after draining.
+  Unclaimed renderer-only observations expire when a legacy host replaces its
+  document. Async input, requests, semantic actions, event polling or explicit
+  shared retirement claim the stream and retain its final observations and
+  accepted outcomes. This keeps adding an observable from freezing an existing
+  document host or growing an unseen retired-event backlog.
+- **A window needs the exact prepared appearance.** Pelt exposes the latest
+  successfully published observation from the same authority as its event
+  stream. The pool getter additionally checks prepared placement generation
+  and receiver identity. A second appearance's viewport cannot supply another
+  window's caret. This gives hosts geometry without a Genet downcast, duplicate
+  metadata cache or second event consumer. Turnstone now reads that observation
+  after primary/lens frame preparation, adds placement and applies display scale
+  once before setting the native IME candidate area. Its
+  [host receiving receipt](https://github.com/merely-made/turnstone/blob/main/docs/receipts/cue_text_input_20261024/README.md)
+  binds the published cohort, exact executable and programmatic checks.
+- **Receiving remains bound to the exercised cases.** The
+  [standalone contract proof](https://github.com/merely-made/wgpu-cue/blob/main/docs/2026-10-24-text-input.md)
+  records fourteen ordinary Cue tests, hardware Metal metadata and pixel/lifecycle
+  checks, lint and a renderer-free wasm build. Genet's static/scripted fixtures
+  cover editing, scroll, zoom, resize, empty and multiline controls, password
+  metadata/value exclusion, blur and detach. Inker's eight focused tests and
+  Pelt's thirty-four control/pool tests pass. Mere's root lock changes only the
+  Genet/Cue cohort. Graphshell's separate web lock uses the parser and renderer versions
+  required by that cohort; locked wasm dependency
+  resolution passes. These checks do not change the earlier physical receipt
+  or establish human AT and physical CJK behavior. Turnstone's two-window
+  geometry test, existing IME-admission test, nine navigation compatibility tests
+  and default-feature all-target compile check pass. A fresh ThinkPad Linux/Vulkan
+  rerun remains blocked on mesh SSH identity unlock.
+- **Display masking still has its own index boundary.** Source inspection shows
+  that native Genet shapes password display text as grapheme-counted bullets,
+  while its caret queries use editing-value byte offsets. The shared publisher
+  inherits that native projection boundary. A mapping between editing and
+  projected text would align password caret and selection geometry. This run
+  checks password classification and value exclusion; password offset-to-glyph
+  behavior has not been qualified.

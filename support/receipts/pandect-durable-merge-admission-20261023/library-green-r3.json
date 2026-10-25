@@ -1,0 +1,21 @@
+{
+  "cwd": "/Users/markik/Code/worktrees/mere-palette-writers-native-route",
+  "command": [
+    "/Users/markik/.rustup/toolchains/1.99.1-x86_64-apple-darwin/bin/cargo",
+    "--config",
+    "build.build-dir=\"/Users/markik/Code/worktrees/mere-palette-writers-native-route/target/build\"",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "pandect",
+    "--lib",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "seconds": 33.74,
+  "debug": 0,
+  "incremental": 0,
+  "jobs": 4
+}

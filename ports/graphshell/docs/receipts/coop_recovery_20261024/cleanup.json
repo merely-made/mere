@@ -1,0 +1,35 @@
+{
+  "accepted_cohort": "gs-recovery-20261024-02",
+  "owner": {
+    "subject_pids": [
+      73269,
+      76182,
+      76231,
+      76388,
+      76414,
+      77260,
+      77284,
+      77357
+    ],
+    "remaining": []
+  },
+  "guest": {
+    "subject_pids": [
+      177578,
+      195504,
+      195557,
+      195653,
+      195713,
+      195715,
+      195844,
+      195846,
+      195915,
+      196001,
+      196053,
+      196055
+    ],
+    "remaining": []
+  },
+  "idle_inhibitors_stopped": true,
+  "scope": "Seven native clients, four custodian lifetimes, three Pasta forwarders, both relay processes, both machine workers and the temporary idle inhibitors stopped; independent PID inspection found none of these subjects."
+}
