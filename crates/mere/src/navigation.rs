@@ -4,6 +4,8 @@
 //! Shared, read-only relationship navigation over the kernel's canonical projection.
 //! Hosts retain navigation admission, actions, graph ownership and persistence.
 //! Direction and kind are retained even when several relations share a member.
+pub mod browser;
+
 use kernel::graph::{Graph, RelationKind, SemanticSubKind};
 
 /// A bounded, live one-hop neighborhood over canonical projected relations.
@@ -24,6 +26,21 @@ pub fn neighborhood_members(graph: &Graph, root: uuid::Uuid) -> Option<Vec<uuid:
         }
     }
     Some(members.into_iter().collect())
+}
+
+/// Live membership for a graph-bearing destination. Presentation remains with
+/// the host; an empty graph is a valid, empty preview.
+pub fn scope_members<G: Clone + PartialEq>(
+    graph: &Graph,
+    place: &browser::ScopePlace<G, uuid::Uuid>,
+) -> Option<Vec<uuid::Uuid>> {
+    use browser::ScopeLevel;
+    match place.level {
+        ScopeLevel::Graph => Some(graph.nodes().map(|(_, n)| n.id).collect()),
+        ScopeLevel::Neighborhood => neighborhood_members(graph, place.root.or(place.focus)?),
+        ScopeLevel::Document => place.focus.filter(|id| graph.get_node_by_id(*id).is_some()).map(|id| vec![id]),
+        ScopeLevel::Overmap | ScopeLevel::Forme(_) => None,
+    }
 }
 
 /// How hosts list relationship rows: one page size and one wording, so the

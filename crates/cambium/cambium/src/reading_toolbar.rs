@@ -33,6 +33,26 @@ pub fn read_toolbar<State: 'static, Action: 'static>(
     find: Option<&ReadFind>,
     handler: impl Fn(&mut State, ReadEvent) + 'static,
 ) -> ShellSlot<State, Action> {
+    read_toolbar_with_trailing(
+        text_size,
+        column_em,
+        text_controls,
+        find,
+        Vec::new(),
+        handler,
+    )
+}
+
+/// Mount host-owned reading actions in the same fixed header as appearance and
+/// Find. In particular a close control must stay outside the document scroller.
+pub fn read_toolbar_with_trailing<State: 'static, Action: 'static>(
+    text_size: u16,
+    column_em: u16,
+    text_controls: bool,
+    find: Option<&ReadFind>,
+    trailing: Vec<ShellSlot<State, Action>>,
+    handler: impl Fn(&mut State, ReadEvent) + 'static,
+) -> ShellSlot<State, Action> {
     let handler = Rc::new(handler);
     let find_open = find.is_some_and(|find| find.open && find.available);
     let appearance_open = find.is_some_and(|ui| ui.appearance_open);
@@ -42,8 +62,21 @@ pub fn read_toolbar<State: 'static, Action: 'static>(
         ("Find", "Find in reading", ReadCommand::Find, find.is_none_or(|find| !find.available), find_open),
     ] {
         let handler = handler.clone();
-        header.push(shell_control(label, name, ShellControl { disabled, expanded: Some(expanded), ..Default::default() },
-            move |state, _| handler(state, ReadEvent::Command(command))));
+        header.push(shell_control(
+            label,
+            name,
+            ShellControl {
+                disabled,
+                expanded: Some(expanded),
+                ..Default::default()
+            },
+            move |state, _| handler(state, ReadEvent::Command(command)),
+        ));
+    }
+    if !trailing.is_empty() {
+        header.push(Box::new(
+            el("div", trailing).attr("class", "read-header-trailing"),
+        ));
     }
     let mut controls: Vec<ShellSlot<State, Action>> = Vec::new();
     for (label, name, command, disabled) in [

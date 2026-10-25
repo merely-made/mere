@@ -348,9 +348,21 @@ where
     Ev: Fn(&mut State, TileEvent) + Clone + 'static,
     Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
 {
+    frisket_with_tab_policy(tree, current, marks, crate::TabStripPolicy::Always, on_event, fill)
+}
+
+/// The host chooses when each stack needs a strip; source arrangement and
+/// durable tile identities remain the same under either presentation.
+pub fn frisket_with_tab_policy<State, AppAction, Ev, Fill>(
+    tree:&TileTree, current:Option<TileId>, marks:&dyn Fn(TileId)->Option<TabMark>,
+    policy:crate::TabStripPolicy, on_event:Ev, fill:Fill,
+) -> impl View<State, AppAction, GenetCtx, Element=GenetElement>
+where State:'static, AppAction:'static, Ev:Fn(&mut State,TileEvent)+Clone+'static,
+    Fill:Fn(&Tile)->Slot<State,AppAction>+Clone+'static,
+{
     el::<_, State, AppAction>(
         "div",
-        render_node(tree, &[], current, marks, &on_event, &fill),
+        render_node(tree, &[], current, marks, policy, &on_event, &fill),
     )
     .attr("class", "frisket-body")
     .attr(
@@ -364,6 +376,7 @@ fn render_node<State, AppAction, Ev, Fill>(
     path: &[usize],
     current: Option<TileId>,
     marks: &dyn Fn(TileId) -> Option<TabMark>,
+    policy: crate::TabStripPolicy,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -387,7 +400,7 @@ where
             for (index, branch) in children.iter().enumerate() {
                 let mut child_path = path.to_vec();
                 child_path.push(index);
-                let inner = render_node(&branch.tree, &child_path, current, marks, on_event, fill);
+                let inner = render_node(&branch.tree, &child_path, current, marks, policy, on_event, fill);
                 items.push(Box::new(
                     el::<_, State, AppAction>("div", inner)
                         .attr("class", "frisket-branch")
@@ -424,7 +437,7 @@ where
                     .attr("style", format!("display: flex; flex-direction: {dir};")),
             )
         },
-        TileTree::Stack(stack) => render_stack(stack, path, current, marks, on_event, fill),
+        TileTree::Stack(stack) => render_stack_with_tab_policy(stack, path, current, marks, policy, on_event, fill),
     }
 }
 
@@ -433,6 +446,24 @@ pub(super) fn render_stack<State, AppAction, Ev, Fill>(
     path: &[usize],
     current: Option<TileId>,
     marks: &dyn Fn(TileId) -> Option<TabMark>,
+    on_event: &Ev,
+    fill: &Fill,
+) -> PaneView<State, AppAction>
+where
+    State: 'static,
+    AppAction: 'static,
+    Ev: Fn(&mut State, TileEvent) + Clone + 'static,
+    Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
+{
+    render_stack_with_tab_policy(stack,path,current,marks,crate::TabStripPolicy::Always,on_event,fill)
+}
+
+fn render_stack_with_tab_policy<State, AppAction, Ev, Fill>(
+    stack: &TabStack,
+    path: &[usize],
+    current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    policy:crate::TabStripPolicy,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -468,7 +499,7 @@ where
     let bar_attrs = [(ATTR_STACK, encode_pane_path(path))];
     // The host's current tile marks the stack it sits in, active tab or not.
     let is_current = current.is_some_and(|id| stack.tabs.iter().any(|tile| tile.id == id));
-    let bar = tab_bar_view(
+    let bar = policy.visible(stack.tabs.len()).then(|| tab_bar_view(
         TabBar::new(&items, stack.active)
             .with_names(FRISKET_TAB_NAMES)
             .with_current(is_current)
@@ -484,7 +515,7 @@ where
                 close_event(state, TileEvent::Closed(*id));
             }
         }),
-    );
+    ));
 
     // The content element: marked with the active tile's id and with which of
     // the three slots it carries. A `View` slot nests the host's child through
@@ -516,6 +547,7 @@ where
     Box::new(
         el::<_, State, AppAction>("div", (bar, content))
             .attr("class", "frisket-stack")
+            .attr("data-tabs-visible", policy.visible(stack.tabs.len()).to_string())
             .attr("style", "display: flex; flex-direction: column;"),
     )
 }
@@ -720,6 +752,22 @@ mod tests {
         Box::new(frisket(&state.tree, |state: &mut State, event| {
             state.events.push(event)
         }))
+    }
+
+    #[test]
+    fn hiding_singleton_strips_removes_their_close_and_activation_targets_only() {
+        fn adaptive(state:&State)->TestView {
+            Box::new(frisket_with_tab_policy(&state.tree,None,&|_|None,crate::TabStripPolicy::Multiple,
+                |state:&mut State,event|state.events.push(event),fill_by_id))
+        }
+        let dom:DomHandle=Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner=GenetAppRunner::new(dom.clone(),adaptive as fn(&State)->TestView,State{tree:sample(),events:Vec::new()});
+        let root=runner.root();let dom=dom.borrow();
+        assert_eq!(count_class(&dom,root,"frisket-tabbar"),1);
+        assert_eq!(count_class(&dom,root,"frisket-close"),2);
+        assert!(find_attr(&dom,root,ATTR_TABKEY,"3").is_none());
+        assert!(find_attr(&dom,root,FRISKET_TILE_ATTR,"3").is_some(),"its real content appearance remains mounted");
+        assert!(find_class(&dom,root,"slot-child").is_some());
     }
 
     /// Only the tile the host marks shows a mark, on its own tab.

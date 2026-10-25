@@ -40,12 +40,21 @@
 
 use crate::pod::GenetElement;
 use crate::{
-    GenetCtx, Key, NamedKey, OptionalAction, PointerClick, View, el, focusable_if, on_click, on_key,
+    GenetCtx, Key, NamedKey, OptionalAction, PointerClick, View, clickable, el, focusable_if,
+    on_click, on_key,
 };
 
 /// The state of a tab strip: which tab is active, plus the group's accessible
 /// name. Composable onto an app field via [`lens`](crate::lens), like
 /// [`RadioGroup`](crate::RadioGroup).
+/// Host-selected disclosure of a tab strip. A hidden strip contributes no
+/// controls or focus targets; the host supplies its single-view close action.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum TabStripPolicy { #[default] Always, Multiple }
+impl TabStripPolicy {
+    pub fn visible(self, members:usize)->bool {match self {Self::Always=>true,Self::Multiple=>members>1}}
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TabStrip {
     /// Index of the active tab in the `tabs` slice passed to [`tab_strip`]. Out
@@ -373,7 +382,7 @@ where
             // The × is its own control, announced as "Close <label>", and it
             // stops propagation so closing does not also activate.
             let close = on_close.clone().map(|close| {
-                on_click(
+                clickable(
                     el::<_, State, Action>("span", "\u{00d7}")
                         .attr("class", class_with("tab-close", names.close))
                         .attr("role", "button")
@@ -558,7 +567,7 @@ mod tests {
     use layout_dom_api::{LayoutDom, LocalName, Namespace};
 
     use super::*;
-    use crate::{DomHandle, GenetAppRunner};
+    use crate::{DomHandle, GenetAppRunner, KeyEvent};
 
     /// The action a closable strip bubbles in these tests.
     #[derive(Clone, Debug, PartialEq, Eq)]
@@ -775,6 +784,16 @@ mod tests {
             runner.state().selected,
             0,
             "the close stops propagation, so it does not also activate its tab"
+        );
+        runner.set_focus(Some(close));
+        assert_eq!(
+            runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Enter))),
+            [Closed(1)]
+        );
+        assert_eq!(
+            runner.state().selected,
+            0,
+            "keyboard close preserves background focus too"
         );
     }
 

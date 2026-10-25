@@ -29,15 +29,18 @@ use layout_dom_api::{LocalName, Namespace, QualName};
 mod action_list;
 mod arrangement;
 mod atlas;
-mod command_surface;
-mod command_menu_bar;
-mod component;
 mod backdrop_scene;
-pub use backdrop_scene::{BackdropSceneEvent, BACKDROP_SCENE_CSS, backdrop_scene_reading};
+mod command_menu_bar;
+mod command_surface;
+mod component;
+pub use backdrop_scene::{BACKDROP_SCENE_CSS, BackdropSceneEvent, backdrop_scene_reading};
 mod context;
 mod controls;
 mod detail_panel;
 mod detail_popover;
+mod focus_card;
+mod forme_swatch;
+pub use forme_swatch::{FormeSwatch, FormeSwatchCell, FormeSwatchTile, forme_swatch};
 mod disclosure;
 mod editor;
 mod element;
@@ -48,6 +51,7 @@ mod focus_request;
 mod focusable;
 mod fold_projection;
 mod frisket;
+mod frisket_presentation;
 mod graph_canvas;
 mod grid;
 #[cfg(feature = "highlight")]
@@ -57,11 +61,11 @@ mod key;
 mod keyed;
 mod menu;
 mod multi;
-mod optional_action;
 mod opened_link;
+mod optional_action;
 mod overlay;
 mod overlay_surface;
-mod frisket_presentation;
+mod paged_list;
 mod pod;
 mod pointer;
 mod popover;
@@ -76,6 +80,7 @@ mod sectioned_list;
 mod select;
 mod selection_bar;
 mod setting_row;
+mod shell;
 mod slider;
 mod splice;
 mod split;
@@ -88,8 +93,6 @@ mod tabs;
 mod tags;
 mod text;
 mod title_bar;
-mod paged_list;
-mod shell;
 mod value;
 mod wheel;
 mod workspace;
@@ -99,23 +102,18 @@ mod tests;
 
 pub use action_list::{ActionItem, ActionListEvent, ActionListState, action_list};
 pub use arrangement::{arrangement, placed, placed_with};
-pub use opened_link::{
-    LinkMemberAction, LinkMemberTarget, OpenedLinkEvent, opened_link_swatch,
-};
 pub use atlas::{
     GraphCanvasAtlas, GraphCanvasAtlasCallout, GraphCanvasAtlasCompoundOutline,
     GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
     GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
 };
+pub use opened_link::{LinkMemberAction, LinkMemberTarget, OpenedLinkEvent, opened_link_swatch};
 // The command set lives in its own crate so hosts without Cambium share it (SE45 to SE48).
-pub use hest::catalogue;
-pub use hest::{EffectClass, Invocation, Outcome};
-pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
+pub use command_menu_bar::{COMMAND_MENU_BAR_CSS, CommandMenuBarState, command_menu_bar};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
 };
-pub use command_menu_bar::{CommandMenuBarState, COMMAND_MENU_BAR_CSS, command_menu_bar};
 pub use component::{COMPONENT_PROBE_ATTR, Component, ComponentView, component};
 pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};
@@ -139,6 +137,9 @@ pub use graph_canvas::{
     graph_canvas_swatch_with_focus_and_drag_and_relations, graph_canvas_with_wheel,
 };
 pub use grid::{GridView, data_grid};
+pub use hest::catalogue;
+pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
+pub use hest::{EffectClass, Invocation, Outcome};
 pub use menu::{MENU_CLASS, MENU_ROW_ACTIVE_CLASS, MENU_ROW_CLASS, menu};
 pub use setting_row::setting_row;
 // Re-export the grid's spec types from Sprigging so a host building a `data_grid`
@@ -177,15 +178,14 @@ pub use pod::{GenetElement, GenetElementMut};
 pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_pointer};
 pub use portable::{PortableKeyed, PortableKeyedState};
 mod retained_mount;
-pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, RadioOption, radio_group, radio_options};
-pub use status_note::{status_note, status_note_labelled};
 pub use range_scrubber::{RangeScrubber, RangeScrubberEvent, RangeScrubberPin, range_scrubber};
 pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
 pub use resize_handle::{RESIZE_HANDLE_CSS, ResizeBounds, ResizeHandleEvent, resize_handle};
+pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use runner::{FocusExit, GenetAppRunner};
 pub use select::{SelectState, select};
 pub use selection_bar::{
@@ -195,9 +195,10 @@ pub use selection_bar::{
 pub use slider::{Slider, slider};
 pub use splice::GenetChildrenSplice;
 pub use sprigging::{
-    AngleStrip, AngleStripMark, DimensionLine, DimensionLineTraversal, GraphCanvas, GraphViewport,
+    AngleStrip, AngleStripMark, ColorF, DimensionLine, DimensionLineTraversal, GraphCanvas, GraphViewport,
     GridColumn, GridSpec, RelationLine,
 };
+pub use status_note::{status_note, status_note_labelled};
 pub use styled_field::{
     FIELD_CARET_CLASS, FIELD_PREEDIT_CLASS, FieldChild, StyleRange, caret_field_children,
     caret_text_field, styled_text_children, styled_text_field, styled_textarea,
@@ -212,13 +213,19 @@ pub use file::{
 pub use frisket::{
     DividerTarget, FRISKET_CSS, FRISKET_TILE_ATTR, PaneView, Slot, SlotKind, close_target,
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
-    frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
+    frisket_with_current, frisket_with_marks, frisket_with_tab_policy, slot_kind, stack_target, tab_drop_index, tab_target,
 };
 pub use frisket_presentation::frisket_presented_with;
+pub use paged_list::{PagedWindow, shell_paged_list};
 pub use popover::{
     POPOVER_CSS, Popover, PopoverEvent, PopoverPlacement, PopoverState, PopoverView, popover,
 };
 pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
+pub use shell::{
+    SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot, shell_activity_control,
+    shell_activity_rail, shell_control, shell_document_rail, shell_navigation_item, shell_popup,
+    shell_projection_switch, shell_source_binding, shell_toolbar,
+};
 pub use split::{Split, SplitAxis, split};
 pub use status_bar::{
     STATUS_BAR_CSS, StatusBar, StatusBarEvent, StatusBarState, StatusChip, StatusSeverity,
@@ -229,22 +236,19 @@ pub use surface::{
     SessionFailure, SurfaceEffect, SurfaceViewport,
 };
 pub use tabs::{
+    TabStripPolicy,
     TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, tab_bar_view, tab_strip,
     tab_strip_closable, tab_strip_items,
 };
 pub use tags::*;
 pub use text::text;
 pub use title_bar::{TITLE_BAR_CSS, TitleBarSlot, title_bar};
-pub use paged_list::{PagedWindow, shell_paged_list};
-pub use shell::{shell_activity_control, shell_activity_rail, shell_document_rail, SHELL_CSS, ShellControl, ShellDensity, ShellMetrics, ShellSlot,
-    shell_control, shell_popup, shell_projection_switch, shell_toolbar,
-    shell_source_binding, shell_navigation_item};
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{
     INSTRUMENT_CSS, WORKSPACE_CSS, WorkspaceModel, WorkspacePaneStatus, composited_slots,
-    workspace_pane_header, workspace_view, workspace_view_with_marks,
-    workspace_view_presented_with_marks,
+    workspace_pane_header, workspace_view, workspace_view_presented_with_marks,
+    workspace_view_with_marks,
 };
 
 // Compatibility aliases for consumers that still use the pre-extraction
@@ -301,5 +305,10 @@ pub use reading_find::{
     find_status,
     is_find_shortcut,
 };
-pub use reading_toolbar::{ReadCommand, read_toolbar, RelationshipPreviewCommand, relationship_preview};
+pub use reading_toolbar::{
+    ReadCommand, RelationshipPreviewCommand, read_toolbar, read_toolbar_with_trailing,
+    relationship_preview,
+};
 pub mod scope_navigation;
+
+pub use focus_card::{FocusCardDeck, FocusCardInfo, FocusCardCommand, focus_card, focus_card_with_body, context_graph_swatch};
