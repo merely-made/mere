@@ -902,15 +902,15 @@ treating a directory or published package name as a separate authority.
 | Nematic | `crates/nematic/` | Smolweb realization and text highlighting through Nematic and Illume; consumes the separately owned transport and theming facilities. |
 | Forme / Platen | `crates/forme/`, `crates/platen/` | Durable graph-arrangement model and its presentation lowering; generic workspace tiles belong to Cambium's Workbench. |
 | Shell / domain | `crates/shell/`, `crates/domain/` | Chrome/comms and Apparatus bounded diagnostic observations beneath product-owned views. |
-| Eidetic | `crates/eidetic/` | Codicil/content storage with its HTTPS and iroh fetchers as features, Muniment journals, Chartulary and RDF, Hagiograph, and the Fjall storage adapter. |
-| Dramatis | `crates/dramatis/` | Personae identity, Insigne, Gaz contacts, persona picker, and related identity/credential composition. |
-| Intel | `crates/intel/` | ESP inference/embeddings, Eidetic search, and Mora dictionary. |
-| Stickleback / Murm | `crates/stickleback/`, `murm/native/crates/` | Replicated-space storage/transfer machinery and bilateral exchange/transport; owning domains decide semantic authority. |
-| Moot | `crates/moot/` | Gemot community authority, Commons graph operations, Mooting recognition/storage support, Moothold federation, and Mien (standing and its composite lens). |
+| Eidetic | [merely-made/eidetic](https://github.com/merely-made/eidetic) (git dependency; see `crates/eidetic/README.md`) | Muniment, Chartulary, Eidetic core, Hagiograph, Stickleback, Luggage, mere-proofs and Servitor left for their own repository on 2026-10-19. |
+| Dramatis | `crates/dramatis/persona-picker/`, `ports/dramatis/` | The persona picker and the Dramatis app. The identity tier (Personae, Insigne, Gaz, Chatelaine, Notochord, dramatis) left for [merely-made/dramatis](https://github.com/merely-made/dramatis) on 2026-10-09. |
+| Intel | `crates/intel/` | Eidetic search, Mora dictionary and reference data. ESP left for [merely-made/esp](https://github.com/merely-made/esp) on 2026-10-19. |
+| Stickleback / Murm | [merely-made/eidetic](https://github.com/merely-made/eidetic), [merely-made/murm](https://github.com/merely-made/murm) (git dependencies) | Replicated-space storage/transfer machinery and bilateral exchange/transport; owning domains decide semantic authority. |
+| Moot | `ports/moot/` | The Mere application adapter. Gemot, Commons, Mooting, Moothold and Mien left for [merely-made/gemot](https://github.com/merely-made/gemot) on 2026-10-19. |
 | Mesh | `crates/mesh/` | Shared jobs, leases, retention, and host composition under product policy. |
 | Graphshell | `crates/graphshell/`, `ports/graphshell/` | Projection client/endpoint/carrier contracts and the reference projection host. |
-| Actors / scripts | `crates/armillary/`, `crates/script/`, `crates/servitor/` | Actor runtime, script host adapters, and bounded agent participation with its capability algebra (`servitor::cap`). |
-| Fleece / Eidetic intake | `crates/fleece/`, `crates/eidetic/eidetic-core/src/import/` | Clip, crawl and capture; portable source-preserving intake. |
+| Actors / scripts | `crates/script/` | Script host adapters. Armillary (actor runtime) left for [merely-made/armillary](https://github.com/merely-made/armillary) and Servitor (bounded agent participation, `servitor::cap`) for [merely-made/eidetic](https://github.com/merely-made/eidetic) on 2026-10-19. |
+| Fleece / Eidetic intake | `crates/fleece/` | Clip, crawl and capture. The portable source-preserving intake (eidetic-core `import`) lives in [merely-made/eidetic](https://github.com/merely-made/eidetic). |
 | Ports / probes | `ports/`, `crates/probes/` | Runnable products and bounded experiments. Knot Editor's product sources live in its independent repository; Alembic and Athanor live under Distillery. |
 
 The [2026-05-19 topology snapshot](mere_docs/technical_architecture/2026-05-19_workspace_topology_status.md)
