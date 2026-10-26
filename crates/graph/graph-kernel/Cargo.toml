@@ -42,7 +42,6 @@ hest.workspace = true
 # beside chartulary's nodes/edges. On crates.io; local checkout via the gitignored
 # `.cargo/config.toml` `[patch.crates-io]`.
 numen.workspace = true
-forme.workspace = true
 crossbeam-channel = "0.5"
 futures-util = "0.3"
 serde = { version = "1.0", features = ["derive"] }

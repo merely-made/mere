@@ -10384,7 +10384,6 @@ dependencies = [
  "futures-util",
  "hest 0.2.0",
  "infer",
- "mere-forme",
  "mime_guess",
  "minicbor-serde",
  "muniment",
