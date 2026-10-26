@@ -31,6 +31,24 @@ fn inside(canvas: &Canvas, key: NodeKey) {
 }
 
 #[test]
+fn visible_fit_frames_forme_boundaries_but_ignores_an_unrelated_scoped_out_forme() {
+    let (mut canvas,keys)=placed(&[(0.0,0.0),(30.0,20.0)]);
+    let member=canvas.graph.get_node(keys[0]).unwrap().id;
+    canvas.set_forme_region(Some(FormeRegion {id:uuid::Uuid::from_u128(42),bounds:[-1600.0,-900.0,1600.0,900.0],cells:vec![FormeCell {member,bounds:[0.0,0.0,1.0,1.0]}],locked:true,visible:true})).unwrap();
+    let position=canvas.world_position_of(keys[0]);
+    assert!(canvas.fit_visible());
+    for point in [(-1600.0,-900.0),(1600.0,-900.0),(1600.0,900.0),(-1600.0,900.0)] {
+        let (x,y)=canvas.camera.to_screen(point.into());
+        assert!((0.0..=800.0).contains(&x) && (0.0..=600.0).contains(&y),"{x}, {y}");
+    }
+    assert_eq!(canvas.world_position_of(keys[0]),position);
+    let other=canvas.graph.get_node(keys[1]).unwrap().id;
+    canvas.scope_to_exact_members([other]);
+    assert!(canvas.fit_visible());
+    assert!(canvas.camera.zoom>1.0,"an out-of-scope Forme must not shrink the visible node");
+}
+
+#[test]
 fn visible_fit_ignores_scoped_outlier_and_preserves_positions_and_focus() {
     let (mut canvas, keys) = placed(&[(-250.0, -70.0), (250.0, 70.0), (9000.0, 9000.0)]);
     let ids = keys[..2]

@@ -18,6 +18,12 @@ impl Canvas {
     pub fn fit_visible(&mut self) -> bool {
         let mut points = self.framing_points(false);
         points.extend(self.fold_summary_centers());
+        // A visible working arrangement is part of this projection's extent.
+        // Its member centers alone can leave the outer cells offscreen.
+        if let Some(region)=self.forme_region.as_ref().filter(|r|r.visible && r.cells.iter().any(|cell|self.graph.get_node_by_id(cell.member).is_some_and(|(key,_)|self.node_in_scope(key)))) {
+            let [x,y,r,b]=region.bounds;
+            points.extend([(x,y),(r,y),(r,b),(x,b)].map(|(x,y)|PortablePoint::new(x,y)));
+        }
         self.frame_points(points)
     }
 
