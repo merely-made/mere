@@ -59,6 +59,8 @@ pub mod journal;
 pub mod legacy_content_migration;
 pub(crate) mod legacy_family_attribution;
 pub mod legacy_resource_migration;
+#[cfg(test)]
+mod legacy_resource_migration_reason_tests;
 pub use cross_graph::ComponentCopy;
 mod assertion_write;
 pub mod pending_links;
@@ -102,6 +104,8 @@ mod relation_read;
 pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
+#[cfg(test)]
+mod resource_content_handle_tests;
 #[cfg(test)]
 mod resource_content_tests;
 pub mod resource_properties;

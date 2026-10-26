@@ -32,6 +32,7 @@ use super::node_facets::{
     PRESENTATION_TAGS, PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT, SEMANTIC_CLASSIFICATIONS,
     SEMANTIC_PROPERTIES, VISIT_HISTORY, VisitHistoryFacet,
 };
+use super::resource_content::LiteralWrite;
 use crate::types::{
     ClassificationScheme, ClassificationStatus, FrameLayoutHint, ImageRef, ImageRole,
     NodeClassification, NodeImportProvenance, NodeProperty, NodeTagPresentationState,
@@ -280,9 +281,9 @@ impl Graph {
         key: NodeKey,
         property: NodeProperty,
     ) -> bool {
-        if self.inner.node(key).is_none() {
+        let Some(node_id) = self.inner.node(key).map(|node| node.id) else {
             return false;
-        }
+        };
         let mut properties =
             self.node_facet_or_default::<Vec<NodeProperty>>(key, SEMANTIC_PROPERTIES);
         if let Some(existing) = properties
@@ -296,6 +297,9 @@ impl Graph {
             return false;
         }
         properties.push(property);
+        if !self.admits_literals(LiteralWrite::Surface(node_id, &properties)) {
+            return false;
+        }
         self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties)
     }
 
