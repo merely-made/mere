@@ -32,14 +32,18 @@ impl Graph {
     }
 
     /// All surface insertions, including copy and snapshot materialization,
-    /// share this boundary. An upsert is an edit of an existing membership.
-    pub(super) fn insert_surface_node(&mut self, node: Node) -> NodeKey {
+    /// share this boundary and its one contract: insert-if-missing. An id that
+    /// is already a member keeps its node and membership untouched, and the
+    /// flag is `false`; callers then skip their own indices and revisions.
+    pub(super) fn insert_surface_node(&mut self, node: Node) -> (NodeKey, bool) {
         let id = node.id;
+        if let Some(key) = self.inner.key_of(&id) {
+            return (key, false);
+        }
         let key = self.inner.insert(node);
         self.surface_node_lifetimes
-            .entry(id)
-            .or_insert_with(SurfaceNodeLifetime::fresh);
-        key
+            .insert(id, SurfaceNodeLifetime::fresh());
+        (key, true)
     }
 }
 
@@ -113,6 +117,105 @@ mod tests {
         assert_ne!(
             graph.surface_node_lifetime(id),
             donor.surface_node_lifetime(source_id)
+        );
+    }
+    #[test]
+    fn adding_an_existing_id_live_keeps_the_node_and_the_url_index_honest() {
+        use crate::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+        use crate::graph::replay_captured_deltas;
+        use std::sync::{Arc, Mutex};
+        let (old, new, unrelated) = (
+            "https://t.test/old",
+            "https://t.test/new",
+            "https://t.test/x",
+        );
+        let mut graph = Graph::new();
+        let seen = Arc::new(Mutex::new(Vec::new()));
+        let sink = seen.clone();
+        graph.set_recorder(Some(Arc::new(move |delta| {
+            sink.lock().unwrap().push(delta.clone())
+        })));
+        let id = Uuid::from_u128(101);
+        let first = add_node(&mut graph, Some(id), old.into(), Default::default());
+        let (recorded, revision) = (seen.lock().unwrap().len(), graph.revision());
+        let second = add_node(&mut graph, Some(id), new.into(), Default::default());
+        assert_eq!(first, second);
+        assert_eq!(graph.node_count(), 1);
+        assert_eq!(graph.get_node(first).unwrap().url(), old);
+        assert_eq!(graph.get_nodes_by_url(old), vec![first]);
+        assert!(graph.get_nodes_by_url(new).is_empty());
+        assert_eq!(
+            seen.lock().unwrap().len(),
+            recorded,
+            "a no-op records nothing"
+        );
+        assert_eq!(graph.revision(), revision);
+        let replayed = replay_captured_deltas(seen.lock().unwrap().clone());
+        assert_eq!(
+            replayed.get_node_by_id(id).unwrap().1.url(),
+            old,
+            "live and replay agree"
+        );
+        apply_graph_delta(&mut graph, GraphDelta::RemoveNode { key: first });
+        assert!(graph.get_nodes_by_url(old).is_empty());
+        let other = add_node(
+            &mut graph,
+            Some(Uuid::from_u128(102)),
+            unrelated.into(),
+            Default::default(),
+        );
+        assert_eq!(other, first, "arena key is recycled");
+        assert!(
+            graph.get_nodes_by_url(old).is_empty(),
+            "the old address never resolves to the recycled slot"
+        );
+        assert_eq!(graph.get_nodes_by_url(unrelated), vec![other]);
+    }
+    #[test]
+    fn copy_and_snapshot_onto_an_existing_id_keep_the_first_node_and_its_index() {
+        let mut graph = Graph::new();
+        let id = Uuid::from_u128(5);
+        let key = graph.add_node_with_id(id, "https://first.example".into(), Default::default());
+        let mut donor = Graph::new();
+        let source = donor.add_node_with_id(
+            Uuid::from_u128(6),
+            "https://donor.example".into(),
+            Default::default(),
+        );
+        let copy = graph.copy_node_from_with_id(
+            id,
+            donor.get_node(source).unwrap(),
+            None,
+            Default::default(),
+        );
+        assert_eq!(copy, key);
+        assert_eq!(graph.get_node(key).unwrap().url(), "https://first.example");
+        assert!(graph.get_nodes_by_url("https://donor.example").is_empty());
+        let mut snapshot = graph.to_snapshot();
+        let mut other = Graph::new();
+        other.add_node_with_id(
+            Uuid::from_u128(7),
+            "https://repeat.example".into(),
+            Default::default(),
+        );
+        let mut repeated = other.to_snapshot().nodes.remove(0);
+        repeated.node_id = id.to_string();
+        repeated.title = "Repeat".into();
+        snapshot.nodes.push(repeated);
+        let restored = Graph::from_snapshot(&snapshot);
+        let (restored_key, node) = restored.get_node_by_id(id).unwrap();
+        assert_eq!(
+            (node.url(), node.title.as_str()),
+            ("https://first.example", "https://first.example")
+        );
+        assert_eq!(
+            restored.get_nodes_by_url("https://first.example"),
+            vec![restored_key]
+        );
+        assert!(
+            restored
+                .get_nodes_by_url("https://repeat.example")
+                .is_empty()
         );
     }
     #[test]

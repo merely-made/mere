@@ -386,10 +386,8 @@ impl Graph {
         url: String,
         position: Point2D<f32>,
     ) -> Option<NodeKey> {
-        if self.get_node_key_by_id(id).is_some() {
-            return None;
-        }
-        Some(self.add_node_with_id(id, url, position))
+        let (key, inserted) = self.insert_node_if_missing(id, url, position);
+        inserted.then_some(key)
     }
 
     /// Replay helper: remove node by stable UUID.

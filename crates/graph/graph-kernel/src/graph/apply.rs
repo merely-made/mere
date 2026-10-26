@@ -26,6 +26,8 @@ use crate::types::{
 
 #[derive(Debug, Clone)]
 pub enum GraphDelta {
+    /// Insert-if-missing, as replay does: an `id` already present keeps its node
+    /// and URL, records nothing, and the result carries that node's key.
     AddNode {
         id: Option<Uuid>,
         url: String,
@@ -560,22 +562,22 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::AddNode { id, url, position } => {
             let capture_url = url.clone();
             let capture_position = [position.x, position.y];
-            let key = match id {
-                Some(id) => graph.add_node_with_id(id, url, position),
+            let (key, inserted) = match id {
+                Some(id) => graph.insert_node_if_missing(id, url, position),
                 #[cfg(not(target_arch = "wasm32"))]
-                None => graph.add_node(url, position),
+                None => (graph.add_node(url, position), true),
                 #[cfg(target_arch = "wasm32")]
                 None => panic!("AddNode without an explicit id is not supported on WASM"),
             };
-            if let Some(node) = graph.get_node(key) {
+            if inserted && let Some(node) = graph.get_node(key) {
                 graph.record_delta(&CapturedDelta::ReplayAddNodeWithIdIfMissing {
                     id: node.id.to_string(),
                     url: capture_url,
                     position: capture_position,
                 });
+                capture_visit_stamp(graph, key);
+                graph.refresh_surface_resource(key);
             }
-            capture_visit_stamp(graph, key);
-            graph.refresh_surface_resource(key);
             GraphDeltaResult::NodeAdded(key)
         },
         GraphDelta::AssertRelation {
