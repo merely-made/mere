@@ -102,6 +102,8 @@ pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
 #[cfg(test)]
+mod resource_content_handle_tests;
+#[cfg(test)]
 mod resource_content_tests;
 pub mod resource_properties;
 pub mod resource_tags;

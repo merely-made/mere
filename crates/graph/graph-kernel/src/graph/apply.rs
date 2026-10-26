@@ -524,6 +524,9 @@ fn set_node_facet(graph: &mut Graph, key: NodeKey, facet: &str, value: serde_jso
     let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
         return false;
     };
+    if !graph.admits_surface_facet(node_id, facet, &value) {
+        return false;
+    }
     let visits = facet == super::node_facets::VISIT_HISTORY;
     let facet = chartulary::FacetId::new(facet);
     if graph.facets().get(&node_id, &facet) == Some(&value) {
@@ -1109,7 +1112,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             resource_id,
             record,
         } => {
-            if graph.set_resource_record(resource_id, record) {
+            if graph.admits_record_literals(resource_id, record.as_ref())
+                && graph.set_resource_record(resource_id, record)
+            {
                 graph.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
                     resource_id: resource_id.to_string(),
                     record: graph.resource_record(resource_id),
