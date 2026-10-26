@@ -125,7 +125,9 @@ graphshell-endpoint = { workspace = true, features = ["door"] }
 graphshell-host = { workspace = true, features = ["native"] }
 # The mere route's wire vocabulary `resident_mere` serves (stack lift plan L14).
 mere-overmap.workspace = true
-knot-editor.workspace = true
+# `peers`: the resident sync host, the publish lane and the iroh blob store are
+# the networked half of the library, off unless a host names them.
+knot-editor = { workspace = true, features = ["peers"] }
 # Exact signed Knot relation intake into durable Mere sessions.
 kernel.workspace = true
 # The resident's own native dialogs (`src/identity_ui.rs`), moved from

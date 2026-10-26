@@ -4481,7 +4481,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c54e03a951783e8b327515db3f2a2fd0e3bed362a96b066f341ce66ed49b4ead"
 dependencies = [
  "data-encoding",
- "syn 1.0.109",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -8699,7 +8699,7 @@ dependencies = [
  "bytes",
  "cfg_aliases",
  "chrono",
- "constant_time_eq 0.1.5",
+ "constant_time_eq 0.4.2",
  "data-encoding",
  "derive_more",
  "genawaiter",
@@ -9256,7 +9256,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "knot-catalog",
 ]
@@ -9264,7 +9264,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9277,7 +9277,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9297,7 +9297,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "cambium",
  "illume",
@@ -9314,7 +9314,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9333,7 +9333,6 @@ dependencies = [
  "knot-document",
  "mere-fetch",
  "mere-overmap",
- "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
  "mere-view",
@@ -9384,7 +9383,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#2e183247628d49e98d4479aa18c056dc9cffd316"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#46caf70312041722c0d51f63862b408b26be6bdf"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -14051,7 +14050,7 @@ dependencies = [
  "combine",
  "downcast-rs 2.0.2",
  "dyn-clone",
- "hashbrown 0.13.2",
+ "hashbrown 0.17.1",
  "hi_sparse_bitset",
  "indexmap",
  "inventory",
@@ -14064,7 +14063,7 @@ dependencies = [
  "rustc_apfloat",
  "slotmap",
  "smallvec",
- "spin 0.5.2",
+ "spin 0.12.3",
  "thiserror 2.0.21",
  "utf8-chars",
 ]
@@ -14518,7 +14517,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.12.1",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -18699,7 +18698,7 @@ version = "2.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86a801b3cea342a06d468c8710662aa29e5e05e4f5c0d62f00bbb7f2ad7941c2"
 dependencies = [
- "rand 0.9.5",
+ "rand 0.10.3",
 ]
 
 [[package]]
