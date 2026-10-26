@@ -47,8 +47,9 @@ fn semantic_sub_kind(sub_kind: PersistedSemanticSubKind) -> SemanticSubKind {
 }
 
 impl Graph {
-    /// Load a snapshot, stopping on invalid explicit resource data.
-    /// Fallible load boundaries should use [`Self::try_from_snapshot`].
+    /// Load a snapshot, stopping on invalid explicit resource data or
+    /// navigation indices. Fallible load boundaries should use
+    /// [`Self::try_from_snapshot`].
     pub fn from_snapshot(snapshot: &GraphSnapshot) -> Self {
         Self::try_from_snapshot(snapshot)
             .unwrap_or_else(|error| panic!("invalid graph snapshot: {error}"))

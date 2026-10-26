@@ -4,13 +4,14 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Validate explicit resource columns before materializing a graph.
+//! Validate explicit resource columns and navigation indices before
+//! materializing a graph.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use uuid::Uuid;
 
-use crate::graph::Graph;
+use crate::graph::{Graph, NavigationIndexError};
 use crate::persistence::{GraphSnapshot, PersistedSemanticStatement};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -81,6 +82,7 @@ pub enum ResourceSnapshotError {
         first_resource: Uuid,
         resource_id: Uuid,
     },
+    InvalidNavigation(NavigationIndexError),
 }
 
 impl fmt::Display for ResourceSnapshotError {
@@ -176,6 +178,7 @@ impl fmt::Display for ResourceSnapshotError {
                 f,
                 "surface {surface_id} shows conflicting resources {first_resource} and {resource_id}"
             ),
+            Self::InvalidNavigation(error) => fmt::Display::fmt(error, f),
         }
     }
 }
@@ -194,6 +197,15 @@ fn parse_id(
         role,
         value: value.to_owned(),
     })
+}
+
+/// Everything a checked load verifies before any column is materialized.
+fn validate_snapshot(snapshot: &GraphSnapshot) -> Result<(), ResourceSnapshotError> {
+    snapshot
+        .navigation
+        .check_indices()
+        .map_err(ResourceSnapshotError::InvalidNavigation)?;
+    validate_resource_columns(snapshot)
 }
 
 fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSnapshotError> {
@@ -495,19 +507,21 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
 }
 
 impl Graph {
-    /// Check all explicit resource columns before loading either graph stratum.
-    /// Legacy surface conversion retains its existing compatibility behavior.
+    /// Check all explicit resource columns and navigation indices before loading
+    /// either graph stratum. Legacy surface conversion retains its existing
+    /// compatibility behavior.
     pub fn try_from_snapshot(snapshot: &GraphSnapshot) -> Result<Self, ResourceSnapshotError> {
-        validate_resource_columns(snapshot)?;
+        validate_snapshot(snapshot)?;
         Ok(Self::from_snapshot_unchecked(snapshot))
     }
 
     /// Load caller-qualified recorded truth without deriving relations from current URLs.
-    /// Explicit resource columns receive the same validation as legacy loads.
+    /// Explicit resource columns and navigation receive the same validation as
+    /// legacy loads.
     pub fn try_from_recorded_snapshot(
         snapshot: &GraphSnapshot,
     ) -> Result<Self, ResourceSnapshotError> {
-        validate_resource_columns(snapshot)?;
+        validate_snapshot(snapshot)?;
         Ok(Self::from_recorded_snapshot_unchecked(snapshot))
     }
 }
