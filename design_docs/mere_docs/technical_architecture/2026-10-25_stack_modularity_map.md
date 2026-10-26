@@ -219,6 +219,24 @@ same for places at compile time and drop the shared-place stack from a
 browser-only build. That is a larger cut than `nomadnet` because the place
 worker owns identity and persistence, not one fetch.
 
+### The toolkit directory carries one document-stack link, through `tabard-workshop`
+
+`tabard` is a leaf over `tinct`, so `mere-lanes` naming its reading
+preferences, typography roles and smolweb palette is a library link downward,
+not a cycle. The upward link is `tabard-workshop`: its reader specimen extracts
+and lowers a real article through `mere-lanes`, `document-canvas` and `inker`,
+and its stylesheet specimen links `genet-livery`, `genet-scripted-dom` and
+`netrender`. `cambium-genet-web-host` reaches the workshop only as a wasm
+dev-dependency. So any grouping that files the workshop with the toolkit makes
+the toolkit depend on the document stack while the document stack depends on
+the toolkit's token library. The 2026-10-08 theme-modes decision put the
+workshop under `crates/cambium/` so applications other than the Tabard port
+could embed it; a crate is embeddable from any directory, so the location is
+the open part: beside its desktop host under `ports/tabard/`, or left where it
+is with its specimens behind features. `scripts/check_port_boundaries.py`
+refuses a new unconditional toolkit-to-document-stack link and prints this
+carried one.
+
 ### Which rung each cut belongs on
 
 Doctrine Stack 5 puts "cold and narrow" behind a component when it wants to be
@@ -239,3 +257,7 @@ split.
   `knot-editor` library without `peers`.
 - Neither check covers the *carried* links above; both print them, so a reader
   can see the gap close.
+- No crate under `crates/cambium/` can gain an unconditional link to the
+  document stack (`inker`, `document-canvas`, `mere-lanes`, `nematic`,
+  `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; the
+  one carried link, `tabard-workshop`, is printed (2026-10-26).
