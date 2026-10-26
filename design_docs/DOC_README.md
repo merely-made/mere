@@ -25,6 +25,7 @@ Template scene framing follow-up (2026-10-16): the [projection grammar adoption 
 
 # Mere Documentation Index
 
+- [Resident delegation petition note](mere_docs/technical_architecture/2026-10-25_resident_delegation_petition_note.md): **design note, 2026-10-25; questions P1–P8 open, nothing implemented**. Turnstone composes the root certificates that custody signs blind under the `mere.denizen` act rule; the note describes a typed custody issuance call after `IssueStationGrant`, owner decision on Djinn's surface, a custody register, signed revocation, and the same treatment for local-door app admission.
 - [Stack modularity map](mere_docs/technical_architecture/2026-10-25_stack_modularity_map.md): which concrete transports and engines Turnstone, Djinn and Knot link by default, the contract each should sit behind, and what is wrong with the seams; Turnstone's Retinue link is now the opt-in `nomadnet` feature and Knot desktop's offline profile is checked in CI.
 
 - [Application-defined contextual navigation](mere_docs/implementation_strategy/2026-10-23_contextual_navigation_plan.md): shared Cambium history and controls received by Woodshed and Knot; app-owned ancestry and restoration preserve playback and live edits, with native qualification tracked separately.

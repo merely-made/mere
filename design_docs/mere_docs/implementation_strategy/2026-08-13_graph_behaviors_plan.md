@@ -530,6 +530,14 @@ and profile migrations; it must not become the recovery rule for a paused or
 revoked resident. New lifecycle/authority records must make those cases
 distinguishable before R1 admits resumed work.
 
+**Corrected 2026-10-25:** the second seam is closed. Since turnstone `5d2c910`,
+`rebuild` adopts stored chains only when they verify under the current root and
+otherwise refuses (`a_rerooted_profile_refuses_automatic_certificate_reissue`);
+the only reissue is the owner-reviewed `install`, which bumps the lifecycle
+generation, and `resident_admission`'s lifecycle record tells revoked and paused
+from a migration heal. Turnstone still composes the root certificates custody
+signs; see the [resident delegation petition note](../technical_architecture/2026-10-25_resident_delegation_petition_note.md).
+
 | Owner | Responsibility after the proposed change |
 | --- | --- |
 | Servitor | Resident/run contracts and recorded-event reduction; trigger semantics; optional procedure schema/retrieval, evaluation contracts and adoption invariants |
