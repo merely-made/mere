@@ -23,7 +23,7 @@ use euclid::default::Point2D;
 use rkyv::{Archive, Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::apply::{GraphDelta, apply_graph_delta};
+use super::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
 use super::{
     Coupling, CouplingResponse, EdgeAssertion, Field, FieldDefinition, FieldExtent, FieldId,
     FieldLifecycle, FrameLayoutHint, Graph, NavigationTrigger, NodeSelector, RelationSelector,
@@ -816,10 +816,30 @@ pub fn replay_captured_deltas_onto<I>(graph: &mut Graph, deltas: I)
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
+    // A refused entry is dropped and replay goes on; scratch replays over merge
+    // candidates accept that. Where the entries are the authority, use the
+    // checked twin.
+    let _ = replay_graph_deltas_onto(
+        graph,
+        deltas.into_iter().filter_map(|delta| delta.replay_delta()),
+        OnRefusal::Drop,
+    );
+}
+
+/// [`replay_captured_deltas_onto`], reporting the first entry the graph refuses
+/// instead of dropping it. The graph holds the entries before it.
+pub fn replay_captured_deltas_onto_checked<I>(
+    graph: &mut Graph,
+    deltas: I,
+) -> Result<(), ReplayRefused>
+where
+    I: IntoIterator<Item = CapturedDelta>,
+{
     replay_graph_deltas_onto(
         graph,
         deltas.into_iter().filter_map(|delta| delta.replay_delta()),
-    );
+        OnRefusal::Stop,
+    )
 }
 
 /// Quiet replay with an author for old assertion records lacking stored attribution.
@@ -828,11 +848,12 @@ pub fn replay_captured_deltas_as_onto<I>(graph: &mut Graph, author: &super::Auth
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
-    replay_graph_deltas_onto(
+    let _ = replay_graph_deltas_onto(
         graph,
         deltas
             .into_iter()
             .filter_map(|delta| delta.replay_delta_as(author)),
+        OnRefusal::Drop,
     );
 }
 
@@ -955,15 +976,45 @@ impl ReplayAttribution {
     }
 }
 
+/// A replayed entry the graph refused: the journal and the graph it replays to
+/// disagree from `position` (an index into the entries replayed) onward.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReplayRefused {
+    pub position: usize,
+    pub reason: super::resource_content::ContentError,
+}
+
+impl std::fmt::Display for ReplayRefused {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "replayed entry {} refused: {}",
+            self.position, self.reason
+        )
+    }
+}
+
+impl std::error::Error for ReplayRefused {}
+
+/// What a replay does with an entry the graph refuses: stop there, so the graph
+/// holds exactly the entries before it, or drop it and keep going.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum OnRefusal {
+    Stop,
+    Drop,
+}
+
 pub(crate) fn replay_attributed_deltas_onto<'a, I>(
     graph: &mut Graph,
     attribution: &mut ReplayAttribution,
     entries: I,
-) where
+    on_refusal: OnRefusal,
+) -> Result<(), ReplayRefused>
+where
     I: IntoIterator<Item = &'a super::journal::AttributedDelta>,
 {
     replay_quietly(graph, |graph| {
-        for entry in entries {
+        for (position, entry) in entries.into_iter().enumerate() {
             if let Some(delta) = attribution.replay_delta(&entry.delta, &entry.author) {
                 let legacy_assertion = matches!(
                     delta,
@@ -971,25 +1022,39 @@ pub(crate) fn replay_attributed_deltas_onto<'a, I>(
                         | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
                         | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
                 );
-                let _ = apply_graph_delta(graph, delta);
+                if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta)
+                    && on_refusal == OnRefusal::Stop
+                {
+                    return Err(ReplayRefused { position, reason });
+                }
                 attribution.1.observe_delta(graph, entry);
                 if legacy_assertion {
                     attribution.observe_graph(graph);
                 }
             }
         }
-    });
+        Ok(())
+    })
 }
 
-pub(crate) fn replay_graph_deltas_onto<I>(graph: &mut Graph, deltas: I)
+pub(crate) fn replay_graph_deltas_onto<I>(
+    graph: &mut Graph,
+    deltas: I,
+    on_refusal: OnRefusal,
+) -> Result<(), ReplayRefused>
 where
     I: IntoIterator<Item = GraphDelta>,
 {
     replay_quietly(graph, |graph| {
-        for delta in deltas {
-            let _ = apply_graph_delta(graph, delta);
+        for (position, delta) in deltas.into_iter().enumerate() {
+            if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta)
+                && on_refusal == OnRefusal::Stop
+            {
+                return Err(ReplayRefused { position, reason });
+            }
         }
-    });
+        Ok(())
+    })
 }
 
 fn replay_quietly<R>(graph: &mut Graph, edit: impl FnOnce(&mut Graph) -> R) -> R {

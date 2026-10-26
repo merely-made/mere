@@ -261,7 +261,9 @@ impl LegacyTranslationReceipt {
         let Some(journal) = self.journal(entries, cursor) else {
             return Ok(None);
         };
-        let graph = journal.snapshot_at_from(&self.baseline.materialize()?, journal.live_cursor());
+        let graph = journal
+            .snapshot_at_from(&self.baseline.materialize()?, journal.live_cursor())
+            .map_err(|error| error.to_string())?;
         if let Some(graph) = &graph {
             graph
                 .validate_active_resource_assertion_handles()
@@ -387,20 +389,28 @@ mod tests {
         let valid = FrozenGraph::of(&graph);
         assert_eq!(FrozenGraph::of(&valid.materialize().unwrap()), valid);
         let surface_id = graph.get_node(surface).unwrap().id;
-        kernel::graph::replay_captured_deltas_onto(
+        // The kernel refuses the colliding replay at the write, so the live
+        // graph cannot be driven into the conflict; the frozen sidecar can.
+        let refused = kernel::graph::replay_captured_deltas_onto_checked(
             &mut graph,
             [CapturedDelta::ReplayAppendNodePropertyById {
                 node_id: surface_id.to_string(),
-                property,
+                property: property.clone(),
             }],
         );
-        let conflicting = FrozenGraph::of(&graph);
+        assert!(refused.is_err(), "a colliding replay is refused, not dropped");
+        assert_eq!(FrozenGraph::of(&graph), valid, "refusal preserves input");
+        let mut conflicting = valid.clone();
+        conflicting
+            .facets
+            .set(
+                surface_id,
+                chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                serde_json::to_value(vec![property.clone(), property]).unwrap(),
+                &chartulary::AcceptAll,
+            )
+            .unwrap();
         assert!(conflicting.materialize().is_err());
-        assert_eq!(
-            FrozenGraph::of(&graph),
-            conflicting,
-            "refusal preserves input"
-        );
         let mut retained = valid.clone();
         retained
             .facets
