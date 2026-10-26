@@ -5224,7 +5224,8 @@ archive checksums and baseline controls are in `Code/output/burn-0221-20261024`.
 
 ### 13.49 Current-main integration (2026-10-25)
 
-**Status:** current-main combination validated; publication authorized by Mark.
+**Status:** current-main combination validated and published with Mark’s
+authorization. Mere main received it at `52178da24844e65f4b2e40da520c157e8435a794`.
 ESP's merged upgrade is published on main at `0ba91dbce5aaaad1b866a3891a0255045ba5131b`.
 This follow-up supersedes section 13.48's local-only publication status; it
 retains that section's original execution source and receipts unchanged.

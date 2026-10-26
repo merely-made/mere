@@ -10170,7 +10170,9 @@ dependencies = [
 name = "mere-athanor"
 version = "0.0.1"
 dependencies = [
+ "armillary",
  "async-trait",
+ "blake3",
  "chartulary",
  "eidetic",
  "euclid",
@@ -10179,7 +10181,10 @@ dependencies = [
  "muniment",
  "pandect",
  "pollster 0.4.0",
+ "serde",
  "serde_json",
+ "servitor",
+ "tempfile",
 ]
 
 [[package]]

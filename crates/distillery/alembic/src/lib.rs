@@ -52,7 +52,11 @@
 //!
 //! The recall half starts with [`memory_levels`] (feature `recall`), the three
 //! memory levels' read-model, moved here from `pandect` 2026-09-23. The
-//! workshop has no implementation yet.
+//! workshop's host-neutral records and controls are in [`workshop`] (feature
+//! `workshop`); Athanor supplies their domain implementation.
 
 #[cfg(feature = "recall")]
 pub mod memory_levels;
+
+#[cfg(feature = "workshop")]
+pub mod workshop;

@@ -1,8 +1,8 @@
 # Alembic implementation plan: memory and the granted-agent workshop
 
-**Status (2026-10-24):** workshop reconciliation and first two-host workflow
-specified in [section 5](#5-workshop-reconciliation-and-first-workflow-2026-10-24);
-implementation and acceptance remain open. Alembic/Athanor own the workshop
+**Status (2026-10-25):** W0 shared-domain implementation and qualification in
+progress. The workshop reconciliation and first two-host workflow are specified in [section 5](#5-workshop-reconciliation-and-first-workflow-2026-10-24);
+Product integration and two-host acceptance remain open. Alembic/Athanor own the workshop
 inside Distillery. Servitor remains in Eidetic, supplying admission and the
 runtime-free run reducer; Armillary supplies execution mechanics. The first
 workflow builds a reviewable evidence brief from selected retained passages in
@@ -540,6 +540,45 @@ retrieval-quality benchmark.
 - Armillary's independently selected actor/lifecycle library already supplies
   execution completion. Its API need not absorb Servitor, identity or graph
   dependencies to drive this workflow.
+
+### 5.7 Shared-domain implementation findings (2026-10-25)
+
+The initial W0 implementation is in Alembic’s [shared records and controls](../../../crates/distillery/alembic/src/workshop.rs)
+and Athanor’s [workshop domain and native worker adapter](../../../ports/distillery/athanor/src/workshop.rs).
+Recall remains independently selectable. Athanor’s existing furnace source
+is moved unchanged to `src/furnace.rs` and re-exported under its default
+`furnace` feature; workshop-only consumers can disable that feature.
+Servitor remains in Eidetic and is a second real run consumer here. Armillary
+is optional execution transport; no run-policy or custody dependency is
+added to Armillary.
+
+The v1 definition uses retained public bytes only, literal Djot quotations,
+exact UTF-8 selectors, owner/version references and integrity digests. The
+three recorded steps implement the fixture’s three decisions/two tool calls
+and zero tokens. Selected definition, binding, explicit limits, run events,
+immutable proposal, separate review state and acceptance assignment persist
+in a transactional owner namespace. Compare-and-write refuses a concurrent
+loser rather than overwriting it. A duplicate acceptance reloads its first
+assignment; changing destination/human under that identity refuses. Replay
+reduces recorded events without dispatching work. Generation completion is
+independent of a destination’s durable acknowledgement.
+
+The initial retention policy caps one installation at 32 runs and 1 MiB,
+reserving space for pending artifacts/acceptance resolution. Hitting that
+bound refuses new work and preserves unresolved history. A general retention
+service, body adoption/migration, private storage qualification, scheduling
+and model calls are outside this initial implementation.
+
+The shared-domain fixtures use independent synthetic owner scopes and a
+native worker. Their cold-process store checks do not qualify Turnstone or
+Graphshell. W1/W2 still need normal source selection, rendering of the shared
+controls, current source/custody gates, and actual destination adapters. In
+particular, Pandect’s `GraphSession::transact_deltas_published` already joins
+journal changes and addressable graph publication, but its public API does
+not yet join an evidence-brief operation ledger and retained note Resource.
+Neither a separate ledger write nor Turnstone’s `SaveSession`/untracked
+handoff supplies the required atomic acceptance receipt. W3 remains open
+until the real product paths pass section 5.5.
 
 ## Decisions — workshop reconciliation (2026-10-24)
 

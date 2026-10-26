@@ -19,6 +19,7 @@ path = "src/lib.rs"
 # An embeddable half a host composes, and an authority half that stays with
 # the resident.
 recall = ["dep:kernel", "dep:serde"]
+workshop = ["dep:serde"]
 
 [dependencies]
 kernel = { workspace = true, optional = true }
