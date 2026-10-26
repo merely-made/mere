@@ -79,10 +79,9 @@ async fn save_library(data_root: &std::path::Path) -> eidetic::ManifestId {
     )
     .await
     .unwrap();
-    let mut template = PromptTemplate::from_bytes(include_bytes!(
-        "fixtures/esp/smollm2-instruct-v1.json"
-    ))
-    .unwrap();
+    let mut template =
+        PromptTemplate::from_bytes(include_bytes!("fixtures/esp/smollm2-instruct-v1.json"))
+            .unwrap();
     template.system_prompt.clear();
     template.user.prefix = "t1 ".into();
     template.user.suffix = " t2 ".into();
@@ -148,6 +147,7 @@ async fn exercise_route(library_model: bool) {
                 embedding: None,
                 recall: Default::default(),
                 model: InferenceModelSettings::Library {
+                    weight_cache: None,
                     row: row.to_string(),
                     device: djinn::settings::InferenceDeviceSettings::Cpu,
                     max_tokens: 4,
@@ -373,6 +373,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
             embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 8,
@@ -1109,6 +1110,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
             embedding: None,
             recall: Default::default(),
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: 64,
@@ -1197,7 +1199,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         owner: None,
         node: None,
     };
-    let ask=RecallAskRequestV1 { ask:AskRequestV1 { run:"retained-answer".into(),question:"What is the Pelican observatory's access word? Answer in one short sentence and cite the passage using [1].".into() },scope:vec![] };
+    let ask=RecallAskRequestV1 { answer_format: Default::default(), ask:AskRequestV1 { run:"retained-answer".into(),question:"What is the Pelican observatory's access word? Answer in one short sentence and cite the passage using [1].".into() },scope:vec![] };
     assert_eq!(
         intent(
             &mut client,
@@ -1394,10 +1396,8 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     use sha2::{Digest, Sha256};
     let directory =
         std::path::PathBuf::from(std::env::var_os("ESP_SMOLLM2_DIR").expect("ESP_SMOLLM2_DIR"));
-    let reference: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "fixtures/esp/smollm2_360m_reference.json"
-    ))
-    .unwrap();
+    let reference: serde_json::Value =
+        serde_json::from_slice(include_bytes!("fixtures/esp/smollm2_360m_reference.json")).unwrap();
     let read = |name: &str| {
         let bytes = std::fs::read(directory.join(name)).unwrap();
         assert_eq!(
@@ -1435,10 +1435,9 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     .await
     .unwrap();
     drop(weights);
-    let template = PromptTemplate::from_bytes(include_bytes!(
-        "fixtures/esp/smollm2-instruct-v1.json"
-    ))
-    .unwrap();
+    let template =
+        PromptTemplate::from_bytes(include_bytes!("fixtures/esp/smollm2-instruct-v1.json"))
+            .unwrap();
     let template = save_typed(
         &mut library,
         &template,
@@ -1465,12 +1464,143 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
     row
 }
 
+/// Explicit alternate checkpoint for the bounded claim-support gate. The
+/// ordinary SmolLM2 fixtures retain their original artifact and template pins.
+#[cfg(feature = "inference-gpu")]
+async fn save_cross_source_answer_model(data_root: &std::path::Path) -> eidetic::ManifestId {
+    let Some(directory) = std::env::var_os("DJINN_CROSS_SOURCE_QWEN_DIR") else {
+        return save_pinned_answer_model(data_root).await;
+    };
+    use distillery::inference::{InferenceModelRow, PromptTemplate};
+    use eidetic::{PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
+    use sha2::{Digest, Sha256};
+    assert!(
+        std::env::var_os("CROSS_SOURCE_CASES").is_some()
+            || std::env::var_os("DJINN_HEADED_MIXED_QUERIES").is_some()
+    );
+    let directory = std::path::PathBuf::from(directory);
+    let qwen3 = std::env::var_os("DJINN_CROSS_SOURCE_QWEN3").is_some();
+    let qwen15 = std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some();
+    let reference: serde_json::Value = serde_json::from_slice(if qwen15 {
+        include_bytes!("fixtures/esp/qwen2_5_1_5b_instruct_artifacts.json").as_slice()
+    } else if qwen3 {
+        include_bytes!("fixtures/esp/qwen3_0_6b_artifacts.json").as_slice()
+    } else {
+        include_bytes!("fixtures/esp/qwen2_5_0_5b_instruct_artifacts.json").as_slice()
+    })
+    .unwrap();
+    let read = |name: &str| {
+        let bytes = std::fs::read(directory.join(name)).unwrap();
+        let hash: String = Sha256::digest(&bytes)
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        assert_eq!(
+            hash,
+            reference["artifacts"][name].as_str().unwrap(),
+            "exact {name}"
+        );
+        bytes
+    };
+    let path = djinn::resident_distillery::model_library_path(data_root, &profile().0, None);
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    let mut library = muniment::RedbBackend::open(path).unwrap();
+    let model = if qwen15 {
+        // The established layer-streaming loader bounds tensor residence;
+        // this keeps the original f32 execution semantics and source bytes.
+        use std::io::Read;
+        for (name, hash) in reference["artifacts"].as_object().unwrap() {
+            let mut file = std::fs::File::open(directory.join(name)).unwrap();
+            let mut digest = Sha256::new();
+            let mut buffer = vec![0; 1024 * 1024];
+            loop {
+                let n = file.read(&mut buffer).unwrap();
+                if n == 0 {
+                    break;
+                }
+                digest.update(&buffer[..n]);
+            }
+            let actual: String = digest
+                .finalize()
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect();
+            assert_eq!(actual, hash.as_str().unwrap(), "exact {name}");
+        }
+        esp::infer::layer_library::import_layered_model(
+            &mut library,
+            &directory,
+            reference["model_id"].as_str().unwrap(),
+            "Apache-2.0",
+            esp::infer::decoder::streaming::StreamingOptions::default(),
+        )
+        .await
+        .unwrap()
+    } else {
+        let config = read("config.json");
+        let tokenizer = read("tokenizer.json");
+        let weights = read("model.safetensors");
+        read("tokenizer_config.json");
+        let imported = eidetic::ModelLibrary::save_model_with_components(
+            &mut library,
+            reference["model_id"].as_str().unwrap(),
+            reference["architecture"].as_str().unwrap(),
+            "Apache-2.0",
+            serde_json::from_slice(&config).unwrap(),
+            &weights,
+            &tokenizer,
+            vec![],
+            vec![],
+            PrivacyClass::LocalOnly,
+            ProvenanceRecord::self_imported("local"),
+            TrustEnvelope::self_asserted(),
+            Timestamp::ZERO,
+        )
+        .await
+        .unwrap();
+        drop(weights);
+        imported
+    };
+    let template = PromptTemplate::from_bytes(if qwen3 {
+        include_bytes!("fixtures/esp/qwen3_non_thinking_v1.json").as_slice()
+    } else {
+        include_bytes!("fixtures/esp/qwen2_5_instruct_v1.json").as_slice()
+    })
+    .unwrap();
+    let template = eidetic::typed::save_typed(
+        &mut library,
+        &template,
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap();
+    eidetic::typed::save_typed(
+        &mut library,
+        &InferenceModelRow { model, template },
+        vec![],
+        PrivacyClass::LocalOnly,
+        ProvenanceRecord::self_imported("local"),
+        TrustEnvelope::self_asserted(),
+        Timestamp::ZERO,
+    )
+    .await
+    .unwrap()
+}
+
 /// Test-owned native resident for the separate, real headed Turnstone process.
 /// Control files contain public fixture state only; vault material stays temporary.
 #[cfg(feature = "inference-gpu")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "requires ESP_SMOLLM2_DIR, DJINN_HEADED_DIR and headed Turnstone"]
 async fn serve_trained_model_for_headed_turnstone() {
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter("distillery::inference::gpu=debug")
+        .with_ansi(false)
+        .try_init();
     let output =
         std::path::PathBuf::from(std::env::var_os("DJINN_HEADED_DIR").expect("DJINN_HEADED_DIR"));
     std::fs::create_dir_all(&output).unwrap();
@@ -1496,7 +1626,7 @@ async fn serve_trained_model_for_headed_turnstone() {
     let row = if phase == Some(1) {
         serde_json::from_slice(&std::fs::read(&row_file).unwrap()).unwrap()
     } else {
-        let row = save_pinned_answer_model(&data_root).await;
+        let row = save_cross_source_answer_model(&data_root).await;
         std::fs::write(&row_file, serde_json::to_vec(&row).unwrap()).unwrap();
         row
     };
@@ -1507,7 +1637,7 @@ async fn serve_trained_model_for_headed_turnstone() {
     if let Some(mixed) = &mixed {
         assert!(phase.is_some() && private_root.is_some());
         let asks = mixed["asks"].as_array().unwrap();
-        assert_eq!(asks.len(), 3);
+        assert!((1..=8).contains(&asks.len()));
         let mut ids = std::collections::BTreeSet::new();
         for case in asks {
             let id = case["id"].as_str().unwrap();
@@ -1572,16 +1702,38 @@ async fn serve_trained_model_for_headed_turnstone() {
         inference: Some(InferenceLaneSettings {
             embedding: embedding.clone(),
             recall: distillery::inference::recall::RecallConfig {
-                max_passages: if mixed.is_some() { 3 } else { 1 },
+                max_passages: if mixed.as_ref().is_some_and(|v| v["claim_support"] == true) {
+                    4
+                } else if mixed.is_some() {
+                    3
+                } else {
+                    1
+                },
                 ..Default::default()
             },
             model: InferenceModelSettings::Library {
+                weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
+                    djinn::settings::InferenceWeightCacheSettings {
+                        host_bytes: 3 * 1024_u64.pow(3),
+                        device_layer_bytes: 4 * 1024_u64.pow(3),
+                    }
+                }),
                 row: row.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Gpu,
-                max_tokens: 512,
+                max_tokens: if mixed.as_ref().is_some_and(|v| v["claim_support"] == true) {
+                    1024
+                } else {
+                    512
+                },
             },
         }),
         ..owner(Some(lane()))
+    };
+    // Four independently bounded asks plus native inspection and shutdown.
+    let headed_seconds = if std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some() {
+        4200
+    } else {
+        1200
     };
     let endpoint_file = output.join("endpoint.txt");
     let endpoint = std::fs::read_to_string(&endpoint_file).unwrap_or_else(|_| endpoint_name());
@@ -1648,7 +1800,15 @@ async fn serve_trained_model_for_headed_turnstone() {
             let grants = grants.clone();
             let catalog = catalog.clone();
             tokio::spawn(async move {
-                let _ = serve_app_broker(&endpoint, keeper, grants, 1_200_000, None, catalog).await;
+                let _ = serve_app_broker(
+                    &endpoint,
+                    keeper,
+                    grants,
+                    headed_seconds * 1000,
+                    None,
+                    catalog,
+                )
+                .await;
             })
         };
         // Prove the application endpoint is accepting before announcing readiness.
@@ -1665,13 +1825,14 @@ async fn serve_trained_model_for_headed_turnstone() {
             serde_json::to_vec_pretty(&lane.runs()).unwrap(),
         )
         .unwrap();
-        let deadline = tokio::time::Instant::now() + Duration::from_secs(1200);
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(headed_seconds);
         let mut last_observation = Vec::new();
         loop {
             let runs = lane.runs();
             let observation = serde_json::to_vec_pretty(&runs).unwrap();
             if observation != last_observation {
-                std::fs::write(output.join(format!("live-runs-{phase}.json")), &observation).unwrap();
+                std::fs::write(output.join(format!("live-runs-{phase}.json")), &observation)
+                    .unwrap();
                 last_observation = observation;
             }
             if runs.runs.len() >= 2
@@ -1687,11 +1848,13 @@ async fn serve_trained_model_for_headed_turnstone() {
                 if let Some(mixed) = &mixed {
                     if run.state == RunStateV1::Finished {
                         let recall = run.recall.as_ref().unwrap();
-                        assert_eq!(
-                            recall.scope.len(),
-                            4,
-                            "mixed scope remains explicit and complete"
-                        );
+                        if mixed["claim_support"] != true {
+                            assert_eq!(
+                                recall.scope.len(),
+                                4,
+                                "mixed scope remains explicit and complete"
+                            );
+                        }
                         for case in mixed["asks"].as_array().unwrap() {
                             if case["question"].as_str().unwrap() == run.question {
                                 let historical = phase == 1
@@ -1706,7 +1869,15 @@ async fn serve_trained_model_for_headed_turnstone() {
                                     format!("mixed-{phase}-{}.json", case["id"].as_str().unwrap())
                                 };
                                 if !output.join(&name).exists()
-                                    && (!historical || !recall.citations.is_empty())
+                                    && (!historical
+                                        || if mixed["claim_support"] == true {
+                                            // Wait for retained source publication before
+                                            // freezing the historical live observation.
+                                            recall.stale.is_empty()
+                                                && recall.unknown_citations.is_empty()
+                                        } else {
+                                            !recall.citations.is_empty()
+                                        })
                                 {
                                     std::fs::write(
                                         output.join(name),
@@ -1816,7 +1987,12 @@ async fn serve_trained_model_for_headed_turnstone() {
                         )
                         .unwrap()
                     });
-                    evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint}));
+                    let support = journal.retained_answer_support(&run.run).unwrap();
+                    let requested_facts = journal.retained_requested_facts(&run.run).unwrap();
+                    if let Some(expected) = run.recall.as_ref().and_then(|r| r.support.as_ref()) {
+                        assert_eq!(support.as_ref(), Some(expected));
+                    }
+                    evidence.push(serde_json::json!({"record":record,"passages":passages,"checkpoint":checkpoint,"answer_support":support,"requested_facts":requested_facts}));
                 }
                 // Store enumeration order may change across OS processes.
                 // Compare every sealed field under the stable run identity.
@@ -1879,6 +2055,53 @@ async fn serve_trained_model_for_headed_turnstone() {
     )
     .unwrap();
     if let Some(mixed) = &mixed {
+        if mixed["claim_support"] == true {
+            // This scenario reopens every historical answer and generates one
+            // fresh cross-source answer. Insufficient answers correctly have
+            // no citations; the independent frozen rubric checks semantics.
+            assert_eq!(snapshots.len(), 2);
+            let load = |name: String| -> serde_json::Value {
+                serde_json::from_slice(&std::fs::read(output.join(name)).unwrap()).unwrap()
+            };
+            for case in mixed["asks"].as_array().unwrap() {
+                let id = case["id"].as_str().unwrap();
+                let warm = load(format!("mixed-0-{id}.json"));
+                assert_eq!(warm, load(format!("history-1-{id}.json")));
+                let retained = |snapshot: &serde_json::Value| {
+                    snapshot["evidence"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|e| e["record"]["run"] == warm["run"])
+                        .unwrap()
+                        .clone()
+                };
+                assert_eq!(retained(&snapshots[0]), retained(&snapshots[1]));
+            }
+            let warm = load("mixed-0-cross.json".into());
+            let fresh = load("mixed-1-cross.json".into());
+            assert_eq!(fresh["state"], "finished");
+            assert_ne!(warm["run"], fresh["run"]);
+            assert_eq!(warm["question"], fresh["question"]);
+            for field in ["scope", "passages"] {
+                assert_eq!(warm["recall"][field], fresh["recall"][field]);
+            }
+            if embedding.is_some() {
+                assert_eq!(warm["recall"]["embedding"]["cache"], "built");
+                assert_eq!(fresh["recall"]["embedding"]["cache"], "reopened");
+                for field in ["envelope", "index"] {
+                    assert_eq!(
+                        warm["recall"]["embedding"][field],
+                        fresh["recall"]["embedding"][field]
+                    );
+                }
+                assert_eq!(
+                    snapshots[0]["embedding_projections"],
+                    snapshots[1]["embedding_projections"]
+                );
+            }
+            return;
+        }
         for case in mixed["asks"].as_array().unwrap() {
             let id = case["id"].as_str().unwrap();
             let load = |name: String| -> serde_json::Value {
@@ -2074,5 +2297,155 @@ async fn serve_trained_model_for_headed_turnstone() {
             .unwrap()
             .iter()
             .any(|run| run["state"] == "cancelled")
+    );
+}
+
+/// Provider capability probe only. The headed gate separately admits real
+/// captures and producer packages through their ordinary custody owners.
+#[cfg(feature = "inference-gpu")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "requires pinned ESP_SMOLLM2_DIR and CROSS_SOURCE_CASES/OUTPUT"]
+async fn probe_bounded_cross_source_answers() {
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter("distillery::inference::gpu=debug")
+        .with_ansi(false)
+        .try_init();
+    use distillery::inference::recall::{
+        AnswerFormat, PageTextCorpus, RecallAskRequestV1, RecallConfig,
+    };
+    use eidetic::models::recall::{RecallSourceId, RecallSourceKind};
+    let cases: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(std::env::var_os("CROSS_SOURCE_CASES").unwrap()).unwrap(),
+    )
+    .unwrap();
+    let output = std::path::PathBuf::from(std::env::var_os("CROSS_SOURCE_OUTPUT").unwrap());
+    std::fs::create_dir_all(&output).unwrap();
+    let temp = tempfile::tempdir().unwrap();
+    let (vault_dir, identity) = open_vault(temp.path());
+    let data_root = temp.path().join("data");
+    write_device_settings(&data_root, Some(lending()));
+    let row = save_cross_source_answer_model(&data_root).await;
+    let config = RecallConfig {
+        max_passages: 4,
+        ..Default::default()
+    };
+    let settings = OwnerSettings {
+        inference: Some(InferenceLaneSettings {
+            embedding: None,
+            recall: config.clone(),
+            model: InferenceModelSettings::Library {
+                weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
+                    djinn::settings::InferenceWeightCacheSettings {
+                        host_bytes: 3 * 1024_u64.pow(3),
+                        device_layer_bytes: 4 * 1024_u64.pow(3),
+                    }
+                }),
+                row: row.to_string(),
+                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                max_tokens: 1024,
+            },
+        }),
+        ..owner(Some(lane()))
+    };
+    let resident = DjinnResident::open(
+        &identity,
+        &data_root,
+        &profile(),
+        settings,
+        &vault_dir,
+        unlock(),
+    )
+    .await
+    .unwrap();
+    let store = Arc::new(muniment::RedbBackend::open(temp.path().join("source.redb")).unwrap());
+    for (key, value) in cases["corpus"].as_object().unwrap() {
+        eidetic::PageTextStore::new(store.as_ref())
+            .put(
+                &format!("https://probe.test/{key}"),
+                value["text"].as_str().unwrap(),
+                1,
+            )
+            .await
+            .unwrap();
+    }
+    resident
+        .configure_inference_recall(Arc::new(PageTextCorpus(store)), config)
+        .unwrap();
+    let lane = resident.inference().unwrap().lane();
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(90);
+    while lane.runs().session.is_none() {
+        assert!(lane.runs().load_error.is_none(), "{:?}", lane.runs());
+        assert!(tokio::time::Instant::now() < deadline);
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let mut incomplete = Vec::new();
+    for case in cases["asks"].as_array().unwrap() {
+        let id = case["id"].as_str().unwrap();
+        let keys: &[&str] = match id {
+            "conflict" => &["capture", "control", "knot", "note"],
+            "reduced" => &["capture", "knot"],
+            _ => &["capture", "knot", "note"],
+        };
+        lane.ask_recalled(RecallAskRequestV1 {
+            answer_format: AnswerFormat::ClaimSupportV1,
+            ask: AskRequestV1 {
+                run: id.into(),
+                question: case["question"].as_str().unwrap().into(),
+            },
+            scope: keys
+                .iter()
+                .map(|key| RecallSourceId {
+                    kind: RecallSourceKind::PageText,
+                    source: format!("https://probe.test/{key}"),
+                    owner: None,
+                    node: None,
+                })
+                .collect(),
+        })
+        .unwrap();
+        let seconds = if std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").is_some() {
+            900
+        } else {
+            300
+        };
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(seconds);
+        let mut cancel_deadline = None;
+        loop {
+            let runs = lane.runs();
+            let run = runs.runs.iter().find(|r| r.run == id).unwrap();
+            std::fs::write(
+                output.join(format!("{id}.partial.json")),
+                serde_json::to_vec_pretty(run).unwrap(),
+            )
+            .unwrap();
+            if run.state.is_terminal() {
+                std::fs::write(
+                    output.join(format!("{id}.json")),
+                    serde_json::to_vec_pretty(run).unwrap(),
+                )
+                .unwrap();
+                if run.state != RunStateV1::Finished || cancel_deadline.is_some() {
+                    incomplete.push((id.to_owned(), run.state));
+                }
+                break;
+            }
+            let now = tokio::time::Instant::now();
+            if let Some(until) = cancel_deadline {
+                assert!(
+                    now < until,
+                    "timed-out case did not cancel within 30 seconds"
+                );
+            } else if now >= deadline {
+                std::fs::write(output.join(format!("{id}.timeout.json")), serde_json::to_vec_pretty(&serde_json::json!({"limit_seconds":seconds,"last_state":run.state,"last_tokens":run.tokens,"reason":"generation_deadline"})).unwrap()).unwrap();
+                lane.cancel(&CancelRequestV1 { run: id.into() }).unwrap();
+                cancel_deadline = Some(now + Duration::from_secs(30));
+            }
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+    }
+    resident.shutdown().await.unwrap();
+    assert!(
+        incomplete.is_empty(),
+        "incomplete frozen cases: {incomplete:?}"
     );
 }

@@ -523,6 +523,7 @@ mod worker {
         let request = GenerationRequest {
             prompt: config.input.clone(),
             context: String::new(),
+            output_grammar: None,
             max_tokens,
             temperature: 0.0,
             top_p: None,

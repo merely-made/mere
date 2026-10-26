@@ -158,9 +158,54 @@ struct Delta {
     evidence: Option<InferenceRunRecord>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     evidence_schema: Option<eidetic::SchemaRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    answer_support: Option<eidetic::ManifestId>,
 }
 fn required_semantics(record: &RunRecord) -> Option<&'static str> {
     if record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+        .is_some_and(|c| c.method == "distillery.quoted-review/v7")
+    {
+        return Some("recall/quoted-candidate-review-v1");
+    }
+    if record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+        .is_some_and(|c| c.method == "distillery.candidate-review/v6")
+    {
+        return Some("recall/candidate-review-v1");
+    }
+    if record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+        .and_then(|c| c.requested_facts.as_ref())
+        .is_some()
+    {
+        Some("recall/requested-fact-set-v1")
+    } else if record.request.output_grammar.is_some() {
+        Some("recall/constrained-answer-v1")
+    } else if record
+        .view
+        .recall
+        .as_ref()
+        .is_some_and(|e| e.answer_contract.is_some())
+    {
+        Some("recall/requested-facts-v1")
+    } else if record
+        .view
+        .recall
+        .as_ref()
+        .is_some_and(|e| e.answer_format == recall::AnswerFormat::ClaimSupportV1)
+    {
+        Some("recall/claim-support-v1")
+    } else if record
         .view
         .recall
         .as_ref()
@@ -175,20 +220,91 @@ fn required_semantics(record: &RunRecord) -> Option<&'static str> {
 }
 impl Delta {
     fn check_semantics(&self) -> Result<(), String> {
-        if self
-            .required_semantics
-            .as_deref()
-            .is_some_and(|value| value != "recall/v1" && value != "recall/published-v1")
-        {
+        if self.required_semantics.as_deref().is_some_and(|value| {
+            value != "recall/v1"
+                && value != "recall/published-v1"
+                && value != "recall/claim-support-v1"
+                && value != "recall/requested-facts-v1"
+                && value != "recall/constrained-answer-v1"
+                && value != "recall/requested-fact-set-v1"
+                && value != "recall/candidate-review-v1"
+                && value != "recall/quoted-candidate-review-v1"
+        }) {
             return Err("unsupported inference checkpoint semantics".into());
         }
         if let Some(record) = &self.record {
             if required_semantics(record) != self.required_semantics.as_deref() {
                 return Err("checkpoint recall semantics do not match its retained inputs".into());
             }
+            check_answer_contract(record)?;
         }
         Ok(())
     }
+}
+
+fn check_answer_contract(record: &RunRecord) -> Result<(), String> {
+    if record
+        .checkpoint
+        .as_ref()
+        .is_some_and(|cp| cp.request.output_grammar != record.request.output_grammar)
+    {
+        return Err(
+            "checkpoint decoding grammar differs from its retained generation request".into(),
+        );
+    }
+    if let Some(contract) = record
+        .view
+        .recall
+        .as_ref()
+        .and_then(|r| r.answer_contract.as_ref())
+    {
+        if matches!(
+            contract.method.as_str(),
+            "distillery.requested-facts/v5"
+                | "distillery.candidate-review/v6"
+                | "distillery.quoted-review/v7"
+        ) || contract.requested_facts.is_some()
+        {
+            let facts = contract
+                .requested_facts
+                .as_ref()
+                .ok_or("retained requested-fact contract is missing its fact set")?;
+            facts.validate(&record.view.question)?;
+            let recall = record.view.recall.as_ref().unwrap();
+            let (expected, prompt, context) = super::answer_contract::prepare_for_method(
+                &record.view.question,
+                recall,
+                &contract.method,
+            )?;
+            if &expected != contract
+                || prompt != record.request.prompt
+                || context != record.request.context
+            {
+                return Err(
+                    "retained requested facts do not match the exact generation task".into(),
+                );
+            }
+        }
+        if contract.question != eidetic::ManifestId::of_blob(record.view.question.as_bytes())
+            || contract.prompt != eidetic::ManifestId::of_blob(record.request.prompt.as_bytes())
+            || contract.context != eidetic::ManifestId::of_blob(record.request.context.as_bytes())
+            || contract.output_grammar
+                != record
+                    .request
+                    .output_grammar
+                    .as_ref()
+                    .map(|g| {
+                        serde_json::to_vec(g).map(|bytes| eidetic::ManifestId::of_blob(&bytes))
+                    })
+                    .transpose()
+                    .map_err(|e| e.to_string())?
+        {
+            return Err(
+                "checkpoint answer contract does not match its exact generation inputs".into(),
+            );
+        }
+    }
+    Ok(())
 }
 #[derive(Serialize, Deserialize)]
 struct Sealed {
@@ -535,6 +651,73 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
         .map_err(|error| error.to_string())?
         .ok_or_else(|| "retained evidence disappeared".into())
     }
+    pub fn retained_answer_support(
+        &self,
+        run: &str,
+    ) -> Result<Option<eidetic::models::answer::AnswerSupport>, String> {
+        let record = self
+            .load()?
+            .into_iter()
+            .find(|r| r.view.run == run)
+            .ok_or("unknown retained run")?;
+        if record.view.state != RunStateV1::Finished {
+            return Ok(None);
+        }
+        let Some(support) = record
+            .view
+            .recall
+            .as_ref()
+            .and_then(|r| r.assess_answer(&record.view.text, &record.view.question))
+        else {
+            return Ok(None);
+        };
+        let mut backend = self.store.backend().clone();
+        let stored: Option<eidetic::models::answer::AnswerSupport> =
+            pollster::block_on(eidetic::typed::load_typed_sealed(
+                &mut backend,
+                &mut eidetic::NoFetcher,
+                Some(self),
+                support.id(),
+            ))
+            .map_err(|e| e.to_string())?;
+        if stored.as_ref() != Some(&support) {
+            return Err("sealed answer support is missing or inconsistent".into());
+        }
+        Ok(stored)
+    }
+    pub fn retained_requested_facts(
+        &self,
+        run: &str,
+    ) -> Result<Option<eidetic::models::requested::RequestedFactSet>, String> {
+        let record = self
+            .load()?
+            .into_iter()
+            .find(|r| r.view.run == run)
+            .ok_or("unknown retained run")?;
+        let Some(facts) = record
+            .view
+            .recall
+            .as_ref()
+            .and_then(|r| r.answer_contract.as_ref())
+            .and_then(|c| c.requested_facts.as_ref())
+        else {
+            return Ok(None);
+        };
+        facts.validate(&record.view.question)?;
+        let mut backend = self.store.backend().clone();
+        let stored: Option<eidetic::models::requested::RequestedFactSet> =
+            pollster::block_on(eidetic::typed::load_typed_sealed(
+                &mut backend,
+                &mut eidetic::NoFetcher,
+                Some(self),
+                facts.id(),
+            ))
+            .map_err(|e| e.to_string())?;
+        if stored.as_ref() != Some(facts) {
+            return Err("sealed requested-fact set is missing or inconsistent".into());
+        }
+        Ok(stored)
+    }
     /// Resolve an exact reference through its sealed Eidetic blob manifest.
     pub fn resolve_evidence_blob(
         &self,
@@ -701,6 +884,15 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
                 self.save_evidence(&passage.passage)?;
             }
         }
+        if record.view.state == RunStateV1::Finished {
+            if let Some(recall) = &record.view.recall {
+                if let Some(support) =
+                    recall.assess_answer(&record.view.text, &record.view.question)
+                {
+                    self.save_evidence(&support)?;
+                }
+            }
+        }
         self.save_evidence(&Self::evidence(record)?)
     }
     /// Attach a real uninterrupted comparison. Absence of a comparison hash
@@ -847,6 +1039,21 @@ impl<B: Backend + Clone + Send + Sync + 'static> PersonaRunJournal<B> {
                     cp.draws = delta.draws;
                     cp.complete = delta.complete;
                     record.view.text = cp.text.clone();
+                }
+                let support = if record.view.state == RunStateV1::Finished {
+                    record
+                        .view
+                        .recall
+                        .as_ref()
+                        .and_then(|r| r.assess_answer(&record.view.text, &record.view.question))
+                } else {
+                    None
+                };
+                if delta.answer_support != support.as_ref().map(|s| s.id()) {
+                    return Err(
+                        "retained answer support does not match raw output and supplied passages"
+                            .into(),
+                    );
                 }
                 if let Some(parent) = delta.parent {
                     let remaining = children
@@ -1014,6 +1221,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
         Ok(runs)
     }
     fn append(&self, record: &RunRecord) -> Result<(), String> {
+        check_answer_contract(record)?;
         let _writer = self.writer.lock().unwrap();
         let mut heads = self.heads.lock().unwrap();
         let previous = heads.get(&record.view.run);
@@ -1027,6 +1235,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
             complete: record.checkpoint.as_ref().is_some_and(|cp| cp.complete),
             evidence: None,
             evidence_schema: None,
+            answer_support: None,
             state: record.view.state,
         };
         if let Some((_, previous)) = previous {
@@ -1069,10 +1278,30 @@ impl<B: Backend + Clone + Send + Sync + 'static> RunJournal for PersonaRunJourna
                 }
             }
         }
+        if delta.record.is_some() {
+            if let Some(facts) = record
+                .view
+                .recall
+                .as_ref()
+                .and_then(|r| r.answer_contract.as_ref())
+                .and_then(|c| c.requested_facts.as_ref())
+            {
+                self.save_evidence(facts)?;
+            }
+        }
         if delta.record.is_some() || delta.complete {
             delta.evidence = Some(Self::evidence(record)?);
             delta.evidence_schema =
                 Some(<InferenceRunRecord as eidetic::TypedPayload>::schema_ref());
+        }
+        if record.view.state == RunStateV1::Finished {
+            if let Some(recall) = &record.view.recall {
+                if let Some(support) =
+                    recall.assess_answer(&record.view.text, &record.view.question)
+                {
+                    delta.answer_support = Some(self.save_evidence(&support)?);
+                }
+            }
         }
         let address = RunExt {
             space: self.policy.space,
@@ -1155,6 +1384,150 @@ mod tests {
         )
     }
     #[test]
+    fn claim_support_is_sealed_reopened_and_bound_to_raw_output() {
+        let journal = journal("a");
+        let mut record = paused();
+        record.view.state = RunStateV1::Queued;
+        let mut evidence = recall::RecallEvidence {
+            answer_format: recall::AnswerFormat::ClaimSupportV1,
+            answer_contract: None,
+            support: None,
+            embedding: None,
+            owner: None,
+            scope: vec![],
+            config: Default::default(),
+            passages: vec![],
+            stale: vec![],
+            citations: vec![],
+            unknown_citations: vec![],
+        };
+        let (contract, prompt, context) =
+            super::super::answer_contract::prepare(&record.view.question, &evidence).unwrap();
+        evidence.answer_contract = Some(contract.clone());
+        record.request.output_grammar =
+            super::super::answer_contract::grammar(&evidence, &contract.method).unwrap();
+        record.request.prompt = prompt;
+        record.request.context = context;
+        record.view.recall = Some(evidence);
+        assert_eq!(
+            required_semantics(&record),
+            Some("recall/quoted-candidate-review-v1")
+        );
+        journal.append(&record).unwrap();
+        assert!(
+            journal
+                .retained_answer_support(&record.view.run)
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(
+            journal.retained_requested_facts(&record.view.run).unwrap(),
+            contract.requested_facts
+        );
+        record.view.state = RunStateV1::Finished;
+        record.view.text = serde_json::json!({"claims":[{"fact":contract.requested_facts.as_ref().unwrap().facts[0],"review":{"candidates":[],"agreement":"none"},"status":"insufficient","text":format!("The supplied evidence does not state {}.",contract.requested_facts.as_ref().unwrap().facts[0].text),"evidence":[]}]}).to_string();
+        journal.append(&record).unwrap();
+        let support = journal
+            .retained_answer_support(&record.view.run)
+            .unwrap()
+            .unwrap();
+        assert!(support.error.is_none());
+        assert_eq!(
+            support.claims[0].review.as_ref().unwrap().candidates.len(),
+            0
+        );
+        assert_eq!(
+            support.claims[0].review.as_ref().unwrap().agreement,
+            eidetic::models::answer::CandidateAgreement::None
+        );
+        assert_eq!(
+            support.raw_output,
+            eidetic::ManifestId::of_blob(record.view.text.as_bytes())
+        );
+        let mut backend = journal.store.backend().clone();
+        let manifest =
+            pollster::block_on(eidetic::manifest::load_manifest(&mut backend, support.id()))
+                .unwrap()
+                .unwrap();
+        assert!(eidetic::seal_marker(&manifest).unwrap().is_some());
+        let reopened = PersonaRunJournal::new(
+            backend,
+            [7; 32],
+            &Ed25519Keypair::from_seed([2; 32]),
+            "a".into(),
+            [9; 32],
+        );
+        assert_eq!(
+            reopened.retained_answer_support(&record.view.run).unwrap(),
+            Some(support.clone())
+        );
+        let restored = reopened.load().unwrap();
+        assert_eq!(
+            restored[0].view.recall.as_ref().unwrap().answer_contract,
+            Some(contract.clone())
+        );
+        assert_eq!(
+            reopened.retained_requested_facts(&record.view.run).unwrap(),
+            contract.requested_facts
+        );
+        let mut altered = record.clone();
+        altered
+            .view
+            .recall
+            .as_mut()
+            .unwrap()
+            .answer_contract
+            .as_mut()
+            .unwrap()
+            .requested_facts
+            .as_mut()
+            .unwrap()
+            .facts[0]
+            .text
+            .push_str(" altered");
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered
+            .view
+            .recall
+            .as_mut()
+            .unwrap()
+            .answer_contract
+            .as_mut()
+            .unwrap()
+            .requested_facts = None;
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered
+            .request
+            .context
+            .push_str("different generation evidence");
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered.request.output_grammar = None;
+        assert!(reopened.append(&altered).is_err());
+        let mut altered = record.clone();
+        altered.checkpoint = Some(GenerationCheckpoint {
+            placements: vec![],
+            session: None,
+            request: GenerationRequest::default(),
+            prompt_ids: vec![],
+            token_ids: vec![],
+            draws: 0,
+            text: String::new(),
+            complete: false,
+        });
+        assert!(check_answer_contract(&altered).is_err());
+        reopened.lock();
+        assert!(reopened.retained_requested_facts(&record.view.run).is_err());
+        assert!(reopened.retained_answer_support(&record.view.run).is_err());
+        reopened.unlock([9; 32]);
+        assert_eq!(
+            reopened.retained_answer_support(&record.view.run).unwrap(),
+            Some(support)
+        );
+    }
+    #[test]
     fn recall_entries_refuse_legacy_readers_instead_of_losing_context() {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
@@ -1183,6 +1556,7 @@ mod tests {
             state: RunStateV1::Queued,
             evidence: None,
             evidence_schema: None,
+            answer_support: None,
         };
         let encoded = serde_json::to_vec(&delta).unwrap();
         assert!(

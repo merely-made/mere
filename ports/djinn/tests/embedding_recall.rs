@@ -191,6 +191,7 @@ async fn resident_embedding_process_fixture() {
                 ..Default::default()
             },
             model: InferenceModelSettings::Library {
+                weight_cache: None,
                 row: generation.to_string(),
                 device: djinn::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 2,
@@ -364,6 +365,7 @@ async fn resident_embedding_process_fixture() {
         let ranks = json!({"lexical":rank(&rankings.lexical),"vector":rank(&rankings.vector),"fused":rank(&rankings.fused)});
         let run = format!("{phase}-query-{i}");
         let ask = RecallAskRequestV1 {
+            answer_format: Default::default(),
             ask: AskRequestV1 {
                 run: run.clone(),
                 question: query["question"].as_str().unwrap().into(),

@@ -39,6 +39,9 @@ use esp::infer::{GenerationRequest, InferCommand, InferUpdate};
 mod observations;
 pub use observations::InferenceObservation;
 #[cfg(feature = "inference-model")]
+mod answer_contract;
+mod candidate_review;
+#[cfg(feature = "inference-model")]
 pub mod durable;
 #[cfg(feature = "inference-model")]
 pub mod recall;
@@ -59,6 +62,7 @@ mod gpu;
 #[cfg(feature = "inference-gpu")]
 pub use gpu::{
     discrete_gpu_inference_device, open_gpu_library_lane, open_gpu_library_lane_with_journal,
+    open_gpu_library_lane_with_journal_and_cache,
 };
 
 #[cfg(feature = "inference-model")]
@@ -421,10 +425,14 @@ struct PublishedBinding {
 }
 #[cfg(feature = "inference-model")]
 enum RecallSelection {
-    Local(Vec<eidetic::models::recall::RecallSourceId>),
+    Local(
+        Vec<eidetic::models::recall::RecallSourceId>,
+        recall::AnswerFormat,
+    ),
     Published {
         owner: String,
         publisher: ProjectionSession,
+        answer_format: recall::AnswerFormat,
         scope: Vec<eidetic::models::recall::RecallSourceId>,
     },
 }
@@ -542,6 +550,9 @@ impl Shared {
         #[cfg(feature = "inference-model")]
         for run in &mut view.runs {
             if let Some(evidence) = &mut run.recall {
+                if run.state == RunStateV1::Finished {
+                    evidence.support = evidence.assess_answer(&run.text, &run.question);
+                }
                 evidence.validate(&run.text, Some(&observed));
             }
         }
@@ -892,7 +903,35 @@ impl InferenceLane {
         self.ask_internal(
             request.ask,
             generation,
-            Some(RecallSelection::Local(request.scope)),
+            Some(RecallSelection::Local(request.scope, request.answer_format)),
+        )
+    }
+
+    /// Explicit, question-anchored fact order for compound requests outside the
+    /// conservative question-only notation. The authenticated host chooses it.
+    #[cfg(feature = "inference-model")]
+    pub fn ask_recalled_with_facts(
+        &self,
+        request: recall::RecallAskRequestV1,
+        facts: eidetic::models::requested::RequestedFactSet,
+    ) -> Result<(), InferenceLaneError> {
+        if request.answer_format != recall::AnswerFormat::ClaimSupportV1 {
+            return Err(InferenceLaneError::Recall(
+                "requested facts require structured answers".into(),
+            ));
+        }
+        facts
+            .validate(&request.ask.question)
+            .map_err(InferenceLaneError::Recall)?;
+        let generation = GenerationRequest {
+            max_tokens: self.shared.max_tokens,
+            ..Default::default()
+        };
+        self.ask_internal_planned(
+            request.ask,
+            generation,
+            Some(RecallSelection::Local(request.scope, request.answer_format)),
+            Some(facts),
         )
     }
 
@@ -917,8 +956,26 @@ impl InferenceLane {
     fn ask_internal(
         &self,
         request: AskRequestV1,
+        generation: GenerationRequest,
+        #[cfg(feature = "inference-model")] recall_scope: Option<RecallSelection>,
+    ) -> Result<(), InferenceLaneError> {
+        self.ask_internal_planned(
+            request,
+            generation,
+            #[cfg(feature = "inference-model")]
+            recall_scope,
+            #[cfg(feature = "inference-model")]
+            None,
+        )
+    }
+    fn ask_internal_planned(
+        &self,
+        request: AskRequestV1,
         mut generation: GenerationRequest,
         #[cfg(feature = "inference-model")] recall_scope: Option<RecallSelection>,
+        #[cfg(feature = "inference-model")] requested_facts: Option<
+            eidetic::models::requested::RequestedFactSet,
+        >,
     ) -> Result<(), InferenceLaneError> {
         generation.prompt = request.question.clone();
         generation.max_tokens = generation.max_tokens.min(self.shared.max_tokens);
@@ -966,17 +1023,19 @@ impl InferenceLane {
             }
             let mut local = self.shared.recall.lock().unwrap();
             let mut published = self.shared.published.lock().unwrap();
-            let (binding, scope, owner) = match scope {
-                RecallSelection::Local(scope) => (
+            let (binding, scope, owner, answer_format) = match scope {
+                RecallSelection::Local(scope, answer_format) => (
                     local.as_mut().ok_or_else(|| {
                         InferenceLaneError::Recall("no retained corpus is attached".into())
                     })?,
                     scope,
                     None,
+                    answer_format,
                 ),
                 RecallSelection::Published {
                     owner,
                     publisher,
+                    answer_format,
                     scope,
                 } => {
                     let slot = published.owners.get_mut(&owner).ok_or_else(|| {
@@ -995,7 +1054,7 @@ impl InferenceLane {
                             "scope names another source owner".into(),
                         ));
                     }
-                    (&mut slot.binding, scope, Some(owner))
+                    (&mut slot.binding, scope, Some(owner), answer_format)
                 },
             };
             if binding.index.is_none() {
@@ -1005,14 +1064,37 @@ impl InferenceLane {
                         .map_err(InferenceLaneError::Recall)?,
                 );
             }
-            let (mut evidence, context) = binding
+            let (mut evidence, mut context) = binding
                 .index
                 .as_ref()
                 .unwrap()
                 .prepare(&request.question, &scope)
                 .map_err(InferenceLaneError::Recall)?;
             evidence.owner = owner;
-            if evidence.passages.is_empty() {
+            evidence.answer_format = answer_format;
+            if answer_format == recall::AnswerFormat::ClaimSupportV1 {
+                let (contract, prompt, supplied_context) = match requested_facts.as_ref() {
+                    Some(facts) => {
+                        answer_contract::prepare_with_facts(&request.question, &evidence, facts)
+                    },
+                    None => answer_contract::prepare(&request.question, &evidence),
+                }
+                .map_err(InferenceLaneError::Recall)?;
+                evidence.answer_contract = Some(contract);
+                generation.output_grammar = answer_contract::grammar(
+                    &evidence,
+                    &evidence.answer_contract.as_ref().unwrap().method,
+                )
+                .map_err(InferenceLaneError::Recall)?;
+                generation.prompt = prompt;
+                context = supplied_context;
+            }
+            if evidence.passages.is_empty()
+                && answer_format == recall::AnswerFormat::ClaimSupportV1
+                && evidence.stale.is_empty()
+            {
+                generation.context = context;
+            } else if evidence.passages.is_empty() {
                 recall_failure = Some(if evidence.stale.is_empty() {
                     "No current retained passages match this question and scope."
                 } else {
@@ -1863,6 +1945,7 @@ impl IntentSink for InferenceAskEndpoint {
                             Some(RecallSelection::Published {
                                 owner: request.owner,
                                 publisher: self.session.clone(),
+                                answer_format: request.answer_format,
                                 scope: request.scope,
                             }),
                         )
@@ -2758,6 +2841,7 @@ mod publication_tests {
             Some(RecallSelection::Published {
                 owner: "turnstone/one".into(),
                 publisher: endpoint.session.clone(),
+                answer_format: recall::AnswerFormat::Prose,
                 scope: vec![],
             }),
         );
