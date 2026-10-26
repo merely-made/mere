@@ -62,7 +62,7 @@ Four readings of the table:
   everything in it exists.
 - **No catalog says which authority a surface projects.** The panes half of
   the frame-tree row comes closest, grouping panes by primary authority. The others enumerate shapes.
-- **The doctrine has no GUI area.** `doctrine.md` has five Stack statements
+- **The doctrine has no GUI area.** `doctrine.md` has six Stack statements
   and none about surfaces, so there is nothing a GUI question can be filed
   under as *applies* or *refines*.
 
@@ -245,4 +245,4 @@ each of the five authorities has a line for it, including its refusal.
 
 This record proposes nothing beyond that reading. A ruling would decide
 whether the matrix is kept as one document, as a column in TERMINOLOGY's
-aspect table, or as a doctrine area that the five Stack statements lack.
+aspect table, or as a doctrine area that the Stack statements lack.
