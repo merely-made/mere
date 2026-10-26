@@ -522,13 +522,23 @@ request and performs no I/O. A host driver using Armillary can drive it, as
 can a deterministic scenario harness. Alembic/Athanor own the workshop's
 installed definitions, lifecycle persistence, review and orchestration.
 
-Two recovery seams need attention before resumable automation: Turnstone's
-`turnstone/src/behaviors.rs` advances the graph cursor before running bodies, and
-`turnstone/src/denizen.rs` (`rebuild`) can reissue certificates from grant projections when
-stored chains do not verify. The latter was written for historical install
-and profile migrations; it must not become the recovery rule for a paused or
-revoked resident. New lifecycle/authority records must make those cases
-distinguishable before R1 admits resumed work.
+Two recovery seams needed attention before resumable automation; one remains.
+Turnstone's `turnstone/src/behaviors.rs` still advances the graph cursor before
+running bodies: `drain_graph_tier` moves `behavior_cursor` to the tail boundary
+first. The other seam is closed. `turnstone/src/denizen.rs` (`rebuild`) once
+reissued certificates from grant projections when stored chains did not verify;
+since Turnstone `5d2c910` it adopts a stored chain only if it verifies under the
+current root and otherwise refuses, because a projection is "an audit record,
+never authority that can mint a replacement certificate".
+`a_rerooted_profile_refuses_automatic_certificate_reissue` (`turnstone/src/app/tests.rs`)
+pins that. The only reissue is the owner-reviewed `install` path, which bumps the
+lifecycle generation. The R1a admission record (`Lifecycle::{Active, Paused,
+Revoked}` plus generation) tells a paused or revoked resident from one needing a
+migration heal: `rebuild` marks a resident Revoked when its chain or body fails to
+verify, and imports Active state only on first adoption, when no admission file
+exists. Still open on the authority side: Turnstone composes the content of each
+root delegation (`install`, `root_certificate`) and custody signs it on a
+delegation-salt rule, without a petition the owner reviews in custody.
 
 | Owner | Responsibility after the proposed change |
 | --- | --- |
@@ -811,6 +821,12 @@ regression execution held here have since run (mere `0e031fa5`; Turnstone
 `5d2c910` and `f3f8e3d`; see §8.6).
 
 ## Progress
+
+- **2026-10-25:** §8.1's recovery-seam paragraph brought up to date against
+  Turnstone `d9efd17`: the `rebuild` reissue path has been gone since `5d2c910`,
+  the lifecycle record now separates revoked from migration heal, and the
+  cursor-before-bodies seam is still open. Recorded the remaining delegation
+  issuance gap. Doc only.
 
 - **2026-10-24:** reconciled the shared admission/run boundary with the
   Alembic workshop. Servitor stays in Eidetic; Athanor owns persisted workshop

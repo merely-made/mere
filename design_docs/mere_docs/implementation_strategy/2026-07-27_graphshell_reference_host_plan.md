@@ -377,6 +377,12 @@ lane starts. It owns:
 It depends on published or git-pinned Graphshell leaf contracts, never on the
 `mere` facade or `ports/graphshell`.
 
+**Clarified 2026-10-25:** "agent" here means a Graphshell management endpoint
+for Retinue's radios, which an owner mounts in Graphshell; it is not an AI agent.
+Mark's 2026-10-24 harness ruling still bounds it: an agent harness links no
+retinue or LXMF and uses neither as a control lane, so an AI-facing door such as
+`graphshell-mcp` must not mount this endpoint's routes.
+
 A new repository is warranted only if the Retinue agent later becomes a
 standalone product with coherent utility apart from both Retinue and Mere.
 
@@ -2173,6 +2179,11 @@ None of these decisions changes the product boundary or requires a new
 repository.
 
 ## Progress
+
+- **2026-10-25:** the Retinue ruling notes that the planned `ports/retinue-agent`
+  is a radio-management endpoint, not an AI agent, and that the 2026-10-24
+  harness ruling keeps AI-facing doors such as `graphshell-mcp` off its routes.
+  Doc only.
 
 - **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
   mere 535bca11, from the D2 record in
