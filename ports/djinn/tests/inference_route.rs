@@ -21,7 +21,7 @@ use std::time::Duration;
 
 use chirograph::IntentResult;
 use common::{
-    lane, lending, open_vault, owner, profile, refusal_from, unlock, write_device_settings,
+    lane, lending, open_vault, owner, profile, refusal_from, write_device_settings,
 };
 use distillery::inference::{
     ASK_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, INFERENCE_ASK_ROUTE,
@@ -114,7 +114,7 @@ async fn save_library(data_root: &std::path::Path) -> eidetic::ManifestId {
 async fn exercise_route(library_model: bool) {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     write_device_settings(&data_root, Some(lending()));
     let (inference, question, model_id, expected_text, expected_session) = if library_model {
         use distillery::inference::{InferenceDevice, load_library_session};
@@ -176,8 +176,7 @@ async fn exercise_route(library_model: bool) {
         &data_root,
         &profile(),
         settings,
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("open a resident with the inference lane");
@@ -319,7 +318,7 @@ async fn exercise_route(library_model: bool) {
 async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     let settings = OwnerSettings {
         inference: stub_lane(),
         ..owner(None)
@@ -330,8 +329,7 @@ async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
             &data_root,
             &profile(),
             settings,
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await,
         "inference without a distillery lane must be refused",
@@ -356,8 +354,8 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     let root_b = temp.path().join("b");
     std::fs::create_dir_all(&root_a).unwrap();
     std::fs::create_dir_all(&root_b).unwrap();
-    let (vault_a, identity_a) = open_vault(&root_a);
-    let (vault_b, identity_b) = open_vault(&root_b);
+    let (_, identity_a) = open_vault(&root_a);
+    let (_, identity_b) = open_vault(&root_b);
     assert_ne!(
         identity_a.master_public_key(),
         identity_b.master_public_key()
@@ -386,8 +384,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_a,
         &profile(),
         settings.clone(),
-        &vault_a,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -414,8 +411,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_a,
         &profile(),
         settings.clone(),
-        &vault_a,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -424,8 +420,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_b,
         &profile(),
         settings.clone(),
-        &vault_b,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -1102,7 +1097,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
 
     let temp = tempfile::tempdir().unwrap();
     let data_root = temp.path().join("data");
-    let (vault_dir, identity) = open_vault(temp.path());
+    let (_, identity) = open_vault(temp.path());
     write_device_settings(&data_root, Some(lending()));
     let row = save_pinned_answer_model(&data_root).await;
     let settings = OwnerSettings {
@@ -1123,8 +1118,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         &data_root,
         &profile(),
         settings.clone(),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -1341,8 +1335,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         &data_root,
         &profile(),
         settings,
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -1620,7 +1613,7 @@ async fn serve_trained_model_for_headed_turnstone() {
     );
     let root = private_root.as_deref().unwrap_or(temp.path());
     let data_root = root.join("data");
-    let (vault_dir, identity) = open_vault(root);
+    let (_, identity) = open_vault(root);
     write_device_settings(&data_root, Some(lending()));
     let row_file = output.join("model-row.json");
     let row = if phase == Some(1) {
@@ -1753,8 +1746,7 @@ async fn serve_trained_model_for_headed_turnstone() {
             &data_root,
             &profile(),
             settings.clone(),
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await
         .unwrap();
@@ -2321,7 +2313,7 @@ async fn probe_bounded_cross_source_answers() {
     let output = std::path::PathBuf::from(std::env::var_os("CROSS_SOURCE_OUTPUT").unwrap());
     std::fs::create_dir_all(&output).unwrap();
     let temp = tempfile::tempdir().unwrap();
-    let (vault_dir, identity) = open_vault(temp.path());
+    let (_, identity) = open_vault(temp.path());
     let data_root = temp.path().join("data");
     write_device_settings(&data_root, Some(lending()));
     let row = save_cross_source_answer_model(&data_root).await;
@@ -2352,8 +2344,7 @@ async fn probe_bounded_cross_source_answers() {
         &data_root,
         &profile(),
         settings,
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();

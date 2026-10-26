@@ -28,12 +28,13 @@
 
 use std::io;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use insigne::DerivedKeyAttestation;
 use pandect::{DeviceId, PersonaId, WalletEpochSealer};
-use personae::signing::{DecisionError, RememberApproval, SigningDecision};
+use personae::signing::{DecisionError, PendingSigningRequest, RememberApproval, SigningDecision};
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
     ProfileId, ProtocolKey, RetainedKeys, UnlockTier,
@@ -54,13 +55,15 @@ use crate::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, ProfileView, SshKeyView, VaultLockView,
     VaultProtectionView, VaultView, load_carry_view,
 };
+#[cfg(test)]
+use dramatis::intents::SigningDecisionIntentV1;
 use dramatis::intents::{
     CreateProfileIntentV1, DEVICE_REVOKE_INTENT, GenerateSshKeyIntentV1,
     ImportSshKeyNativeIntentV1, LockVaultIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT,
     RemoveSshKeyIntentV1, RevokeDeviceIntentV1, SIGNING_APPROVE_IDLE_INTENT,
     SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT, SSH_GENERATE_INTENT,
-    SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT, SigningDecisionIntentV1, SshUnlockPolicyIntentV1,
-    SwitchProfileIntentV1, VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
+    SSH_IMPORT_NATIVE_INTENT, SSH_REMOVE_INTENT, SshUnlockPolicyIntentV1, SwitchProfileIntentV1,
+    VAULT_LOCK_INTENT, VAULT_UNLOCK_INTENT,
 };
 
 const MAX_SHORT_TTL_SECONDS: u32 = 24 * 60 * 60;
@@ -107,6 +110,10 @@ pub enum IdentityIntentError {
     /// Unlock is native: no intent carries the credential (ruling 9).
     #[error("unlocking takes the resident's own surface; no intent carries the credential")]
     UnlockNativeOnly,
+    #[error("signing decisions require the resident's independent native confirmation")]
+    SigningDecisionNativeOnly,
+    #[error("the signing confirmation became stale; ask again")]
+    StaleSigningConfirmation,
     #[error("SSH key generation failed")]
     KeyGeneration,
     #[error("SSH public key encoding failed")]
@@ -195,6 +202,19 @@ struct KeptView {
     ssh_keys: Vec<SshKeyView>,
 }
 
+/// Facts shown by the resident's native confirmation surface. A projected
+/// request UUID cannot manufacture this context or resolve a broker request.
+pub struct NativeSigningContext {
+    pending: PendingSigningRequest,
+    generation: u64,
+}
+
+impl NativeSigningContext {
+    pub fn pending(&self) -> &PendingSigningRequest {
+        &self.pending
+    }
+}
+
 /// The resident's lock: the shared vault, the holders that obey it, the
 /// state observers watch, and the view kept at lock time.
 struct ResidentLock<S: IdentityStorage> {
@@ -205,6 +225,7 @@ struct ResidentLock<S: IdentityStorage> {
     /// The vault directory whose persisted lock this resident keeps (rulings
     /// 5, 80), when it keeps one.
     persisted: Mutex<Option<PathBuf>>,
+    generation: AtomicU64,
 }
 
 impl<S: IdentityStorage + 'static> ResidentLock<S> {
@@ -212,25 +233,31 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
     /// every holder, before anyone is told.
     fn lock(&self) -> Result<(), IdentityError> {
         let mut vault = self.vault.lock().unwrap();
-        if vault.is_locked() {
-            return Ok(());
-        }
-        let kept = public_views(&vault).ok();
-        vault.lock()?;
-        let holders = self.holders.lock().unwrap().clone();
-        for holder in &holders {
-            holder.lock();
-        }
-        *self.kept.lock().unwrap() = kept;
-        drop(vault);
-        // Every lock, the agent's `ssh-add -x` included, persists (ruling 5).
-        if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
-            if let Err(error) = crate::custody::persist_lock(dir) {
-                tracing::error!(%error, "the lock holds, but a restart could reopen the vault");
+        if !vault.is_locked() {
+            let kept = public_views(&vault).ok();
+            vault.lock()?;
+            self.generation.fetch_add(1, Ordering::SeqCst);
+            let holders = self.holders.lock().unwrap().clone();
+            for holder in &holders {
+                holder.lock();
             }
+            *self.kept.lock().unwrap() = kept;
         }
+        // Serialize persistence with unlock. A repeated lock retries a failed
+        // marker write instead of turning an in-memory lock into false success.
+        let persistence = self
+            .persisted
+            .lock()
+            .unwrap()
+            .as_deref()
+            .map(crate::custody::persist_lock)
+            .transpose();
         self.state.send_replace(VaultLockView::Locked);
-        tracing::info!(holders = holders.len(), "vault locked");
+        if let Err(error) = persistence {
+            tracing::error!(%error, "vault memory is locked; durable restart barrier failed");
+            return Err(error);
+        }
+        tracing::info!("vault locked with its configured restart barrier");
         Ok(())
     }
 
@@ -242,6 +269,7 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
             return Ok(());
         }
         vault.unlock(method)?;
+        self.generation.fetch_add(1, Ordering::SeqCst);
         let holders = self.holders.lock().unwrap().clone();
         for holder in &holders {
             let restored = match holder.key_profile() {
@@ -263,10 +291,18 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
             }
         }
         *self.kept.lock().unwrap() = None;
-        drop(vault);
         if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
             if let Err(error) = crate::custody::clear_persisted_lock(dir) {
-                tracing::error!(%error, "unlocked, but the next start will still ask");
+                for holder in &holders {
+                    holder.lock();
+                }
+                vault.lock()?;
+                self.generation.fetch_add(1, Ordering::SeqCst);
+                self.state.send_replace(VaultLockView::Locked);
+                if let Err(rollback) = crate::custody::persist_lock(dir) {
+                    tracing::error!(%rollback, "unlock failed and the restart barrier could not be restored");
+                }
+                return Err(error);
             }
         }
         self.state.send_replace(VaultLockView::Unlocked);
@@ -396,6 +432,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             state: watch::channel(initial).0,
             kept: Mutex::new(None),
             persisted: Mutex::new(None),
+            generation: AtomicU64::new(0),
         });
         let approval = ApprovalBroker::new(decision_timeout);
         let agent =
@@ -445,7 +482,11 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     }
 
     /// The vault mutex serializes replacement with signing, writes and lock transitions.
-    pub fn change_passphrase(&self, old: &[u8], new: &[u8]) -> Result<(), crate::custody::PassphraseChangeError> {
+    pub fn change_passphrase(
+        &self,
+        old: &[u8],
+        new: &[u8],
+    ) -> Result<(), crate::custody::PassphraseChangeError> {
         self.vault.lock().unwrap().change_passphrase(old, new)
     }
 
@@ -866,6 +907,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     }
 
     /// Approve exactly one pending operation.
+    /// Native composition only; projected intents never call this directly.
     pub fn approve_once(&self, request_id: Uuid) -> Result<(), DecisionError> {
         self.approval.decide(
             request_id,
@@ -890,6 +932,66 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         self.approval.decide(request_id, SigningDecision::Deny)
     }
 
+    /// Capture authoritative request facts before displaying a native dialog.
+    pub fn begin_native_signing(
+        &self,
+        request_id: Uuid,
+    ) -> Result<NativeSigningContext, IdentityIntentError> {
+        let vault = self.vault.lock().unwrap();
+        if vault.is_locked() {
+            return Err(IdentityIntentError::Locked);
+        }
+        let pending = self
+            .approval
+            .pending()
+            .into_iter()
+            .find(|p| p.request.request_id == request_id)
+            .ok_or(DecisionError::NotPending)?;
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(u64::MAX);
+        if pending.request.profile != vault.current_profile()?.id.0 || pending.expires_at_ms <= now
+        {
+            return Err(IdentityIntentError::StaleSigningConfirmation);
+        }
+        Ok(NativeSigningContext {
+            pending,
+            generation: self.lock.generation.load(Ordering::SeqCst),
+        })
+    }
+
+    /// Called only after the resident-owned UI confirms the captured facts.
+    /// Lock/profile transitions and expiry invalidate the confirmation.
+    pub fn complete_native_signing(
+        &self,
+        context: NativeSigningContext,
+        decision: SigningDecision,
+    ) -> Result<(), IdentityIntentError> {
+        let vault = self.vault.lock().unwrap();
+        if vault.is_locked() {
+            return Err(IdentityIntentError::Locked);
+        }
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(u64::MAX);
+        if self.lock.generation.load(Ordering::SeqCst) != context.generation
+            || context.pending.expires_at_ms <= now
+            || vault.current_profile()?.id.0 != context.pending.request.profile
+            || !self
+                .approval
+                .pending()
+                .iter()
+                .any(|p| p == &context.pending)
+        {
+            return Err(IdentityIntentError::StaleSigningConfirmation);
+        }
+        self.approval
+            .decide(context.pending.request.request_id, decision)?;
+        Ok(())
+    }
+
     /// Switch the resident vault to another persona, live.
     ///
     /// Everything sharing the vault follows from its next operation — the SSH
@@ -903,7 +1005,11 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         payload: SwitchProfileIntentV1,
     ) -> Result<ProfileSwitchReceipt, IdentityIntentError> {
         let id = ProfileId(payload.profile);
-        self.vault.lock().unwrap().switch_profile(&id)?;
+        {
+            let mut vault = self.vault.lock().unwrap();
+            vault.switch_profile(&id)?;
+            self.lock.generation.fetch_add(1, Ordering::SeqCst);
+        }
         // The kept sets follow the persona now speaking.
         let salts: Vec<Vec<Vec<u8>>> = self
             .retained
@@ -1007,8 +1113,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     ) -> Result<R, IdentityError> {
         let vault = self.vault.lock().unwrap();
         let current = vault.current_profile()?;
-        if vault.profile_id() != profile || current.master.public_key().to_bytes() != *expected_master {
-            return Err(IdentityError::Backend("retained-content profile changed".into()));
+        if vault.profile_id() != profile
+            || current.master.public_key().to_bytes() != *expected_master
+        {
+            return Err(IdentityError::Backend(
+                "retained-content profile changed".into(),
+            ));
         }
         Ok(act())
     }
@@ -1139,20 +1249,8 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         payload: &[u8],
     ) -> Result<IdentityIntentOutcome, IdentityIntentError> {
         match intent {
-            SIGNING_APPROVE_ONCE_INTENT => {
-                let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
-                self.approve_once(payload.request_id)?;
-                Ok(IdentityIntentOutcome::SigningDecision)
-            },
-            SIGNING_APPROVE_IDLE_INTENT => {
-                let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
-                self.approve_until_idle(payload.request_id)?;
-                Ok(IdentityIntentOutcome::SigningDecision)
-            },
-            SIGNING_DENY_INTENT => {
-                let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
-                self.deny(payload.request_id)?;
-                Ok(IdentityIntentOutcome::SigningDecision)
+            SIGNING_APPROVE_ONCE_INTENT | SIGNING_APPROVE_IDLE_INTENT | SIGNING_DENY_INTENT => {
+                Err(IdentityIntentError::SigningDecisionNativeOnly)
             },
             SSH_GENERATE_INTENT => {
                 let payload: GenerateSshKeyIntentV1 = serde_json::from_slice(payload)?;
@@ -1553,7 +1651,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn projected_approval_intent_releases_the_real_ssh_adapter() {
+    async fn projected_decisions_cannot_release_the_real_ssh_adapter_without_native_confirmation() {
         let mut private =
             ssh_key::PrivateKey::random(&mut rand_core::OsRng, Algorithm::Ed25519).unwrap();
         private.set_comment("approval-key");
@@ -1594,8 +1692,30 @@ mod tests {
             request_id: pending.request.request_id,
         })
         .unwrap();
-        host.apply_intent(SIGNING_APPROVE_ONCE_INTENT, &payload)
+        for intent in [
+            SIGNING_APPROVE_ONCE_INTENT,
+            SIGNING_APPROVE_IDLE_INTENT,
+            SIGNING_DENY_INTENT,
+        ] {
+            assert!(matches!(
+                host.apply_intent(intent, &payload),
+                Err(IdentityIntentError::SigningDecisionNativeOnly)
+            ));
+        }
+        assert!(
+            !signing.is_finished(),
+            "the projected client cannot resolve its request"
+        );
+        let context = host
+            .begin_native_signing(pending.request.request_id)
             .unwrap();
+        host.complete_native_signing(
+            context,
+            SigningDecision::Approve {
+                remember: RememberApproval::Once,
+            },
+        )
+        .unwrap();
 
         let signature = signing.await.unwrap().unwrap();
         assert!(!signature.as_bytes().is_empty());

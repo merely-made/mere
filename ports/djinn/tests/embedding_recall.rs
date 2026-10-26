@@ -6,7 +6,7 @@ mod common;
 #[path = "fixtures/esp/decoder.rs"]
 mod decoder_fixture;
 use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs};
-use common::{lane, lending, open_vault, owner, profile, unlock, write_device_settings};
+use common::{lane, lending, open_vault, owner, profile, write_device_settings};
 use distillery::inference::recall::*;
 use distillery::inference::{AskRequestV1, RunStateV1};
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
@@ -162,7 +162,7 @@ async fn resident_embedding_process_fixture() {
     assert!(matches!(phase.as_str(), "prepare" | "cold" | "foreign"));
     let data = root.join("data");
     let benchmark: Value = serde_json::from_str(CORPUS).unwrap();
-    let (vault, identity) = open_vault(&root);
+    let (_, identity) = open_vault(&root);
     if phase == "prepare" {
         write_device_settings(&data, Some(lending()));
     }
@@ -216,7 +216,7 @@ async fn resident_embedding_process_fixture() {
         assert!(!root.join("origin-corpus.json").exists());
     }
     let corpus: Arc<dyn RecallCorpus> = Arc::new(PageTextCorpus(source_store.clone()));
-    let resident = DjinnResident::open(&identity, &data, &profile(), owner, &vault, unlock())
+    let resident = DjinnResident::open(&identity, &data, &profile(), owner, djinn::resident::MeshAuthor::Resident)
         .await
         .unwrap();
     let journal = resident.inference().unwrap().journal().unwrap().clone();

@@ -19,11 +19,10 @@ same vault root. The root-owned installed bundle did not prevent this attack.
 **Production H1 is not qualified.** Native11 subsequently passed 38/38 checks
 in the isolated runtime account, as described below. The fixture does not
 change an existing signing key's ACL or export its private material.
-The receiving results, exact source cuts and failed iterations are retained in
-`support/receipts/custody-h1-macos-20261022/`; `qualification.json` is the
-native10 receiving entry point. `native11-receiving-qualification.json` records
-the passing runtime-account experiment. `separate-account-preparation.json`
-remains its historical preparation receipt.
+The receiving results, exact source cuts and failed iterations were kept
+outside git in `support/receipts/custody-h1-macos-20261022/` and retired with
+the security-audit worktree on 2026-10-26. The hardening plan's §4.1 and §4.2
+record the native10 and native11 results and the exported result's SHA-256.
 
 ## Separate-account receiving gate (native11, 38/38 passed)
 

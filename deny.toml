@@ -3,8 +3,10 @@
 # Today it holds one rule, the custody boundary (dramatis repo plan, rulings
 # D4 and D16): castellan keeps every secret at rest and in hand (the vault,
 # its storages and unlock ladder, the SSH agent, the wallet's seeds and
-# private epochs), so only the resident, djinn, may link it. Anything else
-# reaches identity and secrets by calling djinn (D5).
+# private epochs). Djinn and its independently launched custodian may link it;
+# apps and workers call an authenticated custody route, and Djinn reaches the
+# custodian through custody-wire, which links no castellan. Until H2 Djinn
+# still links it for the consumers that have not moved.
 #
 #   cargo deny check bans
 #
@@ -18,5 +20,5 @@ all-features = true
 multiple-versions = "allow"
 wildcards = "allow"
 deny = [
-  { crate = "castellan", wrappers = ["djinn"], reason = "castellan is secret custody; only the resident (djinn) links it (dramatis repo plan, D4, D16)" },
+  { crate = "castellan", wrappers = ["djinn", "djinn-custodian"], reason = "castellan is secret custody; only Djinn and its independently launched custodian link it; applications and workers may not" },
 ]

@@ -41,7 +41,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use common::{
-    lane, lending, now_ms, open_vault, owner, profile, refusal_from, unlock, write_device_settings,
+    lane, lending, now_ms, open_vault, owner, profile, refusal_from, write_device_settings,
 };
 use distillery::ResidentReceipt;
 use djinn::resident::DjinnResident;
@@ -69,7 +69,7 @@ use tokio::sync::Notify;
 async fn the_works_run_a_real_mesh_job_to_completion_and_close_clean() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     write_device_settings(&data_root, Some(lending()));
 
     let mut resident = DjinnResident::open(
@@ -77,8 +77,7 @@ async fn the_works_run_a_real_mesh_job_to_completion_and_close_clean() {
         &data_root,
         &profile(),
         owner(Some(lane())),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with its Distillery lane");
@@ -213,7 +212,7 @@ async fn the_works_run_a_real_mesh_job_to_completion_and_close_clean() {
 async fn a_thermal_limit_with_no_stated_temperature_refuses_composition() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
 
     let mut hot = lending();
     hot.max_thermal_c = 85;
@@ -226,8 +225,7 @@ async fn a_thermal_limit_with_no_stated_temperature_refuses_composition() {
             &data_root,
             &profile(),
             owner(Some(lane())),
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await,
         "a thermal limit on a device with no thermometer is not a policy",
@@ -246,7 +244,7 @@ async fn a_thermal_limit_with_no_stated_temperature_refuses_composition() {
 async fn an_enabled_lane_with_no_stated_lending_posture_refuses_composition() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     write_device_settings(&data_root, None);
 
     let refusal = refusal_from(
@@ -255,8 +253,7 @@ async fn an_enabled_lane_with_no_stated_lending_posture_refuses_composition() {
             &data_root,
             &profile(),
             owner(Some(lane())),
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await,
         "a works lane with no lending posture must refuse rather than assume one",
@@ -274,7 +271,7 @@ async fn an_enabled_lane_with_no_stated_lending_posture_refuses_composition() {
 async fn a_profile_with_no_lane_composes_no_works_at_all() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     // Deliberately no device settings file at all: an absent lane must not
     // read, need, or complain about a lending posture.
 
@@ -283,8 +280,7 @@ async fn a_profile_with_no_lane_composes_no_works_at_all() {
         &data_root,
         &profile(),
         owner(None),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("a resident with no works lane still opens");
@@ -313,7 +309,7 @@ async fn a_build_with_no_trainer_refuses_a_lane_that_states_one() {
 
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     // A perfectly good lending posture: the refusal under test must be about
     // the missing trainer, not about anything else being wrong.
     write_device_settings(&data_root, Some(lending()));
@@ -332,8 +328,7 @@ async fn a_build_with_no_trainer_refuses_a_lane_that_states_one() {
             &data_root,
             &profile(),
             owner(Some(asks_for_a_trainer)),
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await,
         "a build with no trainer must refuse a lane that states one rather than \

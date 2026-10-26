@@ -103,6 +103,84 @@ other lane because it does not move owners.
 whose crate they fall in; cubek-matmul and the other vendored GPU patches are a separate
 question for Mark (vendored code, upstream ledger first).
 
+### Boundary cues, 2026-10-26
+
+These are the acceptance questions from the ownership assessment Mark brought on 2026-10-26 (an
+agent's design review, not his words; unnumbered), mapped onto the sealed registers so a lane
+answers each with a test instead of re-deriving it. Each is a property one owner boundary holds
+or does not; the register ids are where it fails today, read against the audit's basis commits
+and the L1 and L6 successor receipts (Q013 is out, repaired by L1). The controls already in the
+tree are `ObservedCommand` and `LiveCheck` in
+[`live_graph.rs`](../../../crates/system/pandect/src/live_graph.rs), which name existence, record
+digest, shown resource and tags separately; the staged candidate in `GraphSession::transact_change`,
+which installs graph and history only after storage acknowledges; and `source-edit`'s stamps and
+receipts, which describe an observation without claiming the host applied it. A cue holds when
+every consumer of its boundary either enters a path of that kind or is recorded as a different
+operation with its own rule. Findings whose source has left mere are marked with their repository.
+
+- **Can two windows overwrite one another without detecting the relevant conflict?** L1, L2.
+  Today: Q253, two Forme sessions on one slot both acknowledge and reload loses the first edit,
+  while the presentation session refuses the same stale baseline; Q214, Djinn's dial-hint writer
+  and its pair/unpair writers each load, change and save one settings file with no revision
+  check; Q061, a second client request replaces the first pending operation in `SessionCore`;
+  A004 and A011, four graph persistence paths and two writable address representations that are
+  not reconciled; A028, public assertion and declaration writers outside the one claimed
+  `GraphDelta` path. The check is as narrow as the operation: refusing a title edit because an
+  unrelated node moved is a false conflict, and `LiveCheck`'s granularity is the model for Forme,
+  settings and client slots.
+- **Can a projection with incomplete data save itself as the complete graph?** L1.
+  Today: Q012, import provenance rebuilds authoritative records from an unsuppressed projection
+  and erases suppressed memberships; Q017, the kernel store reports a successful save that drops
+  Surface pins and facets, and A004 records the same omission in Pandect's session graph store;
+  Q257, a projection save acknowledgement marks a replacement draft clean; A067, the presentation
+  acknowledgement is client progress, not a durable receipt, and the protocol prose says
+  otherwise. Pandect's `NeedsCompleteOperation` and the resident's filtered publication are the
+  seam: a reader holding less than the complete record is not a writer of it.
+- **Can a late result alter a replacement session?** L2, L3.
+  Today: Q256, retained presentation rules keep the boot-time graph owner after the active graph
+  is replaced; Q257, the old save completion lands on the replacement editor; Q263, a closed
+  applet handle still reviews and closes later mounts; A683, transport generations and logical
+  host identity are not one owner, so Q270 and Q271 leave stale callbacks and retirement
+  unfenced; A518, two cancellation paths with one settlement. Cancellation is not the defence:
+  the receiving owner checks that the result still names the target and observation it was asked
+  for.
+- **Can a failed write advance in-memory history?** L1, L3.
+  Today: Q240, a rejected capture restores browsing memory but leaves the graph edits pending in
+  `MereHost`, with A550 and A551 naming the missing candidate/rollback seam and the batched apply
+  that cannot strengthen a non-atomic backend; Q047, Djinn's door returns Accepted from an
+  in-memory queue it later drains and drops; Q234, a failed browsing-memory flush discards the
+  unsaved segment (`repos/eidetic`); Q380 and A1119, a failed group-session save is settled by
+  the same-session retry (`repos/eidetic`). A565 is the control: resident observed edits already
+  go through `transact_*`, and their refusal tests inspect graph, journal, revision and bytes.
+- **Can retrying an acknowledged operation apply it twice, or skip it?** L3, L4, L5.
+  Today: Q021, an interrupted identity adoption moves the device identity and then skips the
+  remaining personas on retry; Q050, a failed pre-key publication is not retried on the next open
+  despite the recovery claim; Q380, the retry settles what was never saved; Q362, repeated
+  vouches mint Standing each time (`repos/gemot`); Q375, overlapping watches wake twice for one
+  subject (`repos/eidetic`). A023 is the repaired control for epoch-revocation idempotence. A
+  cross-owner operation such as a document save plus a graph publication needs a stable operation
+  identity and an explicit intermediate state before a retry is answerable at all.
+- **Can a permission revoked during deferred work still be used when the effect occurs?** L4, L5.
+  Today: Q060 and A056, the shared host loop pushes notices before its only authority check and
+  idle timeouts repeat the path, so an expired or revoked grant keeps receiving; Q374, a
+  registered watch keeps revealing changes after its read grant expires (`repos/eidetic`); Q354,
+  a capsule page publishes a deferred navigation after revocation or Stop (`repos/gemot`); Q418,
+  a successful revoke cannot interrupt an in-flight event wait in Signalman; Q201 and Q219, a
+  leased result or an expired lease still publishes. Holding a Rust value or a deserialized
+  identifier does not establish permission; the check belongs at the effect's own admission seam.
+- **Could a second host edit the same session by implementing presentation and request
+  translation alone?** Every lane; the same question as the
+  [stack lift plan](2026-10-14_graphshell_stack_lift_plan.md)'s second-host receipts.
+  Today: Q316, native and browser hosts give one leaf different accessible names because
+  precedence lives in each lowering; Q255, a second string-to-command table silently redefines a
+  command id; A015, seven copies of write-with-backup mechanics with different rollback
+  behaviour; A062, a retained resume loop beside `SessionCore`; A846, the browser smoke
+  hand-assembles a host path instead of using the maintained one; A993, two authority adapters
+  with different conflict precedence by design, which is the shape a deliberate difference takes
+  and is recorded as one. A host that has to invent save ordering, history repair, permission
+  interpretation or stale-result handling is reporting that the boundary beneath it is not
+  finished.
+
 ## 4. Rules every lane carries
 
 - Only Mark numbers rulings; a lane proposes and records his words.
@@ -174,3 +252,5 @@ slice lands.
   production findings, probes. Not run: the full `knot_residue` run (heavy); its verdict is
   unchanged, only its reporting.
 
+- 2026-10-26: boundary cues added to §3 from the ownership assessment Mark brought the same day,
+  each mapped to register ids and a lane; Q013 excluded as repaired (L1 receipt). No code change.
