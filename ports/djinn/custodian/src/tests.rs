@@ -4,386 +4,467 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use super::*;
-use personae::{Ed25519PublicKey, Ed25519Signature};
+//! The H1 negative controls against the core, on real Castellan vaults.
+//! Peers are constructed here; `driver_tests` runs the same contract over
+//! real sockets with OS-derived peers.
 
-const KEY: [u8; 32] = [0x37; 32];
-fn setup() -> (tempfile::TempDir, Custodian) {
+use std::collections::BTreeSet;
+use std::time::{Duration, Instant};
+
+use castellan::custody::bootstrap::{self, Unlock};
+use custody_wire::contract::{Answer, FactCause, Outcome, Purpose, ServerMessage};
+use custody_wire::secret::{Bytes, Secret};
+use custody_wire::{ClientMessage, Operation, Peer};
+use insigne::delegation::{CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate, delegation_signing_salt};
+use personae::{IdentityProvider, ProfileId};
+
+use crate::core::{Core, Decider, Effects, SessionId};
+use crate::policy::Config;
+
+pub(crate) const PASSPHRASE: &str = "correct horse battery staple";
+pub(crate) const DJINN_UID: u32 = 1000;
+
+pub(crate) fn djinn() -> Peer {
+    Peer::Unix {
+        uid: DJINN_UID,
+        gid: DJINN_UID,
+        pid: Some(4242),
+    }
+}
+
+fn consent_helper() -> Peer {
+    Peer::Signed {
+        team: "TEAM".into(),
+        identifier: "com.merely.djinn.consent".into(),
+    }
+}
+
+fn admin() -> Peer {
+    Peer::Unix { uid: 0, gid: 0, pid: Some(1) }
+}
+
+/// A real passphrase vault with one profile, `work`.
+pub(crate) fn vault() -> (tempfile::TempDir, [u8; 32]) {
     let dir = tempfile::tempdir().unwrap();
-    std::fs::write(
-        dir.path().join(".djinn-synthetic-custody"),
-        b"0123456789abcdef0123456789abcdef",
-    )
-    .unwrap();
-    let config = SyntheticConfig {
-        run_id: "0123456789abcdef0123456789abcdef".into(),
-        directory: dir.path().into(),
-        profile: "h1-synthetic".into(),
-        principal: "signed-fixture-controller".into(),
-    };
-    let core = Custodian::create_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    (dir, core)
+    let opened = bootstrap::open_storage(dir.path(), Unlock::passphrase(PASSPHRASE)).unwrap();
+    let (profile, _) = bootstrap::load_or_create_profile(&*opened.storage, &ProfileId("work".into())).unwrap();
+    (dir, profile.master.public_key().to_bytes())
 }
-fn call(c: &mut Custodian, value: Value) -> Result<Dispatch> {
-    c.dispatch(
-        "signed-fixture-controller",
-        &serde_json::to_vec(&value).unwrap(),
-    )
+
+pub(crate) fn config(dir: &std::path::Path, consent: &str, release_consent: &str) -> Config {
+    let json = serde_json::json!({
+        "vault": {"directory": dir},
+        "owner": {"unix_uid": DJINN_UID},
+        "consent": consent,
+        "development": release_consent == "none",
+        "principals": [
+            {"name": "djinn", "match": {"unix-uid": DJINN_UID}, "grants": [
+                {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"},
+                {"operation": "release", "profile": "current", "salts": [{"exact": "mesh-author"}, {"exact": "distillery-personal-mesh"}], "consent": release_consent},
+                {"operation": "sign", "profile": "current", "purpose": {"purpose": "delegation", "audience": "mere.graphshell"}, "consent": "per-operation"}
+            ]},
+            {"name": "consent", "match": {"signed": {"team": "TEAM", "identifier": "com.merely.djinn.consent"}}, "consent_channel": true},
+            {"name": "admin", "match": {"unix-uid": 0}, "grants": [{"operation": "revoke", "consent": "none"}, {"operation": "status"}]}
+        ]
+    });
+    Config::parse(&serde_json::to_vec(&json).unwrap()).unwrap()
 }
-fn sign(c: &mut Custodian, message: &str) -> String {
-    let instance = c.instance.clone();
-    match call(
-        c,
-        json!({"op":"sign","namespace":ROOT_NAMESPACE,"challenge":message,"instance":instance}),
-    )
-    .unwrap()
-    {
-        Dispatch::Confirm(facts) => facts.ticket,
-        _ => panic!("signing must require native confirmation"),
+
+pub(crate) struct Harness {
+    pub core: Core,
+    pub now: Instant,
+    next_id: u64,
+}
+
+impl Harness {
+    pub fn new(config: Config) -> Self {
+        Self {
+            core: Core::start(config).unwrap(),
+            now: Instant::now(),
+            next_id: 1,
+        }
     }
-}
-fn issue_grant(c: &mut Custodian, uses: u16) -> Value {
-    let instance = c.instance.clone();
-    let profile = c.config.profile.clone();
-    let ticket=match call(c,json!({"op":"open-session","namespace":SESSION_NAMESPACE,"profile":profile,"max_uses":uses,"instance":instance})).unwrap() {
-        Dispatch::Confirm(facts)=>facts.ticket,
-        _=>panic!("session must require native confirmation"),
-    };
-    c.complete_confirmation(&ticket, true).unwrap()
-}
-fn session_request(c: &Custodian, g: &Value) -> Value {
-    json!({"op":"session-sign","capability":g["capability"],"namespace":SESSION_NAMESPACE,
-        "profile":c.config.profile,"challenge":"synthetic payload","generation":g["generation"],"instance":c.instance})
-}
-fn verify(reply: &Value, message: &str) {
-    let public: [u8; 32] = STANDARD
-        .decode(reply["publicKey"].as_str().unwrap())
-        .unwrap()
-        .try_into()
-        .unwrap();
-    let signature: [u8; 64] = STANDARD
-        .decode(reply["signature"].as_str().unwrap())
-        .unwrap()
-        .try_into()
-        .unwrap();
-    assert!(Ed25519PublicKey::from_bytes(&public).unwrap().verify(
-        message.as_bytes(),
-        &Ed25519Signature::from_bytes(&signature)
-    ));
-}
 
-#[test]
-fn real_castellan_root_signature_survives_cold_reopen_without_rewriting_records() {
-    let (dir, mut core) = setup();
-    let first = core.public_key.unwrap();
-    let ticket = sign(&mut core, "root payload");
-    verify(
-        &core.complete_confirmation(&ticket, true).unwrap(),
-        "root payload",
-    );
-    let record = std::fs::read_dir(dir.path().join("profiles"))
-        .unwrap()
-        .next()
-        .unwrap()
-        .unwrap()
-        .path();
-    let before = std::fs::read(&record).unwrap();
-    let config = core.config.clone();
-    drop(core);
-    let mut reopened = Custodian::open_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    assert!(reopened.vault.is_none());
-    reopened
-        .unlock_after_native_confirmation(Zeroizing::new(KEY))
-        .unwrap();
-    assert_eq!(reopened.public_key, Some(first));
-    let ticket = sign(&mut reopened, "reopened");
-    verify(
-        &reopened.complete_confirmation(&ticket, true).unwrap(),
-        "reopened",
-    );
-    assert_eq!(std::fs::read(record).unwrap(), before);
-}
-
-#[test]
-fn missing_or_tampered_profile_never_regenerates_an_identity() {
-    let (dir, core) = setup();
-    let config = core.config.clone();
-    drop(core);
-    let record = std::fs::read_dir(dir.path().join("profiles"))
-        .unwrap()
-        .next()
-        .unwrap()
-        .unwrap()
-        .path();
-    std::fs::write(&record, b"tampered").unwrap();
-    let mut reopened = Custodian::open_synthetic(config.clone(), Zeroizing::new(KEY)).unwrap();
-    assert!(
-        reopened
-            .unlock_after_native_confirmation(Zeroizing::new(KEY))
-            .is_err()
-    );
-    std::fs::remove_file(record).unwrap();
-    let mut missing = Custodian::open_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    assert!(
-        missing
-            .unlock_after_native_confirmation(Zeroizing::new(KEY))
-            .is_err()
-    );
-}
-
-#[test]
-fn a_wrong_key_and_a_missing_synthetic_marker_are_refused() {
-    let (dir, core) = setup();
-    let config = core.config.clone();
-    drop(core);
-    let mut reopened = Custodian::open_synthetic(config.clone(), Zeroizing::new([0; 32])).unwrap();
-    assert!(
-        reopened
-            .unlock_after_native_confirmation(Zeroizing::new([0; 32]))
-            .is_err()
-    );
-    std::fs::remove_file(dir.path().join(".djinn-synthetic-custody")).unwrap();
-    assert!(Custodian::open_synthetic(config, Zeroizing::new(KEY)).is_err());
-}
-
-#[test]
-fn client_approval_fields_and_client_decision_operations_cannot_authorize() {
-    let (_dir, mut core) = setup();
-    let instance = core.instance.clone();
-    assert!(call(&mut core,json!({"op":"sign","namespace":ROOT_NAMESPACE,"challenge":"x","instance":instance,"approved":true})).is_err());
-    let ticket = sign(&mut core, "x");
-    assert!(
-        call(
-            &mut core,
-            json!({"op":"approve","ticket":ticket,"accepted":true})
-        )
-        .is_err()
-    );
-    assert!(core.complete_confirmation(&ticket, false).is_err());
-    assert!(
-        core.complete_confirmation(&ticket, true).is_err(),
-        "a denied ticket cannot be replayed"
-    );
-}
-
-#[test]
-fn confirmations_are_one_use_and_bound_to_the_exact_payload() {
-    let (_dir, mut core) = setup();
-    let ticket = sign(&mut core, "exact");
-    let reply = core.complete_confirmation(&ticket, true).unwrap();
-    verify(&reply, "exact");
-    assert!(core.complete_confirmation(&ticket, true).is_err());
-}
-
-#[test]
-fn lock_and_native_unlock_revoke_approvals_and_continuous_capabilities() {
-    let (_dir, mut core) = setup();
-    let old = sign(&mut core, "pending");
-    let grant = issue_grant(&mut core, 3);
-    core.lock().unwrap();
-    assert!(core.vault.is_none());
-    assert!(core.complete_confirmation(&old, true).is_err());
-    core.unlock_after_native_confirmation(Zeroizing::new(KEY))
-        .unwrap();
-    let req = session_request(&core, &grant);
-    assert!(call(&mut core, req).is_err());
-    let ticket = sign(&mut core, "fresh");
-    verify(&core.complete_confirmation(&ticket, true).unwrap(), "fresh");
-}
-
-#[test]
-fn persisted_lock_blocks_reopen_before_decrypting_any_profile() {
-    let (_dir, mut core) = setup();
-    let config = core.config.clone();
-    core.lock().unwrap();
-    drop(core);
-    // Even a wrong key is not used before explicit native unlock.
-    let mut reopened = Custodian::open_synthetic(config, Zeroizing::new([0; 32])).unwrap();
-    assert!(reopened.vault.is_none());
-    assert!(reopened.public_key.is_none());
-    assert!(
-        reopened
-            .unlock_after_native_confirmation(Zeroizing::new([0; 32]))
-            .is_err()
-    );
-    assert!(reopened.vault.is_none());
-    reopened
-        .unlock_after_native_confirmation(Zeroizing::new(KEY))
-        .unwrap();
-    let ticket = sign(&mut reopened, "after native unlock");
-    verify(
-        &reopened.complete_confirmation(&ticket, true).unwrap(),
-        "after native unlock",
-    );
-}
-
-#[test]
-fn continuous_consumer_is_scoped_derived_bounded_and_revocable() {
-    let (_dir, mut core) = setup();
-    let root = core.public_key.unwrap();
-    let grant = issue_grant(&mut core, 2);
-    let mut request = session_request(&core, &grant);
-    request["namespace"] = json!("other-domain");
-    assert!(call(&mut core, request).is_err());
-    let mut request = session_request(&core, &grant);
-    request["profile"] = json!("other-persona");
-    assert!(call(&mut core, request).is_err());
-    for _ in 0..2 {
-        let request = session_request(&core, &grant);
-        let reply = match call(&mut core, request).unwrap() {
-            Dispatch::Reply(v) => v,
-            _ => panic!(),
+    pub fn open(&mut self, peer: Peer) -> SessionId {
+        let hello = ClientMessage::Hello {
+            version: custody_wire::VERSION,
+            nonce: "n".into(),
         };
-        verify(&reply, "synthetic payload");
-        assert_ne!(reply["publicKey"], json!(STANDARD.encode(root)));
+        self.core.open(peer, &hello).map(|(id, _)| id).unwrap()
     }
-    let request = session_request(&core, &grant);
-    assert!(call(&mut core, request).is_err());
-    let grant = issue_grant(&mut core, 2);
-    let instance = core.instance.clone();
-    call(
-        &mut core,
-        json!({"op":"revoke-session","capability":grant["capability"],"instance":instance}),
-    )
-    .unwrap();
-    let request = session_request(&core, &grant);
-    assert!(call(&mut core, request).is_err());
-}
 
-#[test]
-fn a_capability_cannot_cross_authenticated_principals_or_process_instances() {
-    let (_dir, mut core) = setup();
-    let grant = issue_grant(&mut core, 2);
-    let request = session_request(&core, &grant);
-    assert!(
-        core.dispatch(
-            "unrelated-signed-app",
-            &serde_json::to_vec(&request).unwrap()
-        )
-        .is_err()
-    );
-    let config = core.config.clone();
-    drop(core);
-    let mut next = Custodian::open_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    assert!(call(&mut next, request).is_err());
-}
-
-#[test]
-fn expiry_and_capacity_limits_are_enforced_without_native_authorization() {
-    let (_dir, mut core) = setup();
-    let ticket = sign(&mut core, "pending");
-    core.pending.get_mut(&ticket).unwrap().deadline = Instant::now() - Duration::from_secs(1);
-    assert!(core.complete_confirmation(&ticket, true).is_err());
-    for _ in 0..MAX_PENDING {
-        sign(&mut core, "bounded");
+    pub fn request(&mut self, session: SessionId, operation: Operation) -> (u64, Effects) {
+        let id = self.next_id;
+        self.next_id += 1;
+        let message = ClientMessage::Request {
+            id,
+            instance: self.core.instance().to_string(),
+            generation: self.core.generation(),
+            operation,
+        };
+        (id, self.core.handle(session, message, self.now))
     }
-    let instance = core.instance.clone();
-    assert!(
-        call(
-            &mut core,
-            json!({"op":"sign","namespace":ROOT_NAMESPACE,"challenge":"x","instance":instance})
-        )
-        .is_err()
-    );
-    assert!(
-        core.dispatch(
-            "signed-fixture-controller",
-            &vec![b' '; MAX_REQUEST_BYTES + 1]
-        )
-        .is_err()
-    );
+
+    pub fn outcome(&mut self, session: SessionId, operation: Operation) -> Outcome {
+        let (id, effects) = self.request(session, operation);
+        outcome_for(&effects, session, id).expect("an immediate outcome")
+    }
+
+    pub fn unlock(&mut self, session: SessionId) {
+        let outcome = self.outcome(session, Operation::Unlock {
+            passphrase: Secret::copy_from(PASSPHRASE.as_bytes()),
+        });
+        assert!(matches!(outcome, Outcome::Success { answer: Answer::Unlocked { .. } }), "{outcome:?}");
+    }
 }
 
-#[test]
-fn failed_persisted_barrier_still_drops_keys_and_reports_failure_until_repaired() {
-    let (dir, mut core) = setup();
-    let marker = dir.path().join(castellan::custody::PERSISTED_LOCK_FILE);
-    std::fs::create_dir(&marker).unwrap();
-    assert!(core.lock().is_err());
-    assert!(core.vault.is_none());
-    assert!(core.lock().is_err());
-    std::fs::remove_dir(marker).unwrap();
-    core.lock().unwrap();
-    assert!(castellan::custody::lock_persisted(dir.path()));
+pub(crate) fn outcome_for(effects: &Effects, session: SessionId, request: u64) -> Option<Outcome> {
+    effects.messages.iter().find_map(|(to, message)| match message {
+        ServerMessage::Outcome { request: r, outcome, .. } if *to == session && *r == request => Some(outcome.clone()),
+        _ => None,
+    })
 }
 
-#[test]
-fn identity_preserves_real_castellan_profile_format_and_slot_payload_on_relocation() {
-    let (source, core) = setup();
-    let public = core.public_key.unwrap();
-    let mut config = core.config.clone();
-    drop(core);
-    let storage = SealedProfileStorage::open_with_key(source.path(), KEY);
-    let id = ProfileId(config.profile.clone());
-    let mut profile = storage.load_profile(&id).unwrap();
-    profile.slots.insert(
-        personae::ProtocolKey::new("synthetic.slot", None),
-        castellan::custody::IdentitySlot::Direct {
-            kind: "test".into(),
-            payload: castellan::custody::SecretBytes::new(vec![0x51; 32]),
-            lineage: personae::CredentialLineage::LocallyDerived,
-            unlock_tier: personae::UnlockTier::Session,
+fn petition_in(effects: &Effects, to: SessionId) -> Option<custody_wire::Petition> {
+    effects.messages.iter().find_map(|(id, message)| match message {
+        ServerMessage::Petition(petition) if *id == to => Some(petition.clone()),
+        _ => None,
+    })
+}
+
+fn release(salts: &[&str]) -> Operation {
+    Operation::Release {
+        profile: "work".into(),
+        salts: salts.iter().map(|s| Bytes(s.as_bytes().to_vec())).collect(),
+    }
+}
+
+fn code(outcome: &Outcome) -> &str {
+    outcome.code().unwrap_or("success")
+}
+
+fn certificate(master: [u8; 32], domain: &str) -> DelegationCertificate {
+    DelegationCertificate::new(
+        DelegationParent::Root([7; 32]),
+        master,
+        [9; 32],
+        CapabilityScope {
+            domain: domain.into(),
+            resource: b"guest-room".to_vec(),
+            path_prefix: "/".into(),
+            actions: BTreeSet::from(["visit".to_string()]),
         },
-    );
-    storage.save_profile(&profile).unwrap();
-    drop(profile);
-    drop(storage);
-    let destination = tempfile::tempdir().unwrap();
-    std::fs::create_dir(destination.path().join("profiles")).unwrap();
-    for entry in std::fs::read_dir(source.path().join("profiles")).unwrap() {
-        let entry = entry.unwrap();
-        std::fs::copy(
-            entry.path(),
-            destination.path().join("profiles").join(entry.file_name()),
-        )
-        .unwrap();
-    }
-    std::fs::copy(
-        source.path().join(".djinn-synthetic-custody"),
-        destination.path().join(".djinn-synthetic-custody"),
+        1_000,
+        1_000,
+        Some(2_000),
+        0,
+        [3; 32],
     )
-    .unwrap();
-    config.directory = destination.path().into();
-    let mut relocated = Custodian::open_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    relocated
-        .unlock_after_native_confirmation(Zeroizing::new(KEY))
-        .unwrap();
-    assert_eq!(relocated.public_key, Some(public));
-    let slot = relocated
-        .vault
-        .as_ref()
+}
+
+#[test]
+fn the_policy_refuses_unattended_same_user_grants_and_a_desktop_consent_channel() {
+    let (dir, _) = vault();
+    let base = |principals: serde_json::Value, development: bool| {
+        serde_json::to_vec(&serde_json::json!({
+            "vault": {"directory": dir.path()}, "owner": {"unix_uid": 1000}, "consent": "channel",
+            "development": development, "principals": principals
+        }))
         .unwrap()
-        .slot(&personae::ProtocolKey::new("synthetic.slot", None))
-        .unwrap()
-        .unwrap();
-    match slot {
-        castellan::custody::IdentitySlot::Direct { payload, .. } => {
-            assert_eq!(payload.as_slice(), &[0x51; 32])
-        },
-        _ => panic!(),
     };
+    let unattended = serde_json::json!([{"name": "djinn", "match": {"unix-uid": 1000}, "grants": [
+        {"operation": "release", "profile": "current", "salts": [{"exact": "mesh-author"}], "consent": "none"}]}]);
+    assert!(Config::parse(&base(unattended.clone(), false)).is_err());
+    assert!(Config::parse(&base(unattended, true)).is_ok(), "development mode may, and says so");
+    let desktop_consent = serde_json::json!([{"name": "consent", "match": {"unix-uid": 1000}, "consent_channel": true}]);
+    assert!(Config::parse(&base(desktop_consent, true)).is_err());
+    let root_unattended = serde_json::json!([{"name": "svc", "match": {"unix-uid": 77}, "grants": [
+        {"operation": "sign", "profile": "current", "purpose": {"purpose": "root"}, "consent": "per-generation"}]}]);
+    assert!(Config::parse(&base(root_unattended, false)).is_err());
 }
 
 #[test]
-fn removing_the_same_user_lock_marker_cannot_enable_unattended_reopen() {
-    let (dir, mut core) = setup();
-    let config = core.config.clone();
-    let root = core.public_key;
-    core.lock().unwrap();
-    drop(core);
-    std::fs::remove_file(dir.path().join(castellan::custody::PERSISTED_LOCK_FILE)).unwrap();
-    let mut reopened = Custodian::open_synthetic(config, Zeroizing::new(KEY)).unwrap();
-    assert!(reopened.vault.is_none());
-    let instance = reopened.instance.clone();
-    assert!(matches!(
-        call(
-            &mut reopened,
-            json!({"op":"sign","namespace":ROOT_NAMESPACE,"challenge":"attack","instance":instance})
-        ),
-        Err(Refusal("locked"))
-    ));
-    reopened
-        .unlock_after_native_confirmation(Zeroizing::new(KEY))
-        .unwrap();
-    assert_eq!(reopened.public_key, root);
+fn the_principal_comes_from_the_os_peer_and_every_start_is_locked() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let hello = ClientMessage::Hello {
+        version: custody_wire::VERSION,
+        nonce: "n".into(),
+    };
+    let stranger = Peer::Unix { uid: 4321, gid: 4321, pid: None };
+    assert!(matches!(h.core.open(stranger, &hello), Err(ServerMessage::Refused { code }) if code == "principal-unknown"));
+    let wrong_version = ClientMessage::Hello { version: 99, nonce: "n".into() };
+    assert!(h.core.open(djinn(), &wrong_version).is_err());
+    let session = h.open(djinn());
+    assert!(h.core.status().locked);
+    assert_eq!(code(&h.outcome(session, release(&["mesh-author"]))), "locked");
+    let wrong = h.outcome(session, Operation::Unlock {
+        passphrase: Secret::copy_from(b"wrong"),
+    });
+    assert_eq!(code(&wrong), "unlock-refused");
+    assert!(h.core.status().locked);
+    let admin = h.open(admin());
+    let no_grant = h.outcome(admin, Operation::Unlock {
+        passphrase: Secret::copy_from(PASSPHRASE.as_bytes()),
+    });
+    assert_eq!(code(&no_grant), "operation-denied");
 }
+
+#[test]
+fn wrong_profile_and_adjacent_namespaces_are_refused() {
+    let (dir, master) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "none"));
+    let session = h.open(djinn());
+    h.unlock(session);
+    let other_profile = Operation::Release {
+        profile: "home".into(),
+        salts: vec![Bytes(b"mesh-author".to_vec())],
+    };
+    assert_eq!(code(&h.outcome(session, other_profile)), "operation-or-scope");
+    assert_eq!(code(&h.outcome(session, release(&["mesh-author", "graphshell/endpoint-session/x"]))), "operation-or-scope");
+    assert_eq!(code(&h.outcome(session, release(&[""]))), "operation-or-scope");
+
+    let statement = certificate(master, "mere.denizen");
+    let adjacent = Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Delegation { audience: "mere.denizen".into() },
+        salt: Bytes(delegation_signing_salt(&statement.scope)),
+        message: Bytes(statement.signing_bytes()),
+    };
+    assert_eq!(code(&h.outcome(session, adjacent)), "operation-or-scope");
+    let mislabelled = Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Delegation { audience: "mere.graphshell".into() },
+        salt: Bytes(delegation_signing_salt(&statement.scope)),
+        message: Bytes(statement.signing_bytes()),
+    };
+    assert_eq!(code(&h.outcome(session, mislabelled)), "audience-denied");
+    let oracle = Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Delegation { audience: "mere.graphshell".into() },
+        salt: Bytes(b"anything".to_vec()),
+        message: Bytes(b"arbitrary bytes".to_vec()),
+    };
+    assert_eq!(code(&h.outcome(session, oracle)), "not-a-delegation");
+    let root = Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Root {},
+        salt: Bytes(Vec::new()),
+        message: Bytes(b"x".to_vec()),
+    };
+    assert_eq!(code(&h.outcome(session, root)), "operation-or-scope");
+}
+
+#[test]
+fn released_keys_are_exactly_the_in_process_derivations_and_rebuild_as_retained_keys() {
+    let (dir, master) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "none"));
+    let session = h.open(djinn());
+    h.unlock(session);
+    let Outcome::Success { answer: Answer::Released { master_public_key, keys } } = h.outcome(session, release(&["mesh-author", "distillery-personal-mesh"])) else {
+        panic!("release refused")
+    };
+    assert_eq!(master_public_key, master);
+    let opened = bootstrap::open_storage(dir.path(), Unlock::passphrase(PASSPHRASE)).unwrap();
+    let direct = castellan::custody::IdentityVault::open(opened.storage, &ProfileId("work".into())).unwrap();
+    let mut rebuilt = Vec::new();
+    for key in keys {
+        assert_eq!(key.seed.expose(), direct.derive_keypair(&key.salt.0).unwrap().to_seed());
+        let attestation = insigne::DerivedKeyAttestation::from_parts(key.attestation.master, key.attestation.derived, key.attestation.signature.0.clone());
+        let seed: [u8; 32] = key.seed.expose().try_into().unwrap();
+        rebuilt.push((key.salt.0.clone(), personae::Ed25519Keypair::from_seed(seed), attestation));
+    }
+    let retained = personae::RetainedKeys::from_released(personae::Ed25519PublicKey::from_bytes(&master).unwrap(), rebuilt).unwrap();
+    assert!(retained.derive_keypair(b"mesh-author").is_ok());
+    assert!(retained.derive_keypair(b"anything-else").is_err(), "nothing but the release");
+}
+
+#[test]
+fn a_delegation_is_signed_inside_custody_only_after_trusted_consent_bound_to_its_digest() {
+    let (dir, master) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let session = h.open(djinn());
+    let helper = h.open(consent_helper());
+    h.unlock(session);
+    let statement = certificate(master, "mere.graphshell");
+    let sign = Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Delegation { audience: "mere.graphshell".into() },
+        salt: Bytes(delegation_signing_salt(&statement.scope)),
+        message: Bytes(statement.signing_bytes()),
+    };
+    let (id, effects) = h.request(session, sign);
+    assert!(outcome_for(&effects, session, id).is_none(), "waits for consent");
+    let petition = petition_in(&effects, helper).expect("the consent channel is petitioned");
+    assert!(petition_in(&effects, session).is_none(), "the requester is never asked to approve itself");
+    assert_eq!(petition.principal, "djinn");
+    assert_eq!(petition.namespace, "delegation:mere.graphshell");
+
+    // Djinn cannot decide its own petition; bindings must match exactly.
+    let mine = h.core.handle(session, ClientMessage::Decide { request: id, digest: petition.digest.clone(), generation: petition.generation, accept: true }, h.now);
+    assert!(matches!(&mine.messages[..], [(_, ServerMessage::Decided { recorded: false, code: Some(c), .. })] if c == "not-consent-channel"));
+    for (request, digest, generation) in [(id + 1, petition.digest.clone(), petition.generation), (id, "0".repeat(64), petition.generation), (id, petition.digest.clone(), petition.generation + 1)] {
+        let (recorded, _) = h.core.decide(Decider::Session(helper), request, &digest, generation, true, h.now);
+        assert!(recorded.is_err());
+    }
+    let (recorded, effects) = h.core.decide(Decider::Session(helper), id, &petition.digest, petition.generation, true, h.now);
+    recorded.unwrap();
+    let Some(Outcome::Success { answer: Answer::Signature { signature, attestation: Some(attestation), .. } }) = outcome_for(&effects, session, id) else {
+        panic!("no signature")
+    };
+    let signer = insigne::DerivedKeyAttestation::from_parts(attestation.master, attestation.derived, attestation.signature.0);
+    let signed = SignedDelegationCertificate::from_parts(statement, signer, signature.to_vec());
+    signed.check().expect("a valid delegation under the profile's scope key");
+    let (again, _) = h.core.decide(Decider::Session(helper), id, &petition.digest, petition.generation, true, h.now);
+    assert!(again.is_err(), "one decision per petition");
+}
+
+#[test]
+fn per_generation_consent_lasts_until_the_next_lock() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let session = h.open(djinn());
+    let helper = h.open(consent_helper());
+    h.unlock(session);
+    let (id, effects) = h.request(session, release(&["mesh-author"]));
+    let petition = petition_in(&effects, helper).unwrap();
+    let (_, effects) = h.core.decide(Decider::Session(helper), id, &petition.digest, petition.generation, true, h.now);
+    assert!(matches!(outcome_for(&effects, session, id), Some(Outcome::Success { .. })));
+    assert!(matches!(h.outcome(session, release(&["distillery-personal-mesh"])), Outcome::Success { .. }), "same grant, same generation");
+    assert!(matches!(h.outcome(session, Operation::Lock {}), Outcome::Success { .. }));
+    h.unlock(session);
+    let (id, effects) = h.request(session, release(&["mesh-author"]));
+    assert!(outcome_for(&effects, session, id).is_none() && petition_in(&effects, helper).is_some(), "a new generation asks again");
+}
+
+#[test]
+fn a_lock_during_a_pending_operation_invalidates_it_and_reports_three_facts() {
+    let (dir, master) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let session = h.open(djinn());
+    let helper = h.open(consent_helper());
+    h.unlock(session);
+    let statement = certificate(master, "mere.graphshell");
+    let (id, effects) = h.request(session, Operation::Sign {
+        profile: "work".into(),
+        purpose: Purpose::Delegation { audience: "mere.graphshell".into() },
+        salt: Bytes(delegation_signing_salt(&statement.scope)),
+        message: Bytes(statement.signing_bytes()),
+    });
+    let petition = petition_in(&effects, helper).unwrap();
+    let before = h.core.generation();
+    let (lock_id, effects) = h.request(session, Operation::Lock {});
+    assert_eq!(code(&outcome_for(&effects, session, id).unwrap()), "invalidated");
+    let Some(Outcome::Success { answer: Answer::Lock { report } }) = outcome_for(&effects, session, lock_id) else {
+        panic!("lock refused")
+    };
+    assert!(report.memory_locked && report.drained && report.durable);
+    assert_eq!(report.generation, before + 1);
+    let facts: Vec<_> = effects.messages.iter().filter_map(|(to, m)| match m {
+        ServerMessage::Fact(f) => Some((*to, f.clone())),
+        _ => None,
+    }).collect();
+    assert!(facts.iter().any(|(to, f)| *to == helper && f.cause == FactCause::Lock && f.locked && f.generation == before + 1));
+    let (late, _) = h.core.decide(Decider::Session(helper), id, &petition.digest, petition.generation, true, h.now);
+    assert!(late.is_err(), "a decision cannot revive an invalidated petition");
+}
+
+#[test]
+fn a_lock_whose_barrier_fails_is_degraded_but_memory_still_locks() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "none"));
+    let session = h.open(djinn());
+    h.unlock(session);
+    std::fs::create_dir(dir.path().join(castellan::custody::PERSISTED_LOCK_FILE)).unwrap();
+    std::fs::write(dir.path().join(castellan::custody::PERSISTED_LOCK_FILE).join("x"), b"x").unwrap();
+    let outcome = h.outcome(session, Operation::Lock {});
+    let Outcome::Degraded { code: degraded, answer: Some(Answer::Lock { report }) } = outcome else {
+        panic!("expected a degraded lock, got {outcome:?}")
+    };
+    assert_eq!(degraded, "restart-barrier-not-durable");
+    assert!(report.memory_locked && !report.durable);
+    assert!(h.core.status().locked);
+    assert_eq!(code(&h.outcome(session, release(&["mesh-author"]))), "locked");
+}
+
+#[test]
+fn stale_instance_and_generation_are_refused() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "none"));
+    let session = h.open(djinn());
+    h.unlock(session);
+    let old = h.core.generation();
+    assert!(matches!(h.outcome(session, Operation::Lock {}), Outcome::Success { .. }));
+    h.unlock(session);
+    let stale = ClientMessage::Request { id: 90, instance: h.core.instance().into(), generation: old, operation: release(&["mesh-author"]) };
+    let effects = h.core.handle(session, stale, h.now);
+    assert_eq!(code(&outcome_for(&effects, session, 90).unwrap()), "stale-generation");
+    let other = ClientMessage::Request { id: 91, instance: "an-earlier-custodian".into(), generation: h.core.generation(), operation: Operation::Status {} };
+    let effects = h.core.handle(session, other, h.now);
+    assert_eq!(code(&outcome_for(&effects, session, 91).unwrap()), "stale-instance");
+}
+
+#[test]
+fn revocation_advances_the_generation_closes_sessions_and_refuses_readmission() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "none"));
+    let session = h.open(djinn());
+    let admin = h.open(admin());
+    h.unlock(session);
+    let before = h.core.generation();
+    let (id, effects) = h.request(admin, Operation::Revoke { principal: "djinn".into() });
+    assert!(matches!(outcome_for(&effects, admin, id), Some(Outcome::Success { answer: Answer::Revoked { generation } }) if generation == before + 1));
+    assert!(effects.close.contains(&session));
+    assert!(effects.messages.iter().any(|(to, m)| *to == session && matches!(m, ServerMessage::Fact(f) if f.cause == FactCause::Revoke && f.revoked.as_deref() == Some("djinn"))));
+    h.core.close(session);
+    let hello = ClientMessage::Hello { version: custody_wire::VERSION, nonce: "n".into() };
+    assert!(matches!(h.core.open(djinn(), &hello), Err(ServerMessage::Refused { code }) if code == "revoked"));
+}
+
+#[test]
+fn petitions_expire_and_withdraw_with_their_session() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let session = h.open(djinn());
+    let helper = h.open(consent_helper());
+    h.unlock(session);
+    let (id, effects) = h.request(session, release(&["mesh-author"]));
+    assert!(petition_in(&effects, helper).is_some());
+    let effects = h.core.tick(h.now + custody_wire::limits::CONSENT + Duration::from_secs(1));
+    assert_eq!(code(&outcome_for(&effects, session, id).unwrap()), "consent-expired");
+
+    let (_, effects) = h.request(session, release(&["mesh-author"]));
+    let petition = petition_in(&effects, helper).unwrap();
+    h.core.close(session);
+    let (recorded, _) = h.core.decide(Decider::Session(helper), petition.request, &petition.digest, petition.generation, true, h.now);
+    assert!(recorded.is_err(), "a withdrawn petition cannot be approved");
+}
+
+#[test]
+fn without_a_consent_channel_petitions_are_refused_and_connections_are_bounded() {
+    let (dir, _) = vault();
+    let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));
+    let session = h.open(djinn());
+    h.unlock(session);
+    assert_eq!(code(&h.outcome(session, release(&["mesh-author"]))), "consent-unavailable");
+    let _second = h.open(djinn());
+    let hello = ClientMessage::Hello { version: custody_wire::VERSION, nonce: "n".into() };
+    assert!(matches!(h.core.open(djinn(), &hello), Err(ServerMessage::Refused { code }) if code == "principal-connection-capacity"));
+}
+
+#[test]
+fn an_absent_vault_is_never_created_and_a_dpapi_vault_needs_migration() {
+    let empty = tempfile::tempdir().unwrap();
+    let mut json = serde_json::to_value(serde_json::json!({
+        "vault": {"directory": empty.path()}, "owner": {"unix_uid": 1}, "consent": "deny", "principals": []
+    })).unwrap();
+    let config = Config::parse(&serde_json::to_vec(&json).unwrap()).unwrap();
+    assert_eq!(Core::start(config).err(), Some(crate::Refusal("vault-missing")));
+    assert!(!empty.path().join(bootstrap::PASSPHRASE_VAULT_FILE).exists());
+    std::fs::write(empty.path().join(castellan::custody::AUTO_UNLOCK_ROOT_FILE), b"{}").unwrap();
+    json["vault"]["directory"] = serde_json::json!(empty.path());
+    let config = Config::parse(&serde_json::to_vec(&json).unwrap()).unwrap();
+    assert_eq!(Core::start(config).err(), Some(crate::Refusal("os-sealed-vault-needs-migration")));
+}
+
+mod driver_tests;

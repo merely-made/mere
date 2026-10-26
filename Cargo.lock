@@ -4342,6 +4342,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "custody-wire"
+version = "0.0.1"
+dependencies = [
+ "base64 0.22.1",
+ "libc",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "windows-sys 0.59.0",
+ "zeroize",
+]
+
+[[package]]
 name = "darling"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4923,11 +4936,15 @@ dependencies = [
  "base64 0.22.1",
  "blake3",
  "castellan",
+ "custody-wire",
  "getrandom 0.3.4",
+ "insigne",
+ "libc",
  "personae",
  "serde",
  "serde_json",
  "tempfile",
+ "windows-sys 0.59.0",
  "zeroize",
 ]
 
