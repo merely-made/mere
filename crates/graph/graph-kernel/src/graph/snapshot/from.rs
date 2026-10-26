@@ -14,6 +14,7 @@ use euclid::default::Point2D;
 use std::collections::BTreeMap;
 use uuid::Uuid;
 
+use super::super::import_records::import_records_from_legacy_provenance;
 use super::super::*;
 use crate::address::{address_from_url, detect_mime};
 use crate::persistence::{
@@ -321,13 +322,20 @@ impl Graph {
             ));
         }
 
-        if snapshot.import_records.is_empty() {
-            graph.rebuild_import_records_from_node_provenance(snapshot.timestamp_secs);
+        graph.import_records = if snapshot.import_records.is_empty() {
+            // Predates the table: the legacy per-node column is the only source.
+            import_records_from_legacy_provenance(
+                snapshot.nodes.iter().filter_map(|pnode| {
+                    let node_id = Uuid::parse_str(&pnode.node_id).ok()?;
+                    Some((node_id, pnode.import_provenance.as_slice()))
+                }),
+                snapshot.timestamp_secs,
+            )
         } else {
-            graph.import_records = snapshot.import_records.clone();
-            normalize_import_records(&mut graph.import_records);
-            graph.sync_node_import_provenance_from_records();
-        }
+            snapshot.import_records.clone()
+        };
+        normalize_import_records(&mut graph.import_records);
+        graph.sync_node_import_provenance_from_records();
 
         if legacy_derived_containment {
             graph.rebuild_derived_containment_relations();
