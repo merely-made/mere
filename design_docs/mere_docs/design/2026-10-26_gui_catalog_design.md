@@ -52,12 +52,21 @@ Four readings of the table:
   keeps the June docs as its sources.
 - **The rows exist in different degrees.** `SurfaceId` names twenty surfaces
   because each is an event source for accessibility, not because each is
-  built. As read on 2026-10-26, Graphshell's source names Inspector and Roster
-  and never Steward, Comms, Gloss, Omnibar, TreeSpine or ConfirmDialog; Cambium
-  names a status bar and Apparatus. The dock contract the panes doc proposed
-  (`PaneKind`, side, width, focus, context binding) has no enum of that name in
-  the tree. The card family lives in design docs and in Graphshell's 354 `card`
-  mentions; Cambium's "card" is a context for the summary body. A catalog that
+  built. As read on 2026-10-26, four of the twenty are emitted at real seams
+  (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); the pane variants
+  appear only in the kernel's descriptor table and ux-events' diagnostics map,
+  with no open or dismiss seam. The panes themselves are built unevenly and
+  outside the Graphshell port: Comms is a view-model crate
+  (`crates/shell/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
+  Apparatus is a domain crate (`crates/domain/apparatus`) whose rows Cambium's
+  detail panel and sectioned list name beside Steward's, and Graphshell names
+  Inspector and Roster. The dock contract the panes doc proposed exists twice
+  and is shared by neither: `DockState` and `DockSide` in the comms pane, whose
+  module doc says they should graduate to a shared dock, and the kernel's
+  `PanePresentationMode` (tiled, docked, floating, fullscreen) in
+  `crates/graph/graph-kernel/src/pane.rs`. The card family lives in design docs
+  and in Graphshell's 354 `card` mentions, none of which carry the family's four
+  names; Cambium's "card" is a context for the summary body. A catalog that
   does not say *built, named, or designed* per row will be read as a claim that
   everything in it exists.
 - **No catalog says which authority a surface projects.** The panes half of
