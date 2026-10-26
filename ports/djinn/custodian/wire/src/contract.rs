@@ -66,6 +66,115 @@ pub enum Operation {
     Unlock { passphrase: Secret },
     /// Withdraw a named principal's grants until the custodian restarts.
     Revoke { principal: String },
+    /// Derive and release keys from the persona (`profile`, or the open one)
+    /// or the wallet's identity seed. H2's general form of [`Self::Release`].
+    Derive {
+        source: Source,
+        profile: Option<String>,
+        salts: Vec<Bytes>,
+    },
+    /// The root's attestation of the key `salt` derives; no key crosses.
+    Attest {
+        source: Source,
+        profile: Option<String>,
+        salt: Bytes,
+    },
+    /// Sign with the key `salt` derives from `source`, inside custody.
+    SignDerived {
+        source: Source,
+        profile: Option<String>,
+        salt: Bytes,
+        message: Bytes,
+    },
+    /// The public identity read model, answerable while locked.
+    Snapshot {},
+    /// One typed identity intent (dramatis names). Signing decisions are
+    /// refused: only the custodian's consent channel decides them.
+    Intent { intent: String, payload: Bytes },
+    /// Whether the vault holds `profile`.
+    HasProfile { profile: String },
+    /// Replace the passphrase; both are credentials, over the checked channel.
+    ChangePassphrase { old: Secret, new: Secret },
+    /// Store an OpenSSH private key the owner picked natively.
+    ImportSshKey {
+        key: Secret,
+        passphrase: Option<Secret>,
+        options: Bytes,
+    },
+    /// A terminal vault command run inside custody; public output only.
+    VaultCommand {
+        profile: String,
+        command: String,
+        args: Vec<String>,
+    },
+    /// Keys derived from a persona wallet's current private epoch.
+    EpochKeys {
+        persona: String,
+        device_label: Option<String>,
+        keys: Vec<EpochKeyRequest>,
+    },
+    /// Issue a sited station's RemoteAuth grant with the wallet seed.
+    StationGrant {
+        request: serde_json::Value,
+        issuer_public_key: Bytes,
+    },
+    /// Revoke one delegated device in the wallet.
+    RevokeDevice { device_id: String },
+    /// Seal or unseal one retained payload under a persona's current epoch.
+    Payload {
+        profile: String,
+        persona: String,
+        master: Bytes,
+        scope: Bytes,
+        /// The payload's canonical content hash, in eidetic's text form.
+        content_hash: String,
+        operation: PayloadOperation,
+    },
+    /// The credential catalog the custodian holds.
+    Credentials { operation: CredentialOperation },
+}
+
+/// Which root a derivation, attestation or signature comes from.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Source {
+    Persona,
+    Wallet,
+}
+
+/// One epoch derivation: blake3's `derive_key` under `context` over the epoch
+/// secret, followed by this device's public root when `device_bound`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EpochKeyRequest {
+    pub context: String,
+    pub device_bound: bool,
+    pub public_only: bool,
+}
+
+/// One retained-payload operation.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
+pub enum PayloadOperation {
+    Seal { bytes: Bytes },
+    Unseal { bytes: Bytes, marker: serde_json::Value },
+}
+
+/// One credential-catalog operation. Requests and results are the
+/// catalog's own public records, carried as JSON.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
+pub enum CredentialOperation {
+    Quarantine { profile: String },
+    UnassignedImports {},
+    AssignImport { request: serde_json::Value },
+    Review { request: serde_json::Value },
+    CxfPreview { source: Bytes },
+    CxfImport {
+        source: Bytes,
+        destinations: serde_json::Value,
+        preview_sha256: String,
+    },
 }
 
 /// What a signature is for, checked against the bytes signed.
@@ -208,6 +317,46 @@ pub enum Answer {
     Revoked {
         generation: u64,
     },
+    /// The mutation is done; nothing to report.
+    Done {},
+    Bool {
+        value: bool,
+    },
+    Attestation {
+        attestation: AttestationParts,
+    },
+    Snapshot {
+        snapshot: Box<dramatis::view::IdentitySurfaceSnapshot>,
+    },
+    /// A public result record (intent outcome, grant, revocation, cards,
+    /// receipts), carried as JSON.
+    Value {
+        value: serde_json::Value,
+    },
+    VaultOutput {
+        text: String,
+    },
+    VaultEnrollment {
+        target: String,
+        script: String,
+        confirmation: String,
+    },
+    EpochKeys {
+        keys: Vec<ReleasedEpochKey>,
+    },
+    Payload {
+        bytes: Bytes,
+        marker: Option<serde_json::Value>,
+    },
+}
+
+/// One released epoch key: the request it answers and the derived secret,
+/// or the Ed25519 public key it seeds when the request was public-only.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReleasedEpochKey {
+    pub request: EpochKeyRequest,
+    pub key: Secret,
 }
 
 /// Public status.
@@ -222,6 +371,9 @@ pub struct Status {
     pub master_public_key: Option<[u8; 32]>,
     /// What protects the vault, for the owner to read.
     pub protection: String,
+    /// The wallet root's public key, absent with no wallet or while locked.
+    #[serde(with = "fixed_opt", default)]
+    pub wallet_public_key: Option<[u8; 32]>,
 }
 
 /// One released derived key: the salt, its seed and the master's

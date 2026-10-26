@@ -19,8 +19,16 @@ default = []
 native-host = []
 
 [dependencies]
-castellan.workspace = true
+castellan = { workspace = true, features = ["keeper", "cxf"] }
+chatelaine.workspace = true
 custody-wire = { path = "wire" }
+dramatis.workspace = true
+eidetic.workspace = true
+pandect.workspace = true
+ssh-key = { version = "0.6", features = ["ed25519", "encryption"] }
+ssh-agent-lib = "0.6"
+tokio = { version = "1", features = ["net", "rt"] }
+uuid.workspace = true
 insigne = { workspace = true, features = ["verify"] }
 personae.workspace = true
 base64.workspace = true

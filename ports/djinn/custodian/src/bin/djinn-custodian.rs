@@ -91,14 +91,23 @@ fn serve(config: Config, args: &Args) -> Result<(), String> {
     };
     let consent = config.consent;
     let core = Core::start(config.clone()).map_err(|r| format!("start: {r}"))?;
-    let listener = listener(&config, args)?;
+    let (listener, agent) = listeners(&config, args)?;
     let mechanism = mechanism(consent)?;
+    // Every thread starts after confinement: Landlock and seccomp bind the
+    // calling thread and its descendants only.
     let applied = platform::confine(&plan)?;
     for note in &applied.notes {
         eprintln!("djinn-custodian: {note}");
     }
     eprintln!("djinn-custodian: serving instance {} (locked)", core.instance());
     let service = Service::new(core, mechanism);
+    #[cfg(unix)]
+    if let Some(agent) = agent {
+        djinn_custodian::agent::spawn(service.clone(), agent, config.owner.unix_uid).map_err(|e| format!("agent: {e}"))?;
+        eprintln!("djinn-custodian: serving the SSH agent");
+    }
+    #[cfg(not(unix))]
+    let _ = agent;
     #[cfg(windows)]
     {
         let stopping = service.clone();
@@ -114,7 +123,13 @@ fn serve(config: Config, args: &Args) -> Result<(), String> {
     service.serve(&*listener).map_err(|e| format!("serve: {e}"))
 }
 
-fn listener(config: &Config, args: &Args) -> Result<Box<dyn custody_wire::transport::Listener>, String> {
+#[cfg(unix)]
+type AgentListener = std::os::unix::net::UnixListener;
+#[cfg(not(unix))]
+type AgentListener = ();
+
+/// The custody listener and, where configured, the SSH agent's.
+fn listeners(config: &Config, args: &Args) -> Result<(Box<dyn custody_wire::transport::Listener>, Option<AgentListener>), String> {
     #[cfg(unix)]
     {
         use custody_wire::transport::UnixSocketListener;
@@ -122,17 +137,26 @@ fn listener(config: &Config, args: &Args) -> Result<Box<dyn custody_wire::transp
         // can say so (macOS); elsewhere they never match.
         let signed = config.signed_identities();
         if let Some(path) = &args.socket {
-            return UnixSocketListener::bind(path)
-                .map(|l| Box::new(l.with_signed(signed)) as Box<dyn custody_wire::transport::Listener>)
-                .map_err(|e| format!("bind {}: {e}", path.display()));
+            let custody = UnixSocketListener::bind(path).map_err(|e| format!("bind {}: {e}", path.display()))?;
+            let agent = match &config.vault.agent_endpoint {
+                Some(endpoint) => Some(bind_agent(std::path::Path::new(endpoint))?),
+                None => None,
+            };
+            return Ok((Box::new(custody.with_signed(signed)), agent));
         }
         #[cfg(target_os = "linux")]
-        if let Some(listener) = UnixSocketListener::from_systemd().map_err(|e| e.to_string())? {
-            return Ok(Box::new(listener));
+        {
+            let mut named = UnixSocketListener::systemd_named().map_err(|e| e.to_string())?;
+            if let Some(index) = named.iter().position(|(name, _)| name == "custody" || name.is_empty()) {
+                let (_, custody) = named.remove(index);
+                let agent = named.into_iter().find(|(name, _)| name == "agent").map(|(_, l)| l);
+                return Ok((Box::new(UnixSocketListener::from_listener(custody)), agent));
+            }
         }
         #[cfg(target_os = "macos")]
-        if let Some(listener) = platform::macos::launchd_listener("custody").map_err(|e| e.to_string())? {
-            return Ok(Box::new(UnixSocketListener::from_listener(listener).with_signed(signed)));
+        if let Some(custody) = platform::macos::launchd_listener("custody").map_err(|e| e.to_string())? {
+            let agent = platform::macos::launchd_listener("agent").map_err(|e| e.to_string())?;
+            return Ok((Box::new(UnixSocketListener::from_listener(custody).with_signed(signed)), agent));
         }
         Err("no listening socket from the service manager".into())
     }
@@ -141,8 +165,21 @@ fn listener(config: &Config, args: &Args) -> Result<Box<dyn custody_wire::transp
         let _ = args;
         let owner = config.owner.windows_sid.as_deref().ok_or("owner.windows_sid is required on Windows")?;
         let name = format!(r"\\.\pipe\djinn-custodian-{owner}");
-        Ok(Box::new(custody_wire::transport::NamedPipeListener::new(&name, owner)))
+        Ok((Box::new(custody_wire::transport::NamedPipeListener::new(&name, owner)), None))
     }
+}
+
+/// Bind the agent socket at 0600 (development; a protected custodian takes
+/// it from the service manager).
+#[cfg(unix)]
+fn bind_agent(path: &std::path::Path) -> Result<std::os::unix::net::UnixListener, String> {
+    use std::os::unix::fs::PermissionsExt;
+    if std::fs::symlink_metadata(path).is_ok() && std::os::unix::net::UnixStream::connect(path).is_err() {
+        let _ = std::fs::remove_file(path);
+    }
+    let listener = std::os::unix::net::UnixListener::bind(path).map_err(|e| format!("bind {}: {e}", path.display()))?;
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600)).map_err(|e| e.to_string())?;
+    Ok(listener)
 }
 
 fn mechanism(consent: ConsentMode) -> Result<Option<Arc<dyn Mechanism>>, String> {
@@ -224,7 +261,7 @@ fn adopt(config: &Config, from: &Path) -> Result<(), String> {
         let vault = castellan::custody::IdentityVault::open(opened.storage, &id).map_err(|e| e.to_string())?;
         (id.0.clone(), vault.master_public_key().to_bytes())
     };
-    let mut adopted = djinn_custodian::vault::VaultCustody::locked(directory, config.vault.profile.as_deref()).map_err(|r| r.to_string())?;
+    let mut adopted = djinn_custodian::host::HostCustody::locked(directory, config.vault.profile.as_deref(), None).map_err(|r| r.to_string())?;
     adopted.unlock(phrase.as_bytes()).map_err(|r| format!("open the copy: {r}"))?;
     if Some(source_master.1) != adopted.master_public_key() || Some(source_master.0.as_str()) != adopted.profile() {
         adopted.lock();

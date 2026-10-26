@@ -42,6 +42,13 @@ pub struct VaultConfig {
     /// The profile to open; absent, the remembered choice or the sole one.
     #[serde(default)]
     pub profile: Option<String>,
+    /// The wallet (`identity/`) and credential catalog (`castellan/`) in
+    /// Djinn's layout. Absent, wallet and credential operations refuse.
+    #[serde(default)]
+    pub data_root: Option<std::path::PathBuf>,
+    /// Where the custodian serves the SSH agent, when it is served.
+    #[serde(default)]
+    pub agent_endpoint: Option<String>,
 }
 
 /// The vault owner's desktop account.
@@ -117,16 +124,63 @@ pub enum Grant {
     Revoke {
         consent: Consent,
     },
+    /// Release derived keys of `source` for salts the rules admit.
     Release {
         profile: ProfileScope,
         salts: Vec<SaltRule>,
         consent: Consent,
+        #[serde(default)]
+        source: SourceRule,
+    },
+    /// Attest derived keys of `source` for salts the rules admit.
+    Attest {
+        profile: ProfileScope,
+        salts: Vec<SaltRule>,
+        consent: Consent,
+        #[serde(default)]
+        source: SourceRule,
     },
     Sign {
         profile: ProfileScope,
         purpose: PurposeRule,
         consent: Consent,
     },
+    /// The public read model.
+    Snapshot,
+    /// Profile intents, vault commands, passphrase change and SSH import.
+    Manage {
+        consent: Consent,
+    },
+    /// Wallet epochs, station grants and device revocation.
+    Wallet {
+        consent: Consent,
+    },
+    /// Retained-payload sealing under the open persona's epoch.
+    Payload {
+        consent: Consent,
+    },
+    /// The credential catalog: quarantine, older imports, review and CXF.
+    Credentials {
+        consent: Consent,
+    },
+}
+
+/// Which root a release or attestation grant draws from.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SourceRule {
+    #[default]
+    Persona,
+    Wallet,
+}
+
+impl SourceRule {
+    pub fn matches(self, source: custody_wire::Source) -> bool {
+        matches!(
+            (self, source),
+            (Self::Persona, custody_wire::Source::Persona) | (Self::Wallet, custody_wire::Source::Wallet)
+        )
+    }
 }
 
 /// Which profile a grant covers.
@@ -136,15 +190,18 @@ pub enum ProfileScope {
     /// Whichever profile the custodian has open.
     Current,
     Named(String),
+    /// Any profile the vault holds, open or not (an application's own
+    /// adopted persona, D13).
+    Any,
 }
 
 impl ProfileScope {
     pub fn covers(&self, requested: &str, current: &str) -> bool {
-        requested == current
-            && match self {
-                Self::Current => true,
-                Self::Named(name) => name == requested,
-            }
+        match self {
+            Self::Current => requested == current,
+            Self::Named(name) => name == requested && requested == current,
+            Self::Any => !requested.is_empty(),
+        }
     }
 }
 
@@ -168,7 +225,8 @@ impl Consent {
     }
 }
 
-/// One release namespace.
+/// One release namespace. An empty salt is the master's place and no rule
+/// admits it.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub enum SaltRule {
@@ -176,13 +234,51 @@ pub enum SaltRule {
     Exact(String),
     /// Any longer salt with this UTF-8 prefix.
     Prefix(String),
+    /// Exactly these bytes, as hex.
+    ExactHex(String),
+    /// Any longer salt beginning with these bytes, as hex.
+    PrefixHex(String),
+    /// Every delegation scope key in this insigne domain.
+    Delegation(String),
+    /// A family matcher: `reticulum`, `tucket-station` or `sennet-station`.
+    Named(String),
+}
+
+fn hex(text: &str) -> Option<Vec<u8>> {
+    (text.len() % 2 == 0)
+        .then(|| (0..text.len()).step_by(2).map(|i| u8::from_str_radix(&text[i..i + 2], 16).ok()).collect())
+        .flatten()
+}
+
+fn prefixed(salt: &[u8], prefix: &[u8]) -> bool {
+    salt.len() > prefix.len() && salt.starts_with(prefix)
 }
 
 impl SaltRule {
     pub fn allows(&self, salt: &[u8]) -> bool {
+        if salt.is_empty() {
+            return false;
+        }
         match self {
-            Self::Exact(exact) => !salt.is_empty() && salt == exact.as_bytes(),
-            Self::Prefix(prefix) => salt.len() > prefix.len() && salt.starts_with(prefix.as_bytes()),
+            Self::Exact(exact) => salt == exact.as_bytes(),
+            Self::Prefix(prefix) => prefixed(salt, prefix.as_bytes()),
+            Self::ExactHex(exact) => hex(exact).is_some_and(|exact| salt == exact.as_slice()),
+            Self::PrefixHex(prefix) => hex(prefix).is_some_and(|prefix| prefixed(salt, &prefix)),
+            Self::Delegation(domain) => prefixed(salt, &insigne::delegation::delegation_signing_prefix(domain)),
+            Self::Named(name) => match name.as_str() {
+                "reticulum" => personae::reticulum::is_reticulum_salt(salt),
+                "tucket-station" => personae::tucket::is_station_salt(salt),
+                "sennet-station" => personae::sennet::is_station_salt(salt),
+                _ => false,
+            },
+        }
+    }
+
+    fn valid(&self) -> bool {
+        match self {
+            Self::Exact(text) | Self::Prefix(text) | Self::Delegation(text) => !text.is_empty(),
+            Self::ExactHex(text) | Self::PrefixHex(text) => hex(text).is_some_and(|b| !b.is_empty()),
+            Self::Named(name) => matches!(name.as_str(), "reticulum" | "tucket-station" | "sennet-station"),
         }
     }
 
@@ -190,6 +286,10 @@ impl SaltRule {
         match self {
             Self::Exact(exact) => exact.clone(),
             Self::Prefix(prefix) => format!("{prefix}*"),
+            Self::ExactHex(exact) => format!("hex:{exact}"),
+            Self::PrefixHex(prefix) => format!("hex:{prefix}*"),
+            Self::Delegation(domain) => format!("delegation:{domain}*"),
+            Self::Named(name) => format!("named:{name}"),
         }
     }
 }
@@ -202,6 +302,13 @@ pub enum PurposeRule {
     Delegation { audience: String },
     /// The profile master itself.
     Root,
+    /// Arbitrary bytes under derived keys the rules admit: an application's
+    /// own scoped act signed inside custody (D11), never the master.
+    Derived {
+        #[serde(default)]
+        source: SourceRule,
+        salts: Vec<SaltRule>,
+    },
 }
 
 /// A principal selected for a connection.
@@ -277,8 +384,18 @@ impl Config {
                     Grant::Revoke { consent: Consent::None } if same_user => {
                         return Err(PolicyError(format!("{}: revocation by a same-user principal needs consent", rule.name)));
                     },
-                    Grant::Release { salts, .. } if salts.is_empty() => {
-                        return Err(PolicyError(format!("{}: a release grant names no salts", rule.name)));
+                    Grant::Release { salts, .. } | Grant::Attest { salts, .. } | Grant::Sign { purpose: PurposeRule::Derived { salts, .. }, .. }
+                        if salts.is_empty() || !salts.iter().all(SaltRule::valid) =>
+                    {
+                        return Err(PolicyError(format!("{}: a grant names no salts or an invalid salt rule", rule.name)));
+                    },
+                    Grant::Manage { consent: Consent::None } | Grant::Wallet { consent: Consent::None } | Grant::Payload { consent: Consent::None } | Grant::Credentials { consent: Consent::None } | Grant::Attest { consent: Consent::None, .. }
+                        if same_user && !self.development =>
+                    {
+                        return Err(PolicyError(format!(
+                            "{}: a same-user principal cannot hold an unattended custody grant outside development mode",
+                            rule.name
+                        )));
                     },
                     Grant::Sign {
                         purpose: PurposeRule::Delegation { audience },
@@ -336,6 +453,7 @@ impl Principal {
                         profile,
                         salts,
                         consent,
+                        ..
                     } => (
                         profile_name(profile),
                         "release",
@@ -352,9 +470,21 @@ impl Principal {
                         match purpose {
                             PurposeRule::Delegation { audience } => format!("delegation:{audience}"),
                             PurposeRule::Root => "root".into(),
+                            PurposeRule::Derived { salts, .. } => salts.iter().map(SaltRule::describe).collect::<Vec<_>>().join(","),
                         },
                         *consent,
                     ),
+                    Grant::Attest { profile, salts, consent, .. } => (
+                        profile_name(profile),
+                        "attest",
+                        salts.iter().map(SaltRule::describe).collect::<Vec<_>>().join(","),
+                        *consent,
+                    ),
+                    Grant::Snapshot => (String::new(), "snapshot", String::new(), Consent::None),
+                    Grant::Manage { consent } => (String::new(), "manage", String::new(), *consent),
+                    Grant::Wallet { consent } => (String::new(), "wallet", String::new(), *consent),
+                    Grant::Payload { consent } => (String::new(), "payload", String::new(), *consent),
+                    Grant::Credentials { consent } => (String::new(), "credentials", String::new(), *consent),
                 };
                 custody_wire::contract::Scope {
                     profile,
@@ -371,5 +501,6 @@ fn profile_name(scope: &ProfileScope) -> String {
     match scope {
         ProfileScope::Current => "current".into(),
         ProfileScope::Named(name) => name.clone(),
+        ProfileScope::Any => "any".into(),
     }
 }

@@ -1122,6 +1122,15 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         Ok(act())
     }
+    /// Sign `message` with the open persona's master under the host's lock.
+    /// Only the independent custodian calls this, after its own consent; no
+    /// master seed is returned.
+    pub fn sign_with_master(&self, message: &[u8]) -> Result<([u8; 32], [u8; 64]), IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        let master = &vault.current_profile()?.master;
+        Ok((master.public_key().to_bytes(), master.sign(message).to_bytes()))
+    }
+
     /// The persona currently spoken as.
     pub fn current_profile_id(&self) -> ProfileId {
         self.vault.lock().unwrap().profile_id().clone()
