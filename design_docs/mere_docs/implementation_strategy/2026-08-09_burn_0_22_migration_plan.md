@@ -5220,3 +5220,35 @@ changes the compute cohort; Servitor remains in Eidetic. Primary Alembic
 working changes are preserved. No registry release, push or main integration
 was performed. All preparation logs, exact locks/binary and bundle hashes,
 archive checksums and baseline controls are in `Code/output/burn-0221-20261024`.
+
+
+### 13.49 Current-main integration (2026-10-25)
+
+**Status:** current-main combination validated; publication authorized by Mark.
+ESP's merged upgrade is published on main at `0ba91dbce5aaaad1b866a3891a0255045ba5131b`.
+This follow-up supersedes section 13.48's local-only publication status; it
+retains that section's original execution source and receipts unchanged.
+
+Mere receives current main `1c61d792c`, including its newer supplier cuts,
+package renames and Graphshell MCP work. The ESP test fixture package follows
+its current name, `esp-testkit`. All active receiving manifests take published
+ESP `0ba91db`; the compute cohort stays Burn 0.22.1 / CubeCL 0.11.1 / Cubek
+0.3.1, and the retired runtime manifest patch stays retired. The root and
+Graphshell lock changes preserve all non-ESP Git suppliers. The full browser
+probe follows current root's Genet `ea18315d` and the required Netrender
+`8a3d289a`, and names its renamed Cambium dependency explicitly. No browser
+scroll implementation changes. The Alembic design drafts were preserved as
+checkpoint `e13487036` and merged into this integration; Servitor stays in
+Eidetic.
+
+**Fresh validation:** ESP's default/actor workspace suite passes 100 tests
+with zero failures and one existing ignore. The merged Distillery library
+passes locked offline checking with `remote,trainer-gpu,trainer-autodiff`.
+The full browser model probe passes locked offline wasm32 checking after the
+final Genet alignment. These last two rows establish compilation of the new
+combination; they do not repeat the earlier 804-test or headed runtime cohort.
+The [integration record](../../../support/receipts/burn-0221-20261024/integration.json)
+binds source checkpoints, receiving-lock hashes and fresh log hashes. Logs,
+lock audits, guarded admission records and final remote-ref verification live
+in `Code/output/burn-0221-20261024`. Existing compiler caches and retained
+qualification artifacts were kept separate under the workspace storage policy.

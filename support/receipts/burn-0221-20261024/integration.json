@@ -1,0 +1,45 @@
+{
+  "schema": "mere.burn-integration.v1",
+  "date": "2026-10-25",
+  "status": "validated current-main integration; publication authorized",
+  "mere_integration_parent": "24ff683452b25f2557696c5be655b52a1a00b44c",
+  "received_mere_main": "1c61d792cf246eec11817bc259dcf75b60209e6b",
+  "published_esp_main": "0ba91dbce5aaaad1b866a3891a0255045ba5131b",
+  "workshop_design_checkpoint": "e13487036d35960f9f873b7fb231f42389961069",
+  "cohort": {
+    "burn": "0.22.1",
+    "cubecl": "0.11.1",
+    "cubek": "0.3.1"
+  },
+  "checks": [
+    {
+      "gate": "ESP default plus actor workspace tests",
+      "result": "100 passed, 0 failed, 1 existing ignored",
+      "log": "Code/output/burn-0221-20261024/esp-main-actor-tests.log"
+    },
+    {
+      "gate": "Distillery native remote plus GPU trainer plus autodiff composition",
+      "result": "cargo check passed; compile evidence only",
+      "log": "Code/output/burn-0221-20261024/mere-main-composition-check.log"
+    },
+    {
+      "gate": "Full browser model probe on current receiving cuts",
+      "result": "locked offline wasm32 check passed; compile evidence only",
+      "log": "Code/output/burn-0221-20261024/mere-main-browser-final-check.log"
+    }
+  ],
+  "preservation": "Current Mere main supplier/package changes retained. Workshop draft checkpoint merged. Only ESP Git sources change in the root and Graphshell receiving locks. Full model probe follows current Genet ea18315d and required Netrender 8a3d289a. Historical qualification records were not rewritten.",
+  "original_execution_evidence": "qualification.json remains the 2026-10-24 frozen runtime/browser/remote source qualification; the complete 804 tests were not rerun on this merged source snapshot.",
+  "locks": {
+    "Cargo.lock": "03c7b3d947985e02c0e5b461dc7276e235936bd179860408e850ad25ef420567",
+    "ports/graphshell/web/Cargo.lock": "39169695ebae45392c1489881d4ae546b7ea07fd473cb80021cfa6ea6bd13435",
+    "ports/distillery/probe/Cargo.lock": "369c2107720adba5a058fd253a0e339dad7ee593ff5840448a70a0087b324494",
+    "ports/distillery/probe/remote-fixture/Cargo.lock": "91240db507f98991826d4c215b1a8c96946e41d223eb00f6506ce48c7b7c0350",
+    "ports/distillery/probe/session-fixture/Cargo.lock": "1c93173b9e86a8f076e2e16c2aa70bbb50b77c3f02e66fe271bca2eb46f275f5"
+  },
+  "log_sha256": {
+    "esp-main-actor-tests": "1be1e190d8146fda150c751939b772a9faef9939f5128c07d29d1b2dac1f16d0",
+    "mere-main-composition-check": "d63ba3af33d77d9ee9bcbe783d587696ad61c01d4340e0c0e2ba63005b16f522",
+    "mere-main-browser-final-check": "616453f78c239fbcbe7ce98bd8c4211d4349293e829c211cae9b66dec9da25fe"
+  }
+}
