@@ -50,7 +50,7 @@ use graphshell_host::lifecycle::AdmittedEndpointContext;
 use mere_overmap::wire::{
     self as session_item, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1,
     ArchiveActionV1, BRANCH_SESSION_INTENT, CANCEL_MERGE_INTENT, COMPOSE_CODICILS_INTENT,
-    FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS, MERGE_SCHEMA,
+    FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_NOTES, MERE_SESSIONS, MERGE_SCHEMA,
     MERGE_SESSION_INTENT, MERGE_SOURCE, MINT_SESSION_INTENT, MergeChoiceV1, MergeResolutionV1,
     OPEN_CODICIL_INTENT, PENDING_MERGE_SCHEMA, PendingMergeV1, RESOLVE_MERGE_INTENT,
     RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
@@ -678,6 +678,8 @@ impl ResumableProjectionSource for AccessEndpoint {
 
 #[path = "resident_mere_coop.rs"]
 mod coop;
+#[path = "resident_mere_notes.rs"]
+mod notes;
 
 type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 
@@ -886,6 +888,66 @@ fn lifecycle_action(intent: &str, label: &str, explanation: &str) -> AdvertisedA
     }
 }
 
+/// A projection of one card per item, in order, at `epoch` and `revision`.
+fn card_projection(
+    cards: &[SessionsCard],
+    session: ProjectionSession,
+    source_kind: &str,
+    epoch: SceneEpoch,
+    revision: Revision,
+) -> Result<ProjectionSnapshot, String> {
+    let mut scene = Scene::new();
+    let mut presentation = PresentationManifest::default();
+    for (index, card) in cards.iter().enumerate() {
+        let kind = card.kind.unwrap_or(source_kind);
+        let source = scene.intern_source(SourceRef::new(kind, &card.source));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::IDENTITY,
+            footprint: Footprint::Rect {
+                size: Size2::new(1.0, 1.0),
+            },
+            representation: Representation::Card,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: Vec::new(),
+        });
+        let key = PresentationKey(match card.kind {
+            Some(kind) => format!("{kind}:{}", card.source),
+            None => card.source.clone(),
+        });
+        presentation.bindings.push(PresentationBinding {
+            instance: InstanceId(index as u32),
+            key: key.clone(),
+        });
+        presentation.offers.insert(
+            key,
+            vec![PresentationOffer {
+                codec: PresentationCodec::PortableCardV1,
+                resource: ContentHash::of(&card.bytes),
+                byte_size: card.bytes.len() as u64,
+                requires: PresentationCapability::PortableCard,
+                semantics: PresentationSemantics {
+                    label: card.label.clone(),
+                    role: SemanticRole::Graphic,
+                    bounds: BoundsRelationship::FitWithinFootprint,
+                    actions: card.actions.clone(),
+                },
+            }],
+        );
+    }
+    Ok(ProjectionSnapshot {
+        version: ProtocolVersion::V1,
+        session,
+        scene: SceneSnapshot::from_dense(epoch, revision, scene)
+            .map_err(|error| format!("{error:?}"))?,
+        presentation,
+        cache_policy: CachePolicy::default(),
+    })
+}
+
 /// One admitted application's view of one mere.
 struct MereEndpoint {
     shared: Arc<MereShared>,
@@ -897,6 +959,13 @@ struct MereEndpoint {
     /// The sessions revision this connection last saw or was told of.
     seen_sessions: u64,
     seen_archive: u64,
+    /// The notes projection's epoch and revision this connection last saw.
+    seen_notes: (SceneEpoch, Revision),
+    /// The text this connection's notes projection is filtered by.
+    notes_query: String,
+    /// How many searches this connection has set; the notes revision moves
+    /// with each.
+    notes_searches: u64,
 }
 
 impl MereEndpoint {
@@ -934,6 +1003,9 @@ impl MereEndpoint {
                 attached,
                 host,
                 seen_graph,
+                seen_notes: seen_graph,
+                notes_query: String::new(),
+                notes_searches: 0,
             })
         })
     }
@@ -1148,61 +1220,12 @@ impl MereEndpoint {
         source_kind: &str,
     ) -> Result<ProjectionSnapshot, String> {
         let revision = self.sessions_revision();
-        let mut scene = Scene::new();
-        let mut presentation = PresentationManifest::default();
-        for (index, card) in cards.iter().enumerate() {
-            let kind = card.kind.unwrap_or(source_kind);
-            let source = scene.intern_source(SourceRef::new(kind, &card.source));
-            scene.items.push(ProjectedItem {
-                source,
-                space: Scene::WORLD,
-                transform: Transform2::IDENTITY,
-                footprint: Footprint::Rect {
-                    size: Size2::new(1.0, 1.0),
-                },
-                representation: Representation::Card,
-                layer: 0,
-                visible: true,
-                hit: None,
-                channels: Vec::new(),
-            });
-            let key = PresentationKey(match card.kind {
-                Some(kind) => format!("{kind}:{}", card.source),
-                None => card.source.clone(),
-            });
-            presentation.bindings.push(PresentationBinding {
-                instance: InstanceId(index as u32),
-                key: key.clone(),
-            });
-            presentation.offers.insert(
-                key,
-                vec![PresentationOffer {
-                    codec: PresentationCodec::PortableCardV1,
-                    resource: ContentHash::of(&card.bytes),
-                    byte_size: card.bytes.len() as u64,
-                    requires: PresentationCapability::PortableCard,
-                    semantics: PresentationSemantics {
-                        label: card.label.clone(),
-                        role: SemanticRole::Graphic,
-                        bounds: BoundsRelationship::FitWithinFootprint,
-                        actions: card.actions.clone(),
-                    },
-                }],
-            );
-        }
         if session.0 == MERE_ARCHIVE {
             self.seen_archive = revision.0;
         } else {
             self.seen_sessions = revision.0;
         }
-        Ok(ProjectionSnapshot {
-            version: ProtocolVersion::V1,
-            session,
-            scene: SceneSnapshot::from_dense(SESSIONS_EPOCH, revision, scene)
-                .map_err(|error| format!("{error:?}"))?,
-            presentation,
-            cache_policy: CachePolicy::default(),
-        })
+        card_projection(&cards, session, source_kind, SESSIONS_EPOCH, revision)
     }
 
     fn archive_session() -> ProjectionSession {
@@ -1867,9 +1890,10 @@ impl MereEndpoint {
             };
             (result, seen)
         });
-        // An application is not rung for its own change.
+        // An application is not rung for its own change, in either projection.
         if let Some(seen) = seen {
             self.seen_graph = seen;
+            self.seen_notes = self.notes_position(seen);
         }
         result
     }
@@ -1897,6 +1921,7 @@ impl ProjectionCatalog for MereEndpoint {
                         score: Score::new(Arrangement::Spiral(Default::default())),
                     },
                 },
+                Self::notes_offer(),
             ],
         }
     }
@@ -1912,6 +1937,7 @@ impl ProjectionSource for MereEndpoint {
                 let cards = self.archive_cards()?;
                 self.cards_snapshot(cards, Self::archive_session(), ARCHIVE_SOURCE)
             },
+            MERE_NOTES => self.notes_snapshot(),
             MERE_GRAPH => {
                 let host = Arc::clone(&self.host);
                 let app = self.app.clone();
@@ -1950,6 +1976,7 @@ impl PresentationSource for MereEndpoint {
                     bytes,
                 })
             },
+            MERE_NOTES => self.notes_resource(request),
             MERE_GRAPH => {
                 let host = Arc::clone(&self.host);
                 run(async move {
@@ -1971,6 +1998,7 @@ impl IntentSink for MereEndpoint {
             MERE_SESSIONS => self.invoke_sessions(intent),
             MERE_ARCHIVE => self.invoke_archive(intent),
             MERE_GRAPH => self.invoke_graph(intent),
+            MERE_NOTES => self.invoke_notes(intent),
             other => Ok(IntentResult::Rejected {
                 reason: format!("this mere serves no projection {other:?}"),
             }),
@@ -2007,14 +2035,23 @@ impl ProjectionNoticeSource for MereEndpoint {
                 (host.projection_epoch(), host.projection_revision()),
             )
         });
-        if now == self.seen_graph {
+        if now != self.seen_graph {
+            self.seen_graph = now;
+            return Ok(Some(CarrierNotice {
+                session: graph,
+                epoch: now.0,
+                revision: now.1,
+            }));
+        }
+        let notes = self.notes_position(now);
+        if notes == self.seen_notes {
             return Ok(None);
         }
-        self.seen_graph = now;
+        self.seen_notes = notes;
         Ok(Some(CarrierNotice {
-            session: graph,
-            epoch: now.0,
-            revision: now.1,
+            session: Self::notes_session(),
+            epoch: notes.0,
+            revision: notes.1,
         }))
     }
 }

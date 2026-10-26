@@ -59,6 +59,45 @@ outbound half of the same boundary.
 - Whether expose or consume leads. Expose is the higher-value, more-contained half: it
   rides the command registry and needs no new agent runtime.
 
+## Agent memory on a mere route (2026-10-25)
+
+A harness should not compose graph deltas to remember something. The mere route gains a
+**Notes** projection (`djinn.mere/v1/notes`, explicit route only) beside Sessions, Attached
+session and Archive. `mere_invoke` carries it unchanged, so the door does not change.
+
+- **Where notes live.** A note is a Knot-shaped node in the attached session's graph:
+  url `notes://<uuid>`, title = subject, inline djot `body`, and facet `mere.note` =
+  `{kind, evidence, at_ms}`. It is journaled, undoable and attributed like any edit
+  (`Author::person(persona).via(app)`, the app the door admitted), and Graphshell and Knot
+  read it as an ordinary note.
+- **Write.** The Notes header card advertises `mere.notes.append`, payload
+  `mere.notes.append/v1`:
+  `{"schema", "kind", "subject", "body"?, "evidence"?: [ref]}`. `kind` is 1–64 of
+  `[a-z0-9._-]`; `subject` is one non-blank line, at most 200 characters; `body` is at most
+  64 KiB; `evidence` holds at most 32 refs (URLs or `notes://` addresses), each without
+  whitespace and at most 2 KiB long. Unknown fields are refused. A refused note writes
+  nothing. Effect: domain truth.
+- **Search.** The same card advertises `mere.notes.search`, payload
+  `mere.notes.search/v1`: `{"schema", "text"}`. It sets this connection's query, and the
+  Notes projection then lists matches. Every whitespace-separated term must appear, case
+  folded, in the subject, body, kind or evidence. Empty text lists every note. At most 50
+  notes are listed, newest first. Effect: curation (no domain change).
+- **Prose.** Each note is one portable card: the title is the subject, and the values are
+  kind, address, body and one row per evidence ref. The 64 KiB body bound keeps a card
+  well under the 256 KiB offer cap.
+- **Refused where writes are refused.** The ambient route hides Notes. Divination and
+  personal-facts refuse it, because their writes need journaled candidates. A read-only
+  thaw refuses it until the session is forked.
+
+Questions for Mark:
+
+1. Should agent memory live in the attached session, which is the default and the live
+   session changed last (shared with whatever the owner is editing), or in a dedicated
+   session per harness or per mere?
+2. Evidence refs are stored as strings. Should a ref that names a node in the session also
+   assert a provenance relation to it? The "Provenance" rule above asks for one on every
+   agent mutation, and today the journal's `via` attribution stands in for it.
+
 ## Cross-references
 
 - [borrowed-ideas brief](../research/2026-06-25_borrowed_ideas_brief.md): the source.

@@ -326,6 +326,117 @@ impl SessionsActionV1 {
     }
 }
 
+/// The notes projection: typed notes in the attached session, for agents and
+/// anything else that remembers by appending rather than by editing a graph.
+pub const MERE_NOTES: &str = "djinn.mere/v1/notes";
+pub const NOTES_SOURCE: &str = "mere.notes";
+/// Append one note to the attached session.
+pub const APPEND_NOTE_INTENT: &str = "mere.notes.append";
+/// Schema of [`AppendNoteV1`].
+pub const APPEND_NOTE_SCHEMA: &str = "mere.notes.append/v1";
+/// Set the text this connection's notes projection is filtered by.
+pub const SEARCH_NOTES_INTENT: &str = "mere.notes.search";
+/// Schema of [`SearchNotesV1`].
+pub const SEARCH_NOTES_SCHEMA: &str = "mere.notes.search/v1";
+/// The facet a note's kind, evidence and append time ride in.
+pub const NOTE_FACET: &str = "mere.note";
+/// The address scheme of a note node, Knot's own.
+pub const NOTE_SCHEME: &str = "notes://";
+
+const NOTE_SUBJECT_MAX: usize = 200;
+const NOTE_BODY_MAX: usize = 64 * 1024;
+const NOTE_KIND_MAX: usize = 64;
+const NOTE_EVIDENCE_MAX: usize = 32;
+const NOTE_REF_MAX: usize = 2048;
+
+/// Payload of [`APPEND_NOTE_INTENT`]: what kind of note, about what, its djot
+/// body and the refs it rests on.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AppendNoteV1 {
+    pub schema: String,
+    pub kind: String,
+    pub subject: String,
+    #[serde(default)]
+    pub body: String,
+    #[serde(default)]
+    pub evidence: Vec<String>,
+}
+
+impl AppendNoteV1 {
+    pub fn new(kind: impl Into<String>, subject: impl Into<String>) -> Self {
+        Self {
+            schema: APPEND_NOTE_SCHEMA.into(),
+            kind: kind.into(),
+            subject: subject.into(),
+            body: String::new(),
+            evidence: Vec::new(),
+        }
+    }
+
+    /// Why the route would refuse this note, before anything is written.
+    pub fn check(&self) -> Result<(), String> {
+        if self.schema != APPEND_NOTE_SCHEMA {
+            return Err(format!("unknown note schema {:?}", self.schema));
+        }
+        let kind_ok = |byte: u8| matches!(byte, b'a'..=b'z' | b'0'..=b'9' | b'.' | b'_' | b'-');
+        if self.kind.is_empty()
+            || self.kind.len() > NOTE_KIND_MAX
+            || !self.kind.bytes().all(kind_ok)
+        {
+            return Err(format!(
+                "a note kind is 1 to {NOTE_KIND_MAX} of a-z, 0-9, '.', '_' or '-'"
+            ));
+        }
+        if self.subject.trim().is_empty()
+            || self.subject.chars().count() > NOTE_SUBJECT_MAX
+            || self.subject.contains(['\n', '\r'])
+        {
+            return Err(format!(
+                "a note subject is one non-blank line of at most {NOTE_SUBJECT_MAX} characters"
+            ));
+        }
+        if self.body.len() > NOTE_BODY_MAX {
+            return Err(format!("a note body is at most {NOTE_BODY_MAX} bytes"));
+        }
+        if self.evidence.len() > NOTE_EVIDENCE_MAX {
+            return Err(format!(
+                "a note names at most {NOTE_EVIDENCE_MAX} evidence refs"
+            ));
+        }
+        for reference in &self.evidence {
+            if reference.is_empty()
+                || reference.len() > NOTE_REF_MAX
+                || reference.contains(char::is_whitespace)
+            {
+                return Err(format!(
+                    "an evidence ref is a URL or address of at most {NOTE_REF_MAX} bytes, without whitespace"
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Payload of [`SEARCH_NOTES_INTENT`]. Every whitespace-separated term must
+/// appear, case folded, in a note's subject, body, kind or evidence; empty
+/// text lists every note.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SearchNotesV1 {
+    pub schema: String,
+    pub text: String,
+}
+
+impl SearchNotesV1 {
+    pub fn new(text: impl Into<String>) -> Self {
+        Self {
+            schema: SEARCH_NOTES_SCHEMA.into(),
+            text: text.into(),
+        }
+    }
+}
+
 /// An advertised action on a mere route's vocabulary.
 pub fn advertised(
     intent: &str,

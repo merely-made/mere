@@ -16,7 +16,10 @@ use chirograph::{
 };
 use graphshell_endpoint::dispatch_common;
 use graphshell_mcp::{Config, Server};
-use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1, StepV1, UNDO_INTENT};
+use mere_overmap::wire::{
+    APPEND_NOTE_INTENT, APPLY_EDITS_INTENT, AppendNoteV1, ApplyEditsV1, SEARCH_NOTES_INTENT,
+    SearchNotesV1, StepV1, UNDO_INTENT,
+};
 use serde_json::{Value, json};
 
 const AGENT: &str = "mcp.claude-code";
@@ -103,18 +106,23 @@ async fn server_for(fixture: &Fixture, route: &str, app: &str, writes: bool) -> 
     Server::new(Admitted { session, next: 0 }, config)
 }
 
-/// The resource URI of the attached session's graph projection.
-fn graph_resource(server: &mut Server<Admitted>) -> String {
+/// The resource URI of the projection the route labels `name`.
+fn resource_named(server: &mut Server<Admitted>, name: &str) -> String {
     let listed = ask(server, "resources/list", json!({}));
     listed["result"]["resources"]
         .as_array()
         .unwrap()
         .iter()
-        .find(|resource| resource["name"] == "Attached session")
-        .expect("the route offers the mere's graph")["uri"]
+        .find(|resource| resource["name"] == name)
+        .unwrap_or_else(|| panic!("the route offers no {name}: {listed}"))["uri"]
         .as_str()
         .unwrap()
         .to_string()
+}
+
+/// The resource URI of the attached session's graph projection.
+fn graph_resource(server: &mut Server<Admitted>) -> String {
+    resource_named(server, "Attached session")
 }
 
 /// The graph projection's session-item action named `intent`, with the
@@ -163,7 +171,7 @@ async fn an_agent_writes_a_mere_as_its_granted_app_and_the_door_names_it() {
         .iter()
         .map(|resource| resource["name"].as_str().unwrap())
         .collect();
-    assert_eq!(names, ["Sessions", "Attached session", "Archive"]);
+    assert_eq!(names, ["Sessions", "Attached session", "Archive", "Notes"]);
     let graph_uri = graph_resource(&mut mcp);
 
     let before = read(&mut mcp, &graph_uri);
@@ -308,4 +316,230 @@ async fn the_read_only_ambient_route_offers_an_agent_no_way_to_write() {
         }),
     );
     assert_eq!(refused["result"]["isError"], true, "{refused}");
+}
+
+/// Invoke `intent` on the Notes card with `payload`, at the position the
+/// route last advertised.
+fn on_notes(server: &mut Server<Admitted>, intent: &str, payload: Value) -> Value {
+    let uri = resource_named(server, "Notes");
+    let (instance, epoch, revision) = advertised(server, intent);
+    tool(
+        server,
+        "mere_invoke",
+        json!({
+            "projection": uri, "instance": instance, "intent": intent, "payload": payload,
+            "observed_epoch": epoch, "observed_revision": revision,
+        }),
+    )
+}
+
+/// The notes the Notes projection lists now, as their cards.
+fn listed_notes(server: &mut Server<Admitted>) -> Vec<Value> {
+    let uri = resource_named(server, "Notes");
+    let mut items = read(server, &uri)["items"].as_array().unwrap().clone();
+    assert_eq!(items[0]["offers"][0]["content"]["title"], "Notes");
+    items
+        .split_off(1)
+        .into_iter()
+        .map(|item| item["offers"][0]["content"].clone())
+        .collect()
+}
+
+fn admitted(fixture: &Fixture) {
+    fixture.grants.grant(
+        AppId::new(AGENT),
+        ResidentEndpointRoute::new("identity", MERE_NOTICE_POLL).unwrap(),
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_admitted_agent_appends_a_note_and_finds_it_by_text() {
+    let fixture = fixture(44, "memory").await;
+    admitted(&fixture);
+    let mut mcp = server_for(&fixture, &fixture.route, AGENT, true).await;
+    assert!(listed_notes(&mut mcp).is_empty());
+
+    let mut decision = AppendNoteV1::new("decision", "Servers hold no keys");
+    decision.body = "The door admits the app id; _custody_ keeps the key.".into();
+    decision.evidence = vec![
+        "https://merelyllc.com/roadmap/".into(),
+        "notes://550e8400-e29b-41d4-a716-446655440000".into(),
+    ];
+    let todo = AppendNoteV1::new("todo", "Wire the conformance suite");
+    for note in [&decision, &todo] {
+        let done = on_notes(
+            &mut mcp,
+            APPEND_NOTE_INTENT,
+            serde_json::to_value(note).unwrap(),
+        );
+        assert_eq!(
+            done["result"]["structuredContent"]["result"], "accepted",
+            "{done}"
+        );
+    }
+    assert_eq!(
+        listed_notes(&mut mcp).len(),
+        2,
+        "both notes, before any search"
+    );
+
+    // Every word must match, case folded, across subject, body and evidence.
+    let search = SearchNotesV1::new("CUSTODY roadmap");
+    let done = on_notes(
+        &mut mcp,
+        SEARCH_NOTES_INTENT,
+        serde_json::to_value(search).unwrap(),
+    );
+    assert_eq!(done["result"]["isError"], false, "{done}");
+    let found = listed_notes(&mut mcp);
+    assert_eq!(found.len(), 1, "{found:?}");
+    let note = &found[0];
+    assert_eq!(note["title"], "Servers hold no keys");
+    let values = note["values"].as_array().unwrap();
+    let value = |label: &str| -> Vec<&str> {
+        values
+            .iter()
+            .filter(|row| row["label"] == label)
+            .map(|row| row["value"].as_str().unwrap())
+            .collect()
+    };
+    assert_eq!(value("Kind"), ["decision"]);
+    assert_eq!(value("Body"), [decision.body.as_str()]);
+    assert_eq!(
+        value("Evidence"),
+        [
+            "https://merelyllc.com/roadmap/",
+            "notes://550e8400-e29b-41d4-a716-446655440000"
+        ]
+    );
+    let address = value("Note")[0].to_string();
+    assert!(address.starts_with("notes://"), "{address}");
+
+    let none = SearchNotesV1::new("keys todo");
+    on_notes(
+        &mut mcp,
+        SEARCH_NOTES_INTENT,
+        serde_json::to_value(none).unwrap(),
+    );
+    assert!(
+        listed_notes(&mut mcp).is_empty(),
+        "no note holds both words"
+    );
+
+    // A note is a node of the session graph, a Knot note any client reads.
+    let graph_uri = graph_resource(&mut mcp);
+    let graph = read(&mut mcp, &graph_uri);
+    assert_eq!(
+        graph["items"].as_array().unwrap().len(),
+        3,
+        "session item and two notes"
+    );
+    assert!(graph.to_string().contains(&address), "{graph}");
+
+    // Attributed to the persona via the app the door admitted.
+    let mere = fixture.reservoir.meres().await.remove(0);
+    let sessions = mere_dir(fixture._root.path(), persona(44), mere.id).join("sessions");
+    let mut changes = String::new();
+    for entry in std::fs::read_dir(sessions).unwrap() {
+        changes += &std::fs::read_to_string(entry.unwrap().path().join("changes.jsonl")).unwrap();
+    }
+    // The agent minted the session on attach; each note is one edit after it.
+    let edits = changes
+        .lines()
+        .filter(|line| line.contains(&format!("\"via\":\"{AGENT}\"")))
+        .filter(|line| line.contains("\"kind\":\"edit\""))
+        .count();
+    assert_eq!(edits, 2, "{changes}");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_unadmitted_app_reaches_no_notes() {
+    let fixture = fixture(45, "memory").await;
+    let refused = fixture
+        .catalog
+        .update(|catalog| catalog.open(&fixture.route, &context(AGENT)))
+        .await;
+    assert!(
+        refused.is_err(),
+        "an app the owner has not admitted opens no mere"
+    );
+
+    // Admitted, then denied by the owner: the open door reaches nothing.
+    admitted(&fixture);
+    let mut mcp = server_for(&fixture, &fixture.route, AGENT, true).await;
+    let notes = resource_named(&mut mcp, "Notes");
+    let (instance, epoch, revision) = advertised(&mut mcp, APPEND_NOTE_INTENT);
+    let mere = fixture.reservoir.meres().await.remove(0);
+    fixture
+        .routes
+        .set_access(
+            &fixture.reservoir,
+            mere.id,
+            AppId::new(AGENT),
+            true,
+            false,
+            AppId::new("turnstone"),
+        )
+        .await
+        .unwrap();
+    let note = AppendNoteV1::new("decision", "written after the denial");
+    let denied = tool(
+        &mut mcp,
+        "mere_invoke",
+        json!({
+            "projection": notes, "instance": instance, "intent": APPEND_NOTE_INTENT,
+            "payload": serde_json::to_value(note).unwrap(),
+            "observed_epoch": epoch, "observed_revision": revision,
+        }),
+    );
+    assert_eq!(denied["result"]["isError"], true, "{denied}");
+    let read_back = ask(&mut mcp, "resources/read", json!({ "uri": notes }));
+    assert!(read_back.get("result").is_none(), "{read_back}");
+    let listed = tool(&mut mcp, "mere_actions", json!({}));
+    assert!(
+        listed.get("result").is_none() || listed["result"]["isError"] == true,
+        "{listed}"
+    );
+
+    let mut owner = fixture.attach("turnstone").await;
+    assert_eq!(nodes(&graph(&mut owner)), 0, "nothing was written");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_malformed_note_is_refused_without_mutating_the_mere() {
+    let fixture = fixture(46, "memory").await;
+    admitted(&fixture);
+    let mut mcp = server_for(&fixture, &fixture.route, AGENT, true).await;
+    let graph_uri = graph_resource(&mut mcp);
+    let before = read(&mut mcp, &graph_uri);
+    let note = |patch: Value| {
+        let mut note = serde_json::to_value(AppendNoteV1::new("decision", "a subject")).unwrap();
+        for (key, value) in patch.as_object().unwrap() {
+            note[key] = value.clone();
+        }
+        note
+    };
+    for payload in [
+        json!("not a note"),
+        note(json!({"schema": "mere.notes.append/v2"})),
+        note(json!({"kind": "Decision!"})),
+        note(json!({"kind": ""})),
+        note(json!({"subject": "   "})),
+        note(json!({"subject": "two\nlines"})),
+        note(json!({"subject": "x".repeat(201)})),
+        note(json!({"body": "x".repeat(64 * 1024 + 1)})),
+        note(json!({"evidence": ["has a space"]})),
+        note(json!({"evidence": vec!["https://x.test/"; 33]})),
+        note(json!({"author": "someone else"})),
+    ] {
+        let refused = on_notes(&mut mcp, APPEND_NOTE_INTENT, payload.clone());
+        assert_eq!(refused["result"]["isError"], true, "{payload}: {refused}");
+    }
+    let after = read(&mut mcp, &graph_uri);
+    assert_eq!(
+        after["revision"], before["revision"],
+        "no change was written"
+    );
+    assert_eq!(after["items"], before["items"]);
+    assert!(listed_notes(&mut mcp).is_empty());
 }

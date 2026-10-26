@@ -186,8 +186,8 @@ async fn snapshots(client: &mut AppBrokerClient) -> Vec<ProjectionSnapshot> {
     let opened = client.open_session().await.unwrap();
     assert_eq!(
         opened.descriptor.projections.len(),
-        3,
-        "sessions, graph and V3 archive"
+        4,
+        "sessions, graph, V3 archive and notes"
     );
     let mut snapshots = Vec::new();
     for offer in opened.descriptor.projections {
