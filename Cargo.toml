@@ -29,7 +29,6 @@ members = [
     "crates/domain/site",
     "crates/platen/platen",
     "crates/fleece",
-    "crates/intel/eidetic-search",
     "crates/intel/mora-cmudict",
     "crates/intel/reference-data",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
@@ -475,14 +474,9 @@ site-model = { package = "mere-site", version = "0.1.0", path = "crates/domain/s
 personal-facts = { package = "mere-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
 apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80", default-features = false }
 eidetic = { version = "0.0.2", default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "f599ffe93298025bf6d65ae310a7cb4270ea52e3" }
-# Lexical search over the trail (Phase 9 producer half): an in-tree BM25
-# index + weighted-field recall + column reports + the hybrid-fusion seam.
-# tantivy was retired 2026-09-07 (98 crates, a C build, no wasm). Lives under
-# `crates/intel/` since 2026-09-04 (platform boundary plan, P5): it is a Mere
-# product concern over browsing traces, reaching esp and import, and the
-# lexical half of the hybrid recall whose vector half is `esp::embed`. The
-# portable eidetic core it was sitting beside reaches neither.
-eidetic-search = { path = "crates/intel/eidetic-search" }
+# Derived lexical recall is owned by Eidetic. Hosts supply the retained corpus
+# and any vector rankings; model backends remain optional.
+eidetic-search = { git = "https://github.com/merely-made/eidetic.git", rev = "354ab71c08459355278aa3ff32ef8e3493e85653" }
 
 # Standalone spec-B misfin implementation (promoted out of this workspace
 # 2026-07-03). It moved into the smolweb workspace in the 2026-07-23

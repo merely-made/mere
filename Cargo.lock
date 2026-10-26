@@ -5268,16 +5268,12 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/eidetic.git?rev=354ab71c08459355278aa3ff32ef8e3493e85653#354ab71c08459355278aa3ff32ef8e3493e85653"
 dependencies = [
  "eidetic",
- "esp",
  "genet-text",
- "muniment",
- "pollster 0.4.0",
  "serde",
  "serde_json",
- "sha2 0.11.0",
- "tempfile",
  "thiserror 1.0.69",
 ]
 

@@ -1840,9 +1840,12 @@ its isolated consumer now imports this adapter directly. Credential scopes,
 AppIds and wire identities are unchanged. `eidetic-search` remains an active separate
 BM25/document index and ranking implementation, used by Distillery and
 Turnstone and Moot; its library needs Eidetic and Genet text segmentation.
-The source has been prepared in Eidetic under `eidetic/crates/eidetic-search`, with
-model backends opt-in. The donor copy remains until the provider revision and
-actual consumer cutover are qualified.
+The source is now published in Eidetic under `eidetic/crates/eidetic-search`, at
+`354ab71c08459355278aa3ff32ef8e3493e85653`, with model backends opt-in. Its 40
+package tests pass (three harnesses ignored), and the optional recall example
+compiles on Rust 1.99.1. The donor source and workspace membership are removed;
+Mere and Turnstone now name that exact owner revision in their candidate
+manifests. Receiving lock and native checks remain separate gates.
 
 The obsolete `shell-state` re-export crate and unconsumed `content-contract`
 worker protocol are removed with their workspace entries. Chrome remains used
@@ -1939,6 +1942,10 @@ have not run on this final candidate. At 21:48 UTC the workspace held
 reservation was refused. The client alone used a documented 4 GiB estimate
 based on its prior 1.892 GiB cold build. No broader build inherits that
 estimate, and no cache protection or storage policy has been bypassed.
-Search promotion is saved locally in Eidetic `098e8a1`; it is unpublished,
-and its donor removal and consumer pin cutover remain pending. Mere's
-refactor is also local and unpublished.
+Mark subsequently approved a 200 GiB cache budget, retaining the 100 GiB
+free-space floor and all cleanup protections; 43 guard regression tests pass.
+Search promotion is published in Eidetic `354ab71`, and the local Mere donor
+has been removed in favor of that exact provider. Its tests pass and its
+optional model example compiles; no model runtime acceptance is implied.
+Mere's remaining component and receiving-consumer checks are in progress;
+the Mere refactor remains local and unpublished.
