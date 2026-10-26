@@ -1602,3 +1602,7 @@ mod tests {
         custody.shutdown().await.unwrap();
     }
 }
+
+#[cfg(test)]
+#[path = "resident_site/adoption_tests.rs"]
+mod adoption_tests;

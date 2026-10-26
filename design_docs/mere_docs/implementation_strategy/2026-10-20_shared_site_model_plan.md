@@ -1,6 +1,6 @@
 # Shared site model extraction
 
-**Status (2026-10-22):** extraction and optional saved-site revision storage
+**Status (2026-10-26):** extraction and optional saved-site revision storage
 landed. The optional Moot publication binding is landed, with Gemini,
 Scroll and Micron as the first profiles. Snapshot V1 stays unchanged.
 The Gemini, Scroll and Micron runtime continuations are implemented and qualified
@@ -8,6 +8,8 @@ through native processes.
 Native Scroll replies now live in Errand and Knot uses them with unchanged V1
 fixtures. Both shared read loaders require explicit Submit for Titan and Spartan
 submission URLs; focused native tests qualify that rule.
+Published Mere already selects Errand `897fb963`; its Djinn host and process
+qualification continuation below passes on that cohort. Turnstone adoption stays separate.
 
 ## Scope and ownership
 
@@ -23,6 +25,62 @@ Djinn keeps custody, host identity, certificates, listener policy and resident l
 Cross-Moot publication lineage and peer acquisition are subsequent work.
 The Gemini resident uses existing Errand and Armillary seams. Existing V1 limits and profile semantics remain
 unchanged; the adapters reuse existing publication and storage authority.
+
+## Errand adoption in Mere/Djinn (2026-10-26)
+
+Published source `1c61d792c` already selects qualified Errand `897fb963`.
+Qualify that existing cohort rather than introducing another supplier change.
+Keep every root manifest/lock identity fixed, including Knot's independently
+selected peer-enabled package. Mere fetch and document receiving remain shared
+consumers of this same transport source; Turnstone's intake stays separate.
+
+Djinn retains `GeminiListenerPolicyV1`: eight admitted connections by default,
+at most 32, and a 2,000 ms default request allowance, at most 30,000 ms.
+Its semaphore sheds an already accepted excess socket. Armillary owns admitted
+tasks and `close_and_join`; the dedicated host worker is joined afterwards.
+The existing whole-task timer covers TLS and handler work, including response
+writes and close. It starts when the admitted future is polled, without charging
+OS backlog time. Native Scroll keeps its supplied-stream exchange and explicit
+native byte limits inside that host boundary. Preserve these policies and the
+publication-activation gate; do not transplant Knot's admission pause or grace.
+Host policy remains separate from snapshot V1 and community authority.
+
+Done when native controls qualify unchanged defaults/bounds, overload shedding,
+the cumulative TLS/handler deadline, active-handler cancellation/drop and clean
+or panicked Armillary task reports; existing service restart/certificate and
+publication-authority tests pass. Re-run the unchanged Knot Gemini and Scroll
+publisher/resident process fixtures against the newly built Djinn executable,
+preserving exact native metadata/body/abstract bytes, V1, current membership,
+replacement and withdrawal. Check shared fetch/document limits and relevant
+independent feature graphs on the same cohort.
+
+Use the existing stable Mere and Knot targets, explicitly setting both Cargo
+target and build-directory variables. Compact source/lock, command and process
+receipts share a 100 MB retained-byte cap across repositories. The primary Mere
+checkout has another lane's staged work and a separate unpublished commit;
+integrate in `Code/worktrees/mere-errand-adoption`, then remove that worktree
+after its clean committed result is integrated and pushed. Keep the primary
+checkout and index intact.
+
+Qualification passes with five new host controls, the existing eight resident
+and seven governed-host cases, three service integration cases, 48 shared fetch
+and 76 document cases, plus 16 shared-site integration cases and its doctest.
+Both explicitly invoked Knot process fixtures pass against the rebuilt Djinn
+resident: two publishers and three residents per protocol, exact native replies,
+certificate continuity, replacement, membership revocation and withdrawal, with
+an active request cancelled and joined at final shutdown. These are native
+localhost process receipts; headed interaction and independent-machine delivery
+remain separate gates. Production host code, snapshot V1, manifests and locks
+are unchanged.
+
+Strict fetch Clippy passes. Document Clippy requires the existing
+`collapsible_if` allowance. Djinn library plus `published_site` Clippy completes
+with existing warnings; blanket strict Clippy remains blocked by pre-existing
+diagnostics, and the broader all-tests graph also exposes unrelated
+`resident_tasks` and `passphrase_change` fixture failures. This slice does not
+claim a strict whole-port lint pass. The compact
+[qualification receipt](../../../support/receipts/errand-adoption/qualification.json)
+records exact inputs, commands, results and those limits.
 
 ## Phases and done-conditions
 
