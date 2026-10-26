@@ -5,7 +5,8 @@
 catalogs cover, what a complete catalog would have to add, and the loops a
 catalog has to close. No ruling, no code, no work assigned. Amended the same
 day with §6, where the catalogs disagree with each other and with the tree,
-and §7, Mark's rulings 1 to 5 on them.
+§7, Mark's rulings 1 to 5 on them, and §8, his refinement of rulings 1 and 3:
+a frame hosts one presentation, and what a mod contributes is a catalog axis.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -91,6 +92,10 @@ chip; scope trail; settings page; status bar; dialog.
 persistence; actors and workers; resources; engines; analysis and
 generation; networking and transports; sharing and community; identity and
 encryption; asynchrony; mesh computation. Plus the ones §3 adds.
+
+**A third axis, from §8: what a mod contributes.** A presentation, a pane
+adapter, a pane, or a servitor. Every row above can be supplied by a
+contribution of one of those kinds, and the catalog says which.
 
 **Each cell answers two questions.**
 
@@ -368,3 +373,87 @@ variants and `ToolPaneState` carries five names that now fold (kernel
 the dock contract still lives in the comms pane rather than Cambium's shell.
 Both are mechanical under rulings 1, 2 and 5, and neither touches a stored
 format.
+
+## 8. Refinement of rulings 1 and 3: a frame hosts one presentation
+
+Mark, 2026-10-26, after the rulings: "have we goofed on the panes? Missing
+any... overlap... or the concept? It's kinda like tile with no tab, but also a
+good embedding sidecar right? Does it make sense to have like redshank panes,
+or knot, signalman...? And integrate content into the graph while using the
+embedded app as a viewer? And make them available as selectable mods?" And,
+on the first telling of this section: "it seems like enrichment, but also
+there are a lot of legacy concepts in this telling that need consolidation to
+avoid conflicting."
+
+**What the tree says.** The kernel's `crates/graph/graph-kernel/src/pane.rs`
+(April, pre-flip) defines a pane as any frame leaf hosting a "viewer", with
+`TileRenderMode` naming Servo, Wry and an egui host as the ways pixels are
+made. That is the "tile with no tab, embedding sidecar", in the words of its
+day. The live words are TERMINOLOGY's: a **reader** (`inker::Engine`) parses
+acquired content into the document model and document-canvas presents it; a
+**surface producer** is a long-lived presentation driven by an inker host,
+input in, frames out, which is what an embedded application is; the
+interaction spine's three lanes classify how either reaches the screen. Knot
+documents are already presented by nematic's Knot reader (`ENGINE_KNOT`,
+`ENGINE_KNOT_DJOT`), and edits cross back through the shared source-edit
+proposals. The Comms pane is an adapter model: a `ProtocolAdapter`
+(`crates/shell/comms/src/adapter.rs`) presents one backend as conversations
+and accepts a draft. Misfin is both a reader (`ENGINE_MISFIN`) and a comms
+adapter, and nothing says which a node that references a mailbox opens into.
+The mod manifest (`crates/system/registry/src/mod_loader/loader/types.rs`)
+has `provides` as an untyped list of strings, `ModType` as Native or Wasm, and
+`ModCapability` as Network, Filesystem, Identity, Clipboard, Exec: trust and
+loading, with no word for what a mod adds to the GUI. Pelt already carries a
+per-tile reader override (`route_overrides` in `ports/pelt/viewer.rs`).
+
+**Ruled, refining 1 and 3.** A frame hosts one presentation: a reader's
+document, or a surface producer. A tile is a frame presenting a node's
+resource; a pane is a frame presenting an answer to one question about the
+graph or the system. They differ by what is presented, not by whether an
+application is embedded: a surface producer can be what either presents.
+Ruling 1's pane list and ruling 3's workbench stand; this names the axis they
+sit on.
+
+**Contributions, a catalog axis.** What a pack or mod adds to the GUI is one
+of four kinds:
+
+| Kind | What it is | Existing seam | Example |
+|---|---|---|---|
+| presentation | a reader or a surface producer registered with inker, which a node's resource opens into (the design language record's "registered presentation") | inker's registry and routing; the engine flip; pelt's per-tile route override | Knot documents (a reader); the Knot editor or a playback application (a surface producer) |
+| pane adapter | a feed into an existing pane | comms `ProtocolAdapter` | Signalman's LXMF path into Comms |
+| pane | a new question about the graph or system | ruling 1's list; `SurfaceId` under ruling 2 | Steward, when built |
+| servitor | a participant under a grant | the participant gate; a swatch over its nested graph is its inspection UI | a resident helper |
+
+Knot, Signalman and Redshank therefore want a presentation, a pane adapter
+and a presentation, not three panes. Redshank is read here only from its docs
+(a playback piece with Web Annotation tests); if its annotations are kept,
+they are link-model assertions. Selection falls to the settings capability for
+per-mere defaults and to a per-node presentation override on the object card,
+which pelt's per-tile override already shapes.
+
+**Content in the graph, the application as what presents it.** This is the
+[family composition brief §8](../../2026-08-12_family_composition_thesis_brief.md#8-primary-data-model-clips-and-live-entities-2026-10-11)
+direction, and three of its four seams exist: inker routes content type to
+reader, resources are identified by canonical IRI, and source-edit proposals
+carry edits back. The fourth, what an embedded application declares, is split
+across inker's registry and producer capabilities, the mod manifest's trust
+fields, and the resource-leaf draft, with no single contract.
+
+**Examined critically, the same day.** The first telling of this section
+leaned on four words that TERMINOLOGY has retired or never had, and they are
+consolidated here rather than added: *viewer* (the kernel's April word and the
+registry's unextracted "viewer registry") is *presentation*, a reader or a
+surface producer; *engine* as a contribution kind is retired for readers
+(survivors table) and lives only for inference and script engines, so the kind
+is *presentation* and the example is a *reader*; `TileRenderMode`'s Servo and
+Wry modes are the pre-flip classification, and the interaction spine's lanes
+are the live one; the May gate name `engine.route_override` is not in the
+tree, and pelt's `route_overrides` is. `PaneId`, `TileRenderMode` and
+`PanePresentationMode` join the survivors table as the kernel's pane-as-frame
+sense.
+
+**What this leaves, as cues.** The mod manifest's `provides` has no vocabulary
+for the four kinds. Misfin's double registration has no rule for which opens.
+An embedded application's declaration (what it presents, what it exposes as
+resource leaves and clips, what it accepts back, how it reaches the screen)
+lives in three places.
