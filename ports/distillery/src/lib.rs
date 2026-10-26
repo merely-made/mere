@@ -23,8 +23,9 @@
 //!
 //! - **Not esp.** The inference/embedding seam crate stays the portable burn
 //!   boundary; distillery drives it.
-//! - **Not mere-mesh or mere-mesh-host.** Job grammar, leases, and the
-//!   supervisor are substrate; distillery embeds and renders them.
+//! - **mere-mesh** owns the portable job grammar and leases. Distillery owns
+//!   the host lifecycle and mesh-host runtime that sense devices and supervise
+//!   admitted work.
 //! - **Not servitor.** Whether an admitted participant may petition at all stays
 //!   the gate's office.
 //! - **Not turnstone.** The flagship embeds the same views; distillery is the
@@ -33,7 +34,7 @@
 //! The trainer lane (Distillery-as-trainer, per the geist brief) lands here
 //! later, behind its own plan: training is one more job the works runs.
 //!
-//! [`Distillery`] is the first real consumer of `mere-mesh-host`. Its D0
+//! [`Distillery`] combines `mere-mesh` with its `mesh_host` runtime. Its D0
 //! authority drives the non-blocking supervisor and owns checkpoint/collection.
 //! [`ResidentAuthority`] is D1's long-lived process body: it owns persistent
 //! collecting storage, the transport shutdown order, configurable tick and

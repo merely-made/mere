@@ -20,8 +20,12 @@ default = ["document-layout"]
 # Keep document rendering in ordinary hosts; graph-only viewers need only
 # the tiling model and must not activate its text-engine feature choices.
 document-layout = ["dep:document-canvas"]
+# Reusable workspace layout, draft history and acknowledged save lifecycle.
+workspace-editor = ["dep:kernel", "dep:backstep", "uuid/v4"]
 
 [dependencies]
+kernel = { workspace = true, optional = true }
+backstep = { workspace = true, optional = true }
 accesskit.workspace = true
 document-canvas = { workspace = true, optional = true }
 inker.workspace = true

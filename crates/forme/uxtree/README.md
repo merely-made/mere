@@ -86,4 +86,4 @@ and event synthesis stay with the host. Dependencies are `accesskit`, `inker`
 
 Pre-1.0. Document blocks and inline links are covered. Mere structural elements
 project through the domain crates that sit on top of this one (`workbench`,
-`mere-gloss`, `mere-apparatus`), each emitting its own subtree for `stitch`.
+`mere-gloss`), each emitting its own subtree for `stitch`.

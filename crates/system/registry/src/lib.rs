@@ -25,6 +25,8 @@ pub mod layout;
 pub mod lens;
 #[cfg(feature = "mod-loader")]
 pub mod mod_loader;
+#[cfg(feature = "observations")]
+pub mod observations;
 #[cfg(feature = "protocol")]
 pub mod protocol;
 #[cfg(feature = "viewer")]

@@ -13,6 +13,7 @@ name = "registry"
 [features]
 default = ["diagnostics", "input", "knowledge", "layout", "lens", "mod-loader", "protocol", "viewer"]
 diagnostics = ["dep:log", "dep:web-time"]
+observations = ["diagnostics", "dep:apparatus-core"]
 input = ["dep:serde", "dep:hest"]
 knowledge = ["dep:nucleo", "dep:parking_lot", "dep:serde", "dep:serde_json", "dep:tincture"]
 layout = ["dep:serde"]
@@ -26,6 +27,7 @@ pdf = ["viewer"]
 test-utils = ["mod-loader"]
 
 [dependencies]
+apparatus-core = { workspace = true, optional = true }
 web-time = { version = "1", optional = true }
 # Default key bindings name the shared command ids (Scenograph editor plan, SE50).
 hest = { workspace = true, optional = true }

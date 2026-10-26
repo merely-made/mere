@@ -87,16 +87,16 @@ impl EventLog {
     }
 
     /// Each inspection/receipt reader owns a separate cursor. No backfill when off.
-    pub fn diagnostic_cursor(&self) -> Result<Option<apparatus::Cursor>, String> {
+    pub fn diagnostic_cursor(&self) -> Result<Option<apparatus_core::Cursor>, String> {
         let inner = self.0.lock().map_err(|_| "event log lock poisoned")?;
         Ok(inner.diagnostics.as_ref().map(LifecycleDiagnostics::cursor))
     }
 
     pub fn read_diagnostics(
         &self,
-        cursor: &mut apparatus::Cursor,
+        cursor: &mut apparatus_core::Cursor,
         max_records: usize,
-    ) -> Result<Option<apparatus::collector::CollectedBatch<LifecyclePhase>>, String> {
+    ) -> Result<Option<registry::observations::CollectedBatch<LifecyclePhase>>, String> {
         let mut inner = self.0.lock().map_err(|_| "event log lock poisoned")?;
         inner
             .diagnostics

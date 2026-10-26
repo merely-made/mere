@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 // This module carries two portable types: `ContentLoadState` and
 // `ViewerInstanceId` (declared below, after the load-state tests). The
 // 2026-04-22 viewer-identity design pass is settled — a sum-over-providers
-// enum, not a generic parameter threaded through the shell-state types, and
+// enum, not a generic parameter threaded through host session-state types, and
 // the Servo variant holds its `WebViewId` in `serde_json` form rather than the
 // packed `u64` first sketched, because `WebViewId`'s fields are private to the
 // servo crate. Per-variant encoding is documented on `ViewerInstanceId` itself.
@@ -246,7 +246,7 @@ mod tests {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum ViewerInstanceId {
     /// A `servo::WebViewId` encoded as its `serde_json` representation.
-    /// The inner string is treated as opaque by the shell-state crate;
+    /// The inner string is treated as opaque by host session state;
     /// only the servo boundary inspects it.
     Servo(String),
     /// Reserved for future Wry viewer integration. The `u64` payload

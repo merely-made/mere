@@ -55,6 +55,10 @@ pub mod accessibility;
 /// `platen-view`'s flex DOM under genet).
 pub mod workbench;
 
+/// Host-independent workspace editing, with host-supplied preferences.
+#[cfg(feature = "workspace-editor")]
+pub mod workspace;
+
 /// Tree projection — compiles a forme [`forme::Arrangement`] into a
 /// [`tree_projection::WorkbenchPlan`] (splits of tab-stacks), platen's core
 /// role under the composition spine. Sibling projections (cartography,

@@ -1415,10 +1415,10 @@ Apparatus pane. Application Settings remains separate. Both migrations now have
 qualified source changes and native restart receipts. Within-document selection
 inspection and background/sync controls remain later work.
 
-Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
-a renderer-independent observation store. Its older empty diagnostic groups
-remain behind the default `projection` feature; those placeholders do not
-establish a working inspection interface.
+The former Mere Apparatus facade and its empty diagnostic groups have been
+removed. Registry now owns the opt-in observations collector; product-owned
+views own accessibility presentation. This plan's earlier Apparatus crate
+references describe the former implementation and are not current source links.
 [Alembic](../../../crates/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary/README.md) owns actor execution and messaging.
@@ -1854,9 +1854,9 @@ through typed observations and actions rather than raw pixel puppetry.
 - `crates/shell/frame` *(historical citation)* <!-- doc-audit: historical-path --> now gives meerkat a real pane tree. Its projected leaves
   are the natural unit for diagnostics, focus, accessibility bounds, and agent
   action targets.
-- `crates/domain/apparatus` is a useful domain skeleton for an
-  accessibility projection, but the current rendered pane belongs in `meerkat`
-  like roster/gloss/comms. The domain crate should not be mistaken for a full UI.
+- The former `crates/domain/apparatus` accessibility skeleton has been removed.
+  Registry owns diagnostic observations, and Turnstone's private
+  `swatch_pane/inspection` module owns its inspection UI.
 - `crates/shell/chrome` still has valuable Graphshell-era shell semantics:
   toolbar, omnibar, command palette, focus authorities, host intents, routing
   hints, and the eventual `project_chrome(state) -> UxTree` direction.

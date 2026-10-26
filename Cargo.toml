@@ -16,16 +16,15 @@ members = [
     # The labelled state witness G8 and Isocosm share (F116 to F131).
     "crates/system/state-witness",
     "crates/system/source-edit",
-    "crates/system/content-contract",
-    "crates/system/shell-state",
     "crates/system/registry",
+    # Shared custody adapter for Djinn-managed Retinue stations.
+    "crates/system/station-custody",
     "crates/system/tabard",
     "crates/distillery/alembic",
     "crates/system/ux-events",
     "crates/forme/curation",
     "crates/forme/forme",
     "crates/forme/uxtree",
-    "crates/domain/apparatus",
     "crates/domain/personal-facts",
     "crates/domain/site",
     "crates/platen/platen",
@@ -35,8 +34,8 @@ members = [
     "crates/intel/reference-data",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
     # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
-    # the persona picker stays until D7's condition is met.
-    "crates/dramatis/persona-picker",
+    # the shared persona picker belongs to the Cambium widget family.
+    "crates/cambium/persona-picker",
     "crates/mesh/mesh",
     "crates/script/rhai",
     "crates/script/document-host",
@@ -76,9 +75,6 @@ members = [
     "ports/moot",
     "ports/distillery/athanor",
     "ports/gazette",
-    # Commissions and operates Retinue stations through Castellan. A member
-    # since the p2panda 0.7.5 repin (device pairing plan, ruling 35).
-    "ports/signalman",
     # ─── Landed 2026-09-03 from genet (design_docs/mere_docs/implementation_
     # strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md,
     # the consumers-first half of P3) ───
@@ -111,7 +107,6 @@ members = [
     # Shared authoring surface; the standalone product is ports/tabard/desktop.
     "crates/cambium/tabard-workshop",
     "crates/cambium/cambium-genet-web-host",
-    "crates/cambium/command-menu",
     "crates/cambium/hest",
     "crates/cambium/backstep",
     "crates/cambium/meristem",
@@ -156,7 +151,6 @@ members = [
 exclude = [
     "support/patches/accesskit",
     "support/patches/light-file-dialog",
-    "crates/cambium/hest-0_1",
     "crates/probes",
     # The unpublished browser host carries Git-only Genet presentation deps.
     # Keep it outside release resolution. NOTE: the entry below sits inside a
@@ -312,9 +306,7 @@ mere = { path = "crates/mere" }
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
 framing = { package = "mere-framing", version = "0.0.2", path = "crates/system/framing" }
 page-load = { package = "mere-pageload", version = "0.0.1", path = "crates/system/page-load" }
-content-contract = { path = "crates/system/content-contract" }
 proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", rev = "f599ffe93298025bf6d65ae310a7cb4270ea52e3" }
-shell-state = { path = "crates/system/shell-state" }
 incipit = { version = "0.2.0", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
 comms = { package = "mere-comms", path = "crates/shell/comms" }
@@ -367,7 +359,6 @@ mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-web = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
-command-menu = { version = "0.1.1", path = "crates/cambium/command-menu" }
 hest = { version = "0.2.0", path = "crates/cambium/hest" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
@@ -482,7 +473,7 @@ uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 platen = { version = "0.0.1", path = "crates/platen/platen" }
 site-model = { package = "mere-site", version = "0.1.0", path = "crates/domain/site" }
 personal-facts = { package = "mere-facts", version = "0.1.0", path = "crates/domain/personal-facts" }
-apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus", default-features = false }
+apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80", default-features = false }
 eidetic = { version = "0.0.2", default-features = false, git = "https://github.com/merely-made/eidetic.git", rev = "f599ffe93298025bf6d65ae310a7cb4270ea52e3" }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
 # index + weighted-field recall + column reports + the hybrid-fusion seam.
@@ -560,7 +551,7 @@ insigne = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.gi
 chatelaine = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The shared "which persona am I?" list. A Cambium view over the personae
 # roster, so the four applications with a GUI draw one picker rather than four.
-persona-picker = { package = "persona-picker", path = "crates/dramatis/persona-picker" }
+persona-picker = { package = "persona-picker", path = "crates/cambium/persona-picker" }
 
 # Rhai backend for the knot block-evaluator lane (the thin BlockEvaluator
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
@@ -708,7 +699,6 @@ armillary = { git = "https://github.com/merely-made/armillary.git", rev = "864f1
 cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-a11y = { path = "crates/cambium/cambium-winit-a11y" }
-command-menu = { path = "crates/cambium/command-menu" }
 hest = { path = "crates/cambium/hest" }
 document-canvas = { path = "crates/inker/document-canvas" }
 backstep = { path = "crates/cambium/backstep" }
@@ -718,7 +708,6 @@ incipit = { path = "crates/incipit" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "f599ffe93298025bf6d65ae310a7cb4270ea52e3" }
 mere = { path = "crates/mere" }
 mere-alembic = { path = "crates/distillery/alembic" }
-mere-apparatus = { path = "crates/domain/apparatus" }
 mere-cartography = { path = "crates/canvas/cartography" }
 mere-curation = { path = "crates/forme/curation" }
 mere-lanes = { path = "crates/system/document-lanes" }

@@ -664,7 +664,7 @@ Mark: **"Rebuild the release on top (Recommended)"**.
 crates.io 0.7.1, where the audited CBOR split cannot compile. Which?*
 Options: patch it onto the fork tag; leave it on crates.io 0.7.1. Mark:
 **"Patch it onto the fork tag (Recommended)"**. Follows: a `[patch.crates-io]`
-row in `ports/signalman`; its graph drops the dalek-2 family (287 to 278
+row in `ports/signalman` *(historical citation)* <!-- doc-audit: historical-path -->; its graph drops the dalek-2 family (287 to 278
 packages, measured). A desktop workspace outside mere that patches retinue
 will need the same row. *Superseded by ruling 35.*
 

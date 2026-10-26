@@ -36,6 +36,12 @@
 //! from the same numbers the view lays out with. [`MERE_VIEW_CSS`] is the
 //! structural sheet; colour comes from the host's sheet and palette.
 
+#[cfg(feature = "query-editor")]
+pub mod query_editor;
+
+#[cfg(feature = "workbench-editor")]
+pub mod workbench_editor;
+
 mod folds;
 pub use folds::fold_node_key;
 mod layout;

@@ -91,7 +91,7 @@ pub use pixels::{PixelCheck, Viewport, ViewportTransform, create_parent, write_p
 /// A bounded, product-redacted diagnostics batch for a requested run receipt.
 /// The product chooses its reader and correlation references. Sampling at the
 /// lane's completion does not establish that every record caused a captured frame.
-pub type DiagnosticBatch = apparatus::Batch<serde_json::Value>;
+pub type DiagnosticBatch = apparatus_core::Batch<serde_json::Value>;
 
 /// The host context a [`Product`]'s hooks are handed, spelled once.
 pub type Ctx<'a, P> =
