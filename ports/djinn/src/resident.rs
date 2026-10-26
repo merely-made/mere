@@ -15,7 +15,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use armillary::lifecycle::{CloseAction, CloseFuture, close_all};
-use castellan::custody::bootstrap::Unlock;
 use castellan::lock::VaultLockHolder;
 use castellan::resident::{CastellanResident, CredentialSalts};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
@@ -63,6 +62,46 @@ pub struct DjinnResident {
     reservoir: ReservoirLane,
 }
 
+/// Where the Distillery works' mesh author comes from: reviewed derived
+/// keys for exactly [`distillery::InstalledAuthority::release_salts`],
+/// never a second vault open (custody isolation plan, §5.1).
+#[derive(Clone)]
+pub enum MeshAuthor {
+    /// Captured from the resident's own open identity.
+    Resident,
+    /// Released by the independently launched custodian (H1).
+    Custodian(Arc<crate::custodian::CustodianLink>),
+}
+
+impl MeshAuthor {
+    fn identity<P: IdentityProvider + ?Sized>(
+        &self,
+        resident: &P,
+        profile: &ProfileId,
+    ) -> Result<(Arc<dyn IdentityProvider>, String), String> {
+        let salts = distillery::InstalledAuthority::release_salts();
+        match self {
+            Self::Resident => personae::RetainedKeys::capture(resident, &salts)
+                .map(|keys| {
+                    (
+                        Arc::new(keys) as Arc<dyn IdentityProvider>,
+                        "derived keys captured from the resident's open vault".to_string(),
+                    )
+                })
+                .map_err(|error| format!("capture the Distillery mesh author: {error}")),
+            // A consent petition may wait on the owner; the worker is lent.
+            Self::Custodian(link) => tokio::task::block_in_place(|| link.release(&profile.0, &salts))
+                .map(|keys| {
+                    (
+                        Arc::new(keys) as Arc<dyn IdentityProvider>,
+                        "derived keys released by the custodian".to_string(),
+                    )
+                })
+                .map_err(|refusal| format!("the custodian's Distillery mesh author: {refusal:?}")),
+        }
+    }
+}
+
 impl DjinnResident {
     /// Open a resident with local-only inference. Hosts with personal sync use
     /// `open_deferred_inference`, then start inference against that live host.
@@ -71,12 +110,10 @@ impl DjinnResident {
         data_root: &Path,
         profile: &ProfileId,
         owner: OwnerSettings,
-        vault_dir: &Path,
-        unlock: Unlock,
+        mesh_author: MeshAuthor,
     ) -> Result<Self, String> {
         let resident =
-            Self::open_deferred_inference(identity, data_root, profile, owner, vault_dir, unlock)
-                .await?;
+            Self::open_deferred_inference(identity, data_root, profile, owner, mesh_author).await?;
         #[cfg(feature = "inference")]
         let mut resident = resident;
         #[cfg(feature = "inference")]
@@ -92,21 +129,17 @@ impl DjinnResident {
     /// Open the credential, content, and optional Knot and Distillery
     /// authorities selected for one already-unlocked Personae profile.
     ///
-    /// `vault_dir` and `unlock` are threaded through for the Distillery lane
-    /// alone. It opens the shared Personae vault a second time, on the same
-    /// directory, because its identity is a *profile-derived* mesh author
-    /// rather than the process's `IdentityProvider` — and Personae's storage
-    /// opens are not exclusive, so the two coexist. Passing an already-opened
-    /// vault instead would mean either handing this constructor a Personae
-    /// internal or moving the derivation out of Distillery, and both cost more
-    /// than one extra open.
+    /// The Distillery lane's identity is a profile-derived mesh author. It
+    /// used to come from a second open of the same vault under a kept copy
+    /// of the start's passphrase; it now comes from `mesh_author`: exactly
+    /// the works' two release salts, captured from `identity` or released by
+    /// the custodian (custody isolation plan, §5.1). No vault is opened here.
     pub async fn open_deferred_inference<P: IdentityProvider + ?Sized>(
         identity: &P,
         data_root: &Path,
         profile: &ProfileId,
         owner: OwnerSettings,
-        vault_dir: &Path,
-        unlock: Unlock,
+        mesh_author: MeshAuthor,
     ) -> Result<Self, String> {
         // Before anything opens, so a refusal leaves nothing to unwind.
         resident_inference::validate(&owner)?;
@@ -163,16 +196,21 @@ impl DjinnResident {
         };
         let distillery = match owner.distillery {
             Some(lane) => {
-                match ResidentDistillery::open_mesh(
-                    data_root,
-                    profile,
-                    vault_dir,
-                    unlock,
-                    lane,
-                    automatic_mesh,
-                )
-                .await
-                {
+                let opened = match mesh_author.identity(identity, profile) {
+                    Ok((author, protection)) => {
+                        ResidentDistillery::open_mesh(
+                            data_root,
+                            profile,
+                            author,
+                            protection,
+                            lane,
+                            automatic_mesh,
+                        )
+                        .await
+                    },
+                    Err(error) => Err(error),
+                };
+                match opened {
                     Ok(distillery) => Some(distillery),
                     Err(open_error) => {
                         // Unwind in reverse construction order: the Knot lane

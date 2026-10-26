@@ -17,6 +17,7 @@
 //! unresolved so callers can surface an honest degraded startup state rather
 //! than silently falling back to plaintext.
 
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
@@ -32,21 +33,62 @@ pub const PERSISTED_LOCK_FILE: &str = "locked";
 
 /// Whether `vault_dir` carries the persisted lock.
 pub fn lock_persisted(vault_dir: &Path) -> bool {
-    vault_dir.join(PERSISTED_LOCK_FILE).is_file()
+    // A malformed or unreadable marker must not turn into unattended unlock.
+    match std::fs::symlink_metadata(vault_dir.join(PERSISTED_LOCK_FILE)) {
+        Ok(_) => true,
+        Err(error) => error.kind() != std::io::ErrorKind::NotFound,
+    }
 }
 
 /// Record that `vault_dir` is locked, so no `AutoOs` root beside it loads
 /// unattended after a restart (ruling 5).
 pub fn persist_lock(vault_dir: &Path) -> Result<(), IdentityError> {
-    std::fs::create_dir_all(vault_dir)
-        .and_then(|()| std::fs::write(vault_dir.join(PERSISTED_LOCK_FILE), b"locked\n"))
+    let write = || -> std::io::Result<()> {
+        std::fs::create_dir_all(vault_dir)?;
+        let mut nonce = [0u8; 16];
+        getrandom::fill(&mut nonce)
+            .map_err(|_| std::io::Error::other("lock marker randomness unavailable"))?;
+        let temporary = vault_dir.join(format!(".locked-{}.tmp", blake3::hash(&nonce).to_hex()));
+        let mut options = std::fs::OpenOptions::new();
+        options.write(true).create_new(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.mode(0o600);
+        }
+        let result = (|| {
+            let mut file = options.open(&temporary)?;
+            file.write_all(b"locked\n")?;
+            file.sync_all()?;
+            drop(file);
+            std::fs::rename(&temporary, vault_dir.join(PERSISTED_LOCK_FILE))?;
+            sync_lock_directory(vault_dir)
+        })();
+        if result.is_err() {
+            let _ = std::fs::remove_file(&temporary);
+        }
+        result
+    };
+    write()
         .map_err(|err| IdentityError::Backend(format!("persist the lock in {vault_dir:?}: {err}")))
+}
+
+/// Unix metadata persistence is requested explicitly. Other platforms retain
+/// their file-sync/rename behavior; power-loss guarantees need platform receipts.
+fn sync_lock_directory(path: &Path) -> std::io::Result<()> {
+    #[cfg(unix)]
+    std::fs::File::open(path)?.sync_all()?;
+    #[cfg(not(unix))]
+    let _ = path;
+    Ok(())
 }
 
 /// Clear the persisted lock after an unlock by a user act.
 pub fn clear_persisted_lock(vault_dir: &Path) -> Result<(), IdentityError> {
     match std::fs::remove_file(vault_dir.join(PERSISTED_LOCK_FILE)) {
-        Ok(()) => Ok(()),
+        Ok(()) => sync_lock_directory(vault_dir).map_err(|err| {
+            IdentityError::Backend(format!("sync the cleared lock in {vault_dir:?}: {err}"))
+        }),
         Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(err) => Err(IdentityError::Backend(format!(
             "clear the lock in {vault_dir:?}: {err}"

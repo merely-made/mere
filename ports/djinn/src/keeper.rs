@@ -30,6 +30,7 @@ use personae::{IdentityError, IdentityProvider, RetainedKeys};
 
 use crate::custody::ReleasePolicy;
 mod review;
+mod signing;
 use crate::identity_ui::{
     NativeIdentityUi, UnavailableNativeIdentityUi, apply_native_identity_action,
 };
@@ -42,6 +43,7 @@ pub struct Keeper<S: IdentityStorage + 'static> {
     wallet_root: Option<PathBuf>,
     policy: ReleasePolicy,
     payload_custody: std::sync::OnceLock<crate::custody::payload::PayloadCustody>,
+    custodian: std::sync::OnceLock<Arc<crate::custodian::CustodianLink>>,
     #[cfg(feature = "cxf")]
     credentials: std::sync::OnceLock<castellan::resident::CastellanResident>,
     #[cfg(feature = "cxf")]
@@ -60,6 +62,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
             wallet_root: None,
             policy: ReleasePolicy::default(),
             payload_custody: std::sync::OnceLock::new(),
+            custodian: std::sync::OnceLock::new(),
             #[cfg(feature = "cxf")]
             credentials: std::sync::OnceLock::new(),
             #[cfg(feature = "cxf")]
@@ -88,12 +91,29 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
         persona: personae::PersonaId,
         root: PathBuf,
     ) -> Result<(), String> {
-        self.payload_custody.set(crate::custody::payload::PayloadCustody { profile, persona, root })
+        self.payload_custody
+            .set(crate::custody::payload::PayloadCustody {
+                profile,
+                persona,
+                root,
+            })
             .map_err(|_| "retained-content custody is already configured".into())
     }
 
     pub(crate) fn payload_custody(&self) -> Option<&crate::custody::payload::PayloadCustody> {
         self.payload_custody.get()
+    }
+
+    /// Route the H1 consumers through the independently launched custodian.
+    /// Configure before serving; there is no fallback once attached.
+    pub fn attach_custodian(&self, link: Arc<crate::custodian::CustodianLink>) -> Result<(), String> {
+        self.custodian
+            .set(link)
+            .map_err(|_| "a custodian is already attached".into())
+    }
+
+    pub(crate) fn custodian(&self) -> Option<&Arc<crate::custodian::CustodianLink>> {
+        self.custodian.get()
     }
 
     /// Replace which salts may be released (D11).
@@ -217,6 +237,9 @@ impl<S: IdentityStorage + 'static> IdentityAuthority for Keeper<S> {
     }
 
     fn apply_intent(&self, intent: &str, payload: &[u8]) -> Result<(), String> {
+        if signing::is_signing_decision(intent) {
+            return signing::confirm(&self.host, self.ui.as_ref(), intent, payload);
+        }
         self.host
             .apply_intent(intent, payload)
             .map(|_| ())

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- One custody petition: the requesting process's session user must
+     authenticate each time (auth_self, never retained). The owner
+     annotation lets each custodian account check this action for a
+     subject of another uid; install-linux.sh fills it in. -->
+<policyconfig>
+  <vendor>Merely</vendor>
+  <action id="com.merely.djinn.custody.petition">
+    <description>Approve one request to Djinn's custodian</description>
+    <message>A program is asking Djinn's custodian to sign with or release from your identity. Authenticate to approve this one request.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.owner">@OWNERS@</annotate>
+  </action>
+</policyconfig>

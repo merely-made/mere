@@ -82,8 +82,7 @@ use std::time::Duration;
 
 use common::{
     EVAL_PREFIXES, PostedJob, author_fixture, autodiff_settings, finite_difference_settings, lane,
-    lending, now_ms, open_vault, owner, profile, refusal_from, run_trainer_job, unlock,
-    write_device_settings,
+    lending, now_ms, open_vault, owner, profile, refusal_from, run_trainer_job, write_device_settings,
 };
 use distillery::mesh_host::Step;
 use distillery::{
@@ -108,7 +107,7 @@ const FAILURE_BOUND: Duration = Duration::from_secs(600);
 async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
 
     // The posture explicitly permits the trainer, and nothing else. An empty
     // `allowed_resources` would admit this job by permitting everything, which
@@ -160,8 +159,7 @@ async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all(
                 &data_root,
                 &profile(),
                 owner(Some(trains)),
-                &vault_dir,
-                unlock(),
+                djinn::resident::MeshAuthor::Resident,
             )
             .await,
             "a lane that says `device: \"gpu\"` on a machine with no discrete adapter must \
@@ -202,8 +200,7 @@ async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all(
         &data_root,
         &profile(),
         owner(Some(trains)),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with a GPU trainer on this machine's discrete GPU");

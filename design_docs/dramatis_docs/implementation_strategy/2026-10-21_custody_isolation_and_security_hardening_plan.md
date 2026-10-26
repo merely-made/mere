@@ -1,7 +1,7 @@
 # Custody Isolation and Security Hardening Plan
 
 **Date:** 2026-10-21 (America/New_York).
-**Status (2026-10-22):** H1 production migration remains gated. Native11 passed 38/38 synthetic checks in the separate non-admin runtime account; the measured same-user signing attack failed. Native10 remains a failing counterexample for the signing account. Production Castellan, consent/policy and lifecycle integration remain open; no real consumer has migrated.
+**Status (2026-10-26):** H1's portable cut is on main. `djinn-custodian` is a separate process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers (§5.2). Its §5.6 negative controls pass on macOS, where it also runs as a spawned process; Linux and Windows builds type-check. Djinn routes the two H1 consumers through it when one is installed, and Distillery's second vault open is gone. Still gated: the Linux, signed-macOS and Windows receiving runs, and H2 (every other Djinn vault use). Djinn still opens its own vault at start, so no production deployment claims the §1 same-user guarantee yet. Native11's 38/38 and native10's signing-account failure remain the macOS primitive evidence.
 **Audit base:** Mere 0261e2602b5b13fcf59dced3ae408c3441c38a71, freshly fetched
 origin/main; Dramatis 7d498c27df8076dacccb74ba4a05f863f9f48c76, the exact Git
 revision in Mere's lockfile. This frozen-source assessment does not qualify
@@ -129,9 +129,10 @@ is not trusted presence.
 
 ## 4. Diagnostics and experiments
 
-The [receipt directory](../../../support/receipts/custody-security-20261021/)
-retains synthetic diagnostic source, a reproduction driver, output, and frozen
-source hashes. W1–W4 intentionally assert CURRENT weaknesses. They must fail at
+The audit's receipt directory (`support/receipts/custody-security-20261021`,
+synthetic diagnostic source, a reproduction driver, output and frozen source
+hashes) was never versioned. It was retired with the audit worktree on
+2026-10-26; this section keeps its findings. W1–W4 intentionally assert CURRENT weaknesses. They must fail at
 the identified unsafe assertion after repair while authorized controls succeed.
 
 **Diagnostic execution (macOS):** all four witnesses executed successfully against the frozen production code. This confirms the described weaknesses; it does not mark the security boundary safe. Exact commands, controls and hashes are retained in the qualification record.
@@ -223,8 +224,9 @@ confirms that a wrong identity receives a requirement-mismatch rejection.
 The native09 failure and correction are retained separately; its frozen
 manifest and installer source have not been rewritten.
 
-Receiving logs, source cuts and exact fixture metadata are retained in
-support/receipts/custody-h1-macos-20261022. Native10's synthetic item deletion
+Receiving logs, source cuts and exact fixture metadata were kept outside git
+in support/receipts/custody-h1-macos-20261022 and retired with the audit
+worktree on 2026-10-26; the facts above are the retained record. Native10's synthetic item deletion
 and SMAppService unregister succeeded; its custody, fake and hostile-probe jobs
 are no longer registered. The root-owned fixture bundle remains as evidence. Profile material and signed binaries
 stay outside versioned source; receipts retain hashes and bounded public facts.
@@ -276,10 +278,9 @@ unregister. Both recorded custodian PIDs are absent. The builder session's
 cross-account launchd domain query is denied, so its service-query errors are
 not counted as independent proof that jobs were unregistered.
 
-The receiving receipt is
-support/receipts/custody-h1-macos-20261022/native11-receiving-qualification.json;
-the earlier separate-account-preparation.json remains a historical preparation
-receipt. H1-F1's measured runtime-account gate passes for UID 503. The signing
+The receiving receipt (native11-receiving-qualification.json, beside the
+separate-account preparation receipt) was retired with the audit worktree on
+2026-10-26; the SHA-256 above identifies the exported result. H1-F1's measured runtime-account gate passes for UID 503. The signing
 account's native10 escape remains reproducible evidence; running real consumers
 there with the same available signing key would fail the deployment gate.
 Production deployment must preserve this separation and repeat qualification
@@ -697,10 +698,11 @@ their fixes can precede a complete split and must be included in H1 acceptance.
 
 ### H1 — Enforced custody boundary and adversarial vertical slice
 
-**Current slice:** native11 passes 38/38 synthetic native controls in the
-separate non-admin GUI account. The signing-authority attack fails there;
-native10 remains a failed control for the signing account. Production
-Castellan, authority/consumer integration and lifecycle gates remain open.
+**Current slice (2026-10-26):** the portable custodian process and contract
+are on main, with the H1 negative controls in CI-runnable tests. Native11
+passes 38/38 synthetic native controls in the separate non-admin GUI account;
+native10 remains a failed control for the signing account. Platform receiving
+runs, the shared worker launcher and H2 remain open.
 
 - [x] Demonstrate signing-authority separation in the synthetic receiving
   account (H1-F1, native11). The exact attacker payload succeeds in the signing
@@ -711,10 +713,22 @@ Castellan, authority/consumer integration and lifecycle gates remain open.
   fixture against sandboxed and unrelated same-user attackers (native10/11).
   Native11 passes the measured OS gates; production H1 remains incomplete.
 
-- [ ] Implement §5.2's macOS launchd/SMAppService identity, protected install,
-  Hardened Runtime/environment constraints, custodian-only data protection
-  Keychain envelope and signed XPC peers. Equivalent Linux/Windows modes use
-  their selected mechanisms before activation there.
+- [ ] Implement §5.2's launch identity on each OS. **Built 2026-10-26:**
+  - Linux: a socket-activated system service under a per-user custodian
+    account, with pid 1 owning the 0600 socket. Landlock ABI 6, seccomp and
+    `no_new_privs` are applied before input, and polkit `auth_self` consent
+    runs from a pre-confinement helper.
+  - macOS: a launchd agent on its launchd socket with code-signature peers at
+    both ends (audit token). Deny-attach and the hardened-runtime check are
+    enforced.
+  - Windows: an SCM service under its virtual account, serving a pipe with a
+    protected DACL and SID checks, plus mitigations.
+
+  **Open:**
+  - receiving runs on each OS (the custodian README lists the steps);
+  - the macOS data-protection Keychain envelope in the portable binary;
+  - the Windows CNG wrapping key;
+  - a Windows presence channel.
 - [ ] Build the shared confined-worker launcher/manifest and hostile-worker
   fixture; activate sandboxing before parsing. Test malicious workers and a
   separate unsandboxed same-desktop-user app against files, handles, key access,
@@ -722,13 +736,25 @@ Castellan, authority/consumer integration and lifecycle gates remain open.
   launch environment and signed-update/cold-reopen controls (T05/T07/T10).
 - [ ] Inventory root openings and dependency graph; migrate a synthetic vault
   transactionally, covering all usable custody copies and recovery behavior.
-  No general worker links custody or opens its root storage.
-- [ ] Implement one root signature and one scoped continuous consumer with
+  No general worker links custody or opens its root storage. **Done
+  2026-10-26:** Distillery's second open is removed. `djinn-custodian adopt`
+  copies a vault and proves the same identity without touching the source.
+  **Open:** retiring the source and its copies transactionally. Djinn's own
+  start and cli opens, `enrollment` and `hocket_adoption` are H2.
+- [x] Implement one root signature and one scoped continuous consumer with
   authenticated IPC, principal/profile policy, independent consent, generation
-  binding and bounded framing.
+  binding and bounded framing. The signing consumer is Graphshell's
+  `mere.graphshell` delegations, with the statement decoded and its audience,
+  issuer and scope key checked inside custody. Root signing exists with
+  mandatory per-operation consent. The continuous consumer is Distillery's mesh
+  author, exactly two salts checked against attestations. Fixture limits are
+  per §5.6.
 - [ ] Close general-client signing approval (C04) and false durable-lock success
   (C07), retaining authorized controls. Isolate hostile import parsing before
-  that parser is admitted to the production custody path.
+  that parser is admitted to the production custody path. **Done 2026-10-26:**
+  the C04 and C07 resident repairs and the residue repair are on main, and the
+  custodian's lock reports memory, drain and durability separately. **Open:**
+  import parsing isolation.
 
 **Done:** the installed OS denies worker and unrelated desktop-app extraction,
 replacement and self-approval, while authorized operations and sealed cold reopen
@@ -838,6 +864,30 @@ copy of those documents here.
   of H1. Re-read activation/transport/settings source; no installed fleet or OS
   containment experiment was run. Official mechanism references and review
   evidence are in review-confinement-20261022.json beside the original receipt.
+
+- 2026-10-26, portable H1 cut. The user ruled custody isolation live work and
+  a macOS-only approach insufficient. The residue-fix worktree's custodian
+  core, residue repair, C04 and C07 repairs and macOS harness were carried
+  onto current main; `vault_residue` and `no_residue` pass there. Then:
+  - `custody-wire` implements §5.6 once over a transport trait.
+  - `djinn-custodian` became a transport-free core plus a socket driver,
+    binary and the per-OS launch pieces above.
+  - Djinn became a client for the two H1 consumers, and Distillery's second
+    vault open (with the kept passphrase) was removed.
+
+  Evidence on macOS:
+  - `custody-wire` 8 tests;
+  - `djinn-custodian` 16 core and socket tests plus 13 synthetic;
+  - 4 process tests against the spawned binary;
+  - Djinn's `custodian_h1` 4 tests;
+  - Djinn's library and Distillery lane suites.
+
+  Linux and Windows builds type-check for `x86_64-unknown-linux-gnu` and
+  `x86_64-pc-windows-gnu`; nothing was run on those OSes. The ThinkPad refused
+  this session's SSH, so its receiving steps (custodian README) are unverified.
+  The residue-fix and security-audit worktrees were removed; their receipts
+  were never versioned, and this plan and the integration plan keep their
+  findings.
 
 Documentation verification retains inherited failures rather than calling the
 whole tree clean: the full D2 audit has existing missing judgments and a tracked

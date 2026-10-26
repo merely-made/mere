@@ -55,7 +55,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
-use castellan::custody::bootstrap::Unlock;
 use distillery::{
     ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
     ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
@@ -357,15 +356,19 @@ impl ResidentDistillery {
     pub fn inference_stage_services(&self) -> Vec<Arc<distillery::inference_stage::StageService>> {
         self.resident.inference_stage_services()
     }
-    /// Open the works for one already-resolved Personae profile.
+    /// Open the works for one already-resolved Personae profile. `identity`
+    /// holds exactly [`InstalledAuthority::release_salts`]; `protection` says
+    /// where they came from. No vault is opened here (custody isolation
+    /// plan, §5.1): the resident captured them from its own open identity or
+    /// the custodian released them.
     pub async fn open(
         data_root: &Path,
         profile: &ProfileId,
-        vault_dir: &Path,
-        unlock: Unlock,
+        identity: Arc<dyn personae::IdentityProvider>,
+        protection: String,
         lane: DistilleryLaneSettings,
     ) -> Result<Self, String> {
-        Self::open_mesh(data_root, profile, vault_dir, unlock, lane, None).await
+        Self::open_mesh(data_root, profile, identity, protection, lane, None).await
     }
 
     /// Automatic inference names a common graph compute space even when the
@@ -373,8 +376,8 @@ impl ResidentDistillery {
     pub async fn open_mesh(
         data_root: &Path,
         profile: &ProfileId,
-        vault_dir: &Path,
-        unlock: Unlock,
+        identity: Arc<dyn personae::IdentityProvider>,
+        protection: String,
         lane: DistilleryLaneSettings,
         mesh: Option<[u8; 32]>,
     ) -> Result<Self, String> {
@@ -441,13 +444,9 @@ impl ResidentDistillery {
             },
         }
 
-        // djinn opens the vault and hands the works its identity; Distillery
-        // opens none of its own (dramatis repo plan, D5).
-        let opened = castellan::custody::bootstrap::open_storage(vault_dir, unlock)
-            .map_err(|error| format!("open the vault for the Distillery works: {error}"))?;
-        let vault = castellan::custody::IdentityVault::open(opened.storage, profile)
-            .map_err(|error| format!("open the Distillery works' profile: {error}"))?;
-        let authority = InstalledAuthority::open(data_root, Arc::new(vault), opened.description)
+        // The works receive their two derived keys; neither Distillery nor
+        // this lane opens a vault (dramatis repo plan, D5; custody plan §5.1).
+        let authority = InstalledAuthority::open(data_root, identity, protection)
             .map_err(|error| format!("open the Distillery works: {error}"))?;
         let personal_mesh = authority
             .personal_mesh_id()

@@ -72,6 +72,8 @@ members = [
     "ports/djinn",
     "ports/dramatis",
     "ports/djinn/castellan",
+    "ports/djinn/custodian",
+    "ports/djinn/custodian/wire",
     "ports/distillery",
     "ports/moot",
     "ports/distillery/athanor",

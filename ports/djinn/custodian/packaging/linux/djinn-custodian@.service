@@ -1,0 +1,50 @@
+# Djinn's custodian for one desktop user (%i), custody isolation plan §5.2.
+# A system service under its own non-login account, socket-activated, with
+# its vault in a service-owned state directory the desktop user cannot read.
+# The binary applies no_new_privs, Landlock and seccomp itself before input;
+# these settings are the service manager's half of the same recipe.
+[Unit]
+Description=Djinn custodian for %i
+Requires=djinn-custodian@%i.socket
+After=djinn-custodian@%i.socket
+
+[Service]
+Type=simple
+ExecStart=/usr/local/libexec/djinn-custodian --config %d/config
+LoadCredential=config:/etc/djinn-custodian/%i.json
+User=djinn-custodian-%i
+Group=djinn-custodian-%i
+StateDirectory=djinn-custodian/%i
+StateDirectoryMode=0700
+UMask=0077
+Environment=
+NoNewPrivileges=yes
+LimitCORE=0
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+DevicePolicy=closed
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+IPAddressDeny=any
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+KeyringMode=private
+Restart=on-failure
+RestartSec=2
+
+[Install]
+Also=djinn-custodian@%i.socket

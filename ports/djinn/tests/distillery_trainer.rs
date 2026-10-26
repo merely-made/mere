@@ -64,7 +64,7 @@ use std::time::Duration;
 
 use common::{
     EVAL_PREFIXES, PostedJob, author_fixture, autodiff_settings, finite_difference_settings, lane,
-    lending, now_ms, open_vault, owner, profile, run_trainer_job, unlock, write_device_settings,
+    lending, now_ms, open_vault, owner, profile, run_trainer_job, write_device_settings,
 };
 use distillery::{
     TRAINER_AUTODIFF, TRAINER_FINITE_DIFFERENCE, TRAINER_RESOURCE, TrainReceipt, TrainRequest,
@@ -95,7 +95,7 @@ const FAILURE_BOUND: Duration = Duration::from_secs(300);
 async fn the_composed_trainer_trains_a_real_adapter_into_the_personas_model_library() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
 
     // The posture explicitly permits the trainer, and nothing else. An empty
     // `allowed_resources` would admit this job by permitting everything, which
@@ -128,8 +128,7 @@ async fn the_composed_trainer_trains_a_real_adapter_into_the_personas_model_libr
         &data_root,
         &profile(),
         owner(Some(trains)),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with a trainer-carrying Distillery lane");
@@ -416,7 +415,7 @@ async fn committed_jobs(works: &djinn::resident_distillery::ResidentDistillery) 
 async fn a_build_with_no_gpu_trainer_refuses_a_lane_that_states_one() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     // A perfectly good lending posture: the refusal under test must be about
     // the missing GPU trainer, not about anything else being wrong.
     write_device_settings(&data_root, Some(lending()));
@@ -439,8 +438,7 @@ async fn a_build_with_no_gpu_trainer_refuses_a_lane_that_states_one() {
             &data_root,
             &profile(),
             owner(Some(asks_for_a_gpu)),
-            &vault_dir,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await,
         "a build with no GPU trainer must refuse a lane that states one rather than \

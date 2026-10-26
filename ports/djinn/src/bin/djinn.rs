@@ -927,7 +927,7 @@ fn cli_open(args: &Args) -> Result<bootstrap::OpenedStorage, String> {
 }
 
 async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Error>> {
-    let (opened, choice, second_unlock) = start_vault(&args, &events).await?.into_parts();
+    let (opened, choice, startup_passphrase) = start_vault(&args, &events).await?.into_parts();
     tracing::info!(storage = %opened.description, "Personae storage open");
     let profile_id =
         resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())?;
@@ -990,6 +990,22 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             .with_ui(Arc::new(args.native_identity_ui()))
             .with_wallet_root(args.data_root.clone()),
     );
+    // An installed custodian holds the vault for the H1 consumers (custody
+    // isolation plan, §5.6): Graphshell's guest delegations and Distillery's
+    // mesh author go to it, with no in-process fallback. The start's
+    // passphrase unlocks it once here and is then dropped.
+    let custodian = djinn::custodian::InstalledCustodian::load()?
+        .map(|installed| Arc::new(djinn::custodian::CustodianLink::new(installed)));
+    if let Some(link) = &custodian {
+        if let Some(passphrase) = startup_passphrase.as_ref() {
+            match tokio::task::block_in_place(|| link.unlock(passphrase)) {
+                Ok(()) => tracing::info!("custodian unlocked at start"),
+                Err(refusal) => tracing::warn!(?refusal, "custodian not unlocked at start"),
+            }
+        }
+        keeper.attach_custodian(Arc::clone(link))?;
+    }
+    drop(startup_passphrase);
     // The status follows the lock (ruling 31's watch channel; harness H4).
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
@@ -1072,15 +1088,16 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         &data_root,
         &profile_id,
         owner,
-        &args.vault_dir,
-        // The lane derives a mesh author from the profile's vault, so it opens
-        // the same vault directory a second time under the same unlock: the
-        // start's passphrase, kept for this open alone and dropped with it.
-        second_unlock,
+        // The lane's mesh author: exactly its two release salts, from the
+        // custodian when one is installed, else captured from this host.
+        match &custodian {
+            Some(link) => djinn::resident::MeshAuthor::Custodian(Arc::clone(link)),
+            None => djinn::resident::MeshAuthor::Resident,
+        },
     )
     .await?;
     #[cfg(not(feature = "personal-sync"))]
-    drop(second_unlock);
+    drop(custodian);
     // The credential keys follow the vault's lock (vault lock ruling 1).
     #[cfg(feature = "personal-sync")]
     personae.register_lock_holder(resident.credential_lock_holder());

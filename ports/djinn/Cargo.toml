@@ -141,7 +141,10 @@ knot-site = { git = "https://github.com/merely-made/knot-editor.git", branch = "
 # OS; `src/conditions.rs` is the Windows-facing half that seam expects.
 mesh.workspace = true
 # The delegation-signing salts the custody route signs with (D11).
-insigne.workspace = true
+insigne = { workspace = true, features = ["verify"] }
+# The custody contract: Djinn is a client of its independently launched
+# custodian (custody isolation plan, H1). No castellan comes with it.
+custody-wire = { path = "custodian/wire" }
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
@@ -287,6 +290,8 @@ djinn = { path = ".", default-features = false, features = ["passphrase-fd"] }
 # so packaging drops it.
 djinn-testkit = { path = "../../crates/system/djinn-testkit" }
 insigne = { workspace = true, features = ["verify"] }
+# The custody isolation H1 tests run Djinn's client against a real custodian.
+djinn-custodian = { path = "custodian" }
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
 # so the test names safetensors (and eidetic, which production names too since

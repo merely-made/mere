@@ -44,6 +44,15 @@ mod windows_presence;
 /// Implementations own the selected path and passphrase. Neither appears in
 /// the browser request or response types.
 pub trait NativeIdentityUi: Send + Sync {
+    /// Confirm facts obtained from the authority, never text or an answer
+    /// supplied by the requesting app. Absence of a native UI refuses.
+    fn confirm_signing(
+        &self,
+        _pending: &personae::signing::PendingSigningRequest,
+        _decision: personae::signing::SigningDecision,
+    ) -> Result<bool, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
     /// Resident-owned confirmation; apps cannot supply the answer.
     fn confirm_quarantine(
         &self,
@@ -213,6 +222,57 @@ fn linux_password_answer(
 }
 
 impl NativeIdentityUi for SystemNativeIdentityUi {
+    fn confirm_signing(
+        &self,
+        pending: &personae::signing::PendingSigningRequest,
+        decision: personae::signing::SigningDecision,
+    ) -> Result<bool, NativeIdentityFailure> {
+        use personae::signing::{RememberApproval, SigningDecision};
+        self.require_graphical_backend()?;
+        let clean = |text: &str| {
+            text.chars()
+                .filter(|c| !c.is_control())
+                .take(256)
+                .collect::<String>()
+        };
+        let scope = match decision {
+            SigningDecision::Approve {
+                remember: RememberApproval::Once,
+            } => "Approve this request once?",
+            SigningDecision::Approve {
+                remember: RememberApproval::UntilIdle,
+            } => "Approve for this key's configured idle window?",
+            SigningDecision::Deny => "Deny this signing request?",
+        };
+        let request = &pending.request;
+        let message = format!(
+            "Persona: {}\nOperation: {}\nKey: {}\nRequester: {}\nTarget: {}\nPayload digest: {}\n\n{}",
+            clean(&request.profile),
+            clean(&request.operation),
+            clean(&request.public_key_fingerprint),
+            clean(
+                request
+                    .authenticated_requester
+                    .as_deref()
+                    .unwrap_or("not authenticated")
+            ),
+            clean(
+                request
+                    .authenticated_target
+                    .as_deref()
+                    .unwrap_or("not authenticated")
+            ),
+            clean(&request.payload_digest),
+            scope,
+        );
+        Ok(
+            light_file_dialog::dialog::MessageBox::new("Djinn · Signing confirmation", &message)
+                .buttons(light_file_dialog::MessageBoxType::YesNo)
+                .default_button(if cfg!(windows) { 1 } else { 0 })
+                .show()
+                == light_file_dialog::MessageBoxButton::Ok,
+        )
+    }
     fn confirm_quarantine(
         &self,
         profile: &str,

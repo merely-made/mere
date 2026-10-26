@@ -71,6 +71,12 @@ fn storage_round_trip<S: IdentityStorage>(storage: S, seed: [u8; 32], payload: &
     assert_eq!(vault.current_profile().unwrap().master.to_seed(), seed);
     phase(3);
     vault.switch_profile(&ProfileId("work".into())).unwrap();
+    label_allocation(
+        vault.public_profile().slots.as_ptr() as usize,
+        vault.public_profile().slots.capacity()
+            * std::mem::size_of::<castellan::custody::vault::RetainedSlotSummary>(),
+        "public slot summaries after switch",
+    );
     phase(4);
     let listed = vault.storage().list_profiles().unwrap();
     assert_eq!(listed.len(), 1);
@@ -244,9 +250,27 @@ fn passphrase_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], 
         .unwrap();
     phase(6);
     vault.unlock(UnlockMethod::Passphrase(b"lock")).unwrap();
+    label_allocation(
+        vault.public_profile().slots.as_ptr() as usize,
+        vault.public_profile().slots.capacity()
+            * std::mem::size_of::<castellan::custody::vault::RetainedSlotSummary>(),
+        "public slot summaries after unlock",
+    );
     phase(5);
     vault.lock().unwrap();
+    // Public snapshots must preserve None/Some metadata without carrying a
+    // stale seed in inactive representation bytes, live or after being freed.
+    let kept_snapshot = vault.public_profile().clone();
+    let temporary_snapshot = kept_snapshot.clone();
+    label_allocation(
+        kept_snapshot.slots.as_ptr() as usize,
+        kept_snapshot.slots.capacity()
+            * std::mem::size_of::<castellan::custody::vault::RetainedSlotSummary>(),
+        "cloned locked public slot summaries",
+    );
+    drop(temporary_snapshot);
     let (hits, overflow) = disarm();
+    drop(kept_snapshot);
     report.check(
         "passphrase vault locked",
         &[
