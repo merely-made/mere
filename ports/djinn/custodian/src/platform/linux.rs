@@ -174,12 +174,13 @@ fn allowed() -> Vec<libc::c_long> {
         libc::SYS_fdatasync, libc::SYS_renameat, libc::SYS_renameat2, libc::SYS_unlinkat,
         libc::SYS_mkdirat, libc::SYS_getdents64, libc::SYS_flock, libc::SYS_ftruncate,
         libc::SYS_prctl, libc::SYS_tgkill, libc::SYS_restart_syscall, libc::SYS_newfstatat,
-        libc::SYS_ppoll, libc::SYS_membarrier,
+        libc::SYS_ppoll, libc::SYS_membarrier, libc::SYS_prlimit64, libc::SYS_clock_getres,
     ];
     #[cfg(target_arch = "x86_64")]
     calls.extend([
         libc::SYS_stat, libc::SYS_lstat, libc::SYS_rename, libc::SYS_unlink, libc::SYS_mkdir,
         libc::SYS_rmdir, libc::SYS_poll, libc::SYS_arch_prctl, libc::SYS_open,
+        libc::SYS_getrlimit, libc::SYS_gettimeofday, libc::SYS_time,
     ]);
     calls
 }

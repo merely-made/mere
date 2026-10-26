@@ -116,23 +116,9 @@ impl Service {
             stream.shutdown_both();
             return;
         };
-        let opened = lock(&self.core).open(peer, &hello);
-        let id = match opened {
-            Ok((id, opened)) => {
-                if write_message(&mut *stream, &opened).is_err() {
-                    let mut core = lock(&self.core);
-                    let effects = core.close(id);
-                    self.deliver(&mut core, effects);
-                    return;
-                }
-                id
-            },
-            Err(refused) => {
-                let _ = write_message(&mut *stream, &refused);
-                stream.shutdown_both();
-                return;
-            },
-        };
+        // The outbox exists before admission and is registered under the
+        // core's lock, so no fact can be broadcast between the session's
+        // admission and its first message; `Opened` goes out first.
         let (send, receive) = mpsc::sync_channel::<ServerMessage>(OUTBOX);
         let Ok(mut writer) = stream.try_clone_duplex() else {
             stream.shutdown_both();
@@ -148,11 +134,28 @@ impl Service {
                     }
                 }
             });
-        if writer_thread.is_err() {
+        let Ok(writer_thread) = writer_thread else {
             stream.shutdown_both();
             return;
-        }
-        lock(&self.outboxes).insert(id, Outbox { send, control });
+        };
+        let id = {
+            let mut core = lock(&self.core);
+            match core.open(peer, &hello) {
+                Ok((id, opened)) => {
+                    let _ = send.try_send(opened);
+                    lock(&self.outboxes).insert(id, Outbox { send, control });
+                    id
+                },
+                Err(refused) => {
+                    drop(core);
+                    let _ = send.try_send(refused);
+                    drop(send);
+                    let _ = writer_thread.join();
+                    stream.shutdown_both();
+                    return;
+                },
+            }
+        };
         loop {
             let body = match read_frame(&mut *stream) {
                 Ok(Some(body)) => body,

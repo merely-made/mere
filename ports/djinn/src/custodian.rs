@@ -124,7 +124,16 @@ impl CustodianLink {
     }
 
     fn call(&self, operation: Operation, deadline: Duration) -> Result<Answer, CustodyRefusal> {
-        match self.client()?.call(operation, deadline) {
+        let client = self.client()?;
+        let seen = client.observed().generation;
+        let mut outcome = client.call(operation.clone(), deadline);
+        // A refusal ran nothing. If the generation moved before its fact
+        // arrived here, wait for the fact and ask once more.
+        if outcome.code() == Some("stale-generation") {
+            client.wait_for_change(seen, Duration::from_secs(2));
+            outcome = client.call(operation, deadline);
+        }
+        match outcome {
             Outcome::Success { answer } => Ok(answer),
             Outcome::Refused { code } if code == "locked" => Err(CustodyRefusal::Locked),
             Outcome::Refused { code } => Err(CustodyRefusal::Refused {
