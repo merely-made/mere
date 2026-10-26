@@ -1,6 +1,6 @@
 # Castellan public-summary residue repair
 
-Status (2026-10-26): on main. The structural repair passes `vault_residue` (every scenario clean, including passphrase storage after profile switching and the passphrase vault after lock) and `no_residue`, plus 292 keeper tests and the golden snapshots, on current main. The 2026-10-22 cut additionally passed optimized heap-canary checks and 236 Djinn tests. Real consumers are still gated.
+Status (2026-10-26): on main. The structural repair passes `vault_residue` (every scenario clean, including passphrase storage after profile switching and the passphrase vault after lock) and `no_residue`, plus 306 keeper tests and the golden snapshots, on current main. The 2026-10-22 cut additionally passed optimized heap-canary checks and 236 Djinn tests. Real consumers are still gated.
 
 ## Confirmed cause
 
