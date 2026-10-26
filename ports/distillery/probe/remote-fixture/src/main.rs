@@ -979,7 +979,7 @@ async fn run_remote(
                 "server_peer": server_endpoint.id().to_string(),
                 "client_peer": client_endpoint.id().to_string(),
                 "same_endpoint": false,
-                "server_backend": format!("burn-wgpu 0.22.0 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
+                "server_backend": format!("burn-wgpu 0.22.1 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
                 "client_backend": "Burn Dispatch Remote over authorized Iroh"
             },
             "first_run": {

@@ -10,8 +10,8 @@ description = "Native numerical control for Distillery's browser model matrix."
 [workspace]
 
 [dependencies]
-burn = { version = "=0.22.0", default-features = false, features = ["ndarray", "std"] }
-esp = { features = ["bert", "decoder"], git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
+burn = { version = "=0.22.1", default-features = false, features = ["ndarray", "std"] }
+esp = { features = ["bert", "decoder"], git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 serde_json = "1"
 
 [[bin]]
@@ -28,7 +28,7 @@ commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc
 dict-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "f27bee8eb5152618ab91fa8676d62c72ebfcb4fc" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 finger-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 fsp-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 gemini-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }

@@ -1,0 +1,120 @@
+{
+  "schema": "mere.alembic-workshop-qualification.v1",
+  "date": "2026-10-25",
+  "source_commit": "370b251f3b582971b0593d4ebdaffddacd975380",
+  "base_main": "52178da24844e65f4b2e40da520c157e8435a794",
+  "cohort": {
+    "servitor": "aa94fe22eea29e9b54e01ed21e6991536ed4f208",
+    "armillary": "92d5b15cf39aaac40a3f2d863ffee69c9be11bfc",
+    "rust": "1.99.1"
+  },
+  "scope": "W0 shared public evidence-brief domain/read model and optional native worker; no product acceptance claim",
+  "gates": [
+    {
+      "name": "default furnace plus workshop-worker native library suite",
+      "outcome": "pass",
+      "passed": 34,
+      "workshop_cases": 23,
+      "existing_furnace_cases": 11,
+      "failed": 0,
+      "log": "final-combined-tests.log"
+    },
+    {
+      "name": "wasm32 workshop core with defaults disabled",
+      "outcome": "pass",
+      "evidence": "compilation only",
+      "log": "core-wasm-check.log"
+    },
+    {
+      "name": "normal production dependency boundary with defaults disabled",
+      "outcome": "pass",
+      "packages": 72,
+      "absent": [
+        "Armillary",
+        "Tokio",
+        "ESP",
+        "Burn",
+        "CubeCL",
+        "Cubek",
+        "wgpu",
+        "Mere kernel",
+        "Pandect",
+        "Eidetic inference/cache",
+        "Cambium"
+      ],
+      "log": "core-normal-tree.log"
+    },
+    {
+      "name": "independent native processes over retained directory store",
+      "outcome": "pass",
+      "evidence": "synthetic public domain fixture, injected logical clock, immutable proposal and uncertain acceptance survive reopen",
+      "logs": [
+        "cold-process-seed.log",
+        "cold-process-reopen.log"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "Cargo.lock": "5752b88ee23af498348e9853adc027a0d6927075ccc2adf2f687192421af33f7",
+    "crates/distillery/alembic/Cargo.toml": "2b0edfcc181474690a747a1a067fb61bb4692a2a8d195971e655a8e47bde5c1c",
+    "crates/distillery/alembic/src/lib.rs": "5a6fb06eb3b70b47004105ad253069d3d8567eb2ee81a6bfdffdb052474becf2",
+    "crates/distillery/alembic/src/workshop.rs": "83d49fe25aa563383ee4c783fcd6406e9cb3a45947d1b6754e5cbcb198041502",
+    "ports/distillery/athanor/Cargo.toml": "fe988aa530fc7469b43e3d1203a444936f19d86b289ef27535a9afbe0aed7e5f",
+    "ports/distillery/athanor/src/lib.rs": "f371d94c0ee8541a58bff5ab86f61669e03d54d223c7875dfc71ee33524c51f1",
+    "ports/distillery/athanor/src/furnace.rs": "5837dc84416f89ee202d26d94a25b9080dfa19ca339443085a7e21770634fc93",
+    "ports/distillery/athanor/src/workshop.rs": "a4988836b247b283b00429f1442b42af50e8283cc2aba39ae09b5460c51c9550",
+    "ports/distillery/athanor/src/workshop/tests.rs": "fca79bec181ab079e05be9451d4fb2724704570379c9fb81561646defdacd1be"
+  },
+  "log_sha256": {
+    "final-combined-tests.log": "068336286bd22fe99b6f82d95a39498bc68d7a2d3e04613c2b09e32564f88370",
+    "core-wasm-check.log": "d60215e79b2700955cace4ca8b16e8cfc66500b0296b1d2916784f3d0eec1261",
+    "core-normal-tree.log": "29ec8639c36b8a56639dce01b9b470e182588902681afbdf06198bbd43899db5",
+    "cold-process-seed.log": "61512116e1424fb8f25a2a1ddb95cad46f9df23207f3ba499a77621edbd6ac8a",
+    "cold-process-reopen.log": "e35f1913c5c10baed282d4bd5c6672bc3f04eb346575f46e482d625e47c380a3"
+  },
+  "frozen_binary": {
+    "path": "frozen/athanor-workshop-tests",
+    "sha256": "b9d1657842557acccac902a1f94ad47db43abbd0fb6db288d82210bd3b763f97",
+    "bytes": 27650496
+  },
+  "frozen_store": [
+    {
+      "path": "cold-process-store/.muniment-lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "cold-process-store/alembic/workshop/v1/b0829800592c8e751dfdda86ef1ebef68cb243e314d0bf4275d70878963db4df/03030303030303030303030303030303",
+      "sha256": "07433492947ac93329b455102122224c0974d1a1e08b064ebd107330195e2ed4",
+      "bytes": 8759
+    }
+  ],
+  "furnace_preservation": {
+    "method": "byte equality against prior lib.rs",
+    "sha256": "5837dc84416f89ee202d26d94a25b9080dfa19ca339443085a7e21770634fc93"
+  },
+  "limits": {
+    "passages": [
+      2,
+      4
+    ],
+    "passage_utf8_bytes": 2048,
+    "all_passage_utf8_bytes": 8192,
+    "source_metadata_bytes": 4096,
+    "djot_bytes": 16384,
+    "decisions": 3,
+    "tool_calls": 2,
+    "tokens": 0,
+    "elapsed_ms": 30000,
+    "consecutive_retryable_failures": 0,
+    "retained_runs": 32,
+    "record_bytes": 1048576
+  },
+  "limitations": [
+    "Turnstone and Graphshell source selection, rendered controls, source/custody gates and actual destination adapters are not implemented by this cut.",
+    "The target must atomically join its operation ledger, retained note Resource and graph mutation. A synthetic receipt DTO is not proof of such a product mutation.",
+    "W3 headed/fresh-process product matrix, real source routing and graph history remain open. The two owner scopes in unit fixtures are not two application hosts or two physical machines.",
+    "Private inputs are refused; no production custody, model inference, automatic scheduling, protocol adapter or mesh migration is qualified.",
+    "The v1 native definition is selected and persisted; adoption/migration of other definitions is not implemented."
+  ]
+}

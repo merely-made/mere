@@ -1,6 +1,17 @@
-# Alembic implementation plan: graph engrams, the memory pane, and Athanor
+# Alembic implementation plan: memory and the granted-agent workshop
 
-**Status (2026-10-06):** partially implemented. Slices A-C landed 2026-06-24, their host
+**Status (2026-10-25):** W0 shared core implemented and qualified. The
+workshop reconciliation and first two-host workflow are specified in
+[section 5](#5-workshop-reconciliation-and-first-workflow-2026-10-24).
+W1–W3 product integration and two-host acceptance remain open. Alembic/Athanor own the workshop
+inside Distillery. Servitor remains in Eidetic, supplying admission and the
+runtime-free run reducer; Armillary supplies execution mechanics. The first
+workflow builds a reviewable evidence brief from selected retained passages in
+Turnstone and Graphshell. Existing recall and furnace passes are implemented;
+they do not establish a working workshop. Sections 1–4 retain the earlier
+memory implementation record and its dated corrections.
+
+**Earlier status (2026-10-06):** partially implemented. Slices A-C landed 2026-06-24, their host
 halves in meerkat, retired with it 2026-07-18 (`c5f01064`); surviving library parts:
 the codicil spine (`crates/system/pandect/src/graph_codicil.rs`) and the memory levels
 (`crates/distillery/alembic/src/memory_levels.rs`). Slice D is half landed: the
@@ -21,9 +32,11 @@ Earlier status (undated, 2026-09-05 reconcile): partially implemented: slices A-
 `crates/system/pandect/src/graph_codicil.rs`, under the `mere.graph-snapshot/v2`
 schema (v1 is read as legacy). Left unedited below as the historical record.
 
-The build plan that realizes the [Alembic memory + engrams architecture](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
-(the design seed). That doc stays the canonical model; this sequences the build into shippable slices,
-resolves or defers its 7 open decisions, and grounds each phase in the code that already exists.
+The [Alembic memory + engrams architecture](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
+is the memory design seed. This plan owns the workshop integration and its
+first workflow; the [Servitor redesign](2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
+owns reusable admission/run semantics. The [suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md#74-granted-agent-and-automation-workshop-probable)
+records the August workshop charter and September placement inside Distillery.
 
 The Alembic is a multi-part subsystem (a 3-level memory model, graph engrams over eidetic, the docked
 memory pane, the Athanor distillation daemon, and an event-log / Timeline). It is doc-only today, so
@@ -154,10 +167,12 @@ its "runs in the background" condition is unmet, since the crate's module doc sa
 scheduling the passes "is still to come" and a 2026-09-02 ruling there gives the
 scheduler to Djinn; the facet pass and Steward surfacing remain open.
 
-**Open, raised by the S14 pass (2026-10-06):** which plan reports and owns slice D's
-open remainder (background scheduling, the facet pass, Steward surfacing)? Options:
-this plan, reporting A-D plus merge as its status does now; the athanor steady-heat
-actor plan only, with this plan pointing there.
+**Reconciled 2026-10-24:** this plan owns D's remaining workshop integration.
+The archived steady-heat plan is historical evidence. Section 5 specifies the
+first manually invoked actor; automatic cadence and facet extraction remain
+later extensions. Current host controls use the workshop's shared view model;
+June's Steward/Apparatus placement is historical, not a dependency on retired
+panes.
 
 ### E — Event log + Timeline (scoped for implementation, decision #5)
 
@@ -256,6 +271,357 @@ All seven resolved with Mark 2026-06-24 (his calls in **bold ✓**).
 Verification: a unit/integration test that `save → (drop) → open` round-trips a `Graph` through a temp
 `FjallStore` with `verify_integrity` passing, plus a headed save/reopen once the command lands.
 
+## 5. Workshop reconciliation and first workflow (2026-10-24)
+
+### 5.1 Ownership and dependency boundaries
+
+Alembic is the place to create, grant, run, observe, interrupt and dissolve a
+helper. Its shared surfaces present memory and workshop state. Athanor owns
+the workshop domain records and orchestration within Distillery, generalizing
+its existing proposal-producing furnace passes. Target applications retain
+their own truth and effect authority.
+
+| Owner | Contract |
+|---|---|
+| Alembic | Shared workshop view model, controls and embeddable surfaces; recall remains independently selectable. |
+| Athanor | Installed helper definitions/bindings, selected versions, goal and review policy, persisted lifecycle decisions, run journals and proposal orchestration. It uses Servitor's transitions rather than implementing another reducer. |
+| Servitor, in Eidetic | Capability algebra, petitions/admission, binding revalidation and pure recorded-event run reduction. Generic procedure validation/evaluation contracts remain in its R2/R3 design. |
+| Armillary | Actor/task execution, correlation transport, cancellation and observable joins. It supplies no permission, retry eligibility or external-effect completion. |
+| Distillery / ESP | Device policy, compute placement and model execution; optional model calls remain subordinate operations of workshop runs. |
+| Djinn | Compose Athanor as a service and supply process lifetime/scheduling. A host may embed the same domain implementation; no host invents a second workshop authority. |
+| Eidetic / Chartulary | Storage, attributed graph history and retained artifacts under owner-defined schemas. |
+| Source and destination owners | Authorize scoped reads; validate, commit and acknowledge product effects through their existing write paths. |
+
+The host driver lives with Athanor's integration. It records intent, dispatches
+admitted work through Armillary and feeds observations to `RunReducer`. The
+reducer remains usable by synchronous scenarios without Armillary, Tokio, ESP
+or Djinn. Merely sharing a repository would not impose runtime dependencies;
+there is no source-home move or dependency repin in this plan reconciliation.
+No new generic capability algebra, scheduler or actor runtime is required.
+
+Procedure candidate validation belongs to the shared Servitor contract;
+Athanor records the owner's selected revision and authorized adoption decision.
+R2/R3 remain later extensions. A procedure never grants authority or supplies
+its own evidence of success.
+
+### 5.2 First workflow: an evidence brief from retained passages
+
+**User result:** select two to four retained text passages, choose **Make
+evidence brief**, inspect one proposed note with exact quotations and source
+references, then explicitly **Add brief to this graph** or **Reject**. This
+assembles research evidence without claiming semantic summarization. It uses
+already retained bytes with acquisition disabled; no model is needed for the
+first acceptance gate.
+
+**Hosts:** Turnstone is the first embedding host because it already consumes
+Servitor's run reducer and retained-source selection. Graphshell is the second,
+using its retained-content and owned GraphSession paths. Both embed the same
+Alembic controls and Athanor workflow implementation, with small product
+adapters for selecting sources, admitting operations and committing results.
+Two windows of one application do not satisfy this gate.
+
+One versioned helper artifact is installed in each host-owned workspace. Each
+installation has its own `ResidentId`, explicit subject/grants, binding
+generation, run namespace and destination. Definition identity is shared;
+installation identity and authority are not copied implicitly. The fixture
+admits identical passage versions separately in both hosts and also includes
+host-specific material to detect accidental cross-scope reads. This proves
+reuse in two hosts; it does not claim cross-machine migration, shared live
+execution or transfer of grants. A single host's cold reopen must preserve
+that installation's identity, lifecycle and history.
+
+**Inputs and bounds:** a captured ordered set of owner/session identity,
+source/resource ID, immutable version or digest, passage selector and exact
+UTF-8 bytes. The fixture uses three plain-text passages, including non-ASCII
+text and repeated titles/URLs with different source identities. At most four
+passages, 2 KiB each and 8 KiB total, enter the first workflow; oversized or
+unreadable selection refuses visibly rather than silently truncating. These
+are declared workflow limits, not new application-wide defaults. Read
+authority is checked before collection and before resumed collection.
+
+**Body:** a deterministic script or native decision driver validates the
+references and emits a Djot note in selection order: source title, exact
+quotation and an owner-routed source reference for each passage. It invents
+no conclusions, paraphrases or citations. Djot remains the document format;
+typed run/proposal metadata carries the identities a display link cannot.
+Limits allow one context read, one body evaluation and one proposal emission.
+The deterministic fixture supplies three decisions, two tool calls, zero
+model tokens, 30,000 ms elapsed time and zero consecutive retryable failures;
+measured time includes awaited work. The note body is capped at 16 KiB;
+source labels and references have a separate 4 KiB aggregate metadata cap.
+Review/apply is a separate bounded operation. These fixture limits and
+observed usage appear in run details.
+
+The public acceptance fixture is concrete; these source/version labels are
+illustrative shorthand for the digests assigned to its actual retained bytes:
+
+| Selection | Retained source | Exact selected passage |
+|---|---|---|
+| A, version 1 | Saved capture titled Field notes | A retained copy remains readable when its origin is offline. |
+| B, version 2 | Editor clip also titled Field notes | The café note cites version 2 of its source. |
+| C, version 1 | Local research note | Acceptance finishes after the destination confirms storage. |
+
+The expected brief has three sections in A/B/C order, each with that title,
+the complete quoted passage and the corresponding source/version reference.
+B's selector is checked against UTF-8 bytes, including `é`. The source table
+and preview make identical titles unambiguous. Changing B to version 3 after
+proposal generation must not change B's quoted bytes or route its citation
+to version 3. Acceptance creates a new note, leaving A/B/C untouched.
+
+**Authority:** the helper may read only the selected versions and submit one
+brief proposal to its owning workshop. It has no source mutation, acquisition,
+credential-release or destination-write grant. After review, the human's
+currently authorized destination operation creates the accepted note through
+the target application's gate. Acceptance does not widen the helper's grants.
+The commit retains both the proposing resident/run and the accepting human's
+identity; the application determines its native author/provenance encoding.
+
+The example input and operation descriptions here are illustrative contracts,
+not implemented wire APIs. The existing app-host action envelope is an ABI,
+not a ready-made semantic operation catalog. Both adapters must expose the
+same versioned brief operations with checked arguments, scope, preconditions,
+effect class and receipts. Palette/keyboard/automation presentations may
+differ; all invoke those owners' same validation and commit paths.
+
+### 5.3 Walkthrough and durable outcomes
+
+1. **Install and scope.** The owner selects the helper revision and source
+   set in the workshop. Admit its binding using existing stack identity and
+   grants; never mint a new trust root from a readable projection. No timer
+   or watch is enabled for this slice. One active run per installation is
+   allowed; another invocation is refused with the existing run identified.
+2. **Capture and propose.** Persist the run header, exact version references
+   and accepted intent before dispatch. The worker receives selected bytes,
+   not the underlying store. Persist its validated proposal artifact and
+   result before exposing **Ready for review**. Worker completion alone does
+   not establish proposal durability.
+3. **Review.** Show exact inputs, note preview, grants, version, usage,
+   refusals and source coverage. Citation activation asks the current source
+   owner to open the recorded version; unavailable or unauthorized material
+   stays unavailable. An edited source is shown as changed, without replacing
+   the quoted version silently. The owner may reject or request a new run.
+4. **Accept.** Capture a destination owner/graph and current revision witness;
+   revalidate the proposal and human authority. Allocate a stable acceptance
+   operation ID and persist intent before dispatch. The target owner creates
+   exactly one retained note Resource and its graph presentation, with the
+   proposal digest and provenance attached through its own mutation path.
+   Both hosts owe this adapter; Turnstone's research-note chooser and
+   Graphshell's generic graph editor do not already implement it.
+5. **Acknowledge and reopen.** Only the destination's confirmed durable
+   receipt yields **Added** and an openable result. An in-memory application,
+   released port request or pending save stays pending with its actual
+   disposition. Close the host and workshop owner, restart, inspect the run,
+   open the brief and activate its exact retained citations with origins off.
+
+The generation run may finish `Completed` when its proposal is durable. The
+goal stays `AwaitingReview` until accepted or rejected; these are workshop
+dispositions, not extra Servitor terminal variants. Acceptance is a separately
+correlated domain operation with its own current authority, bounded deadline
+and receipt; it does not append events to the terminal generation reducer.
+The destination owns its operation ledger and recovery, rather than
+representing the human as the helper's write-capable binding. A completed
+generation must never be presented as a completed destination commit.
+
+The destination must durably associate acceptance operation ID, proposal
+digest, created resource identity and mutation result. Retry uses the same
+operation ID; a different digest under that ID refuses. If that association
+and the graph edit cannot share a transaction, the adapter must specify and
+qualify its recovery path before this workflow can pass. After an uncertain
+write, query that owner for the operation's receipt or reconcile under its
+exclusive writer ownership. Do not regenerate the note or submit another
+edit. Retain a workshop acceptance disposition of `Reconciling` when neither
+completion nor absence can be proved; the completed generation run stays
+terminal and unchanged.
+Turnstone's `HandoffUntracked` default is insufficient for this path.
+
+The first acceptance decision fixes one destination for the proposal and
+durably assigns its operation ID once. Duplicate button activations,
+reconnection and reopened review reuse that assignment; they cannot allocate
+fresh operation IDs to evade deduplication. Another destination or an edited
+brief requires a new explicit proposal/review identity. The fixture exercises
+concurrent duplicate acceptance, not only retries from one client.
+
+Pause stops further dispatch and requests cooperative worker shutdown;
+Armillary's join reports execution status. Servitor retains uncertainty for
+an active run; the destination ledger retains uncertain acceptance. Reopen
+preserves explicit pause and revocation. Resume rechecks
+binding, grants, source access and destination preconditions. Cancellation
+cannot undo an accepted brief; a rejected or superseded proposal cannot later
+be applied by a delayed reply. Dissolving a helper denies new work while
+retaining unresolved effects and required receipts under the owner's policy.
+
+Private passage copies, proposals and journals follow the selected owner's
+sealed storage and lock policy. Lock prevents new reads/effects and clears
+worker material as the actual custody contract requires; it cannot erase
+uncertain effects. If no qualified sealer is supplied, refuse private inputs
+rather than store them in clear. Public synthetic fixtures can qualify run
+mechanics independently of production custody. Observations retain bounded
+nonsecret references; they do not duplicate prompt/passage bodies.
+
+### 5.4 Records and first implementation boundaries
+
+Use related records rather than a universal work state machine: installed
+binding and selected definition, goal/source set, Servitor run header/events,
+immutable proposal, acceptance operation/receipt, and product journal entry.
+References include owner/session namespace, run/step/attempt/generation and
+artifact digests. A model invocation later references its existing Eidetic
+`InferenceRunRecord`; a mesh job and Apparatus observation keep their own
+identities and meanings. A content hash supplies integrity, not read authority.
+
+Persist actionable version references and effect arguments securely enough
+to reconcile without asking a model to reconstruct intent. The raw prompt
+is not a reconciliation prerequisite. Retention may remove resolved content
+under explicit policy; it must retain the unresolved operation's required
+evidence or refuse further work when a configured bound is reached.
+
+Keep shared implementation in the existing Alembic/Athanor homes. Add workshop
+view/domain/driver modules when implementing; a new crate is not required.
+Reuse Armillary task/lifecycle mechanisms and Servitor `admit`, `revalidate`
+and `RunReducer`. Persist explicit attribution through awaited work instead
+of carrying a mutable global author across async calls. Existing graph
+writers remain sole owners; no second GraphSession writer is opened to apply
+a brief. Automatic scheduling, model decisions, procedure learning, MCP/ACP,
+remote execution and fleet migration have separate acceptance gates.
+
+### 5.5 Feature targets and acceptance
+
+| Target | Deliverable and done-condition |
+|---|---|
+| W0 — shared domain and deterministic workflow | **Shared core qualified 2026-10-25; see section 5.8.** Versioned inputs/proposals and persisted binding/run/review records; one reducer implementation, explicit owner clocks/budgets, and exact three-passage output. Plain Servitor consumers retain their current dependency boundary. |
+| W1 — Turnstone owner adapter | Normal retained-source selection, shared workshop controls, real target gate/commit and fallible persistence acknowledgement. Accept/reject and citation routing work without acquisition. |
+| W2 — Graphshell owner adapter | The identical helper body and workshop view/domain model operate through Graphshell's owner, with independent grants and IDs. No Turnstone workflow implementation or database reader is copied. |
+| W3 — recovery and two-host receipt | Both hosts pass the matrix below on pinned source/dependency cuts. Headed evidence proves normal controls and product history; fresh-process evidence proves durable state. Publication and physical fleet behavior are reported separately. |
+
+The mandatory matrix covers each host, not merely a shared unit fixture:
+
+- Exact three-source order, Unicode quotation spans and versioned citations;
+  empty, oversized, unauthorized and missing inputs; source title/URL collisions.
+- A fourth source outside the grant cannot enter context. Changed versions,
+  wrong owner/session and stale destination revision refuse or request review.
+- Reject adds no note. Accept produces one durable note with proposing run
+  and accepting actor attribution. Duplicate acceptance returns that receipt;
+  a changed proposal under the same operation ID refuses.
+- Kill before dispatch, after proposal persistence, after target application,
+  and before acceptance-receipt persistence. Reopen yields no repeated edit,
+  false success or discarded uncertainty; inability to recover blocks acceptance.
+- Pause/resume, revoke/dissolve, lock where composed, budget exhaustion and
+  delayed/wrong-generation replies. Source/authority changes during awaits
+  are revalidated. Cooperative cancellation and observed join remain distinct.
+- Cold reopen with source origins unavailable: same installation/run IDs,
+  exact proposal/result, pending review or reconciliation, exact local reader
+  activation, and unchanged source content. Two applications pass, with one
+  shared body and view/domain implementation and their actual product adapters.
+
+Fixtures use synthetic public retained content initially. Additional private
+content rows require the supplied custody boundary; model-driven rows require
+a real provider receipt and evidence of value beyond deterministic assembly.
+No software two-host receipt establishes two physical machines or a general
+retrieval-quality benchmark.
+
+### 5.6 Findings (verified 2026-10-24)
+
+- Alembic's [charter](../../../crates/distillery/alembic/README.md) already
+  assigns identity/purpose, tools/models, histories, petitions and lifecycle
+  controls to the workshop. Its [library](../../../crates/distillery/alembic/src/lib.rs)
+  implements recall only; the workshop remains unbuilt.
+- [Athanor](../../../ports/distillery/athanor/src/lib.rs) implements proposal
+  passes for forgetting, consolidation and retirement. These are reusable
+  domain precedents, not evidence of a scheduled workshop service.
+- `repos/eidetic/crates/servitor/src/resident.rs` and `run.rs` supply admission
+  and pure reduction. Its README records the 98-test promotion gate; that
+  historical receipt does not qualify this new workflow.
+- `repos/turnstone/src/resident_runs.rs` persists narrow run records and
+  defaults to untracked external handoff. Its research-note selection in
+  `repos/turnstone/src/app/research_note_arms.rs` binds an actual Knot document;
+  it is not the planned retained-brief destination operation.
+- Graphshell's [retained-content producer](../../../ports/graphshell/src/retained_content/producer.rs)
+  and [Mere host](../../../ports/graphshell/src/mere_host.rs) provide source
+  presentation and an owned graph writer. The accepted-note adapter and
+  operation receipt remain implementation requirements.
+- Armillary's independently selected actor/lifecycle library already supplies
+  execution completion. Its API need not absorb Servitor, identity or graph
+  dependencies to drive this workflow.
+
+### 5.7 Shared-domain implementation findings (2026-10-25)
+
+The initial W0 implementation is in Alembic’s [shared records and controls](../../../crates/distillery/alembic/src/workshop.rs)
+and Athanor’s [workshop domain and native worker adapter](../../../ports/distillery/athanor/src/workshop.rs).
+Recall remains independently selectable. Athanor’s existing furnace source
+is moved unchanged to `src/furnace.rs` and re-exported under its default
+`furnace` feature; workshop-only consumers can disable that feature.
+Servitor remains in Eidetic and is a second real run consumer here. Armillary
+is optional execution transport; no run-policy or custody dependency is
+added to Armillary.
+
+The v1 definition uses retained public bytes only, literal Djot quotations,
+exact UTF-8 selectors, owner/version references and integrity digests. The
+three recorded steps implement the fixture’s three decisions/two tool calls
+and zero tokens. Selected definition, binding, explicit limits, run events,
+immutable proposal, separate review state and acceptance assignment persist
+in a transactional owner namespace. Compare-and-write refuses a concurrent
+loser rather than overwriting it. A duplicate acceptance reloads its first
+assignment; changing destination/human under that identity refuses. Replay
+reduces recorded events without dispatching work. Generation completion is
+independent of a destination’s durable acknowledgement.
+
+The initial retention policy caps one installation at 32 runs and 1 MiB,
+reserving space for pending artifacts/acceptance resolution. Hitting that
+bound refuses new work and preserves unresolved history. A general retention
+service, body adoption/migration, private storage qualification, scheduling
+and model calls are outside this initial implementation.
+
+The shared-domain fixtures use independent synthetic owner scopes and a
+native worker. Their cold-process store checks do not qualify Turnstone or
+Graphshell. W1/W2 still need normal source selection, rendering of the shared
+controls, current source/custody gates, and actual destination adapters. In
+particular, Pandect’s `GraphSession::transact_deltas_published` already joins
+journal changes and addressable graph publication, but its public API does
+not yet join an evidence-brief operation ledger and retained note Resource.
+Neither a separate ledger write nor Turnstone’s `SaveSession`/untracked
+handoff supplies the required atomic acceptance receipt. W3 remains open
+until the real product paths pass section 5.5.
+
+### 5.8 Shared-core qualification (2026-10-25)
+
+Source `370b251f3` passes 34 native library tests: 23 workshop cases and all
+11 existing furnace cases. The workshop core also passes wasm32 checking
+with defaults and Armillary disabled. Its normal dependency graph has 72
+packages and excludes Armillary, Tokio, ESP, Burn/CubeCL, the UI/kernel and
+inference/cache crates. This is a consumer qualification of Servitor’s pure
+admission/run boundary; no supplier source move or API change was needed.
+
+Separate native seed/reopen processes retain the same public synthetic
+installation, proposal, terminal generation and uncertain acceptance in a
+DirectoryBackend store. The native test binary and store are frozen under
+`Code/output/alembic-workshop-20261025`, with verified binary/store/log hashes
+in the [qualification record](../../../support/receipts/alembic-workshop-20261025/qualification.json).
+Checks cover Unicode selectors, literal quotation structure, exact version
+routing after source change, missing/oversized/private/out-of-scope inputs,
+concurrent invocation and acceptance, stale replies, revocation, pause/resume,
+deadlines, persistence refusal, corruption and retention bounds. The fixture
+uses injected logical time; wasm evidence is compilation only.
+
+These results close W0’s shared-core gate. W1–W3 remain open. The synthetic
+receipt and owner scopes qualify domain mechanics, without claiming an actual
+note/graph mutation, headed product controls, production custody or physical
+mesh execution. The actual destination ledger/Resource/graph transaction is
+still the consequential product acceptance boundary.
+
+## Decisions — workshop reconciliation (2026-10-24)
+
+- **D8, keep Servitor's present source home.** Mark: "leave Servitor where it
+  is for now." Servitor remains in Eidetic. This applies the existing stack
+  boundary while the workshop earns a second run consumer; no move to
+  Armillary or split of authority/run crates is part of this plan.
+
+  Links: area Stack · draws on stack.1 · summary Servitor remains in Eidetic while Alembic composes its admission and run contracts.
+
+The ownership reconciliation and concrete workflow in section 5 are the design
+specified in response to Mark's request to reconcile the workshop with
+Servitor and Armillary and flesh out a first workflow in two hosts. They are
+not a claim of implementation, acceptance or authorization for new standing
+automation, credentials, grants or publication.
+
 ## Cross-references
 
 - [Alembic memory + engrams](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md) — the architecture seed this realizes.
@@ -266,6 +632,19 @@ Verification: a unit/integration test that `save → (drop) → open` round-trip
 
 ## Progress
 
+- **2026-10-25:** implemented and qualified the W0 shared core at `370b251f3`:
+  versioned Alembic records/controls, transactional Athanor bindings/runs/review,
+  Servitor admission/replay and an optional Armillary worker. All 34 native
+  tests, wasm core checking, dependency-boundary audit and independent-process
+  domain reopen pass. The default furnace source is preserved byte-for-byte.
+  W1/W2 actual product adapters and W3 headed/cold product acceptance remain
+  open; no private or model-driven qualification is claimed.
+
+- **2026-10-24:** reconciled the workshop with Servitor and Armillary, retaining
+  Servitor in Eidetic. Specified the retained-passage evidence brief in
+  Turnstone and Graphshell, exact owner operations/receipts, separate review
+  state, recovery/refusal controls and two-host done-conditions. This is a
+  documentation/design change; all W0–W3 implementation gates remain open.
 - **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
   535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
   dated status (A-C landed with host halves retired with meerkat, D half landed in

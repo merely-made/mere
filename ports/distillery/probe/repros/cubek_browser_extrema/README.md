@@ -1,7 +1,7 @@
 # Cubek browser extrema reproducer
 
 This is the reduction-only extraction of Distillery's first failed MiniLM
-browser row. It uses Burn 0.22.0-pre.4 and Cubek 0.3.0-pre.4 to run four scalar
+browser row. The current qualification uses Burn 0.22.1 and Cubek 0.3.1 to run four scalar
 extrema cases through BrowserWebGpu in a dedicated worker:
 
 - a finite maximum;
@@ -35,12 +35,22 @@ Open the printed URL in headed Chromium and choose **Run reduction cases**.
 For automation, call `window.cubekExtremaRepro.run()` and inspect both
 `result` and `gpu_errors`.
 
-The checked-in lockfile enables Mere's candidate `cubek-reduce` patch. To
-reproduce the released failure, remove that one patch entry from `Cargo.toml`,
-regenerate `Cargo.lock`, and rebuild; leave the `cubecl-runtime` manifest patch
-in place because it is the independent wasm packaging repair required by this
-prerelease row.
+The current lock selects Mere's rebased `cubek-reduce` patch. A pristine
+comparison must remove that patch while retaining the same released
+Burn/CubeCL/Cubek cohort. CubeCL 0.11.1 now supplies the runtime directly;
+the former independent persistence manifest patch is retired. Current
+execution results and source identities are recorded in the Burn migration
+plan, section 13.48. Older receipts retain their original prerelease versions.
 
 [`UPSTREAM_ISSUE.md`](UPSTREAM_ISSUE.md) contains an issue-ready extraction of
 the failure, the generated WGSL before and after materialization, and the exact
 validation boundary.
+
+## 2026-10-24 released patch cohort
+
+The [normal browser receipt](receipts/2026-10-24_burn_0221_iab.json) passes with no WebGPU
+validation or page-gate errors. The [planted-error control](receipts/2026-10-24_burn_0221_rejection_control.json)
+correctly refuses even though its numerical cases match. The current
+qualification record and source/lock/bundle hashes live in migration plan
+section 13.48. These receipts do not relabel older comparisons or qualify
+other browser versions and full products.

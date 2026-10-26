@@ -439,6 +439,16 @@ no intermediate `ports/` or `crates/` directory. **Names:** `mere-alembic` /
 ruling and claimed the same day: `mere-athanor 0.0.1` published from mere
 `c0216cad`.
 
+**Workshop reconciliation, 2026-10-24:** the [Alembic implementation plan,
+section 5](mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+is the current composition/workflow specification. It retains this placement
+inside Distillery, leaves Servitor in Eidetic, and uses Armillary for
+execution. Its first gate is a retained-passage evidence brief in Turnstone
+and Graphshell, with review, owner-acknowledged application and cold reopen.
+The shared domain/view core and native worker are implemented as of
+2026-10-25 (Alembic plan section 5.7). The product adapters and founding
+two-host receipt remain open.
+
 ## 8. Capabilities that need exposure, not another port
 
 ### Surface contribution and handler choice

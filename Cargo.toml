@@ -237,9 +237,9 @@ chartulary = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 numen = { version = "0.2.0", path = "crates/conatus/numen" }
-esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 # Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
-esp-testkit = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp-testkit = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 mora = "0.1.0"
 mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
@@ -672,7 +672,7 @@ cambium-desktop = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 chirograph = { path = "crates/chirograph" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 mere-fetch = { path = "crates/system/fetch" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
 graphshell = { path = "ports/graphshell" }
@@ -756,7 +756,7 @@ chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 finger-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 gemini-protocol = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
@@ -815,12 +815,10 @@ vello_shaders = { git = "https://github.com/mark-ik/vello", rev = "276b46648c08f
 # existed to do. The vendored copy remains at support/patches/cubecl-wgpu for
 # archaeology until a stable 0.22 lands, but it is no longer patched in.
 # cubecl-wgpu = { path = "support/patches/cubecl-wgpu" }
-# cubecl-runtime 0.11.0: the source is pristine upstream. The manifest
-# removes persistence from default features (ruling 375), avoiding the Turso
-# cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
-# persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
-cubecl-runtime = { path = "support/patches/cubecl-runtime" }
-# cubek-matmul 0.3.0: retain packed Q4 execution on 48-KiB workgroup devices
+# RETIRED 2026-10-24: the manifest-only cubecl-runtime persistence patch.
+# CubeCL 0.11.1 fixes optional compiler default-feature forwarding; selected
+# native and wasm graphs do not activate persistence (migration plan 13.48).
+# cubek-matmul 0.3.1: retain packed Q4 execution on 48-KiB workgroup devices
 # by reducing unit stage partitions after register partitions reach one.
 # Remove when upstream selection admits the same bounded packed-weight rows.
 cubek-matmul = { path = "support/patches/cubek-matmul" }
@@ -828,7 +826,7 @@ cubek-matmul = { path = "support/patches/cubek-matmul" }
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source
 # remains for provenance; current consumers select the registry crate.
-# burn-remote 0.22.0: pump-observed targeted close and session receipts
+# burn-remote 0.22.1: pump-observed targeted close and session receipts
 # let owner reclaim stop one admitted lease without dropping the protocol.
 # Remove when upstream provides equivalent control and passes the lifecycle
 # receipt, including reclaim and recovery.
@@ -899,7 +897,7 @@ chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 errand = { git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
-esp = { git = "https://github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp = { git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 gemot = { git = "https://github.com/merely-made/gemot.git", rev = "8ffdc9a5bab5dcc82fe3be4bfa0e1c5d8dbbab1c" }
 luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 mere-proofs = { git = "https://github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
@@ -923,4 +921,4 @@ servitor = { git = "https://www.github.com/merely-made/eidetic.git", rev = "aa94
 stickleback = { git = "https://www.github.com/merely-made/eidetic.git", rev = "aa94fe22eea29e9b54e01ed21e6991536ed4f208" }
 
 [patch."https://github.com/merely-made/esp.git"]
-esp = { git = "https://www.github.com/merely-made/esp.git", rev = "86fadf2bf0f14f2c5f4ef3a40d092867c1986175" }
+esp = { git = "https://www.github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
