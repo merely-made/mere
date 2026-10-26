@@ -138,6 +138,16 @@ impl SemanticStatement {
         self.withdrawn.is_none()
     }
 
+    /// Whether both records are one claim under a carried handle: predicate, sub-kind,
+    /// scope, asserter and basis reason. Labels, times and method version may differ.
+    pub fn same_claim_as(&self, other: &Self) -> bool {
+        self.predicate == other.predicate
+            && self.recognized_sub_kind == other.recognized_sub_kind
+            && self.graph_scope == other.graph_scope
+            && self.provenance_iri == other.provenance_iri
+            && self.basis.same_reason_as(&other.basis)
+    }
+
     pub fn normalize_basis_compat(&mut self) {
         if self.basis.note.is_none() {
             self.basis.note = self.label.clone();

@@ -159,7 +159,7 @@ pub fn probe_legacy_mint_links(
     let mut source = baseline.clone();
     let mut attribution = ReplayAttribution::from_baseline(baseline);
     let mut known = statement_ids(&baseline.to_snapshot().edges);
-    let mut raw = Vec::<(usize, Pair, ClaimIdentity, Pair)>::new();
+    let mut raw = Vec::<(usize, Pair, super::SemanticStatement, Pair)>::new();
     let mut diagnostics = Vec::new();
     for (index, entry) in entries.iter().enumerate() {
         let before = surface_pairs(&source)?;
@@ -174,7 +174,7 @@ pub fn probe_legacy_mint_links(
                     if old.contains(&statement.statement_id) {
                         continue;
                     }
-                    let identity = ClaimIdentity::from(statement);
+                    let identity = statement.clone();
                     if matches!(entry.delta, CapturedDelta::ReplaySetEdgesByIds { .. })
                         && !known.contains(&statement.statement_id)
                         && statement.recognized_sub_kind.is_none()
@@ -242,26 +242,8 @@ type Pairs = BTreeMap<Pair, Vec<PersistedEdge>>;
 struct Origin {
     surface: Pair,
     resource: Option<Pair>,
-    identity: ClaimIdentity,
-}
-
-#[derive(Clone, PartialEq, Eq)]
-struct ClaimIdentity {
-    predicate: String,
-    recognized_sub_kind: Option<super::SemanticSubKind>,
-    graph_scope: crate::types::GraphScope,
-    provenance_iri: Option<String>,
-}
-
-impl From<&super::SemanticStatement> for ClaimIdentity {
-    fn from(statement: &super::SemanticStatement) -> Self {
-        Self {
-            predicate: statement.predicate.clone(),
-            recognized_sub_kind: statement.recognized_sub_kind,
-            graph_scope: statement.graph_scope.clone(),
-            provenance_iri: statement.provenance_iri.clone(),
-        }
-    }
+    /// The statement as first seen: later records of the handle must be the same claim.
+    claim: super::SemanticStatement,
 }
 
 #[derive(Clone, PartialEq)]
@@ -562,7 +544,7 @@ impl Replay {
             return Ok(Origin {
                 surface: pair,
                 resource: None,
-                identity: statement.into(),
+                claim: statement.clone(),
             });
         }
         let (current_from, from_url) = self.ensure_resource(pair.0)?;
@@ -597,7 +579,7 @@ impl Replay {
         Ok(Origin {
             surface: pair,
             resource: Some((from, to)),
-            identity: statement.into(),
+            claim: statement.clone(),
         })
     }
 
@@ -793,7 +775,7 @@ impl Replay {
                             "legacy handle {id} changed original endpoints"
                         )));
                     }
-                    if origin.identity != ClaimIdentity::from(statement) {
+                    if !origin.claim.same_claim_as(statement) {
                         return Err(LegacyMigrationError(format!(
                             "legacy handle {id} changed its original claim identity"
                         )));
