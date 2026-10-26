@@ -3,7 +3,7 @@
 ## mere_docs/design/2026-10-26_gui_catalog_design.md
 
 - disposition: current
-- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, and §7, Mark's rulings 1 to 5 on them." - accurate: yes
+- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, and §7, Mark's rulings 1 to 5 on them, and §8, his refinement of rulings 1 and 3." - accurate: yes
 - claims checked: 38 - holds: 38, stale: 0, unverifiable: 0
 
 ### Stale claims
