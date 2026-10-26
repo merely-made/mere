@@ -15,6 +15,7 @@
 #![doc(html_no_source)]
 
 pub mod conditions;
+pub mod custodian;
 pub mod custody;
 pub mod door;
 pub mod embedded_reservoir;

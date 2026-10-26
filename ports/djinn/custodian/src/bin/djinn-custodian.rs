@@ -118,9 +118,12 @@ fn listener(config: &Config, args: &Args) -> Result<Box<dyn custody_wire::transp
     #[cfg(unix)]
     {
         use custody_wire::transport::UnixSocketListener;
+        // Signed principals are identified by code signature where the OS
+        // can say so (macOS); elsewhere they never match.
+        let signed = config.signed_identities();
         if let Some(path) = &args.socket {
             return UnixSocketListener::bind(path)
-                .map(|l| Box::new(l) as Box<dyn custody_wire::transport::Listener>)
+                .map(|l| Box::new(l.with_signed(signed)) as Box<dyn custody_wire::transport::Listener>)
                 .map_err(|e| format!("bind {}: {e}", path.display()));
         }
         #[cfg(target_os = "linux")]
@@ -129,9 +132,8 @@ fn listener(config: &Config, args: &Args) -> Result<Box<dyn custody_wire::transp
         }
         #[cfg(target_os = "macos")]
         if let Some(listener) = platform::macos::launchd_listener("custody").map_err(|e| e.to_string())? {
-            return Ok(Box::new(UnixSocketListener::from_listener(listener)));
+            return Ok(Box::new(UnixSocketListener::from_listener(listener).with_signed(signed)));
         }
-        let _ = config;
         Err("no listening socket from the service manager".into())
     }
     #[cfg(windows)]

@@ -15,7 +15,7 @@ use chirograph::{
     CapabilityProfile, Carrier, CarrierRequestBody, CarrierResponseBody, PresentationCapability,
     ProtocolVersion, ResumeReply, ResumeRequest, SessionOpen,
 };
-use common::{lane, lending, now_ms, open_vault, owner, profile, unlock, write_device_settings};
+use common::{lane, lending, now_ms, open_vault, owner, profile, write_device_settings};
 use distillery::ResidentReceipt;
 use djinn::resident::DjinnResident;
 use djinn::resident_distillery::ResidentDistillery;
@@ -107,7 +107,7 @@ fn open_body() -> CarrierRequestBody {
 async fn resident_board_fold_advances_the_admitted_chronicle_route() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     write_device_settings(&data_root, Some(lending()));
 
     let mut resident = DjinnResident::open(
@@ -115,8 +115,7 @@ async fn resident_board_fold_advances_the_admitted_chronicle_route() {
         &data_root,
         &profile(),
         owner(Some(lane())),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose Djinn with its resident Distillery lane");
@@ -281,7 +280,7 @@ async fn resident_board_fold_advances_the_admitted_chronicle_route() {
 async fn resident_board_state_transition_resumes_by_contiguous_diff() {
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     write_device_settings(&data_root, Some(lending()));
 
     let mut resident_lane = lane();
@@ -295,8 +294,7 @@ async fn resident_board_state_transition_resumes_by_contiguous_diff() {
         &data_root,
         &profile(),
         owner(Some(resident_lane)),
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose Djinn with its resident Distillery lane");

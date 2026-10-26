@@ -284,8 +284,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &data_root,
         &profile,
         owner,
-        &vault_dir,
-        Unlock::passphrase(PASSPHRASE),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .map_err(|error| format!("compose temporary Djinn resident: {error}"))?;

@@ -481,6 +481,26 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
+            // H1: a Graphshell guest delegation is signed inside the
+            // custodian, which checks the statement and asks its own consent.
+            if source == KeySource::Persona
+                && crate::custodian::is_graphshell_delegation(&salt)
+                && let Some(link) = keeper.custodian().cloned()
+            {
+                if !keeper.policy().allows_act(source, &salt) {
+                    return Err(CustodyRefusal::NotReleasable);
+                }
+                let profile = keeper.current_profile_id().0;
+                return tokio::task::spawn_blocking(move || {
+                    link.sign_delegation(&profile, crate::custodian::GRAPHSHELL_AUDIENCE, &salt, &message)
+                        .map(|(public_key, signature)| CustodyAnswer::Signature {
+                            public_key,
+                            signature: signature.to_vec(),
+                        })
+                })
+                .await
+                .map_err(failed)?;
+            }
             unlocked(&keeper)?;
             sign(
                 keeper.policy(),

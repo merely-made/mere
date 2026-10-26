@@ -293,6 +293,20 @@ impl Config {
         Ok(())
     }
 
+    /// Every signed identity a principal is matched on.
+    pub fn signed_identities(&self) -> Vec<custody_wire::SignedIdentity> {
+        self.principals
+            .iter()
+            .filter_map(|rule| match &rule.matcher {
+                Matcher::Signed { team, identifier } => Some(custody_wire::SignedIdentity {
+                    team: team.clone(),
+                    identifier: identifier.clone(),
+                }),
+                _ => None,
+            })
+            .collect()
+    }
+
     /// The principal a peer is, if any. The first matching rule wins.
     pub fn principal(&self, peer: &Peer) -> Option<Principal> {
         self.principals

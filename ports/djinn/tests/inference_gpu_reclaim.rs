@@ -66,7 +66,7 @@ async fn an_ask_cancels_a_trainer_that_was_posted_as_checkpointable() {
 async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
     let directory = tempfile::tempdir().unwrap();
     let data_root = directory.path().join("data");
-    let (vault_dir, identity) = open_vault(directory.path());
+    let (_, identity) = open_vault(directory.path());
     let mut posture = lending();
     posture.allowed_resources = vec![TRAINER_RESOURCE.into()];
     posture.accepted_checkpoints = vec!["restart".into(), "resumable".into()];
@@ -109,8 +109,7 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
         &data_root,
         &profile(),
         settings,
-        &vault_dir,
-        unlock(),
+        djinn::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();

@@ -58,12 +58,14 @@ fn the_server_expectation_admits_only_the_installed_identity() {
     let expect = ServerExpectation {
         unix_uids: vec![0, 990],
         windows_sids: vec!["S-1-5-80-1".into()],
+        signed: vec![SignedIdentity { team: "T".into(), identifier: "c".into() }],
     };
     assert!(expect.admits(&Peer::Unix { uid: 990, gid: 990, pid: None }));
     assert!(!expect.admits(&Peer::Unix { uid: 1000, gid: 1000, pid: None }));
     assert!(expect.admits(&Peer::Windows { sid: "S-1-5-80-1".into(), pid: 4 }));
     assert!(!expect.admits(&Peer::Windows { sid: "S-1-5-21-9".into(), pid: 4 }));
     assert!(!expect.admits(&Peer::Signed { team: "T".into(), identifier: "i".into() }));
+    assert!(expect.admits(&Peer::Signed { team: "T".into(), identifier: "c".into() }));
 }
 
 #[cfg(unix)]
@@ -81,6 +83,19 @@ mod unix {
             stream: Box::new(stream),
             peer,
         }
+    }
+
+    /// The negative control: this ad-hoc-signed test binary satisfies no
+    /// team requirement, so it stays a plain uid peer. The positive control
+    /// needs a team-signed custodian and runs in the macOS receiving gate.
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn an_unsigned_peer_never_passes_as_a_signed_identity() {
+        let (a, _b) = UnixStream::pair().unwrap();
+        let candidates = [SignedIdentity { team: "ABCDE12345".into(), identifier: "com.merely.djinn.custodian".into() }];
+        assert!(peer::signed_peer(a.as_raw_fd(), &candidates).is_none());
+        let injected = [SignedIdentity { team: "X\" or anchor apple".into(), identifier: "y".into() }];
+        assert!(peer::signed_peer(a.as_raw_fd(), &injected).is_none(), "requirement text cannot be injected");
     }
 
     #[test]
@@ -102,7 +117,7 @@ mod unix {
         let (client, mut server) = UnixStream::pair().unwrap();
         let expect = ServerExpectation {
             unix_uids: vec![peer::effective_uid().wrapping_add(1)],
-            windows_sids: vec![],
+            ..ServerExpectation::default()
         };
         let refused = Client::over(connection(client), &expect);
         assert!(matches!(refused, Err(ClientError::WrongServer(_))));
@@ -158,7 +173,7 @@ mod unix {
         });
         let expect = ServerExpectation {
             unix_uids: vec![peer::effective_uid()],
-            windows_sids: vec![],
+            ..ServerExpectation::default()
         };
         let client = Client::over(connection(client), &expect).unwrap();
         assert_eq!(client.session().generation, 3);

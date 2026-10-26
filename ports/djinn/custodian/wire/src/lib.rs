@@ -32,7 +32,7 @@ pub use contract::{
     Answer, AttestationParts, ClientMessage, Fact, FactCause, Limits, LockReport, Operation,
     Outcome, Petition, Purpose, ReleasedKey, ServerMessage, Session, Status,
 };
-pub use peer::{Peer, ServerExpectation};
+pub use peer::{Peer, ServerExpectation, SignedIdentity};
 pub use secret::{Bytes, Secret};
 
 /// The contract version a hello names. A server refuses any other.

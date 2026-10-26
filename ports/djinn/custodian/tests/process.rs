@@ -108,7 +108,7 @@ fn start(fixture: &Fixture) -> Running {
 fn client(fixture: &Fixture) -> Client {
     let expect = ServerExpectation {
         unix_uids: vec![uid()],
-        windows_sids: vec![],
+        ..ServerExpectation::default()
     };
     Client::open(&UnixSocketConnector::new(&fixture.socket), &expect).unwrap()
 }

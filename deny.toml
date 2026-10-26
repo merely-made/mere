@@ -3,9 +3,10 @@
 # Today it holds one rule, the custody boundary (dramatis repo plan, rulings
 # D4 and D16): castellan keeps every secret at rest and in hand (the vault,
 # its storages and unlock ladder, the SSH agent, the wallet's seeds and
-# private epochs). The resident and its independent custodian may link it;
-# apps/workers call an authenticated custody route. The new custodian remains
-# synthetic-only while the production H1 consumer gates are incomplete.
+# private epochs). Djinn and its independently launched custodian may link it;
+# apps and workers call an authenticated custody route, and Djinn reaches the
+# custodian through custody-wire, which links no castellan. Until H2 Djinn
+# still links it for the consumers that have not moved.
 #
 #   cargo deny check bans
 #

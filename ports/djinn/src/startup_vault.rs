@@ -126,8 +126,9 @@ impl<U: crate::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
     }
 }
 
-/// The opened vault, and the passphrase that opened it, kept only for the
-/// resident's second open of the same directory (Distillery's authority).
+/// The opened vault, and the passphrase that opened it, kept only until the
+/// start hands it once to an installed custodian (custody isolation plan,
+/// H1). Nothing opens this vault a second time from it.
 pub struct Started {
     /// The opened storage.
     pub opened: OpenedStorage,
@@ -137,14 +138,10 @@ pub struct Started {
 }
 
 impl Started {
-    /// The storage, the choice, and the unlock for one more open of the same
-    /// vault; whoever drops that unlock drops the last copy of the passphrase.
-    pub fn into_parts(self) -> (OpenedStorage, VaultChoice, Unlock) {
-        let second = match self.passphrase {
-            Some(passphrase) => Unlock::Passphrase(passphrase),
-            None => Unlock::AutoOs,
-        };
-        (self.opened, self.choice, second)
+    /// The storage, the choice, and the passphrase for an installed
+    /// custodian's unlock; whoever drops it drops the last copy.
+    pub fn into_parts(self) -> (OpenedStorage, VaultChoice, Option<Zeroizing<Vec<u8>>>) {
+        (self.opened, self.choice, self.passphrase)
     }
 }
 
@@ -468,12 +465,9 @@ mod tests {
             "only the cancel waits; Argon2 throttles a miss"
         );
         assert!(matches!(prompt.1[1], Ask::Unlock { retry: Some(_) }));
-        let (_, choice, second) = started.into_parts();
+        let (_, choice, passphrase) = started.into_parts();
         assert_eq!(choice, VaultChoice::Passphrase);
-        assert!(
-            matches!(second, Unlock::Passphrase(_)),
-            "kept for the second open"
-        );
+        assert!(passphrase.is_some(), "kept only for a custodian's unlock");
     }
 
     #[test]
@@ -568,9 +562,9 @@ mod tests {
         castellan::custody::persist_lock(dir.path()).unwrap();
         let mut prompt = script(&[Some("wrong"), None, Some("right")]);
         let (started, events, slept) = start_as(dir.path(), VaultChoice::AutoOs, &mut prompt);
-        let (opened, choice, second) = started.unwrap().into_parts();
+        let (opened, choice, passphrase) = started.unwrap().into_parts();
         assert_eq!(choice, VaultChoice::AutoOs);
-        assert!(matches!(second, Unlock::AutoOs));
+        assert!(passphrase.is_none());
         assert!(!opened.storage.is_locked());
         assert_eq!(
             events,

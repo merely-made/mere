@@ -57,7 +57,7 @@ fn serve(dir: &std::path::Path, decisions: &[bool]) -> std::path::PathBuf {
 fn expect() -> ServerExpectation {
     ServerExpectation {
         unix_uids: vec![euid()],
-        windows_sids: vec![],
+        ..ServerExpectation::default()
     }
 }
 
@@ -118,7 +118,7 @@ fn a_forged_approval_field_is_an_invalid_request_and_a_wrong_server_gets_nothing
     let reply = read_message::<_, ServerMessage>(&mut raw).unwrap().unwrap();
     assert!(matches!(reply, ServerMessage::Outcome { request: 77, outcome: Outcome::Refused { code }, .. } if code == "invalid-request"));
 
-    let wrong = ServerExpectation { unix_uids: vec![euid().wrapping_add(1)], windows_sids: vec![] };
+    let wrong = ServerExpectation { unix_uids: vec![euid().wrapping_add(1)], ..ServerExpectation::default() };
     assert!(matches!(Client::open(&UnixSocketConnector::new(&path), &wrong), Err(ClientError::WrongServer(_))));
 }
 

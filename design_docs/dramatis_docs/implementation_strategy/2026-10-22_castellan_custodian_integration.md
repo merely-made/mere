@@ -1,6 +1,6 @@
-# Castellan custodian integration on macOS
+# Castellan custodian integration
 
-Status: the frozen native01 fixture passed 49/49; this source cut adds the residue repair and has not been requalified as a new native binary; real consumers remain gated.
+Status (2026-10-26): the portable custodian landed on main. `djinn-custodian` is now a separate process behind one contract (`custody-wire`), with launchers for Linux, macOS and Windows. Its negative controls pass on macOS, and the Linux and Windows builds type-check. Djinn routes the two H1 consumers through it when one is installed. Linux, signed-macOS and Windows receiving runs, and every other consumer (H2), are still gated. The frozen native01 fixture's 49/49 qualifies only that synthetic binary. The residue repair is on main and its residue scenarios pass.
 
 ## Decision and constraints
 
@@ -40,4 +40,32 @@ Even a passing synthetic receiving run does not enable real consumers automatica
 
 The historical attacker decoder understands the old CryptoKit envelope. Any obtained wrapping key or available signing authority fails the new gate, but that decoder is not a positive control for Castellan's storage codec. User cancellation, missing files, arbitrary signing failures, timeouts, unavailable providers and ENOENT are not passing denials.
 
-Implementation: [service core](../../../ports/djinn/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). Machine-readable receipts pin the source, artifact, tests, failures and pending receiving status; they must keep `real_consumers_allowed` false until the applicable gates are explicitly satisfied.
+Implementation: [service core](../../../ports/djinn/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). The harness still links the synthetic core (`djinn_custodian::synthetic`) through the `native-host` C ABI. Its receipts were retired with the residue-fix worktree on 2026-10-26; the results that matter are recorded here and in the repair plan.
+
+## Portable cut, 2026-10-26
+
+The macOS slice above was the starting point. The cut on main makes the custodian a process on every desktop OS. It owns vault open, unlock, lock, root and root-derived signing, and reviewed derived-key release:
+
+- **Contract.** `custody-wire` implements §5.6 once. The peer principal comes from the OS connection: `SO_PEERCRED`, `getpeereid`, or the named-pipe client SID, plus a code-signature identity from the macOS audit token. It never comes from the hello. Sessions open with version, a fresh instance, the lock generation and the granted scopes. Operations are typed, with a request id and an expected instance and generation. Consent petitions carry a custodian-derived digest. Decisions count only from the trusted channel and only for that digest, request and generation. Outcomes are typed, and a disconnect is `Unknown`. Lock, unlock and revocation are monotonic facts. Frames keep the Graphshell door's wire and clear their buffers; the door module itself is not linked.
+- **Core.** It is transport-free and holds Djinn's real passphrase vault, locked at every start. It reopens only the configured, remembered or sole profile, refuses a changed identity and never mints one. Policy is installed, deny-by-default and per principal. A desktop-uid/SID principal cannot sign or release unattended, or be the consent channel, outside declared development mode.
+- **Launchers.**
+  - Linux: a socket-activated systemd system service under `djinn-custodian-USER`. It applies `no_new_privs`, non-dumpable, Landlock (ABI 6 in protected mode) and a seccomp allowlist before input. polkit `auth_self` consent runs from a helper forked before confinement.
+  - macOS: a launchd agent adopting its launchd socket, with deny-attach and a hardened-runtime check. Both ends identify each other by code signature.
+  - Windows: an SCM service under its virtual account, serving a pipe with a protected DACL and client and server SID checks, and process mitigations.
+- **Djinn.** Djinn is a client for the two H1 consumers. Graphshell's `mere.graphshell` guest delegations are decoded, checked for audience, issuer and scope key, and signed inside the custodian. Distillery's mesh author receives exactly its two release salts, checked against the custodian's attestations. Distillery's second vault open is gone in every mode, so Djinn no longer keeps the start's passphrase for it. A locked or unreachable custodian leaves identity pending; nothing falls back to Djinn's own vault.
+
+Evidence (macOS, this checkout; Linux and Windows type-checked for `x86_64-unknown-linux-gnu` and `x86_64-pc-windows-gnu`):
+
+| Suite | Result |
+| --- | --- |
+| `custody-wire` | 8 tests pass. Frames refuse oversize. Decoders refuse forged approval, a principal in the hello and extra fields. The client sends nothing to an unexpected server, and a lost connection is `Unknown`. An unsigned peer never passes as a signed identity. |
+| `djinn-custodian` core and socket | 16 tests pass, plus the 13 synthetic-core tests. Refused: wrong profile, adjacent namespace, mislabelled audience and signing oracle. Consent is bound to digest, request and generation; self-approval is refused; per-generation consent resets on lock. A lock during a pending petition invalidates it. A non-durable barrier degrades the lock without unlocking. A stale instance or generation and readmission after revocation are refused. Expiry, withdrawal, budgets and the handshake deadline hold. |
+| `djinn-custodian` process | 4 tests pass with the real binary. It starts locked. Its loss is `Unknown`, and a restart is locked under a fresh instance, refusing the old one. Adoption keeps the identity and leaves the source byte-identical. Protected mode refuses a self-bound socket. |
+| Djinn `custodian_h1` | 4 tests pass. Distillery's author is released for exactly its salts. A Graphshell delegation is signed by the custodian's key, not Djinn's. A foreign issuer is refused. A locked or absent custodian refuses with no fallback. A user-writable client file is refused. |
+
+Still gated, recorded in the hardening plan's §6 and §8:
+- the Linux receiving run on the ThinkPad: seccomp allowlist tuning, Landlock ABI, file, ptrace and socket denial, polkit prompts and restart;
+- the signed macOS install and receiving run, including the Keychain envelope;
+- the Windows service, ACL and pipe qualification on o-pc;
+- every other Djinn vault use (H2): Djinn still opens its own vault at start;
+- transactional migration that retires the original vault and its copies.

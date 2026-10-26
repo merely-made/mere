@@ -12,7 +12,7 @@ mod common;
 mod fixture;
 
 use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs};
-use common::{lane, lending, open_vault, owner, profile, unlock, write_device_settings};
+use common::{lane, lending, open_vault, owner, profile, write_device_settings};
 use distillery::inference::{ASK_INTENT, AskRequestV1, GenerationCheckpoint, RunStateV1};
 use distillery::inference_protocol::AutomaticStageSettings;
 use djinn::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
@@ -204,7 +204,7 @@ async fn exercise_inner(native: bool) {
         // Round-trip through the production JSON shape before composition.
         let settings: djinn::settings::OwnerSettings =
             serde_json::from_slice(&serde_json::to_vec(&settings).unwrap()).unwrap();
-        let (vault, identity) = &vaults[i];
+        let (_, identity) = &vaults[i];
         if i == 0 {
             let mut prior = settings.clone();
             prior.sync = None;
@@ -218,7 +218,7 @@ async fn exercise_inner(native: bool) {
                 },
                 max_tokens: 8,
             };
-            let prior = DjinnResident::open(identity, &data, &profile(), prior, vault, unlock())
+            let prior = DjinnResident::open(identity, &data, &profile(), prior, djinn::resident::MeshAuthor::Resident)
                 .await
                 .unwrap();
             prior
@@ -267,8 +267,7 @@ async fn exercise_inner(native: bool) {
             &data,
             &profile(),
             settings,
-            vault,
-            unlock(),
+            djinn::resident::MeshAuthor::Resident,
         )
         .await
         .unwrap();

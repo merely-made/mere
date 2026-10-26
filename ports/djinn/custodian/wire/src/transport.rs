@@ -67,6 +67,7 @@ mod unix {
     pub struct UnixSocketListener {
         listener: UnixListener,
         path: Option<PathBuf>,
+        signed: Vec<crate::peer::SignedIdentity>,
     }
 
     impl UnixSocketListener {
@@ -112,7 +113,15 @@ mod unix {
             Ok(Self {
                 listener,
                 path: Some(path.to_path_buf()),
+                signed: Vec::new(),
             })
+        }
+
+        /// On macOS, report a peer satisfying one of these signing
+        /// requirements as that signed identity rather than its uid.
+        pub fn with_signed(mut self, signed: Vec<crate::peer::SignedIdentity>) -> Self {
+            self.signed = signed;
+            self
         }
 
         /// The socket systemd passed (`LISTEN_PID`/`LISTEN_FDS`, fd 3), if
@@ -149,6 +158,7 @@ mod unix {
             Ok(Some(Self {
                 listener,
                 path: None,
+                signed: Vec::new(),
             }))
         }
 
@@ -157,6 +167,7 @@ mod unix {
             Self {
                 listener,
                 path: None,
+                signed: Vec::new(),
             }
         }
     }
@@ -172,7 +183,7 @@ mod unix {
     impl Listener for UnixSocketListener {
         fn accept(&self) -> std::io::Result<Connection> {
             let (stream, _) = self.listener.accept()?;
-            let peer = unix_peer(stream.as_raw_fd())?;
+            let peer = identify(stream.as_raw_fd(), &self.signed)?;
             Ok(Connection {
                 stream: Box::new(stream),
                 peer,
@@ -180,21 +191,41 @@ mod unix {
         }
     }
 
+    fn identify(fd: std::os::fd::RawFd, signed: &[crate::peer::SignedIdentity]) -> std::io::Result<crate::peer::Peer> {
+        #[cfg(target_os = "macos")]
+        if let Some(peer) = crate::peer::signed_peer(fd, signed) {
+            return Ok(peer);
+        }
+        let _ = signed;
+        unix_peer(fd)
+    }
+
     /// Connect to a custodian's Unix-domain socket.
     pub struct UnixSocketConnector {
         path: PathBuf,
+        signed: Vec<crate::peer::SignedIdentity>,
     }
 
     impl UnixSocketConnector {
         pub fn new(path: impl Into<PathBuf>) -> Self {
-            Self { path: path.into() }
+            Self {
+                path: path.into(),
+                signed: Vec::new(),
+            }
+        }
+
+        /// On macOS, identify a server satisfying one of these signing
+        /// requirements by that identity.
+        pub fn with_signed(mut self, signed: Vec<crate::peer::SignedIdentity>) -> Self {
+            self.signed = signed;
+            self
         }
     }
 
     impl Connector for UnixSocketConnector {
         fn connect(&self) -> std::io::Result<Connection> {
             let stream = UnixStream::connect(&self.path)?;
-            let peer = unix_peer(stream.as_raw_fd())?;
+            let peer = identify(stream.as_raw_fd(), &self.signed)?;
             Ok(Connection {
                 stream: Box::new(stream),
                 peer,

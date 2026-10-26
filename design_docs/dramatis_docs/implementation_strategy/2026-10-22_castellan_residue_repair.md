@@ -1,6 +1,6 @@
 # Castellan public-summary residue repair
 
-Status: final structural repair passes normal and optimized heap-canary checks, 292 keeper tests, 14 custodian core/ABI tests, 236 Djinn tests and three golden snapshots; real consumers gated.
+Status (2026-10-26): on main. The structural repair passes `vault_residue` (every scenario clean, including passphrase storage after profile switching and the passphrase vault after lock) and `no_residue`, plus 292 keeper tests and the golden snapshots, on current main. The 2026-10-22 cut additionally passed optimized heap-canary checks and 236 Djinn tests. Real consumers are still gated.
 
 ## Confirmed cause
 
@@ -28,4 +28,4 @@ The optimized configuration sets only `profile.test.package.castellan.opt-level=
 
 The original passing 49/49 macOS package, protected installation, public export, frozen library, source and receipts remain unchanged. A 264-file before/after inventory pins them. The historical receipt qualifies its frozen binary, not this changed source automatically. No fixture is replaced or re-signed, and no real vault or consumer is migrated. The new repair receipt separately records final source, tests, failures and preservation checks.
 
-Final evidence: [repair qualification receipt](../../../support/receipts/castellan-residue-repair-20261022/qualification.json). All 264 pinned old fixture, source, library, export and receipt files match their before-state hashes. All 62 protected installation/payload files retain root ownership and non-writable permissions; strict bundle signature verification passes. The modified source has not been substituted into that preserved native fixture.
+Final evidence, 2026-10-22: all 264 pinned files of the old fixture (source, library, export and receipts) matched their before-state hashes. All 62 protected installation and payload files kept root ownership and stayed non-writable, and strict bundle signature verification passed. The modified source was not substituted into that preserved native fixture. Those receipts were retired with the residue-fix worktree when the repair landed on main on 2026-10-26. On main the residue tests are `cargo test -p castellan --features keeper --test vault_residue --test no_residue`.
