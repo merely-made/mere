@@ -1924,5 +1924,21 @@ resume could replace an explicit Revoked status with Live. The candidate
 keeps Expired/Revoked terminal across replay, transport notifications and
 persistent restore; expiry may become revocation. Late resource/media replies
 cannot refill a withdrawn session. Policy-permitted cached reading and fresh
-admission remain separate. Regression tests cover these boundaries; this
-follow-up still awaits the final native test run.
+admission remain separate. The current client suite now passes on explicit
+Rust 1.99.1: 103 tests passed, with one documentation example ignored. This
+includes the allocation regression with unrelated cached bytes, terminal
+resume/restore status, late resource replies, and endpoint action closure.
+The first attempt found a missing test-only `SceneDiff` import; that import
+was fixed and its failed log retained beside the passing run. Evidence is in
+`validation-resumed/final-checks/client.json` and `client.log` under the lane's
+output directory; `client-source.patch` records the fix over local `c01a90524`.
+
+The remaining native component, moved-owner and receiving-consumer checks
+have not run on this final candidate. At 21:48 UTC the workspace held
+149.1 GiB of compiler caches against its 160 GiB budget; the normal 20 GiB
+reservation was refused. The client alone used a documented 4 GiB estimate
+based on its prior 1.892 GiB cold build. No broader build inherits that
+estimate, and no cache protection or storage policy has been bypassed.
+Search promotion is saved locally in Eidetic `098e8a1`; it is unpublished,
+and its donor removal and consumer pin cutover remain pending. Mere's
+refactor is also local and unpublished.

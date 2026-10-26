@@ -775,7 +775,7 @@ mod tests {
         ResumeReply,
     };
     use sceno::score::{Arrangement, Score};
-    use scenotime::{Revision, SceneEpoch};
+    use scenotime::{Revision, SceneDiff, SceneEpoch};
 
     fn request_for(session: &ProjectionSession) -> ProjectionRequest {
         ProjectionRequest {
