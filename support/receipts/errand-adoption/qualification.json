@@ -1,0 +1,424 @@
+{
+  "schema": "mere.errand-adoption-qualification.v1",
+  "date": "2026-10-26",
+  "status": "qualified_native_bounded_slice",
+  "source": {
+    "repository": "https://github.com/merely-made/mere",
+    "base_commit": "5d8d1f809b3ca4b5d03b7adb7704a39d43346769",
+    "source_commit": "31d730b825ce47ffda7e1186c5924222816100f4",
+    "source_tree": "0ef52941f840e34ac75f82fb317a7f5f75bf5c15",
+    "djinn_tree": "7665549c33abc62c7b7f87d036daabe4c9c7f018",
+    "prior_adoption_commit": "1c61d792cf246eec11817bc259dcf75b60209e6b",
+    "errand_revision": "897fb963d184f0e379ab9041d68e17e726cb7763",
+    "scope": "Qualification of an already published supplier adoption; new host controls and canonical documentation only."
+  },
+  "inputs": {
+    "Cargo.toml": {
+      "sha256_native_bytes": "8b41eb35dc48234ca41ba60f79129a37a71a6f1df75c2d9933f894d5b56193fd",
+      "bytes": 63266,
+      "git_blob": "f1f65e809d11f09148fe7b6a20553943288cec00"
+    },
+    "Cargo.lock": {
+      "sha256_native_bytes": "53a100c77204a288de67d41c2048a3b0dfc85f64943523771c7eff0d1bb80753",
+      "bytes": 522098,
+      "git_blob": "783fa97b8bc02ef410ff66474a8af6a8e4c1aa13"
+    },
+    "ports/djinn/Cargo.toml": {
+      "sha256_native_bytes": "328d18b3fedba904b92637656b2f0105aceece4e3a5638292e014575ec5be431",
+      "bytes": 16349,
+      "git_blob": "c21b9f9b1df983f15021db042183c7fd66055b08"
+    },
+    "ports/djinn/src/resident_site.rs": {
+      "sha256_native_bytes": "e1a3286ee45f26e08948eb56dbd463f573f77e85fa8e3e8feec15d7eb7c647d8",
+      "bytes": 61450,
+      "git_blob": "ef17f22c8cb7b9757388e039e9aa8243a14a5c23"
+    },
+    "ports/djinn/src/resident_site/adoption_tests.rs": {
+      "sha256_native_bytes": "66f0c4ba9ee118a9b88eaecdbbe1ddd32620c7592bc4ba5f55bc4370c5a2570b",
+      "bytes": 9626,
+      "git_blob": "b7faf6c9a6fc2c7d6125a56dfc388bbe83df439c"
+    },
+    "ports/djinn/src/moot_site.rs": {
+      "sha256_native_bytes": "e40e0bdae5886a75a8239e8b82f5fda0e50a1fc8231f4e41a353773a9f81df73",
+      "bytes": 44241,
+      "git_blob": "f59108d60387b7d304ac49321fa2a523ebfd37f3"
+    }
+  },
+  "dependency_preservation": {
+    "root_manifest_lock_and_djinn_manifest_unchanged_from_base": true,
+    "registry_records": 1605,
+    "non_errand_git_records": 121,
+    "errand_records": [
+      {
+        "name": "errand",
+        "version": "0.4.0",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "finger-protocol",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "gemini-protocol",
+        "version": "0.1.7",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "gopher-protocol",
+        "version": "0.2.0",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "guppy-protocol",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "misfin",
+        "version": "0.0.4",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "nex-protocol",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "scroll-protocol",
+        "version": "0.1.0",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      },
+      {
+        "name": "spartan-protocol",
+        "version": "0.1.1",
+        "source": "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+      }
+    ],
+    "standalone_nonselecting_patch_catalogs": "unchanged"
+  },
+  "ownership": {
+    "production_host_unchanged_except_cfg_test_module_registration": true,
+    "normalized_preexisting_resident_site_sha256": "bef97552c8fb5b1a43dc5a4ef8acfc36240f04c0dbc762d0cf371c051f797278",
+    "normalization": "Decode UTF-8, normalize CRLF to LF, strip final whitespace, remove only appended test-module registration before comparing to base.",
+    "snapshot_v1_unchanged": true,
+    "admission": "Accept TCP, try semaphore permit, close excess accepted socket. Default 8, range 1..32.",
+    "deadline": "One host timeout covers TLS and handler including write/close. Default 2000 ms, range 1..30000. Starts when admitted future is first polled; OS backlog time excluded.",
+    "activation": "Descriptor persistence precedes runtime activation. Tests explicitly activate the test host.",
+    "shutdown": "Armillary closes and joins admitted tasks; host worker thread is joined afterwards. No new grace policy. Cooperative synchronous work is not hard-preempted.",
+    "scroll": "Caller-owned stream and native caps remain inside existing host timeout.",
+    "separate_gates": [
+      "Turnstone adoption",
+      "headed browser interaction",
+      "independent-machine delivery",
+      "startup-failure worker-join qualification"
+    ]
+  },
+  "toolchain": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "1.99.1 (5f94df478 2026-08-27)"
+  },
+  "mere_environment": {
+    "CARGO_TARGET_DIR": "C:/t/cargo-targets/mere",
+    "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/mere/build"
+  },
+  "functional_gates": [
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --lib resident_site::adoption_tests --quiet",
+      "exit_code": 0,
+      "passed": 5,
+      "kind": "unit",
+      "final_rerun_seconds": 3.01,
+      "filtered": 257
+    },
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --lib resident_site::tests --quiet",
+      "exit_code": 0,
+      "passed": 8,
+      "kind": "unit",
+      "seconds": 0.17,
+      "filtered": 254
+    },
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --lib moot_site::tests --quiet",
+      "exit_code": 0,
+      "passed": 7,
+      "kind": "unit",
+      "seconds": 8.61,
+      "filtered": 255
+    },
+    {
+      "command": "cargo test --locked --offline -p djinn --no-default-features --features moot-site --test published_site --quiet",
+      "exit_code": 0,
+      "passed": 3,
+      "kind": "integration",
+      "seconds": 0.07
+    },
+    {
+      "command": "cargo test -p mere-fetch --lib --locked --offline --quiet",
+      "exit_code": 0,
+      "passed": 48,
+      "kind": "unit",
+      "seconds": 0.62
+    },
+    {
+      "command": "cargo test -p mere-lanes --lib --features smolweb,netfetch --locked --offline --quiet",
+      "exit_code": 0,
+      "passed": 76,
+      "kind": "unit",
+      "seconds": 0.34
+    },
+    {
+      "command": "cargo test -p mere-site --all-features --features serde_json/preserve_order --locked --offline --quiet",
+      "exit_code": 0,
+      "passed": 17,
+      "kind": "integration_and_doctest",
+      "integration": 16,
+      "doctest": 1,
+      "compatibility": 3,
+      "history": 6,
+      "publication": 7
+    }
+  ],
+  "successful_checks": [
+    {
+      "command": "cargo check --locked -p djinn --no-default-features --features moot-site --lib --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo build --locked --offline -p djinn --no-default-features --features moot-site --bin djinn-moot-site --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo check -p mere-fetch --no-default-features --locked --offline --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo check -p mere-lanes --no-default-features --features smolweb --locked --offline --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo check -p djinn --no-default-features --locked --offline --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo clippy -p mere-fetch --lib --locked --offline --quiet --no-deps -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo clippy -p mere-lanes --lib --features smolweb,netfetch --locked --offline --quiet --no-deps -- -D warnings -A clippy::collapsible_if",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo clippy -p djinn --no-default-features --features moot-site --lib --test published_site --locked --offline --quiet --no-deps",
+      "exit_code": 0
+    },
+    {
+      "command": "rustfmt --edition 2024 --config skip_children=true --check ports/djinn/src/resident_site.rs ports/djinn/src/resident_site/adoption_tests.rs",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "lint_limits": {
+    "fetch_strict": "passed",
+    "document_strict": "Unchanged smolweb.rs:826 collapsible_if fails strict Clippy; named allowance above passes.",
+    "djinn_scoped": "Library plus published_site Clippy completes with 245 warning headers across graph; final focused tests report 231 warning headers.",
+    "djinn_strict": "Blanket --lib --tests -D warnings exits 101 on 20 unchanged baseline diagnostics, including unused_imports, unused_mut, dead_code, too_many_arguments, collapsible_if, redundant_closure, type_complexity, field_reassign_with_default, needless_borrows_for_generic_args, chunks_exact_to_as_chunks and needless_borrow.",
+    "djinn_broader_tests": "Ordinary --lib --tests Clippy also fails unchanged resident_tasks.rs async_yields_async (2) and passphrase_change.rs E0599 attach_credentials in the selected feature graph. No diagnostics attributed to the new adoption_tests.rs.",
+    "baseline_files_unchanged_from_base": true,
+    "blanket_strict_port_pass_claimed": false
+  },
+  "attempts": [
+    {
+      "result": "Initial locked offline Djinn check lacked cached Murm 6a5ba40b embedded-graphics Git input. Same locked check online filled cache and passed; no manifest or lock movement."
+    },
+    {
+      "result": "Historical package selector mere-document-lanes rejected outside-workspace features. Current package is mere-lanes with compatibility library name mere_document_lanes; corrected gate passes."
+    }
+  ],
+  "knot_process_client": {
+    "commit": "1766bf2119571b482f2007bc811966f629dcf160",
+    "inputs": {
+      "crates/knot-site/Cargo.toml": {
+        "sha256_native_bytes": "5360b2fd7da66dfdae30605c1eb863e07c62442d1d5aa9864b71c38ea61f335c",
+        "bytes": 7189
+      },
+      "crates/knot-site/Cargo.lock": {
+        "sha256_native_bytes": "78c6139e75efba94ec3ef5e5faa2dd20188592d47365844507754c3647112127",
+        "bytes": 141934
+      },
+      "crates/knot-site/tests/moot_site_runtime.rs": {
+        "sha256_native_bytes": "f3776992a13d3a545efdc8e6e661188a9e4bd6f64a162a04493b3cba329e9a9b",
+        "bytes": 17734
+      },
+      "crates/knot-site/tests/scroll_moot_site_runtime.rs": {
+        "sha256_native_bytes": "eb8b58fe95889533696c7c72edae3c5ae545a092735009de1707ad405f96bf3d",
+        "bytes": 26166
+      }
+    },
+    "unchanged_standalone_manifest_lock_and_fixtures": true,
+    "independent_client_cohort": "Existing standalone client inputs retained; no Knot repin or source edits.",
+    "environment": {
+      "CARGO_TARGET_DIR": "C:/t/cargo-targets/knot-editor",
+      "CARGO_BUILD_BUILD_DIR": "C:/t/cargo-targets/knot-editor/build",
+      "DJINN_MOOT_SITE_EXE": "C:/t/cargo-targets/mere/debug/djinn-moot-site.exe"
+    }
+  },
+  "process_gates": [
+    {
+      "command": "cargo test --manifest-path crates/knot-site/Cargo.toml --features runtime-acceptance --test moot_site_runtime --locked --offline -- --ignored --nocapture",
+      "cwd": "C:\\Users\\mark_\\Code\\repos\\knot-editor",
+      "exit_code": 0,
+      "passed": 1,
+      "seconds": 18.14,
+      "proof": {
+        "certificate_sha256": [
+          199,
+          19,
+          69,
+          233,
+          26,
+          239,
+          127,
+          37,
+          162,
+          62,
+          99,
+          192,
+          207,
+          57,
+          221,
+          158,
+          186,
+          160,
+          184,
+          250,
+          90,
+          142,
+          101,
+          92,
+          46,
+          109,
+          94,
+          188,
+          15,
+          7,
+          81,
+          206
+        ],
+        "final_shutdown": {
+          "cancelled": 1,
+          "joined": 8,
+          "panicked": 0,
+          "rejected": 0
+        },
+        "first_shutdown": {
+          "cancelled": 0,
+          "joined": 1,
+          "panicked": 0,
+          "rejected": 0
+        },
+        "membership_revocation": true,
+        "publisher_processes": 2,
+        "replacement": true,
+        "resident_processes": 3,
+        "withdrawal": true
+      }
+    },
+    {
+      "command": "cargo test --manifest-path crates/knot-site/Cargo.toml --features runtime-acceptance --test scroll_moot_site_runtime --locked --offline -- --ignored --nocapture",
+      "cwd": "C:\\Users\\mark_\\Code\\repos\\knot-editor",
+      "exit_code": 0,
+      "passed": 1,
+      "seconds": 22.78,
+      "proof": {
+        "author_directory_unavailable": true,
+        "certificate_sha256": [
+          23,
+          200,
+          154,
+          220,
+          97,
+          16,
+          207,
+          195,
+          64,
+          247,
+          196,
+          171,
+          221,
+          249,
+          177,
+          12,
+          33,
+          220,
+          202,
+          239,
+          165,
+          88,
+          43,
+          135,
+          147,
+          3,
+          225,
+          236,
+          211,
+          97,
+          12,
+          137
+        ],
+        "final_shutdown": {
+          "cancelled": 1,
+          "joined": 14,
+          "panicked": 0,
+          "rejected": 0
+        },
+        "first_shutdown": {
+          "cancelled": 0,
+          "joined": 13,
+          "panicked": 0,
+          "rejected": 0
+        },
+        "full_and_abstract_exact": true,
+        "membership_revocation": true,
+        "native_metadata_exact": true,
+        "protocol": "scroll",
+        "publisher_processes": 2,
+        "replacement": true,
+        "resident_processes": 3,
+        "snapshot_v1": true,
+        "withdrawal": true
+      }
+    }
+  ],
+  "binaries": {
+    "C:/t/cargo-targets/mere/debug/djinn-moot-site.exe": {
+      "sha256_native_bytes": "d17d104130ab521cf71686b1d627f2bd005bdf6336d4747b3e1a7219ae11f42c",
+      "bytes": 15204352,
+      "measurement": "Measured after process fixtures; rechecked during receipt creation. No binary copy retained."
+    },
+    "C:/t/cargo-targets/knot-editor/debug/knot-site-publish.exe": {
+      "sha256_native_bytes": "29ac9398af09cf03a92f01a5b9c17fd3eeda01af431e98aaca90226437888127",
+      "bytes": 9153536,
+      "measurement": "Measured after process fixtures; rechecked during receipt creation. No binary copy retained."
+    }
+  },
+  "evidence_boundary": "Native loopback TLS processes and Rust software gates. The rebuilt release-independent debug resident has unchanged production host input. No installed GUI, radio or independent-machine claim.",
+  "workspace": {
+    "isolation_reason": "Primary Mere has a separate unpublished commit and another lane staged index; published main is not its descendant.",
+    "worktree": "C:/Users/mark_/Code/worktrees/mere-errand-adoption",
+    "primary_head_preserved": "03027fb63040384a4a95f1ba17a4f4b842c47811",
+    "primary_index_sha256_preserved": "f8448a71be23e32a997bba8a91a1eb14906e9b463979ce8e547c185daa097200",
+    "cleanup": "Remove this clean isolated worktree after verified commit/push to main; preserve primary and other worktrees.",
+    "stable_shared_targets_reused": true,
+    "new_isolated_target_or_cargo_home": false
+  },
+  "receipt_budget": {
+    "cap_bytes": 100000000,
+    "retention": "This compact JSON and .gitattributes only; no raw build logs, captures, or copied binaries."
+  },
+  "hash_conventions": "sha256_native_bytes hashes exact Windows working/binary bytes. git_blob/source_tree identify normalized committed inputs. Receipt JSON is UTF-8 LF with -text attributes."
+}
