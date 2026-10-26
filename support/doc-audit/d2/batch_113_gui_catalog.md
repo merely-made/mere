@@ -3,8 +3,8 @@
 ## mere_docs/design/2026-10-26_gui_catalog_design.md
 
 - disposition: current
-- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned." - accurate: yes
-- claims checked: 24 - holds: 24, stale: 0, unverifiable: 0
+- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, and §7, Mark's rulings 1 to 5 on them." - accurate: yes
+- claims checked: 38 - holds: 38, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -15,7 +15,13 @@ and `forme_workspace`, `ScopeNavigation<P, A>`, `setting_row`,
 `dramatis::view::VaultLockView` in the door's custody client, the web host's
 `a11y.rs`, inker's `SurfaceProducer` and `WebSurface`, `DocumentCapabilities`
 in `document-lanes`, and `backstep` as `edit-history`'s new name. Doc citations
-were read from the named sections the same day.
+were read from the named sections the same day. The §6 amendment adds
+fourteen more: `ToolPaneState` and `PanePresentationMode` in kernel `pane.rs`,
+`DockState`/`DockSide` in the comms pane, pictograph's gloss module,
+`crates/domain/apparatus`, `cartography::FormFactor`, the absence of
+`Scope::Orrery`, `SurfaceId` emission counts, Graphshell's card identifiers,
+the `workbench` crate description, the spine's projection list, and the
+cabal, verso, engram, meerkat and Gyre identifier senses.
 
 ### Contradictions
 

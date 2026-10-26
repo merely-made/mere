@@ -3,7 +3,9 @@
 **Date:** 2026-10-26
 **Status:** design record, 2026-10-26. Cues only: what the stack's existing
 catalogs cover, what a complete catalog would have to add, and the loops a
-catalog has to close. No ruling, no code, no work assigned.
+catalog has to close. No ruling, no code, no work assigned. Amended the same
+day with §6, where the catalogs disagree with each other and with the tree,
+and §7, Mark's rulings 1 to 5 on them.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -18,6 +20,7 @@ the catalog is the product of the two. The stack already holds six partial
 catalogs, each one row or one column of that product, written from one
 authority's point of view, and none cross-references another (§1). The loops
 Mark names are the places where two of those catalogs claim the same cell (§4).
+Read against each other and the tree, the catalogs also disagree (§6).
 
 **Related:** the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
 (arrangement ontology), the
@@ -52,12 +55,21 @@ Four readings of the table:
   keeps the June docs as its sources.
 - **The rows exist in different degrees.** `SurfaceId` names twenty surfaces
   because each is an event source for accessibility, not because each is
-  built. As read on 2026-10-26, Graphshell's source names Inspector and Roster
-  and never Steward, Comms, Gloss, Omnibar, TreeSpine or ConfirmDialog; Cambium
-  names a status bar and Apparatus. The dock contract the panes doc proposed
-  (`PaneKind`, side, width, focus, context binding) has no enum of that name in
-  the tree. The card family lives in design docs and in Graphshell's 354 `card`
-  mentions; Cambium's "card" is a context for the summary body. A catalog that
+  built. As read on 2026-10-26, four of the twenty are emitted at real seams
+  (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); the pane variants
+  appear only in the kernel's descriptor table and ux-events' diagnostics map,
+  with no open or dismiss seam. The panes themselves are built unevenly and
+  outside the Graphshell port: Comms is a view-model crate
+  (`crates/shell/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
+  Apparatus is a domain crate (`crates/domain/apparatus`) whose rows Cambium's
+  detail panel and sectioned list name beside Steward's, and Graphshell names
+  Inspector and Roster. The dock contract the panes doc proposed exists twice
+  and is shared by neither: `DockState` and `DockSide` in the comms pane, whose
+  module doc says they should graduate to a shared dock, and the kernel's
+  `PanePresentationMode` (tiled, docked, floating, fullscreen) in
+  `crates/graph/graph-kernel/src/pane.rs`. The card family lives in design docs
+  and in Graphshell's 354 `card` mentions, none of which carry the family's four
+  names; Cambium's "card" is a context for the summary body. A catalog that
   does not say *built, named, or designed* per row will be read as a claim that
   everything in it exists.
 - **No catalog says which authority a surface projects.** The panes half of
@@ -246,3 +258,113 @@ each of the five authorities has a line for it, including its refusal.
 This record proposes nothing beyond that reading. A ruling would decide
 whether the matrix is kept as one document, as a column in TERMINOLOGY's
 aspect table, or as a doctrine area that the Stack statements lack.
+
+## 6. Where the catalogs disagree
+
+Mark, 2026-10-26: "i bet a bunch of terminology and relevant plans and code
+need updating" and "like, do those catalogs agree?" They do not. Read against
+the tree at `d969028be`:
+
+| Surface | What the sources say | The disagreement |
+|---|---|---|
+| panes | the panes doc: Gloss, Roster, Inspector, Index, Steward, Apparatus, Comms. TERMINOLOGY: roster, gloss, inspector, apparatus, comms. `SurfaceId`: those plus TreeSpine, NavigatorHost, WorkbenchPane. Kernel `ToolPaneState` (`pane.rs`, from April): Diagnostics, HistoryManager, AccessibilityInspector, FileTree, Settings. Built: Comms as a view-model crate, gloss as pictograph swatch geometry, Apparatus as a domain crate, Roster and Inspector named in Graphshell, Steward as rows in Cambium's detail panel | five lists; `ToolPaneState`'s five names appear in no catalog |
+| Navigator and gloss | TERMINOLOGY ruled the Navigator is gloss expanded (2026-06-07) | `SurfaceId` carries both `GlossPane` and `NavigatorHost`; kernel `pane.rs`, chrome routing, forme's lens, `mere::glossary` and pictograph's gloss docs still say Navigator |
+| dock contract | the panes doc proposes one (kind, open, side, width, focus, context binding) | it exists twice and is shared by neither: `DockState` and `DockSide` in `crates/shell/comms/src/pane.rs`, whose module doc says they graduate to a shared dock, and the kernel's `PanePresentationMode` |
+| pane surfaces | `SurfaceId`'s doc says each surface is one variant and one emission site at its open and dismiss seams | four variants are emitted at real seams (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); every pane variant appears only in the descriptor table and ux-events' diagnostics map |
+| workbench | TERMINOLOGY's tile entry, the `workbench` crate ("split-and-tab workspace organization") and Mark's list: a tile tree | the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md), canonical for the arrangement ontology, makes the tree one of six projections and says the tree was masquerading as the ontology |
+| cards | the summoning doc's family: preview, unvisited, connections swatch, object card | none of the four names is in code; Graphshell's card identifiers are `focus_card`, `PortableCard`, `receipt_card`, `card_offer`, `card_response`; Cambium's nearest is the detail popover |
+| orrery | TERMINOLOGY: a form factor. `cartography::FormFactor`: Canvas, Orrery, Volvelle, Astroid, Minimap | code and TERMINOLOGY agree; TERMINOLOGY's survivors row still waited on a `Scope::Orrery` that no longer exists (corrected 2026-10-26) |
+| swatch | TERMINOLOGY: a scope (node, subgraph, nested graph, mere) and a mode. `scenograph::Scope`: Node, Subgraph, Link, NestedGraph, Mere, Selection | agree; the entry omits Link and Selection |
+
+The retired words, by where they survive (active docs exclude `archive_docs`):
+
+| Word | Active docs | Code files | In TERMINOLOGY's survivors table before today |
+|---|---:|---:|---|
+| meerkat | 85 | 32 | no |
+| orrery | 77 | 29 | yes, stale row |
+| engram | 46 | 4 | no |
+| tessera | 41 | 0 | yes |
+| verso | 35 | 16 | no |
+| graphlet | 34 | 0 | the banner rule |
+| gyre | 32 | 1 | no |
+| Navigator | 31 | 7 | no |
+| cabal | 18 | 9 | no, and `CabalId`, `CabalSink`, `MurmCabal` are live types |
+
+The doc column is mostly age, and the policy already handles it: newer wins,
+banners and historical markers mark the rest, and no sweep is wanted. The code
+column is the cue. TERMINOLOGY's survivors table exists so nobody re-audits
+those names, migrating them when a file is touched and never as a churn pass,
+and most of these names were not in it, so each pass re-found them. The table
+is refreshed today with every row above.
+
+What would improve the stack, as cues:
+
+- One pane list. `SurfaceId`, `ToolPaneState` and TERMINOLOGY's pane entry
+  reconciled, with `ToolPaneState`'s five names either given catalog names or
+  retired; Index and TreeSpine named as one thing or two.
+- One dock contract, graduated from the comms pane to the shared place its
+  module doc already names, with the kernel's presentation mode as its
+  mobility half.
+- Pane surfaces that emit. A pane variant in `SurfaceId` either has an open and
+  dismiss seam or is not there until the pane is built.
+- The workbench row saying what the spine says: the tile tree is the default
+  desktop projection of a forme, not the workbench. Or the spine's claim
+  narrowed, if the tree is the ontology after all.
+- The card family with names in code, or the code's card vocabulary (focus,
+  portable, receipt, offer, response) catalogued in the summoning doc beside
+  the four it names.
+- The cabal types renamed when the comms crate is next touched; the entry's
+  2026-09-05 retirement renamed the term, not the types.
+
+## 7. Rulings
+
+Mark ruled 1 to 5 on 2026-10-26. Each was a choice among offered options; the
+options and the evidence put to him are kept under each ruling, as the
+[stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+§5 does. Three of §6's rows needed no ruling: orrery (already reconciled),
+swatch (TERMINOLOGY's entry now lists link and selection scopes), and the
+cabal types (the survivor rule).
+
+1. **The pane list. Ruled: TERMINOLOGY's list.** Roster, gloss, inspector,
+   apparatus, comms, plus Steward once built. The kernel's `ToolPaneState`
+   names fold: Diagnostics and AccessibilityInspector into apparatus, whose
+   `SurfaceId` doc already lists diagnostics, probes and a11y status; Settings
+   into the settings capability (Mark, 2026-10-25); HistoryManager into
+   history; FileTree retired. It had three uses, all in chrome routing. Index
+   and TreeSpine are in no canonical list, and TreeSpine leaves `SurfaceId`
+   under ruling 2. Options set aside: the kernel lists as canonical, with
+   TERMINOLOGY rewritten to them; product panes and tool surfaces kept apart
+   as two kinds.
+2. **What a `SurfaceId` variant means. Ruled: an emitting surface.** A variant
+   needs an open and dismiss seam. Unbuilt pane variants and their
+   accessibility descriptors leave until the pane is built; this record is the
+   intended set. Nothing stored references them. Option set aside: keep every
+   intended surface declared, and mark declared-not-emitting in the descriptor
+   table.
+3. **The workbench. Ruled: the surface that presents a forme.** The spine
+   stands: a tile is a slot of node content in a projection, and the tile tree
+   (splits and tabs) is the default desktop projection, not the workbench.
+   TERMINOLOGY's tile entry is rewritten and a workbench entry added. Options
+   set aside: the workbench as the tile tree, with the spine narrowed; deferring
+   until a second projection is built.
+4. **Cards. Ruled: kinds in the slot.** The family (preview, unvisited,
+   connections swatch, object) names kinds of content the focus-card slot
+   summons. `focus_card` is that slot, `PortableCard` is chirograph's small
+   semantic card for sharing, `receipt_card` renders receipts. The summoning
+   doc gains a line per code word; nothing renames. Options set aside: the code
+   vocabulary as the live family; the four kinds becoming identifiers under the
+   survivor rule.
+5. **The dock contract. Ruled: Cambium's shell.** `crates/cambium/cambium/src/shell`
+   owns dock state (open, side, width, focus, context binding) as the pane
+   shell's contract, beside the overlay's edge placement. `DockState` and
+   `DockSide` move out of the comms pane; the kernel keeps
+   `PanePresentationMode` as the intent-level mobility word. Options set aside:
+   the kernel's `pane.rs`; the chrome crate beside `ToolbarState`; leaving both
+   until a second docked pane.
+
+What the rulings leave in code, as cues: `SurfaceId` carries unbuilt pane
+variants and `ToolPaneState` carries five names that now fold (kernel
+`pane.rs`, `accessibility.rs`, ux-events' diagnostics map, chrome routing);
+the dock contract still lives in the comms pane rather than Cambium's shell.
+Both are mechanical under rulings 1, 2 and 5, and neither touches a stored
+format.
