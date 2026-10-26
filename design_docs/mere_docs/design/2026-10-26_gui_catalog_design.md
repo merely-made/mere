@@ -3,7 +3,8 @@
 **Date:** 2026-10-26
 **Status:** design record, 2026-10-26. Cues only: what the stack's existing
 catalogs cover, what a complete catalog would have to add, and the loops a
-catalog has to close. No ruling, no code, no work assigned.
+catalog has to close. No ruling, no code, no work assigned. Amended the same
+day with §6, where the catalogs disagree with each other and with the tree.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -18,6 +19,7 @@ the catalog is the product of the two. The stack already holds six partial
 catalogs, each one row or one column of that product, written from one
 authority's point of view, and none cross-references another (§1). The loops
 Mark names are the places where two of those catalogs claim the same cell (§4).
+Read against each other and the tree, the catalogs also disagree (§6).
 
 **Related:** the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
 (arrangement ontology), the
@@ -255,3 +257,60 @@ each of the five authorities has a line for it, including its refusal.
 This record proposes nothing beyond that reading. A ruling would decide
 whether the matrix is kept as one document, as a column in TERMINOLOGY's
 aspect table, or as a doctrine area that the Stack statements lack.
+
+## 6. Where the catalogs disagree
+
+Mark, 2026-10-26: "i bet a bunch of terminology and relevant plans and code
+need updating" and "like, do those catalogs agree?" They do not. Read against
+the tree at `d969028be`:
+
+| Surface | What the sources say | The disagreement |
+|---|---|---|
+| panes | the panes doc: Gloss, Roster, Inspector, Index, Steward, Apparatus, Comms. TERMINOLOGY: roster, gloss, inspector, apparatus, comms. `SurfaceId`: those plus TreeSpine, NavigatorHost, WorkbenchPane. Kernel `ToolPaneState` (`pane.rs`, from April): Diagnostics, HistoryManager, AccessibilityInspector, FileTree, Settings. Built: Comms as a view-model crate, gloss as pictograph swatch geometry, Apparatus as a domain crate, Roster and Inspector named in Graphshell, Steward as rows in Cambium's detail panel | five lists; `ToolPaneState`'s five names appear in no catalog |
+| Navigator and gloss | TERMINOLOGY ruled the Navigator is gloss expanded (2026-06-07) | `SurfaceId` carries both `GlossPane` and `NavigatorHost`; kernel `pane.rs`, chrome routing, forme's lens, `mere::glossary` and pictograph's gloss docs still say Navigator |
+| dock contract | the panes doc proposes one (kind, open, side, width, focus, context binding) | it exists twice and is shared by neither: `DockState` and `DockSide` in `crates/shell/comms/src/pane.rs`, whose module doc says they graduate to a shared dock, and the kernel's `PanePresentationMode` |
+| pane surfaces | `SurfaceId`'s doc says each surface is one variant and one emission site at its open and dismiss seams | four variants are emitted at real seams (CommandPalette, NodeFinder, ConfirmDialog, ContextMenu); every pane variant appears only in the descriptor table and ux-events' diagnostics map |
+| workbench | TERMINOLOGY's tile entry, the `workbench` crate ("split-and-tab workspace organization") and Mark's list: a tile tree | the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md), canonical for the arrangement ontology, makes the tree one of six projections and says the tree was masquerading as the ontology |
+| cards | the summoning doc's family: preview, unvisited, connections swatch, object card | none of the four names is in code; Graphshell's card identifiers are `focus_card`, `PortableCard`, `receipt_card`, `card_offer`, `card_response`; Cambium's nearest is the detail popover |
+| orrery | TERMINOLOGY: a form factor. `cartography::FormFactor`: Canvas, Orrery, Volvelle, Astroid, Minimap | code and TERMINOLOGY agree; TERMINOLOGY's survivors row still waited on a `Scope::Orrery` that no longer exists (corrected 2026-10-26) |
+| swatch | TERMINOLOGY: a scope (node, subgraph, nested graph, mere) and a mode. `scenograph::Scope`: Node, Subgraph, Link, NestedGraph, Mere, Selection | agree; the entry omits Link and Selection |
+
+The retired words, by where they survive (active docs exclude `archive_docs`):
+
+| Word | Active docs | Code files | In TERMINOLOGY's survivors table before today |
+|---|---:|---:|---|
+| meerkat | 85 | 32 | no |
+| orrery | 77 | 29 | yes, stale row |
+| engram | 46 | 4 | no |
+| tessera | 41 | 0 | yes |
+| verso | 35 | 16 | no |
+| graphlet | 34 | 0 | the banner rule |
+| gyre | 32 | 1 | no |
+| Navigator | 31 | 7 | no |
+| cabal | 18 | 9 | no, and `CabalId`, `CabalSink`, `MurmCabal` are live types |
+
+The doc column is mostly age, and the policy already handles it: newer wins,
+banners and historical markers mark the rest, and no sweep is wanted. The code
+column is the cue. TERMINOLOGY's survivors table exists so nobody re-audits
+those names, migrating them when a file is touched and never as a churn pass,
+and most of these names were not in it, so each pass re-found them. The table
+is refreshed today with every row above.
+
+What would improve the stack, as cues:
+
+- One pane list. `SurfaceId`, `ToolPaneState` and TERMINOLOGY's pane entry
+  reconciled, with `ToolPaneState`'s five names either given catalog names or
+  retired; Index and TreeSpine named as one thing or two.
+- One dock contract, graduated from the comms pane to the shared place its
+  module doc already names, with the kernel's presentation mode as its
+  mobility half.
+- Pane surfaces that emit. A pane variant in `SurfaceId` either has an open and
+  dismiss seam or is not there until the pane is built.
+- The workbench row saying what the spine says: the tile tree is the default
+  desktop projection of a forme, not the workbench. Or the spine's claim
+  narrowed, if the tree is the ontology after all.
+- The card family with names in code, or the code's card vocabulary (focus,
+  portable, receipt, offer, response) catalogued in the summoning doc beside
+  the four it names.
+- The cabal types renamed when the comms crate is next touched; the entry's
+  2026-09-05 retirement renamed the term, not the types.

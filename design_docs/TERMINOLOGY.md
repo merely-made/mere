@@ -228,13 +228,19 @@ the product. The active execution plan is the
 
 ## Code-identifier survivors
 
-Retired words that remain as code identifiers, migrating opportunistically when the file is touched for other reasons and never as a churn pass (the `edge` rule). Recorded 2026-09-05 so nobody re-audits them.
+Retired words that remain as code identifiers, migrating opportunistically when the file is touched for other reasons and never as a churn pass (the `edge` rule). Recorded 2026-09-05 so nobody re-audits them; refreshed 2026-10-26 against the tree at `d969028be` (the [GUI catalog record](mere_docs/design/2026-10-26_gui_catalog_design.md) §6 has the counts).
 
 | Identifier | Retired word | Live sense |
 |---|---|---|
 | `edge` (kernel types, `.roster-edge`) | edge (generic user copy; proposed cross-stratum sense above) | graph-theory vocabulary at the petgraph layer |
 | `inker::Engine`, `ENGINE_ID`, `engine_id()` | engine (for readers) | the reader trait |
-| `Scope::Orrery` | orrery (as tier) | the form factor; rename to a form-factor enum when touched |
+| `orrery` in seiche, platen and forme module docs; `node_queries_handle_orrery_scale` | orrery (as tier) | the form factor, which `cartography::FormFactor::Orrery` names; `Scope::Orrery` was gone by 2026-10-26, so the rename this row asked for is done |
+| `SurfaceId::NavigatorHost`; `Navigator` in kernel `pane.rs`, chrome routing, forme `lens.rs`, `mere::glossary` and pictograph `gloss.rs` docs | Navigator | gloss (ruled 2026-06-07); `SurfaceId::GlossPane` sits beside it |
+| `CabalId`, `CabalSink`, `MurmCabal`, `cabal_id` in `shell/comms`; `cabal` in `mesh::sync`, castellan's vault docs and the `CommsPane` descriptor | cabal (type prefix) | murmur; `Conversation*` for mechanics. The 2026-09-05 retirement renamed the entry, not these types |
+| `meerkat` in engine, pictograph and pelt docs; one fleece test route id | meerkat (the genet-as-host shell) | the Cambium hosts; comments and a fixture, no live identifier |
+| `mere.eidetic.engram-seal.v1`, `LEGACY_PRODUCT_ENGRAM_SCHEMA` | Engram | Codicil; on-disk and wire compatibility only, like `tessera.redb` |
+| `Gyre` in a pictograph test comment | gyre | seiche |
+| `VersoAddress`, `VersoViewTarget`, `verso_idx`, `verso_manifest` in `registry` and the kernel; `verso` in inker's flip docs | Verso (as engine-controller) | the engine flip, `inker::flip`, is verso's live sense; the registry's address types predate it and keep their names |
 | `crates/forme` (`forme`, `mere-forme`) | forme (as graphlet qualifier) | a *different* sense that stays live: the workbench arrangement authority, named for the locked-up printing forme. The retirement covers only the graphlet-qualifier use |
 | `tessera.redb`, `tessera_operations` | Tessera | on-disk compatibility only |
 
