@@ -1,7 +1,7 @@
 # Foundation family promotion
 
 **Date:** 2026-10-19
-**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19. A contained observations/action-evidence continuation qualified on 2026-10-20 in the diagnostics plan; broader semantic/collector migrations remain open. Custody process design and source-home follow-up remain scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
+**Status:** Source promotion and consumer cutover completed. Execution/shutdown slice qualified on 2026-10-19. A contained observations/action-evidence continuation qualified on 2026-10-20 in the diagnostics plan; broader semantic/collector migrations remain open. Custody process hardening is designed in the linked 2026-10-21 security plan and remains unimplemented; source-home follow-up remains scoped. Source extraction, behavioral consolidation and process isolation have separate acceptance gates.
 **Receipt budget:** 100 MB total across this migration. Keep compact command summaries and source hashes; do not copy model weights, build trees or historical audit receipts.
 
 ## Decision
@@ -399,31 +399,12 @@ acceptance remain the existing plan's separate gates.
 
 ### Separate design pass: custody process boundary
 
-The intended direction is a narrow Castellan custody process contacted by the
-resident. The present code links Castellan into Djinn; separate crates and
-cargo-deny wrappers do not establish address-space isolation. This design pass
-must produce a reviewable protocol and migration, not a second vault or a
-parallel secret authority. Process separation is not implemented by this scope.
-
-Specify caller authentication and authorization independently: OS-user identity
-alone does not identify the requesting application or authorize key use. Cover
-app/profile/session/key scope, consent, unlock and presence UI, sticky lock and
-revocation, permitted derived-key lifetime, parent/client death, restart and
-reconnection, replay/idempotency, broker ownership and existing SSH/Secret
-Service behavior. Include the exact policy for calls already in flight during
-lock; preserve the existing absence/Locked refusal and prohibition on fallback
-keys. Root material must not cross into the general resident's workers.
-
-The design must identify Djinn's direct vault openings and adapters, including
-`resident_distillery.rs`, and how each becomes a custody operation or a narrowly
-permitted derived-key consumer. Start with a cross-process fixture for one root
-signing operation and one scoped derived-key consumer, using actual authenticated
-IPC. Wrong-app/profile requests, broker loss, lock during use, crash/restart and
-revocation need negative controls. Existing source-formats and credential
-identity stay stable. Packaging, launch policy and per-OS process restrictions
-require explicit acceptance; IPC by itself does not prove complete isolation.
-A trusted resident supervisor's ability to launch or replace the custodian also
-belongs in the stated threat boundary.
+**2026-10-21:** the [custody isolation and security hardening plan](../../dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md)
+now owns the requested boundary audit, operation/caller/consent design, direct
+vault-opening migration, and cross-process acceptance. This replaces the open
+design sketch here with one canonical plan. Separate crates, cargo-deny and
+source-home promotion do not establish containment. Existing identities and
+storage formats must survive; production process isolation remains unimplemented.
 
 ### Source-home follow-up and exclusions
 

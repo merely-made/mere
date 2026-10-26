@@ -10,6 +10,13 @@ says what the lock defends and leaves open. The
 dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`) moves this code
 later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
 64, 65).
+**Security continuation (2026-10-21):** the [custody isolation and security
+hardening plan](2026-10-21_custody_isolation_and_security_hardening_plan.md)
+separates source-confirmed limitations and synthetic witnesses from remaining
+OS/deployment tests. Historical L1–L4 receipts remain scoped: raw key copies,
+state-only lock watching, marker persistence failure and missing macOS native
+event hooks limit stronger claims. Unknown-idle timeout still applies on macOS.
+
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item

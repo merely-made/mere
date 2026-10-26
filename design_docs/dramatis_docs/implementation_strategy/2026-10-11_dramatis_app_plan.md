@@ -6,6 +6,12 @@ creation, contacts, credential fill and CXF export remain open. The Windows
 debug packaging pipeline is qualified; optimized releases, OS install trust,
 publication and Linux/macOS host qualification remain open.
 
+**Security continuation (2026-10-21):** the [custody hardening plan](2026-10-21_custody_isolation_and_security_hardening_plan.md)
+keeps this app's public client and resident-owned quarantine consent, while
+qualifying app-name admission, signing approval and process isolation separately.
+The historical functional/native receipts do not establish an authenticated
+application principal or a trusted signing-consent channel.
+
 ## Phases and done-conditions
 
 - [x] Map the existing picker, public roster, custody route and sealed item

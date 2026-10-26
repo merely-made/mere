@@ -84,6 +84,17 @@ per-graph identities remain distinct where unlinkability requires them.
 Process consolidation must not quietly turn every place, personal graph, and
 Knot vault into one observable node identity.
 
+**Security topology continuation (reviewed 2026-10-22):** the user accepts splitting
+services out of Djinn where that improves containment. The [custody hardening
+plan's service splits](../../dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md#57-splits-out-of-djinn-that-improve-containment)
+define three authority tiers: independently OS-launched custody, a private-data/
+blob owner and workers using shared confinement/IPC infrastructure. Djinn
+coordinates fixed worker roles and connects to custody as a client. Configured
+ingress precedes loopback publication. These enforcement decisions are design
+defaults; implementation/platform acceptance is still open.
+One user-facing resident does not require all authorities to share an address
+space; existing data, identities, store locks and resource ownership must survive.
+
 ## 3. Ownership after consolidation
 
 | Concern | Owner |
