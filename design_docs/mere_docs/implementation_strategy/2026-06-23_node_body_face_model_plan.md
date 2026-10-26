@@ -267,6 +267,17 @@ fidelity) = a directly-authored hull, convex now, concave/compound as the B3 fid
    ([aether rhai_bindings.rs](../../../crates/orrery/aether/src/rhai_bindings.rs) *(historical citation)* <!-- doc-audit: historical-link -->). A decorative
   scripted node face needs no rhai (DOM substrate); a behavioral one is field-regions.
 
+## Decisions
+
+- **D1. Per-node overrides key by member, pruned (Mark, 2026-10-25):** "Uuid keys,
+  pruned", over keeping `NodeKey` keys and pruning by the kernel's lifetime witness. The
+  face, sprite, sprite-hull, material and size overrides key by member Uuid, and
+  `reconcile_derived` drops members that left, so a reused graph slot starts clean and the
+  sidecar never records one node's override under another's identity. Found and argued in
+  the [data-oriented doctrine brief](../../2026-07-02_data_oriented_doctrine_brief.md) §7.7.
+
+  Links: summary Per-node overrides key by member Uuid and are pruned when the member leaves; a reused slot starts clean.
+
 ## Progress
 
 - 2026-06-23: **Plan written (with Mark).** Spun out of the node-representation plan's
@@ -299,3 +310,9 @@ fidelity) = a directly-authored hull, convex now, concave/compound as the B3 fid
   D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: B0 to B2 recorded as landed with
   B3 and B4 open, the pre-B0 "Current state" and the inset constant annotated, the archived
   follow-on owners noted, and their re-homing written in as an open question.
+- **2026-10-25.** D1 landed: a removed node's overrides followed its reused petgraph slot
+  and exported under the new member's Uuid (confirmed by a failing run of
+  `removed_node_overrides_do_not_follow_its_reused_slot` in `canvas/tests/node_face.rs`).
+  The five maps now key by member; the test passes with pictograph's canvas lib suite
+  (619 passed, 18 ignored). `node_shapes` stays `NodeKey`-keyed, replaced wholesale on
+  each host push.

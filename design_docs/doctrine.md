@@ -11,7 +11,8 @@ representational discipline.
 **Status, 2026-10-22:** begun with five statements moved from isocosm's
 doctrine, the parts of its Stack area that bind any product on the stack
 (isocosm's decision-links plan, L6d). This repository's own rulings, kept in
-its plans, join in a later pass. Within the budget in `doctrine_budget.toml`.
+its plans, join in a later pass; the first, Stack 6, joined on 2026-10-25.
+Within the budget in `doctrine_budget.toml`.
 
 ## The stack
 
@@ -80,3 +81,20 @@ Links: draws on isocosm:77, isocosm:78, isocosm:1000, stack.3 · summary Data, s
 
 *Moved 2026-10-22 from isocosm's doctrine, the rungs and their rule from its
 Stack 14; the wing's instances stay there ("Split as drafted").*
+
+### Stack 6. Storage follows the death condition
+
+Data is classified by what makes it dead: a boundary (scratch, task, frame,
+device epoch), an event (one entity removed from a living world) or lost
+reachability. Storage and ownership follow that and the access pattern, not
+allegiance to an allocator. Identity is stable; representations are
+projections with their own lifetimes. Data crossing into a longer-lived domain
+is copied, promoted or re-acquired through that domain's handle, never
+borrowed across, and persisted state keys by durable identity, never by a
+reusable slot. The domains, death kinds and crossing rule are argued in the
+[data-oriented doctrine brief](2026-07-02_data_oriented_doctrine_brief.md) §7.
+
+Links: draws on node-body-face-model D1 · summary Storage follows the death condition; cross domains by copy or handle; persist by durable identity.
+
+*Added 2026-10-25, outcome new ("Write stack.6 now"), the first statement from
+this repository's own rulings.*

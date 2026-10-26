@@ -318,7 +318,9 @@ impl Canvas {
         // manual resize uses, so the face paints at the size the score was saved
         // with. A later size-mode toggle needs `clear_node_size` to take over.
         for (key, side) in faces {
-            self.node_sizes.insert(key, side.clamp(16.0, 160.0));
+            if let Some(id) = self.member_of(key) {
+                self.node_sizes.insert(id, side.clamp(16.0, 160.0));
+            }
         }
         self.push_node_geometry();
         // Claim the restored layout after its saved face measurements are applied.

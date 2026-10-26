@@ -10,6 +10,11 @@ area = "Stack"
 summary = "Servitor remains in Eidetic while Alembic composes its admission and run contracts."
 draws_on = ["stack.1"]
 
+[decisions."node-body-face-model D1"]
+title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
+source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"
+summary = "Per-node overrides key by member Uuid and are pruned when the member leaves; a reused slot starts clean."
+
 [decisions."ranged-fetch D1"]
 title = ". One handle, three calls"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
@@ -72,3 +77,10 @@ source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "Data, scripts, components and native crates; cold and narrow goes behind a component when pluggable, hot or wide stays native."
 draws_on = ["stack.3", "isocosm:77", "isocosm:78", "isocosm:1000"]
+
+[statements."stack.6"]
+title = "Storage follows the death condition"
+source = "design_docs/doctrine.md"
+area = "The stack"
+summary = "Storage follows the death condition; cross domains by copy or handle; persist by durable identity."
+draws_on = ["node-body-face-model D1"]
