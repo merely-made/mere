@@ -29,7 +29,7 @@ uxtree = { workspace = true, optional = true }
 registry = { workspace = true, default-features = false, features = ["diagnostics"], optional = true }
 
 # The portable implementation is owned by Armillary's independent sibling crate.
-apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "75643df1f178757bb7b6386913af1a39353f3069", default-features = false }
+apparatus-core = { version = "0.1.0", git = "https://github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80", default-features = false }
 
 [dev-dependencies]
 serde_json = { workspace = true }
