@@ -27,6 +27,42 @@ pub struct FormeRegion {
     pub visible: bool,
 }
 impl FormeRegion {
+    /// Project this field using the owning pane's complete viewport, including
+    /// orbit and foreshortening. Geometry is view intent; this never lays out nodes.
+    pub fn screen_bounds(&self, viewport: Viewport) -> Option<[f32; 4]> {
+        let camera = scene_paint::Camera {
+            offset: viewport.offset,
+            zoom: viewport.zoom,
+            yaw: viewport.yaw,
+            tilt: viewport.tilt,
+        };
+        if !self.visible || !camera.is_valid() || self.bounds.iter().any(|v| !v.is_finite()) {
+            return None;
+        }
+        let [l, t, r, b] = self.bounds;
+        if r <= l || b <= t {
+            return None;
+        }
+        let mut bounds = [
+            f32::INFINITY,
+            f32::INFINITY,
+            f32::NEG_INFINITY,
+            f32::NEG_INFINITY,
+        ];
+        for (x, y) in [(l, t), (r, t), (r, b), (l, b)] {
+            let (x, y) = camera.to_screen(PortablePoint::new(x, y));
+            if !x.is_finite() || !y.is_finite() {
+                return None;
+            }
+            bounds = [
+                bounds[0].min(x),
+                bounds[1].min(y),
+                bounds[2].max(x),
+                bounds[3].max(y),
+            ];
+        }
+        Some(bounds)
+    }
     pub fn cell_world_bounds(&self, cell: &FormeCell) -> [f32; 4] {
         let [x, y, r, b] = self.bounds;
         let [cx, cy, cr, cb] = cell.bounds;
@@ -190,6 +226,50 @@ fn outline([x, y, r, b]: [f32; 4], mut color: ColorF, alpha: f32) -> PaintCmd {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn field_attachment_uses_its_supplied_viewport_without_moving_members() {
+        let (c, _, _, _) = fixture();
+        let region = c.forme_region().unwrap();
+        let positions = c
+            .graph
+            .nodes()
+            .map(|(key, _)| (key, c.view.position_of(key)))
+            .collect::<Vec<_>>();
+        let mut viewport = c.viewport();
+        viewport.offset = (100., 80.);
+        viewport.zoom = 2.;
+        viewport.tilt = 0.5;
+        viewport.yaw = 0.;
+        assert_eq!(
+            region.screen_bounds(viewport),
+            Some([100., 80., 900., 320.])
+        );
+        viewport.yaw = std::f32::consts::FRAC_PI_2;
+        let actual = region.screen_bounds(viewport).unwrap();
+        for (a, b) in actual.into_iter().zip([-380., 80., 100., 480.]) {
+            assert!((a - b).abs() < 0.001);
+        }
+        assert_eq!(
+            positions,
+            c.graph
+                .nodes()
+                .map(|(key, _)| (key, c.view.position_of(key)))
+                .collect::<Vec<_>>()
+        );
+    }
+    #[test]
+    fn hidden_or_invalid_field_cameras_have_no_screen_attachment() {
+        let (c, _, _, _) = fixture();
+        let mut region = c.forme_region().unwrap().clone();
+        let mut viewport = c.viewport();
+        viewport.zoom = f32::NAN;
+        assert_eq!(region.screen_bounds(viewport), None);
+        viewport = c.viewport();
+        viewport.tilt = 0.;
+        assert_eq!(region.screen_bounds(viewport), None);
+        region.visible = false;
+        assert_eq!(region.screen_bounds(c.viewport()), None);
+    }
     #[test]
     fn rule_guides_restore_base_without_moving_or_unpinning_members() {
         let (mut c, a, _, _) = fixture();

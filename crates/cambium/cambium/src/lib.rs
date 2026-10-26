@@ -41,6 +41,8 @@ mod detail_popover;
 mod focus_card;
 mod forme_swatch;
 pub use forme_swatch::{FormeSwatch, FormeSwatchCell, FormeSwatchTile, forme_swatch};
+mod scope_field;
+pub use scope_field::{ScopeField, ScopeFieldCommand, scope_field_controls};
 mod disclosure;
 mod editor;
 mod element;

@@ -142,9 +142,11 @@
 .scope-up .scope-arrow { transform:rotate(-45deg); }
 .scope-down .scope-arrow { transform:rotate(135deg); }
 .scope-tooltip { position:absolute; top:100%; left:0; z-index:90; padding:6px 9px; width:210px; font-size:12px; white-space:normal; overflow-wrap:anywhere; background-color:var(--shell-background); color:var(--shell-foreground); border:1px solid var(--shell-rule); border-radius:4px; pointer-events:none; }
-.cambium-scope-trail { display:flex; align-items:center; gap:5px; min-width:0; color:var(--shell-foreground); font-size:12px; white-space:nowrap; }
+.cambium-scope-trail { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; gap:5px; min-width:0; color:var(--shell-foreground); font-size:12px; white-space:nowrap; }
 .cambium-scope-trail button.shell-control { font-size:12px; min-height:20px; height:20px; padding:0px 3px; border-width:0px; background-color:transparent; opacity:.72; }
-.cambium-scope-trail [aria-current=location] { opacity:.85; flex:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.cambium-scope-trail > .shell-control { flex-shrink:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.cambium-scope-trail > span { flex:0 0 auto; white-space:nowrap; }
+.cambium-scope-trail [aria-current=location] { opacity:.85; flex:1 1 0; min-width:4ch; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .cambium-scope-location { display:flex; align-items:center; flex:1 1 0; min-width:0; --app-region:no-drag; }
 .cambium-scope-location > .cambium-scope-trail { flex:1 1 0; }
 .read-header-trailing { display:flex; align-items:center; margin-left:auto; }
@@ -179,3 +181,7 @@
 .forme-swatch-tabs .shell-control { min-height:24px; padding:2px 4px; font-size:12px; text-align:left; overflow-wrap:anywhere; }
 .forme-swatch-passage { font-size:12px; line-height:1.45; margin:6px 0 0; overflow-wrap:anywhere; }
 .forme-swatch-focus { font-size:10px; opacity:0.7; }
+.scope-field-controls { display:flex; align-items:center; gap:1px; z-index:18; padding:1px; border:1px solid var(--shell-rule,#637581); border-radius:5px; background:var(--shell-background,#17232b); color:var(--shell-foreground,#dce3e8); line-height:1.2; }
+.scope-field-controls .shell-control { min-width:var(--scope-field-target,26px); min-height:var(--scope-field-target,26px); padding:.23em .54em; border:0; border-radius:3px; background:transparent; color:inherit; font-size:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.scope-field-controls .shell-control:hover { background:var(--shell-selection,#263640); }
+.scope-field-controls .shell-control:focus-visible { outline:2px solid currentColor; outline-offset:1px; }
