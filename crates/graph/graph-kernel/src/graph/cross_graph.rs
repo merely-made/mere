@@ -79,7 +79,7 @@ impl Graph {
         // would leave two nodes bearing one world file.
         container.nested = None;
 
-        let key = self.insert_surface_node(Node {
+        let (key, inserted) = self.insert_surface_node(Node {
             // --- container content: cloned from the source ---
             container,
             // References copy freely: the blob is content-addressed and shared,
@@ -87,6 +87,9 @@ impl Graph {
             // image.
             images: source.images.clone(),
         });
+        if !inserted {
+            return key;
+        }
         self.set_node_facet(key, PROVENANCE_DERIVATIONS, &vec![derivation]);
         self.set_node_facet(
             key,

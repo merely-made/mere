@@ -218,6 +218,38 @@ L1 card round, 2026-10-20 (Mark's words, unnumbered): chartulary is now in repos
 Still open, to be put when a lane reaches it: who owns L2 to L5's start order after L1's first
 slice lands.
 
+Open forks from L1's second pass, 2026-10-26 (questions with the code evidence; unnumbered until
+Mark rules; each lane stopped rather than picked):
+
+- **Q010, malformed facet JSON on replay.** `CapturedDelta::to_delta` in graph-kernel
+  `graph/capture.rs:382` turns a facet record whose `value_json` does not parse into `None`,
+  the same path the loader takes for deliberately obsolete thumbnail and favicon records
+  (`:351`), so a corrupt journal record is dropped and the replayed graph differs from its
+  journal with no report. Either the journal is refused at load, as Pandect already reports
+  Corrupt for other reopen failures, with obsolete imagery kept as an explicit skip; or it loads
+  and reports how many records were dropped. The first makes one corrupt record unloadable; the
+  second keeps the divergence but makes it visible.
+- **Q017, the kernel `store` feature.** `graph-kernel/src/store.rs` saves and loads `graph.json`
+  from the snapshot alone, dropping Surface pins and facets while reporting success. No manifest
+  in the workspace enables `store` (A004 found only integration-test consumers), and Pandect's
+  `GraphSession` already persists facets with checkpoints. Either the feature and module go,
+  leaving `GraphSession` as the one persistence owner of A004's four; or they stay and gain a
+  facet sidecar, which the triage warns is another partial-save authority. `mere-kernel` 0.0.2 is
+  on crates.io, so removal is a public-API change in the next release.
+- **Q031, identical assertion copies on parallel rows.** `frozen_selection.rs:162` accepts a
+  second identical handle on another row, `frozen_link.rs:220` refuses it as a duplicate, and
+  `try_from_snapshot` admits the graph. One validator for assertion handles across snapshot
+  load, selection freeze and link freeze (A012, A016) is the repair either way; the question is
+  whether identical copies on parallel rows are legal graph state, in which case link freeze
+  accepts or dedupes, or not, in which case snapshot load and selection freeze refuse.
+- **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
+  2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
+  document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
+  could embed it. Either it stays and a toolkit grouping carries the document stack; or it moves
+  beside its desktop host under `ports/tabard/`, still embeddable by path; or its reader and
+  stylesheet specimens go behind features. The boundary check prints the carried link until one
+  of these lands.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they

@@ -589,30 +589,45 @@ impl Graph {
         self.add_node_with_id(Uuid::new_v4(), url, position)
     }
 
-    /// Add a node with a pre-existing UUID. `_position` is the caller's initial
-    /// placement hint; it is no longer stored on the node (position is not graph
-    /// truth), so the host applies it to seiche / the cartography sidecar.
+    /// Add a node with a pre-existing UUID, or return the key of the node that
+    /// already holds it ([`insert_node_if_missing`](Self::insert_node_if_missing)).
     pub(crate) fn add_node_with_id(
         &mut self,
         id: Uuid,
         url: String,
-        _position: Point2D<f32>,
+        position: Point2D<f32>,
     ) -> NodeKey {
+        self.insert_node_if_missing(id, url, position).0
+    }
+
+    /// The insertion contract shared by live `AddNode` and replay: insert if
+    /// the id is missing, else leave the existing node, its address and its URL
+    /// index entries as they are. The flag reports whether a node was inserted.
+    /// `_position` is the caller's initial placement hint; it is no longer
+    /// stored on the node (position is not graph truth), so the host applies it
+    /// to seiche / the cartography sidecar.
+    pub(crate) fn insert_node_if_missing(
+        &mut self,
+        id: Uuid,
+        url: String,
+        _position: Point2D<f32>,
+    ) -> (NodeKey, bool) {
         let primary_address = address_from_url(&url);
         let mut container = chartulary::Container::with_identity(id)
             .with_address_record(primary_address)
             .with_title(url.clone());
         container.media_type = detect_mime(&url, None);
-        let key = self.insert_surface_node(Node {
+        let (key, inserted) = self.insert_surface_node(Node {
             container,
             images: std::collections::BTreeMap::new(),
         });
-        self.set_node_last_visited_at_ms(key, Self::epoch_ms());
-
-        self.url_to_nodes.entry(url).or_default().push(key);
-        self.bump_revision();
-        self.bump_content_revision();
-        key
+        if inserted {
+            self.set_node_last_visited_at_ms(key, Self::epoch_ms());
+            self.url_to_nodes.entry(url).or_default().push(key);
+            self.bump_revision();
+            self.bump_content_revision();
+        }
+        (key, inserted)
     }
 
     /// Remove a node and all its connected edges
