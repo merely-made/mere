@@ -4,7 +4,8 @@
 **Status:** design record, 2026-10-26. Cues only: what the stack's existing
 catalogs cover, what a complete catalog would have to add, and the loops a
 catalog has to close. No ruling, no code, no work assigned. Amended the same
-day with §6, where the catalogs disagree with each other and with the tree.
+day with §6, where the catalogs disagree with each other and with the tree,
+and §7, Mark's rulings 1 to 5 on them.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -314,3 +315,56 @@ What would improve the stack, as cues:
   the four it names.
 - The cabal types renamed when the comms crate is next touched; the entry's
   2026-09-05 retirement renamed the term, not the types.
+
+## 7. Rulings
+
+Mark ruled 1 to 5 on 2026-10-26. Each was a choice among offered options; the
+options and the evidence put to him are kept under each ruling, as the
+[stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+§5 does. Three of §6's rows needed no ruling: orrery (already reconciled),
+swatch (TERMINOLOGY's entry now lists link and selection scopes), and the
+cabal types (the survivor rule).
+
+1. **The pane list. Ruled: TERMINOLOGY's list.** Roster, gloss, inspector,
+   apparatus, comms, plus Steward once built. The kernel's `ToolPaneState`
+   names fold: Diagnostics and AccessibilityInspector into apparatus, whose
+   `SurfaceId` doc already lists diagnostics, probes and a11y status; Settings
+   into the settings capability (Mark, 2026-10-25); HistoryManager into
+   history; FileTree retired. It had three uses, all in chrome routing. Index
+   and TreeSpine are in no canonical list, and TreeSpine leaves `SurfaceId`
+   under ruling 2. Options set aside: the kernel lists as canonical, with
+   TERMINOLOGY rewritten to them; product panes and tool surfaces kept apart
+   as two kinds.
+2. **What a `SurfaceId` variant means. Ruled: an emitting surface.** A variant
+   needs an open and dismiss seam. Unbuilt pane variants and their
+   accessibility descriptors leave until the pane is built; this record is the
+   intended set. Nothing stored references them. Option set aside: keep every
+   intended surface declared, and mark declared-not-emitting in the descriptor
+   table.
+3. **The workbench. Ruled: the surface that presents a forme.** The spine
+   stands: a tile is a slot of node content in a projection, and the tile tree
+   (splits and tabs) is the default desktop projection, not the workbench.
+   TERMINOLOGY's tile entry is rewritten and a workbench entry added. Options
+   set aside: the workbench as the tile tree, with the spine narrowed; deferring
+   until a second projection is built.
+4. **Cards. Ruled: kinds in the slot.** The family (preview, unvisited,
+   connections swatch, object) names kinds of content the focus-card slot
+   summons. `focus_card` is that slot, `PortableCard` is chirograph's small
+   semantic card for sharing, `receipt_card` renders receipts. The summoning
+   doc gains a line per code word; nothing renames. Options set aside: the code
+   vocabulary as the live family; the four kinds becoming identifiers under the
+   survivor rule.
+5. **The dock contract. Ruled: Cambium's shell.** `crates/cambium/cambium/src/shell`
+   owns dock state (open, side, width, focus, context binding) as the pane
+   shell's contract, beside the overlay's edge placement. `DockState` and
+   `DockSide` move out of the comms pane; the kernel keeps
+   `PanePresentationMode` as the intent-level mobility word. Options set aside:
+   the kernel's `pane.rs`; the chrome crate beside `ToolbarState`; leaving both
+   until a second docked pane.
+
+What the rulings leave in code, as cues: `SurfaceId` carries unbuilt pane
+variants and `ToolPaneState` carries five names that now fold (kernel
+`pane.rs`, `accessibility.rs`, ux-events' diagnostics map, chrome routing);
+the dock contract still lives in the comms pane rather than Cambium's shell.
+Both are mechanical under rulings 1, 2 and 5, and neither touches a stored
+format.

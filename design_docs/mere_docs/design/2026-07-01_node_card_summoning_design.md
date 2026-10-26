@@ -40,6 +40,8 @@ Cards are summonable surfaces scoped to a node or selection. The family so far:
 - **Object card**: the per-object control surface (widgets bound to the object's settings).
 - **Facet cards** and the roster's detail cards (Link, Graphlet, Field, Facet): the same family embedded in a pane instead of anchored on the canvas.
 
+The code's card words, read 2026-10-26 and ruled *kinds in the slot* ([GUI catalog record](2026-10-26_gui_catalog_design.md), ruling 4): `focus_card` in Graphshell's `web_tree` is the summoning slot the kinds above fill; `PortableCard` in chirograph's `titulus` is a small semantic card for sharing, not a summoned surface; `receipt_card` in `receipts/card.rs` renders receipts and is not a node card. Nothing renames; the four kinds are what the slot summons.
+
 The aspiration (Mark, 2026-07-01): these converge on **embeddable node control surfaces**, one card system that renders anchored-on-canvas or embedded in the roster / a note / a menu, the way the roster detail cards already do in-pane.
 
 ## 3. Summoning
