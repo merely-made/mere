@@ -22,7 +22,7 @@ A pane is described by a small, shared contract — the first dock API:
 - **focus** — whether it holds input focus.
 - **context binding** (optional) — the selection / graph the pane follows, for the graph-contingent panes.
 
-Ruled 2026-10-26 ([GUI catalog record](../design/2026-10-26_gui_catalog_design.md), ruling 5): the shared dock contract lives in Cambium's shell (`crates/cambium/cambium/src/shell`), beside the overlay's edge placement; the comms pane's `DockState` and `DockSide` graduate there, and the kernel's `PanePresentationMode` stays as the intent-level mobility word. `PaneKind` above is the pane list TERMINOLOGY keeps (ruling 1).
+Ruled 2026-10-26 ([GUI catalog record](../design/2026-10-26_gui_catalog_design.md), ruling 5): the shared dock contract lives in Cambium's shell (`crates/cambium/cambium/src/shell`), beside the overlay's edge placement; the comms pane's `DockState` and `DockSide` graduate there, and the kernel's `PanePresentationMode` stays as the intent-level mobility word. `PaneKind` above is the pane list TERMINOLOGY keeps (ruling 1). Refined the same day (that record §8): a pane is a frame presenting an answer to a question; a surface producer, an embedded application, may be what it presents, and what an application adds is a presentation, a pane adapter into a pane such as this one, a pane, or a servitor.
 
 Panes are **per-window** (like the [multi-window synced panels](../../mere_docs/implementation_strategy/2026-06-04_multi_window_plan.md) *(historical citation)* <!-- doc-audit: historical-link --> model: window-specific, graph-bound, tearable), reusing the chrome's separate-roots discipline (a pane is a docked root composited beside the content-root, not a tile inside it).
 
