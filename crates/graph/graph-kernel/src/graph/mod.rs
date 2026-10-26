@@ -92,6 +92,7 @@ mod membership;
 pub use membership::SurfaceNodeLifetime;
 pub mod import_records;
 pub mod merge;
+mod navigation_check;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
@@ -156,6 +157,7 @@ pub use history::{
     NodeHistoryOwner, NodeHistoryProjection, NodeHistorySemanticSummary, RecentVisit,
     SharedNavigationMemory,
 };
+pub use navigation_check::NavigationIndexError;
 
 // Edge taxonomy (family/sub-kind enums) and per-family runtime data structs
 // extracted to their own modules. edge_taxonomy holds classifiers; edge_data

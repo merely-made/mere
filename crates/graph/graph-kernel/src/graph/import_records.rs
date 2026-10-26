@@ -7,14 +7,16 @@
 //! Import-record operations.
 //!
 //! Manages the durable `import_records` truth on `Graph`: queries,
-//! membership suppression, replacement, and the two private helpers
-//! that sync between `import_records` and per-node
-//! `NodeImportProvenance` (`sync_node_import_provenance_from_records`
-//! / `rebuild_import_records_from_node_provenance`).
+//! membership suppression, replacement, and the projection of the table
+//! onto per-node `NodeImportProvenance` facets
+//! (`sync_node_import_provenance_from_records`).
 //!
-//! Also includes `set_node_import_provenance` because it triggers a
-//! rebuild and naturally lives with its sibling import-record
-//! plumbing.
+//! The table owns memberships and their suppression. The per-node facet
+//! is a projection that omits suppressed memberships, so nothing here
+//! rebuilds the table from it. `set_node_import_provenance` edits that
+//! node's memberships in the table; a snapshot that predates the table
+//! derives it from the legacy persisted column
+//! (`import_records_from_legacy_provenance`).
 //!
 //! Extracted from `graph/mod.rs` per the 2026-05-11 kernel
 //! decomposition pass.
@@ -165,73 +167,139 @@ impl Graph {
         }
     }
 
-    pub(crate) fn rebuild_import_records_from_node_provenance(&mut self, imported_at_secs: u64) {
-        let existing_record_meta = self
-            .import_records
-            .iter()
-            .map(|record| {
-                (
-                    (record.source_id.clone(), record.source_label.clone()),
-                    (record.record_id.clone(), record.imported_at_secs),
-                )
-            })
-            .collect::<HashMap<_, _>>();
-
-        let mut grouped = BTreeMap::<(String, String), Vec<ImportRecordMembership>>::new();
-        let nodes = self
-            .nodes()
-            .map(|(node_key, node)| (node_key, node.id))
-            .collect::<Vec<_>>();
-        for (node_key, node_id) in nodes {
-            let node_id = node_id.to_string();
-            for provenance in self.node_import_provenance(node_key).unwrap_or_default() {
-                grouped
-                    .entry((provenance.source_id, provenance.source_label))
-                    .or_default()
-                    .push(ImportRecordMembership {
-                        node_id: node_id.clone(),
-                        suppressed: false,
-                    });
-            }
-        }
-
-        let mut import_records = grouped
-            .into_iter()
-            .map(|((source_id, source_label), memberships)| {
-                let (record_id, imported_at_secs) = existing_record_meta
-                    .get(&(source_id.clone(), source_label.clone()))
-                    .cloned()
-                    .unwrap_or_else(|| (format!("import-record:{}", source_id), imported_at_secs));
-                ImportRecord {
-                    record_id,
-                    source_id,
-                    source_label,
-                    imported_at_secs,
-                    memberships,
-                }
-            })
-            .collect::<Vec<_>>();
-        normalize_import_records(&mut import_records);
-        self.import_records = import_records;
-        self.sync_node_import_provenance_from_records();
-    }
-
+    /// Make `key`'s active provenance exactly `import_provenance`, touching
+    /// only that node's memberships. Other nodes and every suppressed
+    /// membership stay as the table has them.
     pub(crate) fn set_node_import_provenance(
         &mut self,
         key: NodeKey,
         import_provenance: Vec<NodeImportProvenance>,
     ) -> bool {
-        if self.inner.node(key).is_none() {
+        let Some(node_id) = self.get_node(key).map(|node| node.id.to_string()) else {
+            return false;
+        };
+        let mut wanted = import_provenance;
+        wanted.sort();
+        wanted.dedup();
+        if active_provenance(&self.import_records, &node_id) == wanted {
             return false;
         }
-        let mut normalized = import_provenance;
-        normalized.sort();
-        normalized.dedup();
-        if self.node_import_provenance(key).unwrap_or_default() == normalized {
-            return false;
-        }
-        self.set_node_facet(key, super::node_facets::PROVENANCE_IMPORT, &normalized);
-        self.rebuild_import_records_from_node_provenance(current_unix_timestamp_secs());
+        let mut records = std::mem::take(&mut self.import_records);
+        assign_node_memberships(
+            &mut records,
+            &node_id,
+            &wanted,
+            current_unix_timestamp_secs(),
+        );
+        normalize_import_records(&mut records);
+        self.import_records = records;
+        let projected = active_provenance(&self.import_records, &node_id);
+        self.set_node_facet(key, super::node_facets::PROVENANCE_IMPORT, &projected);
         true
     }
+}
+
+fn is_source(record: &ImportRecord, source: &NodeImportProvenance) -> bool {
+    record.source_id == source.source_id && record.source_label == source.source_label
+}
+
+/// What the table projects onto a node: its unsuppressed memberships' sources.
+fn active_provenance(records: &[ImportRecord], node_id: &str) -> Vec<NodeImportProvenance> {
+    let mut provenance = records
+        .iter()
+        .filter(|record| {
+            record
+                .memberships
+                .iter()
+                .any(|membership| membership.node_id == node_id && !membership.suppressed)
+        })
+        .map(|record| NodeImportProvenance {
+            source_id: record.source_id.clone(),
+            source_label: record.source_label.clone(),
+        })
+        .collect::<Vec<_>>();
+    provenance.sort();
+    provenance.dedup();
+    provenance
+}
+
+/// Edit `node_id`'s memberships so its active sources are exactly `wanted`.
+/// A source the node lacks goes to the latest record of that source (an
+/// existing membership is un-suppressed), or to a new record if none exists.
+/// The node's suppressed memberships in other sources are left alone.
+fn assign_node_memberships(
+    records: &mut Vec<ImportRecord>,
+    node_id: &str,
+    wanted: &[NodeImportProvenance],
+    imported_at_secs: u64,
+) {
+    for record in records.iter_mut() {
+        if !wanted.iter().any(|source| is_source(record, source)) {
+            record
+                .memberships
+                .retain(|membership| membership.node_id != node_id || membership.suppressed);
+        }
+    }
+    records.retain(|record| !record.memberships.is_empty());
+    let active = active_provenance(records, node_id);
+    for source in wanted.iter().filter(|source| !active.contains(source)) {
+        let Some(record) = records
+            .iter_mut()
+            .rev()
+            .find(|record| is_source(record, source))
+        else {
+            records.push(ImportRecord {
+                record_id: format!("import-record:{}", source.source_id),
+                source_id: source.source_id.clone(),
+                source_label: source.source_label.clone(),
+                imported_at_secs,
+                memberships: vec![ImportRecordMembership {
+                    node_id: node_id.to_string(),
+                    suppressed: false,
+                }],
+            });
+            continue;
+        };
+        match record
+            .memberships
+            .iter_mut()
+            .find(|membership| membership.node_id == node_id)
+        {
+            Some(membership) => membership.suppressed = false,
+            None => record.memberships.push(ImportRecordMembership {
+                node_id: node_id.to_string(),
+                suppressed: false,
+            }),
+        }
+    }
+}
+
+/// Import records for a snapshot that predates the table: only the legacy
+/// per-node `import_provenance` column names the sources.
+pub(crate) fn import_records_from_legacy_provenance<'a>(
+    nodes: impl IntoIterator<Item = (Uuid, &'a [NodeImportProvenance])>,
+    imported_at_secs: u64,
+) -> Vec<ImportRecord> {
+    let mut grouped = BTreeMap::<(String, String), Vec<ImportRecordMembership>>::new();
+    for (node_id, provenance) in nodes {
+        for source in provenance {
+            grouped
+                .entry((source.source_id.clone(), source.source_label.clone()))
+                .or_default()
+                .push(ImportRecordMembership {
+                    node_id: node_id.to_string(),
+                    suppressed: false,
+                });
+        }
+    }
+    grouped
+        .into_iter()
+        .map(|((source_id, source_label), memberships)| ImportRecord {
+            record_id: format!("import-record:{source_id}"),
+            source_id,
+            source_label,
+            imported_at_secs,
+            memberships,
+        })
+        .collect()
 }
