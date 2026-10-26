@@ -84,7 +84,11 @@ impl Graph {
             // Positions are no longer graph truth; they live in the cartography
             // sidecar (the Cartography projection's geometry). Seed at the origin and
             // let the sidecar override on load. (Position gut.)
-            let key = graph.add_node_with_id(node_id, node_url, Point2D::new(0.0, 0.0));
+            let (key, inserted) =
+                graph.insert_node_if_missing(node_id, node_url, Point2D::new(0.0, 0.0));
+            if !inserted {
+                continue;
+            }
             if let Some(node) = graph.inner.node_mut(key) {
                 if node.title != pnode.title {
                     graph.content_revision = graph.content_revision.wrapping_add(1);
