@@ -14,7 +14,7 @@ but there are a lot of loops to tie up!" and "i probably forgot things too".
 
 **Reading.** Most of that list is not GUI nouns. It is the set of concerns that
 need a GUI face. The surfaces are the rows, the concerns are the columns, and
-the catalog is the product of the two. The stack already holds seven partial
+the catalog is the product of the two. The stack already holds six partial
 catalogs, each one row or one column of that product, written from one
 authority's point of view, and none cross-references another (§1). The loops
 Mark names are the places where two of those catalogs claim the same cell (§4).
@@ -36,14 +36,20 @@ Each is real and useful on its own axis. The gap is between them.
 |---|---|---|---|
 | Cambium component catalog | widgets, executable | [component-catalog](../../cambium_docs/technical_architecture/component-catalog.md), `crates/cambium/cambium/examples/component_catalog.rs` | button through data grid; command surfaces as palette, picker and context menu with disabled reasons; overlay; detail popover; selection bars and filter chips; pane shell and `setting_row` with empty, error and unavailable states; graph-canvas swatch; paint leaves |
 | Projection grammar catalog | graph visuals | [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md) | readings and operators, marks, visual channels, guides and backdrops, relation forms, arrangement families, interaction and change over time |
-| Peripheral panes catalog | dock, by primary authority | [peripheral panes](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) | Gloss, Roster, Inspector, Index; Steward, Apparatus; Comms |
-| Surface and frame taxonomy | roles | [graph roster and frame taxonomy](2026-06-07_graph_roster_and_frame_taxonomy.md) §3 | orrery, gloss, workbench, roster, inspector |
+| Frame-tree surfaces | roles, and panes by primary authority | [TERMINOLOGY, Surfaces](../../TERMINOLOGY.md#surfaces-frame-tree), consolidating the [frame taxonomy](2026-06-07_graph_roster_and_frame_taxonomy.md) §3 and the [peripheral panes](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) dock | frame; pane as roster, gloss, inspector, apparatus, comms, plus Index and Steward from the panes doc, grouped there by graph, runtime or social authority; tile and the workbench tile tree; shellbar |
 | Card family | summoned surfaces | [node card summoning](2026-07-01_node_card_summoning_design.md) §2 | preview, unvisited, connections swatch, object card |
 | Capability-gate catalogue | refusals | [capability gate catalogue](../research/2026-05-14_capability_gate_catalogue_brief.md) | named gates, the policy chain (its chain superseded 2026-05-30 by the narrowing rule) |
 | The kernel's own surface list | UX event sources | `crates/graph/graph-kernel/src/accessibility.rs`, `SurfaceId` | Omnibar, CommandPalette, NodeFinder, ContextMenu, ConfirmDialog, NodeCreate, FrameRename, StatusBar, TreeSpine, NavigatorHost, TilePane, CanvasPane, BaseLayer, RosterPane, InspectorPane, StewardPane, GlossPane, ApparatusPane, CommsPane, WorkbenchPane |
 
-Three readings of the table:
+Four readings of the table:
 
+- **The orrery is not a row.** Mark, 2026-10-26: "the orrery is just a
+  projection of the graph." TERMINOLOGY narrowed it to a form factor on
+  2026-07-26, a way a mere is rendered, and the grammar catalog already lists
+  "orrery or node-link" as a projection family. The June frame taxonomy and
+  the panes catalog were two readings of one frame tree, which TERMINOLOGY's
+  Surfaces section already consolidates; the table cites that section and
+  keeps the June docs as its sources.
 - **The rows exist in different degrees.** `SurfaceId` names twenty surfaces
   because each is an event source for accessibility, not because each is
   built. As read on 2026-10-26, Graphshell's source names Inspector and Roster
@@ -54,8 +60,8 @@ Three readings of the table:
   mentions; Cambium's "card" is a context for the summary body. A catalog that
   does not say *built, named, or designed* per row will be read as a claim that
   everything in it exists.
-- **No catalog says which authority a surface projects.** The panes catalog
-  comes closest, grouping by primary authority. The others enumerate shapes.
+- **No catalog says which authority a surface projects.** The panes half of
+  the frame-tree row comes closest, grouping panes by primary authority. The others enumerate shapes.
 - **The doctrine has no GUI area.** `doctrine.md` has five Stack statements
   and none about surfaces, so there is nothing a GUI question can be filed
   under as *applies* or *refines*.
@@ -64,7 +70,8 @@ Three readings of the table:
 
 **Rows: the surfaces.** The nouns TERMINOLOGY already fixes, plus the ones
 the catalogs above add. Window; frame; pane; shellbar; tile and the workbench
-tile tree; canvas (orrery as a form factor, gnode as a node's body); swatch;
+tile tree; canvas (orrery and volvelle are its form factors, the gnode a
+node's body); swatch;
 card; overlay and popover; command surface (palette, picker, context menu);
 chip; scope trail; settings page; status bar; dialog.
 
@@ -232,7 +239,7 @@ Five authorities cover every cell read above:
 | the build profile | whether the engine behind it is linked | stack modularity map |
 
 A surface is then a projection of a node set under a scope, a ring, a keeping
-level and a profile. The catalog becomes a cross-reference between the seven
+level and a profile. The catalog becomes a cross-reference between the six
 lists in §1, not an eighth list, and a new surface is catalog-complete when
 each of the five authorities has a line for it, including its refusal.
 
