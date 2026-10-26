@@ -239,3 +239,90 @@ fn test_suppress_import_record_membership_updates_node_projection() {
         vec![peer]
     );
 }
+
+fn node_id(graph: &Graph, key: NodeKey) -> String {
+    graph.get_node(key).expect("node").id.to_string()
+}
+
+/// `Some(suppressed)` when the record holds the node.
+fn suppression(graph: &Graph, record_id: &str, node_id: &str) -> Option<bool> {
+    let record = graph
+        .import_records()
+        .iter()
+        .find(|record| record.record_id == record_id)?;
+    let membership = record
+        .memberships
+        .iter()
+        .find(|membership| membership.node_id == node_id)?;
+    Some(membership.suppressed)
+}
+
+#[test]
+fn node_provenance_write_changes_only_that_nodes_memberships() {
+    let mut graph = Graph::new();
+    let hidden = graph.add_node("https://hidden.example".to_string(), Point2D::new(0.0, 0.0));
+    let peer = graph.add_node("https://peer.example".to_string(), Point2D::new(10.0, 0.0));
+    let writer = graph.add_node(
+        "https://writer.example".to_string(),
+        Point2D::new(20.0, 0.0),
+    );
+    let (hidden_id, peer_id, writer_id) = (
+        node_id(&graph, hidden),
+        node_id(&graph, peer),
+        node_id(&graph, writer),
+    );
+    let member = |node_id: &str, suppressed| ImportRecordMembership {
+        node_id: node_id.to_string(),
+        suppressed,
+    };
+    assert!(graph.set_import_records(vec![ImportRecord {
+        record_id: "import-record:old".to_string(),
+        source_id: "old".to_string(),
+        source_label: "Old import".to_string(),
+        imported_at_secs: 1,
+        memberships: vec![member(&hidden_id, true), member(&peer_id, false)],
+    }]));
+
+    let new_source = NodeImportProvenance {
+        source_id: "new".to_string(),
+        source_label: "New import".to_string(),
+    };
+    assert!(graph.set_node_import_provenance(writer, vec![new_source.clone()]));
+    assert_eq!(
+        suppression(&graph, "import-record:old", &hidden_id),
+        Some(true)
+    );
+    assert_eq!(
+        suppression(&graph, "import-record:old", &peer_id),
+        Some(false)
+    );
+    assert_eq!(suppression(&graph, "import-record:old", &writer_id), None);
+    assert_eq!(
+        suppression(&graph, "import-record:new", &writer_id),
+        Some(false)
+    );
+    assert_eq!(graph.node_import_provenance(writer), Some(vec![new_source]));
+    assert!(
+        graph
+            .node_import_provenance(hidden)
+            .expect("hidden")
+            .is_empty()
+    );
+
+    assert!(graph.set_node_import_provenance(writer, vec![]));
+    assert_eq!(graph.import_records().len(), 1);
+    assert_eq!(
+        suppression(&graph, "import-record:old", &hidden_id),
+        Some(true)
+    );
+    assert_eq!(
+        suppression(&graph, "import-record:old", &peer_id),
+        Some(false)
+    );
+    assert!(
+        graph
+            .node_import_provenance(writer)
+            .expect("writer")
+            .is_empty()
+    );
+}
