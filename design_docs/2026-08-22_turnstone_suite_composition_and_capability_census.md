@@ -445,7 +445,9 @@ is the current composition/workflow specification. It retains this placement
 inside Distillery, leaves Servitor in Eidetic, and uses Armillary for
 execution. Its first gate is a retained-passage evidence brief in Turnstone
 and Graphshell, with review, owner-acknowledged application and cold reopen.
-The workflow is specified; the founding two-host receipt remains open.
+The shared domain/view core and native worker are implemented as of
+2026-10-25 (Alembic plan section 5.7). The product adapters and founding
+two-host receipt remain open.
 
 ## 8. Capabilities that need exposure, not another port
 

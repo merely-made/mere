@@ -1,8 +1,9 @@
 # Alembic implementation plan: memory and the granted-agent workshop
 
-**Status (2026-10-25):** W0 shared-domain implementation and qualification in
-progress. The workshop reconciliation and first two-host workflow are specified in [section 5](#5-workshop-reconciliation-and-first-workflow-2026-10-24);
-Product integration and two-host acceptance remain open. Alembic/Athanor own the workshop
+**Status (2026-10-25):** W0 shared core implemented and qualified. The
+workshop reconciliation and first two-host workflow are specified in
+[section 5](#5-workshop-reconciliation-and-first-workflow-2026-10-24).
+W1–W3 product integration and two-host acceptance remain open. Alembic/Athanor own the workshop
 inside Distillery. Servitor remains in Eidetic, supplying admission and the
 runtime-free run reducer; Armillary supplies execution mechanics. The first
 workflow builds a reviewable evidence brief from selected retained passages in
@@ -486,7 +487,7 @@ remote execution and fleet migration have separate acceptance gates.
 
 | Target | Deliverable and done-condition |
 |---|---|
-| W0 — shared domain and deterministic workflow | Versioned inputs/proposals and persisted binding/run/review records; one reducer implementation, explicit owner clocks/budgets, and exact three-passage output. Plain Servitor consumers retain their current dependency boundary. |
+| W0 — shared domain and deterministic workflow | **Shared core qualified 2026-10-25; see section 5.8.** Versioned inputs/proposals and persisted binding/run/review records; one reducer implementation, explicit owner clocks/budgets, and exact three-passage output. Plain Servitor consumers retain their current dependency boundary. |
 | W1 — Turnstone owner adapter | Normal retained-source selection, shared workshop controls, real target gate/commit and fallible persistence acknowledgement. Accept/reject and citation routing work without acquisition. |
 | W2 — Graphshell owner adapter | The identical helper body and workshop view/domain model operate through Graphshell's owner, with independent grants and IDs. No Turnstone workflow implementation or database reader is copied. |
 | W3 — recovery and two-host receipt | Both hosts pass the matrix below on pinned source/dependency cuts. Headed evidence proves normal controls and product history; fresh-process evidence proves durable state. Publication and physical fleet behavior are reported separately. |
@@ -580,6 +581,32 @@ Neither a separate ledger write nor Turnstone’s `SaveSession`/untracked
 handoff supplies the required atomic acceptance receipt. W3 remains open
 until the real product paths pass section 5.5.
 
+### 5.8 Shared-core qualification (2026-10-25)
+
+Source `370b251f3` passes 34 native library tests: 23 workshop cases and all
+11 existing furnace cases. The workshop core also passes wasm32 checking
+with defaults and Armillary disabled. Its normal dependency graph has 72
+packages and excludes Armillary, Tokio, ESP, Burn/CubeCL, the UI/kernel and
+inference/cache crates. This is a consumer qualification of Servitor’s pure
+admission/run boundary; no supplier source move or API change was needed.
+
+Separate native seed/reopen processes retain the same public synthetic
+installation, proposal, terminal generation and uncertain acceptance in a
+DirectoryBackend store. The native test binary and store are frozen under
+`Code/output/alembic-workshop-20261025`, with verified binary/store/log hashes
+in the [qualification record](../../../support/receipts/alembic-workshop-20261025/qualification.json).
+Checks cover Unicode selectors, literal quotation structure, exact version
+routing after source change, missing/oversized/private/out-of-scope inputs,
+concurrent invocation and acceptance, stale replies, revocation, pause/resume,
+deadlines, persistence refusal, corruption and retention bounds. The fixture
+uses injected logical time; wasm evidence is compilation only.
+
+These results close W0’s shared-core gate. W1–W3 remain open. The synthetic
+receipt and owner scopes qualify domain mechanics, without claiming an actual
+note/graph mutation, headed product controls, production custody or physical
+mesh execution. The actual destination ledger/Resource/graph transaction is
+still the consequential product acceptance boundary.
+
 ## Decisions — workshop reconciliation (2026-10-24)
 
 - **D8, keep Servitor's present source home.** Mark: "leave Servitor where it
@@ -604,6 +631,14 @@ automation, credentials, grants or publication.
 - eidetic ([eidetic-core](https://github.com/merely-made/eidetic/tree/main/crates/eidetic-core) over Muniment's [`fjall` backend](https://github.com/merely-made/eidetic/tree/main/crates/muniment/src/fjall_backend.rs), moved 2026-10-11), [armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary), [graph-kernel snapshot](../../../crates/graph/graph-kernel/src/graph/snapshot/).
 
 ## Progress
+
+- **2026-10-25:** implemented and qualified the W0 shared core at `370b251f3`:
+  versioned Alembic records/controls, transactional Athanor bindings/runs/review,
+  Servitor admission/replay and an optional Armillary worker. All 34 native
+  tests, wasm core checking, dependency-boundary audit and independent-process
+  domain reopen pass. The default furnace source is preserved byte-for-byte.
+  W1/W2 actual product adapters and W3 headed/cold product acceptance remain
+  open; no private or model-driven qualification is claimed.
 
 - **2026-10-24:** reconciled the workshop with Servitor and Armillary, retaining
   Servitor in Eidetic. Specified the retained-passage evidence brief in

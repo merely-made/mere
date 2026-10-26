@@ -1,12 +1,13 @@
 # The agent harness: decision drivers in the Alembic workshop
 
 **Date:** 2026-07-03
-**Status (2026-10-24):** model-guided design rationale reconciled with the
+**Status (2026-10-25):** model-guided design rationale reconciled with the
 [Alembic workshop plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24).
 Alembic/Athanor own workshop composition. The [Servitor redesign](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
 owns reusable admission/run semantics; Servitor remains in Eidetic.
-R1a/R1b and the Turnstone adapter have executable receipts. The workshop's
-two-host workflow and model-guided decisions remain unimplemented.
+R1a/R1b and the Turnstone adapter have executable receipts. Athanor now consumes the same reducer in the deterministic evidence-brief
+core (Alembic plan section 5.7). The product adapters, two-host acceptance
+and model-guided decisions remain open.
 
 ## 1. The composition
 
