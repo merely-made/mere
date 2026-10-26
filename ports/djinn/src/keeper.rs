@@ -30,6 +30,7 @@ use personae::{IdentityError, IdentityProvider, RetainedKeys};
 
 use crate::custody::ReleasePolicy;
 mod review;
+mod signing;
 use crate::identity_ui::{
     NativeIdentityUi, UnavailableNativeIdentityUi, apply_native_identity_action,
 };
@@ -88,7 +89,12 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
         persona: personae::PersonaId,
         root: PathBuf,
     ) -> Result<(), String> {
-        self.payload_custody.set(crate::custody::payload::PayloadCustody { profile, persona, root })
+        self.payload_custody
+            .set(crate::custody::payload::PayloadCustody {
+                profile,
+                persona,
+                root,
+            })
             .map_err(|_| "retained-content custody is already configured".into())
     }
 
@@ -217,6 +223,9 @@ impl<S: IdentityStorage + 'static> IdentityAuthority for Keeper<S> {
     }
 
     fn apply_intent(&self, intent: &str, payload: &[u8]) -> Result<(), String> {
+        if signing::is_signing_decision(intent) {
+            return signing::confirm(&self.host, self.ui.as_ref(), intent, payload);
+        }
         self.host
             .apply_intent(intent, payload)
             .map(|_| ())

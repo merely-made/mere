@@ -28,7 +28,8 @@ const SALTS: CredentialSalts = CredentialSalts {
     record: b"castellan-test/records",
     freshness: b"castellan-test/freshness",
 };
-const TOTP: &str = "otpauth://totp/Example:mark?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Example";
+const TOTP: &str =
+    "otpauth://totp/Example:mark?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Example";
 
 /// A host over a lockable temp vault holding `research` (one Ed25519 key)
 /// and `personal`, plus a credential authority registered as its holder.
@@ -39,6 +40,10 @@ struct Locked {
 }
 
 fn lockable(dir: &Path) -> Locked {
+    lockable_with_timeout(dir, Duration::from_secs(2))
+}
+
+fn lockable_with_timeout(dir: &Path, decision_timeout: Duration) -> Locked {
     let storage = SealedProfileStorage::open_with_key(dir.join("vault"), ROOT);
     storage.enroll_passphrase(PASSPHRASE).unwrap();
     let mut key = PrivateKey::random(&mut rand_core::OsRng, Algorithm::Ed25519).unwrap();
@@ -64,7 +69,7 @@ fn lockable(dir: &Path) -> Locked {
         IdentityVault::open(storage, &ProfileId("research".into())).unwrap(),
         None,
         VaultProtectionView::OsProtected,
-        Duration::from_secs(2),
+        decision_timeout,
     );
     let resident =
         CastellanResident::claim_derived(dir.join("records"), dir.join("freshness"), &host, SALTS)
@@ -125,7 +130,10 @@ fn a_lock_drops_the_credential_keys_so_items_and_the_otp_gate_say_locked() {
     let on_disk = record_files(&dir.path().join("records"));
 
     fixture.host.lock_vault().unwrap();
-    assert!(fixture.resident.is_locked(), "the hook ran before lock returned");
+    assert!(
+        fixture.resident.is_locked(),
+        "the hook ran before lock returned"
+    );
     assert!(matches!(
         fixture.resident.items(persona).list(),
         Err(ItemStoreError::Locked)
@@ -134,7 +142,10 @@ fn a_lock_drops_the_credential_keys_so_items_and_the_otp_gate_say_locked() {
         gate.petition(item.item_id(), item.credential_id(), participant()),
         Err(OtpReleaseError::Locked)
     ));
-    assert!(matches!(gate.approve(pending.id), Err(OtpReleaseError::Locked)));
+    assert!(matches!(
+        gate.approve(pending.id),
+        Err(OtpReleaseError::Locked)
+    ));
 
     unlock(&fixture.host);
     assert!(!fixture.resident.is_locked(), "re-derived on unlock");
@@ -224,6 +235,100 @@ fn observers_see_every_change() {
     assert_eq!(*state.borrow_and_update(), VaultLockView::Unlocked);
 }
 
+#[test]
+fn failed_restart_barrier_locks_memory_but_never_reports_success_even_on_retry() {
+    let dir = tempdir().unwrap();
+    let fixture = lockable(dir.path());
+    let blocked = dir.path().join("blocked-marker-directory");
+    std::fs::write(&blocked, b"a file cannot be the marker directory").unwrap();
+    let host = fixture.host.with_persisted_lock(blocked.clone());
+    assert!(host.lock_vault().is_err());
+    assert!(host.is_locked());
+    assert!(fixture.resident.is_locked());
+    assert_eq!(*host.lock_state().borrow(), VaultLockView::Locked);
+    assert!(
+        host.lock_vault().is_err(),
+        "an already locked vault must retry the barrier"
+    );
+    std::fs::remove_file(&blocked).unwrap();
+    host.lock_vault().unwrap();
+    assert!(crate::custody::lock_persisted(&blocked));
+    assert_eq!(
+        std::fs::read_dir(&blocked).unwrap().count(),
+        1,
+        "only the complete marker remains"
+    );
+}
+
+#[test]
+fn failure_to_clear_the_restart_barrier_relocks_every_holder() {
+    let dir = tempdir().unwrap();
+    let fixture = lockable(dir.path());
+    let marker_dir = dir.path().join("marker");
+    let host = fixture.host.with_persisted_lock(marker_dir.clone());
+    host.lock_vault().unwrap();
+    let marker = marker_dir.join(crate::custody::PERSISTED_LOCK_FILE);
+    std::fs::remove_file(&marker).unwrap();
+    std::fs::create_dir(&marker).unwrap();
+    assert!(
+        host.unlock_vault(UnlockMethod::Passphrase(PASSPHRASE))
+            .is_err()
+    );
+    assert!(host.is_locked());
+    assert!(fixture.resident.is_locked());
+    assert_eq!(*host.lock_state().borrow(), VaultLockView::Locked);
+    assert!(
+        crate::custody::lock_persisted(&marker_dir),
+        "a malformed marker is fail-closed"
+    );
+}
+
+#[tokio::test]
+async fn native_signing_confirmation_does_not_survive_a_complete_lock_unlock_interval() {
+    use personae::signing::{SigningPolicy, SigningRequest};
+    let dir = tempdir().unwrap();
+    // This tests generation invalidation, not a two-second approval deadline.
+    // Real passphrase KDF work may take longer under a parallel full suite.
+    let fixture = lockable_with_timeout(dir.path(), Duration::from_secs(120));
+    let broker = fixture.host.approval.clone();
+    let request = SigningRequest::new(
+        "research",
+        "public-fixture-key",
+        "ssh.sign",
+        b"synthetic",
+        "test",
+    );
+    let id = request.request_id;
+    let waiting =
+        tokio::spawn(async move { broker.authorize(request, SigningPolicy::PerUse).await });
+    while fixture.host.approval.pending().is_empty() {
+        tokio::task::yield_now().await;
+    }
+    let old = fixture.host.begin_native_signing(id).unwrap();
+    fixture.host.lock_vault().unwrap();
+    unlock(&fixture.host);
+    assert!(matches!(
+        fixture.host.complete_native_signing(
+            old,
+            SigningDecision::Approve {
+                remember: RememberApproval::Once
+            }
+        ),
+        Err(IdentityIntentError::StaleSigningConfirmation)
+    ));
+    let fresh = fixture.host.begin_native_signing(id).unwrap();
+    fixture
+        .host
+        .complete_native_signing(
+            fresh,
+            SigningDecision::Approve {
+                remember: RememberApproval::Once,
+            },
+        )
+        .unwrap();
+    assert!(waiting.await.unwrap().is_ok());
+}
+
 /// A holder registered while locked drops its keys at once.
 #[test]
 fn a_holder_joining_a_locked_vault_locks() {
@@ -263,17 +368,14 @@ fn the_snapshot_reports_locked_with_the_view_kept_at_lock_time() {
 fn the_lock_intent_works_from_any_surface_and_unlock_is_native_only() {
     let dir = tempdir().unwrap();
     let fixture = lockable(dir.path());
-    let outcome = fixture
-        .host
-        .apply_intent(VAULT_LOCK_INTENT, b"{}")
-        .unwrap();
+    let outcome = fixture.host.apply_intent(VAULT_LOCK_INTENT, b"{}").unwrap();
     assert_eq!(outcome, IdentityIntentOutcome::VaultLocked);
     assert!(fixture.host.is_locked());
     // Locking a locked vault through the intent is harmless.
     fixture.host.apply_intent(VAULT_LOCK_INTENT, b"{}").unwrap();
 
-    let passphrase = serde_json::to_vec(&serde_json::json!({ "passphrase": "castellan lock" }))
-        .unwrap();
+    let passphrase =
+        serde_json::to_vec(&serde_json::json!({ "passphrase": "castellan lock" })).unwrap();
     for payload in [&b"{}"[..], &passphrase] {
         assert!(matches!(
             fixture.host.apply_intent(VAULT_UNLOCK_INTENT, payload),
@@ -385,7 +487,10 @@ async fn the_agent_locks_the_whole_resident_and_refuses_to_unlock_it() {
     let mut agent = fixture.host.agent_session();
     agent.lock(String::from("pw")).await.unwrap();
     assert!(fixture.host.is_locked());
-    assert!(fixture.resident.is_locked(), "the agent's lock is the host's");
+    assert!(
+        fixture.resident.is_locked(),
+        "the agent's lock is the host's"
+    );
     assert_eq!(*fixture.host.lock_state().borrow(), VaultLockView::Locked);
     assert!(agent.unlock(String::from("castellan lock")).await.is_err());
     assert!(fixture.host.is_locked());
@@ -429,14 +534,23 @@ async fn over_an_isolated_pipe_the_agent_locks_by_the_wire_and_unlocks_only_nati
     assert!(client.request_identities().await.unwrap().is_empty());
     assert!(sign_over(&mut client, &public).await.is_err());
     assert!(client.unlock(String::from("pw")).await.is_err());
-    assert!(client.lock(String::from("pw")).await.is_err(), "already locked");
+    assert!(
+        client.lock(String::from("pw")).await.is_err(),
+        "already locked"
+    );
     assert!(fixture.host.is_locked());
 
     unlock(&fixture.host);
     let again = client.request_identities().await.unwrap();
     assert_eq!(
-        again.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>(),
-        listed.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>()
+        again
+            .iter()
+            .map(|i| i.credential.key_data())
+            .collect::<Vec<_>>(),
+        listed
+            .iter()
+            .map(|i| i.credential.key_data())
+            .collect::<Vec<_>>()
     );
     let signature = sign_over(&mut client, &public).await.unwrap();
     public
@@ -471,7 +585,10 @@ fn a_kept_persisted_lock_follows_lock_and_unlock() {
     let vault_dir = dir.path().join("vault");
     let Locked { host, resident, .. } = lockable(dir.path());
     host.lock_vault().unwrap();
-    assert!(!crate::custody::lock_persisted(&vault_dir), "only a host that keeps it writes it");
+    assert!(
+        !crate::custody::lock_persisted(&vault_dir),
+        "only a host that keeps it writes it"
+    );
     unlock(&host);
 
     let host = host.with_persisted_lock(vault_dir.clone());
@@ -479,6 +596,12 @@ fn a_kept_persisted_lock_follows_lock_and_unlock() {
     assert!(crate::custody::lock_persisted(&vault_dir));
     assert!(resident.is_locked());
     unlock(&host);
-    assert!(!crate::custody::lock_persisted(&vault_dir), "an unlock by a user act clears it");
-    assert!(host.unlock_vault(UnlockMethod::Passphrase(PASSPHRASE)).is_ok());
+    assert!(
+        !crate::custody::lock_persisted(&vault_dir),
+        "an unlock by a user act clears it"
+    );
+    assert!(
+        host.unlock_vault(UnlockMethod::Passphrase(PASSPHRASE))
+            .is_ok()
+    );
 }

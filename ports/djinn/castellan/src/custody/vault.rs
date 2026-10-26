@@ -354,30 +354,24 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
     }
 }
 
-/// The secret-free view of `profile`.
-pub(crate) fn public_profile_of(profile: &Profile) -> PublicProfile {
-    // Pushed one at a time into a vector sized up front, each key rebuilt
-    // field by field. A cloned `Option<String>` that is `None` leaves most
-    // of its 24 bytes uninitialised, and a bulk copy of the temporary would
-    // carry whatever stale stack lay under it (a master seed, once) into a
-    // long-lived heap block.
-    let mut slots: Vec<SlotSummary> = Vec::with_capacity(profile.slots.len());
-    for (key, slot) in profile.slots.iter() {
-        slots.push(SlotSummary {
-            key: ProtocolKey {
+/// Build the retained public view using a representation whose optional
+/// instance has no dormant String payload, including after ordinary cloning.
+pub(crate) fn public_profile_of(profile: &Profile) -> RetainedPublicProfile {
+    let mut slots: Vec<RetainedSlotSummary> = profile
+        .slots
+        .iter()
+        .map(|(key, slot)| RetainedSlotSummary {
+            key: RetainedSlotKey {
                 mod_id: key.mod_id.clone(),
-                instance: match &key.instance {
-                    Some(instance) => Some(instance.clone()),
-                    None => None,
-                },
+                instance: key.instance.as_ref().map(|value| Box::new(value.clone())),
             },
-            kind: slot.kind().to_string(),
+            kind: slot.kind().to_owned(),
             lineage: slot.lineage(),
             unlock_tier: slot.unlock_tier(),
-        });
-    }
+        })
+        .collect();
     slots.sort_by(|a, b| a.key.cmp(&b.key));
-    PublicProfile {
+    RetainedPublicProfile {
         id: profile.id.clone(),
         display_name: profile.display_name.clone(),
         master_public_key: profile.master.public_key(),
@@ -403,7 +397,7 @@ pub(crate) fn public_profile_of(profile: &Profile) -> PublicProfile {
 pub struct IdentityVault<S: IdentityStorage> {
     storage: S,
     current: Option<Profile>,
-    public: PublicProfile,
+    public: RetainedPublicProfile,
 }
 
 impl<S: IdentityStorage> IdentityVault<S> {
@@ -441,7 +435,7 @@ impl<S: IdentityStorage> IdentityVault<S> {
     }
 
     /// The secret-free view of the current profile, locked or not.
-    pub fn public_profile(&self) -> &PublicProfile {
+    pub fn public_profile(&self) -> &RetainedPublicProfile {
         &self.public
     }
 
@@ -754,6 +748,10 @@ impl IdentityStorage for InMemoryStorage {
     }
 }
 
+mod retained_public_profile;
+
+pub use retained_public_profile::{RetainedPublicProfile, RetainedSlotKey, RetainedSlotSummary};
+
 mod slot_map;
 
 pub use slot_map::SlotMap;
@@ -763,3 +761,6 @@ mod tests;
 
 #[cfg(test)]
 mod lock_tests;
+
+#[cfg(test)]
+mod public_view_tests;

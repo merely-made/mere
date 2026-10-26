@@ -44,6 +44,8 @@ struct Canary {
 
 #[derive(Clone, Copy)]
 pub struct Hit {
+    pub address: usize,
+    pub offset: Option<usize>,
     pub phase: usize,
     pub live: bool,
     pub canary: usize,
@@ -56,6 +58,7 @@ pub struct Hit {
 pub const UNTRACKED: usize = usize::MAX;
 
 struct State {
+    labelled: [(usize, usize, &'static str); 16],
     canaries: [Option<Canary>; MAX_CANARIES],
     hits: [Option<Hit>; MAX_HITS],
     hit_count: usize,
@@ -71,6 +74,7 @@ struct Shared(UnsafeCell<State>);
 unsafe impl Sync for Shared {}
 
 static STATE: Shared = Shared(UnsafeCell::new(State {
+    labelled: [(0, 0, ""); 16],
     canaries: [const { None }; MAX_CANARIES],
     hits: [None; MAX_HITS],
     hit_count: 0,
@@ -145,6 +149,12 @@ impl State {
             let json = !raw && canary.json && json_hit(canary, block);
             if (raw || json) && self.hit_count < MAX_HITS {
                 self.hits[self.hit_count] = Some(Hit {
+                    address: block.as_ptr() as usize,
+                    offset: (0..block.len().saturating_sub(WINDOW - 1)).find(|&i| {
+                        canary.bytes[..canary.len]
+                            .windows(WINDOW)
+                            .any(|w| w == &block[i..i + WINDOW])
+                    }),
                     phase: PHASE.load(Ordering::Relaxed),
                     live,
                     canary: c,
@@ -292,9 +302,18 @@ pub fn clear_canaries() {
     with_state(|s| s.canaries = [const { None }; MAX_CANARIES]);
 }
 
+pub fn label_allocation(address: usize, bytes: usize, label: &'static str) {
+    with_state(|s| {
+        if let Some(slot) = s.labelled.iter_mut().find(|v| v.0 == 0 || v.0 == address) {
+            *slot = (address, bytes, label);
+        }
+    });
+}
+
 pub fn arm() {
     with_state(|s| {
         s.hits = [None; MAX_HITS];
+        s.labelled = [(0, 0, ""); 16];
         s.hit_count = 0;
     });
     ARMED.store(true, Ordering::SeqCst);
@@ -359,6 +378,16 @@ impl Report {
             p => phases.get(p).copied().unwrap_or("?"),
         };
         for h in hits {
+            let label = with_state(|s| {
+                s.labelled
+                    .iter()
+                    .find(|v| v.0 == h.address && v.1 == h.size)
+                    .map(|v| v.2)
+            });
+            println!(
+                "  allocation 0x{:x}, canary offset {:?}, identified as {:?}",
+                h.address, h.offset, label
+            );
             println!(
                 "  {} {} ({}) in a {}-byte block, phase {} (allocated in {})",
                 if h.live { "live" } else { "freed uncleared" },

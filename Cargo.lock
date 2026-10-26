@@ -4917,6 +4917,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "djinn-custodian"
+version = "0.0.1"
+dependencies = [
+ "base64 0.22.1",
+ "blake3",
+ "castellan",
+ "getrandom 0.3.4",
+ "personae",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "zeroize",
+]
+
+[[package]]
 name = "djinn-testkit"
 version = "0.0.1"
 dependencies = [
