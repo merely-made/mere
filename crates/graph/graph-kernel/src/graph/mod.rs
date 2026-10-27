@@ -48,6 +48,7 @@ use crate::types::{
 };
 
 pub mod apply;
+pub mod assertion_handles;
 pub mod capture;
 /// Cross-graph node copy (tear-out fork): mints a node in this graph from a
 /// donor node in another graph, recording cross-graph derivation provenance.
@@ -73,6 +74,8 @@ pub use frozen_link::{
     FrozenSourceRevision, OpenedFrozenLink,
 };
 pub mod coverage;
+#[cfg(test)]
+mod assertion_handles_tests;
 #[cfg(test)]
 mod frozen_link_tests;
 #[cfg(test)]

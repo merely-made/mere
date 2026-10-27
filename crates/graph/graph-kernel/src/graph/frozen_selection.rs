@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Immutable selections owned by Resources, independent of local appearances.
-use super::{CoverageNote, Graph};
+use super::{CoverageNote, Graph, GraphStratum};
 use crate::persistence::PersistedEdge;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -130,7 +130,13 @@ pub(crate) fn selection_from_record(
     if members.len() != selection.members.len() || members.contains(&Uuid::nil()) {
         return Err("invalid frozen member references".into());
     }
-    let mut handles = std::collections::BTreeMap::new();
+    super::assertion_handles::validate_assertion_handles(
+        selection
+            .statements
+            .iter()
+            .map(|edge| (GraphStratum::Resource, edge)),
+    )
+    .map_err(|error| error.to_string())?;
     for edge in &selection.statements {
         let from = edge
             .from_node_id
@@ -156,13 +162,6 @@ pub(crate) fn selection_from_record(
                 && (!semantic.sub_kinds.is_empty() || semantic.predicate.is_some())
             {
                 return Err("frozen semantic statements require exact handles".into());
-            }
-        }
-        for statement in edge.retained_assertions() {
-            if let Some(previous) = handles.insert(&statement.statement_id, (from, to, statement)) {
-                if previous != (from, to, statement) {
-                    return Err("conflicting frozen statement handle".into());
-                }
             }
         }
         // Reject malformed family/payload combinations instead of normalizing away data.
@@ -291,32 +290,40 @@ mod canonical_record_tests {
         }
     }
 
-    #[test]
-    fn frozen_selection_rejects_conflicting_canonical_ids_across_pairs() {
-        let first = Uuid::from_u128(1);
-        let second = Uuid::from_u128(2);
-        let third = Uuid::from_u128(3);
+    fn record(statements: Vec<PersistedEdge>) -> PersistedResourceRecord {
+        let members = (1..=3).map(Uuid::from_u128).collect();
         let selection = FrozenSelection {
             version: 1,
             spec: serde_json::json!({}),
             revision: 1,
-            members: vec![first, second, third],
-            statements: vec![
-                assertion_edge(first, second, "same-id"),
-                assertion_edge(first, third, "same-id"),
-            ],
+            members,
+            statements,
         };
-        let record = PersistedResourceRecord {
+        PersistedResourceRecord {
             canonical_iri: "urn:uuid:selection".into(),
             facets: vec![PersistedResourceFacet {
                 facet: FROZEN_SELECTION.into(),
                 value_json: serde_json::to_string(&selection).unwrap(),
             }],
-        };
-        assert!(
-            selection_from_record(&record)
-                .unwrap_err()
-                .contains("conflicting frozen statement handle")
-        );
+        }
+    }
+
+    #[test]
+    fn frozen_selection_rejects_conflicting_canonical_ids_across_pairs() {
+        let (first, second, third) = (Uuid::from_u128(1), Uuid::from_u128(2), Uuid::from_u128(3));
+        let error = selection_from_record(&record(vec![
+            assertion_edge(first, second, "same-id"),
+            assertion_edge(first, third, "same-id"),
+        ]))
+        .unwrap_err();
+        assert!(error.contains("one handle means one row"), "{error}");
+    }
+
+    #[test]
+    fn frozen_selection_rejects_identical_copies_on_parallel_rows() {
+        let row = assertion_edge(Uuid::from_u128(1), Uuid::from_u128(2), "copied");
+        assert!(selection_from_record(&record(vec![row.clone()])).is_ok());
+        let error = selection_from_record(&record(vec![row.clone(), row])).unwrap_err();
+        assert!(error.contains("one handle means one row"), "{error}");
     }
 }

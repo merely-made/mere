@@ -35,6 +35,8 @@ pub(crate) use from::{payload_from_persisted, payload_from_persisted_at};
 pub(crate) use to::persisted_edge_for_ids;
 
 #[cfg(test)]
+mod handle_tests;
+#[cfg(test)]
 mod tests;
 
 impl Graph {

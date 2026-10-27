@@ -10,7 +10,6 @@ use super::{CoverageNote, Graph, GraphStratum};
 use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use uuid::Uuid;
 
 pub const FROZEN_LINK: &str = "graph.frozen-link/v1";
@@ -195,7 +194,10 @@ pub(super) fn validate_frozen_link_record(
     if link.statements.is_empty() {
         return Err("frozen link must retain at least one pair bucket".into());
     }
-    let mut handles = BTreeMap::new();
+    super::assertion_handles::validate_assertion_handles(
+        link.statements.iter().map(|edge| (link.stratum, edge)),
+    )
+    .map_err(|error| error.to_string())?;
     for edge in &link.statements {
         let from = edge
             .from_node_id
@@ -215,15 +217,6 @@ pub(super) fn validate_frozen_link_record(
             if statement.statement_id.trim().is_empty() {
                 return Err("frozen link assertion id must be nonempty".into());
             }
-            let key = statement.statement_id.clone();
-            let value = (from, to, statement.clone());
-            if let Some(previous) = handles.get(&key) {
-                if previous == &value {
-                    return Err("duplicate frozen assertion handle".into());
-                }
-                return Err("conflicting frozen assertion handle".into());
-            }
-            handles.insert(key, value);
         }
         let payload = super::snapshot::payload_from_persisted(edge);
         if super::snapshot::persisted_edge_for_ids(from, to, &payload) != *edge {
