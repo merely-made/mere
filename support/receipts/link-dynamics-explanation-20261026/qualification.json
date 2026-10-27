@@ -447,5 +447,95 @@
     "new_findings": {},
     "baseline_log_sha256": "32091701ca075797d45c7794411ef8be748b29598ebdf33601cb2373ee3285a1",
     "final_log_sha256": "32091701ca075797d45c7794411ef8be748b29598ebdf33601cb2373ee3285a1"
+  },
+  "publication_integration": {
+    "integrated_upstream": "9b1397bc488404f690510223e160add86bf83e98",
+    "candidate_revision": "cdce2aa7247d631327ec1fd3a60815679ab428fe",
+    "description": "Workshop example/dev-dependency boundary completion; qualified inspector, Canvas, Seiche and Graphshell runtime sources unchanged.",
+    "normal_runtime_source_paths_unchanged": true,
+    "artifact_comparison": {
+      "native_reviewed": {
+        "graphshell_web_bg.wasm.d.ts": "4418e49add434c77e9e4f9cc04c6a23bbffe6d0a3522a1314822606c8da1b42e",
+        "graphshell_web_bg.wasm": "68c8f6d99107ee21499cee68b9e557509e63b4ba5c672ea77d016e3c33865e67",
+        "graphshell_web.js": "7a7a2285f4a350e49d63e58460a6881289251b4cee282bc18123c1e6b82b2b4b",
+        "graphshell_web.d.ts": "e61aa37b2e74cfd73b1e4c775d84ce5045ecca60f61f4ca7ac94d997c4a1e226"
+      },
+      "publication_candidate": {
+        "graphshell_web_bg.wasm.d.ts": "4418e49add434c77e9e4f9cc04c6a23bbffe6d0a3522a1314822606c8da1b42e",
+        "graphshell_web_bg.wasm": "68c8f6d99107ee21499cee68b9e557509e63b4ba5c672ea77d016e3c33865e67",
+        "graphshell_web.js": "7a7a2285f4a350e49d63e58460a6881289251b4cee282bc18123c1e6b82b2b4b",
+        "graphshell_web.d.ts": "e61aa37b2e74cfd73b1e4c775d84ce5045ecca60f61f4ca7ac94d997c4a1e226"
+      },
+      "exactly_equal": true
+    },
+    "gates": [
+      {
+        "revision": "cdce2aa7247d631327ec1fd3a60815679ab428fe",
+        "status_after": "",
+        "label": "publication-wasm",
+        "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026/ports/graphshell/web",
+        "command": [
+          "cargo",
+          "+1.99.1",
+          "--config",
+          "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target/build\"",
+          "build",
+          "--locked",
+          "--offline",
+          "--target-dir",
+          "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target",
+          "-j2",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--no-default-features",
+          "--features",
+          "product,presentation-webgpu"
+        ],
+        "exit_code": 0,
+        "seconds": 3.49,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "241a93a5b1195441a1336c5b6ddb8c0c4410e63a921f444f2c066295cb8901ba",
+        "results": []
+      },
+      {
+        "revision": "cdce2aa7247d631327ec1fd3a60815679ab428fe",
+        "status_after": "",
+        "label": "publication-bindgen",
+        "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+        "command": [
+          "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/wasm-bindgen",
+          "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+          "--target",
+          "web",
+          "--out-dir",
+          "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/pkg-publication"
+        ],
+        "exit_code": 0,
+        "seconds": 6.36,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "results": []
+      },
+      {
+        "revision": "cdce2aa7247d631327ec1fd3a60815679ab428fe",
+        "status_after": "",
+        "label": "publication-boundaries",
+        "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+        "command": [
+          "python3",
+          "scripts/check_port_boundaries.py"
+        ],
+        "exit_code": 0,
+        "seconds": 2.26,
+        "host": "m4-imac.lan",
+        "architecture": "arm64",
+        "log_sha256": "f0c91cbfaaf6acfc1ed2e40acb42b88c598990100c64a96cc7bb4ed76804ac09",
+        "results": []
+      }
+    ],
+    "root_lock_sha256": "ecff81e260a5c726d0ac78be1fea1b91d6d959d0f7fcc40346b7d20ae4f64a84",
+    "feature_manifest_and_lock_delta": []
   }
 }

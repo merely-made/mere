@@ -476,8 +476,11 @@ separately, with exact source-fact/session continuity and process-exit evidence.
 
 Per-assertion force attribution, net integrated motion, a new weighting policy,
 endpoint feedback and sympathetic resonance remain outside this continuation.
-The existing force laws and source-assertion model are preserved. No manifests
-or lockfiles differ from the integrated upstream stack.
+The existing force laws and source-assertion model are preserved. Final
+publication integration also receives upstream workshop boundary completion
+`9b1397bc4`; rebuilding on `cdce2aa72` produces a byte-identical reviewed product
+package and passes the updated boundary guard. No feature manifests or
+lockfiles differ from that integrated upstream stack.
 
 ## Authority and scope
 
