@@ -271,7 +271,7 @@ mod tests {
     }
 
     fn step(graph: &mut Graph, tracker: &mut LegacyFamilyAttribution, entry: AttributedDelta) {
-        let delta = entry.delta.replay_delta_as(&entry.author).unwrap();
+        let delta = entry.delta.replay_as(&entry.author).into_write().unwrap();
         let _ = apply_graph_delta(graph, delta);
         tracker.observe_delta(graph, &entry);
     }
