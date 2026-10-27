@@ -416,5 +416,5 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   in chartulary (three for Q001 and Q019, one for Q003 beside a control) and a consumer before/after
   in the kernel and Pandect; the audit's probes now fail on their defect assertions. Q002 stays open
   as a fork (§5): its binding has two admission owners. Chartulary 87/87 (79 before), kernel lib
-  485/485, Pandect lib 342/342. Receipt:
+  485/485 on its own base and 506/506 merged with the third pass, Pandect lib 342/342. Receipt:
   `support/receipts/ownership-repair/l1/2026-10-26_l1_chartulary_receipt.json`.

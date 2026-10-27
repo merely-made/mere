@@ -68,8 +68,8 @@
  },
  "suites": {
   "chartulary": "87 passed, 0 failed (79 before plus eight regressions); eidetic-core 149 passed",
-  "kernel_lib": "485 passed, 0 failed (484 before plus one consumer regression)",
-  "pandect_lib": "342 passed, 0 failed (340 before plus two consumer regressions)"
+  "kernel_lib": "485 passed, 0 failed on its own base (484 plus one consumer regression); 506 passed merged with the third pass (505 plus one)",
+  "pandect_lib": "342 passed, 0 failed (340 before plus two consumer regressions), on both bases"
  },
  "consumer_before_after": {
   "old_pin_f599ffe": "kernel replacing_a_navigation_parents_history_keeps_the_branched_child panics at chartulary stemma/snapshot.rs:187; both pandect navigation_tests fail, refused as non-replayable before the undo is reached (so the pandect undo test isolates Q001 only on the new pin)",
