@@ -27,19 +27,11 @@
 //! Titan uploads and Spartan query/data submissions require explicit Submit,
 //! including when a read redirects to a submission target.
 
-#[cfg(feature = "actor")]
-use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
-#[cfg(feature = "actor")]
-use std::sync::mpsc::Receiver;
 use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
-#[cfg(feature = "actor")]
-use armillary::{ActorHandle, Emitter, Wake, spawn};
 use netfetcher::{CookieRecord, CookieStore, InMemoryCookieJar, SameSiteContext};
-#[cfg(feature = "actor")]
-use tokio::runtime::Builder;
 use zeroize::Zeroizing;
 
 /// Host-supplied durable trust storage for Gemini-style TLS.
@@ -313,137 +305,13 @@ pub struct FaviconOutcome {
     pub result: Result<Vec<u8>, String>,
 }
 
-/// Spawn the fetch actor on its own thread (armillary harness). It owns a
-/// multi-thread tokio runtime; each [`FetchCommand`] dispatches a concurrent async
-/// fetch that emits a [`FetchUpdate`] on completion and wakes the loop. Returns the
-/// kernel's command handle plus the receiver to drain in `user_event`. Dropping the
-/// handle ends the actor (its runtime drops, aborting any in-flight fetches).
-///
-/// The internals stay `!Send` where they want to be: the runtime is built *on the
-/// actor thread* inside the closure, never moved across the boundary; only the
-/// `Send` handle and the `Send` `FetchUpdate`s cross.
 #[cfg(feature = "actor")]
-pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
-    spawn_fetcher_with(wake, session_stores().clone())
-}
-
-/// [`spawn_fetcher`] over stores the host owns, so pages, subresources and
-/// any [`NetFetch`] built from the same [`Stores`] share one session.
+mod actor;
 #[cfg(feature = "actor")]
-pub fn spawn_fetcher_with(
-    wake: Wake,
-    stores: Stores,
-) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
-    spawn_fetcher_with_policy(wake, stores, ClientFetchPolicy::default())
-}
-
-/// Spawn with host-selected byte budgets and one deadline per operation.
-#[cfg(feature = "actor")]
-pub fn spawn_fetcher_with_policy(
-    wake: Wake,
-    stores: Stores,
-    policy: ClientFetchPolicy,
-) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
-    spawn(wake, move |commands, out: Emitter<FetchUpdate>| {
-        let runtime = Builder::new_multi_thread()
-            .enable_all()
-            .build()
-            .expect("build the fetch runtime");
-        let mut page_tasks: HashMap<FetchRequestId, (String, tokio::task::JoinHandle<()>)> =
-            HashMap::new();
-        while let Ok(command) = commands.recv() {
-            page_tasks.retain(|_, (_, task)| !task.is_finished());
-            match command {
-                FetchCommand::Page {
-                    request,
-                    url,
-                    identity,
-                } => {
-                    let out = out.clone();
-                    let stores = stores.clone();
-                    let task_url = url.clone();
-                    let task = runtime.spawn(async move {
-                        let progress_out = out.clone();
-                        let request_url = url.clone();
-                        let result = fetch_page_interactive_capped(
-                            &url,
-                            policy.max_page_bytes,
-                            identity.as_ref(),
-                            &stores,
-                            policy,
-                            move |response_url, content_type, bytes| {
-                                progress_out.emit(FetchUpdate::PageProgress(PageProgress {
-                                    request,
-                                    url: request_url.clone(),
-                                    response_url: response_url.to_string(),
-                                    content_type: content_type.map(str::to_string),
-                                    bytes: bytes.to_vec(),
-                                }));
-                            },
-                        )
-                        .await;
-                        out.emit(FetchUpdate::Page(FetchOutcome {
-                            request,
-                            url,
-                            result,
-                        }));
-                    });
-                    if let Some((_, superseded)) = page_tasks.insert(request, (task_url, task)) {
-                        superseded.abort();
-                    }
-                },
-                FetchCommand::CancelPage { request } => {
-                    if let Some((url, task)) = page_tasks.remove(&request) {
-                        task.abort();
-                        out.emit(FetchUpdate::Page(FetchOutcome {
-                            request,
-                            url,
-                            result: Err(FetchFailure::Cancelled),
-                        }));
-                    }
-                },
-                FetchCommand::Subresource(url) => {
-                    let out = out.clone();
-                    let stores = stores.clone();
-                    runtime.spawn(async move {
-                        let result = fetch_bytes(&url, &stores, policy).await;
-                        out.emit(FetchUpdate::Subresource(SubresourceOutcome { url, result }));
-                    });
-                },
-                FetchCommand::Favicon { request, url } => {
-                    let out = out.clone();
-                    let stores = stores.clone();
-                    runtime.spawn(async move {
-                        out.emit(FetchUpdate::Favicon(FaviconOutcome {
-                            request,
-                            result: fetch_bytes(&url, &stores, policy).await,
-                        }));
-                    });
-                },
-                FetchCommand::Submit {
-                    request,
-                    submission,
-                } => {
-                    let out = out.clone();
-                    runtime.spawn(async move {
-                        let url = submission.url().to_string();
-                        #[cfg(feature = "smolweb")]
-                        let result = submit_smolweb(submission, policy).await;
-                        #[cfg(not(feature = "smolweb"))]
-                        let result = Err(FetchFailure::Failed(
-                            "small-web submissions are not built into this host".to_string(),
-                        ));
-                        out.emit(FetchUpdate::Submission(SubmissionOutcome {
-                            request,
-                            url,
-                            result,
-                        }));
-                    });
-                },
-            }
-        }
-    })
-}
+pub use actor::{
+    FetchActor, FetchActorPolicy, FetchActorReport, spawn_fetcher, spawn_fetcher_with,
+    spawn_fetcher_with_admission, spawn_fetcher_with_policy,
+};
 
 // A write is only ever asked for through the actor.
 #[cfg(all(feature = "smolweb", feature = "actor"))]
