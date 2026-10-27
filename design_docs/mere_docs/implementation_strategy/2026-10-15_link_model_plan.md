@@ -41,7 +41,7 @@ records the separate source, browser, reopen and image-review claims.
 | Responsive paths on an ordinary graph | Qualified in this continuation: the normal Graphshell canvas uses the bounded Numen evaluator and shared link adapter for paint and picking, with separate view-local field and compatible-link controls. The existing fixed-endpoint P5 fixture remains its own proof. |
 | Responsive-path legibility | Qualified for the ordinary 2D square-node cohort on source `487f37096`: bounded corner rounding and face clipping, readable selected stratum cores/direction/opposition marks, and one shared segment handoff for paint/pick/report. See the continuation and receipt below; close crossings can still crowd marks. |
 | Attachment in other presentations | Qualified on source `0b7454123` through the shared billboard/camera model for tilted/yawed, rounded/circular, scaled suggestion and lifted profiles. Frame/face placement, visual selection, self arches and responsive clipping share the model. See the continuation and receipt below for scripted-profile, visible-stem and cohort limits. |
-| Strength and physical explanation | Counted endpoint storage and shared runtime/inspection input qualified below. Current unit source-row contributions are explicit and existing force laws are preserved. Weighted policy, one globally aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance remain deferred to dynamics. |
+| Strength and physical explanation | The integrated explanation continuation below joins existing relationship, responsive-path and endpoint execution reports. Counted endpoint storage and shared runtime/inspection input remain qualified below. Current unit source-row contributions are explicit and existing force laws are preserved. Weighted policy, one globally aggregated spring per link, measured per-assertion attribution, endpoint feedback and resonance remain deferred to dynamics. |
 | Occurrence-backed history | Deferred until a consumer requires it: Traversal still owns events and a rollup; navigation/practice occurrences have not become support inside assertions. |
 | Asserter-claimed valid time | Deliberately deferred by L7. Record time remains the timeline axis. |
 | Live source refresh and immutable public revisions | Separate source/receiving work: MereHost public revision availability remains explicit, and Knot's qualified reader is a startup snapshot. Automatic resident refresh/synchronization is not implied. |
@@ -423,6 +423,64 @@ review. Final doc/judgment audit findings are identical to baseline; the
 existing nonzero global gates remain debt. No new native rendering, Woodshed
 SDK repin or receiving-host qualification is claimed for this API cleanup.
 Knot checkpoint confidentiality remains in its separate storage lane.
+
+### Integrated dynamics explanation — 2026-10-26
+
+**Status: qualified within the bounds below.** Compiled source
+`155f701e5c8c300e30316a43771cc411680da8da` incorporates published stack
+`6c4185ffb`, including the cache/body-lifetime and checked-import repairs,
+unused snapshot-store removal and workshop relocation. The reopen script
+correction is `9de74594a`; runtime and dependency bytes are unchanged by it.
+The [qualification receipt](../../../support/receipts/link-dynamics-explanation-20261026/qualification.json)
+keeps exact source, CPU, native and reopen evidence separate.
+
+Graphshell's existing **Explain pair dynamics** and **Explain selected dynamics**
+now present one explanation with expandable details:
+
+- Relationship rows use the existing topology reader and exact assertion
+  inspector for source, basis and lifecycle. View hides and source withdrawal
+  remain distinct.
+- Drawn paths read the existing responsive-path report for the exact displayed
+  pair, retaining canonical strata, source buckets, compatibility declarations,
+  field inputs, bend and cohort fallback/exclusion counts. The bend metric is
+  shared with the existing path controls. Path geometry has no authority over
+  endpoint motion or relationship truth.
+- Endpoint configuration and constraints accompany the latest actual Seiche
+  coupling calls for those members. The report carries the executed tick,
+  simulation time, captured field/coupling identities and bindings, evaluations,
+  body-write readback and cohort truncation. A binding is projected once per
+  observed coupling, rather than duplicating its registry in every row.
+
+The inspector reuses Canvas's nonreused reader keys, already backed by kernel
+membership witnesses. An inspection cannot move to another Canvas or silently
+adopt a removed/recreated appearance, even when its UUID and graph slot recur.
+Choosing a target opens a fresh, bounded 128-row observation window; closing
+clears it. Neither reading nor choosing requests a physics tick. Unobserved,
+empty and truncated reports remain explicit; pause retains the latest observed
+tick during read-only refresh. Inspection state and responsive settings are
+view-local and clear on reopen.
+
+The global-flow native fixture reuses the existing four-node assertion/alias
+cohort and its owning MereHost, in a separate store. It exercises real
+`FlowAdvect` calls with concrete field/coupling identities. The original
+region-inspection fixture stalled before its first presented frame in two
+browser processes; its receipts are retained separately and do not qualify
+regional field painting. That presentation issue remains open in its own lane.
+
+Qualification passes 635 Pictograph, 293 Graphshell and 222 Seiche library
+tests (1,150 total; 34 existing ignores), product Wasm and product-disabled
+viewer checks. Seven reviewed native Chrome/WebGPU captures cover ordinary
+paths, exact hide/withdrawal, an authored global flow and fresh-process reopen.
+The receipt records the seed source, final runtime and script-only correction
+separately, with exact source-fact/session continuity and process-exit evidence.
+
+Per-assertion force attribution, net integrated motion, a new weighting policy,
+endpoint feedback and sympathetic resonance remain outside this continuation.
+The existing force laws and source-assertion model are preserved. Final
+publication integration also receives upstream workshop boundary completion
+`9b1397bc4`; rebuilding on `cdce2aa72` produces a byte-identical reviewed product
+package and passes the updated boundary guard. No feature manifests or
+lockfiles differ from that integrated upstream stack.
 
 ## Authority and scope
 

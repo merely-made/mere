@@ -98,6 +98,24 @@ pub struct EvaluatedLinkPath {
     pub buckets: Vec<LinkPathSourceRef>,
 }
 
+impl EvaluatedLinkPath {
+    /// Maximum perpendicular distance from this emitted path's endpoint chord,
+    /// in world units. A geometry observation, independent of endpoint forces.
+    pub fn max_bend(&self) -> f32 {
+        let points = &self.points;
+        let (Some(first), Some(last)) = (points.first(), points.last()) else {
+            return 0.0;
+        };
+        let dx = last.0 - first.0;
+        let dy = last.1 - first.1;
+        let length = dx.hypot(dy).max(f32::EPSILON);
+        points
+            .iter()
+            .map(|point| ((dx * (first.1 - point.1) - (first.0 - point.0) * dy).abs()) / length)
+            .fold(0.0_f32, f32::max)
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct LinkPathResponseReport {
     pub state: LinkPathState,

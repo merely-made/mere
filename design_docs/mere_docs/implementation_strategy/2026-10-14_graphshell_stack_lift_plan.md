@@ -1,14 +1,14 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-26):** in progress. Query/cache, Forme state and controls,
-typed owner completions, viewer composition and obsolete reader removal are
-implemented in the source candidate recorded at the end. Native component tests
-and the lightweight Wasm viewer passed on the recorded qualification sources.
-The candidate now includes newer authoritative main changes and fixes found by
-the product build; final validation awaits the rewritten supplier cohort.
-Browser interaction is not yet qualified. No candidate commit or publication
-has been made. The dated census and rulings below retain their original
-source context; later progress entries describe subsequent lifts.
+**Status (2026-10-26):** the component and source-ownership slice is published
+in Mere `b232631f3`. Query and Forme state, reusable Query/Workbench controls,
+typed owner completions, bounded cache updates and the viewer feature split
+are implemented and qualified by the automated checks below. Search now lives
+in Eidetic; obsolete Mere facades have been removed or their retained purpose
+has been named explicitly. The five receiving repository cutovers are also published.
+Browser interaction and Woodshed runtime adoption remain unqualified. The dated
+census and rulings retain their original source context; this does not close
+every remaining pane or presentation boundary in the plan.
 
 **Earlier status (2026-10-15):** Castellan has moved (R8); P1 landed:
 the app door is the `door` feature on `graphshell-endpoint` (L1), and
@@ -1936,16 +1936,85 @@ was fixed and its failed log retained beside the passing run. Evidence is in
 `validation-resumed/final-checks/client.json` and `client.log` under the lane's
 output directory; `client-source.patch` records the fix over local `c01a90524`.
 
-The remaining native component, moved-owner and receiving-consumer checks
-have not run on this final candidate. At 21:48 UTC the workspace held
-149.1 GiB of compiler caches against its 160 GiB budget; the normal 20 GiB
-reservation was refused. The client alone used a documented 4 GiB estimate
-based on its prior 1.892 GiB cold build. No broader build inherits that
-estimate, and no cache protection or storage policy has been bypassed.
-Mark subsequently approved a 200 GiB cache budget, retaining the 100 GiB
-free-space floor and all cleanup protections; 43 guard regression tests pass.
-Search promotion is published in Eidetic `354ab71`, and the local Mere donor
-has been removed in favor of that exact provider. Its tests pass and its
-optional model example compiles; no model runtime acceptance is implied.
-Mere's remaining component and receiving-consumer checks are in progress;
-the Mere refactor remains local and unpublished.
+### Published component and ownership qualification
+
+Mere `b232631f3` publishes the source slice after incorporating checked kernel
+replay and the independently qualified canvas cache-lifetime repairs. The final
+combined run passes 561 tests with 7 existing ignores: Graphshell, Mere's Query
+model, Mere View controls and independent hosts, and Platen's workspace model.
+The lightweight viewer and full product/remote/canvas-GPU Wasm compositions
+both pass on this exact commit. Minimal model and Graphshell/Djinn/Distillery
+checks passed before the canvas merge; that merge changed no manifests or locks.
+
+The other bounded suites pass on their recorded inputs: 103 client tests,
+45 Registry observation tests, 18 station-custody tests (one manual receipt
+ignored), and 27 captured-web Moot tests. The client suite includes unrelated
+36 MiB cache allocation, terminal revoke/expiry, and late-response controls.
+Search is published in Eidetic `354ab71`, with 40 tests passed and 3 ignored;
+its optional model example compiles. This is not model or GPU runtime acceptance.
+
+The viewer selects neither Platen nor the workspace editor, Mere View controls,
+IndexedDB, Lanes, or Fleece. Portable graph/storage vocabulary remains in its
+model dependencies. The product explicitly opts into workspace editing and
+Query/Workbench controls. The port/toolkit dependency guard passes; the earlier
+feature-tree receipt and current manifests agree. This establishes build and
+composition boundaries, without claiming headed browser interaction.
+
+Product import now uses checked scratch replay and verifies that every incoming
+facet survives before live edits. The failing collision regressions are retained
+beside passing runs. A valid Resource/Surface handle collision refuses the whole
+import without blob, graph, facet, or journal writes.
+
+The obsolete `shell-state`, `content-contract`, Apparatus facade, `command-menu`,
+and local Hest 0.1 source are removed. Registry owns the observation collector;
+Turnstone owns its inspection presentation; consumers name Armillary's
+`apparatus-core` directly. Persona Picker lives under Cambium. The retained
+Signalman adapter is `station-custody`, with `station-provision` and
+`station-claim` binaries; credential salts, wire/storage identities and AppIds
+are unchanged. The donor Search source is removed from Mere. New package and
+binary names use at most one hyphen.
+
+The guarded compiler-cache budget is now 200 GiB under Mark's explicit approval;
+the 100 GiB free-space floor and all cleanup protections remain. All 43 guard
+regression tests pass. Failed attempts and earlier qualification sources remain
+retained under `Code/output/graphshell-components/validation-resumed/` alongside
+`final-checks`, `final-boundaries`, `canvas-integration.json`, and publication
+receipts. Mere's primary advanced with its unrelated ownership-plan edit
+preserved by content hash and index comparison.
+
+Receiving repositories now consume the exact qualified Mere `b232631f3` source.
+Their changes are committed and published, with primary checkouts advanced and
+unrelated local work preserved:
+
+| Receiver | Published commit | Receiving evidence |
+| --- | --- | --- |
+| Turnstone | `309ea73f7` | 9 inspection-pane tests passed |
+| Knot | `e9ff2407c` | Desktop and test targets compile |
+| Woodshed / Redshank | `712f42ada` | Desktop and test targets compile |
+| Murm / Signalman | `b7e0aa303` | Desktop application compiles |
+| Isocosm | `0d3344404` | Isomere host-enabled library compiles |
+
+All nine affected Isocosm workspace roots pass full dependency resolution;
+the independent validation locks are retained without changing their existing
+repository tracking policy. No duplicate supplier package identities remain in
+those resolved graphs. Parry Ground keeps its exact Conatus/Nisus revision, and
+Responsa retains its independent Eidetic cohort. Cargo coalesced the Murm branch
+packages onto the provider-qualified `4ba804b3`; source comparison proves the
+previous `573a8b2` portable packages unchanged at that revision.
+
+Murm incorporated a concurrent I2P repair after its desktop check. The desktop
+source, metadata packages and selected features are identical after integration;
+I2P is disabled and Truchman is absent from that composition. This does not
+extend the desktop result to I2P runtime behavior.
+
+These receipts qualify the named source commits. Later independent changes on
+Mere and Eidetic main are preserved when publishing this documentation; consumer
+locks remain on the qualified provider revisions. No headed browser interaction,
+Woodshed runtime adoption, physical-device acceptance or learned-model semantic
+qualification is implied. Reading/document-tile lifecycle and the larger
+presentation/rules boundaries remain separate from this completed slice.
+
+The complete commands, source hashes, ignored cases, failed attempts and
+publication/preservation results are retained in
+`Code/output/graphshell-components/validation-resumed/completion.json` and its
+referenced receipts.

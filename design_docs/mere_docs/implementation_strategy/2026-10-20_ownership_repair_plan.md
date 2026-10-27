@@ -276,7 +276,9 @@ words are under each, unnumbered until he numbers them:
   of these lands.
   Mark, 2026-10-26: **"Beside its host (Recommended)"**. `tabard-workshop` moves to
   `ports/tabard/workshop` with its workspace path updated; still embeddable by path; the toolkit
-  directory stops carrying the document stack and the guard's carried list empties.
+  directory stops carrying the document stack and the guard's carried list empties. Later the same
+  evening: **"the guard refuses dev-only crate-to-port links too"**; the web host's
+  `shared_recovery` example moves beside the workshop.
 
 Open fork from L1's chartulary pass, 2026-10-26 (a question with the code evidence; unnumbered
 until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather than picked):
@@ -356,11 +358,19 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
   README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
   theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
-  needs no toolkit carve-out, and it prints rather than refuses a dev-only link from a crate to a
-  port, because the web host's `shared_recovery` wasm example still mounts the workshop. That
-  reading of the one-way rule (examples and tests may mount a product surface; shipped code may
-  not) is a proposal for Mark to confirm or reverse; reversing it means the example moves beside
-  the workshop. Type-check of the workshop with its tests and the Tabard desktop passed.
+  needs no toolkit carve-out. A proposal to print rather than refuse a dev-only link from a crate
+  to a port (the web host's `shared_recovery` wasm example mounted the workshop) was put to Mark
+  and reversed the same evening: **"the guard refuses dev-only crate-to-port links too"**, so the
+  example moved into `ports/tabard/workshop/examples/` with its wasm-only dev-dependencies (the
+  workshop's native host and window stack moved behind `cfg(not(target_arch = "wasm32"))`), and
+  the guard passes with nothing carried. Type-check of the workshop with its tests and the Tabard
+  desktop passed. The move also exposed bit-rot independent of it: the example did not compile for
+  wasm32 against genet main `01d3f52`, because `RenderCore::renderer` is native-only there
+  (`genet-render-host/src/lib.rs:757`) and the example read it twice. Repaired the same evening at
+  Mark's word: both reads go through `cambium_rootstock::try_renderer`, the one-operation checked
+  access that exists on every target, and the proof JSON records a refusal (busy frame gate or
+  lost device) in place of a value it never read, instead of inventing one. The example's wasm32
+  check passes.
 - 2026-10-26 (L1, chartulary): Q001, Q003 and Q019 repaired on eidetic main (`af17fe7`; branch
   `l1-chartulary` merged and pruned) and mere repinned to it, in the workspace and in
   `ports/graphshell/web`, lockfiles changed in their source revs only. Q001 follows Mark's creator

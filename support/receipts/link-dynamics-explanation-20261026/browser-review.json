@@ -1,0 +1,48 @@
+{
+  "reviewer": "/root",
+  "images": [
+    {
+      "path": "ordinary_seed/p8_pair_topology_initial.png",
+      "sha256": "f7d9290c9d94cce7bf4466b43b42524adf8372380e21871afb146097767e62e5",
+      "reviewer": "/root",
+      "observed": "Three held/visible inputs; two responsive pair appearances; zero endpoint coupling calls. Concise explanation and exact assertion buttons remain legible."
+    },
+    {
+      "path": "ordinary_seed/p8_pair_topology_exact_reason_hidden.png",
+      "sha256": "d8906752e9bb06d25227084f27c461afaa051b8796e529ee41ae8c9dfbf38324",
+      "reviewer": "/root",
+      "observed": "Held 3, visible 2, hidden 1. The responsive geometry and source distinction remain legible."
+    },
+    {
+      "path": "ordinary_seed/p8_promoted_source_before_withdrawal.png",
+      "sha256": "00ccace39a892f28ef0172ab164e973433839c9a20c74c53839df51589b45c0b",
+      "reviewer": "/root",
+      "observed": "The promoted review Resource and unchanged comparison marker are visible; source preservation and exact frozen IDs are asserted by the scenario."
+    },
+    {
+      "path": "ordinary_seed/p8_promoted_copy_after_withdrawal.png",
+      "sha256": "519ec5b7b65deee0be64c43ff5577cba1aa30385d1e8218c41cd9cdf41d128e7",
+      "reviewer": "/root",
+      "observed": "The same review Resource displays changed after withdrawal; frozen-copy identity is checked by the scenario."
+    },
+    {
+      "path": "ordinary_seed/p8_pair_topology_after_withdrawal.png",
+      "sha256": "97f4a534aefd86becda8297cd988f1a658658fae96d338969a9f321c51ea8a5a",
+      "reviewer": "/root",
+      "observed": "Held/visible inputs both 2, hidden 0; current paths and independent sibling remain available."
+    },
+    {
+      "path": "authored_flow/p9_authored_endpoint_effects.png",
+      "sha256": "f331f241dda17d891becdb134f970d72da699c55d5f92831ecafc4808ff63d52",
+      "reviewer": "/root",
+      "observed": "Two matching endpoint calls are disclosed at an executed tick with time in seconds. Geometry responses are independently disabled; raw details are collapsed and named appearance/assertion controls are readable."
+    },
+    {
+      "path": "fresh_process_reopen/p8_counted_topology_fresh_reopen.png",
+      "sha256": "f63750e97e1860887f27622e3bef9dc66295c5632112bae7355bfe596bb6e905",
+      "reviewer": "/root",
+      "observed": "Fresh process shows two held/visible inputs and resting paths with response settings cleared. Frozen review assertions and withdrawal continuity pass independently in the scenario."
+    }
+  ],
+  "result": "accepted within the named fixture and viewport bounds"
+}

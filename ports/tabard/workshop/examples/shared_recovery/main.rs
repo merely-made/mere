@@ -15,6 +15,7 @@ use cambium_genet_web_host::{
 use cambium_rootstock::{
     AppCtx, CaptureFrame, CaptureRefusal, FocusedTextSlot, Frame, Host, HostFont, HostHooks,
     HostOptions, HostWindow, Init, KeyPress, NamedKey, PresentedFrame, ProducerImageIdentity,
+    try_renderer,
 };
 use genet_render_host::{RecoveryStatus, RenderCore};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
@@ -234,7 +235,9 @@ fn generic_fonts() -> Vec<(String, Vec<u8>)> {
     // Fixture-owned explicit bindings, never a global/system fallback. The
     // bundled face is intentionally selected for all four requested roles;
     // this gate does not claim serif or fixed-width typography fidelity.
-    let bytes = include_bytes!("../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf");
+    let bytes = include_bytes!(
+        "../../../../../crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf"
+    );
     ["sans-serif", "system-ui", "serif", "monospace"]
         .into_iter()
         .map(|name| (name.into(), bytes.to_vec()))
@@ -658,11 +661,29 @@ async fn sources(mount: &BrowserMount, index: usize) -> Result<Vec<Capture>, Str
     Ok(captures)
 }
 fn adapter_identity(core: &RenderCore) -> Value {
-    let info = core.renderer().wgpu_device.core.adapter.get_info();
+    // One checked operation on the renderer: the browser frame gate must be
+    // idle and the device live, or the proof records the refusal instead of
+    // an adapter it never read.
+    let renderer = match try_renderer(core) {
+        Ok(renderer) => renderer,
+        Err(failure) => {
+            return json!({"refused":format!("{failure:?}"),
+                "source":"actual fixture RenderCore adapter; renderer access refused"});
+        },
+    };
+    let info = renderer.wgpu_device.core.adapter.get_info();
     json!({"name":info.name,"backend":format!("{:?}",info.backend),
         "device_type":format!("{:?}",info.device_type),"vendor":info.vendor,"device":info.device,
         "driver":info.driver,"driver_info":info.driver_info,
         "source":"actual fixture RenderCore adapter; browser fields may be redacted"})
+}
+/// The renderer's curve-quality status for the proof, or the refusal when the
+/// renderer cannot be reached for one operation; never an invented status.
+fn curve_quality_status(core: &RenderCore) -> String {
+    match try_renderer(core) {
+        Ok(renderer) => format!("{:?}", renderer.vello_curve_quality_status()),
+        Err(failure) => format!("renderer access refused: {failure:?}"),
+    }
 }
 fn digest(frame: &Frame) -> String {
     digest_bytes(&frame.rgba)
@@ -1193,7 +1214,7 @@ async fn execute(first_id: &str, second_id: &str, run: &str) -> Result<Value, St
         "exactly_once_capture_refusals":failures.borrow().len(),"queued_readback_loss_then_already_collected":true,"old_core_released":true,"shared_replacement_arc":true,
         "first":first,"second":second,"complete_registered_producers":full_producers,"input_route":"logical Host::key dispatch; real DOM gestures remain separate","post_input":{"seal":after_input.seal,"sha256":digest(&after_input.frame)},
         "resized":{"seal":resized.seal,"sha256":digest(&resized.frame)},
-        "quality_pending_unqualified":format!("{:?}",replacement.renderer().vello_curve_quality_status()),
+        "quality_pending_unqualified":curve_quality_status(&replacement),
         "artifact_names":["first_before","first_after","second_before","second_after","first_reader_before","first_stylesheet_before","first_reader_after","first_stylesheet_after","second_reader_before","second_stylesheet_before","second_reader_after","second_stylesheet_after"]});
     let mut artifacts = vec![
         ("first_before".to_string(), first_before.frame),
