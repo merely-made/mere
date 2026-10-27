@@ -232,7 +232,7 @@ pub mod node_billboard;
 mod node_presentation;
 pub mod relationship_topology;
 pub use dynamics_inspection::{
-    DynamicsInspection, DynamicsTarget, DynamicsTopologyMode, DynamicsTopologyOrigin,
+    DynamicsInspection, DynamicsSubject, DynamicsTarget, DynamicsTopologyMode, DynamicsTopologyOrigin,
     DynamicsTopologyRow, MemberDynamics,
 };
 pub mod dynamics_recipe;
