@@ -331,6 +331,11 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   which gives up the optimization. Whichever binds, a stored checkpoint with no digest is then
   refused, ignored in favour of a full replay (the path legacy assertion-less snapshots already
   take, `spine.rs:740`), or trusted as today.
+  Mark, 2026-10-26: **"muniment digest (Recommended)"** and, for a stored checkpoint with no
+  digest, **"Replay instead (Recommended)"**. muniment's journal offers a digest of its first n
+  entries; chartulary's `Snapshot` and Pandect's `Checkpoint` both store and verify it, one binding
+  with one new muniment API; a digest-less checkpoint is ignored in favour of a full replay, the
+  path legacy assertion-less snapshots already take, and is re-checkpointed with the digest.
 
 ## 6. Findings
 
