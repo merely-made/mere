@@ -279,6 +279,10 @@ words are under each, unnumbered until he numbers them:
   with `baseline_effects` consequences. Either the dedupe extends to those two, at whole-row or
   statement granularity; or those baselines are refused and migrated by hand. Also open: the
   frozen link still refuses an empty handle that checked load accepts.
+  Mark, 2026-10-26: **"Dedupe both (Recommended)"**. Whole identical rows dedupe to the first in
+  the Surface write-back and in pre-existing Resource rows alike, each with a note on the owning
+  Resource; a repeated handle on rows that differ stays a refusal, since that is a conflict, not a
+  copy.
 - **Q010 in legacy migration** (L1, 2026-10-26, the lane stopped rather than picked). Checked
   replay now refuses a malformed facet record, but the caller-qualified legacy migration replays
   its journal under `OnRefusal::Drop`, and `legacy_resource_migration.rs:395` still drops such a
@@ -286,6 +290,9 @@ words are under each, unnumbered until he numbers them:
   as a `LegacyMigrationError`, as `check_typed_record` at `:398` refuses an invalid typed resource
   capture; or it keeps dropping, since the migration is caller-qualified and its diagnostics could
   count the drop. Once decided, the three drop-both adapters in `capture/replay_outcome.rs` go.
+  Mark, 2026-10-26: **"Refuse it (Recommended)"**. Migration returns a `LegacyMigrationError`
+  naming the node and facet, as it does for an invalid typed resource capture; the three drop-both
+  adapters in `capture/replay_outcome.rs` go.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
