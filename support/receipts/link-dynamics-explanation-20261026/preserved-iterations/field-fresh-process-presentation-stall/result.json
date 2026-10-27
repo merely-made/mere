@@ -1,0 +1,460 @@
+{
+  "scenario": {
+    "state": "fail",
+    "errors": [],
+    "gate_failures": [],
+    "result": {
+      "canvas_logical_size": [
+        1200,
+        916
+      ],
+      "canvas_physical_size": [
+        2400,
+        1832
+      ],
+      "log": [
+        "FAIL: native presentation stalled for 10000 ms (603 redraws, 0 presented frames)",
+        "gpu timestamps: no"
+      ],
+      "renderer_adapter": {
+        "backend": "BrowserWebGpu",
+        "device": 0,
+        "device_type": "Other",
+        "driver": "",
+        "driver_info": "",
+        "name": "",
+        "source": "shared host RenderCore adapter",
+        "vendor": 0
+      },
+      "result": "fail",
+      "saved_graph": {
+        "address": "",
+        "file": null,
+        "link_path_source": null,
+        "owner_observation": {
+          "actual_app_present": true,
+          "actual_graph_session": "fe4664ad-3368-4de8-b046-f274cc568e8b",
+          "actual_session_changes": 0,
+          "forme_model_session": "fe4664ad-3368-4de8-b046-f274cc568e8b",
+          "forme_region_id": null,
+          "forme_session_matches": true,
+          "schema": "graphshell.actual-owner-observation/v1"
+        },
+        "reading_anchor": "",
+        "reopened": true,
+        "save_state": "idle",
+        "scope_focus": null,
+        "scope_level": "Graph",
+        "selected": null,
+        "session": "fe4664ad-3368-4de8-b046-f274cc568e8b",
+        "tags": "",
+        "title": ""
+      },
+      "timings": []
+    },
+    "captures": []
+  },
+  "receipt": {
+    "page": "tree",
+    "semanticTree": {
+      "role": "region",
+      "label": "Graphshell, one tree",
+      "children": [
+        {
+          "role": "main",
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "Map navigation",
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "role": "group",
+                                  "label": "History and scope",
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Back",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Forward",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Up: Meres",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Down",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "role": "navigation",
+                                      "label": "Scope trail",
+                                      "children": [
+                                        {
+                                          "role": "button",
+                                          "label": "Scope: MeresMeres",
+                                          "children": []
+                                        },
+                                        {
+                                          "role": "button",
+                                          "label": "Edit location: Local Mere",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Peek belowPeek",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Preview reading layoutLayout",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Document connectionsRelated",
+                                  "expanded": false,
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "PanesPanes",
+                                  "expanded": false,
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "children": [
+                {
+                  "role": "navigation",
+                  "label": "Views and tools",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "ReadReadRead",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "MapMapMap",
+                          "pressed": true,
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "InspectorInspectInspect",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Reading tabsTabsTabs",
+                          "pressed": false,
+                          "children": []
+                        },
+                        {
+                          "role": "button",
+                          "label": "Search document graphSearchSearch",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "children": [
+                        {
+                          "role": "button",
+                          "label": "Fit graphFitFit",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "role": "group",
+                          "label": "11 of 11 shown",
+                          "children": [
+                            {
+                              "role": "group",
+                              "label": "I2P port notes",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "I2P service",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Reference notes",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Reference-host scene",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Mounted remote projection",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Alice",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Alice's laptop",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Alice's phone",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "SSH signing key reference",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Open-address grant",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "role": "group",
+                              "label": "Synthetic signing receipt",
+                              "children": [
+                                {
+                                  "role": "button",
+                                  "label": "Drag",
+                                  "description": "Drag this item; nothing returns it.",
+                                  "children": []
+                                },
+                                {
+                                  "role": "button",
+                                  "label": "Pin",
+                                  "description": "Pin this item; it stays held in place, and a drag moves where it is held.",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "title": "Graphshell, one tree",
+    "visibility": "visible",
+    "viewport": {
+      "width": 1200,
+      "height": 953
+    }
+  },
+  "collected_at_utc": "2026-10-27T00:37:18.378509+00:00"
+}

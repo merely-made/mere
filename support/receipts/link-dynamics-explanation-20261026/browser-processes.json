@@ -1,0 +1,45 @@
+{
+  "source_revision": "0f682d4d861cd52d6fb2c123dc472318b1ce8c75",
+  "origin": "http://127.0.0.1:38151",
+  "observations": [
+    {
+      "phase": "effects-seed",
+      "at": "2026-10-27T00:44:37.413201+00:00",
+      "main_processes": [
+        " 8919 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      ]
+    },
+    {
+      "phase": "seed-verified-exit",
+      "at": "2026-10-27T00:53:41.408059+00:00",
+      "main_processes": []
+    },
+    {
+      "phase": "fresh-reopen-process",
+      "source_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "at": "2026-10-27T00:54:12.518454+00:00",
+      "main_processes": [
+        " 9985 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      ]
+    },
+    {
+      "phase": "final-effects-verified-exit",
+      "at": "2026-10-27T00:57:02.075245+00:00",
+      "main_processes": []
+    },
+    {
+      "phase": "corrected-fresh-reopen-process",
+      "runtime_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "scenario_revision": "9de74594a",
+      "at": "2026-10-27T01:00:12.012371+00:00",
+      "main_processes": [
+        "10456 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      ]
+    },
+    {
+      "phase": "final-verified-exit",
+      "at": "2026-10-27T01:03:33.993634+00:00",
+      "main_processes": []
+    }
+  ]
+}

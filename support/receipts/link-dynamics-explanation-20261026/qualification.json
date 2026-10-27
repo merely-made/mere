@@ -1,0 +1,451 @@
+{
+  "schema": "mere.link-dynamics-explanation-qualification/v1",
+  "status": "qualified_with_named_bounds",
+  "date": "2026-10-26",
+  "runtime_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+  "scenario_revision": "9de74594a38e1e264101bb24154115c743ec538d",
+  "ordinary_seed_revision": "0f682d4d861cd52d6fb2c123dc472318b1ce8c75",
+  "integrated_upstream": "6c4185ffb251942993f31a6501562b80b1cbc63c",
+  "raw_evidence_directory": "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026",
+  "automated": [
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-canvas",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target",
+        "-j2",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 128.5,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "1f2274f89104ba18f55fc88e8d4a59e35d8c6cb8ff0daed9ccd50e9a9829f064",
+      "results": [
+        "test result: ok. 635 passed; 0 failed; 18 ignored; 0 measured; 0 filtered out; finished in 126.07s"
+      ]
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-graphshell",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target",
+        "-j2",
+        "-p",
+        "graphshell",
+        "--no-default-features",
+        "--features",
+        "web",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 52.61,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "e85cbaf114c5ce84d06ec70357ce069b8b417970b813271612d46991118d38dd",
+      "results": [
+        "test result: ok. 293 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 23.10s"
+      ]
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-seiche",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target",
+        "-j2",
+        "-p",
+        "seiche",
+        "--features",
+        "serde",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 5.53,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "fe583c7ff2b6d3ce8ecb67b13b1b4e4de91144968e0a261fb7c8a8b4b93b32b0",
+      "results": [
+        "test result: ok. 222 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 3.89s"
+      ]
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-inspector",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target/build\"",
+        "test",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/target",
+        "-j2",
+        "-p",
+        "pictograph",
+        "--features",
+        "canvas",
+        "--lib",
+        "dynamics_inspection",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 25.74,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "f6c3081d030b398edba676ad7fc0b1a01b3bf5344c170c3f38a949646835ea4a",
+      "results": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 643 filtered out; finished in 0.72s"
+      ]
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-wasm",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026/ports/graphshell/web",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target/build\"",
+        "build",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target",
+        "-j2",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "product,presentation-webgpu"
+      ],
+      "exit_code": 0,
+      "seconds": 31.46,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "84956fe12a5ab18aa82f0e92b96a09a75076a081ae8746a0a28ab52adc38b183",
+      "results": []
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-bindgen",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "/Users/markik/Code/testing/cleromancy/c1-20261013/tools/wasm-bindgen",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target/wasm32-unknown-unknown/debug/graphshell_web.wasm",
+        "--target",
+        "web",
+        "--out-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/pkg-release"
+      ],
+      "exit_code": 0,
+      "seconds": 14.39,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "results": []
+    },
+    {
+      "revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "status_after": "",
+      "label": "release-viewer",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026/ports/graphshell/web",
+      "command": [
+        "cargo",
+        "+1.99.1",
+        "--config",
+        "build.build-dir=\"/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target/build\"",
+        "check",
+        "--locked",
+        "--offline",
+        "--target-dir",
+        "/Users/markik/Code/testing/mere-link-dynamics-explanation-20261026/wasm-target",
+        "-j2",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--no-default-features",
+        "--features",
+        "presentation-webgpu"
+      ],
+      "exit_code": 0,
+      "seconds": 10.36,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "69de155549f1774f576c9b65a56476af97a03129f2060abd1f0003f775a4c719",
+      "results": []
+    },
+    {
+      "revision": "9de74594a38e1e264101bb24154115c743ec538d",
+      "status_after": " M design_docs/DOC_README.md\n M design_docs/mere_docs/implementation_strategy/2026-10-15_link_model_plan.md\n?? support/receipts/link-dynamics-explanation-20261026/\n",
+      "label": "release-boundaries",
+      "cwd": "/Users/markik/Code/worktrees/mere-link-dynamics-explanation-20261026",
+      "command": [
+        "python3",
+        "scripts/check_port_boundaries.py"
+      ],
+      "exit_code": 0,
+      "seconds": 3.34,
+      "host": "m4-imac.lan",
+      "architecture": "arm64",
+      "log_sha256": "25891e3eb805cef322203167b2e8f6821c1241e15b7ae743831d2e8ed04002b1",
+      "results": []
+    }
+  ],
+  "distinct_library_tests": 1150,
+  "existing_ignored_library_tests": 34,
+  "focused_tests_included_in_library_total": 10,
+  "source_inputs": {
+    "crates/canvas/pictograph/src/canvas.rs": "7375b9b02528f0916d8470233194c55f0e14886cc40a63a13275d52cb2ef1374",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection.rs": "bc393aa66d5a0e7e5191fc609e41639236f8fcf8df7f19d453e933bb9843d8b9",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection/observation_tests.rs": "0d45136e09ddf42fc7740bd52e8f1d26dad3ade2e13771c89db00a636982ba2e",
+    "crates/canvas/pictograph/src/canvas/dynamics_inspection/observations.rs": "00272fc89510648807e4bbae248d9ea039bad885a33abb2beed2662dbc4eaa0c",
+    "crates/canvas/pictograph/src/canvas/responsive_links.rs": "0b96e7f06612506545b55a105d20a10ad8ed0bbff43f53247eedcb29b0e6cc9f",
+    "ports/graphshell/src/mere_host_fixture.rs": "60591a2bd535ac696f126bda040cb0c7b3dbcdd98d4e881b76fe80eb4cd548db",
+    "ports/graphshell/src/web_tree/dynamics_inspection.rs": "c5c41db3c9c618fbc07bf90ae2e7956e3281e78af728467f70d97d48326af996",
+    "ports/graphshell/src/web_tree/dynamics_inspection/explanation.rs": "a60e1c1af8c1a97242cf59a1b2299d7ee0298d331b75179c4ea4d41e0e813a18",
+    "ports/graphshell/src/web_tree/ordinary_link_paths.rs": "015f41e2c281c7107fbc7eb2d4a6a842d489aa6d92e72e71989666ce37e68c09",
+    "ports/graphshell/src/web_tree/ordinary_link_paths/observation.rs": "730befa45a8d67ea0f3958f8525d5384ea88c29c661f25e50d8e926f6391b23a",
+    "ports/graphshell/src/web_tree/product.rs": "c077b5d16e29f5db8f8951d4b97c7ca791607c7ed13ffa7218ecda0d40fc1c6b",
+    "ports/graphshell/web/scenarios/p4_tree_dynamics_inspection.scn": "7be721d9c8b95ddce490e35760dca27ab7237be18a25deae87f4a16950896bd2",
+    "ports/graphshell/web/scenarios/p8_tree_counted_topology.scn": "818d2c77bf72992723fb4fc4e3ed22959920a17351838c6e753336a42de65272",
+    "ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn": "1670ae130f9a12b8fb68576d043dae266de9608b7407a28c82f8709eecc1409e",
+    "ports/graphshell/web/scenarios/p9_tree_field_effects.scn": "2aad30d3540abef2a927f9ccb530b0ee5bb19a36432fb89169ab815961dcabb8"
+  },
+  "dependency_delta": {
+    "manifests_changed": [],
+    "lockfiles_changed": [],
+    "root_lock_sha256": "90588cec0b76e2996a3be56eee614d037d6c61e88f7109c9d1cd1d9d1d16b5a9",
+    "web_lock_sha256": "ec609465f3ecaeb26cfc32097f65fcc1aaae050687ca612ebc2848060de928af"
+  },
+  "artifacts": {
+    "pkg-release/graphshell_web_bg.wasm.d.ts": "4418e49add434c77e9e4f9cc04c6a23bbffe6d0a3522a1314822606c8da1b42e",
+    "pkg-release/graphshell_web_bg.wasm": "68c8f6d99107ee21499cee68b9e557509e63b4ba5c672ea77d016e3c33865e67",
+    "pkg-release/graphshell_web.js": "7a7a2285f4a350e49d63e58460a6881289251b4cee282bc18123c1e6b82b2b4b",
+    "pkg-release/graphshell_web.d.ts": "e61aa37b2e74cfd73b1e4c775d84ce5045ecca60f61f4ca7ac94d997c4a1e226"
+  },
+  "native": [
+    {
+      "name": "ordinary_seed",
+      "runtime_revision": "0f682d4d861cd52d6fb2c123dc472318b1ce8c75",
+      "scenario_revision": "0f682d4d861cd52d6fb2c123dc472318b1ce8c75",
+      "result": "ordinary_seed/result.json",
+      "result_sha256": "7a0680c27504e61ff197ec39abe6134ee918aaff61cd6fae593b4f8d102111e3",
+      "captures": [
+        {
+          "path": "ordinary_seed/p8_pair_topology_initial.png",
+          "sha256": "f7d9290c9d94cce7bf4466b43b42524adf8372380e21871afb146097767e62e5",
+          "width": 2400,
+          "height": 1906
+        },
+        {
+          "path": "ordinary_seed/p8_pair_topology_exact_reason_hidden.png",
+          "sha256": "d8906752e9bb06d25227084f27c461afaa051b8796e529ee41ae8c9dfbf38324",
+          "width": 2400,
+          "height": 1906
+        },
+        {
+          "path": "ordinary_seed/p8_promoted_source_before_withdrawal.png",
+          "sha256": "00ccace39a892f28ef0172ab164e973433839c9a20c74c53839df51589b45c0b",
+          "width": 2400,
+          "height": 1906
+        },
+        {
+          "path": "ordinary_seed/p8_promoted_copy_after_withdrawal.png",
+          "sha256": "519ec5b7b65deee0be64c43ff5577cba1aa30385d1e8218c41cd9cdf41d128e7",
+          "width": 2400,
+          "height": 1906
+        },
+        {
+          "path": "ordinary_seed/p8_pair_topology_after_withdrawal.png",
+          "sha256": "97f4a534aefd86becda8297cd988f1a658658fae96d338969a9f321c51ea8a5a",
+          "width": 2400,
+          "height": 1906
+        }
+      ]
+    },
+    {
+      "name": "authored_flow",
+      "runtime_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "scenario_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "result": "authored_flow/result.json",
+      "result_sha256": "5e9f0a7bc924e636a562e3bf476614da8d93538361b3ee8847466a71f25147e7",
+      "captures": [
+        {
+          "path": "authored_flow/p9_authored_endpoint_effects.png",
+          "sha256": "f331f241dda17d891becdb134f970d72da699c55d5f92831ecafc4808ff63d52",
+          "width": 2400,
+          "height": 1906
+        }
+      ]
+    },
+    {
+      "name": "fresh_process_reopen",
+      "runtime_revision": "155f701e5c8c300e30316a43771cc411680da8da",
+      "scenario_revision": "9de74594a38e1e264101bb24154115c743ec538d",
+      "result": "fresh_process_reopen/result.json",
+      "result_sha256": "8d04ee633513a9561ecd10a1841cd2f2fb09576f9bef5861dca4cb681677b267",
+      "captures": [
+        {
+          "path": "fresh_process_reopen/p8_counted_topology_fresh_reopen.png",
+          "sha256": "f63750e97e1860887f27622e3bef9dc66295c5632112bae7355bfe596bb6e905",
+          "width": 2400,
+          "height": 1906
+        }
+      ]
+    }
+  ],
+  "review": "browser-review.json",
+  "processes": "browser-processes.json",
+  "environment": "browser-environment.json",
+  "reopen": {
+    "same_stored_session": true,
+    "exact_source_facts_and_runtime_revision_equal": true,
+    "cleared_inspector_and_response_settings_asserted": true,
+    "source_continuity_sha256": "91614afac87e3cbfd3d7ad92e72a3021168e2f80c6152a3814f3028add03cd45"
+  },
+  "continuity": {
+    "script_only_changes_after_runtime_revision": [
+      "ports/graphshell/web/scenarios/p8_tree_counted_topology_reopen.scn"
+    ],
+    "runtime_and_dependency_bytes_equal": true,
+    "inspector_canvas_and_seiche_sources_unchanged_between_seed_and_final_runtime": true
+  },
+  "preserved_iterations": [
+    {
+      "name": "field-first-presentation-stall",
+      "result": "preserved-iterations/field-first-presentation-stall/result.json",
+      "sha256": "74e1224e3e18b9f12ab24451b47a5702dc52cd7ec29a281bdeba18f70a3113b6",
+      "log": [
+        "FAIL: native presentation stalled for 10000 ms (602 redraws, 0 presented frames)",
+        "gpu timestamps: no"
+      ]
+    },
+    {
+      "name": "field-fresh-process-presentation-stall",
+      "result": "preserved-iterations/field-fresh-process-presentation-stall/result.json",
+      "sha256": "8e0799560ab3e1330e397807ae5b2d3073dd8bb577c81882cd4022a27306ea00",
+      "log": [
+        "FAIL: native presentation stalled for 10000 ms (603 redraws, 0 presented frames)",
+        "gpu timestamps: no"
+      ]
+    },
+    {
+      "name": "reopen-inspector-disclosure",
+      "result": "preserved-iterations/reopen-inspector-disclosure/result.json",
+      "sha256": "2b5fbc50cf0e38cf1c7ef26711cfd3bf8bbfee7128414f8135437692aadfb0a7",
+      "log": [
+        "FAIL: reveal role:button Open promoted link 1: nothing matches",
+        "FAIL: assert text 'Review Resource': not on any surface",
+        "FAIL: assert snap promoted-link-drift Eq 'changed': got ''",
+        "FAIL: assert snap promoted-link-withdrawn-ids Eq 'fixture:p7:collection-primary': got ''",
+        "FAIL: assert snap promoted-link-frozen-assertion-ids Eq 'fixture:p7:collection-independent|fixture:p7:collection-primary': got ''",
+        "FAIL: assert snap promoted-link-frozen-withdrawn-count Eq '0': got ''",
+        "captured p8_counted_topology_fresh_reopen",
+        "Fresh process restores the withdrawn source reason, independent sibling and promoted copy; pair inspection reads the two currently held topology rows",
+        "FAIL: selector click refused for Selector { surface: None, matcher: Role(\"button\"), text: Some(\"Open promoted link 1\"), attr: None }",
+        "gpu timestamps: no"
+      ]
+    }
+  ],
+  "open_qualification_gap": "The region-inspection fixture stalled before its first presented frame in two browser processes, with the inspector still closed. No regional-paint qualification is claimed; authored global-flow execution is separately qualified on the ordinary graph.",
+  "bounds": [
+    "Executed coupling calls are evidence before integration; no per-assertion net force or final-motion attribution.",
+    "128-row capture limit is disclosed for the whole cohort. Reading and choosing do not request ticks or invoke entry callbacks.",
+    "Appearance retirement is covered by focused CPU tests, including same UUID/slot recreation and foreign Canvas refusal; native scenarios cover ordinary source/view lifecycle and process reopen.",
+    "No new weighting law, endpoint feedback, sympathetic resonance, other-product intake, physical-device, independent-second-host or MSRV qualification.",
+    "Repository-wide documentation findings are baseline compared separately."
+  ],
+  "documentation_audit": {
+    "counts_before": {
+      "active_docs": 307,
+      "indexed_active_docs": 287,
+      "index_orphans": 19,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 2,
+      "broken_relative_links": 30,
+      "historical_broken_relative_links": 239,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 176,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 31,
+      "missing_known_root_paths": 387,
+      "historical_missing_known_root_paths": 231,
+      "planned_missing_known_root_paths": 9,
+      "invalid_historical_annotations": 5,
+      "stale_historical_annotations": 6,
+      "unheaded_owned_sources": 798,
+      "exhibit_b_sources": 0
+    },
+    "counts_after": {
+      "active_docs": 307,
+      "indexed_active_docs": 287,
+      "index_orphans": 19,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 2,
+      "broken_relative_links": 30,
+      "historical_broken_relative_links": 239,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 176,
+      "ignored_known_root_patterns": 23,
+      "reserved_identifier_paths": 31,
+      "missing_known_root_paths": 387,
+      "historical_missing_known_root_paths": 231,
+      "planned_missing_known_root_paths": 9,
+      "invalid_historical_annotations": 5,
+      "stale_historical_annotations": 6,
+      "unheaded_owned_sources": 798,
+      "exhibit_b_sources": 0
+    },
+    "new_findings": {},
+    "baseline_log_sha256": "32091701ca075797d45c7794411ef8be748b29598ebdf33601cb2373ee3285a1",
+    "final_log_sha256": "32091701ca075797d45c7794411ef8be748b29598ebdf33601cb2373ee3285a1"
+  }
+}
