@@ -12,6 +12,7 @@
 //! and builds its output in an explicit staged scope, `Graph::stage_edges` to
 //! `Graph::settle_staged_edges`: edge replays are not checked one by one, and the
 //! finished output is checked once, refusing the migration if it would not reopen.
+//! Whole identical rows never reach that check: they dedupe to the first (`copies`).
 
 mod copies;
 
@@ -864,13 +865,17 @@ impl Replay {
                     .get(id)
                     .is_some_and(|origin| origin.resource.is_some())
             });
-            let filtered = filter_resource_aggregates(pair, &semantic_filtered);
+            let (filtered, copies) =
+                copies::split_copies(filter_resource_aggregates(pair, &semantic_filtered));
             let (Some(from), Some(to)) = (
                 self.output.get_node_key_by_id(pair.0),
                 self.output.get_node_key_by_id(pair.1),
             ) else {
                 continue;
             };
+            for copy in &copies {
+                self.note_deduped_surface_copy(pair, copy)?;
+            }
             if self.output.persisted_edges_between(from, to) != filtered {
                 // Surface restore inserts in petgraph order; reverse to retain the read order.
                 self.output.set_edges_between(
@@ -952,6 +957,7 @@ impl Replay {
                 )));
             }
         }
+        self.dedupe_resource_copies()?;
         // Raw legacy lifecycle has no shown-resource column. Bind its current pages explicitly.
         let surfaces: Vec<_> = self.source.nodes().map(|(_, node)| node.id).collect();
         for surface in surfaces {
