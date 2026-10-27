@@ -229,8 +229,8 @@ the reducer Woodshed also wants, so cutting that one import is a P2 task.
 | L4 | The option helpers in `projection_editor.rs:463-530` (`arrangement_options`, `arrangement_defaults`, `option_placeholder`, `with_option`, `with_kind`) | `scenomise` (it owns the solver registry and catalog the helpers read) | None | Knot's `recipe/editor.rs` deletes its three copies and calls the shared helpers | Medium / low |
 | L4b | `ProjectionEditor` reducer, panels, `ProjectionDefinitionSink` (about 540 code lines) | Stays until a second host edits whole `ProjectionDefinition` drafts (§5, R1) | R1 | A host other than Graphshell opens and saves a whole-definition draft | Medium / medium, waits |
 | L4c | Host recipes: `chronicle_definition`, `default_definition`, `PRACTICE_CARD` | The owning domain: Distillery (chronicle), the Woodshed export (practice) | Woodshed publishes the recipe in its dataset; Graphshell keeps its card size as host policy | Graphshell renders the Woodshed fixture without a Woodshed-named function | Low / low |
-| L10 | `presentation_editor` (511 + 301 tests) | Waits: `scenograph::presentation` already holds the model; the port holds a Muniment-backed workspace record | A second host that stores rule sets | A second host loads and edits a rule set through the same record | Low / low |
-| L11 | `presentation_binding` (306 + 328), `node_presentation` (204 + 216), with `link_inspection` and `access_inspection` | `crates/mere` (it already holds `roster`, `subgraph`, `query_view`, `gloss`), once a consumer exists | Move `link_inspection` and `access_inspection` first; they import only `mere::kernel` | Turnstone's or Woodshed's canvas resolves node faces from the same rule set; the `canvas::node_presentation` surface in pictograph (64 lines) is the paint end | Medium / medium, waits |
+| L10 | Rule authoring and presentation controls | Landed in `scenograph::presentation::editor` and Mere View; Graphshell retains the actual `presentation_store` adapter | Authoring is opt-in through editor features | Independent windowless host exercises failure/retry, saved history and conflict reconciliation; application adoption remains separate | Shared state and controls; no compatibility facade |
+| L11 | `presentation_binding`, `node_presentation`, `link_inspection` and `access_inspection` | Availability-aware resolution is shared in Scenograph; graph occurrence binding, renderer support and inspection remain Graphshell adapters | No port dependency in the shared resolver | Resolver model tests cover undisclosed inputs; another application has not adopted the graph adapters | Policy lifted; actual host responsibilities retained |
 
 ### Group 1c: forme
 
@@ -539,10 +539,12 @@ Knot's workspace) that names its done condition.
 the lifted session; the lifted crate's tests carry the lifecycle cases that
 today live in `forme_session_lifecycle_tests.rs` without importing the port.
 
-**P7. L11, L10 and the inspection readers.** Waits for a consumer. If
-Turnstone or Woodshed adopts presentation rules, `link_inspection` and
-`access_inspection` move first, then binding and node presentation.
-*Done when:* a second host resolves faces from the same rule set.
+**P7. L11, L10 and the inspection readers.** Rule authoring and availability-aware
+resolution now belong to Scenograph; Mere View owns the reusable controls.
+Graphshell retains graph occurrence binding, renderer support, inspection and
+its renamed persistence adapter. The independent windowless host qualifies the
+shared authoring boundary; Turnstone or Woodshed runtime adoption remains a
+separate receipt. No port facade is retained while awaiting that adoption.
 
 **P8. L13 and group 4.** Sequenced behind the resident-host port and the
 facet dissolution brief. `personal_sync` types move once the facet constants
@@ -1672,7 +1674,7 @@ adapters, not to the component state and views currently embedded there.
 |---|---|---|
 | Owner operations and pane acknowledgements | `web_tree/product.rs` owns several completion cells, booleans, pending variants and the movable `App`; `web_tree/promoted_links.rs::poll` still infers completion from `saving` and `save_state` strings. Coupling reads a separate owner result slot. | Typed operation/attempt completions shared by the actual owner adapters, with pane-specific state transitions. Delete string-driven control flow and duplicate retry routing as callers convert. Status text is a view of state. |
 | Forme and workbench | `forme_workspace`, `forme_session`, and `web_tree/forme` split layout, save proposals, retired writes, rebinding, drag previews and tile UI across the port. `current` and `projected_model` expose the same draft-or-committed choice. | Move layout/session state with the component. Platen remains R2's home after cutting canvas application and port-owned scope/inspector types; browser storage, pointer capture and texture installation stay in host adapters. Remove the old modules/import paths in the same change. |
-| Rules and presentation | `presentation_editor` already owns a draft/history session, but `web_tree/presentation` owns its controls, store and completion cell. `presentation_binding` also imports link inspection. | Lift rule authoring and complete controls together. Keep occurrence readings as typed inputs, and host policy at the edge; include the inspection dependencies rather than hide a port dependency behind a wrapper. |
+| Rules and presentation | `presentation_editor` formerly mixed shared draft/history state with the port record; the browser owned controls and completions. | Landed in Scenograph and Mere View. Deleted the old editor module; named the actual graph-scoped CAS record adapter `presentation_store`. Graph binding and renderer policy remain in the host. See the retained reading and authoring entry below. |
 | Documents, reading tiles and cards | `web_tree/blocks::Pane` mixes document/notation state with IndexedDB, completion cells and rendering resources. `web_tree/reading::Reading` combines content bindings, source retirement and progress with browser downloads and audio elements. | Reuse the existing document, Inker, notation and Cambium owners. Move interaction state and views alongside them; express load/save/export/play requests as effects. Keep DOM object URLs, audio elements and native equivalents in adapters. |
 | Viewer composition | `product_off.rs` and `remote_off.rs` imitate disabled workspace APIs. The viewer builds the common `TreePage` composition with impossible services and empty views. The practice imitation is removed in this candidate, as described below. | Compose the viewer directly from viewing/navigation components. Compose workspace and remote services only where enabled; delete the remaining off-module imitations and their branches. Feature flags alone currently reduce dependencies but do not finish this composition split. |
 | Actual compatibility code | `product.rs::decode_profiled_codicil` accepts the old v2 codicil and v1 engram; `forme_session::SavedRecord` accepts the old flat record through defaulted history fields. Scene readers and tests retain additional historical conversions. | Retire obsolete accepted formats and tests that exist only to preserve them when selecting the current format boundary. Current data integrity, conflict and authority checks remain. Existing stored artifacts and receipts are not deleted by a source cleanup. |
@@ -2018,3 +2020,52 @@ The complete commands, source hashes, ignored cases, failed attempts and
 publication/preservation results are retained in
 `Code/output/graphshell-components/validation-resumed/completion.json` and its
 referenced receipts.
+
+
+### 2026-10-26: retained reading lifecycle and rule authoring owners
+
+`mere-lanes::reading_lifecycle` owns retained access reconciliation and one-shot
+operation tickets. Its input is a lightweight owner, membership-lifetime,
+address and visibility projection; it contains no graph authority, document
+bytes, browser resources or rendering engine. Owner/persona changes, retirement,
+source replacement, operation supersession and explicit content-session rebinding
+revoke old completion rights. Graphshell applies the resulting retirement
+decisions to its Pelt slots, producers, pending reads, media and downloads.
+Reconciliation precedes progress writes and async effects, and initial tile
+rendering seeds the leases before it can start a clip read. Hidden clip reads may
+finish, but cannot make the access visible again.
+
+The reading preparation and workbench render paths no longer clone the whole
+graph. Tile closures retain only their labels, addresses and tags. Unchanged
+inline sources are compared through borrowed bytes before allocating replacement
+content. Retained clips reuse their verified session handle without copying
+document or media payloads. The inline-source comparison still examines active
+body bytes: the kernel's existing content revision does not cover body edits,
+so using it as a body cache key would miss changes. No claim of constant-time
+inline-body change detection is made.
+
+`scenograph::presentation::editor` owns raw drafts, strict parsing, validation,
+private history, saved undo/redo and acknowledged save transitions. Opaque
+operation identities distinguish workspace instances as well as attempts. A
+failed save keeps the draft; reconciling newly loaded committed state preserves
+that private draft for explicit review and application. Availability-aware rule
+resolution also lives in Scenograph and validates the original rules before
+suppressing an unavailable input, including under `Not` or `Any`. It resolves
+directly without cloning the rule set for each occurrence.
+
+Mere View supplies reusable presentation controls with a bounded effect outbox.
+Graphshell's former `presentation_editor` module is removed; its actual remaining
+role is named `presentation_store`, an adapter for graph-scoped Muniment records
+and atomic compare-and-replace writes. Callers import rule types directly from
+Scenograph. The browser adapter correlates load/save results with graph binding
+and operation, distinguishes temporary product unavailability from retirement,
+and exposes conflict reconciliation and retry. Graph occurrence binding,
+renderer support and app appearance defaults remain with Graphshell.
+
+Authoring is opt-in through Scenograph's `editor` feature and Graphshell's
+`workspace-editor` feature; the lightweight viewer keeps rule resolution without
+linking the authoring owner or Graphshell's rule-store adapter. No package or
+compatibility reexport was added.
+
+Validation evidence for this slice is retained under
+`Code/output/graphshell-components/lifecycle/`.

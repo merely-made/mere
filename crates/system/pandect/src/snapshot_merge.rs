@@ -197,9 +197,13 @@ pub(crate) fn merge_snapshots_with_remap(
     let a = canonical_assertion_columns(a)?;
     let mut b = canonical_assertion_columns(b)?;
     let held_edge_signatures: HashSet<_> = a.edges.iter().map(edge_signature).collect();
-    let incoming_edge_signatures: HashSet<_> = b.edges.iter().map(edge_signature).collect();
     remove_identical_assertion_overlaps(&a.edges, &mut b.edges);
     remove_identical_assertion_overlaps(&a.resource_edges, &mut b.resource_edges);
+    // Removing the last assertion can leave its old family tag on a retained
+    // traversal or other sidecar. Normalize before comparing edge signatures,
+    // so repeating the same import cannot append that sidecar again.
+    b = canonical_assertion_columns(&b)?;
+    let incoming_edge_signatures: HashSet<_> = b.edges.iter().map(edge_signature).collect();
     let mut report = MergeReport::default();
     let mut merged = a.clone();
     // A retained schema-0 orphan is opaque compatibility data. Keep the
@@ -964,8 +968,8 @@ mod tests {
         let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
         let mut a = snap(&[]);
         a.resources = vec![
-            resource_record(from_iri, "test.owner", "from"),
-            resource_record(to_iri, "test.owner", "to"),
+            resource_record(from_iri, "test.owner", "\"from\""),
+            resource_record(to_iri, "test.owner", "\"to\""),
         ];
         a.resource_edges = vec![assertion(&from, &to, "held-handle")];
         let mut b = a.clone();
@@ -1008,7 +1012,8 @@ mod tests {
             "repeating the same composition does not multiply held assertions"
         );
         assert_eq!(
-            repeated, merged,
+            serde_json::to_value(&repeated).unwrap(),
+            serde_json::to_value(&merged).unwrap(),
             "repeat composition is snapshot-idempotent"
         );
         assert_eq!(report, MergeReport::default());
@@ -1047,7 +1052,10 @@ mod tests {
         );
         let (sidecar_repeat, repeat_report) =
             try_merge_snapshots(&sidecar_merge, &surface_b).unwrap();
-        assert_eq!(sidecar_repeat, sidecar_merge);
+        assert_eq!(
+            serde_json::to_value(&sidecar_repeat).unwrap(),
+            serde_json::to_value(&sidecar_merge).unwrap()
+        );
         assert_eq!(repeat_report.added_edges, 0);
         assert_eq!(repeat_report.deduped_edges, 1);
     }
@@ -1062,12 +1070,14 @@ mod tests {
         let other = chartulary::resource_id_from_canonical_iri(other_iri).to_string();
         let mut valid = snap(&[]);
         valid.resources = vec![
-            resource_record(from_iri, "test.owner", "from"),
-            resource_record(to_iri, "test.owner", "to"),
-            resource_record(other_iri, "test.owner", "other"),
+            resource_record(from_iri, "test.owner", "\"from\""),
+            resource_record(to_iri, "test.owner", "\"to\""),
+            resource_record(other_iri, "test.owner", "\"other\""),
         ];
         valid.resource_edges = vec![assertion(&from, &to, "shared-handle")];
         let empty = snap(&[]);
+        assert!(try_merge_snapshots(&valid, &empty).is_ok());
+        assert!(try_merge_snapshots(&empty, &valid).is_ok());
 
         let mut duplicate_a = valid.clone();
         let duplicate = duplicate_a.resource_edges[0].clone();
@@ -1080,12 +1090,24 @@ mod tests {
 
         let mut owner_conflict = valid.clone();
         owner_conflict.resource_edges[0].from_node_id = other;
-        assert!(try_merge_snapshots(&valid, &owner_conflict).is_err());
+        assert!(
+            try_merge_snapshots(&valid, &owner_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
 
         let mut payload_conflict = valid.clone();
-        payload_conflict.resource_edges[0].retained_assertions_mut()[0].label =
-            Some("different payload".into());
-        assert!(try_merge_snapshots(&valid, &payload_conflict).is_err());
+        let conflicting_statement =
+            &mut payload_conflict.resource_edges[0].retained_assertions_mut()[0];
+        conflicting_statement.label = Some("different payload".into());
+        conflicting_statement.basis.note = Some("different payload".into());
+        assert!(
+            try_merge_snapshots(&valid, &payload_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
 
         let mut stratum_conflict = snap(&["https://surface.test/a", "https://surface.test/b"]);
         stratum_conflict.edges = vec![assertion(
@@ -1093,7 +1115,12 @@ mod tests {
             &stratum_conflict.nodes[1].node_id,
             "shared-handle",
         )];
-        assert!(try_merge_snapshots(&valid, &stratum_conflict).is_err());
+        assert!(
+            try_merge_snapshots(&valid, &stratum_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
     }
 
     #[test]
