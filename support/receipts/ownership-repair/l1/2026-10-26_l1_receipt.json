@@ -114,5 +114,6 @@
   "passed": 340,
   "failed": 0,
   "note": "the consumer gate for Q016; two of its tests needed the kernel to report a refused replay rather than drop it"
- }
+ },
+ "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host"
 }
