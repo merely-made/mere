@@ -48,18 +48,16 @@
    "authority": [
     "A016"
    ],
-   "owner": "a muniment digest of the journal's first n entries is the one binding of a checkpoint to its journal; chartulary's Snapshot and Pandect's Checkpoint each store it and check it before trusting their contents, and a checkpoint with no digest is replayed past, then re-checkpointed with one",
-   "rulings_applied": "Mark, 2026-10-26: \"muniment digest (Recommended)\" and \"Replay instead (Recommended)\", recorded in the plan's section 5",
-   "change": "muniment journal/digest.rs Journal::prefix_digest (blake3 over each entry's canonical serde encoding, maps ordered by encoded key, entries whole plus the count, not id, provenance or causes); chartulary spine.rs Snapshot.journal_digest, check_names_prefix_of, load_checkpointed (mismatch is StoreError::Codec naming the sequence, digest-less replays in full as the assertion-less path does); container.rs tags serialize sorted; pandect graph_session.rs Checkpoint.journal_digest written at both checkpoint sites, open refuses a mismatch as SessionError::Corrupt naming the checkpoint and ignores a digest-less checkpoint",
-   "regression": "muniment journal::digest::tests (7: prefix absent past the log, stable as the log grows, follows entry content and order, map-order independence, survives save and load, entries only and shared by a fork, variants encode distinctly); chartulary spine::tests::a_snapshot_of_another_graph_is_refused_in_place_of_the_durable_journal (the audit's durable/foreign probe inverted), a_snapshot_of_a_rewritten_journal_prefix_is_refused, a_snapshot_names_the_journal_prefix_it_reflects_and_still_loads_beside_a_longer_one, a_snapshot_without_a_journal_digest_is_replayed_in_full_and_the_next_one_names_its_prefix, a_checkpoint_of_nodes_with_many_tags_never_mismatches_after_a_reload, container::tests::tags_serialize_in_sorted_order; pandect graph_session::checkpoint_tests::a_checkpoint_names_the_journal_prefix_it_reflects_and_opens_beside_it, a_checkpoint_taken_beside_another_journal_is_refused_as_corrupt, a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_next_names_the_journal",
-   "mutation_controls": "removing the map sort fails the two muniment order tests; removing the digest check fails the foreign and rewritten-prefix chartulary tests and the foreign pandect test; trusting a digest-less snapshot or checkpoint fails the digest-less test in each; unsorted tags fail the container and the many-tags test",
-   "audit_probe": "chartulary_foundations.rs snapshot_can_override_the_authoritative_durable_journal is inverted by the foreign-snapshot regression (load_checkpointed refuses where it loaded the foreign graph at revision 1); pandect_checkpoint_reason_diagnostics.rs recorded_session_accepts_foreign_checkpoint_at_its_own_valid_cursor, which replaces only graph.json and facets.json, STILL PASSES on the repaired code: the journal digest lives in checkpoint.json and cannot reach them",
-   "limit": "repairs the checkpoint taken beside another journal and the checkpoint that names no journal; does not repair graph.json and facets.json replaced beneath a valid checkpoint record, which is a fork in plan section 5 (what binds them to the record)",
-   "commit": "eidetic 14559a8 (muniment) and a7bd370 (chartulary), merged cceb203"
+   "owner": "a muniment digest of the journal's first n entries is the one binding of a checkpoint to its journal, and a hash of the stored bytes of graph.json and facets.json (in Pandect's record) binds it to its files; a checkpoint that cannot be shown to match is a cache the journal outranks and is replayed past, then re-checkpointed",
+   "rulings_applied": "Mark, 2026-10-26: \"muniment digest (Recommended)\" and \"Replay instead (Recommended)\"; Mark, 2026-10-27, asked in the Q002 session: \"Hash in the record (Recommended)\" for graph.json and facets.json, \"Replay past it (Recommended)\" for a mismatch, \"Keep Codec (Recommended)\" for the error type. All recorded in the plan's section 5",
+   "change": "muniment journal/digest.rs Journal::prefix_digest (blake3 over each entry's canonical serde encoding, maps ordered by encoded key, entries whole plus the count, not id, provenance or causes); chartulary spine.rs Snapshot.journal_digest, summarizes_prefix_of, load_checkpointed (a snapshot that names no prefix, another's, or one past the log replays in full); container.rs tags serialize sorted; pandect graph_session.rs Checkpoint.journal_digest and contents_digest written together by checkpoint_ops at both sites, open ignores a checkpoint whose journal prefix or (for a session with no retained translation) stored graph and facets bytes do not match what it names",
+   "regression": "muniment journal::digest::tests (7); chartulary spine::tests::a_snapshot_of_another_graph_is_replayed_past_in_favour_of_the_durable_journal (the audit's durable/foreign probe inverted), a_snapshot_of_a_rewritten_journal_prefix_is_replayed_past_and_the_next_one_names_the_new_prefix, a_snapshot_past_the_end_of_the_journal_is_replayed_past, a_snapshot_names_the_journal_prefix_it_reflects_and_still_loads_beside_a_longer_one, a_snapshot_without_a_journal_digest_is_replayed_in_full_and_the_next_one_names_its_prefix, a_checkpoint_of_nodes_with_many_tags_never_mismatches_after_a_reload, container::tests::tags_serialize_in_sorted_order; pandect graph_session::checkpoint_tests::a_checkpoint_names_the_journal_prefix_and_the_files_it_reflects_and_opens_beside_them, a_checkpoint_taken_beside_another_journal_is_replayed_past, a_checkpoint_whose_graph_and_facets_were_replaced_is_replayed_past (the audit's swapped-file probe inverted), a_checkpoint_naming_no_files_is_replayed_past, a_checkpoint_without_a_journal_digest_is_ignored_for_a_full_replay_and_the_next_names_the_journal",
+   "mutation_controls": "removing the map sort fails the two muniment order tests; trusting every snapshot fails four chartulary tests; removing the file-hash check fails the replaced-files and names-no-files pandect tests; removing the journal-digest check fails the foreign-journal pandect test; unsorted tags fail the container and many-tags tests",
+   "audit_probe": "chartulary_foundations.rs snapshot_can_override_the_authoritative_durable_journal is inverted (load_checkpointed no longer loads the foreign graph); pandect_checkpoint_reason_diagnostics.rs recorded_session_accepts_foreign_checkpoint_at_its_own_valid_cursor, which replaces only graph.json and facets.json, now fails at its assertion that the foreign node is the session's graph",
+   "commit": "eidetic 14559a8 and a7bd370 (merged cceb203), then ae46a1e (merged e7eef1e); mere branch merged at the Q002 follow-through commit",
+   "reading_to_confirm": "a session with a retained legacy translation is not hashed: its checkpoint is compared with the translation and a difference is refused as Corrupt (existing test translated_checkpoint_rejects_valid_truth_changes_before_admission), which a replay-past answer would otherwise have turned into a replay",
+   "test_adapted": "graph_session::tests::checked_snapshot_session_load_reports_baseline_and_checkpoint_corruption now writes the checkpoint record that names each corrupt graph.json, so its validation is still reached"
   }
- ],
- "fork_recorded_in_plan_section_5": [
-  "Q002 ruled by Mark 2026-10-26 and applied; two questions remain, recorded 2026-10-27: what binds Pandect's graph.json and facets.json to their checkpoint record (stored-bytes hashes in the record, one record, or kernel formats carrying the digest; mismatch Corrupt or replay), and whether a digest mismatch caused by an entry-encoding change refuses or replays"
  ],
  "repin": {
   "from": "f599ffe93298025bf6d65ae310a7cb4270ea52e3",
@@ -84,6 +82,11 @@
    "to": "cceb203776646ab20d617dcfeb9d8edc1b48ba09",
    "lockfiles": "Cargo.lock 27 source lines and ports/graphshell/web/Cargo.lock 28; source revs only, no version changed",
    "unchanged_code": "between the two revs the crate source changes are muniment's digest module and chartulary's snapshot binding and sorted tags; the other new commits are docs"
+  },
+  "q002_follow_through": {
+   "from": "cceb203776646ab20d617dcfeb9d8edc1b48ba09",
+   "to": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+   "lockfiles": "Cargo.lock 27 source lines and ports/graphshell/web/Cargo.lock 28; source revs only"
   }
  },
  "suites": {
@@ -97,6 +100,13 @@
    "check": "muniment and chartulary check --no-default-features finished clean",
    "kernel": "mere-kernel lib 513 passed and both reopen tests (the parent's baseline of 512 predates other sessions' tests on the base)",
    "pandect": "pandect lib 347 passed (345 with this pass's 3 on the earlier base) and 28 integration tests"
+  },
+  "q002_follow_through": {
+   "muniment": "54 passed",
+   "chartulary": "94 passed (93 before plus one)",
+   "stickleback": "105 lib and 5 boundary tests passed on eidetic cceb203 (default features); the earlier stall was the full workspace's feature unification",
+   "kernel": "mere-kernel lib 513 and both reopen tests",
+   "pandect": "pandect lib 349 passed and 28 integration tests"
   }
  },
  "consumer_before_after": {
@@ -104,9 +114,7 @@
   "new_pin_af17fe7": "all three pass",
   "probes_rerun": "kernel_navigation.rs replacing_a_navigation_parents_history_panics fails at is_err (control ordinary_parent_deletion_preserves_navigation_owner_without_panicking passes); pandect_undo.rs undoing_parent_navigation_panics_when_a_child_anchors_its_history fails at is_err and navigation_replay_equality_changes_with_unordered_navigation_sets fails at mismatches > 0 (zero live/replay mismatches in 64)"
  },
- "unrepaired_so_far": [
-  "Q002 residual: graph.json and facets.json beneath a valid checkpoint record (fork); digest mismatch policy under entry-encoding change (fork)"
- ],
+ "unrepaired_so_far": [],
  "cues": [
   "Stemma's derived Serialize still emits entry_index, owner_index, bindings and owned_visits in hash order; to_snapshot is the canonical form and the only one mere reads",
   "entries, visits and owners are written in slot order, which follows insertion only until a deletion frees a slot; stable under the kernel's hydrate-and-write cycle, not canonical for a long-lived Stemma",
@@ -116,6 +124,10 @@
   "the digest is over each entry's canonical serde encoding, so a type that serializes a set in hash order (a HashSet, as Container.tags did) must serialize it sorted; muniment sorts maps only",
   "the digest binds entries only: a journal later compacted or rebased would have to carry the digest of the prefix it dropped; muniment's Journal has no compaction today",
   "chartulary's mismatch is StoreError::Codec like its other refusals; a matchable variant would be an API change to the public StoreError enum",
-  "prefix_digest costs a linear encode-and-hash of the prefix on every checkpointed open and every checkpoint write, far less than the replay it guards"
- ]
+  "prefix_digest costs a linear encode-and-hash of the prefix on every checkpointed open and every checkpoint write, far less than the replay it guards",
+  "chartulary still refuses a legacy (assertion-less) snapshot past the journal with an error; it is outside the replay-past rule and only matters when such a snapshot is ahead",
+  "Pandect's open reads graph.json and facets.json twice (the hash check, then the decode); the stores are the session's own, so the gap between the reads is not a threat in the stated model"
+ ],
+ "forks_ruled": "",
+ "q002_forks_ruled": "2026-10-27, both, in the plan's section 5: the files are bound by a hash in the checkpoint record; a mismatch is replayed past"
 }
