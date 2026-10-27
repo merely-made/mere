@@ -286,6 +286,7 @@ pub(crate) mod windows {
     };
     use windows_sys::Win32::System::Threading::{
         GetCurrentProcess, OpenProcess, OpenProcessToken, PROCESS_QUERY_LIMITED_INFORMATION,
+        QueryFullProcessImageNameW,
     };
 
     use super::{Connection, Connector, Duplex, Listener};
@@ -399,6 +400,78 @@ pub(crate) mod windows {
         process_sid(process.0)
     }
 
+    /// The main executable of a process, as a Win32 path.
+    pub fn process_image(pid: u32) -> std::io::Result<String> {
+        // SAFETY: an ordinary query-only open; closed by `Owned`.
+        let process = Owned(unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid) });
+        if process.0.is_null() {
+            return Err(std::io::Error::last_os_error());
+        }
+        let mut buffer = vec![0u16; 32 * 1024];
+        let mut len = buffer.len() as u32;
+        // SAFETY: `buffer` is valid for `len` UTF-16 units.
+        if unsafe { QueryFullProcessImageNameW(process.0, 0, buffer.as_mut_ptr(), &mut len) } == 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        Ok(String::from_utf16_lossy(&buffer[..len as usize]))
+    }
+
+    /// The peer on the client end of a connected pipe instance: its token
+    /// SID, and its executable where the OS could say so.
+    pub fn pipe_client_peer(handle: HANDLE) -> std::io::Result<Peer> {
+        let mut pid = 0u32;
+        // SAFETY: valid out-pointer on a connected pipe.
+        if unsafe { GetNamedPipeClientProcessId(handle, &mut pid) } == 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        let sid = peer_sid(pid)?;
+        let image = process_image(pid).ok();
+        Ok(Peer::Windows { sid, pid, image })
+    }
+
+    /// The protected DACL every custodian pipe carries: full control for
+    /// SYSTEM and the creator (the service), read and write for the owner,
+    /// nothing inherited.
+    pub fn owner_pipe_sddl(owner_sid: &str) -> String {
+        format!("D:P(A;;GA;;;SY)(A;;GA;;;OW)(A;;GRGW;;;{owner_sid})")
+    }
+
+    /// A security descriptor from SDDL, for a pipe created here or by the
+    /// SSH agent's listener.
+    pub struct PipeSecurity(*mut core::ffi::c_void);
+
+    // SAFETY: the descriptor is immutable once converted and freed once.
+    unsafe impl Send for PipeSecurity {}
+    unsafe impl Sync for PipeSecurity {}
+
+    impl PipeSecurity {
+        pub fn from_sddl(sddl: &str) -> std::io::Result<Self> {
+            let text = wide(sddl);
+            let mut descriptor: *mut core::ffi::c_void = std::ptr::null_mut();
+            // SAFETY: a NUL-terminated SDDL string; the descriptor is freed on drop.
+            if unsafe { ConvertStringSecurityDescriptorToSecurityDescriptorW(text.as_ptr(), SDDL_REVISION_1, &mut descriptor, std::ptr::null_mut()) } == 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(Self(descriptor))
+        }
+
+        /// Attributes naming this descriptor, for a create call.
+        pub fn attributes(&self) -> SECURITY_ATTRIBUTES {
+            SECURITY_ATTRIBUTES {
+                nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
+                lpSecurityDescriptor: self.0,
+                bInheritHandle: 0,
+            }
+        }
+    }
+
+    impl Drop for PipeSecurity {
+        fn drop(&mut self) {
+            // SAFETY: allocated by the system for this wrapper.
+            unsafe { LocalFree(self.0.cast()) };
+        }
+    }
+
     /// This process's token user SID.
     pub fn current_user_sid() -> std::io::Result<String> {
         // SAFETY: the pseudo-handle needs no closing.
@@ -431,41 +504,29 @@ pub(crate) mod windows {
     /// service itself) and rejects remote clients.
     pub struct NamedPipeListener {
         name: Vec<u16>,
-        sddl: Vec<u16>,
+        sddl: String,
         first: std::sync::Mutex<bool>,
     }
 
     impl NamedPipeListener {
         /// `owner_sid` is the desktop user whose vault this custodian holds.
         pub fn new(name: &str, owner_sid: &str) -> Self {
-            // Protected DACL: full control for SYSTEM and the creator (the
-            // service), read/write for the owner; no inheritance.
-            let sddl = format!("D:P(A;;GA;;;SY)(A;;GA;;;OW)(A;;GRGW;;;{owner_sid})");
             Self {
                 name: wide(name),
-                sddl: wide(&sddl),
+                sddl: owner_pipe_sddl(owner_sid),
                 first: std::sync::Mutex::new(true),
             }
         }
 
         fn create(&self) -> std::io::Result<File> {
-            let mut descriptor: *mut core::ffi::c_void = std::ptr::null_mut();
-            // SAFETY: a NUL-terminated SDDL string; the descriptor is freed below.
-            if unsafe { ConvertStringSecurityDescriptorToSecurityDescriptorW(self.sddl.as_ptr(), SDDL_REVISION_1, &mut descriptor, std::ptr::null_mut()) } == 0 {
-                return Err(std::io::Error::last_os_error());
-            }
-            let attributes = SECURITY_ATTRIBUTES {
-                nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
-                lpSecurityDescriptor: descriptor,
-                bInheritHandle: 0,
-            };
+            let security = PipeSecurity::from_sddl(&self.sddl)?;
+            let attributes = security.attributes();
             let mut first = self.first.lock().unwrap_or_else(|e| e.into_inner());
             let open_mode = PIPE_ACCESS_DUPLEX | if *first { FILE_FLAG_FIRST_PIPE_INSTANCE } else { 0 };
             // SAFETY: valid name and attributes for the duration of the call.
             let handle = unsafe {
                 CreateNamedPipeW(self.name.as_ptr(), open_mode, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS, PIPE_UNLIMITED_INSTANCES, 64 * 1024, 64 * 1024, 0, &attributes)
             };
-            unsafe { LocalFree(descriptor) };
             if handle == INVALID_HANDLE_VALUE {
                 return Err(std::io::Error::last_os_error());
             }
@@ -486,17 +547,12 @@ pub(crate) mod windows {
                     return Err(error);
                 }
             }
-            let mut pid = 0u32;
-            // SAFETY: valid out-pointer on a connected pipe.
-            if unsafe { GetNamedPipeClientProcessId(handle, &mut pid) } == 0 {
-                return Err(std::io::Error::last_os_error());
-            }
             // The DACL admits only the owner; the custodian's policy still
-            // selects a principal from this SID and refuses anything else.
-            let sid = peer_sid(pid)?;
+            // selects a principal from this peer and refuses anything else.
+            let peer = pipe_client_peer(handle)?;
             Ok(Connection {
                 stream: Box::new(PipeStream { file, server: true }),
-                peer: Peer::Windows { sid, pid },
+                peer,
             })
         }
     }
@@ -536,7 +592,7 @@ pub(crate) mod windows {
                 let sid = peer_sid(pid)?;
                 return Ok(Connection {
                     stream: Box::new(PipeStream { file, server: false }),
-                    peer: Peer::Windows { sid, pid },
+                    peer: Peer::Windows { sid, pid, image: None },
                 });
             }
             Err(std::io::Error::new(std::io::ErrorKind::TimedOut, "the custodian pipe stayed busy"))
