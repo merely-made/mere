@@ -12,6 +12,7 @@
 //! and builds its output in an explicit staged scope, `Graph::stage_edges` to
 //! `Graph::settle_staged_edges`: edge replays are not checked one by one, and the
 //! finished output is checked once, refusing the migration if it would not reopen.
+//! Whole identical rows never reach that check: they dedupe to the first (`copies`).
 
 mod copies;
 
@@ -24,7 +25,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::capture::{
-    OnRefusal, ReplayAttribution, replay_attributed_deltas_onto, replay_graph_deltas_onto,
+    OnRefusal, Replay as Outcome, ReplayAttribution, replay_attributed_deltas_onto,
+    replay_graph_deltas_onto,
 };
 use super::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
 use super::snapshot::{payload_from_persisted, persisted_edge_for_ids};
@@ -366,7 +368,7 @@ pub fn migrate_legacy_prefix_with_content_context(
         replay.output.facets(),
     )?);
     let mut entry_effects = Vec::with_capacity(entries.len());
-    for entry in entries {
+    for (index, entry) in entries.iter().enumerate() {
         let before = replay.output.to_snapshot();
         let before_facets = replay.output.facets().clone();
         let old_pairs = surface_pairs(&replay.source)?;
@@ -378,10 +380,12 @@ pub fn migrate_legacy_prefix_with_content_context(
             replay
                 .aggregate_active
                 .retain(|_, member| member.resource != pair);
-            let delta = replay
-                .attribution
-                .replay_delta(&entry.delta, &entry.author)
-                .ok_or_else(|| LegacyMigrationError("invalid typed resource capture".into()))?;
+            let Outcome::Apply(delta) = replay.attribution.replay(&entry.delta, &entry.author)
+            else {
+                return Err(LegacyMigrationError(
+                    "invalid typed resource capture".into(),
+                ));
+            };
             let super::apply::GraphDelta::ReplaySetResourceEdgesByIds { edges, .. } = &delta else {
                 unreachable!()
             };
@@ -403,8 +407,17 @@ pub fn migrate_legacy_prefix_with_content_context(
                 OnRefusal::Drop,
             );
             if !legacy_edge_edit(&entry.delta) {
-                if let Some(delta) = entry.delta.replay_delta_as(&entry.author) {
-                    let _ = replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
+                match entry.delta.replay_as(&entry.author) {
+                    Outcome::Apply(delta) => {
+                        let _ =
+                            replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
+                    },
+                    Outcome::Skip => {},
+                    Outcome::Malformed(bad) => {
+                        return Err(LegacyMigrationError(format!(
+                            "legacy journal entry {index}: {bad}"
+                        )));
+                    },
                 }
                 replay.check_typed_record(&entry.delta)?;
             }
@@ -852,13 +865,17 @@ impl Replay {
                     .get(id)
                     .is_some_and(|origin| origin.resource.is_some())
             });
-            let filtered = filter_resource_aggregates(pair, &semantic_filtered);
+            let (filtered, copies) =
+                copies::split_copies(filter_resource_aggregates(pair, &semantic_filtered));
             let (Some(from), Some(to)) = (
                 self.output.get_node_key_by_id(pair.0),
                 self.output.get_node_key_by_id(pair.1),
             ) else {
                 continue;
             };
+            for copy in &copies {
+                self.note_deduped_surface_copy(pair, copy)?;
+            }
             if self.output.persisted_edges_between(from, to) != filtered {
                 // Surface restore inserts in petgraph order; reverse to retain the read order.
                 self.output.set_edges_between(
@@ -940,6 +957,7 @@ impl Replay {
                 )));
             }
         }
+        self.dedupe_resource_copies()?;
         // Raw legacy lifecycle has no shown-resource column. Bind its current pages explicitly.
         let surfaces: Vec<_> = self.source.nodes().map(|(_, node)| node.id).collect();
         for surface in surfaces {
@@ -2997,7 +3015,10 @@ mod tests {
             node_id: Uuid::from_u128(1).to_string(),
             title: "recorder remains live".into(),
         };
-        super::super::apply::apply_graph_delta(&mut checkpoint, witness.replay_delta().unwrap());
+        super::super::apply::apply_graph_delta(
+            &mut checkpoint,
+            witness.replay().into_write().unwrap(),
+        );
         assert_eq!(
             *seen.lock().unwrap(),
             vec![witness],
