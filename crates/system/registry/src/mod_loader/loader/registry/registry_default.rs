@@ -4,6 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use inker::PresentationDeclaration;
+
+use super::super::contributes::Contribution;
 use super::super::free_fns::NativeModRegistration;
 use super::super::types::*;
 use super::ModRegistry;
@@ -19,15 +22,13 @@ fn verso_manifest() -> ModManifest {
         "mod:web-runtime",
         "Verso",
         ModType::Native,
-        vec![
-            "protocol:http".to_string(),
-            "protocol:https".to_string(),
-            "protocol:data".to_string(),
-            "viewer:webview".to_string(),
-        ],
+        vec![],
         vec!["ProtocolRegistry".to_string(), "ViewerRegistry".to_string()],
         vec![ModCapability::Network],
     )
+    .with_contributes(vec![Contribution::Presentation(
+        PresentationDeclaration::surface("viewer:webview").schemes(["http", "https", "data"]),
+    )])
 }
 
 fn core_protocol_manifest() -> ModManifest {

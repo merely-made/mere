@@ -4,6 +4,9 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+pub mod contributes;
+pub use contributes::{Contribution, ContributionKind};
+
 pub mod types;
 pub use types::*;
 
@@ -13,5 +16,7 @@ pub use free_fns::*;
 pub mod registry;
 pub use registry::*;
 
+#[cfg(test)]
+mod contributes_tests;
 #[cfg(test)]
 mod tests;

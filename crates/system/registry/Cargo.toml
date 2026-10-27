@@ -5,25 +5,21 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
-description = "Mere's late-binding registries: diagnostics channels, input bindings, knowledge tags, layout domains, lenses, mods, protocol contracts, themes and viewers, one feature each."
+description = "Mere's late-binding registries: diagnostics channels, input bindings, knowledge tags, layout domains, lenses, mods, protocol contracts and themes, one feature each."
 
 [lib]
 name = "registry"
 
 [features]
-default = ["diagnostics", "input", "knowledge", "layout", "lens", "mod-loader", "protocol", "viewer"]
+default = ["diagnostics", "input", "knowledge", "layout", "lens", "mod-loader", "protocol"]
 diagnostics = ["dep:log", "dep:web-time"]
 observations = ["diagnostics", "dep:apparatus-core"]
 input = ["dep:serde", "dep:hest"]
 knowledge = ["dep:nucleo", "dep:parking_lot", "dep:serde", "dep:serde_json", "dep:tincture"]
 layout = ["dep:serde"]
 lens = ["dep:kernel", "dep:petgraph", "dep:serde", "dep:tabard", "dep:tincture"]
-mod-loader = ["diagnostics", "viewer", "dep:inventory", "dep:serde", "dep:toml"]
+mod-loader = ["diagnostics", "dep:inker", "dep:inventory", "dep:serde", "dep:toml"]
 protocol = ["dep:http", "dep:tower"]
-viewer = ["layout", "dep:infer", "dep:kernel", "dep:serde", "dep:url"]
-# Module sub-features, kept under their former names.
-audio = ["viewer"]
-pdf = ["viewer"]
 test-utils = ["mod-loader"]
 
 [dependencies]
@@ -32,7 +28,7 @@ web-time = { version = "1", optional = true }
 # Default key bindings name the shared command ids (Scenograph editor plan, SE50).
 hest = { workspace = true, optional = true }
 http = { version = "1.4", optional = true }
-infer = { version = "0.19", optional = true }
+inker = { workspace = true, optional = true }
 inventory = { version = "0.3", optional = true }
 kernel = { workspace = true, optional = true }
 log = { version = "0.4.29", optional = true }
@@ -45,7 +41,6 @@ tabard = { workspace = true, optional = true }
 tincture = { workspace = true, optional = true }
 toml = { version = "0.8", optional = true }
 tower = { version = "0.5", optional = true }
-url = { version = "2.5", optional = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

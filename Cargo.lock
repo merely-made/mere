@@ -8459,6 +8459,7 @@ dependencies = [
  "petgraph 0.8.3",
  "serde",
  "serde_json",
+ "toml 0.8.23",
  "tracing",
  "uuid",
  "webcue",
@@ -10538,7 +10539,7 @@ dependencies = [
  "apparatus-core",
  "hest",
  "http",
- "infer",
+ "inker",
  "inventory",
  "log",
  "mere-kernel",
@@ -10552,7 +10553,6 @@ dependencies = [
  "tinct",
  "toml 0.8.23",
  "tower",
- "url",
  "web-time",
 ]
 
