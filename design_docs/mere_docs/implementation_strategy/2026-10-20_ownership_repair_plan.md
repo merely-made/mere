@@ -340,9 +340,10 @@ words are under each, unnumbered until he numbers them:
   example moved into `ports/tabard/workshop/examples/` with its wasm-only dev-dependencies (the
   workshop's native host and window stack moved behind `cfg(not(target_arch = "wasm32"))`), and
   the guard passes with nothing carried. Type-check of the workshop with its tests and the Tabard
-  desktop passed. Cue, independent of the move: the example does not compile for wasm32 against
-  genet main `01d3f52`, because `RenderCore::renderer` is native-only there
-  (`genet-render-host/src/lib.rs:757`) and the example reads it twice
-  (`examples/shared_recovery/main.rs:661` and `:1196`); those two calls are the only errors left in
-  its wasm32 check, so the example had bit-rotted in the web host before it moved, and its sealed
-  receipts describe an older genet.
+  desktop passed. The move also exposed bit-rot independent of it: the example did not compile for
+  wasm32 against genet main `01d3f52`, because `RenderCore::renderer` is native-only there
+  (`genet-render-host/src/lib.rs:757`) and the example read it twice. Repaired the same evening at
+  Mark's word: both reads go through `cambium_rootstock::try_renderer`, the one-operation checked
+  access that exists on every target, and the proof JSON records a refusal (busy frame gate or
+  lost device) in place of a value it never read, instead of inventing one. The example's wasm32
+  check passes.
