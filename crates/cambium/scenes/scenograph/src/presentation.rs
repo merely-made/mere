@@ -19,6 +19,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+#[cfg(feature = "editor")]
+pub mod editor;
+
 use sceno::Representation;
 use serde::{Deserialize, Serialize};
 
@@ -269,6 +272,17 @@ pub struct Context {
     pub previous_matches: BTreeSet<String>,
 }
 
+/// Inputs that a host has actually disclosed for one rule context.
+///
+/// A missing state is not necessarily false: hosts may not have a view input
+/// for every state. Screen measurements are likewise unavailable until the
+/// host supplies one.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct InputAvailability {
+    pub states: BTreeSet<ViewState>,
+    pub screen_size: bool,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Decision {
     pub rule_id: String,
@@ -383,13 +397,26 @@ impl RuleSet {
     /// Resolve with no script engine. A set that carries a script condition is
     /// refused; the `scripts` feature adds `resolve_with_scripts`.
     pub fn resolve(&self, context: &Context) -> Result<Resolution, Vec<Issue>> {
-        self.resolve_inner(context, None)
+        self.resolve_inner(context, None, None)
+    }
+
+    /// Resolve after suppressing any matching rule that depends on an
+    /// unavailable host input. Unknown inputs suppress the whole rule,
+    /// including under `Not` and `Any`; a disclosed false state remains a
+    /// known false value in `context.states`.
+    pub fn resolve_with_availability(
+        &self,
+        context: &Context,
+        availability: &InputAvailability,
+    ) -> Result<Resolution, Vec<Issue>> {
+        self.resolve_inner(context, None, Some(availability))
     }
 
     fn resolve_inner(
         &self,
         context: &Context,
         mut engine: scripts::Engine<'_>,
+        availability: Option<&InputAvailability>,
     ) -> Result<Resolution, Vec<Issue>> {
         self.validate()?;
         let mut issues = Vec::new();
@@ -441,6 +468,13 @@ impl RuleSet {
                 || (!rule.target.ids.is_empty() && !rule.target.ids.contains(&context.id))
             {
                 (false, "target does not include this occurrence".into())
+            } else if let Some(reason) = availability
+                .and_then(|availability| availability.unavailable(&rule.condition, context))
+            {
+                (
+                    false,
+                    format!("Host input unavailable: {reason}; rule skipped"),
+                )
             } else {
                 let previously_matched = context.previous_matches.contains(&rule.id);
                 let bound = if contains_script(&rule.condition) {
@@ -492,6 +526,24 @@ impl RuleSet {
                 .collect();
         }
         Ok(result)
+    }
+}
+
+impl InputAvailability {
+    fn unavailable(&self, condition: &Condition, context: &Context) -> Option<String> {
+        match condition {
+            Condition::State { state } if !self.states.contains(state) => {
+                Some(format!("view state {state:?} is unavailable"))
+            },
+            Condition::ScreenSize { .. } if !self.screen_size || context.screen_size.is_none() => {
+                Some("screen measurement is unavailable".into())
+            },
+            Condition::All { conditions } | Condition::Any { conditions } => conditions
+                .iter()
+                .find_map(|condition| self.unavailable(condition, context)),
+            Condition::Not { condition } => self.unavailable(condition, context),
+            _ => None,
+        }
     }
 }
 
@@ -761,6 +813,88 @@ mod tests {
             result.traces[3].winning_properties,
             vec![Property::Representation]
         );
+    }
+
+    #[test]
+    fn unavailable_inputs_suppress_whole_rules_and_preserve_known_false() {
+        let available = InputAvailability {
+            states: BTreeSet::from([ViewState::Selected]),
+            screen_size: false,
+        };
+        let set = rules(vec![
+            rule(
+                "unknown-not",
+                10,
+                Condition::Not {
+                    condition: Box::new(Condition::State {
+                        state: ViewState::ForegroundPinned,
+                    }),
+                },
+                Representation::Glyph,
+            ),
+            rule(
+                "unknown-any",
+                9,
+                Condition::Any {
+                    conditions: vec![
+                        Condition::Always,
+                        Condition::State {
+                            state: ViewState::Overview,
+                        },
+                    ],
+                },
+                Representation::Glyph,
+            ),
+            rule(
+                "unknown-measurement",
+                8,
+                Condition::ScreenSize {
+                    enter_below: 24.0,
+                    exit_above: 48.0,
+                },
+                Representation::Glyph,
+            ),
+            rule(
+                "known-false",
+                0,
+                Condition::Not {
+                    condition: Box::new(Condition::State {
+                        state: ViewState::Selected,
+                    }),
+                },
+                Representation::Card,
+            ),
+        ]);
+        let resolved = set
+            .resolve_with_availability(&context("a"), &available)
+            .unwrap();
+        assert_eq!(
+            resolved.winners[&Property::Representation].rule_id,
+            "known-false"
+        );
+        assert!(
+            resolved.traces[..3]
+                .iter()
+                .all(|trace| { !trace.matched && trace.reason.contains("unavailable") })
+        );
+        assert!(resolved.traces[3].matched);
+    }
+
+    #[test]
+    fn unavailable_input_does_not_hide_invalid_rules() {
+        let mut malformed = rule(
+            "invalid",
+            0,
+            Condition::State {
+                state: ViewState::Overview,
+            },
+            Representation::Card,
+        );
+        malformed.effects.clear();
+        let error = rules(vec![malformed])
+            .resolve_with_availability(&context("a"), &InputAvailability::default())
+            .unwrap_err();
+        assert_eq!(error[0].field, "rules[0].effects");
     }
 
     #[test]

@@ -26,9 +26,7 @@ use eidetic::{Error, Result};
 use kernel::graph::Graph;
 #[cfg(test)]
 use kernel::graph::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
-use kernel::persistence::GraphSnapshot;
-#[cfg(test)]
-use kernel::persistence::PersistedEdge;
+use kernel::persistence::{GraphSnapshot, PersistedEdge};
 
 use crate::merge_rules::{edge_signature, layer_resource_record, layer_surface};
 
@@ -100,6 +98,56 @@ fn canonical_assertion_columns(snapshot: &GraphSnapshot) -> Result<GraphSnapshot
     Ok(normalized)
 }
 
+/// Remove only cross-input copies of the exact same held assertion. Each
+/// source has already been validated independently, so a repeated handle
+/// within either input remains an error. A handle with a different owner or
+/// payload stays present and is rejected by the merged snapshot validation.
+fn remove_identical_assertion_overlaps(held: &[PersistedEdge], incoming: &mut Vec<PersistedEdge>) {
+    let mut assertions = HashMap::new();
+    let exact_edges: HashSet<_> = held.iter().map(edge_signature).collect();
+    for edge in held {
+        for statement in edge.retained_assertions() {
+            assertions.insert(
+                statement.statement_id.clone(),
+                (
+                    edge.from_node_id.clone(),
+                    edge.to_node_id.clone(),
+                    statement.clone(),
+                ),
+            );
+        }
+    }
+    incoming.retain_mut(|edge| {
+        if exact_edges.contains(&edge_signature(edge)) {
+            // Leave full edge copies intact so the ordinary edge union records
+            // them as deduped rather than as newly introduced empty buckets.
+            return true;
+        }
+        let from = edge.from_node_id.clone();
+        let to = edge.to_node_id.clone();
+        let before = edge.retained_assertions().len();
+        if let Some(statements) = edge.assertions.as_mut() {
+            statements.retain(|statement| {
+                !matches!(
+                    assertions.get(&statement.statement_id),
+                    Some((held_from, held_to, held_statement))
+                        if *held_from == from && *held_to == to && *held_statement == *statement
+                )
+            });
+        }
+        let remaining = edge.retained_assertions().len();
+        let sidecar = edge.traversal.is_some()
+            || edge.containment.is_some()
+            || edge.arrangement.is_some()
+            || edge.imported.is_some()
+            || edge.provenance.is_some()
+            || edge.has_legacy_assertion_data();
+        // Keep pre-existing empty buckets. Drop a bucket only when overlap
+        // removal made it empty and it carries no other sidecar data.
+        !(before > remaining && remaining == 0 && !sidecar)
+    });
+}
+
 /// What [`merge_snapshots`] did, for the Athanor proposal / diagnostics. Never a
 /// placebo: every count reflects a real change to the merged snapshot.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -147,7 +195,15 @@ pub(crate) fn merge_snapshots_with_remap(
     b: &GraphSnapshot,
 ) -> Result<(GraphSnapshot, MergeReport, HashMap<String, String>)> {
     let a = canonical_assertion_columns(a)?;
-    let b = canonical_assertion_columns(b)?;
+    let mut b = canonical_assertion_columns(b)?;
+    let held_edge_signatures: HashSet<_> = a.edges.iter().map(edge_signature).collect();
+    remove_identical_assertion_overlaps(&a.edges, &mut b.edges);
+    remove_identical_assertion_overlaps(&a.resource_edges, &mut b.resource_edges);
+    // Removing the last assertion can leave its old family tag on a retained
+    // traversal or other sidecar. Normalize before comparing edge signatures,
+    // so repeating the same import cannot append that sidecar again.
+    b = canonical_assertion_columns(&b)?;
+    let incoming_edge_signatures: HashSet<_> = b.edges.iter().map(edge_signature).collect();
     let mut report = MergeReport::default();
     let mut merged = a.clone();
     // A retained schema-0 orphan is opaque compatibility data. Keep the
@@ -253,6 +309,19 @@ pub(crate) fn merge_snapshots_with_remap(
             merged.shown_resources.push(shown.clone());
         }
     }
+    // Compose can collect two assertion rows with disjoint handles on separate
+    // records for the same owner. Canonicalize the active columns once so the
+    // returned snapshot is already a fixed point for the next composition.
+    // This helper also carries schema-0 orphans and empty Surface buckets.
+    merged = canonical_assertion_columns(&merged)?;
+    report.added_edges = merged
+        .edges
+        .iter()
+        .filter(|edge| !held_edge_signatures.contains(&edge_signature(edge)))
+        .count();
+    report.deduped_edges = incoming_edge_signatures
+        .intersection(&held_edge_signatures)
+        .count();
     check_assertion_handles(&merged)?;
     Graph::try_from_snapshot(&merged)
         .map_err(|error| Error::new(format!("invalid composed resources: {error}")))?;
@@ -367,11 +436,11 @@ mod tests {
     fn dedups_a_relation_asserted_in_both() {
         let mut a = snap(&["https://x", "https://y"]);
         let (ax, ay) = (a.nodes[0].node_id.clone(), a.nodes[1].node_id.clone());
-        a.edges.push(edge(&ax, &ay));
+        a.edges.push(assertion(&ax, &ay, "surface-held"));
         let mut b = a.clone();
         b.edges.clear();
         let (bx, by) = (b.nodes[0].node_id.clone(), b.nodes[1].node_id.clone());
-        b.edges.push(edge(&bx, &by));
+        b.edges.push(assertion(&bx, &by, "surface-held"));
 
         let (merged, report) = merge_snapshots(&a, &b);
         assert_eq!(
@@ -889,6 +958,169 @@ mod tests {
         );
         assert_eq!(identical.shown_resources.len(), 1);
         assert!(Graph::try_from_snapshot(&merged).is_ok());
+    }
+
+    #[test]
+    fn identical_cross_input_assertion_overlap_is_idempotent_while_new_rows_survive() {
+        let from_iri = "https://from.test/item";
+        let to_iri = "https://to.test/item";
+        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        let mut a = snap(&[]);
+        a.resources = vec![
+            resource_record(from_iri, "test.owner", "\"from\""),
+            resource_record(to_iri, "test.owner", "\"to\""),
+        ];
+        a.resource_edges = vec![assertion(&from, &to, "held-handle")];
+        let mut b = a.clone();
+        let mut incoming = assertion(&from, &to, "held-handle");
+        let mut new_statement = incoming.retained_assertions()[0].clone();
+        new_statement.statement_id = "new-handle".into();
+        new_statement.label = Some("second assertion".into());
+        incoming
+            .assertions
+            .as_mut()
+            .expect("canonical assertion vector")
+            .push(new_statement.clone());
+        // The row differs from A because it also carries new held truth. Its
+        // already-present assertion is removed while the distinct row remains.
+        b.resource_edges = vec![incoming];
+
+        let (merged, _) = try_merge_snapshots(&a, &b).unwrap();
+        let statements: Vec<_> = merged
+            .resource_edges
+            .iter()
+            .flat_map(|edge| edge.retained_assertions())
+            .collect();
+        assert_eq!(
+            statements
+                .iter()
+                .map(|statement| statement.statement_id.as_str())
+                .collect::<HashSet<_>>(),
+            HashSet::from(["held-handle", "new-handle"])
+        );
+        assert_eq!(statements.len(), 2, "identical overlap appears once");
+        assert!(Graph::try_from_snapshot(&merged).is_ok());
+        let (repeated, report) = try_merge_snapshots(&merged, &b).unwrap();
+        assert_eq!(
+            repeated
+                .resource_edges
+                .iter()
+                .flat_map(|edge| edge.retained_assertions())
+                .count(),
+            2,
+            "repeating the same composition does not multiply held assertions"
+        );
+        assert_eq!(
+            serde_json::to_value(&repeated).unwrap(),
+            serde_json::to_value(&merged).unwrap(),
+            "repeat composition is snapshot-idempotent"
+        );
+        assert_eq!(report, MergeReport::default());
+
+        let mut surface_a = snap(&["https://surface.test/a", "https://surface.test/b"]);
+        let surface_from = surface_a.nodes[0].node_id.clone();
+        let surface_to = surface_a.nodes[1].node_id.clone();
+        surface_a.edges = vec![assertion(&surface_from, &surface_to, "surface-held")];
+        let mut surface_b = surface_a.clone();
+        let mut traversal_overlap = assertion(&surface_from, &surface_to, "surface-held");
+        traversal_overlap
+            .families
+            .push(kernel::persistence::PersistedEdgeFamily::Traversal);
+        traversal_overlap.traversal = Some(Default::default());
+        surface_b.edges = vec![traversal_overlap];
+        let (sidecar_merge, sidecar_report) = try_merge_snapshots(&surface_a, &surface_b).unwrap();
+        assert_eq!(
+            sidecar_report.added_edges, 1,
+            "the new traversal sidecar is retained"
+        );
+        assert!(
+            sidecar_merge
+                .edges
+                .iter()
+                .any(|edge| edge.traversal.is_some())
+        );
+        assert_eq!(
+            sidecar_merge
+                .edges
+                .iter()
+                .flat_map(|edge| edge.retained_assertions())
+                .filter(|statement| statement.statement_id == "surface-held")
+                .count(),
+            1,
+            "the repeated assertion is removed while the traversal sidecar survives"
+        );
+        let (sidecar_repeat, repeat_report) =
+            try_merge_snapshots(&sidecar_merge, &surface_b).unwrap();
+        assert_eq!(
+            serde_json::to_value(&sidecar_repeat).unwrap(),
+            serde_json::to_value(&sidecar_merge).unwrap()
+        );
+        assert_eq!(repeat_report.added_edges, 0);
+        assert_eq!(repeat_report.deduped_edges, 1);
+    }
+
+    #[test]
+    fn duplicate_handles_inside_either_input_and_cross_input_identity_conflicts_refuse() {
+        let from_iri = "https://from.test/item";
+        let to_iri = "https://to.test/item";
+        let other_iri = "https://other.test/item";
+        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        let other = chartulary::resource_id_from_canonical_iri(other_iri).to_string();
+        let mut valid = snap(&[]);
+        valid.resources = vec![
+            resource_record(from_iri, "test.owner", "\"from\""),
+            resource_record(to_iri, "test.owner", "\"to\""),
+            resource_record(other_iri, "test.owner", "\"other\""),
+        ];
+        valid.resource_edges = vec![assertion(&from, &to, "shared-handle")];
+        let empty = snap(&[]);
+        assert!(try_merge_snapshots(&valid, &empty).is_ok());
+        assert!(try_merge_snapshots(&empty, &valid).is_ok());
+
+        let mut duplicate_a = valid.clone();
+        let duplicate = duplicate_a.resource_edges[0].clone();
+        duplicate_a.resource_edges.push(duplicate);
+        assert!(try_merge_snapshots(&duplicate_a, &empty).is_err());
+        let mut duplicate_b = valid.clone();
+        let duplicate = duplicate_b.resource_edges[0].clone();
+        duplicate_b.resource_edges.push(duplicate);
+        assert!(try_merge_snapshots(&empty, &duplicate_b).is_err());
+
+        let mut owner_conflict = valid.clone();
+        owner_conflict.resource_edges[0].from_node_id = other;
+        assert!(
+            try_merge_snapshots(&valid, &owner_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
+
+        let mut payload_conflict = valid.clone();
+        let conflicting_statement =
+            &mut payload_conflict.resource_edges[0].retained_assertions_mut()[0];
+        conflicting_statement.label = Some("different payload".into());
+        conflicting_statement.basis.note = Some("different payload".into());
+        assert!(
+            try_merge_snapshots(&valid, &payload_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
+
+        let mut stratum_conflict = snap(&["https://surface.test/a", "https://surface.test/b"]);
+        stratum_conflict.edges = vec![assertion(
+            &stratum_conflict.nodes[0].node_id,
+            &stratum_conflict.nodes[1].node_id,
+            "shared-handle",
+        )];
+        assert!(
+            try_merge_snapshots(&valid, &stratum_conflict)
+                .unwrap_err()
+                .to_string()
+                .contains("shared-handle")
+        );
     }
 
     #[test]

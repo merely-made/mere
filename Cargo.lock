@@ -4930,6 +4930,8 @@ dependencies = [
  "tempfile",
  "tokio",
  "uuid",
+ "windows",
+ "windows-future",
  "windows-sys 0.59.0",
  "zeroize",
 ]
@@ -7265,7 +7267,6 @@ version = "0.0.2"
 dependencies = [
  "accesskit 0.25.1",
  "async-trait",
- "backstep",
  "base64 0.22.1",
  "blake3",
  "cambium",
@@ -10388,6 +10389,7 @@ dependencies = [
  "tempfile",
  "tokio",
  "url",
+ "uuid",
  "wgpu",
 ]
 
@@ -10624,6 +10626,7 @@ dependencies = [
  "netrender",
  "pictograph",
  "platen",
+ "scenograph",
  "serde_json",
  "sprigging",
  "taproot",
@@ -15982,6 +15985,7 @@ dependencies = [
 name = "scenograph"
 version = "0.0.5"
 dependencies = [
+ "backstep",
  "mere-curation",
  "sceno",
  "script-engine-api",

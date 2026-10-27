@@ -12,7 +12,9 @@
 //! list. A principal matched only by the desktop user's uid or SID is an
 //! ordinary same-user requester: loading refuses an unattended signing or
 //! release grant for it unless the configuration declares development mode,
-//! which every status then reports.
+//! which every status then reports. The one same-user consent channel is
+//! Windows' pinned helper image ([`Matcher::WindowsImage`]), which may hold a
+//! status grant and nothing else.
 
 use custody_wire::Peer;
 use serde::Deserialize;
@@ -95,11 +97,14 @@ pub enum Matcher {
     UnixUid(u32),
     WindowsSid(String),
     /// A process of `sid` whose main executable is `image`: the installed
-    /// consent helper on Windows, where the installer leaves the executable
-    /// writable only by administrators. Another process of the same user
-    /// can still attach to it or start it under its own environment, so
-    /// this is the same-user posture of a polkit authentication agent, not
-    /// an OS-held identity; the plan records it as such.
+    /// consent helper on Windows (`djinn-custodian consent`, run in the
+    /// owner's session), where the installer leaves the executable writable
+    /// only by administrators. Another process of the same user can still
+    /// attach to it or start it under its own environment, so this is the
+    /// same-user posture of a polkit authentication agent, not an OS-held
+    /// identity; the plan records it as such. As the consent channel it may
+    /// hold a status grant only, and it must be listed before the account's
+    /// own rule, since the first matching rule wins.
     WindowsImage { sid: String, image: String },
     Signed { team: String, identifier: String },
 }
@@ -415,6 +420,12 @@ impl Config {
             if rule.consent_channel && same_user && !pinned {
                 return Err(PolicyError(format!(
                     "{}: the desktop account cannot be the trusted consent channel; any of its processes would match",
+                    rule.name
+                )));
+            }
+            if rule.consent_channel && same_user && rule.grants.iter().any(|grant| !matches!(grant, Grant::Status)) {
+                return Err(PolicyError(format!(
+                    "{}: a consent channel pinned to the desktop account's executable may hold only a status grant",
                     rule.name
                 )));
             }

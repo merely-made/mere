@@ -42,6 +42,9 @@ pub mod query_editor;
 #[cfg(feature = "workbench-editor")]
 pub mod workbench_editor;
 
+#[cfg(feature = "presentation-editor")]
+pub mod presentation_editor;
+
 mod folds;
 pub use folds::fold_node_key;
 mod layout;
