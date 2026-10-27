@@ -42,7 +42,7 @@ use kernel::graph::{
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
-use muniment::{Backend, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
+use muniment::{Backend, Hash, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
@@ -315,11 +315,17 @@ struct Checkpoint {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     translated_receipt_digest: Option<String>,
     /// The muniment digest (hex) of the journal's first `cursor` entries: what
-    /// ties the checkpoint to the journal it was written beside. Absent from
-    /// checkpoints written before it existed; those name no journal, so open
-    /// ignores them and replays in full.
+    /// ties the checkpoint to the journal it was written beside.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     journal_digest: Option<String>,
+    /// The muniment hash (hex) of the stored bytes of `graph.json` and
+    /// `facets.json` as this checkpoint wrote them: what ties the checkpoint to
+    /// the files it summarizes with. Open reads a checkpoint only if it names
+    /// both; one that names neither, or that the journal or the files no longer
+    /// match, is a cache the journal outranks and is replayed past. (A session
+    /// with a retained translation compares the files with it instead.)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    contents_digest: Option<String>,
 }
 
 /// The digest a checkpoint at `cursor` stores for `journal`.
@@ -328,6 +334,66 @@ fn journal_digest(journal: &GraphJournal, cursor: Seq) -> Result<Option<String>,
         .log()
         .prefix_digest(cursor.index())?
         .map(|digest| digest.to_hex()))
+}
+
+/// The hash a checkpoint stores for the bytes of its graph and facets files.
+fn contents_digest(graph: &[u8], facets: &[u8]) -> String {
+    let mut framed = Vec::with_capacity(graph.len() + facets.len() + 16);
+    for bytes in [graph, facets] {
+        framed.extend((bytes.len() as u64).to_le_bytes());
+        framed.extend(bytes);
+    }
+    Hash::of(&framed).to_hex()
+}
+
+/// The three records of a checkpoint at `cursor`: the graph, its facets, and the
+/// record naming the journal prefix and the exact bytes of the other two.
+fn checkpoint_ops(
+    keys: &Keys,
+    graph: &Graph,
+    journal: &GraphJournal,
+    cursor: Seq,
+    translated_receipt_digest: Option<String>,
+) -> Result<[WriteOp; 3], SessionError> {
+    let graph_bytes = pretty_bytes(&graph.to_snapshot())?;
+    let facets_bytes = pretty_bytes(graph.facets())?;
+    let record = Checkpoint {
+        cursor,
+        translated_receipt_digest,
+        journal_digest: journal_digest(journal, cursor)?,
+        contents_digest: Some(contents_digest(&graph_bytes, &facets_bytes)),
+    };
+    Ok([
+        WriteOp::Put {
+            key: keys.at(GRAPH),
+            value: graph_bytes,
+        },
+        WriteOp::Put {
+            key: keys.at(NODE_FACETS_FILE),
+            value: facets_bytes,
+        },
+        pretty(keys.at(CHECKPOINT), &record)?,
+    ])
+}
+
+/// Whether the stored graph and facets files are the ones `checkpoint` wrote.
+async fn stored_contents_match<B: Backend>(
+    slots: &JsonSlots<B>,
+    keys: &Keys,
+    checkpoint: &Checkpoint,
+) -> Result<bool, SessionError> {
+    let Some(expected) = &checkpoint.contents_digest else {
+        return Ok(false);
+    };
+    let Some(graph) = slots.backend().get(&keys.at(GRAPH)).await? else {
+        return Ok(false);
+    };
+    let facets = slots
+        .backend()
+        .get(&keys.at(NODE_FACETS_FILE))
+        .await?
+        .unwrap_or_default();
+    Ok(contents_digest(&graph, &facets) == *expected)
 }
 
 #[derive(Clone, Default)]
@@ -358,10 +424,15 @@ impl Keys {
     }
 }
 
+fn pretty_bytes<T: Serialize>(value: &T) -> Result<Vec<u8>, SessionError> {
+    Ok(serde_json::to_vec_pretty(value).map_err(|error| StoreError::Codec(error.to_string()))?)
+}
+
 fn pretty<T: Serialize>(key: String, value: &T) -> Result<WriteOp, SessionError> {
-    let value =
-        serde_json::to_vec_pretty(value).map_err(|error| StoreError::Codec(error.to_string()))?;
-    Ok(WriteOp::Put { key, value })
+    Ok(WriteOp::Put {
+        key,
+        value: pretty_bytes(value)?,
+    })
 }
 
 async fn read<B: Backend, T: DeserializeOwned>(
@@ -783,25 +854,33 @@ impl<B: Backend> GraphSession<B> {
         }
 
         let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
-        let (mut graph, checkpointed) = match checkpoint {
+        // A checkpoint is read only beside the journal prefix and the files it
+        // names. Any other is a cache the journal outranks: it is replayed past,
+        // and the next checkpoint names what it was written with. A session with
+        // a retained translation compares its checkpoint with that translation
+        // below instead, and refuses a difference.
+        let checkpoint = match checkpoint {
             Some(checkpoint)
                 if checkpoint.cursor <= live
                     && checkpoint.journal_digest.is_some()
+                    && journal_digest(&journal, checkpoint.cursor)?
+                        == checkpoint.journal_digest
+                    && (translation.is_some()
+                        || stored_contents_match(&slots, &keys, &checkpoint).await?) =>
+            {
+                Some(checkpoint)
+            },
+            _ => None,
+        };
+        let (mut graph, checkpointed) = match checkpoint {
+            Some(checkpoint)
+                if checkpoint.cursor <= live
                     && translation.as_ref().is_none_or(|receipt| {
                         checkpoint.cursor >= receipt.placement.cutoff()
                             && checkpoint.translated_receipt_digest.as_deref()
                                 == Some(receipt.translation_digest.as_str())
                     }) =>
             {
-                if journal_digest(&journal, checkpoint.cursor)? != checkpoint.journal_digest {
-                    return Err(SessionError::Corrupt(format!(
-                        "{}: checkpoint at {} does not match the first {} entries of {}",
-                        keys.at(CHECKPOINT),
-                        checkpoint.cursor.0,
-                        checkpoint.cursor.0,
-                        keys.at(JOURNAL),
-                    )));
-                }
                 let snapshot: GraphSnapshot = read(&slots, &keys.at(GRAPH))
                     .await?
                     .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
@@ -1064,21 +1143,18 @@ impl<B: Backend> GraphSession<B> {
             .graph_at(self.journal.entries(), live)
             .map_err(SessionError::Corrupt)?
             .expect("cutoff validated against live journal");
-        let ops = [
+        let mut ops = vec![
             pretty(self.keys.at(PLACEMENT), &placement)?,
             pretty(self.keys.at(TRANSLATION), &receipt)?,
-            pretty(self.keys.at(GRAPH), &graph.to_snapshot())?,
-            pretty(self.keys.at(NODE_FACETS_FILE), graph.facets())?,
-            pretty(
-                self.keys.at(CHECKPOINT),
-                &Checkpoint {
-                    cursor: live,
-                    translated_receipt_digest: Some(receipt.translation_digest.clone()),
-                    journal_digest: journal_digest(&self.journal, live)?,
-                },
-            )?,
         ];
-        self.commit_translation(retained, ops.to_vec()).await?;
+        ops.extend(checkpoint_ops(
+            &self.keys,
+            &graph,
+            &self.journal,
+            live,
+            Some(receipt.translation_digest.clone()),
+        )?);
+        self.commit_translation(retained, ops).await?;
         graph.copy_semantic_context_from(&self.graph);
         record_into(&mut graph, &self.pending);
         self.graph = graph;
@@ -1428,21 +1504,15 @@ impl<B: Backend> GraphSession<B> {
             || journal.0 - self.checkpointed.0 >= self.checkpoint_interval)
             .then_some(journal);
         if checkpoint.is_some() {
-            ops.extend([
-                pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
-                pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
-                pretty(
-                    self.keys.at(CHECKPOINT),
-                    &Checkpoint {
-                        cursor: journal,
-                        translated_receipt_digest: self
-                            .translation
-                            .as_ref()
-                            .map(|receipt| receipt.translation_digest.clone()),
-                        journal_digest: journal_digest(&self.journal, journal)?,
-                    },
-                )?,
-            ]);
+            ops.extend(checkpoint_ops(
+                &self.keys,
+                &self.graph,
+                &self.journal,
+                journal,
+                self.translation
+                    .as_ref()
+                    .map(|receipt| receipt.translation_digest.clone()),
+            )?);
         }
         for (source, mark) in &self.merge_marks {
             let key = Keys::new(*source).at(MERGED);
@@ -2738,6 +2808,7 @@ mod tests {
                         cursor: session.journal().live_cursor(),
                         translated_receipt_digest: None,
                         journal_digest: None,
+                        contents_digest: None,
                     },
                 )
                 .unwrap()])
@@ -4074,25 +4145,26 @@ mod tests {
                 graph: snapshot,
                 facets: NodeFacetStore::default(),
             };
+            // The checkpoint record a writer would leave beside `graph` bytes.
+            let record = |graph: &[u8]| {
+                pretty(
+                    keys.at(CHECKPOINT),
+                    &Checkpoint {
+                        cursor: Seq(0),
+                        translated_receipt_digest: None,
+                        journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                        contents_digest: Some(contents_digest(graph, b"")),
+                    },
+                )
+                .unwrap()
+            };
             for column in [BASELINE, GRAPH] {
                 for conflict in [false, true] {
                     store
                         .apply(&[
                             pretty(keys.at(BASELINE), &baseline(valid.clone())).unwrap(),
                             pretty(keys.at(GRAPH), &valid).unwrap(),
-                            pretty(
-                                keys.at(CHECKPOINT),
-                                &Checkpoint {
-                                    cursor: Seq(0),
-                                    translated_receipt_digest: None,
-                                    journal_digest: journal_digest(
-                                        &GraphJournal::default(),
-                                        Seq(0),
-                                    )
-                                    .unwrap(),
-                                },
-                            )
-                            .unwrap(),
+                            record(&pretty_bytes(&valid).unwrap()),
                         ])
                         .await
                         .unwrap();
@@ -4113,6 +4185,14 @@ mod tests {
                         pretty(keys.at(column), &invalid).unwrap()
                     };
                     store.apply(&[op.clone()]).await.unwrap();
+                    if column == GRAPH {
+                        // Written consistently, as a faulty writer would: the
+                        // checkpoint names these bytes, so they are validated.
+                        store
+                            .apply(&[record(&pretty_bytes(&invalid).unwrap())])
+                            .await
+                            .unwrap();
+                    }
                     match GraphSession::open(store.clone(), id).await {
                         Err(SessionError::Corrupt(error)) => {
                             assert!(error.contains(&keys.at(column)));
@@ -4150,6 +4230,7 @@ mod tests {
                 .apply(&[
                     pretty(keys.at(BASELINE), &baseline(legacy.clone())).unwrap(),
                     pretty(keys.at(GRAPH), &legacy).unwrap(),
+                    record(&pretty_bytes(&legacy).unwrap()),
                 ])
                 .await
                 .unwrap();

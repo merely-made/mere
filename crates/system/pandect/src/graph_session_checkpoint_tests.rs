@@ -65,7 +65,7 @@ async fn put(backend: &MemoryBackend, id: SessionId, name: &str, value: Vec<u8>)
 }
 
 #[test]
-fn a_checkpoint_names_the_journal_prefix_it_reflects_and_opens_beside_it() {
+fn a_checkpoint_names_the_journal_prefix_and_the_files_it_reflects_and_opens_beside_them() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
         let sessions = MereSessions::new(backend.clone());
@@ -82,12 +82,17 @@ fn a_checkpoint_names_the_journal_prefix_it_reflects_and_opens_beside_it() {
             .unwrap()
             .unwrap();
         assert_eq!(record["journal_digest"], digest.to_hex());
+        let contents = contents_digest(
+            &stored(&backend, id, GRAPH).await,
+            &stored(&backend, id, NODE_FACETS_FILE).await,
+        );
+        assert_eq!(record["contents_digest"], contents);
         assert_eq!(title_of(&opened), "alpha");
     });
 }
 
 #[test]
-fn a_checkpoint_taken_beside_another_journal_is_refused_as_corrupt() {
+fn a_checkpoint_taken_beside_another_journal_is_replayed_past() {
     pollster::block_on(async {
         let backend = MemoryBackend::new();
         let sessions = MereSessions::new(backend.clone());
@@ -98,14 +103,104 @@ fn a_checkpoint_taken_beside_another_journal_is_refused_as_corrupt() {
             put(&backend, ours, name, stored(&backend, theirs, name).await).await;
         }
 
-        let error = sessions
+        let mut opened = sessions
             .open(ours)
             .await
-            .err()
             .expect("not this journal's checkpoint");
+        assert_eq!(title_of(&opened), "alpha");
+        opened.checkpoint().await.unwrap();
+        assert_eq!(title_of(&sessions.open(ours).await.unwrap()), "alpha");
+    });
+}
+
+#[test]
+fn a_checkpoint_whose_graph_and_facets_were_replaced_is_replayed_past() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let sessions = MereSessions::new(backend.clone());
+        let id = checkpointed(&sessions, "alpha").await;
+        // The audit's probe: only the two files change, the record is the session's own.
+        let mut foreign = Graph::new();
+        add_node(
+            &mut foreign,
+            Some(Uuid::from_u128(999)),
+            "https://foreign.test/".into(),
+            Default::default(),
+        );
+        put(
+            &backend,
+            id,
+            GRAPH,
+            serde_json::to_vec(&foreign.to_snapshot()).unwrap(),
+        )
+        .await;
+        put(
+            &backend,
+            id,
+            NODE_FACETS_FILE,
+            serde_json::to_vec(foreign.facets()).unwrap(),
+        )
+        .await;
+
+        let mut opened = sessions.open(id).await.expect("replayed past, not refused");
+        assert_eq!(title_of(&opened), "alpha");
         assert!(
-            matches!(&error, SessionError::Corrupt(message) if message.contains(CHECKPOINT)),
-            "{error:?}"
+            opened
+                .graph()
+                .get_node_by_id(Uuid::from_u128(999))
+                .is_none()
+        );
+
+        opened.checkpoint().await.unwrap();
+        let reopened = sessions.open(id).await.unwrap();
+        assert_eq!(title_of(&reopened), "alpha");
+        assert!(
+            reopened
+                .graph()
+                .get_node_by_id(Uuid::from_u128(999))
+                .is_none()
+        );
+    });
+}
+
+#[test]
+fn a_checkpoint_naming_no_files_is_replayed_past() {
+    pollster::block_on(async {
+        let backend = MemoryBackend::new();
+        let sessions = MereSessions::new(backend.clone());
+        let id = checkpointed(&sessions, "alpha").await;
+        let mut record: serde_json::Value =
+            serde_json::from_slice(&stored(&backend, id, CHECKPOINT).await).unwrap();
+        record.as_object_mut().unwrap().remove("contents_digest");
+        put(
+            &backend,
+            id,
+            CHECKPOINT,
+            serde_json::to_vec(&record).unwrap(),
+        )
+        .await;
+        let mut foreign = Graph::new();
+        add_node(
+            &mut foreign,
+            Some(Uuid::from_u128(999)),
+            "https://foreign.test/".into(),
+            Default::default(),
+        );
+        put(
+            &backend,
+            id,
+            GRAPH,
+            serde_json::to_vec(&foreign.to_snapshot()).unwrap(),
+        )
+        .await;
+
+        let opened = sessions.open(id).await.unwrap();
+        assert_eq!(title_of(&opened), "alpha");
+        assert!(
+            opened
+                .graph()
+                .get_node_by_id(Uuid::from_u128(999))
+                .is_none()
         );
     });
 }
