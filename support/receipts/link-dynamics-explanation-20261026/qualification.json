@@ -536,6 +536,14 @@
       }
     ],
     "root_lock_sha256": "ecff81e260a5c726d0ac78be1fea1b91d6d959d0f7fcc40346b7d20ae4f64a84",
-    "feature_manifest_and_lock_delta": []
+    "feature_manifest_and_lock_delta": [],
+    "final_example_only_tail": {
+      "upstream": "435d976c5",
+      "changed_paths": [
+        "ports/tabard/workshop/examples/shared_recovery/main.rs",
+        "design_docs/mere_docs/implementation_strategy/2026-10-20_ownership_repair_plan.md"
+      ],
+      "qualified_product_source_dependency_and_document_inputs_unchanged": true
+    }
   }
 }
