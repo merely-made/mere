@@ -324,3 +324,7 @@ words are under each, unnumbered until he numbers them:
   (477 before), Pandect lib suite 340/340. Forks recorded in §5: Q010, Q017, Q031, Q016's edge
   replays. Q014 stays re-document only; Q001 to Q003 and Q019 wait on an eidetic branch.
   Receipt: `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.
+- 2026-10-26 (L1, Q017 closed by removal): the kernel's `store` feature and module are gone per
+  Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
+  three paths). The two reopen integration tests that were gated on the feature now run against
+  a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
