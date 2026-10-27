@@ -647,6 +647,79 @@ fn items<'a>(
         })
 }
 
+/// Active instances whose cards are required by this route projection.
+/// Graph cards are selected only when the caller requests Complete material.
+pub(crate) fn required_card_instances(
+    snapshot: &ProjectionSnapshot,
+    include_graph: bool,
+) -> Vec<InstanceId> {
+    snapshot
+        .scene
+        .active_items_in_order()
+        .into_iter()
+        .filter_map(|(instance, item)| {
+            let source = snapshot
+                .scene
+                .tables
+                .sources
+                .get(item.source.0 as usize)?
+                .as_ref()?;
+            let required = match snapshot.session.0.as_str() {
+                MERE_SESSIONS => matches!(source.adapter.as_str(), SESSIONS_SOURCE | MERGE_SOURCE),
+                MERE_ARCHIVE => source.adapter == ARCHIVE_SOURCE,
+                MERE_GRAPH if include_graph => matches!(
+                    source.adapter.as_str(),
+                    SESSION_ITEM_SOURCE | MERE_GRAPH_ADAPTER
+                ),
+                _ => false,
+            };
+            required.then_some(instance)
+        })
+        .collect()
+}
+
+/// The required card's unique binding and first PortableCard offer.
+/// Keep the historical materialization diagnostics and first-offer rule.
+pub(crate) fn card_hash(
+    snapshot: &ProjectionSnapshot,
+    instance: InstanceId,
+) -> Result<ContentHash, String> {
+    let mut bindings = snapshot
+        .presentation
+        .bindings
+        .iter()
+        .filter(|binding| binding.instance == instance);
+    let binding = bindings.next().ok_or("Missing material card binding.")?;
+    if bindings.next().is_some() {
+        return Err("Duplicate material card binding.".into());
+    }
+    let offer = snapshot
+        .presentation
+        .offers
+        .get(&binding.key)
+        .and_then(|offers| offers.first())
+        .ok_or("Missing material card offer.")?;
+    if offer.codec != chirograph::PresentationCodec::PortableCardV1
+        || offer.requires != chirograph::PresentationCapability::PortableCard
+    {
+        return Err(
+            "The mere reading requires an advertised portable card codec and capability.".into(),
+        );
+    }
+    Ok(offer.resource)
+}
+
+/// Check required card offer completeness without fetching resources.
+pub(crate) fn validate_required_cards(
+    snapshot: &ProjectionSnapshot,
+    include_graph: bool,
+) -> Result<(), String> {
+    for instance in required_card_instances(snapshot, include_graph) {
+        card_hash(snapshot, instance)?;
+    }
+    Ok(())
+}
+
 fn offer(snapshot: &ProjectionSnapshot, instance: InstanceId) -> Option<&PresentationOffer> {
     let binding = snapshot
         .presentation

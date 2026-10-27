@@ -149,69 +149,22 @@ fn source_of(snapshot: &ProjectionSnapshot, instance: InstanceId) -> Option<&sce
         .as_ref()
 }
 
-fn card_hash(snapshot: &ProjectionSnapshot, instance: InstanceId) -> Result<ContentHash, String> {
-    let mut bindings = snapshot
-        .presentation
-        .bindings
-        .iter()
-        .filter(|binding| binding.instance == instance);
-    let binding = bindings.next().ok_or("Missing material card binding.")?;
-    if bindings.next().is_some() {
-        return Err("Duplicate material card binding.".into());
-    }
-    let offer = snapshot
-        .presentation
-        .offers
-        .get(&binding.key)
-        .and_then(|offers| offers.first())
-        .ok_or("Missing material card offer.")?;
-    if offer.codec != chirograph::PresentationCodec::PortableCardV1
-        || offer.requires != chirograph::PresentationCapability::PortableCard
-    {
-        return Err(
-            "The mere reading requires an advertised portable card codec and capability.".into(),
-        );
-    }
-    Ok(offer.resource)
-}
-
 async fn cards(
     source: &mut impl MaterializationSource,
     snapshot: &ProjectionSnapshot,
     result: &mut HashMap<ContentHash, Vec<u8>>,
 ) -> Result<(), String> {
-    // Required cards come from the projection's active source items, not its
-    // possibly incomplete presentation sidecar. Keep checking other advertised
-    // bindings too, as before. This function is never called for graph cards
-    // during ProjectionOnly reads.
-    let mut instances: Vec<_> = snapshot
-        .scene
-        .active_items_in_order()
-        .into_iter()
-        .filter_map(|(instance, _)| {
-            let source = source_of(snapshot, instance)?;
-            let required = match snapshot.session.0.as_str() {
-                wire::MERE_SESSIONS => matches!(
-                    source.adapter.as_str(),
-                    wire::SESSIONS_SOURCE | wire::MERGE_SOURCE
-                ),
-                wire::MERE_ARCHIVE => source.adapter == wire::ARCHIVE_SOURCE,
-                wire::MERE_GRAPH => matches!(
-                    source.adapter.as_str(),
-                    wire::SESSION_ITEM_SOURCE | cartography::MERE_GRAPH_ADAPTER
-                ),
-                _ => false,
-            };
-            required.then_some(instance)
-        })
-        .collect();
+    // Required cards come from active source items, not the possibly
+    // incomplete presentation sidecar. Graph cards are fetched only for a
+    // Complete read. Keep checking every other advertised binding too.
+    let mut instances = route::required_card_instances(snapshot, true);
     for binding in &snapshot.presentation.bindings {
         if !instances.contains(&binding.instance) {
             instances.push(binding.instance);
         }
     }
     for instance in instances {
-        let hash = card_hash(snapshot, instance)?;
+        let hash = route::card_hash(snapshot, instance)?;
         // Fetch in each projection scope, even if another scope offered the same hash.
         let bytes = resource(source, &snapshot.session, hash).await?;
         serde_json::from_slice::<PortableCardV1>(&bytes)
@@ -253,7 +206,7 @@ pub async fn read(
         cards(source, archive, &mut result.cards).await?;
     }
     if let Some(instance) = route::unique_merge_card(&result.sessions)? {
-        let card_hash = card_hash(&result.sessions, instance)?;
+        let card_hash = route::card_hash(&result.sessions, instance)?;
         let bytes = result
             .cards
             .get(&card_hash)
@@ -285,7 +238,7 @@ pub async fn read(
                 uuid::Uuid::parse_str(&attached.id)
                     .map_err(|_| "The material card names no attached session.")?,
             );
-            let card_hash = card_hash(&result.graph, *instance)?;
+            let card_hash = route::card_hash(&result.graph, *instance)?;
             let bytes = result
                 .cards
                 .get(&card_hash)
