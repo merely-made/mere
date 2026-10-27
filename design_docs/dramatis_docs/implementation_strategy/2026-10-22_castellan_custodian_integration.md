@@ -67,5 +67,22 @@ Still gated, recorded in the hardening plan's §6 and §8:
 - the Linux receiving run on the ThinkPad: seccomp allowlist tuning, Landlock ABI, file, ptrace and socket denial, polkit prompts and restart;
 - the signed macOS install and receiving run, including the Keychain envelope;
 - the Windows service, ACL and pipe qualification on o-pc;
-- every other Djinn vault use (H2): Djinn still opens its own vault at start;
+- every other Djinn vault use (H2): done since, in the next section;
 - transactional migration that retires the original vault and its copies.
+
+## H2 consumer migration, 2026-10-26
+
+The custodian now hosts Castellan's resident host (`PersonaeHost`), the wallet, the credential catalog and the SSH agent. Djinn's custody is one trait, `ResidentCustody`. A production build has only its client, `RemoteHost`, and links no castellan. The in-process host survives only under the `in-process-custody` feature, for test suites and receipt hosts, and is never a fallback. The hardening plan's [H2 section](2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration) maps each consumer to its §5.6 operation, and records two things:
+- Hocket adoption is stopped: it needs an identity-format change.
+- The wallet is migrated at the operation level, but its secret files move into custody only after a public/secret file split.
+
+Evidence (macOS, after merging main):
+- `custody-wire` passes 8 tests, and `djinn-custodian` 38 unit tests (9 of them H2) and 4 process tests;
+- Djinn's `custodian_client` (8), `quarantine_review` (16) and `cxf_import` (1) run against a real custodian;
+- the resident end-to-end test `custodian_resident` (run with `--ignored`) passes;
+- the rest of Djinn's suite passes, except the replay case that fails on plain main too;
+- a default Djinn build links no castellan.
+
+Linux and Windows type-check only.
+
+Still gated: the Linux and signed-macOS receiving runs (custodian README), the wallet split, and Windows consent, vault migration and an agent pipe.

@@ -950,6 +950,48 @@ copy of those documents here.
   were never versioned, and this plan and the integration plan keep their
   findings.
 
+- 2026-10-26, H2. The user overrode the H1-only landing: "Go to H2. Tell the
+  session to do the full consumer migration before landing."
+  - Djinn's custody became the `ResidentCustody` trait, with `RemoteHost` as
+    its only production implementation. The resident's start, its CLI and
+    the embedded reservoir reach custody through `open_custody`. A default
+    build links no castellan: `cargo tree -p djinn -e normal -i castellan`
+    prints nothing.
+  - The custodian now hosts `PersonaeHost`, the wallet, the credential
+    catalog and the SSH agent, behind the H2 operations in §6.
+  - Packaging: the `djinn-door` rule, one installed-grant template, and the
+    agent socket in the Linux and macOS units.
+  - Fixed on the way, each with a test:
+    - the custodian's status and `current` grants now follow a profile switch;
+    - an approved per-use SSH petition now signs, and a denied one reaches
+      the waiting client at once;
+    - a lock intent now goes through the lock operation;
+    - every credential store stays bound to its own profile, and CXF imports
+      land in the store claimed at start, as before H2;
+    - `RemoteHost` reads the status on every sync, because an outcome can
+      arrive before its lock fact.
+
+  Evidence on macOS, after merging main:
+  - `custody-wire` 8 tests;
+  - `djinn-custodian` 38 unit tests (9 of them H2) plus 4 process tests;
+  - Djinn's `custodian_client` 8, `quarantine_review` 16 and `cxf_import` 1,
+    each against a real custodian;
+  - the resident end-to-end test `custodian_resident`, run with `--ignored`:
+    a real `djinn` with no vault of its own unlocks and serves from the
+    custodian, `ssh-add` reaches the custodian's agent, a lock and an unlock
+    taken on the custodian reach the resident, and it stops cleanly;
+  - the full requalification after merging main:
+    - the Castellan (306), custodian, wire and testkit suites pass;
+    - Djinn's whole suite passes 336 tests with 20 ignored. The exception is
+      `embedded_reservoir_validation`'s
+      `recorded_situation_and_weather_survive_three_owners_and_refuse_tamper`,
+      which fails the same way on plain main.
+
+  Linux and Windows builds of the custodian type-check. `ring`, which came
+  in with the SSH agent, ran its build script under a stub C compiler for
+  that check, so nothing was linked or run on those OSes. Hocket adoption is stopped, and the wallet's at-rest move is
+  gated (§6 H2).
+
 Documentation verification retains inherited failures rather than calling the
 whole tree clean: the full D2 audit has existing missing judgments and a tracked
 snapshot digest mismatch. The new plan has its own supplemental judgment;
