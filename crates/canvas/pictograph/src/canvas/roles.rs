@@ -91,6 +91,31 @@ impl Default for ArrangementRoles {
     }
 }
 
+impl ArrangementRoles {
+    /// Retain runtime role state only for memberships that survived. Returns
+    /// whether a keyboard move was cancelled, without releasing its old slot.
+    pub(super) fn retain_members(&mut self, keep: impl Fn(&NodeKey) -> bool) -> bool {
+        self.table.items.retain(|key, _| keep(key));
+        self.pinned.retain(&keep);
+        if let Some(settled) = &mut self.settled {
+            settled.retain(|(key, _)| keep(key));
+        }
+        if let Some(ret) = &mut self.stop_return {
+            ret.from.retain(|(key, _)| keep(key));
+            ret.to.retain(|(key, _)| keep(key));
+        }
+        self.rest.retain_members(&keep);
+        let cancelled = self.key_move.is_some_and(|move_| !keep(&move_.node));
+        if cancelled {
+            self.key_move = None;
+        }
+        if self.last_key_move.is_some_and(|move_| !keep(&move_.node)) {
+            self.last_key_move = None;
+        }
+        cancelled
+    }
+}
+
 impl Canvas {
     /// The roles the active arrangement's positions play.
     pub fn arrangement_roles(&self) -> &RoleTable {

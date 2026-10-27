@@ -1,0 +1,24 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "pictograph",
+    "--no-default-features",
+    "--features",
+    "canvas",
+    "--lib",
+    "canvas::tests::cache_lifetimes"
+  ],
+  "cwd": "C:/Users/mark_/Code/worktrees/mere-canvas-caches",
+  "started": "2026-10-26T23:57:17.792384+00:00",
+  "finished": "2026-10-26T23:57:26.095055+00:00",
+  "exit_code": 101,
+  "results": [
+    "error: failed to get `cleromancy-core` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\worktrees\\mere-canvas-caches\\ports\\djinn)`"
+  ],
+  "diagnostic_tail": "error: failed to get `cleromancy-core` as a dependency of package `djinn v0.0.2 (C:\\Users\\mark_\\Code\\worktrees\\mere-canvas-caches\\ports\\djinn)`\n\nCaused by:\n  failed to load source for dependency `cleromancy-core`\n\nCaused by:\n  unable to update https://github.com/merely-made/cleromancy.git?branch=main#ee21cf01\n\nCaused by:\n  can't checkout from 'https://github.com/merely-made/cleromancy.git': you are in the offline mode (--offline)\n",
+  "target": "C:\\t\\cargo-targets\\mere"
+}

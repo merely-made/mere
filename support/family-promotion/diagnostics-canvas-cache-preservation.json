@@ -1,0 +1,32 @@
+{
+  "primary_checkout": "C:\\Users\\mark_\\Code\\repos\\mere",
+  "head_before": "03027fb63040384a4a95f1ba17a4f4b842c47811",
+  "head_unchanged": true,
+  "index_sha256_before": "f8448a71be23e32a997bba8a91a1eb14906e9b463979ce8e547c185daa097200",
+  "index_byte_identical": true,
+  "working_file_sha256": {
+    "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md": "82934da3a346d7b736862016aa04d0344945a07f937985f416b3b1485f1a3da1",
+    "support/doc-audit/d2/batch_103_diagnostics_target_lifetime_receiving.md": "202e8b82bcb2536399ca3cf78d865f52c6764d9f4f234cf3c0bcb35b46fb8063",
+    "support/family-promotion/diagnostics-lifetimes-integrated-browser.json": "d897a4e0686f811f8f28c00a935c35797baf63f34f6b6fa203220209bc4fc21f",
+    "support/family-promotion/diagnostics-lifetimes-integrated-docs.json": "0ea19087451593b1c6036129f0f722313cb550fa22c23b55a36069eec4545c89",
+    "support/family-promotion/diagnostics-lifetimes-integrated-embedding.json": "cf6187834b31afd91a22138a23a6bd1c89bfdcc88542e65d9ff83a13c2df732d",
+    "support/family-promotion/diagnostics-lifetimes-integrated-native-evidence.json": "8cd5043a5147b26d0185b43e94d84576e15f5e736b02f9d31b15da776bf29418",
+    "support/family-promotion/diagnostics-lifetimes-integrated-native.json": "51bb2c51f378c3904f01b90d91461450c47d61c333aa5bf3096c358cb2814173",
+    "support/family-promotion/diagnostics-lifetimes-integrated-qualification.json": "1369a7b76beeec16712962950e1d188d44db49e4ce9381eef86a7961bed52f9c",
+    "support/family-promotion/diagnostics-lifetimes-integrated-source.json": "f047bd11ed2792496eb8b10c523a62175eb4261447433841ea6e3cc78add7876",
+    "support/family-promotion/diagnostics-lifetimes-main-browser.json": "0a8b7db12b89050f2dbb0cba074b58669614796595d8f2b2e8d56f4ce13c2039",
+    "support/family-promotion/diagnostics-lifetimes-main-controls.json": "0604cd6fd3807db170e0f94a88961184534cf7c8adabf957c6f15651f9c04fc1",
+    "support/family-promotion/diagnostics-lifetimes-main-docs.json": "eafdb4e5e3e5a4f5cdb0fbfb663e1a8b2be43146cfe849f69c415c276630b9bb",
+    "support/family-promotion/diagnostics-lifetimes-main-embedding.json": "b40ce8e1247a50631390ae19eb10a45d89891a547b76b503421d4c5f917f58e4",
+    "support/family-promotion/diagnostics-lifetimes-main-qualification.json": "99c2931cfb19959f42fc2f3fe9a3da85c5ebff62babe088c1a44945c027f5ecd",
+    "support/family-promotion/diagnostics-lifetimes-main-source.json": "0430d88b76f42cd6cdd2ac2d995a22b97976b1be9c544b36945dfdeb94208393",
+    "support/family-promotion/diagnostics-lifetimes-main-upstream.json": "1965f5ea865ae928e5a18c4af6038293b87ec000f89fc39d115fb1db91d9a722",
+    "support/family-promotion/diagnostics-ownership-review.json": "373f82c78945fa7f57ec8ee2643573bd237387a29acec3231465c2e0e62a8926"
+  },
+  "status_unchanged": true,
+  "primary_alignment": "Local main retains old rewritten-history lineage and staged WIP. This slice is based on current origin/main; primary main is not reset, rebased or merged with rewritten history.",
+  "target": "C:/t/cargo-targets/mere",
+  "isolated_cargo_home": null,
+  "temporary_checkout": "C:/Users/mark_/Code/worktrees/mere-canvas-caches",
+  "cleanup": "Remove this clean task checkout after commits are pushed and verified on origin/main."
+}

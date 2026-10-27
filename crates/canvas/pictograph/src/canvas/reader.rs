@@ -107,7 +107,7 @@ impl CanvasDescription {
 /// A keyboard move under way: the item, and where the move began.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) struct KeyMove {
-    node: NodeKey,
+    pub(super) node: NodeKey,
     origin: PortablePoint,
 }
 

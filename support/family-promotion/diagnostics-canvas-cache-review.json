@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-26",
+  "basis": "95ea7c7d6",
+  "status": "Implemented; final automated gates in progress",
+  "authority": {
+    "kernel": "SurfaceNodeLifetime remains the sole membership witness allocator; no kernel or durable schema change",
+    "Canvas": "One last-reconciled membership table receives witnesses and retires runtime caches before slot reuse can be observed",
+    "Seiche": "Graph-free explicit retirement command drops only named body lives and their remembered material/kinds; ordinary sync still retains existing bodies",
+    "actor": "Atomic retire-and-sync command plus existing command-epoch barrier rejects pre-retirement layouts; this is runtime protocol evidence"
+  },
+  "fixed": [
+    "Selected nodes, explicit pins, node state/shape, Mosaic, attention/seeds/offers, role items and pinned/settled/at-rest/return state retire by membership rather than endpoint slot presence",
+    "Keyboard/pointer moves are cancelled without sending release or Escape to replacement bodies; historical key-move introspection cannot read a new member",
+    "Local strategy/paused positions, regions, scope slots, link display appearances, fold-history selections and context/pending self-link presses lose retired slots",
+    "UUID-keyed faces/sizes/sprites/hulls/materials retain D1; same-call UUID recreation now prunes the departed overrides before sidecar export",
+    "Strategy graph stamps include membership witnesses; title-only edits and metadata clones preserve cache/action continuity",
+    "Physics replacement drops the old Rapier body generation, pins, velocity, colliders and axis locks, plus remembered material/kinds; unaffected bodies retain their handles",
+    "Explicit graph switches retire runtime lives even for clones, clear old content-affinity/weighted topology and community worker, and reacquire scope choices by UUID rather than old slots",
+    "Affected content-affinity rows retire; installed old affinity forces are removed before replacement bodies can run"
+  ],
+  "preserved_domains": [
+    "Content-addressed decoded image bytes and deterministic address-derived icon bytes are not a membership cache and retain their own cache policy",
+    "Authored exact scope, Fold definitions and Forme cell rosters remain UUID intent. Retiring a runtime hold does not delete that intent; a current Forme application can acquire a new hold for a recreated UUID",
+    "Ordinary edits/metadata clones and unrelated member replacements preserve surviving action IDs, selections, overrides, ongoing moves, layout coordinates and physics bodies",
+    "No source witness is persisted, allocated by reads, treated as an authorization lease or claimed as durable actor completion"
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "Delayed host positions, transitions and content/affinity replies",
+      "gap": "Public position/StopReturn and member-UUID setters do not carry captured membership lives. Local cache pruning and physics epochs cannot revoke a detached host result that is submitted later.",
+      "done_condition": "Trace concrete callers; capture owner/membership provenance at dispatch and validate it at installation, preserving authored UUID intent and current explicit edits."
+    },
+    {
+      "owner": "Shared signal registry and asynchronous model owners",
+      "gap": "ChannelRegistry assumes one graph and uses graph-local revisions. Explicit set_graph resets the registry and community receiver; arbitrary wholesale graph replacement inside ingest with equal revisions is not a shared owner-generation contract. Meaning/community/other models need their own receiving evidence.",
+      "done_condition": "One explicit graph-owner generation and membership-aware input contract through shared registries and asynchronous dispatch/receiving, tested against equal-revision replacement and stale completion."
+    },
+    {
+      "owner": "Link/field/assertion identities and authored curation",
+      "gap": "Stable LinkKey, assertion/Field IDs, Fold definitions, Forme cells and page link offers have source lifetimes beyond surface-node slots. Node membership does not establish their removal/recreation, rollback or durable replay semantics.",
+      "done_condition": "Receive each source owner explicitly; distinguish retained authored intent from live holds and provider replies rather than blanket invalidation."
+    },
+    {
+      "owner": "Kernel transactions and durable materialization",
+      "gap": "Runtime retirement does not make legacy mutation paths durable, atomic or backend-acknowledged; snapshot restoration intentionally starts new runtime lives.",
+      "done_condition": "Finish checked owner transactions, history/substrate intake and backend-reported completion with separate qualification."
+    },
+    {
+      "owner": "Producer, supplier, guest and platform boundaries",
+      "gap": "Custom producer/action reassignment, external supplier promotion/consumer patches, guest namespace/selection ingress, Rootstock full-leaf raster/intrinsic sizing, terminal actor outcomes, headed AT and physical handoff remain separate.",
+      "done_condition": "Continue the existing owner-specific receiving slices and exact consumer/platform gates."
+    }
+  ],
+  "evidence": {
+    "red": "diagnostics-canvas-cache-red-online.json",
+    "initial_offline_dependency_failure": "diagnostics-canvas-cache-red.json",
+    "initial_compile_repair": "diagnostics-canvas-cache-green.json",
+    "focused_controls": "diagnostics-canvas-cache-controls.json",
+    "initial_full_scope_control_failure": "diagnostics-canvas-cache-canvas.json",
+    "final": "diagnostics-canvas-cache-qualification.json"
+  },
+  "retained_byte_cap": 10000000
+}
