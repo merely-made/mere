@@ -587,6 +587,11 @@ standalone desktop port remains the reference consumer. Turnstone, Woodshed,
 Knot editor and Cleromancy are adoption candidates; this change does not claim
 that their independent dependency pins or application settings are migrated.
 
+2026-10-26: Mark moved the package to `ports/tabard/workshop`, beside its
+desktop host, because its reader and stylesheet specimens link the document
+stack and the toolkit directory should not (ownership repair plan, §5). It is
+embedded by workspace path as before.
+
 **Context:** theme derivation and syntax/document/graph previews already use
 Tinct, Illume and the existing document and graph components. The workshop
 lived under a product port, and native title-bar views were assembled locally

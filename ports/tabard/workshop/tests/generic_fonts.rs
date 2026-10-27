@@ -15,13 +15,13 @@ fn ledger() -> Vec<(String, Vec<u8>)> {
         .map(|name| {
             (
                 name.into(),
-                include_bytes!("../../examples/genet_web_smoke/assets/Roboto-Regular.ttf").to_vec(),
+                include_bytes!("../../../../crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf").to_vec(),
             )
         })
         .collect()
 }
 fn actual_fonts(scene: &Scene) {
-    let bytes = include_bytes!("../../examples/genet_web_smoke/assets/Roboto-Regular.ttf");
+    let bytes = include_bytes!("../../../../crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf");
     assert!(
         scene
             .ops

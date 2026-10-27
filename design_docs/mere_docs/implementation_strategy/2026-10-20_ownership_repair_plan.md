@@ -328,3 +328,12 @@ words are under each, unnumbered until he numbers them:
   Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
   three paths). The two reopen integration tests that were gated on the feature now run against
   a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
+- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `crates/cambium/` to
+  `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
+  README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
+  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
+  needs no toolkit carve-out, and it prints rather than refuses a dev-only link from a crate to a
+  port, because the web host's `shared_recovery` wasm example still mounts the workshop. That
+  reading of the one-way rule (examples and tests may mount a product surface; shipped code may
+  not) is a proposal for Mark to confirm or reverse; reversing it means the example moves beside
+  the workshop. Type-check of the workshop with its tests and the Tabard desktop passed.
