@@ -235,6 +235,7 @@ impl Canvas {
                 .map(|&(key, at)| (key, to.get(&key).copied().unwrap_or(at)))
                 .collect();
             self.queue_return(StopReturn {
+                source: super::host_results::LayoutResultSource::capture(self),
                 from: before,
                 to: after,
                 duration_ms: Some(RESET_EASE_MS),

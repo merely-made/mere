@@ -5,8 +5,12 @@
 catalogs cover, what a complete catalog would have to add, and the loops a
 catalog has to close. No ruling, no code, no work assigned. Amended the same
 day with §6, where the catalogs disagree with each other and with the tree,
-§7, Mark's rulings 1 to 5 on them, and §8, his refinement of rulings 1 and 3:
-a frame hosts one presentation, and what a mod contributes is a catalog axis.
+§7, Mark's rulings 1 to 5 on them, §8, his refinement of rulings 1 and 3: a
+frame hosts one presentation, and what a mod contributes is a catalog axis, and
+§9, his rulings 6 to 8 on the cues §8 left: a typed `contributes` list, a misfin
+address opens its Comms conversation, and inker defines the embedded-application
+declaration that a manifest carries. The §9 code landed 2026-10-27, read at
+`10fe98b50`; §9 closes with what it leaves.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -457,4 +461,127 @@ sense.
 for the four kinds. Misfin's double registration has no rule for which opens.
 An embedded application's declaration (what it presents, what it exposes as
 resource leaves and clips, what it accepts back, how it reaches the screen)
-lives in three places.
+lives in three places. Ruled the same day in §9.
+
+## 9. Rulings 6 to 8: the cues §8 left
+
+Mark ruled 6 to 8 on 2026-10-26, each a choice among offered options, with the
+evidence read from the tree at `8d69c9144` the same day and kept under each
+ruling as §7 does.
+
+6. **A mod's contributions. Ruled: a typed `contributes` list.** Evidence:
+   `ModManifest::provides` (`crates/system/registry/src/mod_loader/loader/types.rs`)
+   is a list of strings read for dependency order (`resolve_mod_load_order`),
+   `is_capability_available` and `active_capability_ids`, and nothing else.
+   The seven built-in manifests in `registry_default.rs` put two vocabularies
+   in it: registry names that other mods require (`ProtocolRegistry`,
+   `ViewerRegistry`, `IdentityRegistry`, `ActionRegistry`, `ControlPanel`,
+   `DiagnosticsRegistry`) and contributed ids (`protocol:http`,
+   `viewer:webview`). A typed vocabulary already exists one step later:
+   `ModExtensionRecord` (ProtocolScheme, ViewerMime, ViewerExtension,
+   ViewerCapabilities, Action, IndexProvider, Lens, Theme, WasmRuntime) is
+   what activation returns, and only WasmRuntime is produced outside tests.
+   The pack manifest (eidetic `PackManifest`) carries the trust ask as
+   `requested_scopes` and its parts by role. Ruled: `contributes` is a typed
+   field beside `provides`, naming each contribution by kind (presentation,
+   pane adapter, pane, servitor) and id, in the TOML manifest
+   (`DiskModManifest`) and the native registrations alike. `provides` and
+   `requires` keep only dependency names; the `protocol:` and `viewer:` ids
+   move into `contributes`. The records a mod returns at activation verify
+   the declaration: a mod that registers what it did not declare is refused,
+   a typed refusal in the catalog's sense. `requested_scopes` stays the trust
+   ask. Options set aside: four reserved prefixes on the `provides` strings;
+   deriving the kind from the activation records alone, which would leave
+   install review and the settings capability's per-mere selection unable to
+   show a contribution before the mod runs.
+7. **A misfin address. Ruled: it opens the Comms conversation.** Evidence:
+   Misfin is a send protocol, the request carries the message and the reply
+   is a status, and nothing in mere's tree names the scheme on a fetch path;
+   `document-lanes`' smolweb lane only renders a body it is handed, by scheme
+   or by `message/x-misfin`. So inker's default `misfin` scheme rule
+   (`crates/inker/inker/src/routing.rs`) and the registry's middlenet scheme
+   list (`viewer.rs`) reach a reader with nothing to read. The comms adapter
+   (`crates/shell/comms/src/misfin_adapter.rs`) presents one mailbox from the
+   receive server's `MailboxStore`, one conversation per correspondent, and
+   its bodies are gemtext. The kernel's `AddressKind` has no misfin variant.
+   Ruled: a misfin address names a correspondent, not a document. Opening a
+   node that carries one selects that conversation in Comms
+   (`CommsPane::select`, opening the pane if it is closed). The reader keeps
+   its `message/x-misfin` content-type route for a body a host already holds,
+   as the adapter's messages are; the `misfin` scheme rule leaves inker's
+   default policy and the registry's middlenet list. Options set aside: a
+   reader tile with Comms reached only by its command; received messages as
+   resource nodes with minted IRIs, a graph-model change the opening rule
+   does not need.
+8. **An embedded application's declaration. Ruled: inker defines it, the
+   manifest carries it.** Evidence: the declaration's four parts live in
+   three places. Inker holds how it reaches the screen and what it accepts:
+   `SurfaceEngine` (id, spawn, `a11y_capability`), `WebSurface::capabilities`
+   (cookie, script, pointer, document, drag-drop), and `EngineRoutePolicy`
+   rules that map a scheme or content type to an engine id and a
+   `SurfaceContractMode` (CompositedTexture, NativeOverlay, EmbeddedHost,
+   Headless); three engine crates (graft, weld, scrying) implement
+   `SurfaceEngine`, and hosts collect them in `SurfaceEngineRegistry`. The
+   registry's viewer registry (`crates/system/registry/src/viewer.rs`:
+   `ViewerCapability`, `ViewerRenderMode`, `ViewerRegistry`) declares the
+   same things in the April words and has no caller outside its crate. Trust
+   lives in the mod manifest's `ModCapability`, which document-host checks at
+   activation, and in the pack's `requested_scopes`. What an application
+   exposes is the composition brief's clip ruling 4 (inspect, annotate,
+   reclip, open, play, edit and apply as separate operations) and the
+   resource-leaf draft; what it accepts back is the shared source-edit crate
+   (`crates/system/source-edit`, the 2026-10-18 plan). Neither registry nor
+   inker depends on the other. Ruled: one declaration type in inker: what it
+   presents (schemes, content types, extensions), how it reaches the screen
+   (`SurfaceContractMode`, `A11yCapability`, producer capabilities), what it
+   accepts back (source-edit proposals, commands), and which of the brief's
+   operations it exposes. A manifest's presentation entry under `contributes`
+   carries that type; built-ins construct it in code, as
+   `EngineRoutePolicy::default` and the engine crates do now. The registry's
+   viewer registry and the `ModExtensionRecord` viewer variants retire into
+   it (survivors table). Trust stays with `ModCapability` and
+   `requested_scopes`. Leaves and clips stay graph facts under the link model
+   and the resource-leaf draft, which a presentation's operations act on;
+   they are not fields of the declaration. Options set aside: the manifest as
+   owner, which would have the registry crate define a schema inker cannot
+   import; three owners named in TERMINOLOGY with nothing unified.
+
+Landed 2026-10-27, read at `10fe98b50`. Rulings 6 and 8 (`cebb68fa4`, merged
+as `306fa68c7`): `inker::PresentationDeclaration`
+(`crates/inker/inker/src/presentation.rs`) carries the four parts: `presents`
+(schemes, content types, extensions), `reaches` (`SurfaceContractMode`,
+accessibility, producer capabilities), `accepts` (source edits, commands) and
+`operations`. `EngineRoutePolicy::default` is built from the declared
+built-in readers, routing unchanged, and graft, weld and scrying carry their
+id and accessibility in their declaration. `ModManifest` and
+`DiskModManifest` carry a typed `contributes` (`loader/contributes.rs`:
+presentation, pane adapter, pane, servitor); Verso's four ids left `provides`
+and are one presentation; activation refuses a protocol, content-type,
+extension or reach record the manifest did not declare
+(`ModActivationError::undeclared`) and rolls back what the mod applied. The
+registry's viewer registry is deleted with its `viewer`, `audio` and `pdf`
+features, `ModExtensionRecord`'s viewer variants are
+`PresentationContentType`, `PresentationExtension` and
+`PresentationReaches`, and the registry takes `inker` under `mod-loader`.
+Ruling 7 (`c499b708f`, `10fe98b50`): the `misfin` scheme rule is out of
+inker's default policy, and the middlenet list went with the viewer registry;
+`comms::misfin_correspondent` reads the correspondent from a misfin address
+and `CommsPane::misfin_conversation` finds its loaded conversation;
+graphshell's tree page owns a `CommsPane` (`web_tree/comms_pane.rs`), and its
+three Forme open paths (`open_selected`, `open_retained`, `read_related`)
+send a correspondent node to Comms through `graphshell::comms_open::open_node`
+instead of a tile, with `mere-comms` an optional dependency under
+`workspace-editor`.
+
+What that leaves, as cues: verification runs one way, since native activation
+returns no records, and Action, IndexProvider, Lens, Theme and WasmRuntime
+records are not declarable; the built-in declarations list no operations and
+accept nothing, because nothing in code exposes either, so the brief's
+operations have a field and no type behind it; `ViewerRegistry` and
+`mod:core-viewer` remain as dependency names so load order holds; the tree
+page loads no inbox, since the misfin adapter reads a native mailbox store the
+browser lacks, so every misfin open lands on the no-conversation notice until
+a backend fills it; what opening does when no conversation is loaded (the pane
+opens and keeps its selection) is unruled; the pelt workspace has no Comms
+path; and whether a murm author key or an LXMF destination opens the way a
+misfin address does is unruled.

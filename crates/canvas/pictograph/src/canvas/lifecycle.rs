@@ -89,14 +89,7 @@ impl Canvas {
                     .collect(),
             );
         }
-        self.meaning.forget_graph();
-        self.community_actor = None;
-        self.content_affinity = None;
-        self.content_affinity_dirty = true;
-        self.installed_affinity_revision = None;
-        self.affinity_force_installed = false;
-        self.physics.set_affinity_force(None);
-        self.weighted_edges_cache = None;
+        self.forget_graph_models();
         self.last_strategy_inputs = None;
         *self
             .strategy_graph_memo
@@ -127,7 +120,10 @@ impl Canvas {
         self.projection_score = None;
         self.projection_representations.clear();
         self.node_rule_faces.clear();
-        self.graph_view_epoch = self.graph_view_epoch.wrapping_add(1);
+        self.graph_view_epoch = self
+            .graph_view_epoch
+            .checked_add(1)
+            .expect("Canvas epoch exhausted");
         self.restored_score_hold = None;
         self.strategy_positions = None;
         self.paused_positions = None;
@@ -185,6 +181,7 @@ impl Canvas {
             graph,
             described_keys: Default::default(),
             cache_memberships: Default::default(),
+            result_owner: Arc::new(()),
             physics,
             #[cfg(feature = "gpu")]
             physics_device: None,
@@ -312,6 +309,7 @@ impl Canvas {
             fold_redo: Vec::new(),
             render_gnodes_as_dom: false,
         };
+        canvas.channels.bind_graph(&canvas.graph);
         canvas.described_keys.reconcile(&canvas.graph);
         canvas.reconcile_member_lifetimes();
         // Construction establishes the footprint baseline before any layout is cached.
@@ -454,6 +452,13 @@ impl Canvas {
     /// callers seed new members as needed. The pool
     /// is structural, so it is rebuilt, not grown incrementally.
     pub(crate) fn reconcile_derived(&mut self) {
+        if self.channels.bind_graph(&self.graph) {
+            self.forget_graph_models();
+            self.graph_view_epoch = self
+                .graph_view_epoch
+                .checked_add(1)
+                .expect("Canvas epoch exhausted");
+        }
         let retired = self.reconcile_member_lifetimes();
         self.described_keys.reconcile(&self.graph);
         // The registry's facts gate on `Graph::revision` — bumped at the kernel mutation source, so

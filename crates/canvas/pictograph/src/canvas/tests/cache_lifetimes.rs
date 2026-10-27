@@ -201,7 +201,7 @@ fn explicit_graph_switch_ends_cache_lives_even_for_a_clone() {
     c.scope_to_members([aid]);
     c.roles.table.items.insert(a, seiche::Role::Pinned);
     c.content_affinity = Some(vec![(a, b, 0.9)]);
-    c.installed_affinity_revision = Some(c.graph.revision());
+    c.installed_affinity_revision = Some(c.graph.structural_input_key());
     c.affinity_force_installed = true;
     c.selected.insert(a);
     let old_action = c.described_keys.by_member[&aid];

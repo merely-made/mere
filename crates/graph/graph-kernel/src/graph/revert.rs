@@ -1162,7 +1162,7 @@ pub(super) mod tests {
 
     pub(in crate::graph) fn apply_all(graph: &mut Graph, edits: &[CapturedDelta]) {
         for edit in edits {
-            let _ = apply_graph_delta(graph, edit.replay_delta().expect("replayable"));
+            let _ = apply_graph_delta(graph, edit.replay().into_write().expect("replayable"));
         }
     }
 

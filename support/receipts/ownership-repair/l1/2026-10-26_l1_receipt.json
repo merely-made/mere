@@ -8,7 +8,10 @@
   "Q012",
   "Q015",
   "Q016",
-  "Q032"
+  "Q032",
+  "Q017",
+  "Q031",
+  "Q010"
  ],
  "rulings_applied": "Mark's L1 card round, 2026-10-20: adding an existing node id is insert-if-missing live too",
  "operations": [
@@ -75,12 +78,83 @@
    "regression": "graph::legacy_resource_migration_reason_tests::legacy_migration_and_checked_writer_agree_which_reason_changes_a_carried_claim",
    "audit_probe": "legacy_migration_diagnostics.rs migrated_handle_can_change_reason_identity_that_the_checked_writer_refuses (asserts the defect; inverted in the regression)",
    "commit": "69f8e7ff0"
+  },
+  {
+   "id": "Q017",
+   "authority": [
+    "A004"
+   ],
+   "owner": "Pandect's GraphSession is the one graph persistence owner; the kernel's snapshot-only `store` feature and module are removed (Mark's ruling, 2026-10-26)",
+   "change": "graph-kernel Cargo.toml drops the `store` feature; src/lib.rs drops the module; src/store.rs deleted. No manifest enabled the feature and nothing outside the kernel named it. A public-API change for the next mere-kernel release",
+   "regression": "the reopen integration tests frozen_link_reopen.rs and assertion_lifecycle_reopen.rs were gated on the feature and never ran in-tree; they now run against a test-only graph.json helper (tests/common/graph_file.rs) and pass; the audit probe kernel_store.rs no longer compiles against the kernel",
+   "kernel_suite_after": {
+    "lib_passed": 484,
+    "integration_passed": 2,
+    "failed": 0
+   }
+  },
+  {
+   "id": "Q016 edge replays",
+   "authority": [
+    "A012"
+   ],
+   "ruling": "Mark, 2026-10-26: join the invariant",
+   "owner": "validate_handles_after stays the one validator, its pending-write type widened to PendingWrite::{Literals, ResourceEdges, SurfaceEdges}; both edge replay arms consult it before storing and return Refused(HandleCollision) for a handle a Resource literal, another row or a repeat within the set already holds",
+   "change": "graph/edge_admission.rs (new: admit_resource_edges, admit_surface_edges, the staged scope Graph::stage_edges/settle_staged_edges, a flag clones do not inherit); apply.rs both arms; resource.rs pair check shared; legacy_resource_migration.rs stages its source and output and validates the finished output once; mod.rs",
+   "regression": "graph::resource_content_edge_tests::{replayed_resource_edges_are_refused_where_checked_open_refuses_them, replayed_surface_edges_are_refused_where_checked_open_refuses_them, checked_replay_reports_a_refused_edge_set_instead_of_dropping_it, legacy_migration_stages_edge_admission_and_refuses_a_result_that_would_not_reopen, legacy_migration_reads_its_source_through_the_staged_state_repeated_rows_included}",
+   "note": "the Surface arm also refuses a handle on a second Surface row (cross-pair or within the set), per Q031's ruling at the write path; held Surface-only duplicates in an existing graph are still tolerated by validate_active_resource_assertion_handles",
+   "commit": "3aacc9636, merged ff0eb87f0"
+  },
+  {
+   "id": "Q031",
+   "authority": [
+    "A012",
+    "A016"
+   ],
+   "ruling": "Mark, 2026-10-26: not legal; enforced at the live graph, freezes copy faithfully",
+   "owner": "one rule in graph/assertion_handles.rs, validate_assertion_handles(rows) and the incremental AssertionHandles::admit: a statement handle appears on exactly one row across both strata, repeats refused whether or not identical; checked and recorded load, selection freeze and link freeze call it and give one byte-equal reason",
+   "change": "snapshot/checked.rs both loaders through the validator (ConflictingAssertion and ActiveSurfaceAssertion became RepeatedAssertionHandle), 713 to 640 lines; frozen_selection.rs and frozen_link.rs drop their private comparisons; legacy_resource_migration/copies.rs dedupes identical parallel copies of the rows the migration builds and records each as a LegacyMigrationNote on the owning Resource; one assertion_write.rs test that built copies now builds one row",
+   "regression": "graph::snapshot::handle_tests::identical_copies_on_parallel_rows_are_refused_by_load_and_both_freezes_with_one_reason (inverts the probe) plus a_graph_without_copies_loads_and_freezes_both_ways and seven more in assertion_handles_tests.rs, frozen_link_tests.rs and legacy_resource_migration.rs",
+   "unchanged": "schema-0 Surface rows stay permissive among themselves; Graph::from_snapshot panics on copies as on other invalid data; frozen link still refuses an empty handle that checked load accepts",
+   "forks_recorded_in_plan_section_5": "legacy baselines with copies of a Surface-placed claim or in pre-existing Resource rows fail the migration's final checked load",
+   "commit": "c1eb4e0ae, merged after ff0eb87f0"
+  },
+  {
+   "id": "Q010",
+   "authority": [
+    "A016"
+   ],
+   "ruling": "Mark, 2026-10-26: refuse at checked load; obsolete imagery an explicit skip",
+   "owner": "CapturedDelta::replay and replay_as decide once and return Replay::{Apply, Skip, Malformed{node_id, facet, error}}; every loop and live writer acts on that result",
+   "change": "capture/replay_outcome.rs (new: Replay, Malformed, Unwritable, Replay::into_write, the shared loop replay_outcomes_onto, and three drop-both adapters kept for the legacy migration's callers); capture.rs conversion and loops; journal.rs replay_from on the shared loop under Stop; consumers in pandect, graphshell and djinn use replay_as(..).into_write()",
+   "regression": "graph::capture::replay_outcome_tests::checked_replay_refuses_the_malformed_facet_record_a_tolerant_replay_skips (inverts the probe) plus eight more there, including snapshot_at_from_refuses_a_journal_entry_whose_facet_json_is_malformed and an_obsolete_thumbnail_record_is_skipped_silently_by_checked_and_tolerant_replay",
+   "note": "ReplayRefused.position now counts skipped entries on every journal path; parse_uuid in capture.rs still panics on a malformed id (out of scope)",
+   "forks_recorded_in_plan_section_5": "legacy migration drops or refuses a malformed facet record (legacy_resource_migration.rs:395)",
+   "commit": "49b5d844f, merged after c1eb4e0ae"
+  },
+  {
+   "id": "Q031 legacy baselines",
+   "ruling": "Mark, 2026-10-26: dedupe both",
+   "owner": "a copy is a whole persisted row equal to an earlier row on its pair that holds at least one handle; the first row stays, each later copy is dropped with a LegacyMigrationNote on the owning Resource, one per statement the copy held; a handle repeated on rows that differ is untouched and the final validation still refuses it",
+   "change": "legacy_resource_migration/copies.rs split_copies, note_deduped_surface_copy, dedupe_resource_copies, note_copy and two new uncertainty tags (identical_parallel_surface_copy_deduped_to_first_row, identical_parallel_resource_copy_deduped_to_first_row); the Surface write-back splits off copies and notes them; sync ends with dedupe_resource_copies so a typed journal entry that sets copies is deduped too; LegacyMigrationNote's pub shape unchanged (a Resource-row copy carries empty surface ids)",
+   "regression": "legacy_resource_migration_copies_tests::{legacy_migration_dedupes_identical_copies_of_a_surface_placed_claim_and_says_so, legacy_migration_dedupes_identical_surface_rows_that_a_journal_entry_sets, legacy_migration_dedupes_identical_copies_in_pre_existing_resource_rows_and_says_so, legacy_migration_refuses_a_repeated_handle_on_rows_that_differ}",
+   "commit": "2d5601db5"
+  },
+  {
+   "id": "Q010 in legacy migration",
+   "ruling": "Mark, 2026-10-26: refuse it",
+   "owner": "the migration loop reads the typed Replay outcome: Apply applies, Skip skips, Malformed returns LegacyMigrationError naming the entry index, facet and node; the typed-record path refuses anything but Apply",
+   "change": "legacy_resource_migration.rs loop and typed-record path; capture/replay_outcome.rs drops the three drop-both adapters and the pub CapturedDelta::replay_delta / replay_delta_as (a public-API change; no caller left in crates/ or ports/; the sealed audit probe audit_authority.rs still names them and no target builds it); legacy_family_attribution.rs test helper on replay_as(..).into_write()",
+   "regression": "legacy_resource_migration_malformed_tests::{legacy_migration_refuses_a_malformed_facet_record_naming_the_node_and_facet, legacy_migration_still_skips_an_obsolete_thumbnail_record}",
+   "note": "the migration's other OnRefusal::Drop replays keep their mode; the output replay still drops non-malformed refusals that legacy journals contain by design",
+   "commit": "5936edf2c"
   }
  ],
  "kernel_suite_after": {
-  "passed": 484,
+  "lib_passed": 512,
+  "integration_passed": 2,
   "failed": 0,
-  "basis": "main after the Q016 replay follow-through: Q009, Q012, Q015, Q016 and Q032 merged, the kernel's unused forme dependency removed; 477 before this pass plus seven regressions"
+  "basis": "main with the migration rulings merged onto the chartulary repin (fcae43cc7): 477 lib tests before the day plus 35 regressions"
  },
  "forks_recorded_in_plan_section_5": [
   "Q010",
@@ -89,9 +163,6 @@
   "Q016 edge replays"
  ],
  "unrepaired_so_far": [
-  "Q010",
-  "Q017",
-  "Q031",
   "Q014 (re-document only)",
   "Q001",
   "Q002",
@@ -111,9 +182,9 @@
   "merge scratch replays (graph_session_merge.rs) and GraphJournal::replay drop a refused entry and continue; whether a merge candidate may silently lack an edit is the Q010 class of question"
  ],
  "pandect_suite_after": {
-  "passed": 340,
-  "failed": 0,
-  "note": "the consumer gate for Q016; two of its tests needed the kernel to report a refused replay rather than drop it"
+  "lib_passed": 342,
+  "integration_passed": 28,
+  "failed": 0
  },
  "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host"
 }

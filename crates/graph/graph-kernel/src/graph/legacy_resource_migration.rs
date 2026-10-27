@@ -6,6 +6,15 @@
 
 //! Explicit legacy replay. Ordinary replay keeps its recorded stores.
 //! The caller must establish a legacy placement profile before using this adapter.
+//!
+//! Legacy records repeat handles and pass through states in which both strata hold
+//! one, which ordinary edge replay refuses. The migration replays its legacy source
+//! and builds its output in an explicit staged scope, `Graph::stage_edges` to
+//! `Graph::settle_staged_edges`: edge replays are not checked one by one, and the
+//! finished output is checked once, refusing the migration if it would not reopen.
+//! Whole identical rows never reach that check: they dedupe to the first (`copies`).
+
+mod copies;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -16,7 +25,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use super::capture::{
-    OnRefusal, ReplayAttribution, replay_attributed_deltas_onto, replay_graph_deltas_onto,
+    OnRefusal, Replay as Outcome, ReplayAttribution, replay_attributed_deltas_onto,
+    replay_graph_deltas_onto,
 };
 use super::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
 use super::snapshot::{payload_from_persisted, persisted_edge_for_ids};
@@ -159,6 +169,7 @@ pub fn probe_legacy_mint_links(
     entries: &[AttributedDelta],
 ) -> Result<Vec<LegacyMintLinkDiagnostic>, LegacyMigrationError> {
     let mut source = baseline.clone();
+    source.stage_edges();
     let mut attribution = ReplayAttribution::from_baseline(baseline);
     let mut known = statement_ids(&baseline.to_snapshot().edges);
     let mut raw = Vec::<(usize, Pair, super::SemanticStatement, Pair)>::new();
@@ -339,6 +350,8 @@ pub fn migrate_legacy_prefix_with_content_context(
             .map(|record| record.canonical_iri)
             .collect(),
     };
+    replay.source.stage_edges();
+    replay.output.stage_edges();
     let before = replay.output.to_snapshot();
     let before_facets = replay.output.facets().clone();
     replay.sync(&Pairs::new(), true, None)?;
@@ -355,7 +368,7 @@ pub fn migrate_legacy_prefix_with_content_context(
         replay.output.facets(),
     )?);
     let mut entry_effects = Vec::with_capacity(entries.len());
-    for entry in entries {
+    for (index, entry) in entries.iter().enumerate() {
         let before = replay.output.to_snapshot();
         let before_facets = replay.output.facets().clone();
         let old_pairs = surface_pairs(&replay.source)?;
@@ -367,10 +380,12 @@ pub fn migrate_legacy_prefix_with_content_context(
             replay
                 .aggregate_active
                 .retain(|_, member| member.resource != pair);
-            let delta = replay
-                .attribution
-                .replay_delta(&entry.delta, &entry.author)
-                .ok_or_else(|| LegacyMigrationError("invalid typed resource capture".into()))?;
+            let Outcome::Apply(delta) = replay.attribution.replay(&entry.delta, &entry.author)
+            else {
+                return Err(LegacyMigrationError(
+                    "invalid typed resource capture".into(),
+                ));
+            };
             let super::apply::GraphDelta::ReplaySetResourceEdgesByIds { edges, .. } = &delta else {
                 unreachable!()
             };
@@ -392,8 +407,17 @@ pub fn migrate_legacy_prefix_with_content_context(
                 OnRefusal::Drop,
             );
             if !legacy_edge_edit(&entry.delta) {
-                if let Some(delta) = entry.delta.replay_delta_as(&entry.author) {
-                    let _ = replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
+                match entry.delta.replay_as(&entry.author) {
+                    Outcome::Apply(delta) => {
+                        let _ =
+                            replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
+                    },
+                    Outcome::Skip => {},
+                    Outcome::Malformed(bad) => {
+                        return Err(LegacyMigrationError(format!(
+                            "legacy journal entry {index}: {bad}"
+                        )));
+                    },
                 }
                 replay.check_typed_record(&entry.delta)?;
             }
@@ -450,6 +474,10 @@ pub fn migrate_legacy_prefix_with_content_context(
         effective.extend(corrections);
         entry_effects.push(effective);
     }
+    replay
+        .output
+        .settle_staged_edges()
+        .map_err(|error| LegacyMigrationError(error.to_string()))?;
     // The same checked boundary used by ordinary loads verifies final cross-store handles.
     Graph::try_from_snapshot(&replay.output.to_snapshot())
         .map_err(|error| LegacyMigrationError(error.to_string()))?;
@@ -806,21 +834,25 @@ impl Replay {
                             .statements
                             .retain(|statement| statement.statement_id == id);
                         semantic.rebuild_compat();
-                        next.entry(id)
-                            .or_insert_with(|| Membership {
-                                surface: pair,
-                                resource,
-                                edges: Vec::new(),
-                            })
-                            .edges
-                            .push(persisted_edge_for_ids(resource.0, resource.1, &claim));
+                        let edge = persisted_edge_for_ids(resource.0, resource.1, &claim);
+                        let held = next.entry(id).or_insert_with(|| Membership {
+                            surface: pair,
+                            resource,
+                            edges: Vec::new(),
+                        });
+                        if held.edges.contains(&edge) {
+                            self.note_deduped_copy(pair, resource, &edge)?;
+                        } else {
+                            held.edges.push(edge);
+                        }
                     }
                 }
             }
         }
         self.active = next;
         self.aggregate_active = aggregate_next;
-        // Remove surface authority first, before the exact resource handle admission check.
+        // Staged: the replay arms' edge check waits for the settle. Remove surface
+        // authority first anyway, before the exact resource handle admission check.
         for pair in before
             .keys()
             .chain(after.keys())
@@ -833,13 +865,17 @@ impl Replay {
                     .get(id)
                     .is_some_and(|origin| origin.resource.is_some())
             });
-            let filtered = filter_resource_aggregates(pair, &semantic_filtered);
+            let (filtered, copies) =
+                copies::split_copies(filter_resource_aggregates(pair, &semantic_filtered));
             let (Some(from), Some(to)) = (
                 self.output.get_node_key_by_id(pair.0),
                 self.output.get_node_key_by_id(pair.1),
             ) else {
                 continue;
             };
+            for copy in &copies {
+                self.note_deduped_surface_copy(pair, copy)?;
+            }
             if self.output.persisted_edges_between(from, to) != filtered {
                 // Surface restore inserts in petgraph order; reverse to retain the read order.
                 self.output.set_edges_between(
@@ -921,6 +957,7 @@ impl Replay {
                 )));
             }
         }
+        self.dedupe_resource_copies()?;
         // Raw legacy lifecycle has no shown-resource column. Bind its current pages explicitly.
         let surfaces: Vec<_> = self.source.nodes().map(|(_, node)| node.id).collect();
         for surface in surfaces {
@@ -2544,7 +2581,7 @@ mod tests {
     }
 
     #[test]
-    fn legacy_resource_migration_keeps_identical_parallel_handle_copies() {
+    fn legacy_resource_migration_dedupes_identical_parallel_handle_copies_and_says_so() {
         let mut baseline = baseline(&["https://a.test/", "https://b.test/"]);
         let a = baseline.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
         let b = baseline.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
@@ -2557,13 +2594,40 @@ mod tests {
         baseline.inner.connect(a, b, claim);
         let migrated = migrate_legacy_prefix(&baseline, &[]).unwrap();
         let pair = resource_pair("https://a.test/", "https://b.test/");
-        let copies = migrated
+        let rows = migrated
             .graph
             .persisted_resource_edges_between(pair.0, pair.1);
-        assert_eq!(copies.len(), 2);
-        assert_eq!(copies[0], copies[1]);
-        assert_eq!(statement_ids(&copies), BTreeSet::from(["copied".into()]));
+        assert_eq!(rows.len(), 1, "the copy is dropped, the first row kept");
+        assert_eq!(statement_ids(&rows), BTreeSet::from(["copied".into()]));
         assert!(migrated.graph.persisted_edges_between(a, b).is_empty());
+        let record = migrated.graph.resource_record(pair.0).unwrap();
+        let notes: Vec<LegacyMigrationNote> = serde_json::from_str(
+            &record
+                .facets
+                .iter()
+                .find(|facet| facet.facet == LEGACY_RESOURCE_MIGRATION_FACET)
+                .unwrap()
+                .value_json,
+        )
+        .unwrap();
+        assert!(
+            notes
+                .iter()
+                .any(|note| note.uncertainty == copies::DEDUPED_COPY
+                    && note.statement.statement_id == "copied")
+        );
+        Graph::try_from_snapshot(&migrated.graph.to_snapshot())
+            .expect("the migrated graph is legal state");
+        let mut replayed = baseline.clone();
+        replay_captured_deltas_onto(&mut replayed, migrated.baseline_effects.clone());
+        assert_eq!(
+            replayed.to_snapshot().resources,
+            migrated.graph.to_snapshot().resources
+        );
+        assert_eq!(
+            replayed.to_snapshot().resource_edges,
+            migrated.graph.to_snapshot().resource_edges
+        );
         let mut invalid = baseline.clone();
         let key = invalid.find_edge_key(a, b).unwrap();
         invalid.get_edge_mut(key).unwrap().assertions.statements[0].label =
@@ -2951,7 +3015,10 @@ mod tests {
             node_id: Uuid::from_u128(1).to_string(),
             title: "recorder remains live".into(),
         };
-        super::super::apply::apply_graph_delta(&mut checkpoint, witness.replay_delta().unwrap());
+        super::super::apply::apply_graph_delta(
+            &mut checkpoint,
+            witness.replay().into_write().unwrap(),
+        );
         assert_eq!(
             *seen.lock().unwrap(),
             vec![witness],

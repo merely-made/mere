@@ -5,31 +5,32 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The off-thread **community-detection lane**: an [`armillary`] actor that runs Louvain on a
-//! `Send` [`CommunitySnapshot`] and emits a revision-stamped [`ClusterSet`]. Mirrors the physics
+//! `Send` [`CommunitySnapshot`] and emits a input-key-stamped [`ClusterSet`]. Mirrors the physics
 //! actor (the same off-thread discipline). Used only when the host has supplied an off-thread wake
 //! (native + offloaded); on wasm and in tests the canvas computes community inline instead, so this
 //! lane is never spun up there. (Graph signals — the background lane, P3.)
 //!
 //! The `Graph` never crosses the thread: the owner extracts a `Send` [`CommunitySnapshot`] on its
 //! own thread, sends it, and the worker computes the partition. A result computed against a
-//! since-superseded graph is rejected by **revision** on arrival (stale-rejection), so a layout or
+//! since-superseded graph is rejected by its source-qualified input key on arrival (stale-rejection), so a layout or
 //! ring never paints a partition that no longer matches the graph.
 
+use kernel::graph::GraphInputKey;
 use std::sync::mpsc::Receiver;
 
 use crate::signals::{ClusterSet, CommunitySnapshot, community_louvain_on_snapshot};
 use armillary::{ActorHandle, Emitter, Wake, spawn};
 
-/// A recompute request: the structure to partition, stamped with the graph revision it was taken at.
+/// A recompute request: the structure to partition, stamped with the graph input key it was taken at.
 pub(crate) struct CommunityRequest {
     snapshot: CommunitySnapshot,
-    revision: u64,
+    revision: GraphInputKey,
 }
 
 /// A finished partition, carrying the revision it was computed against. (Graph signals.)
 pub(crate) struct CommunityUpdate {
     pub clusters: ClusterSet,
-    pub revision: u64,
+    pub revision: GraphInputKey,
 }
 
 /// The host side of the community worker: dispatch snapshots, drain results. Dropping it ends the
@@ -39,7 +40,7 @@ pub(crate) struct CommunityActor {
     updates: Receiver<CommunityUpdate>,
     /// The revision of an in-flight request, so a stable graph is not re-dispatched while a result
     /// is pending. Cleared when that revision's result lands.
-    inflight: Option<u64>,
+    inflight: Option<GraphInputKey>,
 }
 
 impl CommunityActor {
@@ -61,7 +62,7 @@ impl CommunityActor {
 
     /// Dispatch a recompute for `revision`, unless one is already in flight for that same revision
     /// (so a stable graph is not recomputed repeatedly while a result is pending).
-    pub fn request(&mut self, snapshot: CommunitySnapshot, revision: u64) {
+    pub fn request(&mut self, snapshot: CommunitySnapshot, revision: GraphInputKey) {
         if self.inflight == Some(revision) {
             return;
         }
@@ -114,7 +115,8 @@ mod tests {
 
         let wake: Wake = Arc::new(|| {});
         let mut actor = CommunityActor::spawn(wake);
-        actor.request(CommunitySnapshot::from_graph(&graph), 42);
+        let key = graph.structural_input_key();
+        actor.request(CommunitySnapshot::from_graph(&graph), key);
 
         // Spin until the worker emits (sub-millisecond; bounded so a regression fails rather than
         // hangs). The result carries the revision it was requested for, and the right partition.
@@ -128,7 +130,7 @@ mod tests {
         }
         let update = update.expect("the worker emitted a partition");
         assert_eq!(
-            update.revision, 42,
+            update.revision, key,
             "the result carries its request revision"
         );
         assert_eq!(

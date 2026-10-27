@@ -639,7 +639,7 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
         .push(statement);
     assert!(matches!(
         checked_rejection(&changed_metadata),
-        ResourceSnapshotError::ConflictingAssertion { .. }
+        ResourceSnapshotError::RepeatedAssertionHandle(_)
     ));
     let mut changed_pair = base.clone();
     let mut reverse = changed_pair.resource_edges[0].clone();
@@ -648,7 +648,7 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
     changed_pair.resource_edges.push(reverse);
     assert!(matches!(
         checked_rejection(&changed_pair),
-        ResourceSnapshotError::ConflictingAssertion { .. }
+        ResourceSnapshotError::RepeatedAssertionHandle(_)
     ));
     let mut active_surface = base.clone();
     let mut surface_edge = active_surface.resource_edges[0].clone();
@@ -657,7 +657,7 @@ fn checked_resource_load_rejects_reused_handles_and_conflicting_shown_resources(
     active_surface.edges.push(surface_edge);
     assert!(matches!(
         checked_rejection(&active_surface),
-        ResourceSnapshotError::ActiveSurfaceAssertion { .. }
+        ResourceSnapshotError::RepeatedAssertionHandle(_)
     ));
     let mut orphan_surface = active_surface.clone();
     orphan_surface.edges[0].to_node_id = Uuid::from_u128(123).to_string();

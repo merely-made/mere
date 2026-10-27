@@ -1115,6 +1115,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             ) else {
                 return GraphDeltaResult::Applied;
             };
+            if let Err(refused) = graph.admit_surface_edges(from_id, to_id, &edges) {
+                return GraphDeltaResult::Refused(refused);
+            }
             graph.set_edges_between(from, to, &edges);
             graph.record_delta(&CapturedDelta::ReplaySetEdgesByIds {
                 from_id: from_id.to_string(),
@@ -1143,6 +1146,11 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             to_resource_id,
             edges,
         } => {
+            if let Err(refused) =
+                graph.admit_resource_edges(from_resource_id, to_resource_id, &edges)
+            {
+                return GraphDeltaResult::Refused(refused);
+            }
             if graph.set_resource_edges_between(from_resource_id, to_resource_id, &edges) {
                 graph.record_delta(&CapturedDelta::ReplaySetResourceEdgesByIds {
                     from_resource_id: from_resource_id.to_string(),

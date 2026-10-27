@@ -78,6 +78,7 @@ const PATH_FLAGS: &[&str] = &[
     "--log-file",
     "--events-file",
     "--sync-store",
+    "--custodian",
 ];
 
 /// What is spawned: a resident must carry every endpoint flag.

@@ -1,0 +1,162 @@
+{
+  "schema": "mere.fetch-actor-lifecycle.qualification.v1",
+  "date": "2026-10-27",
+  "status": "qualified_supplier_native_slice",
+  "source": {
+    "repository": "https://github.com/merely-made/mere",
+    "initial_workspace_head": "8d69c9144a8c10e437287fb0a82044be3b0b8659",
+    "integrated_parent": "32cd7e077673afe5bf279cf3d9ebcc6e513b9a55",
+    "qualified_commit": "493ccc2ea7f4caf14ce9eb97d1ec3ec8d3f781dd",
+    "qualified_tree": "5128244fb9532d4a218da95bdc5b38df0289017a",
+    "fetch_tree": "9e1babdfd22c5f9b05b89cd26d645aaace446c3a",
+    "upstream_before_publication": "32cd7e077673afe5bf279cf3d9ebcc6e513b9a55"
+  },
+  "inputs": {
+    "Cargo.toml": {
+      "git_blob": "dccbf73a8bf4f8ac68465864a6b9e1fd89552af5",
+      "native_sha256": "c6b06898915694dcd14d86085ffc864d68e75bbaf3eb4545e9c77e4fa5092ad9"
+    },
+    "Cargo.lock": {
+      "git_blob": "5efb36d1a96c1d76354d65f3817e62c885cba118",
+      "native_sha256": "6ccb81cf2d783e488c47f27ec1872006210a0d4be1174be031ddf19f8fcf3d66"
+    },
+    "crates/system/fetch/Cargo.toml": {
+      "git_blob": "d646ff328784fe02de511b8cd6fa74fac389016d",
+      "native_sha256": "347b7758aaabf778a3767bbe566985865890f0581745dd4903b2be7fd70563b8"
+    },
+    "crates/system/fetch/src/lib.rs": {
+      "git_blob": "fd519408534cc42eac0b9be541e9a2e189d1ef59",
+      "native_sha256": "6b47c07a75ed5501dd76222c196deff66a3305c21a80d6b3bf5c3d426da446d8"
+    },
+    "crates/system/fetch/src/actor.rs": {
+      "git_blob": "893643c4f87acba5b25abd040faebf067d11a091",
+      "native_sha256": "7860d58e96ac9205ae79d278d20f0e355398818d76d0da080f5df1ea0c32001d"
+    },
+    "crates/system/fetch/src/actor_tests.rs": {
+      "git_blob": "e3aa517c2f5e4be4a6ff5dc8b15856d45773bb72",
+      "native_sha256": "1a0a331b7891dc1f21ffbf05e32a4c384a629837b03e49686fa34e9065c042e6"
+    },
+    "crates/system/fetch/src/client_limits_tests.rs": {
+      "git_blob": "b3f9a35ba15dc637a3f037c9ef2652367c8154ec",
+      "native_sha256": "1f8ed25879dd51965d69fe26242d66398c5aa1ceae1ad02a7b01a408fb8e2296"
+    },
+    "crates/system/fetch/src/policy.rs": {
+      "git_blob": "c78fc0c0a33f1c778dc1daaaef99bd6c9cc5c841",
+      "native_sha256": "783d07ee7b03ada2af042c2c85913dec6ffbb319cededff05e61b08088b915ce"
+    }
+  },
+  "cohort_preservation": {
+    "root_manifest_and_lock_unchanged_from_integrated_parent": true,
+    "package_record_count": 1830,
+    "all_package_records_versions_checksums_sources_and_edges_preserved": true,
+    "armillary_source": [
+      "git+https://www.github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+    ],
+    "errand_source": [
+      "git+https://github.com/merely-made/errand.git?rev=897fb963d184f0e379ab9041d68e17e726cb7763#897fb963d184f0e379ab9041d68e17e726cb7763"
+    ],
+    "new_packages_or_supplier_repins": false,
+    "only_fetch_manifest_change": "actor feature adds armillary/tokio and tokio/macros using already selected packages."
+  },
+  "behavior_preservation": {
+    "acquisition_and_submission_helper_tail_unchanged": true,
+    "normalized_helper_tail_sha256": "7bc50049dd77b0ef3ebde1b65b8dab7d76abdd7e10139a9820f033cee5263769",
+    "normalization": "UTF-8 decode and CRLF to LF from the unchanged // A write is only ever asked marker to EOF. Public request/update DTO segment independently compared byte-for-byte after newline normalization.",
+    "request_update_dtos_and_client_policy_unchanged": true,
+    "legacy_constructor_signatures": "spawn_fetcher, spawn_fetcher_with and spawn_fetcher_with_policy retain ActorHandle<FetchCommand> plus Receiver<FetchUpdate>.",
+    "legacy_boundary": "Original Armillary mailbox remains unbounded; active/pending execution is bounded after dequeue and explicit ActorHandle.join waits for tracked task cleanup. This does not claim bounded legacy ingress or completion from nonblocking Drop.",
+    "bounded_companion": "spawn_fetcher_with_admission returns FetchActor; reserve active/pending capacity before enqueue, direct exact-ID CancelPage control, explicit close_and_join report.",
+    "browser_correlation": "Distinct request IDs remain separate even at one URL. Same-ID intent supersedes the previous generation, including if latest intent is refused for overload; first terminal outcome per generation wins. Preexisting progress already being emitted may arrive late; host request-correlation remains authoritative.",
+    "writes": "Explicit Submit only; no introduced retry/dedup/redirect following. Started interrupted writes without an observed receipt report delivery unknown, not retried; unstarted queued writes report not sent."
+  },
+  "admission": {
+    "default_max_active": 16,
+    "default_max_pending": 64,
+    "default_queue_timeout_ms": 30000,
+    "max_active_zero": "disable all acquisition including queuing",
+    "max_pending_zero": "shed when active slots reserved",
+    "queue_clock": "At reservation, including mailbox time; expiry checked before and after active permit acquisition.",
+    "native_clock": "Existing ClientFetchPolicy whole-operation timeout begins after queue admission; native protocol/redirect/body policies remain unchanged.",
+    "capacity_scope": "Operation/payload ownership counts, not aggregate body/output memory or HTTP pool connections.",
+    "permit_release": "Job slot is its last field, after transport future/completion cleanup; no reservation released at terminal-notification time alone.",
+    "shutdown": "Fence bounded ingress, signal stop, drop mailbox-resident jobs, ResidentTasks.close_and_join all admitted futures, then ActorHandle.join worker. Synchronous future work remains cooperative.",
+    "report": "TaskReport is actual joined completed/cancelled/panicked/rejected work; admitted counts capacity reservations, discarded_before_spawn accounts jobs whose payloads are destroyed before future creation, overloaded and queue_timeouts remain distinct."
+  },
+  "gates": {
+    "default_tests": 66,
+    "actor_smolweb_tests": 66,
+    "new_actor_controls": 18,
+    "actor_only_controls": 14,
+    "failed": 0,
+    "ignored": 0,
+    "strict_no_deps_all_target_clippy": "passed",
+    "minimal_and_actor_disabled_smolweb_checks": "passed",
+    "rustfmt": "passed",
+    "warnings_boundary": "31 unchanged dependency compiler diagnostics plus inherited unused-patch notices in default graph; owned fetch all-target Clippy passes -D warnings."
+  },
+  "native_controls": [
+    "actor::tests::a_timed_out_waiter_releases_its_pending_reservation_only_after_task_destruction",
+    "actor::tests::admission_sheds_overflow_without_contacting_the_second_origin",
+    "actor::tests::cancelling_one_same_url_request_leaves_the_other_correlated_request_live",
+    "actor::tests::closing_a_pending_write_reports_not_started_and_never_contacts_its_origin",
+    "actor::tests::closing_a_started_write_reports_unknown_delivery_without_retry",
+    "actor::tests::closing_with_active_page_subresource_and_favicon_joins_and_finishes_each_once",
+    "actor::tests::concurrent_same_id_admission_leaves_only_the_latest_completion_registered",
+    "actor::tests::dropping_fetch_actor_does_not_wait_for_a_blocked_cancellation_wake",
+    "actor::tests::exact_cancel_drops_one_native_stream_before_shutdown_and_same_url_peer_finishes",
+    "actor::tests::invalid_capacity_and_zero_queue_deadline_are_rejected_before_startup",
+    "actor::tests::native_transport_timeout_starts_after_admission_queue_wait",
+    "actor::tests::original_actor_handle_join_waits_for_task_cleanup",
+    "actor::tests::page_progress_keeps_its_request_id_and_has_one_terminal_completion",
+    "actor::tests::queued_cancel_is_terminal_and_never_opens_its_origin",
+    "actor::tests::queued_request_expires_before_transport_contact",
+    "actor::tests::rejected_duplicate_id_is_latest_intent_and_suppresses_older_completion",
+    "actor::tests::task_wake_panic_is_reported_after_the_terminal_update_without_hanging_join",
+    "actor::tests::zero_active_disables_work_and_zero_queue_sheds_instead_of_waiting"
+  ],
+  "evidence_scope": "Rust supplier/native localhost HTTP, Gopher and Spartan fixtures; no application receiving, headed, physical radio, independent-machine or whole-workspace qualification.",
+  "consumer_lane": {
+    "turnstone_files_or_sdk_pin_changed": false,
+    "turnstone_receiving_commands_run": false,
+    "next": "Adopt bounded FetchActor handle in Turnstone and qualify browser/session receiving separately. Other original API callers retain source compatibility."
+  },
+  "other_open_owners": [
+    "bounded output delivery/backpressure",
+    "aggregate retained-body/queue-byte policy",
+    "HTTP transport pool partition/connection policy",
+    "native server/listener policy (already independently qualified)",
+    "protocol-specific wire/session ownership"
+  ],
+  "workspace": {
+    "qualification_worktree": "C:/Users/mark_/Code/worktrees/mere-fetch-actor",
+    "reason": "Concurrent Canvas and custody edits/commits in shared primary during implementation; pinned clean committed source for final gates.",
+    "target": "C:/t/cargo-targets/mere",
+    "build_dir": "C:/t/cargo-targets/mere/build",
+    "isolated_target_or_cargo_home_created": false,
+    "cleanup": "Remove clean temporary worktree after verified push/integration. Preserve unrelated worktrees and primary changes."
+  },
+  "toolchain": {
+    "rustc": "1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "1.99.1 (5f94df478 2026-08-27)"
+  },
+  "review": "Two bounded Luna lanes reviewed Armillary reuse and consumer compatibility; independent static review accepted corrected per-ID publication, permit lifetime, truthful submission and shutdown ordering. Root ran Cargo gates.",
+  "receipt_files": {
+    ".gitattributes": {
+      "bytes": 34,
+      "native_sha256": "52aa6ee83155b75f631aca53d8bd09b4701c7944f374f453cff3cad89dba7a2c"
+    },
+    "attempts.json": {
+      "bytes": 18758,
+      "native_sha256": "21a3158c8c3caecabc600aeca6437e957dbfe883ffc5461a3897ceca4bfea377"
+    },
+    "commands.json": {
+      "bytes": 10901,
+      "native_sha256": "92ab93fa007b36731c08f7e5d78816c6f7471d8bb9b60273e03fb856fa9e1a40"
+    }
+  },
+  "receipt_budget": {
+    "cap_bytes": 100000000,
+    "retention": "Compact command/attempt results and source/binary identities only; no copied executables or full build logs."
+  },
+  "hash_convention": "Git tree/blob identities are committed normalized inputs. native_sha256/artifact SHA256 hash exact filesystem bytes. Receipt JSON is UTF-8 LF and protected by -text attributes."
+}

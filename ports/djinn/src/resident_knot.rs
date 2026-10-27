@@ -180,14 +180,28 @@ pub struct ResidentKnot {
     gate: KnotGate,
 }
 
+/// Where Knot's personal vault keys come from: the persona wallet's
+/// current epoch, derived where the wallet is held (the custodian in a
+/// production build), never read here.
+pub type KnotEpochs = Arc<
+    dyn Fn(
+            personae::PersonaId,
+            &str,
+            &[graphshell_endpoint::door::custody::EpochKeyRequest],
+        ) -> Result<Vec<graphshell_endpoint::door::custody::ReleasedEpochKey>, String>
+        + Send
+        + Sync,
+>;
+
 impl ResidentKnot {
     /// Open the selected persona once and keep its source resident.
     pub async fn open(
         data_root: &Path,
         config: KnotResidentSettings,
         blob_custody: ResidentBlobCustody,
+        epochs: KnotEpochs,
     ) -> Result<Self, String> {
-        Self::open_through(data_root, config, blob_custody, KnotGate::default()).await
+        Self::open_through(data_root, config, blob_custody, KnotGate::default(), epochs).await
     }
 
     /// [`Self::open`], serving the route through `gate` (a reopen keeps the
@@ -197,6 +211,7 @@ impl ResidentKnot {
         config: KnotResidentSettings,
         blob_custody: ResidentBlobCustody,
         gate: KnotGate,
+        epochs: KnotEpochs,
     ) -> Result<Self, String> {
         let persona_uuid = uuid::Uuid::parse_str(config.persona.trim())
             .map_err(|error| format!("invalid resident Knot persona UUID: {error}"))?;
@@ -220,14 +235,8 @@ impl ResidentKnot {
         if device_label.is_empty() {
             return Err("resident Knot device label is empty".into());
         }
-        let released = crate::custody::epoch_keys(
-            &crate::custody::ReleasePolicy::default(),
-            data_root,
-            persona,
-            Some(device_label),
-            &PersonalVaultKeys::requests(),
-        )
-        .map_err(|error| format!("could not derive resident Knot keys: {error}"))?;
+        let released = tokio::task::block_in_place(|| epochs(persona, device_label, &PersonalVaultKeys::requests()))
+            .map_err(|error| format!("could not derive resident Knot keys: {error}"))?;
         let keys = PersonalVaultKeys::from_released(&released)?;
         let startup =
             StartupUnlockedPersonalVault::open(data_root, persona, keys, authority.writers())?;

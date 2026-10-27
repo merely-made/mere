@@ -79,7 +79,7 @@ fn options(root: &Path, address: &str) -> ReservoirAttachmentOptions {
         session_duration: Duration::from_secs(60),
     }
 }
-fn identity() -> Arc<PersonaeHost<InMemoryStorage>> {
+fn identity() -> Arc<dyn djinn::custody_host::ResidentCustody> {
     Arc::new(PersonaeHost::new(
         IdentityVault::with_profile(
             InMemoryStorage::new(),
@@ -470,7 +470,7 @@ async fn child_serves_the_registered_domain() {
         .await
         .unwrap()
     } else {
-        let reservoir = ResidentReservoir::open(&config.shared_root, Some(config.persona))
+        let reservoir = ResidentReservoir::open(&config.shared_root, config.persona)
             .await
             .unwrap();
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
@@ -559,7 +559,7 @@ async fn child_serves_the_registered_domain() {
             .await;
         drop(reservoir);
     }
-    ResidentReservoir::open(&config.shared_root, Some(config.persona))
+    ResidentReservoir::open(&config.shared_root, config.persona)
         .await
         .unwrap();
     println!(

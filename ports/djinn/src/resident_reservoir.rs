@@ -36,7 +36,6 @@ use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use muniment::RedbBackend;
-use pandect::wallet_store::resolve_persona;
 use pandect::{
     Author, DomainId, MereApplicationAccess, MereId, MereRecord, ReservoirStore,
     open_reservoir_backend,
@@ -49,6 +48,7 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 
+use crate::custody_host::{PersonaIndex, resolve_persona};
 use crate::resident_mere::MereRoutes;
 use crate::settings::ReservoirLaneSettings;
 
@@ -93,13 +93,19 @@ pub enum ReservoirLane {
 }
 
 impl ReservoirLane {
-    /// Open the lane as the owner's settings say. This never fails the
-    /// resident: a reservoir that cannot open is reported with its reason.
-    pub async fn open(shared_root: &Path, settings: &ReservoirLaneSettings) -> Self {
+    /// Open the lane as the owner's settings say. When no persona is named,
+    /// the sole persona in `personas` is the one: custody's index, never a
+    /// wallet file read here. This never fails the resident: a reservoir
+    /// that cannot open is reported with its reason.
+    pub async fn open(shared_root: &Path, settings: &ReservoirLaneSettings, personas: Arc<dyn PersonaIndex>) -> Self {
         if !settings.enabled {
             return Self::Off;
         }
-        match ResidentReservoir::open(shared_root, settings.persona).await {
+        let persona = match resolve_persona(personas, settings.persona).await {
+            Ok(persona) => persona,
+            Err(reason) => return Self::Unavailable(reason),
+        };
+        match ResidentReservoir::open(shared_root, persona).await {
             Ok(reservoir) => Self::Open(reservoir),
             Err(reason) => Self::Unavailable(reason),
         }
@@ -137,10 +143,9 @@ pub struct ResidentReservoir {
 }
 
 impl ResidentReservoir {
-    /// Open `persona`'s reservoir under `shared_root`, or the sole persona
-    /// wallet's when none is named. Takes the reservoir's exclusive lock.
-    pub async fn open(shared_root: &Path, persona: Option<PersonaId>) -> Result<Self, String> {
-        let persona = resolve_persona(shared_root, persona).map_err(|error| error.to_string())?;
+    /// Open `persona`'s reservoir under `shared_root`. Takes the reservoir's
+    /// exclusive lock. Choosing the persona is [`resolve_persona`]'s.
+    pub async fn open(shared_root: &Path, persona: PersonaId) -> Result<Self, String> {
         let backend =
             open_reservoir_backend(shared_root, persona).map_err(|error| error.to_string())?;
         let store = ReservoirStore::open(backend, persona)
@@ -573,7 +578,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread")]
     async fn an_admitted_session_ensures_and_lists_meres_through_the_route() {
         let root = tempfile::tempdir().unwrap();
-        let reservoir = ResidentReservoir::open(root.path(), Some(persona(7)))
+        let reservoir = ResidentReservoir::open(root.path(), persona(7))
             .await
             .unwrap();
         let mut catalog = ResidentEndpointCatalog::new();
@@ -621,7 +626,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread")]
     async fn a_bad_domain_or_a_stale_revision_changes_nothing() {
         let root = tempfile::tempdir().unwrap();
-        let reservoir = ResidentReservoir::open(root.path(), Some(persona(8)))
+        let reservoir = ResidentReservoir::open(root.path(), persona(8))
             .await
             .unwrap();
         let mut catalog = ResidentEndpointCatalog::new();
@@ -648,11 +653,35 @@ mod tests {
         assert_eq!(reservoir.meres().await.len(), 1);
     }
 
+    /// A persona index that discloses a fixed list, as custody would.
+    struct Indexed(Vec<PersonaId>);
+
+    impl PersonaIndex for Indexed {
+        fn personas(&self) -> Result<Vec<PersonaId>, String> {
+            Ok(self.0.clone())
+        }
+    }
+
+    fn index(personas: &[u128]) -> Arc<dyn PersonaIndex> {
+        Arc::new(Indexed(personas.iter().map(|n| persona(*n)).collect()))
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_lane_takes_the_sole_persona_custody_discloses_and_refuses_several() {
+        let root = tempfile::tempdir().unwrap();
+        match ReservoirLane::open(root.path(), &ReservoirLaneSettings::default(), index(&[5, 6])).await {
+            ReservoirLane::Unavailable(reason) => assert!(reason.contains("several personas") && reason.contains(&persona(6).as_uuid().to_string())),
+            _ => panic!("two personas and none named must leave the lane unavailable"),
+        }
+        let lane = ReservoirLane::open(root.path(), &ReservoirLaneSettings::default(), index(&[5])).await;
+        assert_eq!(lane.reservoir().unwrap().persona(), persona(5));
+    }
+
     #[tokio::test(flavor = "multi_thread")]
     async fn the_lane_reports_why_it_is_unavailable_and_refuses_a_second_owner() {
         let root = tempfile::tempdir().unwrap();
-        // No persona wallet exists under this root and none is named.
-        match ReservoirLane::open(root.path(), &ReservoirLaneSettings::default()).await {
+        // Custody discloses no persona wallet and none is named.
+        match ReservoirLane::open(root.path(), &ReservoirLaneSettings::default(), index(&[])).await {
             ReservoirLane::Unavailable(reason) => assert!(reason.contains("no persona wallet")),
             _ => panic!("a root with no persona wallet must leave the lane unavailable"),
         }
@@ -661,7 +690,7 @@ mod tests {
             ..ReservoirLaneSettings::default()
         };
         assert!(matches!(
-            ReservoirLane::open(root.path(), &off).await,
+            ReservoirLane::open(root.path(), &off, index(&[])).await,
             ReservoirLane::Off
         ));
 
@@ -669,9 +698,9 @@ mod tests {
             persona: Some(persona(9)),
             ..ReservoirLaneSettings::default()
         };
-        let first = ReservoirLane::open(root.path(), &named).await;
+        let first = ReservoirLane::open(root.path(), &named, index(&[])).await;
         assert!(first.reservoir().is_some());
-        match ReservoirLane::open(root.path(), &named).await {
+        match ReservoirLane::open(root.path(), &named, index(&[])).await {
             ReservoirLane::Unavailable(reason) => {
                 assert!(reason.contains("could not open the reservoir"))
             },
@@ -679,7 +708,7 @@ mod tests {
         }
         drop(first);
         assert!(
-            ReservoirLane::open(root.path(), &named)
+            ReservoirLane::open(root.path(), &named, index(&[]))
                 .await
                 .reservoir()
                 .is_some()

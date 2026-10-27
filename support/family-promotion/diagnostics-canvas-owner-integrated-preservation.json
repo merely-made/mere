@@ -1,0 +1,22 @@
+{
+  "primary_before": "e870314e6df2e030f12328f2fe02f7df0db05e5e",
+  "integrated_commit": "eada2c2c3013eca1ca33e890ffdca8275ff74b02",
+  "readme": {
+    "path": "design_docs/DOC_README.md",
+    "original_working_sha256": "adfe7a1ccffc1c37a568be747d7222c599a0a1f73c967c003cd2e4b7fafe5f17",
+    "old_canonical_blob": "d64577a0701af886f147fdc74b7d81329919dbe0",
+    "new_canonical_blob": "9b1ab671a54e774aaab090bb603ca64cac7c3d6a",
+    "merged_working_sha256": "bb8235790a0cabcbe8134afdc770ed4235a1710f7e5e7d12ac6d23e483b99321",
+    "method": "Clean git merge-file of local working edit, previous canonical blob and incoming canonical blob; unstaged edit retained after fast-forward"
+  },
+  "other_tracked_wip_sha256_unchanged": {
+    "design_docs/nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md": "1b61fa124562c5f5d8f51b3b4de529edd2a7523acbf73dd048d98d043c5b33dd",
+    "crates/system/fetch/Cargo.toml": "347b7758aaabf778a3767bbe566985865890f0581745dd4903b2be7fd70563b8",
+    "crates/system/fetch/src/lib.rs": "9a5f76eb9b5aba5bf2dafb2d210442bf2e3e34a94244bb9870a9f20cab30a6ce"
+  },
+  "staged_paths_after": [],
+  "untracked_parallel_sources_retained": [
+    "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\fetch\\src\\actor.rs",
+    "C:\\Users\\mark_\\Code\\repos\\mere\\crates\\system\\fetch\\src\\actor_tests.rs"
+  ]
+}

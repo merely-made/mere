@@ -18,15 +18,15 @@
 
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Arc;
 
-use castellan::authority::PersonaeHost;
-use castellan::custody::{IdentityStorage, OsPresence, UnlockMethod};
+#[cfg(feature = "in-process-custody")]
+use castellan::custody::OsPresence;
 #[cfg(not(target_os = "linux"))]
 use light_file_dialog::dialog::InputBox;
 use light_file_dialog::dialog::{Dialog, DialogBackend, OpenFileDialog};
-use ssh_key::PrivateKey;
 use zeroize::Zeroizing;
+
+use crate::custody_host::ResidentCustody;
 
 use crate::door::browser_carrier::{
     NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
@@ -36,7 +36,7 @@ use dramatis::intents::ImportSshKeyNativeIntentV1;
 const MAX_SSH_PRIVATE_KEY_BYTES: u64 = 1024 * 1024;
 const PICKER_START_ENV: &str = "GRAPHSHELL_NATIVE_PICKER_START";
 
-#[cfg(windows)]
+#[cfg(all(windows, feature = "in-process-custody"))]
 mod windows_presence;
 
 /// Secret-bearing desktop interactions required by native identity actions.
@@ -70,6 +70,8 @@ pub trait NativeIdentityUi: Send + Sync {
 
     /// Ask the OS to verify the user (Windows Hello). `Ok(None)` when it is
     /// unavailable, cancelled or not verified: the passphrase box follows.
+    /// Only an in-process, OS-sealed vault takes this proof.
+    #[cfg(feature = "in-process-custody")]
     fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
         Ok(None)
     }
@@ -325,6 +327,7 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
     }
 
     /// Windows Hello through personae's gate, which alone mints the proof.
+    #[cfg(feature = "in-process-custody")]
     fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
         if self.prefer_passphrase {
             return Ok(None);
@@ -376,14 +379,13 @@ impl NativeIdentityUi for UnavailableNativeIdentityUi {
     }
 }
 
-/// Apply one fixed native interaction against the resident Personae host.
-pub fn apply_native_identity_action<S, U>(
-    host: &Arc<PersonaeHost<S>>,
+/// Apply one fixed native interaction against custody.
+pub fn apply_native_identity_action<U>(
+    host: &dyn ResidentCustody,
     ui: &U,
     action: NativeIdentityAction,
 ) -> NativeIdentityResult
 where
-    S: IdentityStorage + 'static,
     U: NativeIdentityUi + ?Sized,
 {
     match action {
@@ -395,11 +397,10 @@ where
 }
 
 /// Local owner action. No caller supplies a credential, path, or prompt text.
-pub(crate) fn change_passphrase<S: IdentityStorage + 'static, U: NativeIdentityUi + ?Sized>(
-    host: &Arc<PersonaeHost<S>>,
+pub(crate) fn change_passphrase<U: NativeIdentityUi + ?Sized>(
+    host: &dyn ResidentCustody,
     ui: &U,
 ) -> dramatis::authentication::PassphraseChangeReceiptV1 {
-    use castellan::custody::PassphraseChangeError as E;
     use dramatis::authentication::{
         PassphraseChangeFailureV1 as F, PassphraseChangeReceiptV1 as R,
     };
@@ -432,39 +433,32 @@ pub(crate) fn change_passphrase<S: IdentityStorage + 'static, U: NativeIdentityU
     }
     match host.change_passphrase(old.as_bytes(), new.as_bytes()) {
         Ok(()) => R::Changed,
-        Err(e) => rejected(match e {
-            E::Locked => F::Locked,
-            E::Unsupported => F::Unsupported,
-            E::IncorrectCurrent => F::CurrentPassphraseRejected,
-            E::InvalidNew => F::InvalidNewPassphrase,
-            E::Storage => F::StorageFailure,
-        }),
+        Err(failure) => rejected(failure),
     }
 }
 
-/// OS presence first, then the passphrase box; the credential stays here.
-fn unlock_vault<S, U>(host: &Arc<PersonaeHost<S>>, ui: &U) -> NativeIdentityResult
+/// OS presence first where an in-process vault takes it, then the
+/// passphrase box. Toward a custodian the passphrase is sent once over the
+/// checked channel (the documented terminal-unlock exception) and dropped.
+fn unlock_vault<U>(host: &dyn ResidentCustody, ui: &U) -> NativeIdentityResult
 where
-    S: IdentityStorage + 'static,
     U: NativeIdentityUi + ?Sized,
 {
     if !host.is_locked() {
         return NativeIdentityResult::UnlockedVault;
     }
-    if let Ok(Some(proof)) = ui.verify_presence() {
-        match host.unlock_vault(UnlockMethod::OsPresence(proof)) {
-            Ok(()) => return NativeIdentityResult::UnlockedVault,
-            Err(error) => {
-                tracing::warn!(%error, "presence unlock refused; asking for the passphrase")
-            },
-        }
+    let ui_object: &dyn NativeIdentityUi = &Delegate(ui);
+    match host.unlock_with_presence(ui_object) {
+        Some(Ok(())) => return NativeIdentityResult::UnlockedVault,
+        Some(Err(error)) => tracing::warn!(%error, "presence unlock refused; asking for the passphrase"),
+        None => {},
     }
     let passphrase = match ui.prompt_vault_passphrase() {
         Ok(Some(passphrase)) => passphrase,
         Ok(None) => return NativeIdentityResult::Cancelled,
         Err(reason) => return NativeIdentityResult::Rejected { reason },
     };
-    let unlocked = host.unlock_vault(UnlockMethod::Passphrase(passphrase.as_bytes()));
+    let unlocked = host.unlock_with_passphrase(passphrase.as_bytes());
     drop(passphrase);
     match unlocked {
         Ok(()) => NativeIdentityResult::UnlockedVault,
@@ -477,13 +471,12 @@ where
     }
 }
 
-fn import_ssh_private<S, U>(
-    host: &Arc<PersonaeHost<S>>,
+fn import_ssh_private<U>(
+    host: &dyn ResidentCustody,
     ui: &U,
     options: ImportSshKeyNativeIntentV1,
 ) -> NativeIdentityResult
 where
-    S: IdentityStorage + 'static,
     U: NativeIdentityUi + ?Sized,
 {
     let path = match ui.pick_ssh_private_key() {
@@ -517,52 +510,63 @@ where
             reason: NativeIdentityFailure::SelectedFileTooLarge,
         };
     }
-    let mut private = match PrivateKey::from_openssh(bytes.as_slice()) {
-        Ok(private) => private,
+    let encrypted = match ssh_key::PrivateKey::from_openssh(bytes.as_slice()) {
+        Ok(private) => private.is_encrypted(),
         Err(_) => {
             return NativeIdentityResult::Rejected {
                 reason: NativeIdentityFailure::InvalidPrivateKey,
             };
         },
     };
-    if private.is_encrypted() {
-        let passphrase = match ui.prompt_ssh_private_key_passphrase() {
-            Ok(Some(passphrase)) => passphrase,
+    let passphrase = match encrypted {
+        true => match ui.prompt_ssh_private_key_passphrase() {
+            Ok(Some(passphrase)) => Some(passphrase),
             Ok(None) => return NativeIdentityResult::Cancelled,
             Err(reason) => return NativeIdentityResult::Rejected { reason },
-        };
-        private = match private.decrypt(passphrase.as_bytes()) {
-            Ok(private) => private,
-            Err(_) => {
-                return NativeIdentityResult::Rejected {
-                    reason: NativeIdentityFailure::IncorrectPassphrase,
-                };
-            },
-        };
-    }
-
-    match host.import_ssh_private(private, options) {
+        },
+        false => None,
+    };
+    // The key file's bytes go to custody once; the key is opened and stored
+    // there, not here.
+    match host.import_ssh_key(bytes.as_slice(), passphrase.as_ref().map(|p| p.as_bytes()), options) {
         Ok(receipt) => NativeIdentityResult::ImportedSshPrivate {
             fingerprint: receipt.fingerprint,
             comment: receipt.comment,
             unlock_policy: receipt.unlock_policy,
             replaced_existing: receipt.replaced_existing,
         },
-        Err(_) => NativeIdentityResult::Rejected {
-            reason: NativeIdentityFailure::ImportRejected,
-        },
+        Err(reason) => NativeIdentityResult::Rejected { reason },
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use std::sync::Mutex;
+/// A sized native surface as a trait object.
+struct Delegate<'a, U: NativeIdentityUi + ?Sized>(&'a U);
 
+impl<U: NativeIdentityUi + ?Sized> NativeIdentityUi for Delegate<'_, U> {
+    fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure> {
+        self.0.pick_ssh_private_key()
+    }
+
+    fn prompt_ssh_private_key_passphrase(&self) -> Result<Option<Zeroizing<String>>, NativeIdentityFailure> {
+        self.0.prompt_ssh_private_key_passphrase()
+    }
+
+    #[cfg(feature = "in-process-custody")]
+    fn verify_presence(&self) -> Result<Option<OsPresence>, NativeIdentityFailure> {
+        self.0.verify_presence()
+    }
+}
+
+#[cfg(all(test, feature = "in-process-custody"))]
+mod tests {
+    use std::sync::{Arc, Mutex};
+
+    use castellan::authority::PersonaeHost;
     use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
     use dramatis::intents::SshUnlockPolicyIntentV1;
     use dramatis::view::VaultProtectionView;
     use personae::{Ed25519Keypair, ProfileId};
-    use ssh_key::{Algorithm, LineEnding};
+    use ssh_key::{Algorithm, LineEnding, PrivateKey};
 
     use super::*;
 
@@ -707,7 +711,7 @@ mod tests {
         };
         let host = host();
         let result = apply_native_identity_action(
-            &host,
+            host.as_ref(),
             &ui,
             NativeIdentityAction::ImportSshPrivate {
                 unlock_policy: SshUnlockPolicyIntentV1::PerUse,
@@ -738,7 +742,7 @@ mod tests {
         };
         let host = host();
         let result = apply_native_identity_action(
-            &host,
+            host.as_ref(),
             &ui,
             NativeIdentityAction::ImportSshPrivate {
                 unlock_policy: SshUnlockPolicyIntentV1::ShortTtl { idle_seconds: 90 },
@@ -757,7 +761,7 @@ mod tests {
     #[test]
     fn unavailable_ui_cannot_downgrade_to_browser_secret_input() {
         let result = apply_native_identity_action(
-            &host(),
+            host().as_ref(),
             &UnavailableNativeIdentityUi,
             NativeIdentityAction::ImportSshPrivate {
                 unlock_policy: SshUnlockPolicyIntentV1::Session,

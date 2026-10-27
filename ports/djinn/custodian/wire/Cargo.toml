@@ -10,6 +10,8 @@ description = "The custody contract between Djinn and its independently launched
 # castellan. The custodian links both.
 [dependencies]
 base64.workspace = true
+# The public identity views and intents (secret-free; personae, gaz, serde).
+dramatis.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 zeroize = "1"

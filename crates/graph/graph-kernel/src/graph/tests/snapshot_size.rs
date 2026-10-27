@@ -20,9 +20,9 @@
 //! cost strictly more (pay-per-use). A separate, coarse ceiling on a
 //! semantic-statement chain guards the edge lane from gross regression.
 //!
-//! Size is the compact-JSON snapshot — the actual on-disk form
-//! (`store::save_graph`), minus the pretty-printer's whitespace so the number
-//! reflects field/key cost, not formatting.
+//! Size is the compact-JSON snapshot — the form a session's checkpoint
+//! persists, minus the pretty-printer's whitespace so the number reflects
+//! field/key cost, not formatting.
 
 use super::super::*;
 use crate::graph::SemanticStatementSpec;

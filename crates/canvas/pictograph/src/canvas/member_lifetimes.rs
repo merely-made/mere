@@ -8,6 +8,25 @@ use kernel::graph::SurfaceNodeLifetime;
 type Memberships = HashMap<NodeKey, (uuid::Uuid, SurfaceNodeLifetime)>;
 
 impl Canvas {
+    pub(super) fn forget_graph_models(&mut self) {
+        self.meaning.forget_graph();
+        self.community_actor = None;
+        self.content_affinity = None;
+        self.content_affinity_dirty = true;
+        self.installed_affinity_revision = None;
+        self.affinity_force_installed = false;
+        self.physics.set_affinity_force(None);
+        self.weighted_edges_cache = None;
+        self.last_strategy_inputs = None;
+        *self
+            .strategy_graph_memo
+            .get_mut()
+            .expect("strategy input cache") = None;
+        self.gloss_cache_inputs = None;
+        self.gloss_positions = None;
+        self.gloss_overlays.clear();
+    }
+
     pub(super) fn reconcile_member_lifetimes(&mut self) -> Vec<NodeKey> {
         let live: Memberships = self
             .graph
@@ -31,6 +50,12 @@ impl Canvas {
         if retired.is_empty() {
             return;
         }
+        // Rule-face batches belong to the former live view, even when a UUID
+        // is recreated. This does not change surviving member/action IDs.
+        self.graph_view_epoch = self
+            .graph_view_epoch
+            .checked_add(1)
+            .expect("Canvas epoch exhausted");
         let keep = |key: &NodeKey| !retired.contains_key(key);
         let members: HashSet<_> = retired.values().map(|(id, _)| *id).collect();
         for &key in retired.keys() {

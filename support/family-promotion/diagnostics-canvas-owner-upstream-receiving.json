@@ -1,0 +1,9 @@
+{
+  "upstream": "912aeab51",
+  "merge_commit": "b54325af0b05deb6933a6aa8c1f52a8cbcfbb431",
+  "qualification": "diagnostics-canvas-owner-integrated-qualification.json",
+  "qualified_source_snapshot": "diagnostics-canvas-owner-integrated-source.json",
+  "qualified_source_and_manifest_hashes_unchanged": true,
+  "canonical_diagnostics_documents_unchanged": true,
+  "scope": "Custody/wallet code and documentation only; no Canvas/kernel/model source, relevant manifest or lockfile changes. Existing 1192-pass qualification is reused; no custody acceptance is claimed."
+}

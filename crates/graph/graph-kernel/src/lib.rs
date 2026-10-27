@@ -41,10 +41,6 @@ pub mod persistence_edge;
 /// under the per-file ceiling.
 pub mod persistence_fields;
 pub mod signal_router;
-/// Native on-disk graph persistence. Gated by the `store` feature so the kernel
-/// stays portable-by-default; the native host enables it.
-#[cfg(feature = "store")]
-pub mod store;
 pub mod time;
 pub mod types;
 pub mod verso_address;

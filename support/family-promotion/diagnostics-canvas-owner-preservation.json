@@ -1,0 +1,26 @@
+{
+  "isolation_basis": "8d69c9144a8c10e437287fb0a82044be3b0b8659",
+  "unowned_files_at_isolation": {
+    "crates/system/fetch/Cargo.toml": "347b7758aaabf778a3767bbe566985865890f0581745dd4903b2be7fd70563b8",
+    "crates/system/fetch/src/lib.rs": "9a5f76eb9b5aba5bf2dafb2d210442bf2e3e34a94244bb9870a9f20cab30a6ce",
+    "design_docs/DOC_README.md": "adfe7a1ccffc1c37a568be747d7222c599a0a1f73c967c003cd2e4b7fafe5f17",
+    "design_docs/nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md": "1b61fa124562c5f5d8f51b3b4de529edd2a7523acbf73dd048d98d043c5b33dd",
+    "crates/system/fetch/src/actor.rs": "331dd910b6c59c0c49493a98506d5aa2a0309f303421d62facfe1ac776859cd7",
+    "crates/system/fetch/src/actor_tests.rs": "7677df8d5a7425d48b769c72f42ee493912ff54c8ca716278939bc0a3c3c0d0b"
+  },
+  "unchanged_at_receiving": {
+    "crates/system/fetch/Cargo.toml": "347b7758aaabf778a3767bbe566985865890f0581745dd4903b2be7fd70563b8",
+    "crates/system/fetch/src/lib.rs": "9a5f76eb9b5aba5bf2dafb2d210442bf2e3e34a94244bb9870a9f20cab30a6ce",
+    "design_docs/DOC_README.md": "adfe7a1ccffc1c37a568be747d7222c599a0a1f73c967c003cd2e4b7fafe5f17",
+    "design_docs/nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md": "1b61fa124562c5f5d8f51b3b4de529edd2a7523acbf73dd048d98d043c5b33dd"
+  },
+  "continued_concurrent_edits": [
+    "crates/system/fetch/src/actor.rs",
+    "crates/system/fetch/src/actor_tests.rs"
+  ],
+  "primary_staged_before": [],
+  "retained_target": "C:/t/cargo-targets/mere",
+  "isolated_cargo_home": null,
+  "temporary_checkout": "C:/Users/mark_/Code/worktrees/mere-canvas-owners",
+  "cleanup": "Remove after integration, push and verification; preserve primary source-bearing WIP."
+}

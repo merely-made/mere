@@ -36,12 +36,12 @@ use petgraph::visit::EdgeRef;
 const PAGE_RANK_DAMPING: f32 = 0.85;
 const PAGE_RANK_ITERATIONS: usize = 50;
 
-/// The physics view's key (F178): the graph's structural revision and the
+/// The physics view's key (F178): the graph's source-qualified structural input and the
 /// canvas's view revision, which a hide or show that changes the view bumps.
 /// The caller passes it in, so the registry holds no canvas.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct PhysicsViewKey {
-    pub structure: u64,
+    pub structure: kernel::graph::GraphInputKey,
     pub view: u64,
 }
 

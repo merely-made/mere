@@ -267,6 +267,34 @@ words are under each, unnumbered until he numbers them:
   Mark, 2026-10-26: **"Yes, join the invariant (Recommended)"**. `ReplaySetEdgesByIds` and
   `ReplaySetResourceEdgesByIds` run the shared validator; legacy migration gets an explicit
   staged state the check tolerates until it completes.
+- **Q031's legacy baselines with copies** (L1, 2026-10-26, the lane stopped rather than picked).
+  With checked load refusing a repeated handle, the caller-qualified legacy migration dedupes the
+  identical parallel copies of the Resource rows it builds for each claim and records each dedupe
+  as a `LegacyMigrationNote` on the owning Resource (`legacy_resource_migration/copies.rs`). Two
+  baselines still fail the migration's final checked load with the shared reason, confirmed by
+  throwaway probes: identical copies of a Surface-placed claim (for example `UserGrouped` on
+  parallel Surface rows), whose dedupe would belong in the Surface write-back after "Remove
+  surface authority first" (`legacy_resource_migration.rs:823` onward); and a baseline whose
+  Resource rows already hold copies that the migration never placed, where a dedupe rewrites rows
+  with `baseline_effects` consequences. Either the dedupe extends to those two, at whole-row or
+  statement granularity; or those baselines are refused and migrated by hand. Also open: the
+  frozen link still refuses an empty handle that checked load accepts.
+  Mark, 2026-10-26: **"Dedupe both (Recommended)"**. Whole identical rows dedupe to the first in
+  the Surface write-back and in pre-existing Resource rows alike, each with a note on the owning
+  Resource; a repeated handle on rows that differ stays a refusal, since that is a conflict, not a
+  copy.
+  Landed the same evening (`2d5601db5`): whole-row copies dedupe in both strata with a note each.
+- **Q010 in legacy migration** (L1, 2026-10-26, the lane stopped rather than picked). Checked
+  replay now refuses a malformed facet record, but the caller-qualified legacy migration replays
+  its journal under `OnRefusal::Drop`, and `legacy_resource_migration.rs:395` still drops such a
+  record with `if let Some(delta) = entry.delta.replay_delta_as(..)`. Either migration refuses it
+  as a `LegacyMigrationError`, as `check_typed_record` at `:398` refuses an invalid typed resource
+  capture; or it keeps dropping, since the migration is caller-qualified and its diagnostics could
+  count the drop. Once decided, the three drop-both adapters in `capture/replay_outcome.rs` go.
+  Mark, 2026-10-26: **"Refuse it (Recommended)"**. Migration returns a `LegacyMigrationError`
+  naming the node and facet, as it does for an invalid typed resource capture; the three drop-both
+  adapters in `capture/replay_outcome.rs` go.
+  Landed the same evening (`5936edf2c`): migration refuses the record naming node and facet; the adapters are gone.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
@@ -276,7 +304,105 @@ words are under each, unnumbered until he numbers them:
   of these lands.
   Mark, 2026-10-26: **"Beside its host (Recommended)"**. `tabard-workshop` moves to
   `ports/tabard/workshop` with its workspace path updated; still embeddable by path; the toolkit
-  directory stops carrying the document stack and the guard's carried list empties.
+  directory stops carrying the document stack and the guard's carried list empties. Later the same
+  evening: **"the guard refuses dev-only crate-to-port links too"**; the web host's
+  `shared_recovery` example moves beside the workshop.
+
+Open fork from L1's chartulary pass, 2026-10-26 (a question with the code evidence; unnumbered
+until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather than picked):
+
+- **Q002, what binds a checkpoint to the journal it summarizes.** Two admission paths check only
+  that the checkpoint's sequence does not pass the journal's length. Chartulary's
+  `GraphLog::load_checkpointed` (`spine.rs:732`, the check at `:756`) reads a `Snapshot`
+  (`spine.rs:70`) whose fields name no journal beyond `at_seq`, which `snapshot` fills from
+  `self.log.len()` (`:703`). On eidetic main `af17fe7`, a one-node log `durable` beside a one-node
+  snapshot of an unrelated graph `foreign` loads `foreign` at revision 1, where `load_full` gives
+  `durable` at revision 1. Pandect does not call that loader (nothing in mere does; kernel
+  `graph/journal.rs:25` only mirrors it). `GraphSession` open has its own
+  `Checkpoint { cursor, translated_receipt_digest }` (`graph_session.rs:313`), admitted when
+  `cursor <= live` (`:774`), then reads `graph.json` and `facets.json` without binding either to
+  the journal; only the legacy-translation path carries a digest (`:749`). muniment's `Journal`
+  carries a `LogId` and `Provenance` but no content digest (`journal/persist.rs:10` to `:20` lists
+  hash-indexed entries as roadmap). So one rule has two owners, and repairing either leaves the
+  other open. Either (a) muniment's journal offers a digest of its first n entries and both
+  checkpoints store and verify it: one binding, and a new muniment API; (b) each checkpoint owner
+  computes its own, so `Snapshot` and `Checkpoint` each gain a field and the format is duplicated
+  again (A016); or (c) a checkpoint stops being trusted and is verified by replay, or dropped,
+  which gives up the optimization. Whichever binds, a stored checkpoint with no digest is then
+  refused, ignored in favour of a full replay (the path legacy assertion-less snapshots already
+  take, `spine.rs:740`), or trusted as today.
+  Mark, 2026-10-26: **"muniment digest (Recommended)"** and, for a stored checkpoint with no
+  digest, **"Replay instead (Recommended)"**. muniment's journal offers a digest of its first n
+  entries; chartulary's `Snapshot` and Pandect's `Checkpoint` both store and verify it, one binding
+  with one new muniment API; a digest-less checkpoint is ignored in favour of a full replay, the
+  path legacy assertion-less snapshots already take, and is re-checkpointed with the digest.
+
+Open forks from the Q002 repair, 2026-10-27 (questions with the code evidence; unnumbered until
+Mark rules; the lane applied his two answers and stopped at these rather than picked):
+
+- **Q002, what binds Pandect's `graph.json` and `facets.json` to their checkpoint.** The journal
+  digest lives in `checkpoint.json` (`Checkpoint.journal_digest`, verified at
+  `graph_session.rs:796`), but the graph and its facets are separate records the open then reads
+  without any check against it (`:805`, `:808`), written in the same batch as the checkpoint
+  (`:1432` to `:1433`, with the record at `:1442`). So a checkpoint of this journal stays valid
+  while `graph.json` and `facets.json` are replaced by another graph's, which is exactly what the
+  audit's probe does: `pandect_checkpoint_reason_diagnostics.rs`
+  `recorded_session_accepts_foreign_checkpoint_at_its_own_valid_cursor` replaces only those two
+  keys and still passes on the repaired code, the foreign node opened as the session's graph. The
+  journal digest cannot reach this; chartulary does not have the gap because its `Snapshot` is one
+  record carrying contents and digest together (`spine.rs:75` at eidetic `cceb203`). The repaired
+  cases are a whole checkpoint (record and files) taken beside another journal, which open then
+  refused as Corrupt, and a checkpoint with no digest, which open ignores for a full replay.
+  Either (a) the checkpoint
+  record also stores a muniment `Hash` of the stored bytes of `graph.json` and `facets.json`, which
+  open hashes as read: bytes as stored, no new format for the files, and a hand edit of either
+  file then fails the check; (b) the three become one record, so contents, cursor and digest
+  cannot be separated: a format change that retires two files other tools may read; or (c) the
+  kernel's `GraphSnapshot` and `NodeFacetStore` each carry the digest, a change to two kernel
+  formats. And whichever binds, a mismatch is Corrupt, as a foreign journal digest now is, or the
+  checkpoint is ignored for the replay, as a missing one is.
+  Mark, 2026-10-27 (asked in the Q002 session): **"Hash in the record (Recommended)"**.
+  `Checkpoint.contents_digest` holds a muniment `Hash` of the stored bytes of `graph.json` and
+  `facets.json`, each length-framed; open hashes the bytes as read, and a checkpoint that names no
+  such hash is treated as naming no files. One reading, ruled below: a session with a
+  retained legacy translation is not hashed, because its checkpoint is already compared with that
+  translation and a difference there is refused as Corrupt (the existing
+  `translated_checkpoint_rejects_valid_truth_changes_before_admission`), which his mismatch answer
+  below would otherwise have turned into a replay.
+  Re-asked in the parent session later the same morning, with the evidence, before that session
+  had pulled the landing: Mark answered **"Stored-bytes hashes (Recommended)"** and
+  **"Corrupt (Recommended)"**. Shown that the Q002 session had already asked and landed the
+  opposite mismatch rule, he ruled **"Replay past stands (Recommended)"**: the mismatch answer
+  here is withdrawn and the landed rule stands. On the reading above: **"Keep the refusal
+  (Recommended)"**, the translation is a qualification record, not a cache, so a checkpoint that
+  differs from it stays Corrupt. Asked again in the Q002 session, which had not yet pulled that
+  answer, he replied the same: "Yes: a retained-translation session keeps its comparison with the
+  translation and refuses a difference as Corrupt." Ruled; no code changes.
+- **Q002, a digest the entries' encoding can move.** The journal digest is taken over each entry's
+  canonical serde encoding (`muniment` `journal/digest.rs`), because stored bytes change with the
+  codec and, for a hash-ordered map, from one save to the next. So an entry type whose
+  serialization changes for existing entries (a field added without `skip_serializing_if`, a
+  renamed field) changes the digest of every stored checkpoint, and a refused mismatch then
+  rejects a checkpoint that a replay would have read correctly: `GraphLog::load_checkpointed`
+  returns `StoreError::Codec` and Pandect open returns `SessionError::Corrupt`, as the existing
+  refusal of a checkpoint past the journal does (`spine.rs:758`). Either the refusal stands and an
+  entry type's owner versions any change to how existing entries encode; or a mismatch is
+  treated as unverifiable and replayed, which keeps old checkpoints usable across such a change
+  and gives up the loud signal for a substituted checkpoint.
+  Mark, 2026-10-27 (asked in the Q002 session): **"Replay past it (Recommended)"**, and for the
+  matchable `StoreError` variant, **"Keep Codec (Recommended)"**, which is moot once a mismatch
+  replays. A checkpoint is a cache the journal outranks: chartulary's `load_checkpointed` and
+  Pandect's open ignore one that names no journal prefix, another journal's prefix, a prefix past
+  the end of this journal, or (Pandect) files that are not the ones it wrote, replay in full, and
+  the next checkpoint names what it was written with. No digest mismatch is an error any longer.
+  chartulary's refusal of a legacy (assertion-less) snapshot past the journal
+  (`legacy snapshot sequence ... exceeds journal length`) is outside this and stays.
+  Re-asked in the parent session the same morning: **"Refuse, with a version (Recommended)"**
+  (a stored entry format version beside the digest, a different version replays, a same-version
+  mismatch Corrupt, golden digest tests pinning each entry type's encoding). Shown the landing, he
+  ruled **"Replay past stands (Recommended)"**. No entry format version is stored: an encoding
+  change invalidates every stored checkpoint once, silently, and the next checkpoint names the
+  new encoding.
 
 ## 6. Findings
 
@@ -324,3 +450,81 @@ words are under each, unnumbered until he numbers them:
   (477 before), Pandect lib suite 340/340. Forks recorded in §5: Q010, Q017, Q031, Q016's edge
   replays. Q014 stays re-document only; Q001 to Q003 and Q019 wait on an eidetic branch.
   Receipt: `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.
+- 2026-10-26 (L1, Q017 closed by removal): the kernel's `store` feature and module are gone per
+  Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
+  three paths). The two reopen integration tests that were gated on the feature now run against
+  a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
+- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `crates/cambium/` to
+  `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
+  README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
+  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
+  needs no toolkit carve-out. A proposal to print rather than refuse a dev-only link from a crate
+  to a port (the web host's `shared_recovery` wasm example mounted the workshop) was put to Mark
+  and reversed the same evening: **"the guard refuses dev-only crate-to-port links too"**, so the
+  example moved into `ports/tabard/workshop/examples/` with its wasm-only dev-dependencies (the
+  workshop's native host and window stack moved behind `cfg(not(target_arch = "wasm32"))`), and
+  the guard passes with nothing carried. Type-check of the workshop with its tests and the Tabard
+  desktop passed. The move also exposed bit-rot independent of it: the example did not compile for
+  wasm32 against genet main `01d3f52`, because `RenderCore::renderer` is native-only there
+  (`genet-render-host/src/lib.rs:757`) and the example read it twice. Repaired the same evening at
+  Mark's word: both reads go through `cambium_rootstock::try_renderer`, the one-operation checked
+  access that exists on every target, and the proof JSON records a refusal (busy frame gate or
+  lost device) in place of a value it never read, instead of inventing one. The example's wasm32
+  check passes.
+- 2026-10-26 (L1, third pass, Mark's rulings applied): Q010, a malformed facet record is a
+  `Replay::Malformed` outcome the checked loops refuse and the tolerant loops drop, with obsolete
+  imagery an explicit `Skip`; Q031, one rule in `graph/assertion_handles.rs` serves checked and
+  recorded load, selection freeze and link freeze with one reason, and the caller-qualified
+  migration dedupes the copies it builds and says so in a `LegacyMigrationNote`; Q016's edge
+  replay arms consult the widened handle validator (`PendingWrite`) and migration runs inside the
+  explicit `stage_edges`/`settle_staged_edges` scope. Kernel lib 505/505 and both reopen tests,
+  Pandect 340 lib and 28 integration tests green; one Pandect frozen-record test now asserts the
+  refusal of an identical copy. New forks in §5: Q031's legacy baselines that already hold copies,
+  and whether migration drops or refuses a malformed facet record. Receipt updated.
+- 2026-10-26 (L1, chartulary): Q001, Q003 and Q019 repaired on eidetic main (`af17fe7`; branch
+  `l1-chartulary` merged and pruned) and mere repinned to it, in the workspace and in
+  `ports/graphshell/web`, lockfiles changed in their source revs only. Q001 follows Mark's creator
+  ruling (re-parent to the deleted owner's creator, else clear) and also clears a survivor's pending
+  origin parent that the deletion collected; Q019 writes snapshot bindings and owned visits in index
+  order; Q003 archives a shared nested graph only when its last bearer leaves. One regression each
+  in chartulary (three for Q001 and Q019, one for Q003 beside a control) and a consumer before/after
+  in the kernel and Pandect; the audit's probes now fail on their defect assertions. Q002 stays open
+  as a fork (§5): its binding has two admission owners. Chartulary 87/87 (79 before), kernel lib
+  485/485 on its own base and 506/506 merged with the third pass, Pandect lib 342/342. Receipt:
+  `support/receipts/ownership-repair/l1/2026-10-26_l1_chartulary_receipt.json`.
+- 2026-10-26 (L1, fourth pass, the migration rulings): legacy migration dedupes whole identical
+  rows in both strata with a `LegacyMigrationNote` each (`legacy_resource_migration/copies.rs`)
+  and refuses a malformed facet record as a `LegacyMigrationError` naming node and facet; the
+  drop-both replay adapters and the pub `CapturedDelta::replay_delta` / `replay_delta_as` are gone
+  (a public-API change with no caller left). Merged onto the chartulary repin. Kernel lib 512/512
+  with both reopen tests, Pandect 342 lib and 28 integration tests. Of L1's first slice only Q002
+  (chartulary, a fork in §5) and Q014 (re-document only) remain. Receipt updated.
+- 2026-10-27 (L1, Q002 applied): muniment gains `Journal::prefix_digest(len)`, a blake3 digest of
+  the first `len` entries over their canonical encoding (maps ordered by key; a prefix keeps its
+  digest as the log grows, across saves and in forks). Chartulary's `Snapshot` stores it,
+  `load_checkpointed` refuses a snapshot of another prefix and replays in full past one with no
+  digest (Mark's two answers); `Container` tags serialize sorted so a journal entry holding them
+  digests alike after a reload. Pandect's `Checkpoint` stores it, open refuses a mismatch as
+  Corrupt naming the checkpoint (replayed past since, below) and ignores a digest-less checkpoint
+  for the baseline-plus-journal replay, and the next checkpoint writes the digest. Regressions in muniment (7), chartulary (6)
+  and Pandect (3); mutation controls that remove the check, the digest-less path and the sorting
+  each fail the matching ones. The audit's swapped
+  `graph.json`/`facets.json` probe still opens the foreign graph, because the journal digest cannot
+  reach files outside the record that holds it: that, and what an entry-encoding change does to a
+  stored digest, are two forks in §5. Eidetic `cceb203`; kernel lib 513, Pandect lib 347 and its 28
+  integration tests (other sessions' tests are in those counts). Receipt updated.
+- 2026-10-27 (L1, Q002 follow-through, Mark's two answers applied): a checkpoint that cannot be shown
+  to match is replayed past instead of refused, in chartulary (eidetic `e7eef1e`) and Pandect, and
+  Pandect's checkpoint record now also hashes the stored bytes of `graph.json` and `facets.json`, so
+  the audit's swapped-file probe no longer opens the foreign graph (the probe now fails at its
+  defect assertion). The earlier foreign-journal regression changed from Corrupt to replay; two
+  regressions are new, one for replaced files and one for a record that names no files. A session
+  with a retained translation keeps its own comparison and refusal (ruled by Mark, §5). Kernel lib 513, Pandect lib 349 and its 28 integration tests, chartulary 94, muniment 54.
+  `stickleback` (105 and 5 tests) passes on eidetic `cceb203`; the full-workspace stall was feature
+  unification, not that crate. Receipt updated.
+- 2026-10-27 (L1, the Q002 forks asked twice): the parent session walked Mark through both
+  forks with the evidence an hour after the Q002 session had asked and landed them, without
+  having pulled main first, and got the opposite mismatch answer. Shown the conflict, Mark ruled
+  the landed rule stands (replay past) and confirmed the translated-session refusal; both are
+  recorded under the forks in §5. Nothing in code changed. A fork is answered in §5 before it is
+  asked again: pull main and read §5 first.

@@ -116,3 +116,7 @@ support/doc-audit/d2/batch_112_canvas_membership_lifetimes.md -text
 # Canvas cache lifetime receipts retain exact bytes.
 support/family-promotion/diagnostics-canvas-cache-*.json -text
 support/doc-audit/d2/batch_114_canvas_cache_lifetimes.md -text
+
+# Canvas host/model ownership receipts retain exact bytes.
+support/family-promotion/diagnostics-canvas-owner-*.json -text
+support/doc-audit/d2/batch_115_canvas_host_ownership.md -text

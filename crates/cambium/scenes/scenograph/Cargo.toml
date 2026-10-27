@@ -12,6 +12,7 @@ keywords = ["projection", "authoring", "scene", "visualization"]
 categories = ["visualization", "data-structures"]
 
 [dependencies]
+backstep = { workspace = true, optional = true }
 # A swatch's subgraph scope (Scenograph editor plan, SE63, SE67).
 curation = { package = "mere-curation", version = "0.1.0", path = "../../../forme/curation" }
 # `SourceRef`, the score contract's source identity, which a resolved dataset's
@@ -25,6 +26,8 @@ serde_json = "1.0.140"
 script-engine-api = { workspace = true, optional = true }
 
 [features]
+# Draft/history ownership is unnecessary for hosts that only resolve rules.
+editor = ["dep:backstep"]
 # Run `Condition::Script` (`RuleSet::resolve_with_scripts`). Off by default: the
 # condition is data and always present, and `resolve` refuses a set carrying one.
 scripts = ["dep:script-engine-api"]

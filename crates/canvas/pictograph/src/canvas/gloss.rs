@@ -108,7 +108,7 @@ impl Canvas {
         let fresh_edges = self
             .weighted_edges_cache
             .as_ref()
-            .filter(|(rev, _)| *rev == self.graph.revision());
+            .filter(|(rev, _)| *rev == self.graph.structural_input_key());
         let fallback_edges;
         let weighted: &[(NodeKey, NodeKey, u32)] = match fresh_edges {
             Some((_, edges)) => edges,
@@ -204,7 +204,7 @@ impl Canvas {
         match &self.gloss_cache_inputs {
             Some((sid, rev, sw, sh, rings, bridges, scope, sfocus)) => {
                 sid != id
-                    || *rev != self.graph.revision()
+                    || *rev != self.graph.structural_input_key()
                     || *sw != w
                     || *sh != h
                     || *rings != self.show_community_rings
@@ -250,7 +250,7 @@ impl Canvas {
                 .flatten();
             self.gloss_cache_inputs = Some((
                 id,
-                self.graph.revision(),
+                self.graph.structural_input_key(),
                 w,
                 h,
                 self.show_community_rings,

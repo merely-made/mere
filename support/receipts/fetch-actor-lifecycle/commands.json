@@ -1,0 +1,201 @@
+[
+  {
+    "command": "cargo test -p mere-fetch --no-default-features --features actor,smolweb --lib --locked --offline -j 2 --message-format=json -- --test-threads=1",
+    "exit_code": 0,
+    "seconds": 12.34,
+    "warnings": 0,
+    "errors": [],
+    "test_summaries": [
+      "running 66 tests",
+      "test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.07s"
+    ],
+    "tail": [
+      "test tests::read_effects::every_read_entry_refuses_submission_before_connecting ... ok",
+      "test tests::read_effects::explicit_spartan_submit_sends_exact_bytes_and_returns_its_redirect ... ok",
+      "test tests::read_effects::explicit_titan_submit_preserves_payload_and_capsule_identity ... ok",
+      "test tests::read_effects::read_redirect_to_an_ordinary_spartan_page_keeps_exact_bytes ... ok",
+      "test tests::read_effects::read_redirects_refuse_submission_before_contacting_the_target ... ok",
+      "test tests::read_effects::refused_titan_read_traces_redact_credentials_and_upload_parameters ... ok",
+      "test tests::scroll_success_keeps_complete_mime_without_inventing_native_metadata ... ok",
+      "test tests::smolweb_content_type_tags_fixed_schemes_and_passes_others_through ... ok",
+      "test tests::smolweb_input_preserves_prompt_target_and_sensitivity ... ok",
+      "test tests::smolweb_trace_address_omits_query_and_fragment ... ok",
+      "test tests::spartan_submission_redirect_cannot_cross_origin ... ok",
+      "test tests::state_tag_distinguishes_transitions ... ok",
+      "test tests::submission_redirect_is_returned_without_becoming_a_fetch ... ok",
+      "",
+      "test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.07s",
+      ""
+    ],
+    "artifacts": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\fetch-3ae2da201457eb90.exe",
+        "bytes": 23133184,
+        "sha256": "38f0f3aded3728ef9f91295f3f1be489ae46d88ffbb566562850f9a88ebe21c2"
+      }
+    ]
+  },
+  {
+    "command": "cargo test -p mere-fetch --lib --locked --offline -j 2 --message-format=json -- --test-threads=1",
+    "exit_code": 0,
+    "seconds": 17.53,
+    "warnings": 31,
+    "errors": [],
+    "test_summaries": [
+      "running 66 tests",
+      "test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.08s"
+    ],
+    "tail": [
+      "test tests::read_effects::every_read_entry_refuses_submission_before_connecting ... ok",
+      "test tests::read_effects::explicit_spartan_submit_sends_exact_bytes_and_returns_its_redirect ... ok",
+      "test tests::read_effects::explicit_titan_submit_preserves_payload_and_capsule_identity ... ok",
+      "test tests::read_effects::read_redirect_to_an_ordinary_spartan_page_keeps_exact_bytes ... ok",
+      "test tests::read_effects::read_redirects_refuse_submission_before_contacting_the_target ... ok",
+      "test tests::read_effects::refused_titan_read_traces_redact_credentials_and_upload_parameters ... ok",
+      "test tests::scroll_success_keeps_complete_mime_without_inventing_native_metadata ... ok",
+      "test tests::smolweb_content_type_tags_fixed_schemes_and_passes_others_through ... ok",
+      "test tests::smolweb_input_preserves_prompt_target_and_sensitivity ... ok",
+      "test tests::smolweb_trace_address_omits_query_and_fragment ... ok",
+      "test tests::spartan_submission_redirect_cannot_cross_origin ... ok",
+      "test tests::state_tag_distinguishes_transitions ... ok",
+      "test tests::submission_redirect_is_returned_without_becoming_a_fetch ... ok",
+      "",
+      "test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.08s",
+      ""
+    ],
+    "artifacts": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\fetch-d2e25d24e9afc9f8.exe",
+        "bytes": 23376384,
+        "sha256": "f060c35838cddeb72e67e7851d79333d367c7e6faf82d2b147b7f7a4375c3c5f"
+      }
+    ]
+  },
+  {
+    "command": "cargo clippy -p mere-fetch --all-targets --no-deps --locked --offline -j 2 --message-format=json -- -D warnings",
+    "exit_code": 0,
+    "seconds": 6.31,
+    "warnings": 31,
+    "errors": [],
+    "test_summaries": [],
+    "tail": [
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "Checking mere-fetch v0.0.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-fetch-actor\\crates\\system\\fetch)",
+      "Finished `dev` profile [unoptimized] target(s) in 6.09s"
+    ],
+    "artifacts": []
+  },
+  {
+    "command": "cargo test -p mere-fetch --no-default-features --features actor --lib actor::tests --locked --offline -j 2 --message-format=json -- --test-threads=1",
+    "exit_code": 0,
+    "seconds": 9.44,
+    "warnings": 0,
+    "errors": [],
+    "test_summaries": [
+      "running 14 tests",
+      "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.62s"
+    ],
+    "tail": [
+      "test actor::tests::admission_sheds_overflow_without_contacting_the_second_origin ... ok",
+      "test actor::tests::cancelling_one_same_url_request_leaves_the_other_correlated_request_live ... ok",
+      "test actor::tests::closing_with_active_page_subresource_and_favicon_joins_and_finishes_each_once ... ok",
+      "test actor::tests::concurrent_same_id_admission_leaves_only_the_latest_completion_registered ... ok",
+      "test actor::tests::dropping_fetch_actor_does_not_wait_for_a_blocked_cancellation_wake ... ok",
+      "test actor::tests::invalid_capacity_and_zero_queue_deadline_are_rejected_before_startup ... ok",
+      "test actor::tests::original_actor_handle_join_waits_for_task_cleanup ... ok",
+      "test actor::tests::page_progress_keeps_its_request_id_and_has_one_terminal_completion ... ok",
+      "test actor::tests::queued_cancel_is_terminal_and_never_opens_its_origin ... ok",
+      "test actor::tests::queued_request_expires_before_transport_contact ... ok",
+      "test actor::tests::rejected_duplicate_id_is_latest_intent_and_suppresses_older_completion ... ok",
+      "test actor::tests::task_wake_panic_is_reported_after_the_terminal_update_without_hanging_join ... ok",
+      "test actor::tests::zero_active_disables_work_and_zero_queue_sheds_instead_of_waiting ... ok",
+      "",
+      "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.62s",
+      ""
+    ],
+    "artifacts": [
+      {
+        "path": "C:\\t\\cargo-targets\\mere\\build\\debug\\deps\\fetch-16fffb769bb172eb.exe",
+        "bytes": 20822528,
+        "sha256": "199dc7cdf1c2c38da7ca0a4978f8413069cd5c0fd68cb5881814c752f5be9139"
+      }
+    ]
+  },
+  {
+    "command": "cargo check -p mere-fetch --no-default-features --locked --offline -j 2 --message-format=json",
+    "exit_code": 0,
+    "seconds": 5.2,
+    "warnings": 0,
+    "errors": [],
+    "test_summaries": [],
+    "tail": [
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "Checking mere-pageload v0.0.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-fetch-actor\\crates\\system\\page-load)",
+      "Checking mere-fetch v0.0.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-fetch-actor\\crates\\system\\fetch)",
+      "Finished `dev` profile [unoptimized] target(s) in 5.08s"
+    ],
+    "artifacts": []
+  },
+  {
+    "command": "cargo check -p mere-fetch --no-default-features --features smolweb --locked --offline -j 2 --message-format=json",
+    "exit_code": 0,
+    "seconds": 5.53,
+    "warnings": 0,
+    "errors": [],
+    "test_summaries": [],
+    "tail": [
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `mere-proofs v0.1.0 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `servitor v0.0.2 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "warning: patch `stickleback v0.1.1 (https://github.com/merely-made/eidetic.git?rev=af17fe7fb362f92fb01926d9ff5d9f7b3b468a12#af17fe7f)` was not used in the crate graph",
+      "|",
+      "= help: perhaps you meant one of the following:",
+      "https://www.github.com/merely-made/eidetic.git",
+      "Checking mere-fetch v0.0.1 (C:\\Users\\mark_\\Code\\worktrees\\mere-fetch-actor\\crates\\system\\fetch)",
+      "Finished `dev` profile [unoptimized] target(s) in 5.41s"
+    ],
+    "artifacts": []
+  },
+  {
+    "command": "rustfmt --edition 2024 --config skip_children=true --check crates/system/fetch/src/lib.rs crates/system/fetch/src/actor.rs crates/system/fetch/src/actor_tests.rs crates/system/fetch/src/client_limits_tests.rs",
+    "exit_code": 0,
+    "seconds": 0.11,
+    "warnings": 0,
+    "errors": [],
+    "test_summaries": [],
+    "tail": [],
+    "artifacts": []
+  }
+]

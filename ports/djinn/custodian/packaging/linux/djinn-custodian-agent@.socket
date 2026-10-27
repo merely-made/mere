@@ -1,0 +1,19 @@
+# The SSH agent the custodian serves for one desktop user (%i), custody
+# isolation plan H2: the user's SSH_AUTH_SOCK points here. The same posture
+# as the custody socket: systemd listens, only the owner may connect (0600),
+# and the custodian admits only the owner's uid once the vault is open.
+[Unit]
+Description=Djinn custodian SSH agent socket for %i
+
+[Socket]
+ListenStream=/run/djinn-custodian/%i-agent.sock
+SocketUser=%i
+SocketMode=0600
+DirectoryMode=0755
+Accept=no
+RemoveOnStop=yes
+FileDescriptorName=agent
+Service=djinn-custodian@%i.service
+
+[Install]
+WantedBy=sockets.target

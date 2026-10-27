@@ -37,10 +37,29 @@ pub const SETTLED_ARRANGEMENT: &str = "settled";
 /// host that does not still lands.
 #[derive(Clone, Debug, PartialEq)]
 pub struct StopReturn {
+    pub(super) source: super::host_results::LayoutResultSource,
     pub from: Vec<(NodeKey, PortablePoint)>,
     pub to: Vec<(NodeKey, PortablePoint)>,
     /// The ease's length; `None` is the arrangement transition's default.
     pub duration_ms: Option<u32>,
+}
+
+impl StopReturn {
+    /// Capture the actual Canvas owner and structural inputs before handing a
+    /// return to a delayed host. Ordinary title edits preserve this source.
+    pub fn new(
+        canvas: &Canvas,
+        from: Vec<(NodeKey, PortablePoint)>,
+        to: Vec<(NodeKey, PortablePoint)>,
+        duration_ms: Option<u32>,
+    ) -> Self {
+        Self {
+            source: super::host_results::LayoutResultSource::capture(canvas),
+            from,
+            to,
+            duration_ms,
+        }
+    }
 }
 
 /// The canvas's role state, kept in one field so it moves as one piece.
@@ -429,6 +448,7 @@ impl Canvas {
             })
             .collect();
         self.roles.stop_return = moved.then(|| StopReturn {
+            source: super::host_results::LayoutResultSource::capture(self),
             from: from.to_vec(),
             to: to.clone(),
             duration_ms: None,

@@ -48,6 +48,7 @@ use crate::types::{
 };
 
 pub mod apply;
+pub mod assertion_handles;
 pub mod capture;
 /// Cross-graph node copy (tear-out fork): mints a node in this graph from a
 /// donor node in another graph, recording cross-graph derivation provenance.
@@ -59,6 +60,10 @@ pub mod journal;
 pub mod legacy_content_migration;
 pub(crate) mod legacy_family_attribution;
 pub mod legacy_resource_migration;
+#[cfg(test)]
+mod legacy_resource_migration_copies_tests;
+#[cfg(test)]
+mod legacy_resource_migration_malformed_tests;
 #[cfg(test)]
 mod legacy_resource_migration_reason_tests;
 pub use cross_graph::ComponentCopy;
@@ -72,6 +77,8 @@ pub use frozen_link::{
     FROZEN_LINK, FrozenLink, FrozenLinkEndpoint, FrozenLinkSource, FrozenSourceBinding,
     FrozenSourceRevision, OpenedFrozenLink,
 };
+#[cfg(test)]
+mod assertion_handles_tests;
 pub mod coverage;
 #[cfg(test)]
 mod frozen_link_tests;
@@ -79,6 +86,7 @@ mod frozen_link_tests;
 mod frozen_selection_tests;
 mod residency;
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
+mod edge_admission;
 pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
@@ -90,6 +98,8 @@ pub mod filter;
 pub mod fixtures;
 pub mod history;
 pub mod identity;
+mod input_key;
+pub use input_key::GraphInputKey;
 mod membership;
 pub use membership::SurfaceNodeLifetime;
 pub mod import_records;
@@ -104,6 +114,8 @@ mod relation_read;
 pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
+#[cfg(test)]
+mod resource_content_edge_tests;
 #[cfg(test)]
 mod resource_content_handle_tests;
 #[cfg(test)]
@@ -170,8 +182,8 @@ pub use navigation_check::NavigationIndexError;
 // `EdgeKind`; reads go through [`RelationKind`] + [`RelationSelector`], writes
 // through [`EdgeAssertion`].
 pub use capture::{
-    CapturedDelta, DeltaRecorder, GraphTableStats, ReplayRefused, replay_captured_deltas,
-    replay_captured_deltas_as_onto, replay_captured_deltas_onto,
+    CapturedDelta, DeltaRecorder, GraphTableStats, Malformed, Replay, ReplayRefused, Unwritable,
+    replay_captured_deltas, replay_captured_deltas_as_onto, replay_captured_deltas_onto,
     replay_captured_deltas_onto_checked, set_captured_delta_hook, with_isolated_capture,
 };
 pub use journal::{
@@ -326,6 +338,9 @@ pub struct ContainmentEdgeView {
 /// Main graph structure backed by petgraph::StableGraph
 #[derive(Clone)]
 pub struct Graph {
+    /// Runtime-only model input versions, preserved by clones and advanced at
+    /// the existing structural/content/site/visit mutation boundaries.
+    runtime_input_keys: [GraphInputKey; 4],
     /// The substrate graph: a [`chartulary::Graph`] over mere's [`Node`] and
     /// [`EdgePayload`] (the G5 re-base — mere's graph *is* a chartulary graph).
     /// It owns the petgraph topology and the stable id-to-key index (mere's old
@@ -375,7 +390,7 @@ pub struct Graph {
     /// or on pure content edits (title/url/tags), since those leave the structure a derived signal
     /// reads unchanged. The single source of truth any consumer gates a cache on — community,
     /// arrangements, importance — so a recompute happens once per real change, not per frame.
-    /// (Graph signals — the universal cache key.)
+    /// (Graph signals — the local counter; cross-owner caches use structural_input_key.)
     revision: u64,
 
     /// A monotonic revision for the URL-authority partition used by views such
@@ -421,12 +436,15 @@ pub struct Graph {
     pub(crate) semantic_observation_revision: u64,
     pub(crate) appearance_admission_revision: u64,
     pub(crate) known_coverage: CoverageNote,
+    /// Set only inside a legacy migration's staged scope; see `edge_admission`.
+    pub(crate) staged_edges: edge_admission::StagedEdges,
 }
 
 impl Graph {
     /// Create a new empty graph
     pub fn new() -> Self {
         Self {
+            runtime_input_keys: [GraphInputKey::new_source(); 4],
             inner: chartulary::Graph::new(),
             surface_node_lifetimes: HashMap::new(),
             resources: chartulary::Graph::new(),
@@ -450,6 +468,7 @@ impl Graph {
             semantic_observation_revision: 0,
             appearance_admission_revision: 0,
             known_coverage: CoverageNote::default(),
+            staged_edges: Default::default(),
         }
     }
 
@@ -529,21 +548,25 @@ impl Graph {
     }
 
     /// Advance the structural revision. Called by the topology/relation mutators on a real change.
-    /// (Graph signals — the universal cache key.)
+    /// (Graph signals — the local counter; cross-owner caches use structural_input_key.)
     fn bump_revision(&mut self) {
         self.revision = self.revision.wrapping_add(1);
+        self.runtime_input_keys[0].advance();
     }
 
     fn bump_url_grouping_revision(&mut self) {
         self.url_grouping_revision = self.url_grouping_revision.wrapping_add(1);
+        self.runtime_input_keys[2].advance();
     }
 
     pub(crate) fn bump_content_revision(&mut self) {
         self.content_revision = self.content_revision.wrapping_add(1);
+        self.runtime_input_keys[1].advance();
     }
 
     pub(crate) fn bump_visit_revision(&mut self) {
         self.visit_revision = self.visit_revision.wrapping_add(1);
+        self.runtime_input_keys[3].advance();
     }
 
     // Durable write boundaries. The Phase 6.5 GraphDelta migration covers

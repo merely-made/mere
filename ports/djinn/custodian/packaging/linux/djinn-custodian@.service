@@ -6,7 +6,8 @@
 [Unit]
 Description=Djinn custodian for %i
 Requires=djinn-custodian@%i.socket
-After=djinn-custodian@%i.socket
+Wants=djinn-custodian-agent@%i.socket
+After=djinn-custodian@%i.socket djinn-custodian-agent@%i.socket
 
 [Service]
 Type=simple
@@ -47,4 +48,4 @@ Restart=on-failure
 RestartSec=2
 
 [Install]
-Also=djinn-custodian@%i.socket
+Also=djinn-custodian@%i.socket djinn-custodian-agent@%i.socket

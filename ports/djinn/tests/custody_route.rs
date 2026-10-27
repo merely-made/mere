@@ -59,7 +59,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     djinn::custody::grant(&grants).unwrap();
     let endpoint = endpoint_name();
     {
-        let (endpoint, keeper) = (endpoint.clone(), Arc::new(Keeper::new(Arc::clone(&host))));
+        let (endpoint, keeper) = (endpoint.clone(), Arc::new(Keeper::new(host.clone())));
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,

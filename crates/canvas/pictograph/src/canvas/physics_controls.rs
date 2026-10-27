@@ -798,9 +798,20 @@ pub fn advance_arrangement(
     host_ms: f64,
 ) -> Option<String> {
     if let Some(stop) = canvas.take_stop_return() {
-        *transition = ArrangementTransition::returning(canvas, &stop)
-            .ok()
-            .flatten();
+        match ArrangementTransition::returning(canvas, &stop) {
+            Ok(pending) => *transition = pending,
+            Err(reason) => {
+                *transition = None;
+                return Some(format!("Arrangement cancelled: {reason}"));
+            },
+        }
+    }
+    if transition
+        .as_ref()
+        .is_some_and(|pending| !pending.source.is_current(canvas))
+    {
+        *transition = None;
+        return Some("Arrangement cancelled: its graph or view changed".into());
     }
     let returning = transition.as_ref()?.returning;
     let (positions, complete) = transition.as_mut()?.advance(host_ms);
@@ -830,6 +841,7 @@ pub fn advance_arrangement(
 /// anchored items. Scenotime owns the schedule; the host owns the frame clock
 /// it is advanced with.
 pub struct ArrangementTransition {
+    source: super::host_results::LayoutResultSource,
     schedule: scenotime::TransitionSchedule,
     clock: ProjectionClock,
     node_of: HashMap<sceno::InstanceId, NodeKey>,
@@ -857,6 +869,9 @@ impl ArrangementTransition {
     /// A stop's return (F24): from where the anchored items were to their
     /// arrangement positions, everything else holding still.
     pub fn returning(canvas: &Canvas, stop: &super::StopReturn) -> Result<Option<Self>, String> {
+        if !stop.source.is_current(canvas) {
+            return Err("Stop return belongs to a superseded graph or view".into());
+        }
         let start_of = stop
             .from
             .iter()
@@ -948,6 +963,7 @@ impl ArrangementTransition {
         )
         .map_err(|error| format!("could not schedule arrangement transition: {error:?}"))?;
         Ok(Some(Self {
+            source: super::host_results::LayoutResultSource::capture(canvas),
             schedule,
             clock: ProjectionClock::default(),
             node_of,
@@ -957,7 +973,8 @@ impl ArrangementTransition {
         }))
     }
 
-    /// The positions at host time `host_ms`, and whether the transition is done.
+    /// Sample positions at host time `host_ms`. This is only schedule sampling;
+    /// hosts install through `advance_arrangement`, which revalidates the source.
     pub fn advance(&mut self, host_ms: f64) -> (Vec<(NodeKey, PortablePoint)>, bool) {
         let frame = self.schedule.sample_at(self.clock.observe(host_ms));
         if frame.complete {

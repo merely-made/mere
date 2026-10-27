@@ -6,6 +6,8 @@
 
 use std::path::PathBuf;
 
+use super::contributes::Contribution;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModType {
     Native,
@@ -36,8 +38,14 @@ pub struct ModManifest {
     pub mod_id: String,
     pub display_name: String,
     pub mod_type: ModType,
+    /// Dependency names other mods can require (`ProtocolRegistry`).
     pub provides: Vec<String>,
+    /// Dependency names this mod needs, matched against `provides`.
     pub requires: Vec<String>,
+    /// What this mod adds to the GUI, by kind and id. Defaults empty; set by
+    /// the manifest reader or [`ModManifest::with_contributes`], not
+    /// [`ModManifest::new`]. Activation is checked against it.
+    pub contributes: Vec<Contribution>,
     pub capabilities: Vec<ModCapability>,
     /// Origin globs this mod's wasm binds as a DocumentScript (the "installed
     /// extension" auto-attach form). Empty = not a document-script mod. When
@@ -62,9 +70,15 @@ impl ModManifest {
             mod_type,
             provides,
             requires,
+            contributes: Vec::new(),
             capabilities,
             document_script_origins: Vec::new(),
         }
+    }
+
+    pub fn with_contributes(mut self, contributes: Vec<Contribution>) -> Self {
+        self.contributes = contributes;
+        self
     }
 }
 
@@ -81,17 +95,17 @@ pub enum ModExtensionRecord {
         scheme: String,
         previously_present: bool,
     },
-    ViewerMime {
-        mime: String,
-        previous_viewer_id: Option<String>,
+    PresentationContentType {
+        content_type: String,
+        previous_presentation_id: Option<String>,
     },
-    ViewerExtension {
+    PresentationExtension {
         extension: String,
-        previous_viewer_id: Option<String>,
+        previous_presentation_id: Option<String>,
     },
-    ViewerCapabilities {
-        viewer_id: String,
-        previous_capabilities: Option<crate::viewer::ViewerSubsystemCapabilities>,
+    PresentationReaches {
+        presentation_id: String,
+        previous: Option<inker::presentation::Reaches>,
     },
     Action {
         action_id: String,
@@ -128,21 +142,44 @@ pub enum ModUnloadError {
 pub struct ModActivationError {
     reason: String,
     applied_records: Vec<ModExtensionRecord>,
+    undeclared: Option<ModExtensionRecord>,
 }
 
 impl ModActivationError {
     pub fn failed(reason: impl Into<String>) -> Self {
-        Self {
-            reason: reason.into(),
-            applied_records: Vec::new(),
-        }
+        Self::rollback(reason, Vec::new())
     }
 
     pub fn rollback(reason: impl Into<String>, applied_records: Vec<ModExtensionRecord>) -> Self {
         Self {
             reason: reason.into(),
             applied_records,
+            undeclared: None,
         }
+    }
+
+    /// The mod registered `record`, which its manifest's `contributes` does
+    /// not declare. `applied_records` are everything it registered, for
+    /// rollback.
+    pub fn undeclared(
+        mod_id: &str,
+        record: ModExtensionRecord,
+        applied_records: Vec<ModExtensionRecord>,
+    ) -> Self {
+        Self {
+            reason: format!("mod '{mod_id}' registered {record:?} but does not declare it"),
+            applied_records,
+            undeclared: Some(record),
+        }
+    }
+
+    pub fn reason(&self) -> &str {
+        &self.reason
+    }
+
+    /// The record that broke the manifest's declaration, if that was the cause.
+    pub fn undeclared_record(&self) -> Option<&ModExtensionRecord> {
+        self.undeclared.as_ref()
     }
 
     pub(super) fn into_parts(self) -> (String, Vec<ModExtensionRecord>) {

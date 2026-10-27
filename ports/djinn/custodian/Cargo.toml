@@ -17,11 +17,23 @@ path = "src/bin/djinn-custodian.rs"
 default = []
 # The private C ABI the signed macOS host links (testing/macos-castellan-custodian-h1).
 native-host = []
+# A custodian served from a caller's thread over a synthetic vault, for test
+# suites and receipt hosts (`src/fixture.rs`). Never an installed build.
+fixture = []
 
 [dependencies]
-castellan.workspace = true
+castellan = { workspace = true, features = ["keeper", "cxf"] }
+chatelaine.workspace = true
 custody-wire = { path = "wire" }
+dramatis.workspace = true
+eidetic.workspace = true
+pandect.workspace = true
+ssh-key = { version = "0.6", features = ["ed25519", "encryption"] }
+ssh-agent-lib = "0.6"
+tokio = { version = "1", features = ["net", "rt"] }
+uuid.workspace = true
 insigne = { workspace = true, features = ["verify"] }
+notochord.workspace = true
 personae.workspace = true
 base64.workspace = true
 blake3.workspace = true
@@ -36,9 +48,18 @@ libc = "0.2"
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = [
     "Win32_Foundation",
+    "Win32_System_Console",
     "Win32_System_Services",
     "Win32_System_Threading",
 ] }
+# The consent helper's Windows Hello prompt (`src/platform/hello.rs`).
+windows = { version = "0.62", features = [
+    "Security_Credentials_UI",
+    "Win32_Foundation",
+    "Win32_System_WinRT",
+    "Win32_UI_WindowsAndMessaging",
+] }
+windows-future = "0.3"
 
 [dev-dependencies]
 tempfile = "3"

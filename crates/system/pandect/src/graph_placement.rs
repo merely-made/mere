@@ -398,7 +398,10 @@ mod tests {
                 property: property.clone(),
             }],
         );
-        assert!(refused.is_err(), "a colliding replay is refused, not dropped");
+        assert!(
+            refused.is_err(),
+            "a colliding replay is refused, not dropped"
+        );
         assert_eq!(FrozenGraph::of(&graph), valid, "refusal preserves input");
         let mut conflicting = valid.clone();
         conflicting
@@ -551,7 +554,7 @@ mod tests {
     }
 
     #[test]
-    fn frozen_surface_edge_records_ignore_slots_but_preserve_exact_contents_and_multiplicity() {
+    fn frozen_surface_edge_records_ignore_slots_preserve_exact_contents_and_refuse_copies() {
         let grouped = |from: u128, to: u128| CapturedDelta::ReplayAssertRelationByIds {
             from_id: Uuid::from_u128(from).to_string(),
             to_id: Uuid::from_u128(to).to_string(),
@@ -574,7 +577,7 @@ mod tests {
         alternate.graph.edges.reverse();
         assert_eq!(FrozenGraph::of(&alternate.materialize().unwrap()), original);
 
-        for field in ["id", "source", "time", "endpoints", "dropped", "duplicate"] {
+        for field in ["id", "source", "time", "endpoints", "dropped"] {
             let mut changed = original.clone();
             match field {
                 "id" => changed.graph.edges[0].retained_assertions_mut()[0]
@@ -591,7 +594,6 @@ mod tests {
                 "dropped" => {
                     changed.graph.edges.pop();
                 },
-                "duplicate" => changed.graph.edges.push(changed.graph.edges[0].clone()),
                 _ => unreachable!(),
             }
             assert_ne!(
@@ -600,6 +602,19 @@ mod tests {
                 "changed {field} retained as exact difference"
             );
         }
+        // One handle means one row (Q031, 2026-10-26): an identical copy of a
+        // row is not legal graph state, so the frozen form refuses it rather
+        // than carrying the copy as a difference.
+        let mut copied = original.clone();
+        copied.graph.edges.push(copied.graph.edges[0].clone());
+        let refusal = copied
+            .materialize()
+            .err()
+            .expect("an identical parallel copy is refused");
+        assert!(
+            refusal.contains("handle"),
+            "the refusal names the handle rule: {refusal}"
+        );
 
         let mut two_assertions = original.clone();
         let statements = two_assertions.graph.edges[0].assertions.as_mut().unwrap();

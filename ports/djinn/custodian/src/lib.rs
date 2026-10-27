@@ -11,22 +11,35 @@
 //! authenticated local IPC and never link castellan.
 //!
 //! - [`policy`]: the installed, deny-by-default principal and grant policy.
-//! - [`vault`]: the real Castellan vault, locked at every start.
+//! - [`host`]: Castellan's resident authority, wallet and credential catalog
+//!   over Djinn's real vault, locked at every start.
 //! - [`core`]: the transport-free state machine for §5.3 to §5.6.
 //! - [`driver`]: serves the core over any `custody-wire` listener.
 //! - [`consent`]: consent mechanisms the custodian runs itself.
+//! - [`helper`]: the consent channel's client loop, run by the Windows
+//!   logon helper (`djinn-custodian consent`).
+//! - [`adoption`]: copying Djinn's existing vault into the passphrase vault.
 //! - [`delegation`]: the H1 signing consumer's purpose and audience check.
 //! - [`platform`]: one launcher, one peer-identity check and one confinement
 //!   recipe per OS.
 
+pub mod adoption;
+pub mod agent;
+#[cfg(windows)]
+pub mod agent_pipe;
 pub mod consent;
 pub mod core;
+mod credentials;
 pub mod delegation;
 pub mod driver;
+#[cfg(feature = "fixture")]
+pub mod fixture;
 pub mod platform;
+pub mod helper;
+pub mod host;
 pub mod policy;
 pub mod synthetic;
-pub mod vault;
+pub mod wallet;
 
 /// A refusal with a stable, secret-free code.
 #[derive(Debug, Clone, PartialEq, Eq)]

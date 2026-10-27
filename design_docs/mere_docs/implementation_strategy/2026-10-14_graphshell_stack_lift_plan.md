@@ -1,14 +1,14 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-26):** in progress. Query/cache, Forme state and controls,
-typed owner completions, viewer composition and obsolete reader removal are
-implemented in the source candidate recorded at the end. Native component tests
-and the lightweight Wasm viewer passed on the recorded qualification sources.
-The candidate now includes newer authoritative main changes and fixes found by
-the product build; final validation awaits the rewritten supplier cohort.
-Browser interaction is not yet qualified. No candidate commit or publication
-has been made. The dated census and rulings below retain their original
-source context; later progress entries describe subsequent lifts.
+**Status (2026-10-26):** the component and source-ownership slice is published
+in Mere `b232631f3`. Query and Forme state, reusable Query/Workbench controls,
+typed owner completions, bounded cache updates and the viewer feature split
+are implemented and qualified by the automated checks below. Search now lives
+in Eidetic; obsolete Mere facades have been removed or their retained purpose
+has been named explicitly. The five receiving repository cutovers are also published.
+Browser interaction and Woodshed runtime adoption remain unqualified. The dated
+census and rulings retain their original source context; this does not close
+every remaining pane or presentation boundary in the plan.
 
 **Earlier status (2026-10-15):** Castellan has moved (R8); P1 landed:
 the app door is the `door` feature on `graphshell-endpoint` (L1), and
@@ -229,8 +229,8 @@ the reducer Woodshed also wants, so cutting that one import is a P2 task.
 | L4 | The option helpers in `projection_editor.rs:463-530` (`arrangement_options`, `arrangement_defaults`, `option_placeholder`, `with_option`, `with_kind`) | `scenomise` (it owns the solver registry and catalog the helpers read) | None | Knot's `recipe/editor.rs` deletes its three copies and calls the shared helpers | Medium / low |
 | L4b | `ProjectionEditor` reducer, panels, `ProjectionDefinitionSink` (about 540 code lines) | Stays until a second host edits whole `ProjectionDefinition` drafts (§5, R1) | R1 | A host other than Graphshell opens and saves a whole-definition draft | Medium / medium, waits |
 | L4c | Host recipes: `chronicle_definition`, `default_definition`, `PRACTICE_CARD` | The owning domain: Distillery (chronicle), the Woodshed export (practice) | Woodshed publishes the recipe in its dataset; Graphshell keeps its card size as host policy | Graphshell renders the Woodshed fixture without a Woodshed-named function | Low / low |
-| L10 | `presentation_editor` (511 + 301 tests) | Waits: `scenograph::presentation` already holds the model; the port holds a Muniment-backed workspace record | A second host that stores rule sets | A second host loads and edits a rule set through the same record | Low / low |
-| L11 | `presentation_binding` (306 + 328), `node_presentation` (204 + 216), with `link_inspection` and `access_inspection` | `crates/mere` (it already holds `roster`, `subgraph`, `query_view`, `gloss`), once a consumer exists | Move `link_inspection` and `access_inspection` first; they import only `mere::kernel` | Turnstone's or Woodshed's canvas resolves node faces from the same rule set; the `canvas::node_presentation` surface in pictograph (64 lines) is the paint end | Medium / medium, waits |
+| L10 | Rule authoring and presentation controls | Landed in `scenograph::presentation::editor` and Mere View; Graphshell retains the actual `presentation_store` adapter | Authoring is opt-in through editor features | Independent windowless host exercises failure/retry, saved history and conflict reconciliation; application adoption remains separate | Shared state and controls; no compatibility facade |
+| L11 | `presentation_binding`, `node_presentation`, `link_inspection` and `access_inspection` | Availability-aware resolution is shared in Scenograph; graph occurrence binding, renderer support and inspection remain Graphshell adapters | No port dependency in the shared resolver | Resolver model tests cover undisclosed inputs; another application has not adopted the graph adapters | Policy lifted; actual host responsibilities retained |
 
 ### Group 1c: forme
 
@@ -539,10 +539,12 @@ Knot's workspace) that names its done condition.
 the lifted session; the lifted crate's tests carry the lifecycle cases that
 today live in `forme_session_lifecycle_tests.rs` without importing the port.
 
-**P7. L11, L10 and the inspection readers.** Waits for a consumer. If
-Turnstone or Woodshed adopts presentation rules, `link_inspection` and
-`access_inspection` move first, then binding and node presentation.
-*Done when:* a second host resolves faces from the same rule set.
+**P7. L11, L10 and the inspection readers.** Rule authoring and availability-aware
+resolution now belong to Scenograph; Mere View owns the reusable controls.
+Graphshell retains graph occurrence binding, renderer support, inspection and
+its renamed persistence adapter. The independent windowless host qualifies the
+shared authoring boundary; Turnstone or Woodshed runtime adoption remains a
+separate receipt. No port facade is retained while awaiting that adoption.
 
 **P8. L13 and group 4.** Sequenced behind the resident-host port and the
 facet dissolution brief. `personal_sync` types move once the facet constants
@@ -1672,7 +1674,7 @@ adapters, not to the component state and views currently embedded there.
 |---|---|---|
 | Owner operations and pane acknowledgements | `web_tree/product.rs` owns several completion cells, booleans, pending variants and the movable `App`; `web_tree/promoted_links.rs::poll` still infers completion from `saving` and `save_state` strings. Coupling reads a separate owner result slot. | Typed operation/attempt completions shared by the actual owner adapters, with pane-specific state transitions. Delete string-driven control flow and duplicate retry routing as callers convert. Status text is a view of state. |
 | Forme and workbench | `forme_workspace`, `forme_session`, and `web_tree/forme` split layout, save proposals, retired writes, rebinding, drag previews and tile UI across the port. `current` and `projected_model` expose the same draft-or-committed choice. | Move layout/session state with the component. Platen remains R2's home after cutting canvas application and port-owned scope/inspector types; browser storage, pointer capture and texture installation stay in host adapters. Remove the old modules/import paths in the same change. |
-| Rules and presentation | `presentation_editor` already owns a draft/history session, but `web_tree/presentation` owns its controls, store and completion cell. `presentation_binding` also imports link inspection. | Lift rule authoring and complete controls together. Keep occurrence readings as typed inputs, and host policy at the edge; include the inspection dependencies rather than hide a port dependency behind a wrapper. |
+| Rules and presentation | `presentation_editor` formerly mixed shared draft/history state with the port record; the browser owned controls and completions. | Landed in Scenograph and Mere View. Deleted the old editor module; named the actual graph-scoped CAS record adapter `presentation_store`. Graph binding and renderer policy remain in the host. See the retained reading and authoring entry below. |
 | Documents, reading tiles and cards | `web_tree/blocks::Pane` mixes document/notation state with IndexedDB, completion cells and rendering resources. `web_tree/reading::Reading` combines content bindings, source retirement and progress with browser downloads and audio elements. | Reuse the existing document, Inker, notation and Cambium owners. Move interaction state and views alongside them; express load/save/export/play requests as effects. Keep DOM object URLs, audio elements and native equivalents in adapters. |
 | Viewer composition | `product_off.rs` and `remote_off.rs` imitate disabled workspace APIs. The viewer builds the common `TreePage` composition with impossible services and empty views. The practice imitation is removed in this candidate, as described below. | Compose the viewer directly from viewing/navigation components. Compose workspace and remote services only where enabled; delete the remaining off-module imitations and their branches. Feature flags alone currently reduce dependencies but do not finish this composition split. |
 | Actual compatibility code | `product.rs::decode_profiled_codicil` accepts the old v2 codicil and v1 engram; `forme_session::SavedRecord` accepts the old flat record through defaulted history fields. Scene readers and tests retain additional historical conversions. | Retire obsolete accepted formats and tests that exist only to preserve them when selecting the current format boundary. Current data integrity, conflict and authority checks remain. Existing stored artifacts and receipts are not deleted by a source cleanup. |
@@ -1936,16 +1938,167 @@ was fixed and its failed log retained beside the passing run. Evidence is in
 `validation-resumed/final-checks/client.json` and `client.log` under the lane's
 output directory; `client-source.patch` records the fix over local `c01a90524`.
 
-The remaining native component, moved-owner and receiving-consumer checks
-have not run on this final candidate. At 21:48 UTC the workspace held
-149.1 GiB of compiler caches against its 160 GiB budget; the normal 20 GiB
-reservation was refused. The client alone used a documented 4 GiB estimate
-based on its prior 1.892 GiB cold build. No broader build inherits that
-estimate, and no cache protection or storage policy has been bypassed.
-Mark subsequently approved a 200 GiB cache budget, retaining the 100 GiB
-free-space floor and all cleanup protections; 43 guard regression tests pass.
-Search promotion is published in Eidetic `354ab71`, and the local Mere donor
-has been removed in favor of that exact provider. Its tests pass and its
-optional model example compiles; no model runtime acceptance is implied.
-Mere's remaining component and receiving-consumer checks are in progress;
-the Mere refactor remains local and unpublished.
+### Published component and ownership qualification
+
+Mere `b232631f3` publishes the source slice after incorporating checked kernel
+replay and the independently qualified canvas cache-lifetime repairs. The final
+combined run passes 561 tests with 7 existing ignores: Graphshell, Mere's Query
+model, Mere View controls and independent hosts, and Platen's workspace model.
+The lightweight viewer and full product/remote/canvas-GPU Wasm compositions
+both pass on this exact commit. Minimal model and Graphshell/Djinn/Distillery
+checks passed before the canvas merge; that merge changed no manifests or locks.
+
+The other bounded suites pass on their recorded inputs: 103 client tests,
+45 Registry observation tests, 18 station-custody tests (one manual receipt
+ignored), and 27 captured-web Moot tests. The client suite includes unrelated
+36 MiB cache allocation, terminal revoke/expiry, and late-response controls.
+Search is published in Eidetic `354ab71`, with 40 tests passed and 3 ignored;
+its optional model example compiles. This is not model or GPU runtime acceptance.
+
+The viewer selects neither Platen nor the workspace editor, Mere View controls,
+IndexedDB, Lanes, or Fleece. Portable graph/storage vocabulary remains in its
+model dependencies. The product explicitly opts into workspace editing and
+Query/Workbench controls. The port/toolkit dependency guard passes; the earlier
+feature-tree receipt and current manifests agree. This establishes build and
+composition boundaries, without claiming headed browser interaction.
+
+Product import now uses checked scratch replay and verifies that every incoming
+facet survives before live edits. The failing collision regressions are retained
+beside passing runs. A valid Resource/Surface handle collision refuses the whole
+import without blob, graph, facet, or journal writes.
+
+The obsolete `shell-state`, `content-contract`, Apparatus facade, `command-menu`,
+and local Hest 0.1 source are removed. Registry owns the observation collector;
+Turnstone owns its inspection presentation; consumers name Armillary's
+`apparatus-core` directly. Persona Picker lives under Cambium. The retained
+Signalman adapter is `station-custody`, with `station-provision` and
+`station-claim` binaries; credential salts, wire/storage identities and AppIds
+are unchanged. The donor Search source is removed from Mere. New package and
+binary names use at most one hyphen.
+
+The guarded compiler-cache budget is now 200 GiB under Mark's explicit approval;
+the 100 GiB free-space floor and all cleanup protections remain. All 43 guard
+regression tests pass. Failed attempts and earlier qualification sources remain
+retained under `Code/output/graphshell-components/validation-resumed/` alongside
+`final-checks`, `final-boundaries`, `canvas-integration.json`, and publication
+receipts. Mere's primary advanced with its unrelated ownership-plan edit
+preserved by content hash and index comparison.
+
+Receiving repositories now consume the exact qualified Mere `b232631f3` source.
+Their changes are committed and published, with primary checkouts advanced and
+unrelated local work preserved:
+
+| Receiver | Published commit | Receiving evidence |
+| --- | --- | --- |
+| Turnstone | `309ea73f7` | 9 inspection-pane tests passed |
+| Knot | `e9ff2407c` | Desktop and test targets compile |
+| Woodshed / Redshank | `712f42ada` | Desktop and test targets compile |
+| Murm / Signalman | `b7e0aa303` | Desktop application compiles |
+| Isocosm | `0d3344404` | Isomere host-enabled library compiles |
+
+All nine affected Isocosm workspace roots pass full dependency resolution;
+the independent validation locks are retained without changing their existing
+repository tracking policy. No duplicate supplier package identities remain in
+those resolved graphs. Parry Ground keeps its exact Conatus/Nisus revision, and
+Responsa retains its independent Eidetic cohort. Cargo coalesced the Murm branch
+packages onto the provider-qualified `4ba804b3`; source comparison proves the
+previous `573a8b2` portable packages unchanged at that revision.
+
+Murm incorporated a concurrent I2P repair after its desktop check. The desktop
+source, metadata packages and selected features are identical after integration;
+I2P is disabled and Truchman is absent from that composition. This does not
+extend the desktop result to I2P runtime behavior.
+
+These receipts qualify the named source commits. Later independent changes on
+Mere and Eidetic main are preserved when publishing this documentation; consumer
+locks remain on the qualified provider revisions. No headed browser interaction,
+Woodshed runtime adoption, physical-device acceptance or learned-model semantic
+qualification is implied. Reading/document-tile lifecycle and the larger
+presentation/rules boundaries remain separate from this completed slice.
+
+The complete commands, source hashes, ignored cases, failed attempts and
+publication/preservation results are retained in
+`Code/output/graphshell-components/validation-resumed/completion.json` and its
+referenced receipts.
+
+
+### 2026-10-26: retained reading lifecycle and rule authoring owners
+
+`mere-lanes::reading_lifecycle` owns retained access reconciliation and one-shot
+operation tickets. Its input is a lightweight owner, membership-lifetime,
+address and visibility projection; it contains no graph authority, document
+bytes, browser resources or rendering engine. Owner/persona changes, retirement,
+source replacement, operation supersession and explicit content-session rebinding
+revoke old completion rights. Graphshell applies the resulting retirement
+decisions to its Pelt slots, producers, pending reads, media and downloads.
+Reconciliation precedes progress writes and async effects, and initial tile
+rendering seeds the leases before it can start a clip read. Hidden clip reads may
+finish, but cannot make the access visible again.
+
+The reading preparation and workbench render paths no longer clone the whole
+graph. Tile closures retain only their labels, addresses and tags. Unchanged
+inline sources are compared through borrowed bytes before allocating replacement
+content. Retained clips reuse their verified session handle without copying
+document or media payloads. The inline-source comparison still examines active
+body bytes: the kernel's existing content revision does not cover body edits,
+so using it as a body cache key would miss changes. No claim of constant-time
+inline-body change detection is made.
+
+`scenograph::presentation::editor` owns raw drafts, strict parsing, validation,
+private history, saved undo/redo and acknowledged save transitions. Opaque
+operation identities distinguish workspace instances as well as attempts. A
+failed save keeps the draft; reconciling newly loaded committed state preserves
+that private draft for explicit review and application. Availability-aware rule
+resolution also lives in Scenograph and validates the original rules before
+suppressing an unavailable input, including under `Not` or `Any`. It resolves
+directly without cloning the rule set for each occurrence.
+
+Mere View supplies reusable presentation controls with a bounded effect outbox.
+Graphshell's former `presentation_editor` module is removed; its actual remaining
+role is named `presentation_store`, an adapter for graph-scoped Muniment records
+and atomic compare-and-replace writes. Callers import rule types directly from
+Scenograph. The browser adapter correlates load/save results with graph binding
+and operation, distinguishes temporary product unavailability from retirement,
+and exposes conflict reconciliation and retry. Graph occurrence binding,
+renderer support and app appearance defaults remain with Graphshell.
+
+Authoring is opt-in through Scenograph's `editor` feature and Graphshell's
+`workspace-editor` feature; the lightweight viewer keeps rule resolution without
+linking the authoring owner or Graphshell's rule-store adapter. No package or
+compatibility reexport was added.
+
+Validation evidence for this slice is retained under
+`Code/output/graphshell-components/lifecycle/`.
+
+
+The clean integrated source `3c74f49f9` passes 829 native tests with seven
+existing ignores: Graphshell 350, bound actions six, reading lanes 30,
+Mere View 38, the independent presentation host two, Pandect 344 and
+Scenograph 59. The independent host exercises failed-save retry, saved
+undo and conflict reconciliation while preserving a private draft.
+
+The checked snapshot merge now removes only exact cross-input assertion
+copies. Conflicting handles and duplicates inside either input still refuse.
+Remaining sidecars are normalized before union so repeating an import cannot
+append traversal data again. This preserves the stricter assertion identity
+rules integrated from main.
+
+The guarded cache budget is 300 GiB under Mark's explicit approval, with the
+100 GiB free-space floor and all retention protections unchanged. Cleanup found
+no eligible cache profiles; no generated files or retained evidence were deleted.
+
+The lightweight viewer Wasm check passes at `3c74f49f9`; the full
+product/remote/canvas-GPU build passes at `8e99ee189`. The latter adds only
+shared `Rc` handles for the browser workbench's immutable render maps and
+documentation relative to the native receipt. The product-gated workbench is
+absent from the viewer. Neither native library sources nor viewer inputs
+changed. The feature receipt confirms the viewer selects Graphshell `web`
+only and no Scenograph authoring, Platen or reading lanes.
+
+The final upstream integration adds Windows custodian code outside this
+qualified dependency graph: the selected native package tree is identical
+before and after, and browser inputs are unchanged. Source checks and
+windowless component tests do not establish headed browser interaction,
+Woodshed runtime adoption or constant-time inline-body detection. Exact
+commands, hashes, failed attempts and integration evidence remain in
+`Code/output/graphshell-components/lifecycle/`.

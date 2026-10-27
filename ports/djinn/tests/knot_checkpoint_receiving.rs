@@ -146,6 +146,7 @@ async fn receive_through_owner(root: &Path, replacement: Option<&str>) -> String
     let custody = ResidentBlobCustody::open(root, &ResidentContentSettings::default())
         .await
         .unwrap();
+    let epoch_root = root.to_path_buf();
     let resident = ResidentKnot::open(
         root,
         KnotResidentSettings {
@@ -154,6 +155,9 @@ async fn receive_through_owner(root: &Path, replacement: Option<&str>) -> String
             ..Default::default()
         },
         custody.clone(),
+        std::sync::Arc::new(move |persona, label: &str, requests: &[_]| {
+            djinn::custody::epoch_keys(&djinn::custody::ReleasePolicy::default(), &epoch_root, persona, Some(label), requests).map_err(|r| format!("{r:?}"))
+        }),
     )
     .await
     .unwrap();

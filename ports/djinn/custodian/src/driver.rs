@@ -62,9 +62,15 @@ impl Service {
         self.deliver(&mut core, effects);
     }
 
+    /// The SSH agent session over the vault, once it has been opened.
+    pub fn agent_session(&self) -> Option<castellan::custody::agent::VaultAgent<Box<dyn castellan::custody::IdentityStorage>>> {
+        lock(&self.core).custody().agent_session()
+    }
+
     /// Accept forever. Returns only when the listener fails.
     pub fn serve(&self, listener: &dyn Listener) -> std::io::Result<()> {
         self.spawn_ticker();
+        self.spawn_signing_bridge();
         loop {
             let connection = match listener.accept() {
                 Ok(connection) => connection,
@@ -94,6 +100,22 @@ impl Service {
                 }
             })
             .expect("spawn the custody ticker");
+    }
+
+    /// Watch Castellan's broker for per-use SSH requests and petition the
+    /// consent channel for each.
+    fn spawn_signing_bridge(&self) {
+        let service = self.clone();
+        let _ = std::thread::Builder::new().name("custody-signing".into()).spawn(move || {
+            loop {
+                {
+                    let mut core = lock(&service.core);
+                    let effects = core.petition_signing(Instant::now());
+                    service.deliver(&mut core, effects);
+                }
+                std::thread::sleep(std::time::Duration::from_millis(250));
+            }
+        });
     }
 
     fn session(&self, connection: Connection) {

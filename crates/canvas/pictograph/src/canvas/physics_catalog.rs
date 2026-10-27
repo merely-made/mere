@@ -1468,7 +1468,7 @@ impl Canvas {
     /// (F178).
     pub(crate) fn physics_view_key(&self) -> PhysicsViewKey {
         PhysicsViewKey {
-            structure: self.graph.revision(),
+            structure: self.graph.structural_input_key(),
             view: self.physics_view_revision,
         }
     }

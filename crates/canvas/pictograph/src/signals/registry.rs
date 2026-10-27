@@ -10,10 +10,11 @@
 //!
 //! It owns no graph: each read names the graph and the registry checks the
 //! fact's key against it, recomputing only when the key moved. Keys are the
-//! kernel's revisions: structure for the topology facts, the URL grouping for
+//! kernel's process-local input versions: structure for topology, URL grouping for
 //! sites, structure and visits for recency (F54), plus a fact's own
-//! parameters (a focus, a metric, an iteration count). One registry serves one
-//! graph; a host that swaps its graph resets it.
+//! parameters (a focus, a metric, an iteration count). Ordinary clones retain input versions; independent graphs and divergent
+//! candidates cannot collide through equal local counters. Binding a different
+//! graph source drops held values while retaining producer counters.
 //!
 //! Each producer counts its runs ([`RegistryRuns`]), so a reader can assert
 //! one computation per key.
@@ -33,7 +34,7 @@ use cartography::{
     COORDS_SPECTRAL, ImportanceWeights, IntelligenceSignals, NodeEmbeddings, NodeOrder, NodeRings,
     ORDER_RECENCY, ORDER_TIMELINE, RINGS_FOCUS, Signal, WEIGHT_DEGREE, WEIGHT_RECENCY,
 };
-use kernel::graph::{Graph, NodeKey};
+use kernel::graph::{Graph, GraphInputKey, NodeKey};
 
 #[cfg(feature = "canvas")]
 use super::physics::{self, PhysicsRuns, PhysicsView, PhysicsViewKey};
@@ -97,18 +98,19 @@ impl<K: PartialEq + Copy, V> Slot<K, V> {
 /// See the module doc.
 #[derive(Clone, Debug, Default)]
 pub struct ChannelRegistry {
-    community: Slot<u64, ClusterSet>,
-    bridges_betweenness: Slot<(u64, u32), BridgeNodes>,
-    bridges_articulation: Slot<(u64, u32), BridgeNodes>,
-    affinity: Slot<(u64, u32), AffinityScores>,
-    importance_degree: Slot<u64, HashMap<NodeKey, f32>>,
-    importance_betweenness: Slot<u64, HashMap<NodeKey, f32>>,
-    recency: Slot<(u64, u64), Recency>,
-    enumeration: Slot<u64, Vec<NodeKey>>,
-    spectral: Slot<(u64, usize), HashMap<NodeKey, (f32, f32)>>,
-    rings: Slot<(u64, NodeKey), HashMap<NodeKey, u32>>,
-    degree_weights: Slot<u64, HashMap<NodeKey, f32>>,
-    sites: Slot<(u64, u64), HashMap<NodeKey, String>>,
+    source: Option<GraphInputKey>,
+    community: Slot<GraphInputKey, ClusterSet>,
+    bridges_betweenness: Slot<(GraphInputKey, u32), BridgeNodes>,
+    bridges_articulation: Slot<(GraphInputKey, u32), BridgeNodes>,
+    affinity: Slot<(GraphInputKey, u32), AffinityScores>,
+    importance_degree: Slot<GraphInputKey, HashMap<NodeKey, f32>>,
+    importance_betweenness: Slot<GraphInputKey, HashMap<NodeKey, f32>>,
+    recency: Slot<(GraphInputKey, GraphInputKey), Recency>,
+    enumeration: Slot<GraphInputKey, Vec<NodeKey>>,
+    spectral: Slot<(GraphInputKey, usize), HashMap<NodeKey, (f32, f32)>>,
+    rings: Slot<(GraphInputKey, NodeKey), HashMap<NodeKey, u32>>,
+    degree_weights: Slot<GraphInputKey, HashMap<NodeKey, f32>>,
+    sites: Slot<(GraphInputKey, GraphInputKey), HashMap<NodeKey, String>>,
     runs: RegistryRuns,
     #[cfg(feature = "canvas")]
     physics: std::cell::RefCell<PhysicsSlots>,
@@ -211,6 +213,26 @@ impl ChannelRegistry {
 }
 
 impl ChannelRegistry {
+    /// Bind held values to one materialized graph source. Preserve producer
+    /// counters, but never carry last-good values into a different source.
+    pub fn bind_graph(&mut self, graph: &Graph) -> bool {
+        let key = graph.structural_input_key();
+        let changed = self.source.is_some_and(|source| !source.same_source(key));
+        if changed {
+            let runs = self.runs;
+            #[cfg(feature = "canvas")]
+            let physics_runs = self.physics.get_mut().runs;
+            *self = Self::default();
+            self.runs = runs;
+            #[cfg(feature = "canvas")]
+            {
+                self.physics.get_mut().runs = physics_runs;
+            }
+        }
+        self.source = Some(key);
+        changed
+    }
+
     pub fn new() -> Self {
         Self::default()
     }
@@ -222,10 +244,12 @@ impl ChannelRegistry {
 
     /// The Louvain partition (`groups.cluster`), keyed by structure.
     pub fn community(&mut self, graph: &Graph) -> &ClusterSet {
-        self.community
-            .get(graph.revision(), &mut self.runs.community, || {
-                community_louvain(graph)
-            })
+        self.bind_graph(graph);
+        self.community.get(
+            graph.structural_input_key(),
+            &mut self.runs.community,
+            || community_louvain(graph),
+        )
     }
 
     /// The partition held, fresh or not (the last good one while a newer is
@@ -236,12 +260,21 @@ impl ChannelRegistry {
 
     /// Whether the partition held is for `graph`'s structure as it stands.
     pub fn community_is_fresh(&self, graph: &Graph) -> bool {
-        self.community.fresh(graph.revision())
+        self.community.fresh(graph.structural_input_key())
     }
 
     /// A partition computed off-thread for structural revision `revision`:
     /// taken, and counted, unless one for it is already held.
-    pub fn offer_community(&mut self, revision: u64, clusters: ClusterSet) -> bool {
+    pub fn offer_community(
+        &mut self,
+        graph: &Graph,
+        revision: GraphInputKey,
+        clusters: ClusterSet,
+    ) -> bool {
+        self.bind_graph(graph);
+        if revision != graph.structural_input_key() {
+            return false;
+        }
         if self.community.fresh(revision) {
             return false;
         }
@@ -255,12 +288,13 @@ impl ChannelRegistry {
     /// option, F85), one cache per metric, keyed by structure and the
     /// threshold.
     pub fn bridges(&mut self, graph: &Graph, metric: BridgeMetric, threshold: f32) -> &BridgeNodes {
+        self.bind_graph(graph);
         let slot = match metric {
             BridgeMetric::Betweenness => &mut self.bridges_betweenness,
             BridgeMetric::Articulation => &mut self.bridges_articulation,
         };
         slot.get(
-            (graph.revision(), threshold.to_bits()),
+            (graph.structural_input_key(), threshold.to_bits()),
             &mut self.runs.bridges,
             || bridges(graph, metric, threshold),
         )
@@ -283,8 +317,9 @@ impl ChannelRegistry {
     /// Structural Jaccard affinity (`pairs.structural`) at or above
     /// `min_similarity`, keyed by structure and the floor.
     pub fn structural_affinity(&mut self, graph: &Graph, min_similarity: f32) -> &AffinityScores {
+        self.bind_graph(graph);
         self.affinity.get(
-            (graph.revision(), min_similarity.to_bits()),
+            (graph.structural_input_key(), min_similarity.to_bits()),
             &mut self.runs.affinity,
             || structural_affinity(graph, min_similarity),
         )
@@ -297,7 +332,7 @@ impl ChannelRegistry {
         min_similarity: f32,
     ) -> Option<&AffinityScores> {
         self.affinity
-            .fresh_value((graph.revision(), min_similarity.to_bits()))
+            .fresh_value((graph.structural_input_key(), min_similarity.to_bits()))
     }
 
     /// Importance by `metric` (`importance.degree`, `importance.betweenness`),
@@ -307,13 +342,16 @@ impl ChannelRegistry {
         graph: &Graph,
         metric: ImportanceMetric,
     ) -> &HashMap<NodeKey, f32> {
+        self.bind_graph(graph);
         let slot = match metric {
             ImportanceMetric::Degree => &mut self.importance_degree,
             ImportanceMetric::Betweenness => &mut self.importance_betweenness,
         };
-        slot.get(graph.revision(), &mut self.runs.importance, || {
-            importance(graph, metric).weights.into_iter().collect()
-        })
+        slot.get(
+            graph.structural_input_key(),
+            &mut self.runs.importance,
+            || importance(graph, metric).weights.into_iter().collect(),
+        )
     }
 
     /// The importance held under `metric`, fresh or not.
@@ -327,8 +365,9 @@ impl ChannelRegistry {
     /// The recency order and values (`order.recency`), keyed by structure and
     /// visits (F54).
     pub fn recency(&mut self, graph: &Graph) -> &Recency {
+        self.bind_graph(graph);
         self.recency.get(
-            (graph.revision(), graph.visit_revision()),
+            (graph.structural_input_key(), graph.visit_input_key()),
             &mut self.runs.recency,
             || producers::recency(graph),
         )
@@ -342,17 +381,20 @@ impl ChannelRegistry {
     /// The enumeration order (`order.timeline`): the order every score's
     /// ordinal follows and a timeline lays its axis along, keyed by structure.
     pub fn enumeration(&mut self, graph: &Graph) -> &[NodeKey] {
-        self.enumeration
-            .get(graph.revision(), &mut self.runs.enumeration, || {
-                producers::enumeration_order(graph)
-            })
+        self.bind_graph(graph);
+        self.enumeration.get(
+            graph.structural_input_key(),
+            &mut self.runs.enumeration,
+            || producers::enumeration_order(graph),
+        )
     }
 
     /// Spectral coordinates (`coords.spectral`) after `iterations` power
     /// iterations, keyed by structure and the count.
     pub fn spectral(&mut self, graph: &Graph, iterations: usize) -> &HashMap<NodeKey, (f32, f32)> {
+        self.bind_graph(graph);
         self.spectral.get(
-            (graph.revision(), iterations),
+            (graph.structural_input_key(), iterations),
             &mut self.runs.spectral,
             || producers::spectral_coords(graph, iterations),
         )
@@ -361,10 +403,12 @@ impl ChannelRegistry {
     /// Ring indices from `focus` (`rings.focus`), keyed by structure and the
     /// focus.
     pub fn rings(&mut self, graph: &Graph, focus: NodeKey) -> &HashMap<NodeKey, u32> {
-        self.rings
-            .get((graph.revision(), focus), &mut self.runs.rings, || {
-                producers::radial_rings(graph, focus)
-            })
+        self.bind_graph(graph);
+        self.rings.get(
+            (graph.structural_input_key(), focus),
+            &mut self.runs.rings,
+            || producers::radial_rings(graph, focus),
+        )
     }
 
     /// Degree plus one (`weight.degree`), keyed by structure: an
@@ -372,17 +416,20 @@ impl ChannelRegistry {
     /// mass is `mass.degree`, another computation over the physics view's
     /// edges (F147; `canvas::channels`).
     pub fn degree_weights(&mut self, graph: &Graph) -> &HashMap<NodeKey, f32> {
-        self.degree_weights
-            .get(graph.revision(), &mut self.runs.degree_weights, || {
-                producers::degree_weights(graph)
-            })
+        self.bind_graph(graph);
+        self.degree_weights.get(
+            graph.structural_input_key(),
+            &mut self.runs.degree_weights,
+            || producers::degree_weights(graph),
+        )
     }
 
     /// Each node's site (`groups.site`: its URL authority), keyed by structure
     /// and the URL grouping.
     pub fn sites(&mut self, graph: &Graph) -> &HashMap<NodeKey, String> {
+        self.bind_graph(graph);
         self.sites.get(
-            (graph.revision(), graph.url_grouping_revision()),
+            (graph.structural_input_key(), graph.url_grouping_input_key()),
             &mut self.runs.sites,
             || {
                 graph
@@ -396,7 +443,7 @@ impl ChannelRegistry {
     /// The sites held for `graph` as it stands, if fresh.
     pub fn sites_fresh(&self, graph: &Graph) -> Option<&HashMap<NodeKey, String>> {
         self.sites
-            .fresh_value((graph.revision(), graph.url_grouping_revision()))
+            .fresh_value((graph.structural_input_key(), graph.url_grouping_input_key()))
     }
 
     /// The keyed signals a projection request carries for `channels`
@@ -410,6 +457,7 @@ impl ChannelRegistry {
         channels: &[&str],
         focus: Option<NodeKey>,
     ) -> IntelligenceSignals {
+        self.bind_graph(graph);
         let mut signals = IntelligenceSignals::new();
         for &id in channels {
             let signal = match id {
