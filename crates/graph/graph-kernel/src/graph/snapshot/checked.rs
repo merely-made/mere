@@ -11,8 +11,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use uuid::Uuid;
 
-use crate::graph::{Graph, NavigationIndexError};
-use crate::persistence::{GraphSnapshot, PersistedSemanticStatement};
+use crate::graph::assertion_handles::{AssertionHandleRepeat, AssertionHandles};
+use crate::graph::{Graph, GraphStratum, NavigationIndexError};
+use crate::persistence::GraphSnapshot;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResourceSnapshotError {
@@ -66,17 +67,7 @@ pub enum ResourceSnapshotError {
     LegacySemanticAggregate {
         edge_index: usize,
     },
-    ActiveSurfaceAssertion {
-        edge_index: usize,
-        statement_id: String,
-    },
-    ConflictingAssertion {
-        statement_id: String,
-        first_pair: (Uuid, Uuid),
-        pair: (Uuid, Uuid),
-        first_stratum: &'static str,
-        stratum: &'static str,
-    },
+    RepeatedAssertionHandle(AssertionHandleRepeat),
     ConflictingShownResource {
         surface_id: Uuid,
         first_resource: Uuid,
@@ -153,23 +144,7 @@ impl fmt::Display for ResourceSnapshotError {
                 f,
                 "resource_edges[{edge_index}] has semantic data without exact assertion handles"
             ),
-            Self::ActiveSurfaceAssertion {
-                edge_index,
-                statement_id,
-            } => write!(
-                f,
-                "resource_edges[{edge_index}] reuses active surface assertion {statement_id:?}"
-            ),
-            Self::ConflictingAssertion {
-                statement_id,
-                first_pair,
-                pair,
-                first_stratum,
-                stratum,
-            } => write!(
-                f,
-                "assertion {statement_id:?} conflicts between {first_stratum} pair {first_pair:?} and {stratum} pair {pair:?}"
-            ),
+            Self::RepeatedAssertionHandle(repeat) => fmt::Display::fmt(repeat, f),
             Self::ConflictingShownResource {
                 surface_id,
                 first_resource,
@@ -287,9 +262,8 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
         .iter()
         .filter_map(|node| Uuid::parse_str(&node.node_id).ok())
         .collect::<BTreeSet<_>>();
-    let mut surface_assertions = BTreeSet::new();
-    let mut assertions: BTreeMap<&str, ((Uuid, Uuid), &'static str, &PersistedSemanticStatement)> =
-        BTreeMap::new();
+    let mut handles = AssertionHandles::new();
+    let repeated = ResourceSnapshotError::RepeatedAssertionHandle;
     if snapshot.assertion_schema == 1 {
         for (index, edge) in snapshot.edges.iter().enumerate() {
             if edge.retained_assertions().is_empty() {
@@ -317,46 +291,24 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
                     });
                 }
             }
-            for statement in edge.retained_assertions() {
-                surface_assertions.insert(statement.statement_id.as_str());
-                if let Some((first_pair, first_stratum, previous)) =
-                    assertions.get(statement.statement_id.as_str())
-                {
-                    if *first_pair != (from, to)
-                        || *first_stratum != "surface"
-                        || *previous != statement
-                    {
-                        return Err(ResourceSnapshotError::ConflictingAssertion {
-                            statement_id: statement.statement_id.clone(),
-                            first_pair: *first_pair,
-                            pair: (from, to),
-                            first_stratum: *first_stratum,
-                            stratum: "surface",
-                        });
-                    }
-                } else {
-                    assertions.insert(&statement.statement_id, ((from, to), "surface", statement));
-                }
-            }
+            handles
+                .admit(GraphStratum::Surface, edge)
+                .map_err(repeated)?;
         }
     } else {
         // Schema 0 preserves the permissive legacy Surface loader: malformed
         // or orphaned edge endpoints are skipped by materialization.
-        surface_assertions = snapshot
-            .edges
-            .iter()
-            .filter(|edge| {
-                [&edge.from_node_id, &edge.to_node_id]
-                    .into_iter()
-                    .all(|id| {
-                        Uuid::parse_str(id)
-                            .ok()
-                            .is_some_and(|id| surfaces.contains(&id))
-                    })
-            })
-            .flat_map(|edge| edge.retained_assertions())
-            .map(|statement| statement.statement_id.as_str())
-            .collect();
+        for edge in snapshot.edges.iter().filter(|edge| {
+            [&edge.from_node_id, &edge.to_node_id]
+                .into_iter()
+                .all(|id| {
+                    Uuid::parse_str(id)
+                        .ok()
+                        .is_some_and(|id| surfaces.contains(&id))
+                })
+        }) {
+            handles.hold_legacy_surface(edge);
+        }
     }
     for (index, edge) in snapshot.resource_edges.iter().enumerate() {
         let from = parse_id(&edge.from_node_id, "resource_edges", index, "source")?;
@@ -391,32 +343,9 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
         {
             return Err(ResourceSnapshotError::LegacySemanticAggregate { edge_index: index });
         }
-        for statement in edge.retained_assertions() {
-            if surface_assertions.contains(statement.statement_id.as_str()) {
-                return Err(ResourceSnapshotError::ActiveSurfaceAssertion {
-                    edge_index: index,
-                    statement_id: statement.statement_id.clone(),
-                });
-            }
-            if let Some((first_pair, first_stratum, previous)) =
-                assertions.get(statement.statement_id.as_str())
-            {
-                if *first_pair != (from, to)
-                    || *first_stratum != "resource"
-                    || *previous != statement
-                {
-                    return Err(ResourceSnapshotError::ConflictingAssertion {
-                        statement_id: statement.statement_id.clone(),
-                        first_pair: *first_pair,
-                        pair: (from, to),
-                        first_stratum: *first_stratum,
-                        stratum: "resource",
-                    });
-                }
-            } else {
-                assertions.insert(&statement.statement_id, ((from, to), "resource", statement));
-            }
-        }
+        handles
+            .admit(GraphStratum::Resource, edge)
+            .map_err(repeated)?;
     }
 
     let surface_literals: BTreeSet<_> = snapshot
@@ -429,10 +358,11 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
                 .map(|property| property.statement_id.as_str())
         })
         .collect();
-    for (handle, (pair, _, _)) in &assertions {
+    for (handle, row) in handles.rows() {
         if surface_literals.contains(handle) {
             return Err(ResourceSnapshotError::InvalidFacet {
-                resource_id: pair.0,
+                resource_id: Uuid::parse_str(&row.from_node_id)
+                    .expect("admitted rows have validated endpoints"),
                 facet: crate::graph::resource_content::RESOURCE_PROPERTIES.into(),
                 detail: format!(
                     "resource assertion handle {handle:?} reuses an active surface literal"
@@ -458,8 +388,7 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
                         property.statement_id
                     ),
                 };
-                if surface_assertions.contains(property.statement_id.as_str())
-                    || assertions.contains_key(property.statement_id.as_str())
+                if handles.holds(&property.statement_id)
                     || surface_literals.contains(property.statement_id.as_str())
                 {
                     return Err(error());
@@ -529,7 +458,9 @@ impl Graph {
 #[cfg(test)]
 mod assertion_schema_tests {
     use super::*;
-    use crate::persistence::{PersistedEdge, PersistedSemanticEdgeData};
+    use crate::persistence::{
+        PersistedEdge, PersistedSemanticEdgeData, PersistedSemanticStatement,
+    };
     use crate::types::{AssertionBasis, GraphScope};
     use euclid::default::Point2D;
 
@@ -678,7 +609,7 @@ mod assertion_schema_tests {
     }
 
     #[test]
-    fn canonical_surface_assertion_ids_are_global_but_identical_owner_copies_are_allowed() {
+    fn canonical_surface_assertion_handles_are_global_and_identical_copies_are_refused() {
         let mut snapshot = base_snapshot();
         snapshot.assertion_schema = 1;
         let from = snapshot.nodes[0].node_id.clone();
@@ -687,27 +618,25 @@ mod assertion_schema_tests {
         snapshot
             .edges
             .push(canonical_edge(&from, &to, vec![same.clone()]));
-        snapshot
-            .edges
-            .push(canonical_edge(&from, &to, vec![same.clone()]));
         assert!(Graph::try_from_snapshot(&snapshot).is_ok());
 
-        let mut conflicting_pair = snapshot.clone();
-        let third = conflicting_pair.nodes[1].node_id.clone();
-        let first = conflicting_pair.nodes[0].node_id.clone();
-        conflicting_pair
+        let mut identical = snapshot.clone();
+        identical
             .edges
-            .push(canonical_edge(&third, &first, vec![same.clone()]));
-        assert!(matches!(
-            Graph::try_from_snapshot(&conflicting_pair),
-            Err(ResourceSnapshotError::ConflictingAssertion { .. })
-        ));
-
-        let mut conflicting_claim = snapshot;
-        conflicting_claim.edges[1].assertions.as_mut().unwrap()[0].predicate = "urn:other".into();
-        assert!(matches!(
-            Graph::try_from_snapshot(&conflicting_claim),
-            Err(ResourceSnapshotError::ConflictingAssertion { .. })
-        ));
+            .push(canonical_edge(&from, &to, vec![same.clone()]));
+        let mut reversed = snapshot.clone();
+        reversed
+            .edges
+            .push(canonical_edge(&to, &from, vec![same.clone()]));
+        let mut changed = snapshot;
+        let mut claim = same;
+        claim.predicate = "urn:other".into();
+        changed.edges.push(canonical_edge(&from, &to, vec![claim]));
+        for repeated in [identical, reversed, changed] {
+            assert!(matches!(
+                Graph::try_from_snapshot(&repeated),
+                Err(ResourceSnapshotError::RepeatedAssertionHandle(_))
+            ));
+        }
     }
 }
