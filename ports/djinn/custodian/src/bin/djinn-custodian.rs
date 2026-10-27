@@ -13,9 +13,11 @@
 //!
 //!   djinn-custodian --config PATH [--socket PATH]
 //!   djinn-custodian init  --config PATH      (passphrase twice on stdin)
-//!   djinn-custodian adopt --config PATH --from DIR   (a passphrase vault: its
-//!       passphrase on stdin; an OS-rooted Windows vault: the new passphrase
-//!       twice, run as the owner)
+//!   djinn-custodian adopt --config PATH [--from VAULT-DIR] [--data-from DATA-ROOT]
+//!       --from: a passphrase vault (its passphrase on stdin) or an OS-rooted
+//!       Windows vault (the new passphrase twice, run as the owner);
+//!       --data-from: the wallet and credential catalog, no passphrase
+//!   djinn-custodian wallet-files --data-root DIR   (the wallet's files, NUL-separated)
 //!   djinn-custodian consent --client PATH   (Windows: the logon helper that
 //!       puts petitions to the owner through Windows Hello)
 
@@ -44,6 +46,7 @@ struct Args {
     client: Option<PathBuf>,
     socket: Option<PathBuf>,
     from: Option<PathBuf>,
+    data_from: Option<PathBuf>,
 }
 
 impl Args {
@@ -58,7 +61,7 @@ fn parse() -> Result<Args, String> {
         Some("init") | Some("adopt") | Some("consent") => raw.next().expect("peeked"),
         _ => "serve".to_string(),
     };
-    let (mut config, mut client, mut socket, mut from) = (None, None, None, None);
+    let (mut config, mut client, mut socket, mut from, mut data_from) = (None, None, None, None, None);
     while let Some(flag) = raw.next() {
         let value = raw.next().ok_or_else(|| format!("{flag} needs a value"))?;
         match flag.as_str() {
@@ -66,6 +69,7 @@ fn parse() -> Result<Args, String> {
             "--client" => client = Some(PathBuf::from(value)),
             "--socket" => socket = Some(PathBuf::from(value)),
             "--from" => from = Some(PathBuf::from(value)),
+            "--data-from" => data_from = Some(PathBuf::from(value)),
             other => return Err(format!("unknown argument {other}")),
         }
     }
@@ -80,10 +84,14 @@ fn parse() -> Result<Args, String> {
         client,
         socket,
         from,
+        data_from,
     })
 }
 
 fn run() -> Result<(), String> {
+    if std::env::args().nth(1).as_deref() == Some("wallet-files") {
+        return wallet_files();
+    }
     let args = parse()?;
     if args.command == "consent" {
         return consent(args.client.as_deref().ok_or("consent needs --client")?);
@@ -93,7 +101,7 @@ fn run() -> Result<(), String> {
     let config = Config::parse(&bytes).map_err(|e| e.to_string())?;
     match args.command.as_str() {
         "init" => init(&config),
-        "adopt" => adopt(&config, args.from.as_deref().ok_or("adopt needs --from")?),
+        "adopt" => adopt(&config, args.from.as_deref(), args.data_from.as_deref()),
         _ => serve(config, &args),
     }
 }
@@ -260,13 +268,60 @@ fn init(config: &Config) -> Result<(), String> {
     Ok(())
 }
 
+/// Adopt Djinn's existing vault, its wallet and credential catalog, or both.
+/// The vault goes first: with `--from` it must open before any wallet moves.
+fn adopt(config: &Config, from: Option<&Path>, data_from: Option<&Path>) -> Result<(), String> {
+    if from.is_none() && data_from.is_none() {
+        return Err("adopt needs --from, --data-from or both".into());
+    }
+    if let Some(from) = from {
+        adopt_vault(config, from)?;
+    }
+    match data_from {
+        Some(data_from) => adopt_data(config, data_from),
+        None => Ok(()),
+    }
+}
+
+/// Carry Djinn's wallet and credential catalog into the custodian's data
+/// root, prove the copy is the same wallet, then remove the copies in
+/// `data_from`: the seed no longer sits where Djinn can read it.
+fn adopt_data(config: &Config, data_from: &Path) -> Result<(), String> {
+    let data_root = config.vault.data_root.as_deref().ok_or("the configuration names no vault.data_root")?;
+    let adopted = djinn_custodian::wallet::adopt_files(data_from, data_root)?;
+    println!("adopted {} wallet and credential files from {} into {}", adopted.files.len(), data_from.display(), data_root.display());
+    if adopted.left.is_empty() {
+        return Ok(());
+    }
+    for (file, why) in &adopted.left {
+        eprintln!("djinn-custodian: could not remove {}: {why}", data_from.join(file).display());
+    }
+    Err(format!("the wallet is adopted, but {} copies remain in {}; remove them as their owner", adopted.left.len(), data_from.display()))
+}
+
+/// The wallet's and catalog's files under a data root, relative and
+/// NUL-separated, for an installer to stage and later remove as the owner.
+fn wallet_files() -> Result<(), String> {
+    use std::io::Write;
+    let mut args = std::env::args().skip(2);
+    let root = match (args.next().as_deref(), args.next(), args.next()) {
+        (Some("--data-root"), Some(root), None) => PathBuf::from(root),
+        _ => return Err("usage: djinn-custodian wallet-files --data-root DIR".into()),
+    };
+    let mut out = std::io::stdout().lock();
+    for file in djinn_custodian::wallet::wallet_files(&root).map_err(|e| e.to_string())? {
+        out.write_all(file.to_string_lossy().as_bytes()).and_then(|()| out.write_all(&[0])).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 /// Bring Djinn's existing vault into the state directory, then prove the
 /// copy opens to the same identity. The source is left in place for the
 /// owner to retire; nothing is migrated in place. A passphrase vault is
 /// copied as the file it is. Djinn's OS-rooted Windows vault opens only for
 /// its owner's own logon, so it is read here, as the owner, and written as a
 /// new passphrase vault.
-fn adopt(config: &Config, from: &Path) -> Result<(), String> {
+fn adopt_vault(config: &Config, from: &Path) -> Result<(), String> {
     use castellan::custody::bootstrap::PASSPHRASE_VAULT_FILE;
     let directory = &config.vault.directory;
     if directory.join(PASSPHRASE_VAULT_FILE).exists() {

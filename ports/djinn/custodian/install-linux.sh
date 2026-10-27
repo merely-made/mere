@@ -9,19 +9,27 @@
 # systemd system service under its own non-login account (custody isolation
 # plan §5.2). Run as root:
 #
-#   install-linux.sh USER BUILT-BINARY [DJINN-VAULT-DIR]
+#   install-linux.sh USER BUILT-BINARY [DJINN-VAULT-DIR|-] [DJINN-DATA-ROOT]
 #
 # With DJINN-VAULT-DIR the user's existing passphrase vault is copied into
 # the custodian's state directory and reopened to the same identity (the
 # passphrase is read once from the terminal); the original stays where it is
-# for the owner to retire. Without it, create a vault afterwards with
-# `runuser -u djinn-custodian-USER -- /usr/local/libexec/djinn-custodian init
-# --config /etc/djinn-custodian/USER.json`.
+# for the owner to retire. Without it (or with -), create a vault afterwards
+# with `runuser -u djinn-custodian-USER -- /usr/local/libexec/djinn-custodian
+# init --config /etc/djinn-custodian/USER.json`.
+#
+# With DJINN-DATA-ROOT (the directory holding the user's identity/ and
+# castellan/) the existing wallet and credential catalog move into the
+# custodian's state directory, byte for byte, and are removed from the user's
+# root once the copy is proved to open to the same wallet. The user's own
+# account reads and removes its files and the custodian's account writes
+# its own; root never walks the user's directories.
 set -eu
 
 [ "$(id -u)" = 0 ] || { echo 'Run as root.' >&2; exit 2; }
-[ $# -ge 2 ] || { echo 'usage: install-linux.sh USER BUILT-BINARY [DJINN-VAULT-DIR]' >&2; exit 2; }
-user=$1 binary=$2 adopt_from=${3:-}
+[ $# -ge 2 ] || { echo 'usage: install-linux.sh USER BUILT-BINARY [DJINN-VAULT-DIR|-] [DJINN-DATA-ROOT]' >&2; exit 2; }
+user=$1 binary=$2 adopt_from=${3:-} data_from=${4:-}
+[ "$adopt_from" != - ] || adopt_from=
 case $user in *[!a-z0-9_-]*|'') echo 'The user name holds characters this installer refuses.' >&2; exit 2;; esac
 uid=$(id -u "$user")
 account="djinn-custodian-$user"
@@ -85,6 +93,21 @@ if [ -n "$adopt_from" ]; then
         --config "/etc/djinn-custodian/$user.json" --from "$import"
     unset passphrase
     rm -rf "$import"
+fi
+if [ -n "$data_from" ]; then
+    custodian=/usr/local/libexec/djinn-custodian
+    stage="$state/import-data"
+    install -d -o "$account" -g "$account" -m 0700 "$stage"
+    # The owner lists and reads its own wallet files and pipes them to the
+    # custodian's account, which adopts them (and removes the staged copy)
+    # only after proving they open to the same wallet.
+    runuser -u "$user" -- sh -c 'cd "$1" && "$2" wallet-files --data-root . | tar --null -T - -cf -' sh "$data_from" "$custodian" \
+        | runuser -u "$account" -- sh -c 'umask 077 && exec tar -C "$1" --no-same-owner -xf -' sh "$stage"
+    runuser -u "$account" -- "$custodian" adopt --config "/etc/djinn-custodian/$user.json" --data-from "$stage"
+    # Then the owner removes its originals, so the seed no longer sits where
+    # Djinn's account can read it.
+    runuser -u "$user" -- sh -c 'cd "$1" && "$2" wallet-files --data-root . | xargs -0 -r rm -f -- && { find identity castellan personas -mindepth 1 -depth -type d -empty -delete 2>/dev/null || true; }' sh "$data_from" "$custodian"
+    rm -rf "$stage"
 fi
 
 systemd-analyze verify "/etc/systemd/system/djinn-custodian@.service" "/etc/systemd/system/djinn-custodian@.socket" \

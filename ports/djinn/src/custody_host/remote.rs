@@ -28,7 +28,7 @@ use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation 
 use graphshell_endpoint::door::identity::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider, PersonaId, ProfileId, RetainedKeys};
 
-use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, refusal};
+use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, WalletPublic, refusal};
 use crate::custodian::InstalledCustodian;
 use crate::door::browser_carrier::NativeIdentityFailure;
 
@@ -541,6 +541,19 @@ impl ResidentCustody for RemoteHost {
             Answer::Value { value } => serde_json::from_value(value).map_err(|_| unexpected()),
             _ => Err(unexpected()),
         }
+    }
+
+    fn wallet_public(&self, _wallet_root: &Path) -> Result<WalletPublic, CustodyRefusal> {
+        let Answer::WalletPublic { personas, roster } = self.call(Operation::WalletPublic {}, NONINTERACTIVE)? else {
+            return Err(unexpected());
+        };
+        Ok(WalletPublic {
+            personas: personas
+                .iter()
+                .map(|persona| uuid::Uuid::parse_str(persona).map(PersonaId::from_uuid).map_err(|_| unexpected()))
+                .collect::<Result<_, _>>()?,
+            roster: roster.map(serde_json::from_value).transpose().map_err(|_| unexpected())?,
+        })
     }
 
     fn payload(&self, _wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal> {

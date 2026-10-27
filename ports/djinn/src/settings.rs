@@ -470,7 +470,7 @@ pub struct ReservoirLaneSettings {
     /// False turns the lane off.
     pub enabled: bool,
     /// The wallet persona whose reservoir this resident holds. Unset means the
-    /// sole persona wallet under the shared root.
+    /// sole persona in the wallet's index, which custody discloses.
     pub persona: Option<personae::PersonaId>,
     /// Offer web-address handoff to the receiving device's default browser.
     /// Profile-local, opt-in and read at resident startup; no executable paths.

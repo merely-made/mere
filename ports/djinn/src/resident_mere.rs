@@ -2212,7 +2212,7 @@ mod tests {
         handlers: HandlerRegistry,
     ) -> Fixture {
         let root = tempfile::tempdir().unwrap();
-        let reservoir = ResidentReservoir::open(root.path(), Some(persona(persona_n)))
+        let reservoir = ResidentReservoir::open(root.path(), persona(persona_n))
             .await
             .unwrap();
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());

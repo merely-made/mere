@@ -93,6 +93,10 @@ pub enum Operation {
     },
     /// The public identity read model, answerable while locked.
     Snapshot {},
+    /// The wallet's public records, answerable while locked: the persona
+    /// index and the device roster. No seed, epoch or device secret is in
+    /// either, and none of those files is ever opened by the caller.
+    WalletPublic {},
     /// One typed identity intent (dramatis names). Signing decisions are
     /// refused: only the custodian's consent channel decides them.
     Intent { intent: String, payload: Bytes },
@@ -336,6 +340,13 @@ pub enum Answer {
     },
     Snapshot {
         snapshot: Box<dramatis::view::IdentitySurfaceSnapshot>,
+    },
+    /// The wallet's public records. `personas` are the persona UUIDs that
+    /// hold a wallet manifest, sorted; `roster` is the device roster as
+    /// stored, absent when the wallet has none.
+    WalletPublic {
+        personas: Vec<String>,
+        roster: Option<serde_json::Value>,
     },
     /// A public result record (intent outcome, grant, revocation, cards,
     /// receipts), carried as JSON.

@@ -24,7 +24,7 @@ use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation 
 use graphshell_endpoint::door::identity::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{IdentityError, IdentityProvider, InMemoryProvider, PersonaId, ProfileId, RetainedKeys};
 
-use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, refusal};
+use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, WalletPublic, refusal};
 use crate::door::browser_carrier::NativeIdentityFailure;
 use crate::identity_ui::NativeIdentityUi;
 
@@ -259,6 +259,13 @@ impl<S: IdentityStorage + 'static> ResidentCustody for PersonaeHost<S> {
             return Err(CustodyRefusal::Locked);
         }
         djinn_custodian::wallet::revoke_device(wallet_root, device).map_err(failed)
+    }
+
+    fn wallet_public(&self, wallet_root: &Path) -> Result<WalletPublic, CustodyRefusal> {
+        Ok(WalletPublic {
+            personas: pandect::wallet_store::list_personas(wallet_root).map_err(failed)?,
+            roster: pandect::wallet_store::load_device_roster(wallet_root).map_err(failed)?,
+        })
     }
 
     fn payload(&self, wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal> {

@@ -21,7 +21,7 @@
 //! attestation; a root never crosses. Acts that must not release their key
 //! (`sign`, `attest`) are performed where the key is.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use dramatis::authentication::PassphraseChangeFailureV1;
@@ -132,6 +132,11 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     fn epoch_keys(&self, wallet_root: &Path, persona: PersonaId, device_label: Option<&str>, requests: &[EpochKeyRequest]) -> Result<Vec<ReleasedEpochKey>, CustodyRefusal>;
     fn station_grant(&self, wallet_root: &Path, request: &StationGrantRequest, issuer: [u8; 32]) -> Result<personae::carry::DeviceGrantSet, CustodyRefusal>;
     fn revoke_device(&self, wallet_root: &Path, device: uuid::Uuid) -> Result<pandect::RemoteAuthRevocationOutcome, CustodyRefusal>;
+    /// The wallet's public records: its persona index and device roster. A
+    /// custodian discloses them; Djinn never opens a wallet file, which a
+    /// custodian keeps beside the seed. Only an in-process host reads
+    /// `wallet_root` itself.
+    fn wallet_public(&self, wallet_root: &Path) -> Result<WalletPublic, CustodyRefusal>;
     /// Seal or unseal one retained payload, admitted to the open profile.
     fn payload(&self, wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal>;
     fn credentials(&self, call: CredentialCall) -> Result<serde_json::Value, CustodyRefusal>;
@@ -149,6 +154,54 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     fn confirm_signing(&self, ui: &dyn NativeIdentityUi, intent: &str, payload: &[u8]) -> Result<(), String> {
         let _ = (ui, intent, payload);
         Err("signing decisions are made on the custodian's own consent channel".into())
+    }
+}
+
+/// The wallet's public records, as custody discloses them: no seed, epoch or
+/// device secret.
+#[derive(Clone, Debug, PartialEq)]
+pub struct WalletPublic {
+    /// The personas that hold a wallet manifest, sorted by UUID.
+    pub personas: Vec<PersonaId>,
+    /// The device roster, absent when the wallet has none.
+    pub roster: Option<pandect::DeviceRoster>,
+}
+
+/// Where the wallet's persona index comes from. The index is custody's to
+/// disclose; a caller never lists wallet files itself.
+pub trait PersonaIndex: Send + Sync {
+    fn personas(&self) -> Result<Vec<PersonaId>, String>;
+}
+
+/// The persona index through a custody host.
+pub struct CustodyPersonas {
+    pub custody: Arc<dyn ResidentCustody>,
+    /// Read only by an in-process host.
+    pub wallet_root: PathBuf,
+}
+
+impl PersonaIndex for CustodyPersonas {
+    fn personas(&self) -> Result<Vec<PersonaId>, String> {
+        self.custody.wallet_public(&self.wallet_root).map(|public| public.personas).map_err(|refusal| format!("custody refused the persona index: {refusal:?}"))
+    }
+}
+
+/// The wallet persona to act for: `explicit` when given, otherwise the sole
+/// persona in the index. Zero or several are refused with what exists,
+/// because guessing among real identities is how a document gets sealed to
+/// somebody else.
+pub async fn resolve_persona(index: Arc<dyn PersonaIndex>, explicit: Option<PersonaId>) -> Result<PersonaId, String> {
+    if let Some(persona) = explicit {
+        return Ok(persona);
+    }
+    let personas = tokio::task::spawn_blocking(move || index.personas()).await.map_err(|error| error.to_string())??;
+    match personas.as_slice() {
+        [only] => Ok(*only),
+        [] => Err("no persona wallet exists in custody yet; pair this device first, or name a persona".into()),
+        _ => Err(format!(
+            "several personas live in custody's wallet; name one of: {}",
+            personas.iter().map(|persona| persona.as_uuid().to_string()).collect::<Vec<_>>().join(", ")
+        )),
     }
 }
 
