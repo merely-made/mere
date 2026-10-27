@@ -7295,6 +7295,7 @@ dependencies = [
  "knot-editor-host",
  "layout-dom-api",
  "mere",
+ "mere-comms",
  "mere-fleece",
  "mere-lanes",
  "mere-mesh",
