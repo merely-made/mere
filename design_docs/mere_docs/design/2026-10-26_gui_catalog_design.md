@@ -9,7 +9,8 @@ day with §6, where the catalogs disagree with each other and with the tree,
 frame hosts one presentation, and what a mod contributes is a catalog axis, and
 §9, his rulings 6 to 8 on the cues §8 left: a typed `contributes` list, a misfin
 address opens its Comms conversation, and inker defines the embedded-application
-declaration that a manifest carries.
+declaration that a manifest carries. The §9 code landed 2026-10-27, read at
+`10fe98b50`; §9 closes with what it leaves.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -545,12 +546,42 @@ ruling as §7 does.
    owner, which would have the registry crate define a schema inker cannot
    import; three owners named in TERMINOLOGY with nothing unified.
 
-What the rulings leave in code, as cues: seven built-in manifests carry both
-vocabularies in `provides`; `ModExtensionRecord` keeps its viewer words and
-produces one variant; inker's default policy and the registry's middlenet
-list still route the `misfin` scheme, and no open path reaches
-`CommsPane::select` from a node; the registry's viewer registry has no caller
-and no retirement; the brief's operations have no type. Rulings 6 and 7 are
-mechanical; ruling 8's declaration type is a design slice, and the
-`contributes` entry for a presentation waits on it. Whether a murm author key
-or an LXMF destination opens the way a misfin address does is unruled.
+Landed 2026-10-27, read at `10fe98b50`. Rulings 6 and 8 (`cebb68fa4`, merged
+as `306fa68c7`): `inker::PresentationDeclaration`
+(`crates/inker/inker/src/presentation.rs`) carries the four parts: `presents`
+(schemes, content types, extensions), `reaches` (`SurfaceContractMode`,
+accessibility, producer capabilities), `accepts` (source edits, commands) and
+`operations`. `EngineRoutePolicy::default` is built from the declared
+built-in readers, routing unchanged, and graft, weld and scrying carry their
+id and accessibility in their declaration. `ModManifest` and
+`DiskModManifest` carry a typed `contributes` (`loader/contributes.rs`:
+presentation, pane adapter, pane, servitor); Verso's four ids left `provides`
+and are one presentation; activation refuses a protocol, content-type,
+extension or reach record the manifest did not declare
+(`ModActivationError::undeclared`) and rolls back what the mod applied. The
+registry's viewer registry is deleted with its `viewer`, `audio` and `pdf`
+features, `ModExtensionRecord`'s viewer variants are
+`PresentationContentType`, `PresentationExtension` and
+`PresentationReaches`, and the registry takes `inker` under `mod-loader`.
+Ruling 7 (`c499b708f`, `10fe98b50`): the `misfin` scheme rule is out of
+inker's default policy, and the middlenet list went with the viewer registry;
+`comms::misfin_correspondent` reads the correspondent from a misfin address
+and `CommsPane::misfin_conversation` finds its loaded conversation;
+graphshell's tree page owns a `CommsPane` (`web_tree/comms_pane.rs`), and its
+three Forme open paths (`open_selected`, `open_retained`, `read_related`)
+send a correspondent node to Comms through `graphshell::comms_open::open_node`
+instead of a tile, with `mere-comms` an optional dependency under
+`workspace-editor`.
+
+What that leaves, as cues: verification runs one way, since native activation
+returns no records, and Action, IndexProvider, Lens, Theme and WasmRuntime
+records are not declarable; the built-in declarations list no operations and
+accept nothing, because nothing in code exposes either, so the brief's
+operations have a field and no type behind it; `ViewerRegistry` and
+`mod:core-viewer` remain as dependency names so load order holds; the tree
+page loads no inbox, since the misfin adapter reads a native mailbox store the
+browser lacks, so every misfin open lands on the no-conversation notice until
+a backend fills it; what opening does when no conversation is loaded (the pane
+opens and keeps its selection) is unruled; the pelt workspace has no Comms
+path; and whether a murm author key or an LXMF destination opens the way a
+misfin address does is unruled.

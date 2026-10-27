@@ -3,8 +3,8 @@
 ## mere_docs/design/2026-10-26_gui_catalog_design.md
 
 - disposition: current
-- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, §7, Mark's rulings 1 to 5 on them, §8, his refinement of rulings 1 and 3, and §9, his rulings 6 to 8 on the cues §8 left." - accurate: yes
-- claims checked: 58 - holds: 58, stale: 0, unverifiable: 0
+- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, §7, Mark's rulings 1 to 5 on them, §8, his refinement of rulings 1 and 3, and §9, his rulings 6 to 8 on the cues §8 left. The §9 code landed 2026-10-27, read at `10fe98b50`; §9 closes with what it leaves." - accurate: yes
+- claims checked: 79 - holds: 79, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -32,6 +32,18 @@ variants, `CommsPane::select` and `open`, `SurfaceEngine` and
 the three `SurfaceEngine` implementors, the viewer registry's lack of an
 external caller, document-host's capability check, the brief's clip ruling 4,
 `crates/system/source-edit`, and the registry/inker dependency direction.
+The 2026-10-27 closing of §9 adds twenty-one, read at `10fe98b50`:
+`PresentationDeclaration` and its four parts, `EngineRoutePolicy::default`
+from the declared readers, the three engines' declarations, `contributes` on
+`ModManifest` and `DiskModManifest`, `Contribution`'s four kinds, Verso's
+moved ids, `ModActivationError::undeclared` and its rollback, the viewer
+registry's deletion with three features, the three renamed record variants,
+the registry's `inker` dependency, the absent `misfin` scheme rule,
+`misfin_correspondent`, `CommsPane::misfin_conversation`,
+`comms_open::open_node`, the tree page's `comms_pane` and its three Forme
+call sites, graphshell's `mere-comms` dependency, one-way verification, the
+built-ins' empty operations, `ViewerRegistry` and `mod:core-viewer` as
+dependency names, the unloaded inbox, and pelt's absent Comms path.
 
 ### Contradictions
 
