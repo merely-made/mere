@@ -433,7 +433,7 @@ fn middlenet_viewer_for_uri_scheme(uri: &str) -> Option<&'static str> {
         Some(scheme)
             if matches!(
                 scheme.as_str(),
-                "gemini" | "titan" | "gopher" | "finger" | "spartan" | "misfin"
+                "gemini" | "titan" | "gopher" | "finger" | "spartan"
             ) =>
         {
             Some("viewer:middlenet")

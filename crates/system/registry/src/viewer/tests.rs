@@ -129,6 +129,15 @@ fn viewer_registry_selects_middlenet_for_titan_scheme_without_mime_hint() {
 }
 
 #[test]
+fn viewer_registry_does_not_route_the_misfin_scheme_to_middlenet() {
+    let registry = ViewerRegistry::default();
+    let selection = registry.select_for_uri("misfin://alice@example.com", None);
+
+    assert!(selection.fallback_used);
+    assert_eq!(selection.matched_by, "fallback");
+}
+
+#[test]
 fn viewer_registry_selects_middlenet_for_gemini_mime() {
     let registry = ViewerRegistry::default();
     let selection = registry.select_for_uri("https://example.com/capsule.gmi", Some("text/gemini"));
