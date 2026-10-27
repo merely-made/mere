@@ -34,7 +34,7 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
-scenograph.workspace = true
+scenograph = { workspace = true, features = ["editor"] }
 pictograph = { workspace = true, features = ["canvas"] }
 serde_json.workspace = true
 netrender.workspace = true

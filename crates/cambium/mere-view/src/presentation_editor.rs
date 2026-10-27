@@ -60,7 +60,7 @@ impl PresentationEditor {
             return false;
         }
         match effect {
-            Effect::Begin => !s.editing,
+            Effect::Begin => !s.editing && !s.can_reload,
             Effect::AddNode | Effect::AddRelation | Effect::AddField | Effect::Discard => s.editing,
             Effect::Apply => s.editing && s.dirty && !s.can_reload,
             Effect::Undo => s.can_undo && (s.editing || !s.can_reload),

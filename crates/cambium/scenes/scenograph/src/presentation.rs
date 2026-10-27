@@ -19,6 +19,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+#[cfg(feature = "editor")]
 pub mod editor;
 
 use sceno::Representation;

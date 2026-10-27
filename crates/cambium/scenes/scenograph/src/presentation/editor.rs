@@ -234,6 +234,24 @@ impl SavedState {
 }
 
 static NEXT_WORKSPACE: AtomicU32 = AtomicU32::new(1);
+
+fn workspace_identity() -> u32 {
+    let mut current = NEXT_WORKSPACE.load(Ordering::Relaxed);
+    loop {
+        let next = current
+            .checked_add(1)
+            .expect("presentation workspace identity exhausted");
+        match NEXT_WORKSPACE.compare_exchange_weak(
+            current,
+            next,
+            Ordering::Relaxed,
+            Ordering::Relaxed,
+        ) {
+            Ok(_) => return current,
+            Err(observed) => current = observed,
+        }
+    }
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct OperationId {
     workspace: u32,
@@ -265,8 +283,7 @@ pub struct RuleWorkspace {
 impl RuleWorkspace {
     pub fn new(saved: SavedState) -> Result<Self, String> {
         saved.validate()?;
-        let identity = NEXT_WORKSPACE.fetch_add(1, Ordering::Relaxed);
-        assert_ne!(identity, 0, "presentation workspace identity exhausted");
+        let identity = workspace_identity();
         Ok(Self {
             identity,
             saved,
