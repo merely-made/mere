@@ -720,8 +720,10 @@ fn native_transport_timeout_starts_after_admission_queue_wait() {
     let peers = GopherPeers::start();
     let url = peers.url();
     let client_timeout = Duration::from_millis(1600);
-    let mut client_policy = ClientFetchPolicy::default();
-    client_policy.timeout = client_timeout;
+    let client_policy = ClientFetchPolicy {
+        timeout: client_timeout,
+        ..ClientFetchPolicy::default()
+    };
     let (actor, updates) = spawn_fetcher_with_admission(
         wake(),
         Stores::in_memory(),
