@@ -234,7 +234,7 @@ fn generic_fonts() -> Vec<(String, Vec<u8>)> {
     // Fixture-owned explicit bindings, never a global/system fallback. The
     // bundled face is intentionally selected for all four requested roles;
     // this gate does not claim serif or fixed-width typography fidelity.
-    let bytes = include_bytes!("../../../examples/genet_web_smoke/assets/Roboto-Regular.ttf");
+    let bytes = include_bytes!("../../../../../crates/cambium/examples/genet_web_smoke/assets/Roboto-Regular.ttf");
     ["sans-serif", "system-ui", "serif", "monospace"]
         .into_iter()
         .map(|name| (name.into(), bytes.to_vec()))
