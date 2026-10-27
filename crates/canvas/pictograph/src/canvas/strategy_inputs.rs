@@ -21,14 +21,14 @@ struct StrategyGraphInputs {
 }
 
 pub(super) struct StrategyGraphMemo {
-    revision: u64,
+    revision: kernel::graph::GraphInputKey,
     stamp: u64,
     inputs: StrategyGraphInputs,
 }
 
 impl Canvas {
     pub(super) fn strategy_graph_stamp(&self) -> u64 {
-        let revision = self.graph.revision();
+        let revision = self.graph.structural_input_key();
         let mut memo = self
             .strategy_graph_memo
             .lock()

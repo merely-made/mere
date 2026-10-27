@@ -393,11 +393,17 @@ fn live_resource_rebinding_invalidates_cached_topology() {
     ] {
         apply_graph_delta(
             &mut graph,
-            GraphDelta::SetNodeUrl { key: keys[5], new_url: url.into() },
+            GraphDelta::SetNodeUrl {
+                key: keys[5],
+                new_url: url.into(),
+            },
         );
         assert_eq!(registry.degree_weights(&graph)[&keys[5]], expected);
         let mut fresh = ChannelRegistry::new();
-        assert_eq!(registry.degree_weights(&graph), fresh.degree_weights(&graph));
+        assert_eq!(
+            registry.degree_weights(&graph),
+            fresh.degree_weights(&graph)
+        );
         assert_eq!(registry.runs().degree_weights, runs);
     }
     assert_eq!(graph.shown_resource_id(keys[5]), Some(resource));
@@ -411,8 +417,8 @@ fn an_offered_partition_counts_once_and_goes_stale_with_structure() {
     let (mut graph, keys) = parity_fixture();
     let mut registry = ChannelRegistry::new();
     let partition = super::community_louvain(&graph);
-    assert!(registry.offer_community(graph.revision(), partition.clone()));
-    assert!(!registry.offer_community(graph.revision(), partition));
+    assert!(registry.offer_community(&graph, graph.structural_input_key(), partition.clone()));
+    assert!(!registry.offer_community(&graph, graph.structural_input_key(), partition));
     assert_eq!(registry.runs().community, 1);
     assert!(registry.community_is_fresh(&graph));
     // Reading it now computes nothing.

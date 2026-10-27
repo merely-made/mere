@@ -350,7 +350,7 @@ impl Canvas {
     /// *whether* community is needed (cluster-kanban or the rings toggle); this only refreshes.
     /// (Graph signals — P3.)
     pub(crate) fn ensure_community_fresh(&mut self) {
-        let revision = self.graph.revision();
+        let revision = self.graph.structural_input_key();
         // Already fresh for this revision — nothing to do.
         if self.channels.community_is_fresh(&self.graph) {
             return;
@@ -382,9 +382,9 @@ impl Canvas {
             None => return,
         };
         let Some(update) = update else { return };
-        if update.revision == self.graph.revision() {
+        if update.revision == self.graph.structural_input_key() {
             self.channels
-                .offer_community(update.revision, update.clusters);
+                .offer_community(&self.graph, update.revision, update.clusters);
         }
     }
 
@@ -465,7 +465,7 @@ impl Canvas {
     /// last built, so the per-frame gloss redraw reads it instead of re-deduping `relations()` every
     /// frame. Called from [`frame`](Self::frame). (Graph signals — query memos.)
     pub(crate) fn refresh_weighted_edges(&mut self) {
-        let revision = self.graph.revision();
+        let revision = self.graph.structural_input_key();
         if self
             .weighted_edges_cache
             .as_ref()
@@ -558,7 +558,7 @@ impl Canvas {
     /// new equilibrium takes. (Graph signals — P4.)
     pub(crate) fn sync_affinity_force(&mut self) {
         if self.cluster_by_affinity {
-            let revision = self.graph.revision();
+            let revision = self.graph.structural_input_key();
             let has_content = self.content_affinity.is_some();
             // Which sources feed the force under the current blend mode. `ContentOnly` with no
             // injected signal falls back to structural, so the toggle always does something.

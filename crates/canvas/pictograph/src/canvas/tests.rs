@@ -40,6 +40,7 @@ mod grammar;
 mod grammar_view;
 mod grouped;
 mod home_at_budget_end;
+mod host_lifetimes;
 mod layout_and_drag;
 mod link_suggestions;
 mod live_physics;

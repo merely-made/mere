@@ -197,6 +197,7 @@ pub use seiche::{
     Speed, StepBudget, display_period,
 };
 mod cull;
+mod host_results;
 mod input;
 mod member_lifetimes;
 mod resolved_image_cache;
@@ -233,8 +234,8 @@ pub mod node_billboard;
 mod node_presentation;
 pub mod relationship_topology;
 pub use dynamics_inspection::{
-    DynamicsInspection, DynamicsSubject, DynamicsTarget, DynamicsTopologyMode, DynamicsTopologyOrigin,
-    DynamicsTopologyRow, MemberDynamics,
+    DynamicsInspection, DynamicsSubject, DynamicsTarget, DynamicsTopologyMode,
+    DynamicsTopologyOrigin, DynamicsTopologyRow, MemberDynamics,
 };
 pub mod dynamics_recipe;
 /// The dynamics spec over this catalog: seiche's portable spec, with the
@@ -401,6 +402,9 @@ pub struct Canvas {
     /// Last reconciled memberships for runtime caches. The kernel authors the
     /// witnesses; this receiver neither mints nor persists them.
     cache_memberships: HashMap<NodeKey, (uuid::Uuid, kernel::graph::SurfaceNodeLifetime)>,
+    /// This Canvas owner, kept alive by captured host results. Ordinary graph
+    /// edits do not replace it; a second Canvas can never admit its results.
+    result_owner: Arc<()>,
     /// The force-directed layout backend — in-thread (tests / wasm) or an
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.
@@ -650,7 +654,7 @@ pub struct Canvas {
     /// `None` when no force is installed. Lets [`sync_affinity_force`](Self::sync_affinity_force)
     /// rebuild the force only when the signal actually changed (or the toggle flips), not per frame.
     /// (Graph signals — P4.)
-    installed_affinity_revision: Option<u64>,
+    installed_affinity_revision: Option<kernel::graph::GraphInputKey>,
     /// A host-injected **content-affinity** signal (semantic similarity from node embeddings),
     /// superseding the internal structural-Jaccard one while `Some`. `None` = use structural. The
     /// host owns the embedding provider (burn stays out of the canvas) and re-injects on node-content
@@ -683,7 +687,7 @@ pub struct Canvas {
     gloss_positions: Option<HashMap<NodeKey, PortablePoint>>,
     gloss_cache_inputs: Option<(
         String,
-        u64,
+        kernel::graph::GraphInputKey,
         u32,
         u32,
         bool,
@@ -714,7 +718,7 @@ pub struct Canvas {
     /// refreshes it once per structural change; [`gloss_geometry`](Self::gloss_geometry) reads it,
     /// falling back to a fresh compute when stale (a direct call before the first frame). (Graph
     /// signals — query memos, C.)
-    weighted_edges_cache: Option<(u64, Vec<(NodeKey, NodeKey, u32)>)>,
+    weighted_edges_cache: Option<(kernel::graph::GraphInputKey, Vec<(NodeKey, NodeKey, u32)>)>,
     /// How many times [`refresh_weighted_edges`](Self::refresh_weighted_edges) actually recomputed
     /// (test introspection for the memo: a static frame must not bump it).
     weighted_edges_rebuilds: u64,

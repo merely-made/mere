@@ -297,6 +297,7 @@ pub(crate) fn meaning_text(node: &kernel::graph::Node) -> &str {
 /// The canvas's Meaning state: the engine, the accepted snapshot, the run
 /// count, and where a run happens.
 pub(crate) struct MeaningState {
+    source_key: Option<kernel::graph::GraphInputKey>,
     pub(crate) engine: Arc<dyn MeaningEngine>,
     /// Bumped when the engine or the whole graph changes, so a snapshot of
     /// the old one is stale whatever its content revision reads.
@@ -322,6 +323,7 @@ impl Default for MeaningState {
     fn default() -> Self {
         Self {
             engine: Arc::new(LexicalMeaning::new()),
+            source_key: None,
             generation: 0,
             snapshot: None,
             runs: Arc::new(AtomicU64::new(0)),
@@ -337,6 +339,13 @@ impl Default for MeaningState {
 }
 
 impl MeaningState {
+    fn observe_content(&mut self, key: kernel::graph::GraphInputKey) {
+        if self.source_key.is_some_and(|previous| previous != key) {
+            self.forget_graph();
+        }
+        self.source_key = Some(key);
+    }
+
     pub(crate) fn snapshot(&self) -> Option<&MeaningSnapshot> {
         self.snapshot.as_ref()
     }
@@ -354,7 +363,11 @@ impl MeaningState {
     /// The whole graph was replaced: its content revision counts from its own
     /// origin, so nothing computed for the old graph stands.
     pub(crate) fn forget_graph(&mut self) {
-        self.generation += 1;
+        self.generation = self
+            .generation
+            .checked_add(1)
+            .expect("Meaning generation exhausted");
+        self.source_key = None;
         self.snapshot = None;
         self.pending = None;
         self.failed = None;
@@ -443,6 +456,7 @@ impl Canvas {
     /// the actor on a native offloaded canvas, one slice of a sliced run, or
     /// the whole run inline. Returns whether a new snapshot was accepted now.
     pub(crate) fn refresh_meaning(&mut self) -> bool {
+        self.meaning.observe_content(self.graph.content_input_key());
         let tag = (self.graph.content_revision(), self.meaning.generation);
         if self.meaning.is_fresh(tag) {
             self.meaning.pending = None;
@@ -495,6 +509,7 @@ impl Canvas {
     /// run, start or continue one when the content moved, and hand a new
     /// snapshot to its consumers.
     pub(crate) fn sync_meaning(&mut self) {
+        self.meaning.observe_content(self.graph.content_input_key());
         let mut landed = false;
         if let Some(update) = self.meaning.actor.as_mut().and_then(MeaningActor::drain) {
             let tag = (self.graph.content_revision(), self.meaning.generation);

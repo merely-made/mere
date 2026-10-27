@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-26",
+  "basis": "8d69c9144",
+  "scope": "Delayed arrangement receiving and source-qualified shared signal/model inputs; preserve ordinary edit and detached-candidate continuity",
+  "retained_byte_cap": 10000000,
+  "required_receipts": ["red regressions", "kernel runtime key controls", "full Canvas/signal tests", "Graphshell owner/reader receiving", "Canvas Wasm compile", "documentation baseline and migration record", "source and final receipt hashes"],
+  "target": "C:/t/cargo-targets/mere",
+  "isolation": "Clean primary main fast-forwarded from c0d8d207c to current origin/main; no task worktree or isolated Cargo home",
+  "limits": "Runtime source keys and result admission are not durable identity, provider request ordering, storage acknowledgement, terminal actor outcome or headed/physical qualification."
+}
