@@ -11,6 +11,26 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
+mod observations;
+
+/// A runtime-only binding to this Canvas owner. Reuses its nonreused reader
+/// keys, whose kernel membership witnesses retire removed/recreated appearances.
+#[derive(Clone, Debug)]
+pub struct DynamicsSubject {
+    target: DynamicsTarget,
+    members: Vec<(Uuid, u64)>,
+}
+
+impl DynamicsTarget {
+    fn members(self) -> Vec<Uuid> {
+        match self {
+            Self::Access { member } => vec![member],
+            Self::Pair { first, second } if first == second => vec![first],
+            Self::Pair { first, second } => vec![first, second],
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DynamicsTopologyMode {
@@ -78,15 +98,46 @@ pub struct DynamicsInspection {
     pub pair_topology_rows: Option<Vec<DynamicsTopologyRow>>,
     pub controller_edges: usize,
     pub controller_edge_runs: usize,
+    /// Current geometry readback for this displayed pair, separate from physics.
+    pub path_response: Option<Value>,
+    /// Latest bounded execution evidence for these exact endpoint bodies.
+    pub coupling_observation: Value,
     pub limits: Vec<String>,
 }
 impl Canvas {
+    pub fn bind_dynamics_target(&self, target: DynamicsTarget) -> Result<DynamicsSubject, String> {
+        let members = target
+            .members()
+            .into_iter()
+            .map(|id| {
+                self.described_keys
+                    .by_member
+                    .get(&id)
+                    .copied()
+                    .filter(|key| self.member_of_described(*key) == Some(id))
+                    .map(|key| (id, key))
+                    .ok_or_else(|| format!("Access {id} is absent from this view"))
+            })
+            .collect::<Result<_, _>>()?;
+        Ok(DynamicsSubject { target, members })
+    }
+
+    pub fn inspect_bound_dynamics(
+        &self,
+        subject: &DynamicsSubject,
+    ) -> Result<DynamicsInspection, String> {
+        for &(id, key) in &subject.members {
+            if self.member_of_described(key) != Some(id) {
+                return Err(format!(
+                    "The inspected appearance {id} ended. Choose an appearance again."
+                ));
+            }
+        }
+        self.inspect_dynamics(subject.target)
+    }
+
     pub fn inspect_dynamics(&self, target: DynamicsTarget) -> Result<DynamicsInspection, String> {
-        let ids: Vec<_> = match target {
-            DynamicsTarget::Access { member } => vec![member],
-            DynamicsTarget::Pair { first, second } if first == second => vec![first],
-            DynamicsTarget::Pair { first, second } => vec![first, second],
-        };
+        let ids = target.members();
         let mut members = Vec::new();
         for member in ids {
             let (key, node) = self
@@ -237,13 +288,15 @@ impl Canvas {
             pair_topology_rows,
             controller_edges: topology.len(),
             controller_edge_runs: topology.run_count(),
+            path_response: observations::paths(self, target),
+            coupling_observation: observations::couplings(self, target),
             limits: vec![
                 "This reads configuration and the current topology input seam; it does not step physics or measure a force vector.".into(),
                 "A visible relation row supplies one topology slot, not one force per assertion. The live law/composition determines how those inputs are used.".into(),
                 "Counted edge runs compress adjacent identical ordered endpoint rows for storage. Logical row count preserves multiplicity; run count is not a unique-link count or force measure.".into(),
                 "For a pair, `pair_topology_rows` are the exact current controller rows, including each assertion ID; traversal rows are identified as rollups without assertion IDs. `pair_inputs` summarizes held-cell groups. Its held row totals include individually hidden source assertions, and its cell hidden flag describes cell or whole-link hiding.".into(),
                 "Role policy, installed arrangement pins, explicit position pins, Forme holds and attention state have separate owners. Anchor presence is configuration, not a measured contribution.".into(),
-                "Per-assertion force attribution, installed coupling target snapshots, derived display-link execution evidence and foreground pins are not available here.".into(),
+                "Coupling rows describe actual endpoint calls before integration. They do not attribute a net force or final motion to an assertion or link. Other forces, contacts and foreground pins are outside this trace.".into(),
                 "The record is current Canvas readback, not a storage acknowledgment or source-history snapshot.".into(),
                 "The flat law label is a picker summary. Read the full live stage for mixtures/groupings and the authored record for schedules.".into(),
             ],
@@ -253,3 +306,6 @@ impl Canvas {
 #[cfg(test)]
 #[path = "dynamics_inspection_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+mod observation_tests;
