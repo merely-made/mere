@@ -90,8 +90,8 @@ scroll-protocol = { workspace = true, optional = true, features = ["server"] }
 url = { version = "2.5", optional = true }
 pollster = { version = "0.4", optional = true }
 # Local redacted lifecycle diagnostics, without the projection/rendering feature.
-apparatus = { workspace = true, features = ["registry", "serde"] }
-registry = { workspace = true, features = ["diagnostics"] }
+apparatus-core = { workspace = true, features = ["serde"] }
+registry = { workspace = true, features = ["observations"] }
 armillary = { workspace = true, features = ["tokio"] }
 # The personal sync, carriage and transfer staging hosts (`sync`) and the
 # browser door's nonces (`door::browser_host`), moved from Graphshell's

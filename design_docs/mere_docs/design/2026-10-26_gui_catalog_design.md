@@ -62,9 +62,10 @@ Four readings of the table:
   with no open or dismiss seam. The panes themselves are built unevenly and
   outside the Graphshell port: Comms is a view-model crate
   (`crates/shell/comms/src/pane.rs`), gloss is swatch geometry in pictograph,
-  Apparatus is a domain crate (`crates/domain/apparatus`) whose rows Cambium's
-  detail panel and sectioned list name beside Steward's, and Graphshell names
-  Inspector and Roster. The dock contract the panes doc proposed exists twice
+  diagnostic observations come from Registry (`crates/system/registry`)
+  through Armillary's `apparatus-core`, and product views own their inspection
+  UI. Cambium's detail panel and sectioned list name Apparatus rows beside
+  Steward's, and Graphshell names Inspector and Roster. The dock contract the panes doc proposed exists twice
   and is shared by neither: `DockState` and `DockSide` in the comms pane, whose
   module doc says they should graduate to a shared dock, and the kernel's
   `PanePresentationMode` (tiled, docked, floating, fullscreen) in

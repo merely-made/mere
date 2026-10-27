@@ -72,6 +72,7 @@ pub enum PresentationResolution {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResourceCacheError {
     UnknownSession,
+    TerminalSession,
     UnadvertisedResource,
     AddressMismatch,
     SizeMismatch,
@@ -259,7 +260,7 @@ pub struct ClientState {
     mounted: BTreeMap<ProjectionSession, MountedScene>,
     // Disclosure stays session-scoped even when two endpoints advertise the
     // same content hash. Cross-session reuse requires an explicit later policy.
-    resources: BTreeMap<(ProjectionSession, ContentHash), Vec<u8>>,
+    resources: BTreeMap<ProjectionSession, BTreeMap<ContentHash, Vec<u8>>>,
 }
 
 impl ClientState {
@@ -287,8 +288,9 @@ impl ClientState {
             .flatten()
             .map(|offer| offer.resource)
             .collect::<BTreeSet<_>>();
-        self.resources
-            .retain(|(owner, hash), _| owner != &session || advertised.contains(hash));
+        if let Some(resources) = self.resources.get_mut(&session) {
+            resources.retain(|hash, _| advertised.contains(hash));
+        }
         self.mounted.insert(session, mounted);
         Ok(())
     }
@@ -302,66 +304,20 @@ impl ClientState {
         if diff.version.major != chirograph::ProtocolVersion::V1.major {
             return Err(ClientDiffError::UnsupportedVersion);
         }
-        let current = self
+        let mut next = self
             .mounted
             .get(&diff.session)
             .cloned()
             .ok_or(ClientDiffError::UnknownSession)?;
-        let mut next = current.clone();
-        let mut next_resources = self.resources.clone();
-        let outcome = match next.scene.apply_diff(&diff.scene) {
-            Ok(outcome) => outcome,
-            Err(DiffError::WrongEpoch { .. } | DiffError::MissingBase { .. }) => {
-                return Ok(DiffApplication::Resynchronize(ResumeRequest {
-                    session: diff.session.clone(),
-                    epoch: current.scene.epoch,
-                    revision: current.scene.revision,
-                }));
-            },
-            Err(error) => return Err(ClientDiffError::InvalidScene(error)),
-        };
-        let ack = ProjectionAck {
-            session: diff.session.clone(),
-            epoch: next.scene.epoch,
-            revision: next.scene.revision,
-        };
-        if outcome == ApplyOutcome::AlreadyApplied {
-            return Ok(DiffApplication::AlreadyApplied(ack));
+        let mut resources = ResourceChanges::default();
+        let outcome = stage_diff(&mut next, diff, &mut resources)?;
+        if matches!(outcome, DiffApplication::Applied(_)) {
+            // All fallible validation precedes both commits. Resource bytes are
+            // never copied and unrelated sessions are never traversed.
+            self.mounted.insert(diff.session.clone(), next);
+            resources.commit(&diff.session, &mut self.resources);
         }
-
-        for change in &diff.presentation {
-            match change {
-                PresentationChange::Bind(binding) => {
-                    next.presentation
-                        .bindings
-                        .retain(|existing| existing.instance != binding.instance);
-                    next.presentation.bindings.push(binding.clone());
-                },
-                PresentationChange::Unbind { instance } => next
-                    .presentation
-                    .bindings
-                    .retain(|binding| binding.instance != *instance),
-                PresentationChange::ReplaceOffers { key, offers } => {
-                    next.presentation.offers.insert(key.clone(), offers.clone());
-                },
-                PresentationChange::RemoveOffers { key } => {
-                    next.presentation.offers.remove(key);
-                },
-                PresentationChange::InvalidateResource { resource } => {
-                    next_resources.remove(&(diff.session.clone(), *resource));
-                },
-            }
-        }
-        validate_presentation(&next).map_err(ClientDiffError::InvalidPresentation)?;
-        if let Some(status) = diff.status {
-            next.status = status;
-            if status == SessionStatus::Revoked && next.cache_policy.purge_on_revocation {
-                next_resources.retain(|(session, _), _| session != &diff.session);
-            }
-        }
-        self.mounted.insert(diff.session.clone(), next);
-        self.resources = next_resources;
-        Ok(DiffApplication::Applied(ack))
+        Ok(outcome)
     }
 
     /// Verify and cache one resource only if this session advertised it.
@@ -370,6 +326,9 @@ impl ClientState {
             .mounted
             .get(&response.session)
             .ok_or(ResourceCacheError::UnknownSession)?;
+        if is_terminal_status(mounted.status) {
+            return Err(ResourceCacheError::TerminalSession);
+        }
         if !response.has_valid_address() {
             return Err(ResourceCacheError::AddressMismatch);
         }
@@ -389,7 +348,9 @@ impl ClientState {
             return Err(ResourceCacheError::SizeMismatch);
         }
         self.resources
-            .insert((response.session, response.resource), response.bytes);
+            .entry(response.session)
+            .or_default()
+            .insert(response.resource, response.bytes);
         Ok(())
     }
 
@@ -424,7 +385,11 @@ impl ClientState {
             }));
         };
 
-        let Some(bytes) = self.resources.get(&(session.clone(), offer.resource)) else {
+        let Some(bytes) = self
+            .resources
+            .get(session)
+            .and_then(|resources| resources.get(&offer.resource))
+        else {
             return Ok(PresentationResolution::NeedsResource(ResourceRequest {
                 session: session.clone(),
                 resource: offer.resource,
@@ -600,13 +565,12 @@ impl ClientState {
         session: &ProjectionSession,
         reply: ResumeReply,
     ) -> Result<ResumeApplication, ResumeApplyError> {
-        let mut next = self.clone();
         match reply {
             ResumeReply::Current(ack) => {
                 if &ack.session != session {
                     return Err(ResumeApplyError::WrongSession);
                 }
-                let current = next
+                let current = self
                     .acknowledgement(session)
                     .ok_or(ResumeApplyError::UnknownSession)?;
                 if current.epoch != ack.epoch || current.revision != ack.revision {
@@ -616,20 +580,25 @@ impl ClientState {
                         revision: current.revision,
                     }));
                 }
-                next.mounted.get_mut(session).unwrap().status = SessionStatus::Live;
-                *self = next;
+                let mounted = self.mounted.get_mut(session).unwrap();
+                if !is_terminal_status(mounted.status) {
+                    mounted.status = SessionStatus::Live;
+                }
                 Ok(ResumeApplication::Current(ack))
             },
             ResumeReply::Diffs(diffs) => {
-                let mut last_ack = next
-                    .acknowledgement(session)
+                let mut next = self
+                    .mounted
+                    .get(session)
+                    .cloned()
                     .ok_or(ResumeApplyError::UnknownSession)?;
+                let mut resources = ResourceChanges::default();
+                let mut last_ack = self.acknowledgement(session).unwrap();
                 for diff in diffs {
                     if &diff.session != session {
                         return Err(ResumeApplyError::WrongSession);
                     }
-                    match next
-                        .apply_diff(&diff)
+                    match stage_diff(&mut next, &diff, &mut resources)
                         .map_err(ResumeApplyError::InvalidDiff)?
                     {
                         DiffApplication::Applied(ack) | DiffApplication::AlreadyApplied(ack) => {
@@ -640,34 +609,56 @@ impl ClientState {
                         },
                     }
                 }
-                next.mounted.get_mut(session).unwrap().status = SessionStatus::Live;
-                *self = next;
+                if !is_terminal_status(next.status) {
+                    next.status = SessionStatus::Live;
+                }
+                resources.purge |=
+                    next.status == SessionStatus::Revoked && next.cache_policy.purge_on_revocation;
+                self.mounted.insert(session.clone(), next);
+                resources.commit(session, &mut self.resources);
                 Ok(ResumeApplication::Applied(last_ack))
             },
             ResumeReply::Snapshot(snapshot) => {
                 if &snapshot.session != session {
                     return Err(ResumeApplyError::WrongSession);
                 }
-                next.apply_snapshot(*snapshot)
+                let terminal_status = self
+                    .mounted
+                    .get(session)
+                    .map(|mounted| mounted.status)
+                    .filter(|status| is_terminal_status(*status));
+                self.apply_snapshot(*snapshot)
                     .map_err(ResumeApplyError::InvalidSnapshot)?;
-                let ack = next
-                    .acknowledgement(session)
-                    .ok_or(ResumeApplyError::UnknownSession)?;
-                *self = next;
-                Ok(ResumeApplication::Applied(ack))
+                if let Some(status) = terminal_status {
+                    let purge = {
+                        let mounted = self.mounted.get_mut(session).unwrap();
+                        mounted.status = status;
+                        status == SessionStatus::Revoked && mounted.cache_policy.purge_on_revocation
+                    };
+                    if purge {
+                        self.resources.remove(session);
+                    }
+                }
+                Ok(ResumeApplication::Applied(
+                    self.acknowledgement(session).unwrap(),
+                ))
             },
         }
     }
 
     pub fn mark_stale(&mut self, session: &ProjectionSession) {
         if let Some(mounted) = self.mounted.get_mut(session) {
-            mounted.status = SessionStatus::Stale;
+            if !is_terminal_status(mounted.status) {
+                mounted.status = SessionStatus::Stale;
+            }
         }
     }
 
     pub fn mark_disconnected(&mut self, session: &ProjectionSession) {
         if let Some(mounted) = self.mounted.get_mut(session) {
-            mounted.status = SessionStatus::Disconnected;
+            if !is_terminal_status(mounted.status) {
+                mounted.status = SessionStatus::Disconnected;
+            }
         }
     }
 
@@ -678,7 +669,9 @@ impl ClientState {
     /// resume, an expired one needs a new admission.
     pub fn mark_expired(&mut self, session: &ProjectionSession) {
         if let Some(mounted) = self.mounted.get_mut(session) {
-            mounted.status = SessionStatus::Expired;
+            if mounted.status != SessionStatus::Revoked {
+                mounted.status = SessionStatus::Expired;
+            }
         }
     }
 
@@ -687,7 +680,7 @@ impl ClientState {
         if let Some(mounted) = self.mounted.get_mut(session) {
             mounted.status = SessionStatus::Revoked;
             if mounted.cache_policy.purge_on_revocation {
-                self.resources.retain(|(owner, _), _| owner != session);
+                self.resources.remove(session);
             }
         }
     }
@@ -698,7 +691,7 @@ impl ClientState {
 
     pub fn forget_session(&mut self, session: &ProjectionSession) {
         self.mounted.remove(session);
-        self.resources.retain(|(owner, _), _| owner != session);
+        self.resources.remove(session);
     }
 
     pub fn persist_session<S: ProjectionStore>(
@@ -721,9 +714,11 @@ impl ClientState {
             .collect::<BTreeSet<_>>();
         let resources = self
             .resources
-            .iter()
-            .filter(|((owner, hash), _)| owner == session && advertised.contains(hash))
-            .map(|((_, hash), bytes)| PersistedResource {
+            .get(session)
+            .into_iter()
+            .flat_map(|resources| resources.iter())
+            .filter(|(hash, _)| advertised.contains(*hash))
+            .map(|(hash, bytes)| PersistedResource {
                 hash: *hash,
                 bytes: bytes.clone(),
             })
@@ -763,6 +758,7 @@ impl ClientState {
         validate_presentation(&record.mounted).map_err(|_| PersistenceError::Corrupt)?;
         let mut restored = ClientState::default();
         let mut restored_mounted = record.mounted.clone();
+        let restored_status = restored_mounted.status;
         restored_mounted.status = SessionStatus::Stale;
         restored.mounted.insert(session.clone(), restored_mounted);
         for resource in record.resources {
@@ -773,6 +769,17 @@ impl ClientState {
                     bytes: resource.bytes,
                 })
                 .map_err(|_| PersistenceError::Corrupt)?;
+        }
+        if restored_status == SessionStatus::Revoked
+            && restored
+                .mounted
+                .get(session)
+                .is_some_and(|mounted| mounted.cache_policy.purge_on_revocation)
+        {
+            restored.resources.remove(session);
+        }
+        if is_terminal_status(restored_status) {
+            restored.mounted.get_mut(session).unwrap().status = restored_status;
         }
         self.forget_session(session);
         self.mounted.extend(restored.mounted);
@@ -785,6 +792,106 @@ impl ClientState {
         store: &mut S,
     ) -> Result<(), PersistenceError<S::Error>> {
         store.remove(session).map_err(PersistenceError::Store)
+    }
+}
+
+/// Deferred cache changes for one session. A whole replay validates before
+/// this is committed, so a rejected suffix cannot invalidate accepted bytes.
+#[derive(Default)]
+struct ResourceChanges {
+    invalidated: BTreeSet<ContentHash>,
+    purge: bool,
+}
+impl ResourceChanges {
+    fn commit(
+        self,
+        session: &ProjectionSession,
+        cache: &mut BTreeMap<ProjectionSession, BTreeMap<ContentHash, Vec<u8>>>,
+    ) {
+        if self.purge {
+            cache.remove(session);
+        } else if !self.invalidated.is_empty() {
+            if let Some(resources) = cache.get_mut(session) {
+                for hash in self.invalidated {
+                    resources.remove(&hash);
+                }
+            }
+        }
+    }
+}
+
+fn stage_diff(
+    next: &mut MountedScene,
+    diff: &ProjectionDiff,
+    resources: &mut ResourceChanges,
+) -> Result<DiffApplication, ClientDiffError> {
+    if diff.version.major != chirograph::ProtocolVersion::V1.major {
+        return Err(ClientDiffError::UnsupportedVersion);
+    }
+    let outcome = match next.scene.apply_diff(&diff.scene) {
+        Ok(outcome) => outcome,
+        Err(DiffError::WrongEpoch { .. } | DiffError::MissingBase { .. }) => {
+            return Ok(DiffApplication::Resynchronize(ResumeRequest {
+                session: diff.session.clone(),
+                epoch: next.scene.epoch,
+                revision: next.scene.revision,
+            }));
+        },
+        Err(error) => return Err(ClientDiffError::InvalidScene(error)),
+    };
+    let ack = ProjectionAck {
+        session: diff.session.clone(),
+        epoch: next.scene.epoch,
+        revision: next.scene.revision,
+    };
+    if outcome == ApplyOutcome::AlreadyApplied {
+        return Ok(DiffApplication::AlreadyApplied(ack));
+    }
+    for change in &diff.presentation {
+        match change {
+            PresentationChange::Bind(binding) => {
+                next.presentation
+                    .bindings
+                    .retain(|existing| existing.instance != binding.instance);
+                next.presentation.bindings.push(binding.clone());
+            },
+            PresentationChange::Unbind { instance } => next
+                .presentation
+                .bindings
+                .retain(|binding| binding.instance != *instance),
+            PresentationChange::ReplaceOffers { key, offers } => {
+                next.presentation.offers.insert(key.clone(), offers.clone());
+            },
+            PresentationChange::RemoveOffers { key } => {
+                next.presentation.offers.remove(key);
+            },
+            PresentationChange::InvalidateResource { resource } => {
+                resources.invalidated.insert(*resource);
+            },
+        }
+    }
+    validate_presentation(next).map_err(ClientDiffError::InvalidPresentation)?;
+    if let Some(status) = diff.status {
+        // Lapse statuses are terminal for this admitted projection. A replay
+        // may recover stale/disconnected state, but it cannot revive authority
+        // that expired or was revoked under the same session id.
+        next.status = transition_status(next.status, status);
+        resources.purge |=
+            next.status == SessionStatus::Revoked && next.cache_policy.purge_on_revocation;
+    }
+    Ok(DiffApplication::Applied(ack))
+}
+
+fn is_terminal_status(status: SessionStatus) -> bool {
+    matches!(status, SessionStatus::Expired | SessionStatus::Revoked)
+}
+
+fn transition_status(current: SessionStatus, incoming: SessionStatus) -> SessionStatus {
+    match (current, incoming) {
+        (SessionStatus::Revoked, _) => SessionStatus::Revoked,
+        (SessionStatus::Expired, SessionStatus::Revoked) => SessionStatus::Revoked,
+        (SessionStatus::Expired, _) => SessionStatus::Expired,
+        (_, incoming) => incoming,
     }
 }
 
@@ -911,6 +1018,245 @@ mod tests {
                 purge_on_revocation: true,
             },
         }
+    }
+
+    fn cached_session(
+        client: &mut ClientState,
+        name: &str,
+        byte: u8,
+    ) -> (ProjectionSession, ContentHash) {
+        let session = ProjectionSession(name.into());
+        let bytes = vec![byte; 1024 * 1024];
+        let hash = ContentHash::of(&bytes);
+        client
+            .apply_snapshot(snapshot_with_offer(
+                &session,
+                PresentationCodec::ImageV1 {
+                    mime_type: "image/png".into(),
+                },
+                PresentationCapability::Image,
+                semantics(name, SemanticRole::Graphic),
+                &bytes,
+                CacheRetention::MemoryOnly,
+            ))
+            .unwrap();
+        client
+            .apply_resource(ResourceResponse {
+                session: session.clone(),
+                resource: hash,
+                bytes,
+            })
+            .unwrap();
+        (session, hash)
+    }
+
+    fn revision_diff(session: &ProjectionSession, base: u64) -> ProjectionDiff {
+        ProjectionDiff {
+            version: ProtocolVersion::V1,
+            session: session.clone(),
+            scene: SceneDiff {
+                epoch: SceneEpoch(1),
+                base: Revision(base),
+                revision: Revision(base + 1),
+                operations: vec![],
+            },
+            presentation: vec![],
+            status: None,
+        }
+    }
+
+    #[test]
+    fn small_updates_and_resume_keep_cached_byte_allocations() {
+        let mut client = ClientState::default();
+        let (session, hash) = cached_session(&mut client, "active", 1);
+        let (other, other_hash) = cached_session(&mut client, "unrelated", 2);
+        let pointer = client.resources[&session][&hash].as_ptr();
+        let other_pointer = client.resources[&other][&other_hash].as_ptr();
+        client.apply_diff(&revision_diff(&session, 4)).unwrap();
+        client
+            .apply_resume(
+                &session,
+                ResumeReply::Diffs(vec![revision_diff(&session, 5), revision_diff(&session, 6)]),
+            )
+            .unwrap();
+        let ack = client.acknowledgement(&session).unwrap();
+        client
+            .apply_resume(&session, ResumeReply::Current(ack))
+            .unwrap();
+        assert_eq!(client.resources[&session][&hash].as_ptr(), pointer);
+        assert_eq!(
+            client.resources[&other][&other_hash].as_ptr(),
+            other_pointer
+        );
+        client.mark_revoked(&session);
+        assert!(!client.resources.contains_key(&session));
+        assert_eq!(
+            client.resources[&other][&other_hash].as_ptr(),
+            other_pointer
+        );
+    }
+
+    #[test]
+    fn terminal_resume_status_cannot_be_reopened_or_retain_revoked_bytes() {
+        let mut client = ClientState::default();
+        let (session, hash) = cached_session(&mut client, "terminal-replay", 9);
+        assert!(client.resources[&session].contains_key(&hash));
+
+        client.mark_disconnected(&session);
+        assert!(matches!(
+            client
+                .apply_resume(&session, ResumeReply::Diffs(Vec::new()))
+                .unwrap(),
+            ResumeApplication::Applied(_)
+        ));
+        assert_eq!(
+            client.mounted(&session).unwrap().status,
+            SessionStatus::Live,
+            "an empty successful replay recovers a disconnected projection"
+        );
+
+        let mut revoked = revision_diff(&session, 4);
+        revoked.status = Some(SessionStatus::Revoked);
+        let mut claims_live = revision_diff(&session, 5);
+        claims_live.status = Some(SessionStatus::Live);
+        client
+            .apply_resume(&session, ResumeReply::Diffs(vec![revoked, claims_live]))
+            .unwrap();
+        assert_eq!(
+            client.mounted(&session).unwrap().status,
+            SessionStatus::Revoked
+        );
+        assert!(
+            !client.resources.contains_key(&session),
+            "revocation purges the session's cached bytes"
+        );
+        client.mark_disconnected(&session);
+        client.mark_stale(&session);
+        client.mark_expired(&session);
+        assert_eq!(
+            client.mounted(&session).unwrap().status,
+            SessionStatus::Revoked,
+            "incidental transport changes and expiry cannot weaken revocation"
+        );
+
+        client
+            .apply_resume(&session, ResumeReply::Diffs(Vec::new()))
+            .unwrap();
+        let ack = client.acknowledgement(&session).unwrap();
+        client
+            .apply_resume(&session, ResumeReply::Current(ack))
+            .unwrap();
+        assert_eq!(
+            client.mounted(&session).unwrap().status,
+            SessionStatus::Revoked,
+            "neither empty nor current resume replies revive terminal authority"
+        );
+
+        let mut snapshot = snapshot_with_offer(
+            &session,
+            PresentationCodec::ImageV1 {
+                mime_type: "image/png".into(),
+            },
+            PresentationCapability::Image,
+            semantics("terminal-replay", SemanticRole::Graphic),
+            b"replacement image",
+            CacheRetention::MemoryOnly,
+        );
+        snapshot.scene.revision = Revision(6);
+        client
+            .apply_resume(&session, ResumeReply::Snapshot(Box::new(snapshot)))
+            .unwrap();
+        assert_eq!(
+            client.mounted(&session).unwrap().status,
+            SessionStatus::Revoked,
+            "a same-session snapshot does not reauthorize a terminal projection"
+        );
+        assert!(!client.resources.contains_key(&session));
+
+        let mut expired_client = ClientState::default();
+        let (expired_session, _) = cached_session(&mut expired_client, "expired-replay", 10);
+        expired_client.mark_expired(&expired_session);
+        expired_client.mark_disconnected(&expired_session);
+        expired_client.mark_stale(&expired_session);
+        expired_client
+            .apply_resume(&expired_session, ResumeReply::Diffs(Vec::new()))
+            .unwrap();
+        assert_eq!(
+            expired_client.mounted(&expired_session).unwrap().status,
+            SessionStatus::Expired
+        );
+        let mut revoked_after_expiry = revision_diff(&expired_session, 4);
+        revoked_after_expiry.status = Some(SessionStatus::Revoked);
+        expired_client
+            .apply_resume(
+                &expired_session,
+                ResumeReply::Diffs(vec![revoked_after_expiry]),
+            )
+            .unwrap();
+        assert_eq!(
+            expired_client.mounted(&expired_session).unwrap().status,
+            SessionStatus::Revoked,
+            "an explicit revocation strengthens expiry"
+        );
+    }
+
+    #[test]
+    fn rejected_replay_suffix_keeps_earlier_invalidations_and_revocation_uncommitted() {
+        let mut client = ClientState::default();
+        let (session, hash) = cached_session(&mut client, "replay", 3);
+        let before = client.clone();
+        let mut first = revision_diff(&session, 4);
+        first
+            .presentation
+            .push(PresentationChange::InvalidateResource { resource: hash });
+        first.status = Some(SessionStatus::Revoked);
+        let mut bad = revision_diff(&session, 5);
+        bad.presentation
+            .push(PresentationChange::Bind(PresentationBinding {
+                instance: InstanceId(99),
+                key: PresentationKey("absent".into()),
+            }));
+        assert!(
+            client
+                .apply_resume(&session, ResumeReply::Diffs(vec![first, bad]))
+                .is_err()
+        );
+        assert_eq!(client, before);
+        let mut stale = revision_diff(&session, 4);
+        stale.scene.base = Revision(20);
+        stale.scene.revision = Revision(21);
+        assert!(matches!(
+            client.apply_resume(
+                &session,
+                ResumeReply::Diffs(vec![revision_diff(&session, 4), stale])
+            ),
+            Ok(ResumeApplication::Resynchronize(_))
+        ));
+        assert_eq!(client, before);
+    }
+
+    #[test]
+    fn invalidation_is_atomic_and_scoped_even_for_identical_content() {
+        let mut client = ClientState::default();
+        let (session, hash) = cached_session(&mut client, "first", 4);
+        let (other, _) = cached_session(&mut client, "second", 4);
+        let before = client.clone();
+        let mut diff = revision_diff(&session, 4);
+        diff.presentation
+            .push(PresentationChange::InvalidateResource { resource: hash });
+        diff.presentation
+            .push(PresentationChange::Bind(PresentationBinding {
+                instance: InstanceId(99),
+                key: PresentationKey("absent".into()),
+            }));
+        assert!(client.apply_diff(&diff).is_err());
+        assert_eq!(client, before);
+        diff.presentation.pop();
+        client
+            .apply_resume(&session, ResumeReply::Diffs(vec![diff]))
+            .unwrap();
+        assert!(!client.resources[&session].contains_key(&hash));
+        assert!(client.resources[&other].contains_key(&hash));
     }
 
     #[test]
@@ -1478,6 +1824,64 @@ mod tests {
             self.records.remove(session);
             Ok(())
         }
+    }
+
+    #[test]
+    fn restore_preserves_terminal_status_and_rejects_new_resource_bytes() {
+        let session = ProjectionSession("loopback:terminal-persist".into());
+        let glyph = serde_json::to_vec(&NativeGlyphV1 {
+            label: "Terminal".into(),
+            icon: Some("T".into()),
+            color: None,
+        })
+        .unwrap();
+        let hash = ContentHash::of(&glyph);
+        let mut snapshot = snapshot_with_offer(
+            &session,
+            PresentationCodec::NativeGlyphV1,
+            PresentationCapability::NativeGlyph,
+            semantics("Terminal", SemanticRole::Graphic),
+            &glyph,
+            CacheRetention::EncryptedPersistent,
+        );
+        snapshot.cache_policy.purge_on_revocation = false;
+        let mut client = ClientState::default();
+        client.apply_snapshot(snapshot).unwrap();
+        client
+            .apply_resource(ResourceResponse {
+                session: session.clone(),
+                resource: hash,
+                bytes: glyph.clone(),
+            })
+            .unwrap();
+        client.mark_revoked(&session);
+        let mut store = MemoryStore {
+            encrypted: true,
+            ..MemoryStore::default()
+        };
+        client.persist_session(&session, 10, &mut store).unwrap();
+
+        let mut restored = ClientState::default();
+        restored.restore_session(&session, 11, &store).unwrap();
+        assert_eq!(
+            restored.mounted(&session).unwrap().status,
+            SessionStatus::Revoked
+        );
+        assert!(restored.resources[&session].contains_key(&hash));
+        assert_eq!(
+            restored.apply_resource(ResourceResponse {
+                session: session.clone(),
+                resource: hash,
+                bytes: glyph,
+            }),
+            Err(ResourceCacheError::TerminalSession)
+        );
+        restored.mark_stale(&session);
+        restored.mark_expired(&session);
+        assert_eq!(
+            restored.mounted(&session).unwrap().status,
+            SessionStatus::Revoked
+        );
     }
 
     #[test]

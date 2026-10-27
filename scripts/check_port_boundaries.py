@@ -6,7 +6,8 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # SPDX-License-Identifier: MPL-2.0
 
-"""Enforce the one-way dependency boundary from Mere ports into crates."""
+"""Enforce Mere's one-way dependency boundaries: ports into crates, and the
+toolkit into the document stack."""
 
 from __future__ import annotations
 
@@ -20,6 +21,19 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 CRATES = (ROOT / "crates").resolve()
 PORTS = (ROOT / "ports").resolve()
 WASM_TARGET = "wasm32-unknown-unknown"
+TOOLKIT = (CRATES / "cambium").resolve()
+# The document stack: content sessions, lanes, canvases, loaders and capture.
+# The toolkit renders what they produce; it does not link them.
+DOCUMENT_STACK_PACKAGES = {
+    "inker",
+    "document-canvas",
+    "mere-lanes",
+    "nematic",
+    "fleece",
+    "mere-pageload",
+    "mere-fetch",
+    "knot-editor-host",
+}
 FORBIDDEN_GRAPHSHELL_WEB_PACKAGES = {
     "turnstone",
     "genet-winit",
@@ -104,6 +118,22 @@ def check_graphshell_web_cone() -> None:
         )
 
 
+def check_toolkit_document_links(packages: list[dict]) -> None:
+    for package in packages:
+        manifest = pathlib.Path(package["manifest_path"]).resolve()
+        if not is_beneath(manifest, TOOLKIT):
+            continue
+        for dependency in package["dependencies"]:
+            if dependency.get("kind") is not None or dependency.get("optional"):
+                continue
+            if dependency["name"] not in DOCUMENT_STACK_PACKAGES:
+                continue
+            fail(
+                f"toolkit crate {manifest.relative_to(ROOT)} links the document "
+                f"stack: {package['name']} -> {dependency['name']}"
+            )
+
+
 def main() -> None:
     result = subprocess.run(
         ["cargo", "metadata", "--format-version", "1", "--no-deps"],
@@ -126,19 +156,23 @@ def main() -> None:
             continue
         for dependency in package["dependencies"]:
             path = dependency.get("path")
-            if path is not None and is_beneath(pathlib.Path(path), PORTS):
-                fail(
-                    f"{manifest.relative_to(ROOT)} depends on port package "
-                    f"{dependency['name']} at {pathlib.Path(path).relative_to(ROOT)}"
-                )
+            if path is None or not is_beneath(pathlib.Path(path), PORTS):
+                continue
+            # Every kind, dev-dependencies included: an example or test that
+            # mounts a product surface lives with that product (Mark, 2026-10-26).
+            fail(
+                f"{manifest.relative_to(ROOT)} depends on port package "
+                f"{dependency['name']} at {pathlib.Path(path).relative_to(ROOT)}"
+            )
 
     expected = (PORTS / "graphshell" / "Cargo.toml").resolve()
     if graphshell_manifests != [expected]:
         rendered = [str(path.relative_to(ROOT)) for path in graphshell_manifests]
         fail(f"graphshell manifests are {rendered}, expected ports/graphshell/Cargo.toml")
 
+    check_toolkit_document_links(packages)
     check_graphshell_web_cone()
-    print("Mere port and Graphshell web dependency boundaries passed")
+    print("Mere port, toolkit and Graphshell web dependency boundaries passed")
 
 
 if __name__ == "__main__":

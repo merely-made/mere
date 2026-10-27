@@ -55,6 +55,20 @@ impl Canvas {
     /// without the sim re-scrambling first (positions are no longer graph truth, S2).
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
+        // Carry a transient scope's intent by member UUID across an explicit
+        // switch, never by the old graph's reusable slots.
+        let scope_members: Option<Vec<_>> = self.scope.as_ref().map(|scope| {
+            scope
+                .iter()
+                .filter_map(|key| self.graph.get_node(*key).map(|node| node.id))
+                .collect()
+        });
+        // An explicit graph switch ends every runtime cache life, even if the
+        // incoming graph is a clone with the same kernel witnesses.
+        let retired = std::mem::take(&mut self.cache_memberships);
+        self.retire_member_caches(&retired);
+        self.physics
+            .sync_nodes_retiring(Vec::new(), retired.keys().copied().collect());
         // Node keys can be reused by another graph; release this view's local
         // holds before syncing bodies under the replacement graph.
         for key in self.forme_held.drain() {
@@ -67,8 +81,22 @@ impl Canvas {
         // authored IDs again against the replacement.
         if let Some(roster) = self.exact_scope.clone() {
             self.scope = Some(self.resolve_exact_scope(&roster));
+        } else if let Some(members) = scope_members {
+            self.scope = Some(
+                members
+                    .into_iter()
+                    .filter_map(|id| self.graph.get_node_key_by_id(id))
+                    .collect(),
+            );
         }
         self.meaning.forget_graph();
+        self.community_actor = None;
+        self.content_affinity = None;
+        self.content_affinity_dirty = true;
+        self.installed_affinity_revision = None;
+        self.affinity_force_installed = false;
+        self.physics.set_affinity_force(None);
+        self.weighted_edges_cache = None;
         self.last_strategy_inputs = None;
         *self
             .strategy_graph_memo
@@ -123,6 +151,7 @@ impl Canvas {
         self.fold_undo.clear();
         self.fold_redo.clear();
         self.reconcile_derived();
+        self.sync_arrangement_roles();
         let positions: Vec<(NodeKey, Point2D<f32>)> = self
             .graph
             .nodes()
@@ -155,6 +184,7 @@ impl Canvas {
         let mut canvas = Self {
             graph,
             described_keys: Default::default(),
+            cache_memberships: Default::default(),
             physics,
             #[cfg(feature = "gpu")]
             physics_device: None,
@@ -283,6 +313,7 @@ impl Canvas {
             render_gnodes_as_dom: false,
         };
         canvas.described_keys.reconcile(&canvas.graph);
+        canvas.reconcile_member_lifetimes();
         // Construction establishes the footprint baseline before any layout is cached.
         canvas.strategy_footprints = canvas
             .graph
@@ -418,10 +449,12 @@ impl Canvas {
     }
 
     /// Re-sync the physics bodies, edge topology, and node-children pool to the
-    /// current graph after a structural change. Does not seed positions, alter the
-    /// selection, or restart the settle; callers do that as they need. The pool
+    /// current graph after a structural change. Retires caches for ended member
+    /// lives while preserving continuous members. Does not restart the settle;
+    /// callers seed new members as needed. The pool
     /// is structural, so it is rebuilt, not grown incrementally.
     pub(crate) fn reconcile_derived(&mut self) {
+        let retired = self.reconcile_member_lifetimes();
         self.described_keys.reconcile(&self.graph);
         // The registry's facts gate on `Graph::revision` — bumped at the kernel mutation source, so
         // a spurious reconcile (e.g. a selection change) cannot invalidate them. (Graph signals.)
@@ -433,15 +466,11 @@ impl Canvas {
             .nodes()
             .map(|(key, _node)| (key, Point2D::zero()))
             .collect();
-        self.physics.sync_nodes(nodes);
+        let memberships_retired = !retired.is_empty();
+        self.physics.sync_nodes_retiring(nodes, retired);
         self.physics.sync_edge_topology(self.controller_topology());
-        self.pinned_nodes
-            .retain(|key| self.graph.get_node(*key).is_some());
-        self.grammar
-            .retain(|key| self.graph.get_node(*key).is_some());
-        self.mosaic
-            .retain(|key| self.graph.get_node(*key).is_some());
-        // Per-node overrides key by member, so a reused slot starts clean (lifetime brief §7.7).
+        // UUID-keyed overrides retain their D1 model. The lifetime receiver above
+        // also prunes exits hidden inside a same-call UUID recreation.
         let live = |id: &uuid::Uuid| self.graph.get_node_key_by_id(*id).is_some();
         self.node_faces.retain(|id, _| live(id));
         self.node_sizes.retain(|id, _| live(id));
@@ -475,6 +504,9 @@ impl Canvas {
         self.stage_node = stage_node;
         self.fold_badge_nodes.clear();
         self.resync_view_to_graph();
+        if memberships_retired {
+            self.sync_arrangement_roles();
+        }
         // Degree-based sizes shift when the topology changes, so re-push radii (also
         // seeds them for newly-spawned bodies). No re-settle here: the structural
         // change's own settle covers it.

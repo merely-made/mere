@@ -462,7 +462,12 @@ mod tests {
             author: Author::person("https://original-author.test/"),
             delta: assertion(),
         };
-        super::super::capture::replay_attributed_deltas_onto(&mut graph, &mut attribution, [&mint]);
+        let _ = super::super::capture::replay_attributed_deltas_onto(
+            &mut graph,
+            &mut attribution,
+            [&mint],
+            super::super::capture::OnRefusal::Drop,
+        );
 
         let mut carried = graph.to_snapshot().edges;
         let statement = &mut carried[0].retained_assertions_mut()[0];
@@ -476,10 +481,11 @@ mod tests {
                 edges: carried,
             },
         };
-        super::super::capture::replay_attributed_deltas_onto(
+        let _ = super::super::capture::replay_attributed_deltas_onto(
             &mut graph,
             &mut attribution,
             [&checkpoint],
+            super::super::capture::OnRefusal::Drop,
         );
         attribution.repair_checkpoint(&mut graph);
         assert_eq!(

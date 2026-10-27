@@ -734,3 +734,76 @@ fn recorded_load_keeps_a_set_node_url_over_the_navigation_cursor() {
     assert_eq!(restored.get_nodes_by_url("https://audit.test/new"), vec![key]);
     assert!(restored.get_nodes_by_url("https://audit.test/old").is_empty());
 }
+
+/// Q015: every index in the navigation snapshot names a row of its own column,
+/// so each checked load refuses one that names none instead of panicking when
+/// Stemma hydrates it.
+#[test]
+fn checked_loads_refuse_a_navigation_index_that_names_no_row() {
+    use crate::graph::apply::add_node;
+    use chartulary::stemma::{StemmaSnapshot, TransitionKind};
+    type Nav = StemmaSnapshot<String, String, NodeHistoryOwner, ()>;
+    const BAD: usize = 999_999;
+
+    let (a, b) = (Uuid::from_u128(1), Uuid::from_u128(2));
+    let mut nav = SharedNavigationMemory::empty();
+    nav.record_visit(a, "https://audit.test/a", TransitionKind::UrlTyped, 1);
+    nav.record_visit(a, "https://audit.test/b", TransitionKind::LinkClick, 2);
+    nav.back(a, 3);
+    nav.spawn(b, a);
+    nav.record_visit(b, "https://audit.test/c", TransitionKind::UrlTyped, 4);
+    let mut graph = Graph::new();
+    for (id, url) in [(a, "https://audit.test/a"), (b, "https://audit.test/c")] {
+        add_node(&mut graph, Some(id), url.into(), Default::default());
+    }
+    let mut valid = graph.to_snapshot();
+    valid.navigation = nav;
+    assert!(Graph::try_from_snapshot(&valid).is_ok());
+    assert!(Graph::try_from_recorded_snapshot(&valid).is_ok());
+
+    let corruptions: [(&str, fn(&mut Nav)); 10] = [
+        ("visit entry", |n| n.visits[0].entry = BAD),
+        ("visit parent", |n| n.visits[1].parent = Some(BAD)),
+        ("visit child", |n| n.visits[0].children[0] = BAD),
+        ("binding owner", |n| {
+            n.visits
+                .iter_mut()
+                .flat_map(|v| &mut v.bindings)
+                .next()
+                .unwrap()
+                .owner = BAD
+        }),
+        ("binding forward child", |n| {
+            let binding = n
+                .visits
+                .iter_mut()
+                .flat_map(|v| &mut v.bindings)
+                .next()
+                .unwrap();
+            binding.forward_child = Some(BAD)
+        }),
+        ("owner origin", |n| n.owners[0].origin = Some(BAD)),
+        ("owner current", |n| n.owners[0].current = Some(BAD)),
+        ("owner creator", |n| n.owners[1].creator = Some(BAD)),
+        ("owner pending origin parent", |n| {
+            n.owners[1].pending_origin_parent = Some(BAD)
+        }),
+        ("owner owned visit", |n| n.owners[0].owned_visits[0] = BAD),
+    ];
+    for (what, corrupt) in corruptions {
+        let mut snapshot = valid.clone();
+        let mut nav = snapshot.navigation.snapshot().clone();
+        corrupt(&mut nav);
+        snapshot.navigation = SharedNavigationMemory::from_snapshot(nav);
+        let loads = [
+            Graph::try_from_snapshot(&snapshot),
+            Graph::try_from_recorded_snapshot(&snapshot),
+        ];
+        for load in loads {
+            assert!(
+                matches!(load, Err(ResourceSnapshotError::InvalidNavigation(_))),
+                "{what}"
+            );
+        }
+    }
+}

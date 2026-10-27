@@ -19,10 +19,6 @@ test-utils = []
 # sample graphs without routing through GraphDelta. Enable in dev-dependencies
 # ONLY — a non-dev enable reopens the Phase 6.5 write-path boundary.
 fixtures = []
-# Native on-disk graph persistence (the `store` module: Graph <-> graph.json
-# via GraphSnapshot). Off by default so the kernel stays portable-by-default;
-# the native host enables it. serde_json is already a base dep.
-store = []
 
 [lib]
 name = "kernel"
@@ -42,7 +38,6 @@ hest.workspace = true
 # beside chartulary's nodes/edges. On crates.io; local checkout via the gitignored
 # `.cargo/config.toml` `[patch.crates-io]`.
 numen.workspace = true
-forme.workspace = true
 crossbeam-channel = "0.5"
 futures-util = "0.3"
 serde = { version = "1.0", features = ["derive"] }

@@ -1,0 +1,99 @@
+[package]
+rust-version = "1.97.1"
+name = "tabard-workshop"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Tabard's reusable appearance workshop surface and authored-theme workflow"
+readme = "README.md"
+
+[features]
+default = []
+host-previews = ["dep:cambium-rootstock"]
+native-host = ["dep:cambium-desktop", "host-previews"]
+
+[dependencies]
+tabard.workspace = true
+tinct.workspace = true
+cambium = { workspace = true, features = ["highlight"] }
+sprigging.workspace = true
+mere-lanes.workspace = true
+document-canvas.workspace = true
+inker.workspace = true
+netrender.workspace = true
+genet-livery.workspace = true
+genet-scripted-dom.workspace = true
+layout-dom-api.workspace = true
+paint_list_render.workspace = true
+livery.workspace = true
+cambium-rootstock = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+cambium-desktop = { workspace = true, optional = true }
+
+# Controlled shared-device replacement through two full Workshop mounts on one
+# browser render core. Moved here from the web host on 2026-10-26: an example
+# that mounts a product surface lives with the product.
+[[example]]
+name = "shared_recovery"
+path = "examples/shared_recovery/main.rs"
+crate-type = ["cdylib"]
+required-features = ["host-previews"]
+
+[dev-dependencies]
+netrender = { workspace = true, features = ["vello-cpu"] }
+postcard = { version = "1", features = ["alloc"] }
+serde_json = "1"
+genet-presenter.workspace = true
+taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
+genet-scripted-dom.workspace = true
+layout-dom-api.workspace = true
+accesskit.workspace = true
+tempfile = "3"
+
+# The native host and its window stack; the browser example has its own host.
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+cambium-desktop.workspace = true
+winit.workspace = true
+wgpu = { version = "30.0.1", default-features = false, features = ["std", "wgsl"] }
+
+# The browser example's host, render core and bindings. genet-presenter above
+# supplies `genet_render_host`.
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+cambium-web.workspace = true
+cambium-rootstock.workspace = true
+wgpu.workspace = true
+sha2.workspace = true
+console_error_panic_hook = "0.1"
+js-sys = "0.3"
+wasm-bindgen = "=0.2.129"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+    "Blob",
+    "CompositionEvent",
+    "CssStyleDeclaration",
+    "Document",
+    "DomRect",
+    "Element",
+    "Event",
+    "EventTarget",
+    "File",
+    "FileList",
+    "FocusEvent",
+    "FocusOptions",
+    "HtmlCanvasElement",
+    "HtmlElement",
+    "HtmlInputElement",
+    "KeyboardEvent",
+    "MouseEvent",
+    "Node",
+    "PointerEvent",
+    "Performance",
+    "Text",
+    "WheelEvent",
+    "Window",
+    "WebglLoseContext",
+    "WebGlSync",
+] }

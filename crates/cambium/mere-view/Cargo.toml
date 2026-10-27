@@ -11,7 +11,14 @@ keywords = ["mere", "cambium", "graph", "sessions", "gui"]
 categories = ["gui"]
 publish = true
 
+[features]
+# Editable query UI is absent from ordinary mere views and the site viewer.
+query-editor = ["dep:mere"]
+workbench-editor = ["dep:platen", "platen/workspace-editor"]
+
 [dependencies]
+mere = { path = "../../mere", default-features = false, features = ["query"], optional = true }
+platen = { path = "../../platen/platen", default-features = false, optional = true }
 curation.workspace = true
 cambium = { workspace = true }
 # Graph-only layouts by strategy id, over a kernel graph built from the model.

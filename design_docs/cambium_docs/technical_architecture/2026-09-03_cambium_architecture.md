@@ -371,7 +371,7 @@ reconstruction. Rootstock's outer text system, a Reader `SmolwebDocument`, and
 an isolated Stylesheet `LiveryDocument` are three separate owners; registering
 outer faces alone does not provision the producer documents. Host-selected CSS
 generic mappings preserve authored family requests and quoted aliases. See the
-[Workshop host resource seam](../../../crates/cambium/tabard-workshop/README.md#retained-host-font-resources)
+[Workshop host resource seam](../../../ports/tabard/workshop/README.md#retained-host-font-resources)
 and `genet/components/genet-livery/README.md` for the owned APIs. Invalid resource
 replacement is typed and batch-atomic; it must not advance accepted source
 revision or image authority. GPU/session execution refusals have their own

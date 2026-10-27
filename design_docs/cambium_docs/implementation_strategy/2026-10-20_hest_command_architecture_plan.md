@@ -8,6 +8,12 @@ Hest 0.1/0.2, command-menu 0.1.1 and Cambium 0.5 remain published; H4 uses their
 existing command data contract and ships as Git adapters. Native acceptance
 and backend package publication remain separate.
 
+**Current source note (2026-10-26):** the Mere workspace uses Hest 0.2 directly.
+Hest 0.1 and command-menu 0.1.1 remain published registry packages. The local
+compatibility sources and their obsolete facade fixture have been removed;
+current tests exercise Hest 0.2. Historical source locations and frozen release
+receipts below describe the architecture at the cited revision.
+
 **Owner direction (Mark, 2026-10-20):** subordinate `command-menu` to `hest` and
 centralize some form of command architecture under it. The name `hest` was picked
 because the alternatives are taken on crates.io (`beck`, `beckon`, `behest`, `bid`);
@@ -22,7 +28,7 @@ under Findings and Progress.
 
 | What | Where | Role |
 |---|---|---|
-| `Command`, `CommandChoices`, `CommandSet`, `MenuSession`, the shared id catalogue | `crates/cambium/command-menu/src/lib.rs:26`, `:70`, `:81`; `session.rs:13`; `catalogue.rs` | Declare a command and offer it: one order every surface shares, the person's kept and recent choices, a palette's open state. Serde is its only dependency. |
+| `Command`, `CommandChoices`, `CommandSet`, `MenuSession`, the shared id catalogue | `crates/cambium/command-menu/src/lib.rs` *(historical citation)* <!-- doc-audit: historical-path --> `:26`, `:70`, `:81`; `session.rs:13`; `catalogue.rs` | Declare a command and offer it: one order every surface shares, the person's kept and recent choices, a palette's open state. Serde is its only dependency. |
 | `ActionId`, the typed form of the catalogue ids | `crates/graph/graph-kernel/src/actions.rs:21` | Graph hosts match on it instead of strings. |
 | Key bindings keyed by catalogue ids | `crates/system/registry/src/input.rs:7` | Bind keys to shared commands without knowing the host. |
 | The destructive-action gate probe | `crates/system/ux-events/src/ux_probes/destructive_action_gate.rs` | Reads a caller-supplied list of destructive `ActionId`s: the "destructive" fact lives in the probe's argument, not on the command. |
@@ -130,9 +136,10 @@ concurrent native Hest/material/receipt merge `9fe4a7ef0`; delivery reached
 `4214af802`. Historical expanded-rootstock and package-test failures remain in
 their packets with the passing replacements. No whole-tree doc-clean claim is made.
 
-The excluded `crates/cambium/hest-0_1` package remains available to reproduce
-original path-based receipts. The shim remains on Hest 0.1.x, preserving
-published Cambium 0.4.0. H4 does not modify those source trees or published APIs.
+At publication, the excluded `crates/cambium/hest-0_1` package and command-menu
+shim preserved the Hest 0.1 API used by published Cambium 0.4.0. Those local
+compatibility sources were retired on 2026-10-26. Their frozen release receipts
+and already published registry packages retain the original evidence.
 
 ## H4: bounded script adapters and audit
 

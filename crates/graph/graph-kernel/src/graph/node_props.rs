@@ -32,6 +32,7 @@ use super::node_facets::{
     PRESENTATION_TAGS, PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT, SEMANTIC_CLASSIFICATIONS,
     SEMANTIC_PROPERTIES, VISIT_HISTORY, VisitHistoryFacet,
 };
+use super::resource_content::LiteralWrite;
 use crate::types::{
     ClassificationScheme, ClassificationStatus, FrameLayoutHint, ImageRef, ImageRole,
     NodeClassification, NodeImportProvenance, NodeProperty, NodeTagPresentationState,
@@ -279,10 +280,10 @@ impl Graph {
         &mut self,
         key: NodeKey,
         property: NodeProperty,
-    ) -> bool {
-        if self.inner.node(key).is_none() {
-            return false;
-        }
+    ) -> Result<bool, super::resource_content::ContentError> {
+        let Some(node_id) = self.inner.node(key).map(|node| node.id) else {
+            return Ok(false);
+        };
         let mut properties =
             self.node_facet_or_default::<Vec<NodeProperty>>(key, SEMANTIC_PROPERTIES);
         if let Some(existing) = properties
@@ -291,12 +292,13 @@ impl Graph {
         {
             if existing.asserted_at_ms != property.asserted_at_ms {
                 existing.asserted_at_ms = property.asserted_at_ms;
-                return self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties);
+                return Ok(self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties));
             }
-            return false;
+            return Ok(false);
         }
         properties.push(property);
-        self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties)
+        self.admit_literals(LiteralWrite::Surface(node_id, &properties))?;
+        Ok(self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties))
     }
 
     pub fn node_tags(&self, key: NodeKey) -> Option<&HashSet<String>> {

@@ -278,6 +278,13 @@ fidelity) = a directly-authored hull, convex now, concave/compound as the B3 fid
 
   Links: summary Per-node overrides key by member Uuid and are pruned when the member leaves; a reused slot starts clean.
 
+- **D1 receiving, 2026-10-26:** UUID keys remain the override model. Canvas now
+  also receives the kernel membership witness during reconciliation, so a hidden
+  same-call removal/recreation of the same UUID prunes its departed overrides.
+  Ordinary edits and metadata clones retain them. Runtime body/hold retirement
+  is qualified separately from authored roster intent and delayed host replies;
+  see `support/family-promotion/diagnostics-canvas-cache-review.json`.
+
 ## Progress
 
 - 2026-06-23: **Plan written (with Mark).** Spun out of the node-representation plan's

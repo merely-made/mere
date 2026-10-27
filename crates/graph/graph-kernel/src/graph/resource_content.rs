@@ -6,10 +6,10 @@
 
 //! Typed, recorded content on shared resources. Unknown facets remain untouched.
 
-use super::{CapturedDelta, Graph, NodeKey};
+use super::{CapturedDelta, Graph, NodeKey, ResourceNode};
 use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification, NodeProperty};
-use serde::{Serialize, de::DeserializeOwned};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
 pub const RESOURCE_PROPERTIES: &str = "semantic.properties";
@@ -86,6 +86,14 @@ enum ResourceHandleOwner {
     Literal(Uuid),
 }
 
+/// Literals about to replace what one owner holds, checked before they are stored.
+#[derive(Clone, Copy)]
+pub(crate) enum LiteralWrite<'a> {
+    Resource(Uuid, &'a [NodeProperty]),
+    /// Retained Surface literals, by Surface node id.
+    Surface(Uuid, &'a [NodeProperty]),
+}
+
 impl Graph {
     pub(crate) fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
         self.insert_shown_tag(key, tag)
@@ -148,8 +156,62 @@ impl Graph {
     }
 
     /// Check Resource handle ownership after a host overlays retained Surface facets.
-    /// Historical Surface-only duplicate grammar remains unchanged.
+    /// Historical Surface-only duplicate grammar remains unchanged. Checked open and
+    /// replayed writes share this one rule.
     pub fn validate_active_resource_assertion_handles(&self) -> Result<(), ContentError> {
+        self.validate_handles_after(None)
+    }
+
+    /// Whether storing `write` leaves the graph passing checked open. A write that
+    /// claims no literal its owner does not already hold cannot collide, so it skips
+    /// the scan.
+    pub(crate) fn admit_literals(&self, write: LiteralWrite<'_>) -> Result<(), ContentError> {
+        let (held, incoming) = match write {
+            LiteralWrite::Resource(id, incoming) => (self.resource_properties(id), incoming),
+            LiteralWrite::Surface(id, incoming) => (
+                self.get_node_key_by_id(id)
+                    .and_then(|key| self.legacy_node_properties(key))
+                    .unwrap_or_default(),
+                incoming,
+            ),
+        };
+        if incoming.iter().all(|property| held.contains(property)) {
+            return Ok(());
+        }
+        self.validate_handles_after(Some(write))
+    }
+
+    pub(crate) fn admit_record_literals(
+        &self,
+        id: Uuid,
+        record: Option<&PersistedResourceRecord>,
+    ) -> Result<(), ContentError> {
+        let properties: Vec<NodeProperty> = record
+            .and_then(|record| {
+                record
+                    .facets
+                    .iter()
+                    .find(|facet| facet.facet == RESOURCE_PROPERTIES)
+            })
+            .and_then(|facet| serde_json::from_str(&facet.value_json).ok())
+            .unwrap_or_default();
+        self.admit_literals(LiteralWrite::Resource(id, &properties))
+    }
+
+    pub(crate) fn admit_surface_facet(
+        &self,
+        node_id: Uuid,
+        facet: &str,
+        value: &serde_json::Value,
+    ) -> Result<(), ContentError> {
+        if facet != super::node_facets::SEMANTIC_PROPERTIES {
+            return Ok(());
+        }
+        let properties = Vec::<NodeProperty>::deserialize(value).unwrap_or_default();
+        self.admit_literals(LiteralWrite::Surface(node_id, &properties))
+    }
+
+    fn validate_handles_after(&self, write: Option<LiteralWrite<'_>>) -> Result<(), ContentError> {
         let mut handles = std::collections::BTreeMap::<
             String,
             (ResourceHandleOwner, ResourceHandlePayload),
@@ -176,12 +238,24 @@ impl Graph {
                 )?;
             }
         }
-        for resource in self.resource_nodes() {
-            for property in self.resource_properties(resource.id()) {
+        let unheld = match write {
+            Some(LiteralWrite::Resource(id, _)) if self.resource(id).is_none() => Some(id),
+            _ => None,
+        };
+        for id in self.resource_nodes().map(ResourceNode::id).chain(unheld) {
+            let held;
+            let properties = match write {
+                Some(LiteralWrite::Resource(owner, properties)) if owner == id => properties,
+                _ => {
+                    held = self.resource_properties(id);
+                    &held
+                },
+            };
+            for property in properties {
                 insert(
                     property.statement_id.clone(),
-                    ResourceHandleOwner::Literal(resource.id()),
-                    ResourceHandlePayload::Literal(property),
+                    ResourceHandleOwner::Literal(id),
+                    ResourceHandlePayload::Literal(property.clone()),
                 )?;
             }
         }
@@ -194,10 +268,18 @@ impl Graph {
                 }
             }
         }
-        for (key, _) in self.nodes() {
-            for property in self.legacy_node_properties(key).into_iter().flatten() {
+        for (key, node) in self.nodes() {
+            let held;
+            let properties = match write {
+                Some(LiteralWrite::Surface(owner, properties)) if owner == node.id => properties,
+                _ => {
+                    held = self.legacy_node_properties(key).unwrap_or_default();
+                    &held
+                },
+            };
+            for property in properties {
                 if handles.contains_key(&property.statement_id) {
-                    return Err(ContentError::HandleCollision(property.statement_id));
+                    return Err(ContentError::HandleCollision(property.statement_id.clone()));
                 }
             }
         }

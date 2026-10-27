@@ -156,7 +156,7 @@ fn the_receipt_carries_every_named_section_and_its_kind() {
 
 #[test]
 fn diagnostic_export_carries_loss_without_inventing_success_or_frame_causality() {
-    use apparatus::{ObservationMetadata, ObservationStore, RetentionLimits, RunId, SourceId};
+    use apparatus_core::{ObservationMetadata, ObservationStore, RetentionLimits, RunId, SourceId};
     use std::time::Duration;
 
     let mut store = ObservationStore::new(

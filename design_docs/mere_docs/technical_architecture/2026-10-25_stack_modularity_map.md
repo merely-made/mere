@@ -49,7 +49,7 @@ metadata one the first version of this note used.
 | Link | Turnstone | Djinn | Knot desktop, default (`mere-retention`) | Knot desktop, `--no-default-features` | First hop | Contract it should sit behind |
 |---|---|---|---|---|---|---|
 | retinue (+ tulle) | **was linked, now opt-in** (`nomadnet`) | off (`knot-site-nomadnet`, `moot-site-nomadnet`) | off (`knot-desktop/retinue`) | off | `turnstone` | a page-fetch contract; `mere-transport`'s `reticulum` feature |
-| outrider, radio-hand, sennet, tucket | absent | absent | absent | absent | reached only through `retinue`, `mere-signalman`, `postilion`, `seneschal` | none needed; they stay out of product graphs |
+| outrider, radio-hand, sennet, tucket | absent | absent | absent | absent | reached only through `retinue`, `station-custody` (the Mere custody adapter used by Murm’s Signalman), `postilion`, `seneschal` | none needed; they stay out of product graphs |
 | emissary, arti | absent | absent | absent | absent | `emissary` only in Murm's `murm-i2p`; no manifest in the family repos read names `arti` | none needed |
 | mere-transport, iroh, iroh-blobs, snow, quinn | linked | linked | **absent** (was linked via knot-editor) | **absent** | `turnstone`, `distillery`, `graphshell-host`, `mere-mesh`, `knot-editor` (now `peers`), `djinn` | `Transport` trait with an in-memory implementation |
 | mere-p2panda-net | linked | linked | **absent** (was linked via knot-editor) | absent | `stickleback` (now `net`), `mere-transport`, `mere-mesh`, `knot-editor` (now `peers`) | done for stickleback and knot-editor; `mere-transport` and `mere-mesh` remain |
@@ -77,6 +77,11 @@ What the table says in one line each:
 
 ## Landed
 
+- **Workshop beside its host (2026-10-26).** `tabard-workshop` moved from
+  `crates/cambium/` to `ports/tabard/workshop`, so the toolkit directory
+  carries no document-stack link and `check_port_boundaries.py` refuses any new
+  one. Embedding is unchanged: Pelt and the Tabard desktop take it by workspace
+  path.
 - **Turnstone `nomadnet`.** `retinue` is `optional`; the `nomadnet` feature is the
   only way it enters a build, with `default = []` beside `weld`, `scry`, `servo`,
   `piccolo` and `wasm`. Only `src/nomadnet/link.rs` names retinue. Address
@@ -219,6 +224,31 @@ same for places at compile time and drop the shared-place stack from a
 browser-only build. That is a larger cut than `nomadnet` because the place
 worker owns identity and persistence, not one fetch.
 
+### The toolkit directory carries one document-stack link, through `tabard-workshop`
+
+`tabard` is a leaf over `tinct`, so `mere-lanes` naming its reading
+preferences, typography roles and smolweb palette is a library link downward,
+not a cycle. The upward link is `tabard-workshop`: its reader specimen extracts
+and lowers a real article through `mere-lanes`, `document-canvas` and `inker`,
+and its stylesheet specimen links `genet-livery`, `genet-scripted-dom` and
+`netrender`. `cambium-genet-web-host` reaches the workshop only as a wasm
+dev-dependency. So any grouping that files the workshop with the toolkit makes
+the toolkit depend on the document stack while the document stack depends on
+the toolkit's token library. The 2026-10-08 theme-modes decision put the
+workshop under `crates/cambium/` so applications other than the Tabard port
+could embed it; a crate is embeddable from any directory, so the location is
+the open part: beside its desktop host under `ports/tabard/`, or left where it
+is with its specimens behind features. `scripts/check_port_boundaries.py`
+refuses a new unconditional toolkit-to-document-stack link.
+
+Ruled and landed 2026-10-26: Mark chose "beside its host"; the package is
+`ports/tabard/workshop`, embedded by workspace path as before, and no crate
+under `crates/cambium/` links the document stack. The web host's
+`shared_recovery` wasm example mounted the workshop as a dev-dependency; Mark
+ruled that a dev-only link from a crate to a port is refused like any other, so
+the example moved into `ports/tabard/workshop/examples/` and the boundary check
+passes with nothing carried.
+
 ### Which rung each cut belongs on
 
 Doctrine Stack 5 puts "cold and narrow" behind a component when it wants to be
@@ -239,3 +269,8 @@ split.
   `knot-editor` library without `peers`.
 - Neither check covers the *carried* links above; both print them, so a reader
   can see the gap close.
+- No crate under `crates/cambium/` can gain an unconditional link to the
+  document stack (`inker`, `document-canvas`, `mere-lanes`, `nematic`,
+  `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; none
+  does since `tabard-workshop` moved to `ports/tabard/workshop` (2026-10-26).
+  A crate's dev-dependency on a port is refused like any other link.

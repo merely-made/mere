@@ -760,15 +760,6 @@ impl Graph {
         if statement.provenance_iri.is_none() {
             statement.provenance_iri = Some(self.write_author().asserter_iri());
         }
-        let spec = SemanticStatementSpec {
-            predicate: statement.predicate.clone(),
-            recognized_sub_kind: statement.recognized_sub_kind,
-            graph_scope: statement.graph_scope.clone(),
-            provenance_iri: statement.provenance_iri.clone(),
-            label: statement.label.clone(),
-            asserted_at_ms: statement.asserted_at_ms,
-            basis: statement.basis.clone(),
-        };
         if let Some((owner, existing)) = self.find_semantic_statement(&statement.statement_id) {
             let pair_matches = match owner {
                 RelationKey::Surface(key) => {
@@ -788,12 +779,7 @@ impl Graph {
                     actual == self.prospective_resource_pair(from, to)
                 },
             };
-            let same_claim = existing.predicate == spec.predicate
-                && existing.recognized_sub_kind == spec.recognized_sub_kind
-                && existing.graph_scope == spec.graph_scope
-                && existing.provenance_iri == spec.provenance_iri
-                && existing.basis.same_reason_as(&statement.basis);
-            if !pair_matches || !same_claim {
+            if !pair_matches || !existing.same_claim_as(&statement) {
                 return Err(StatementWriteError::HandleCollision(statement.statement_id));
             }
             if existing.withdrawn.is_some() {

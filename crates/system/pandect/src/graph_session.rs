@@ -835,10 +835,13 @@ impl<B: Backend> GraphSession<B> {
                 receipt.effect_cursor(checkpointed),
                 &mut graph,
                 &baseline,
-            );
+            )
         } else {
-            journal.replay_from_with_baseline(checkpointed, &mut graph, &baseline);
+            journal.replay_from_with_baseline(checkpointed, &mut graph, &baseline)
         }
+        .map_err(|error| {
+            SessionError::Corrupt(format!("{}: replayed graph: {error}", keys.at(JOURNAL)))
+        })?;
         graph
             .validate_active_resource_assertion_handles()
             .map_err(|error| {
@@ -1702,7 +1705,7 @@ impl<B: Backend> GraphSession<B> {
                 .graph_at(self.journal.entries(), cursor)
                 .ok()
                 .flatten(),
-            None => self.journal.snapshot_at_from(&self.baseline, cursor),
+            None => self.journal.snapshot_at_from(&self.baseline, cursor).ok().flatten(),
         }?;
         graph.validate_active_resource_assertion_handles().ok()?;
         graph.set_known_coverage(self.graph.known_coverage().clone());
@@ -2427,6 +2430,7 @@ mod tests {
         session.graph = session
             .journal
             .snapshot_at_from(&session.baseline, session.journal.live_cursor())
+            .unwrap()
             .unwrap();
         session
             .store(wall_clock_now(), Vec::new(), true)
@@ -4228,6 +4232,7 @@ mod tests {
             session.graph = session
                 .journal
                 .snapshot_at_from(&session.baseline, Seq(2))
+                .unwrap()
                 .unwrap();
             session
                 .store(SystemTime::now(), Vec::new(), true)
@@ -4239,6 +4244,7 @@ mod tests {
             session.graph = session
                 .journal
                 .snapshot_at_from(&session.baseline, Seq(3))
+                .unwrap()
                 .unwrap();
             session.flush(SystemTime::now()).await.unwrap();
             drop(session);

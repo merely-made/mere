@@ -218,6 +218,68 @@ L1 card round, 2026-10-20 (Mark's words, unnumbered): chartulary is now in repos
 Still open, to be put when a lane reaches it: who owns L2 to L5's start order after L1's first
 slice lands.
 
+Open forks from L1's second pass, 2026-10-26 (questions with the code evidence; each lane stopped
+rather than picked). Mark ruled all five the same evening, one at a time with the evidence; his
+words are under each, unnumbered until he numbers them:
+
+- **Q010, malformed facet JSON on replay.** `CapturedDelta::to_delta` in graph-kernel
+  `graph/capture.rs:382` turns a facet record whose `value_json` does not parse into `None`,
+  the same path the loader takes for deliberately obsolete thumbnail and favicon records
+  (`:351`), so a corrupt journal record is dropped and the replayed graph differs from its
+  journal with no report. Either the journal is refused at load, as Pandect already reports
+  Corrupt for other reopen failures, with obsolete imagery kept as an explicit skip; or it loads
+  and reports how many records were dropped. The first makes one corrupt record unloadable; the
+  second keeps the divergence but makes it visible.
+  Mark, 2026-10-26: **"Refuse at checked load (Recommended)"**. A malformed record is corruption:
+  checked replay stops there and open reports it, as a refused write does; obsolete imagery
+  becomes an explicit skip.
+- **Q017, the kernel `store` feature.** `graph-kernel/src/store.rs` saves and loads `graph.json`
+  from the snapshot alone, dropping Surface pins and facets while reporting success. No manifest
+  in the workspace enables `store` (A004 found only integration-test consumers), and Pandect's
+  `GraphSession` already persists facets with checkpoints. Either the feature and module go,
+  leaving `GraphSession` as the one persistence owner of A004's four; or they stay and gain a
+  facet sidecar, which the triage warns is another partial-save authority. `mere-kernel` 0.0.2 is
+  on crates.io, so removal is a public-API change in the next release.
+  Mark, 2026-10-26: **"Remove it (Recommended)"**. The feature and module go; `GraphSession` is
+  the one persistence owner; a public-API change for the next `mere-kernel` release.
+- **Q031, identical assertion copies on parallel rows.** `frozen_selection.rs:162` accepts a
+  second identical handle on another row, `frozen_link.rs:220` refuses it as a duplicate, and
+  `try_from_snapshot` admits the graph. One validator for assertion handles across snapshot
+  load, selection freeze and link freeze (A012, A016) is the repair either way; the question is
+  whether identical copies on parallel rows are legal graph state, in which case link freeze
+  accepts or dedupes, or not, in which case snapshot load and selection freeze refuse.
+  Mark, 2026-10-26: **"Not legal (Recommended)"**, with his clarification that the freezes exist
+  "to get a snapshot for representing a node's content in the graph". So one handle, one row
+  is a rule of the live graph, enforced at the write path and checked load; a freeze copies legal
+  rows faithfully, and the one shared validator checks that the frozen record is a canonical copy
+  rather than re-deciding legality. Existing copies need a migration or a documented dedupe on
+  load.
+- **Q016's edge replays.** The literal repair makes `apply_graph_delta` refuse a replayed
+  literal handle that checked open would refuse, but `ReplaySetResourceEdgesByIds` and
+  `ReplaySetEdgesByIds` still accept a statement handle equal to a held Resource literal handle:
+  `set_resource_edges_between` (`resource.rs:318`) compares edges only against edges, and
+  `set_edges_between` (`edge_ops.rs:921`) checks nothing, while `legacy_resource_migration.rs:815`
+  removes Surface authority before the exact-handle admission check and so passes through a
+  state where both strata hold the handle. Either the edge arms run the same validator, and
+  migration is given an explicit staged state that the check tolerates; or edge replays are
+  declared out of this invariant's scope. Until one lands, "any applied delta can be reopened"
+  holds for literal writes only.
+  Mark, 2026-10-26: **"Yes, join the invariant (Recommended)"**. `ReplaySetEdgesByIds` and
+  `ReplaySetResourceEdgesByIds` run the shared validator; legacy migration gets an explicit
+  staged state the check tolerates until it completes.
+- **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
+  2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
+  document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
+  could embed it. Either it stays and a toolkit grouping carries the document stack; or it moves
+  beside its desktop host under `ports/tabard/`, still embeddable by path; or its reader and
+  stylesheet specimens go behind features. The boundary check prints the carried link until one
+  of these lands.
+  Mark, 2026-10-26: **"Beside its host (Recommended)"**. `tabard-workshop` moves to
+  `ports/tabard/workshop` with its workspace path updated; still embeddable by path; the toolkit
+  directory stops carrying the document stack and the guard's carried list empties. Later the same
+  evening: **"the guard refuses dev-only crate-to-port links too"**; the web host's
+  `shared_recovery` example moves beside the workshop.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
@@ -254,3 +316,34 @@ slice lands.
 
 - 2026-10-26: boundary cues added to §3 from the ownership assessment Mark brought the same day,
   each mapped to register ids and a lane; Q013 excluded as repaired (L1 receipt). No code change.
+
+- 2026-10-26 (L1, second pass): Q009, Q012, Q015, Q016 and Q032 repaired in graph-kernel, one
+  regression each, on main. Q009 follows Mark's insert-if-missing ruling. Q016 needed a second
+  step: a write the kernel refuses is now `GraphDeltaResult::Refused`, the journal's checked
+  replay paths stop there and report `ReplayRefused`, and Pandect's open reports Corrupt and
+  `graph_at` None for a journal carrying a colliding record, which its own tests already
+  required; tolerant scratch replays drop the entry and continue. Kernel lib suite 484/484
+  (477 before), Pandect lib suite 340/340. Forks recorded in §5: Q010, Q017, Q031, Q016's edge
+  replays. Q014 stays re-document only; Q001 to Q003 and Q019 wait on an eidetic branch.
+  Receipt: `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.
+- 2026-10-26 (L1, Q017 closed by removal): the kernel's `store` feature and module are gone per
+  Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
+  three paths). The two reopen integration tests that were gated on the feature now run against
+  a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
+- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `crates/cambium/` to
+  `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
+  README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
+  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
+  needs no toolkit carve-out. A proposal to print rather than refuse a dev-only link from a crate
+  to a port (the web host's `shared_recovery` wasm example mounted the workshop) was put to Mark
+  and reversed the same evening: **"the guard refuses dev-only crate-to-port links too"**, so the
+  example moved into `ports/tabard/workshop/examples/` with its wasm-only dev-dependencies (the
+  workshop's native host and window stack moved behind `cfg(not(target_arch = "wasm32"))`), and
+  the guard passes with nothing carried. Type-check of the workshop with its tests and the Tabard
+  desktop passed. The move also exposed bit-rot independent of it: the example did not compile for
+  wasm32 against genet main `01d3f52`, because `RenderCore::renderer` is native-only there
+  (`genet-render-host/src/lib.rs:757`) and the example read it twice. Repaired the same evening at
+  Mark's word: both reads go through `cambium_rootstock::try_renderer`, the one-operation checked
+  access that exists on every target, and the proof JSON records a refusal (busy frame gate or
+  lost device) in place of a value it never read, instead of inventing one. The example's wasm32
+  check passes.

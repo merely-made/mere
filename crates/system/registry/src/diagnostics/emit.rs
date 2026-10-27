@@ -12,7 +12,7 @@
 //! observable counters. Producers must redact and bound payload construction
 //! before emission; already allocated strings are not retroactively bounded.
 //! A receiver feeds product-owned collectors. It is not an independent-reader
-//! store: Apparatus supplies independent cursors after product projection.
+//! store: `apparatus-core` supplies independent cursors after product projection.
 
 use std::sync::OnceLock;
 use std::{marker::PhantomData, rc::Rc};

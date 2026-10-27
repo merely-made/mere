@@ -62,7 +62,7 @@ fn actor_loss_fails_pending_work_and_refuses_later_commands() {
     let mut observations = lane
         .enable_observations(
             "actor-loss".into(),
-            apparatus::RetentionLimits {
+            apparatus_core::RetentionLimits {
                 max_records: 16,
                 max_bytes: 4096,
                 max_age: Duration::from_secs(60),

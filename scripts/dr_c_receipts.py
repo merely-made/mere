@@ -51,7 +51,7 @@ def main():
     (runtime / ".dr-c-generated").write_text("synthetic receipt data\n")
     records = []
     sources = {
-        "mere": (mere, ["scripts/dr_c_receipts.py", "ports/djinn/castellan/Cargo.toml", "ports/graphshell/Cargo.toml", "ports/djinn/Cargo.toml", "crates/graphshell/graphshell-endpoint/src/door/custody.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs", "ports/graphshell/src/bin/personae_vault.rs", "ports/djinn/src/bin/dr_c_receipt_host.rs", "ports/djinn/src/custody.rs", "ports/djinn/tests/custody_route.rs", "ports/djinn/castellan/src/authority.rs", "ports/djinn/castellan/src/custody/vault_commands/mod.rs", "ports/djinn/castellan/src/custody/vault_commands/certs.rs", "ports/djinn/castellan/src/custody/vault_commands/tests.rs", "crates/graphshell/graphshell-endpoint/src/door/profile.rs", "ports/graphshell/tests/dr_c_pending.rs", "ports/signalman/src/authority.rs", "ports/signalman/tests/dr_c_pending.rs", "ports/djinn/src/bin/distillery_installed.rs"]),
+        "mere": (mere, ["scripts/dr_c_receipts.py", "ports/djinn/castellan/Cargo.toml", "ports/graphshell/Cargo.toml", "ports/djinn/Cargo.toml", "crates/graphshell/graphshell-endpoint/src/door/custody.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs", "ports/graphshell/src/bin/personae_vault.rs", "ports/djinn/src/bin/dr_c_receipt_host.rs", "ports/djinn/src/custody.rs", "ports/djinn/tests/custody_route.rs", "ports/djinn/castellan/src/authority.rs", "ports/djinn/castellan/src/custody/vault_commands/mod.rs", "ports/djinn/castellan/src/custody/vault_commands/certs.rs", "ports/djinn/castellan/src/custody/vault_commands/tests.rs", "crates/graphshell/graphshell-endpoint/src/door/profile.rs", "ports/graphshell/tests/dr_c_pending.rs", "crates/system/station-custody/src/authority.rs", "crates/system/station-custody/tests/dr_c_pending.rs", "ports/djinn/src/bin/distillery_installed.rs"]),
         "knot": (knot, ["crates/knot-editor/src/startup.rs", "apps/desktop/src/main.rs", "crates/knot-editor/src/bin/knot_endpoint.rs", "crates/knot-editor/src/bin/knot_sync_host.rs"]),
         "woodshed": (woodshed, ["crates/woodshed-genet/src/storage.rs", "ports/hocket/crates/hocket-genet/src/identity.rs"]),
         "turnstone": (turnstone, ["src/identity.rs", "src/app/tests.rs", "src/bin/g3_receipt.rs", "src/remote_projection.rs"]),
@@ -87,7 +87,7 @@ def main():
 
         jobs = [
             ("graphshell", mere, "mere", ["-p", "graphshell", "--test", "dr_c_pending"]),
-            ("signalman", mere, "mere", ["-p", "mere-signalman", "--test", "dr_c_pending"]),
+            ("signalman", mere, "mere", ["-p", "station-custody", "--test", "dr_c_pending"]),
             ("knot", knot, "knot-editor", ["-p", "knot-editor", "--lib"]),
             ("knot-desktop", knot, "knot-editor", ["-p", "knot-desktop", "--bin", "knot"]),
             ("woodshed", woodshed, "woodshed", ["-p", "woodshed-genet", "--bin", "woodshed-genet"]),
@@ -119,7 +119,7 @@ def main():
         for label, repo, target, options in jobs:
             binaries[label] = test_executable(label, repo, target, options)
         run("build-knot-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "knot-editor"), "-j", "4", "-p", "knot-editor", "--bin", "knot_endpoint", "--bin", "knot_sync_host"], cwd=knot)
-        run("build-signalman-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "mere"), "-j", "4", "-p", "mere-signalman", "--bin", "mere-signalman-provision"], cwd=mere)
+        run("build-signalman-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "mere"), "-j", "4", "-p", "station-custody", "--bin", "station-provision"], cwd=mere)
         run("build-turnstone-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "turnstone"), "-j", "4", "-p", "turnstone", "--bin", "g3_receipt"], cwd=turnstone)
 
         debug = targets / "mere" / "debug"
@@ -162,7 +162,7 @@ def main():
                     raise RuntimeError(f"Knot {label} failed to stay pending without creating state")
             before = sorted(str(path.relative_to(product_root)) for path in product_root.rglob("*"))
             station = product_root / "station"
-            log = run(f"{mode}-signalman-provision", [str(debug / ("mere-signalman-provision" + suffix)), "--app-endpoint", endpoint, "--station-root", str(station), "--record", "head.json", "--label", "DR-C fixture", "--expires-hours", "1"], expected=1)
+            log = run(f"{mode}-signalman-provision", [str(debug / ("station-provision" + suffix)), "--app-endpoint", endpoint, "--station-root", str(station), "--record", "head.json", "--label", "DR-C fixture", "--expires-hours", "1"], expected=1)
             if "pending" not in log.read_text() or station.exists():
                 raise RuntimeError("Signalman must provision no credential or record while pending")
             rendered = product_root / "g3.html"

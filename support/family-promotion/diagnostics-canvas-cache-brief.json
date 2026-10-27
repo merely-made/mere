@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-26",
+  "scope": "Receive kernel member lifetimes in Canvas runtime caches and graph-free physics body retirement; preserve ordinary edits and unrelated member lives",
+  "basis": "95ea7c7d6",
+  "retained_byte_cap": 10000000,
+  "required_receipts": ["red cache regressions", "green cache and full Canvas tests", "Seiche inline/actor tests", "Graphshell reader/owner controls", "Canvas Wasm compile", "source and WIP preservation", "current migration record and documentation audit"],
+  "target": "C:/t/cargo-targets/mere",
+  "isolation": "Primary checkout has staged docs/deletions and diverges across rewritten history; clean current origin/main checkout preserves that WIP unchanged",
+  "limits": "Content-addressed pixels and explicit authored UUID rosters retain their own lifetimes. Custom producer, async result, durable replay, supplier and headed platform ownership remain independently qualified."
+}
