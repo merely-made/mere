@@ -1,0 +1,89 @@
+{
+ "lane": "L1",
+ "slice": "chartulary (repos/eidetic)",
+ "recorded": "2026-10-26",
+ "base_commit": "eidetic 354ab71 (origin 5876a1a); mere 6c4185ffb",
+ "supersedes_status_of": [
+  "Q001",
+  "Q003",
+  "Q019"
+ ],
+ "rulings_applied": "Mark's L1 card round, 2026-10-20: chartulary findings go on an eidetic branch and mere repins; creator after owner deletion: re-parent to the deleted owner's creator, else clear",
+ "operations": [
+  {
+   "id": "Q001",
+   "authority": [
+    "A003"
+   ],
+   "owner": "Stemma::delete_owner is the one place an owner leaves the lineage, and it leaves no survivor naming it: owners it created are re-parented to its creator, or cleared when it had none",
+   "change": "chartulary stemma/mutations.rs delete_owner; the same function also clears a survivor's pending_origin_parent when the deletion collected that visit, which panicked to_snapshot the same way and has one answer (the visit is gone)",
+   "regression": "stemma::tests::deleting_a_creator_reparents_its_surviving_owners_to_the_creators_creator, deleting_a_creator_with_no_creator_clears_its_surviving_owners_creator, deleting_a_creator_leaves_no_pending_origin_on_a_collected_visit",
+   "consumer_regression": "kernel graph::tests::snapshot_navigation::replacing_a_navigation_parents_history_keeps_the_branched_child; pandect graph_session::navigation_tests::undoing_a_parent_navigation_keeps_the_branched_childs_history",
+   "audit_probe": "chartulary_foundations.rs deleting_a_creator_breaks_snapshotting_of_the_surviving_child, kernel_navigation.rs replacing_a_navigation_parents_history_panics and pandect_undo.rs undoing_parent_navigation_panics_when_a_child_anchors_its_history assert the defect; the first now fails at its is_err assertion (inverted in the regressions)",
+   "commit": "eidetic b3d4177, merged af17fe7"
+  },
+  {
+   "id": "Q019",
+   "authority": [
+    "A016"
+   ],
+   "owner": "Stemma::to_snapshot is the one canonical form of navigation state: visit bindings and owned visits are written in ascending snapshot-index order, so equal state writes an equal snapshot",
+   "change": "chartulary stemma/snapshot.rs to_snapshot sorts both collections",
+   "regression": "stemma::tests::snapshots_of_equal_navigation_state_are_equal_whatever_the_hash_order, hydrating_and_rewriting_a_snapshot_leaves_it_unchanged, snapshot_lists_bindings_and_owned_visits_in_ascending_index_order",
+   "consumer_regression": "pandect graph_session::navigation_tests::ordinary_navigations_are_never_refused_as_non_replayable (16 sessions; the audit measured 45 of 64 refused before)",
+   "audit_probe": "pandect_undo.rs navigation_replay_equality_changes_with_unordered_navigation_sets asserts the defect (mismatches > 0, rejected > 0; inverted in the regressions)",
+   "commit": "eidetic b3d4177, merged af17fe7"
+  },
+  {
+   "id": "Q003",
+   "authority": [],
+   "owner": "a nested graph's lifecycle belongs to the nodes that bear it together: remove_bearing_node archives it only when no other live node bears it, so the last bearer to leave archives it",
+   "change": "chartulary nested.rs remove_bearing_node, borne_by_another; module doc names the owner; returns None for a graph left live for another bearer",
+   "regression": "nested::tests::removing_one_bearer_leaves_a_shared_nested_graph_live_for_the_others (recovery then removes nothing); control nested::tests::the_last_bearer_to_leave_archives_a_shared_nested_graph held before and after",
+   "audit_probe": "chartulary_foundations.rs removing_one_bearer_archives_the_other_bearers_live_graph asserts the defect; now fails at its live-slot assertion (inverted in the regression)",
+   "commit": "eidetic 0b26bc2, merged af17fe7"
+  }
+ ],
+ "fork_recorded_in_plan_section_5": [
+  "Q002: a checkpoint's binding to its journal has two admission owners (chartulary Snapshot, Pandect Checkpoint) and no digest in muniment's Journal; reproduced on eidetic main with an equal-length foreign snapshot"
+ ],
+ "repin": {
+  "from": "f599ffe93298025bf6d65ae310a7cb4270ea52e3",
+  "to": "af17fe7fb362f92fb01926d9ff5d9f7b3b468a12",
+  "manifests": [
+   "Cargo.toml (36 lines, github.com and www.github.com forms)",
+   "ports/graphshell/web/Cargo.toml (30 lines)"
+  ],
+  "lockfiles": "Cargo.lock 27 source lines (20 github.com, 7 www.github.com) and ports/graphshell/web/Cargo.lock 28 (21, 7); source revs only, no version changed; cargo metadata --locked --offline warnings 26 before and after on the workspace; the web workspace was resolved with cargo fetch, not built",
+  "crates": [
+   "chartulary",
+   "eidetic",
+   "luggage",
+   "mere-proofs",
+   "muniment",
+   "servitor",
+   "stickleback"
+  ],
+  "unchanged_code": "between f599ffe and af17fe7 the only source change to these crates is this receipt's three repairs; the other new commits are docs and the eidetic-search crate, which mere does not take from eidetic"
+ },
+ "suites": {
+  "chartulary": "87 passed, 0 failed (79 before plus eight regressions); eidetic-core 149 passed",
+  "kernel_lib": "485 passed, 0 failed (484 before plus one consumer regression)",
+  "pandect_lib": "342 passed, 0 failed (340 before plus two consumer regressions)"
+ },
+ "consumer_before_after": {
+  "old_pin_f599ffe": "kernel replacing_a_navigation_parents_history_keeps_the_branched_child panics at chartulary stemma/snapshot.rs:187; both pandect navigation_tests fail, refused as non-replayable before the undo is reached (so the pandect undo test isolates Q001 only on the new pin)",
+  "new_pin_af17fe7": "all three pass",
+  "probes_rerun": "kernel_navigation.rs replacing_a_navigation_parents_history_panics fails at is_err (control ordinary_parent_deletion_preserves_navigation_owner_without_panicking passes); pandect_undo.rs undoing_parent_navigation_panics_when_a_child_anchors_its_history fails at is_err and navigation_replay_equality_changes_with_unordered_navigation_sets fails at mismatches > 0 (zero live/replay mismatches in 64)"
+ },
+ "unrepaired_so_far": [
+  "Q002 (fork)"
+ ],
+ "cues": [
+  "Stemma's derived Serialize still emits entry_index, owner_index, bindings and owned_visits in hash order; to_snapshot is the canonical form and the only one mere reads",
+  "entries, visits and owners are written in slot order, which follows insertion only until a deletion frees a slot; stable under the kernel's hydrate-and-write cycle, not canonical for a long-lived Stemma",
+  "nothing in chartulary forbids or counts a second bearer at admission; commit_bearing_batch guards only a node bearing its own graph",
+  "a nested graph archived by the earlier first-bearer behaviour with another bearer still live is indistinguishable from an interrupted removal, so recover_archived_bearings would still remove that bearer",
+  "EditSpec::RemoveNode through commit_batch removes a bearing node without archiving its nested graph; only remove_bearing_node archives"
+ ]
+}

@@ -278,6 +278,30 @@ words are under each, unnumbered until he numbers them:
   `ports/tabard/workshop` with its workspace path updated; still embeddable by path; the toolkit
   directory stops carrying the document stack and the guard's carried list empties.
 
+Open fork from L1's chartulary pass, 2026-10-26 (a question with the code evidence; unnumbered
+until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather than picked):
+
+- **Q002, what binds a checkpoint to the journal it summarizes.** Two admission paths check only
+  that the checkpoint's sequence does not pass the journal's length. Chartulary's
+  `GraphLog::load_checkpointed` (`spine.rs:732`, the check at `:756`) reads a `Snapshot`
+  (`spine.rs:70`) whose fields name no journal beyond `at_seq`, which `snapshot` fills from
+  `self.log.len()` (`:703`). On eidetic main `af17fe7`, a one-node log `durable` beside a one-node
+  snapshot of an unrelated graph `foreign` loads `foreign` at revision 1, where `load_full` gives
+  `durable` at revision 1. Pandect does not call that loader (nothing in mere does; kernel
+  `graph/journal.rs:25` only mirrors it). `GraphSession` open has its own
+  `Checkpoint { cursor, translated_receipt_digest }` (`graph_session.rs:313`), admitted when
+  `cursor <= live` (`:774`), then reads `graph.json` and `facets.json` without binding either to
+  the journal; only the legacy-translation path carries a digest (`:749`). muniment's `Journal`
+  carries a `LogId` and `Provenance` but no content digest (`journal/persist.rs:10` to `:20` lists
+  hash-indexed entries as roadmap). So one rule has two owners, and repairing either leaves the
+  other open. Either (a) muniment's journal offers a digest of its first n entries and both
+  checkpoints store and verify it: one binding, and a new muniment API; (b) each checkpoint owner
+  computes its own, so `Snapshot` and `Checkpoint` each gain a field and the format is duplicated
+  again (A016); or (c) a checkpoint stops being trusted and is verified by replay, or dropped,
+  which gives up the optimization. Whichever binds, a stored checkpoint with no digest is then
+  refused, ignored in favour of a full replay (the path legacy assertion-less snapshots already
+  take, `spine.rs:740`), or trusted as today.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
@@ -337,3 +361,14 @@ words are under each, unnumbered until he numbers them:
   reading of the one-way rule (examples and tests may mount a product surface; shipped code may
   not) is a proposal for Mark to confirm or reverse; reversing it means the example moves beside
   the workshop. Type-check of the workshop with its tests and the Tabard desktop passed.
+- 2026-10-26 (L1, chartulary): Q001, Q003 and Q019 repaired on eidetic main (`af17fe7`; branch
+  `l1-chartulary` merged and pruned) and mere repinned to it, in the workspace and in
+  `ports/graphshell/web`, lockfiles changed in their source revs only. Q001 follows Mark's creator
+  ruling (re-parent to the deleted owner's creator, else clear) and also clears a survivor's pending
+  origin parent that the deletion collected; Q019 writes snapshot bindings and owned visits in index
+  order; Q003 archives a shared nested graph only when its last bearer leaves. One regression each
+  in chartulary (three for Q001 and Q019, one for Q003 beside a control) and a consumer before/after
+  in the kernel and Pandect; the audit's probes now fail on their defect assertions. Q002 stays open
+  as a fork (§5): its binding has two admission owners. Chartulary 87/87 (79 before), kernel lib
+  485/485, Pandect lib 342/342. Receipt:
+  `support/receipts/ownership-repair/l1/2026-10-26_l1_chartulary_receipt.json`.
