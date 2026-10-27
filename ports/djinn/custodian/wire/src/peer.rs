@@ -23,8 +23,15 @@ pub enum Peer {
         gid: u32,
         pid: Option<i32>,
     },
-    /// A Windows named-pipe peer, by its token's user SID.
-    Windows { sid: String, pid: u32 },
+    /// A Windows named-pipe peer, by its token's user SID. `image` is the
+    /// peer's main executable path where the OS could say so: the fact a
+    /// policy pins its consent helper on.
+    Windows {
+        sid: String,
+        pid: u32,
+        #[serde(default)]
+        image: Option<String>,
+    },
     /// A macOS XPC peer whose code signature the native host verified.
     Signed { team: String, identifier: String },
 }
@@ -236,4 +243,4 @@ pub fn effective_uid() -> u32 {
 }
 
 #[cfg(windows)]
-pub use crate::transport::windows::{current_user_sid, service_sid};
+pub use crate::transport::windows::{PipeSecurity, current_user_sid, owner_pipe_sddl, pipe_client_peer, process_image, service_sid};

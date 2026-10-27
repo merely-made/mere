@@ -184,6 +184,45 @@ fn the_policy_refuses_unattended_same_user_grants_and_a_desktop_consent_channel(
 }
 
 #[test]
+fn a_pinned_windows_image_can_be_the_consent_channel_but_only_with_a_status_grant() {
+    let (dir, _) = vault();
+    const SID: &str = "S-1-5-21-1-2-3-1001";
+    const IMAGE: &str = r"C:\Program Files\Merely\djinn-custodian\djinn-custodian.exe";
+    let parse = |principals: serde_json::Value| {
+        Config::parse(&serde_json::to_vec(&serde_json::json!({
+            "vault": {"directory": dir.path()}, "owner": {"windows_sid": SID}, "consent": "channel", "principals": principals
+        }))
+        .unwrap())
+    };
+    let channel = |image: &str, grants: serde_json::Value| serde_json::json!({
+        "name": "consent", "match": {"windows-image": {"sid": SID, "image": image}}, "consent_channel": true, "grants": grants
+    });
+    let djinn = serde_json::json!({"name": "djinn", "match": {"windows-sid": SID}, "grants": [
+        {"operation": "release", "profile": "current", "salts": [{"exact": "mesh-author"}], "consent": "per-generation"}]});
+    let status = serde_json::json!([{"operation": "status"}]);
+
+    assert!(parse(serde_json::json!([channel(IMAGE, status.clone()), djinn.clone()])).is_ok());
+    assert!(parse(serde_json::json!([{"name": "consent", "match": {"windows-sid": SID}, "consent_channel": true}])).is_err(), "the account alone is never the channel");
+    assert!(parse(serde_json::json!([channel(IMAGE, serde_json::json!([{"operation": "status"}, {"operation": "lock"}]))])).is_err(), "a pinned channel decides and does nothing else");
+    for relative in ["djinn-custodian.exe", "", r"..\djinn-custodian.exe"] {
+        assert!(parse(serde_json::json!([channel(relative, status.clone())])).is_err(), "{relative:?} is not an absolute image");
+    }
+
+    let config = parse(serde_json::json!([channel(IMAGE, status.clone()), djinn.clone()])).unwrap();
+    let peer = |image: Option<&str>| Peer::Windows { sid: SID.into(), pid: 7, image: image.map(Into::into) };
+    let name = |peer: &Peer| config.principal(peer).map(|p| (p.name, p.consent_channel, p.same_user));
+    assert_eq!(name(&peer(Some(IMAGE))), Some(("consent".into(), true, true)));
+    assert_eq!(name(&peer(Some(&format!(r"\\?\{}", IMAGE.to_uppercase().replace('\\', "/"))))), Some(("consent".into(), true, true)), "case, separator and the verbatim prefix do not matter");
+    assert_eq!(name(&peer(Some(r"C:\Users\mark\djinn-custodian.exe"))), Some(("djinn".into(), false, true)), "another executable of the same user is only Djinn's requester");
+    assert_eq!(name(&peer(None)), Some(("djinn".into(), false, true)), "a peer whose image could not be read is never the channel");
+    let other_user = Peer::Windows { sid: "S-1-5-21-1-2-3-1002".into(), pid: 7, image: Some(IMAGE.into()) };
+    assert_eq!(name(&other_user), None, "the pinned image of another account is nobody");
+    // Rules are matched in order, which is why the installer lists the channel first.
+    let reversed = parse(serde_json::json!([djinn, channel(IMAGE, status)])).unwrap();
+    assert_eq!(reversed.principal(&peer(Some(IMAGE))).map(|p| p.name), Some("djinn".into()));
+}
+
+#[test]
 fn the_principal_comes_from_the_os_peer_and_every_start_is_locked() {
     let (dir, _) = vault();
     let mut h = Harness::new(config(dir.path(), "channel", "per-generation"));

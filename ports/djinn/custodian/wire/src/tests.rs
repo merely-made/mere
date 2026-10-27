@@ -62,8 +62,8 @@ fn the_server_expectation_admits_only_the_installed_identity() {
     };
     assert!(expect.admits(&Peer::Unix { uid: 990, gid: 990, pid: None }));
     assert!(!expect.admits(&Peer::Unix { uid: 1000, gid: 1000, pid: None }));
-    assert!(expect.admits(&Peer::Windows { sid: "S-1-5-80-1".into(), pid: 4 }));
-    assert!(!expect.admits(&Peer::Windows { sid: "S-1-5-21-9".into(), pid: 4 }));
+    assert!(expect.admits(&Peer::Windows { sid: "S-1-5-80-1".into(), pid: 4, image: None }));
+    assert!(!expect.admits(&Peer::Windows { sid: "S-1-5-21-9".into(), pid: 4, image: None }));
     assert!(!expect.admits(&Peer::Signed { team: "T".into(), identifier: "i".into() }));
     assert!(expect.admits(&Peer::Signed { team: "T".into(), identifier: "c".into() }));
 }

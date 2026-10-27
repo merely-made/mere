@@ -874,7 +874,7 @@ impl ResidentDistillery {
     pub async fn close(mut self) -> Result<(), String> {
         #[cfg(feature = "inference-stages")]
         if let Some(network) = self.stage_network.take() {
-            network.close().await?;
+            network.close().await;
         }
         self.resident
             .shutdown()

@@ -12,7 +12,9 @@
 //! list. A principal matched only by the desktop user's uid or SID is an
 //! ordinary same-user requester: loading refuses an unattended signing or
 //! release grant for it unless the configuration declares development mode,
-//! which every status then reports.
+//! which every status then reports. The one same-user consent channel is
+//! Windows' pinned helper image ([`Matcher::WindowsImage`]), which may hold a
+//! status grant and nothing else.
 
 use custody_wire::Peer;
 use serde::Deserialize;
@@ -94,6 +96,16 @@ pub struct PrincipalRule {
 pub enum Matcher {
     UnixUid(u32),
     WindowsSid(String),
+    /// A process of `sid` whose main executable is `image`: the installed
+    /// consent helper on Windows (`djinn-custodian consent`, run in the
+    /// owner's session), where the installer leaves the executable writable
+    /// only by administrators. Another process of the same user can still
+    /// attach to it or start it under its own environment, so this is the
+    /// same-user posture of a polkit authentication agent, not an OS-held
+    /// identity; the plan records it as such. As the consent channel it may
+    /// hold a status grant only, and it must be listed before the account's
+    /// own rule, since the first matching rule wins.
+    WindowsImage { sid: String, image: String },
     Signed { team: String, identifier: String },
 }
 
@@ -102,6 +114,7 @@ impl Matcher {
         match (self, peer) {
             (Self::UnixUid(want), Peer::Unix { uid, .. }) => want == uid,
             (Self::WindowsSid(want), Peer::Windows { sid, .. }) => want == sid,
+            (Self::WindowsImage { sid: want, image: pinned }, Peer::Windows { sid, image: Some(image), .. }) => want == sid && same_image(pinned, image),
             (
                 Self::Signed { team, identifier },
                 Peer::Signed {
@@ -112,6 +125,13 @@ impl Matcher {
             _ => false,
         }
     }
+}
+
+/// Whether two Win32 paths name the same file, as the filesystem would:
+/// case-insensitively, either separator, with or without the `\\?\` prefix.
+fn same_image(pinned: &str, image: &str) -> bool {
+    let normal = |path: &str| path.trim_start_matches(r"\\?\").replace('/', "\\").to_lowercase();
+    !pinned.is_empty() && normal(pinned) == normal(image)
 }
 
 /// One granted operation.
@@ -372,7 +392,7 @@ impl Config {
     fn same_user(&self, matcher: &Matcher) -> bool {
         match matcher {
             Matcher::UnixUid(uid) => self.owner.unix_uid == Some(*uid),
-            Matcher::WindowsSid(sid) => self.owner.windows_sid.as_deref() == Some(sid),
+            Matcher::WindowsSid(sid) | Matcher::WindowsImage { sid, .. } => self.owner.windows_sid.as_deref() == Some(sid),
             Matcher::Signed { .. } => false,
         }
     }
@@ -387,9 +407,25 @@ impl Config {
                 return Err(PolicyError(format!("principal name {:?} is empty, too long or repeated", rule.name)));
             }
             let same_user = self.same_user(&rule.matcher);
-            if rule.consent_channel && same_user {
+            let pinned = match &rule.matcher {
+                Matcher::WindowsImage { image, .. } => {
+                    let absolute = image.get(1..2) == Some(":") || image.starts_with('\\');
+                    if !absolute {
+                        return Err(PolicyError(format!("{}: the pinned image must be an absolute Win32 path", rule.name)));
+                    }
+                    true
+                },
+                _ => false,
+            };
+            if rule.consent_channel && same_user && !pinned {
                 return Err(PolicyError(format!(
                     "{}: the desktop account cannot be the trusted consent channel; any of its processes would match",
+                    rule.name
+                )));
+            }
+            if rule.consent_channel && same_user && rule.grants.iter().any(|grant| !matches!(grant, Grant::Status)) {
+                return Err(PolicyError(format!(
+                    "{}: a consent channel pinned to the desktop account's executable may hold only a status grant",
                     rule.name
                 )));
             }

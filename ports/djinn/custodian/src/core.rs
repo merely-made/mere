@@ -184,8 +184,9 @@ impl Core {
         if self.sessions.len() >= limits::MAX_CONNECTIONS {
             return Err(refuse("connection-capacity"));
         }
-        let account = peer.account();
-        if self.sessions.values().filter(|s| s.peer.account() == account).count() >= limits::MAX_CONNECTIONS_PER_PRINCIPAL {
+        // By principal, not by OS account: on Windows the consent helper and
+        // Djinn are one SID and must not share a budget.
+        if self.sessions.values().filter(|s| s.principal.name == principal.name).count() >= limits::MAX_CONNECTIONS_PER_PRINCIPAL {
             return Err(refuse("principal-connection-capacity"));
         }
         let id = self.next_session;

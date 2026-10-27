@@ -4,8 +4,8 @@
 **Status (2026-10-26):** H1 and H2 are on main. `djinn-custodian` is a separate process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers (§5.2). Since H2 it also holds Castellan's resident host, the wallet, the credential catalog and the SSH agent. A production Djinn links no castellan and reaches every vault use through the custodian (§6 H2 inventory).
 - **Stopped and gated:** Hocket adoption is stopped (an identity-format change).
 - **Wallet at rest (2026-10-26):** the wallet's files and the credential catalog now live only in the custodian's data root, and `djinn-custodian adopt --data-from` moves an existing set there byte for byte. Djinn gets the persona index and device roster over `custody-wire`. A receiving run on Linux still has to confirm it.
-- **Evidence:** the tests pass on macOS; Linux and Windows builds type-check.
-- **Production gate:** the Linux and signed-macOS receiving runs, including the wallet's at-rest check, and the Windows pieces. Until those pass, no deployment claims the §1 same-user guarantee.
+- **Evidence:** the tests pass on macOS; Linux and Windows builds type-check. The Windows consent helper, OS-vault adoption and agent pipe are type-checked only; the custodian README's Windows steps on o-pc are their qualification.
+- **Production gate:** the Linux and signed-macOS receiving runs, including the wallet's at-rest check, and the Windows o-pc run. Until those pass, no deployment claims the §1 same-user guarantee.
 
 Native11's 38/38 and native10's signing-account failure remain the macOS primitive evidence.
 **Audit base:** Mere 0261e2602b5b13fcf59dced3ae408c3441c38a71, freshly fetched
@@ -734,7 +734,7 @@ runs and the shared worker launcher remain open; H2 is implemented (below).
   - receiving runs on each OS (the custodian README lists the steps);
   - the macOS data-protection Keychain envelope in the portable binary;
   - the Windows CNG wrapping key;
-  - a Windows presence channel.
+  - the Windows presence channel, built in H2 as a logon helper pinned by executable image (not yet run).
 - [ ] Build the shared confined-worker launcher/manifest and hostile-worker
   fixture; activate sandboxing before parsing. Test malicious workers and a
   separate unsandboxed same-desktop-user app against files, handles, key access,
@@ -822,7 +822,7 @@ Releases hand Djinn derived keys only, each checked against the root's attestati
 - **Consent per platform:**
   - Linux: Djinn is a same-user principal there, so every grant it uses prompts polkit once per generation.
   - macOS: the config has no consent channel, so per-use SSH keys are refused until one is qualified.
-  - Windows: every grant needs consent and none is qualified. The DPAPI vault must be migrated first and there is no agent pipe, so a Windows Djinn with a custodian cannot run its consumers.
+  - Windows: the policy admits a helper (`djinn-custodian consent`, registered at logon to run as the owner) as the consent channel by the path of its installed executable, with a status grant only, and the helper puts each petition to the owner through Windows Hello. Any unavailability, cancel or error is a refusal. This is the same-user posture of a polkit authentication agent, not an OS-held identity: another process of the owner can attach to the helper or start the executable under its own environment. The `adopt` command copies Djinn's OS-rooted vault into the passphrase vault as the owner, and the custodian serves the SSH agent on its own pipe. All of it is type-checked only.
 - **The custodian's dependency graph grew.** It now links Castellan's keeper and CXF code, the SSH agent library and a tokio current-thread runtime. Through the wallet it also links `pandect` and `graph-kernel`; H4's dependency review covers them.
 
 **Fixed while migrating:**
@@ -842,7 +842,7 @@ Releases hand Djinn derived keys only, each checked against the root's attestati
 1. The Linux receiving run, custodian README steps 1–8.
 2. The signed macOS receiving run.
 3. The wallet's public/secret split, and moving an existing wallet and catalog into the custodian's state directory. **Implemented 2026-10-26:** the custodian discloses the public records, and `adopt --data-from` moves the files. The Linux receiving run (README step 8) is what remains.
-4. On Windows, a consent channel, the DPAPI-to-passphrase migration and an agent pipe; today it only compiles.
+4. On Windows, the o-pc run of the custodian README's Windows steps: the consent helper, the DPAPI-to-passphrase adoption and the agent pipe, which are built and type-checked but never run.
 
 Until the first two pass on their hosts, no deployment installs a custodian for daily use.
 
@@ -1039,6 +1039,20 @@ copy of those documents here.
   - `publish_grant_carriage` (above);
   - on macOS, the file permission between the custodian's state and Djinn;
   - on Windows, the DPAPI-sealed wallet, with the Windows pieces.
+
+- 2026-10-26, Windows consent, adoption and agent (H2 gate item 4). The
+  custodian gained the logon consent helper (`djinn-custodian consent`, pinned
+  by image, answered through Windows Hello), `adopt` for Djinn's OS-rooted
+  vault and an agent pipe, with the installer, policy and README to match.
+  - On macOS `custody-wire` has 8 tests and `djinn-custodian` 46 unit tests
+    (the helper over real sockets with Windows-shaped peers, the pinned-image
+    policy, and a sealed-record vault round-tripped into a passphrase vault)
+    plus 4 process tests. The connection cap now counts per principal, so the
+    helper and Djinn, one SID, do not share a budget.
+  - The Windows type-check of both crates and their tests passes under the
+    stub compiler. The Hello prompt, both pipes, the logon task and the
+    OS-rooted read have never run; the README's Windows steps on o-pc are
+    the qualification.
 
 Documentation verification retains inherited failures rather than calling the
 whole tree clean: the full D2 audit has existing missing judgments and a tracked

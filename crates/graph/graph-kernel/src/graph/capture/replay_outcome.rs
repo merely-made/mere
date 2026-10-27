@@ -4,12 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! What a captured record replays as. [`CapturedDelta::replay`] decides once;
-//! replay loops and writers only act on the answer.
+//! What a captured record replays as. [`CapturedDelta::replay`](super::CapturedDelta::replay)
+//! decides once; replay loops and writers only act on the answer.
 
 use super::{
-    CapturedDelta, GraphDelta, GraphDeltaResult, OnRefusal, ReplayRefused, apply_graph_delta,
-    replay_quietly,
+    GraphDelta, GraphDeltaResult, OnRefusal, ReplayRefused, apply_graph_delta, replay_quietly,
 };
 use crate::graph::Graph;
 use crate::graph::resource_content::ContentError;
@@ -87,40 +86,6 @@ impl Replay {
             Self::Apply(delta) => Ok(delta),
             Self::Skip => Err(Unwritable::Skipped),
             Self::Malformed(malformed) => Err(Unwritable::Malformed(malformed)),
-        }
-    }
-}
-
-impl CapturedDelta {
-    /// The delta, if the record has one. A skip and a malformed record both
-    /// give `None`: for callers that drop either way. Anything that can refuse
-    /// matches on [`replay`](Self::replay) instead.
-    pub fn replay_delta(&self) -> Option<GraphDelta> {
-        match self.replay() {
-            Replay::Apply(delta) => Some(delta),
-            Replay::Skip | Replay::Malformed(_) => None,
-        }
-    }
-
-    /// [`replay_delta`](Self::replay_delta) with the journal's attribution applied.
-    pub fn replay_delta_as(&self, author: &crate::graph::Author) -> Option<GraphDelta> {
-        match self.replay_as(author) {
-            Replay::Apply(delta) => Some(delta),
-            Replay::Skip | Replay::Malformed(_) => None,
-        }
-    }
-}
-
-impl super::ReplayAttribution {
-    /// [`CapturedDelta::replay_delta`] with this attribution's repairs applied.
-    pub(crate) fn replay_delta(
-        &mut self,
-        delta: &CapturedDelta,
-        author: &crate::graph::Author,
-    ) -> Option<GraphDelta> {
-        match self.replay(delta, author) {
-            Replay::Apply(delta) => Some(delta),
-            Replay::Skip | Replay::Malformed(_) => None,
         }
     }
 }

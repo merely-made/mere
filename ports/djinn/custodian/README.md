@@ -1,6 +1,6 @@
 # Djinn custodian
 
-Status: H2 implemented. The custodian holds Castellan's resident host, the wallet, the credential catalog and the SSH agent, and a production Djinn reaches all of them through it: Djinn links no castellan, opens no vault and opens no wallet file. An existing wallet and catalog move into the custodian's state directory with `adopt --data-from`. The H1 and H2 tests pass on macOS. Linux and Windows builds type-check; their qualification steps below are still to run on those hosts. Production enablement waits on those runs and on the gaps in the [plan](../../../design_docs/dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration).
+Status: H2 implemented. The custodian holds Castellan's resident host, the wallet, the credential catalog and the SSH agent, and a production Djinn reaches all of them through it: Djinn links no castellan, opens no vault and opens no wallet file. An existing wallet and catalog move into the custodian's state directory with `adopt --data-from`. The H1 and H2 tests pass on macOS. Linux and Windows builds type-check; their qualification steps below are still to run on those hosts. Everything Windows-specific (the consent helper, the OS-vault adoption and the agent pipe) is type-checked only: the Windows steps below, on o-pc, are its qualification. Production enablement waits on those runs and on the gaps in the [plan](../../../design_docs/dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration).
 
 `djinn-custodian` is the independently launched process that opens Djinn's Castellan vault (custody isolation plan, §5). Only this process does the following:
 - unlocks the vault and locks it;
@@ -31,13 +31,16 @@ Djinn and every other client go through [`custody-wire`](wire) over authenticate
   - the credential catalog.
 - [`policy`](src/policy.rs): installed, deny-by-default, per-principal grants for profile, operation, namespace and consent.
   - A principal matched only by the desktop user's uid or SID cannot sign or release unattended, or act as the consent channel, outside declared development mode.
+    The one exception is Windows' `windows-image` matcher, which pins the consent helper to the installed executable and allows it a status grant only.
   - The `djinn-door` rule names exactly the open profile's two door keys, so every other `mere.graphshell` delegation key stays sign-only.
   - Djinn's installed grants are one template, [`packaging/djinn-grants.json.in`](packaging/djinn-grants.json.in), with the consent filled in per OS.
 - [`host`](src/host.rs): Djinn's real passphrase vault behind Castellan's `PersonaeHost`.
   - Every start is locked. The first unlock builds the host on the configured or remembered profile and claims the credential catalog; later unlocks reopen it. A changed identity is refused.
-  - Nothing mints a profile, and an OS-sealed (DPAPI) vault must be migrated first.
+  - Nothing mints a profile, and an OS-sealed (DPAPI) vault must be migrated first (`adopt`, below).
 - [`wallet`](src/wallet.rs) and [`credentials`](src/credentials.rs): the wallet's acts, its public records and the credential catalog's operations, moved from Djinn unchanged in effect. The epoch derivation is pinned by a test against the epoch read directly. [`wallet::adopt`](src/wallet/adopt.rs) lists the wallet's files and carries them into a data root: same relative paths, same bytes, proved to open to the same wallet before the source copies go.
-- [`agent`](src/agent.rs) (Unix): the SSH agent. Its socket admits only the owner's uid, and only once the vault has opened. Per-use approvals become consent petitions.
+- [`agent`](src/agent.rs) (Unix) and [`agent_pipe`](src/agent_pipe.rs) (Windows): the SSH agent. Its socket or pipe admits only the owner (uid, or the client process's token SID), and only once the vault has opened. Per-use approvals become consent petitions.
+- [`helper`](src/helper.rs) and [`platform::hello`](src/platform/hello.rs) (Windows): the consent channel. `djinn-custodian consent` runs in the owner's session and puts each petition to the owner through Windows Hello; see the Windows row below.
+- [`adoption`](src/adoption.rs): copies the profiles of Djinn's OS-rooted Windows vault into the custodian's passphrase vault.
 - [`core`](src/core.rs): the state machine without I/O, driven by [`driver`](src/driver.rs) over any listener. Lock, unlock and revocation each advance one generation, cancel pending petitions and broadcast a fact. A lock reports separately whether memory locked, the drain finished and the barrier persisted.
 - [`delegation`](src/delegation.rs): the signing consumer for Graphshell (`mere.graphshell`). It decodes an insigne delegation certificate or revocation, rebuilds it byte-for-byte, then checks the audience, the issuer and the scope key before signing inside custody.
 - [`platform`](src/platform): one launcher, peer check and confinement recipe per OS.
@@ -53,7 +56,10 @@ djinn-custodian init  --config PATH                                 # new vault;
 djinn-custodian adopt --config PATH --from DJINN-VAULT-DIR          # copy and reopen to the same identity
 djinn-custodian adopt --config PATH --data-from DJINN-DATA-ROOT     # carry the wallet and catalog, then remove the copies there
 djinn-custodian wallet-files --data-root DIR                        # the wallet's and catalog's files, NUL-separated
+djinn-custodian consent --client PATH                               # Windows only: the consent helper
 ```
+
+`adopt` takes either kind of Djinn vault. A passphrase vault (`vault.json`) is copied as it is and keeps its passphrase on stdin. A Windows OS-rooted vault (`auto-unlock-root.json`, no `vault.json`) can be opened only by its owner's own logon, so `adopt` runs as the owner from an elevated prompt with the service stopped, refuses when the current user's SID is not `owner.windows_sid`, reads a new passphrase twice from stdin and writes every profile into a new passphrase vault, with the roster choice. It then proves the copy opens to the same profile and master public key. If Djinn left its persisted lock, unlock Djinn once first.
 
 `--socket PATH` binds the custody socket directly, plus `vault.agent_endpoint` when configured. It is refused outside development mode. Installers: [Linux](install-linux.sh), [macOS](install-macos.sh), [Windows](install-windows.ps1). Djinn finds an installed custodian through a client file the desktop user cannot write (`djinn::custodian::installed_path`); the file also names the agent socket for Djinn's status. A Djinn harness build (`passphrase-fd`) never reads the installed file. It reaches only a custodian named with `--custodian FILE`.
 
@@ -67,7 +73,7 @@ The installers point `vault.data_root` at the custodian's own state directory, s
 | --- | --- | --- | --- | --- |
 | Linux | systemd system service `djinn-custodian@USER` under account `djinn-custodian-USER`. It is socket-activated: pid 1 owns the 0600 sockets `custody` and `agent` (`djinn-custodian-agent@USER.socket`), so clients expect uid 0. State lives in `/var/lib/djinn-custodian/USER`. | `no_new_privs`, not dumpable, `RLIMIT_CORE` 0, Landlock and a seccomp allowlist. Landlock ABI 6 is required in protected mode: state read-write, config read-only, no exec, no TCP, abstract sockets and signals scoped. polkit `auth_self` consent runs from a helper forked before confinement. The agent's runtime starts after confinement. | `x86_64-unknown-linux-gnu` type-check of the crate and its tests (`ring`'s C under a stub compiler; nothing linked) | Linux steps 1–8 below |
 | macOS | launchd agent adopting its launchd sockets `custody` and `agent`. Both ends of the custody socket identify each other by team and identifier through the socket's audit token. | Deny-attach and no core files. Protected mode refuses to run without a valid hardened-runtime signature lacking `get-task-allow`. | Process, socket and H2 tests; the unsigned negative control for signed peers | Signed install and receiving run (macOS steps) |
-| Windows | SCM service under `NT SERVICE\djinn-custodian` on pipe `\\.\pipe\djinn-custodian-<owner SID>`. The pipe's protected DACL admits only the owner, and the client requires the service SID as the pipe server. No agent pipe yet. | Extension points, dynamic code, and remote or low-label image loads disabled | `x86_64-pc-windows-gnu` type-check of the crate and its tests (as for Linux) | Windows steps below (o-pc) |
+| Windows | SCM service under `NT SERVICE\djinn-custodian` on pipe `\\.\pipe\djinn-custodian-<owner SID>`. The pipe's protected DACL admits only the owner, and the client requires the service SID as the pipe server. The SSH agent has its own pipe, `\\.\pipe\djinn-custodian-<owner SID>-agent` (or `vault.agent_endpoint`), with the same DACL; a connection is admitted only from the owner's token and once the vault has opened. Consent comes from a helper (`djinn-custodian consent`) that the installer registers to run as the owner at logon. The policy matches it by the installed executable's path (`windows-image`) and lets it decide petitions and nothing else. It asks the owner through Windows Hello, and any unavailability, cancel or error is a refusal. | Extension points, dynamic code, and remote or low-label image loads disabled (the service only; the helper is not confined) | `x86_64-pc-windows-gnu` type-check of the crate and its tests (as for Linux). The policy, helper loop, reconnect and adoption copy run on macOS against Windows-shaped peers. | Windows steps below (o-pc) |
 
 **Linux** (on the Fedora ThinkPad, kernel with Landlock ABI ≥ 6):
 1. Build there: `cargo +1.99.1 test --locked -p djinn-custodian -p custody-wire`, then Djinn's `custodian_client`, `quarantine_review` and `cxf_import` tests. The process tests run unconfined there; confinement runs in development (logging) mode.
@@ -110,9 +116,17 @@ The data-protection Keychain envelope and the native consent dialog remain the [
 **Windows** (o-pc):
 1. Run `cargo +1.99.1 test --locked -p djinn-custodian -p custody-wire`, then `.\install-windows.ps1 -User mark_ -Binary target\release\djinn-custodian.exe`.
 2. Check that `sc.exe qsidtype djinn-custodian` reports unrestricted, and that `icacls` on the state directory admits only the service SID, SYSTEM and Administrators.
-3. As the user, the state files and the service configuration must be unreadable and unwritable. A second local account must not open the pipe, and Djinn must refuse a pipe served by any other process.
+3. As the user, the state files and the service configuration must be unreadable and unwritable. A second local account must not open either pipe, and Djinn must refuse a pipe served by any other process. Djinn must also connect at all: the service identifies a client by opening its process (`OpenProcess` for query rights, then its token and image path), which the owner's default process ACL may refuse to a virtual service account. If it does, `accept` fails and no client is admitted; the token SID can then be read by impersonating the client at identification level, but its image has no such route, so the helper's image pin needs another source.
+4. Adopt Djinn's vault. Close Djinn, unlock it once, stop the service, and from an elevated prompt of the owner's own account run `djinn-custodian.exe adopt --config C:\ProgramData\djinn-custodian\custodian.json --from <Djinn vault dir>` with the new passphrase twice. It must print the profile and master Djinn showed before. Another account, or an administrator other than the owner, must be refused. Re-run the `icacls` line for the state directory, then `Start-Service djinn-custodian` and `Start-ScheduledTask -TaskName djinn-custodian-consent`.
+5. Consent helper:
+   - `Get-Process djinn-custodian` must show the helper running as the owner, not as SYSTEM or the service; it must come back after logoff and logon, and after the service restarts.
+   - Unlock Djinn and use a grant: Windows Hello must prompt, naming the principal and the operation (the petition carries no requesting process). Approving must succeed once per generation; cancelling, a wrong PIN until retries run out, and Hello turned off must each refuse.
+   - Copy the executable elsewhere and start it as the owner with `consent --client ...`: the custodian must not admit it as the channel (it says so on its stderr; started from a shell it keeps that console, started by the task it has none). Check that the Hello dialog comes to the front over a full-screen app, since its owner is a one-pixel tool window parked off the screen.
+   - Count the prompts after an unlock and record them: that count is the cost of the same-user posture.
+6. Agent: with `$env:SSH_AUTH_SOCK = '\\.\pipe\djinn-custodian-<owner SID>-agent'` (or `IdentityAgent` in `ssh_config`; Win32-OpenSSH's `ssh.exe` reads the variable as a pipe name), `ssh-add -L` must list the vault's keys once unlocked and nothing before. A per-use key must prompt Hello on each signature. A second account must not connect, and the agent must keep serving after a client disconnects.
+7. Kill the service. Djinn must report the identity pending, and the helper must reconnect without a restart once the service is back.
 
-Djinn's grants are installed, but every one needs consent. The config is `deny` until a Windows presence channel exists, so each grant is refused there. The DPAPI vault Djinn uses on Windows must first be migrated to the passphrase vault, and no agent pipe is served. A Windows Djinn with this custodian therefore cannot run its consumers yet.
+The helper is not an OS-held identity. It is the same-user posture of a polkit authentication agent: the policy admits the owner's process whose executable is the installed one, which the installer leaves writable only by administrators. Another process of the owner can still attach to it, or start the executable under its own environment, so the helper must be checked at step 5 and recorded, not assumed. A Windows presence channel the owner's other processes cannot reach waits for the CNG envelope.
 
 ## Negative controls and H2 tests (CI, no GUI)
 
@@ -138,5 +152,12 @@ They cover:
 - the epoch derivation is the one Djinn made;
 - the door rule releases exactly the open profile's door keys, and Djinn's own door function agrees with it;
 - per-use SSH signing is petitioned to the consent channel, and a denial reaches the waiting client at once;
+- a `windows-image` consent channel is validated (absolute path, status grant only, never the account alone) and matched ahead of the account's own rule, and another image of the same user is an ordinary requester ([`src/tests.rs`](src/tests.rs));
+- the Windows helper, over real sockets with Windows-shaped peers ([`src/helper/tests.rs`](src/helper/tests.rs)):
+  - it is petitioned for each release, and neither the requester nor another image of the same user can decide it;
+  - an approval releases, a refusal is final, and consent lasts a generation;
+  - a session not admitted as the channel is not served, and a lost custodian ends the loop;
+  - it connects again until admitted and reports a failure streak once;
+- a sealed-record vault round-trips into a passphrase vault with its slots and roster choice, and an existing vault is never replaced ([`src/adoption.rs`](src/adoption.rs));
 - Djinn's lock holders forget their keys on a custodian lock and re-derive through it on unlock;
 - quarantine review and CXF import go through the custodian's catalog behind Djinn's native consent.

@@ -14,13 +14,18 @@
 //!   djinn-custodian --config PATH [--socket PATH]
 //!   djinn-custodian init  --config PATH      (passphrase twice on stdin)
 //!   djinn-custodian adopt --config PATH [--from VAULT-DIR] [--data-from DATA-ROOT]
-//!                                                  (passphrase on stdin with --from)
+//!       --from: a passphrase vault (its passphrase on stdin) or an OS-rooted
+//!       Windows vault (the new passphrase twice, run as the owner);
+//!       --data-from: the wallet and credential catalog, no passphrase
 //!   djinn-custodian wallet-files --data-root DIR   (the wallet's files, NUL-separated)
+//!   djinn-custodian consent --client PATH   (Windows: the logon helper that
+//!       puts petitions to the owner through Windows Hello)
 
 use std::io::BufRead;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use djinn_custodian::adoption::{self, VaultKind};
 use djinn_custodian::consent::Mechanism;
 use djinn_custodian::core::Core;
 use djinn_custodian::driver::Service;
@@ -37,36 +42,46 @@ fn main() {
 
 struct Args {
     command: String,
-    config: PathBuf,
+    config: Option<PathBuf>,
+    client: Option<PathBuf>,
     socket: Option<PathBuf>,
     from: Option<PathBuf>,
     data_from: Option<PathBuf>,
 }
 
+impl Args {
+    fn config(&self) -> Result<&Path, String> {
+        self.config.as_deref().ok_or_else(|| "--config is required".to_string())
+    }
+}
+
 fn parse() -> Result<Args, String> {
     let mut raw = std::env::args().skip(1).peekable();
     let command = match raw.peek().map(String::as_str) {
-        Some("init") | Some("adopt") => raw.next().expect("peeked"),
+        Some("init") | Some("adopt") | Some("consent") => raw.next().expect("peeked"),
         _ => "serve".to_string(),
     };
-    let (mut config, mut socket, mut from, mut data_from) = (None, None, None, None);
+    let (mut config, mut client, mut socket, mut from, mut data_from) = (None, None, None, None, None);
     while let Some(flag) = raw.next() {
         let value = raw.next().ok_or_else(|| format!("{flag} needs a value"))?;
         match flag.as_str() {
             "--config" => config = Some(PathBuf::from(value)),
+            "--client" => client = Some(PathBuf::from(value)),
             "--socket" => socket = Some(PathBuf::from(value)),
             "--from" => from = Some(PathBuf::from(value)),
             "--data-from" => data_from = Some(PathBuf::from(value)),
             other => return Err(format!("unknown argument {other}")),
         }
     }
-    let config = config.ok_or("--config is required")?;
-    if !config.is_absolute() {
-        return Err("--config must be absolute".into());
+    for (flag, path) in [("--config", &config), ("--client", &client)] {
+        if path.as_ref().is_some_and(|path| !path.is_absolute()) {
+            return Err(format!("{flag} must be absolute"));
+        }
     }
     Ok(Args {
         command,
         config,
+        client,
         socket,
         from,
         data_from,
@@ -78,7 +93,11 @@ fn run() -> Result<(), String> {
         return wallet_files();
     }
     let args = parse()?;
-    let bytes = std::fs::read(&args.config).map_err(|e| format!("read {}: {e}", args.config.display()))?;
+    if args.command == "consent" {
+        return consent(args.client.as_deref().ok_or("consent needs --client")?);
+    }
+    let path = args.config()?;
+    let bytes = std::fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
     let config = Config::parse(&bytes).map_err(|e| e.to_string())?;
     match args.command.as_str() {
         "init" => init(&config),
@@ -94,7 +113,7 @@ fn serve(config: Config, args: &Args) -> Result<(), String> {
     }
     let plan = Confinement {
         state: config.vault.directory.clone(),
-        config: args.config.clone(),
+        config: args.config()?.to_path_buf(),
         required: !development,
     };
     let consent = config.consent;
@@ -114,8 +133,12 @@ fn serve(config: Config, args: &Args) -> Result<(), String> {
         djinn_custodian::agent::spawn(service.clone(), agent, config.owner.unix_uid).map_err(|e| format!("agent: {e}"))?;
         eprintln!("djinn-custodian: serving the SSH agent");
     }
-    #[cfg(not(unix))]
-    let _ = agent;
+    #[cfg(windows)]
+    {
+        let owner = config.owner.windows_sid.clone().ok_or("owner.windows_sid is required on Windows")?;
+        djinn_custodian::agent_pipe::spawn(service.clone(), agent, owner).map_err(|e| format!("agent: {e}"))?;
+        eprintln!("djinn-custodian: serving the SSH agent");
+    }
     #[cfg(windows)]
     {
         let stopping = service.clone();
@@ -133,11 +156,18 @@ fn serve(config: Config, args: &Args) -> Result<(), String> {
 
 #[cfg(unix)]
 type AgentListener = std::os::unix::net::UnixListener;
-#[cfg(not(unix))]
-type AgentListener = ();
+/// The agent's pipe name.
+#[cfg(windows)]
+type AgentListener = String;
 
-/// The custody listener and, where configured, the SSH agent's.
-fn listeners(config: &Config, args: &Args) -> Result<(Box<dyn custody_wire::transport::Listener>, Option<AgentListener>), String> {
+#[cfg(unix)]
+type AgentEndpoint = Option<AgentListener>;
+#[cfg(windows)]
+type AgentEndpoint = AgentListener;
+
+/// The custody listener and the SSH agent's: where configured on Unix, always
+/// on Windows.
+fn listeners(config: &Config, args: &Args) -> Result<(Box<dyn custody_wire::transport::Listener>, AgentEndpoint), String> {
     #[cfg(unix)]
     {
         use custody_wire::transport::UnixSocketListener;
@@ -173,7 +203,8 @@ fn listeners(config: &Config, args: &Args) -> Result<(Box<dyn custody_wire::tran
         let _ = args;
         let owner = config.owner.windows_sid.as_deref().ok_or("owner.windows_sid is required on Windows")?;
         let name = format!(r"\\.\pipe\djinn-custodian-{owner}");
-        Ok((Box::new(custody_wire::transport::NamedPipeListener::new(&name, owner)), None))
+        let agent = config.vault.agent_endpoint.clone().unwrap_or_else(|| djinn_custodian::agent_pipe::default_endpoint(owner));
+        Ok((Box::new(custody_wire::transport::NamedPipeListener::new(&name, owner)), agent))
     }
 }
 
@@ -284,37 +315,21 @@ fn wallet_files() -> Result<(), String> {
     Ok(())
 }
 
-/// Copy Djinn's existing passphrase vault into the state directory, then
-/// prove the copy opens to the same identity. The source is left in place
-/// for the owner to retire; nothing is migrated in place.
+/// Bring Djinn's existing vault into the state directory, then prove the
+/// copy opens to the same identity. The source is left in place for the
+/// owner to retire; nothing is migrated in place. A passphrase vault is
+/// copied as the file it is. Djinn's OS-rooted Windows vault opens only for
+/// its owner's own logon, so it is read here, as the owner, and written as a
+/// new passphrase vault.
 fn adopt_vault(config: &Config, from: &Path) -> Result<(), String> {
     use castellan::custody::bootstrap::PASSPHRASE_VAULT_FILE;
-    use castellan::custody::roster::choice_path;
     let directory = &config.vault.directory;
     if directory.join(PASSPHRASE_VAULT_FILE).exists() {
         return Err("a vault already exists in the custodian's state directory".into());
     }
-    let source = from.join(PASSPHRASE_VAULT_FILE);
-    if !source.is_file() {
-        return Err(format!("no passphrase vault at {}", source.display()));
-    }
-    std::fs::create_dir_all(directory).map_err(|e| e.to_string())?;
-    let staged = directory.join(format!("{PASSPHRASE_VAULT_FILE}.adopting"));
-    std::fs::copy(&source, &staged).map_err(|e| e.to_string())?;
-    std::fs::File::open(&staged).and_then(|f| f.sync_all()).map_err(|e| e.to_string())?;
-    if choice_path(from).is_file() {
-        std::fs::copy(choice_path(from), choice_path(directory)).map_err(|e| e.to_string())?;
-    }
-    std::fs::rename(&staged, directory.join(PASSPHRASE_VAULT_FILE)).map_err(|e| e.to_string())?;
-    let phrase = passphrase(&mut std::io::stdin().lock())?;
-    // The source is only read: no lock marker is written or cleared there.
-    let source_master = {
-        use castellan::custody::bootstrap::{self, Unlock};
-        use personae::IdentityProvider;
-        let opened = bootstrap::open_storage(from, Unlock::passphrase(phrase.as_bytes().to_vec())).map_err(|e| format!("open the source: {e}"))?;
-        let id = castellan::custody::roster::resolve_profile(&*opened.storage, from).map_err(|e| e.to_string())?;
-        let vault = castellan::custody::IdentityVault::open(opened.storage, &id).map_err(|e| e.to_string())?;
-        (id.0.clone(), vault.master_public_key().to_bytes())
+    let (phrase, source_master) = match adoption::kind(from)? {
+        VaultKind::Passphrase => adopt_passphrase_file(directory, from)?,
+        VaultKind::OsRooted => adopt_os_rooted(config, directory, from)?,
     };
     let mut adopted = djinn_custodian::host::HostCustody::locked(directory, config.vault.profile.as_deref(), None).map_err(|r| r.to_string())?;
     adopted.unlock(phrase.as_bytes()).map_err(|r| format!("open the copy: {r}"))?;
@@ -328,9 +343,104 @@ fn adopt_vault(config: &Config, from: &Path) -> Result<(), String> {
         "adopted profile {} with master {}; retire {} once Djinn uses the custodian",
         adopted.profile().unwrap_or_default(),
         hex(&adopted.master_public_key().unwrap_or_default()),
-        source.display()
+        from.display()
     );
     Ok(())
+}
+
+/// The passphrase and the source's profile and master, after copying
+/// `vault.json` and the roster choice beside it.
+fn adopt_passphrase_file(directory: &Path, from: &Path) -> Result<(Zeroizing<String>, (String, [u8; 32])), String> {
+    use castellan::custody::bootstrap::PASSPHRASE_VAULT_FILE;
+    use castellan::custody::roster::choice_path;
+    let source = from.join(PASSPHRASE_VAULT_FILE);
+    std::fs::create_dir_all(directory).map_err(|e| e.to_string())?;
+    let staged = directory.join(format!("{PASSPHRASE_VAULT_FILE}.adopting"));
+    std::fs::copy(&source, &staged).map_err(|e| e.to_string())?;
+    std::fs::File::open(&staged).and_then(|f| f.sync_all()).map_err(|e| e.to_string())?;
+    if choice_path(from).is_file() {
+        std::fs::copy(choice_path(from), choice_path(directory)).map_err(|e| e.to_string())?;
+    }
+    std::fs::rename(&staged, directory.join(PASSPHRASE_VAULT_FILE)).map_err(|e| e.to_string())?;
+    let phrase = passphrase(&mut std::io::stdin().lock())?;
+    // The source is only read: no lock marker is written or cleared there.
+    use castellan::custody::bootstrap::{self, Unlock};
+    use personae::IdentityProvider;
+    let opened = bootstrap::open_storage(from, Unlock::passphrase(phrase.as_bytes().to_vec())).map_err(|e| format!("open the source: {e}"))?;
+    let id = castellan::custody::roster::resolve_profile(&*opened.storage, from).map_err(|e| e.to_string())?;
+    let vault = castellan::custody::IdentityVault::open(opened.storage, &id).map_err(|e| e.to_string())?;
+    Ok((phrase, (id.0.clone(), vault.master_public_key().to_bytes())))
+}
+
+/// Only the owner's own logon opens an OS-rooted vault, so this refuses any
+/// other account, then writes a new passphrase vault from it.
+fn adopt_os_rooted(config: &Config, directory: &Path, from: &Path) -> Result<(Zeroizing<String>, (String, [u8; 32])), String> {
+    require_owner(config)?;
+    let first = passphrase(&mut std::io::stdin().lock())?;
+    let second = passphrase(&mut std::io::stdin().lock())?;
+    if first.as_bytes() != second.as_bytes() {
+        return Err("the two passphrases did not match".into());
+    }
+    let source = adoption::open_os_rooted(from)?;
+    let id = castellan::custody::roster::resolve_profile(&source, from).map_err(|e| e.to_string())?;
+    let master = {
+        use castellan::custody::IdentityStorage;
+        source.load_profile(&id).map_err(|e| format!("read profile {}: {e}", id.0))?.master.public_key().to_bytes()
+    };
+    adoption::into_passphrase_vault(&source, from, directory, first.as_bytes())?;
+    Ok((first, (id.0.clone(), master)))
+}
+
+#[cfg(windows)]
+fn require_owner(config: &Config) -> Result<(), String> {
+    let owner = config.owner.windows_sid.as_deref().ok_or("owner.windows_sid is required on Windows")?;
+    let current = custody_wire::peer::current_user_sid().map_err(|e| e.to_string())?;
+    if current != owner {
+        return Err(format!("run adopt as the owner ({owner}); this user is {current}"));
+    }
+    Ok(())
+}
+
+#[cfg(not(windows))]
+fn require_owner(_: &Config) -> Result<(), String> {
+    Err("an OS-rooted Djinn vault can be adopted only on Windows, as its owner".into())
+}
+
+/// The Windows logon helper: put each petition to the owner through
+/// Windows Hello until the process is ended.
+#[cfg(windows)]
+fn consent(client_file: &Path) -> Result<(), String> {
+    use custody_wire::Client;
+    use custody_wire::transport::NamedPipeConnector;
+    use djinn_custodian::helper::{self, ClientFile, Retry};
+    use djinn_custodian::platform::hello::Hello;
+    detach_own_console();
+    let file = ClientFile::read(client_file)?;
+    let hello = Hello::new()?;
+    let connector = NamedPipeConnector::new(&file.endpoint);
+    let stop = std::sync::atomic::AtomicBool::new(false);
+    helper::run(&|| Client::open(&connector, &file.server), &hello, &stop, Retry::default(), &|text| eprintln!("djinn-custodian consent: {text}"));
+    Ok(())
+}
+
+/// The logon task starts this console program with a console of its own,
+/// which would sit open for the whole session; one started from a shell
+/// keeps the shell's console and its messages.
+#[cfg(windows)]
+fn detach_own_console() {
+    use windows_sys::Win32::System::Console::{FreeConsole, GetConsoleProcessList};
+    let mut attached = [0u32; 2];
+    // SAFETY: a buffer of the length passed; FreeConsole takes nothing.
+    unsafe {
+        if GetConsoleProcessList(attached.as_mut_ptr(), 2) == 1 {
+            FreeConsole();
+        }
+    }
+}
+
+#[cfg(not(windows))]
+fn consent(_: &Path) -> Result<(), String> {
+    Err("the consent helper is the Windows logon helper; this platform's consent is polkit or the signed host".into())
 }
 
 fn hex(bytes: &[u8]) -> String {
