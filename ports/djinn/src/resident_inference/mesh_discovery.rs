@@ -261,7 +261,9 @@ impl StageNetwork {
             tasks: vec![accept, discover],
         })
     }
-    pub(crate) async fn close(mut self) -> Result<(), String> {
+    /// Infallible, so closing the resident Distillery always reaches the
+    /// works' own shutdown after this.
+    pub(crate) async fn close(mut self) {
         for task in &self.tasks {
             task.abort();
         }
@@ -269,7 +271,6 @@ impl StageNetwork {
             let _ = task.await;
         }
         self.host.stage_transport().stop_accepting(&Alpn::new(ALPN));
-        Ok(())
     }
 }
 impl Drop for StageNetwork {
