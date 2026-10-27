@@ -29,8 +29,9 @@ pub mod transport;
 
 pub use client::{Client, ClientError, Observed};
 pub use contract::{
-    Answer, AttestationParts, ClientMessage, Fact, FactCause, Limits, LockReport, Operation,
-    Outcome, Petition, Purpose, ReleasedKey, ServerMessage, Session, Status,
+    Answer, AttestationParts, ClientMessage, CredentialOperation, EpochKeyRequest, Fact,
+    FactCause, Limits, LockReport, Operation, Outcome, PayloadOperation, Petition, Purpose,
+    ReleasedEpochKey, ReleasedKey, ServerMessage, Session, Source, Status,
 };
 pub use peer::{Peer, ServerExpectation, SignedIdentity};
 pub use secret::{Bytes, Secret};

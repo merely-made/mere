@@ -4,35 +4,26 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Real custody-wire import over disposable synthetic credentials.
-#![cfg(feature = "cxf")]
+//! Real custody-wire import over disposable synthetic credentials: Djinn
+//! reads the owner's source file and the custodian, which holds the
+//! credential catalog, parses and commits it (custody isolation plan, H2).
+#![cfg(all(unix, feature = "cxf"))]
 
-use castellan::authority::PersonaeHost;
-use castellan::custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage};
-use castellan::resident::{CastellanResident, CredentialSalts};
+mod custodian_fixture;
+
+use custodian_fixture::{TestCustodian, manage_grants};
+use djinn::custody_host::ResidentCustody;
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::keeper::Keeper;
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
 use graphshell_endpoint::door::custody_client::{CustodyClient, CustodyClientError};
-use graphshell_endpoint::door::identity::VaultProtectionView;
-use personae::{Ed25519Keypair, PersonaId, ProfileId};
+use personae::{PersonaId, ProfileId};
 use serde_json::{Value, json};
 use std::sync::Arc;
 
-fn endpoint() -> String {
-    #[cfg(windows)]
-    {
-        format!(r"\\.\pipe\djinn-cxf-{}", uuid::Uuid::new_v4())
-    }
-    #[cfg(not(windows))]
-    {
-        std::env::temp_dir()
-            .join(format!("djinn-cxf-{}.sock", uuid::Uuid::new_v4()))
-            .display()
-            .to_string()
-    }
-}
+const PASSPHRASE: &str = "synthetic custody wire receipt";
+
 fn command(name: &str, args: Vec<String>) -> CustodyCall {
     CustodyCall::VaultCommand {
         profile: ProfileId("family".into()),
@@ -48,40 +39,15 @@ fn output(answer: CustodyAnswer) -> String {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn preview_commit_and_locked_refusal_use_the_residents_existing_authority() {
-    let dir = tempfile::tempdir().unwrap();
-    let storage = SealedProfileStorage::open_with_key(dir.path().join("vault"), [0x55; 32]);
-    storage
-        .enroll_passphrase(b"synthetic custody wire receipt")
-        .unwrap();
-    let profile = Profile::new(
-        ProfileId("family".into()),
-        "Family",
-        Ed25519Keypair::from_seed([0x45; 32]),
-    );
-    storage.save_profile(&profile).unwrap();
-    let host = Arc::new(PersonaeHost::new(
-        IdentityVault::with_profile(storage, profile),
-        None,
-        VaultProtectionView::OsProtected,
-    ));
-    let salts = CredentialSalts {
-        record: b"cxf-receipt/records",
-        freshness: b"cxf-receipt/freshness",
-    };
-    let resident = CastellanResident::claim_derived(
-        dir.path().join("records"),
-        dir.path().join("freshness"),
-        host.as_ref(),
-        salts,
-    )
-    .unwrap();
-    host.register_lock_holder(resident.lock_holder(salts));
-    let keeper = Arc::new(Keeper::new(Arc::clone(&host)));
-    keeper.attach_credentials(resident.clone()).unwrap();
+async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
+    let custodian = TestCustodian::start(PASSPHRASE, &[("family", [0x45; 32])], manage_grants());
+    let remote = custodian.remote();
+    remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    let keeper = Arc::new(Keeper::new(remote.clone()));
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     djinn::custody::grant(&grants).unwrap();
-    let endpoint = endpoint();
+    let dir = custodian.dir.path();
+    let endpoint = dir.join("app.sock").display().to_string();
     let server_endpoint = endpoint.clone();
     let server = tokio::spawn(async move {
         serve_app_broker(
@@ -104,7 +70,7 @@ async fn preview_commit_and_locked_refusal_use_the_residents_existing_authority(
     }
     let mut client = client.expect("custody broker opens");
     let persona = PersonaId::new();
-    let source = dir.path().join("credentials.cxf");
+    let source = dir.join("credentials.cxf");
     std::fs::write(&source,serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Account","email":"receipt@example.invalid","collections":[],"items":[{"id":"aQ","title":"Imported","credentials":[{"type":"generated-password","password":"synthetic-wire-secret-marker"}]}]}]})).unwrap()).unwrap();
     let preview = output(
         client
@@ -113,10 +79,9 @@ async fn preview_commit_and_locked_refusal_use_the_residents_existing_authority(
             .unwrap(),
     );
     assert!(!preview.contains("synthetic-wire-secret-marker"));
-    assert!(resident.items(persona).list().unwrap().is_empty());
     let preview: Value = serde_json::from_str(&preview).unwrap();
     let hash = preview["source_sha256"].as_str().unwrap().to_string();
-    let choices = dir.path().join("destinations.json");
+    let choices = dir.join("destinations.json");
     std::fs::write(
         &choices,
         serde_json::to_vec(&json!({"YQ":{"persona":persona,"profile":"family"}})).unwrap(),
@@ -144,10 +109,9 @@ async fn preview_commit_and_locked_refusal_use_the_residents_existing_authority(
             .await
             .is_err()
     );
-    assert!(resident.items(persona).list().unwrap().is_empty());
     let receipt = output(
         client
-            .call(command("cxf-import", args(hash)))
+            .call(command("cxf-import", args(hash.clone())))
             .await
             .unwrap(),
     );
@@ -155,15 +119,13 @@ async fn preview_commit_and_locked_refusal_use_the_residents_existing_authority(
     let receipt: Value = serde_json::from_str(&receipt).unwrap();
     assert_eq!(receipt["items"], 1);
     assert_eq!(receipt["delete_plaintext_source"], true);
-    assert_eq!(resident.items(persona).list().unwrap().len(), 1);
-    host.lock_vault().unwrap();
-    assert!(resident.is_locked());
+    remote.lock_vault().unwrap();
     // A nonexistent source proves the Locked path refuses before file I/O.
     assert!(matches!(
         client
             .call(command(
                 "cxf-preview",
-                vec![dir.path().join("absent.cxf").display().to_string()]
+                vec![dir.join("absent.cxf").display().to_string()]
             ))
             .await,
         Err(CustodyClientError::Refused(CustodyRefusal::Locked))

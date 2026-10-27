@@ -1,7 +1,12 @@
 # Custody Isolation and Security Hardening Plan
 
 **Date:** 2026-10-21 (America/New_York).
-**Status (2026-10-26):** H1's portable cut is on main. `djinn-custodian` is a separate process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers (§5.2). Its §5.6 negative controls pass on macOS, where it also runs as a spawned process; Linux and Windows builds type-check. Djinn routes the two H1 consumers through it when one is installed, and Distillery's second vault open is gone. Still gated: the Linux, signed-macOS and Windows receiving runs, and H2 (every other Djinn vault use). Djinn still opens its own vault at start, so no production deployment claims the §1 same-user guarantee yet. Native11's 38/38 and native10's signing-account failure remain the macOS primitive evidence.
+**Status (2026-10-26):** H1 and H2 are on main. `djinn-custodian` is a separate process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers (§5.2). Since H2 it also holds Castellan's resident host, the wallet, the credential catalog and the SSH agent. A production Djinn links no castellan and reaches every vault use through the custodian (§6 H2 inventory).
+- **Stopped and gated:** Hocket adoption is stopped (an identity-format change). The wallet's secret files move into custody only after a public/secret file split.
+- **Evidence:** the tests pass on macOS; Linux and Windows builds type-check.
+- **Production gate:** the Linux and signed-macOS receiving runs and the wallet split. Until those pass, no deployment claims the §1 same-user guarantee.
+
+Native11's 38/38 and native10's signing-account failure remain the macOS primitive evidence.
 **Audit base:** Mere 0261e2602b5b13fcf59dced3ae408c3441c38a71, freshly fetched
 origin/main; Dramatis 7d498c27df8076dacccb74ba4a05f863f9f48c76, the exact Git
 revision in Mere's lockfile. This frozen-source assessment does not qualify
@@ -702,7 +707,7 @@ their fixes can precede a complete split and must be included in H1 acceptance.
 are on main, with the H1 negative controls in CI-runnable tests. Native11
 passes 38/38 synthetic native controls in the separate non-admin GUI account;
 native10 remains a failed control for the signing account. Platform receiving
-runs, the shared worker launcher and H2 remain open.
+runs and the shared worker launcher remain open; H2 is implemented (below).
 
 - [x] Demonstrate signing-authority separation in the synthetic receiving
   account (H1-F1, native11). The exact attacker payload succeeds in the signing
@@ -740,7 +745,8 @@ runs, the shared worker launcher and H2 remain open.
   2026-10-26:** Distillery's second open is removed. `djinn-custodian adopt`
   copies a vault and proves the same identity without touching the source.
   **Open:** retiring the source and its copies transactionally. Djinn's own
-  start and cli opens, `enrollment` and `hocket_adoption` are H2.
+  start and cli opens and `enrollment` moved to the custodian in H2;
+  `hocket_adoption` is stopped there.
 - [x] Implement one root signature and one scoped continuous consumer with
   authenticated IPC, principal/profile policy, independent consent, generation
   binding and bounded framing. The signing consumer is Graphshell's
@@ -763,18 +769,73 @@ cannot pass H1. A failed platform mechanism blocks that protected deployment.
 
 ### H2 — Complete authority and consumer migration
 
-- [ ] Cover every call, named profile/persona, epoch, radio/grant/revoke and
-  terminal command with the operation table.
-- [ ] Migrate SSH, credential catalogs, Knot, payloads, inference, Distillery and
-  transport/door exceptions; remove direct/fallback openings.
-- [ ] Create the tier-2 private-data/blob owner and only the scoped operations
-  needed by its first worker. Run the shared worker baseline for enabled ingress,
-  then compute, then loopback publication, with domain-specific authority tests.
-  Keep inference/training under one GPU/library owner; remove whole BlobStore
-  handoffs. Corpus-isolation claims wait for this boundary.
-- [ ] Qualify trusted authentication helpers and any explicit terminal-unlock
-  exception (T01/T02/T04).
-- [ ] Publish each raw-key exception and peer/rotation consequence.
+**Implemented 2026-10-26; production enablement gated.** Every Djinn vault use now goes through one trait, `ResidentCustody` (`ports/djinn/src/custody_host.rs`).
+- **Production build:** the trait has one implementation, `RemoteHost`, a client of the custodian. Djinn then links no castellan and opens no vault.
+- **Test builds:** Castellan's in-process host remains only under the `in-process-custody` feature, for the test suites and receipt hosts. A build either has that feature or not; nothing falls back to it when a custodian refuses or is gone.
+- **Custodian:** it now hosts Castellan's `PersonaeHost`, the wallet, the credential catalog and the SSH agent.
+
+Releases hand Djinn derived keys only, each checked against the root's attestation. Acts that must not release their key run where the key is: signing, attesting, epochs, payloads, the catalog and SSH.
+
+**Inventory.** Each of Djinn's vault uses, the files that carry it, and what it became. A "derived key" row releases attested, namespaced keys to Djinn; every other row is an act inside custody.
+
+| Consumer | Djinn files | Becomes (§5.6 operation) | Kind |
+|---|---|---|---|
+| Start, terminal and native unlock, lock, status, lock triggers | `bin/djinn.rs`, `startup_vault.rs`, `identity_ui.rs`, `resident_status.rs`, `lock_triggers.rs` | `Status`, `Unlock`, `Lock`; lock facts drive the lock watch | act; the passphrase typed on Djinn's surface crosses once (terminal-unlock exception) |
+| Public read model, roster and profile intents | `keeper.rs`, `custody.rs`, `door/identity_endpoint.rs`, `resident_mere.rs` | `Snapshot`, `Intent`, `HasProfile`, `PublicKey` | act |
+| Graphshell guest delegations (H1) | `custody.rs` | `Sign{Delegation mere.graphshell}` | act |
+| App custody route: release, attest, sign, `AsProfile` | `custody.rs` | `Derive`, `Attest`, `SignDerived`, each with a persona or wallet source and the open or a named profile | derived key or act |
+| Door keys | `keeper.rs`, `door/local_session.rs` | `Derive` of exactly the open profile's two door salts (`djinn-door`), kept through locks | derived key |
+| Distillery mesh author (H1) | `resident.rs`, `resident_distillery.rs` | `Derive` of `mesh-author` and `distillery-personal-mesh` | derived key |
+| Personal sync and pairing | `personal_sync.rs`, `sync/personal_sync_host.rs`, `sync/graph_keys.rs`, `pairing.rs` | `Derive` and `Attest` of the per-graph writer, group-session and prekey salts | derived key |
+| Inference lane and stages | `resident_inference.rs`, `resident_inference/personal.rs` | `Derive`; holders re-derive after each unlock | derived key |
+| Knot epochs | `resident_knot.rs`, `resident.rs` | `EpochKeys` (persona, contexts, device label) | key derived from the epoch; the epoch stays |
+| Station grants and device revocation | `custody.rs` | `StationGrant`, `RevokeDevice` | act |
+| Retained payloads | `custody/payload.rs` | `Payload{Seal, Unseal}` under the open profile and master | act |
+| Credential catalog: quarantine, older imports, review | `keeper/review.rs` | `Credentials{Quarantine, UnassignedImports, AssignImport, Review}` after Djinn's native consent | act |
+| CXF preview and import | `keeper.rs` | `Credentials{CxfPreview, CxfImport}` (Djinn reads the file; the custodian parses) | act |
+| Passphrase change, SSH import, vault commands | `identity_ui.rs`, `custody.rs` | `ChangePassphrase`, `ImportSshKey`, `VaultCommand` | act |
+| SSH agent | `bin/djinn.rs` | served by the custodian on its own socket; per-use approvals are consent petitions | act |
+| Lock holders and the Knot lane | `resident_inference.rs`, `resident_distillery.rs`, `bin/djinn.rs` | holders forget on a lock fact or custodian loss and re-derive through `Derive` on unlock; Knot closes and reopens on the lock watch | derived key |
+| Embedded reservoir | `embedded_reservoir.rs` | the same start as the resident (`open_custody`) | — |
+| Passphrase enrolment | `enrollment.rs` | `djinn-custodian init` and `adopt`; the in-process path remains only for tests | — |
+| Hocket adoption (D13) | `hocket_adoption.rs` | **stopped** (below) | — |
+
+**Stops and gaps, each named rather than worked around:**
+- **Hocket adoption is stopped.** Hocket seals its identity under the desktop user's OS key. The custodian's account cannot open that store, and adopting it in Djinn would reopen a vault in Djinn. Moving it needs Hocket's identity re-enveloped for custody, which is an identity-format change. With a custodian, Djinn refuses the adoption; a test build still adopts in-process.
+- **The wallet is migrated at the operation level, but not at rest.** The custodian performs every wallet act. The wallet's secret files still live in a data root:
+  - the identity seed (a raw 32-byte file under `identity/` on macOS and Linux);
+  - the private epochs;
+  - the device secret.
+
+  The installers point the custodian's `data_root` at its own state directory, so a wallet created there is the custodian's alone. An existing wallet in Djinn's data root is not moved. Djinn and the reservoir read public wallet records (the persona index and the device roster) from the same files, and separating secret from public records is a file-layout change. Until that split, a device with an existing wallet keeps its seed where Djinn's user can read it, and the §1 guarantee does not cover the wallet root.
+- **The credential catalog** is sealed with keys only the custodian derives, so its files are ciphertext to Djinn. On Linux they must move into the custodian's state directory (a copy, no format change). The installer starts the catalog empty.
+- **CXF parsing now runs in the custodian**, because it holds the catalog. Hostile-import isolation (H1's open item) is therefore a custodian-surface item; the 900 KiB cap holds.
+- **Consent per platform:**
+  - Linux: Djinn is a same-user principal there, so every grant it uses prompts polkit once per generation.
+  - macOS: the config has no consent channel, so per-use SSH keys are refused until one is qualified.
+  - Windows: every grant needs consent and none is qualified. The DPAPI vault must be migrated first and there is no agent pipe, so a Windows Djinn with a custodian cannot run its consumers.
+- **The custodian's dependency graph grew.** It now links Castellan's keeper and CXF code, the SSH agent library and a tokio current-thread runtime. Through the wallet it also links `pandect` and `graph-kernel`; H4's dependency review covers them.
+
+**Fixed while migrating:**
+- A profile switch did not move the custodian's reported profile and master, or its `current` grants. Now they follow.
+- A per-use SSH petition approved on the consent channel was refused as invalidated, because it has no requesting session. A denied or expired petition was left to Castellan's timeout. Now an approval signs, and a denial reaches the waiting client at once.
+
+- [x] Cover every call, named profile/persona, epoch, radio/grant/revoke and terminal command with the operation table (the inventory above).
+- [x] Migrate SSH, credential catalogs, Knot, payloads, inference, Distillery and transport/door exceptions; remove direct and fallback openings. Hocket adoption is stopped and the wallet's at-rest move is gated, both above.
+- [ ] Create the tier-2 private-data/blob owner and only the scoped operations needed by its first worker.
+  - Run the shared worker baseline for enabled ingress, then compute, then loopback publication, with domain-specific authority tests.
+  - Keep inference and training under one GPU/library owner; remove whole BlobStore handoffs.
+  - Corpus-isolation claims wait for this boundary.
+- [ ] Qualify trusted authentication helpers and any explicit terminal-unlock exception (T01/T02/T04). The exception is implemented: Djinn's start prompt sends the passphrase once over the checked channel and drops it. Qualification is open.
+- [ ] Publish each raw-key exception and its peer and rotation consequence. The inventory lists every released key; the consequences are open.
+
+**Gate.** H2 is implemented and passes its tests on this Mac (evidence in §8). Production enablement waits on these:
+1. The Linux receiving run, custodian README steps 1–8.
+2. The signed macOS receiving run.
+3. The wallet's public/secret split, and moving an existing wallet and catalog into the custodian's state directory.
+4. On Windows, a consent channel, the DPAPI-to-passphrase migration and an agent pipe; today it only compiles.
+
+Until the first two pass on their hosts, no deployment installs a custodian for daily use.
 
 **Done:** one authority; roots/epochs remain inside. Golden identity/derivation,
 stored content and cold-reopen checks preserve data and public keys. No broad
@@ -888,6 +949,48 @@ copy of those documents here.
   The residue-fix and security-audit worktrees were removed; their receipts
   were never versioned, and this plan and the integration plan keep their
   findings.
+
+- 2026-10-26, H2. The user overrode the H1-only landing: "Go to H2. Tell the
+  session to do the full consumer migration before landing."
+  - Djinn's custody became the `ResidentCustody` trait, with `RemoteHost` as
+    its only production implementation. The resident's start, its CLI and
+    the embedded reservoir reach custody through `open_custody`. A default
+    build links no castellan: `cargo tree -p djinn -e normal -i castellan`
+    prints nothing.
+  - The custodian now hosts `PersonaeHost`, the wallet, the credential
+    catalog and the SSH agent, behind the H2 operations in §6.
+  - Packaging: the `djinn-door` rule, one installed-grant template, and the
+    agent socket in the Linux and macOS units.
+  - Fixed on the way, each with a test:
+    - the custodian's status and `current` grants now follow a profile switch;
+    - an approved per-use SSH petition now signs, and a denied one reaches
+      the waiting client at once;
+    - a lock intent now goes through the lock operation;
+    - every credential store stays bound to its own profile, and CXF imports
+      land in the store claimed at start, as before H2;
+    - `RemoteHost` reads the status on every sync, because an outcome can
+      arrive before its lock fact.
+
+  Evidence on macOS, after merging main:
+  - `custody-wire` 8 tests;
+  - `djinn-custodian` 38 unit tests (9 of them H2) plus 4 process tests;
+  - Djinn's `custodian_client` 8, `quarantine_review` 16 and `cxf_import` 1,
+    each against a real custodian;
+  - the resident end-to-end test `custodian_resident`, run with `--ignored`:
+    a real `djinn` with no vault of its own unlocks and serves from the
+    custodian, `ssh-add` reaches the custodian's agent, a lock and an unlock
+    taken on the custodian reach the resident, and it stops cleanly;
+  - the full requalification after merging main:
+    - the Castellan (306), custodian, wire and testkit suites pass;
+    - Djinn's whole suite passes 336 tests with 20 ignored. The exception is
+      `embedded_reservoir_validation`'s
+      `recorded_situation_and_weather_survive_three_owners_and_refuse_tamper`,
+      which fails the same way on plain main.
+
+  Linux and Windows builds of the custodian type-check. `ring`, which came
+  in with the SSH agent, ran its build script under a stub C compiler for
+  that check, so nothing was linked or run on those OSes. Hocket adoption is stopped, and the wallet's at-rest move is
+  gated (§6 H2).
 
 Documentation verification retains inherited failures rather than calling the
 whole tree clean: the full D2 audit has existing missing judgments and a tracked

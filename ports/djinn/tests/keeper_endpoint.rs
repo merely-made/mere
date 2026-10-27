@@ -28,7 +28,7 @@ use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionSource};
 use personae::{Ed25519Keypair, ProfileId, UnlockTier};
 use ssh_key::{Algorithm, LineEnding};
 
-type Kept = Keeper<InMemoryStorage>;
+type Kept = Keeper;
 
 fn endpoint_with_private_sentinel() -> (IdentityEndpoint<Kept>, String) {
     let mut private =

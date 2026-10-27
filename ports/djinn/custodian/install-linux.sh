@@ -40,6 +40,7 @@ fi
 
 install -D -o root -g root -m 0755 "$binary" /usr/local/libexec/djinn-custodian
 install -o root -g root -m 0644 "$here/packaging/linux/djinn-custodian@.socket" /etc/systemd/system/
+install -o root -g root -m 0644 "$here/packaging/linux/djinn-custodian-agent@.socket" /etc/systemd/system/
 install -o root -g root -m 0644 "$here/packaging/linux/djinn-custodian@.service" /etc/systemd/system/
 
 owners=$(getent passwd | cut -d: -f1 | grep '^djinn-custodian-' | sed 's/^/unix-user:/' | tr '\n' ' ' | sed 's/ $//')
@@ -48,31 +49,28 @@ chmod 0644 /usr/share/polkit-1/actions/com.merely.djinn.custody.policy
 
 install -d -o root -g root -m 0755 /etc/djinn-custodian /etc/djinn-custodian/clients
 state=/var/lib/djinn-custodian/$user
+# Djinn's grants (custody isolation plan, H2 inventory). Djinn is a
+# same-user principal, so each release or act waits for polkit once per
+# unlock, and a guest delegation once per signature.
+grants=$(sed -e 's/@CONSENT@/per-generation/g' -e 's/@SIGN_CONSENT@/per-operation/g' "$here/packaging/djinn-grants.json.in")
 cat > "/etc/djinn-custodian/$user.json" <<EOF
 {
-  "vault": {"directory": "$state/vault"},
+  "vault": {"directory": "$state/vault", "data_root": "$state/data"},
   "owner": {"unix_uid": $uid},
   "consent": "polkit",
   "principals": [
-    {"name": "djinn", "match": {"unix-uid": $uid}, "grants": [
-      {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"},
-      {"operation": "release", "profile": "current",
-       "salts": [{"exact": "mesh-author"}, {"exact": "distillery-personal-mesh"}],
-       "consent": "per-generation"},
-      {"operation": "sign", "profile": "current",
-       "purpose": {"purpose": "delegation", "audience": "mere.graphshell"},
-       "consent": "per-operation"}
-    ]}
+    {"name": "djinn", "match": {"unix-uid": $uid}, "grants": $grants}
   ]
 }
 EOF
 chmod 0644 "/etc/djinn-custodian/$user.json"
 cat > "/etc/djinn-custodian/clients/$uid.json" <<EOF
-{"endpoint": "/run/djinn-custodian/$user.sock", "server": {"unix_uids": [0]}}
+{"endpoint": "/run/djinn-custodian/$user.sock", "server": {"unix_uids": [0]},
+ "agent": "/run/djinn-custodian/$user-agent.sock"}
 EOF
 chmod 0644 "/etc/djinn-custodian/clients/$uid.json"
 
-install -d -o "$account" -g "$account" -m 0700 /var/lib/djinn-custodian "$state" "$state/vault"
+install -d -o "$account" -g "$account" -m 0700 /var/lib/djinn-custodian "$state" "$state/vault" "$state/data"
 chown root:root /var/lib/djinn-custodian
 chmod 0755 /var/lib/djinn-custodian
 if [ -n "$adopt_from" ]; then
@@ -89,7 +87,9 @@ if [ -n "$adopt_from" ]; then
     rm -rf "$import"
 fi
 
-systemd-analyze verify "/etc/systemd/system/djinn-custodian@.service" "/etc/systemd/system/djinn-custodian@.socket" || true
+systemd-analyze verify "/etc/systemd/system/djinn-custodian@.service" "/etc/systemd/system/djinn-custodian@.socket" \
+    "/etc/systemd/system/djinn-custodian-agent@.socket" || true
 systemctl daemon-reload
-systemctl enable --now "djinn-custodian@$user.socket"
-echo "Installed. Djinn finds the custodian through /etc/djinn-custodian/clients/$uid.json."
+systemctl enable --now "djinn-custodian@$user.socket" "djinn-custodian-agent@$user.socket"
+echo "Installed. Djinn finds the custodian through /etc/djinn-custodian/clients/$uid.json;"
+echo "point SSH_AUTH_SOCK at /run/djinn-custodian/$user-agent.sock."

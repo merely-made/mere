@@ -166,11 +166,11 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
     let dir = tempfile::tempdir().unwrap();
     let host = lockable(dir.path());
     let subject = host.master_public_key().to_bytes();
-    let kept = djinn::keeper::Keeper::new(Arc::clone(&host))
+    let kept = djinn::keeper::Keeper::new(host.clone())
         .door_keys()
         .unwrap();
     host.lock_vault().unwrap();
-    let again = djinn::keeper::Keeper::new(Arc::clone(&host))
+    let again = djinn::keeper::Keeper::new(host.clone())
         .door_keys()
         .expect("the lock leaves the door keys in place");
     assert!(Arc::ptr_eq(&kept, &again));
@@ -223,7 +223,7 @@ fn a_door_never_used_before_the_lock_stays_closed() {
     let host = lockable(dir.path());
     host.lock_vault().unwrap();
     assert!(matches!(
-        djinn::keeper::Keeper::new(Arc::clone(&host)).door_keys(),
+        djinn::keeper::Keeper::new(host.clone()).door_keys(),
         Err(IdentityError::Locked)
     ));
 }
@@ -285,7 +285,7 @@ async fn the_native_unlock_command_carries_nothing_and_runs_the_residents_prompt
         Arc::new(move || {
             *prompts.lock().unwrap() += 1;
             match apply_native_identity_action(
-                &host,
+                host.as_ref(),
                 &Scripted::passphrase(PASSPHRASE),
                 NativeIdentityAction::UnlockVault,
             ) {
@@ -380,7 +380,7 @@ fn the_native_unlock_asks_the_os_first_then_the_passphrase() {
 
     let wrong = Scripted::passphrase(b"wrong");
     assert_eq!(
-        apply_native_identity_action(&host, &wrong, NativeIdentityAction::UnlockVault),
+        apply_native_identity_action(host.as_ref(), &wrong, NativeIdentityAction::UnlockVault),
         NativeIdentityResult::Rejected {
             reason: NativeIdentityFailure::IncorrectPassphrase
         }
@@ -390,21 +390,21 @@ fn the_native_unlock_asks_the_os_first_then_the_passphrase() {
 
     let cancelled = Scripted::cancelling();
     assert_eq!(
-        apply_native_identity_action(&host, &cancelled, NativeIdentityAction::UnlockVault),
+        apply_native_identity_action(host.as_ref(), &cancelled, NativeIdentityAction::UnlockVault),
         NativeIdentityResult::Cancelled
     );
     assert!(host.is_locked());
 
     let right = Scripted::passphrase(PASSPHRASE);
     assert_eq!(
-        apply_native_identity_action(&host, &right, NativeIdentityAction::UnlockVault),
+        apply_native_identity_action(host.as_ref(), &right, NativeIdentityAction::UnlockVault),
         NativeIdentityResult::UnlockedVault
     );
     assert!(!host.is_locked());
     // Unlocked already: nothing is asked.
     let idle = Scripted::passphrase(PASSPHRASE);
     assert_eq!(
-        apply_native_identity_action(&host, &idle, NativeIdentityAction::UnlockVault),
+        apply_native_identity_action(host.as_ref(), &idle, NativeIdentityAction::UnlockVault),
         NativeIdentityResult::UnlockedVault
     );
     assert!(idle.asked.lock().unwrap().is_empty());

@@ -15,8 +15,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use armillary::lifecycle::{CloseAction, CloseFuture, close_all};
-use castellan::lock::VaultLockHolder;
-use castellan::resident::{CastellanResident, CredentialSalts};
+#[cfg(feature = "inference")]
+use crate::custody_host::LockHolder as VaultLockHolder;
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use personae::{IdentityProvider, ProfileId};
@@ -31,23 +31,17 @@ use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
 use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
 use crate::settings::{KnotResidentSettings, OwnerSettings, ReservoirLaneSettings};
 
-const CASTELLAN_RECORD_SALT: &[u8] = b"mere.djinn/castellan/records/v1";
-const CASTELLAN_FRESHNESS_SALT: &[u8] = b"mere.djinn/castellan/freshness/v1";
-const CASTELLAN_SALTS: CredentialSalts = CredentialSalts {
-    record: CASTELLAN_RECORD_SALT,
-    freshness: CASTELLAN_FRESHNESS_SALT,
-};
-
 /// Process-wide services retained by one Djinn run.
 pub struct DjinnResident {
-    credentials: CastellanResident,
+    /// The profile whose keys seal this run's inference data.
+    #[cfg_attr(not(feature = "inference"), allow(dead_code))]
     credential_profile: ProfileId,
     blobs: ResidentBlobCustody,
     site: Arc<tokio::sync::Mutex<PublishedSiteService>>,
     knot: Option<ResidentKnot>,
     /// What reopens the Knot lane after a lock: its settings and the gate
     /// its route was registered over (vault lock ruling 48).
-    knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate)>,
+    knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate, crate::resident_knot::KnotEpochs)>,
     distillery: Option<ResidentDistillery>,
     /// The inference lane, which borrows the Distillery lane's model
     /// library and so closes before it.
@@ -62,42 +56,68 @@ pub struct DjinnResident {
     reservoir: ReservoirLane,
 }
 
-/// Where the Distillery works' mesh author comes from: reviewed derived
-/// keys for exactly [`distillery::InstalledAuthority::release_salts`],
-/// never a second vault open (custody isolation plan, §5.1).
+/// Where the resident's custody-derived material comes from (custody
+/// isolation plan, H2): Distillery's mesh author (exactly
+/// [`distillery::InstalledAuthority::release_salts`]) and Knot's epoch keys.
+/// Never a second vault open, and never a wallet read in this process.
 #[derive(Clone)]
 pub enum MeshAuthor {
-    /// Captured from the resident's own open identity.
+    /// Captured from the identity the resident was given. Knot's epochs are
+    /// read in this process only in a build with `in-process-custody`.
     Resident,
-    /// Released by the independently launched custodian (H1).
-    Custodian(Arc<crate::custodian::CustodianLink>),
+    /// Custody itself: the independently launched custodian in production.
+    Custody(Arc<dyn crate::custody_host::ResidentCustody>),
 }
 
 impl MeshAuthor {
     fn identity<P: IdentityProvider + ?Sized>(
         &self,
         resident: &P,
-        profile: &ProfileId,
+        _profile: &ProfileId,
     ) -> Result<(Arc<dyn IdentityProvider>, String), String> {
         let salts = distillery::InstalledAuthority::release_salts();
-        match self {
-            Self::Resident => personae::RetainedKeys::capture(resident, &salts)
-                .map(|keys| {
-                    (
-                        Arc::new(keys) as Arc<dyn IdentityProvider>,
-                        "derived keys captured from the resident's open vault".to_string(),
-                    )
-                })
-                .map_err(|error| format!("capture the Distillery mesh author: {error}")),
+        let (captured, protection) = match self {
+            Self::Resident => (personae::RetainedKeys::capture(resident, &salts), "derived keys captured from the resident's identity"),
             // A consent petition may wait on the owner; the worker is lent.
-            Self::Custodian(link) => tokio::task::block_in_place(|| link.release(&profile.0, &salts))
-                .map(|keys| {
-                    (
-                        Arc::new(keys) as Arc<dyn IdentityProvider>,
-                        "derived keys released by the custodian".to_string(),
-                    )
+            Self::Custody(host) => (
+                tokio::task::block_in_place(|| personae::RetainedKeys::capture(host.as_ref(), &salts)),
+                "derived keys released by the custodian",
+            ),
+        };
+        captured
+            .map(|keys| (Arc::new(keys) as Arc<dyn IdentityProvider>, protection.to_string()))
+            .map_err(|error| format!("the Distillery mesh author: {error}"))
+    }
+
+    /// Knot's personal vault keys, each derivation checked against the
+    /// default release policy where they are made.
+    fn knot_epochs(&self, data_root: &Path) -> crate::resident_knot::KnotEpochs {
+        let policy = crate::custody::ReleasePolicy::default();
+        match self {
+            Self::Custody(host) => {
+                let host = Arc::clone(host);
+                let root = data_root.to_path_buf();
+                Arc::new(move |persona, label, requests| {
+                    if requests.iter().any(|request| !policy.allows_epoch(request)) {
+                        return Err("an epoch derivation outside the release policy".into());
+                    }
+                    host.epoch_keys(&root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
                 })
-                .map_err(|refusal| format!("the custodian's Distillery mesh author: {refusal:?}")),
+            },
+            Self::Resident => {
+                #[cfg(feature = "in-process-custody")]
+                {
+                    let root = data_root.to_path_buf();
+                    Arc::new(move |persona, label, requests| {
+                        crate::custody::epoch_keys(&policy, &root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
+                    })
+                }
+                #[cfg(not(feature = "in-process-custody"))]
+                {
+                    let _ = (data_root, policy);
+                    Arc::new(|_, _, _| Err("Knot's epoch keys come from custody; this resident was given none".into()))
+                }
+            },
         }
     }
 }
@@ -143,7 +163,6 @@ impl DjinnResident {
     ) -> Result<Self, String> {
         // Before anything opens, so a refusal leaves nothing to unwind.
         resident_inference::validate(&owner)?;
-        let credentials = claim_credentials(identity, data_root, profile)?;
         let blobs = ResidentBlobCustody::open(data_root, &owner.content).await?;
         let site_root = published_site_profile_root(data_root, profile);
         let site_scope = published_site_profile_scope(profile);
@@ -161,7 +180,7 @@ impl DjinnResident {
         };
         let knot_settings = owner.knot.clone();
         let knot = match owner.knot {
-            Some(settings) => match ResidentKnot::open(data_root, settings, blobs.clone()).await {
+            Some(settings) => match ResidentKnot::open(data_root, settings, blobs.clone(), mesh_author.knot_epochs(data_root)).await {
                 Ok(knot) => Some(knot),
                 Err(open_error) => {
                     drop(site);
@@ -236,11 +255,10 @@ impl DjinnResident {
             None => None,
         };
         let knot_reopen = match (&knot, knot_settings) {
-            (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate())),
+            (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate(), mesh_author.knot_epochs(data_root))),
             _ => None,
         };
         Ok(Self {
-            credentials,
             credential_profile: profile.clone(),
             blobs,
             site,
@@ -406,18 +424,6 @@ impl DjinnResident {
         Ok(Some(ResidentReservoir::route()))
     }
 
-    /// The single record authority behind every Castellan view or adapter.
-    pub fn credentials(&self) -> &CastellanResident {
-        &self.credentials
-    }
-
-    /// The hook the resident host's lock runs (vault lock ruling 1): it
-    /// drops the credential keys and re-derives them on unlock.
-    pub fn credential_lock_holder(&self) -> Arc<dyn VaultLockHolder> {
-        self.credentials
-            .lock_holder_for_profile(CASTELLAN_SALTS, self.credential_profile.clone())
-    }
-
     #[cfg(feature = "inference")]
     pub fn inference_lock_holder(&self) -> Option<Arc<dyn VaultLockHolder>> {
         self.inference
@@ -433,21 +439,6 @@ impl DjinnResident {
             .and_then(|works| works.inference_stage_lock_holder())
     }
 
-    /// Claim existing credential stores under each persisted persona's own keys.
-    /// This runs during startup, before the app door opens. Empty roots are not
-    /// created for profiles which have never kept credentials.
-    pub fn credential_stores<S: castellan::custody::IdentityStorage + 'static>(
-        &self,
-        host: &castellan::authority::PersonaeHost<S>,
-        data_root: &Path,
-    ) -> Result<std::collections::BTreeMap<ProfileId, CastellanResident>, String> {
-        claim_existing_credential_stores(
-            host,
-            data_root,
-            &self.credential_profile,
-            &self.credentials,
-        )
-    }
 
     /// Clone the shared physical blob custody for a composed product lane.
     pub fn blobs(&self) -> ResidentBlobCustody {
@@ -545,11 +536,11 @@ impl DjinnResident {
         if self.knot.is_some() {
             return Ok(false);
         }
-        let Some((data_root, settings, gate)) = self.knot_reopen.clone() else {
+        let Some((data_root, settings, gate, epochs)) = self.knot_reopen.clone() else {
             return Ok(false);
         };
         let knot =
-            ResidentKnot::open_through(&data_root, settings, self.blobs.clone(), gate).await?;
+            ResidentKnot::open_through(&data_root, settings, self.blobs.clone(), gate, epochs).await?;
         self.knot = Some(knot);
         Ok(true)
     }
@@ -603,7 +594,6 @@ impl DjinnResident {
     pub async fn shutdown(self) -> Result<(), String> {
         let Self {
             credential_profile: _,
-            credentials,
             blobs,
             site,
             knot,
@@ -682,7 +672,6 @@ impl DjinnResident {
                 "Castellan",
                 Box::new(move || {
                     Box::pin(async move {
-                        drop(credentials);
                         Ok(())
                     }) as CloseFuture<'static>
                 }) as CloseAction<'static>,
@@ -709,51 +698,6 @@ impl DjinnResident {
     }
 }
 
-fn claim_credentials<P: IdentityProvider + ?Sized>(
-    identity: &P,
-    data_root: &Path,
-    profile: &ProfileId,
-) -> Result<CastellanResident, String> {
-    let profile_root = credential_profile_root(data_root, profile);
-    CastellanResident::claim_derived(
-        profile_root.join("records"),
-        profile_root.join("freshness"),
-        identity,
-        CASTELLAN_SALTS,
-    )
-    .map_err(|error| format!("claim Castellan resident: {error}"))
-}
-
-fn claim_existing_credential_stores<S: castellan::custody::IdentityStorage + 'static>(
-    host: &castellan::authority::PersonaeHost<S>,
-    data_root: &Path,
-    primary: &ProfileId,
-    credentials: &CastellanResident,
-) -> Result<std::collections::BTreeMap<ProfileId, CastellanResident>, String> {
-    let mut stores = std::collections::BTreeMap::from([(primary.clone(), credentials.clone())]);
-    for profile in host
-        .snapshot()
-        .map_err(|_| "credential persona roster is unavailable".to_string())?
-        .profiles
-    {
-        let id = ProfileId(profile.id);
-        if stores.contains_key(&id)
-            || !credential_profile_root(data_root, &id)
-                .join("records")
-                .is_dir()
-        {
-            continue;
-        }
-        let provider = host
-            .profile_provider(&id)
-            .map_err(|_| "credential store persona is unavailable".to_string())?;
-        let store = claim_credentials(&provider, data_root, &id)?;
-        host.register_lock_holder(store.lock_holder_for_profile(CASTELLAN_SALTS, id.clone()));
-        stores.insert(id, store);
-    }
-    Ok(stores)
-}
-
 fn published_site_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     data_root
         .join("published-sites")
@@ -764,59 +708,12 @@ fn published_site_profile_scope(profile: &ProfileId) -> BlobScope {
     BlobScope::new(*blake3::hash(profile.0.as_bytes()).as_bytes())
 }
 
-fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
-    let segment: String = profile
-        .0
-        .chars()
-        .map(|character| {
-            if character.is_ascii_alphanumeric() || matches!(character, '-' | '_') {
-                character
-            } else {
-                '_'
-            }
-        })
-        .collect();
-    data_root
-        .join("castellan")
-        .join("profiles")
-        .join(if segment.is_empty() {
-            "default"
-        } else {
-            &segment
-        })
-}
-
 #[cfg(test)]
 mod tests {
-    use personae::{IdentityProvider, InMemoryProvider, ProfileId};
+    use personae::ProfileId;
 
-    use super::{
-        credential_profile_root, published_site_profile_root, published_site_profile_scope,
-    };
+    use super::{published_site_profile_root, published_site_profile_scope};
 
-    #[test]
-    fn credential_roots_stay_profile_scoped_and_below_the_data_root() {
-        let root = std::path::Path::new("resident-data");
-        assert_eq!(
-            credential_profile_root(root, &ProfileId("work/../burner".into())),
-            root.join("castellan/profiles/work____burner")
-        );
-    }
-
-    #[test]
-    fn credential_derivation_is_distinct_from_the_personal_sync_identity() {
-        let identity = InMemoryProvider::from_seed([0x91; 32]);
-        assert_ne!(
-            identity
-                .derive_keypair(super::CASTELLAN_RECORD_SALT)
-                .unwrap()
-                .to_seed(),
-            identity
-                .derive_keypair(super::CASTELLAN_FRESHNESS_SALT)
-                .unwrap()
-                .to_seed()
-        );
-    }
     #[test]
     fn published_sites_keep_profile_paths_and_custody_scopes_distinct() {
         let root = std::path::Path::new("resident-data");
@@ -831,78 +728,5 @@ mod tests {
             published_site_profile_scope(&personal)
         );
         assert!(published_site_profile_root(root, &work).starts_with(root));
-    }
-    #[test]
-    fn startup_discovers_original_store_after_selected_persona_changes() {
-        use castellan::{
-            authority::PersonaeHost,
-            custody::{
-                IdentityStorage, IdentityVault, Profile, SealedProfileStorage, UnlockMethod,
-            },
-        };
-        use graphshell_endpoint::door::identity::VaultProtectionView;
-        use personae::{Ed25519Keypair, PersonaId};
-        let root = tempfile::tempdir().unwrap();
-        let storage = SealedProfileStorage::open_with_key(root.path().join("vault"), [0x53; 32]);
-        storage
-            .enroll_passphrase(b"synthetic startup receipt")
-            .unwrap();
-        let family = Profile::new(
-            ProfileId("family".into()),
-            "Family",
-            Ed25519Keypair::from_seed([0x43; 32]),
-        );
-        let work = Profile::new(
-            ProfileId("work".into()),
-            "Work",
-            Ed25519Keypair::from_seed([0x44; 32]),
-        );
-        storage.save_profile(&family).unwrap();
-        storage.save_profile(&work).unwrap();
-        let host = PersonaeHost::new(
-            IdentityVault::with_profile(storage, family),
-            None,
-            VaultProtectionView::Passphrase,
-        );
-        let original =
-            super::claim_credentials(&host, root.path(), &ProfileId("family".into())).unwrap();
-        let namespace = PersonaId::new();
-        original
-            .bind_profile(namespace, &ProfileId("family".into()))
-            .unwrap();
-        drop(original);
-        host.switch_profile(dramatis::intents::SwitchProfileIntentV1 {
-            profile: "work".into(),
-        })
-        .unwrap();
-        let current =
-            super::claim_credentials(&host, root.path(), &ProfileId("work".into())).unwrap();
-        host.register_lock_holder(
-            current.lock_holder_for_profile(super::CASTELLAN_SALTS, ProfileId("work".into())),
-        );
-        let stores = super::claim_existing_credential_stores(
-            &host,
-            root.path(),
-            &ProfileId("work".into()),
-            &current,
-        )
-        .unwrap();
-        assert_eq!(stores.len(), 2);
-        host.lock_vault().unwrap();
-        host.unlock_vault(UnlockMethod::Passphrase(b"synthetic startup receipt"))
-            .unwrap();
-        assert_eq!(host.current_profile_id(), ProfileId("work".into()));
-        assert_eq!(
-            stores[&ProfileId("family".into())]
-                .profile_personas(&ProfileId("family".into()))
-                .unwrap(),
-            vec![namespace]
-        );
-        assert!(
-            stores[&ProfileId("work".into())]
-                .profile_personas(&ProfileId("family".into()))
-                .unwrap()
-                .is_empty()
-        );
     }
 }

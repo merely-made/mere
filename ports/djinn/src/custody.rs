@@ -24,20 +24,18 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use castellan::custody::IdentityStorage;
 use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
 use graphshell_endpoint::door::app_admission::AppId;
+#[cfg(feature = "in-process-custody")]
+use graphshell_endpoint::door::custody::ReleasedEpochKey;
 use graphshell_endpoint::door::custody::{
-    CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey,
-    ReleasedKey, ResidentStatus, StationGrantRequest,
+    CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ResidentStatus,
 };
-use pandect::DeviceId;
-use pandect::station_grant::{SitedStationGrant, SitedStationGrantRequest};
-use personae::{Ed25519Keypair, IdentityError, IdentityProvider, InMemoryProvider, ProfileId};
-use zeroize::Zeroizing;
+use personae::ProfileId;
 
+use crate::custody_host::VaultOutput;
 use crate::keeper::Keeper;
 pub(crate) mod payload;
 
@@ -292,8 +290,8 @@ impl ReleasePolicy {
 }
 
 /// Answer one custody call for `app`.
-pub(crate) async fn answer<S: IdentityStorage + 'static>(
-    keeper: Arc<Keeper<S>>,
+pub(crate) async fn answer(
+    keeper: Arc<Keeper>,
     app: AppId,
     call: CustodyCall,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
@@ -303,7 +301,7 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         && !keeper.is_locked()
     {
         // D13: Hocket's own record joins custody before Hocket asks who it is.
-        if let Err(error) = crate::hocket_adoption::adopt(keeper.host()) {
+        if let Err(error) = keeper.host().adopt_hocket() {
             tracing::warn!(%error, "Hocket's identity was not adopted");
         }
     }
@@ -410,10 +408,8 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
                     .host()
                     .vault_command(&profile, &command, &args)
                     .map(|output| match output {
-                        castellan::authority::VaultCommandOutput::Text(text) => {
-                            CustodyAnswer::VaultOutput { text }
-                        },
-                        castellan::authority::VaultCommandOutput::Enrollment {
+                        VaultOutput::Text(text) => CustodyAnswer::VaultOutput { text },
+                        VaultOutput::Enrollment {
                             target,
                             script,
                             confirmation,
@@ -422,10 +418,6 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
                             script,
                             confirmation,
                         },
-                    })
-                    .map_err(|error| match error {
-                        castellan::authority::IdentityIntentError::Locked => CustodyRefusal::Locked,
-                        other => refused(other),
                     })
             })
             .await
@@ -458,20 +450,14 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
         },
         CustodyCall::Release { source, salts } => {
             unlocked(&keeper)?;
-            let root = root(&keeper, source)?;
-            release(keeper.policy(), &app, source, root.provider(), salts)
+            release(&keeper, &app, source, None, salts).await
         },
         CustodyCall::Attest { source, salt } => {
             if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
-            attest(
-                keeper.policy(),
-                source,
-                root(&keeper, source)?.provider(),
-                &salt,
-            )
+            attest(&keeper, source, None, salt).await
         },
         CustodyCall::Sign {
             source,
@@ -481,59 +467,38 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
-            // H1: a Graphshell guest delegation is signed inside the
-            // custodian, which checks the statement and asks its own consent.
-            if source == KeySource::Persona
-                && crate::custodian::is_graphshell_delegation(&salt)
-                && let Some(link) = keeper.custodian().cloned()
-            {
-                if !keeper.policy().allows_act(source, &salt) {
-                    return Err(CustodyRefusal::NotReleasable);
-                }
-                let profile = keeper.current_profile_id().0;
-                return tokio::task::spawn_blocking(move || {
-                    link.sign_delegation(&profile, crate::custodian::GRAPHSHELL_AUDIENCE, &salt, &message)
-                        .map(|(public_key, signature)| CustodyAnswer::Signature {
-                            public_key,
-                            signature: signature.to_vec(),
-                        })
-                })
-                .await
-                .map_err(failed)?;
-            }
             unlocked(&keeper)?;
-            sign(
-                keeper.policy(),
-                source,
-                root(&keeper, source)?.provider(),
-                &salt,
-                &message,
-            )
+            sign(&keeper, source, None, salt, message).await
         },
         CustodyCall::AsProfile { profile, inner } => {
             unlocked(&keeper)?;
-            let persona = keeper.profile_provider(&profile).map_err(identity)?;
             let source = KeySource::Persona;
             match *inner {
                 CustodyCall::Status => {
                     let mut status = status(&keeper)?;
-                    status.persona_public_key = Some(persona.master_public_key().to_bytes());
+                    let host = Arc::clone(keeper.host());
+                    let named = profile.clone();
+                    status.persona_public_key = Some(
+                        tokio::task::spawn_blocking(move || host.root_public_key(source, Some(&named)))
+                            .await
+                            .map_err(failed)??,
+                    );
                     status.profile = Some(profile);
                     Ok(CustodyAnswer::Status(status))
                 },
                 CustodyCall::Release {
                     source: KeySource::Persona,
                     salts,
-                } => release(keeper.policy(), &app, source, &persona, salts),
+                } => release(&keeper, &app, source, Some(profile), salts).await,
                 CustodyCall::Attest {
                     source: KeySource::Persona,
                     salt,
-                } => attest(keeper.policy(), source, &persona, &salt),
+                } => attest(&keeper, source, Some(profile), salt).await,
                 CustodyCall::Sign {
                     source: KeySource::Persona,
                     salt,
                     message,
-                } => sign(keeper.policy(), source, &persona, &salt, &message),
+                } => sign(&keeper, source, Some(profile), salt, message).await,
                 _ => Err(CustodyRefusal::Refused {
                     reason: "only a status, or a persona release, attestation or signature, answers as a named persona".into(),
                 }),
@@ -544,18 +509,21 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             issuer_public_key,
         } => {
             unlocked(&keeper)?;
-            issue_station_grant(&keeper, request, issuer_public_key)
+            let root = keeper.wallet_root().map(Path::to_path_buf).unwrap_or_default();
+            let host = Arc::clone(keeper.host());
+            tokio::task::spawn_blocking(move || host.station_grant(&root, &request, issuer_public_key))
+                .await
+                .map_err(failed)?
                 .map(CustodyAnswer::StationGrant)
         },
         CustodyCall::RevokeDevice { device_id } => {
             unlocked(&keeper)?;
-            let root = keeper.wallet_root().ok_or(CustodyRefusal::NoWallet)?;
-            castellan::custody::wallet::revoke_remote_auth_device(
-                root,
-                DeviceId::from_uuid(device_id),
-            )
-            .map(CustodyAnswer::Revoked)
-            .map_err(failed)
+            let root = keeper.wallet_root().map(Path::to_path_buf).unwrap_or_default();
+            let host = Arc::clone(keeper.host());
+            tokio::task::spawn_blocking(move || host.revoke_device(&root, device_id))
+                .await
+                .map_err(failed)?
+                .map(CustodyAnswer::Revoked)
         },
         CustodyCall::ReleaseEpochKeys {
             persona,
@@ -563,14 +531,16 @@ pub(crate) async fn answer<S: IdentityStorage + 'static>(
             keys,
         } => {
             unlocked(&keeper)?;
-            let root = keeper.wallet_root().ok_or(CustodyRefusal::NoWallet)?;
-            let released = epoch_keys(
-                keeper.policy(),
-                root,
-                personae::PersonaId::from_uuid(persona),
-                device_label.as_deref(),
-                &keys,
-            )?;
+            if keys.is_empty() || keys.iter().any(|request| !keeper.policy().allows_epoch(request)) {
+                return Err(CustodyRefusal::NotReleasable);
+            }
+            let root = keeper.wallet_root().map(Path::to_path_buf).unwrap_or_default();
+            let host = Arc::clone(keeper.host());
+            let released = tokio::task::spawn_blocking(move || {
+                host.epoch_keys(&root, personae::PersonaId::from_uuid(persona), device_label.as_deref(), &keys)
+            })
+            .await
+            .map_err(failed)??;
             tracing::info!(app = %app, keys = released.len(), "released epoch keys");
             Ok(CustodyAnswer::EpochKeys { keys: released })
         },
@@ -618,8 +588,10 @@ fn call_name(call: &CustodyCall) -> &'static str {
 }
 
 /// Derive `requests` from `persona`'s current private epoch under
-/// `data_root`, each checked against `policy`. djinn's own resident Knot
-/// opens through this too, so the route and the resident cannot drift.
+/// `data_root`, each checked against `policy`, in this process. Only builds
+/// with `in-process-custody` (tests and receipt hosts) have it; a resident
+/// with a custodian asks [`ResidentCustody::epoch_keys`].
+#[cfg(feature = "in-process-custody")]
 pub fn epoch_keys(
     policy: &ReleasePolicy,
     data_root: &Path,
@@ -630,65 +602,25 @@ pub fn epoch_keys(
     if requests.is_empty() || requests.iter().any(|request| !policy.allows_epoch(request)) {
         return Err(CustodyRefusal::NotReleasable);
     }
-    if pandect::wallet_store::load_persona_wallet(data_root, persona)
-        .map_err(failed)?
-        .is_none()
-    {
-        return Err(CustodyRefusal::NoPersona);
-    }
-    // A wallet whose epoch will not load is sealed and locked: pending (D12).
-    let epoch = castellan::custody::wallet::load_current_private_epoch(data_root, persona)
-        .map_err(failed)?
-        .ok_or(CustodyRefusal::Locked)?;
-    let epoch = Zeroizing::new(epoch.epoch_secret);
-    let device_root = match requests.iter().any(|request| request.device_bound) {
-        true => Some(device_root(data_root, device_label)?),
-        false => None,
-    };
-    Ok(requests
+    let wire: Vec<_> = requests
         .iter()
-        .map(|request| {
-            let mut material = Zeroizing::new(Vec::with_capacity(64));
-            material.extend_from_slice(&epoch);
-            if let (true, Some(device_root)) = (request.device_bound, device_root.as_ref()) {
-                material.extend_from_slice(device_root);
-            }
-            let derived = Zeroizing::new(blake3::derive_key(&request.context, &material));
-            let key = match request.public_only {
-                true => Ed25519Keypair::from_seed(*derived).public_key().to_bytes(),
-                false => *derived,
-            };
-            ReleasedEpochKey {
-                request: request.clone(),
-                key,
-            }
+        .map(|r| custody_wire::EpochKeyRequest {
+            context: r.context.clone(),
+            device_bound: r.device_bound,
+            public_only: r.public_only,
         })
-        .collect())
-}
-
-/// This machine's public device key: distinct per device, so a
-/// device-bound derivation differs between a persona's devices. A label
-/// mints the identity when there is none.
-fn device_root(data_root: &Path, label: Option<&str>) -> Result<[u8; 32], CustodyRefusal> {
-    let identity = match label {
-        Some(label) => castellan::custody::wallet::ensure_local_device_identity(data_root, label)
-            .map(Some)
-            .map_err(failed)?,
-        None => {
-            castellan::custody::wallet::load_local_device_identity(data_root).map_err(failed)?
-        },
-    };
-    match identity {
-        Some(identity) => Ok(Ed25519Keypair::from_seed(identity.device_seed)
-            .public_key()
-            .to_bytes()),
-        None if pandect::wallet_store::local_device_identity_path(data_root).is_file() => {
-            Err(CustodyRefusal::Locked)
-        },
-        None => Err(CustodyRefusal::Refused {
-            reason: "this device has no identity yet".into(),
-        }),
-    }
+        .collect();
+    let keys = djinn_custodian::wallet::epoch_keys(data_root, persona, device_label, &wire)
+        .map_err(|r| crate::custody_host::refusal(r.0))?;
+    keys.into_iter()
+        .zip(requests)
+        .map(|(key, request)| {
+            Ok(ReleasedEpochKey {
+                request: request.clone(),
+                key: <[u8; 32]>::try_from(key.key.expose()).map_err(failed)?,
+            })
+        })
+        .collect()
 }
 
 fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
@@ -696,113 +628,73 @@ fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
         || app == &AppId::new("signalman")
 }
 
-/// Release `salts`' keys from `root`, each with its attestation (D11).
-fn release(
-    policy: &ReleasePolicy,
+/// Release `salts`' keys from `source`, each with its attestation (D11).
+async fn release(
+    keeper: &Keeper,
     app: &AppId,
     source: KeySource,
-    root: &dyn IdentityProvider,
+    profile: Option<ProfileId>,
     salts: Vec<Vec<u8>>,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
-    if salts.is_empty()
-        || salts
-            .iter()
-            .any(|salt| !policy.allows(source, salt) || !radio_station_app_allowed(app, salt))
-    {
+    if !releasable(keeper.policy(), app, source, &salts) {
         return Err(CustodyRefusal::NotReleasable);
     }
-    let master = root.master_public_key().to_bytes();
-    let keys = salts
-        .into_iter()
-        .map(|salt| {
-            Ok(ReleasedKey {
-                seed: root.derive_keypair(&salt).map_err(identity)?.to_seed(),
-                attestation: root.attest_derived_key(&salt).map_err(identity)?,
-                salt,
-            })
-        })
-        .collect::<Result<Vec<_>, CustodyRefusal>>()?;
+    let host = Arc::clone(keeper.host());
+    let (master, keys) = tokio::task::spawn_blocking(move || host.release(source, profile.as_ref(), &salts))
+        .await
+        .map_err(failed)??;
     tracing::info!(app = %app, keys = keys.len(), ?source, "released derived keys");
     Ok(CustodyAnswer::Released { master, keys })
 }
 
-/// The master's attestation of `salt`'s key; no key crosses.
-fn attest(
-    policy: &ReleasePolicy,
-    source: KeySource,
-    root: &dyn IdentityProvider,
-    salt: &[u8],
-) -> Result<CustodyAnswer, CustodyRefusal> {
-    if !policy.allows_act(source, salt) {
-        return Err(CustodyRefusal::NotReleasable);
-    }
-    root.attest_derived_key(salt)
-        .map(CustodyAnswer::Attestation)
-        .map_err(identity)
+/// Whether every one of `salts` may leave for `app` under `policy`.
+fn releasable(policy: &ReleasePolicy, app: &AppId, source: KeySource, salts: &[Vec<u8>]) -> bool {
+    !salts.is_empty()
+        && salts
+            .iter()
+            .all(|salt| policy.allows(source, salt) && radio_station_app_allowed(app, salt))
 }
 
-/// Sign `message` with `salt`'s key, here; only the signature crosses.
-fn sign(
-    policy: &ReleasePolicy,
-    source: KeySource,
-    root: &dyn IdentityProvider,
-    salt: &[u8],
-    message: &[u8],
-) -> Result<CustodyAnswer, CustodyRefusal> {
-    if !policy.allows_act(source, salt) {
+/// The root's attestation of `salt`'s key; no key crosses.
+async fn attest(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if !keeper.policy().allows_act(source, &salt) {
         return Err(CustodyRefusal::NotReleasable);
     }
-    let key = root.derive_keypair(salt).map_err(identity)?;
-    let signature = key.sign(message);
-    Ok(CustodyAnswer::Signature {
-        public_key: key.public_key().to_bytes(),
-        signature: signature.to_bytes().to_vec(),
+    let host = Arc::clone(keeper.host());
+    tokio::task::spawn_blocking(move || host.attest(source, profile.as_ref(), &salt))
+        .await
+        .map_err(failed)?
+        .map(CustodyAnswer::Attestation)
+}
+
+/// Sign `message` with `salt`'s key where the key is; only the signature
+/// crosses. A Graphshell guest delegation is decoded and checked for its
+/// audience, issuer and scope key before it is signed.
+async fn sign(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>, message: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if !keeper.policy().allows_act(source, &salt) {
+        return Err(CustodyRefusal::NotReleasable);
+    }
+    let host = Arc::clone(keeper.host());
+    let delegation = source == KeySource::Persona && profile.is_none() && crate::custodian::is_graphshell_delegation(&salt);
+    let (public_key, signature) = tokio::task::spawn_blocking(move || match delegation {
+        true => host.sign_delegation(crate::custodian::GRAPHSHELL_AUDIENCE, &salt, &message),
+        false => host.sign(source, profile.as_ref(), &salt, &message),
     })
+    .await
+    .map_err(failed)??;
+    Ok(CustodyAnswer::Signature { public_key, signature })
 }
 
 /// Refuse while the vault is Locked: every act and release waits for an
-/// unlock on djinn's own surface (D12).
-fn unlocked<S: IdentityStorage + 'static>(keeper: &Keeper<S>) -> Result<(), CustodyRefusal> {
+/// unlock (D12).
+fn unlocked(keeper: &Keeper) -> Result<(), CustodyRefusal> {
     match keeper.is_locked() {
         true => Err(CustodyRefusal::Locked),
         false => Ok(()),
     }
 }
 
-/// The root a call derives from: the persona in use, or the wallet's seed.
-enum Root<'a, S: IdentityStorage + 'static> {
-    Persona(&'a castellan::authority::PersonaeHost<S>),
-    Wallet(InMemoryProvider),
-}
-
-impl<S: IdentityStorage + 'static> Root<'_, S> {
-    fn provider(&self) -> &dyn IdentityProvider {
-        match self {
-            Self::Persona(host) => *host,
-            Self::Wallet(wallet) => wallet,
-        }
-    }
-}
-
-fn root<S: IdentityStorage + 'static>(
-    keeper: &Keeper<S>,
-    source: KeySource,
-) -> Result<Root<'_, S>, CustodyRefusal> {
-    match source {
-        KeySource::Persona => Ok(Root::Persona(keeper.host().as_ref())),
-        KeySource::Wallet => {
-            let root = keeper.wallet_root().ok_or(CustodyRefusal::NoWallet)?;
-            let seed = castellan::custody::wallet::load_identity_seed(root)
-                .map_err(failed)?
-                .ok_or(CustodyRefusal::NoWallet)?;
-            Ok(Root::Wallet(InMemoryProvider::from_seed(seed)))
-        },
-    }
-}
-
-fn status<S: IdentityStorage + 'static>(
-    keeper: &Keeper<S>,
-) -> Result<ResidentStatus, CustodyRefusal> {
+fn status(keeper: &Keeper) -> Result<ResidentStatus, CustodyRefusal> {
     let snapshot = keeper.snapshot().map_err(failed)?;
     let lock = snapshot.vault.lock;
     let profile = snapshot
@@ -814,10 +706,7 @@ fn status<S: IdentityStorage + 'static>(
         VaultLockView::Locked => (None, None),
         VaultLockView::Unlocked => (
             Some(keeper.master_public_key().to_bytes()),
-            match root(keeper, KeySource::Wallet) {
-                Ok(wallet) => Some(wallet.provider().master_public_key().to_bytes()),
-                Err(_) => None,
-            },
+            keeper.host().root_public_key(KeySource::Wallet, None).ok(),
         ),
     };
     Ok(ResidentStatus {
@@ -832,7 +721,7 @@ fn status<S: IdentityStorage + 'static>(
 
 /// The roster from the keeper's public view, which it keeps while Locked
 /// (vault lock ruling 11), so a picker draws either way.
-fn roster<S: IdentityStorage + 'static>(keeper: &Keeper<S>) -> Result<Roster, CustodyRefusal> {
+fn roster(keeper: &Keeper) -> Result<Roster, CustodyRefusal> {
     let snapshot = keeper.snapshot().map_err(failed)?;
     let mut entries: Vec<RosterEntry> = snapshot
         .profiles
@@ -850,52 +739,12 @@ fn roster<S: IdentityStorage + 'static>(keeper: &Keeper<S>) -> Result<Roster, Cu
         .find(|entry| entry.chosen)
         .map(|entry| entry.id.clone())
         .or_else(graphshell_endpoint::door::profile::env_profile)
-        .unwrap_or_else(|| ProfileId(castellan::custody::roster::DEFAULT_PROFILE.into()));
+        .unwrap_or_else(|| ProfileId("default".into()));
     Ok(Roster {
         entries,
         chosen,
         description: format!("{:?}", snapshot.vault.protection),
     })
-}
-
-fn issue_station_grant<S: IdentityStorage + 'static>(
-    keeper: &Keeper<S>,
-    request: StationGrantRequest,
-    issuer_public_key: [u8; 32],
-) -> Result<personae::carry::DeviceGrantSet, CustodyRefusal> {
-    let root = keeper.wallet_root().ok_or(CustodyRefusal::NoWallet)?;
-    let wallet_public_key = self::root(keeper, KeySource::Wallet)?
-        .provider()
-        .master_public_key()
-        .to_bytes();
-    let request = SitedStationGrantRequest::new(
-        DeviceId::from_uuid(request.device_id),
-        request.station_ed25519_public_key,
-        request.label,
-        request.issued_at_ms,
-        request.expires_at_ms,
-    )
-    .map_err(|error| CustodyRefusal::Refused {
-        reason: error.to_string(),
-    })?;
-    let grant = SitedStationGrant::issue_with(
-        root,
-        issuer_public_key,
-        wallet_public_key,
-        request,
-        |spec| castellan::custody::wallet::issue_remote_auth_device_grant(root, spec),
-    )
-    .map_err(|error| CustodyRefusal::Refused {
-        reason: error.to_string(),
-    })?;
-    Ok(grant.signed().clone())
-}
-
-fn identity(error: IdentityError) -> CustodyRefusal {
-    match error {
-        IdentityError::Locked => CustodyRefusal::Locked,
-        other => failed(other),
-    }
 }
 
 fn refused(error: impl std::fmt::Display) -> CustodyRefusal {
@@ -910,6 +759,7 @@ fn failed(error: impl std::fmt::Display) -> CustodyRefusal {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -921,53 +771,16 @@ mod tests {
             personae::tucket::station_salt(&[4; 16], "ridge").unwrap(),
             personae::sennet::station_salt(&[4; 16], "ridge").unwrap(),
         ] {
-            let root = personae::InMemoryProvider::from_seed([19; 32]);
             let signalman = AppId::new("signalman");
-            assert!(
-                release(
-                    &policy,
-                    &signalman,
-                    KeySource::Wallet,
-                    &root,
-                    vec![salt.clone()]
-                )
-                .is_ok()
-            );
-            assert!(
-                release(
-                    &policy,
-                    &AppId::new("turnstone"),
-                    KeySource::Wallet,
-                    &root,
-                    vec![salt.clone()]
-                )
-                .is_err()
-            );
-            assert!(
-                release(
-                    &policy,
-                    &signalman,
-                    KeySource::Persona,
-                    &root,
-                    vec![salt.clone()]
-                )
-                .is_err()
-            );
+            assert!(releasable(&policy, &signalman, KeySource::Wallet, &[salt.clone()]));
+            assert!(!releasable(&policy, &AppId::new("turnstone"), KeySource::Wallet, &[salt.clone()]));
+            assert!(!releasable(&policy, &signalman, KeySource::Persona, &[salt.clone()]));
             for forbidden in [
                 vec![],
                 b"mere.signalman.tucket.station/v1/".to_vec(),
                 [salt.as_slice(), b"x"].concat(),
             ] {
-                assert!(
-                    release(
-                        &policy,
-                        &signalman,
-                        KeySource::Wallet,
-                        &root,
-                        vec![salt.clone(), forbidden]
-                    )
-                    .is_err()
-                );
+                assert!(!releasable(&policy, &signalman, KeySource::Wallet, &[salt.clone(), forbidden]));
             }
         }
     }

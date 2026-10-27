@@ -11,6 +11,7 @@ SocketMode=0600
 DirectoryMode=0755
 Accept=no
 RemoveOnStop=yes
+FileDescriptorName=custody
 
 [Install]
 WantedBy=sockets.target

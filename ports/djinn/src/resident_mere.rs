@@ -149,15 +149,13 @@ impl MereRoutes {
     }
     /// Resolve newly introduced profile subjects through the actual owner vault.
     /// Existing admitted references continue to replay after profile deletion.
-    pub fn with_profile_subject_authority<S: castellan::custody::IdentityStorage + 'static>(
+    pub fn with_profile_subject_authority(
         mut self,
-        host: Arc<castellan::authority::PersonaeHost<S>>,
+        host: Arc<dyn crate::custody_host::ResidentCustody>,
     ) -> Self {
         Arc::get_mut(&mut self.inner)
             .expect("set profile authority before serving routes")
-            .profile_lookup = Some(Arc::new(move |id| {
-            Ok(host.with_profile_authority(id, || true).unwrap_or(false))
-        }));
+            .profile_lookup = Some(Arc::new(move |id| Ok(!host.is_locked() && host.has_profile(id).unwrap_or(false))));
         self
     }
 

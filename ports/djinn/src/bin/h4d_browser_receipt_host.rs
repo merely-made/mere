@@ -90,7 +90,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut writer = tokio::io::stdout();
     let summary = serve_identity_native_messages(
         &identity,
-        Arc::new(Keeper::new(Arc::clone(&host))),
+        Arc::new(Keeper::new(host.clone())),
         launcher,
         &mut reader,
         &mut writer,

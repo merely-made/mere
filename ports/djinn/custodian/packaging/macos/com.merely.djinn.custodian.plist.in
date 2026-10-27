@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- Djinn's custodian as a launchd agent in the owner's GUI session
-     (custody isolation plan §5.2). launchd creates the 0600 socket and the
-     custodian adopts it by the name "custody". Both ends identify each
-     other by code signature through the socket's audit token, so a
-     same-user process that squats the path can deny service but cannot
-     pass as either side. install-macos.sh fills the placeholders and
-     installs this root-owned. -->
+     (custody isolation plan §5.2). launchd creates the 0600 sockets and the
+     custodian adopts them by name: "custody" for Djinn, "agent" for SSH
+     clients (H2). Both ends of the custody socket identify each other by
+     code signature through its audit token, so a same-user process that
+     squats the path can deny service but cannot pass as either side.
+     install-macos.sh fills the placeholders and installs this root-owned. -->
 <plist version="1.0">
 <dict>
   <key>Label</key>
@@ -25,6 +25,13 @@
     <dict>
       <key>SockPathName</key>
       <string>@HOME@/Library/Application Support/Merely/djinn-custodian/custody.sock</string>
+      <key>SockPathMode</key>
+      <integer>384</integer>
+    </dict>
+    <key>agent</key>
+    <dict>
+      <key>SockPathName</key>
+      <string>@HOME@/Library/Application Support/Merely/djinn-custodian/agent.sock</string>
       <key>SockPathMode</key>
       <integer>384</integer>
     </dict>

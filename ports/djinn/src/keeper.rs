@@ -4,69 +4,58 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The keeper djinn hands Graphshell's doors: castellan's `PersonaeHost`
-//! behind graphshell's `ResidentIdentity` (dramatis repo plan, D15).
+//! The keeper djinn hands Graphshell's doors: custody behind graphshell's
+//! `ResidentIdentity` (dramatis repo plan, D15).
 //!
 //! Graphshell names no castellan; its identity endpoint, browser door,
 //! application door and custody route are generic over `ResidentIdentity`,
 //! and this is the one implementation. It also answers the custody route
 //! ([`crate::custody`]): the calls every application makes instead of opening
-//! a vault, storage or wallet (D5), with root-level acts kept here and only
-//! namespaced derived keys released (D11).
+//! a vault, storage or wallet (D5). Custody itself is
+//! [`ResidentCustody`]: the independently launched custodian in a
+//! production build, so root-level acts happen there and only namespaced
+//! derived keys reach this process (custody isolation plan, H2).
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::custody_host::{CredentialCall, ResidentCustody};
 use crate::door::browser_carrier::{NativeIdentityAction, NativeIdentityResult};
 use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::{DoorIdentity, door_salts};
 use crate::door::resident_identity::{CustodyFuture, ResidentIdentity};
-use castellan::authority::PersonaeHost;
-use castellan::custody::IdentityStorage;
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::custody::CustodyCall;
 use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
-use personae::{IdentityError, IdentityProvider, RetainedKeys};
+use personae::{IdentityError, RetainedKeys};
 
 use crate::custody::ReleasePolicy;
 mod review;
-mod signing;
+#[cfg(feature = "in-process-custody")]
+pub(crate) mod signing;
 use crate::identity_ui::{
     NativeIdentityUi, UnavailableNativeIdentityUi, apply_native_identity_action,
 };
 
-/// castellan's resident authority, as Graphshell's doors and the custody
-/// route see it.
-pub struct Keeper<S: IdentityStorage + 'static> {
-    host: Arc<PersonaeHost<S>>,
+/// Custody, as Graphshell's doors and the custody route see it.
+pub struct Keeper {
+    host: Arc<dyn ResidentCustody>,
     ui: Arc<dyn NativeIdentityUi>,
     wallet_root: Option<PathBuf>,
     policy: ReleasePolicy,
     payload_custody: std::sync::OnceLock<crate::custody::payload::PayloadCustody>,
-    custodian: std::sync::OnceLock<Arc<crate::custodian::CustodianLink>>,
-    #[cfg(feature = "cxf")]
-    credentials: std::sync::OnceLock<castellan::resident::CastellanResident>,
-    #[cfg(feature = "cxf")]
-    credential_stores: std::sync::OnceLock<
-        std::collections::BTreeMap<personae::ProfileId, castellan::resident::CastellanResident>,
-    >,
 }
 
-impl<S: IdentityStorage + 'static> Keeper<S> {
+impl Keeper {
     /// Keep `host`, with no native surface, no wallet and the default
     /// release policy.
-    pub fn new(host: Arc<PersonaeHost<S>>) -> Self {
+    pub fn new(host: Arc<dyn ResidentCustody>) -> Self {
         Self {
             host,
             ui: Arc::new(UnavailableNativeIdentityUi),
             wallet_root: None,
             policy: ReleasePolicy::default(),
             payload_custody: std::sync::OnceLock::new(),
-            custodian: std::sync::OnceLock::new(),
-            #[cfg(feature = "cxf")]
-            credentials: std::sync::OnceLock::new(),
-            #[cfg(feature = "cxf")]
-            credential_stores: std::sync::OnceLock::new(),
         }
     }
 
@@ -77,7 +66,7 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     }
 
     /// The wallet root grants and stations are issued from (D8, D17): the
-    /// same carry root the host was composed with.
+    /// same carry root the host was composed with. A custodian uses its own.
     pub fn with_wallet_root(mut self, root: Option<PathBuf>) -> Self {
         self.wallet_root = root;
         self
@@ -104,65 +93,19 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
         self.payload_custody.get()
     }
 
-    /// Route the H1 consumers through the independently launched custodian.
-    /// Configure before serving; there is no fallback once attached.
-    pub fn attach_custodian(&self, link: Arc<crate::custodian::CustodianLink>) -> Result<(), String> {
-        self.custodian
-            .set(link)
-            .map_err(|_| "a custodian is already attached".into())
-    }
-
-    pub(crate) fn custodian(&self) -> Option<&Arc<crate::custodian::CustodianLink>> {
-        self.custodian.get()
-    }
-
     /// Replace which salts may be released (D11).
     pub fn with_release_policy(mut self, policy: ReleasePolicy) -> Self {
         self.policy = policy;
         self
     }
 
-    /// The authority itself, for the resident's own composition.
-    pub fn host(&self) -> &Arc<PersonaeHost<S>> {
+    /// Custody itself, for the resident's own composition.
+    pub fn host(&self) -> &Arc<dyn ResidentCustody> {
         &self.host
     }
 
-    /// Attach the resident's existing, lock-bound credential authority.
-    #[cfg(feature = "cxf")]
-    pub fn attach_credentials(
-        &self,
-        credentials: castellan::resident::CastellanResident,
-    ) -> Result<(), String> {
-        let profile = self.host.current_profile_id();
-        self.attach_credential_stores(
-            profile.clone(),
-            std::collections::BTreeMap::from([(profile, credentials)]),
-        )
-    }
-
-    /// Attach the startup catalog before serving the app door. Each store keeps
-    /// its original key persona; CXF commands retain the primary resident store.
-    #[cfg(feature = "cxf")]
-    pub fn attach_credential_stores(
-        &self,
-        primary: personae::ProfileId,
-        stores: std::collections::BTreeMap<
-            personae::ProfileId,
-            castellan::resident::CastellanResident,
-        >,
-    ) -> Result<(), String> {
-        let initial = stores
-            .get(&primary)
-            .ok_or("primary credential store is unavailable")?
-            .clone();
-        self.credential_stores
-            .set(stores)
-            .map_err(|_| "credential authority already attached".to_string())?;
-        self.credentials
-            .set(initial)
-            .map_err(|_| "credential authority already attached".into())
-    }
-    /// Execute owner-only CXF commands without opening another vault.
+    /// Owner-only CXF commands: the source is read here and parsed and
+    /// committed by the custodian, which holds the credential catalog.
     #[cfg(feature = "cxf")]
     pub(crate) fn cxf_command(&self, command: &str, args: &[String]) -> Result<String, String> {
         if self.host.is_locked() {
@@ -170,12 +113,16 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
         }
         let source = args.first().ok_or("CXF command requires a source file")?;
         let bytes = std::fs::read(source).map_err(|_| "cannot read CXF source file")?;
-        let import = castellan::cxf::Import::read(bytes).map_err(|error| error.to_string())?;
+        let refused = |r: graphshell_endpoint::door::custody::CustodyRefusal| match r {
+            graphshell_endpoint::door::custody::CustodyRefusal::Refused { reason } => reason,
+            other => format!("{other:?}"),
+        };
         if command == "cxf-preview" {
             if args.len() != 1 {
                 return Err("usage: cxf-preview <source.cxf>".into());
             }
-            return serde_json::to_string_pretty(import.preview())
+            let preview = self.host.credentials(CredentialCall::CxfPreview(bytes)).map_err(refused)?;
+            return serde_json::to_string_pretty(&preview)
                 .map(|s| format!("{s}\n"))
                 .map_err(|_| "cannot encode CXF preview".into());
         }
@@ -184,27 +131,20 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
                 "usage: cxf-import <source.cxf> <destinations.json> <preview-sha256>".into(),
             );
         }
-        if args[2] != import.preview().source_sha256 {
-            return Err("CXF source changed; preview it again".into());
-        }
         let choices = std::fs::read(&args[1]).map_err(|_| "cannot read destination choices")?;
-        let destinations =
+        let destinations: serde_json::Value =
             serde_json::from_slice(&choices).map_err(|_| "invalid destination choices")?;
-        let resident = self
-            .credentials
-            .get()
-            .ok_or("credential authority is unavailable")?;
-        match import.commit(destinations, resident, self.host.as_ref()) {
-            Ok(receipt) => serde_json::to_string_pretty(&receipt)
-                .map(|s| format!("{s}\n"))
-                .map_err(|_| "cannot encode CXF receipt".into()),
-            Err(failure) => Err(format!(
-                "{}\n{}",
-                failure.reason,
-                serde_json::to_string_pretty(&failure.receipt)
-                    .map_err(|_| "cannot encode partial CXF receipt")?
-            )),
-        }
+        let receipt = self
+            .host
+            .credentials(CredentialCall::CxfImport {
+                source: bytes,
+                destinations,
+                preview_sha256: args[2].clone(),
+            })
+            .map_err(refused)?;
+        serde_json::to_string_pretty(&receipt)
+            .map(|s| format!("{s}\n"))
+            .map_err(|_| "cannot encode CXF receipt".into())
     }
 
     pub(crate) fn wallet_root(&self) -> Option<&Path> {
@@ -216,40 +156,38 @@ impl<S: IdentityStorage + 'static> Keeper<S> {
     }
 }
 
-impl<S: IdentityStorage + 'static> std::ops::Deref for Keeper<S> {
-    type Target = PersonaeHost<S>;
+impl std::ops::Deref for Keeper {
+    type Target = dyn ResidentCustody;
 
-    fn deref(&self) -> &PersonaeHost<S> {
-        &self.host
+    fn deref(&self) -> &dyn ResidentCustody {
+        self.host.as_ref()
     }
 }
 
-impl<S: IdentityStorage + 'static> DoorIdentity for Keeper<S> {
+impl DoorIdentity for Keeper {
     fn door_keys(&self) -> Result<Arc<RetainedKeys>, IdentityError> {
         self.host
             .retained_keys(&door_salts(self.host.master_public_key().to_bytes()))
     }
 }
 
-impl<S: IdentityStorage + 'static> IdentityAuthority for Keeper<S> {
+impl IdentityAuthority for Keeper {
     fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
         self.host.snapshot()
     }
 
     fn apply_intent(&self, intent: &str, payload: &[u8]) -> Result<(), String> {
-        if signing::is_signing_decision(intent) {
-            return signing::confirm(&self.host, self.ui.as_ref(), intent, payload);
+        use dramatis::intents::{SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT};
+        if matches!(intent, SIGNING_APPROVE_IDLE_INTENT | SIGNING_APPROVE_ONCE_INTENT | SIGNING_DENY_INTENT) {
+            return self.host.confirm_signing(self.ui.as_ref(), intent, payload);
         }
-        self.host
-            .apply_intent(intent, payload)
-            .map(|_| ())
-            .map_err(|error| error.to_string())
+        self.host.apply_intent(intent, payload)
     }
 }
 
-impl<S: IdentityStorage + 'static> ResidentIdentity for Keeper<S> {
+impl ResidentIdentity for Keeper {
     fn native_action(&self, action: NativeIdentityAction) -> NativeIdentityResult {
-        apply_native_identity_action(&self.host, self.ui.as_ref(), action)
+        apply_native_identity_action(self.host.as_ref(), self.ui.as_ref(), action)
     }
 
     fn custody(self: Arc<Self>, app: AppId, call: CustodyCall) -> CustodyFuture {

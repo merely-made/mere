@@ -3,13 +3,9 @@
 
 //! Retained-content seal operations under stable custody/profile authority.
 use crate::keeper::Keeper;
-use castellan::custody::IdentityStorage;
-use eidetic::{Hash, PayloadSealer};
 use graphshell_endpoint::door::app_admission::AppId;
 use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyRefusal};
-use graphshell_endpoint::door::custody_payload::{
-    PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult,
-};
+use graphshell_endpoint::door::custody_payload::PayloadRequest;
 use personae::{PersonaId, ProfileId};
 use std::path::PathBuf;
 
@@ -19,8 +15,8 @@ pub(crate) struct PayloadCustody {
     pub root: PathBuf,
 }
 
-pub(super) fn answer<S: IdentityStorage + 'static>(
-    keeper: &Keeper<S>,
+pub(super) fn answer(
+    keeper: &Keeper,
     app: &AppId,
     request: PayloadRequest,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
@@ -44,46 +40,6 @@ pub(super) fn answer<S: IdentityStorage + 'static>(
         &request.master,
     ))
     .map_err(super::failed)?;
-    keeper
-        .host()
-        .with_current_profile_authority(&request.profile, &request.master, || {
-            let result = match request.operation {
-                PayloadOperation::Seal { bytes } => {
-                    let sealer = castellan::custody::wallet::epoch_sealer_for_persona(
-                        &binding.root,
-                        binding.persona,
-                    )
-                    .map_err(super::failed)?
-                    .ok_or(CustodyRefusal::Locked)?
-                    .with_scope(scope.clone());
-                    let (bytes, marker) = sealer
-                        .seal(&request.content_hash, &bytes.0)
-                        .map_err(super::failed)?;
-                    PayloadResult::Sealed {
-                        bytes: PayloadBytes(bytes),
-                        marker,
-                    }
-                },
-                PayloadOperation::Unseal { bytes, marker } => {
-                    let bytes = castellan::custody::wallet::unseal_persona_payload(
-                        &binding.root,
-                        binding.persona,
-                        &request.content_hash,
-                        &scope,
-                        &marker,
-                        &bytes.0,
-                    )
-                    .map_err(super::failed)?
-                    .ok_or(CustodyRefusal::Locked)?;
-                    if Hash::of(&bytes) != request.content_hash {
-                        return Err(super::refused("unsealed retained payload hash differs"));
-                    }
-                    PayloadResult::Clear {
-                        bytes: PayloadBytes(bytes),
-                    }
-                },
-            };
-            Ok(CustodyAnswer::Payload { result })
-        })
-        .map_err(super::identity)?
+    let result = keeper.host().payload(&binding.root, binding.persona, request, scope)?;
+    Ok(CustodyAnswer::Payload { result })
 }

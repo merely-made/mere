@@ -4,8 +4,15 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! How the resident opens its vault without the environment (vault lock
-//! rulings 42 and 62 to 66).
+//! How the resident reaches its custody without the environment (vault lock
+//! rulings 42 and 62 to 66; custody isolation plan, H2).
+//!
+//! With an installed custodian (every production build), the resident opens
+//! no vault: [`open_custody`] connects to the custodian and, while it is
+//! locked, asks for the passphrase on the same native box or terminal and
+//! sends it once over the checked channel. Builds with
+//! `in-process-custody` (tests and receipt hosts) keep the in-process open
+//! below when no custodian is installed.
 //!
 //! A passphrase vault starts locked: the resident asks before it builds any
 //! storage key, profile, door or lane (ruling 66), first in a native box and
@@ -18,13 +25,18 @@
 //! environment is never read (ruling 7).
 
 use std::path::Path;
+use std::sync::Arc;
 use std::time::Duration;
 
+#[cfg(feature = "in-process-custody")]
 use castellan::custody::bootstrap::{self, OpenedStorage, PASSPHRASE_VAULT_FILE, Unlock};
+#[cfg(feature = "in-process-custody")]
 use castellan::custody::{
     AUTO_UNLOCK_ROOT_FILE, IdentityStorage, OsPresence, SealedProfileStorage, UnlockMethod,
 };
 use zeroize::Zeroizing;
+
+use crate::custody_host::ResidentCustody;
 
 /// Which vault a start opens.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -39,6 +51,7 @@ pub enum VaultChoice {
 /// already holds one, or when a passphrase was handed over and no OS-rooted
 /// vault is there yet; else the OS's (whose persisted lock a handed-over
 /// passphrase then answers).
+#[cfg(feature = "in-process-custody")]
 pub fn choose(vault_dir: &Path, passphrase_given: bool) -> VaultChoice {
     let os_root = cfg!(windows);
     let os_vault = vault_dir.join(AUTO_UNLOCK_ROOT_FILE).exists();
@@ -94,6 +107,7 @@ pub trait Prompt {
 
     /// The OS's own check of the user (Windows Hello), where this source
     /// offers one; `None` when unavailable, cancelled or not verified.
+    #[cfg(feature = "in-process-custody")]
     fn presence(&mut self) -> Option<OsPresence> {
         None
     }
@@ -106,6 +120,7 @@ pub struct NativeOrTerminal<U> {
 }
 
 impl<U: crate::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
+    #[cfg(feature = "in-process-custody")]
     fn presence(&mut self) -> Option<OsPresence> {
         self.native.verify_presence().ok().flatten()
     }
@@ -126,9 +141,8 @@ impl<U: crate::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
     }
 }
 
-/// The opened vault, and the passphrase that opened it, kept only until the
-/// start hands it once to an installed custodian (custody isolation plan,
-/// H1). Nothing opens this vault a second time from it.
+/// The opened vault, in a build with `in-process-custody`.
+#[cfg(feature = "in-process-custody")]
 pub struct Started {
     /// The opened storage.
     pub opened: OpenedStorage,
@@ -137,11 +151,12 @@ pub struct Started {
     passphrase: Option<Zeroizing<Vec<u8>>>,
 }
 
+#[cfg(feature = "in-process-custody")]
 impl Started {
-    /// The storage, the choice, and the passphrase for an installed
-    /// custodian's unlock; whoever drops it drops the last copy.
-    pub fn into_parts(self) -> (OpenedStorage, VaultChoice, Option<Zeroizing<Vec<u8>>>) {
-        (self.opened, self.choice, self.passphrase)
+    /// The storage and the choice; the passphrase is dropped with this.
+    pub fn into_parts(self) -> (OpenedStorage, VaultChoice) {
+        drop(self.passphrase);
+        (self.opened, self.choice)
     }
 }
 
@@ -162,8 +177,9 @@ pub fn backoff(misses: u32) -> Duration {
     Duration::from_secs((1u64 << misses.min(5)).min(30))
 }
 
-/// Open the vault for a start. A passphrase vault waits on `prompt`; `sleep`
-/// is the backoff (injected for tests).
+/// Open the vault for a start, in this process. A passphrase vault waits on
+/// `prompt`; `sleep` is the backoff (injected for tests).
+#[cfg(feature = "in-process-custody")]
 pub fn open(
     vault_dir: &Path,
     choice: VaultChoice,
@@ -259,6 +275,7 @@ pub fn open(
 /// An OS-rooted vault whose lock persisted: open it locked and wait for a
 /// user act, Hello once and then the passphrase box, before anything else
 /// exists (rulings 5, 76). The marker clears with the unlock.
+#[cfg(feature = "in-process-custody")]
 fn open_under_persisted_lock(
     vault_dir: &Path,
     prompt: &mut dyn Prompt,
@@ -322,6 +339,128 @@ fn open_under_persisted_lock(
     })
 }
 
+/// Custody for a start: the installed custodian, waited on until it holds an
+/// unlocked identity; else, in a build with `in-process-custody`, the vault
+/// opened here. Without either the start fails: nothing falls back.
+pub fn open_custody(
+    vault_dir: &Path,
+    profile: Option<&personae::ProfileId>,
+    data_root: Option<std::path::PathBuf>,
+    passphrase_given: bool,
+    prompt: &mut dyn Prompt,
+    waiting: &mut dyn Waiting,
+    sleep: &mut dyn FnMut(Duration),
+) -> Result<OpenedCustody, String> {
+    if let Some(installed) = crate::custodian::InstalledCustodian::load()? {
+        let host = crate::custody_host::remote::RemoteHost::connect(installed)?;
+        unlock_custodian(host.as_ref(), prompt, waiting, sleep)?;
+        let held = host.current_profile_id();
+        if let Some(wanted) = profile
+            && *wanted != held
+        {
+            return Err(format!(
+                "the custodian holds profile {:?}, not {:?}; switch it with the profile intent",
+                held.0, wanted.0
+            ));
+        }
+        return Ok(OpenedCustody {
+            host,
+            protection: dramatis::view::VaultProtectionView::Passphrase,
+            #[cfg(feature = "in-process-custody")]
+            in_process: None,
+        });
+    }
+    #[cfg(feature = "in-process-custody")]
+    {
+        let choice = choose(vault_dir, passphrase_given);
+        let started = open(vault_dir, choice, prompt, waiting, sleep)?;
+        let (opened, choice) = started.into_parts();
+        let profile_id = crate::profile::resolve_selected_profile(&*opened.storage, vault_dir, profile).map_err(|e| e.to_string())?;
+        let (record, created) = bootstrap::load_or_create_profile(&*opened.storage, &profile_id).map_err(|e| e.to_string())?;
+        if created {
+            tracing::warn!(profile = %profile_id.0, "selected profile was created");
+        }
+        let protection = match choice {
+            VaultChoice::Passphrase => dramatis::view::VaultProtectionView::Passphrase,
+            VaultChoice::AutoOs => dramatis::view::VaultProtectionView::OsProtected,
+        };
+        let host = Arc::new(
+            castellan::authority::PersonaeHost::new(castellan::custody::IdentityVault::with_profile(opened.storage, record), data_root, protection)
+                .with_vault_dir(vault_dir.to_path_buf())
+                .with_persisted_lock(vault_dir.to_path_buf()),
+        );
+        return Ok(OpenedCustody {
+            host: host.clone(),
+            protection,
+            in_process: Some(host),
+        });
+    }
+    #[cfg(not(feature = "in-process-custody"))]
+    {
+        let _ = (vault_dir, profile, data_root, passphrase_given);
+        Err(format!(
+            "no custodian is installed (expected {}); install djinn-custodian, which holds the vault",
+            crate::custodian::installed_path().display()
+        ))
+    }
+}
+
+/// Custody a start reached.
+pub struct OpenedCustody {
+    pub host: Arc<dyn ResidentCustody>,
+    /// How the vault is protected: a custodian's is always a passphrase vault.
+    pub protection: dramatis::view::VaultProtectionView,
+    /// Castellan's host itself, when the vault was opened in this process (a
+    /// test or receipt build); it serves the SSH agent there. A custodian
+    /// serves its own.
+    #[cfg(feature = "in-process-custody")]
+    pub in_process: Option<Arc<castellan::authority::PersonaeHost<Box<dyn IdentityStorage>>>>,
+}
+
+/// Wait until the custodian holds an unlocked identity, asking for its
+/// passphrase while it is locked. A cancel asks again after a backoff; a
+/// refusal says why and asks again.
+pub fn unlock_custodian(
+    host: &dyn ResidentCustody,
+    prompt: &mut dyn Prompt,
+    waiting: &mut dyn Waiting,
+    sleep: &mut dyn FnMut(Duration),
+) -> Result<(), String> {
+    if !host.is_locked() {
+        return Ok(());
+    }
+    waiting.emit("waiting-for-unlock", serde_json::json!({ "custodian": true }));
+    let mut misses = 0u32;
+    let mut retry: Option<String> = None;
+    loop {
+        let passphrase = match prompt.ask(&Ask::Unlock { retry: retry.take() })? {
+            Answer::Passphrase(passphrase) if passphrase.is_empty() => {
+                retry = Some("An empty passphrase is not accepted.".into());
+                continue;
+            },
+            Answer::Passphrase(passphrase) => passphrase,
+            Answer::Cancelled => {
+                waiting.emit("unlock-cancelled", serde_json::json!({ "misses": misses }));
+                sleep(backoff(misses));
+                misses += 1;
+                continue;
+            },
+        };
+        let unlocked = host.unlock_with_passphrase(passphrase.as_bytes());
+        drop(passphrase);
+        match unlocked {
+            Ok(()) => {
+                waiting.emit("unlocked-at-start", serde_json::json!({ "custodian": true }));
+                return Ok(());
+            },
+            Err(error) => {
+                waiting.emit("unlock-refused", serde_json::json!({ "reason": error }));
+                retry = Some(format!("The custodian did not unlock ({error})."));
+            },
+        }
+    }
+}
+
 /// One passphrase from standard input, for the harness (ruling 65): one
 /// line, read once, never the environment. Only fd 0 exists everywhere.
 #[cfg(feature = "passphrase-fd")]
@@ -371,7 +510,7 @@ impl Prompt for Given {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "in-process-custody"))]
 mod tests {
     use super::*;
     use std::collections::VecDeque;
@@ -465,9 +604,8 @@ mod tests {
             "only the cancel waits; Argon2 throttles a miss"
         );
         assert!(matches!(prompt.1[1], Ask::Unlock { retry: Some(_) }));
-        let (_, choice, passphrase) = started.into_parts();
+        let (_, choice) = started.into_parts();
         assert_eq!(choice, VaultChoice::Passphrase);
-        assert!(passphrase.is_some(), "kept only for a custodian's unlock");
     }
 
     #[test]
@@ -562,9 +700,8 @@ mod tests {
         castellan::custody::persist_lock(dir.path()).unwrap();
         let mut prompt = script(&[Some("wrong"), None, Some("right")]);
         let (started, events, slept) = start_as(dir.path(), VaultChoice::AutoOs, &mut prompt);
-        let (opened, choice, passphrase) = started.unwrap().into_parts();
+        let (opened, choice) = started.unwrap().into_parts();
         assert_eq!(choice, VaultChoice::AutoOs);
-        assert!(passphrase.is_none());
         assert!(!opened.storage.is_locked());
         assert_eq!(
             events,

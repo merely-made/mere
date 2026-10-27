@@ -23,8 +23,7 @@ use std::time::Duration;
 
 use crate::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use armillary::tasks::ResidentTasks;
-use castellan::authority::PersonaeHost;
-use castellan::custody::IdentityStorage;
+use crate::custody_host::ResidentCustody;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
@@ -184,47 +183,20 @@ impl ReservoirAttachment {
                 let persona =
                     pandect::wallet_store::resolve_persona(&options.shared_root, options.persona)
                         .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
-                let choice = crate::startup_vault::choose(&options.vault_dir, false);
                 let mut quiet = |_: &str, _: serde_json::Value| {};
-                let started = crate::startup_vault::open(
+                // The family identity through custody: the installed
+                // custodian, or the in-process vault in a test build.
+                let opened = crate::startup_vault::open_custody(
                     &options.vault_dir,
-                    choice,
+                    options.profile.as_ref(),
+                    None,
+                    false,
                     prompt,
                     &mut quiet,
                     &mut std::thread::sleep,
                 )
                 .map_err(ReservoirAttachmentError::Embedded)?;
-                let profile_id = crate::profile::resolve_selected_profile(
-                    &*started.opened.storage,
-                    &options.vault_dir,
-                    options.profile.as_ref(),
-                )
-                .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
-                let (profile, _) = castellan::custody::bootstrap::load_or_create_profile(
-                    &*started.opened.storage,
-                    &profile_id,
-                )
-                .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
-                let protection = match choice {
-                    crate::startup_vault::VaultChoice::Passphrase => {
-                        graphshell_endpoint::door::identity::VaultProtectionView::Passphrase
-                    },
-                    crate::startup_vault::VaultChoice::AutoOs => {
-                        graphshell_endpoint::door::identity::VaultProtectionView::OsProtected
-                    },
-                };
-                let host = Arc::new(
-                    PersonaeHost::new(
-                        castellan::custody::IdentityVault::with_profile(
-                            started.opened.storage,
-                            profile,
-                        ),
-                        None,
-                        protection,
-                    )
-                    .with_vault_dir(options.vault_dir.clone())
-                    .with_persisted_lock(options.vault_dir),
-                );
+                let host = opened.host;
                 let attached = ReservoirAttachmentOptions {
                     endpoint: options.endpoint,
                     application: options.application,
@@ -240,14 +212,13 @@ impl ReservoirAttachment {
         }
     }
     /// Attach to Djinn, or compose its reservoir lane if the endpoint is absent.
-    pub async fn open<S, F, Fut>(
+    pub async fn open<F, Fut>(
         options: ReservoirAttachmentOptions,
         identity: F,
     ) -> Result<Self, ReservoirAttachmentError>
     where
-        S: IdentityStorage + 'static,
         F: FnOnce() -> Fut,
-        Fut: Future<Output = Result<Arc<PersonaeHost<S>>, String>>,
+        Fut: Future<Output = Result<Arc<dyn ResidentCustody>, String>>,
     {
         Self::open_with(options, identity, |routes| async {
             Ok(routes.with_divination_authority())
@@ -260,15 +231,14 @@ impl ReservoirAttachment {
     /// The hook runs only in embedded mode, before any route is served. The
     /// same registrations must also be installed in the daemon composition.
     /// It receives the reusable routes, never a client-owned graph or store.
-    pub async fn open_with<S, F, Fut, C, CFut>(
+    pub async fn open_with<F, Fut, C, CFut>(
         options: ReservoirAttachmentOptions,
         identity: F,
         configure: C,
     ) -> Result<Self, ReservoirAttachmentError>
     where
-        S: IdentityStorage + 'static,
         F: FnOnce() -> Fut,
-        Fut: Future<Output = Result<Arc<PersonaeHost<S>>, String>>,
+        Fut: Future<Output = Result<Arc<dyn ResidentCustody>, String>>,
         C: FnOnce(MereRoutes) -> CFut,
         CFut: Future<Output = Result<MereRoutes, String>>,
     {
@@ -436,13 +406,12 @@ struct EmbeddedOwner {
 }
 
 impl EmbeddedOwner {
-    async fn start<S, C, CFut>(
+    async fn start<C, CFut>(
         options: &ReservoirAttachmentOptions,
-        host: Arc<PersonaeHost<S>>,
+        host: Arc<dyn ResidentCustody>,
         configure: C,
     ) -> Result<Self, ReservoirAttachmentError>
     where
-        S: IdentityStorage + 'static,
         C: FnOnce(MereRoutes) -> CFut,
         CFut: Future<Output = Result<MereRoutes, String>>,
     {

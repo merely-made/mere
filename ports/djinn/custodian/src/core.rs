@@ -20,13 +20,13 @@
 use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 use std::time::{Duration, Instant};
 
-use custody_wire::contract::{Answer, Fact, FactCause, Limits, LockReport, Outcome, Petition, Purpose, ReleasedKey, ServerMessage, Session, Status};
+use custody_wire::contract::{Answer, Fact, FactCause, Limits, LockReport, Outcome, Petition, Purpose, ReleasedKey, ServerMessage, Session, Source, Status};
 use custody_wire::secret::{Bytes, Secret};
 use custody_wire::{ClientMessage, Operation, Peer, limits};
 
 use crate::Refusal;
+use crate::host::{CommandOutput, HostCustody};
 use crate::policy::{Config, Consent, ConsentMode, Grant, Principal, PurposeRule};
-use crate::vault::VaultCustody;
 
 /// A session handle, unique per custodian start.
 pub type SessionId = u64;
@@ -66,10 +66,18 @@ struct SessionState {
 }
 
 enum Deferred {
-    Sign { salt: Vec<u8>, message: Vec<u8> },
-    Release { salts: Vec<Vec<u8>> },
+    Operation(Operation),
     Revoke { principal: String },
+    /// A per-use SSH signing request waiting in Castellan's broker.
+    Signing(uuid::Uuid),
 }
+
+/// The session id internal petitions carry: no client waits on them.
+const NO_SESSION: SessionId = 0;
+
+/// What a consent petition shows: operation, profile, namespace and the
+/// digest of the bytes or salts involved.
+type Summary = (&'static str, String, String, String);
 
 struct Pending {
     session: SessionId,
@@ -88,7 +96,7 @@ struct Pending {
 /// The custodian.
 pub struct Core {
     config: Config,
-    vault: VaultCustody,
+    vault: HostCustody,
     instance: String,
     generation: u64,
     sessions: HashMap<SessionId, SessionState>,
@@ -97,6 +105,7 @@ pub struct Core {
     consented: HashSet<(String, usize, u64)>,
     queue: VecDeque<Pending>,
     active: Option<String>,
+    signing: HashSet<uuid::Uuid>,
 }
 
 const MAX_SALTS: usize = 32;
@@ -106,7 +115,7 @@ const MAX_PETITIONS_PER_SESSION: usize = 4;
 impl Core {
     /// Start locked, with a fresh instance id.
     pub fn start(config: Config) -> Result<Self, Refusal> {
-        let vault = VaultCustody::locked(&config.vault.directory, config.vault.profile.as_deref())?;
+        let vault = HostCustody::locked(&config.vault.directory, config.vault.profile.as_deref(), config.vault.data_root.as_deref())?;
         Ok(Self {
             config,
             vault,
@@ -118,6 +127,7 @@ impl Core {
             consented: HashSet::new(),
             queue: VecDeque::new(),
             active: None,
+            signing: HashSet::new(),
         })
     }
 
@@ -146,7 +156,13 @@ impl Core {
             profile: self.vault.profile().map(str::to_string),
             master_public_key: self.vault.master_public_key(),
             protection,
+            wallet_public_key: self.vault.wallet_public_key(),
         }
+    }
+
+    /// The vault, for the SSH agent and the signing-consent bridge.
+    pub fn custody(&self) -> &HostCustody {
+        &self.vault
     }
 
     /// Admit a session for `peer`. The first message must be a hello.
@@ -268,6 +284,35 @@ impl Core {
         (report, effects)
     }
 
+    /// Turn each new per-use SSH signing request into a consent petition.
+    /// The requester the mechanism names is a session of the vault owner;
+    /// with none connected, the request is denied rather than left waiting.
+    pub fn petition_signing(&mut self, now: Instant) -> Effects {
+        let mut effects = self.expire(now);
+        let pending = self.vault.pending_signing();
+        let live: HashSet<uuid::Uuid> = pending.iter().map(|p| p.request.request_id).collect();
+        self.signing.retain(|id| live.contains(id));
+        for pending in pending {
+            let request = pending.request;
+            if !self.signing.insert(request.request_id) {
+                continue;
+            }
+            let owner = self.sessions.values().find(|s| s.principal.same_user).map(|s| (s.principal.clone(), s.peer.clone()));
+            let Some((principal, requester)) = owner.filter(|_| self.config.consent != ConsentMode::Deny) else {
+                let _ = self.vault.decide_signing(request.request_id, false);
+                continue;
+            };
+            let summary: Summary = (
+                "ssh-sign",
+                self.vault.profile().unwrap_or_default().to_string(),
+                request.public_key_fingerprint.chars().take(120).collect(),
+                request.payload_digest.chars().take(64).collect(),
+            );
+            let _ = self.gate(NO_SESSION, 0, &principal, requester, usize::MAX, Consent::PerOperation, summary, Deferred::Signing(request.request_id), now, &mut effects);
+        }
+        effects
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn request(&mut self, session: SessionId, id: u64, instance: &str, generation: u64, operation: Operation, now: Instant, effects: &mut Effects) -> Option<Outcome> {
         let Some(state) = self.sessions.get(&session) else {
@@ -308,93 +353,179 @@ impl Core {
                 if !self.config.principals.iter().any(|p| p.name == target) {
                     return Some(Outcome::refused("principal-unknown"));
                 }
-                let summary = ("revoke", String::new(), target.clone(), blake3::hash(target.as_bytes()).to_hex().to_string());
+                let summary: Summary = ("revoke", String::new(), target.clone(), blake3::hash(target.as_bytes()).to_hex().to_string());
                 self.gate(session, id, &principal, requester, index, consent, summary, Deferred::Revoke { principal: target }, now, effects)
             },
-            Operation::Sign {
-                profile,
-                purpose,
-                salt,
-                message,
-            } => {
-                let current = self.vault.profile().unwrap_or_default().to_string();
-                if self.vault.is_locked() {
+            operation => {
+                if self.vault.is_locked() && !matches!(operation, Operation::Snapshot {}) {
                     return Some(Outcome::refused("locked"));
                 }
-                if message.0.len() > MAX_SIGNED_BYTES {
-                    return Some(Outcome::refused("message-too-large"));
-                }
-                let found = self.config_grants(&principal).find_map(|(index, grant)| match (grant, &purpose) {
-                    (
-                        Grant::Sign {
-                            profile: scope,
-                            purpose: PurposeRule::Delegation { audience: granted },
-                            consent,
-                        },
-                        Purpose::Delegation { audience },
-                    ) if granted == audience && scope.covers(&profile, &current) => Some((index, *consent)),
-                    (
-                        Grant::Sign {
-                            profile: scope,
-                            purpose: PurposeRule::Root,
-                            consent,
-                        },
-                        Purpose::Root {},
-                    ) if scope.covers(&profile, &current) => Some((index, *consent)),
-                    _ => None,
-                });
-                let Some((index, consent)) = found else {
-                    return Some(Outcome::refused("operation-or-scope"));
+                let (index, consent, summary) = match self.authorize(&principal, &operation) {
+                    Ok(found) => found,
+                    Err(refusal) => return Some(Outcome::refused(refusal.0)),
                 };
-                let master = self.vault.master_public_key().unwrap_or_default();
-                let checked = match &purpose {
-                    Purpose::Delegation { audience } => crate::delegation::check(audience, &master, &salt.0, &message.0),
-                    Purpose::Root {} if salt.0.is_empty() => Ok(()),
-                    Purpose::Root {} => Err(Refusal("root-signature-takes-no-salt")),
-                };
-                if let Err(refusal) = checked {
-                    return Some(Outcome::refused(refusal.0));
-                }
-                let namespace = match &purpose {
-                    Purpose::Delegation { audience } => format!("delegation:{audience}"),
-                    Purpose::Root {} => "root".into(),
-                };
-                let summary = ("sign", profile, namespace, blake3::hash(&message.0).to_hex().to_string());
-                self.gate(session, id, &principal, requester, index, consent, summary, Deferred::Sign { salt: salt.0, message: message.0 }, now, effects)
-            },
-            Operation::Release { profile, salts } => {
-                let current = self.vault.profile().unwrap_or_default().to_string();
-                if self.vault.is_locked() {
-                    return Some(Outcome::refused("locked"));
-                }
-                if salts.is_empty() || salts.len() > MAX_SALTS {
-                    return Some(Outcome::refused("operation-or-scope"));
-                }
-                let salts: Vec<Vec<u8>> = salts.into_iter().map(|b| b.0).collect();
-                let found = self.config_grants(&principal).find_map(|(index, grant)| match grant {
-                    Grant::Release {
-                        profile: scope,
-                        salts: rules,
-                        consent,
-                    } if scope.covers(&profile, &current) && salts.iter().all(|s| rules.iter().any(|r| r.allows(s))) => Some((index, *consent)),
-                    _ => None,
-                });
-                let Some((index, consent)) = found else {
-                    return Some(Outcome::refused("operation-or-scope"));
-                };
-                let mut digest = blake3::Hasher::new();
-                for salt in &salts {
-                    digest.update(&(salt.len() as u64).to_le_bytes());
-                    digest.update(salt);
-                }
-                let summary = ("release", profile, "derived-keys".to_string(), digest.finalize().to_hex().to_string());
-                self.gate(session, id, &principal, requester, index, consent, summary, Deferred::Release { salts }, now, effects)
+                self.gate(session, id, &principal, requester, index, consent, summary, Deferred::Operation(operation), now, effects)
             },
         }
     }
 
-    fn config_grants<'a>(&self, principal: &'a Principal) -> impl Iterator<Item = (usize, &'a Grant)> {
-        principal.grants.iter().enumerate()
+    /// Which grant admits `operation`, its consent, and the petition summary.
+    /// Purpose, audience, profile and namespace are all checked here, before
+    /// any petition is shown.
+    fn authorize(&self, principal: &Principal, operation: &Operation) -> Result<(usize, Consent, Summary), Refusal> {
+        let current = self.vault.profile().unwrap_or_default().to_string();
+        let grants = || principal.grants.iter().enumerate();
+        let digest = |bytes: &[u8]| blake3::hash(bytes).to_hex().to_string();
+        let salts_digest = |salts: &[Bytes]| {
+            let mut hasher = blake3::Hasher::new();
+            for salt in salts {
+                hasher.update(&(salt.0.len() as u64).to_le_bytes());
+                hasher.update(&salt.0);
+            }
+            hasher.finalize().to_hex().to_string()
+        };
+        let open_master = self.vault.master_public_key();
+        // A rule naming the open profile's own keys sees its master only for
+        // the open profile's persona root.
+        let master_for = |source: Source, profile: &str| (matches!(source, Source::Persona) && profile == current).then_some(open_master.as_ref()).flatten();
+        let releasable = |source: Source, profile: &str, salt: &[u8]| {
+            grants().find_map(|(index, grant)| match grant {
+                Grant::Release { profile: scope, salts: rules, consent, source: from } if from.matches(source) && scope.covers(profile, &current) && rules.iter().any(|r| r.allows_under(salt, master_for(source, profile))) => Some((index, *consent)),
+                _ => None,
+            })
+        };
+        let refused = || Refusal("operation-or-scope");
+        match operation {
+            Operation::Sign { profile, purpose, salt, message } => {
+                if message.0.len() > MAX_SIGNED_BYTES {
+                    return Err(Refusal("message-too-large"));
+                }
+                let (index, consent) = grants()
+                    .find_map(|(index, grant)| match (grant, purpose) {
+                        (Grant::Sign { profile: scope, purpose: PurposeRule::Delegation { audience: granted }, consent }, Purpose::Delegation { audience })
+                            if granted == audience && scope.covers(profile, &current) =>
+                        {
+                            Some((index, *consent))
+                        },
+                        (Grant::Sign { profile: scope, purpose: PurposeRule::Root, consent }, Purpose::Root {}) if scope.covers(profile, &current) => Some((index, *consent)),
+                        _ => None,
+                    })
+                    .ok_or_else(refused)?;
+                let master = self.vault.master_public_key().unwrap_or_default();
+                match purpose {
+                    Purpose::Delegation { audience } => crate::delegation::check(audience, &master, &salt.0, &message.0)?,
+                    Purpose::Root {} if salt.0.is_empty() => {},
+                    Purpose::Root {} => return Err(Refusal("root-signature-takes-no-salt")),
+                }
+                let namespace = match purpose {
+                    Purpose::Delegation { audience } => format!("delegation:{audience}"),
+                    Purpose::Root {} => "root".into(),
+                };
+                Ok((index, consent, ("sign", profile.clone(), namespace, digest(&message.0))))
+            },
+            Operation::Release { profile, salts } | Operation::Derive { source: Source::Persona, profile: Some(profile), salts } => {
+                self.release_grant(Source::Persona, profile, salts, &releasable).map(|(i, c)| (i, c, ("release", profile.clone(), "derived-keys".into(), salts_digest(salts))))
+            },
+            Operation::Derive { source, profile, salts } => {
+                let profile = profile.clone().unwrap_or_else(|| current.clone());
+                let name = match source {
+                    Source::Persona => "derived-keys",
+                    Source::Wallet => "wallet-keys",
+                };
+                self.release_grant(*source, &profile, salts, &releasable).map(|(i, c)| (i, c, ("release", profile.clone(), name.into(), salts_digest(salts))))
+            },
+            Operation::Attest { source, profile, salt } => {
+                let profile = profile.clone().unwrap_or_else(|| current.clone());
+                let attestable = grants().find_map(|(index, grant)| match grant {
+                    Grant::Attest { profile: scope, salts: rules, consent, source: from } if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows_under(&salt.0, master_for(*source, &profile))) => Some((index, *consent)),
+                    _ => None,
+                });
+                let (index, consent) = attestable.or_else(|| releasable(*source, &profile, &salt.0)).ok_or_else(refused)?;
+                Ok((index, consent, ("attest", profile, "derived-key".into(), digest(&salt.0))))
+            },
+            Operation::SignDerived { source, profile, salt, message } => {
+                if message.0.len() > MAX_SIGNED_BYTES {
+                    return Err(Refusal("message-too-large"));
+                }
+                let profile = profile.clone().unwrap_or_else(|| current.clone());
+                let signable = grants().find_map(|(index, grant)| match grant {
+                    Grant::Sign { profile: scope, purpose: PurposeRule::Derived { source: from, salts: rules }, consent }
+                        if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows_under(&salt.0, master_for(*source, &profile))) =>
+                    {
+                        Some((index, *consent))
+                    },
+                    _ => None,
+                });
+                let (index, consent) = signable.or_else(|| releasable(*source, &profile, &salt.0)).ok_or_else(refused)?;
+                Ok((index, consent, ("sign-derived", profile, "derived-key".into(), digest(&message.0))))
+            },
+            Operation::Snapshot {} => self.coarse(principal, |g| matches!(g, Grant::Snapshot), ("snapshot", String::new(), String::new(), String::new())),
+            Operation::PublicKey { source, profile } => {
+                let profile = profile.clone().unwrap_or_else(|| current.clone());
+                let found = grants().find_map(|(index, grant)| match grant {
+                    Grant::Release { profile: scope, source: from, .. } | Grant::Attest { profile: scope, source: from, .. } if from.matches(*source) && scope.covers(&profile, &current) => Some(index),
+                    _ => None,
+                });
+                found.map(|index| (index, Consent::None, ("public-key", profile, String::new(), String::new()))).ok_or_else(refused)
+            },
+            Operation::Intent { intent, payload } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("intent", current.clone(), intent.chars().take(64).collect(), digest(&payload.0))),
+            Operation::HasProfile { profile } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("has-profile", profile.clone(), String::new(), String::new())),
+            Operation::ChangePassphrase { .. } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("change-passphrase", current.clone(), String::new(), String::new())),
+            Operation::ImportSshKey { options, .. } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("import-ssh-key", current.clone(), String::new(), digest(&options.0))),
+            Operation::VaultCommand { profile, command, args } => {
+                let mut hasher = blake3::Hasher::new();
+                for arg in args {
+                    hasher.update(&(arg.len() as u64).to_le_bytes());
+                    hasher.update(arg.as_bytes());
+                }
+                self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("vault-command", profile.clone(), command.chars().take(64).collect(), hasher.finalize().to_hex().to_string()))
+            },
+            Operation::EpochKeys { persona, keys, .. } => {
+                let contexts = keys.iter().map(|k| k.context.as_str()).collect::<Vec<_>>().join(",");
+                self.coarse(principal, |g| matches!(g, Grant::Wallet { .. }), ("epoch-keys", persona.clone(), contexts.chars().take(160).collect(), String::new()))
+            },
+            Operation::StationGrant { request, .. } => self.coarse(principal, |g| matches!(g, Grant::Wallet { .. }), ("station-grant", String::new(), String::new(), digest(request.to_string().as_bytes()))),
+            Operation::RevokeDevice { device_id } => self.coarse(principal, |g| matches!(g, Grant::Wallet { .. }), ("revoke-device", String::new(), device_id.clone(), String::new())),
+            Operation::Payload { profile, persona, content_hash, .. } => self.coarse(principal, |g| matches!(g, Grant::Payload { .. }), ("payload", profile.clone(), persona.clone(), content_hash.clone())),
+            Operation::Credentials { operation } => {
+                let kind = match operation {
+                    custody_wire::CredentialOperation::Quarantine { .. } => "quarantine",
+                    custody_wire::CredentialOperation::UnassignedImports {} => "unassigned-imports",
+                    custody_wire::CredentialOperation::AssignImport { .. } => "assign-import",
+                    custody_wire::CredentialOperation::Review { .. } => "review",
+                    custody_wire::CredentialOperation::CxfPreview { .. } => "cxf-preview",
+                    custody_wire::CredentialOperation::CxfImport { .. } => "cxf-import",
+                };
+                self.coarse(principal, |g| matches!(g, Grant::Credentials { .. }), ("credentials", current.clone(), kind.into(), String::new()))
+            },
+            Operation::Status {} | Operation::Lock {} | Operation::Unlock { .. } | Operation::Revoke { .. } => Err(refused()),
+        }
+    }
+
+    fn release_grant(&self, source: Source, profile: &str, salts: &[Bytes], releasable: &dyn Fn(Source, &str, &[u8]) -> Option<(usize, Consent)>) -> Result<(usize, Consent), Refusal> {
+        if salts.is_empty() || salts.len() > MAX_SALTS {
+            return Err(Refusal("operation-or-scope"));
+        }
+        let mut found: Option<(usize, Consent)> = None;
+        for salt in salts {
+            let (index, consent) = releasable(source, profile, &salt.0).ok_or(Refusal("operation-or-scope"))?;
+            // Every salt must come under one grant, so one consent covers them.
+            if found.is_some_and(|(i, _)| i != index) {
+                return Err(Refusal("operation-or-scope"));
+            }
+            found = Some((index, consent));
+        }
+        found.ok_or(Refusal("operation-or-scope"))
+    }
+
+    /// A grant without namespaces (host, wallet, payload, credentials).
+    fn coarse(&self, principal: &Principal, wanted: impl Fn(&Grant) -> bool, summary: Summary) -> Result<(usize, Consent, Summary), Refusal> {
+        let (index, grant) = principal.grants.iter().enumerate().find(|(_, g)| wanted(g)).ok_or(Refusal("operation-denied"))?;
+        let consent = match grant {
+            Grant::Manage { consent } | Grant::Wallet { consent } | Grant::Payload { consent } | Grant::Credentials { consent } => *consent,
+            _ => Consent::None,
+        };
+        Ok((index, consent, summary))
     }
 
     fn granted(&self, principal: &Principal, wanted: impl Fn(&Grant) -> bool) -> Result<(usize, Grant), Refusal> {
@@ -409,7 +540,7 @@ impl Core {
 
     /// Run now, or queue a petition, according to the grant's consent.
     #[allow(clippy::too_many_arguments)]
-    fn gate(&mut self, session: SessionId, request: u64, principal: &Principal, requester: Peer, grant: usize, consent: Consent, summary: (&str, String, String, String), deferred: Deferred, now: Instant, effects: &mut Effects) -> Option<Outcome> {
+    fn gate(&mut self, session: SessionId, request: u64, principal: &Principal, requester: Peer, grant: usize, consent: Consent, summary: Summary, deferred: Deferred, now: Instant, effects: &mut Effects) -> Option<Outcome> {
         let approved = match consent {
             Consent::None => true,
             Consent::PerGeneration => self.consented.contains(&(principal.name.clone(), grant, self.generation)),
@@ -506,9 +637,15 @@ impl Core {
         }
         let pending = self.queue.remove(position).expect("position is in range");
         self.active = None;
+        // An SSH signing petition has no requesting session: the client
+        // waiting on the agent is the requester.
+        let requester_gone = pending.session != NO_SESSION && !self.sessions.contains_key(&pending.session);
+        let (session, request) = (pending.session, pending.request);
         let outcome = if !accept {
+            self.withdraw(&pending);
             Outcome::refused("consent-denied")
-        } else if self.revoked.contains(&pending.principal) || !self.sessions.contains_key(&pending.session) {
+        } else if self.revoked.contains(&pending.principal) || requester_gone {
+            self.withdraw(&pending);
             Outcome::refused("invalidated")
         } else {
             if pending.consent == Consent::PerGeneration {
@@ -516,41 +653,35 @@ impl Core {
             }
             self.execute(pending.deferred, effects)
         };
-        effects.messages.push((pending.session, ServerMessage::Outcome {
-            request: pending.request,
-            generation: self.generation,
-            outcome,
-        }));
+        self.settle(session, request, outcome, effects);
         self.promote(effects);
         Ok(())
     }
 
+    /// Answer the session that asked; a signing petition has none.
+    fn settle(&self, session: SessionId, request: u64, outcome: Outcome, effects: &mut Effects) {
+        if session != NO_SESSION {
+            effects.messages.push((session, ServerMessage::Outcome {
+                request,
+                generation: self.generation,
+                outcome,
+            }));
+        }
+    }
+
+    /// A petition that will not run: an SSH request is denied in the broker
+    /// at once rather than left to Castellan's own timeout.
+    fn withdraw(&self, pending: &Pending) {
+        if let Deferred::Signing(request) = pending.deferred {
+            let _ = self.vault.decide_signing(request, false);
+        }
+    }
+
     fn execute(&mut self, deferred: Deferred, effects: &mut Effects) -> Outcome {
         match deferred {
-            Deferred::Sign { salt, message } => match self.vault.sign(&salt, &message) {
-                Ok(signed) => Outcome::Success {
-                    answer: Answer::Signature {
-                        public_key: signed.public_key,
-                        signature: signed.signature,
-                        attestation: signed.attestation,
-                    },
-                },
-                Err(refusal) => Outcome::refused(refusal.0),
-            },
-            Deferred::Release { salts } => match self.vault.release(&salts) {
-                Ok((master, released)) => Outcome::Success {
-                    answer: Answer::Released {
-                        master_public_key: master,
-                        keys: released
-                            .into_iter()
-                            .map(|r| ReleasedKey {
-                                salt: Bytes(r.salt),
-                                seed: Secret::copy_from(&*r.seed),
-                                attestation: r.attestation,
-                            })
-                            .collect(),
-                    },
-                },
+            Deferred::Operation(operation) => self.perform(operation),
+            Deferred::Signing(request) => match self.vault.decide_signing(request, true) {
+                Ok(()) => Outcome::Success { answer: Answer::Done {} },
                 Err(refusal) => Outcome::refused(refusal.0),
             },
             Deferred::Revoke { principal } => {
@@ -564,6 +695,79 @@ impl Core {
                     answer: Answer::Revoked { generation: self.generation },
                 }
             },
+        }
+    }
+
+    /// Run one authorized operation against the vault, wallet or catalog.
+    fn perform(&mut self, operation: Operation) -> Outcome {
+        let success = |answer| Outcome::Success { answer };
+        let refuse = |refusal: Refusal| Outcome::refused(refusal.0);
+        let text = |prefix: &str, error: String| Outcome::Refused {
+            code: format!("{prefix}: {}", error.chars().take(400).collect::<String>()),
+        };
+        let signature = |signed: crate::host::Signed| {
+            success(Answer::Signature {
+                public_key: signed.public_key,
+                signature: signed.signature,
+                attestation: signed.attestation,
+            })
+        };
+        let released = |(master, keys): ([u8; 32], Vec<crate::host::Released>)| {
+            success(Answer::Released {
+                master_public_key: master,
+                keys: keys
+                    .into_iter()
+                    .map(|r| ReleasedKey {
+                        salt: Bytes(r.salt),
+                        seed: Secret::copy_from(&*r.seed),
+                        attestation: r.attestation,
+                    })
+                    .collect(),
+            })
+        };
+        match operation {
+            Operation::Sign { profile, salt, message, .. } => self.vault.sign(Source::Persona, Some(&profile), &salt.0, &message.0).map_or_else(refuse, signature),
+            Operation::Release { profile, salts } => {
+                let salts: Vec<Vec<u8>> = salts.into_iter().map(|b| b.0).collect();
+                self.vault.release(Source::Persona, Some(&profile), &salts).map_or_else(refuse, released)
+            },
+            Operation::Derive { source, profile, salts } => {
+                let salts: Vec<Vec<u8>> = salts.into_iter().map(|b| b.0).collect();
+                self.vault.release(source, profile.as_deref(), &salts).map_or_else(refuse, released)
+            },
+            Operation::Attest { source, profile, salt } => self.vault.attest(source, profile.as_deref(), &salt.0).map_or_else(refuse, |attestation| success(Answer::Attestation { attestation })),
+            Operation::SignDerived { source, profile, salt, message } => {
+                if salt.0.is_empty() {
+                    return Outcome::refused("operation-or-scope");
+                }
+                self.vault.sign(source, profile.as_deref(), &salt.0, &message.0).map_or_else(refuse, signature)
+            },
+            Operation::Snapshot {} => self.vault.snapshot().map_or_else(refuse, |snapshot| success(Answer::Snapshot { snapshot: Box::new(snapshot) })),
+            Operation::PublicKey { source, profile } => self.vault.public_key(source, profile.as_deref()).map_or_else(refuse, |key| success(Answer::PublicKey { key })),
+            Operation::Intent { intent, payload } => self.vault.intent(&intent, &payload.0).map_or_else(|e| text("intent-refused", e), |()| success(Answer::Done {})),
+            Operation::HasProfile { profile } => self.vault.has_profile(&profile).map_or_else(refuse, |value| success(Answer::Bool { value })),
+            Operation::ChangePassphrase { old, new } => self.vault.change_passphrase(old.expose(), new.expose()).map_or_else(|e| text("passphrase-change-refused", e), |()| success(Answer::Done {})),
+            Operation::ImportSshKey { key, passphrase, options } => self
+                .vault
+                .import_ssh_key(key.expose(), passphrase.as_ref().map(Secret::expose), &options.0)
+                .map_or_else(|e| text("import-refused", e), |value| success(Answer::Value { value })),
+            Operation::VaultCommand { profile, command, args } => match self.vault.vault_command(&profile, &command, &args) {
+                Ok(CommandOutput::Text(text)) => success(Answer::VaultOutput { text }),
+                Ok(CommandOutput::Enrollment { target, script, confirmation }) => success(Answer::VaultEnrollment { target, script, confirmation }),
+                Err(refusal) => refuse(refusal),
+            },
+            Operation::EpochKeys { persona, device_label, keys } => self.vault.epoch_keys(&persona, device_label.as_deref(), &keys).map_or_else(refuse, |keys| success(Answer::EpochKeys { keys })),
+            Operation::StationGrant { request, issuer_public_key } => self
+                .vault
+                .station_grant(&request, &issuer_public_key.0)
+                .map_or_else(|e| text("station-grant-refused", e), |value| success(Answer::Value { value })),
+            Operation::RevokeDevice { device_id } => self.vault.revoke_device(&device_id).map_or_else(|e| text("revoke-refused", e), |value| success(Answer::Value { value })),
+            Operation::Payload { profile, persona, master, scope, content_hash, operation } => self
+                .vault
+                .payload(&profile, &persona, &master.0, &scope.0, &content_hash, &operation)
+                .map_or_else(refuse, |(bytes, marker)| success(Answer::Payload { bytes: Bytes(bytes), marker })),
+            Operation::Credentials { operation } => self.vault.credentials(&operation).map_or_else(|e| text("credentials-refused", e), |value| success(Answer::Value { value })),
+            Operation::Status {} | Operation::Lock {} | Operation::Unlock { .. } | Operation::Revoke { .. } => Outcome::refused("operation-or-scope"),
         }
     }
 
@@ -608,16 +812,13 @@ impl Core {
 
     fn cancel(&mut self, which: impl Fn(&Pending) -> bool, effects: &mut Effects) {
         let mut kept = VecDeque::new();
-        for pending in self.queue.drain(..) {
+        for pending in std::mem::take(&mut self.queue) {
             if which(&pending) {
                 if self.active.as_deref() == Some(pending.digest.as_str()) {
                     self.active = None;
                 }
-                effects.messages.push((pending.session, ServerMessage::Outcome {
-                    request: pending.request,
-                    generation: self.generation,
-                    outcome: Outcome::refused("invalidated"),
-                }));
+                self.withdraw(&pending);
+                self.settle(pending.session, pending.request, Outcome::refused("invalidated"), effects);
             } else {
                 kept.push_back(pending);
             }
@@ -648,16 +849,13 @@ impl Core {
     fn expire(&mut self, now: Instant) -> Effects {
         let mut effects = Effects::default();
         let mut kept = VecDeque::new();
-        for pending in self.queue.drain(..) {
+        for pending in std::mem::take(&mut self.queue) {
             if pending.deadline <= now {
                 if self.active.as_deref() == Some(pending.digest.as_str()) {
                     self.active = None;
                 }
-                effects.messages.push((pending.session, ServerMessage::Outcome {
-                    request: pending.request,
-                    generation: self.generation,
-                    outcome: Outcome::refused("consent-expired"),
-                }));
+                self.withdraw(&pending);
+                self.settle(pending.session, pending.request, Outcome::refused("consent-expired"), &mut effects);
             } else {
                 kept.push_back(pending);
             }

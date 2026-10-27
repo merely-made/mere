@@ -38,26 +38,25 @@ fi
 install -d -o root -g wheel -m 0755 "/Library/Application Support/Merely" "$root" "$root/clients"
 install -o root -g wheel -m 0755 "$binary" "$root/djinn-custodian"
 state="$home/Library/Application Support/Merely/djinn-custodian"
-install -d -o "$user" -g staff -m 0700 "$home/Library/Application Support/Merely" "$state" "$state/vault"
+install -d -o "$user" -g staff -m 0700 "$home/Library/Application Support/Merely" "$state" "$state/vault" "$state/data"
+# Djinn's grants (custody isolation plan, H2 inventory). Djinn is matched
+# by its code signature, not as "some process of this user", so its grants
+# run unattended as H1's did.
+grants=$(sed -e 's/@CONSENT@/none/g' -e 's/@SIGN_CONSENT@/none/g' "$here/packaging/djinn-grants.json.in")
 cat > "$root/$user.json" <<EOF
 {
-  "vault": {"directory": "$state/vault"},
+  "vault": {"directory": "$state/vault", "data_root": "$state/data"},
   "owner": {"unix_uid": $uid},
   "consent": "deny",
   "principals": [
-    {"name": "djinn", "match": {"signed": {"team": "$djinn_team", "identifier": "com.merely.djinn"}}, "grants": [
-      {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"},
-      {"operation": "release", "profile": "current",
-       "salts": [{"exact": "mesh-author"}, {"exact": "distillery-personal-mesh"}], "consent": "none"},
-      {"operation": "sign", "profile": "current",
-       "purpose": {"purpose": "delegation", "audience": "mere.graphshell"}, "consent": "none"}
-    ]}
+    {"name": "djinn", "match": {"signed": {"team": "$djinn_team", "identifier": "com.merely.djinn"}}, "grants": $grants}
   ]
 }
 EOF
 cat > "$root/clients/$uid.json" <<EOF
 {"endpoint": "$state/custody.sock",
- "server": {"signed": [{"team": "$team", "identifier": "com.merely.djinn.custodian"}]}}
+ "server": {"signed": [{"team": "$team", "identifier": "com.merely.djinn.custodian"}]},
+ "agent": "$state/agent.sock"}
 EOF
 chmod 0644 "$root/$user.json" "$root/clients/$uid.json"
 sed -e "s|@USER@|$user|g" -e "s|@HOME@|$home|g" "$here/packaging/macos/com.merely.djinn.custodian.plist.in" \
@@ -67,3 +66,4 @@ chmod 0644 /Library/LaunchAgents/com.merely.djinn.custodian.plist
 plutil -lint /Library/LaunchAgents/com.merely.djinn.custodian.plist
 echo "Installed. Log in as $user (or: launchctl bootstrap gui/$uid /Library/LaunchAgents/com.merely.djinn.custodian.plist)."
 echo "Move or create the vault in $state/vault with: $root/djinn-custodian adopt|init --config '$root/$user.json'"
+echo "Point SSH_AUTH_SOCK at $state/agent.sock."

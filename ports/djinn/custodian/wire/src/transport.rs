@@ -162,6 +162,27 @@ mod unix {
             }))
         }
 
+        /// Every socket systemd passed, by `FileDescriptorName` (`LISTEN_FDNAMES`),
+        /// for a unit that listens on more than one.
+        pub fn systemd_named() -> std::io::Result<Vec<(String, UnixListener)>> {
+            let pid_matches = std::env::var("LISTEN_PID").ok().and_then(|pid| pid.parse::<u32>().ok()) == Some(std::process::id());
+            let count = std::env::var("LISTEN_FDS").ok().and_then(|n| n.parse::<i32>().ok()).unwrap_or(0);
+            if !pid_matches || !(1..=8).contains(&count) {
+                return Ok(Vec::new());
+            }
+            let names: Vec<String> = std::env::var("LISTEN_FDNAMES").unwrap_or_default().split(':').map(str::to_string).collect();
+            let mut listeners = Vec::new();
+            for index in 0..count {
+                let fd = 3 + index;
+                // SAFETY: systemd transferred these descriptors to this pid.
+                unsafe { libc::fcntl(fd, libc::F_SETFD, libc::FD_CLOEXEC) };
+                // SAFETY: as above; each descriptor is taken exactly once.
+                let listener = unsafe { UnixListener::from_raw_fd(fd) };
+                listeners.push((names.get(index as usize).cloned().unwrap_or_default(), listener));
+            }
+            Ok(listeners)
+        }
+
         /// Wrap an already-bound listener (tests).
         pub fn from_listener(listener: UnixListener) -> Self {
             Self {

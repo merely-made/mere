@@ -331,7 +331,7 @@ fn refuses_empty_pairs_invalid_source_and_mutation_or_removal_of_frozen_owner() 
     assert!(
         frozen_link::validate_frozen_link_record(&duplicate_id)
             .unwrap_err()
-            .contains("duplicate frozen assertion handle")
+            .contains("one handle means one row")
     );
 
     let mut changed = record.clone();
@@ -370,4 +370,32 @@ fn refuses_empty_pairs_invalid_source_and_mutation_or_removal_of_frozen_owner() 
         graph.resource(owner).is_none(),
         "whole Resource deletion remains distinct from facet replacement"
     );
+}
+
+#[test]
+fn frozen_link_refuses_identical_parallel_surface_copies_with_the_shared_reason() {
+    let mut graph = Graph::new();
+    let (first, second) = add_surface_pair(&mut graph);
+    let first_id = graph.get_node(first).unwrap().id;
+    let second_id = graph.get_node(second).unwrap().id;
+    claim(&mut graph, first, second, "held");
+    let freeze = |graph: &mut Graph, nonce: u128| {
+        graph.freeze_link_with_nonce(
+            GraphStratum::Surface,
+            first_id,
+            second_id,
+            available_source(),
+            Uuid::from_u128(nonce),
+        )
+    };
+    freeze(&mut graph, 201).expect("one row freezes");
+    let row = graph
+        .get_edge(graph.find_edge_key(first, second).unwrap())
+        .unwrap()
+        .clone();
+    graph.inner.connect(first, second, row);
+    let before = graph.to_snapshot().resources;
+    let error = freeze(&mut graph, 202).unwrap_err();
+    assert!(error.contains("one handle means one row"), "{error}");
+    assert_eq!(graph.to_snapshot().resources, before);
 }

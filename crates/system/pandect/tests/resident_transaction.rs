@@ -89,7 +89,8 @@ fn add(n: u128) -> Vec<kernel::graph::apply::GraphDelta> {
             url: format!("https://resident.test/{n}"),
             position: [0.0, 0.0],
         }
-        .replay_delta_as(&author())
+        .replay_as(&author())
+        .into_write()
         .unwrap(),
     ]
 }

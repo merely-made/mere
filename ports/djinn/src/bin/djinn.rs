@@ -16,11 +16,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use armillary::tasks::ResidentTasks;
-use castellan::authority::PersonaeHost;
-#[cfg(windows)]
-use castellan::authority::STANDARD_WINDOWS_AGENT_ENDPOINT;
-use castellan::custody::IdentityVault;
-use castellan::custody::bootstrap;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
@@ -34,7 +29,6 @@ use djinn::keeper::Keeper;
 use djinn::pairing;
 #[cfg(feature = "personal-sync")]
 use djinn::personal_sync as device_sync;
-use djinn::profile::resolve_selected_profile;
 use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
@@ -59,7 +53,7 @@ use graphshell_endpoint::door::app_admission::{
 use graphshell_endpoint::door::app_client::AppBrokerClient;
 use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
 use graphshell_endpoint::door::local_endpoint::LocalListener;
-#[cfg(not(windows))]
+#[cfg(all(not(windows), feature = "in-process-custody"))]
 use graphshell_endpoint::door::local_endpoint::prepare_unix_endpoint;
 #[cfg(feature = "personal-sync")]
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
@@ -67,11 +61,14 @@ use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
+#[cfg(feature = "in-process-custody")]
 use ssh_agent_lib::agent::listen;
 
 const EXTRA_EXTENSIONS_ENV: &str = "DJINN_EXTENSION_IDS";
 const DATA_ROOT_ENV: &str = "DJINN_DATA_ROOT";
 const SESSION_SECONDS_ENV: &str = "DJINN_BROWSER_SESSION_SECONDS";
+#[cfg(windows)]
+const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
 
 enum AgentEndpoint {
     Standard(String),
@@ -80,9 +77,9 @@ enum AgentEndpoint {
 
 struct Args {
     vault_dir: PathBuf,
-    /// `--profile`, when given. `None` means the family choice decides, once
-    /// the vault is open ([`resolve_selected_profile`] needs the storage for
-    /// the sole-persona rung), so each flow resolves after its own open.
+    /// `--profile`, when given. `None` means custody's own choice decides:
+    /// the custodian's configured profile, or in a build with
+    /// `in-process-custody` the family ladder after the open.
     profile: Option<ProfileId>,
     agent: AgentEndpoint,
     browser_endpoint: String,
@@ -121,6 +118,10 @@ struct Args {
     /// (vault lock ruling 65).
     #[cfg(feature = "passphrase-fd")]
     passphrase_fd: Option<u32>,
+    /// `--custodian <client-file>`: the harness's custodian, in place of the
+    /// installed client file.
+    #[cfg(feature = "passphrase-fd")]
+    custodian: Option<PathBuf>,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -173,20 +174,13 @@ async fn main() {
             std::process::exit(2);
         },
     };
+    #[cfg(feature = "passphrase-fd")]
+    if let Some(path) = &args.custodian {
+        djinn::custodian::InstalledCustodian::use_fixture(path.clone());
+    }
     // Enrolment edits the vault directory and reports; it hosts nothing.
     if args.enroll_passphrase {
-        let result = if args.native {
-            djinn::enrollment::enroll_passphrase_native(
-                &args.vault_dir,
-                &SystemNativeIdentityUi::default(),
-            )
-        } else {
-            djinn::enrollment::enroll_passphrase(
-                &args.vault_dir,
-                &mut djinn::enrollment::read_from_terminal,
-            )
-        };
-        match result {
+        match enroll(&args) {
             Ok(message) => {
                 println!("{message}");
                 return;
@@ -294,6 +288,26 @@ async fn main() {
 
 const DEFAULT_LOG_FILTER: &str = "info";
 
+#[cfg(feature = "in-process-custody")]
+fn enroll(args: &Args) -> Result<String, String> {
+    if args.native {
+        djinn::enrollment::enroll_passphrase_native(
+            &args.vault_dir,
+            &SystemNativeIdentityUi::default(),
+        )
+    } else {
+        djinn::enrollment::enroll_passphrase(&args.vault_dir, &mut djinn::enrollment::read_from_terminal)
+    }
+}
+
+/// The custodian holds the vault, so its passphrase is enrolled there.
+#[cfg(not(feature = "in-process-custody"))]
+fn enroll(_: &Args) -> Result<String, String> {
+    Err("the vault is held by djinn-custodian: create one with `djinn-custodian init`, \
+         or move this vault in with `djinn-custodian adopt --from <vault-dir>`"
+        .into())
+}
+
 /// Only the installed resident binds the default endpoints (djinn test
 /// harness plan, ruling 8). The installer says which process that is by
 /// passing `--installed`; any other run names its own endpoints.
@@ -398,6 +412,8 @@ fn parse_args() -> Result<Args, String> {
     let mut prefer_passphrase = false;
     #[cfg(feature = "passphrase-fd")]
     let mut passphrase_fd = None;
+    #[cfg(feature = "passphrase-fd")]
+    let mut custodian = None;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -497,6 +513,10 @@ fn parse_args() -> Result<Args, String> {
             "--passphrase-fd" => {
                 let fd = argv.next().ok_or("--passphrase-fd needs a value")?;
                 passphrase_fd = Some(fd.parse().map_err(|_| "--passphrase-fd takes a number")?);
+            },
+            #[cfg(feature = "passphrase-fd")]
+            "--custodian" => {
+                custodian = Some(PathBuf::from(argv.next().ok_or("--custodian needs a client file")?));
             },
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
@@ -638,6 +658,8 @@ fn parse_args() -> Result<Args, String> {
         prefer_passphrase,
         #[cfg(feature = "passphrase-fd")]
         passphrase_fd,
+        #[cfg(feature = "passphrase-fd")]
+        custodian,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -673,17 +695,12 @@ fn parse_args() -> Result<Args, String> {
 
 /// Print what the other device needs in order to pair with this one.
 ///
-/// Opens the vault but not the store, so it works while the resident host is
+/// Reaches custody but not the store, so it works while the resident host is
 /// running and holding the store's lock.
 #[cfg(feature = "personal-sync")]
 fn report_pairing_facts(args: &Args) -> Result<String, String> {
-    let opened = cli_open(args)?;
-    let profile_id =
-        resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())
-            .map_err(|error| error.to_string())?;
-    let (profile, _created) = bootstrap::load_or_create_profile(&*opened.storage, &profile_id)
-        .map_err(|error| error.to_string())?;
-    let vault = IdentityVault::with_profile(opened.storage, profile);
+    let custody = cli_custody(args)?;
+    let profile_id = custody.host.current_profile_id();
     let app_dir = owner_settings::default_app_dir();
     // The data root is where the key group's sealed session lives, so passing
     // it is what makes the pre-key appear in these facts. Resolving it the
@@ -692,7 +709,7 @@ fn report_pairing_facts(args: &Args) -> Result<String, String> {
     let data_root =
         device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())
             .map_err(|error| error.to_string())?;
-    let facts = pairing::pairing_facts(&vault, &app_dir, &profile_id, Some(&data_root))
+    let facts = pairing::pairing_facts(custody.host.as_ref(), &app_dir, &profile_id, Some(&data_root))
         .map_err(|error| error.to_string())?;
     let Some(facts) = facts else {
         return Err(format!(
@@ -715,7 +732,7 @@ fn report_pairing_facts(args: &Args) -> Result<String, String> {
 fn unpair_device(args: &Args, node_id: &str) -> Result<String, String> {
     let node = owner_settings::parse_hex32(node_id).map_err(|error| error.to_string())?;
     // Pairing settings are per-profile, so unpairing the wrong profile's
-    // settings would silently unpair nothing. Resolving costs one vault open;
+    // settings would silently unpair nothing. Resolving reaches custody once;
     // this is a one-shot command that exits.
     let profile_id = resolve_cli_profile(args)?;
     let outcome = pairing::unpair_device(&owner_settings::default_app_dir(), &profile_id, node)
@@ -730,13 +747,11 @@ fn unpair_device(args: &Args, node_id: &str) -> Result<String, String> {
     })
 }
 
-/// Resolve the profile for a one-shot CLI flow that does not otherwise open
-/// the vault. The open exists only for the family ladder's sole-persona rung.
+/// Resolve the profile for a one-shot CLI flow that does not otherwise use
+/// custody: the profile custody holds.
 #[cfg(feature = "personal-sync")]
 fn resolve_cli_profile(args: &Args) -> Result<ProfileId, String> {
-    let opened = cli_open(args)?;
-    resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())
-        .map_err(|error| error.to_string())
+    Ok(cli_custody(args)?.host.current_profile_id())
 }
 
 #[cfg(feature = "personal-sync")]
@@ -852,34 +867,36 @@ fn init_logging(path: Option<&Path>, filter: &str) -> Result<(), std::io::Error>
     Ok(())
 }
 
-/// Open the vault before anything else exists: a passphrase vault waits on
-/// the resident's own prompt (vault lock rulings 42, 62 to 66).
-async fn start_vault(args: &Args, events: &EventLog) -> Result<startup_vault::Started, String> {
+/// Reach custody before anything else exists: a locked custodian (or, in a
+/// build with `in-process-custody`, a passphrase vault) waits on the
+/// resident's own prompt (vault lock rulings 42, 62 to 66).
+async fn start_custody(
+    args: &Args,
+    events: &EventLog,
+) -> Result<startup_vault::OpenedCustody, String> {
     let given = given_passphrase(args)?;
-    let choice = startup_vault::choose(&args.vault_dir, given.is_some());
     let vault_dir = args.vault_dir.clone();
+    let profile = args.profile.clone();
+    let data_root = args.data_root.clone();
     let native_ui = args.native_identity_ui();
     let events = events.clone();
     // A dialog or a terminal read blocks; it gets a thread of its own.
     tokio::task::spawn_blocking(move || {
         let mut waiting = |event: &str, fields: serde_json::Value| events.emit(event, fields);
-        let mut sleep = std::thread::sleep;
-        match given {
-            Some(passphrase) => startup_vault::open(
-                &vault_dir,
-                choice,
-                &mut startup_vault::Given::new(passphrase),
-                &mut waiting,
-                &mut sleep,
-            ),
-            None => startup_vault::open(
-                &vault_dir,
-                choice,
-                &mut startup_vault::NativeOrTerminal { native: native_ui },
-                &mut waiting,
-                &mut sleep,
-            ),
-        }
+        let passphrase_given = given.is_some();
+        let mut prompt: Box<dyn startup_vault::Prompt> = match given {
+            Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
+            None => Box::new(startup_vault::NativeOrTerminal { native: native_ui }),
+        };
+        startup_vault::open_custody(
+            &vault_dir,
+            profile.as_ref(),
+            data_root,
+            passphrase_given,
+            prompt.as_mut(),
+            &mut waiting,
+            &mut std::thread::sleep,
+        )
     })
     .await
     .map_err(|error| error.to_string())?
@@ -899,48 +916,83 @@ fn given_passphrase(args: &Args) -> Result<Option<zeroize::Zeroizing<String>>, S
     }
 }
 
-/// A one-shot command's open: the same choice, asked at the terminal.
+/// A one-shot command's custody: the same start, asked at the terminal.
 #[cfg(feature = "personal-sync")]
-fn cli_open(args: &Args) -> Result<bootstrap::OpenedStorage, String> {
+fn cli_custody(args: &Args) -> Result<startup_vault::OpenedCustody, String> {
     let given = given_passphrase(args)?;
-    let choice = startup_vault::choose(&args.vault_dir, given.is_some());
-    let mut quiet = |_: &str, _: serde_json::Value| {};
-    let started = match given {
-        Some(passphrase) => startup_vault::open(
-            &args.vault_dir,
-            choice,
-            &mut startup_vault::Given::new(passphrase),
-            &mut quiet,
-            &mut std::thread::sleep,
-        ),
-        None => startup_vault::open(
-            &args.vault_dir,
-            choice,
-            &mut startup_vault::NativeOrTerminal {
-                native: djinn::identity_ui::UnavailableNativeIdentityUi,
-            },
-            &mut quiet,
-            &mut std::thread::sleep,
-        ),
+    let passphrase_given = given.is_some();
+    let mut prompt: Box<dyn startup_vault::Prompt> = match given {
+        Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
+        None => Box::new(startup_vault::NativeOrTerminal {
+            native: djinn::identity_ui::UnavailableNativeIdentityUi,
+        }),
     };
-    started.map(|started| started.into_parts().0)
+    startup_vault::open_custody(
+        &args.vault_dir,
+        args.profile.as_ref(),
+        args.data_root.clone(),
+        passphrase_given,
+        prompt.as_mut(),
+        &mut |_: &str, _: serde_json::Value| {},
+        &mut std::thread::sleep,
+    )
+}
+
+/// The SSH agent. The custodian serves it beside the vault; only a vault
+/// opened in this process (a test or receipt build) is served here.
+type AgentRun = std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), String>> + Send>>;
+
+async fn serve_agent(
+    args: &Args,
+    custody: &startup_vault::OpenedCustody,
+) -> Result<AgentRun, Box<dyn std::error::Error>> {
+    #[cfg(feature = "in-process-custody")]
+    if let Some(host) = custody.in_process.clone() {
+        let endpoint = match &args.agent {
+            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
+        };
+        #[cfg(not(windows))]
+        prepare_unix_endpoint(Path::new(endpoint)).await?;
+        let listener = match &args.agent {
+            AgentEndpoint::Standard(endpoint) => host.bind_standard_listener(endpoint)?,
+            AgentEndpoint::Receipt(endpoint) => host.bind_receipt_listener(endpoint)?,
+        };
+        #[cfg(not(windows))]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(endpoint, std::fs::Permissions::from_mode(0o600))?;
+        }
+        tracing::info!(endpoint, "SSH agent listening");
+        return Ok(Box::pin(async move {
+            listen(listener, host.agent_session())
+                .await
+                .map_err(|error| error.to_string())
+        }));
+    }
+    let _ = (args, custody);
+    tracing::info!("SSH agent served by the custodian");
+    Ok(Box::pin(std::future::pending()))
 }
 
 async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Error>> {
-    let (opened, choice, startup_passphrase) = start_vault(&args, &events).await?.into_parts();
-    tracing::info!(storage = %opened.description, "Personae storage open");
-    let profile_id =
-        resolve_selected_profile(&*opened.storage, &args.vault_dir, args.profile.as_ref())?;
-    let (profile, created) = bootstrap::load_or_create_profile(&*opened.storage, &profile_id)?;
-    if created {
-        tracing::warn!(profile = %profile_id.0, "selected profile was created");
-    }
-    let (protection, startup_unlock) = match choice {
-        startup_vault::VaultChoice::Passphrase => {
-            (VaultProtectionView::Passphrase, StartupUnlockV1::Passphrase)
-        },
-        startup_vault::VaultChoice::AutoOs => {
-            (VaultProtectionView::OsProtected, StartupUnlockV1::AutoOs)
+    let custody = start_custody(&args, &events).await?;
+    let personae = Arc::clone(&custody.host);
+    let profile_id = personae.current_profile_id();
+    #[cfg(feature = "in-process-custody")]
+    let in_process = custody.in_process.is_some();
+    #[cfg(not(feature = "in-process-custody"))]
+    let in_process = false;
+    tracing::info!(profile = %profile_id.0, in_process, "custody reached");
+    let protection = custody.protection;
+    let startup_unlock = match protection {
+        VaultProtectionView::OsProtected => StartupUnlockV1::AutoOs,
+        _ => StartupUnlockV1::Passphrase,
+    };
+    // A custodian serves the SSH agent; the status names its endpoint.
+    let agent_endpoint = match (in_process, djinn::custodian::InstalledCustodian::load()?) {
+        (false, Some(installed)) => installed.agent.unwrap_or_default(),
+        _ => match &args.agent {
+            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint.clone(),
         },
     };
     let status = ResidentStatusSource::new(ResidentStatusV1 {
@@ -954,11 +1006,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         // The host's lock state follows once it exists (below).
         lock: VaultLockView::Unlocked.into(),
         endpoints: ResidentEndpointsV1 {
-            agent: match &args.agent {
-                AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => {
-                    endpoint.clone()
-                },
-            },
+            agent: agent_endpoint,
             agent_listener: match &args.agent {
                 AgentEndpoint::Standard(_) => AgentListenerV1::Standard,
                 AgentEndpoint::Receipt(_) => AgentListenerV1::Receipt,
@@ -970,42 +1018,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     })
     .with_events(events.clone());
     let stop = StopSignal::default();
-    let personae = Arc::new(
-        PersonaeHost::new(
-            IdentityVault::with_profile(opened.storage, profile),
-            args.data_root.clone(),
-            protection,
-        )
-        // So a profile switch is remembered for the whole family, not just
-        // applied to this resident.
-        .with_vault_dir(args.vault_dir.clone())
-        // Every lock persists beside the vault, so a restart waits for a
-        // user act (vault lock rulings 5, 76, 80).
-        .with_persisted_lock(args.vault_dir.clone()),
-    );
     // What Graphshell's doors and the custody route serve (dramatis repo
-    // plan, D15): the host, its native surface and its wallet root.
+    // plan, D15): custody, its native surface and its wallet root.
     let keeper = Arc::new(
         Keeper::new(Arc::clone(&personae))
             .with_ui(Arc::new(args.native_identity_ui()))
             .with_wallet_root(args.data_root.clone()),
     );
-    // An installed custodian holds the vault for the H1 consumers (custody
-    // isolation plan, §5.6): Graphshell's guest delegations and Distillery's
-    // mesh author go to it, with no in-process fallback. The start's
-    // passphrase unlocks it once here and is then dropped.
-    let custodian = djinn::custodian::InstalledCustodian::load()?
-        .map(|installed| Arc::new(djinn::custodian::CustodianLink::new(installed)));
-    if let Some(link) = &custodian {
-        if let Some(passphrase) = startup_passphrase.as_ref() {
-            match tokio::task::block_in_place(|| link.unlock(passphrase)) {
-                Ok(()) => tracing::info!("custodian unlocked at start"),
-                Err(refusal) => tracing::warn!(?refusal, "custodian not unlocked at start"),
-            }
-        }
-        keeper.attach_custodian(Arc::clone(link))?;
-    }
-    drop(startup_passphrase);
     // The status follows the lock (ruling 31's watch channel; harness H4).
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
@@ -1017,9 +1036,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     let unlocker: resident_status::Unlocker = {
         let personae = Arc::clone(&personae);
         Arc::new(move |passphrase: &[u8]| {
-            personae
-                .unlock_vault(castellan::custody::UnlockMethod::Passphrase(passphrase))
-                .map_err(|error| error.to_string())
+            tokio::task::block_in_place(|| personae.unlock_with_passphrase(passphrase))
         })
     };
     // `djinn --unlock --native` shows the resident's own prompt (ruling 47).
@@ -1029,7 +1046,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         Arc::new(move || {
             let prompt = || {
                 djinn::identity_ui::apply_native_identity_action(
-                    &personae,
+                    personae.as_ref(),
                     &native_ui,
                     djinn::door::browser_carrier::NativeIdentityAction::UnlockVault,
                 )
@@ -1049,7 +1066,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let warned = events.clone();
         djinn::lock_triggers::spawn(
             djinn::lock_triggers::settings_path(&owner_settings::default_app_dir()),
-            move || locker.lock_vault().map_err(|error| error.to_string()),
+            move || tokio::task::block_in_place(|| locker.lock_vault()),
             personae.lock_state(),
             move |reason| reported.emit("lock-trigger", json!({ "reason": reason.as_str() })),
             move |warning| {
@@ -1088,24 +1105,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         &data_root,
         &profile_id,
         owner,
-        // The lane's mesh author: exactly its two release salts, from the
-        // custodian when one is installed, else captured from this host.
-        match &custodian {
-            Some(link) => djinn::resident::MeshAuthor::Custodian(Arc::clone(link)),
-            None => djinn::resident::MeshAuthor::Resident,
-        },
+        // The lane's mesh author: exactly its two release salts, from custody.
+        djinn::resident::MeshAuthor::Custody(Arc::clone(&personae)),
     )
     .await?;
-    #[cfg(not(feature = "personal-sync"))]
-    drop(custodian);
-    // The credential keys follow the vault's lock (vault lock ruling 1).
-    #[cfg(feature = "personal-sync")]
-    personae.register_lock_holder(resident.credential_lock_holder());
-    #[cfg(feature = "cxf")]
-    keeper.attach_credential_stores(
-        profile_id.clone(),
-        resident.credential_stores(personae.as_ref(), &data_root)?,
-    )?;
     // The reservoir lives under the family-shared root, not this resident's
     // data root: every application of the identity reaches the same meres.
     #[cfg(feature = "personal-sync")]
@@ -1174,29 +1177,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         tracing::warn!("control: a blob-store holder left outside the task scope");
     }
     let outcome: Result<(), Box<dyn std::error::Error>> = tasks.scope(Box::pin(async {
-        #[cfg(not(windows))]
-        prepare_unix_endpoint(Path::new(match &args.agent {
-            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
-        }))
-        .await?;
-
-        let agent_listener = match &args.agent {
-            AgentEndpoint::Standard(endpoint) => personae.bind_standard_listener(endpoint)?,
-            AgentEndpoint::Receipt(endpoint) => personae.bind_receipt_listener(endpoint)?,
-        };
-        let agent_endpoint = match &args.agent {
-            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
-        };
-        #[cfg(not(windows))]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(agent_endpoint, std::fs::Permissions::from_mode(0o600))?;
-        }
-        tracing::info!(endpoint = agent_endpoint, "SSH agent listening");
+        let agent = serve_agent(&args, &custody).await?;
 
         let allowlist = AllowedExtensions::default()
             .with_additional(&std::env::var(EXTRA_EXTENSIONS_ENV).unwrap_or_default());
-        let agent = listen(agent_listener, personae.agent_session());
         #[cfg(feature = "personal-sync")]
         let (supplemental_cards, device_directory, personal_sync_host) = match device_sync::start(
             personae.as_ref(),
@@ -1456,10 +1440,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 }
                 result = &mut agent, if exit.is_none() => {
                     events.stopping("agent listener ended");
-                    exit = Some(match result {
-                        Ok(()) => Err("SSH agent listener ended unexpectedly".into()),
-                        Err(error) => Err(error.into()),
-                    });
+                    exit = Some(Err(match result {
+                        Ok(()) => "SSH agent listener ended unexpectedly".into(),
+                        Err(error) => error.into(),
+                    }));
                 }
                 result = &mut browser, if exit.is_none() => {
                     events.stopping("browser broker ended");

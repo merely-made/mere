@@ -9,6 +9,7 @@
 use super::{CapturedDelta, Graph, NodeKey, ResourceNode};
 use crate::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use crate::types::{ClassificationScheme, ClassificationStatus, NodeClassification, NodeProperty};
+use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
@@ -79,6 +80,8 @@ pub(crate) fn validate_content_record(
 enum ResourceHandlePayload {
     Semantic(super::SemanticStatement),
     Literal(crate::types::NodeProperty),
+    /// A row of the write under check, whose statements are not yet stored.
+    Pending,
 }
 #[derive(Clone, PartialEq, Eq)]
 enum ResourceHandleOwner {
@@ -92,6 +95,18 @@ pub(crate) enum LiteralWrite<'a> {
     Resource(Uuid, &'a [NodeProperty]),
     /// Retained Surface literals, by Surface node id.
     Surface(Uuid, &'a [NodeProperty]),
+}
+
+/// A write checked against the handle rule before it is stored.
+#[derive(Clone, Copy)]
+pub(crate) enum PendingWrite<'a> {
+    Literals(LiteralWrite<'a>),
+    /// The handles of the rows that replace every Resource edge from one
+    /// Resource to another. Each handle may sit on one row only.
+    ResourceEdges(Uuid, Uuid, &'a [String]),
+    /// The handles of the rows that replace every Surface edge from one node to
+    /// another, by node id.
+    SurfaceEdges(Uuid, Uuid, &'a [String]),
 }
 
 impl Graph {
@@ -156,8 +171,9 @@ impl Graph {
     }
 
     /// Check Resource handle ownership after a host overlays retained Surface facets.
-    /// Historical Surface-only duplicate grammar remains unchanged. Checked open and
-    /// replayed writes share this one rule.
+    /// Held Surface-only duplicates keep their historical grammar. Checked open and
+    /// replayed writes share this one rule; a replayed edge set also keeps each
+    /// handle to one row.
     pub fn validate_active_resource_assertion_handles(&self) -> Result<(), ContentError> {
         self.validate_handles_after(None)
     }
@@ -178,7 +194,7 @@ impl Graph {
         if incoming.iter().all(|property| held.contains(property)) {
             return Ok(());
         }
-        self.validate_handles_after(Some(write))
+        self.validate_handles_after(Some(PendingWrite::Literals(write)))
     }
 
     pub(crate) fn admit_record_literals(
@@ -211,17 +227,26 @@ impl Graph {
         self.admit_literals(LiteralWrite::Surface(node_id, &properties))
     }
 
-    fn validate_handles_after(&self, write: Option<LiteralWrite<'_>>) -> Result<(), ContentError> {
+    pub(super) fn validate_handles_after(
+        &self,
+        write: Option<PendingWrite<'_>>,
+    ) -> Result<(), ContentError> {
+        let literals = match write {
+            Some(PendingWrite::Literals(literals)) => Some(literals),
+            _ => None,
+        };
         let mut handles = std::collections::BTreeMap::<
             String,
             (ResourceHandleOwner, ResourceHandlePayload),
         >::new();
+        // A strict claim is refused whenever any other row holds the handle.
         let mut insert = |id: String,
                           owner: ResourceHandleOwner,
-                          payload: ResourceHandlePayload|
+                          payload: ResourceHandlePayload,
+                          strict: bool|
          -> Result<(), ContentError> {
             if let Some((held_owner, held_payload)) = handles.get(&id) {
-                if *held_owner != owner || *held_payload != payload {
+                if strict || *held_owner != owner || *held_payload != payload {
                     return Err(ContentError::HandleCollision(id));
                 }
             } else {
@@ -230,21 +255,32 @@ impl Graph {
             Ok(())
         };
         for (from, to, payload) in self.resource_edges() {
+            if matches!(write, Some(PendingWrite::ResourceEdges(a, b, _)) if (a, b) == (from.id(), to.id()))
+            {
+                continue;
+            }
             for statement in payload.assertions() {
                 insert(
                     statement.statement_id.clone(),
                     ResourceHandleOwner::Relation(from.id(), to.id()),
                     ResourceHandlePayload::Semantic(statement.clone()),
+                    false,
                 )?;
             }
         }
-        let unheld = match write {
+        if let Some(PendingWrite::ResourceEdges(from, to, rows)) = write {
+            for id in rows {
+                let owner = ResourceHandleOwner::Relation(from, to);
+                insert(id.clone(), owner, ResourceHandlePayload::Pending, true)?;
+            }
+        }
+        let unheld = match literals {
             Some(LiteralWrite::Resource(id, _)) if self.resource(id).is_none() => Some(id),
             _ => None,
         };
         for id in self.resource_nodes().map(ResourceNode::id).chain(unheld) {
             let held;
-            let properties = match write {
+            let properties = match literals {
                 Some(LiteralWrite::Resource(owner, properties)) if owner == id => properties,
                 _ => {
                     held = self.resource_properties(id);
@@ -256,21 +292,48 @@ impl Graph {
                     property.statement_id.clone(),
                     ResourceHandleOwner::Literal(id),
                     ResourceHandlePayload::Literal(property.clone()),
+                    false,
                 )?;
             }
         }
-        for payload in self.inner.inner().edge_weights() {
-            for statement in payload.assertions() {
+        let replaced = match write {
+            Some(PendingWrite::SurfaceEdges(from, to, _)) => self
+                .get_node_key_by_id(from)
+                .zip(self.get_node_key_by_id(to)),
+            _ => None,
+        };
+        let mut surface_rows = std::collections::BTreeSet::new();
+        for edge in self.inner.inner().edge_references() {
+            if replaced == Some((edge.source(), edge.target())) {
+                continue;
+            }
+            for statement in edge.weight().assertions() {
                 if handles.contains_key(&statement.statement_id) {
                     return Err(ContentError::HandleCollision(
                         statement.statement_id.clone(),
                     ));
                 }
+                if replaced.is_some() {
+                    surface_rows.insert(statement.statement_id.as_str());
+                }
+            }
+        }
+        if let Some(PendingWrite::SurfaceEdges(_, _, rows)) = write {
+            // Held Surface-only duplicates keep their historical grammar; a
+            // replayed set may not put a handle on a second row.
+            let mut claimed = std::collections::BTreeSet::new();
+            for id in rows {
+                if handles.contains_key(id)
+                    || surface_rows.contains(id.as_str())
+                    || !claimed.insert(id)
+                {
+                    return Err(ContentError::HandleCollision(id.clone()));
+                }
             }
         }
         for (key, node) in self.nodes() {
             let held;
-            let properties = match write {
+            let properties = match literals {
                 Some(LiteralWrite::Surface(owner, properties)) if owner == node.id => properties,
                 _ => {
                     held = self.legacy_node_properties(key).unwrap_or_default();

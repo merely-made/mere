@@ -33,16 +33,20 @@ $vault = Join-Path $state 'vault'
 New-Item -ItemType Directory -Force -Path $programRoot, $dataRoot, $state, $vault | Out-Null
 Copy-Item -Force $Binary (Join-Path $programRoot 'djinn-custodian.exe')
 
+$custody = Join-Path $state 'data'
+New-Item -ItemType Directory -Force -Path $custody | Out-Null
 $config = Join-Path $dataRoot 'custodian.json'
+# Djinn's grants (custody isolation plan, H2 inventory). Djinn is matched by
+# the owner's SID, "some process of this user", so each grant needs consent;
+# with no consent channel qualified on Windows yet, they are refused.
+$grants = (Get-Content -Raw (Join-Path $PSScriptRoot 'packaging\djinn-grants.json.in')).Replace('@CONSENT@', 'per-generation').Replace('@SIGN_CONSENT@', 'per-operation')
 @"
 {
-  "vault": {"directory": "$($vault.Replace('\','\\'))"},
+  "vault": {"directory": "$($vault.Replace('\','\\'))", "data_root": "$($custody.Replace('\','\\'))"},
   "owner": {"windows_sid": "$ownerSid"},
   "consent": "deny",
   "principals": [
-    {"name": "djinn", "match": {"windows-sid": "$ownerSid"}, "grants": [
-      {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"}
-    ]}
+    {"name": "djinn", "match": {"windows-sid": "$ownerSid"}, "grants": $grants}
   ]
 }
 "@ | Set-Content -Encoding ascii $config

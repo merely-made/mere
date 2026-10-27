@@ -5,11 +5,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Synthetic native/wire fixture. Never opens the installed user's vault.
-use castellan::{
-    authority::PersonaeHost,
-    custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
-    resident::{CastellanResident, CredentialSalts},
-};
+//!
+//! The credential catalog is the custodian's (custody isolation plan, H2),
+//! so this host serves a fixture custodian from a thread over a new
+//! synthetic vault and composes Djinn's keeper as its client.
+#![cfg_attr(windows, allow(unused))]
+use djinn::custody_host::{CredentialCall, ResidentCustody};
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::door::browser_carrier::NativeIdentityFailure;
 use djinn::{
@@ -19,11 +20,11 @@ use djinn::{
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
     custody_client::CustodyClient,
-    identity::VaultProtectionView,
 };
-use personae::{Ed25519Keypair, PersonaId, ProfileId};
+use personae::PersonaId;
 use serde_json::json;
-use std::{collections::BTreeMap, path::PathBuf, sync::Arc, time::Duration};
+use std::{path::PathBuf, sync::Arc, time::Duration};
+const PASSPHRASE: &str = "synthetic Dramatis receipt";
 struct ReceiptUi;
 impl NativeIdentityUi for ReceiptUi {
     fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure> {
@@ -37,9 +38,7 @@ impl NativeIdentityUi for ReceiptUi {
     fn prompt_vault_passphrase(
         &self,
     ) -> Result<Option<zeroize::Zeroizing<String>>, NativeIdentityFailure> {
-        Ok(Some(zeroize::Zeroizing::new(
-            "synthetic Dramatis receipt".into(),
-        )))
+        Ok(Some(zeroize::Zeroizing::new(PASSPHRASE.into())))
     }
     fn confirm_quarantine(
         &self,
@@ -50,6 +49,12 @@ impl NativeIdentityUi for ReceiptUi {
         Ok(false)
     }
 }
+#[cfg(windows)]
+fn main() {
+    eprintln!("dramatis-review-host serves its fixture custodian on a Unix socket only");
+    std::process::exit(2);
+}
+#[cfg(unix)]
 #[tokio::main]
 async fn main() {
     let args: Vec<_> = std::env::args().skip(1).collect();
@@ -69,60 +74,43 @@ async fn main() {
         "synthetic Dramatis custody fixture",
     )
     .unwrap();
-    let storage = SealedProfileStorage::open_with_key(root.join("vault"), [0x73; 32]);
-    storage
-        .enroll_passphrase(b"synthetic Dramatis receipt")
-        .unwrap();
-    for (id, name, seed) in [("family", "Family", 0x71), ("work", "Work", 0x72)] {
-        storage
-            .save_profile(&Profile::new(
-                ProfileId(id.into()),
-                name,
-                Ed25519Keypair::from_seed([seed; 32]),
-            ))
-            .unwrap();
-    }
-    let host = Arc::new(PersonaeHost::new(
-        IdentityVault::open(storage, &ProfileId("family".into())).unwrap(),
-        None,
-        VaultProtectionView::Passphrase,
-    ));
-    let salts = CredentialSalts {
-        record: b"dramatis-receipt/records",
-        freshness: b"dramatis-receipt/freshness",
-    };
-    let resident = CastellanResident::claim_derived(
-        root.join("records"),
-        root.join("freshness"),
-        host.as_ref(),
-        salts,
+    let fixture = djinn_custodian::fixture::start(
+        &root.join("custodian"),
+        djinn_custodian::fixture::Spec {
+            passphrase: PASSPHRASE,
+            profiles: &[("family", "Family", [0x71; 32]), ("work", "Work", [0x72; 32])],
+            grants: json!([
+                {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"}, {"operation": "snapshot"},
+                {"operation": "manage", "consent": "none"}, {"operation": "credentials", "consent": "none"}
+            ]),
+            consent: "deny",
+            mechanism: None,
+            agent: false,
+        },
     )
     .unwrap();
-    host.register_lock_holder(resident.lock_holder_for_profile(salts, ProfileId("family".into())));
+    let installed = djinn::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap();
+    let host = djinn::custody_host::remote::RemoteHost::connect(installed).unwrap();
+    host.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
     let persona = PersonaId::new();
     let source = json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Receipt","email":"fixture@example.invalid","collections":[],"items":[
         {"id":"Yw","title":"Personal payment card","credentials":[{"type":"credit-card","number":{"fieldType":"concealed-string","value":"4111111111111111"}}]},
         {"id":"b3Rw","title":"Imported OTP with 11 digits","credentials":[{"type":"totp","secret":"MY======","algorithm":"sha1","period":30,"digits":11}]},
         {"id":"dW5r","title":"Credential from a newer format","credentials":[{"type":"future-credential","secret":"synthetic-never-render-this"}]}]}]});
-    let choices = BTreeMap::from([(
-        "YQ".into(),
-        castellan::cxf::Destination {
-            persona,
-            profile: ProfileId("family".into()),
-            ssh_unlock_policy: dramatis::intents::SshUnlockPolicyIntentV1::Session,
-        },
-    )]);
-    castellan::cxf::Import::read(serde_json::to_vec(&source).unwrap())
-        .unwrap()
-        .commit(choices, &resident, &host)
-        .unwrap();
+    let source = serde_json::to_vec(&source).unwrap();
+    let preview = host.credentials(CredentialCall::CxfPreview(source.clone())).unwrap();
+    host.credentials(CredentialCall::CxfImport {
+        source,
+        destinations: json!({"YQ": {"persona": persona, "profile": "family"}}),
+        preview_sha256: preview["source_sha256"].as_str().unwrap().into(),
+    })
+    .unwrap();
     let ui: Arc<dyn NativeIdentityUi> = if mode == "native" {
         Arc::new(SystemNativeIdentityUi::default())
     } else {
         Arc::new(ReceiptUi)
     };
     let keeper = Arc::new(Keeper::new(host.clone()).with_ui(ui));
-    keeper.attach_credentials(resident).unwrap();
     if mode == "locked" {
         host.lock_vault().unwrap();
     }
