@@ -228,6 +228,61 @@ fn navigate_forward_fork_preserves_the_alternate_branch() {
     );
 }
 
+#[test]
+fn replacing_a_navigation_parents_history_keeps_the_branched_child() {
+    // A child branched from a parent's history names the parent's owner as its
+    // creator. Replacing the parent's history deletes that owner and re-parents
+    // the child's, so the shared history still snapshots and the child stays put.
+    use crate::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    let mut graph = Graph::new();
+    let parent = add_node(
+        &mut graph,
+        Some(Uuid::from_u128(1)),
+        "https://example.com/parent".into(),
+        Default::default(),
+    );
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::NavigateNode {
+            key: parent,
+            url: "https://example.com/parent".into(),
+        },
+    );
+    let child = add_node(
+        &mut graph,
+        Some(Uuid::from_u128(2)),
+        "https://example.com/child".into(),
+        Default::default(),
+    );
+    apply_graph_delta(&mut graph, GraphDelta::BranchHistory { child, parent });
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::NavigateNode {
+            key: child,
+            url: "https://example.com/child".into(),
+        },
+    );
+
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::UpdateNodeHistory {
+            key: parent,
+            entries: vec!["https://example.com/replacement".into()],
+            current_index: 0,
+        },
+    );
+
+    assert_eq!(
+        graph.node_history_projection(parent).entries,
+        vec!["https://example.com/replacement".to_string()]
+    );
+    assert_eq!(
+        graph.node_current_url(child).as_deref(),
+        Some("https://example.com/child")
+    );
+    Graph::from_snapshot(&graph.to_snapshot_at(0));
+}
+
 /// Scroll left the kernel Node for the host's BrowserNodeState sidecar
 /// (boundary pass slice C). What the kernel guarantees now: a legacy
 /// snapshot's `session_state` scroll/draft stay readable on the

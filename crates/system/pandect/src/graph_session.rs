@@ -2286,6 +2286,10 @@ mod content_tests;
 mod pending_tests;
 
 #[cfg(test)]
+#[path = "graph_session_navigation_tests.rs"]
+mod navigation_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use kernel::graph::replay_captured_deltas_onto;
