@@ -48,6 +48,16 @@ pub fn arrangement_choices() -> impl Iterator<Item = (&'static str, &'static str
 
 /// The live profile id, or [`CUSTOM_PROFILE`].
 pub fn profile_id(canvas: &Canvas) -> &'static str {
+    let Ok(spec) = canvas.dynamics_spec() else {
+        return CUSTOM_PROFILE;
+    };
+    // A composed root is not named by its first live law and overlays.
+    if matches!(
+        spec.root,
+        Node::Mix { .. } | Node::Grouped { .. } | Node::Schedule { .. }
+    ) {
+        return CUSTOM_PROFILE;
+    }
     PhysicsChoice::live(canvas)
         .profile_id()
         .unwrap_or(CUSTOM_PROFILE)
@@ -1060,6 +1070,65 @@ mod tests {
         apply_grouping(&mut canvas, &grouping).unwrap();
         assert_eq!(read_two_law_grouping(&canvas), Ok(Some(grouping)));
         assert_eq!(read_two_law_mix(&canvas), Ok(None));
+    }
+
+    #[test]
+    fn profile_id_uses_composition_root_shape_not_just_live_first_law() {
+        let mut flat = canvas();
+        let mut choice = PhysicsChoice::live(&flat);
+        choice.law = PhysicsLaw::Charge;
+        choice.overlays.clear();
+        apply_physics(&mut flat, &choice);
+        assert_eq!(profile_id(&flat), "gas");
+
+        let mut mix_canvas = canvas();
+        apply_mix(
+            &mut mix_canvas,
+            &TwoLawMix {
+                first: PhysicsLaw::Charge,
+                second: PhysicsLaw::Springs,
+                first_share: 1.0,
+                second_share: 1.0,
+            },
+        )
+        .unwrap();
+        assert!(read_two_law_mix(&mix_canvas).unwrap().is_some());
+        assert_eq!(profile_id(&mix_canvas), CUSTOM_PROFILE);
+
+        let mut grouping_canvas = canvas();
+        apply_grouping(
+            &mut grouping_canvas,
+            &TwoLawGrouping {
+                partition: PhysicsKindSource::Site,
+                outer: PhysicsLaw::Charge,
+                inner: PhysicsLaw::Springs,
+                outer_share: 1.0,
+            },
+        )
+        .unwrap();
+        assert!(read_two_law_grouping(&grouping_canvas).unwrap().is_some());
+        assert_eq!(profile_id(&grouping_canvas), CUSTOM_PROFILE);
+
+        let mut schedule_canvas = canvas();
+        apply_two_stage_schedule(
+            &mut schedule_canvas,
+            &TwoStageSchedule {
+                first: StageDraft {
+                    law: PhysicsLaw::Charge,
+                    stop: StageStop::Rest,
+                    capture: None,
+                },
+                second: StageDraft {
+                    law: PhysicsLaw::Springs,
+                    stop: StageStop::Rest,
+                    capture: None,
+                },
+                overlays: Vec::new(),
+            },
+        )
+        .unwrap();
+        assert!(read_two_stage_schedule(&schedule_canvas).unwrap().is_some());
+        assert_eq!(profile_id(&schedule_canvas), CUSTOM_PROFILE);
     }
 
     #[test]

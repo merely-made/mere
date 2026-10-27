@@ -10,13 +10,16 @@
 
 use super::*;
 use crate::canvas::physics_controls::{
-    self, SPEED_PRESETS, TwoLawGrouping, TwoLawMix, TwoStageSchedule,
+    self, SPEED_PRESETS, StageDraft, TwoLawGrouping, TwoLawMix, TwoStageSchedule,
 };
 use crate::canvas::physics_form::{
     Command, Control, FieldId, FormAction, PhysicsForm, Readback, STOP_FRAMES, STOP_LAW, Section,
     Slot,
 };
-use crate::canvas::{PhysicsKindSource, PhysicsLaw, PhysicsOverlay, Role, StageStop};
+use crate::canvas::{
+    PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay, Role,
+    StageStop,
+};
 
 fn canvas() -> Canvas {
     let mut canvas = Canvas::with_sample_graph();
@@ -29,7 +32,7 @@ fn picked(canvas: &Canvas) -> PhysicsChoice {
 }
 
 fn press(form: &PhysicsForm, command: Command, canvas: &mut Canvas) -> FormOutcome {
-    form.action(command, &picked(canvas))
+    form.action(command)
         .expect("the form holds a valid request")
         .run(canvas)
 }
@@ -188,10 +191,7 @@ fn a_mix_reads_back_what_the_form_applied() {
 /// The form after its own request was applied and read back.
 fn form_after_roundtrip(form: &PhysicsForm) -> PhysicsForm {
     let mut canvas = canvas();
-    let _ = form
-        .action(Command::ApplyMix, &picked(&canvas))
-        .unwrap()
-        .run(&mut canvas);
+    let _ = form.action(Command::ApplyMix).unwrap().run(&mut canvas);
     PhysicsForm::new(&canvas)
 }
 
@@ -331,22 +331,21 @@ fn readbacks_differ_only_when_the_composition_does() {
 #[test]
 fn the_form_refuses_what_it_cannot_make_into_a_request() {
     let mut form = PhysicsForm::new(&canvas());
-    let flat = picked(&canvas());
     form.enter(FieldId::MixShare(Slot::Second), "lots");
     assert_eq!(
-        form.action(Command::ApplyMix, &flat),
+        form.action(Command::ApplyMix),
         Err("Mix shares must be numbers".into())
     );
     form.enter(FieldId::GroupOuterShare, "");
     assert_eq!(
-        form.action(Command::ApplyGrouping, &flat),
+        form.action(Command::ApplyGrouping),
         Err("Grouping outer share must be a number".into())
     );
     form.choose(FieldId::StageStop(Slot::First), STOP_FRAMES);
     for bad in ["0", "-3", "12.5", "many", ""] {
         form.enter(FieldId::StageFrames(Slot::First), bad);
         assert_eq!(
-            form.action(Command::ApplySchedule, &flat),
+            form.action(Command::ApplySchedule),
             Err("Schedule refused · First stage frames must be a positive integer".into()),
             "{bad:?}"
         );
@@ -355,7 +354,7 @@ fn the_form_refuses_what_it_cannot_make_into_a_request() {
     form.choose(FieldId::StageStop(Slot::Second), STOP_FRAMES);
     form.enter(FieldId::StageFrames(Slot::Second), "0");
     assert_eq!(
-        form.action(Command::ApplySchedule, &flat),
+        form.action(Command::ApplySchedule),
         Err("Schedule refused · Second stage frames must be a positive integer".into())
     );
 }
@@ -430,4 +429,383 @@ fn the_requests_the_form_makes_are_the_typed_inputs() {
             overlays: Vec::new(),
         })
     );
+}
+
+#[test]
+fn flat_physics_fields_are_typed_and_unknown_ids_are_noops() {
+    let mut form = PhysicsForm::new(&canvas());
+    let fields = PhysicsForm::physics_fields();
+    assert_eq!(fields.first(), Some(&FieldId::PhysicsLaw));
+    assert_eq!(fields.last(), Some(&FieldId::PhysicsProfile));
+    assert_eq!(
+        fields
+            .iter()
+            .filter(|id| **id == FieldId::PhysicsOverlay(PhysicsOverlay::ALL[0]))
+            .count(),
+        1
+    );
+    for field in fields {
+        let value = form.field(field);
+        assert!(!value.label.is_empty());
+        match (field, value.control) {
+            (FieldId::PhysicsLaw, Control::Choice { options, .. }) => {
+                assert_eq!(options, crate::canvas::CANVAS_PHYSICS_LAWS.to_vec());
+            },
+            (FieldId::PhysicsKind | FieldId::PhysicsGroups, Control::Choice { options, .. }) => {
+                assert_eq!(options, crate::canvas::CANVAS_PHYSICS_KIND_SOURCES.to_vec());
+            },
+            (FieldId::PhysicsMass, Control::Choice { options, .. }) => {
+                assert_eq!(options, crate::canvas::CANVAS_PHYSICS_MASS_SOURCES.to_vec());
+            },
+            (FieldId::PhysicsDepth, Control::Choice { options, .. }) => {
+                assert_eq!(
+                    options,
+                    crate::canvas::CANVAS_PHYSICS_DEPTH_SOURCES.to_vec()
+                );
+            },
+            (FieldId::PhysicsOverlay(_), Control::Toggle(_)) => {},
+            (FieldId::PhysicsProfile, Control::Choice { options, .. }) => {
+                assert_eq!(
+                    options.first(),
+                    Some(&(physics_controls::CUSTOM_PROFILE, "Custom (no profile)"))
+                );
+            },
+            _ => panic!("unexpected control for {field:?}"),
+        }
+    }
+    for (field, invalid) in [
+        (FieldId::PhysicsLaw, "not-a-law"),
+        (FieldId::PhysicsKind, "not-a-source"),
+        (FieldId::PhysicsMass, "not-a-source"),
+        (FieldId::PhysicsDepth, "not-a-source"),
+        (FieldId::PhysicsGroups, "not-a-source"),
+        (FieldId::PhysicsProfile, "not-a-profile"),
+    ] {
+        let before = form.clone();
+        assert!(!form.choose(field, invalid));
+        assert_eq!(form, before, "unknown field choice is atomic: {field:?}");
+    }
+    let overlay = FieldId::PhysicsOverlay(PhysicsOverlay::ALL[0]);
+    assert!(form.tick(overlay, true));
+    assert_eq!(form.value(overlay), "true");
+    assert_eq!(form.physics_choice().overlays, vec![PhysicsOverlay::ALL[0]]);
+}
+
+#[test]
+fn readback_names_flat_charge_gas_and_composed_roots_custom() {
+    let mut flat_canvas = canvas();
+    let mut flat_spec = flat_canvas.dynamics_spec().unwrap();
+    let mut choice = PhysicsChoice::live(&flat_canvas);
+    choice.law = PhysicsLaw::Charge;
+    choice.overlays.clear();
+    choice.write_into(&mut flat_spec, &PhysicsChoice::live(&flat_canvas));
+    flat_canvas.set_dynamics_spec(&flat_spec).unwrap();
+    assert_eq!(Readback::of(&flat_canvas).physics_profile, "gas");
+    assert_eq!(PhysicsForm::new(&flat_canvas).profile_id(), "gas");
+
+    let mut mix_canvas = canvas();
+    physics_controls::apply_mix(
+        &mut mix_canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 1.0,
+            second_share: 1.0,
+        },
+    )
+    .unwrap();
+    let mix_readback = Readback::of(&mix_canvas);
+    assert_eq!(mix_readback.physics.law, PhysicsLaw::Charge);
+    assert_eq!(
+        mix_readback.physics_profile,
+        physics_controls::CUSTOM_PROFILE
+    );
+
+    let mut grouping_canvas = canvas();
+    physics_controls::apply_grouping(
+        &mut grouping_canvas,
+        &TwoLawGrouping {
+            partition: PhysicsKindSource::Site,
+            outer: PhysicsLaw::Charge,
+            inner: PhysicsLaw::Springs,
+            outer_share: 1.0,
+        },
+    )
+    .unwrap();
+    assert_eq!(
+        Readback::of(&grouping_canvas).physics_profile,
+        physics_controls::CUSTOM_PROFILE
+    );
+
+    let mut schedule_canvas = canvas();
+    physics_controls::apply_two_stage_schedule(
+        &mut schedule_canvas,
+        &TwoStageSchedule {
+            first: StageDraft {
+                law: PhysicsLaw::Charge,
+                stop: StageStop::Rest,
+                capture: None,
+            },
+            second: StageDraft {
+                law: PhysicsLaw::Springs,
+                stop: StageStop::Rest,
+                capture: None,
+            },
+            overlays: vec![],
+        },
+    )
+    .unwrap();
+    assert_eq!(
+        Readback::of(&schedule_canvas).physics_profile,
+        physics_controls::CUSTOM_PROFILE
+    );
+}
+
+#[test]
+fn typed_source_only_edit_keeps_composed_root_and_law_edit_replaces_it() {
+    let mut canvas = canvas();
+    physics_controls::apply_mix(
+        &mut canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 0.4,
+            second_share: 0.6,
+        },
+    )
+    .unwrap();
+    let original = canvas.dynamics_spec().unwrap();
+    let mut form = PhysicsForm::new(&canvas);
+    assert!(form.choose(FieldId::PhysicsKind, PhysicsKindSource::Cluster.id()));
+    let choice = form.physics_choice();
+    assert_eq!(choice.kind, PhysicsKindSource::Cluster);
+    physics_controls::apply_physics(&mut canvas, &choice);
+    let after_source = canvas.dynamics_spec().unwrap();
+    assert_eq!(after_source.root, original.root);
+    assert_eq!(after_source.seed, original.seed);
+    assert_eq!(after_source.target, original.target);
+
+    assert!(form.choose(FieldId::PhysicsLaw, PhysicsLaw::Springs.id()));
+    physics_controls::apply_physics(&mut canvas, &form.physics_choice());
+    let after_law = canvas.dynamics_spec().unwrap();
+    assert_ne!(after_law.root, original.root);
+    assert_eq!(after_law.seed, original.seed);
+    assert_eq!(after_law.target, original.target);
+}
+
+#[test]
+fn profile_choice_changes_only_law_and_overlays_and_unknown_is_atomic() {
+    let mut form = PhysicsForm::new(&canvas());
+    assert!(form.choose(FieldId::PhysicsKind, PhysicsKindSource::Cluster.id()));
+    assert!(form.choose(FieldId::PhysicsMass, PhysicsMassSource::PageRank.id()));
+    assert!(form.choose(FieldId::PhysicsDepth, PhysicsDepthSource::Layers.id()));
+    assert!(form.choose(FieldId::PhysicsGroups, PhysicsKindSource::Meaning.id()));
+    let sources = form.physics_choice().sources();
+    assert!(form.choose(FieldId::PhysicsProfile, "gas"));
+    let choice = form.physics_choice();
+    assert_eq!(choice.law, PhysicsLaw::Charge);
+    assert_eq!(choice.sources(), sources);
+    assert_eq!(form.profile_id(), "gas");
+    assert!(form.choose(FieldId::PhysicsProfile, physics_controls::CUSTOM_PROFILE));
+    assert_eq!(form.physics_choice(), choice);
+    assert_eq!(form.profile_id(), physics_controls::CUSTOM_PROFILE);
+
+    assert!(form.choose(FieldId::PhysicsProfile, "solid"));
+    assert_eq!(form.physics_choice().sources(), sources);
+    assert_eq!(
+        form.physics_choice().overlays,
+        vec![
+            PhysicsOverlay::DomainCluster,
+            PhysicsOverlay::DegreeRepulsion
+        ]
+    );
+}
+
+#[test]
+fn no_op_flat_picks_keep_custom_readback() {
+    let mut mix_canvas = canvas();
+    physics_controls::apply_mix(
+        &mut mix_canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 1.0,
+            second_share: 1.0,
+        },
+    )
+    .unwrap();
+    let mut form = PhysicsForm::new(&mix_canvas);
+    assert_eq!(form.profile_id(), physics_controls::CUSTOM_PROFILE);
+    assert!(form.choose(FieldId::PhysicsLaw, PhysicsLaw::Charge.id()));
+    assert!(form.tick(FieldId::PhysicsOverlay(PhysicsOverlay::GravityLocus), false));
+    assert_eq!(form.profile_id(), physics_controls::CUSTOM_PROFILE);
+}
+
+#[test]
+fn readback_and_source_only_edit_preserve_authored_overlay_run_order() {
+    let authored_overlays = [
+        PhysicsOverlay::DomainCluster,
+        PhysicsOverlay::DegreeRepulsion,
+    ];
+    let mut canvas = canvas();
+    let mut spec = canvas.dynamics_spec().unwrap();
+    let running = PhysicsChoice::live(&canvas);
+    let mut flat = running.clone();
+    flat.law = PhysicsLaw::Springs;
+    flat.overlays = authored_overlays.to_vec();
+    flat.write_into(&mut spec, &running);
+    canvas.set_dynamics_spec(&spec).unwrap();
+
+    physics_controls::apply_mix(
+        &mut canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 0.4,
+            second_share: 0.6,
+        },
+    )
+    .unwrap();
+    let before = canvas.dynamics_spec().unwrap();
+    let mut form = PhysicsForm::new(&canvas);
+    assert_eq!(form.physics_choice().overlays, authored_overlays.to_vec());
+    assert_eq!(form.physics_choice(), Readback::of(&canvas).physics);
+    assert_eq!(form.profile_id(), physics_controls::CUSTOM_PROFILE);
+
+    assert!(form.choose(FieldId::PhysicsKind, PhysicsKindSource::Cluster.id()));
+    physics_controls::apply_physics(&mut canvas, &form.physics_choice());
+    let after = canvas.dynamics_spec().unwrap();
+    assert_eq!(after.root, before.root);
+    assert_eq!(after.seed, before.seed);
+    assert_eq!(after.target, before.target);
+    assert_eq!(
+        PhysicsChoice::live(&canvas).overlays,
+        authored_overlays.to_vec()
+    );
+    assert_eq!(
+        PhysicsForm::new(&canvas).profile_id(),
+        physics_controls::CUSTOM_PROFILE
+    );
+}
+
+#[test]
+fn source_only_edits_keep_mix_grouping_and_schedule_roots_and_overlay_order() {
+    let authored_overlays = [
+        PhysicsOverlay::DomainCluster,
+        PhysicsOverlay::DegreeRepulsion,
+    ];
+    let mut mix_canvas = canvas();
+    install_authored_overlay_order(&mut mix_canvas, &authored_overlays);
+    physics_controls::apply_mix(
+        &mut mix_canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 0.4,
+            second_share: 0.6,
+        },
+    )
+    .unwrap();
+    assert_source_only_keeps_root_and_order(&mut mix_canvas, &authored_overlays);
+
+    let mut grouping_canvas = canvas();
+    install_authored_overlay_order(&mut grouping_canvas, &authored_overlays);
+    physics_controls::apply_grouping(
+        &mut grouping_canvas,
+        &TwoLawGrouping {
+            partition: PhysicsKindSource::Site,
+            outer: PhysicsLaw::Charge,
+            inner: PhysicsLaw::Springs,
+            outer_share: 0.5,
+        },
+    )
+    .unwrap();
+    assert_source_only_keeps_root_and_order(&mut grouping_canvas, &authored_overlays);
+
+    let mut schedule_canvas = canvas();
+    let schedule_overlays = [
+        PhysicsOverlay::DegreeRepulsion,
+        PhysicsOverlay::DomainCluster,
+    ];
+    install_authored_overlay_order(&mut schedule_canvas, &schedule_overlays);
+    physics_controls::apply_two_stage_schedule(
+        &mut schedule_canvas,
+        &TwoStageSchedule {
+            first: StageDraft {
+                law: PhysicsLaw::Charge,
+                stop: StageStop::Rest,
+                capture: None,
+            },
+            second: StageDraft {
+                law: PhysicsLaw::Springs,
+                stop: StageStop::Rest,
+                capture: None,
+            },
+            overlays: schedule_overlays.to_vec(),
+        },
+    )
+    .unwrap();
+    assert_source_only_keeps_root_and_order(&mut schedule_canvas, &schedule_overlays);
+}
+
+fn install_authored_overlay_order(canvas: &mut Canvas, overlays: &[PhysicsOverlay]) {
+    let mut spec = canvas.dynamics_spec().unwrap();
+    let running = PhysicsChoice::live(canvas);
+    let mut choice = running.clone();
+    choice.overlays = overlays.to_vec();
+    choice.write_into(&mut spec, &running);
+    canvas.set_dynamics_spec(&spec).unwrap();
+}
+
+fn assert_source_only_keeps_root_and_order(canvas: &mut Canvas, overlays: &[PhysicsOverlay]) {
+    let before = canvas.dynamics_spec().unwrap();
+    let mut form = PhysicsForm::new(canvas);
+    assert_eq!(form.physics_choice().overlays.as_slice(), overlays);
+    for overlay in overlays {
+        assert!(form.tick(FieldId::PhysicsOverlay(*overlay), true));
+    }
+    assert_eq!(form.physics_choice().overlays.as_slice(), overlays);
+    assert!(form.choose(FieldId::PhysicsKind, PhysicsKindSource::Cluster.id()));
+    physics_controls::apply_physics(canvas, &form.physics_choice());
+    let after = canvas.dynamics_spec().unwrap();
+    assert_eq!(after.root, before.root);
+    assert_eq!(after.seed, before.seed);
+    assert_eq!(after.target, before.target);
+    assert_eq!(PhysicsChoice::live(canvas).overlays.as_slice(), overlays);
+}
+
+#[test]
+fn matching_profile_keeps_composition_until_single_law_is_explicit() {
+    let mut canvas = canvas();
+    let mut flat = PhysicsChoice::live(&canvas);
+    flat.overlays.clear();
+    physics_controls::apply_physics(&mut canvas, &flat);
+    physics_controls::apply_mix(
+        &mut canvas,
+        &TwoLawMix {
+            first: PhysicsLaw::Charge,
+            second: PhysicsLaw::Springs,
+            first_share: 1.0,
+            second_share: 1.0,
+        },
+    )
+    .unwrap();
+    let before = canvas.dynamics_spec().unwrap();
+    let mut form = PhysicsForm::new(&canvas);
+    assert!(form.choose(FieldId::PhysicsProfile, "gas"));
+    assert_eq!(
+        canvas.dynamics_spec().unwrap(),
+        before,
+        "a form pick is staged"
+    );
+    physics_controls::apply_physics(&mut canvas, &form.physics_choice());
+    assert_eq!(canvas.dynamics_spec().unwrap().root, before.root);
+    assert_eq!(
+        Readback::of(&canvas).physics_profile,
+        physics_controls::CUSTOM_PROFILE
+    );
+
+    form.action(Command::UseSingleLaw).unwrap().run(&mut canvas);
+    assert_eq!(physics_controls::read_two_law_mix(&canvas), Ok(None));
+    assert_eq!(Readback::of(&canvas).physics_profile, "gas");
 }
