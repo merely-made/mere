@@ -117,7 +117,7 @@ async fn fresh_resident_enforces_recorded_access() {
         std::env::var(PARENT).unwrap()
     );
     let root = Path::new(&root);
-    let reservoir = ResidentReservoir::open(root, Some(persona()))
+    let reservoir = ResidentReservoir::open(root, persona())
         .await
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());

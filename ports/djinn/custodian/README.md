@@ -1,6 +1,6 @@
 # Djinn custodian
 
-Status: H2 implemented. The custodian holds Castellan's resident host, the wallet, the credential catalog and the SSH agent, and a production Djinn reaches all of them through it: Djinn links no castellan and opens no vault. The H1 and H2 tests pass on macOS. Linux and Windows builds type-check; their qualification steps below are still to run on those hosts. Production enablement waits on those runs and on the gaps in the [plan](../../../design_docs/dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration).
+Status: H2 implemented. The custodian holds Castellan's resident host, the wallet, the credential catalog and the SSH agent, and a production Djinn reaches all of them through it: Djinn links no castellan, opens no vault and opens no wallet file. An existing wallet and catalog move into the custodian's state directory with `adopt --data-from`. The H1 and H2 tests pass on macOS. Linux and Windows builds type-check; their qualification steps below are still to run on those hosts. Production enablement waits on those runs and on the gaps in the [plan](../../../design_docs/dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration).
 
 `djinn-custodian` is the independently launched process that opens Djinn's Castellan vault (custody isolation plan, §5). Only this process does the following:
 - unlocks the vault and locks it;
@@ -26,6 +26,7 @@ Djinn and every other client go through [`custody-wire`](wire) over authenticate
   - derived keys of the persona or wallet root, attestations, derived signatures and public keys;
   - the public read model, profile intents, passphrase change, SSH import and vault commands;
   - wallet epochs, station grants and device revocation;
+  - the wallet's public records, the persona index and the device roster, answerable while locked to a `snapshot` grant;
   - retained payloads;
   - the credential catalog.
 - [`policy`](src/policy.rs): installed, deny-by-default, per-principal grants for profile, operation, namespace and consent.
@@ -35,7 +36,7 @@ Djinn and every other client go through [`custody-wire`](wire) over authenticate
 - [`host`](src/host.rs): Djinn's real passphrase vault behind Castellan's `PersonaeHost`.
   - Every start is locked. The first unlock builds the host on the configured or remembered profile and claims the credential catalog; later unlocks reopen it. A changed identity is refused.
   - Nothing mints a profile, and an OS-sealed (DPAPI) vault must be migrated first.
-- [`wallet`](src/wallet.rs) and [`credentials`](src/credentials.rs): the wallet's acts and the credential catalog's operations, moved from Djinn unchanged in effect. The epoch derivation is pinned by a test against the epoch read directly.
+- [`wallet`](src/wallet.rs) and [`credentials`](src/credentials.rs): the wallet's acts, its public records and the credential catalog's operations, moved from Djinn unchanged in effect. The epoch derivation is pinned by a test against the epoch read directly. [`wallet::adopt`](src/wallet/adopt.rs) lists the wallet's files and carries them into a data root: same relative paths, same bytes, proved to open to the same wallet before the source copies go.
 - [`agent`](src/agent.rs) (Unix): the SSH agent. Its socket admits only the owner's uid, and only once the vault has opened. Per-use approvals become consent petitions.
 - [`core`](src/core.rs): the state machine without I/O, driven by [`driver`](src/driver.rs) over any listener. Lock, unlock and revocation each advance one generation, cancel pending petitions and broadcast a fact. A lock reports separately whether memory locked, the drain finished and the barrier persisted.
 - [`delegation`](src/delegation.rs): the signing consumer for Graphshell (`mere.graphshell`). It decodes an insigne delegation certificate or revocation, rebuilds it byte-for-byte, then checks the audience, the issuer and the scope key before signing inside custody.
@@ -50,11 +51,15 @@ The `synthetic` module is the 2026-10-22 core behind the signed macOS receiving 
 djinn-custodian --config /etc/djinn-custodian/USER.json            # listeners from systemd/launchd
 djinn-custodian init  --config PATH                                 # new vault; passphrase twice on stdin
 djinn-custodian adopt --config PATH --from DJINN-VAULT-DIR          # copy and reopen to the same identity
+djinn-custodian adopt --config PATH --data-from DJINN-DATA-ROOT     # carry the wallet and catalog, then remove the copies there
+djinn-custodian wallet-files --data-root DIR                        # the wallet's and catalog's files, NUL-separated
 ```
 
 `--socket PATH` binds the custody socket directly, plus `vault.agent_endpoint` when configured. It is refused outside development mode. Installers: [Linux](install-linux.sh), [macOS](install-macos.sh), [Windows](install-windows.ps1). Djinn finds an installed custodian through a client file the desktop user cannot write (`djinn::custodian::installed_path`); the file also names the agent socket for Djinn's status. A Djinn harness build (`passphrase-fd`) never reads the installed file. It reaches only a custodian named with `--custodian FILE`.
 
-The installers point `vault.data_root` at the custodian's own state directory, so a wallet and catalog created there are the custodian's alone. An existing wallet or catalog in Djinn's data root is not moved (see the plan's wallet gap).
+The installers point `vault.data_root` at the custodian's own state directory, so a wallet and catalog created there are the custodian's alone, and Djinn gets the wallet's public records (the persona index and the device roster) through the `WalletPublic` operation rather than from a file.
+
+`adopt --data-from DIR` moves an existing wallet and catalog out of Djinn's data root (the directory holding `identity/` and `castellan/`). `--from` and `--data-from` may be given together or alone. `--data-from` carries every file of the wallet, secret and public, and the catalog, byte for byte at the same relative paths. It checks that the copy holds the same seed, persona index, roster and manifests, then removes the copies in `DIR`. It refuses a root that already holds a wallet or catalog, an overlap, and any symlink. If a copy cannot be removed, or changed after it was carried, it stays, adopt names it and exits non-zero. Pass the owner's data root as the last installer argument: `install-linux.sh USER BINARY [DJINN-VAULT-DIR|-] [DJINN-DATA-ROOT]`, `install-macos.sh USER BINARY TEAM DJINN-TEAM [DJINN-DATA-ROOT]`.
 
 ## Platform recipes and qualification
 
@@ -66,7 +71,7 @@ The installers point `vault.data_root` at the custodian's own state directory, s
 
 **Linux** (on the Fedora ThinkPad, kernel with Landlock ABI ≥ 6):
 1. Build there: `cargo +1.99.1 test --locked -p djinn-custodian -p custody-wire`, then Djinn's `custodian_client`, `quarantine_review` and `cxf_import` tests. The process tests run unconfined there; confinement runs in development (logging) mode.
-2. Install: `sudo ./install-linux.sh markik target/release/djinn-custodian ~/.local/share/djinn/vault`. Check that `systemctl status djinn-custodian@markik.socket djinn-custodian-agent@markik.socket` both listen.
+2. Install: `sudo ./install-linux.sh markik target/release/djinn-custodian ~/.local/share/djinn/vault ~/.local/share/mere` (the last argument is the directory holding `identity/` and `castellan/`: the family root `~/.local/share/mere`, or Djinn's own data root if `--data-root` named one; `djinn-custodian wallet-files --data-root DIR` lists what a directory holds. The owner's account pipes those files to the custodian's account, which removes its staged copy after proving them, then the owner removes the originals). Check that `systemctl status djinn-custodian@markik.socket djinn-custodian-agent@markik.socket` both listen.
 3. Start once with `"development": true` in `/etc/djinn-custodian/markik.json`. Run the production `djinn` (default features) and exercise:
    - start and unlock, door admission and personal sync;
    - a Knot reopen after lock, a payload seal and a quarantine review;
@@ -88,12 +93,16 @@ The installers point `vault.data_root` at the custodian's own state directory, s
    Count the prompts after an unlock and record them; that count is the cost of the same-user posture.
 6. Kill the custodian. Djinn must report the identity pending, with its holders locked and its doors refusing new sessions. After a restart the custodian must be locked with a fresh instance.
 7. Confirm that `djinn` (default features) does not link castellan: `cargo tree -p djinn -e normal -i castellan` must fail.
-8. Leave the wallet at rest as it is. The plan's wallet gap decides when an existing wallet moves.
+8. Check the wallet at rest. Before the install, note Djinn's wallet public key, a persona UUID, and one epoch-derived result (a Knot reopen). After it:
+   - Djinn's data root holds no `identity/` and no `castellan/`, and no `private-epoch-bridge.json` or `wallet.json` under `personas/*/`;
+   - `/var/lib/djinn-custodian/markik/data` holds them, each file `0600` in `0700` directories, and step 4 denies `markik` reading it;
+   - after the unlock, Djinn's status shows the same wallet public key and persona, the resident reservoir opens that persona (it takes the sole persona from the custodian), and the Knot reopen and payload unseal of step 3 still read the content made before the move;
+   - `systemctl stop djinn-custodian@markik.socket` followed by a restart reproduces all of it from the custodian's files alone.
 
 **macOS** (needs the user's signing step, from an account the receiving account cannot use, H1-F1):
 1. Sign `djinn-custodian` with the team identity, the hardened runtime and identifier `com.merely.djinn.custodian`. Sign Djinn as `com.merely.djinn`.
 2. Run `sudo ./install-macos.sh USER BINARY TEAM DJINN_TEAM` and log in as USER.
-3. Repeat Linux steps 3, 4, 6 and 7 there. An unsigned or differently signed peer must be refused at both ends.
+3. Repeat Linux steps 3, 4, 6 and 7 there. An unsigned or differently signed peer must be refused at both ends. To move an existing wallet, pass its data root as the installer's last argument. The custodian's state directory is the same account's as Djinn's, so that move changes who holds and uses the wallet, not who can open the file; the data-protection envelope below is what remains.
 4. Per-use SSH keys are refused: the macOS config has no consent channel (`deny`).
 
 The data-protection Keychain envelope and the native consent dialog remain the [signed fixture's](../../../testing/macos-castellan-custodian-h1/README.md) pieces and are not part of this binary.
@@ -108,7 +117,7 @@ Djinn's grants are installed, but every one needs consent. The config is `deny` 
 ## Negative controls and H2 tests (CI, no GUI)
 
 The controls are in these files:
-- [`src/tests.rs`](src/tests.rs), [`src/tests/driver_tests.rs`](src/tests/driver_tests.rs), [`src/tests/h2_tests.rs`](src/tests/h2_tests.rs) and [`tests/process.rs`](tests/process.rs);
+- [`src/tests.rs`](src/tests.rs), [`src/tests/driver_tests.rs`](src/tests/driver_tests.rs), [`src/tests/h2_tests.rs`](src/tests/h2_tests.rs), [`src/tests/wallet_tests.rs`](src/tests/wallet_tests.rs) and [`tests/process.rs`](tests/process.rs);
 - on Djinn's side, [`custodian_client`](../tests/custodian_client.rs), [`quarantine_review`](../tests/quarantine_review.rs) and [`cxf_import`](../tests/cxf_import.rs);
 - [`custodian_resident`](../tests/custodian_resident.rs), which runs the real resident and is ignored by default.
 
@@ -120,6 +129,9 @@ They cover:
 - the handshake deadline, connection budgets and consent expiry;
 - custodian loss is `Unknown`, and a restart is locked with a fresh instance;
 - adoption keeps the identity and leaves the source untouched;
+- an adopted wallet is byte for byte the original: the seed's public key, the epoch derivations (public-only, bound and unbound), the persona index and the roster are identical across a cold reopen, the custodian's files are `0600` in `0700` directories, and nothing of the wallet or catalog stays in Djinn's root, though Djinn's own files do;
+- an adoption that cannot proceed changes nothing: no wallet, an occupied custodian root, an overlap, a symlink, a copy that cannot be made, and a source file that changed after it was carried;
+- the wallet's public records are disclosed over the wire while locked and only to a `snapshot` grant, with no seed or secret file in the answer, and a custodian process serves them from an adopted wallet;
 - a protected custodian refuses a self-bound socket;
 - Djinn never falls back to a vault of its own when the custodian is locked or gone;
 - each H2 operation answers from the vault or wallet opened directly, and is refused without its grant or while locked;

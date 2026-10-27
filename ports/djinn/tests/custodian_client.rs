@@ -247,6 +247,34 @@ fn profiles_snapshot_and_intents_are_answered_by_the_custodian() {
     assert!(remote.apply_intent(dramatis::intents::SIGNING_DENY_INTENT, b"{}").is_err());
 }
 
+#[tokio::test(flavor = "multi_thread")]
+async fn the_wallets_persona_index_is_the_custodians_to_disclose_and_djinn_never_lists_a_file() {
+    use djinn::custody_host::{CustodyPersonas, resolve_persona};
+    let custodian = custodian();
+    let remote = custodian.remote();
+    let (first, second) = (personae::PersonaId::new(), personae::PersonaId::new());
+    let index = |host: Arc<RemoteHost>| -> Arc<dyn djinn::custody_host::PersonaIndex> {
+        // A root that holds no wallet: only the custodian's own is read.
+        Arc::new(CustodyPersonas { custody: host, wallet_root: custodian.dir.path().join("djinns-data-root-has-no-wallet") })
+    };
+    let nothing = remote.wallet_public(custodian.dir.path()).unwrap();
+    assert!(nothing.personas.is_empty() && nothing.roster.is_none());
+    assert!(resolve_persona(index(Arc::clone(&remote)), None).await.unwrap_err().contains("no persona wallet"));
+
+    castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, first, "fixture").unwrap();
+    // Answered while locked, and without the wallet root Djinn names.
+    let locked = remote.wallet_public(custodian.dir.path()).unwrap();
+    assert_eq!(locked.personas, vec![first]);
+    assert_eq!(locked.roster, pandect::wallet_store::load_device_roster(&custodian.data_root).unwrap());
+    assert!(locked.roster.is_some());
+    assert_eq!(resolve_persona(index(Arc::clone(&remote)), None).await.unwrap(), first);
+    assert_eq!(resolve_persona(index(Arc::clone(&remote)), Some(second)).await.unwrap(), second, "a named persona is never second-guessed");
+
+    castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, second, "fixture").unwrap();
+    let several = resolve_persona(index(Arc::clone(&remote)), None).await.unwrap_err();
+    assert!(several.contains("several personas") && several.contains(&first.as_uuid().to_string()) && several.contains(&second.as_uuid().to_string()), "{several}");
+}
+
 #[test]
 fn a_custodian_without_a_grant_refuses_every_release() {
     let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());

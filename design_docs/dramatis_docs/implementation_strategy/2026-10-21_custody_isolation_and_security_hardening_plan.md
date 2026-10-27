@@ -2,9 +2,10 @@
 
 **Date:** 2026-10-21 (America/New_York).
 **Status (2026-10-26):** H1 and H2 are on main. `djinn-custodian` is a separate process behind one authenticated contract (`custody-wire`), with Linux, macOS and Windows launchers (§5.2). Since H2 it also holds Castellan's resident host, the wallet, the credential catalog and the SSH agent. A production Djinn links no castellan and reaches every vault use through the custodian (§6 H2 inventory).
-- **Stopped and gated:** Hocket adoption is stopped (an identity-format change). The wallet's secret files move into custody only after a public/secret file split.
+- **Stopped and gated:** Hocket adoption is stopped (an identity-format change).
+- **Wallet at rest (2026-10-26):** the wallet's files and the credential catalog now live only in the custodian's data root, and `djinn-custodian adopt --data-from` moves an existing set there byte for byte. Djinn gets the persona index and device roster over `custody-wire`. A receiving run on Linux still has to confirm it.
 - **Evidence:** the tests pass on macOS; Linux and Windows builds type-check.
-- **Production gate:** the Linux and signed-macOS receiving runs and the wallet split. Until those pass, no deployment claims the §1 same-user guarantee.
+- **Production gate:** the Linux and signed-macOS receiving runs, including the wallet's at-rest check, and the Windows pieces. Until those pass, no deployment claims the §1 same-user guarantee.
 
 Native11's 38/38 and native10's signing-account failure remain the macOS primitive evidence.
 **Audit base:** Mere 0261e2602b5b13fcf59dced3ae408c3441c38a71, freshly fetched
@@ -782,6 +783,7 @@ Releases hand Djinn derived keys only, each checked against the root's attestati
 |---|---|---|---|
 | Start, terminal and native unlock, lock, status, lock triggers | `bin/djinn.rs`, `startup_vault.rs`, `identity_ui.rs`, `resident_status.rs`, `lock_triggers.rs` | `Status`, `Unlock`, `Lock`; lock facts drive the lock watch | act; the passphrase typed on Djinn's surface crosses once (terminal-unlock exception) |
 | Public read model, roster and profile intents | `keeper.rs`, `custody.rs`, `door/identity_endpoint.rs`, `resident_mere.rs` | `Snapshot`, `Intent`, `HasProfile`, `PublicKey` | act |
+| Reservoir persona choice (the sole persona of the wallet's index) | `resident_reservoir.rs`, `embedded_reservoir.rs` | `WalletPublic` (the persona index and device roster, answerable while locked) | act |
 | Graphshell guest delegations (H1) | `custody.rs` | `Sign{Delegation mere.graphshell}` | act |
 | App custody route: release, attest, sign, `AsProfile` | `custody.rs` | `Derive`, `Attest`, `SignDerived`, each with a persona or wallet source and the open or a named profile | derived key or act |
 | Door keys | `keeper.rs`, `door/local_session.rs` | `Derive` of exactly the open profile's two door salts (`djinn-door`), kept through locks | derived key |
@@ -802,12 +804,19 @@ Releases hand Djinn derived keys only, each checked against the root's attestati
 
 **Stops and gaps, each named rather than worked around:**
 - **Hocket adoption is stopped.** Hocket seals its identity under the desktop user's OS key. The custodian's account cannot open that store, and adopting it in Djinn would reopen a vault in Djinn. Moving it needs Hocket's identity re-enveloped for custody, which is an identity-format change. With a custodian, Djinn refuses the adoption; a test build still adopts in-process.
-- **The wallet is migrated at the operation level, but not at rest.** The custodian performs every wallet act. The wallet's secret files still live in a data root:
-  - the identity seed (a raw 32-byte file under `identity/` on macOS and Linux);
-  - the private epochs;
-  - the device secret.
+- **The wallet is migrated at rest.** Every file of the wallet, secret and public, lives under the custodian's `data_root`:
+  - the identity seed (a raw 32-byte file under `identity/` on macOS and Linux), the device secret and the wrapping keys;
+  - the private epochs, and each persona's manifest, the roster and the grants beside them.
 
-  The installers point the custodian's `data_root` at its own state directory, so a wallet created there is the custodian's alone. An existing wallet in Djinn's data root is not moved. Djinn and the reservoir read public wallet records (the persona index and the device roster) from the same files, and separating secret from public records is a file-layout change. Until that split, a device with an existing wallet keeps its seed where Djinn's user can read it, and the §1 guarantee does not cover the wallet root.
+  Djinn and the reservoir open none of them. Layout and bytes are unchanged: each file keeps its relative path, so every sealed record, derivation and public key reopens as it did.
+  - **Disclosure.** A typed `WalletPublic` operation returns the persona index (the UUIDs that hold a wallet manifest) and the device roster. It needs the same `snapshot` grant as the public read model, and it answers while locked (§5.3, "secret-free while locked where supported"): it reads only public manifests and never the vault.
+  - **Why the wire, not a sidecar.** The reservoirs read exactly one thing, the persona index, once, when no persona is named, and only after custody is open. A sidecar would be a second public copy for the custodian to keep in step with the roster that revoke and station grants change, and it would leave a file in Djinn's account that nothing authenticates. The wire answer is authenticated and always current.
+  - **Moving a wallet.** `djinn-custodian adopt --data-from DIR` carries the wallet and catalog out of `DIR`, proves the copy holds the same seed, persona index, roster and manifests and is byte-identical, then removes the copies in `DIR`; a copy that changed after it was carried stays and is reported. It refuses a custodian root that already holds a wallet, and any symlink among the files. On Linux the installer has the owner's own account pipe the files to the custodian's account, so root never walks the owner's directories (`wallet-files` lists the set).
+  - **What it does not do.**
+    - On macOS the custodian and Djinn run as the same account, so its state directory is that account's: the move changes who holds and uses the wallet, not who can open the file. The data-protection envelope stays the signed fixture's piece.
+    - Windows seals the wallet under DPAPI and moves with the Windows pieces.
+    - `publish_grant_carriage` reads the roster, grants and wrapped epoch records from a data root it is handed, with the wrapping-key bridge and seed as arguments. Only the carriage tests call it, so it would need disclosure of those records and an act in custody before a production caller exists.
+    - The in-process host and the receipt hosts, under the test-only `in-process-custody` feature, still read a wallet directly.
 - **The credential catalog** is sealed with keys only the custodian derives, so its files are ciphertext to Djinn. On Linux they must move into the custodian's state directory (a copy, no format change). The installer starts the catalog empty.
 - **CXF parsing now runs in the custodian**, because it holds the catalog. Hostile-import isolation (H1's open item) is therefore a custodian-surface item; the 900 KiB cap holds.
 - **Consent per platform:**
@@ -832,7 +841,7 @@ Releases hand Djinn derived keys only, each checked against the root's attestati
 **Gate.** H2 is implemented and passes its tests on this Mac (evidence in §8). Production enablement waits on these:
 1. The Linux receiving run, custodian README steps 1–8.
 2. The signed macOS receiving run.
-3. The wallet's public/secret split, and moving an existing wallet and catalog into the custodian's state directory.
+3. The wallet's public/secret split, and moving an existing wallet and catalog into the custodian's state directory. **Implemented 2026-10-26:** the custodian discloses the public records, and `adopt --data-from` moves the files. The Linux receiving run (README step 8) is what remains.
 4. On Windows, a consent channel, the DPAPI-to-passphrase migration and an agent pipe; today it only compiles.
 
 Until the first two pass on their hosts, no deployment installs a custodian for daily use.
@@ -989,8 +998,47 @@ copy of those documents here.
 
   Linux and Windows builds of the custodian type-check. `ring`, which came
   in with the SSH agent, ran its build script under a stub C compiler for
-  that check, so nothing was linked or run on those OSes. Hocket adoption is stopped, and the wallet's at-rest move is
-  gated (§6 H2).
+  that check, so nothing was linked or run on those OSes. Hocket adoption is stopped (§6 H2); the wallet's at-rest move is
+  recorded next.
+
+- 2026-10-26, wallet at rest (H2 gate item 3). The wallet and catalog moved into
+  the custodian's data root, and Djinn stopped reading wallet files.
+  - `custody-wire` gained `WalletPublic`, answered while locked to a `snapshot`
+    grant. Djinn's `ResidentCustody::wallet_public` and `resolve_persona` carry
+    the reservoirs' one read, the sole persona of the index. Djinn's production
+    keeper no longer names a wallet root, and the reservoirs open no wallet file.
+  - `djinn-custodian adopt --data-from` carries every wallet and catalog file
+    byte for byte, proves the same seed, persona index, roster and manifests,
+    then removes the source copies. `wallet-files` lists the set for the Linux
+    installer, which stages it through the owner's own account.
+  - No wallet format, identity or derivation changed: files keep their relative
+    paths and bytes, and Castellan's wallet code is untouched.
+
+  Evidence on macOS, on the merged tree:
+  - `custody-wire` 8 tests; Castellan 306 (`--features cxf,wallet,agent`), unchanged;
+  - `djinn-custodian` 44 unit tests (6 new, wallet) plus 6 process tests (2 new);
+    the golden check compares the seed's public key, public-only, device-bound
+    and unbound epoch derivations, persona index, roster and the secret files
+    before and after the move, at a cold reopen, and a custodian process serves
+    the disclosure from an adopted wallet;
+  - Djinn's `custodian_client` 9 (1 new: a real custodian discloses the index),
+    `quarantine_review` 16, `cxf_import` 1, the reservoir tests and Djinn's
+    library tests (249, 1 new) pass, and the ignored `custodian_resident` passes;
+  - `embedded_reservoir_validation` has the one failure it has on plain main
+    (`recorded_situation_and_weather_survive_three_owners_and_refuse_tamper`);
+  - the custodian type-checks for Linux and Windows, including its tests and
+    binary (`ring` under a stub C compiler, as above).
+
+  The two broker tests, `mere_two_process` and `custodian_resident` build socket
+  paths from `TMPDIR` and fail on macOS with its default `TMPDIR` ("path must be
+  shorter than SUN_LEN"). Run them with a short `TMPDIR` (and a short
+  `DJINN_RECEIPTS_ROOT` for `custodian_resident`).
+
+  Still outside the custodian:
+  - the in-process host and the receipt hosts under `in-process-custody`;
+  - `publish_grant_carriage` (above);
+  - on macOS, the file permission between the custodian's state and Djinn;
+  - on Windows, the DPAPI-sealed wallet, with the Windows pieces.
 
 Documentation verification retains inherited failures rather than calling the
 whole tree clean: the full D2 audit has existing missing judgments and a tracked

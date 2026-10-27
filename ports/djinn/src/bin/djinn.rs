@@ -1020,11 +1020,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     let stop = StopSignal::default();
     // What Graphshell's doors and the custody route serve (dramatis repo
     // plan, D15): custody, its native surface and its wallet root.
-    let keeper = Arc::new(
-        Keeper::new(Arc::clone(&personae))
-            .with_ui(Arc::new(args.native_identity_ui()))
-            .with_wallet_root(args.data_root.clone()),
-    );
+    let keeper = Keeper::new(Arc::clone(&personae)).with_ui(Arc::new(args.native_identity_ui()));
+    // Only an in-process host reads a wallet root itself. A custodian holds
+    // the wallet in its own state directory, so Djinn names none.
+    #[cfg(feature = "in-process-custody")]
+    let keeper = keeper.with_wallet_root(args.data_root.clone());
+    let keeper = Arc::new(keeper);
     // The status follows the lock (ruling 31's watch channel; harness H4).
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
@@ -1112,8 +1113,17 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // The reservoir lives under the family-shared root, not this resident's
     // data root: every application of the identity reaches the same meres.
     #[cfg(feature = "personal-sync")]
+    //
+    // The persona is custody's to name: the wallet's index is a disclosure
+    // from the custodian, never a file Djinn lists.
     match resident
-        .open_reservoir(&pandect::shared_root::shared_root())
+        .open_reservoir(
+            &pandect::shared_root::shared_root(),
+            Arc::new(djinn::custody_host::CustodyPersonas {
+                custody: Arc::clone(&personae),
+                wallet_root: pandect::shared_root::shared_root(),
+            }),
+        )
         .await
     {
         ReservoirLane::Open(reservoir) => {

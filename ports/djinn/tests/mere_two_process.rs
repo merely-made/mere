@@ -137,7 +137,7 @@ fn finish(mut child: Child, lines: Receiver<String>, mut seen: Vec<String>) -> V
 #[tokio::test(flavor = "multi_thread")]
 async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
     let root = tempfile::tempdir().unwrap();
-    let reservoir = ResidentReservoir::open(root.path(), Some(persona()))
+    let reservoir = ResidentReservoir::open(root.path(), persona())
         .await
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());

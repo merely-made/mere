@@ -28,7 +28,7 @@ const WORK: [u8; 32] = [0x31; 32];
 const HOME: [u8; 32] = [0x32; 32];
 
 /// A passphrase vault with `work` and `home`, and a data root beside it.
-fn vault() -> tempfile::TempDir {
+pub(super) fn vault() -> tempfile::TempDir {
     let dir = tempfile::tempdir().unwrap();
     let opened = bootstrap::open_storage(&dir.path().join("vault"), Unlock::passphrase(PASSPHRASE)).unwrap();
     for (id, seed) in [("work", WORK), ("home", HOME)] {
@@ -38,11 +38,11 @@ fn vault() -> tempfile::TempDir {
     dir
 }
 
-fn data(dir: &tempfile::TempDir) -> PathBuf {
+pub(super) fn data(dir: &tempfile::TempDir) -> PathBuf {
     dir.path().join("data")
 }
 
-fn config(dir: &tempfile::TempDir, consent: &str, grants: Value) -> Config {
+pub(super) fn config(dir: &tempfile::TempDir, consent: &str, grants: Value) -> Config {
     let json = json!({
         "vault": {"directory": dir.path().join("vault"), "profile": "work", "data_root": data(dir)},
         "owner": {"unix_uid": DJINN_UID}, "consent": consent, "development": true,
@@ -54,7 +54,7 @@ fn config(dir: &tempfile::TempDir, consent: &str, grants: Value) -> Config {
     Config::parse(&serde_json::to_vec(&json).unwrap()).unwrap()
 }
 
-fn base(extra: Value) -> Value {
+pub(super) fn base(extra: Value) -> Value {
     let mut grants = vec![json!({"operation": "status"}), json!({"operation": "lock"}), json!({"operation": "unlock"})];
     grants.extend(extra.as_array().unwrap().iter().cloned());
     Value::Array(grants)
@@ -65,7 +65,7 @@ fn direct(dir: &Path, profile: &str) -> castellan::custody::IdentityVault<Box<dy
     castellan::custody::IdentityVault::open(opened.storage, &ProfileId(profile.into())).unwrap()
 }
 
-fn answer(outcome: Outcome) -> Answer {
+pub(super) fn answer(outcome: Outcome) -> Answer {
     match outcome {
         Outcome::Success { answer } => answer,
         other => panic!("refused: {other:?}"),
