@@ -337,6 +337,42 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   with one new muniment API; a digest-less checkpoint is ignored in favour of a full replay, the
   path legacy assertion-less snapshots already take, and is re-checkpointed with the digest.
 
+Open forks from the Q002 repair, 2026-10-27 (questions with the code evidence; unnumbered until
+Mark rules; the lane applied his two answers and stopped at these rather than picked):
+
+- **Q002, what binds Pandect's `graph.json` and `facets.json` to their checkpoint.** The journal
+  digest lives in `checkpoint.json` (`Checkpoint.journal_digest`, verified at
+  `graph_session.rs:796`), but the graph and its facets are separate records the open then reads
+  without any check against it (`:805`, `:808`), written in the same batch as the checkpoint
+  (`:1432` to `:1433`, with the record at `:1442`). So a checkpoint of this journal stays valid
+  while `graph.json` and `facets.json` are replaced by another graph's, which is exactly what the
+  audit's probe does: `pandect_checkpoint_reason_diagnostics.rs`
+  `recorded_session_accepts_foreign_checkpoint_at_its_own_valid_cursor` replaces only those two
+  keys and still passes on the repaired code, the foreign node opened as the session's graph. The
+  journal digest cannot reach this; chartulary does not have the gap because its `Snapshot` is one
+  record carrying contents and digest together (`spine.rs:75` at eidetic `cceb203`). The repaired
+  cases are a whole checkpoint (record and files) taken beside another journal, which open now
+  refuses as Corrupt, and a checkpoint with no digest, which open ignores for a full replay.
+  Either (a) the checkpoint
+  record also stores a muniment `Hash` of the stored bytes of `graph.json` and `facets.json`, which
+  open hashes as read: bytes as stored, no new format for the files, and a hand edit of either
+  file then fails the check; (b) the three become one record, so contents, cursor and digest
+  cannot be separated: a format change that retires two files other tools may read; or (c) the
+  kernel's `GraphSnapshot` and `NodeFacetStore` each carry the digest, a change to two kernel
+  formats. And whichever binds, a mismatch is Corrupt, as a foreign journal digest now is, or the
+  checkpoint is ignored for the replay, as a missing one is.
+- **Q002, a digest the entries' encoding can move.** The journal digest is taken over each entry's
+  canonical serde encoding (`muniment` `journal/digest.rs`), because stored bytes change with the
+  codec and, for a hash-ordered map, from one save to the next. So an entry type whose
+  serialization changes for existing entries (a field added without `skip_serializing_if`, a
+  renamed field) changes the digest of every stored checkpoint, and a refused mismatch then
+  rejects a checkpoint that a replay would have read correctly: `GraphLog::load_checkpointed`
+  returns `StoreError::Codec` and Pandect open returns `SessionError::Corrupt`, as the existing
+  refusal of a checkpoint past the journal does (`spine.rs:758`). Either the refusal stands and an
+  entry type's owner versions any change to how existing entries encode; or a mismatch is
+  treated as unverifiable and replayed, which keeps old checkpoints usable across such a change
+  and gives up the loud signal for a substituted checkpoint.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
@@ -432,3 +468,17 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   (a public-API change with no caller left). Merged onto the chartulary repin. Kernel lib 512/512
   with both reopen tests, Pandect 342 lib and 28 integration tests. Of L1's first slice only Q002
   (chartulary, a fork in §5) and Q014 (re-document only) remain. Receipt updated.
+- 2026-10-27 (L1, Q002 applied): muniment gains `Journal::prefix_digest(len)`, a blake3 digest of
+  the first `len` entries over their canonical encoding (maps ordered by key; a prefix keeps its
+  digest as the log grows, across saves and in forks). Chartulary's `Snapshot` stores it,
+  `load_checkpointed` refuses a snapshot of another prefix and replays in full past one with no
+  digest (Mark's two answers); `Container` tags serialize sorted so a journal entry holding them
+  digests alike after a reload. Pandect's `Checkpoint` stores it, open refuses a mismatch as
+  Corrupt naming the checkpoint and ignores a digest-less checkpoint for the baseline-plus-journal
+  replay, and the next checkpoint writes the digest. Regressions in muniment (7), chartulary (6)
+  and Pandect (3); mutation controls that remove the check, the digest-less path and the sorting
+  each fail the matching ones. The audit's swapped
+  `graph.json`/`facets.json` probe still opens the foreign graph, because the journal digest cannot
+  reach files outside the record that holds it: that, and what an entry-encoding change does to a
+  stored digest, are two forks in §5. Eidetic `cceb203`; kernel lib 513, Pandect lib 347 and its 28
+  integration tests (other sessions' tests are in those counts). Receipt updated.
