@@ -889,7 +889,7 @@ fn queued_cancel_is_terminal_and_never_opens_its_origin() {
     assert!(matches!(server.seen.try_recv(), Err(TryRecvError::Empty)));
     let report = actor.close_and_join().unwrap();
     assert_eq!(report.admitted, 2);
-    assert_eq!(report.tasks.joined(), 2);
+    assert_eq!(report.tasks.joined() + report.discarded_before_spawn, 2);
     assert!(report.tasks.is_clean());
     assert!(matches!(next_update(&updates), FetchUpdate::Page(_)));
 }
