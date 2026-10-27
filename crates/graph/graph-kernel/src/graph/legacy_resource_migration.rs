@@ -6,6 +6,12 @@
 
 //! Explicit legacy replay. Ordinary replay keeps its recorded stores.
 //! The caller must establish a legacy placement profile before using this adapter.
+//!
+//! Legacy records repeat handles and pass through states in which both strata hold
+//! one, which ordinary edge replay refuses. The migration replays its legacy source
+//! and builds its output in an explicit staged scope, `Graph::stage_edges` to
+//! `Graph::settle_staged_edges`: edge replays are not checked one by one, and the
+//! finished output is checked once, refusing the migration if it would not reopen.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -159,6 +165,7 @@ pub fn probe_legacy_mint_links(
     entries: &[AttributedDelta],
 ) -> Result<Vec<LegacyMintLinkDiagnostic>, LegacyMigrationError> {
     let mut source = baseline.clone();
+    source.stage_edges();
     let mut attribution = ReplayAttribution::from_baseline(baseline);
     let mut known = statement_ids(&baseline.to_snapshot().edges);
     let mut raw = Vec::<(usize, Pair, super::SemanticStatement, Pair)>::new();
@@ -339,6 +346,8 @@ pub fn migrate_legacy_prefix_with_content_context(
             .map(|record| record.canonical_iri)
             .collect(),
     };
+    replay.source.stage_edges();
+    replay.output.stage_edges();
     let before = replay.output.to_snapshot();
     let before_facets = replay.output.facets().clone();
     replay.sync(&Pairs::new(), true, None)?;
@@ -450,6 +459,10 @@ pub fn migrate_legacy_prefix_with_content_context(
         effective.extend(corrections);
         entry_effects.push(effective);
     }
+    replay
+        .output
+        .settle_staged_edges()
+        .map_err(|error| LegacyMigrationError(error.to_string()))?;
     // The same checked boundary used by ordinary loads verifies final cross-store handles.
     Graph::try_from_snapshot(&replay.output.to_snapshot())
         .map_err(|error| LegacyMigrationError(error.to_string()))?;
@@ -820,7 +833,8 @@ impl Replay {
         }
         self.active = next;
         self.aggregate_active = aggregate_next;
-        // Remove surface authority first, before the exact resource handle admission check.
+        // Staged: the replay arms' edge check waits for the settle. Remove surface
+        // authority first anyway, before the exact resource handle admission check.
         for pair in before
             .keys()
             .chain(after.keys())

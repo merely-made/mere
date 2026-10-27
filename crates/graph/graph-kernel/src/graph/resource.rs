@@ -326,20 +326,7 @@ impl Graph {
         else {
             return false;
         };
-        if edges
-            .iter()
-            .any(|edge| edge.from_node_id != from.to_string() || edge.to_node_id != to.to_string())
-        {
-            return false;
-        }
-        if edges
-            .iter()
-            .filter_map(|edge| edge.semantic.as_ref())
-            .any(|semantic| {
-                semantic.statements.is_empty()
-                    && (!semantic.sub_kinds.is_empty() || semantic.predicate.is_some())
-            })
-        {
+        if !super::edge_admission::resource_rows_wellformed(from, to, edges) {
             return false;
         }
         let mut statements = std::collections::BTreeMap::new();
