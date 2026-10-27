@@ -330,9 +330,11 @@ where
         .clone();
     let mut deltas = Vec::<GraphDelta>::with_capacity(captures.len());
     for capture in captures {
-        let delta = capture
-            .replay_delta()
-            .ok_or_else(|| refuse("Knot intake produced a non-replayable graph capture"))?;
+        let delta = capture.replay().into_write().map_err(|why| {
+            refuse(format!(
+                "Knot intake produced a non-replayable graph capture: {why}"
+            ))
+        })?;
         deltas.push(delta);
     }
     if !deltas.is_empty() {

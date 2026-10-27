@@ -465,7 +465,7 @@ mod tests {
             "the incoming relation joins the live one"
         );
         assert!(
-            edits.iter().all(|edit| edit.replay_delta().is_some()),
+            edits.iter().all(|edit| edit.replay().into_write().is_ok()),
             "every edit has a replay form, so a session can journal it"
         );
     }

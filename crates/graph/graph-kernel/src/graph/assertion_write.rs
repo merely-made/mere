@@ -254,7 +254,7 @@ mod migrated_handle_tests {
     use super::*;
 
     #[test]
-    fn ambiguous_content_requires_exact_id_and_duplicate_copies_update_together() {
+    fn ambiguous_content_requires_exact_id_and_updates_reach_the_one_row() {
         let mut graph = Graph::new();
         let a = graph.add_node_with_id(
             Uuid::from_u128(106),
@@ -282,7 +282,6 @@ mod migrated_handle_tests {
         let mut other = edges[0].retained_assertions()[0].clone();
         other.statement_id = "second-exact-handle".into();
         edges[0].assertions.as_mut().unwrap().push(other.clone());
-        edges.push(edges[0].clone());
         assert!(graph.set_resource_edges_between(pair.0, pair.1, &edges));
         assert!(Graph::try_from_snapshot(&graph.to_snapshot()).is_ok());
         let before = serde_json::to_value(graph.to_snapshot()).unwrap();
@@ -321,7 +320,7 @@ mod migrated_handle_tests {
             .flat_map(|(_, _, _, payload)| payload.semantic_statements().iter())
             .filter(|statement| statement.statement_id == other.statement_id)
             .collect();
-        assert_eq!(copies.len(), 2);
+        assert_eq!(copies.len(), 1);
         assert!(copies.iter().all(
             |statement| statement.label.as_deref() == Some("precise edit")
                 && statement.asserted_at_ms == Some(99)
@@ -347,7 +346,7 @@ mod migrated_handle_tests {
             .flat_map(|(_, _, _, payload)| payload.semantic_statements().iter())
             .filter(|statement| statement.statement_id == first.statement_id)
             .collect();
-        assert_eq!(withdrawn_copies.len(), 2);
+        assert_eq!(withdrawn_copies.len(), 1);
         assert!(
             withdrawn_copies
                 .iter()
@@ -364,7 +363,7 @@ mod migrated_handle_tests {
             .flat_map(|(_, _, _, payload)| payload.semantic_statements().iter())
             .filter(|statement| statement.statement_id == other.statement_id)
             .collect();
-        assert_eq!(copies.len(), 2);
+        assert_eq!(copies.len(), 1);
         assert!(
             copies
                 .iter()

@@ -48,6 +48,7 @@ use crate::types::{
 };
 
 pub mod apply;
+pub mod assertion_handles;
 pub mod capture;
 /// Cross-graph node copy (tear-out fork): mints a node in this graph from a
 /// donor node in another graph, recording cross-graph derivation provenance.
@@ -74,11 +75,14 @@ pub use frozen_link::{
 };
 pub mod coverage;
 #[cfg(test)]
+mod assertion_handles_tests;
+#[cfg(test)]
 mod frozen_link_tests;
 #[cfg(test)]
 mod frozen_selection_tests;
 mod residency;
 pub use coverage::{CoverageLayer, CoverageLimit, CoverageNote};
+mod edge_admission;
 pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
@@ -104,6 +108,8 @@ mod relation_read;
 pub mod resource;
 pub mod resource_classifications;
 pub mod resource_content;
+#[cfg(test)]
+mod resource_content_edge_tests;
 #[cfg(test)]
 mod resource_content_handle_tests;
 #[cfg(test)]
@@ -170,8 +176,8 @@ pub use navigation_check::NavigationIndexError;
 // `EdgeKind`; reads go through [`RelationKind`] + [`RelationSelector`], writes
 // through [`EdgeAssertion`].
 pub use capture::{
-    CapturedDelta, DeltaRecorder, GraphTableStats, ReplayRefused, replay_captured_deltas,
-    replay_captured_deltas_as_onto, replay_captured_deltas_onto,
+    CapturedDelta, DeltaRecorder, GraphTableStats, Malformed, Replay, ReplayRefused, Unwritable,
+    replay_captured_deltas, replay_captured_deltas_as_onto, replay_captured_deltas_onto,
     replay_captured_deltas_onto_checked, set_captured_delta_hook, with_isolated_capture,
 };
 pub use journal::{
@@ -421,6 +427,8 @@ pub struct Graph {
     pub(crate) semantic_observation_revision: u64,
     pub(crate) appearance_admission_revision: u64,
     pub(crate) known_coverage: CoverageNote,
+    /// Set only inside a legacy migration's staged scope; see `edge_admission`.
+    pub(crate) staged_edges: edge_admission::StagedEdges,
 }
 
 impl Graph {
@@ -450,6 +458,7 @@ impl Graph {
             semantic_observation_revision: 0,
             appearance_admission_revision: 0,
             known_coverage: CoverageNote::default(),
+            staged_edges: Default::default(),
         }
     }
 
