@@ -94,6 +94,13 @@ pub struct PrincipalRule {
 pub enum Matcher {
     UnixUid(u32),
     WindowsSid(String),
+    /// A process of `sid` whose main executable is `image`: the installed
+    /// consent helper on Windows, where the installer leaves the executable
+    /// writable only by administrators. Another process of the same user
+    /// can still attach to it or start it under its own environment, so
+    /// this is the same-user posture of a polkit authentication agent, not
+    /// an OS-held identity; the plan records it as such.
+    WindowsImage { sid: String, image: String },
     Signed { team: String, identifier: String },
 }
 
@@ -102,6 +109,7 @@ impl Matcher {
         match (self, peer) {
             (Self::UnixUid(want), Peer::Unix { uid, .. }) => want == uid,
             (Self::WindowsSid(want), Peer::Windows { sid, .. }) => want == sid,
+            (Self::WindowsImage { sid: want, image: pinned }, Peer::Windows { sid, image: Some(image), .. }) => want == sid && same_image(pinned, image),
             (
                 Self::Signed { team, identifier },
                 Peer::Signed {
@@ -112,6 +120,13 @@ impl Matcher {
             _ => false,
         }
     }
+}
+
+/// Whether two Win32 paths name the same file, as the filesystem would:
+/// case-insensitively, either separator, with or without the `\\?\` prefix.
+fn same_image(pinned: &str, image: &str) -> bool {
+    let normal = |path: &str| path.trim_start_matches(r"\\?\").replace('/', "\\").to_lowercase();
+    !pinned.is_empty() && normal(pinned) == normal(image)
 }
 
 /// One granted operation.
@@ -372,7 +387,7 @@ impl Config {
     fn same_user(&self, matcher: &Matcher) -> bool {
         match matcher {
             Matcher::UnixUid(uid) => self.owner.unix_uid == Some(*uid),
-            Matcher::WindowsSid(sid) => self.owner.windows_sid.as_deref() == Some(sid),
+            Matcher::WindowsSid(sid) | Matcher::WindowsImage { sid, .. } => self.owner.windows_sid.as_deref() == Some(sid),
             Matcher::Signed { .. } => false,
         }
     }
@@ -387,7 +402,17 @@ impl Config {
                 return Err(PolicyError(format!("principal name {:?} is empty, too long or repeated", rule.name)));
             }
             let same_user = self.same_user(&rule.matcher);
-            if rule.consent_channel && same_user {
+            let pinned = match &rule.matcher {
+                Matcher::WindowsImage { image, .. } => {
+                    let absolute = image.get(1..2) == Some(":") || image.starts_with('\\');
+                    if !absolute {
+                        return Err(PolicyError(format!("{}: the pinned image must be an absolute Win32 path", rule.name)));
+                    }
+                    true
+                },
+                _ => false,
+            };
+            if rule.consent_channel && same_user && !pinned {
                 return Err(PolicyError(format!(
                     "{}: the desktop account cannot be the trusted consent channel; any of its processes would match",
                     rule.name
