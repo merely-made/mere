@@ -2069,3 +2069,36 @@ compatibility reexport was added.
 
 Validation evidence for this slice is retained under
 `Code/output/graphshell-components/lifecycle/`.
+
+
+The clean integrated source `3c74f49f9` passes 829 native tests with seven
+existing ignores: Graphshell 350, bound actions six, reading lanes 30,
+Mere View 38, the independent presentation host two, Pandect 344 and
+Scenograph 59. The independent host exercises failed-save retry, saved
+undo and conflict reconciliation while preserving a private draft.
+
+The checked snapshot merge now removes only exact cross-input assertion
+copies. Conflicting handles and duplicates inside either input still refuse.
+Remaining sidecars are normalized before union so repeating an import cannot
+append traversal data again. This preserves the stricter assertion identity
+rules integrated from main.
+
+The guarded cache budget is 300 GiB under Mark's explicit approval, with the
+100 GiB free-space floor and all retention protections unchanged. Cleanup found
+no eligible cache profiles; no generated files or retained evidence were deleted.
+
+The lightweight viewer Wasm check passes at `3c74f49f9`; the full
+product/remote/canvas-GPU build passes at `8e99ee189`. The latter adds only
+shared `Rc` handles for the browser workbench's immutable render maps and
+documentation relative to the native receipt. The product-gated workbench is
+absent from the viewer. Neither native library sources nor viewer inputs
+changed. The feature receipt confirms the viewer selects Graphshell `web`
+only and no Scenograph authoring, Platen or reading lanes.
+
+The final upstream integration adds Windows custodian code outside this
+qualified dependency graph: the selected native package tree is identical
+before and after, and browser inputs are unchanged. Source checks and
+windowless component tests do not establish headed browser interaction,
+Woodshed runtime adoption or constant-time inline-body detection. Exact
+commands, hashes, failed attempts and integration evidence remain in
+`Code/output/graphshell-components/lifecycle/`.
