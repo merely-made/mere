@@ -1209,8 +1209,9 @@ impl<B: Backend> GraphSession<B> {
         let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_delta_as(&author)
-                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
+                edit.replay_as(&author)
+                    .into_write()
+                    .map_err(|why| SessionError::NotReplayable(format!("{why}: {edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(self
@@ -1613,8 +1614,9 @@ impl<B: Backend> GraphSession<B> {
             .edits
             .iter()
             .map(|edit| {
-                edit.replay_delta_as(&author)
-                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
+                edit.replay_as(&author)
+                    .into_write()
+                    .map_err(|why| SessionError::NotReplayable(format!("{why}: {edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
         let mark = self.merge_mark_after(&kind);
