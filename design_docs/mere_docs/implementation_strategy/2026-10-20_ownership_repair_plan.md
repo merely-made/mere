@@ -364,7 +364,7 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   Mark, 2026-10-27 (asked in the Q002 session): **"Hash in the record (Recommended)"**.
   `Checkpoint.contents_digest` holds a muniment `Hash` of the stored bytes of `graph.json` and
   `facets.json`, each length-framed; open hashes the bytes as read, and a checkpoint that names no
-  such hash is treated as naming no files. One reading to confirm or reverse: a session with a
+  such hash is treated as naming no files. One reading, ruled below: a session with a
   retained legacy translation is not hashed, because its checkpoint is already compared with that
   translation and a difference there is refused as Corrupt (the existing
   `translated_checkpoint_rejects_valid_truth_changes_before_admission`), which his mismatch answer
@@ -375,7 +375,9 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   opposite mismatch rule, he ruled **"Replay past stands (Recommended)"**: the mismatch answer
   here is withdrawn and the landed rule stands. On the reading above: **"Keep the refusal
   (Recommended)"**, the translation is a qualification record, not a cache, so a checkpoint that
-  differs from it stays Corrupt.
+  differs from it stays Corrupt. Asked again in the Q002 session, which had not yet pulled that
+  answer, he replied the same: "Yes: a retained-translation session keeps its comparison with the
+  translation and refuses a difference as Corrupt." Ruled; no code changes.
 - **Q002, a digest the entries' encoding can move.** The journal digest is taken over each entry's
   canonical serde encoding (`muniment` `journal/digest.rs`), because stored bytes change with the
   codec and, for a hash-ordered map, from one save to the next. So an entry type whose
@@ -517,8 +519,7 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   the audit's swapped-file probe no longer opens the foreign graph (the probe now fails at its
   defect assertion). The earlier foreign-journal regression changed from Corrupt to replay; two
   regressions are new, one for replaced files and one for a record that names no files. A session
-  with a retained translation keeps its own comparison and refusal (a reading for Mark to confirm,
-  §5). Kernel lib 513, Pandect lib 349 and its 28 integration tests, chartulary 94, muniment 54.
+  with a retained translation keeps its own comparison and refusal (ruled by Mark, §5). Kernel lib 513, Pandect lib 349 and its 28 integration tests, chartulary 94, muniment 54.
   `stickleback` (105 and 5 tests) passes on eidetic `cceb203`; the full-workspace stall was feature
   unification, not that crate. Receipt updated.
 - 2026-10-27 (L1, the Q002 forks asked twice): the parent session walked Mark through both
