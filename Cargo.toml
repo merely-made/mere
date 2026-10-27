@@ -106,7 +106,7 @@ members = [
     "crates/cambium/cambium-winit-a11y",
     "crates/cambium/cambium-genet-winit-host",
     # Shared authoring surface; the standalone product is ports/tabard/desktop.
-    "crates/cambium/tabard-workshop",
+    "ports/tabard/workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/hest",
     "crates/cambium/backstep",
@@ -418,7 +418,7 @@ pelt-core = { path = "ports/pelt/core" }
 # defaults off. Pelt re-enables livery/reader/netfetch through its own features.
 pelt-desktop = { path = "ports/pelt/desktop", default-features = false }
 tabard = { version = "0.0.2", path = "crates/system/tabard" }
-tabard-workshop = { path = "crates/cambium/tabard-workshop" }
+tabard-workshop = { path = "ports/tabard/workshop" }
 mere-lanes = { version = "0.1.0", path = "crates/system/document-lanes" }
 
 # Genet crates the landed ports reach. In genet these were relative paths into
@@ -723,7 +723,7 @@ pictograph = { path = "crates/canvas/pictograph" }
 seiche = { path = "crates/conatus/seiche" }
 sprigging = { path = "crates/cambium/sprigging" }
 tabard = { path = "crates/system/tabard" }
-tabard-workshop = { path = "crates/cambium/tabard-workshop" }
+tabard-workshop = { path = "ports/tabard/workshop" }
 tinct = { path = "crates/cambium/tinct" }
 uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }

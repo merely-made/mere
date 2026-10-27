@@ -4,7 +4,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-#![cfg(all(feature = "store", not(target_arch = "wasm32")))]
+#![cfg(not(target_arch = "wasm32"))]
+
+#[path = "common/graph_file.rs"]
+mod graph_file;
 
 use std::path::Path;
 use std::process::Command;
@@ -46,7 +49,7 @@ fn assertion_lifecycle_survives_a_fresh_process() {
     }
 }
 
-// Invoked only by the parent with a fresh process for each side of the store boundary.
+// Invoked only by the parent with a fresh process for each side of the on-disk boundary.
 #[test]
 #[ignore = "subprocess helper for assertion_lifecycle_survives_a_fresh_process"]
 fn lifecycle_reopen_child() {
@@ -136,7 +139,7 @@ fn write_fixture(directory: &Path) {
             },
         )
         .unwrap();
-    kernel::store::save_graph(directory, &graph).unwrap();
+    graph_file::save_graph(directory, &graph).unwrap();
     std::fs::write(
         directory.join("expected.json"),
         serde_json::to_vec(&graph.to_snapshot_at(0)).unwrap(),
@@ -151,7 +154,7 @@ fn write_fixture(directory: &Path) {
 }
 
 fn read_fixture(directory: &Path) {
-    let graph = kernel::store::load_graph(directory).unwrap().unwrap();
+    let graph = graph_file::load_graph(directory).unwrap().unwrap();
     let expected: serde_json::Value =
         serde_json::from_slice(&std::fs::read(directory.join("expected.json")).unwrap()).unwrap();
     assert_eq!(

@@ -3,7 +3,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
-#![cfg(all(feature = "store", not(target_arch = "wasm32")))]
+#![cfg(not(target_arch = "wasm32"))]
+
+#[path = "common/graph_file.rs"]
+mod graph_file;
 
 use kernel::graph::apply::add_node;
 use kernel::graph::{
@@ -123,8 +126,8 @@ fn write(directory: &Path) {
     let mut carried = Graph::new().to_snapshot();
     carried.resources = vec![record.clone()];
     let receiver = Graph::try_from_snapshot(&carried).unwrap();
-    kernel::store::save_graph(&directory.join("receiver"), &receiver).unwrap();
-    kernel::store::save_graph(&directory.join("author"), &graph).unwrap();
+    graph_file::save_graph(&directory.join("receiver"), &receiver).unwrap();
+    graph_file::save_graph(&directory.join("author"), &graph).unwrap();
     std::fs::write(directory.join("expected.json"), serde_json::to_vec(&serde_json::json!({"owner":owner,"frozen":frozen,"claim":claim.statement_id,"record":record})).unwrap()).unwrap();
     println!(
         "P7 writer PID {} saved source withdrawal, frozen copy, comment and reference-only receiver",
@@ -138,7 +141,7 @@ fn expected(directory: &Path) -> serde_json::Value {
 
 fn read(directory: &Path) {
     let expected = expected(directory);
-    let graph = kernel::store::load_graph(&directory.join("author"))
+    let graph = graph_file::load_graph(&directory.join("author"))
         .unwrap()
         .unwrap();
     let owner = serde_json::from_value(expected["owner"].clone()).unwrap();
@@ -175,7 +178,7 @@ fn read(directory: &Path) {
 
 fn receiver(directory: &Path) {
     let expected = expected(directory);
-    let graph = kernel::store::load_graph(&directory.join("receiver"))
+    let graph = graph_file::load_graph(&directory.join("receiver"))
         .unwrap()
         .unwrap();
     let owner = serde_json::from_value(expected["owner"].clone()).unwrap();

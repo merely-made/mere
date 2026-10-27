@@ -8,7 +8,8 @@
   "Q012",
   "Q015",
   "Q016",
-  "Q032"
+  "Q032",
+  "Q017"
  ],
  "rulings_applied": "Mark's L1 card round, 2026-10-20: adding an existing node id is insert-if-missing live too",
  "operations": [
@@ -75,6 +76,20 @@
    "regression": "graph::legacy_resource_migration_reason_tests::legacy_migration_and_checked_writer_agree_which_reason_changes_a_carried_claim",
    "audit_probe": "legacy_migration_diagnostics.rs migrated_handle_can_change_reason_identity_that_the_checked_writer_refuses (asserts the defect; inverted in the regression)",
    "commit": "69f8e7ff0"
+  },
+  {
+   "id": "Q017",
+   "authority": [
+    "A004"
+   ],
+   "owner": "Pandect's GraphSession is the one graph persistence owner; the kernel's snapshot-only `store` feature and module are removed (Mark's ruling, 2026-10-26)",
+   "change": "graph-kernel Cargo.toml drops the `store` feature; src/lib.rs drops the module; src/store.rs deleted. No manifest enabled the feature and nothing outside the kernel named it. A public-API change for the next mere-kernel release",
+   "regression": "the reopen integration tests frozen_link_reopen.rs and assertion_lifecycle_reopen.rs were gated on the feature and never ran in-tree; they now run against a test-only graph.json helper (tests/common/graph_file.rs) and pass; the audit probe kernel_store.rs no longer compiles against the kernel",
+   "kernel_suite_after": {
+    "lib_passed": 484,
+    "integration_passed": 2,
+    "failed": 0
+   }
   }
  ],
  "kernel_suite_after": {
@@ -90,7 +105,6 @@
  ],
  "unrepaired_so_far": [
   "Q010",
-  "Q017",
   "Q031",
   "Q014 (re-document only)",
   "Q001",
@@ -114,5 +128,6 @@
   "passed": 340,
   "failed": 0,
   "note": "the consumer gate for Q016; two of its tests needed the kernel to report a refused replay rather than drop it"
- }
+ },
+ "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host"
 }

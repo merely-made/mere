@@ -34,10 +34,6 @@ DOCUMENT_STACK_PACKAGES = {
     "mere-fetch",
     "knot-editor-host",
 }
-# Carried links, printed rather than refused: tabard-workshop's reader and
-# stylesheet specimens render real documents, and its home is an open question
-# (ownership repair plan, open forks, 2026-10-26).
-CARRIED_TOOLKIT_LINKS = {"tabard-workshop"}
 FORBIDDEN_GRAPHSHELL_WEB_PACKAGES = {
     "turnstone",
     "genet-winit",
@@ -123,7 +119,6 @@ def check_graphshell_web_cone() -> None:
 
 
 def check_toolkit_document_links(packages: list[dict]) -> None:
-    carried = []
     for package in packages:
         manifest = pathlib.Path(package["manifest_path"]).resolve()
         if not is_beneath(manifest, TOOLKIT):
@@ -133,16 +128,10 @@ def check_toolkit_document_links(packages: list[dict]) -> None:
                 continue
             if dependency["name"] not in DOCUMENT_STACK_PACKAGES:
                 continue
-            link = f"{package['name']} -> {dependency['name']}"
-            if package["name"] in CARRIED_TOOLKIT_LINKS:
-                carried.append(link)
-                continue
             fail(
                 f"toolkit crate {manifest.relative_to(ROOT)} links the document "
-                f"stack: {link}"
+                f"stack: {package['name']} -> {dependency['name']}"
             )
-    for link in sorted(set(carried)):
-        print(f"carried toolkit link: {link}")
 
 
 def main() -> None:
@@ -167,11 +156,20 @@ def main() -> None:
             continue
         for dependency in package["dependencies"]:
             path = dependency.get("path")
-            if path is not None and is_beneath(pathlib.Path(path), PORTS):
-                fail(
-                    f"{manifest.relative_to(ROOT)} depends on port package "
-                    f"{dependency['name']} at {pathlib.Path(path).relative_to(ROOT)}"
+            if path is None or not is_beneath(pathlib.Path(path), PORTS):
+                continue
+            if dependency.get("kind") == "dev":
+                # Examples and tests may mount a product surface; shipped code
+                # may not. Printed so the edge stays visible.
+                print(
+                    f"carried dev-only link: {package['name']} -> {dependency['name']} "
+                    f"({pathlib.Path(path).relative_to(ROOT)})"
                 )
+                continue
+            fail(
+                f"{manifest.relative_to(ROOT)} depends on port package "
+                f"{dependency['name']} at {pathlib.Path(path).relative_to(ROOT)}"
+            )
 
     expected = (PORTS / "graphshell" / "Cargo.toml").resolve()
     if graphshell_manifests != [expected]:

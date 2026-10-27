@@ -218,8 +218,9 @@ L1 card round, 2026-10-20 (Mark's words, unnumbered): chartulary is now in repos
 Still open, to be put when a lane reaches it: who owns L2 to L5's start order after L1's first
 slice lands.
 
-Open forks from L1's second pass, 2026-10-26 (questions with the code evidence; unnumbered until
-Mark rules; each lane stopped rather than picked):
+Open forks from L1's second pass, 2026-10-26 (questions with the code evidence; each lane stopped
+rather than picked). Mark ruled all five the same evening, one at a time with the evidence; his
+words are under each, unnumbered until he numbers them:
 
 - **Q010, malformed facet JSON on replay.** `CapturedDelta::to_delta` in graph-kernel
   `graph/capture.rs:382` turns a facet record whose `value_json` does not parse into `None`,
@@ -229,6 +230,9 @@ Mark rules; each lane stopped rather than picked):
   Corrupt for other reopen failures, with obsolete imagery kept as an explicit skip; or it loads
   and reports how many records were dropped. The first makes one corrupt record unloadable; the
   second keeps the divergence but makes it visible.
+  Mark, 2026-10-26: **"Refuse at checked load (Recommended)"**. A malformed record is corruption:
+  checked replay stops there and open reports it, as a refused write does; obsolete imagery
+  becomes an explicit skip.
 - **Q017, the kernel `store` feature.** `graph-kernel/src/store.rs` saves and loads `graph.json`
   from the snapshot alone, dropping Surface pins and facets while reporting success. No manifest
   in the workspace enables `store` (A004 found only integration-test consumers), and Pandect's
@@ -236,12 +240,20 @@ Mark rules; each lane stopped rather than picked):
   leaving `GraphSession` as the one persistence owner of A004's four; or they stay and gain a
   facet sidecar, which the triage warns is another partial-save authority. `mere-kernel` 0.0.2 is
   on crates.io, so removal is a public-API change in the next release.
+  Mark, 2026-10-26: **"Remove it (Recommended)"**. The feature and module go; `GraphSession` is
+  the one persistence owner; a public-API change for the next `mere-kernel` release.
 - **Q031, identical assertion copies on parallel rows.** `frozen_selection.rs:162` accepts a
   second identical handle on another row, `frozen_link.rs:220` refuses it as a duplicate, and
   `try_from_snapshot` admits the graph. One validator for assertion handles across snapshot
   load, selection freeze and link freeze (A012, A016) is the repair either way; the question is
   whether identical copies on parallel rows are legal graph state, in which case link freeze
   accepts or dedupes, or not, in which case snapshot load and selection freeze refuse.
+  Mark, 2026-10-26: **"Not legal (Recommended)"**, with his clarification that the freezes exist
+  "to get a snapshot for representing a node's content in the graph". So one handle, one row
+  is a rule of the live graph, enforced at the write path and checked load; a freeze copies legal
+  rows faithfully, and the one shared validator checks that the frozen record is a canonical copy
+  rather than re-deciding legality. Existing copies need a migration or a documented dedupe on
+  load.
 - **Q016's edge replays.** The literal repair makes `apply_graph_delta` refuse a replayed
   literal handle that checked open would refuse, but `ReplaySetResourceEdgesByIds` and
   `ReplaySetEdgesByIds` still accept a statement handle equal to a held Resource literal handle:
@@ -252,6 +264,9 @@ Mark rules; each lane stopped rather than picked):
   migration is given an explicit staged state that the check tolerates; or edge replays are
   declared out of this invariant's scope. Until one lands, "any applied delta can be reopened"
   holds for literal writes only.
+  Mark, 2026-10-26: **"Yes, join the invariant (Recommended)"**. `ReplaySetEdgesByIds` and
+  `ReplaySetResourceEdgesByIds` run the shared validator; legacy migration gets an explicit
+  staged state the check tolerates until it completes.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
@@ -259,6 +274,9 @@ Mark rules; each lane stopped rather than picked):
   beside its desktop host under `ports/tabard/`, still embeddable by path; or its reader and
   stylesheet specimens go behind features. The boundary check prints the carried link until one
   of these lands.
+  Mark, 2026-10-26: **"Beside its host (Recommended)"**. `tabard-workshop` moves to
+  `ports/tabard/workshop` with its workspace path updated; still embeddable by path; the toolkit
+  directory stops carrying the document stack and the guard's carried list empties.
 
 ## 6. Findings
 
@@ -306,3 +324,16 @@ Mark rules; each lane stopped rather than picked):
   (477 before), Pandect lib suite 340/340. Forks recorded in §5: Q010, Q017, Q031, Q016's edge
   replays. Q014 stays re-document only; Q001 to Q003 and Q019 wait on an eidetic branch.
   Receipt: `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.
+- 2026-10-26 (L1, Q017 closed by removal): the kernel's `store` feature and module are gone per
+  Mark's ruling the same evening; `GraphSession` is the one persistence owner (A004 drops to
+  three paths). The two reopen integration tests that were gated on the feature now run against
+  a test-only `graph.json` helper. Kernel lib 484/484, integration 2/2. Receipt updated.
+- 2026-10-26 (the workshop's home, landed): `tabard-workshop` moved from `crates/cambium/` to
+  `ports/tabard/workshop` per Mark's ruling; workspace path, the toolkit README map, the port
+  README, the architecture doc link and one test's relative asset path updated; the 2026-10-08
+  theme-modes decision keeps its text with a dated note. `scripts/check_port_boundaries.py` now
+  needs no toolkit carve-out, and it prints rather than refuses a dev-only link from a crate to a
+  port, because the web host's `shared_recovery` wasm example still mounts the workshop. That
+  reading of the one-way rule (examples and tests may mount a product surface; shipped code may
+  not) is a proposal for Mark to confirm or reverse; reversing it means the example moves beside
+  the workshop. Type-check of the workshop with its tests and the Tabard desktop passed.

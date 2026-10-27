@@ -77,6 +77,11 @@ What the table says in one line each:
 
 ## Landed
 
+- **Workshop beside its host (2026-10-26).** `tabard-workshop` moved from
+  `crates/cambium/` to `ports/tabard/workshop`, so the toolkit directory
+  carries no document-stack link and `check_port_boundaries.py` refuses any new
+  one. Embedding is unchanged: Pelt and the Tabard desktop take it by workspace
+  path.
 - **Turnstone `nomadnet`.** `retinue` is `optional`; the `nomadnet` feature is the
   only way it enters a build, with `default = []` beside `weld`, `scry`, `servo`,
   `piccolo` and `wasm`. Only `src/nomadnet/link.rs` names retinue. Address
@@ -234,8 +239,15 @@ workshop under `crates/cambium/` so applications other than the Tabard port
 could embed it; a crate is embeddable from any directory, so the location is
 the open part: beside its desktop host under `ports/tabard/`, or left where it
 is with its specimens behind features. `scripts/check_port_boundaries.py`
-refuses a new unconditional toolkit-to-document-stack link and prints this
-carried one.
+refuses a new unconditional toolkit-to-document-stack link.
+
+Ruled and landed 2026-10-26: Mark chose "beside its host"; the package is
+`ports/tabard/workshop`, embedded by workspace path as before, and no crate
+under `crates/cambium/` links the document stack. The web host's
+`shared_recovery` wasm example still mounts the workshop as a dev-dependency,
+which the port boundary check now prints as a carried dev-only link rather
+than refusing; whether examples may mount a product surface is Mark's to
+confirm.
 
 ### Which rung each cut belongs on
 
@@ -259,5 +271,6 @@ split.
   can see the gap close.
 - No crate under `crates/cambium/` can gain an unconditional link to the
   document stack (`inker`, `document-canvas`, `mere-lanes`, `nematic`,
-  `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; the
-  one carried link, `tabard-workshop`, is printed (2026-10-26).
+  `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; none
+  does since `tabard-workshop` moved to `ports/tabard/workshop` (2026-10-26).
+  A dev-only link from a crate to a port is printed, never refused.

@@ -17,8 +17,6 @@ remain for source compatibility during consumer migration.
 - `sprigging`: engine-neutral custom leaves and arrangement geometry
 - `mesquite`: the scenario lane over a document host — scenario ticking,
   captures, pixel checks, cost accounting and one JSON receipt
-- [`tabard-workshop`](tabard-workshop): shared theme-authoring state, Cambium
-  controls and preview scenes for embedding applications
 
 Every crate is MPL-2.0 (see the repository `LICENSE`). Meristem (from
 `xilem_core`) and the Cambium files ported or adapted from `xilem_web` keep the
@@ -36,7 +34,9 @@ Standalone and sibling-checkout development are described in
 ## Shared appearance and title bars
 
 `tabard` owns theme definitions, modes, derivation and interchange;
-`tabard-workshop` provides their retained authoring surface. Tinct supplies
+[`tabard-workshop`](../../ports/tabard/workshop) provides their retained
+authoring surface, beside its desktop host since 2026-10-26 because its
+specimens render real documents through the document stack. Tinct supplies
 color math and Illume supplies syntax roles. Hosts keep application appearance
 selection, document appearance precedence and authored-file destinations.
 
