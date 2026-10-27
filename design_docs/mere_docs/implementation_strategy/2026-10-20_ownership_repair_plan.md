@@ -283,6 +283,7 @@ words are under each, unnumbered until he numbers them:
   the Surface write-back and in pre-existing Resource rows alike, each with a note on the owning
   Resource; a repeated handle on rows that differ stays a refusal, since that is a conflict, not a
   copy.
+  Landed the same evening (`2d5601db5`): whole-row copies dedupe in both strata with a note each.
 - **Q010 in legacy migration** (L1, 2026-10-26, the lane stopped rather than picked). Checked
   replay now refuses a malformed facet record, but the caller-qualified legacy migration replays
   its journal under `OnRefusal::Drop`, and `legacy_resource_migration.rs:395` still drops such a
@@ -293,6 +294,7 @@ words are under each, unnumbered until he numbers them:
   Mark, 2026-10-26: **"Refuse it (Recommended)"**. Migration returns a `LegacyMigrationError`
   naming the node and facet, as it does for an invalid typed resource capture; the three drop-both
   adapters in `capture/replay_outcome.rs` go.
+  Landed the same evening (`5936edf2c`): migration refuses the record naming node and facet; the adapters are gone.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
@@ -418,3 +420,10 @@ until Mark rules; the lane repaired Q001, Q003 and Q019 and stopped here rather 
   as a fork (§5): its binding has two admission owners. Chartulary 87/87 (79 before), kernel lib
   485/485 on its own base and 506/506 merged with the third pass, Pandect lib 342/342. Receipt:
   `support/receipts/ownership-repair/l1/2026-10-26_l1_chartulary_receipt.json`.
+- 2026-10-26 (L1, fourth pass, the migration rulings): legacy migration dedupes whole identical
+  rows in both strata with a `LegacyMigrationNote` each (`legacy_resource_migration/copies.rs`)
+  and refuses a malformed facet record as a `LegacyMigrationError` naming node and facet; the
+  drop-both replay adapters and the pub `CapturedDelta::replay_delta` / `replay_delta_as` are gone
+  (a public-API change with no caller left). Merged onto the chartulary repin. Kernel lib 512/512
+  with both reopen tests, Pandect 342 lib and 28 integration tests. Of L1's first slice only Q002
+  (chartulary, a fork in §5) and Q014 (re-document only) remain. Receipt updated.

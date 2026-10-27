@@ -131,13 +131,30 @@
    "note": "ReplayRefused.position now counts skipped entries on every journal path; parse_uuid in capture.rs still panics on a malformed id (out of scope)",
    "forks_recorded_in_plan_section_5": "legacy migration drops or refuses a malformed facet record (legacy_resource_migration.rs:395)",
    "commit": "49b5d844f, merged after c1eb4e0ae"
+  },
+  {
+   "id": "Q031 legacy baselines",
+   "ruling": "Mark, 2026-10-26: dedupe both",
+   "owner": "a copy is a whole persisted row equal to an earlier row on its pair that holds at least one handle; the first row stays, each later copy is dropped with a LegacyMigrationNote on the owning Resource, one per statement the copy held; a handle repeated on rows that differ is untouched and the final validation still refuses it",
+   "change": "legacy_resource_migration/copies.rs split_copies, note_deduped_surface_copy, dedupe_resource_copies, note_copy and two new uncertainty tags (identical_parallel_surface_copy_deduped_to_first_row, identical_parallel_resource_copy_deduped_to_first_row); the Surface write-back splits off copies and notes them; sync ends with dedupe_resource_copies so a typed journal entry that sets copies is deduped too; LegacyMigrationNote's pub shape unchanged (a Resource-row copy carries empty surface ids)",
+   "regression": "legacy_resource_migration_copies_tests::{legacy_migration_dedupes_identical_copies_of_a_surface_placed_claim_and_says_so, legacy_migration_dedupes_identical_surface_rows_that_a_journal_entry_sets, legacy_migration_dedupes_identical_copies_in_pre_existing_resource_rows_and_says_so, legacy_migration_refuses_a_repeated_handle_on_rows_that_differ}",
+   "commit": "2d5601db5"
+  },
+  {
+   "id": "Q010 in legacy migration",
+   "ruling": "Mark, 2026-10-26: refuse it",
+   "owner": "the migration loop reads the typed Replay outcome: Apply applies, Skip skips, Malformed returns LegacyMigrationError naming the entry index, facet and node; the typed-record path refuses anything but Apply",
+   "change": "legacy_resource_migration.rs loop and typed-record path; capture/replay_outcome.rs drops the three drop-both adapters and the pub CapturedDelta::replay_delta / replay_delta_as (a public-API change; no caller left in crates/ or ports/; the sealed audit probe audit_authority.rs still names them and no target builds it); legacy_family_attribution.rs test helper on replay_as(..).into_write()",
+   "regression": "legacy_resource_migration_malformed_tests::{legacy_migration_refuses_a_malformed_facet_record_naming_the_node_and_facet, legacy_migration_still_skips_an_obsolete_thumbnail_record}",
+   "note": "the migration's other OnRefusal::Drop replays keep their mode; the output replay still drops non-malformed refusals that legacy journals contain by design",
+   "commit": "5936edf2c"
   }
  ],
  "kernel_suite_after": {
-  "lib_passed": 505,
+  "lib_passed": 512,
   "integration_passed": 2,
   "failed": 0,
-  "basis": "main after the third pass: Q009, Q010, Q012, Q015, Q016 (literals and edges), Q017 removed, Q031, Q032; 477 lib tests before the day plus 28 regressions"
+  "basis": "main with the migration rulings merged onto the chartulary repin (fcae43cc7): 477 lib tests before the day plus 35 regressions"
  },
  "forks_recorded_in_plan_section_5": [
   "Q010",
@@ -165,10 +182,9 @@
   "merge scratch replays (graph_session_merge.rs) and GraphJournal::replay drop a refused entry and continue; whether a merge candidate may silently lack an edit is the Q010 class of question"
  ],
  "pandect_suite_after": {
-  "lib_passed": 340,
+  "lib_passed": 342,
   "integration_passed": 28,
-  "failed": 0,
-  "note": "all targets; one frozen-record test now asserts that an identical copy is refused instead of preserved (Q031)"
+  "failed": 0
  },
  "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host"
 }
