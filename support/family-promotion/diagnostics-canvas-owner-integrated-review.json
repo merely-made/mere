@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-26",
+  "basis": "8d69c9144",
+  "implementation_commit": "e870314e6",
+  "status": "Implemented and qualified for the named runtime receiving boundaries: 1192 distinct tests passed, 18 existing ignores; signals-only, Canvas Wasm and embedding builds passed",
+  "authority": {
+    "kernel": "GraphInputKey is allocated at graph construction and existing structural/content/site/visit bump boundaries. Clones preserve keys; edited forks get distinct input versions even when numeric counters match. Fresh materialization gets another source.",
+    "shared_models": "ChannelRegistry keys graph and physics facts by these source-qualified inputs. Binding a different source drops held values without resetting producer counts; off-thread community offers must match the live graph key.",
+    "Meaning": "Content input observation advances the existing request generation before freshness tests or actor draining, invalidating pending jobs, accepted snapshots and failed-run tags from replaced inputs while retaining engine/settings.",
+    "Canvas_host": "Captured layout source includes the actual Canvas owner, replacement epoch and structural input. Transition installation revalidates it; detached StopReturn carries the same source. Cancellation reports cancellation rather than a landed arrangement."
+  },
+  "fixed_bugs": [
+    "Equal numeric revisions previously allowed one materialized graph or divergent candidate to reuse another graph's signal values.",
+    "Equal content counters could call an old Meaning snapshot fresh after wholesale ingest; source-qualified content observation invalidates it before receiving.",
+    "Delayed arrangement transitions could land on a removed/recreated node or another Canvas sharing the same Graph clone.",
+    "Detached StopReturn previously resolved bare slots against the receiving graph before any source admission.",
+    "Weighted edge, topology/physics, analytic memo, gloss and affinity-install caches now use the same kernel input boundary instead of colliding graph-local counters.",
+    "Rule-face batch epochs now retire with ended surface memberships, including same-UUID recreation, without changing surviving member/action IDs."
+  ],
+  "ordinary_edit_contract": [
+    "GraphInputKey reads allocate nothing. Structural keys survive title-only edits, preserving topology cache run counts; content keys advance only at the existing content invalidation boundary.",
+    "Ordinary clones, metadata refresh and surviving member/action identities remain continuous. Independently edited candidates cannot collide through equal counter values.",
+    "Authored UUID rosters, override ownership, durable IDs and snapshot schemas remain separate; runtime keys and Canvas ownership receipts are not serialized."
+  ],
+  "write_path_inventory": [
+    "Graph::new creates one source shared by its four runtime input domains; bump_revision/bump_content_revision/bump_url_grouping_revision/bump_visit_revision advance the corresponding domain.",
+    "Residency, snapshot loading and legacy journal replacement materialize a candidate graph with its own source. Their existing explicit numeric counter assignments do not turn a fresh source into an old one.",
+    "Graph::clone copies keys until a mutator advances its affected domain. No mutable pointer identity or read-time identity allocation is used."
+  ],
+  "api_receiving": [
+    "StopReturn is captured with StopReturn::new(canvas, from, to, duration_ms); its source is private. All in-repo construction paths were updated.",
+    "PhysicsViewKey.structure and ChannelRegistry community offers now take GraphInputKey. The shared registry owns the source comparison; Canvas does not maintain a second graph input allocator.",
+    "ArrangementTransition::advance remains a schedule sampler. In-tree Graphshell installation uses advance_arrangement, which checks the captured source. External direct raw-position installers still need explicit admission."
+  ],
+  "remaining_migrations": [
+    {
+      "owner": "External host result and provider request admission",
+      "gap": "Bare position/UUID/content/affinity setters express current direct edits. They cannot identify an out-of-order network or embedding reply, or revoke a detached external caller. Layout source admission does not capture every recipe/viewport/policy request parameter.",
+      "done_condition": "Carry actual owner, captured input version and request identity from each dispatch to its exact installer, including superseded requests on the same live member. Replace unchecked external sampler/raw-position installation at concrete consumers."
+    },
+    {
+      "owner": "Graphshell async product and fetch ownership",
+      "gap": "Product completions reconcile a returned app/session before Canvas metadata receiving; the legacy direct metadata helper and provider-specific fetch cancellation/admission need separate source/request receiving. Parallel fetch-actor WIP is preserved and excluded from this patch and isolated acceptance.",
+      "done_condition": "Trace each real completion transaction and provider reply through dispatch, owner/head admission, backend outcome and projection install. Qualify any fetch actor changes in their own lane."
+    },
+    {
+      "owner": "Source-specific assertions, fields, authored curation and durable history",
+      "gap": "Graph runtime input versions do not define link/field/assertion ABA, authored Fold/Forme lifetime policy, snapshot transaction authority or durable replay completion.",
+      "done_condition": "Receive each source's own replacement/rollback and durable installation rules without converting runtime tokens into persisted authority."
+    },
+    {
+      "owner": "Supplier, custom producers and platform delivery",
+      "gap": "Custom producer/action reassignments, external consumer pins, guest namespaces/selection ingress, full-leaf raster/intrinsic sizing, terminal actor outcomes and headed AT/physical handoff remain independently open.",
+      "done_condition": "Continue owner-specific producer, supplier and platform gates."
+    }
+  ],
+  "evidence": {
+    "red": "diagnostics-canvas-owner-red-online.json",
+    "focused": "diagnostics-canvas-owner-controls-final.json",
+    "qualification": "diagnostics-canvas-owner-integrated-qualification.json"
+  },
+  "retained_byte_cap": 10000000,
+  "tests": {
+    "kernel": {
+      "passed": 513,
+      "existing_ignored": 0
+    },
+    "canvas": {
+      "passed": 645,
+      "existing_ignored": 18
+    },
+    "reader": {
+      "passed": 12,
+      "existing_ignored": 0
+    },
+    "workspace-refresh": {
+      "passed": 22,
+      "existing_ignored": 0
+    }
+  },
+  "feature_receiving": "The old retained-content-only owner_lifecycle filter found zero tests and is excluded; workspace-editor enables the actual 22 owner tests.",
+  "integrated_receiving": {
+    "commit": "eada2c2c3013eca1ca33e890ffdca8275ff74b02",
+    "upstream": "dc4845f06",
+    "qualification": "diagnostics-canvas-owner-integrated-qualification.json",
+    "source": "diagnostics-canvas-owner-integrated-source.json",
+    "preservation": "diagnostics-canvas-owner-integrated-preservation.json",
+    "source_changes": "Only Cargo.lock among the original qualified source files changed; task-owned Rust code is unchanged."
+  }
+}

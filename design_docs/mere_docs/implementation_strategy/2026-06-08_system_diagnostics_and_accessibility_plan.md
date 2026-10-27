@@ -3,9 +3,9 @@
 ## Delayed host results and shared model inputs, 2026-10-26
 
 **Status (2026-10-26):** implemented; isolated automated receiving is recorded in
-`support/family-promotion/diagnostics-canvas-owner-qualification.json`.
+`support/family-promotion/diagnostics-canvas-owner-integrated-qualification.json`.
 Fixed bugs, source boundaries and remaining migrations:
-`support/family-promotion/diagnostics-canvas-owner-review.json`.
+`support/family-promotion/diagnostics-canvas-owner-integrated-review.json`.
 
 Graph-local counters could collide across materialized graphs and divergent
 candidates. Kernel Graph now authors opaque, process-local input keys for the

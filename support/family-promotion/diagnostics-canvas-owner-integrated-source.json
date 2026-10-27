@@ -1,0 +1,41 @@
+{
+  "integrated_commit": "eada2c2c3013eca1ca33e890ffdca8275ff74b02",
+  "upstream_main": "dc4845f06",
+  "implementation_commit": "e870314e6df2e030f12328f2fe02f7df0db05e5e",
+  "prior_qualification": "diagnostics-canvas-owner-qualification.json",
+  "normalization": "CRLF normalized to LF",
+  "source_sha256": {
+    ".gitattributes": "d94dfd96af86eab09ef8ddf7270d72311a78907024393db04ec1d94b1260574b",
+    "Cargo.lock": "be13fb03c906813e989c2dff805255d18cba34a32d500c27b7323f6970350512",
+    "Cargo.toml": "02adcd281cdc77fb896836af3df3701ac9fd10693f40673d70f39f6d9f890bde",
+    "crates/cambium/mere-view/Cargo.toml": "664c7f444cf12b78f260779d881f3581f048d9aaa6f5e0d0bdc1eca356aa57e9",
+    "crates/cambium/scenes/scenograph/Cargo.toml": "f817d7a3aa4384b02b9701587969a991b14ec3590cfda6c9eecdce9c33a46890",
+    "crates/canvas/pictograph/src/canvas.rs": "beb1302b35cf8d84b011013de4e3066f2b4839c81b2eea4b3ffeaf2a4c52d1cf",
+    "crates/canvas/pictograph/src/canvas/attention.rs": "d7372e0123f7cefa1c7b6f867f861a5ccbbbd9c74deb25b252f1a239cd9b9fe7",
+    "crates/canvas/pictograph/src/canvas/community_lane.rs": "f24ad18426d66651771fd268a293b2bc106468ab348c3fd78a62579cdc4950ab",
+    "crates/canvas/pictograph/src/canvas/gloss.rs": "b8b772b3da98212b50e6a8828d37690ee725cb229af4ac28ac1d58010ecd35a2",
+    "crates/canvas/pictograph/src/canvas/host_results.rs": "d0e30046b984eba086908e7b825d1d3fc1757b8d989228384d9445fd9c72a07a",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "61fc5fb4d23c9acb2dfd0142433231b21d6719281833106b7d19e787eb9c0253",
+    "crates/canvas/pictograph/src/canvas/meaning.rs": "6345c9501a5ecba96f5213f07f6d243c85b5432d81e138cb0d8b95dc94099bc6",
+    "crates/canvas/pictograph/src/canvas/member_lifetimes.rs": "4f190ecb6f24373f56680d1b42ecec94e1b1322be59900181d839476c257449b",
+    "crates/canvas/pictograph/src/canvas/physics_catalog.rs": "5de58a3d8da971df760431b27029f480b50c7219a419d955ba4c8adbfb3e0443",
+    "crates/canvas/pictograph/src/canvas/physics_controls.rs": "b0d5d5ebc820d1ea2293b1c277364cb452977000b470c39891590596fafe907f",
+    "crates/canvas/pictograph/src/canvas/roles.rs": "b8272ace34bb130aeb301cf5f68dcae76f7922df70f240fc3564589d5dfe4fda",
+    "crates/canvas/pictograph/src/canvas/strategy.rs": "516f042e882d5c04d97f9eab9e368b7183d11cbf66f25ae9c871b8d75e540e79",
+    "crates/canvas/pictograph/src/canvas/strategy_inputs.rs": "bc2fcf273bf6e9e694338b9bfdcd2e349f18ac2d880a181b85dcca97e1b85034",
+    "crates/canvas/pictograph/src/canvas/tests.rs": "cec61ae21b0baee6ca28681c7c96d09c6acdfbbe1d427ea853e5bd3e78c3e3dc",
+    "crates/canvas/pictograph/src/canvas/tests/cache_lifetimes.rs": "1882370a7ee966ccb09997e20eaea81e09eb1e43c9e415065c486a7e0ea9b3c8",
+    "crates/canvas/pictograph/src/canvas/tests/host_lifetimes.rs": "2d2dc515da7f178557836b64af45eead0e70214cc1670f89d7182a8903c8d7c4",
+    "crates/canvas/pictograph/src/signals/physics.rs": "ad72b208848970943359c07e2c1e1de0043c171fec19e60f5f147c2195de8c23",
+    "crates/canvas/pictograph/src/signals/registry.rs": "3551110d1b7b16635fe355dadee6894697f857ef95ea7ca299d30cbb6bb6eca1",
+    "crates/canvas/pictograph/src/signals/registry_tests.rs": "f1e0c0e3def319c834673a2bcaaf688e200ccbb855b1dee106cd20fdaa781329",
+    "crates/graph/graph-kernel/src/graph/input_key.rs": "fddc51dab130ffd79fdafff14cacd0541b3d6dbb4d73eb52f6e0f3f34d57a167",
+    "crates/graph/graph-kernel/src/graph/mod.rs": "ad61162dc2ba2dd5303212e52f7677aa4586cf72ad849fed382248fa5a3268d9",
+    "crates/system/document-lanes/Cargo.toml": "bc960bb6142d5382abb78dda6749e310dfbd7b129a37d3b9d69c9c754d141606",
+    "ports/graphshell/Cargo.toml": "fa7dac476fc10c38bb47947f6f081ac131658bf7fe4c4000d6293a7d373c84eb"
+  },
+  "changes_from_initial_source_snapshot": [
+    "Cargo.lock"
+  ],
+  "receiving": "Upstream reading/presentation/custody merge; task-owned Rust code unchanged. Affected Canvas, Graphshell and compile gates repeated."
+}
