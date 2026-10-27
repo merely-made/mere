@@ -4,75 +4,27 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Scoped declarative rule authoring. Preview returns decisions, never host actions.
-//! The workspace record contains rules/history only, not graph or selection state.
-use std::sync::{Arc, Mutex};
-
-use backstep::History;
-use muniment::{Backend, WriteOp};
-pub use scenograph::presentation;
-use scenograph::presentation::{
+//! Host-neutral authoring state for presentation rule sets.
+//!
+//! This module owns private drafts and saved undo/redo transitions. Hosts own
+//! serialization, storage, graph identity, and acknowledgement delivery.
+use super::{
     Condition, Context, Effect, Issue, PRESENTATION_RULE_VERSION, PrimitiveKind, Resolution, Rule,
     RuleSet, Target,
 };
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use backstep::History;
+use serde::{Serialize, de::DeserializeOwned};
 use serde_json::Value;
-use uuid::Uuid;
+use std::sync::atomic::{AtomicU32, Ordering};
 
 const RECORD_LIMIT: usize = 1024 * 1024;
 const HISTORY_LIMIT: usize = 32;
 
-/// Muniment's default transaction method requires Sync on native hosts; the
-/// browser's JS handles stay on the main thread and need no Sync promise.
-#[cfg(not(target_arch = "wasm32"))]
-pub trait RuleStore: Backend + Sync {}
-#[cfg(not(target_arch = "wasm32"))]
-impl<B: Backend + Sync> RuleStore for B {}
-#[cfg(target_arch = "wasm32")]
-pub trait RuleStore: Backend {}
-#[cfg(target_arch = "wasm32")]
-impl<B: Backend> RuleStore for B {}
-
-pub fn slot(graph_id: Uuid) -> String {
-    format!("graphshell/presentation-rules/v1/{graph_id}")
-}
-fn empty() -> RuleSet {
-    RuleSet {
-        version: PRESENTATION_RULE_VERSION,
-        rules: Vec::new(),
-    }
-}
 fn json(value: &impl Serialize) -> String {
     serde_json::to_string(value).expect("validated presentation data serializes")
 }
 
-/// Raw fields remain editable and undoable even while malformed.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RuleDraft {
-    pub id: String,
-    pub label: String,
-    pub enabled: bool,
-    pub priority: String,
-    pub target: String,
-    pub condition: String,
-    pub effects: String,
-}
-impl From<&Rule> for RuleDraft {
-    fn from(rule: &Rule) -> Self {
-        Self {
-            id: rule.id.clone(),
-            label: rule.label.clone(),
-            enabled: rule.enabled,
-            priority: rule.priority.to_string(),
-            target: json(&rule.target),
-            condition: json(&rule.condition),
-            effects: json(&rule.effects),
-        }
-    }
-}
-
-/// Refuse unknown JSON properties in this editor rather than silently dropping
-/// authored input. The shared resolver's compatibility policy is unchanged.
+/// Refuse unknown JSON properties instead of silently discarding authored input.
 fn unknown(input: &Value, known: &Value, path: &str, issues: &mut Vec<Issue>) {
     match (input, known) {
         (Value::Object(input), Value::Object(known)) => {
@@ -96,6 +48,7 @@ fn unknown(input: &Value, known: &Value, path: &str, issues: &mut Vec<Issue>) {
         _ => {},
     }
 }
+
 pub fn parse<T: DeserializeOwned + Serialize>(text: &str, path: &str) -> Result<T, Vec<Issue>> {
     let invalid = |message: String| {
         vec![Issue {
@@ -119,6 +72,31 @@ pub fn parse<T: DeserializeOwned + Serialize>(text: &str, path: &str) -> Result<
         Ok(value)
     } else {
         Err(issues)
+    }
+}
+
+/// Raw fields stay editable and undoable while malformed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RuleDraft {
+    pub id: String,
+    pub label: String,
+    pub enabled: bool,
+    pub priority: String,
+    pub target: String,
+    pub condition: String,
+    pub effects: String,
+}
+impl From<&Rule> for RuleDraft {
+    fn from(rule: &Rule) -> Self {
+        Self {
+            id: rule.id.clone(),
+            label: rule.label.clone(),
+            enabled: rule.enabled,
+            priority: rule.priority.to_string(),
+            target: json(&rule.target),
+            condition: json(&rule.condition),
+            effects: json(&rule.effects),
+        }
     }
 }
 
@@ -219,26 +197,29 @@ impl RuleSetDraft {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Record {
-    version: u16,
-    graph_id: Uuid,
-    generation: u64,
-    rules: RuleSet,
-    undo: Vec<RuleSet>,
-    redo: Vec<RuleSet>,
+/// Durable state needed by an adapter to serialize an acknowledged save.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SavedState {
+    pub generation: u64,
+    pub rules: RuleSet,
+    pub undo: Vec<RuleSet>,
+    pub redo: Vec<RuleSet>,
 }
-impl Record {
-    fn validate(&self, graph_id: Uuid) -> Result<(), String> {
-        if self.version != 1
-            || self.graph_id != graph_id
-            || self.undo.len() > HISTORY_LIMIT
-            || self.redo.len() > HISTORY_LIMIT
-        {
-            return Err(
-                "invalid presentation workspace identity, version or history length".into(),
-            );
+impl SavedState {
+    pub fn empty() -> Self {
+        Self {
+            generation: 0,
+            rules: RuleSet {
+                version: PRESENTATION_RULE_VERSION,
+                rules: Vec::new(),
+            },
+            undo: Vec::new(),
+            redo: Vec::new(),
+        }
+    }
+    pub fn validate(&self) -> Result<(), String> {
+        if self.undo.len() > HISTORY_LIMIT || self.redo.len() > HISTORY_LIMIT {
+            return Err("saved history exceeds 32 steps".into());
         }
         for rules in std::iter::once(&self.rules)
             .chain(&self.undo)
@@ -251,90 +232,54 @@ impl Record {
         Ok(())
     }
 }
+
+static NEXT_WORKSPACE: AtomicU32 = AtomicU32::new(1);
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct OperationId {
+    workspace: u32,
+    sequence: u64,
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SaveKind {
     Apply,
     Undo,
     Redo,
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct PreparedOperation {
+    pub id: OperationId,
+    pub state: SavedState,
+}
 
-#[derive(Clone)]
-pub struct PreparedSave {
-    key: String,
-    expected: Option<Vec<u8>>,
-    bytes: Vec<u8>,
-}
-impl PreparedSave {
-    /// Compare and replace inside the backend transaction; stale tabs cannot
-    /// overwrite a newer workspace. Nontransactional backends refuse this save.
-    pub async fn save<B: RuleStore>(&self, backend: B) -> Result<(), String> {
-        let key = self.key.clone();
-        let expected = self.expected.clone();
-        let bytes = self.bytes.clone();
-        let outcome = Arc::new(Mutex::new(None));
-        let answer = outcome.clone();
-        backend.transact(Box::new(move |reader| {
-            let result = reader.get(&key).map_err(|e| e.to_string()).and_then(|held| {
-                if held == expected { Ok(()) } else { Err("Saved rules changed elsewhere; draft retained. Reopen or reconcile before applying.".into()) }
-            });
-            let accepted = result.is_ok();
-            *answer.lock().expect("transaction result") = Some(result);
-            if accepted { vec![WriteOp::Put { key, value: bytes }] } else { Vec::new() }
-        })).await.map_err(|e| e.to_string())?;
-        outcome
-            .lock()
-            .expect("transaction result")
-            .take()
-            .ok_or("backend did not run the transaction")?
-    }
-}
 struct Draft {
     value: RuleSetDraft,
     history: History<RuleSetDraft, String>,
 }
-pub struct PresentationSession {
-    saved: Record,
-    baseline: Option<Vec<u8>>,
+pub struct RuleWorkspace {
+    identity: u32,
+    saved: SavedState,
     draft: Option<Draft>,
-    pending: Option<(Record, PreparedSave)>,
+    pending: Option<PreparedOperation>,
+    next_operation: u64,
 }
-impl PresentationSession {
-    pub fn new(graph_id: Uuid) -> Self {
-        Self {
-            saved: Record {
-                version: 1,
-                graph_id,
-                generation: 0,
-                rules: empty(),
-                undo: Vec::new(),
-                redo: Vec::new(),
-            },
-            baseline: None,
+impl RuleWorkspace {
+    pub fn new(saved: SavedState) -> Result<Self, String> {
+        saved.validate()?;
+        let identity = NEXT_WORKSPACE.fetch_add(1, Ordering::Relaxed);
+        assert_ne!(identity, 0, "presentation workspace identity exhausted");
+        Ok(Self {
+            identity,
+            saved,
             draft: None,
             pending: None,
-        }
-    }
-    pub async fn load<B: Backend>(backend: B, graph_id: Uuid) -> Result<Self, String> {
-        let baseline = backend
-            .get(&slot(graph_id))
-            .await
-            .map_err(|e| e.to_string())?;
-        let mut session = Self::new(graph_id);
-        if let Some(bytes) = &baseline {
-            if bytes.len() > RECORD_LIMIT {
-                return Err("presentation workspace exceeds 1 MiB".into());
-            }
-            let text = std::str::from_utf8(bytes)
-                .map_err(|e| format!("Invalid presentation workspace: {e}"))?;
-            session.saved = parse(text, "workspace")
-                .map_err(|e| format!("Invalid presentation workspace: {e:?}"))?;
-            session.saved.validate(graph_id)?;
-        }
-        session.baseline = baseline;
-        Ok(session)
+            next_operation: 0,
+        })
     }
     pub fn committed(&self) -> &RuleSet {
         &self.saved.rules
+    }
+    pub fn saved_state(&self) -> &SavedState {
+        &self.saved
     }
     pub fn draft(&self) -> Option<&RuleSetDraft> {
         self.draft.as_ref().map(|d| &d.value)
@@ -393,7 +338,6 @@ impl PresentationSession {
         let draft = self.draft.as_mut().ok_or("Begin a rule draft first")?;
         let mut next = draft.value.clone();
         change(&mut next);
-        // Bound malformed drafts as well as valid saved records.
         let size: usize = next
             .rules
             .iter()
@@ -437,12 +381,10 @@ impl PresentationSession {
         self.draft()
             .map_or_else(|| Ok(self.saved.rules.clone()), RuleSetDraft::validate)
     }
-    /// Pure preview: prior matches are explicit input, never silently shared
-    /// between occurrences, samples, committed rules and drafts.
     pub fn preview(&self, context: &Context) -> Result<Resolution, Vec<Issue>> {
         self.rules()?.resolve(context)
     }
-    pub fn prepare_save(&mut self, kind: SaveKind) -> Result<PreparedSave, String> {
+    pub fn prepare(&mut self, kind: SaveKind) -> Result<PreparedOperation, String> {
         self.idle()?;
         let mut next = self.saved.clone();
         match kind {
@@ -480,32 +422,202 @@ impl PresentationSession {
             .generation
             .checked_add(1)
             .ok_or("presentation generation exhausted")?;
-        next.validate(self.saved.graph_id)?;
-        let bytes = serde_json::to_vec(&next).map_err(|e| e.to_string())?;
-        if bytes.len() > RECORD_LIMIT {
-            return Err("saved rule history exceeds 1 MiB; draft retained".into());
-        }
-        let proposal = PreparedSave {
-            key: slot(next.graph_id),
-            expected: self.baseline.clone(),
-            bytes,
+        next.validate()?;
+        self.next_operation = self
+            .next_operation
+            .checked_add(1)
+            .ok_or("presentation operation sequence exhausted")?;
+        let operation = PreparedOperation {
+            id: OperationId {
+                workspace: self.identity,
+                sequence: self.next_operation,
+            },
+            state: next,
         };
-        self.pending = Some((next, proposal.clone()));
-        Ok(proposal)
+        self.pending = Some(operation.clone());
+        Ok(operation)
     }
-    pub fn finish_save(&mut self, result: Result<(), String>) -> Result<(), String> {
-        let (next, proposal) = self
-            .pending
-            .take()
-            .ok_or("No presentation save is pending")?;
+    /// A completion promotes its prepared snapshot only when its operation id
+    /// still matches. Failure or a stale id leaves committed state and draft intact.
+    pub fn finish(&mut self, id: OperationId, result: Result<(), String>) -> Result<bool, String> {
+        let Some(pending) = self.pending.as_ref() else {
+            return Ok(false);
+        };
+        if pending.id != id {
+            return Ok(false);
+        }
+        let pending = self.pending.take().expect("checked pending operation");
         result?;
-        self.saved = next;
-        self.baseline = Some(proposal.bytes);
+        self.saved = pending.state;
         self.draft = None;
+        Ok(true)
+    }
+    /// Replace the committed baseline from a freshly loaded record while
+    /// retaining the private draft for explicit review and re-application.
+    pub fn reconcile(&mut self, saved: SavedState) -> Result<(), String> {
+        self.idle()?;
+        saved.validate()?;
+        self.saved = saved;
         Ok(())
     }
 }
 
 #[cfg(test)]
-#[path = "presentation_editor_tests.rs"]
-mod tests;
+mod tests {
+    use super::*;
+    use crate::presentation::{Property, ViewState};
+
+    fn context(id: &str) -> Context {
+        Context {
+            id: id.into(),
+            kind: PrimitiveKind::Node,
+            facts: Default::default(),
+            states: Default::default(),
+            screen_size: Some(64.0),
+            previous_matches: Default::default(),
+        }
+    }
+    fn add(workspace: &mut RuleWorkspace, kind: PrimitiveKind) {
+        workspace.begin().unwrap();
+        workspace
+            .edit(None, 1000, |draft| {
+                draft.add(kind);
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn strict_parse_rejects_unknown_nested_fields_and_malformed_draft_remains_undoable() {
+        let mut workspace = RuleWorkspace::new(SavedState::empty()).unwrap();
+        add(&mut workspace, PrimitiveKind::Node);
+        let valid = workspace.rules().unwrap();
+        workspace
+            .edit(None, 1010, |draft| {
+                draft.rules[0].condition =
+                    r#"{"kind":"not","condition":{"kind":"always","surprise":true}}"#.into()
+            })
+            .unwrap();
+        assert!(
+            workspace
+                .rules()
+                .unwrap_err()
+                .iter()
+                .any(|issue| issue.field.ends_with("condition.surprise"))
+        );
+        workspace
+            .edit(None, 1020, |draft| draft.rules[0].condition = "{".into())
+            .unwrap();
+        assert!(workspace.rules().is_err());
+        assert!(workspace.prepare(SaveKind::Apply).is_err());
+        workspace.undo_draft(false).unwrap();
+        assert!(workspace.rules().is_err());
+        workspace.undo_draft(false).unwrap();
+        assert_eq!(workspace.rules().unwrap(), valid);
+    }
+
+    #[test]
+    fn reordering_tied_rules_changes_winner_and_draft_undo_restores_it() {
+        let mut workspace = RuleWorkspace::new(SavedState::empty()).unwrap();
+        add(&mut workspace, PrimitiveKind::Node);
+        workspace
+            .edit(None, 1010, |draft| {
+                draft.add(PrimitiveKind::Node);
+            })
+            .unwrap();
+        workspace
+            .edit(None, 1020, |draft| {
+                draft.rules[1].effects = r#"[{"kind":"details","visible":false}]"#.into()
+            })
+            .unwrap();
+        let before = workspace.preview(&context("one")).unwrap();
+        assert_eq!(before.winners[&Property::Details].rule_id, "node-2");
+        workspace
+            .edit(None, 1030, |draft| draft.rules.swap(0, 1))
+            .unwrap();
+        assert_eq!(
+            workspace.preview(&context("one")).unwrap().winners[&Property::Details].rule_id,
+            "node-1"
+        );
+        workspace.undo_draft(false).unwrap();
+        assert_eq!(workspace.preview(&context("one")).unwrap(), before);
+    }
+
+    #[test]
+    fn draft_preview_is_pure_and_hysteresis_is_occurrence_local() {
+        let mut workspace = RuleWorkspace::new(SavedState::empty()).unwrap();
+        add(&mut workspace, PrimitiveKind::Node);
+        workspace
+            .edit(None, 1010, |draft| {
+                draft.rules[0].target = r#"{"kind":"node","ids":["first","second"]}"#.into();
+                draft.rules[0].condition =
+                    r#"{"kind":"screen_size","enter_below":48,"exit_above":84}"#.into();
+            })
+            .unwrap();
+        let mut first = context("first");
+        first.previous_matches.insert("node-1".into());
+        first.states.insert(ViewState::Selected);
+        let before = first.clone();
+        assert!(
+            workspace
+                .preview(&first)
+                .unwrap()
+                .matched_rules
+                .contains("node-1")
+        );
+        assert_eq!(first, before);
+        assert!(
+            workspace
+                .preview(&context("second"))
+                .unwrap()
+                .winners
+                .is_empty()
+        );
+        assert!(
+            workspace
+                .preview(&context("other"))
+                .unwrap()
+                .winners
+                .is_empty()
+        );
+        assert_eq!(workspace.committed(), &SavedState::empty().rules);
+    }
+
+    #[test]
+    fn bounds_and_noop_apply_are_refused() {
+        let mut workspace = RuleWorkspace::new(SavedState::empty()).unwrap();
+        workspace.begin().unwrap();
+        assert!(workspace.prepare(SaveKind::Apply).is_err());
+        add(&mut workspace, PrimitiveKind::Node);
+        assert!(
+            workspace
+                .edit(None, 1010, |draft| draft.rules[0].label =
+                    "x".repeat(RECORD_LIMIT))
+                .is_err()
+        );
+        assert!(workspace.rules().is_ok());
+    }
+
+    #[test]
+    fn saved_history_is_capped_at_thirty_two_steps() {
+        let mut workspace = RuleWorkspace::new(SavedState::empty()).unwrap();
+        add(&mut workspace, PrimitiveKind::Node);
+        let apply = workspace.prepare(SaveKind::Apply).unwrap();
+        workspace.finish(apply.id, Ok(())).unwrap();
+        for index in 0..35 {
+            workspace.begin().unwrap();
+            workspace
+                .edit(None, 2000 + index, |draft| {
+                    draft.rules[0].label = format!("label {index}")
+                })
+                .unwrap();
+            let apply = workspace.prepare(SaveKind::Apply).unwrap();
+            workspace.finish(apply.id, Ok(())).unwrap();
+        }
+        for _ in 0..32 {
+            let undo = workspace.prepare(SaveKind::Undo).unwrap();
+            workspace.finish(undo.id, Ok(())).unwrap();
+        }
+        assert!(!workspace.can_undo());
+        assert!(workspace.can_redo());
+    }
+}

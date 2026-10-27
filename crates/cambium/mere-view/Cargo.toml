@@ -15,6 +15,7 @@ publish = true
 # Editable query UI is absent from ordinary mere views and the site viewer.
 query-editor = ["dep:mere"]
 workbench-editor = ["dep:platen", "platen/workspace-editor"]
+presentation-editor = []
 
 [dependencies]
 mere = { path = "../../mere", default-features = false, features = ["query"], optional = true }
@@ -33,6 +34,7 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+scenograph.workspace = true
 pictograph = { workspace = true, features = ["canvas"] }
 serde_json.workspace = true
 netrender.workspace = true

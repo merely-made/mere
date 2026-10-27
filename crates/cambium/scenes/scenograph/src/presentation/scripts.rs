@@ -30,7 +30,7 @@ impl RuleSet {
         context: &Context,
         engine: &mut dyn ValueEngine,
     ) -> Result<Resolution, Vec<Issue>> {
-        self.resolve_inner(context, Some(engine))
+        self.resolve_inner(context, Some(engine), None)
     }
 }
 
