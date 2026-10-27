@@ -13,12 +13,12 @@ use uuid::Uuid;
 
 mod observations;
 
-/// A runtime-only inspection binding. Kernel membership witnesses prevent a
-/// retained inspector from silently adopting a removed/recreated appearance.
+/// A runtime-only binding to this Canvas owner. Reuses its nonreused reader
+/// keys, whose kernel membership witnesses retire removed/recreated appearances.
 #[derive(Clone, Debug)]
 pub struct DynamicsSubject {
     target: DynamicsTarget,
-    members: Vec<(Uuid, kernel::graph::SurfaceNodeLifetime)>,
+    members: Vec<(Uuid, u64)>,
 }
 
 impl DynamicsTarget {
@@ -110,9 +110,12 @@ impl Canvas {
             .members()
             .into_iter()
             .map(|id| {
-                self.graph
-                    .surface_node_lifetime(id)
-                    .map(|life| (id, life))
+                self.described_keys
+                    .by_member
+                    .get(&id)
+                    .copied()
+                    .filter(|key| self.member_of_described(*key) == Some(id))
+                    .map(|key| (id, key))
                     .ok_or_else(|| format!("Access {id} is absent from this view"))
             })
             .collect::<Result<_, _>>()?;
@@ -123,8 +126,8 @@ impl Canvas {
         &self,
         subject: &DynamicsSubject,
     ) -> Result<DynamicsInspection, String> {
-        for &(id, life) in &subject.members {
-            if self.graph.surface_node_lifetime(id) != Some(life) {
+        for &(id, key) in &subject.members {
+            if self.member_of_described(key) != Some(id) {
                 return Err(format!(
                     "The inspected appearance {id} ended. Choose an appearance again."
                 ));

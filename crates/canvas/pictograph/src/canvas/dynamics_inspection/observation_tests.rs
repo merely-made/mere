@@ -235,3 +235,14 @@ fn pair_path_readback_preserves_exact_appearances_and_view_only_hides() {
         source
     );
 }
+
+#[test]
+fn bound_subject_cannot_be_used_by_another_canvas_with_the_same_graph() {
+    let (canvas, first, _, _) = fixture();
+    let subject = canvas
+        .bind_dynamics_target(DynamicsTarget::Access { member: first })
+        .unwrap();
+    let other = Canvas::with_graph(canvas.graph.clone());
+    assert!(other.inspect_bound_dynamics(&subject).is_err());
+    assert!(canvas.inspect_bound_dynamics(&subject).is_ok());
+}
