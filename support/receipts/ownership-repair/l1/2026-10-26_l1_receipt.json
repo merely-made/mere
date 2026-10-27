@@ -1,0 +1,118 @@
+{
+ "lane": "L1",
+ "slice": "graph-kernel, second pass",
+ "recorded": "2026-10-26",
+ "base_commit": "45bfc3bb2",
+ "supersedes_status_of": [
+  "Q009",
+  "Q012",
+  "Q015",
+  "Q016",
+  "Q032"
+ ],
+ "rulings_applied": "Mark's L1 card round, 2026-10-20: adding an existing node id is insert-if-missing live too",
+ "operations": [
+  {
+   "id": "Q009",
+   "authority": [
+    "A001"
+   ],
+   "owner": "one insert-if-missing contract for adding a node id, live and on replay; the URL index changes only on a real insert",
+   "change": "graph/membership.rs insert_surface_node returns (key, inserted); graph/mod.rs insert_node_if_missing; apply.rs AddNode, edge_ops.rs replay, cross_graph.rs copy and snapshot/from.rs load share it",
+   "regression": "graph::membership::tests::adding_an_existing_id_live_keeps_the_node_and_the_url_index_honest (plus copy_and_snapshot_onto_an_existing_id_keep_the_first_node_and_its_index)",
+   "audit_probe": "kernel_authority_current.rs adding_the_same_id_at_a_new_url_leaves_the_old_url_index_live (asserts the defect; inverted in the regression)",
+   "commit": "b441f7b6e, merged 0b6fa7f9a"
+  },
+  {
+   "id": "Q012",
+   "authority": [
+    "A004"
+   ],
+   "owner": "the import-record table owns memberships and their suppression; a per-node provenance write edits only that node's memberships and never rebuilds the table from the facet projection",
+   "change": "graph/import_records.rs set_node_import_provenance edits the table per node and refreshes one facet; rebuild_import_records_from_node_provenance deleted; snapshot/from.rs table-less loads derive from the legacy import_provenance column",
+   "detail_choices_open_to_overrule": [
+    "a source new to the node joins that source's latest record, as the old rebuild already chose; none existing creates import-record:{source_id}",
+    "writing a source the node had suppressed un-suppresses that membership, so the node's facet equals what was written",
+    "the node's suppressed memberships in sources not written are left alone"
+   ],
+   "regression": "graph::tests::snapshot_imports::node_provenance_write_changes_only_that_nodes_memberships",
+   "audit_probe": "kernel_authority_current.rs writing_one_nodes_import_provenance_erases_another_records_suppression (asserts the defect; inverted in the regression)",
+   "commit": "c3dbd4944"
+  },
+  {
+   "id": "Q015",
+   "authority": [
+    "A012"
+   ],
+   "owner": "one bounds check, SharedNavigationMemory::check_indices in graph/navigation_check.rs, runs in validate_snapshot before Stemma hydration for both checked loaders; every other load path wraps one of them",
+   "change": "new graph/navigation_check.rs; snapshot/checked.rs gains ResourceSnapshotError::InvalidNavigation and validate_snapshot; at this base the probe no longer panicked during load (Q013 removed the cursor read) but the first history projection did, so the repair refuses at load",
+   "limit": "bounds only; in-range structural faults such as a parent cycle are not checked",
+   "regression": "graph::snapshot::tests::checked_loads_refuse_a_navigation_index_that_names_no_row",
+   "audit_probe": "kernel_snapshot.rs checked_snapshot_load_panics_on_unvalidated_navigation_indices (asserts the defect; inverted in the regression)",
+   "commit": "84b12c2f6"
+  },
+  {
+   "id": "Q016",
+   "authority": [
+    "A012"
+   ],
+   "owner": "validate_active_resource_assertion_handles stays the one owner of the handle rule; apply_graph_delta consults the same body, with the pending literal write applied, before storing ReplaySetResourceRecordById, ReplaySetNodeFacetById and SetNodeFacet on semantic.properties, and ReplayAppendNodePropertyById, so a refused delta changes and records nothing",
+   "change": "graph/resource_content.rs validator takes an optional pending write; apply.rs and node_props.rs call it at those arms; no consumer change (the validator had no kernel callers)",
+   "limit": "literal writes only; see the edge-replay fork",
+   "regression": "graph::resource_content_handle_tests::replayed_literal_handles_are_refused_where_checked_open_refuses_them and graph::resource_content_handle_tests::checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it",
+   "audit_probe": "kernel_admission.rs replay_record_admission_accepts_literal_ownership_that_checked_load_rejects (asserts the defect; inverted in the regression)",
+   "commit": "503adf904",
+   "follow_through": "a refused write is GraphDeltaResult::Refused rather than a no-op; the journal's checked replay paths (GraphJournal::snapshot_at, snapshot_at_from, replay_from, replay_from_with_baseline) stop at the first refused entry and return ReplayRefused naming it, so Pandect's open reports Corrupt and graph_at reports None for a journal that carries a colliding record, as its existing tests require; replay_captured_deltas_onto, replay_captured_deltas_as_onto and GraphJournal::replay keep dropping a refused entry and continuing, with replay_captured_deltas_onto_checked as the checked twin",
+   "consumer_tests": "pandect frozen_materialization_checks_active_sidecar_handles_and_preserves_retained_notes now builds its conflict in the frozen sidecar, since the kernel refuses it at the write; replayed_session_handles_are_checked_before_open_and_historical_publication unchanged"
+  },
+  {
+   "id": "Q032",
+   "authority": [
+    "A012"
+   ],
+   "owner": "SemanticStatement::same_claim_as in graph/edge_data.rs is the one definition of the same claim (predicate, sub-kind, scope, provenance, basis reason ignoring version); the checked writer and legacy migration both use it and migration's private ClaimIdentity is gone",
+   "change": "edge_data.rs same_claim_as; assertion_write.rs and legacy_resource_migration.rs call it; no existing test encoded the old tolerance",
+   "regression": "graph::legacy_resource_migration_reason_tests::legacy_migration_and_checked_writer_agree_which_reason_changes_a_carried_claim",
+   "audit_probe": "legacy_migration_diagnostics.rs migrated_handle_can_change_reason_identity_that_the_checked_writer_refuses (asserts the defect; inverted in the regression)",
+   "commit": "69f8e7ff0"
+  }
+ ],
+ "kernel_suite_after": {
+  "passed": 484,
+  "failed": 0,
+  "basis": "main after the Q016 replay follow-through: Q009, Q012, Q015, Q016 and Q032 merged, the kernel's unused forme dependency removed; 477 before this pass plus seven regressions"
+ },
+ "forks_recorded_in_plan_section_5": [
+  "Q010",
+  "Q017",
+  "Q031",
+  "Q016 edge replays"
+ ],
+ "unrepaired_so_far": [
+  "Q010",
+  "Q017",
+  "Q031",
+  "Q014 (re-document only)",
+  "Q001",
+  "Q002",
+  "Q003",
+  "Q019 (chartulary, repos/eidetic)"
+ ],
+ "merges": [
+  "0b6fa7f9a (l1-q009)",
+  "22ae6792d (l1-q012-q015)",
+  "a13cf09c7 (l1-q016-q032)"
+ ],
+ "cues": [
+  "four places still repeat the five-field claim comparison against a spec rather than a statement: assertion_write.rs matches_spec (~399), edge_data.rs (~364, ~455), edge_ops.rs (~602)",
+  "import records sharing a record_id without a source label (import-record:{source_id}) still collide, unchanged by Q012",
+  "checked.rs, from.rs, snapshot/tests.rs and legacy_resource_migration.rs were over the 600-line ceiling before this pass; new code went to sibling files",
+  "Pandect's GraphSession::apply and edit_as still answer Ok to a delta the kernel refused; the Refused result is available to surface it",
+  "merge scratch replays (graph_session_merge.rs) and GraphJournal::replay drop a refused entry and continue; whether a merge candidate may silently lack an edit is the Q010 class of question"
+ ],
+ "pandect_suite_after": {
+  "passed": 340,
+  "failed": 0,
+  "note": "the consumer gate for Q016; two of its tests needed the kernel to report a refused replay rather than drop it"
+ }
+}

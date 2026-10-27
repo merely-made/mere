@@ -51,7 +51,9 @@ fn content_migration_baseline_requires_original_mere_only_for_unknown_tags() {
         super::super::node_facets::PRESENTATION_TAGS,
         &presentation,
     );
-    baseline.legacy_append_node_property(key, property("literal"));
+    baseline
+        .legacy_append_node_property(key, property("literal"))
+        .unwrap();
     baseline.legacy_add_node_classification(key, classification(ClassificationStatus::Rejected));
     let before = baseline.to_snapshot();
     assert!(migrate_legacy_prefix(&baseline, &[]).is_err());

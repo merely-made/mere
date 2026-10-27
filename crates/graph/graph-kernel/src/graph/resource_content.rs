@@ -165,7 +165,7 @@ impl Graph {
     /// Whether storing `write` leaves the graph passing checked open. A write that
     /// claims no literal its owner does not already hold cannot collide, so it skips
     /// the scan.
-    pub(crate) fn admits_literals(&self, write: LiteralWrite<'_>) -> bool {
+    pub(crate) fn admit_literals(&self, write: LiteralWrite<'_>) -> Result<(), ContentError> {
         let (held, incoming) = match write {
             LiteralWrite::Resource(id, incoming) => (self.resource_properties(id), incoming),
             LiteralWrite::Surface(id, incoming) => (
@@ -175,15 +175,17 @@ impl Graph {
                 incoming,
             ),
         };
-        incoming.iter().all(|property| held.contains(property))
-            || self.validate_handles_after(Some(write)).is_ok()
+        if incoming.iter().all(|property| held.contains(property)) {
+            return Ok(());
+        }
+        self.validate_handles_after(Some(write))
     }
 
-    pub(crate) fn admits_record_literals(
+    pub(crate) fn admit_record_literals(
         &self,
         id: Uuid,
         record: Option<&PersistedResourceRecord>,
-    ) -> bool {
+    ) -> Result<(), ContentError> {
         let properties: Vec<NodeProperty> = record
             .and_then(|record| {
                 record
@@ -193,20 +195,20 @@ impl Graph {
             })
             .and_then(|facet| serde_json::from_str(&facet.value_json).ok())
             .unwrap_or_default();
-        self.admits_literals(LiteralWrite::Resource(id, &properties))
+        self.admit_literals(LiteralWrite::Resource(id, &properties))
     }
 
-    pub(crate) fn admits_surface_facet(
+    pub(crate) fn admit_surface_facet(
         &self,
         node_id: Uuid,
         facet: &str,
         value: &serde_json::Value,
-    ) -> bool {
+    ) -> Result<(), ContentError> {
         if facet != super::node_facets::SEMANTIC_PROPERTIES {
-            return true;
+            return Ok(());
         }
         let properties = Vec::<NodeProperty>::deserialize(value).unwrap_or_default();
-        self.admits_literals(LiteralWrite::Surface(node_id, &properties))
+        self.admit_literals(LiteralWrite::Surface(node_id, &properties))
     }
 
     fn validate_handles_after(&self, write: Option<LiteralWrite<'_>>) -> Result<(), ContentError> {

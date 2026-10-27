@@ -37,8 +37,8 @@ use rkyv::{Archive, Deserialize, Serialize};
 
 use super::Graph;
 use super::capture::{
-    CapturedDelta, DeltaRecorder, ReplayAttribution, replay_attributed_deltas_onto,
-    replay_graph_deltas_onto,
+    CapturedDelta, DeltaRecorder, OnRefusal, ReplayAttribution, ReplayRefused,
+    replay_attributed_deltas_onto, replay_graph_deltas_onto,
 };
 use super::source_time::{SourceExtent, SourceTime};
 
@@ -311,18 +311,23 @@ impl GraphJournal {
     /// `n` entries; `Seq(0)` is empty and [`live_cursor`](Self::live_cursor)
     /// replays every current entry. A cursor beyond the known prefix is stale
     /// and is refused rather than silently clamped to live.
-    pub fn snapshot_at(&self, cursor: Seq) -> Option<Graph> {
+    pub fn snapshot_at(&self, cursor: Seq) -> Result<Option<Graph>, ReplayRefused> {
         self.snapshot_at_from(&Graph::new(), cursor)
     }
 
     /// Replay a prefix over its retained baseline, preserving baseline attribution.
-    pub fn snapshot_at_from(&self, baseline: &Graph, cursor: Seq) -> Option<Graph> {
+    pub fn snapshot_at_from(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+    ) -> Result<Option<Graph>, ReplayRefused> {
         let end = cursor.index();
-        (end <= self.log.len()).then(|| {
-            let mut graph = baseline.clone();
-            replay_entries_onto(&mut graph, &self.log.entries()[..end]);
-            graph
-        })
+        if end > self.log.len() {
+            return Ok(None);
+        }
+        let mut graph = baseline.clone();
+        replay_entries_onto(&mut graph, &self.log.entries()[..end], OnRefusal::Stop)?;
+        Ok(Some(graph))
     }
 
     /// Migration of a caller-qualified legacy baseline and prefix.
@@ -472,7 +477,9 @@ impl GraphJournal {
     /// Rebuild the whole graph, using its author for legacy unattributed assertions.
     pub fn replay(&self) -> Graph {
         let mut graph = Graph::new();
-        replay_entries_onto(&mut graph, self.log.entries());
+        // A whole-log rebuild drops a refused entry and keeps going; checked
+        // readers use `snapshot_at`.
+        let _ = replay_entries_onto(&mut graph, self.log.entries(), OnRefusal::Drop);
         graph
     }
 
@@ -483,19 +490,25 @@ impl GraphJournal {
     /// Without a retained baseline, exact records missing attribution stay unknown.
     /// Use [`replay_from_with_baseline`](Self::replay_from_with_baseline) to recover
     /// the original minting author across earlier removal and later restoration.
-    pub fn replay_from(&self, since: Seq, graph: &mut Graph) {
+    pub fn replay_from(&self, since: Seq, graph: &mut Graph) -> Result<(), ReplayRefused> {
         replay_graph_deltas_onto(
             graph,
             self.log
                 .from(since)
                 .iter()
                 .filter_map(|entry| entry.delta.replay_delta_as(&entry.author)),
-        );
+            OnRefusal::Stop,
+        )
     }
 
     /// Replay a checkpoint tail with the baseline and original minting entries.
     /// `baseline` is the graph before entry zero, not the checkpoint at `since`.
-    pub fn replay_from_with_baseline(&self, since: Seq, graph: &mut Graph, baseline: &Graph) {
+    pub fn replay_from_with_baseline(
+        &self,
+        since: Seq,
+        graph: &mut Graph,
+        baseline: &Graph,
+    ) -> Result<(), ReplayRefused> {
         let mut attribution = ReplayAttribution::from_baseline(baseline);
         // Reconstruct prefix evidence on one shadow graph. Pair/kind legacy
         // attribution needs ordered membership transitions, while cloning the
@@ -505,9 +518,15 @@ impl GraphJournal {
             &mut shadow,
             &mut attribution,
             self.log.entries().iter().take(since.index()),
-        );
+            OnRefusal::Stop,
+        )?;
         attribution.repair_checkpoint(graph);
-        replay_attributed_deltas_onto(graph, &mut attribution, self.log.from(since));
+        replay_attributed_deltas_onto(
+            graph,
+            &mut attribution,
+            self.log.from(since),
+            OnRefusal::Stop,
+        )
     }
 
     /// Fork this journal under a new identity: copies the whole edit history and
@@ -540,12 +559,16 @@ impl GraphJournal {
     }
 }
 
-fn replay_entries_onto<'a, I>(graph: &mut Graph, entries: I)
+fn replay_entries_onto<'a, I>(
+    graph: &mut Graph,
+    entries: I,
+    on_refusal: OnRefusal,
+) -> Result<(), ReplayRefused>
 where
     I: IntoIterator<Item = &'a AttributedDelta>,
 {
     let mut attribution = ReplayAttribution::from_baseline(graph);
-    replay_attributed_deltas_onto(graph, &mut attribution, entries);
+    replay_attributed_deltas_onto(graph, &mut attribution, entries, on_refusal)
 }
 
 impl SourceTime for GraphJournal {
@@ -564,7 +587,7 @@ impl SourceTime for GraphJournal {
     }
 
     fn source_snapshot(&self, cursor: &Self::Cursor) -> Option<Self::Snapshot> {
-        self.snapshot_at(*cursor)
+        self.snapshot_at(*cursor).ok().flatten()
     }
 }
 
@@ -752,7 +775,7 @@ mod tests {
                 2
             );
         }
-        let mut prefix = journal.snapshot_at(Seq(4)).unwrap();
+        let mut prefix = journal.snapshot_at(Seq(4)).unwrap().unwrap();
         let prefix_attributions = attributions(&prefix);
         assert_eq!(prefix_attributions.len(), 2);
         assert!(
@@ -760,7 +783,7 @@ mod tests {
                 .iter()
                 .all(|(_, iri)| iri == &alice.asserter_iri())
         );
-        journal.replay_from(Seq(4), &mut prefix);
+        journal.replay_from(Seq(4), &mut prefix).unwrap();
         assert_eq!(attributions(&prefix), full_attributions);
         let unattributed =
             replay_captured_deltas(journal.entries().iter().map(|entry| entry.delta.clone()));
@@ -864,7 +887,7 @@ mod tests {
                 super::super::capture::replay_captured_deltas_onto(&mut baseline, [exact.clone()]);
                 let mut baseline_journal = GraphJournal::new();
                 baseline_journal.record_as(recorder.clone(), exact);
-                baseline_journal.replay_from(Seq(0), &mut baseline);
+                baseline_journal.replay_from(Seq(0), &mut baseline).unwrap();
                 assert_eq!(
                     baseline.persisted_edges_between(from, to)[0].retained_assertions()[0]
                         .provenance_iri
@@ -887,7 +910,7 @@ mod tests {
                     },
                 },
             );
-            let prefix = journal.snapshot_at(Seq(3)).unwrap();
+            let prefix = journal.snapshot_at(Seq(3)).unwrap().unwrap();
             let prefix_edges = prefix.persisted_edges_between(from, to);
             assert_eq!(
                 prefix_edges[0].retained_assertions()[0].provenance_iri,
@@ -921,7 +944,9 @@ mod tests {
             );
 
             let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
-            journal.replay_from_with_baseline(Seq(3), &mut checkpoint, &Graph::new());
+            journal
+                .replay_from_with_baseline(Seq(3), &mut checkpoint, &Graph::new())
+                .unwrap();
             assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
             let reopened = Graph::from_snapshot(&full.to_snapshot());
             assert_eq!(reopened.persisted_edges_between(from, to), expected);
@@ -997,7 +1022,9 @@ mod tests {
         checkpoint.set_recorder(Some(Arc::new(move |delta| {
             sink.lock().unwrap().push(delta.clone());
         })));
-        journal.replay_from_with_baseline(Seq(1), &mut checkpoint, &baseline);
+        journal
+            .replay_from_with_baseline(Seq(1), &mut checkpoint, &baseline)
+            .unwrap();
         let repaired = checkpoint.persisted_edges_between(from, to);
         let statements = &repaired[0].retained_assertions();
         assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
@@ -1007,7 +1034,10 @@ mod tests {
         assert_eq!(statements[1], old_statements[1]);
         assert!(checkpoint.revision() > before_revision);
         assert!(captured.lock().unwrap().is_empty());
-        let full = journal.snapshot_at_from(&baseline, Seq(1)).unwrap();
+        let full = journal
+            .snapshot_at_from(&baseline, Seq(1))
+            .unwrap()
+            .unwrap();
         assert_eq!(repaired, full.persisted_edges_between(from, to));
     }
 
@@ -1064,7 +1094,10 @@ mod tests {
         edges[0].retained_assertions_mut()[1].provenance_iri = None;
         journal.record_as(undoer, capture(edges));
 
-        let full = journal.snapshot_at_from(&baseline, Seq(4)).unwrap();
+        let full = journal
+            .snapshot_at_from(&baseline, Seq(4))
+            .unwrap()
+            .unwrap();
         let expected = full.persisted_edges_between(from, to);
         let statements = &expected[0].retained_assertions();
         assert_eq!(statements.len(), 3);
@@ -1083,13 +1116,21 @@ mod tests {
         assert_eq!(statements[2].asserted_at_ms, Some(202));
         assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
         for cursor in 0..=4 {
-            let prefix = journal.snapshot_at_from(&baseline, Seq(cursor)).unwrap();
+            let prefix = journal
+                .snapshot_at_from(&baseline, Seq(cursor))
+                .unwrap()
+                .unwrap();
             let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
-            journal.replay_from_with_baseline(Seq(cursor), &mut checkpoint, &baseline);
+            journal
+                .replay_from_with_baseline(Seq(cursor), &mut checkpoint, &baseline)
+                .unwrap();
             assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
         }
 
-        let withdrawn = journal.snapshot_at_from(&baseline, Seq(3)).unwrap();
+        let withdrawn = journal
+            .snapshot_at_from(&baseline, Seq(3))
+            .unwrap()
+            .unwrap();
         assert_eq!(
             withdrawn.persisted_edges_between(from, to)[0]
                 .retained_assertions()
@@ -1097,7 +1138,7 @@ mod tests {
             1
         );
         let mut without_baseline = Graph::from_snapshot(&withdrawn.to_snapshot());
-        journal.replay_from(Seq(3), &mut without_baseline);
+        journal.replay_from(Seq(3), &mut without_baseline).unwrap();
         let conservative = without_baseline.persisted_edges_between(from, to);
         assert_eq!(
             conservative[0].retained_assertions()[2]
@@ -1383,7 +1424,7 @@ mod tests {
         );
 
         let history = hooked.lock().unwrap().clone();
-        let scrubbed = history.snapshot_at(history.live_cursor()).unwrap();
+        let scrubbed = history.snapshot_at(history.live_cursor()).unwrap().unwrap();
         replay_captured_deltas_onto(&mut session, [add(2, "https://b.test/")]);
         assert_eq!(scrubbed.node_count(), 1);
         assert_eq!(session.node_count(), 2);
@@ -1464,14 +1505,28 @@ mod tests {
 
         assert_eq!(journal.earliest_cursor(), Seq(0));
         assert_eq!(journal.live_cursor(), Seq(3));
-        assert_eq!(journal.snapshot_at(Seq(0)).unwrap().node_count(), 0);
-        assert_eq!(journal.snapshot_at(Seq(1)).unwrap().node_count(), 1);
-        let historical = journal.snapshot_at(Seq(2)).expect("known prefix");
+        assert_eq!(
+            journal.snapshot_at(Seq(0)).unwrap().unwrap().node_count(),
+            0
+        );
+        assert_eq!(
+            journal.snapshot_at(Seq(1)).unwrap().unwrap().node_count(),
+            1
+        );
+        let historical = journal.snapshot_at(Seq(2)).unwrap().expect("known prefix");
         assert_eq!(historical.node_count(), 2);
         assert_eq!(historical.relations().count(), 0);
-        assert_eq!(journal.snapshot_at(Seq(3)).unwrap().relations().count(), 1);
+        assert_eq!(
+            journal
+                .snapshot_at(Seq(3))
+                .unwrap()
+                .unwrap()
+                .relations()
+                .count(),
+            1
+        );
         assert!(
-            journal.snapshot_at(Seq(4)).is_none(),
+            journal.snapshot_at(Seq(4)).unwrap().is_none(),
             "stale cursors refuse"
         );
         assert_eq!(

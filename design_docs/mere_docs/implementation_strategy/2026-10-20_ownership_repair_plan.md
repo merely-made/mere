@@ -242,6 +242,16 @@ Mark rules; each lane stopped rather than picked):
   load, selection freeze and link freeze (A012, A016) is the repair either way; the question is
   whether identical copies on parallel rows are legal graph state, in which case link freeze
   accepts or dedupes, or not, in which case snapshot load and selection freeze refuse.
+- **Q016's edge replays.** The literal repair makes `apply_graph_delta` refuse a replayed
+  literal handle that checked open would refuse, but `ReplaySetResourceEdgesByIds` and
+  `ReplaySetEdgesByIds` still accept a statement handle equal to a held Resource literal handle:
+  `set_resource_edges_between` (`resource.rs:318`) compares edges only against edges, and
+  `set_edges_between` (`edge_ops.rs:921`) checks nothing, while `legacy_resource_migration.rs:815`
+  removes Surface authority before the exact-handle admission check and so passes through a
+  state where both strata hold the handle. Either the edge arms run the same validator, and
+  migration is given an explicit staged state that the check tolerates; or edge replays are
+  declared out of this invariant's scope. Until one lands, "any applied delta can be reopened"
+  holds for literal writes only.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
@@ -286,3 +296,13 @@ Mark rules; each lane stopped rather than picked):
 
 - 2026-10-26: boundary cues added to §3 from the ownership assessment Mark brought the same day,
   each mapped to register ids and a lane; Q013 excluded as repaired (L1 receipt). No code change.
+
+- 2026-10-26 (L1, second pass): Q009, Q012, Q015, Q016 and Q032 repaired in graph-kernel, one
+  regression each, on main. Q009 follows Mark's insert-if-missing ruling. Q016 needed a second
+  step: a write the kernel refuses is now `GraphDeltaResult::Refused`, the journal's checked
+  replay paths stop there and report `ReplayRefused`, and Pandect's open reports Corrupt and
+  `graph_at` None for a journal carrying a colliding record, which its own tests already
+  required; tolerant scratch replays drop the entry and continue. Kernel lib suite 484/484
+  (477 before), Pandect lib suite 340/340. Forks recorded in §5: Q010, Q017, Q031, Q016's edge
+  replays. Q014 stays re-document only; Q001 to Q003 and Q019 wait on an eidetic branch.
+  Receipt: `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.

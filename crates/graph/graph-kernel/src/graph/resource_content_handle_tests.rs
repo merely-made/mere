@@ -114,3 +114,34 @@ fn replayed_literal_handles_are_refused_where_checked_open_refuses_them() {
     assert_eq!(graph.legacy_node_properties(key).unwrap().len(), 1);
     assert!(reopens(&graph));
 }
+
+/// A journal entry the graph refuses is reported, with the graph holding only
+/// the entries before it, rather than dropped into a quietly different replay.
+#[test]
+fn checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it() {
+    let mut graph = Graph::new();
+    let mut held = NodeProperty::new("urn:replay:literal".into(), "held".into());
+    held.statement_id = "shared replay handle".into();
+    set_record(&mut graph, "urn:owner", &[held.clone()]);
+    let before = serde_json::to_value(graph.to_snapshot()).unwrap();
+    let colliding = CapturedDelta::ReplaySetResourceRecordById {
+        resource_id: chartulary::resource_id_from_canonical_iri("urn:other").to_string(),
+        record: Some(record("urn:other", &[held])),
+    };
+    let refused = super::replay_captured_deltas_onto_checked(&mut graph, [colliding.clone()])
+        .expect_err("a colliding literal handle is refused on replay");
+    assert_eq!(refused.position, 0);
+    assert!(
+        refused.to_string().contains("shared replay handle"),
+        "the refusal names the handle: {refused}"
+    );
+    assert_eq!(
+        serde_json::to_value(graph.to_snapshot()).unwrap(),
+        before,
+        "a refused entry changes nothing"
+    );
+    assert!(graph.validate_active_resource_assertion_handles().is_ok());
+    let mut journal = super::journal::GraphJournal::default();
+    journal.record_as(super::Author::person("test"), colliding);
+    assert!(journal.snapshot_at_from(&graph, super::Seq(1)).is_err());
+}

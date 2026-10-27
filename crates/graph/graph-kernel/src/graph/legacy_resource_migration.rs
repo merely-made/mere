@@ -15,7 +15,9 @@ pub use super::legacy_content_migration::LegacyContentContext;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::capture::{ReplayAttribution, replay_attributed_deltas_onto, replay_graph_deltas_onto};
+use super::capture::{
+    OnRefusal, ReplayAttribution, replay_attributed_deltas_onto, replay_graph_deltas_onto,
+};
 use super::predicate_declarations::PREDICATE_DECLARATIONS_FACET;
 use super::snapshot::{payload_from_persisted, persisted_edge_for_ids};
 use super::{AttributedDelta, CapturedDelta, EdgePayload, Graph, GraphStratum, ResourceNode};
@@ -163,7 +165,8 @@ pub fn probe_legacy_mint_links(
     let mut diagnostics = Vec::new();
     for (index, entry) in entries.iter().enumerate() {
         let before = surface_pairs(&source)?;
-        replay_attributed_deltas_onto(&mut source, &mut attribution, [entry]);
+        let _ =
+            replay_attributed_deltas_onto(&mut source, &mut attribution, [entry], OnRefusal::Drop);
         let after = surface_pairs(&source)?;
         for (&pair, edges) in &after {
             let old = statement_ids(before.get(&pair).map(Vec::as_slice).unwrap_or(&[]));
@@ -372,7 +375,7 @@ pub fn migrate_legacy_prefix_with_content_context(
                 unreachable!()
             };
             let expected = edges.clone();
-            replay_graph_deltas_onto(&mut replay.output, [delta]);
+            let _ = replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
             let actual = replay
                 .output
                 .persisted_resource_edges_between(pair.0, pair.1);
@@ -382,10 +385,15 @@ pub fn migrate_legacy_prefix_with_content_context(
                 ));
             }
         } else {
-            replay_attributed_deltas_onto(&mut replay.source, &mut replay.attribution, [entry]);
+            let _ = replay_attributed_deltas_onto(
+                &mut replay.source,
+                &mut replay.attribution,
+                [entry],
+                OnRefusal::Drop,
+            );
             if !legacy_edge_edit(&entry.delta) {
                 if let Some(delta) = entry.delta.replay_delta_as(&entry.author) {
-                    replay_graph_deltas_onto(&mut replay.output, [delta]);
+                    let _ = replay_graph_deltas_onto(&mut replay.output, [delta], OnRefusal::Drop);
                 }
                 replay.check_typed_record(&entry.delta)?;
             }
@@ -2169,6 +2177,7 @@ mod tests {
         let checkpoint_cursor = journal.live_cursor();
         let mut checkpoint = journal
             .snapshot_at_from(&baseline, checkpoint_cursor)
+            .unwrap()
             .unwrap();
         journal.record_as(
             Author::person("restorer"),

@@ -495,6 +495,9 @@ pub enum GraphDeltaResult {
     ImportRecordsUpdated(bool),
     /// A mutation with no observable result (e.g. navigate, branch-history).
     Applied,
+    /// Storing the write would leave the graph failing checked open, so nothing
+    /// changed and nothing was recorded. Replay reports it instead of dropping it.
+    Refused(super::resource_content::ContentError),
 }
 
 /// Journal a new node's visit stamp. Creating a node reads the clock, and
@@ -522,17 +525,20 @@ fn capture_resolved_import_records(graph: &Graph) {
     });
 }
 
-fn set_node_facet(graph: &mut Graph, key: NodeKey, facet: &str, value: serde_json::Value) -> bool {
+fn set_node_facet(
+    graph: &mut Graph,
+    key: NodeKey,
+    facet: &str,
+    value: serde_json::Value,
+) -> Result<bool, super::resource_content::ContentError> {
     let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
-        return false;
+        return Ok(false);
     };
-    if !graph.admits_surface_facet(node_id, facet, &value) {
-        return false;
-    }
+    graph.admit_surface_facet(node_id, facet, &value)?;
     let visits = facet == super::node_facets::VISIT_HISTORY;
     let facet = chartulary::FacetId::new(facet);
     if graph.facets().get(&node_id, &facet) == Some(&value) {
-        return false;
+        return Ok(false);
     }
     graph
         .facets
@@ -541,7 +547,7 @@ fn set_node_facet(graph: &mut Graph, key: NodeKey, facet: &str, value: serde_jso
     if visits {
         graph.bump_visit_revision();
     }
-    true
+    Ok(true)
 }
 
 fn remove_node_facet(graph: &mut Graph, key: NodeKey, facet: &str) -> bool {
@@ -891,9 +897,13 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             facet,
             value,
         } => {
-            let updated = graph
-                .get_node_key_by_id(node_id)
-                .is_some_and(|key| set_node_facet(graph, key, &facet, value.clone()));
+            let updated = match graph.get_node_key_by_id(node_id) {
+                Some(key) => match set_node_facet(graph, key, &facet, value.clone()) {
+                    Ok(updated) => updated,
+                    Err(refused) => return GraphDeltaResult::Refused(refused),
+                },
+                None => false,
+            };
             if updated {
                 graph.record_delta(&CapturedDelta::ReplaySetNodeFacetById {
                     node_id: node_id.to_string(),
@@ -907,7 +917,10 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         GraphDelta::SetNodeFacet { key, facet, value } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_value = value.clone();
-            let updated = set_node_facet(graph, key, &facet, value);
+            let updated = match set_node_facet(graph, key, &facet, value) {
+                Ok(updated) => updated,
+                Err(refused) => return GraphDeltaResult::Refused(refused),
+            };
             if updated && let Some(node_id) = node_id {
                 graph.record_delta(&CapturedDelta::ReplaySetNodeFacetById {
                     node_id: node_id.to_string(),
@@ -1114,9 +1127,10 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             resource_id,
             record,
         } => {
-            if graph.admits_record_literals(resource_id, record.as_ref())
-                && graph.set_resource_record(resource_id, record)
-            {
+            if let Err(refused) = graph.admit_record_literals(resource_id, record.as_ref()) {
+                return GraphDeltaResult::Refused(refused);
+            }
+            if graph.set_resource_record(resource_id, record) {
                 graph.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
                     resource_id: resource_id.to_string(),
                     record: graph.resource_record(resource_id),
@@ -1368,9 +1382,13 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::HistoryStepped(stepped)
         },
         GraphDelta::ReplayAppendNodePropertyById { node_id, property } => {
-            let updated = graph
-                .get_node_key_by_id(node_id)
-                .is_some_and(|key| graph.legacy_append_node_property(key, property.clone()));
+            let updated = match graph.get_node_key_by_id(node_id) {
+                Some(key) => match graph.legacy_append_node_property(key, property.clone()) {
+                    Ok(updated) => updated,
+                    Err(refused) => return GraphDeltaResult::Refused(refused),
+                },
+                None => false,
+            };
             if updated {
                 graph.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
                     node_id: node_id.to_string(),
