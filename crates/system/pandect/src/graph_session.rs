@@ -314,6 +314,20 @@ struct Checkpoint {
     cursor: Seq,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     translated_receipt_digest: Option<String>,
+    /// The muniment digest (hex) of the journal's first `cursor` entries: what
+    /// ties the checkpoint to the journal it was written beside. Absent from
+    /// checkpoints written before it existed; those name no journal, so open
+    /// ignores them and replays in full.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    journal_digest: Option<String>,
+}
+
+/// The digest a checkpoint at `cursor` stores for `journal`.
+fn journal_digest(journal: &GraphJournal, cursor: Seq) -> Result<Option<String>, SessionError> {
+    Ok(journal
+        .log()
+        .prefix_digest(cursor.index())?
+        .map(|digest| digest.to_hex()))
 }
 
 #[derive(Clone, Default)]
@@ -772,12 +786,22 @@ impl<B: Backend> GraphSession<B> {
         let (mut graph, checkpointed) = match checkpoint {
             Some(checkpoint)
                 if checkpoint.cursor <= live
+                    && checkpoint.journal_digest.is_some()
                     && translation.as_ref().is_none_or(|receipt| {
                         checkpoint.cursor >= receipt.placement.cutoff()
                             && checkpoint.translated_receipt_digest.as_deref()
                                 == Some(receipt.translation_digest.as_str())
                     }) =>
             {
+                if journal_digest(&journal, checkpoint.cursor)? != checkpoint.journal_digest {
+                    return Err(SessionError::Corrupt(format!(
+                        "{}: checkpoint at {} does not match the first {} entries of {}",
+                        keys.at(CHECKPOINT),
+                        checkpoint.cursor.0,
+                        checkpoint.cursor.0,
+                        keys.at(JOURNAL),
+                    )));
+                }
                 let snapshot: GraphSnapshot = read(&slots, &keys.at(GRAPH))
                     .await?
                     .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
@@ -1050,6 +1074,7 @@ impl<B: Backend> GraphSession<B> {
                 &Checkpoint {
                     cursor: live,
                     translated_receipt_digest: Some(receipt.translation_digest.clone()),
+                    journal_digest: journal_digest(&self.journal, live)?,
                 },
             )?,
         ];
@@ -1414,6 +1439,7 @@ impl<B: Backend> GraphSession<B> {
                             .translation
                             .as_ref()
                             .map(|receipt| receipt.translation_digest.clone()),
+                        journal_digest: journal_digest(&self.journal, journal)?,
                     },
                 )?,
             ]);
@@ -2292,6 +2318,10 @@ mod pending_tests;
 mod navigation_tests;
 
 #[cfg(test)]
+#[path = "graph_session_checkpoint_tests.rs"]
+mod checkpoint_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use kernel::graph::replay_captured_deltas_onto;
@@ -2707,6 +2737,7 @@ mod tests {
                     &Checkpoint {
                         cursor: session.journal().live_cursor(),
                         translated_receipt_digest: None,
+                        journal_digest: None,
                     },
                 )
                 .unwrap()])
@@ -4054,6 +4085,11 @@ mod tests {
                                 &Checkpoint {
                                     cursor: Seq(0),
                                     translated_receipt_digest: None,
+                                    journal_digest: journal_digest(
+                                        &GraphJournal::default(),
+                                        Seq(0),
+                                    )
+                                    .unwrap(),
                                 },
                             )
                             .unwrap(),
