@@ -1,7 +1,7 @@
 {
   "date": "2026-10-26",
   "basis": "95ea7c7d6",
-  "status": "Implemented; final automated gates in progress",
+  "status": "Implemented and qualified within the documented receiving boundaries: 879 distinct tests passed, 28 existing ignores; Canvas Wasm compile passed",
   "authority": {
     "kernel": "SurfaceNodeLifetime remains the sole membership witness allocator; no kernel or durable schema change",
     "Canvas": "One last-reconciled membership table receives witnesses and retires runtime caches before slot reuse can be observed",
@@ -59,5 +59,23 @@
     "initial_full_scope_control_failure": "diagnostics-canvas-cache-canvas.json",
     "final": "diagnostics-canvas-cache-qualification.json"
   },
-  "retained_byte_cap": 10000000
+  "retained_byte_cap": 10000000,
+  "test_counts": {
+    "canvas-final": {
+      "passed": 630,
+      "existing_ignored": 18
+    },
+    "seiche": {
+      "passed": 215,
+      "existing_ignored": 10
+    },
+    "graphshell-reader": {
+      "passed": 12,
+      "existing_ignored": 0
+    },
+    "owner-refresh": {
+      "passed": 22,
+      "existing_ignored": 0
+    }
+  }
 }

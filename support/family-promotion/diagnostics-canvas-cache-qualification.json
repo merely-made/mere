@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-26",
+  "status": "Qualified for local Canvas cache/body retirement and existing automated receiving controls",
+  "basis": "95ea7c7d697f3c9f553aef752a7e3467aec6b6ae",
+  "source_commit": "89f9bc52fe5ea19e58f04fea3e046c1f53e6d736",
+  "source_snapshot": "diagnostics-canvas-cache-source.json",
+  "review_and_remaining_migrations": "diagnostics-canvas-cache-review.json",
+  "distinct_passed": 879,
+  "existing_ignored": 28,
+  "tests": {
+    "canvas-final": {
+      "passed": 630,
+      "existing_ignored": 18
+    },
+    "seiche": {
+      "passed": 215,
+      "existing_ignored": 10
+    },
+    "graphshell-reader": {
+      "passed": 12,
+      "existing_ignored": 0
+    },
+    "owner-refresh": {
+      "passed": 22,
+      "existing_ignored": 0
+    }
+  },
+  "compile_gate": "diagnostics-canvas-cache-wasm.json",
+  "focused_controls": "Five earlier controls are repeated subsets; final full Canvas suite includes eight cache-lifetime controls and receives all final source changes.",
+  "failure_receipts": {
+    "red": "Original new tests reproduced three runtime failures and one passing ordinary-edit control before the fix. See diagnostics-canvas-cache-red-online.json",
+    "offline": "Initial unavailable Cleromancy pin required an online locked fetch; manifests/locks unchanged. See diagnostics-canvas-cache-red.json",
+    "compile": "Initial field-privacy compile error repaired. See diagnostics-canvas-cache-green.json",
+    "scope_control": "Full suite caught the explicit-scope clone preservation contract; received by UUID re-resolution, and final suite passes. See diagnostics-canvas-cache-canvas.json"
+  },
+  "formatting": {
+    "command": "rustfmt --check --edition 2024 --config skip_children=true <all changed Rust files>",
+    "exit_code": 0
+  },
+  "documentation_audit": {
+    "before": "diagnostics-canvas-cache-docs-baseline.json",
+    "after": "diagnostics-canvas-cache-docs-final.json",
+    "exit_code": 1,
+    "pre_existing_errors": 45,
+    "exact_error_array_unchanged": true,
+    "note": "Current-main baseline is 45; the older lane recorded 40. This is not a clean global documentation audit."
+  },
+  "preservation": "diagnostics-canvas-cache-preservation.json",
+  "limits": [
+    "Kernel remains the sole runtime membership witness allocator; this slice changes no kernel or durable schema.",
+    "Body generation, controlled actor command application and stale snapshot barriers are automated runtime evidence, not terminal actor, headed AT or physical delivery acceptance.",
+    "Authored UUID scope/Fold/Forme rosters and content-addressed images keep their own lifetimes; runtime hold retirement does not erase intent.",
+    "Detached host results/transition positions, shared signal/model owner generations, source-specific link/field/assertion lifetimes and the larger producer/platform migrations remain open."
+  ],
+  "documentation_sha256": {
+    "design_docs/DOC_README.md": "537f7d0f2bb6884ba55de5dcbf0cad2ec6cf38cc1746b8bb4a5ade12f5c82e4f",
+    "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md": "fb54cfd0aca70936c7d578341ddd6accb16b43aaae6f96a67059e729fda023e0",
+    "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md": "be5856d8fc0d38002b3e8859a3bfc8b5822c042a118ee7c9b05280f089dd4b07",
+    "support/family-promotion/diagnostics-ownership-review.json": "c81b416e46b1ef75bcadc2f087ed90ed6c272543ee0ac7f0860cd93c490a791d"
+  },
+  "retained_byte_cap": 10000000,
+  "target": "C:/t/cargo-targets/mere",
+  "isolated_target": null,
+  "isolated_cargo_home": null,
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-canvas-cache-brief.json": "5f8c494143731f0141080b3b27453c66649439e675dd27769308106fd350e7f6",
+    "support/family-promotion/diagnostics-canvas-cache-canvas-final.json": "d93b0ef0bfc7069fd944ba474cf696a05aaa67c2e7d1dcfb50563b584fd99c9c",
+    "support/family-promotion/diagnostics-canvas-cache-canvas.json": "f68252783396ae301efb5ec0c58d815dfe27f1123a574e905c68e03d9cfa9461",
+    "support/family-promotion/diagnostics-canvas-cache-controls.json": "e24d034703c07552f5fc4692ed3999db3c59150bbdd727fb84e0fc902f0bb35c",
+    "support/family-promotion/diagnostics-canvas-cache-docs-baseline.json": "b5091812c5eb050f79e480de53f06ca823442e1d061e0c4f82152a505f7f8760",
+    "support/family-promotion/diagnostics-canvas-cache-docs-final.json": "292813004d8bf972118fed186473a57d1de918c3bd1db5a0744c1be1a245a785",
+    "support/family-promotion/diagnostics-canvas-cache-graphshell-reader.json": "569d0d0643337577240351c06cc727d4e00755f227f0d751e5b86689e94758d8",
+    "support/family-promotion/diagnostics-canvas-cache-green.json": "e4164b69d4789b50cbc6391edaa96778d12ee8d0c61d5c0504c283e855f25c57",
+    "support/family-promotion/diagnostics-canvas-cache-owner-refresh.json": "534413886f50172b9262e49a826e954aa49e2a1a0bbb7f5111d2aa55cc53cedf",
+    "support/family-promotion/diagnostics-canvas-cache-preservation.json": "6a6254fe60cf7b4bc557c15bcb95675047797878091bef5bd419d0c66721dd2a",
+    "support/family-promotion/diagnostics-canvas-cache-red-online.json": "b260338cf20b7a10ad9fc5ba0f5fbc5e5eb6de8d4c3394b1d784f17a1d5d8d52",
+    "support/family-promotion/diagnostics-canvas-cache-red.json": "42c0dd4e827d55adab4a8930c7b5c09459b8c292fe243b3a2862ccbdba54d519",
+    "support/family-promotion/diagnostics-canvas-cache-review.json": "cbf04d8bb4e68dae671dec579998df73c87fc33c694286bb1e0ef301f7c4d421",
+    "support/family-promotion/diagnostics-canvas-cache-seiche.json": "4cb37245e9ffeef6ce4aa99a60b102033aa2c2484ef9f59740610124546fca88",
+    "support/family-promotion/diagnostics-canvas-cache-source.json": "101471e893f9f4535acdd39a6b38b6c0f2ec9ce25babe13be5038bdac2095281",
+    "support/family-promotion/diagnostics-canvas-cache-wasm.json": "b34ecbca8ae64d020f545724ae8b1320fbde76e50a62953b1592a2f2d2b04361",
+    "support/doc-audit/d2/batch_114_canvas_cache_lifetimes.md": "03c95871f3e2853250a78b14fbfe32e41b98d8718ac5306371dd299f518625ca"
+  },
+  "retained_bytes_excluding_this_qualification": 189943
+}
