@@ -369,6 +369,13 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   translation and a difference there is refused as Corrupt (the existing
   `translated_checkpoint_rejects_valid_truth_changes_before_admission`), which his mismatch answer
   below would otherwise have turned into a replay.
+  Re-asked in the parent session later the same morning, with the evidence, before that session
+  had pulled the landing: Mark answered **"Stored-bytes hashes (Recommended)"** and
+  **"Corrupt (Recommended)"**. Shown that the Q002 session had already asked and landed the
+  opposite mismatch rule, he ruled **"Replay past stands (Recommended)"**: the mismatch answer
+  here is withdrawn and the landed rule stands. On the reading above: **"Keep the refusal
+  (Recommended)"**, the translation is a qualification record, not a cache, so a checkpoint that
+  differs from it stays Corrupt.
 - **Q002, a digest the entries' encoding can move.** The journal digest is taken over each entry's
   canonical serde encoding (`muniment` `journal/digest.rs`), because stored bytes change with the
   codec and, for a hash-ordered map, from one save to the next. So an entry type whose
@@ -388,6 +395,12 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   the next checkpoint names what it was written with. No digest mismatch is an error any longer.
   chartulary's refusal of a legacy (assertion-less) snapshot past the journal
   (`legacy snapshot sequence ... exceeds journal length`) is outside this and stays.
+  Re-asked in the parent session the same morning: **"Refuse, with a version (Recommended)"**
+  (a stored entry format version beside the digest, a different version replays, a same-version
+  mismatch Corrupt, golden digest tests pinning each entry type's encoding). Shown the landing, he
+  ruled **"Replay past stands (Recommended)"**. No entry format version is stored: an encoding
+  change invalidates every stored checkpoint once, silently, and the next checkpoint names the
+  new encoding.
 
 ## 6. Findings
 
@@ -508,3 +521,9 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   §5). Kernel lib 513, Pandect lib 349 and its 28 integration tests, chartulary 94, muniment 54.
   `stickleback` (105 and 5 tests) passes on eidetic `cceb203`; the full-workspace stall was feature
   unification, not that crate. Receipt updated.
+- 2026-10-27 (L1, the Q002 forks asked twice): the parent session walked Mark through both
+  forks with the evidence an hour after the Q002 session had asked and landed them, without
+  having pulled main first, and got the opposite mismatch answer. Shown the conflict, Mark ruled
+  the landed rule stands (replay past) and confirmed the translated-session refusal; both are
+  recorded under the forks in §5. Nothing in code changed. A fork is answered in §5 before it is
+  asked again: pull main and read §5 first.
