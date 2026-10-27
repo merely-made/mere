@@ -200,6 +200,81 @@ fn adopt_copies_djinns_vault_and_proves_the_same_identity_without_touching_the_s
     assert_eq!(status.master_public_key, Some(master), "the same identity, now held by the custodian");
 }
 
+/// The fixture's configuration with a data root and the snapshot grant.
+fn wallet_config(fixture: &Fixture) -> PathBuf {
+    let mut json: serde_json::Value = serde_json::from_slice(&std::fs::read(&fixture.config).unwrap()).unwrap();
+    let data_root = fixture.root.join("state/data");
+    json["vault"]["data_root"] = serde_json::json!(data_root);
+    json["principals"][0]["grants"].as_array_mut().unwrap().push(serde_json::json!({"operation": "snapshot"}));
+    std::fs::write(&fixture.config, serde_json::to_vec_pretty(&json).unwrap()).unwrap();
+    data_root
+}
+
+/// Djinn's data root with a wallet, and a file of Djinn's own beside it.
+fn djinn_data(fixture: &Fixture) -> (PathBuf, personae::PersonaId) {
+    let source = fixture.root.join("djinn-data");
+    let persona = personae::PersonaId::new();
+    castellan::custody::wallet::ensure_wallet_state(&source, persona, "fixture").unwrap();
+    std::fs::create_dir_all(source.join("settings")).unwrap();
+    std::fs::write(source.join("settings/owner.json"), b"{}").unwrap();
+    (source, persona)
+}
+
+fn wallet_files(root: &Path) -> Vec<String> {
+    let output = Command::new(binary()).args(["wallet-files", "--data-root", root.to_str().unwrap()]).output().unwrap();
+    assert!(output.status.success(), "wallet-files: {}", String::from_utf8_lossy(&output.stderr));
+    output.stdout.split(|byte| *byte == 0).filter(|name| !name.is_empty()).map(|name| String::from_utf8(name.to_vec()).unwrap()).collect()
+}
+
+#[test]
+fn adopt_moves_the_wallet_and_leaves_nothing_of_it_where_djinn_reads() {
+    let fixture = fixture(true);
+    let data_root = wallet_config(&fixture);
+    let (source, persona) = djinn_data(&fixture);
+    let listed = wallet_files(&source);
+    assert!(listed.contains(&"identity/master.seed".to_string()), "{listed:?}");
+    assert!(!listed.iter().any(|name| name.starts_with("settings")), "Djinn's own files are not the wallet's");
+    let seed = std::fs::read(source.join("identity/master.seed")).unwrap();
+
+    let config = fixture.config.to_str().unwrap();
+    let output = run_with_stdin(&["adopt", "--config", config, "--data-from", source.to_str().unwrap()], "");
+    assert!(output.status.success(), "adopt: {}", String::from_utf8_lossy(&output.stderr));
+    assert_eq!(std::fs::read(data_root.join("identity/master.seed")).unwrap(), seed, "the seed arrives byte for byte");
+    assert!(data_root.join(format!("personas/{}/private-epoch-bridge.json", persona.as_uuid())).is_file());
+    assert!(wallet_files(&source).is_empty(), "the owner-side listing finds no wallet file left");
+    assert!(!source.join("identity").exists());
+    assert!(source.join("settings/owner.json").is_file());
+
+    let again = run_with_stdin(&["adopt", "--config", config, "--data-from", source.to_str().unwrap()], "");
+    assert!(!again.status.success() && String::from_utf8_lossy(&again.stderr).contains("no wallet"), "nothing is adopted twice");
+    let neither = run_with_stdin(&["adopt", "--config", config], "");
+    assert!(String::from_utf8_lossy(&neither.stderr).contains("--data-from"));
+}
+
+#[test]
+fn an_adopted_wallet_is_disclosed_over_the_wire_while_the_custodian_is_locked() {
+    let fixture = fixture(true);
+    let data_root = wallet_config(&fixture);
+    init(&fixture);
+    let (source, persona) = djinn_data(&fixture);
+    let output = run_with_stdin(&["adopt", "--config", fixture.config.to_str().unwrap(), "--data-from", source.to_str().unwrap()], "");
+    assert!(output.status.success(), "adopt: {}", String::from_utf8_lossy(&output.stderr));
+
+    let _custodian = start(&fixture);
+    let client = client(&fixture);
+    assert!(client.session().locked);
+    let Outcome::Success { answer: Answer::WalletPublic { personas, roster } } = client.call(Operation::WalletPublic {}, WAIT) else {
+        panic!("not disclosed")
+    };
+    assert_eq!(personas, vec![persona.as_uuid().to_string()]);
+    let direct = pandect::wallet_store::load_device_roster(&data_root).unwrap().map(|roster| serde_json::to_value(roster).unwrap());
+    assert!(direct.is_some());
+    assert_eq!(roster, direct);
+    let text = serde_json::to_string(&roster).unwrap();
+    let seed = std::fs::read(data_root.join("identity/master.seed")).unwrap();
+    assert!(!text.contains(&seed.iter().map(|b| format!("{b:02x}")).collect::<String>()), "no seed in the disclosure");
+}
+
 #[test]
 fn a_protected_custodian_refuses_to_bind_its_own_socket() {
     let fixture = fixture(false);

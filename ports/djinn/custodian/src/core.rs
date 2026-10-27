@@ -358,7 +358,7 @@ impl Core {
                 self.gate(session, id, &principal, requester, index, consent, summary, Deferred::Revoke { principal: target }, now, effects)
             },
             operation => {
-                if self.vault.is_locked() && !matches!(operation, Operation::Snapshot {}) {
+                if self.vault.is_locked() && !matches!(operation, Operation::Snapshot {} | Operation::WalletPublic {}) {
                     return Some(Outcome::refused("locked"));
                 }
                 let (index, consent, summary) = match self.authorize(&principal, &operation) {
@@ -461,6 +461,8 @@ impl Core {
                 Ok((index, consent, ("sign-derived", profile, "derived-key".into(), digest(&message.0))))
             },
             Operation::Snapshot {} => self.coarse(principal, |g| matches!(g, Grant::Snapshot), ("snapshot", String::new(), String::new(), String::new())),
+            // The same disclosure class as the snapshot's carry view.
+            Operation::WalletPublic {} => self.coarse(principal, |g| matches!(g, Grant::Snapshot), ("wallet-public", String::new(), String::new(), String::new())),
             Operation::PublicKey { source, profile } => {
                 let profile = profile.clone().unwrap_or_else(|| current.clone());
                 let found = grants().find_map(|(index, grant)| match grant {
@@ -744,6 +746,7 @@ impl Core {
                 self.vault.sign(source, profile.as_deref(), &salt.0, &message.0).map_or_else(refuse, signature)
             },
             Operation::Snapshot {} => self.vault.snapshot().map_or_else(refuse, |snapshot| success(Answer::Snapshot { snapshot: Box::new(snapshot) })),
+            Operation::WalletPublic {} => self.vault.wallet_public().map_or_else(refuse, |(personas, roster)| success(Answer::WalletPublic { personas, roster })),
             Operation::PublicKey { source, profile } => self.vault.public_key(source, profile.as_deref()).map_or_else(refuse, |key| success(Answer::PublicKey { key })),
             Operation::Intent { intent, payload } => self.vault.intent(&intent, &payload.0).map_or_else(|e| text("intent-refused", e), |()| success(Answer::Done {})),
             Operation::HasProfile { profile } => self.vault.has_profile(&profile).map_or_else(refuse, |value| success(Answer::Bool { value })),

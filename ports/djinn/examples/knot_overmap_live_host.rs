@@ -146,7 +146,7 @@ async fn main() {
     drop(authority);
 
     // Reservoir, routes and grants, as c1-receipt-host composes them.
-    let reservoir = ResidentReservoir::open(&shared, Some(persona))
+    let reservoir = ResidentReservoir::open(&shared, persona)
         .await
         .unwrap();
     let apps = reservoir_applications();

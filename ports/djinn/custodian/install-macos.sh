@@ -10,7 +10,15 @@
 # vault the custodian will hold, and sign in an account that account cannot
 # use (H1-F1):
 #
-#   sudo install-macos.sh USER SIGNED-BINARY TEAM-ID DJINN-TEAM-ID
+#   sudo install-macos.sh USER SIGNED-BINARY TEAM-ID DJINN-TEAM-ID [DJINN-DATA-ROOT]
+#
+# With DJINN-DATA-ROOT (the directory holding the owner's identity/ and
+# castellan/) the existing wallet and credential catalog move into the
+# custodian's state directory, byte for byte, and are removed from that root
+# once the copy is proved to open to the same wallet. USER must be able to
+# read and write that root. The state directory is the same account's, so
+# this moves who holds and uses the wallet, not who can open the file; the
+# data-protection envelope is not part of this binary.
 #
 # The binary must carry TEAM-ID's signature, identifier
 # com.merely.djinn.custodian and the hardened runtime without
@@ -20,8 +28,8 @@
 set -eu
 
 [ "$(id -u)" = 0 ] || { echo 'Run with sudo from an administrator account.' >&2; exit 2; }
-[ $# -eq 4 ] || { echo 'usage: install-macos.sh USER SIGNED-BINARY TEAM-ID DJINN-TEAM-ID' >&2; exit 2; }
-user=$1 binary=$2 team=$3 djinn_team=$4
+{ [ $# -eq 4 ] || [ $# -eq 5 ]; } || { echo 'usage: install-macos.sh USER SIGNED-BINARY TEAM-ID DJINN-TEAM-ID [DJINN-DATA-ROOT]' >&2; exit 2; }
+user=$1 binary=$2 team=$3 djinn_team=$4 data_from=${5:-}
 case "$user$team$djinn_team" in *[!A-Za-z0-9_.-]*|'') echo 'Refusing unexpected characters.' >&2; exit 2;; esac
 uid=$(id -u "$user")
 home=$(dscl . -read "/Users/$user" NFSHomeDirectory | sed 's/^NFSHomeDirectory: //')
@@ -59,11 +67,14 @@ cat > "$root/clients/$uid.json" <<EOF
  "agent": "$state/agent.sock"}
 EOF
 chmod 0644 "$root/$user.json" "$root/clients/$uid.json"
+if [ -n "$data_from" ]; then
+    sudo -u "$user" "$root/djinn-custodian" adopt --config "$root/$user.json" --data-from "$data_from"
+fi
 sed -e "s|@USER@|$user|g" -e "s|@HOME@|$home|g" "$here/packaging/macos/com.merely.djinn.custodian.plist.in" \
     > /Library/LaunchAgents/com.merely.djinn.custodian.plist
 chown root:wheel /Library/LaunchAgents/com.merely.djinn.custodian.plist
 chmod 0644 /Library/LaunchAgents/com.merely.djinn.custodian.plist
 plutil -lint /Library/LaunchAgents/com.merely.djinn.custodian.plist
 echo "Installed. Log in as $user (or: launchctl bootstrap gui/$uid /Library/LaunchAgents/com.merely.djinn.custodian.plist)."
-echo "Move or create the vault in $state/vault with: $root/djinn-custodian adopt|init --config '$root/$user.json'"
+echo "Move or create the vault in $state/vault with: $root/djinn-custodian adopt|init --config '$root/$user.json' (adopt: --from VAULT-DIR)"
 echo "Point SSH_AUTH_SOCK at $state/agent.sock."

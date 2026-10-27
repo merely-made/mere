@@ -66,7 +66,9 @@ impl Keeper {
     }
 
     /// The wallet root grants and stations are issued from (D8, D17): the
-    /// same carry root the host was composed with. A custodian uses its own.
+    /// same carry root the host was composed with. Only an in-process host
+    /// reads it; a custodian holds the wallet in its own state directory,
+    /// so a production Djinn names none.
     pub fn with_wallet_root(mut self, root: Option<PathBuf>) -> Self {
         self.wallet_root = root;
         self

@@ -138,6 +138,11 @@ impl HostCustody {
         self.data_root.as_deref().ok_or(Refusal("no-wallet"))
     }
 
+    /// The wallet's public records, answerable while locked.
+    pub fn wallet_public(&self) -> Result<(Vec<String>, Option<serde_json::Value>), Refusal> {
+        crate::wallet::public_records(self.wallet()?)
+    }
+
     /// The wallet root's public key, while unlocked and present.
     pub fn wallet_public_key(&self) -> Option<[u8; 32]> {
         self.unlocked().ok()?;
@@ -505,6 +510,9 @@ fn claim_credentials(host: &Arc<Host>, data_root: &Path, primary: &ProfileId) ->
     Ok(stores)
 }
 
+/// The credential catalog's directory under a data root.
+pub const CATALOG_DIR: &str = "castellan";
+
 /// Djinn's credential layout: `castellan/profiles/<sanitized id>`.
 pub fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     let segment: String = profile
@@ -512,7 +520,7 @@ pub fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf
         .chars()
         .map(|c| if c.is_ascii_alphanumeric() || matches!(c, '-' | '_') { c } else { '_' })
         .collect();
-    data_root.join("castellan").join("profiles").join(segment)
+    data_root.join(CATALOG_DIR).join("profiles").join(segment)
 }
 
 fn parts(attestation: &insigne::DerivedKeyAttestation) -> AttestationParts {

@@ -400,8 +400,8 @@ impl DjinnResident {
     /// test passes a scratch directory rather than the owner's real one. It
     /// never fails the resident; a reservoir that cannot open leaves the lane
     /// unavailable with its reason.
-    pub async fn open_reservoir(&mut self, shared_root: &Path) -> &ReservoirLane {
-        self.reservoir = ReservoirLane::open(shared_root, &self.reservoir_settings).await;
+    pub async fn open_reservoir(&mut self, shared_root: &Path, personas: Arc<dyn crate::custody_host::PersonaIndex>) -> &ReservoirLane {
+        self.reservoir = ReservoirLane::open(shared_root, &self.reservoir_settings, personas).await;
         &self.reservoir
     }
 

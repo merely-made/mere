@@ -309,7 +309,7 @@ async fn two_starting_processes_cannot_both_own_the_reservoir() {
     second.signal();
     first.finish();
     second.finish();
-    ResidentReservoir::open(root.path(), Some(persona()))
+    ResidentReservoir::open(root.path(), persona())
         .await
         .unwrap();
 }
@@ -365,7 +365,7 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
     host.lock_vault().unwrap();
     // Awaiting close also awaits cancellation and release after the lock bell.
     let _ = attached.close().await;
-    ResidentReservoir::open(&config.shared_root, Some(persona()))
+    ResidentReservoir::open(&config.shared_root, persona())
         .await
         .unwrap();
     println!(
@@ -444,7 +444,7 @@ async fn child_runs_the_standalone_application() {
             let mut line = String::new();
             std::io::stdin().read_line(&mut line).unwrap();
             attached.close().await.unwrap();
-            ResidentReservoir::open(Path::new(&root), Some(persona()))
+            ResidentReservoir::open(Path::new(&root), persona())
                 .await
                 .unwrap();
             println!(
@@ -467,7 +467,7 @@ async fn child_runs_the_standalone_application() {
 /// This is a library daemon fixture, not the full installed Djinn binary or
 /// its network/credential lanes. It owns real disk stores in this process.
 async fn daemon_fixture(config: ReservoirAttachmentOptions) {
-    let reservoir = ResidentReservoir::open(&config.shared_root, Some(config.persona))
+    let reservoir = ResidentReservoir::open(&config.shared_root, config.persona)
         .await
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
@@ -549,7 +549,7 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
         .update(|catalog| *catalog = ResidentEndpointCatalog::new())
         .await;
     drop(reservoir);
-    ResidentReservoir::open(&config.shared_root, Some(config.persona))
+    ResidentReservoir::open(&config.shared_root, config.persona)
         .await
         .unwrap();
     println!(

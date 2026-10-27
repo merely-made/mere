@@ -178,11 +178,6 @@ impl ReservoirAttachment {
                         "embedded resident requires a multi-thread Tokio runtime".into(),
                     ));
                 }
-                // Resolve the existing wallet namespace, rather than minting a
-                // product-specific identity beside the user's selected one.
-                let persona =
-                    pandect::wallet_store::resolve_persona(&options.shared_root, options.persona)
-                        .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
                 let mut quiet = |_: &str, _: serde_json::Value| {};
                 // The family identity through custody: the installed
                 // custodian, or the in-process vault in a test build.
@@ -197,6 +192,18 @@ impl ReservoirAttachment {
                 )
                 .map_err(ReservoirAttachmentError::Embedded)?;
                 let host = opened.host;
+                // Resolve the existing wallet namespace, rather than minting a
+                // product-specific identity beside the user's selected one.
+                // Custody discloses the index: no wallet file is opened here.
+                let persona = crate::custody_host::resolve_persona(
+                    Arc::new(crate::custody_host::CustodyPersonas {
+                        custody: host.clone(),
+                        wallet_root: options.shared_root.clone(),
+                    }),
+                    options.persona,
+                )
+                .await
+                .map_err(ReservoirAttachmentError::Embedded)?;
                 let attached = ReservoirAttachmentOptions {
                     endpoint: options.endpoint,
                     application: options.application,
@@ -426,7 +433,7 @@ impl EmbeddedOwner {
             .ok_or_else(|| {
                 ReservoirAttachmentError::Embedded("invalid session lease duration".into())
             })?;
-        let reservoir = ResidentReservoir::open(&options.shared_root, Some(options.persona))
+        let reservoir = ResidentReservoir::open(&options.shared_root, options.persona)
             .await
             .map_err(ReservoirAttachmentError::Embedded)?;
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());

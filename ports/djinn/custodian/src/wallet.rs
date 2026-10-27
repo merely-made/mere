@@ -12,6 +12,9 @@
 
 use std::path::Path;
 
+mod adopt;
+pub use adopt::{Adopted, adopt_files, carry_files, retire_files, wallet_files};
+
 use custody_wire::contract::{EpochKeyRequest, PayloadOperation, ReleasedEpochKey};
 use custody_wire::secret::Secret;
 use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId};
@@ -21,6 +24,18 @@ use crate::Refusal;
 
 fn storage(_: impl std::fmt::Display) -> Refusal {
     Refusal("vault-storage")
+}
+
+/// The wallet's public records: the persona index (the UUIDs that hold a
+/// wallet manifest, sorted) and the device roster as stored. Neither holds
+/// a seed, an epoch or a device secret, and neither needs the vault open.
+pub fn public_records(root: &Path) -> Result<(Vec<String>, Option<serde_json::Value>), Refusal> {
+    let personas = pandect::wallet_store::list_personas(root).map_err(storage)?;
+    let roster = pandect::wallet_store::load_device_roster(root).map_err(storage)?;
+    Ok((
+        personas.iter().map(|persona| persona.as_uuid().to_string()).collect(),
+        roster.map(|roster| serde_json::to_value(roster)).transpose().map_err(storage)?,
+    ))
 }
 
 /// Keys derived from `persona`'s current private epoch: blake3's

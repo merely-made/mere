@@ -70,7 +70,7 @@ fn describe(output: &Output) -> String {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_second_process_is_refused_while_the_first_owns_the_reservoir() {
     let root = tempfile::tempdir().unwrap();
-    let owner = ResidentReservoir::open(root.path(), Some(persona()))
+    let owner = ResidentReservoir::open(root.path(), persona())
         .await
         .unwrap();
 
@@ -102,7 +102,7 @@ async fn a_second_process_is_refused_while_the_first_owns_the_reservoir() {
     );
 
     // What the second process wrote is there for the next owner.
-    let next = ResidentReservoir::open(root.path(), Some(persona()))
+    let next = ResidentReservoir::open(root.path(), persona())
         .await
         .unwrap();
     let domains: Vec<String> = next
@@ -121,7 +121,7 @@ async fn child_attempts_to_own_the_reservoir() {
     let (Some(root), Ok(expect)) = (std::env::var_os(ROOT_ENV), std::env::var(EXPECT_ENV)) else {
         return;
     };
-    let attempt = ResidentReservoir::open(Path::new(&root), Some(persona())).await;
+    let attempt = ResidentReservoir::open(Path::new(&root), persona()).await;
     match (expect.as_str(), attempt) {
         ("refused", Err(reason)) => {
             assert!(reason.contains("could not open the reservoir"), "{reason}");

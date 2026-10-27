@@ -513,7 +513,7 @@ async fn main() {
         VaultProtectionView::Passphrase,
     ));
     let persona = fixture_persona();
-    let reservoir = ResidentReservoir::open(&root.join("shared"), Some(persona))
+    let reservoir = ResidentReservoir::open(&root.join("shared"), persona)
         .await
         .unwrap();
     let apps = reservoir_applications();
@@ -591,7 +591,7 @@ async fn main() {
     drop(routes);
     drop(reservoir);
     // Prove the exclusive reservoir handle was released before reporting.
-    ResidentReservoir::open(&root.join("shared"), Some(persona))
+    ResidentReservoir::open(&root.join("shared"), persona)
         .await
         .unwrap();
     println!("C1_RELEASED pid={}", std::process::id());
