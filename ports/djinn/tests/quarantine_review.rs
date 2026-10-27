@@ -4,14 +4,19 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Real owner-local custody wire with synthetic sealed items and resident UI.
-#![cfg(feature = "cxf")]
-use castellan::{
-    authority::PersonaeHost,
-    custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
-    resident::{CastellanResident, CredentialSalts},
-};
-use chatelaine::ItemState;
+//! Real owner-local custody wire with synthetic credentials, the resident's
+//! native consent and a real custodian holding the catalog (custody
+//! isolation plan, H2). Djinn shows the exact item and forwards only an
+//! approved act; the custodian re-checks the item or import revision under
+//! profile authority. What happens to an item after a forwarded act is the
+//! custodian's own test (`djinn-custodian` credential tests).
+#![cfg(all(unix, feature = "cxf"))]
+
+mod custodian_fixture;
+
+use custodian_fixture::{TestCustodian, manage_grants};
+use djinn::custody_host::remote::RemoteHost;
+use djinn::custody_host::{CredentialCall, ResidentCustody};
 use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use djinn::door::browser_carrier::NativeIdentityFailure;
 use djinn::{identity_ui::NativeIdentityUi, keeper::Keeper};
@@ -19,19 +24,19 @@ use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
     custody::CustodyRefusal,
     custody_client::{CustodyClient, CustodyClientError},
-    identity::VaultProtectionView,
-    quarantine::{ReviewAction, ReviewRequest},
+    quarantine::{QuarantineCard, ReviewAction, ReviewRequest},
 };
-use personae::{Ed25519Keypair, PersonaId, ProfileId};
+use personae::{PersonaId, ProfileId};
 use serde_json::json;
 use std::{
-    collections::BTreeMap,
     sync::{
         Arc, Mutex,
         atomic::{AtomicBool, AtomicUsize, Ordering},
     },
     time::Duration,
 };
+
+const PASSPHRASE: &str = "synthetic review receipt";
 
 #[derive(Default)]
 struct Ui {
@@ -66,13 +71,12 @@ impl NativeIdentityUi for Ui {
         Ok(self.allow.load(Ordering::SeqCst))
     }
 }
+
 struct Fixture {
-    _dir: tempfile::TempDir,
-    host: Arc<PersonaeHost<SealedProfileStorage>>,
-    resident: CastellanResident,
-    work_resident: CastellanResident,
+    /// Keeps the custodian's vault and socket for the fixture's life.
+    _custodian: TestCustodian,
+    remote: Arc<RemoteHost>,
     ui: Arc<Ui>,
-    persona: PersonaId,
     endpoint: String,
     server: tokio::task::JoinHandle<()>,
 }
@@ -81,86 +85,98 @@ impl Drop for Fixture {
         self.server.abort();
     }
 }
+
+fn cxf(title: &str, credential: serde_json::Value) -> Vec<u8> {
+    serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Account","email":"test@example.invalid","collections":[],"items":[{"id":"aQ","title":title,"credentials":[credential]}]}]})).unwrap()
+}
+
+/// Import through the custodian into the store of the profile it has open.
+fn import(remote: &RemoteHost, bytes: Vec<u8>, persona: PersonaId, profile: &str) {
+    let preview = remote.credentials(CredentialCall::CxfPreview(bytes.clone())).unwrap();
+    remote
+        .credentials(CredentialCall::CxfImport {
+            source: bytes,
+            destinations: json!({"YQ": {"persona": persona, "profile": profile}}),
+            preview_sha256: preview["source_sha256"].as_str().unwrap().into(),
+        })
+        .unwrap();
+}
+
+/// An older import: an item in a namespace no profile owns, written into
+/// the family store before the custodian first claims it.
+fn seed_older_namespace(custodian: &TestCustodian) -> PersonaId {
+    let root = djinn_custodian::host::credential_profile_root(&custodian.data_root, &ProfileId("family".into()));
+    let family = custodian.direct("family");
+    let store = castellan::resident::CastellanResident::claim_derived(
+        root.join("records"),
+        root.join("freshness"),
+        &family,
+        djinn_custodian::host::CREDENTIAL_SALTS,
+    )
+    .unwrap();
+    let persona = PersonaId::new();
+    store
+        .otp_items(persona)
+        .import_otpauth_uri(
+            "otpauth://totp/Receipt:older?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Receipt",
+        )
+        .unwrap();
+    persona
+}
+
+/// A CXF card committed into `profile`'s own store before the custodian
+/// first claims it, as an earlier resident under that profile would have.
+fn seed_card(custodian: &TestCustodian, profile: &str, title: &str) {
+    use castellan::custody::bootstrap::{self, Unlock};
+    let id = ProfileId(profile.into());
+    let root = djinn_custodian::host::credential_profile_root(&custodian.data_root, &id);
+    let opened = bootstrap::open_storage(&custodian.vault, Unlock::passphrase(PASSPHRASE)).unwrap();
+    let host = castellan::authority::PersonaeHost::new(
+        castellan::custody::IdentityVault::open(opened.storage, &id).unwrap(),
+        None,
+        dramatis::view::VaultProtectionView::Passphrase,
+    );
+    let store = castellan::resident::CastellanResident::claim_derived(
+        root.join("records"),
+        root.join("freshness"),
+        &host,
+        djinn_custodian::host::CREDENTIAL_SALTS,
+    )
+    .unwrap();
+    let choices = std::collections::BTreeMap::from([(
+        "YQ".to_string(),
+        castellan::cxf::Destination {
+            persona: PersonaId::new(),
+            profile: id,
+            ssh_unlock_policy: dramatis::intents::SshUnlockPolicyIntentV1::Session,
+        },
+    )]);
+    castellan::cxf::Import::read(cxf(title, credit_card()))
+        .unwrap()
+        .commit(choices, &store, &host)
+        .unwrap();
+}
+
 impl Fixture {
     async fn new(credential: serde_json::Value) -> Self {
-        let dir = tempfile::tempdir().unwrap();
-        let storage = SealedProfileStorage::open_with_key(dir.path().join("vault"), [0x53; 32]);
-        storage
-            .enroll_passphrase(b"synthetic review receipt")
-            .unwrap();
-        let family = Profile::new(
-            ProfileId("family".into()),
-            "Family",
-            Ed25519Keypair::from_seed([0x43; 32]),
-        );
-        let work = Profile::new(
-            ProfileId("work".into()),
-            "Work",
-            Ed25519Keypair::from_seed([0x44; 32]),
-        );
-        storage.save_profile(&family).unwrap();
-        storage.save_profile(&work).unwrap();
-        let host = Arc::new(PersonaeHost::new(
-            IdentityVault::with_profile(storage, family),
-            None,
-            VaultProtectionView::Passphrase,
-        ));
-        let salts = CredentialSalts {
-            record: b"review-fixture/records",
-            freshness: b"review-fixture/freshness",
-        };
-        let resident = CastellanResident::claim_derived(
-            dir.path().join("records"),
-            dir.path().join("freshness"),
-            host.as_ref(),
-            salts,
-        )
-        .unwrap();
-        host.register_lock_holder(
-            resident.lock_holder_for_profile(salts, ProfileId("family".into())),
-        );
-        let work_provider = host.profile_provider(&ProfileId("work".into())).unwrap();
-        let work_resident = CastellanResident::claim_derived(
-            dir.path().join("work-records"),
-            dir.path().join("work-freshness"),
-            &work_provider,
-            salts,
-        )
-        .unwrap();
-        host.register_lock_holder(
-            work_resident.lock_holder_for_profile(salts, ProfileId("work".into())),
-        );
-        let persona = PersonaId::new();
-        let bytes = serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Account","email":"test@example.invalid","collections":[],"items":[{"id":"aQ","title":"Review card","credentials":[credential]}]}]})).unwrap();
-        let choices = BTreeMap::from([(
-            "YQ".to_string(),
-            castellan::cxf::Destination {
-                persona,
-                profile: ProfileId("family".into()),
-                ssh_unlock_policy: dramatis::intents::SshUnlockPolicyIntentV1::Session,
-            },
-        )]);
-        castellan::cxf::Import::read(bytes)
-            .unwrap()
-            .commit(choices, &resident, &host)
-            .unwrap();
+        Self::build(credential, &|_| None).await.0
+    }
+
+    /// `seed` writes into the data root before the custodian first opens it.
+    async fn build(
+        credential: serde_json::Value,
+        seed: &dyn Fn(&TestCustodian) -> Option<PersonaId>,
+    ) -> (Self, Option<PersonaId>) {
+        let custodian = TestCustodian::start(PASSPHRASE, &[("family", [0x43; 32]), ("work", [0x44; 32])], manage_grants());
+        let older = seed(&custodian);
+        let remote = custodian.remote();
+        remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+        import(&remote, cxf("Review card", credential), PersonaId::new(), "family");
         let ui = Arc::new(Ui::default());
-        let keeper = Arc::new(Keeper::new(host.clone()).with_ui(ui.clone()));
-        keeper
-            .attach_credential_stores(
-                ProfileId("family".into()),
-                BTreeMap::from([
-                    (ProfileId("family".into()), resident.clone()),
-                    (ProfileId("work".into()), work_resident.clone()),
-                ]),
-            )
-            .unwrap();
+        let keeper = Arc::new(Keeper::new(remote.clone()).with_ui(ui.clone()));
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
         djinn::custody::grant(&grants).unwrap();
-        #[cfg(windows)]
-        let endpoint = format!(r"\\.\pipe\dramatis-review-{}", uuid::Uuid::new_v4());
-        #[cfg(not(windows))]
-        let endpoint = dir.path().join("review.sock").display().to_string();
+        let endpoint = custodian.dir.path().join("review.sock").display().to_string();
         let serving = endpoint.clone();
         let server = tokio::spawn(async move {
             let _ = serve_app_broker(
@@ -174,12 +190,9 @@ impl Fixture {
             .await;
         });
         let fixture = Self {
-            _dir: dir,
-            host,
-            resident,
-            work_resident,
+            _custodian: custodian,
+            remote,
             ui,
-            persona,
             endpoint,
             server,
         };
@@ -188,7 +201,7 @@ impl Fixture {
                 .await
                 .is_ok()
             {
-                return fixture;
+                return (fixture, older);
             }
             tokio::time::sleep(Duration::from_millis(20)).await;
         }
@@ -199,14 +212,15 @@ impl Fixture {
             .await
             .unwrap()
     }
-    async fn request(&self, action: ReviewAction) -> ReviewRequest {
-        let card = self
-            .client("dramatis")
+    async fn cards(&self, profile: &str) -> Vec<QuarantineCard> {
+        self.client("dramatis")
             .await
-            .quarantine(ProfileId("family".into()))
+            .quarantine(ProfileId(profile.into()))
             .await
             .unwrap()
-            .remove(0);
+    }
+    async fn request(&self, action: ReviewAction) -> ReviewRequest {
+        let card = self.cards("family").await.remove(0);
         ReviewRequest {
             store: card.store,
             profile: ProfileId("family".into()),
@@ -216,8 +230,12 @@ impl Fixture {
             action,
         }
     }
-    fn state(&self) -> ItemState {
-        self.resident.items(self.persona).list().unwrap()[0].state
+    /// The family card is still held, unchanged.
+    async fn still_held(&self, request: &ReviewRequest) {
+        let cards = self.cards("family").await;
+        assert_eq!(cards.len(), 1);
+        assert_eq!(cards[0].item.id, request.item);
+        assert_eq!(cards[0].revision, request.revision);
     }
 }
 fn credit_card() -> serde_json::Value {
@@ -241,17 +259,10 @@ async fn cards_are_secret_free_scoped_and_denial_preserves_the_item() {
             .unwrap()
             .contains("4111111111111111")
     );
-    let before = f.resident.items(f.persona).get(cards[0].item.id).unwrap();
-    assert!(
-        c.review_quarantine(f.request(ReviewAction::Accept).await)
-            .await
-            .is_err()
-    );
+    let request = f.request(ReviewAction::Accept).await;
+    assert!(c.review_quarantine(request.clone()).await.is_err());
     assert_eq!(f.ui.count.load(Ordering::SeqCst), 1);
-    assert_eq!(
-        before,
-        f.resident.items(f.persona).get(cards[0].item.id).unwrap()
-    );
+    f.still_held(&request).await;
     assert_eq!(
         f.ui.seen.lock().unwrap()[0],
         (
@@ -268,13 +279,7 @@ async fn resident_approval_accepts_and_replay_is_refused() {
     let r = f.request(ReviewAction::Accept).await;
     let mut c = f.client("dramatis").await;
     c.review_quarantine(r.clone()).await.unwrap();
-    assert_eq!(f.state(), ItemState::Vault);
-    assert!(
-        c.quarantine(ProfileId("family".into()))
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    assert!(f.cards("family").await.is_empty());
     assert!(c.review_quarantine(r).await.is_err());
     assert_eq!(f.ui.count.load(Ordering::SeqCst), 1);
 }
@@ -288,7 +293,7 @@ async fn resident_approval_deletes_only_the_exact_quarantined_item() {
         .review_quarantine(r)
         .await
         .unwrap();
-    assert!(f.resident.items(f.persona).list().unwrap().is_empty());
+    assert!(f.cards("family").await.is_empty());
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn wrong_persona_stale_revision_and_ordinary_app_cannot_mutate() {
@@ -314,38 +319,38 @@ async fn wrong_persona_stale_revision_and_ordinary_app_cannot_mutate() {
             .is_err()
     );
     assert!(matches!(
-        f.client("turnstone").await.review_quarantine(r).await,
+        f.client("turnstone").await.review_quarantine(r.clone()).await,
         Err(CustodyClientError::Refused(CustodyRefusal::NotServed))
     ));
-    assert_eq!(f.state(), ItemState::Quarantined);
+    f.still_held(&r).await;
     assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn lock_during_native_consent_refuses_the_commit() {
     let f = Fixture::new(credit_card()).await;
     f.ui.allow.store(true, Ordering::SeqCst);
-    let host = f.host.clone();
-    *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || host.lock_vault().unwrap()));
+    let remote = f.remote.clone();
+    *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || remote.lock_vault().unwrap()));
     let r = f.request(ReviewAction::Accept).await;
     assert!(matches!(
-        f.client("dramatis").await.review_quarantine(r).await,
+        f.client("dramatis").await.review_quarantine(r.clone()).await,
         Err(CustodyClientError::Refused(CustodyRefusal::Locked))
     ));
-    f.host
-        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
-            b"synthetic review receipt",
-        ))
-        .unwrap();
-    assert_eq!(f.state(), ItemState::Quarantined);
+    f.remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    f.still_held(&r).await;
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn deletion_during_native_consent_cannot_accept_a_replacement() {
     let f = Fixture::new(credit_card()).await;
     f.ui.allow.store(true, Ordering::SeqCst);
-    let store = f.resident.items(f.persona);
     let r = f.request(ReviewAction::Accept).await;
-    let id = store.list().unwrap()[0].id;
-    *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || store.delete(id).unwrap()));
+    let mut delete = r.clone();
+    delete.action = ReviewAction::Delete;
+    let remote = f.remote.clone();
+    let delete = serde_json::to_value(&delete).unwrap();
+    *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || {
+        remote.credentials(CredentialCall::Review(delete.clone())).unwrap();
+    }));
     assert!(
         f.client("dramatis")
             .await
@@ -353,6 +358,7 @@ async fn deletion_during_native_consent_cannot_accept_a_replacement() {
             .await
             .is_err()
     );
+    assert!(f.cards("family").await.is_empty());
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn unsupported_otp_and_unknown_types_stay_held_but_can_be_deleted() {
@@ -370,36 +376,34 @@ async fn unsupported_otp_and_unknown_types_stay_held_but_can_be_deleted() {
                 .unwrap()
                 .contains("synthetic-hidden-marker")
         );
-        assert!(
-            c.review_quarantine(f.request(ReviewAction::Accept).await)
-                .await
-                .is_err()
-        );
+        let accept = f.request(ReviewAction::Accept).await;
+        assert!(c.review_quarantine(accept.clone()).await.is_err());
         assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
-        assert_eq!(f.state(), ItemState::Quarantined);
+        f.still_held(&accept).await;
         c.review_quarantine(f.request(ReviewAction::Delete).await)
             .await
             .unwrap();
-        assert!(f.resident.items(f.persona).list().unwrap().is_empty());
+        assert!(f.cards("family").await.is_empty());
     }
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn malformed_known_payload_is_not_activated() {
     let f = Fixture::new(json!({"type":"credit-card","number":false})).await;
     f.ui.allow.store(true, Ordering::SeqCst);
+    let accept = f.request(ReviewAction::Accept).await;
     assert!(
         f.client("dramatis")
             .await
-            .review_quarantine(f.request(ReviewAction::Accept).await)
+            .review_quarantine(accept.clone())
             .await
             .is_err()
     );
-    assert_eq!(f.state(), ItemState::Quarantined);
+    f.still_held(&accept).await;
 }
 #[tokio::test(flavor = "multi_thread")]
 async fn a_locked_resident_keeps_public_roster_but_refuses_cards_and_selection() {
     let f = Fixture::new(credit_card()).await;
-    f.host.lock_vault().unwrap();
+    f.remote.lock_vault().unwrap();
     let mut c = f.client("dramatis").await;
     assert_eq!(c.roster().await.unwrap().entries.len(), 2);
     assert!(c.quarantine(ProfileId("family".into())).await.is_err());
@@ -407,33 +411,33 @@ async fn a_locked_resident_keeps_public_roster_but_refuses_cards_and_selection()
     assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
 }
 #[tokio::test(flavor = "multi_thread")]
-async fn existing_namespace_binding_cannot_be_reassigned() {
+async fn an_owned_namespace_is_not_offered_for_assignment() {
     let f = Fixture::new(credit_card()).await;
-    assert!(
-        f.resident
-            .bind_profile(f.persona, &ProfileId("work".into()))
-            .is_err()
-    );
-    assert!(
-        f.client("dramatis")
-            .await
-            .quarantine(ProfileId("work".into()))
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    let card = f.cards("family").await.remove(0);
+    let mut c = f.client("dramatis").await;
+    assert!(c.unassigned_imports().await.unwrap().is_empty());
+    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
+        store: ProfileId("family".into()),
+        profile: ProfileId("work".into()),
+        persona: card.persona,
+        revision: card.revision,
+    };
+    assert!(c.assign_import(request).await.is_err());
+    assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
+    assert!(f.cards("work").await.is_empty());
 }
 
 #[tokio::test(flavor = "multi_thread")]
 async fn switching_during_consent_keeps_review_bound_to_its_named_profile() {
     let f = Fixture::new(credit_card()).await;
     f.ui.allow.store(true, Ordering::SeqCst);
-    let host = f.host.clone();
+    let remote = f.remote.clone();
     *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || {
-        host.switch_profile(dramatis::intents::SwitchProfileIntentV1 {
-            profile: "work".into(),
-        })
-        .unwrap();
+        remote
+            .switch_profile(dramatis::intents::SwitchProfileIntentV1 {
+                profile: "work".into(),
+            })
+            .unwrap();
     }));
     let r = f.request(ReviewAction::Accept).await;
     f.client("dramatis")
@@ -441,16 +445,9 @@ async fn switching_during_consent_keeps_review_bound_to_its_named_profile() {
         .review_quarantine(r)
         .await
         .unwrap();
-    assert_eq!(f.state(), ItemState::Vault);
-    assert_eq!(f.host.current_profile_id(), ProfileId("work".into()));
-    assert!(
-        f.client("dramatis")
-            .await
-            .quarantine(ProfileId("work".into()))
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    assert!(f.cards("family").await.is_empty());
+    assert_eq!(f.remote.current_profile_id(), ProfileId("work".into()));
+    assert!(f.cards("work").await.is_empty());
 }
 
 #[test]
@@ -459,20 +456,10 @@ fn the_wire_cannot_assert_owner_consent() {
     assert!(serde_json::from_value::<ReviewRequest>(request).is_err());
 }
 
-fn older_namespace(f: &Fixture) -> PersonaId {
-    let persona = PersonaId::new();
-    f.resident
-        .otp_items(persona)
-        .import_otpauth_uri(
-            "otpauth://totp/Receipt:older?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=Receipt",
-        )
-        .unwrap();
-    persona
-}
 #[tokio::test(flavor = "multi_thread")]
-async fn older_import_assignment_needs_consent_and_preserves_item_state() {
-    let f = Fixture::new(credit_card()).await;
-    let persona = older_namespace(&f);
+async fn older_import_assignment_needs_consent_and_is_not_replayed() {
+    let (f, persona) = Fixture::build(credit_card(), &|c| Some(seed_older_namespace(c))).await;
+    let persona = persona.unwrap();
     let mut c = f.client("dramatis").await;
     let imports = c.unassigned_imports().await.unwrap();
     assert_eq!(imports.len(), 1);
@@ -480,7 +467,7 @@ async fn older_import_assignment_needs_consent_and_preserves_item_state() {
     assert!(
         !serde_json::to_string(&imports)
             .unwrap()
-            .contains("MY======")
+            .contains("GEZDGNBV")
     );
     let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
@@ -488,120 +475,62 @@ async fn older_import_assignment_needs_consent_and_preserves_item_state() {
         persona: *persona.as_uuid(),
         revision: imports[0].revision.clone(),
     };
-    let before = f.resident.items(persona).list().unwrap();
     assert!(c.assign_import(request.clone()).await.is_err());
     assert_eq!(c.unassigned_imports().await.unwrap(), imports);
     f.ui.allow.store(true, Ordering::SeqCst);
     c.assign_import(request.clone()).await.unwrap();
     assert!(c.unassigned_imports().await.unwrap().is_empty());
-    assert_eq!(f.resident.items(persona).list().unwrap(), before);
-    assert!(
-        f.resident
-            .profile_personas(&ProfileId("work".into()))
-            .unwrap()
-            .contains(&persona)
-    );
     assert!(c.assign_import(request).await.is_err());
+    assert_eq!(f.ui.count.load(Ordering::SeqCst), 2);
 }
 #[tokio::test(flavor = "multi_thread")]
-async fn older_import_assignment_rechecks_revision_and_lock_after_consent() {
-    for locked in [false, true] {
-        let f = Fixture::new(credit_card()).await;
-        let persona = older_namespace(&f);
-        let mut c = f.client("dramatis").await;
-        let import = c.unassigned_imports().await.unwrap().remove(0);
-        let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
-            store: ProfileId("family".into()),
-            profile: ProfileId("work".into()),
-            persona: *persona.as_uuid(),
-            revision: import.revision,
-        };
-        f.ui.allow.store(true, Ordering::SeqCst);
-        let host = f.host.clone();
-        let store = f.resident.items(persona);
-        let id = store.list().unwrap()[0].id;
-        *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || {
-            if locked {
-                host.lock_vault().unwrap()
-            } else {
-                store.delete(id).unwrap()
-            }
-        }));
-        assert!(c.assign_import(request).await.is_err());
-        if locked {
-            f.host
-                .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
-                    b"synthetic review receipt",
-                ))
-                .unwrap();
-        }
-        assert!(
-            f.resident
-                .profile_personas(&ProfileId("work".into()))
-                .unwrap()
-                .is_empty()
-        );
-    }
+async fn older_import_assignment_rechecks_the_lock_after_consent() {
+    let (f, persona) = Fixture::build(credit_card(), &|c| Some(seed_older_namespace(c))).await;
+    let persona = persona.unwrap();
+    let mut c = f.client("dramatis").await;
+    let import = c.unassigned_imports().await.unwrap().remove(0);
+    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
+        store: ProfileId("family".into()),
+        profile: ProfileId("work".into()),
+        persona: *persona.as_uuid(),
+        revision: import.revision.clone(),
+    };
+    f.ui.allow.store(true, Ordering::SeqCst);
+    let remote = f.remote.clone();
+    *f.ui.on_prompt.lock().unwrap() = Some(Box::new(move || remote.lock_vault().unwrap()));
+    assert!(c.assign_import(request).await.is_err());
+    f.remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    assert_eq!(c.unassigned_imports().await.unwrap(), vec![import]);
 }
 
 #[tokio::test(flavor = "multi_thread")]
 async fn persona_selection_and_lock_preserve_the_original_credential_root() {
     let f = Fixture::new(credit_card()).await;
-    f.host
+    f.remote
         .switch_profile(dramatis::intents::SwitchProfileIntentV1 {
             profile: "work".into(),
         })
         .unwrap();
-    f.host.lock_vault().unwrap();
-    f.host
-        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
-            b"synthetic review receipt",
-        ))
-        .unwrap();
-    assert_eq!(f.host.current_profile_id(), ProfileId("work".into()));
-    assert_eq!(f.state(), ItemState::Quarantined);
-    assert_eq!(
-        f.client("dramatis")
-            .await
-            .quarantine(ProfileId("family".into()))
-            .await
-            .unwrap()
-            .len(),
-        1
-    );
+    f.remote.lock_vault().unwrap();
+    f.remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    assert_eq!(f.remote.current_profile_id(), ProfileId("work".into()));
+    assert_eq!(f.cards("family").await.len(), 1);
 }
 
 #[tokio::test(flavor = "multi_thread")]
 async fn multiple_stores_keep_keys_and_review_targets_distinct() {
-    let f = Fixture::new(credit_card()).await;
-    let persona = PersonaId::new();
-    let bytes = serde_json::to_vec(&json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Work","email":"test@example.invalid","collections":[],"items":[{"id":"aQ","title":"Work card","credentials":[credit_card()]}]}]})).unwrap();
-    castellan::cxf::Import::read(bytes)
-        .unwrap()
-        .commit(
-            BTreeMap::from([(
-                "YQ".into(),
-                castellan::cxf::Destination {
-                    persona,
-                    profile: ProfileId("work".into()),
-                    ssh_unlock_policy: dramatis::intents::SshUnlockPolicyIntentV1::Session,
-                },
-            )]),
-            &f.work_resident,
-            &f.host,
-        )
-        .unwrap();
-    f.host
+    let (f, _) = Fixture::build(credit_card(), &|c| {
+        seed_card(c, "work", "Work card");
+        None
+    })
+    .await;
+    f.remote
         .switch_profile(dramatis::intents::SwitchProfileIntentV1 {
             profile: "work".into(),
         })
         .unwrap();
-    f.host.lock_vault().unwrap();
-    f.host
-        .unlock_vault(castellan::custody::UnlockMethod::Passphrase(
-            b"synthetic review receipt",
-        ))
-        .unwrap();
+    f.remote.lock_vault().unwrap();
+    f.remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
     let mut c = f.client("dramatis").await;
     let family = c.quarantine(ProfileId("family".into())).await.unwrap();
     let work = c.quarantine(ProfileId("work".into())).await.unwrap();
@@ -623,15 +552,11 @@ async fn multiple_stores_keep_keys_and_review_targets_distinct() {
     assert_eq!(f.ui.count.load(Ordering::SeqCst), 0);
     f.ui.allow.store(true, Ordering::SeqCst);
     c.review_quarantine(request).await.unwrap();
-    assert_eq!(
-        f.work_resident.items(persona).list().unwrap()[0].state,
-        ItemState::Vault
-    );
-    assert_eq!(f.state(), ItemState::Quarantined);
     assert!(
         c.quarantine(ProfileId("work".into()))
             .await
             .unwrap()
             .is_empty()
     );
+    assert_eq!(c.quarantine(ProfileId("family".into())).await.unwrap(), family);
 }

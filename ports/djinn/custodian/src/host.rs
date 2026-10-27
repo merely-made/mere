@@ -22,7 +22,7 @@ use castellan::custody::bootstrap::{self, PASSPHRASE_VAULT_FILE, Unlock};
 use castellan::custody::{AUTO_UNLOCK_ROOT_FILE, IdentityStorage, IdentityVault, UnlockMethod};
 use castellan::resident::{CastellanResident, CredentialSalts};
 use custody_wire::contract::{CredentialOperation, EpochKeyRequest, PayloadOperation, ReleasedEpochKey, Source};
-use custody_wire::secret::{Bytes, Secret};
+use custody_wire::secret::Bytes;
 use custody_wire::AttestationParts;
 use dramatis::view::{CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView, VaultView};
 use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider, PersonaId, ProfileId};
@@ -33,7 +33,7 @@ use crate::Refusal;
 type Host = PersonaeHost<Box<dyn IdentityStorage>>;
 
 /// The credential catalog's two salts, exactly as Djinn derived them.
-const CREDENTIAL_SALTS: CredentialSalts = CredentialSalts {
+pub const CREDENTIAL_SALTS: CredentialSalts = CredentialSalts {
     record: b"mere.djinn/castellan/records/v1",
     freshness: b"mere.djinn/castellan/freshness/v1",
 };
@@ -65,6 +65,9 @@ pub struct HostCustody {
     configured: Option<ProfileId>,
     host: Option<Arc<Host>>,
     credentials: BTreeMap<ProfileId, CastellanResident>,
+    /// The profile open at the first unlock, whose store takes CXF imports,
+    /// as Djinn's start profile did.
+    credential_primary: Option<ProfileId>,
     known_profile: Option<ProfileId>,
     known_master: Option<[u8; 32]>,
 }
@@ -99,6 +102,7 @@ impl HostCustody {
             configured: profile.map(|p| ProfileId(p.to_string())),
             host: None,
             credentials: BTreeMap::new(),
+            credential_primary: None,
             known_profile: None,
             known_master: None,
         })
@@ -172,6 +176,7 @@ impl HostCustody {
         }
         if let Some(root) = &self.data_root {
             self.credentials = claim_credentials(&host, root, &profile)?;
+            self.credential_primary = Some(profile.clone());
         }
         self.known_master = Some(master);
         self.known_profile = Some(profile);
@@ -255,6 +260,11 @@ impl HostCustody {
         }
     }
 
+    /// The public key of `source`'s root.
+    pub fn public_key(&self, source: Source, profile: Option<&str>) -> Result<[u8; 32], Refusal> {
+        self.provider(source, profile).map(|p| p.master_public_key().to_bytes())
+    }
+
     /// Sign with the key `salt` derives, or with the persona master for an
     /// empty salt. The key never leaves this call.
     pub fn sign(&self, source: Source, profile: Option<&str>, salt: &[u8], message: &[u8]) -> Result<Signed, Refusal> {
@@ -308,13 +318,22 @@ impl HostCustody {
 
     /// One identity intent. Signing decisions belong to the custodian's own
     /// consent channel and are refused here (C04).
-    pub fn intent(&self, intent: &str, payload: &[u8]) -> Result<(), String> {
-        use dramatis::intents::{SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT};
+    pub fn intent(&mut self, intent: &str, payload: &[u8]) -> Result<(), String> {
+        use dramatis::intents::{SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT, SIGNING_DENY_INTENT, VAULT_LOCK_INTENT};
         if matches!(intent, SIGNING_APPROVE_IDLE_INTENT | SIGNING_APPROVE_ONCE_INTENT | SIGNING_DENY_INTENT) {
             return Err("signing decisions are made only on the custodian's consent channel".into());
         }
-        let host = self.host.as_ref().ok_or("vault is locked")?;
-        host.apply_intent(intent, payload).map(|_| ()).map_err(|error| error.to_string())
+        // A lock advances the generation and reports its barrier; only the
+        // lock operation does that.
+        if intent == VAULT_LOCK_INTENT {
+            return Err("lock through the lock operation".into());
+        }
+        let host = Arc::clone(self.host.as_ref().ok_or("vault is locked")?);
+        host.apply_intent(intent, payload).map_err(|error| error.to_string())?;
+        // A switch changes who speaks: the status and `current` grants follow.
+        self.known_profile = Some(host.current_profile_id());
+        self.known_master = Some(host.master_public_key().to_bytes());
+        Ok(())
     }
 
     pub fn has_profile(&self, profile: &str) -> Result<bool, Refusal> {
@@ -353,75 +372,24 @@ impl HostCustody {
     /// mixed in where asked. The epoch itself never crosses.
     pub fn epoch_keys(&self, persona: &str, device_label: Option<&str>, requests: &[EpochKeyRequest]) -> Result<Vec<ReleasedEpochKey>, Refusal> {
         self.unlocked()?;
-        let root = self.wallet()?;
-        let persona = persona_id(persona)?;
-        if requests.is_empty() || requests.iter().any(|r| r.context.is_empty()) {
-            return Err(Refusal("operation-or-scope"));
-        }
-        if pandect::wallet_store::load_persona_wallet(root, persona).map_err(storage)?.is_none() {
-            return Err(Refusal("no-persona"));
-        }
-        let epoch = castellan::custody::wallet::load_current_private_epoch(root, persona)
-            .map_err(storage)?
-            .ok_or(Refusal("locked"))?;
-        let epoch = Zeroizing::new(epoch.epoch_secret);
-        let device_root = match requests.iter().any(|r| r.device_bound) {
-            true => Some(device_root(root, device_label)?),
-            false => None,
-        };
-        Ok(requests
-            .iter()
-            .map(|request| {
-                let mut material = Zeroizing::new(Vec::with_capacity(64));
-                material.extend_from_slice(&*epoch);
-                if let (true, Some(device_root)) = (request.device_bound, device_root.as_ref()) {
-                    material.extend_from_slice(device_root);
-                }
-                let derived = Zeroizing::new(blake3::derive_key(&request.context, &material));
-                let key = match request.public_only {
-                    true => Ed25519Keypair::from_seed(*derived).public_key().to_bytes(),
-                    false => *derived,
-                };
-                ReleasedEpochKey {
-                    request: request.clone(),
-                    key: Secret::copy_from(&key),
-                }
-            })
-            .collect())
+        crate::wallet::epoch_keys(self.wallet()?, persona_id(persona)?, device_label, requests)
     }
 
     /// Issue a sited station's narrow RemoteAuth grant with the wallet seed.
     pub fn station_grant(&self, request: &serde_json::Value, issuer_public_key: &[u8]) -> Result<serde_json::Value, String> {
-        use pandect::station_grant::{SitedStationGrant, SitedStationGrantRequest};
         self.unlocked().map_err(|r| r.0.to_string())?;
         let root = self.wallet().map_err(|r| r.0.to_string())?;
-        let wire: StationGrantWire = serde_json::from_value(request.clone()).map_err(|_| "invalid station grant request")?;
+        let wire: crate::wallet::StationGrantWire = serde_json::from_value(request.clone()).map_err(|_| "invalid station grant request")?;
         let issuer: [u8; 32] = issuer_public_key.try_into().map_err(|_| "issuer key is not 32 bytes")?;
-        let wallet_public_key = self
-            .provider(Source::Wallet, None)
-            .map_err(|r| r.0.to_string())?
-            .master_public_key()
-            .to_bytes();
-        let request = SitedStationGrantRequest::new(
-            pandect::DeviceId::from_uuid(wire.device_id),
-            wire.station_ed25519_public_key,
-            wire.label,
-            wire.issued_at_ms,
-            wire.expires_at_ms,
-        )
-        .map_err(|error| error.to_string())?;
-        let grant = SitedStationGrant::issue_with(root, issuer, wallet_public_key, request, |spec| {
-            castellan::custody::wallet::issue_remote_auth_device_grant(root, spec)
-        })
-        .map_err(|error| error.to_string())?;
-        serde_json::to_value(grant.signed()).map_err(|error| error.to_string())
+        let grant = crate::wallet::station_grant(root, &wire, issuer)?;
+        serde_json::to_value(grant).map_err(|error| error.to_string())
     }
 
     pub fn revoke_device(&self, device_id: &str) -> Result<serde_json::Value, String> {
         self.unlocked().map_err(|r| r.0.to_string())?;
         let root = self.wallet().map_err(|r| r.0.to_string())?;
         let id = uuid::Uuid::parse_str(device_id).map_err(|_| "invalid device id")?;
-        let outcome = castellan::custody::wallet::revoke_remote_auth_device(root, pandect::DeviceId::from_uuid(id)).map_err(|error| error.to_string())?;
+        let outcome = crate::wallet::revoke_device(root, id)?;
         serde_json::to_value(outcome).map_err(|error| error.to_string())
     }
 
@@ -430,33 +398,13 @@ impl HostCustody {
     /// its trust boundary (§5.3).
     #[allow(clippy::too_many_arguments)]
     pub fn payload(&self, profile: &str, persona: &str, master: &[u8], scope: &[u8], content_hash: &str, operation: &PayloadOperation) -> Result<(Vec<u8>, Option<serde_json::Value>), Refusal> {
-        use eidetic::PayloadSealer;
         let host = self.unlocked()?;
         let root = self.wallet()?;
         let persona = persona_id(persona)?;
         let master: [u8; 32] = master.try_into().map_err(|_| Refusal("operation-or-scope"))?;
         let hash: eidetic::Hash = serde_json::from_value(serde_json::Value::String(content_hash.to_string())).map_err(|_| Refusal("operation-or-scope"))?;
-        host.with_current_profile_authority(&ProfileId(profile.into()), &master, || match operation {
-            PayloadOperation::Seal { bytes } => {
-                let sealer = castellan::custody::wallet::epoch_sealer_for_persona(root, persona)
-                    .map_err(storage)?
-                    .ok_or(Refusal("locked"))?
-                    .with_scope(scope.to_vec());
-                let (sealed, marker) = sealer.seal(&hash, &bytes.0).map_err(storage)?;
-                Ok((sealed, Some(serde_json::to_value(marker).map_err(storage)?)))
-            },
-            PayloadOperation::Unseal { bytes, marker } => {
-                let marker: eidetic::SealedBlobRef = serde_json::from_value(marker.clone()).map_err(|_| Refusal("operation-or-scope"))?;
-                let clear = castellan::custody::wallet::unseal_persona_payload(root, persona, &hash, scope, &marker, &bytes.0)
-                    .map_err(storage)?
-                    .ok_or(Refusal("locked"))?;
-                if eidetic::Hash::of(&clear) != hash {
-                    return Err(Refusal("payload-hash-differs"));
-                }
-                Ok((clear, None))
-            },
-        })
-        .map_err(|_| Refusal("profile-changed"))?
+        host.with_current_profile_authority(&ProfileId(profile.into()), &master, || crate::wallet::payload(root, persona, &hash, scope, operation))
+            .map_err(|_| Refusal("profile-changed"))?
     }
 
     /// The credential catalog's operations, as Djinn's keeper ran them.
@@ -466,6 +414,10 @@ impl HostCustody {
 
     pub(crate) fn credential_stores(&self) -> &BTreeMap<ProfileId, CastellanResident> {
         &self.credentials
+    }
+
+    pub(crate) fn credential_primary(&self) -> Option<&ProfileId> {
+        self.credential_primary.as_ref()
     }
 
     pub(crate) fn host(&self) -> Result<&Arc<Host>, Refusal> {
@@ -494,15 +446,6 @@ impl HostCustody {
     pub fn agent_session(&self) -> Option<castellan::custody::agent::VaultAgent<Box<dyn IdentityStorage>>> {
         self.host.as_ref().map(|host| host.agent_session())
     }
-}
-
-#[derive(serde::Deserialize)]
-struct StationGrantWire {
-    device_id: uuid::Uuid,
-    station_ed25519_public_key: [u8; 32],
-    label: String,
-    issued_at_ms: u64,
-    expires_at_ms: u64,
 }
 
 /// The open persona, as an identity provider, without exposing its master.
@@ -536,19 +479,6 @@ fn persona_id(text: &str) -> Result<PersonaId, Refusal> {
     uuid::Uuid::parse_str(text).map(PersonaId::from_uuid).map_err(|_| Refusal("operation-or-scope"))
 }
 
-/// This machine's public device key; a label mints the identity when none.
-fn device_root(root: &Path, label: Option<&str>) -> Result<[u8; 32], Refusal> {
-    let identity = match label {
-        Some(label) => castellan::custody::wallet::ensure_local_device_identity(root, label).map(Some).map_err(storage)?,
-        None => castellan::custody::wallet::load_local_device_identity(root).map_err(storage)?,
-    };
-    match identity {
-        Some(identity) => Ok(Ed25519Keypair::from_seed(identity.device_seed).public_key().to_bytes()),
-        None if pandect::wallet_store::local_device_identity_path(root).is_file() => Err(Refusal("locked")),
-        None => Err(Refusal("no-device-identity")),
-    }
-}
-
 /// Claim every profile's credential store under its own derived keys and
 /// have each follow the host's lock, as Djinn did at start.
 fn claim_credentials(host: &Arc<Host>, data_root: &Path, primary: &ProfileId) -> Result<BTreeMap<ProfileId, CastellanResident>, Refusal> {
@@ -567,17 +497,16 @@ fn claim_credentials(host: &Arc<Host>, data_root: &Path, primary: &ProfileId) ->
             CastellanResident::claim_derived(root.join("records"), root.join("freshness"), &provider, CREDENTIAL_SALTS)
         }
         .map_err(storage)?;
-        host.register_lock_holder(match &id == primary {
-            true => store.lock_holder(CREDENTIAL_SALTS),
-            false => store.lock_holder_for_profile(CREDENTIAL_SALTS, id.clone()),
-        });
+        // Bound to its own profile, so a switch never re-derives a store
+        // under another persona's keys.
+        host.register_lock_holder(store.lock_holder_for_profile(CREDENTIAL_SALTS, id.clone()));
         stores.insert(id, store);
     }
     Ok(stores)
 }
 
 /// Djinn's credential layout: `castellan/profiles/<sanitized id>`.
-pub(crate) fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
+pub fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     let segment: String = profile
         .0
         .chars()

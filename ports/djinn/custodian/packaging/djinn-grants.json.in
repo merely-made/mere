@@ -1,0 +1,58 @@
+[
+  {"operation": "status"}, {"operation": "lock"}, {"operation": "unlock"}, {"operation": "snapshot"},
+  {"operation": "release", "profile": "current", "consent": "@CONSENT@", "salts": [
+    {"named": "djinn-door"},
+    {"exact": "mesh-author"}, {"exact": "distillery-personal-mesh"},
+    {"exact": "mere.djinn/inference/data/v1"},
+    {"prefix": "mere.djinn/personal-inference/writer/v1/"},
+    {"prefix": "graphshell.personal-graph.writer.v1/"},
+    {"prefix": "graphshell.personal-graph.group-session/v1/"},
+    {"prefix": "stickleback/group-prekey-identity/v1"},
+    {"exact": "woodshed.practice-session.seal.v1"},
+    {"exact": "mere/knot-publish/reader/v1"},
+    {"prefix": "graphshell/endpoint-session/"},
+    {"prefix": "hocket/handoff/v2/"},
+    {"prefix": "turnstone.place."},
+    {"prefix": "turnstone/projection-endpoint/"},
+    {"prefix": "personae/gemini-client-identity/v1/"},
+    {"prefix": "mere.commons.writer.v1/"},
+    {"prefix": "mere.commons.chat.writer.v1/"},
+    {"prefix": "mere.gemot.membership.v1/"},
+    {"prefix": "mere.gemot.objects.v1/"},
+    {"prefix": "stickleback/group-key-writer/v1/"},
+    {"delegation": "moot"},
+    {"delegation": "mere.knot"}
+  ]},
+  {"operation": "release", "profile": "any", "consent": "@CONSENT@", "salts": [
+    {"exact": "mesh-author"}, {"exact": "distillery-personal-mesh"},
+    {"exact": "woodshed.practice-session.seal.v1"},
+    {"exact": "mere/knot-publish/reader/v1"},
+    {"prefix": "graphshell/endpoint-session/"},
+    {"prefix": "hocket/handoff/v2/"},
+    {"prefix": "turnstone.place."},
+    {"prefix": "turnstone/projection-endpoint/"},
+    {"prefix": "personae/gemini-client-identity/v1/"},
+    {"prefix": "mere.commons.writer.v1/"},
+    {"prefix": "mere.commons.chat.writer.v1/"},
+    {"prefix": "mere.gemot.membership.v1/"},
+    {"prefix": "mere.gemot.objects.v1/"},
+    {"prefix": "stickleback/group-key-writer/v1/"},
+    {"prefix": "stickleback/group-prekey-identity/v1"},
+    {"delegation": "moot"},
+    {"delegation": "mere.knot"}
+  ]},
+  {"operation": "release", "profile": "current", "source": "wallet", "consent": "@CONSENT@", "salts": [
+    {"named": "reticulum"}, {"named": "tucket-station"}, {"named": "sennet-station"}
+  ]},
+  {"operation": "attest", "profile": "any", "consent": "@CONSENT@", "salts": [
+    {"delegation": "mere.denizen"}, {"delegation": "mere.graphshell"}
+  ]},
+  {"operation": "sign", "profile": "any", "consent": "@CONSENT@",
+   "purpose": {"purpose": "derived", "salts": [{"delegation": "mere.denizen"}]}},
+  {"operation": "sign", "profile": "current", "consent": "@SIGN_CONSENT@",
+   "purpose": {"purpose": "delegation", "audience": "mere.graphshell"}},
+  {"operation": "manage", "consent": "@CONSENT@"},
+  {"operation": "wallet", "consent": "@CONSENT@"},
+  {"operation": "payload", "consent": "@CONSENT@"},
+  {"operation": "credentials", "consent": "@CONSENT@"}
+]

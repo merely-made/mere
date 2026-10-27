@@ -7,7 +7,6 @@ use castellan::{
         IdentitySlot, IdentityStorage, IdentityVault, PassphraseEncryptedStorage, Profile,
         SealedProfileStorage, SecretBytes, UnlockMethod,
     },
-    resident::{CastellanResident, CredentialSalts},
 };
 use djinn::{
     door::{
@@ -134,7 +133,7 @@ fn keeper(
     portable: bool,
     password: &str,
     ui: Arc<dyn NativeIdentityUi>,
-) -> Arc<Keeper<Box<dyn IdentityStorage>>> {
+) -> Arc<Keeper> {
     let storage = open(root, portable, password).unwrap();
     check_profiles(&*storage);
     let host = Arc::new(PersonaeHost::new(
@@ -142,21 +141,7 @@ fn keeper(
         None,
         VaultProtectionView::Passphrase,
     ));
-    let salts = CredentialSalts {
-        record: b"local-auth/records",
-        freshness: b"local-auth/freshness",
-    };
-    let resident = CastellanResident::claim_derived(
-        root.join("records"),
-        root.join("freshness"),
-        host.as_ref(),
-        salts,
-    )
-    .unwrap();
-    host.register_lock_holder(resident.lock_holder_for_profile(salts, ProfileId("family".into())));
-    let k = Arc::new(Keeper::new(host).with_ui(ui));
-    k.attach_credentials(resident).unwrap();
-    k
+    Arc::new(Keeper::new(host).with_ui(ui))
 }
 fn endpoint(root: &Path) -> String {
     #[cfg(windows)]
@@ -172,7 +157,7 @@ fn endpoint(root: &Path) -> String {
     }
 }
 async fn serve(
-    k: Arc<Keeper<Box<dyn IdentityStorage>>>,
+    k: Arc<Keeper>,
     endpoint: String,
 ) -> tokio::task::JoinHandle<()> {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
@@ -232,15 +217,13 @@ async fn resident_requires_dramatis_and_fresh_credentials_and_honors_cancellatio
         let mut c = CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
             .await
             .unwrap();
-        k.host().lock_vault().unwrap();
+        k.lock_vault().unwrap();
         assert_eq!(
             c.change_passphrase_native().await.unwrap(),
             R::Rejected { reason: F::Locked }
         );
         assert_eq!(ui.0.lock().unwrap().len(), 12);
-        k.host()
-            .unlock_vault(UnlockMethod::Passphrase(OLD.as_bytes()))
-            .unwrap();
+        k.unlock_with_passphrase(OLD.as_bytes()).unwrap();
         for expected in [
             R::Cancelled,
             R::Rejected {

@@ -240,8 +240,28 @@ pub enum SaltRule {
     PrefixHex(String),
     /// Every delegation scope key in this insigne domain.
     Delegation(String),
-    /// A family matcher: `reticulum`, `tucket-station` or `sennet-station`.
+    /// A family matcher: `reticulum`, `tucket-station` or `sennet-station`;
+    /// or `djinn-door`, exactly the open profile's two door keys.
     Named(String),
+}
+
+/// Djinn's door keys for the profile whose master is `master`: the local
+/// grant's delegation signer and the session signer bound to its local
+/// network (`djinn::door::local_session::door_salts`, pinned against this by
+/// Djinn's tests). Naming them exactly keeps every other `mere.graphshell`
+/// delegation key sign-only.
+pub fn door_salts(master: &[u8; 32]) -> [Vec<u8>; 2] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"mere.graphshell/local-browser-network/v1");
+    hasher.update(master);
+    let network = notochord::NetworkId(*hasher.finalize().as_bytes());
+    let scope = insigne::delegation::CapabilityScope {
+        domain: "mere.graphshell".into(),
+        resource: network.0.to_vec(),
+        path_prefix: String::new(),
+        actions: Default::default(),
+    };
+    [insigne::delegation::delegation_signing_salt(&scope), notochord::network_session_signing_salt(&network)]
 }
 
 fn hex(text: &str) -> Option<Vec<u8>> {
@@ -255,6 +275,15 @@ fn prefixed(salt: &[u8], prefix: &[u8]) -> bool {
 }
 
 impl SaltRule {
+    /// [`Self::allows`], with the open profile's master for a rule that
+    /// names that profile's own keys; `None` for any other profile.
+    pub fn allows_under(&self, salt: &[u8], master: Option<&[u8; 32]>) -> bool {
+        match (self, master) {
+            (Self::Named(name), Some(master)) if name == "djinn-door" => !salt.is_empty() && door_salts(master).iter().any(|door| door == salt),
+            _ => self.allows(salt),
+        }
+    }
+
     pub fn allows(&self, salt: &[u8]) -> bool {
         if salt.is_empty() {
             return false;
@@ -278,7 +307,7 @@ impl SaltRule {
         match self {
             Self::Exact(text) | Self::Prefix(text) | Self::Delegation(text) => !text.is_empty(),
             Self::ExactHex(text) | Self::PrefixHex(text) => hex(text).is_some_and(|b| !b.is_empty()),
-            Self::Named(name) => matches!(name.as_str(), "reticulum" | "tucket-station" | "sennet-station"),
+            Self::Named(name) => matches!(name.as_str(), "reticulum" | "tucket-station" | "sennet-station" | "djinn-door"),
         }
     }
 

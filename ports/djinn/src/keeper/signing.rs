@@ -15,6 +15,8 @@ use personae::signing::{RememberApproval, SigningDecision};
 
 use crate::identity_ui::NativeIdentityUi;
 
+#[allow(dead_code)]
+#[allow(dead_code)]
 pub(super) fn is_signing_decision(intent: &str) -> bool {
     matches!(
         intent,
@@ -22,7 +24,7 @@ pub(super) fn is_signing_decision(intent: &str) -> bool {
     )
 }
 
-pub(super) fn confirm<S: IdentityStorage + 'static>(
+pub(crate) fn confirm<S: IdentityStorage + 'static>(
     host: &PersonaeHost<S>,
     ui: &dyn NativeIdentityUi,
     intent: &str,

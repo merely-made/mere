@@ -73,7 +73,7 @@ fn options(root: &Path, endpoint: &str) -> ReservoirAttachmentOptions {
     }
 }
 
-fn identity() -> Arc<PersonaeHost<InMemoryStorage>> {
+fn identity() -> Arc<dyn djinn::custody_host::ResidentCustody> {
     let profile = Profile::new(
         ProfileId("v5-fixture".into()),
         "V5 fixture",
@@ -350,7 +350,7 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
     ));
     host.lock_vault().unwrap();
     let config = options(&root.path().join("meres"), &endpoint());
-    let locked = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone()) }).await;
+    let locked = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn djinn::custody_host::ResidentCustody>) }).await;
     assert!(
         matches!(locked, Err(ReservoirAttachmentError::Embedded(reason)) if reason.contains("locked"))
     );
@@ -359,7 +359,7 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
         b"isolated v5 fixture",
     ))
     .unwrap();
-    let attached = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone()) })
+    let attached = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn djinn::custody_host::ResidentCustody>) })
         .await
         .unwrap();
     host.lock_vault().unwrap();

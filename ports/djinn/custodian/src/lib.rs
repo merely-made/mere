@@ -26,10 +26,13 @@ pub mod core;
 mod credentials;
 pub mod delegation;
 pub mod driver;
+#[cfg(feature = "fixture")]
+pub mod fixture;
 pub mod platform;
 pub mod policy;
 pub mod host;
 pub mod synthetic;
+pub mod wallet;
 
 /// A refusal with a stable, secret-free code.
 #[derive(Debug, Clone, PartialEq, Eq)]

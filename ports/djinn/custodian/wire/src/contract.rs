@@ -86,6 +86,11 @@ pub enum Operation {
         salt: Bytes,
         message: Bytes,
     },
+    /// The public key of `source`'s root (a named persona or the wallet).
+    PublicKey {
+        source: Source,
+        profile: Option<String>,
+    },
     /// The public identity read model, answerable while locked.
     Snapshot {},
     /// One typed identity intent (dramatis names). Signing decisions are
@@ -319,6 +324,10 @@ pub enum Answer {
     },
     /// The mutation is done; nothing to report.
     Done {},
+    PublicKey {
+        #[serde(with = "fixed")]
+        key: [u8; 32],
+    },
     Bool {
         value: bool,
     },

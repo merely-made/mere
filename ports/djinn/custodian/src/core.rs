@@ -384,9 +384,13 @@ impl Core {
             }
             hasher.finalize().to_hex().to_string()
         };
+        let open_master = self.vault.master_public_key();
+        // A rule naming the open profile's own keys sees its master only for
+        // the open profile's persona root.
+        let master_for = |source: Source, profile: &str| (matches!(source, Source::Persona) && profile == current).then_some(open_master.as_ref()).flatten();
         let releasable = |source: Source, profile: &str, salt: &[u8]| {
             grants().find_map(|(index, grant)| match grant {
-                Grant::Release { profile: scope, salts: rules, consent, source: from } if from.matches(source) && scope.covers(profile, &current) && rules.iter().any(|r| r.allows(salt)) => Some((index, *consent)),
+                Grant::Release { profile: scope, salts: rules, consent, source: from } if from.matches(source) && scope.covers(profile, &current) && rules.iter().any(|r| r.allows_under(salt, master_for(source, profile))) => Some((index, *consent)),
                 _ => None,
             })
         };
@@ -433,7 +437,7 @@ impl Core {
             Operation::Attest { source, profile, salt } => {
                 let profile = profile.clone().unwrap_or_else(|| current.clone());
                 let attestable = grants().find_map(|(index, grant)| match grant {
-                    Grant::Attest { profile: scope, salts: rules, consent, source: from } if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows(&salt.0)) => Some((index, *consent)),
+                    Grant::Attest { profile: scope, salts: rules, consent, source: from } if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows_under(&salt.0, master_for(*source, &profile))) => Some((index, *consent)),
                     _ => None,
                 });
                 let (index, consent) = attestable.or_else(|| releasable(*source, &profile, &salt.0)).ok_or_else(refused)?;
@@ -446,7 +450,7 @@ impl Core {
                 let profile = profile.clone().unwrap_or_else(|| current.clone());
                 let signable = grants().find_map(|(index, grant)| match grant {
                     Grant::Sign { profile: scope, purpose: PurposeRule::Derived { source: from, salts: rules }, consent }
-                        if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows(&salt.0)) =>
+                        if from.matches(*source) && scope.covers(&profile, &current) && rules.iter().any(|r| r.allows_under(&salt.0, master_for(*source, &profile))) =>
                     {
                         Some((index, *consent))
                     },
@@ -456,6 +460,14 @@ impl Core {
                 Ok((index, consent, ("sign-derived", profile, "derived-key".into(), digest(&message.0))))
             },
             Operation::Snapshot {} => self.coarse(principal, |g| matches!(g, Grant::Snapshot), ("snapshot", String::new(), String::new(), String::new())),
+            Operation::PublicKey { source, profile } => {
+                let profile = profile.clone().unwrap_or_else(|| current.clone());
+                let found = grants().find_map(|(index, grant)| match grant {
+                    Grant::Release { profile: scope, source: from, .. } | Grant::Attest { profile: scope, source: from, .. } if from.matches(*source) && scope.covers(&profile, &current) => Some(index),
+                    _ => None,
+                });
+                found.map(|index| (index, Consent::None, ("public-key", profile, String::new(), String::new()))).ok_or_else(refused)
+            },
             Operation::Intent { intent, payload } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("intent", current.clone(), intent.chars().take(64).collect(), digest(&payload.0))),
             Operation::HasProfile { profile } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("has-profile", profile.clone(), String::new(), String::new())),
             Operation::ChangePassphrase { .. } => self.coarse(principal, |g| matches!(g, Grant::Manage { .. }), ("change-passphrase", current.clone(), String::new(), String::new())),
@@ -625,9 +637,15 @@ impl Core {
         }
         let pending = self.queue.remove(position).expect("position is in range");
         self.active = None;
+        // An SSH signing petition has no requesting session: the client
+        // waiting on the agent is the requester.
+        let requester_gone = pending.session != NO_SESSION && !self.sessions.contains_key(&pending.session);
+        let (session, request) = (pending.session, pending.request);
         let outcome = if !accept {
+            self.withdraw(&pending);
             Outcome::refused("consent-denied")
-        } else if self.revoked.contains(&pending.principal) || !self.sessions.contains_key(&pending.session) {
+        } else if self.revoked.contains(&pending.principal) || requester_gone {
+            self.withdraw(&pending);
             Outcome::refused("invalidated")
         } else {
             if pending.consent == Consent::PerGeneration {
@@ -635,13 +653,28 @@ impl Core {
             }
             self.execute(pending.deferred, effects)
         };
-        effects.messages.push((pending.session, ServerMessage::Outcome {
-            request: pending.request,
-            generation: self.generation,
-            outcome,
-        }));
+        self.settle(session, request, outcome, effects);
         self.promote(effects);
         Ok(())
+    }
+
+    /// Answer the session that asked; a signing petition has none.
+    fn settle(&self, session: SessionId, request: u64, outcome: Outcome, effects: &mut Effects) {
+        if session != NO_SESSION {
+            effects.messages.push((session, ServerMessage::Outcome {
+                request,
+                generation: self.generation,
+                outcome,
+            }));
+        }
+    }
+
+    /// A petition that will not run: an SSH request is denied in the broker
+    /// at once rather than left to Castellan's own timeout.
+    fn withdraw(&self, pending: &Pending) {
+        if let Deferred::Signing(request) = pending.deferred {
+            let _ = self.vault.decide_signing(request, false);
+        }
     }
 
     fn execute(&mut self, deferred: Deferred, effects: &mut Effects) -> Outcome {
@@ -710,6 +743,7 @@ impl Core {
                 self.vault.sign(source, profile.as_deref(), &salt.0, &message.0).map_or_else(refuse, signature)
             },
             Operation::Snapshot {} => self.vault.snapshot().map_or_else(refuse, |snapshot| success(Answer::Snapshot { snapshot: Box::new(snapshot) })),
+            Operation::PublicKey { source, profile } => self.vault.public_key(source, profile.as_deref()).map_or_else(refuse, |key| success(Answer::PublicKey { key })),
             Operation::Intent { intent, payload } => self.vault.intent(&intent, &payload.0).map_or_else(|e| text("intent-refused", e), |()| success(Answer::Done {})),
             Operation::HasProfile { profile } => self.vault.has_profile(&profile).map_or_else(refuse, |value| success(Answer::Bool { value })),
             Operation::ChangePassphrase { old, new } => self.vault.change_passphrase(old.expose(), new.expose()).map_or_else(|e| text("passphrase-change-refused", e), |()| success(Answer::Done {})),
@@ -778,16 +812,13 @@ impl Core {
 
     fn cancel(&mut self, which: impl Fn(&Pending) -> bool, effects: &mut Effects) {
         let mut kept = VecDeque::new();
-        for pending in self.queue.drain(..) {
+        for pending in std::mem::take(&mut self.queue) {
             if which(&pending) {
                 if self.active.as_deref() == Some(pending.digest.as_str()) {
                     self.active = None;
                 }
-                effects.messages.push((pending.session, ServerMessage::Outcome {
-                    request: pending.request,
-                    generation: self.generation,
-                    outcome: Outcome::refused("invalidated"),
-                }));
+                self.withdraw(&pending);
+                self.settle(pending.session, pending.request, Outcome::refused("invalidated"), effects);
             } else {
                 kept.push_back(pending);
             }
@@ -818,16 +849,13 @@ impl Core {
     fn expire(&mut self, now: Instant) -> Effects {
         let mut effects = Effects::default();
         let mut kept = VecDeque::new();
-        for pending in self.queue.drain(..) {
+        for pending in std::mem::take(&mut self.queue) {
             if pending.deadline <= now {
                 if self.active.as_deref() == Some(pending.digest.as_str()) {
                     self.active = None;
                 }
-                effects.messages.push((pending.session, ServerMessage::Outcome {
-                    request: pending.request,
-                    generation: self.generation,
-                    outcome: Outcome::refused("consent-expired"),
-                }));
+                self.withdraw(&pending);
+                self.settle(pending.session, pending.request, Outcome::refused("consent-expired"), &mut effects);
             } else {
                 kept.push_back(pending);
             }

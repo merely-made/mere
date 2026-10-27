@@ -12,7 +12,12 @@ categories = ["command-line-utilities", "authentication"]
 
 [features]
 default = ["personal-sync", "cxf"]
-cxf = ["personal-sync", "castellan/cxf"]
+cxf = ["personal-sync"]
+# Castellan's host in this process (custody isolation plan, H2): only for
+# the test suites and receipt hosts that predate the custodian. A production
+# build has no such feature, links no castellan and reaches its vault only
+# through the installed custodian.
+in-process-custody = ["dep:castellan", "castellan/cxf", "dep:djinn-custodian", "djinn-custodian/fixture"]
 personal-sync = []
 moot-site = ["site-model/publication", "dep:gemot", "dep:errand", "dep:pollster", "dep:scroll-protocol", "dep:url"]
 moot-site-nomadnet = ["moot-site", "dep:retinue"]
@@ -25,7 +30,7 @@ knot-site-nomadnet = ["knot-site/retinue"]
 # it on through the dev-dependency on this package below; release builds keep
 # the prompt only.
 passphrase-fd = []
-custody-receipt-host = []
+custody-receipt-host = ["in-process-custody"]
 # The Distillery trainer resource, composed into the works lane
 # (`src/resident_distillery.rs`). Gated because it pulls the burn stack into
 # the desktop resident: a default build must stay light, and a lane whose
@@ -59,6 +64,7 @@ trainer-autodiff = ["trainer", "distillery/trainer-autodiff"]
 # resident binary or importing fixture release identity into product startup.
 distillery-chronicle-receipt-host = [
     "personal-sync",
+    "in-process-custody",
     "graphshell/webrtc-session",
     "graphshell-host/webrtc-session",
     "dep:webrtc-carrier",
@@ -101,7 +107,8 @@ chatelaine.workspace = true
 # The one crate allowed to link castellan (dramatis repo plan, D4, D16).
 # `os-presence`: the resident's own unlock prompt asks Windows Hello first
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
-castellan = { workspace = true, features = ["keeper", "os-presence"] }
+castellan = { workspace = true, features = ["keeper", "os-presence"], optional = true }
+djinn-custodian = { path = "custodian", optional = true }
 chirograph.workspace = true
 # Divination replay authority is supplied by the product's portable package;
 # the native Cleromancy executable may itself embed Djinn without a crate cycle.
@@ -255,22 +262,22 @@ required-features = ["personal-sync"]
 [[bin]]
 name = "h4_identity_receipt"
 path = "src/bin/h4_identity_receipt.rs"
-required-features = ["personal-sync"]
+required-features = ["personal-sync", "in-process-custody"]
 
 [[bin]]
 name = "persona_switch_receipt"
 path = "src/bin/persona_switch_receipt.rs"
-required-features = ["personal-sync"]
+required-features = ["personal-sync", "in-process-custody"]
 
 [[bin]]
 name = "h4d_browser_receipt_host"
 path = "src/bin/h4d_browser_receipt_host.rs"
-required-features = ["personal-sync"]
+required-features = ["personal-sync", "in-process-custody"]
 
 [[bin]]
 name = "h4e_browser_import_receipt_host"
 path = "src/bin/h4e_browser_import_receipt_host.rs"
-required-features = ["personal-sync"]
+required-features = ["personal-sync", "in-process-custody"]
 
 [[bin]]
 name = "distillery_chronicle_receipt_host"
@@ -285,13 +292,14 @@ esp.workspace = true
 knot-editor = { workspace = true, features = ["mere-overlay"] }
 # This package with `passphrase-fd`, so the binary the tests spawn reads the
 # harness's passphrase (ruling 65).
-djinn = { path = ".", default-features = false, features = ["passphrase-fd"] }
+djinn = { path = ".", default-features = false, features = ["passphrase-fd", "in-process-custody"] }
 # The shared resident harness (djinn test harness plan): path only, unpublished,
 # so packaging drops it.
 djinn-testkit = { path = "../../crates/system/djinn-testkit" }
 insigne = { workspace = true, features = ["verify"] }
-# The custody isolation H1 tests run Djinn's client against a real custodian.
-djinn-custodian = { path = "custodian" }
+# The custody isolation tests run Djinn's client against a real custodian,
+# served from a test thread over a synthetic vault.
+djinn-custodian = { path = "custodian", features = ["fixture"] }
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
 # so the test names safetensors (and eidetic, which production names too since

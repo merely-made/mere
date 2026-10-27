@@ -13,8 +13,10 @@
 //! is refused, so a passphrase vault beside it is never shadowed.
 
 use std::io;
+#[cfg(feature = "in-process-custody")]
 use std::path::Path;
 
+#[cfg(feature = "in-process-custody")]
 use castellan::custody::{IdentityStorage, SealedProfileStorage};
 use zeroize::Zeroizing;
 
@@ -30,6 +32,7 @@ pub fn read_from_terminal(prompt: &str) -> io::Result<Zeroizing<String>> {
 
 /// First enrollment in native masked prompts, with no terminal fallback.
 /// Existing-root and already-enrolled checks run before either prompt.
+#[cfg(feature = "in-process-custody")]
 pub fn enroll_passphrase_native(
     vault_dir: &Path,
     ui: &dyn crate::identity_ui::NativeIdentityUi,
@@ -37,6 +40,7 @@ pub fn enroll_passphrase_native(
     enroll_passphrase(vault_dir, &mut |message| read_from_native(ui, message))
 }
 
+#[cfg(feature = "in-process-custody")]
 fn read_from_native(
     ui: &dyn crate::identity_ui::NativeIdentityUi,
     message: &str,
@@ -55,6 +59,7 @@ fn read_from_native(
 }
 
 /// Enrol a passphrase over the vault at `vault_dir`, asking twice.
+#[cfg(feature = "in-process-custody")]
 pub fn enroll_passphrase(vault_dir: &Path, read: &mut ReadSecret<'_>) -> Result<String, String> {
     let storage = SealedProfileStorage::open_existing_auto_os(vault_dir)
         .map_err(|error| error.to_string())?
@@ -85,7 +90,7 @@ pub fn enroll_passphrase(vault_dir: &Path, read: &mut ReadSecret<'_>) -> Result<
     ))
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "in-process-custody"))]
 mod tests {
     use castellan::custody::{IdentityVault, Profile, UnlockMethod};
     use personae::{Ed25519Keypair, ProfileId};

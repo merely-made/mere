@@ -131,7 +131,10 @@ pub(crate) fn run(custody: &HostCustody, operation: &CredentialOperation) -> Res
                 return Err("CXF source changed; preview it again".into());
             }
             let destinations = serde_json::from_value(destinations.clone()).map_err(|_| "invalid destination choices")?;
-            let resident = stores.get(&host.current_profile_id()).ok_or("credential authority is unavailable")?;
+            let resident = custody
+                .credential_primary()
+                .and_then(|primary| stores.get(primary))
+                .ok_or("credential authority is unavailable")?;
             match import.commit(destinations, resident, host.as_ref()) {
                 Ok(receipt) => serde_json::to_value(receipt).map_err(|e| e.to_string()),
                 Err(failure) => Err(format!(

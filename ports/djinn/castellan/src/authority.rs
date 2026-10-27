@@ -1122,6 +1122,11 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         Ok(act())
     }
+    /// The wallet and carry data root this host was composed with.
+    pub fn data_root(&self) -> Option<&std::path::Path> {
+        self.data_root.as_deref()
+    }
+
     /// Sign `message` with the open persona's master under the host's lock.
     /// Only the independent custodian calls this, after its own consent; no
     /// master seed is returned.
