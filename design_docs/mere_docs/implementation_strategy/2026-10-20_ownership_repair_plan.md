@@ -267,6 +267,25 @@ words are under each, unnumbered until he numbers them:
   Mark, 2026-10-26: **"Yes, join the invariant (Recommended)"**. `ReplaySetEdgesByIds` and
   `ReplaySetResourceEdgesByIds` run the shared validator; legacy migration gets an explicit
   staged state the check tolerates until it completes.
+- **Q031's legacy baselines with copies** (L1, 2026-10-26, the lane stopped rather than picked).
+  With checked load refusing a repeated handle, the caller-qualified legacy migration dedupes the
+  identical parallel copies of the Resource rows it builds for each claim and records each dedupe
+  as a `LegacyMigrationNote` on the owning Resource (`legacy_resource_migration/copies.rs`). Two
+  baselines still fail the migration's final checked load with the shared reason, confirmed by
+  throwaway probes: identical copies of a Surface-placed claim (for example `UserGrouped` on
+  parallel Surface rows), whose dedupe would belong in the Surface write-back after "Remove
+  surface authority first" (`legacy_resource_migration.rs:823` onward); and a baseline whose
+  Resource rows already hold copies that the migration never placed, where a dedupe rewrites rows
+  with `baseline_effects` consequences. Either the dedupe extends to those two, at whole-row or
+  statement granularity; or those baselines are refused and migrated by hand. Also open: the
+  frozen link still refuses an empty handle that checked load accepts.
+- **Q010 in legacy migration** (L1, 2026-10-26, the lane stopped rather than picked). Checked
+  replay now refuses a malformed facet record, but the caller-qualified legacy migration replays
+  its journal under `OnRefusal::Drop`, and `legacy_resource_migration.rs:395` still drops such a
+  record with `if let Some(delta) = entry.delta.replay_delta_as(..)`. Either migration refuses it
+  as a `LegacyMigrationError`, as `check_typed_record` at `:398` refuses an invalid typed resource
+  capture; or it keeps dropping, since the migration is caller-qualified and its diagnostics could
+  count the drop. Once decided, the three drop-both adapters in `capture/replay_outcome.rs` go.
 - **The workshop's home**, raised by the lanes-to-tabard cut (stack modularity map cue,
   2026-10-26). `tabard-workshop` is the only crate under `crates/cambium/` that links the
   document stack; it was placed there on 2026-10-08 so applications other than the Tabard port
@@ -347,3 +366,13 @@ words are under each, unnumbered until he numbers them:
   access that exists on every target, and the proof JSON records a refusal (busy frame gate or
   lost device) in place of a value it never read, instead of inventing one. The example's wasm32
   check passes.
+- 2026-10-26 (L1, third pass, Mark's rulings applied): Q010, a malformed facet record is a
+  `Replay::Malformed` outcome the checked loops refuse and the tolerant loops drop, with obsolete
+  imagery an explicit `Skip`; Q031, one rule in `graph/assertion_handles.rs` serves checked and
+  recorded load, selection freeze and link freeze with one reason, and the caller-qualified
+  migration dedupes the copies it builds and says so in a `LegacyMigrationNote`; Q016's edge
+  replay arms consult the widened handle validator (`PendingWrite`) and migration runs inside the
+  explicit `stage_edges`/`settle_staged_edges` scope. Kernel lib 505/505 and both reopen tests,
+  Pandect 340 lib and 28 integration tests green; one Pandect frozen-record test now asserts the
+  refusal of an identical copy. New forks in §5: Q031's legacy baselines that already hold copies,
+  and whether migration drops or refuses a malformed facet record. Receipt updated.
