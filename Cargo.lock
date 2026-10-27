@@ -4930,6 +4930,8 @@ dependencies = [
  "tempfile",
  "tokio",
  "uuid",
+ "windows",
+ "windows-future",
  "windows-sys 0.59.0",
  "zeroize",
 ]
