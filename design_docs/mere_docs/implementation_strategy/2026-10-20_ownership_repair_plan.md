@@ -351,8 +351,8 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   keys and still passes on the repaired code, the foreign node opened as the session's graph. The
   journal digest cannot reach this; chartulary does not have the gap because its `Snapshot` is one
   record carrying contents and digest together (`spine.rs:75` at eidetic `cceb203`). The repaired
-  cases are a whole checkpoint (record and files) taken beside another journal, which open now
-  refuses as Corrupt, and a checkpoint with no digest, which open ignores for a full replay.
+  cases are a whole checkpoint (record and files) taken beside another journal, which open then
+  refused as Corrupt, and a checkpoint with no digest, which open ignores for a full replay.
   Either (a) the checkpoint
   record also stores a muniment `Hash` of the stored bytes of `graph.json` and `facets.json`, which
   open hashes as read: bytes as stored, no new format for the files, and a hand edit of either
@@ -361,6 +361,14 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   kernel's `GraphSnapshot` and `NodeFacetStore` each carry the digest, a change to two kernel
   formats. And whichever binds, a mismatch is Corrupt, as a foreign journal digest now is, or the
   checkpoint is ignored for the replay, as a missing one is.
+  Mark, 2026-10-27 (asked in the Q002 session): **"Hash in the record (Recommended)"**.
+  `Checkpoint.contents_digest` holds a muniment `Hash` of the stored bytes of `graph.json` and
+  `facets.json`, each length-framed; open hashes the bytes as read, and a checkpoint that names no
+  such hash is treated as naming no files. One reading to confirm or reverse: a session with a
+  retained legacy translation is not hashed, because its checkpoint is already compared with that
+  translation and a difference there is refused as Corrupt (the existing
+  `translated_checkpoint_rejects_valid_truth_changes_before_admission`), which his mismatch answer
+  below would otherwise have turned into a replay.
 - **Q002, a digest the entries' encoding can move.** The journal digest is taken over each entry's
   canonical serde encoding (`muniment` `journal/digest.rs`), because stored bytes change with the
   codec and, for a hash-ordered map, from one save to the next. So an entry type whose
@@ -372,6 +380,14 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   entry type's owner versions any change to how existing entries encode; or a mismatch is
   treated as unverifiable and replayed, which keeps old checkpoints usable across such a change
   and gives up the loud signal for a substituted checkpoint.
+  Mark, 2026-10-27 (asked in the Q002 session): **"Replay past it (Recommended)"**, and for the
+  matchable `StoreError` variant, **"Keep Codec (Recommended)"**, which is moot once a mismatch
+  replays. A checkpoint is a cache the journal outranks: chartulary's `load_checkpointed` and
+  Pandect's open ignore one that names no journal prefix, another journal's prefix, a prefix past
+  the end of this journal, or (Pandect) files that are not the ones it wrote, replay in full, and
+  the next checkpoint names what it was written with. No digest mismatch is an error any longer.
+  chartulary's refusal of a legacy (assertion-less) snapshot past the journal
+  (`legacy snapshot sequence ... exceeds journal length`) is outside this and stays.
 
 ## 6. Findings
 
@@ -474,11 +490,21 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   `load_checkpointed` refuses a snapshot of another prefix and replays in full past one with no
   digest (Mark's two answers); `Container` tags serialize sorted so a journal entry holding them
   digests alike after a reload. Pandect's `Checkpoint` stores it, open refuses a mismatch as
-  Corrupt naming the checkpoint and ignores a digest-less checkpoint for the baseline-plus-journal
-  replay, and the next checkpoint writes the digest. Regressions in muniment (7), chartulary (6)
+  Corrupt naming the checkpoint (replayed past since, below) and ignores a digest-less checkpoint
+  for the baseline-plus-journal replay, and the next checkpoint writes the digest. Regressions in muniment (7), chartulary (6)
   and Pandect (3); mutation controls that remove the check, the digest-less path and the sorting
   each fail the matching ones. The audit's swapped
   `graph.json`/`facets.json` probe still opens the foreign graph, because the journal digest cannot
   reach files outside the record that holds it: that, and what an entry-encoding change does to a
   stored digest, are two forks in §5. Eidetic `cceb203`; kernel lib 513, Pandect lib 347 and its 28
   integration tests (other sessions' tests are in those counts). Receipt updated.
+- 2026-10-27 (L1, Q002 follow-through, Mark's two answers applied): a checkpoint that cannot be shown
+  to match is replayed past instead of refused, in chartulary (eidetic `e7eef1e`) and Pandect, and
+  Pandect's checkpoint record now also hashes the stored bytes of `graph.json` and `facets.json`, so
+  the audit's swapped-file probe no longer opens the foreign graph (the probe now fails at its
+  defect assertion). The earlier foreign-journal regression changed from Corrupt to replay; two
+  regressions are new, one for replaced files and one for a record that names no files. A session
+  with a retained translation keeps its own comparison and refusal (a reading for Mark to confirm,
+  §5). Kernel lib 513, Pandect lib 349 and its 28 integration tests, chartulary 94, muniment 54.
+  `stickleback` (105 and 5 tests) passes on eidetic `cceb203`; the full-workspace stall was feature
+  unification, not that crate. Receipt updated.
