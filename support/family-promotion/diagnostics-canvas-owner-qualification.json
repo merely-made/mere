@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-26",
+  "status": "Qualified for source-qualified graph/model inputs and in-tree delayed layout installation",
+  "implementation_commit": "e870314e6df2e030f12328f2fe02f7df0db05e5e",
+  "basis": "8d69c9144a8c10e437287fb0a82044be3b0b8659",
+  "source_snapshot": "diagnostics-canvas-owner-source.json",
+  "review_and_remaining_migrations": "diagnostics-canvas-owner-review.json",
+  "distinct_passed": 1192,
+  "existing_ignored": 18,
+  "tests": {
+    "kernel": {
+      "passed": 513,
+      "existing_ignored": 0
+    },
+    "canvas": {
+      "passed": 645,
+      "existing_ignored": 18
+    },
+    "reader": {
+      "passed": 12,
+      "existing_ignored": 0
+    },
+    "workspace-refresh": {
+      "passed": 22,
+      "existing_ignored": 0
+    }
+  },
+  "compile_gates": {
+    "signals": "diagnostics-canvas-owner-signals.json",
+    "wasm": "diagnostics-canvas-owner-wasm.json",
+    "embedding": "diagnostics-canvas-owner-embedding.json"
+  },
+  "repeated_subsets": "6 then 10 focused controls are subsets of the full Canvas suite, excluded from distinct total.",
+  "zero_test_receipt": {
+    "receipt": "diagnostics-canvas-owner-owner-refresh.json",
+    "counted": false,
+    "receiving": "Reran with retained-content,workspace-editor; 22 owner tests pass in diagnostics-canvas-owner-workspace-refresh.json"
+  },
+  "red_green": {
+    "red": "diagnostics-canvas-owner-red-online.json",
+    "result": "Five failures and one ordinary-edit passing control before the fix; full Canvas suite now passes.",
+    "initial_offline_failure": "diagnostics-canvas-owner-red.json",
+    "note": "Pinned Eidetic source required an online locked fetch. This patch repins no dependency and preserves the basis manifests/lock."
+  },
+  "formatting": {
+    "exit_code": 0,
+    "scope": "All task-owned Rust files with skip_children=true"
+  },
+  "documentation_audit": {
+    "before": "diagnostics-canvas-owner-docs-baseline.json",
+    "after": "diagnostics-canvas-owner-docs-received.json",
+    "exit_code": 1,
+    "pre_existing_errors": 45,
+    "exact_error_array_unchanged": true,
+    "not_a_clean_global_audit": true
+  },
+  "preservation": "diagnostics-canvas-owner-preservation.json",
+  "limits": [
+    "Graph input keys and Canvas result ownership are process-local; no durable ID or snapshot schema change, serialization/transport identity, backend acknowledgement or terminal actor completion claim.",
+    "Admission here checks layout owner, replacement epoch and graph structural inputs. External raw samplers/installers and content/affinity providers still need request, recipe, viewport and policy provenance through their own receiving boundaries.",
+    "Inline/sliced model and community protocol/source receiving controls are automated evidence. They do not establish headed AT, physical handoff or provider-specific blocked-worker/network races.",
+    "Further shared/product caches must adopt owner-qualified inputs at their own boundaries; source-specific links/fields/assertions, authored curation and durable/kernel transaction migrations remain separately tracked."
+  ],
+  "retained_byte_cap": 10000000,
+  "target": "C:/t/cargo-targets/mere",
+  "isolated_target": null,
+  "isolated_cargo_home": null,
+  "documentation_sha256": {
+    "design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md": "58fd1efd2d9a3fabe9efdf24a189d215c09e2d31940fbb72276099565bdc2533",
+    "support/family-promotion/diagnostics-ownership-review.json": "3cafc34a78e31d11fe3d2b9c50d574de79c5eca94b3e37f0c9a897b51f5edc4f"
+  },
+  "receipt_sha256": {
+    "support/family-promotion/diagnostics-canvas-owner-brief.json": "25a458344dbf22bd88d1d1acc14d0b66c9aa6f67150e13d9f35c92e9d736a576",
+    "support/family-promotion/diagnostics-canvas-owner-canvas.json": "fc3ee9085de1412fddd88089f5316aa300c7b360654d4ef6b93ce4125b5cc0db",
+    "support/family-promotion/diagnostics-canvas-owner-controls-final.json": "fcbb28f3660145943a6b3fcdc834645bafd69a36231b357c63a22430bba9b03d",
+    "support/family-promotion/diagnostics-canvas-owner-controls.json": "9bd82b7d2ac50ea9c9bf583c5bb1f746c1e0e609b250ed63bee896ca0f07cf5d",
+    "support/family-promotion/diagnostics-canvas-owner-docs-baseline.json": "e5236e1699ecc46ec7197fb1751dca8b1dd2f2a89e6b5d3ac29357d3953ce72e",
+    "support/family-promotion/diagnostics-canvas-owner-docs-final.json": "b90411a1250ad9c519815db12737f6b644777307fd31adb7fac28b15e0c6a6f9",
+    "support/family-promotion/diagnostics-canvas-owner-docs-received.json": "4056a6f1ee21d1f4b6b6376b200631d2a1355e687abe8a274989a5240ee518ac",
+    "support/family-promotion/diagnostics-canvas-owner-embedding.json": "60c40cd680669a0a0b854ae893d7c15c2f081eb71fe8fccb2066f6805762fb53",
+    "support/family-promotion/diagnostics-canvas-owner-kernel.json": "33904bc554dd4fe4973e8bfa6e08c55b1364831c81378329e25299c1dfe1e80e",
+    "support/family-promotion/diagnostics-canvas-owner-owner-refresh.json": "5e182e026a7413e59f559896be3dedb306af609670615f3758791a7a1701a564",
+    "support/family-promotion/diagnostics-canvas-owner-preservation.json": "f36d4efe609d776a9f92809942056b22814295cef8e01b26a03d2ec58de7858b",
+    "support/family-promotion/diagnostics-canvas-owner-reader.json": "d4d313039fc222a514eaa267c1377f1f1de33af63e0c2d9ed0ce08316bba7adf",
+    "support/family-promotion/diagnostics-canvas-owner-red-online.json": "ef6226bd6ff73a8770a98805d807536e124dd8172e12faebb3dfa016d02645c3",
+    "support/family-promotion/diagnostics-canvas-owner-red.json": "2fca4aad8ec24ae517d30c66dab8af289b680e5755f782dfbbba1e62e5c70b30",
+    "support/family-promotion/diagnostics-canvas-owner-review.json": "a432243031128e73e6d52273d94293034b4957a10f01c1b1b7aefdf32595e235",
+    "support/family-promotion/diagnostics-canvas-owner-signals.json": "6f963071124013df5888e623121d7c1c68193515a89c766acd8d90a43bff3682",
+    "support/family-promotion/diagnostics-canvas-owner-source.json": "c4ff55a2f12bde4333f3b17e0090b9a3011941b697f83f55d7999efaec795192",
+    "support/family-promotion/diagnostics-canvas-owner-wasm.json": "49c3beda9c6a6d2fef5ede30d2faba1f36c266666c4b0b8c9f24fe7f11f19e17",
+    "support/family-promotion/diagnostics-canvas-owner-workspace-refresh.json": "96186e8df6dc59202eca95cc84369c32e68287a8254a224d4e90dba212c7c949",
+    "support/doc-audit/d2/batch_115_canvas_host_ownership.md": "2f7a6778a56092a90073b258c09bfe9374c9a94062b2d44995a8d785a601fc58"
+  },
+  "retained_bytes_excluding_this_qualification": 225087
+}

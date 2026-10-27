@@ -1,5 +1,52 @@
 # System Diagnostics and Accessibility Plan
 
+## Delayed host results and shared model inputs, 2026-10-26
+
+**Status (2026-10-26):** implemented; isolated automated receiving is recorded in
+`support/family-promotion/diagnostics-canvas-owner-qualification.json`.
+Fixed bugs, source boundaries and remaining migrations:
+`support/family-promotion/diagnostics-canvas-owner-review.json`.
+
+Graph-local counters could collide across materialized graphs and divergent
+candidates. Kernel Graph now authors opaque, process-local input keys for the
+existing structure, content, URL grouping and visit domains. Clones preserve
+keys; mutations advance the affected domain, so title edits preserve structural
+cache identity. Reads allocate nothing. Fresh materialization creates a fresh
+source. These keys are not durable graph IDs, storage acknowledgement or leases.
+
+The shared registry and physics/model caches use those keys, and the community
+receiver compares its captured key with the current graph before installation.
+Binding a different source drops held values while retaining producer counters.
+Meaning observes content keys before freshness checks and actor receiving, so
+an old pending/successful/failed run cannot become current through counter reuse.
+Canvas's weighted topology, analytic/gloss and affinity-install memos share the
+same boundary. Whole-source ingest also resets model receivers consistently.
+
+Arrangement transitions capture the actual Canvas owner, its replacement epoch
+and structural inputs. The shared host installer checks this source before
+writing positions or reporting success. Detached StopReturn captures its source
+before slots leave the Canvas and refuses a superseded receiver. Ordinary title
+edits and metadata clones preserve the transition and member/action identities.
+Rule-face batch epochs retire when a surface membership ends, including a hidden
+same-UUID recreation. A cancellation is reported as cancellation.
+
+### Remaining ownership migrations and done-conditions
+
+1. External raw-position and content/affinity providers need dispatch-to-install
+   request provenance, including same-member supersession and recipe/viewport/
+   policy inputs. A current direct-edit API is not a delayed-result lease.
+2. Trace Graphshell app/session completion and each fetch/provider request through
+   exact owner/head admission, backend outcome and projection install. Preserve
+   parallel fetch-actor work; it is not qualified by this Canvas patch.
+3. Receive source-specific link/field/assertion lifetimes, authored Fold/Forme
+   rules, durable history/rollback and checked transaction installation.
+4. Continue custom producer/action ownership, supplier/external pin receiving,
+   guest ingress, full-leaf rendering and terminal outcomes, then headed AT and
+   physical delivery evidence at their actual platform owners.
+
+The slice retains at most 10 MB, reuses the stable shared Mere target and keeps
+concurrent primary-checkout WIP out of the isolated acceptance source.
+
 ## Canvas cache membership receiving, 2026-10-26
 
 **Status (2026-10-26):** implemented; automated acceptance is recorded separately
@@ -31,12 +78,12 @@ transition or provider result, nor durable replay or physical presentation.
 
 ### Next ownership boundaries and done-conditions
 
-1. Delayed host layout/StopReturn, content and affinity replies: capture the
-   dispatch owner and member lifetime; refuse a superseded install at the actual
-   receiving boundary. Bare NodeKey/UUID setters are not revocation contracts.
-2. Shared signal/model caches: propagate graph-owner generations, including
-   equal-revision whole-graph replacement, through dispatch and receiving.
-   ChannelRegistry's one-graph revision assumption remains explicit.
+1. The host/model continuation above receives in-tree layout/StopReturn
+   installation. External content/affinity providers and raw position installers
+   still need actual dispatch and request provenance at their receivers.
+2. Shared signal/model source collisions, including equal-revision graphs and
+   divergent candidates, are received above through kernel input keys. Broader
+   provider request/policy admission remains an explicit separate migration.
 3. Link/field/assertion owners and authored curation: establish their own
    replacement/rollback and replay rules. Surface lifetimes do not settle these.
 4. Continue checked kernel transactions and durable/history intake, custom

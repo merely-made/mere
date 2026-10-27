@@ -678,6 +678,12 @@
     "status": "Local Canvas cache/body lifetimes received; ordinary-edit continuity retained",
     "review": "diagnostics-canvas-cache-review.json",
     "qualification": "diagnostics-canvas-cache-qualification.json",
-    "remaining": "Delayed host installation, shared signal/model owner generations, link/field/assertion and durable source lifetimes; existing producer/platform migrations"
+    "remaining": "See canvas_host_owner_continuation for received layout/shared-model boundaries; external provider requests, source-specific and durable lifetimes, existing producer/platform migrations remain"
+  },
+  "canvas_host_owner_continuation": {
+    "status": "Delayed layout/source admission and source-qualified shared model inputs implemented",
+    "review": "diagnostics-canvas-owner-review.json",
+    "qualification": "diagnostics-canvas-owner-qualification.json",
+    "remaining": "External provider request and raw-position admission, app/fetch completion ownership, source-specific and durable lifetimes, existing producer/platform receiving"
   }
 }
