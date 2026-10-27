@@ -963,9 +963,10 @@ fn dropping_fetch_actor_does_not_wait_for_a_blocked_cancellation_wake() {
     let url = server.url("/drop");
     let (wake_entered_tx, wake_entered_rx) = mpsc::channel();
     let (wake_release_tx, wake_release_rx) = mpsc::channel();
+    let wake_release_rx = Mutex::new(wake_release_rx);
     let wake: Wake = Arc::new(move || {
         let _ = wake_entered_tx.send(());
-        let _ = wake_release_rx.recv_timeout(WAIT);
+        let _ = wake_release_rx.lock().unwrap().recv_timeout(WAIT);
     });
     let (actor, updates) = spawn_fetcher_with_admission(
         wake,
