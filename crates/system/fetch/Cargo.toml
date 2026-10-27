@@ -18,7 +18,7 @@ path = "src/lib.rs"
 # netfetcher (design_docs/.../2026-09-20_ranged_fetch_plan.md, D3).
 default = ["actor", "smolweb", "persona-cookies", "flip"]
 # The off-UI-thread page actor.
-actor = ["dep:armillary"]
+actor = ["dep:armillary", "armillary/tokio", "tokio/macros"]
 # gemini, gopher, finger, spartan, nex, guppy and titan through errand.
 smolweb = ["dep:errand"]
 # Durable per-persona cookies in an eidetic store.
