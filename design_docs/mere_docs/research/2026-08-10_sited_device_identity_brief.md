@@ -12,7 +12,7 @@ implemented, deliberately short of commissioning and grant distribution.
 `postilion::StationConfig` now accepts a caller-supplied typed Reticulum
 identity and has no identity path, loader, or minting fallback. Castellan
 derives separate X25519 and Ed25519 material from domain-separated Personae
-children, and the new private `ports/signalman` adapter is the first consumer
+children, and the new private `ports/signalman` *(historical citation)* <!-- doc-audit: historical-path --> adapter, now `crates/system/station-custody`, is the first consumer
 that turns it into a Retinue identity. Retinue itself does not depend on Mere,
 Castellan, or Personae.
 

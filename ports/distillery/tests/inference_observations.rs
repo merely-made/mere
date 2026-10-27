@@ -6,7 +6,7 @@
 
 #![cfg(feature = "inference")]
 
-use apparatus::RetentionLimits;
+use apparatus_core::RetentionLimits;
 use distillery::inference::{
     InferenceLane, InferenceObservation as Phase, RunJournal, RunRecord, StubInferenceProvider,
 };

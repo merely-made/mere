@@ -8,7 +8,7 @@
 //! window or GPU. The product records application effects, not driver guesses.
 
 use super::*;
-use apparatus::{Cursor, ObservationMetadata, ObservationStore, RetentionLimits};
+use apparatus_core::{Cursor, ObservationMetadata, ObservationStore, RetentionLimits};
 use cambium::{AnyView, GenetCtx, GenetElement, el, on_wheel};
 use cambium_rootstock::{Hook, Host, HostHooks, HostOptions, HostState, HostWake, Runner};
 use genet_scripted_dom::ScriptedDom;

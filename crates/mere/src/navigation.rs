@@ -1,4 +1,7 @@
 // Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
 //! Shared, read-only relationship navigation over the kernel's canonical projection.
@@ -38,7 +41,10 @@ pub fn scope_members<G: Clone + PartialEq>(
     match place.level {
         ScopeLevel::Graph => Some(graph.nodes().map(|(_, n)| n.id).collect()),
         ScopeLevel::Neighborhood => neighborhood_members(graph, place.root.or(place.focus)?),
-        ScopeLevel::Document => place.focus.filter(|id| graph.get_node_by_id(*id).is_some()).map(|id| vec![id]),
+        ScopeLevel::Document => place
+            .focus
+            .filter(|id| graph.get_node_by_id(*id).is_some())
+            .map(|id| vec![id]),
         ScopeLevel::Overmap | ScopeLevel::Forme(_) => None,
     }
 }
@@ -232,12 +238,36 @@ mod tests {
     #[test]
     fn a_document_has_one_name_in_every_row() {
         let mut graph = Graph::new();
-        let a = add_node(&mut graph, Some(uuid::Uuid::from_u128(1)), "https://same.test/a".into(), Default::default());
-        let b = add_node(&mut graph, Some(uuid::Uuid::from_u128(2)), "https://same.test/b".into(), Default::default());
-        let c = add_node(&mut graph, Some(uuid::Uuid::from_u128(3)), "https://same.test/c".into(), Default::default());
+        let a = add_node(
+            &mut graph,
+            Some(uuid::Uuid::from_u128(1)),
+            "https://same.test/a".into(),
+            Default::default(),
+        );
+        let b = add_node(
+            &mut graph,
+            Some(uuid::Uuid::from_u128(2)),
+            "https://same.test/b".into(),
+            Default::default(),
+        );
+        let c = add_node(
+            &mut graph,
+            Some(uuid::Uuid::from_u128(3)),
+            "https://same.test/c".into(),
+            Default::default(),
+        );
         graph.get_node_mut(c).unwrap().title = "Third".into();
         for to in [b, c] {
-            assert_relation(&mut graph, a, to, EdgeAssertion::Semantic { sub_kind: SemanticSubKind::Cites, label: None }).unwrap();
+            assert_relation(
+                &mut graph,
+                a,
+                to,
+                EdgeAssertion::Semantic {
+                    sub_kind: SemanticSubKind::Cites,
+                    label: None,
+                },
+            )
+            .unwrap();
         }
         let rows = relationships(0u8, &graph, uuid::Uuid::from_u128(1));
         for (key, title) in [(b, "same.test/b"), (c, "Third")] {

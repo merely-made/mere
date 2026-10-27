@@ -673,5 +673,11 @@
     "review": "diagnostics-canvas-life-review.json",
     "qualification": "diagnostics-canvas-life-qualification.json",
     "remaining": "Other retained Canvas caches, custom/action owner intake, supplier, guest/platform and full-leaf/terminal-actor paths remain open"
+  },
+  "canvas_cache_continuation": {
+    "status": "Local Canvas cache/body lifetimes received; ordinary-edit continuity retained",
+    "review": "diagnostics-canvas-cache-review.json",
+    "qualification": "diagnostics-canvas-cache-qualification.json",
+    "remaining": "Delayed host installation, shared signal/model owner generations, link/field/assertion and durable source lifetimes; existing producer/platform migrations"
   }
 }

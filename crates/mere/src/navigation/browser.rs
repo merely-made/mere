@@ -1,4 +1,7 @@
 // Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
 //! Browser navigation policy used by Turnstone and Graphshell. Applications
@@ -201,7 +204,9 @@ impl<G: Clone + PartialEq, M: Clone + PartialEq> ScopePlace<G, M> {
         None
     }
     pub fn reading(&self, graph: G, member: M) -> Self {
-        if self.graph == graph && matches!(self.level, ScopeLevel::Neighborhood | ScopeLevel::Forme(_)) {
+        if self.graph == graph
+            && matches!(self.level, ScopeLevel::Neighborhood | ScopeLevel::Forme(_))
+        {
             let mut next = self.enter(ScopeLevel::Document);
             next.focus = Some(member);
             return next;
@@ -250,23 +255,43 @@ mod tests {
     }
     #[test]
     fn forme_is_an_explicit_context_and_does_not_change_default_graph_navigation() {
-        let graph=ScopePlace {level:ScopeLevel::Graph,graph:1u8,root:Some(2u8),focus:Some(3),contexts:None};
-        assert_eq!(graph.down().unwrap().level,ScopeLevel::Neighborhood);
-        let a=graph.enter(ScopeLevel::Forme(uuid::Uuid::from_u128(40)));
-        let b=graph.enter(ScopeLevel::Forme(uuid::Uuid::from_u128(41)));
+        let graph = ScopePlace {
+            level: ScopeLevel::Graph,
+            graph: 1u8,
+            root: Some(2u8),
+            focus: Some(3),
+            contexts: None,
+        };
+        assert_eq!(graph.down().unwrap().level, ScopeLevel::Neighborhood);
+        let a = graph.enter(ScopeLevel::Forme(uuid::Uuid::from_u128(40)));
+        let b = graph.enter(ScopeLevel::Forme(uuid::Uuid::from_u128(41)));
         assert!(!a.same_scope(&b));
-        let document=a.reading(1,3);
+        let document = a.reading(1, 3);
         assert!(document.valid());
-        assert_eq!(document.up().unwrap().level,a.level);
-        assert_eq!(document.up().unwrap().up().unwrap().level,ScopeLevel::Graph);
-        assert_eq!(document.trail().iter().map(|p|p.level).collect::<Vec<_>>(),vec![ScopeLevel::Overmap,ScopeLevel::Graph,a.level,ScopeLevel::Document]);
-        let encoded=serde_json::to_string(&document).unwrap();
-        assert_eq!(serde_json::from_str::<ScopePlace<u8,u8>>(&encoded).unwrap(),document);
+        assert_eq!(document.up().unwrap().level, a.level);
+        assert_eq!(
+            document.up().unwrap().up().unwrap().level,
+            ScopeLevel::Graph
+        );
+        assert_eq!(
+            document.trail().iter().map(|p| p.level).collect::<Vec<_>>(),
+            vec![
+                ScopeLevel::Overmap,
+                ScopeLevel::Graph,
+                a.level,
+                ScopeLevel::Document
+            ]
+        );
+        let encoded = serde_json::to_string(&document).unwrap();
+        assert_eq!(
+            serde_json::from_str::<ScopePlace<u8, u8>>(&encoded).unwrap(),
+            document
+        );
     }
     #[test]
     fn contextual_up_preserves_nested_roots_and_down_enters_current_focus() {
         let mut place = doc();
-        place.root=Some(4);
+        place.root = Some(4);
         place.contexts = Some(vec![
             ScopeContext {
                 level: ScopeLevel::Graph,

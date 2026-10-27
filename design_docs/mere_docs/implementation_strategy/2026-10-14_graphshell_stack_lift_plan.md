@@ -1,13 +1,23 @@
 # Graphshell stack lift plan
 
-**Status (2026-10-15):** in progress. Castellan has moved (R8); P1 landed:
+**Status (2026-10-26):** in progress. Query/cache, Forme state and controls,
+typed owner completions, viewer composition and obsolete reader removal are
+implemented in the source candidate recorded at the end. Native component tests
+and the lightweight Wasm viewer passed on the recorded qualification sources.
+The candidate now includes newer authoritative main changes and fixes found by
+the product build; final validation awaits the rewritten supplier cohort.
+Browser interaction is not yet qualified. No candidate commit or publication
+has been made. The dated census and rulings below retain their original
+source context; later progress entries describe subsequent lifts.
+
+**Earlier status (2026-10-15):** Castellan has moved (R8); P1 landed:
 the app door is the `door` feature on `graphshell-endpoint` (L1), and
 Signalman and `ports/dramatis` build without the `graphshell` package; P2a's
 code landed: `mere-overmap` holds the remote overmap client (L14); its
 Turnstone receipt and the Djinn route registration it needs are open, with
 the transport design in the
 [transport agnosticism note](../technical_architecture/2026-10-15_transport_agnosticism_note.md).
-Nothing else has moved. The census below was read from the source at
+At that checkpoint nothing else had moved. The census below was read from the source at
 `0aade8668` and corrects the first pass in several places (§2). Mark ruled R1
 to R8 and the `Page` split on 2026-10-15 (§5).
 
@@ -22,7 +32,7 @@ Woodshed as the second native consumer.
 
 **What this plan decides and what it does not.** It names a home, a
 prerequisite, a second-host receipt and a risk for each movable group, and
-orders them. It moves nothing. Each phase's code change is its own pass
+orders them. Each phase's code change is its own pass
 under the rulings in §5.
 
 ## 1. What 100k lines is
@@ -1578,3 +1588,364 @@ fast-forward of local main; nothing built).**
   Cues: the flat law, overlay and source form still has a draft here and
   applies at once in Turnstone; the speed pick is not in the saved scene in
   either host.
+
+
+### 2026-10-26: first query-component extraction and bounded cache updates
+
+Candidate based on Mere `5d8d1f809`; implementation is not yet qualified. The
+browser host's remaining pane migration is still open. This continues P9's
+ruling that the component, its state and its typed inputs move together.
+
+The first extracted editor has two layers:
+
+- `mere::query_view::editor` owns draft identity, expected source definition,
+  save transitions and effect/completion types. A request identifies its
+  component instance, binding generation, owner scope, operation and retry
+  attempt. An unconfirmed write retains its operation; retries cannot create
+  another Resource. Rebinding retires UI interest without cancelling an
+  accepted owner write, and old completions cannot revive that draft.
+- `mere_view::query_editor`, behind `query-editor`, owns Cambium text controls,
+  the editor view and its effect outbox. A host embeds it with ordinary `lens`,
+  supplies availability and a source binding, drains effects and returns
+  completions. It has no browser API, store, executor or Graphshell dependency.
+
+Graphshell's adapter translates those effects into the existing journal and
+store path. The owner saves the query definition and local appearance as one
+journaled edit, and keeps the correlation data with the actual asynchronous
+persistence operation. Query and freeze completions are explicit messages;
+the query pane no longer infers acknowledgement from global status strings.
+The query catalog is refreshed on source binding/revision changes. Existing
+query tiles, link inspection and source navigation remain host adapters.
+`SavedProduct` still serializes writes and the browser still pumps adapters
+from its frame hook; this extraction does not claim a complete event-driven
+host, lifecycle migration for other panes, or adoption by Woodshed.
+
+The client cache now indexes resources by session. Ordinary diffs validate a
+candidate scene/presentation, then commit only the requested resource removals.
+Reconnect replays stage one session and defer resource invalidations until the
+entire replay validates. Neither path clones cached bytes or traverses the
+other sessions' resources. Scene validation still scales with the affected
+scene; explicit image resolution and persistence still create owned outputs.
+Wire and persisted projection formats are unchanged.
+
+Evidence added in source:
+
+- `graphshell-client` regression cases for unchanged byte allocations,
+  session-scoped revocation/invalidation and atomic rejected replays; the
+  `cache_update_cost` integration test compares allocation bytes with 1 KiB
+  versus 36 MiB of cached resources, including unrelated sessions.
+- Query lifecycle tests for validation, refusal, exact acknowledgement,
+  unconfirmed retry, stale attempts, independent instances and rebinding.
+- `mere-view/tests/query_editor_host.rs`: a windowless native host with its
+  own graph and acknowledgement policy, mounting the actual Cambium editor;
+  source covers retry without recreation and completion after removal.
+- Owner test for one-step undo of query plus appearance and rejection without
+  source mutation. Existing `query_views`, `query_views_reopen` and
+  `query_views_inspect` browser scenarios retain their labels and probe fields.
+
+Validation executed: locked/offline Cargo metadata for both roots; dependency
+resolution for the shared editor, product Wasm configuration and minimal
+viewer; static shared-crate/port boundary inspection; Rust parsing/formatting
+and patch whitespace checks. Only the two `mere-view` lockfile records gain
+its optional `mere` dependency; package identities and supplier pins do not
+change. The minimal viewer does not resolve `mere-view`.
+
+Compilation, the new tests, and fresh browser scenarios have **not run**.
+The mandatory build-storage preflight is blocked by this session's sandbox:
+`Operation not permitted: ps`. No guard was bypassed. The local evidence and
+exact guarded validation commands are retained in
+`Code/output/graphshell-components/`. This is source and dependency evidence,
+not a native, browser, performance or second-application acceptance receipt.
+
+
+### 2026-10-26: remaining component boundaries and deletion candidates
+
+Source inspected at `5d8d1f809` plus the uncommitted query/cache candidate.
+Mark reiterated that there are no compatibility consumers to preserve. A
+changed API gets direct caller updates and deletion of the old surface;
+second-host adoption supplies evidence of reuse, not a reason to retain a
+port facade. This continues P9 and the current DOC_POLICY section 3. The old
+Group 5 blanket classification of `web_tree` as port code applies to browser
+adapters, not to the component state and views currently embedded there.
+
+| Boundary | Source evidence at the start of this audit | Clean replacement and retirement |
+|---|---|---|
+| Owner operations and pane acknowledgements | `web_tree/product.rs` owns several completion cells, booleans, pending variants and the movable `App`; `web_tree/promoted_links.rs::poll` still infers completion from `saving` and `save_state` strings. Coupling reads a separate owner result slot. | Typed operation/attempt completions shared by the actual owner adapters, with pane-specific state transitions. Delete string-driven control flow and duplicate retry routing as callers convert. Status text is a view of state. |
+| Forme and workbench | `forme_workspace`, `forme_session`, and `web_tree/forme` split layout, save proposals, retired writes, rebinding, drag previews and tile UI across the port. `current` and `projected_model` expose the same draft-or-committed choice. | Move layout/session state with the component. Platen remains R2's home after cutting canvas application and port-owned scope/inspector types; browser storage, pointer capture and texture installation stay in host adapters. Remove the old modules/import paths in the same change. |
+| Rules and presentation | `presentation_editor` already owns a draft/history session, but `web_tree/presentation` owns its controls, store and completion cell. `presentation_binding` also imports link inspection. | Lift rule authoring and complete controls together. Keep occurrence readings as typed inputs, and host policy at the edge; include the inspection dependencies rather than hide a port dependency behind a wrapper. |
+| Documents, reading tiles and cards | `web_tree/blocks::Pane` mixes document/notation state with IndexedDB, completion cells and rendering resources. `web_tree/reading::Reading` combines content bindings, source retirement and progress with browser downloads and audio elements. | Reuse the existing document, Inker, notation and Cambium owners. Move interaction state and views alongside them; express load/save/export/play requests as effects. Keep DOM object URLs, audio elements and native equivalents in adapters. |
+| Viewer composition | `product_off.rs` and `remote_off.rs` imitate disabled workspace APIs. The viewer builds the common `TreePage` composition with impossible services and empty views. The practice imitation is removed in this candidate, as described below. | Compose the viewer directly from viewing/navigation components. Compose workspace and remote services only where enabled; delete the remaining off-module imitations and their branches. Feature flags alone currently reduce dependencies but do not finish this composition split. |
+| Actual compatibility code | `product.rs::decode_profiled_codicil` accepts the old v2 codicil and v1 engram; `forme_session::SavedRecord` accepts the old flat record through defaulted history fields. Scene readers and tests retain additional historical conversions. | Retire obsolete accepted formats and tests that exist only to preserve them when selecting the current format boundary. Current data integrity, conflict and authority checks remain. Existing stored artifacts and receipts are not deleted by a source cleanup. |
+
+The immediate cleanup removes `graphshell::{protocol, client, endpoint}`
+re-exports. All six qualified uses in current port Rust source now name
+Chirograph or `graphshell-client` directly. The standalone web manifest gains
+an explicit Chirograph dependency already present in its resolved graph; no
+package pin changes. README and the obsolete web entry-point description now
+match the standalone manifest. A parallel source pass also removes
+`projection_compile`'s wildcard exports of Scenomise and updates its callers
+to the owning modules, retaining Graphshell's actual host recipes. No shims
+replace either set of exports.
+
+The practice pane had a live page/loader contract (`practice.html`,
+`practice-embed.html`, `data-practice-workspace`) but its component was gated
+on `main-page`, absent from both manifests. This candidate gates it on the
+existing `product` feature with its backend, and removes `practice_off.rs`.
+The viewer now compiles no practice state, mount, view, frame callback or
+probe call. The product pages can reach their implemented component again;
+fresh Wasm compilation and page qualification remain unrun. The unused
+`Forme::Pane::projected_model` duplicate is removed; `current` retains the
+live candidate-or-committed behavior.
+
+The viewer audit found no proven per-frame cost from the unused off-remote
+`pump` method. Making the standalone client dependency optional alone would
+not remove it from the viewer graph: the Graphshell port still depends on
+`graphshell-client`. A real dependency reduction requires changing the
+transitive composition too.
+
+The first query extraction still has a Graph-tools retry bridge and a
+query-specific owner completion queue. Those are internal consolidation
+candidates in the owner-operation pass, not compatibility promises. Likewise,
+removing the resource-cache copy does not eliminate graph/scene candidate
+cloning. `pandect::GraphSession::edit_as` still clones candidates and replay
+state; performance claims about it need their own workload and allocation
+measurements.
+
+That initial cleanup changed import ownership, the practice feature boundary and
+documentation. Its locked/offline resolution, source parsing, removed-path scan
+and lockfile identity comparison are retained under
+`Code/output/graphshell-components/cleanup-audit/`. The subsequent slices below
+replace parts of this audit with implemented source; qualification remains separate.
+
+
+### 2026-10-26: Forme state, owner acknowledgements and viewer composition slices
+
+The candidate was refreshed from `5d8d1f809` to freshly fetched `origin/main`
+`498fef4bf` before further review. The two intervening current-main commits did
+not overlap its edited files. The pre-refresh patch, source archive and hashes
+are retained under `Code/output/graphshell-components/slices/before-main-refresh/`.
+The separate Eidetic/ESP integration is advancing its supplier cohort; this
+refactor must reconcile forward with that settled source before main integration.
+No supplier pin is being restored to an older qualification revision.
+
+**Forme state and controls.** `platen::workspace` now owns the generic saved
+workspace, draft and saved layout history, drop proposals, pure region geometry,
+load ticket and retired-write fence. `FormeSession<P>` prepares a record for a
+host to write and commits it only after the corresponding acknowledgement.
+Failure retains the draft; a consumed or foreign proposal cannot commit.
+`PreparedSave::bytes` and `FormeSession::from_bytes` are storage-independent.
+The model uses Forme, kernel and Workbench contracts directly, with no import
+from Graphshell, Mere canvas, Tabard, Cambium or Muniment. Its open tile contract
+is `forme.member`, with the source surface UUID as the content ID.
+
+`mere_view::workbench_editor` owns the actual Cambium editing controls and emits
+typed unlock/apply/discard/undo/redo/visibility effects. Graphshell mounts that
+view and removes the duplicate inline implementation. Graphshell's remaining
+`forme_workspace` module is a concrete application adapter: its preferences
+carry inspector binding, reading choices, anchors/trail and scope navigation,
+and it converts pure workspace regions to the canvas type. The serialized
+preference fields retain their existing flat shape. `FormeSession::preferences_update` applies a narrow host change separately to
+committed and draft preferences, retaining unrelated draft state. Its intent
+names whether the update changes document timestamps; scope and inspector
+binding retain their previous timestamp behavior. Browser IndexedDB,
+clock, executor, pointer capture, texture installation and reading content stay
+at the host edge. The old port `forme_session` module is deleted, and all live
+reading/scope/source-binding callers use the new owner directly.
+
+**Typed owner completions.** Query writes and promoted-link writes now share
+one `PendingOperation` enum in the owner adapter, captured once by the actual
+persistence task. Each completion names the accepted scope, operation and
+attempt. Query Freeze uses its already-created frozen Resource as operation
+identity. A retry advances the attempt and persists the accepted in-memory
+mutation without recreating the query, Resource or comment. Promoted-link
+polling no longer infers success from global status text or the `saving` flag;
+it consumes the matching completion and rereads the acknowledged result.
+The Graph-tools retry bridge synchronizes a listening pane's attempt. This is
+a bounded consolidation: other owner operations still have separate completion
+paths and the host still owns the movable application and persistence task.
+
+**Viewer composition and retirement.** `product_off.rs`, `remote_off.rs` and
+the earlier `practice_off.rs` are deleted. Product, practice and remote state,
+controls, frame work and probes exist only in their enabled compositions.
+Canvas GPU attach/detach remains independent of the optional remote board.
+The viewer's retained-clip export carries no product owner/store. A build
+without remote support has no `connect_remote` export; the loader reports an
+unavailable requested connection rather than instantiating a fake service.
+This removes false host services, not all shared port dependencies; no new
+Wasm-size or frame-cost claim follows from the source change.
+
+The codicil reader now accepts the current v3 transport schema only. The v2
+codicil/v1 engram conversion and their compatibility constants/struct are gone.
+Rejection coverage checks that both import routes retain graph, owner and
+journal state. Forme likewise requires the current history-bearing record;
+the obsolete flat-workspace fallback is removed. Current preference and
+history records remain supported. Saved-scene conversions elsewhere are not
+implicitly retired, and stored artifacts/receipts remain untouched.
+
+**Verification boundary.** Current behavior regression cases move with the
+layout/session code: stable access and tile identity, geometry validation,
+draft history, saved undo/redo, failed/stale acknowledgements, graph-member
+retirement and source-scoped preferences. Separate windowless host fixtures
+embed the real Query and Workbench controls without Graphshell imports. These
+now pass as windowless native host tests: two Query cases and one Workbench
+case. The client suite passes 99 tests (including the 36 MiB unrelated-cache
+allocation comparison); the Query model passes 16 and Platen workspace passes
+73. An initial Platen run exposed five migrated test-fixture assumptions about
+split cells and prior undo history, corrected without changing the model.
+The initial permission denial is retained in the earlier logs; after process
+inspection became available, builds resumed through the guarded launcher.
+On integrated main `e88711496`, the Graphshell library passes 329 tests (six
+ignored) and Apparatus with Registry/projection passes seven. The first
+Graphshell compile exposed missing direct test imports and three obsolete
+preview calls; the tests now use the shared candidate plus the canvas adapter
+and retain their assertions. A capacity refusal during the concurrent resident
+build is preserved; the successful rerun used the released guarded window.
+The native runs used Homebrew Rust 1.99.0: the initial `rustup run python3`
+launcher left its binaries ahead of rustup on PATH. The first Wasm attempt
+stopped before project code because that compiler has no Wasm standard library.
+The corrected driver explicitly selects the installed Rust 1.99.1 binaries and
+records their identities. Wasm composition checks are in progress. Browser
+interaction is still unqualified. Static checks and commands remain under
+`Code/output/graphshell-components/slices/`; executed logs are under
+`Code/output/graphshell-components/validation-resumed/`.
+
+Presentation/rule editing and the document/reading tile lifecycle remain the
+next substantial component boundaries described in the audit above. The shared
+workbench controls do not yet contain the complete reading-tile/drag view, and
+no Woodshed adoption or efficiency result is claimed by the windowless fixture.
+
+
+### 2026-10-26: Mere source ownership and obsolete shell residue
+
+Mark clarified that the audit includes Mere crates left behind after supplier
+promotions, rather than only Graphshell modules. The candidate incorporates
+current main `15d78a40f`, following a saved patch/source snapshot and a check
+that the incoming documentation changes did not overlap local edits. It then
+reconciles forward to settled supplier integration `e88711496`, preserving a
+second patch/source archive and verifying all non-overlapping candidate hashes.
+The only textual conflict was the new Eidetic `mere-proofs` revision beside
+the two removed workspace dependencies; resolution keeps the new revision and
+both deletions. Both full workspaces resolve offline/locked, and lockfile
+comparison confirms every external package identity and dependency entry is
+unchanged from the integrated main. These refresh receipts are retained under
+`validation-resumed/before-supplier-refresh/` in the lane's output directory.
+
+The promoted Eidetic, ESP, Armillary and Gemot implementations are consumed
+from their supplier repositories. The local `crates/eidetic` relocation README
+has since been removed; the supplier repository is the source home. Comms is
+consumed by Murm's Signalman. The former Mere Signalman port has been renamed
+`station-custody` under `crates/system/station-custody`: it supplies resident
+custody for station commissioning. The Signalman application remains in Murm;
+its isolated consumer now imports this adapter directly. Credential scopes,
+AppIds and wire identities are unchanged. `eidetic-search` remains an active separate
+BM25/document index and ranking implementation, used by Distillery and
+Turnstone and Moot; its library needs Eidetic and Genet text segmentation.
+The source is now published in Eidetic under `eidetic/crates/eidetic-search`, at
+`354ab71c08459355278aa3ff32ef8e3493e85653`, with model backends opt-in. Its 40
+package tests pass (three harnesses ignored), and the optional recall example
+compiles on Rust 1.99.1. The donor source and workspace membership are removed;
+Mere and Turnstone now name that exact owner revision in their candidate
+manifests. Receiving lock and native checks remain separate gates.
+
+The obsolete `shell-state` re-export crate and unconsumed `content-contract`
+worker protocol are removed with their workspace entries. Chrome remains used
+by Turnstone. The Apparatus facade has also been removed: its collector now
+lives as Registry's opt-in `observations` module, while the accessibility
+inspection pane lives in Turnstone's private `swatch_pane/inspection` module.
+The uncalled `project_skeleton` scaffold is gone. Persona-picker source now
+lives under Cambium. The old `hest_0_1` source and `command-menu` compatibility
+crate and its obsolete compatibility fixture are removed; current consumers
+use Hest/Cambium directly. The empty
+Scenograph marker and obsolete Eidetic README are gone. Historical receipts
+and promotion source snapshots remain unchanged.
+
+The earlier consumer census found no production consumer for the `content-contract`
+worker protocol. Its source and workspace entries are now removed; the
+historical authority-audit fixture that records its old API remains frozen.
+This deletion is not a claim that a supplier already owns an identical
+implementation. Historical release receipts remain evidence for published
+contracts and are not rewritten.
+
+
+### 2026-10-26: browser checks and authoritative history refresh
+
+The explicitly selected Rust 1.99.1 viewer composition
+(`--no-default-features --features presentation-webgpu`) passes Wasm checking.
+That run found and fixed product-only focused-text and busy reads, a missing
+viewer snapshot return, and physics disclosure state incorrectly owned by the
+remote composition. The real physics disclosure is now shared by viewer and
+product; the unused remote copy is removed. No fake service module returns.
+
+The next product check found four migration gaps: a missing direct Platen
+dependency in the standalone manifest, a history completion still using the
+old tuple, an ambiguous Query error type, and a reading call to a removed
+helper. Source now enables Platen only with `product`, records history without
+a Query/Promoted completion under its existing selection lock, fixes the error
+type to String, and uses `Pane::current()` for reading preview selection. The
+last replacement has the exact candidate-or-session behavior of the old helper;
+`tile_tree` still masks missing graph members. All six Wasm compositions now pass on explicit Rust 1.99.1: viewer, product,
+remote, product plus remote, canvas GPU, and product plus canvas GPU, each
+with presentation WebGPU. This checks feature independence and Rust compilation;
+it does not claim headed browser acceptance. Failed attempts remain beside
+the passing logs.
+
+Mark confirmed that the repository history rewrite removing commit trailers
+is authoritative. The refactor branch itself was remapped from `e88711496` to
+`45d019657`; both commits have the identical source tree
+`f26455df602dfbf74850d2f8841778aa9c92d78f`. The candidate was then preserved and
+fast-forwarded within the rewritten history to `739a3a5b1`. This adds current
+Cambium/Pictograph source and custody/documentation changes. Only the doc index
+overlapped local edits, and every other candidate file hash was verified
+unchanged. No old ancestry was rejoined or pushed.
+
+The integration lane refreshed coherent supplier pins against the rewritten
+histories and still holds the guarded build window while it closes Turnstone.
+The settled Mere source is incorporated below; current-source native
+qualification and browser checks affected by later source changes remain.
+The earlier 329 Graphshell, seven
+Apparatus, 99 client, 16 Query, 73 workspace and three independent-host passes
+remain evidence for their recorded sources, not a claim that this newer
+candidate has completed validation. Native runs used Homebrew Rust 1.99.0;
+all six passing browser checks explicitly used rustup Rust 1.99.1. Browser runtime
+interaction and Woodshed adoption remain outside these receipts.
+
+
+The candidate now follows settled main `5fb0e01f3`: all external package
+records in the root and standalone web locks remain identical to that main.
+The own removals, renamed station adapter, and component source changes were
+replayed with all other edited/untracked source hashes preserved. The replay
+receipt is under `validation-resumed/settled-cohort-refresh/`.
+
+The subsequent documentation-only main `abb8be956` is incorporated too. The
+two overlapping documents replayed cleanly; all 178 other edited/new paths
+retained their hashes. Its GUI catalog now names Registry and product-owned
+inspection UI in place of the deleted Apparatus facade. The preservation
+receipt is under `validation-resumed/catalog-refresh/`.
+
+A subsequent client review found a preexisting lifecycle hole: successful
+resume could replace an explicit Revoked status with Live. The candidate
+keeps Expired/Revoked terminal across replay, transport notifications and
+persistent restore; expiry may become revocation. Late resource/media replies
+cannot refill a withdrawn session. Policy-permitted cached reading and fresh
+admission remain separate. The current client suite now passes on explicit
+Rust 1.99.1: 103 tests passed, with one documentation example ignored. This
+includes the allocation regression with unrelated cached bytes, terminal
+resume/restore status, late resource replies, and endpoint action closure.
+The first attempt found a missing test-only `SceneDiff` import; that import
+was fixed and its failed log retained beside the passing run. Evidence is in
+`validation-resumed/final-checks/client.json` and `client.log` under the lane's
+output directory; `client-source.patch` records the fix over local `c01a90524`.
+
+The remaining native component, moved-owner and receiving-consumer checks
+have not run on this final candidate. At 21:48 UTC the workspace held
+149.1 GiB of compiler caches against its 160 GiB budget; the normal 20 GiB
+reservation was refused. The client alone used a documented 4 GiB estimate
+based on its prior 1.892 GiB cold build. No broader build inherits that
+estimate, and no cache protection or storage policy has been bypassed.
+Mark subsequently approved a 200 GiB cache budget, retaining the 100 GiB
+free-space floor and all cleanup protections; 43 guard regression tests pass.
+Search promotion is published in Eidetic `354ab71`, and the local Mere donor
+has been removed in favor of that exact provider. Its tests pass and its
+optional model example compiles; no model runtime acceptance is implied.
+Mere's remaining component and receiving-consumer checks are in progress;
+the Mere refactor remains local and unpublished.

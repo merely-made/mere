@@ -49,7 +49,7 @@ metadata one the first version of this note used.
 | Link | Turnstone | Djinn | Knot desktop, default (`mere-retention`) | Knot desktop, `--no-default-features` | First hop | Contract it should sit behind |
 |---|---|---|---|---|---|---|
 | retinue (+ tulle) | **was linked, now opt-in** (`nomadnet`) | off (`knot-site-nomadnet`, `moot-site-nomadnet`) | off (`knot-desktop/retinue`) | off | `turnstone` | a page-fetch contract; `mere-transport`'s `reticulum` feature |
-| outrider, radio-hand, sennet, tucket | absent | absent | absent | absent | reached only through `retinue`, `mere-signalman`, `postilion`, `seneschal` | none needed; they stay out of product graphs |
+| outrider, radio-hand, sennet, tucket | absent | absent | absent | absent | reached only through `retinue`, `station-custody` (the Mere custody adapter used by Murm’s Signalman), `postilion`, `seneschal` | none needed; they stay out of product graphs |
 | emissary, arti | absent | absent | absent | absent | `emissary` only in Murm's `murm-i2p`; no manifest in the family repos read names `arti` | none needed |
 | mere-transport, iroh, iroh-blobs, snow, quinn | linked | linked | **absent** (was linked via knot-editor) | **absent** | `turnstone`, `distillery`, `graphshell-host`, `mere-mesh`, `knot-editor` (now `peers`), `djinn` | `Transport` trait with an in-memory implementation |
 | mere-p2panda-net | linked | linked | **absent** (was linked via knot-editor) | absent | `stickleback` (now `net`), `mere-transport`, `mere-mesh`, `knot-editor` (now `peers`) | done for stickleback and knot-editor; `mere-transport` and `mere-mesh` remain |

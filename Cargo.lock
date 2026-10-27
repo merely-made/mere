@@ -2243,7 +2243,7 @@ dependencies = [
  "chartulary",
  "genet-scripted-dom",
  "genet-text",
- "hest 0.2.0",
+ "hest",
  "illume",
  "layout-dom-api",
  "mere-surface-api",
@@ -2703,7 +2703,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "blake3",
- "hest 0.2.0",
+ "hest",
  "sceno",
  "scenotime",
  "serde",
@@ -2894,13 +2894,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "command-menu"
-version = "0.1.1"
-dependencies = [
- "hest 0.1.0",
-]
-
-[[package]]
 name = "commons-spine"
 version = "0.0.1"
 source = "git+https://github.com/merely-made/gemot.git?rev=998133bc17b8636152e9c4f7605eb475498213c8#998133bc17b8636152e9c4f7605eb475498213c8"
@@ -3055,24 +3048,6 @@ name = "constcat"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "136d3e02915a2cea4d74caa8681e2d44b1c3254bdbf17d11d41d587ff858832c"
-
-[[package]]
-name = "content-contract"
-version = "0.0.1"
-dependencies = [
- "document-canvas",
- "genet-parley",
- "js-sys",
- "linebender_resource_handle",
- "mere-kernel",
- "mere-rdf",
- "netrender",
- "paint_list_render",
- "postcard",
- "serde",
- "wasm-bindgen",
- "web-sys",
-]
 
 [[package]]
 name = "convert_case"
@@ -4795,6 +4770,7 @@ dependencies = [
 name = "distillery"
 version = "0.0.1"
 dependencies = [
+ "apparatus-core",
  "armillary",
  "burn-backend",
  "burn-flex",
@@ -4814,7 +4790,6 @@ dependencies = [
  "insigne",
  "iroh",
  "layout-dom-api",
- "mere-apparatus",
  "mere-mesh",
  "mere-proofs",
  "mere-surface-api",
@@ -4848,6 +4823,7 @@ dependencies = [
 name = "djinn"
 version = "0.0.2"
 dependencies = [
+ "apparatus-core",
  "armillary",
  "base64 0.22.1",
  "blake3",
@@ -4882,7 +4858,6 @@ dependencies = [
  "knot-site",
  "libc",
  "light-file-dialog",
- "mere-apparatus",
  "mere-facts",
  "mere-kernel",
  "mere-mesh",
@@ -5327,16 +5302,12 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/eidetic.git?rev=354ab71c08459355278aa3ff32ef8e3493e85653#354ab71c08459355278aa3ff32ef8e3493e85653"
 dependencies = [
  "eidetic",
- "esp",
  "genet-text",
- "muniment",
- "pollster 0.4.0",
  "serde",
  "serde_json",
- "sha2 0.11.0",
- "tempfile",
  "thiserror 1.0.69",
 ]
 
@@ -7306,7 +7277,7 @@ dependencies = [
  "graphshell-client",
  "graphshell-endpoint",
  "graphshell-host",
- "hest 0.2.0",
+ "hest",
  "illume",
  "image",
  "inker",
@@ -7369,7 +7340,7 @@ dependencies = [
  "accesskit 0.25.1",
  "chirograph",
  "genet-scripted-dom",
- "hest 0.2.0",
+ "hest",
  "incipit",
  "layout-dom-api",
  "sceno",
@@ -7458,7 +7429,7 @@ dependencies = [
  "graphshell",
  "graphshell-client",
  "graphshell-endpoint",
- "hest 0.2.0",
+ "hest",
  "layout-dom-api",
  "mere",
  "mere-overmap",
@@ -7746,13 +7717,6 @@ name = "hermit-abi"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284"
-
-[[package]]
-name = "hest"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "hest"
@@ -10160,7 +10124,6 @@ dependencies = [
  "accesskit 0.25.1",
  "euclid",
  "inker",
- "mere-apparatus",
  "mere-fleece",
  "mere-forme",
  "mere-kernel",
@@ -10187,18 +10150,6 @@ dependencies = [
  "serde",
  "serde_json",
  "uuid",
-]
-
-[[package]]
-name = "mere-apparatus"
-version = "0.0.1"
-dependencies = [
- "accesskit 0.25.1",
- "apparatus-core",
- "mere-registry",
- "serde_json",
- "tracing",
- "uxtree",
 ]
 
 [[package]]
@@ -10382,7 +10333,7 @@ dependencies = [
  "crossbeam-channel",
  "euclid",
  "futures-util",
- "hest 0.2.0",
+ "hest",
  "infer",
  "mime_guess",
  "minicbor-serde",
@@ -10496,7 +10447,7 @@ dependencies = [
  "chirograph",
  "graphshell-client",
  "graphshell-endpoint",
- "hest 0.2.0",
+ "hest",
  "mere-cartography",
  "mere-kernel",
  "mere-view",
@@ -10573,7 +10524,8 @@ dependencies = [
 name = "mere-registry"
 version = "0.0.1"
 dependencies = [
- "hest 0.2.0",
+ "apparatus-core",
+ "hest",
  "http",
  "infer",
  "inventory",
@@ -10591,28 +10543,6 @@ dependencies = [
  "tower",
  "url",
  "web-time",
-]
-
-[[package]]
-name = "mere-signalman"
-version = "0.0.1"
-dependencies = [
- "blake3",
- "graphshell-endpoint",
- "insigne",
- "outrider",
- "p2panda-core",
- "pandect",
- "personae",
- "postilion",
- "radio-hand",
- "retinue",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "uuid",
- "zeroize",
 ]
 
 [[package]]
@@ -10677,12 +10607,14 @@ dependencies = [
  "genet-scripted-dom",
  "incipit",
  "layout-dom-api",
+ "mere",
  "mere-cartography",
  "mere-curation",
  "mere-kernel",
  "mesquite",
  "netrender",
  "pictograph",
+ "platen",
  "serde_json",
  "sprigging",
  "taproot",
@@ -10702,10 +10634,10 @@ dependencies = [
 name = "mesquite"
 version = "0.1.0"
 dependencies = [
+ "apparatus-core",
  "cambium",
  "cambium-rootstock",
  "genet-scripted-dom",
- "mere-apparatus",
  "paint_list_api",
  "png 0.17.16",
  "postcard",
@@ -13306,7 +13238,7 @@ dependencies = [
  "eidetic",
  "euclid",
  "getrandom 0.3.4",
- "hest 0.2.0",
+ "hest",
  "hex",
  "incipit",
  "insigne",
@@ -14064,9 +13996,11 @@ name = "platen"
 version = "0.0.1"
 dependencies = [
  "accesskit 0.25.1",
+ "backstep",
  "document-canvas",
  "inker",
  "mere-forme",
+ "mere-kernel",
  "serde",
  "serde_json",
  "tracing",
@@ -16102,7 +16036,7 @@ name = "script-rhai"
 version = "0.0.1"
 dependencies = [
  "getrandom 0.3.4",
- "hest 0.2.0",
+ "hest",
  "inker",
  "libm",
  "rhai",
@@ -16584,18 +16518,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
-]
-
-[[package]]
-name = "shell-state"
-version = "0.0.1"
-dependencies = [
- "mere-chrome",
- "mere-forme",
- "mere-kernel",
- "serde",
- "serde_json",
- "ux-events",
 ]
 
 [[package]]
@@ -17259,6 +17181,28 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
+name = "station-custody"
+version = "0.0.1"
+dependencies = [
+ "blake3",
+ "graphshell-endpoint",
+ "insigne",
+ "outrider",
+ "p2panda-core",
+ "pandect",
+ "personae",
+ "postilion",
+ "radio-hand",
+ "retinue",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "uuid",
+ "zeroize",
+]
 
 [[package]]
 name = "std-semaphore"
@@ -19115,7 +19059,7 @@ dependencies = [
 name = "ux-events"
 version = "0.0.1"
 dependencies = [
- "hest 0.2.0",
+ "hest",
  "mere-chrome",
  "mere-kernel",
  "serde",

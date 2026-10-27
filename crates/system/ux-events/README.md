@@ -77,5 +77,5 @@ published `CommandSurfaceSemanticSnapshot` and a
 ## History
 
 These four modules were extracted from `shell-state` on 2026-05-10.
-`shell-state` re-exports each of them, so `shell_state::ux_observability::*`
-still resolves; new code imports from `ux_events::*`.
+The unused `shell-state` compatibility re-exports were removed on 2026-10-26;
+consumers import from `ux_events::*` directly.

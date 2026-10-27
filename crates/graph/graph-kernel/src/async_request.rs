@@ -17,7 +17,7 @@
 //! `AsyncRequestState<T>` is the portable replacement: pure data, no
 //! threading primitives inside. A host-side driver owns the actual
 //! channel / future / fetch, and deposits results into this state
-//! when ready. The shell-state side just reads and reacts.
+//! when ready. The host session just reads and reacts.
 //!
 //! Concretely:
 //!
@@ -32,7 +32,7 @@
 //!   state it shepherds.
 //!
 //! The state type has no threading or time dependencies, so it is
-//! safe to place inside types that belong in a portable shell-state
+//! safe to place inside types that belong in portable session-state
 //! sub-crate targeting `wasm32-unknown-unknown` and `wasip2`.
 //!
 //! [`arm_pending`]: AsyncRequestState::arm_pending

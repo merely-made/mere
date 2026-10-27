@@ -157,7 +157,7 @@ struct Shared {
 #[derive(Clone)]
 pub struct DiagnosticSender(Arc<Shared>);
 /// One bounded staging consumer. Independent inspection/receipt cursors belong
-/// on the downstream Apparatus store, rather than competing queue drains.
+/// on the downstream `apparatus-core` store, rather than competing queue drains.
 pub struct DiagnosticReceiver(Arc<Shared>);
 
 pub fn diagnostic_channel(limits: IngressLimits) -> (DiagnosticSender, DiagnosticReceiver) {

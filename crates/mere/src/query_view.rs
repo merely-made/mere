@@ -12,6 +12,7 @@ use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+pub mod editor;
 mod projection;
 pub use projection::*;
 mod stroke;

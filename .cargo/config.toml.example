@@ -27,7 +27,7 @@
 #
 # 2026-08-24 dead-entry prune. Eleven entries removed after resolving all four
 # consumers of this file and taking the union of what they actually pull: the
-# root workspace (with --all-features), ports/graphshell/web, ports/signalman,
+# root workspace (with --all-features), ports/graphshell/web, crates/system/station-custody,
 # and the crates/probes tree. Removed: script-engine-boa, genet-winit-host,
 # scrying-engine, graft-engine, weld-engine, genet-documents, script-engine-api,
 # netrender_text, cambium-winit, and the sole entries of the wgpu-scry and

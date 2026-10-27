@@ -24,6 +24,7 @@ pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
 mod binding;
 mod bounded_scenes;
+mod cache_lifetimes;
 mod camera;
 mod combinators;
 mod density;

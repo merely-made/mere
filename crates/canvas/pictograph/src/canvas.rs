@@ -198,6 +198,7 @@ pub use seiche::{
 };
 mod cull;
 mod input;
+mod member_lifetimes;
 mod resolved_image_cache;
 pub use resolved_image_cache::DEFAULT_RESOLVED_IMAGE_CACHE_BYTES;
 
@@ -397,6 +398,9 @@ pub struct Canvas {
     /// can be reused after removal, so reader actions must name member identity
     /// rather than a current NodeKey index.
     described_keys: reader::DescribedKeyRegistry,
+    /// Last reconciled memberships for runtime caches. The kernel authors the
+    /// witnesses; this receiver neither mints nor persists them.
+    cache_memberships: HashMap<NodeKey, (uuid::Uuid, kernel::graph::SurfaceNodeLifetime)>,
     /// The force-directed layout backend — in-thread (tests / wasm) or an
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.

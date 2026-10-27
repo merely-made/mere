@@ -1,5 +1,51 @@
 # System Diagnostics and Accessibility Plan
 
+## Canvas cache membership receiving, 2026-10-26
+
+**Status (2026-10-26):** implemented; automated acceptance is recorded separately
+in `support/family-promotion/diagnostics-canvas-cache-qualification.json`.
+Review, fixed bugs and remaining owner migrations:
+`support/family-promotion/diagnostics-canvas-cache-review.json`.
+
+The kernel remains the only author of runtime member lifetimes. Canvas now
+receives those witnesses before reconciling its runtime caches. Same-call
+removal/recreation retires selection/pins, state/shape, active moves, role and
+at-rest state, seeds/Mosaic, local layout slots, display appearances and saved
+fold selections. UUID-keyed overrides retain the D1 ruling and prune exits even
+when the same UUID returns before reconciliation. Ordinary edits, metadata
+clones and unrelated members keep their live identities and state.
+
+Seiche receives graph-free explicit retirement, not another identity allocator.
+It drops named body lives and remembered material/kinds, then reconciles the
+replacement set in one actor command. The existing epoch barrier excludes older
+snapshots. Unaffected bodies retain their Rapier handles. Explicit graph switches
+also retire runtime state for clones, reset the community receiver/affinity and
+reacquire scope choices by UUID. Cache presence alone is no longer used as proof
+that a surface membership survived.
+
+Content-addressed pixels, address-derived icon bytes and authored UUID rosters
+keep their separate lifetimes. A Forme's old runtime hold retires; its current
+authored cell roster may acquire a fresh hold. An exact scope and Fold definition
+remain authored intent. This does not qualify a detached delayed host callback,
+transition or provider result, nor durable replay or physical presentation.
+
+### Next ownership boundaries and done-conditions
+
+1. Delayed host layout/StopReturn, content and affinity replies: capture the
+   dispatch owner and member lifetime; refuse a superseded install at the actual
+   receiving boundary. Bare NodeKey/UUID setters are not revocation contracts.
+2. Shared signal/model caches: propagate graph-owner generations, including
+   equal-revision whole-graph replacement, through dispatch and receiving.
+   ChannelRegistry's one-graph revision assumption remains explicit.
+3. Link/field/assertion owners and authored curation: establish their own
+   replacement/rollback and replay rules. Surface lifetimes do not settle these.
+4. Continue checked kernel transactions and durable/history intake, custom
+   producer/action owners, supplier/consumer promotion, guest ingress, full-leaf
+   raster/intrinsic sizing and terminal outcomes, then headed AT/physical handoff.
+
+This slice caps retained evidence at 10 MB and uses the stable shared Mere target.
+The primary checkout's staged work and rewritten local history are preserved.
+
 ## Canvas same-call member lifetimes, 2026-10-23
 
 **Status (2026-10-23):** implemented; the retained Pin failure now passes, with ordinary-edit identity controls and automated receiving qualified within the boundaries below.
@@ -41,9 +87,9 @@ recorded in the producer-activation audit without invalidating unrelated nodes.
 
 ### Remaining ownership migrations
 
-- Receive witnesses in other retained Canvas state, including physics/selection,
-  Forme holds and render caches. Action routing and seed placement do not qualify
-  every cache's replacement, disposal or rollback behavior.
+- The 2026-10-26 cache continuation above receives local physics/selection,
+  Forme holds, role/move and rendering/layout caches. Delayed host installs,
+  shared model ownership and authored source/rollback semantics remain separate.
 - Receive checked activation and action-ID reassignment in deeper shared/custom
   producer owners. A trait default cannot make arbitrary interior state atomic.
 - Promote supplier APIs and coordinate external consumer patches/pins; receive
@@ -1415,10 +1461,10 @@ Apparatus pane. Application Settings remains separate. Both migrations now have
 qualified source changes and native restart receipts. Within-document selection
 inspection and background/sync controls remain later work.
 
-Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
-a renderer-independent observation store. Its older empty diagnostic groups
-remain behind the default `projection` feature; those placeholders do not
-establish a working inspection interface.
+The former Mere Apparatus facade and its empty diagnostic groups have been
+removed. Registry now owns the opt-in observations collector; product-owned
+views own accessibility presentation. This plan's earlier Apparatus crate
+references describe the former implementation and are not current source links.
 [Alembic](../../../crates/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](https://github.com/merely-made/armillary/tree/main/crates/armillary/README.md) owns actor execution and messaging.
@@ -1854,9 +1900,9 @@ through typed observations and actions rather than raw pixel puppetry.
 - `crates/shell/frame` *(historical citation)* <!-- doc-audit: historical-path --> now gives meerkat a real pane tree. Its projected leaves
   are the natural unit for diagnostics, focus, accessibility bounds, and agent
   action targets.
-- `crates/domain/apparatus` is a useful domain skeleton for an
-  accessibility projection, but the current rendered pane belongs in `meerkat`
-  like roster/gloss/comms. The domain crate should not be mistaken for a full UI.
+- The former `crates/domain/apparatus` accessibility skeleton has been removed.
+  Registry owns diagnostic observations, and Turnstone's private
+  `swatch_pane/inspection` module owns its inspection UI.
 - `crates/shell/chrome` still has valuable Graphshell-era shell semantics:
   toolbar, omnibar, command palette, focus authorities, host intents, routing
   hints, and the eventual `project_chrome(state) -> UxTree` direction.

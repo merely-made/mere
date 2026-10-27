@@ -11,7 +11,11 @@ use super::*;
 
 #[derive(PartialEq, Eq)]
 struct StrategyGraphInputs {
-    nodes: Vec<(NodeKey, uuid::Uuid)>,
+    nodes: Vec<(
+        NodeKey,
+        uuid::Uuid,
+        Option<kernel::graph::SurfaceNodeLifetime>,
+    )>,
     relations: Vec<(kernel::graph::RelationKey, kernel::graph::RelationView)>,
     payloads: Vec<(kernel::graph::RelationKey, kernel::graph::EdgePayload)>,
 }
@@ -47,7 +51,7 @@ impl Canvas {
             nodes: self
                 .graph
                 .nodes()
-                .map(|(key, node)| (key, node.id))
+                .map(|(key, node)| (key, node.id, self.graph.surface_node_lifetime(node.id)))
                 .collect(),
             relations,
             payloads,

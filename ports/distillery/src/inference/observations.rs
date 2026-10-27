@@ -8,7 +8,7 @@
 //! They are an optional bounded copy, never the run table or durable journal.
 
 use super::{InferUpdate, InferenceLane, RunStateV1};
-use apparatus::{
+use apparatus_core::{
     Batch, Cursor, ObservationMetadata, ObservationStore, OperationId, RetentionLimits, RunId,
 };
 use serde::Serialize;

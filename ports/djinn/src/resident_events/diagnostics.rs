@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Product policy for a local lifecycle copy, separate from event-file writes.
-use apparatus::collector::{CollectedBatch, DiagnosticProjection, RegistryCollector};
-use apparatus::{Cursor, ObservationMetadata, RetentionLimits};
+use apparatus_core::{Cursor, ObservationMetadata, RetentionLimits};
 use registry::diagnostics::{
     ChannelConfig, ChannelRegistrationPolicy, DiagnosticEvent, DiagnosticSender,
     DiagnosticsChannelOwner, DiagnosticsRegistry, IngressLimits, RuntimeChannelDescriptor,
     diagnostic_channel,
 };
+use registry::observations::{CollectedBatch, DiagnosticProjection, RegistryCollector};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::time::{Duration, Instant};

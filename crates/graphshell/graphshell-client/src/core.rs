@@ -253,6 +253,14 @@ impl SessionCore {
 
     /// Ask for a fresh full snapshot on the request that mounted this session.
     pub fn resnapshot(&mut self, session: &ProjectionSession) -> Result<Progress<Outcome>, String> {
+        if self.client.mounted(session).is_some_and(|mounted| {
+            matches!(
+                mounted.status,
+                chirograph::SessionStatus::Expired | chirograph::SessionStatus::Revoked
+            )
+        }) {
+            return Err("owner projection is not live".into());
+        }
         let request = self
             .requests
             .get(session)
@@ -284,14 +292,24 @@ impl SessionCore {
             PresentationResolution::Ready(presentation) => {
                 Ok(Progress::Done(Outcome::Resolved(Box::new(presentation))))
             },
-            PresentationResolution::NeedsResource(request) => Ok(self.begin(
-                Pending::Resolve {
-                    session: session.clone(),
-                    instance,
-                    request: request.clone(),
-                },
-                CarrierRequestBody::Resource(request),
-            )),
+            PresentationResolution::NeedsResource(request) => {
+                if self.client.mounted(session).is_some_and(|mounted| {
+                    matches!(
+                        mounted.status,
+                        chirograph::SessionStatus::Expired | chirograph::SessionStatus::Revoked
+                    )
+                }) {
+                    return Err("owner projection is not live".into());
+                }
+                Ok(self.begin(
+                    Pending::Resolve {
+                        session: session.clone(),
+                        instance,
+                        request: request.clone(),
+                    },
+                    CarrierRequestBody::Resource(request),
+                ))
+            },
         }
     }
 
@@ -304,6 +322,14 @@ impl SessionCore {
         instance: InstanceId,
         index: usize,
     ) -> Result<Progress<Outcome>, String> {
+        if self.client.mounted(session).is_some_and(|mounted| {
+            matches!(
+                mounted.status,
+                chirograph::SessionStatus::Expired | chirograph::SessionStatus::Revoked
+            )
+        }) {
+            return Err("owner projection is not live".into());
+        }
         let resolved = self
             .client
             .resolve(session, instance, &self.profile)
@@ -579,7 +605,27 @@ impl SessionCore {
                             session.0, snapshot.session.0
                         ));
                     }
+                    let terminal_status = self
+                        .client
+                        .mounted(&session)
+                        .map(|mounted| mounted.status)
+                        .filter(|status| {
+                            matches!(
+                                status,
+                                chirograph::SessionStatus::Expired
+                                    | chirograph::SessionStatus::Revoked
+                            )
+                        });
                     self.apply_snapshot(*snapshot, request)?;
+                    match terminal_status {
+                        Some(chirograph::SessionStatus::Revoked) => {
+                            self.client.mark_revoked(&session);
+                        },
+                        Some(chirograph::SessionStatus::Expired) => {
+                            self.client.mark_expired(&session);
+                        },
+                        _ => {},
+                    }
                     Ok(Progress::Done(Outcome::Resnapshotted))
                 },
                 other => Err(unexpected("snapshot", &other)),
@@ -609,6 +655,15 @@ impl SessionCore {
                         return Err(
                             "The media response has another scope or content address.".into()
                         );
+                    }
+                    let Some(mounted) = self.client.mounted(&request.session) else {
+                        return Err("owner projection is unavailable".into());
+                    };
+                    if matches!(
+                        mounted.status,
+                        chirograph::SessionStatus::Expired | chirograph::SessionStatus::Revoked
+                    ) {
+                        return Err("owner projection is not live".into());
                     }
                     Ok(Progress::Done(Outcome::MediaResource(Box::new(response))))
                 },
@@ -715,9 +770,12 @@ impl SessionCore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chirograph::{EndpointDescriptor, ProjectionOffer, ProjectionRequest, ProtocolVersion};
+    use chirograph::{
+        EndpointDescriptor, ProjectionDiff, ProjectionOffer, ProjectionRequest, ProtocolVersion,
+        ResumeReply,
+    };
     use sceno::score::{Arrangement, Score};
-    use scenotime::{Revision, SceneEpoch};
+    use scenotime::{Revision, SceneDiff, SceneEpoch};
 
     fn request_for(session: &ProjectionSession) -> ProjectionRequest {
         ProjectionRequest {
@@ -917,6 +975,96 @@ mod tests {
             .unwrap();
         (core, session, card, media)
     }
+
+    #[test]
+    fn revoked_resume_purges_bytes_and_keeps_endpoint_actions_closed() {
+        let (mut core, session, card, _) = media_core();
+        let hash = chirograph::ContentHash::of(&card);
+        core.client
+            .apply_resource(ResourceResponse::new(session.clone(), card))
+            .unwrap();
+        assert!(core.client.resources[&session].contains_key(&hash));
+
+        let start = core
+            .resume_from_notice(CarrierNotice {
+                session: session.clone(),
+                epoch: SceneEpoch(1),
+                revision: Revision(2),
+            })
+            .unwrap();
+        assert!(matches!(
+            start.request(),
+            Some(CarrierRequestBody::Resume(_))
+        ));
+        let replay = ProjectionDiff {
+            version: ProtocolVersion::V1,
+            session: session.clone(),
+            scene: SceneDiff {
+                epoch: SceneEpoch(1),
+                base: Revision(1),
+                revision: Revision(2),
+                operations: Vec::new(),
+            },
+            presentation: Vec::new(),
+            status: Some(chirograph::SessionStatus::Revoked),
+        };
+        let finished = core
+            .on_response(CarrierResponseBody::Resume(ResumeReply::Diffs(vec![
+                replay,
+            ])))
+            .unwrap();
+
+        assert!(matches!(finished, Progress::Done(Outcome::Changed(true))));
+        assert_eq!(
+            core.client.mounted(&session).unwrap().status,
+            chirograph::SessionStatus::Revoked
+        );
+        assert!(!core.client.resources.contains_key(&session));
+        assert!(
+            core.current_actions(&session, InstanceId(0))
+                .unwrap_err()
+                .contains("not live")
+        );
+    }
+
+    #[test]
+    fn late_resource_replies_after_revocation_cannot_repopulate_or_escape() {
+        let (mut core, session, card, _) = media_core();
+        let request = core.resolve(&session, InstanceId(0)).unwrap();
+        assert!(matches!(
+            request.request(),
+            Some(CarrierRequestBody::Resource(_))
+        ));
+        core.client.mark_revoked(&session);
+        let error = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session.clone(),
+                card,
+            )))
+            .expect_err("a late presentation response after revocation is refused");
+        assert!(error.contains("TerminalSession"), "{error}");
+        assert!(!core.client.resources.contains_key(&session));
+
+        let (mut core, session, card, media) = media_core();
+        core.client
+            .apply_resource(ResourceResponse::new(session.clone(), card))
+            .unwrap();
+        let request = core.media_resource(&session, InstanceId(0), 0).unwrap();
+        assert!(matches!(
+            request.request(),
+            Some(CarrierRequestBody::Resource(resource))
+                if resource.resource == chirograph::ContentHash::of(&media)
+        ));
+        core.client.mark_revoked(&session);
+        let error = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session.clone(),
+                media,
+            )))
+            .expect_err("a late card-media response after revocation is refused");
+        assert!(error.contains("not live"), "{error}");
+    }
+
     #[test]
     fn media_requires_a_verified_card_and_keeps_owner_bytes_out_of_presentation_cache() {
         let (mut core, session, card, media) = media_core();
@@ -952,10 +1100,9 @@ mod tests {
             matches!(outcome,Progress::Done(Outcome::MediaResource(response)) if response.bytes==media)
         );
         assert!(
-            !core
-                .client
-                .resources
-                .contains_key(&(session, chirograph::ContentHash::of(&media)))
+            !core.client.resources.get(&session).is_some_and(
+                |resources| resources.contains_key(&chirograph::ContentHash::of(&media))
+            )
         );
     }
 
@@ -976,10 +1123,14 @@ mod tests {
             !core.is_awaiting(),
             "the refusal starts no follow-up request"
         );
-        assert!(!core.client.resources.contains_key(&(
-            session,
-            chirograph::ContentHash::of(b"other advertised resource")
-        )));
+        assert!(
+            !core
+                .client
+                .resources
+                .get(&session)
+                .is_some_and(|resources| resources
+                    .contains_key(&chirograph::ContentHash::of(b"other advertised resource")))
+        );
     }
 
     #[test]
