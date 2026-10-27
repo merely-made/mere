@@ -38,7 +38,7 @@ use rkyv::{Archive, Deserialize, Serialize};
 use super::Graph;
 use super::capture::{
     CapturedDelta, DeltaRecorder, OnRefusal, ReplayAttribution, ReplayRefused,
-    replay_attributed_deltas_onto, replay_graph_deltas_onto,
+    replay_attributed_deltas_onto, replay_outcomes_onto,
 };
 use super::source_time::{SourceExtent, SourceTime};
 
@@ -491,12 +491,12 @@ impl GraphJournal {
     /// Use [`replay_from_with_baseline`](Self::replay_from_with_baseline) to recover
     /// the original minting author across earlier removal and later restoration.
     pub fn replay_from(&self, since: Seq, graph: &mut Graph) -> Result<(), ReplayRefused> {
-        replay_graph_deltas_onto(
+        replay_outcomes_onto(
             graph,
             self.log
                 .from(since)
                 .iter()
-                .filter_map(|entry| entry.delta.replay_delta_as(&entry.author)),
+                .map(|entry| entry.delta.replay_as(&entry.author)),
             OnRefusal::Stop,
         )
     }

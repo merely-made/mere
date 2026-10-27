@@ -170,8 +170,8 @@ pub use navigation_check::NavigationIndexError;
 // `EdgeKind`; reads go through [`RelationKind`] + [`RelationSelector`], writes
 // through [`EdgeAssertion`].
 pub use capture::{
-    CapturedDelta, DeltaRecorder, GraphTableStats, ReplayRefused, replay_captured_deltas,
-    replay_captured_deltas_as_onto, replay_captured_deltas_onto,
+    CapturedDelta, DeltaRecorder, GraphTableStats, Malformed, Replay, ReplayRefused, Unwritable,
+    replay_captured_deltas, replay_captured_deltas_as_onto, replay_captured_deltas_onto,
     replay_captured_deltas_onto_checked, set_captured_delta_hook, with_isolated_capture,
 };
 pub use journal::{

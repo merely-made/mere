@@ -38,9 +38,14 @@ use crate::types::{
 };
 
 mod edge_assertion_compat;
+mod replay_outcome;
+pub(crate) use replay_outcome::replay_outcomes_onto;
+pub use replay_outcome::{Malformed, Replay, Unwritable};
 
 #[cfg(test)]
 mod decay_compat_tests;
+#[cfg(test)]
+mod replay_outcome_tests;
 
 /// The stable-id, serializable mirror of the replayable graph deltas.
 #[derive(
@@ -90,7 +95,7 @@ pub enum CapturedDelta {
     //
     // Journals recorded before the node-image externalization carry raw bytes
     // in these. They are kept so an existing journal still deserializes and
-    // replays; `replay_delta` returns `None` for them, so the pixels are
+    // replays; `replay` gives `Replay::Skip` for them, so the pixels are
     // dropped rather than restored. That is deliberate: a preview is
     // experience, not truth, and the next capture re-deposits it. Nothing
     // emits these variants any more.
@@ -281,12 +286,11 @@ pub enum CapturedDelta {
 }
 
 impl CapturedDelta {
-    /// The graph-kernel replay delta this captured record folds back into.
-    ///
-    /// `None` for records with no live equivalent (pre-phase-2 inline
-    /// imagery), which a replay skips.
-    pub fn replay_delta(&self) -> Option<GraphDelta> {
-        Some(match self {
+    /// What this captured record replays as: the graph-kernel delta it folds
+    /// back into, an explicit skip (pre-phase-2 inline imagery, which has no
+    /// live equivalent), or a malformed record. The one place these are told apart.
+    pub fn replay(&self) -> Replay {
+        Replay::Apply(match self {
             Self::ReplayAddNodeWithIdIfMissing { id, url, position } => {
                 GraphDelta::ReplayAddNodeWithIdIfMissing {
                     id: parse_uuid(id),
@@ -348,7 +352,7 @@ impl CapturedDelta {
             // cannot store a blob (that is async, and the store's job), so the
             // bytes are dropped and the preview regenerates on next capture.
             Self::ReplaySetNodeThumbnailById { .. } | Self::ReplaySetNodeFaviconById { .. } => {
-                return None;
+                return Replay::Skip;
             },
             Self::ReplaySetNodeMimeHintById { node_id, mime_hint } => {
                 GraphDelta::ReplaySetNodeMimeHintById {
@@ -379,7 +383,10 @@ impl CapturedDelta {
                 facet,
                 value_json,
             } => {
-                let value = serde_json::from_str(value_json).ok()?;
+                let value = match serde_json::from_str(value_json) {
+                    Ok(value) => value,
+                    Err(error) => return Replay::Malformed(Malformed::new(node_id, facet, error)),
+                };
                 GraphDelta::ReplaySetNodeFacetById {
                     node_id: parse_uuid(node_id),
                     facet: facet.clone(),
@@ -624,17 +631,17 @@ impl CapturedDelta {
     }
     /// Replay old assertion records with their journal's attribution envelope.
     /// Exact captures need the baseline-aware journal methods to recover minting authors.
-    pub fn replay_delta_as(&self, author: &super::Author) -> Option<GraphDelta> {
-        let mut delta = self.replay_delta()?;
-        match &mut delta {
+    pub fn replay_as(&self, author: &super::Author) -> Replay {
+        let mut replay = self.replay();
+        if let Replay::Apply(
             GraphDelta::ReplayAssertRelationByIds { asserter_iri, .. }
             | GraphDelta::ReplayAssertSemanticPredicateByIds { asserter_iri, .. }
-            | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { asserter_iri, .. } => {
-                *asserter_iri = author.asserter_iri();
-            },
-            _ => {},
+            | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { asserter_iri, .. },
+        ) = &mut replay
+        {
+            *asserter_iri = author.asserter_iri();
         }
-        Some(delta)
+        replay
     }
 }
 
@@ -816,18 +823,19 @@ pub fn replay_captured_deltas_onto<I>(graph: &mut Graph, deltas: I)
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
-    // A refused entry is dropped and replay goes on; scratch replays over merge
-    // candidates accept that. Where the entries are the authority, use the
+    // A refused or malformed entry is dropped and replay goes on; scratch
+    // replays over merge candidates accept that. Where the entries are the authority, use the
     // checked twin.
-    let _ = replay_graph_deltas_onto(
+    let _ = replay_outcomes_onto(
         graph,
-        deltas.into_iter().filter_map(|delta| delta.replay_delta()),
+        deltas.into_iter().map(|delta| delta.replay()),
         OnRefusal::Drop,
     );
 }
 
 /// [`replay_captured_deltas_onto`], reporting the first entry the graph refuses
-/// instead of dropping it. The graph holds the entries before it.
+/// or that is malformed instead of dropping it. The graph holds the entries
+/// before it. An explicit skip is never a refusal.
 pub fn replay_captured_deltas_onto_checked<I>(
     graph: &mut Graph,
     deltas: I,
@@ -835,9 +843,9 @@ pub fn replay_captured_deltas_onto_checked<I>(
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
-    replay_graph_deltas_onto(
+    replay_outcomes_onto(
         graph,
-        deltas.into_iter().filter_map(|delta| delta.replay_delta()),
+        deltas.into_iter().map(|delta| delta.replay()),
         OnRefusal::Stop,
     )
 }
@@ -848,11 +856,9 @@ pub fn replay_captured_deltas_as_onto<I>(graph: &mut Graph, author: &super::Auth
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
-    let _ = replay_graph_deltas_onto(
+    let _ = replay_outcomes_onto(
         graph,
-        deltas
-            .into_iter()
-            .filter_map(|delta| delta.replay_delta_as(author)),
+        deltas.into_iter().map(|delta| delta.replay_as(author)),
         OnRefusal::Drop,
     );
 }
@@ -938,12 +944,11 @@ impl ReplayAttribution {
         changed
     }
 
-    pub(crate) fn replay_delta(
-        &mut self,
-        delta: &CapturedDelta,
-        author: &super::Author,
-    ) -> Option<GraphDelta> {
-        let mut delta = delta.replay_delta_as(author)?;
+    pub(crate) fn replay(&mut self, delta: &CapturedDelta, author: &super::Author) -> Replay {
+        let mut delta = match delta.replay_as(author) {
+            Replay::Apply(delta) => delta,
+            other => return other,
+        };
         if let GraphDelta::ReplaySetEdgesByIds { edges, .. }
         | GraphDelta::ReplaySetResourceEdgesByIds { edges, .. } = &mut delta
         {
@@ -972,7 +977,7 @@ impl ReplayAttribution {
                 }
             }
         }
-        Some(delta)
+        Replay::Apply(delta)
     }
 }
 
@@ -1015,22 +1020,28 @@ where
 {
     replay_quietly(graph, |graph| {
         for (position, entry) in entries.into_iter().enumerate() {
-            if let Some(delta) = attribution.replay_delta(&entry.delta, &entry.author) {
-                let legacy_assertion = matches!(
-                    delta,
-                    GraphDelta::ReplayAssertRelationByIds { .. }
-                        | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
-                        | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
-                );
-                if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta)
-                    && on_refusal == OnRefusal::Stop
-                {
-                    return Err(ReplayRefused { position, reason });
-                }
-                attribution.1.observe_delta(graph, entry);
-                if legacy_assertion {
-                    attribution.observe_graph(graph);
-                }
+            let delta = match attribution.replay(&entry.delta, &entry.author) {
+                Replay::Apply(delta) => delta,
+                Replay::Skip => continue,
+                Replay::Malformed(bad) if on_refusal == OnRefusal::Stop => {
+                    return Err(bad.refused_at(position));
+                },
+                Replay::Malformed(_) => continue,
+            };
+            let legacy_assertion = matches!(
+                delta,
+                GraphDelta::ReplayAssertRelationByIds { .. }
+                    | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
+                    | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
+            );
+            if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta)
+                && on_refusal == OnRefusal::Stop
+            {
+                return Err(ReplayRefused { position, reason });
+            }
+            attribution.1.observe_delta(graph, entry);
+            if legacy_assertion {
+                attribution.observe_graph(graph);
             }
         }
         Ok(())
@@ -1045,16 +1056,7 @@ pub(crate) fn replay_graph_deltas_onto<I>(
 where
     I: IntoIterator<Item = GraphDelta>,
 {
-    replay_quietly(graph, |graph| {
-        for (position, delta) in deltas.into_iter().enumerate() {
-            if let GraphDeltaResult::Refused(reason) = apply_graph_delta(graph, delta)
-                && on_refusal == OnRefusal::Stop
-            {
-                return Err(ReplayRefused { position, reason });
-            }
-        }
-        Ok(())
-    })
+    replay_outcomes_onto(graph, deltas.into_iter().map(Replay::Apply), on_refusal)
 }
 
 fn replay_quietly<R>(graph: &mut Graph, edit: impl FnOnce(&mut Graph) -> R) -> R {
@@ -1388,7 +1390,7 @@ mod tests {
         let restored: CapturedDelta = postcard::from_bytes(&bytes).expect("decode");
         assert_eq!(restored, delta, "an old journal entry still reads");
         assert!(
-            restored.replay_delta().is_none(),
+            matches!(restored.replay(), Replay::Skip),
             "it has no live delta: the pixels are dropped, not restored"
         );
     }
@@ -2898,13 +2900,13 @@ mod resource_capture_tests {
             },
         ];
         for delta in &writes {
-            apply_graph_delta(&mut graph, delta.replay_delta().unwrap());
+            apply_graph_delta(&mut graph, delta.replay().into_write().unwrap());
         }
         let recorded = seen.lock().unwrap().clone();
         assert_eq!(recorded.len(), 4);
         let revision = graph.revision();
         for delta in &recorded {
-            apply_graph_delta(&mut graph, delta.replay_delta().unwrap());
+            apply_graph_delta(&mut graph, delta.replay().into_write().unwrap());
         }
         assert_eq!(
             seen.lock().unwrap().len(),
