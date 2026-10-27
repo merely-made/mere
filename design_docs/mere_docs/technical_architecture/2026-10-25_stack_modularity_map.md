@@ -244,10 +244,10 @@ refuses a new unconditional toolkit-to-document-stack link.
 Ruled and landed 2026-10-26: Mark chose "beside its host"; the package is
 `ports/tabard/workshop`, embedded by workspace path as before, and no crate
 under `crates/cambium/` links the document stack. The web host's
-`shared_recovery` wasm example still mounts the workshop as a dev-dependency,
-which the port boundary check now prints as a carried dev-only link rather
-than refusing; whether examples may mount a product surface is Mark's to
-confirm.
+`shared_recovery` wasm example mounted the workshop as a dev-dependency; Mark
+ruled that a dev-only link from a crate to a port is refused like any other, so
+the example moved into `ports/tabard/workshop/examples/` and the boundary check
+passes with nothing carried.
 
 ### Which rung each cut belongs on
 
@@ -273,4 +273,4 @@ split.
   document stack (`inker`, `document-canvas`, `mere-lanes`, `nematic`,
   `fleece`, `mere-pageload`, `mere-fetch`, `knot-editor-host`) unnoticed; none
   does since `tabard-workshop` moved to `ports/tabard/workshop` (2026-10-26).
-  A dev-only link from a crate to a port is printed, never refused.
+  A crate's dev-dependency on a port is refused like any other link.

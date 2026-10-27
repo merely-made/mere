@@ -158,14 +158,8 @@ def main() -> None:
             path = dependency.get("path")
             if path is None or not is_beneath(pathlib.Path(path), PORTS):
                 continue
-            if dependency.get("kind") == "dev":
-                # Examples and tests may mount a product surface; shipped code
-                # may not. Printed so the edge stays visible.
-                print(
-                    f"carried dev-only link: {package['name']} -> {dependency['name']} "
-                    f"({pathlib.Path(path).relative_to(ROOT)})"
-                )
-                continue
+            # Every kind, dev-dependencies included: an example or test that
+            # mounts a product surface lives with that product (Mark, 2026-10-26).
             fail(
                 f"{manifest.relative_to(ROOT)} depends on port package "
                 f"{dependency['name']} at {pathlib.Path(path).relative_to(ROOT)}"
