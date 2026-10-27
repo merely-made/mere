@@ -1,5 +1,51 @@
 # System Diagnostics and Accessibility Plan
 
+## Canvas cache membership receiving, 2026-10-26
+
+**Status (2026-10-26):** implemented; automated acceptance is recorded separately
+in `support/family-promotion/diagnostics-canvas-cache-qualification.json`.
+Review, fixed bugs and remaining owner migrations:
+`support/family-promotion/diagnostics-canvas-cache-review.json`.
+
+The kernel remains the only author of runtime member lifetimes. Canvas now
+receives those witnesses before reconciling its runtime caches. Same-call
+removal/recreation retires selection/pins, state/shape, active moves, role and
+at-rest state, seeds/Mosaic, local layout slots, display appearances and saved
+fold selections. UUID-keyed overrides retain the D1 ruling and prune exits even
+when the same UUID returns before reconciliation. Ordinary edits, metadata
+clones and unrelated members keep their live identities and state.
+
+Seiche receives graph-free explicit retirement, not another identity allocator.
+It drops named body lives and remembered material/kinds, then reconciles the
+replacement set in one actor command. The existing epoch barrier excludes older
+snapshots. Unaffected bodies retain their Rapier handles. Explicit graph switches
+also retire runtime state for clones, reset the community receiver/affinity and
+reacquire scope choices by UUID. Cache presence alone is no longer used as proof
+that a surface membership survived.
+
+Content-addressed pixels, address-derived icon bytes and authored UUID rosters
+keep their separate lifetimes. A Forme's old runtime hold retires; its current
+authored cell roster may acquire a fresh hold. An exact scope and Fold definition
+remain authored intent. This does not qualify a detached delayed host callback,
+transition or provider result, nor durable replay or physical presentation.
+
+### Next ownership boundaries and done-conditions
+
+1. Delayed host layout/StopReturn, content and affinity replies: capture the
+   dispatch owner and member lifetime; refuse a superseded install at the actual
+   receiving boundary. Bare NodeKey/UUID setters are not revocation contracts.
+2. Shared signal/model caches: propagate graph-owner generations, including
+   equal-revision whole-graph replacement, through dispatch and receiving.
+   ChannelRegistry's one-graph revision assumption remains explicit.
+3. Link/field/assertion owners and authored curation: establish their own
+   replacement/rollback and replay rules. Surface lifetimes do not settle these.
+4. Continue checked kernel transactions and durable/history intake, custom
+   producer/action owners, supplier/consumer promotion, guest ingress, full-leaf
+   raster/intrinsic sizing and terminal outcomes, then headed AT/physical handoff.
+
+This slice caps retained evidence at 10 MB and uses the stable shared Mere target.
+The primary checkout's staged work and rewritten local history are preserved.
+
 ## Canvas same-call member lifetimes, 2026-10-23
 
 **Status (2026-10-23):** implemented; the retained Pin failure now passes, with ordinary-edit identity controls and automated receiving qualified within the boundaries below.
@@ -41,9 +87,9 @@ recorded in the producer-activation audit without invalidating unrelated nodes.
 
 ### Remaining ownership migrations
 
-- Receive witnesses in other retained Canvas state, including physics/selection,
-  Forme holds and render caches. Action routing and seed placement do not qualify
-  every cache's replacement, disposal or rollback behavior.
+- The 2026-10-26 cache continuation above receives local physics/selection,
+  Forme holds, role/move and rendering/layout caches. Delayed host installs,
+  shared model ownership and authored source/rollback semantics remain separate.
 - Receive checked activation and action-ID reassignment in deeper shared/custom
   producer owners. A trait default cannot make arbitrary interior state atomic.
 - Promote supplier APIs and coordinate external consumer patches/pins; receive

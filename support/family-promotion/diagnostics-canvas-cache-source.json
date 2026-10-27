@@ -1,0 +1,22 @@
+{
+  "basis": "95ea7c7d697f3c9f553aef752a7e3467aec6b6ae",
+  "normalization": "CRLF normalized to LF",
+  "sha256": {
+    ".gitattributes": "2d38e74895102c8a0f6966a1f651239532d1c5750a2d2936db4fe2d284507a17",
+    "Cargo.lock": "6a7bb70226c34e262d8c99eda7e32dff620eb737239614914c18b61e213b2b9d",
+    "Cargo.toml": "651efbc453657c74a2abca77b7bd6e592945aa1fca5944ea3964d437e39e9a0d",
+    "crates/canvas/pictograph/src/canvas.rs": "e73f6d594658f0c1e9a98892835cd0175542c935a3621c9fe93b37b53b8439dc",
+    "crates/canvas/pictograph/src/canvas/at_rest.rs": "25549c656443e7e2cd199c118851f80042fb2002683d477edd6fa8cd0b7d5367",
+    "crates/canvas/pictograph/src/canvas/lifecycle.rs": "4da6583109db2fef6339b2488817a16c5a4618881f7309519e87acc254d0e5c0",
+    "crates/canvas/pictograph/src/canvas/member_lifetimes.rs": "0d4d78bdf455bfb551cf1386dd603ec82b3a9dff440c547b19c81d89f462d890",
+    "crates/canvas/pictograph/src/canvas/reader.rs": "b4c92a163fd9a4006cd873afecbab403b19a6584dfcc93c1892835978c8f070c",
+    "crates/canvas/pictograph/src/canvas/roles.rs": "d55d0903997b3141464a7fdc74a2db2b380ff8127ff13fd30096935a7e9e5e8b",
+    "crates/canvas/pictograph/src/canvas/strategy_inputs.rs": "6928d9437f52021ca19a498ed27816ca6a66e07596241d47ea51a8cc783be2c0",
+    "crates/canvas/pictograph/src/canvas/tests.rs": "a9bbcd3366c4685fca9967ac6eb320186e64edb6d4f1c69859799436e40f23d7",
+    "crates/canvas/pictograph/src/canvas/tests/cache_lifetimes.rs": "ff176af51130792a5152d9916b08779e614d2420094de047e43b43ec31558ad4",
+    "crates/conatus/seiche/src/runtime.rs": "0328fc57d882aec7217a0880dc6f58c362efe686577d2f98d577fe13d8b3000e",
+    "crates/conatus/seiche/src/runtime/actor.rs": "f6c6a32c7c539588b99400a9b77d605024fb3032a08e60d2a56139fa4004bb5b",
+    "crates/conatus/seiche/src/runtime/retirement_tests.rs": "6ad8e86242a14c7cddd44fba04a21f9d97949a230cac99c8d89df750c5e35275",
+    "crates/conatus/seiche/src/sync.rs": "01804e1ddf387b90481668be04fc7a80b2227eb756684a378c00a39093ecbdf2"
+  }
+}

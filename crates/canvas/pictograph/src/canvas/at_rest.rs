@@ -46,6 +46,11 @@ pub(crate) struct AtRest {
 }
 
 impl AtRest {
+    pub(super) fn retain_members(&mut self, keep: impl Fn(&NodeKey) -> bool) {
+        self.glide.retain(|(key, _, _)| keep(key));
+        self.parked.retain(keep);
+    }
+
     /// Fold one frame's stepping state in: true on the frame a settle
     /// budget runs out (F63).
     pub(crate) fn budget_ended(&mut self, stepping: bool) -> bool {
