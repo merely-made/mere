@@ -69,6 +69,10 @@ pub enum Progress<T> {
     Ask(CarrierRequestBody),
     /// The operation is finished and this is its result.
     Done(T),
+    /// Nothing was started: another operation is still waiting on its answer.
+    /// The starters that return a `Result` give this message as `Err`; it
+    /// rides here for those that cannot (`rediscover`, `poll`, `close`).
+    Refused(String),
 }
 
 impl<T> Progress<T> {
@@ -76,14 +80,14 @@ impl<T> Progress<T> {
     pub fn request(&self) -> Option<&CarrierRequestBody> {
         match self {
             Progress::Ask(body) => Some(body),
-            Progress::Done(_) => None,
+            Progress::Done(_) | Progress::Refused(_) => None,
         }
     }
 
     /// The result, when the operation is finished.
     pub fn done(self) -> Option<T> {
         match self {
-            Progress::Ask(_) => None,
+            Progress::Ask(_) | Progress::Refused(_) => None,
             Progress::Done(value) => Some(value),
         }
     }
@@ -211,6 +215,14 @@ impl SessionCore {
         self.client.forget_session(session);
     }
 
+    /// Stop awaiting an answer the endpoint refused.
+    ///
+    /// Unlike [`SessionCore::disconnect`] the mounted scenes stay live: the
+    /// endpoint is still there and declined only this request.
+    pub(crate) fn abandon(&mut self) {
+        self.pending = None;
+    }
+
     /// Every mounted projection stops being live.
     ///
     /// The scene is kept rather than dropped: a host still wants to show what
@@ -243,12 +255,12 @@ impl SessionCore {
             .get(offer_index)
             .map(|offer| offer.request.clone())
             .ok_or_else(|| format!("endpoint has no projection {offer_index}"))?;
-        Ok(self.begin(
+        self.begin(
             Pending::Mount {
                 request: request.clone(),
             },
             CarrierRequestBody::Snapshot(request),
-        ))
+        )
     }
 
     /// Ask for a fresh full snapshot on the request that mounted this session.
@@ -266,13 +278,13 @@ impl SessionCore {
             .get(session)
             .cloned()
             .ok_or_else(|| format!("Graphshell did not mount {}", session.0))?;
-        Ok(self.begin(
+        self.begin(
             Pending::Resnapshot {
                 session: session.clone(),
                 request: request.clone(),
             },
             CarrierRequestBody::Snapshot(request),
-        ))
+        )
     }
 
     /// Resolve one presentation, fetching resources only as it needs them.
@@ -301,14 +313,14 @@ impl SessionCore {
                 }) {
                     return Err("owner projection is not live".into());
                 }
-                Ok(self.begin(
+                self.begin(
                     Pending::Resolve {
                         session: session.clone(),
                         instance,
                         request: request.clone(),
                     },
                     CarrierRequestBody::Resource(request),
-                ))
+                )
             },
         }
     }
@@ -348,12 +360,12 @@ impl SessionCore {
             session: session.clone(),
             resource,
         };
-        Ok(self.begin(
+        self.begin(
             Pending::MediaResource {
                 request: request.clone(),
             },
             CarrierRequestBody::Resource(request),
-        ))
+        )
     }
 
     /// Invoke an action exactly as advertised.
@@ -410,9 +422,7 @@ impl SessionCore {
         offered: &AdvertisedAction,
         command: &hest::Invocation,
     ) -> Result<Progress<Outcome>, String> {
-        if self.is_awaiting() {
-            return Err("Graphshell is awaiting the endpoint's answer".into());
-        }
+        self.ensure_idle()?;
         let advertised = self
             .current_actions(&target.session, target.target)?
             .into_iter()
@@ -427,7 +437,7 @@ impl SessionCore {
             target.observed_revision,
         )
         .map_err(|error| format!("could not bind advertised command: {error:?}"))?;
-        Ok(self.begin(Pending::Intent, CarrierRequestBody::Intent(invocation)))
+        self.begin(Pending::Intent, CarrierRequestBody::Intent(invocation))
     }
 
     /// Current endpoint actions for one exact, active item. Cached scenes and
@@ -526,6 +536,7 @@ impl SessionCore {
         &mut self,
         session: &ProjectionSession,
     ) -> Result<Progress<Outcome>, String> {
+        self.ensure_idle()?;
         let request = self
             .client
             .resume_request(session)
@@ -536,13 +547,13 @@ impl SessionCore {
             revision: request.revision,
         };
         self.client.mark_stale(session);
-        Ok(self.begin(
+        self.begin(
             Pending::Resume {
                 notice,
                 attempts: 0,
             },
             CarrierRequestBody::Resume(request),
-        ))
+        )
     }
 
     /// Discover again on a session that already exists.
@@ -557,17 +568,20 @@ impl SessionCore {
     /// bells that follow resume by diff rather than by snapshot.
     pub fn rediscover(&mut self) -> Progress<Outcome> {
         self.begin(Pending::Rediscover, CarrierRequestBody::Discover)
+            .unwrap_or_else(Progress::Refused)
     }
 
     /// Start the discovery round trip a polling host uses to let its carrier
     /// collect whatever notices the endpoint has already written.
     pub fn poll(&mut self) -> Progress<Outcome> {
         self.begin(Pending::PollDiscover, CarrierRequestBody::Discover)
+            .unwrap_or_else(Progress::Refused)
     }
 
     /// Close the session.
     pub fn close(&mut self) -> Progress<Outcome> {
         self.begin(Pending::Close, CarrierRequestBody::Close)
+            .unwrap_or_else(Progress::Refused)
     }
 
     // ── Feeding answers back ────────────────────────────────────────────────
@@ -697,10 +711,10 @@ impl SessionCore {
                                     "endpoint did not produce an applicable resume after {RESUME_ATTEMPTS} attempts"
                                 ));
                             }
-                            Ok(self.begin(
+                            self.begin(
                                 Pending::Resume { notice, attempts },
                                 CarrierRequestBody::Resume(next),
-                            ))
+                            )
                         },
                     }
                 },
@@ -722,10 +736,28 @@ impl SessionCore {
 
     // ── Internals ───────────────────────────────────────────────────────────
 
-    /// Arm one pending operation and hand back what to ask.
-    fn begin(&mut self, pending: Pending, body: CarrierRequestBody) -> Progress<Outcome> {
+    /// The refusal every start gets while an operation awaits its answer.
+    ///
+    /// Starts that change something before they arm (`resume_session`,
+    /// `resume_step`) call it first, so a refused start leaves no trace.
+    fn ensure_idle(&self) -> Result<(), String> {
+        if self.is_awaiting() {
+            return Err("Graphshell is awaiting the endpoint's answer".into());
+        }
+        Ok(())
+    }
+
+    /// Arm one pending operation and hand back what to ask, or refuse while
+    /// another still awaits its answer. The follow-ups in `on_response` come
+    /// through here too, after taking the operation they continue.
+    fn begin(
+        &mut self,
+        pending: Pending,
+        body: CarrierRequestBody,
+    ) -> Result<Progress<Outcome>, String> {
+        self.ensure_idle()?;
         self.pending = Some(pending);
-        Progress::Ask(body)
+        Ok(Progress::Ask(body))
     }
 
     /// The resume state machine's entry, shared by the first attempt and every
@@ -742,14 +774,15 @@ impl SessionCore {
         if notice.epoch == acknowledged.epoch && notice.revision <= acknowledged.revision {
             return Ok(Progress::Done(Outcome::Changed(false)));
         }
+        self.ensure_idle()?;
         self.client.mark_stale(&notice.session);
         let Some(request) = self.client.resume_request(&notice.session) else {
             return Ok(Progress::Done(Outcome::Changed(false)));
         };
-        Ok(self.begin(
+        self.begin(
             Pending::Resume { notice, attempts },
             CarrierRequestBody::Resume(request),
-        ))
+        )
     }
 
     fn apply_snapshot(
@@ -1205,5 +1238,72 @@ mod tests {
             );
             assert!(!core.is_awaiting());
         }
+    }
+
+    /// One operation at a time: a second start is refused whole, arming and
+    /// changing nothing, and the first operation's answer still completes it.
+    #[test]
+    fn a_start_while_awaiting_is_refused_and_the_first_stays_answerable() {
+        let (mut core, session, card, _) = media_core();
+        let _ = core.resolve(&session, InstanceId(0)).unwrap();
+        let notice = CarrierNotice {
+            session: session.clone(),
+            epoch: SceneEpoch(1),
+            revision: Revision(2),
+        };
+
+        for refusal in [
+            core.mount(0),
+            core.resnapshot(&session),
+            core.resolve(&session, InstanceId(0)),
+            core.resume_session(&session),
+            core.resume_from_notice(notice),
+        ] {
+            let error = refusal.expect_err("an operation is awaiting its answer");
+            assert!(error.contains("awaiting"), "{error}");
+        }
+        for refusal in [core.rediscover(), core.poll(), core.close()] {
+            assert!(
+                matches!(&refusal, Progress::Refused(message) if message.contains("awaiting")),
+                "{refusal:?}"
+            );
+            assert!(refusal.request().is_none() && refusal.done().is_none());
+        }
+        assert_eq!(
+            core.client.mounted(&session).unwrap().status,
+            chirograph::SessionStatus::Live,
+            "a refused resume does not mark the session stale"
+        );
+
+        let answered = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session, card,
+            )))
+            .expect("the first operation is still the one awaited");
+        assert!(matches!(answered, Progress::Done(Outcome::Resolved(_))));
+        assert!(!core.is_awaiting());
+    }
+
+    #[test]
+    fn a_second_media_request_is_refused_while_the_first_awaits() {
+        let (mut core, session, card, media) = media_core();
+        core.client
+            .apply_resource(ResourceResponse::new(session.clone(), card))
+            .unwrap();
+        let _ = core.media_resource(&session, InstanceId(0), 0).unwrap();
+        let error = core
+            .media_resource(&session, InstanceId(0), 0)
+            .expect_err("one at a time");
+        assert!(error.contains("awaiting"), "{error}");
+
+        let answered = core
+            .on_response(CarrierResponseBody::Resource(ResourceResponse::new(
+                session, media,
+            )))
+            .unwrap();
+        assert!(matches!(
+            answered,
+            Progress::Done(Outcome::MediaResource(_))
+        ));
     }
 }
