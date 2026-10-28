@@ -4253,6 +4253,43 @@ mod tests {
     }
 
     #[test]
+    fn an_eight_field_baseline_qualifies_whatever_the_hash_order() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+        use kernel::graph::{Field, FieldDefinition, FieldId, ScalarField};
+
+        pollster::block_on(async {
+            for _ in 0..8 {
+                let mut graph = Graph::new();
+                for n in 0..8u128 {
+                    let field = Field::new(
+                        FieldId::from_uuid(Uuid::from_u128(n + 1)),
+                        FieldDefinition::Scalar(ScalarField::Const(n as f32)),
+                    );
+                    apply_graph_delta(&mut graph, GraphDelta::AddField { field });
+                }
+                let expected = graph.to_snapshot().fields;
+                let sessions = MereSessions::new(MemoryBackend::new());
+                let mut session = sessions.begin(person(), Some(graph));
+                session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+                let id = session.id();
+                let mut opened = sessions.open(id).await.unwrap();
+                assert_eq!(opened.graph().to_snapshot().fields, expected);
+                opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
+                assert_eq!(
+                    sessions
+                        .open(id)
+                        .await
+                        .unwrap()
+                        .graph()
+                        .to_snapshot()
+                        .fields,
+                    expected
+                );
+            }
+        });
+    }
+
+    #[test]
     fn opening_a_session_whose_facets_steal_a_handle_is_refused() {
         pollster::block_on(async {
             let store = MemoryBackend::new();

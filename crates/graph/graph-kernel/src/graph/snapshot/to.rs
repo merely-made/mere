@@ -110,8 +110,8 @@ impl Graph {
             .collect();
 
         // Edge slots are reused, so storage order is history; the snapshot is
-        // in the order of each edge's JSON bytes, which `FrozenGraph::of` keeps.
-        // The statements inside an edge keep their exact order.
+        // in the order of each edge's JSON bytes, so comparisons need no sort of
+        // their own. The statements inside an edge keep their exact order.
         let mut edges: Vec<_> = self
             .inner
             .inner()
