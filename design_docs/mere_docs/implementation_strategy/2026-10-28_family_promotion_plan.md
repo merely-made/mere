@@ -54,8 +54,10 @@ After the functional seams qualify, promote the resident and its custody impleme
 
 - 2026-10-19: the Eidetic repository owns Muniment, Chartulary, Eidetic, Hagiograph, Stickleback, Luggage, `mere-proofs` and Servitor as separate crates; Armillary has its own repository (and the sibling crate `apparatus-core`); ESP its own for model execution; Gemot its own for the governance and community family (Mien, Mooting, Moothold, Commons); Errand continues in the Smolweb repository as `merely-made/errand` with its thirteen protocol crates. Mere remains the graph application platform: Graphshell, Djinn, Cambium, Conatus, the graph kernel, canvas and application integration stay (family promotion 11-37, 179-192).
 - 2026-10-21: `mere-apparatus` stays Mere's integration facade over `apparatus-core`: it re-exports the public types and forwards `serde`, while the Registry collector, the structural accessibility projection and the default projection behavior remain in Mere (family promotion 679-703).
+- 2026-10-28: F3's dependency evidence is in [the source homes map](../technical_architecture/2026-10-28_source_homes_map.md). With no consumer in Mere, `station-custody` (used only by Murm's `signalman-desktop`), the four Conatus engine crates (used only by Isocosm) and Knot's three crates sit in Mere. `mesh` and `mere-site` have no Mere dependency. `document-host` and `ux-events` have no consumer anywhere read.
 - Not established: any unfiltered Murm transport-suite or physical-radio pass (family promotion 541-543); durable audit-log qualification by `apparatus-core`, which is a bounded observation copy while products keep authoritative results and persistence (family promotion 707-708); the Knot checkpoint feature lane and an unfiltered standalone Knot suite; native UI, physical devices and heavy models, which keep separate owners (family promotion 591-593, 626, 835-836).
 
 ## Progress
 
 - 2026-10-28: cut from the family promotion plan; nothing new landed.
+- 2026-10-28: source homes map added for F3; nothing moved.
