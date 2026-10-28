@@ -404,6 +404,130 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   change invalidates every stored checkpoint once, silently, and the next checkpoint names the
   new encoding.
 
+### Open forks from L1's owner round, 2026-10-28
+
+The lane's second slice: the five authority entries the first round named and the graphshell host
+findings that waited on them (§5.2). Each entry lists what is copied today, with the code at main
+`295c39cd8`, and the single owner the lane proposes; Mark's answer follows each.
+
+- **A001, three copies of the navigation mutation.** `graph/mod.rs:772-814` keeps `navigate_node`,
+  `branch_history`, `node_history_back` and `node_history_forward` as `pub(crate)` raw wrappers;
+  the live arms in `graph/apply.rs:1190-1255` repeat the same mutation and add the capture,
+  `refresh_surface_resource` (the Resource record and shown binding a navigation leaves, which
+  `tests/resource_lifecycle.rs:198` asserts) and the shared retry tail; the replay arms at
+  `apply.rs:1310-1392` repeat it a third time with the captured stamp. No production code calls the
+  raw wrappers: they are reached through `GraphFixtures` (`fixtures.rs:113-122`) and four lines of
+  `tests/snapshot_navigation.rs`, so a fixture graph navigated through the trait lacks what a live
+  navigation leaves, and three copies are kept in step by hand. The `mere` crate's `fixtures`
+  feature (`crates/mere/Cargo.toml:61`) is an ordinary feature, so `--all-features` on the root
+  enables the hatch outside dev-dependencies. One owner: a `pub(crate)` primitive per navigation
+  operation, taking the transition, stamp and session, under both arms; the raw wrappers go, the
+  Mark, 2026-10-28: **"Delete; one primitive (Recommended)"**. The raw wrappers go, one
+  `pub(crate)` primitive per navigation operation serves both arms, fixtures and tests navigate
+  through the delta, and the root crate's ordinary `fixtures` feature goes with them.
+- **A003, two recency clocks.** Stemma's visit clock is written by every navigation and read by
+  `recent_visited` (`graph/history.rs:333`), whose doc claims one shared visit space and "no
+  separate recency list" and which no production code calls. The facet `visit.history`
+  (`node_facets.rs:33`) `last_visited_ms` is written at node creation (`mod.rs:654`) and by
+  `TouchNodeLastVisited`, the canvas revisit of an existing URL (`pictograph/canvas/input.rs:573`),
+  and read by the canvas recency channel (`signals/producers.rs:243`) and the `last_traversal`
+  filter key. `NavigateNode` (`apply.rs:1190`), which the in-place navigation at
+  `pictograph/canvas/nodes.rs:308` sends, and the history steps write Stemma only, so navigating
+  a node to a new page does not move its recency in the canvas while revisiting its URL does. Each
+  Stemma read rebuilds the whole memory (`history.rs:164`), so recency over every node cannot be a
+  Stemma projection, and a touch is not a navigation (it would add a no-op step to back and
+  forward). One owner: the facet holds recency, stamped by one primitive from `NavigateNode`, the
+  history steps and the touch, with the replays carrying the stamp; Stemma holds the trail and
+  Mark, 2026-10-28: **"Facet owns recency (Recommended)"**. One primitive stamps `visit.history`
+  from `NavigateNode`, the history steps and the touch; replays carry the stamp; `recent_visited`
+  and its claim go; Stemma is the trail.
+- **A003, the session clock has no writer.** `last_session_visited` is stamped from
+  `Graph::current_session`, which only `set_current_session` sets; its one non-test caller is a
+  pictograph wrapper (`canvas/lifecycle.rs:330`) nothing calls, so every node carries session 0.
+  `PersonaSettings.session_count` (`persona_settings_store.rs:66`) exists to count launches and is
+  read only by its test. Alembic's `KeepSessions` eviction (`memory_levels.rs:132`) treats 0 as
+  never stale and so never evicts, and `KeepDays` reads a per-node map no host builds. Either the
+  host that opens a persona's session installs the launch counter, with a regression that a
+  navigation in launch N stamps N; or the session clock, `session_count` and `KeepSessions` go,
+  Mark, 2026-10-28: **"Wire the launch counter (Recommended)"**. The host that opens a persona's
+  session increments and persists `session_count` and installs it with `set_current_session`; a
+  navigation in launch N stamps N and `KeepSessions` evicts by it.
+- **A012, who decides a graph is loadable or saveable.** The kernel's checked load
+  (`snapshot/checked.rs:178`: navigation indices, resource columns, the one handle rule) is the
+  structural validator, run by every load through `materialize_snapshot` and by addressable
+  publication (`addressable_graph/write.rs:58`). Saves disagree: the file saves in
+  `session_graph_store.rs` validate nothing and have no caller left (`GRAPH_FILE` is the module's
+  only use); the unchecked codicil saves (`graph_codicil.rs:294-372`) validate nothing; the
+  profiled codicil save runs the unprofiled loader whatever the placement (`:383`); the checked
+  archive save materializes and runs the product closure (`:517`); session checkpoints
+  (`graph_session.rs:1453`) run only the optional product validator and rely on the write path.
+  Facets are installed by `*graph.facets_mut() = ...` with the post-overlay handle check
+  (`resource_content.rs:177`) a separate call at six Pandect and six host sites, and three loaders
+  skip it (`mere-overmap/wire.rs:67`, kernel `residency.rs:18`, `addressable_graph/write.rs:58`).
+  Checked load keeps the first of two Surfaces with one id (`from.rs:89`) and drops an unparseable
+  id (`:73`) without saying so, which Q010's ruling refuses for facet records. One owner: the
+  kernel's checked load decides structure and refuses a repeated or unparseable Surface id as it
+  refuses a malformed facet; facets install through one checked primitive that runs the handle
+  check; every archive save runs the checked loader with its own placement; product validators
+  stay the product's, after structure; the dead `session_graph_store` save and load go (A004 to
+  two paths).
+  Mark, 2026-10-28: **"Checked load decides (Recommended)"**, as proposed.
+- **A016, one canonical form or one per comparison.** Comparisons of graph truth each
+  canonicalize differently: `replay_state` (`graph_session.rs:636`) compares snapshot and facets
+  as `serde_json::Value` in `to_snapshot_at` order; `FrozenGraph::of` (`graph_placement.rs:114`)
+  sorts Surface edges only; the residency digest (`addressable_graph/residency.rs:68`) sorts
+  fields and couplings by id; the addressable record hash binds each edge's position in the whole
+  snapshot (`write.rs:86`); pictograph (`canvas/lifecycle.rs:871`) and `product.rs:834` sort on
+  their own. The kernel still holds `fields` and `couplings` in `HashMap`s (`graph/mod.rs:379`)
+  emitted in iteration order (`snapshot/to.rs:119`), so Q034's false refusal stands; Stemma's
+  snapshot is sorted since Q019 except `children` order. Byte digests (`source_digest`, the
+  translation digest, Pandect's `contents_digest`) bind stored bytes, a different obligation. One
+  owner: the kernel's snapshot is canonical at the source (ordered maps for fields and couplings,
+  edges and resource edges in identity order, Stemma's sorted snapshot), so every comparison and
+  content hash sees one order and the per-site sorts go; byte digests over stored files stay.
+  Mark, 2026-10-28: **"Canonical at the source (Recommended)"**, as proposed.
+- **A017, what counts as an identity reference in a pick merge.** `remap_edit`
+  (`graph_session_merge.rs:244`) serializes a `CapturedDelta` to JSON and rewrites every string
+  and key equal to a mapped id, so a title, tag, URL or body equal to a UUID is rewritten (Q020,
+  whose audit probe still passes against main), and ids inside a facet's `value_json` string are
+  never rewritten. The kernel already enumerates every id-bearing field per variant in
+  `Touched::add` (`graph/revert.rs:106-186`, "exhaustive on purpose"), which the merge uses only
+  to filter. The other copy paths decide identity through typed fields with policies of their own:
+  `copy_component_from` (`cross_graph.rs:144`), `merge_snapshots_with_remap` (`snapshot_merge.rs:193`),
+  `copy_node_facets` (`facet_store.rs:101`), `import_edits` (`merge.rs:40`). One owner: a typed
+  remap on `CapturedDelta`, exhaustive by variant beside `Touched`, with facet values remapped
+  through the facet's own declared id fields and other facets carried verbatim; the other copy
+  paths are recorded as separate operations with their own rule.
+  Mark, 2026-10-28: **"Typed remap by variant (Recommended)"**, as proposed.
+- **Q056, a peer told Accept for a session the host refuses.** `admit_session`
+  (`graphshell-host/src/admission.rs:168`) keeps Notochord's Accept reply and turns the outcome
+  into `ActionNotOffered` when the owner allowed an action Graphshell does not serve; `host_join`
+  (`webrtc_session.rs:245`) writes that reply before testing the outcome, and the peer maps
+  Accept to a completed join (`webrtc_join.rs:310`), then sees the channel close. The native
+  carrier documents the same two stages on purpose (`carrier.rs:125-135`: "the handshake did not
+  deny it: this service did"), and `webrtc_session.rs:148` says every refusing path writes the
+  refusal, which this path does not. No crate test checks reply and outcome together for this
+  case; the audit's probe does. Either the host's vocabulary is part of what admission answers
+  and `ActionNotOffered` is written as the reply on every carrier before anything closes; or the
+  two stages stay and the peer learns to treat an Accept followed by a close as not served.
+  Mark, 2026-10-28: **"Write the refusal (Recommended)"**. The served vocabulary is part of what
+  admission answers: `ActionNotOffered` is written as the reply on every carrier before anything
+  closes, the native carrier writes it before shutdown, and a test checks reply and outcome
+  together.
+- **Q057, a reconnect claim admission does not enforce.** `lifecycle.rs:22-29` says a reconnect
+  "produces a different id ... by construction"; `projection_session`'s own doc (`:57-64`) says
+  nothing checks that a nonce is fresh, and the test (`:471`) picks two different ids by hand. The
+  id is Notochord's transcript digest over the client nonce, subject, transport identity and
+  shared link; the WebRTC carrier mixes a fresh host nonce into the link on every join
+  (`webrtc_session.rs:183`), so there the claim holds through the carrier, and on a carrier
+  without one two admissions of one hello give one id (the audit's probe). Nothing stores seen
+  nonces. Either the prose and the test claim what admission enforces, freshness from the
+  carrier's link or the client, with a test that admits one hello twice; or the responder supplies
+  freshness on every carrier, which is a Notochord change.
+  Mark, 2026-10-28: **"Claim what is enforced (Recommended)"**. The prose and the test say
+  freshness comes from the carrier's link or the client; the test admits one hello twice on one
+  link and once on a fresh link; no replay state.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they
@@ -528,3 +652,15 @@ Mark rules; the lane applied his two answers and stopped at these rather than pi
   the landed rule stands (replay past) and confirmed the translated-session refusal; both are
   recorded under the forks in §5. Nothing in code changed. A fork is answered in §5 before it is
   asked again: pull main and read §5 first.
+- 2026-10-28 (L1, the owner round): the five authority entries the first round named (A001, A003,
+  A012, A016, A017) and the graphshell host findings that waited on them (Q056, Q057) walked
+  through with the code at `295c39cd8`; eight forks recorded in §5 with Mark's answers the same
+  morning: one navigation primitive under both arms with the raw wrappers and fixture methods
+  gone; the facet owns recency and Stemma the trail; the launch counter is wired into the session
+  clock; the kernel's checked load decides structure, with one checked facet install and the dead
+  `session_graph_store` saves gone; the kernel's snapshot is canonical at the source; a typed remap
+  by variant replaces the JSON walker; `ActionNotOffered` is written as the reply on every
+  carrier; the reconnect claim says what admission enforces. Nothing in code changed. Findings
+  not asked, carried as cues: `hydrate()` rebuilds the whole navigation memory on every read and
+  mutation (`history.rs:164`); `merge_rules.rs:180` re-decides handle legality for composition
+  instead of calling the kernel's one rule; `KeepDays` eviction reads a map no host builds.
