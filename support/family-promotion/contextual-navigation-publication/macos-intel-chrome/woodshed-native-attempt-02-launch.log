@@ -1,0 +1,2 @@
+{"launch_method": "direct native executable; same product/scenario/renderer", "launcher_exit": -15, "timeout": false, "success": false, "elapsed_seconds": 177.382, "binary_sha256": "e78eca57b2f2dd1b23f99fdab0c1d98d5284519eb8d4221d3e6ebfcbf5062f9f", "scenario_sha256": "7cf88f3e027bf2b8c40206956e90f947682ac49334f67ba4fdd12492b4fee4a8", "receipt": null, "captures": 1}
+

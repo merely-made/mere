@@ -1,0 +1,25 @@
+{
+  "source": "535a2efcc150c19acd7db3036796ce708d8fd80d",
+  "observation": "Woodshed wrote RESULT ok for both app-side checkpoints then remained alive until90second harness termination.",
+  "interpretation": "Expected close-preservation refusal for the locked/pending identity profile with no writable store.",
+  "evidence": {
+    "crates/woodshed-genet/src/capture_persistence.rs": {
+      "lines": [
+        656,
+        703
+      ],
+      "condition": "preserve_request returns Blocked if shared.storage.is_none() before considering dirty state; close_request keeps window visible and sets close notice.",
+      "git_blob": "6532442357a429069e35c6e2c24bbf905dc4b1b5"
+    },
+    "crates/woodshed-genet/src/main.rs": {
+      "lines": [
+        229,
+        261
+      ],
+      "condition": "guard_requested_close routes completion close through prepare_close.",
+      "git_blob": "9ce488942e729f6d3afc7ae3e4b66a3640eb63b9"
+    }
+  },
+  "qualification_limit": "The later close-refusal dialog was not separately captured. This is a source-grounded explanation, not an observed shutdown deadlock.",
+  "pending_gate": "Native frame-inclusive screenshots and native traffic-light visual checks require macOS Screen Recording approval."
+}

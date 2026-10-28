@@ -1,0 +1,9 @@
+{
+  "source": "macOS TCC attribution log for the actual denied screencapture request",
+  "responsible_identifier": "com.apple.sshd-keygen-wrapper",
+  "responsible_path": "/usr/libexec/sshd-keygen-wrapper",
+  "accessing_identifier": "com.apple.screencapture",
+  "service": "kTCCServiceScreenCapture",
+  "observation": "No grant was found for this responsible process; request denied. ChatGPT approval is separate.",
+  "action": "Opened Screen Recording settings and revealed helper executable in Finder for user review. No permission setting modified."
+}

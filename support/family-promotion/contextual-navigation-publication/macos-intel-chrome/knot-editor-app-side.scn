@@ -1,0 +1,18 @@
+settle 5
+resize 1280 760
+settle 5
+assert snap chrome_host_logical_width == 1280.0
+assert snap format == Djot
+assert snap dirty == false
+assert snap chrome_caption_group_rect == unavailable
+assert snap chrome_controls_group_rect == unavailable
+capture wide
+resize 640 760
+settle 5
+assert snap chrome_host_logical_width == 640.0
+assert snap format == Djot
+assert snap dirty == false
+assert snap chrome_caption_group_rect == unavailable
+assert snap chrome_controls_group_rect == unavailable
+capture narrow
+log Native macOS chrome checkpoints complete

@@ -1,0 +1,13 @@
+{
+  "checkpoint": "wide",
+  "window_id": 16813,
+  "native_bounds": {
+    "Height": 788,
+    "Width": 1280,
+    "X": 730,
+    "Y": 342
+  },
+  "exit": 1,
+  "stderr": "could not create image from window\n",
+  "captured": false
+}

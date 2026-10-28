@@ -1,0 +1,10 @@
+settle 5
+resize 1280 760
+settle 5
+assert snap rehearsal-running == false
+capture wide
+resize 640 760
+settle 5
+assert snap rehearsal-running == false
+capture narrow
+log Native macOS chrome checkpoints complete

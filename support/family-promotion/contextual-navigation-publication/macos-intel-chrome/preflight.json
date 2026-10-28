@@ -1,0 +1,33 @@
+{
+  "platform": {
+    "os": "15.8.1",
+    "arch": "x86_64"
+  },
+  "apps": {
+    "woodshed": {
+      "source": "535a2efcc150c19acd7db3036796ce708d8fd80d",
+      "lock_sha256": "776e4f151a899e48b95fe1fcd97b7ddd539a22167caadb5fe3f76c11bdb0877c",
+      "status": "",
+      "runtime_root": "/Users/markik/Code/repos/woodshed/.cargo/local/context-navigation-chrome",
+      "git_blobs": {
+        "Cargo.toml": "0cd9d0bb440afcc656da5b7269899bc9e3a2cb26",
+        "Cargo.lock": "4914af3636b99fb10e4e2035306da3de5c59e490"
+      }
+    },
+    "knot-editor": {
+      "source": "e9ff2407c3a9a056a371958b41d1b3e6433a46ac",
+      "lock_sha256": "e0cb2cf5935e5ead0b59d3a6567cd51757dc898e2dcd754191532fc840ec3720",
+      "status": "",
+      "runtime_root": "/Users/markik/Code/repos/knot-editor/.cargo/local/context-navigation-chrome",
+      "git_blobs": {
+        "Cargo.toml": "8e3bcbbf565b13e5c8baef945224650cb8eeec38",
+        "Cargo.lock": "21678188f504528e07a30e1ba3eb37f207ec47ef"
+      }
+    }
+  },
+  "window_info": {
+    "path": "/Users/markik/Code/output/turnstone-gui-native-20261020/window_info",
+    "exists": true,
+    "sha256": "78a4cda5267032f734e2c9158c88aca7bef14fdce6bbe40ba5ca625e15e95ce8"
+  }
+}

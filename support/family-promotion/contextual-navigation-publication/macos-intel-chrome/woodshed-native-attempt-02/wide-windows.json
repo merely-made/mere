@@ -1,0 +1,22 @@
+{
+  "screen_capture_available" : false,
+  "windows" : [
+    {
+      "kCGWindowAlpha" : 1,
+      "kCGWindowBounds" : {
+        "Height" : 788,
+        "Width" : 1280,
+        "X" : 730,
+        "Y" : 360
+      },
+      "kCGWindowIsOnscreen" : true,
+      "kCGWindowLayer" : 0,
+      "kCGWindowMemoryUsage" : 2288,
+      "kCGWindowNumber" : 16805,
+      "kCGWindowOwnerName" : "product",
+      "kCGWindowOwnerPID" : 75276,
+      "kCGWindowSharingState" : 0,
+      "kCGWindowStoreType" : 1
+    }
+  ]
+}
