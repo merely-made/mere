@@ -435,10 +435,11 @@ where
             h.relayout(lw, lh);
             window.request_redraw();
         }
-        if !host.borrow().s.hidden
-            && poll_quality(&mut host.borrow_mut())
-            && window.take_pending_frame()
-        {
+        let can_draw = {
+            let mut host = host.borrow_mut();
+            !host.s.hidden && poll_quality(&mut host)
+        };
+        if can_draw && window.take_pending_frame() {
             draw_at(&mut host.borrow_mut(), timestamp_ms);
         }
         if let Some(browser) = web_sys::window()
