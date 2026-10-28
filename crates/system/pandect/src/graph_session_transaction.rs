@@ -7,6 +7,17 @@
 //! Stage a journaled candidate; install it only after atomic storage acknowledgement.
 use super::*;
 
+/// Writes a commit carries beside the session's own, and the stored bytes
+/// they were decided against.
+#[derive(Clone, Debug, Default)]
+pub struct CommitExtra {
+    /// Written in the same atomic batch, after the session's own.
+    pub ops: Vec<WriteOp>,
+    /// Keys the extra writes depend on, with the bytes read (`None`: absent).
+    /// The commit lands only if each key still holds exactly those bytes.
+    pub expect: Vec<(String, Option<Vec<u8>>)>,
+}
+
 enum Rejection {
     ReadOnly(SessionId),
     Validation(String),
@@ -17,14 +28,15 @@ fn refused(error: StoreError) -> Rejection {
 }
 
 /// What the store must still hold for a commit from one handle to land: no
-/// merged mark, and the stored length and last stored entry of each log this
-/// handle appends to. Every commit of a session rechecks through here,
-/// inside its backend transaction.
+/// merged mark, the stored length and last stored entry of each log this
+/// handle appends to, and the caller's own keys. Every commit of a session
+/// rechecks through here, inside its backend transaction.
 struct Recheck {
     session: SessionId,
     merged: String,
     logs: Vec<(String, Seq, &'static str)>,
     tails: Vec<WriteOp>,
+    keys: Vec<(String, Option<Vec<u8>>)>,
 }
 
 impl Recheck {
@@ -49,6 +61,13 @@ impl Recheck {
                 }
             }
         }
+        for (key, bytes) in &self.keys {
+            if &reader.get(key).map_err(refused)? != bytes {
+                return Err(Rejection::Validation(format!(
+                    "{key} changed before commit; draft retained"
+                )));
+            }
+        }
         Ok(())
     }
 }
@@ -63,7 +82,10 @@ fn last_stored<T: Serialize>(
     let Some(last) = stored.0.checked_sub(1) else {
         return Ok(None);
     };
-    Ok(log.entry_writes::<JsonCodec>(prefix, Seq(last))?.into_iter().next())
+    Ok(log
+        .entry_writes::<JsonCodec>(prefix, Seq(last))?
+        .into_iter()
+        .next())
 }
 
 impl<B: LegacyTransactionBackend> GraphSession<B> {
@@ -78,26 +100,32 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
             self.stored(pending);
             return Ok(());
         }
-        self.commit(pending, Vec::new()).await
+        self.commit(pending, Vec::new(), Vec::new()).await
     }
 
     /// Write `pending` and `extra` atomically if the store passes this
     /// handle's recheck; mark `pending` stored once it has landed.
-    async fn commit(&mut self, pending: Pending, extra: Vec<WriteOp>) -> Result<(), SessionError> {
-        let check = self.recheck()?;
+    async fn commit(
+        &mut self,
+        pending: Pending,
+        extra: Vec<WriteOp>,
+        expect: Vec<(String, Option<Vec<u8>>)>,
+    ) -> Result<(), SessionError> {
+        let check = self.recheck(expect)?;
         let mut ops = pending.ops().to_vec();
         ops.extend(extra);
         let rejection = Arc::new(Mutex::new(None));
         let rejected = rejection.clone();
-        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
-            match check.run(reader) {
-                Ok(()) => ops,
-                Err(error) => {
-                    *rejected.lock().expect("transaction rejection") = Some(error);
-                    Vec::new()
+        let transaction =
+            Box::new(
+                move |reader: &dyn muniment::TransactionReader| match check.run(reader) {
+                    Ok(()) => ops,
+                    Err(error) => {
+                        *rejected.lock().expect("transaction rejection") = Some(error);
+                        Vec::new()
+                    },
                 },
-            }
-        });
+            );
         self.slots.backend().transact(transaction).await?;
         match rejection.lock().expect("transaction rejection").take() {
             Some(Rejection::ReadOnly(id)) => return Err(SessionError::ReadOnly(id)),
@@ -108,25 +136,33 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
         Ok(())
     }
 
-    fn recheck(&self) -> Result<Recheck, SessionError> {
+    fn recheck(&self, keys: Vec<(String, Option<Vec<u8>>)>) -> Result<Recheck, SessionError> {
         let moved = "Session changed before commit; draft retained";
         let (journal, changes) = (self.keys.at(JOURNAL), self.keys.at(CHANGES));
         let mut tails = Vec::new();
         tails.extend(last_stored(self.journal.log(), &journal, self.saved)?);
         tails.extend(last_stored(&self.changes, &changes, self.changes_saved)?);
-        let mut logs = vec![(journal, self.saved, moved), (changes, self.changes_saved, moved)];
+        let mut logs = vec![
+            (journal, self.saved, moved),
+            (changes, self.changes_saved, moved),
+        ];
         // A view has its own log, so a graph head alone cannot detect a
         // competing view append.
         for (key, view) in &self.views {
             let log = self.keys.view_log(key);
             tails.extend(last_stored(&view.log, &log, view.saved)?);
-            logs.push((log, view.saved, "Session view changed before commit; draft retained"));
+            logs.push((
+                log,
+                view.saved,
+                "Session view changed before commit; draft retained",
+            ));
         }
         Ok(Recheck {
             session: self.id(),
             merged: self.keys.at(MERGED),
             logs,
             tails,
+            keys,
         })
     }
 }
@@ -264,10 +300,10 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .map(|(result, _)| result)
     }
 
-    /// Run `change` on a detached candidate of this session and commit it, with
-    /// the handle's own unstored entries, in one backend transaction; install
-    /// it only after storage acknowledges. A refusal, from `change` or from
-    /// storage, leaves this session as it was.
+    /// Run `change` on a [detached candidate](Self::detached_candidate) and
+    /// commit it as one change, with the handle's own unstored entries, in one
+    /// backend transaction ([`commit_candidate`](Self::commit_candidate)).
+    /// A refusal, from `change` or from storage, leaves this session as it was.
     ///
     /// The closure edits through [`edit_now`](Self::edit_now), so a direct
     /// write (a public assertion or declaration writer) transacts under the
@@ -282,10 +318,37 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         self.ensure_writable()?;
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
+        let generation = self
+            .commit_candidate(candidate, at, publish, CommitExtra::default())
+            .await?;
+        Ok((result, generation))
+    }
+
+    /// Commit `candidate`, a [`detached_candidate`](Self::detached_candidate)
+    /// of this session edited since, and `extra` in one backend transaction;
+    /// this session becomes the candidate on success. `publish` adds the
+    /// addressable publication of the candidate's graph to the write. Storage
+    /// changing under the handle, or under a key in `extra.expect`, refuses the
+    /// commit before anything is written; this session is then unchanged.
+    pub async fn commit_candidate(
+        &mut self,
+        mut candidate: Self,
+        at: SystemTime,
+        publish: bool,
+        extra: CommitExtra,
+    ) -> Result<Option<String>, SessionError> {
+        self.ensure_writable()?;
+        if candidate.id() != self.id()
+            || (candidate.saved, candidate.changes_saved) != (self.saved, self.changes_saved)
+        {
+            return Err(SessionError::Validation(
+                "Candidate was not cut from this session's stored state".into(),
+            ));
+        }
         let pending = candidate.pending(at)?;
+        let mut ops = Vec::new();
         // The publication describes the candidate's graph and joins its write.
         // Preparation refuses before anything is written or installed.
-        let mut ops = Vec::new();
         let generation = if publish {
             let publication = candidate.prepare_resident_publication()?;
             ops.extend_from_slice(publication.ops());
@@ -293,14 +356,17 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
-        candidate.commit(pending, ops).await?;
+        ops.extend(extra.ops);
+        candidate.commit(pending, ops, extra.expect).await?;
         *self = candidate;
-        Ok((result, generation))
+        Ok(generation)
     }
 
-    // A private copy with its own recorder. No candidate edit can reach the
-    // acknowledged graph's capture buffer through an Arc shared by Graph::clone.
-    fn detached_candidate(&self) -> Self {
+    /// A private copy with its own recorder, to edit and offer to
+    /// [`commit_candidate`](Self::commit_candidate). No candidate edit can reach
+    /// the acknowledged graph's capture buffer through an Arc shared by
+    /// Graph::clone, and nothing of this session changes until a commit lands.
+    pub fn detached_candidate(&self) -> Self {
         let pending = Arc::default();
         let mut graph = self.graph.clone();
         record_into(&mut graph, &pending);

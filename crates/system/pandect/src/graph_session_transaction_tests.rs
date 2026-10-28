@@ -22,7 +22,10 @@ fn add(id: u128) -> CapturedDelta {
 }
 
 fn holds(session: &GraphSession<MemoryBackend>, id: u128) -> bool {
-    session.graph().get_node_key_by_id(Uuid::from_u128(id)).is_some()
+    session
+        .graph()
+        .get_node_key_by_id(Uuid::from_u128(id))
+        .is_some()
 }
 
 #[test]
@@ -71,10 +74,7 @@ fn a_transaction_carries_a_direct_writer_through_the_replay_check() {
             })
             .await;
         assert!(matches!(refused, Err(SessionError::NotReplayable(_))));
-        assert_eq!(
-            (session.journal().len(), session.changes().len()),
-            before
-        );
+        assert_eq!((session.journal().len(), session.changes().len()), before);
         assert_ne!(session.graph().get_node(key).unwrap().title, "Unrecorded");
         let reopened = mere.open(id).await.unwrap();
         assert_eq!(reopened.journal().len(), before.0);
@@ -133,4 +133,45 @@ fn a_transaction_carries_the_handles_unstored_entries() {
 
 fn add_delta(id: u128) -> GraphDelta {
     add(id).replay_as(&person()).into_write().unwrap()
+}
+
+#[test]
+fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let id = mere.mint(person(), None).await.unwrap().session_id;
+        let mut session = mere.open(id).await.unwrap();
+        store.put("side/ledger", b"one").await.unwrap();
+        let extra = |read: &[u8], write: &[u8]| CommitExtra {
+            ops: vec![WriteOp::Put {
+                key: "side/ledger".into(),
+                value: write.to_vec(),
+            }],
+            expect: vec![("side/ledger".into(), Some(read.to_vec()))],
+        };
+        let at = SystemTime::UNIX_EPOCH;
+
+        let mut candidate = session.detached_candidate();
+        candidate.apply_now(person(), vec![add(1)]).unwrap();
+        // The key the extra write was decided against moves under the candidate.
+        store.put("side/ledger", b"other").await.unwrap();
+        let refused = session
+            .commit_candidate(candidate, at, false, extra(b"one", b"two"))
+            .await;
+        assert!(matches!(refused, Err(SessionError::Validation(_))));
+        assert!(!holds(&session, 1) && !session.has_unstored());
+        assert_eq!(store.get("side/ledger").await.unwrap().unwrap(), b"other");
+        assert!(!holds(&mere.open(id).await.unwrap(), 1));
+
+        let mut candidate = session.detached_candidate();
+        candidate.apply_now(person(), vec![add(1)]).unwrap();
+        session
+            .commit_candidate(candidate, at, false, extra(b"other", b"two"))
+            .await
+            .unwrap();
+        assert!(holds(&session, 1) && !session.has_unstored());
+        assert_eq!(store.get("side/ledger").await.unwrap().unwrap(), b"two");
+        assert!(holds(&mere.open(id).await.unwrap(), 1));
+    });
 }
