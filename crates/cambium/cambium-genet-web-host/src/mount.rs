@@ -605,7 +605,7 @@ where
                 }
                 window.request_redraw();
             }
-            if !host.s.hidden && window.take_pending_frame() {
+            if !host.s.hidden && poll_quality(&mut host) && window.take_pending_frame() {
                 draw_at(&mut host, timestamp_ms);
                 if window
                     .canvas()
@@ -652,6 +652,39 @@ where
     Ok(())
 }
 
+/// Drain the previous frame before admitting more GPU work. Browser device
+/// polling cannot synchronously complete map promises: a cold shader compile
+/// can take many animation frames. Keep the redraw request pending while the
+/// event loop makes progress, including for a final otherwise-static frame.
+fn poll_quality<State, Logic, V>(host: &mut Host<State, Logic, V>) -> bool
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    // Presentation drivers own their pending-frame acceptance and must keep
+    // being polled while holding the Core. Only the retained legacy surface
+    // path needs this admission guard.
+    if host.s.presentation_driver.is_some() {
+        return true;
+    }
+    let quality = host.s.shared.render_core.as_ref().map(|core| {
+        core.try_renderer().and_then(|renderer| {
+            renderer.poll_vello_curve_quality().map_err(|error| {
+                genet_render_host::RasterizeFailure::ProviderError(std::sync::Arc::new(error))
+            })
+        })
+    });
+    match quality {
+        Some(Ok(Some((pending, _)))) => pending == 0,
+        Some(Err(error)) => {
+            host.refuse_rasterization(error, None);
+            false
+        },
+        _ => true,
+    }
+}
+
 /// Draw a frame and mirror it for a reader.
 pub(crate) fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>)
 where
@@ -675,6 +708,13 @@ where
         let (width, height) = host.logical_size();
         host.relayout(width, height);
         host.sync_a11y();
+        return;
+    }
+    if !poll_quality(host) {
+        host.sync_a11y();
+        if let Some(window) = &host.s.window {
+            window.request_redraw();
+        }
         return;
     }
     let timestamp =
