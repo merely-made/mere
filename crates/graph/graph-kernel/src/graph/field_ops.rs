@@ -20,7 +20,7 @@ impl Graph {
 
     /// Add or replace a field by its id.
     pub(crate) fn add_field(&mut self, field: Field) {
-        self.fields.insert(field.id, field);
+        self.fields.insert(field.id.as_uuid(), field);
     }
 
     /// Retire a field: mark it `Retired` (keeping its definition for history /
@@ -41,11 +41,11 @@ impl Graph {
     /// would keep it. Couplings that target it stay, each its own part to
     /// revert. Returns whether the field existed.
     pub(crate) fn remove_field(&mut self, id: FieldId) -> bool {
-        self.fields.remove(&id).is_some()
+        self.fields.remove(&id.as_uuid()).is_some()
     }
 
     fn set_field_lifecycle(&mut self, id: FieldId, lifecycle: FieldLifecycle) -> bool {
-        match self.fields.get_mut(&id) {
+        match self.fields.get_mut(&id.as_uuid()) {
             Some(field) => {
                 field.lifecycle = lifecycle;
                 true
@@ -56,10 +56,10 @@ impl Graph {
 
     /// The field with this id, if any.
     pub fn field(&self, id: FieldId) -> Option<&Field> {
-        self.fields.get(&id)
+        self.fields.get(&id.as_uuid())
     }
 
-    /// All fields, in unspecified order.
+    /// All fields, in id order.
     pub fn fields(&self) -> impl Iterator<Item = &Field> {
         self.fields.values()
     }
@@ -68,16 +68,16 @@ impl Graph {
 
     /// Add or replace a coupling by its id.
     pub(crate) fn add_coupling(&mut self, coupling: Coupling) {
-        self.couplings.insert(coupling.id, coupling);
+        self.couplings.insert(coupling.id.as_uuid(), coupling);
     }
 
     /// Remove a coupling. Returns whether it existed. (Couplings have no
     /// lifecycle state of their own; retracting drops the rule.)
     pub(crate) fn retract_coupling(&mut self, id: CouplingId) -> bool {
-        self.couplings.remove(&id).is_some()
+        self.couplings.remove(&id.as_uuid()).is_some()
     }
 
-    /// All couplings, in unspecified order.
+    /// All couplings, in id order.
     pub fn couplings(&self) -> impl Iterator<Item = &Coupling> {
         self.couplings.values()
     }

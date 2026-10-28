@@ -375,8 +375,12 @@ pub struct Graph {
     /// beside the node/edge petgraph. A coupling targets a *selector* over nodes,
     /// not a node→node edge, so fields/couplings cannot ride the petgraph; they
     /// are content truth that numen reads and evaluates (derived).
-    pub(crate) fields: HashMap<FieldId, Field>,
-    pub(crate) couplings: HashMap<CouplingId, Coupling>,
+    ///
+    /// Ordered by id (the inner UUID, which orders as its canonical string
+    /// does; `FieldId` and `CouplingId` carry no `Ord`), so every read and
+    /// every snapshot sees one order.
+    pub(crate) fields: BTreeMap<Uuid, Field>,
+    pub(crate) couplings: BTreeMap<Uuid, Coupling>,
 
     /// The graph's whole navigation history: one shared visit space, one owner
     /// per node (the (b) anchor design). In-place navigation extends a node's own
@@ -452,8 +456,8 @@ impl Graph {
             facets: chartulary::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
-            fields: HashMap::new(),
-            couplings: HashMap::new(),
+            fields: BTreeMap::new(),
+            couplings: BTreeMap::new(),
             nav: SharedNavigationMemory::empty(),
             revision: 0,
             url_grouping_revision: 0,

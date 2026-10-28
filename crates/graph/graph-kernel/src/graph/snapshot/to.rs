@@ -109,12 +109,18 @@ impl Graph {
             })
             .collect();
 
-        let edges = self
+        // Edge slots are reused, so storage order is history; the snapshot is
+        // in the order of each edge's JSON bytes, which `FrozenGraph::of` keeps.
+        // The statements inside an edge keep their exact order.
+        let mut edges: Vec<_> = self
             .inner
             .inner()
             .edge_references()
             .map(|edge| self.persisted_edge(edge.source(), edge.target(), edge.weight()))
             .collect();
+        edges.sort_by_cached_key(|edge| {
+            serde_json::to_vec(edge).expect("persisted surface edge encodes")
+        });
 
         let fields = self
             .fields()
