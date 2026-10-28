@@ -30,6 +30,12 @@ fn snapshot_with(
     }
 }
 
+/// The page `key`'s history cursor rests on, if the node has been visited.
+fn cursor_page(graph: &Graph, key: NodeKey) -> Option<String> {
+    let trail = graph.node_history_projection(key);
+    trail.entries.get(trail.current_index).cloned()
+}
+
 /// A minimal `PersistedNode` at `url` with id `node_id` (no session state).
 fn persisted_node(node_id: Uuid, url: &str) -> crate::persistence::PersistedNode {
     use crate::persistence::{PersistedAddress, PersistedNode};
@@ -187,9 +193,10 @@ fn test_cold_restore_reapplies_history_index() {
     let history = restored.node_history_projection(key);
     assert_eq!(history.entries.len(), 3);
     assert_eq!(history.current_index, 2);
-    // The restored current page follows the history cursor.
+    // The restored cursor rests on the seeded page (the address is the stored
+    // primary, not the cursor's).
     assert_eq!(
-        restored.node_current_url(key).as_deref(),
+        cursor_page(&restored, key).as_deref(),
         Some("https://example.com/three")
     );
 }
@@ -233,7 +240,7 @@ fn navigate_forward_fork_preserves_the_alternate_branch() {
         "b is preserved as an alternate branch off a after the forward-fork",
     );
     assert_eq!(
-        graph.node_current_url(key).as_deref(),
+        cursor_page(&graph, key).as_deref(),
         Some("https://example.com/c")
     );
 }
@@ -287,7 +294,7 @@ fn replacing_a_navigation_parents_history_keeps_the_branched_child() {
         vec!["https://example.com/replacement".to_string()]
     );
     assert_eq!(
-        graph.node_current_url(child).as_deref(),
+        cursor_page(&graph, child).as_deref(),
         Some("https://example.com/child")
     );
     Graph::from_snapshot(&graph.to_snapshot_at(0));
@@ -433,7 +440,7 @@ fn live_and_replayed_navigation_leave_one_state() {
     let snapshot = |graph: &Graph| serde_json::to_value(graph.to_snapshot_at(0)).unwrap();
     assert_eq!(snapshot(&live), snapshot(&replayed));
     assert_eq!(live.facets(), replayed.facets());
-    let current = |graph: &Graph, key| graph.node_current_url(key);
+    let current = |graph: &Graph, key| cursor_page(graph, key);
     assert_eq!(current(&live, a), Some(url("a3")));
     assert_eq!(current(&replayed, a), Some(url("a3")));
 }
@@ -509,4 +516,46 @@ fn navigating_a_node_in_place_moves_its_recency() {
         assert_eq!(recency(&replayed, key), recency(&live, key));
     }
     assert!(recency(&replayed, a) > Some(1));
+}
+
+#[test]
+fn a_set_address_is_the_address_until_the_next_history_step() {
+    use crate::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
+    let page = |name: &str| format!("https://example.com/{name}");
+    let mut graph = Graph::new();
+    let key = graph.add_node(page("a"), Point2D::new(0.0, 0.0));
+    let apply = |graph: &mut Graph, delta| apply_graph_delta(graph, delta);
+    for name in ["previous", "a"] {
+        apply(
+            &mut graph,
+            GraphDelta::NavigateNode {
+                key,
+                url: page(name),
+            },
+        );
+    }
+    apply(
+        &mut graph,
+        GraphDelta::SetNodeUrl {
+            key,
+            new_url: page("b"),
+        },
+    );
+
+    // The set address is the node's address; the trail still rests on `a`.
+    assert_eq!(graph.get_node(key).unwrap().url(), page("b"));
+    assert_eq!(graph.get_nodes_by_url(&page("b")), vec![key]);
+    assert!(graph.get_nodes_by_url(&page("a")).is_empty());
+    let trail = graph.node_history_projection(key);
+    assert_eq!(trail.entries, vec![page("previous"), page("a")]);
+    assert_eq!(trail.entries[trail.current_index], page("a"));
+
+    // A history step is the one place history writes the address back.
+    assert_eq!(
+        apply(&mut graph, GraphDelta::NodeHistoryBack { key }),
+        GraphDeltaResult::HistoryStepped(Some(page("previous")))
+    );
+    assert_eq!(graph.get_node(key).unwrap().url(), page("previous"));
+    assert_eq!(graph.get_nodes_by_url(&page("previous")), vec![key]);
+    assert!(graph.get_nodes_by_url(&page("b")).is_empty());
 }
