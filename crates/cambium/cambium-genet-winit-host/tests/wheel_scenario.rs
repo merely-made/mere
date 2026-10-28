@@ -282,7 +282,7 @@ fn a_wheel_with_no_target_or_a_typo_fails_the_scenario() {
     let (receipt, _) = run("settle 2
 wheel 0 1 on .nothing-like-it
 ");
-    failed(&receipt, "no current DOM target");
+    failed(&receipt, "no current pointer target");
     let (receipt, _) = run("wheel 0 1 sideways at 0 0\n");
     failed(&receipt, "unknown wheel word");
 }
