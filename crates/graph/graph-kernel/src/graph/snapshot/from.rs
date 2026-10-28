@@ -69,6 +69,7 @@ impl Graph {
         // before the node loop, so each node's restored current page reads from it.
         graph.nav = snapshot.navigation.clone();
 
+        // Checked load has already refused an unparseable or repeated Surface id.
         for pnode in &snapshot.nodes {
             let Ok(node_id) = Uuid::parse_str(&pnode.node_id) else {
                 continue;

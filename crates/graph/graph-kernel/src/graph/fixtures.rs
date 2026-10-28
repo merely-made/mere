@@ -52,10 +52,6 @@ pub trait GraphFixtures {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize;
-    fn navigate_node(&mut self, key: NodeKey, url: &str);
-    fn branch_history(&mut self, child: NodeKey, parent: NodeKey);
-    fn node_history_back(&mut self, key: NodeKey) -> Option<String>;
-    fn node_history_forward(&mut self, key: NodeKey) -> Option<String>;
     fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool;
     fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool;
     fn set_node_title(&mut self, key: NodeKey, title: String) -> bool;
@@ -108,18 +104,6 @@ impl GraphFixtures for Graph {
         selector: RelationSelector,
     ) -> usize {
         Graph::retract_relations(self, from, to, selector)
-    }
-    fn navigate_node(&mut self, key: NodeKey, url: &str) {
-        Graph::navigate_node(self, key, url)
-    }
-    fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
-        Graph::branch_history(self, child, parent)
-    }
-    fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
-        Graph::node_history_back(self, key)
-    }
-    fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
-        Graph::node_history_forward(self, key)
     }
     fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
         Graph::insert_node_tag(self, key, tag)

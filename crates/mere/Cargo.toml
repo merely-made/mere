@@ -56,9 +56,6 @@ workbench = [
 # The app-facing semantic query surface stays opt-in because it carries the
 # SPARQL evaluator. Consumers that only need graph construction do not pull it.
 query = ["linked-data", "linked-data/query"]
-# Test-only fixture escape hatch. This mirrors kernel's gate without exposing
-# the fixture API to ordinary library consumers.
-fixtures = ["graph", "kernel/fixtures"]
 clip = ["graph", "dep:fleece", "fleece/clip"]
 
 [dependencies]
