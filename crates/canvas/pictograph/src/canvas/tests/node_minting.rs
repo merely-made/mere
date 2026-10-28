@@ -131,7 +131,11 @@ fn open_as_new_node_mints_distinct_node_with_navigated_from_edge() {
     );
     assert!(canvas.graph().find_edge_key(a, new_key).is_none());
     assert_eq!(
-        canvas.graph().node_current_url(new_key).as_deref(),
+        canvas
+            .graph()
+            .node_history_semantic_summary(new_key)
+            .current_url
+            .as_deref(),
         Some("https://example.com"),
         "the minted node carries its opening page as its first visit",
     );
