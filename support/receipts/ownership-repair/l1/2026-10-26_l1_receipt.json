@@ -293,5 +293,64 @@
     "alembic_recall": 8,
     "checks": "djinn, cambium, mere-overmap, rdf, forme, cartography, athanor, mere"
   },
-  "chartulary_findings": "Q001, Q002, Q003 and Q019 are repaired on eidetic main; see 2026-10-26_l1_chartulary_receipt.json"
+  "chartulary_findings": "Q001, Q002, Q003 and Q019 are repaired on eidetic main; see 2026-10-26_l1_chartulary_receipt.json",
+  "second_owner_round_2026_10_28": {
+    "forks_ruled": "fifteen, in the plan's section 5, all the proposed owner",
+    "consumer_findings_placed": {
+      "L1": [
+        "Q100",
+        "Q101 (borderline: the scope is an identity roster)",
+        "Q209 (borderline: session-only members)",
+        "Q210",
+        "Q243",
+        "Q244",
+        "Q247 (borderline: could be an export-contract item)",
+        "the capture acknowledgement with no sender (unnumbered)"
+      ],
+      "L2": [
+        "Q091",
+        "Q092",
+        "Q093",
+        "Q094",
+        "Q095",
+        "Q096",
+        "Q097",
+        "Q102",
+        "Q103",
+        "Q106",
+        "Q256 (owner change now rebinds; not re-audited)",
+        "Q263",
+        "Q271 (send pump fenced; receive pump and retirement not)"
+      ],
+      "L5": [
+        "Q245 (per the L6 receipt)"
+      ],
+      "L6": [
+        "Q246",
+        "Q254",
+        "Q264",
+        "Q265",
+        "Q266",
+        "Q267",
+        "Q269 (partly addressed: standalone doc, command still from the root)"
+      ],
+      "no lane": [
+        "Q255 (table consolidated in 7b72e0584; the hosted-fit difference is deliberate)",
+        "Q258 (input adapter; the host-has-no-cancel comment is stale)",
+        "Q268 (CSS containment)"
+      ],
+      "repaired outside any lane receipt": [
+        "Q098 (e0ef4124c)",
+        "Q104 and Q105 (1241276b7)",
+        "Q099 counterexample (54ff75f73; the cell hidden flag still ignores assertion hides)"
+      ]
+    },
+    "cues": [
+      "the extension's queue has never been acknowledged since 93ce49c82; the ack had no test",
+      "the audit's Forme probe and pictograph boundary probe no longer compile or run on main (moved modules, a hard-coded Windows target path)",
+      "the remote-session adapter clears its own pending on a refused start while the driver and core keep theirs (remote.rs:585-610)",
+      "set_graph preserves the kept-link queue across a graph swap (the audit's unnumbered A405 observation)",
+      "the accessibility reader's item_rect still uses the ground position and raw node size (reader.rs:173-177)"
+    ]
+  }
 }
