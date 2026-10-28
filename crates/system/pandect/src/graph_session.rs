@@ -1331,9 +1331,12 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Run `edit` on the live graph as one change under `author`, journaled
-    /// but not stored until the next flush. Every mutation goes through
-    /// `apply_graph_delta`, the kernel's one write path, so the journal sees
-    /// all of them.
+    /// but not stored until the next flush. Every writer the closure uses,
+    /// `apply_graph_delta` or a public assertion or declaration writer, emits
+    /// captured deltas that `edit_as` records, replays onto a fresh clone and
+    /// compares, refusing a candidate that differs
+    /// ([`SessionError::NotReplayable`]). That check is the write boundary;
+    /// `GraphDelta` is one of its writers.
     pub fn edit_now<R>(
         &mut self,
         author: Author,
@@ -2400,6 +2403,10 @@ mod navigation_tests;
 #[cfg(test)]
 #[path = "graph_session_checkpoint_tests.rs"]
 mod checkpoint_tests;
+
+#[cfg(test)]
+#[path = "graph_session_transaction_tests.rs"]
+mod transaction_tests;
 
 #[cfg(test)]
 mod tests {

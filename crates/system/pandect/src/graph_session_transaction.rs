@@ -140,7 +140,16 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .map(|(result, _)| result)
     }
 
-    pub(crate) async fn transact_change<R>(
+    /// Run `change` on a detached candidate of this session and commit it in
+    /// one backend transaction, installing it only after storage acknowledges.
+    /// A refusal, from `change` or from storage, leaves this session as it was.
+    /// Refused while this handle has unstored entries.
+    ///
+    /// The closure edits through [`edit_now`](Self::edit_now), so a direct
+    /// write (a public assertion or declaration writer) transacts under the
+    /// same capture-and-replay check as a `GraphDelta`: a candidate that
+    /// changed graph truth outside the captured deltas is `NotReplayable`.
+    pub async fn transact_change<R>(
         &mut self,
         at: SystemTime,
         publish: bool,
