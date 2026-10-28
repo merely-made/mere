@@ -540,9 +540,6 @@ pub async fn admit_local_session<P: IdentityProvider>(
         Ok(Err(ProjectionRefusal::NotAdmitted(reason))) => {
             return Err(BrowserCarrierError::Refused(reason));
         },
-        Ok(Err(ProjectionRefusal::ActionNotServed(_))) => {
-            return Err(BrowserCarrierError::Refused(DenyReason::ActionNotOffered));
-        },
         Err(ProjectionAcceptError::Handshake(error)) => {
             return Err(BrowserCarrierError::Handshake(error));
         },

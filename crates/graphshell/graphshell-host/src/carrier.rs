@@ -13,14 +13,15 @@
 //! - the carrier facts come from [`transport::AcceptedSession::into_session`],
 //!   the one audited adapter (N1), so this crate never hand-builds a
 //!   [`SessionFacts`](notochord::SessionFacts);
-//! - the framing and the admitted conclusion come from
-//!   [`notochord::admit_session`], so a refusal is finished rather than
-//!   flushed and a refused stream cannot reach an application;
+//! - the decision comes from the sans-I/O [`crate::admission::admit_session_with`]
+//!   and the frames from `notochord`'s framing, so the reply is written before
+//!   anything closes, a refusal is finished rather than flushed, and a refused
+//!   stream cannot reach an application;
 //! - the delegation grammar stays in Personae, and the owner's rules stay in
 //!   the policy the host supplies.
 //!
-//! What is Graphshell's, and lives here: the ALPN, the service path the owner
-//! offers, and which admitted actions this service serves.
+//! What is Graphshell's, and lives here: the ALPN and the service path the owner
+//! offers. Which actions this service serves is [`crate::admission`]'s.
 //!
 //! ## The transport must outlive the session
 //!
@@ -57,24 +58,29 @@
 //! host's own [`ActionCheck`] (`*_with`) for a host serving a vocabulary of
 //! its own under the projection service.
 //!
-//! ## Why the action check is not a second admission
+//! ## The served vocabulary is part of admission's answer
 //!
-//! The owner policy allows only named admission actions. Graphshell checks the
-//! admitted action again through [`crate::admission::serves_action`], because
-//! the service implementation remains authoritative about what it actually
-//! serves even when the owner's serialized vocabulary changes.
+//! The owner policy allows only named admission actions, and the host's
+//! vocabulary ([`crate::admission::serves_action`], or the `*_with` check)
+//! decides which of those it serves, because the service implementation
+//! remains authoritative about what it serves even when the owner's
+//! serialized vocabulary changes. Both stages are decided before the reply.
+//! They are one answer to the peer, so an action the owner allows and the host
+//! does not serve is written as `ActionNotOffered` and the stream finished,
+//! exactly as a policy refusal is.
 
-use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
-    AdmittedPrincipal, AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy,
-    NetworkId, ProfileRef, RevocationLedger, ServiceAccess, ServiceRule, SessionFacts, TrustedRoot,
-    admit_session,
+    AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
+    RevocationLedger, ServiceAccess, ServiceRule, SessionFacts, SessionHello, TrustedRoot,
+    read_frame, write_frame,
 };
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
 use transport::{AcceptedSession, Alpn, Transport, TransportError};
 
+pub use crate::admission::ActionCheck;
 use crate::admission::{
-    CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_PROTOCOL, PROJECTION_SERVICE, serves_action,
+    CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_PROTOCOL, PROJECTION_SERVICE, admit_session_with,
+    serves_admitted,
 };
 
 /// The ALPN a projection session is accepted for.
@@ -117,21 +123,12 @@ pub fn projection_policy(
 }
 
 /// Why a projection session was not served.
-///
-/// Split because the two mean different things to whoever reads the log: one
-/// is the owner's policy or the peer's authority falling short, the other is a
-/// peer who was genuinely admitted asking this service for something it does
-/// not do.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProjectionRefusal {
-    /// Admission refused the session, and the peer has been told why.
+    /// Admission refused the session, and the peer has been told why before
+    /// the stream was finished. That covers an action the owner allows and
+    /// this host does not serve: `ActionNotOffered`.
     NotAdmitted(DenyReason),
-    /// Admitted, but for an action projections do not serve.
-    ///
-    /// Carries that action for the log. The peer sees the session close
-    /// rather than a handshake denial, because the handshake did not deny it:
-    /// this service did.
-    ActionNotServed(String),
 }
 
 /// Errors that stop the accept path before it reaches a decision.
@@ -173,8 +170,9 @@ pub async fn accept_projection_session<T: Transport>(
 }
 
 /// [`accept_projection_session`] with the host's own action check in place
-/// of [`serves_action`]. For a host that serves a vocabulary of its own under
-/// the projection service, such as a route-selecting host
+/// of [`serves_action`](crate::admission::serves_action). For a host that
+/// serves a vocabulary of its own under the projection service, such as a
+/// route-selecting host
 /// ([`crate::projection_host::RouteSelector`]).
 pub async fn accept_projection_session_with<T: Transport>(
     transport: &T,
@@ -198,18 +196,6 @@ pub async fn accept_projection_session_with<T: Transport>(
     .await
 }
 
-/// Whether this host serves what an admitted principal was admitted for,
-/// given the delegation chain the conclusion was drawn from. The chain is
-/// there for checks that read the grant itself, such as an application its
-/// leaf must name.
-pub type ActionCheck<'a> =
-    &'a (dyn Fn(&AdmittedPrincipal, &[SignedDelegationCertificate]) -> bool + Send + Sync);
-
-/// [`serves_action`] as an [`ActionCheck`].
-fn serves_admitted(principal: &AdmittedPrincipal, _chain: &[SignedDelegationCertificate]) -> bool {
-    serves_action(principal)
-}
-
 /// Admit and action-check a session this carrier did not accept itself.
 ///
 /// [`accept_projection_session`] is [`admit_accepted_session`] with the
@@ -220,9 +206,8 @@ fn serves_admitted(principal: &AdmittedPrincipal, _chain: &[SignedDelegationCert
 /// is nothing to `.accept(alpn)` on. Rather than make it fabricate one, this
 /// function is the seam such a carrier calls directly, taking the
 /// [`AcceptedSession`] it already produced and running exactly the same
-/// admission and action check `accept_projection_session` runs after its own
-/// accept: N1's facts, `notochord::admit_session`, then
-/// [`crate::admission::serves_action`].
+/// admission `accept_projection_session` runs after its own accept: N1's
+/// facts, then [`crate::admission::admit_session_with`].
 ///
 /// Same refusal semantics as `accept_projection_session`: a refusal is
 /// finished, never dropped, and a refused stream never reaches the caller.
@@ -278,7 +263,7 @@ where
 
 /// [`admit_stream`] with the host's own [`ActionCheck`].
 pub async fn admit_stream_with<S>(
-    stream: S,
+    mut stream: S,
     facts: &SessionFacts,
     policy: &LocalNetworkPolicy,
     ledger: &RevocationLedger,
@@ -289,23 +274,49 @@ pub async fn admit_stream_with<S>(
 where
     S: AsyncRead + AsyncWrite + Unpin,
 {
-    let admitted = admit_session(stream, policy, ledger, facts, now_ms, active_sessions).await?;
-    let mut session = match admitted {
-        Ok(session) => session,
-        Err(reason) => return Ok(Err(ProjectionRefusal::NotAdmitted(reason))),
-    };
+    let limits = policy.limits.clamped();
+    let hello = read_frame(&mut stream, limits.max_hello_bytes)
+        .await
+        .map_err(IoHandshakeError::from)?;
+    // Decided before anything is written: the owner's rule and the host's
+    // vocabulary give the one answer the reply carries.
+    let (reply, outcome) = admit_session_with(
+        policy,
+        ledger,
+        &hello,
+        facts,
+        now_ms,
+        active_sessions,
+        serves,
+    );
+    write_frame(&mut stream, &reply, limits.max_reply_bytes)
+        .await
+        .map_err(IoHandshakeError::from)?;
 
-    if !serves(&session.principal, &session.claims.delegations) {
-        let action = session.principal.action.action.clone();
-        // Finish rather than drop, for the same reason a refused handshake is
-        // finished. Both arms happen to drain on drop today, through two Drop
-        // impls nobody chose; saying it explicitly is the difference between a
-        // guarantee and an accident.
-        let _ = session.stream.shutdown().await;
-        return Ok(Err(ProjectionRefusal::ActionNotServed(action)));
+    match outcome {
+        Ok(principal) => {
+            // `admit_session_with` accepted this exact bounded frame, so
+            // decoding it again cannot turn unverified bytes into claims.
+            let claims = SessionHello::decode(&hello, &limits)
+                .map_err(IoHandshakeError::from)?
+                .claims();
+            Ok(Ok(AdmittedSession {
+                stream,
+                principal,
+                claims,
+                facts: facts.clone(),
+                limits,
+            }))
+        },
+        Err(reason) => {
+            // Finish rather than drop. Both arms happen to drain on drop
+            // today, through two Drop impls nobody chose; saying it
+            // explicitly is the difference between a guarantee and an
+            // accident.
+            let _ = stream.shutdown().await;
+            Ok(Err(ProjectionRefusal::NotAdmitted(reason)))
+        },
     }
-
-    Ok(Ok(session))
 }
 
 #[cfg(test)]
@@ -318,7 +329,7 @@ mod tests {
     use insigne::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
     };
-    use notochord::{CarrierKind, RequestedAction, SessionHello, TrafficClass, initiate_session};
+    use notochord::{CarrierKind, RequestedAction, SessionReply, TrafficClass, initiate_session};
     use personae::IdentityProvider;
     use personae::InMemoryProvider;
     use tokio::io::AsyncReadExt;
@@ -400,14 +411,14 @@ mod tests {
     }
 
     /// Drive one session over the paired memory carrier and return what the
-    /// responder decided.
+    /// responder decided beside the reply the client read.
     ///
     /// The client half holds its stream until the responder has decided, which
     /// is what a real client does and what the module docs require of a
     /// service: neither side may drop the connection out from under a reply
     /// that has been written.
     /// `Ok(action)` means the session was served under that action.
-    async fn run(action: &str) -> Result<String, ProjectionRefusal> {
+    async fn run(action: &str) -> (Result<String, ProjectionRefusal>, SessionReply) {
         let viewer = viewer();
         let subject = viewer.master_public_key().to_bytes();
         // The memory carrier authenticates its counterparty by construction,
@@ -471,8 +482,11 @@ mod tests {
                 )
             }
             .expect("issue hello");
-            let _ = initiate_session(&mut stream, &hello, &policy().limits.clamped()).await;
+            let reply = initiate_session(&mut stream, &hello, &policy().limits.clamped())
+                .await
+                .expect("the reply");
             tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+            reply
         });
 
         let outcome = accept_projection_session(
@@ -484,25 +498,36 @@ mod tests {
         )
         .await
         .expect("accept path");
-        client_task.abort();
+        let reply = client_task.await.expect("client task");
 
-        outcome.map(|session| session.principal.action.action.clone())
+        (
+            outcome.map(|session| session.principal.action.action.clone()),
+            reply,
+        )
     }
 
     #[tokio::test]
     async fn a_connect_grant_is_admitted_and_served() {
-        let served = run(CONNECT_ACTION).await.expect("must be served");
-        assert_eq!(served, CONNECT_ACTION);
+        let (outcome, reply) = run(CONNECT_ACTION).await;
+        assert_eq!(outcome.expect("must be served"), CONNECT_ACTION);
+        assert!(reply.is_accept(), "the client is told it was admitted");
     }
 
     /// Even when the owner document allows an action, the service remains
-    /// authoritative about what its implementation serves.
+    /// authoritative about what its implementation serves, and the client is
+    /// told so in the reply rather than seeing an accept and then a close.
     #[tokio::test]
     async fn an_admitted_action_this_service_does_not_serve_is_refused() {
-        let refusal = run("administer").await.expect_err("must be refused");
+        let (outcome, reply) = run("administer").await;
         assert_eq!(
-            refusal,
-            ProjectionRefusal::ActionNotServed("administer".to_string())
+            outcome.expect_err("must be refused"),
+            ProjectionRefusal::NotAdmitted(DenyReason::ActionNotOffered)
+        );
+        assert_eq!(
+            reply,
+            SessionReply::Reject {
+                reason: DenyReason::ActionNotOffered
+            }
         );
     }
 
