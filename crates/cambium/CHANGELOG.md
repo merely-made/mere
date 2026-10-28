@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix `OnClick` ignoring a change of `.capture()` on rebuild: the listener now
+  re-registers in the new phase, as `OnKey` already did.
 - Move click, key and focus listeners onto genet's event layer (native event
   dispatch plan, Phase 2). They register in a `genet_events::Registry` under
   `CAMBIUM_OWNER` (owner 1; the script runtime is 0), the runner's click, key

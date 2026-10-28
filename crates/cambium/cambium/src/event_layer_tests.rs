@@ -715,3 +715,25 @@ fn a_nested_native_call_is_queued_and_runs_when_the_outer_walk_unwinds() {
         ]
     );
 }
+
+#[test]
+fn flipping_capture_on_an_on_click_rebuild_moves_its_registration() {
+    let (_, events, mut runner) = start(
+        |capture: &bool| {
+            on_click(el::<_, bool, ()>("button", "+"), |_: &mut bool, _: PointerClick| {})
+                .capture(*capture)
+        },
+        false,
+    );
+    let at = TargetKey::Node(runner.root());
+    let phase = |events: &Rc<RefCell<Registry>>| {
+        let clicks = events.borrow().snapshot(at, "click");
+        assert_eq!(clicks.len(), 1, "one registration, never a duplicate");
+        clicks[0].capture
+    };
+    assert!(!phase(&events));
+    runner.update(|capture| *capture = true);
+    assert!(phase(&events), "the rebuild moved it to the capture phase");
+    runner.update(|capture| *capture = false);
+    assert!(!phase(&events), "and back to bubble");
+}

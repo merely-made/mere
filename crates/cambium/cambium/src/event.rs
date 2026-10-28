@@ -263,7 +263,10 @@ where
             // move — moveBefore plan S5). Same node + same path is the steady
             // state and skips the registry churn.
             let node = *element.node;
-            if node != prev_node || ctx.view_path() != view_state.path.as_slice() {
+            if node != prev_node
+                || ctx.view_path() != view_state.path.as_slice()
+                || self.capture != prev.capture
+            {
                 ctx.unregister_click(prev_node, &view_state.path);
                 let path = ctx.view_path().to_vec();
                 ctx.register_click(node, path.clone(), self.capture);
