@@ -823,6 +823,8 @@ the charter is a separate argument.
 
 ## archive_docs/ — superseded checkpoints (DOC_POLICY §4)
 
+- [Alembic owner/workshop receipts](archive_docs/2026-10-28/2026-10-28_alembic_implementation_plan_receipts.md) — bounded shared/Graphshell qualification, native observations, source-cut distinctions and open Turnstone receiving gates.
+
 - [`2026-10-28/`](archive_docs/2026-10-28/) — 79 documents archived whole on 2026-10-28 when the active plans were cut into a new, interconsistent set from their open, deferred and follow-on items (DOC_POLICY §8): 77 plans, the archived-plan-tails backlog holder and three historical records. Each carries an end note naming its successor, and the successors cite them by line. Links in live documents point at these copies.
 - [`2026-05-09_engine_layer_complete/`](archive_docs/2026-05-09_engine_layer_complete/) — the 2026-05-06 graphshell migration plan + donor inventory.
 - [`2026-06-04_resource_coordination_merge/`](archive_docs/2026-06-04_resource_coordination_merge/) — the 2026-06-03 resource-banking + compute-mesh briefs (merged into the resource-coordination brief).

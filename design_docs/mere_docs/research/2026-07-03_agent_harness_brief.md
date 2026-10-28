@@ -224,6 +224,14 @@ owners needs explicit handoff/conflict rules. Choosing peers does not eliminate
 those rules, and centralizing all durable authority in a permanent coordinator
 would erase much of the resilience the mesh was meant to provide.
 
+An owner is a logical authority, not necessarily one always-on machine. The
+workshop's present OS file lease excludes local writers; it does not fence a
+writer on another peer. Moving an owner requires a qualified handoff and stale-
+writer rejection, while replicating a writable owner requires a stated fault
+and consistency model. During a partition, retained reading and proposal work
+can remain available even when final acceptance must wait. This is a design
+limit of the current local adapters, not evidence for replicated ownership.
+
 Useful research cues are measurable counterexamples: hold task quality and
 budgets fixed while comparing whole-job placement with token-path splitting;
 measure recovery time, bytes resent, duplicate effects and billed invocations

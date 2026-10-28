@@ -239,6 +239,18 @@ pub fn surface(state: &SurfaceState) -> Surface {
         ));
     }
     if let Some(view) = &state.view {
+        body.push(Box::new(
+            el(
+                "p",
+                match view.lifecycle {
+                    InstallationStatus::Active => "Helper active",
+                    InstallationStatus::Paused => "Helper paused",
+                    InstallationStatus::Revoked => "Helper revoked",
+                    InstallationStatus::Dissolved => "Helper dissolved",
+                },
+            )
+            .attr("data-fact", "alembic-lifecycle"),
+        ));
         body.push(Box::new(el("h2", phase(view.phase))));
         body.push(Box::new(
             el(

@@ -125,7 +125,7 @@ chooser binds an actual Knot document and is not the destination operation, and 
 
 ### W2. Graphshell owner adapter
 The identical helper body and workshop view and domain model operate through Graphshell's owner (its
-retained-content producer and owned GraphSession) with independent grants and ids, and no Turnstone
+owned GraphSession and retained body Resources) with independent grants and ids, and no Turnstone
 workflow code or database reader is copied. Pandect's `GraphSession::transact_deltas_published`
 joins journal changes and addressable graph publication, without an evidence-brief operation ledger
 with the retained note Resource in the W0 cut. The owner adapter now uses a staged
@@ -149,7 +149,8 @@ reopening with no repeated edit, false success or discarded uncertainty; pause, 
 dissolve, lock, budget exhaustion and delayed or wrong-generation replies, cooperative cancellation
 kept distinct from observed join; cold reopen with origins unavailable keeping ids, the exact
 proposal and result, pending review or reconciliation, and unchanged source content. The destination
-ledger, Resource and graph transaction is the consequential acceptance boundary and is unqualified.
+ledger, Resource and graph transaction is the consequential acceptance boundary. Bounded shared and
+Graphshell owner/process gates qualify that boundary; the full per-host matrix remains open.
 Automatic scheduling, model decisions, procedure learning, MCP and ACP, remote execution, fleet
 migration, a general retention service, body adoption and private storage qualification have
 separate gates.
@@ -275,12 +276,26 @@ automation, credentials, grants or publication.
   drafted adapter executes the bounded helper off-thread, but journal I/O and
   graph replacement still run on the UI service turn. This responsiveness limit
   and the full per-host W3 matrix remain open until separately qualified.
+- 2026-10-28: revision tokens include the authoritative node-facet sidecar, with
+  `install_facets` replacing the defaults synthesized during snapshot reconstruction.
+  Overlaying an absent visit facet would retain a new wall-clock visit and make
+  unchanged stored work appear stale. Same-owner receipt reconciliation reloads
+  the durable graph/history after a lost storage reply before acknowledging it.
+- 2026-10-28: an exact durable receipt can coexist with a stale live owner after
+  a committed write loses its acknowledgement. A queued duplicate Accept must
+  reconcile that owner before returning success, while preserving any later
+  publication generation (`MereHost::workshop_commit`). An old receipt alone
+  does not prove the live graph can open its result.
 
 ## Progress
 
 - 2026-10-28: cut from `2026-06-24_alembic_implementation_plan.md` and
   `2026-07-06_node_image_externalization_plan.md`; the Decisions section is copied unchanged;
   nothing new landed.
+- 2026-10-28: added the opt-in shared native workshop, Athanor owner driver and
+  destination operation contract, Pandect receipt reconciliation, and the native
+  Graphshell owner entry. The public Graphshell workflow is qualified; Turnstone's
+  adapter remains in receiving qualification and the full two-host matrix stays open.
 
 ## Received from the backlog holder, 2026-10-28
 
