@@ -512,6 +512,11 @@ impl Graph {
         self.current_session = session;
     }
 
+    /// The launch number [`set_current_session`](Self::set_current_session) installed.
+    pub fn current_session(&self) -> u64 {
+        self.current_session
+    }
+
     /// The current structural revision (see [`revision`](Self::revision)). A consumer captures it
     /// alongside a derived result and recomputes only when it has advanced. (Graph signals.)
     pub fn revision(&self) -> u64 {

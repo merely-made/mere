@@ -1153,6 +1153,7 @@ impl<B: Backend> GraphSession<B> {
         )?);
         self.commit_translation(retained, ops).await?;
         graph.copy_semantic_context_from(&self.graph);
+        graph.set_current_session(self.graph.current_session());
         record_into(&mut graph, &self.pending);
         self.graph = graph;
         self.placement = Some(placement);
@@ -4286,6 +4287,38 @@ mod tests {
                     expected
                 );
             }
+        });
+    }
+
+    #[test]
+    fn qualifying_a_legacy_session_keeps_the_launch() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+
+        pollster::block_on(async {
+            let sessions = MereSessions::new(MemoryBackend::new());
+            let graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut session = sessions.begin(person(), Some(graph));
+            session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+            let mut opened = sessions.open(session.id()).await.unwrap();
+            opened.set_current_session(7);
+            opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
+            assert_eq!(opened.graph().current_session(), 7);
+
+            let node = Uuid::from_u128(1);
+            let key = opened.graph().get_node_key_by_id(node).unwrap();
+            opened
+                .edit_now(person(), |graph| {
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::NavigateNode {
+                            key,
+                            url: "https://1.test/next".into(),
+                        },
+                    );
+                })
+                .unwrap();
+            let key = opened.graph().get_node_key_by_id(node).unwrap();
+            assert_eq!(opened.graph().node_last_session_visited(key), Some(7));
         });
     }
 
