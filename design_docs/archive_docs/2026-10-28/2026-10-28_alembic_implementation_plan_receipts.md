@@ -139,19 +139,46 @@ Turnstone's action/window adapter, source allowlist, existing graph writer,
 exclusive session lease and ledger retention are implemented but have not yet
 passed a receiving check. Its older Eidetic pin lacked `Journal::prefix_digest`;
 the receiving manifests now select the exact published Eidetic revision used
-by this Mere cut. A coherent local supplier overlay is temporary and must be
-removed before canonical Git-pin qualification. The scoped overlay resolution
-now passes locked metadata: its AccessKit crates.io override selects the local
-fork directly instead of leaving a Git-source patch unused. Retained attempts distinguish parse/setup failures, the
-actual supplier mismatch, and guard refusals from executed product tests.
+by this Mere cut. The temporary local supplier overlay has been removed and
+the Turnstone config is byte-identical to its baseline. Its canonical lock
+pins Mere `3d69d032e7f7516b50879ccc14d13971cba40773`, including AccessKit, and
+the matching published Eidetic cohort. Rust 1.99.1 locked/offline metadata exits
+0 after the upstream Turnstone lock merge. Its known Servo malformed-fixture
+diagnostic is retained separately from that exit status.
+
+`alembic-turnstone-20261028/receiving-cut/merged-identity-audit.json` checks 162
+Git packages against both lock records and actual loaded checkout HEADs, with
+no identity mismatch. Against current Turnstone upstream, unrelated package
+records remain unchanged except the required new `genet-events` package at
+the existing Genet revision and the root Alembic dependency. A broader Cargo
+update candidate that refreshed unrelated branches was retained and rejected.
+These metadata facts are not a compiler or product test result.
+
+The local receiving source also routes citations through the exact persisted
+proposal and owner, shares session-state cleanup between lease and load
+refusal, and drops the workshop before App's writer leases. None of those
+Turnstone regressions has executed. The pre-fix lease-refusal file, fixed file,
+reversible patch and exact red/green re-entry steps are retained in
+`alembic-turnstone-20261028/lease-refusal-refactor-reentry.md`.
 
 The current compiler-cache cap is 300 GiB and the free-space floor is 100 GiB.
 Repeated active-lane/admission refusals delayed the final preview gate and
 prevented receiving attempts from reaching Cargo. The final Mere gate above
 subsequently ran successfully; Turnstone remains separate. No cap increase has
-been applied. Source, native
+been applied. The latest canonical Turnstone attempt was refused because the
+300 GiB compiler-cache budget itself would be exceeded, before Cargo ran.
+Source, native
 window, OS containment, private custody, real Persona authority, provider/model,
 remote fleet and full two-host W3 qualification remain separate claims.
+
+For the eventual Turnstone native gate, its existing place-sharing `Resident`
+recipe supports a fresh isolated test vault and private endpoints, with an
+in-memory random passphrase passed on stdin. An existing Djinn lane artifact
+is APFS-cloned and hash-verified as
+`alembic-turnstone-20261028/djinn-native-public-fixture-candidate`; its candidate
+manifest explicitly records missing historical build provenance. No daemon
+was started, user vault accessed or model loaded. Actual protocol and native
+qualification remain required before relying on that candidate.
 
 The local build guard has a separately tested optimization: reuse an unchanged
 preliminary inventory while retaining the fresh admission inventory. All 51
