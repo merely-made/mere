@@ -251,3 +251,108 @@ or helper journal. The expanded test batch will additionally exercise reading
 a saved private result after helper dissolution and journal deletion, using an
 actual authenticated cipher. Content-hash equality/confirmation, existing browser
 addresses/titles and RAM erasure remain outside this storage claim.
+
+
+## Integrated private library and portability cut
+
+The implementation checkpoint is `38af485fb`; the already inspected upstream
+cut `0740ea10a` merged into `fa4493236ebb30f071a4846a3f6d3960c3724e3a`.
+That merge changes Mesh's injected sync handle/dependency and documentation;
+it selects no new supplier revision. Locked offline metadata passes.
+The candidate is published on `codex/alembic-hosts-20261028` for receiving
+validation; it is not a private-product or main-integration receipt.
+
+`integrated-libraries.log` / `.exit` records the guarded combined gate on that
+cut, with a warm 8 GiB reservation:
+
+```sh
+PATH=/usr/local/opt/rustup/bin:$PATH python3 /Users/markik/Code/tools/build_storage.py build \
+  --lane alembic-hosts-20261028 --cwd /Users/markik/Code/worktrees/mere-alembic-hosts-20261028 \
+  --reserve-gib 8 -- +1.99.1 test --locked --offline -p djinn-custodian -p custody-wire \
+  -p mere-athanor --lib --no-default-features \
+  --features mere-athanor/workshop-worker,mere-athanor/workshop-destination,mere-athanor/workshop-sealed -j 4
+```
+
+The command ran through `Code/tools/build_storage.py` in the existing
+`alembic-hosts-20261028` lane. Its HEAD and source SHA-256s are retained in
+`integrated-libraries.head` and `.sha256`.
+
+| Target | Passed | Failed | Ignored |
+| --- | ---: | ---: | ---: |
+| custody-wire | 9 | 0 | 0 |
+| djinn-custodian | 56 | 0 | 0 |
+| Athanor | 41 | 0 | 0 |
+| Total | 106 | 0 | 0 |
+
+The expanded gate includes the profile round-trip fix, exhausted admission and
+session closure, generation-fact handling, and reading the encrypted human-owned
+result after helper dissolution and journal deletion.
+
+`integrated-workshop-wasm.log` / `.exit` passes the workshop-only Athanor check
+for `wasm32-unknown-unknown`, with defaults disabled and no worker or sealing
+feature. `integrated-production.log` / `.exit` passes the endpoint/Djinn
+production library check with endpoint `door` and Djinn `personal-sync,cxf`,
+without test-only feature unification. Both reserve the original 6 GiB check
+allowance, and retain HEAD/source hashes.
+
+The named Djinn IPC integration has not executed: `integrated-djinn-ipc.log`
+records a capacity refusal; `integrated-djinn-ipc-retry.log` records an admission
+lock timeout. These are not failing tests. Later invocations use a validated
+policy copy whose only difference is admission wait 300 to 900 seconds;
+`admission-wait-900-receipt.json` binds it to the unchanged global 400 GiB
+cache budget, 100 GiB floor and all cleanup/reservation protections. This
+queue-wait change cannot admit a build that fails capacity or safety checks.
+
+## Turnstone candidate receiving identity
+
+`Code/output/alembic-turnstone-20261028/private-receiving-cut/` retains the
+before lock/manifest/config, Cargo's incidental update, the restored lock and
+identity audit. The selected 62 Mere package records point to `fa4493236`.
+All 1,599 nonselected package records are unchanged, including the prior
+Genet, Murm and Netrender cuts; Cargo's incidental moving-head refresh was
+not adopted. Locked offline metadata passes and all 162 Git package checkout
+HEADs match their lock source identities across 21 checkouts. The Cargo
+configuration is unchanged. The receiving lock's SHA-256 is
+`232f7dcc9ec825a4662aa74d63cdef04a5774c30a54acd829e163ea93ab72f22`.
+
+Turnstone's first check reached rustc and exposed host API/type mismatches.
+Those diagnostics were repaired in source; subsequent admission refusals do
+not qualify that repair. Host tests, native private controls, responsiveness,
+lock/save races, the source picker and the full W3 matrix remain open.
+Private binding requires the new authoritative-epoch resident; an older
+resident without that capability leaves the private identity pending.
+
+
+The helper-journal deletion test retains the wallet seal epoch. It does not
+qualify key retirement or rewrapping. Binding generation changes revoke current
+access without deleting retained encryption keys; the private operation ledger's
+stored-ciphertext immutability guard requires an admitted migration before those
+ciphertexts can be rewrapped. Helper dissolution alone is no evidence that the
+human-owned result's encryption key is unused.
+
+
+## Held consumer checkpoint and current capacity boundary
+
+Turnstone's complete source checkpoint is `ce5b6ae9a667a6a65baebb9e3c340dd0c2bba3c2` on its isolated
+`codex/alembic-hosts-20261028` branch. It is committed locally, not merged or
+published. `private-source-checkpoint.json` records every owned changed file's
+SHA-256 and the selected lock hash. The later source fixes include receipt
+ownership, live-callback library admission/publication/read fences, stale-enable
+coverage, and redacted library Debug output. These latest sources have not
+completed a compiler or semantic test gate.
+
+The compiler did execute in `check-fa449-scope-fixes.log` and
+`check-fa449-policy900.log`, reporting host integration errors and then one
+remaining ownership error. Those were fixed afterward. `check-fa449-fixes2.log`
+and `check-fa449-final.log` record guard refusals before Cargo; unrelated rustc
+processes are not evidence for this lane. The genuine lease-red procedure is
+preserved in `lease-refusal-refactor-reentry.md`, using current targeted fixed
+and red snapshots rather than overwriting later changes with a historical file.
+The lease red still has not executed.
+
+The remaining shared IPC attempt is also unexecuted. `integrated-djinn-ipc-wait900.log`
+and `integrated-djinn-ipc-after-release.log` record capacity refusals. Read-only
+verified lease snapshots briefly showed zero active reservations before a new
+launch; other reservations appeared by admission. The 8 GiB test reservation,
+400 GiB cache budget, 100 GiB floor and cleanup protections were not reduced or
+bypassed. Main integration remains held for the required integration evidence.

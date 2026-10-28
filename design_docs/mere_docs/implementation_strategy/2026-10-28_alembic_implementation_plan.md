@@ -295,6 +295,12 @@ automation, credentials, grants or publication.
   identities. It protects new payload and request copies; it does not hide
   equality or confirmation through content hashes, remove pre-existing browser
   addresses/titles, migrate legacy LocalOnly data, or qualify RAM erasure.
+- 2026-10-28: helper retirement, custody-binding expiry and retained encryption
+  keys have different lifetimes. The result reader outlives the helper journal
+  while the wallet still retains its seal epoch. Key retirement/rewrapping is
+  not qualified by these tests; the current immutable operation-ledger guard
+  compares stored ciphertext bytes, so rewrapping needs an explicitly admitted
+  owner migration and must preserve the same operation evidence.
 - 2026-10-28: private payload requests bind the custodian instance and generation,
   not only the profile's public identity and unlocked state. Profile/master
   transitions must invalidate pending consent and notify clients even if the
