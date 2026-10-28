@@ -435,7 +435,10 @@ where
             h.relayout(lw, lh);
             window.request_redraw();
         }
-        if !host.borrow().s.hidden && window.take_pending_frame() {
+        if !host.borrow().s.hidden
+            && poll_quality(&mut host.borrow_mut())
+            && window.take_pending_frame()
+        {
             draw_at(&mut host.borrow_mut(), timestamp_ms);
         }
         if let Some(browser) = web_sys::window()
@@ -458,6 +461,32 @@ where
     initial_request.set(Some(id));
     lifetime.raf_pending(true);
     Ok(())
+}
+
+/// Drain the previous frame before admitting more GPU work. Browser device
+/// polling cannot synchronously complete map promises: a cold shader compile
+/// can take many animation frames. Keep the redraw request pending while the
+/// event loop makes progress, including for a final otherwise-static frame.
+fn poll_quality<State, Logic, V>(host: &mut Host<State, Logic, V>) -> bool
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    let quality = host.s.shared.render_core.as_ref().map(|core| {
+        core.renderer().poll_vello_curve_quality()
+    });
+    match quality {
+        Some(Ok(Some((pending, _)))) => pending == 0,
+        Some(Err(error)) => {
+            host.refuse_rasterization(
+                genet_render_host::RasterizeFailure::ProviderError(std::sync::Arc::new(error)),
+                None,
+            );
+            false
+        },
+        _ => true,
+    }
 }
 
 /// Draw a frame and mirror it for a reader.
@@ -483,6 +512,13 @@ where
         let (width, height) = host.logical_size();
         host.relayout(width, height);
         host.sync_a11y();
+        return;
+    }
+    if !poll_quality(host) {
+        host.sync_a11y();
+        if let Some(window) = &host.s.window {
+            window.request_redraw();
+        }
         return;
     }
     let timestamp =
