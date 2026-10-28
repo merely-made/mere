@@ -31,8 +31,8 @@
 use identity::Ed25519Keypair;
 use muniment::Backend;
 use p2panda_core::{Operation, SigningKey};
-use p2panda_net::{Endpoint, Gossip};
 use stickleback::JoinedSpace;
+use stickleback::{Endpoint, Gossip};
 
 use crate::board::JobBoard;
 use crate::retention::RetentionCheckpoint;

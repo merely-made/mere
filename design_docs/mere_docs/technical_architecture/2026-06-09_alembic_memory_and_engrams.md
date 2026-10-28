@@ -253,6 +253,8 @@ Surfacing Athanor clarified the Apparatus/Steward boundary, and the correction i
 recorded in the [pane architecture](2026-06-06_peripheral_panes_architecture.md)
 and the [diagnostics plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md):
 
+*2026-10-28:* this axis is withdrawn with the Steward pane ([GUI catalog record](../design/2026-10-26_gui_catalog_design.md) §10): live job state is distillery's embeddable half, a presentation, and apparatus reads armillary's actor state beside its at-rest record.
+
 - **Steward** is the **live** plane: the process / daemon monitor (running actors,
   async jobs, distillation passes in flight) shown as status you can act on.
 - **Apparatus** is the **at-rest** plane: system diagnostics (the recorded trace

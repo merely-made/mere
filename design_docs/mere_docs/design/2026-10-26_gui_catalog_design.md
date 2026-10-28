@@ -12,6 +12,7 @@ address opens its Comms conversation, and inker defines the embedded-application
 declaration that a manifest carries. The §9 code landed 2026-10-27, read at
 `10fe98b50`; §9 closes with what it leaves. Since 2026-10-28 the rules are
 the doctrine's Surfaces area (statements 1 to 4) and the inventory stays here.
+§10, his ruling 9 of 2026-10-28: no Steward pane.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -590,3 +591,53 @@ a backend fills it; what opening does when no conversation is loaded (the pane
 opens and keeps its selection) is unruled; the pelt workspace has no Comms
 path; and whether a murm author key or an LXMF destination opens the way a
 misfin address does is unruled.
+
+## 10. Ruling 9: no Steward pane
+
+Mark, 2026-10-28, after reading what Steward was supposed to be: "if we're
+going to make the apps into panes, embeddable, then steward kind of loses its
+purpose, so I'm okay with cutting it, because there could just be a
+distillery, right?"
+
+**What the tree says, read at `d4d5b0c32`.** The June panes architecture
+(`../technical_architecture/2026-06-06_peripheral_panes_architecture.md`)
+defines Steward as the live async plane: running actors and user-facing async
+operations (fetch, upload, sync, pinning, storage repair, model jobs, mesh
+jobs, distillation passes, background tabs, failed retries) shown as status
+you can act on, reading armillary's actor constellation, with the rule that
+it shows genuine status and never a placebo; the 2026-06-09 correction
+(`../technical_architecture/2026-06-09_alembic_memory_and_engrams.md` §8)
+split it from Apparatus on a live-versus-at-rest axis. Nothing built it. It
+is `SurfaceId::StewardPane` with an accessibility descriptor
+(`crates/graph/graph-kernel/src/accessibility.rs`) and a diagnostics channel
+pair (`crates/system/ux-events/src/ux_diagnostics.rs`), and Cambium's list and
+detail components name "Steward (active / queued)" as a predicted consumer
+(`crates/cambium/cambium/src/sectioned_list.rs`, `detail_panel.rs`).
+Distillery's crate doc (`ports/distillery/src/lib.rs`) already describes an
+embeddable half any host composes: the job board, lease and heartbeat tiles,
+the device roster, retention and device-policy panes, model-manifest browsing
+and a streaming console, rendering what the supervisor reports and never a
+placebo. Armillary, whose actors Steward would read, is a separate repository
+(`merely-made/armillary`, pinned in `Cargo.toml`) that also holds
+`apparatus-core`. Distillery's fixtures already use *steward* for the mesh
+device that posts a lendable job (`ports/distillery/tests/walk_fixtures.rs`).
+
+**Ruled: no Steward pane.** Under §8 an embedded application is a
+presentation, not a pane, so the live-jobs monitor is distillery's embeddable
+half, presented in a frame. What distillery does not cover, armillary's host
+actors, shows in two places that exist: per node, on the node's own faces,
+since a fetch in flight is that node's activation state, which the gnode's
+colour is reserved for; and system-wide, in apparatus, whose domain crate
+lives beside those actors. The 2026-06-09 live-versus-at-rest axis goes with
+it. Loop 5 (§4) closes on the job id alone: the ask, whichever presentation
+shows the job, and the facet all carry it. Ruling 1's "plus Steward once
+built" is withdrawn; `StewardPane` leaves `SurfaceId` with ruling 2's trim;
+the word is free for distillery's device role. Options set aside: a Steward
+presentation contributed by the host over armillary's constellation, which
+would need a seam armillary does not expose; a pane for the fetch and sync
+actors alone, which would show state the node already shows.
+
+What this leaves, as cues: the panes doc and the §8 correction describe
+Steward as current and carry a banner from today; Cambium's two module docs
+still name Steward rows, under the survivor rule; nothing yet shows
+armillary's actor state in apparatus; the job id is unbuilt.
