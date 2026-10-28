@@ -1259,6 +1259,14 @@ impl<B: Backend> GraphSession<B> {
         &self.graph
     }
 
+    /// Install the host's launch number: the kernel stamps it as the
+    /// `last_session_visited` of every node navigated from now on. Per-launch
+    /// host wiring, not graph truth, so it is neither journaled nor compared;
+    /// the candidates an edit clones carry it.
+    pub fn set_current_session(&mut self, launch: u64) {
+        self.graph.set_current_session(launch);
+    }
+
     pub fn journal(&self) -> &GraphJournal {
         &self.journal
     }
