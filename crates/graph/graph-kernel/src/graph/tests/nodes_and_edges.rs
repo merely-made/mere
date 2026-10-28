@@ -400,6 +400,39 @@ fn test_retract_relation_by_sub_kind_between_nodes() {
     assert!(!payload.has_relation(RelationSelector::Semantic(SemanticSubKind::UserGrouped)));
 }
 
+#[test]
+fn projected_neighbors_reads_both_strata_and_a_self_loop_once() {
+    let mut graph = Graph::new();
+    let [a, b, c, d] = ["a", "b", "c", "d"]
+        .map(|name| graph.add_node(format!("https://{name}.com"), Point2D::new(0.0, 0.0)));
+    graph.assert_relation(a, b, user_grouped(None)).unwrap();
+    graph.assert_relation(c, a, hyperlink()).unwrap();
+    graph.assert_relation(a, a, user_grouped(None)).unwrap();
+    graph.assert_relation(d, d, hyperlink()).unwrap();
+
+    let neighbors = |key| {
+        let mut found: Vec<_> = graph.projected_neighbors(key).collect();
+        found.sort_by_key(|node| node.index());
+        found
+    };
+    assert_eq!(
+        neighbors(a),
+        vec![a, b, c],
+        "Surface b, Resource c, itself once"
+    );
+    assert_eq!(neighbors(c), vec![a]);
+    assert_eq!(
+        neighbors(d),
+        vec![d],
+        "a Resource self-loop is read once too"
+    );
+    assert_eq!(
+        graph.neighbors_undirected(a).count(),
+        2,
+        "the Surface reader alone sees b and itself"
+    );
+}
+
 /// The statement-aware write API (petgraph-RDF Phase 1): assert returns a
 /// device-safe fact handle; content-dedup returns the SAME handle (updating
 /// metadata in place); retract-by-id removes exactly that fact, clears the
