@@ -91,6 +91,13 @@ pub enum CredentialCall {
 
 /// Custody, as Djinn reaches it.
 pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
+    /// None identifies a legacy/test host without authoritative transition
+    /// evidence. A private consumer must not upgrade it to a synthetic epoch.
+    fn custody_epoch(
+        &self,
+    ) -> Result<Option<graphshell_endpoint::door::custody::CustodyEpoch>, CustodyRefusal> {
+        Ok(None)
+    }
     /// The public identity read model, answerable while locked.
     fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot>;
     fn is_locked(&self) -> bool;

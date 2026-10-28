@@ -11,9 +11,14 @@ mod furnace;
 pub use furnace::*;
 #[cfg(feature = "workshop")]
 pub mod workshop;
+#[cfg(feature = "workshop")]
+pub mod workshop_seal;
 
 #[cfg(all(feature = "workshop-worker", not(target_arch = "wasm32")))]
 pub mod workshop_driver;
 
 #[cfg(feature = "workshop-destination")]
 pub mod workshop_destination;
+
+#[cfg(all(feature = "workshop-destination", feature = "workshop-sealed"))]
+pub mod workshop_sealed_destination;

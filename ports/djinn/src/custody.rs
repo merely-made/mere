@@ -695,6 +695,7 @@ fn unlocked(keeper: &Keeper) -> Result<(), CustodyRefusal> {
 }
 
 fn status(keeper: &Keeper) -> Result<ResidentStatus, CustodyRefusal> {
+    let custody_epoch = keeper.host().custody_epoch()?;
     let snapshot = keeper.snapshot().map_err(failed)?;
     let lock = snapshot.vault.lock;
     let profile = snapshot
@@ -709,6 +710,9 @@ fn status(keeper: &Keeper) -> Result<ResidentStatus, CustodyRefusal> {
             keeper.host().root_public_key(KeySource::Wallet, None).ok(),
         ),
     };
+    if keeper.host().custody_epoch()? != custody_epoch {
+        return Err(refused("custody changed during status observation"));
+    }
     Ok(ResidentStatus {
         lock,
         protection: snapshot.vault.protection,
@@ -716,6 +720,7 @@ fn status(keeper: &Keeper) -> Result<ResidentStatus, CustodyRefusal> {
         persona_public_key,
         wallet_public_key,
         wallet_root: keeper.wallet_root().map(Into::into),
+        custody_epoch,
     })
 }
 

@@ -250,6 +250,25 @@ pub struct ResidentStatus {
     /// Where the wallet's public records live, for an application that reads
     /// already-public state (grant sets, the device roster) itself.
     pub wallet_root: Option<PathBuf>,
+    /// Authoritative transition evidence when supplied by a separate custodian.
+    /// Absence is a legacy capability, never a synthetic generation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custody_epoch: Option<CustodyEpoch>,
+}
+
+/// Authoritative custodian lifetime and invalidation generation. It is public
+/// transition evidence, not a key, grant or proof of a completed effect.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CustodyEpoch {
+    pub instance: String,
+    pub generation: u64,
+}
+
+impl CustodyEpoch {
+    pub fn valid(&self) -> bool {
+        !self.instance.is_empty() && self.instance.len() <= 256
+    }
 }
 
 /// One released key: its salt, the derived seed and the master's attestation.
@@ -456,6 +475,7 @@ mod tests {
         assert_eq!(serde_json::from_str::<CustodyCall>(&text).unwrap(), call);
 
         let status = CustodyAnswer::Status(ResidentStatus {
+            custody_epoch: None,
             lock: VaultLockView::Locked,
             protection: VaultProtectionView::Ephemeral,
             profile: Some(ProfileId("default".into())),

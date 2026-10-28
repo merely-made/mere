@@ -6,7 +6,7 @@ successor keeps the keyword `alembic-implementation`, so its Decisions stay as t
 the codicil spine (slice A), the memory-level read model and manual forgetting (slice C's spine),
 Athanor's forgetting and consolidation passes in `mere-athanor`, merge by identity
 (`compose_graph_codicils`), the W0 shared workshop core (qualified 2026-10-25), and image-store
-phases 1-3 with the bounded decoded cache and the orphan GC in library code. In progress: W1-W2 owner adapters and shared native controls. Open: W3 (the
+phases 1-3 with the bounded decoded cache and the orphan GC in library code. In progress: private-source storage and custody qualification (W0P), prioritized by Mark on 2026-10-28, then W1-W2 owner adapters and shared native controls. Open: W3 (the
 two-host product and recovery qualification), slice C's promote, demote, editable-policy and
 by-sessions tails, slice D's scheduling, facet pass and surfacing, the image GC's host caller, Phase
 4's closure and Phase 6's re-measure.
@@ -107,6 +107,39 @@ facet extraction stay later extensions, and a future page engram should supply F
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md:135-176,297-300`;
   tails `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:610-618`
+
+### W0P. Private source and derived-state protection
+
+Mark's D9 prioritizes this boundary before further workshop UI completion.
+New private capture must seal the source, annotation, decoded recovery body and
+sensitive request/recovery metadata. Legacy LocalOnly captures remain explicitly
+unsealed; no real-store migration or implicit reclassification is part of this
+slice. Tagged sealed identities and a separate namespace prevent collisions.
+
+The complete workshop record, including source copies and proposals, is sealed
+under live owner custody and an authenticated owner/installation context. CAS
+compares the original stored ciphertext, not a newly encrypted equivalent.
+Private accepted notes and operation requests must share the destination's
+atomic snapshot/publication without putting clear private text in node bodies,
+facets, diagnostics or ordinary exports. Mixed inputs inherit private status.
+The human's accepted note remains readable through its owner after helper
+retirement or journal removal; stable authenticated routing must not depend on
+an active helper or widened grants.
+Observed lock or custody loss invalidates the current generation, cancels and
+joins work, clears transient private presentation, and refuses stale callbacks.
+Authoritative custodian instance/generation fences each payload operation;
+a boolean unlocked sample does not prove continuity. An already admitted write
+can require reconciliation; lock is not a promise to undo it.
+
+- Done when: synthetic private canaries survive exact-citation and cold-reopen
+  flows through the current isolated custody process, while stored artifacts,
+  journals, graph snapshots/sidecars and ordinary logs contain no cleartext
+  canary. Lock/loss, changed generations, tamper, source revocation, failure and
+  lost acknowledgement refuse or retain uncertainty without plaintext fallback.
+- Needs: current PayloadSealer route and owner admission, the source actor,
+  sealed workshop journal and private destination effect path. Existing frozen
+  public receipts do not qualify this boundary.
+- Rulings: alembic-implementation D9
 
 ### W1. Turnstone owner adapter
 Turnstone is the first embedding host, already consuming Servitor's run reducer and retained-source
@@ -233,12 +266,44 @@ win.
 
   Links: area Stack · draws on stack.1 · summary Servitor remains in Eidetic while Alembic composes its admission and run contracts.
 
+- **D9, private-source support first (2026-10-28).** Mark: "Prioritize private-source support."
+  This refines the ordering of the workshop slice: qualify sealed sources and
+  derived private records before further UI completion. The already qualified
+  public example remains bounded evidence. Existing unsealed captures are not
+  silently migrated or described as sealed.
+
+  Links: area Stack · draws on stack.1 · summary Private source and derived-state protection precede further workshop UI completion.
+
 The ownership constraints and W1-W3 workflow above are the design
 specified in response to Mark's request to reconcile the workshop with
 Servitor and Armillary and flesh out a first workflow in two hosts. Their done-conditions do not authorize new standing
 automation, credentials, grants or publication.
 
 ## Findings
+
+- 2026-10-28: the existing Turnstone LocalOnly source path calls unsealed
+  Eidetic/Fleece saves and retains decoded recovery bytes and CaptureRequest
+  metadata. LocalOnly is a distribution classification, not proof of encryption.
+  Private workshop qualification must cover these copies as well as the journal,
+  accepted-note body and operation ledger.
+- 2026-10-28: the private destination retains encrypted operation evidence and
+  note content in the same snapshot. An authenticated routing envelope lets the
+  owner read a retained note by operation id without loading the helper journal;
+  deletion does not recreate its surface. This new path still needs host and
+  current-custodian qualification.
+- 2026-10-28: sealed storage retains visible content addresses and stable routing
+  identities. It protects new payload and request copies; it does not hide
+  equality or confirmation through content hashes, remove pre-existing browser
+  addresses/titles, migrate legacy LocalOnly data, or qualify RAM erasure.
+- 2026-10-28: private payload requests bind the custodian instance and generation,
+  not only the profile's public identity and unlocked state. Profile/master
+  transitions must invalidate pending consent and notify clients even if the
+  profile later returns; exhausted authority must close rather than reuse a
+  live generation. These new custodian paths remain in receiving qualification.
+- 2026-10-28: the current custody payload route limits a clear operation to
+  512 KiB. The new sealed workshop path uses a smaller explicit record bound;
+  public retention bounds remain separate. Context must be authenticated inside
+  the payload because the custody route selects a fixed application scope.
 
 - 2026-10-06: the codicil spine is `crates/system/pandect/src/graph_codicil.rs`
   (`save_graph_codicil`, `open_codicil_as_session`, `list_graph_codicils`, schema

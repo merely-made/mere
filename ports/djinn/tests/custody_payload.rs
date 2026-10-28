@@ -87,6 +87,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     let mut client = client.expect("custody starts");
     let clear = b"private retained cafe passage";
     let request = PayloadRequest {
+        custody_epoch: None,
         profile: ProfileId("family".into()),
         master: host.master_public_key().to_bytes(),
         content_hash: Hash::of(clear),
@@ -116,6 +117,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     );
     let sealed_epoch = marker.epoch;
     let read = PayloadRequest {
+        custody_epoch: None,
         operation: PayloadOperation::Unseal {
             bytes: bytes.clone(),
             marker: marker.clone(),
@@ -134,18 +136,28 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     ));
     for bad in [
         PayloadRequest {
+            custody_epoch: Some(graphshell_endpoint::door::custody::CustodyEpoch {
+                instance: "a-different-custodian".into(), generation: 1,
+            }),
+            ..read.clone()
+        },
+        PayloadRequest {
+            custody_epoch: None,
             profile: ProfileId("foreign".into()),
             ..read.clone()
         },
         PayloadRequest {
+            custody_epoch: None,
             master: [3; 32],
             ..read.clone()
         },
         PayloadRequest {
+            custody_epoch: None,
             content_hash: Hash::of(b"wrong"),
             ..read.clone()
         },
         PayloadRequest {
+            custody_epoch: None,
             operation: PayloadOperation::Unseal {
                 bytes: PayloadBytes(b"altered".to_vec()),
                 marker: marker.clone(),
@@ -153,6 +165,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
             ..read.clone()
         },
         PayloadRequest {
+            custody_epoch: None,
             operation: PayloadOperation::Seal {
                 bytes: PayloadBytes(vec![0; MAX_PAYLOAD_BYTES + 1]),
             },

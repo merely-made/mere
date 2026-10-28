@@ -32,8 +32,26 @@ impl<B> Drop for Driver<B> {
 
 impl<B: WorkshopBackend> Driver<B> {
     pub fn new(backend: B, owner: Owner, installation: [u8; 16], wake: armillary::Wake) -> Self {
+        Self::from_workshop(Workshop::new(backend, owner, installation), wake)
+    }
+
+    #[cfg(feature = "workshop-sealed")]
+    pub fn new_sealed(
+        backend: B,
+        owner: Owner,
+        installation: [u8; 16],
+        wake: armillary::Wake,
+        protection: std::sync::Arc<dyn crate::workshop_seal::Protection>,
+    ) -> Self {
+        Self::from_workshop(
+            Workshop::new_sealed(backend, owner, installation, protection),
+            wake,
+        )
+    }
+
+    fn from_workshop(workshop: Workshop<B>, wake: armillary::Wake) -> Self {
         Self {
-            workshop: Workshop::new(backend, owner, installation),
+            workshop,
             wake,
             worker: None,
             active: None,

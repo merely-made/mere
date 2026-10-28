@@ -58,7 +58,7 @@ fn request(
     encoded(&(acceptance, proposal))
 }
 
-fn identifiers(acceptance: &Acceptance) -> (Uuid, String, String) {
+pub(crate) fn identifiers(acceptance: &Acceptance) -> (Uuid, String, String) {
     let iri = format!(
         "https://mere.computer/notes/evidence-brief/{}",
         hex(&acceptance.operation)
@@ -77,10 +77,14 @@ pub fn result_surface(acceptance: &Acceptance) -> Uuid {
     identifiers(acceptance).0
 }
 
-fn ledger_identity(acceptance: &Acceptance) -> (String, Uuid) {
+pub(crate) fn ledger_identity(acceptance: &Acceptance) -> (String, Uuid) {
+    ledger_identity_for(&acceptance.operation)
+}
+
+pub(crate) fn ledger_identity_for(operation: &[u8; 32]) -> (String, Uuid) {
     let iri = format!(
         "https://mere.computer/operations/evidence-brief/{}",
-        hex(&acceptance.operation)
+        hex(operation)
     );
     let iri = chartulary::canonical_url(&iri);
     let id = chartulary::resource_id_from_canonical_iri(&iri);
@@ -224,7 +228,7 @@ struct GraphOperation {
     witness: String,
 }
 
-fn require_complete(graph: &Graph) -> Result<(), Error> {
+pub(crate) fn require_complete(graph: &Graph) -> Result<(), Error> {
     if graph
         .known_coverage()
         .limits
@@ -311,16 +315,18 @@ pub fn preserve_graph_operations(before: &Graph, after: &Graph) -> Result<(), Er
     let previous = before.to_snapshot_at(0);
     let next = after.to_snapshot_at(0);
     for resource in &previous.resources {
-        let Some(operation) = resource.facets.iter().find(|f| f.facet == OPERATION_FACET) else {
-            continue;
-        };
-        let retained = next
-            .resources
-            .iter()
-            .find(|r| r.canonical_iri == resource.canonical_iri)
-            .and_then(|r| r.facets.iter().find(|f| f.facet == OPERATION_FACET));
-        if retained != Some(operation) {
-            return Err(Error::Conflict);
+        for operation in resource.facets.iter().filter(|f| {
+            f.facet == OPERATION_FACET
+                || f.facet == "mere.alembic.evidence-brief.sealed-operation/v1"
+        }) {
+            let retained = next
+                .resources
+                .iter()
+                .find(|r| r.canonical_iri == resource.canonical_iri)
+                .and_then(|r| r.facets.iter().find(|f| f.facet == operation.facet));
+            if retained != Some(operation) {
+                return Err(Error::Conflict);
+            }
         }
     }
     Ok(())

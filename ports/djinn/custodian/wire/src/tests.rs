@@ -127,6 +127,37 @@ mod unix {
     }
 
     #[test]
+    fn profile_change_fact_updates_the_generation_before_next_call() {
+        let (client, mut server) = UnixStream::pair().unwrap();
+        let fake = std::thread::spawn(move || {
+            let ClientMessage::Hello { nonce, .. } = read_message(&mut server).unwrap().unwrap() else { panic!("hello") };
+            write_message(&mut server, &ServerMessage::Opened(Session {
+                version: VERSION, instance: "instance".into(), generation: 3, locked: false,
+                principal: "djinn".into(), peer: Peer::Unix { uid: 1, gid: 1, pid: None },
+                scopes: vec![], consent_channel: false,
+                limits: Limits { max_frame_bytes: limits::MAX_FRAME_BYTES, max_queued_operations: 16, noninteractive_ms: 30_000, consent_ms: 120_000 }, nonce,
+            })).unwrap();
+            write_message(&mut server, &ServerMessage::Fact(Fact {
+                instance: "instance".into(), generation: 4, cause: FactCause::ProfileChanged,
+                locked: false, report: None, revoked: None,
+            })).unwrap();
+            let ClientMessage::Request { id, generation, .. } = read_message(&mut server).unwrap().unwrap() else { panic!("request") };
+            assert_eq!(generation, 4);
+            write_message(&mut server, &ServerMessage::Outcome {
+                request: id, generation: 4, outcome: Outcome::Success { answer: Answer::Done {} },
+            }).unwrap();
+        });
+        let expect = ServerExpectation { unix_uids: vec![peer::effective_uid()], ..ServerExpectation::default() };
+        let client = Client::over(connection(client), &expect).unwrap();
+        assert_eq!(client.wait_for_change(3, Duration::from_secs(5)).generation, 4);
+        assert!(matches!(client.call(Operation::Status {}, Duration::from_secs(5)), Outcome::Success { .. }));
+        fake.join().unwrap();
+        let observed = client.wait_for_change(4, Duration::from_secs(5));
+        assert!(!observed.alive);
+        assert_eq!(client.call(Operation::Status {}, Duration::from_secs(1)), Outcome::unknown("custodian-lost"));
+    }
+
+    #[test]
     fn a_lost_connection_is_an_unknown_outcome_never_success() {
         let (client, mut server) = UnixStream::pair().unwrap();
         let fake = std::thread::spawn(move || {

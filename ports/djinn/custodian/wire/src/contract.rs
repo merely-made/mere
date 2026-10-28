@@ -438,6 +438,9 @@ pub enum FactCause {
     Lock,
     Unlock,
     Revoke,
+    /// The active profile or master changed. Older strict version-1 decoders
+    /// disconnect on this fact and must reconnect using this supplier cohort.
+    ProfileChanged,
 }
 
 /// A monotonic invalidation fact. Honest clients forget released keys of

@@ -39,6 +39,7 @@ door = [
     "dep:windows-sys",
     "dep:zeroize",
     "tokio/net",
+    "tokio/macros",
     "tokio/sync",
     "tokio/time",
 ]

@@ -459,3 +459,44 @@ fn the_installed_grants_parse_on_every_platform_and_cover_djinns_own_keys() {
         assert_eq!(code(&h.outcome(session, derive)), "operation-or-scope", "guest delegations stay sign-only");
     }
 }
+
+#[test]
+fn generation_advances_on_profile_roundtrip() {
+    let dir = vault();
+    let mut h = Harness::new(config(&dir, "deny", base(json!([{"operation": "manage", "consent": "none"}]))));
+    let session = h.open(djinn());
+    h.unlock(session);
+    let initial = h.core.generation();
+    let switched = intent(dramatis::intents::PROFILE_SWITCH_INTENT, json!({"profile": "home"}));
+    let (id, effects) = h.request(session, switched);
+    assert!(matches!(answer(super::outcome_for(&effects, session, id).unwrap()), Answer::Done {}));
+    let home = h.core.generation();
+    assert!(home > initial, "profile change must invalidate the old authority generation");
+    assert!(effects.messages.iter().any(|(_, message)| matches!(message, custody_wire::ServerMessage::Fact(fact) if fact.cause == custody_wire::FactCause::ProfileChanged && fact.generation == home && !fact.locked)));
+    let switched = intent(dramatis::intents::PROFILE_SWITCH_INTENT, json!({"profile": "work"}));
+    assert!(matches!(answer(h.outcome(session, switched)), Answer::Done {}));
+    assert!(h.core.generation() > home, "returning to the original profile must not revive the old authority");
+}
+
+#[test]
+fn profile_change_invalidates_pending_consent_without_invalidating_unrelated_intents() {
+    let dir = vault();
+    let grants = base(json!([
+        {"operation": "manage", "consent": "none"},
+        {"operation": "release", "profile": "current", "salts": [{"exact": "mesh-author"}], "consent": "per-operation"}
+    ]));
+    let mut h = Harness::new(config(&dir, "channel", grants));
+    let session = h.open(djinn());
+    let helper = h.open(consent_helper());
+    h.unlock(session);
+    let generation = h.core.generation();
+    let created = intent(dramatis::intents::PROFILE_CREATE_INTENT, json!({"id": "studio", "display_name": "Studio"}));
+    assert!(matches!(answer(h.outcome(session, created)), Answer::Done {}));
+    assert_eq!(h.core.generation(), generation);
+    let (pending_id, effects) = h.request(session, super::release(&["mesh-author"]));
+    let petition = petition_in(&effects, helper).unwrap();
+    let switched = intent(dramatis::intents::PROFILE_SWITCH_INTENT, json!({"profile": "home"}));
+    let (_, effects) = h.request(session, switched);
+    assert_eq!(code(&super::outcome_for(&effects, session, pending_id).unwrap()), "invalidated");
+    assert!(h.core.decide(Decider::Session(helper), pending_id, &petition.digest, petition.generation, true, h.now).0.is_err());
+}

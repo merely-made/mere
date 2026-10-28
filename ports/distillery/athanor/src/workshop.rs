@@ -78,10 +78,30 @@ pub fn definition() -> Digest {
 
 /// The adapter must first authorize this exact retained version and classify
 /// its bytes. This function checks UTF-8 selectors, not the owner's authority.
-pub fn capture(mut source: Source, retained: &str, public: bool) -> Result<Passage, Error> {
+pub fn capture(source: Source, retained: &str, public: bool) -> Result<Passage, Error> {
     if !public {
         return Err(Error::Invalid("private storage is not qualified"));
     }
+    capture_classified(source, retained, public)
+}
+
+/// Private capture is explicit and requires the owner's live protected store.
+/// This is not source admission: the host still authorizes the exact version.
+#[cfg(feature = "workshop-sealed")]
+pub fn capture_private(
+    source: Source,
+    retained: &str,
+    protection: &dyn crate::workshop_seal::Protection,
+) -> Result<Passage, Error> {
+    let epoch = protection.epoch().ok_or(Error::Unauthorized)?;
+    let passage = capture_classified(source, retained, false)?;
+    if protection.epoch() != Some(epoch) {
+        return Err(Error::Unauthorized);
+    }
+    Ok(passage)
+}
+
+fn capture_classified(mut source: Source, retained: &str, public: bool) -> Result<Passage, Error> {
     let start = usize::try_from(source.start).map_err(|_| Error::Invalid("selector"))?;
     let end = usize::try_from(source.end).map_err(|_| Error::Invalid("selector"))?;
     let text = retained
@@ -106,6 +126,13 @@ fn owner_valid(owner: &Owner) -> bool {
 }
 
 fn validate(owner: &Owner, passages: &[Passage]) -> Result<(), Error> {
+    if passages.iter().any(|passage| !passage.public) {
+        return Err(Error::Invalid("private storage is not qualified"));
+    }
+    validate_shape(owner, passages)
+}
+
+fn validate_shape(owner: &Owner, passages: &[Passage]) -> Result<(), Error> {
     if !owner_valid(owner) || !(2..=4).contains(&passages.len()) {
         return Err(Error::Invalid("owner or selection count"));
     }
@@ -113,9 +140,6 @@ fn validate(owner: &Owner, passages: &[Passage]) -> Result<(), Error> {
     let mut bytes = 0;
     for passage in passages {
         let source = &passage.source;
-        if !passage.public {
-            return Err(Error::Invalid("private storage is not qualified"));
-        }
         if &source.owner != owner {
             return Err(Error::Invalid("source owner/session"));
         }
@@ -214,7 +238,7 @@ fn title_text(text: &str) -> String {
         .collect()
 }
 
-fn proposal(id: [u8; 16], run: u64, sources: &[Passage]) -> Result<Proposal, Error> {
+pub(crate) fn proposal(id: [u8; 16], run: u64, sources: &[Passage]) -> Result<Proposal, Error> {
     let mut djot = String::from("# Evidence brief\n\n");
     for (index, passage) in sources.iter().enumerate() {
         djot.push_str(&format!(
@@ -289,6 +313,26 @@ pub fn validate_proposal(proposed: &Proposal) -> Result<(), Error> {
         .source
         .owner;
     validate(owner, &proposed.sources)?;
+    if proposed != &proposal(proposed.installation, proposed.run, &proposed.sources)? {
+        return Err(Error::Invalid("proposal integrity"));
+    }
+    Ok(())
+}
+
+/// Validate a mixed/private immutable proposal; storage and disclosure still
+/// require the owner's qualified protection and live source/custody gates.
+#[cfg(feature = "workshop-sealed")]
+pub fn validate_private_proposal(proposed: &Proposal) -> Result<(), Error> {
+    if proposed.sources.iter().all(|passage| passage.public) {
+        return Err(Error::Invalid("private proposal requires private input"));
+    }
+    let owner = &proposed
+        .sources
+        .first()
+        .ok_or(Error::Invalid("selection"))?
+        .source
+        .owner;
+    validate_shape(owner, &proposed.sources)?;
     if proposed != &proposal(proposed.installation, proposed.run, &proposed.sources)? {
         return Err(Error::Invalid("proposal integrity"));
     }
@@ -492,6 +536,7 @@ pub struct Workshop<B> {
     owner: Owner,
     id: [u8; 16],
     key: String,
+    protection: Option<Arc<dyn crate::workshop_seal::Protection>>,
 }
 
 /// Native transactional futures require a shared backend; browser backends
@@ -552,6 +597,7 @@ impl<B: WorkshopBackend> Workshop<B> {
         Ok(
             matches!(reducer.phase(), RunPhase::Awaiting { correlation: c, .. } if c == correlation(dispatch.correlation))
                 && dispatch.installation == self.id
+                && dispatch.protected == self.protection.is_some()
                 && dispatch.inputs == run.inputs
                 && dispatch.candidate == run.candidate
                 && Some(dispatch.issued_at_ms) == issued
@@ -572,6 +618,38 @@ impl<B: WorkshopBackend> Workshop<B> {
             owner,
             id,
             key,
+            protection: None,
+        }
+    }
+
+    /// A separate sealed namespace never upgrades or reinterprets a legacy
+    /// plaintext journal. The owner supplies protection with live epoch checks.
+    #[cfg(feature = "workshop-sealed")]
+    pub fn new_sealed(
+        backend: B,
+        owner: Owner,
+        id: [u8; 16],
+        protection: Arc<dyn crate::workshop_seal::Protection>,
+    ) -> Self {
+        let mut workshop = Self::new(backend, owner, id);
+        workshop.key = format!(
+            "alembic/workshop/sealed/v1/{}/{}",
+            hex(&digest(&workshop.owner)),
+            hex(&id)
+        );
+        workshop.protection = Some(protection);
+        workshop
+    }
+
+    fn protection_context(&self) -> Result<Vec<u8>, Error> {
+        encoded(&("alembic-workshop-record-v1", &self.owner, self.id))
+    }
+
+    fn validate_inputs(&self, inputs: &[Passage]) -> Result<(), Error> {
+        if self.protection.is_some() {
+            validate_shape(&self.owner, inputs)
+        } else {
+            validate(&self.owner, inputs)
         }
     }
 
@@ -585,8 +663,12 @@ impl<B: WorkshopBackend> Workshop<B> {
         if bytes.len() > MAX_RECORD {
             return Err(Error::Invalid("record size"));
         }
+        let clear = match &self.protection {
+            Some(protection) => protection.open(&self.protection_context()?, &bytes)?,
+            None => bytes.clone(),
+        };
         let record: Record =
-            serde_json::from_slice(&bytes).map_err(|_| Error::Invalid("record schema"))?;
+            serde_json::from_slice(&clear).map_err(|_| Error::Invalid("record schema"))?;
         if record.schema != SCHEMA
             || record.owner != self.owner
             || record.binding.id != self.id
@@ -599,7 +681,7 @@ impl<B: WorkshopBackend> Workshop<B> {
             if run.admitted.id != self.id || run.admitted.revision != definition() {
                 return Err(Error::Invalid("selected definition"));
             }
-            validate(&self.owner, &run.inputs)?;
+            self.validate_inputs(&run.inputs)?;
             if run.limits != LIMITS {
                 return Err(Error::Invalid("run limits"));
             }
@@ -661,15 +743,39 @@ impl<B: WorkshopBackend> Workshop<B> {
     }
 
     async fn save(&self, before: Option<Vec<u8>>, record: Record) -> Result<(), Error> {
-        let value = encoded(&record)?;
-        if value.len() > MAX_RECORD || record.projected_size()? > MAX_RECORD {
+        let clear = encoded(&record)?;
+        let limit = if self.protection.is_some() {
+            crate::workshop_seal::MAX_SEALED_CLEAR
+        } else {
+            MAX_RECORD
+        };
+        if clear.len() > limit || record.projected_size()? > limit {
+            return Err(Error::Invalid("record retention bound"));
+        }
+        let protection_epoch = self
+            .protection
+            .as_ref()
+            .map(|p| p.epoch().ok_or(Error::Unauthorized))
+            .transpose()?;
+        let value = match &self.protection {
+            Some(protection) => protection.seal(&self.protection_context()?, &clear)?,
+            None => clear,
+        };
+        if value.len() > MAX_RECORD {
             return Err(Error::Invalid("record retention bound"));
         }
         let key = self.key.clone();
+        let protection = self.protection.clone();
         let committed = Arc::new(AtomicBool::new(false));
         let flag = committed.clone();
         self.backend
             .transact(Box::new(move |reader| {
+                if protection
+                    .as_ref()
+                    .is_some_and(|p| p.epoch() != protection_epoch)
+                {
+                    return vec![];
+                }
                 // Read errors refuse the comparison. They never select an absent
                 // record or fall back to a nontransactional write.
                 if reader.get(&key).ok().as_ref() != Some(&before) {
@@ -680,6 +786,15 @@ impl<B: WorkshopBackend> Workshop<B> {
             }))
             .await
             .map_err(|e| Error::Store(e.to_string()))?;
+        if self
+            .protection
+            .as_ref()
+            .is_some_and(|p| p.epoch() != protection_epoch)
+        {
+            // The write may be durable: callers must retain uncertainty and
+            // reconcile under fresh custody, never retry as an absent effect.
+            return Err(Error::Unauthorized);
+        }
         if committed.load(Ordering::Acquire) {
             Ok(())
         } else {
@@ -717,7 +832,7 @@ impl<B: WorkshopBackend> Workshop<B> {
         authority: &impl AuthorityProvider,
         now: u64,
     ) -> Result<(), Error> {
-        validate(&self.owner, &inputs)?;
+        self.validate_inputs(&inputs)?;
         // Check the prospective artifact before installing an actionable run;
         // an unrenderable selection must not poison its persisted record.
         proposal(self.id, id, &inputs)?;
@@ -802,6 +917,7 @@ impl<B: WorkshopBackend> Workshop<B> {
         let dispatch = Dispatch {
             correlation: wire(c),
             installation: self.id,
+            protected: self.protection.is_some(),
             issued_at_ms: now,
             deadline_at_ms: run
                 .started
@@ -1224,6 +1340,7 @@ impl<B: WorkshopBackend> Workshop<B> {
 pub struct Dispatch {
     pub correlation: Correlation,
     installation: [u8; 16],
+    protected: bool,
     issued_at_ms: u64,
     deadline_at_ms: u64,
     inputs: Vec<Passage>,
@@ -1255,7 +1372,11 @@ pub fn evaluate(dispatch: Dispatch) -> Result<Observation, Error> {
         .ok_or(Error::Invalid("selection"))?
         .source
         .owner;
-    validate(owner, &dispatch.inputs)?;
+    if dispatch.protected {
+        validate_shape(owner, &dispatch.inputs)?;
+    } else {
+        validate(owner, &dispatch.inputs)?;
+    }
     let proposed = match c.step {
         0 => None,
         1 => Some(proposal(dispatch.installation, c.run, &dispatch.inputs)?),

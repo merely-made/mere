@@ -99,6 +99,7 @@ pub struct Core {
     vault: HostCustody,
     instance: String,
     generation: u64,
+    exhausted: bool,
     sessions: HashMap<SessionId, SessionState>,
     next_session: SessionId,
     revoked: BTreeSet<String>,
@@ -121,6 +122,7 @@ impl Core {
             vault,
             instance: crate::nonce()?,
             generation: 1,
+            exhausted: false,
             sessions: HashMap::new(),
             next_session: 1,
             revoked: BTreeSet::new(),
@@ -329,6 +331,9 @@ impl Core {
             return Some(Outcome::refused("stale-instance"));
         }
         let generation_free = matches!(operation, Operation::Status {} | Operation::Lock {});
+        if self.exhausted && !generation_free {
+            return Some(Outcome::refused("generation-exhausted"));
+        }
         if !generation_free && generation != self.generation {
             return Some(Outcome::refused("stale-generation"));
         }
@@ -682,14 +687,33 @@ impl Core {
 
     fn execute(&mut self, deferred: Deferred, effects: &mut Effects) -> Outcome {
         match deferred {
-            Deferred::Operation(operation) => self.perform(operation),
+            Deferred::Operation(operation) => {
+                let identity = if matches!(&operation, Operation::Intent { .. }) {
+                    Some((self.vault.profile().map(str::to_string), self.vault.master_public_key()))
+                } else {
+                    None
+                };
+                let outcome = self.perform(operation);
+                if identity.is_some_and(|before| before != (self.vault.profile().map(str::to_string), self.vault.master_public_key())) {
+                    if !self.advance() {
+                        self.lock(effects);
+                        return Outcome::refused("generation-exhausted");
+                    }
+                    self.cancel(|_| true, effects);
+                    self.broadcast(FactCause::ProfileChanged, None, None, effects);
+                }
+                outcome
+            },
             Deferred::Signing(request) => match self.vault.decide_signing(request, true) {
                 Ok(()) => Outcome::Success { answer: Answer::Done {} },
                 Err(refusal) => Outcome::refused(refusal.0),
             },
             Deferred::Revoke { principal } => {
                 self.revoked.insert(principal.clone());
-                self.advance();
+                if !self.advance() {
+                    self.lock(effects);
+                    return Outcome::refused("generation-exhausted");
+                }
                 self.cancel(|p| p.principal == principal, effects);
                 let doomed: Vec<SessionId> = self.sessions.iter().filter(|(_, s)| s.principal.name == principal).map(|(id, _)| *id).collect();
                 self.broadcast(FactCause::Revoke, None, Some(principal), effects);
@@ -779,11 +803,16 @@ impl Core {
         if let Err(refusal) = self.granted(principal, |g| matches!(g, Grant::Unlock)) {
             return Outcome::refused(refusal.0);
         }
+        if self.exhausted || self.generation == u64::MAX {
+            self.lock(effects);
+            return Outcome::refused("generation-exhausted");
+        }
         if let Err(refusal) = self.vault.unlock(passphrase.expose()) {
             return Outcome::refused(refusal.0);
         }
         drop(passphrase);
-        self.advance();
+        let advanced = self.advance();
+        debug_assert!(advanced);
         self.broadcast(FactCause::Unlock, None, None, effects);
         Outcome::Success {
             answer: Answer::Unlocked { generation: self.generation },
@@ -794,7 +823,9 @@ impl Core {
     fn lock(&mut self, effects: &mut Effects) -> LockReport {
         let was_unlocked = !self.vault.is_locked();
         let durable = self.vault.lock();
-        self.advance();
+        if !self.advance() {
+            effects.close.extend(self.sessions.keys().copied());
+        }
         self.cancel(|_| true, effects);
         let report = LockReport {
             generation: self.generation,
@@ -809,9 +840,15 @@ impl Core {
         report
     }
 
-    fn advance(&mut self) {
-        self.generation = self.generation.saturating_add(1);
+    fn advance(&mut self) -> bool {
         self.consented.clear();
+        if self.exhausted {
+            return false;
+        }
+        match self.generation.checked_add(1) {
+            Some(next) => { self.generation = next; true },
+            None => { self.exhausted = true; false },
+        }
     }
 
     fn cancel(&mut self, which: impl Fn(&Pending) -> bool, effects: &mut Effects) {
@@ -894,4 +931,62 @@ pub fn tick_interval(core: &Core, now: Instant) -> Duration {
         .map(|d| d.saturating_duration_since(now))
         .unwrap_or(Duration::from_secs(60))
         .clamp(Duration::from_millis(50), Duration::from_secs(60))
+}
+
+#[cfg(test)]
+mod exhaustion_tests {
+    use super::*;
+    use crate::tests::{Harness, PASSPHRASE, config, djinn, vault};
+    use custody_wire::secret::Secret;
+
+    #[test]
+    fn generation_exhaustion_during_revoke_locks_and_closes_all_sessions() {
+        let (dir, _) = vault();
+        let mut harness = Harness::new(config(dir.path(), "deny", "none"));
+        let session = harness.open(djinn());
+        let admin = harness.open(custody_wire::Peer::Unix { uid: 0, gid: 0, pid: Some(1) });
+        harness.unlock(session);
+        harness.core.generation = u64::MAX - 1;
+        harness.core.lock_now();
+        assert_eq!(harness.core.generation(), u64::MAX);
+        let (_, effects) = harness.request(admin, Operation::Revoke { principal: "djinn".into() });
+        assert!(harness.core.status().locked);
+        assert!(harness.core.exhausted);
+        assert!(effects.close.contains(&session) && effects.close.contains(&admin));
+        assert!(matches!(harness.outcome(admin, Operation::Unlock { passphrase: Secret::copy_from(PASSPHRASE.as_bytes()) }), Outcome::Refused { .. }));
+    }
+
+    #[test]
+    fn generation_exhaustion_permanently_refuses_unlock_and_substantive_operations() {
+        let (dir, _) = vault();
+        let mut harness = Harness::new(config(dir.path(), "deny", "none"));
+        let session = harness.open(djinn());
+        harness.unlock(session);
+        harness.core.generation = u64::MAX;
+        let (_, effects) = harness.core.lock_now();
+        assert!(effects.close.contains(&session), "exhaustion must disconnect clients holding the saturated generation");
+        assert!(harness.core.status().locked);
+        let outcome = harness.outcome(
+            session,
+            Operation::Unlock {
+                passphrase: Secret::copy_from(PASSPHRASE.as_bytes()),
+            },
+        );
+        assert!(
+            matches!(outcome, Outcome::Refused { .. }),
+            "overflow must never permit a reused generation to unlock"
+        );
+        assert!(
+            harness.core.status().locked,
+            "overflow must retain no unlocked root"
+        );
+        let outcome = harness.outcome(
+            session,
+            Operation::Release {
+                profile: "work".into(),
+                salts: vec![custody_wire::secret::Bytes(b"mesh-author".to_vec())],
+            },
+        );
+        assert!(matches!(outcome, Outcome::Refused { .. }));
+    }
 }

@@ -19,6 +19,7 @@ default = ["furnace"]
 furnace = ["dep:alembic", "alembic/recall", "dep:eidetic", "dep:kernel", "dep:pandect"]
 workshop = ["dep:alembic", "alembic/workshop", "dep:servitor", "dep:muniment", "dep:serde", "dep:serde_json", "dep:blake3"]
 workshop-worker = ["workshop", "dep:armillary"]
+workshop-sealed = ["workshop", "dep:eidetic"]
 workshop-destination = ["workshop", "dep:pandect", "dep:kernel", "dep:chartulary", "dep:euclid", "dep:uuid"]
 
 [dependencies]
@@ -37,6 +38,7 @@ euclid = { version = "0.22", optional = true }
 uuid = { version = "1", optional = true }
 
 [dev-dependencies]
+chacha20poly1305 = "=0.10.1"
 async-trait = "0.1"
 chartulary.workspace = true
 euclid = "0.22"

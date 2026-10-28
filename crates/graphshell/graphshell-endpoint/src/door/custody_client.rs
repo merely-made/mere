@@ -289,9 +289,64 @@ impl CustodyClient {
 pub struct BlockingCustodyClient {
     runtime: tokio::runtime::Runtime,
     client: CustodyClient,
+    timeout: Option<std::time::Duration>,
+}
+
+fn deadline_error() -> CustodyClientError {
+    CustodyClientError::Transport(AppClientError::Io(std::io::Error::new(
+        std::io::ErrorKind::TimedOut,
+        "custody operation deadline elapsed",
+    )))
 }
 
 impl BlockingCustodyClient {
+    /// Bound connection, handshake and one read-only status operation together.
+    /// The client is dropped on timeout so a late frame can never answer a later
+    /// request on a reused sequential connection. Call outside a Tokio runtime.
+    pub fn status_at_timeout(
+        endpoint: &str,
+        app: AppId,
+        profile: Option<ProfileId>,
+        timeout: std::time::Duration,
+    ) -> Result<ResidentStatus, CustodyClientError> {
+        expect_status(Self::call_at_timeout(
+            endpoint,
+            app,
+            profile,
+            CustodyCall::Status,
+            timeout,
+        )?)
+    }
+
+    /// One bounded independent conversation. Timeout discards its transport;
+    /// callers decide uncertainty/reconciliation and this never retries a call.
+    pub fn call_at_timeout(
+        endpoint: &str,
+        app: AppId,
+        profile: Option<ProfileId>,
+        call: CustodyCall,
+        timeout: std::time::Duration,
+    ) -> Result<CustodyAnswer, CustodyClientError> {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|error| CustodyClientError::Absent(AppClientError::Io(error)))?;
+        runtime.block_on(async {
+            tokio::time::timeout(timeout, async {
+                let mut client = CustodyClient::open_at(endpoint, app).await?;
+                client.speak_as(profile);
+                client.call(call).await
+            })
+            .await
+            .map_err(|_| {
+                CustodyClientError::Transport(AppClientError::Io(std::io::Error::new(
+                    std::io::ErrorKind::TimedOut,
+                    "custody status deadline elapsed",
+                )))
+            })?
+        })
+    }
+
     /// Connect to the configured first-party endpoint as `app`.
     pub fn open(app: AppId) -> Result<Self, CustodyClientError> {
         Self::open_at(&configured_app_endpoint(), app)
@@ -304,7 +359,38 @@ impl BlockingCustodyClient {
             .build()
             .map_err(|error| CustodyClientError::Absent(AppClientError::Io(error)))?;
         let client = runtime.block_on(CustodyClient::open_at(endpoint, app))?;
-        Ok(Self { runtime, client })
+        Ok(Self {
+            runtime,
+            client,
+            timeout: None,
+        })
+    }
+
+    /// Bounded transport for a provider whose actor must be joinable. Every
+    /// later call also has this deadline; a transport timeout retires the client.
+    pub fn open_at_timeout(
+        endpoint: &str,
+        app: AppId,
+        timeout: std::time::Duration,
+    ) -> Result<Self, CustodyClientError> {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|error| CustodyClientError::Absent(AppClientError::Io(error)))?;
+        let client = runtime.block_on(async {
+            tokio::time::timeout(timeout, CustodyClient::open_at(endpoint, app))
+                .await
+                .map_err(|_| deadline_error())?
+        })?;
+        Ok(Self {
+            runtime,
+            client,
+            timeout: Some(timeout),
+        })
+    }
+
+    pub(crate) fn set_call_timeout(&mut self, timeout: Option<std::time::Duration>) {
+        self.timeout = timeout;
     }
 
     /// See [`CustodyClient::speak_as`].
@@ -314,7 +400,14 @@ impl BlockingCustodyClient {
 
     /// One raw call.
     pub fn call(&mut self, call: CustodyCall) -> Result<CustodyAnswer, CustodyClientError> {
-        self.runtime.block_on(self.client.call(call))
+        match self.timeout {
+            Some(timeout) => self.runtime.block_on(async {
+                tokio::time::timeout(timeout, self.client.call(call))
+                    .await
+                    .map_err(|_| deadline_error())?
+            }),
+            None => self.runtime.block_on(self.client.call(call)),
+        }
     }
 
     /// See [`CustodyClient::status`].
@@ -517,6 +610,55 @@ mod tests {
 
     use super::*;
     use crate::door::custody::ReleasedKey;
+
+    #[cfg(unix)]
+    #[test]
+    fn bounded_custody_status_times_out_a_stalled_handshake() {
+        use std::os::unix::{fs::PermissionsExt, net::UnixListener};
+        use std::time::{Duration, Instant};
+        let path = std::path::PathBuf::from(format!(
+            "/tmp/alembic-status-{}.sock",
+            uuid::Uuid::new_v4().simple()
+        ));
+        let listener = UnixListener::bind(&path).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let (stop, stopped) = std::sync::mpsc::channel();
+        let server = std::thread::spawn(move || {
+            let deadline = Instant::now() + Duration::from_secs(3);
+            while Instant::now() < deadline && stopped.try_recv().is_err() {
+                match listener.accept() {
+                    Ok((_stream, _)) => {
+                        let _ = stopped.recv_timeout(Duration::from_secs(3));
+                        break;
+                    },
+                    Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                        std::thread::sleep(Duration::from_millis(5));
+                    },
+                    Err(_) => break,
+                }
+            }
+        });
+        let start = Instant::now();
+        let result = BlockingCustodyClient::status_at_timeout(
+            path.to_str().unwrap(),
+            AppId::new("turnstone"),
+            None,
+            Duration::from_millis(150),
+        );
+        let elapsed = start.elapsed();
+        let _ = stop.send(());
+        server.join().unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert!(
+            matches!(result, Err(CustodyClientError::Transport(AppClientError::Io(ref error)))
+            if error.kind() == std::io::ErrorKind::TimedOut)
+        );
+        assert!(
+            elapsed < Duration::from_secs(2),
+            "status must not wait for the stalled resident"
+        );
+    }
 
     fn release_of(provider: &InMemoryProvider, salts: &[&[u8]]) -> CustodyAnswer {
         CustodyAnswer::Released {

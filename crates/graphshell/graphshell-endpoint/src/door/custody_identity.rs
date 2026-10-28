@@ -24,9 +24,9 @@
 //! replaced by a key of the application's own (D12).
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, mpsc};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use dramatis::roster::Roster;
 use dramatis::view::VaultLockView;
@@ -45,15 +45,64 @@ use crate::door::app_client::AppClientError;
 use crate::door::custody::{CustodyAnswer, CustodyCall, KeySource, ResidentStatus};
 use crate::door::custody_client::{BlockingCustodyClient, CustodyClient, CustodyClientError};
 
-type Job = Box<dyn FnOnce(Option<&mut BlockingCustodyClient>) -> bool + Send>;
+type JobCall = Box<dyn FnOnce(Option<&mut BlockingCustodyClient>) -> bool + Send>;
+struct Job {
+    deadline: Option<Instant>,
+    cancelled: Arc<AtomicBool>,
+    call: JobCall,
+}
+impl Job {
+    fn remaining(&self) -> Option<Duration> {
+        self.deadline
+            .map(|deadline| deadline.saturating_duration_since(Instant::now()))
+    }
+    fn expired(&self) -> bool {
+        self.cancelled.load(Ordering::SeqCst)
+            || self
+                .remaining()
+                .is_some_and(|remaining| remaining.is_zero())
+    }
+    fn run(self, client: Option<&mut BlockingCustodyClient>) -> bool {
+        if self.expired() {
+            return true;
+        }
+        (self.call)(client)
+    }
+}
+
+/// Own the initializing actor until every fallible constructor step succeeds.
+struct StartingActor {
+    sender: Option<mpsc::Sender<Job>>,
+    thread: Option<std::thread::JoinHandle<()>>,
+    stop: Arc<AtomicBool>,
+}
+impl Drop for StartingActor {
+    fn drop(&mut self) {
+        if self.thread.is_none() {
+            return;
+        }
+        self.stop.store(true, Ordering::SeqCst);
+        self.sender.take();
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
+}
 
 /// The persona djinn speaks as, reached through the custody route.
 pub struct CustodyIdentity {
+    endpoint: String,
+    app: AppId,
+    requested_profile: Option<ProfileId>,
     master: Ed25519PublicKey,
     status: ResidentStatus,
-    jobs: Mutex<mpsc::Sender<Job>>,
+    jobs: Mutex<Option<mpsc::Sender<Job>>>,
+    job_thread: Mutex<Option<std::thread::JoinHandle<()>>>,
+    watch_thread: Mutex<Option<std::thread::JoinHandle<()>>>,
+    call_timeout: Option<Duration>,
     held: Arc<Mutex<HashMap<Vec<u8>, RetainedKeys>>>,
     locked: Arc<AtomicBool>,
+    epoch: Arc<AtomicU64>,
     stop: Arc<AtomicBool>,
 }
 
@@ -63,6 +112,20 @@ impl CustodyIdentity {
     /// or Locked.
     pub fn connect(app: &str) -> Result<Self, CustodyClientError> {
         Self::connect_at(&configured_app_endpoint(), app)
+    }
+
+    /// A provider with bounded connection/status stages and bounded actor RPCs.
+    /// Intended for cancellable off-thread setup; it never retries an operation.
+    pub fn connect_timeout(app: &str, timeout: Duration) -> Result<Self, CustodyClientError> {
+        Self::connect_as_at_bounded(&configured_app_endpoint(), app, None, Some(timeout))
+    }
+
+    pub fn connect_at_timeout(
+        endpoint: &str,
+        app: &str,
+        timeout: Duration,
+    ) -> Result<Self, CustodyClientError> {
+        Self::connect_as_at_bounded(endpoint, app, None, Some(timeout))
     }
 
     /// The same, at an explicit endpoint.
@@ -82,9 +145,27 @@ impl CustodyIdentity {
         app: &str,
         profile: Option<ProfileId>,
     ) -> Result<Self, CustodyClientError> {
+        Self::connect_as_at_bounded(endpoint, app, profile, None)
+    }
+
+    fn connect_as_at_bounded(
+        endpoint: &str,
+        app: &str,
+        profile: Option<ProfileId>,
+        timeout: Option<Duration>,
+    ) -> Result<Self, CustodyClientError> {
+        let deadline = timeout
+            .map(|duration| Instant::now().checked_add(duration).ok_or_else(timed_out))
+            .transpose()?;
+        let remaining = || deadline.map(|end| end.saturating_duration_since(Instant::now()));
         let app = AppId::new(app);
-        let open = move |endpoint: &str, app: AppId| {
-            BlockingCustodyClient::open_at(endpoint, app).map(|mut client| {
+        let requested_profile = profile.clone();
+        let open = move |endpoint: &str, app: AppId, limit: Option<Duration>| {
+            let opened = match limit {
+                Some(timeout) => BlockingCustodyClient::open_at_timeout(endpoint, app, timeout),
+                None => BlockingCustodyClient::open_at(endpoint, app),
+            };
+            opened.map(|mut client| {
                 client.speak_as(profile.clone());
                 client
             })
@@ -93,10 +174,14 @@ impl CustodyIdentity {
         let (ready, opened) = mpsc::channel();
         let actor_endpoint = endpoint.to_string();
         let actor_app = app.clone();
-        std::thread::Builder::new()
+        let stop = Arc::new(AtomicBool::new(false));
+        let actor_stop = stop.clone();
+        let job_thread = std::thread::Builder::new()
             .name(format!("custody-{app}"))
             .spawn(move || {
-                let mut client = match open(&actor_endpoint, actor_app.clone()) {
+                let initial_timeout =
+                    deadline.map(|end| end.saturating_duration_since(Instant::now()));
+                let mut client = match open(&actor_endpoint, actor_app.clone(), initial_timeout) {
                     Ok(client) => {
                         let _ = ready.send(Ok(()));
                         Some(client)
@@ -107,18 +192,50 @@ impl CustodyIdentity {
                     },
                 };
                 while let Ok(job) = received.recv() {
-                    if client.is_none() {
-                        client = open(&actor_endpoint, actor_app.clone()).ok();
+                    if actor_stop.load(Ordering::SeqCst) {
+                        break;
                     }
-                    if !job(client.as_mut()) {
+                    if job.expired() {
+                        continue;
+                    }
+                    if client.is_none() {
+                        client = open(&actor_endpoint, actor_app.clone(), job.remaining()).ok();
+                    }
+                    if actor_stop.load(Ordering::SeqCst) {
+                        break;
+                    }
+                    if job.expired() {
+                        continue;
+                    }
+                    if let Some(client) = client.as_mut() {
+                        client.set_call_timeout(job.remaining());
+                    }
+                    if !job.run(client.as_mut()) {
                         client = None;
                     }
                 }
             })
             .map_err(|error| CustodyClientError::Absent(AppClientError::Io(error)))?;
-        opened.recv().map_err(|_| closed())??;
+        let mut starting = StartingActor {
+            sender: Some(jobs),
+            thread: Some(job_thread),
+            stop: stop.clone(),
+        };
+        match timeout {
+            Some(_) => opened
+                .recv_timeout(remaining().expect("bounded startup"))
+                .map_err(|error| match error {
+                    mpsc::RecvTimeoutError::Timeout => timed_out(),
+                    mpsc::RecvTimeoutError::Disconnected => closed(),
+                })??,
+            None => opened.recv().map_err(|_| closed())??,
+        }
 
-        let status = ask_on(&jobs, |client| client.status())?;
+        let status = ask_on_bounded(
+            starting.sender.as_ref().expect("startup sender"),
+            remaining(),
+            |client| client.status(),
+        )?;
         let Some(master) = status
             .persona_public_key
             .filter(|_| status.lock == VaultLockView::Unlocked)
@@ -129,12 +246,19 @@ impl CustodyIdentity {
         };
         let master = Ed25519PublicKey::from_bytes(&master).map_err(CustodyClientError::Release)?;
         let this = Self {
+            endpoint: endpoint.to_owned(),
+            app: app.clone(),
+            requested_profile,
             master,
             status,
-            jobs: Mutex::new(jobs),
+            jobs: Mutex::new(starting.sender.take()),
+            job_thread: Mutex::new(starting.thread.take()),
+            watch_thread: Mutex::new(None),
+            call_timeout: timeout,
             held: Arc::default(),
             locked: Arc::new(AtomicBool::new(false)),
-            stop: Arc::new(AtomicBool::new(false)),
+            epoch: Arc::new(AtomicU64::new(1)),
+            stop,
         };
         this.watch(endpoint.to_string(), app);
         Ok(this)
@@ -161,9 +285,36 @@ impl CustodyIdentity {
         self.locked.load(Ordering::SeqCst)
     }
 
+    /// Monotonic local binding generation, including lock/loss followed by
+    /// unlock between UI turns. It is not a wallet epoch or an authorization.
+    pub fn custody_epoch(&self) -> Option<u64> {
+        let epoch = self.epoch.load(Ordering::SeqCst);
+        (!self.is_locked() && epoch != 0 && self.epoch.load(Ordering::SeqCst) == epoch)
+            .then_some(epoch)
+    }
+
     /// The lock, the protection and the public roots, now.
     pub fn status(&self) -> Result<ResidentStatus, CustodyClientError> {
         self.ask(|client| client.status())
+    }
+
+    /// A bounded, read-only status check independent of the provider job queue.
+    /// Timeout drops this fresh conversation; no consequential call is retried.
+    pub fn status_timeout(&self, timeout: Duration) -> Result<ResidentStatus, CustodyClientError> {
+        let endpoint = self.endpoint.clone();
+        let app = self.app.clone();
+        let profile = self.requested_profile.clone();
+        let result = bounded_worker(move || {
+            BlockingCustodyClient::status_at_timeout(&endpoint, app, profile, timeout)
+        });
+        if self.status.custody_epoch.is_some()
+            && !result
+                .as_ref()
+                .is_ok_and(|status| self.status_matches_binding(status))
+        {
+            self.invalidate_binding();
+        }
+        result
     }
 
     /// The vault's personas, for a picker. Answered while Locked too.
@@ -249,6 +400,7 @@ impl CustodyIdentity {
 
     /// Drop every key held so far.
     pub fn forget(&self) {
+        advance_epoch(&self.epoch);
         self.held.lock().unwrap_or_else(|e| e.into_inner()).clear();
     }
 
@@ -280,7 +432,14 @@ impl CustodyIdentity {
         &self,
         call: impl FnOnce(&mut BlockingCustodyClient) -> Result<T, CustodyClientError> + Send + 'static,
     ) -> Result<T, CustodyClientError> {
-        ask_on(&self.jobs.lock().unwrap_or_else(|e| e.into_inner()), call)
+        let jobs = self
+            .jobs
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .as_ref()
+            .cloned()
+            .ok_or_else(closed)?;
+        ask_on_bounded(&jobs, self.call_timeout, call)
     }
 
     /// Follow the lock broadcast on a second conversation: a Locked vault,
@@ -288,55 +447,339 @@ impl CustodyIdentity {
     fn watch(&self, endpoint: String, app: AppId) {
         let held = Arc::clone(&self.held);
         let locked = Arc::clone(&self.locked);
+        let epoch = Arc::clone(&self.epoch);
         let stop = Arc::clone(&self.stop);
         let spawned = std::thread::Builder::new()
             .name(format!("custody-lock-{app}"))
             .spawn(move || {
-                let Ok(runtime) = tokio::runtime::Builder::new_current_thread()
-                    .enable_all()
-                    .build()
-                else {
-                    return;
-                };
                 let drop_all = || {
-                    locked.store(true, Ordering::SeqCst);
+                    invalidate_epoch(&locked, &epoch);
                     held.lock().unwrap_or_else(|e| e.into_inner()).clear();
                 };
+                let Ok(runtime) = tokio::runtime::Builder::new_current_thread().enable_all().build() else {
+                    drop_all(); return;
+                };
                 while !stop.load(Ordering::SeqCst) {
-                    let mut client =
-                        match runtime.block_on(CustodyClient::open_at(&endpoint, app.clone())) {
-                            Ok(client) => client,
-                            Err(_) => {
-                                drop_all();
-                                std::thread::sleep(Duration::from_secs(2));
-                                continue;
-                            },
-                        };
+                    let opened = runtime.block_on(async {
+                        tokio::select! {
+                            _ = wait_stopped(&stop) => None,
+                            result = tokio::time::timeout(Duration::from_secs(2), CustodyClient::open_at(&endpoint, app.clone())) => Some(result),
+                        }
+                    });
+                    let mut client = match opened {
+                        None => return,
+                        Some(Ok(Ok(client))) => client,
+                        Some(_) => {
+                            drop_all();
+                            runtime.block_on(async {
+                                tokio::select! {
+                                    _ = wait_stopped(&stop) => {},
+                                    _ = tokio::time::sleep(Duration::from_secs(2)) => {},
+                                }
+                            });
+                            continue;
+                        },
+                    };
                     let mut seen = VaultLockView::Unlocked;
                     loop {
-                        match runtime.block_on(client.watch_lock(seen)) {
-                            Ok(VaultLockView::Locked) => {
-                                drop_all();
-                                seen = VaultLockView::Locked;
+                        let changed = runtime.block_on(async {
+                            tokio::select! {
+                                _ = wait_stopped(&stop) => None,
+                                result = client.watch_lock(seen) => Some(result),
+                            }
+                        });
+                        match changed {
+                            None => return,
+                            Some(Ok(VaultLockView::Locked)) => {
+                                drop_all(); seen = VaultLockView::Locked;
                             },
-                            Ok(VaultLockView::Unlocked) => {
-                                locked.store(false, Ordering::SeqCst);
-                                seen = VaultLockView::Unlocked;
+                            Some(Ok(VaultLockView::Unlocked)) => {
+                                locked.store(false, Ordering::SeqCst); seen = VaultLockView::Unlocked;
                             },
-                            Err(_) => {
-                                drop_all();
-                                break;
-                            },
-                        }
-                        if stop.load(Ordering::SeqCst) {
-                            return;
+                            Some(Err(_)) => { drop_all(); break; },
                         }
                     }
                 }
             });
-        if spawned.is_err() {
-            tracing::warn!("custody lock watcher could not start; held keys follow calls only");
+        match spawned {
+            Ok(thread) => {
+                *self.watch_thread.lock().unwrap_or_else(|e| e.into_inner()) = Some(thread)
+            },
+            Err(_) => {
+                invalidate_epoch(&self.locked, &self.epoch);
+                self.forget();
+                tracing::warn!("custody lock watcher could not start; identity remains locked");
+            },
         }
+    }
+}
+
+fn advance_epoch(epoch: &AtomicU64) {
+    // Exhaustion permanently closes the generation instead of reusing one.
+    let _ = epoch.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |value| {
+        Some(if value == 0 {
+            0
+        } else {
+            value.checked_add(1).unwrap_or(0)
+        })
+    });
+}
+
+async fn wait_stopped(stop: &AtomicBool) {
+    while !stop.load(Ordering::SeqCst) {
+        tokio::time::sleep(Duration::from_millis(25)).await;
+    }
+}
+
+fn timed_out() -> CustodyClientError {
+    CustodyClientError::Transport(AppClientError::Io(std::io::Error::new(
+        std::io::ErrorKind::TimedOut,
+        "custody provider deadline elapsed",
+    )))
+}
+
+fn invalidate_epoch(locked: &AtomicBool, epoch: &AtomicU64) {
+    if !locked.swap(true, Ordering::SeqCst) {
+        advance_epoch(epoch);
+    }
+}
+
+#[cfg(test)]
+mod epoch_tests {
+    use super::*;
+
+    fn actorless_fixture() -> (CustodyIdentity, mpsc::Receiver<Job>) {
+        use personae::IdentityProvider as _;
+        let root = personae::InMemoryProvider::from_seed([7; 32]);
+        let master = root.master_public_key();
+        let (jobs, receiver) = mpsc::channel();
+        let identity = CustodyIdentity {
+            endpoint: "/tmp/alembic-no-custody-runtime-test.sock".into(),
+            app: AppId::new("turnstone"),
+            requested_profile: None,
+            master,
+            status: ResidentStatus {
+                lock: VaultLockView::Unlocked,
+                protection: dramatis::view::VaultProtectionView::Ephemeral,
+                profile: Some(ProfileId("test".into())),
+                persona_public_key: Some(master.to_bytes()),
+                wallet_public_key: None,
+                wallet_root: None,
+                custody_epoch: None,
+            },
+            jobs: Mutex::new(Some(jobs)),
+            job_thread: Mutex::new(None),
+            watch_thread: Mutex::new(None),
+            call_timeout: Some(Duration::from_secs(2)),
+            held: Arc::default(),
+            locked: Arc::new(AtomicBool::new(false)),
+            epoch: Arc::new(AtomicU64::new(1)),
+            stop: Arc::new(AtomicBool::new(false)),
+        };
+        (identity, receiver)
+    }
+
+    #[test]
+    fn bounded_payload_is_safe_inside_tokio_runtime() {
+        const CHILD: &str = "MERE_CUSTODY_NESTED_RUNTIME_CHILD";
+        if std::env::var_os(CHILD).is_none() {
+            let result = std::process::Command::new(std::env::current_exe().unwrap())
+                .args(["--exact", "door::custody_identity::epoch_tests::bounded_payload_is_safe_inside_tokio_runtime"])
+                .env(CHILD, "1").output().unwrap();
+            assert!(
+                result.status.success(),
+                "payload must not panic in Tokio: {}",
+                String::from_utf8_lossy(&result.stderr)
+            );
+            assert!(
+                String::from_utf8_lossy(&result.stdout).contains("1 passed"),
+                "child must execute the payload regression"
+            );
+            return;
+        }
+        let (identity, _receiver) = actorless_fixture();
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(async {
+            let _ = eidetic::PayloadSealer::seal(&identity, &eidetic::Hash::of(b"test"), b"test");
+        });
+    }
+
+    #[test]
+    fn fresh_status_must_match_original_authoritative_epoch_profile_and_master() {
+        let (mut identity, _receiver) = actorless_fixture();
+        identity.status.custody_epoch = Some(crate::door::custody::CustodyEpoch {
+            instance: "test-custodian".into(),
+            generation: 4,
+        });
+        let original = identity.status.clone();
+        assert!(identity.status_matches_binding(&original));
+        let mut changed = original.clone();
+        changed.custody_epoch.as_mut().unwrap().generation += 1;
+        assert!(!identity.status_matches_binding(&changed));
+        let mut changed = original.clone();
+        changed.profile = Some(ProfileId("other".into()));
+        assert!(!identity.status_matches_binding(&changed));
+        let mut changed = original.clone();
+        changed.persona_public_key = Some([0; 32]);
+        assert!(!identity.status_matches_binding(&changed));
+        let mut changed = original;
+        changed.custody_epoch = None;
+        assert!(!identity.status_matches_binding(&changed));
+    }
+
+    #[test]
+    fn simultaneous_callers_can_enqueue_without_waiting_for_each_other() {
+        let (identity, receiver) = actorless_fixture();
+        let identity = Arc::new(identity);
+        let first = identity.clone();
+        let one = std::thread::spawn(move || first.status());
+        let first_job = receiver
+            .recv_timeout(Duration::from_secs(2))
+            .expect("first caller queued");
+        let second = identity.clone();
+        let two = std::thread::spawn(move || second.status());
+        let second_job = receiver.recv_timeout(Duration::from_millis(500));
+        assert!(
+            second_job.is_ok(),
+            "another caller must enqueue before the first answer"
+        );
+        first_job.run(None);
+        second_job.unwrap().run(None);
+        assert!(one.join().unwrap().is_err());
+        assert!(two.join().unwrap().is_err());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn watcher_drop_joins_while_handshake_is_stalled() {
+        use std::os::unix::{fs::PermissionsExt, net::UnixListener};
+        use std::time::Instant;
+        let path = std::path::PathBuf::from(format!(
+            "/tmp/alembic-watch-{}.sock",
+            uuid::Uuid::new_v4().simple()
+        ));
+        let listener = UnixListener::bind(&path).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let (accepted_tx, accepted_rx) = mpsc::channel();
+        let (stop_tx, stop_rx) = mpsc::channel::<()>();
+        let server = std::thread::spawn(move || {
+            if let Ok((_stream, _)) = listener.accept() {
+                let _ = accepted_tx.send(());
+                let _ = stop_rx.recv_timeout(Duration::from_secs(3));
+            }
+        });
+        let (identity, _receiver) = actorless_fixture();
+        identity.watch(path.to_str().unwrap().into(), AppId::new("turnstone"));
+        accepted_rx
+            .recv_timeout(Duration::from_secs(2))
+            .expect("watcher connected");
+        let start = Instant::now();
+        drop(identity);
+        assert!(
+            start.elapsed() < Duration::from_secs(1),
+            "watcher stop must interrupt stalled handshake"
+        );
+        let _ = stop_tx.send(());
+        server.join().unwrap();
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn failed_initialization_closes_and_joins_actor() {
+        let (sender, receiver) = mpsc::channel::<Job>();
+        let exited = Arc::new(AtomicBool::new(false));
+        let observed = exited.clone();
+        let worker = std::thread::spawn(move || {
+            while receiver.recv().is_ok() {}
+            observed.store(true, Ordering::SeqCst);
+        });
+        let result: Result<(), ()> = (|| {
+            let _starting = StartingActor {
+                sender: Some(sender),
+                thread: Some(worker),
+                stop: Arc::new(AtomicBool::new(false)),
+            };
+            Err(())
+        })();
+        assert!(result.is_err());
+        assert!(
+            exited.load(Ordering::SeqCst),
+            "constructor failure must join its actor"
+        );
+    }
+
+    #[test]
+    fn caller_timeout_retires_a_queued_job_before_dispatch() {
+        let (sender, receiver) = mpsc::channel();
+        let caller = std::thread::spawn(move || {
+            ask_on_bounded(&sender, Some(Duration::from_millis(30)), |_| Ok(()))
+        });
+        let job: Job = receiver.recv_timeout(Duration::from_secs(2)).unwrap();
+        assert!(matches!(
+            caller.join().unwrap(),
+            Err(CustodyClientError::Transport(_))
+        ));
+        assert!(job.expired());
+        assert!(job.run(None), "expired job must not touch a provider");
+    }
+
+    #[test]
+    fn timed_out_or_cancelled_queued_job_never_dispatches() {
+        let calls = Arc::new(AtomicU64::new(0));
+        for (deadline, cancelled) in [
+            (Some(Instant::now()), false),
+            (Some(Instant::now() + Duration::from_secs(30)), true),
+        ] {
+            let observed = calls.clone();
+            let job = Job {
+                deadline,
+                cancelled: Arc::new(AtomicBool::new(cancelled)),
+                call: Box::new(move |_| {
+                    observed.fetch_add(1, Ordering::SeqCst);
+                    true
+                }),
+            };
+            assert!(job.run(None));
+        }
+        assert_eq!(calls.load(Ordering::SeqCst), 0);
+        let observed = calls.clone();
+        let job = Job {
+            deadline: None,
+            cancelled: Arc::new(AtomicBool::new(false)),
+            call: Box::new(move |_| {
+                observed.fetch_add(1, Ordering::SeqCst);
+                true
+            }),
+        };
+        assert!(job.run(None));
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn custody_epoch_remembers_lock_unlock_between_observations() {
+        let locked = AtomicBool::new(false);
+        let epoch = AtomicU64::new(1);
+        let admitted = epoch.load(Ordering::SeqCst);
+        invalidate_epoch(&locked, &epoch);
+        invalidate_epoch(&locked, &epoch);
+        locked.store(false, Ordering::SeqCst);
+        assert!(!locked.load(Ordering::SeqCst));
+        assert_ne!(epoch.load(Ordering::SeqCst), admitted);
+        assert_eq!(epoch.load(Ordering::SeqCst), 2);
+        invalidate_epoch(&locked, &epoch);
+        assert_eq!(epoch.load(Ordering::SeqCst), 3);
+    }
+
+    #[test]
+    fn custody_epoch_exhaustion_does_not_reuse_an_old_generation() {
+        let epoch = AtomicU64::new(u64::MAX);
+        advance_epoch(&epoch);
+        assert_eq!(epoch.load(Ordering::SeqCst), 0);
+        advance_epoch(&epoch);
+        assert_eq!(epoch.load(Ordering::SeqCst), 0);
     }
 }
 
@@ -344,6 +787,23 @@ impl Drop for CustodyIdentity {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::SeqCst);
         self.forget();
+        if let Some(thread) = self
+            .watch_thread
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .take()
+        {
+            let _ = thread.join();
+        }
+        self.jobs.lock().unwrap_or_else(|e| e.into_inner()).take();
+        if let Some(thread) = self
+            .job_thread
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .take()
+        {
+            let _ = thread.join();
+        }
     }
 }
 
@@ -483,6 +943,33 @@ impl eidetic::PayloadSealer for CustodyIdentity {
 }
 
 impl CustodyIdentity {
+    fn invalidate_binding(&self) {
+        invalidate_epoch(&self.locked, &self.epoch);
+        self.held.lock().unwrap_or_else(|e| e.into_inner()).clear();
+    }
+
+    fn status_matches_binding(&self, status: &ResidentStatus) -> bool {
+        status.lock == VaultLockView::Unlocked
+            && status.profile == self.status.profile
+            && status.persona_public_key == Some(self.master.to_bytes())
+            && status.custody_epoch == self.status.custody_epoch
+    }
+
+    fn check_fresh_payload_binding(&self, timeout: Duration) -> eidetic::Result<()> {
+        let status = self.status_timeout(timeout);
+        if status
+            .as_ref()
+            .is_ok_and(|status| self.status_matches_binding(status))
+            && self.custody_epoch().is_some()
+        {
+            return Ok(());
+        }
+        self.invalidate_binding();
+        Err(eidetic::Error::new(
+            "custody binding unavailable or changed",
+        ))
+    }
+
     fn retained_payload(
         &self,
         hash: &eidetic::Hash,
@@ -496,20 +983,63 @@ impl CustodyIdentity {
             })?,
             master: self.master.to_bytes(),
             content_hash: *hash,
+            custody_epoch: self.status.custody_epoch.clone(),
             operation,
         };
         request.validate().map_err(eidetic::Error::new)?;
-        self.ask(
-            move |client| match client.call(CustodyCall::Payload(request))? {
-                CustodyAnswer::Payload { result } => Ok(result),
-                _ => Err(CustodyClientError::UnexpectedAnswer {
+        let timeout = self.call_timeout.unwrap_or(Duration::from_secs(5));
+        let deadline = Instant::now()
+            .checked_add(timeout)
+            .ok_or_else(|| eidetic::Error::new("custody deadline invalid"))?;
+        let local_epoch = self
+            .custody_epoch()
+            .ok_or_else(|| eidetic::Error::new("custody binding unavailable"))?;
+        let remaining = || deadline.saturating_duration_since(Instant::now());
+        if request.custody_epoch.is_some() {
+            self.check_fresh_payload_binding(remaining())?;
+        }
+        let endpoint = self.endpoint.clone();
+        let app = self.app.clone();
+        let profile = self.requested_profile.clone();
+        let payload_timeout = remaining();
+        let result = bounded_worker(move || {
+            match BlockingCustodyClient::call_at_timeout(
+                &endpoint,
+                app,
+                profile,
+                CustodyCall::Payload(request),
+                payload_timeout,
+            ) {
+                Ok(CustodyAnswer::Payload { result }) => Ok(result),
+                Ok(_) => Err(CustodyClientError::UnexpectedAnswer {
                     asked: "retained payload",
                     got: "another operation",
                 }),
-            },
-        )
-        .map_err(|e| eidetic::Error::new(e.to_string()))
+                Err(error) => Err(error),
+            }
+        });
+        if self.status.custody_epoch.is_some() {
+            self.check_fresh_payload_binding(remaining())?;
+        }
+        if self.custody_epoch() != Some(local_epoch) {
+            return Err(eidetic::Error::new(
+                "custody binding changed during payload",
+            ));
+        }
+        result.map_err(|e| eidetic::Error::new(e.to_string()))
     }
+}
+
+/// Isolate synchronous one-shot Tokio runtimes from any caller runtime.
+/// The one-shot transport has its own deadline and is never retried.
+fn bounded_worker<T: Send + 'static>(
+    operation: impl FnOnce() -> Result<T, CustodyClientError> + Send + 'static,
+) -> Result<T, CustodyClientError> {
+    let thread = std::thread::Builder::new()
+        .name("custody-bounded-call".into())
+        .spawn(operation)
+        .map_err(|error| CustodyClientError::Absent(AppClientError::Io(error)))?;
+    thread.join().map_err(|_| closed())?
 }
 
 /// A pending identity reads as Locked; anything else keeps its reason.
@@ -522,26 +1052,51 @@ fn identity_error(error: CustodyClientError) -> IdentityError {
 }
 
 /// Run `call` on the provider's own thread and wait for its answer.
-fn ask_on<T: Send + 'static>(
+fn ask_on_bounded<T: Send + 'static>(
     jobs: &mpsc::Sender<Job>,
+    timeout: Option<Duration>,
     call: impl FnOnce(&mut BlockingCustodyClient) -> Result<T, CustodyClientError> + Send + 'static,
 ) -> Result<T, CustodyClientError> {
     let (reply, answer) = mpsc::channel();
-    let job: Job = Box::new(move |client| match client {
-        Some(client) => {
-            let result = call(client);
-            let healthy = !matches!(
-                result,
-                Err(CustodyClientError::Transport(_) | CustodyClientError::Absent(_))
-            );
-            let _ = reply.send(result);
-            healthy
-        },
-        None => {
-            let _ = reply.send(Err(CustodyClientError::Absent(AppClientError::Closed)));
-            false
-        },
-    });
+    let deadline = timeout
+        .map(|duration| Instant::now().checked_add(duration).ok_or_else(timed_out))
+        .transpose()?;
+    let cancelled = Arc::new(AtomicBool::new(false));
+    let check = cancelled.clone();
+    let job = Job {
+        deadline,
+        cancelled: check.clone(),
+        call: Box::new(move |client| {
+            if check.load(Ordering::SeqCst) || deadline.is_some_and(|end| Instant::now() >= end) {
+                return true;
+            }
+            match client {
+                Some(client) => {
+                    let result = call(client);
+                    let healthy = !matches!(
+                        result,
+                        Err(CustodyClientError::Transport(_) | CustodyClientError::Absent(_))
+                    );
+                    let _ = reply.send(result);
+                    healthy
+                },
+                None => {
+                    let _ = reply.send(Err(CustodyClientError::Absent(AppClientError::Closed)));
+                    false
+                },
+            }
+        }),
+    };
     jobs.send(job).map_err(|_| closed())?;
-    answer.recv().map_err(|_| closed())?
+    let result = match deadline {
+        Some(deadline) => answer
+            .recv_timeout(deadline.saturating_duration_since(Instant::now()))
+            .map_err(|error| match error {
+                mpsc::RecvTimeoutError::Timeout => timed_out(),
+                mpsc::RecvTimeoutError::Disconnected => closed(),
+            }),
+        None => answer.recv().map_err(|_| closed()),
+    };
+    cancelled.store(true, Ordering::SeqCst);
+    result?
 }

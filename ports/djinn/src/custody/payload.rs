@@ -25,6 +25,11 @@ pub(super) fn answer(
         return Err(CustodyRefusal::NotServed);
     }
     request.validate().map_err(super::refused)?;
+    if let Some(expected) = request.custody_epoch.as_ref() {
+        if keeper.host().custody_epoch()?.as_ref() != Some(expected) {
+            return Err(super::refused("retained-content custody generation changed"));
+        }
+    }
     let binding = keeper.payload_custody().ok_or_else(|| {
         super::refused("retained-content custody has no configured wallet namespace")
     })?;

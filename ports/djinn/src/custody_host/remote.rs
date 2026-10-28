@@ -272,6 +272,33 @@ impl IdentityProvider for RemoteHost {
 }
 
 impl ResidentCustody for RemoteHost {
+    fn custody_epoch(
+        &self,
+    ) -> Result<Option<graphshell_endpoint::door::custody::CustodyEpoch>, CustodyRefusal> {
+        let client = self.client()?;
+        // Read authoritative status rather than the local boolean watch. Its
+        // generation remembers transitions even before this caller subscribed.
+        match client.call(Operation::Status {}, Duration::from_secs(2)) {
+            Outcome::Success {
+                answer: Answer::Status { status },
+            } => {
+                let epoch = graphshell_endpoint::door::custody::CustodyEpoch {
+                    instance: status.instance,
+                    generation: status.generation,
+                };
+                if epoch.valid() {
+                    Ok(Some(epoch))
+                } else {
+                    Err(unexpected())
+                }
+            },
+            Outcome::Refused { code } => Err(refusal(&code)),
+            Outcome::Degraded { .. } | Outcome::Unknown { .. } => {
+                Err(unavailable("status epoch unavailable"))
+            },
+            _ => Err(unexpected()),
+        }
+    }
     fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
         match self.call(Operation::Snapshot {}, NONINTERACTIVE) {
             Ok(Answer::Snapshot { snapshot }) => Ok(*snapshot),
@@ -557,6 +584,7 @@ impl ResidentCustody for RemoteHost {
     }
 
     fn payload(&self, _wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal> {
+        let expected_epoch = request.custody_epoch.clone();
         let content_hash = match serde_json::to_value(request.content_hash) {
             Ok(serde_json::Value::String(text)) => text,
             _ => return Err(unexpected()),
@@ -579,7 +607,29 @@ impl ResidentCustody for RemoteHost {
             content_hash,
             operation,
         };
-        let Answer::Payload { bytes, marker } = self.call(operation, PROMPTED)? else {
+        let answer = match expected_epoch.as_ref() {
+            Some(expected) => {
+                let client = self.client()?;
+                let observed = client.observed();
+                if !observed.alive || observed.instance != expected.instance {
+                    return Err(unavailable("retained payload custodian changed"));
+                }
+                // Exact generation admission: unlike the legacy call helper,
+                // never refresh/retry this private operation after revocation.
+                match client.call_at(operation, expected.generation, NONINTERACTIVE) {
+                    Outcome::Success { answer } => answer,
+                    Outcome::Refused { code } => return Err(refusal(&code)),
+                    Outcome::Unknown { .. } | Outcome::Degraded { .. } => return Err(unavailable("retained payload outcome unresolved")),
+                }
+            },
+            None => self.call(operation, PROMPTED)?,
+        };
+        if let Some(expected) = expected_epoch.as_ref() {
+            if self.custody_epoch()?.as_ref() != Some(expected) {
+                return Err(unavailable("retained payload custody changed after admission"));
+            }
+        }
+        let Answer::Payload { bytes, marker } = answer else {
             return Err(unexpected());
         };
         Ok(match (sealing, marker) {

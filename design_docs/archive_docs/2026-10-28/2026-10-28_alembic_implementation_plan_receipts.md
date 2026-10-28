@@ -195,3 +195,59 @@ the workshop plan or harness brief touched here. The audit script and snapshot
 aggregate have byte-identical hashes to `origin/main`, recorded in
 `doc-audit-baseline-comparison.json`. This is a retained baseline failure; the
 workshop change does not repair or claim full documentation-audit coverage.
+
+
+## Private-source priority and intermediate custody evidence
+
+Mark prioritized private-source support on 2026-10-28 before further workshop
+UI completion. The authorized workspace compiler-cache ceiling is now 400 GiB;
+the 100 GiB free-space floor, age rules, active-cache protections and retained
+receipts are unchanged. The workspace guard's 51 Python tests pass; policy
+before/after and authorization evidence live under
+`Code/output/alembic-hosts-20261028/cache-policy-400-20261028T204852Z/`.
+
+This checkpoint does not qualify a private native workflow or production
+custody. New sealed capture, host retirement and destination integrations are
+still receiving work. No real-store migration or production installation was
+performed.
+
+- `private-core-destination-tests.log`: 40 Athanor tests passed before the later
+  Resource-only reader and helper-journal-deletion test were added. It covers
+  the authenticated sealer adapter, whole-record ciphertext CAS/reopen and the
+  initial private destination. This is library/fixture evidence.
+- `custody-payload-nested-red.log`: the provider payload-sealer call from Tokio
+  executed and failed before the endpoint repair. Setup failures remain separate.
+- `final-endpoint-tests.log` / `.exit`: 55 endpoint tests passed after the bounded
+  startup deadline and owned stalled-watch shutdown changes. The production-only
+  endpoint/Djinn library check passed in `final-production-check.log` / `.exit`.
+  Both results precede the later custodian Core and wire repair below.
+- `endpoint-prod-feature-tree-normal.log` and `djinn-prod-feature-tree.log`:
+  normal/build dependency inspection excludes endpoint dev dependencies and
+  Djinn's in-process custody; `door` supplies `tokio/macros` explicitly.
+- `custodian-generation-red.log`: setup failure, no regression executed; the
+  login shell selected non-rustup Cargo and rejected the toolchain argument.
+- `custodian-generation-red-retry.log` / `.exit`: genuine pre-fix run, five
+  executed tests, three passed and two failed. A profile switch away and back
+  failed to advance generation; exhausted generation still allowed unlock.
+  Initial regression sources are retained in `custodian-exhaustion/`.
+- `final-private-libraries.log` / `.exit`: the post-fix custodian, wire and
+  Athanor batch was refused before Cargo after waiting for build admission.
+  It supplies no green result. Source now adds the profile-change fact, pending
+  consent invalidation, and permanent exhausted admission with session closure.
+
+The new `ProfileChanged` fact retains wire version 1. An older strict receiver
+disconnects on that fact and must reconnect; current cohort tests must qualify
+folding the new generation and closing authority on loss. This is a deliberate
+compatibility boundary, not a claim that old decoders understand the new fact.
+
+The added Djinn tests use the real custodian implementation over socket IPC,
+served by a test thread over a synthetic vault, including the app broker and
+provider path. They are not separate-process, native-product or H1 production
+qualification. These tests have not executed at this checkpoint.
+
+The private destination retains only encrypted content plus stable routing and
+content identities. Its Resource-only reader no longer needs an active helper
+or helper journal. The expanded test batch will additionally exercise reading
+a saved private result after helper dissolution and journal deletion, using an
+actual authenticated cipher. Content-hash equality/confirmation, existing browser
+addresses/titles and RAM erasure remain outside this storage claim.

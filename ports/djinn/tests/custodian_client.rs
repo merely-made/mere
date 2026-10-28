@@ -296,3 +296,76 @@ fn the_custodians_door_rule_names_exactly_djinns_door_keys() {
         assert_eq!(custodian, djinn::door::local_session::door_salts(master));
     }
 }
+
+#[test]
+fn real_custodian_fences_private_payload_to_authoritative_generation() {
+    use eidetic::Hash;
+    use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult};
+    let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
+    let persona = personae::PersonaId::new();
+    castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, persona, "isolated fixture").unwrap();
+    let remote = unlocked(&custodian);
+    let original = remote.custody_epoch().unwrap().expect("separate custodian exposes an epoch");
+    let master = remote.root_public_key(KeySource::Persona, None).unwrap();
+    let clear = b"PRIVATE-EPOCH-CANARY-381";
+    let request = PayloadRequest {
+        profile: ProfileId("work".into()), master, content_hash: Hash::of(clear),
+        operation: PayloadOperation::Seal { bytes: PayloadBytes(clear.to_vec()) },
+        custody_epoch: Some(original.clone()),
+    };
+    let scope = b"isolated-test-scope".to_vec();
+    let PayloadResult::Sealed { bytes, marker } = remote.payload(custodian.dir.path(), persona, request.clone(), scope.clone()).expect("current custodian epoch seals") else { panic!("expected sealed payload") };
+    assert_ne!(bytes.0, clear);
+    remote.lock_vault().unwrap();
+    remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    let fresh = remote.custody_epoch().unwrap().expect("fresh epoch");
+    assert_ne!(fresh, original, "lock and unlock change authoritative epoch");
+    assert!(remote.payload(custodian.dir.path(), persona, request, scope.clone()).is_err(), "an old binding cannot write after lock and unlock");
+    let open = PayloadRequest {
+        profile: ProfileId("work".into()), master, content_hash: Hash::of(clear),
+        operation: PayloadOperation::Unseal { bytes, marker }, custody_epoch: Some(fresh),
+    };
+    assert!(matches!(remote.payload(custodian.dir.path(), persona, open, scope), Ok(PayloadResult::Clear { bytes }) if bytes.0 == clear));
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn real_custodian_generation_reaches_the_app_payload_route() {
+    use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+    use eidetic::{Hash, PayloadSealer};
+    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+    use graphshell_endpoint::door::custody_client::CustodyClient;
+    use graphshell_endpoint::door::custody_identity::CustodyIdentity;
+    use std::time::Duration;
+
+    let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
+    let persona = personae::PersonaId::new();
+    castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, persona, "isolated route fixture").unwrap();
+    let remote = unlocked(&custodian);
+    let keeper = Arc::new(Keeper::new(remote.clone()));
+    keeper.configure_payload_custody(ProfileId("work".into()), persona, custodian.data_root.clone()).unwrap();
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    djinn::custody::grant(&grants).unwrap();
+    let endpoint = custodian.dir.path().join("app.sock").to_string_lossy().to_string();
+    let server = tokio::spawn({ let endpoint = endpoint.clone(); async move {
+        serve_app_broker(&endpoint, keeper, grants, 60_000, None, AppEndpointCatalog::default()).await
+    }});
+    for _ in 0..100 {
+        if CustodyClient::open_at(&endpoint, AppId::new("turnstone")).await.is_ok() { break; }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let open = |endpoint: String| tokio::task::spawn_blocking(move || CustodyIdentity::connect_at_timeout(&endpoint, "turnstone", Duration::from_secs(3)));
+    let old = open(endpoint.clone()).await.unwrap().expect("application custody connects");
+    let epoch = old.connected_status().custody_epoch.clone().expect("authoritative generation forwarded");
+    let clear = b"PRIVATE-BROKER-EPOCH-CANARY-417";
+    let (bytes, marker) = old.seal(&Hash::of(clear), clear).expect("bound private seal through actual route");
+    assert_ne!(bytes, clear);
+    remote.lock_vault().unwrap();
+    remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
+    assert!(old.unseal(&Hash::of(clear), &marker, &bytes).is_err(), "old application binding cannot survive a lock cycle");
+    let fresh = open(endpoint).await.unwrap().expect("fresh application binding");
+    assert_ne!(fresh.connected_status().custody_epoch.as_ref(), Some(&epoch));
+    assert_eq!(fresh.unseal(&Hash::of(clear), &marker, &bytes).unwrap(), clear);
+    drop(old);
+    drop(fresh);
+    server.abort();
+}

@@ -40,10 +40,21 @@ pub struct PayloadRequest {
     pub master: [u8; 32],
     pub content_hash: Hash,
     pub operation: PayloadOperation,
+    /// A private binding names the exact custodian lifetime/generation. None
+    /// preserves legacy wire decoding; qualified private hosts require Some.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custody_epoch: Option<super::custody::CustodyEpoch>,
 }
 
 impl PayloadRequest {
     pub fn validate(&self) -> Result<(), &'static str> {
+        if self
+            .custody_epoch
+            .as_ref()
+            .is_some_and(|epoch| !epoch.valid())
+        {
+            return Err("invalid retained payload custody generation");
+        }
         let (bytes, limit) = match &self.operation {
             PayloadOperation::Seal { bytes } => {
                 if Hash::of(&bytes.0) != self.content_hash {
@@ -85,6 +96,7 @@ mod tests {
     #[test]
     fn retained_material_is_redacted_and_hash_checked_on_the_wire() {
         let request = PayloadRequest {
+            custody_epoch: None,
             profile: ProfileId("family".into()),
             master: [7; 32],
             content_hash: Hash::of(b"private retained passage"),
@@ -105,6 +117,7 @@ mod tests {
         assert!(request.validate().is_ok());
         assert!(
             PayloadRequest {
+                custody_epoch: None,
                 content_hash: Hash::of(b"changed"),
                 ..request
             }
@@ -116,6 +129,7 @@ mod tests {
     #[test]
     fn the_payload_budget_fits_the_existing_transport_and_roundtrips_seal_overhead() {
         let request = PayloadRequest {
+            custody_epoch: None,
             profile: ProfileId("family".into()),
             master: [7; 32],
             content_hash: Hash::of(&vec![0; MAX_PAYLOAD_BYTES]),
@@ -136,6 +150,7 @@ mod tests {
             format: eidetic::seal::SEAL_FORMAT_V1.into(),
         };
         let mut read = PayloadRequest {
+            custody_epoch: None,
             operation: PayloadOperation::Unseal {
                 bytes: PayloadBytes(vec![0; MAX_PAYLOAD_BYTES + 40]),
                 marker,
