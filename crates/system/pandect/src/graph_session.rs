@@ -1580,11 +1580,6 @@ impl<B: Backend> GraphSession<B> {
         }
     }
 
-    /// Store everything not stored yet, stamping new changes `at`.
-    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
-        self.store(at, Vec::new(), false).await
-    }
-
     /// Store what is pending, with `extra`, as one batch.
     async fn store(
         &mut self,
@@ -2221,7 +2216,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             }
         }
         session.manifest.codicil_read_only = true;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2234,7 +2229,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_fork_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2260,7 +2255,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_branch_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2369,6 +2364,7 @@ impl<B: Backend + Clone> MereSessions<B> {
     }
 
     /// Write a new session's manifest, baseline and first change as one batch.
+    /// Nobody else holds it, so there is nothing to recheck.
     async fn create(
         &self,
         manifest: GraphSessionManifest,
@@ -2383,7 +2379,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             author,
             kind,
         );
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 }

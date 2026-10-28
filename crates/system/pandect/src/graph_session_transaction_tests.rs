@@ -21,6 +21,10 @@ fn add(id: u128) -> CapturedDelta {
     }
 }
 
+fn holds(session: &GraphSession<MemoryBackend>, id: u128) -> bool {
+    session.graph().get_node_key_by_id(Uuid::from_u128(id)).is_some()
+}
+
 #[test]
 fn a_transaction_carries_a_direct_writer_through_the_replay_check() {
     pollster::block_on(async {
@@ -71,11 +75,62 @@ fn a_transaction_carries_a_direct_writer_through_the_replay_check() {
             (session.journal().len(), session.changes().len()),
             before
         );
-        assert_ne!(
-            session.graph().get_node(key).unwrap().title(),
-            "Unrecorded"
-        );
+        assert_ne!(session.graph().get_node(key).unwrap().title, "Unrecorded");
         let reopened = mere.open(id).await.unwrap();
         assert_eq!(reopened.journal().len(), before.0);
     });
+}
+
+#[test]
+fn two_handles_flushing_from_one_saved_point_refuse_the_stale_one() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let id = mere.mint(person(), None).await.unwrap().session_id;
+        let mut first = mere.open(id).await.unwrap();
+        let mut second = mere.open(id).await.unwrap();
+        first.apply_now(person(), vec![add(1)]).unwrap();
+        second.apply_now(person(), vec![add(2)]).unwrap();
+
+        first.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+        let refused = second.flush(SystemTime::UNIX_EPOCH).await;
+        assert!(matches!(
+            refused,
+            Err(SessionError::Validation(ref why)) if why.contains("Session changed before commit")
+        ));
+        assert!(second.has_unstored(), "the refused edit stays pending");
+        assert!(holds(&second, 2));
+        let stored = mere.open(id).await.unwrap();
+        assert!(holds(&stored, 1) && !holds(&stored, 2));
+
+        let mut rebased = mere.open(id).await.unwrap();
+        rebased.apply_now(person(), vec![add(2)]).unwrap();
+        rebased.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+        let stored = mere.open(id).await.unwrap();
+        assert!(holds(&stored, 1) && holds(&stored, 2));
+    });
+}
+
+#[test]
+fn a_transaction_carries_the_handles_unstored_entries() {
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let id = mere.mint(person(), None).await.unwrap().session_id;
+        let mut session = mere.open(id).await.unwrap();
+        session.apply_now(person(), vec![add(1)]).unwrap();
+        assert!(session.has_unstored());
+
+        session
+            .transact_deltas(person(), vec![add_delta(2)], SystemTime::UNIX_EPOCH)
+            .await
+            .unwrap();
+        assert!(!session.has_unstored());
+        let stored = mere.open(id).await.unwrap();
+        assert!(holds(&stored, 1) && holds(&stored, 2));
+    });
+}
+
+fn add_delta(id: u128) -> GraphDelta {
+    add(id).replay_as(&person()).into_write().unwrap()
 }

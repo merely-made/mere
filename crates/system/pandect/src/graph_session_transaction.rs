@@ -7,8 +7,132 @@
 //! Stage a journaled candidate; install it only after atomic storage acknowledgement.
 use super::*;
 
+enum Rejection {
+    ReadOnly(SessionId),
+    Validation(String),
+}
+
+fn refused(error: StoreError) -> Rejection {
+    Rejection::Validation(error.to_string())
+}
+
+/// What the store must still hold for a commit from one handle to land: no
+/// merged mark, and the stored length and last stored entry of each log this
+/// handle appends to. Every commit of a session rechecks through here,
+/// inside its backend transaction.
+struct Recheck {
+    session: SessionId,
+    merged: String,
+    logs: Vec<(String, Seq, &'static str)>,
+    tails: Vec<WriteOp>,
+}
+
+impl Recheck {
+    fn run(&self, reader: &dyn muniment::TransactionReader) -> Result<(), Rejection> {
+        // The merged marker can change independently of the source logs when
+        // another handle undoes or redoes a merge.
+        if reader.get(&self.merged).map_err(refused)?.is_some() {
+            return Err(Rejection::ReadOnly(self.session));
+        }
+        for (log, stored, message) in &self.logs {
+            let held = reader.list(&format!("{log}/")).map_err(refused)?.len() as u64;
+            if held != stored.0 {
+                return Err(Rejection::Validation((*message).into()));
+            }
+        }
+        for tail in &self.tails {
+            if let WriteOp::Put { key, value } = tail {
+                if reader.get(key).map_err(refused)?.as_ref() != Some(value) {
+                    return Err(Rejection::Validation(
+                        "Session log head changed before commit; draft retained".into(),
+                    ));
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// The write of the last entry a handle stored: what a log must still hold
+/// at its end for the handle's next append to follow it.
+fn last_stored<T: Serialize>(
+    log: &Journal<T>,
+    prefix: &str,
+    stored: Seq,
+) -> Result<Option<WriteOp>, StoreError> {
+    let Some(last) = stored.0.checked_sub(1) else {
+        return Ok(None);
+    };
+    Ok(log.entry_writes::<JsonCodec>(prefix, Seq(last))?.into_iter().next())
+}
+
+impl<B: LegacyTransactionBackend> GraphSession<B> {
+    /// Store everything not stored yet, stamping new changes `at`, in one
+    /// backend transaction. It lands only if the store still holds what this
+    /// handle was opened or last stored at (log lengths, last entries, no
+    /// merge mark): a stale handle is refused with "Session changed before
+    /// commit" and keeps its pending edits for the caller to rebase.
+    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
+        let pending = self.pending(at)?;
+        if pending.is_empty() {
+            self.stored(pending);
+            return Ok(());
+        }
+        self.commit(pending, Vec::new()).await
+    }
+
+    /// Write `pending` and `extra` atomically if the store passes this
+    /// handle's recheck; mark `pending` stored once it has landed.
+    async fn commit(&mut self, pending: Pending, extra: Vec<WriteOp>) -> Result<(), SessionError> {
+        let check = self.recheck()?;
+        let mut ops = pending.ops().to_vec();
+        ops.extend(extra);
+        let rejection = Arc::new(Mutex::new(None));
+        let rejected = rejection.clone();
+        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
+            match check.run(reader) {
+                Ok(()) => ops,
+                Err(error) => {
+                    *rejected.lock().expect("transaction rejection") = Some(error);
+                    Vec::new()
+                },
+            }
+        });
+        self.slots.backend().transact(transaction).await?;
+        match rejection.lock().expect("transaction rejection").take() {
+            Some(Rejection::ReadOnly(id)) => return Err(SessionError::ReadOnly(id)),
+            Some(Rejection::Validation(error)) => return Err(SessionError::Validation(error)),
+            None => {},
+        }
+        self.stored(pending);
+        Ok(())
+    }
+
+    fn recheck(&self) -> Result<Recheck, SessionError> {
+        let moved = "Session changed before commit; draft retained";
+        let (journal, changes) = (self.keys.at(JOURNAL), self.keys.at(CHANGES));
+        let mut tails = Vec::new();
+        tails.extend(last_stored(self.journal.log(), &journal, self.saved)?);
+        tails.extend(last_stored(&self.changes, &changes, self.changes_saved)?);
+        let mut logs = vec![(journal, self.saved, moved), (changes, self.changes_saved, moved)];
+        // A view has its own log, so a graph head alone cannot detect a
+        // competing view append.
+        for (key, view) in &self.views {
+            let log = self.keys.view_log(key);
+            tails.extend(last_stored(&view.log, &log, view.saved)?);
+            logs.push((log, view.saved, "Session view changed before commit; draft retained"));
+        }
+        Ok(Recheck {
+            session: self.id(),
+            merged: self.keys.at(MERGED),
+            logs,
+            tails,
+        })
+    }
+}
+
 impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
-    /// Apply one complete, validated change against an already durable session.
+    /// Apply one complete, validated change against a session.
     /// Storage failure or a competing append leaves graph and history unchanged.
     /// Append-only log lengths and their last retained entries are rechecked in
     /// the write transaction. This is not a journal corruption/tampering audit.
@@ -140,10 +264,10 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .map(|(result, _)| result)
     }
 
-    /// Run `change` on a detached candidate of this session and commit it in
-    /// one backend transaction, installing it only after storage acknowledges.
-    /// A refusal, from `change` or from storage, leaves this session as it was.
-    /// Refused while this handle has unstored entries.
+    /// Run `change` on a detached candidate of this session and commit it, with
+    /// the handle's own unstored entries, in one backend transaction; install
+    /// it only after storage acknowledges. A refusal, from `change` or from
+    /// storage, leaves this session as it was.
     ///
     /// The closure edits through [`edit_now`](Self::edit_now), so a direct
     /// write (a public assertion or declaration writer) transacts under the
@@ -156,48 +280,12 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
     ) -> Result<(R, Option<String>), SessionError> {
         self.ensure_writable()?;
-        if self.has_unstored() {
-            return Err(SessionError::Validation(
-                "Save pending session changes before this transaction".into(),
-            ));
-        }
-        let journal = self.keys.at(JOURNAL);
-        let changes = self.keys.at(CHANGES);
-        let expected_journal = self.saved;
-        let expected_changes = self.changes_saved;
-        let mut tails = Vec::new();
-        if self.saved.0 > 0 {
-            tails.extend(
-                self.journal
-                    .log()
-                    .entry_writes::<JsonCodec>(&journal, Seq(self.saved.0 - 1))?,
-            );
-        }
-        if self.changes_saved.0 > 0 {
-            tails.extend(
-                self.changes
-                    .entry_writes::<JsonCodec>(&changes, Seq(self.changes_saved.0 - 1))?,
-            );
-        }
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
-        // A view has its own log, so a graph head alone cannot detect a
-        // competing view append. Include existing and newly requested keys.
-        let mut view_heads = Vec::new();
-        for (key, view) in &candidate.views {
-            let log = self.keys.view_log(key);
-            view_heads.push((log.clone(), view.saved));
-            if let Some(held) = self.views.get(key).filter(|held| held.saved.0 > 0) {
-                tails.extend(
-                    held.log
-                        .entry_writes::<JsonCodec>(&log, Seq(held.saved.0 - 1))?,
-                );
-            }
-        }
         let pending = candidate.pending(at)?;
-        let mut ops = pending.ops().to_vec();
         // The publication describes the candidate's graph and joins its write.
         // Preparation refuses before anything is written or installed.
+        let mut ops = Vec::new();
         let generation = if publish {
             let publication = candidate.prepare_resident_publication()?;
             ops.extend_from_slice(publication.ops());
@@ -205,85 +293,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
-        enum TransactionRejection {
-            ReadOnly(SessionId),
-            Validation(String),
-        }
-
-        let session_id = self.id();
-        let merged = self.keys.at(MERGED);
-        let rejection = Arc::new(Mutex::new(None));
-        let rejected = rejection.clone();
-        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
-            let check = || -> Result<(), TransactionRejection> {
-                // The merged marker can change independently of the source
-                // logs when another handle undoes or redoes a merge. Read it
-                // in this same backend transaction as the candidate writes.
-                match reader.get(&merged) {
-                    Ok(Some(_)) => return Err(TransactionRejection::ReadOnly(session_id)),
-                    Ok(None) => {},
-                    Err(error) => {
-                        return Err(TransactionRejection::Validation(error.to_string()));
-                    },
-                }
-                if reader
-                    .list(&format!("{journal}/"))
-                    .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                    .len() as u64
-                    != expected_journal.0
-                    || reader
-                        .list(&format!("{changes}/"))
-                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                        .len() as u64
-                        != expected_changes.0
-                {
-                    return Err(TransactionRejection::Validation(
-                        "Session changed before commit; draft retained".into(),
-                    ));
-                }
-                for (log, expected) in view_heads {
-                    if reader
-                        .list(&format!("{log}/"))
-                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                        .len() as u64
-                        != expected.0
-                    {
-                        return Err(TransactionRejection::Validation(
-                            "Session view changed before commit; draft retained".into(),
-                        ));
-                    }
-                }
-                for op in tails {
-                    if let WriteOp::Put { key, value } = op {
-                        if reader
-                            .get(&key)
-                            .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                            .as_ref()
-                            != Some(&value)
-                        {
-                            return Err(TransactionRejection::Validation(
-                                "Session log head changed before commit; draft retained".into(),
-                            ));
-                        }
-                    }
-                }
-                Ok(())
-            };
-            if let Err(error) = check() {
-                *rejected.lock().expect("transaction rejection") = Some(error);
-                Vec::new()
-            } else {
-                ops
-            }
-        });
-        self.slots.backend().transact(transaction).await?;
-        if let Some(rejection) = rejection.lock().expect("transaction rejection").take() {
-            return Err(match rejection {
-                TransactionRejection::ReadOnly(session_id) => SessionError::ReadOnly(session_id),
-                TransactionRejection::Validation(error) => SessionError::Validation(error),
-            });
-        }
-        candidate.stored(pending);
+        candidate.commit(pending, ops).await?;
         *self = candidate;
         Ok((result, generation))
     }
