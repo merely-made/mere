@@ -169,7 +169,7 @@ pub use arrangement_facets::{
     write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
     write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
 };
-pub use atomic_file::write_bytes_with_backup;
+pub use atomic_file::{Replacement, replace_bytes_if_unchanged, write_bytes_with_backup};
 pub use codicil_seal::WalletEpochSealer;
 pub use denizen_facets::{
     DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,
