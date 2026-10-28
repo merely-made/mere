@@ -874,6 +874,14 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
+- **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
+  while a lock record names an older revision than the package Cargo loads from
+  its Git workspace. Compare resolved `(name, version, source)` records with the
+  lock as well as checking Cargo's exit status. A Git package ID can omit its
+  precise revision; use the reported source or actual checkout head. Preserve
+  unrelated records when aligning a workspace cohort. The [presentation engines plan](inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md#findings)
+  records the Netrender device case.
+
 - **Workshop composition (2026-10-28):** Alembic/Athanor own the workshop inside Distillery; Servitor stays in Eidetic and supplies admission/run semantics, while Armillary supplies execution. Products retain commit and durability authority. The [Alembic plan](mere_docs/implementation_strategy/2026-10-28_alembic_implementation_plan.md) owns the concrete two-host workflow and its qualification gates; the [harness brief](mere_docs/research/2026-07-03_agent_harness_brief.md) separates durable ownership, peer execution and model computation.
 - **Accepted effects and owner recovery (2026-10-28):** atomically save the operation identity with its effect, retain its receipt independently of a deletable result, and query after an uncertain acknowledgement. A graph-snapshot owner acquires its writer lease before loading and retains operation evidence on every replacement, including undo. Worker completion alone cannot establish a committed product change.
 
