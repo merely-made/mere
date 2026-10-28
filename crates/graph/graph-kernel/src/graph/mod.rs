@@ -170,8 +170,7 @@ pub use resource::ResourceNode;
 // (`kernel::graph::NodeNavigationMemory`, etc.) keep resolving.
 pub use history::{
     NodeHistoryBranchAlternative, NodeHistoryBranchProjection, NodeHistoryBranchVisit,
-    NodeHistoryOwner, NodeHistoryProjection, NodeHistorySemanticSummary, RecentVisit,
-    SharedNavigationMemory,
+    NodeHistoryOwner, NodeHistoryProjection, NodeHistorySemanticSummary, SharedNavigationMemory,
 };
 pub use navigation_check::NavigationIndexError;
 
@@ -770,10 +769,10 @@ impl Graph {
 
     /// Navigate `key` in place to `url`: record the visit in the node's own
     /// browse history (a forward-fork if the cursor had stepped back), update
-    /// its Primary URL and stamp its session. No new node and no
-    /// edge: the node is a browsing surface whose content changes; the graph
-    /// shape does not. Cross-node lineage (the navigated-from relation) is a
-    /// separate, explicit edge.
+    /// its Primary URL, and stamp its recency at `at_ms` and its session. No new
+    /// node and no edge: the node is a browsing surface whose content changes;
+    /// the graph shape does not. Cross-node lineage (the navigated-from
+    /// relation) is a separate, explicit edge.
     ///
     /// The one mutation under both the live and the replayed arm, which differ
     /// only in the stamp they pass. Returns the node's id, or `None` if absent.
@@ -789,6 +788,7 @@ impl Graph {
         self.nav.record_visit(id, url, transition, at_ms);
         self.set_node_last_session_visited(key, last_session_visited);
         self.update_node_url(key, url.to_string());
+        self.set_node_last_visited_at_ms(key, at_ms);
         Some(id)
     }
 
@@ -813,7 +813,7 @@ impl Graph {
     pub(crate) fn node_history_back(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.back(id, at_ms)?;
-        self.update_node_url(key, url.clone());
+        self.land_history_step(key, &url, at_ms);
         Some(url)
     }
 
@@ -822,8 +822,15 @@ impl Graph {
     pub(crate) fn node_history_forward(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.forward(id, at_ms)?;
-        self.update_node_url(key, url.clone());
+        self.land_history_step(key, &url, at_ms);
         Some(url)
+    }
+
+    /// What a moved history cursor leaves on the node: the revealed page as its
+    /// Primary URL, and the step as its latest visit.
+    fn land_history_step(&mut self, key: NodeKey, url: &str, at_ms: u64) {
+        self.update_node_url(key, url.to_string());
+        self.set_node_last_visited_at_ms(key, at_ms);
     }
 
     /// Whether `key`'s within-node history can step back (toolbar gating).
@@ -871,13 +878,6 @@ impl Graph {
             .node(key)
             .map(|node| self.nav.semantic_summary(node.id))
             .unwrap_or_default()
-    }
-
-    /// The graph's recently-visited nodes, newest first, capped at `limit` — the
-    /// graph-wide "recent" projection over the shared visit space (gloss; the
-    /// lineage pane). Delegates to [`SharedNavigationMemory::recent_visited`].
-    pub fn recent_visited(&self, limit: usize) -> Vec<RecentVisit> {
-        self.nav.recent_visited(limit)
     }
 
     /// Milliseconds since the Unix epoch, for visit timestamps (live-app clock).

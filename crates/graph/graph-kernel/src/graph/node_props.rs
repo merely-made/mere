@@ -519,6 +519,8 @@ impl Graph {
         self.set_node_last_visited_at_ms(key, Graph::epoch_ms())
     }
 
+    /// The one recency stamp: sets `visit.history`'s `last_visited_ms`. Creation,
+    /// navigation, the history steps and the canvas touch all write it here.
     pub(crate) fn set_node_last_visited_at_ms(&mut self, key: NodeKey, timestamp_ms: u64) -> bool {
         if self.inner.node(key).is_none() {
             return false;
@@ -544,6 +546,8 @@ impl Graph {
         self.set_node_facet(key, VISIT_HISTORY, &history)
     }
 
+    /// When `key` was last visited: the recency the canvas reads. Not a
+    /// projection of the browse trail, which Stemma holds.
     pub fn node_last_visited(&self, key: NodeKey) -> Option<SystemTime> {
         self.get_node(key)?;
         self.node_facet_or_default::<VisitHistoryFacet>(key, VISIT_HISTORY)

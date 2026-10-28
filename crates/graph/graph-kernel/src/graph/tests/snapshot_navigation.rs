@@ -437,3 +437,76 @@ fn live_and_replayed_navigation_leave_one_state() {
     assert_eq!(current(&live, a), Some(url("a3")));
     assert_eq!(current(&replayed, a), Some(url("a3")));
 }
+
+#[test]
+fn navigating_a_node_in_place_moves_its_recency() {
+    use crate::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    let url = |name: &str| format!("https://example.com/{name}");
+    let mut live = Graph::new();
+    let node = |graph: &mut Graph, id: u128, name: &str| {
+        add_node(
+            graph,
+            Some(Uuid::from_u128(id)),
+            url(name),
+            Default::default(),
+        )
+    };
+    let (a, b) = (node(&mut live, 1, "a"), node(&mut live, 2, "b"));
+    let recency = |graph: &Graph, key| {
+        let visited = graph.node_last_visited(key)?;
+        Some(
+            visited
+                .duration_since(std::time::UNIX_EPOCH)
+                .ok()?
+                .as_millis() as u64,
+        )
+    };
+    let (mut replayed, captured) = live_and_replayed(&mut live, |graph| {
+        // Pin a node's stamp in the past, so any later stamp is a visible move.
+        let pin = |graph: &mut Graph, id: u128| {
+            apply_graph_delta(
+                graph,
+                GraphDelta::ReplayTouchNodeLastVisitedById {
+                    node_id: Uuid::from_u128(id),
+                    timestamp_ms: 1,
+                },
+            );
+        };
+        let moved = |graph: &Graph, key| recency(graph, key) > Some(1);
+        pin(graph, 1);
+        pin(graph, 2);
+
+        // A step with nowhere to go moves nothing.
+        apply_graph_delta(graph, GraphDelta::NodeHistoryBack { key: a });
+        assert_eq!(recency(graph, a), Some(1));
+
+        let navigate = |name| GraphDelta::NavigateNode {
+            key: a,
+            url: url(name),
+        };
+        apply_graph_delta(graph, navigate("a1"));
+        assert!(moved(graph, a), "navigating stamps the node");
+        apply_graph_delta(graph, navigate("a2"));
+
+        pin(graph, 1);
+        apply_graph_delta(graph, GraphDelta::NodeHistoryBack { key: a });
+        assert!(moved(graph, a), "stepping back stamps the node");
+        pin(graph, 1);
+        apply_graph_delta(graph, GraphDelta::NodeHistoryForward { key: a });
+        assert!(moved(graph, a), "stepping forward stamps the node");
+
+        apply_graph_delta(
+            graph,
+            GraphDelta::BranchHistory {
+                child: b,
+                parent: a,
+            },
+        );
+        assert_eq!(recency(graph, b), Some(1), "a branch is not a visit");
+    });
+    crate::graph::capture::replay_captured_deltas_onto(&mut replayed, captured);
+    for key in [a, b] {
+        assert_eq!(recency(&replayed, key), recency(&live, key));
+    }
+    assert!(recency(&replayed, a) > Some(1));
+}
