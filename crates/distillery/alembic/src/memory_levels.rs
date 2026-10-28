@@ -330,6 +330,38 @@ mod tests {
     }
 
     #[test]
+    fn keep_sessions_evicts_by_the_launch_stamp() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+
+        let mut graph = Graph::new();
+        let visited = node(&mut graph, "visited");
+        graph.set_current_session(5);
+        apply_graph_delta(
+            &mut graph,
+            GraphDelta::NavigateNode {
+                key: visited,
+                url: "https://visited.example/next".into(),
+            },
+        );
+        assert_eq!(graph.node_last_session_visited(visited), Some(5));
+
+        let id = graph.get_node(visited).unwrap().id.to_string();
+        let evicted = |sessions| {
+            let policy = EvictionPolicy::KeepSessions(sessions);
+            evictable_short_term(&graph, &HashMap::new(), policy, 0, 7)
+        };
+        assert_eq!(
+            evicted(2),
+            vec![id],
+            "two launches on is out of a window of two"
+        );
+        assert!(
+            evicted(3).is_empty(),
+            "two launches on is inside a window of three"
+        );
+    }
+
+    #[test]
     fn census_counts_levels_and_evictable() {
         let now = 100 * DAY_MS;
         let mut graph = Graph::new();

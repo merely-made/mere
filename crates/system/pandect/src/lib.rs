@@ -225,7 +225,7 @@ pub use notochord_policy_store::{
 };
 pub use persona_settings_store::{
     PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
-    persona_settings_path, save_persona_settings,
+    persona_settings_path, record_launch, save_persona_settings,
 };
 pub use reservoir::{
     DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereApplicationAccess, MereId, MereRecord,
