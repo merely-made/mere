@@ -1,5 +1,15 @@
 # Event-model convergence plan (2026-06-01)
 
+**Status (2026-10-28): superseded** by genet's native event dispatch plan
+(`genet/docs/2026-10-17_native_event_dispatch_plan.md`, ruling 9), whose Phase 2
+landed today: Cambium's click, key and focus listeners register on `genet-events`
+and one dispatch walk replaces the two dispatchers this plan reconciled. The
+scenario table below stays as a permanent test, not a plan: the native column is
+`crates/cambium/cambium/src/event_layer_tests.rs` (`table_*`), run against the
+single dispatcher, and `genet-events` and genet's `dom_node_events_work` carry
+the script column. The rest of this document is the 2026-06-01 reasoning,
+unchanged.
+
 **Status (2026-10-06):** core dispatcher convergence (steps 1–3) and the
 dom/events push landed 2026-06-01. Three items this plan deferred have since
 landed in genet, all inside Mere's genet pin `bd3e8861`: `window` in the

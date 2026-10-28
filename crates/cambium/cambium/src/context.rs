@@ -5,51 +5,33 @@
 //! The view context for the Genet backend.
 //!
 //! It holds the `id_path` used for message routing, a shared handle to the
-//! [`ScriptedDom`] every view mutates, event-handler registries, focusability
+//! [`ScriptedDom`] every view mutates, the event listeners, focusability
 //! markers, and the portable-child nursery.
 //!
-//! Each click or key handler has a propagation phase ([`Handler::capture`]): a
-//! listener registered with `capture == true` fires in
-//! the `root → target` capture pass, one with `capture == false` (the
-//! browser/`xilem_web` default) in the `target → root` bubble pass. A node may
-//! carry *several* listeners of one kind (nested `on_click`s over one element, a
-//! handler beside an instrumentation listener), so each registry maps a node to a
-//! `Vec` of [`Handler`]s and dispatch routes every one — in registration order
-//! within the matching phase — rather than letting a later listener silently
-//! clobber an earlier one.
+//! Click, key and focus listeners register in a [`genet_events::Registry`]
+//! under [`CAMBIUM_OWNER`](crate::CAMBIUM_OWNER), beside any other owner's listeners on the same
+//! nodes (see [`events`](crate::events)). Each has a propagation phase: a
+//! listener registered with `capture == true` fires in the `root → target`
+//! capture pass, one with `capture == false` (the browser/`xilem_web` default)
+//! in the `target → root` bubble pass. A node may carry *several* listeners of
+//! one kind (nested `on_click`s over one element, a handler beside an
+//! instrumentation listener), and dispatch runs every one, in registration
+//! order within the matching phase, rather than letting a later listener
+//! silently clobber an earlier one.
 
 use std::any::{Any, TypeId};
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::rc::Rc;
 
 use crate::DomHandle;
+use crate::events::{Kind, Listeners, NativeOwner};
 use crate::pod::{GenetElement, GenetElementMut};
+use genet_events::Registry;
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{LayoutDom, LayoutDomMut};
 use meristem::{View, ViewId, ViewPathTracker};
-
-/// A registered event handler: its routing view path plus the propagation phase
-/// it listens in.
-///
-/// A node maps to a `Vec` of these per event type — usually one, but several when
-/// listeners stack on one element. `path` is the `view_path()` captured inside the
-/// handler's `with_id` (so it ends in the handler's marker id and routes straight
-/// to its `message`), and it uniquely identifies this listener for removal;
-/// `capture` is the per-listener phase set by
-/// [`OnClick::capture`](crate::OnClick::capture) /
-/// [`OnKey::capture`](crate::OnKey::capture) — `true` = capture phase
-/// (`root → target`), `false` (default) = bubble phase (`target → root`).
-#[derive(Clone, Debug)]
-pub struct Handler {
-    /// The routing view path to the handler's `message`.
-    pub path: Vec<ViewId>,
-    /// The phase this listener fires in: `true` = capture, `false` = bubble.
-    pub capture: bool,
-    /// Whether this handler makes its node a Tab/click focus target. Click
-    /// handlers set this to `false`; key handlers default to `true` and may opt
-    /// out when they only observe keys bubbling from descendants.
-    pub focusable: bool,
-}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum FocusRequest {
@@ -60,10 +42,11 @@ pub(crate) enum FocusRequest {
 /// The [`ViewPathTracker`] context for all Genet views.
 ///
 /// The context tracks the current Meristem view path, the shared DOM, and the
-/// routing registries built by event views. [`OnClick`](crate::OnClick) and
+/// routing state built by event views. [`OnClick`](crate::OnClick) and
 /// [`OnKey`](crate::OnKey) record their view paths against the DOM node they
-/// wrap. [`GenetAppRunner`](crate::GenetAppRunner) walks the hit or focused
-/// node's ancestors and routes messages down those retained paths.
+/// wrap, as listeners in the event layer. [`GenetAppRunner`](crate::GenetAppRunner)
+/// walks the hit or focused node's path through that layer and routes messages
+/// down the retained view paths its listeners name.
 ///
 /// Key handlers and explicit [`focusable`](crate::focusable) markers together
 /// define the focus traversal set. Pointer, hover, and wheel handlers use the
@@ -71,27 +54,16 @@ pub(crate) enum FocusRequest {
 pub struct GenetCtx {
     id_path: Vec<ViewId>,
     dom: DomHandle,
-    /// `NodeId → `[`Handler`]s for click handlers, in registration order. Usually
-    /// one, but a node can carry several stacked `on_click`s; each [`Handler::path`]
-    /// is the `view_path()` captured inside that handler's `with_id` (ending in
-    /// `ON_CLICK_ID`) and [`Handler::capture`] its propagation phase.
-    click_handlers: HashMap<NodeId, Vec<Handler>>,
-    /// `NodeId → `[`Handler`]s for key handlers, the parallel of
-    /// [`click_handlers`](Self::click_handlers). Each path is the `view_path()`
-    /// captured inside an [`OnKey`](crate::OnKey)'s `with_id`, ending in
-    /// `ON_KEY_ID`. Handlers whose [`Handler::focusable`] bit is true contribute
-    /// to the focus set regardless of phase; the other source is an explicit
-    /// [`focusable`](crate::focusable) marker, tracked in
-    /// [`focusable`](Self::focusable).
-    key_handlers: HashMap<NodeId, Vec<Handler>>,
+    /// Click, key and focus listeners: the `genet_events` registry (shared, so
+    /// a host can hand one in) and the token table mapping each of Cambium's
+    /// listeners to its routing view path.
+    listeners: Listeners,
     /// Nodes marked focusable by an explicit [`focusable`](crate::focusable) view,
     /// independent of any key handler — so a plain `on_click` button (no `on_key`)
     /// can still be tab-reached and Enter/Space-activated. The `usize` is a
     /// refcount, so stacked markers and node-swap rebuilds stay balanced. Read
-    /// (with [`key_handlers`](Self::key_handlers)) by [`is_focusable`](Self::is_focusable).
+    /// (with the key listeners) by [`is_focusable`](Self::is_focusable).
     focusable: HashMap<NodeId, usize>,
-    /// Nodes observing runner focus transitions through [`on_focus`](crate::on_focus).
-    focus_handlers: HashMap<NodeId, Vec<ViewId>>,
     /// `NodeId → routing path` for pointer-drag handlers
     /// ([`OnPointer`](crate::OnPointer)). Unlike click/key there is no
     /// capture/bubble phase: a drag routes straight to the captured target, so
@@ -198,15 +170,23 @@ fn teardown_parked<State, Action, V>(
 }
 
 impl GenetCtx {
-    /// Create a context over an existing document handle.
+    /// Create a context over an existing document handle, with an event
+    /// registry of its own.
     pub fn new(dom: DomHandle) -> Self {
+        Self::with_events(dom, Rc::default())
+    }
+
+    /// Create a context over an existing document handle whose listeners
+    /// register in `events`, a registry the host shares with another owner (a
+    /// script runtime's, say) so that both owners' listeners on a node
+    /// interleave in registration order. Cambium's listeners are
+    /// [`CAMBIUM_OWNER`](crate::CAMBIUM_OWNER)'s.
+    pub fn with_events(dom: DomHandle, events: Rc<RefCell<Registry>>) -> Self {
         Self {
             id_path: Vec::new(),
             dom,
-            click_handlers: HashMap::new(),
-            key_handlers: HashMap::new(),
+            listeners: Listeners::new(events),
             focusable: HashMap::new(),
-            focus_handlers: HashMap::new(),
             pointer_handlers: HashMap::new(),
             value_handlers: HashMap::new(),
             file_handlers: HashMap::new(),
@@ -326,6 +306,22 @@ impl GenetCtx {
         self.dom.clone()
     }
 
+    /// The registry this context's listeners live in: its own unless the host
+    /// handed one to [`with_events`](Self::with_events).
+    pub fn events(&self) -> Rc<RefCell<Registry>> {
+        self.listeners.events()
+    }
+
+    /// The endpoint for native calls that reach Cambium's owner from a dispatch
+    /// the runner is not running. See [`NativeOwner`].
+    pub fn native_owner(&self) -> NativeOwner {
+        self.listeners.owner()
+    }
+
+    pub(crate) fn listeners(&self) -> &Listeners {
+        &self.listeners
+    }
+
     /// Register `path` (in phase `capture`) as *a* click handler for `node`,
     /// appended after any already there.
     ///
@@ -337,32 +333,13 @@ impl GenetCtx {
     /// Idempotent per `path`: re-registering the same path updates its phase in
     /// place rather than duplicating, so a redundant rebuild can't grow the list.
     pub fn register_click(&mut self, node: NodeId, path: Vec<ViewId>, capture: bool) {
-        let handlers = self.click_handlers.entry(node).or_default();
-        handlers.retain(|h| h.path != path);
-        handlers.push(Handler {
-            path,
-            capture,
-            focusable: false,
-        });
+        self.listeners.add(node, Kind::Click, path, capture, false);
     }
 
     /// Drop the click handler with `path` from `node` (teardown, or before a
-    /// re-register onto a different node), leaving any sibling listeners. The
-    /// node's entry is removed once its last handler goes.
+    /// re-register onto a different node), leaving any sibling listeners.
     pub fn unregister_click(&mut self, node: NodeId, path: &[ViewId]) {
-        if let Some(handlers) = self.click_handlers.get_mut(&node) {
-            handlers.retain(|h| h.path != path);
-            if handlers.is_empty() {
-                self.click_handlers.remove(&node);
-            }
-        }
-    }
-
-    /// The click handlers on `node`, in registration order (empty if none).
-    /// The runner's dispatch walk consults this per ancestor, in both the capture
-    /// and bubble passes, routing every listener in the matching phase.
-    pub fn click_handlers_at(&self, node: NodeId) -> &[Handler] {
-        self.click_handlers.get(&node).map_or(&[], Vec::as_slice)
+        self.listeners.remove(node, Kind::Click, path);
     }
 
     /// Register `path` (in phase `capture`) as *a* key handler for `node`.
@@ -382,38 +359,25 @@ impl GenetCtx {
         capture: bool,
         focusable: bool,
     ) {
-        let handlers = self.key_handlers.entry(node).or_default();
-        handlers.retain(|h| h.path != path);
-        handlers.push(Handler {
-            path,
-            capture,
-            focusable,
-        });
+        self.listeners
+            .add(node, Kind::Key, path, capture, focusable);
     }
 
     /// Drop the key handler with `path` from `node`, leaving any siblings. When
     /// the last focusable key handler goes, `node` is no longer focusable via a
     /// handler (an explicit [`focusable`](crate::focusable) marker still counts).
     pub fn unregister_key(&mut self, node: NodeId, path: &[ViewId]) {
-        if let Some(handlers) = self.key_handlers.get_mut(&node) {
-            handlers.retain(|h| h.path != path);
-            if handlers.is_empty() {
-                self.key_handlers.remove(&node);
-            }
-        }
+        self.listeners.remove(node, Kind::Key, path);
     }
 
-    /// The key handlers on `node`, in registration order (empty if none).
-    ///
-    /// A handler whose `Handler::focusable` is true also makes `node`
-    /// focusable, independent of phase. The runner's
-    /// [`dispatch_click`](crate::GenetAppRunner::dispatch_click) uses
-    /// [`is_focusable`](Self::is_focusable) to find the focus target (nearest
-    /// focusable ancestor of a click), and
-    /// [`dispatch_key`](crate::GenetAppRunner::dispatch_key) routes from the
-    /// focused node up its ancestor chain through the per-phase passes.
-    pub fn key_handlers_at(&self, node: NodeId) -> &[Handler] {
-        self.key_handlers.get(&node).map_or(&[], Vec::as_slice)
+    /// Whether `node` carries a click handler.
+    pub(crate) fn has_click(&self, node: NodeId) -> bool {
+        self.listeners.has(node, Kind::Click)
+    }
+
+    /// Whether `node` carries a key handler.
+    pub(crate) fn has_key(&self, node: NodeId) -> bool {
+        self.listeners.has(node, Kind::Key)
     }
 
     /// Mark `node` focusable explicitly (an [`focusable`](crate::focusable)
@@ -437,25 +401,19 @@ impl GenetCtx {
     /// Whether `node` is *focusable*: it carries a focusable key handler (in
     /// either phase) or an explicit [`focusable`](crate::focusable) marker.
     pub fn is_focusable(&self, node: NodeId) -> bool {
-        self.key_handlers
-            .get(&node)
-            .is_some_and(|handlers| handlers.iter().any(|handler| handler.focusable))
-            || self.focusable.contains_key(&node)
+        self.listeners.has_focusable_key(node) || self.focusable.contains_key(&node)
     }
 
-    /// Register the retained message path that observes focus for `node`.
+    /// Register the retained message path that observes focus for `node`,
+    /// replacing any observer already there.
     pub fn register_focus(&mut self, node: NodeId, path: Vec<ViewId>) {
-        self.focus_handlers.insert(node, path);
+        self.listeners.remove_all(node, Kind::Focus);
+        self.listeners.add(node, Kind::Focus, path, false, false);
     }
 
     /// Remove `node`'s focus observer during teardown or node replacement.
     pub fn unregister_focus(&mut self, node: NodeId) {
-        self.focus_handlers.remove(&node);
-    }
-
-    /// The retained message path observing focus for `node`.
-    pub fn focus_handler(&self, node: NodeId) -> Option<&[ViewId]> {
-        self.focus_handlers.get(&node).map(Vec::as_slice)
+        self.listeners.remove_all(node, Kind::Focus);
     }
 
     /// Register `path` as the pointer-drag handler for `node`

@@ -2241,6 +2241,7 @@ version = "0.6.0"
 dependencies = [
  "backstep",
  "chartulary",
+ "genet-events",
  "genet-scripted-dom",
  "genet-text",
  "hest",

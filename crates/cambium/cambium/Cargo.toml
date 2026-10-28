@@ -27,6 +27,9 @@ sceno = { workspace = true }
 scenograph = { workspace = true }
 scenomise = { workspace = true }
 genet-scripted-dom = { workspace = true }
+# The listener registry and the one DOM event dispatch walk (native event
+# dispatch plan, Phase 2): click, key and focus listeners register here.
+genet-events = { workspace = true }
 # Cambium also renders host settings and surface descriptors, which remain
 # product-neutral Genet host contracts rather than workspace vocabulary.
 mere-surface-api = { workspace = true }

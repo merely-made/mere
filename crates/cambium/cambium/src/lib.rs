@@ -47,6 +47,7 @@ mod disclosure;
 mod editor;
 mod element;
 mod event;
+mod events;
 mod file;
 mod focus;
 mod focus_request;
@@ -99,6 +100,8 @@ mod value;
 mod wheel;
 mod workspace;
 
+#[cfg(test)]
+mod event_layer_tests;
 #[cfg(test)]
 mod tests;
 
@@ -155,6 +158,7 @@ pub use controls::{
 };
 pub use element::{El, Element, ElementView, el};
 pub use event::{OnClick, OnClickState, PointerClick, clickable, on_click};
+pub use events::{CAMBIUM_OWNER, NativeOwner};
 pub use focus::{FocusEvent, FocusPhase, OnFocus, OnFocusState, on_focus};
 pub use focus_request::{FocusRequest, FocusRequestState, request_focus};
 pub use focusable::{Focusable, FocusableState, focusable, focusable_if};

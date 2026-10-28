@@ -28,15 +28,20 @@
 //! each a projection of the same state into its own `ScriptedDom`.
 
 use core::marker::PhantomData;
+use std::cell::RefCell;
+use std::rc::Rc;
 
+use genet_events::{EventInit, Invoker, Registry, TargetKey, build_path};
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LayoutDomMut, LocalName, Namespace};
 use meristem::{DynMessage, MessageCtx, MessageResult, View, ViewId};
 
 use crate::context::FocusRequest;
+use crate::events::{NativeOwner, Routing};
 use crate::{
     DomHandle, FocusEvent, FocusPhase, GenetCtx, GenetElement, GenetElementMut, HoverEvent, Key,
-    KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, ValueEvent, WheelEvent,
+    KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, Propagation, ValueEvent,
+    WheelEvent,
 };
 
 /// Which end of a runner's focusable set traversal left by, with
@@ -49,8 +54,25 @@ pub enum FocusExit {
     Backward,
 }
 
+/// What one [`walk`](RunnerTree::walk) produced.
+struct Walk<Action> {
+    /// The actions that reached the root.
+    actions: Vec<Action>,
+    /// How many listeners ran.
+    invoked: usize,
+}
+
+impl<Action> Default for Walk<Action> {
+    fn default() -> Self {
+        Self {
+            actions: Vec::new(),
+            invoked: 0,
+        }
+    }
+}
+
 /// The per-tree half of a runner: one `ScriptedDom` target, its [`GenetCtx`]
-/// (handler registries are keyed by this dom's `NodeId`s), the retained view
+/// (its listeners are keyed by this dom's `NodeId`s), the retained view
 /// tree, and the per-window interaction state (focus, pointer capture, the
 /// cancellation flag). App state and the view-producing logic are *not* here —
 /// they are threaded into every method, so one state can drive one tree
@@ -102,6 +124,9 @@ where
     /// A file request a view filed in the latest build or rebuild, waiting
     /// for the host to take it.
     file_request: Option<crate::FileRequest>,
+    /// Runs the listeners of other owners that share this tree's registry, in
+    /// the walks the runner drives. Without one they are skipped.
+    foreign: Option<Box<dyn Invoker>>,
     phantom: PhantomData<fn() -> (State, Action)>,
 }
 
@@ -134,7 +159,19 @@ where
         logic: &mut impl FnMut(&State) -> V,
         state: &mut State,
     ) -> Self {
-        let mut ctx = GenetCtx::new(dom.clone());
+        let ctx = GenetCtx::new(dom.clone());
+        Self::build_in(dom, mount, ctx, logic, state)
+    }
+
+    /// [`build_at`](Self::build_at) over a context the caller made, whose event
+    /// registry a host may share with another owner.
+    pub(crate) fn build_in(
+        dom: DomHandle,
+        mount: NodeId,
+        mut ctx: GenetCtx,
+        logic: &mut impl FnMut(&State) -> V,
+        state: &mut State,
+    ) -> Self {
         let view = logic(state);
         let (root, view_state) = view.build(&mut ctx, state);
 
@@ -163,6 +200,7 @@ where
             focus_exits: false,
             focus_exit: None,
             file_request,
+            foreign: None,
             phantom: PhantomData,
         }
     }
@@ -325,50 +363,88 @@ where
         ctx.drain_nursery();
     }
 
-    /// Build the routing paths for `chain` in DOM propagation order
-    /// (**capture → target → bubble**), the shared core of
-    /// [`dispatch_click`](Self::dispatch_click) and
-    /// [`dispatch_key`](Self::dispatch_key).
+    /// Walk `target`'s event path through the event layer, in DOM propagation
+    /// order (**capture → target → bubble**), and route each Cambium listener it
+    /// reaches down its view path as `View::message`. The shared core of
+    /// [`dispatch_click`](Self::dispatch_click),
+    /// [`dispatch_key`](Self::dispatch_key) and the focus transitions.
     ///
-    /// `chain` is the ancestor list in `target → … → document` order. `lookup`
-    /// resolves a node's [`Handler`](crate::context::Handler) for the relevant
-    /// event type (click or key). The result interleaves the two phases:
-    ///   * **Capture pass** — `chain` *reversed* (`root → target`), keeping only
-    ///     handlers whose `capture == true`.
-    ///   * **Bubble pass** — `chain` as given (`target → root`), keeping only
-    ///     handlers whose `capture == false`.
+    /// `genet_events::dispatch` owns the walk, with this tree as the
+    /// [`Invoker`]: a listener fires in exactly one phase, a node's listeners run
+    /// in registration order, and `prop`'s flags are read back after each, so
+    /// `stop_propagation` ends the walk at the node and `stop_immediate_propagation`
+    /// ends it at the listener. The rebuild is the caller's, after the walk,
+    /// as before: no rebuild between listeners.
     ///
-    /// Each listener matches exactly one phase, so it contributes one path and
-    /// never double-fires; a node carrying several listeners contributes each, in
-    /// registration order within the phase. Collected entirely under a shared
-    /// `&self` borrow (clones the paths) so the borrow releases before routing.
-    fn phase_ordered_paths(
-        &self,
-        chain: &[NodeId],
-        lookup: impl Fn(&GenetCtx, NodeId) -> &[crate::context::Handler],
-    ) -> Vec<Vec<ViewId>> {
-        let mut paths = Vec::new();
-        // Capture pass: root → target (chain reversed), capture listeners only.
-        for &node in chain.iter().rev() {
-            for handler in lookup(&self.ctx, node) {
-                if handler.capture {
-                    paths.push(handler.path.clone());
-                }
-            }
+    /// Calls that reached [`NativeOwner`] during the walk (a nested native
+    /// dispatch, queued rather than run mid-walk) run last, once the walk has
+    /// unwound; see [`NativeOwner`] for the ordering this departs from.
+    fn walk(
+        &mut self,
+        state: &mut State,
+        target: NodeId,
+        event_type: &str,
+        bubbles: bool,
+        prop: Option<&Propagation>,
+        message: &dyn Fn() -> DynMessage,
+    ) -> Walk<Action> {
+        let events = self.ctx.events();
+        // The fast path: nobody listens for this type, so no path to build.
+        if !events.borrow().has_type(event_type) {
+            return Walk::default();
         }
-        // Bubble pass: target → root (chain order), bubble listeners only.
-        for &node in chain {
-            for handler in lookup(&self.ctx, node) {
-                if !handler.capture {
-                    paths.push(handler.path.clone());
-                }
-            }
+        let path = build_path(
+            &self.dom.borrow(),
+            TargetKey::Node(target),
+            None,
+            event_type,
+            true,
+        );
+        let init = EventInit {
+            event_type: event_type.to_owned(),
+            bubbles,
+            stop_propagation: prop.is_some_and(Propagation::stopped),
+            stop_immediate: prop.is_some_and(Propagation::stopped_immediately),
+            canceled: prop.is_some_and(Propagation::default_prevented),
+            activation_event: false,
+        };
+        let Self {
+            ctx,
+            view,
+            view_state,
+            root,
+            dom,
+            mount,
+            foreign,
+            ..
+        } = self;
+        let mut routing = Routing {
+            view: &*view,
+            view_state,
+            root,
+            dom: &*dom,
+            mount: *mount,
+            state,
+            listeners: ctx.listeners(),
+            foreign: foreign.as_deref_mut(),
+            message,
+            prop,
+            actions: Vec::new(),
+            invoked: 0,
+        };
+        genet_events::dispatch(&events, path, &init, &mut routing);
+        routing.run_queued();
+        Walk {
+            actions: routing.actions,
+            invoked: routing.invoked,
         }
-        paths
     }
 
     /// Route a focus change through the retained view before the caller's
-    /// publication rebuild. Lost is delivered first, then Gained.
+    /// publication rebuild. Lost is delivered first, then Gained. Each is a
+    /// `blur` or `focus` event walked through the layer to its node; neither
+    /// bubbles, so only that node's own observer (and any other owner's listeners
+    /// there) hears it.
     fn route_focus_transition(
         &mut self,
         state: &mut State,
@@ -378,46 +454,22 @@ where
         if old == new {
             return (Vec::new(), false);
         }
-        let deliveries: Vec<_> = [
-            (old, FocusEvent::new(FocusPhase::Lost)),
-            (new, FocusEvent::new(FocusPhase::Gained)),
-        ]
-        .into_iter()
-        .filter_map(|(node, event)| {
-            let node = node?;
-            let path = self.ctx.focus_handler(node)?.to_vec();
-            Some((path, event))
-        })
-        .collect();
-        if deliveries.is_empty() {
-            return (Vec::new(), false);
-        }
-
         let mut actions = Vec::new();
-        {
-            let Self {
-                view,
-                view_state,
-                root,
-                dom,
-                mount,
-                ..
-            } = self;
-            for (path, event) in deliveries {
-                let mut msg = MessageCtx::new(path, DynMessage::new(event));
-                let mut_ref = GenetElementMut {
-                    node: &mut root.node,
-                    dom: dom.clone(),
-                    parent: Some(*mount),
-                };
-                if let MessageResult::Action(action) =
-                    view.message(view_state, &mut msg, mut_ref, state)
-                {
-                    actions.push(action);
-                }
-            }
+        let mut routed = false;
+        for (node, event_type, phase) in [
+            (old, "blur", FocusPhase::Lost),
+            (new, "focus", FocusPhase::Gained),
+        ] {
+            let Some(node) = node else {
+                continue;
+            };
+            let walk = self.walk(state, node, event_type, false, None, &|| {
+                DynMessage::new(FocusEvent::new(phase))
+            });
+            routed |= walk.invoked > 0;
+            actions.extend(walk.actions);
         }
-        (actions, true)
+        (actions, routed)
     }
 
     /// Dispatch a native pointer click that hit `target`. See
@@ -435,26 +487,24 @@ where
             return Vec::new();
         }
 
-        // 1. Collect the ancestor chain (target → … → document) once, and — in
-        //    the same walk — find the nearest focusable (key-handler-bearing)
-        //    ancestor for click-to-focus. Done under a short-lived shared borrow
-        //    of `dom`, fully released before routing.
-        let (chain, new_focus): (Vec<NodeId>, Option<NodeId>) = {
+        // 1. Find the nearest focusable (key-handler-bearing or marked) ancestor
+        //    for click-to-focus. Done under a short-lived shared borrow of
+        //    `dom`, fully released before routing.
+        let new_focus: Option<NodeId> = {
             let dom = self.dom.borrow();
-            let mut chain = Vec::new();
-            let mut focus = None;
             let mut current = Some(target);
+            let mut focus = None;
             while let Some(node) = current {
-                chain.push(node);
                 // The first (nearest) focusable ancestor wins; the walk runs
                 // target → root, so the first hit is the deepest. Focusability
-                // is phase-independent (presence in the key registry).
-                if focus.is_none() && self.ctx.is_focusable(node) {
+                // is phase-independent.
+                if self.ctx.is_focusable(node) {
                     focus = Some(node);
+                    break;
                 }
                 current = dom.parent(node);
             }
-            (chain, focus)
+            focus
         };
 
         // Click-to-focus: focus the nearest focusable ancestor, or clear it when
@@ -464,74 +514,45 @@ where
         self.focus = new_focus;
         let (mut actions, focus_routed) = self.route_focus_transition(state, old_focus, new_focus);
 
-        // 2. Build the routing paths in propagation order: capture pass first
-        //    (chain reversed → root → target, capture==true handlers only), then
-        //    bubble pass (chain as-is → target → root, capture==false only). A
-        //    node's lone listener is in exactly one phase, so it routes once.
-        let paths = self.phase_ordered_paths(&chain, |ctx, node| ctx.click_handlers_at(node));
-
-        if paths.is_empty() {
-            // Focus observers may still have mutated state even when the hit had
-            // no click handler, so publish that transition before returning.
-            if focus_routed {
-                self.rebuild(logic, state);
-            }
-            self.last_default_prevented = event.prop.default_prevented();
-            return actions;
-        }
-
-        // 3. Route the event down each collected path through the faithful
-        //    message cycle. The disjoint-field destructure mirrors `rebuild`,
-        //    so `View::message`'s borrow set does not alias `self`. Any action
-        //    that reaches the root (a `MessageResult::Action`) is collected.
-        {
-            // `ctx` is not needed for routing: the recorded path is the full
-            // routing target, so `View::message` walks it without the context.
-            let Self {
-                view,
-                view_state,
-                root,
-                dom,
-                mount,
-                ..
-            } = self;
-
-            for path in paths {
-                let mut msg = MessageCtx::new(path, DynMessage::new(event.clone()));
-                let mut_ref = GenetElementMut {
-                    node: &mut root.node,
-                    dom: dom.clone(),
-                    parent: Some(*mount),
-                };
-                // Handlers may mutate state in place (a rebuild below reflects
-                // that) and/or bubble an `Action` up to the root. A root-level
-                // `MessageResult::Action(a)` is the runner's `Action` home: we
-                // collect it for the caller. `Action = ()` collects nothing
-                // meaningful (the Stage 2b path).
-                if let MessageResult::Action(a) = view.message(view_state, &mut msg, mut_ref, state)
-                {
-                    actions.push(a);
-                }
-                // stopPropagation / stopImmediatePropagation: a handler that
-                // canceled propagation halts the capture/bubble walk here, after
-                // its path fired (every event clone shares one Propagation cell).
-                // The native twin of dom.rs's per-node `__stop` check.
-                if event.prop.stopped() {
-                    break;
-                }
-            }
-        }
+        // 2. Walk the click through the event layer: capture pass first
+        //    (root → target, capture listeners only), then bubble pass
+        //    (target → root, the rest). A listener sits in exactly one phase,
+        //    so it routes once. Any action that reaches the root (a
+        //    `MessageResult::Action`) is collected; `Action = ()` collects
+        //    nothing meaningful. A handler's stop_propagation ends the walk, and
+        //    its prevent_default is read below.
+        let walk = self.walk(state, target, "click", true, Some(&event.prop), &|| {
+            DynMessage::new(event.clone())
+        });
+        actions.extend(walk.actions);
 
         // Record whether a handler prevented the default action — the host reads
         // this (default_prevented()) to gate its own default (the cancellation
         // seam's consumption point).
         self.last_default_prevented = event.prop.default_prevented();
 
-        // 4. Rebuild so the handler's state mutation reaches the DOM — the same
+        if walk.invoked == 0 {
+            // Focus observers may still have mutated state even when the hit had
+            // no click handler, so publish that transition before returning.
+            if focus_routed {
+                self.rebuild(logic, state);
+            }
+            return actions;
+        }
+
+        // 3. Rebuild so the handler's state mutation reaches the DOM — the same
         //    tail `update` runs.
         self.rebuild(logic, state);
 
         actions
+    }
+
+    pub(crate) fn set_foreign_invoker(&mut self, invoker: Option<Box<dyn Invoker>>) {
+        self.foreign = invoker;
+    }
+
+    pub(crate) fn native_owner(&self) -> NativeOwner {
+        self.ctx.native_owner()
     }
 
     pub(crate) fn default_prevented(&self) -> bool {
@@ -674,45 +695,18 @@ where
             chain
         };
 
-        // 2. Route the key to the focused element's handlers in propagation order
-        //    (capture then bubble), exactly as `dispatch_click`. Tab is delivered
-        //    here too (no longer swallowed pre-routing), so a view can handle
-        //    it and `prevent_default` to override the traversal in step 3. `paths`
-        //    is empty for a focusable node with no `on_key` — a plain
-        //    `focusable(button(..))`.
-        let paths = self.phase_ordered_paths(&chain, |ctx, node| ctx.key_handlers_at(node));
-        let routed = !paths.is_empty();
-        let mut actions = Vec::new();
+        // 2. Walk the key from the focused element through the event layer in
+        //    propagation order (capture then bubble), exactly as `dispatch_click`.
+        //    Tab is delivered here too (no longer swallowed pre-routing), so a
+        //    view can handle it and `prevent_default` to override the traversal
+        //    in step 3. Nothing runs for a focusable node with no `on_key` — a
+        //    plain `focusable(button(..))`.
+        let walk = self.walk(state, focus, "keydown", true, Some(&event.prop), &|| {
+            DynMessage::new(event.clone())
+        });
+        let routed = walk.invoked > 0;
+        let mut actions = walk.actions;
         if routed {
-            {
-                let Self {
-                    view,
-                    view_state,
-                    root,
-                    dom,
-                    mount,
-                    ..
-                } = self;
-
-                for path in paths {
-                    let mut msg = MessageCtx::new(path, DynMessage::new(event.clone()));
-                    let mut_ref = GenetElementMut {
-                        node: &mut root.node,
-                        dom: dom.clone(),
-                        parent: Some(*mount),
-                    };
-                    if let MessageResult::Action(a) =
-                        view.message(view_state, &mut msg, mut_ref, state)
-                    {
-                        actions.push(a);
-                    }
-                    // stopPropagation halts the bubble walk (shared Propagation
-                    // cell), matching dispatch_click and the JS dispatcher.
-                    if event.prop.stopped() {
-                        break;
-                    }
-                }
-            }
             // Record whether a handler prevented the default (gates step 3 + host).
             self.last_default_prevented = event.prop.default_prevented();
         }
@@ -736,9 +730,7 @@ where
                 // roles use Space; buttons use Enter and Space. Radio groups
                 // own their authored-widget behavior in Cambium.
                 Key::Named(NamedKey::Enter | NamedKey::Space)
-                    if !self.ctx.click_handlers_at(focus).is_empty()
-                        && self.ctx.key_handlers_at(focus).is_empty()
-                        && activates =>
+                    if self.ctx.has_click(focus) && !self.ctx.has_key(focus) && activates =>
                 {
                     actions.extend(self.dispatch_click(
                         logic,
@@ -784,7 +776,7 @@ where
                         || !owned(origin)
                         || !owned(group)
                         || dom.parent(origin) != Some(group)
-                        || self.ctx.key_handlers_at(origin).is_empty()
+                        || !self.ctx.has_key(origin)
                         || attr(&dom, origin, "role") != Some("tab")
                         || attr(&dom, group, "role") != Some("tablist")
                     {
@@ -793,7 +785,7 @@ where
                     let candidate = dom.dom_children(group).into_iter().nth(index)?;
                     (owned(candidate)
                         && self.ctx.is_focusable(candidate)
-                        && !self.ctx.key_handlers_at(candidate).is_empty()
+                        && self.ctx.has_key(candidate)
                         && attr(&dom, candidate, "role") == Some("tab")
                         && attr(&dom, candidate, "aria-selected") == Some("true")
                         && attr(&dom, candidate, "tabindex") == Some("0"))
@@ -1247,6 +1239,41 @@ where
         assert!(dom.borrow().is_live(mount), "runner mount must be live");
         let tree = RunnerTree::build_at(dom, mount, &mut logic, &mut state);
         Self { state, logic, tree }
+    }
+
+    /// [`new_at`](Self::new_at) whose listeners register in `events`, an event
+    /// registry the host shares with another owner (a script runtime's). Both
+    /// owners' listeners on one node then interleave in registration order in one
+    /// walk; the other owner's run through
+    /// [`set_foreign_invoker`](Self::set_foreign_invoker), and without one they are
+    /// skipped. Cambium's own are [`CAMBIUM_OWNER`](crate::CAMBIUM_OWNER)'s.
+    pub fn with_events(
+        dom: DomHandle,
+        mount: NodeId,
+        events: Rc<RefCell<Registry>>,
+        mut logic: Logic,
+        mut state: State,
+    ) -> Self {
+        assert!(dom.borrow().is_live(mount), "runner mount must be live");
+        let ctx = GenetCtx::with_events(dom.clone(), events);
+        let tree = RunnerTree::build_in(dom, mount, ctx, &mut logic, &mut state);
+        Self { state, logic, tree }
+    }
+
+    /// Run the listeners of other owners in a shared registry through
+    /// `invoker`, inside the walks of [`dispatch_click`](Self::dispatch_click) and
+    /// [`dispatch_key`](Self::dispatch_key) and the focus transitions, at their
+    /// place in registration order. A listener the layer marks `once` is
+    /// removed before it runs, so without an invoker those would be lost: install
+    /// it before the first dispatch.
+    pub fn set_foreign_invoker(&mut self, invoker: Option<Box<dyn Invoker>>) {
+        self.tree.set_foreign_invoker(invoker);
+    }
+
+    /// The endpoint other owners' dispatchers hand [`CAMBIUM_OWNER`](crate::CAMBIUM_OWNER)
+    /// calls to. See [`NativeOwner`].
+    pub fn native_owner(&self) -> NativeOwner {
+        self.tree.native_owner()
     }
 
     /// Apply a state update, then rebuild the view tree against the new state.

@@ -15,10 +15,10 @@
 // `prevent_default()` on the event it received is seen by the dispatch loop and
 // by every other clone.
 //
-// This is the native twin of `dom.rs`'s `__stop` / `__stopImmediate` /
-// `__canceled` on the JS `Event`. See
-// `design_docs/cambium_docs/implementation_strategy/2026-06-01_event_model_convergence_plan.md`
-// — both dispatchers satisfy one propagation/cancellation contract.
+// The flags are the native twin of the JS `Event`'s stop / stop-immediate /
+// canceled state, and `genet_events::dispatch` reads them back after each
+// listener, so both owners satisfy one propagation/cancellation contract in one
+// walk (genet `docs/2026-10-17_native_event_dispatch_plan.md`).
 
 use std::cell::Cell;
 use std::rc::Rc;
@@ -42,7 +42,7 @@ struct Flags {
 /// [`KeyEvent`](crate::KeyEvent)). All clones of an event share one flag cell, so
 /// a handler calling [`stop_propagation`](Self::stop_propagation) /
 /// [`prevent_default`](Self::prevent_default) is observed by the dispatch loop
-/// (which checks [`stopped`](Self::stopped) between routed paths) and by the host
+/// (which reads the flags back after each listener) and by the host
 /// (which reads [`default_prevented`](Self::default_prevented) to decide whether
 /// to run the event's default action).
 #[derive(Clone, Debug)]
@@ -98,9 +98,8 @@ impl Propagation {
     }
 
     /// Stop the event reaching any *later* node in the propagation path. The
-    /// current node's other listeners still run (this dispatcher registers at
-    /// most one listener per node per type, so that distinction rarely bites —
-    /// but the contract matches the JS side). Mirrors `Event.stopPropagation`.
+    /// current node's other listeners still run, as in the DOM. Mirrors
+    /// `Event.stopPropagation`.
     pub fn stop_propagation(&self) {
         let mut f = self.flags.get();
         f.stop = true;
@@ -129,10 +128,15 @@ impl Propagation {
     }
 
     /// Whether propagation has been stopped (`stop_propagation` or
-    /// `stop_immediate_propagation`). The dispatch loop checks this between
-    /// routed paths to halt the capture/bubble walk.
+    /// `stop_immediate_propagation`).
     pub fn stopped(&self) -> bool {
         self.flags.get().stop
+    }
+
+    /// Whether `stop_immediate_propagation` was called. The layer's dispatch
+    /// reads it after each listener, to skip the rest of the node's list.
+    pub(crate) fn stopped_immediately(&self) -> bool {
+        self.flags.get().stop_immediate
     }
 
     /// Whether `prevent_default` was called. Read by the host after dispatch.

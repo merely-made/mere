@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- Move click, key and focus listeners onto genet's event layer (native event
+  dispatch plan, Phase 2). They register in a `genet_events::Registry` under
+  `CAMBIUM_OWNER` (owner 1; the script runtime is 0), the runner's click, key
+  and focus walks go through `genet_events::dispatch` with the runner as the
+  `Invoker`, and the click, key and focus registries in `GenetCtx` are gone:
+  `click_handlers_at`, `key_handlers_at`, `focus_handler` and the `Handler` type
+  they returned are removed (nothing outside the crate called them). `OnClick`,
+  `OnKey`, `.capture()`, `Propagation` and the `register_*` signatures are
+  unchanged. One behaviour follows the DOM now: `stop_propagation` ends the walk
+  after the current node, so that node's other listeners still run (it used to
+  stop at the listener, as `stop_immediate_propagation` does). Added:
+  `GenetCtx::with_events`, `events` and `native_owner`;
+  `GenetAppRunner::with_events`, `set_foreign_invoker` and `native_owner`;
+  `CAMBIUM_OWNER` and `NativeOwner`. A host that shares a registry with a script
+  runtime gets both owners' listeners on a node in registration order in one
+  walk; a native call that arrives while the runner is mid-walk is queued and
+  runs when that walk unwinds. Pointer, hover, wheel, value and file listeners,
+  focus traversal and activation stay in Cambium for now. Cambium now depends
+  on `genet-events` (git, version 0.0.0, unpublished), so it cannot be
+  published until that crate is.
 - Remove `stylesheet_at_display_scale`. A native host composes at one layout
   scale, as the rootstock host does: sheets stay in layout pixels, layout runs
   at `physical / scale`, and the scene is rasterized at `scale`, so no host
