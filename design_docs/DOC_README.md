@@ -872,6 +872,14 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
+- **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
+  while a lock record names an older revision than the package Cargo loads from
+  its Git workspace. Compare resolved `(name, version, source)` records with the
+  lock as well as checking Cargo's exit status. A Git package ID can omit its
+  precise revision; use the reported source or actual checkout head. Preserve
+  unrelated records when aligning a workspace cohort. The [presentation engines plan](inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md#findings)
+  records the Netrender device case.
+
 - **Workshop composition (2026-10-24):** Alembic/Athanor own the workshop inside Distillery; Servitor stays in Eidetic for now and supplies admission/run semantics, while Armillary supplies execution. Products retain commit and durability authority. The [Alembic plan, section 5](archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24) owns the concrete two-host workflow and its acceptance evidence.
 
 - **Shared surface receiving (2026-10-23):** keep canonical document types on

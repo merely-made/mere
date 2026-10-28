@@ -1,0 +1,945 @@
+{
+  "date": "2026-10-28",
+  "published_fix": "db89839439cf8bac217728123c0c0c49ef559711",
+  "upstream_preserved": "8996e935a",
+  "change_from_upstream": "one root netrender_device source revision, d9d6e778 to the already loaded parent workspace at 66b2f72e",
+  "initial_reproduction": {
+    "locked_metadata_exit": 0,
+    "resolved_packages": 1358,
+    "lock_records": 1830,
+    "missing_source_aware_records": [
+      [
+        "netrender_device",
+        "0.1.2",
+        "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
+      ]
+    ],
+    "resolved_device_manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/netrender_device/Cargo.toml",
+    "device_tree_at_old_revision": "fdc0f0a60bd8ea174e4e2ddb67980aaf4849a21d",
+    "device_tree_at_selected_revision": "fdc0f0a60bd8ea174e4e2ddb67980aaf4849a21d"
+  },
+  "initial_root_source_audit": {
+    "resolved_packages": 1358,
+    "lock_records": 1830,
+    "missing_source_aware_records": [],
+    "netrender_sources": [
+      "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
+    ]
+  },
+  "initial_web_source_audit": {
+    "resolved_packages": 721,
+    "lock_records": 1131,
+    "missing_source_aware_records": [],
+    "netrender_sources": [
+      "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
+    ]
+  },
+  "initial_qualified_source_head": "042843343f069ac546380a9b52d026b684b2b666",
+  "initial_qualification": {
+    "native_default_graphshell_library": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "--lib",
+        "-j4"
+      ],
+      "source_head": "042843343f069ac546380a9b52d026b684b2b666",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "081c7f6d3b880a6d3beebe2d28326d12b3a5e157ef6a72d9f8ae5ad2082789d7",
+      "started": 1793207661.1376488,
+      "exit": 0,
+      "elapsed_seconds": 508.794
+    },
+    "native_viewer": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell-mere",
+        "--bin",
+        "graphshell_mere",
+        "-j4"
+      ],
+      "source_head": "042843343f069ac546380a9b52d026b684b2b666",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "081c7f6d3b880a6d3beebe2d28326d12b3a5e157ef6a72d9f8ae5ad2082789d7",
+      "started": 1793208169.952299,
+      "exit": 0,
+      "elapsed_seconds": 518.942
+    },
+    "full_default_web_product": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--lib",
+        "-j4"
+      ],
+      "source_head": "042843343f069ac546380a9b52d026b684b2b666",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "2a0c47db5e2da9a51906672bc13ff5fb1ca729c547125b1fe5e37329df0d4c27",
+      "started": 1793210118.9523158,
+      "exit": 0,
+      "elapsed_seconds": 912.396
+    },
+    "native_artifact": {
+      "path": "<Code>/output/graphshell-netrender-lock/graphshell_mere",
+      "sha256": "22622022588727fd277bf661205a3f36f6ad40bad55a272d133843fe9492ad63",
+      "size": 225582032
+    },
+    "web_artifact": {
+      "path": "<Code>/output/graphshell-netrender-lock/web-admission-retry/graphshell_web.wasm",
+      "sha256": "5adbb3e948fd0c8ec353f97195e9087cbc34b96fdfea8a2e062e6674724c0e79",
+      "size": 1630503223
+    },
+    "lock_snapshots": {
+      "Cargo.lock": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "ports/graphshell/web/Cargo.lock": "2a0c47db5e2da9a51906672bc13ff5fb1ca729c547125b1fe5e37329df0d4c27"
+    }
+  },
+  "published_target_qualification": {
+    "passed": false,
+    "status": "incomplete: repeated guarded attempts were refused for live compiler-cache reservations before Cargo launched",
+    "builds": {
+      "native": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "--policy",
+          "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "20",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+          "--",
+          "build",
+          "--locked",
+          "--offline",
+          "-p",
+          "graphshell",
+          "-p",
+          "graphshell-mere",
+          "--lib",
+          "--bin",
+          "graphshell_mere",
+          "--message-format",
+          "json-render-diagnostics",
+          "-j4"
+        ],
+        "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+        "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+        "started": 1793215971.990766,
+        "exit": 2,
+        "elapsed_seconds": 190.294
+      },
+      "web": null
+    },
+    "compiled_source_audits": {
+      "native": null,
+      "web": null
+    },
+    "artifacts": {
+      "native": null,
+      "web": null
+    },
+    "last_refusal": "build-storage: Compiler-cache capacity is already reserved by active lanes"
+  },
+  "published_target_source": {
+    "published_fix": "db89839439cf8bac217728123c0c0c49ef559711",
+    "upstream_preserved": "8996e935a",
+    "only_change_from_upstream": "one root netrender_device source revision",
+    "cohorts": [
+      {
+        "consumer": "root",
+        "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+        "netrender_sources": [
+          "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
+        ],
+        "genet_sources": [
+          "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8"
+        ]
+      },
+      {
+        "consumer": "web",
+        "lock_sha256": "1c88bcca27e8b430baabbdcfccdec19e236f320c8b8f22a5a606fabfe5119d49",
+        "netrender_sources": [
+          "git+https://github.com/merely-made/netrender.git?branch=main#11e208b84a981993df8077bb6025f8b3adbe2291"
+        ],
+        "genet_sources": [
+          "git+https://github.com/merely-made/genet.git?branch=main#36526e047f32d3b981f8983a2cab1afe68a9bc08",
+          "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8"
+        ]
+      }
+    ],
+    "static_netrender_git_cohorts_consistent": true,
+    "fresh_published_cohort_compilation": "blocked before Cargo by reserved compiler-cache capacity"
+  },
+  "superseded_web_candidate": {
+    "repair": {
+      "changed_record": [
+        [
+          "cambium",
+          "0.6.0",
+          null
+        ]
+      ],
+      "added_record": [
+        [
+          "genet-events",
+          "0.0.0",
+          "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8"
+        ]
+      ],
+      "added_dependency_edge": "cambium -> genet-events",
+      "all_existing_package_identity_keys_preserved": true,
+      "all_other_package_records_preserved": true,
+      "new_record_copied_from_root_lock": true,
+      "supplier_revisions_unchanged": true
+    },
+    "receiving_note": "The isolated a732a7d4 event record/edge candidate passed a full web build. Upstream 8996e935a subsequently supplied the event edge with a newer web supplier cohort; the candidate web lock was preserved as evidence and not published over upstream."
+  },
+  "rejected_runs": {
+    "initial_web_lock_stale": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "0",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+        "--",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--filter-platform",
+        "wasm32-unknown-unknown"
+      ],
+      "source_head": "042843343f069ac546380a9b52d026b684b2b666",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "081c7f6d3b880a6d3beebe2d28326d12b3a5e157ef6a72d9f8ae5ad2082789d7",
+      "started": 1793208690.803263,
+      "exit": 101,
+      "elapsed_seconds": 367.09
+    },
+    "first_web_admission_timeout": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "--target",
+        "wasm32-unknown-unknown",
+        "--lib",
+        "-j4"
+      ],
+      "source_head": "042843343f069ac546380a9b52d026b684b2b666",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "2a0c47db5e2da9a51906672bc13ff5fb1ca729c547125b1fe5e37329df0d4c27",
+      "started": 1793209504.742465,
+      "exit": 2,
+      "elapsed_seconds": 467.648
+    },
+    "first_combined_native_admission_timeout": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "-p",
+        "graphshell-mere",
+        "--lib",
+        "--bin",
+        "graphshell_mere",
+        "-j4"
+      ],
+      "source_head": "eb8abf63004f4b18ace6873635d2db4e0d3df106",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "2a0c47db5e2da9a51906672bc13ff5fb1ca729c547125b1fe5e37329df0d4c27",
+      "started": 1793211118.860364,
+      "exit": 2,
+      "elapsed_seconds": 486.981
+    },
+    "combined_native_capacity_refusal": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "--policy",
+        "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "-p",
+        "graphshell-mere",
+        "--lib",
+        "--bin",
+        "graphshell_mere",
+        "-j4"
+      ],
+      "source_head": "eb8abf63004f4b18ace6873635d2db4e0d3df106",
+      "root_lock_sha256": "aef135a84fa4bc32d53f9267aa3bbb3149cb2324cc217b81f95e1dc273ef1809",
+      "web_lock_sha256": "2a0c47db5e2da9a51906672bc13ff5fb1ca729c547125b1fe5e37329df0d4c27",
+      "started": 1793211631.034878,
+      "exit": 2,
+      "elapsed_seconds": 738.132
+    },
+    "published_native_capacity_refusal": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "--policy",
+        "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "-p",
+        "graphshell-mere",
+        "--lib",
+        "--bin",
+        "graphshell_mere",
+        "--message-format",
+        "json-render-diagnostics",
+        "-j4"
+      ],
+      "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+      "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+      "started": 1793213234.613151,
+      "exit": 2,
+      "elapsed_seconds": 524.234
+    },
+    "published_after_cleanup_native_capacity_refusal": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "--policy",
+        "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "-p",
+        "graphshell-mere",
+        "--lib",
+        "--bin",
+        "graphshell_mere",
+        "--message-format",
+        "json-render-diagnostics",
+        "-j4"
+      ],
+      "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+      "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+      "started": 1793215108.0932758,
+      "exit": 2,
+      "elapsed_seconds": 375.952
+    },
+    "published_idle_window_capacity_refusal": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "--policy",
+        "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "build",
+        "--locked",
+        "--offline",
+        "-p",
+        "graphshell",
+        "-p",
+        "graphshell-mere",
+        "--lib",
+        "--bin",
+        "graphshell_mere",
+        "--message-format",
+        "json-render-diagnostics",
+        "-j4"
+      ],
+      "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+      "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+      "started": 1793215971.990766,
+      "exit": 2,
+      "elapsed_seconds": 190.294
+    }
+  },
+  "capacity_snapshot_after_refusal": {
+    "observed_utc": "2026-10-28T18:58:11.354964+00:00",
+    "cache_budget_gib": 300,
+    "requested_reserve_gib": 20,
+    "active_lanes": [],
+    "active_reserved_gib": 0,
+    "native_gate_exit": 2,
+    "reason": "build-storage: Compiler-cache capacity is already reserved by active lanes",
+    "note": "The lease sample was collected after the failed gate; an empty list is a later state, not the reservation set at refusal."
+  },
+  "capacity_release_wait": [
+    {
+      "time": 1793214191.88801,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214206.923291,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214221.948695,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214236.99555,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214252.004565,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214267.0151439,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q010",
+          "reserve_gib": 6
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214282.024854,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214297.032608,
+      "active_reservations": [
+        {
+          "lane": "genet-events-host",
+          "reserve_gib": 6.513
+        },
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214312.064403,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214327.1011012,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214342.136534,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214357.148799,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214372.1596951,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214387.1713438,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214402.181262,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214417.210815,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214432.243951,
+      "active_reservations": [
+        {
+          "lane": "mere-l1-q016",
+          "reserve_gib": 1.47
+        }
+      ]
+    },
+    {
+      "time": 1793214447.249185,
+      "active_reservations": []
+    }
+  ],
+  "admission_wait_adjustment": {
+    "changed_field": "admission_wait_seconds",
+    "before": 300,
+    "after": 1800,
+    "all_storage_limits_and_cleanup_rules_unchanged": true,
+    "global_policy_unchanged": true,
+    "original_policy_sha256": "5f78758f55920009e12e2aac1fff04d0fee012eac0eff33f440628aad7f8d9cc",
+    "run_policy_sha256": "5f6f24f24f649a5f5b2b6186320898ad3a90a8918d7254a4a4ef07f30cefe2be"
+  },
+  "run_storage_policy": {
+    "version": 1,
+    "idle_days": 7,
+    "pressure_idle_hours": 24,
+    "cache_budget_gib": 300,
+    "cleanup_below_free_gib": 200,
+    "minimum_free_gib": 100,
+    "default_build_reserve_gib": 20,
+    "light_build_reserve_gib": 6,
+    "minimum_build_reserve_gib": 1,
+    "growth_reserve_margin": 1.5,
+    "admission_wait_seconds": 1800
+  },
+  "limits": [
+    "Development-profile compilation/linking and source identity evidence, not release packaging or deployment.",
+    "No new native UI, browser runtime, physical IME, GPU pixel or human accessibility qualification.",
+    "Initial green builds are bound to their older source/lock snapshot; they do not qualify the newer published dependency cohort unless the published-target section passes."
+  ],
+  "retention": "Complete raw logs, metadata, source/lock snapshots and frozen artifacts are retained in Code/output/graphshell-netrender-lock.",
+  "documentation_audit": {
+    "baseline_counts": {
+      "active_docs": 264,
+      "indexed_active_docs": 242,
+      "index_orphans": 21,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 1,
+      "broken_relative_links": 19,
+      "historical_broken_relative_links": 216,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 58,
+      "ignored_known_root_patterns": 13,
+      "reserved_identifier_paths": 18,
+      "missing_known_root_paths": 203,
+      "historical_missing_known_root_paths": 156,
+      "planned_missing_known_root_paths": 0,
+      "invalid_historical_annotations": 1,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 803,
+      "exhibit_b_sources": 0
+    },
+    "current_counts": {
+      "active_docs": 264,
+      "indexed_active_docs": 242,
+      "index_orphans": 21,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 1,
+      "broken_relative_links": 19,
+      "historical_broken_relative_links": 216,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 58,
+      "ignored_known_root_patterns": 13,
+      "reserved_identifier_paths": 18,
+      "missing_known_root_paths": 203,
+      "historical_missing_known_root_paths": 156,
+      "planned_missing_known_root_paths": 0,
+      "invalid_historical_annotations": 1,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 803,
+      "exhibit_b_sources": 0
+    },
+    "new_findings": {},
+    "method": "Read HEAD versions of only the edited documents through the same auditor with identical checkout paths; no source files replaced."
+  },
+  "raw_log_sha256": {
+    "baseline-metadata.log": "27a7fed99ecdd585a2239885e0c4c9bb1a8d3b28baa56469918af2ca113f4100",
+    "final-storage-audit.log": "c73a2e615b4d3440945d0e21d8baf208b46b1cd34d2bce68424b96f31ff14af9",
+    "final-storage-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "integrated/native-viewer.stderr": "6859a3014bf51bc4dfa003916d4a2c87a38fe71229b5a7ae370adeca0e0a0fa6",
+    "integrated/native-viewer.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "integrated-wait/native-viewer.stderr": "6d53745f84ce98888f66c150adfedc13de1dbf51190f8d433622f46844cdbb39",
+    "integrated-wait/native-viewer.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-graphshell.stderr": "fecf78cc76676a98bf3a0b182808347a880a38be10c80aefa638d2988d9fec58",
+    "native-graphshell.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "native-viewer.stderr": "2f8266914fe6ad8023330f29347699ee1436ea3ca3c47702d7c66178eaa86c25",
+    "native-viewer.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "post-cleanup-storage-audit.log": "00a7453047edac87db1486d955c35b32f06979680e199c95dc185f0314476fc4",
+    "post-cleanup-storage-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "published/native.stderr": "6d53745f84ce98888f66c150adfedc13de1dbf51190f8d433622f46844cdbb39",
+    "published/native.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "published-after-cleanup/native.stderr": "6d53745f84ce98888f66c150adfedc13de1dbf51190f8d433622f46844cdbb39",
+    "published-after-cleanup/native.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "published-capacity-retry/native.stderr": "2250908883c72d49efd6f9e300da4ae3df39794f4e278d7ad2b5151a5aa96d14",
+    "published-capacity-retry/native.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "published-idle-window/native.stderr": "6d53745f84ce98888f66c150adfedc13de1dbf51190f8d433622f46844cdbb39",
+    "published-idle-window/native.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "root-metadata.stderr": "27a7fed99ecdd585a2239885e0c4c9bb1a8d3b28baa56469918af2ca113f4100",
+    "root-metadata.stdout": "232aaad558453ff64c70bc5d5892c279967e6eff685f9503b4a33f71fba329f0",
+    "web-admission-retry/web-product.stderr": "f9fd950aea4a4cfeeaefb24da8b852f9f30b8e828402e8e19947c4d604c58d2f",
+    "web-admission-retry/web-product.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "web-metadata-after-event-edge.stderr": "052ee6b14a462aacedaaedb5bf156548f882d77a9ffdd5859253e4e239c9f6d1",
+    "web-metadata-after-event-edge.stdout": "866b64337ce09f332bae61761dc680489c95717a935d0964dbdb59dd2f74e2a4",
+    "web-metadata.stderr": "bc78b26fde6a02f9d1a0460621167712a4ee556f0524e2e4701fcd2a7186b302",
+    "web-metadata.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "web-product.stderr": "6859a3014bf51bc4dfa003916d4a2c87a38fe71229b5a7ae370adeca0e0a0fa6",
+    "web-product.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "guarded_cleanup_between_attempts": {
+    "started_utc": "2026-10-28T19:15:36.884658+00:00",
+    "apply": true,
+    "pressure": true,
+    "minimum_idle_hours": 24,
+    "before_free_bytes": 263081254912,
+    "removed": [
+      "<Code>/targets/lanes/mere-custody-windows/build/x86_64-pc-windows-gnu/debug/incremental",
+      "<Code>/targets/lanes/mere-custody-windows/build/x86_64-pc-windows-gnu/debug/deps",
+      "<Code>/targets/lanes/mere-custody-windows/build/x86_64-pc-windows-gnu/debug/build",
+      "<Code>/targets/lanes/mere-custody-windows/build/x86_64-pc-windows-gnu/debug/.fingerprint",
+      "<Code>/targets/lanes/mere-misfin-open/build/debug/incremental",
+      "<Code>/targets/lanes/mere-misfin-open/build/debug/deps",
+      "<Code>/targets/lanes/mere-misfin-open/build/debug/build",
+      "<Code>/targets/lanes/mere-misfin-open/build/debug/.fingerprint",
+      "<Code>/targets/lanes/mere-contributes/build/debug/incremental",
+      "<Code>/targets/lanes/mere-contributes/build/debug/deps",
+      "<Code>/targets/lanes/mere-contributes/build/debug/build",
+      "<Code>/targets/lanes/mere-contributes/build/debug/.fingerprint",
+      "<Code>/targets/lanes/mere-misfin-open-comms/build/debug/incremental",
+      "<Code>/targets/lanes/mere-misfin-open-comms/build/debug/deps",
+      "<Code>/targets/lanes/mere-misfin-open-comms/build/debug/build",
+      "<Code>/targets/lanes/mere-misfin-open-comms/build/debug/.fingerprint",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/debug/incremental",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/debug/deps",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/debug/build",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/debug/.fingerprint",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/wasm32-unknown-unknown/debug/incremental",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/wasm32-unknown-unknown/debug/deps",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/wasm32-unknown-unknown/debug/build",
+      "<Code>/targets/lanes/mere-misfin-open-comms-web/build/wasm32-unknown-unknown/debug/.fingerprint"
+    ],
+    "eligible": [
+      {
+        "path": "<Code>/targets/lanes/mere-contributes/build/debug",
+        "bytes": 16451366912,
+        "last_activity": 1793082829.3785331,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-contributes",
+        "idle_hours": 36.684195537765824
+      },
+      {
+        "path": "<Code>/targets/lanes/mere-misfin-open-comms/build/debug",
+        "bytes": 10329088000,
+        "last_activity": 1793125875.808774,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-misfin-open-comms",
+        "idle_hours": 24.73082678390874
+      },
+      {
+        "path": "<Code>/targets/lanes/mere-misfin-open/build/debug",
+        "bytes": 4567777280,
+        "last_activity": 1793080384.501655,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-misfin-open",
+        "idle_hours": 37.367507454686695
+      },
+      {
+        "path": "<Code>/targets/lanes/mere-misfin-open-comms-web/build/debug",
+        "bytes": 1835814912,
+        "last_activity": 1793126123.820318,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-misfin-open-comms-web",
+        "idle_hours": 24.659926221900516
+      },
+      {
+        "path": "<Code>/targets/lanes/mere-misfin-open-comms-web/build/wasm32-unknown-unknown/debug",
+        "bytes": 1015382016,
+        "last_activity": 1793126123.820318,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-misfin-open-comms-web",
+        "idle_hours": 24.659879309402573
+      },
+      {
+        "path": "<Code>/targets/lanes/mere-custody-windows/build/x86_64-pc-windows-gnu/debug",
+        "bytes": 703516672,
+        "last_activity": 1793074171.060559,
+        "blocked": [],
+        "children": [
+          "incremental",
+          "deps",
+          "build",
+          ".fingerprint"
+        ],
+        "lane": "mere-custody-windows",
+        "idle_hours": 39.0921931366788
+      }
+    ],
+    "skipped": [],
+    "errors": [],
+    "active_builds": [],
+    "completed_utc": "2026-10-28T19:16:21.887879+00:00",
+    "after_free_bytes": 294144733184
+  },
+  "capacity_audit_before_cleanup": {
+    "audit_at_utc": "2026-10-28T19:14:04.253972+00:00",
+    "cache_estimate_gib": 296.93,
+    "free_gib": 246.894,
+    "cache_budget_gib": 300,
+    "requested_reserve_gib": 20,
+    "estimate_plus_request_gib": 316.93,
+    "scan_errors": [],
+    "cleanup_started_utc": "2026-10-28T19:15:36.884658+00:00",
+    "age_eligible_profiles": 6,
+    "cleanup_removed": 24
+  },
+  "attempted_policy": "Global limits and cleanup rules unchanged; only this task admission wait increased from 300 to 1800 seconds; every substantive build requested the same 20 GiB reservation.",
+  "source_audit_method_cross_check": {
+    "git_packages_cross_checked": 102,
+    "checkout_roots": 18,
+    "metadata_source_disagreements": [],
+    "method": "Cross-check the per-manifest checkout HEAD reconstruction against Cargo metadata source fields on the known original cohort."
+  },
+  "storage_snapshot_after_guarded_cleanup": {
+    "at_utc": "2026-10-28T19:30:29.702702+00:00",
+    "cache_estimate_gib": 274.498,
+    "free_gib": 268.901,
+    "active_build_processes": 0,
+    "scan_errors": [],
+    "note": "This was a transient idle snapshot before the final attempt; it is not the reservation set when that attempt was refused."
+  }
+}
