@@ -43,9 +43,11 @@ pub enum UnpairOutcome {
 
 /// Record a paired device in a profile's settings.
 ///
-/// This and [`unpair_device`] are the only writers of the settings file. The
-/// resident host reads it and reconciles its live transport against it but
-/// never writes back, so two processes never race to rewrite it.
+/// Three writers share the settings file, from separate processes: this,
+/// [`unpair_device`], and the resident host, which records a fresh dial hint
+/// for a connected device. Each edits through [`OwnerSettings::update`], which
+/// writes only if the file is still what the edit started from; on a conflict
+/// it reloads and reapplies the edit, and after three conflicts it reports one.
 pub fn pair_device(
     app_dir: &Path,
     profile: &ProfileId,
@@ -72,23 +74,26 @@ pub fn pair_device_with_prekey(
     prekey: Option<String>,
 ) -> Result<PairOutcome, DeviceSyncError> {
     let path = owner_settings::settings_path(app_dir, profile);
-    let mut settings = OwnerSettings::load(&path)?;
-    let sync = settings.sync.get_or_insert_with(SyncSettings::default);
-    // Refuse to record a peer for a graph that does not exist: the pairing
-    // would look accepted and then never join anything.
-    if sync.graph.trim().is_empty() {
-        return Err(DeviceSyncError::NoGraphConfigured {
-            profile: profile.0.clone(),
-            path: path.display().to_string(),
-        });
-    }
-    if !sync.pair_with_prekey(node_id, root, label, at_ms, prekey) {
-        return Ok(PairOutcome::AlreadyPaired);
-    }
-    settings.save(&path)?;
-    Ok(PairOutcome::Added {
-        path,
-        receive_only: root.is_none(),
+    OwnerSettings::update(&path, |settings| {
+        let sync = settings.sync.get_or_insert_with(SyncSettings::default);
+        // Refuse to record a peer for a graph that does not exist: the pairing
+        // would look accepted and then never join anything.
+        if sync.graph.trim().is_empty() {
+            return Err(DeviceSyncError::NoGraphConfigured {
+                profile: profile.0.clone(),
+                path: path.display().to_string(),
+            });
+        }
+        Ok(
+            if sync.pair_with_prekey(node_id, root, label, at_ms, prekey.clone()) {
+                PairOutcome::Added {
+                    path: path.clone(),
+                    receive_only: root.is_none(),
+                }
+            } else {
+                PairOutcome::AlreadyPaired
+            },
+        )
     })
 }
 
@@ -102,15 +107,16 @@ pub fn unpair_device(
     node_id: [u8; 32],
 ) -> Result<UnpairOutcome, DeviceSyncError> {
     let path = owner_settings::settings_path(app_dir, profile);
-    let mut settings = OwnerSettings::load(&path)?;
-    let Some(sync) = settings.sync.as_mut() else {
-        return Ok(UnpairOutcome::NotPaired);
-    };
-    if !sync.unpair(node_id) {
-        return Ok(UnpairOutcome::NotPaired);
-    }
-    settings.save(&path)?;
-    Ok(UnpairOutcome::Removed { path })
+    OwnerSettings::update(&path, |settings| {
+        let Some(sync) = settings.sync.as_mut() else {
+            return Ok(UnpairOutcome::NotPaired);
+        };
+        Ok(if sync.unpair(node_id) {
+            UnpairOutcome::Removed { path: path.clone() }
+        } else {
+            UnpairOutcome::NotPaired
+        })
+    })
 }
 
 /// What the other device needs in order to pair with this one.
@@ -420,5 +426,62 @@ mod tests {
         let again = OwnerSettings::load(&path).unwrap().sync.unwrap();
         assert_eq!(again.paired_devices.len(), 1);
         assert_eq!(again.paired_devices[0].added_ms, 3);
+    }
+
+    #[test]
+    fn a_dial_hint_and_a_pair_from_separate_loads_both_reach_the_file() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = configured(directory.path());
+        pair_device(
+            directory.path(),
+            &profile(),
+            [0x31; 32],
+            Some([0xa1; 32]),
+            "qpc",
+            1,
+        )
+        .unwrap();
+        let mut attempts = 0;
+
+        // The resident's edit has loaded the file when a management verb pairs
+        // a second device, so its first commit is stale.
+        OwnerSettings::update(
+            &path,
+            |settings| -> Result<(), owner_settings::OwnerSettingsError> {
+                attempts += 1;
+                if attempts == 1 {
+                    pair_device(
+                        directory.path(),
+                        &profile(),
+                        [0x32; 32],
+                        Some([0xa2; 32]),
+                        "thinkpad",
+                        2,
+                    )
+                    .unwrap();
+                }
+                let sync = settings.sync.as_mut().unwrap();
+                assert!(sync.record_endpoint(&[0x31; 32], "ticket-for-qpc"));
+                Ok(())
+            },
+        )
+        .unwrap();
+
+        assert_eq!(attempts, 2, "the stale commit is refused and reapplied");
+        let stored = OwnerSettings::load(&path).unwrap().sync.unwrap();
+        let labels: Vec<_> = stored
+            .paired_devices
+            .iter()
+            .map(|device| device.label.as_str())
+            .collect();
+        assert_eq!(
+            labels,
+            ["qpc", "thinkpad"],
+            "the hint must not undo the pair"
+        );
+        assert_eq!(
+            stored.paired_devices[0].last_endpoint.as_deref(),
+            Some("ticket-for-qpc")
+        );
     }
 }

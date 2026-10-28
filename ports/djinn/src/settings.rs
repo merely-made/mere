@@ -33,6 +33,10 @@ use pandect::write_bytes_with_backup;
 use personae::ProfileId;
 use serde::{Deserialize, Serialize};
 
+mod commit;
+
+pub use commit::LoadedSettings;
+
 /// Djinn's own application directory.
 ///
 /// Mirrors the platform choice personae makes for its vault, but deliberately
@@ -99,6 +103,11 @@ pub(crate) fn sanitize_profile(profile: &str) -> String {
 pub enum OwnerSettingsError {
     #[error("owner settings at {path}: {message}")]
     File { path: String, message: String },
+    #[error(
+        "owner settings at {path} changed since they were loaded; \
+         reload them and reapply the edit"
+    )]
+    Conflict { path: String },
     #[error("owner settings: {value:?} is not a 64-character hex key")]
     NotHex { value: String },
     #[error("both {legacy} and {current} exist; refusing to guess which personal graph is current")]
@@ -679,36 +688,33 @@ impl OwnerSettings {
     /// an error, because silently falling back to defaults would quietly turn
     /// lanes off or drop paired devices.
     pub fn load(path: &Path) -> Result<Self, OwnerSettingsError> {
-        let text = match std::fs::read_to_string(path) {
-            Ok(text) => text,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(Self::default());
-            },
-            Err(error) => {
-                return Err(OwnerSettingsError::File {
-                    path: path.display().to_string(),
-                    message: error.to_string(),
-                });
-            },
-        };
-        serde_json::from_str(&text).map_err(|error| OwnerSettingsError::File {
-            path: path.display().to_string(),
-            message: error.to_string(),
-        })
+        Self::load_for_commit(path).map(|loaded| loaded.settings)
     }
 
     /// Write settings through the shared recoverable replacement path. A
     /// mid-write failure leaves the previous file intact; interruption during
     /// its two-rename fallback can leave the old file in `.previous`.
+    ///
+    /// This does not notice a write made since the settings were loaded. A
+    /// caller that edits a file other processes also write uses
+    /// [`OwnerSettings::update`] instead.
     pub fn save(&self, path: &Path) -> Result<(), OwnerSettingsError> {
-        let fail = |message: String| OwnerSettingsError::File {
+        let document = self.document(path)?;
+        write_bytes_with_backup(path, &document).map_err(|error| OwnerSettingsError::File {
             path: path.display().to_string(),
-            message,
-        };
+            message: error.to_string(),
+        })
+    }
+
+    /// The bytes `save` and `commit` write.
+    fn document(&self, path: &Path) -> Result<Vec<u8>, OwnerSettingsError> {
         let mut text =
-            serde_json::to_string_pretty(self).map_err(|error| fail(error.to_string()))?;
+            serde_json::to_string_pretty(self).map_err(|error| OwnerSettingsError::File {
+                path: path.display().to_string(),
+                message: error.to_string(),
+            })?;
         text.push('\n');
-        write_bytes_with_backup(path, text.as_bytes()).map_err(|error| fail(error.to_string()))
+        Ok(text.into_bytes())
     }
 }
 
