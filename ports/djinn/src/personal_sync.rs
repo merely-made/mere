@@ -933,27 +933,24 @@ async fn refresh_dial_hint(
     if stored == Some(ticket.as_str()) {
         return;
     }
-    // Load-modify-save through the same atomic path every other settings write
-    // uses, so a concurrent pair or unpair edit is not clobbered by this
-    // refresh.
-    let mut latest = match OwnerSettings::load(settings_file) {
-        Ok(latest) => latest,
-        Err(error) => {
-            tracing::warn!(%error, "could not reload settings to refresh a hint");
-            return;
-        },
-    };
-    let Some(live) = latest.sync.as_mut() else {
-        return;
-    };
-    if !live.record_endpoint(&node, &ticket) {
-        return;
-    }
-    match latest.save(settings_file) {
-        Ok(()) => {
+    // The resident is one of three writers of this file, with pair and unpair,
+    // and they run in separate processes. `update` commits only if the file is
+    // still what it loaded and otherwise reloads and reapplies the hint, so a
+    // device paired or unpaired meanwhile is kept rather than overwritten.
+    let recorded = OwnerSettings::update(settings_file, |latest| {
+        Ok::<_, OwnerSettingsError>(
+            latest
+                .sync
+                .as_mut()
+                .is_some_and(|live| live.record_endpoint(&node, &ticket)),
+        )
+    });
+    match recorded {
+        Ok(true) => {
             tracing::info!(node = %node_hex, "recorded a fresh dial hint for a connected device")
         },
-        Err(error) => tracing::warn!(%error, "could not persist a refreshed dial hint"),
+        Ok(false) => {},
+        Err(error) => tracing::warn!(%error, "could not record a refreshed dial hint"),
     }
 }
 
