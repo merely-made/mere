@@ -528,6 +528,144 @@ findings that waited on them (§5.2). Each entry lists what is copied today, wit
   freshness comes from the carrier's link or the client; the test admits one hello twice on one
   link and once on a fresh link; no replay state.
 
+### Open forks from L1's remainder, 2026-10-28 (the second owner round)
+
+The rest of the lane in seven file sets, read against main `042843343`: the §3 cues that point at
+L1, the kernel's address and write-boundary entries, and the pictograph and web findings whose
+repair needs an owner choice (the rest of those two crates' findings sit with L2, L5 and L6, listed
+in the receipt). Each entry names what is copied today and the single owner the lane proposes;
+Mark's answer follows each.
+
+- **Q253, a Forme save that compares nothing.** The audit's `PreparedSave::save` is gone; the
+  blind write moved to the host: `web_tree/forme.rs:112-115` puts the bytes with `backend.put`
+  and the session never holds the bytes it loaded (`forme.rs:40-44`, `:323-325`). The rules editor
+  refuses a stale write inside `backend.transact` by comparing the held bytes with what it loaded
+  (`presentation_store.rs:150-157`), and `block_editing/store.rs:67-116` is a third copy of the
+  same compare. Every guard Forme has is in-process (request token, busy, write fence, load gate),
+  and `forme_session_lifecycle_tests.rs:735` asserts the old proposal's blind put as fine. One
+  owner: one compare-and-replace over a slot, on muniment's `Backend::transact`, used by the rules
+  store, the block store and Forme's pane, which keeps its loaded baseline and keeps the draft on a
+  conflict as `finish_save(Err)` already does.
+- **Q214, three writers of one settings file.** `pairing.rs:75-88` (pair), `:105-112` (unpair)
+  and `personal_sync.rs:939-952` (the resident's dial hint) each load, modify and save
+  `OwnerSettings` with no revision check or lock between; `pairing.rs:46-48` still says pair and
+  unpair are the only writers and two processes never race. `OwnerSettings::save` funnels into
+  `write_bytes_with_backup`, an atomic replace that protects no earlier read. The muniment
+  directory lock is single-owner and long-lived, which is why management verbs avoid it. One
+  owner: `OwnerSettings` gains one load-modify-commit that writes only if the file still holds the
+  bytes it loaded, under a short advisory lock around the compare and the rename, refusing a
+  conflict so the caller reloads and reapplies; all three writers use it, the claim is corrected.
+- **Q061, a refused second request overwrites the first.** `SessionCore::begin` (`core.rs:726`)
+  sets `pending` unconditionally; `SessionDriver::discover` (`driver.rs:126-134`) calls
+  `rediscover` before `send` checks `inflight` (`:217-222`), so the refused second start leaves
+  the core expecting a descriptor and the original Closed answer is then refused. `submit_command`
+  alone guards with `is_awaiting` (`core.rs:413`); the other nine starters and `core_mut` do not.
+  The test at `driver.rs:394` asserts only the refusal, never the original's answer. One owner:
+  `begin` refuses while an operation is pending and every starter returns that refusal, so the
+  driver's inflight and the core's pending cannot disagree; the internal follow-ups keep taking
+  the pending first.
+- **Q240 with A550 and A551, a rejected capture leaves graph edits pending.** `capture.rs:685`
+  and `:740` edit the host through `edit_now` before anything is stored, and on a staging or
+  commit failure `:793-803` restore only `self.memory`; the ledger put, access manifests and trace
+  writes in the batch are dropped while the graph edits stay pending in `MereHost` and the next
+  `stage` or `persist` writes them without their records (`forget_url` has the same shape,
+  `:824-884`). The control, `transact_change` (`graph_session_transaction.rs:143-280`), builds a
+  detached candidate, commits in one `backend.transact` with rechecks and installs on success, but
+  it is crate-private, takes no extra write ops or keys, rechecks only the session's own keys and
+  refuses while edits are unstored. One owner: a transaction entry the host can reach that takes
+  the capture's graph change as deltas on the candidate plus its ledger, manifest and trace ops
+  and the keys they depend on, commits once and installs; capture edits nothing live before that
+  and restores its in-memory browsing memory on refusal as today.
+- **A004, the flush path rechecks nothing.** With the kernel store (Q017) and the file saves
+  (2026-10-28) gone, `GraphSession` writes by `flush` (`graph_session.rs:1581-1599`, plain puts of
+  journal and change entries at `[saved, len)`), by the compare-and-set `transact_change`, and by
+  checkpoint; the archive codicil saves and the addressable publication stand beside it. Two
+  handles opened at one `saved` that both edit and flush overwrite each other's entries, last
+  writer wins; the compare-and-set path refuses the same case ("Session changed before commit").
+  No test exercises two flushing handles. One owner: `flush` commits under the same rechecks as
+  `transact_change` (log lengths and tails), on a backend that transacts, so a stale handle is
+  refused rather than overwriting.
+- **Q257 with A067, a save acknowledgement that names nothing.** The projection's save keeps one
+  Boolean (`web_tree/product/projection.rs:102`, set at `:677`); the host's generic completion
+  (`product.rs:1384-1388`) then calls `saved()` (`projection.rs:371-382`), which marks whatever
+  editor is current clean. `load_projection_input` (`:385-426`) replaces the editor on a dataset
+  change from the frame hook (`web_tree.rs:2014-2030`) without touching the pending flag, so a
+  replacement draft is marked clean by the old save. Link visibility already binds its
+  acknowledgement to an identity (`product.rs:1257-1308`). A067: chirograph's doc still calls the
+  wire acknowledgement "the last revision a client has durably applied" (`chirograph/src/lib.rs:578`)
+  while it carries in-memory scene progress. One owner: the pending save records what it sent (the
+  dataset identity and editor generation) and completion marks clean only that; a replacement
+  during a save stays dirty; the chirograph doc says applied in memory.
+- **Q243 and Q244, the extension's capture storage has two rules.** `background.js:212-225`
+  (configure) and `:291-294` (permission removed) write the queue, visit map and policy outside
+  `serializedQueueMutation` (`:64`), which the queue and ack writers use, so a configure can drop a
+  concurrently queued visit. `capture-model.js:207-211` refuses a conflicting visit on url, time,
+  transition and parent, while the ledger's `same_source_facts` (eidetic
+  `import/encounters.rs:68-85`) also compares `original_unix_micros` and `source_is_local`, and
+  a thrown conflict aborts the whole batch. One owner: every capture-storage write goes through
+  the one lock, and the queue's conflict rule is the ledger's, checked by a fixture generated from
+  the Rust rule, refusing the one visit rather than the batch.
+- **The capture acknowledgement has no sender.** `extension-profile.js:246` listens for
+  `graphshell-capture-complete` and the extension README says the host acknowledges visits after
+  the batch persists, but nothing dispatches it since `93ce49c82` removed `publish_capture_receipt`;
+  the queue is never acked and every redelivery is absorbed by the ledger's duplicate drops
+  (`capture.rs:677-679`). Either the host dispatches the acknowledgement after `staged()` and the
+  queue drains; or the listener and the claim go and redelivery is the documented contract.
+- **Q247, the local-file exclusion strips a facet and keeps the address.** Export's
+  `filtered_facets` (`product.rs:1042`) drops the local-file facet when the box is unchecked, and
+  `transfer.rs:345` forces it off, but `filtered_snapshot` keeps the node's `file:` address in
+  both address fields and the access-history facet keeps `address` and `referring_address`; every
+  test uses an `ni:` address, so none exports a `file:` one. One owner: the exclusion is decided
+  by the typed address (`Address::File`), applied to the node's addresses, the legacy url field and
+  the access-history records alike, with a test that exports a `file:` address.
+- **A011, the address and the history cursor can disagree.** Primary is written by
+  `update_node_url` from `SetNodeUrl` (`apply.rs:756`), from `navigate_node` after the Stemma
+  visit (`mod.rs:788-802`) and from a history step (`land_history_step`, `mod.rs:840-843`); load
+  keeps primary since Q013. `NavigateNode{A}` then `SetNodeUrl{B}` leaves primary B and cursor A,
+  and the next step re-imposes the cursor's page on primary, discarding the set address;
+  `node_current_url` (`mod.rs:860`) reads the cursor and its one caller checks only existence. No
+  test asserts the two agree. One owner: the primary address is the node's address and the Stemma
+  cursor is history, said in the kernel's docs; `node_current_url` goes, and a history step lands
+  on primary as it does, which is the one place history writes the address.
+- **A028, what counts as the write path.** The kernel comment names the public assertion and
+  declaration writers (`mod.rs:580-606`); `GraphSession::edit_now`'s doc still says every mutation
+  goes through `apply_graph_delta`, "the kernel's one write path" (`graph_session.rs:1333-1336`).
+  In fact `edit_as` captures any writer's emitted deltas under a recorder, replays them onto a
+  fresh clone and refuses a candidate that differs (`:1346-1399`), so the session's
+  capture-and-replay check is the boundary and `GraphDelta` is one of its writers; the
+  compare-and-set wrappers accept deltas only and the generic `transact_change` is crate-private,
+  so djinn converts direct writes to deltas first (`knot_relation_intake.rs:295-343`). One owner:
+  the docs name the capture-and-replay check as the boundary, and `transact_change` opens to hosts
+  so a direct write transacts under the same check.
+- **Q100 and Q101 with Q091, who reads a node's neighbours and statements.** Pair Unrelate
+  (`selection.rs:333-344`) takes the first Surface arc from `find_edge_key` and its sub-kinds, so
+  on a Resource-stratum relation (Cites, Hyperlink, everything but UserGrouped) it removes nothing
+  and reports 0, while the kernel's `retract_relations` already withdraws across both strata
+  (`edge_ops.rs:775-877`). `isolate_selection` (`view.rs:155-160`) and degree sizing
+  (`cartography.rs:466, 591`) read the Surface-only `neighbors_undirected`; the canvas holds six
+  neighbour readers with different hide and self-loop rules (`signals.rs:69`, `producers.rs:24`,
+  `fold_projection.rs:205`, `seiche_bridge.rs:53`). One owner: the kernel enumerates, both strata,
+  through one neighbour reader the canvas readers adopt (hides applied by the visible-row reader
+  only), and Unrelate asks the kernel's `retract_relations` for the pair.
+- **Q100, whose statements a canvas gesture may withdraw.** The kernel's
+  `withdraw_semantic_assertion(id, None, None)` checks no ownership; graphshell's
+  `promoted_links::can_withdraw` (`promoted_links.rs:300-340`) requires the current persona as
+  asserter, user scope and no method. Either the gesture withdraws only what the host's rule
+  allows, asking the host; or the canvas withdraws any statement on the pair.
+- **Q209, two admission computations for suggested links.** `refresh_link_suggestions` takes a
+  mint budget from counts of its own before minting (`link_suggestions.rs:137-145`) and
+  `admit_suggestions` recomputes admission afterwards from a different candidate set
+  (`suggestions.rs:59-71`); the source gate applies to the links source only. One owner: one
+  admitted set, computed once after source filtering, from which minting and attention both read.
+- **Q210, which page is a kept link's origin.** The first eligible page per URL wins
+  (`link_suggestions.rs:149-162`), the origin is written once into the derived tuple (`:200`) and
+  never updated, and the graph relation page to member is a Hyperlink the host later writes
+  durably from that tuple; a withdrawn page stays the origin of a shared URL and `create_link`
+  mints an unlinked address when it is gone. Member identity comes from three sources (the FNV
+  `link_member`, the kernel's insert-if-missing, the host's held-by-URL or fresh id). One owner:
+  the graph relation holds the origin and the kept link reads it at keep time; the offers list
+  only dedupes.
+
 ## 6. Findings
 
 - 2026-10-20: the boundary counts above are keyword groupings over the sealed registers; they

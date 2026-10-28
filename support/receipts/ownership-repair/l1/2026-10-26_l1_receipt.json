@@ -7,6 +7,7 @@
     "Q009",
     "Q010",
     "Q012",
+    "Q014",
     "Q015",
     "Q016",
     "Q017",
@@ -221,6 +222,14 @@
       "change": "graphshell-host lifecycle.rs",
       "regression": "a_reconnect_is_a_new_session_when_the_link_or_the_nonce_is_fresh (one hello twice on one link: same id; a fresh link or nonce: a different id)",
       "commit": "973a34490"
+    },
+    {
+      "id": "Q014 (2026-10-28)",
+      "ruling": "plan \u00a73: re-document only",
+      "owner": "live containment derivation writes Resource relations and the load-time rebuild adds Surface compatibility rows by design (family_assertions.rs requires both); query.rs no longer claims derived relations are never persisted; the register's own status is 'documentation corrected; compatibility behavior deliberately retained'",
+      "change": "none; status closed as re-documented",
+      "regression": "existing live_and_loaded_containment_use_different_stores_and_both_get_persisted pins the two stores",
+      "note": "the Resource and Surface derivations still disagree in content; resolving that is the L1 question for A014-class entries if one is opened, not this finding"
     }
   ],
   "kernel_suite_after": {
@@ -235,13 +244,7 @@
     "Q031",
     "Q016 edge replays"
   ],
-  "unrepaired_so_far": [
-    "Q014 (re-document only)",
-    "Q001",
-    "Q002",
-    "Q003",
-    "Q019 (chartulary, repos/eidetic)"
-  ],
+  "unrepaired_so_far": [],
   "merges": [
     "0b6fa7f9a (l1-q009)",
     "22ae6792d (l1-q012-q015)",
@@ -289,5 +292,6 @@
     "pictograph_lib": 654,
     "alembic_recall": 8,
     "checks": "djinn, cambium, mere-overmap, rdf, forme, cartography, athanor, mere"
-  }
+  },
+  "chartulary_findings": "Q001, Q002, Q003 and Q019 are repaired on eidetic main; see 2026-10-26_l1_chartulary_receipt.json"
 }
