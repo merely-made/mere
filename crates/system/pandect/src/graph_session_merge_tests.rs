@@ -1138,6 +1138,77 @@ fn a_picked_node_the_target_deleted_can_be_added_as_new() {
     });
 }
 
+/// The parent, a part picked off node 1, and the part's copy of node 1.
+async fn picked_one(
+    mere: &MereSessions<MemoryBackend>,
+) -> (
+    GraphSession<MemoryBackend>,
+    GraphSession<MemoryBackend>,
+    Uuid,
+) {
+    let target = parent(mere).await;
+    let container = *target.manifest().root_graph_id.as_uuid();
+    let part = mere.fork_component(&target, id(1), person()).await.unwrap();
+    let part = mere.open(part.session_id).await.unwrap();
+    let copy = copy_of(part.graph(), id(1), container);
+    (target, part, copy)
+}
+
+async fn merge_clean(
+    mere: &MereSessions<MemoryBackend>,
+    target: &mut GraphSession<MemoryBackend>,
+    part: &mut GraphSession<MemoryBackend>,
+) {
+    let plan = mere.merge_in(target, part).await.unwrap();
+    assert!(plan.is_clean(), "{:?}", plan.conflicts());
+    mere.apply_merge(target, part, plan, &BTreeMap::new(), person())
+        .await
+        .unwrap();
+}
+
+#[test]
+fn merging_a_pick_keeps_a_title_that_equals_a_node_id() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let (mut target, mut part, copy) = picked_one(&mere).await;
+        // Text that reads as the id the merge maps the copy to its original from.
+        let text = copy.to_string();
+        part.apply(other(), vec![retitle(copy, &text)])
+            .await
+            .unwrap();
+
+        merge_clean(&mere, &mut target, &mut part).await;
+
+        assert_eq!(title(target.graph(), id(1)).as_deref(), Some(text.as_str()));
+        assert_eq!(title(part.graph(), copy).as_deref(), Some(text.as_str()));
+    });
+}
+
+#[test]
+fn a_facet_value_naming_an_id_is_carried_verbatim_through_a_pick_merge() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let (mut target, mut part, copy) = picked_one(&mere).await;
+        let facet = FacetId::new("extension.note");
+        let value = serde_json::json!({ "about": copy.to_string() });
+        part.apply(
+            other(),
+            vec![CapturedDelta::ReplaySetNodeFacetById {
+                node_id: copy.to_string(),
+                facet: facet.as_str().to_string(),
+                value_json: value.to_string(),
+            }],
+        )
+        .await
+        .unwrap();
+
+        merge_clean(&mere, &mut target, &mut part).await;
+
+        assert_eq!(target.graph().facets().get(&id(1), &facet), Some(&value));
+        assert_eq!(part.graph().facets().get(&copy, &facet), Some(&value));
+    });
+}
+
 fn properties_record(iri: &str, facets: &[(&str, Value)]) -> CapturedDelta {
     CapturedDelta::ReplaySetResourceRecordById {
         resource_id: chartulary::resource_id(iri).to_string(),
