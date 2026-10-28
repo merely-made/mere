@@ -56,7 +56,7 @@ use mere_overmap::wire::{
     RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
     SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
 };
-use muniment::{DirectoryBackend, RedbBackend};
+use muniment::{DirectoryBackend, JsonSlots, RedbBackend};
 use pandect::{
     Author, GraphSessionManifest, MereApplicationAccess, MereId, MereRecord, MereSessions,
     SessionId, open_mere_archive_backend, open_mere_backend,
@@ -67,7 +67,7 @@ use sceno::{
     SourceRef, Transform2,
 };
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, OnceCell};
 
 /// How often a granted client polls a mere's route for bells.
 pub const MERE_NOTICE_POLL: Duration = Duration::from_millis(50);
@@ -110,6 +110,9 @@ struct Routes {
     coop_relays: Vec<transport::p2panda_transport::RelayUrl>,
     shared_root: PathBuf,
     persona: PersonaId,
+    /// This process's launch of `persona`, counted when the first mere is
+    /// served and installed on every host the routes open.
+    launch: OnceCell<u64>,
     catalog: WeakAppEndpointCatalog,
     grants: AppRouteGrants,
     apps: Vec<AppId>,
@@ -174,6 +177,7 @@ impl MereRoutes {
                 coop_relays: Vec::new(),
                 shared_root,
                 persona,
+                launch: OnceCell::new(),
                 catalog: catalog.downgrade(),
                 grants,
                 apps,
@@ -325,6 +329,19 @@ impl MereRoutes {
         self
     }
 
+    /// The persona's launch number for this process: counted in the
+    /// persona's settings once, on first use, and held for every mere served.
+    async fn launch(&self) -> Result<u64, String> {
+        let launch = self.inner.launch.get_or_try_init(|| async {
+            let root = DirectoryBackend::open(&self.inner.shared_root)
+                .map_err(|error| error.to_string())?;
+            pandect::record_launch(&JsonSlots::new(root), self.inner.persona)
+                .await
+                .map_err(|error| error.to_string())
+        });
+        launch.await.copied()
+    }
+
     /// Serve `mere` on `mere/<domain>`: open its store, register its route and
     /// grant it, unless it is served already.
     pub async fn serve(&self, mere: &MereRecord) -> Result<ResidentEndpointRoute, String> {
@@ -357,6 +374,7 @@ impl MereRoutes {
         if served.contains_key(&domain) {
             return Ok(route);
         }
+        let launch = self.launch().await?;
         let backend = open_mere_backend(&self.inner.shared_root, self.inner.persona, mere.id)
             .map_err(|error| error.to_string())?;
         let shared = Arc::new(MereShared {
@@ -385,6 +403,7 @@ impl MereRoutes {
             .map_err(|e| e.to_string())?,
             backend,
             persona: self.inner.persona,
+            launch,
             hosts: Mutex::new(HashMap::new()),
             coop: Default::default(),
             lifecycle: AtomicU64::new(1),
@@ -693,6 +712,8 @@ struct MereShared {
     backend: DirectoryBackend,
     archive: RedbBackend,
     persona: PersonaId,
+    /// The launch every host of this mere stamps on the nodes it navigates.
+    launch: u64,
     hosts: Mutex<HashMap<SessionId, SharedHost>>,
     coop: coop::Activities,
     /// The sessions projection's revision: it moves with every lifecycle step.
@@ -780,6 +801,7 @@ impl MereShared {
         .await
         .map_err(|error| error.to_string())?
         .with_projection_session(ProjectionSession(MERE_GRAPH.to_string()))
+        .with_launch(self.launch)
         .with_session_item();
         let host = match &self.admission_validator {
             Some(validator) => host.with_graph_admission_validator(validator.clone()),
