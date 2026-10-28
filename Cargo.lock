@@ -10411,7 +10411,6 @@ dependencies = [
  "blake3",
  "esp",
  "insigne",
- "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
  "muniment",
