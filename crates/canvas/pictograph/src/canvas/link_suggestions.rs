@@ -6,8 +6,8 @@
 
 //! Suggestions from the links a page carries that the graph does not yet hold
 //! (graph grammar, *Suggestions and derived content*). Each admitted link is a
-//! **derived member**: a session-only node, linked from its page, that the
-//! host never persists. Selecting one keeps it: it stops being
+//! **derived member**: a session-only node, linked from every page that offers
+//! it, that the host never persists. Selecting one keeps it: it stops being
 //! offered and the host takes it through [`Canvas::take_kept_links`] to write
 //! it as the person's own. Which links are minted is the canvas's one admitted
 //! set (`suggestions.rs`), so turning suggestions off removes them. A host that
@@ -20,6 +20,7 @@ use kernel::graph::NodeKey;
 
 use euclid::default::Point2D;
 use kernel::graph::apply::{self as graph_apply, GraphDelta, apply_graph_delta};
+use kernel::graph::{RelationSelector, SemanticSubKind};
 
 use super::Canvas;
 use super::build::hyperlink;
@@ -35,12 +36,14 @@ pub struct KeptLink {
     /// The canvas's derived member, replaced once the host's write lands.
     pub member: uuid::Uuid,
     pub url: String,
-    /// The page the link was found on.
-    pub origin: uuid::Uuid,
+    /// A page that still held the link when it was kept (the least id when
+    /// several did); `None` when no page did.
+    pub origin: Option<uuid::Uuid>,
 }
 
 /// A link on offer: its member id and the live pages that offer it, in the
-/// order they offered. The first page is where the member is minted.
+/// order they offered. Pages only dedupe the member; the graph relation from
+/// each page is what says where a link was found.
 pub(crate) struct LinkOffer {
     pub(crate) member: uuid::Uuid,
     url: String,
@@ -49,8 +52,6 @@ pub(crate) struct LinkOffer {
 
 #[derive(Clone, Debug)]
 struct Derived {
-    /// The page the link was found on.
-    origin: uuid::Uuid,
     url: String,
     kept: bool,
 }
@@ -206,19 +207,24 @@ impl Canvas {
         }
         let mut seeds = Vec::new();
         for offer in offers {
-            let Some(first) = offer
+            let pages: Vec<NodeKey> = offer
                 .pages
                 .iter()
-                .find_map(|page| self.graph.get_node_key_by_id(*page))
-            else {
+                .filter_map(|page| self.graph.get_node_key_by_id(*page))
+                .collect();
+            let Some(first) = pages.first().copied() else {
                 continue;
             };
-            if self.grammar.links.is_derived(offer.member) {
-                continue;
-            }
-            let (key, at) = self.mint_link(offer, first);
-            seeds.push((key, at));
-            changed = true;
+            let key = match self.graph.get_node_key_by_id(offer.member) {
+                Some(key) if self.grammar.links.is_derived(offer.member) => key,
+                _ => {
+                    let (key, at) = self.mint_link(offer, first);
+                    seeds.push((key, at));
+                    changed = true;
+                    key
+                },
+            };
+            changed |= self.sync_link_relations(key, &pages);
         }
         if changed {
             self.reconcile_derived();
@@ -243,14 +249,57 @@ impl Canvas {
             offer.url.clone(),
             PortablePoint::new(at.x, at.y),
         );
-        let _ = graph_apply::assert_relation(&mut self.graph, first, key, hyperlink());
         let derived = Derived {
-            origin: offer.pages[0],
             url: offer.url.clone(),
             kept: false,
         };
         self.grammar.links.derived.insert(offer.member, derived);
         (key, Point2D::new(at.x, at.y))
+    }
+
+    /// Hold a hyperlink from each of `pages` to `member` and withdraw the ones
+    /// from pages that offered links before but no longer offer this one.
+    /// Returns whether the graph changed.
+    fn sync_link_relations(&mut self, member: NodeKey, pages: &[NodeKey]) -> bool {
+        let mut holders = self.link_holders(member);
+        let mut changed = false;
+        for page in pages {
+            if !holders.contains(page) {
+                changed |=
+                    graph_apply::assert_relation(&mut self.graph, *page, member, hyperlink())
+                        .is_some();
+            }
+        }
+        holders.retain(|holder| !pages.contains(holder));
+        for holder in holders {
+            let offered = self
+                .graph
+                .get_node(holder)
+                .is_some_and(|node| self.grammar.links.pages.contains(&node.id));
+            if offered {
+                let selector = RelationSelector::Semantic(SemanticSubKind::Hyperlink);
+                let _ = apply_graph_delta(
+                    &mut self.graph,
+                    GraphDelta::RetractRelations {
+                        from: holder,
+                        to: member,
+                        selector,
+                    },
+                );
+                changed = true;
+            }
+        }
+        changed
+    }
+
+    /// The nodes holding a hyperlink to `member`, whichever stratum holds it.
+    fn link_holders(&self, member: NodeKey) -> Vec<NodeKey> {
+        let hyperlink = RelationSelector::Semantic(SemanticSubKind::Hyperlink);
+        self.graph
+            .projected_incoming_relations(member)
+            .filter(|(_, _, payload)| payload.has_relation(hyperlink))
+            .map(|(from, _, _)| from)
+            .collect()
     }
 
     /// Per frame: keep a selected derived member, and mint again after a host
@@ -262,14 +311,14 @@ impl Canvas {
             let Some(id) = self.graph.get_node(key).map(|node| node.id) else {
                 continue;
             };
-            let Some(derived) = self.grammar.links.derived.get_mut(&id) else {
-                continue;
+            let url = match self.grammar.links.derived.get(&id) {
+                Some(derived) if !derived.kept => derived.url.clone(),
+                _ => continue,
             };
-            if derived.kept {
-                continue;
+            let origin = self.link_origin(key);
+            if let Some(derived) = self.grammar.links.derived.get_mut(&id) {
+                derived.kept = true;
             }
-            derived.kept = true;
-            let (origin, url) = (derived.origin, derived.url.clone());
             self.grammar.links.offers.retain(|(_, u)| *u != url);
             self.grammar.links.kept.push(KeptLink {
                 member: id,
@@ -288,5 +337,14 @@ impl Canvas {
         if kept_any || lost {
             self.admit_suggestions();
         }
+    }
+
+    /// The page `member` was found on, read from the graph at keep time: the
+    /// least id among the pages still holding a hyperlink to it.
+    fn link_origin(&self, member: NodeKey) -> Option<uuid::Uuid> {
+        self.link_holders(member)
+            .into_iter()
+            .filter_map(|page| self.graph.get_node(page).map(|node| node.id))
+            .min()
     }
 }

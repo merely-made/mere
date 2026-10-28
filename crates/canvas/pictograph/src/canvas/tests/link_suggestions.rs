@@ -7,7 +7,7 @@
 //! A page's unvisited links as derived members.
 
 use super::*;
-use crate::canvas::link_suggestions::LINK_SOURCE;
+use crate::canvas::link_suggestions::{KeptLink, LINK_SOURCE};
 use scenograph::attention::Attention;
 use scenograph::suggestion::SuggestionSettings;
 
@@ -108,7 +108,7 @@ fn selecting_a_derived_member_keeps_it_and_a_reinstall_mints_again() {
     let kept = canvas.take_kept_links();
     assert_eq!(kept.len(), 1);
     assert_eq!(kept[0].member, first);
-    assert_eq!(kept[0].origin, page);
+    assert_eq!(kept[0].origin, Some(page));
     assert!(canvas.take_kept_links().is_empty(), "taken once");
     assert!(
         !canvas
@@ -235,4 +235,84 @@ fn a_minted_link_stays_admitted_on_a_small_plate() {
     canvas.set_suggestion_settings(on(1));
     canvas.offer_page_links(page, ["https://a.example/one".to_string()]);
     assert_eq!(admitted_agree(&canvas, &[]), 1);
+}
+
+/// Two pages that offer one URL, and the member they share.
+fn shared_link() -> (Canvas, [uuid::Uuid; 2], uuid::Uuid) {
+    let mut graph = Graph::new();
+    let keys = ["first", "second"]
+        .map(|p| graph.add_node(format!("https://a.example/{p}"), PortablePoint::zero()));
+    let pages = keys.map(|key| graph.get_node(key).unwrap().id);
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.resize(800, 600);
+    canvas.set_physics_paused(true);
+    canvas.set_suggestion_settings(on(2));
+    for page in pages {
+        canvas.offer_page_links(page, ["https://a.example/shared".to_string()]);
+    }
+    let [member] = canvas.derived_members()[..] else {
+        panic!("one member per URL");
+    };
+    (canvas, pages, member)
+}
+
+fn holders(canvas: &Canvas, member: uuid::Uuid) -> Vec<uuid::Uuid> {
+    let to = canvas.graph().get_node_key_by_id(member).unwrap();
+    let from = canvas
+        .graph()
+        .projected_relations()
+        .filter(|(_, relation)| relation.to == to)
+        .map(|(_, relation)| canvas.graph().get_node(relation.from).unwrap().id);
+    sorted(from.collect())
+}
+
+fn keep(canvas: &mut Canvas, member: uuid::Uuid) -> KeptLink {
+    canvas.select_member(member);
+    canvas.frame(800, 600);
+    let kept = canvas.take_kept_links();
+    assert_eq!(kept.len(), 1);
+    kept[0].clone()
+}
+
+#[test]
+fn a_shared_url_keeps_its_origin_from_the_page_that_still_holds_the_relation() {
+    let (mut canvas, [first, second], member) = shared_link();
+    assert_eq!(holders(&canvas, member), sorted(vec![first, second]));
+    canvas.select_member(first);
+    assert_eq!(canvas.remove_focused(), Some(first));
+    assert_eq!(keep(&mut canvas, member).origin, Some(second));
+}
+
+#[test]
+fn several_holding_pages_name_the_least_id_as_origin() {
+    let (mut canvas, pages, member) = shared_link();
+    assert_eq!(
+        keep(&mut canvas, member).origin,
+        Some(pages[0].min(pages[1]))
+    );
+}
+
+#[test]
+fn a_page_that_withdraws_its_offer_stops_being_the_origin() {
+    let (mut canvas, pages, member) = shared_link();
+    let (low, high) = (pages[0].min(pages[1]), pages[0].max(pages[1]));
+    canvas.offer_page_links(low, Vec::<String>::new());
+    assert_eq!(
+        holders(&canvas, member),
+        [high],
+        "the relation went with the offer"
+    );
+    assert_eq!(keep(&mut canvas, member).origin, Some(high));
+}
+
+#[test]
+fn a_keep_with_no_page_left_names_no_origin() {
+    let (mut canvas, page) = page_canvas();
+    canvas.set_suggestion_settings(on(1));
+    canvas.offer_page_links(page, ["https://a.example/one".to_string()]);
+    let member = canvas.derived_members()[0];
+    canvas.select_member(page);
+    canvas.remove_focused();
+    let kept = keep(&mut canvas, member);
+    assert_eq!((kept.member, kept.origin), (member, None));
 }
