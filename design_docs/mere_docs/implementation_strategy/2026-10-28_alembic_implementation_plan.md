@@ -6,8 +6,8 @@ successor keeps the keyword `alembic-implementation`, so its Decisions stay as t
 the codicil spine (slice A), the memory-level read model and manual forgetting (slice C's spine),
 Athanor's forgetting and consolidation passes in `mere-athanor`, merge by identity
 (`compose_graph_codicils`), the W0 shared workshop core (qualified 2026-10-25), and image-store
-phases 1-3 with the bounded decoded cache and the orphan GC in library code. Open: W1-W3 (the
-two-host product adapters and the receipt), slice C's promote, demote, editable-policy and
+phases 1-3 with the bounded decoded cache and the orphan GC in library code. In progress: W1-W2 owner adapters and shared native controls. Open: W3 (the
+two-host product and recovery qualification), slice C's promote, demote, editable-policy and
 by-sessions tails, slice D's scheduling, facet pass and surfacing, the image GC's host caller, Phase
 4's closure and Phase 6's re-measure.
 
@@ -40,7 +40,8 @@ Evidence that matters is a test in the repository or a line in Findings.
   completion; Djinn composes Athanor and supplies process lifetime and scheduling, and no host
   invents a second workshop authority; source and destination owners authorize scoped reads and
   commit and acknowledge product effects. No second GraphSession writer is opened to apply a brief,
-  and there is no source-home move, dependency repin or new crate (`:480-485`).
+  and there is no source-home move or new crate (`:480-485`). Supplier lock updates
+  for adopting the shared implementation stay scoped to that cohort.
 - Athanor proposes and never mutates graph truth or edits existing codicils (eidetic R0), and runs
   async off the UI thread (`:135-176,244-256`). Resolved with Mark on 2026-06-24: redaction strips
   thumbnails, favicons and session state by default with per-field opt-in, keeping structure,
@@ -126,9 +127,9 @@ chooser binds an actual Knot document and is not the destination operation, and 
 The identical helper body and workshop view and domain model operate through Graphshell's owner (its
 retained-content producer and owned GraphSession) with independent grants and ids, and no Turnstone
 workflow code or database reader is copied. Pandect's `GraphSession::transact_deltas_published`
-joins journal changes and addressable graph publication but not an evidence-brief operation ledger
-with the retained note Resource, and Graphshell's generic graph editor does not implement the
-accepted-note adapter.
+joins journal changes and addressable graph publication, without an evidence-brief operation ledger
+with the retained note Resource in the W0 cut. The owner adapter now uses a staged
+operation transaction joining those records; this requires the product recovery qualification below.
 - Done when: the identical helper body and workshop view and domain model operate through
   Graphshell's owner with independent grants and ids, and no Turnstone workflow implementation or
   database reader is copied.
@@ -231,10 +232,9 @@ win.
 
   Links: area Stack · draws on stack.1 · summary Servitor remains in Eidetic while Alembic composes its admission and run contracts.
 
-The ownership reconciliation and concrete workflow in section 5 are the design
+The ownership constraints and W1-W3 workflow above are the design
 specified in response to Mark's request to reconcile the workshop with
-Servitor and Armillary and flesh out a first workflow in two hosts. They are
-not a claim of implementation, acceptance or authorization for new standing
+Servitor and Armillary and flesh out a first workflow in two hosts. Their done-conditions do not authorize new standing
 automation, credentials, grants or publication.
 
 ## Findings
@@ -254,6 +254,27 @@ automation, credentials, grants or publication.
   in `crates/canvas/pictograph/src/canvas/resolved_image_cache.rs`
   (`set_resolved_image_cache_limit_bytes` at `nodes.rs:65`); the orphan GC in athanor; Turnstone's
   read sites use the role-keyed model.
+
+- 2026-10-28: the shared native surface is opt-in through Alembic's
+  `workshop-surface` / `workshop-native` features. Athanor's `workshop_driver`
+  persists before dispatch and pauses orphaned runs only after its owner proves
+  exclusive ownership; worker return and destination acknowledgement stay distinct.
+- 2026-10-28: `workshop_destination` stages the same note effect for Pandect and
+  graph-snapshot owners. Pandect joins its independent operation ledger, journal
+  and publication in one backend transaction. A graph-only owner stores the
+  ledger in a separate unshown Resource, retains it across every save, and
+  acknowledges only after atomic snapshot replacement. Generic graph APIs do
+  not enforce that retention policy on their own.
+- 2026-10-28: Turnstone's adapter must use its canonical Canvas/runtime writer;
+  opening another GraphSession would create a competing owner. An exclusive
+  session lease is acquired before loading the graph and held through writes.
+  The initial corpus is authored public example text in both hosts; saved-source
+  private bytes still refuse. Synthetic example principals do not qualify
+  production Personae identity or custody.
+- 2026-10-28: native Graphshell composes its owner on a service thread. Turnstone's
+  drafted adapter executes the bounded helper off-thread, but journal I/O and
+  graph replacement still run on the UI service turn. This responsiveness limit
+  and the full per-host W3 matrix remain open until separately qualified.
 
 ## Progress
 

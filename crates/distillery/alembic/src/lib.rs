@@ -60,3 +60,9 @@ pub mod memory_levels;
 
 #[cfg(feature = "workshop")]
 pub mod workshop;
+
+#[cfg(feature = "workshop-surface")]
+pub mod workshop_surface;
+
+#[cfg(all(feature = "workshop-native", not(target_arch = "wasm32")))]
+pub mod workshop_native;

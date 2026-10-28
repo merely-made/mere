@@ -710,6 +710,7 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_transaction.rs"]
 mod transaction;
+pub use transaction::OperationReceipt;
 
 #[path = "graph_session_merge.rs"]
 mod merge;

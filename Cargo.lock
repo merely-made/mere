@@ -7296,6 +7296,8 @@ dependencies = [
  "knot-editor-host",
  "layout-dom-api",
  "mere",
+ "mere-alembic",
+ "mere-athanor",
  "mere-comms",
  "mere-fleece",
  "mere-kernel",
@@ -10158,11 +10160,14 @@ dependencies = [
 name = "mere-alembic"
 version = "0.0.1"
 dependencies = [
+ "cambium",
+ "cambium-desktop",
  "chartulary",
  "euclid",
  "mere-kernel",
  "serde",
  "serde_json",
+ "taproot",
  "uuid",
 ]
 
@@ -10185,6 +10190,7 @@ dependencies = [
  "serde_json",
  "servitor",
  "tempfile",
+ "uuid",
 ]
 
 [[package]]
