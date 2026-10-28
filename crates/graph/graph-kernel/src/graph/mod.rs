@@ -578,7 +578,9 @@ impl Graph {
     //   1. Ordinary primitive mutations (topology, relations, nav history, tags,
     //      titles, body, media, classifications, properties, predicates,
     //      fields/couplings, frame hints, import records) — `pub(crate)`,
-    //      reached externally only via `GraphDelta`.
+    //      reached externally only via `GraphDelta`. Navigation has one primitive
+    //      per operation (`navigate_node`, `branch_history`, `node_history_back`,
+    //      `node_history_forward`) under both the live and the replay arm.
     //   2. Public native assertion/declaration writes: `assertion_write` and
     //      `predicate_declarations`, with their own capture emission.
     //   3. Compound kernel operations stay `pub`: `from_snapshot`,
@@ -590,8 +592,10 @@ impl Graph {
     //      host wiring). Webview runtime state left the kernel entirely
     //      (`BrowserNodeState` sidecar, boundary pass slice C).
     //   5. Test fixtures: the `fixtures` cargo feature re-exposes the raw
-    //      mutators via `graph::fixtures::GraphFixtures` — dev-dependencies
-    //      only, never a production enable.
+    //      structural mutators via `graph::fixtures::GraphFixtures` —
+    //      dev-dependencies only, never a production enable. Navigation is not
+    //      among them: a fixture graph navigates through `GraphDelta`, so it
+    //      carries what a live navigation leaves.
 
     /// The fixed namespace for the deterministic node id (see
     /// [`node_namespace_id`](Self::node_namespace_id)). Fixed forever: changing it
@@ -765,38 +769,48 @@ impl Graph {
     }
 
     /// Navigate `key` in place to `url`: record the visit in the node's own
-    /// browse history (a forward-fork if the cursor had stepped back) and update
-    /// its Primary URL. No new node and no edge — the node is a browsing surface
-    /// whose content changes; the graph shape does not. Cross-node lineage
-    /// (the navigated-from relation) is a separate, explicit edge.
-    pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
-        let at_ms = Self::epoch_ms();
-        if let Some(id) = self.inner.node(key).map(|n| n.id) {
-            self.nav
-                .record_visit(id, url, chartulary::stemma::TransitionKind::UrlTyped, at_ms);
-        }
-        self.set_node_last_session_visited(key, self.current_session);
+    /// browse history (a forward-fork if the cursor had stepped back), update
+    /// its Primary URL and stamp its session. No new node and no
+    /// edge: the node is a browsing surface whose content changes; the graph
+    /// shape does not. Cross-node lineage (the navigated-from relation) is a
+    /// separate, explicit edge.
+    ///
+    /// The one mutation under both the live and the replayed arm, which differ
+    /// only in the stamp they pass. Returns the node's id, or `None` if absent.
+    pub(crate) fn navigate_node(
+        &mut self,
+        key: NodeKey,
+        url: &str,
+        transition: NodeHistoryTransitionKind,
+        at_ms: u64,
+        last_session_visited: u64,
+    ) -> Option<Uuid> {
+        let id = self.inner.node(key)?.id;
+        self.nav.record_visit(id, url, transition, at_ms);
+        self.set_node_last_session_visited(key, last_session_visited);
         self.update_node_url(key, url.to_string());
+        Some(id)
     }
 
     /// Anchor a freshly-minted `child` node's history under `parent`'s current
-    /// visit — the navigated-from anchor. Call **before** the child's first
-    /// [`navigate_node`](Self::navigate_node) so that first visit attaches there in
-    /// the shared lineage tree (the (b) cross-node anchor; the branch-mint path).
-    pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
-        let (Some(child_id), Some(parent_id)) = (
-            self.inner.node(child).map(|n| n.id),
-            self.inner.node(parent).map(|n| n.id),
-        ) else {
-            return;
-        };
+    /// visit, the navigated-from anchor. Do this **before** the child's first
+    /// [`navigate_node`](Self::navigate_node) so that first visit attaches there
+    /// in the shared lineage tree (the (b) cross-node anchor; the branch-mint
+    /// path). Returns the `(child, parent)` ids, or `None` if either is absent.
+    pub(crate) fn branch_history(
+        &mut self,
+        child: NodeKey,
+        parent: NodeKey,
+    ) -> Option<(Uuid, Uuid)> {
+        let child_id = self.inner.node(child)?.id;
+        let parent_id = self.inner.node(parent)?.id;
         self.nav.spawn(child_id, parent_id);
+        Some((child_id, parent_id))
     }
 
     /// Step `key` back one visit in its own history, updating its Primary URL to
     /// the revealed page. Returns the new URL, or `None` if already at the root.
-    pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
-        let at_ms = Self::epoch_ms();
+    pub(crate) fn node_history_back(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.back(id, at_ms)?;
         self.update_node_url(key, url.clone());
@@ -805,8 +819,7 @@ impl Graph {
 
     /// Step `key` forward one visit in its own history. Returns the new URL, or
     /// `None` if already at the tip.
-    pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
-        let at_ms = Self::epoch_ms();
+    pub(crate) fn node_history_forward(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.forward(id, at_ms)?;
         self.update_node_url(key, url.clone());

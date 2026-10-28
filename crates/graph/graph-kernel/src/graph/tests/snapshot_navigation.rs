@@ -199,15 +199,25 @@ fn navigate_forward_fork_preserves_the_alternate_branch() {
     // The real user path (navigate / back / navigate) forward-forks: from `a`,
     // navigating to `b`, stepping back, then navigating to `c` keeps `b` as an
     // alternate child of `a` (temporal integrity), now over the shared space.
+    use crate::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
     let mut graph = Graph::new();
     let key = graph.add_node("https://example.com/a".to_string(), Point2D::new(0.0, 0.0));
-    graph.navigate_node(key, "https://example.com/a");
-    graph.navigate_node(key, "https://example.com/b");
+    let navigate = |graph: &mut Graph, url: &str| {
+        apply_graph_delta(
+            graph,
+            GraphDelta::NavigateNode {
+                key,
+                url: url.into(),
+            },
+        );
+    };
+    navigate(&mut graph, "https://example.com/a");
+    navigate(&mut graph, "https://example.com/b");
     assert_eq!(
-        graph.node_history_back(key).as_deref(),
-        Some("https://example.com/a")
+        apply_graph_delta(&mut graph, GraphDelta::NodeHistoryBack { key }),
+        GraphDeltaResult::HistoryStepped(Some("https://example.com/a".into()))
     );
-    graph.navigate_node(key, "https://example.com/c");
+    navigate(&mut graph, "https://example.com/c");
 
     let branch = graph.node_history_branch_projection(key);
     let a_visit = branch
@@ -364,4 +374,66 @@ fn test_restore_fallback_without_session_state() {
         vec!["https://legacy-one.example".to_string()]
     );
     assert_eq!(history.current_index, 0);
+}
+
+/// Apply `steps` to a graph that records, replay what it recorded onto a copy
+/// taken beforehand, and return both.
+fn live_and_replayed(
+    live: &mut Graph,
+    steps: impl FnOnce(&mut Graph),
+) -> (Graph, Vec<crate::graph::capture::CapturedDelta>) {
+    let replayed = live.clone();
+    let seen = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let sink = seen.clone();
+    live.set_recorder(Some(std::sync::Arc::new(move |delta| {
+        sink.lock().unwrap().push(delta.clone())
+    })));
+    steps(live);
+    let captured = seen.lock().unwrap().clone();
+    (replayed, captured)
+}
+
+#[test]
+fn live_and_replayed_navigation_leave_one_state() {
+    use crate::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    let mut live = Graph::new();
+    let url = |name: &str| format!("https://example.com/{name}");
+    let a = add_node(
+        &mut live,
+        Some(Uuid::from_u128(1)),
+        url("a"),
+        Default::default(),
+    );
+    let b = add_node(
+        &mut live,
+        Some(Uuid::from_u128(2)),
+        url("b"),
+        Default::default(),
+    );
+    let (mut replayed, captured) = live_and_replayed(&mut live, |graph| {
+        let mut apply = |delta| apply_graph_delta(graph, delta);
+        let navigate = |key, name| GraphDelta::NavigateNode {
+            key,
+            url: url(name),
+        };
+        apply(navigate(a, "a1"));
+        apply(navigate(a, "a2"));
+        apply(GraphDelta::BranchHistory {
+            child: b,
+            parent: a,
+        });
+        apply(navigate(b, "b1"));
+        apply(GraphDelta::NodeHistoryBack { key: a });
+        apply(GraphDelta::NodeHistoryForward { key: a });
+        apply(GraphDelta::NodeHistoryBack { key: a });
+        apply(navigate(a, "a3"));
+    });
+    crate::graph::capture::replay_captured_deltas_onto(&mut replayed, captured);
+
+    let snapshot = |graph: &Graph| serde_json::to_value(graph.to_snapshot_at(0)).unwrap();
+    assert_eq!(snapshot(&live), snapshot(&replayed));
+    assert_eq!(live.facets(), replayed.facets());
+    let current = |graph: &Graph, key| graph.node_current_url(key);
+    assert_eq!(current(&live, a), Some(url("a3")));
+    assert_eq!(current(&replayed, a), Some(url("a3")));
 }
