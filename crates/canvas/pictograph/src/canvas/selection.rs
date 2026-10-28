@@ -6,8 +6,9 @@
 
 //! Selection, tagging, semantic relations, and node-state setters.
 
-use kernel::graph::Graph;
 use kernel::graph::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
+use kernel::graph::{EdgeFamily, Graph, Retraction, SemanticStatement};
+use kernel::types::GraphScope;
 
 use super::*;
 
@@ -301,48 +302,57 @@ impl Canvas {
         self.untag_node(member, tag)
     }
 
-    /// Retract the user-asserted semantic relation(s) on the selected edge(s) —
-    /// a true removal, not the display-only [`hide_selected_edges`]. Scoped to the
-    /// `Semantic` family, so navigation / provenance history on the same edge
-    /// survives; an edge left with no families is garbage-collected by the kernel.
-    /// Returns how many pairwise semantic rows were retracted. Selecting a
-    /// link never performs a source mutation; member actions go through the
-    /// source-bound inspector API.
+    /// Retract the semantic relations between the two selected nodes that
+    /// [`default_withdraw_policy`](Self::default_withdraw_policy) allows, in
+    /// both strata and both stored directions. Returns how many statements it
+    /// withdrew; [`withdraw_selected_relation`](Self::withdraw_selected_relation)
+    /// also says how many it left. A true removal, not the display-only
+    /// [`hide_selected_edges`]. Scoped to the `Semantic` family, so navigation /
+    /// provenance history on the same edge survives. Selecting a link never
+    /// performs a source mutation; member actions go through the source-bound
+    /// inspector API.
     pub fn retract_selected_relation(&mut self) -> usize {
-        let mut removed = 0;
-        // Symmetric with `assert_selected_relation`: a two-node selection retracts
-        // the relation between the pair (either stored direction), so `>unrelate`
-        // mirrors `>relate` on the same gesture.
+        self.withdraw_selected_relation(Self::default_withdraw_policy)
+            .withdrawn
+    }
+
+    /// Whether a canvas without a host rule may withdraw `statement`: it is in
+    /// the user's own scope (the unnamed graph the relate gesture writes into,
+    /// or `User`) and no method inferred it. Imported, agent- and method-backed
+    /// statements stay.
+    pub fn default_withdraw_policy(statement: &SemanticStatement) -> bool {
+        matches!(
+            statement.graph_scope,
+            GraphScope::Default | GraphScope::User
+        ) && statement.basis.method.is_none()
+    }
+
+    /// Withdraw, for the two selected nodes, each semantic statement `allow`
+    /// accepts, in both strata and both stored directions: symmetric with
+    /// [`assert_selected_relation`], so `>unrelate` mirrors `>relate` on the same
+    /// gesture. The kernel asks `allow` per statement; a refused statement stays
+    /// held and is counted in [`Retraction::refused`].
+    pub fn withdraw_selected_relation(
+        &mut self,
+        allow: impl Fn(&SemanticStatement) -> bool,
+    ) -> Retraction {
+        let mut done = Retraction::default();
         if self.selected.len() == 2 {
             let mut pair: Vec<NodeKey> = self.selected.iter().copied().collect();
             pair.sort_by_key(|k| self.graph.get_node(*k).map(|n| n.id));
-            removed += self.retract_semantic_between(pair[0], pair[1]);
-            removed += self.retract_semantic_between(pair[1], pair[0]);
+            let semantic = RelationSelector::Family(EdgeFamily::Semantic);
+            for (from, to) in [(pair[0], pair[1]), (pair[1], pair[0])] {
+                let part = self
+                    .graph
+                    .retract_relations_where(from, to, semantic, &allow);
+                done.withdrawn += part.withdrawn;
+                done.refused += part.refused;
+            }
         }
-        if removed > 0 {
+        if done.withdrawn > 0 {
             self.reconcile_derived();
         }
-        removed
-    }
-
-    /// Retract every semantic relation on the directed edge `a -> b`. The `Family`
-    /// selector is read-only (not retractable), so enumerate the edge's semantic
-    /// sub-kinds and retract each — the user-meaning relations go, while traversal
-    /// / provenance history on the same edge survives (an edge left with no
-    /// families is garbage-collected by the kernel). Returns how many were removed.
-    pub(crate) fn retract_semantic_between(&mut self, a: NodeKey, b: NodeKey) -> usize {
-        let sub_kinds: Vec<SemanticSubKind> = self
-            .graph
-            .find_edge_key(a, b)
-            .and_then(|k| self.graph.get_edge(k))
-            .and_then(|p| p.semantic_data())
-            .map(|s| s.sub_kinds.iter().copied().collect())
-            .unwrap_or_default();
-        let mut removed = 0;
-        for sk in sub_kinds {
-            removed += retract_via_delta(&mut self.graph, a, b, RelationSelector::Semantic(sk));
-        }
-        removed
+        done
     }
 
     /// Retract a specific relation selector between two stable graph members.

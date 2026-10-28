@@ -155,6 +155,7 @@ pub use identity::{
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
 pub use assertion_write::StatementWriteError;
+pub use edge_ops::Retraction;
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
 pub use predicate_declarations::{
