@@ -119,8 +119,9 @@ pub mod station_grant;
 // boundary-pass plan parked it.
 pub mod manifest;
 pub mod manifest_store;
-// Filesystem persistence of the session graph (graph.json); native-only so the
-// crate stays wasm-clean (wasm hosts use a different storage backend).
+// The session graph file's name and path (graph.json; GraphSession writes it);
+// native-only so the crate stays wasm-clean (wasm hosts use a different storage
+// backend).
 #[cfg(not(target_arch = "wasm32"))]
 pub mod session_graph_store;
 pub mod session_service_runner;

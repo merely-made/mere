@@ -22,7 +22,7 @@
 //! <sessions_dir>/
 //! └── <session_id>/
 //!     ├── manifest.json            ← ManifestStore
-//!     ├── graph.json               ← session_graph_store
+//!     ├── graph.json               ← GraphSession
 //!     ├── browser_nodes.json       ← this module
 //!     └── views/...                ← view_intent_store
 //! ```
