@@ -210,6 +210,7 @@ impl Canvas {
             mosaic: Default::default(),
             territory_field: false,
             graph_grammar: false,
+            withdraw_policy: None,
             category_colors: Vec::new(),
             field_drag: None,
             forme_region: None,

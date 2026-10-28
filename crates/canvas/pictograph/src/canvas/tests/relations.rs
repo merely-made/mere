@@ -505,6 +505,14 @@ fn pair_unrelate_withdraws_a_resource_relation_the_policy_allows_and_leaves_what
         "the default policy leaves a statement imported from a source"
     );
     assert_eq!(canvas.graph().projected_assertions().count(), 1);
+
+    canvas.set_withdraw_policy(Some(Box::new(|s| s.graph_scope == GraphScope::Source)));
+    assert_eq!(
+        canvas.retract_selected_relation(),
+        1,
+        "an installed host rule decides instead of the default"
+    );
+    assert_eq!(canvas.graph().projected_assertions().count(), 0);
 }
 
 #[test]

@@ -302,9 +302,11 @@ impl Canvas {
         self.untag_node(member, tag)
     }
 
-    /// Retract the semantic relations between the two selected nodes that
-    /// [`default_withdraw_policy`](Self::default_withdraw_policy) allows, in
-    /// both strata and both stored directions. Returns how many statements it
+    /// Retract the semantic relations between the two selected nodes that the
+    /// installed host rule ([`set_withdraw_policy`](Self::set_withdraw_policy))
+    /// allows, or [`default_withdraw_policy`](Self::default_withdraw_policy)
+    /// without one, in both strata and both stored directions. Returns how many
+    /// statements it
     /// withdrew; [`withdraw_selected_relation`](Self::withdraw_selected_relation)
     /// also says how many it left. A true removal, not the display-only
     /// [`hide_selected_edges`]. Scoped to the `Semantic` family, so navigation /
@@ -312,8 +314,20 @@ impl Canvas {
     /// performs a source mutation; member actions go through the source-bound
     /// inspector API.
     pub fn retract_selected_relation(&mut self) -> usize {
-        self.withdraw_selected_relation(Self::default_withdraw_policy)
-            .withdrawn
+        let Some(policy) = self.withdraw_policy.take() else {
+            return self
+                .withdraw_selected_relation(Self::default_withdraw_policy)
+                .withdrawn;
+        };
+        let done = self.withdraw_selected_relation(&*policy);
+        self.withdraw_policy = Some(policy);
+        done.withdrawn
+    }
+
+    /// Install the host's rule for what the pair gesture may withdraw; `None`
+    /// restores the canvas's own default.
+    pub fn set_withdraw_policy(&mut self, policy: Option<WithdrawPolicy>) {
+        self.withdraw_policy = policy;
     }
 
     /// Whether a canvas without a host rule may withdraw `statement`: it is in

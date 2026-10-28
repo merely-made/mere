@@ -119,7 +119,7 @@ impl SurfaceNode {
 
     // Per-node navigation history moved to the graph-level shared visit space
     // (`Graph.nav` / `SharedNavigationMemory`); read it via the `Graph::node_history_*`
-    // / `Graph::node_current_url` methods. (The (b) anchor design, 2026-06-06.)
+    // methods. The primary address is the node's address (`history.rs`).
 
     #[cfg(not(target_arch = "wasm32"))]
     pub fn test_stub(url: &str) -> Self {
