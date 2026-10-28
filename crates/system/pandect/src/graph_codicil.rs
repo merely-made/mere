@@ -120,14 +120,23 @@ pub struct ProfiledGraphCodicil {
 
 impl ProfiledGraphCodicil {
     pub fn into_graph(self) -> Result<Graph> {
-        let mut graph = materialize_snapshot(&self.codicil.snapshot, self.placement)
-            .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
-        *graph.facets_mut() = self.codicil.facets;
-        graph
-            .validate_active_resource_assertion_handles()
-            .map_err(|error| Error::new(format!("invalid graph codicil facets: {error}")))?;
-        Ok(graph)
+        checked_graph(&self.codicil.snapshot, self.codicil.facets, self.placement)
     }
+}
+
+/// The graph a codicil's parts load as under `placement`: the checked load
+/// every open and every save runs, so a save refuses what an open would.
+fn checked_graph(
+    snapshot: &GraphSnapshot,
+    facets: NodeFacetStore,
+    placement: Option<PlacementProfile>,
+) -> Result<Graph> {
+    let mut graph = materialize_snapshot(snapshot, placement)
+        .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
+    graph
+        .install_facets(facets)
+        .map_err(|error| Error::new(format!("invalid graph codicil facets: {error}")))?;
+    Ok(graph)
 }
 
 impl TypedPayload for ProfiledGraphCodicil {
@@ -183,13 +192,7 @@ impl TypedPayload for LegacyGraphCodicil {
 
 impl GraphCodicil {
     pub(crate) fn into_graph(self) -> Result<Graph> {
-        let mut graph = Graph::try_from_snapshot(&self.snapshot)
-            .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
-        *graph.facets_mut() = self.facets;
-        graph
-            .validate_active_resource_assertion_handles()
-            .map_err(|error| Error::new(format!("invalid graph codicil facets: {error}")))?;
-        Ok(graph)
+        checked_graph(&self.snapshot, self.facets, None)
     }
 }
 

@@ -69,7 +69,9 @@ impl SessionGraphV1 {
             return Err(format!("unknown session graph schema {:?}", self.schema));
         }
         let mut graph = Graph::try_from_snapshot(&self.graph).map_err(|error| error.to_string())?;
-        *graph.facets_mut() = self.facets;
+        graph
+            .install_facets(self.facets)
+            .map_err(|error| error.to_string())?;
         Ok(graph)
     }
 }

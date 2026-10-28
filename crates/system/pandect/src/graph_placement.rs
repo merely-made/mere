@@ -127,9 +127,8 @@ impl FrozenGraph {
     pub fn materialize(&self) -> Result<Graph, String> {
         let mut graph =
             Graph::try_from_recorded_snapshot(&self.graph).map_err(|error| error.to_string())?;
-        *graph.facets_mut() = self.facets.clone();
         graph
-            .validate_active_resource_assertion_handles()
+            .install_facets(self.facets.clone())
             .map_err(|error| error.to_string())?;
         Ok(graph)
     }
@@ -369,7 +368,7 @@ pub(crate) fn placement_test_graph() -> Graph {
     claim.provenance_iri = Some("urn:mere:profile:source".into());
     claim.asserted_at_ms = Some(42);
     let mut recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
-    *recorded.facets_mut() = graph.facets().clone();
+    recorded.install_facets(graph.facets().clone()).unwrap();
     recorded
 }
 

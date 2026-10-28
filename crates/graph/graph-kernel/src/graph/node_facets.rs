@@ -44,17 +44,16 @@ impl Graph {
         &self.facets
     }
 
-    /// Mutable facet access for the host and extension gate.
+    /// Raw mutable access to the store, for kernel code and test fixtures.
     ///
-    /// Kernel-owned facet families should still use their typed graph methods;
-    /// this surface exists for host-defined and unknown-forward namespaces.
-    /// Installing a loaded store through it skips the handle rule checked open
-    /// applies: use [`install_facets`](Self::install_facets) or
-    /// [`overlay_facets`](Self::overlay_facets), which are replacing it.
+    /// Outside the kernel a loaded store goes in through
+    /// [`install_facets`](Self::install_facets) or
+    /// [`overlay_facets`](Self::overlay_facets), which apply the handle rule
+    /// checked open applies; this skips it.
     ///
     /// A write through it may touch visit history, so taking it advances the
     /// [visit revision](Graph::visit_revision).
-    pub fn facets_mut(&mut self) -> &mut NodeFacetStore {
+    pub(crate) fn facets_mut(&mut self) -> &mut NodeFacetStore {
         self.bump_visit_revision();
         &mut self.facets
     }

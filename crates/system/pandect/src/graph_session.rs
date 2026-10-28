@@ -454,7 +454,7 @@ fn graph_of(
     facets: NodeFacetStore,
 ) -> Result<Graph, kernel::graph::snapshot::ResourceSnapshotError> {
     let mut graph = Graph::try_from_snapshot(snapshot)?;
-    *graph.facets_mut() = facets;
+    graph.install_facets(facets)?;
     Ok(graph)
 }
 
@@ -608,12 +608,9 @@ async fn load_retained_source<B: Backend>(
                 Graph::try_from_snapshot(&baseline.graph)
             }
             .map_err(|error| SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE))))?;
-            *graph.facets_mut() = baseline.facets;
-            graph
-                .validate_active_resource_assertion_handles()
-                .map_err(|error| {
-                    SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
-                })?;
+            graph.install_facets(baseline.facets).map_err(|error| {
+                SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
+            })?;
             Ok::<_, SessionError>(graph)
         })
         .transpose()?
@@ -2406,6 +2403,7 @@ mod checkpoint_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::replay_captured_deltas_onto;
 
     use euclid::default::Point2D;
@@ -4251,6 +4249,82 @@ mod tests {
             let opened = GraphSession::open(store, id).await.unwrap();
             assert_eq!(opened.graph().node_count(), 1);
             assert!(opened.graph().to_snapshot().resources.is_empty());
+        });
+    }
+
+    #[test]
+    fn opening_a_session_whose_facets_steal_a_handle_is_refused() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let keys = Keys::new(id);
+            let surface = Uuid::from_u128(1);
+            let mut graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut held =
+                kernel::types::NodeProperty::new("urn:test:predicate".into(), "held".into());
+            held.statement_id = "owned-handle".into();
+            let key = graph.get_node_key_by_id(surface).unwrap();
+            assert!(graph.append_node_properties(key, vec![held.clone()]));
+            let snapshot = graph.to_snapshot();
+            let honest = graph.facets().clone();
+            let mut stolen = honest.clone();
+            stolen
+                .set(
+                    surface,
+                    chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                    serde_json::to_value(vec![held]).unwrap(),
+                    &chartulary::AcceptAll,
+                )
+                .unwrap();
+            // The files a faulty writer would leave: the checkpoint names the
+            // very bytes of `graph.json` and `facets.json`, so it is trusted.
+            let write = |baseline: &NodeFacetStore, checkpoint: &NodeFacetStore| {
+                let graph_bytes = pretty_bytes(&snapshot).unwrap();
+                let facet_bytes = pretty_bytes(checkpoint).unwrap();
+                let record = Checkpoint {
+                    cursor: Seq(0),
+                    translated_receipt_digest: None,
+                    journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                    contents_digest: Some(contents_digest(&graph_bytes, &facet_bytes)),
+                };
+                [
+                    pretty(
+                        keys.at(BASELINE),
+                        &Baseline {
+                            graph: snapshot.clone(),
+                            facets: baseline.clone(),
+                        },
+                    )
+                    .unwrap(),
+                    WriteOp::Put {
+                        key: keys.at(GRAPH),
+                        value: graph_bytes,
+                    },
+                    WriteOp::Put {
+                        key: keys.at(NODE_FACETS_FILE),
+                        value: facet_bytes,
+                    },
+                    pretty(keys.at(CHECKPOINT), &record).unwrap(),
+                ]
+            };
+            store.apply(&write(&honest, &honest)).await.unwrap();
+            let opened = GraphSession::open(store.clone(), id).await.unwrap();
+            assert_eq!(opened.graph().facets(), &honest);
+
+            for (baseline, checkpoint, refused_at) in
+                [(&stolen, &honest, BASELINE), (&honest, &stolen, GRAPH)]
+            {
+                store.apply(&write(baseline, checkpoint)).await.unwrap();
+                match GraphSession::open(store.clone(), id).await {
+                    Err(SessionError::Corrupt(error)) => {
+                        assert!(error.contains(&keys.at(refused_at)), "{error}");
+                        assert!(error.contains("facets refused"), "{error}");
+                    },
+                    Err(error) => panic!("unexpected load error: {error}"),
+                    Ok(_) => panic!("facets that steal a handle were installed"),
+                }
+            }
         });
     }
 

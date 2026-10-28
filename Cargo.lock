@@ -7298,6 +7298,7 @@ dependencies = [
  "mere",
  "mere-comms",
  "mere-fleece",
+ "mere-kernel",
  "mere-lanes",
  "mere-mesh",
  "mere-moot",

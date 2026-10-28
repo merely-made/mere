@@ -55,7 +55,11 @@ impl<B: Backend> AddressableGraphStore<B> {
             ));
         }
         let snapshot = graph.to_snapshot_at(0);
-        Graph::try_from_recorded_snapshot(&snapshot).map_err(|e| fail(e.to_string()))?;
+        let mut loaded =
+            Graph::try_from_recorded_snapshot(&snapshot).map_err(|e| fail(e.to_string()))?;
+        loaded
+            .install_facets(graph.facets().clone())
+            .map_err(|e| fail(e.to_string()))?;
         let mut catalog = Catalog {
             version: 1,
             globals: snapshot.clone(),

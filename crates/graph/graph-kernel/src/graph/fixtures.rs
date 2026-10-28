@@ -24,7 +24,8 @@ use uuid::Uuid;
 
 use super::edge_payload::EdgePayload;
 use super::{
-    Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeKey, RelationKey, RelationSelector,
+    Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeFacetStore, NodeKey, RelationKey,
+    RelationSelector,
 };
 
 /// Raw-mutator access for test fixtures. Every method delegates to the
@@ -68,6 +69,9 @@ pub trait GraphFixtures {
     fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node>;
     fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload>;
     fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload>;
+    /// The facet store, unchecked: a test that must hold a graph checked open
+    /// would refuse. Production installs through `install_facets`.
+    fn facets_mut(&mut self) -> &mut NodeFacetStore;
 }
 
 impl GraphFixtures for Graph {
@@ -142,5 +146,8 @@ impl GraphFixtures for Graph {
     }
     fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload> {
         Graph::get_relation_mut(self, key)
+    }
+    fn facets_mut(&mut self) -> &mut NodeFacetStore {
+        Graph::facets_mut(self)
     }
 }
