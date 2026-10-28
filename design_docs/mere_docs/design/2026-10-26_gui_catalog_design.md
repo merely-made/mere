@@ -577,7 +577,8 @@ What that leaves, as cues: verification runs one way, since native activation
 returns no records, and Action, IndexProvider, Lens, Theme and WasmRuntime
 records are not declarable; the built-in declarations list no operations and
 accept nothing, because nothing in code exposes either, so the brief's
-operations have a field and no type behind it; `ViewerRegistry` and
+operations have a type (`Operation`) and a field that no host reads;
+`ViewerRegistry` and
 `mod:core-viewer` remain as dependency names so load order holds; the tree
 page loads no inbox, since the misfin adapter reads a native mailbox store the
 browser lacks, so every misfin open lands on the no-conversation notice until
