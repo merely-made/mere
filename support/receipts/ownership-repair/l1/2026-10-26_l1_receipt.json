@@ -1,190 +1,293 @@
 {
- "lane": "L1",
- "slice": "graph-kernel, second pass",
- "recorded": "2026-10-26",
- "base_commit": "45bfc3bb2",
- "supersedes_status_of": [
-  "Q009",
-  "Q012",
-  "Q015",
-  "Q016",
-  "Q032",
-  "Q017",
-  "Q031",
-  "Q010"
- ],
- "rulings_applied": "Mark's L1 card round, 2026-10-20: adding an existing node id is insert-if-missing live too",
- "operations": [
-  {
-   "id": "Q009",
-   "authority": [
-    "A001"
-   ],
-   "owner": "one insert-if-missing contract for adding a node id, live and on replay; the URL index changes only on a real insert",
-   "change": "graph/membership.rs insert_surface_node returns (key, inserted); graph/mod.rs insert_node_if_missing; apply.rs AddNode, edge_ops.rs replay, cross_graph.rs copy and snapshot/from.rs load share it",
-   "regression": "graph::membership::tests::adding_an_existing_id_live_keeps_the_node_and_the_url_index_honest (plus copy_and_snapshot_onto_an_existing_id_keep_the_first_node_and_its_index)",
-   "audit_probe": "kernel_authority_current.rs adding_the_same_id_at_a_new_url_leaves_the_old_url_index_live (asserts the defect; inverted in the regression)",
-   "commit": "b441f7b6e, merged 0b6fa7f9a"
-  },
-  {
-   "id": "Q012",
-   "authority": [
-    "A004"
-   ],
-   "owner": "the import-record table owns memberships and their suppression; a per-node provenance write edits only that node's memberships and never rebuilds the table from the facet projection",
-   "change": "graph/import_records.rs set_node_import_provenance edits the table per node and refreshes one facet; rebuild_import_records_from_node_provenance deleted; snapshot/from.rs table-less loads derive from the legacy import_provenance column",
-   "detail_choices_open_to_overrule": [
-    "a source new to the node joins that source's latest record, as the old rebuild already chose; none existing creates import-record:{source_id}",
-    "writing a source the node had suppressed un-suppresses that membership, so the node's facet equals what was written",
-    "the node's suppressed memberships in sources not written are left alone"
-   ],
-   "regression": "graph::tests::snapshot_imports::node_provenance_write_changes_only_that_nodes_memberships",
-   "audit_probe": "kernel_authority_current.rs writing_one_nodes_import_provenance_erases_another_records_suppression (asserts the defect; inverted in the regression)",
-   "commit": "c3dbd4944"
-  },
-  {
-   "id": "Q015",
-   "authority": [
-    "A012"
-   ],
-   "owner": "one bounds check, SharedNavigationMemory::check_indices in graph/navigation_check.rs, runs in validate_snapshot before Stemma hydration for both checked loaders; every other load path wraps one of them",
-   "change": "new graph/navigation_check.rs; snapshot/checked.rs gains ResourceSnapshotError::InvalidNavigation and validate_snapshot; at this base the probe no longer panicked during load (Q013 removed the cursor read) but the first history projection did, so the repair refuses at load",
-   "limit": "bounds only; in-range structural faults such as a parent cycle are not checked",
-   "regression": "graph::snapshot::tests::checked_loads_refuse_a_navigation_index_that_names_no_row",
-   "audit_probe": "kernel_snapshot.rs checked_snapshot_load_panics_on_unvalidated_navigation_indices (asserts the defect; inverted in the regression)",
-   "commit": "84b12c2f6"
-  },
-  {
-   "id": "Q016",
-   "authority": [
-    "A012"
-   ],
-   "owner": "validate_active_resource_assertion_handles stays the one owner of the handle rule; apply_graph_delta consults the same body, with the pending literal write applied, before storing ReplaySetResourceRecordById, ReplaySetNodeFacetById and SetNodeFacet on semantic.properties, and ReplayAppendNodePropertyById, so a refused delta changes and records nothing",
-   "change": "graph/resource_content.rs validator takes an optional pending write; apply.rs and node_props.rs call it at those arms; no consumer change (the validator had no kernel callers)",
-   "limit": "literal writes only; see the edge-replay fork",
-   "regression": "graph::resource_content_handle_tests::replayed_literal_handles_are_refused_where_checked_open_refuses_them and graph::resource_content_handle_tests::checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it",
-   "audit_probe": "kernel_admission.rs replay_record_admission_accepts_literal_ownership_that_checked_load_rejects (asserts the defect; inverted in the regression)",
-   "commit": "503adf904",
-   "follow_through": "a refused write is GraphDeltaResult::Refused rather than a no-op; the journal's checked replay paths (GraphJournal::snapshot_at, snapshot_at_from, replay_from, replay_from_with_baseline) stop at the first refused entry and return ReplayRefused naming it, so Pandect's open reports Corrupt and graph_at reports None for a journal that carries a colliding record, as its existing tests require; replay_captured_deltas_onto, replay_captured_deltas_as_onto and GraphJournal::replay keep dropping a refused entry and continuing, with replay_captured_deltas_onto_checked as the checked twin",
-   "consumer_tests": "pandect frozen_materialization_checks_active_sidecar_handles_and_preserves_retained_notes now builds its conflict in the frozen sidecar, since the kernel refuses it at the write; replayed_session_handles_are_checked_before_open_and_historical_publication unchanged"
-  },
-  {
-   "id": "Q032",
-   "authority": [
-    "A012"
-   ],
-   "owner": "SemanticStatement::same_claim_as in graph/edge_data.rs is the one definition of the same claim (predicate, sub-kind, scope, provenance, basis reason ignoring version); the checked writer and legacy migration both use it and migration's private ClaimIdentity is gone",
-   "change": "edge_data.rs same_claim_as; assertion_write.rs and legacy_resource_migration.rs call it; no existing test encoded the old tolerance",
-   "regression": "graph::legacy_resource_migration_reason_tests::legacy_migration_and_checked_writer_agree_which_reason_changes_a_carried_claim",
-   "audit_probe": "legacy_migration_diagnostics.rs migrated_handle_can_change_reason_identity_that_the_checked_writer_refuses (asserts the defect; inverted in the regression)",
-   "commit": "69f8e7ff0"
-  },
-  {
-   "id": "Q017",
-   "authority": [
-    "A004"
-   ],
-   "owner": "Pandect's GraphSession is the one graph persistence owner; the kernel's snapshot-only `store` feature and module are removed (Mark's ruling, 2026-10-26)",
-   "change": "graph-kernel Cargo.toml drops the `store` feature; src/lib.rs drops the module; src/store.rs deleted. No manifest enabled the feature and nothing outside the kernel named it. A public-API change for the next mere-kernel release",
-   "regression": "the reopen integration tests frozen_link_reopen.rs and assertion_lifecycle_reopen.rs were gated on the feature and never ran in-tree; they now run against a test-only graph.json helper (tests/common/graph_file.rs) and pass; the audit probe kernel_store.rs no longer compiles against the kernel",
-   "kernel_suite_after": {
-    "lib_passed": 484,
+  "lane": "L1",
+  "slice": "graph-kernel, second pass",
+  "recorded": "2026-10-26",
+  "base_commit": "45bfc3bb2",
+  "supersedes_status_of": [
+    "Q009",
+    "Q010",
+    "Q012",
+    "Q015",
+    "Q016",
+    "Q017",
+    "Q020",
+    "Q031",
+    "Q032",
+    "Q034",
+    "Q056",
+    "Q057"
+  ],
+  "rulings_applied": "Mark's L1 card round, 2026-10-20: adding an existing node id is insert-if-missing live too",
+  "operations": [
+    {
+      "id": "Q009",
+      "authority": [
+        "A001"
+      ],
+      "owner": "one insert-if-missing contract for adding a node id, live and on replay; the URL index changes only on a real insert",
+      "change": "graph/membership.rs insert_surface_node returns (key, inserted); graph/mod.rs insert_node_if_missing; apply.rs AddNode, edge_ops.rs replay, cross_graph.rs copy and snapshot/from.rs load share it",
+      "regression": "graph::membership::tests::adding_an_existing_id_live_keeps_the_node_and_the_url_index_honest (plus copy_and_snapshot_onto_an_existing_id_keep_the_first_node_and_its_index)",
+      "audit_probe": "kernel_authority_current.rs adding_the_same_id_at_a_new_url_leaves_the_old_url_index_live (asserts the defect; inverted in the regression)",
+      "commit": "b441f7b6e, merged 0b6fa7f9a"
+    },
+    {
+      "id": "Q012",
+      "authority": [
+        "A004"
+      ],
+      "owner": "the import-record table owns memberships and their suppression; a per-node provenance write edits only that node's memberships and never rebuilds the table from the facet projection",
+      "change": "graph/import_records.rs set_node_import_provenance edits the table per node and refreshes one facet; rebuild_import_records_from_node_provenance deleted; snapshot/from.rs table-less loads derive from the legacy import_provenance column",
+      "detail_choices_open_to_overrule": [
+        "a source new to the node joins that source's latest record, as the old rebuild already chose; none existing creates import-record:{source_id}",
+        "writing a source the node had suppressed un-suppresses that membership, so the node's facet equals what was written",
+        "the node's suppressed memberships in sources not written are left alone"
+      ],
+      "regression": "graph::tests::snapshot_imports::node_provenance_write_changes_only_that_nodes_memberships",
+      "audit_probe": "kernel_authority_current.rs writing_one_nodes_import_provenance_erases_another_records_suppression (asserts the defect; inverted in the regression)",
+      "commit": "c3dbd4944"
+    },
+    {
+      "id": "Q015",
+      "authority": [
+        "A012"
+      ],
+      "owner": "one bounds check, SharedNavigationMemory::check_indices in graph/navigation_check.rs, runs in validate_snapshot before Stemma hydration for both checked loaders; every other load path wraps one of them",
+      "change": "new graph/navigation_check.rs; snapshot/checked.rs gains ResourceSnapshotError::InvalidNavigation and validate_snapshot; at this base the probe no longer panicked during load (Q013 removed the cursor read) but the first history projection did, so the repair refuses at load",
+      "limit": "bounds only; in-range structural faults such as a parent cycle are not checked",
+      "regression": "graph::snapshot::tests::checked_loads_refuse_a_navigation_index_that_names_no_row",
+      "audit_probe": "kernel_snapshot.rs checked_snapshot_load_panics_on_unvalidated_navigation_indices (asserts the defect; inverted in the regression)",
+      "commit": "84b12c2f6"
+    },
+    {
+      "id": "Q016",
+      "authority": [
+        "A012"
+      ],
+      "owner": "validate_active_resource_assertion_handles stays the one owner of the handle rule; apply_graph_delta consults the same body, with the pending literal write applied, before storing ReplaySetResourceRecordById, ReplaySetNodeFacetById and SetNodeFacet on semantic.properties, and ReplayAppendNodePropertyById, so a refused delta changes and records nothing",
+      "change": "graph/resource_content.rs validator takes an optional pending write; apply.rs and node_props.rs call it at those arms; no consumer change (the validator had no kernel callers)",
+      "limit": "literal writes only; see the edge-replay fork",
+      "regression": "graph::resource_content_handle_tests::replayed_literal_handles_are_refused_where_checked_open_refuses_them and graph::resource_content_handle_tests::checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it",
+      "audit_probe": "kernel_admission.rs replay_record_admission_accepts_literal_ownership_that_checked_load_rejects (asserts the defect; inverted in the regression)",
+      "commit": "503adf904",
+      "follow_through": "a refused write is GraphDeltaResult::Refused rather than a no-op; the journal's checked replay paths (GraphJournal::snapshot_at, snapshot_at_from, replay_from, replay_from_with_baseline) stop at the first refused entry and return ReplayRefused naming it, so Pandect's open reports Corrupt and graph_at reports None for a journal that carries a colliding record, as its existing tests require; replay_captured_deltas_onto, replay_captured_deltas_as_onto and GraphJournal::replay keep dropping a refused entry and continuing, with replay_captured_deltas_onto_checked as the checked twin",
+      "consumer_tests": "pandect frozen_materialization_checks_active_sidecar_handles_and_preserves_retained_notes now builds its conflict in the frozen sidecar, since the kernel refuses it at the write; replayed_session_handles_are_checked_before_open_and_historical_publication unchanged"
+    },
+    {
+      "id": "Q032",
+      "authority": [
+        "A012"
+      ],
+      "owner": "SemanticStatement::same_claim_as in graph/edge_data.rs is the one definition of the same claim (predicate, sub-kind, scope, provenance, basis reason ignoring version); the checked writer and legacy migration both use it and migration's private ClaimIdentity is gone",
+      "change": "edge_data.rs same_claim_as; assertion_write.rs and legacy_resource_migration.rs call it; no existing test encoded the old tolerance",
+      "regression": "graph::legacy_resource_migration_reason_tests::legacy_migration_and_checked_writer_agree_which_reason_changes_a_carried_claim",
+      "audit_probe": "legacy_migration_diagnostics.rs migrated_handle_can_change_reason_identity_that_the_checked_writer_refuses (asserts the defect; inverted in the regression)",
+      "commit": "69f8e7ff0"
+    },
+    {
+      "id": "Q017",
+      "authority": [
+        "A004"
+      ],
+      "owner": "Pandect's GraphSession is the one graph persistence owner; the kernel's snapshot-only `store` feature and module are removed (Mark's ruling, 2026-10-26)",
+      "change": "graph-kernel Cargo.toml drops the `store` feature; src/lib.rs drops the module; src/store.rs deleted. No manifest enabled the feature and nothing outside the kernel named it. A public-API change for the next mere-kernel release",
+      "regression": "the reopen integration tests frozen_link_reopen.rs and assertion_lifecycle_reopen.rs were gated on the feature and never ran in-tree; they now run against a test-only graph.json helper (tests/common/graph_file.rs) and pass; the audit probe kernel_store.rs no longer compiles against the kernel",
+      "kernel_suite_after": {
+        "lib_passed": 484,
+        "integration_passed": 2,
+        "failed": 0
+      }
+    },
+    {
+      "id": "Q016 edge replays",
+      "authority": [
+        "A012"
+      ],
+      "ruling": "Mark, 2026-10-26: join the invariant",
+      "owner": "validate_handles_after stays the one validator, its pending-write type widened to PendingWrite::{Literals, ResourceEdges, SurfaceEdges}; both edge replay arms consult it before storing and return Refused(HandleCollision) for a handle a Resource literal, another row or a repeat within the set already holds",
+      "change": "graph/edge_admission.rs (new: admit_resource_edges, admit_surface_edges, the staged scope Graph::stage_edges/settle_staged_edges, a flag clones do not inherit); apply.rs both arms; resource.rs pair check shared; legacy_resource_migration.rs stages its source and output and validates the finished output once; mod.rs",
+      "regression": "graph::resource_content_edge_tests::{replayed_resource_edges_are_refused_where_checked_open_refuses_them, replayed_surface_edges_are_refused_where_checked_open_refuses_them, checked_replay_reports_a_refused_edge_set_instead_of_dropping_it, legacy_migration_stages_edge_admission_and_refuses_a_result_that_would_not_reopen, legacy_migration_reads_its_source_through_the_staged_state_repeated_rows_included}",
+      "note": "the Surface arm also refuses a handle on a second Surface row (cross-pair or within the set), per Q031's ruling at the write path; held Surface-only duplicates in an existing graph are still tolerated by validate_active_resource_assertion_handles",
+      "commit": "3aacc9636, merged ff0eb87f0"
+    },
+    {
+      "id": "Q031",
+      "authority": [
+        "A012",
+        "A016"
+      ],
+      "ruling": "Mark, 2026-10-26: not legal; enforced at the live graph, freezes copy faithfully",
+      "owner": "one rule in graph/assertion_handles.rs, validate_assertion_handles(rows) and the incremental AssertionHandles::admit: a statement handle appears on exactly one row across both strata, repeats refused whether or not identical; checked and recorded load, selection freeze and link freeze call it and give one byte-equal reason",
+      "change": "snapshot/checked.rs both loaders through the validator (ConflictingAssertion and ActiveSurfaceAssertion became RepeatedAssertionHandle), 713 to 640 lines; frozen_selection.rs and frozen_link.rs drop their private comparisons; legacy_resource_migration/copies.rs dedupes identical parallel copies of the rows the migration builds and records each as a LegacyMigrationNote on the owning Resource; one assertion_write.rs test that built copies now builds one row",
+      "regression": "graph::snapshot::handle_tests::identical_copies_on_parallel_rows_are_refused_by_load_and_both_freezes_with_one_reason (inverts the probe) plus a_graph_without_copies_loads_and_freezes_both_ways and seven more in assertion_handles_tests.rs, frozen_link_tests.rs and legacy_resource_migration.rs",
+      "unchanged": "schema-0 Surface rows stay permissive among themselves; Graph::from_snapshot panics on copies as on other invalid data; frozen link still refuses an empty handle that checked load accepts",
+      "forks_recorded_in_plan_section_5": "legacy baselines with copies of a Surface-placed claim or in pre-existing Resource rows fail the migration's final checked load",
+      "commit": "c1eb4e0ae, merged after ff0eb87f0"
+    },
+    {
+      "id": "Q010",
+      "authority": [
+        "A016"
+      ],
+      "ruling": "Mark, 2026-10-26: refuse at checked load; obsolete imagery an explicit skip",
+      "owner": "CapturedDelta::replay and replay_as decide once and return Replay::{Apply, Skip, Malformed{node_id, facet, error}}; every loop and live writer acts on that result",
+      "change": "capture/replay_outcome.rs (new: Replay, Malformed, Unwritable, Replay::into_write, the shared loop replay_outcomes_onto, and three drop-both adapters kept for the legacy migration's callers); capture.rs conversion and loops; journal.rs replay_from on the shared loop under Stop; consumers in pandect, graphshell and djinn use replay_as(..).into_write()",
+      "regression": "graph::capture::replay_outcome_tests::checked_replay_refuses_the_malformed_facet_record_a_tolerant_replay_skips (inverts the probe) plus eight more there, including snapshot_at_from_refuses_a_journal_entry_whose_facet_json_is_malformed and an_obsolete_thumbnail_record_is_skipped_silently_by_checked_and_tolerant_replay",
+      "note": "ReplayRefused.position now counts skipped entries on every journal path; parse_uuid in capture.rs still panics on a malformed id (out of scope)",
+      "forks_recorded_in_plan_section_5": "legacy migration drops or refuses a malformed facet record (legacy_resource_migration.rs:395)",
+      "commit": "49b5d844f, merged after c1eb4e0ae"
+    },
+    {
+      "id": "Q031 legacy baselines",
+      "ruling": "Mark, 2026-10-26: dedupe both",
+      "owner": "a copy is a whole persisted row equal to an earlier row on its pair that holds at least one handle; the first row stays, each later copy is dropped with a LegacyMigrationNote on the owning Resource, one per statement the copy held; a handle repeated on rows that differ is untouched and the final validation still refuses it",
+      "change": "legacy_resource_migration/copies.rs split_copies, note_deduped_surface_copy, dedupe_resource_copies, note_copy and two new uncertainty tags (identical_parallel_surface_copy_deduped_to_first_row, identical_parallel_resource_copy_deduped_to_first_row); the Surface write-back splits off copies and notes them; sync ends with dedupe_resource_copies so a typed journal entry that sets copies is deduped too; LegacyMigrationNote's pub shape unchanged (a Resource-row copy carries empty surface ids)",
+      "regression": "legacy_resource_migration_copies_tests::{legacy_migration_dedupes_identical_copies_of_a_surface_placed_claim_and_says_so, legacy_migration_dedupes_identical_surface_rows_that_a_journal_entry_sets, legacy_migration_dedupes_identical_copies_in_pre_existing_resource_rows_and_says_so, legacy_migration_refuses_a_repeated_handle_on_rows_that_differ}",
+      "commit": "2d5601db5"
+    },
+    {
+      "id": "Q010 in legacy migration",
+      "ruling": "Mark, 2026-10-26: refuse it",
+      "owner": "the migration loop reads the typed Replay outcome: Apply applies, Skip skips, Malformed returns LegacyMigrationError naming the entry index, facet and node; the typed-record path refuses anything but Apply",
+      "change": "legacy_resource_migration.rs loop and typed-record path; capture/replay_outcome.rs drops the three drop-both adapters and the pub CapturedDelta::replay_delta / replay_delta_as (a public-API change; no caller left in crates/ or ports/; the sealed audit probe audit_authority.rs still names them and no target builds it); legacy_family_attribution.rs test helper on replay_as(..).into_write()",
+      "regression": "legacy_resource_migration_malformed_tests::{legacy_migration_refuses_a_malformed_facet_record_naming_the_node_and_facet, legacy_migration_still_skips_an_obsolete_thumbnail_record}",
+      "note": "the migration's other OnRefusal::Drop replays keep their mode; the output replay still drops non-malformed refusals that legacy journals contain by design",
+      "commit": "5936edf2c"
+    },
+    {
+      "id": "A001 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: delete; one primitive",
+      "owner": "one pub(crate) primitive per navigation operation (navigate_node, branch_history, node_history_back/forward, graph/mod.rs:783-830) under the live and replay arms; the raw wrappers, the four GraphFixtures navigation methods and the mere crate's ordinary fixtures feature are gone; fixtures and tests navigate through apply_graph_delta",
+      "change": "graph/mod.rs, apply.rs, fixtures.rs, tests/snapshot_navigation.rs, crates/mere/Cargo.toml",
+      "regression": "live_and_replayed_navigation_leave_one_state",
+      "commit": "3de747fc9"
+    },
+    {
+      "id": "A003 recency (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: facet owns recency",
+      "owner": "visit.history last_visited_ms is stamped by set_node_last_visited_at_ms from the navigation and history-step primitives (replays carry the captured stamp) and the touch; Stemma is the trail; recent_visited, RecentVisit and the 'no separate recency list' claim are gone",
+      "change": "graph/mod.rs, node_props.rs, history.rs, cross_graph.rs",
+      "regression": "navigating_a_node_in_place_moves_its_recency",
+      "commit": "636ad450e"
+    },
+    {
+      "id": "A003 session clock (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: wire the launch counter",
+      "owner": "pandect::record_launch increments PersonaSettings.session_count at the slot personas/<id>/settings/ui.json; GraphSession::set_current_session and MereHost::with_launch install it; djinn's MereRoutes records one launch per process and every host it opens stamps it; the launch survives a replacement session and legacy qualification",
+      "change": "persona_settings_store.rs, graph_session.rs, mere_host.rs, resident_mere.rs",
+      "regression": "record_launch_counts_each_boot_and_keeps_the_other_settings, record_launch_reads_and_writes_the_file_the_path_store_does, a_navigation_in_launch_n_stamps_n (graphshell), keep_sessions_evicts_by_the_launch_stamp (alembic), qualifying_a_legacy_session_keeps_the_launch",
+      "note": "graphshell's web product opens a fixture persona with no boot owner and installs no launch, so its nodes stay at 0 (never stale)",
+      "commit": "5b0aacd6a, 4342d353e, 7a93dc9db"
+    },
+    {
+      "id": "A012 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: checked load decides",
+      "owner": "checked load refuses a repeated or unparseable Surface id (InvalidSurfaceId, RepeatedSurfaceId); Graph::install_facets and overlay_facets run the handle check and restore the store on refusal, facets_mut is pub(crate) (GraphFixtures::facets_mut for tests); every Pandect and host loader installs through them and the follow-up validate calls are gone; the unchecked and profiled codicil saves run the checked loader with their own placement (checked_graph in graph_codicil.rs); the dead session_graph_store saves and loads are deleted",
+      "change": "snapshot/checked.rs, node_facets.rs, residency.rs; pandect graph_session.rs, graph_codicil.rs, graph_placement.rs, addressable_graph/write.rs, session_graph_store.rs; mere-overmap wire.rs; graphshell product.rs, mere_host.rs, transfer.rs; pictograph view.rs",
+      "regression": "checked_load_refuses_an_unparseable_or_repeated_surface_id, installing_facets_that_steal_a_resource_handle_is_refused_and_leaves_the_store, opening_a_session_whose_facets_steal_a_handle_is_refused, a_codicil_save_refuses_what_checked_load_refuses, a_profiled_codicil_save_materializes_with_its_placement",
+      "note": "a profiled save of a LegacySurfaceV1 placement is now refused, as its load always was; membership.rs's keep-first test now expects the refusal",
+      "commit": "04f97eec6, c66dbc938, da9f00069, 0dd5664a5"
+    },
+    {
+      "id": "A016 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: canonical at the source",
+      "owner": "fields and couplings are BTreeMaps keyed by the id's Uuid, to_snapshot_at emits Surface edges sorted by their serialized bytes (FrozenGraph's key, so stored frozen receipts keep comparing equal); FrozenGraph::of, the schema-0 comparison arm and the residency digest no longer sort",
+      "change": "graph/mod.rs, snapshot/to.rs, field_ops.rs; pandect graph_placement.rs, addressable_graph/residency.rs, snapshot_merge.rs (finds a held edge by claim); pictograph lifecycle.rs",
+      "regression": "a_snapshot_is_canonical_whatever_the_insertion_or_hash_order, an_eight_field_baseline_qualifies_whatever_the_hash_order",
+      "note": "Resource records and the parallel rows of one pair stay in insertion order, so product.rs:834 and pictograph's record and pair sorts stay; the audit's Q034 probe now fails at its defect assertion",
+      "commit": "e3f99642e, 89ea5a01c"
+    },
+    {
+      "id": "A017 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: typed remap by variant",
+      "owner": "CapturedDelta::remap_ids (graph/revert.rs:250), exhaustive by variant beside Touched, rewrites only id fields; facet values go through remap_facet_value, which declares arrangement.frame-layout (members are node ids) and carries every other facet verbatim (provenance.derivations names a source-graph node and is the merge's key); Pandect's JSON walker and remap_edit are deleted",
+      "change": "graph/revert.rs; pandect graph_session_merge.rs",
+      "regression": "remap_ids_rewrites_what_touched_names_and_nothing_else, remap_ids_leaves_an_id_the_map_does_not_name, a_facet_value_is_remapped_only_through_the_ids_it_declares, merging_a_pick_keeps_a_title_that_equals_a_node_id, a_facet_value_naming_an_id_is_carried_verbatim_through_a_pick_merge",
+      "note": "the audit's Q020 probe now fails at its defect assertion; frozen-link and frozen-selection resource facets can hold surface ids and carry verbatim, as before",
+      "commit": "89a46065d"
+    },
+    {
+      "id": "Q056 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: write the refusal",
+      "owner": "admit_session_with decides the owner's rule and the host's ActionCheck before any reply; an action the owner allows and the host does not serve is refused ActionNotOffered in the reply and the outcome (the host re-judges the hello against a policy offering no action, since the pinned Notochord exports no reply encoder); the native carrier reads the hello, decides, writes the reply and shuts down on refusal; ProjectionRefusal::ActionNotServed folds into NotAdmitted(ActionNotOffered)",
+      "change": "graphshell-host admission.rs, carrier.rs, webrtc_session.rs, webrtc_door.rs; djinn door/browser_carrier.rs",
+      "regression": "an_action_the_owner_allows_but_this_host_does_not_serve_is_refused_in_the_reply; an_admitted_action_this_service_does_not_serve_is_refused and an_action_this_door_does_not_serve_is_not_offered now read the reply",
+      "note": "the audit's probe service_vocabulary_refusal_retains_the_accept_reply now fails at its defect assertion",
+      "commit": "dc556f65b"
+    },
+    {
+      "id": "Q057 (2026-10-28)",
+      "ruling": "Mark, 2026-10-28: claim what is enforced",
+      "owner": "lifecycle.rs says freshness comes from the carrier's link or the client; no replay state",
+      "change": "graphshell-host lifecycle.rs",
+      "regression": "a_reconnect_is_a_new_session_when_the_link_or_the_nonce_is_fresh (one hello twice on one link: same id; a fresh link or nonce: a different id)",
+      "commit": "973a34490"
+    }
+  ],
+  "kernel_suite_after": {
+    "lib_passed": 520,
     "integration_passed": 2,
-    "failed": 0
-   }
+    "failed": 0,
+    "basis": "main 7a93dc9db, 2026-10-28"
   },
-  {
-   "id": "Q016 edge replays",
-   "authority": [
-    "A012"
-   ],
-   "ruling": "Mark, 2026-10-26: join the invariant",
-   "owner": "validate_handles_after stays the one validator, its pending-write type widened to PendingWrite::{Literals, ResourceEdges, SurfaceEdges}; both edge replay arms consult it before storing and return Refused(HandleCollision) for a handle a Resource literal, another row or a repeat within the set already holds",
-   "change": "graph/edge_admission.rs (new: admit_resource_edges, admit_surface_edges, the staged scope Graph::stage_edges/settle_staged_edges, a flag clones do not inherit); apply.rs both arms; resource.rs pair check shared; legacy_resource_migration.rs stages its source and output and validates the finished output once; mod.rs",
-   "regression": "graph::resource_content_edge_tests::{replayed_resource_edges_are_refused_where_checked_open_refuses_them, replayed_surface_edges_are_refused_where_checked_open_refuses_them, checked_replay_reports_a_refused_edge_set_instead_of_dropping_it, legacy_migration_stages_edge_admission_and_refuses_a_result_that_would_not_reopen, legacy_migration_reads_its_source_through_the_staged_state_repeated_rows_included}",
-   "note": "the Surface arm also refuses a handle on a second Surface row (cross-pair or within the set), per Q031's ruling at the write path; held Surface-only duplicates in an existing graph are still tolerated by validate_active_resource_assertion_handles",
-   "commit": "3aacc9636, merged ff0eb87f0"
+  "forks_recorded_in_plan_section_5": [
+    "Q010",
+    "Q017",
+    "Q031",
+    "Q016 edge replays"
+  ],
+  "unrepaired_so_far": [
+    "Q014 (re-document only)",
+    "Q001",
+    "Q002",
+    "Q003",
+    "Q019 (chartulary, repos/eidetic)"
+  ],
+  "merges": [
+    "0b6fa7f9a (l1-q009)",
+    "22ae6792d (l1-q012-q015)",
+    "a13cf09c7 (l1-q016-q032)",
+    "f620891a0 (l1-owner-kernel)",
+    "2bded5d59 (l1-owner-remap)",
+    "1a3d2c6e2 (l1-owner-session)",
+    "53686dba4 (l1-owner-host)",
+    "7a93dc9db (l1-owner-pandect, fast-forward)"
+  ],
+  "cues": [
+    "four places still repeat the five-field claim comparison against a spec rather than a statement: assertion_write.rs matches_spec (~399), edge_data.rs (~364, ~455), edge_ops.rs (~602)",
+    "import records sharing a record_id without a source label (import-record:{source_id}) still collide, unchanged by Q012",
+    "checked.rs, from.rs, snapshot/tests.rs and legacy_resource_migration.rs were over the 600-line ceiling before this pass; new code went to sibling files",
+    "Pandect's GraphSession::apply and edit_as still answer Ok to a delta the kernel refused; the Refused result is available to surface it",
+    "merge scratch replays (graph_session_merge.rs) and GraphJournal::replay drop a refused entry and continue; whether a merge candidate may silently lack an edit is the Q010 class of question",
+    "SharedNavigationMemory::hydrate rebuilds the whole navigation memory on every read and mutation (history.rs:164)",
+    "merge_rules.rs:180 re-decides handle legality for composition instead of calling the kernel's one rule",
+    "alembic KeepDays eviction reads a per-node last-visit map no host builds",
+    "the pinned Notochord exports no SessionReply encoder, so the host writes a vocabulary refusal by re-judging the hello against an action-less policy",
+    "Resource records and the parallel rows of one Resource pair are still emitted in insertion order; one kernel sort would let product.rs:834 and pictograph lifecycle's record and pair sorts go",
+    "graphshell's web product opens a fixture persona with no boot owner, so it installs no launch",
+    "djinn records the launch through a short-lived DirectoryBackend on the shared root (its lock file remains); two MereRoutes in one process would count two launches",
+    "pandect fork_component_graph now returns Result<Option<Graph>, _>; Turnstone's caller is outside this repository",
+    "FieldId and CouplingId (numen) lack Ord, so the kernel keys the field and coupling maps by the inner Uuid"
+  ],
+  "pandect_suite_after": {
+    "lib_passed": 353,
+    "integration_passed": 28,
+    "failed": 0,
+    "basis": "main 7a93dc9db"
   },
-  {
-   "id": "Q031",
-   "authority": [
-    "A012",
-    "A016"
-   ],
-   "ruling": "Mark, 2026-10-26: not legal; enforced at the live graph, freezes copy faithfully",
-   "owner": "one rule in graph/assertion_handles.rs, validate_assertion_handles(rows) and the incremental AssertionHandles::admit: a statement handle appears on exactly one row across both strata, repeats refused whether or not identical; checked and recorded load, selection freeze and link freeze call it and give one byte-equal reason",
-   "change": "snapshot/checked.rs both loaders through the validator (ConflictingAssertion and ActiveSurfaceAssertion became RepeatedAssertionHandle), 713 to 640 lines; frozen_selection.rs and frozen_link.rs drop their private comparisons; legacy_resource_migration/copies.rs dedupes identical parallel copies of the rows the migration builds and records each as a LegacyMigrationNote on the owning Resource; one assertion_write.rs test that built copies now builds one row",
-   "regression": "graph::snapshot::handle_tests::identical_copies_on_parallel_rows_are_refused_by_load_and_both_freezes_with_one_reason (inverts the probe) plus a_graph_without_copies_loads_and_freezes_both_ways and seven more in assertion_handles_tests.rs, frozen_link_tests.rs and legacy_resource_migration.rs",
-   "unchanged": "schema-0 Surface rows stay permissive among themselves; Graph::from_snapshot panics on copies as on other invalid data; frozen link still refuses an empty handle that checked load accepts",
-   "forks_recorded_in_plan_section_5": "legacy baselines with copies of a Surface-placed claim or in pre-existing Resource rows fail the migration's final checked load",
-   "commit": "c1eb4e0ae, merged after ff0eb87f0"
+  "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host 2026-10-28 morning, the owner round, eight forks, all applied the same day.",
+  "authority_entries_reduced": {
+    "A001": "one owner",
+    "A003": "facet recency, Stemma trail, launch counter wired",
+    "A012": "checked load and one checked facet install",
+    "A016": "canonical snapshot at the source",
+    "A017": "typed remap; other copy paths recorded as separate operations"
   },
-  {
-   "id": "Q010",
-   "authority": [
-    "A016"
-   ],
-   "ruling": "Mark, 2026-10-26: refuse at checked load; obsolete imagery an explicit skip",
-   "owner": "CapturedDelta::replay and replay_as decide once and return Replay::{Apply, Skip, Malformed{node_id, facet, error}}; every loop and live writer acts on that result",
-   "change": "capture/replay_outcome.rs (new: Replay, Malformed, Unwritable, Replay::into_write, the shared loop replay_outcomes_onto, and three drop-both adapters kept for the legacy migration's callers); capture.rs conversion and loops; journal.rs replay_from on the shared loop under Stop; consumers in pandect, graphshell and djinn use replay_as(..).into_write()",
-   "regression": "graph::capture::replay_outcome_tests::checked_replay_refuses_the_malformed_facet_record_a_tolerant_replay_skips (inverts the probe) plus eight more there, including snapshot_at_from_refuses_a_journal_entry_whose_facet_json_is_malformed and an_obsolete_thumbnail_record_is_skipped_silently_by_checked_and_tolerant_replay",
-   "note": "ReplayRefused.position now counts skipped entries on every journal path; parse_uuid in capture.rs still panics on a malformed id (out of scope)",
-   "forks_recorded_in_plan_section_5": "legacy migration drops or refuses a malformed facet record (legacy_resource_migration.rs:395)",
-   "commit": "49b5d844f, merged after c1eb4e0ae"
-  },
-  {
-   "id": "Q031 legacy baselines",
-   "ruling": "Mark, 2026-10-26: dedupe both",
-   "owner": "a copy is a whole persisted row equal to an earlier row on its pair that holds at least one handle; the first row stays, each later copy is dropped with a LegacyMigrationNote on the owning Resource, one per statement the copy held; a handle repeated on rows that differ is untouched and the final validation still refuses it",
-   "change": "legacy_resource_migration/copies.rs split_copies, note_deduped_surface_copy, dedupe_resource_copies, note_copy and two new uncertainty tags (identical_parallel_surface_copy_deduped_to_first_row, identical_parallel_resource_copy_deduped_to_first_row); the Surface write-back splits off copies and notes them; sync ends with dedupe_resource_copies so a typed journal entry that sets copies is deduped too; LegacyMigrationNote's pub shape unchanged (a Resource-row copy carries empty surface ids)",
-   "regression": "legacy_resource_migration_copies_tests::{legacy_migration_dedupes_identical_copies_of_a_surface_placed_claim_and_says_so, legacy_migration_dedupes_identical_surface_rows_that_a_journal_entry_sets, legacy_migration_dedupes_identical_copies_in_pre_existing_resource_rows_and_says_so, legacy_migration_refuses_a_repeated_handle_on_rows_that_differ}",
-   "commit": "2d5601db5"
-  },
-  {
-   "id": "Q010 in legacy migration",
-   "ruling": "Mark, 2026-10-26: refuse it",
-   "owner": "the migration loop reads the typed Replay outcome: Apply applies, Skip skips, Malformed returns LegacyMigrationError naming the entry index, facet and node; the typed-record path refuses anything but Apply",
-   "change": "legacy_resource_migration.rs loop and typed-record path; capture/replay_outcome.rs drops the three drop-both adapters and the pub CapturedDelta::replay_delta / replay_delta_as (a public-API change; no caller left in crates/ or ports/; the sealed audit probe audit_authority.rs still names them and no target builds it); legacy_family_attribution.rs test helper on replay_as(..).into_write()",
-   "regression": "legacy_resource_migration_malformed_tests::{legacy_migration_refuses_a_malformed_facet_record_naming_the_node_and_facet, legacy_migration_still_skips_an_obsolete_thumbnail_record}",
-   "note": "the migration's other OnRefusal::Drop replays keep their mode; the output replay still drops non-malformed refusals that legacy journals contain by design",
-   "commit": "5936edf2c"
+  "other_suites_2026_10_28": {
+    "graphshell_lib": 313,
+    "graphshell_host_all_features": 104,
+    "graphshell_host_integration": 6,
+    "pictograph_lib": 654,
+    "alembic_recall": 8,
+    "checks": "djinn, cambium, mere-overmap, rdf, forme, cartography, athanor, mere"
   }
- ],
- "kernel_suite_after": {
-  "lib_passed": 512,
-  "integration_passed": 2,
-  "failed": 0,
-  "basis": "main with the migration rulings merged onto the chartulary repin (fcae43cc7): 477 lib tests before the day plus 35 regressions"
- },
- "forks_recorded_in_plan_section_5": [
-  "Q010",
-  "Q017",
-  "Q031",
-  "Q016 edge replays"
- ],
- "unrepaired_so_far": [
-  "Q014 (re-document only)",
-  "Q001",
-  "Q002",
-  "Q003",
-  "Q019 (chartulary, repos/eidetic)"
- ],
- "merges": [
-  "0b6fa7f9a (l1-q009)",
-  "22ae6792d (l1-q012-q015)",
-  "a13cf09c7 (l1-q016-q032)"
- ],
- "cues": [
-  "four places still repeat the five-field claim comparison against a spec rather than a statement: assertion_write.rs matches_spec (~399), edge_data.rs (~364, ~455), edge_ops.rs (~602)",
-  "import records sharing a record_id without a source label (import-record:{source_id}) still collide, unchanged by Q012",
-  "checked.rs, from.rs, snapshot/tests.rs and legacy_resource_migration.rs were over the 600-line ceiling before this pass; new code went to sibling files",
-  "Pandect's GraphSession::apply and edit_as still answer Ok to a delta the kernel refused; the Refused result is available to surface it",
-  "merge scratch replays (graph_session_merge.rs) and GraphJournal::replay drop a refused entry and continue; whether a merge candidate may silently lack an edit is the Q010 class of question"
- ],
- "pandect_suite_after": {
-  "lib_passed": 342,
-  "integration_passed": 28,
-  "failed": 0
- },
- "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host"
 }

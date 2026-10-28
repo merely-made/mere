@@ -664,3 +664,24 @@ findings that waited on them (§5.2). Each entry lists what is copied today, wit
   not asked, carried as cues: `hydrate()` rebuilds the whole navigation memory on every read and
   mutation (`history.rs:164`); `merge_rules.rs:180` re-decides handle legality for composition
   instead of calling the kernel's one rule; `KeepDays` eviction reads a map no host builds.
+- 2026-10-28 (L1, the owner rulings applied): all eight landed on main the same day in two waves of
+  worktree agents, one regression each. Kernel: one navigation primitive under the live and replay
+  arms with the raw wrappers, the fixtures trait's navigation methods and the root crate's
+  ordinary `fixtures` feature gone (A001); the `visit.history` facet owns recency, stamped by
+  navigation and the history steps, with `recent_visited` and its claim gone (A003); checked load
+  refuses a repeated or unparseable Surface id and `install_facets`/`overlay_facets` are the one
+  checked install, `facets_mut` now crate-private (A012); fields and couplings in id order and
+  Surface edges in byte order at the source, the per-site sorts gone (A016); `CapturedDelta::remap_ids`
+  by variant replaces the JSON walker, with `arrangement.frame-layout` the one facet declaring ids
+  (A017). Pandect: every loader installs through the checked primitive, the unchecked and profiled
+  codicil saves run the checked loader with their own placement, the dead `session_graph_store`
+  saves are deleted. Hosts: `ActionNotOffered` is written as the reply on every carrier (Q056); the
+  reconnect prose and test claim what admission enforces (Q057); `record_launch` counts launches in
+  the persona settings slot and djinn installs the number on every host it opens, the launch
+  surviving a replacement session and qualification (A003 session clock). The audit's Q020, Q034
+  and Q056 probes now fail at their defect assertions. Kernel lib 520, Pandect 353 and 28,
+  graphshell 313, graphshell-host 104 and 6, pictograph 654, alembic 8; djinn, cambium, overmap,
+  rdf, forme, cartography, athanor and mere check. Receipt updated. Cues: Resource records and a
+  pair's parallel rows still emit in insertion order; graphshell's web product has no persona boot
+  and installs no launch; Notochord exports no reply encoder, so the host refuses by re-judging
+  against an action-less policy; `fork_component_graph` changed signature for Turnstone's caller.
