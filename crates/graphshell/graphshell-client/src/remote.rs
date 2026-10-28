@@ -493,6 +493,17 @@ impl RemoteSession {
         self.events.push(format!("remote-error {error}"));
     }
 
+    /// A start that did not go out. With nothing in flight that is a failure
+    /// like any other; with an operation in flight it is the new request that
+    /// failed, not the link, and that operation is left as it was.
+    fn refuse(&mut self, error: String) {
+        if self.pending.is_none() {
+            return self.fail(error);
+        }
+        self.form.status = format!("Failed · remote: {error}");
+        self.events.push(format!("remote-error {error}"));
+    }
+
     // ── The wire ────────────────────────────────────────────────────────────
 
     /// One line from the endpoint.
@@ -557,17 +568,17 @@ impl RemoteSession {
         };
         let progress = core.submit_action_draft(&target, draft);
         let label = draft.action().label.clone();
-        self.form.count = self.form.count.saturating_add(1);
-        self.form.status = format!("Invoking · {label}");
-        self.begin(RemoteOp::Invoke, progress);
+        if self.begin(RemoteOp::Invoke, progress) {
+            self.form.count = self.form.count.saturating_add(1);
+            self.form.status = format!("Invoking · {label}");
+        }
     }
 
     // ── Sequencing ──────────────────────────────────────────────────────────
 
     fn begin_discovery(&mut self) {
-        self.pending = Some(RemoteOp::Discover);
         let advance = self.driver.discover();
-        self.carry(advance);
+        self.start(RemoteOp::Discover, advance);
     }
 
     /// End the old transport's work while retaining its mounted scene for
@@ -581,11 +592,27 @@ impl RemoteSession {
     }
 
     /// Start an operation: hand the driver the core's progress and carry the
-    /// first step — a line out, or an answer already at hand.
-    fn begin(&mut self, op: RemoteOp, progress: Result<Progress<Outcome>, String>) {
+    /// first step — a line out, or an answer already at hand. Whether it
+    /// started.
+    fn begin(&mut self, op: RemoteOp, progress: Result<Progress<Outcome>, String>) -> bool {
         let advance = progress.and_then(|progress| self.driver.begin(progress));
-        self.pending = Some(op);
-        self.carry(advance);
+        self.start(op, advance)
+    }
+
+    /// Own `op` only once the driver has taken it, so a refused start leaves
+    /// this end agreeing with the driver and the core about what is in flight.
+    fn start(&mut self, op: RemoteOp, advance: Result<Advance, String>) -> bool {
+        match advance {
+            Ok(advance) => {
+                self.pending = Some(op);
+                self.carry(Ok(advance));
+                true
+            },
+            Err(error) => {
+                self.refuse(error);
+                false
+            },
+        }
     }
 
     fn carry(&mut self, advance: Result<Advance, String>) {

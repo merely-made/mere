@@ -273,8 +273,11 @@ impl RetainedEndpointSession {
         loop {
             match progress {
                 Progress::Done(outcome) => return Ok(outcome),
+                Progress::Refused(message) => return Err(message),
                 Progress::Ask(body) => {
-                    let answer = self.ask(body)?;
+                    // A request that got no answer leaves nothing for the core
+                    // to wait on, or the next start would be refused for good.
+                    let answer = self.ask(body).inspect_err(|_| self.core.abandon())?;
                     progress = self.core.on_response(answer)?;
                 },
             }
@@ -409,4 +412,63 @@ pub fn unexpected(expected: &str, actual: &CarrierResponseBody) -> String {
 /// should be able to report it and carry on.
 fn misdriven(expected: &str, actual: &Outcome) -> String {
     format!("Graphshell expected {expected} but the session core produced {actual:?}")
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::VecDeque;
+
+    use chirograph::{CarrierError, CarrierNotice, EndpointDescriptor};
+
+    use super::*;
+
+    /// A carrier that plays back a script of answers, whatever is asked.
+    struct Scripted(VecDeque<Result<CarrierResponseBody, CarrierError>>);
+
+    impl Carrier for Scripted {
+        fn request(&mut self, _: CarrierRequestBody) -> Result<CarrierResponseBody, CarrierError> {
+            self.0.pop_front().expect("the script ran out")
+        }
+
+        fn take_notice(&mut self) -> Option<CarrierNotice> {
+            None
+        }
+
+        fn wait_for_notice(&mut self) -> Result<CarrierNotice, CarrierError> {
+            Err(CarrierError::Disconnected("scripted".into()))
+        }
+
+        fn shutdown(&mut self) -> Result<(), CarrierError> {
+            Ok(())
+        }
+    }
+
+    /// The endpoint declining one request leaves the session intact, so the
+    /// next request must be allowed: the core cannot keep waiting on the
+    /// declined one.
+    #[test]
+    fn a_declined_request_leaves_the_session_free_to_ask_again() {
+        let descriptor = EndpointDescriptor {
+            label: "scripted".into(),
+            projections: Vec::new(),
+        };
+        let carrier = Scripted(VecDeque::from([
+            Ok(CarrierResponseBody::Descriptor(descriptor.clone())),
+            Err(CarrierError::Refused("not now".into())),
+            Ok(CarrierResponseBody::Descriptor(descriptor)),
+        ]));
+        let mut session =
+            RetainedEndpointSession::over(Box::new(carrier), CapabilityProfile::default())
+                .expect("discovery answers");
+
+        let error = session
+            .poll_for_change()
+            .expect_err("the endpoint declined");
+        assert!(error.contains("not now"), "{error}");
+        assert_eq!(
+            session.poll_for_change(),
+            Ok(false),
+            "the next poll is asked"
+        );
+    }
 }
