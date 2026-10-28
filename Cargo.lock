@@ -11465,7 +11465,7 @@ dependencies = [
 [[package]]
 name = "netrender_device"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?branch=main#d9d6e778df7cbf220de315f91fa5ddd870d72233"
+source = "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
 dependencies = [
  "log",
  "pollster 1.0.1",
