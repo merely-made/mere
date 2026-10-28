@@ -20,15 +20,14 @@ impl Canvas {
         self.graph.facets()
     }
 
-    /// Mutable access for host-defined and unknown-forward facet namespaces.
-    pub fn facets_mut(&mut self) -> &mut kernel::graph::NodeFacetStore {
-        self.graph.facets_mut()
-    }
-
     /// Overlay the canonical sidecar after the graph imported any legacy
-    /// snapshot columns.
-    pub fn overlay_facets(&mut self, facets: kernel::graph::NodeFacetStore) {
-        self.graph.overlay_facets(facets);
+    /// snapshot columns. Refused, with the store kept, when the result would
+    /// fail checked open.
+    pub fn overlay_facets(
+        &mut self,
+        facets: kernel::graph::NodeFacetStore,
+    ) -> Result<(), kernel::graph::snapshot::ResourceSnapshotError> {
+        self.graph.overlay_facets(facets)
     }
 
     /// The current camera (pan + zoom), for the host to persist as view-intent.

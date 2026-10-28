@@ -768,8 +768,19 @@ mod tests {
         let chosen = graph.to_snapshot();
         assert_eq!(chosen.edges, held.edges);
         assert_eq!(chosen.resource_edges, held.resource_edges);
+        // The loaded graph also holds derived containment edges, and a
+        // snapshot lists edges in byte order, so find the held edge by claim.
+        let held_surface = chosen
+            .edges
+            .iter()
+            .find(|edge| {
+                edge.retained_assertions()
+                    .iter()
+                    .any(|claim| claim.statement_id == "held-surface")
+            })
+            .unwrap();
         assert_eq!(
-            chosen.edges[0].retained_assertions(),
+            held_surface.retained_assertions(),
             merged.edges[0].retained_assertions()
         );
         assert_eq!(

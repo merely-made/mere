@@ -2004,19 +2004,20 @@ pub fn picked_session_name(source: Option<&str>) -> String {
 /// `seed`, copied with its facets through the id remap, and the donor
 /// container's scene settings carried to the fork's container. The
 /// product-neutral half of Turnstone's tear-out; nested worlds and resident
-/// admissions stay Turnstone's to carry. Native only, as the kernel's
-/// component copy is.
+/// admissions stay Turnstone's to carry. `None` when `seed` names no node;
+/// refused when the carried facets fail the handle rule. Native only, as the
+/// kernel's component copy is.
 #[cfg(not(target_arch = "wasm32"))]
 pub fn fork_component_graph(
     donor: &Graph,
     donor_container: Uuid,
     seed: Uuid,
     fork_container: Uuid,
-) -> Option<Graph> {
+) -> Result<Option<Graph>, kernel::graph::snapshot::ResourceSnapshotError> {
     let mut fork = Graph::new();
     let copy = fork.copy_component_from(donor, seed, Some(donor_container.to_string()));
     if copy.new_keys.is_empty() {
-        return None;
+        return Ok(None);
     }
     let mut facets = NodeFacetStore::new();
     copy_node_facets(donor.facets(), &mut facets, &copy.id_remap);
@@ -2034,17 +2035,19 @@ pub fn fork_component_graph(
                 .map(|value| (*minted, value))
         })
         .collect();
-    fork.overlay_facets(facets);
+    let mut merged = fork.facets().clone();
+    merged.overlay(facets);
     let import = FacetId::new(PROVENANCE_IMPORT);
     for (_, minted) in &copy.id_remap {
-        fork.facets_mut().remove(minted, &import);
+        merged.remove(minted, &import);
     }
     for (minted, value) in derivations {
-        fork.facets_mut()
+        merged
             .set(minted, derivation.clone(), value, &AcceptAll)
             .expect("AcceptAll admits every value");
     }
-    Some(fork)
+    fork.install_facets(merged)?;
+    Ok(Some(fork))
 }
 
 /// A mere's sessions, over its one store.
@@ -2343,6 +2346,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             seed,
             *fork_graph_id.as_uuid(),
         )
+        .map_err(|error| SessionError::Validation(error.to_string()))?
         .ok_or(SessionError::NoSuchNode(seed))?;
         parent.validate(&graph)?;
         let at = parent.journal().live_cursor();
@@ -3543,11 +3547,13 @@ mod tests {
             second.retained_assertions_mut()[0].statement_id = "held-profile-second".into();
             snapshot.edges.push(second);
             let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
-            graph.overlay_facets(
-                crate::graph_placement::placement_test_graph()
-                    .facets()
-                    .clone(),
-            );
+            graph
+                .overlay_facets(
+                    crate::graph_placement::placement_test_graph()
+                        .facets()
+                        .clone(),
+                )
+                .unwrap();
             let mut live = sessions.begin_recorded(person(), Some(graph));
             live.set_view_now(
                 person(),
