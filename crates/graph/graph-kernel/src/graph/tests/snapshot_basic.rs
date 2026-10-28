@@ -179,7 +179,7 @@ fn node_properties_survive_snapshot_roundtrip() {
 
     let facets = graph.facets().clone();
     let mut restored = Graph::from_snapshot(&graph.to_snapshot());
-    restored.overlay_facets(facets);
+    restored.overlay_facets(facets).unwrap();
 
     let (key, _) = restored.get_node_by_url("https://a.test/").unwrap();
     let properties = restored.node_properties(key).unwrap();
@@ -213,7 +213,7 @@ fn test_snapshot_roundtrip() {
     let snapshot = graph.to_snapshot();
     let facets = graph.facets().clone();
     let mut restored = Graph::from_snapshot(&snapshot);
-    restored.overlay_facets(facets);
+    restored.overlay_facets(facets).unwrap();
 
     assert_eq!(restored.node_count(), 2);
     assert_eq!(restored.edge_count(), 0);
