@@ -10,10 +10,13 @@
 //! the last tenth of the things they keep track of and as their content
 //! fills the plate.
 
+use std::collections::HashSet;
+
 use kernel::graph::NodeKey;
 use scenograph::suggestion::SuggestionSettings;
 
 use super::Canvas;
+use super::link_suggestions::LINK_SOURCE;
 
 impl Canvas {
     pub fn suggestion_settings(&self) -> &SuggestionSettings {
@@ -23,7 +26,7 @@ impl Canvas {
     /// Replace the host's suggestion settings and re-admit the last offer.
     pub fn set_suggestion_settings(&mut self, settings: SuggestionSettings) {
         self.grammar.suggestions = settings;
-        self.refresh_link_suggestions();
+        self.admit_suggestions();
     }
 
     /// Offer `candidates` (member, source) in the scene's order, replacing
@@ -42,33 +45,65 @@ impl Canvas {
     /// How full the plate is: the faces' area over the viewport's, 0 to 1.
     /// An unsized canvas has no plate yet, so nothing fills it.
     pub fn plate_fill(&self) -> f32 {
+        self.fill_of(self.view.positions().map(|(key, _)| key))
+    }
+
+    fn fill_of(&self, keys: impl Iterator<Item = NodeKey>) -> f32 {
         if self.view_w == 0 || self.view_h == 0 {
             return 0.0;
         }
         let viewport = (self.view_w * self.view_h) as f32;
         let zoom = self.camera.zoom;
-        let faces: f32 = self
-            .view
-            .positions()
-            .map(|(key, _)| (self.node_size(key) * zoom).powi(2))
-            .sum();
+        let faces: f32 = keys.map(|key| (self.node_size(key) * zoom).powi(2)).sum();
         (faces / viewport).clamp(0.0, 1.0)
     }
 
-    pub(crate) fn admit_suggestions(&mut self) {
-        let mut candidates = self.grammar.offered.clone();
-        candidates.extend(self.link_suggestion_members());
-        let offered: Vec<NodeKey> = candidates.iter().map(|(key, _)| *key).collect();
-        // What the person keeps: everything held that is not on offer.
-        let kept = self
+    /// What the person keeps: the held nodes neither on offer nor derived,
+    /// counted and measured against the plate. Suggestions are no part of it,
+    /// so minting one never changes what admits it.
+    fn kept_content(&self) -> (usize, f32) {
+        let offered: HashSet<NodeKey> = self.grammar.offered.iter().map(|(key, _)| *key).collect();
+        let kept: HashSet<NodeKey> = self
             .graph
             .nodes()
             .filter(|(key, node)| !offered.contains(key) && !self.is_derived_member(node.id))
-            .count();
-        let admitted = self
+            .map(|(key, _)| key)
+            .collect();
+        let fill = self.fill_of(
+            self.view
+                .positions()
+                .map(|(key, _)| key)
+                .filter(|k| kept.contains(k)),
+        );
+        (kept.len(), fill)
+    }
+
+    /// The one admission. The scene's offers and the links pages carry make a
+    /// single candidate set; the settings admit from it once, by source,
+    /// against the count and fill of what the person keeps. Derived link
+    /// members are minted or removed to match and attention reads the same
+    /// set, so a link is on the canvas exactly when it is admitted.
+    pub(crate) fn admit_suggestions(&mut self) {
+        self.prune_derived();
+        let links = self.link_candidates();
+        let mut candidates: Vec<(uuid::Uuid, String)> = self
             .grammar
-            .suggestions
-            .admit(candidates, kept, self.plate_fill());
-        self.grammar.attention_book_mut().set_suggested(admitted);
+            .offered
+            .iter()
+            .filter_map(|(key, source)| Some((self.graph.get_node(*key)?.id, source.clone())))
+            .collect();
+        candidates.extend(
+            links
+                .iter()
+                .map(|link| (link.member, LINK_SOURCE.to_string())),
+        );
+        let (kept, fill) = self.kept_content();
+        let admitted = self.grammar.suggestions.admit(candidates, kept, fill);
+        self.sync_link_members(&links, &admitted);
+        let keys: Vec<NodeKey> = admitted
+            .iter()
+            .filter_map(|member| self.graph.get_node_key_by_id(*member))
+            .collect();
+        self.grammar.attention_book_mut().set_suggested(keys);
     }
 }
