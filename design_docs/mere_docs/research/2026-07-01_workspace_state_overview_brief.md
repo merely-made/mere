@@ -58,7 +58,7 @@ complete), user zoom shipped, auto-DPI planned.
   undo ships first, with zero storage).
 - **The write side of knots**: the [djot editor](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
   (jotdown + logos injection, pure Rust, wasm-safe), with
-  [illume / tinct](../implementation_strategy/2026-06-26_illume_text_lexer_plan.md)
+  [illume / tinct](../../archive_docs/2026-10-28/2026-06-26_illume_text_lexer_plan.md)
   extraction as publishable siblings.
 - **Swatch as the fourth primitive**: the P5 visibility stack
   (`GraphDefault < GraphViewOverride < SelectionOverride`), templates, and the

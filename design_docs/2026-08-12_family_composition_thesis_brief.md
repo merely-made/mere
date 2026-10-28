@@ -10,7 +10,7 @@ implementation promotion remain open (see §7's experiment results).
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
 (the three-seam composition thesis this elevates),
 [Graphshell remote projection host plan](archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
-and [reference host plan](mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md)
+and [reference host plan](archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md)
 (the rulings this extends),
 [credential port + gazette brief](mere_docs/research/2026-08-10_credential_port_gazette_brief.md)
 (the castellan split this generalizes),
@@ -152,7 +152,7 @@ scope; score). Stated this compactly it is testable: any place a projection
 can exceed its sync scope, or a sync exceed its disclosure, is a bug class
 with a name.
 
-> **Amended 2026-10-04 (Mark, [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> **Amended 2026-10-04 (Mark, [graph semantics plan](archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md)
 > ruling 4):** every query and projection result names the layer that limited
 > it, and partial residency adds "not loaded". *Reading, not ruled*: residency
 > sits inside possession (held on disk or another device, not in memory), so
@@ -295,7 +295,7 @@ contracts local is a successful research outcome.
 **Implementation ready:** a selected contract names state and authority,
 identifier scope, lifetime/invalidation, inputs/outputs, cancellation and
 failure behavior, a forcing consumer, and bounded owner-specific slices.
-Reuse the [runtime composition ledger's](mere_docs/implementation_strategy/2026-08-23_runtime_composition_acceptance_plan.md)
+Reuse the [runtime composition ledger's](archive_docs/2026-10-28/2026-08-23_runtime_composition_acceptance_plan.md)
 distinction: settled reusable mechanics can move for one forcing consumer;
 cross-product orchestration, identity, authority and lease contracts require
 a heterogeneous second consumer before promotion.
@@ -478,14 +478,14 @@ ranges through its own ureq client, outside Turnstone's cookies, HSTS, cache,
 redirect limit and transport seam, which
 `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` records as
 its open gate 1. A side client would also bypass the I2P and Arti lanes the
-[reachability plan](mere_docs/implementation_strategy/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
+[reachability plan](archive_docs/2026-10-28/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
 puts in Turnstone's fetch stack. Existing guarantees: netfetcher sends `Range`
 with identity encoding and streams bodies; the netfetcher plan (archived
 2026-06-09) puts a fetcher pool in each host's session layer over persona-scoped
 stores, and no such worker exists yet; the
-[session store plan](mere_docs/implementation_strategy/2026-06-23_native_session_store_plan.md)
+[session store plan](archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md)
 rules one substrate per persona; the
-[resident plan](mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md)
+[resident plan](archive_docs/2026-10-28/2026-08-20_device_resident_consolidation_plan.md)
 makes iroh's BLAKE3 blob store the shared content store.
 
 Rulings (Mark, 2026-09-20):
@@ -1024,7 +1024,7 @@ The rulings settle policy, not a wire schema or implementation receipt.
    personal tagging assertion citing that evidence; it preserves the engine's
    attribution and does not rewrite the suggestion as a human observation.
    Existing concept identity and asserter rules remain governed by C7/ruling 20
-   of the [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md).
+   of the [graph semantics plan](archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md).
 4. **CP4, unavailable source owner.** Mark: **"Queue domain-supported edits for
    review when the owner returns"**. Retain supported inert edit requests with
    source-owner/entity reference, expected source revision, payload schema,
@@ -1130,7 +1130,7 @@ pause retain their existing meaning.
 The closest internal predecessor is the
 [2026-07-08 unifying-graph vision](mere_docs/technical_architecture/2026-07-08_mere_as_the_unifying_graph.md):
 heterogeneous app data becomes a legible pool through graph relationships.
-The [generic substrate plan](mere_docs/technical_architecture/2026-07-08_generic_graph_substrate_plan.md)
+The [generic substrate plan](archive_docs/2026-10-28/2026-07-08_generic_graph_substrate_plan.md)
 separates stable identity from optional content, address and graph capabilities.
 The [2026-09-02 composition assessment](mere_docs/research/2026-09-02_port_gui_composition_and_comparable_stacks_brief.md#4-the-crux-deterministic-domain-aware-projections-out-of-app-pattern-data)
 adds purposeful, domain-aware projections and typed intents. These are earlier
@@ -1412,7 +1412,7 @@ remain with their respective owners.
 ### Browser WebGL2 presentation tenants design (2026-10-13)
 
 **Status:** written design approved by the owner, 2026-10-13. Implementation
-planning is recorded in the [browser presentation tenants plan](mere_docs/implementation_strategy/2026-10-13_browser_presentation_tenants_plan.md).
+planning is recorded in the [browser presentation tenants plan](archive_docs/2026-10-28/2026-10-13_browser_presentation_tenants_plan.md).
 This continues the embedding draft above; native egui/Iced integration keeps
 its separate gates.
 

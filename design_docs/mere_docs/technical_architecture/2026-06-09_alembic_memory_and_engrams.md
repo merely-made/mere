@@ -10,7 +10,7 @@ distillation daemon, and graph engrams as one composable engram schema.
 - [peripheral panes architecture](2026-06-06_peripheral_panes_architecture.md) — the dock/pane catalog Alembic joins; carries the 2026-06-09 Apparatus/Steward axis refinement this doc drove.
 - [memory tiers brief](../research/2026-05-11_memory_tiers_brief.md) — the prior two-tier (short/long) partition. This doc refines its vocabulary (see §2).
 - [geist models brief](../research/2026-05-10_geist_models_brief.md) — geists as base model + LoRA-adapter engrams; the loras lane. This doc names the geist as one engram schema (§6).
-- [system diagnostics + accessibility plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md) — Athanor is a first customer of its observability spine; the Apparatus/Steward correction lives there too.
+- [system diagnostics + accessibility plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md) — Athanor is a first customer of its observability spine; the Apparatus/Steward correction lives there too.
 - [composition spine](2026-05-21_mere_composition_spine.md) — graph truth projected into surfaces; the orrery is the live graph's spatial surface, an engram is a frozen one.
 - Kernel snapshot: [`graph/snapshot/mod.rs`](../../../crates/graph/graph-kernel/src/graph/snapshot/mod.rs), node fields: [`graph/node.rs`](../../../crates/graph/graph-kernel/src/graph/node.rs).
 
@@ -251,7 +251,7 @@ preserve-duplicates, §4) are Athanor's, set in Apparatus (config).
 
 Surfacing Athanor clarified the Apparatus/Steward boundary, and the correction is
 recorded in the [pane architecture](2026-06-06_peripheral_panes_architecture.md)
-and the [diagnostics plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md):
+and the [diagnostics plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md):
 
 - **Steward** is the **live** plane: the process / daemon monitor (running actors,
   async jobs, distillation passes in flight) shown as status you can act on.

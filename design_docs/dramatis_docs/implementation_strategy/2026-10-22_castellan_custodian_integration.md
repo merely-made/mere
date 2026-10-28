@@ -72,7 +72,7 @@ Still gated, recorded in the hardening plan's §6 and §8:
 
 ## H2 consumer migration, 2026-10-26
 
-The custodian now hosts Castellan's resident host (`PersonaeHost`), the wallet, the credential catalog and the SSH agent. Djinn's custody is one trait, `ResidentCustody`. A production build has only its client, `RemoteHost`, and links no castellan. The in-process host survives only under the `in-process-custody` feature, for test suites and receipt hosts, and is never a fallback. The hardening plan's [H2 section](2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration) maps each consumer to its §5.6 operation, and records two things:
+The custodian now hosts Castellan's resident host (`PersonaeHost`), the wallet, the credential catalog and the SSH agent. Djinn's custody is one trait, `ResidentCustody`. A production build has only its client, `RemoteHost`, and links no castellan. The in-process host survives only under the `in-process-custody` feature, for test suites and receipt hosts, and is never a fallback. The hardening plan's [H2 section](../../archive_docs/2026-10-28/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration) maps each consumer to its §5.6 operation, and records two things:
 - Hocket adoption is stopped: it needs an identity-format change.
 - The wallet is migrated at the operation level, but its secret files move into custody only after a public/secret file split.
 

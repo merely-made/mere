@@ -4,7 +4,7 @@
 **Kind:** design record. Mark's rulings on ambiance, the examples he gave, the
 stack precedents they cite, and how they sit in Mere's existing session and
 memory design. No code.
-> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md)
 > ruling 17):** keeping's bottom step is now called **the ambient level**, so that
 > *tier* names only the t1–t4 socialization aspect. The meaning is unchanged; the
 > text below keeps "ambient tier" as written.
@@ -227,7 +227,7 @@ examined stays ambient. Turnstone is the browser "where browsing history is the
 graph rather than a tab strip" ([TERMINOLOGY](../../TERMINOLOGY.md)). Mark:
 "this obviously directly applies to turnstone."
 
-> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md)
 > ruling 4):** a recognized link statement (cites, quotes) whose target is not
 > in the graph stays ambient, but it is no longer discarded: a rebuildable
 > index, which is not graph truth, re-derives it when the target returns, and
@@ -444,7 +444,7 @@ thaws sessions (`crates/system/pandect/src/graph_codicil.rs`):
 That is the repository Mark describes: sessions saved and archived by Eidetic,
 reopened from the archive, forking and merging.
 
-The [Alembic implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md)
+The [Alembic implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md)
 records how far it is built: "slices A-C landed; merge, promotion, event-log,
 LoRA, and settings/Timeline follow-ons remain deferred."
 
@@ -521,7 +521,7 @@ Consequences:
   uses "Tier 2, ambient separate sims" for the living backdrop. *The ambient
   tier* is neither: it is the bottom level of the keeping axis.
 - **"ambient".** The
-  [meaningful physics signals plan](../implementation_strategy/2026-06-24_meaningful_physics_signals_plan.md)
+  [meaningful physics signals plan](../../archive_docs/2026-10-28/2026-06-24_meaningful_physics_signals_plan.md)
   has an ambient pulse, in which "the backdrop sims read the system's live
   state", and the physics scenes plan's living backdrop is "ambient, cheap,
   default-intangible". Those are the system's ambiance, drawn from runtime
@@ -540,7 +540,7 @@ Consequences:
   projection session, admitted session, the Session subgraph binding,
   Cleromancy's reading session, and the per-persona web session store of
   cookies and storage
-  ([native session store plan](../implementation_strategy/2026-06-23_native_session_store_plan.md)).
+  ([native session store plan](../../archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md)).
 - **"reservoir".** IBM's data reservoir is "a reference architecture that
   balances the desire for easy access to data with information governance and
   security" (Redbook SG24-8274 abstract). It is one governed ecosystem for a
@@ -565,7 +565,7 @@ Consequences:
   the durable graph session, which is Mere's session.
 - [Alembic memory and codicils](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md):
   the three levels of memory, Athanor, and the structural event log. The
-  [implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md)
+  [implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md)
   records what has landed.
 - [Lexicon brief](../../2026-05-04_lexicon_brief.md) §4.1: the tier-1 mere,
   "Backed by `eidetic`", and "All four tiers are **forkable**".
@@ -613,7 +613,7 @@ No original §9 design question is left open. Section 10 opens the later
 consumer interaction questions without reopening these rulings. The shape of
 the engine registry is work
 for the plan that builds it. The
-[reservoir plan](../implementation_strategy/2026-09-23_reservoir_plan.md)
+[reservoir plan](../../archive_docs/2026-10-28/2026-09-23_reservoir_plan.md)
 implements the per-domain meres, their sessions and archive, and the access and
 ambient grants. Alembic's own open decisions stand, including the
 event log's shape (its §10, item 5).
@@ -648,11 +648,11 @@ The [projection-scenes direction](../../2026-08-23_projection_scenes_and_graph_n
 §§4–5 separates scope-producing queries from scenes, and source identity from
 projected instance identity. A lens selects or derives a disclosed scope and
 reading; a scene determines what its entities and relations become. The
-[relationship adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md)
+[relationship adoption plan](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md)
 already requires source revisions, explained relationships and occurrence-safe
 selection. Those contracts are reused, not replaced by a second context graph.
 
-The [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+The [Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md)
 SE11–SE22 distinguishes working draft history from attributed session saves;
 SE31 puts command preferences in the view plane. Transient lens activation
 should not dirty an authored recipe. Editing and explicitly saving a recipe
@@ -740,7 +740,7 @@ from the transitives they bring. It need not become another architectural tier.
 
 “All dependencies” means all within the stated coverage, never an unsupported
 claim about an entire ecosystem. Each result carries the limiting layer and
-any breadth/traversal budget, following [graph-semantics ruling 4](../implementation_strategy/2026-10-04_graph_semantics_plan.md).
+any breadth/traversal budget, following [graph-semantics ruling 4](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md).
 Not loaded, undisclosed, unavailable, unsupported, stale and truncated are
 different from a known empty result. Identity, evidence and freshness remain
 inspectable in spatial and list presentations. Multiple attributed assertions
@@ -1031,8 +1031,8 @@ The same disclosed subject can support several presentations and lifetimes:
 
 | Concern | Existing home and boundary |
 | --- | --- |
-| Source facts, saved queries, frozen selections and residency coverage | The [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) completes P1–P5 on main at source `7628ab689`. Its resident reader uses explicit checkpoint/refresh; edits still use the complete recorded session. This supplies graph mechanisms, not an ambient reason controller. |
-| Several appearances and linked comparison | The [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md) S2 owns linked swatches, coordinated selection and visibility. Source selection, appearance-part selection and instance dismissal must remain distinguishable; the part name awaits Mark under SE84. |
+| Source facts, saved queries, frozen selections and residency coverage | The [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md) completes P1–P5 on main at source `7628ab689`. Its resident reader uses explicit checkpoint/refresh; edits still use the complete recorded session. This supplies graph mechanisms, not an ambient reason controller. |
+| Several appearances and linked comparison | The [Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md) S2 owns linked swatches, coordinated selection and visibility. Source selection, appearance-part selection and instance dismissal must remain distinguishable; the part name awaits Mark under SE84. |
 | Ambient relevance and attention | This proposal applies the design language §9.2: selected or foreground-pinned subjects shape context; previously selected material survives in the background until dismissed; untouched context can withdraw when its reasons cease. The lens set and reason reducer are still proposed work. |
 | Scene placement, forme and dynamics | The design language §9.4 describes a field representing the recursive workbench arrangement. It does not define the sandbox's field physics, finish Scenograph B1 or change arrangement roles. The [Scenograph handoff](../research/2026-10-09_scenograph_codex_handoff.md) retains the ruled carrier, dynamics-axis, B1 and S2 work. |
 | One application inside another | The [app composition brief](../../cambium_docs/research/2026-10-06_app_composition_brief.md) owns retained sessions and host accessibility composition. Owner-served projections and locally granted applet execution have distinct lifecycle and authority boundaries; neither gives a lens access to undisclosed material. |
@@ -1042,7 +1042,7 @@ An ambient controller should consume coverage rather than manufacture complete
 answers from a resident subset. P5 can report known NotLoaded addresses, and
 demand/refresh preserves recorded truth. It does not make Cargo acquisition,
 shard publication, pending assertion derivation or context scheduling automatic.
-The [graph semantics follow-ons](../implementation_strategy/2026-10-09_graph_semantics_followons_plan.md)
+The [graph semantics follow-ons](../../archive_docs/2026-10-28/2026-10-09_graph_semantics_followons_plan.md)
 own consumer adoption, automatic refresh, partial editing and cleanup. The site
 and native browser can remain pinned to earlier qualified suppliers while those
 successors are qualified; a moving Mere main is not consumer adoption.
@@ -1058,7 +1058,7 @@ The site's frozen publication can demonstrate related information and export
 portable documents or sessions without owning a resident service. GitHub Pages
 delivery therefore does not settle extension permissions, attached Turnstone
 authority or Cloudflare rendezvous. Those remain in the Turnstone browser-
-sidecar proposal and the [browser carrier plan](../implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md).
+sidecar proposal and the [browser carrier plan](../../archive_docs/2026-10-28/2026-08-25_browser_webrtc_carrier_plan.md).
 The next bounded ambient proof should qualify the lifecycle above with the
 existing disclosed site graph before expanding to member crates and a named
 Cargo configuration. No larger graph or live app mount is qualified by this

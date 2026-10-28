@@ -33,7 +33,7 @@ adopted: P4 rules "salva is out", and P4c built its own PBF fluid.
 - [node_representation_arrangement_plan](../2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md) — `gyre`
   already supports non-uniform colliders (`NodeCollider` Ball/Square/RoundedSquare/Hull); scene props
   reuse that lowering. Nodes are the billboards a tangible scene pushes around.
-- [scriptable_field_regions_plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) — a placed field
+- [scriptable_field_regions_plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md) — a placed field
   region's rhai rules already drive local forces; a localized scene effect (a whirlpool, a
   gravity well) rides that substrate. The environment is the global cousin.
 - [cartography_aether_layout_seam](../../mere_docs/technical_architecture/2026-05-29_cartography_aether_layout_seam.md)

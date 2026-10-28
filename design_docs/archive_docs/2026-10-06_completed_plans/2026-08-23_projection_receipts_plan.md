@@ -17,7 +17,7 @@ Open: wave 3 (FT9, FT10), gated on a field-data consumer that does not exist.
 **Related:**
 
 - [projection-scenes direction note](../../2026-08-23_projection_scenes_and_graph_native_platform.md) — the receipts this plan schedules
-- [projection grammar adoption plan](../../mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) — the gated targets this plan supplies evidence to
+- [projection grammar adoption plan](../2026-10-28/2026-08-15_projection_grammar_adoption_plan.md) — the gated targets this plan supplies evidence to
 - [projection grammar catalog](../../mere_docs/research/2026-08-15_projection_grammar_catalog.md) — grammar, promotion rules, boundary map
 - [shelfmark format note](../../mere_docs/technical_architecture/2026-08-16_shelfmark_format_note.md) — owns the citation envelope FT4's receipt determines
 - [Turnstone suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md) — gazette port status and the composition seam

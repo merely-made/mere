@@ -45,7 +45,7 @@ holds the ledger, it does not absorb the lanes.
 - [inference_provider_plan](2026-07-05_inference_provider_plan.md) (Lane 3),
   [burn_wgpu_flip_plan](2026-07-04_burn_wgpu_flip_plan.md) (Lane 1),
   [browser_model_ceiling_probe_plan](2026-08-09_browser_model_ceiling_probe_plan.md)
-  (D2), [burn_0_22_migration_plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+  (D2), [burn_0_22_migration_plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md)
   (D3),
   [orrery_graph_intelligence_plan](2026-07-06_orrery_graph_intelligence_plan.md)
   (Lane 5) — the landed lanes esp inherits.
@@ -224,7 +224,7 @@ up, per the burn brief's own rule.
   512-row request, then exactly recovers all 384 values under a new lease.
   Stable 0.22 publication remains the dependency repin gate, not an executable
   adapter gate. See the
-  [migration plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md) and
+  [migration plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md) and
   [receipt](../../mere_docs/testing/2026-08-23_distillery_remote_minilm_receipt.md).
 - **Lane 4, training**: Distillery-as-trainer as a native-only armillary job
   over the scoped corpus, emitting the geist §6 engram triple
@@ -273,7 +273,7 @@ up, per the burn brief's own rule.
 
 **The consumer shape (reviewed 2026-09-20).** Servitor currently supplies
 participant authority plus watch, tick, cascade and deadband primitives.
-The [resident/run redesign](../../mere_docs/implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
+The [resident/run redesign](../2026-10-28/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
 additionally assigns it portable resident/run semantics and optional
 procedural guidance. This supersedes the earlier claim that none of these
 organs should own the resident. R1a admission, the R1b reducer and the Turnstone

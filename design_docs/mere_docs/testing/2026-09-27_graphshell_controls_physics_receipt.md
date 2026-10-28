@@ -1,7 +1,7 @@
 # Graphshell tree controls, pause and frame cost
 
 Date: 2026-09-27. First slice of phase 4 of the
-[one-tree plan](../implementation_strategy/2026-09-25_graphshell_one_tree_plan.md).
+[one-tree plan](../../archive_docs/2026-10-28/2026-09-25_graphshell_one_tree_plan.md).
 The [migration inventory](../implementation_strategy/2026-09-27_graphshell_tree_migration_inventory.md)
 defines what remains outside this slice.
 

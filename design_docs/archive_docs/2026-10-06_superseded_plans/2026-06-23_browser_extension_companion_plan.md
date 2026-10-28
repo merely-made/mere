@@ -2,7 +2,7 @@
 
 **Date**: 2026-06-23
 **Status (2026-10-06):** superseded 2026-07-27 by the
-[Graphshell reference host plan](../../mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md)
+[Graphshell reference host plan](../2026-10-28/2026-07-27_graphshell_reference_host_plan.md)
 (H4/H5), which absorbs the live parts of this plan; kept as evidence. An MV3
 extension ships at `ports/graphshell/web/extension/`, with its capture core at
 `ports/graphshell/src/capture.rs`.
@@ -30,7 +30,7 @@ portable, shareable orrery.
 - [`../research/2026-06-19_cross_platform_parallelism_strategy.md`](../../mere_docs/research/2026-06-19_cross_platform_parallelism_strategy.md) — the browser-delivery lanes (open-web no-SAB vs PWA SAB), Wasmtime-out / Boa-in-browser, "netrender is structurally ready, never compiled for web."
 - [`../../2026-06-21_substrate_parallelism_composition_brief.md`](../../2026-06-21_substrate_parallelism_composition_brief.md) — the web build budget (3 builds / 2 toolchains) and the jco AOT path for components in the browser.
 - [`2026-06-17_unified_document_host_plan.md`](../2026-10-06_completed_plans/2026-06-17_unified_document_host_plan.md) + [`2026-06-18_node_representation_arrangement_plan.md`](2026-06-18_node_representation_arrangement_plan.md) — the orrery-as-element work that built `render_as_cards`; this plan is its browser consumer.
-- [`2026-06-23_gloss_outline_lens_plan.md`](../../mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md) — renames `mere-orrery` to `glossary`; this plan must not collide (the browser orrery core is the `orrery` crate, never `mere-orrery`).
+- [`2026-06-23_gloss_outline_lens_plan.md`](../2026-10-28/2026-06-23_gloss_outline_lens_plan.md) — renames `mere-orrery` to `glossary`; this plan must not collide (the browser orrery core is the `orrery` crate, never `mere-orrery`).
 - [`2026-06-21_document_script_substrate_plan.md`](../2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md) + [`2026-06-23_document_script_followons_plan.md`](../2026-07-03_completed_plans/2026-06-23_document_script_followons_plan.md) — the DocumentScript substrate, now **shipped native** (P0→P2.5 + all four follow-ons): the `mere:script` WIT world (`log` / `caps` / `net` / `document-host`), a **Wasmtime** host (the `document-host` crate — it deps wasmtime, so it is **native-only**, does not compile to wasm), `.cwasm` AOT, the fiber-async `net.fetch`, and the `kernel::permissions` → `Grant` model. Untrusted in-browser extension scripting rides the **same WIT contract** via **jco AOT** (no JIT in the tab): one shared *contract*, a per-target *runtime*. See §2 (scripting) for the harmonization. The contract lives at the shared, runtime-neutral `crates/script/wit/world.wit` (extracted out of the native crate 2026-06-23), so the browser jco path consumes the same world.
 - [`../research/2026-05-31_murm_p2p_landscape_brief.md`](../../mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md) — iroh + noq is native QUIC; the browser tab needs WebTransport or WebRTC, which motivates the companion split.
 - [`../research/2026-06-15_in_the_wings_and_browser_bar_audit.md`](../../mere_docs/research/2026-06-15_in_the_wings_and_browser_bar_audit.md) — the dormant eidetic `BrowsingMemory` / `BrowsingTrace` (federation-faithful, zero live callers) this plan activates.

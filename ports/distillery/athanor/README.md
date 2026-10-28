@@ -33,7 +33,7 @@ Lives in the [mere](https://github.com/merely-made/mere) workspace at
 consolidation, image-reference cleanup and retirement proposal logic. The
 `workshop` feature adds the public retained-passage evidence-brief domain;
 `workshop-worker` adds native Armillary execution. The two product adapters,
-headed controls and destination mutation receipts remain open. The [Alembic plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+headed controls and destination mutation receipts remain open. The [Alembic plan](../../../design_docs/archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
 owns their integration and the first retained-passage evidence-brief workflow.
 Athanor persists domain decisions and drives Servitor's existing reducer;
 an Armillary adapter performs admitted work and reports execution completion.

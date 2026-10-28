@@ -72,7 +72,7 @@ fix rather than a hidden one.
 So the idea is worth holding and has nothing to attach to in the graphs as
 they stand. It becomes real when something has to decide what re-runs because
 something else changed, and that moment now has a plan: the
-[graph behaviors plan](mere_docs/implementation_strategy/2026-08-13_graph_behaviors_plan.md)
+[graph behaviors plan](archive_docs/2026-10-28/2026-08-13_graph_behaviors_plan.md)
 (same day, later) lands the split as a behavior's two capability scopes,
 watch = trigger and read-beyond-watch = observe, never as edge kinds on a
 data graph.

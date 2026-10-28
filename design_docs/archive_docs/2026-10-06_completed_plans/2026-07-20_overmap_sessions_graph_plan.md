@@ -9,7 +9,7 @@ fork is node lineage at that level; the switcher becomes a graph view.
 (fork consumes the lineage edge); turnstone's
 [recycle-bin design](../../../../turnstone/design_docs/2026-07-20_recycle_bin_athanor.md)
 (the deletion pattern this mirrors at session level);
-[Alembic slice D](../../mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md) (athanor).
+[Alembic slice D](../2026-10-28/2026-06-24_alembic_implementation_plan.md) (athanor).
 
 ## The three open questions, answered
 

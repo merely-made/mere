@@ -1,6 +1,6 @@
 # Graphshell canvas producer: browser rendering and culling
 
-Date: 2026-09-27. Phase 3 of the [one-tree plan](../implementation_strategy/2026-09-25_graphshell_one_tree_plan.md).
+Date: 2026-09-27. Phase 3 of the [one-tree plan](../../archive_docs/2026-10-28/2026-09-25_graphshell_one_tree_plan.md).
 This receipt describes the `reservoir-v2` branch. Integration with main's
 Mesquite integration is separate from these historical measurements. Mark
 approved proceeding to phase 4 on 2026-09-27; performance and live physics

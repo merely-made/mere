@@ -41,7 +41,7 @@ question.
   without our schema:** p2panda's protocol, signed grants, open project files.
   Encoding is deterministic, and decoding is strict wherever bytes are signed,
   content-addressed or validated on the wire. That is ruling 24's line in the
-  [device pairing plan](mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md).
+  [device pairing plan](archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md).
 - **No third binary format in production.** Codec races stay
   dev-dependencies.
 

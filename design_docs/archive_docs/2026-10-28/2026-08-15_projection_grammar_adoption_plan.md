@@ -1,0 +1,2281 @@
+# Projection Grammar Adoption Plan
+
+**Status (2026-10-06):** active. Track F (the field receipts FT9 and FT10, from the archived projection receipts plan, ruling S61) was received gated.
+- The 2026-10-05 cross-domain relationship recipe continuation is published and
+  qualified (its own status line, below).
+- The executable compiler lives in `scenomise::projection` since `c79bb8c2`.
+- Stack seams P1's arrangement catalog landed on main at `1633be0c`: built-in
+  families, `ProjectionCompiler` with host `ItemSizes`.
+- A5 and the remaining portable-grammar questions stay open.
+
+This line supersedes the two older status lines in the document, the
+2026-09-04 one below and "Status (reconciled 2026-09-01)" further down. Both
+keep their words as history (stack seams S14 pass, batch 43).
+
+Earlier status (2026-09-04): active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
+
+## Shared graph label placement (2026-10-17)
+
+Status: locally qualified; publication pending. Source `d1a200b18`, with
+Woodshed receiving source `b809565`. Woodshed's
+Related graph exposes collisions in Cambium's shared graph-canvas labels.
+The material projection and node coordinates remain product-owned; screen-space
+label placement belongs to the shared component. Independently choosing a quiet
+axis gives neighboring labels the same space, and the prior optional culling
+computed different rectangles from those emitted into CSS.
+
+The resolver tries alternate anchored sides before suppressing a label, uses
+one bounded box for CSS and collision tests, and avoids node/overlay footprints.
+Collision culling defaults on; the existing explicit opt-out retains a diagnostic
+show-all policy. Selected, focused, then hovered nodes get stable first choice;
+mutual emphasis is no longer an exemption from collision checks. Explicit host
+side overrides remain directional requests; full accessible names and native
+node targets survive omitted visible labels. Offscreen anchors do not leave
+orphaned text clamped to the viewport edge. Font-width estimates choose box size;
+they do not claim intrinsic glyph measurement. Bounded overflow remains clipped.
+
+Qualification: 279 Cambium and 119 Rootstock cases pass (three existing
+ignores), including real retained layout/emphasis and an oversized Ahem clip
+control. Woodshed adds 242 view cases, a clean committed desktop build, seven
+native label/navigation images and nine three-surface camera/wheel images.
+Both accepted native scenarios pass with normal exit zero and exact supervised
+executable identity. The first harness trial is excluded for omitting the
+existing key prefix from an expected material title; the corrected repeat uses
+the identical product binary. See
+`woodshed/validation/related-labels_20261017/README.md` and the local
+[shared receipt](../../../support/receipts/graph-labels-20261017/qualification.json).
+The rendered full-name navigation target survives; mutual visible-label
+collisions are absent in the bounded captures. Allocated canvas bounds do not
+prove whole-window visibility: 420px toolbar overflow and 125% right graph/control
+clipping remain Woodshed P8 work. Some edges pass behind text, and dense labels
+can yield. No all-node-name, every-font, fresh-reopen or audio qualification is
+claimed. Ordinary Pictograph responsive paths are a separate lane.
+
+Progress (2026-10-17): shared resolver, component and retained geometry controls
+implemented; Woodshed receiving/native source qualified locally. Maintainer
+publication approval remains separate.
+
+## Cross-domain relationship recipe continuation (2026-10-05)
+
+Status: shared implementation and Knot adoption published and qualified;
+visible Woodshed host adoption is published and qualified on committed source
+`c55461cc`, with acceptance documentation on main at `dad3f624`.
+The existing Scenograph authoring definitions are the source contract. The
+executable compiler has moved from Graphshell to `scenomise::projection`,
+preserving the authoring crate's independence from solvers and widgets.
+Graphshell continues to compose that capability into its reference host.
+
+Feature target: one editable relationship recipe over Knot sound selections and
+Woodshed Working Set occurrences. Start with authored order, occurrence labels,
+and disclosed relationships with explanations and method provenance. Duplicate
+occurrences may refer to one source; selection and relationship endpoints remain
+occurrence-specific. Domain calculations and owner actions stay in the adapters.
+
+Done conditions:
+
+- Both domains use the same shared recipe/compiler rather than copied layout
+  implementations, with explicit refusal for missing semantic roles.
+- A spacing/arrangement edit, occurrence selection, and explained relationship
+  survive save/reopen; compatible rebinding requires an explicit new source.
+- Knot embeds the capability in its reading workflow and retains validated
+  recipe versions in its own mere. Woodshed retains its own source custody.
+- Shared tests cover source freshness, duplicate occurrences, relation endpoints,
+  schema bounds and compatible/incompatible bindings; consumer tests exercise
+  actual domain results and owner actions. Native captures qualify only the
+  paths actually observed.
+
+This slice does not require the completion of dynamics G1–G6. Existing physics,
+pairing and dependency-migration lanes keep their owners. No recipe conveys a
+credential, data-access grant, or script execution authority.
+
+Findings: inspection of Mere `bd119a69d` confirms existing durable Scenograph
+definitions and the executable compiler's node/grid/scatter subset. The two
+consumer repositories remain separate; the local integration worktree is the
+single owner of shared compiler changes for this pass.
+
+Progress: Scenograph supplies the typed relationship recipe, shared draft edits
+and saved occurrence/relationship selection. Scenomise supplies bounded
+disclosure validation, source-revision checking, compilation and explained edge
+endpoints; Graphshell reexports the compiler instead of copying it. Named
+`authored_order`, `occurrence_labels` and `explained_relationships` facets are
+mandatory. Ordinal relationship recipes use a spaced grid; scatter coordinates
+are not inferred from occurrence order. The generic coordinate compiler retains
+its previous scatter support.
+
+Knot integrates actual Mora relationships into its reading UI and typed retained
+collection material. Woodshed supplies actual Working Set/catalog disclosure and
+retains shared recipe state through its existing session model. Woodshed's
+compiler adoption is exercised by a standalone compatibility instrument and a
+visible host recipe editor. Production uses one coherent Mere `5011e2f9` /
+Genet `bd3e8861` pair, without a local path override or copied compiler.
+
+Shared qualification (2026-10-05): `cargo test --locked -p scenograph -p
+scenomise` passes 8 authoring tests, 88 choreography tests (including nine new
+relationship regressions), and the authoring compile-fail doctest. The two
+crates also pass `cargo check --locked --target wasm32-unknown-unknown`.
+Graphshell's native `--features web` compiler compatibility suite passes 12
+tests; the generic compiler's prior grid/scatter semantics remain intact.
+Shared Clippy passes with only the explicit pre-existing `manual_contains`
+solver-lint allowance; unconditional strict Clippy is not claimed.
+
+Historical disclosure checkpoint: shared code is on Mere main at
+`c79bb8c203b52817991e0d7ba1c4ce3c3a2aac34`. Woodshed's disclosed source and
+session adoption are on main at `c92e7c96779ef316f5d8244a59de7cbc84f42a0b`.
+Its receipt reports core 189, views 97, desktop session 16, shared adoption 5,
+exporters 10 and integration 1 tests passing, plus separate-process restoration
+using the production session backend on an isolated unsealed fixture. It does
+not qualify a visible Woodshed editor or native rendering.
+
+Knot's actual Mora-derived recipe also rebinds through the common draft to the
+generated Woodshed disclosure: edited label/spacing, repeated-source identity,
+occurrence selection and exact musical explanation survive; neither dataset
+changes, missing semantic facets refuse, and Knot document anchors cannot be
+repurposed as music owner actions. Focused adapter test passes. Knot's native
+recipe scenario has four reviewed captures at 1280×1100 (bind, spacing, explained
+relation, authority refusal). Knot subsequently adopts shared horizontal reveal
+`5011e2f9` on implementation `e4cf739c`, published with acceptance docs at
+`9d0b955f`. Its compact recipe scenario passes four reviewed native captures at
+420×900 and four at 1280×900 / 400% UI zoom: real second occurrence selection
+reveals the full card, method/limits and source anchor remain readable across
+scroll positions, and unavailable-authority refusal is visible. Updated-pin
+qualification passes desktop 306 tests / one existing ignore, composition/readings
+61 / one existing ignore, locked build and metadata. Successful native personal-wallet
+retention remains unrun. Knot's canonical collection plan
+records its complete suite and encrypted-retention receipts. The visible
+Woodshed editor/renderer was qualified in the host continuation below; Knot's
+unrun native personal-wallet gate remains separate. The compact native receipt
+is `/Users/markik/Code/testing/knot-editor/recipe-responsive-20261005/receipt.json`;
+no retained collection reopen, browser runtime or other-platform claim is added.
+
+### Knot authored-scene adoption in Mere (2026-10-11)
+
+Status: consumer qualification is published; Mere's embedded adoption is
+qualified. Knot `19b99042d6c6708854f64e6187429da839a1c82c` adds bounded,
+source-bound occurrence translations through the shared `SceneTrace`. Its own
+mere retains immutable signed/encrypted versions; copied analysis, occurrence
+identity, source anchors and source bytes keep their original authority. Drag
+release and keyboard controls use Knot's existing undo/redo history.
+
+Knot's canonical receipt is
+`knot-editor/docs/receipts/2026-10-11_authored_scene/README.md`. It records 647
+workspace tests, 45 default and 61 engine/highlight document tests, four native
+save/fresh-process-reopen runs at 1100×900 and 420×900, and 28 inspected captures.
+That native evidence uses disposable synthetic identities. Personal-custody
+native acceptance, unattended background presentation and live dynamics remain
+separate gates.
+
+Mere moves workspace `knot-editor`, workspace `knot-document` and Djinn's
+`knot-site` together. The regenerated root lock contains all six Knot packages
+at that one revision and removes the old Genet `7422e906` Fleece/layout copies;
+no registry version changes occur. Djinn's resolved closure redirects the
+shared scene, host and storage contracts to this Mere workspace, with no second
+Mere git source. The existing `scenotime` patch supplies the new retained trace
+dependency; no desktop-only contract is added to the embedded patch table.
+
+The supplier family remains Genet `4bc75583`, Dramatis `0234e7ee`, Netrender
+`ef5412d7` and maintained Vello `5862bba2` (Classic/encoding/shaders 0.11.0).
+Standalone Knot and Woodshed's published `8846b13` adoption qualify Mere
+`0e78fcff`; Mere's embedded contracts use its own current source. Woodshed's Hocket/Redshank appearance reopen continuation is published at
+`0032f35`: two fresh processes, 33 presentations and four reviewed captures,
+with both saved profile identities preserved. Knot's next live-dynamics work
+retains its owner.
+Native execution stays serialized, Woodshed before Knot.
+
+Qualification: isolated `cargo check --locked -p djinn --all-targets -j 2` passes.
+The pinned `knot-composition` recipe suite passes 17 tests against Mere's local
+contracts; shared Scenograph/Scenomise/Scenotime suites pass 243 tests, including
+the authoring compile-fail doctest. Documentation findings and D2 judgment
+coverage match pre-edit HEAD exactly; the existing snapshot-digest and producer
+receipt coverage defects remain baseline debt. All three pins and the root lock
+publish together. These checks establish embedded source/type and tested scene
+contract compatibility; no new Mere native launch or personal-custody acceptance
+is claimed. Exact results and source bounds belong in the
+[embedded qualification record](../testing/receipts/2026-10-11_knot_repin/qualification.json).
+
+Host continuation starting point (2026-10-05): refreshed Woodshed main `c92e7c9` matches the
+published disclosure/session proof. Its production Mere `8106c7c` / Genet
+`34626a6` pair predates the shared compiler. The next bounded pass integrates
+the real shared draft/compiler into a visible Woodshed reading, preserving
+Working Set/Card identity and source custody. It includes explicit source
+navigation and rebind/refusal, durable edited state, actual host controls,
+separate-process reopen, and default/narrow native captures. Production pins
+must remain coherent; no local path override or copied layout/compiler counts
+as adoption. The Woodshed checkout lane owns implementation and its canonical
+plan; this coordinating lane owns capture review and shared status reconciliation.
+
+Shared host contribution `5011e2f9` is published: Woodshed's 420px native
+graph-node acceptance exposed that Rootstock's generic `scroll_into_view`
+handled only the vertical axis. The independent semantic-click fixture failed
+before the fix. The host now reveals horizontal targets through ancestor
+scrollports and the document, respects clipping, keeps oversized targets stable,
+and reports each moved plane once. Vertical alignment and caret-follow behavior
+remain unchanged. Qualification: 56 Rootstock unit tests and 157 native-host
+tests across 25 suites pass; the focused 18-test click/scroll gate is included
+in that host total. No solver, shader, domain calculation, or Genet pin change
+was required. Woodshed's production repin and final native matrix now pass.
+
+Visible host qualification (2026-10-05): Woodshed implementation source
+`c55461cc97bb29e9e78ecb2bb310bb4bda5accdf` uses the shared draft and compiler
+for editable labels/spacing, graph occurrence selection, and method-disclosed
+pitch-class relationships. A retained reading appears in Woodshed's own Mere
+view, linked to its exact captured Working Set. Navigation checks owner Set,
+Card identity, ordered content revision and full owner-derived disclosure;
+changed source instructions refuse until explicit rebind. Navigation does not
+start playback or transfer a background rehearsal owner. Invalid optional
+retained payloads are preserved, not silently overwritten.
+
+The final automated gate passes 558 tests (core 189, integration 1, desktop 63,
+graph 14, views 106, theory 181, doctests 4); the standalone compatibility
+instrument separately passes 5. Locked desktop build and native host check of
+the web crate pass. This is not a browser/wasm runtime acceptance claim.
+
+Committed-source native acceptance passes 8 captures at 1280×900, 8 at 420×900,
+and 2 after a separate-process reopen. All 18 captures were visually reviewed,
+including real last/middle graph-node selection at narrow width, readable
+explanation/method/limits, visible stale-source refusal, explicit rebind, retained
+owner disclosure, restored spacing/selection, and exact source Card navigation.
+The first final narrow attempt failed before any capture landed because the
+surface was occluded; its logs remain preserved. An unchanged-source replay in
+a fresh profile passed after explicit foreground Raise. External scenario copies
+only extend initial settling to allow native launch and Raise; assertions remain
+those of the committed scenarios.
+
+Evidence: `/Users/markik/Code/testing/woodshed/relationship-host-20261005/receipt.json`
+records source/binary/scenario hashes, automated logs, preserved failed attempts,
+and the committed baseline, narrow retry and reopen captures. Retention here
+uses the production session FsBackend in an isolated explicitly unsealed profile.
+It proves durable host state, not successful personal-wallet encryption. No
+high-zoom, other-platform, release-signing or browser-runtime qualification is
+claimed. A multi-reading library and explicit recovery UI for invalid payloads
+remain follow-ons; this bounded host slice does not complete A5 or dynamics G1–G6.
+
+Publication verified: Woodshed main and origin/main match
+`dad3f6240bef8339432effa2d9fe7840d5035612`, with a clean checkout. That
+acceptance-only commit follows the native-qualified implementation `c55461cc`.
+The existing Woodshed `repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md` and
+document index record the final gates and their limits; no parallel plan was
+introduced. Mere's shared behavior fix is on main at
+`5011e2f90e988775410fe4b4213e9895fe64538e`.
+
+## Executable authoring proof (2026-09-04, verified in current working tree)
+
+Mark requested Luna/Terra subagents to try the review's bounded proof. Graphshell's
+editor previously saved definitions while its preview only formatted a sentence. This
+slice resolves a supported definition against disclosed Woodshed Set facts and
+compiles it through existing Score/Scene machinery. Woodshed owns the export;
+Graphshell has no dependency on Woodshed's product crates. This does not promote
+new portable grammar contracts or close A5.
+
+Done when a generated export from actual Woodshed Set/catalog types, including
+two occurrences of one source, drives two arrangements in the existing browser
+host; spatial and list selection name the same occurrence; saving and reopening
+restores the definition and selection. Unsupported registrations, fields, and
+stale source revisions must fail explicitly. Validate the exporter, focused
+compiler tests, wasm build, and a headed browser interaction with a captured
+frame. Preserve concurrent Cambium and Woodshed release work.
+
+Findings (2026-09-04): the executable subset resolves `nodes`, numeric x/y
+fields, a text label field, `grid.default` (dense numeric ranks), and
+`scatter.default` (numeric values). Both compile through `scenomise::solve`;
+Graphshell realizes the result through Cambium, Genet, and Netrender. Single
+occurrence selection is coordinated between spatial cards and an occurrence
+list; the saved payload holds the definition and occurrence id. Unsupported
+registrations, channels, realization policies, and stale source revisions are
+explicit failures. Source ownership remains in Woodshed; the included export
+is a reproducible three-card Set made from its real musical catalog, not a live
+connection to a user's saved practice library.
+
+*2026-10-05, one arrangement catalog.* The
+[stack seams plan](2026-10-04_stack_seams_plan.md) ruled S1: "Resolve through
+scenomise (Recommended)". Graphshell maps the two families above by hand:
+- `arrangement_for` and `placement_for` in `ports/graphshell/src/projection_compile.rs`
+  (lines 666-691);
+- `grid.default` uses a fixed 184 by 84 cell and 8 columns;
+- `scatter.default` maps to `Geographic`;
+- every other id resolves to nothing.
+
+Both functions retire into one shared scenomise compile step. It resolves an
+id through the registry, takes its parameters from the definition, and makes
+every registered family authorable. That plan's P1 carries it out. Asked who
+takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
+records the change and does not build it.
+*Superseded 2026-10-06* (stack seams S14 pass, batch 43). When this note was
+written, local main did not yet hold `c79bb8c2`, which had already moved the
+compiler into `scenomise::projection`. `ports/graphshell/src/projection_compile.rs`
+is now 432 lines and re-exports `scenomise::projection::*`, so the hand map
+above is gone. P1 then replaced it with the built-in catalog (next note).
+
+*2026-10-05, P1 under way (stack seams rulings S12, S15 to S20).* A
+cross-reference for the relationship-recipe pass, which moved the compiler
+into `scenomise::projection` at `c79bb8c2`. One correction to the note
+above: scenomise's registry holds only custom solvers (stack seams F12), so
+ids resolve through a built-in catalog of sceno's eleven named families beside
+it, and an unknown id falls through to the registry (S15). P1 changes the
+compiler where it now lives: the dataset types move to scenograph and stay
+re-exported from `scenomise::projection` (S12); `grid.default` and
+`scatter.default` resolve as aliases, so saved recipes load (S15); parameters a
+recipe leaves unset are measured from the items (S16); and item sizes come from
+the host instead of the 164 by 68 written into the compiler (S20), so the
+compile entry points take the host's sizes. A consumer sees two changes when it
+repins past P1: that signature, and grid pitch (cell plus gap), which becomes
+the host's card size plus the spacing (180 by 84 for a 164 by 68 card at
+spacing 16, against 200 by 100 today). Built on branch `stack-seams-p1`;
+nothing merges before Mark's review.
+*2026-10-06:* P1 landed on main at `1633be0c`, recorded in the stack seams plan
+at `add54925`. The compile entry points take a `ProjectionCompiler` built from
+host `ItemSizes` (`scenomise/src/projection.rs:520`, `:530`).
+
+Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
+compiler skeleton before both hit the account usage limit. Root completed
+integration. An isolated source-path harness passed 14 compiler/editor tests,
+15 existing Stage/arrangement tests, and 3 exporter tests. This harness points
+at the actual Rust source modules and excludes unrelated application hosts;
+it is not a full Woodshed workspace test. The exporter replay SHA-256 is
+`E23353CD22FA22B309FF4E46E1941429525B3B20C7A5F832FBF66E3011F32B7F`.
+The fixture is `ports/graphshell/web/fixtures/woodshed-stage.json`, produced by
+`woodshed/crates/woodshed-core/examples/stage_projection_export.rs`.
+The browser scenarios are `projection_authoring.scn` and
+`projection_reopen.scn` under `ports/graphshell/web/scenarios`.
+The actual standalone Graphshell wasm build passed offline. Terra also ran
+`cargo test -p graphshell projection_compile --lib -j 1` against the native
+workspace: 7 tests passed (overlaps the harness coverage above).
+
+The final Chromium/WebGPU run at 1280x720 passed 58 authoring steps and 13
+fresh-page reopen steps, with four GPU captures and no page errors. Additional
+real browser input verified Enter selection from the list and pointer selection
+from the spatial view. A full-page screenshot exposed a CSS specificity bug in
+the semantic overlay; the final run verifies transparent, absolutely positioned
+buttons aligned with the painted card rectangles. Invalid numeric spacing now
+invalidates the typed draft and blocks saving instead of saving its old value.
+
+Evidence is in `ports/graphshell/docs/receipts/projection_authoring_receipt.json`
+and the four `projection_*.png` files beside it. The receipt records source and
+wasm hashes, exact scenario results, and manual browser checks. These are current
+dirty-tree receipts, not a committed release baseline. To replay, build the
+standalone web package, run wasm-bindgen with `--target web`, serve the web assets
+over loopback HTTP, and open `index.html?scenario=scenarios/projection_authoring.scn`,
+then `index.html?scenario=scenarios/projection_reopen.scn` on the same origin.
+The loader exposes scenario results and captures on the page; an optional `sink`
+query parameter receives the existing JSON receipt protocol.
+
+The Woodshed musical-projections plan is the next product-directed refinement.
+Its review addendum records metric, complete-cost, history-provenance, and voicing
+resolver corrections. This proof does not implement those slices or settle the
+finished product appearance, narrow layouts, arbitrary data loading, or release
+packaging.
+
+## Shared practice proof (2026-09-04, verified in current working tree)
+
+Mark authorized a second Luna/Terra proof: two people join a Woodshed practice
+space, contribute one musical comparison, disconnect, and reopen retained work.
+Woodshed's `musical_comparison_export` example owns the keyed C Major/A Minor
+disclosure and versioned singleton-difference method. It does not implement a
+general voice-leading metric or publish personal browsing history.
+
+`commons_practice_peer` is a proof-only native consumer of real Commons redb
+replicas, Personae writer attestations, and Gemot authority-filtered projections.
+Each peer owns an independent store. Fixed identities, a fixed evaluation clock,
+and an exactly pinned fixture constitution establish the test boundary; signed
+delegations admit the member. This is not a constitutional lifecycle or identity
+onboarding implementation. The gateway carries canonical signed plaintext graph
+operations over loopback HTTP. It does not establish Internet P2P discovery,
+encryption, or a production invitation protocol.
+
+Graphshell's `co_op.html` hosts membership, contribution, sync and offline-reopen
+controls alongside the existing Genet/Netrender projection. Only effective shared
+records enter the contributed rows. Local source material is separately marked
+as a preview. `co_op_receipt.py` reproduces the process/HTTP receipt, including
+an unauthorized signed record retained but excluded from the effective view;
+headed browser verification is a separate gate. Disconnect closes the native
+process, and offline reopen starts a fresh process over the same local store.
+
+Both gates passed. The process/HTTP receipt proves pre-invitation join and
+pre-admission contribution rejection, successful signed admission, byte-equivalent
+comparison retention on both peers, distinct process IDs after offline reopen,
+unchanged network traffic during that reopen, and duplicate-free reconciliation.
+A third fixture writer's signed operation remains retained but pending authority:
+both peers retain two operations and expose only the one admitted comparison.
+Six native checks also pass: invitation codec roundtrip, tampered delegation,
+unsigned rule mutation, wrong-space invitation, unauthorized author, and
+wrong-container operation.
+
+Two browser surfaces completed found/join/contribute/disconnect/reopen. Fresh
+pages then each passed the seven-step retained-projection capture scenario at
+1280x720 with no page errors. Keyboard selection of the shared comparison maps
+to its spatial occurrence. Full-page visual inspection corrected a sidebar
+overlap, stale host status, and an unavailable arrow glyph. The executable wasm
+build passed, as did Woodshed's seven exporter tests. The first authoring proof
+also passed its 58-step authoring and 13-step reopen regression after adding the
+external-source seam (before the final cosmetic fixes).
+
+`ports/graphshell/docs/receipts/co_op_process_receipt.json` records the process
+states and negative checks. `co_op_browser_receipt.json` records browser actions,
+source/wasm hashes, offline peer states and the two `co_op_*.png` GPU captures.
+The PNGs exclude HTML controls; those were separately inspected in full-page
+browser screenshots. Receipts describe a dirty working tree, not a published
+feature. Membership changes over time, public hosting, encryption, discovery,
+arbitrary shared Set editing and production identity onboarding remain unproven.
+
+Reproduce from Mere after building the standalone Graphshell web package and
+running wasm-bindgen into its `pkg` directory (an isolated copied asset directory
+also works):
+
+```powershell
+cargo build -p mere-moot --example commons_practice_peer -j 1 --target-dir <isolated-target>
+python ports/graphshell/web/co_op_receipt.py --binary <isolated-target>/debug/examples/commons_practice_peer.exe --comparison ../woodshed/scenarios/woodshed_musical_comparison.json --assets ports/graphshell/web --output <new-receipt-directory>
+```
+
+For interactive reproduction, run `co_op_gateway.py` twice with separate `--store`
+directories, `--role founder` / `--role member`, ports 8860 / 8861, and opposite
+`--peer-port` values. Both require the same `--binary`, `--comparison`, `--assets`
+and a `--receipts` output directory. Open each server's `co_op.html`. After offline
+reopen, `?scenario=scenarios/co_op_retained.scn&sink=http://127.0.0.1:<port>/scenario-receipt`
+captures the retained GPU projection on that origin.
+
+**Date**: 2026-08-15
+*Superseded by the top status line (2026-10-06); kept as written.*
+**Status (reconciled 2026-09-01)**: A0, A6, A1, C1, B1, B2, B3, C3, A3 stage
+one, A4+C2, and A2 are closed. Turnstone `648bf19` is B1's definitive close,
+including routed screen-reader interaction. The Projection Receipts Plan's
+coordinated spatial/Matrix views close A2's resolution half. A3 stage two and
+A5 retain their entrance gates. A3 stage two's gate was sharpened 2026-09-01
+against C4a: it waits for a remote viewer with a local camera over a served
+scene, which C4b is not; its fact-transport shape is ruled (evaluation must
+work without the host facts; carrying them is the stretch). A5 waits for a named product consumer to open
+its first proof; the promotion suite begins with that proof and is an evidence
+harness rather than a consumer. FT7 is closed through the local, admitted
+remote, and frozen Matrix parity receipt. FT8 is closed through Retinue
+Signalman's mixed-realization receipt at `8cea8f9`.
+The Scenograph family is now on an unpublished 0.0.4 development line with
+Score v4. Mer3ly ruled an authority-grade consumer 2026-08-16. This plan turns the projection grammar report's
+findings (the claude.ai design artifact "Projection Grammar Report", two
+passes, sources verified 2026-08-15) into gated feature targets across mere,
+genet, and cambium. Sequenced against the
+[scenograph expansion brief](../research/2026-08-10_scenograph_expansion_brief.md)
+lanes L1-L5 and governed by the
+[projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md)
+promotion rules.
+**Related**:
+[scenograph_0_0_3_release_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md)
+(historical 0.0.3 release; rulings D1-D4),
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
+scene contract note
+(`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`),
+[multi_window_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-10_multi_window_plan.md),
+[graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md),
+[accesskit_screen_reader_verification](../../archive_docs/2026-09-02_retired_plans/2026-06-09_accesskit_screen_reader_verification.md).
+
+## Ruling context
+
+
+### Workbench component adoption (2026-08-31)
+
+Platen now names its graph-specific split/tab cache `TileLayout`; `Workbench` is a compatibility
+alias. Its structural AccessKit projection lives at
+`platen::accessibility::project_tile_layout`, beside the layout it reads. The old Mere
+`workbench` package is retired. Mere and Graphshell consume Genet's reusable `workbench` package
+at immutable revision `eff0cb6df4834ecce9ac552a055c1c459befa7c3`. The component boundary and
+remaining headed-host receipts are in
+`genet/design_docs/2026-08-31_workbench_component_plan.md` *(historical citation)* <!-- doc-audit: historical-path -->.
+
+The report reviewed the catalog against eleven external systems (Vega-Lite,
+Draco, SetCoLa, Gemini, GoTree, ATOM; then Mosaic, Gosling, Penrose, Bluefish,
+GoFish) and returned three results this plan acts on: the catalog's stack
+holds and its authority layer is genuinely novel; every named contract gap has
+a shipped anatomy to lift rather than invent; and the eleven systems are prior
+art for the *compiler* (what a projection spec means), not for drawing scenes.
+
+Two disciplines from the report govern every target here:
+
+1. **Solver proposes, the score records.** Draco-style search and
+   Penrose-style global optimization live above the score, never inside it.
+   The score stays a deterministic record of what was chosen; determinism
+   receipts stay meaningful. (Report caution 4.)
+2. **A layer enters the portable contract only when a promotion proof fails
+   without it.** GoTree's complexity cliff is the cost of adopting
+    speculatively; the catalog's promotion rules are the defense. Published
+    0.0.3 remains an historical artifact; `main` evolves through explicit
+    score and crate versions behind forcing consumers. (Report caution 2.)
+
+### Consumer ruling (2026-08-16)
+
+Mer3ly is authority-grade: its asks open gates, and it is not a donor in the
+way graphshell is. It is live, public, pinned to a real rev, and consumes six
+Mere crates plus published cambium and genet-scripted-dom. The
+[mer3ly stack consumer survey](../research/2026-08-16_mer3ly_stack_consumer_survey.md)
+is the evidence. The practical effect is that "the first consumer that asks"
+has a real answer today, so the targets below name mer3ly where they used to
+name a hypothetical host, and expansion lane L3's entrance gate is already met
+in production.
+
+## Findings
+
+What transfers, from where, to where. Landing sites verified against the tree
+2026-08-15 (score shape read from `crates/scenograph/sceno/src/score.rs` *(historical citation)* <!-- doc-audit: historical-path -->;
+0.0.3 release rulings from the release plan; genet components listed from
+`repos/genet/components/`).
+
+| Transfer | Source system | Landing site |
+| --- | --- | --- |
+| Placement satisfaction state; pin = ensure (fails loudly), anchored home = encourage *(2026-10-03: the pinned and anchored roles, beside seeded; see A1)* | WebCoLa silent-soft caution + Penrose `ensure`/`encourage` | sceno scene surface + scenomise solvers (A1), cambium chrome (C1) |
+| Selection clauses with declared resolution (single / union / intersect / crossfilter) | Mosaic selections + Vega-Lite selections | chirograph intent plane / mere host coordination (A2) |
+| LOD rungs as declarative conditions (measure, operation, threshold, hysteresis) | Gosling `visibility` | cartography representation profiles, then `ScoreItem.representation` selection (A3) |
+| Transition specs between epochs, host-owned clock | Gemini | scenotime, expansion lane L5 (A4, C2) |
+| Set-scoped constraints over predicate-defined member sets | SetCoLa | future score constraint records, gap 2 proof (A5) |
+| Factored arrangement dimensions instead of new monolithic variants | GoTree + ATOM | `score::Arrangement` evolution at the hierarchy/tiling proofs (A5) |
+| Rule-filled scales and guides; unit/aggregate distinction | Vega-Lite + ATOM | gap 1 proof (A5) |
+| Per-channel shared/independent scale resolution | Vega-Lite `resolve` | gap 4 proof (A5) |
+| Backdrop property classing (visible / collidable / hit / provenance; layout vs paint) | Mapbox Style Spec | expansion lane L2 backdrops (C3) |
+| Accessible static realization as a standing receipt | none external; catalog's W3C citations stand | promotion rules + Graphshell realization targeting Genet surfaces (B1) |
+| Compound scenegraph shape (hierarchy + adjacency together) | Bluefish | sceno `Scene` already carries spaces, regions, layers; hold the shape deliberately, add nothing now |
+| Effectiveness knowledge versions beside the grammar, never inside it | Draco 1 vs Draco 2 | wherever defaults/effectiveness land; `SCORE_VERSION` covers the wire, not the knowledge |
+
+Current portable baseline the targets extend: `Score` v3 with
+`Arrangement::{Spiral, Grid, Geographic, Hulls}`,
+`Placement::{Ordinal, Cell, Coordinate}`, per-item footprint, pre-selected
+`Representation` rung, layer, visibility, authored holds, and honored/unmet
+placement truth. Intents live in chirograph (release ruling D1); picking in
+scenotime (D4); emphasis channels open (D3).
+
+## Plan
+
+Three tracks. Every target names its forcing consumer; a target with no
+consumer yet states its entrance gate and waits.
+
+### Track A: mere (contract and compiler)
+
+**A0. Catalog second shelf (docs only) — landed 2026-08-15.**
+Context: the catalog's external-systems section reads as one shelf of
+renderers and toolkits; the report's central structural finding is that
+specification languages and design solvers are a different kind of prior art.
+Tasks: split "What the external systems teach us" into two shelves; add the
+eleven report systems with one-line transfers; add the Penrose name-collision
+note (CMU's Penrose diagram language is unrelated to the
+`graph_layout:penrose` tiling arrangement); cite the report in-repo rather
+than by artifact URL, since mere is a public repo.
+Validation: catalog cites all eleven; DOC_README updated.
+Done when: a reader of the catalog can find every system the report verified
+without leaving the repo.
+
+**A6. The placement seam (numbered late, sequenced first) - CLOSED 2026-08-16.**
+Context: mer3ly consumes the stack along two disjoint paths. The portable path
+builds a `Score` with `Placement::Ordinal` and solves it; the live path runs a
+seiche simulation with `pin_node`, three-way mobility, and backdrops. `Score`
+and `Placement` appear only in the first, pins and mobility only in the second,
+and nothing joins them. A visitor who pins three repositories and shares the
+result is sharing state the portable contract cannot express, which is why the
+site invented its own wire.
+The seam is the precondition for three targets that otherwise each wait on a
+consumer that does not exist: A1 has no satisfaction to record while pins never
+reach a score, A2 has no coordinated view to serialize, and C3 has no portable
+backdrop.
+Tasks: let a live arrangement's placement reach the score.
+`Placement::Coordinate` carries a visitor-placed position; the mobility class
+(`anchored` and `free` since mer3ly `145eb41` retired `frozen` from the
+interactive path) is recorded rather than inferred from force configuration; the solver's proposal and the recorded outcome stay
+distinguishable, per the solver-proposes discipline. Decide with mer3ly whether
+the seam is a write-back into the score or a sidecar the score references.
+Ruling 2026-08-16 constrains the decision: whatever A6 produces is also the
+shelfmark's `placement` delta section, one serialization, never a parallel
+one (the shelfmark format note owns the envelope; A6 owns this record).
+Forcing consumer: mer3ly, authority-grade.
+Validation: a pinned arrangement in the sandbox survives a round trip as a
+portable artifact; the reconstructed scene places pinned items where the
+visitor put them; the determinism receipt still holds for the unpinned case.
+Done when: the two paths meet, and a shared scene is a portable artifact rather
+than a site-local JSON blob.
+
+**A1. Placement satisfaction state - CLOSED 2026-08-16.**
+Context: the catalog's free/anchored/pinned policies currently have no
+satisfaction surface. Authored coordinates exist today (isometry adapts
+authored pins to a geographic score via `Placement::Coordinate`), and two
+mechanisms may displace placed items after the arrangement speaks
+(`scenomise::relax`, viewport fits). WebCoLa's silent-soft failure is the
+warned outcome; Penrose's ensure/encourage is the vocabulary: a pin is
+ensure-class (satisfied or reported), an anchored home is encourage-class
+(best effort by design).
+Tasks: first, audit where a `Coordinate`-placed item can move after solving
+and whether anything records it. Then, with the forcing consumer, give the
+realized scene a satisfaction record for ensure-class placements (shape
+decided by the consumer: a typed field or a recognized channel). An unmet pin
+is reported, never silently repositioned.
+Forcing consumer: mer3ly, once A6 lands. Its sandbox already ships the
+ensure/encourage split (an `anchored` mobility installs a soft `AnchorSpring`,
+a manual pin hard-pins) with no satisfaction record anywhere, and it already
+shares pins to a second device. Until A6, those pins never reach a score, so
+there is nothing for a satisfaction field to attach to. Isometry's VTT pins and
+the canvas pin/unpin intent remain alternates.
+Validation: a score with an unsatisfiable pin produces a scene that carries
+the violation; a test asserts the violation is present rather than the pin
+silently best-efforted; the record crosses the graphshell wire.
+Done when: a remote viewer can distinguish "placed as pinned" from "pin
+unmet" without source access.
+
+**2026-10-03, the roles.** The
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) retires ensure
+and encourage for three roles: seeded, anchored and pinned (F26). Read this
+target's ensure-class as pinned. Its encourage-class covered two different
+behaviours:
+- the anchored home, which returns to the arrangement (F19);
+- sceno's best-effort `Hold::Anchored` ("relaxation may carry it away",
+  `crates/cambium/scenes/sceno/src/score.rs`, lines 86–88), which nothing
+  returns. F19 and F25 name it seeded.
+
+F25 gives `Hold` all three: `Seeded` (the old `Anchored`'s meaning, read from
+old saves by a serde alias), `Anchored` (returns) and `Pinned`. The dynamics
+plan's G7 builds it. The Progress entries below keep their words: their
+`Hold::Anchored` and "encourage" are the seeded role, and their
+"ensure-class" is pinned.
+- A1's record is unchanged: `honored_holds` carries pinned holds only.
+  *Reading, not ruled:* anchored holds stay out of it, as seeded ones did, and
+  report a residual through the dynamics plan's G6 instead.
+- **A finding for mer3ly.** `PlacementDelta::holds`
+  (`mer3ly/crates/repo-graph/src/lib.rs`, line 1878) records a pin placed
+  under mer3ly's `anchored` motion as `Hold::Anchored`, "best effort by the
+  visitor's own choice", and a test at line 3034 asserts it. The sandbox's
+  `shelfmarkPlacement` (`mer3ly/assets/graph-sandbox.js`, line 1521) makes
+  the same choice in JS. The live path itself hard-pins a manual pin in
+  either motion (`pinNode`, `mer3ly/crates/repo-graph/src/lib.rs`, line 399),
+  so the recorded class already differs from the live behaviour under
+  `anchored`. Under F25 the Rust line keeps compiling but changes meaning,
+  from best effort to returning, the next time mer3ly repins mere. Scores mer3ly has already shared read
+  back as seeded, through the alias. Which role those pins should take
+  returns to Mark with mer3ly's mobility move, which G7 lists outside its
+  track.
+  *2026-10-03, ruled:* a manual pin records as `Hold::Pinned` in either
+  motion, once mer3ly takes up the roles. Mark: "A pin is a pin
+  (Recommended)" (mer3ly's site canvas plan, Ruling 103). Both mapping sites
+  drop the motion check. *Landed the same day,* ahead of mer3ly's repin
+  (mer3ly `f0fc678`), at Mark's "make the move". mer3ly no longer writes
+  `Hold::Anchored` anywhere, so G7 changes no meaning for it.
+- **The alias, as F25 is written.** A serde alias `"Anchored"` on `Seeded`
+  also catches the new `Anchored` on read. In a scratch probe,
+  `Hold::Anchored` serialized as `"Anchored"` and read back as `Seeded`, with
+  only an `unreachable_patterns` warning. How old saves are read is G7's
+  question, and it has gone to the dynamics grammar session.
+
+**A2. Selection clauses: coordination as data — CLOSED 2026-08-23.**
+Context: release ruling D1 stands (sceno ships no intent vocabulary; the
+protocol owns the triple). What the report adds is the *coordination* record
+between views: Mosaic's clause (source, client set, predicate, value) with
+declared resolution (single, union, intersect, crossfilter), where crossfilter
+means a view is filtered by every brush but its own. Mere's one-app-state,
+N-windows posture (multi_window_plan, expansion lane L3) is the shipped
+precedent's exact use case; a Mere clause carries a reading-parameter delta
+against graph authority, never SQL.
+Tasks: with the forcing consumer, define the clause record and resolution
+declaration; decide its home with evidence (chirograph beside the intent
+triple, or mere host state that graphshell serializes); wire two views over
+one authority through it.
+Forcing consumer: L3's entrance gate is met. Mer3ly shares a scene by URL hash,
+and Wave 1 of the [projection receipts plan](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md)
+supplies the genuine two-view ask: its spatial view and two-reading Matrix
+contribute named clauses over the same source identities. The proof forced
+crossfilter only; union and intersection remain absent until their behavior is
+distinctly required.
+Validation: brush in view one filters view two; crossfilter resolution
+honored (the brushing view is unfiltered by its own clause); serialized round
+trip is deterministic; clause removal restores the unfiltered reading.
+Done when: brush, filter, and focus are named, serialized citizens rather
+than host-only state.
+
+**A3. LOD rungs as declarative conditions - STAGE ONE LANDED 2026-08-19 (via P3b); stage two stays gated, gate sharpened 2026-09-01.**
+Context: `ScoreItem.representation` is a pre-selected rung; the conditions
+that select it live in host code, so a remote client cannot re-select on its
+own zoom and a static realization cannot state why a rung was chosen.
+Gosling ships the missing form: target, measure (screen-space width/height
+vs data-space zoomLevel), operation, threshold, and hysteresis padding as
+data. The measure split mirrors Mapbox's layout/paint classing: screen-space
+conditions are realization-dependent, data-space conditions are
+reading-dependent.
+Tasks: stage one, conditions as data in cartography's representation
+profiles (host-side registry; the P3b card-to-glyph traversal is the named
+consumer). Stage two, portable only when a remote viewer re-selects on a
+camera of its own: rung conditions travel beside the score, and a static
+realization evaluates them at its declared zoom deterministically. Stage two
+is larger than the ladder alone: `ScreenWidth`, `ScreenHeight` and `ZoomLevel`
+are viewer facts, but `Recency` and `Focused` are host facts the wire does not
+carry (recency derives from `graph.node_last_visited` in
+`cartography/src/spiral_score.rs`), so either they travel per item or the
+ladder is split-evaluated. Ruled 2026-09-01: both, in that order of
+obligation; see
+[Stage-two fact transport](#resolved-ruling-and-open-question).
+Forcing consumer: P3b (the recorded remaining half of P3: representation
+degrades card to glyph with recency and zoom, focus stays live). Mer3ly does
+not force this one: it exports `representation_registry()` to JavaScript for
+the live path's own UI, while its portable path hardcodes
+`Representation::Glyph`, and its fold/expand is a manual toggle over `visible`
+plus an untyped fold channel rather than a measure and threshold.
+Validation: same graph and placement inputs, two declared zooms, different
+selected rungs, deterministic; a hysteresis test shows a rung boundary does
+not flicker under small zoom oscillation.
+Stage-one done when: the representation ladder is registry data and one live
+host selects from it using declared view facts rather than a hardcoded branch.
+Entrance gate (sharpened 2026-09-01): a remote viewer with a local camera
+over a served scene. The earlier wording, "a remote re-selection consumer",
+made C4a's browser peer look like a candidate; it is not. The browser's
+remote view has no camera (`ports/graphshell/src/web.rs` `zoom` and `pan`
+return unless the session is local; `remote_scene` fits the served bounds at
+scale <= 1.0), the served rung is fixed by the endpoint
+(`MereHost::build_snapshot` hardcodes `Representation::Card` at
+`ports/graphshell/src/mere_host.rs`), and the client's own resolution is
+capability-based offer choice within that rung, the presentation plane the
+remote projection host plan ruled in §4.3 and landed at G1. C4b's
+done-conditions are keyboard and accessibility-tree checks on the embedded
+and full-page surfaces; they add no camera. The gate opens the moment a
+served scene is composed on the local canvas's camera, which the remote
+projection host plan §1 permits as curation truth.
+Stage-two done when: the ladder travels beside the score because a second host
+needs to re-select locally, and that host honors it without porting Mere's
+selection code.
+
+**A4. Transition specs between epochs - CLOSED 2026-08-19.**
+Context: expansion lane L5 named motion the deepest of the missing 90%;
+`scenotime::diff` computes what changed and every consumer snaps. Gemini's
+result: transitions specified relative to explicit start and end states, over
+component classes, with sync/concat composition, and the authors rejected
+extending the visualization spec itself. Scenotime epoch pairs are the
+natural start/end states; the host owns the clock (the same seam discipline
+the mesh host, `distillery::mesh_host`, uses for `Clock`).
+Tasks: a transition spec over diff output (which item classes, what staging,
+duration ratios); pure evaluation against host-supplied time in scenotime;
+default staging so consumers get respectable motion for free; playback in the
+first continuous consumer.
+Forcing consumer: L5's entrance gate verbatim: the first continuous
+re-projection a consumer ships (woodshed's rehearsal filmstrip or a canvas
+projection switch, whichever lands first). C2 is the cambium half. Mer3ly
+already ships most of the record this needs, a labeled revision-chained diff
+sequence it steps through with a source-time control, so it is the cheapest
+place to prove a spec once one exists; what it lacks is the authored half,
+duration, easing, and staging.
+Validation: identical scene pair plus identical spec yields an identical
+schedule; a static realization is unaffected by transition specs; motion
+stays out of arrangement types (the catalog's motion taxonomy holds).
+Done when: a projection switch reads as a staged transition, specified as
+data, on at least one consumer, with snapping still the default elsewhere.
+
+**A5. Gap proofs adopt named anatomies (gated on a named first proof consumer).**
+Context: the catalog's promotion suite is an evidence harness, not a consumer.
+It begins when a named product needs one of these proofs. Reusing one
+heterogeneous fixture as orrery, matrix, Cartesian chart, hierarchy, and
+schematic then tests whether the resulting contract material composes beyond
+that first ask. The report's job was to make sure none of that material is
+invented fresh.
+Tasks, each strictly behind its proof:
+- Chart proof (gap 1): scales, axes, legends filled by rule with derivation
+  recoverable, per Vega-Lite; the unit/aggregate distinction per ATOM ("a bar
+  over twenty nodes is not a twenty-first node" is already catalog law).
+- Facet proof (gap 4): per-channel shared/independent resolution, lifted from
+  Vega-Lite `resolve` with its default resolutions.
+- Schematic proof (gap 2): ELK's port and label anatomy for endpoints;
+  SetCoLa's set-scoped constraint form (constraints over predicate-defined
+  sets, instance generation deferred to the runtime) so a saved layout
+  reapplies to a second graph, which is the catalog's second-dataset receipt.
+- Hierarchy proof: before adding tree/treemap as new monolithic
+  `Arrangement` variants, evaluate GoTree's factoring (element x placement
+  rule x coordinate transform) and ATOM's recursive partition operators so
+  node-link and space-filling are parameter settings of one family.
+- Every proof: an accessible static realization in the receipt (B1 defines
+  the shape). Read GoFish in full before the facet and flow proofs; it is the
+  chart-side proof of the catalog's central bet.
+Forcing consumer: no A5 proof is activated. The
+[Distillery projection walk](2026-09-02_distillery_projection_walk_plan.md)
+W3 is the prospective schematic consumer: training/provenance records and the
+workspace dependency graph, manifest/evaluation interactions, and a frozen
+navigable table. At W3's entrance, check existing routed polylines and endpoint
+semantics before claiming a portable port/routing addition is needed. Naming
+this candidate does not close its entrance check or open the other A5 families.
+Entrance gate: a named product consumer needs one proof strongly enough to
+state its task, source facts, interaction, and accessible output. Found the
+suite around that proof. Any portable addition
+still needs the catalog's second heterogeneous consumer; the other suite views
+do not count as substitutes merely because they share a fixture.
+Validation: per the catalog's promotion checklist, unchanged.
+Per-proof done when: the contract addition cites the anatomy it lifted, the
+first proof that forced it, and the second heterogeneous consumer that proves
+it portable. A5 stays open until every A5 proof family is either promoted
+through that evidence or ruled unnecessary by a forcing proof.
+
+### Track B: genet (realization receipts)
+
+Genet is the realization layer of the projection stack: the accessible static
+form and the drivable interactive form both *target* its surfaces. They do not
+live in it. **Corrected 2026-08-16 while opening B1**: genet has no dependency
+on scenograph and mere depends on genet, so a converter from `Scene` to a
+semantic form cannot sit in genet without inverting the stack. The static
+realization lands in mere and renders into genet's lane, which is the same
+direction mer3ly already proves by serializing cambium views to static HTML.
+Pointer docs in `genet/docs/` are founded when a slice genuinely lands there.
+
+**B1. Accessible static realization - CLOSED 2026-08-20. All legs, including the manual pass.**
+Context: no surveyed grammar treats the accessible form as a first-class
+realization target; the catalog's W3C citations (WAI complex images, Graphics
+ARIA, SVG structure) are the anatomy. Retrofitting accessibility contracts is
+the expensive order, so the receipt shape should exist before the promotion
+suite starts producing receipts.
+Tasks: define the receipt shape (navigable structure, names, descriptions,
+values, relations, and a tabular or long-form alternate where the visual
+alone is insufficient); realize one existing scene (the P3 spiral score or
+the P5 `coastal_map.json` fixture) as a static semantic form through genet's
+DOM lane; verify with the AccessKit lane precedent
+(accesskit_screen_reader_verification, 2026-06-09) and a genet-probe scenario
+asserting the semantic tree (apps self-drive via genet-probe; never synthetic
+OS input).
+Forcing consumers: Mer3ly's shipping accessibility gap opened the static form,
+and Turnstone `648bf19` supplied the definitive headed traversal and routed
+interaction close. The promotion suite reuses this receipt shape; it is the
+harness that made the need visible, not a substitute consumer. Mer3ly's sandbox
+was JavaScript-only, shipping `data-graph-interface` hidden with a runtime-built
+node list and a no-script status reading "Graphshell sandbox not initialized",
+so the site served accessibility by rendering an entirely separate
+authority-derived static index instead. That workaround is what B1 retires.
+Validation: a screen-reader traversal of the static projection enumerates
+instances and relations with names; a probe scenario asserts structure
+deterministically; the same scene still produces its interactive realization.
+Done when: "static with navigable semantics" is a checklist item the first
+promotion proof can satisfy by following an existing worked example.
+
+**B2. Probe-drivable projections - CLOSED 2026-08-20.**
+Context: genet-probe drives applications through DOM-carried identity, and
+chirograph intents target an `InstanceId`. The two identities should meet:
+a scenario should pick a projected instance and invoke an intent on it by
+stable identity, not by coordinates.
+Tasks: projected instances expose stable identity to the probe resolver at
+whichever host surface renders them; a scenario verb resolves instance to
+intent invocation.
+Forcing consumer: the first headed receipt that asserts an intent against a
+projected instance (the promotion suite's interaction receipts, or the A1
+pin receipt, whichever runs first).
+Validation: a scenario addresses an instance by identity, invokes an intent,
+and asserts the `IntentResult`; renaming or moving the instance on screen
+does not break the scenario.
+Done when: projection receipts are driven by identity end to end.
+**Landed.** Turnstone's retained Knot toolbar carries the projected
+`InstanceId` and advertised intent in DOM data attributes on Save, Resolve,
+and Run. The Knot session retains the endpoint's exact `IntentResult` as a
+visible receipt carrying the same target and intent. `knot_authoring.scn`
+selects Resolve as `.knot-resolve @data-projection-instance=1`, independent of
+its label and screen position, then asserts
+`Projection intent 1: knot.transclusion.resolve accepted` and the derived
+content. A focused unit proof resolves a second fixture at `InstanceId(17)`
+through genet-probe. The headed scenario completed with `RESULT ok`. The
+boundary stayed narrow: Turnstone carries the host identity, genet-probe uses
+its existing generic class-plus-attribute resolver, and chirograph continues
+to own `InstanceId`, invocation, and result.
+
+**B3. Livery property-classing check - CLOSED 2026-08-16, recorded.**
+Context: Mapbox's layout/paint split is prior art for classing every visual
+property by what it invalidates. Livery's TOML property DB likely already
+carries an invalidation class per property for its own engine needs.
+Tasks: read livery's property DB schema; if classing exists, record the
+rhyme in livery's docs and close this item; if it does not, weigh adding the
+class with livery's own consumers, not on the report's authority.
+Validation: one paragraph of recorded evidence either way.
+Done when: the question is answered from the tree, not the report.
+**Answered.** Livery's DB carries no invalidation class: 123 property entries
+with name, value type, inheritance, initial, grammar, seed values, animation
+behaviour, and source, and nothing saying what a change invalidates. But the
+rhyme is not missing from genet, it is *borrowed*: `LayoutDamageClass` resolves
+None / PaintOnly / Relayout and a color swap is asserted repaint-only, with the
+damage computed inside Stylo's `compute_style_difference` from the incumbent's
+own property metadata. The adapter's `compute_layout_damage` hook is a stub.
+So the classing leaves with the fork at retirement unless Livery's DB grows
+somewhere to put it. Recorded in the cutover plan's deferral register as a
+compounding item, on that plan's authority and with its retirement stage as the
+forcing consumer, which is what this target asked for.
+
+### Track C: cambium (host consumption)
+
+Cambium is where scenes meet users: `cambium-genet-winit-host` is the
+single-root host, woodshed then signalman its consumers, and swatches are the
+agreed cross-product graph-view contract. Cambium doc updates land in
+`genet/components/cambium/docs/` *(historical citation)* <!-- doc-audit: historical-path --> when a slice opens.
+
+**C1. Satisfaction state in host chrome - LANDED 2026-08-16.**
+Context: A1's scene-side record is only honest if a user can see it.
+Tasks: with A1's consumer, surface pin state in the host's widget chrome
+(a pinned badge; an unmet-pin state visibly distinct); keep the vocabulary
+plain (pinned, held, unmet), not solver jargon.
+Validation: the headed receipt shows a pinned item, a displaced anchored
+item returning home, and an unmet pin visibly reported.
+Done when: no best-effort placement is presented as satisfied truth in any
+cambium-hosted view.
+
+**C2. Transition playback with the host clock (consumer half of A4) - CLOSED
+2026-08-19.**
+Context: scenotime evaluates transitions purely; a cambium host owns time.
+Tasks: the host drives A4's schedule with its frame clock; woodshed's
+rehearsal filmstrip is the named first consumer (L5); the canvas projection
+switch is the alternate.
+Validation: pausing the host clock pauses the transition; identical inputs
+replay identically; a consumer that never adopts transitions still snaps.
+Done when: one shipping cambium consumer plays a staged epoch transition.
+
+**C3. Backdrop realization (consumer half of expansion lane L2) - CLOSED
+2026-08-20.**
+Context: L2's two waiting consumers (isometry's map, woodshed's stage floor)
+force the backdrop contract; the report adds the vocabulary: class backdrop
+properties explicitly (visible, collidable, hit-transparent, provenance;
+which properties are placement-class vs paint-class), per Mapbox's decade of
+production answers, so "a backdrop may be visible, collidable, both, or
+neither" is declared data rather than host convention.
+Tasks: prototype against both consumers per L2's entrance gate; carry the
+property classing into whatever shape both force; a remote graphshell viewer
+renders the backdrop from scene data alone. Mer3ly supplies a third,
+already-shipping data point for the minimum property set: `set_backdrop(kind,
+tangible)` in the live path, and a backdrop carrying kind and collidable on its
+shared wire. Identity plus collidable is what a real consumer reached for
+first, ahead of visible, hit-transparent, and provenance.
+Validation: L2's own gate, plus: the same backdrop crosses the wire and
+renders identically remote; a hit-transparent backdrop never picks; a
+collidable one participates in placement.
+Done when: environment is scene data with declared properties on two
+consumers.
+
+### Track F: field receipts (gated; received 2026-10-06)
+
+The projection receipts plan's wave 3 came here when the stack seams S14
+archive pass retired that plan (stack seams ruling S61). Its tail is recorded
+in the [archived plan tails plan](2026-07-03_archived_plan_tails_plan.md),
+section "2026-10-06 archive pass". The archived plan is at
+[archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md),
+§5. The targets keep that plan's words. No work opens under either one until
+its gate's trigger is met: scheduling them here asserts order, not readiness.
+
+**F1 (was FT9). Derived-mark integrity (receipt 3) — gated.**
+A Distribution or Contour scene emits derived marks that remain selectable,
+name their values and contributors, and never masquerade as source nodes.
+Gate: a named statistical or field consumer.
+
+**F2 (was FT10). Field distinction (receipt 6) — gated.**
+One sample dataset produces Territory and Contour scenes whose categorical
+and scalar meanings remain distinct through rendering, picking, legends, and
+accessible output.
+Gate: a field-data consumer. The trigger candidates on record:
+- host-side radio and mesh placement facts. This is the sited-device brief's
+  fact surface: the node does not know where it is, the host knows where it
+  put it.
+- a simulator or radio model for Current.
+
+*Reading, not ruled:* both receipts are A5's territory, the remaining
+portable-grammar questions, which already wait on a forcing consumer. A field
+consumer that opens F2 would also force A5's gap 1, derived marks, scales and
+guides. So F1 and F2 open with A5 rather than ahead of it.
+
+### Sequence
+
+Closed: **A0**, **A6**, **A1**, **C1**, **B1**, **B2**, **B3**, **C3**, **A2**,
+**A3 stage one**, **A4 + C2**, and P3b's local selection-to-renderer proof.
+Turnstone `648bf19` closes B1's readable and routed-interaction receipts.
+
+The remaining implementation targets keep their entrance gates. **A3 stage
+two** waits for a remote re-selection consumer. **A5** waits for a named first
+proof consumer; the promotion suite is founded with that proof.
+
+Non-goals, restated from the governing docs and the report: no intent
+vocabulary in sceno (D1 stands); no global nonconvex solver
+in scenomise (deterministic solving is the receipt currency); no speculative
+adoption of the report's six-layer spec stack (each layer arrives only with
+its proof); no new grammar DSL (the score is the spec; the report's
+what-a-spec-means table describes meanings the score may adopt, not syntaxes
+to build).
+
+## Resolved ruling and open question
+
+**The site's wire as an index - ruled 2026-08-16.** Mark's framing, 2026-08-16: the wire has its
+own utility as an index, and that may be a better way to think about it than
+promotion. The argument in its favor is already in the code. `score.generation`
+is derived from the authority's SHA-256, so a score is a pure function of its
+authority. That makes the site's scene state a citation rather than a
+transport: dataset, revision cursor, reading, arrangement, and a small delta of
+pins, selection, motion, and backdrop. The scene is reconstituted
+deterministically rather than shipped, which is why the wire is small. If the
+framing holds, the five fields it carries beyond the contract do not all need
+to enter the score, and the index becomes its own layer above the contract with
+its own promotion question.
+Ruled 2026-08-16, all five questions, recorded in the
+[shelfmark format note](../technical_architecture/2026-08-16_shelfmark_format_note.md):
+the citation is **shelfmark**, a Mere-level format held as a note until the second
+shipping consumer; the citation delta and A6's sidecar are one record (A6's
+`placement` section is the first standardized member); home is incipit, scoped,
+with chirograph the fallback; checkability (`expects.generation`) is required in
+v1. The [scene citation index brief](../research/2026-08-16_scene_citation_index_brief.md)
+holds the reasoning.
+
+**Apps embedded in the site - ruled 2026-09-01, two sites, two answers.** Mark, 2026-08-16: if he could embed full
+versions of all his apps in the site, he would. That is a larger scope question
+than this plan carries, but it bears on the index ruling directly. An index is
+exactly the addressing an embedded app needs for a deep link, and under that
+reading authority-grade consumption stops being one site consuming one stack
+and becomes the site hosting the family. Recorded here so the index question is
+not settled without it.
+Ruled 2026-09-01. There are two sites and the answer differs. For
+**merelyllc.com**, the company site: it hosts Graphshell embeds, and every
+other application reaches it as a served projection through Graphshell, which
+is the remote projection host plan's product ruling (§1) applied; shelfmark is
+the deep link, C4b of the browser WebRTC carrier plan is the embed component,
+and C5 public rendezvous is what lets a visitor reach a device. For
+**mer3ly.net**: full versions of the applications embedded in the site as
+their own browser builds, the site hosting the family. Forced to one answer
+for both, the second wins. Refined the same day: the first of those
+applications is Graphshell, and its job on mer3ly.net is to **supersede the
+site's own canvas** (the seiche sandbox the consumer survey found consuming
+the stack along its second, non-portable path) and to **serve as the site
+index** beside everything else it does. That reading joins the two rulings
+above: shelfmark is already the index layer, and Graphshell as the site's
+canvas is the thing that reads it. It also answers the prover-or-demand
+question raised in Progress for mer3ly's own case: once Graphshell is the
+site's index, the graph view stops being a stress-test toy and becomes the
+site's navigation, which is a product pull. The mer3ly.net direction is a
+new objective, not a target in this plan: it needs its own assessment,
+Graphshell-supersedes-the-canvas first and one per further application,
+since each has its own browser story. Nothing in the ruled scope of this
+plan starts it.
+
+**Stage-two fact transport - ruled 2026-09-01.** Found 2026-09-01 while testing C4b
+against A3's gate. `RepresentationLadder::select` evaluates five facts;
+three are the viewer's (`ScreenWidth`, `ScreenHeight`, `ZoomLevel`) and two
+are the host's (`Recency`, `Focused`), and neither the score nor the scene
+carries the host pair. When stage two opens, one of two shapes has to be
+chosen: the host pair travels per item beside the ladder, or the ladder is
+split-evaluated, host clauses resolved before serving and viewer clauses at
+the viewer. The choice fixes what a static realization can claim about why a
+rung was chosen, so it is ruled before the consumer exists, not under it.
+Ruled: not a choice between the two. **Evaluation without the host facts is
+the baseline obligation**: a viewer given a ladder and no `Recency` or
+`Focused` must still select a rung, so the host's clauses resolve to a
+per-item ceiling before serving and the viewer evaluates the rest. **Carrying
+the facts is the stretch**: a host may disclose them per item, and a viewer
+that receives them evaluates the full ladder. Disclosure is therefore never
+required for the ladder to work, which is what makes it a host's choice
+rather than a wire obligation. Design consequence for stage two: a condition
+whose fact is absent must have a defined result (the ceiling stands in for
+the host clauses; an absent viewer fact is the existing non-finite path,
+which never selects), and a static realization states whichever half it had.
+The ladder types move out of cartography (they depend only on
+`sceno::Representation`) when stage two opens. `ProjectedItem.channels` is
+the natural carrier for the disclosed pair if the stretch is taken; its doc
+already reserves it for host-side signals a remote viewer cannot read.
+
+**Served endpoint selects at a declared zoom - ruled and landed 2026-09-01.** Found the
+same day: `MereHost::local_request` builds the offer's score through the
+strategy at 1280 x 720, zoom 1.0, no extents, so the ladder's Card rung fails
+`ScreenWidth > 0` and every item scores Glyph, while `build_snapshot`
+hardcodes every item as Card at 240 x 112. The offer and the snapshot
+disagree on every item; nothing breaks because endpoints ignore the request
+score for shape, but the wire carries two answers. Ruled: the served snapshot
+selects from the ladder at declared zoom 1.0 with the served footprint as the
+measured extent, and the hardcode goes. That makes stage one's "one live host
+selects from it" true of the product endpoint, and the offer and snapshot
+agree. A3 stage-one task; the landing is recorded in Progress.
+
+**What mer3ly is, clear-eyed - recorded 2026-09-01.** Mark's framing when
+ruling the two 2026-08-16 leftovers below: the graph view of an index of his
+own site is a toy, and a fine one, whose purpose is stress-testing an embedded
+canvas. There are zero consumers for sharing how people arrange it, and no
+need for any. The feature would have real utility over a real dataset, which
+needs other embeds and other data than descriptions of his GitHub repositories.
+Recorded beside the 2026-08-16 consumer ruling above because the two must be
+read together: mer3ly is live, public, pinned, and the shipping prover of the
+receipts plan, and that is what makes it authority-grade; what it is not is
+evidence of product demand for the features its receipts prove. Whether that
+qualifies the consumer ruling's "its asks open gates" is not settled here; it
+is raised in Progress for Mark.
+*Settled 2026-09-30.* Mark, when opening the mer3ly.net canvas assessment:
+"my feeling is, the site counts as a consumer, but it should be consuming or
+creating stack capabilities, not special exceptions." mer3ly's asks open gates,
+but only for capabilities that another consumer could use unchanged. Recorded
+as Ruling 1 of mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`, which
+is that objective's assessment.
+*Added 2026-10-01.* Rulings in that assessment that land in mere:
+- A typed fold is promoted onto sceno's 0.0.4 line, with mer3ly as the forcing
+  consumer. Mere's native canvas, through pictograph's existing
+  `forme::FoldRecord` projection plus a product trigger and folds in
+  `MereHost` scenes, is the second (Ruling 11).
+- *Ruled 2026-10-08, the fold fact's promotion (site S5, Rulings 149 to 153
+  there).* Two questions put to Mark when the site began S5, the fold fact's
+  data layer, with the native canvas left to a later phase (its Ruling 152).
+  **A pending second consumer.** The catalog's promotion rule says every
+  promoted addition "still requires the second heterogeneous consumer"; the
+  native canvas, named by Ruling 11, comes in the native phase. Options:
+  promote, the record naming the native canvas and marking it pending until
+  the native phase (recommended); land it provisional, promoted only when the
+  native canvas consumes it; hold promotion until then. Mark: **"Promote,
+  marked pending (Recommended)"**. *Follows:* the catalog's addition record
+  names the native canvas as pending and is checked again when the native
+  phase lands; the rule carries a dated note.
+  **Whether `forme::FoldRecord` is a duplicate.** The rule removes "the old
+  duplicated implementation" on promotion; FoldRecord stays, moving to a
+  view-curation leaf crate in the native phase (Ruling 153). Its members are
+  kernel graph-member UUIDs and it persists as view curation (pandect
+  `ViewIntent.folds`); the fact's members are scene `InstanceId`s and it
+  belongs to a served scene and its trace; a host lowers the one into the
+  other (Ruling 149). Options: not a duplicate, the authored record and its
+  realization (recommended); a duplicate whose retirement the native phase
+  plans. Mark: **"Not a duplicate (Recommended)"**. *Follows:* the record
+  names mer3ly's copies as the duplicates that retire (`visibility_diff` in
+  `repos/mer3ly/crates/repo-graph`, the `["fold",1]` channel, the `+N` count in
+  `assets/projection-proof.js`), in the site's follow-up to S5. *Open:*
+  pictograph's `FoldProjection` summary logic overlaps the fact's summary
+  stand-in; whether it retires is native-phase work, not yet ruled.
+- The two-reading matrix's contract types go into cartography, and its
+  derivation into a cartography sibling crate. Both mer3ly's copy and
+  `ports/gazette/src/ledger.rs` retire, as the catalog's
+  removal-on-promotion rule requires (Rulings 10 and 12).
+- *Amended 2026-10-01 (Rulings 19-20 there):* there is no sibling crate. The
+  matrix's types and a thin adapter go in cartography beside `src/adapters/`,
+  and the cell derivation goes in the scenes family, after the adapters' own
+  pattern. Cartography's "stays contract-only" comment (`Cargo.toml:18`)
+  predates `graph-layout`'s retirement at `739c87f4` and is stale. The fold
+  fact names its stand-in: either a member or a synthetic summary.
+- *Added 2026-10-08 (site Ruling 142):* the types move too. The matrix's
+  types and its pure derivation are `scenomise::matrix`; cartography's
+  `adapters/matrix.rs` re-exports them and adds a `two-reading-matrix`
+  profile beside the unchanged one-authority `matrix` profile.
+  graphshell-client's `frozen.rs` gains `FrozenGrid`, the two-axis table.
+  Gazette's `ledger.rs` stays until the dramatis split (the dramatis repo
+  plan's D7), held to the shared derivation by `tests/ledger_parity.rs`; at
+  the split it retires onto `scenomise::matrix` and `FrozenGrid` (site
+  Ruling 143). Landed by the mer3ly site
+  session as its S2, `96fbe064` to `3620cd3b`; its Rulings 142 to 147 are in
+  mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`.
+- Separately, A4's text here runs together two histories that the assessment
+  separates: authority-revision history, the site's checkpoint slider, and
+  scene-edit history, `projection-proof`'s chained trace.
+- *Added 2026-10-08:* the scene-edit history now has a portable form.
+  scenotime's `SceneTrace` (`src/trace.rs`, `SCENE_TRACE_VERSION = 1`) is a
+  pure record of a base and steps (a label, an optional `SceneDiff`, an opaque
+  host note), validated as a chain and replayed by `snapshot_at(n)`; moving
+  through it and truncating on commit is `edit_history::History<SceneTrace>`
+  (scenotime `tests/history.rs`), so the Scenograph editor plan's one history
+  serves it. A capture of it travels beside chirograph's `ProjectionCaptureV2`
+  (`capture.rs`: an optional `score` and a `CaptureAuthorityV1`). Landed by the
+  mer3ly site session as its S4 and S6, ending at `a6014bcb`; its Rulings 130
+  to 133 are in mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`. The
+  authority-revision history stays apart from it.
+- *Added 2026-10-08:* the authority-revision history has its form too:
+  `scenomise.host-dataset/v2` carries a dataset per revision (v1 stays
+  readable), `scenomise::history` classes each item as added, updated, stable
+  or removed between revisions, and cartography's `adapters/changes.rs`
+  reads it. It stays apart from `SceneTrace`. Landed by the mer3ly site
+  session as its S3, `1a53836b` to `1adedb50`.
+
+## Progress
+
+- **2026-09-05:** cross-plan review names Distillery W3 as the prospective
+  schematic proof consumer. W1's cleared repository-move prerequisite is not a
+  W3 or A5 receipt. Existing `sceno::RoutedRelation` already carries full
+  polylines; the W3 entrance review must distinguish route realization from
+  any missing reusable port-anchor semantics. Every portable addition still
+  requires the catalog's independent heterogeneous consumer proof.
+
+- 2026-08-15: plan founded from the projection grammar report (pass one: six
+  specification grammars and the five gap anatomies; pass two: the
+  Mosaic/Gosling/Penrose/Bluefish/GoFish tail survey and the
+  what-a-spec-means typology, the latter arriving from Mark's notes and
+  verified against the papers). The report artifact was updated the same day
+  with both passes. Landing sites verified against the tree: score shape read
+  from `sceno/src/score.rs`, release rulings D1-D4 from the 0.0.3 plan,
+  expansion lanes L1-L5 from the brief, isometry's authored pins and P3b's
+  open LOD half from the proofs plan, genet component inventory
+  (cambium family, genet-probe, livery) from `repos/genet/components/`. No
+  code target started.
+- 2026-08-15: **A0 landed.** Catalog's external-systems section split into
+  two shelves (renderers/toolkits/foundations, then specification languages and
+  design solvers) with all eleven report systems cited and one-line transfers.
+  Source URLs checked before writing: two guesses were 404s (`uwdata.github.io/draco2`,
+  `uwdata.github.io/gemini`) and were replaced with the live repos; GoTree, ATOM, and
+  GoFish resolved to an ACM DOI, the MSR publication page, and the MIT VIS page.
+  The report artifact is cited by name and date, not linked: mere is a public repo and
+  a claude.ai artifact URL is private, so A0's done-condition (findable without leaving
+  the repo) is met by pointing at this plan instead.
+  The collision note covers **Mosaic** as well as Penrose: the catalog's own tiling row
+  names Mosaic as a packing variant, and it has no implementation in the tree.
+  DOC_README: founded the missing catalog entry (the catalog had no index line at all)
+  and recorded A0 on this plan's entry.
+- 2026-08-16: correction. A0's first pass claimed `graph_layout:penrose` was absent
+  from the tree and rewrote the note around `PenroseAdapter` / `penrose.default`. That
+  was wrong: the claim came from a grep truncated by `head -20`. Both ids are real and
+  distinct, `graph_layout:penrose` being the `LayoutCapability` registry id
+   (`crates/canvas/arrangements/src/registry.rs:358` *(historical citation)* <!-- doc-audit: historical-path -->) and `penrose.default` the cartography
+  adapter's projection id. Plan text and catalog note restored to the registry id.
+- 2026-08-16: **mer3ly ruled authority-grade; A6 founded.** Survey first
+  (`../research/2026-08-16_mer3ly_stack_consumer_survey.md`), then Mark's
+  ruling: mer3ly's asks open gates. A6, the placement seam, is the new target
+  and the new opener, because the site's two paths never meet and that single
+  fact is what leaves A1, A2, and C3 each waiting on a consumer that does not
+  exist. Re-gated A1 (follows A6; mer3ly ships ensure/encourage with no
+  satisfaction record), A2 (L3's gate met by URL-hash scene sharing; resolution
+  strategies still unforced), A3 (mer3ly does not force it; the plan's premise
+  stands), A4 (mer3ly has the record, not the spec), B1 (mer3ly is the standing
+  argument, not a counterexample), C3 (identity plus collidable is the shipped
+  minimum). Two open rulings recorded: whether the site's wire is better
+  understood as an index than a promotion candidate, and the app-embedding
+  ambition that bears on it.
+- 2026-08-16: **index ruled; shelfmark founded as a format note.** Mark ruled
+  the brief's five questions: note now scoped Mere-level; one record shared
+  between A6's sidecar and the citation delta, grounded in the stack; incipit
+  as home (scoped: 127 lines, serde + uuid only, register pairs with the
+  shelfmark; chirograph fallback if the opaque-sections indirection fights
+  the one-record rule); checkability in v1; the name is shelfmark. The
+  format note (`../technical_architecture/2026-08-16_shelfmark_format_note.md`)
+  is the authority; the founding in code waits for the second shipping
+  consumer. A6's task text now carries the one-record constraint.
+- 2026-08-16: **A6 first slice landed: the score can hold a placement, and
+  every solver honors it.** The audit found three silent displacement paths,
+  not one. `Placement::Coordinate` was honored by `Geographic` and `Hulls` and
+  silently discarded by `Spiral` (ordinal wins) and `Board` (rank wins), and
+  `relax` moved every item with no notion of a pin at all. All three were the
+  same bug wearing different clothes: the person said where, the layout
+  answered somewhere else, and nothing said so.
+  Decision, write-back versus sidecar: **sidecar, keyed by `SourceRef`**. The
+  stack argued it, per the one-record ruling. A shelfmark cites by source
+  identity, so a per-item field would mean shipping a whole score to cite one
+  pin, defeating the index; item indices move when the authority changes and
+  source ids do not; and pins are sparse, so absence is the free common case.
+  `Score.holds: Vec<HeldPlacement>` is therefore the shelfmark's `placement`
+  delta section verbatim, one serialization of a pin.
+  Landed: `sceno` gains `Hold` (`Anchored` = encourage, `Pinned` = ensure),
+  `HeldPlacement { source, at, hold }`, `Score.holds` (serde-default) and
+  `Score::hold_for`; `SCORE_VERSION` 1 -> 2, because an adapter that only knows
+  v1 must reject rather than silently drop the one field that carries what
+  someone asked for. `scenomise::solve` consults `hold_for` ahead of all four
+  arrangement families; `relax_holding` leaves held instances where they stand
+  while they still push their neighbours (the asymmetry is the meaning of a
+  hard hold), with `relax` preserved as the nothing-held wrapper;
+  `pinned_instances` resolves holds to instances through interned sources, so
+  a source appearing twice pins both.
+  Receipts: 8 new tests, `sceno` 19 -> 21 and `scenomise` 15 -> 21, all green,
+  plus `chirograph` (21) and `mere-cartography` (25) unaffected. A v1 score
+  still loads and loads as "nothing held"; an unheld score places exactly as
+  before, so no existing determinism receipt moves.
+  At this point satisfaction reporting was still A1 and crate versions stayed
+  at 0.0.3. Later entries close A1. The 2026-08-19 reconciliation opens the
+  0.0.4 development line and Score v3; nothing was republished. Mer3ly's own
+  seam (its live path still never builds a score) was the next slice.
+- 2026-08-16: **A6 mer3ly half written and verified, parked on a push.** The
+  seam now exists in code: `PlacementDelta` deserializes the sandbox's own
+  scene state (extra fields ignored, so a caller hands over the whole shared
+  record), and its `holds()` maps that placement onto `Score.holds`. A manual
+  pin is hard in the live path, so it records as `Hold::Pinned`; under
+  `anchored` motion the visitor has already said best-effort, so it records as
+  `Hold::Anchored`. The class is recorded rather than left to be re-inferred
+  from a spring stiffness, which was the point. `portable_projection_holding`
+  and `portable_projection_with_placement_json` carry it, with a
+  `portable_projection_with_placement` wasm export for the sandbox, and a pin
+  naming a node the authority lacks is refused as a broken citation rather
+  than solved into a scene that quietly omits it.
+  The receipt half matters as much: `consume_portable_projection` now checks
+  every hold against the scene **as solved** (not after the trace, which
+  deliberately moves Turnstone) and reports `honored_holds`. A forged artifact
+  claiming a pin the scene does not satisfy is rejected. That makes a cited
+  pin checkable, which is the shelfmark's `expects` property arriving one
+  layer down.
+  Receipts: mer3ly-repo-graph 14 -> 19 tests, site workspace 49 green,
+  including a round trip that pins a node under `Spiral`, the exact family
+  that used to discard an authored coordinate in silence.
+  The version bump proved itself immediately: `tests/m7_showcase.rs` asserted
+  `score.version == 1` and failed loudly the moment the contract moved, which
+  is a consumer noticing rather than silently dropping a field.
+  **Blocker, and it is only this.** Mer3ly resolves mere by git rev, pinned at
+  `8a7ede70`, and the contract half sits in unpushed `3716c601`. A local
+  `[patch]` does not substitute for a rev-pinned git dep (it resolved the old
+  rev with no warning), so verification ran against temporarily repointed path
+  deps, now reverted; no local path is left in a manifest. Landing sequence:
+  push mere, bump mer3ly's rev, reapply the parked diff, rebuild the committed
+  wasm, then wire the sandbox's share control to the new export. The last two
+  are deliberately not done, because a wasm rebuilt against a local path is
+  not a thing to commit.
+- 2026-08-16: **A6 closed; A1's first slice landed.** A6's mer3ly half shipped
+  after the rev bump: `PlacementDelta` maps the sandbox's pins onto
+  `Score.holds`, `consume_portable_projection` checks each hold against the
+  scene as solved and reports `honored_holds`, and an `export projection`
+  control sits beside `share scene` rather than replacing it, because a share
+  is a citation and a score plus snapshot has no business in a URL. Verified in
+  a browser, not only in tests: pin a node, press export, "1 pin honored"; and
+  driving the export directly returns score version 2, a hold recording
+  `Pinned` at (-137.5, 88.25), and that node placed at exactly (-137.5, 88.25)
+  under `Spiral`. The Wasm ceiling was raised deliberately, with all three
+  measurements recorded beside it (858,444 baseline / 932,204 stripped /
+  958,016 full) and the finding that no variant fit the old bound.
+  A1 then opened on a gap A6 itself created. A hold naming a source the score
+  never placed was dropped in silence, which is the same failure as moving a
+  pin and saying nothing; a probe test confirmed it before anything was built.
+  `Scene.unmet_holds` now carries those violations as full `HeldPlacement`
+  records, so a viewer without the score can say what was asked and where, and
+  `SceneTables.unmet_holds` carries them through `from_dense` onto the wire.
+  Encourage-class holds are excluded on purpose: an anchored home that goes
+  unplaced is best effort working as designed.
+  Receipts: sceno 21, scenomise 24, scenotime 19, with chirograph (21) and
+  mere-cartography (25) unaffected. Two of the new tests serialize the snapshot
+  and read it back, because A1's done-condition names a *remote* viewer, and
+  one strips the field to prove an older wire still loads.
+  Still open in A1: the only unsatisfiable case today is a hold on an absent
+  source. Displacement by a consumer's own physics or a viewport fit is not yet
+  reported, and mer3ly's `honored_holds` remains a site-local receipt rather
+  than a promoted one. C1 (satisfaction in host chrome) now has something real
+  to render.
+- 2026-08-16: **B3 closed, and the answer was better than either branch the
+  target anticipated.** The question was whether Livery's property DB classes
+  properties by what they invalidate. It does not: 123 entries, eight keys,
+  none of them an invalidation class, and Livery's own invalidation machinery
+  is selector-scoped, a different axis. The target then expected either "close
+  it" or "weigh adding it". Neither fit, because genet already has the
+  layout/paint rhyme working: `LayoutDamageClass` resolves None / PaintOnly /
+  Relayout, `RestyleOutcome::needs_relayout` reads `RestyleDamage::RELAYOUT`,
+  and a test asserts a color swap is repaint-only. It is borrowed, not owned.
+  Stylo computes the damage in `compute_style_difference` from its own
+  per-property metadata, and genet's `compute_layout_damage` hook is a stub
+  returning default. A first read of that stub suggested the classing was
+  unimplemented; checking where damage actually comes from corrected it.
+  So the finding is a dependency, not a gap: every incremental-layout receipt
+  that skips layout for a paint-only change is currently a receipt for Stylo's
+  property table, and the classing leaves with the fork unless the DB grows a
+  home for it. Recorded in genet's cutover-plan deferral register as a
+  compounding item with the retirement stage as its forcing consumer, on that
+  plan's authority rather than the report's, which is exactly the bar this
+  target set. Mapbox's layout/paint split is named there as the shape to
+  borrow when it is built.
+- 2026-08-16: **B1's first slice landed: the receipt shape exists, with two
+  corrections it forced.** `graphshell_client::frozen` turns a `Scene` into
+  navigable semantics: a document name, a generated summary, one entry per
+  visible instance with a coarse role (symbol / object / live content, mapped
+  down from `Representation` because a reader cares about kind, not rung),
+  relations resolved to names at both ends, and a `rows()` tabular alternate.
+  It produces a *structure*, not markup, so a host renders it into a genet DOM
+  tree, an AccessKit node tree, or an HTML table, and the receipt is assertable
+  in a test with no browser. That also keeps a DOM engine out of the client.
+  **Correction one: B1's home is mere, not genet.** Genet has no dependency on
+  scenograph and mere depends on genet, so a `Scene`-to-semantics converter
+  cannot live in genet without inverting the stack. Track B's preamble is
+  corrected: the realizations *target* genet's surfaces rather than living
+  there, which is the direction mer3ly already proves.
+  **Correction two: a scene carries no names.** `ProjectedItem` identifies
+  itself with a `SourceRef`, an address rather than a label, so an accessible
+  form cannot be derived from a scene alone. The names already exist one layer
+  out, on `chirograph::PresentationSemantics.label`, so `freeze` takes a
+  supplied lookup and falls back to the source id, and `unnamed` counts the
+  fallbacks so a receipt can state how legible the scene actually was. This is
+  the report's claim landing concretely: no surveyed grammar treats the
+  accessible form as first-class, and the contract shows it.
+  A1's violations are carried into the frozen form deliberately. A sighted
+  reader can see a pin sitting in the wrong place; without this the frozen
+  realization would be the one form that cannot say so.
+  Receipts: six tests, run against the real P5 `coastal_map.json` fixture
+  solved through `scenomise` (added test-only) rather than a hand-built
+  stand-in, covering enumeration, fallback naming, summary-matches-listing,
+  invisible-item omission, relation naming, unmet placements reaching the
+  tabular alternate, and determinism. graphshell-client 13 -> 19.
+  Still open in B1: rendering the structure into an actual DOM tree, the
+  AccessKit screen-reader traversal, and the genet-probe scenario asserting the
+  semantic tree. The shape they all need now exists and is stable.
+- 2026-08-16: **B1 carried to its buildable edge; A1 closed; A2 half-open.**
+  B1 gained a renderer: `FrozenScene::to_html` emits the graphics-document
+  anatomy with WAI's long-form alternate as a real table, and the tests parse it
+  back through genet-scripted-dom rather than string-matching, so a malformed
+  tag fails as a missing tree node. One of them is a hostile name, because a
+  projection whose accessible form can be broken by a source called `<script>`
+  is not accessible and is a hole besides. It also gained an AccessKit
+  projection into uxtree, behind an off-by-default feature so a client that only
+  reads scenes carries no tree builder, and probe-resolution proof that every
+  instance is reachable by carried id and by announced name.
+  What B1 still lacks needs a host, not effort: no OS screen reader has been
+  driven, and no probe scenario can run until something renders this realization
+  inside a frame pump. The precedent this target named is a manual checklist
+  written for meerkat, an app that no longer exists, so it could not be followed
+  literally.
+  A1 closed by merging its two remaining questions into one field.
+  `Scene.honored_holds` records the positive half bound to instances, which both
+  promotes the receipt mer3ly was recomputing and closes a real footgun: plain
+  `relax` used to drag an ensure-class placement away in silence and now cannot,
+  whatever entry point a caller reaches for. Anchored holds stay out, because
+  recording a suggestion as honored would invite a later pass to treat it as
+  binding.
+  A2's serialization half landed as `chirograph::Selection`, carrying the
+  producing view and its targets, with the resolution strategy deliberately
+  absent until two coordinated views exist. The `source` field is mandatory now
+  rather than later because crossfilter is defined as "every brush but this
+  view's own", which is unanswerable without it, and a field added later would
+  be missing from every link already in circulation. The shelfmark note's
+  reserved `selection` section is now defined against that record.
+- 2026-08-16: **C1 investigated and blocked, on the same wall B1 hit.** A1 has
+  landed, so there is finally something real to render: `Scene.unmet_holds`
+  crosses the wire, `Scene.honored_holds` names the satisfied pins, and the
+  frozen realization already lists violations in its tabular alternate and
+  announces them in its AccessKit tree. The target says surface the same
+  distinction in cambium host chrome. Cambium cannot: it has no `sceno`
+  dependency, so it cannot see a `Scene` at all, and nothing in mere consumes
+  cambium either. Verified from the tree in both directions, not assumed.
+  This is Track C meeting the correction Track B already took. A host renders
+  *into* cambium's surfaces; the code that knows what a hold is lives mere-side.
+  So C1's home is a mere-side host built on cambium, and no such host exists
+  today, which is the same missing piece that blocks the driven probe scenario.
+  One consumer could take it now without a new host: mer3ly already reports
+  "1 pin honored" on its export control, and could report the unmet count
+  beside it rather than only failing the whole artifact, since the snapshot now
+  carries the violations. That is C1's substance in a web page rather than
+  native chrome, and it costs another rev bump, wasm rebuild, and public deploy,
+  so it is Mark's call rather than a quiet extension of this target.
+  Not built: a speculative cambium surface with no consumer. That is exactly
+  the work the five gated targets are being held back from, and C1 does not get
+  an exemption for being adjacent to something that just landed.
+- 2026-08-16: **C1 landed, after a wrong "blocked" call that Mark caught.**
+  The earlier entry claimed C1 could not be built because nothing in mere
+  consumes cambium. That was false. `ports/graphshell/web` depends on cambium,
+  sceno, and graphshell together, and `ports/graphshell/src/web.rs` already
+  renders a mounted `SceneSnapshot` in `remote_scene`. The claim came from a
+  grep with relative paths run after the shell cwd had been reset, so it
+  searched a directory with no `ports/` in it and returned nothing; an empty
+  result was read as an answer. That is the wrong-cwd trap, hit one turn after
+  citing it about a Cargo patch table.
+  Chasing the real host then exposed a second, worse gap: `SceneTables` carried
+  `unmet_holds` but not `honored_holds`, because the honored half was added to
+  `Scene` after the unmet half had already been wired through `from_dense`. So
+  A1's done-condition was only half met on the wire. A remote viewer could see
+  that a pin failed but not that a pin succeeded, leaving every unremarked item
+  ambiguous between unpinned and pinned-and-honored. Both halves now cross, with
+  one test asserting them together rather than separately, since testing each
+  alone is what let the gap open.
+  C1 itself: `graphshell_client::frozen::Satisfaction` reads both halves off a
+  snapshot and answers the two questions a host has, whether a given instance is
+  holding an authored position and what the chrome line should say. It lives in
+  the client rather than the host because `web.rs` is
+  `#![cfg(target_arch = "wasm32")]` and no native test can reach it; a summary
+  nobody can test is one that quietly goes wrong. The host draws a held edge
+  outside a pinned card, so an item sitting where a person put it no longer
+  looks identical to one the arrangement happened to place there, and the chrome
+  carries the line. An unpinned scene says nothing at all, because zero of zero
+  is noise.
+  Receipts: three native tests on the summary, one wire test on the pair, and
+  `cargo check -p graphshell-web --target wasm32-unknown-unknown` for the host,
+  which is the only check that covers a cfg-gated file at all.
+- 2026-08-19: **protocol and catalogs reconciled.** The Scenograph family
+  moves to the unpublished 0.0.4 development line; Score v3 renames portable
+  regular-cell Board to Grid, while the local categorical layout is Columns.
+  Chirograph 0.0.2 renames the retained wire artifact to
+  `ProjectionCaptureV1`. Snapshot validation now rejects an honored-pin claim
+  whose instance is absent, names another source, is not ensure-class, or is
+  not at the claimed position. The projection grammar governs primitives;
+  the content catalog depends on it and collects complete scene recipes.
+  Rosette is recorded as landed through Knot over poem and lyric datasets.
+- 2026-08-19: **B1 probe scenario ran for real; the no-host premise died the
+  way C1 death did.** Mark asked whether graphshell was built on cambium;
+  re-checking from the tree found what the wrong-cwd grep had hidden, and the
+  right host was turnstone: it implements genet-probe Automatable with real
+  ProbeSurfaces, carries a .scn scenario lane whose assert-a11y reads a
+  stitched AccessKit tree, and already depends on graphshell-client, sceno,
+  and cambium.
+  Landed in turnstone (49e179e): disclose_scene extracted from the endpoint
+  snapshot so the frozen form freezes exactly what a remote peer is served,
+  one recipe rather than two that drift; a Frozen Projection pane in cambium
+  chrome with instances by name and carried data-source-id, relations named
+  at both ends, the WAI summary, unmet placements, and C1 satisfaction line;
+  and an a11y arm built by FrozenScene::to_ux_tree itself, so assert-a11y
+  reads the realization actual tree rather than a summary of one.
+  Receipt: scenarios/frozen_projection.scn, RESULT ok, self-driven, offline
+  mere:// nodes, captures in Code/testing/turnstone/frozen_projection. The
+  capture shows the pane beside the live canvas: 14 items, 17 relationships,
+  harbor-notes and beacon-notes by name.
+  All three automated verification legs are now done: renderer proven by
+  parsing, AccessKit tree driven through a real host, probe scenario driven.
+  At this checkpoint the manual OS screen-reader pass was still open. Turnstone
+  `648bf19` later supplied the definitive routed receipt and supersedes this
+  historical remainder.
+- 2026-08-19: **A3 stage one landed; P3b selection is declarative.**
+  `mere.graph-representation-registry/v2` puts ordered representation rungs
+  on each class profile. A rung names its selected `sceno::Representation`
+  and a conjunction of measure, operation, threshold, and hysteresis
+  conditions. The initial policy is concrete: focus selects `LivePane`; a
+  measured, recent item at zoom 1 or closer selects `Card`; `Glyph` is the
+  fallback. Cartography resolves graph classes in registry order, normalizes
+  durable visit recency, and consults the prior score only for hysteresis.
+  Graphshell's live web host now supplies its camera zoom, measured node
+  extents, focus, and prior score, and refreshes the score after local view
+  commands. `sceno` is unchanged: it still records only the chosen rung.
+  Deterministic receipts prove identical placement at two zooms with different
+  rungs, focus overriding distance, and a card holding through the declared
+  0.1 hysteresis band. This closes A3's host-side grammar, not P3b's visible
+  rendering: the canvas still stores the selected score without painting
+  distinct glyph/card/live-pane realizations from it. Portable conditions stay
+  gated on a remote client that needs to re-select.
+- 2026-08-19: **P3b's local renderer half landed.** Canvas rebinds the score's
+  opaque `mere.graph` sources to node keys and its real frame assigns distinct
+  `Glyph`, `Card`, and `LivePane` face classes. The glyph hides the caption,
+  the card retains the established labelled node, and the live-capable rung
+  receives a frame plus caption emphasis. The measured footprint still owns
+  all geometry, and the live-capable treatment does not claim embedded browser
+  content. Tests drive score → Canvas frame → DOM class and computed style,
+  and prove a whole-graph swap clears the rebound score state. This closes the
+  local forcing consumer for A3 stage one; A3 stage two remains gated on a
+  remote client that must perform its own re-selection.
+- 2026-08-19: **A4 + C2 landed through Graphshell's Canvas arrangement
+  switch.** `scenotime::TransitionSpec` declares duration, easing, class
+  windows, and stable stagger ratios over a validated `SceneDiff`.
+  `TransitionSchedule::sample_at` is a pure function of that data and elapsed
+  host time. The default stages exits, updates, and entrances without adding
+  motion to `Arrangement` or changing direct diff application.
+  Graphshell builds the arrangement change as a real scene diff, advances it
+  from browser frame timestamps, and feeds sampled positions through Canvas's
+  preview buffer. Completion returns to the ordinary strategy apply, which is
+  still the authority that seeds physics. The host clock explicitly excludes
+  paused intervals; identical timestamp sequences replay identically.
+  Receipts: 27 scenotime tests, 179 Canvas tests, the focused Graphshell host
+  clock test, and a wasm32 build. A headed browser drive reported
+  `Arrangement changing to grid.default` before
+  `Arrangement set to grid.default`; the start and final canvas captures were
+  distinct. Consumers that do not construct a schedule continue to snap.
+- 2026-08-19: **A3 stage one arrived under P3b's flag, landed by a sibling
+  session and verified here against the tree.** The P3b check Mark ordered
+  found the gate had fallen the same day: cartography's v2 representation
+  profiles now declare `RepresentationCondition { measure, operation,
+  threshold, hysteresis }`, which is Gosling's anatomy verbatim, serde-derived
+  so the conditions are data, with the measure split A3 asked for
+  (ScreenWidth/ScreenHeight are realization-space; ZoomLevel, Recency, Focused
+  are view facts). Hysteresis relaxes the threshold only for the rung already
+  selected, so a card holds to zoom 0.9 while a glyph still needs 1.0, and
+  `profile_ladder_selects_from_data_and_retains_through_hysteresis` is the
+  no-flicker receipt A3's validation named. The renderer half consumes the
+  selected rung in the real canvas frame. What was the hint: the frozen-pane
+  captures showing plain nodes flip object to symbol between runs, which was
+  rung selection moving with recency and focus.
+  Stage two, portable rung conditions traveling beside the score, remains
+  gated exactly as written: the P3b entry itself says remote re-selection
+  waits on a real remote consumer, and nothing about stage one changes that.
+- 2026-08-20: **C3 and L2 landed through Isometry and Woodshed.** The two
+  consumers forced a separate backdrop table rather than an item kind or a
+  generalized Region. Each backdrop carries a source reference, coordinate
+  space, transform, footprint, open appearance kind, visibility, and collision
+  participation. Table order is back-to-front and the whole table paints before
+  graph content. Pointer transparency is structural: selecting part of a map
+  remains an ordinary item over the environment, so intent routing keeps one
+  `InstanceId` path.
+  Isometry's authored board now supplies `isometry:tile-board` behind its
+  selectable tile items. Woodshed's Stage supplies `woodshed:stage-floor`
+  around its arranged cards. Both cross `SceneSnapshot`; stable backdrop slots
+  also cross `SceneDiff`. Graphshell's remote canvas derives transformed
+  backdrop bounds and deterministic fallback paint from the snapshot before it
+  draws items. Scenomise treats collidable backdrop footprints as static
+  placement obstacles while visibility remains independent.
+  Receipts: 22 sceno tests, 31 scenomise tests, 30 scenotime tests, 116
+  Graphshell tests, Isometry's views and Graphshell endpoint tests, Woodshed's
+  `stage_backdrop` wire test, and the Graphshell wasm32 build.
+- 2026-08-20: **B2 landed through Turnstone Knot authoring.** Save, Resolve,
+  and Run expose the projection instance and intent in the retained DOM. The
+  session records the endpoint's typed intent result as visible scene text.
+  The shared genet-probe scenario selects Resolve by `InstanceId(1)`, asserts
+  the accepted result, and verifies the resulting transclusion before running
+  the document. Receipts: the focused `InstanceId(17)` resolver unit test and
+  the headed `knot_authoring.scn` run, `RESULT ok`.
+- 2026-08-20: **B1 closed. Mark ran the manual screen-reader pass, and it
+  earned its place twice before it passed.** Preflight found the OS bridge
+  had never existed: accesskit was in-process only, so assert-a11y read a
+  complete tree while Narrator saw a bare window; turnstone gained
+  shell/a11y_bridge.rs (accesskit_winit installed before first show, shared
+  slot for cross-thread activation, thirty-frame cadence, ActionRequests
+  dropped honestly rather than routed nowhere). Attempt one then dead-ended
+  at the omnibar: a live UIA dump showed every projected node boundless
+  (rect -Infinity), which Narrator treats as off-screen and stops at, while
+  the in-process integrity test written on the spot passed - a structurally
+  sound tree that no reader could walk, the exact gap between iterating a
+  node list and being a UIA client with geometry. Window-extent bounds fixed
+  it. Attempt two: the full walk - window, chrome, canvas group, the
+  Disclosed projection document with its summary spoken, twelve items by
+  name, all twenty-seven relationships to the last entry, in the operator's
+  words "made it to 27 of 27". Receipt at turnstone
+  design_docs/2026-08-20_screen_reader_pass_receipt.md (05a2ec8), replacing
+  the meerkat-era checklist as the worked example. Recorded follow-ups, none
+  speculative: route ActionRequests when a consumer asks for operable rather
+  than readable, per-node rects from the surface plan, and a label for the
+  frisket root group that announces as blank.
+- 2026-08-20: **The routed half landed: a screen reader's Enter reaches the
+  app.** Mark asked for it, which is the forcing consumer B1's follow-up was
+  written to wait for. Turnstone e117f27: a route table built beside every
+  pushed tree (ids are one-way path hashes, so routing cannot be parsed back
+  out of the tree), a frozen-projection instance selecting its member in the
+  graph, the omnibar opening, both through the same update spine a keypress
+  uses; unrouted requests land as interaction-missed a11y-action, the pointer
+  miss's exact vocabulary. Eight tests. Linking them exposed two real defects:
+  the livery cutover had shipped a second AccessKit platform stack beside the
+  bridge's (two UIA providers in one process, deduped), and the grown graph
+  crossed the preview MSVC linker's PDB limit. Both fixed and recorded in the
+  turnstone receipt (`648bf19`). **Reconciled 2026-08-23:** that clean Turnstone
+  state is the definitive routed screen-reader receipt; B1 has no remaining
+  manual leg.
+- 2026-08-23: **A2 resolution closed through the first projection-receipts
+  wave.** `chirograph::CoordinatedSelection` carries named focus/filter/brush
+  clauses and explicit `single` or `crossfilter` resolution. The mer3ly
+  spatial and Matrix views prove both clauses in a headed browser: each view
+  applies the foreign clause and excludes its own; deterministic Shelfmark
+  serialization restores both clauses; removing the Matrix clause restores all
+  18 spatial actors. Gazette's Ledger independently replays the same record.
+- 2026-08-25: **FT7 closed.** The FT1 Matrix preserves its exact
+  `InstanceId -> SourceRef` mapping, including repeated source instances,
+  through `LocalCarrier`, an admitted Graphshell `MemoryTransport` session
+  using Notochord/personae policy to a source-free viewer, and the
+  `FrozenScene` semantic-table realization. The Mere platform implementation
+  is `302bbe72d7597b7573e14199ce926bd3b03eea7f`; the Mer3ly consumer is
+  `4c42847272489c41a20dc515884e83f3b413059a`.
+- 2026-08-25: **FT8 closed.** Retinue Signalman's Network face derives its
+  Sprigging marks and Cambium retained semantic targets from one
+  `GraphCanvasSwatch`. Its focused receipt proves those marks and ordinary DOM
+  controls share one focus order, pointer-capture route, AccessKit tree,
+  genet-probe address space, and `DesktopState` action model. The full locked,
+  offline Signalman suite passes 50 tests at Retinue `8cea8f9`. The receipt
+  reused Cambium's existing `graph_canvas`; it did not force a generic
+  scene-hosting abstraction or keyboard-navigable Cambium Matrix. A3 stage two
+  and A5 remain gated by their own consumer rules.
+- 2026-08-29: **governing documents reconciled against landed code and the
+  promotion rule** at Mere `caf19a014766ae08e3231d9963d5edfaec945dd7`. The
+  catalog now describes Score v4's actual arrangement surface, distinguishes
+  C3's closed minimum backdrop contract from richer raster and scalar field
+  work, and states that the promotion suite is an evidence harness rather than
+  a forcing consumer. A5 now waits for a named first proof consumer and still
+  requires a second heterogeneous consumer for every portable addition. The
+  shelfmark/index ruling is labeled resolved; the embedded-app question
+  remains open.
+- 2026-08-31: **Graphshell Projection Editor component and first authoring
+  loop landed through Mere `77369f6f0c03b301c398ad65107114080c4ba630`.** The
+  host-neutral `ports/graphshell/src/projection_editor.rs` now models source
+  and domain binding, reading, encoding, arrangement, interaction,
+  appearance/realization, and provenance as an editable definition with
+  field-level validation, panel taxonomy, reducer actions, deterministic JSON,
+  and a sink-only save boundary. Its seven tools are `workbench::Tile`s in an
+  open Graphshell content lane, so selection and typed tearout use the shared
+  reducer without granting graph or endpoint authority. A focused standalone
+  cross-repo harness passed eight tests, including Platen projection, editor
+  activation, tearout custody, validation, provenance, serialization, and sink
+  refusal. The standalone web manifest now restates its inherited immutable
+  Genet patches, and the host `x86_64-pc-windows-msvc` cargo check passes
+  offline with the immutable G1 Genet revision. G1's native-only `fontsan`
+  policy closes the prior C++/WASI sysroot blocker for the wasm dependency
+  cone. The standalone wasm build now passes with an isolated target and the
+  matching `wasm-bindgen 0.2.126` package is generated under the ignored web
+  package directory. The headed Graphshell browser receipt is now green:
+  localhost reported title `GRAPHSHELL H3 READY` and `ready=true`; the editor
+  opened the source panel, authored `local-workbench-receipt`,
+  `woodshed.practice`, `fixture.projection/workbench`, `practice_title`,
+  `tempo`/`difficulty`, `grid.default`/vertical/24, `canvas.points`, title
+  `Workbench projection receipt`, and provenance
+  `Projection Editor receipt` / `workbench-w4` / `Saved and reloaded in the Graphshell browser receipt`. The deterministic preview was `Workbench projection receipt · read nodes by practice_title · grid.default · x=tempo y=difficulty · canvas.points`. Save reported `saveCount=1`,
+  `validation=valid`, `errors=0`, and `Saved · workbench-w4 · 1 save(s)`;
+  after mutation, reload restored every authored field and reported
+  `Reloaded · graphshell-reference · workbench-w4`. The bound stripped artifact
+  is 34,679,440 bytes with SHA256
+  `A6A43EA0D1FB510E9EEF897B6C9232BB66F5D1F5927DF54DADE3463F55D3DB85`.
+  This closes the browser authoring receipt, while broader headed verification
+  and A5 remain open. Woodshed is Workbench's second
+  heterogeneous consumer, but it is not itself A5's named portable projection
+  proof; A5 still needs a named proof consumer and its per-proof evidence. The
+  component follows the component seam in
+   `genet/design_docs/2026-08-31_workbench_component_plan.md` *(historical citation)* <!-- doc-audit: historical-path -->.
+- 2026-09-01: **C4a landed; A3 stage two tested against it and the gate
+  sharpened.** Mere `d10e04da` serves a live Graphshell projection to a
+  browser-shaped WebRTC peer (admitted by Notochord, sans-I/O `SessionCore`
+  with blocking and event-driven adapters, `LiveEndpoint` moving only for
+  admitted intent), tracked in the browser WebRTC carrier plan; C4b, the
+  embedded and full-page surfaces, was split out 2026-08-31. Checked whether
+  C4b is A3 stage two's remote re-selection consumer: it is not. The served
+  rung is endpoint-fixed, the browser's remote view has no camera, and the
+  client's only resolution is capability-based offer choice within the rung.
+  The gate now reads "a remote viewer with a local camera over a served
+  scene". Opened the stage-two fact transport ruling, since `Recency` and
+  `Focused` are host facts the wire does not carry. No code changed.
+- 2026-09-01: **the open rulings and two deferred questions scoped and
+  ruled by Mark.** Stage-two fact transport: evaluation without host facts
+  is the baseline, carrying them the stretch; disclosure is a host's choice.
+  Apps embedded: two sites, two answers; merelyllc.com hosts Graphshell
+  embeds with other applications as served projections, mer3ly.net embeds
+  the full applications, and the latter is a new objective needing its own
+  assessment. Served endpoint: select from the ladder at declared zoom 1.0
+  rather than hardcode Card; code to follow. Two 2026-08-16 leftovers: A1's
+  `honored_holds` half is closed, since `Scene.honored_holds` was promoted
+  the same day, while displacement by a consumer's own physics or viewport
+  fit stays gated on a consumer asking; C1's mer3ly unmet-count beside
+  "1 pin honored" is approved and folds into the next mer3ly wasm rebuild
+  rather than earning a deploy. Both carry Mark's framing, recorded in the
+  rulings section: mer3ly's graph view is a stress-test toy for an embedded
+  canvas, not a product pull.
+  Raised the same day and answered by Mark's refinement of the embedded-app
+  ruling: mer3ly's asks are a prover's until Graphshell supersedes the site
+  canvas and becomes the site index, at which point the graph view is the
+  site's navigation and its asks are product demand. The 2026-08-16
+  consumer ruling stands unchanged; this records what would change its
+  character and when.
+- 2026-09-01: **served endpoint selects from the ladder: code written,
+  receipt written, receipt not yet run.** `MereHost` now builds the offer's
+  score and the snapshot from one `served_layout` (phyllotaxis at 1280 x 720,
+  every node measured at the served 240 x 112 footprint, ladder evaluated at
+  `SERVED_ZOOM = 1.0`), and each served item carries the rung the registry
+  selected, Glyph when the score does not name it. The receipt
+  `served_snapshot_selects_rungs_from_the_ladder_at_declared_zoom` asserts
+  the fixture's visit spread as its control, then web (10 ms) as Glyph,
+  receipt (110 ms) as Card, and offer/snapshot agreement on every item.
+  Verification so far: the change compiles for its real target
+  (`cargo check -p graphshell --target wasm32-unknown-unknown
+  --no-default-features --features web`, clean). It could not be *run*:
+  `mere_host` is `web`-gated, the default `native` suite never compiles it
+  (149 tests pass and prove nothing about this file), and the native
+  `--no-default-features --features web` test build fails at link with
+  unresolved `canvas` symbols even after `cargo clean -p mere-canvas
+  -p mere-cartography -p graphshell`. That failure predates this work: it is
+  the invocation the 2026-07-27 H1 receipt ran, and every MereHost-testing
+  module (`app`, `capture`, `product`, `mere_host`) is `web`-gated, so the
+  whole MereHost test surface has been unrunnable natively on this machine
+  for some time without anything noticing. Swept in on the way: the
+  `sessions.rs` test module used `native`-only imports under a bare
+  `cfg(test)`, which was the first compile error the web build hit; it is
+  now gated like its imports. Visible effect of the change, for the record:
+  none on the rich viewer, which picks offers by capability and never
+  branches on the rung; the frozen realization now calls stale served items
+  Symbol and recent ones Object, and the offer's score stops contradicting
+  the snapshot.
+- 2026-09-01: **the link break chased to its cause; the receipt ran.** After
+  a real clean the 103 unresolved externals fell to one symbol,
+  `drop_glue<canvas::geometry::CartographyGeometry>`, advertised in
+  mere-canvas's metadata and absent from its incremental object cache: the
+  shape of rust-lang/rust#86049 (open; windows-msvc; incremental;
+  LNK2019/2001 on allocator and drop glue; no cause identified upstream;
+  "disable incremental" the standing workaround). Turning incremental off
+  for `mere-canvas` alone links: the receipt passes and the full web-feature
+  suite passes, 39 of 39, with graphshell still incremental. The fix is
+  scoped to the invocation rather than the workspace because a canvas
+  edit-loop rebuild measures ~9 s incremental against ~2.5 min without, a
+  penalty the Mac and Linux boxes have no reason to pay: `cargo test-web`,
+  an alias in `.cargo/config.toml.example`, carries
+  `--config profile.dev.package.mere-canvas.incremental=false`, and the H1
+  receipt doc points at it. Retire condition: run the bare invocation on
+  each toolchain bump; if it links, drop the override. The served-endpoint
+  ruling is closed by this receipt; A3 stage one now holds for the product
+  endpoint.
+- 2026-10-03: **arrangement roles carried in.** The dynamics grammar plan's
+  F18–F30 are recorded in the projection grammar catalog:
+  - the Free, Anchored and Pinned policies are now the seeded, anchored and
+    pinned roles, chosen per item over a recipe default, with seeded as the
+    default and an encoded axis pinned;
+  - the §6 "Force and constraint" row moved out, and "Settled" joined as an
+    arrangement source;
+  - §7 reads drag, displacement, pick and stop by role;
+  - a scene recipe names an arrangement and, optionally, a dynamics recipe,
+    under one binding.
+
+  This plan gains A1's note on the old `Hold::Anchored`, which named the
+  seeded role, and the mer3ly finding. Doc-only; no code moved.
+
+- 2026-10-07: **handed off.** Asked what a projection grammar handoff should
+  cover (the whole lane; mer3ly's site canvas plan only; the mere grammar docs
+  only), Mark answered "mere grammar docs only". The
+  [projection grammar handoff](../research/2026-10-07_projection_grammar_handoff.md)
+  covers this plan and the catalog: who owns which sections, the open and gated
+  targets, the rulings carried in, and the cross-session agreements.
+
+## 2026-09-05 practice workspace browser proof
+
+The current-tree Graphshell practice proof gives one disclosed Woodshed
+comparison a small browser workspace: Relations, a pitch-membership Compare
+view, and History share typed occurrence/comparison selection. Save and reopen
+retain the bounded workspace location and runtime settings only when the
+current source identity, revision, occurrence IDs, and complete disclosed
+comparison evidence still validate. This is a Graphshell component proof, not
+native Woodshed: the same WASM component runs in `web/practice.html` and in
+the `web/practice-embed.html` wrapper.
+
+Relations use real Seiche dragging around projection slots; Grid and Scatter
+remain recipes, physics runs at a fixed 60 Hz with at most three substeps, and
+redraw is demand-driven. Cambium/Genet and Netrender retain faces across
+frames. Projection fields are not wired into this proof yet.
+
+The current-tree
+`ports/graphshell/docs/receipts/practice_workspace_receipt.json` records the
+current-tree checks: 14 reducer/disclosure tests, 15 overlapping
+compiler/editor tests, four physics tests, and a passing wasm build. The
+browser scenarios passed 45 standalone, 11 fresh-reopen, 14 embedded, and
+58 existing-authoring regression steps. At 360px, Compare remains readable
+and Relations stacks its cards; keyboard Enter saves successfully. Idle
+counters remain unchanged. A real drag added 367 physics steps with zero
+projection compiles or text layouts. These CPU counters exclude GPU present.
+
+Grid compilation previously rebuilt and sorted channel ranks for every card.
+Precomputing ranks once changes that path from quadratic sorting work to
+O(n log n). Sequential single-sample release runs at 10,000 occurrences measured
+14,328,279us before and 19,618us after, including Scenomise solving. The receipt
+preserves raw output and binary hashes; the baseline source snapshot was not
+archived. The reproducible example is `ports/graphshell/examples/projection_compile_perf.rs`.
+This is not a large-graph interactive frame budget or a release benchmark.
+
+To reproduce, build the current Graphshell web package, serve
+`ports/graphshell/web` over loopback HTTP, then open
+`practice.html?scenario=scenarios/practice_workspace.scn`. Reopen on the same
+origin with `practice.html?scenario=scenarios/practice_reopen.scn`. For the
+component-in-wrapper check, open
+`practice-embed.html?scenario=scenarios/practice_embedded.scn` on that origin.
+
+### Template scene vertical framing (2026-10-16)
+
+**Status:** shared fitting and native Woodshed adoption qualified.
+
+Long template timelines currently shrink both axes through BoardFit, leaving
+labels and role alignments in a narrow band even when the host lends height.
+Pictograph's shared BackdropSurface will fit template Y coordinates to the
+available height independently, using the same transform for paint and inverse
+picking. Other scene kinds retain uniform instrument/map geometry. Source
+facts, musical spans, selection identities and document serialization stay
+authoritative. Done when the shared regression verifies row clearance and span
+edge picking, and Woodshed presents the revised scene in its native panel.
+
+Findings (2026-10-16): the 580 × 300 timeline now separates supplied and
+expected rows by about 49 pixels. The same two-axis transform drives inverse
+picking, including the lower edge of a stretched Card span. Fretboard fitting
+remains uniform. Five surface tests pass against the current source; see
+`validation/template-scene-height_20261016/tests.log`.
+
+Native adoption (2026-10-16): Woodshed `f683bbe` adopts shared source
+`52fb4900e`. Its 300px primary canvas passes 214 view cases, two native editor
+cases and the locked build. Three reviewed native captures show the separated
+rows and compact scrolling; the actual sealed Set and complete portable
+document equal the earlier fixture. Consumer evidence lives in
+`woodshed/validation/native-arrangement-spacing_20261016/receipt.json`.
+
+
+### Native arrangement interaction geometry (2026-10-16)
+
+**Status:** shared geometry and native Woodshed interaction adoption qualified.
+
+BackdropSurface now exposes forward/inverse viewport transforms and rectangular
+occurrence bounds through its existing fit. A host can opt into selected-span
+edge affordances. These queries carry no mutation authority or domain edit
+semantics. Woodshed owns beat snapping, draft preview, validation and Save.
+The shared regression exercises both progression and metre template specimens
+across three viewports, verifies round trips and visible-edge picking, and rejects
+invalid queries. Six surface tests pass (`validation/template-scene-interaction_20261016/tests.log`).
+A shared editing-intent API still requires a second concrete editing consumer;
+metre geometry evidence alone does not qualify source editing in Knot/Graphshell.
+
+
+Woodshed adoption (2026-10-16): source `b3afe76` pins shared `d1e1d7aae`.
+Fourteen focused consumer tests and the locked desktop build pass. Native body
+and edge gestures, keyboard movement, Escape and compact rest editing pass in
+229 frames; a 94-frame fresh process reopens the exact sealed Set and complete
+portable document. Five captures were reviewed. The consumer keeps beat
+snapping and draft/Save semantics; the surface still supplies geometry only.
+Evidence: `woodshed/validation/native-arrangement-spans_20261016/receipt.json`.
+
+
+### Metre editing and shared span intents (2026-10-17)
+
+Prove native authored metre alignment in Knot before extracting editing overlap
+with Woodshed. Each source syllable has an optional explicit positive span (or
+unplaced value); omitted records retain legacy ordinal placement. Stress heights,
+pronunciation evidence, exact source identities and rhyme arcs stay independent
+of authored alignment. Metre positions are not playback durations.
+
+Done conditions: native pointer and keyboard edit/cancel/reopen over the shared
+surface; source/pronunciation preservation and stale proposal refusal; portable
+Graphshell rendering and local-copy editing; one bounded revision-qualified
+intent contract used by both real owners, with domain validation and persistence
+remaining in those owners. Read-only imports never gain source mutation authority.
+
+Implementation: `scenomise::span_edit` now supplies checked move/start/end math,
+placed-span targets and source/revision/occurrence/lane/before-qualified intents.
+Metre and Woodshed adapters accept the same contract; they retain their own
+history, source checks and durable writes. Zero movement preserves off-grid
+source spans. Graphshell offers explicit local-copy editing, preview/cancel and
+portable export; source imports retain read-only authority. The standalone
+product WebAssembly check and dependency boundaries pass. At that initial compile milestone, native and browser acceptance receipts were
+still pending; the final qualification below closes those bounded gates.
+The web lockfile reconciles two missing `zeroize` edges from the fetched
+owner-admission supplier update; no web Git source pins change.
+
+Bounded continuation complete: Knot `fdd6940` and Woodshed `28a0741` adopt the
+canonical shared `4c4ea11d8` source. Shared validation passes three span-intent,
+four sequence-template and six surface cases plus the dependency boundaries.
+Woodshed passes nine locked arrangement-editor route/model cases. Knot passes
+72 focused cases and two final macOS native processes (237 presented frames, six
+reviewed captures), including preview/Escape, body and edges, keyboard, history,
+explicit sealed collection and exact fresh-process SceneInput reopening.
+The lexical source, candidate stress and rhyme facts remain unchanged.
+
+Graphshell's actual WebGPU product host passes the committed copy-edit scenario
+for metre and progression inputs, with three functional captures and no page
+gate failures. The scrolled captures do not claim every viewport is visually
+qualified. Source imports remain read-only; explicit local copies receive a new
+Graphshell identity and exported copied facts. No generic command bus, history,
+playback clock or source-write capability was moved into the shared intent type.
+Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261017/receipt.json),
+`knot-editor/docs/receipts/2026-10-17_metre_editing/`, and
+`woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
+portable-grammar gates in this plan remain open.
+
+Findings (2026-10-18, authoring-gate reds after `4c4ea11d`): two
+`tests/backdrop_scenes.rs` cases went red on main with no test edit.
+(1) Metre syllable marks became selectable in `4c4ea11d` (`false` to `true`, in
+the same hunk that sized the mark by its authored span). This is intended: the
+done conditions require native pointer edit over the shared surface,
+`BackdropSurface::occurrence_rect` returns geometry only for `selectable`
+marks, and `SceneInput::span_target` addresses exactly these `line/syllable/n`
+keys. Selectable marks hit by their own footprint, so `hit` is `None` rather
+than the inert `Point`. The metre test now asserts selectable and
+`hit == None`; stress height and role stay candidate facts. The plan states
+this as a done condition, not as a numbered ruling.
+(2) A line key that collides with a syllable key (`line-1/syllable/0`) is now
+refused at `metre.occurrences` (input validation) instead of `marks`
+(compile-time check). `SceneInputError.path` is a free string with no
+documented contract and no consumer in the tree matches on it, so neither path
+is promised. This was open and went to Mark, who ruled (2026-10-18, audit plan R5): "Keep
+metre.occurrences, fix the test (Recommended)". The test now expects
+`metre.occurrences`; the later `marks` check stays as a backstop.
+*Reading, not ruled:* `SceneInputError.path` remains a free string, not a stable code.
+
+
+### Sets canonical tag admission (2026-10-17)
+
+**Status:** focused native CPU qualification complete; consumer adoption pending.
+The full library run has one unchanged timing-control failure, detailed below.
+
+Feature target: Sets reads the Resource tags written by public Canvas tagging,
+including two Surface members showing the same Resource, while retaining the
+existing accessor's legacy unbound-Surface fallback.
+
+Done conditions: public `Canvas::tag_node` writes produce bounded song/practice
+regions when legacy member tag fields are empty; shared Resource views receive
+the same memberships; existing bounded-scene controls pass. Turnstone must
+then adopt the published supplier and rerun its unchanged scene assertion.
+
+Findings (2026-10-17): Turnstone's current scene fixture writes canonical tags
+through Canvas and confirms they survive reconciliation. On Mere `55c479bc7`,
+`canvas::scene_axes::tag_sets` still reads `node.tags`, so Sets receives an empty
+axis and produces no bounded regions. The supplier's older fixture directly
+mutates that legacy field and hides the mismatch. This is independent of
+Turnstone's source-capture save acknowledgement work and frame scheduling.
+
+Progress (2026-10-17): the shared axis now uses `Graph::node_content_tags`, whose
+existing contract reads shown Resource tags and falls back only for unbound
+legacy members. A public-write regression covers two views of one Resource and
+an independent Resource, with empty legacy tag fields. The initial bounded run
+passed five cases and failed the older Sets fixture: it directly mutated legacy
+member tags before provenance bound those members to Resources. Its tag setup
+now uses public `Canvas::tag_node`; the exact expected song/practice/publishing
+regions and member assertions remain unchanged. The standalone unbound Graph
+tag-axis unit control still proves the accessor's existing legacy fallback.
+
+Qualification (2026-10-17), locked canonical dependencies at base `55c479bc7`,
+Rust 1.99.1 on macOS, `pictograph` with `canvas` and default features:
+
+- `cargo test --locked -p pictograph --features canvas --lib
+  canvas::tests::bounded_scenes`: six passed, zero failures/ignores.
+- The same command with `canvas::scene_axes`: two passed, zero failures/ignores.
+- The full `--lib` run: 516 passed, one failed, 18 existing ignores in 374.93 s.
+  The unchanged `speed::fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed`
+  failed its wall-clock forecast bound at `tests/speed.rs:223`: frame 0 took
+  133.087014 ms against a 5.452144 ms budget plus a 94.022302 ms prior worst tick.
+- Running that exact control alone in the same test binary with
+  `--exact ... --nocapture --test-threads=1`, without another Cargo invocation,
+  reproduced the failure: zero passed, one failed in 53.90 s; frame 0 took
+  101.536396 ms against 5.018372 ms plus 11.826586 ms. Substantial unrelated
+  compiler load remained on the host. This is a measured remaining timing gate,
+  not a full-library pass. The control uses a free force canvas and does not
+  call the tag axis or select an arrangement; no physics source or assertion
+  was changed. No further retry was taken.
+
+Live tag-edit cache invalidation and headed/GPU acceptance retain separate
+scope; this correction does not change the layout cache. Turnstone's receiving
+scene check must run against the subsequently published supplier revision.
+
+Publication update (2026-10-17): shared label source `d1a200b18` is reachable on main through merge `c8d316b60`; Woodshed adoption and audit closure are published through `8204688`. Merged Mere CPU checks pass 279 Cambium and 120 Rootstock cases, with three existing ignores. Woodshed retains its exact qualified supplier; this integration adds no native claim. See the [publication record](../../../support/receipts/graph-labels-20261017/publication.json).
+
+### Portable scene-document supplier (2026-10-19)
+
+The canonical `scenomise` crate now carries the opt-in `djot` feature for an
+inert transport of the existing `SceneDocument` JSON facts in one attributed
+Djot block. JSON remains the canonical payload; the codec admits one declared
+block and does not interpret other document content or write to its source.
+Free metre admits zero expected feet, retains full line text when scansion is
+absent, and exposes explicitly unknown stress without converting it to weak
+stress. Rootstock now applies pending DOM mutations and relayout after keyboard
+dispatch before focus restyling.
+
+Focused canonical checks: `scenomise` scene-document tests with `djot` (4
+passed), backdrop-scene tests (8 passed), and the Rootstock inserted/focused
+control regression (1 passed). These are supplier-level checks; they do not
+claim Woodshed receiving qualification or native playback. Current command
+output is recorded in the local
+`/Users/markik/Code/output/woodshed-arrangement-playback-20261019` evidence
+directory.
+
+### Woodshed notation readings on canonical main (2026-10-19)
+
+Graphshell's editable progression blocks now consume the pure `woodshedding`
+notation model/conversion and the Woodshed-owned `woodshed-notation` leaf.
+Chart, Tab and Score read saved Set MusicXML; absent music requires an explicit
+Write notation action, which is one ordinary document edit. Hosts retain their
+own commands, attention, labels and persistence. The accepted boundary and
+trade-offs live once in
+`woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, section
+“ADR: shared notation readings in Graphshell (2026-10-19)”.
+
+Evidence and coverage limits:
+`ports/graphshell/docs/receipts/notation_readings_20261019/`. The local source
+integration uses canonical sibling checkouts; publication and a portable family
+source pin remain separate.
+
+#### Current-host reconciliation (2026-10-20)
+
+The maintainer confirmed selectable Chart/Tab/Score readings with linked event
+selection, keeping MusicXML as source, and an explicit **Write notation** action
+when a progression has no music. This does not add Graphshell note editing or
+practice playback. Reading and selection changes do not author; notation creation
+uses the ordinary document history and save/reopen path.
+
+The published Woodshed provider is now `a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61`
+on `codex/woodshed-timing-integration` (superseding `111da595`).
+Current Mere uses AccessKit 0.25, while that provider's native fallback adapter
+names 0.24. The provider refinement makes the renderer's fallback
+`accessibility` feature optional and default-on. Graphshell disables it and owns
+the notation label and focusable musical-event buttons; Woodshed retains its
+existing default labels and playback description. Paint, glyphs, layout, label
+positions and event rectangles are shared unchanged across the two hosts.
+
+Initial development qualification used an explicit local provider override;
+the consumer now pins the published provider without that override. No sibling
+path is committed in the consumer manifests. Current-host evidence is kept separately
+from the historical packet at
+`ports/graphshell/docs/receipts/notation_readings_20261020/`; raw development
+attempts remain under `Code/output/graphshell-notation-20261020`.
+
+The current read path consumes saved MusicXML independently of legacy
+Card/arrangement validation. Those commands keep their own admission checks;
+invalid legacy metadata does not prevent displaying otherwise valid music.
+
+The maintainer confirmed whole-number 1–400 BPM for notation creation as well
+as the existing MusicXML score profile. The local converter and Graphshell
+command accept that full range; practice tempo remains separately controlled.
+The follow-up evidence is in
+`ports/graphshell/docs/receipts/notation_tempo_20261020/`; the earlier packet
+preserves the initial qualification and its then-pending range decision.
+
+Publication qualification uses the immutable `a0ae58f` supplier without the
+development override, with both consumer lockfiles refreshed. Its published
+provider resolution, locked checks and browser evidence are recorded at
+`ports/graphshell/docs/receipts/notation_publication_20261020/`. The read-only
+viewer continues to exclude the musical packages.
+
+### Current owner actions on bound views (2026-10-20)
+
+**Status (2026-10-20):** runtime adapter and native selected-record controls
+implemented and reconciled with the canonical Hest worker; 128 focused tests
+and portable-client checks passed for Git integration. The live Mere handler
+continuation below now qualifies one configured action through the native UI;
+other owners and platforms retain their own acceptance gates.
+
+The maintainer chose the owner's current actions for selected content first,
+leaving recipes unchanged. If an owner cannot identify the exact target for
+an occurrence, its actions are unavailable. The roster remains the existing
+way to select graph objects; this connection adds no target chooser.
+The first visible owner integration is the Mere graph already available to
+Graphshell, as chosen by the maintainer; Woodshed remains a later consumer.
+
+**Findings.** `scenograph::SourceBinding` records descriptive source identity;
+`RuntimeSourceBinding<W>` carries an opaque host witness without serialization.
+The compiler's item IDs and a Chirograph owner's item IDs belong to different
+projections. A `SourceRef` can occur repeatedly, so finding the first matching
+source or the first same-named action is insufficient. Chirograph already
+carries owner offers, bounded forms, exact target observations and dispatch
+results. Its Hest bridge preserves schema/effect checks and does not turn
+dispatch acceptance into terminal completion.
+
+The Graphshell host adapter in `ports/graphshell/src/bound_actions.rs` borrows
+one endpoint's `SessionCore` and an explicitly supplied runtime source binding
+whose witness maps occurrence IDs to exact owner targets. It checks the view's
+source, selected occurrence and target source before reading that target's
+current supported offers. No owner is discovered or authenticated from imported
+source names. The integrating host must obtain the association from its known
+owner; a scripted fixture does not qualify that product integration.
+
+The existing `SessionCore::invoke` and `submit_action_draft` paths now use
+`submit_command`: it rechecks the current offer, live status and active target,
+uses Chirograph's Hest invocation bridge, and preserves the command's original
+epoch/revision for the owner's stale check.
+Viewer-local actions retain their separate route. Owner authorization,
+confirmation and enactment remain with the owner. No wire format, recipe field,
+permission model, command vocabulary or shared crate is introduced.
+
+The native Graphshell selected-record panel reads its offers from the admitted
+`MereRouteSession`. That controller already validates graph material against
+the application, attached session and acknowledged position. Its new
+`record_actions` method requires one exact active graph record and keeps the
+synthetic session item out of record actions. The native panel keeps choices
+in the existing `ActionForm`, sends existing Hest invocation data through its
+worker, and preserves owner refusal/stale feedback. Acceptance is worded
+“Request accepted by the owner”, with no terminal completion claim.
+
+The domain-specific address action uses the existing `OpenAddressV1` schema;
+bounded forms retain the owner's fields and exact opaque choices. The initial
+integration used an empty `HandlerRegistry`. The live continuation below adds
+opt-in web handlers while preserving that empty default. The UI distinguishes
+a valid empty offer from an unavailable owner.
+
+Qualification phases and done-conditions:
+
+1. Exact-target connection: prove repeated source appearances can expose
+   different current offers despite different compiled/owner IDs; retain the
+   existing form values, command contract and wire target unchanged.
+2. Refusal and lifetime checks: prove missing/wrong mappings, changed selection,
+   changed offers, unsupported presentations and disconnected owners do not
+   invoke; preserve owner refusal/stale results and pending acceptance.
+3. Regression and persistence boundary: run the existing client and local
+   projection checks; prove ordinary projection snapshots contain no runtime
+   owner session or action data. Record focused evidence separately from any
+   future headed host acceptance.
+4. Native Mere receiving path: prove record selection exposes the owner's exact
+   target after the synthetic session item; exercise current offers, existing
+   address payloads and bounded choices through the native worker and admitted
+   route controller, including refusal and changed-target checks.
+
+**Initial qualification (2026-10-20):** the adapter and focused scripted-endpoint
+tests were implemented together with the native Mere receiving path, recorded
+in source checkpoint `ac099b385`. Locked,
+offline checks passed with Rust 1.99.1 and debug information disabled:
+
+- 6 bound-action tests, including actual mutation/refusal/stale behavior in
+  Graphshell's existing endpoint fixture, repeated-source targets, changed
+  offers, stale forms and mismatched compiled/disclosed sources;
+- 3 existing local projection save/reopen tests;
+- all 78 client library and 6 Mere-route library tests;
+- all 20 native Graphshell Mere tests, including actual Genet button/form
+  dispatch, existing typed address payloads, exact owner-target forwarding
+  after the hidden session item, owner refusal, and the existing framed-door
+  receiving checks;
+- the shared client's `wasm32-unknown-unknown` check, the web consumer's locked
+  offline metadata resolution, source formatting and whitespace checks.
+
+Source hashes, commands, final outputs and acceptance limits are recorded in
+`Code/output/domain-action-bindings-20261020/receipt.json`. These are source,
+headless UI and protocol checks, not headed rendering, screen-reader, configured
+live-handler or second-product qualification. The canonical-worker continuation
+below supersedes this initial integration status.
+
+The generic projection editor's imported fixture table still has
+no live owner association; this pass does not claim editing through a live
+Woodshed owner. New direct Hest dependencies use its existing package and do
+not change the wire or recipe serialization.
+
+#### Canonical worker reconciliation (2026-10-20)
+
+Upstream's native Hest worker landed while this connection was being qualified.
+The integrated implementation keeps that worker's `WorkerCommand` /
+`WorkerReply` envelope, one request-generation allocator and persistent refusal
+handling. Record actions add their runtime target context beside the existing
+Hest invocation; they retain the owner's declaration and are not recoded as
+local Mere-view commands. Both command origins use the same send path.
+
+The worker checks the supplied owner declaration through Chirograph's existing
+bridge, then the admitted route rechecks the actual current offer and exact
+selected target before dispatch. An unrelated automatic reading cannot settle
+a pending owner request. The receiving tests cover that generation boundary
+and reject changed owner command IDs, schemas and effects before dispatch.
+
+The integrated check runs pass: 78 client tests, 7 Mere-route tests, 6 bound-action
+tests, 3 existing projection save/reopen tests and 34 native Graphshell Mere
+tests. The client Wasm check, web locked/offline metadata resolution, port
+dependency boundaries, source formatting and whitespace checks also pass.
+The tracked [qualification receipt](../../../support/receipts/domain-actions-20261020/qualification.json)
+pins source hashes, commands and compressed final logs. It preserves the same
+headless/protocol and live-handler limits as the initial qualification.
+
+
+### Live Mere owner handler (2026-10-20)
+
+**Status (2026-10-20):** implemented and qualified on working source. The
+maintainer chose opening a web address in the receiving device's default
+browser only after owner acceptance. All 93 focused tests pass (39 native,
+31 resident Mere, 23 owner-settings tests). Three fresh native processes and
+three resident starts pass real macOS acceptance, including cold reopen and
+disabling the offer. This is source-hash qualification, not publication.
+
+**Findings (2026-10-20).** The resident previously supplied an empty
+`HandlerRegistry` for every session. `MereHost::invoke` already validates the
+open-address intent, handler, exact target, address, epoch and revision, then
+journals an access-history entry and returns `Accepted`. That result does not
+perform an operating-system launch. The web host separately attempts a browser
+open; the native Mere host currently has no equivalent dispatch. Enabling an
+“Open” offer alone would leave its visible behavior incomplete.
+
+Phases and done-conditions:
+
+1. Owner configuration: supply the existing ordered `HandlerRegistry` at route
+   composition; preserve the empty default and owner-side target checks. Prove
+   a configured offer reaches the exact record and a wrong address or stale
+   observation is refused without another access-history entry.
+2. Native action: implement the chosen host behavior using the existing
+   `OpenAddressV1` and owner response. Preserve refusal and unknown-outcome
+   feedback; an ordinary refreshed reading cannot authorize the action.
+3. Live acceptance: run an isolated real resident and native window, activate
+   the retained native control, inspect presented captures and verify the
+   resulting owner state through its admitted route. Reopen fresh processes
+   and check persistence; retain actual commands, source hashes and limits.
+
+No new recipe action grants, command language, graph-derived executable
+configuration or shared crate is part of this continuation.
+
+The resident's existing owner settings now accept
+`reservoir.open_web_addresses: true` (default false, read at startup). This
+composes the existing web-only `system.default` offer through
+`MereRoutes::with_handlers`; there are no graph-provided executable paths or
+shell commands. The native adapter compares the actual outbound invocation
+with the retained exact request and dispatches only on its typed `Accepted`
+response. Refusal, staleness, transport failure and ordinary readings cannot
+authorize a launch; reconnects and refreshes do not retry it. The native
+adapter validates HTTP/HTTPS URLs and bounds its platform handoff. Successful
+handoff is described as requested, not proof of page loading or terminal
+completion. Local handoff failures remain distinct from owner acceptance.
+The resident supplies a fresh owner timestamp for access-history writes,
+instead of the previous host-construction placeholder of zero.
+
+
+**Acceptance (2026-10-20).**
+`support/receipts/domain-actions-live-20261020/qualification.json` records the
+93 passing tests and links the native packet. The existing Mesquite lane
+activated the retained **Open in browser** control in a real native window.
+The owner accepted the exact selected record; macOS's default browser
+(Firefox in this run) visited a unique localhost page once. The owner saved
+one access-history entry with its handler, address and nonzero timestamp.
+Fresh resident and native processes preserved the same history and current
+offer without another browser visit. Disabling `open_web_addresses` and
+restarting removed the offer while preserving history. Four host-owned
+captures were reviewed. The native action retains both the button and honest
+handoff status after acceptance.
+
+The packet uses an isolated profile and synthetic graph; ordinary installed
+settings are unchanged. This qualifies the local admitted owner route on
+macOS, retained-control activation, native presentation and the observed
+browser visit. Linux/Windows runtime, physical pointer/keyboard input,
+assistive activation and general page-load completion remain unqualified.
+The access-history entry records the accepted handoff; it is not a page-load
+or successful application-completion receipt.
+
+
+**Git integration qualification (2026-10-20).** The live handler checkpoint is
+`c2db56559`; `3b73f15c8` reconciles it with main `1797a2eed`. The integration
+packet at `support/receipts/domain-actions-live-20261020/integration/` records
+93 passing focused tests on the combined source. Rebuilt native and helper
+binaries match the original live artifacts; the rebuilt resident differs after
+upstream's retained-recall change, so the full native acceptance was repeated
+with frozen binaries. The new browser visit, durable history, cold reopen,
+disabled offer and four reviewed captures all pass. The original 50 receipt
+files remain unchanged. This integration adds no new product decisions.
+
+
+**Publication qualification (2026-10-20).** Tested source `0dacf49a2` includes
+main `e94cb23e8`, the co-op relay/shared-shell integration and H4 command
+adapters. Both independent MereShared handler and relay fields survive the
+merge. All 94 focused tests pass (39 native, 31 resident Mere, 24 settings).
+The independently rebuilt and frozen native host, resident and helper pass a
+fresh complete native run, including one browser visit, durable access history,
+cold reopen without redispatch and disabled-offer behavior. Four new presented
+captures were reviewed. The final packet is
+`support/receipts/domain-actions-live-20261020/publication/`; all 95 original
+and earlier integration receipt files remain unchanged. Intermediate native
+receipts and frozen binaries also remain in the external delivery output.
+
+---
+
+*Archived 2026-10-28.* Cut, with the other active plans, into a new set: what was still open, deferred or a follow-on here now lives in `mere_docs/implementation_strategy/2026-10-28_projection_grammar_plan.md`, which cites this file by line. This copy is history: its status lines, receipts and claims are as they stood, not current.

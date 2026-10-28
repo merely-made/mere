@@ -115,7 +115,7 @@ injection is done another way: pictograph's `Canvas` and `PhysicsBoard` take a
 host `PhysicsDevice` with lagged GPU repulsion
 (`crates/canvas/pictograph/src/canvas/physics_device.rs`, `c57e820b`,
 2026-10-02), recorded as P5c in the
-[physics catalog plan](../../mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md).
+[physics catalog plan](../2026-10-28/2026-09-02_physics_catalog_plan.md).
 
 ### P4 — Semantic arrangement (mechanism landed 2026-07-06)
 

@@ -35,7 +35,7 @@ and count/byte/age limits. Records contain fixed phases and generated execution
 IDs, excluding prompts, answers, caller run names and error strings. Worker
 completion and accepted run outcome are separate facts; journal failure cannot
 become a successful outcome. This installs no exporter or runtime policy. See
-the [diagnostics continuation](../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20)
+the [diagnostics continuation](../../design_docs/archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md#observations-and-semantic-action-continuation-2026-10-20)
 for qualification and remaining owner migrations.
 
 `Distillery<B>` composes a `MeshHost<B>`, drives its non-blocking supervisor
@@ -190,7 +190,7 @@ limits. Inline JSON is capped at 128 KiB and oversized publications are refused.
 Published material stays in memory; supplied passages and run records use the
 existing sealed journal. Published checkpoints require `recall/published-v1`.
 
-See the [resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+See the [resident inference plan](../../design_docs/archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md).
 
 `probe/` is D2's standalone headed-browser evidence surface. Its first MiniLM
 row localized and recovered two Burn/CubeCL browser defects. The configured

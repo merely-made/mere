@@ -11,7 +11,7 @@ complete. Open: live radio facts for P5; the naming drift between the two
 display-name tables (the scenomise catalog says "L-system" and "Kanban" where
 the canvas catalog carries the ratified Fractal and Columns); and the
 arrangement pull, which `270172db` (2026-10-03) removed and which now belongs
-to the [dynamics grammar plan](../../mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md).
+to the [dynamics grammar plan](../2026-10-28/2026-10-02_dynamics_grammar_plan.md).
 Executes the five-proof sequence from the
 [projection_engine_prior_art_brief](../../mere_docs/research/2026-07-21_projection_engine_prior_art_brief.md)
 §9.

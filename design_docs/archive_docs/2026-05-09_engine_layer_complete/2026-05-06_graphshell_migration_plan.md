@@ -8,7 +8,7 @@
 
 - [`../../../README.md`](../../../README.md) — current Mere workspace crate roles
 - [`../../2026-05-04_lexicon_brief.md`](../../2026-05-04_lexicon_brief.md) — current product/component vocabulary
-- [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) — protocol/identity/transport architecture that Graphshell must consume, not duplicate
+- [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../2026-10-28/2026-05-05_protocol_architecture_plan.md) — protocol/identity/transport architecture that Graphshell must consume, not duplicate
 - Inherited: [`../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/2026-05-01_workspace_architecture_proposal.md`](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/2026-05-01_workspace_architecture_proposal.md) — current root-crate decomposition plan and registrar/system-layer receipts
 - Inherited: [`../../../../genet/docs/2026-05-05_genet_netrender_cut_plan.md`](../../../../genet/docs/2026-05-05_genet_netrender_cut_plan.md) — Genet/Netrender imposed renderer shape
 - Inherited: [`../../../../netrender/netrender-notes/2026-05-04_feature_roadmap.md`](../../../../netrender/netrender-notes/2026-05-04_feature_roadmap.md) — Netrender compositor handoff roadmap

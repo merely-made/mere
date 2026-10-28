@@ -1,0 +1,296 @@
+# Runtime Composition Acceptance Plan
+
+**Date:** 2026-08-23
+**Status (2026-10-06):** active. C0 is complete (Mere `5767563c`), C1's
+Mesocosm commit `b112931` is integrated on isometry main, and the DDA
+promotion gate closed with `modulus` landing on main 2026-09-02 (Progress).
+C2, C2a and C2b completed in Isometry's `isometry-runtime` crate (`303e347`,
+`15f5da2`, `7d45c40`), which Isometry retired in `73a31409` (2026-09-27); the
+commits remain only as history, and whether those gates stand is open (see
+C2). Quint, named throughout as an owner, was folded in `eae87153`. Open: C3
+host adoption, C4's second-consumer challenge, 3D realization, and this
+ledger's reconciliation with the conatus engine plan's body-binding and T2
+rulings (see the ledger).
+**Scope:** Name how Merely games compose runtime organs, who owns each seam,
+and which executable receipts are required before a local shape becomes a
+shared contract.
+
+## Direction
+
+The engine is the composition a product runtime profile conducts. It is not a
+crate and does not need one universal owner. ("Engine" here is the
+product-level assembly; it is distinct from the platform's two engines —
+projection and inference — in the consolidation map ruled 2026-08-28 in
+`2026-08-22_conatus_engine_plan.md`.) A profile chooses its clocks,
+triggers, input-to-intent mapping, authorization, source bindings, spatial and
+inference organs, render tenants, audio adapters, persistence route, and
+diagnostics. Each organ retains its own state and authority boundary.
+
+Conatus advances spatial state. It does not own the product's clock, rules,
+input, durable identities, assets, scenes, renderer policy, audio policy,
+checkpoint lifecycle, or packaging. This ledger exists to keep those absences
+from being mistaken for either missing Conatus features or permission to found
+a second application engine.
+
+Two extraction rules govern every row:
+
+1. Reusable mechanics may move after one forcing consumer when ownership is
+   already settled and the move creates no second authority.
+2. Cross-product contracts for orchestration, identity, authority, device
+   ownership, frames, triggers, or leases remain product-local until a second
+   heterogeneous consumer tests the shape.
+
+## Ownership and acceptance ledger
+
+Cross-stack research now has a shared home in the
+[family composition brief, §7](../../2026-08-12_family_composition_thesis_brief.md#7-stack-pillars-research-before-implementation-2026-09-08)
+(2026-09-08): R1 investigates host drive demand and resource lifetime; R2
+investigates identity, provenance and custody. Initial drive and custody
+models have run; actual consumer probes remain open. This ledger retains
+its product ownership and second-consumer gates;
+research proposals do not promote a common clock, identifier or lease.
+
+| Concern | Authority and natural owner | Product-profile seam | First executable proof | Promotion gate | State |
+|---|---|---|---|---|---|
+| Durable rules and consequences | Each product core and ordered record | Accepted product intent or event enters adapters | Isometry `Intent -> Resolved`; Mesocosm ordered `Intent` and replay | Never promoted as one game-rule vocabulary | Established product-local |
+| Semantic runtime projection | Each product's durable domain record; the product profile owns semantic selection, recipe version, and source bindings | Accepted facts compile into rebuildable typed records, relationship indexes, and subsystem bindings | Isometry's accepted-map body profile is the narrow first instance; Paredros's post-F3 world-compiler receipt is the first semantic challenge | A heterogeneous second product must prove the same rebuild, delta, removal, and one-source-to-many lifecycle; product vocabulary never promotes with the mechanics | Direction settled; semantic receipt open |
+| Runtime cadence | Product profile | Exact step, elapsed frame, turn, epoch, or event trigger | Isometry profile uses event-driven zero-step spatial publication | A second game must need the same trigger vocabulary | Provisional product-local |
+| Input and actions | Genet/Cambium captures input; product maps it to intents | Authorized intent lowering | Isometry protocol refusal and application tests | Two products must share semantics, not merely devices | No shared action contract |
+| Tactile bodies and spatial queries | Conatus owns the state it advances | Product source bindings to runtime `BodyId`s | Isometry product profile mirrors accepted map tokens; Mesocosm's `mesocosm-runtime` tactile adapter (terrarium picking, T1 2026-08-26) is the second, oracle-judged consumer | Met 2026-08-26 by Mesocosm; the shared vocabulary stays Conatus ids and arrays, Rapier private | Two profiles proven; contract held by Conatus's public vocabulary |
+| CPU voxel patch mechanics | `nisus` (renamed from `conatus-voxel` 2026-08-28, published) owns generic value mechanics; product owns voxel identity, material meaning, and durable authority | Product adapter supplies admitted source revisions | Mesocosm `GroundVoxelProfile` preserves `Ground`, replay, refusal, occupancy lowering, and silence without resolving Rapier | A second product tests mechanics; identity/frame contracts remain local regardless | Narrow package adopted locally |
+| Resident fields and chunks | Quint owns resident allocations and typed views for its advanced state | Profile orders passes and binds product source revisions | Mesocosm resident-ground (now per-brick patches, tracer-validated read epochs, allocator-observed bytes; V1b 2026-08-26) plus Isometry resident body-position receipts | Second product proves any shared lease or identity vocabulary; the lease itself is now consumed cross-crate by the brick tracer | Reusable mechanics proven twice and epoch-validated; cross-product identity contract still provisional |
+| DDA traversal | `modulus` (renamed from `conatus-brick` 2026-08-28) owns the product-free pointer/atlas ABI and ray-in WGSL DDA | Product lens owns source binding, camera, material, and composition | Mesocosm and Paredros compile the same platform module under orthographic and perspective profiles | Permanent tracked adoption by the second product | Core promoted; lens and depth composition remain product-local |
+| Scene facts and transitions | Sceno/scenomise/scenotime; product adapter owns meaning | Profile chooses scene recipe and realization | Existing Mere and game consumers | Governed by Scenograph's own two-consumer receipts | Outside Conatus |
+| Device tenancy and final composition | Netrender | Profile selects tenants on host device and queue | Existing same-device composition receipts | New contract only if a second host needs it | Established seam |
+| 2D resident body realization | Isometry product tenant | Stamped Quint position view to tenant-owned same-device texture | Isometry `7d45c40` direct-buffer and Netrender boundary receipt | Second product or renderer challenges the tenant and frame shape | First product adapter complete; contract provisional |
+| 3D body realization | Renderling or another selected tenant | Product-local spatial-frame adapter | First adapter remains open | Second renderer or product challenges the frame | Open |
+| Inference and learned proposals | ESP/Burn/CubeCL or product-selected model organ | Proposal plus provenance enters product adjudication | Mesocosm bounded fauna and field proposals | Shared proposal envelope needs two products | Product authority settled; composition local |
+| Assets and procedural content | Product campaign/content packs; shared cache only when forced | Profile binds durable content refs to runtime instances | Isometry campaign and voxel-appearance packs | Shared asset lifecycle needs heterogeneous pack consumers | No universal asset manager |
+| Audio | Hocket/Firewheel realization, product-owned cues and routing | Profile maps accepted events to voices | Open | Two games challenge the adapter vocabulary | Open, outside Conatus |
+| Persistence, checkpoints, and replay | Product record plus Mere storage/replication organs | Profile checkpoints product truth and rebuilds disposable organs | Existing Isometry and Mesocosm replay suites | Never serialize Conatus as a second product record | Established law; profile lifecycle open |
+| Diagnostics and packaging | Product host/tooling | Profile reports selected organs, revisions, refusals, and build provenance | Focused crate receipts exist | One useful cross-product report shape must be consumed twice | Open |
+
+**Corrected 2026-10-06 (S14 pass):** the tree has moved under three rows. The
+Isometry profile and tenant that the tactile, resident and 2D-realization rows
+cite lived in `isometry-runtime`, which Isometry retired in `73a31409`
+(2026-09-27); `303e347`, `15f5da2` and `7d45c40` remain only as history. Quint,
+the resident row's owner and the 2D row's "stamped Quint position view", was
+folded into its owners in `eae87153`: `ResidentChunk` and the resident module
+are now in `crates/conatus/conatus/src/resident/` (`chunk.rs`), eval and
+burn lowering in numen, and the tensor forces in seiche. The ledger has no
+entries after 2026-08-26.
+
+**Open, raised by the S14 pass (2026-10-06):** the conatus engine plan's
+2026-09-28 entry says this ledger still needs reconciling with its
+body-binding shape (§1) and T2 voxel-store rulings (§2). Should the ledger
+take them as gates? Options: add body-binding and T2 rows with their gates;
+leave them to the conatus engine plan alone.
+
+## Product profiles
+
+### Isometry
+
+The first profile is deliberately narrow and host-neutral. Its source binding
+is `(map source, TokenId) -> BodyId`, so equal token numbers on different maps
+cannot alias. It accepts an already-applied `MapDocument`, mirrors tokens as
+fixed Conatus bodies, and publishes changes with `advance(0)`. Movement and
+facing remain ordered Isometry events. Rejected events never reach the
+profile. Its tile span, elevation step, and collider extent are configuration,
+not shared defaults.
+
+The first slice lives in the product-owned `isometry-runtime` crate rather than
+`isometry-core`: core stays pure record/geometry, while the runtime crate may
+compose shared organs. It remains a standalone, root-excluded workspace with
+its own lock until adoption, because the desktop graph still carries Genet's
+deleted layout compatibility cone. Desktop-host wiring waits for the active
+protocol H2 gate and that Genet migration; the profile must not become a reason
+to reorder either prerequisite.
+
+Its optional resident slice remains product-local too. Isometry owns the fixed
+capacity, source-to-`BodyId` generation binding, coordinate interpretation,
+and tenant selection for a Quint-backed position plane. The plane is rebuilt
+from accepted product truth and is not a durable identity table or a shared
+spatial-frame contract.
+
+Its first renderer tenant is likewise product-local. A configurable
+fixed-isometric marker pass reads the position plane's exact GPU
+suballocation, renders to a tenant-owned texture, and enters Netrender at an
+explicit scene boundary. This proves direct resident realization and
+same-device composition. It does not establish a shared frame, lease, tenant,
+marker, camera, or 3D-rendering contract.
+
+**Corrected 2026-10-06 (S14 pass):** this profile, its resident plane and its
+renderer tenant no longer exist as code: Isometry retired `isometry-runtime`
+in `73a31409` (2026-09-27), and the slice survives only as the history of
+`303e347`, `15f5da2` and `7d45c40`. The Quint-backed plane's mechanism is now
+conatus's resident module (`eae87153`).
+
+### Mesocosm
+
+Mesocosm's first composition slice is a voxel adapter, not yet its complete
+runtime conductor. `Ground` remains the only serialized voxel authority.
+`GroundVoxelProfile` holds disposable Conatus chunks, separates the global
+source revision from local chunk revisions, and emits accepted spatial work.
+The epoch clock, ecology rules, renderer selection, and durable history remain
+Mesocosm-owned.
+
+### Paredros
+
+Paredros continues its product sequence. F3 memory/belief/standing does not
+wait for engine adoption. Its durable observations, claims, reports, norms,
+and corrections are product facts; any belief index or later ECS is a
+rebuildable product projection. F3 may prove that nonspatial lifecycle without
+Conatus, but that proof does not satisfy C4: the first Conatus use must still
+be pulled by an embodied spatial requirement and challenge Isometry's body
+identity, cadence, authorization, and frame consumption. A shared conductor
+or semantic vocabulary is not declared in advance.
+
+## Gates and done-conditions
+
+### C0 — Spatial foundation
+
+**Complete at Mere commit `5767563c`.** Conatus names spatial phases and the
+runtime-local command trust boundary, carries tested voxel mechanics, and
+documents product-owned profiles and source bindings.
+
+### C1 — First voxel-mechanics consumer
+
+**Implemented locally at Mesocosm commit `b112931`; remote integration open.**
+Done when the commit is integrated without crossing the concurrent dirty lane,
+the focused adapter tests and full core suite remain green, and the real
+resident-ground example resolves Quint from the same Mere provenance.
+
+**Corrected 2026-10-06 (S14 pass):** remote integration is no longer open:
+`b112931` is an ancestor of isometry main (HEAD 988b9929). Quint, which the
+done condition names, has since been folded into conatus, numen and seiche
+(`eae87153`).
+
+### C2 — First runtime profile
+
+**Complete in the product at Isometry commit `303e347`.** `isometry-runtime`
+proves map-qualified source bindings, accepted-event-only synchronization,
+stable body identity across moves, distinct identity across maps, unchanged-
+frame silence, and warnings-denied checks. Four focused tests and Clippy pass
+under Rust 1.96.0. Desktop wiring remains a separate adoption gate.
+
+**Corrected 2026-10-06 (S14 pass):** C2, C2a and C2b were met in
+`isometry-runtime`, which Isometry retired in `73a31409` (2026-09-27).
+`303e347`, `15f5da2` and `7d45c40` remain as history; no live code carries the
+profile, the resident body view or the tenant.
+
+**Open, raised by the S14 pass (2026-10-06):** with `isometry-runtime`
+retired, how do C2, C2a and C2b stand? Options: they stand as historical
+receipts, with C3 restated against current Isometry; they reopen as unmet
+until a live Isometry profile, resident view and tenant exist again.
+
+### C2a — First resident body view
+
+**Complete at Mere commit `c382e734` and Isometry commit `15f5da2`.** Quint
+atomically publishes disjoint patches under one stamp. Isometry's optional
+resident consumer proves nonadjacent body updates, stable allocation identity,
+silent-frame behavior, explicit capacity refusal, and generation-aware slot
+reuse on a real adapter. The default four-test profile graph remains GPU-free.
+This proves the mechanism and one product seam; it promotes no shared frame,
+source, lease, or tenant contract.
+
+### C2b — First renderer tenant
+
+**Complete in Isometry at commit `7d45c40`.** A product-owned plain-wgpu
+tenant reads the stamped Quint position suballocation directly and emits a
+same-device texture for Netrender. Its real-device receipt proves explicit
+scene ordering around the tenant, silent-frame skipping, stable-allocation
+moves, stale-view refusal, removal, generation-aware slot reuse, and refusal
+before invalid resource creation. The isometric basis, target, marker
+geometry, and color remain product configuration. This closes the first 2D
+adapter only; Renderling-backed 3D, desktop host adoption, and contract
+promotion remain open.
+
+### C3 — First host adoption
+
+**Open behind existing Isometry prerequisites.** Done when the desktop host's
+current Genet migration and protocol H2 gate are closed, the host constructs
+the product profile, and an accepted event yields one consumed spatial frame
+without any peer or Conatus re-derivation.
+
+**Corrected 2026-10-06 (S14 pass):** the profile this gate's host would
+construct was `isometry-runtime`'s, retired in `73a31409` (2026-09-27), so
+C3's premise no longer matches current Isometry; restating it waits on the
+question under C2.
+
+### C4 — Second consumer challenge
+
+**Open.** Paredros or Mesocosm consumes the relevant Isometry profile shape and
+forces at least one real comparison of source identity, trigger cadence,
+authorization, subsystem selection, and frame consumption. Paredros's
+nonspatial F3 proof may establish cold rebuild versus incremental delta,
+recipe-version refusal, removal-before-replacement, and one durable source
+materializing into several runtime bindings, but it cannot close C4 without an
+embodied spatial consumer. Only the common minimum may then move to a shared
+contract. Product-specific fields and epistemic vocabulary remain local.
+
+## Stop rules
+
+- Product work continues while profile contracts are provisional; engine
+  adoption is never a prerequisite for unrelated game progress.
+- Conatus receives admitted spatial work, never raw remote commands or rules.
+- A disposable spatial or resident view never enters the product's durable
+  record merely to make replay convenient; rebuild it from product truth.
+- `ResidentChunk` stays Quint-owned. DDA renderer policy stays product-owned.
+  Voxel CPU mechanics do not imply a universal voxel-world service.
+- A first consumer may establish mechanics. It cannot establish a shared
+  conductor, source-binding schema, spatial frame, or lease contract.
+- An open row is a boundary map and receipt queue, not permission to found a
+  catch-all engine crate.
+
+**Corrected 2026-10-06 (S14 pass):** "`ResidentChunk` stays Quint-owned" is out
+of date: quint was folded in `eae87153`, and `ResidentChunk` is now
+`crates/conatus/conatus/src/resident/chunk.rs`.
+
+## Progress
+
+- **2026-08-23:** Founded from the engine-stack review and its adjudication.
+  Recorded the pushed Conatus foundation, the local Mesocosm voxel adoption,
+  the first Isometry profile slice, and the explicit second-consumer stop.
+- **2026-08-23:** The first Isometry profile proof closed without host wiring.
+  It remains product-local and root-excluded; C3 and C4 stay open, and no
+  conductor, source-binding, frame, trigger, or lease contract was promoted.
+- **2026-08-24:** The incumbent Rapier implementation moved behind a structural
+  private boundary, and reusable voxel value mechanics moved into
+  `conatus-voxel`. Mesocosm's adapter now depends on that narrow package. These
+  are mechanics and dependency corrections; they do not promote a shared
+  backend selector, voxel identity, conductor, frame, or lease contract.
+- **2026-08-25:** C2a closed with Quint's atomic sparse patch mechanism and
+  Isometry's product-owned resident position consumer. The real-adapter receipt
+  preserved allocation identity and product authority. Renderer tenancy, host
+  adoption, direct-GPU body ownership, and the second-consumer challenge stay
+  open.
+- **2026-08-25:** C2b closed at Isometry commit `7d45c40`. The product tenant
+  now realizes resident positions without CPU position carriage and composes
+  through Netrender at an explicit scene boundary. Host adoption, 3D
+  realization, broader resident body planes, direct-GPU advancement, and the
+  second-consumer challenge stay open.
+- **2026-08-26:** `modulus` (then `conatus-brick`) became the narrow permanent
+  owner of the sparse pointer/atlas ABI, projection identity, trace-space
+  uniform, and ray-in WGSL DDA. Mesocosm retains only its Ground adapter and
+  presentation shader; Paredros owns a separate Ground source binding. Both
+  product profiles compile the same platform module, while camera
+  construction, material look, body composition, residency policy, and source
+  revision remain local. This closes the DDA promotion gate without promoting
+  a frame, lease, camera, or renderer contract. Landed on main 2026-09-02.
+- **2026-08-26:** The semantic-world/ECS review named runtime world compilation
+  as another product-profile responsibility. Paredros F3 remains product work;
+  its later compiler receipt may prove the general rebuild lifecycle, while C4
+  still requires an embodied spatial consumer before any shared contract moves
+  upward.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status records C1 as
+  integrated and C2/C2a/C2b as met in the since-retired `isometry-runtime`
+  (`73a31409`); the ledger, the Isometry section, C3 and the `ResidentChunk`
+  stop rule are annotated for that retirement and for quint's fold
+  (`eae87153`); and two open questions (how C2-C2b stand, whether the ledger
+  takes the body-binding and T2 gates) are written in.
+
+---
+
+*Archived 2026-10-28.* Cut, with the other active plans, into a new set: what was still open, deferred or a follow-on here now lives in `mere_docs/implementation_strategy/2026-10-28_projection_grammar_plan.md`, which cites this file by line. This copy is history: its status lines, receipts and claims are as they stood, not current.

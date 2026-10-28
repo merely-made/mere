@@ -196,7 +196,7 @@ the native host's 80 across nine suites.
 An application can ask the host to bring one of its own elements into view. The two
 scroll planes above stay host-owned and their setters stay crate-private; what an
 application gets is a request. Decision 18 of the Micron navigation plan
-(`nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md`) settled
+(`archive_docs/2026-10-28/2026-09-15_micron_navigation_plan.md`) settled
 that the request belongs to Cambium, for every Cambium application, rather than Knot's
 preview becoming a scroll container of its own.
 
@@ -494,7 +494,7 @@ edge is added. This supersedes the earlier integration-pending status.
 This is DOM semantic parity. Sprigging custom-leaf contributions and complete
 HTML/CSS visibility/role conformance remain outside it. The document projection
 still uses revision zero; it is not an immutable presentation-qualified snapshot.
-The [current diagnostics design](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+The [current diagnostics design](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 requires producer-supplied identity/revision references rather than inventing
 correlation from this limitation. No shared diagnostics store is implemented by
 the selector work.

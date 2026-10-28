@@ -397,7 +397,7 @@ consumer appears.
   remains canonical for arrangement ontology, but its older host rows require the
   current boundary plan's reading.
 - Historical tail topics route to current owners: S5 comms and sync in the
-  active [Murm peer runtime and Moot domain plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+  active [Murm peer runtime and Moot domain plan](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
   and the active [Moot collections and community publishing plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md);
   S6 external content in the [Scrying tile plan](../2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md);
   S7 retirement and documentation reconciliation in the platform plan's P7

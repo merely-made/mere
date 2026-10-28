@@ -14,7 +14,7 @@ one: the host it describes was meerkat, deleted 2026-07-18 (`c5f01064`). Nothing
 the tree implements the one shell document or the orrery element; `orrery_a11y_tree`
 survives only in a comment in `crates/mere/src/glossary.rs`. Slice 5's home, the
 layout phase split probe plan, was retired 2026-09-02 and its point carried to the
-[archived plan tails](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md). The same applies to the
+[archived plan tails](../2026-10-28/2026-07-03_archived_plan_tails_plan.md). The same applies to the
 "foundational, still-current record" wording in the closing Progress entry.
 
 **Rename banner (2026-07-02):** the code pointers throughout this doc (`OrreryCard`,
@@ -693,7 +693,7 @@ original four resolve or narrow; resolutions are reflected in the phase notes ab
   polished; Phase 1's consolidation and Phase 2's element / hit-test / focus / scene-teardown
   remain.** A cross-plan consolidation pass (with the
   [node-representation + arrangement plan](../2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md) and
-  the [scriptable field regions plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md); reduce the
+  the [scriptable field regions plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md); reduce the
   drift; formalize the supported-format interaction model) is refactoring this plan.
 
 - **2026-06-18/19 (Phase 1 document consolidation, 3 of 4 done-conditions).** The load-bearing

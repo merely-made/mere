@@ -38,7 +38,7 @@ and offline signed receipts are different tools.
 
 **Commitment correction folded in 2026-06-30**: do not bake Merkle trees into
 the social model. The shared interface is
-[`../implementation_strategy/2026-06-30_commitment_proof_interface_plan.md`](../implementation_strategy/2026-06-30_commitment_proof_interface_plan.md).
+[`../implementation_strategy/2026-06-30_commitment_proof_interface_plan.md`](../../archive_docs/2026-10-28/2026-06-30_commitment_proof_interface_plan.md).
 It treats Merkle, sparse Merkle, MMR, accumulators, vector commitments, and
 private set-cardinality proofs as backends behind typed commitments and typed
 proofs. P2panda still owns operation identity, signatures, per-author log order,
@@ -86,7 +86,7 @@ board distinguishes `LeaseRevokedByOwner` from `LeaseLapsed`.
 [`../implementation_strategy/2026-06-30_kith_capability_sharing_plan.md`](../../archive_docs/2026-09-02_retired_plans/2026-06-30_kith_capability_sharing_plan.md)
 
 **Related**:
-[`../implementation_strategy/2026-06-26_federation_interop_plan.md`](../implementation_strategy/2026-06-26_federation_interop_plan.md),
+[`../implementation_strategy/2026-06-26_federation_interop_plan.md`](../../archive_docs/2026-10-28/2026-06-26_federation_interop_plan.md),
 [`../implementation_strategy/2026-05-10_graph_cluster_namespaces_brief.md`](../implementation_strategy/2026-05-10_graph_cluster_namespaces_brief.md),
 [`2026-05-14_capability_gate_catalogue_brief.md`](2026-05-14_capability_gate_catalogue_brief.md)
 

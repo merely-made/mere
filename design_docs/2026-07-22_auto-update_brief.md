@@ -219,7 +219,7 @@ Rust, but `vpk` needs a .NET runtime wherever releases are packed). Ruled:
 - **T2 (partially landed):** verified artifact staging survives restart and
   rechecks BLAKE3 before apply. The self-sufficient signed offer and portable
   staged-swap mechanics remain open in the
-  [Djinn resident plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+  [Djinn resident plan](archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md)
   A2.
 - **T3 (planned, design constraint carried from day one):** update
   distribution as signed manifests + content-addressed artifacts over

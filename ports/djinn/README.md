@@ -367,7 +367,7 @@ pause/resume, cancellation and exact source reopening after both processes
 restart with the origin offline. That gate uses a test-owned native resident;
 the installed Djinn binary retains its separate gate.
 See the
-[resident inference plan](../../design_docs/mere_docs/implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md).
+[resident inference plan](../../design_docs/archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md).
 
 ## Publishing
 

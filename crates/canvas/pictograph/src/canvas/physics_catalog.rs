@@ -31,7 +31,7 @@
 //! arrangement catalog in [`cartography_scene`](crate::canvas::cartography_scene):
 //! that is *where* nodes go, this is *how* they move.
 //!
-//! Plan: `design_docs/mere_docs/implementation_strategy/2026-09-02_physics_catalog_plan.md`.
+//! Plan: `design_docs/archive_docs/2026-10-28/2026-09-02_physics_catalog_plan.md`.
 
 use std::collections::{HashMap, HashSet};
 

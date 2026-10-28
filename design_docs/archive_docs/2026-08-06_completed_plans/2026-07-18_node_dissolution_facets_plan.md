@@ -6,7 +6,7 @@
 completion), **D** (the kernel `Node` dissolution ladder). Lanes are
 independently workable; D depends on F0 for its facet destinations and on the
 D-gate measurement for its hot fields.
-**Companions:** the [image externalization plan](../../mere_docs/implementation_strategy/2026-07-06_node_image_externalization_plan.md)
+**Companions:** the [image externalization plan](../2026-10-28/2026-07-06_node_image_externalization_plan.md)
 (D0 executes its phase 2; its phase 1 store is built), the
 [boundary pass plan](../../mere_docs/implementation_strategy/2026-07-09_mere_turnstone_boundary_pass_plan.md) (slice C
 invented the sidecar pattern), the

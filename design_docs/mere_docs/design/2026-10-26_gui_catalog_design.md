@@ -136,7 +136,7 @@ Mark's list did not name. The citation is where the stack already says it.
   in the persistence column.
 - **Scope and the trail.** `ScopeNavigation<P, A>` in
   `crates/cambium/cambium/src/scope_navigation/` landed in Woodshed and Knot on
-  2026-10-23 ([contextual navigation](../implementation_strategy/2026-10-23_contextual_navigation_plan.md)).
+  2026-10-23 ([contextual navigation](../../archive_docs/2026-10-28/2026-10-23_contextual_navigation_plan.md)).
   Mark's 2026-10-25 description of settings reached as "context cards opened
   from the context menu as a peek-down scope" is the same mechanism.
 - **Selection and focus as separate authorities.** The contextual navigation
@@ -155,7 +155,7 @@ Mark's list did not name. The citation is where the stack already says it.
   the vault lock view (`dramatis::view::VaultLockView`, used by the door's
   custody client). Identity is not one column. It decides which cells render.
 - **Asks and refusals.** Durable asks checkpoint at every token boundary
-  ([resident inference](../implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md)
+  ([resident inference](../../archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md)
   R8); disabled reasons; empty, error and unavailable states; typed offline
   refusals. These are one row today only in Cambium's catalog.
 - **Accessibility and input.** The web host's a11y mirror
@@ -204,7 +204,7 @@ The evidence is cited; what would improve the stack follows it.
    (`crates/platen/platen/Cargo.toml`); Graphshell's `forme_session` and
    `forme_workspace` use `platen::TileLayout` and `TreeGeometry` and touch
    pictograph, so they cannot move into `forme`, and only the `mere` facade
-   sees all four ([stack lift](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+   sees all four ([stack lift](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
    §2 and R2). The tile tree's authority, its plan compiler and its canvas form
    a cycle at the center of the workbench row. R2 cuts it by putting workspace
    and session in `platen` behind a feature once the three canvas-touching
@@ -334,7 +334,7 @@ What would improve the stack, as cues:
 
 Mark ruled 1 to 5 on 2026-10-26. Each was a choice among offered options; the
 options and the evidence put to him are kept under each ruling, as the
-[stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+[stack lift plan](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
 §5 does. Three of §6's rows needed no ruling: orrery (already reconciled),
 swatch (TERMINOLOGY's entry now lists link and selection scopes), and the
 cabal types (the survivor rule).

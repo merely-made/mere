@@ -80,7 +80,7 @@ The orrery is a map of *what* you have; Trail is a record of *when and how* you 
 fuller surface behind the already-named "Trail" shellbar button (the Tier-A sidequest in
 [lane0_sidequests_plan](../../archive_docs/2026-09-02_retired_plans/2026-06-16_lane0_sidequests_plan.md)) and the
 substrate from
-[node_navigation_lineage_wiring_plan](../implementation_strategy/2026-06-05_node_navigation_lineage_wiring_plan.md).
+[node_navigation_lineage_wiring_plan](../../archive_docs/2026-10-28/2026-06-05_node_navigation_lineage_wiring_plan.md).
 
 **Reads.** `node-lineage` `VisitRecord` (the branching visit tree with `parent` / `children` /
 `created_at_ms` / `inbound` transition), `TransitionKind` (LinkClick / Back / Forward / TabSpawn /

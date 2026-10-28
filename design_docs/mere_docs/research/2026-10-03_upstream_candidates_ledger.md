@@ -14,13 +14,13 @@ engine plan's ruling C4 (2026-10-09).
 
 **Related**:
 
-- [device pairing by key plan](../implementation_strategy/2026-10-02_device_pairing_by_key_plan.md):
+- [device pairing by key plan](../../archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md):
   ruling 46, and the measurements behind items 1 to 6 (its §6).
-- [Burn 0.22 migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md):
+- [Burn 0.22 migration plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md):
   item 7 (its §13.3).
-- [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md):
+- [vault lock plan](../../archive_docs/2026-10-28/2026-10-05_vault_lock_plan.md):
   item 9 (its ruling 33).
-- [Conatus engine plan](../implementation_strategy/2026-08-22_conatus_engine_plan.md):
+- [Conatus engine plan](../../archive_docs/2026-10-28/2026-08-22_conatus_engine_plan.md):
   item 12 (§1, the BodyWorld queries' assessment and ruling C4).
 
 ---

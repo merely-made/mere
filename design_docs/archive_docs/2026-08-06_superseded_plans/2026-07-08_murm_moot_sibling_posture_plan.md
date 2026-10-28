@@ -1,7 +1,7 @@
 # Murm/Moot Sibling Posture Plan
 
 **Status**: **Superseded 2026-07-12** by
-[`2026-07-12_murm_peer_runtime_and_moot_domain_plan.md`](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
+[`2026-07-12_murm_peer_runtime_and_moot_domain_plan.md`](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
 The completed R, N, and S receipts below remain historical implementation
 evidence. The sibling purity rule, the host as the sole composition point, and
 the target standalone package boundary are retired.

@@ -19,7 +19,7 @@ copies, receiver coverage, review assertions and browser reopening.
 Mark ruled L1–L6 on
 2026-10-15 and clarified the dynamics purpose: links respond to fields and
 perhaps to compatible links, making different dynamics legible (§7.3). The
-[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
+[implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md)
 owns current assignments, exact evidence and qualification limits.
 Mark ruled the remaining open questions as L7–L13 on 2026-10-15 (§4); none
 remain open (§9).
@@ -28,7 +28,7 @@ remain open (§9).
 (`testing/mere/link-edge-survey-20261015/survey.json`, outside this repo,
 covering history, kernel, RDF, semantics, presentation and consumers, plus a
 completeness critic). Also the primary sources it cites, re-read for this
-doc: [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+doc: [graph semantics plan](../../archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md)
 (ruling 1, §7), the [edge system audit](../research/2026-06-13_edge_system_audit.md)
 (thread 2), the [petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)
 (2026-07-04 revision), the [statements-over-schema stance](2026-05-22_statements_over_schema_stance.md),
@@ -36,7 +36,7 @@ the [statement kernel brief](2026-06-19_statement_kernel_brief.md),
 [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md):89,
 [graph projections research](../research/2026-06-22_graph_projections_research.md),
 [swatch design](../design/2026-06-27_swatch_primitive_design.md) §7 and §11,
-the [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md)
+the [dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md)
 (design-language inputs) and [TERMINOLOGY](../../TERMINOLOGY.md).
 
 **Origin.** Woodshed's adoption of Graphshell's canvas controls exposed links
@@ -179,7 +179,7 @@ L1–L4 were asked as four questions, and L5–L6 as two more after the review (
   its pair bucket with `withdrawn { at_ms, by }`. It is hidden from held
   readers until its predicate's lifecycle compacts it, locally, or an
   accepted checkpoint does, when shared. This follows the
-  [deletion, retention and native drop plan](../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md)
+  [deletion, retention and native drop plan](../../archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md)
   §3.3 law: a withdrawal stays visible until a checkpoint captures the
   absence. Erasure remains a separate act.
 - **L3. Unification scope: all families.** Containment, arrangement,
@@ -633,7 +633,7 @@ the probe separate worktree and output ownership if it runs concurrently.
 Qualify the combined consumer once the source and adapter changes are in
 place; retain the distinction between a fixture probe, an integrated host
 and reviewed native behavior. This routing does not claim phase acceptance. Execution began on 2026-10-15 under the
-[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md).
+[implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md).
 
 ## 9. Open rulings for Mark
 
@@ -694,7 +694,7 @@ alongside the outgoing parallel-bucket export fix and an isolated Numen path
 probe. P1 preserves existing records while adding explicit source availability
 to Graphshell's output; graph-only consumers report missing source context
 rather than inventing public identity or revision. The
-[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md)
+[implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md)
 records that delivery's checks and open gates. At that point P2–P4/P6 and
 P5's host/visual proof remained open; the continuation below updates status.
 
@@ -767,7 +767,7 @@ retained assertion records; the four former set families have derived
 compatibility reads. Exact withdrawal and exact view hiding preserve independent
 reasons and their source metadata. Versioned legacy conversion preserves unknown
 clocks and only repairs attribution from proven journal history. The
-[implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md#p6-qualification-and-receiving-proof)
+[implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md#p6-qualification-and-receiving-proof)
 records source, compatibility, 50,000-withdrawal budgets, reviewed WebGPU
 hide/reopen proof and the published Woodshed receiving receipt. Traversal remains
 event-shaped; fields and sympathetic influences retain the dynamics framing in
@@ -776,7 +776,7 @@ event-shaped; fields and sympathetic influences retain the dynamics framing in
 
 ### P7 promoted-link qualification (2026-10-16)
 
-The [implementation plan](../implementation_strategy/2026-10-15_link_model_plan.md#p7-qualification-2026-10-16)
+The [implementation plan](../../archive_docs/2026-10-28/2026-10-15_link_model_plan.md#p7-qualification-2026-10-16)
 and [receipt](../../../support/receipts/link-model-p7-20261016/receipt.json)
 record bounded Graphshell P7 on `6d53d4439`. Each freeze creates an independent
 Resource with the original stratum, endpoint references, exact directed assertion

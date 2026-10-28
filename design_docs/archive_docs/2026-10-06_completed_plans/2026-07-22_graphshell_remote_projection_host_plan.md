@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-22
 **Product scope amended 2026-07-27** by the
-[Graphshell reference host plan](../../mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md):
+[Graphshell reference host plan](../2026-10-28/2026-07-27_graphshell_reference_host_plan.md):
 Graphshell is Mere's WASM-safe local reference host as well as its remote
 projection port. The session stack, disclosure boundary, and G-series receipts
 below remain; the claim that Graphshell's only local truth is remote-scene
@@ -39,7 +39,7 @@ the [projection proofs plan](2026-07-21_projection_proofs_plan.md), the
 [participant gate and packs plan](2026-07-17_participant_gate_packs_plan.md),
 the [one-node layer map](../../mere_docs/technical_architecture/2026-07-18_one_node_facets_layer_map.md),
 and the
-[Murm peer-runtime and Moot-domain plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
+[Murm peer-runtime and Moot-domain plan](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
 
 ## 1. Product ruling
 
@@ -554,7 +554,7 @@ identity-vault-ssh-agent plan's progress log and was being counted on without
 being planned or assigned.
 
 **Superseded the same day** by
-[H4, "Make Personae visible and usable"](../../mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md),
+[H4, "Make Personae visible and usable"](../2026-10-28/2026-07-27_graphshell_reference_host_plan.md),
 which covers the same ground in more detail: the resident host moves into
 native Graphshell, with an Identity surface for profiles, vault backend and
 protection, agent-listener state, SSH slots, devices and grants, and pending
@@ -630,7 +630,7 @@ reproducible by one command:
 summarized in `Code/testing/mere/webrtc_c4b_receipt.md`. Forced relay,
 host-signed DTLS-fingerprint binding and replay refusal were proven at C3
 (`webrtc_forced_relay_receipt.md`). The lane's full record is the
-[browser WebRTC carrier plan](../../mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md).
+[browser WebRTC carrier plan](../2026-10-28/2026-08-25_browser_webrtc_carrier_plan.md).
 
 ### 2026-08-25: browser carrier feasibility is green; the profile remains open
 
@@ -646,7 +646,7 @@ contains neither Mere admission nor TURN, and it does not reconnect a real
 Graphshell session. Forced relay, host-authenticated DTLS fingerprint binding,
 replay refusal, snapshot-or-diff resume, and a headed projection/intent receipt
 remain the gates. Their ordered implementation now lives in the
-[browser WebRTC carrier plan](../../mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md).
+[browser WebRTC carrier plan](../2026-10-28/2026-08-25_browser_webrtc_carrier_plan.md).
 
 ### 2026-07-25: G5 readiness, measured — the identity substrate arrived from another lane
 

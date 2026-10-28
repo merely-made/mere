@@ -270,7 +270,7 @@ There are three relevant precedents:
   snapshot audit corrects the earlier assumption that re-rendering cached
   content reproduces a captured live viewport. Capture identity, source
   revision, viewport, freshness, and retention remain separate concerns.
-- The [Chisel design](cambium_docs/implementation_strategy/2026-07-07_chisel_widget_leaf_design.md)
+- The [Chisel design](archive_docs/2026-10-28/2026-07-07_chisel_widget_leaf_design.md)
   uses leaf to mean a custom-paint element inside a host's layout/input/paint
   machinery. That is a realization mechanism. A working surface may contain
   such leaves, ordinary document content, or another scene.
@@ -576,7 +576,7 @@ Selection, activity and where something is presented are separate concerns.
 Mark's example for identity was two browser tabs both showing Google: they
 are two accessings of the content, even when they share the same resource.
 
-*Inherited semantics:* the [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md),
+*Inherited semantics:* the [graph semantics plan](archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md),
 especially rulings 6 and 19 and its placement table, already distinguishes
 resources from surfaces. Resource identity and content statements are shared;
 surfaces retain independent traversal, arrangement and layout containment,
@@ -620,7 +620,7 @@ Keep these controls distinguishable:
 | Position pin | Keep its position fixed against dynamics. |
 | Forme layout lock | Guard the explicit editing of the workbench arrangement. |
 
-The [dynamics grammar plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md)
+The [dynamics grammar plan](archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md)
 owns the existing arrangement roles and their realization. This record gives
 the interaction intent; it does not declare a new dynamics role or storage
 schema.
@@ -675,7 +675,7 @@ user themes and supports forking a user copy. Woodshed's
 `e08bf4b9875a7efb02b1c17bf9fac56708712cee` has Slate, Ember, Light, Dusk,
 Meadow and Parchment definitions represented as built-in Tabard themes. These
 are precedents for variety, not a ruling to impose those six defaults on every
-app. The [theme modes plan](mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md)
+app. The [theme modes plan](archive_docs/2026-10-28/2026-07-05_theme_modes_plan.md)
 owns its implementation history and remaining consumer work.
 
 Mark also named **Emblem and Pictograph for iconography**. The existing roles
@@ -721,7 +721,7 @@ affects dynamics. No implementation completion is inferred from this record.
 | Tabard and appearance consumers | Configurable themes, varied defaults, installed-font choice with openly licensed defaults. |
 | Iconography consumers | Emblem for vector graphics and Pictograph for derived node faces, integrated with theme palettes. |
 
-The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md),
+The [Scenograph editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md),
 [Cambium architecture](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md),
 and the other owning plans linked above remain the implementation homes.
 Apps can cite this section as the shared design direction rather than copying
@@ -785,13 +785,13 @@ examples into a finished specification or new implementation assignments.
    membership does not automatically install a force. Exact marks, reveal
    controls and contribution attribution remain open.
 
-The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+The [Scenograph editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md)
 carries selection/preview and scene-authoring consequences; the
-[field regions plan](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
+[field regions plan](archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md)
 carries scoped behavior and composition questions; the
-[dynamics grammar plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md)
+[dynamics grammar plan](archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md)
 carries force explanation and constraints; the
-[theme modes plan](mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md)
+[theme modes plan](archive_docs/2026-10-28/2026-07-05_theme_modes_plan.md)
 carries theme application and font-role research. Existing work order and
 viewer ownership holds stand. This pass records direction, not runtime proof.
 Tabard's §9.6 source links were corrected to its current system-crate home.
@@ -829,7 +829,7 @@ remain usable even when no force is attached. A field's rules and membership
 need an inspectable representation as well as its geometry. Shared source
 attributes stay with their owner while per-view choices stay with the view.
 
-The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+The [Scenograph editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md)
 carries the proposed reference-host proof and the
 [facet dissolution brief](mere_docs/research/2026-10-08_facet_dissolution_brief.md)
 retains its graph-semantics ownership. Graphshell is the reference host for
@@ -867,14 +867,14 @@ same mixed-content scene across three editable starting treatments (paper
 and ink, workshop, night), independently of arrangement and representation.
 These are study presets, not prescribed palettes for every application.
 
-The [Scenograph editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md)
+The [Scenograph editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md)
 owns track R1 for the shared declarative model and first interactive study.
 Production host adoption and the Rhai runner are separately qualified there.
 
 ### 9.11 Forme draft session (2026-10-10)
 
 **Agreed interaction; Graphshell adapter implemented, headed qualification pending.**
-The [editor plan's draft progress](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#workbench-forme-draft-2026-10-10)
+The [editor plan's draft progress](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#workbench-forme-draft-2026-10-10)
 records its scoped native/build checks; other-host adoption remains separate.
 Mark described unlocked nodes
 as tile handles: dragging a handle previews the corresponding tile region,
@@ -910,7 +910,7 @@ pin, foreground pin and dynamics controls retain their separate meanings.
 This interaction settles how layout edits are drafted and accepted; it does
 not require another force-composition model or prescribe a scene's appearance.
 
-The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
+The [editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#forme-draft-follow-through-2026-10-10-agreed-interaction)
 maps the shared history and layout substrate to implementation steps and
 qualification. The first Graphshell adapter now implements the draft and saved
 arrangement undo, with its interactive check pending; this agreement and source
@@ -993,7 +993,7 @@ context, Pelt retained document viewing, and Turnstone their browsing
 composition, as the [suite census](2026-08-22_turnstone_suite_composition_and_capability_census.md)
 describes. The composition is direction, not evidence of this bridge shipping.
 
-The [editor plan](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
+The [editor plan](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#mixed-content-study-2026-10-10-proposal-not-opened)
 records candidate steps and done-conditions. A study matrix may compare theme
 on one axis with representation or arrangement on another; the shipped grid's
 axis contract is not expanded by this proposal. Keep source material and access
@@ -1055,8 +1055,8 @@ by renaming Clear to Reset. Depth and richer scenery also require a forcing
 consumer; today's portable 2D transform/footprint contract does not establish
 a complete spatial scene implementation.
 
-The [editor's B1 follow-through](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86-amended-by-se90),
-[dynamics plan](mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
+The [editor's B1 follow-through](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#b1--backdrops-in-the-graphshell-viewer-se86-amended-by-se90),
+[dynamics plan](archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md#backdrop-control-correction-2026-10-10)
 and [ambiance continuation](mere_docs/design/2026-09-23_ambiance_design.md#backdrop-and-context-distinction-2026-10-10)
 carry this correction. The shared design is recorded here; controls, legacy
 mode migration and richer input/runtime behavior remain implementation and
@@ -1101,9 +1101,9 @@ design allocation, not a new runtime receipt or a dispatch to another agent.
 ### 9.15 Field and primitive editor draft (2026-10-10)
 
 Mark asked the projection grammar lane to proceed with its assigned design
-work. The [field authoring draft](mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
+work. The [field authoring draft](archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md#field-authoring-draft-2026-10-10)
 specifies member/extent, placement, influence, projection, action and appearance
-controls. The [primitive editor draft](mere_docs/implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
+controls. The [primitive editor draft](archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#primitive-editor-draft-2026-10-10)
 specifies inspect/edit flows for content accesses, Resources, scene appearances,
 link bundles/source records and fields. These are reviewable proposals, not
 additional rulings. The established selection fundamentals and agreed forme
@@ -1212,7 +1212,7 @@ as the motivating example. He asks whether additional strata, such as tagging
 or indexing, are definable, and how SPARQL fits. He authorized a draft and an
 update to the terminology reference.
 
-The [graph semantics draft](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md#7-strata-and-query-driven-views-draft)
+The [graph semantics draft](archive_docs/2026-10-28/2026-10-04_graph_semantics_plan.md#7-strata-and-query-driven-views-draft)
 owns the definitions, candidate admission questions and proposed first tagging
 view. The [terminology reference](TERMINOLOGY.md) distinguishes established
 definitions from this draft refinement. Tags remain resources under the

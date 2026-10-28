@@ -70,7 +70,7 @@ After **Comms** (in flight), the first three:
 
 ## Donor harvest per pane (shapes, not crates to revive)
 
-- **register-theme → harvest now** for edge styling (P3 of the [nav-lineage plan](../implementation_strategy/2026-06-05_node_navigation_lineage_wiring_plan.md)). `edge_style.rs` (`EdgeStyleToken`, non-color signatures, endpoint markers, validation) is directly useful. **Correction:** the live kernel has **six** families (incl. `Provenance`); the donor has five — map forward, don't copy the enum. First insertion: `platen/platen/src/canvas_scene.rs` (~`family_color`), which already keeps `RelationKind`/tags.
+- **register-theme → harvest now** for edge styling (P3 of the [nav-lineage plan](../../archive_docs/2026-10-28/2026-06-05_node_navigation_lineage_wiring_plan.md)). `edge_style.rs` (`EdgeStyleToken`, non-color signatures, endpoint markers, validation) is directly useful. **Correction:** the live kernel has **six** families (incl. `Provenance`); the donor has five — map forward, don't copy the enum. First insertion: `platen/platen/src/canvas_scene.rs` (~`family_color`), which already keeps `RelationKind`/tags.
 - **register-diagnostics → Apparatus** (not bulk adoption): the `emit` scaffold is serviceable; prune the old-host channel set around current `meerkat`/`armillary`/`inker`/`platen` terms. `ux-events` is the cleaner first feed.
 - **register-input → latent** (real binding/remap/conflict machinery): adopt when **Settings** grows shortcut editing, not before.
 - **register-lens → latent but valuable**: translate the named physics profiles into `gyre` / `arrangements` settings; do not recreate a lens registry as an authority (gyre owns runtime force integration).

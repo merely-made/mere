@@ -18,7 +18,7 @@ domain → host pattern as the chrome. It closes the [modular integration
 plan](../2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md)'s **gap #7** ("murm/moot
 unsurfaced") and its **S5** (comms surface), and is the on-screen form of the
 inherited `COMMS_AS_APPLETS` family the [protocol architecture
-plan](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) names.
+plan](../2026-10-28/2026-05-05_protocol_architecture_plan.md) names.
 **Grounded in**: a read of the actual crates this session (misfin, errand,
 nematic, murm, the chrome domain) against the 2026-06-05 tree.
 

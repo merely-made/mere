@@ -788,12 +788,12 @@ controller in `pelt-core`) and S8 (page accessibility).
 
 ## 10. Cross-references
 
-- [Stack seams plan](../../mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md):
+- [Stack seams plan](../../archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md):
   P2 and rulings S23 to S31; F16 to F20.
 - [One state, N windows design](../../mere_docs/design/2026-07-05_one_state_n_windows_design.md).
 - [Cambium architecture](../technical_architecture/2026-09-03_cambium_architecture.md):
   external viewport producers; Mesquite paint sidecars.
-- [Dynamics grammar plan](../../mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md):
+- [Dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md):
   G9, F65 (child buttons for actions).
 - [Tear-out composability plan](../../archive_docs/2026-07-04_completed_plans/2026-06-19_tearout_composability_plan.md),
   [tear-out gestures plan](../../archive_docs/2026-10-06_completed_plans/2026-06-24_tearout_gestures_plan.md),
@@ -959,7 +959,7 @@ many bytes a real frame takes. Two existing plans bear on this:
   (`turnstone/design_docs/2026-07-28_turnstone_peer_web_reframe.md`, P4).
 - The Commons calls plan makes screen sharing a later product, and its first
   slice "must not create abstractions for them"
-  (`mere_docs/implementation_strategy/2026-07-27_commons_calls_plan.md`).
+  (`archive_docs/2026-10-28/2026-07-27_commons_calls_plan.md`).
 
 **F17. Prior art.** *Reading, not ruled.* B2 corresponds to the iframe and B3
 to a custom element with a shadow root. The web made this choice once already,

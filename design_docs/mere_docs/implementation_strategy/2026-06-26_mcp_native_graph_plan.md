@@ -24,9 +24,9 @@ only as a string literal
 (`crates/system/registry/src/mod_loader/loader/registry/registry_default.rs:71`),
 `Command::ALL` has no hits (the agent harness went with meerkat), and the command
 registry plan is retired. Two live plans now schedule MCP as an optional adapter: the
-[Graphshell reference host plan](2026-07-27_graphshell_reference_host_plan.md)'s H9, over
+[Graphshell reference host plan](../../archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md)'s H9, over
 Graphshell's projection, query and intent grammar, and the
-[djinn family resident services plan](2026-08-22_djinn_family_resident_services_plan.md)'s
+[djinn family resident services plan](../../archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md)'s
 F2, over djinn's authenticated agent door.
 
 **Open, raised by the S14 pass (2026-10-06):** which substrate does the expose half ride
@@ -45,7 +45,7 @@ outbound half of the same boundary.
 - **Capability gating.** Exposed mutating tools sit behind the in-app permission spine
   (the [capability-gate catalogue](../research/2026-05-14_capability_gate_catalogue_brief.md)),
   with consent. Read scope can reuse the federation capability work
-  ([federation_interop](2026-06-26_federation_interop_plan.md)) when an external agent's
+  ([federation_interop](../../archive_docs/2026-10-28/2026-06-26_federation_interop_plan.md)) when an external agent's
   reach should be a scoped subgraph rather than the whole space.
 - **Provenance.** Every external-agent mutation asserts a `ProvenanceSubKind` edge (the
   borrowed-ideas brief's assert-on-every-agent-mutation rule), so external action stays
@@ -105,11 +105,27 @@ Questions for Mark:
   `ActionRegistry` that becomes the MCP tool set.
 - [capability-gate catalogue brief](../research/2026-05-14_capability_gate_catalogue_brief.md):
   the gating the exposed tools sit behind.
-- [federation_interop plan](2026-06-26_federation_interop_plan.md): capability-scoped read
+- [federation_interop plan](../../archive_docs/2026-10-28/2026-06-26_federation_interop_plan.md): capability-scoped read
   for external agents.
 - [document_script_substrate plan](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md),
   [local_models_harness brief](../research/2026-06-24_local_models_harness_brief.md): the
   agentic lanes this complements.
+
+## Received 2026-10-28: the reference host's H9 surfaces
+
+The Graphshell reference host plan (`archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md`,
+archived whole in the 2026-10-28 cut) opened its H9, "open the surface to
+applications and AI": the first-party application door and the Turnstone
+receipts client landed, and the AI and MCP surfaces stayed open. This plan owns
+that remainder, since the adapter above is the MCP surface.
+
+- H9's done-condition: a user, an application and a granted agent inspect the
+  same scene and invoke the same action through three adapters.
+  From: `archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md:1460-1476`
+- The H9 landing claims (door, receipts client) and the verification wall's
+  behavioural receipts stay in the archived copy; what this plan can claim is
+  the stdio adapter above and its socket path and model-driven session, still
+  unrun (Progress, 2026-10-25).
 
 ## Progress
 

@@ -30,7 +30,7 @@ stands? Nothing in Mere or Turnstone calls `gemtext_view`, `gopher_view` or
 `feed_view`; Turnstone, Pelt and Signalman read smolweb through
 `mere-document-lanes`' engine-native `EngineDocument` lane. Options: the
 per-format native views in `cambium::nematic::views` stand, and host integration
-stays open, carried by the [smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md);
+stays open, carried by the [smolweb fidelity plan](../2026-10-28/2026-07-01_smolweb_fidelity_plan.md);
 the `EngineDocument` lane stands, and this plan's two-family view model becomes
 historical.
 
@@ -276,7 +276,7 @@ Built so each phase stands alone and the early ones are genet-local and small.
 
 ## Cross-references
 
-- [smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md) — the successor that tracks this plan's spec-faithfulness gaps: enrich the parse ASTs (the losses are at parse time, not paint time), trust in the native lane (the genet lane drops the `DocumentTrustState` the card lane carries), and bespoke (regime B) rendering only where a format's line model is genuinely not box-shaped, gopher first. The A/B/C regime frame and the code-verified collapse inventory live there.
+- [smolweb fidelity plan](../2026-10-28/2026-07-01_smolweb_fidelity_plan.md) — the successor that tracks this plan's spec-faithfulness gaps: enrich the parse ASTs (the losses are at parse time, not paint time), trust in the native lane (the genet lane drops the `DocumentTrustState` the card lane carries), and bespoke (regime B) rendering only where a format's line model is genuinely not box-shaped, gopher first. The A/B/C regime frame and the code-verified collapse inventory live there.
 - djot editor + knot nodes plan (`mere/design_docs/archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md`) — owns the document-family block→view mapper (Phase D); its 2026-06-27 reframe set the direct-to-genet-views render path this plan shares.
 - illume text lexer plan (`mere/design_docs/mere_docs/implementation_strategy/2026-06-26_illume_text_lexer_plan.md`) — the portable-core + tinct + genet-renderer + host-bridge pattern this mirrors; the entity pass reused inside gemtext prose.
 - [polyglot knot design](../../nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md) — the knot format the capture path lowers into; `knot/expand.rs` shares the smolweb parse functions.

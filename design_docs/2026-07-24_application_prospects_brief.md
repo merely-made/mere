@@ -24,7 +24,7 @@ intersect, because no incumbent holds that combination. The differentiators:
   identity the DOM itself carries);
 - p2p unicast and multicast over radio mesh and IP alike (retinue plus murm
   over p2panda, one service boundary per the
-  [low-power managed network plan](mere_docs/implementation_strategy/2026-07-24_low_power_managed_network_plan.md));
+  [low-power managed network plan](archive_docs/2026-10-28/2026-07-24_low_power_managed_network_plan.md));
 - local inference and embeddings (vates, sibylla, the burn lanes);
 - an owned rendering engine embeddable behind `genet-host-api`;
 - a portable scene contract (sceno), already consumed by mere, isometry, and

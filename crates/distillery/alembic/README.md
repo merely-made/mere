@@ -8,7 +8,7 @@ boundary.
 **Status (2026-10-25):** recall and the workshop’s shared records/read model
 are implemented. Enable `workshop` for versioned passage, proposal, review,
 acceptance and receipt records plus typed controls; this feature requires
-Serde only. Athanor supplies the deterministic domain and optional worker. The [Alembic plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+Serde only. Athanor supplies the deterministic domain and optional worker. The [Alembic plan](../../../design_docs/archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
 owns its first workflow: assemble an evidence brief from retained passages in
 Turnstone and Graphshell, review it, and apply it through each destination's
 owner. Servitor remains in Eidetic and supplies admission/run semantics;

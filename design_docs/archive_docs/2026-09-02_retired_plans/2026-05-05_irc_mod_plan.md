@@ -4,14 +4,14 @@
 **Status**: Draft / branching from the cross-cutting protocol architecture plan. **Reframed by the 2026-05-07 [moot-tiers brief](../../mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md):** Pattern A is now "thin-client routing — the moot links to an IRC channel and members open it via a `mooting-irc` adapter that doesn't translate IRC into moot semantics," and Pattern B is "outbound bridge in a separate `mere-bridge-irc` crate, not a `mooting-*` adapter, since IRC's wire format can't fully express tessera or engrams." The plan's T1 / T2 / T3 cost tiers also reinterpret through the new tier framework (orrery → moot → moothold → coalition). Re-read the moot-tiers brief before extending this plan.
 
 **Scope**: Concrete plan for IRC as the **first T1 protocol mod** in Moothold (per
-[`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) §5.5).
+[`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../2026-10-28/2026-05-05_protocol_architecture_plan.md) §5.5).
 Wraps the maintained [`irc`](https://crates.io/crates/irc) crate; lands as
 both Pattern A (user-orrery-pinned) and Pattern B (moot-relayed; puppet mode
 only) per the plan's pinning patterns.
 
 **Related**:
 
-- [Protocol architecture plan](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) §5.0–§5.5 — split rule, pinning patterns, cost tiers
+- [Protocol architecture plan](../2026-10-28/2026-05-05_protocol_architecture_plan.md) §5.0–§5.5 — split rule, pinning patterns, cost tiers
 - [Inherited IRC positioning](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/social/comms/2026-04-09_irc_public_comms_lane_positioning.md) — Graphshell-side public-lane framing (still relevant after the rename)
 - [Inherited COMMS_AS_APPLETS](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/social/comms/COMMS_AS_APPLETS.md) — applet surface family that consumes the mod
 - [`MURM_AS_BILATERAL.md`](../../murm_docs/technical_architecture/MURM_AS_BILATERAL.md) — Murm's boundaries (this mod sits in moothold, NOT murm; the protocol architecture plan §5.0 corrects MURM_AS_BILATERAL's earlier framing — IRC `/msg` lives with the network/channels in Moothold, not partitioned)
@@ -20,7 +20,7 @@ only) per the plan's pinning patterns.
 
 ## 1. Why IRC first
 
-Per [protocol architecture plan §5.5](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md), IRC has the right combination for a Phase 3 leadoff:
+Per [protocol architecture plan §5.5](../2026-10-28/2026-05-05_protocol_architecture_plan.md), IRC has the right combination for a Phase 3 leadoff:
 
 1. **T1 cost tier.** Wraps the maintained [`irc`](https://crates.io/crates/irc) crate. Weeks-of-work integration, not months-of-spec-implementation.
 2. **Stress-tests Pattern B end-to-end.** IRC needs a long-lived TCP connection — exactly the workload where moot-host-as-relay matters. Visitor doesn't have to keep the IRC socket alive; the moot does.

@@ -9,7 +9,7 @@
 //! A contract for an imperative custom-paint widget (a knob, meter, waveform,
 //! graph canvas) to live as one Genet element. It supplies sizing, paint and
 //! semantic hooks; each host must receive the hooks it supports. Design:
-//! `design_docs/cambium_docs/implementation_strategy/2026-07-07_chisel_widget_leaf_design.md`.
+//! `design_docs/archive_docs/2026-10-28/2026-07-07_chisel_widget_leaf_design.md`.
 //!
 //! This is the Path-A scaffold: a leaf paints by pushing common `PaintCmd`s
 //! (portable, tile-cached) which Genet splices into its paint list at the

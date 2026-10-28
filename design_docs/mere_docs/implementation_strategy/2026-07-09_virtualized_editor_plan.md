@@ -209,7 +209,7 @@ coordinate path uses the projection.
   blocked on this; the illume `folds`/`outline`/container-tree the model reads.
 - genet `docs/2026-07-08_chisel_widget_catalog.md`: the editor ladder + the arrangement /
   `VirtualWindow` tier-3 mechanism this consumes.
-- [illume text lexer plan](2026-06-26_illume_text_lexer_plan.md): the per-line highlight +
+- [illume text lexer plan](../../archive_docs/2026-10-28/2026-06-26_illume_text_lexer_plan.md): the per-line highlight +
   `folds` the render uses.
 
 ## Progress

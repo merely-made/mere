@@ -1,0 +1,763 @@
+# Djinn Family Resident Services Plan
+
+Tucket custody continuation (2026-10-16, qualified at the custody boundary): the owner selected a
+Djinn-backed Tucket identity before further Signalman physical qualification.
+Personae owns the device/realm derivation; Djinn releases that exact wallet
+child only on Signalman's admitted custody route. The Signalman port verifies
+the release and watches custody for the connection lifetime. Real-broker probes
+pass absent, Locked and no-wallet refusal, stable identity on reopen, wrong-app
+release/sign/attest refusal, and independent lock/resident-loss closure. Both
+custody policy tests pass. A deliberately restored local-seed fallback fails
+the absent and Locked controls; the exact clean source is restored and the
+rebuilt clean executable passes all six probes. See
+[`testing/receipts/tucket-custody`](../../../testing/receipts/tucket-custody/README.md).
+Signalman's port/example pass strict Clippy; strict Djinn Clippy is blocked by
+existing sync/door diagnostics recorded with the receipts.
+The consumer/runtime and radio gates remain in
+`murm/design_docs/2026-10-13_murm_family_move_plan.md`, R6. This bounded custody
+extension does not claim the planned resident service phases below.
+
+**Status (2026-10-06):** Phases A to G are planned and still gated on the
+`djinn 0.0.2` release (§2): djinn is version 0.0.2, but its knot-site
+dependency is Git-only, so `cargo package` would refuse it. §13's ordinary
+Gemini publication service was implemented and receipted outside that gate on
+2026-09-13 (`ports/djinn/src/resident_site.rs`,
+`ports/djinn/src/bin/djinn_site.rs`). A4 is partly built: Luggage's
+`ReleaseRefV1` landed in `d10e04da` (2026-09-01) for the WebRTC carrier, while
+`ReleaseOfferV1` and the versioned manifest are open.
+**Date:** 2026-08-22
+**Amended:** 2026-09-04, notification ownership name corrected; 2026-10-01,
+Gazette row added (Mark's ruling 6 in the
+dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`))
+
+**Related:**
+
+- [auto-update brief](../../2026-07-22_auto-update_brief.md)
+- [browser WebRTC carrier](2026-08-25_browser_webrtc_carrier_plan.md)
+- [browser/native carrier research](../research/2026-08-25_browser_native_webrtc_carrier_probe.md)
+
+## 1. Decision
+
+Djinn is the product-neutral desktop resident for the Merely family. It owns
+the lifetime and local projection of device services that must work while no
+application is running. Applications render those services and send intents;
+they do not each carry background polling, discovery, notification, or update
+loops.
+
+The resident composes domain crates rather than absorbing their semantics:
+
+| Concern | Owner |
+|---|---|
+| Process lifetime, scheduling, installed-app inventory, local projections | Djinn |
+| Update policy grammar, signed feeds, verified staging, platform apply | Luggage |
+| Distillation, cleanup, and facet proposals | Athanor |
+| Notification records and delivery rules | Notification domain (`notifications` is the working package name) |
+| Authenticated streams and DNS-SD mechanics | Murm |
+| Local caller identity and durable secret authority | Personae and Castellan |
+| Directory resolution, feed polling, contact intake, announcing a persona's well-known documents | Gazette (ruled 2026-10-01; unbuilt) |
+| Firmware compatibility and flashing | Linkboy |
+
+**Corrected 2026-10-06 (S14 pass):** Gazette is not unbuilt. `ports/gazette`
+exists, and its manifest reports "Built today: ... WebFinger (RFC 7033)
+resolution and unverified Gaz address intake" (`ports/gazette/Cargo.toml`,
+line 7). What is unbuilt is the djinn composition: djinn has no gazette
+dependency.
+
+Djinn contains the scheduler. Athanor is one scheduled service and remains a
+proposal emitter; it does not become the generic scheduler or directly mutate
+graph truth.
+
+## 2. Entry gate: publish the resident baseline
+
+This work starts after `djinn 0.0.2` and its public dependency chain are
+published and pinned by a clean consumer. The current source version is not
+that receipt: packaging still stops at workspace dependencies without registry
+version requirements, beginning with `cambium` through `knot-editor`.
+
+Done conditions:
+
+1. `cargo package -p djinn --locked` succeeds from a clean checkout.
+2. `djinn 0.0.2` is published with the resident positioning already landed.
+3. A clean external probe resolves `djinn = "0.0.2"` without path or Git
+   substitutions and starts the resident fixture.
+4. The release commit and package contents are recorded before any work below
+   changes the public API.
+
+This plan targets the next source version. It does not fold new services into
+the `0.0.2` release.
+
+**Open, raised by the S14 pass (2026-10-06):** §13's ordinary Gemini service
+shipped on 2026-09-13 without passing this gate. How does the plan hold that?
+Options: scope this entry gate to Phases A to G only; split §13 into its own
+plan.
+
+## 3. Invariants
+
+1. An application never needs to be running for checks, downloads, or honest
+   update status to advance.
+2. Update policy is per installed application and configurable: off, notify,
+   download then ask, or automatic; channel, cadence, and metered-network
+   behavior remain explicit.
+3. A store, distro, or enterprise-managed installation is reported as
+   externally managed and is never overwritten by Djinn or Luggage.
+4. Release keys are offline product keys, separate from Personae identity.
+5. Manifest and artifact verification both happen before staging. Apply
+   revalidates the complete persisted offer, not only the artifact digest.
+6. A staged offer is bound to an application id, target, version, artifact
+   format, canonical installation root, digest, and signed manifest.
+7. Djinn never crosses an installation privilege boundary. Elevated or
+   system-owned installs remain externally managed.
+8. `Applied` means the newly launched binary reported its actual version. An
+   installer spawn or process exit is not an apply receipt.
+9. DNS-SD advertises only enabled service records. It does not disclose a
+   persona, vault, place, document, or release key.
+10. Firmware may use the signed artifact envelope, but Djinn never flashes a
+    device. Linkboy owns compatibility checks, consent, transfer, and apply.
+11. A release reference is a signed-manifest hash plus publisher-key identity.
+    It carries neither a feed nor authority to trust that publisher.
+12. Advertising, resolving, or joining a release never changes an installed
+    application's trusted publisher, feed, channel, or update policy.
+
+## 4. Phase A: make Luggage a durable resident boundary
+
+### A1. Extract the proven policy grammar
+
+Hocket currently owns the first real implementation of `UpdatePolicy`,
+`UpdateChannel`, `UpdateStatus`, `decide`, and the update worker. Move the
+product-neutral types and pure decisions into Luggage rather than copying them
+into Djinn.
+
+Add the missing policy axis from the auto-update brief:
+
+- metered-network behavior;
+- an explicit externally-managed state;
+- durable timestamps for last attempt, last success, and next eligible check;
+- failure phase and reason without a generic working state.
+
+Hocket-specific settings projection and rendering stay in Hocket until the
+resident migration in Phase C.
+
+Done conditions:
+
+- Hocket and a Luggage-only test consumer use the same public policy and status
+  types;
+- the four policies have table tests covering check, download, consent, and
+  apply decisions on metered and unmetered networks;
+- unknown persisted policy values fail visibly rather than silently changing
+  behavior;
+- no UI, Genet, Graphshell, or Djinn dependency enters Luggage.
+
+### A2. Persist a self-sufficient verified offer
+
+The current `Update::install_staged(&self, &StagedUpdate)` still requires the
+ephemeral `Update` returned by the original feed check. A fresh application
+holding only `StagedUpdate` cannot apply it. The current stage record also
+stores mutable format and extraction-path fields while rechecking only the
+artifact BLAKE3 digest.
+
+Replace that handoff with a self-sufficient staged offer. The exact API may be
+refined during implementation, but it must support this operation:
+
+```rust
+StagedUpdate::apply(expected_app, current_executable)
+```
+
+The stage persists the signed manifest bytes and signature, the artifact
+signature, and the fields required to reconstruct the verified release. Apply
+rechecks the manifest signature, artifact signature and digest, application
+identity, target, version ordering, format, and permitted install root.
+
+Applying returns an explicit disposition such as `RelaunchStarted`,
+`AppliedExitRequired`, or `Deferred`; callers do not infer process behavior
+from `Ok(())`.
+
+Done conditions:
+
+- a fresh process applies a stage without checking the network or retaining an
+  `Update` object;
+- tampering with any persisted offer field is refused;
+- a valid artifact staged for one application or target cannot be applied to
+  another;
+- interrupted record/artifact writes recover as absent or resumable, never as
+  a valid partial stage;
+- Windows, macOS, and Linux tests cover the process disposition expected from
+  each installer format.
+
+### A3. Preserve rollback and channel history
+
+Luggage persists the highest accepted release per application and channel.
+Older signed releases remain authentic but are refused as automatic updates.
+An explicit rollback, if later wanted, requires a separate user-authorized
+operation and receipt.
+
+### A4. Name a release independently of its feed and target
+
+The browser/native session is the second consumer that forces Luggage's signed
+manifest to become a portable release identity. Add a Wasm-clean release
+envelope, owned and re-exported by Luggage:
+
+```rust
+pub struct ReleaseRefV1 {
+    pub manifest_blake3: [u8; 32],
+    pub publisher_key_id: [u8; 32],
+}
+```
+
+`manifest_blake3` hashes the exact manifest bytes covered by the detached
+signature. `publisher_key_id` is a domain-separated BLAKE3 digest of the
+canonical decoded minisign public-key bytes. It is a lookup and display
+identity, not a trust grant. A resolver accepts manifest bytes and their
+detached signature from any carrier, then verifies them against a separately
+trusted publisher key.
+
+Version the signed manifest and add the cross-platform facts the current
+updater-only shape lacks:
+
+- stable application id and release version;
+- source repository and revision;
+- supported invitation and application-protocol versions;
+- artifacts keyed by kind and target, including native installer, browser
+  bundle, and later firmware;
+- BLAKE3 digest, minisign signature, and format per artifact.
+
+One manifest names one release family. Its Windows, Linux, macOS, and browser
+artifacts have different hashes. The source revision is a signed publisher
+claim, not reproducible-build proof.
+
+Keep byte locations outside that identity. `ReleaseOfferV1` pairs a
+`ReleaseRefV1` with disposable per-artifact locators supplied by a feed, native
+host, HTTPS mirror, or peer. Changing mirrors must not change the release
+reference. The offer is never trusted: only bytes matching an artifact in the
+verified manifest may advance. The current v1 `luggage.json` embeds artifact
+URLs, so v2 needs a compatibility reader and a split writer rather than
+silently reinterpreting old manifests.
+
+Keep the envelope verifier free of filesystem, HTTP, installer, Djinn,
+Graphshell, and Genet dependencies so the stable `mer3ly.net` bootstrap loader
+can verify a browser bundle before executing it. The native Luggage crate keeps
+feed polling, staging, and platform apply around that core.
+
+Done conditions:
+
+- native and `wasm32-unknown-unknown` consumers derive the same
+  `ReleaseRefV1` from frozen signed-manifest vectors;
+- changing application id, source revision, compatibility, or artifact digest
+  invalidates the manifest signature and reference;
+- changing only `ReleaseOfferV1` locators leaves the reference unchanged and
+  cannot make mismatching bytes verify;
+- a reference carrying an unknown publisher id remains resolvable but is never
+  described as trusted;
+- the same verified artifact bytes are accepted from HTTP, a directory, and an
+  injected in-memory source without changing the verifier;
+- selecting a browser artifact cannot select a native installer or firmware
+  entry with the same target spelling.
+
+**Corrected 2026-10-06 (S14 pass):** A4 is partly built, which this section
+did not record. `ReleaseRefV1` exists at `crates/system/luggage/src/release.rs`
+(line 62), landed in `d10e04da` (2026-09-01), and
+`murm/native/crates/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
+versioned manifest are absent.
+
+**Open, raised by the S14 pass (2026-10-06):** `ReleaseRefV1` landed for the
+WebRTC carrier rather than through this phase. Where is it credited? Options:
+credit A4 as partial here; leave it to the
+[browser WebRTC carrier plan](2026-08-25_browser_webrtc_carrier_plan.md).
+
+## 5. Phase B: add the family update resident to Djinn
+
+### B1. Installed-app inventory
+
+Add a versioned, device-local registry of installed family applications. An
+installer writes or updates its own record; arbitrary application processes do
+not choose another application's executable or release key.
+
+Each record carries at least:
+
+- stable application id and display label;
+- install owner: self-managed or externally managed;
+- canonical executable and allowed installation root;
+- platform target and artifact formats;
+- stable release-key identity;
+- feed per configured channel;
+- per-app update policy and stage directory.
+
+An offered `ReleaseRefV1` may use an existing record only when its verified
+application id and publisher key match. Adopting a fork is an explicit change
+to both the trusted publisher key and configured feed; accepting its live
+session is not that change.
+
+Paths are canonicalized and constrained to the registering installation. A
+record cannot contain an arbitrary command line for Djinn to execute.
+
+Done conditions:
+
+- registration, replacement, removal, malformed records, path escapes, and
+  externally managed installs have focused tests;
+- installer registration is atomic and idempotent;
+- uninstall removes the registration and stage without touching another app;
+- a copied development binary is not guessed to be an installed app.
+
+### B2. Resident polling and staging
+
+Add `FamilyUpdateResident` to Djinn. It loads the inventory, evaluates each
+application's policy, schedules eligible checks, invokes Luggage, and persists
+status transitions. Cadence, concurrency, retry, jitter, channel, and metered
+behavior are policy inputs rather than hardcoded product defaults.
+
+The resident must distinguish:
+
+- disabled;
+- externally managed;
+- waiting for the next eligible check;
+- checking;
+- available;
+- awaiting download consent;
+- downloading;
+- staged;
+- awaiting install consent;
+- apply on next launch;
+- applied and confirmed;
+- failed with phase, reason, and retry eligibility.
+
+Djinn attempts every service shutdown and reports every failure through the
+existing `distillery::lifecycle` close report.
+
+Done conditions:
+
+- two fake installed apps on different policies advance independently under a
+  deterministic clock;
+- closing every app does not stop checks or downloads;
+- metered refusal and later unmetered resumption are chronological tests;
+- a resident restart restores the exact durable status and never repeats an
+  apply already acknowledged by the new binary;
+- one broken feed does not block another application's schedule;
+- shutdown cancels network work, preserves valid stages, and leaks no task.
+
+### B3. Local status projection and intents
+
+Project the durable application statuses through Djinn's admitted local
+surface. Hosts render the projection and submit typed intents for check now,
+download, approve install, defer, discard, and policy changes.
+
+The projection does not expose feed credentials, release keys, installation
+paths, or staged bytes. Caller admission precedes every mutation.
+
+## 6. Phase C: migrate Hocket and prove the second consumer
+
+Hocket is the first application migration because its update policy, worker,
+Luggage transport, CLI, settings provider, and three-host receipts already
+exist.
+
+1. Move its current device-local update settings into the Djinn app record
+   through an idempotent migration.
+2. Remove Hocket's automatic check/download worker and in-memory Luggage
+   transport.
+3. Keep only the status renderer, explicit user intents, and the early startup
+   hook that asks Luggage to apply an approved stage before Genet, winit, or
+   the audio engine starts.
+4. If Djinn is unavailable, report that the resident updater is unavailable;
+   do not silently resurrect an application-owned polling loop.
+5. Retain an explicit release-test command that exercises the same resident
+   service rather than a second implementation.
+
+Done conditions:
+
+- a signed Hocket update is discovered and staged while Hocket is closed;
+- notify does not download, download-then-ask does not apply without approval,
+  and automatic applies at the next natural launch;
+- Hocket reports its launched version to Djinn, which alone advances the state
+  to applied;
+- the existing Windows, macOS, and Linux installed-update receipts pass through
+  the resident path;
+- Hocket contains no periodic feed poll or background update worker afterward.
+
+## 7. Phase D: Djinn updates itself
+
+Djinn cannot rely on an always-running process to replace itself. The
+platform launcher owns the final handoff:
+
+- Windows Task Scheduler;
+- a launchd user agent on macOS;
+- a systemd user unit, or the selected equivalent, on Linux.
+
+Djinn stages and records intent, then exits cleanly. The launcher invokes the
+verified Luggage apply path before starting the resident again. Store locks and
+network endpoints are released before apply. The new resident reports its
+version and the launcher retains a recoverable previous installation until the
+startup receipt succeeds.
+
+Done conditions:
+
+- the resident updates itself from `N` to `N+1` without a second live owner;
+- failure before replacement restarts `N`; failure after replacement restores
+  or explicitly offers the working previous version;
+- the scheduled-task identity and profile selection survive the update;
+- no general elevated update service is introduced.
+
+## 8. Phase E: extract the resident scheduler through real jobs
+
+Extract a small scheduler only after the update resident is working. Its first
+two consumers are family updates and one Athanor maintenance pass. Gazette's
+feed polling is a later consumer (ruled 2026-10-01); it does not change the
+first two.
+
+The common contract is limited to:
+
+- due-time calculation under an injected clock;
+- cancellation and orderly shutdown;
+- configurable jitter, retry, and missed-run behavior;
+- durable last-run and next-eligible facts;
+- structured outcome reporting.
+
+Athanor still emits proposals. The authority that owns the affected store
+reviews or applies them under its existing policy.
+
+## 9. Phase F: notifications, agent door, and DNS-SD
+
+### F1. Notification delivery
+
+Update availability, consent requests, staged updates, and failures provide
+the first concrete resident consumer. A product-neutral notification domain
+owns `NoticeRecord`, `DeliveryRule`, deduplication, acknowledgement, expiry, and
+delivery semantics. `notifications` is a working package name, not a public
+product identity. Djinn owns the service lifetime and local projection. Hosts
+choose presentation.
+
+The earlier Redshank assignment is retired. Redshank is the listening and
+timed-annotation product incubated in Woodshed; it has no ownership role in
+Djinn's resident notification service.
+
+### F2. Authenticated agent door
+
+Djinn may own one authenticated local socket for agent clients. Personae and
+Castellan decide caller and secret authority. MCP is an optional adapter over
+that local service, not Djinn's native domain model. Remote listeners are out
+of scope until a concrete consumer supplies an admission and disclosure model.
+
+### F3. DNS-SD advertisement
+
+Murm implements DNS-SD browsing and advertisement. Djinn supplies the registry
+of enabled resident services and their disclosure-safe records. LAN discovery
+is configurable and preferred for local reachability; it does not create
+authorization and does not replace owner-selected relays outside the LAN.
+
+The peer-discovery substrate this advertises beside is recorded as R0 of the
+[reachability rungs plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
+(2026-09-01); `P2pandaHostPolicy` in `murm/native/crates/transport/src/p2panda_host.rs`
+is where an advertisement toggle plugs in.
+
+Done conditions for Phase F:
+
+- an update notification appears once, survives a host restart, and can be
+  acknowledged from two different hosts without duplicate delivery;
+- an admitted local agent can enumerate only its allowed tools and receives no
+  durable secret material;
+- two LAN devices discover an enabled service without a relay, while an
+  unconfigured service and all persona identifiers remain absent from DNS-SD;
+- disabling discovery withdraws the advertisement and leaves underlying
+  authorization unchanged.
+
+## 10. Phase G: firmware artifacts without resident flashing
+
+Extend Luggage's signed manifest envelope with an explicit artifact kind and
+firmware compatibility facts: board, hardware revision, region, minimum
+bootloader, and image digest. These are signed fields.
+
+Djinn may check, download, and stage a compatible-looking firmware offer for a
+registered device family. Linkboy independently validates the device and offer,
+obtains consent, transfers bytes, flashes, and reports the resulting firmware
+version. A desktop automatic policy never implies automatic firmware flashing.
+
+## 11. Release and review gates
+
+Each phase lands as an independently buildable slice. Before a new public
+release:
+
+1. run Luggage and Djinn focused suites with a deterministic clock and fake
+   feeds;
+2. run Hocket's installed update cycle on Windows, macOS, and Linux;
+3. review canonical-path handling, signed-offer reconstruction, anti-rollback,
+   release-reference resolution, publisher-key changes, local caller admission,
+   stage permissions, and launcher privilege;
+4. inspect packaged crate contents and verify every public dependency resolves
+   from the registry;
+5. retain app-authored receipts for applied version and resident-authored
+   receipts for schedule and status chronology.
+
+## 12. Non-goals
+
+- a universal daemon framework shared by unrelated products;
+- a public MCP, Knot, Misfin, Gemot, or relay service without its own forcing
+  consumer and admission model;
+- silent firmware flashing;
+- replacing distro, store, or enterprise package managers;
+- treating DNS-SD reachability as authorization;
+- making Athanor a graph-truth authority;
+- staged percentage rollout infrastructure before a release operator needs it.
+
+## 13. Ordinary site serving and governed replication (2026-09-11 scope)
+
+**Status:** ordinary saved-snapshot service implemented; local resident retrieval
+and restart acceptance passed. Knot's in-process serving remains available. Djinn now has a separate
+owner-controlled Gemini publication route and CLI, described below. The separate
+governed Gemini/Scroll/Micron caller has native process qualification; main-broker
+attachment and peer acquisition retain their own gates. This does not complete
+the resident release gate or the earlier phases above.
+
+### Verified composition seams
+
+**2026-10-22 governed Micron continuation:** the separate caller
+adds the optional `moot-site-nomadnet` backend with a persistent host destination,
+explicit bounded policy and per-request publication authority. Retinue owns
+transport; Armillary owns application task shutdown. Native controls and the
+Gemini, Scroll and Micron process fixtures pass on integrated source `1f660dcb4`,
+with exact bytes, restart identity, reused-link authority changes and joined
+shutdown. Scope, exact evidence and done-conditions
+live in the [shared site plan](2026-10-20_shared_site_model_plan.md#governed-micron-resident-2026-10-22).
+Browser receiving, client limits and external Python/Go/radio qualification stay
+separate.
+
+**2026-10-20 shared-model extraction:** portable site configuration, native page
+metadata and canonical `PublishedSnapshotV1` records move from `knot-site` to
+`mere-site` (`crates/domain/site`). Djinn imports those records directly; Knot
+retains file-source and protocol adapters. Existing snapshot bytes, digests,
+custody, certificate identity and listener policy stay unchanged. Scope and
+receipts: [shared site model plan](2026-10-20_shared_site_model_plan.md).
+
+**2026-10-22 governed Scroll continuation:** the separate `djinn-moot-site`
+caller extends the already qualified Gemini publication composition with an
+explicit persisted Scroll transport, native Errand replies and the same
+per-request collection authority/TLS/task scope. The integrated receiving build,
+13 focused host controls and both native product process fixtures pass. Exact
+source/binary identities and ownership limits are tracked in the
+[shared site plan](2026-10-20_shared_site_model_plan.md#governed-scroll-resident-2026-10-22).
+This does not change the ordinary snapshot-handoff route, release gates or
+main-broker attachment.
+
+`ports/djinn/src/resident.rs::DjinnResident` already composes device lifetime,
+resident Knot, identity and Distillery. `resident_knot.rs::ResidentKnot` keeps
+one source and optional personal sync host alive. `resident_blobs.rs` provides
+scoped blob custody and rebinds serving leases after restart. These are useful
+existing services. The bounded Gemini service below composes them without
+turning Djinn into a general application server.
+
+Errand's external `serve` module separates content through `Source` and
+`Item::Document` from protocol projection. `gemini-protocol::server` and
+`spartan-protocol::serve` own wire transactions. Knot's site model supplies
+bounded, immutable native bytes; it cannot hand a server an arbitrary script
+or mutable editor buffer. That same read-only content contract can support
+both a Knot-owned process lifetime and a later Djinn-owned lifetime.
+
+The [author-offline publication proof](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/research/2026-09-05_author_offline_publication_proof.md)
+already demonstrated author exit, retained content, scoped peer transfer and
+ordinary Gemini reading. Its production publication/hosting record ownership
+and cross-machine acceptance are separate gates, not daemon acceptance.
+
+### Concrete options
+
+| Option | Useful behavior | Authority and remaining gate |
+|---|---|---|
+| Knot owns the listener | An ordinary site is readable while the authoring application runs. | Knot selects saved files, shared protocol crates serve their snapshot, closing Knot stops the listener. Current implementation scope. |
+| Djinn holds published snapshots | Sites remain readable after Knot exits and resume according to a saved startup policy. | Knot explicitly transfers an immutable selected revision to a local authenticated service. Djinn retains bytes and owns listener lifetime. Preferred first persistent slice; requires the gates below. |
+| Djinn also composes governed hosting | A device can retain and serve publications accepted from a moot under current hosting authority. | Gemot owns membership, contribution and hosting permission; domain stores own durable records; transport owns replication. Djinn supervises those services and rechecks their conclusions. Separate later slice. |
+
+The second option is recommended first. Serving ordinary published content must
+work without Gemot membership, paired devices or a moot replica. Adding a moot
+hosting commitment is a distinct opt-in operation. Likewise, broadcasting
+availability through discovery does not copy content, grant a reader access,
+or authorize hosting. The UI should expose publication, replication and
+advertisement as separate settings with their current state.
+
+### Proposed persistent service contract
+
+The host submits a versioned descriptor identifying a publication, exact
+snapshot digest, native paths/MIME types, byte limits and listener policy.
+It supplies retained content through the shared read-only source seam. The
+descriptor distinguishes ordinary owner-selected content from a governed
+hosting lease; the latter carries references to the domain's verified
+authority, expiry and revocation state. Djinn must not recreate Gemot's grant
+evaluation inside the protocol handler.
+
+The process-neutral serving component should accept a snapshot and listener
+configuration and return a lifetime handle with replace/stop/status operations.
+It owns neither editable files nor moot records. Protocol grammar stays in the
+existing shared protocol crates. Knot may compose it locally; Djinn may compose
+it with durable custody. No new distributed protocol or arbitrary-code execution
+host is required for this step.
+
+Before persistent rollout is concrete and reviewable, settle and verify:
+
+1. Explicit local caller authorization for publish, replace, stop and removal;
+   restoring a saved descriptor cannot silently expand its audience.
+2. Stable certificate/key ownership across restart, including a visible rotation
+   operation that does not train clients to ignore changed certificates.
+3. Configurable interface and port binding, disabled-by-default automatic startup,
+   advertisement policy, connection and byte limits, and useful failure status.
+4. Atomic snapshot handoff and recovery after interrupted writes; only complete
+   selected revisions become visible. Editing a source file is not publishing.
+5. Retention and garbage-collection policy, including what Stop does and whether
+   retained bytes remain for later restart. Removal is a separate operation.
+6. For governed content, current hosting permission after restart and on every
+   authority change, with refusal after revocation or expiry.
+7. Acceptance with an independent ordinary client after Knot exits and after a
+   Djinn restart, plus bind-conflict, malformed-request, resource-bound and
+   shutdown tests. Public exposure needs its own reviewed deployment receipt.
+
+These contracts retain the ownership and done-conditions for further protocols
+and deployment. The first implementation only binds the loopback interface.
+
+### Implementation boundary and first acceptance (2026-09-13)
+
+**Status:** first ordinary Gemini service implemented, with an actual local
+resident and independent-reader receipt on 2026-09-13.
+
+- Knot's `PublishedSnapshotV1` (knot-editor `6b68405`) serializes the selected
+  saved pages, native format, metadata and exact bytes. Validation enforces
+  canonical encoding, path/MIME constraints and bounded content. Thirteen
+  standalone snapshot tests pass. No authoring directory or editor buffer is
+  exposed to the daemon.
+- `ports/djinn/src/resident_site.rs` retains a snapshot under a profile-scoped
+  blob lease and persists its digest, listener policy and certificate fingerprint.
+  Each selected profile gets one publication and its own durable TLS identity.
+  The default startup policy is stopped; resuming after restart requires explicit
+  `resume_on_restart`. The API bounds connections and total request lifetime.
+- `djinn-site publish SITE_DIR [PORT] [--resume]` uploads a complete snapshot in
+  64 KiB frames through `published-site-v1`, then explicitly commits it. A page
+  is limited to 1 MiB, all raw pages to 16 MiB, and the encoded snapshot to 24 MiB.
+  The live listener accepts only a completed, digest-verified revision. Later
+  edits to the authoring files do not change the publication.
+- The application broker admits local owner processes and grants this route to
+  the `knot-editor` label. That label is routing metadata, not authenticated
+  executable identity. Website reader access is independent of personal-sync
+  or evidence-reader authority. Status uses a valid portable card referencing
+  separately typed status bytes.
+- Stop releases the listener while retaining the snapshot. Remove releases the
+  publication's lease separately; retained cleanup is visible and retryable.
+  The certificate remains for the next publication. Restore refuses missing or
+  mismatched identity instead of silently rotating it.
+
+The initial authoring caller is the CLI. A Knot desktop publish-to-Djinn control,
+explicit identity rotation, installation, public binding, additional protocols,
+and governed hosting are further slices. Existing `knot-site` local serving is
+still a separate editor-owned lifetime.
+
+Acceptance must distinguish the standalone publisher process from a headed
+Knot window. The local resident gate requires ordinary Lagrange reading after
+the publisher exits, after a Djinn restart with the same certificate, byte-exact
+TLS retrieval, and absent unpublished edits. Focused lifecycle tests cover
+replacement failure, stop/reopen, profile isolation and connection limits. A
+headed Knot handoff, clean operating-system shutdown and public/two-machine
+exposure retain separate receipts. Stock-reader byte retrieval is not a visual
+layout or theme acceptance result.
+
+#### Local resident receipt (2026-09-13)
+
+The actual `djinn` and `djinn-site` binaries built with Rust 1.97.1,
+`--locked --offline -j2`, against the published Knot snapshot contract
+`6b68405`, Genet `101d9e9` and Netrender `3961aca`. The shared dependency
+baseline is Mere `b5750a96`; the new resident implementation was tested from
+this checkout before publication. The library suite passes 74 tests; the public
+service integration passes three tests covering occupied-port rollback,
+persisted stop/reopen and independent profile custody. Final binaries were
+rebuilt after the lifecycle fixes, then the independent acceptance below was
+repeated successfully.
+
+A separate publisher submitted a saved two-page Gemini site to an isolated,
+owner-only named-pipe endpoint. After that process exited, the authoring file
+was changed without republishing. Python's TLS client retrieved the original
+69 bytes exactly, and stock Lagrange 1.21.1 `--dump` retrieved the same content
+(normalizing only its Windows stdout newlines). After abrupt termination and
+restart of the task-owned Djinn process, both readers retrieved that revision
+again with the same certificate. A final run selected a fixed port and verified
+that the identical URL survived restart as well. Stop and remove succeeded;
+a further resident restart reported `Unavailable`.
+
+- Tested `djinn.exe` SHA-256: `f929e4b53fe32fe835861ee4e0ed15deb981c29d55fb9d2fe4fca502223c9d0b`.
+- Tested `djinn-site.exe` SHA-256: `db8d08dfab8f88f32da0597d02b4fa4eca8cf016f31946cc8c103d0aa9782c36`.
+- Selected body SHA-256: `0f8e13689b24cbba4952e583343df84c0e652b8c58eb6fb05595f65fdf8366c8`.
+- Certificate SHA-256 before/after restart: `db67ef36257e429cfe07051bf30a62f0b3fcac2153713ca3bf7bb469cb067aad`.
+- Stock portable client release: [Lagrange v1.21.1](https://github.com/skyjake/lagrange/releases/tag/v1.21.1).
+  Downloaded ZIP SHA-256: `d5c65777d9075f79b78fd58d92c8efd340729a3dd5b79358d3c1016e2fc615f1`.
+- Raw local receipt directory: `C:/t/smolweb-next-20260913/acceptance/`;
+  orchestration log: `C:/t/smolweb-next-20260913/resident-acceptance.log`.
+  The directory includes a private test vault and identity; it is not a
+  publication artifact and must not be copied into source control.
+
+The accepted reader URL was `gemini://localhost:<bound-port>/`. The same stock
+client refused the literal `127.0.0.1` URL with certificate-verification status
+`-87`; ordinary verification stayed enabled for the successful hostname run.
+Python's independent check also pinned the exact certificate across restart.
+This records CLI publication and resident recovery, not a headed Knot publish
+control, visual Lagrange rendering, public exposure, power-loss testing or clean
+operating-system shutdown. The source files remained ordinary files throughout.
+
+Governed selective hosting follows the production records in the
+[Moot publication plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
+Its author-offline proof is evidence for the desired behavior, not an implemented
+Djinn service. Production revision/hosting records, historical authority,
+Persona/device binding and two-machine acceptance remain distinct gates.
+Select accepted revisions/files by their hashes, retain them under the relevant
+lease and recheck hosting permission on restart and authority changes. Discovery
+advertises availability separately; retaining bytes grants neither editing rights
+nor decryption keys. Serving a saved ordinary site must keep working without a moot.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records Phases A
+  to G as still gated and §13's service and A4's `ReleaseRefV1` as landed, the
+  Gazette row is corrected, and §13's relation to the gate and A4's credit are
+  raised as open questions.
+
+### Sennet scoped station continuation (2026-10-16, scoped API qualified)
+
+Murm R7 extends the existing Signalman radio custody path to a canonical
+Sennet device/realm child. Dramatis 19be483 derives its public node number;
+this is not authenticated RF identity or a channel key. Only admitted Signalman
+may release/sign/attest this namespace. Sennet and Tucket share one sticky
+station watch, preserving the Tucket public type name. Reconnect requests a
+new scoped release. Done when actual Keeper probes refuse absent/Locked/no-wallet
+and wrong-app acts, retain stable identity on reopen and close independently
+on lock/resident loss. Consumer nonce reservations, public LongFast radio
+qualification and private-channel provisioning are separate Murm-owned gates.
+
+The primary Mere main has unrelated unpublished commits and newer concurrent
+upstream work. An integration worktree based on origin/main isolates this
+supplier change; it must be removed after publishing and receiving checks.
+
+The API and six actual Keeper cases are published through `e12788bc`, with
+stable reopen identity, absent/Locked/no-wallet and wrong-app refusal, and
+independent sticky lock/resident-loss closure. Both selected policy tests and
+strict Signalman port/example Clippy pass. The integration of concurrent
+upstream documentation leaves the qualified source/lock unchanged. Public
+evidence is in `testing/receipts/sennet-custody/`; private synthetic wallets
+stay in Murm's ignored validation results with helpers stopped. The existing
+shared `C:/t/cargo-homes/mere-upstreams` cache remains co-owned by the earlier
+family qualifiers and this gate. No isolated Cargo home/target was created.
+
+Murm R8 (2026-10-16) adds `SennetStationMaterial` from Dramatis `2f27f1a`
+to the same exact release, preserving the public node and sticky lease.
+Transient copies and retained material zeroize; Debug is redacted. Broker
+namespace/policy remain unchanged. Six real-Keeper cases pass again, now
+including stable material on reopen as well as wrong-app and custody controls.
+The updated probe builds and selected port/example strict Clippy passes with
+`--no-deps`; a broader invocation separately records unrelated Tabard warnings.
+Public evidence is in `testing/receipts/sennet-directed-custody/`. Murm owns
+protocol construction, peer pinning, nonce allocation and directed/ACK RF proof.
+
+
+## Boundary consolidation continuation, 2026-10-19
+
+The [family-promotion boundary scope](2026-10-19_family_promotion_plan.md#boundary-consolidation-scope-2026-10-19)
+records the execution/shutdown consolidation, shared observation/semantic-action
+follow-up and separate Castellan process design. This plan retains its domain
+implementation and acceptance gates. The new scope does not change existing
+custody, event meanings, configured limits or action admission, and, at the scoping checkpoint, supplied no
+new runtime, process-isolation or human accessibility receipt.
+
+Execution/shutdown qualification (2026-10-19): the [owning continuation](2026-10-19_family_promotion_plan.md#executionshutdown-qualification-2026-10-19) records the shared mechanics and native receiving gates. Observation/action and custody-process gates remain open in their respective lanes.
+
+---
+
+*Archived 2026-10-28.* Cut, with the other active plans, into a new set: what was still open, deferred or a follow-on here now lives in `mere_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md` and `mere_docs/implementation_strategy/2026-10-28_site_publication_plan.md`, which cites this file by line. This copy is history: its status lines, receipts and claims are as they stood, not current.

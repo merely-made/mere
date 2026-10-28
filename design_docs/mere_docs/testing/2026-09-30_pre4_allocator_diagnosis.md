@@ -8,7 +8,7 @@ dependencies and acceptance thresholds were not changed.
 **Corrected 2026-10-06 (S14 pass):** the repair is selected and accepted.
 Ruling 508 put it in burn-remote's close path (`88fd392f`, 2026-10-03), and
 its acceptance is recorded in `861042c9` (2026-10-03,
-[burn plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+[burn plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md)
 §13.32). Pre.4 merged to main at `cec0b3a4` on 2026-10-05. The measurements
 below remain pre-repair evidence.
 

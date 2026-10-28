@@ -17,8 +17,8 @@ capabilities that merely lack a handler or reusable surface.
 
 - [family composition thesis](2026-08-12_family_composition_thesis_brief.md)
 - [application prospects brief](2026-07-24_application_prospects_brief.md)
-- [Graphshell reference host plan](mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md)
-- [device resident consolidation plan](mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md)
+- [Graphshell reference host plan](archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md)
+- [device resident consolidation plan](archive_docs/2026-10-28/2026-08-20_device_resident_consolidation_plan.md)
 - [leverage census](2026-08-10_leverage_census_brief.md)
 - [Pelt and Knot direction](https://github.com/merely-made/genet/blob/main/docs/2026-07-24_pelt_knot_direction.md)
 
@@ -351,7 +351,7 @@ this section are the port law's two halves rather than alternatives: the
 shared Dramatis-facing surface — contact cards and the recipient picker — is
 the port's embeddable half, and resolution, feed polling, and trust state
 are its authority half, hosted by Djinn (see the
-[Djinn family resident services plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)).
+[Djinn family resident services plan](archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md)).
 The boundary proof asked for above is the second-host test already: the
 picker consumed by Knot, Moot, and Signalman.
 
@@ -406,7 +406,7 @@ machinery. The split follows the castellan mold: the embeddable half is the
 recall and memory surfaces of section 8, behind a `recall` feature so a host
 can take memory without the workshop; the authority half (Athanor, agent
 grants, runs, petitions, revocation) lives with Djinn, whose
-[resident services plan](mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+[resident services plan](archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md)
 already names Athanor jobs. Distinct from Distillery exactly as stated
 above: Distillery runs models, Alembic runs work. The package is
 `mere-alembic` with `[lib] name = "alembic"` (crates.io `alembic` is the
@@ -440,7 +440,7 @@ ruling and claimed the same day: `mere-athanor 0.0.1` published from mere
 `c0216cad`.
 
 **Workshop reconciliation, 2026-10-24:** the [Alembic implementation plan,
-section 5](mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
+section 5](archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24)
 is the current composition/workflow specification. It retains this placement
 inside Distillery, leaves Servitor in Eidetic, and uses Armillary for
 execution. Its first gate is a retained-passage evidence brief in Turnstone

@@ -2,7 +2,7 @@
 
 **2026-10-06 S16 annotation (S14 pass):** S16 ran on 2026-10-05. Main merged
 the pre.4 branch at `cec0b3a4` and was pushed, origin/main then at `07db35e2`
-([migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+([migration plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md)
 §13.44). Main's production row is now Burn `=0.22.0-pre.4`, CubeCL
 `=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`. The 2026-10-03 annotation's "Main
 stays on pre.2 until S16", and the pre.2 production row in the 2026-08-20

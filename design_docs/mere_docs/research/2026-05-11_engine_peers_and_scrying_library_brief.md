@@ -281,6 +281,6 @@ shape, different impl (overlay rather than embedded frame).
   are content producers; cartography projects truth into views.
   Cartography doesn't care which engine renders a tile — it consumes
   graph state regardless. This decision keeps that separation clean.
-- [Post-engine-layer priorities](../implementation_strategy/2026-05-09_post_engine_layer_priorities.md):
+- [Post-engine-layer priorities](../../archive_docs/2026-10-28/2026-05-09_post_engine_layer_priorities.md):
   §2.2 donor-area rebuilds includes "runtime / webview lifecycle wiring";
   this brief makes the `wry.compat` integration concrete.

@@ -17,7 +17,7 @@ The two consumers:
 | Consumer | Where it lives | Boundary |
 |---|---|---|
 | Turnstone place | `turnstone/src/place/`, T5a to T5c of `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md` | Product code; p2panda place transport; system clock |
-| Practice fixture | `crates/moot/commons/examples/commons_practice_peer.rs`, `ports/graphshell/web/co_op_gateway.py`, `co_op.html`, `co_op_receipt.py` | Proof-only; fixed identities; fixed clock; loopback HTTP between two stores; receipt in the [projection grammar adoption plan](../../mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md#shared-practice-proof-2026-09-04-verified-in-current-working-tree) |
+| Practice fixture | `crates/moot/commons/examples/commons_practice_peer.rs`, `ports/graphshell/web/co_op_gateway.py`, `co_op.html`, `co_op_receipt.py` | Proof-only; fixed identities; fixed clock; loopback HTTP between two stores; receipt in the [projection grammar adoption plan](../2026-10-28/2026-08-15_projection_grammar_adoption_plan.md#shared-practice-proof-2026-09-04-verified-in-current-working-tree) |
 
 The practice fixture is the census's "Woodshed peer comparison proof".
 Woodshed contributes only the comparison export; no Woodshed code changes.

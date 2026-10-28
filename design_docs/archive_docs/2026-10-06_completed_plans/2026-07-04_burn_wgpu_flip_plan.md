@@ -8,7 +8,7 @@ builds use tokenizers' `unstable_wasm` path, Oniguruma is native-only, and
 `bert-wgpu` passes on `wasm32-unknown-unknown`. The crates have since been
 renamed, embed to esp (`crates/intel/esp`) and aether to numen
 (`crates/conatus/numen`); the move to burn 0.22 belongs to the
-[burn 0.22 migration plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md).
+[burn 0.22 migration plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md).
 **Related**: [burn_utilization_brief](../../mere_docs/research/2026-07-04_burn_utilization_brief.md) (Lane 1 + decision D1; this plan is its first spin-out), [local_models_harness_brief](../../mere_docs/research/2026-06-24_local_models_harness_brief.md) (D2, the wasm ceiling, starts after this), `crates/intel/embed` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/orrery/aether` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 ## Scope

@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! **djinn-testkit**: one tested way to run djinn residents under test
-//! (`design_docs/mere_docs/implementation_strategy/2026-10-05_djinn_test_harness_plan.md`).
+//! (`design_docs/archive_docs/2026-10-28/2026-10-05_djinn_test_harness_plan.md`).
 //!
 //! A [`Run`] takes the machine-wide receipt lock, samples load, and captures
 //! the walls around the installed resident. Each [`Resident`] it hands out

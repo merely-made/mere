@@ -73,7 +73,7 @@ and embedded where the platform requires it. The resident owns Knot's
 persona-vault source, sync join, and blob store; first-party clients reach it
 through the existing owner-only Graphshell application door. The implementation
 sequence, standards-oriented content identity, and consolidation gates live in
-the [device resident consolidation plan](../implementation_strategy/2026-08-20_device_resident_consolidation_plan.md).
+the [device resident consolidation plan](../../archive_docs/2026-10-28/2026-08-20_device_resident_consolidation_plan.md).
 
 ## 1. Evidence-bearing clipping
 

@@ -7,7 +7,7 @@
 //! [`PassphraseEncryptedStorage`] — passphrase-encrypted on-disk vault.
 //!
 //! Phase 2C v0 production-grade backend per
-//! [`mere/design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../../../../design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md)
+//! [`mere/design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../../../../design_docs/archive_docs/2026-10-28/2026-05-05_protocol_architecture_plan.md)
 //! §3.2.
 //!
 //! ## Wire format

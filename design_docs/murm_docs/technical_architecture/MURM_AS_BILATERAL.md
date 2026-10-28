@@ -19,7 +19,7 @@
 
 ---
 
-> **Superseded (2026-07-14).** This is a historical design receipt. The active [Murm peer-runtime plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md) replaces its plugin model: the `murmuring` package and `BilateralProtocol` trait are retired, and the signed conversation grammar now lives in `murm` over `murm-replication`.
+> **Superseded (2026-07-14).** This is a historical design receipt. The active [Murm peer-runtime plan](../../archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md) replaces its plugin model: the `murmuring` package and `BilateralProtocol` trait are retired, and the signed conversation grammar now lives in `murm` over `murm-replication`.
 >
 > **Earlier status update (2026-05-31).** This doc predates two later shifts and now reads partly stale. Read it with these corrections, tracked in the [murm/p2p landscape brief](../../mere_docs/research/2026-05-31_murm_p2p_landscape_brief.md):
 > - **Built reality.** `transport` (iroh QUIC + blobs + gossip), `murmuring`/`murm` (Cable bilateral sync), and a `persona/identity` vault skeleton plus passphrase backend are built and tested. The moot/federation tier is a 61-LOC stub.

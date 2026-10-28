@@ -8,7 +8,7 @@
 //! eidetic codicil, and thawing one back into a live graph.
 //!
 //! This is the spine of the Alembic memory subsystem (slice A of
-//! `design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md`):
+//! `design_docs/archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md`):
 //! "Save as graph codicil" freezes a [`Graph`] to its [`GraphSnapshot`] plus
 //! atomic facet store, redacts private / heavy state, and writes it through the
 //! eidetic typed-payload layer under the v4 graph-snapshot schemas; "Open

@@ -233,7 +233,7 @@ def scaffold():
     p = MERE / ".gitignore"
     write(p, p.read_text(encoding="utf-8-sig").replace("!/crates/moot/gemot/examples/capsule-library/guest/Cargo.lock", "!/ports/moot/examples/capsule-library/guest/Cargo.lock"))
     index = MERE / "design_docs/DOC_README.md"
-    link = "[Foundation family promotion](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)"
+    link = "[Foundation family promotion](archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md)"
     text = index.read_text(encoding="utf-8-sig")
     if link not in text:
         text += f"\n\nFamily promotion (2026-10-19): {link} owns extraction, independent library validation and source cutover for Eidetic, Armillary, ESP, Gemot and the continuing Errand/Smolweb family.\n"

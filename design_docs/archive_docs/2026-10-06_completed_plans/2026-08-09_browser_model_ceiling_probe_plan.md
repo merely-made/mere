@@ -331,7 +331,7 @@ product default is a later decision informed by these receipts.
   `burn-cubecl` selector was retired under ruling 410, with current consumers
   on the registry crate, and that the `cubecl-runtime` patch source is pristine
   upstream. The
-  [burn 0.22 migration plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md) records
+  [burn 0.22 migration plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md) records
   the retirement in §13.28 (2026-09-29), after upstream pre.4 passed, and its
   status records the four embedding rows and the SmolLM2 decoder row passing
   on that line.

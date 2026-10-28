@@ -5,7 +5,7 @@ schema = 1
 
 [decisions."alembic-implementation D8"]
 title = "keep Servitor's present source home"
-source = "design_docs/mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_alembic_implementation_plan.md"
 area = "Stack"
 summary = "Servitor remains in Eidetic while Alembic composes its admission and run contracts."
 draws_on = ["stack.1"]

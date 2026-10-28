@@ -39,7 +39,7 @@ In scope now (the model is stated over these):
 - **p2p / cooperative**: substrate live (murm Cable + p2panda transport + moothold tessera, in
   `comms_host.rs` / `sync.rs`); the named gaps are a shared-session and a moot-content card path.
 - **local media (net-media)**: the one format that is plan-only today
-  ([net_media_plan](../implementation_strategy/2026-05-26_net_media_plan.md), no crate); in scope
+  ([net_media_plan](../../archive_docs/2026-10-28/2026-05-26_net_media_plan.md), no crate); in scope
   as a *target*, needs the net-media crate built. AV1 / WebRTC decode internals can lag.
 
 Deferred to the later **Genet / WPT track** (not this spine): full-web HTML via genet (the
@@ -91,7 +91,7 @@ registry (phyllotaxis / radial / l-system / penrose / grid) overlays host-comput
 field-region couplings add localized force wells. The orrery and the tiled workbench are two
 projections of one forme arrangement.
 **Owners:** node-representation (the scene-wide arrangement choice + per-scene persistence);
-[field-regions](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) (the
+[field-regions](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md) (the
 localized / scripted arrangement scoped to a placed region). The arrangements registry is the
 shared substrate; the [composition spine](2026-05-21_mere_composition_spine.md) keeps the forme /
 platen projection ontology.

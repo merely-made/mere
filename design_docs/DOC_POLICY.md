@@ -267,7 +267,7 @@ the repo that owns the subject" is the general form of it. Track the work in
 the [doc policy consolidation plan](archive_docs/2026-10-06_completed_plans/2026-08-24_doc_policy_consolidation_plan.md).
 
 **Amended 2026-10-06 (ruling S65 of the
-[stack seams plan](mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md)):**
+[stack seams plan](archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md)):**
 that plan is complete and archived. The work is recorded here, in this
 policy, instead: this addendum's area-root list and the round-trip
 paragraph above are the record of the 2026-09-03 return, and a later move
@@ -328,7 +328,7 @@ When pulling a donor doc's content into a mere doc:
 Armillary founding proposal, and four community authority/publication documents
 with their retained proof receipt followed the code into Eidetic, Armillary and
 Gemot. Mere keeps application integration plans and links to those owners. The
-[family promotion record](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)
+[family promotion record](archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md)
 records the source cutover and validation boundaries.
 
 ### Decisions and doctrine

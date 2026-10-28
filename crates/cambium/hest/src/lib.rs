@@ -12,7 +12,7 @@
 //!
 //! [`Invocation`] carries a command's opaque arguments and declared effect;
 //! [`Outcome`] records only a host-established terminal result. The plan is
-//! `design_docs/cambium_docs/implementation_strategy/2026-10-20_hest_command_architecture_plan.md`
+//! `design_docs/archive_docs/2026-10-28/2026-10-20_hest_command_architecture_plan.md`
 //! in the Mere repository. Workspace consumers use this Hest 0.2 API.
 
 pub mod catalogue;

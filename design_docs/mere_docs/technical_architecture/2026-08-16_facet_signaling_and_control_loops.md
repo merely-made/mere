@@ -13,7 +13,7 @@ Where the one-node doc asked what a node *carries*, this doc asks what
 participants *say to each other* through what nodes carry.
 
 **Related:** the
-[graph behaviors plan](../implementation_strategy/2026-08-13_graph_behaviors_plan.md)
+[graph behaviors plan](../../archive_docs/2026-10-28/2026-08-13_graph_behaviors_plan.md)
 owns the watch and cascade substrate section 6 reasons over (its slices W0
 through W5 landed 2026-08-13 and its actuation deadband landed 2026-08-18); the
 [capability model plan](../../archive_docs/2026-10-06_completed_plans/2026-07-23_capability_model_plan.md)

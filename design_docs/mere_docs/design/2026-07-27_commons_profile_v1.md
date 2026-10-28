@@ -120,7 +120,7 @@ checkpoint, and tail receipt.
 ## Deferred
 
 Calls have their own
-[product plan](../implementation_strategy/2026-07-27_commons_calls_plan.md);
+[product plan](../../archive_docs/2026-10-28/2026-07-27_commons_calls_plan.md);
 implementation has not started. Group calls, compressed frontiers, richer
 content schemas, and Knot merge beyond the bounded two-version text case remain
 separate work. Automated epoch retention now has authorized checkpoint,

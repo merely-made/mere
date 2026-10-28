@@ -7,7 +7,7 @@ Sources: `repos/mer3ly` at `a7a2d2e` (2026-08-12, working tree dirty in three fi
 
 ## Ruling
 
-Mer3ly is a genuine second consumer of the frozen 0.0.3 contract, over a second dataset, deployed publicly. It is also the reason several targets in the [projection grammar adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) are mis-gated, though not for the reason the 2026-08-15 reading gave.
+Mer3ly is a genuine second consumer of the frozen 0.0.3 contract, over a second dataset, deployed publicly. It is also the reason several targets in the [projection grammar adoption plan](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md) are mis-gated, though not for the reason the 2026-08-15 reading gave.
 
 The site consumes the stack along **two disjoint paths**. The portable path builds a `Score`, solves it, and records a diff trace. The live path drives an interactive simulation with pins, mobility, and backdrops. Nothing joins them: a pin placed by a visitor never reaches a `Score`, and the portable artifact never carries a coordinate.
 

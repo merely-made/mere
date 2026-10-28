@@ -1,7 +1,7 @@
 # macOS H1 synthetic custody fixture
 
 This fixture tests the macOS mechanisms selected in the
-[custody hardening plan](../../design_docs/dramatis_docs/implementation_strategy/2026-10-21_custody_isolation_and_security_hardening_plan.md).
+[custody hardening plan](../../design_docs/archive_docs/2026-10-28/2026-10-21_custody_isolation_and_security_hardening_plan.md).
 It does not open a real vault or migrate a consumer. It uses a CryptoKit
 AES-GCM envelope around a newly generated Ed25519 seed, rather than the
 production Rust Castellan vault implementation.

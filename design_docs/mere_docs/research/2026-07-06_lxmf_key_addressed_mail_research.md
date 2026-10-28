@@ -117,7 +117,7 @@ recorded in the 2026-07-24 application brainstorm: day-one interop for Merely
 radios (a freshly flashed radio can message existing Sideband/MeshChat users,
 answering the hardware cold-start problem), and LXMF propagation as an
 offered role in the
-[managed-network plan](../implementation_strategy/2026-07-24_low_power_managed_network_plan.md)'s
+[managed-network plan](../../archive_docs/2026-10-28/2026-07-24_low_power_managed_network_plan.md)'s
 V9 offers, its propagation store matching V10's store-and-forward with
 expiration. Posture otherwise unchanged: LXMF stays a boundary format and an
 offered service; the internal spine is the shared engram (see the

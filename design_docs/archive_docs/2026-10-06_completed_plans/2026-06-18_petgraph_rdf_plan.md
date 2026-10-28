@@ -6,7 +6,7 @@ federation-safe `StatementId` minting, the round-trip gate, vocabulary
 alignment, N-Quads/TriG I/O, the snapshot-size gate). Phase 3's spareval path
 landed 2026-07-06 (`sparql()` over `dataset_quads`); whether it meets Phase 3's
 done-condition is open (see Phase 3), and the resource-graph adapter of the
-[graph semantics plan](../../mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)'s ruling 6 is carried
+[graph semantics plan](../2026-10-28/2026-10-04_graph_semantics_plan.md)'s ruling 6 is carried
 by that plan's P2. Phase 4 is gated and deferred on the 2026-07-06 footprint
 measurement. Open: the JSON-LD shaper gaps, the `skip_serializing_if`
 follow-up, the `ExampleOf` and `Summarizes` rows, the raw-IRI `Semantic` edge
@@ -106,7 +106,7 @@ granularity:
     `EdgePayload` per `(from,to)` carrying a statement list, because pair adjacency
     is still the hot path. Pair-level APIs can keep returning "there is an edge from
     A to B"; RDF projection and exact mutation use statement iterators.
-    > **Amended 2026-10-04 (Mark, [graph semantics plan](../../mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)
+    > **Amended 2026-10-04 (Mark, [graph semantics plan](../2026-10-28/2026-10-04_graph_semantics_plan.md)
     > ruling 1):** a fact is one asserter's assertion, not the claim. Dedup keys on
     > `(predicate, scope, asserter)`, so two asserters of one claim hold two
     > statements, each retracted alone, projected as two reifiers on one triple term.
@@ -200,7 +200,7 @@ node pair, raw + CiTO predicates).
 
 ## Phase 3 — `QueryableDataset` adapter (SPARQL over the kernel, no held quads)
 
-> **Amended 2026-10-04 (Mark, [graph semantics plan](../../mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../2026-10-28/2026-10-04_graph_semantics_plan.md)
 > ruling 6):** content statements move to a resource graph beside the surface graph,
 > and SPARQL is served by this adapter over the resource graph rather than by a
 > dataset rebuilt per query. That plan's P2 carries this phase.
@@ -266,7 +266,7 @@ graph semantics P2.
   The footprint levers in ROI order are: (1) **externalize image blobs**
   (content-addressed store, keep a hash in the node) — reclaims ~64% and is a
   bigger, simpler win than Phase 4, now scoped in
-  [node_image_externalization_plan](../../mere_docs/implementation_strategy/2026-07-06_node_image_externalization_plan.md); (2) **slim `EdgePayload`** (box the rare edge
+  [node_image_externalization_plan](../2026-10-28/2026-07-06_node_image_externalization_plan.md); (2) **slim `EdgePayload`** (box the rare edge
   families / a compact statement record) — chips the 28%; (3) the term dictionary
   / slotmap kernel — last, ~1%, and only meaningful *after* (1) makes strings the
   dominant remaining cost. Phase 4 stays gated, and its Phase 3 on-ramp (a

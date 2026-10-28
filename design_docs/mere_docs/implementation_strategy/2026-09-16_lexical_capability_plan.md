@@ -1,7 +1,7 @@
 # Lexical Capability Plan — senses, word parts, etymology, and writing checks
 
 **Status (2026-10-06):** in progress; L2 is partly built. Ruling S42 of the
-[stack seams plan](2026-10-04_stack_seams_plan.md) makes
+[stack seams plan](../../archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md) makes
 `crates/intel/reference-data` (`9310518b`, 2026-09-30) this plan's L2 and
 re-scopes L2 onto that crate, so Mere has one lexical surface. It looks up a
 lemma, language and sources and returns language-tagged senses and relations

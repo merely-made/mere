@@ -117,7 +117,7 @@ later).
   design), gemini (TOFU), and misfin (signed sender) tile currently render with the
   same neutral chrome. Producing trust at the errand transport, carrying it on
   `SmolwebDocument`, and surfacing it as tile chrome is Workstream 2 of the
-  smolweb fidelity plan (`design_docs/nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md`);
+  smolweb fidelity plan (`design_docs/archive_docs/2026-10-28/2026-07-01_smolweb_fidelity_plan.md`);
   it lands against this plan's P3/P4.
 
 ## Progress

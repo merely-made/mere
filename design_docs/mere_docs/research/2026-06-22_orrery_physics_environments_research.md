@@ -17,7 +17,7 @@ paint / backdrop), `crates/orrery/aether` *(historical citation)* <!-- doc-audit
   — the per-node "scripted" representation form is *per-node* scene decoration; an environment is
   *scene-wide*, so it is a different layer. Representation stays orthogonal (a node keeps its form
   inside any environment).
-- [scriptable_field_regions_plan](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
+- [scriptable_field_regions_plan](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md)
   — a placed field region already drives local forces via rhai (gyre couplings). A local scene
   effect (a whirlpool, a gravity well) is the same substrate; the environment is the global cousin.
 - [cartography_aether_layout_seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md)

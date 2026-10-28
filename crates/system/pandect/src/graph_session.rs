@@ -7,7 +7,7 @@
 //! A mere's sessions: their schema over one muniment store, the live session
 //! ([`GraphSession`]) and the lifecycle ([`MereSessions`]).
 //!
-//! Reservoir plan V2 (`design_docs/mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md`).
+//! Reservoir plan V2 (`design_docs/archive_docs/2026-10-28/2026-09-23_reservoir_plan.md`).
 //! A mere is one muniment store, and each of its sessions lives at keys under
 //! `sessions/<id>/`:
 //!

@@ -7,8 +7,8 @@
 **Related**:
 
 - [`README.md`](../../../README.md) — Mere crate roles
-- [`../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md) — current forward-looking plan (the 2026-05-06 migration plan that originally lived here is archived under `archive_docs/2026-05-09_engine_layer_complete/`)
-- [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) — protocol architecture (Graphshell consumes; does not duplicate)
+- [`../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../2026-10-28/2026-05-09_post_engine_layer_priorities.md) — current forward-looking plan (the 2026-05-06 migration plan that originally lived here is archived under `archive_docs/2026-05-09_engine_layer_complete/`)
+- [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../2026-10-28/2026-05-05_protocol_architecture_plan.md) — protocol architecture (Graphshell consumes; does not duplicate)
 - Inherited (graphshell): [`view_dimension_spec.md`](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/graph/view_dimension_spec.md) — original ZSource contract
 - Inherited (graphshell): [`2026-04-10_vello_scene_canvas_rapier_scene_mode_architecture_plan.md`](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/graph/2026-04-10_vello_scene_canvas_rapier_scene_mode_architecture_plan.md) — prior Wasmtime canonicalization (this plan supersedes the language choice)
 - Inherited (graphshell): [`2026-04-03_twod_twopointfive_isometric_plan.md`](../../../../graphshell/design_docs/graphshell_docs/implementation_strategy/graph/2026-04-03_twod_twopointfive_isometric_plan.md) — projection ladder predecessor

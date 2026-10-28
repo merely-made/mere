@@ -224,7 +224,7 @@ exercising it. C1 builds the exercising; C2 builds the item.
   graphshell enables only `keeper`. No replication or carry path exists for
   the OTP or Secret Service record namespaces, so records are durable on one
   device only. Follow-on slices, in order: product hosting (device-host
-  composition per the [device resident consolidation plan](../../mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md),
+  composition per the [device resident consolidation plan](../2026-10-28/2026-08-20_device_resident_consolidation_plan.md),
   Cambium tile and approval, Linux user-service lifecycle); credential
   replication designed together with per-device freshness evidence; CXF/CXP
   import. Windows Credential Manager and macOS Keychain import, KDBX, and a

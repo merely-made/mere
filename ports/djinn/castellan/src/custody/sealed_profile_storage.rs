@@ -7,7 +7,7 @@
 //! [`SealedProfileStorage`] — profile storage over sealed records.
 //!
 //! Fills the `OsKeychainStorage` role from
-//! [`mere/design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../../../../design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md)
+//! [`mere/design_docs/mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../../../../design_docs/archive_docs/2026-10-28/2026-05-05_protocol_architecture_plan.md)
 //! §3.2: the desktop-default [`crate::custody::vault::IdentityStorage`] backend whose
 //! unlock rides OS-protected local storage rather than a passphrase. It
 //! composes two existing layers instead of adding cryptography:

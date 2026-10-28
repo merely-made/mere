@@ -9,7 +9,7 @@ GitHub. Line numbers are as read at those revisions. Nothing was built for
 this note.
 
 **Origin.** P2a of the
-[Graphshell stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+[Graphshell stack lift plan](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
 moved the remote overmap client into `mere-overmap`. Its receipt needs a mere
 route that a remote device can dial, and Djinn registers `mere/<domain>` only
 on the local application door. Mark chose to design that first and widened

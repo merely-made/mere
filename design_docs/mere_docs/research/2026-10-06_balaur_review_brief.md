@@ -80,7 +80,7 @@ modes are **"Short arc, as authored, clockwise and counter"**. Each
 interpolation, for spins and data-driven sweeps), Clockwise or
 Counter-clockwise.
 
-**Carried 2026-10-07.** Rulings A and B are carried by the [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md), tracks E1 to E5, with Mark's further rulings SE5 to SE8 on how: Cambium's `EditHistory` is generalized rather than joined by a second type, and the option-declaration type lives in scenograph.
+**Carried 2026-10-07.** Rulings A and B are carried by the [Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md), tracks E1 to E5, with Mark's further rulings SE5 to SE8 on how: Cambium's `EditHistory` is generalized rather than joined by a second type, and the option-declaration type lives in scenograph.
 
 ## 2. What the review reads for
 
@@ -394,8 +394,8 @@ tree and the registry. Snapshot, replay and rollback are bound to `Engine`, the
 stages and the script host.
 
 *What it meets.* G8 in
-`design_docs/mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`,
-and S4 in `design_docs/mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md`.
+`design_docs/archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md`,
+and S4 in `design_docs/archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md`.
 - The `seiche-repeat` probe (`Code/testing/mere/seiche-repeat`) already uses
   balaur's fold, FNV-1a over `to_bits` with positions sorted by key, but takes
   one fingerprint at the end of 300 ticks.

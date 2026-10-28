@@ -22,7 +22,7 @@ The supervisor, and the lanes M2 and M3 both leaned on, are gates H0-H2 of the
 **Related**:
 [`2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md),
 [`2026-06-30_personal_mesh_substrate_m2_plan.md`](2026-06-30_personal_mesh_substrate_m2_plan.md),
-[`2026-08-09_burn_0_22_migration_plan.md`](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md),
+[`2026-08-09_burn_0_22_migration_plan.md`](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md),
 [`2026-06-12_mesh_m1_plan.md`](../2026-06-15_completed_plans/2026-06-12_mesh_m1_plan.md)
 
 M3 makes lending an owned device socially safe. It records lease lifecycle as
