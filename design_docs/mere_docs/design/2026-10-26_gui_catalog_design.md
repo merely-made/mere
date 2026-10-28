@@ -10,7 +10,8 @@ frame hosts one presentation, and what a mod contributes is a catalog axis, and
 §9, his rulings 6 to 8 on the cues §8 left: a typed `contributes` list, a misfin
 address opens its Comms conversation, and inker defines the embedded-application
 declaration that a manifest carries. The §9 code landed 2026-10-27, read at
-`10fe98b50`; §9 closes with what it leaves.
+`10fe98b50`; §9 closes with what it leaves. Since 2026-10-28 the rules are
+the doctrine's Surfaces area (statements 1 to 4) and the inventory stays here.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -267,7 +268,10 @@ each of the five authorities has a line for it, including its refusal.
 
 This record proposes nothing beyond that reading. A ruling would decide
 whether the matrix is kept as one document, as a column in TERMINOLOGY's
-aspect table, or as a doctrine area that the Stack statements lack.
+aspect table, or as a doctrine area that the Stack statements lack. Ruled
+2026-10-28 (Mark): the rules are the doctrine's Surfaces area, four
+statements in [`doctrine.md`](../../doctrine.md), and the inventory stays in a
+document; the aspect table's rows are ways of dividing a mere, not surfaces.
 
 ## 6. Where the catalogs disagree
 

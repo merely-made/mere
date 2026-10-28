@@ -235,7 +235,7 @@ this paragraph refines the mechanism's home without moving source meaning.
 #### Body bindings (ruled 2026-09-26; documented, not built)
 
 The comparison and complete adoption conditions are in
-`isometry/mesocosm/design_docs/2026-09-26_body_binding_plan.md`, §2 and §6.
+`isometry/mesocosm/design_docs/archive_docs/2026-10-28/2026-09-26_body_binding_plan.md`, §2 and §6.
 Rulings 346 to 352 are recorded in
 `isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`.
 This section carries Appendix A's module shape into its owning plan;
@@ -897,7 +897,7 @@ contract declared in advance.
     first.
     *Assessed and answered (2026-10-02):* renderling is already ruled out by
     the presentation plan's L7 (`isometry/mesocosm/design_docs/
-    2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
+    archive_docs/2026-10-28/2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
     unmet), ruling 27 keeps the renderer swappable (kiss3d first, renderling
     "far later"), and ruling 442's recommendation retires it before the mode
     host; only `eponym-client`'s `Tenant` and two probes use it. Upstream

@@ -97,7 +97,7 @@ Rootstock's `ProducerRegistry` binds an application renderer to an existing
 picking. Genet owns the content box, CSS composition, clipping and input geometry;
 Rootstock owns registration, image staging and document lifetime. The specimen
 bench consumer and its done-conditions live in
-`isometry/mesocosm/design_docs/2026-09-11_orthographic_voxel_presentation_plan.md`,
+`isometry/mesocosm/design_docs/archive_docs/2026-10-28/2026-09-11_orthographic_voxel_presentation_plan.md`,
 Bench B. This seam does not introduce a second scene model or device.
 
 The frame hook registers a `TextureProducer` through `AppCtx.producers`, declaring

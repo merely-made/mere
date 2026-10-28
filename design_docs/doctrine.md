@@ -14,6 +14,12 @@ doctrine, the parts of its Stack area that bind any product on the stack
 its plans, join in a later pass; the first, Stack 6, joined on 2026-10-25.
 Within the budget in `doctrine_budget.toml`.
 
+**Status, 2026-10-28:** a second area, Surfaces, with four statements from
+the [GUI catalog record](mere_docs/design/2026-10-26_gui_catalog_design.md)'s
+rulings of 2026-10-26, placed here by Mark on 2026-10-28; the record keeps
+the inventory. Its rulings have no typed keys, since the record is not a plan,
+so each statement's note names them.
+
 ## The stack
 
 ### Stack 1. Build on the stack we have
@@ -98,3 +104,76 @@ Links: draws on node-body-face-model D1 · summary Storage follows the death con
 
 *Added 2026-10-25, outcome new ("Write stack.6 now"), the first statement from
 this repository's own rulings.*
+
+## Surfaces
+
+### Surfaces 1. A frame hosts one presentation
+
+A frame, a leaf of a window's frame tree, hosts one presentation: a reader's
+document, or a surface producer, which is what an embedded application is. A
+tile is a frame presenting a node's resource; a pane is a frame presenting an
+answer to one question about the graph or the system. The two differ by what
+is presented, not by whether an application is embedded: a surface producer
+can be what either presents. A product does not add a pane for an application
+it can present, and a node whose address names a correspondent opens the
+conversation that answers for it rather than a tile.
+
+Links: summary A frame hosts one presentation, a reader's document or a surface producer; a tile presents a resource, a pane answers a question; an embedded application is a presentation, not a pane.
+
+*Added 2026-10-28, outcome new, from the GUI catalog record §8 (Mark,
+2026-10-26, refining its rulings 1 and 3) and its ruling 7. Rulings 1, 3 and
+7 apply under it: the pane list is TERMINOLOGY's, the workbench presents a
+forme with the tile tree as its default desktop projection, and a misfin
+address opens its Comms conversation.*
+
+### Surfaces 2. A catalogued surface is an emitting one
+
+A surface in a product's catalog is one with an open and dismiss seam, an
+emission site that diagnostics and the accessibility tree can hear. An
+intended surface is recorded in the design record that intends it, not
+declared in code before it is built, and nothing stored references it. The
+state a surface's shell keeps, open, side, width, focus, context binding, has
+one owner, and the surface renders what that owner holds.
+
+Links: summary A catalogued surface has an open and dismiss seam; an intended one stays in its record until built; shell state has one owner, and the surface renders it.
+
+*Added 2026-10-28, outcome new, from the GUI catalog record's ruling 2 (Mark,
+2026-10-26). Rulings 4 and 5 apply under it: cards are kinds of content the
+focus-card slot summons, and the dock contract is Cambium's shell's.*
+
+### Surfaces 3. A contribution is one of four kinds
+
+What a pack or mod adds to a product's GUI is a presentation (a reader or a
+surface producer, which a node's resource opens into), a pane adapter (a feed
+into an existing pane), a pane (a new question), or a servitor (a participant
+under a grant). A manifest declares its contributions in a typed list beside
+its dependency names, and activation verifies the declaration: a mod that
+registers what it did not declare is refused. A presentation's declaration is
+one type, owned by the reader layer and carried by the manifest: what it
+presents, how it reaches the screen, what it accepts back, and which
+operations it exposes. Trust stays with the manifest's capabilities and the
+pack's requested scopes; leaves and clips stay graph facts that the
+operations act on.
+
+Links: draws on stack.5 · summary Four contribution kinds, declared in a typed manifest list and verified at activation; a presentation's declaration is one type the reader layer owns and the manifest carries.
+
+*Added 2026-10-28, outcome new, from the GUI catalog record §8 and its
+rulings 6 and 8 (Mark, 2026-10-26); the code landed 2026-10-27, as the
+record's §9 closing says.*
+
+### Surfaces 4. A surface names its five authorities
+
+A surface is a projection of a node set under a scope, a ring, a keeping
+level and a build profile: the node decides what is shown, the scope which
+part and from where, the ring who may see or act, the keeping level whether
+it is in focus, kept or ambient, and the profile whether the engine behind it
+is linked. A surface is catalog-complete when each of the five has a line for
+it, including its refusal, and a catalog says which profile it was read
+under.
+
+Links: draws on stack.2 · summary A surface projects a node set under scope, ring, keeping level and build profile; it is catalogued when each authority has a line for it, refusal included.
+
+*Added 2026-10-28, outcome new. The GUI catalog record's §5 read the five
+authorities from the stack on 2026-10-26 and left their home unruled; Mark
+ruled on 2026-10-28 that the rules live here and the inventory stays in a
+document.*

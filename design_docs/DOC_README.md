@@ -235,7 +235,7 @@ Handler continuation (2026-10-12): [Retention and hosting handlers](https://gith
 
 1. [`DOC_POLICY.md`](DOC_POLICY.md) — documentation governance rules.
 2. [`TERMINOLOGY.md`](TERMINOLOGY.md) — canonical current terminology.
-3. [`doctrine.md`](doctrine.md) — the stack's doctrine: what the stack holds and why, by area (`DOC_POLICY.md`, core §11); begun 2026-10-22 with five statements from isocosm's; Stack 6 (storage follows the death condition, drawing on `node-body-face-model D1`) added 2026-10-25, the first from this repository's rulings; budget in `doctrine_budget.toml`, manifest `decisions.toml` generated.
+3. [`doctrine.md`](doctrine.md) — the stack's doctrine: what the stack holds and why, by area (`DOC_POLICY.md`, core §11); begun 2026-10-22 with five statements from isocosm's; Stack 6 (storage follows the death condition, drawing on `node-body-face-model D1`) added 2026-10-25, the first from this repository's rulings; budget in `doctrine_budget.toml`, manifest `decisions.toml` generated; the Surfaces area, four statements from the GUI catalog record's rulings, joined 2026-10-28.
 4. [`2026-05-04_lexicon_brief.md`](2026-05-04_lexicon_brief.md) — naming history; its 2026-08-31 amendment points current terms back to `TERMINOLOGY.md`.
 5. [`2026-05-24_external_deps_topology_brief.md`](2026-05-24_external_deps_topology_brief.md) — the `Code/` workspace-root `crates/` ↔ `repos/` split, path-dep convention, and cross-repo rename lineage.
 

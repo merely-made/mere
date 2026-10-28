@@ -260,7 +260,7 @@ because something happened there; the rest regenerates on demand, and a thing
 of note that stops mattering returns to the soup through garbage collection.
 The sim plan names wilderness "the ambient tier for places, from which
 candidate locations are derived and asserted when persisted"
-(`repos/isometry/mesocosm/design_docs/2026-09-22_sim_plan.md`).
+(`repos/isometry/mesocosm/design_docs/archive_docs/2026-10-28/2026-09-22_sim_plan.md`).
 
 ### Divination: Cleromancy
 
@@ -591,7 +591,7 @@ Consequences:
   ambient context boundary and its rules);
   `repos/isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`
   (rulings 69–71, 80 and D11, and §3.4.1's three tiers of keeping); and
-  `repos/isometry/mesocosm/design_docs/2026-09-22_sim_plan.md` (wilderness).
+  `repos/isometry/mesocosm/design_docs/archive_docs/2026-10-28/2026-09-22_sim_plan.md` (wilderness).
 
 ## 9. Rulings on the questions this document raised
 

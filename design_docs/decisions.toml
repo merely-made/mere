@@ -84,3 +84,29 @@ source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "Storage follows the death condition; cross domains by copy or handle; persist by durable identity."
 draws_on = ["node-body-face-model D1"]
+
+[statements."surfaces.1"]
+title = "A frame hosts one presentation"
+source = "design_docs/doctrine.md"
+area = "Surfaces"
+summary = "A frame hosts one presentation, a reader's document or a surface producer; a tile presents a resource, a pane answers a question; an embedded application is a presentation, not a pane."
+
+[statements."surfaces.2"]
+title = "A catalogued surface is an emitting one"
+source = "design_docs/doctrine.md"
+area = "Surfaces"
+summary = "A catalogued surface has an open and dismiss seam; an intended one stays in its record until built; shell state has one owner, and the surface renders it."
+
+[statements."surfaces.3"]
+title = "A contribution is one of four kinds"
+source = "design_docs/doctrine.md"
+area = "Surfaces"
+summary = "Four contribution kinds, declared in a typed manifest list and verified at activation; a presentation's declaration is one type the reader layer owns and the manifest carries."
+draws_on = ["stack.5"]
+
+[statements."surfaces.4"]
+title = "A surface names its five authorities"
+source = "design_docs/doctrine.md"
+area = "Surfaces"
+summary = "A surface projects a node set under scope, ring, keeping level and build profile; it is catalogued when each authority has a line for it, refusal included."
+draws_on = ["stack.2"]
