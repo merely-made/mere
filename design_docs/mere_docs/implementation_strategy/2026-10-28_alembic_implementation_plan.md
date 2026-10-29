@@ -281,6 +281,13 @@ automation, credentials, grants or publication.
 
 ## Findings
 
+- 2026-10-29: retained-payload custody admits Turnstone and Graphshell with
+  distinct authenticated application scopes. Turnstone's existing AAD remains
+  exact for retained ciphertext compatibility; Graphshell has a separate scope.
+  This separates admitted application labels, not authenticated executable
+  identities, and does not make private ciphertext automatically portable across
+  hosts. An admitted transfer or rewrap and the H1 installation gate remain
+  separate from this receiving path.
 - 2026-10-29: the opt-in Djinn `private_workshop_fixture` separates its
   synthetic custodian child from the app-broker process, which uses the real
   `RemoteHost` client. It requires a new absolute directory and exposes only

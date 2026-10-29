@@ -466,3 +466,43 @@ parentage, lock/unlock generation changes, unknown-input redaction, custody loss
 and owned-child reaping using a frozen executable. The checkpoint JSON records
 these distinct gates. No current private product, installed identity, signing,
 physical-platform or H1 production qualification follows from the compiler pass.
+
+## Explicit private payload scopes for both product hosts
+
+The actual native Graphshell process first refused at sealed startup. The
+failure is retained in `20261029-graphshell-private-process-v1.json`: the
+broker's payload policy admitted only the `turnstone` app label. The frozen
+fixture itself passed process parentage, lock/unlock generation, unknown-input
+redaction, custody-loss reaping and clean-exit checks in
+`20261029-private-fixture-process-v1.json`. Its frozen SHA-256 is
+`d52de97a089a1a74664283c6fb2f6e0651814ddaa42b16c12394785ff1f68839`.
+The failed startup's sixteen regular retained files were separately scanned in
+`20261029-graphshell-private-process-v1-no-clear.json`; no source canary was
+stored and no plaintext fallback occurred. This is a negative observation,
+not a successful private workflow receipt.
+
+`20261029-two-app-payload-red.log` / `.exit` is a genuine pre-fix regression:
+one test executed and failed at the required Graphshell seal operation with
+`Refused(NotServed)`. The source and pre-fix policy are retained beside it.
+The frozen red test executable is `20261029-two-app-payload-red-binary`,
+SHA-256 `089682c13295ebd7fce49eb6b58e533d79662ba561599520138e87990eae66e4`.
+
+The broker now explicitly admits the two app labels. The existing encoded
+Turnstone AAD, `turnstone.retained-clips/custody-v1`, remains exact; Graphshell
+uses `graphshell.retained-content/custody-v1`. Every other label remains
+refused. The resulting `20261029-two-app-payload-green.log` / `.exit` passes
+the named `custodian_client` and `custody_payload` targets: twelve passes,
+zero failures, one existing ignored receipt helper. Both commands use the
+unchanged warm 8 GiB reservation and retain source/lock hashes. The expanded
+crypto test checks the Graphshell round trip, both cross-app decryption
+refusals, compatibility with independently produced legacy Turnstone-scoped
+wallet ciphertext, and the existing profile/master/hash/tamper/lock and
+retained-epoch cases.
+
+This proves domain separation for the admitted application label. It does not
+authenticate an executable identity or qualify H1 installation. Private
+ciphertext is not automatically portable between these scopes; an admitted
+transfer/rewrap is separate. Generic legacy decoding of an absent custody
+epoch remains unchanged, while the new Graphshell consumer requires an
+authoritative epoch and sends its exact binding. Production custody and
+real-consumer qualification flags remain false.

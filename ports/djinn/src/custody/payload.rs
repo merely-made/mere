@@ -21,13 +21,18 @@ pub(super) fn answer(
     request: PayloadRequest,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
     // Route admission alone does not authorize use of retained-content keys.
-    if app.as_str() != "turnstone" {
-        return Err(CustodyRefusal::NotServed);
-    }
+    let app_scope = match app.as_str() {
+        // Preserve the existing encoded AAD for retained Turnstone ciphertext.
+        "turnstone" => "turnstone.retained-clips/custody-v1",
+        "graphshell" => "graphshell.retained-content/custody-v1",
+        _ => return Err(CustodyRefusal::NotServed),
+    };
     request.validate().map_err(super::refused)?;
     if let Some(expected) = request.custody_epoch.as_ref() {
         if keeper.host().custody_epoch()?.as_ref() != Some(expected) {
-            return Err(super::refused("retained-content custody generation changed"));
+            return Err(super::refused(
+                "retained-content custody generation changed",
+            ));
         }
     }
     let binding = keeper.payload_custody().ok_or_else(|| {
@@ -39,12 +44,10 @@ pub(super) fn answer(
     // The admitted application cannot use this operation to decrypt another
     // lane's wallet-sealed artifacts. This AAD binding is independent from the
     // immutable payload's canonical content identity.
-    let scope = serde_json::to_vec(&(
-        "turnstone.retained-clips/custody-v1",
-        &request.profile.0,
-        &request.master,
-    ))
-    .map_err(super::failed)?;
-    let result = keeper.host().payload(&binding.root, binding.persona, request, scope)?;
+    let scope = serde_json::to_vec(&(app_scope, &request.profile.0, &request.master))
+        .map_err(super::failed)?;
+    let result = keeper
+        .host()
+        .payload(&binding.root, binding.persona, request, scope)?;
     Ok(CustodyAnswer::Payload { result })
 }

@@ -105,6 +105,56 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         panic!("sealed response expected")
     };
     assert_ne!(bytes.0, clear);
+    // Both product hosts retain private sources through custody. They use
+    // distinct authenticated app scopes even under the same wallet/profile.
+    let mut graphshell = CustodyClient::open_at(&endpoint, AppId::new("graphshell"))
+        .await
+        .unwrap();
+    let CustodyAnswer::Payload {
+        result:
+            PayloadResult::Sealed {
+                bytes: graphshell_bytes,
+                marker: graphshell_marker,
+            },
+    } = graphshell
+        .call(CustodyCall::Payload(request.clone()))
+        .await
+        .expect("Graphshell has its own retained-content custody scope")
+    else {
+        panic!("Graphshell sealed response expected")
+    };
+    let graphshell_read = PayloadRequest {
+        operation: PayloadOperation::Unseal {
+            bytes: graphshell_bytes,
+            marker: graphshell_marker,
+        },
+        ..request.clone()
+    };
+    assert!(matches!(
+        graphshell.call(CustodyCall::Payload(graphshell_read.clone())).await.unwrap(),
+        CustodyAnswer::Payload { result: PayloadResult::Clear { bytes } } if bytes.0 == clear
+    ));
+    assert!(
+        client
+            .call(CustodyCall::Payload(graphshell_read))
+            .await
+            .is_err(),
+        "Turnstone cannot unseal Graphshell's retained bytes"
+    );
+    let turnstone_read = PayloadRequest {
+        operation: PayloadOperation::Unseal {
+            bytes: bytes.clone(),
+            marker: marker.clone(),
+        },
+        ..request.clone()
+    };
+    assert!(
+        graphshell
+            .call(CustodyCall::Payload(turnstone_read))
+            .await
+            .is_err(),
+        "Graphshell cannot unseal Turnstone's retained bytes"
+    );
     let ordinary_wallet_sealer =
         castellan::custody::wallet::epoch_sealer_for_persona(root.path(), persona)
             .unwrap()
@@ -114,6 +164,30 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
             .unseal(&Hash::of(clear), &marker, &bytes.0)
             .is_err(),
         "retained-content ciphertext is bound to its app/profile lane"
+    );
+    // Compatibility input uses the pre-existing Turnstone AAD and the actual
+    // wallet cipher independently of the broker's current scope selection.
+    let legacy_scope = serde_json::to_vec(&(
+        "turnstone.retained-clips/custody-v1",
+        "family",
+        &request.master,
+    ))
+    .unwrap();
+    let (legacy_bytes, legacy_marker) = ordinary_wallet_sealer
+        .with_scope(legacy_scope)
+        .seal(&Hash::of(clear), clear)
+        .unwrap();
+    let legacy_read = PayloadRequest {
+        operation: PayloadOperation::Unseal {
+            bytes: PayloadBytes(legacy_bytes),
+            marker: legacy_marker,
+        },
+        ..request.clone()
+    };
+    assert!(
+        matches!(client.call(CustodyCall::Payload(legacy_read)).await.unwrap(),
+        CustodyAnswer::Payload { result: PayloadResult::Clear { bytes } } if bytes.0 == clear),
+        "existing Turnstone-scoped ciphertext remains readable"
     );
     let sealed_epoch = marker.epoch;
     let read = PayloadRequest {
@@ -137,7 +211,8 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     for bad in [
         PayloadRequest {
             custody_epoch: Some(graphshell_endpoint::door::custody::CustodyEpoch {
-                instance: "a-different-custodian".into(), generation: 1,
+                instance: "a-different-custodian".into(),
+                generation: 1,
             }),
             ..read.clone()
         },
