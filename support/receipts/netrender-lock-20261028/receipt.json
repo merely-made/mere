@@ -1286,7 +1286,7 @@
       "source": "https://crates.io/api/v1/crates/spareval",
       "raw_metadata_sha256": "a84deb5ee2e526ace890f7d83519c310f12951e51459d7e5e8abc9d4d9bedd86"
     },
-    "status": "native query/test and full-default web compile-only checks passed; full test execution and web linking remain queued",
+    "status": "105 native query tests passed and full-default web product linked; existing genet-taffy source identity gap remains",
     "lock_reconciliation": {
       "Cargo.lock": {
         "selected_updates": {
@@ -1481,9 +1481,70 @@
       "checkout": "<Code>/worktrees/mere-spareval-029-queued-20261028",
       "live_state": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/state.json",
       "reserve_gib": 20,
-      "policy": "current workspace policy; no limits changed; no messages to other chats"
+      "policy": "current workspace policy; no limits changed; no messages to other chats",
+      "completion": {
+        "target": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+        "checkout": "<Code>/worktrees/mere-spareval-029-queued-20261028",
+        "status": "builds_passed_with_existing_source_identity_gap",
+        "attempts": [
+          {
+            "stage": "query-tests",
+            "directory": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/query-tests-0001",
+            "policy_sha256": "f81b39a804364f3d271af01c9e8b5b9a8507c8a2422bfd1b6e8859066e73b69b"
+          },
+          {
+            "stage": "web",
+            "directory": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/web-0001",
+            "policy_sha256": "f81b39a804364f3d271af01c9e8b5b9a8507c8a2422bfd1b6e8859066e73b69b"
+          }
+        ],
+        "results": {
+          "query-tests": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/query-tests-0001",
+          "web": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/web-0001"
+        },
+        "no_messages_to_other_chats": true,
+        "updated_utc": "2026-10-29T02:03:17.552306+00:00",
+        "stage": "web",
+        "web_source_identity_gaps": [
+          [
+            "genet-taffy",
+            "0.14.0",
+            "git+https://github.com/merely-made/genet.git?branch=main#36526e047f32d3b981f8983a2cab1afe68a9bc08"
+          ]
+        ]
+      },
+      "artifact": {
+        "path": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/web-0001/graphshell_web.wasm",
+        "sha256": "c2be20e27c620d12a87876829dc23f61648c80d215c844af1d62b70220b60f92",
+        "size": 1628867487
+      },
+      "built_source_audit": {
+        "built_package_identities": 554,
+        "lock_records": 1131,
+        "all_built_package_identities_match_lock": false,
+        "missing_source_aware_records": [
+          [
+            "genet-taffy",
+            "0.14.0",
+            "git+https://github.com/merely-made/genet.git?branch=main#36526e047f32d3b981f8983a2cab1afe68a9bc08"
+          ]
+        ],
+        "git_checkout_heads": {
+          "/Users/markik/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+          "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/36526e0": "36526e047f32d3b981f8983a2cab1afe68a9bc08",
+          "/Users/markik/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+          "/Users/markik/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b": "11e208b84a981993df8077bb6025f8b3adbe2291",
+          "/Users/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+          "/Users/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+          "/Users/markik/.cargo/git/checkouts/esp-45bbaf8e1db2afe3/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+          "/Users/markik/.cargo/git/checkouts/woodshed-b9974f59ddc43cf9/a0ae58f": "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+          "/Users/markik/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+          "/Users/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+          "/Users/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80"
+        }
+      }
     },
-    "hash_function_regression": "MD5, SHA1, SHA256, SHA384 and SHA512 of abc through the public SPARQL query path; compiled but not yet executed",
+    "hash_function_regression": "MD5, SHA1, SHA256, SHA384 and SHA512 of abc through the public SPARQL query path; executed and passed in the 105-test suite",
     "existing_web_source_identity_gap": {
       "package": "genet-taffy 0.14.0",
       "locked_revision": "a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
