@@ -394,13 +394,22 @@ automation, credentials, grants or publication.
   publication generation (`MereHost::workshop_commit`). An old receipt alone
   does not prove the live graph can open its result.
 
+- 2026-10-29: Turnstone's modern session loader installs the exact canonical
+  facet file, preserving absence instead of reconstructed defaults, so its
+  unchanged graph keeps the destination revision. Reconciliation installs the
+  proven destination before a fallible helper acknowledgement. An auxiliary
+  workshop window requests its own redraw after owner updates. Native
+  inspection currently requires a paused scene; the active-scene timeout is
+  an unresolved presentation/inspection boundary, not a privacy qualification.
+
 ## Progress
 
-- 2026-10-29: qualified the opt-in separate-process custody fixture and the
-  Graphshell private native process and visible controls. Live custody loss
-  terminally retires the window, including queued source-bearing actions;
-  unlock requires a fresh binding. Turnstone receiving and production gates
-  remain open.
+- 2026-10-29: qualified the opt-in separate-process custody fixture and both
+  private native workshop paths. Graphshell retires queued private actions on
+  custody loss; Turnstone qualifies retained-source admission, acceptance,
+  offline cold result reading and retirement in a paused scene. Turnstone's
+  playing-scene inspection, supplier integration and production gates remain
+  open. Unlock requires a fresh binding in both hosts.
 - 2026-10-28: cut from `2026-06-24_alembic_implementation_plan.md` and
   `2026-07-06_node_image_externalization_plan.md`; the Decisions section is copied unchanged;
   nothing new landed.

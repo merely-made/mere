@@ -640,3 +640,146 @@ identity, real-profile migration, physical input/IME/accessibility hardware,
 production custody, cross-machine transfer or a model inference provider. The
 two application hosts remain a separate acceptance boundary: Turnstone's
 private native receiving qualification is still open.
+
+
+## Turnstone private receiving, regression repairs and native gate still open
+
+Turnstone candidate `fcf8a0d06469aef5512b3e2688c532636f407284` is pushed to
+`codex/alembic-hosts-20261028`. It receives Mere
+`bd5ec7eb51eaafa409e64d8b8987b05ad0f24eca`: the source-aware audit advances
+only the 62 Mere lock records and preserves all 1,599 nonselected records.
+Locked offline metadata succeeds; all 162 Git packages match their actual
+checkout revisions across 21 source identities. The receiving manifest and
+local composition configuration are unchanged. These audits live in
+`Code/output/alembic-turnstone-20261028/bd5-receiving-cut/`.
+
+The session lease refusal regression has a genuine executed pre-fix failure
+and repaired pass. The red left the departed session's Place state live after
+writer admission failed. The repair routes both lease and load refusal through
+the same cleanup. `private-source-test-receipt-20261029.md` distinguishes that
+red from compiler setup failures and from four test-only capture fixture
+adjustments: explicit custody installation and exact sidecar-committed crash
+boundaries. Fresh-process recovery still checks Keep and the original capture
+reference, then retries without duplicating the attachment.
+
+A second real regression injects an acknowledgement error after the helper
+journal transaction commits. The pre-fix run executes once and fails because
+the durable note is absent from the live owner although review is Added.
+`reconcile-install-before-ack-red-executed-20261029.log` and frozen artifact
+`recovery-reconcile-red-artifact-20261029.json` retain that evidence. The actual
+completion seam now installs the proven destination before its single helper
+acknowledgement. Its regression passes on the final receiving harness.
+
+The first native app pass used three loopback pages and ordinary Save source
+and keep controls, with a separate custody broker/custodian and explicitly
+isolated roots. The quiet workshop chooser admitted the sealed retained
+versions of 91, 99 and 100 UTF-8 bytes. It generated a private proposal and
+opened its exact Unicode source citation. That pass exposed two receiving
+problems: an asynchronous workshop update did not request its own native
+redraw, and accepting refused because reloading the same graph invented a
+new revision. No note was accepted in that pass. The native receipt
+`native-private-first-receive-red-20261029.json` retains the input identities
+and boundaries; scanning all 37 ordinary persisted files and the app log found
+no private source canary.
+
+The redraw repair explicitly requests the auxiliary window's redraw. A third
+executed regression demonstrates the revision defect through a real save/load:
+`canonical-facets-red-executed-20261029.log` runs once and fails on an ordinary
+live facet store. The loader now installs an existing modern canonical facet
+file exactly, preserving absence, while genuine legacy columns keep their
+existing migration and canonical precedence. The added migration control
+checks canonical false over a legacy Keep label and stable repeat loading.
+
+The final guarded command builds the normal app, library tests and binary tests
+in one lane invocation, using the unchanged 20 GiB reservation:
+
+```sh
+PATH=/Users/markik/.cargo/bin:$PATH python3 /Users/markik/Code/tools/build_storage.py \
+  --policy /Users/markik/Code/output/alembic-hosts-20261028/admission-wait-900-policy.json \
+  build --lane alembic-turnstone-20261028 \
+  --cwd /Users/markik/Code/worktrees/turnstone-alembic-hosts-20261028 --reserve-gib 20 -- \
+  +1.99.1 build --lib --bin turnstone --tests --locked --offline --message-format=json -j 4
+```
+
+`canonical-facets-green-build-20261029.log` / `.exit` succeeds. Cargo identifies
+the normal binary with `profile.test=false` and the separate library harness
+with `profile.test=true`; both report `fresh=false`. APFS-cloned executables
+and their hashes are bound by `private-receive-v2-artifacts-20261029.json`:
+
+- Normal app: `turnstone-private-receive-v2-native-20261029-bd5`, SHA-256
+  `b307d72faded793b0971eac3d533bf119f3ceaab2130dee83cda8a1f749da809`.
+- Library harness: `turnstone-private-receive-v2-tests-20261029-bd5`, SHA-256
+  `7035c0c0f67a24c4549051e4f3a81ce199e096189341bc768b47eb5199197ce3`.
+
+`private-receive-v2-focused-20261029.json` records 103 distinct passing named
+tests, with no failures or ignores: session persistence 21, session loading and
+migration 16, Surface controls 4, workshop 8, source-capture persistence 26,
+saved sources 11, custody binding 4, sealed capture 4, captured Place collection
+6 and graph facet editing 3. This includes the abrupt fresh-process Fjall
+capture tests. Test roots are explicit, with no scenario plaintext export.
+
+The final normal app cold-opens with `TURNSTONE_OFFLINE=1` after the owned
+loopback origin was stopped. Expected typed acquisition refusals appear in its
+log. Native inspection then times out for the app through path, bundle ID and
+name; a fresh app registration reproduces it while Finder inspection succeeds.
+The retained process sample is too sparse to establish a deadlock or root cause.
+A preserved-layout/default-map diagnostic also times out; it does not qualify
+the original restored Read layout. At that checkpoint, native acceptance, accepted-result cold reading and live
+custody retirement remained open for Turnstone. The paused-scene continuation
+below subsequently qualifies those bounded workshop conditions; the playing
+scene and original restored Read layout remain separate limits. No production,
+external-principal or H1 qualification flag is lifted.
+
+
+## Turnstone paused-scene private native continuation
+
+`native-private-paused-diagnostic-20261029.json` records a controlled fixture
+change after the owned app exited: only the saved scene's `physics_paused`
+boolean changed from false to true. The original facet bytes are retained and
+every other JSON value is verified unchanged. Native inspection immediately
+succeeds on the same frozen app, root and offline policy. This narrows the
+observed inspection failure to the active scene/presentation condition; it does
+not establish a root cause or qualify playing-scene performance. The earlier
+layout diagnostic and original layout remain preserved.
+
+The three sources were captured through the ordinary native Save source and
+keep action on the earlier frozen normal app (`c2a3f116…`); the capture/storage
+path did not change in the subsequent loader/redraw repair. The final app
+(`b307d72f…`) cold-receives those sealed versions while the origin is stopped
+and `TURNSTONE_OFFLINE=1`. Its quiet chooser again shows the exact 91/99/100-byte
+versions. The prior unaccepted proposal is rejected, then a fresh helper run
+finishes and displays its proposal without Pause/Resume or another refresh
+control. No model provider is involved.
+
+The final native controls qualify:
+
+- Opening the exact Unicode saved citation while offline.
+- Accepting one private brief, receiving the graph/receipt acknowledgement and
+  reading the retained result Resource `0fd49e75-ce8c-5df6-9ccc-694700343593`.
+- Live custody lock at generation 7 closing the private workshop; a fresh
+  workshop-open attempt is refused with no source canary exposed in the full
+  accessibility tree. Unlock at generation 8 does not revive the old window.
+- A fresh binding recovering the same Added result, then helper dissolution
+  leaving that result readable.
+- Normal owner shutdown and a cold process change from PID 94663 to 95272;
+  the dissolved helper's retained review reopens the same Resource and Unicode
+  result, with the origin still absent.
+- Actual custodian process loss retiring the private window and clearing the
+  private canary from the full accessibility tree.
+
+`native-private-v2-headed-20261029.json` retains these observations and the
+final store scan. Exactly one accepted note remains: four graph nodes and five
+Resources, including the separate operation Resource. All 38 regular files
+under the isolated product root and the ordinary app log are free of the private
+source canaries. The loopback connection is refused. The app, origin server,
+broker and custodian are stopped and their owned process exits verified.
+
+This qualifies the bounded private workshop in both application hosts on one
+Mac, with a paused Turnstone scene and synthetic custody. It does not qualify
+two physical hosts, an inference provider, authenticated external helper
+principals, arbitrary live-scene performance, the original multi-Read restored
+layout, private real-store migration or production custody. The complete W3
+failure matrix and supplier integration remain open. The current integrated
+main candidates introduce a newer Dramatis/Genet cohort; those dependency
+identities are awaiting the requested explicit selection before adoption and
+combined qualification. Candidate branches are published; main is not merged.
