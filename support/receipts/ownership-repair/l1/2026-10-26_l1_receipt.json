@@ -299,7 +299,7 @@
       "change": "src/web_capture.rs, src/web_tree/product/history.rs (capture-buffered probe field), web/extension-profile.js, web/extension/README.md, smoke-capture-ack.mjs",
       "regression": "smoke-capture-ack (the queue stays until the event, then drains; the status line reads the root's counters)",
       "commit": "3236e96ef, merged 74d9fe15c",
-      "note": "the Rust half lives in the wasm-only graphshell-web crate (src/web.rs, target wasm32) and was type-checked only in isolation: the wasm check of ports/graphshell/web fails in a dependency (spareval 0.2.7, digest 0.10 vs 0.11) before reaching it, and nothing ran in a browser. The capture panel markup (#capture-panel etc.) has been gone from the page since 93ce49c82, so prepareCapture threw and the extension page never mounted; the lane made the panel optional so the pull and the ack listener work without it. graphshell-history-controls-complete is likewise never dispatched; the README still says the portal's Enable capture control requests history"
+      "note": "the Rust half lives in the wasm-only graphshell-web crate (src/web.rs, target wasm32) and was type-checked only in isolation: the wasm check of ports/graphshell/web fails in a dependency (spareval 0.2.7, digest 0.10 vs 0.11) before reaching it, and nothing ran in a browser. The capture panel markup (#capture-panel etc.) has been gone from the page since 93ce49c82, so prepareCapture threw and the extension page never mounted; the lane made the panel optional so the pull and the ack listener work without it. graphshell-history-controls-complete is likewise never dispatched; the README still says the portal's Enable capture control requests history; compiled clean for wasm32 at 9dab9408a"
     },
     {
       "id": "Q214 (2026-10-28)",
@@ -334,7 +334,7 @@
       "change": "pandect graph_session_transaction.rs; graphshell capture.rs, mere_host.rs",
       "regression": "a_refused_capture_leaves_no_graph_edits_pending_and_a_later_delivery_carries_only_its_own_records; the audit probe, run as a temporary should_panic, panics at its defect assertion and was not committed",
       "commit": "b39710034, merged 09ac76cc9",
-      "note": "capture's expectations pin keys read with get, not list or scan results; the RejectingApplyBackend test backend gained transact; wasm not built"
+      "note": "capture's expectations pin keys read with get, not list or scan results; the RejectingApplyBackend test backend gained transact; wasm not built; compiled clean for wasm32 at 9dab9408a"
     },
     {
       "id": "Q253 (2026-10-28)",
@@ -343,7 +343,7 @@
       "change": "pandect slot_guard.rs (new), lib.rs; platen workspace/session.rs; graphshell presentation_store.rs, block_editing/store.rs, forme_session_lifecycle_tests.rs, web_tree/forme.rs",
       "regression": "slot_guard: a_replace_with_a_stale_baseline_refuses_and_leaves_the_slot, an_empty_baseline_replaces_only_an_empty_slot, a_read_error_or_a_missing_transaction_is_an_error_not_a_conflict; platen: baseline_is_the_loaded_bytes_then_the_bytes_an_acknowledged_save_wrote; lifecycle: a_session_refused_by_the_slot_guard_keeps_its_draft_until_it_reloads_the_slot, two_sessions_loaded_from_an_empty_slot_cannot_both_create_it",
       "commit": "c1a05793a, 78307ffe6, merged e92d97a02",
-      "note": "web_tree/forme.rs is wasm-only and was not compiled (graphshell-web check fails in spareval, then refused by the cache budget); pandect lib 361, graphshell lib with workspace-editor,editable-blocks 383, platen lib 78"
+      "note": "web_tree/forme.rs is wasm-only and was not compiled (graphshell-web check fails in spareval, then refused by the cache budget); pandect lib 361, graphshell lib with workspace-editor,editable-blocks 383, platen lib 78; compiled clean for wasm32 at 9dab9408a"
     },
     {
       "id": "Q257 and A067 (2026-10-28)",
@@ -352,7 +352,7 @@
       "change": "graphshell projection_save.rs (new), lib.rs, web_tree/product/projection.rs; chirograph lib.rs doc",
       "regression": "projection_save: a_save_acknowledges_only_the_editor_it_was_sent_from, a_save_without_a_dataset_is_current_until_one_loads",
       "commit": "654d17386, merged 9bc83253f",
-      "note": "projection.rs is wasm-only and was not compiled; field edits during a pending save are not blocked and the ack still marks an edited draft clean (the generation counts editor replacements only)"
+      "note": "projection.rs is wasm-only and was not compiled; field edits during a pending save are not blocked and the ack still marks an edited draft clean (the generation counts editor replacements only); compiled clean for wasm32 at 9dab9408a"
     },
     {
       "id": "Q247 (2026-10-28)",
@@ -505,13 +505,15 @@
       "projection field edits during a pending save are not blocked and the ack still marks an edited draft clean",
       "the local-file rule drops a local resource with its shown link and resource edges, so a relation held through the resource layer (Cites) is not exported; titles, provenance.import, visit.history and resource facets may still hold a path",
       "Alembic transact_change_record duplication removed; the operation record now commits as CommitExtra with an expected-absent key and the receipt is re-read on refusal",
-      "support/receipts/authority-success-audit/forme_stale_save_probe.rs still shows the removed PreparedSave::save API"
+      "support/receipts/authority-success-audit/forme_stale_save_probe.rs still shows the removed PreparedSave::save API",
+      "spareval 0.2.9 declares sha2, sha1 and md-5 as >=0.10,<0.12, so a lock can split them across digest majors and its hash evaluator stops compiling; updating spareval alone keeps an old edge (the web lock did at 4559b860a)",
+      "graphshell-web carries twelve warnings older than this round (unused imports in forme.rs, query_view.rs, link_attachment.rs, overlay_observation.rs and web_timing.rs; never-read fields in web_tree.rs, web_capture.rs and web_rtc_link.rs; unused mount, rebind_host_presenter, session and narrow), residue of the tree going uncompiled since spareval entered the web lock at dd68daf23"
     ],
     "applied": "all fifteen, by crate in six parallel worktrees, one regression each, merged in the merges list from 267f91b40 to the l1-r2-transact merge; operations dated 2026-10-28 from Q061 on",
     "unverified": [
-      "the web tree (web_tree*, web_graphs.rs, web_capture.rs, web_tree/product/*) compiles only in the graphshell-web cdylib for wasm32; its check fails inside the dependency spareval (0.2.7, and still 0.2.9 on the merged main 38da98b69: its hash functions mix digest 0.10 and 0.11 traits, six E0277 errors in expression.rs) before reaching this code, so the Forme pane, projection page, product call sites, history and capture edits of this round are compile-unchecked",
       "the extension capture panel's acknowledgement path is pinned by a unit test, not a browser run"
     ],
+    "web_tree_check": "2026-10-29: spareval 0.2.9 allows sha2, sha1 and md-5 anywhere from 0.10 to 0.11, and the web lock had kept its sha2 edge at 0.10.9 while sha1 and md-5 sat at 0.11, so the SPARQL hash evaluator mixed digest majors (the root lock resolved all three at 0.11); with spareval's sha2 edge at 0.11.0 (9dab9408a) the wasm32 check of ports/graphshell/web compiles spareval, graphshell and graphshell-web clean (0 errors, 45 s, no lane growth), so the Forme pane, projection page, product call sites, history and capture edits of this round are compiled",
     "capacity": "the compiler-cache budget (400 GiB) was reached at 399.5 GiB during gating and refused every launch for about two hours; the wrapper has no per-lane release and the pressure prune needs 24 idle hours; on Mark's word the four finished lanes' build caches (q010, q012, q016, modularity, 88 GiB) were deleted, artifacts kept",
     "regated_after_origin_merge": "main 38da98b69, fourteen commits from origin merged after the gates above (custody contracts, Taffy fork, smolweb palettes, spareval 0.2.9): pandect 368+28, pictograph with canvas 663+5, djinn check; the incoming dramatis revision had to be fetched once before any offline gate could resolve"
   }
