@@ -108,7 +108,7 @@ pub fn station_grant(root: &Path, request: &StationGrantWire, issuer: [u8; 32]) 
         .ok_or("no-wallet")?;
     let wallet_public_key = InMemoryProvider::from_seed(seed).master_public_key().to_bytes();
     let request = SitedStationGrantRequest::new(
-        pandect::DeviceId::from_uuid(request.device_id),
+        personae::carry::DeviceId::from_uuid(request.device_id),
         request.station_ed25519_public_key,
         request.label.clone(),
         request.issued_at_ms,
@@ -123,8 +123,8 @@ pub fn station_grant(root: &Path, request: &StationGrantWire, issuer: [u8; 32]) 
 }
 
 /// Revoke one delegated device in the wallet.
-pub fn revoke_device(root: &Path, device: uuid::Uuid) -> Result<pandect::RemoteAuthRevocationOutcome, String> {
-    castellan::custody::wallet::revoke_remote_auth_device(root, pandect::DeviceId::from_uuid(device)).map_err(|error| error.to_string())
+pub fn revoke_device(root: &Path, device: uuid::Uuid) -> Result<personae::carry::RemoteAuthRevocationOutcome, String> {
+    castellan::custody::wallet::revoke_remote_auth_device(root, personae::carry::DeviceId::from_uuid(device)).map_err(|error| error.to_string())
 }
 
 /// Seal or unseal one retained payload under `persona`'s wallet epoch, bound

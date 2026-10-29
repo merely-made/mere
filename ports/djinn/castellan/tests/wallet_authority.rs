@@ -7,6 +7,7 @@ mod enrollment {
     //! Regression coverage of public custody flows. All keys are temp fixtures.
     use castellan::custody::wallet::*;
     use pandect::{wallet_grant::*, wallet_store::*};
+    use personae::carry::DeviceId;
     use personae::PersonaId;
 
     fn spec(device: &LocalDeviceIdentity, persona: PersonaId) -> RemoteAuthGrantSpec {
@@ -161,6 +162,7 @@ mod revocation {
     //! All roots, keys and device records here are isolated fixtures.
     use castellan::custody::wallet::*;
     use pandect::{wallet_grant::*, wallet_store::*};
+    use personae::carry::DeviceId;
     use personae::{IdentityProvider, PersonaId, carry::revoke_device_grant_set};
 
     #[test]
@@ -267,6 +269,7 @@ mod interruptions {
     #![cfg(windows)]
     use castellan::custody::wallet::*;
     use pandect::{wallet_grant::*, wallet_store::*};
+    use personae::carry::DeviceId;
     use personae::PersonaId;
 
     #[test]

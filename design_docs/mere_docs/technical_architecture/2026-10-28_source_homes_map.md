@@ -7,6 +7,9 @@ Knot, Turnstone, Cleromancy and Woodshed (their manifests' Mere dependencies).
 Nothing has moved yet. This is the dependency evidence that the family promotion
 plan's F3 asks for before it chooses a grouping
 ([family promotion plan](../implementation_strategy/2026-10-28_family_promotion_plan.md)).
+[What the code adds](#what-the-code-adds) comes from reading every package's
+code at Mere `0740ea10a` and the other repositories' `main`. Its load-bearing
+claims were checked again at `45492c644`.
 
 **Origin.** Mark, 2026-10-28: "consider what should be moved from mere to the
 various repos." Earlier that day he described Mere's scope, in conversation
@@ -18,6 +21,18 @@ Alembic and Athanor beside ESP. The review that followed agreed on three
 points: the custody packages are siblings in the resident unit, Pandect takes
 domain settings in rather than importing them, and Graphshell's fixture edges
 move to an integration unit. Neither home was ruled.
+
+Later on 2026-10-28 he added, again in conversation:
+- "redefine existing names instead of minting new ones."
+- Graphshell may become a repository again. That would mean unarchiving the old
+  repository and replacing its contents, leaving its history in the past.
+  "what's important is to untangle the repos and prevent cycles, dogfooding,
+  and not drawing inefficient boundaries."
+- On Djinn: "some of djinn's capabilities have to be distributed throughout the
+  stack."
+- On which apps project: "we are _not_ treating the current situation as the
+  intended one". The design is that every app projects through Graphshell's
+  protocol.
 
 ## The scope test
 
@@ -51,6 +66,250 @@ each package's coupling measured in files.
 | `mere-edit` (`source-edit`), `mora-cmudict`, `reference-data` | nothing | Knot | none | Knot; `mora-cmudict` could go beside `mora` instead | No ruling found. |
 | `document-host`, `ux-events` | nothing | nothing in the nine repositories read | — | — | Workspace members with no consumer. |
 | `support/graphshell-coop/relay_server`, `support/patches/burn-remote`, `crates/probes/murm-direct-phy` | the co-op harness; Distillery `remote` | — | — | The relay and the Burn patch: murm `design_docs/2026-10-28_transport_consolidation_plan.md`, T5 and T4. The probe: Murm. | Transport plan. |
+
+## What the code adds
+
+On 2026-10-28, eleven readers went through the code of the whole stack: every
+package's code, not just its manifest. The table above says where packages could
+go. The findings below say where the lines between homes fall, and why several
+of those lines can't be drawn yet: they follow contracts that the stack doesn't
+have.
+
+### Capabilities with no contract
+
+Without a shared contract, each app writes its own version of a capability, and
+every copy is one more edge for a move to carry.
+
+- **Persona.**
+  - The word names six unrelated things:
+    - Castellan's `ProfileId`, a vault master key;
+    - `PersonaId`, a wallet persona's UUID and a directory name;
+    - `gaz::PersonaScope`;
+    - Gemot's `mien::PersonaKey`;
+    - Hocket's `IdentityHome`;
+    - notochord's `ProfileRef`.
+  - About ten pieces of code decide which persona an app runs under. Only hand
+    configuration links a `ProfileId` to a `PersonaId`, and only tests call
+    `PersonaId::new()`.
+  - There is no type for use that leaves no trace. The journal's `AuthorKind`
+    is Person, Rule, Script or Engine (`graph-kernel/src/graph/journal.rs:66-99`),
+    and `GraphSessionManifest.persona_id` is required
+    (`pandect/src/manifest.rs:124`).
+  - What already fits:
+    - An app gets keys through `IdentityProvider`, and a writer record may
+      carry a `DerivedKeyAttestation` (Eidetic `stickleback/src/writer.rs:43`).
+      A signer without one is its own root and has no standing.
+    - Woodshed's persona gate is the one anonymous mode in code: escape keeps
+      "no key, no store, nothing kept".
+  - A persona contract would let an app declare its persona use and salt
+    namespace itself. It would also decide which package is the persona
+    client. Today that is the `door`, described below.
+- **Settings.**
+  - There are seven or more stores, each with its own file layout:
+    - Djinn's `OwnerSettings` and `lock.toml`;
+    - Pandect's `ApplicationSettings`, `DeviceSettings` and `PersonaSettings`;
+    - Knot's;
+    - Distillery's `InstalledSettings`;
+    - the custodian's per-user file.
+  - Two `SettingScope` types define different scopes: kernel `permissions.rs`
+    and `surface-api` `settings.rs`.
+  - About 51 non-test files across the apps write JSON through a temp file and
+    a rename. At least seven of them hand-roll it.
+  - Pandect holds other owners' shapes:
+    - `ApplicationSettings` is Turnstone's (`tab_cap`, `shellbar_edge`);
+    - `DeviceSettings` holds Djinn's unlock mode and mesh lending;
+    - `PersonaSettings` stores Alembic's `EvictionPolicy`. This is the
+      Pandect→Alembic edge in the table.
+  - The 08-06 ruling already fits a settings capability:
+    - the configured thing owns its typed setting;
+    - providers describe it, Cambium renders it and hosts apply it;
+    - mechanism may be shared, schema may not.
+
+    What's missing is the shared mechanism and one scope vocabulary. With
+    those, each of the shapes above would live with its owner, and Pandect's
+    Alembic edge would go.
+- **Custody and admission.**
+  - One custody API exists in three shapes:
+    - the door's `CustodyCall`, with 21 variants;
+    - Djinn's `ResidentCustody`, with 29 methods;
+    - `custody-wire`'s `Operation`, with 22.
+  - `CustodyCall` mixes app calls (Release, Attest, Sign, Status) with owner
+    and admin calls (ChooseProfile, CreateProfile, RevokeDevice,
+    IssueStationGrant).
+  - Each of three doors has its own admission path: the app door, Djinn's
+    browser door, and `graphshell-host`'s WebRTC door. Projection admission
+    (notochord triples, `graphshell-host/src/admission.rs`) is a fourth model.
+  - The custody plan says a forwarded label never grants scope, and that
+    releasable-salt permission becomes per-principal grants. The code differs:
+    - Every installer defines one principal, `djinn`.
+    - Its grants (`custodian/packaging/djinn-grants.json.in`) are the union of
+      every app's salts.
+    - They repeat Djinn's `ReleasePolicy` (`ports/djinn/src/custody.rs`). One
+      test is the only check that the two agree.
+- **Transport.**
+  - Consumers call `P2pandaTransport`'s own p2panda and iroh methods rather
+    than the `Transport` trait. Its `builder_for` has 23 call sites outside
+    Murm.
+  - Distillery and Djinn bind at least five separate transports per resident.
+    Djinn's inference mesh defines its own ALPN
+    (`resident_inference/mesh_discovery.rs`).
+  - Isocosm opens a raw iroh endpoint (`isonetry/src/iroh_link.rs`). Knot runs
+    a bare quinn server (`knot-editor/src/mark.rs`), which Murm's consolidation
+    survey doesn't list.
+
+### Djinn holds what apps can't declare
+
+- Djinn has 46k lines in `src`. Its resident core is about 6k:
+  - the composition in `bin/djinn.rs`;
+  - the lane container (`resident.rs`);
+  - status and events;
+  - blobs;
+  - the custody client;
+  - the generic app door.
+- By purpose, the rest belongs to other owners:
+  - Distillery: about 5k lines (`resident_distillery`, `resident_inference`);
+  - Murm and sync: about 7.9k, whose replica and offer vocabulary is still
+    Graphshell's;
+  - Knot;
+  - publication: a hand-built Gemini server (`resident_site`), Gemot's
+    `moot_site` and Retinue's `micron_site`;
+  - Dramatis: the identity endpoint and projection, enrollment and the keeper;
+  - Graphshell: the browser carrier;
+  - Mere: the graph routes (`resident_mere`);
+  - an OS adapter: `conditions` and `lock_triggers`;
+  - settings: `settings.rs`, one closed struct that holds every lane's
+    settings.
+- Apps can't declare themselves, so Djinn names them:
+  - The app list is hard-coded in three places: `custody.rs:46`
+    (`CUSTODY_APPS`, ten labels), `bin/djinn.rs:1284` and
+    `embedded_reservoir.rs`.
+  - Routes are registered and granted by label (`bin/djinn.rs:1243-1335`).
+  - The door's `AppMessage` (`graphshell-endpoint/src/door/wire.rs:55`) is
+    Connect, Request, TakeNotice, WaitNotice or Call. No message lets an app
+    offer a projection.
+- Djinn and Cleromancy form a repository cycle:
+  - Djinn installs Cleromancy's divination validator in the mere route
+    (`resident_mere.rs:131-138`).
+  - Djinn depends on `cleromancy-core` by git.
+  - Cleromancy links `djinn`.
+- The door could carry an app manifest: routes, projections, salt namespaces
+  and persona use. With one, each piece above could live with its owner, and
+  Djinn's home would be a question about its 6k-line core rather than all
+  46k lines.
+
+### "Graphshell" names three things
+
+- **The projection protocol:** Chirograph, the endpoint traits and
+  `graphshell-client`. Since 2026-08-01, `crates/graphshell` has had 79
+  commits and Chirograph 20.
+- **The graph product:** `ports/graphshell`, with 93.6k lines in `src` and 925
+  commits over the same period.
+  - About 9.1k of its lines are adapters for other owners: Woodshed practice,
+    Knot blocks, Pelt retained content, Moot resources, the Alembic workshop
+    and Distillery.
+  - `ports/graphshell/docs` holds about 269 MB of committed receipts.
+- **Djinn's client library:** the `door` module in `graphshell-endpoint`,
+  about 4.5k lines, which handles app admission and acts as the custody client.
+  - The socket (`graphshell-app.sock`), the environment variables
+    (`GRAPHSHELL_APP_ENDPOINT`, `GRAPHSHELL_PROFILE`), the hello schema and
+    Djinn's app directory all carry Graphshell's name.
+  - Ruling R3 of the stack lift plan put the door in the endpoint crate,
+    because apps already depended on that crate.
+  - As a result, Woodshed and Hocket link Pandect, the kernel and the wallet
+    crypto through the door for two types, `DeviceId` and
+    `RemoteAuthRevocationOutcome` (`door/custody_client.rs:28`).
+
+The scope test files the four `graphshell-*` crates together as a capability
+contract. The code divides them:
+- Chirograph, the endpoint traits and `graphshell-client` are the projection
+  contract.
+- The `door` is a custody and admission client.
+- `graphshell-host` (`publish = false`) holds admission and lifecycle. Beside
+  them sit the WebRTC door (2.8k lines) and about 2.7k lines of fixtures and
+  receipt views.
+
+A persona and custody client under its own existing name would let custody and
+projection change apart, and Graphshell's name would mean one thing.
+
+### Two graph edit spines
+
+- The kernel wraps `chartulary::Graph` (`graph-kernel/src/graph/mod.rs:352`)
+  but writes through its own muniment `GraphJournal`. Six consumers write
+  through Chartulary's revision-checked `GraphLog` instead: Servitor,
+  commons-spine, Turnstone, Woodshed, Knot and Cleromancy.
+  - In Mere, `GraphLog` appears only in tests and probes.
+  - Turnstone keeps each participant in both graphs, under different authors.
+  - The G5 note that justified a separate journal calls `GraphLog`
+    "topology-only". That was before `EditSpec` gained `SetFacet`, `Assert`
+    and `Derive`.
+- Servitor's gate is typed to `GraphLog`, `Container` and `Relation` (Eidetic
+  `servitor/src/gate.rs`), so it can't petition the main graph.
+- Pandect has two session-persistence stacks:
+  - files (`manifest_store`, `session_graph_store`, `facet_store`), which
+    Turnstone uses;
+  - muniment (`graph_session`), which Djinn and Graphshell use.
+- Merge is written four times: the kernel's `merge.rs`, and Pandect's
+  `snapshot_merge`, `graph_session_merge` and `merge_rules`.
+- With one edit spine, Servitor's `Cap`, which Gemot already maps onto, would
+  govern the main graph. It would also be clear which half of Pandect is graph
+  sessions.
+
+### Code with no consumer
+
+Every move carries this weight, and it counts toward each layout's costs below:
+- `chrome`, apart from about 380 lines (`nav::History`, `classify`);
+- six of the registry's modules;
+- about 4.8k parked Forme lines, which `forme/src/lib.rs` says "will be
+  removed";
+- about 1.7k lines of donor-era kernel host vocabulary (`pane`, `host_event`,
+  `overlay` and others), used only by `chrome`, `ux-events` and the registry;
+- Castellan's one-time-password and Secret Service code, about 7k lines;
+- `gazette`.
+
+Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
+
+### What already fits the design
+
+- **Already projecting:**
+  - Knot;
+  - Isocosm: its world, six game-table panels, Mesocosm and Eponym;
+  - Turnstone;
+  - Cleromancy;
+  - Distillery's Chronicle, which implements all six traits
+    (`ports/distillery/src/chronicle.rs`);
+  - Djinn's own endpoints.
+
+  Woodshed and Hocket don't project.
+- **G6, one workspace composing several apps' projections, isn't met in
+  code:**
+  - `ClientState` is a mount cache keyed by a `ProjectionSession` that isn't
+    qualified by endpoint (`graphshell-client/src/lib.rs`).
+    `graphshell-host/src/lifecycle.rs` warns that a second mount replaces the
+    first unless the caller mints per-session randomness.
+  - sceno has no notion of a mount or a fragment.
+  - A saved workspace (`pandect/src/saved_scene.rs`) has no list of endpoints.
+- **The plan record lags.** The Graphshell host plan carries G6 and G7 without
+  an owner. Its line that they gate publishing four `graphshell-*` crates is
+  stale: Chirograph, `graphshell-client`, `graphshell-endpoint` and
+  `graphshell` were published at 0.0.2 on 2026-08-23 and 24.
+- **Clean upstream:** Gemot needs nothing from Mere. Eidetic, ESP and
+  Armillary also sit cleanly upstream of it.
+
+### What this means for the homes
+
+- The lines between homes follow four contracts that the stack doesn't have
+  yet:
+  - a persona and custody client that isn't part of the projection protocol;
+  - an app manifest that the door carries;
+  - a settings mechanism with one scope vocabulary;
+  - one graph edit spine.
+
+  A package that moves before its contract exists takes today's copies with
+  it, and each copy becomes an edge between repositories.
+- Armillary, Personae, Eidetic and Servitor each left Mere, came back, and left
+  again within about three months.
+- This map records Mere's scope from conversation, not from a ruling. Mere's
+  README still calls Graphshell "Mere's reference host".
 
 ## Costs every move carries
 

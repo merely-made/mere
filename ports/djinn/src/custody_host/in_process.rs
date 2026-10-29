@@ -254,7 +254,7 @@ impl<S: IdentityStorage + 'static> ResidentCustody for PersonaeHost<S> {
         })
     }
 
-    fn revoke_device(&self, wallet_root: &Path, device: uuid::Uuid) -> Result<pandect::RemoteAuthRevocationOutcome, CustodyRefusal> {
+    fn revoke_device(&self, wallet_root: &Path, device: uuid::Uuid) -> Result<personae::carry::RemoteAuthRevocationOutcome, CustodyRefusal> {
         if PersonaeHost::is_locked(self) {
             return Err(CustodyRefusal::Locked);
         }

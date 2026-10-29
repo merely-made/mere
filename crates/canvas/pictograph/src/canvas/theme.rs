@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! One mapping from theme roles to the Map: the ground it clears to, the edge
-//! stroke, the face palette and the five category colours. Hosts used to carry
+//! stroke, the caption ink, the face palette and the five category colours. Hosts used to carry
 //! their own copies (Graphshell read the roles from a browser cascade, Turnstone
 //! did not theme the Map at all); both now resolve roles and apply this.
 
@@ -32,6 +32,7 @@ pub struct CanvasRoles {
 pub struct CanvasTheme {
     ground: [f32; 4],
     edge: [f32; 4],
+    caption: [u8; 3],
     faces: DerivedFacePalette,
     categories: [[u8; 3]; 5],
 }
@@ -45,6 +46,7 @@ impl CanvasTheme {
         Self {
             ground: unit(roles.ground),
             edge: unit(roles.edge),
+            caption: [roles.text.r, roles.text.g, roles.text.b],
             faces: DerivedFacePalette::from_roles(
                 [roles.primary, roles.secondary, roles.tertiary],
                 [roles.success, roles.danger],
@@ -79,11 +81,19 @@ impl CanvasTheme {
 }
 
 impl Canvas {
-    /// Re-theme the Map: ground, edge, derived faces and category colours.
+    /// Re-theme the Map: ground, edge, captions, derived faces and category
+    /// colours.
     pub fn apply_theme(&mut self, theme: &CanvasTheme) {
         self.set_palette(theme.ground, theme.edge);
+        self.set_caption_color(Some(theme.caption));
         self.set_derived_face_palette(theme.faces);
         self.set_category_colors(theme.categories);
+    }
+
+    /// Ink the node captions, and the rings and marks drawn in their colour,
+    /// so they read against a themed ground; `None` restores the canvas's own.
+    pub fn set_caption_color(&mut self, color: Option<[u8; 3]>) {
+        self.stage_style = crate::canvas::build::stage_style(color);
     }
 }
 
@@ -114,6 +124,7 @@ mod tests {
         assert_eq!(faces[3], color(70).to_array());
         assert_eq!(faces[4], color(80).to_array());
         assert_eq!(theme.categories[4], [130, 65, 125]);
+        assert_eq!(theme.caption, [30, 15, 225]);
         assert_eq!(theme.ground(), unit(color(10)));
     }
 }

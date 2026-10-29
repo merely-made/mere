@@ -15,7 +15,7 @@ use station_custody::{
     DjinnStationAuthority, SITED_STATION_CONTROL_TITLE, SitedStationControlResult,
     SitedStationCredential, SitedStationHead, SitedStationHeadError,
 };
-use pandect::DeviceId;
+use personae::carry::DeviceId;
 use personae::{IdentityProvider, SealedRecordStorage};
 
 struct ProvisionArgs {

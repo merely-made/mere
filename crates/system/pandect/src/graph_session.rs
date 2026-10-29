@@ -710,11 +710,14 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_transaction.rs"]
 mod transaction;
-pub use transaction::OperationReceipt;
+#[path = "graph_session_operation.rs"]
+mod operation;
+pub use operation::OperationReceipt;
 
 #[path = "graph_session_merge.rs"]
 mod merge;
 pub use merge::{DroppedChoice, MergeChoice, MergeConflict, MergeMatch, PendingMerge};
+pub use transaction::CommitExtra;
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
@@ -1332,9 +1335,12 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Run `edit` on the live graph as one change under `author`, journaled
-    /// but not stored until the next flush. Every mutation goes through
-    /// `apply_graph_delta`, the kernel's one write path, so the journal sees
-    /// all of them.
+    /// but not stored until the next flush. Every writer the closure uses,
+    /// `apply_graph_delta` or a public assertion or declaration writer, emits
+    /// captured deltas that `edit_as` records, replays onto a fresh clone and
+    /// compares, refusing a candidate that differs
+    /// ([`SessionError::NotReplayable`]). That check is the write boundary;
+    /// `GraphDelta` is one of its writers.
     pub fn edit_now<R>(
         &mut self,
         author: Author,
@@ -1576,11 +1582,6 @@ impl<B: Backend> GraphSession<B> {
         if let Some(at) = pending.updated_at {
             self.manifest.updated_at = at;
         }
-    }
-
-    /// Store everything not stored yet, stamping new changes `at`.
-    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
-        self.store(at, Vec::new(), false).await
     }
 
     /// Store what is pending, with `extra`, as one batch.
@@ -2219,7 +2220,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             }
         }
         session.manifest.codicil_read_only = true;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2232,7 +2233,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_fork_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2258,7 +2259,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_branch_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2367,6 +2368,7 @@ impl<B: Backend + Clone> MereSessions<B> {
     }
 
     /// Write a new session's manifest, baseline and first change as one batch.
+    /// Nobody else holds it, so there is nothing to recheck.
     async fn create(
         &self,
         manifest: GraphSessionManifest,
@@ -2381,7 +2383,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             author,
             kind,
         );
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 }
@@ -2401,6 +2403,10 @@ mod navigation_tests;
 #[cfg(test)]
 #[path = "graph_session_checkpoint_tests.rs"]
 mod checkpoint_tests;
+
+#[cfg(test)]
+#[path = "graph_session_transaction_tests.rs"]
+mod transaction_tests;
 
 #[cfg(test)]
 mod tests {

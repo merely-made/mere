@@ -225,18 +225,150 @@
     },
     {
       "id": "Q014 (2026-10-28)",
-      "ruling": "plan \u00a73: re-document only",
+      "ruling": "plan §3: re-document only",
       "owner": "live containment derivation writes Resource relations and the load-time rebuild adds Surface compatibility rows by design (family_assertions.rs requires both); query.rs no longer claims derived relations are never persisted; the register's own status is 'documentation corrected; compatibility behavior deliberately retained'",
       "change": "none; status closed as re-documented",
       "regression": "existing live_and_loaded_containment_use_different_stores_and_both_get_persisted pins the two stores",
       "note": "the Resource and Surface derivations still disagree in content; resolving that is the L1 question for A014-class entries if one is opened, not this finding"
+    },
+    {
+      "id": "Q061 (2026-10-28)",
+      "ruling": "plan §5: the core refuses while pending",
+      "owner": "SessionCore::begin refuses while an operation awaits its answer and every starter returns the refusal (Progress::Refused for rediscover, poll and close, which have no error channel); the driver and the blocking adapter clear the core's pending when a request dies without an answer; RemoteSession owns an operation only once the driver has taken it",
+      "change": "graphshell-client core.rs, driver.rs, session.rs, remote.rs",
+      "regression": "driver::a_refused_second_start_leaves_the_first_answerable, core::a_start_while_awaiting_is_refused_and_the_first_stays_answerable, core::a_second_media_request_is_refused_while_the_first_awaits, remote::a_refused_draft_leaves_the_adapters_pending_as_it_was, session::a_declined_request_leaves_the_session_free_to_ask_again",
+      "commit": "17ce0e9ad, merged 267f91b40",
+      "note": "resolve served from cache and a bell for an acknowledged revision still return Done while an operation is pending (they ask nothing); RemoteSession still clears its pending on a wrong-id or unreadable line while the driver waits"
+    },
+    {
+      "id": "A011 (2026-10-28)",
+      "ruling": "plan §5: primary owns, cursor is history",
+      "owner": "the primary address is the node's address; the Stemma cursor is history. The rule is in the history.rs module doc and on update_node_url, navigate_node and land_history_step; Graph::node_current_url and SharedNavigationMemory::current_url are gone; canvas/nodes.rs reads the history projection's existence",
+      "change": "graph-kernel history.rs, mod.rs, node.rs doc; pictograph canvas/nodes.rs",
+      "regression": "a_set_address_is_the_address_until_the_next_history_step",
+      "commit": "39a7b6353, merged 0158f47dc; node.rs doc in 015f38651"
+    },
+    {
+      "id": "Q101 and Q091 (2026-10-28)",
+      "ruling": "plan §5: the kernel enumerates",
+      "owner": "Graph::projected_neighbors reads a node's neighbours across both strata (parallel relations repeat, a self-loop once, no hides); view.rs, cartography.rs, signals.rs and producers.rs adopt it and the producers' private copy is gone. The seiche_bridge visible-row reader and controller_topology stay (hide-filtered relation rows, not neighbours); fold_projection keeps its directed, family-filtered closure",
+      "change": "graph-kernel query.rs; pictograph view.rs, cartography.rs, signals.rs, importance.rs, producers.rs",
+      "regression": "isolating_a_selection_keeps_a_resource_neighbour_and_degree_counts_it",
+      "commit": "f786cb04c, merged 0158f47dc"
+    },
+    {
+      "id": "Q100 (2026-10-28)",
+      "ruling": "plan §5: what the host's rule allows",
+      "owner": "Graph::retract_relations_where asks a per-statement predicate and returns Retraction { withdrawn, refused }; pair Unrelate selects the Semantic family across both strata and both directions through Canvas::withdraw_selected_relation(allow). The canvas stores a host WithdrawPolicy (set_withdraw_policy); without one the default admits the unnamed and User scopes with no method. graphshell's promoted_links::own_statement is the one statement rule, used by can_withdraw and by withdraw_policy(persona), which local_scene::adopt_host_graph and open_codicil install wherever the host's graph enters the canvas",
+      "change": "graph-kernel edge_ops.rs, mod.rs; pictograph selection.rs, canvas.rs, lifecycle.rs; graphshell promoted_links.rs, local_scene.rs, web_tree/product.rs call sites, forme_session_lifecycle_tests.rs call sites",
+      "regression": "pair_unrelate_withdraws_a_resource_relation_the_policy_allows_and_leaves_what_it_refuses (default and installed arms), the_pair_gesture_withdraws_only_what_the_link_rule_allows",
+      "commit": "b0300dd4f, 015f38651, merged 0158f47dc",
+      "note": "application call: the host rule admits GraphScope::Default beside User, because the canvas gesture writes relations into the unnamed scope and a User-only rule would refuse the person's own gesture-drawn relation; the asserter check remains the guard. Left: retract_relation_between_members (roster Link Card) asks no policy; no command path consumes `refused` yet; the fixture and generated pages keep the canvas default; GraphDelta cannot carry a predicate so the gesture calls the kernel directly"
+    },
+    {
+      "id": "Q209 (2026-10-28)",
+      "ruling": "plan §5: one admitted set",
+      "owner": "Canvas::admit_suggestions builds one candidate set (scene offers, then page links not held or kept) and runs scenograph's admit once, minting or removing link members to match and setting attention from the same set; refresh_link_suggestions is gone; kept_content counts and sizes only what the person keeps, so a minted suggestion never changes what admits it",
+      "change": "pictograph suggestions.rs, link_suggestions.rs",
+      "regression": "mixed_scene_and_link_offers_with_an_excluded_source_admit_one_set, a_minted_link_stays_admitted_on_a_small_plate",
+      "commit": "a1c75ad63, merged 2d7edb39f",
+      "note": "pictograph's lib count needs --features canvas (654 before, 660 after the two links rulings)"
+    },
+    {
+      "id": "Q210 (2026-10-28)",
+      "ruling": "plan §5: the relation holds the origin",
+      "owner": "sync_link_relations asserts the Hyperlink from every offering page and retracts it from pages that offered before and no longer offer; the derived entry keeps only the URL and the kept flag; a keep reads its origin from the member's page relations at keep time (the least page id among holders; None when none holds it). KeptLink.origin is Option<Uuid> and graphshell's create_link takes it, making an unlinked address for None",
+      "change": "pictograph link_suggestions.rs; graphshell local_intake.rs",
+      "regression": "a_shared_url_keeps_its_origin_from_the_page_that_still_holds_the_relation, several_holding_pages_name_the_least_id_as_origin, a_page_that_withdraws_its_offer_stops_being_the_origin, a_keep_with_no_page_left_names_no_origin; local_intake's a_kept_link_arrives_with_its_hyperlink_in_one_change gained the None arm",
+      "commit": "ef0462a2d, merged 2d7edb39f; create_link in 015f38651",
+      "note": "withdrawing a page's offer retracts every Hyperlink from that page to the member, one the person drew included (same stratum, no provenance split; the predicate registry decides stratum by sub-kind); set_graph keeps the pending kept queue across a graph switch with the old graph's origin ids"
+    },
+    {
+      "id": "Q243 and Q244 (2026-10-28)",
+      "ruling": "plan §5: one lock, the ledger's rule",
+      "owner": "every capture-storage write in the extension (queue, ack, configure, permission removal) runs through serializedQueueMutation, one writer order; mergeQueue's conflict rule is the ledger's same_source_facts (url, at_ms, transition, parent key, original_unix_micros, source_is_local; titles ignored), and a conflicting visit is refused alone (first visit wins, counted in coverage.refused_conflicts) instead of throwing for the batch. A Rust integration test judges fifteen visit pairs with BrowserEncounterLedger::receive and pins web/extension/fixtures/capture-conflicts.json byte for byte; the Node smoke test reaches each verdict through mergeQueue",
+      "change": "web/extension/background.js, capture-model.js, extension-profile.js, README.md, smoke-capture-model.mjs, smoke-capture-background.mjs; tests/capture_conflict_fixture.rs (required-features web); fixtures/capture-conflicts.json",
+      "regression": "extension_queue_conflict_fixture_carries_the_ledgers_verdicts; smoke-capture-model (conflict refused alone, fixture verdicts); smoke-capture-background (configure racing a queued visit keeps it; permission removal racing a configure disables on top of it)",
+      "commit": "3236e96ef, merged 74d9fe15c",
+      "note": "reconcileAddress still reads liveFrom and the visit map outside the lock (read only); the retained audit probe support/receipts/authority-success-audit/capture_queue_probe.mjs asserts the replaced behavior (mergeQueue throwing, returning an array) and is stale by design"
+    },
+    {
+      "id": "capture acknowledgement (2026-10-28)",
+      "ruling": "plan §5: restore the ack",
+      "owner": "web_capture::announce_capture writes data-capture-accepted/-dropped/-buffered on the Graphshell root and dispatches graphshell-capture-complete on document; HistoryControls::load calls it only after apply_initial_capture returned Ok, so a failed batch dispatches nothing; extension-profile.js reads the counters from the same root and acks the pulled ids on the event; the README says the ack follows the batch commit",
+      "change": "src/web_capture.rs, src/web_tree/product/history.rs (capture-buffered probe field), web/extension-profile.js, web/extension/README.md, smoke-capture-ack.mjs",
+      "regression": "smoke-capture-ack (the queue stays until the event, then drains; the status line reads the root's counters)",
+      "commit": "3236e96ef, merged 74d9fe15c",
+      "note": "the Rust half lives in the wasm-only graphshell-web crate (src/web.rs, target wasm32) and was type-checked only in isolation: the wasm check of ports/graphshell/web fails in a dependency (spareval 0.2.7, digest 0.10 vs 0.11) before reaching it, and nothing ran in a browser. The capture panel markup (#capture-panel etc.) has been gone from the page since 93ce49c82, so prepareCapture threw and the extension page never mounted; the lane made the panel optional so the pull and the ack listener work without it. graphshell-history-controls-complete is likewise never dispatched; the README still says the portal's Enable capture control requests history"
+    },
+    {
+      "id": "Q214 (2026-10-28)",
+      "ruling": "plan §5: load-modify-commit",
+      "owner": "pandect::replace_bytes_if_unchanged stages the new bytes, then under std File::lock on <target>.lock re-reads the target and installs only if it still holds the baseline (absent or byte-equal), reporting Replacement::Conflict otherwise; OwnerSettings::load_for_commit keeps the loaded bytes, LoadedSettings::commit maps a conflict to OwnerSettingsError::Conflict, and OwnerSettings::update loads, edits, commits and on a conflict reloads and reapplies up to three times; pair, unpair and the resident's dial hint use update, and pairing.rs names the three writers and the conflict rule",
+      "change": "pandect atomic_file.rs, lib.rs; djinn settings.rs, settings/commit.rs (new), pairing.rs, personal_sync.rs",
+      "regression": "two_writers_from_one_load_refuse_the_second_until_it_reloads, a_missing_file_commits_only_while_it_is_still_missing, update_reloads_and_reapplies_its_edit_after_a_conflict, update_reports_the_conflict_once_three_attempts_have_lost, update_writes_nothing_for_an_edit_that_changes_nothing_or_fails, a_dial_hint_and_a_pair_from_separate_loads_both_reach_the_file; pandect a_changed_target_is_a_conflict_that_writes_nothing_and_releases_the_lock, an_unchanged_target_is_replaced_and_a_missing_one_only_while_it_is_missing, a_held_lock_defers_the_compare_until_it_is_released",
+      "commit": "4aef35625, f829f299b, merged e68fd49b3",
+      "note": "the lock excludes guarded replacements only: a plain save or write_bytes_with_backup on the same file can still clobber a guarded commit (a test helper in djinn/tests/mdns_first_contact_two_instance.rs:42-49 and the fixtures still save plainly); eight other pandect stores call write_bytes_with_backup with no baseline check (application_settings_store.rs:145, device_settings_store.rs:254, persona_settings_store.rs:142, settings_store.rs:186, script_bindings_store.rs:60, view_intent_store.rs:233, notochord_policy_store.rs:63, facet_store.rs:89), writer counts unchecked; a <profile>.json.lock file stays beside each settings file; Windows File::lock and two-process contention not run; djinn lib 246 -> 252 with the same three pre-existing door and resident_mere failures before and after; pandect lib 358 -> 361 on the branch base"
+    },
+    {
+      "id": "A028 (2026-10-28)",
+      "ruling": "plan §5: capture-and-replay is the boundary",
+      "owner": "edit_now's doc (graph_session.rs) names capture-and-replay as the write boundary: a direct writer (public assertion or declaration writer) transacts under the same check as a GraphDelta, and a candidate that changed graph truth outside the captured deltas is NotReplayable; transact_change is pub for hosts",
+      "change": "pandect graph_session.rs, graph_session_transaction.rs",
+      "regression": "a_transaction_carries_a_direct_writer_through_the_replay_check",
+      "commit": "b21f3d74d, merged 09ac76cc9"
+    },
+    {
+      "id": "A004 (2026-10-28)",
+      "ruling": "plan §5: flush rechecks like transact",
+      "owner": "GraphSession::flush commits through the one commit path under the transaction's Recheck (no merged mark, stored log lengths, last stored entries, the caller's keys); the has_unstored precondition on transact is gone, so a transaction carries the handle's unstored entries; new sessions (create, fork_at, branch_at, codicil open, the legacy-slot migration) store plainly; MereHost::persist takes the transacting bound, carried through its generic callers (local_edit.rs, local_intake.rs, transfer.rs, retained_content/fixture.rs, query_views.rs). Main's Alembic operation record (transact_operation_published) now rides the same commit as an extra write expected absent, in its own module graph_session_operation.rs; a refused commit re-reads the receipt and answers an identical request with it",
+      "change": "pandect graph_session.rs, graph_session_transaction.rs, graph_session_operation.rs (new), graph_session_transaction_tests.rs; graphshell mere_host.rs and five one-line bounds",
+      "regression": "two_handles_flushing_from_one_saved_point_refuse_the_stale_one, a_transaction_carries_the_handles_unstored_entries, a_candidate_commits_extra_writes_and_refuses_a_key_that_changed; main's operation_receipt_reconciles_duplicates_and_refuses_changed_request and the concurrent-duplicate tests hold",
+      "commit": "55c63edce, a1ce3b18c, merged 09ac76cc9; the merge resolution with main's Alembic lane",
+      "note": "apply, undo, redo and checkpoint still store with plain puts; the has_unstored guards in mere_host_coupling.rs stay; the tail recheck compares re-encoded bytes, so a store written by an older codec could be refused"
+    },
+    {
+      "id": "Q240 with A550 and A551 (2026-10-28)",
+      "ruling": "plan §5: one candidate, one commit",
+      "owner": "Pandect's detached_candidate and commit_candidate(candidate, at, publish, CommitExtra { ops, expect }) commit a candidate's edits with the caller's own writes and the keys they read, in one backend transaction; MereHost::edit_candidate swaps the live session for a detached candidate while a change runs and commit_candidate installs it, so capture's ingest_batch and forget_url edit nothing live and commit once with the ledger bytes and every base key they read and then wrote rechecked; a refused batch leaves no graph edit pending. MereHost::stage is gone; CaptureBatch stays a read-through buffer that records its base reads",
+      "change": "pandect graph_session_transaction.rs; graphshell capture.rs, mere_host.rs",
+      "regression": "a_refused_capture_leaves_no_graph_edits_pending_and_a_later_delivery_carries_only_its_own_records; the audit probe, run as a temporary should_panic, panics at its defect assertion and was not committed",
+      "commit": "b39710034, merged 09ac76cc9",
+      "note": "capture's expectations pin keys read with get, not list or scan results; the RejectingApplyBackend test backend gained transact; wasm not built"
+    },
+    {
+      "id": "Q253 (2026-10-28)",
+      "ruling": "plan §5: one compare-and-replace",
+      "owner": "pandect::slot_guard::replace runs one Backend::transact that compares the slot to the baseline and writes only on a match; Outcome::Replaced, Outcome::Conflict (nothing written) or Err(StoreError); a read error inside the transaction is an error, never a conflict. RuleStore and DocumentStore are re-exports of its SlotBackend. FormeSession keeps the baseline it loaded or last wrote, PreparedSave carries it, finish_save(Ok) installs the written bytes as the new baseline; the Forme pane saves through the guard and clears retry on a conflict",
+      "change": "pandect slot_guard.rs (new), lib.rs; platen workspace/session.rs; graphshell presentation_store.rs, block_editing/store.rs, forme_session_lifecycle_tests.rs, web_tree/forme.rs",
+      "regression": "slot_guard: a_replace_with_a_stale_baseline_refuses_and_leaves_the_slot, an_empty_baseline_replaces_only_an_empty_slot, a_read_error_or_a_missing_transaction_is_an_error_not_a_conflict; platen: baseline_is_the_loaded_bytes_then_the_bytes_an_acknowledged_save_wrote; lifecycle: a_session_refused_by_the_slot_guard_keeps_its_draft_until_it_reloads_the_slot, two_sessions_loaded_from_an_empty_slot_cannot_both_create_it",
+      "commit": "c1a05793a, 78307ffe6, merged e92d97a02",
+      "note": "web_tree/forme.rs is wasm-only and was not compiled (graphshell-web check fails in spareval, then refused by the cache budget); pandect lib 361, graphshell lib with workspace-editor,editable-blocks 383, platen lib 78"
+    },
+    {
+      "id": "Q257 and A067 (2026-10-28)",
+      "ruling": "plan §5: the ack names what it saved",
+      "owner": "projection_save::PendingSave records the dataset identity (SourceBinding plus PublicSourceRevision) and the editor generation when a save is sent; acknowledge returns Current, EarlierDataset or EarlierDraft; the projection page marks the editor clean only on Current and otherwise reports which earlier thing was saved; chirograph's doc says the ack is applied in memory (session, epoch, revision of the mounted scene)",
+      "change": "graphshell projection_save.rs (new), lib.rs, web_tree/product/projection.rs; chirograph lib.rs doc",
+      "regression": "projection_save: a_save_acknowledges_only_the_editor_it_was_sent_from, a_save_without_a_dataset_is_current_until_one_loads",
+      "commit": "654d17386, merged 9bc83253f",
+      "note": "projection.rs is wasm-only and was not compiled; field edits during a pending save are not blocked and the ack still marks an edited draft clean (the generation counts editor replacements only)"
+    },
+    {
+      "id": "Q247 (2026-10-28)",
+      "ruling": "plan §5: the typed address decides",
+      "owner": "local_locations::is_local_file_location parses the address with the kernel's address_from_url and treats Address::File and Address::Directory as local; export (product.rs), the access-history facet and transfer manifests apply it; a node with a local address keeps its identity, title, tags, content and edges and has its address and url emptied; local access records are dropped and a local referring_address cleared; a local resource, its shown link and its resource edges are dropped too",
+      "change": "graphshell local_locations.rs (new), lib.rs, product.rs, transfer.rs",
+      "regression": "product: exporting_without_local_file_locations_strips_a_file_address_from_the_node_its_url_and_its_access_history; transfer: a_transfer_withholds_a_file_address_from_its_selection_and_source_access_records; local_locations: files_and_directories_are_local_and_the_rest_are_not",
+      "commit": "ef8732684, merged 9bc83253f",
+      "note": "a relation a local-file node holds through the resource layer (Cites) is not exported; titles, provenance.import, visit.history and resource facets may still hold a path and were not inspected; graphshell lib 319 before the last mechanical edits (re-run refused by the cache budget)"
     }
   ],
   "kernel_suite_after": {
-    "lib_passed": 520,
-    "integration_passed": 2,
+    "lib_passed": 523,
+    "integration_passed": 3,
     "failed": 0,
-    "basis": "main 7a93dc9db, 2026-10-28"
+    "basis": "main 09ac76cc9, 2026-10-28 evening"
   },
   "forks_recorded_in_plan_section_5": [
     "Q010",
@@ -253,7 +385,16 @@
     "2bded5d59 (l1-owner-remap)",
     "1a3d2c6e2 (l1-owner-session)",
     "53686dba4 (l1-owner-host)",
-    "7a93dc9db (l1-owner-pandect, fast-forward)"
+    "7a93dc9db (l1-owner-pandect, fast-forward)",
+    "267f91b40 (l1-r2-client)",
+    "0158f47dc (l1-r2-reader)",
+    "2d7edb39f (l1-r2-links)",
+    "015f38651 (parent wiring: canvas withdraw policy, graphshell adopts the host graph with it, create_link takes an optional origin)",
+    "74d9fe15c (l1-r2-capture)",
+    "e68fd49b3 (l1-r2-settings)",
+    "9bc83253f (l1-r2-saveack)",
+    "e92d97a02 (l1-r2-forme)",
+    "09ac76cc9 (l1-r2-transact)"
   ],
   "cues": [
     "four places still repeat the five-field claim comparison against a spec rather than a statement: assertion_write.rs matches_spec (~399), edge_data.rs (~364, ~455), edge_ops.rs (~602)",
@@ -272,12 +413,12 @@
     "FieldId and CouplingId (numen) lack Ord, so the kernel keys the field and coupling maps by the inner Uuid"
   ],
   "pandect_suite_after": {
-    "lib_passed": 353,
+    "lib_passed": 368,
     "integration_passed": 28,
     "failed": 0,
-    "basis": "main 7a93dc9db"
+    "basis": "main 09ac76cc9, 2026-10-28 evening"
   },
-  "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host 2026-10-28 morning, the owner round, eight forks, all applied the same day.",
+  "forks_ruled": "2026-10-26 evening, all five, recorded in the plan's section 5 in Mark's words: Q010 refuse at checked load; Q017 remove the store feature; Q031 copies not legal, enforced at the live graph, freezes copy faithfully; Q016 edge replays join the invariant; the workshop moves beside its host 2026-10-28 morning, the owner round, eight forks, all applied the same day. 2026-10-28 evening, the second owner round, fifteen forks, all applied the same day.",
   "authority_entries_reduced": {
     "A001": "one owner",
     "A003": "facet recency, Stemma trail, launch counter wired",
@@ -286,12 +427,13 @@
     "A017": "typed remap; other copy paths recorded as separate operations"
   },
   "other_suites_2026_10_28": {
-    "graphshell_lib": 313,
+    "graphshell_lib": 320,
     "graphshell_host_all_features": 104,
     "graphshell_host_integration": 6,
-    "pictograph_lib": 654,
-    "alembic_recall": 8,
-    "checks": "djinn, cambium, mere-overmap, rdf, forme, cartography, athanor, mere"
+    "pictograph_lib": "661 (at 015f38651; unchanged since)",
+    "alembic_recall": "8 (at 7a93dc9db; unchanged since)",
+    "checks": "graphshell all targets with web, alembic-workshop, workspace-editor and editable-blocks; djinn",
+    "basis": "main 09ac76cc9, 2026-10-28 evening"
   },
   "chartulary_findings": "Q001, Q002, Q003 and Q019 are repaired on eidetic main; see 2026-10-26_l1_chartulary_receipt.json",
   "second_owner_round_2026_10_28": {
@@ -350,7 +492,27 @@
       "the audit's Forme probe and pictograph boundary probe no longer compile or run on main (moved modules, a hard-coded Windows target path)",
       "the remote-session adapter clears its own pending on a refused start while the driver and core keep theirs (remote.rs:585-610)",
       "set_graph preserves the kept-link queue across a graph swap (the audit's unnumbered A405 observation)",
-      "the accessibility reader's item_rect still uses the ground position and raw node size (reader.rs:173-177)"
-    ]
+      "the accessibility reader's item_rect still uses the ground position and raw node size (reader.rs:173-177)",
+      "pictograph retract_relation_between_members has no withdraw policy; no command path consumes Retraction.refused",
+      "set_graph keeps the kept-link queue across a graph switch",
+      "a Hyperlink retraction can remove a person-drawn relation in the same stratum",
+      "apply, undo, redo and checkpoint in the Pandect session are still plain puts; only flush, transact_change and the capture candidate recheck",
+      "the recheck compares re-encoded bytes, so a store written by an older codec would be refused on its first write",
+      "capture expectations pin get keys only; graphshell-history-controls-complete is never dispatched; the audit probe capture_queue_probe.mjs is stale",
+      "eight other Pandect stores write without a baseline check (athanor workshop.rs:663 turns a read error into a conflict; site history.rs:183 rechecks inside its transaction; mere_host_resident_view.rs:72 is a blind transact)",
+      "IndexedDbBackend::transact copies the whole object store per call, so every Forme save now reads everything; a keyed compare-and-put in muniment would fix it",
+      "a Forme pane refused by the slot guard stays stale until the page reloads; discard does not clear retry",
+      "projection field edits during a pending save are not blocked and the ack still marks an edited draft clean",
+      "the local-file rule drops a local resource with its shown link and resource edges, so a relation held through the resource layer (Cites) is not exported; titles, provenance.import, visit.history and resource facets may still hold a path",
+      "Alembic transact_change_record duplication removed; the operation record now commits as CommitExtra with an expected-absent key and the receipt is re-read on refusal",
+      "support/receipts/authority-success-audit/forme_stale_save_probe.rs still shows the removed PreparedSave::save API"
+    ],
+    "applied": "all fifteen, by crate in six parallel worktrees, one regression each, merged in the merges list from 267f91b40 to the l1-r2-transact merge; operations dated 2026-10-28 from Q061 on",
+    "unverified": [
+      "the web tree (web_tree*, web_graphs.rs, web_capture.rs, web_tree/product/*) compiles only in the graphshell-web cdylib for wasm32; its check fails inside the dependency spareval (0.2.7, and still 0.2.9 on the merged main 38da98b69: its hash functions mix digest 0.10 and 0.11 traits, six E0277 errors in expression.rs) before reaching this code, so the Forme pane, projection page, product call sites, history and capture edits of this round are compile-unchecked",
+      "the extension capture panel's acknowledgement path is pinned by a unit test, not a browser run"
+    ],
+    "capacity": "the compiler-cache budget (400 GiB) was reached at 399.5 GiB during gating and refused every launch for about two hours; the wrapper has no per-lane release and the pressure prune needs 24 idle hours; on Mark's word the four finished lanes' build caches (q010, q012, q016, modularity, 88 GiB) were deleted, artifacts kept",
+    "regated_after_origin_merge": "main 38da98b69, fourteen commits from origin merged after the gates above (custody contracts, Taffy fork, smolweb palettes, spareval 0.2.9): pandect 368+28, pictograph with canvas 663+5, djinn check; the incoming dramatis revision had to be fetched once before any offline gate could resolve"
   }
 }

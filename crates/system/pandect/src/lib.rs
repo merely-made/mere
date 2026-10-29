@@ -81,6 +81,9 @@ pub mod cartography_geometry;
 // Recoverable replacement mechanics shared by product-owned settings stores.
 // Paths, schemas, and validation remain with the configured product.
 pub mod atomic_file;
+// The one compare-and-replace over a muniment slot, for every store that
+// writes back bytes it loaded (rules, blocks, Forme).
+pub mod slot_guard;
 // The scene.* facet namespace: the graph-scene's own view settings (sizing
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
@@ -169,7 +172,7 @@ pub use arrangement_facets::{
     write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
     write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
 };
-pub use atomic_file::write_bytes_with_backup;
+pub use atomic_file::{Replacement, replace_bytes_if_unchanged, write_bytes_with_backup};
 pub use codicil_seal::WalletEpochSealer;
 pub use denizen_facets::{
     DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,
@@ -268,7 +271,7 @@ pub use wallet_grant::{
     REMOTE_AUTH_PAIRING_TICKET_SCHEMA_VERSION, REMOTE_AUTH_PAIRING_WRAP_CONTEXT_V1,
     RemoteAuthEnrollmentBundle, RemoteAuthGrantSpec, RemoteAuthPairingMaterial,
     RemoteAuthPairingResponse, RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest,
-    RemoteAuthRevocationOutcome, WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
+    WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
     WrappedEpochMaterial, WrappedEpochRecord, assess_device_grant, blinded_slot_id,
     build_remote_auth_enrollment_bundle, certificate_device_id, decode_device_grant_set,
     decode_epoch_record, decode_remote_auth_enrollment_bundle, decode_remote_auth_pairing_ticket,
@@ -283,7 +286,7 @@ pub use wallet_grant::{
 };
 pub use wallet_store::{
     CapabilitySlotRef, CarriagePolicy, DEVICE_ROSTER_FILENAME, DeviceExposure, DeviceGrantRef,
-    DeviceId, DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
+    DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
     IDENTITY_GRANTS_DIR, IDENTITY_SEED_FILENAME, IDENTITY_WALLET_FILENAME, IdentityWalletManifest,
     KeyEpochId, LOCAL_DEVICE_IDENTITY_FILENAME, LocalDeviceIdentity, PERSONA_EPOCH_BRIDGE_FILENAME,
     PERSONA_WALLET_FILENAME, PersonaChainRoot, PersonaEpochBridge, PersonaWalletManifest,

@@ -257,11 +257,7 @@ pub(crate) fn build_pool_dom(
 
     let stage = dom.create_element(qual("div"));
     dom.set_attribute(stage, qual("class"), "stage");
-    dom.set_attribute(
-        stage,
-        qual("style"),
-        "transform: translate(0px, 0px) scale(1);",
-    );
+    dom.set_attribute(stage, qual("style"), &stage_style(None));
     dom.append_child(root, stage);
 
     let mut gnode_of = HashMap::new();
@@ -282,6 +278,17 @@ pub(crate) fn build_pool_dom(
         gnode_of.insert(key, gnode);
     }
     (dom, gnode_of, stage)
+}
+
+/// The `.stage` inline style. The stage is identity (each gnode carries its
+/// own transform); a themed caption ink overrides the sheet's
+/// `--node-caption-fg` here, so the sheet itself stays built once.
+pub(crate) fn stage_style(caption: Option<[u8; 3]>) -> String {
+    let identity = "transform: translate(0px, 0px) scale(1);";
+    match caption {
+        Some(ink) => format!("{identity} --node-caption-fg: {};", palette::rgb(ink)),
+        None => identity.to_string(),
+    }
 }
 
 /// Set a changed inline `style`, leaving retained layout intact for equal values.

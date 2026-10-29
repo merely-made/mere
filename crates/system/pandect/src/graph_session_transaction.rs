@@ -7,195 +7,184 @@
 //! Stage a journaled candidate; install it only after atomic storage acknowledgement.
 use super::*;
 
-/// Opaque owner data retained atomically with a published graph change.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct OperationReceipt {
-    pub session: String,
-    pub request: Vec<u8>,
-    pub result: Vec<u8>,
-    pub generation: String,
+/// Writes a commit carries beside the session's own, and the stored bytes
+/// they were decided against.
+#[derive(Default)]
+pub struct CommitExtra {
+    /// Written in the same atomic batch, after the session's own.
+    pub ops: Vec<WriteOp>,
+    /// Keys the extra writes depend on, with the bytes read (`None`: absent).
+    /// The commit lands only if each key still holds exactly those bytes.
+    pub expect: Vec<(String, Option<Vec<u8>>)>,
+    /// Writes decided inside the transaction, against what the store holds
+    /// there. `Err` refuses the whole commit with that message and nothing is
+    /// written. The decision runs before the session's own recheck, so its
+    /// refusal names the cause even when the session moved as well.
+    pub decide: Option<Decide>,
 }
 
-impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
-    /// Content-bound graph and history head, stable across a cold reopen.
-    /// Partial resident graphs and pending changes are refused.
-    pub fn operation_revision(&self) -> Result<String, SessionError> {
-        if self.has_unstored() {
-            return Err(SessionError::Validation(
-                "Save pending session changes before observing a revision".into(),
-            ));
+/// A caller's decision taken inside the commit's transaction.
+#[cfg(not(target_arch = "wasm32"))]
+pub type Decide =
+    Box<dyn FnOnce(&dyn muniment::TransactionReader) -> Result<Vec<WriteOp>, String> + Send>;
+/// See the native [`Decide`]; wasm drops the `Send` bound like `TransactFn`.
+#[cfg(target_arch = "wasm32")]
+pub type Decide = Box<dyn FnOnce(&dyn muniment::TransactionReader) -> Result<Vec<WriteOp>, String>>;
+
+enum Rejection {
+    ReadOnly(SessionId),
+    Validation(String),
+}
+
+fn refused(error: StoreError) -> Rejection {
+    Rejection::Validation(error.to_string())
+}
+
+/// What the store must still hold for a commit from one handle to land: no
+/// merged mark, the stored length and last stored entry of each log this
+/// handle appends to, and the caller's own keys. Every commit of a session
+/// rechecks through here, inside its backend transaction.
+struct Recheck {
+    session: SessionId,
+    merged: String,
+    logs: Vec<(String, Seq, &'static str)>,
+    tails: Vec<WriteOp>,
+    keys: Vec<(String, Option<Vec<u8>>)>,
+}
+
+impl Recheck {
+    fn run(&self, reader: &dyn muniment::TransactionReader) -> Result<(), Rejection> {
+        // The merged marker can change independently of the source logs when
+        // another handle undoes or redoes a merge.
+        if reader.get(&self.merged).map_err(refused)?.is_some() {
+            return Err(Rejection::ReadOnly(self.session));
         }
-        // Keep the publication's completeness/placement preflight. Snapshot
-        // reconstruction synthesizes visit times; replace them with the exact
-        // authoritative facet sidecar before hashing.
-        self.prepare_resident_publication()?;
-        let mut normalized = Graph::try_from_recorded_snapshot(&self.graph.to_snapshot_at(0))
-            .map_err(|error| SessionError::Validation(error.to_string()))?;
-        normalized
-            .install_facets(self.graph.facets().clone())
-            .map_err(|error| SessionError::Validation(error.to_string()))?;
-        let publication = self.resident_store().prepare_recorded_graph(&normalized)?;
-        let mut hasher = blake3::Hasher::new();
-        hasher.update(b"mere.graph-operation-revision/v1");
-        hasher.update(publication.generation().as_bytes());
-        for (name, ops) in [
-            (
-                "journal",
-                self.journal
-                    .log()
-                    .entry_writes::<JsonCodec>(&self.keys.at(JOURNAL), Seq(0))?,
-            ),
-            (
-                "changes",
-                self.changes
-                    .entry_writes::<JsonCodec>(&self.keys.at(CHANGES), Seq(0))?,
-            ),
-        ] {
-            hasher.update(name.as_bytes());
-            for op in ops {
-                if let WriteOp::Put { value, .. } = op {
-                    hasher.update(&(value.len() as u64).to_le_bytes());
-                    hasher.update(&value);
+        for (log, stored, message) in &self.logs {
+            let held = reader.list(&format!("{log}/")).map_err(refused)?.len() as u64;
+            if held != stored.0 {
+                return Err(Rejection::Validation((*message).into()));
+            }
+        }
+        for tail in &self.tails {
+            if let WriteOp::Put { key, value } = tail {
+                if reader.get(key).map_err(refused)?.as_ref() != Some(value) {
+                    return Err(Rejection::Validation(
+                        "Session log head changed before commit; draft retained".into(),
+                    ));
                 }
             }
         }
-        Ok(hasher.finalize().to_hex().to_string())
+        for (key, bytes) in &self.keys {
+            if &reader.get(key).map_err(refused)? != bytes {
+                return Err(Rejection::Validation(format!(
+                    "{key} changed before commit; draft retained"
+                )));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// The write of the last entry a handle stored: what a log must still hold
+/// at its end for the handle's next append to follow it.
+fn last_stored<T: Serialize>(
+    log: &Journal<T>,
+    prefix: &str,
+    stored: Seq,
+) -> Result<Option<WriteOp>, StoreError> {
+    let Some(last) = stored.0.checked_sub(1) else {
+        return Ok(None);
+    };
+    Ok(log
+        .entry_writes::<JsonCodec>(prefix, Seq(last))?
+        .into_iter()
+        .next())
+}
+
+impl<B: LegacyTransactionBackend> GraphSession<B> {
+    /// Store everything not stored yet, stamping new changes `at`, in one
+    /// backend transaction. It lands only if the store still holds what this
+    /// handle was opened or last stored at (log lengths, last entries, no
+    /// merge mark): a stale handle is refused with "Session changed before
+    /// commit" and keeps its pending edits for the caller to rebase.
+    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
+        let pending = self.pending(at)?;
+        if pending.is_empty() {
+            self.stored(pending);
+            return Ok(());
+        }
+        self.commit(pending, CommitExtra::default()).await
     }
 
-    fn operation_key(&self, operation: [u8; 32]) -> String {
-        format!("graph-operations/{}.json", hex::encode(operation))
+    /// Write `pending` and `extra` atomically if the store passes this
+    /// handle's recheck; mark `pending` stored once it has landed.
+    async fn commit(&mut self, pending: Pending, extra: CommitExtra) -> Result<(), SessionError> {
+        let check = self.recheck(extra.expect)?;
+        let mut ops = pending.ops().to_vec();
+        ops.extend(extra.ops);
+        let decide = extra.decide;
+        let rejection = Arc::new(Mutex::new(None));
+        let rejected = rejection.clone();
+        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
+            let decided = match decide {
+                Some(decide) => decide(reader).map_err(Rejection::Validation),
+                None => Ok(Vec::new()),
+            }
+            .and_then(|extra| check.run(reader).map(|()| extra));
+            match decided {
+                Ok(extra) => {
+                    ops.extend(extra);
+                    ops
+                },
+                Err(error) => {
+                    *rejected.lock().expect("transaction rejection") = Some(error);
+                    Vec::new()
+                },
+            }
+        });
+        self.slots.backend().transact(transaction).await?;
+        match rejection.lock().expect("transaction rejection").take() {
+            Some(Rejection::ReadOnly(id)) => return Err(SessionError::ReadOnly(id)),
+            Some(Rejection::Validation(error)) => return Err(SessionError::Validation(error)),
+            None => {},
+        }
+        self.stored(pending);
+        Ok(())
     }
 
-    /// Query the durable owner record without consulting the current graph head.
-    pub async fn operation_receipt(
-        &self,
-        operation: [u8; 32],
-    ) -> Result<Option<OperationReceipt>, SessionError> {
-        self.slots
-            .backend()
-            .get(&self.operation_key(operation))
-            .await?
-            .map(|bytes| {
-                serde_json::from_slice(&bytes).map_err(|e| SessionError::Corrupt(e.to_string()))
-            })
-            .transpose()
-    }
-
-    /// Reconcile an operation after an uncertain storage acknowledgement.
-    ///
-    /// The owner must hold its exclusive writer lease throughout this call.
-    /// If a durable receipt exists, reopen the same session and install its
-    /// validated complete state only after reading the current publication.
-    /// Pending local work is refused; live admission policy is retained for
-    /// future edits but is not reapplied to already committed history.
-    pub async fn reconcile_operation(
-        &mut self,
-        operation: [u8; 32],
-    ) -> Result<Option<(OperationReceipt, String)>, SessionError> {
-        self.ensure_writable()?;
-        if self.has_unstored() {
-            return Err(SessionError::Validation(
-                "Save pending session changes before reconciliation".into(),
+    fn recheck(&self, keys: Vec<(String, Option<Vec<u8>>)>) -> Result<Recheck, SessionError> {
+        let moved = "Session changed before commit; draft retained";
+        let (journal, changes) = (self.keys.at(JOURNAL), self.keys.at(CHANGES));
+        let mut tails = Vec::new();
+        tails.extend(last_stored(self.journal.log(), &journal, self.saved)?);
+        tails.extend(last_stored(&self.changes, &changes, self.changes_saved)?);
+        let mut logs = vec![
+            (journal, self.saved, moved),
+            (changes, self.changes_saved, moved),
+        ];
+        // A view has its own log, so a graph head alone cannot detect a
+        // competing view append.
+        for (key, view) in &self.views {
+            let log = self.keys.view_log(key);
+            tails.extend(last_stored(&view.log, &log, view.saved)?);
+            logs.push((
+                log,
+                view.saved,
+                "Session view changed before commit; draft retained",
             ));
         }
-        // Refuse unqualified or residency-limited writers before any reload.
-        self.prepare_resident_publication()?;
-        let Some(receipt) = self.operation_receipt(operation).await? else {
-            return Ok(None);
-        };
-        if receipt.session != self.id().as_uuid().to_string() {
-            return Err(SessionError::Validation(
-                "Operation belongs to a different session".into(),
-            ));
-        }
-        let launch = self.graph.current_session();
-        let mut candidate = Self::open(self.slots.backend().clone(), self.id()).await?;
-        candidate.ensure_writable()?;
-        // This checks the reconstructed complete graph, not newly introduced
-        // references: live admission does not rewrite committed history.
-        candidate.prepare_resident_publication()?;
-        if let Some(validator) = &self.validator {
-            validator(&candidate.graph).map_err(SessionError::Validation)?;
-        }
-        let resident = candidate
-            .resident_store()
-            .open(crate::addressable_graph::ResidencyRoots::default())
-            .await?;
-        let generation = resident.generation().to_owned();
-        candidate.graph.set_current_session(launch);
-        candidate.checkpoint_interval = self.checkpoint_interval;
-        candidate.validator = self.validator.clone();
-        candidate.admission_validator = self.admission_validator.clone();
-        candidate.revision = self.revision.wrapping_add(1);
-        *self = candidate;
-        Ok(Some((receipt, generation)))
+        Ok(Recheck {
+            session: self.id(),
+            merged: self.keys.at(MERGED),
+            logs,
+            tails,
+            keys,
+        })
     }
+}
 
-    /// Atomically associate an immutable request and result with a published edit.
-    /// Owners validate policy and verify that the deltas produce their intended
-    /// effect. Identical requests return the original result, never a new edit.
-    pub async fn transact_operation_published(
-        &mut self,
-        operation: [u8; 32],
-        request: Vec<u8>,
-        result: Vec<u8>,
-        author: Author,
-        deltas: Vec<GraphDelta>,
-        at: SystemTime,
-    ) -> Result<OperationReceipt, SessionError> {
-        self.transact_operation_published_checked(
-            operation,
-            request,
-            result,
-            author,
-            deltas,
-            at,
-            |_| Ok(()),
-        )
-        .await
-    }
-
-    /// As above, with an owner-supplied postcondition over the staged graph.
-    pub async fn transact_operation_published_checked(
-        &mut self,
-        operation: [u8; 32],
-        request: Vec<u8>,
-        result: Vec<u8>,
-        author: Author,
-        deltas: Vec<GraphDelta>,
-        at: SystemTime,
-        validate: impl FnOnce(&Graph) -> Result<(), String>,
-    ) -> Result<OperationReceipt, SessionError> {
-        if let Some(receipt) = self.operation_receipt(operation).await? {
-            return if receipt.request == request
-                && receipt.result == result
-                && receipt.session == self.id().as_uuid().to_string()
-            {
-                Ok(receipt)
-            } else {
-                Err(SessionError::Validation(
-                    "Operation identity already belongs to another request".into(),
-                ))
-            };
-        }
-        let key = self.operation_key(operation);
-        let (_, receipt) = self
-            .transact_change_record(at, true, Some((key, request, result)), move |candidate| {
-                let (checked, applied) = candidate.edit_as(author, ChangeKind::Edit, |graph| {
-                    for delta in deltas {
-                        apply_graph_delta(graph, delta);
-                    }
-                    validate(graph)
-                })?;
-                checked.map_err(SessionError::Validation)?;
-                Ok(applied)
-            })
-            .await?;
-        Ok(receipt.expect("operation record"))
-    }
-
-    /// Apply one complete, validated change against an already durable session.
+impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
+    /// Apply one complete, validated change against a session.
     /// Storage failure or a competing append leaves graph and history unchanged.
     /// Append-only log lengths and their last retained entries are rechecked in
     /// the write transaction. This is not a journal corruption/tampering audit.
@@ -327,66 +316,81 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         .map(|(result, _)| result)
     }
 
-    pub(crate) async fn transact_change<R>(
+    /// Run `change` on a [detached candidate](Self::detached_candidate) and
+    /// commit it as one change, with the handle's own unstored entries, in one
+    /// backend transaction ([`commit_candidate`](Self::commit_candidate)).
+    /// A refusal, from `change` or from storage, leaves this session as it was.
+    ///
+    /// The closure edits through [`edit_now`](Self::edit_now), so a direct
+    /// write (a public assertion or declaration writer) transacts under the
+    /// same capture-and-replay check as a `GraphDelta`: a candidate that
+    /// changed graph truth outside the captured deltas is `NotReplayable`.
+    pub async fn transact_change<R>(
         &mut self,
         at: SystemTime,
         publish: bool,
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
     ) -> Result<(R, Option<String>), SessionError> {
-        let (result, _) = self
-            .transact_change_record(at, publish, None, change)
-            .await?;
-        Ok(result.expect("ordinary transaction"))
+        self.transact_change_with(at, publish, |_| CommitExtra::default(), change)
+            .await
     }
 
-    async fn transact_change_record<R>(
+    /// [`transact_change`](Self::transact_change) whose commit carries the
+    /// writes `extra` returns, decided once the candidate's publication
+    /// generation is known (`None` when not publishing).
+    pub async fn transact_change_with<R>(
         &mut self,
         at: SystemTime,
         publish: bool,
-        operation: Option<(String, Vec<u8>, Vec<u8>)>,
+        extra: impl FnOnce(Option<&str>) -> CommitExtra,
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
-    ) -> Result<(Option<(R, Option<String>)>, Option<OperationReceipt>), SessionError> {
+    ) -> Result<(R, Option<String>), SessionError> {
         self.ensure_writable()?;
-        if self.has_unstored() {
-            return Err(SessionError::Validation(
-                "Save pending session changes before this transaction".into(),
-            ));
-        }
-        let journal = self.keys.at(JOURNAL);
-        let changes = self.keys.at(CHANGES);
-        let expected_journal = self.saved;
-        let expected_changes = self.changes_saved;
-        let mut tails = Vec::new();
-        if self.saved.0 > 0 {
-            tails.extend(
-                self.journal
-                    .log()
-                    .entry_writes::<JsonCodec>(&journal, Seq(self.saved.0 - 1))?,
-            );
-        }
-        if self.changes_saved.0 > 0 {
-            tails.extend(
-                self.changes
-                    .entry_writes::<JsonCodec>(&changes, Seq(self.changes_saved.0 - 1))?,
-            );
-        }
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
-        // A view has its own log, so a graph head alone cannot detect a
-        // competing view append. Include existing and newly requested keys.
-        let mut view_heads = Vec::new();
-        for (key, view) in &candidate.views {
-            let log = self.keys.view_log(key);
-            view_heads.push((log.clone(), view.saved));
-            if let Some(held) = self.views.get(key).filter(|held| held.saved.0 > 0) {
-                tails.extend(
-                    held.log
-                        .entry_writes::<JsonCodec>(&log, Seq(held.saved.0 - 1))?,
-                );
-            }
+        let generation = self
+            .commit_candidate_with(candidate, at, publish, extra)
+            .await?;
+        Ok((result, generation))
+    }
+
+    /// Commit `candidate`, a [`detached_candidate`](Self::detached_candidate)
+    /// of this session edited since, and `extra` in one backend transaction;
+    /// this session becomes the candidate on success. `publish` adds the
+    /// addressable publication of the candidate's graph to the write. Storage
+    /// changing under the handle, or under a key in `extra.expect`, refuses the
+    /// commit before anything is written, as does `extra.decide` returning
+    /// `Err`; this session is then unchanged.
+    pub async fn commit_candidate(
+        &mut self,
+        candidate: Self,
+        at: SystemTime,
+        publish: bool,
+        extra: CommitExtra,
+    ) -> Result<Option<String>, SessionError> {
+        self.commit_candidate_with(candidate, at, publish, |_| extra)
+            .await
+    }
+
+    /// [`commit_candidate`](Self::commit_candidate) with the extra writes
+    /// decided from the candidate's publication generation.
+    pub async fn commit_candidate_with(
+        &mut self,
+        mut candidate: Self,
+        at: SystemTime,
+        publish: bool,
+        extra: impl FnOnce(Option<&str>) -> CommitExtra,
+    ) -> Result<Option<String>, SessionError> {
+        self.ensure_writable()?;
+        if candidate.id() != self.id()
+            || (candidate.saved, candidate.changes_saved) != (self.saved, self.changes_saved)
+        {
+            return Err(SessionError::Validation(
+                "Candidate was not cut from this session's stored state".into(),
+            ));
         }
         let pending = candidate.pending(at)?;
-        let mut ops = pending.ops().to_vec();
+        let mut ops = Vec::new();
         // The publication describes the candidate's graph and joins its write.
         // Preparation refuses before anything is written or installed.
         let generation = if publish {
@@ -396,143 +400,19 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
-        let session = self.id().as_uuid().to_string();
-        let record = operation.map(|(key, request, result)| {
-            let receipt = OperationReceipt {
-                session,
-                request,
-                result,
-                generation: generation.clone().expect("operation publishes"),
-            };
-            (key, receipt)
-        });
-        let existing = Arc::new(Mutex::new(None));
-        let observed = existing.clone();
-        let duplicate = Arc::new(Mutex::new(false));
-        let was_duplicate = duplicate.clone();
-        enum TransactionRejection {
-            ReadOnly(SessionId),
-            Validation(String),
-        }
-
-        let session_id = self.id();
-        let merged = self.keys.at(MERGED);
-        let rejection = Arc::new(Mutex::new(None));
-        let rejected = rejection.clone();
-        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
-            let check = || -> Result<(), TransactionRejection> {
-                if let Some((key, receipt)) = &record {
-                    match reader
-                        .get(key)
-                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                    {
-                        Some(bytes) => {
-                            let prior: OperationReceipt = serde_json::from_slice(&bytes)
-                                .map_err(|e| TransactionRejection::Validation(e.to_string()))?;
-                            if prior.request != receipt.request
-                                || prior.result != receipt.result
-                                || prior.session != receipt.session
-                            {
-                                return Err(TransactionRejection::Validation(
-                                    "Operation identity already belongs to another request".into(),
-                                ));
-                            }
-                            *observed.lock().expect("operation receipt") = Some(prior);
-                            *was_duplicate.lock().expect("duplicate") = true;
-                            return Ok(());
-                        },
-                        None => {},
-                    }
-                }
-                // The merged marker can change independently of the source
-                // logs when another handle undoes or redoes a merge. Read it
-                // in this same backend transaction as the candidate writes.
-                match reader.get(&merged) {
-                    Ok(Some(_)) => return Err(TransactionRejection::ReadOnly(session_id)),
-                    Ok(None) => {},
-                    Err(error) => {
-                        return Err(TransactionRejection::Validation(error.to_string()));
-                    },
-                }
-                if reader
-                    .list(&format!("{journal}/"))
-                    .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                    .len() as u64
-                    != expected_journal.0
-                    || reader
-                        .list(&format!("{changes}/"))
-                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                        .len() as u64
-                        != expected_changes.0
-                {
-                    return Err(TransactionRejection::Validation(
-                        "Session changed before commit; draft retained".into(),
-                    ));
-                }
-                for (log, expected) in view_heads {
-                    if reader
-                        .list(&format!("{log}/"))
-                        .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                        .len() as u64
-                        != expected.0
-                    {
-                        return Err(TransactionRejection::Validation(
-                            "Session view changed before commit; draft retained".into(),
-                        ));
-                    }
-                }
-                for op in tails {
-                    if let WriteOp::Put { key, value } = op {
-                        if reader
-                            .get(&key)
-                            .map_err(|e| TransactionRejection::Validation(e.to_string()))?
-                            .as_ref()
-                            != Some(&value)
-                        {
-                            return Err(TransactionRejection::Validation(
-                                "Session log head changed before commit; draft retained".into(),
-                            ));
-                        }
-                    }
-                }
-                Ok(())
-            };
-            if let Err(error) = check() {
-                *rejected.lock().expect("transaction rejection") = Some(error);
-                Vec::new()
-            } else if observed.lock().expect("operation receipt").is_some() {
-                Vec::new()
-            } else {
-                if let Some((key, receipt)) = record {
-                    ops.push(WriteOp::Put {
-                        key,
-                        value: serde_json::to_vec(&receipt).expect("receipt serializes"),
-                    });
-                    *observed.lock().expect("operation receipt") = Some(receipt);
-                }
-                ops
-            }
-        });
-        self.slots.backend().transact(transaction).await?;
-        if let Some(rejection) = rejection.lock().expect("transaction rejection").take() {
-            return Err(match rejection {
-                TransactionRejection::ReadOnly(session_id) => SessionError::ReadOnly(session_id),
-                TransactionRejection::Validation(error) => SessionError::Validation(error),
-            });
-        }
-        let receipt = existing.lock().expect("operation receipt").take();
-        // A concurrent duplicate did not write this staged candidate.
-        if *duplicate.lock().expect("duplicate") {
-            return Ok((None, receipt));
-        }
-        candidate.stored(pending);
+        let mut extra = extra(generation.as_deref());
+        ops.append(&mut extra.ops);
+        extra.ops = ops;
+        candidate.commit(pending, extra).await?;
         *self = candidate;
-        Ok((Some((result, generation)), receipt))
+        Ok(generation)
     }
 
-    // A private copy with its own recorder. No candidate edit can reach the
-    // acknowledged graph's capture buffer through an Arc shared by Graph::clone.
-    fn detached_candidate(&self) -> Self {
+    /// A private copy with its own recorder, to edit and offer to
+    /// [`commit_candidate`](Self::commit_candidate). No candidate edit can reach
+    /// the acknowledged graph's capture buffer through an Arc shared by
+    /// Graph::clone, and nothing of this session changes until a commit lands.
+    pub fn detached_candidate(&self) -> Self {
         let pending = Arc::default();
         let mut graph = self.graph.clone();
         record_into(&mut graph, &pending);

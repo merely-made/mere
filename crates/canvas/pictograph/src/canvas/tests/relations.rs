@@ -452,6 +452,70 @@ fn retract_selected_relation_removes_the_user_relation() {
 }
 
 #[test]
+fn pair_unrelate_withdraws_a_resource_relation_the_policy_allows_and_leaves_what_it_refuses() {
+    use kernel::graph::{Retraction, SemanticStatementSpec, predicate_iri};
+    use kernel::types::GraphScope;
+
+    let mut canvas = Canvas::new();
+    let a = canvas.open_member_as_new_node(None, "https://pair-a.test");
+    let b = canvas.open_member_as_new_node(None, "https://pair-b.test");
+    let ak = canvas.graph().get_node_by_id(a).unwrap().0;
+    let bk = canvas.graph().get_node_by_id(b).unwrap().0;
+    for (sub_kind, graph_scope) in [
+        (SemanticSubKind::Cites, GraphScope::User),
+        (SemanticSubKind::Quotes, GraphScope::Source),
+    ] {
+        let spec = SemanticStatementSpec {
+            predicate: predicate_iri(sub_kind).into(),
+            recognized_sub_kind: Some(sub_kind),
+            graph_scope,
+            ..Default::default()
+        };
+        canvas
+            .graph
+            .try_assert_semantic_statement(ak, bk, spec)
+            .unwrap();
+    }
+    canvas.selected.clear();
+    canvas.selected.insert(ak);
+    canvas.selected.insert(bk);
+    assert!(
+        canvas.graph().find_edge_key(ak, bk).is_none(),
+        "both statements live on the Resource stratum only"
+    );
+
+    let done = canvas.withdraw_selected_relation(|s| s.graph_scope == GraphScope::User);
+    assert_eq!(
+        done,
+        Retraction {
+            withdrawn: 1,
+            refused: 1
+        }
+    );
+    let held: Vec<_> = canvas
+        .graph()
+        .projected_assertions()
+        .map(|(_, _, _, statement)| statement.recognized_sub_kind)
+        .collect();
+    assert_eq!(held, vec![Some(SemanticSubKind::Quotes)]);
+
+    assert_eq!(
+        canvas.retract_selected_relation(),
+        0,
+        "the default policy leaves a statement imported from a source"
+    );
+    assert_eq!(canvas.graph().projected_assertions().count(), 1);
+
+    canvas.set_withdraw_policy(Some(Box::new(|s| s.graph_scope == GraphScope::Source)));
+    assert_eq!(
+        canvas.retract_selected_relation(),
+        1,
+        "an installed host rule decides instead of the default"
+    );
+    assert_eq!(canvas.graph().projected_assertions().count(), 0);
+}
+
+#[test]
 fn explicit_member_retraction_removes_only_that_relation() {
     let mut canvas = Canvas::new();
     let a = canvas.open_member_as_new_node(None, "https://cell-a.test");

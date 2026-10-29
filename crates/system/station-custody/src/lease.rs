@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
-use pandect::{DeviceId, RemoteAuthRevocationOutcome};
+use personae::carry::{DeviceId, RemoteAuthRevocationOutcome};
 
 use crate::authority::StationAuthority;
 

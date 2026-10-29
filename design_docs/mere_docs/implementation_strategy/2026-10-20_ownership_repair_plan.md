@@ -855,3 +855,16 @@ Mark's answer follows each.
   host's rule allows (Q100); one admitted set for suggested links (Q209) and the relation holds a
   kept link's origin (Q210). Q014 closed as re-documented. The other pictograph and web findings
   are placed with L2, L5, L6 or no lane in the receipt. Nothing in code changed.
+- 2026-10-28 (L1, the second owner round applied): all fifteen rulings landed on main the same
+  evening, by crate in six parallel worktrees with one regression each, in nine merges from
+  `267f91b40` (client, Q061) to `09ac76cc9` (transaction: A028, A004, Q240), with a parent wiring
+  commit `015f38651` for the canvas withdraw policy, the host-graph adoption seam and the optional
+  kept-link origin. Gates on main `09ac76cc9`: kernel 523+3, Pandect 368+28, graphshell lib 320,
+  graphshell-host all features 104+6, pictograph 661 (at 015f38651; unchanged since), alembic
+  recall 8 (at 7a93dc9db; unchanged since); checks graphshell all targets with web,
+  alembic-workshop, workspace-editor and editable-blocks; djinn. Unverified: the web tree is
+  wasm-only and its `graphshell-web` check fails inside `spareval` before this code, so the Forme
+  pane, projection page, product call sites, history and capture edits are read-checked only. The
+  compiler-cache budget refused every gate for two hours until the four finished lanes' caches
+  were retired on Mark's word. Receipt: the operations dated 2026-10-28 from Q061 on in
+  `support/receipts/ownership-repair/l1/2026-10-26_l1_receipt.json`.

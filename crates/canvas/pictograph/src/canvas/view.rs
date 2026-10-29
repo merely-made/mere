@@ -154,7 +154,7 @@ impl Canvas {
         }
         let mut scope: HashSet<NodeKey> = self.selected.clone();
         for &key in &self.selected {
-            scope.extend(self.graph.neighbors_undirected(key));
+            scope.extend(self.graph.projected_neighbors(key));
         }
         self.exact_scope = None;
         self.scope = Some(scope.into_iter().collect());

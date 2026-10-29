@@ -27,7 +27,6 @@ door = [
     "dep:eidetic",
     "dep:insigne",
     "dep:libc",
-    "dep:pandect",
     "dep:personae",
     "dep:rand_core",
     "dep:serde",
@@ -56,7 +55,6 @@ chatelaine = { workspace = true, optional = true }
 dramatis = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
 insigne = { workspace = true, optional = true }
-pandect = { workspace = true, optional = true }
 personae = { workspace = true, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 thiserror = { version = "1", optional = true }
