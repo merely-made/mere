@@ -509,9 +509,10 @@
     ],
     "applied": "all fifteen, by crate in six parallel worktrees, one regression each, merged in the merges list from 267f91b40 to the l1-r2-transact merge; operations dated 2026-10-28 from Q061 on",
     "unverified": [
-      "the web tree (web_tree*, web_graphs.rs, web_capture.rs, web_tree/product/*) compiles only in the graphshell-web cdylib for wasm32; its check fails in the dependency spareval 0.2.7 (digest 0.10 against 0.11) before reaching this code, so the Forme pane, projection page, product call sites, history and capture edits of this round are compile-unchecked",
+      "the web tree (web_tree*, web_graphs.rs, web_capture.rs, web_tree/product/*) compiles only in the graphshell-web cdylib for wasm32; its check fails inside the dependency spareval (0.2.7, and still 0.2.9 on the merged main 38da98b69: its hash functions mix digest 0.10 and 0.11 traits, six E0277 errors in expression.rs) before reaching this code, so the Forme pane, projection page, product call sites, history and capture edits of this round are compile-unchecked",
       "the extension capture panel's acknowledgement path is pinned by a unit test, not a browser run"
     ],
-    "capacity": "the compiler-cache budget (400 GiB) was reached at 399.5 GiB during gating and refused every launch for about two hours; the wrapper has no per-lane release and the pressure prune needs 24 idle hours; on Mark's word the four finished lanes' build caches (q010, q012, q016, modularity, 88 GiB) were deleted, artifacts kept"
+    "capacity": "the compiler-cache budget (400 GiB) was reached at 399.5 GiB during gating and refused every launch for about two hours; the wrapper has no per-lane release and the pressure prune needs 24 idle hours; on Mark's word the four finished lanes' build caches (q010, q012, q016, modularity, 88 GiB) were deleted, artifacts kept",
+    "regated_after_origin_merge": "main 38da98b69, fourteen commits from origin merged after the gates above (custody contracts, Taffy fork, smolweb palettes, spareval 0.2.9): pandect 368+28, pictograph with canvas 663+5, djinn check; the incoming dramatis revision had to be fetched once before any offline gate could resolve"
   }
 }
