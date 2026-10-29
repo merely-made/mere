@@ -783,3 +783,97 @@ failure matrix and supplier integration remain open. The current integrated
 main candidates introduce a newer Dramatis/Genet cohort; those dependency
 identities are awaiting the requested explicit selection before adoption and
 combined qualification. Candidate branches are published; main is not merged.
+
+
+## Approved custody/renderer cohort integration and native requalification
+
+Mark approved Dramatis `6711105e0284adb3e881fc9aebcc56f25000c1ca` and
+Genet `565458ea3ab816940484079330eb165a878a22e0` on 2026-10-29. The latter
+receives published `genet-taffy` 0.16.0, based on Taffy 0.15.1. Mere's tested
+integration commit is `9ce25faf88810802342ad085ba92b607b3222afc`;
+Turnstone's tested receiving commit is `78a43ab081b07fe7d8c8b0125cd3e565424d4530`.
+Both preserve the existing `branch = "main"` selectors and exact lock revisions.
+Servitor remains in Eidetic.
+
+The Mere source audit checks 101 Git packages against actual checkout heads
+and preserves all 1,736 external lock records from the selected upstream cut.
+Turnstone checks 161 Git packages across 21 source identities. Its 69 selected
+source replacements leave unrelated lock records unchanged. Locked offline
+metadata succeeds in both hosts, with no local path overlay. Receipts are
+`Code/output/alembic-hosts-20261028/cohort-merged-source-identity-audit-20261029.json`
+and `Code/output/alembic-turnstone-hosts-20261028/merge-20261029/`.
+
+All compiler commands use the existing stable lanes and guarded launcher,
+with the 400 GiB cache cap and 100 GiB free-space floor. The retained
+`cohort-*-20261029.command.json`, `.log` and `.exit` files under
+`Code/output/alembic-hosts-20261028/` record:
+
+- Custody wire, custodian, Athanor and Pandect: 474 passing tests.
+- Graphshell library, native workshop and public process gate: 308 passing,
+  six existing ignored tests.
+- Turnstone normal app, library and binary test builds; 103 distinct focused
+  tests pass with no ignores, including source-capture fresh-process recovery,
+  canonical facets, session ownership and acceptance reconciliation.
+- Djinn custodian-client and payload IPC: 12 passing, one existing ignored
+  helper. Total: 897 passing, zero failing and seven existing ignored tests.
+- Normal separate-process custody fixture build, production endpoint/Djinn
+  library check without the fixture feature, and portable Athanor workshop
+  `wasm32-unknown-unknown` check all succeed.
+
+Frozen normal executables are APFS clones, verified against the Cargo JSON
+artifact identity and SHA-256, with `profile.test = false` and `fresh = false`:
+
+- Graphshell: `graphshell-alembic-cohort-20261029`,
+  `81c15109c6ebd5111815713d01ced6b17c852aa8d5d15255020965b00c615fe7`.
+- Turnstone: `turnstone-cohort-native-20261029`,
+  `757f76752d24a10d024d09cc51c5dfe45f743659ae1c1e74a981da5fd5d2f73f`.
+- Separate broker/custodian fixture:
+  `private-workshop-custody-fixture-cohort-20261029`,
+  `5bb878a788ce280d3593af8e1a1131aa1c281b9b5a1e73a02d44668c2704385b`.
+
+Graphshell's integrated private process gate passes seed, generate, acceptance,
+exact cold proposal/source/receipt/result recovery, lock refusal, fresh-unlock
+recovery, helper dissolution and actual custodian loss. All 33 regular files
+are free of the private canary. The independent headed run generates and accepts
+through the native controls, opens the Unicode citation, dissolves the helper,
+and reopens the same retained storage witness in a different process. Its
+Resource is `e53fe0b1-cca2-5328-a06f-b14920c38252`; the native displayed version
+is the storage witness, distinct from the clear body digest. The headed root
+and ordinary log scan covers 34 regular files.
+
+Turnstone starts with a fresh isolated root and captures three loopback pages
+through ordinary Save source and keep. Pause or resume physics and Save session
+are ordinary product actions; no fixture metadata rewrite is used. After normal
+shutdown the origin stops, `TURNSTONE_OFFLINE=1` is set explicitly, and a new
+process restores all three original Read tabs. The quiet workshop admits exact
+91/99/100-byte sealed versions, generates without a manual refresh, opens the
+Unicode citation, accepts once and reads Resource
+`7438c5d4-c94f-593c-8556-9853238b75e8`. That same result survives helper
+dissolution and another independent offline process. Exactly one accepted note
+remains, with four graph nodes and five Resources. The scan covers 38 regular files, including the ordinary app log, with no
+source canary exposed.
+
+On both visible native hosts, custody lock clears private text. Unlock does
+not revive the retired window or binding; explicit reopening obtains a fresh
+binding and recovers the accepted result. Actual custodian process loss then
+clears both hosts again. All owned apps, the loopback origin, broker and
+custodian exit; process inventory verifies closure. The two headed receipts
+are `cohort-native-private-headed-20261029.json` under each stable lane's
+`Code/output` directory; file inventories are retained beside them.
+
+A final upstream fetch also receives the web-only spareval digest-edge repair
+and its upstream qualification receipt, merged at
+`b67f27481f9c2e5e0b60e91770b4e092abaabcbc`. That merge changes only the
+separate web Cargo.lock and ownership-plan/receipt files. Native/workshop
+source and the root lock remain byte-identical to the tested cut. The old
+spareval full-web failure is therefore a historical result; this run's own
+portable gate is the narrower Athanor workshop check.
+
+This closes the selected supplier integration and bounded private native
+receiving gates in two application hosts on one Mac, with a paused Turnstone
+scene and synthetic custody. It does not close the full per-host W3 matrix,
+playing-scene responsiveness, real-store migration, physical two-machine
+transfer, inference-provider value, installed-executable authentication,
+external helper principals or production custody. No H1 or production flag is
+raised. Publication and final source-equivalence proofs are recorded separately
+in `Code/output/alembic-hosts-20261028/cohort-publication-20261029.json`.

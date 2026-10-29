@@ -6,8 +6,10 @@ successor keeps the keyword `alembic-implementation`, so its Decisions stay as t
 the codicil spine (slice A), the memory-level read model and manual forgetting (slice C's spine),
 Athanor's forgetting and consolidation passes in `mere-athanor`, merge by identity
 (`compose_graph_codicils`), the W0 shared workshop core (qualified 2026-10-25), and image-store
-phases 1-3 with the bounded decoded cache and the orphan GC in library code. In progress: private-source storage and custody qualification (W0P), prioritized by Mark on 2026-10-28, then W1-W2 owner adapters and shared native controls. Open: W3 (the
-two-host product and recovery qualification), slice C's promote, demote, editable-policy and
+phases 1-3 with the bounded decoded cache and the orphan GC in library code. Landed within the
+bounded local workshop: private-source storage and custody gates (W0P), prioritized by Mark on
+2026-10-28, and W1-W2 owner adapters with shared native controls. Open: W3 (the complete per-host
+product and recovery matrix), slice C's promote, demote, editable-policy and
 by-sessions tails, slice D's scheduling, facet pass and surfacing, the image GC's host caller, Phase
 4's closure and Phase 6's re-measure.
 
@@ -404,6 +406,13 @@ automation, credentials, grants or publication.
 
 ## Progress
 
+- 2026-10-29: integrated the selected published custody and renderer cohort and
+  requalified the bounded private workshop in both native application hosts.
+  Turnstone's ordinary pause and session-save actions preserve its original
+  multi-Read layout across an offline process restart; accepted results survive
+  helper dissolution and fresh bindings. Both hosts clear private presentation
+  on lock and actual custodian loss. The full W3 matrix, playing-scene
+  responsiveness, physical fleet and production custody remain separate gates.
 - 2026-10-29: qualified the opt-in separate-process custody fixture and both
   private native workshop paths. Graphshell retires queued private actions on
   custody loss; Turnstone qualifies retained-source admission, acceptance,
