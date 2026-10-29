@@ -820,9 +820,8 @@ cubek-matmul = { path = "support/patches/cubek-matmul" }
 burn-remote = { path = "support/patches/burn-remote" }
 layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.1" }
 genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.2" }
-# Livery/Buckram require Genet's Taffy fork. Genet's workspace patch is not
-# inherited by consumers, so Mere restates the same immutable Genet revision.
-taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", branch = "main" }
+# Livery/Buckram select published genet-taffy 0.16 directly. No Git patch is
+# needed; the registry source remains independent of the Genet checkout.
 # No parley/fontique patch rows: as of genet 5ae30cad the forks are published as
 # `genet-parley` and `genet-fontique`, so nothing in genet answers to the name
 # `parley` and a patch row here would match no package and fail resolution.
