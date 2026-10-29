@@ -356,3 +356,80 @@ verified lease snapshots briefly showed zero active reservations before a new
 launch; other reservations appeared by admission. The 8 GiB test reservation,
 400 GiB cache budget, 100 GiB floor and cleanup protections were not reduced or
 bypassed. Main integration remains held for the required integration evidence.
+
+## 2026-10-29 private owner receiving continuation
+
+The selected dependency cut remains the earlier inspected cohort. New upstream
+Mere and Turnstone supplier changes have been inspected, but adoption is held
+for the requested exact-cut decision. None of the following results qualifies
+those newer supplier cohorts or main integration.
+
+The named Djinn integration gate finally executed. `20261029-djinn-ipc.log`
+ran eleven client tests, with ten passes and a test-setup refusal: the fixture
+correctly refused an ungranted root-public release before the payload assertion.
+The test now uses the already-admitted status master and checks it against the
+synthetic fixture vault, without adding a grant. The intervening
+`20261029-djinn-ipc-fixed.log` stopped before tests because the new Graphshell
+dev dependency required its lock entry. Offline metadata updated only the
+Graphshell dependency list to include existing `chacha20poly1305 0.10.1`;
+no package or supplier source changed.
+
+`20261029-djinn-ipc-fixed-lock.log` / `.exit` passes: eleven client tests and
+one payload test, zero failures and one existing ignored receipt helper. The
+provider/app-broker path and authoritative generation/lock cycle execute here.
+These sockets are served by test threads, not separate custody processes.
+
+Graphshell now uses its canonical MereHost for encrypted source Resource
+retention, the sealed workshop journal and private result publication. The
+independent Pandect operation record stores a commitment rather than a clear
+request. Private operation evidence and note Resources share the original
+journal/publication transaction; its admission validator preserves retained
+operation facets across normal writer/history candidates.
+
+`20261029-graphshell-private-tests.log` records 294 passes, six existing ignores
+and three failures. Two are genuine regressions: a retired-owner DTO preserved a
+queued private source action, and the normal writer could remove encrypted
+operation evidence. The other failure is a test-setup lifetime error: its helper
+journal deletion handle was still open during reopen. The red executable and
+source snapshots are frozen in `20261029-graphshell-private-red/`, with matching
+binary SHA-256s. The fixed source makes owner retirement terminal in the UI,
+clears queued actions, installs the graph admission guard and closes the test
+handle before reopening.
+
+`20261029-graphshell-private-fixed-tests.log` / `.exit` passes the same guarded
+command, using the original warm 8 GiB reservation:
+
+```sh
+PATH=/Users/markik/.cargo/bin:$PATH python3 /Users/markik/Code/tools/build_storage.py \
+  --policy /Users/markik/Code/output/alembic-hosts-20261028/admission-wait-900-policy.json \
+  build --lane alembic-hosts-20261028 \
+  --cwd /Users/markik/Code/worktrees/mere-alembic-hosts-20261028 --reserve-gib 8 -- \
+  +1.99.1 test --locked --offline -p graphshell --no-default-features \
+  --features alembic-workshop-private --lib --bins --test alembic_workshop_process -j 4
+```
+
+The library has 297 passes, zero failures and six pre-existing ignores; the
+native service test and fresh-process public recovery test each pass. The
+private owner tests use authenticated synthetic ChaCha20Poly1305 protection
+and actual DirectoryBackend/GraphSession persistence. They cover cold reopen,
+exact Unicode source reading, lost acknowledgement, helper dissolution and
+journal deletion, Resource-only result reading, custody loss/terminal retirement,
+wrong owner, source collision/range/tamper refusal and cleartext canary scans.
+They do not yet qualify the current production custody route or headed private
+controls.
+
+`graphshell-alembic-private-20261029` is an APFS clone of the built executable,
+SHA-256 `54f052f2906520dd01c7a5c0c7c9fc266aeb7d3c610f53d064017df866e7979e`.
+`graphshell-private-20261029-binary.json` and
+`20261029-graphshell-private-fixed-source.json` bind it to exact source hashes.
+The explicitly enabled private CLI uses a supplied app-broker endpoint and
+requires an authoritative unlocked custody epoch; an old resident or failed
+connection cannot select plaintext storage. Its private probe prints only
+hashes/state, unlike the historical public probe's readable public fixtures.
+
+Turnstone's compiler check passed before the later sealed chooser and quiet
+source-loading additions. Those additions and facet error propagation remain
+unqualified. Its reserve-20 lease-red attempt was capacity-refused before Cargo;
+the fixed source was restored byte-for-byte and no red test executed. The 400
+GiB budget, 100 GiB floor and running-cache protections remain unchanged.
+Production custody and real-consumer qualification flags remain false.

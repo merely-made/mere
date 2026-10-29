@@ -305,8 +305,9 @@ fn real_custodian_fences_private_payload_to_authoritative_generation() {
     let persona = personae::PersonaId::new();
     castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, persona, "isolated fixture").unwrap();
     let remote = unlocked(&custodian);
-    let original = remote.custody_epoch().unwrap().expect("separate custodian exposes an epoch");
-    let master = remote.root_public_key(KeySource::Persona, None).unwrap();
+    let original = remote.custody_epoch().unwrap().expect("custodian exposes an epoch");
+    let master = remote.master_public_key().to_bytes();
+    assert_eq!(master, custodian.direct("work").master_public_key().to_bytes());
     let clear = b"PRIVATE-EPOCH-CANARY-381";
     let request = PayloadRequest {
         profile: ProfileId("work".into()), master, content_hash: Hash::of(clear),

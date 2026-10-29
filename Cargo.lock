@@ -7274,6 +7274,7 @@ dependencies = [
  "cambium-a11y",
  "cambium-desktop",
  "cambium-rootstock",
+ "chacha20poly1305 0.10.1",
  "chartulary",
  "chatelaine",
  "chirograph",

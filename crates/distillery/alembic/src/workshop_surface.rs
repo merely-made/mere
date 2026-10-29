@@ -56,6 +56,9 @@ pub struct SurfaceState {
     pub view: Option<WorkshopView>,
     pub choices: Vec<SourceChoice>,
     pub busy: bool,
+    /// The owner has permanently retired this window's private binding.
+    /// A fresh owner/window is required; pending local actions carry source data.
+    pub owner_retired: bool,
     pub status: String,
     pub error: Option<String>,
     pub reading: Option<RetainedReading>,
@@ -65,7 +68,7 @@ pub struct SurfaceState {
 impl SurfaceState {
     pub fn new() -> Self {
         Self {
-            status: "Select two to four public retained passages.".into(),
+            status: "Select two to four retained passages.".into(),
             ..Self::default()
         }
     }
@@ -82,6 +85,21 @@ impl SurfaceState {
     /// Merge an asynchronous owner observation without undoing a newer local
     /// selection. A replacement version requires a fresh selection.
     pub fn apply_owner_update(&mut self, mut update: Self) {
+        // Retirement is terminal for this window. A queued older DTO cannot
+        // bring private content or source-bearing actions back after lock.
+        if self.owner_retired {
+            return;
+        }
+        if update.owner_retired {
+            self.actions.clear();
+            update.actions.clear();
+            update.view = None;
+            update.reading = None;
+            update.choices.clear();
+            update.busy = true;
+            *self = update;
+            return;
+        }
         for choice in &mut update.choices {
             if let Some(local) = self.choices.iter().find(|local| local.key == choice.key) {
                 choice.selected =
@@ -92,6 +110,9 @@ impl SurfaceState {
         *self = update;
     }
     pub fn request(&mut self, action: SurfaceAction) {
+        if self.owner_retired {
+            return;
+        }
         // Coalesce identical unhandled UI activations. Durable identity and
         // target deduplication remain the domain and owner's responsibility.
         if !self.actions.contains(&action) {
@@ -177,7 +198,7 @@ pub fn surface(state: &SurfaceState) -> Surface {
     let mut body: Vec<Surface> = vec![
         Box::new(el("h1", "Alembic")),
         Box::new(el("p", "Make an evidence brief from retained passages, then review it before adding a note.")),
-        Box::new(el("p", "The helper reads only your selected public versions and proposes a brief. Adding it to a graph is your separate decision.").attr("class", "alembic-detail")),
+        Box::new(el("p", "The helper reads only your selected retained versions and proposes a brief. Adding it to a graph is your separate decision.").attr("class", "alembic-detail")),
         action("Load public example", "alembic-example", SurfaceAction::LoadExample, !state.busy),
         Box::new(el("h2", "Retained sources")),
     ];

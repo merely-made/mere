@@ -281,6 +281,22 @@ automation, credentials, grants or publication.
 
 ## Findings
 
+- 2026-10-29: Graphshell's private receiving adapter retains source bodies,
+  titles and UTF-8 ranges only in authenticated encrypted Resource facets.
+  The graph's normal journal receives ciphertext deltas. Pandect's independent
+  operation receipt must retain a commitment rather than the clear proposal;
+  the encrypted operation and note remain in its existing atomic publication.
+  This receiving implementation is still under compiler and host qualification.
+- 2026-10-29: retiring a private owner must clear queued presentation actions as
+  well as the visible proposal and reader. An unexecuted citation action carries
+  a source title, so preserving it across a closed-owner DTO retains private
+  presentation data even when the backend correctly refuses execution.
+- 2026-10-29: the first Turnstone private chooser uses admitted sealed saved
+  passages whose full bodies fit the existing workshop passage bound. It does
+  not truncate long documents or guess a quotation range. Opening the workshop
+  must load the current admitted source projection without requiring an unrelated
+  search action; passage-range authoring remains a separate interaction.
+
 - 2026-10-28: the existing Turnstone LocalOnly source path calls unsealed
   Eidetic/Fleece saves and retains decoded recovery bytes and CaptureRequest
   metadata. LocalOnly is a distribution classification, not proof of encryption.
