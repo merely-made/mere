@@ -610,3 +610,33 @@ free of the private source canary. This process flow does not exercise the
 native event loop; the executed receiving-seam regression supplies the ordering
 proof, and headed live-window acceptance remains its separate gate. No H1 or
 real-consumer qualification flag is lifted.
+
+
+## Native private Graphshell controls and live custody retirement
+
+The headed gate uses the same separate broker/custodian fixture v2 and an
+isolated application bundle/root, with no default profile or model provider.
+`20261029-graphshell-private-headed-v1.json` records the visible three-source
+selection, brief generation, exact Unicode citation, accepted note and cold
+reopen in a new native process after helper dissolution. Full accessibility
+observations confirm that locking custody clears the source choices, proposal
+and retained reading; unlocking does not revive the retired window.
+
+After the receiving-order repair, the bundle's consumer was replaced with an
+APFS clone of `graphshell-alembic-private-20261029-retirement-v2` and its hash
+verified as `101b781efde0e02e9cc46c44763361e6c5226f1436d1523353dc22ea46816e62`.
+`20261029-graphshell-private-headed-retirement-v2.json` records visible reading
+of the retained Unicode note on that exact binary, then live custody lock at
+generation 5 and unlock at generation 6. The complete accessibility tree no
+longer exposes the private reading or source choices after lock, and remains
+closed after unlock. All 33 regular retained fixture/product files and the
+ordinary app log remain free of the private source canary. Closing the private
+app was verified through process inventory. Earlier receipt and executable
+paths remain preserved.
+
+This establishes the native controls and live window gate on one Mac using
+synthetic custody and fixture sources. It does not qualify installed executable
+identity, real-profile migration, physical input/IME/accessibility hardware,
+production custody, cross-machine transfer or a model inference provider. The
+two application hosts remain a separate acceptance boundary: Turnstone's
+private native receiving qualification is still open.

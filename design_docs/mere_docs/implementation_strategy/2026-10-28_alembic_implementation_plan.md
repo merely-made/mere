@@ -396,10 +396,11 @@ automation, credentials, grants or publication.
 
 ## Progress
 
-- 2026-10-29: added the opt-in separate-process custody fixture and qualified
-  its compiler and native process paths. The Graphshell private flow now runs
-  through the real broker/custodian boundary; Turnstone, headed controls and
-  production gates remain open.
+- 2026-10-29: qualified the opt-in separate-process custody fixture and the
+  Graphshell private native process and visible controls. Live custody loss
+  terminally retires the window, including queued source-bearing actions;
+  unlock requires a fresh binding. Turnstone receiving and production gates
+  remain open.
 - 2026-10-28: cut from `2026-06-24_alembic_implementation_plan.md` and
   `2026-07-06_node_image_externalization_plan.md`; the Decisions section is copied unchanged;
   nothing new landed.
