@@ -9,14 +9,27 @@ use super::*;
 
 /// Writes a commit carries beside the session's own, and the stored bytes
 /// they were decided against.
-#[derive(Clone, Debug, Default)]
+#[derive(Default)]
 pub struct CommitExtra {
     /// Written in the same atomic batch, after the session's own.
     pub ops: Vec<WriteOp>,
     /// Keys the extra writes depend on, with the bytes read (`None`: absent).
     /// The commit lands only if each key still holds exactly those bytes.
     pub expect: Vec<(String, Option<Vec<u8>>)>,
+    /// Writes decided inside the transaction, against what the store holds
+    /// there. `Err` refuses the whole commit with that message and nothing is
+    /// written. The decision runs before the session's own recheck, so its
+    /// refusal names the cause even when the session moved as well.
+    pub decide: Option<Decide>,
 }
+
+/// A caller's decision taken inside the commit's transaction.
+#[cfg(not(target_arch = "wasm32"))]
+pub type Decide =
+    Box<dyn FnOnce(&dyn muniment::TransactionReader) -> Result<Vec<WriteOp>, String> + Send>;
+/// See the native [`Decide`]; wasm drops the `Send` bound like `TransactFn`.
+#[cfg(target_arch = "wasm32")]
+pub type Decide = Box<dyn FnOnce(&dyn muniment::TransactionReader) -> Result<Vec<WriteOp>, String>>;
 
 enum Rejection {
     ReadOnly(SessionId),
@@ -100,32 +113,35 @@ impl<B: LegacyTransactionBackend> GraphSession<B> {
             self.stored(pending);
             return Ok(());
         }
-        self.commit(pending, Vec::new(), Vec::new()).await
+        self.commit(pending, CommitExtra::default()).await
     }
 
     /// Write `pending` and `extra` atomically if the store passes this
     /// handle's recheck; mark `pending` stored once it has landed.
-    async fn commit(
-        &mut self,
-        pending: Pending,
-        extra: Vec<WriteOp>,
-        expect: Vec<(String, Option<Vec<u8>>)>,
-    ) -> Result<(), SessionError> {
-        let check = self.recheck(expect)?;
+    async fn commit(&mut self, pending: Pending, extra: CommitExtra) -> Result<(), SessionError> {
+        let check = self.recheck(extra.expect)?;
         let mut ops = pending.ops().to_vec();
-        ops.extend(extra);
+        ops.extend(extra.ops);
+        let decide = extra.decide;
         let rejection = Arc::new(Mutex::new(None));
         let rejected = rejection.clone();
-        let transaction =
-            Box::new(
-                move |reader: &dyn muniment::TransactionReader| match check.run(reader) {
-                    Ok(()) => ops,
-                    Err(error) => {
-                        *rejected.lock().expect("transaction rejection") = Some(error);
-                        Vec::new()
-                    },
+        let transaction = Box::new(move |reader: &dyn muniment::TransactionReader| {
+            let decided = match decide {
+                Some(decide) => decide(reader).map_err(Rejection::Validation),
+                None => Ok(Vec::new()),
+            }
+            .and_then(|extra| check.run(reader).map(|()| extra));
+            match decided {
+                Ok(extra) => {
+                    ops.extend(extra);
+                    ops
                 },
-            );
+                Err(error) => {
+                    *rejected.lock().expect("transaction rejection") = Some(error);
+                    Vec::new()
+                },
+            }
+        });
         self.slots.backend().transact(transaction).await?;
         match rejection.lock().expect("transaction rejection").take() {
             Some(Rejection::ReadOnly(id)) => return Err(SessionError::ReadOnly(id)),
@@ -343,7 +359,8 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     /// this session becomes the candidate on success. `publish` adds the
     /// addressable publication of the candidate's graph to the write. Storage
     /// changing under the handle, or under a key in `extra.expect`, refuses the
-    /// commit before anything is written; this session is then unchanged.
+    /// commit before anything is written, as does `extra.decide` returning
+    /// `Err`; this session is then unchanged.
     pub async fn commit_candidate(
         &mut self,
         candidate: Self,
@@ -383,9 +400,10 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
-        let extra = extra(generation.as_deref());
-        ops.extend(extra.ops);
-        candidate.commit(pending, ops, extra.expect).await?;
+        let mut extra = extra(generation.as_deref());
+        ops.append(&mut extra.ops);
+        extra.ops = ops;
+        candidate.commit(pending, extra).await?;
         *self = candidate;
         Ok(generation)
     }

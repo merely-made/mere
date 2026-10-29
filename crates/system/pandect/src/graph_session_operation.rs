@@ -6,7 +6,7 @@
 
 //! An owner's operation record, retained atomically with the published edit it
 //! names, through the session's one commit.
-use super::transaction::CommitExtra;
+use super::transaction::{CommitExtra, Decide};
 use super::*;
 
 /// Opaque owner data retained atomically with a published graph change.
@@ -159,10 +159,11 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     }
 
     /// [`transact_operation_published`](Self::transact_operation_published)
-    /// with `validate` run on the edited graph before the commit. The receipt
-    /// rides in the commit as an extra write expected absent, so an identical
-    /// request that landed first is answered with its receipt and never edits
-    /// twice, and a different request under the same identity is refused.
+    /// with `validate` run on the edited graph before the commit. The record
+    /// is decided inside the commit's transaction: absent, the receipt is
+    /// written with the edit; held by an identical request that landed first,
+    /// that receipt is the answer and nothing is edited twice; held by a
+    /// different request, the identity is refused.
     pub async fn transact_operation_published_checked(
         &mut self,
         operation: [u8; 32],
@@ -174,17 +175,17 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         validate: impl FnOnce(&Graph) -> Result<(), String>,
     ) -> Result<OperationReceipt, SessionError> {
         let session = self.id().as_uuid().to_string();
-        let matches = |receipt: &OperationReceipt| {
-            receipt.request == request && receipt.result == result && receipt.session == session
+        let same = |held: &OperationReceipt| {
+            held.request == request && held.result == result && held.session == session
         };
-        let belongs_elsewhere = || {
+        let elsewhere = || {
             SessionError::Validation("Operation identity already belongs to another request".into())
         };
-        if let Some(receipt) = self.operation_receipt(operation).await? {
-            return if matches(&receipt) {
-                Ok(receipt)
+        if let Some(held) = self.operation_receipt(operation).await? {
+            return if same(&held) {
+                Ok(held)
             } else {
-                Err(belongs_elsewhere())
+                Err(elsewhere())
             };
         }
         let key = self.operation_key(operation);
@@ -194,14 +195,23 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             result: result.clone(),
             generation: generation.to_owned(),
         };
+        // The record the transaction found under the key when it refused.
+        let found: Arc<Mutex<Option<OperationReceipt>>> = Arc::default();
         let record = |generation: Option<&str>| {
             let receipt = receipt_of(generation.expect("operation publishes"));
+            let (key, seen) = (key.clone(), found.clone());
+            let decide: Decide = Box::new(move |reader: &dyn muniment::TransactionReader| {
+                let Some(bytes) = reader.get(&key).map_err(|e| e.to_string())? else {
+                    let value = serde_json::to_vec(&receipt).expect("receipt serializes");
+                    return Ok(vec![WriteOp::Put { key, value }]);
+                };
+                let held = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+                *seen.lock().expect("operation record") = Some(held);
+                Err("Operation identity already recorded".into())
+            });
             CommitExtra {
-                ops: vec![WriteOp::Put {
-                    key: key.clone(),
-                    value: serde_json::to_vec(&receipt).expect("receipt serializes"),
-                }],
-                expect: vec![(key.clone(), None)],
+                decide: Some(decide),
+                ..CommitExtra::default()
             }
         };
         let committed = self
@@ -218,12 +228,12 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
             .await;
         match committed {
             Ok((_, generation)) => Ok(receipt_of(&generation.expect("operation publishes"))),
-            // The commit was refused. If the same request landed meanwhile, its
-            // receipt is the answer; another request under this identity is not.
+            // The commit was refused. A record found under the identity decides:
+            // the same request's receipt is the answer, another request is not.
             Err(SessionError::Validation(error)) => {
-                match self.operation_receipt(operation).await? {
-                    Some(receipt) if matches(&receipt) => Ok(receipt),
-                    Some(_) => Err(belongs_elsewhere()),
+                match found.lock().expect("operation record").take() {
+                    Some(held) if same(&held) => Ok(held),
+                    Some(_) => Err(elsewhere()),
                     None => Err(SessionError::Validation(error)),
                 }
             },

@@ -149,6 +149,7 @@ fn a_candidate_commits_extra_writes_and_refuses_a_key_that_changed() {
                 value: write.to_vec(),
             }],
             expect: vec![("side/ledger".into(), Some(read.to_vec()))],
+            decide: None,
         };
         let at = SystemTime::UNIX_EPOCH;
 
