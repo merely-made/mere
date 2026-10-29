@@ -17,7 +17,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use outrider::LxmfPayload;
-use pandect::DeviceId;
+use personae::carry::DeviceId;
 use personae::{IdentityError, SealedRecordStorage};
 use postilion::management::ManagementSnapshot;
 use postilion::{Event, Sent, Station, StationConfig};

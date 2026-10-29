@@ -38,6 +38,7 @@ mod validate_tests;
 // What the moved flows name from pandect, as they named it from inside it.
 use pandect::wallet_grant::*;
 use pandect::wallet_store::*;
+use personae::carry::{DeviceId, RemoteAuthRevocationOutcome};
 
 pub use bootstrap::{WalletBootstrapMode, bootstrap_wallet_state, ensure_wallet_state};
 pub use devices::{

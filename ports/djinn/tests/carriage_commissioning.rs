@@ -35,11 +35,12 @@ mod commissioning {
         ensure_wallet_state, issue_remote_auth_device_grant_from_pairing, load_identity_seed,
     };
     use pandect::{
-        CarriagePolicy, DeviceExposure, DeviceId, DevicePublicKey, KeyEpochId,
+        CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId,
         PairedRemoteAuthGrantSpec, PersonaId, PrivateEpochPlaintext, blinded_slot_id,
         decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster,
         unwrap_private_epoch_material,
     };
+    use personae::carry::DeviceId;
     use personae::InMemoryProvider;
     use personae::carry::derive_persona_chain_root;
     use uuid::Uuid;
@@ -180,10 +181,11 @@ mod retraction {
         revoke_remote_auth_device,
     };
     use pandect::{
-        CarriagePolicy, DeviceExposure, DeviceId, DevicePublicKey, KeyEpochId,
+        CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId,
         PairedRemoteAuthGrantSpec, PersonaId, PrivateEpochPlaintext, blinded_slot_id,
         decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster,
     };
+    use personae::carry::DeviceId;
     use personae::InMemoryProvider;
     use personae::carry::derive_persona_chain_root;
     use uuid::Uuid;

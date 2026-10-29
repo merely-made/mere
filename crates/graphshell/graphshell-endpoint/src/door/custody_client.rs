@@ -25,8 +25,7 @@
 use dramatis::roster::Roster;
 use dramatis::view::VaultLockView;
 use insigne::DerivedKeyAttestation;
-use pandect::{DeviceId, RemoteAuthRevocationOutcome};
-use personae::carry::DeviceGrantSet;
+use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, ProfileId, RetainedKeys};
 
 use crate::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};

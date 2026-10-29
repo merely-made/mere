@@ -34,7 +34,8 @@
 //! party that already knows every association the blinding hides from peers.
 
 use muniment::JsonSlots;
-use pandect::{DeviceId, PersonaId, WrappedEpochRecord, encode_epoch_record};
+use pandect::{PersonaId, WrappedEpochRecord, encode_epoch_record};
+use personae::carry::DeviceId;
 use personae::IdentityProvider;
 use personae::carry::persona_wallet_salt;
 use serde::{Deserialize, Serialize};
@@ -71,10 +72,10 @@ pub struct CarriageRetractReport {
 #[derive(Debug, Default)]
 pub struct CarriagePublishReport {
     /// Each (device, persona) whose slot went onto the lane.
-    pub published: Vec<(pandect::DeviceId, pandect::PersonaId)>,
+    pub published: Vec<(personae::carry::DeviceId, pandect::PersonaId)>,
     /// Leased devices whose wrapping key the wallet never retained, so their
     /// slots cannot be addressed. Pairing retains one; direct issue does not.
-    pub skipped_no_wrapping_key: Vec<pandect::DeviceId>,
+    pub skipped_no_wrapping_key: Vec<personae::carry::DeviceId>,
     /// Certificates obliged to carry epoch material that have no record yet.
     pub skipped_no_record: usize,
     /// Certificates whose grant expiry has already passed.

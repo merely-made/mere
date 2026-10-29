@@ -21,7 +21,7 @@ fn dr_c_signalman_identity_stays_pending() {
         assert_eq!(mode, "absent");
     }
     assert!(
-        matches!(authority.release_station(pandect::DeviceId::new()), Err(error) if error.is_pending()),
+        matches!(authority.release_station(personae::carry::DeviceId::new()), Err(error) if error.is_pending()),
         "Signalman must not derive a fallback station"
     );
     assert!(

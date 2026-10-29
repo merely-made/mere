@@ -131,7 +131,7 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     /// Keys derived from a persona wallet's current private epoch.
     fn epoch_keys(&self, wallet_root: &Path, persona: PersonaId, device_label: Option<&str>, requests: &[EpochKeyRequest]) -> Result<Vec<ReleasedEpochKey>, CustodyRefusal>;
     fn station_grant(&self, wallet_root: &Path, request: &StationGrantRequest, issuer: [u8; 32]) -> Result<personae::carry::DeviceGrantSet, CustodyRefusal>;
-    fn revoke_device(&self, wallet_root: &Path, device: uuid::Uuid) -> Result<pandect::RemoteAuthRevocationOutcome, CustodyRefusal>;
+    fn revoke_device(&self, wallet_root: &Path, device: uuid::Uuid) -> Result<personae::carry::RemoteAuthRevocationOutcome, CustodyRefusal>;
     /// The wallet's public records: its persona index and device roster. A
     /// custodian discloses them; Djinn never opens a wallet file, which a
     /// custodian keeps beside the seed. Only an in-process host reads

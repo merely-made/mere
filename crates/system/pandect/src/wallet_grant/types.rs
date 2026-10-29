@@ -8,7 +8,6 @@
 //! responses, enrollment bundles, and the specs the flows take as input.
 
 use identity::carry::DeviceGrantSet;
-use insigne::delegation::SignedDelegationRevocation;
 
 use super::{BlindedEpochIndex, WrappedEpochRecord};
 use identity::{Ed25519Signature, PersonaId};
@@ -158,20 +157,4 @@ pub struct PairedRemoteAuthGrantSpec {
 pub struct RemoteAuthPairingMaterial {
     pub wrapping_key: [u8; 32],
     pub short_auth_string: String,
-}
-
-/// Summary of one remote-auth device revocation. Serializable since DR-C,
-/// because a revocation djinn performs is answered to the app that asked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RemoteAuthRevocationOutcome {
-    pub device_id: DeviceId,
-    pub already_revoked: bool,
-    pub rotated_personas: Vec<PersonaId>,
-    pub refreshed_devices: Vec<DeviceId>,
-    /// The signed statements withdrawing every certificate the device held.
-    ///
-    /// Returned rather than only filed, because these are what travels: a
-    /// caller hands them to peers, or to the radio itself if it can still be
-    /// reached. The wallet's own copy is already folded into its ledger.
-    pub statements: Vec<SignedDelegationRevocation>,
 }

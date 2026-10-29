@@ -268,7 +268,7 @@ pub use wallet_grant::{
     REMOTE_AUTH_PAIRING_TICKET_SCHEMA_VERSION, REMOTE_AUTH_PAIRING_WRAP_CONTEXT_V1,
     RemoteAuthEnrollmentBundle, RemoteAuthGrantSpec, RemoteAuthPairingMaterial,
     RemoteAuthPairingResponse, RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest,
-    RemoteAuthRevocationOutcome, WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
+    WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
     WrappedEpochMaterial, WrappedEpochRecord, assess_device_grant, blinded_slot_id,
     build_remote_auth_enrollment_bundle, certificate_device_id, decode_device_grant_set,
     decode_epoch_record, decode_remote_auth_enrollment_bundle, decode_remote_auth_pairing_ticket,
@@ -283,7 +283,7 @@ pub use wallet_grant::{
 };
 pub use wallet_store::{
     CapabilitySlotRef, CarriagePolicy, DEVICE_ROSTER_FILENAME, DeviceExposure, DeviceGrantRef,
-    DeviceId, DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
+    DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
     IDENTITY_GRANTS_DIR, IDENTITY_SEED_FILENAME, IDENTITY_WALLET_FILENAME, IdentityWalletManifest,
     KeyEpochId, LOCAL_DEVICE_IDENTITY_FILENAME, LocalDeviceIdentity, PERSONA_EPOCH_BRIDGE_FILENAME,
     PERSONA_WALLET_FILENAME, PersonaChainRoot, PersonaEpochBridge, PersonaWalletManifest,
