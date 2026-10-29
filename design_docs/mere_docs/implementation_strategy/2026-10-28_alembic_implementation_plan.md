@@ -291,15 +291,17 @@ automation, credentials, grants or publication.
 - 2026-10-29: the opt-in Djinn `private_workshop_fixture` separates its
   synthetic custodian child from the app-broker process, which uses the real
   `RemoteHost` client. It requires a new absolute directory and exposes only
-  redacted readiness and lock/loss controls. This is a receiving fixture;
-  compiling it does not qualify process behavior, installed identity or
-  production custody.
+  redacted readiness and lock/loss controls. Separate native processes now
+  exercise Graphshell's private retention, cold result reading and lock/loss
+  refusal through that route. This remains a receiving fixture and does not
+  qualify installed identity or production custody.
 - 2026-10-29: Graphshell's private receiving adapter retains source bodies,
   titles and UTF-8 ranges only in authenticated encrypted Resource facets.
   The graph's normal journal receives ciphertext deltas. Pandect's independent
   operation receipt must retain a commitment rather than the clear proposal;
   the encrypted operation and note remain in its existing atomic publication.
-  This receiving implementation is still under compiler and host qualification.
+  Bounded library and native process receiving are qualified; headed controls
+  and the complete two-host product matrix retain their own gates.
 - 2026-10-29: retiring a private owner must clear queued presentation actions as
   well as the visible proposal and reader. An unexecuted citation action carries
   a source title, so preserving it across a closed-owner DTO retains private
@@ -390,8 +392,9 @@ automation, credentials, grants or publication.
 ## Progress
 
 - 2026-10-29: added the opt-in separate-process custody fixture and qualified
-  its compiler path. Native execution remains held by workspace capacity;
-  private product and production gates remain open.
+  its compiler and native process paths. The Graphshell private flow now runs
+  through the real broker/custodian boundary; Turnstone, headed controls and
+  production gates remain open.
 - 2026-10-28: cut from `2026-06-24_alembic_implementation_plan.md` and
   `2026-07-06_node_image_externalization_plan.md`; the Decisions section is copied unchanged;
   nothing new landed.

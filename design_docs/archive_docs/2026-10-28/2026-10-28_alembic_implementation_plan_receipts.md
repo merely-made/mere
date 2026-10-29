@@ -506,3 +506,51 @@ transfer/rewrap is separate. Generic legacy decoding of an absent custody
 epoch remains unchanged, while the new Graphshell consumer requires an
 authoritative epoch and sends its exact binding. Production custody and
 real-consumer qualification flags remain false.
+
+## Native private Graphshell receiving through separate custody processes
+
+The repaired broker is source commit
+`746a4d4e2d785fb22b467e90efc86039338d2d6f`. Its guarded native fixture build
+passes in `20261029-private-fixture-build-v2.log` / `.exit`, using the unchanged
+20 GiB reservation. The exact command is the earlier fixture compiler command
+with `build` replacing `check`; HEAD, Cargo lock and changed source hashes are
+retained in the matching `.head` and `.sha256` files. No supplier revision or
+source identity was changed for the app-scope repair.
+
+The APFS-cloned fixture executable is
+`Code/output/alembic-hosts-20261028/private-workshop-custody-fixture-20261029-v2`,
+SHA-256 `7e7ff63d16dc9b67453af8375cf2b4bfc25739e1566d4e1aa0b9ce22ac326e3f`.
+`20261029-private-fixture-binary-v2.json` retains that build provenance.
+The unchanged Graphshell consumer remains SHA-256
+`54f052f2906520dd01c7a5c0c7c9fc266aeb7d3c610f53d064017df866e7979e`.
+
+`20261029-private-fixture-process-v2.json` passes the fixture lifecycle smoke:
+actual broker/custodian parentage, authoritative lock/unlock generation
+advance, redaction of an unknown control input, acknowledged custody loss,
+owned-child reaping and clean broker exit. Consumers open the broker from
+independent native processes; the custodian service is a separate child and
+the broker uses `RemoteHost`, with no in-process custody fallback on this path.
+
+`20261029-graphshell-private-process-v2.json` passes the private product owner
+flow using the same frozen executables and a new isolated root:
+
+- Retain three sealed private sources, generate the brief and accept one note.
+- Cold-reopen independent consumers with the same proposal digest, ordered
+  source versions, original receipt and matching retained note/body digest.
+- Refuse reading while custody is locked, then recover the same result through
+  a fresh unlocked binding.
+- Dissolve the helper and cold-open the same human-owned result, retaining
+  exactly one added note.
+- Refuse startup/reading after custodian process loss, without plaintext
+  fallback.
+- Scan all 33 regular persisted fixture/product files for the private source
+  canary; it is absent. Probe stdout/stderr contain only hashes/state, with no
+  clear canary.
+
+The library test separately qualifies reading after helper journal deletion;
+this native flow dissolves the helper without deleting that journal. The native
+process run does not establish headed controls, an existing consumer's live
+window across lock/unlock, signed executable admission, real-store migration,
+physical-platform behavior or H1 production qualification. Production custody
+and real-consumer qualification flags remain false. Failed v1 evidence and
+both fixture executables remain retained.
