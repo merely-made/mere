@@ -33,7 +33,8 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use insigne::DerivedKeyAttestation;
-use pandect::{DeviceId, PersonaId, WalletEpochSealer};
+use pandect::{PersonaId, WalletEpochSealer};
+use personae::carry::DeviceId;
 use personae::signing::{DecisionError, PendingSigningRequest, RememberApproval, SigningDecision};
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,

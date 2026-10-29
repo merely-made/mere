@@ -8,7 +8,7 @@
 
 use super::*;
 use crate::canvas::grammar_view::{LINK_QUIET, link_tone};
-use paint_list_api::PaintCmd;
+use paint_list_api::{PaintCmd, PaintList};
 use scenograph::attention::Attention;
 
 fn class_of(canvas: &Canvas, key: NodeKey) -> String {
@@ -133,6 +133,46 @@ fn retained_and_suggested_nodes_carry_their_marks() {
         .unwrap()
         .to_owned();
     assert!(style.contains("width: 16.19"), "the smallest mark: {style}");
+}
+
+#[test]
+fn captions_take_the_themes_ink() {
+    let mut canvas = Canvas::new();
+    canvas.visit("https://a.example");
+    let inks = |canvas: &mut Canvas| -> Vec<(u8, u8, u8)> {
+        canvas.frame(800, 600);
+        let list = canvas.node_document.frame(800, 600).unwrap();
+        list.commands()
+            .iter()
+            .filter_map(|command| match command {
+                PaintCmd::DrawText(text) => Some((
+                    (text.color.r * 255.0).round() as u8,
+                    (text.color.g * 255.0).round() as u8,
+                    (text.color.b * 255.0).round() as u8,
+                )),
+                _ => None,
+            })
+            .collect()
+    };
+    let own = (216, 222, 234);
+    let unthemed = inks(&mut canvas);
+    assert!(
+        !unthemed.is_empty() && unthemed.iter().all(|ink| *ink == own),
+        "{unthemed:?}"
+    );
+
+    canvas.set_caption_color(Some([20, 30, 40]));
+    let themed = inks(&mut canvas);
+    assert!(
+        !themed.is_empty() && themed.iter().all(|ink| *ink == (20, 30, 40)),
+        "{themed:?}"
+    );
+
+    canvas.set_caption_color(None);
+    assert!(
+        inks(&mut canvas).iter().all(|ink| *ink == own),
+        "none restores the canvas's own"
+    );
 }
 
 #[test]

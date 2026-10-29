@@ -27,9 +27,8 @@ use std::path::PathBuf;
 use dramatis::roster::Roster;
 use dramatis::view::{VaultLockView, VaultProtectionView};
 use insigne::DerivedKeyAttestation;
-use pandect::RemoteAuthRevocationOutcome;
 use personae::ProfileId;
-use personae::carry::DeviceGrantSet;
+use personae::carry::{DeviceGrantSet, RemoteAuthRevocationOutcome};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

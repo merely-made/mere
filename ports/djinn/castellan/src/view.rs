@@ -156,9 +156,11 @@ fn recovery_policy_label(policy: RecoveryPolicy) -> &'static str {
 #[cfg(test)]
 mod tests {
     use pandect::{
-        DeviceId, DevicePublicKey, DeviceRecord, DeviceRoster, IdentityWalletManifest, PersonaId,
+        DevicePublicKey, DeviceRecord, DeviceRoster, IdentityWalletManifest, PersonaId,
         PersonaWalletRef, save_device_roster, save_identity_wallet,
     };
+
+    use personae::carry::DeviceId;
 
     use super::*;
 

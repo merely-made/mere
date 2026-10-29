@@ -6,7 +6,7 @@
 
 //! Public-only custody receipt probe. No radio access or identity fallback.
 use station_custody::DjinnStationAuthority;
-use pandect::DeviceId;
+use personae::carry::DeviceId;
 use std::{
     path::PathBuf,
     time::{Duration, Instant},

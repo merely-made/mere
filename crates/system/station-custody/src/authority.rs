@@ -21,9 +21,8 @@ use graphshell_endpoint::door::custody::{
 };
 use graphshell_endpoint::door::custody_client::{BlockingCustodyClient, CustodyClientError};
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
-use pandect::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::RetainedKeys;
-use personae::carry::DeviceGrantSet;
+use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};
 
 mod sennet;
 mod tucket;

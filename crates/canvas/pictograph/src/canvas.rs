@@ -437,6 +437,9 @@ pub struct Canvas {
     gnode_of: HashMap<NodeKey, DomNodeId>,
     /// The `.stage` container element (carries the camera transform).
     stage_node: DomNodeId,
+    /// The `.stage` inline style: identity, plus the theme's caption ink
+    /// (`theme.rs`).
+    stage_style: String,
     camera: Camera,
     style: ScenePaintStyle,
     /// The content-surface backdrop color (themed; the host pushes it via

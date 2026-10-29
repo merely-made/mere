@@ -834,13 +834,91 @@ compositor correlation retain separate bounds.
   the candidate lock was preserved as evidence and not published over it. This
   fix changes only the root device source record, with no supplier revision
   chosen for the web consumer.
-- **A green build belongs to its source snapshot.** The original native library,
-  native viewer and full default web builds passed. Later upstream changes are
-  kept separate from those results. The
+- **A green build belongs to its source snapshot.** The initial native library,
+  viewer and full default web builds passed on their older snapshot. The queued
+  refresh of `db8983943` subsequently built the native library/viewer and matched
+  all 721 compiled package identities to the root lock. Its full default web
+  build reached Cargo and failed in `spareval 0.2.7`: MD5/SHA-1 used `digest 0.11`
+  while SHA-2 used `digest 0.10`. The
   [qualification receipt](../../../support/receipts/netrender-lock-20261028/receipt.json)
-  binds source heads, lock hashes, exact source audits, frozen artifacts and any
-  storage admission or capacity refusal on the published-cohort refresh. Fresh
-  validation of `db8983943` remains blocked before Cargo by compiler-cache
-  capacity reserved by active lanes; the older passes do not qualify the newer
-  dependency cohort. Guarded cleanup removed eligible idle intermediates between
-  attempts, with the limits and 20 GiB build reservation preserved.
+  retains those passes, the compiler failure, frozen native artifact and earlier
+  guard refusals without treating the older web pass as newer-cohort evidence.
+- **The evaluator and its exact companions form one receiving set.** Mere
+  `4559b860a` raises the evaluator minimum to the latest stable `spareval 0.2.9`
+  and updates eight registry records in both locks. Existing dependency choices
+  stay fixed except the evaluator's SHA-2 edge, which joins MD5/SHA-1 on `0.11`.
+  All package records outside that set remain unchanged. A query regression
+  checks the known MD5, SHA-1, SHA-256, SHA-384 and SHA-512 digests of `abc`.
+- **Executed tests and linking close the evaluator build gap.** The queued
+  validation of `4559b860a` completed: all 105 native query tests passed,
+  including the five hash-function results, and the full default web product
+  linked. The frozen Wasm artifact and source audit are retained with the
+  [qualification receipt](../../../support/receipts/netrender-lock-20261028/receipt.json).
+  The audit matches 553 of 554 compiled package identities; its one existing
+  Taffy source-record disagreement remains a distinct issue. This is build
+  and test evidence for that snapshot, with no new native UI, browser runtime,
+  physical IME, GPU pixel or human accessibility claim.
+- **The evaluator snapshot retains its earlier source disagreement.** Locked web metadata
+  for `4559b860a` loads `genet-taffy 0.14.0` from the parent Genet checkout at `36526e0`, while its
+  existing lock record names `a732a7d4`. The Taffy source trees are identical at
+  those revisions. This pre-existing record is preserved separately from the
+  evaluator update; compile success alone does not close that identity gap.
+  The receiving upgrade below replaces both old fork identities.
+
+## Genet Taffy upstream base and consumer identity (2026-10-28)
+
+- **The fork now carries the current upstream release.** Genet `565458ea3ab`
+  rebases the current fork, including its unreleased changes, from upstream
+  Taffy 0.13.0 onto 0.15.1. Published `genet-taffy 0.16.0` contains that result.
+  A fork's own latest published version did not establish that its upstream
+  base was current. The retained float, containment, order, static-position
+  and automatic-minimum seams now sit on the new upstream algorithms and API.
+- **One registry package removes the fork's parent-checkout ambiguity.** Mere
+  `590097f6a` adopts the new Genet cohort in both locks and removes the redundant
+  Taffy Git patches. Buckram and Livery select the published fork directly.
+  All nonselected package records, including the evaluator's repaired hash
+  dependencies, remain unchanged. Locked metadata checks actual checkout
+  heads and matches all 1,611 root and 725 web package identities to their locks.
+- **The migration keeps regressions visible.** The refreshed complete delta
+  reproduces all 52 source files byte for byte against pristine 0.15.1. The
+  fork and its extracted package each pass 196 unit tests and five doctests;
+  Buckram, Genet-Livery and Livery pass 1,220 tests with 12 existing ignored
+  tests. Retained red/green evidence covers the wrapped-column automatic
+  minimum and explicit content-basis ratio. Livery's stale `align-content`
+  initial value is corrected to `normal`; a positioned-grid regression and
+  explicit `stretch` control distinguish margin collapse from intentional
+  independent formatting contexts. These results are source and native test
+  evidence, with no new physical IME, human accessibility or Linux/Vulkan claim.
+- **The receiving products link with the published fork.** The native
+  Graphshell library/viewer and full default Wasm web product build at
+  `590097f6a`. All 721 native and 554 web compiled package identities match
+  their respective locks, including the registry fork. Frozen artifacts,
+  hashes, lock-preservation proof and the upstream/package evidence are in the
+  [receiving receipt](../../../support/receipts/genet-taffy-0151-20261028/receipt.json).
+  This closes the old fork source-record gap on the new receiving snapshot.
+
+
+## Linux geometry receiving on the rebased Taffy fork (2026-10-29)
+
+- **The rebased owner reaches hardware Vulkan.** Turnstone `299d6ff` and SDK
+  `c314b7e` use Genet `565458ea3ab` and registry `genet-taffy 0.16.0`, based on
+  upstream Taffy 0.15.1. The ThinkPad verifies all 52 fork source files against
+  the published package, with no lock/source disagreement. The two native SDK
+  geometry cases and the three focused host geometry, IME-admission and
+  pending-frame tests pass on AMD Radeon Graphics / RADV Renoir / Vulkan.
+- **Both field types keep their geometry through native receiving.** Fresh
+  ordinary and password scenarios pass primary-window editing, 110% page zoom
+  and explicit lens-content focus. Every distinct shared caret rectangle
+  matches a native Wayland request on the correct window surface within one
+  logical pixel; swapping the window identities fails the checker. Ordinary
+  caret height changes from 34 to 37.4, password height from 33 to 36.3, and
+  both lenses retain the zoomed height. All source captures are nonblank and
+  identify hardware Vulkan at native display scale 1.
+- **The rerun preserves the other acceptance boundaries.** Every nonselected
+  dependency record and the earlier physical IME, ordinary geometry and
+  password receipt trees remain unchanged. This is synthetic geometry
+  receiving, with no new physical IME, candidate-popup, CJK, human AT,
+  native high-DPI, X11 or Servo IME claim. The canonical evidence is
+  `turnstone/docs/receipts/cue_taffy_geometry_linux_20261029/receipt.json`;
+  its manifests bind the frozen executable, source cohorts, native protocol,
+  source rasters and original evidence hashes.

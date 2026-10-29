@@ -173,6 +173,14 @@ impl Mode {
         matches!(self, Mode::HcLight | Mode::HcDark)
     }
 
+    /// The tinct derivation profile this mode selects.
+    pub fn profile(&self) -> tinct::ModeProfile {
+        tinct::ModeProfile {
+            dark: self.dark(),
+            high_contrast: self.high_contrast(),
+        }
+    }
+
     /// The canonical mode for a `(dark, high_contrast)` flag pair.
     pub fn from_flags(dark: bool, high_contrast: bool) -> Self {
         match (dark, high_contrast) {

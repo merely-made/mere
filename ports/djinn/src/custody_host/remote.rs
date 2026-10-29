@@ -536,7 +536,7 @@ impl ResidentCustody for RemoteHost {
         }
     }
 
-    fn revoke_device(&self, _wallet_root: &Path, device: uuid::Uuid) -> Result<pandect::RemoteAuthRevocationOutcome, CustodyRefusal> {
+    fn revoke_device(&self, _wallet_root: &Path, device: uuid::Uuid) -> Result<personae::carry::RemoteAuthRevocationOutcome, CustodyRefusal> {
         match self.call(Operation::RevokeDevice { device_id: device.to_string() }, PROMPTED)? {
             Answer::Value { value } => serde_json::from_value(value).map_err(|_| unexpected()),
             _ => Err(unexpected()),

@@ -192,6 +192,7 @@ impl Canvas {
             node_document,
             gnode_of,
             stage_node,
+            stage_style: crate::canvas::build::stage_style(None),
             camera: Camera::default(),
             style: dark_scene_style(),
             backdrop: surface_bg(),

@@ -18,7 +18,8 @@ use insigne::CheckFault;
 use insigne::DerivedKeyAttestation;
 use p2panda_core::cbor::{decode_cbor, decode_cbor_strict, encode_cbor};
 use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
-use pandect::{DeviceGrantError, DeviceId, decode_device_grant_set, encode_device_grant_set};
+use pandect::{DeviceGrantError, decode_device_grant_set, encode_device_grant_set};
+use personae::carry::DeviceId;
 use personae::{
     Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError, IdentityProvider,
 };
@@ -852,7 +853,7 @@ fn decode_snapshot<T: for<'de> Deserialize<'de>>(
 
 #[cfg(test)]
 mod tests {
-    use pandect::DeviceId;
+    use personae::carry::DeviceId;
     use personae::InMemoryProvider;
 
     use crate::authority::test_support::TestWallet;

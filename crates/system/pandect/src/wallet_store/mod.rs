@@ -98,11 +98,12 @@ pub const PERSONA_EPOCH_BRIDGE_FILENAME: &str = "private-epoch-bridge.json";
 // see design_docs/mere_docs/implementation_strategy/
 // 2026-08-10_wallet_carry_foldin_plan.md). This module keeps the store
 // adapter: path layout, device-settings policy, sealed-record wiring, and
-// bootstrap. The re-exports keep every existing consumer path
-// (`pandect::wallet_store::*`) compiling unchanged.
+// bootstrap. DeviceId belongs to the carry model and is imported privately.
+use identity::carry::DeviceId;
+
 pub use identity::carry::{
     CapabilitySlotRef, CarriagePolicy, CarryHashFn, CarryRef, CarryRefParseError, DeviceExposure,
-    DeviceGrantRef, DeviceId, DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster,
+    DeviceGrantRef, DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster,
     IdentityWalletManifest, KeyEpochId, LocalDeviceIdentity, PersonaChainRoot, PersonaEpochBridge,
     PersonaWalletManifest, PersonaWalletRef, PrivateEpochRecord, PrivateRoots, PublicRoots,
     RecoveryPolicy, RemoteAuthWrappingKeyBridge, RemoteAuthWrappingKeyRecord,
