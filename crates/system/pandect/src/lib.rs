@@ -81,6 +81,9 @@ pub mod cartography_geometry;
 // Recoverable replacement mechanics shared by product-owned settings stores.
 // Paths, schemas, and validation remain with the configured product.
 pub mod atomic_file;
+// The one compare-and-replace over a muniment slot, for every store that
+// writes back bytes it loaded (rules, blocks, Forme).
+pub mod slot_guard;
 // The scene.* facet namespace: the graph-scene's own view settings (sizing
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
