@@ -306,6 +306,11 @@ automation, credentials, grants or publication.
   well as the visible proposal and reader. An unexecuted citation action carries
   a source title, so preserving it across a closed-owner DTO retains private
   presentation data even when the backend correctly refuses execution.
+- 2026-10-29: native retirement observations take precedence over ordinary
+  request serials. An older handled serial can still carry terminal custody
+  loss after a newer UI request was sent; suppressing that DTO delays clearing
+  private presentation. Healthy stale replies remain suppressed, and once
+  retirement reaches the shared Surface, a later healthy DTO cannot revive it.
 - 2026-10-29: the first Turnstone private chooser uses admitted sealed saved
   passages whose full bodies fit the existing workshop passage bound. It does
   not truncate long documents or guess a quotation range. Opening the workshop

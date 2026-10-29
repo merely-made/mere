@@ -554,3 +554,59 @@ window across lock/unlock, signed executable admission, real-store migration,
 physical-platform behavior or H1 production qualification. Production custody
 and real-consumer qualification flags remain false. Failed v1 evidence and
 both fixture executables remain retained.
+
+## Terminal retirement before queued native requests
+
+The native Graphshell `after_wake` receiver used the ordinary `handled >= sent`
+condition for every owner update. A terminal `owner_retired` DTO carrying an
+older handled serial could therefore wait behind a newer queued UI request,
+despite the shared Surface's correct one-way retirement behavior. The actual
+native update-application seam is now extracted as `deliver_surface_update`;
+its initial serial-only behavior was kept for the executed regression.
+
+`20261029-native-retirement-serial-red.log` / `.exit` executes three native bin
+tests: two controls pass and the retirement case fails. The test queues a
+private source-bearing action and retained reading behind a newer sent serial,
+then delivers terminal custody loss with an older handled serial. The failure
+is the actual receiver suppressing that observation. A healthy stale-response
+control passes. The frozen red harness is
+`20261029-native-retirement-serial-red-binary`, SHA-256
+`86f0d3c196c0b25dd8841b10664f5837913ecdbb743ca2e11e033c11143cd01d`;
+its source snapshot and matching hashes are retained beside the log.
+
+The receiver now admits terminal retirement regardless of the ordinary serial
+condition. `20261029-native-retirement-serial-green.log` / `.exit` passes all
+three bin tests and the existing fresh-process public recovery test. The
+regression additionally proves clearing of the private reading, source choices
+and queued action; a later serial-valid healthy DTO and another local source
+activation cannot revive the retired window. Healthy stale-response suppression
+still preserves the newer request and its busy state. No shared-library source
+changed, so the prior library gate was not repeated.
+
+```sh
+PATH=/Users/markik/.cargo/bin:$PATH python3 /Users/markik/Code/tools/build_storage.py \
+  --policy /Users/markik/Code/output/alembic-hosts-20261028/admission-wait-900-policy.json \
+  build --lane alembic-hosts-20261028 \
+  --cwd /Users/markik/Code/worktrees/mere-alembic-hosts-20261028 --reserve-gib 8 -- \
+  +1.99.1 test --locked --offline -p graphshell --no-default-features \
+  --features alembic-workshop-private --bin graphshell-alembic \
+  --test alembic_workshop_process -j 4
+```
+
+The integration target rebuilt the normal executable. Its APFS-frozen copy is
+`graphshell-alembic-private-20261029-retirement-v2`, SHA-256
+`101b781efde0e02e9cc46c44763361e6c5226f1436d1523353dc22ea46816e62`.
+`20261029-graphshell-retirement-v2-binary.json` binds the executable to the exact
+native bin source hash and the green gate. The older frozen consumer, its app
+bundle and existing runtime were not modified.
+
+`20261029-graphshell-private-process-retirement-v2.json` passes the complete
+earlier private process qualifier using this new consumer and the unchanged
+fixture v2 (`7e7ff63d…`): three retained sealed sources, one accepted note,
+matching cold proposal/source/receipt/note digests, refusal while locked,
+fresh unlocked reading, retained reading after dissolution, and refusal after
+custodian loss. All 33 regular persisted files and probe stdout/stderr remain
+free of the private source canary. This process flow does not exercise the
+native event loop; the executed receiving-seam regression supplies the ordering
+proof, and headed live-window acceptance remains its separate gate. No H1 or
+real-consumer qualification flag is lifted.
