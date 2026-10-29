@@ -135,14 +135,12 @@
   },
   "published_target_qualification": {
     "passed": false,
-    "status": "incomplete: repeated guarded attempts were refused for live compiler-cache reservations before Cargo launched",
+    "status": "native library/viewer passed; full default web build failed in spareval 0.2.7 because its hash functions mixed digest 0.10 and 0.11 traits",
     "builds": {
       "native": {
         "command": [
           "python3",
           "<Code>/tools/build_storage.py",
-          "--policy",
-          "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
           "build",
           "--lane",
           "graphshell-components",
@@ -167,21 +165,294 @@
         ],
         "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
         "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
-        "started": 1793215971.990766,
-        "exit": 2,
-        "elapsed_seconds": 190.294
+        "started": 1793221572.669019,
+        "exit": 0,
+        "elapsed_seconds": 671.872
+      },
+      "web": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "20",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+          "--",
+          "build",
+          "--locked",
+          "--offline",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--lib",
+          "--message-format",
+          "json-render-diagnostics",
+          "-j4"
+        ],
+        "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+        "lock_sha256": "1c88bcca27e8b430baabbdcfccdec19e236f320c8b8f22a5a606fabfe5119d49",
+        "started": 1793222249.263951,
+        "exit": 101,
+        "elapsed_seconds": 547.211
+      }
+    },
+    "compiled_source_audits": {
+      "native": {
+        "built_package_identities": 721,
+        "lock_records": 1830,
+        "all_built_package_identities_match_lock": true,
+        "missing_source_aware_records": [],
+        "git_checkout_heads": {
+          "/Users/markik/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+          "/Users/markik/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+          "/Users/markik/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d": "a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+          "/Users/markik/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72": "66b2f72e9e0785819139739cc4503bf1e8766de9",
+          "/Users/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+          "/Users/markik/.cargo/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b": "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+          "/Users/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+          "/Users/markik/.cargo/git/checkouts/esp-fee4926440a1bad1/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+          "/Users/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+          "/Users/markik/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+          "/Users/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80"
+        },
+        "rendering_cohorts": [
+          {
+            "package": "layout-dom-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/layout-dom/Cargo.toml"
+          },
+          {
+            "package": "paint_list_api",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/paint_list_api/Cargo.toml"
+          },
+          {
+            "package": "genet-static-dom",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-static-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-paint-types",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/paint-types/Cargo.toml"
+          },
+          {
+            "package": "document-session-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/document-session-api/Cargo.toml"
+          },
+          {
+            "package": "genet-fontique",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/support/patches/fontique/Cargo.toml"
+          },
+          {
+            "package": "engine-observables-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/engine-observables-api/Cargo.toml"
+          },
+          {
+            "package": "genet-parley",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/support/patches/parley/Cargo.toml"
+          },
+          {
+            "package": "regress",
+            "version": "0.11.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/support/patches/regress-0.11.1/Cargo.toml"
+          },
+          {
+            "package": "genet-text",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-text/Cargo.toml"
+          },
+          {
+            "package": "genet-scripted-dom",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-scripted-dom/Cargo.toml"
+          },
+          {
+            "package": "livery",
+            "version": "0.0.5",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/livery/Cargo.toml"
+          },
+          {
+            "package": "genet-host-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-host-api/Cargo.toml"
+          },
+          {
+            "package": "genet-flow",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/css-flow/Cargo.toml"
+          },
+          {
+            "package": "cadency",
+            "version": "0.0.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/cadency/Cargo.toml"
+          },
+          {
+            "package": "genet-taffy",
+            "version": "0.14.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/support/patches/taffy/Cargo.toml"
+          },
+          {
+            "package": "buckram",
+            "version": "0.0.3",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/buckram/Cargo.toml"
+          },
+          {
+            "package": "genet-document-resources",
+            "version": "0.2.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-document-resources/Cargo.toml"
+          },
+          {
+            "package": "genet-livery",
+            "version": "0.0.4",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-livery/Cargo.toml"
+          },
+          {
+            "package": "netrender_device",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/netrender_device/Cargo.toml"
+          },
+          {
+            "package": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/netrender/Cargo.toml"
+          },
+          {
+            "package": "paint_list_render",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/paint_list_render/Cargo.toml"
+          },
+          {
+            "package": "genet-events",
+            "version": "0.0.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-events/Cargo.toml"
+          },
+          {
+            "package": "genet-render",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-render/Cargo.toml"
+          },
+          {
+            "package": "genet-presenter",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-render-host/Cargo.toml"
+          },
+          {
+            "package": "fleece",
+            "version": "0.5.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/fleece/Cargo.toml"
+          },
+          {
+            "package": "genet-browsing",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/shared/browsing-context/Cargo.toml"
+          },
+          {
+            "package": "genet-documents",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-documents/Cargo.toml"
+          },
+          {
+            "package": "genet-winit",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/genet-winit-host/Cargo.toml"
+          },
+          {
+            "package": "taproot",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/a732a7d/components/taproot/Cargo.toml"
+          }
+        ],
+        "method": "Cargo compiler-artifact messages supply the actual package manifests; Git HEAD is read from each Cargo checkout and compared with the precise lock source. Registry/path identities use the Cargo package id and manifest package name.",
+        "parent_lock_negative_control_missing": [
+          [
+            "netrender_device",
+            "0.1.2",
+            "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9"
+          ]
+        ]
       },
       "web": null
     },
-    "compiled_source_audits": {
-      "native": null,
-      "web": null
-    },
     "artifacts": {
-      "native": null,
+      "native": {
+        "path": "<Code>/output/graphshell-netrender-lock/queued-20261028/native-0002/graphshell_mere",
+        "sha256": "c90a590da438f2f156a00a84cdf16509673f7fc96a23896e0f97bcecec6c35ba",
+        "size": 225429960
+      },
       "web": null
     },
-    "last_refusal": "build-storage: Compiler-cache capacity is already reserved by active lanes"
+    "queue_status": {
+      "target": "db89839439cf8bac217728123c0c0c49ef559711",
+      "status": "needs_attention",
+      "stage": "web",
+      "attempts": [
+        {
+          "stage": "native",
+          "directory": "<Code>/output/graphshell-netrender-lock/queued-20261028/native-0001",
+          "policy_sha256": "f81b39a804364f3d271af01c9e8b5b9a8507c8a2422bfd1b6e8859066e73b69b"
+        },
+        {
+          "stage": "native",
+          "directory": "<Code>/output/graphshell-netrender-lock/queued-20261028/native-0002",
+          "policy_sha256": "f81b39a804364f3d271af01c9e8b5b9a8507c8a2422bfd1b6e8859066e73b69b"
+        },
+        {
+          "stage": "web",
+          "directory": "<Code>/output/graphshell-netrender-lock/queued-20261028/web-0001",
+          "policy_sha256": "f81b39a804364f3d271af01c9e8b5b9a8507c8a2422bfd1b6e8859066e73b69b"
+        }
+      ],
+      "results": {
+        "native": "<Code>/output/graphshell-netrender-lock/queued-20261028/native-0002"
+      },
+      "no_messages_to_other_chats": true,
+      "updated_utc": "2026-10-28T21:26:37.220677+00:00",
+      "last_refusal": "build-storage: Lock is held after waiting 300s: <Code>/.build-storage/admission.lock",
+      "failure": {
+        "stage": "web",
+        "returncode": 101,
+        "directory": "<Code>/output/graphshell-netrender-lock/queued-20261028/web-0001"
+      },
+      "branch_restoration": "Previous HEAD position was db8983943 Merge remote-tracking branch 'origin/main' into codex/cue-geometry-linux-20261027\nSwitched to branch 'codex/cue-geometry-linux-20261027'\nYour branch is behind 'origin/main' by 6 commits, and can be fast-forwarded.\n  (use \"git pull\" to update your local branch)",
+      "branch_restored": true
+    }
   },
   "published_target_source": {
     "published_fix": "db89839439cf8bac217728123c0c0c49ef559711",
@@ -211,7 +482,7 @@
       }
     ],
     "static_netrender_git_cohorts_consistent": true,
-    "fresh_published_cohort_compilation": "blocked before Cargo by reserved compiler-cache capacity"
+    "fresh_published_cohort_compilation": "Native library/viewer passed at db8983943; the full default web build failed in spareval 0.2.7 with six Digest trait errors."
   },
   "superseded_web_candidate": {
     "repair": {
@@ -789,7 +1060,19 @@
     "web-metadata.stderr": "bc78b26fde6a02f9d1a0460621167712a4ee556f0524e2e4701fcd2a7186b302",
     "web-metadata.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
     "web-product.stderr": "6859a3014bf51bc4dfa003916d4a2c87a38fe71229b5a7ae370adeca0e0a0fa6",
-    "web-product.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "web-product.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "queued-20261028/native-0002/native.stdout": "b6bb4be7b37a475c2f591c871ab8c2d92a6303f363ff60d34fa8af0280932105",
+    "queued-20261028/native-0002/native.stderr": "4f36df7823cb11ebc0e7ab6e256bf390454699fac946067fd3a602f725f8b821",
+    "queued-20261028/web-0001/web.stdout": "2b9f78365948e48a0d3ccf3f9864bc72a123dbd5d13e3c902d2120e78fb769de",
+    "queued-20261028/web-0001/web.stderr": "61f3f46a8dc858cb05d16f653ded4721798f724302025ce9229d14d3439b5a40",
+    "spareval-0.2.9/lock-reconciliation.json": "6189770f2f2fffdb618daf49df0f0a03936c171160241b9cdc12e7cc15648940",
+    "spareval-0.2.9/metadata-source-audit.json": "716e6f6938eafae2eac1c782d137fb648edafaf99c327541e9797b871c95b592",
+    "spareval-0.2.9/validation/query-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spareval-0.2.9/validation/query-tests.stderr": "6c151f884b229584be92b37555a205a231f9d2aadae4a6858e90269c0ba6d3bc",
+    "spareval-0.2.9/checks/query.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "spareval-0.2.9/checks/query.stderr": "243de123c243c774ba82739e59c498417399e70f11e3fd12f2639cc86a8bbf75",
+    "spareval-0.2.9/checks/web.stdout": "96153b7b79157b88137c60ecd8ab06c3419c5304faa4cfde050f401f434741fa",
+    "spareval-0.2.9/checks/web.stderr": "42ae2ca64dbd055719fee9a18d099ac611ed53adbccc388f32c1ff209aa5a2eb"
   },
   "guarded_cleanup_between_attempts": {
     "started_utc": "2026-10-28T19:15:36.884658+00:00",
@@ -941,5 +1224,317 @@
     "active_build_processes": 0,
     "scan_errors": [],
     "note": "This was a transient idle snapshot before the final attempt; it is not the reservation set when that attempt was refused."
+  },
+  "prior_published_target_qualification": {
+    "passed": false,
+    "status": "incomplete: repeated guarded attempts were refused for live compiler-cache reservations before Cargo launched",
+    "builds": {
+      "native": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "--policy",
+          "<Code>/output/graphshell-netrender-lock/extended-admission-policy.json",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "20",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+          "--",
+          "build",
+          "--locked",
+          "--offline",
+          "-p",
+          "graphshell",
+          "-p",
+          "graphshell-mere",
+          "--lib",
+          "--bin",
+          "graphshell_mere",
+          "--message-format",
+          "json-render-diagnostics",
+          "-j4"
+        ],
+        "source_head": "db89839439cf8bac217728123c0c0c49ef559711",
+        "lock_sha256": "44217652e8dd74e206c4c6cf76c7fd9bedf6b6f51f954f7f28de7ff92e9a63ec",
+        "started": 1793215971.990766,
+        "exit": 2,
+        "elapsed_seconds": 190.294
+      },
+      "web": null
+    },
+    "compiled_source_audits": {
+      "native": null,
+      "web": null
+    },
+    "artifacts": {
+      "native": null,
+      "web": null
+    },
+    "last_refusal": "build-storage: Compiler-cache capacity is already reserved by active lanes"
+  },
+  "spareval_release_receiving": {
+    "recorded_local": "2026-10-28T21:55:11.842577-04:00",
+    "source_head": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+    "manifest_minimum": "0.2.9",
+    "latest_stable_release": {
+      "version": "0.2.9",
+      "published": "2026-10-22T19:14:04.538267Z",
+      "yanked": false,
+      "source": "https://crates.io/api/v1/crates/spareval",
+      "raw_metadata_sha256": "a84deb5ee2e526ace890f7d83519c310f12951e51459d7e5e8abc9d4d9bedd86"
+    },
+    "status": "native query/test and full-default web compile-only checks passed; full test execution and web linking remain queued",
+    "lock_reconciliation": {
+      "Cargo.lock": {
+        "selected_updates": {
+          "oxjsonld": {
+            "from": "0.2.6",
+            "to": "0.2.7"
+          },
+          "oxrdf": {
+            "from": "0.3.4",
+            "to": "0.3.5"
+          },
+          "oxsdatatypes": {
+            "from": "0.2.3",
+            "to": "0.2.4"
+          },
+          "oxttl": {
+            "from": "0.2.4",
+            "to": "0.2.5"
+          },
+          "sparesults": {
+            "from": "0.3.4",
+            "to": "0.3.5"
+          },
+          "spareval": {
+            "from": "0.2.7",
+            "to": "0.2.9"
+          },
+          "spargebra": {
+            "from": "0.4.7",
+            "to": "0.4.8"
+          },
+          "sparopt": {
+            "from": "0.3.7",
+            "to": "0.3.9"
+          }
+        },
+        "all_nonselected_package_records_preserved": true,
+        "existing_dependency_choices_preserved_except_spareval_sha2": true,
+        "spareval_sha2": "0.11.0",
+        "before_sha256": "43ee0d660feaaeb2fcf650166e549de5cf0e57da28f4d4824a8a188e3eb11847",
+        "after_sha256": "d626c692ec1c49db834d7d7e110fcd1a0820341b271080dd7eee5143e74d690d"
+      },
+      "ports/graphshell/web/Cargo.lock": {
+        "selected_updates": {
+          "oxjsonld": {
+            "from": "0.2.6",
+            "to": "0.2.7"
+          },
+          "oxrdf": {
+            "from": "0.3.4",
+            "to": "0.3.5"
+          },
+          "oxsdatatypes": {
+            "from": "0.2.3",
+            "to": "0.2.4"
+          },
+          "oxttl": {
+            "from": "0.2.4",
+            "to": "0.2.5"
+          },
+          "sparesults": {
+            "from": "0.3.4",
+            "to": "0.3.5"
+          },
+          "spareval": {
+            "from": "0.2.7",
+            "to": "0.2.9"
+          },
+          "spargebra": {
+            "from": "0.4.7",
+            "to": "0.4.8"
+          },
+          "sparopt": {
+            "from": "0.3.7",
+            "to": "0.3.9"
+          }
+        },
+        "all_nonselected_package_records_preserved": true,
+        "existing_dependency_choices_preserved_except_spareval_sha2": true,
+        "spareval_sha2": "0.11.0",
+        "before_sha256": "1c88bcca27e8b430baabbdcfccdec19e236f320c8b8f22a5a606fabfe5119d49",
+        "after_sha256": "e51cbb786f53c5e8c510c958f68807a462198f620b8ca6bc38a4010e4a08f2f4"
+      }
+    },
+    "metadata_source_audit": {
+      "root": {
+        "resolved_packages": 1611,
+        "lock_records": 1830,
+        "missing_source_aware_records": [],
+        "lock_sha256": "d626c692ec1c49db834d7d7e110fcd1a0820341b271080dd7eee5143e74d690d"
+      },
+      "web": {
+        "resolved_packages": 725,
+        "lock_records": 1131,
+        "missing_source_aware_records": [
+          [
+            "genet-taffy",
+            "0.14.0",
+            "git+https://github.com/merely-made/genet.git?branch=main#36526e047f32d3b981f8983a2cab1afe68a9bc08"
+          ]
+        ],
+        "lock_sha256": "e51cbb786f53c5e8c510c958f68807a462198f620b8ca6bc38a4010e4a08f2f4",
+        "taffy_manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/36526e0/support/patches/taffy/Cargo.toml"
+      }
+    },
+    "compile_only_checks": {
+      "query": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "6",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+          "--",
+          "check",
+          "--locked",
+          "--offline",
+          "-p",
+          "mere-rdf",
+          "--features",
+          "query",
+          "--tests",
+          "-j4"
+        ],
+        "source_head": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+        "lock_sha256": "d626c692ec1c49db834d7d7e110fcd1a0820341b271080dd7eee5143e74d690d",
+        "started": 1793238397.711272,
+        "exit": 0,
+        "elapsed_seconds": 232.282
+      },
+      "web": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "6",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+          "--",
+          "check",
+          "--locked",
+          "--offline",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--lib",
+          "-j4"
+        ],
+        "source_head": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+        "lock_sha256": "e51cbb786f53c5e8c510c958f68807a462198f620b8ca6bc38a4010e4a08f2f4",
+        "started": 1793238630.0247931,
+        "exit": 0,
+        "elapsed_seconds": 271.78
+      }
+    },
+    "first_full_validation_attempt": {
+      "command": [
+        "python3",
+        "<Code>/tools/build_storage.py",
+        "build",
+        "--lane",
+        "graphshell-components",
+        "--reserve-gib",
+        "20",
+        "--cwd",
+        "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+        "--",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "mere-rdf",
+        "--features",
+        "query",
+        "--lib",
+        "-j4"
+      ],
+      "source_head": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+      "lock_sha256": "d626c692ec1c49db834d7d7e110fcd1a0820341b271080dd7eee5143e74d690d",
+      "started": 1793238174.978985,
+      "exit": 2,
+      "elapsed_seconds": 138.7
+    },
+    "queue": {
+      "target": "4559b860a4f43b00a7700dc9f03f418b9e759e3f",
+      "checkout": "<Code>/worktrees/mere-spareval-029-queued-20261028",
+      "live_state": "<Code>/output/graphshell-netrender-lock/spareval-0.2.9/queue/state.json",
+      "reserve_gib": 20,
+      "policy": "current workspace policy; no limits changed; no messages to other chats"
+    },
+    "hash_function_regression": "MD5, SHA1, SHA256, SHA384 and SHA512 of abc through the public SPARQL query path; compiled but not yet executed",
+    "existing_web_source_identity_gap": {
+      "package": "genet-taffy 0.14.0",
+      "locked_revision": "a732a7d466bfef88ba2edd1a20be64cb39b80dd8",
+      "loaded_parent_revision": "36526e047f32d3b981f8983a2cab1afe68a9bc08",
+      "taffy_tree_at_both_revisions": "a2dbf23b553f9ebe388cb3d54abac36400f60741",
+      "disposition": "pre-existing record preserved; separate from the eight selected registry updates"
+    }
+  },
+  "release_documentation_audit": {
+    "baseline_counts": {
+      "active_docs": 265,
+      "indexed_active_docs": 243,
+      "index_orphans": 21,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 1,
+      "broken_relative_links": 19,
+      "historical_broken_relative_links": 216,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 58,
+      "ignored_known_root_patterns": 13,
+      "reserved_identifier_paths": 18,
+      "missing_known_root_paths": 207,
+      "historical_missing_known_root_paths": 156,
+      "planned_missing_known_root_paths": 0,
+      "invalid_historical_annotations": 1,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 811,
+      "exhibit_b_sources": 0
+    },
+    "current_counts": {
+      "active_docs": 265,
+      "indexed_active_docs": 243,
+      "index_orphans": 21,
+      "index_ghosts": 0,
+      "memory_directory_links": 0,
+      "statusless_plans": 1,
+      "broken_relative_links": 19,
+      "historical_broken_relative_links": 216,
+      "planned_broken_relative_links": 0,
+      "ambiguous_known_root_paths": 58,
+      "ignored_known_root_patterns": 13,
+      "reserved_identifier_paths": 18,
+      "missing_known_root_paths": 207,
+      "historical_missing_known_root_paths": 156,
+      "planned_missing_known_root_paths": 0,
+      "invalid_historical_annotations": 1,
+      "stale_historical_annotations": 1,
+      "unheaded_owned_sources": 811,
+      "exhibit_b_sources": 0
+    },
+    "new_findings": {}
   }
 }
