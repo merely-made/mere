@@ -315,11 +315,25 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         publish: bool,
         change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
     ) -> Result<(R, Option<String>), SessionError> {
+        self.transact_change_with(at, publish, |_| CommitExtra::default(), change)
+            .await
+    }
+
+    /// [`transact_change`](Self::transact_change) whose commit carries the
+    /// writes `extra` returns, decided once the candidate's publication
+    /// generation is known (`None` when not publishing).
+    pub async fn transact_change_with<R>(
+        &mut self,
+        at: SystemTime,
+        publish: bool,
+        extra: impl FnOnce(Option<&str>) -> CommitExtra,
+        change: impl FnOnce(&mut Self) -> Result<R, SessionError>,
+    ) -> Result<(R, Option<String>), SessionError> {
         self.ensure_writable()?;
         let mut candidate = self.detached_candidate();
         let result = change(&mut candidate)?;
         let generation = self
-            .commit_candidate(candidate, at, publish, CommitExtra::default())
+            .commit_candidate_with(candidate, at, publish, extra)
             .await?;
         Ok((result, generation))
     }
@@ -332,10 +346,23 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
     /// commit before anything is written; this session is then unchanged.
     pub async fn commit_candidate(
         &mut self,
-        mut candidate: Self,
+        candidate: Self,
         at: SystemTime,
         publish: bool,
         extra: CommitExtra,
+    ) -> Result<Option<String>, SessionError> {
+        self.commit_candidate_with(candidate, at, publish, |_| extra)
+            .await
+    }
+
+    /// [`commit_candidate`](Self::commit_candidate) with the extra writes
+    /// decided from the candidate's publication generation.
+    pub async fn commit_candidate_with(
+        &mut self,
+        mut candidate: Self,
+        at: SystemTime,
+        publish: bool,
+        extra: impl FnOnce(Option<&str>) -> CommitExtra,
     ) -> Result<Option<String>, SessionError> {
         self.ensure_writable()?;
         if candidate.id() != self.id()
@@ -356,6 +383,7 @@ impl<B: LegacyTransactionBackend + Clone> GraphSession<B> {
         } else {
             None
         };
+        let extra = extra(generation.as_deref());
         ops.extend(extra.ops);
         candidate.commit(pending, ops, extra.expect).await?;
         *self = candidate;

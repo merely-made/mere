@@ -11,3 +11,9 @@ mod furnace;
 pub use furnace::*;
 #[cfg(feature = "workshop")]
 pub mod workshop;
+
+#[cfg(all(feature = "workshop-worker", not(target_arch = "wasm32")))]
+pub mod workshop_driver;
+
+#[cfg(feature = "workshop-destination")]
+pub mod workshop_destination;

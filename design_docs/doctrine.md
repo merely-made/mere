@@ -120,11 +120,11 @@ conversation that answers for it rather than a tile.
 
 Links: summary A frame hosts one presentation, a reader's document or a surface producer; a tile presents a resource, a pane answers a question; an embedded application is a presentation, not a pane.
 
-*Added 2026-10-28, outcome new, from the GUI catalog record §8 (Mark,
-2026-10-26, refining its rulings 1 and 3) and its ruling 7. Rulings 1, 3 and
-7 apply under it: the pane list is TERMINOLOGY's, the workbench presents a
-forme with the tile tree as its default desktop projection, and a misfin
-address opens its Comms conversation.*
+*Latest outcome, 2026-10-28, applies: ruling 9 of the GUI catalog record (§10),
+no Steward pane; the live-jobs monitor is distillery's embeddable half, a
+presentation, and armillary's host actors show on the node and in apparatus.
+Added the same day, outcome new, from the record's §8 (Mark, 2026-10-26,
+refining its rulings 1 and 3) and its ruling 7; rulings 1, 3 and 7 apply too.*
 
 ### Surfaces 2. A catalogued surface is an emitting one
 

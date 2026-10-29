@@ -3,8 +3,8 @@
 ## mere_docs/design/2026-10-26_gui_catalog_design.md
 
 - disposition: current
-- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, §7, Mark's rulings 1 to 5 on them, §8, his refinement of rulings 1 and 3, and §9, his rulings 6 to 8 on the cues §8 left. The §9 code landed 2026-10-27, read at `10fe98b50`; §9 closes with what it leaves. Since 2026-10-28 the rules are the doctrine's Surfaces area (statements 1 to 4) and the inventory stays here." - accurate: yes
-- claims checked: 80 - holds: 80, stale: 0, unverifiable: 0
+- status line: "design record, 2026-10-26. Cues only: what the stack's existing catalogs cover, what a complete catalog would have to add, and the loops a catalog has to close. No ruling, no code, no work assigned. Amended the same day with §6, where the catalogs disagree with each other and with the tree, §7, Mark's rulings 1 to 5 on them, §8, his refinement of rulings 1 and 3, and §9, his rulings 6 to 8 on the cues §8 left. The §9 code landed 2026-10-27, read at `10fe98b50`; §9 closes with what it leaves. Since 2026-10-28 the rules are the doctrine's Surfaces area (statements 1 to 4) and the inventory stays here. §10, his ruling 9 of 2026-10-28: no Steward pane." - accurate: yes
+- claims checked: 86 - holds: 86, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -45,7 +45,12 @@ call sites, graphshell's `mere-comms` dependency, one-way verification, the
 built-ins' empty operations, `ViewerRegistry` and `mod:core-viewer` as
 dependency names, the unloaded inbox, and pelt's absent Comms path. The
 2026-10-28 ruling in §5 adds one: the doctrine's Surfaces area, statements 1
-to 4, read from `doctrine.md` the same day.
+to 4, read from `doctrine.md` the same day. The §10 ruling adds six, read at
+`d4d5b0c32`: the panes doc's Steward definition and the 2026-06-09 axis, the
+`StewardPane` variant with its descriptor and diagnostics channels, Cambium's
+two module docs naming Steward rows, distillery's embeddable-half crate doc,
+armillary as a separate repository holding `apparatus-core`, and the steward
+device role in distillery's fixtures.
 
 ### Contradictions
 

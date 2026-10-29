@@ -389,6 +389,10 @@ struct FoldViewState {
     selected_link_appearances: HashMap<LinkKey, (NodeKey, NodeKey)>,
 }
 
+/// A host's rule for the pair gesture: whether one held statement may be
+/// withdrawn. Installed with [`Canvas::set_withdraw_policy`].
+pub type WithdrawPolicy = Box<dyn Fn(&kernel::graph::SemanticStatement) -> bool + Send + Sync>;
+
 /// The canvas content-root: the graph, its physics, the camera, and the abs-pos
 /// node-children pool. Window-agnostic — see the module docs.
 pub struct Canvas {
@@ -471,6 +475,9 @@ pub struct Canvas {
     territory_field: bool,
     /// Whether nodes and links are presented by the graph grammar (`grammar_view.rs`).
     graph_grammar: bool,
+    /// The host's rule for what the pair gesture may withdraw (`selection.rs`);
+    /// `None` applies the canvas's own default.
+    withdraw_policy: Option<WithdrawPolicy>,
     /// The theme's category colours (`grammar_view.rs`); empty uses the canvas's own.
     category_colors: Vec<[u8; 3]>,
     /// An in-progress field move / resize drag, if any. (Field regions.)

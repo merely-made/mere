@@ -30,6 +30,14 @@ use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::{DissolvedTraversalRecord, Graph};
 use crate::persistence::PersistedEdge;
 
+/// What a selector retraction did to the statements it found: those it
+/// withdrew, and those the caller's predicate refused, which stay held.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Retraction {
+    pub withdrawn: usize,
+    pub refused: usize,
+}
+
 impl Graph {
     pub(crate) fn assert_relation(
         &mut self,
@@ -411,7 +419,7 @@ impl Graph {
             return 0;
         };
         if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
-            return self.withdraw_selected_semantic_assertions(from_key, to_key, selector, false);
+            return self.replay_withdraw_selected(from_key, to_key, selector);
         }
         self.retract_surface_relations(from_key, to_key, selector)
     }
@@ -778,9 +786,37 @@ impl Graph {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize {
-        if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
-            return self.withdraw_selected_semantic_assertions(from, to, selector, true);
+        self.retract_relations_where(from, to, selector, |_| true)
+            .withdrawn
+    }
+
+    /// [`retract_relations`](Self::retract_relations) that asks `allow` about
+    /// each statement before withdrawing it, across both strata of the pair.
+    /// A refused statement stays held and is counted in [`Retraction::refused`].
+    /// Traversal history holds no statements, so `allow` is not consulted for
+    /// that family.
+    pub fn retract_relations_where(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+        mut allow: impl FnMut(&SemanticStatement) -> bool,
+    ) -> Retraction {
+        if selector == RelationSelector::Family(super::EdgeFamily::Traversal) {
+            return Retraction {
+                withdrawn: self.retract_traversals(from, to, selector),
+                refused: 0,
+            };
         }
+        self.withdraw_selected_semantic_assertions(from, to, selector, true, &mut allow)
+    }
+
+    fn retract_traversals(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+    ) -> usize {
         let mut removed = self.retract_surface_relations(from, to, selector);
         if removed > 0 {
             self.capture_semantic_pair(from, to);
@@ -827,9 +863,21 @@ impl Graph {
         selector: RelationSelector,
     ) -> usize {
         if selector != RelationSelector::Family(super::EdgeFamily::Traversal) {
-            return self.withdraw_selected_semantic_assertions(from, to, selector, false);
+            return self.replay_withdraw_selected(from, to, selector);
         }
         self.retract_relations(from, to, selector)
+    }
+
+    /// Replay withdrawal of every held statement `selector` names between the
+    /// pair: undated, and never refused.
+    fn replay_withdraw_selected(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        selector: RelationSelector,
+    ) -> usize {
+        self.withdraw_selected_semantic_assertions(from, to, selector, false, &mut |_| true)
+            .withdrawn
     }
 
     fn withdraw_selected_semantic_assertions(
@@ -838,34 +886,39 @@ impl Graph {
         to: NodeKey,
         selector: RelationSelector,
         authored: bool,
-    ) -> usize {
+        allow: &mut dyn FnMut(&SemanticStatement) -> bool,
+    ) -> Retraction {
         let matches_selector = |statement: &SemanticStatement| {
             super::edge_payload::selector_matches_kind(selector, statement.relation_kind())
         };
-        let mut ids = self
+        let mut found = self
             .inner
             .inner()
             .edges_connecting(from, to)
             .flat_map(|edge| edge.weight().held_assertions())
             .filter(|statement| matches_selector(statement))
-            .map(|statement| statement.statement_id.clone())
+            .cloned()
             .collect::<Vec<_>>();
         if authored
             && let Some((source, target)) =
                 self.shown_resource_id(from).zip(self.shown_resource_id(to))
         {
-            ids.extend(
+            found.extend(
                 self.resource_relations()
                     .filter(|(_, a, b, _)| (*a, *b) == (source, target))
                     .flat_map(|(_, _, _, payload)| payload.held_assertions())
                     .filter(|statement| matches_selector(statement))
-                    .map(|statement| statement.statement_id.clone()),
+                    .cloned(),
             );
         }
-        ids.sort();
-        ids.dedup();
-        ids.into_iter()
-            .filter(|id| {
+        found.sort_by(|a, b| a.statement_id.cmp(&b.statement_id));
+        found.dedup_by(|a, b| a.statement_id == b.statement_id);
+        let (allowed, refused): (Vec<_>, Vec<_>) =
+            found.into_iter().partition(|statement| allow(statement));
+        let withdrawn = allowed
+            .iter()
+            .filter(|statement| {
+                let id = &statement.statement_id;
                 if authored {
                     self.withdraw_semantic_assertion(id, None, None)
                 } else {
@@ -873,7 +926,11 @@ impl Graph {
                     self.apply_imported_semantic_withdrawal(id, None, Some(author))
                 }
             })
-            .count()
+            .count();
+        Retraction {
+            withdrawn,
+            refused: refused.len(),
+        }
     }
 
     fn retract_surface_relations(

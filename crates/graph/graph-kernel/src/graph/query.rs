@@ -616,7 +616,8 @@ impl Graph {
             .map(|edge| edge.source())
     }
 
-    /// Iterate undirected neighbor keys for a node.
+    /// Iterate undirected neighbor keys for a node, Surface stratum only.
+    /// [`projected_neighbors`](Self::projected_neighbors) reads both strata.
     pub fn neighbors_undirected(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
         let inner = self.inner.inner();
         let outgoing = inner
@@ -628,6 +629,37 @@ impl Graph {
             .filter(|edge| edge.weight().has_held_topology() && edge.source() != edge.target())
             .map(|edge| edge.source());
         outgoing.chain(incoming)
+    }
+
+    /// Every node adjacent to `key` in either direction across both strata: the
+    /// Surface neighbours, plus the surfaces showing the far end of each Resource
+    /// relation of the resource `key` shows. One entry per incident held relation,
+    /// so parallel relations repeat; a self-loop is read once, from its outgoing
+    /// side, so a node adjacent to itself appears once. Hides are a view concern
+    /// and do not apply here.
+    pub fn projected_neighbors(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
+        let incoming = self
+            .projected_incoming_relations(key)
+            .filter(|(_, relation, _)| !self.is_self_loop(*relation));
+        self.projected_outgoing_relations(key)
+            .chain(incoming)
+            .map(|(neighbor, _, _)| neighbor)
+    }
+
+    /// Whether `relation` joins one node, or one resource, to itself.
+    fn is_self_loop(&self, relation: RelationKey) -> bool {
+        match relation {
+            RelationKey::Surface(edge) => self
+                .inner
+                .inner()
+                .edge_endpoints(edge)
+                .is_some_and(|(from, to)| from == to),
+            RelationKey::Resource(edge) => self
+                .resources
+                .inner()
+                .edge_endpoints(edge.raw())
+                .is_some_and(|(from, to)| from == to),
+        }
     }
 
     /// Undirected neighbors sorted by stable node-key order.

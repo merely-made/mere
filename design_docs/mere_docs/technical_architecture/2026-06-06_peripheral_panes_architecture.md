@@ -5,6 +5,8 @@
 **Date**: 2026-06-06
 **Status**: Architecture decision (design seed; the catalog will grow). Generalizes the docked-pane pattern the [comms shell plan](../../archive_docs/2026-10-06_completed_plans/2026-06-05_comms_shell_plan.md) established into the full pane system. Per the [composition spine](2026-05-21_mere_composition_spine.md) and the [modular integration plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md) (gaps #6 panes, #7 comms).
 
+*Amended 2026-10-28:* Steward is cut ([GUI catalog record](../design/2026-10-26_gui_catalog_design.md) §10; doctrine Surfaces 1): an embedded application is a presentation, not a pane, so distillery's embeddable half is the live-jobs monitor, and armillary's host actors show on the node and in apparatus. The live-versus-at-rest axis of 2026-06-09 goes with it. The pane list is TERMINOLOGY's (ruling 1, 2026-10-26). The text below is the June reading, kept as history.
+
 ## The one idea
 
 Peripheral panes are **contingent projections of the graph**, sharing **one dock mechanism**, but they are **not one product object** — each is its own thing with **one primary authority**. They are emphatically **not graph tiles** (a tile projects a node's media; a pane projects selection / runtime / social state), and **none invents its own panel system** — they all ride the same dock contract and the same domain → host render pattern as `chrome` and `comms`.

@@ -67,13 +67,8 @@ impl TopologyView for Graph {
     }
 
     fn neighbors_undirected(&self, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
-        // A self-loop bucket appears in both directions; count it once.
-        self.projected_outgoing_relations(key)
-            .chain(
-                self.projected_incoming_relations(key)
-                    .filter(move |(neighbor, _, _)| *neighbor != key),
-            )
-            .map(|(neighbor, _, _)| neighbor)
+        // The kernel's one neighbour reader: both strata, a self-loop once, no hides.
+        self.projected_neighbors(key)
     }
 }
 

@@ -15,6 +15,14 @@
 //! and within-node + cross-node lineage live in one tree (the (b) anchor design,
 //! 2026-06-06; see the node-navigation-lineage plan).
 //!
+//! The trail is not the address. A node's primary address is its own: the url
+//! index finds the node by it, and `SetNodeUrl` changes it with no visit. A visit
+//! (`navigate_node`) records the page here and writes it as the address. A history
+//! step moves the cursor and lands the page it reveals on the address, the one
+//! place history writes the address, so a step re-imposes the trail's page over an
+//! address a `SetNodeUrl` has since moved. The cursor is the position in the trail
+//! (`node_history_projection`); nothing reads it back as the address.
+//!
 //! Stemma holds the trail: the cursor, each visit's transition and its time. It
 //! does not hold recency. When a node was last visited is the `visit.history`
 //! facet's `last_visited_ms`, stamped by navigation, the history steps, creation
@@ -323,12 +331,6 @@ impl SharedNavigationMemory {
         }
     }
 
-    /// `node`'s current page (its cursor's URL), if any.
-    pub fn current_url(&self, node: Uuid) -> Option<String> {
-        let projection = self.projection(node);
-        projection.entries.get(projection.current_index).cloned()
-    }
-
     /// Whether [`back`](Self::back) would move `node`'s cursor.
     pub fn can_back(&self, node: Uuid) -> bool {
         self.projection(node).current_index > 0
@@ -388,6 +390,12 @@ mod tests {
         Uuid::from_u128(x)
     }
 
+    /// The page the cursor rests on.
+    fn cursor(m: &SharedNavigationMemory, node: Uuid) -> Option<String> {
+        let trail = m.projection(node);
+        trail.entries.get(trail.current_index).cloned()
+    }
+
     #[test]
     fn record_visit_back_forward_and_forward_fork() {
         let node = n(1);
@@ -395,7 +403,7 @@ mod tests {
         m.record_visit(node, "a", MemoryTransitionKind::UrlTyped, 1);
         m.record_visit(node, "b", MemoryTransitionKind::LinkClick, 2);
         m.record_visit(node, "c", MemoryTransitionKind::LinkClick, 3);
-        assert_eq!(m.current_url(node).as_deref(), Some("c"));
+        assert_eq!(cursor(&m, node).as_deref(), Some("c"));
         assert!(m.can_back(node));
         assert!(!m.can_forward(node));
 
@@ -408,7 +416,7 @@ mod tests {
 
         // Forward-fork: from b, navigate to d. c is preserved as an alternate.
         m.record_visit(node, "d", MemoryTransitionKind::UrlTyped, 8);
-        assert_eq!(m.current_url(node).as_deref(), Some("d"));
+        assert_eq!(cursor(&m, node).as_deref(), Some("d"));
         let branch = m.branch_projection(node);
         let b_visit = branch
             .visits
@@ -428,8 +436,8 @@ mod tests {
         m.record_visit(a, "a1", MemoryTransitionKind::UrlTyped, 1);
         m.record_visit(a, "a2", MemoryTransitionKind::LinkClick, 2);
         m.record_visit(b, "b1", MemoryTransitionKind::UrlTyped, 3);
-        assert_eq!(m.current_url(a).as_deref(), Some("a2"));
-        assert_eq!(m.current_url(b).as_deref(), Some("b1"));
+        assert_eq!(cursor(&m, a).as_deref(), Some("a2"));
+        assert_eq!(cursor(&m, b).as_deref(), Some("b1"));
         assert!(
             m.can_back(a) && !m.can_back(b),
             "each node walks only its own path"
@@ -445,9 +453,9 @@ mod tests {
         // Branch: spawn child anchored at the parent, then its first visit.
         m.spawn(child, parent);
         m.record_visit(child, "c1", MemoryTransitionKind::UrlTyped, 3);
-        assert_eq!(m.current_url(child).as_deref(), Some("c1"));
+        assert_eq!(cursor(&m, child).as_deref(), Some("c1"));
         // The child is its own history; the parent is unchanged (still at p2).
-        assert_eq!(m.current_url(parent).as_deref(), Some("p2"));
+        assert_eq!(cursor(&m, parent).as_deref(), Some("p2"));
         assert!(!m.can_back(child), "the child's first visit is its root");
     }
 
@@ -469,12 +477,12 @@ mod tests {
         let mut m = SharedNavigationMemory::empty();
         m.seed_linear(node, vec!["a".into(), "b".into(), "c".into()], 1);
         assert_eq!(
-            m.current_url(node).as_deref(),
+            cursor(&m, node).as_deref(),
             Some("b"),
             "cursor at the seeded index"
         );
         assert!(m.can_back(node) && m.can_forward(node));
         m.remove(node);
-        assert_eq!(m.current_url(node), None, "owner dropped on remove");
+        assert_eq!(cursor(&m, node), None, "owner dropped on remove");
     }
 }

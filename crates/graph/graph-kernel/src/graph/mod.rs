@@ -155,6 +155,7 @@ pub use identity::{
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
 pub use assertion_write::StatementWriteError;
+pub use edge_ops::Retraction;
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
 pub use predicate_declarations::{
@@ -705,8 +706,14 @@ impl Graph {
         }
     }
 
-    /// Update a node's Primary URL, maintaining the url_to_nodes index.
+    /// Write a node's primary address, maintaining the url_to_nodes index.
     /// Returns the old URL, or None if the node doesn't exist.
+    ///
+    /// The one writer of the address. `SetNodeUrl` calls it alone, changing the
+    /// address with no visit; [`navigate_node`](Self::navigate_node) calls it
+    /// after recording the visit, and a history step after moving the cursor
+    /// (`land_history_step`). The Stemma cursor is the browse trail's position,
+    /// not the address; see the `history` module.
     ///
     /// Operates on the Primary claim only; aliases (when supported) stay
     /// attached. To mutate aliases, use dedicated alias methods (future).
@@ -777,11 +784,12 @@ impl Graph {
     }
 
     /// Navigate `key` in place to `url`: record the visit in the node's own
-    /// browse history (a forward-fork if the cursor had stepped back), update
-    /// its Primary URL, and stamp its recency at `at_ms` and its session. No new
-    /// node and no edge: the node is a browsing surface whose content changes;
-    /// the graph shape does not. Cross-node lineage (the navigated-from
-    /// relation) is a separate, explicit edge.
+    /// browse history (a forward-fork if the cursor had stepped back), write
+    /// `url` as its primary address, and stamp its recency at `at_ms` and its
+    /// session. A visit moves the trail and the address together; `SetNodeUrl`
+    /// moves the address alone. No new node and no edge: the node is a browsing
+    /// surface whose content changes; the graph shape does not. Cross-node
+    /// lineage (the navigated-from relation) is a separate, explicit edge.
     ///
     /// The one mutation under both the live and the replayed arm, which differ
     /// only in the stamp they pass. Returns the node's id, or `None` if absent.
@@ -836,7 +844,9 @@ impl Graph {
     }
 
     /// What a moved history cursor leaves on the node: the revealed page as its
-    /// Primary URL, and the step as its latest visit.
+    /// primary address, and the step as its latest visit. The one place history
+    /// writes the address: the cursor is the trail's position, and a step lands
+    /// its page on the address even where a `SetNodeUrl` has moved it since.
     fn land_history_step(&mut self, key: NodeKey, url: &str, at_ms: u64) {
         self.update_node_url(key, url.to_string());
         self.set_node_last_visited_at_ms(key, at_ms);
@@ -854,12 +864,6 @@ impl Graph {
         self.inner
             .node(key)
             .is_some_and(|n| self.nav.can_forward(n.id))
-    }
-
-    /// `key`'s current page (its history cursor's URL), if any.
-    pub fn node_current_url(&self, key: NodeKey) -> Option<String> {
-        let id = self.inner.node(key)?.id;
-        self.nav.current_url(id)
     }
 
     /// `key`'s linear-history projection (active path + cursor).

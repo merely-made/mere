@@ -279,6 +279,22 @@ pub fn citation_source(proposed: &Proposal, reference: &str) -> Result<Source, E
         .ok_or(Error::Invalid("citation route"))
 }
 
+/// Validate the exact immutable public proposal before a product owner admits
+/// its acceptance. Integrity does not supply read or destination authority.
+pub fn validate_proposal(proposed: &Proposal) -> Result<(), Error> {
+    let owner = &proposed
+        .sources
+        .first()
+        .ok_or(Error::Invalid("selection"))?
+        .source
+        .owner;
+    validate(owner, &proposed.sources)?;
+    if proposed != &proposal(proposed.installation, proposed.run, &proposed.sources)? {
+        return Err(Error::Invalid("proposal integrity"));
+    }
+    Ok(())
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 enum Lifecycle {
     Active,
@@ -490,6 +506,65 @@ pub trait WorkshopBackend: Backend {}
 impl<B: Backend> WorkshopBackend for B {}
 
 impl<B: WorkshopBackend> Workshop<B> {
+    /// Refuse a caller that names a different subject for this installation.
+    pub async fn validate_installed_subject(&self, subject: [u8; 32]) -> Result<(), Error> {
+        let (_, record) = self.load().await?;
+        if record.binding.subject != subject {
+            return Err(Error::Unauthorized);
+        }
+        Ok(())
+    }
+
+    /// Return the installed run's bounded captured inputs to its owning driver.
+    /// This does not authorize source disclosure; the caller rechecks its gate.
+    pub async fn run_inputs(&self, id: u64) -> Result<Vec<Passage>, Error> {
+        let (_, record) = self.load().await?;
+        Ok(record
+            .runs
+            .iter()
+            .find(|r| r.id == id)
+            .ok_or(Error::Missing)?
+            .inputs
+            .clone())
+    }
+
+    /// Recheck the binding and authority after intent persistence and before
+    /// handing captured bytes to the worker. This observes no new effect.
+    pub async fn dispatch_authorized(
+        &self,
+        dispatch: &Dispatch,
+        authority: &impl AuthorityProvider,
+    ) -> Result<bool, Error> {
+        let (_, record) = self.load().await?;
+        if record.dissolved {
+            return Ok(false);
+        }
+        let run = record
+            .runs
+            .iter()
+            .find(|r| r.id == dispatch.correlation.run)
+            .ok_or(Error::Missing)?;
+        let reducer = run.replay(&self.owner)?;
+        let issued = run.entries.iter().rev().find_map(|entry| match entry {
+            Entry::Intent { correlation, at } if *correlation == dispatch.correlation => Some(*at),
+            _ => None,
+        });
+        Ok(
+            matches!(reducer.phase(), RunPhase::Awaiting { correlation: c, .. } if c == correlation(dispatch.correlation))
+                && dispatch.installation == self.id
+                && dispatch.inputs == run.inputs
+                && dispatch.candidate == run.candidate
+                && Some(dispatch.issued_at_ms) == issued
+                && run.started.checked_add(run.limits.elapsed_ms) == Some(dispatch.deadline_at_ms)
+                && servitor::revalidate(
+                    reducer.ticket(),
+                    &record.binding.servitor(),
+                    authority,
+                    &[],
+                )
+                .is_ok(),
+        )
+    }
     pub fn new(backend: B, owner: Owner, id: [u8; 16]) -> Self {
         let key = format!("alembic/workshop/v1/{}/{}", hex(&digest(&owner)), hex(&id));
         Self {
@@ -727,6 +802,11 @@ impl<B: WorkshopBackend> Workshop<B> {
         let dispatch = Dispatch {
             correlation: wire(c),
             installation: self.id,
+            issued_at_ms: now,
+            deadline_at_ms: run
+                .started
+                .checked_add(run.limits.elapsed_ms)
+                .ok_or(Error::Invalid("run deadline overflow"))?,
             inputs: run.inputs.clone(),
             candidate: run.candidate.clone(),
         };
@@ -743,6 +823,19 @@ impl<B: WorkshopBackend> Workshop<B> {
         authority: &impl AuthorityProvider,
         now: u64,
     ) -> Result<(), Error> {
+        self.observe_guarded(observation, authority, &|| now, &|_| true)
+            .await
+    }
+
+    /// Recheck the exact stored source selection and sample time after loading
+    /// the run. The owner serializes policy changes with the subsequent write.
+    pub async fn observe_guarded(
+        &self,
+        observation: Observation,
+        authority: &impl AuthorityProvider,
+        clock: &impl Fn() -> u64,
+        source_gate: &impl Fn(&Passage) -> bool,
+    ) -> Result<(), Error> {
         let (before, mut record) = self.load().await?;
         let binding = record.binding.servitor();
         if record.dissolved {
@@ -754,6 +847,10 @@ impl<B: WorkshopBackend> Workshop<B> {
             .iter_mut()
             .find(|r| r.id == c.run)
             .ok_or(Error::Missing)?;
+        if !run.inputs.iter().all(source_gate) {
+            return Err(Error::Unauthorized);
+        }
+        let now = clock();
         let reducer = run.replay(&self.owner)?;
         servitor::revalidate(reducer.ticket(), &binding, authority, &[])
             .map_err(|_| Error::Unauthorized)?;
@@ -1127,9 +1224,21 @@ impl<B: WorkshopBackend> Workshop<B> {
 pub struct Dispatch {
     pub correlation: Correlation,
     installation: [u8; 16],
+    issued_at_ms: u64,
+    deadline_at_ms: u64,
     inputs: Vec<Passage>,
     candidate: Option<Proposal>,
 }
+impl Dispatch {
+    /// Fixed original run deadline; persistence waits do not extend it.
+    pub fn deadline_at_ms(&self) -> u64 {
+        self.deadline_at_ms
+    }
+    pub fn issued_at_ms(&self) -> u64 {
+        self.issued_at_ms
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Observation {
     pub correlation: Correlation,

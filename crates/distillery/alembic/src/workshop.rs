@@ -8,6 +8,14 @@ use serde::{Deserialize, Serialize};
 
 pub type Digest = [u8; 32];
 
+/// Authored public material for the first host qualification. These bytes are
+/// intrinsically public example data; they do not classify users' saved sources.
+pub const PUBLIC_EXAMPLE: [(&str, &str, &str, &str); 3] = [
+    ("A", "1", "Field notes", "A retained copy remains readable when its origin is offline."),
+    ("B", "2", "Field notes", "The café note cites version 2 of its source."),
+    ("C", "1", "Local research note", "Acceptance finishes after the destination confirms storage."),
+];
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Owner {

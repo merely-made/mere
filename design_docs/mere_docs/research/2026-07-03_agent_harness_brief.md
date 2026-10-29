@@ -1,13 +1,13 @@
 # The agent harness: decision drivers in the Alembic workshop
 
 **Date:** 2026-07-03
-**Status (2026-10-25):** model-guided design rationale reconciled with the
-[Alembic workshop plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md#5-workshop-reconciliation-and-first-workflow-2026-10-24).
+**Status (2026-10-28):** model-guided design rationale reconciled with the
+[Alembic workshop plan](../implementation_strategy/2026-10-28_alembic_implementation_plan.md).
 Alembic/Athanor own workshop composition. The [Servitor redesign](../../archive_docs/2026-10-28/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
 owns reusable admission/run semantics; Servitor remains in Eidetic.
 R1a/R1b and the Turnstone adapter have executable receipts. Athanor now consumes the same reducer in the deterministic evidence-brief
-core (Alembic plan section 5.7). The product adapters, two-host acceptance
-and model-guided decisions remain open.
+core (the Alembic plan's W0 finding). The product adapters are under implementation;
+two-host acceptance and model-guided decisions remain open.
 
 ## 1. The composition
 
@@ -71,6 +71,21 @@ Malformed output becomes an observed refusal/failure within the run budget.
 MCP exposure/consumption remains an optional adapter with its own transport,
 disclosure and authorization contract. The workshop's first workflow does
 not depend on it or establish a universal action registry.
+
+As checked on 2026-10-28, existing protocols already carry useful lifecycle
+concepts; they should not be reduced to "just tool transport." An adapter can
+preserve them without making the protocol the product's graph writer:
+
+| Protocol surface | Workshop mapping | Qualification still required |
+| --- | --- | --- |
+| [ACP v1 session load/resume](https://agentclientprotocol.com/protocol/v1/session-setup) | Retained interaction/session identity and history projection | Negotiate each capability; replay is history, not a grant or proof of an effect |
+| [A2A v1 task, context and artifact](https://a2a-protocol.org/v1.0.0/specification/) | Run/goal projection, related context and proposed artifact | Preserve separate proposal/acceptance identities and owner commit evidence |
+| [MCP Tasks extension, 2026-07-28](https://github.com/modelcontextprotocol/ext-tasks/blob/main/specification/2026-07-28/tasks.md) | Durable asynchronous handle over a bounded owner operation | Negotiate extension support; reconnect polling and cancellation must preserve unresolved effects |
+
+A task marked complete can mean generation completed. It must not manufacture a
+destination acknowledgement. Protocol cancellation likewise cannot erase an
+already committed product effect. These are adapter design mappings, with no
+claim that the workshop currently exposes or consumes these protocols.
 
 ## 4. Retained work, proposals and accepted effects
 
@@ -143,9 +158,92 @@ authorized, versioned adoption. Servitor defines reusable validation
 invariants; Athanor records the owner's adoption decision and selected
 revision. Procedure text cannot confer authority or certify its own success.
 
+## 8. Peer topology: durable ownership before distributed computation
+
+A personal mesh is promising for continuity, locality and replacing execution
+substrates. The useful unit to move first is a bounded job with authorized
+inputs, a versioned body, an operation identity and an observable result. Its
+workspace and effect owners remain named while machines join, leave or sleep.
+Persona continuity is therefore a retained relationship between identity,
+policy, work and evidence; it does not imply an immortal process or a portable
+provider KV cache. A model invocation is one execution step within that work.
+
+This separates three choices that the phrase "peer AI" otherwise conflates:
+
+| Layer | Useful peer role | Remaining coordination |
+| --- | --- | --- |
+| Work and retained context | Offline reading, local retrieval, durable proposals and handoff | Version selection, disclosure, retention and conflict policy |
+| Job execution | Whole jobs placed near data or on an available accelerator | Admission, leases, budgets, result validation and uncertain completion |
+| Model computation | Specialized groups that split a model or a training job | Bandwidth, stragglers, memory, synchronization and model-specific state |
+
+The first two layers can reduce repeated context reconstruction and make a
+client's disappearance survivable. They do not automatically improve model
+throughput. A WAN hop on every decoding step introduces a different cost from
+one job handoff; splitting inference needs evidence about that actual topology.
+A disconnected peer may preserve work without having sufficient hardware to
+continue its chosen model. Cached source copies also increase the number of
+places whose custody and deletion behavior must be understood.
+
+Research supports different parts of this space. [Petals (2023)](https://arxiv.org/abs/2209.01188)
+demonstrates collaborative inference and fine-tuning across parties, including
+consumer GPUs, and compares favorably with RAM offloading for BLOOM-176B. That
+comparison establishes feasibility in its measured setting, not superiority to
+an optimized data center. [DiLoCo (2024 revision)](https://arxiv.org/abs/2311.08105)
+shows language-model training on loosely connected compute islands with much
+less communication than synchronous optimization. Training permits long local
+intervals that an interactive decoding path cannot simply assume.
+[DistServe (OSDI 2024)](https://www.usenix.org/conference/osdi24/presentation/zhong-yinmin)
+improves serving by separating prefill and decode and choosing placement around
+cluster bandwidth. Even within a managed cluster, placement and communication
+matter. None of these results establishes arbitrary consumer WAN peers as the
+best universal serving substrate.
+
+For providers such as OpenAI, Anthropic or xAI, the potential benefit is a
+hypothesis about a contract, not a claim about their internal systems. A
+customer-owned peer service could deliver smaller authorized context, handle
+local tools, retain application work and request bounded provider computation.
+Providers could then serve one stable invocation contract across many apps.
+Against this stand batching and accelerator utilization, support for many peer
+versions, untrusted result verification, disclosure, billing and abuse control.
+Client fragmentation is primarily an interoperability problem. Replacing
+incompatible clients with incompatible peers retains that fragmentation.
+
+The present stack still links shared Rust crates into each application and
+requires coherent supplier sources. A peer network alone does not remove that
+release/build coupling. A separately running owner with a stable semantic wire
+contract could let clients evolve without relinking its implementation, at the
+cost of protocol compatibility, deployment and process recovery. The workshop
+first earns a second owner adapter; it does not yet turn that proposed service
+boundary into an independently deployable interoperability layer.
+
+The long-term design preference here is a personal mesh of durable owners and
+replaceable workers, connected to specialized compute groups and optional
+frontier providers through versioned contracts. No global consensus is needed
+for one owner's brief; its owner can serialize acceptance. Collaboration across
+owners needs explicit handoff/conflict rules. Choosing peers does not eliminate
+those rules, and centralizing all durable authority in a permanent coordinator
+would erase much of the resilience the mesh was meant to provide.
+
+An owner is a logical authority, not necessarily one always-on machine. The
+workshop's present OS file lease excludes local writers; it does not fence a
+writer on another peer. Moving an owner requires a qualified handoff and stale-
+writer rejection, while replicating a writable owner requires a stated fault
+and consistency model. During a partition, retained reading and proposal work
+can remain available even when final acceptance must wait. This is a design
+limit of the current local adapters, not evidence for replicated ownership.
+
+Useful research cues are measurable counterexamples: hold task quality and
+budgets fixed while comparing whole-job placement with token-path splitting;
+measure recovery time, bytes resent, duplicate effects and billed invocations
+after a worker disappears; distinguish an unobserved result from an absent
+effect; and compare the energy and latency of local preparation plus a bounded
+remote call with repeated full-context calls. The present evidence-brief gate
+isolates the ownership/recovery part without model variability. A later model
+row earns its complexity through measured benefit over deterministic assembly.
+
 ## Related owners and research
 
-- [Alembic implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md)
+- [Alembic implementation plan](../implementation_strategy/2026-10-28_alembic_implementation_plan.md)
   — workshop composition, first workflow and current acceptance gates.
 - [Graph behaviors plan](../../archive_docs/2026-10-28/2026-08-13_graph_behaviors_plan.md)
   — watches, admission, run contracts and proposed R2/R3.

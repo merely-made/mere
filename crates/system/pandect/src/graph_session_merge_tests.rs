@@ -1405,3 +1405,466 @@ fn a_new_plan_carries_the_choices_that_still_apply_and_says_why_others_dropped()
         assert_eq!(title(target.graph(), id(3)).as_deref(), Some("By hand"));
     });
 }
+
+#[test]
+fn operation_receipt_reconciles_duplicates_and_refuses_changed_request() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut first = parent(&mere).await;
+        let mut competing = mere.open(first.id()).await.unwrap();
+        let before = first.graph().node_count();
+        let operation = [17; 32];
+        let make_deltas = || {
+            vec![
+                GraphDelta::AddNode {
+                    id: Some(id(77)),
+                    url: "https://brief.test/77".into(),
+                    position: euclid::point2(0.0, 0.0),
+                },
+                GraphDelta::ReplaySetNodeBodyById {
+                    node_id: id(77),
+                    body: Some("brief".into()),
+                },
+            ]
+        };
+        let saved = first
+            .transact_operation_published(
+                operation,
+                b"request".to_vec(),
+                b"note".to_vec(),
+                person(),
+                make_deltas(),
+                wall_clock_now(),
+            )
+            .await
+            .unwrap();
+        let duplicate = competing
+            .transact_operation_published(
+                operation,
+                b"request".to_vec(),
+                b"note".to_vec(),
+                person(),
+                make_deltas(),
+                wall_clock_now(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(saved, duplicate);
+        assert_eq!(
+            competing.graph().node_count(),
+            before,
+            "duplicate must not install a speculative candidate"
+        );
+        assert!(
+            competing
+                .transact_operation_published(
+                    operation,
+                    b"changed".to_vec(),
+                    vec![],
+                    person(),
+                    make_deltas(),
+                    wall_clock_now()
+                )
+                .await
+                .is_err()
+        );
+        assert!(
+            competing
+                .transact_operation_published(
+                    operation,
+                    b"request".to_vec(),
+                    b"other result".to_vec(),
+                    person(),
+                    make_deltas(),
+                    wall_clock_now()
+                )
+                .await
+                .is_err()
+        );
+        let reopened = mere.open(first.id()).await.unwrap();
+        assert_eq!(
+            reopened.operation_receipt(operation).await.unwrap(),
+            Some(saved)
+        );
+        let (key, _) = reopened.graph().get_node_by_id(id(77)).unwrap();
+        let snapshot = reopened.graph().to_snapshot();
+        let node = snapshot
+            .nodes
+            .iter()
+            .find(|n| n.node_id == id(77).to_string())
+            .unwrap();
+        assert_eq!(node.body.as_deref(), Some("brief"));
+        assert!(reopened.graph().shown_resource_id(key).is_some());
+        assert_eq!(reopened.graph().node_count(), before + 1);
+    });
+}
+
+#[test]
+fn operation_refuses_stale_graph_without_installing_candidate() {
+    pollster::block_on(async {
+        let mere = MereSessions::new(MemoryBackend::new());
+        let mut first = parent(&mere).await;
+        let mut stale = mere.open(first.id()).await.unwrap();
+        let key = first.graph().get_node_by_id(id(1)).unwrap().0;
+        first
+            .transact_deltas_published(
+                person(),
+                vec![GraphDelta::SetNodeTitle {
+                    key,
+                    title: "new head".into(),
+                }],
+                wall_clock_now(),
+            )
+            .await
+            .unwrap();
+        let stale_key = stale.graph().get_node_by_id(id(1)).unwrap().0;
+        let result = stale
+            .transact_operation_published(
+                [18; 32],
+                b"request".to_vec(),
+                b"result".to_vec(),
+                person(),
+                vec![GraphDelta::SetNodeTitle {
+                    key: stale_key,
+                    title: "refused".into(),
+                }],
+                wall_clock_now(),
+            )
+            .await;
+        assert!(result.is_err());
+        assert_eq!(title(stale.graph(), id(1)).as_deref(), Some("One"));
+        assert!(stale.operation_receipt([18; 32]).await.unwrap().is_none());
+        assert_eq!(
+            title(mere.open(first.id()).await.unwrap().graph(), id(1)).as_deref(),
+            Some("new head")
+        );
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn concurrent_operation_requests_share_one_receipt() {
+    use std::sync::{Arc, Barrier};
+    #[derive(Clone)]
+    struct RacingBackend {
+        store: MemoryBackend,
+        barrier: Arc<Barrier>,
+    }
+    #[async_trait::async_trait]
+    impl Backend for RacingBackend {
+        async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            let value = self.store.get(key).await?;
+            if key.starts_with("graph-operations/") {
+                self.barrier.wait();
+            }
+            Ok(value)
+        }
+        async fn put(&self, key: &str, bytes: &[u8]) -> Result<(), StoreError> {
+            self.store.put(key, bytes).await
+        }
+        async fn delete(&self, key: &str) -> Result<(), StoreError> {
+            self.store.delete(key).await
+        }
+        async fn list(&self, prefix: &str) -> Result<Vec<String>, StoreError> {
+            self.store.list(prefix).await
+        }
+        async fn scan(&self, start: &str, end: &str) -> Result<Vec<String>, StoreError> {
+            self.store.scan(start, end).await
+        }
+        async fn apply(&self, ops: &[WriteOp]) -> Result<(), StoreError> {
+            self.store.apply(ops).await
+        }
+        async fn transact(&self, transaction: muniment::TransactFn) -> Result<(), StoreError> {
+            self.store.transact(transaction).await
+        }
+    }
+    let store = MemoryBackend::new();
+    let mere = MereSessions::new(store.clone());
+    let session = pollster::block_on(parent(&mere)).id();
+    let backend = RacingBackend {
+        store: store.clone(),
+        barrier: Arc::new(Barrier::new(2)),
+    };
+    let runners: Vec<_> = (0..2)
+        .map(|_| {
+            let backend = backend.clone();
+            std::thread::spawn(move || {
+                pollster::block_on(async move {
+                    let mut writer = GraphSession::open(backend, session).await.unwrap();
+                    writer
+                        .transact_operation_published(
+                            [19; 32],
+                            b"same".to_vec(),
+                            b"result".to_vec(),
+                            person(),
+                            vec![
+                                GraphDelta::AddNode {
+                                    id: Some(id(78)),
+                                    url: "https://brief.test/78".into(),
+                                    position: euclid::point2(0.0, 0.0),
+                                },
+                                GraphDelta::ReplaySetNodeBodyById {
+                                    node_id: id(78),
+                                    body: Some("brief".into()),
+                                },
+                            ],
+                            wall_clock_now(),
+                        )
+                        .await
+                        .unwrap()
+                })
+            })
+        })
+        .collect();
+    let receipts: Vec<_> = runners.into_iter().map(|r| r.join().unwrap()).collect();
+    assert_eq!(receipts[0], receipts[1]);
+    let reopened = pollster::block_on(mere.open(session)).unwrap();
+    assert_eq!(reopened.graph().node_count(), 4);
+    assert!(reopened.graph().get_node_by_id(id(78)).is_some());
+}
+
+#[test]
+fn operation_revision_binds_content_and_survives_reopen() {
+    pollster::block_on(async {
+        let one_store = MemoryBackend::new();
+        let one = MereSessions::new(one_store.clone());
+        let mut a = parent(&one).await;
+        let two_store = MemoryBackend::new();
+        for (key, value) in backend_snapshot(&one_store).await {
+            two_store.put(&key, &value).await.unwrap();
+        }
+        let two = MereSessions::new(two_store);
+        let mut b = two.open(a.id()).await.unwrap();
+        assert_eq!(
+            a.operation_revision().unwrap(),
+            b.operation_revision().unwrap()
+        );
+        let akey = a.graph().get_node_by_id(id(1)).unwrap().0;
+        let bkey = b.graph().get_node_by_id(id(1)).unwrap().0;
+        a.transact_deltas_published(
+            person(),
+            vec![GraphDelta::SetNodeTitle {
+                key: akey,
+                title: "alpha".into(),
+            }],
+            wall_clock_now(),
+        )
+        .await
+        .unwrap();
+        b.transact_deltas_published(
+            person(),
+            vec![GraphDelta::SetNodeTitle {
+                key: bkey,
+                title: "beta".into(),
+            }],
+            wall_clock_now(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(a.journal().live_cursor(), b.journal().live_cursor());
+        assert_eq!(a.changes().len(), b.changes().len());
+        assert_ne!(
+            a.operation_revision().unwrap(),
+            b.operation_revision().unwrap()
+        );
+        assert_eq!(
+            a.operation_revision().unwrap(),
+            one.open(a.id())
+                .await
+                .unwrap()
+                .operation_revision()
+                .unwrap()
+        );
+    });
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn operation_storage_refusal_and_lost_ack_reconcile() {
+    use std::sync::{
+        Arc,
+        atomic::{AtomicU8, Ordering},
+    };
+    #[derive(Clone)]
+    struct FaultBackend {
+        store: MemoryBackend,
+        fault: Arc<AtomicU8>,
+    }
+    #[async_trait::async_trait]
+    impl Backend for FaultBackend {
+        async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            self.store.get(key).await
+        }
+        async fn put(&self, key: &str, bytes: &[u8]) -> Result<(), StoreError> {
+            self.store.put(key, bytes).await
+        }
+        async fn delete(&self, key: &str) -> Result<(), StoreError> {
+            self.store.delete(key).await
+        }
+        async fn list(&self, prefix: &str) -> Result<Vec<String>, StoreError> {
+            self.store.list(prefix).await
+        }
+        async fn scan(&self, start: &str, end: &str) -> Result<Vec<String>, StoreError> {
+            self.store.scan(start, end).await
+        }
+        async fn apply(&self, ops: &[WriteOp]) -> Result<(), StoreError> {
+            self.store.apply(ops).await
+        }
+        async fn transact(&self, transaction: muniment::TransactFn) -> Result<(), StoreError> {
+            let fault = self.fault.swap(0, Ordering::SeqCst);
+            if fault == 1 {
+                return Err(StoreError::NotTransactional);
+            }
+            self.store.transact(transaction).await?;
+            if fault == 2 {
+                return Err(StoreError::NotTransactional);
+            }
+            Ok(())
+        }
+    }
+    pollster::block_on(async {
+        let store = MemoryBackend::new();
+        let mere = MereSessions::new(store.clone());
+        let session = parent(&mere).await.id();
+        let fault = Arc::new(AtomicU8::new(1));
+        let backend = FaultBackend {
+            store,
+            fault: fault.clone(),
+        };
+        let mut writer = GraphSession::open(backend.clone(), session).await.unwrap();
+        let mut pending = GraphSession::open(backend.clone(), session).await.unwrap();
+        let mut rejected = GraphSession::open(backend.clone(), session)
+            .await
+            .unwrap()
+            .with_validator(Arc::new(|graph| {
+                if graph.get_node_by_id(id(79)).is_some() {
+                    Err("replayed graph rejected".into())
+                } else {
+                    Ok(())
+                }
+            }))
+            .unwrap();
+        let make_deltas = || {
+            vec![GraphDelta::AddNode {
+                id: Some(id(79)),
+                url: "https://brief.test/79".into(),
+                position: euclid::point2(0.0, 0.0),
+            }]
+        };
+        assert!(
+            writer
+                .transact_operation_published(
+                    [20; 32],
+                    b"same".to_vec(),
+                    b"result".to_vec(),
+                    person(),
+                    make_deltas(),
+                    wall_clock_now()
+                )
+                .await
+                .is_err()
+        );
+        assert!(writer.graph().get_node_by_id(id(79)).is_none());
+        assert!(writer.operation_receipt([20; 32]).await.unwrap().is_none());
+        assert!(
+            writer
+                .reconcile_operation([20; 32])
+                .await
+                .unwrap()
+                .is_none()
+        );
+        fault.store(2, Ordering::SeqCst);
+        assert!(
+            writer
+                .transact_operation_published(
+                    [20; 32],
+                    b"same".to_vec(),
+                    b"result".to_vec(),
+                    person(),
+                    make_deltas(),
+                    wall_clock_now()
+                )
+                .await
+                .is_err()
+        );
+        assert!(writer.graph().get_node_by_id(id(79)).is_none());
+        let old_cursor = writer.journal().live_cursor();
+
+        // A reload must never discard local unsaved work, even when the receipt
+        // is present in durable storage.
+        let key = pending.graph().get_node_by_id(id(1)).unwrap().0;
+        pending
+            .edit_now(person(), |graph| {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::SetNodeTitle {
+                        key,
+                        title: "unsaved".into(),
+                    },
+                );
+            })
+            .unwrap();
+        assert!(pending.reconcile_operation([20; 32]).await.is_err());
+        assert_eq!(title(pending.graph(), id(1)).as_deref(), Some("unsaved"));
+        assert!(pending.graph().get_node_by_id(id(79)).is_none());
+
+        // Product validation rejects a reconstructed graph without replacing the
+        // previously held graph, history or settings.
+        assert!(rejected.reconcile_operation([20; 32]).await.is_err());
+        assert!(rejected.graph().get_node_by_id(id(79)).is_none());
+        assert_eq!(rejected.journal().live_cursor(), old_cursor);
+
+        writer.set_current_session(43);
+        writer.set_checkpoint_interval(37);
+        let validation: GraphValidator = Arc::new(|_| Ok(()));
+        let admission: GraphAdmissionValidator =
+            Arc::new(|_, _| Err("new admission refused".into()));
+        writer = writer
+            .with_validator(validation.clone())
+            .unwrap()
+            .with_admission_validator(admission.clone());
+        let (reconciled, current_generation) =
+            writer.reconcile_operation([20; 32]).await.unwrap().unwrap();
+        assert_eq!(writer.graph().node_count(), 4);
+        assert!(writer.graph().get_node_by_id(id(79)).is_some());
+        assert!(writer.journal().live_cursor() > old_cursor);
+        assert_eq!(writer.graph().current_session(), 43);
+        assert_eq!(writer.checkpoint_interval, 37);
+        assert!(Arc::ptr_eq(writer.validator.as_ref().unwrap(), &validation));
+        assert!(Arc::ptr_eq(
+            writer.admission_validator.as_ref().unwrap(),
+            &admission
+        ));
+        assert_eq!(current_generation, reconciled.generation);
+        // Reconciliation does not consume a second operation or repeat a graph edit.
+        let current_cursor = writer.journal().live_cursor();
+        assert_eq!(
+            writer
+                .reconcile_operation([20; 32])
+                .await
+                .unwrap()
+                .unwrap()
+                .0,
+            reconciled
+        );
+        assert_eq!(writer.journal().live_cursor(), current_cursor);
+
+        let mut reopened = GraphSession::open(backend, session).await.unwrap();
+        let receipt = reopened.operation_receipt([20; 32]).await.unwrap().unwrap();
+        assert_eq!(receipt, reconciled);
+        assert!(reopened.graph().get_node_by_id(id(79)).is_some());
+        let retry = reopened
+            .transact_operation_published(
+                [20; 32],
+                b"same".to_vec(),
+                b"result".to_vec(),
+                person(),
+                make_deltas(),
+                wall_clock_now(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(receipt, retry);
+        assert_eq!(reopened.graph().node_count(), 4);
+    });
+}
