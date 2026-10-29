@@ -281,6 +281,12 @@ automation, credentials, grants or publication.
 
 ## Findings
 
+- 2026-10-29: the opt-in Djinn `private_workshop_fixture` separates its
+  synthetic custodian child from the app-broker process, which uses the real
+  `RemoteHost` client. It requires a new absolute directory and exposes only
+  redacted readiness and lock/loss controls. This is a receiving fixture;
+  compiling it does not qualify process behavior, installed identity or
+  production custody.
 - 2026-10-29: Graphshell's private receiving adapter retains source bodies,
   titles and UTF-8 ranges only in authenticated encrypted Resource facets.
   The graph's normal journal receives ciphertext deltas. Pandect's independent
@@ -376,6 +382,9 @@ automation, credentials, grants or publication.
 
 ## Progress
 
+- 2026-10-29: added the opt-in separate-process custody fixture and qualified
+  its compiler path. Native execution remains held by workspace capacity;
+  private product and production gates remain open.
 - 2026-10-28: cut from `2026-06-24_alembic_implementation_plan.md` and
   `2026-07-06_node_image_externalization_plan.md`; the Decisions section is copied unchanged;
   nothing new landed.

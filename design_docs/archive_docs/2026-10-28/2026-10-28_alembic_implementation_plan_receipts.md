@@ -433,3 +433,36 @@ unqualified. Its reserve-20 lease-red attempt was capacity-refused before Cargo;
 the fixed source was restored byte-for-byte and no red test executed. The 400
 GiB budget, 100 GiB floor and running-cache protections remain unchanged.
 Production custody and real-consumer qualification flags remain false.
+
+## Separate-process custody fixture compiler checkpoint
+
+`ports/djinn/examples/private_workshop_fixture.rs`, enabled only by
+`custody-receipt-host`, creates a new synthetic vault and wallet in a dedicated
+custodian child. Its parent uses the real `RemoteHost` and serves the normal
+app-broker route; receiving products are separate processes. Readiness contains
+only process IDs, the explicit socket, a synthetic profile and a false production
+qualification flag. Standard input supplies lock, unlock, status, custody-loss
+and quit controls. Unknown commands are redacted, and normal exit or input EOF
+stops and reaps the owned child. These are source facts, not executed lifecycle
+evidence at this checkpoint.
+
+The guarded compiler gate passes in
+`Code/output/alembic-hosts-20261028/20261029-private-fixture-check.log` / `.exit`:
+
+```sh
+PATH=/Users/markik/.cargo/bin:$PATH python3 /Users/markik/Code/tools/build_storage.py \
+  --policy /Users/markik/Code/output/alembic-hosts-20261028/admission-wait-900-policy.json \
+  build --lane alembic-hosts-20261028 \
+  --cwd /Users/markik/Code/worktrees/mere-alembic-hosts-20261028 --reserve-gib 6 -- \
+  +1.99.1 check --locked --offline -p djinn --features custody-receipt-host \
+  --example private_workshop_fixture -j 4
+```
+
+The retained HEAD/source hashes accompany that log. The native example build
+has not run; its 20 GiB code-generation reservation remains unchanged. The
+process smoke driver, `qualify-private-workshop-fixture.py` in that output
+directory, is syntax-checked but unexecuted. It checks actual broker/custodian
+parentage, lock/unlock generation changes, unknown-input redaction, custody loss
+and owned-child reaping using a frozen executable. The checkpoint JSON records
+these distinct gates. No current private product, installed identity, signing,
+physical-platform or H1 production qualification follows from the compiler pass.

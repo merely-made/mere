@@ -359,3 +359,7 @@ required-features = ["custody-receipt-host"]
 name = "dramatis-review-host"
 path = "src/bin/dramatis_review_host.rs"
 required-features = ["custody-receipt-host", "cxf"]
+
+[[example]]
+name = "private_workshop_fixture"
+required-features = ["custody-receipt-host"]
