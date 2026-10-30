@@ -34,6 +34,9 @@ pub struct Service {
     core: Arc<Mutex<Core>>,
     outboxes: Arc<Mutex<HashMap<SessionId, Outbox>>>,
     mechanism: Option<Arc<dyn Mechanism>>,
+    // Every service clone, including background workers, retains the fixture lease.
+    #[cfg(feature = "fixture")]
+    fixture_lease: Option<Arc<std::fs::File>>,
 }
 
 struct Outbox {
@@ -47,7 +50,15 @@ impl Service {
             core: Arc::new(Mutex::new(core)),
             outboxes: Arc::new(Mutex::new(HashMap::new())),
             mechanism,
+            #[cfg(feature = "fixture")]
+            fixture_lease: None,
         }
+    }
+
+    #[cfg(feature = "fixture")]
+    pub(crate) fn with_fixture_lease(mut self, lease: Option<Arc<std::fs::File>>) -> Self {
+        self.fixture_lease = lease;
+        self
     }
 
     /// The core, for a platform hook that must lock from inside.
