@@ -343,9 +343,21 @@ presentation alone (every lane).
   on every backend; a backend that commits then errors leaves the host at its acknowledged state and
   a retry is refused, not duplicated (resident `:20-48,63-75`).
 
+- 2026-10-30: bounded live resource-pair capture supports Turnstone's exact
+  assertion recovery without copying unrelated graph payloads. Unlike a durable
+  snapshot, replacing a live pair must preserve session-only arrangements too.
+  The public kernel API checks edge count and serialized bytes before cloning
+  the selected payloads. These are operation bounds, not a total process-memory
+  ceiling. The consumer's authority, storage and recovery contract stays in
+  `eidetic/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md`,
+  P4a M4; supplier and consumer evidence has one home in
+  `eidetic/design_docs/archive_docs/2026-10-30/2026-10-11_eidetic_development_plan_receipts.md`.
+
 ## Progress
 
 - 2026-10-28: cut from the six sources named in Status; nothing new landed.
+- 2026-10-30: published bounded live resource-pair capture and preservation tests
+  for the model-free structured-record recovery consumer.
 
 ## Received from the backlog holder, 2026-10-28
 
