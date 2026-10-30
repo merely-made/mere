@@ -1,10 +1,9 @@
 # Cambium composition: retained components, bindings and selective updates
 
-**Status:** 2026-10-29: P0 locally qualified; P1 in progress. P1's shared
-composition model/transaction and revision-aware settings contract are
-implemented and unit-qualified. Turnstone's actual shared write owner,
-guarded adapter and binding/request admission remain open, so P1 is not
-complete. P2–P6 remain proposed work. P0 supplier/consumer receiving used a
+**Status:** 2026-10-29: P0 and P1 locally qualified. The shared composition
+model/transaction, revision-aware settings contract, and Turnstone's shared
+settings owner, guarded adapter and binding/request admission passed focused
+offline qualification. P2–P6 remain open. P0/P1 supplier/consumer receiving used a
 temporary local source override; publication and consumer repinning remain
 separate from these source changes. Earlier findings retain the pre-P0 baseline.
 
@@ -472,7 +471,8 @@ lands; this design does not authorize a release or claim external compatibility.
 
 ### P1. Composition model, guarded binding and event vocabulary
 
-**State:** foundations implemented and unit-qualified; product receiving open.
+**State:** locally qualified for the stated supplier and consumer test scope;
+composition editing and P2–P6 remain open.
 
 - Implemented: public `cambium::composition` descriptors, stable keys,
   group/drawer placement, explicit unplaced components, application validation,
@@ -486,9 +486,39 @@ lands; this design does not authorize a release or claim external compatibility.
   request correlation and typed outcomes. The old `SettingsProvider` remains
   unguarded. Fake-owner tests qualify the protocol; they do not qualify a real
   product's storage transaction.
-- Still required: one actual Turnstone owner for participating writers, its
-  revisioned adapter, binding/request admission, and real-provider failure and
-  concurrency controls. The writer inventory below grounds that handoff.
+- Implemented in Turnstone: one shared in-process settings owner for shell and
+  Settings-pane writes, a revisioned adapter, and per-setting bindings with a
+  maximum of eight pending requests, client UUID, generation and opaque
+  single-use tickets. Four owner-issued domains are `appearance-choice`,
+  `shell-chrome` (including zoom), `behaviors` and `theme-catalog`. A write
+  validates its owner/domain/revision guard and persists under the shared
+  owner lock; the owner publishes a new target-domain revision only on success.
+  Committed replies contain the canonical persisted value, so normalized
+  values such as zoom become the displayed baseline. Older acknowledgements
+  cannot regress a binding baseline. Guards remain sticky when only a revision
+  changes, including same-value edits; an explicit discard/reload adopts a new
+  guard. Validation, storage and unavailable failures do not publish the
+  attempted value or advance its revision.
+- Theme-library refresh advances only `theme-catalog` when its semantic
+  contents/status change. Applying a theme is a separate explicit choice write;
+  even a successful same-value Apply advances the appearance-choice revision.
+- Locally qualified: the guarded offline Turnstone settings filter passed 61
+  tests (0 failures), including all 13 binding tests, real-owner/receiving
+  coverage, all five command tests and existing theme/UI receiving. The frozen
+  binary Arrange filter passed nine tests (0 failures). Source-size and diff
+  checks passed. Evidence under
+  `/Users/markik/Code/output/cambium-composition-p1-owner` includes the source
+  manifest, `settings-test-r2.log`, `arrange-test.log`, and frozen
+  `turnstone-lib-tests` (SHA-256
+  `2aef06464467c3b79ebb55c3380b3a49e62713207d3b58359a556c6fa820e89c`).
+- On successful Apply, the binding accepts a canonical persisted value. The
+  pane may adopt same-value/control sibling guards from a coherent post-commit
+  snapshot only when each sibling still has the exact guard captured for that
+  request. This lets successive fields in the same pane proceed without
+  refreshing an older draft from another pane. The owner serializes participating
+  in-process callers only; file reload/replacement is not cross-process
+  compare-and-swap, and detached provider snapshots are not coordinated writers.
+  The historical writer inventory below remains the dated baseline.
 
 - Define the generic descriptor/table/placement model, allowed edit set and validation. Build the revision-aware settings companion, serialize participating Turnstone writes through one authority and define the scoped diagnostic identities/events. Inventory the theme-workshop write route and other writers before claiming a write scope.
 - Done when: each supported edit validates and produces the intended edit set; invalid or duplicate compositions leave the accepted model unchanged. A stale guarded write fails without overwriting a newer value; unrelated domains can refresh without erasing a draft; persistence failure publishes no committed revision; binding/request generations reject old results; same-id theme-library saves retain explicit Apply behavior. These pass with a fake delayed provider and Turnstone's real provider adapter.
@@ -502,7 +532,7 @@ lands; this design does not authorize a release or claim external compatibility.
 
 ### P3. Editable composition and persistence
 
-- Add row/group/drawer edits and accessible commands to Turnstone settings; save the model through its existing pane-config owner. Implement dirty-delete, conflict and rebind behavior.
+- Add row/group/drawer edits and accessible commands to Turnstone settings; save the model through its existing pane-config owner. Implement dirty-delete, conflict and rebind behavior. P1's guarded owner rejects stale writes, but the current `setting_row` still resets its raw draft when an external snapshot changes that same setting's value or control; full dirty/conflicted reconciliation is deferred to this phase.
 - Done when: a dirty row survives reorder, regroup, hide/reveal, whole-pane move and saving the arrangement; Apply reaches its original target exactly once; source replacement cannot retarget it; confirmed deletion and undo have the documented incarnation behavior; restart restores structure with clean drafts. Invalid configs leave the previous live composition intact; missing kinds/settings remain recoverable descriptors. Existing Turnstone settings scenarios (rung4_settings.scn and rung4_settings_verify.scn under turnstone/scenarios) continue to pass.
 - Needs: P1–P2. Cross-pane row transfer remains outside this slice.
 
@@ -663,6 +693,23 @@ earlier source revisions.
   returning its original outcome, short of the domain-owned idempotency O3
   asks for.
 
+- 2026-10-29 (P1 implementation, locally qualified; Turnstone composition
+  worktree): `turnstone/src/settings_provider/owner.rs` wraps the existing
+  persistence provider in `SharedApplicationSettingsOwner`; shell startup
+  constructs the owner in `turnstone/src/shell/shell_new.rs`, and the shell
+  passes a clone through `turnstone/src/shell/render/shell_answer_permission_request.rs`
+  to Settings panes. `turnstone/src/settings_pane/commands.rs` routes Apply
+  through the revisioned binding and shared owner. The shared handle lives in
+  `turnstone/src/settings_pane/live_settings.rs`; the appearance editor keeps
+  library edits/refresh separate from explicit choice Apply. The four domains
+  and guard, acknowledgement, and failure behavior are summarized in P1 above.
+  The guarded offline Settings filter passed 61 tests and the frozen-binary
+  Arrange filter passed nine; source-size and diff checks passed. Receipts and
+  the frozen binary hash are recorded under
+  `/Users/markik/Code/output/cambium-composition-p1-owner`. This is an
+  in-process writer boundary only; it establishes no cross-process CAS,
+  publication/pin status, or headed acceptance.
+
 ## Decisions
 
 Mark answered fourteen question cards on 2026-10-29. Each entry quotes the
@@ -751,10 +798,16 @@ confirmed it.
   primary checkouts. Receiving used a temporary worktree-only source override;
   tracked consumer dependency pins were preserved.
 - 2026-10-29: P1 shared model and guarded-settings contract implemented and
-  unit-qualified. The real Turnstone write-owner/adapter handoff remains open;
-  P1 is in progress. P0 source commits were retained while reconciling with the
+  unit-qualified. At that point the real Turnstone write-owner/adapter handoff
+  remained open; the later P1 receiving and qualification entry below records
+  its completion. P0 source commits were retained while reconciling with the
   latest Turnstone module split.
 - 2026-10-29: Mark ruled D1–D14 by question card. Lifecycle, binding and
   persistence text now cites them; P4–P6 and their design sections are
   outlines (D14). Findings added for upstream Xilem and Murm's secure
   sessions and live interaction plan.
+- 2026-10-29: Turnstone shared owner, guarded Apply route and binding admission
+  passed focused local offline qualification (61 settings-filter tests and
+  nine frozen-binary Arrange tests; zero failures). The consumer used a local
+  source override with dependency pins unchanged. No Meristem API change was
+  made; P2–P6 remain open. No headed or cross-process qualification is claimed.

@@ -81,6 +81,9 @@ pub struct RevisionedSettingsWriteRequest {
 
 /// Owner-confirmed committed write. The returned guard is the published
 /// revision after the value was durably accepted.
+/// `value` is the owner's canonical stored value, which may differ from the
+/// requested value after a documented conversion (for example, `f64` to `f32`).
+/// Clients adopt this value rather than assuming the request was stored verbatim.
 #[derive(Clone, Debug, PartialEq)]
 pub struct CommittedSettingsWrite {
     pub request_id: String,

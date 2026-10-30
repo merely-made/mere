@@ -255,6 +255,7 @@ pub enum Harmony {
     },
 }
 
+#[derive(Clone, PartialEq)]
 pub struct ThemeRegistry {
     /// Derived, resolvable token sets (built-ins + user themes), keyed by
     /// lowercased id.
