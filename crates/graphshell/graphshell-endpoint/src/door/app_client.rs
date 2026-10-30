@@ -65,6 +65,15 @@ pub struct AppConnection {
 }
 
 impl AppConnection {
+    #[cfg(test)]
+    pub(super) fn for_test(stream: Box<dyn LocalStream>) -> Self {
+        Self {
+            stream,
+            session: "fixture".into(),
+            next_id: 1,
+        }
+    }
+
     /// Connect to the configured endpoint and complete the whole handshake:
     /// hello, challenge, connect, connected.
     pub async fn open(app: AppId) -> Result<Self, AppClientError> {

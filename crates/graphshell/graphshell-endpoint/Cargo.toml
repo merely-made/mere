@@ -19,6 +19,8 @@ door-serve = ["door-native", "dep:armillary", "armillary/tokio", "dep:tracing", 
 custody = ["door", "dep:base64", "dep:chatelaine", "dep:dramatis", "dep:eidetic", "dep:insigne", "dep:personae", "dep:uuid"]
 custody-client = ["custody", "door-native", "dep:tracing"]
 projection-door = ["projection", "door-native"]
+projection-offer = ["projection", "door"]
+projection-provider = ["projection-offer", "door-native"]
 profile = ["custody-client"]
 
 [dependencies]

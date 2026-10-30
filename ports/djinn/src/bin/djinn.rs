@@ -1084,14 +1084,17 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     let initial_lock = *lock_state.borrow_and_update();
     status.update(|status| status.lock = initial_lock.into());
 
-    #[cfg(feature = "personal-sync")]
     let app_dir = owner_settings::default_app_dir();
     #[cfg(feature = "personal-sync")]
     let data_root =
         device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())?;
-    #[cfg(feature = "personal-sync")]
     let owner =
         owner_settings::OwnerSettings::load(&owner_settings::settings_path(&app_dir, &profile_id))?;
+    let projection_providers = owner
+        .projection_providers
+        .iter()
+        .map(owner_settings::ProjectionProviderSettings::permission)
+        .collect::<Result<Vec<_>, _>>()?;
     #[cfg(feature = "personal-sync")]
     let coop_relays = owner.coop_relays()?;
     #[cfg(feature = "personal-sync")]
@@ -1339,6 +1342,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             djinn::custody::grant(&grants)?;
             (grants, AppEndpointCatalog::default())
         };
+        app_catalog
+            .set_provider_permissions(projection_providers)
+            .await?;
         // Binding is startup work: a ready resident must already own every
         // endpoint. Keep serving lazy so the resident loop owns their lifetime.
         let app_listener = LocalListener::bind(&args.app_endpoint, "first-party")

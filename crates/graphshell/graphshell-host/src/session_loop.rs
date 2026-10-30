@@ -137,6 +137,7 @@ where
         resume,
         now_ms,
         None::<(Duration, NoNotices<E>)>,
+        |_| true,
     )
     .await
 }
@@ -149,7 +150,7 @@ where
 /// interval. Polling in both places is what makes a busy client and an idle
 /// one behave the same: a peer sending faster than the interval would
 /// otherwise never let the timeout arm fire.
-pub(crate) async fn serve_admitted_session_with<E, S, F, N, P>(
+pub(crate) async fn serve_admitted_session_with<E, S, F, N, P, L>(
     session: &mut AdmittedSession<S>,
     authority: &SessionAuthority,
     revocations: &RwLock<RevocationLedger>,
@@ -157,6 +158,7 @@ pub(crate) async fn serve_admitted_session_with<E, S, F, N, P>(
     resume: &mut F,
     now_ms: N,
     mut notices: Option<(Duration, P)>,
+    is_live: L,
 ) -> Result<SessionSummary, SessionLoopError>
 where
     E: ProjectionCatalog + ProjectionSource + PresentationSource + IntentSink,
@@ -167,16 +169,23 @@ where
     F: FnMut(&mut E, ResumeRequest) -> Result<ResumeReply, String>,
     N: Fn() -> u64,
     P: FnMut(&mut E) -> Result<Option<CarrierNotice>, String>,
+    L: Fn(&E) -> bool,
 {
     let (reader, mut writer) = tokio::io::split(&mut session.stream);
     let mut lines = LineReader::new(reader);
     let mut answered = 0u64;
 
     let end = loop {
+        if !is_live(endpoint) {
+            break SessionEnd::Disconnected;
+        }
         // Before blocking on the peer: anything the endpoint produced while
         // the last request was being served goes out now.
         if let Some((_, poll)) = notices.as_mut() {
             while let Some(notice) = poll(endpoint).map_err(SessionLoopError::Notices)? {
+                if !is_live(endpoint) {
+                    break;
+                }
                 write_notice(&mut writer, &notice).await?;
             }
         }
@@ -236,6 +245,9 @@ where
 
         let session_plane = match dispatch_common(endpoint, request, resume) {
             Ok(response) => {
+                if !is_live(endpoint) {
+                    break SessionEnd::Disconnected;
+                }
                 write_line(&mut writer, &response).await?;
                 answered += 1;
                 continue;
@@ -257,6 +269,9 @@ where
                     // long before it expires.
                     expires_at_ms: authority.deadline_ms(),
                 };
+                if !is_live(endpoint) {
+                    break SessionEnd::Disconnected;
+                }
                 write_line(
                     &mut writer,
                     &ok(id, CarrierResponseBody::Opened(Box::new(opened))),

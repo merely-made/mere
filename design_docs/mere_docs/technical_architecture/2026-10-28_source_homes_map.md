@@ -187,6 +187,14 @@ every copy is one more edge for a move to carry.
   - The door's `AppMessage` (`graphshell-endpoint/src/door/wire.rs:62`) is
     Connect, Request, TakeNotice, WaitNotice or Call. No message lets an app
     offer a projection.
+- **2026-10-30 follow-up:** external apps can now offer a projection route through
+  the existing typed Call/Answer envelope. `door::projection_offer` owns its
+  portable messages, `door::projection_provider` the native runner, and Djinn's
+  `door::projection_offers` owns permission and lease handling. The standalone
+  Knot directory endpoint is the first consumer. This addresses projection
+  registration, not the full proposed app manifest, custody salt grants or
+  extraction of embedded resident lanes. See the [implementation plan](../implementation_strategy/2026-10-30_app_projection_offers.md)
+  and [qualification](../testing/receipts/2026-10-30_app_projection_offers.md).
 - Djinn and Cleromancy form a repository cycle:
   - Djinn installs Cleromancy's divination validator in the mere route
     (`resident_mere.rs:131-138`).

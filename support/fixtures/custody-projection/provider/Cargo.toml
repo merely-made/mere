@@ -1,0 +1,11 @@
+[workspace]
+[package]
+name = "projection-provider-consumer-fixture"
+version = "0.0.0"
+edition = "2024"
+publish = false
+[dependencies]
+graphshell-endpoint = { path = "../../../../crates/graphshell/graphshell-endpoint", default-features = false, features = ["projection-provider"] }
+
+[features]
+forbidden-api = []

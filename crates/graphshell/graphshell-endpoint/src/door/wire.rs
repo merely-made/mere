@@ -72,7 +72,7 @@ pub enum AppMessage<Request, Call> {
     TakeNotice,
     /// Wait until the admitted endpoint rings with a revision notice.
     WaitNotice,
-    /// One call on the custody route ([`crate::door::custody`]).
+    /// One typed call on the selected route (custody or a projection provider).
     Call { id: u64, call: Call },
 }
 
@@ -93,7 +93,7 @@ pub enum AppHostMessage<Response, Notice, Answer> {
     Notice {
         notice: Option<Notice>,
     },
-    /// The answer to one custody call, by its id.
+    /// The answer to one typed route call, by its id.
     Answer {
         id: u64,
         answer: Answer,

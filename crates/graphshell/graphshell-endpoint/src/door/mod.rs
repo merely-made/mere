@@ -10,7 +10,9 @@
 //! envelopes and synchronous framing. `door-native` adds the shared local
 //! connection; `door-serve` adds the native listener and serving machinery.
 //! `custody`, `custody-client`, `projection-door` and `profile` select their
-//! respective types and clients on native Unix and Windows. The Djinn broker
+//! respective types and clients on native Unix and Windows. `projection-offer`
+//! adds portable provider messages; `projection-provider` adds their native runner.
+//! The Djinn broker
 //! owns the serving policy and session loops.
 //!
 //! A local socket or named pipe establishes a same-user boundary. Application
@@ -67,3 +69,8 @@ pub mod quarantine;
 pub mod resident_mere_proxy;
 pub mod route;
 pub mod wire;
+
+#[cfg(feature = "projection-offer")]
+pub mod projection_offer;
+#[cfg(all(feature = "projection-provider", any(unix, windows), not(target_arch = "wasm32")))]
+pub mod projection_provider;
