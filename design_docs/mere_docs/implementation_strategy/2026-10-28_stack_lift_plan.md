@@ -1,6 +1,6 @@
 # Stack lift: Graphshell component extraction
 
-**Status:** 2026-10-29: status corrected; cut on 2026-10-28 from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. P6's Knot second-host adoption is committed locally and qualified on 2026-10-29; it has not been pushed. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
+**Status:** 2026-10-30: publication updated; cut on 2026-10-28 from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. P6's Knot second-host adoption is published at `3e380e2`, with current merged-source receiving gates and the original source-bound native qualification recorded separately below. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
 
 **For:** extracting from the Graphshell port (about 100k lines) the parts other applications want without taking the whole port. It began when Mark noticed the reference host's size and asked what could be generalised; Knot, Cleromancy and Woodshed want its interactive capabilities, and Woodshed's own survey asks whether Mere extracts the canvas controls and editors into native-buildable crates with Woodshed as second native consumer. Each phase names a home, a prerequisite and a second-host receipt; a phase that lands code ends with that receipt, and a receipt in this repository's tests does not stand in for the other repository's build.
 Not here: the Graphshell one-tree cutover and the reference host's own phases, `2026-10-28_graphshell_host_plan.md`; the facet dissolution brief's ruling and the resident-host port that replaces `product.rs` operations with Pandect `LiveCommand` values, `2026-10-28_graph_semantics_plan.md` (the brief's owner); the Eidetic development plan's P0 inventory, which takes `capture` (Eidetic repository); SE13, SE24, SE46 to SE51 and SE78 (gestures, command-menu verb ids), `2026-10-28_scenograph_editor_plan.md`; `appearance`, which stays in Graphshell (R6) with Tabard's division in `2026-10-28_appearance_plan.md`; custody isolation, `2026-10-28_custody_plan.md`; Woodshed's manifest repins, the Woodshed lane.
@@ -58,7 +58,7 @@ Woodshed publishes the practice host dataset; `practice_disclosure` loses the Wo
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:241-252`
 
-### P6. Forme: Knot second-host adoption (complete locally)
+### P6. Forme: Knot second-host adoption (published 2026-10-30)
 `platen::workspace::FormeSession` now drives Knot's actual workspace layout draft,
 with View/menu-palette commands for Unlock, first-pane more/less space, Discard
 and Apply. Knot keeps document sessions, focus, source undo and local persistence;
@@ -69,16 +69,27 @@ allow different runtime tile allocation on reopen; scratch instances and changed
 reading pins do not inherit another binding's saved layout. Unlock preserves the
 host's focused document when saved active-tab geometry is restored.
 
-The implementation is local Knot commit `2924a5f`. Its receiving tests cover the
+The original 2026-10-29 implementation was local Knot commit `2924a5f`. Its receiving tests cover the
 shared session, real source Edit/Undo through layout Discard, focus, failed saves
 and responsive compact-to-wide recovery. Native review covers explicit layout
 authoring, a fresh process loading the same pinned-reading layout on Unlock, and
 default compact presentation. The receiving record is
 [`knot-editor/docs/receipts/2026-10-29_forme_workspace/README.md`](https://github.com/merely-made/knot-editor/blob/2924a5f1571f010bb9eb7692d6767117f3dff8ef/docs/receipts/2026-10-29_forme_workspace/README.md).
 
+**Publication update, 2026-10-30:** Knot `main` is published at
+[`3e380e2`](https://github.com/merely-made/knot-editor/blob/3e380e21fd1453d91e121b8539e07474d3e50d64/docs/receipts/2026-10-29_forme_workspace/README.md).
+The merged runtime `a256eede` preserves upstream source and supplier pins;
+locked/offline desktop library, menu/responsive, all-target and binary-build gates
+passed on that cohort. The additional native repeat is unqualified: the console
+session was locked, with zero presented frames and captures. The original native
+qualification remains bound to implementation `2924a5f` and its original receipt;
+publication does not relabel it as native acceptance of the merged cohort.
+The [publication verification](https://github.com/merely-made/knot-editor/blob/3e380e21fd1453d91e121b8539e07474d3e50d64/docs/receipts/2026-10-29_forme_workspace/publication-20261030/verification.json)
+records those separate outcomes.
+
 - Done when: the second host unlocks, drafts, discards and applies a forme through the lifted session. **Met by Knot.**
 - Remaining UI scope: Frisket pointer resizing, tab drags, new splits, floats, layout-undo controls and automatic source-session reopening are separate follow-ups. Responsive presentation may constrain the visible fractions to protect the writing measure; it does not rewrite the saved canonical layout.
-- Needs: no further second-host prerequisite for P6; publication remains separate.
+- Needs: no further second-host prerequisite for P6; publication is verified.
 - Rulings: R2
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:235-240,536-541,1733-1755`; Knot's receiving record above.
 
@@ -137,3 +148,5 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - 2026-10-29: source-checked Knot's existing option-helper adoption; retained L4b as the separate whole-definition reducer receipt.
 
 - 2026-10-29: P6 second-host adoption completed locally in Knot (`2924a5f`), with coordinated source review, receiving tests and bounded native/fresh-process qualification; no push.
+
+- 2026-10-30: P6 published on Knot `main` at `3e380e2` after merging current upstream and passing receiving gates. The original native qualification remains source-bound; the locked-console repeat is unqualified, as recorded in the publication update above.
