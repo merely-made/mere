@@ -184,7 +184,7 @@ every copy is one more edge for a move to carry.
     (`CUSTODY_APPS`, ten labels), `bin/djinn.rs:1284` and
     `embedded_reservoir.rs`.
   - Routes are registered and granted by label (`bin/djinn.rs:1243-1335`).
-  - The door's `AppMessage` (`graphshell-endpoint/src/door/wire.rs:55`) is
+  - The door's `AppMessage` (`graphshell-endpoint/src/door/wire.rs:62`) is
     Connect, Request, TakeNotice, WaitNotice or Call. No message lets an app
     offer a projection.
 - Djinn and Cleromancy form a repository cycle:
@@ -300,7 +300,8 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
 - The lines between homes follow four contracts that the stack doesn't have
   yet:
   - a persona and custody client that isn't part of the projection protocol;
-  - an app manifest that the door carries;
+  - an app manifest that the door carries (since 2026-10-30, M1 of the
+    [capability door plan](../implementation_strategy/2026-10-30_capability_door_plan.md));
   - a settings mechanism with one scope vocabulary;
   - one graph edit spine.
 
