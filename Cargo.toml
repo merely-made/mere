@@ -501,6 +501,7 @@ stickleback = { version = "0.1.1", git = "https://github.com/merely-made/eidetic
 # Named through the `www` alias; see the Murm patch table below.
 murm = { version = "0.0.1", git = "https://github.com/merely-made/murm.git", branch = "main" }
 transport = { package = "mere-transport", version = "0.0.2", git = "https://github.com/merely-made/murm.git", branch = "main" }
+murm-ocapn = { version = "0.1.0", git = "https://github.com/merely-made/murm.git", branch = "main" }
 # The Wasm-clean half of the browser WebRTC carrier: bounded frames, invite
 # ids, role-tagged DTLS fingerprints, and the link-challenge transcript that
 # derives Notochord's `shared_link`. It depends on neither `transport` nor

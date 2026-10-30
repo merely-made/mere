@@ -157,6 +157,70 @@ keeps opened bytes and feedback local to each reading. The separate
 using signed, public in-memory fixtures. It installs no activity owner. See
 the [host continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#admitted-graphshell-resource-mount-2026-10-12).
 
+## Optional live collection interaction
+
+The `ocapn-coop` feature adds `ocapn_coop` over a stream already secured and
+admitted by Murm/Notochord. It registers no endpoint or discovery service.
+The ordinary port remains usable without this runtime or Gemot governance.
+The protocol is the bounded OCapN suite profile identified by
+`mere/gemot-coop/ocapn-suite-31f0b806/v1`.
+
+`MootSessionAuthority::from_admitted` takes the actual secure admission result
+and expected network. Its immutable subject and admission epoch enter the
+runtime through host-supplied `SessionAuthority`; Syrup arguments cannot supply
+or change them. Construct a fresh `session_object` and runtime authority context
+for each admission. A previous object's subject or epoch cannot acquire a new
+session's authority. The service's `mere.gemot` / `/services/gemot-coop` /
+`connect` grant permits adapter use only.
+
+`CollectionOwner` owns one configured collection and serializes its actual
+`Moot`, host signing identity and current admission revocation ledger. Every
+view, proposal and callback emission checks retained session authority, current
+Moot membership and the current signed typed collection grant/delegation.
+Read members can view; proposals additionally need Write access. The host signs
+an accepted membership change under its own checked Gemot authority, and the
+receipt separately names `submitted_by`, `authored_by`, admission epoch and the
+ordinary operation hash. Exact collection heads make a repeated or stale
+proposal fail; reconnect never automatically replays a mutation.
+
+The callable methods are `view`, `subscribe` with a callback capability,
+`unsubscribe` with its returned id, and `set-membership` with one bounded JSON
+`MembershipProposal`. They expose no arbitrary records, collection selectors,
+clocks, subject claims, evaluator or method reflection. View and receipt
+records contain bounded JSON bytes. Views reuse `coop::LifecycleReport` as the
+owner's current reading, with no new lifecycle authority.
+
+The host must ingest membership, constitution, delegation and revocation
+updates through `host_update` under the same coordinator. Mutating cloned
+underlying stores outside it breaks the stated serialization contract. After
+an update, `emit_current` repeats current membership/typed-grant authorization
+at a fresh clock reading and checks retained-session lapse immediately before
+synchronous bounded callback queue insertion; it never waits for a peer reply. An emission
+already admitted to that queue may finish in flight after a later revocation;
+subsequent emissions fail closed. Queue refusal drops that subscription.
+Callback references and disconnect watchers have per-owner and per-session
+ceilings, and session closure removes the retained callback references.
+Reads and proposals authorize at their captured owner-clock reading under the
+coordinator. Already-authorized work may finish if time advances or the remote
+disconnects during its existing domain operation. The direct `read` and
+`propose` APIs are trusted host paths; remote calls use the bound session object,
+which also checks runtime session lifetime.
+
+Accepted proposals return Gemot's normal command receipt and outbound operation.
+The configured nonblocking `PublicationHook` offers them to the host's existing
+publication path; it creates no second durable store. A queue refusal is
+reported in the receipt, while the committed operation remains recoverable
+through `Moot::outbound`. The trusted hook must itself perform bounded,
+nonblocking work. Submitter attribution belongs to the returned/local receipt;
+Gemot's ordinary durable history records the host author. Retaining the
+submitter receipt uses the host's existing audit/publication path.
+
+`testing/moot-ocapn-coop` is an isolated source consumer for the adapter, using
+real signed Gemot operations and independent replica intake. It avoids the
+port's unrelated browser/rendering dev dependencies. The canonical phase and
+qualification boundaries live in
+`murm/design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`.
+
 ## License
 
 MPL-2.0
