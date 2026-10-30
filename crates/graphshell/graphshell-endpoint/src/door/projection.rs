@@ -124,7 +124,11 @@ impl AppBrokerClient {
                 .await?;
             cards.push(DeviceCard {
                 label: offer.semantics.label.clone(),
-                card: serde_json::from_slice(&bytes).map_err(|_| AppClientError::MalformedCard)?,
+                card: serde_json::from_slice(&bytes).map_err(|_| {
+                    AppClientError::InvalidResponse(
+                        "a card resource was not valid PortableCardV1 JSON".into(),
+                    )
+                })?,
             });
         }
         Ok(cards)
@@ -269,34 +273,36 @@ fn accept_resource_chunk(
     total: &mut Option<u64>,
 ) -> Result<Option<Vec<u8>>, AppClientError> {
     if &response.session != session || response.resource != resource {
-        return Err(AppClientError::InvalidResourceAddress);
+        return Err(AppClientError::InvalidResponse(
+            "resource scope or content address mismatch".into(),
+        ));
     }
     if response.total_len > MAX_APP_RESOURCE_BYTES
         || total.is_some_and(|size| size != response.total_len)
     {
-        return Err(AppClientError::InvalidResourceChunk(
+        return Err(AppClientError::InvalidResponse(
             "inconsistent or excessive total length".into(),
         ));
     }
     let bytes = response
         .decode()
-        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk address or encoding".into()))?;
+        .ok_or_else(|| AppClientError::InvalidResponse("chunk address or encoding".into()))?;
     let end = response
         .offset
         .checked_add(bytes.len() as u64)
-        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk length overflow".into()))?;
+        .ok_or_else(|| AppClientError::InvalidResponse("chunk length overflow".into()))?;
     if bytes.len() > chirograph::MAX_RESOURCE_CHUNK_BYTES as usize
         || end > response.total_len
         || (bytes.is_empty() && response.offset < response.total_len)
     {
-        return Err(AppClientError::InvalidResourceChunk(
+        return Err(AppClientError::InvalidResponse(
             "chunk exceeds its bounds or makes no progress".into(),
         ));
     }
     *total = Some(response.total_len);
     assembly
         .accept(response)
-        .map_err(|e| AppClientError::InvalidResourceChunk(e.to_string()))
+        .map_err(|e| AppClientError::InvalidResponse(e.to_string()))
 }
 #[cfg(test)]
 mod resource_boundary_tests {

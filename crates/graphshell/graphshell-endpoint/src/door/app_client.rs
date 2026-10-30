@@ -41,12 +41,8 @@ pub enum AppClientError {
     MismatchedResponse { expected: u64, got: u64 },
     #[error("JSON failed: {0}")]
     Json(JsonDiagnostic),
-    #[error("a card resource was not valid PortableCardV1 JSON")]
-    MalformedCard,
-    #[error("the resident resource has another scope or content address")]
-    InvalidResourceAddress,
-    #[error("the resident resource chunk is invalid: {0}")]
-    InvalidResourceChunk(String),
+    #[error("the resident response is invalid: {0}")]
+    InvalidResponse(String),
     #[error("transport failed: {0}")]
     Io(#[from] std::io::Error),
 }

@@ -242,3 +242,32 @@ Delivery is complete for this boundary and its receiving API migrations.
 The public package owner/name remains unsettled, and the broader relationship
 recipe, retained-process fixture, previous Distillery probe, Windows execution
 and full GUI/browser runtime remain outside the qualified results above.
+
+## Reconciliation of the earlier 7516c6206 review
+
+The Base64 feature defect and empty-key coverage gap were corrected in the
+published series (`972855420` after rebase). Actual sync/async writer failures
+were added in `881383aab`; observed wiping after JSON decode errors followed in
+`3f344e2b4`. The old empty-key exact-wire fixture remains, supplemented by a
+nonempty ReleasedKey round trip and unexpected/mismatched-answer tests checking
+the encoded synthetic seed and every exposed error/source formatting path.
+
+Two cleanup items remained in the delivered source. The neutral AppClientError
+now uses InvalidResponse; projection owns its card/chunk diagnostic reasons.
+No return type, rejection check, package owner or wire format changed. The
+removed projection-specific variants have no remaining live consumers. Root
+crate documentation now describes the separate portable/native features.
+Independent static review found no blocker in this three-file cleanup.
+
+Fresh bounded gates passed:
+
+- `root-split-review-cleanup`: custody DTO-only 26 tests, projection-door 34 tests,
+  and Djinn library check. Log SHA-256:
+  `3630eaab535a672702a3ec784d2d66327405214658ae6dd68c47d39bcd0edede`.
+- `root-split-review-isolated`: the independent custody-types workspace passed
+  its one test with default features disabled and only custody selected; the
+  combined endpoint suite passed 70 tests, including populated-key redaction,
+  failing-writer wiping and observed wiping after JSON failures. Log SHA-256:
+  `2fe323729ee022f5eba9517e7677be0f648d5ad65ee9ddbbe30147e262ac498d`.
+
+These feature suites overlap. Repository and fixture locks remained unchanged.
