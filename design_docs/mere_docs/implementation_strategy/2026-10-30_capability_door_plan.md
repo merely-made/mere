@@ -1,8 +1,12 @@
 # Capability door: app identity, manifests, introduction and WIT contracts
 
-**Status:** 2026-10-30: plan. Nothing is built. Findings were read against
-Mere `56fbdc2e4`, Murm `96e8843e814` and upstream on 2026-10-30; no test was
-run for them.
+**Status:** 2026-10-30, revised the same day (D4): plan. Most of S1 landed
+outside this plan in Mere `c3567c5ab` (application projection offers), and the
+door library moved to Armillary's `djinn` crate (`721e17d`). Knot's M1
+case has landed; I1 comes next, before M1's remaining entries, and C0 waits
+for a component provider someone wants. The first findings
+were read against Mere `56fbdc2e4` and Murm `96e8843e814`, the revision's
+against Mere `94c1bd1a3` and Armillary `a333f51`; no test was run for them.
 
 **For:** letting applications and components share capabilities with each
 other, on one device and beyond it, without each one carrying the stack.
@@ -119,14 +123,64 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.3, stack.5 · summary Capability interfaces and handles are WIT; bulk data stays Rust types carried as named serde bytes.
 
+- **D4, record what landed; Knot's case, then I1.** `c3567c5ab` built most
+  of S1 (policy offers with leases) seven minutes after this plan. Mark chose
+  "Revise plan, then I1 (Recommended)": the plan records what landed and
+  fixes its stale findings, and C0 waits for a component provider someone
+  wants, since G6's two native applications are served by the offers path
+  without WIT. The same day, in another session, he ruled "Application
+  registration is next, with Knot as the first complete case" (under M1).
+  Asked to reconcile the two, he chose "Knot case stands, then I1
+  (Recommended)": Knot's landed declaration case stays, and I1 comes next,
+  before M1's remaining entries, so later declarations bind to OS identity
+  rather than labels. I1 closes the gap the offers record names ("Same-user
+  AppId labels are not executable authentication").
+
+  Links: area Stack · draws on stack.2 · summary Most of S1 landed as policy offers; Knot's declaration case stands, I1 comes before M1's remaining entries, and C0 waits for a wanted component provider.
+
+- **D5, OCapN is an optional edge profile.** Mark, on the stack as a whole:
+  "Idk if OCapN is ready, or if this proposition coheres in the way we'd
+  hope". He chose "Optional edge profile (Recommended)": `murm-ocapn` stays a
+  pinned, optional profile for interop at the device edge; nothing local
+  depends on it; G1 waits for a named remote consumer and for OCapN's
+  encoding and error types to settle. The Murm runtime stays as built.
+
+  Links: area Stack · draws on stack.1 · summary murm-ocapn is a pinned optional edge profile; nothing local depends on it; G1 waits for a remote consumer and a settled encoding.
+
+- **D6, versioned CBOR for payloads between applications.** Mark chose
+  "CBOR, versioned (Recommended)": projection payloads that cross an
+  application boundary through Djinn are CBOR behind a version, following the
+  data formats brief's line for bytes that cross an ownership boundary. The
+  existing door path keeps JSON. Postcard was rejected because chirograph's
+  internally tagged enums and skipped fields need a self-describing format.
+
+  Links: area Stack · draws on stack.3 · summary Projection payloads crossing an application boundary are versioned CBOR; the existing door path keeps JSON.
+
+- **D7, one home for OS peer facts.** Armillary's door cannot depend on
+  `custody-wire`, which lives in Mere, and the two already duplicate the
+  Windows token reading. Mark chose "Small crate in Armillary
+  (Recommended)": `Peer` and its OS readers move into one small Armillary
+  crate that both the door and `custody-wire` depend on; `custody-wire` keeps
+  its own policy (`ServerExpectation`, consent). The crate's name is open and
+  goes through the naming ledger.
+
+  Links: area Stack · draws on stack.1 · summary OS peer facts move into one small Armillary crate shared by Djinn's door and custody-wire; custody policy stays in custody-wire.
+
 ## Phases
 
 ### C0. One contract, bound both ways
+Held (D4) until a component provider is wanted; G6 no longer needs it.
+
 Write the projection session's control surface (`CarrierRequestBody`'s
 Discover, Open, Resume, Intent, Close and Suspend) as a WIT interface with a
 `projection-session` resource. Snapshots and resource chunks return bytes in
-chirograph's serde form under a named format. Bind it from a native provider
-and consumer, and from a component guest under `app-host`.
+chirograph's serde form as versioned CBOR (D6). Bind it from a native provider
+and consumer, and from a component guest under `app-host`. Before binding,
+the phase settles what the existing contract leaves open: discovery and
+opening apart from methods on an opened session, Resume rechecking authority,
+revocation and cancellation apart from Close and Suspend, and size limits. Flow
+control is already settled: a chunk request acknowledges the previous chunk,
+and notices carry no payload (`crates/chirograph/src/lib.rs:1131-1205`).
 - Done when: the native pair and the component exchange the same calls and
   payloads; the binding route for native code is chosen and the rejected ones
   recorded (Wasmtime's `bindgen!` types, `wit-bindgen-wrpc` over a channel
@@ -135,6 +189,11 @@ and consumer, and from a component guest under `app-host`.
 - Needs: nothing. This phase is in-process; carriage is N1.
 
 ### I1. Identity at the door
+Next (D4). The door now lives in Armillary's `djinn` crate, so this phase
+works in two repositories, Armillary first. Its first step extracts the OS
+peer facts into one small Armillary crate (D7): `custody-wire`'s `Peer`
+(`ports/mere-resident/custodian/wire/src/peer.rs`, 246 lines) and the door's
+same-user check (`crates/djinn/src/door/local_endpoint.rs:300-345`).
 - Done when: the door records each connection's OS peer facts; outside
   development mode it refuses a label that disagrees with them, on macOS
   (signature) and Windows (image); Djinn launches Linux applications with a
@@ -159,7 +218,14 @@ custody salt namespaces and persona use. Djinn routes from the declarations.
 
 ### S1. Applications serve routes
 The door's missing message: an application offers a route (a projection or
-another service) into Djinn's catalog.
+another service) into Djinn's catalog. Mostly built for projections in
+`c3567c5ab`
+([application projection offers](2026-10-30_app_projection_offers.md)):
+`ProviderCall` Offer, Next and Withdraw over the reserved
+`mere.projection-provider` route, owner-set provider permissions apart from
+viewer grants, and generation-bound leases withdrawn on disconnect, revocation
+or timeout. What remains is driving those permissions from M1's manifests and
+serving routes other than projections.
 - Done when: a route one application serves is reachable by a second
   admitted application through Djinn, and is withdrawn when the serving
   application disconnects.
@@ -186,6 +252,8 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
 - Needs: C0.
 
 ### G1. The gateway to Murm
+Deferred (D5) until a remote consumer is named and OCapN's encoding and
+error types settle.
 - Done when: a route served on one device is invoked from a peer through
   `murm-ocapn`, and a peer's object reaches a local application as a channel;
   both sides agree on session scope, breaking on disconnect, deliver versus
@@ -195,6 +263,10 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
 
 ## Open questions
 
+- **Which authority computes the effective grant.** Notochord admission,
+  Djinn's route and provider policy, insigne and Servitor delegations, Gemot
+  membership and, at the edge, OCapN references all bear on authority. The
+  intersection rule needs a named owner before G1.
 - **How native code binds WIT.** C0 decides.
 - **The WIT package:** extend `mere:script` or open a sibling package. Mark's
   2026-10-28 preference applies: "redefine existing names instead of minting
@@ -220,7 +292,8 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   (`crates/graphshell/graphshell-endpoint/src/door/app_admission.rs:22-28`).
   `AllowedAppRoutes::default` admits only Turnstone (`:255`), and
   `AppMessage` has no message by which an application offers a route
-  (`door/wire.rs:62`).
+  (`door/wire.rs:62`). Superseded the same day: see the revision's findings
+  below.
 - 2026-10-30: Djinn grants routes by label in code: identity, Knot, site,
   devices, status, control, custody, reservoir, chronicle and inference
   (`ports/mere-resident/src/bin/djinn.rs:1245-1339`). `CUSTODY_APPS` lists ten labels
@@ -245,8 +318,11 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   (`ports/moot/examples/capsule-library/native.rs`).
 - 2026-10-30: chirograph is 2,019 lines with 63 serde types, using
   `BTreeMap` fields and boxed variants (`crates/chirograph/src/lib.rs`). WIT
-  has no map type and no recursive types (component-model `WIT.md`: "Types,
-  however, cannot be recursive").
+  has no recursive types (component-model `WIT.md`: "Types, however, cannot
+  be recursive"). The map half needs a version: WASI 0.3.1 (2026-08-11)
+  adopted the component model's `map<K, V>`
+  ([WASI roadmap](https://wasi.dev/roadmap)); WASI 0.2 and Wasmtime 45's
+  hosts here predate it.
 - 2026-10-30: Genet vendors ipc-channel 0.22 with its in-process backend as
   the default, because the OS backend's `windows` 0.61 pin collided with
   wgpu-hal's 0.62 (Genet `Cargo.toml`, `support/patches/ipc-channel`).
@@ -259,13 +335,39 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   WASI on 2026-08-24 and `wasi:webgpu` is at Phase 2. OCapN's "a finish line"
   milestone has ten issues open and none closed, among them its encoding,
   ordering guarantees and error types.
-
 - 2026-10-30: the `mark-ik/arboard` custom-formats fork no longer exists, so
   any graph resolving Genet's clipboard failed (Turnstone, Hocket). Genet
   `b7c0bef` returns `genet-clipboard` to arboard 3.7: one primary
   representation per write, custom formats reported `Unsupported`. Hocket
   (Woodshed `e1d93b0`) keeps copied loop audio host-locally, so audio paste
   works only inside one running Hocket.
+- 2026-10-30, revision: `c3567c5ab` ("Admit application projection offers
+  through leased resident routes", 01:52, seven minutes after this plan)
+  added the provider route, owner policy and leases S1 describes, for
+  projections (`ports/mere-resident/src/door/projection_offers.rs`,
+  `crates/graphshell/graphshell-endpoint/src/door/projection_offer.rs`).
+  `675540865` then moved the neutral door modules (`app_admission`, `wire`,
+  `frame`, `local_endpoint`, `app_client`, the custody modules) to Armillary's
+  `djinn` 0.0.3, pinned at `721e17d`
+  (`armillary/design_docs/armillary_docs/implementation_strategy/2026-10-30_djinn_ownership.md`);
+  Mere's resident composition is `ports/mere-resident` (renamed from
+  `ports/djinn` in `28a39cef2`).
+- 2026-10-30, revision: the Armillary door checks only that a peer is the
+  same user (a 0600 socket on Unix, SID equality on Windows,
+  `crates/djinn/src/door/local_endpoint.rs:300-345`) and keeps no peer
+  facts; `door/server.rs` admits by the `AppId` and declaration in the
+  hello. Unchanged at `a333f51`, the revision Mere now pins.
+- 2026-10-30, revision: the door's wire is JSON lines (`CarrierOutput` is
+  `#[serde(untagged)]`), and chirograph uses internally tagged enums
+  (`#[serde(tag = "type")]`, `lib.rs:927`) and `skip_serializing_if`.
+  Postcard cannot decode either; CBOR can (D6).
+- 2026-10-30, revision, upstream: OCapN agreed on 2026-08-11 to replace
+  Syrup with a new binary encoding
+  ([ocapn#275](https://github.com/ocapn/ocapn/issues/275), draft PR #284);
+  its varint, tag layout and in-band promise and error forms are open. The
+  "first consensus draft" milestone shows one issue closed; "a finish line"
+  shows ten open. Murm's plan already records this and keeps its pinned
+  `ocapn-suite-31f0b806` Syrup profile (D5).
 
 ## Progress
 
@@ -282,3 +384,7 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   `djinn-site` is gone. Remaining for M1: the other applications' entries,
   salt namespaces in declarations, `reservoir_applications()` for the
   embedded reservoir owner, the MCP door's Retinue ban, and I1.
+- 2026-10-30: revised after `c3567c5ab` and the Armillary move (D4 to D7):
+  S1 marked mostly built, I1 next before M1's remaining entries, C0 held,
+  G1 deferred, payloads CBOR, and the OS peer facts homed in one Armillary
+  crate.
