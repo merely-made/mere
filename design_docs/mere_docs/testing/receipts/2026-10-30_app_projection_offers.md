@@ -4,7 +4,11 @@ Source base: Mere `59d87099c`, after fetching and incorporating documentation-on
 upstream changes over the qualified code base `56fbdc2e4`. This extends the reviewed custody/projection feature boundary.
 The source hashes, commands, resource caps and verified log SHA-256 values are in
 [qualification.json](../../../../support/receipts/app-projection-offers-20261030/qualification.json).
-Retained executor logs live under `/home/markik/Code/testing/custody-contract-20261029`.
+Supplier code was published in Mere `c3567c5ab`; the current supplier head is
+`46e339b118565c0b46c821fe741659cb302eae52`. Knot published its provider CLI
+baseline as `63ba1b9c61cb119053c7460abe497a3285b2fdba`. Retained supplier
+executor logs live under `/home/markik/Code/testing/custody-contract-20261029`;
+Knot consumer logs live under `/home/markik/Code/testing/djinn-ownership-20261030`.
 
 ## Behavior
 
@@ -18,8 +22,11 @@ The native integration uses arbitrary provider/viewer labels and a real Knot
 directory, without an app-specific Djinn registration. It reads a snapshot and
 resource, checks provider/viewer denial, revokes live sessions, observes provider
 disconnect and replacement, and checks raw idle-viewer EOF. A provider capacity
-refusal leaves its existing viewer usable. The standalone Knot CLI intake is
-pending publication of this supplier; this receipt does not yet qualify that binary.
+refusal leaves its existing viewer usable. The standalone Knot CLI provider intake is published in Knot `63ba1b9c`. It
+uses the explicit `projection-provider` feature, offers a read-only directory
+under a caller-selected non-`knot` route, and opens a separate endpoint for each
+admitted viewer. Focused CLI tests passed 4/4; the existing `peers` feature
+continues to serve the stdio modes.
 
 ## Verification
 
@@ -65,6 +72,12 @@ locked revisions. The workspace lock changes only three stale source identities
 (chatelaine, dramatis and gaz) to the already-resolved Dramatis cohort. Every
 upstream registry dependency selection is retained; the edge audit is retained
 in `testing/app-projection-offers-20261030/cohort-reconcile-edges.json`.
+
+The Knot narrow-lock audit compares 1,363 package entries. It preserves all
+package versions, checksums and dependency edges; only 52 Mere package identities
+move from source revision `c6290142866eefead385e728c5c5da24ac6f624a` to
+`46e339b118565c0b46c821fe741659cb302eae52`. The audit and consumer gate receipts
+are recorded in `qualification.json`.
 
 All heavy gates use the shared machine lock, MemoryMax=3G, zero swap, 150% CPU,
 one Cargo job, one test thread, and the existing ten-minute per-run cap. Lock wait
