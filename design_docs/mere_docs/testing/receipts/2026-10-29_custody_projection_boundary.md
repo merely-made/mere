@@ -1,6 +1,6 @@
 # Custody and projection dependency boundary
 
-Status: Implemented; supplier and local cohort qualification passed; published receiver integration in progress.
+Status: Implemented and published; endpoint and unpatched broker qualification passed. External receiving checks are recorded separately.
 
 This slice makes custody independently buildable inside the existing
 `graphshell-endpoint` package. It does not settle the eventual public package
@@ -159,3 +159,29 @@ local branch `archive/custody-projection-reviewed-20261029` found no differences
 in crates, ports, support, Cargo.toml or Cargo.lock. Review hashes above describe
 the original series: `171bec593` corresponds to `66cdeb368`, `d5d5605e1` to
 `972855420`, and `1047cfc30` to `3f344e2b4` in the rebased publication history.
+
+## Published supplier cohort
+
+The final unpatched broker gate receives Knot
+`704084d064da886dd14cbe8ac3dd8758af105e1d`, Dramatis
+`051e95a68011072f172b9ec4c0f04d4e5259df5b` and Murm
+`1f601488f851c4e54672cd439b7c45728255ea65`. Knot's upstream `d400d0c`
+introduced secure-publishing APIs requiring those Dramatis/Murm revisions;
+its source and pins were preserved when the endpoint migration was rebased.
+The endpoint supplier published to receivers is Mere
+`c6290142866eefead385e728c5c5da24ac6f624a`.
+
+`root-split-published-broker` passed without local overrides: 44 Djinn door
+tests, one custody-payload test, two custody-route tests and five vault-lock
+tests. The retained-process fixture remains explicitly ignored. This includes
+the fresh custody connection while locked, unexpected/released-key responses,
+and browser-wrapper JSON diagnostics. The gate used the same 3 GiB, zero-swap,
+150 percent CPU limits. Log SHA-256:
+`1e48a7b3cd19fdb8f326670558ec372d29e416c366b4ad7a6dc150981f2a436c`.
+
+The root lock changes only the 26 Git package identities from those three
+suppliers. Its resolved edge audit found 28 unchanged-identity owners whose
+supplier targets advanced; no dependency target name or version changed.
+The web lock is unchanged. Earlier local-cohort results above remain bounded
+to their recorded sources; this published-cohort run supersedes their pending
+unpatched broker gate.

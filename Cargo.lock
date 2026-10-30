@@ -2690,7 +2690,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "serde",
  "uuid",
@@ -5063,7 +5063,7 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "gaz",
  "personae",
@@ -5393,7 +5393,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics"
 version = "0.8.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "az",
  "byteorder",
@@ -5405,7 +5405,7 @@ dependencies = [
 [[package]]
 name = "embedded-graphics-core"
 version = "0.4.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "az",
  "byteorder",
@@ -6324,7 +6324,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "insigne",
  "muniment",
@@ -8523,7 +8523,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "blake3",
  "ed25519-dalek 3.0.0",
@@ -9274,7 +9274,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "knot-catalog",
 ]
@@ -9282,7 +9282,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9295,7 +9295,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9315,7 +9315,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "cambium",
  "illume",
@@ -9332,7 +9332,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -9401,7 +9401,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e2251698bada90d20cc0eb19551841339376f9a"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10598,7 +10598,7 @@ dependencies = [
 [[package]]
 name = "mere-transport"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
@@ -10958,7 +10958,7 @@ dependencies = [
 [[package]]
 name = "murm"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "async-trait",
  "blake3",
@@ -10981,7 +10981,7 @@ dependencies = [
 [[package]]
 name = "murm-webrtc"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "blake3",
  "futures-channel",
@@ -10998,7 +10998,7 @@ dependencies = [
 [[package]]
 name = "murm-wire"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "bytes",
  "futures-util",
@@ -11694,7 +11694,7 @@ dependencies = [
 [[package]]
 name = "notochord"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "blake3",
  "insigne",
@@ -12720,7 +12720,7 @@ dependencies = [
 [[package]]
 name = "outrider"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "hkdf 0.13.0",
  "retinue",
@@ -13663,7 +13663,7 @@ dependencies = [
 [[package]]
 name = "personae"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
 dependencies = [
  "blake3",
  "chacha20poly1305 0.11.0",
@@ -14295,7 +14295,7 @@ dependencies = [
 [[package]]
 name = "postilion"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "getrandom 0.3.4",
  "heapless 0.9.3",
@@ -14793,7 +14793,7 @@ dependencies = [
 [[package]]
 name = "radio-face"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "embedded-graphics",
 ]
@@ -14801,7 +14801,7 @@ dependencies = [
 [[package]]
 name = "radio-hand"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "heapless 0.9.3",
  "hmac 0.13.0",
@@ -15481,7 +15481,7 @@ dependencies = [
 [[package]]
 name = "retinue"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -16260,7 +16260,7 @@ checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 [[package]]
 name = "selvage"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 
 [[package]]
 name = "semver"
@@ -16281,7 +16281,7 @@ checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
 [[package]]
 name = "seneschal"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "heapless 0.9.3",
@@ -18474,7 +18474,7 @@ checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 [[package]]
 name = "tulle"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/murm.git?branch=main#4ba804b3a52af2de43b659aa16d9ed99c16a94d9"
+source = "git+https://github.com/merely-made/murm.git?branch=main#1f601488f851c4e54672cd439b7c45728255ea65"
 dependencies = [
  "selvage",
  "serial2-tokio",
