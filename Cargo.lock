@@ -1133,7 +1133,7 @@ dependencies = [
  "bitflags 2.13.2",
  "cexpr",
  "clang-sys",
- "itertools 0.12.1",
+ "itertools 0.11.0",
  "lazy_static",
  "lazycell",
  "log",
@@ -1156,7 +1156,7 @@ dependencies = [
  "bitflags 2.13.2",
  "cexpr",
  "clang-sys",
- "itertools 0.12.1",
+ "itertools 0.11.0",
  "log",
  "prettyplease 0.2.37",
  "proc-macro2",
@@ -2387,7 +2387,7 @@ dependencies = [
  "cap-primitives",
  "cap-std",
  "io-lifetimes",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2416,7 +2416,7 @@ dependencies = [
  "maybe-owned",
  "rustix 1.1.5",
  "rustix-linux-procfs",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
  "winx",
 ]
 
@@ -2881,7 +2881,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -4471,7 +4471,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c54e03a951783e8b327515db3f2a2fd0e3bed362a96b066f341ce66ed49b4ead"
 dependencies = [
  "data-encoding",
- "syn 3.0.6",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -4824,27 +4824,6 @@ dependencies = [
 [[package]]
 name = "djinn"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
-dependencies = [
- "base64 0.22.1",
- "chatelaine",
- "dramatis",
- "eidetic",
- "insigne",
- "personae",
- "rand_core 0.6.4",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
- "tokio",
- "tracing",
- "uuid",
- "zeroize",
-]
-
-[[package]]
-name = "djinn"
-version = "0.0.3"
 source = "git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
 dependencies = [
  "armillary",
@@ -5039,7 +5018,7 @@ dependencies = [
  "cambium",
  "cambium-desktop",
  "chatelaine",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "dramatis",
  "image",
  "luggage",
@@ -5640,7 +5619,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6105,7 +6084,7 @@ checksum = "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a"
 dependencies = [
  "io-lifetimes",
  "rustix 1.1.5",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -7241,7 +7220,7 @@ dependencies = [
  "chirograph",
  "cue-netrender",
  "distillery",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "dramatis",
  "eidetic",
  "gemot",
@@ -7337,7 +7316,7 @@ name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "dramatis",
  "insigne",
  "personae",
@@ -7354,7 +7333,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
@@ -7379,7 +7358,7 @@ name = "graphshell-mcp"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "graphshell-endpoint",
  "sceno",
  "scenotime",
@@ -7394,7 +7373,7 @@ dependencies = [
  "cambium-desktop",
  "cambium-rootstock",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
@@ -8545,7 +8524,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2285ddfe3054097ef4b2fe909ef8c3bcd1ea52a8f0d274416caebeef39f04a65"
 dependencies = [
  "io-lifetimes",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -8670,7 +8649,7 @@ dependencies = [
  "bytes",
  "cfg_aliases",
  "chrono",
- "constant_time_eq 0.4.2",
+ "constant_time_eq 0.1.5",
  "data-encoding",
  "derive_more",
  "genawaiter",
@@ -9228,7 +9207,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "knot-catalog",
 ]
@@ -9236,7 +9215,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9249,7 +9228,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9269,7 +9248,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "cambium",
  "illume",
@@ -9286,13 +9265,13 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "base64 0.22.1",
  "blake3",
  "chartulary",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868)",
+ "djinn",
  "dramatis",
  "eidetic",
  "esp",
@@ -9357,7 +9336,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#3e089ba1540224f1d279e00211bfcaa65e5e8065"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10428,7 +10407,7 @@ name = "mere-overmap"
 version = "0.1.0"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "graphshell-client",
  "graphshell-endpoint",
  "hest",
@@ -10544,7 +10523,7 @@ dependencies = [
  "cleromancy-core",
  "custody-wire",
  "distillery",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "djinn-custodian",
  "djinn-testkit",
  "dramatis",
@@ -13081,7 +13060,7 @@ dependencies = [
  "oxiri",
  "oxrdf",
  "ryu-js",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -13094,7 +13073,7 @@ dependencies = [
  "oxiri",
  "oxsdatatypes",
  "rand 0.9.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -13104,7 +13083,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "034779b2d182d5069cd28b1f921ba334cad708ab1340db9776312464b6874b78"
 dependencies = [
  "js-sys",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -13117,7 +13096,7 @@ dependencies = [
  "oxilangtag",
  "oxiri",
  "oxrdf",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -14572,7 +14551,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.11.0",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -14809,7 +14788,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15841,7 +15820,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15854,7 +15833,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15922,7 +15901,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -17007,7 +16986,7 @@ dependencies = [
  "memchr",
  "oxrdf",
  "quick-xml 0.37.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -17026,11 +17005,11 @@ dependencies = [
  "regex",
  "rustc-hash 2.1.3",
  "sha1 0.11.0",
- "sha2 0.11.0",
+ "sha2 0.10.9",
  "sparesults",
  "spargebra",
  "sparopt",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -17044,7 +17023,7 @@ dependencies = [
  "oxrdf",
  "peg",
  "rand 0.9.5",
- "thiserror 2.0.21",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -17274,7 +17253,7 @@ name = "station-custody"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
+ "djinn",
  "dramatis",
  "insigne",
  "outrider",
@@ -17789,10 +17768,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.5",
- "windows-sys 0.60.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -20496,7 +20475,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -21019,7 +20998,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f3fd376f71958b862e7afb20cfe5a22830e1963462f3a17f49d82a6c1d1f42d"
 dependencies = [
  "bitflags 2.13.2",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
