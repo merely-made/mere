@@ -184,6 +184,91 @@ listener shutdown does not prove; the generic Gopher adapter drops Plus request 
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-10-20_shared_site_model_plan.md:359-364,470-473`
 
+### P10. Portable reader verification (2026-10-29)
+
+**Status:** implemented and locally checked, 2026-10-29. The first proof uses
+complete evidence files and isolated reader processes; discovery, remote acquisition, custody acknowledgements and
+physical-device failover remain follow-ons.
+
+C's independently configured trust anchor is the Moot founder public key plus
+Moot/collection identity (`CollectionRef`). A provider cannot replace that anchor.
+C also supplies its evaluation time, retention posture and byte/record limits.
+B supplies a complete public Gemot native drop (constitution, membership,
+delegation and object/collection history as required by Gemot's export), plus
+canonical snapshot V1 bytes. Neither side needs the author's private key to
+verify or re-serve this evidence. Exporting a whole public drop may disclose
+other public records in that Moot; selective evidence export is deferred.
+
+The API is `mere_site::publication::reader::verify_reader_evidence`, behind the
+existing `publication` feature. `ReaderTrust` carries the founder and collection;
+`ReaderLimits` bounds history bytes and native-drop records. The provider evidence
+is two byte slices: native drop and canonical V1 snapshot. `VerifiedPublication`
+returns the opened site, evaluation time and `EvidenceScope::SuppliedHistoryOnly`.
+
+The reader imports into a fresh, disposable in-memory Moot under the trusted
+founder, uses Gemot's authorized collection fold to resolve exactly one effective
+site contribution, and checks that its manifest names the supplied canonical
+snapshot bytes. It retains the verified content only in disposable local storage
+and opens through the existing publication adapter. No membership is authored,
+no signing key is supplied, and no provider-selected release or clock is trusted.
+Incomplete, invalid, ambiguous, withdrawn, expired or mismatched evidence refuses
+when the existing authority path cannot establish an effective selection.
+
+A successful result explicitly means **valid under supplied history**. It cannot
+prove that a provider supplied all newer authority/revocation records. Each call
+starts empty and has no remembered frontier, so it does not provide known-rollback
+protection; P11 adds a separate persistent reader history owner. The snapshot V1
+schema version is never a release sequence. Provider discovery and TLS identity
+remain separate from this publication trust anchor.
+
+- Done when: a cold child process verifies evidence re-exported by B after A and
+  B's live objects are dropped; altered bytes, wrong anchors/collections, missing
+  authority, invalid signed records, ambiguous selections, known withdrawal and
+  bounded-input failures refuse; an older valid evidence set succeeds with its
+  explicit freshness limitation. The proof covers Gemini, Scroll and Micron.
+- Continuation: P11 implements remembered reader observations and rollback refusal.
+  Follow-ons: minimal public authority export; transport framing/acquisition; daemon evidence delivery and
+  exact-release custody acknowledgement; independent-machine serving.
+
+### P11. Remembered reader authority (2026-10-30)
+
+**Status:** implemented and locally checked, 2026-10-30. Extend P10 with a
+caller-owned transactional Muniment store partitioned by the full
+founder/Moot/collection trust anchor.
+
+The API is `mere_site::publication::reader::history::ReaderHistory`. Its
+`observe` method commits admitted history without requiring content, while
+`verify` observes first and opens a snapshot against the merged history. A
+successful read returns `EvidenceScope::SuppliedAndRememberedHistory`.
+
+The reader reimports remembered Gemot evidence and the provider's complete drop
+into disposable stores, then persists their re-exported union. It does not rank
+releases by timestamp, schema version or a provider counter. A missing newer
+operation in the incoming drop cannot remove an observed replacement, withdrawal,
+revocation or conflict from the local authority fold.
+
+Authority observation commits independently of content verification: valid new
+history remains remembered even if the requested snapshot is missing, invalid or
+no longer selected. Invalid imports and failed storage commits produce no new
+observation. State metadata and full evidence bytes commit atomically with a
+comparison against the previously read pair; concurrent writers retry rather
+than overwrite a newer observation. Both reads use transactional snapshots.
+Persist the reader's evaluation-time high-water mark and refuse a backwards
+clock; this is local policy, not a publication sequence.
+
+Success still cannot establish global newest state. Remembered history survives
+ordinary process restart but relies on the host preserving the local store:
+deletion or replacement of the entire store with an older valid backup is outside
+this proof. Corrupt or incomplete state refuses instead of resetting silently.
+Full retained history remains bounded; exceeding capacity refuses without pruning.
+
+- Done when: a fresh process reopens reader storage and refuses an older snapshot
+  after replacement; observation of withdrawal/revocation persists even when the
+  associated page read refuses; malformed evidence, corrupt storage, failed writes,
+  capacity, backwards time and concurrent stale commits cannot weaken memory.
+- Follow-ons: host adoption, protected local storage/backup policy, selective
+  evidence retention/checkpoint handling, acquisition/discovery and device proof.
+
 ## Open questions
 
 - Does the `djinn 0.0.2` entry gate bind this service? The ordinary Gemini service shipped on 2026-09-13 without passing
@@ -202,6 +287,34 @@ listener shutdown does not prove; the generic Gopher adapter drops Plus request 
   preferences introduce no variant negotiation. Is it to be designed, and by whom? From: `archive_docs/2026-10-28/2026-10-20_shared_site_model_plan.md:383-385,468-469`
 
 ## Findings
+
+- 2026-10-30: `crates/domain/site/src/publication/reader/history.rs` retains a
+  bounded full-evidence union plus trust identity, digest and evaluation-time
+  high-water mark in one Muniment transaction. It imports into disposable Gemot
+  stores, commits admitted authority before content verification, and compares
+  both stored records before writing. Final read validation refuses a concurrent
+  observation. `crates/domain/site/tests/reader/remembered.rs` covers Redb-backed
+  process reopen, remembered replacement/withdrawal/revocation/conflict, invalid
+  evidence and content, clock rollback, corrupt/incomplete state, transaction
+  refusal/failure, capacity and stale writers. Re-export uses Gemot's existing
+  complete native drop; history is not replaced by a release counter. Host
+  adoption, pruning/checkpoint policy and protection against whole-store rollback
+  remain open.
+
+- 2026-10-29: `crates/domain/site/src/publication/reader.rs` verifies provider
+  evidence using an independently configured founder and collection, Gemot native
+  drop admission, shared collection selection and exact canonical snapshot bytes.
+  Imports are disposable and never author reader membership. Success is limited
+  to supplied history; withholding newer records and remembered rollback remain
+  outside this stateless API. `crates/domain/site/tests/reader.rs` exercises cold
+  child readers, B re-export after A drops, all three native profiles, replacement,
+  withdrawal, membership revocation, expiry, wrong anchors, modified signed records
+  under recomputed carrier integrity, missing authority, noncanonical/mismatched
+  snapshots and caller limits. Current default limits are 8 MiB of history,
+  4096 records, 1 MiB per record/manifest and the existing snapshot V1 byte cap;
+  acquisition must enforce its own pre-buffer limits. Whole-drop evidence can
+  include other public Moot records. This is file-delivered verification, not
+  discovery, network delivery, durable custody or physical-device failover.
 
 - 2026-10-21: `muniment` at the existing Eidetic pin already gives transactional directory and memory backends, immutable
   blobs and serializable journals; no Eidetic core change was needed. Eidetic's `manifest:` and `blob:` keys do not fit
@@ -227,3 +340,12 @@ listener shutdown does not prove; the generic Gopher adapter drops Plus request 
 ## Progress
 
 - 2026-10-28: cut from the shared site model plan and the Djinn plan's section 13; nothing new landed.
+
+- 2026-10-29: P10's bounded portable-reader API and isolated-process proof are
+  implemented in the local worktree. The supplier proof preserves existing
+  publication/history behavior and schema V1. Persistent rollback observations,
+  selective evidence export, daemon delivery and consumer adoption remain open.
+
+- 2026-10-30: P11's remembered-authority adapter and persistent reader-process
+  proof are implemented locally. P10 remains available as a stateless verifier;
+  both scopes still allow unknown newer history elsewhere.
