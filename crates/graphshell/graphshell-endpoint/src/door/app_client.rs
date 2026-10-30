@@ -18,7 +18,9 @@
 use rand_core::{OsRng, RngCore};
 
 use crate::door::app_admission::{AppHello, AppId, AppRouteId, configured_app_endpoint};
-use crate::door::frame::{FrameError, read_native_message_async, write_native_message_async};
+use crate::door::frame::{
+    FrameError, JsonDiagnostic, read_native_message_async, write_native_message_async,
+};
 use crate::door::local_endpoint::{LocalStream, connect_local};
 use crate::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
 
@@ -37,6 +39,8 @@ pub enum AppClientError {
     },
     #[error("resident response {got} does not answer request {expected}")]
     MismatchedResponse { expected: u64, got: u64 },
+    #[error("JSON failed: {0}")]
+    Json(JsonDiagnostic),
     #[error("a card resource was not valid PortableCardV1 JSON")]
     MalformedCard,
     #[error("the resident resource has another scope or content address")]
@@ -45,6 +49,16 @@ pub enum AppClientError {
     InvalidResourceChunk(String),
     #[error("transport failed: {0}")]
     Io(#[from] std::io::Error),
+}
+
+impl From<serde_json::Error> for AppClientError {
+    fn from(error: serde_json::Error) -> Self {
+        Self::Json(JsonDiagnostic {
+            category: error.classify(),
+            line: error.line(),
+            column: error.column(),
+        })
+    }
 }
 
 /// An open session against the resident host, as `app`.
@@ -236,6 +250,34 @@ fn unexpected<R, N, A>(expected: &'static str, got: &AppHostMessage<R, N, A>) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn json_conversion_keeps_only_redacted_diagnostic_metadata() {
+        #[derive(Debug, serde::Deserialize)]
+        #[allow(dead_code)]
+        enum Expected {
+            Allowed,
+        }
+        let sentinel = "private-app-json-variant";
+        let input = format!("\"{sentinel}\"");
+        let raw = serde_json::from_str::<Expected>(&input).unwrap_err();
+        assert!(raw.to_string().contains(sentinel));
+        let expected = (raw.classify(), raw.line(), raw.column());
+        let error = AppClientError::from(raw);
+        match &error {
+            AppClientError::Json(diagnostic) => assert_eq!(
+                (diagnostic.category, diagnostic.line, diagnostic.column),
+                expected
+            ),
+            other => panic!("unexpected error: {other:?}"),
+        }
+        assert!(!format!("{error:?} {error}").contains(sentinel));
+        let mut source = std::error::Error::source(&error);
+        while let Some(cause) = source {
+            assert!(!format!("{cause:?} {cause}").contains(sentinel));
+            source = cause.source();
+        }
+    }
 
     #[tokio::test]
     async fn unexpected_released_answer_does_not_leak_payload_in_error() {

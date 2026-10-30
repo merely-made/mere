@@ -460,6 +460,16 @@ impl From<FrameError> for BrowserCarrierError {
     }
 }
 
+impl From<serde_json::Error> for BrowserCarrierError {
+    fn from(error: serde_json::Error) -> Self {
+        Self::Json(frame::JsonDiagnostic {
+            category: error.classify(),
+            line: error.line(),
+            column: error.column(),
+        })
+    }
+}
+
 /// Run the existing SessionHello admission over a private stream whose link
 /// id was derived from this browser launch.
 ///
@@ -674,6 +684,34 @@ mod tests {
     use personae::InMemoryProvider;
     use personae::delegation::Issue;
     use std::io::Cursor;
+
+    #[test]
+    fn json_conversion_keeps_only_redacted_diagnostic_metadata() {
+        #[derive(Debug, serde::Deserialize)]
+        #[allow(dead_code)]
+        enum Expected {
+            Allowed,
+        }
+        let sentinel = "private-browser-json-variant";
+        let input = format!("\"{sentinel}\"");
+        let raw = serde_json::from_str::<Expected>(&input).unwrap_err();
+        assert!(raw.to_string().contains(sentinel));
+        let expected = (raw.classify(), raw.line(), raw.column());
+        let error = BrowserCarrierError::from(raw);
+        match &error {
+            BrowserCarrierError::Json(diagnostic) => assert_eq!(
+                (diagnostic.category, diagnostic.line, diagnostic.column),
+                expected
+            ),
+            other => panic!("unexpected error: {other:?}"),
+        }
+        assert!(!format!("{error:?} {error}").contains(sentinel));
+        let mut source = std::error::Error::source(&error);
+        while let Some(cause) = source {
+            assert!(!format!("{cause:?} {cause}").contains(sentinel));
+            source = cause.source();
+        }
+    }
 
     #[tokio::test]
     async fn admitted_client_queues_a_notice_that_precedes_its_response() {
