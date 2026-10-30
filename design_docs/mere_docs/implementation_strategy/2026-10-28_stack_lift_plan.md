@@ -1,6 +1,6 @@
 # Stack lift: Graphshell component extraction
 
-**Status:** 2026-10-28: cut from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), the Forme second host (P6), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
+**Status:** 2026-10-29: status corrected; cut on 2026-10-28 from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), the Forme second host (P6), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
 
 **For:** extracting from the Graphshell port (about 100k lines) the parts other applications want without taking the whole port. It began when Mark noticed the reference host's size and asked what could be generalised; Knot, Cleromancy and Woodshed want its interactive capabilities, and Woodshed's own survey asks whether Mere extracts the canvas controls and editors into native-buildable crates with Woodshed as second native consumer. Each phase names a home, a prerequisite and a second-host receipt; a phase that lands code ends with that receipt, and a receipt in this repository's tests does not stand in for the other repository's build.
 Not here: the Graphshell one-tree cutover and the reference host's own phases, `2026-10-28_graphshell_host_plan.md`; the facet dissolution brief's ruling and the resident-host port that replaces `product.rs` operations with Pandect `LiveCommand` values, `2026-10-28_graph_semantics_plan.md` (the brief's owner); the Eidetic development plan's P0 inventory, which takes `capture` (Eidetic repository); SE13, SE24, SE46 to SE51 and SE78 (gestures, command-menu verb ids), `2026-10-28_scenograph_editor_plan.md`; `appearance`, which stays in Graphshell (R6) with Tabard's division in `2026-10-28_appearance_plan.md`; custody isolation, `2026-10-28_custody_plan.md`; Woodshed's manifest repins, the Woodshed lane.
@@ -45,9 +45,9 @@ Touch gestures (`touch_use`, `two_finger`) wait for host touch input in Cambium 
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:273-328,480-495,1379-1384`; `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:632-633`
 
 ### P3r. Option helpers, host recipes and the authoring reducer: the other side
-Landed on the Mere side: `scenomise::arrangement`, `scenomise::authoring` and Chronicle's recipe in `distillery::chronicle_recipe`. Held is Knot's side: its `recipe/editor.rs` and the shared helpers are siblings, not copies, so "delete Knot's copies" is a copy decision for Knot's owner. `default_definition` (the Woodshed-flavoured practice recipe) stays in `projection_compile.rs` until Woodshed publishes the recipe with its dataset. No second host has adopted the whole-definition authoring reducer (L4b); Turnstone's side is a one-line repoint to `scenograph`.
+Landed on the Mere side: `scenomise::arrangement`, `scenomise::authoring` and Chronicle's recipe in `distillery::chronicle_recipe`. Knot's `composition/recipe/editor.rs` already imports `OptionFallback`, `arrangement_defaults`, `arrangement_options` and `option_fallback` from the shared arrangement module; its remaining functions supply host wording rather than duplicate the shared value resolution. `default_definition` (the Woodshed-flavoured practice recipe) stays in `projection_compile.rs` until Woodshed publishes the recipe with its dataset. The remaining L4b receipt is a second host adopting the whole-definition authoring reducer; this is separate from the already-adopted option helpers.
 - Done when: Knot's `recipe/editor.rs` uses the shared helpers and its tests pass; Graphshell's editor uses the same; no `chronicle_definition` or `default_definition` remains in a shared path; a host other than Graphshell opens and saves a whole-definition draft.
-- Needs: Knot's owner; Woodshed's recipe publication (W1).
+- Needs: a receiving host for the whole-definition reducer; Woodshed's recipe publication (W1).
 - Rulings: R1
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:225-235,370-374,496-507,890-892`
 
@@ -102,7 +102,7 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 
 ## Findings
 
-- 2026-10-29: the historical ESP fixture paths have been replaced in Djinn tests by vendored `tests/fixtures/esp` inputs; Woodshed's relationship-recipe manifest includes `tempfile`. Historical failure receipts remain archived and do not establish current test status.
+- 2026-10-29: the historical ESP fixture paths have been replaced in Djinn tests by vendored `ports/djinn/tests/fixtures/esp` inputs; Woodshed's relationship-recipe manifest includes `tempfile`. Historical failure receipts remain archived and do not establish current test status.
 
 - 2026-10-28: the app-facing half of the port is the `door` feature on `graphshell-endpoint`; Signalman and `ports/dramatis` build without the `graphshell` package. Knot's recipe editor and the shared option helpers are siblings, not copies.
 - 2026-10-28: the `web_tree` views are page-shaped; twelve of its files call no browser API.
@@ -114,3 +114,5 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - 2026-10-28: cut from the stack lift plan; nothing new landed.
 
 - 2026-10-29: corrected stale receiving-failure claims and the already-satisfied P9 ruling prerequisite; runtime qualification remains open.
+
+- 2026-10-29: source-checked Knot's existing option-helper adoption; retained L4b as the separate whole-definition reducer receipt.
