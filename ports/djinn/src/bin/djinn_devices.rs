@@ -12,7 +12,7 @@ use djinn::resident_devices::{
     not_connected_path_active, read_directory,
 };
 use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::projection::AppBrokerClient;
 
 const USAGE: &str = "usage: djinn-devices [--json]";
 

@@ -35,7 +35,7 @@ cambium-desktop.workspace = true
 persona-picker.workspace = true
 # The custody client and quarantine types, without the Graphshell port
 # (stack lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["door"] }
+graphshell-endpoint = { workspace = true, features = ["custody-client"] }
 dramatis.workspace = true
 personae.workspace = true
 serde_json.workspace = true

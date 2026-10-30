@@ -28,9 +28,11 @@ use chirograph::{
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppHello, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::app_client::AppBrokerClient;
-use graphshell_endpoint::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use graphshell_endpoint::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+type AppMessage = WireMessage<chirograph::CarrierRequest, graphshell_endpoint::door::custody::CustodyCall>;
+type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<graphshell_endpoint::door::custody::CustodyAnswer, graphshell_endpoint::door::custody::CustodyRefusal>>;
 
 fn resident_host() -> Arc<FixedIdentity> {
     FixedIdentity::new(0x91)

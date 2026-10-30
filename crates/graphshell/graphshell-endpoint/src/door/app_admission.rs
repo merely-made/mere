@@ -403,6 +403,11 @@ impl AppRouteGrants {
 }
 
 /// The per-user endpoint first-party applications connect to.
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub fn configured_app_endpoint() -> String {
     std::env::var(APP_ENDPOINT_ENV)
         .ok()
@@ -412,6 +417,11 @@ pub fn configured_app_endpoint() -> String {
 
 /// The platform default, ignoring the environment override. Only the device
 /// resident (installed or embedded) may bind it.
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub fn default_app_endpoint() -> String {
     #[cfg(windows)]
     {
@@ -553,6 +563,11 @@ mod tests {
 
     // That this endpoint differs from the browser door's is checked beside
     // the browser door, in Graphshell's `native::device_broker`.
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
     #[test]
     fn the_default_endpoint_is_named() {
         assert!(!default_app_endpoint().is_empty());

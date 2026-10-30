@@ -4,33 +4,66 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The first-party application door, application side (`door` feature).
+//! First-party application door shared with the Djinn resident.
 //!
-//! What an application embeds to reach the resident (djinn) on its owner-only
-//! local endpoint: the self-declared hello and the host's route table
-//! ([`app_admission`], [`route`]), the envelope and frames both halves share
-//! ([`wire`], [`frame`]), the client ([`app_client`]), the custody route's
-//! wire and its clients ([`custody`], [`custody_client`], [`custody_identity`]),
-//! quarantine review ([`quarantine`]), the local socket or named pipe
-//! ([`local_endpoint`]), tracked tasks ([`tasks`]), the secret-free identity
-//! views ([`identity`]) and the application's persona ([`profile`]).
+//! The `door` feature exposes portable admission labels, route policy, wire
+//! envelopes and synchronous framing. `door-native` adds the shared local
+//! connection; `door-serve` adds the native listener and serving machinery.
+//! `custody`, `custody-client`, `projection-door` and `profile` select their
+//! respective types and clients on native Unix and Windows. The Djinn broker
+//! owns the serving policy and session loops.
 //!
-//! The serving half (the broker, the browser door, the session loops) stays
-//! in Graphshell (`ports/graphshell`), and an application needs none of it.
-//! Lifted from Graphshell's `native` module (Graphshell stack lift plan, L1,
-//! ruling R3).
+//! A local socket or named pipe establishes a same-user boundary. Application
+//! labels are self-declared inputs to route policy, not proof of executable
+//! identity.
 
 pub mod app_admission;
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod app_client;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod custody;
+#[cfg(all(
+    feature = "custody-client",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod custody_client;
+#[cfg(all(
+    feature = "custody-client",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod custody_identity;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod custody_payload;
 pub mod frame;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod identity;
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod local_endpoint;
+#[cfg(all(feature = "profile", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod profile;
+#[cfg(all(
+    feature = "projection-door",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
+pub mod projection;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod quarantine;
+#[cfg(all(
+    feature = "projection-door",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod resident_mere_proxy;
 pub mod route;
 pub mod wire;

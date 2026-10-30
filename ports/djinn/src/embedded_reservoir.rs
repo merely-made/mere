@@ -28,7 +28,7 @@ use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, Inte
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use graphshell_endpoint::door::{app_client::AppClientError, projection::AppBrokerClient};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};

@@ -1,0 +1,15 @@
+[workspace]
+
+[package]
+name = "custody-projection-portable-fixture"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[features]
+forbidden-api = []
+
+[dependencies]
+graphshell-endpoint = { path = "../../../../crates/graphshell/graphshell-endpoint", default-features = false, features = ["door"] }
+serde_json = "1"
+

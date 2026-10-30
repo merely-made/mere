@@ -9,13 +9,13 @@
 //! application, persona, route, store or alternate authority through it.
 //!
 //! An endpoint whose verbs forward over the application door
-//! ([`crate::door::app_client::AppBrokerClient`]), so it is the door's client
+//! ([`crate::door::projection::AppBrokerClient`]), so it is the door's client
 //! side: a host composes it into its own catalog. It was Graphshell's
 //! `native::resident_mere_proxy`, then briefly Djinn's, until Mark's ruling
 //! after the stack lift plan's P5 put it here.
 
 use crate::door::app_admission::{AppId, AppRouteId};
-use crate::door::app_client::AppBrokerClient;
+use crate::door::projection::AppBrokerClient;
 use crate::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,

@@ -74,7 +74,7 @@ shared session, real source Edit/Undo through layout Discard, focus, failed save
 and responsive compact-to-wide recovery. Native review covers explicit layout
 authoring, a fresh process loading the same pinned-reading layout on Unlock, and
 default compact presentation. The receiving record is
-`knot-editor/docs/receipts/2026-10-29_forme_workspace/README.md`.
+[`knot-editor/docs/receipts/2026-10-29_forme_workspace/README.md`](https://github.com/merely-made/knot-editor/blob/2924a5f1571f010bb9eb7692d6767117f3dff8ef/docs/receipts/2026-10-29_forme_workspace/README.md).
 
 - Done when: the second host unlocks, drafts, discards and applies a forme through the lifted session. **Met by Knot.**
 - Remaining UI scope: Frisket pointer resizing, tab drags, new splits, floats, layout-undo controls and automatic source-session reopening are separate follow-ups. Responsive presentation may constrain the visible fractions to protect the writing measure; it does not rewrite the saved canonical layout.

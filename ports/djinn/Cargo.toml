@@ -126,7 +126,7 @@ distillery = { workspace = true, features = ["inference-wire"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["door"] }
+graphshell-endpoint = { workspace = true, features = ["door-serve", "projection-door", "custody-client", "profile"] }
 # The serving half: the endpoint catalog and its admitted context, the
 # projection host, admission and the session loop (stack lift plan, L2).
 graphshell-host = { workspace = true, features = ["native"] }
@@ -315,7 +315,7 @@ graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 # mere view's model it fills, and the kernel's relations to fill it with.
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 mere-overmap = { workspace = true, features = ["view"] }
-graphshell-endpoint.workspace = true
+graphshell-endpoint = { workspace = true, features = ["door-serve", "projection-door", "custody-client", "profile"] }
 pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"

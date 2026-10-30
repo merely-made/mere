@@ -1,4 +1,7 @@
 // Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 //! Actual admitted IPC with a wallet epoch. No keys cross the custody wire.
 use castellan::authority::PersonaeHost;
@@ -18,7 +21,7 @@ use graphshell_endpoint::door::{
     custody_payload::{
         MAX_PAYLOAD_BYTES, PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult,
     },
-    identity::VaultProtectionView,
+    identity::{VaultLockView, VaultProtectionView},
 };
 use personae::{Ed25519Keypair, IdentityProvider, PersonaId, ProfileId};
 use std::{sync::Arc, time::Duration};
@@ -293,6 +296,19 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     .unwrap();
     assert_ne!(new_marker.epoch, sealed_epoch);
     host.lock_vault().unwrap();
+    // A fresh custody connection must not need projection admission or door
+    // keys after the vault locks. It may read status, but cannot release data.
+    let mut locked_client = CustodyClient::open_at(&endpoint, AppId::new("turnstone"))
+        .await
+        .expect("custody remains reachable while locked");
+    assert_eq!(
+        locked_client.status().await.unwrap().lock,
+        VaultLockView::Locked
+    );
+    assert!(matches!(
+        locked_client.call(CustodyCall::Payload(read.clone())).await,
+        Err(CustodyClientError::Refused(CustodyRefusal::Locked))
+    ));
     assert!(matches!(
         client.call(CustodyCall::Payload(read)).await,
         Err(CustodyClientError::Refused(CustodyRefusal::Locked))

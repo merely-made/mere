@@ -19,6 +19,7 @@
 //! against this process's before a byte is read. Neither says *which*
 //! application is speaking; that is the door's business, above this layer.
 
+#[cfg(feature = "door-serve")]
 use std::future::Future;
 
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -36,6 +37,7 @@ impl<T> LocalStream for T where T: AsyncRead + AsyncWrite + Unpin + Send + 'stat
 ///
 /// Keeping the platform listener here lets callers establish that their
 /// endpoint is available before reporting readiness.
+#[cfg(feature = "door-serve")]
 pub struct LocalListener {
     #[cfg(windows)]
     endpoint: String,
@@ -47,6 +49,7 @@ pub struct LocalListener {
     listener: tokio::net::UnixListener,
 }
 
+#[cfg(feature = "door-serve")]
 impl LocalListener {
     /// Prepare and bind a local endpoint.
     pub async fn bind(endpoint: &str, what: &'static str) -> Result<Self, std::io::Error> {
@@ -126,6 +129,7 @@ pub async fn connect_local(endpoint: &str) -> Result<Box<dyn LocalStream>, std::
 ///
 /// `what` names the door in the log line, so an operator reading a startup log
 /// can tell which endpoint came up.
+#[cfg(feature = "door-serve")]
 pub async fn serve_local<H, F>(
     endpoint: &str,
     what: &'static str,
@@ -141,6 +145,7 @@ where
         .await
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(windows)]
 async fn serve_platform<H, F>(listener: LocalListener, handle: H) -> Result<(), std::io::Error>
 where
@@ -170,6 +175,7 @@ where
     }
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(not(windows))]
 async fn serve_platform<H, F>(listener: LocalListener, handle: H) -> Result<(), std::io::Error>
 where
@@ -195,6 +201,7 @@ where
 /// path-based unlink still has a small same-directory race between that check
 /// and unlink; callers should place endpoints in a runtime directory whose
 /// parent cannot be modified by other users.
+#[cfg(feature = "door-serve")]
 #[cfg(unix)]
 pub async fn prepare_unix_endpoint(endpoint: &std::path::Path) -> Result<(), std::io::Error> {
     // SAFETY: geteuid has no pointer arguments or other preconditions.
@@ -205,6 +212,7 @@ pub async fn prepare_unix_endpoint(endpoint: &std::path::Path) -> Result<(), std
     .await
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(unix)]
 async fn prepare_with_probe<P, ProbeFuture>(
     endpoint: &std::path::Path,
@@ -259,6 +267,7 @@ where
     }
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(unix)]
 fn endpoint_metadata(
     endpoint: &std::path::Path,
@@ -270,6 +279,7 @@ fn endpoint_metadata(
     }
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(unix)]
 fn validate_endpoint_owner(
     metadata: &std::fs::Metadata,
@@ -296,6 +306,7 @@ fn validate_endpoint_owner(
 ///
 /// Unix gets this from the socket's mode. Windows named pipes are reachable by
 /// other users on the machine unless the server checks, so the server checks.
+#[cfg(feature = "door-serve")]
 #[cfg(windows)]
 fn verify_same_user(
     connection: &tokio::net::windows::named_pipe::NamedPipeServer,
@@ -332,6 +343,7 @@ fn verify_same_user(
     Ok(())
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(windows)]
 fn token_user(
     process: windows_sys::Win32::Foundation::HANDLE,
@@ -369,9 +381,11 @@ fn token_user(
     Ok(buffer)
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(windows)]
 struct OwnedHandle(windows_sys::Win32::Foundation::HANDLE);
 
+#[cfg(feature = "door-serve")]
 #[cfg(windows)]
 impl Drop for OwnedHandle {
     fn drop(&mut self) {
@@ -383,6 +397,7 @@ impl Drop for OwnedHandle {
     }
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(all(test, windows))]
 mod windows_tests {
     use super::*;
@@ -429,6 +444,7 @@ mod windows_tests {
     }
 }
 
+#[cfg(feature = "door-serve")]
 #[cfg(all(test, unix))]
 mod unix_tests {
     use std::os::unix::{
