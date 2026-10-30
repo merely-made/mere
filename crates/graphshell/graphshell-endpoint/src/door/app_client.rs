@@ -4,18 +4,16 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Client side of the first-party door.
+//! Shared native connection to the first-party application door.
 //!
-//! What an application holds while talking to the resident host: the
-//! handshake, a request counter, and typed calls for the three things a
-//! reader of receipt cards does — open, snapshot, read a resource. The
-//! server half is Graphshell's `native::app_broker`; the two share the types
-//! in [`super::wire`] and the frames in [`super::frame`] so they cannot drift.
+//! [`AppConnection`] handles the hello, handshake, sequential typed exchanges,
+//! and request IDs used by the custody and projection clients. Djinn serves
+//! the other side; both use the envelopes in [`super::wire`] and frames in
+//! [`super::frame`]. Projection operations live in `super::projection`.
 //!
-//! The wire is strictly request/response, so the client is deliberately
-//! sequential: one call at a time against `&mut self`, no demultiplexer. A
-//! first-party app reading cards is human-paced; the day something needs
-//! pipelining, that pressure should reshape the wire, not hide in a client.
+//! The local transport establishes a same-user boundary. The self-declared
+//! application label is used by host route policy and is not executable
+//! authentication. Exchanges use `&mut self`, with one outstanding call.
 
 use rand_core::{OsRng, RngCore};
 
@@ -273,7 +271,113 @@ mod tests {
             .await
             .unwrap_err();
         assert!(matches!(error, AppClientError::UnexpectedAnswer { .. }));
-        assert!(!format!("{error:?} {error}").contains("private-release-material"));
+        let sentinel = "private-release-material";
+        assert!(!format!("{error:?} {error}").contains(sentinel));
+        let mut source = std::error::Error::source(&error);
+        while let Some(cause) = source {
+            assert!(!format!("{cause:?} {cause}").contains(sentinel));
+            source = cause.source();
+        }
         server_task.await.unwrap();
+    }
+
+    #[cfg(feature = "custody")]
+    #[tokio::test]
+    async fn unexpected_real_custody_release_does_not_leak_in_error_chain() {
+        use crate::door::custody::{CustodyAnswer, CustodyRefusal};
+        let (client, mut server) = tokio::io::duplex(4096);
+        let mut connection = AppConnection {
+            stream: Box::new(client),
+            session: "fixture".into(),
+            next_id: 1,
+        };
+        let host = tokio::spawn(async move {
+            let _: Option<AppMessage<String, ()>> =
+                read_native_message_async(&mut server).await.unwrap();
+            let answer = AppHostMessage::<(), (), _>::Answer {
+                id: 1,
+                answer: Ok::<_, CustodyRefusal>(CustodyAnswer::Released {
+                    master: [0x5a; 32],
+                    keys: vec![],
+                }),
+            };
+            write_native_message_async(&mut server, &answer)
+                .await
+                .unwrap();
+        });
+        let error = connection
+            .request::<_, String, ()>("request")
+            .await
+            .unwrap_err();
+        assert!(matches!(error, AppClientError::UnexpectedAnswer { .. }));
+        let sentinel = "WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo";
+        assert!(!format!("{error:?} {error}").contains(sentinel));
+        let mut source = std::error::Error::source(&error);
+        while let Some(cause) = source {
+            assert!(!format!("{cause:?} {cause}").contains(sentinel));
+            source = cause.source();
+        }
+        host.await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn request_and_call_share_ids_and_reject_a_mismatched_answer() {
+        #[derive(serde::Serialize, serde::Deserialize)]
+        struct Request {
+            id: u64,
+        }
+        let (client, mut server) = tokio::io::duplex(4096);
+        let mut connection = AppConnection {
+            stream: Box::new(client),
+            session: "fixture".into(),
+            next_id: 1,
+        };
+        let host = tokio::spawn(async move {
+            let request: AppMessage<Request, ()> = read_native_message_async(&mut server)
+                .await
+                .unwrap()
+                .unwrap();
+            assert!(matches!(
+                request,
+                AppMessage::Request {
+                    request: Request { id: 1 }
+                }
+            ));
+            write_native_message_async(
+                &mut server,
+                &AppHostMessage::<_, (), ()>::Response { response: 1u64 },
+            )
+            .await
+            .unwrap();
+            let call: AppMessage<(), String> = read_native_message_async(&mut server)
+                .await
+                .unwrap()
+                .unwrap();
+            assert!(matches!(call, AppMessage::Call { id: 2, .. }));
+            write_native_message_async(
+                &mut server,
+                &AppHostMessage::<(), (), _>::Answer {
+                    id: 99,
+                    answer: "wrong",
+                },
+            )
+            .await
+            .unwrap();
+        });
+        let id = connection.next_id();
+        let response = connection
+            .request::<_, u64, ()>(Request { id })
+            .await
+            .unwrap();
+        assert_eq!(response, id);
+        let error = connection.call::<_, String>("status").await.unwrap_err();
+        assert!(matches!(
+            error,
+            AppClientError::MismatchedResponse {
+                expected: 2,
+                got: 99
+            }
+        ));
+        host.await.unwrap();
     }
 }

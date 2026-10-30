@@ -4,14 +4,13 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The first-party door's envelope, as both halves speak it.
+//! Typed envelopes shared by applications and the Djinn door broker.
 //!
-//! An application speaks [`AppMessage`] and hears [`AppHostMessage`], each
-//! one native-messaging frame ([`super::frame`]). The carrier payload inside
-//! is the browser door's; the envelope is separate so this door can version
-//! independently of a shipped browser extension. The client half is
-//! [`super::app_client`]; the server half is Graphshell's `native::app_broker`.
-//! Both name these types, so they cannot drift.
+//! Each [`AppMessage`] or [`AppHostMessage`] occupies one native-messaging
+//! frame. Payload slots are generic so custody and projection can use the same
+//! envelope without depending on each other. The common handshake is carried
+//! by `super::app_client` on native platforms; `super::projection` and
+//! `super::custody_client` supply their own typed operations.
 
 #[cfg(all(
     feature = "door-serve",
@@ -124,6 +123,68 @@ mod tests {
                 answer: true
             }
         ));
+    }
+
+    #[cfg(feature = "projection")]
+    #[test]
+    fn projection_slots_preserve_exact_wire_fixtures() {
+        use chirograph::{
+            CarrierNotice, CarrierRequest, CarrierRequestBody, CarrierResponse,
+            CarrierResponseBody, ProjectionSession, Revision, SceneEpoch,
+        };
+        type Incoming = AppMessage<CarrierRequest, ()>;
+        type Outgoing = AppHostMessage<CarrierResponse, CarrierNotice, ()>;
+        let cases = [
+            (
+                Outgoing::Response {
+                    response: CarrierResponse {
+                        id: 7,
+                        body: Ok(CarrierResponseBody::Closed),
+                    },
+                },
+                r#"{"type":"response","response":{"id":7,"body":{"Ok":"Closed"}}}"#,
+            ),
+            (
+                Outgoing::Notice {
+                    notice: Some(CarrierNotice {
+                        session: ProjectionSession("graph".into()),
+                        epoch: SceneEpoch(3),
+                        revision: Revision(4),
+                    }),
+                },
+                r#"{"type":"notice","notice":{"session":"graph","epoch":3,"revision":4}}"#,
+            ),
+        ];
+        let request = Incoming::Request {
+            request: CarrierRequest {
+                id: 7,
+                body: CarrierRequestBody::Discover,
+            },
+        };
+        let fixture = r#"{"type":"request","request":{"id":7,"body":"Discover"}}"#;
+        assert_eq!(serde_json::to_string(&request).unwrap(), fixture);
+        assert_eq!(serde_json::from_str::<Incoming>(fixture).unwrap(), request);
+        for (message, fixture) in cases {
+            assert_eq!(serde_json::to_string(&message).unwrap(), fixture);
+            assert_eq!(serde_json::from_str::<Outgoing>(fixture).unwrap(), message);
+        }
+    }
+
+    #[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
+    #[test]
+    fn released_custody_answer_preserves_exact_wire_fixture() {
+        use crate::door::custody::{CustodyAnswer, CustodyRefusal};
+        type Outgoing = AppHostMessage<(), (), Result<CustodyAnswer, CustodyRefusal>>;
+        let answer = Outgoing::Answer {
+            id: 9,
+            answer: Ok(CustodyAnswer::Released {
+                master: [0x5a; 32],
+                keys: vec![],
+            }),
+        };
+        let fixture = r#"{"type":"answer","id":9,"answer":{"Ok":{"answer":"released","master":"WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo","keys":[]}}}"#;
+        assert_eq!(serde_json::to_string(&answer).unwrap(), fixture);
+        assert_eq!(serde_json::from_str::<Outgoing>(fixture).unwrap(), answer);
     }
 
     #[cfg(all(
