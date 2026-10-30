@@ -394,7 +394,7 @@ pub enum BrowserCarrierError {
     #[error("native messaging stream failed: {0}")]
     Io(#[from] std::io::Error),
     #[error("native messaging JSON failed: {0}")]
-    Json(#[from] serde_json::Error),
+    Json(#[from] frame::JsonDiagnostic),
     #[error("browser session handshake failed: {0}")]
     Handshake(#[from] IoHandshakeError),
     #[error("browser session was refused: {0}")]
