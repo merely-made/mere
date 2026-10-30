@@ -1,12 +1,12 @@
 # Cambium composition: retained components, bindings and selective updates
 
-**Status:** 2026-10-29: P0 implemented and machine-qualified locally. The
-shared row resets on setting-id replacement, Settings rows are keyed by id,
-and regression coverage includes Settings insertion/reorder and Arrange
-identity replacement. P1–P6 remain proposed work. Qualification used Turnstone's
-existing pinned supplier cohort with a temporary local Cambium dependency
-closure; publication and consumer repinning are separate from this source
-change. Earlier findings below retain the pre-P0 source baseline.
+**Status:** 2026-10-29: P0 locally qualified; P1 in progress. P1's shared
+composition model/transaction and revision-aware settings contract are
+implemented and unit-qualified. Turnstone's actual shared write owner,
+guarded adapter and binding/request admission remain open, so P1 is not
+complete. P2–P6 remain proposed work. P0 supplier/consumer receiving used a
+temporary local source override; publication and consumer repinning remain
+separate from these source changes. Earlier findings retain the pre-P0 baseline.
 
 **For:** reusable controls that retain local state while the user rearranges,
 regroups, hides and saves them. Turnstone's settings pane is the first consumer.
@@ -516,6 +516,24 @@ lands; this design does not authorize a release or claim external compatibility.
 
 ### P1. Composition model, guarded binding and event vocabulary
 
+**State:** foundations implemented and unit-qualified; product receiving open.
+
+- Implemented: public `cambium::composition` descriptors, stable keys,
+  group/drawer placement, explicit unplaced components, application validation,
+  authored-unavailable restore and deterministic transaction edits. Defaults:
+  256 components, 64 groups/drawers, placement depth 12 (hard cap), payload depth
+  64, encoded model 1 MiB. Loading/editing must use admission, not unchecked
+  deserialization as authorization. Edit records contain application data and
+  are declarative; they are not a renderer execution order or diagnostic payload.
+- Implemented: the opt-in `RevisionedSettingsProvider` contract in surface-api,
+  with owner incarnations, named-domain revision vectors, per-setting guards,
+  request correlation and typed outcomes. The old `SettingsProvider` remains
+  unguarded. Fake-owner tests qualify the protocol; they do not qualify a real
+  product's storage transaction.
+- Still required: one actual Turnstone owner for participating writers, its
+  revisioned adapter, binding/request admission, and real-provider failure and
+  concurrency controls. The writer inventory below grounds that handoff.
+
 - Define the generic descriptor/table/placement model, allowed edit set and validation. Build the revision-aware settings companion, serialize participating Turnstone writes through one authority and define the scoped diagnostic identities/events. Inventory the theme-workshop write route and other writers before claiming a write scope.
 - Done when: each supported edit validates and produces the intended edit set; invalid or duplicate compositions leave the accepted model unchanged. A stale guarded write fails without overwriting a newer value; unrelated domains can refresh without erasing a draft; persistence failure publishes no committed revision; binding/request generations reject old results; same-id theme-library saves retain explicit Apply behavior. These pass with a fake delayed provider and Turnstone's real provider adapter.
 - Needs: existing provider/storage and diagnostics contracts; no Meristem API change.
@@ -552,8 +570,8 @@ lands; this design does not authorize a release or claim external compatibility.
 
 ## Remaining implementation questions
 
-- Select concrete row/depth/config-size and scheduling budgets in P1/P4 from
-  the settings consumer; exercise admission and nonstarvation at those bounds.
+- P1 now supplies concrete model admission defaults above. Select the P4
+  scheduling budgets from the actual consumer and qualify nonstarvation.
 - Inventory uncoordinated or cross-process settings writers in P1. The proposed
   single-owner guarantee must not be widened without storage-owner support.
 - Inventory the actual Genet mutation and host frame tokens in P5. Missing
@@ -633,6 +651,30 @@ earlier source revisions.
   composition and scheduling remain P1–P6. Retained evidence follows the local
   Code/output policy.
 
+- 2026-10-29 (P1 shared foundations implemented):
+  `crates/cambium/cambium/src/composition.rs` and its tests implement bounded
+  whole-candidate admission and declarative edit classification without view
+  state. `crates/system/surface-api/settings/revisioned.rs` defines the separate
+  object-safe guarded interface. The full Cambium library suite (352 tests)
+  and surface-api suite (10 tests) pass. Rejection tests preserve the accepted
+  model; delayed stale requests, owner replacement, storage failure and
+  unrelated-domain commits are covered by a fake owner. No real Turnstone
+  guarded-write guarantee follows from those tests.
+- 2026-10-29 (P1 writer inventory, Turnstone source at 571c2f3c):
+  `turnstone/src/settings_provider.rs` centralizes production application-file
+  writes in `save_candidate`, but each settings pane loads its own provider.
+  `current_write_base` reloads and then replaces storage without a revision
+  guard. `LiveSettingsHandle` in `turnstone/src/settings_pane.rs` shares chrome
+  snapshots/actions/notices, not the write owner. Shell creation moved to
+  `turnstone/src/shell/shell_new.rs`. `turnstone/src/shell/appearance_editor.rs`
+  edits the authored theme library and refreshes catalogs on close; it protects
+  the application-settings path and does not itself select the saved theme.
+  No production caller of `apply_theme_choice` or separate full-settings reset
+  writer was found. Pandect's recoverable file replacement is not compare-and-set
+  protection. Consolidation must cover the actual pane writers and retain this
+  explicit library-versus-selection boundary; cross-process safety needs its
+  own storage-owner protocol.
+
 ## Decisions
 
 None yet.
@@ -649,3 +691,7 @@ None yet.
   tests. Local supplier and consumer suites passed; source changes are in the
   primary checkouts. Receiving used a temporary worktree-only source override;
   tracked consumer dependency pins were preserved.
+- 2026-10-29: P1 shared model and guarded-settings contract implemented and
+  unit-qualified. The real Turnstone write-owner/adapter handoff remains open;
+  P1 is in progress. P0 source commits were retained while reconciling with the
+  latest Turnstone module split.
