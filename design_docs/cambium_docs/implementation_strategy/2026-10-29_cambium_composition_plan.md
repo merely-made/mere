@@ -1,10 +1,14 @@
 # Cambium composition: retained components, bindings and selective updates
 
-**Status:** 2026-10-29: P0 and P1 locally qualified. The shared composition
-model/transaction, revision-aware settings contract, and Turnstone's shared
-settings owner, guarded adapter and binding/request admission passed focused
-offline qualification. P2–P6 remain open. P0/P1 supplier/consumer receiving used a
-temporary local source override; publication and consumer repinning remain
+**Status:** 2026-10-29: P0, P1 and P2 locally qualified in their recorded
+automated supplier/receiving scopes. P2's flat retained owner table, placement
+containers and parking, route admission, input custody and move preparation
+passed the full Cambium library suite and Turnstone Settings/Arrange receiving
+filters. This does not include headed host acceptance. Move preparation commits
+tracked Cambium preedit and cancels pointer capture through the old route; native
+IME candidate finalization and host echo correlation remain P6 gaps. P3–P6
+remain open. P0/P1/P2 receiving used temporary local source overrides with
+tracked dependency pins unchanged; publication and consumer repinning remain
 separate from these source changes. Earlier findings retain the pre-P0 baseline.
 
 **For:** reusable controls that retain local state while the user rearranges,
@@ -206,10 +210,16 @@ owner to a valid old station or explicit parking; it cannot drop the draft.
 
 Same-document moves preserve DOM identity, local selection and scroll state.
 The target host recomputes bounds, clips and accessibility mappings. Active
-pointer capture is cancelled before transfer. In v1 a move commits an active
-IME composition, as a focus loss would, and then moves (D4); native
-composition is not assumed transferable. The host must be able to force that
-commit, which nobody has checked for Genet. Cross-window focus is restored only
+pointer capture is cancelled before transfer. In v1 a move commits tracked
+Cambium preedit through the retained child and its old route, then moves (D4).
+This synthetic Cambium commit updates the component's text state; it does not
+prove that the native IME finalized its candidate or provide an OS session token
+for matching a later native echo. That host/native qualification remains open
+under P6. Before moving an active subtree, the host calls the move-preparation
+hook; a move attempted while pointer capture or focused preedit remains active
+is refused before DOM mutation. Focused retirement is likewise refused before
+mutation. Before hiding or disposing a focused control, the host must send
+focus loss; a visible move retains focus. Cross-window focus is restored only
 after target custody and native focus admission. Hidden controls are absent
 from the active accessibility projection even while their DOM is retained.
 
@@ -526,7 +536,43 @@ composition editing and P2–P6 remain open.
 
 ### P2. Retained settings rows and custody
 
-- Build the composition view with a flat retained instance table inside the existing pane runner, naturally sized row containers, owned parking and stable route generations. Instrument creation, movement, hiding and disposal from the start.
+- **State:** implemented and locally qualified in the automated supplier and
+  receiving scope below; headed host qualification remains open.
+- Implemented in source: one flat retained owner table inside the existing
+  runner, separate presentation containers, naturally sized rows and an owned
+  hidden parking root. Table slots and route generations stay stable across
+  placement moves; full placement generations change on moves and participate
+  in message admission. Hidden rows retain state and stop rendering; hidden
+  rebuilds skip their factory. Typed bounded lifecycle facts report creation,
+  moves, hiding, reveal and disposal without raw binding/config values, with a
+  dropped-event count and typed refusal reasons. The Turnstone settings
+  consumer uses the real shared revisioned settings adapter from P1.
+- Implemented in source: unprepared active-interaction moves and focused
+  retirement fail closed before DOM mutation. The host can prepare a move to
+  cancel captured pointer input and commit tracked Cambium preedit through the
+  old route; hiding or disposing a focused row still requires host focus loss.
+  Visible moves retain focus. Native IME candidate finalization and matching a
+  delayed native Commit echo remain P6 host-qualification gaps.
+- Ordinary retained-view publication sends `FocusLost` and pointer `Cancel`
+  through still-live old routes before scrubbing handles when a rebuild
+  hides/inerts the owner; callback state is published by one follow-up rebuild.
+  New physical input remains blocked by hidden/inert/parked ancestors. An
+  `aria-hidden` ancestor alone still permits physical clicks, while excluding
+  the subtree from focus traversal and accessibility value actions. A live
+  hidden file owner may receive completion of an already-started picker; P1
+  settings binding outcomes are adjudicated independently.
+- Locally qualified: full Cambium library suite 378 passed (0 failures),
+  guarded Turnstone Settings filter 63 passed (0 failures), and frozen
+  same-binary Arrange filter 9 passed (0 failures). Turnstone receiving used a
+  temporary local source override with tracked dependency pins unchanged. The
+  source snapshot is
+  `/Users/markik/Code/output/cambium-composition-p2/source-before-r5.json`;
+  frozen Cambium binary SHA-256 is
+  `0de326e0ef348adfc7887f981875d9598ad3bee42f89b70c78b941d6952acd91`, and
+  frozen Turnstone binary SHA-256 is
+  `0afe3c34101791b28b23be92bbd94301b81cb7b2393c15400e27e5e5d9f6675e`.
+  These results establish automated source/receiving behavior only; no headed
+  or native IME host qualification is claimed.
 - Done when: reorder and regroup keep owner incarnation, control state and DOM identity in both reconciliation orders, including adjacent settings with equal control/value and a nonempty draft; insertion/removal cannot transfer that draft to a neighbor. Replacing a group wrapper cannot remove retained descendants; parking plus DOM collection preserves the draft; duplicate placement and foreign-document moves are refused before mutation; final disposal tears down once and rejects late input. Tab traversal and accessibility activation use the current visible order and owner.
 - Needs: P0 and P1; existing view/DOM contracts and pane runner. RetainedMount remains at the whole-pane boundary.
 
@@ -709,6 +755,34 @@ earlier source revisions.
   `/Users/markik/Code/output/cambium-composition-p1-owner`. This is an
   in-process writer boundary only; it establishes no cross-process CAS,
   publication/pin status, or headed acceptance.
+- 2026-10-29 (P2 implementation and automated qualification):
+  `crates/cambium/cambium/src/retained_composition/` implements the flat owner
+  table, separate presentation containers, natural row sizing, hidden parking,
+  and live-slot/route plus placement-generation admission. It emits typed,
+  bounded lifecycle facts without raw binding/config payloads and exposes the
+  dropped-event count and typed refusal. Hidden rebuilds skip their child
+  factory. Unprepared moves with active capture/preedit and focused retirement
+  refuse before DOM mutation; `prepare_subtree_move` dispatches pointer cancel
+  and a synthetic tracked Cambium commit over the old route. A prepared move
+  keeps visible focus. The host must send focus loss before hide/dispose. This
+  does not qualify native IME candidate finalization or native echo matching;
+  those remain P6. The ordinary runner publication path sends focus-loss and
+  pointer-cancel to still-live hidden owners before scrubbing handles, then
+  publishes callback state with one follow-up rebuild. Physical click/key
+  admission uses hidden/inert/parked state; `aria-hidden` controls focus
+  traversal and accessibility value input while leaving physical clicks
+  available. Hidden live file owners still receive already-started chooser
+  completions; P1 settings binding admission remains a separate check. The
+  actual Turnstone settings consumer is wired to P1's shared revisioned adapter.
+  Full Cambium passed 378/0, the guarded Turnstone Settings filter passed 63/0,
+  and the frozen same-binary Arrange filter passed 9/0. Turnstone receiving
+  used a temporary local source override with pins unchanged. Evidence is under
+  `/Users/markik/Code/output/cambium-composition-p2`, including
+  `source-before-r5.json`; frozen Cambium and Turnstone SHA-256 values are
+  `0de326e0ef348adfc7887f981875d9598ad3bee42f89b70c78b941d6952acd91` and
+  `0afe3c34101791b28b23be92bbd94301b81cb7b2393c15400e27e5e5d9f6675e`.
+  This qualifies automated source/receiving behavior, not headed acceptance or
+  native IME candidate finalization/echo correlation. P3–P6 remain open.
 
 ## Decisions
 

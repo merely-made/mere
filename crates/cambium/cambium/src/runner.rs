@@ -39,9 +39,9 @@ use meristem::{DynMessage, MessageCtx, MessageResult, View, ViewId};
 use crate::context::FocusRequest;
 use crate::events::{NativeOwner, Routing};
 use crate::{
-    DomHandle, FocusEvent, FocusPhase, GenetCtx, GenetElement, GenetElementMut, HoverEvent, Key,
-    KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, Propagation, ValueEvent,
-    WheelEvent,
+    CompositionEvent, DomHandle, FocusEvent, FocusPhase, GenetCtx, GenetElement, GenetElementMut,
+    HoverEvent, Key, KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, Propagation,
+    ValueEvent, WheelEvent,
 };
 
 /// Which end of a runner's focusable set traversal left by, with
@@ -111,6 +111,17 @@ where
     /// keeps reaching the element it started on even if the cursor leaves it.
     pointer_capture: Option<NodeId>,
     pointer_owner: Option<(i32, PointerButton)>,
+    /// Latest admitted IME preedit, owned by the focused target.
+    ime_preedit: Option<(NodeId, String)>,
+    /// True only while dispatching the synthetic commit used to prepare a
+    /// subtree move. A prevented synthetic commit keeps the interaction live
+    /// through its rebuild; native commits retain their normal semantics.
+    preparing_ime_commit: bool,
+    /// One prepared semantic commit awaiting a possible native echo. Correlation
+    /// is bounded to `(target, text)` and expires on the next non-commit key,
+    /// focus change, or lifecycle event; a host session token is needed to
+    /// distinguish every possible late echo from a later identical commit.
+    prepared_ime_commit: Option<(NodeId, String)>,
     /// Whether the most recent dispatch had its default action prevented (a
     /// handler called `prevent_default` on the shared [`Propagation`](crate::Propagation)
     /// cell). Read via `default_prevented` after dispatch to gate the host's
@@ -178,12 +189,15 @@ where
         // Attach the produced root under the mount node (append).
         dom.borrow_mut().insert_before(mount, root.node, None);
         let focus = match ctx.take_focus_request() {
-            Some(FocusRequest::Focus(node)) if dom.borrow().is_live(node) => Some(node),
+            Some(FocusRequest::Focus(node)) if node_is_admitted_in_dom(&dom.borrow(), node) => {
+                Some(node)
+            },
             _ => None,
         };
         let file_request = ctx
             .take_file_request()
             .filter(|request| dom.borrow().is_live(request.node));
+        ctx.set_interaction_snapshot(focus, None, None);
 
         Self {
             dom,
@@ -196,6 +210,9 @@ where
             focus_request_serial: 0,
             pointer_capture: None,
             pointer_owner: None,
+            ime_preedit: None,
+            preparing_ime_commit: false,
+            prepared_ime_commit: None,
             last_default_prevented: false,
             focus_exits: false,
             focus_exit: None,
@@ -221,6 +238,7 @@ where
     /// borrowing `root.node` so a view *could* swap the root node, and cloning
     /// the shared `dom` handle.
     pub(crate) fn rebuild(&mut self, logic: &mut impl FnMut(&State) -> V, state: &mut State) {
+        self.sync_interaction_snapshot();
         let next = logic(state);
 
         // Disjoint borrows: each field separately so `rebuild`'s argument set
@@ -256,6 +274,16 @@ where
         // (moveBefore plan S5.)
         self.ctx.drain_nursery();
 
+        // A node can remain live while an ordinary view hides or inerts an
+        // ancestor. Deliver lifecycle cleanup through the retained old route
+        // before the generic scrub drops those handles. The callbacks run only
+        // after the root rebuild has unwound; if one routes, rebuild once to
+        // publish any local-state changes.
+        if self.cleanup_inadmitted_interactions(state) {
+            self.rebuild(logic, state);
+            return;
+        }
+
         // Focus and pointer capture are retained NodeIds, so a rebuild that
         // replaces or removes their element can retire either handle. The DOM
         // dangle contract makes `is_live` the only safe read in that state.
@@ -265,8 +293,18 @@ where
         if let Some(request) = self.ctx.take_focus_request() {
             self.focus_request_serial = self.focus_request_serial.wrapping_add(1);
             match request {
-                FocusRequest::Focus(node) if self.node_is_live(node) => self.focus = Some(node),
-                FocusRequest::Blur(node) if self.focus == Some(node) => self.focus = None,
+                FocusRequest::Focus(node) if self.node_is_admitted(node) => {
+                    if self.focus != Some(node) {
+                        self.prepared_ime_commit = None;
+                        self.ime_preedit = None;
+                    }
+                    self.focus = Some(node);
+                },
+                FocusRequest::Blur(node) if self.focus == Some(node) => {
+                    self.focus = None;
+                    self.prepared_ime_commit = None;
+                    self.ime_preedit = None;
+                },
                 _ => {},
             }
         }
@@ -275,11 +313,121 @@ where
         {
             self.file_request = Some(request);
         }
+        self.sync_interaction_snapshot();
+    }
+
+    fn sync_interaction_snapshot(&mut self) {
+        let preedit = self
+            .ime_preedit
+            .as_ref()
+            .map(|(node, _)| *node)
+            .filter(|node| self.focus == Some(*node));
+        self.ctx
+            .set_interaction_snapshot(self.focus, preedit, self.pointer_capture);
+    }
+
+    /// Refresh retained event routes after a host moves this subtree to a new
+    /// placement path. This deliberately uses the stored view and state; it
+    /// does not call the logic closure or recreate the component tree.
+    pub(crate) fn refresh_routes(&mut self, state: &mut State) {
+        self.sync_interaction_snapshot();
+        let Self {
+            ctx,
+            view,
+            view_state,
+            root,
+            dom,
+            mount,
+            ..
+        } = self;
+        let mut_ref = GenetElementMut {
+            node: &mut root.node,
+            dom: dom.clone(),
+            parent: Some(*mount),
+        };
+        ctx.with_route_refresh(|ctx| {
+            view.rebuild(view, view_state, ctx, mut_ref, state);
+        });
+        self.scrub_dead_interaction_handles();
+        self.sync_interaction_snapshot();
+    }
+
+    /// Finish Cambium-owned interaction state before a host reparents a live
+    /// subtree. Pointer capture receives a real Cancel, and an active focused
+    /// IME preedit receives a synthetic Commit through its old retained route.
+    /// This does not ask the operating system to finalize its IME candidate;
+    /// hosts must still suppress a matching late native commit. A prevented
+    /// synthetic Commit leaves the preedit active, so the host must check
+    /// [`subtree_move_has_active_interaction`](Self::subtree_move_has_active_interaction)
+    /// and refuse the relocation.
+    pub(crate) fn prepare_subtree_move(
+        &mut self,
+        logic: &mut impl FnMut(&State) -> V,
+        state: &mut State,
+        subtree: NodeId,
+    ) -> Vec<Action> {
+        if !self.node_is_live(subtree) {
+            return Vec::new();
+        }
+        self.sync_interaction_snapshot();
+        let mut actions = Vec::new();
+        if let Some((target, text)) = self.ime_preedit.clone()
+            && self.focus == Some(target)
+            && self.is_descendant_or_self(subtree, target)
+            && self.node_is_admitted(target)
+        {
+            let commit = KeyEvent::new(Key::Composition(CompositionEvent::Commit(text.clone())));
+            let was_preparing = self.preparing_ime_commit;
+            self.preparing_ime_commit = true;
+            actions.extend(self.dispatch_key(logic, state, commit.clone()));
+            self.preparing_ime_commit = was_preparing;
+            if commit.prop.default_prevented() {
+                self.ime_preedit = Some((target, text));
+                self.prepared_ime_commit = None;
+            } else {
+                self.ime_preedit = None;
+                self.prepared_ime_commit = Some((target, text));
+            }
+        }
+        if self
+            .pointer_capture
+            .is_some_and(|node| self.is_descendant_or_self(subtree, node))
+        {
+            let (pointer_id, button) = self.pointer_owner.unwrap_or((0, PointerButton::Primary));
+            let mut cancel = PointerEvent::new(crate::PointerPhase::Cancel, (0.0, 0.0), (0.0, 0.0))
+                .with_button(button);
+            cancel.pointer_id = pointer_id;
+            actions.extend(self.dispatch_pointer_up(logic, state, cancel));
+        }
+        self.sync_interaction_snapshot();
+        actions
+    }
+
+    pub(crate) fn subtree_move_has_active_interaction(&self, subtree: NodeId) -> bool {
+        self.pointer_capture
+            .is_some_and(|node| self.is_descendant_or_self(subtree, node))
+            || self.ime_preedit.as_ref().is_some_and(|(node, _)| {
+                self.focus == Some(*node) && self.is_descendant_or_self(subtree, *node)
+            })
+    }
+
+    fn is_descendant_or_self(&self, ancestor: NodeId, node: NodeId) -> bool {
+        let dom = self.dom.borrow();
+        let mut current = Some(node);
+        while let Some(candidate) = current {
+            if candidate == ancestor {
+                return true;
+            }
+            current = dom.parent(candidate);
+        }
+        false
     }
 
     /// The file request a view filed, once, for the host to answer.
     pub(crate) fn take_file_request(&mut self) -> Option<crate::FileRequest> {
-        self.file_request.take()
+        self.file_request
+            .take()
+            .filter(|request| self.node_is_live(request.node))
     }
 
     /// Route a host's file answer to the [`open_file`](crate::open_file) view
@@ -291,6 +439,10 @@ where
         node: NodeId,
         event: crate::FileEvent,
     ) -> Vec<Action> {
+        self.scrub_dead_interaction_handles();
+        // A file answer completes an already-started host operation. Keep
+        // delivering it to the live owner even if it became hidden while the
+        // chooser was open; this is not new input admission.
         if !self.node_is_live(node) {
             return Vec::new();
         }
@@ -327,12 +479,84 @@ where
         self.dom.borrow().is_live(node)
     }
 
+    fn node_is_admitted(&self, node: NodeId) -> bool {
+        node_is_admitted_in_dom(&self.dom.borrow(), node)
+    }
+
+    fn cleanup_inadmitted_interactions(&mut self, state: &mut State) -> bool {
+        let mut routed = false;
+        if let Some(node) = self.focus
+            && self.node_is_live(node)
+            && !self.node_is_admitted(node)
+        {
+            self.focus = None;
+            self.prepared_ime_commit = None;
+            self.ime_preedit = None;
+            let (_, focus_routed) = self.route_focus_transition(state, Some(node), None);
+            routed |= focus_routed;
+        }
+        if let Some(node) = self.pointer_capture
+            && self.node_is_live(node)
+            && !self.node_is_admitted(node)
+        {
+            let (pointer_id, button) = self.pointer_owner.unwrap_or((0, PointerButton::Primary));
+            // Clear the old handles before invoking user code so a cleanup
+            // callback cannot cause this publication boundary to cancel twice.
+            self.pointer_capture = None;
+            self.pointer_owner = None;
+            routed |= self.route_pointer_without_rebuild(
+                state,
+                node,
+                PointerEvent::new(crate::PointerPhase::Cancel, (0.0, 0.0), (0.0, 0.0))
+                    .with_button(button)
+                    .with_pointer_id(pointer_id),
+            );
+        }
+        self.sync_interaction_snapshot();
+        routed
+    }
+
+    fn route_pointer_without_rebuild(
+        &mut self,
+        state: &mut State,
+        node: NodeId,
+        event: PointerEvent,
+    ) -> bool {
+        let Some(path) = self.ctx.pointer_handler(node).map(<[ViewId]>::to_vec) else {
+            return false;
+        };
+        let Self {
+            view,
+            view_state,
+            root,
+            dom,
+            mount,
+            ..
+        } = self;
+        let mut message = MessageCtx::new(path, DynMessage::new(event));
+        let element = GenetElementMut {
+            node: &mut root.node,
+            dom: dom.clone(),
+            parent: Some(*mount),
+        };
+        let _ = view.message(view_state, &mut message, element, state);
+        true
+    }
+
     fn scrub_dead_interaction_handles(&mut self) {
         let dom = self.dom.borrow();
-        if self.focus.is_some_and(|node| !dom.is_live(node)) {
+        if self
+            .focus
+            .is_some_and(|node| !dom.is_live(node) || !node_is_admitted_in_dom(&dom, node))
+        {
             self.focus = None;
+            self.prepared_ime_commit = None;
+            self.ime_preedit = None;
         }
-        if self.pointer_capture.is_some_and(|node| !dom.is_live(node)) {
+        if self
+            .pointer_capture
+            .is_some_and(|node| !dom.is_live(node) || !node_is_admitted_in_dom(&dom, node))
+        {
             self.pointer_capture = None;
             self.pointer_owner = None;
         }
@@ -482,7 +706,8 @@ where
         target: NodeId,
         event: PointerClick,
     ) -> Vec<Action> {
-        if !self.node_is_live(target) {
+        self.scrub_dead_interaction_handles();
+        if !self.node_is_admitted(target) {
             self.last_default_prevented = false;
             return Vec::new();
         }
@@ -512,6 +737,10 @@ where
         // a click handler fired below.
         let old_focus = self.focus;
         self.focus = new_focus;
+        if old_focus != new_focus {
+            self.prepared_ime_commit = None;
+            self.ime_preedit = None;
+        }
         let (mut actions, focus_routed) = self.route_focus_transition(state, old_focus, new_focus);
 
         // 2. Walk the click through the event layer: capture pass first
@@ -580,9 +809,13 @@ where
         state: &mut State,
         node: Option<NodeId>,
     ) -> Vec<Action> {
-        let next = node.filter(|&node| self.node_is_live(node));
+        let next = node.filter(|&node| self.node_is_admitted(node));
         let old = self.focus;
         self.focus = next;
+        if old != next {
+            self.prepared_ime_commit = None;
+            self.ime_preedit = None;
+        }
         let (actions, _) = self.route_focus_transition(state, old, next);
         if old != next {
             self.rebuild(logic, state);
@@ -683,6 +916,19 @@ where
             return Vec::new();
         };
 
+        if let Key::Composition(CompositionEvent::Commit(text)) = &event.key
+            && self
+                .prepared_ime_commit
+                .as_ref()
+                .is_some_and(|(target, committed)| *target == focus && committed == text)
+        {
+            self.prepared_ime_commit = None;
+            return Vec::new();
+        }
+        if !matches!(&event.key, Key::Composition(CompositionEvent::Commit(_))) {
+            self.prepared_ime_commit = None;
+        }
+
         // 1. Collect the ancestor chain (focus → … → document) once.
         let chain: Vec<NodeId> = {
             let dom = self.dom.borrow();
@@ -706,6 +952,31 @@ where
         });
         let routed = walk.invoked > 0;
         let mut actions = walk.actions;
+        if routed {
+            match &event.key {
+                Key::Composition(CompositionEvent::Preedit { text, .. }) => {
+                    self.ime_preedit = Some((focus, text.clone()));
+                },
+                Key::Composition(CompositionEvent::Commit(_))
+                    if self.preparing_ime_commit && event.prop.default_prevented() =>
+                {
+                    // Keep the tracked preedit live through the following
+                    // rebuild. RetainedComposition must still refuse a move
+                    // while a handler prevented this synthetic commit.
+                },
+                Key::Composition(
+                    CompositionEvent::Enabled
+                    | CompositionEvent::Commit(_)
+                    | CompositionEvent::Disabled,
+                ) => self.ime_preedit = None,
+                _ => self.ime_preedit = None,
+            }
+        } else if !matches!(
+            &event.key,
+            Key::Composition(CompositionEvent::Preedit { .. })
+        ) {
+            self.ime_preedit = None;
+        }
         if routed {
             // Record whether a handler prevented the default (gates step 3 + host).
             self.last_default_prevented = event.prop.default_prevented();
@@ -813,7 +1084,8 @@ where
         // A fresh pass: reset the cancellation flag; route_pointer records the
         // real value when a handler runs, and a no-capture press leaves it false.
         self.last_default_prevented = false;
-        if !self.node_is_live(target) {
+        self.scrub_dead_interaction_handles();
+        if !self.node_is_admitted(target) {
             return Vec::new();
         }
         let captured = {
@@ -851,7 +1123,7 @@ where
                 if request.button == PointerButton::Secondary
                     && request.capture_requested()
                     && self.pointer_capture.is_none()
-                    && self.node_is_live(node)
+                    && self.node_is_admitted(node)
                     && self.pointer_target(node) == Some(node)
                 {
                     self.pointer_capture = Some(node);
@@ -917,7 +1189,7 @@ where
     /// The nearest ancestor of `hit` (including itself) carrying an
     /// [`on_pointer`](crate::on_pointer) handler.
     pub(crate) fn pointer_target(&self, hit: NodeId) -> Option<NodeId> {
-        if !self.node_is_live(hit) {
+        if !self.node_is_admitted(hit) {
             return None;
         }
         let dom = self.dom.borrow();
@@ -941,7 +1213,8 @@ where
         event: HoverEvent,
     ) -> Vec<Action> {
         self.last_default_prevented = false;
-        if !self.node_is_live(target) {
+        self.scrub_dead_interaction_handles();
+        if !self.node_is_admitted(target) {
             return Vec::new();
         }
         match self.hover_target(target) {
@@ -953,7 +1226,7 @@ where
     /// The nearest ancestor of `hit` (including itself) carrying a hover
     /// handler.
     pub(crate) fn hover_target(&self, hit: NodeId) -> Option<NodeId> {
-        if !self.node_is_live(hit) {
+        if !self.node_is_admitted(hit) {
             return None;
         }
         let dom = self.dom.borrow();
@@ -1059,7 +1332,10 @@ where
         node: NodeId,
         event: ValueEvent,
     ) -> Vec<Action> {
-        if !event.value.is_finite() || !self.node_is_live(node) {
+        self.scrub_dead_interaction_handles();
+        if !event.value.is_finite()
+            || !node_is_accessibility_admitted_in_dom(&self.dom.borrow(), node)
+        {
             return Vec::new();
         }
         let Some(path) = self.ctx.value_handler(node).map(<[ViewId]>::to_vec) else {
@@ -1101,7 +1377,8 @@ where
         event: WheelEvent,
     ) -> Vec<Action> {
         self.last_default_prevented = false;
-        if !self.node_is_live(target) {
+        self.scrub_dead_interaction_handles();
+        if !self.node_is_admitted(target) {
             return Vec::new();
         }
         let resolved = {
@@ -1126,7 +1403,7 @@ where
     /// The nearest ancestor of `hit` (including itself) carrying an
     /// [`on_wheel`](crate::on_wheel) handler.
     pub(crate) fn wheel_target(&self, hit: NodeId) -> Option<NodeId> {
-        if !self.node_is_live(hit) {
+        if !self.node_is_admitted(hit) {
             return None;
         }
         let dom = self.dom.borrow();
@@ -1284,6 +1561,28 @@ where
     pub fn update(&mut self, f: impl FnOnce(&mut State)) {
         f(&mut self.state);
         self.tree.rebuild(&mut self.logic, &mut self.state);
+    }
+
+    /// Refresh retained listener routes after an external host changes this
+    /// runner's placement path, without evaluating application logic.
+    pub fn refresh_routes(&mut self) {
+        self.tree.refresh_routes(&mut self.state);
+    }
+
+    /// Prepare a subtree for synchronous relocation. Call this before changing
+    /// its parent or placement metadata, and forward the returned actions to
+    /// the product owner. This can dispatch pointer Cancel and a synthetic IME
+    /// Commit through the subtree's current retained routes.
+    pub fn prepare_subtree_move(&mut self, subtree: NodeId) -> Vec<Action> {
+        self.tree
+            .prepare_subtree_move(&mut self.logic, &mut self.state, subtree)
+    }
+
+    /// Whether relocating `subtree` now would discard an active Cambium
+    /// pointer capture or focused IME preedit. A host can use this as a
+    /// fail-closed check when it cannot call [`Self::prepare_subtree_move`].
+    pub fn subtree_move_has_active_interaction(&self, subtree: NodeId) -> bool {
+        self.tree.subtree_move_has_active_interaction(subtree)
     }
 
     /// Update retained paint state without rebuilding the semantic view tree.
@@ -1531,12 +1830,55 @@ where
 /// Append `node`'s focusable descendants (including itself), in document
 /// pre-order, to `out`. Focusable = carries a key handler ([`GenetCtx::is_focusable`]).
 fn collect_focusables(dom: &ScriptedDom, ctx: &GenetCtx, node: NodeId, out: &mut Vec<NodeId>) {
+    // Hidden, parked, and accessibility-hidden ancestors exclude their entire
+    // subtree from DOM-order focus traversal, even when listener records remain.
+    if !node_is_accessibility_admitted_in_dom(dom, node) {
+        return;
+    }
     if ctx.is_focusable(node) {
         out.push(node);
     }
     for child in dom.dom_children(node) {
         collect_focusables(dom, ctx, child, out);
     }
+}
+
+fn is_true_token(value: &str) -> bool {
+    matches!(
+        value.trim().to_ascii_lowercase().as_str(),
+        "true" | "1" | "yes" | "on"
+    )
+}
+
+fn node_is_admitted_in_dom(dom: &ScriptedDom, node: NodeId) -> bool {
+    if !dom.is_live(node) {
+        return false;
+    }
+    let mut current = Some(node);
+    while let Some(ancestor) = current {
+        if attr(dom, ancestor, "hidden").is_some()
+            || attr(dom, ancestor, "inert").is_some()
+            || attr(dom, ancestor, "data-cambium-parked").is_some_and(is_true_token)
+        {
+            return false;
+        }
+        current = dom.parent(ancestor);
+    }
+    true
+}
+
+fn node_is_accessibility_admitted_in_dom(dom: &ScriptedDom, node: NodeId) -> bool {
+    if !node_is_admitted_in_dom(dom, node) {
+        return false;
+    }
+    let mut current = Some(node);
+    while let Some(ancestor) = current {
+        if attr(dom, ancestor, "aria-hidden").is_some_and(is_true_token) {
+            return false;
+        }
+        current = dom.parent(ancestor);
+    }
+    true
 }
 
 fn attr<'a>(dom: &'a ScriptedDom, node: NodeId, name: &str) -> Option<&'a str> {
@@ -1567,9 +1909,9 @@ mod tests {
     use genet_scripted_dom::{NodeId, ScriptedDom};
     use layout_dom_api::{DomMutation, LayoutDom, LayoutDomMut, NodeKind};
 
-    use crate::{DomHandle, El, el};
+    use crate::{CompositionEvent, DomHandle, El, FocusPhase, el};
 
-    use super::GenetAppRunner;
+    use super::{GenetAppRunner, is_true_token};
 
     /// A counter: the canonical Stage 1b app state.
     struct Counter {
@@ -1679,6 +2021,365 @@ mod tests {
                     .any(|m| matches!(m, DomMutation::Removed { .. })),
                 "tick to {expected} should not remove nodes: {muts:?}"
             );
+        }
+    }
+
+    #[test]
+    fn hidden_and_parked_ancestors_are_not_admitted_or_focusable() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(
+            dom.clone(),
+            |_count: &u32| {
+                crate::button::<u32, (), (), _>(
+                    "increment",
+                    |count: &mut u32, _: crate::PointerClick| {
+                        *count += 1;
+                    },
+                )
+            },
+            0_u32,
+        );
+        let root = runner.root();
+        runner.set_focus(Some(root));
+        assert_eq!(runner.focus(), Some(root));
+
+        dom.borrow_mut()
+            .set_attribute(root, crate::attr_qual("inert"), "");
+
+        assert!(
+            runner
+                .dispatch_key(crate::KeyEvent::new(crate::Key::Named(
+                    crate::NamedKey::Enter
+                )))
+                .is_empty()
+        );
+        assert_eq!(runner.state(), &0, "hidden key activation must be rejected");
+        assert!(
+            runner
+                .dispatch_click(root, crate::PointerClick::at((0.0, 0.0)))
+                .is_empty()
+        );
+        assert!(runner.focusables().is_empty());
+        assert_eq!(runner.focus(), None, "a hidden focused node is scrubbed");
+        assert_eq!(
+            runner.state(),
+            &0,
+            "hidden activation must not mutate app state"
+        );
+        runner.set_focus(Some(root));
+        assert_eq!(
+            runner.focus(),
+            None,
+            "programmatic focus cannot target hidden content"
+        );
+    }
+
+    #[derive(Default)]
+    struct HideInteractionState {
+        hidden: bool,
+        focus: Vec<FocusPhase>,
+        pointer: Vec<crate::PointerPhase>,
+        keys: usize,
+        clicks: usize,
+        values: usize,
+    }
+
+    fn hide_interaction_view(
+        state: &HideInteractionState,
+    ) -> impl crate::View<HideInteractionState, (), crate::GenetCtx, Element = crate::GenetElement> + use<>
+    {
+        let element = if state.hidden {
+            el::<_, HideInteractionState, ()>("div", "interaction").attr("hidden", "")
+        } else {
+            el::<_, HideInteractionState, ()>("div", "interaction")
+        };
+        crate::focusable(crate::on_focus(
+            crate::on_value(
+                crate::on_key(
+                    crate::on_pointer(
+                        crate::on_click(element, |state: &mut HideInteractionState, _| {
+                            state.clicks += 1;
+                        }),
+                        |state: &mut HideInteractionState, event: crate::PointerEvent| {
+                            state.pointer.push(event.phase);
+                        },
+                    ),
+                    |state: &mut HideInteractionState, _: crate::KeyEvent| state.keys += 1,
+                ),
+                |state: &mut HideInteractionState, event: crate::ValueEvent| {
+                    state.values += event.value as usize;
+                },
+            ),
+            |state: &mut HideInteractionState, event: crate::FocusEvent| {
+                state.focus.push(event.phase);
+            },
+        ))
+    }
+
+    #[test]
+    fn normal_hidden_rebuild_publishes_focus_lost_and_pointer_cancel_once() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::new(dom, hide_interaction_view, HideInteractionState::default());
+        let root = runner.root();
+        runner.set_focus(Some(root));
+        runner.dispatch_pointer_down(
+            root,
+            crate::PointerEvent::new(crate::PointerPhase::Down, (1.0, 1.0), (4.0, 4.0)),
+        );
+        assert_eq!(runner.pointer_capture(), Some(root));
+        assert_eq!(runner.state().focus, [FocusPhase::Gained]);
+        assert_eq!(runner.state().pointer, [crate::PointerPhase::Down]);
+
+        runner.update(|state| state.hidden = true);
+
+        assert_eq!(runner.focus(), None);
+        assert_eq!(runner.pointer_capture(), None);
+        assert_eq!(runner.state().focus, [FocusPhase::Gained, FocusPhase::Lost]);
+        assert_eq!(
+            runner.state().pointer,
+            [crate::PointerPhase::Down, crate::PointerPhase::Cancel]
+        );
+        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Named(
+            crate::NamedKey::Enter,
+        )));
+        runner.dispatch_pointer_down(
+            root,
+            crate::PointerEvent::new(crate::PointerPhase::Down, (1.0, 1.0), (4.0, 4.0)),
+        );
+        runner.dispatch_click(root, crate::PointerClick::at((1.0, 1.0)));
+        assert_eq!(runner.state().keys, 0);
+        assert_eq!(runner.state().clicks, 0);
+        assert_eq!(runner.state().focus, [FocusPhase::Gained, FocusPhase::Lost]);
+        assert_eq!(
+            runner.state().pointer,
+            [crate::PointerPhase::Down, crate::PointerPhase::Cancel]
+        );
+    }
+
+    #[test]
+    fn aria_hidden_keeps_physical_clicks_but_rejects_accessibility_actions() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(
+            dom.clone(),
+            hide_interaction_view,
+            HideInteractionState::default(),
+        );
+        let root = runner.root();
+        dom.borrow_mut()
+            .set_attribute(root, crate::attr_qual("aria-hidden"), "true");
+
+        runner.dispatch_click(root, crate::PointerClick::at((1.0, 1.0)));
+        assert_eq!(runner.state().clicks, 1);
+        assert!(runner.focusables().is_empty());
+        assert!(
+            runner
+                .dispatch_value(root, crate::ValueEvent { value: 5.0 })
+                .is_empty()
+        );
+        assert_eq!(runner.state().values, 0);
+    }
+
+    #[derive(Default)]
+    struct FileCompletionState {
+        hidden: bool,
+        completed: usize,
+    }
+
+    fn file_completion_view(
+        state: &FileCompletionState,
+    ) -> impl crate::View<FileCompletionState, (), crate::GenetCtx, Element = crate::GenetElement> + use<>
+    {
+        let element = if state.hidden {
+            el::<_, FileCompletionState, ()>("button", "choose").attr("hidden", "")
+        } else {
+            el::<_, FileCompletionState, ()>("button", "choose")
+        };
+        crate::open_file(
+            element,
+            true,
+            crate::FileFilter::default(),
+            |state: &mut FileCompletionState, _: crate::FileEvent| state.completed += 1,
+        )
+    }
+
+    #[test]
+    fn hidden_live_file_owner_receives_already_started_completion() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::new(dom, file_completion_view, FileCompletionState::default());
+        let request = runner.take_file_request().expect("initial file request");
+        runner.update(|state| state.hidden = true);
+
+        runner.dispatch_file(request.node, crate::FileEvent::default());
+
+        assert_eq!(runner.state().completed, 1);
+    }
+
+    #[test]
+    fn admission_tokens_are_exact_and_boolean_attributes_are_presence_based() {
+        assert!(is_true_token(" true "));
+        assert!(is_true_token("1"));
+        assert!(!is_true_token("true-ish"));
+        assert!(!is_true_token("false"));
+    }
+
+    #[test]
+    fn hidden_numeric_control_does_not_accept_accessibility_value() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(
+            dom.clone(),
+            |_: &u32| {
+                crate::on_value(
+                    crate::el::<_, u32, ()>("input", ""),
+                    |state: &mut u32, event: crate::ValueEvent| *state = event.value as u32,
+                )
+            },
+            0_u32,
+        );
+        let root = runner.root();
+        dom.borrow_mut()
+            .set_attribute(root, crate::attr_qual("inert"), "");
+        assert!(
+            runner
+                .dispatch_value(root, crate::ValueEvent { value: 7.0 })
+                .is_empty()
+        );
+        assert_eq!(runner.state(), &0);
+    }
+
+    #[test]
+    fn hiding_captured_pointer_target_cancels_capture_before_next_move() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(
+            dom.clone(),
+            |_: &u32| {
+                crate::on_pointer(
+                    crate::el::<_, u32, ()>("div", "drag"),
+                    |count: &mut u32, _: crate::PointerEvent| *count += 1,
+                )
+            },
+            0_u32,
+        );
+        let root = runner.root();
+        runner.dispatch_pointer_down(
+            root,
+            crate::PointerEvent::new(crate::PointerPhase::Down, (1.0, 1.0), (10.0, 10.0)),
+        );
+        assert_eq!(runner.pointer_capture(), Some(root));
+        dom.borrow_mut()
+            .set_attribute(root, crate::attr_qual("hidden"), "");
+
+        runner.dispatch_pointer_move(crate::PointerEvent::new(
+            crate::PointerPhase::Move,
+            (2.0, 2.0),
+            (10.0, 10.0),
+        ));
+        assert_eq!(runner.pointer_capture(), None);
+        assert_eq!(
+            runner.state(),
+            &1,
+            "hidden move must not reach the captured handler"
+        );
+    }
+
+    #[test]
+    fn prepare_move_routes_pointer_cancel_before_host_reparents() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(
+            dom,
+            |_: &Vec<crate::PointerPhase>| {
+                crate::on_pointer(
+                    crate::el::<_, Vec<crate::PointerPhase>, ()>("div", "drag"),
+                    |phases: &mut Vec<crate::PointerPhase>, event: crate::PointerEvent| {
+                        phases.push(event.phase);
+                    },
+                )
+            },
+            Vec::new(),
+        );
+        let root = runner.root();
+        runner.dispatch_pointer_down(
+            root,
+            crate::PointerEvent::new(crate::PointerPhase::Down, (1.0, 1.0), (10.0, 10.0)),
+        );
+        assert!(runner.subtree_move_has_active_interaction(root));
+
+        runner.prepare_subtree_move(root);
+
+        assert_eq!(
+            runner.state(),
+            &[crate::PointerPhase::Down, crate::PointerPhase::Cancel]
+        );
+        assert_eq!(runner.pointer_capture(), None);
+        assert!(!runner.subtree_move_has_active_interaction(root));
+    }
+
+    #[test]
+    fn preparing_move_commits_active_preedit_once_before_relocation() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::new(dom, crate::text_field_typed, crate::TextInput::new(""));
+        let root = runner.root();
+        runner.set_focus(Some(root));
+        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Composition(
+            CompositionEvent::Preedit {
+                text: "漢".into(),
+                selection: None,
+            },
+        )));
+        assert_eq!(runner.state().preedit(), "漢");
+        assert!(runner.subtree_move_has_active_interaction(root));
+
+        runner.prepare_subtree_move(root);
+        assert!(!runner.subtree_move_has_active_interaction(root));
+        assert_eq!(runner.state().text(), "漢");
+        assert_eq!(runner.state().preedit(), "");
+
+        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Composition(
+            CompositionEvent::Commit("漢".into()),
+        )));
+        assert_eq!(
+            runner.state().text(),
+            "漢",
+            "matching late commit is deduplicated"
+        );
+    }
+
+    #[test]
+    fn prepared_ime_commit_expires_on_lifecycle_or_ordinary_input() {
+        let resets = [
+            (crate::Key::Composition(CompositionEvent::Enabled), "漢漢"),
+            (crate::Key::Composition(CompositionEvent::Disabled), "漢漢"),
+            (
+                crate::Key::Composition(CompositionEvent::Preedit {
+                    text: "漢".into(),
+                    selection: None,
+                }),
+                "漢漢",
+            ),
+            (crate::Key::Character("q".into()), "漢q漢"),
+        ];
+        for (reset, expected) in resets {
+            let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+            let mut runner =
+                GenetAppRunner::new(dom, crate::text_field_typed, crate::TextInput::new(""));
+            let root = runner.root();
+            runner.set_focus(Some(root));
+            runner.dispatch_key(crate::KeyEvent::new(crate::Key::Composition(
+                CompositionEvent::Preedit {
+                    text: "漢".into(),
+                    selection: None,
+                },
+            )));
+            runner.prepare_subtree_move(root);
+
+            runner.dispatch_key(crate::KeyEvent::new(reset));
+            runner.dispatch_key(crate::KeyEvent::new(crate::Key::Composition(
+                CompositionEvent::Commit("漢".into()),
+            )));
+
+            assert_eq!(runner.state().text(), expected);
         }
     }
 }

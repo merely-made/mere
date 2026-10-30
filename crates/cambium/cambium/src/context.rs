@@ -20,6 +20,7 @@
 //! silently clobber an earlier one.
 
 use std::any::{Any, TypeId};
+use std::cell::Cell;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -53,6 +54,14 @@ pub(crate) enum FocusRequest {
 /// same context for drag capture, hover transitions, and scroll routing.
 pub struct GenetCtx {
     id_path: Vec<ViewId>,
+    /// Host-requested retained-tree walk used only to refresh routing paths
+    /// after a placement move. It must not make memoized component bodies run.
+    route_refresh: Rc<Cell<bool>>,
+    /// Interaction state mirrored from the owning runner before each retained
+    /// rebuild so composition views can fail closed before a placement move.
+    active_focus: Option<NodeId>,
+    active_preedit: Option<NodeId>,
+    active_capture: Option<NodeId>,
     dom: DomHandle,
     /// Click, key and focus listeners: the `genet_events` registry (shared, so
     /// a host can hand one in) and the token table mapping each of Cambium's
@@ -184,6 +193,10 @@ impl GenetCtx {
     pub fn with_events(dom: DomHandle, events: Rc<RefCell<Registry>>) -> Self {
         Self {
             id_path: Vec::new(),
+            route_refresh: Rc::new(Cell::new(false)),
+            active_focus: None,
+            active_preedit: None,
+            active_capture: None,
             dom,
             listeners: Listeners::new(events),
             focusable: HashMap::new(),
@@ -200,6 +213,71 @@ impl GenetCtx {
 
     pub(crate) fn request_focus(&mut self, node: NodeId) {
         self.focus_request = Some(FocusRequest::Focus(node));
+    }
+
+    /// Run a retained view rebuild as a routing-only traversal. Event wrappers
+    /// update their stored paths while memoized component boundaries preserve
+    /// local state and skip their body.
+    pub fn with_route_refresh<R>(&mut self, f: impl FnOnce(&mut Self) -> R) -> R {
+        struct Reset {
+            flag: Rc<Cell<bool>>,
+            old: bool,
+        }
+        impl Drop for Reset {
+            fn drop(&mut self) {
+                self.flag.set(self.old);
+            }
+        }
+        let was_refreshing = self.route_refresh.replace(true);
+        let _reset = Reset {
+            flag: Rc::clone(&self.route_refresh),
+            old: was_refreshing,
+        };
+        f(self)
+    }
+
+    pub(crate) fn route_refresh_requested(&self) -> bool {
+        self.route_refresh.get()
+    }
+
+    pub(crate) fn current_view_path(&self) -> &[ViewId] {
+        &self.id_path
+    }
+
+    pub(crate) fn set_interaction_snapshot(
+        &mut self,
+        focus: Option<NodeId>,
+        preedit: Option<NodeId>,
+        capture: Option<NodeId>,
+    ) {
+        self.active_focus = focus;
+        self.active_preedit = preedit;
+        self.active_capture = capture;
+    }
+
+    /// Whether moving `subtree` would strand an active Cambium composition or
+    /// pointer capture. The focused target is separately queryable so a host
+    /// can preserve focus across a visible move.
+    pub(crate) fn subtree_move_has_active_interaction(&self, subtree: NodeId) -> bool {
+        self.in_subtree(subtree, self.active_preedit)
+            || self.in_subtree(subtree, self.active_capture)
+    }
+
+    pub(crate) fn focused_node_in_subtree(&self, subtree: NodeId) -> Option<NodeId> {
+        self.active_focus
+            .filter(|&node| self.in_subtree(subtree, Some(node)))
+    }
+
+    fn in_subtree(&self, root: NodeId, node: Option<NodeId>) -> bool {
+        let dom = self.dom.borrow();
+        let mut current = node;
+        while let Some(candidate) = current {
+            if candidate == root {
+                return true;
+            }
+            current = dom.parent(candidate);
+        }
+        false
     }
 
     pub(crate) fn request_blur(&mut self, node: NodeId) {

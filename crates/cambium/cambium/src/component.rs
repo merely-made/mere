@@ -126,6 +126,8 @@ pub struct ComponentState<Local: 'static, Event: 'static> {
     /// Set when a message reaches this subtree (it may have mutated `local`),
     /// cleared when a rebuild has run `body`. Gates the `memo()` skip.
     local_dirty: bool,
+    /// The placement path at which the retained child last registered routes.
+    route_path: Vec<meristem::ViewId>,
 }
 
 impl<Props, Local, Event, State, Action, Output, Init, Reconcile, Body, OnEvent> ViewMarker
@@ -167,6 +169,7 @@ where
                 child,
                 child_state,
                 local_dirty: false,
+                route_path: ctx.current_view_path().to_vec(),
             },
         )
     }
@@ -179,10 +182,46 @@ where
         mut element: Mut<'_, Self::Element>,
         _app_state: &mut State,
     ) {
+        if ctx.route_refresh_requested() {
+            // A host placement walk is routing-only even for components that
+            // are not memoized. Preserve the retained factory result and local
+            // state, and let each nested component make the same decision.
+            state.child.rebuild(
+                &state.child,
+                &mut state.child_state,
+                ctx,
+                element.reborrow_mut(),
+                &mut state.local,
+            );
+            state.route_path = ctx.current_view_path().to_vec();
+            apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+            return;
+        }
         if let Some(unchanged) = self.props_unchanged {
-            if !state.local_dirty && unchanged(&prev.props, &self.props) {
+            if unchanged(&prev.props, &self.props)
+                && !state.local_dirty
+                && state.route_path == ctx.current_view_path()
+            {
                 // The probe stamp is cheap and idempotent, and `probe_id` is
                 // not covered by the props comparison, so keep it honest.
+                apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+                return;
+            }
+            if unchanged(&prev.props, &self.props)
+                && !state.local_dirty
+                && state.route_path != ctx.current_view_path()
+            {
+                // Route-only traversal: re-enter the retained child at its
+                // current path. In particular, do not call reconcile/body or
+                // mutate local state because placement changed.
+                state.child.rebuild(
+                    &state.child,
+                    &mut state.child_state,
+                    ctx,
+                    element.reborrow_mut(),
+                    &mut state.local,
+                );
+                state.route_path = ctx.current_view_path().to_vec();
                 apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
                 return;
             }
@@ -198,6 +237,7 @@ where
         );
         state.child = child;
         state.local_dirty = false;
+        state.route_path = ctx.current_view_path().to_vec();
         apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
     }
 
@@ -256,6 +296,7 @@ mod tests {
 
     use genet_scripted_dom::ScriptedDom;
     use layout_dom_api::{DomMutation, LayoutDom, LayoutDomMut, LocalName, Namespace};
+    use meristem::ViewPathTracker;
 
     use super::*;
     use crate::{
@@ -531,6 +572,141 @@ mod tests {
             body_runs.get(),
             3,
             "the skip resumes once local is clean again"
+        );
+    }
+
+    #[test]
+    fn route_refresh_traverses_retained_component_without_running_body() {
+        use std::cell::Cell;
+
+        let body_runs = Rc::new(Cell::new(0_u32));
+        let seen = body_runs.clone();
+        let view = move |_: &ProbeApp| {
+            let seen = seen.clone();
+            component(
+                (),
+                |_: &()| (),
+                |_: &(), _: &(), _: &mut ()| {},
+                move |_: &(), _: &()| -> ComponentView<(), ProbeEvent> {
+                    seen.set(seen.get() + 1);
+                    Box::new(crate::el::<_, (), ProbeEvent>("div", "retained"))
+                },
+                |_: &mut ProbeApp, _: ProbeEvent| {},
+            )
+        };
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(dom, view, ProbeApp { probe_id: None });
+        assert_eq!(body_runs.get(), 1);
+
+        runner.refresh_routes();
+
+        assert_eq!(
+            body_runs.get(),
+            1,
+            "route refresh must retain component body state"
+        );
+    }
+
+    struct PathScope<V> {
+        route: u64,
+        child: V,
+    }
+
+    struct PathScopeState<S> {
+        child: S,
+    }
+
+    impl<V> ViewMarker for PathScope<V> {}
+
+    impl<State: 'static, Action: 'static, V> View<State, Action, GenetCtx> for PathScope<V>
+    where
+        V: View<State, Action, GenetCtx, Element = GenetElement>,
+    {
+        type Element = GenetElement;
+        type ViewState = PathScopeState<V::ViewState>;
+
+        fn build(&self, ctx: &mut GenetCtx, state: &mut State) -> (GenetElement, Self::ViewState) {
+            ctx.push_id(meristem::ViewId::new(self.route));
+            let (element, child) = self.child.build(ctx, state);
+            ctx.pop_id();
+            (element, PathScopeState { child })
+        }
+
+        fn rebuild(
+            &self,
+            prev: &Self,
+            state: &mut Self::ViewState,
+            ctx: &mut GenetCtx,
+            element: Mut<'_, GenetElement>,
+            app_state: &mut State,
+        ) {
+            ctx.push_id(meristem::ViewId::new(self.route));
+            self.child
+                .rebuild(&prev.child, &mut state.child, ctx, element, app_state);
+            ctx.pop_id();
+        }
+
+        fn teardown(
+            &self,
+            state: &mut Self::ViewState,
+            ctx: &mut GenetCtx,
+            element: Mut<'_, GenetElement>,
+        ) {
+            self.child.teardown(&mut state.child, ctx, element);
+        }
+
+        fn message(
+            &self,
+            state: &mut Self::ViewState,
+            message: &mut MessageCtx,
+            element: Mut<'_, GenetElement>,
+            app_state: &mut State,
+        ) -> MessageResult<Action> {
+            self.child
+                .message(&mut state.child, message, element, app_state)
+        }
+    }
+
+    #[test]
+    fn dirty_memo_component_renders_when_parent_route_changes_in_same_dispatch() {
+        use std::cell::Cell;
+
+        let body_runs = Rc::new(Cell::new(0_u32));
+        let seen = body_runs.clone();
+        let logic = move |app: &ProbeApp| {
+            let seen = seen.clone();
+            PathScope {
+                route: if app.probe_id.is_some() { 1 } else { 0 },
+                child: component::<(), i64, Bump, ProbeApp, Bump, (), _, _, _, _>(
+                    (),
+                    |_: &()| 0_i64,
+                    |_: &(), _: &(), _: &mut i64| {},
+                    move |_: &(), _count: &i64| -> ComponentView<i64, Bump> {
+                        seen.set(seen.get() + 1);
+                        Box::new(crate::button(
+                            "increment",
+                            move |count: &mut i64, _: crate::PointerClick| {
+                                *count += 1;
+                                Bump
+                            },
+                        ))
+                    },
+                    |app: &mut ProbeApp, _: Bump| app.probe_id = Some("changed-route".into()),
+                )
+                .memo(),
+            }
+        };
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(dom, logic, ProbeApp { probe_id: None });
+        let root = runner.root();
+        assert_eq!(body_runs.get(), 1);
+
+        runner.dispatch_click(root, crate::PointerClick::at((0.0, 0.0)));
+
+        assert_eq!(
+            body_runs.get(),
+            2,
+            "dirty local state must render despite route change"
         );
     }
 }

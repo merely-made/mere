@@ -184,6 +184,7 @@ pub use overlay_surface::{OverlayDismiss, OverlayRole, OverlaySurface, overlay_s
 pub use pod::{GenetElement, GenetElementMut};
 pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_pointer};
 pub use portable::{PortableKeyed, PortableKeyedState};
+mod retained_composition;
 mod retained_mount;
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, RadioOption, radio_group, radio_options};
@@ -192,6 +193,11 @@ pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
 pub use resize_handle::{RESIZE_HANDLE_CSS, ResizeBounds, ResizeHandleEvent, resize_handle};
+pub use retained_composition::{
+    ComponentRoute, ComponentRouteSnapshot, ErasedComponentView, LifecycleEvent,
+    LifecycleEventSink, LifecycleRefusal, RetainedComponentFactory, RetainedComposition,
+    RetainedState,
+};
 pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use runner::{FocusExit, GenetAppRunner};
 pub use select::{SelectState, select};
