@@ -1,5 +1,7 @@
 # Engine and rendering ownership audit, 2026-10-29
 
+**Revision, 2026-10-29:** the [corrected audit](REPORT.md) controls the recommendations. This appendix retains source evidence at the revisions below. Established suppliers and source size do not establish net benefit. Compare the complete consumer feature/build/target cost, retained adapter work and actual behavior removed. Architectural substitutions below are withdrawn from the reuse queue; they would need a coherent stack-level argument. No new implementation is authorized by this appendix.
+
 Read-only source assessment. No builds, runtime probes, migrations, commits or repository edits were performed. Recommendations are ownership judgments; replacement compatibility remains untested. Source line counts below include inline tests and comments and exclude separate `tests/` directories; they indicate size, not complexity or defect counts.
 
 ## Reviewed revisions
@@ -60,37 +62,31 @@ Use [Weedle](https://docs.rs/weedle/latest/weedle/), already used by [wasm-bindg
 
 **Mismatch/test:** Unicode version must remain 17, including defaults for unassigned characters. Compare every Unicode scalar against the retained source corpus and measure native/Wasm artifact growth. A tiny generated table may remain cheaper for consumers that otherwise never need ICU. Do not replace first-strong HTML policy with the full bidi layout algorithm.
 
-## High-cost ownership decisions
+## Architectural observations, outside the reuse queue
 
-### ESSL compiler and WebGL state: investigate ANGLE before expanding the owned compiler
+### ESSL compiler and WebGL state: R29 struck
 
-G `components/webgl-essl/` has 10,005 non-test-file lines across lexer, recursive-descent/Pratt parser, AST, typing, function registry, validation, reflection and lowering. `lib.rs:5-37` describes its partial ESSL 3 delta and ANGLE-inspired WebGL restrictions; `Cargo.toml` already buys rspirv and Naga for SPIR-V-to-WGSL. `components/webgl-wgpu/lib.rs:5-11` adds browser graphics state on the shared wgpu device.
+G `components/webgl-essl/` has 10,005 non-test-file lines across lexer, parser, typing, validation, reflection and lowering at the reviewed revision. It already buys rspirv and Naga. `components/webgl-wgpu` supplies browser graphics state on the shared device. These are observations of owned scope, not evidence that a replacement preserves it.
 
-[ANGLE's standalone GLSL ES translator](https://github.com/google/angle/blob/main/doc/DevSetup.md) is independent of its full GLES/EGL implementation and offers SPIR-V output. It is the serious mature comparator. **Recommendation: strategic evaluate, medium confidence**, not a claimed drop-in. It adds C++ tooling/FFI and complicates pure-Rust and browser-Wasm goals, reflection, stage linking and uniform packing. Replacing the entire graphics backend may introduce a second GPU device rather than preserve the unified-device goal.
+The recommendation to investigate ANGLE as a supplier is withdrawn. Its C++ toolchain conflicts with the pure-Rust requirement. SPIR-V output alone does not establish reflection, stage-linking, uniform layout, WebGL rejection, Wasm or resource-lifecycle equivalence. No ANGLE work is proposed. Naga GLES output is likewise not proof of ESSL input or browser validation support.
 
-**Deciding experiment:** two adapters feeding the same wgpu output and reflection contract, same accepted/rejected ESSL corpus and Khronos WebGL shader validation/linking cases, limits/resource abuse tests, native/wasm build feasibility, and pixels/uniform layouts for both engines. Use ANGLE as a differential oracle even if it cannot be shipped. Naga's ability to output GLES is not evidence that it accepts ESSL 1.00 input or implements browser shader restrictions; a text preprocessor around Naga is not a qualified WebGL compiler replacement.
+### Cadency selectors: R27 recommendation withdrawn
 
-### Cadency selectors: a deliberate reinvention with a real upstream alternative
+G `components/cadency/` has 1,550 non-test-file Rust lines. Its README lists supported selectors and omissions, while the recorded plan deliberately removes selectors/servo_arc. The original audit treated that decision as an economic mistake without measuring the actual alternative.
 
-G `components/cadency/` has 1,550 non-test-file Rust lines. `README.md:7-13` lists supported selectors and explicit omissions (:has, named namespace prefixes, quirks). `design_docs/2026-09-18_cadency_selector_engine_plan.md:10-23` records the earlier decision to remove even `selectors` and `servo_arc`, and decline harvesting upstream generic machinery. That explains the code; the current audit can reconsider it.
+A Rust selectors parser/matcher could be compared as local reuse only after defining required syntax and inspecting its feature/build cone, Element adapter, reach/dependency inspection, invalidation and browser behavior. Neither code size nor upstream maturity establishes that cut. There is no selector migration or prototype in this queue.
 
-The [selectors crate](https://docs.rs/selectors/latest/selectors/) exposes parsing/matching over an Element adapter, relative-selector machinery, bloom filters and nth-index caches. **Recommendation: strategic evaluate, high overlap, medium net-benefit confidence.** If complete web compatibility is the goal, this is more economically questionable ownership than a DOM arena. If the earlier source-family ban remains a present preference, Cadency is its continuing standards-maintenance cost. Restore a library boundary, not all of Stylo, if that trade is now acceptable.
+### WHATWG Streams: R28 recommendation withdrawn
 
-**Test:** same CSS/DOM adapter, specificity/forgiving-list parsing, shadow scope/part/exportparts, state vocabulary, CSS rejection sets, DOM query and cascade WPT, and invalidation/large-tree performance. Existing reach/dependency/key inspection needs equivalent facts or conservative invalidation. Generic matching alone does not supply browser cascade behavior.
+G `components/script-runtime-api/streams/{core,readable,writable,piping}.js` has 3,712 lines and owns shared weak brands, captured per-realm intrinsics, private Fetch operations, promise jobs and buffer transfer. A ponyfill's algorithm coverage does not establish compatible host integration or refusal behavior.
 
-### WHATWG Streams: evaluate vendored upstream algorithms, retain the private host integration
-
-G `components/script-runtime-api/streams/{core,readable,writable,piping}.js` has 3,712 lines. `streams.rs:5-7` and `core.js:60` own agent-shared weak brands and per-realm captured intrinsics. Fetch uses private operation tables, promise jobs and buffer transfer. This is a substantial standards subsystem, not just a queue wrapper.
-
-[web-streams-polyfill](https://github.com/MattiasBuelens/web-streams-polyfill) offers vendorable ponyfill algorithms and tests against WPT, with documented exceptions and real buffer-transfer prerequisites. **Recommendation: evaluate, medium confidence.** Its own compatibility statements are not browser-embedder security qualification. A runtime author cannot assume a package designed for application environments has the same hostile-global, cross-realm or native Fetch integration contract.
-
-**Test:** graft its algorithm core under Genet's captured host operations; run exact current Streams/Fetch WPT plus existing native regression suites on Boa and Vano, mutated globals/prototypes, BYOB real detachment, realm identity/branding, tee/backpressure/error scheduling and live-response clone rejection. `design_docs/2026-10-06_whatwg_streams_plan.md` records recent improvements and earlier losses; retain its before/after accounting. Transferable streams remain separate. The goal is fewer owned algorithms while preserving a browser-quality boundary.
+The polyfill replacement recommendation is withdrawn. No adapter across Boa/Vano realms, hostile globals, native brands, BYOB detachment, backpressure and scheduling was demonstrated. Those obligations cannot be counted as removed simply by importing another implementation.
 
 ### Vano and Boa: keep the VM reuse, audit fork deltas rather than proposing another interpreter
 
 G `components/script-engine-{nova,boa}/Cargo.toml` make the split explicit: Vano for 64-bit, Boa for wasm32/32-bit and a second native conformance path. Vano's own `nova_vm/Cargo.toml` already uses Oxc parser/AST/semantics, regress, temporal_rs, numeric and Unicode crates. There is no evidence that Genet is hand-writing its JavaScript parser, regex engine or Temporal implementation. Piccolo is likewise a reused Lua VM.
 
-The continuing cost is maintaining two adapters and forks for host realm/caller provenance, GC/reflector lifetimes, interruption, buffer transfer, job queues, snapshots and clocks. See G `docs/2026-07-04_vano_strategy_note.md` and `design_docs/2026-10-08_boa_stable_upstream_refresh.md`. **Recommendation: strategic keep/evaluate consolidation, not replace wholesale.** Vano's data-oriented heap cloning is a real architecture feature; Boa covers the target Vano cannot. Choosing one VM or a C/C++ VM is an explicit product/target trade, not a zero-cost dependency upgrade.
+The continuing cost is maintaining two adapters and forks for host realm/caller provenance, GC/reflector lifetimes, interruption, buffer transfer, job queues, snapshots and clocks. See G `docs/2026-07-04_vano_strategy_note.md` and `design_docs/2026-10-08_boa_stable_upstream_refresh.md`. **Corrected assessment: no consolidation is proposed (R40).** Vano's data-oriented heap cloning is a real architecture feature; Boa covers the target Vano cannot. No equivalent single-VM path was demonstrated. A target or snapshot capability change would require its own architectural case; C/C++ alternatives are excluded here.
 
 **Fork retirement test:** exact adapter and realm/GC regression suites against pristine upstream; identify every failed contract; upstream generic host seams and remove only absorbed patches. Native checks and wasm compilation do not prove browser-hosted scripting acceptance.
 
@@ -104,7 +100,7 @@ Owned substantial pieces include scene/resource identity and validation; paint-l
 
 Vello pin `276b4664` carries native shader progress/coarse traversal, resident atlas, allocation recovery, bounded append and device-pixel quality changes (its commit log immediately preceding the pin). **Evaluate upstreaming and retirement per patch.** Later Vello main is not proof those repairs are absorbed, and upstream's current demos are not proof of Genet's exact hardware paths. Require current replay/pixel/timeout receipts on native Vulkan/DX12/Metal and direct browser WebGL2/WebGPU before changing the pin.
 
-Graft/Scry/Weld already buy the three full-browser choices: Servo, platform WebKit/WebView2/WPE, and CEF. Their reviewed READMEs and source inventories show Scry/Weld native resource imports delegated to Graft, while producer callback lifetimes, copy/retain policy, synchronization, navigation and events remain local. **Keep that integration boundary.** A stock webview widget does not promise offscreen pixels into the same wgpu device. Using these existing full engines more often can reduce Genet's standards surface strategically, but will not preserve every pure-Rust, DOM access, portability or graph integration property automatically. Hardware status is per backend and receipt; older all-platform statements do not qualify new engine pins.
+Graft/Scry/Weld already buy the three full-browser choices: Servo, platform WebKit/WebView2/WPE, and CEF. Their reviewed READMEs and source inventories show Scry/Weld native resource imports delegated to Graft, while producer callback lifetimes, copy/retain policy, synchronization, navigation and events remain local. **Keep that integration boundary.** A stock webview widget does not promise offscreen pixels into the same wgpu device. R41’s full-engine substitution recommendation is withdrawn: no equivalent pure-Rust, DOM access, portability or graph integration path was demonstrated. Existing optional adapters do not establish a replacement for Genet. Hardware status is per backend and receipt; older all-platform statements do not qualify new engine pins.
 
 ## Other reviewed boundaries and rejected easy substitutions
 

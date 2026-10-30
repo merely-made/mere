@@ -1,5 +1,7 @@
 # Storage, identity, inference and application ownership review
 
+**Revision, 2026-10-29:** the [corrected audit](REPORT.md) controls the recommendations. This appendix retains source evidence at the revisions below. Established suppliers and source size do not establish net benefit. Compare the complete consumer feature/build/target cost, retained adapter work and actual behavior removed. Architectural substitutions below are withdrawn from the reuse queue; they would need a coherent stack-level argument. No new implementation is authorized by this appendix.
+
 Reviewed 2026-10-29. This is source and dependency evidence, not migration or runtime qualification. Revisions are deliberately fixed because other work was advancing the repositories during the audit.
 
 | Source | Revision reviewed |
@@ -14,29 +16,29 @@ Reviewed 2026-10-29. This is source and dependency evidence, not migration or ru
 
 ## Findings
 
-### 1. Replace the handwritten MAC comparison
+### 1. Use a dedicated MAC comparison; family scope remains open
 
 **Confidence: high. Scope: small.** Dramatis `crates/personae/src/sealed_record_storage/freshness.rs:188-189,262` uses a local XOR/OR loop called `constant_time_eq` when authenticating the freshness-ledger MAC. Source-level absence of an early return on different bytes does not provide a compiler-resistant constant-time contract. Use a dedicated equality primitive, such as [`constant_time_eq`](https://docs.rs/constant_time_eq/latest/constant_time_eq/), already directly used by Castellan elsewhere in the stack, or an appropriate `subtle` comparison.
 
 This is a reason to retire a local primitive, not evidence of a demonstrated timing exploit. Preserve the fixed 32-byte MAC type and failure result. Done when the local primitive is removed, valid/tampered ledger tests retain their results, and the dependency/target policy is checked.
 
-### 2. Replace commodity Base58, hex and percent codecs
+### 2. Evaluate/consolidate commodity codecs across the family
 
 **Confidence: high. Scope: small, cross-repository.** Additional to the earlier Castellan Base32 and Truchman Base64 findings, Dramatis `crates/insigne/src/encoding.rs:17,44,73,84` implements Base58 and hex. Eidetic `crates/eidetic-core/src/pack.rs:173,178` implements another hex pair, and `crates/servitor/src/lib.rs:116,129` has another representation. Turnstone has more hex decoders under `src/place.rs`, `src/resident_admission.rs`, and `src/resident_runs.rs`.
 
-[`bs58`](https://docs.rs/bs58/latest/bs58/) has no external dependencies and supports custom alphabets and caller buffers. [`data-encoding`](https://docs.rs/data-encoding/latest/data_encoding/) covers Base32/64/hex with explicit tolerance settings. [`percent-encoding`](https://docs.rs/percent-encoding/latest/percent_encoding/) covers the repeated byte decoding in Turnstone `src/download.rs:130`, Castellan OTP URI intake and Gaz account intake. Retain domain validation, exact-length checks, accepted historical casing, and secret-buffer zeroization in the adapters. A tiny codec is still an independent compatibility burden when copied across many crates.
+[`bs58`](https://docs.rs/bs58/latest/bs58/) supports custom alphabets and caller buffers. The tested 0.5.1 alloc configuration adds tinyvec; do not describe it as dependency-free. Inspect the exact feature closure in each consumer. [`data-encoding`](https://docs.rs/data-encoding/latest/data_encoding/) covers Base32/64/hex with explicit tolerance settings. [`percent-encoding`](https://docs.rs/percent-encoding/latest/percent_encoding/) covers the repeated byte decoding in Turnstone `src/download.rs:130`, Castellan OTP URI intake and Gaz account intake. Retain domain validation, exact-length checks, accepted historical casing, and secret-buffer zeroization in the adapters. A tiny codec is still an independent compatibility burden when copied across many crates.
 
 Done when one selected implementation per encoding backs the affected adapters, wire/reference vectors match, malformed inputs keep the intended refusal behavior, and sensitive buffers are cleared on failure.
 
-### 3. Replace bookmark HTML lexing and entity decoding
+### 3. Compare bookmark syntax reuse with a bounded repair
 
 **Confidence: high. Scope: bounded.** Eidetic `crates/eidetic-core/src/import/parser.rs:394,433,479,500` owns an angle-bracket tokenizer, attribute reader and a very small named-entity table. `tokenize_html` finds the first `>` without tracking quoted attribute values. A quoted `>` in an exported bookmark attribute therefore ends the token early. The entity table covers five names plus numeric forms, rather than HTML's named characters.
 
-Use [`html5ever::tokenizer`](https://docs.rs/html5ever/latest/html5ever/tokenizer/) with a token sink and keep the Netscape-bookmark folder/date/location mapping. The tokenizer can be used without adopting the browser engine or constructing a full DOM. A narrow import format does justify narrow domain mapping; it does not require another HTML lexer.
+A candidate is [`html5ever::tokenizer`](https://docs.rs/html5ever/latest/html5ever/tokenizer/) with a token sink preserving the Netscape-bookmark folder/date/location mapping. Its complete added closure and build/target cost in Eidetic are unmeasured; compare them with repairing the bounded parser before choosing it. The tokenizer can be used without adopting the browser engine or constructing a full DOM. A narrow import format does justify narrow domain mapping; it does not require another HTML lexer.
 
 Done when real Firefox/Chrome/Safari export fixtures, quoted delimiters, comments, omitted closing tags, Unicode named references, malformed exports and intake notices survive the adapter. This is static evidence of a parser limitation; no importer execution was performed here.
 
-### 4. Replace download header parsing and byte unescaping
+### 4. Correct download header parsing; choose reuse after comparison
 
 **Confidence: high for replacement; chosen parser still needs trial.** Turnstone `src/download.rs:112` splits Content-Disposition on every semicolon and strips quotes. Quoted filenames containing semicolons and extended parameters with a declared charset are standards work, not product behavior. The current `filename*` branch discards charset/language and decodes as UTF-8 lossily.
 
@@ -66,13 +68,11 @@ The custom parts worth retaining are resource-identity policy: fragment treatmen
 
 Retain the graph-to-triple mapping and disclosure policy, but use [`oxttl`](https://docs.rs/oxttl/latest/oxttl/) / `oxrdf` for RDF term validation and N-Quads syntax. That removes a parallel standards serializer without importing a database. Test IRI delimiters/control characters, Unicode literals, language/datatype terms, deterministic output ordering and parser round trips. Do not claim a confirmed injection vulnerability without checking the input admission path.
 
-### 8. Treat DirectoryBackend as a small database, not a free file adapter
+### 8. DirectoryBackend: R32 recommendation withdrawn
 
-**Confidence: high about the ownership cost; conditional recommendation.** Muniment `crates/muniment/src/directory_backend.rs` implements a checksummed redo format, replay after interruption, single/multi-step commit distinctions, log indexing/truncation, locks, portable path restrictions and poisoned-state recovery. This is database recovery machinery. Redb and Fjall already exist as Muniment backends.
+Muniment `crates/muniment/src/directory_backend.rs` implements checksummed redo, replay, multi-step commit, truncation, locks, path restrictions and poisoned-state recovery. Redb and Fjall already exist as selectable backends. Turnstone's inspected direct feature set selects them, not DirectoryBackend.
 
-For ordinary authoritative mutable state, prefer the established transactional backend. Keep DirectoryBackend when a human-readable, incrementally updated directory is an actual product requirement. If that requirement is essential, a database is not a transparent substitute and the custom backend earns a dedicated crash/filesystem qualification lane. Turnstone's inspected direct Muniment feature set is redb/fjall; do not imply the directory backend currently stores all browser data.
-
-Done condition for retention: explicit consumers plus fault-injection coverage at each durable write/replay boundary on supported filesystems. For retirement: a consumer and format migration that preserves intended readable exports and recovers old interrupted stores.
+The original recommendation to prefer a database for ordinary state is withdrawn from this audit. Human-readable incremental files and backend choice are architectural capabilities. No consumer/format migration preserving those requirements was shown. Recovery testing remains relevant to this backend, but its cost alone does not demonstrate an equivalent substitute.
 
 ### 9. Review Luggage's fork and staged-update trust before expanding it
 
@@ -94,11 +94,11 @@ Keep the durable request grammar contract, acceptance semantics, model session i
 
 The deterministic SplitMix64 stream itself is tiny, versioned by behavior and tied to checkpoint `skip_draws`. Replacing it with a different PRNG merely to remove a few arithmetic lines can break replay for little benefit. Retain it or introduce an explicitly versioned RNG profile. Existing seeded generation and pause/resume results must stay exact; fresh entropy failures should be reported through the provider contract.
 
-### 12. Reassess ownership of model implementations separately from ESP's API
+### 12. Model implementations: R31 recommendation withdrawn
 
-**Confidence: high maintenance burden; medium alternative fit.** ESP's pinned README and source own Llama/Mistral/Qwen dense and MoE blocks, BERT, imports, RoPE variants, quantized weight formats, sampling, layer/expert streaming, LoRA/training and checkpoint reconstruction. Burn already supplies tensor/backend machinery, so calling it an entire homebuilt numerical framework would be wrong.
+The inspected ESP pin owns model architectures, imports, quantization, sampling, streaming and continuation while already buying Burn tensor/backend machinery. That is real owned scope, but not an entire numerical framework written from scratch.
 
-The expensive part is keeping model architecture and optimization compatibility current. Preserve the provider boundary and exact artifact/admission contract. Evaluate an additional established native inference provider before continuing to expand architecture coverage. Existing model implementations may still justify themselves for shared wgpu, bounded library-owned streaming, Wasm or exact continuation. A successful comparison must measure the same admitted models, actual memory limits, startup/token latency, quantization compatibility, cancellation, offline access and continuation guarantees. General claims that llama.cpp/Candle/mistral.rs are drop-in replacements are unsupported by this audit.
+The additional-native-provider recommendation is withdrawn. No supplier was demonstrated to preserve the shared wgpu device, Wasm target, bounded library-owned streaming, artifact/admission, private data, cancellation and continuation contract together. C/C++ suppliers are outside this review's constraints. An architectural argument could question that contract, but must name changed capabilities and migration/deployment costs rather than count model code as a free saving.
 
 ### 13. Retain small exact search; buy an approximate index only at demonstrated scale
 
@@ -114,9 +114,9 @@ Likewise Chartulary wraps petgraph, Muniment wraps redb/fjall/IndexedDB/zip, and
 
 ### 15. Turquet: meaningful model ownership; continue delegating standards foundations
 
-**Decision: keep the provider/API; evaluate specialized internals when a concrete need appears.** Turnstone's actual pin is Turquet 0.13.0 `bc3c454`, not the newer cached 0.17.0. It is a history-preserving adoption of astro-rust; `Cargo.toml` uses hifitime for time scales and sofars for IAU orientation. ANISE is an optional verifier, not currently the runtime ephemeris provider at this pin.
+**Corrected assessment: no provider substitution is proposed (R35).** Turnstone's actual pin is Turquet 0.13.0 `bc3c454`, not the newer cached 0.17.0. It is a history-preserving adoption of astro-rust; `Cargo.toml` uses hifitime for time scales and sofars for IAU orientation. ANISE is an optional verifier, not currently the runtime ephemeris provider at this pin.
 
-The analytical VSOP87/ELP-style model and bounded event search have specific offline/embedded/data-size and provenance goals. An SPK/ANISE runtime provider could reduce analytical-model maintenance for desktop users who accept kernel files, but would change the storage/data contract. Avoid suggesting another astronomy library without comparing frames, timescales, supported epochs, errors, model/data licensing and Wasm/no_std requirements. The pinned AUDIT.md already distinguishes measured, corrected, example-only and unverified legacy calculations; an ordinary algebraic regression is not astronomical accuracy evidence.
+The analytical VSOP87/ELP-style model and bounded event search have specific offline/embedded/data-size and provenance goals. An SPK/ANISE runtime provider would change the storage/data contract; no equivalent replacement benefit was demonstrated here. Avoid suggesting another astronomy library without comparing frames, timescales, supported epochs, errors, model/data licensing and Wasm/no_std requirements. The pinned AUDIT.md already distinguishes measured, corrected, example-only and unverified legacy calculations; an ordinary algebraic regression is not astronomical accuracy evidence.
 
 ## Coverage and limits
 
