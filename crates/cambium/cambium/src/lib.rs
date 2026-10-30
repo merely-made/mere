@@ -83,7 +83,9 @@ mod runner;
 mod sectioned_list;
 mod select;
 mod selection_bar;
+mod setting_row_managed;
 mod setting_row;
+mod setting_row_session;
 mod shell;
 mod slider;
 mod splice;
@@ -148,6 +150,11 @@ pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
 pub use hest::{EffectClass, Invocation, Outcome};
 pub use menu::{MENU_CLASS, MENU_ROW_ACTIVE_CLASS, MENU_ROW_CLASS, menu};
 pub use setting_row::setting_row;
+pub use setting_row_managed::{SettingRowEvent, setting_row_managed};
+pub use setting_row_session::{
+    SettingRowAckDisposition, SettingRowFailureKind, SettingRowObservation, SettingRowPhase,
+    SettingRowSession, SettingRowSnapshot,
+};
 // Re-export the grid's spec types from Sprigging so a host building a `data_grid`
 // needs no second direct `sprigging` dependency. The grid widget's home
 // is here; its column model rides along.

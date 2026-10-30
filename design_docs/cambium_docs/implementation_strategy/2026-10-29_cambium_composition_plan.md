@@ -1,15 +1,15 @@
 # Cambium composition: retained components, bindings and selective updates
 
-**Status:** 2026-10-29: P0, P1 and P2 locally qualified in their recorded
-automated supplier/receiving scopes. P2's flat retained owner table, placement
-containers and parking, route admission, input custody and move preparation
-passed the full Cambium library suite and Turnstone Settings/Arrange receiving
-filters. This does not include headed host acceptance. Move preparation commits
-tracked Cambium preedit and cancels pointer capture through the old route; native
-IME candidate finalization and host echo correlation remain P6 gaps. P3–P6
-remain open. P0/P1/P2 receiving used temporary local source overrides with
-tracked dependency pins unchanged; publication and consumer repinning remain
-separate from these source changes. Earlier findings retain the pre-P0 baseline.
+**Status:** 2026-10-29: P0–P3 implemented and locally qualified in their recorded
+automated supplier/receiving scopes. P3 adds managed draft sessions, the Settings
+arrangement editor and frame-owned config/view persistence. Native arrangement
+and viewer-pin save/restart smoke pairs passed; this is narrower than full P6 host
+acceptance. Move preparation commits tracked Cambium preedit and cancels pointer
+capture through the old route; native IME candidate finalization and host echo
+correlation remain P6 gaps. P4–P6 remain open. Receiving used temporary local
+source overrides with tracked dependency pins unchanged; publication and
+consumer repinning remain separate from these source changes. Earlier findings
+retain their dated baselines.
 
 **For:** reusable controls that retain local state while the user rearranges,
 regroups, hides and saves them. Turnstone's settings pane is the first consumer.
@@ -101,6 +101,9 @@ The implementation has three authorities:
   diagnostics collect the facts each owner emits.
 
 ### What already exists, and what is new
+
+This is the inventory assessed before P0. The P0–P3 phase records below describe
+the implemented source and its current qualification scope.
 
 | Capability | Current source | Work needed for this consumer |
 |---|---|---|
@@ -578,7 +581,57 @@ composition editing and P2–P6 remain open.
 
 ### P3. Editable composition and persistence
 
-- Add row/group/drawer edits and accessible commands to Turnstone settings; save the model through its existing pane-config owner. Implement dirty-delete, conflict and rebind behavior. P1's guarded owner rejects stale writes, but the current `setting_row` still resets its raw draft when an external snapshot changes that same setting's value or control; full dirty/conflicted reconciliation is deferred to this phase.
+- Source implementation: Cambium's opt-in `setting_row_managed` keeps its
+  typed text, slider, toggle or radio control inside the retained component;
+  `SettingRowSession` supplies ephemeral value snapshots, dirty/reset/edit
+  generations and pending/failed/conflicted admission metadata. Existing
+  `setting_row` remains available with its earlier semantics. Managed rows
+  delegate input to the existing controls. Move preparation's synthetic
+  preedit commit reaches the session as an edit; slider cancellation preserves
+  the last drag value.
+- Turnstone now owns a validated accepted arrangement and bounded 64-entry
+  model-only undo/redo history, with commands for adding, moving, grouping,
+  hiding, duplicating, deleting and rebinding rows. Group/drawer collapse and
+  reveal are named accessible controls available outside arrangement mode.
+  Structural commands queue until the pane can prepare old input routes;
+  retirement/rebinding rechecks dirty and pending work after preparation.
+  Confirmed deletion disposes the session; undo creates a clean incarnation.
+- Each realized component key has its own session and guarded binding, even
+  for duplicate rows targeting the same setting. Dirty refresh preserves its
+  captured write guard; only refused Apply raises a conflict. Use current
+  explicitly discards, while review/retry checks the exact freshly reviewed
+  owner guard before submitting. An adjusted reviewed edit remains unresolved
+  through refresh, including when it matches the original baseline. A missing
+  saved target remains inert and can be rebound to a registered target.
+- Authored descriptors/placement persist in `turnstone.settings.config` and
+  expansion/scroll in `turnstone.settings.view`. PaneWorkspace carries view
+  records beside its descriptors through frame/lens persistence and transfers.
+  Drafts, sessions, binding/request guards and history never enter either
+  payload. Unknown authored kinds and unavailable source/setting references
+  round-trip as inert descriptors; newly authored targets require registry
+  admission. Invalid records leave the live arrangement and drafts intact.
+- Save uses an exact pane admission and request id. The shell acknowledges
+  only after the existing frame persistence write succeeds; an error retains
+  unsaved state and an explicit retry path. Own accepted-record echoes cannot
+  erase newer local changes or masquerade as an outside edit. No Meristem
+  API or lifecycle change is needed for P3.
+- Local automated qualification: the full Cambium library passed 401 tests;
+  Turnstone's Settings filter passed 93, Arrange passed nine, and the workspace
+  filter passed 13, all with zero failures. The actual Settings consumer tests
+  include dirty group movement/collapse/reveal, parked refresh, destination-first
+  whole-pane movement plus DOM collection, duplicate/conflict behavior,
+  deletion/undo, unavailable-target rebind, disk restore, invalid-record refusal
+  and failed/successful save-echo admission. The two native
+  `settings_arrangement` scenarios passed using a fresh isolated profile and a
+  new process for restore. Their headed scope proves group save/restore and
+  rendered controls, not physical IME or every placement/scroll variant.
+  Logs, frozen binaries, source hashes, temporary dependency closure and native
+  captures are retained at `/Users/markik/Code/output/cambium-composition-p3`.
+  The existing `rung4_settings` save/restart pair also passed after updating its
+  retired `genet.web` default expectation and expanding Change viewer before
+  choosing a radio. It exercises Auto-to-explicit `genet.livery` pinning,
+  viewer-changed/respawn, title readback and applied restore; it does not claim
+  switching to the retired engine. Failed first attempts remain in the evidence.
 - Done when: a dirty row survives reorder, regroup, hide/reveal, whole-pane move and saving the arrangement; Apply reaches its original target exactly once; source replacement cannot retarget it; confirmed deletion and undo have the documented incarnation behavior; restart restores structure with clean drafts. Invalid configs leave the previous live composition intact; missing kinds/settings remain recoverable descriptors. Existing Turnstone settings scenarios (rung4_settings.scn and rung4_settings_verify.scn under turnstone/scenarios) continue to pass.
 - Needs: P1–P2. Cross-pane row transfer remains outside this slice.
 
@@ -885,3 +938,11 @@ confirmed it.
   nine frozen-binary Arrange tests; zero failures). The consumer used a local
   source override with dependency pins unchanged. No Meristem API change was
   made; P2–P6 remain open. No headed or cross-process qualification is claimed.
+- 2026-10-29: P3 managed settings rows, arrangement commands and frame-owned
+  config/view persistence implemented. Full Cambium library 401/0, Turnstone
+  Settings 93/0, Arrange 9/0 and workspace 13/0 passed. A fresh-profile native
+  arrangement pair and the updated viewer-pin pair passed (four native cases).
+  Per-row conflict review, dirty deletion,
+  clean undo, missing-target recovery and save acknowledgements are exercised
+  through the installed consumer. No Meristem API changes, publication or
+  dependency repin; full P6 host/native IME acceptance remains open.
