@@ -2690,7 +2690,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e"
 dependencies = [
  "serde",
  "uuid",
@@ -5063,7 +5063,7 @@ checksum = "fd8e701084c37e7ef62d3f9e453b618130cbc0ef3573847785952a3ac3f746bf"
 [[package]]
 name = "dramatis"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e"
 dependencies = [
  "gaz",
  "personae",
@@ -6324,7 +6324,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#051e95a68011072f172b9ec4c0f04d4e5259df5b"
+source = "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e"
 dependencies = [
  "insigne",
  "muniment",
