@@ -38,7 +38,6 @@ native = [
     "admission",
     "webrtc-join",
     "graphshell-endpoint/door",
-    "graphshell-endpoint/projection",
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
     "notochord/tokio",
@@ -56,7 +55,7 @@ webrtc-session = ["native", "webrtc-carrier/native"]
 base64.workspace = true
 chirograph.workspace = true
 graphshell-client.workspace = true
-graphshell-endpoint.workspace = true
+graphshell-endpoint = { workspace = true, features = ["projection"] }
 sceno.workspace = true
 scenotime.workspace = true
 insigne = { workspace = true, optional = true }
