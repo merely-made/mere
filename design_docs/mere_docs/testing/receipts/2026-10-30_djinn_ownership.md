@@ -1,8 +1,8 @@
 # Djinn ownership extraction, 2026-10-30
 
-**Status:** Mere receiving gates passed against published suppliers. Independent
-Djinn is published at Armillary `721e17d41a8f258073f440adbbb39ad145250868`.
-External receiver publication is recorded in a follow-up receiving receipt.
+**Status:** ownership extraction and consumer migrations published. The table below
+records exact qualified commits. Subsequent unrelated Mere graph work is preserved
+in this receipt commit; these gates describe the pinned ownership cohort.
 
 ## Ownership
 
@@ -96,3 +96,36 @@ consumers whose direct edges changed. Heavy checks used the shared machine lock,
 3 GiB memory cap, zero swap, one Cargo job, one test thread and 600-second
 execution limit. The retained timeout remains a failed overall gate, with its
 completed subcommands identified separately.
+
+## Published receiving cohort
+
+| Repository / packages | Published commit | Receiving result |
+| --- | --- | --- |
+| Armillary / independent Djinn | `721e17d41a8f258073f440adbbb39ad145250868` | Native and isolated feature fixtures passed |
+| Mere / mere-resident and Graphshell adapters | `675540865430958085da67155188be9ca1aa37ff` | Focused tests and consuming targets passed |
+| Knot | `055e1f4e54e8f2539673d6c9ed2ab273478a1c0d` | Four provider tests and peers check passed |
+| Woodshed / Hocket | `b790b3c1f9c4a08a599e5ad746c39134ee22810a` | Both all-target checks passed |
+| Turnstone | `720f59f885545b93d81070958ac92ce755b99bad` | Authoring-enabled all-target check passed |
+| Cleromancy | `6ec7e34774d9e12bcf5f21969ec883dd059479bd` | Default all-target check; four resident and eight domain tests passed with default features disabled |
+
+The [receiving receipt](../../../../support/receipts/djinn-ownership-20261030/receiving.json)
+records commands, log hashes, source hashes and retained audit locations. These
+final receiver gates use published Git suppliers without local path overrides.
+The earlier default-feature Cleromancy focused test reached its 600-second limit
+while compiling; no test ran in that attempt. Its failed receipt is retained.
+
+Mere's root lock retains Knot's published implementation commit `072ff2ca`; the
+final Knot receiving commit changes only its lock and an unused patch entry.
+Turnstone and Cleromancy lock the final Knot commit. Their existing Genet and Netrender cohorts were retained. Dramatis resolves
+consistently to their existing `051e95a6` cohort, including correction of split
+lock identities in Knot; Murm intake is required by Knot's current
+transport-security API. Stale unused Genet Taffy patch entries were
+removed where they prevented resolution; the selected registry package stayed
+unchanged. Isolated worktrees and failed gate logs remain preserved.
+
+Cleromancy's allocator lock hash changed from `01d3f528` to `565458ea`, but
+baseline and final locked metadata both resolve the actual `565458ea` checkout.
+The package subtree tree ID is identical at both commits:
+`0cdb33d47adf5e74dfc4d0f9e0b2609598c67e78`. This is a corrected stale lock
+identity, not an allocator implementation upgrade; the receiving receipt names
+the retained baseline/final audit.
