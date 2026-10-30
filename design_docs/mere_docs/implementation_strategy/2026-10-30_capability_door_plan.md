@@ -394,3 +394,9 @@ error types settle.
   `CustodyIdentity`, an `AllowedAppRoutes::default()` that admits no one),
   Mere, Knot and Turnstone. Armillary `main` reverted `b2388f4` (`1cb9518`);
   landing the branches repins the cohort to it.
+- 2026-10-30: I1's first step, D7. Armillary `d0c79f5` adds `peer-facts`
+  (Unix credentials and pid, Windows pipe token SID and image, macOS code
+  signature against the audit token), and Djinn's listener and admission
+  record each connection's peer (`serve_with_peer`, `admit_from`,
+  `AdmittedApp::peer`). custody-wire reads peers through it and keeps its
+  custodian policy. Mere adopts the recorded peers when it repins Djinn.

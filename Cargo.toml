@@ -182,6 +182,8 @@ authors = ["Mark AB (markik)"]
 [workspace.dependencies]
 # Independent application door and resident lifetime supplier.
 djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "a333f516a3b8e05c381a3b0b55e617ffe154b592", default-features = false }
+# OS peer facts shared with Djinn's door (capability door plan D7).
+peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", rev = "d0c79f5edf1ba0a4987898a5d44609a8b1c0ce86" }
 
 cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", rev = "b5b70c2c9c40748abedc0c18d2b6ec5373e48958" }
 webcue = "=0.1.2"
