@@ -271,3 +271,26 @@ Fresh bounded gates passed:
   `2fe323729ee022f5eba9517e7677be0f648d5ad65ee9ddbbe30147e262ac498d`.
 
 These feature suites overlap. Repository and fixture locks remained unchanged.
+
+## Djinn consumer review reconciliation
+
+`split-final-check-3` remains a failed receipt (exit 101). Its six E0277 errors
+were introduced consumer migration failures, not an unrelated baseline. The
+later `97e8e1b3c` correction supplies a sanitizing From<serde_json::Error> for
+AppClientError: only category, line and column survive. Existing question-mark
+parsing sites, including resident_devices and resident_status, use that safe
+conversion. No raw Serde error or payload-bearing source is retained. The
+sentinel test exercises Display, Debug and the complete exposed source chain.
+
+On source `aacce9979`, `root-split-consumer-review` passed:
+
+- `cargo check --locked -p djinn --all-targets`, covering the library, tests,
+  examples and binaries enabled by default features;
+- `cargo test --locked -p djinn --test device_directory --test resident_status`,
+  with one device-directory and four resident-status tests passing, none ignored.
+
+The opt-in feature targets and Windows are not implied by this default-target
+check. No source or lock edits were needed for this reconciliation. The run
+retained the existing resource caps. Log SHA-256:
+`b19fbaab7bd44d1e27ba3632e13ea25ceeffa1309f1bf840d0db879d4bfc6601`.
+The original failed gate and these later green gates remain distinct evidence.
