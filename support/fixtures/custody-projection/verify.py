@@ -1,3 +1,9 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 """Run isolated feature gates; retain dependency and expected-failure evidence."""
 import json
 from pathlib import Path
@@ -41,7 +47,7 @@ def metadata(name, target):
               "endpoint_features": nodes[endpoint]["features"],
               "endpoint_direct_dependencies": direct}
     (out / f"{name}-{target}.cone.json").write_text(json.dumps(report, indent=2) + "\n")
-    if name == "custody":
+    if name in ("custody", "custody-types"):
         assert not set(names) & {"chirograph", "sceno", "scenotime", "hest", "pandect",
                                  "mere-kernel", "mere-alembic", "graphshell"}, names
     if name == "projection":
@@ -49,7 +55,7 @@ def metadata(name, target):
     print(name, target, len(names), "normal/build package names", flush=True)
 
 
-for name, forbidden in [("custody", "ProjectionCatalog"), ("projection", "custody_client"),
+for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "app_client"), ("projection", "custody_client"),
                         ("portable", "app_client"), ("host", None)]:
     manifest = str(base / name / "Cargo.toml")
     metadata(name, native)
