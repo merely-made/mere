@@ -10612,6 +10612,7 @@ dependencies = [
  "serde",
  "serde_json",
  "servitor",
+ "stickleback",
  "tempfile",
  "time",
 ]
