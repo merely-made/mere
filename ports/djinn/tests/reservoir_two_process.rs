@@ -19,7 +19,7 @@ use std::process::{Command, Output};
 use std::time::{Duration, Instant};
 
 use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
-use djinn::resident_reservoir::{
+use mere_resident::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};

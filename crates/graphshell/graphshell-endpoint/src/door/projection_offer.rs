@@ -1,8 +1,8 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 //! Portable messages for the application projection provider route.
-use super::app_admission::{AppId, AppRouteId};
 use chirograph::{CarrierNotice, CarrierRequest, CarrierResponse, EndpointDescriptor};
+use djinn::door::app_admission::{AppId, AppRouteId};
 use serde::{Deserialize, Serialize};
 
 pub const PROJECTION_PROVIDER_ROUTE: &str = "mere.projection-provider";

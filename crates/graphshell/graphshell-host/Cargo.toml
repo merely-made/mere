@@ -37,7 +37,7 @@ webrtc-join = [
 native = [
     "admission",
     "webrtc-join",
-    "graphshell-endpoint/door",
+    "djinn/door",
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
     "notochord/tokio",
@@ -52,6 +52,7 @@ native = [
 webrtc-session = ["native", "webrtc-carrier/native"]
 
 [dependencies]
+djinn = { workspace = true, optional = true, features = ["door"] }
 base64.workspace = true
 chirograph.workspace = true
 graphshell-client.workspace = true

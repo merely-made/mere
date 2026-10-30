@@ -4,13 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! **Djinn**, the local desktop resident for the Mere stack.
+//! Mere's concrete resident composition, served by independent Djinn.
 //!
-//! Djinn owns process lifetime, profile-scoped settings, physical content
-//! custody, and local endpoint assembly. Product ports retain their own
-//! semantics: Graphshell provides admitted session surfaces, Knot provides
-//! Djot source, sync, and evidence rules, Personae provides identity, and
-//! Castellan provides credential custody.
+//! This package constructs Knot, graph/reservoir, Distillery and published-site
+//! services and supplies their authorities and shutdown order. Djinn owns the
+//! application door and resident task lifetime. Custodian remains a separately
+//! protected authority using custody-wire. Executable names remain `djinn`.
 
 #![doc(html_no_source)]
 

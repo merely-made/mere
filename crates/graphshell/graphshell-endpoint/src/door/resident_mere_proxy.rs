@@ -14,7 +14,6 @@
 //! `native::resident_mere_proxy`, then briefly Djinn's, until Mark's ruling
 //! after the stack lift plan's P5 put it here.
 
-use crate::door::app_admission::{AppId, AppRouteId};
 use crate::door::projection::AppBrokerClient;
 use crate::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
@@ -25,6 +24,7 @@ use chirograph::{
     IntentResult, ProjectionRequest, ProjectionSnapshot, ResourceChunkRequest,
     ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
 };
+use djinn::door::app_admission::{AppId, AppRouteId};
 use std::sync::mpsc::{self, Sender};
 use std::thread::JoinHandle;
 use std::time::Duration;

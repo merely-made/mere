@@ -25,15 +25,15 @@ use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSnapshot,
 };
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::embedded_reservoir::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::embedded_reservoir::{
     ApplicationReservoirOptions, ReservoirAttachment, ReservoirAttachmentOptions,
 };
-use djinn::resident_mere::MereRoutes;
-use djinn::resident_reservoir::ResidentReservoir;
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_reservoir::ResidentReservoir;
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::projection::AppBrokerClient;
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId, GraphValidator, MereId, mere_dir};
@@ -50,11 +50,11 @@ const PRODUCT: &str = "DJINN_V35_PRODUCT";
 const PATIENCE: Duration = Duration::from_secs(30);
 
 struct NoLocalPrompt;
-impl djinn::startup_vault::Prompt for NoLocalPrompt {
+impl mere_resident::startup_vault::Prompt for NoLocalPrompt {
     fn ask(
         &mut self,
-        _: &djinn::startup_vault::Ask,
-    ) -> Result<djinn::startup_vault::Answer, String> {
+        _: &mere_resident::startup_vault::Ask,
+    ) -> Result<mere_resident::startup_vault::Answer, String> {
         panic!("live resident attachment must not prompt for local custody");
     }
 }
@@ -79,7 +79,7 @@ fn options(root: &Path, address: &str) -> ReservoirAttachmentOptions {
         session_duration: Duration::from_secs(60),
     }
 }
-fn identity() -> Arc<dyn djinn::custody_host::ResidentCustody> {
+fn identity() -> Arc<dyn mere_resident::custody_host::ResidentCustody> {
     Arc::new(PersonaeHost::new(
         IdentityVault::with_profile(
             InMemoryStorage::new(),
@@ -505,7 +505,7 @@ async fn child_serves_the_registered_domain() {
             scope
                 .scope(serve_app_broker(
                     &address,
-                    std::sync::Arc::new(djinn::keeper::Keeper::new(identity())),
+                    std::sync::Arc::new(mere_resident::keeper::Keeper::new(identity())),
                     grants,
                     60_000,
                     None,
@@ -514,7 +514,7 @@ async fn child_serves_the_registered_domain() {
                 .await
         });
         for _ in 0..100 {
-            if graphshell_endpoint::door::local_endpoint::connect_local(&config.endpoint)
+            if djinn::door::local_endpoint::connect_local(&config.endpoint)
                 .await
                 .is_ok()
             {

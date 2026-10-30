@@ -23,9 +23,9 @@ use custody_wire::secret::{Bytes, Secret};
 use custody_wire::{Client, Operation};
 use dramatis::authentication::PassphraseChangeFailureV1;
 use dramatis::intents::{CreateProfileIntentV1, ImportSshKeyNativeIntentV1, PROFILE_CREATE_INTENT, PROFILE_SWITCH_INTENT, SwitchProfileIntentV1};
-use graphshell_endpoint::door::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
-use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
-use graphshell_endpoint::door::identity::{IdentitySurfaceSnapshot, VaultLockView};
+use djinn::door::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
+use djinn::door::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
+use dramatis::view::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider, PersonaId, ProfileId, RetainedKeys};
 
 use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, WalletPublic, refusal};
@@ -274,7 +274,7 @@ impl IdentityProvider for RemoteHost {
 impl ResidentCustody for RemoteHost {
     fn custody_epoch(
         &self,
-    ) -> Result<Option<graphshell_endpoint::door::custody::CustodyEpoch>, CustodyRefusal> {
+    ) -> Result<Option<djinn::door::custody::CustodyEpoch>, CustodyRefusal> {
         let client = self.client()?;
         // Read authoritative status rather than the local boolean watch. Its
         // generation remembers transitions even before this caller subscribed.
@@ -282,7 +282,7 @@ impl ResidentCustody for RemoteHost {
             Outcome::Success {
                 answer: Answer::Status { status },
             } => {
-                let epoch = graphshell_endpoint::door::custody::CustodyEpoch {
+                let epoch = djinn::door::custody::CustodyEpoch {
                     instance: status.instance,
                     generation: status.generation,
                 };

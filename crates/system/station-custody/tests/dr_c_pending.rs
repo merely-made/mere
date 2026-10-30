@@ -12,10 +12,10 @@ fn dr_c_signalman_identity_stays_pending() {
     let authority = DjinnStationAuthority::at(std::env::var("GRAPHSHELL_APP_ENDPOINT").unwrap());
     if mode == "locked" {
         let status = authority.status().unwrap();
-        assert_eq!(status.lock, graphshell_endpoint::door::identity::VaultLockView::Locked);
+        assert_eq!(status.lock, dramatis::view::VaultLockView::Locked);
         assert!(status.wallet_public_key.is_none());
-        let mut client = graphshell_endpoint::door::custody_client::BlockingCustodyClient::open(
-            graphshell_endpoint::door::app_admission::AppId::new("signalman")).unwrap();
+        let mut client = djinn::door::custody_client::BlockingCustodyClient::open(
+            djinn::door::app_admission::AppId::new("signalman")).unwrap();
         assert!(!client.roster().unwrap().entries.is_empty(), "public persona roster remains readable");
     } else {
         assert_eq!(mode, "absent");

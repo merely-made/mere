@@ -21,7 +21,7 @@ use chirograph::{
     SessionOpen,
 };
 use graphshell_client::{ClientState, PresentationResolution, ResolvedContent};
-use graphshell_endpoint::door::wire::BrowserChallenge;
+use djinn::door::wire::BrowserChallenge;
 use graphshell_host::admission::{CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_SERVICE};
 use graphshell_host::lifecycle::SessionAuthority;
 use graphshell_host::session_loop::{SessionEnd, serve_admitted_session};

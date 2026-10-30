@@ -129,13 +129,13 @@ async fn app_wire_receipt() {
         .iter()
         .find(|c| c.accept_blocked.is_none())
         .unwrap();
-    let request = graphshell_endpoint::door::quarantine::ReviewRequest {
+    let request = djinn::door::quarantine::ReviewRequest {
         store: card.store.clone(),
         profile: ProfileId("family".into()),
         persona: card.persona,
         item: card.item.id,
         revision: card.revision.clone(),
-        action: graphshell_endpoint::door::quarantine::ReviewAction::Delete,
+        action: djinn::door::quarantine::ReviewAction::Delete,
     };
     let reply = dramatis_app::execute_at(&endpoint, Request::Review(request)).await;
     assert!(reply.notice.contains("cancelled"));
@@ -164,13 +164,13 @@ async fn native_consent_receipt() {
         .iter()
         .find(|c| c.accept_blocked.is_none())
         .unwrap();
-    let request = graphshell_endpoint::door::quarantine::ReviewRequest {
+    let request = djinn::door::quarantine::ReviewRequest {
         store: card.store.clone(),
         profile: ProfileId("family".into()),
         persona: card.persona,
         item: card.item.id,
         revision: card.revision.clone(),
-        action: graphshell_endpoint::door::quarantine::ReviewAction::Delete,
+        action: djinn::door::quarantine::ReviewAction::Delete,
     };
     let reply = dramatis_app::execute_at(&endpoint, Request::Review(request)).await;
     if std::env::var("DRAMATIS_NATIVE_RESPONSE").as_deref() == Ok("approve") {

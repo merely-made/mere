@@ -694,7 +694,7 @@ pub struct ProjectionProviderSettings {
 
 impl ProjectionProviderSettings {
     pub fn permission(&self) -> Result<crate::door::projection_offers::ProviderPermission, String> {
-        use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
+        use djinn::door::app_admission::{AppId, AppRouteId};
         Ok(crate::door::projection_offers::ProviderPermission {
             provider: AppId::new(&self.provider),
             route: AppRouteId::new(&self.route).map_err(|error| error.to_string())?,

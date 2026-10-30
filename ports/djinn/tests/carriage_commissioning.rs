@@ -13,8 +13,8 @@
 
 use std::path::PathBuf;
 
-use djinn::door::browser_host::now_ms;
-use djinn::sync::carriage_host::{CarriageHost, CarriageHostConfig};
+use mere_resident::door::browser_host::now_ms;
+use mere_resident::sync::carriage_host::{CarriageHost, CarriageHostConfig};
 use graphshell::carriage::CarriageCeilings;
 use personae::Ed25519Keypair;
 

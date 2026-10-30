@@ -10,10 +10,10 @@ use std::path::Path;
 use std::process::Command;
 
 use chirograph::ProjectionSession;
-use djinn::door::app_broker::AppEndpointCatalog;
-use djinn::resident_mere::{MereRoutes, ambient_mere_route_id, mere_route_id};
-use djinn::resident_reservoir::ResidentReservoir;
-use graphshell_endpoint::door::app_admission::{
+use mere_resident::door::app_broker::AppEndpointCatalog;
+use mere_resident::resident_mere::{MereRoutes, ambient_mere_route_id, mere_route_id};
+use mere_resident::resident_reservoir::ResidentReservoir;
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRequest, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::{ProjectionCatalog, ProjectionSource};

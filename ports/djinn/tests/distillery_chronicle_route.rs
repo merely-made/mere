@@ -17,8 +17,8 @@ use chirograph::{
 };
 use common::{lane, lending, now_ms, open_vault, owner, profile, write_device_settings};
 use distillery::ResidentReceipt;
-use djinn::resident::DjinnResident;
-use djinn::resident_distillery::ResidentDistillery;
+use mere_resident::resident::DjinnResident;
+use mere_resident::resident_distillery::ResidentDistillery;
 use graphshell_host::admission::open_session;
 use graphshell_host::carrier::projection_policy;
 use graphshell_host::network_carrier::{
@@ -115,7 +115,7 @@ async fn resident_board_fold_advances_the_admitted_chronicle_route() {
         &data_root,
         &profile(),
         owner(Some(lane())),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose Djinn with its resident Distillery lane");
@@ -294,7 +294,7 @@ async fn resident_board_state_transition_resumes_by_contiguous_diff() {
         &data_root,
         &profile(),
         owner(Some(resident_lane)),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose Djinn with its resident Distillery lane");

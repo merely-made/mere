@@ -1,14 +1,14 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 //! Projection client and carrier over the application connection.
-use crate::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
-use crate::door::app_client::{AppClientError, AppConnection};
 use chirograph::{
     CapabilityProfile, Carrier, CarrierError, CarrierNotice, CarrierRequest, CarrierRequestBody,
     CarrierResponseBody, ContentHash, PortableCardV1, PresentationCodec, ProjectionRequest,
     ProjectionSnapshot, ProtocolVersion, ResourceAssembly, ResourceChunkRequest,
     ResourceChunkResponse, SessionOpen, SessionOpened,
 };
+use djinn::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
+use djinn::door::app_client::{AppClientError, AppConnection};
 
 pub struct AppBrokerClient {
     inner: AppConnection,
@@ -325,9 +325,9 @@ mod resource_boundary_tests {
                 id: 1,
                 body: Ok(CarrierResponseBody::ResourceChunk(Box::new(chunk.clone()))),
             };
-            let framed = crate::door::wire::AppHostMessage::<_, (), ()>::Response { response };
+            let framed = djinn::door::wire::AppHostMessage::<_, (), ()>::Response { response };
             let mut wire = Vec::new();
-            crate::door::frame::write_native_message(&mut wire, &framed).unwrap();
+            djinn::door::frame::write_native_message(&mut wire, &framed).unwrap();
             assert!(wire.len() < 1024 * 1024);
             frames += 1;
             if let Some(actual) =

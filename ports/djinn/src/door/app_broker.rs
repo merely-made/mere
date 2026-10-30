@@ -6,7 +6,7 @@
 
 //! The first-party application door.
 //!
-//! Serves `graphshell_endpoint::door::app_admission`'s endpoint: an owner-only socket that a
+//! Serves `djinn::door::app_admission`'s endpoint: an owner-only socket that a
 //! first-party application — turnstone, today — opens to browse this device's
 //! graph. Everything past the hello is the same machinery the browser door
 //! uses, from `local_session`, so the two doors cannot come to two different
@@ -15,7 +15,7 @@
 //! **What is different here, and why.** Two things only:
 //!
 //! - *The wire.* An application speaks [`AppMessage`] (the shared envelope in
-//!   `graphshell_endpoint::door::wire`), not the browser's
+//!   `djinn::door::wire`), not the browser's
 //!   native-messaging frames. The carrier payload inside is identical; the
 //!   envelope is separate so this door can version independently of a shipped
 //!   browser extension.
@@ -36,37 +36,31 @@ use std::sync::RwLock as StdRwLock;
 
 use armillary::tasks::spawn_tracked_with_handle;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, ResumeRequest};
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     APP_IDENTITY_ROUTE, AllowedAppRoutes, AppAdmissionError, AppHello, AppId, AppRouteGrants,
     AppRouteId,
 };
-use graphshell_endpoint::door::custody::CUSTODY_ROUTE;
-use graphshell_endpoint::door::local_endpoint::{LocalListener, LocalStream, connect_local};
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
-use graphshell_endpoint::door::wire::{
-    APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage,
-    BrowserChallenge,
-};
+use djinn::door::custody::CUSTODY_ROUTE;
+use djinn::door::local_endpoint::{LocalListener, LocalStream, connect_local};
+use djinn::door::route::ResidentEndpointRoute;
+#[cfg(test)]
+use djinn::door::wire::APP_CONNECT_SCHEMA;
+use djinn::door::wire::{AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use tokio::io::{AsyncRead, AsyncWrite};
-type AppMessage =
-    WireMessage<chirograph::CarrierRequest, graphshell_endpoint::door::custody::CustodyCall>;
+type AppMessage = WireMessage<chirograph::CarrierRequest, djinn::door::custody::CustodyCall>;
 type AppHostMessage = WireHostMessage<
     chirograph::CarrierResponse,
     chirograph::CarrierNotice,
-    Result<
-        graphshell_endpoint::door::custody::CustodyAnswer,
-        graphshell_endpoint::door::custody::CustodyRefusal,
-    >,
+    Result<djinn::door::custody::CustodyAnswer, djinn::door::custody::CustodyRefusal>,
 >;
 
-use crate::door::browser_carrier::{
-    LocalLink, read_native_message_async, write_native_message_async,
-};
+use crate::door::browser_carrier::{read_native_message_async, write_native_message_async};
 use crate::door::browser_host::BrowserHostError;
 use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
 use crate::door::identity_endpoint::IdentityEndpoint;
 use crate::door::local_session::{LocalSession, admit_local_client, identity_endpoint_for};
 use crate::door::resident_identity::ResidentIdentity;
+use djinn::door::link::LocalLink;
 use graphshell_host::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };
@@ -79,6 +73,8 @@ use graphshell_host::session_notices::{
 #[derive(Debug, thiserror::Error)]
 pub enum AppBrokerError {
     #[error(transparent)]
+    Door(#[from] djinn::door::server::AppServerError),
+    #[error(transparent)]
     Admission(#[from] AppAdmissionError),
     #[error(transparent)]
     Host(#[from] BrowserHostError),
@@ -88,12 +84,6 @@ pub enum AppBrokerError {
     Carrier(#[from] crate::door::browser_carrier::BrowserCarrierError),
     #[error("projection provider failed: {0}")]
     Provider(String),
-    #[error("the application stream ended before its hello")]
-    MissingHello,
-    #[error("the first application message must answer the host challenge")]
-    ConnectRequired,
-    #[error("application connect used another schema")]
-    WrongSchema,
     #[error("application broker transport failed: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -233,10 +223,11 @@ pub async fn serve_app_broker_on<A>(
 where
     A: ResidentIdentity,
 {
-    listener
-        .serve(move |stream: Box<dyn LocalStream>| {
+    djinn::door::server::serve_on(
+        listener,
+        grants,
+        move |stream: Box<dyn LocalStream>, allowed| {
             let personae = Arc::clone(&personae);
-            let allowed = grants.current();
             let surface = surface.clone();
             let catalog = catalog.clone();
             async move {
@@ -255,8 +246,9 @@ where
                     tracing::warn!(%error, "first-party session failed");
                 }
             }
-        })
-        .await?;
+        },
+    )
+    .await?;
     Ok(())
 }
 
@@ -277,38 +269,38 @@ where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
 {
-    let hello = read_native_message_async::<_, AppHello>(reader)
-        .await?
-        .ok_or(AppBrokerError::MissingHello)?;
-    let request = hello.accept()?;
-    let route = if request.route.as_str() == PROJECTION_PROVIDER_ROUTE {
-        if !catalog.offers.provider_allowed(&request.app) {
-            return Err(AppAdmissionError::NotAllowed(request.app).into());
-        }
-        let mut allowed = allowed.clone();
-        allowed.grant(
-            request.app.clone(),
-            ResidentEndpointRoute::new(
-                PROJECTION_PROVIDER_ROUTE,
-                std::time::Duration::from_millis(50),
-            )
-            .expect("valid provider route"),
-        );
-        allowed.admit(&request)?
-    } else {
-        let mut allowed = allowed.clone();
-        if catalog.offers.viewer_route(&request.app, &request.route) {
+    let admitted = djinn::door::server::admit(reader, allowed, |request, allowed| {
+        if request.route.as_str() == PROJECTION_PROVIDER_ROUTE {
+            if !catalog.offers.provider_allowed(&request.app) {
+                return Err(AppAdmissionError::NotAllowed(request.app.clone()).into());
+            }
+            let mut allowed = allowed.clone();
             allowed.grant(
                 request.app.clone(),
                 ResidentEndpointRoute::new(
-                    request.route.as_str(),
+                    PROJECTION_PROVIDER_ROUTE,
                     std::time::Duration::from_millis(50),
                 )
-                .expect("validated policy route"),
+                .expect("valid provider route"),
             );
+            allowed.admit(request)
+        } else {
+            let mut allowed = allowed.clone();
+            if catalog.offers.viewer_route(&request.app, &request.route) {
+                allowed.grant(
+                    request.app.clone(),
+                    ResidentEndpointRoute::new(
+                        request.route.as_str(),
+                        std::time::Duration::from_millis(50),
+                    )
+                    .expect("validated policy route"),
+                );
+            }
+            allowed.admit(request)
         }
-        allowed.admit(&request)?
-    };
+    })
+    .await?;
+    let djinn::door::server::AdmittedApp { app, route } = admitted;
     // Read once, at session start, exactly as the browser door does: a
     // transfer accepted while an application is already connected becomes
     // visible on its next session rather than mid-stream.
@@ -316,12 +308,16 @@ where
         Some(surface) => surface.read().await.clone(),
         None => DeviceSurface::default(),
     };
+    let Some(link) = djinn::door::server::connect(reader, writer, &app).await? else {
+        return Ok(None);
+    };
     serve_admitted_app(
         reader,
         writer,
         personae,
-        request.app,
+        app,
         route,
+        link,
         session_duration_ms,
         surface,
         catalog,
@@ -335,6 +331,7 @@ async fn serve_admitted_app<A, R, W>(
     personae: Arc<A>,
     app: AppId,
     route: ResidentEndpointRoute,
+    link: LocalLink,
     session_duration_ms: u64,
     surface: DeviceSurface,
     catalog: AppEndpointCatalog,
@@ -344,33 +341,6 @@ where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
 {
-    let challenge = BrowserChallenge::fresh();
-    write_native_message_async(
-        writer,
-        &AppHostMessage::Challenge {
-            challenge: challenge.clone(),
-        },
-    )
-    .await?;
-
-    let Some(message) = read_native_message_async::<_, AppMessage>(reader).await? else {
-        return Ok(None);
-    };
-    let AppMessage::Connect {
-        schema,
-        host_nonce,
-        client_nonce,
-    } = message
-    else {
-        return Err(AppBrokerError::ConnectRequired);
-    };
-    if schema != APP_CONNECT_SCHEMA {
-        return Err(AppBrokerError::WrongSchema);
-    }
-    // The application name is what gets bound into the transcript, so a link
-    // minted for one application is not replayable as another.
-    let link = LocalLink::bind(app.to_string(), &challenge, &host_nonce, &client_nonce)?;
-
     if route.id() == PROJECTION_PROVIDER_ROUTE {
         return serve_provider(reader, writer, app, catalog).await;
     }

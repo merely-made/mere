@@ -19,15 +19,15 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use custodian_fixture::{TestCustodian, grants_with, manage_grants};
-use djinn::custodian::InstalledCustodian;
-use djinn::custody_host::remote::RemoteHost;
-use djinn::custody_host::{LockHolder, ResidentCustody};
-use djinn::door::resident_identity::ResidentIdentity;
-use djinn::keeper::Keeper;
+use mere_resident::custodian::InstalledCustodian;
+use mere_resident::custody_host::remote::RemoteHost;
+use mere_resident::custody_host::{LockHolder, ResidentCustody};
+use mere_resident::door::resident_identity::ResidentIdentity;
+use mere_resident::keeper::Keeper;
 use dramatis::intents::CreateProfileIntentV1;
-use graphshell_endpoint::door::app_admission::AppId;
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
-use graphshell_endpoint::door::identity::VaultLockView;
+use djinn::door::app_admission::AppId;
+use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
+use dramatis::view::VaultLockView;
 use insigne::delegation::{CapabilityScope, DelegationCertificate, DelegationParent, delegation_signing_salt};
 use personae::{IdentityError, IdentityProvider, ProfileId};
 use serde_json::json;
@@ -249,11 +249,11 @@ fn profiles_snapshot_and_intents_are_answered_by_the_custodian() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn the_wallets_persona_index_is_the_custodians_to_disclose_and_djinn_never_lists_a_file() {
-    use djinn::custody_host::{CustodyPersonas, resolve_persona};
+    use mere_resident::custody_host::{CustodyPersonas, resolve_persona};
     let custodian = custodian();
     let remote = custodian.remote();
     let (first, second) = (personae::PersonaId::new(), personae::PersonaId::new());
-    let index = |host: Arc<RemoteHost>| -> Arc<dyn djinn::custody_host::PersonaIndex> {
+    let index = |host: Arc<RemoteHost>| -> Arc<dyn mere_resident::custody_host::PersonaIndex> {
         // A root that holds no wallet: only the custodian's own is read.
         Arc::new(CustodyPersonas { custody: host, wallet_root: custodian.dir.path().join("djinns-data-root-has-no-wallet") })
     };
@@ -293,14 +293,14 @@ fn a_custodian_without_a_grant_refuses_every_release() {
 fn the_custodians_door_rule_names_exactly_djinns_door_keys() {
     for master in [[0x11; 32], [0x5c; 32]] {
         let custodian = djinn_custodian::policy::door_salts(&master).to_vec();
-        assert_eq!(custodian, djinn::door::local_session::door_salts(master));
+        assert_eq!(custodian, mere_resident::door::local_session::door_salts(master));
     }
 }
 
 #[test]
 fn real_custodian_fences_private_payload_to_authoritative_generation() {
     use eidetic::Hash;
-    use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult};
+    use djinn::door::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult};
     let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
     let persona = personae::PersonaId::new();
     castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, persona, "isolated fixture").unwrap();
@@ -331,11 +331,11 @@ fn real_custodian_fences_private_payload_to_authoritative_generation() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn real_custodian_generation_reaches_the_app_payload_route() {
-    use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+    use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
     use eidetic::{Hash, PayloadSealer};
-    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
-    use graphshell_endpoint::door::custody_client::CustodyClient;
-    use graphshell_endpoint::door::custody_identity::CustodyIdentity;
+    use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+    use djinn::door::custody_client::CustodyClient;
+    use djinn::door::custody_identity::CustodyIdentity;
     use std::time::Duration;
 
     let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
@@ -345,7 +345,7 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
     let keeper = Arc::new(Keeper::new(remote.clone()));
     keeper.configure_payload_custody(ProfileId("work".into()), persona, custodian.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let endpoint = custodian.dir.path().join("app.sock").to_string_lossy().to_string();
     let server = tokio::spawn({ let endpoint = endpoint.clone(); async move {
         serve_app_broker(&endpoint, keeper, grants, 60_000, None, AppEndpointCatalog::default()).await

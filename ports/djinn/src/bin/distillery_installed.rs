@@ -20,8 +20,8 @@
 use std::path::PathBuf;
 
 use distillery::{InstalledAuthority, InstalledSettings};
-use graphshell_endpoint::door::app_admission::{AppId, configured_app_endpoint};
-use graphshell_endpoint::door::custody_client::BlockingCustodyClient;
+use djinn::door::app_admission::{AppId, configured_app_endpoint};
+use djinn::door::custody_client::BlockingCustodyClient;
 use personae::ProfileId;
 
 /// The application name this tool connects to djinn as.
@@ -72,7 +72,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 },
                 Err(error) => return Err(error.to_string()),
             };
-            if status.lock == graphshell_endpoint::door::identity::VaultLockView::Locked {
+            if status.lock == dramatis::view::VaultLockView::Locked {
                 println!("Distillery profile: {}\nPersonae identity: pending (the vault is locked)\nProduct root: {}",
                     settings.profile, options.data_root.display());
                 return Ok(());

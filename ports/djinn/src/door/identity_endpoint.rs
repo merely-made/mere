@@ -35,7 +35,7 @@ use crate::door::identity_projection::{
     IdentityProjectionAction, SIGNING_APPROVE_IDLE_INTENT, SIGNING_APPROVE_ONCE_INTENT,
     SIGNING_DENY_INTENT, project_identity,
 };
-use graphshell_endpoint::door::identity::IdentitySurfaceSnapshot;
+use dramatis::view::IdentitySurfaceSnapshot;
 
 /// What the identity endpoint reads from the resident's identity authority:
 /// the secret-free snapshot the cards project, and typed intents applied
@@ -710,7 +710,7 @@ mod tests {
     use crate::door::identity_projection::{
         GenerateSshKeyIntentV1, SSH_GENERATE_INTENT, SshUnlockPolicyIntentV1,
     };
-    use graphshell_endpoint::door::identity::{ProfileView, SshKeyView};
+    use dramatis::view::{ProfileView, SshKeyView};
 
     /// The identity projection Graphshell's `app` test pins into a scene and
     /// reopens (`h4_exportable_identity_cards_and_access_survive_scene_reopen_as_projections`):
@@ -724,7 +724,7 @@ mod tests {
     fn graphshells_identity_cards_fixture_is_this_endpoints_projection() {
         use crate::door::identity_projection::{DEVICE_REVOKE_INTENT, RevokeDeviceIntentV1};
         use chirograph::{IntentInvocation, ResourceRequest};
-        use graphshell_endpoint::door::identity::{DeviceGrantView, DeviceView};
+        use dramatis::view::{DeviceGrantView, DeviceView};
         use personae::signing::{
             ApprovalSource, SigningPolicy, SigningRecord, SigningRecordResult, SigningRequest,
         };
@@ -1365,7 +1365,7 @@ pub(crate) mod test_support {
     use std::sync::{Arc, Mutex};
 
     use super::*;
-    use graphshell_endpoint::door::identity::{
+    use dramatis::view::{
         AgentListenerView, CarryView, VaultLockView, VaultProtectionView, VaultView,
     };
 

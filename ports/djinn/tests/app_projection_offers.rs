@@ -12,22 +12,23 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
-use djinn::door::identity_endpoint::IdentityAuthority;
-use djinn::door::local_session::DoorIdentity;
-use djinn::door::projection_offers::ProviderPermission;
-use djinn::door::resident_identity::ResidentIdentity;
-use graphshell_endpoint::door::app_admission::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
+use mere_resident::door::identity_endpoint::IdentityAuthority;
+use mere_resident::door::local_session::DoorIdentity;
+use mere_resident::door::projection_offers::ProviderPermission;
+use mere_resident::door::resident_identity::ResidentIdentity;
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::identity::{
+use dramatis::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
     VaultView,
 };
-use graphshell_endpoint::door::local_endpoint::LocalListener;
+use djinn::door::local_endpoint::LocalListener;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;
-use graphshell_endpoint::door::{app_client::AppConnection, projection_provider};
+use djinn::door::app_client::AppConnection;
+use graphshell_endpoint::door::projection_provider;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{IdentityError, InMemoryProvider, RetainedKeys};
 
@@ -147,7 +148,7 @@ async fn door() -> Door {
 }
 
 struct Provider(
-    tokio::task::JoinHandle<Result<(), graphshell_endpoint::door::app_client::AppClientError>>,
+    tokio::task::JoinHandle<Result<(), djinn::door::app_client::AppClientError>>,
 );
 impl Drop for Provider {
     fn drop(&mut self) {
@@ -202,7 +203,7 @@ async fn wait_offer(catalog: &AppEndpointCatalog, present: bool) {
 async fn viewer(
     door: &Door,
     app: &str,
-) -> Result<AppBrokerClient, graphshell_endpoint::door::app_client::AppClientError> {
+) -> Result<AppBrokerClient, djinn::door::app_client::AppClientError> {
     tokio::time::timeout(
         Duration::from_secs(5),
         AppBrokerClient::open_route_at(
@@ -330,12 +331,10 @@ async fn idle_provider_disconnect_withdraws_and_replacement_does_not_inherit_vie
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn withdrawing_an_offer_closes_an_idle_viewer_socket() {
     use base64::Engine;
-    use graphshell_endpoint::door::{
-        app_admission::AppHello,
-        frame::{read_native_message_async, write_native_message_async},
-        local_endpoint::connect_local,
-        wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage},
-    };
+    use djinn::door::app_admission::AppHello;
+use djinn::door::frame::{read_native_message_async, write_native_message_async};
+use djinn::door::local_endpoint::connect_local;
+use djinn::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
     use tokio::io::AsyncReadExt;
     type Reply = AppHostMessage<(), (), ()>;
     let directory = tempfile::tempdir().unwrap();

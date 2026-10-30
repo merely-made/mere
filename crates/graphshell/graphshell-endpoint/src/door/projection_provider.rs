@@ -1,16 +1,16 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 //! Native application-side runner for a projection offer.
-use super::{
-    app_admission::AppRouteId,
-    app_client::{AppClientError, AppConnection},
-    projection_offer::{
-        ProviderAnswer, ProviderCall, ViewerContext, Work, WorkOperation, WorkOutcome, WorkResult,
-    },
+use super::projection_offer::{
+    ProviderAnswer, ProviderCall, ViewerContext, Work, WorkOperation, WorkOutcome, WorkResult,
 };
 use crate::{
     CompleteEndpoint, IntentSink, PresentationSource, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource, dispatch_common,
+};
+use djinn::door::{
+    app_admission::AppRouteId,
+    app_client::{AppClientError, AppConnection},
 };
 use std::{collections::BTreeMap, fmt::Display, time::Duration};
 
@@ -290,14 +290,69 @@ mod tests {
             WorkOutcome::Failed { .. }
         ));
     }
+    #[cfg(unix)]
+    async fn fixture_connection() -> (AppConnection, tokio::net::UnixStream) {
+        use djinn::door::{
+            app_admission::{AppHello, AppId},
+            frame::{read_native_message_async, write_native_message_async},
+            wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge},
+        };
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static NEXT: AtomicU64 = AtomicU64::new(0);
+        let path = std::env::temp_dir().join(format!(
+            "djinn-provider-{}-{}.sock",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        let listener = tokio::net::UnixListener::bind(&path).unwrap();
+        let endpoint = path.to_str().unwrap().to_owned();
+        let host = tokio::spawn(async move {
+            let (mut host, _) = listener.accept().await.unwrap();
+            let hello: AppHello = read_native_message_async(&mut host).await.unwrap().unwrap();
+            let request = hello.accept().unwrap();
+            let challenge = BrowserChallenge {
+                schema: djinn::door::wire::BROWSER_CHALLENGE_SCHEMA.into(),
+                host_nonce: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".into(),
+            };
+            write_native_message_async(
+                &mut host,
+                &AppHostMessage::<(), (), ()>::Challenge {
+                    challenge: challenge.clone(),
+                },
+            )
+            .await
+            .unwrap();
+            let connect: AppMessage<(), ()> =
+                read_native_message_async(&mut host).await.unwrap().unwrap();
+            assert!(
+                matches!(connect, AppMessage::Connect { schema, host_nonce, .. } if schema == APP_CONNECT_SCHEMA && host_nonce == challenge.host_nonce)
+            );
+            write_native_message_async(
+                &mut host,
+                &AppHostMessage::<(), (), ()>::Connected {
+                    app: request.app,
+                    session: "fixture".into(),
+                },
+            )
+            .await
+            .unwrap();
+            host
+        });
+        let client = AppConnection::open_at(&endpoint, AppId::new("fixture"))
+            .await
+            .unwrap();
+        let host = host.await.unwrap();
+        std::fs::remove_file(path).unwrap();
+        (client, host)
+    }
+    #[cfg(unix)]
     #[tokio::test]
     async fn runner_exchanges_work_and_reports_disconnect() {
-        use crate::door::{
+        use djinn::door::{
             frame::{read_native_message_async, write_native_message_async},
             wire::{AppHostMessage, AppMessage},
         };
-        let (client, mut host) = tokio::io::duplex(8192);
-        let connection = AppConnection::for_test(Box::new(client));
+        let (connection, mut host) = fixture_connection().await;
         let server = tokio::spawn(async move {
             let first: AppMessage<(), ProviderCall> =
                 read_native_message_async(&mut host).await.unwrap().unwrap();
@@ -365,9 +420,10 @@ mod tests {
         assert!(result.is_err());
         server.await.unwrap();
     }
+    #[cfg(unix)]
     #[tokio::test(flavor = "current_thread")]
     async fn slow_factory_does_not_block_the_async_runtime() {
-        use crate::door::{
+        use djinn::door::{
             frame::{read_native_message_async, write_native_message_async},
             wire::{AppHostMessage, AppMessage},
         };
@@ -375,8 +431,7 @@ mod tests {
             Arc,
             atomic::{AtomicBool, Ordering},
         };
-        let (client, mut host) = tokio::io::duplex(8192);
-        let connection = AppConnection::for_test(Box::new(client));
+        let (connection, mut host) = fixture_connection().await;
         let entered = Arc::new(AtomicBool::new(false));
         let timer_ran = Arc::new(AtomicBool::new(false));
         let factory_entered = entered.clone();

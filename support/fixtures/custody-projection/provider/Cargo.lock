@@ -210,6 +210,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+dependencies = [
+ "base64",
+ "personae",
+ "rand_core 0.6.4",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "ed25519"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -310,15 +325,11 @@ dependencies = [
 name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
- "base64",
  "chirograph",
- "personae",
- "rand_core 0.6.4",
+ "djinn",
  "serde",
  "serde_json",
- "thiserror",
  "tokio",
- "zeroize",
 ]
 
 [[package]]
@@ -449,6 +460,7 @@ dependencies = [
 name = "projection-provider-consumer-fixture"
 version = "0.0.0"
 dependencies = [
+ "djinn",
  "graphshell-endpoint",
 ]
 

@@ -1,4 +1,5 @@
-# Djinn
+<!-- The Cargo package is mere-resident; installed executable names remain djinn. -->
+# Mere resident composition
 
 Djinn is Mere's local desktop resident. It composes the owner-held parts of a
 personal device: Personae authority, the SSH agent, Graphshell's local browser
@@ -23,7 +24,7 @@ Feature `moot-site` adds a local public Gemini or Scroll endpoint over supplied
 Gemot and Eidetic owners:
 
 ```text
-cargo run -p djinn --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
+cargo run -p mere-resident --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
 ```
 
 The versioned owners file names `moot_id`, `moot_directory`, `content_database`,
@@ -60,7 +61,7 @@ consumer gates. The earlier `djinn-site` snapshot-handoff command stays availabl
 ### Personal resident
 
 ```text
-cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root> \
+cargo run -p mere-resident --bin djinn -- --dir <personae-vault> --data-root <data-root> \
   --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>
 ```
 
@@ -456,3 +457,8 @@ than zero and at most 300 seconds. The host caps all offered sessions together a
 processes one work item at a time. Native frames retain the existing 1 MiB bound
 and native-endian length prefix. `projection-offer` exposes portable DTOs;
 `projection-provider` adds the native runner without enabling custody.
+
+The independent `djinn` crate in Armillary owns the application door, selected
+clients and resident service/task lifetime. This package supplies concrete
+Mere services, product policy and protected custody authority. See the
+[ownership receipt](../../design_docs/mere_docs/testing/receipts/2026-10-30_djinn_ownership.md).

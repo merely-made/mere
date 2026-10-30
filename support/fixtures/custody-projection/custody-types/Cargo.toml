@@ -10,5 +10,5 @@ publish = false
 forbidden-api = []
 
 [dependencies]
-graphshell-endpoint = { path = "../../../../crates/graphshell/graphshell-endpoint", default-features = false, features = ["custody"] }
+djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "721e17d41a8f258073f440adbbb39ad145250868", default-features = false, features = ["custody"] }
 serde_json = "1"

@@ -15,50 +15,52 @@ use std::sync::Arc;
 #[cfg(feature = "personal-sync")]
 use std::time::Duration;
 
-use armillary::tasks::ResidentTasks;
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
-use djinn::door::browser_carrier::AllowedExtensions;
-use djinn::door::device_broker::{
+use djinn::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
+    default_app_endpoint,
+};
+use djinn::door::local_endpoint::LocalListener;
+#[cfg(all(not(windows), feature = "in-process-custody"))]
+use djinn::door::local_endpoint::prepare_unix_endpoint;
+#[cfg(feature = "personal-sync")]
+use djinn::door::route::ResidentEndpointRoute;
+use djinn::resident::{
+    MaintenanceActivity, Resident, RunFailure, Service, supervise_with_maintenance,
+};
+use dramatis::view::{VaultLockView, VaultProtectionView};
+use graphshell_endpoint::door::projection::AppBrokerClient;
+#[cfg(feature = "personal-sync")]
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
+use mere_resident::door::browser_carrier::AllowedExtensions;
+use mere_resident::door::device_broker::{
     configured_device_endpoint, default_device_endpoint, serve_browser_broker_on,
 };
-use djinn::identity_ui::SystemNativeIdentityUi;
-use djinn::keeper::Keeper;
+use mere_resident::identity_ui::SystemNativeIdentityUi;
+use mere_resident::keeper::Keeper;
 #[cfg(feature = "personal-sync")]
-use djinn::pairing;
+use mere_resident::pairing;
 #[cfg(feature = "personal-sync")]
-use djinn::personal_sync as device_sync;
-use djinn::resident::DjinnResident;
+use mere_resident::personal_sync as device_sync;
+use mere_resident::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
-use djinn::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
+use mere_resident::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
 #[cfg(feature = "personal-sync")]
-use djinn::resident_distillery::ResidentDistillery;
-use djinn::resident_events::EventLog;
+use mere_resident::resident_distillery::ResidentDistillery;
+use mere_resident::resident_events::EventLog;
 #[cfg(feature = "personal-sync")]
-use djinn::resident_mere::MereRoutes;
-use djinn::resident_reservoir::ReservoirLane;
-use djinn::resident_status::{
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_reservoir::ReservoirLane;
+use mere_resident::resident_status::{
     self, AgentListenerV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE,
     ResidentControlEndpoint, ResidentEndpointsV1, ResidentStatusEndpoint, ResidentStatusSource,
     ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal, SyncStatusV1,
 };
 #[cfg(feature = "personal-sync")]
-use djinn::settings::{self as owner_settings, SyncOverrides};
-use djinn::startup_vault;
-use graphshell_endpoint::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
-    default_app_endpoint,
-};
-use graphshell_endpoint::door::projection::AppBrokerClient;
-use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
-use graphshell_endpoint::door::local_endpoint::LocalListener;
-#[cfg(all(not(windows), feature = "in-process-custody"))]
-use graphshell_endpoint::door::local_endpoint::prepare_unix_endpoint;
-#[cfg(feature = "personal-sync")]
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
-#[cfg(feature = "personal-sync")]
-use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use mere_resident::settings::{self as owner_settings, SyncOverrides};
+use mere_resident::startup_vault;
 use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
 #[cfg(feature = "in-process-custody")]
@@ -84,7 +86,7 @@ struct Args {
     agent: AgentEndpoint,
     browser_endpoint: String,
     /// Where first-party applications connect. A separate door from the
-    /// browser one, on purpose: see `graphshell_endpoint::door::app_admission`.
+    /// browser one, on purpose: see `djinn::door::app_admission`.
     app_endpoint: String,
     data_root: Option<PathBuf>,
     log_file: Option<PathBuf>,
@@ -176,7 +178,7 @@ async fn main() {
     };
     #[cfg(feature = "passphrase-fd")]
     if let Some(path) = &args.custodian {
-        djinn::custodian::InstalledCustodian::use_fixture(path.clone());
+        mere_resident::custodian::InstalledCustodian::use_fixture(path.clone());
     }
     // Enrolment edits the vault directory and reports; it hosts nothing.
     if args.enroll_passphrase {
@@ -241,7 +243,7 @@ async fn main() {
         .as_deref()
         .map(|path| {
             let file = std::fs::File::open(path)?;
-            serde_json::from_reader::<_, djinn::resident_events::DiagnosticsConfig>(file)
+            serde_json::from_reader::<_, mere_resident::resident_events::DiagnosticsConfig>(file)
                 .map_err(std::io::Error::other)
         })
         .transpose()
@@ -291,21 +293,26 @@ const DEFAULT_LOG_FILTER: &str = "info";
 #[cfg(feature = "in-process-custody")]
 fn enroll(args: &Args) -> Result<String, String> {
     if args.native {
-        djinn::enrollment::enroll_passphrase_native(
+        mere_resident::enrollment::enroll_passphrase_native(
             &args.vault_dir,
             &SystemNativeIdentityUi::default(),
         )
     } else {
-        djinn::enrollment::enroll_passphrase(&args.vault_dir, &mut djinn::enrollment::read_from_terminal)
+        mere_resident::enrollment::enroll_passphrase(
+            &args.vault_dir,
+            &mut mere_resident::enrollment::read_from_terminal,
+        )
     }
 }
 
 /// The custodian holds the vault, so its passphrase is enrolled there.
 #[cfg(not(feature = "in-process-custody"))]
 fn enroll(_: &Args) -> Result<String, String> {
-    Err("the vault is held by djinn-custodian: create one with `djinn-custodian init`, \
+    Err(
+        "the vault is held by djinn-custodian: create one with `djinn-custodian init`, \
          or move this vault in with `djinn-custodian adopt --from <vault-dir>`"
-        .into())
+            .into(),
+    )
 }
 
 /// Only the installed resident binds the default endpoints (djinn test
@@ -341,7 +348,7 @@ async fn resident_client(args: &Args) -> Result<String, String> {
     // Read before the door opens, so a cancelled prompt opens nothing.
     let passphrase = match args.unlock && !args.native {
         true => Some(
-            djinn::enrollment::read_from_terminal("Vault passphrase: ")
+            mere_resident::enrollment::read_from_terminal("Vault passphrase: ")
                 .map_err(|error| error.to_string())?,
         ),
         false => None,
@@ -516,7 +523,9 @@ fn parse_args() -> Result<Args, String> {
             },
             #[cfg(feature = "passphrase-fd")]
             "--custodian" => {
-                custodian = Some(PathBuf::from(argv.next().ok_or("--custodian needs a client file")?));
+                custodian = Some(PathBuf::from(
+                    argv.next().ok_or("--custodian needs a client file")?,
+                ));
             },
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
@@ -709,8 +718,13 @@ fn report_pairing_facts(args: &Args) -> Result<String, String> {
     let data_root =
         device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())
             .map_err(|error| error.to_string())?;
-    let facts = pairing::pairing_facts(custody.host.as_ref(), &app_dir, &profile_id, Some(&data_root))
-        .map_err(|error| error.to_string())?;
+    let facts = pairing::pairing_facts(
+        custody.host.as_ref(),
+        &app_dir,
+        &profile_id,
+        Some(&data_root),
+    )
+    .map_err(|error| error.to_string())?;
     let Some(facts) = facts else {
         return Err(format!(
             "personal sync is not configured for profile {:?}",
@@ -924,7 +938,7 @@ fn cli_custody(args: &Args) -> Result<startup_vault::OpenedCustody, String> {
     let mut prompt: Box<dyn startup_vault::Prompt> = match given {
         Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
         None => Box::new(startup_vault::NativeOrTerminal {
-            native: djinn::identity_ui::UnavailableNativeIdentityUi,
+            native: mere_resident::identity_ui::UnavailableNativeIdentityUi,
         }),
     };
     startup_vault::open_custody(
@@ -989,10 +1003,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         _ => StartupUnlockV1::Passphrase,
     };
     // A custodian serves the SSH agent; the status names its endpoint.
-    let agent_endpoint = match (in_process, djinn::custodian::InstalledCustodian::load()?) {
+    let agent_endpoint = match (
+        in_process,
+        mere_resident::custodian::InstalledCustodian::load()?,
+    ) {
         (false, Some(installed)) => installed.agent.unwrap_or_default(),
         _ => match &args.agent {
-            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint.clone(),
+            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => {
+                endpoint.clone()
+            },
         },
     };
     let status = ResidentStatusSource::new(ResidentStatusV1 {
@@ -1030,7 +1049,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // The doors' kept keys are captured now, while unlocked, so the doors
     // stay open through any later lock (rulings 40, 46). A resident that
     // starts locked (ruling 42, L3) captures them at its first unlock.
-    if let Err(error) = djinn::door::local_session::DoorIdentity::door_keys(keeper.as_ref()) {
+    if let Err(error) = mere_resident::door::local_session::DoorIdentity::door_keys(keeper.as_ref())
+    {
         tracing::warn!(%error, "door keys not captured at start");
     }
     // `djinn --unlock` arrives here over the control route (ruling 41).
@@ -1046,15 +1066,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let native_ui = args.native_identity_ui();
         Arc::new(move || {
             let prompt = || {
-                djinn::identity_ui::apply_native_identity_action(
+                mere_resident::identity_ui::apply_native_identity_action(
                     personae.as_ref(),
                     &native_ui,
-                    djinn::door::browser_carrier::NativeIdentityAction::UnlockVault,
+                    mere_resident::door::browser_carrier::NativeIdentityAction::UnlockVault,
                 )
             };
             // A dialog blocks; the worker it holds is handed over meanwhile.
             match tokio::task::block_in_place(prompt) {
-                djinn::door::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                mere_resident::door::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
                 other => Err(format!("the native unlock ended: {other:?}")),
             }
         })
@@ -1065,8 +1085,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let locker = Arc::clone(&personae);
         let reported = events.clone();
         let warned = events.clone();
-        djinn::lock_triggers::spawn(
-            djinn::lock_triggers::settings_path(&owner_settings::default_app_dir()),
+        mere_resident::lock_triggers::spawn(
+            mere_resident::lock_triggers::settings_path(&owner_settings::default_app_dir()),
             move || tokio::task::block_in_place(|| locker.lock_vault()),
             personae.lock_state(),
             move |reason| reported.emit("lock-trigger", json!({ "reason": reason.as_str() })),
@@ -1110,7 +1130,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         &profile_id,
         owner,
         // The lane's mesh author: exactly its two release salts, from custody.
-        djinn::resident::MeshAuthor::Custody(Arc::clone(&personae)),
+        mere_resident::resident::MeshAuthor::Custody(Arc::clone(&personae)),
     )
     .await?;
     // The reservoir lives under the family-shared root, not this resident's
@@ -1122,7 +1142,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     match resident
         .open_reservoir(
             &pandect::shared_root::shared_root(),
-            Arc::new(djinn::custody_host::CustodyPersonas {
+            Arc::new(mere_resident::custody_host::CustodyPersonas {
                 custody: Arc::clone(&personae),
                 wallet_root: pandect::shared_root::shared_root(),
             }),
@@ -1178,7 +1198,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // connections, sync's watchers) is not dropped with it, so it runs in a
     // task scope that is cancelled and joined below. Boxed: the loop's future
     // is large, and the scope must not carry it on the main thread's stack.
-    let tasks = ResidentTasks::new();
+    let lifetime = Resident::new();
     if args.control_unjoined_holder {
         // A receipt control: one blob-store holder outside the scope, which
         // the shutdown's borrower check must refuse.
@@ -1189,7 +1209,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         });
         tracing::warn!("control: a blob-store holder left outside the task scope");
     }
-    let outcome: Result<(), Box<dyn std::error::Error>> = tasks.scope(Box::pin(async {
+    let drained = lifetime.run(Box::pin(async {
+        let product: Result<(), Box<dyn std::error::Error>> = async {
         let agent = serve_agent(&args, &custody).await?;
 
         let allowlist = AllowedExtensions::default()
@@ -1239,7 +1260,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(feature = "personal-sync")]
         let app_surface = supplemental_cards.clone();
         #[cfg(not(feature = "personal-sync"))]
-        let app_surface: Option<djinn::door::device_broker::DeviceSurfaceHandle> = None;
+        let app_surface: Option<mere_resident::door::device_broker::DeviceSurfaceHandle> = None;
         // The catalog and grants are shared with the door, so a mere ensured
         // while it serves gets its route then (reservoir plan Â§7 item 20).
         #[cfg(feature = "personal-sync")]
@@ -1280,7 +1301,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .await?;
             resident_status::grant(&grants, route);
             // Custody, for every first-party application (D5).
-            djinn::custody::grant(&grants)?;
+            mere_resident::custody::grant(&grants)?;
             // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
@@ -1339,7 +1360,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(not(feature = "personal-sync"))]
         let (allowed_app_routes, app_catalog) = {
             let grants = AppRouteGrants::default();
-            djinn::custody::grant(&grants)?;
+            mere_resident::custody::grant(&grants)?;
             (grants, AppEndpointCatalog::default())
         };
         app_catalog
@@ -1382,100 +1403,60 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             session_duration_ms(),
             supplemental_cards,
         );
-        tokio::pin!(agent);
-        tokio::pin!(browser);
-        tokio::pin!(apps);
         let mut knot_refresh = tokio::time::interval(Duration::from_secs(1));
         knot_refresh.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-
-        // The works stop on request rather than on process death: a lease is a
-        // promise to let go, and a device killed mid-lease leaves the ring
-        // waiting out a lapse for work that is already gone.
         let works_enabled = works.is_some();
         let stop_works = Arc::new(tokio::sync::Notify::new());
         let works_stop = Arc::clone(&stop_works);
+        let stopping = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let works_stopping = stopping.clone();
         let works_run = async {
-            match works.as_mut() {
-                // `notify_one` stores a permit when nothing is waiting yet, so
-                // a Ctrl-C that lands before the first poll is not lost.
-                Some(lane) => {
-                    lane.run_until(async move { works_stop.notified().await }, |receipt| {
-                        observe_distillery(&receipt)
-                    })
-                    .await
-                },
+            let result = match works.as_mut() {
+                Some(lane) => lane.run_until(async move { works_stop.notified().await }, |receipt| {
+                    observe_distillery(&receipt)
+                }).await,
                 None => std::future::pending::<Result<(), String>>().await,
+            };
+            if !works_stopping.load(std::sync::atomic::Ordering::SeqCst) {
+                events.stopping("distillery works ended");
+                status.update(|status| status.ready = false);
             }
+            result
         };
-        tokio::pin!(works_run);
-        let interrupt = tokio::signal::ctrl_c();
-        tokio::pin!(interrupt);
-
-        // The loop does not leave the moment it knows how the run ended. It
-        // records the outcome, asks the works to stop, and waits for them,
-        // because whichever arm ended the run â€” Ctrl-C or a broker failing â€”
-        // the ring on the other side of a lease deserves the same deliberate
-        // release. `stopping` and `works_running` exist to keep a resolved
-        // future from being polled again.
-        let mut stopping = false;
-        let mut lock_watched = true;
-        let mut works_running = works_enabled;
-        let mut exit: Option<Result<(), Box<dyn std::error::Error>>> = None;
-        status.update(|status| status.ready = true);
-        events.emit("ready", json!({}));
-
-        loop {
-            if exit.is_some() && !works_running {
-                break exit.take().expect("just checked");
-            }
-            tokio::select! {
-                result = &mut interrupt, if !stopping => {
-                    tracing::info!("shutdown requested");
-                    events.stopping("interrupt");
-                    exit = Some(result.map_err(Into::into));
-                }
-                () = stop.raised(), if exit.is_none() => {
-                    tracing::info!("stop requested on the control route");
-                    events.stopping("stop intent");
-                    exit = Some(Ok(()));
-                }
-                result = &mut works_run, if works_running => {
-                    works_running = false;
-                    let ended = match result {
-                        // Only a stop we asked for is an ordinary ending.
-                        Ok(()) if stopping => Ok(()),
-                        Ok(()) => Err("resident Distillery works ended unexpectedly".into()),
-                        Err(error) => Err(error.into()),
-                    };
-                    // A failure already recorded is the one that explains the
-                    // run; the works stopping afterwards is a consequence.
-                    if exit.is_none() {
-                        events.stopping("distillery works ended");
-                        exit = Some(ended);
+        let services = vec![
+            watch_service("SSH agent listener", "agent listener ended", agent, &events, &status),
+            watch_service("browser device broker", "browser broker ended", async { browser.await.map_err(|error| error.to_string()) }, &events, &status),
+            watch_service("first-party application broker", "app broker ended", async { apps.await.map_err(|error| error.to_string()) }, &events, &status),
+        ];
+        let control = async {
+            let interrupt = tokio::signal::ctrl_c();
+            tokio::pin!(interrupt);
+            loop {
+                tokio::select! {
+                    result = &mut interrupt => {
+                        tracing::info!("shutdown requested");
+                        events.stopping("interrupt");
+                        status.update(|status| status.ready = false);
+                        break result.map_err(|error| error.to_string());
+                    }
+                    () = stop.raised() => {
+                        tracing::info!("stop requested on the control route");
+                        events.stopping("stop intent");
+                        status.update(|status| status.ready = false);
+                        break Ok(());
                     }
                 }
-                result = &mut agent, if exit.is_none() => {
-                    events.stopping("agent listener ended");
-                    exit = Some(Err(match result {
-                        Ok(()) => "SSH agent listener ended unexpectedly".into(),
-                        Err(error) => error.into(),
-                    }));
-                }
-                result = &mut browser, if exit.is_none() => {
-                    events.stopping("browser broker ended");
-                    exit = Some(match result {
-                        Ok(()) => Err("browser device broker ended unexpectedly".into()),
-                        Err(error) => Err(error.into()),
-                    });
-                }
-                result = &mut apps, if exit.is_none() => {
-                    events.stopping("app broker ended");
-                    exit = Some(match result {
-                        Ok(()) => Err("first-party application broker ended unexpectedly".into()),
-                        Err(error) => Err(error.into()),
-                    });
-                }
+            }
+        };
+        let maintenance_stopping = stopping.clone();
+        let activity = MaintenanceActivity::new();
+        let action_activity = activity.clone();
+        let maintenance = async {
+            let mut lock_watched = true;
+            loop {
+                tokio::select! {
                 changed = lock_state.changed(), if lock_watched => {
+                    let _action = action_activity.begin();
                     match changed {
                         Ok(()) => {
                             let now = *lock_state.borrow_and_update();
@@ -1492,7 +1473,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             let since = std::time::Instant::now();
                             if now == VaultLockView::Unlocked {
                                 // Kept from the first unlock on (ruling 46).
-                                let _ = djinn::door::local_session::DoorIdentity::door_keys(
+                                let _ = mere_resident::door::local_session::DoorIdentity::door_keys(
                                     keeper.as_ref(),
                                 );
                             }
@@ -1519,48 +1500,62 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                         Err(_) => lock_watched = false,
                     }
                 }
-                _ = knot_refresh.tick(), if resident.knot_enabled() && exit.is_none() => {
+                _ = knot_refresh.tick(), if resident.knot_enabled() && !maintenance_stopping.load(std::sync::atomic::Ordering::SeqCst) => {
+                    let _action = action_activity.begin();
                     if let Err(error) = resident.refresh().await {
                         tracing::warn!(%error, "could not refresh resident Knot authority");
                     }
                 }
+                }
             }
-            if exit.is_some() {
-                status.update(|status| status.ready = false);
-            }
-            if exit.is_some() && works_running && !stopping {
-                stopping = true;
-                // Let `run_until` return on its own rather than dropping it
-                // mid-tick, so the works stop the way the ring expects.
-                stop_works.notify_one();
-            }
-        }
+        };
+        status.update(|status| status.ready = true);
+        events.emit("ready", json!({}));
+        supervise_with_maintenance(services, control, works_enabled.then_some(works_run), maintenance, activity, move || {
+            stopping.store(true, std::sync::atomic::Ordering::SeqCst);
+            stop_works.notify_one();
+        }).await.map_err(|error| Box::new(error) as Box<dyn std::error::Error>)
+        }.await;
+        product.map_err(|error| match error.downcast::<RunFailure>() {
+            Ok(error) => *error,
+            Err(error) => RunFailure::new("startup", error.to_string()),
+        })
     }))
     .await;
-    // Before the release checks: every spawned holder ends and lets go.
-    let ended = tasks.close_and_join().await;
-    tracing::info!(?ended, "resident task shutdown report");
-    let outcome = if ended.is_clean() {
-        outcome
-    } else {
-        Err(format!("resident task failures: {ended:?}; listener outcome: {outcome:?}").into())
-    };
-
-    // The run loop borrowed the works; hand them back so the ordered shutdown
-    // below is the one thing that closes them.
+    tracing::info!(?drained.tasks, "resident task shutdown report");
+    // Return borrowed works before the product's ordered close.
     resident.restore_distillery(works);
-
-    // A listener failure is not permission to leave sealed credentials or
-    // content custody open. Preserve the listener outcome, but make the
-    // closure failure visible when it is the only failure.
-    match (outcome, resident.shutdown().await) {
-        (Ok(()), Ok(())) => Ok(()),
-        (Err(error), Ok(())) => Err(error),
-        (Ok(()), Err(error)) => Err(error.into()),
-        (Err(outcome), Err(shutdown)) => {
-            Err(format!("{outcome}; resident shutdown: {shutdown}").into())
-        },
+    let report = drained.finish(|| resident.shutdown()).await;
+    let mut errors = Vec::new();
+    if let Err(error) = report.outcome {
+        errors.push(error.to_string());
     }
+    if !report.tasks.is_clean() {
+        errors.push(format!("resident task failures: {:?}", report.tasks));
+    }
+    if let Err(error) = report.shutdown {
+        errors.push(format!("resident shutdown: {error}"));
+    }
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors.join("; ").into())
+    }
+}
+
+fn watch_service<'a>(
+    name: &'static str,
+    reason: &'static str,
+    future: impl std::future::Future<Output = Result<(), String>> + 'a,
+    events: &'a EventLog,
+    status: &'a ResidentStatusSource,
+) -> Service<'a> {
+    Service::new(name, async move {
+        let result = future.await;
+        events.stopping(reason);
+        status.update(|status| status.ready = false);
+        result
+    })
 }
 
 /// Report exactly what the works did, without building a second lifecycle

@@ -10,9 +10,9 @@ use std::path::{Path, PathBuf};
 use chirograph::{
     EditableTextV1, IntentInvocation, IntentResult, PresentationCodec, ResourceRequest, SaveTextV1,
 };
-use djinn::resident_blobs::ResidentBlobCustody;
-use djinn::resident_knot::{RESIDENT_KNOT_ROUTE, ResidentKnot};
-use djinn::settings::{KnotResidentSettings, ResidentContentSettings};
+use mere_resident::resident_blobs::ResidentBlobCustody;
+use mere_resident::resident_knot::{RESIDENT_KNOT_ROUTE, ResidentKnot};
+use mere_resident::settings::{KnotResidentSettings, ResidentContentSettings};
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_host::lifecycle::AdmittedEndpointContext;
@@ -36,8 +36,8 @@ fn persona() -> PersonaId {
 }
 
 fn keys(root: &Path) -> (PersonalVaultKeys, Zeroizing<[u8; 32]>) {
-    let mut released = djinn::custody::epoch_keys(
-        &djinn::custody::ReleasePolicy::default(),
+    let mut released = mere_resident::custody::epoch_keys(
+        &mere_resident::custody::ReleasePolicy::default(),
         root,
         persona(),
         Some(DEVICE),
@@ -156,7 +156,7 @@ async fn receive_through_owner(root: &Path, replacement: Option<&str>) -> String
         },
         custody.clone(),
         std::sync::Arc::new(move |persona, label: &str, requests: &[_]| {
-            djinn::custody::epoch_keys(&djinn::custody::ReleasePolicy::default(), &epoch_root, persona, Some(label), requests).map_err(|r| format!("{r:?}"))
+            mere_resident::custody::epoch_keys(&mere_resident::custody::ReleasePolicy::default(), &epoch_root, persona, Some(label), requests).map_err(|r| format!("{r:?}"))
         }),
     )
     .await

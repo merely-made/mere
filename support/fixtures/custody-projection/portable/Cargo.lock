@@ -6,13 +6,14 @@ version = 4
 name = "custody-projection-portable-fixture"
 version = "0.0.0"
 dependencies = [
- "graphshell-endpoint",
+ "djinn",
  "serde_json",
 ]
 
 [[package]]
-name = "graphshell-endpoint"
-version = "0.0.2"
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 dependencies = [
  "serde",
  "serde_json",

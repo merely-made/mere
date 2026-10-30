@@ -3,9 +3,9 @@
 
 //! Retained-content seal operations under stable custody/profile authority.
 use crate::keeper::Keeper;
-use graphshell_endpoint::door::app_admission::AppId;
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyRefusal};
-use graphshell_endpoint::door::custody_payload::PayloadRequest;
+use djinn::door::app_admission::AppId;
+use djinn::door::custody::{CustodyAnswer, CustodyRefusal};
+use djinn::door::custody_payload::PayloadRequest;
 use personae::{PersonaId, ProfileId};
 use std::path::PathBuf;
 

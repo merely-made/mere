@@ -17,8 +17,8 @@ use castellan::custody::{
     IdentityStorage, IdentityVault, Profile, SealedIdentityProvider, SealedProfileStorage,
     load_or_create_auto_unlock_root,
 };
-use djinn::hocket_adoption::{APART_PROFILE, MARKER, RECORD, adopt_from};
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use mere_resident::hocket_adoption::{APART_PROFILE, MARKER, RECORD, adopt_from};
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId, SealedRecordStorage};
 
 const FAMILY: [u8; 32] = [0x42; 32];

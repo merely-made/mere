@@ -15,17 +15,15 @@
 mod custodian_fixture;
 
 use custodian_fixture::{TestCustodian, manage_grants};
-use djinn::custody_host::remote::RemoteHost;
-use djinn::custody_host::{CredentialCall, ResidentCustody};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::door::browser_carrier::NativeIdentityFailure;
-use djinn::{identity_ui::NativeIdentityUi, keeper::Keeper};
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody::CustodyRefusal,
-    custody_client::{CustodyClient, CustodyClientError},
-    quarantine::{QuarantineCard, ReviewAction, ReviewRequest},
-};
+use mere_resident::custody_host::remote::RemoteHost;
+use mere_resident::custody_host::{CredentialCall, ResidentCustody};
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::door::browser_carrier::NativeIdentityFailure;
+use mere_resident::{identity_ui::NativeIdentityUi, keeper::Keeper};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody::CustodyRefusal;
+use djinn::door::custody_client::{CustodyClient, CustodyClientError};
+use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 use personae::{PersonaId, ProfileId};
 use serde_json::json;
 use std::{
@@ -175,7 +173,7 @@ impl Fixture {
         let ui = Arc::new(Ui::default());
         let keeper = Arc::new(Keeper::new(remote.clone()).with_ui(ui.clone()));
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-        djinn::custody::grant(&grants).unwrap();
+        mere_resident::custody::grant(&grants).unwrap();
         let endpoint = custodian.dir.path().join("review.sock").display().to_string();
         let serving = endpoint.clone();
         let server = tokio::spawn(async move {
@@ -416,7 +414,7 @@ async fn an_owned_namespace_is_not_offered_for_assignment() {
     let card = f.cards("family").await.remove(0);
     let mut c = f.client("dramatis").await;
     assert!(c.unassigned_imports().await.unwrap().is_empty());
-    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
+    let request = djinn::door::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: card.persona,
@@ -469,7 +467,7 @@ async fn older_import_assignment_needs_consent_and_is_not_replayed() {
             .unwrap()
             .contains("GEZDGNBV")
     );
-    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
+    let request = djinn::door::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),
@@ -489,7 +487,7 @@ async fn older_import_assignment_rechecks_the_lock_after_consent() {
     let persona = persona.unwrap();
     let mut c = f.client("dramatis").await;
     let import = c.unassigned_imports().await.unwrap().remove(0);
-    let request = graphshell_endpoint::door::quarantine::AssignImportRequest {
+    let request = djinn::door::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),

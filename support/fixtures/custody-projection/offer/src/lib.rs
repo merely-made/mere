@@ -5,7 +5,7 @@ pub fn fixture() -> String {
 }
 
 #[cfg(feature = "forbidden-api")]
-pub use graphshell_endpoint::door::app_client::AppConnection;
+pub use djinn::door::app_client::AppConnection;
 
 #[test]
 fn portable_offer_response_preserves_its_wire_shape() {

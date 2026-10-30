@@ -9,12 +9,12 @@ use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs
 use common::{lane, lending, open_vault, owner, profile, write_device_settings};
 use distillery::inference::recall::*;
 use distillery::inference::{AskRequestV1, RunStateV1};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::{
     resident::DjinnResident,
     settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings},
 };
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use serde_json::{Value, json};
 use std::{
@@ -38,7 +38,7 @@ fn settings(model: &str) -> EmbeddingRecallSettings {
 async fn seed_model(root: &Path, data: &Path) -> eidetic::ManifestId {
     let source =
         PathBuf::from(std::env::var_os("ESP_MINILM_DIR").expect("pinned MiniLM directory"));
-    let path = djinn::resident_distillery::model_library_path(data, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(data, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut store = muniment::RedbBackend::open(path).unwrap();
     let model = eidetic::ModelLibrary::save_model_with_components(
@@ -63,7 +63,7 @@ async fn seed_model(root: &Path, data: &Path) -> eidetic::ManifestId {
 }
 async fn seed_generation_model(root: &Path, data: &Path) -> eidetic::ManifestId {
     use distillery::inference::{InferenceModelRow, PromptTemplate};
-    let path = djinn::resident_distillery::model_library_path(data, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(data, &profile().0, None);
     let mut store = muniment::RedbBackend::open(path).unwrap();
     // RoPE has no learned position tensor; retain the tiny decoder weights
     // while admitting the complete retained-passage prompt in this fixture.
@@ -193,7 +193,7 @@ async fn resident_embedding_process_fixture() {
             model: InferenceModelSettings::Library {
                 weight_cache: None,
                 row: generation.to_string(),
-                device: djinn::settings::InferenceDeviceSettings::Cpu,
+                device: mere_resident::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 2,
             },
         }),
@@ -216,7 +216,7 @@ async fn resident_embedding_process_fixture() {
         assert!(!root.join("origin-corpus.json").exists());
     }
     let corpus: Arc<dyn RecallCorpus> = Arc::new(PageTextCorpus(source_store.clone()));
-    let resident = DjinnResident::open(&identity, &data, &profile(), owner, djinn::resident::MeshAuthor::Resident)
+    let resident = DjinnResident::open(&identity, &data, &profile(), owner, mere_resident::resident::MeshAuthor::Resident)
         .await
         .unwrap();
     let journal = resident.inference().unwrap().journal().unwrap().clone();
@@ -329,7 +329,7 @@ async fn resident_embedding_process_fixture() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,

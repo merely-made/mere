@@ -108,6 +108,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "zeroize",
+]
+
+[[package]]
 name = "find-msvc-tools"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -118,10 +129,9 @@ name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
  "chirograph",
+ "djinn",
  "serde",
  "serde_json",
- "thiserror",
- "zeroize",
 ]
 
 [[package]]
@@ -171,6 +181,7 @@ dependencies = [
 name = "projection-offer-consumer-fixture"
 version = "0.0.0"
 dependencies = [
+ "djinn",
  "graphshell-endpoint",
  "serde_json",
 ]

@@ -10,10 +10,8 @@ use chirograph::{
     ProjectionSnapshot,
 };
 use dramatis::{birth::BirthFacts, resources::SubjectResourceAssociation, subject::SubjectRef};
-use graphshell_endpoint::door::{
-    app_admission::{AppId, AppRouteId},
-    projection::AppBrokerClient,
-};
+use djinn::door::app_admission::{AppId, AppRouteId};
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use mere_overmap::wire;
 use personal_facts::{BirthResource, ContactResource};
 use serde::{Deserialize, Serialize};

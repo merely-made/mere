@@ -36,7 +36,7 @@ fn provider_calls_and_answers_have_stable_wire_shapes() {
 
 #[test]
 fn offer_and_registration_wire_fixtures_are_stable() {
-    use graphshell_endpoint::door::app_admission::AppRouteId;
+    use djinn::door::app_admission::AppRouteId;
     let offer = ProviderCall::Offer {
         route: AppRouteId::new("sample.route").unwrap(),
         label: "Sample".into(),

@@ -28,11 +28,12 @@ use personae::delegation::DelegationError;
 use personae::{IdentityError, IdentityProvider, InMemoryProvider, RetainedKeys};
 use tokio::io::DuplexStream;
 
-use crate::door::browser_carrier::{BrowserSessionClient, LocalLink, admit_local_session};
+use crate::door::browser_carrier::{BrowserSessionClient, admit_local_session};
 use crate::door::browser_host::{BrowserHostError, now_ms};
 use crate::door::device_broker::DeviceSurface;
 use crate::door::identity_endpoint::IdentityEndpoint;
 use crate::door::resident_identity::ResidentIdentity;
+use djinn::door::link::LocalLink;
 use graphshell_host::admission::{CONNECT_ACTION, GRAPHSHELL_DOMAIN, PROJECTION_SERVICE};
 use graphshell_host::lifecycle::SessionAuthority;
 
@@ -221,9 +222,8 @@ fn local_grant<P: IdentityProvider>(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::door::browser_carrier::BrowserMessage;
-    use graphshell_endpoint::door::wire::BrowserChallenge;
+    use djinn::door::wire::BrowserChallenge;
 
     /// The transcript binds the client label, so two clients answering the
     /// same challenge with the same nonce still get different sessions. This
@@ -236,9 +236,18 @@ mod tests {
             host_nonce: challenge.host_nonce.clone(),
             client_nonce: challenge.host_nonce.clone(),
         };
-        let app = LocalLink::accept("turnstone".to_string(), &challenge, connect.clone()).unwrap();
-        let browser =
-            LocalLink::accept("chrome-extension://abc/".to_string(), &challenge, connect).unwrap();
+        let app = crate::door::browser_carrier::accept_local(
+            "turnstone".to_string(),
+            &challenge,
+            connect.clone(),
+        )
+        .unwrap();
+        let browser = crate::door::browser_carrier::accept_local(
+            "chrome-extension://abc/".to_string(),
+            &challenge,
+            connect,
+        )
+        .unwrap();
         assert_ne!(app.shared_link, browser.shared_link);
     }
 }

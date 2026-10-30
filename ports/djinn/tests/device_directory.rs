@@ -16,17 +16,18 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::resident_devices::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::resident_devices::{
     self, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryEndpoint,
     DeviceDirectorySource, DeviceDirectoryV1, read_directory,
 };
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::{app_client::AppClientError, projection::AppBrokerClient};
-use graphshell_endpoint::door::identity::VaultProtectionView;
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::app_client::AppClientError;
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use dramatis::view::VaultProtectionView;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
@@ -99,7 +100,7 @@ async fn only_the_granted_caller_reads_the_device_directory() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,

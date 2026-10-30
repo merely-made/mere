@@ -12,7 +12,7 @@ use std::process::Command;
 use std::time::SystemTime;
 
 use chartulary::resource_id;
-use djinn::knot_relation_intake::{
+use mere_resident::knot_relation_intake::{
     KnotEndpointBinding, KnotRelationProjection, import_knot_relations,
 };
 use kernel::geometry::PortablePoint;

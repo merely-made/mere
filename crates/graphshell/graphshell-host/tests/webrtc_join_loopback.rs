@@ -20,7 +20,7 @@ use std::time::Duration;
 use chirograph::IntentResult;
 use graphshell_client::{Advance, Outcome, SessionDriver};
 use graphshell_endpoint::ResumableProjectionSource;
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::carrier::projection_policy;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_host::lifecycle::SessionAuthority;

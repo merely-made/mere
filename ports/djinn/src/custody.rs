@@ -27,10 +27,10 @@ use std::sync::Arc;
 use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
-use graphshell_endpoint::door::app_admission::AppId;
+use djinn::door::app_admission::AppId;
 #[cfg(feature = "in-process-custody")]
-use graphshell_endpoint::door::custody::ReleasedEpochKey;
-use graphshell_endpoint::door::custody::{
+use djinn::door::custody::ReleasedEpochKey;
+use djinn::door::custody::{
     CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ResidentStatus,
 };
 use personae::ProfileId;
@@ -58,10 +58,10 @@ pub const CUSTODY_APPS: &[&str] = &[
 
 /// Grant the custody route to [`CUSTODY_APPS`].
 pub fn grant(
-    grants: &graphshell_endpoint::door::app_admission::AppRouteGrants,
-) -> Result<(), graphshell_endpoint::door::route::ResidentEndpointRouteError> {
-    let route = graphshell_endpoint::door::route::ResidentEndpointRoute::new(
-        graphshell_endpoint::door::custody::CUSTODY_ROUTE,
+    grants: &djinn::door::app_admission::AppRouteGrants,
+) -> Result<(), djinn::door::route::ResidentEndpointRouteError> {
+    let route = djinn::door::route::ResidentEndpointRoute::new(
+        djinn::door::custody::CUSTODY_ROUTE,
         std::time::Duration::from_millis(50),
     )?;
     for app in CUSTODY_APPS {

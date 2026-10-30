@@ -21,10 +21,10 @@ use std::io::{Read, Write};
 
 use base64::Engine;
 use chirograph::{CarrierNotice, CarrierOutput, CarrierRequest, CarrierResponse};
-use graphshell_endpoint::door::frame::{self, FrameError};
-use graphshell_endpoint::door::wire::{
-    BROWSER_CHALLENGE_SCHEMA as CHALLENGE_SCHEMA, BrowserChallenge,
-};
+use djinn::door::frame::{self, FrameError};
+#[cfg(test)]
+use djinn::door::wire::BROWSER_CHALLENGE_SCHEMA as CHALLENGE_SCHEMA;
+use djinn::door::wire::BrowserChallenge;
 use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
     AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
@@ -52,7 +52,6 @@ pub const FIREFOX_EXTENSION_ID: &str = "graphshell@mere.systems";
 pub const MAX_NATIVE_MESSAGE_BYTES: u32 = frame::MAX_NATIVE_MESSAGE_BYTES;
 
 const CONNECT_SCHEMA: &str = "mere.graphshell/browser-connect/v1";
-const LINK_DOMAIN: &[u8] = b"mere.graphshell/native-messaging-link/v1";
 
 /// Browser family inferred from the arguments supplied by the browser.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -163,15 +162,6 @@ impl AllowedExtensions {
     }
 }
 
-/// The browser door's nonce check on its own challenge: the schema must be
-/// the shared one and the nonce 32 bytes.
-fn challenge_nonce(challenge: &BrowserChallenge) -> Result<[u8; 32], BrowserCarrierError> {
-    if challenge.schema != CHALLENGE_SCHEMA {
-        return Err(BrowserCarrierError::WrongSchema);
-    }
-    decode_nonce(&challenge.host_nonce)
-}
-
 /// Browser-to-host messages.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -268,72 +258,38 @@ pub enum BrowserHostMessage {
     },
 }
 
-/// A checked connect answer and its transcript link, for any local client.
-///
-/// The label is bound into the transcript, so a link minted for one client
-/// cannot be replayed as another even on the same challenge. What the label
-/// says is the caller's business: an extension origin for a browser, an
-/// application name for a first-party app.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct LocalLink {
-    pub label: String,
-    pub host_nonce: [u8; 32],
-    pub client_nonce: [u8; 32],
-    pub shared_link: [u8; 16],
-}
+use djinn::door::link::{LinkError, LocalLink};
 
-impl LocalLink {
-    /// Check a connect answer against this host process and bind `label`.
-    pub fn accept(
-        label: String,
-        challenge: &BrowserChallenge,
-        message: BrowserMessage,
-    ) -> Result<Self, BrowserCarrierError> {
-        let BrowserMessage::Connect {
-            schema,
-            host_nonce,
-            client_nonce,
-        } = message
-        else {
-            return Err(BrowserCarrierError::ConnectRequired);
-        };
-        if schema != CONNECT_SCHEMA {
-            return Err(BrowserCarrierError::WrongSchema);
-        }
-        Self::bind(label, challenge, &host_nonce, &client_nonce)
+pub(crate) fn accept_local(
+    label: String,
+    challenge: &BrowserChallenge,
+    message: BrowserMessage,
+) -> Result<LocalLink, BrowserCarrierError> {
+    let BrowserMessage::Connect {
+        schema,
+        host_nonce,
+        client_nonce,
+    } = message
+    else {
+        return Err(BrowserCarrierError::ConnectRequired);
+    };
+    if schema != CONNECT_SCHEMA {
+        return Err(BrowserCarrierError::WrongSchema);
     }
-
-    /// Bind a client label and its answered nonces into a transcript link.
-    ///
-    /// Separate from [`LocalLink::accept`] so a door with its own message
-    /// vocabulary can bind the same way without having to speak the browser
-    /// connect frame.
-    pub fn bind(
-        label: String,
-        challenge: &BrowserChallenge,
-        host_nonce: &str,
-        client_nonce: &str,
-    ) -> Result<Self, BrowserCarrierError> {
-        let expected = challenge_nonce(challenge)?;
-        let echoed = decode_nonce(host_nonce)?;
-        if echoed != expected {
-            return Err(BrowserCarrierError::ChallengeMismatch);
+    Ok(LocalLink::bind(
+        label,
+        challenge,
+        &host_nonce,
+        &client_nonce,
+    )?)
+}
+impl From<LinkError> for BrowserCarrierError {
+    fn from(error: LinkError) -> Self {
+        match error {
+            LinkError::WrongSchema => Self::WrongSchema,
+            LinkError::ChallengeMismatch => Self::ChallengeMismatch,
+            LinkError::InvalidNonce => Self::InvalidNonce,
         }
-        let client_nonce = decode_nonce(client_nonce)?;
-        let mut hasher = blake3::Hasher::new();
-        hasher.update(LINK_DOMAIN);
-        hasher.update(&(label.len() as u64).to_le_bytes());
-        hasher.update(label.as_bytes());
-        hasher.update(&expected);
-        hasher.update(&client_nonce);
-        let mut shared_link = [0u8; 16];
-        shared_link.copy_from_slice(&hasher.finalize().as_bytes()[..16]);
-        Ok(Self {
-            label,
-            host_nonce: expected,
-            client_nonce,
-            shared_link,
-        })
     }
 }
 
@@ -352,7 +308,7 @@ impl BrowserLink {
         challenge: &BrowserChallenge,
         message: BrowserMessage,
     ) -> Result<Self, BrowserCarrierError> {
-        let link = LocalLink::accept(launcher.label(), challenge, message)?;
+        let link = accept_local(launcher.label(), challenge, message)?;
         Ok(Self {
             launcher,
             host_nonce: link.host_nonce,
@@ -656,15 +612,6 @@ impl BrowserSessionClient {
 #[cfg(test)]
 fn encode_nonce(nonce: [u8; 32]) -> String {
     base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(nonce)
-}
-
-fn decode_nonce(value: &str) -> Result<[u8; 32], BrowserCarrierError> {
-    let bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
-        .decode(value)
-        .map_err(|_| BrowserCarrierError::InvalidNonce)?;
-    bytes
-        .try_into()
-        .map_err(|_| BrowserCarrierError::InvalidNonce)
 }
 
 #[cfg(test)]

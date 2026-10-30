@@ -19,9 +19,10 @@ default = ["view"]
 # without the view's Cambium cone.
 view = ["dep:mere-view", "dep:graphshell-client", "dep:hest", "dep:cartography", "dep:sceno", "dep:uuid"]
 
-resident = ["view", "dep:graphshell-endpoint"]
+resident = ["dep:djinn", "view", "dep:graphshell-endpoint"]
 
 [dependencies]
+djinn = { workspace = true, optional = true, features = ["door-native"] }
 chirograph.workspace = true
 kernel.workspace = true
 pandect.workspace = true

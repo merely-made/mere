@@ -10,17 +10,15 @@
 //! so this host serves a fixture custodian from a thread over a new
 //! synthetic vault and composes Djinn's keeper as its client.
 #![cfg_attr(windows, allow(unused))]
-use djinn::custody_host::{CredentialCall, ResidentCustody};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::door::browser_carrier::NativeIdentityFailure;
-use djinn::{
+use mere_resident::custody_host::{CredentialCall, ResidentCustody};
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::door::browser_carrier::NativeIdentityFailure;
+use mere_resident::{
     identity_ui::{NativeIdentityUi, SystemNativeIdentityUi},
     keeper::Keeper,
 };
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody_client::CustodyClient,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody_client::CustodyClient;
 use personae::PersonaId;
 use serde_json::json;
 use std::{path::PathBuf, sync::Arc, time::Duration};
@@ -89,8 +87,8 @@ async fn main() {
         },
     )
     .unwrap();
-    let installed = djinn::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap();
-    let host = djinn::custody_host::remote::RemoteHost::connect(installed).unwrap();
+    let installed = mere_resident::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap();
+    let host = mere_resident::custody_host::remote::RemoteHost::connect(installed).unwrap();
     host.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
     let persona = PersonaId::new();
     let source = json!({"version":{"major":1,"minor":0},"exporterRpId":"example.invalid","exporterDisplayName":"Receipt","timestamp":1,"accounts":[{"id":"YQ","username":"Receipt","email":"fixture@example.invalid","collections":[],"items":[
@@ -115,7 +113,7 @@ async fn main() {
         host.lock_vault().unwrap();
     }
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let serving = endpoint.clone();
     let server = tokio::spawn(async move {
         serve_app_broker(

@@ -98,7 +98,7 @@ The installers point `vault.data_root` at the custodian's own state directory, s
 
    Count the prompts after an unlock and record them; that count is the cost of the same-user posture.
 6. Kill the custodian. Djinn must report the identity pending, with its holders locked and its doors refusing new sessions. After a restart the custodian must be locked with a fresh instance.
-7. Confirm that `djinn` (default features) does not link castellan: `cargo tree -p djinn -e normal -i castellan` must fail.
+7. Confirm that `djinn` (default features) does not link castellan: `cargo tree -p mere-resident -e normal -i castellan` must fail.
 8. Check the wallet at rest. Before the install, note Djinn's wallet public key, a persona UUID, and one epoch-derived result (a Knot reopen). After it:
    - Djinn's data root holds no `identity/` and no `castellan/`, and no `private-epoch-bridge.json` or `wallet.json` under `personas/*/`;
    - `/var/lib/djinn-custodian/markik/data` holds them, each file `0600` in `0700` directories, and step 4 denies `markik` reading it;

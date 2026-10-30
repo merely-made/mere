@@ -10,13 +10,11 @@ use castellan::{
     authority::PersonaeHost,
     custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
 };
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::keeper::Keeper;
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody_client::CustodyClient,
-    identity::VaultProtectionView,
-};
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::keeper::Keeper;
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody_client::CustodyClient;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, ProfileId};
 use std::{path::PathBuf, sync::Arc, time::Duration};
 
@@ -55,7 +53,7 @@ async fn main() {
         _ => panic!("mode must be locked or unlocked"),
     }
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let serving_endpoint = endpoint.clone();
     let server = tokio::spawn(async move {
         serve_app_broker(

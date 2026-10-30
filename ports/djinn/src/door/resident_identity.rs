@@ -23,8 +23,8 @@ use crate::door::browser_carrier::{
 };
 use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::DoorIdentity;
-use graphshell_endpoint::door::app_admission::AppId;
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use djinn::door::app_admission::AppId;
+use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
 
 /// One custody call in flight.
 pub type CustodyFuture =
@@ -42,7 +42,7 @@ pub trait ResidentIdentity: DoorIdentity + IdentityAuthority + Send + Sync + 'st
         }
     }
 
-    /// Answer one call on the custody route ([`graphshell_endpoint::door::custody`]),
+    /// Answer one call on the custody route ([`djinn::door::custody`]),
     /// from the application the door admitted.
     fn custody(self: Arc<Self>, app: AppId, call: CustodyCall) -> CustodyFuture {
         let _ = (app, call);
@@ -61,7 +61,7 @@ pub(crate) mod test_support {
     use personae::{IdentityError, InMemoryProvider, RetainedKeys};
 
     use super::*;
-    use graphshell_endpoint::door::identity::{
+    use dramatis::view::{
         AgentListenerView, CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
         VaultView,
     };

@@ -502,7 +502,7 @@ dependencies = [
 [[package]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+source = "git+https://www.github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 dependencies = [
  "tokio",
  "tracing",
@@ -4822,88 +4822,26 @@ dependencies = [
 
 [[package]]
 name = "djinn"
-version = "0.0.2"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 dependencies = [
- "apparatus-core",
  "armillary",
  "base64 0.22.1",
  "blake3",
- "castellan",
- "chartulary",
  "chatelaine",
- "chirograph",
- "chrono",
- "cleromancy-core",
- "custody-wire",
- "distillery",
- "djinn",
- "djinn-custodian",
- "djinn-testkit",
  "dramatis",
  "eidetic",
- "errand",
- "esp",
- "futures-util",
- "gaz",
- "gemini-protocol",
- "gemot",
- "graphshell",
- "graphshell-client",
- "graphshell-endpoint",
- "graphshell-host",
- "graphshell-mcp",
- "incipit",
  "insigne",
- "iroh",
- "knot-editor",
- "knot-site",
  "libc",
- "light-file-dialog",
- "mere-facts",
- "mere-kernel",
- "mere-mesh",
- "mere-overmap",
- "mere-p2panda-net",
- "mere-registry",
- "mere-site",
- "mere-transport",
- "mere-view",
- "muniment",
- "murm-webrtc",
- "notochord",
- "p2panda-core",
- "p2panda-store",
- "pandect",
  "personae",
- "pollster 0.4.0",
  "rand_core 0.6.4",
- "rcgen 0.13.2",
- "retinue",
- "rpassword",
- "rustls",
- "safetensors 0.4.5",
- "sceno",
- "scenograph",
- "scenotime",
- "scroll-protocol",
  "serde",
  "serde_json",
- "sha2 0.11.0",
- "signature 2.2.0",
- "ssh-agent-lib",
- "ssh-key",
- "stickleback",
- "tempfile",
  "thiserror 1.0.69",
  "tokio",
- "tokio-rustls",
- "toml 0.8.23",
  "tracing",
- "tracing-subscriber",
- "url",
  "uuid",
- "windows",
- "zbus",
+ "windows-sys 0.59.0",
  "zeroize",
 ]
 
@@ -5079,8 +5017,8 @@ dependencies = [
  "cambium",
  "cambium-desktop",
  "chatelaine",
+ "djinn",
  "dramatis",
- "graphshell-endpoint",
  "image",
  "luggage",
  "mesquite",
@@ -7281,6 +7219,7 @@ dependencies = [
  "chirograph",
  "cue-netrender",
  "distillery",
+ "djinn",
  "dramatis",
  "eidetic",
  "gemot",
@@ -7375,26 +7314,16 @@ dependencies = [
 name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
- "armillary",
- "base64 0.22.1",
- "chatelaine",
  "chirograph",
+ "djinn",
  "dramatis",
- "eidetic",
  "insigne",
- "libc",
  "personae",
- "rand_core 0.6.4",
  "sceno",
  "scenotime",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
  "tokio",
- "tracing",
- "uuid",
- "windows-sys 0.59.0",
- "zeroize",
 ]
 
 [[package]]
@@ -7403,6 +7332,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "chirograph",
+ "djinn",
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
@@ -7427,6 +7357,7 @@ name = "graphshell-mcp"
 version = "0.0.1"
 dependencies = [
  "chirograph",
+ "djinn",
  "graphshell-endpoint",
  "sceno",
  "scenotime",
@@ -7441,6 +7372,7 @@ dependencies = [
  "cambium-desktop",
  "cambium-rootstock",
  "chirograph",
+ "djinn",
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
@@ -9274,7 +9206,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "knot-catalog",
 ]
@@ -9282,7 +9214,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9295,7 +9227,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9315,7 +9247,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "cambium",
  "illume",
@@ -9332,12 +9264,14 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "base64 0.22.1",
  "blake3",
  "chartulary",
  "chirograph",
+ "djinn",
+ "dramatis",
  "eidetic",
  "esp",
  "fleece",
@@ -9401,7 +9335,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10470,6 +10404,7 @@ name = "mere-overmap"
 version = "0.1.0"
 dependencies = [
  "chirograph",
+ "djinn",
  "graphshell-client",
  "graphshell-endpoint",
  "hest",
@@ -10567,6 +10502,94 @@ dependencies = [
  "toml 0.8.23",
  "tower",
  "web-time",
+]
+
+[[package]]
+name = "mere-resident"
+version = "0.0.2"
+dependencies = [
+ "apparatus-core",
+ "armillary",
+ "base64 0.22.1",
+ "blake3",
+ "castellan",
+ "chartulary",
+ "chatelaine",
+ "chirograph",
+ "chrono",
+ "cleromancy-core",
+ "custody-wire",
+ "distillery",
+ "djinn",
+ "djinn-custodian",
+ "djinn-testkit",
+ "dramatis",
+ "eidetic",
+ "errand",
+ "esp",
+ "futures-util",
+ "gaz",
+ "gemini-protocol",
+ "gemot",
+ "graphshell",
+ "graphshell-client",
+ "graphshell-endpoint",
+ "graphshell-host",
+ "graphshell-mcp",
+ "incipit",
+ "insigne",
+ "iroh",
+ "knot-editor",
+ "knot-site",
+ "libc",
+ "light-file-dialog",
+ "mere-facts",
+ "mere-kernel",
+ "mere-mesh",
+ "mere-overmap",
+ "mere-p2panda-net",
+ "mere-registry",
+ "mere-resident",
+ "mere-site",
+ "mere-transport",
+ "mere-view",
+ "muniment",
+ "murm-webrtc",
+ "notochord",
+ "p2panda-core",
+ "p2panda-store",
+ "pandect",
+ "personae",
+ "pollster 0.4.0",
+ "rand_core 0.6.4",
+ "rcgen 0.13.2",
+ "retinue",
+ "rpassword",
+ "rustls",
+ "safetensors 0.4.5",
+ "sceno",
+ "scenograph",
+ "scenotime",
+ "scroll-protocol",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "signature 2.2.0",
+ "ssh-agent-lib",
+ "ssh-key",
+ "stickleback",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tokio",
+ "tokio-rustls",
+ "toml 0.8.23",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+ "windows",
+ "zbus",
+ "zeroize",
 ]
 
 [[package]]
@@ -17226,7 +17249,8 @@ name = "station-custody"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "graphshell-endpoint",
+ "djinn",
+ "dramatis",
  "insigne",
  "outrider",
  "p2panda-core",
@@ -21724,7 +21748,7 @@ dependencies = [
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21769,7 +21793,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=01ee97b0b95d6794309
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21814,7 +21838,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=01ee97b0b95d6794309
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
 
 [[patch.unused]]
 name = "chartulary"

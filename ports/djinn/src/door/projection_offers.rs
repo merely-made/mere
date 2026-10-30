@@ -7,8 +7,8 @@ use chirograph::{
     IntentInvocation, IntentResult, ProjectionRequest, ProjectionSnapshot, ResourceChunkRequest,
     ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
 };
-use graphshell_endpoint::door::app_admission::{APP_IDENTITY_ROUTE, AppId, AppRouteId};
-use graphshell_endpoint::door::custody::CUSTODY_ROUTE;
+use djinn::door::app_admission::{APP_IDENTITY_ROUTE, AppId, AppRouteId};
+use djinn::door::custody::CUSTODY_ROUTE;
 use graphshell_endpoint::door::projection_offer::{
     PROJECTION_PROVIDER_ROUTE, ViewerContext, Work, WorkOperation, WorkOutcome,
 };

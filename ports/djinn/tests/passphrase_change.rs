@@ -8,7 +8,7 @@ use castellan::{
         SealedProfileStorage, SecretBytes, UnlockMethod,
     },
 };
-use djinn::{
+use mere_resident::{
     door::{
         app_broker::{AppEndpointCatalog, serve_app_broker},
         browser_carrier::NativeIdentityFailure,
@@ -17,12 +17,10 @@ use djinn::{
     keeper::Keeper,
 };
 use dramatis::authentication::{PassphraseChangeFailureV1 as F, PassphraseChangeReceiptV1 as R};
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody::{CustodyAnswer, CustodyCall},
-    custody_client::CustodyClient,
-    identity::VaultProtectionView,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody::{CustodyAnswer, CustodyCall};
+use djinn::door::custody_client::CustodyClient;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, ProfileId};
 use std::{
     collections::VecDeque,
@@ -161,7 +159,7 @@ async fn serve(
     endpoint: String,
 ) -> tokio::task::JoinHandle<()> {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let path = endpoint.clone();
     let task = tokio::spawn(async move {
         serve_app_broker(
