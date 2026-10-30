@@ -29,7 +29,7 @@ use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};
 use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, ProfileId, RetainedKeys};
 
 use crate::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
-use crate::door::app_client::{AppBrokerClient, AppClientError};
+use crate::door::app_client::{AppClientError, AppConnection};
 use crate::door::custody::{
     CUSTODY_ROUTE, CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource,
     ReleasedEpochKey, ResidentStatus, StationGrantRequest,
@@ -72,7 +72,7 @@ impl CustodyClientError {
 
 /// An open custody session against djinn, as one application.
 pub struct CustodyClient {
-    inner: AppBrokerClient,
+    inner: AppConnection,
     profile: Option<ProfileId>,
 }
 
@@ -85,7 +85,7 @@ impl CustodyClient {
     /// The same, at an explicit endpoint. Tests and receipts use this.
     pub async fn open_at(endpoint: &str, app: AppId) -> Result<Self, CustodyClientError> {
         let route = AppRouteId::new(CUSTODY_ROUTE).expect("the custody route id is valid");
-        let inner = AppBrokerClient::open_route_at(endpoint, app, route)
+        let inner = AppConnection::open_route_at(endpoint, app, route)
             .await
             .map_err(CustodyClientError::Absent)?;
         Ok(Self {
@@ -103,7 +103,10 @@ impl CustodyClient {
             },
             _ => call,
         };
-        Ok(self.inner.custody_call(call).await??)
+        Ok(self
+            .inner
+            .call::<_, Result<CustodyAnswer, CustodyRefusal>>(call)
+            .await??)
     }
 
     /// Speak as persona `profile` from now on, without switching djinn to

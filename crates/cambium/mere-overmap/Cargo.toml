@@ -32,7 +32,7 @@ serde_json.workspace = true
 cartography = { workspace = true, optional = true }
 graphshell-client = { workspace = true, optional = true }
 hest = { workspace = true, optional = true }
-graphshell-endpoint = { workspace = true, optional = true, features = ["door"] }
+graphshell-endpoint = { workspace = true, optional = true, features = ["projection-door"] }
 mere-view = { workspace = true, optional = true }
 sceno = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }

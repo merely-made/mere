@@ -12,7 +12,7 @@ use chirograph::{
 use dramatis::{birth::BirthFacts, resources::SubjectResourceAssociation, subject::SubjectRef};
 use graphshell_endpoint::door::{
     app_admission::{AppId, AppRouteId},
-    app_client::AppBrokerClient,
+    projection::AppBrokerClient,
 };
 use mere_overmap::wire;
 use personal_facts::{BirthResource, ContactResource};

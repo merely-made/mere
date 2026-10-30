@@ -13,7 +13,7 @@ use chirograph::{
 use distillery::inference::{INFERENCE_ASK_ROUTE, InferenceRunsV1};
 use graphshell_endpoint::door::{
     app_admission::{AppId, AppRouteId},
-    app_client::{AppBrokerClient, AppClientError},
+    app_client::AppClientError, projection::AppBrokerClient,
     identity::VaultProtectionView,
 };
 use personae::{Ed25519Keypair, ProfileId};

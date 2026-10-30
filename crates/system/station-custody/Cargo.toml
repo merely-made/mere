@@ -15,7 +15,7 @@ blake3.workspace = true
 # and its revocation, and opens no wallet (dramatis repo plan, D5, D17). The
 # first-party door's application side, without the Graphshell port (stack
 # lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["door"] }
+graphshell-endpoint = { workspace = true, features = ["custody-client"] }
 personae.workspace = true
 # The check conclusions and faults, named directly (insigne proofs plan, B).
 insigne = { workspace = true, features = ["verify"] }

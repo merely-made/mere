@@ -34,7 +34,7 @@ use djinn::resident_reservoir::{
 use graphshell_endpoint::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;

@@ -4,7 +4,7 @@
 use chirograph::*;
 use graphshell_endpoint::door::{
     app_admission::{AppId, AppRouteId},
-    app_client::AppBrokerClient,
+    projection::AppBrokerClient,
 };
 use mere_overmap::wire::*;
 use pandect::CapturedDelta;

@@ -16,6 +16,11 @@ use std::io::{Read, Write};
 
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use zeroize::{Zeroize, Zeroizing};
 
@@ -112,6 +117,11 @@ where
 
 /// Read one native-messaging JSON frame from an asynchronous stream, with the
 /// same size and truncation behavior as [`read_native_message`].
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub async fn read_native_message_async<R, T>(reader: &mut R) -> Result<Option<T>, FrameError>
 where
     R: AsyncRead + Unpin,
@@ -133,6 +143,11 @@ where
 }
 
 /// Write one native-messaging JSON frame to an asynchronous stream.
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub async fn write_native_message_async<W, T>(writer: &mut W, message: &T) -> Result<(), FrameError>
 where
     W: AsyncWrite + Unpin,
@@ -214,6 +229,11 @@ mod tests {
         assert!(output.is_empty());
     }
 
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
     #[tokio::test]
     async fn async_json_and_partial_serialization_errors_are_redacted() {
         let body = b"\"secret-variant\"";
@@ -282,6 +302,11 @@ mod tests {
         finish_wipe_observation(&observations, "secret-partial-body".len());
     }
 
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
     #[tokio::test]
     async fn cancelling_pending_read_and_write_wipes_owned_buffers() {
         use std::future::Future;
@@ -352,6 +377,11 @@ mod tests {
         ));
     }
 
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
     #[tokio::test]
     async fn asynchronous_frames_match_the_synchronous_wire() {
         let message = serde_json::json!({ "type": "failure", "message": "no" });

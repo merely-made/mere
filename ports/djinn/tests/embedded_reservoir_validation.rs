@@ -32,7 +32,7 @@ use djinn::embedded_reservoir::{
 use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ResidentReservoir;
 use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_endpoint::door::identity::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};

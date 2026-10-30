@@ -25,7 +25,7 @@ use djinn::{
 };
 use graphshell_endpoint::door::{
     app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
-    app_client::AppBrokerClient,
+    projection::AppBrokerClient,
     identity::VaultProtectionView,
 };
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;

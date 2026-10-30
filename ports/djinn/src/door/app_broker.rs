@@ -38,9 +38,11 @@ use graphshell_endpoint::door::custody::CUSTODY_ROUTE;
 use graphshell_endpoint::door::local_endpoint::{LocalListener, LocalStream, connect_local};
 use graphshell_endpoint::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::door::wire::{
-    APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge,
+    APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage, BrowserChallenge,
 };
 use tokio::io::{AsyncRead, AsyncWrite};
+type AppMessage = WireMessage<chirograph::CarrierRequest, graphshell_endpoint::door::custody::CustodyCall>;
+type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<graphshell_endpoint::door::custody::CustodyAnswer, graphshell_endpoint::door::custody::CustodyRefusal>>;
 
 use crate::door::browser_carrier::{
     LocalLink, read_native_message_async, write_native_message_async,

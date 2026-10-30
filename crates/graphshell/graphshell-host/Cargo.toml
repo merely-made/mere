@@ -38,6 +38,7 @@ native = [
     "admission",
     "webrtc-join",
     "graphshell-endpoint/door",
+    "graphshell-endpoint/projection",
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
     "notochord/tokio",

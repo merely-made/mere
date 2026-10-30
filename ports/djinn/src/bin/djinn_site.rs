@@ -20,7 +20,7 @@ use djinn::resident_site::{
     PUBLISHED_SITE_ROUTE, PUBLISHED_SITE_STOP_INTENT, PublishedSiteChunkV1, PublishedSitePrepareV1,
 };
 use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use knot_site::Site;
 use sceno::InstanceId;
 use scenotime::{Revision, SceneEpoch};

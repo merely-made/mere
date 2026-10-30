@@ -21,16 +21,52 @@
 //! ruling R3).
 
 pub mod app_admission;
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod app_client;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod custody;
+#[cfg(all(
+    feature = "custody-client",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod custody_client;
+#[cfg(all(
+    feature = "custody-client",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod custody_identity;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod custody_payload;
 pub mod frame;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod identity;
+#[cfg(all(
+    feature = "door-native",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod local_endpoint;
+#[cfg(all(feature = "profile", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod profile;
+#[cfg(all(
+    feature = "projection-door",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
+pub mod projection;
+#[cfg(all(feature = "custody", any(unix, windows), not(target_arch = "wasm32")))]
 pub mod quarantine;
+#[cfg(all(
+    feature = "projection-door",
+    any(unix, windows),
+    not(target_arch = "wasm32")
+))]
 pub mod resident_mere_proxy;
 pub mod route;
 pub mod wire;

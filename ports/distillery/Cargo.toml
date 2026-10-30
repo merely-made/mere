@@ -25,7 +25,7 @@ personae.workspace = true
 pandect.workspace = true
 cambium.workspace = true
 chirograph.workspace = true
-graphshell-endpoint.workspace = true
+graphshell-endpoint = { workspace = true, features = ["projection"] }
 sceno.workspace = true
 scenograph.workspace = true
 scenomise.workspace = true
