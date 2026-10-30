@@ -1,0 +1,1491 @@
+{
+  "source_base": "59d87099ce749448c44386450e5f613649cc505d",
+  "source_hashes": {
+    "Cargo.lock": "c7549308681ba1b06952419967288d4cfce9fe1745faee01ac7431fde571a329",
+    "crates/graphshell/graphshell-endpoint/Cargo.toml": "d86ad03b5cf73b52365aa11711b15a18f54c66a04e3518fffc6a05790c12ca62",
+    "crates/graphshell/graphshell-endpoint/src/door/app_client.rs": "56a6a755556a93c6dbe161fa608980f1546cadb7ba4a5786dcf4b916f89b52f9",
+    "crates/graphshell/graphshell-endpoint/src/door/mod.rs": "29d4e3f54293db1b945be67c9519610f19c26eb6bfb07cfe43fec608b31d43f5",
+    "crates/graphshell/graphshell-endpoint/src/door/projection_offer.rs": "95c7d75e4fee8f1f41f259154f410037f6b86a4187f1a8b59f999a3fbe98d786",
+    "crates/graphshell/graphshell-endpoint/src/door/projection_provider.rs": "d6cdca37af5a6fc4dec97302f1a66736cd96cf7efe14172986b2bf317ebf9414",
+    "crates/graphshell/graphshell-endpoint/src/door/wire.rs": "9ec8b631497c42c156d2b4bf9661118063d9d14addcd11ddb5929fcd89103985",
+    "crates/graphshell/graphshell-endpoint/tests/projection_offer_wire.rs": "0f268452722884c8b584018cb60aac5a10bcc4a00fd1015fc68202e159651f14",
+    "crates/graphshell/graphshell-host/src/endpoint_catalog.rs": "f7ce858988d46070955a35cae17f59cf9b92a6c953a79541206ca974273204bf",
+    "crates/graphshell/graphshell-host/src/session_loop.rs": "7c25808dce29c398a144023fa0828521d730d91c6305c4deaf83c96475bbfe69",
+    "crates/graphshell/graphshell-host/src/session_notices.rs": "d0a1206e17bbb477b64fef8c1662b6786cabda75265c2526c29d7ca82247ed2d",
+    "ports/djinn/Cargo.toml": "eb2704e8a704fd4793af70b84d5e7b7889797da57dad7a5b6f19d4dcb5cb798e",
+    "ports/djinn/src/bin/djinn.rs": "b966c45cd7a999f0293e8e354d49445f5e84c036745af351b347b343b161b7a8",
+    "ports/djinn/src/door/app_broker.rs": "f43b82980d85a7296e1e0c311751cb67a6807ed8789bcb73d9137ec038cef7cb",
+    "ports/djinn/src/door/mod.rs": "75bb5b6cdaf8cf8a1108d672804bf882d7d90888a6eeaff1d360d8a68a27a169",
+    "ports/djinn/src/door/projection_offers.rs": "86d896633628478eb9635012f720e212b26ad598f5721f6617877e156b40db10",
+    "ports/djinn/src/pairing.rs": "3afd968ed299f2f5339778e7651c5a713c51aa7fb67454140d3b220a4b51f7e2",
+    "ports/djinn/src/settings.rs": "53fcff7c7811147a8c20dc8f54cc69b1cc3f211a5c18d16e93f277b474342430",
+    "ports/djinn/tests/app_projection_offers.rs": "e2dd79f5d03318a989b4d24a26657885b09f13ea108f62de80f57f8259349a1b",
+    "support/fixtures/custody-projection/offer/Cargo.toml": "d2c8df4c3a4099909f49ab5bb91bb75b1bc69750b772f0d59265a9fa5ccf5031",
+    "support/fixtures/custody-projection/offer/src/lib.rs": "6c028d3c3e6aa3465e023b7572b0f0dc9e0bed04004ae7041fc79058b37608ad",
+    "support/fixtures/custody-projection/provider/Cargo.toml": "4e19e2815790c90fd78f53f4b02e3df3ddddb4fe8cac45889da5e861bc28ded0",
+    "support/fixtures/custody-projection/provider/src/lib.rs": "4e48d4c545df16fe36189d215b7670d1cc6f70026e67da2602ac28911c81649d",
+    "Cargo.toml": "089d6ac97a7f06d4f027999a4391ad5af4ea41fee14a30b4b512fb5eafb9414b",
+    "support/fixtures/custody-projection/provider/Cargo.lock": "d290645554358a2c4d580f6b465653931639e4cfa33dc63da25a2a3a701b627e"
+  },
+  "gates": [
+    {
+      "name": "offer-contract-runtime-green-20261030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-provider"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-contract-runtime-green-20261030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-provider"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.74,
+      "finished_utc": "2026-10-30T05:09:33.420671+00:00",
+      "log": "offer-contract-runtime-green-20261030.log",
+      "log_sha256": "be6561b07968e15a3f22dd23ce9e75a63854e020902c8505739a3ca8c578d18b"
+    },
+    {
+      "name": "offer-host-final-1030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-host",
+        "--features",
+        "native",
+        "--lib"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-host-final-1030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-host",
+        "--features",
+        "native",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.78,
+      "finished_utc": "2026-10-30T05:16:27.618029+00:00",
+      "log": "offer-host-final-1030.log",
+      "log_sha256": "6515d1a8c2a299bfdc98d0796ae5e655b906f7d749166f6f1aad7acd12bff61b"
+    },
+    {
+      "name": "offer-djinn-door-frozen-1030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--lib",
+        "door::"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-djinn-door-frozen-1030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--lib",
+        "door::"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 102.71,
+      "finished_utc": "2026-10-30T05:26:13.076575+00:00",
+      "log": "offer-djinn-door-frozen-1030.log",
+      "log_sha256": "0915244003c52482259e0a7da1ad412dae3b51c6542196702b0572b9954a1194"
+    },
+    {
+      "name": "root-offer-feature-matrix",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "python3",
+        "support/fixtures/custody-projection/verify.py",
+        "/home/markik/Code/testing/app-projection-offers-20261030/features"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-feature-matrix",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "support/fixtures/custody-projection/verify.py",
+        "/home/markik/Code/testing/app-projection-offers-20261030/features"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 36.44,
+      "finished_utc": "2026-10-30T05:15:56.260945+00:00",
+      "log": "root-offer-feature-matrix.log",
+      "log_sha256": "fe37e377b5df6a9f632831f0564f09a11114fcdef88dbecc5711dd80c757e5fe"
+    },
+    {
+      "name": "root-offer-consuming-targets",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/consuming_targets.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-consuming-targets",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/consuming_targets.py"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 68.17,
+      "finished_utc": "2026-10-30T05:28:07.324604+00:00",
+      "log": "root-offer-consuming-targets.log",
+      "log_sha256": "0f6283afad6295546c2aa41671f1cfe6ac93af338a311a6885e138a34f40a084"
+    },
+    {
+      "name": "root-offer-consuming-remaining",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/consuming_targets.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-consuming-remaining",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/consuming_targets.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 57.22,
+      "finished_utc": "2026-10-30T05:31:24.353961+00:00",
+      "log": "root-offer-consuming-remaining.log",
+      "log_sha256": "1c8d8488e35d6f302e374a9b2c6901468c80d6ea4ea3c833bb8d4d03639c7074"
+    },
+    {
+      "name": "root-offer-settings-red",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--lib",
+        "settings::tests::projection_provider_permissions_are_explicit_and_round_trip"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-settings-red",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "djinn",
+        "--lib",
+        "settings::tests::projection_provider_permissions_are_explicit_and_round_trip"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 138.82,
+      "finished_utc": "2026-10-30T05:03:06.160686+00:00",
+      "log": "root-offer-settings-red.log",
+      "log_sha256": "45a907e8da4caf50a685d13a166dd4472d97027c780877b6ec640bfa1754efa4"
+    },
+    {
+      "name": "offer-catalog-red-native-1030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "graphshell-host",
+        "--features",
+        "native",
+        "--lib",
+        "removal_requires_the_registration_owner",
+        "--locked"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-catalog-red-native-1030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "-p",
+        "graphshell-host",
+        "--features",
+        "native",
+        "--lib",
+        "removal_requires_the_registration_owner",
+        "--locked"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 233.67,
+      "finished_utc": "2026-10-30T04:59:51.941774+00:00",
+      "log": "offer-catalog-red-native-1030.log",
+      "log_sha256": "5a6d6e1affae4e04fb01943160e00ccac67c3f0c8d8d8a0494b75919269f1b5c"
+    },
+    {
+      "name": "offer-contract-red-queued-20261030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-offer",
+        "--test",
+        "projection_offer_wire"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-contract-red-queued-20261030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-offer",
+        "--test",
+        "projection_offer_wire"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 155.75,
+      "finished_utc": "2026-10-30T05:00:07.744399+00:00",
+      "log": "offer-contract-red-queued-20261030.log",
+      "log_sha256": "1be3e326fdfdcf734a4c1b622ccefd4d2f29e198b6de577905a47b5d3bc27482"
+    },
+    {
+      "name": "offer-contract-runtime-red-20261030",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-provider",
+        "slow_factory_does_not_block_the_async_runtime"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-offer-contract-runtime-red-20261030",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "projection-provider",
+        "slow_factory_does_not_block_the_async_runtime"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 8.57,
+      "finished_utc": "2026-10-30T05:09:05.643740+00:00",
+      "log": "offer-contract-runtime-red-20261030.log",
+      "log_sha256": "2f5de304cefa60b72730a5a6688ed63a073b9ceadd677255e70ec332332896d6"
+    },
+    {
+      "name": "root-offer-upstream-requalification",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/requalify.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-upstream-requalification",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/requalify.py"
+      ],
+      "exit_code": 124,
+      "elapsed_seconds": 600.04,
+      "finished_utc": "2026-10-30T05:48:14.987723+00:00",
+      "log": "root-offer-upstream-requalification.log",
+      "log_sha256": "0be34a6da86ae01e9d3cbda7fabe643df5feb095b389da62508090a980a38e26"
+    },
+    {
+      "name": "root-offer-upstream-remaining",
+      "cwd": "/home/markik/Code/worktrees/mere-custody-contract-20261029",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/requalify_remaining.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-root-offer-upstream-remaining",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/app-projection-offers-20261030/requalify_remaining.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 119.36,
+      "finished_utc": "2026-10-30T05:50:33.470938+00:00",
+      "log": "root-offer-upstream-remaining.log",
+      "log_sha256": "eb1b6c32e70d62e5b83da117ef05749ed09e3e3a18d3fcb8a5d52b68e1546548"
+    }
+  ],
+  "cones": [
+    {
+      "fixture": "custody-types-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 113,
+      "endpoint_features": [
+        "custody",
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chatelaine",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "dramatis",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "eidetic",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "insigne",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "uuid",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "custody-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 122,
+      "endpoint_features": [
+        "custody",
+        "custody-client",
+        "door",
+        "door-native"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chatelaine",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "dramatis",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "eidetic",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "insigne",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "rand_core",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "tracing",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "uuid",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "host-wasm32-unknown-unknown.cone.json",
+      "package_name_count": 34,
+      "endpoint_features": [
+        "default",
+        "projection"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "host-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 35,
+      "endpoint_features": [
+        "default",
+        "projection"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "offer-wasm32-unknown-unknown.cone.json",
+      "package_name_count": 35,
+      "endpoint_features": [
+        "door",
+        "projection",
+        "projection-offer"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "offer-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 36,
+      "endpoint_features": [
+        "door",
+        "projection",
+        "projection-offer"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "portable-wasm32-unknown-unknown.cone.json",
+      "package_name_count": 16,
+      "endpoint_features": [
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "portable-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 16,
+      "endpoint_features": [
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "projection-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 66,
+      "endpoint_features": [
+        "door",
+        "door-native",
+        "projection",
+        "projection-door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "rand_core",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture": "provider-x86_64-unknown-linux-gnu.cone.json",
+      "package_name_count": 66,
+      "endpoint_features": [
+        "door",
+        "door-native",
+        "projection",
+        "projection-offer",
+        "projection-provider"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "rand_core",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "consumer_status": "Knot provider CLI intake published and narrowly qualified by 4 provider CLI tests and the peers-only endpoint check; see consumer_publication.gates.",
+  "root_lock_changed": true,
+  "limitations": [
+    "Windows runtime not qualified",
+    "Portable Wasm compile is not browser provider IPC",
+    "No full GUI or distributed transport qualification",
+    "root-offer-consuming-targets passed all-targets then rejected unsupported no-default-features djinn binary; corrected library and remaining tests passed separately"
+  ],
+  "qualified_code_base": "56fbdc2e45f0ef18db1eda8ee518723ce788a264",
+  "root_lock_change": "Only chatelaine/dramatis/gaz source revisions aligned to actual resolved Dramatis 6aa0daa4; all upstream registry selections retained.",
+  "upstream_requalification": "All test commands passed on current cohort before 600-second run cap during all-targets check; unfinished checks and refreshed provider fixture passed in remaining gate. Later 59d87099c changed docs only.",
+  "consumer_publication": {
+    "repository": "https://github.com/merely-made/knot-editor",
+    "commit": "63ba1b9c61cb119053c7460abe497a3285b2fdba",
+    "supplier_code_commit": "c3567c5ab",
+    "supplier_head": "46e339b118565c0b46c821fe741659cb302eae52",
+    "status": "Knot provider CLI intake published; focused provider tests and peers-only check passed.",
+    "features": [
+      "peers",
+      "projection-provider"
+    ],
+    "provider_cli_mode": "projection-provider <directory> <route> [--endpoint <app-endpoint>] [--max-sessions <1..64>]",
+    "gates": [
+      {
+        "name": "knot_provider_narrow_tests",
+        "cwd": "/home/markik/Code/worktrees/knot-editor-custody-projection-20261029",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "knot-editor",
+          "--features",
+          "peers,projection-provider",
+          "--bin",
+          "knot_endpoint",
+          "provider_cli_tests"
+        ],
+        "wrapped_command": [
+          "flock",
+          "-w",
+          "600",
+          "/home/markik/Code/testing/machine-heavy.lock",
+          "systemd-run",
+          "--user",
+          "--scope",
+          "--unit=custody-contract-knot_provider_narrow_tests",
+          "--property=MemoryMax=3G",
+          "--property=MemorySwapMax=0",
+          "--property=CPUQuota=150%",
+          "env",
+          "CARGO_TARGET_DIR=/home/markik/Code/target",
+          "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+          "CARGO_BUILD_JOBS=1",
+          "CARGO_INCREMENTAL=0",
+          "CARGO_PROFILE_DEV_DEBUG=0",
+          "CARGO_PROFILE_TEST_DEBUG=0",
+          "RUST_TEST_THREADS=1",
+          "nice",
+          "-n",
+          "10",
+          "/usr/bin/time",
+          "-v",
+          "timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "600s",
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "knot-editor",
+          "--features",
+          "peers,projection-provider",
+          "--bin",
+          "knot_endpoint",
+          "provider_cli_tests"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 113.65,
+        "finished_utc": "2026-10-30T06:01:23.222777+00:00",
+        "log": "knot_provider_narrow_tests.log",
+        "log_sha256": "b51a953907c8329148127e00cca36ab46e28f2d6dec3483a111e3631f1cf49e2",
+        "receipt_json": "/home/markik/Code/testing/djinn-ownership-20261030/knot_provider_narrow_tests.json",
+        "retained_log_path": "/home/markik/Code/testing/djinn-ownership-20261030/knot_provider_narrow_tests.log",
+        "retained_log_sha256_verified": true
+      },
+      {
+        "name": "knot_provider_narrow_peers_check",
+        "cwd": "/home/markik/Code/worktrees/knot-editor-custody-projection-20261029",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "-p",
+          "knot-editor",
+          "--features",
+          "peers",
+          "--bin",
+          "knot_endpoint"
+        ],
+        "wrapped_command": [
+          "flock",
+          "-w",
+          "600",
+          "/home/markik/Code/testing/machine-heavy.lock",
+          "systemd-run",
+          "--user",
+          "--scope",
+          "--unit=custody-contract-knot_provider_narrow_peers_check",
+          "--property=MemoryMax=3G",
+          "--property=MemorySwapMax=0",
+          "--property=CPUQuota=150%",
+          "env",
+          "CARGO_TARGET_DIR=/home/markik/Code/target",
+          "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+          "CARGO_BUILD_JOBS=1",
+          "CARGO_INCREMENTAL=0",
+          "CARGO_PROFILE_DEV_DEBUG=0",
+          "CARGO_PROFILE_TEST_DEBUG=0",
+          "RUST_TEST_THREADS=1",
+          "nice",
+          "-n",
+          "10",
+          "/usr/bin/time",
+          "-v",
+          "timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "600s",
+          "cargo",
+          "check",
+          "--locked",
+          "-p",
+          "knot-editor",
+          "--features",
+          "peers",
+          "--bin",
+          "knot_endpoint"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 34.03,
+        "finished_utc": "2026-10-30T06:01:59.582651+00:00",
+        "log": "knot_provider_narrow_peers_check.log",
+        "log_sha256": "9cb10242598f19198276dc487df3881a6dc4adb653d5c5847595f0d35a80ebcc",
+        "receipt_json": "/home/markik/Code/testing/djinn-ownership-20261030/knot_provider_narrow_peers_check.json",
+        "retained_log_path": "/home/markik/Code/testing/djinn-ownership-20261030/knot_provider_narrow_peers_check.log",
+        "retained_log_sha256_verified": true
+      }
+    ],
+    "lock_audit": {
+      "lockfile": "Knot Cargo.lock",
+      "package_entry_count": 1363,
+      "changed_package_source_identity_count": 52,
+      "old_mere_revision": "c6290142866eefead385e728c5c5da24ac6f624a",
+      "new_mere_revision": "46e339b118565c0b46c821fe741659cb302eae52",
+      "preserved": "All package versions, checksums and dependency edges; no unrelated registry or Git source selections were refreshed."
+    }
+  }
+}

@@ -17,11 +17,11 @@ use std::sync::Arc;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
-use djinn::door::browser_carrier::{AllowedExtensions, BrowserLauncher};
-use djinn::door::browser_host::serve_identity_native_messages;
-use djinn::identity_ui::SystemNativeIdentityUi;
-use djinn::keeper::Keeper;
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use mere_resident::door::browser_carrier::{AllowedExtensions, BrowserLauncher};
+use mere_resident::door::browser_host::serve_identity_native_messages;
+use mere_resident::identity_ui::SystemNativeIdentityUi;
+use mere_resident::keeper::Keeper;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, InMemoryProvider, ProfileId};
 use ssh_key::{Algorithm, LineEnding, PrivateKey};
 

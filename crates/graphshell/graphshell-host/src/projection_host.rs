@@ -63,7 +63,7 @@ use crate::session_loop::{SessionLoopError, SessionSummary};
 use crate::session_notices::serve_admitted_session_notifying;
 #[cfg(feature = "webrtc-session")]
 use crate::webrtc_session::{HostedInvite, JoinError, ServedJoin, serve_webrtc_join};
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::route::ResidentEndpointRoute;
 use insigne::delegation::SignedDelegationCertificate;
 use notochord::AdmittedPrincipal;
 #[cfg(feature = "webrtc-session")]

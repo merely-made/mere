@@ -26,11 +26,11 @@ use std::sync::Arc;
 
 use dramatis::authentication::PassphraseChangeFailureV1;
 use dramatis::intents::{CreateProfileIntentV1, ImportSshKeyNativeIntentV1, SwitchProfileIntentV1};
-use graphshell_endpoint::door::custody::{
+use djinn::door::custody::{
     CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest,
 };
-use graphshell_endpoint::door::custody_payload::{PayloadRequest, PayloadResult};
-use graphshell_endpoint::door::identity::{IdentitySurfaceSnapshot, VaultLockView};
+use djinn::door::custody_payload::{PayloadRequest, PayloadResult};
+use dramatis::view::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{IdentityError, IdentityProvider, PersonaId, ProfileId, RetainedKeys};
 
 use crate::door::browser_carrier::NativeIdentityFailure;
@@ -95,7 +95,7 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     /// evidence. A private consumer must not upgrade it to a synthetic epoch.
     fn custody_epoch(
         &self,
-    ) -> Result<Option<graphshell_endpoint::door::custody::CustodyEpoch>, CustodyRefusal> {
+    ) -> Result<Option<djinn::door::custody::CustodyEpoch>, CustodyRefusal> {
         Ok(None)
     }
     /// The public identity read model, answerable while locked.

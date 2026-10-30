@@ -1,0 +1,2295 @@
+{
+  "base": "4e75bd4b61789ac22ccebfd738837073c8b76c9c",
+  "supplier": "721e17d41a8f258073f440adbbb39ad145250868",
+  "knot_source_receiving": "072ff2ca300a56de710ccdbe1af0160112d28dc0",
+  "source_hashes": {
+    "Cargo.lock": "03da8f75f749553eb95a6ada40279f45b9c7fd9d4146e18510c07c513a4fce44",
+    "Cargo.toml": "cf5e4be8d2f4dc99f37a412510b30e54ebbcb624e4911466ab79ff3acd3f8cdb",
+    "crates/cambium/mere-overmap/Cargo.toml": "70b8d311e362689390103eb24143028e325debff101b2eb6be3cd5c9d1432b39",
+    "crates/graphshell/graphshell-endpoint/Cargo.toml": "4add2d26ce3d93b53a347b210eae5b208b71ec8176b0a82c7c13770e5649488d",
+    "crates/graphshell/graphshell-endpoint/src/door/mod.rs": "f58b1c40a4b181732f2947c7ca731365ed9ea87dce4c2d4ead70efc0a611397b",
+    "crates/graphshell/graphshell-endpoint/src/door/profile.rs": "e15b9304b8a877fe6cc509f2b77ffc374ec9e68b30f231306f009ea6b8be2eb8",
+    "crates/graphshell/graphshell-endpoint/src/door/projection.rs": "5a7ffb01d92a14d3badb975f16f747651b7fd4d0cff4036a824058ed41df1ef8",
+    "crates/graphshell/graphshell-endpoint/src/door/projection_offer.rs": "8dfed134b45382bfece780b9a7597268ef127e4d4649968b237df3950022f006",
+    "crates/graphshell/graphshell-endpoint/src/door/projection_provider.rs": "ee63cad3fd75a810cd919413ad03b39ade552c743d2c4847b4555e3c0fb5c9b8",
+    "crates/graphshell/graphshell-endpoint/src/door/resident_mere_proxy.rs": "63f242477eb50589c03e0bb7cb728662de649777d64c4f17e30dafe0ccaca1a4",
+    "crates/graphshell/graphshell-endpoint/src/lib.rs": "969a88b7e6b7b0128ea2e947354e174063289767ff56c8674df3c69cdc0e4c29",
+    "crates/graphshell/graphshell-endpoint/tests/projection_offer_wire.rs": "64046eb07487480d15039215a55dadcad0cfbd82597da2d07348f3a9cd1df125",
+    "crates/graphshell/graphshell-endpoint/tests/projection_wire.rs": "4e4cdf7ca54366936378706c6566aeefd2449abd3e814f79fa31f15c4408f7df",
+    "crates/graphshell/graphshell-host/Cargo.toml": "2a1c3f63f6898fbf7fdf2977268c7e13818eebf5129065146889bdd0a22bd4d4",
+    "crates/graphshell/graphshell-host/src/projection_host.rs": "3c273fe2d219395e3d01caee1a1c5aa07512de5713a000fb18e2fd5648537eb2",
+    "crates/graphshell/graphshell-host/tests/webrtc_join_loopback.rs": "885ebd0f2122b2db32c9bc56a827ecd7328ae291da8cdcad52d9c26ca74167a2",
+    "crates/graphshell/graphshell-mcp/Cargo.toml": "c7e3dcbb0c75449d1bbb9b4f2e9679df7984f26d92cf4bf6f344589881484747",
+    "crates/graphshell/graphshell-mcp/README.md": "eb12deeeb3b32b13f98247579560358de3b141422d7d6667c2dbe2bd38154a07",
+    "crates/graphshell/graphshell-mcp/src/bin/mere-mcp.rs": "a8e5ddd79ec390ba99a4e2d9af5caa56637584ef17ae0815529c7097c10cbf9e",
+    "crates/system/station-custody/Cargo.toml": "25223c150c830c234df4c03a802a40c4bfd297202e932fe83effb99b0e9d6d48",
+    "crates/system/station-custody/examples/sennet_custody_receipt.rs": "bd72a18dc569033bbb4355d199650c1b7c1213e0ebd1655ca7f42e92e78ca55a",
+    "crates/system/station-custody/examples/tucket_custody_receipt.rs": "4169820348735bd3dabbd75bc8a8748711ec28149d4000f44c9d6c4a7f17bd77",
+    "crates/system/station-custody/src/authority.rs": "1867b55706033731a02e28ae2f919696e40ceb8e3ee7e4062f9fce4dcba445c1",
+    "crates/system/station-custody/src/authority/tucket.rs": "9320c484c975d470403d540df187dbf441a67db00fa43680ab38eb317da4e0cf",
+    "crates/system/station-custody/src/bin/station-provision.rs": "a92c8c1fe8d850167cc0d354d2bcd73b059a72ae5a96e13ed5ca4550d714b729",
+    "crates/system/station-custody/tests/dr_c_pending.rs": "9d1b12dc284a7584d3f27f8fb527096f2c31fc36b28efdbf48373f664d76ba4a",
+    "ports/djinn/Cargo.toml": "ae77c476cd2a9c4fb9c2842d962ee35dd4d3944069df6a428428180b9fe3f726",
+    "ports/djinn/README.md": "969f97edb3167f34471bf50f8152408daf1b9b5ded175a69ffe940d1b6243880",
+    "ports/djinn/custodian/README.md": "373046d887c1b87529f7c0174bc39f7ccc8656c7e0cf17835b12d513db884cc2",
+    "ports/djinn/examples/coop_existing_graph.rs": "97ae2320c95bd63307e95f3025f316deedb079483c1b16251ee163ab377e867d",
+    "ports/djinn/examples/knot_overmap_live_host.rs": "639cf8cc8d3ce29c094f08bc423183bdf8a3dd7b2dc0dcbff7a6fe0d5c36cce1",
+    "ports/djinn/examples/private_workshop_fixture.rs": "8c076a2ce04c5adbd98b878a312e774795df2e4c71234e408ef18ef722274436",
+    "ports/djinn/examples/resident_v1_fixture.rs": "59ce6564dd13a3bc5280250833bdbed5a9e2f2a4faec25a3ddd81db071b3df25",
+    "ports/djinn/src/bin/c1_receipt_host.rs": "69ff307f210895cb49d88b1b6b04cc05066ac6155f3f275d11152648919809ff",
+    "ports/djinn/src/bin/distillery_chronicle_receipt_host.rs": "270d3143b69e6623d8575e89f0d0ca8a73c79dd81df5200d5a0f006924c1800c",
+    "ports/djinn/src/bin/distillery_installed.rs": "05e13246b143ef8cdd2851fd8c4331b0bb8ae16e1db805807ee8126db7c18be3",
+    "ports/djinn/src/bin/djinn.rs": "f1ad1c42079e28c3e68f63d1f5fde1e23b3fb4af573e059a241a963eb71275a9",
+    "ports/djinn/src/bin/djinn_devices.rs": "cd2edc89883076c66db94861431afeac438bd3e8cdec103f01853dd579897919",
+    "ports/djinn/src/bin/djinn_moot_site.rs": "bf92bf510384152f2883d6f5faf1df1518b1e5e90db16d782bb4090b9a9ab4c8",
+    "ports/djinn/src/bin/djinn_site.rs": "76215aa234a99cd96e414eacfe1f13ce98d1b7c0d3473de9f0d35befebfa8484",
+    "ports/djinn/src/bin/dr_c_receipt_host.rs": "b3c6bc059f5fa7a0bd0d5c1fa313c4fd58eb08c08c10c7aef21d84ced391364b",
+    "ports/djinn/src/bin/dramatis_review_host.rs": "0e7fa4e0d8cac9c79f08c9b2195cdcef10abb4eb93f646e5e8c7e1b9b865f5bd",
+    "ports/djinn/src/bin/graphshell_native_host.rs": "aec936d21a71bbe4417cc62bb45326d21069ea850756b5541f0c4e910ceb09f8",
+    "ports/djinn/src/bin/h4_identity_receipt.rs": "84c654e8e02a4f09b7bd90a99504af54a503a60eec37d10773a3ac21f814dc96",
+    "ports/djinn/src/bin/h4d_browser_receipt_host.rs": "f322af25e66db6d130b8dc70d99c138a573acb5e6f302043d050b5c7cb26de80",
+    "ports/djinn/src/bin/h4e_browser_import_receipt_host.rs": "b40b314bd68e166b53ef9372bd2efe940307dff9a5b9f932e2375090d3b8a117",
+    "ports/djinn/src/bin/persona_switch_receipt.rs": "546e6a6c35f78967c184e67847ec1d44871e5c8f484ddf72c2e7f8d982e23e90",
+    "ports/djinn/src/bin/tucket_custody_receipt_host.rs": "cf2511c9931ae724d4c37615a7bc5bb9774e70af86c2494da06db6136be0535c",
+    "ports/djinn/src/custody.rs": "bd7b9eac36f7207fb00bec3d2bd7ce69bb58dc50a1dd1dc72da85ba538b36a99",
+    "ports/djinn/src/custody/payload.rs": "8075fff0ba8d6a3e560692b48c447b817079ce3f2d9f275203e47c4027962a85",
+    "ports/djinn/src/custody_host.rs": "85b61781dc99677502bdb5c689f36b6bd3fd6a679fc3ec43a16413677563e594",
+    "ports/djinn/src/custody_host/in_process.rs": "4c266ebbffa55d8e7db8c9d1a4c955d6d0f9e172cdacba009d0ba053483c5963",
+    "ports/djinn/src/custody_host/remote.rs": "08c16df930405348f6a53dcc808d6fccb3ba57f234342c7908be05acb0057986",
+    "ports/djinn/src/door/app_broker.rs": "feeaf561ca5ec2e590e4c13362c1cdded3b6a7761e211d73e1b885ad9f9d2777",
+    "ports/djinn/src/door/app_broker_tests.rs": "920915f4ee94e41528ecb23f708245ac0ac464d9823c9d1c746bc677e9dc33d9",
+    "ports/djinn/src/door/browser_carrier.rs": "cf7dc9a0d77bc813f6a96b702f7b7f615eb5a8f99ad80e953eac5a5abbdcf0b5",
+    "ports/djinn/src/door/browser_host.rs": "e771fbc188f8c5d4cabb980902e53df56cb06ba93cd367ee622cc3c918a5ce5d",
+    "ports/djinn/src/door/device_broker.rs": "f5df2da9c46e3f7c305d84be83d6d92c6cff73a3a3ecc0b0b8892ea0de6031ca",
+    "ports/djinn/src/door/identity_endpoint.rs": "a43f9b00eb2211aa3cb486a1b4b035ea920a3ce0d27c02fb18d12fd15d8f86ed",
+    "ports/djinn/src/door/identity_projection.rs": "7648f3a287d1100c49d1f0785d3141aae512cfa5392ce18c156b2878ade1a7dc",
+    "ports/djinn/src/door/identity_session_tests.rs": "6d127e6beeefa5f87b88875309012baa5656b2166b933067f76a4a606b556178",
+    "ports/djinn/src/door/local_session.rs": "553391614062442bef46241f33032f96a66a55e98062f310887a84b011c257a9",
+    "ports/djinn/src/door/projection_offers.rs": "65b158df3ff3170a2c9027f839d48cfabec70b8ce51437007e08ce975b528531",
+    "ports/djinn/src/door/resident_identity.rs": "a67644fd5b26e4cb584a0e571a9e7b5b55dd920ee8b7c2de39dfd95ae45e22e1",
+    "ports/djinn/src/embedded_reservoir.rs": "ec4063b0c757b3f2a5dde5a7893cca6bc2a0923b3e44ec551670b98d9c8c09f8",
+    "ports/djinn/src/keeper.rs": "68e6a64b2f1a86fc068526f86b4fb43ff4f17822b69d0f54b26ed6d4f49bfd91",
+    "ports/djinn/src/keeper/review.rs": "e0143bb1884af2f4f054da9efaec859ed1690aa0331edd5ae382003ed0d3bf3f",
+    "ports/djinn/src/lib.rs": "8ba45a4700cb341ed4f410bab43023609733ca94fc6a097d2b65df95221ffce6",
+    "ports/djinn/src/lock_triggers/host.rs": "19ffc8d9f4f3c7e121137399fc10d86deeb356f63f831292e3ac52ddceea3479",
+    "ports/djinn/src/personal_facts.rs": "232ee5fa044b36f29f01662be03f10a1331eed0658f466bcfad91ee7b3e500e1",
+    "ports/djinn/src/resident.rs": "51661ca98c1b4607a47b50ca4b43aef773b3eebf854fd8e33c8b0c5b34d90a1f",
+    "ports/djinn/src/resident_devices.rs": "19a6e0e619c7e2ef0da4c31da4c54baea5d3fe5e39539a8c061217cf97416028",
+    "ports/djinn/src/resident_distillery.rs": "ea80e522eaad6eb74c291bf639b3739693b7628b44b0296e90b50471b6fe2c8e",
+    "ports/djinn/src/resident_inference.rs": "0eecac526d59ecc9ae5118714ef00237e8de8d5639f40c58ba5d0e78ac9123a4",
+    "ports/djinn/src/resident_knot.rs": "492c2208bbf690627c85acbe811975c789fe12dd4c674aeaaa45235baaf7d4a0",
+    "ports/djinn/src/resident_mere.rs": "4dab6f82a485e2c356b8d78f4ab95013615436613aa18fc1ee90fafb19d55776",
+    "ports/djinn/src/resident_mere_coop.rs": "4d687f9c494953c4aee83f3e78b23a27664c82dc68c3657db1b4a392f590b777",
+    "ports/djinn/src/resident_projection.rs": "3b1868d34563ec9c2d26cfeac46a09f56152a6635000491e93049582a0c9a933",
+    "ports/djinn/src/resident_reservoir.rs": "903a890873725e9424219eee41136b2cf204d375c2252b7491187942fa9df062",
+    "ports/djinn/src/resident_site.rs": "65bc2e0276a0f2b373fdc4569bf77fd01783745fbee96f3f7cc198d773fb8a50",
+    "ports/djinn/src/resident_status.rs": "a33c33a3d62d99c2d46878940b3ed8da7e058f6ade310856d8b7b5f2a03413eb",
+    "ports/djinn/src/settings.rs": "4efbc8111f1c51473de01345801d297996f10f9ca869cc035c0d7e16e795b28b",
+    "ports/djinn/tests/app_projection_offers.rs": "2cc0599ce8d9750b3a4bcbd7b40ddf39b46c78f4f5e76fcf8c7d223dfcf63fc8",
+    "ports/djinn/tests/carriage_commissioning.rs": "ec3824f837f0173283becf87902ee11a341cdbfaeaaa05ab5ebaf75c1bdac827",
+    "ports/djinn/tests/common/inference_door.rs": "6501e687bf1e4bb68affe24b6e0ac61979674fee8bebf08543aa14ab13fd30cb",
+    "ports/djinn/tests/common/mod.rs": "79c424ac1a03d7c00cde40689ec1f6d63ac0ee565efb908c8b57496477518007",
+    "ports/djinn/tests/custodian_client.rs": "ced446ef42f76fba7dfd2f96a6f97ba3b8cb6300db081b3b376bd789778d1d64",
+    "ports/djinn/tests/custodian_fixture/mod.rs": "23069ab9462ec64fa13f5e06329889307cc05d2761900db03dbcb17b154ee6d0",
+    "ports/djinn/tests/custodian_resident.rs": "4deef65e3f94efcfdab1d11686de58292cefd9298905f88e3e22d5b398060008",
+    "ports/djinn/tests/custody_payload.rs": "8e461694d69d1f0ba6599d58088817279856712df877c82e1f179cce0f404201",
+    "ports/djinn/tests/custody_route.rs": "01dd8f3ba6db7b1b7f477ac8240fdc056522e8e33f3bbddd979136784a750b30",
+    "ports/djinn/tests/cxf_import.rs": "0e9f7dc009a19722685bf75a587839e9478ce31ae4caadc7dd377ee9f1735467",
+    "ports/djinn/tests/device_directory.rs": "0ffa0b879cb518ea8ea3eb04b2fff2d98592712dde888cde5722a85cd25371d3",
+    "ports/djinn/tests/distillery_chronicle_route.rs": "c61d6bb3888543af613003bae21b02054daaf9638b5de43c9d63810c57561ac5",
+    "ports/djinn/tests/distillery_lane.rs": "d7a3e205fd9c650b9c068b4e5f98329d43eb1bfe3608a612f29ab3b36ef3fd6a",
+    "ports/djinn/tests/distillery_trainer.rs": "407bf8f485f0d0445e6f8b73825725d76ca667cd001a4f6dbda48e72b1e32d0b",
+    "ports/djinn/tests/distillery_trainer_gpu.rs": "7d77882a47b2ad415d7b531290a2c89962b42add0ec16253274344ace1cc0935",
+    "ports/djinn/tests/embedded_reservoir_two_process.rs": "21926cc62c10374baab2ef71f212a7b254cdf70fd245121cb2259e4fc2eb34ad",
+    "ports/djinn/tests/embedded_reservoir_validation.rs": "5079c0a7d1d9ceaea46c97c6abdc1837186977cbe629302838d506ad150d25fe",
+    "ports/djinn/tests/embedding_recall.rs": "d863c7a6a9940841e72c7f7cc230bea2526d1706e88a71be936aebd4be44978a",
+    "ports/djinn/tests/hocket_adoption.rs": "6b8807c67c12f461481a59c03bf57078ed9712a2f7719555e40870a9c342b107",
+    "ports/djinn/tests/inference_automatic.rs": "4b3772b35ce56f69ec01b1d4750a790d2d4b4827161975b4f0457146836c637b",
+    "ports/djinn/tests/inference_gpu_reclaim.rs": "fd7b1945eb820b941446b952f9ab0f9475ebd000b36fcfa64dd9abd0e2ac44ee",
+    "ports/djinn/tests/inference_route.rs": "caeb7faf9e8a8646e8abeff71063703481826483bf72f67d74c019cfee835030",
+    "ports/djinn/tests/keeper_endpoint.rs": "14115e60bf82cf964999bb166b2075235b66134a399729bf13033629fe91da94",
+    "ports/djinn/tests/knot_app_route.rs": "e85c5386086988f2bd0166139b6b9bfca2333d83b69915739d6d057fb663f92f",
+    "ports/djinn/tests/knot_checkpoint_receiving.rs": "2c3ad414d5213d1654d47f4c494116caa50a4272454fb2fb39f4838ae1f6c279",
+    "ports/djinn/tests/knot_relation_intake.rs": "669e5bb0a5c04b7de36713879c0bd9181f4f6291d62164960163dd86cb675721",
+    "ports/djinn/tests/lock_agent.rs": "e9155624a78c09cccee649f327aef4cec2bc670e235ad1d8a190692e9d3983d2",
+    "ports/djinn/tests/mdns_first_contact_two_instance.rs": "71dfd01b33d0ac04f2043be5761ba02d1d26a3104ce2d60f828882496029d59d",
+    "ports/djinn/tests/mere_two_process.rs": "06fbc813757c704a1a8b473538f0f3cbae92d8985b4f3d3cc00ff0813fcb65e7",
+    "ports/djinn/tests/passphrase_change.rs": "e6bb6c6a9457fdbd31493128f2ac4ef308815fd032669d2c0cbe98b91be12af4",
+    "ports/djinn/tests/personal_facts.rs": "5f3e18dc9b0bd9b47763d16c1ff5bf8dea48d17c91609674fd6be8dcd30d9ec3",
+    "ports/djinn/tests/published_site.rs": "3bc030d804ac92957673f9a43b8a959d84c62d6085b5d918106917234142475e",
+    "ports/djinn/tests/quarantine_review.rs": "730ec7e14904d64e172e4d833e2a322ce2e6a52b6082eb98f50d1df76fb02c22",
+    "ports/djinn/tests/reservoir_access.rs": "6306cfb322982e67c78b58ad71e498b13a9c45e64b0f756aca09dc3df0ab08df",
+    "ports/djinn/tests/reservoir_two_process.rs": "40ad3fed82620d9c27981bd2d423130aedb719c2db9087779c4b0a655ebc4078",
+    "ports/djinn/tests/resident_harness/mod.rs": "39e96b87ebb1d2321225e580785e0051e03c35fca479943bc5bfae97b6e57f64",
+    "ports/djinn/tests/resident_status.rs": "10dbeec74cf366d76e26e838c0e01e20cb94972926b43a767cd9200c2ea6a09f",
+    "ports/djinn/tests/vault_lock_doors.rs": "6c0f727f88e84022794b53dc11a5a7f48ab52f17e9a71f339630642f581eae5c",
+    "ports/dramatis/Cargo.toml": "9ed2af638bbe4953bb94e54ce16b62c57be8490f9303255c03f2aba7abe61803",
+    "ports/dramatis/src/lib.rs": "4a653f506a583b8f9b3a16c87b3349ebb2127efb9803beb38e6664fc5a51ee6a",
+    "ports/dramatis/src/views.rs": "920ebee92d6b72e67d43c1bd357015f2c3c78f78a3c37b7fc51ccd81c9ba70ab",
+    "ports/dramatis/tests/interaction.rs": "b0f0623a3029697034252da2e4538cf952c47c2a9d5ebc9ccc089366bad92fa3",
+    "ports/dramatis/tests/state.rs": "27d2e0c4227816005a7310a92e8c0b0ca8c801feff28ed92adae629566a695f0",
+    "ports/graphshell/Cargo.toml": "a409299a47efb4271576719c5458f6b3a101375cdebdfb86c5881c19dce82ca2",
+    "ports/graphshell/mere/Cargo.toml": "b21e5ceff29153d352b6d93c152a6c1ad0116d0f933689979fb6464ea848f6ad",
+    "ports/graphshell/mere/src/connection.rs": "3f79092f0f9db82d18b3d32a71450fad4fc40133429ca5ee822dc281e8b1cd46",
+    "ports/graphshell/mere/src/connection_door_tests.rs": "e2724c9b329f2a042145534af6e1c5c08277148e1af8bf4690d4217f514478e9",
+    "ports/graphshell/mere/src/coop.rs": "28e55d95792bf06f369977b6c5e184be413101f52770fd46020c93ce6af2bc23",
+    "ports/graphshell/src/bin/c4_webrtc_host.rs": "c6e2250f5a60b98d1229b6ef1b2b7429ea028115d41fc4f6f3e5bca84bc357fc",
+    "ports/graphshell/src/bin/graphshell_alembic.rs": "cea311f804ec40452c9760f7589c6eee22ee6b138b47784ff4e8a9cba47038ca",
+    "ports/graphshell/src/bin/personae_vault.rs": "e936d49efd0a35f00fef613b271079f579078c5d5ffc3add62599941fe3e3abf",
+    "ports/graphshell/src/coop/mod.rs": "6b232a3ac56b79225e2aec14af728090b03f05b895db8db0efd7199ba99b6c90",
+    "ports/graphshell/src/coop/network.rs": "cfa48aecad3a4bab34b0a5155a09fb5bc2d46a0a392261eb3f9a9001b60629f1",
+    "ports/graphshell/tests/distillery_chronicle_host.rs": "c3a36c6269e22b5f7cc1f1df6ff53f4c0dc8378ec0dc20d438faa21620107ae5",
+    "ports/graphshell/tests/dr_c_pending.rs": "555caa6b5a3afa9b70516cd9ffccd2d619f4a97f7ff1c27a97d4761a8ee62c08",
+    "support/dramatis_auth_freeze.py": "44fbc4a7f1638110926905bcc32e3b46499c114a117731da02e79f480183e22d",
+    "support/dramatis_review_receipts.py": "81fef24dad1d6828ba8a0f5aa5154fb7bd163ac268735488253504dea82ba710",
+    "support/fixtures/custody-projection/combined/audit.py": "bb952976d6fc50110e0663eb03598185c5602b88723f07e10cb93b2f269d961c",
+    "support/fixtures/custody-projection/combined/generate.py": "39256fd010e20af1e34c2508efca1e0fe257dcf81ce40d66dff29c6d817c919c",
+    "support/fixtures/custody-projection/combined/src/lib.rs": "3e61489e029f0a3778b2c94863b2768ce4de253e96cedee76e16a1f1d9a4b987",
+    "support/fixtures/custody-projection/custody-types/Cargo.lock": "4174b06b7e4151fc6be17f67a1882920e4c5d290e252f3d26ebe65bb2a53ad9e",
+    "support/fixtures/custody-projection/custody-types/Cargo.toml": "d9e6759c8e0b5fa2eab427c34fd7e3b7280b6de336981f381e1c599d3f37ee56",
+    "support/fixtures/custody-projection/custody-types/src/lib.rs": "c5db53286a0d340dc123d7cf2458b36ddfb82a2c1ac454ab80930ce79f5abe48",
+    "support/fixtures/custody-projection/custody/Cargo.lock": "4878e5f57c223c339a5b6ad038540a6c33cb78df7ef4d12dcbc5d5dccb7e42cc",
+    "support/fixtures/custody-projection/custody/Cargo.toml": "654020384c8057b573185e2ec5e425d68b85abf806e938c4f3f2ef56ae98c3a7",
+    "support/fixtures/custody-projection/custody/src/lib.rs": "f83d9da3cc619771eb4c8d6ea38f332f39ab1e792df867f1beb57c686fc66d74",
+    "support/fixtures/custody-projection/offer/Cargo.lock": "95a4ea026b1bc50e0d3cd605c7f89e5c73fa640f601f36786f6dde7405ea7256",
+    "support/fixtures/custody-projection/offer/Cargo.toml": "7e9b1e32cadf8bdb858cae42be5db2d1ab9f8a94bd0fb0b6b68d85e968a2254d",
+    "support/fixtures/custody-projection/offer/src/lib.rs": "5df0775759765f4db229b7643f1f50bfa2a3bf043754c2770b734f37e6c0833d",
+    "support/fixtures/custody-projection/portable/Cargo.lock": "b0a899b4fdbf539b8558c5d106304a3eae2b13ccdc06cbfc6a62590536fb301b",
+    "support/fixtures/custody-projection/portable/Cargo.toml": "2c66889b018a687dd80378e2737b5aee558192b01a3d1bd61aa077b15b67f060",
+    "support/fixtures/custody-projection/portable/src/lib.rs": "1f226656a66803287593e8be70ae6a1fa9c5ba96ff7c8ee08280a9341e03c621",
+    "support/fixtures/custody-projection/projection/Cargo.lock": "50abdd7bdb19af52049ec5c59475504604c3823b785188d4bd06c1bceb2bfe35",
+    "support/fixtures/custody-projection/projection/Cargo.toml": "4f6c99b8ccd2f651a5420d3ca003179ff90e66bd7f9f8e129cd9d2d1a32e9a34",
+    "support/fixtures/custody-projection/projection/src/lib.rs": "f2ef7ef9714850d69a67d44f80f42b97b756fc2f7d0a496ccb862dcf4634a559",
+    "support/fixtures/custody-projection/provider/Cargo.lock": "189d6a1943a59764de54cebb2855659a153aa738ec1ecd5a6aaf273c64fd967e",
+    "support/fixtures/custody-projection/provider/Cargo.toml": "f16d134fe138878b9b8c39ec6ec9711fb9838544c2a9bbe43750d282c9691338",
+    "support/fixtures/custody-projection/provider/src/lib.rs": "5bca9c7d753979f35b04cfeebe067db526c437c04826a2cc5183f4ad10359a71",
+    "support/fixtures/custody-projection/verify.py": "ce39e1e8f4c3ec5a0212612dc46c91f046f40a2da900f502b2d022f85581c1d2",
+    "support/graphshell-coop/freeze.py": "61946ad7d3ee39252d084aa262c56bdcec441d50247b54d6048b1d27e6661a4f"
+  },
+  "deleted_source_files": [
+    "crates/graphshell/graphshell-endpoint/src/door/app_admission.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/app_client.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/custody.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/custody_payload.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/frame.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/identity.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/local_endpoint.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/quarantine.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/route.rs",
+    "crates/graphshell/graphshell-endpoint/src/door/wire.rs"
+  ],
+  "gates": [
+    {
+      "name": "djinn-mere-consuming-check-2",
+      "cwd": "/home/markik/Code/worktrees/mere-djinn-ownership-20261030",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "mere-resident",
+        "--all-targets"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-djinn-mere-consuming-check-2",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "mere-resident",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 49.47,
+      "finished_utc": "2026-10-30T06:08:26.766103+00:00",
+      "log": "djinn-mere-consuming-check-2.log",
+      "log_sha256": "20f75fa98b4cd51cfd91abb7d81b4e442b64ac976b71303667b3515c52169694",
+      "retained_directory": "/home/markik/Code/testing/custody-contract-20261029"
+    },
+    {
+      "name": "djinn-mere-regressions-2",
+      "cwd": "/home/markik/Code/worktrees/mere-djinn-ownership-20261030",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/mere_gates.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "60",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-djinn-mere-regressions-2",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/mere_gates.py"
+      ],
+      "exit_code": 124,
+      "elapsed_seconds": 600.03,
+      "finished_utc": "2026-10-30T06:20:13.006242+00:00",
+      "log": "djinn-mere-regressions-2.log",
+      "log_sha256": "132994964bb26a679bc71fedf8fbc1d39ad81a47aaccf6c631c825a31b0c4ef2",
+      "retained_directory": "/home/markik/Code/testing/custody-contract-20261029"
+    },
+    {
+      "name": "adapter-published-matrix",
+      "cwd": "/home/markik/Code/worktrees/mere-djinn-ownership-20261030",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/adapter_matrix.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-adapter-published-matrix",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/adapter_matrix.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 319.47,
+      "finished_utc": "2026-10-30T06:37:35.036945+00:00",
+      "log": "adapter-published-matrix.log",
+      "log_sha256": "9d6affe1c44d4ee86b6de967f7ae06e9d61b09c08cb1db744cd73a5b96858024",
+      "retained_directory": "/home/markik/Code/testing/djinn-ownership-20261030"
+    },
+    {
+      "name": "mere-published-receiving",
+      "cwd": "/home/markik/Code/worktrees/mere-djinn-ownership-20261030",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/mere_receiving.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-mere-published-receiving",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/mere_receiving.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 640.17,
+      "finished_utc": "2026-10-30T06:48:18.073964+00:00",
+      "log": "mere-published-receiving.log",
+      "log_sha256": "371cec994077a0e1e7b00b6ebab5a77cb3040f4b59c0b0e03627b4a18440e4cd",
+      "retained_directory": "/home/markik/Code/testing/djinn-ownership-20261030"
+    },
+    {
+      "name": "other-mere-consumers",
+      "cwd": "/home/markik/Code/worktrees/mere-djinn-ownership-20261030",
+      "command": [
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/other_consumers.py"
+      ],
+      "wrapped_command": [
+        "flock",
+        "-w",
+        "600",
+        "/home/markik/Code/testing/machine-heavy.lock",
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--unit=custody-contract-other-mere-consumers",
+        "--property=MemoryMax=3G",
+        "--property=MemorySwapMax=0",
+        "--property=CPUQuota=150%",
+        "env",
+        "CARGO_TARGET_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_BUILD_DIR=/home/markik/Code/target",
+        "CARGO_BUILD_JOBS=1",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_PROFILE_TEST_DEBUG=0",
+        "RUST_TEST_THREADS=1",
+        "nice",
+        "-n",
+        "10",
+        "/usr/bin/time",
+        "-v",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "600s",
+        "python3",
+        "/home/markik/Code/testing/djinn-ownership-20261030/other_consumers.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 861.3,
+      "finished_utc": "2026-10-30T06:53:16.641308+00:00",
+      "log": "other-mere-consumers.log",
+      "log_sha256": "9f89e6208da05118093da6fc9d6e9db104ddd0795ff6800d692535cb45ff5bb3",
+      "retained_directory": "/home/markik/Code/testing/djinn-ownership-20261030"
+    }
+  ],
+  "adapter_cones": {
+    "custody-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "aead",
+        "arrayvec",
+        "async-trait",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "bytecheck",
+        "bytecheck_derive",
+        "bytes",
+        "cc",
+        "cfg-if",
+        "chacha20",
+        "chacha20poly1305",
+        "chartulary",
+        "chatelaine",
+        "cipher",
+        "cmov",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "ctutils",
+        "curve25519-dalek",
+        "curve25519-dalek-derive",
+        "custody-projection-custody-fixture",
+        "digest",
+        "displaydoc",
+        "djinn",
+        "dramatis",
+        "ed25519",
+        "ed25519-dalek",
+        "eidetic",
+        "equivalent",
+        "find-msvc-tools",
+        "fixedbitset",
+        "foldhash",
+        "form_urlencoded",
+        "gaz",
+        "getrandom",
+        "hashbrown",
+        "hybrid-array",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "idna",
+        "idna_adapter",
+        "indexmap",
+        "inout",
+        "insigne",
+        "itoa",
+        "libc",
+        "litemap",
+        "memchr",
+        "mio",
+        "munge",
+        "munge_macro",
+        "muniment",
+        "once_cell",
+        "percent-encoding",
+        "personae",
+        "petgraph",
+        "pin-project-lite",
+        "poly1305",
+        "potential_utf",
+        "proc-macro2",
+        "ptr_meta",
+        "ptr_meta_derive",
+        "quote",
+        "rancor",
+        "rand_core",
+        "rend",
+        "rkyv",
+        "rkyv_derive",
+        "rustc_version",
+        "semver",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha1_smol",
+        "sha2",
+        "shlex",
+        "signature",
+        "simdutf8",
+        "slotmap",
+        "smallvec",
+        "socket2",
+        "stable_deref_trait",
+        "subtle",
+        "syn",
+        "synstructure",
+        "thiserror",
+        "thiserror-impl",
+        "tinystr",
+        "tinyvec",
+        "tokio",
+        "tokio-macros",
+        "tracing",
+        "tracing-attributes",
+        "tracing-core",
+        "typenum",
+        "unicode-ident",
+        "universal-hash",
+        "url",
+        "utf8_iter",
+        "utf_types",
+        "uuid",
+        "version_check",
+        "writeable",
+        "yoke",
+        "yoke-derive",
+        "zerofrom",
+        "zerofrom-derive",
+        "zeroize",
+        "zeroize_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec-derive",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "custody",
+        "custody-client",
+        "door",
+        "door-native"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chatelaine",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "dramatis",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "eidetic",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "insigne",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "rand_core",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "tracing",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "uuid",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "custody-types-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "aead",
+        "arrayvec",
+        "async-trait",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "bytecheck",
+        "bytecheck_derive",
+        "bytes",
+        "cc",
+        "cfg-if",
+        "chacha20",
+        "chacha20poly1305",
+        "chartulary",
+        "chatelaine",
+        "cipher",
+        "cmov",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "ctutils",
+        "curve25519-dalek",
+        "curve25519-dalek-derive",
+        "custody-projection-custody-types-fixture",
+        "digest",
+        "displaydoc",
+        "djinn",
+        "dramatis",
+        "ed25519",
+        "ed25519-dalek",
+        "eidetic",
+        "equivalent",
+        "find-msvc-tools",
+        "fixedbitset",
+        "foldhash",
+        "form_urlencoded",
+        "gaz",
+        "getrandom",
+        "hashbrown",
+        "hybrid-array",
+        "icu_collections",
+        "icu_locale_core",
+        "icu_normalizer",
+        "icu_normalizer_data",
+        "icu_properties",
+        "icu_properties_data",
+        "icu_provider",
+        "idna",
+        "idna_adapter",
+        "indexmap",
+        "inout",
+        "insigne",
+        "itoa",
+        "libc",
+        "litemap",
+        "memchr",
+        "munge",
+        "munge_macro",
+        "muniment",
+        "percent-encoding",
+        "personae",
+        "petgraph",
+        "poly1305",
+        "potential_utf",
+        "proc-macro2",
+        "ptr_meta",
+        "ptr_meta_derive",
+        "quote",
+        "rancor",
+        "rand_core",
+        "rend",
+        "rkyv",
+        "rkyv_derive",
+        "rustc_version",
+        "semver",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha1_smol",
+        "sha2",
+        "shlex",
+        "signature",
+        "simdutf8",
+        "slotmap",
+        "smallvec",
+        "stable_deref_trait",
+        "subtle",
+        "syn",
+        "synstructure",
+        "thiserror",
+        "thiserror-impl",
+        "tinystr",
+        "tinyvec",
+        "typenum",
+        "unicode-ident",
+        "universal-hash",
+        "url",
+        "utf8_iter",
+        "utf_types",
+        "uuid",
+        "version_check",
+        "writeable",
+        "yoke",
+        "yoke-derive",
+        "zerofrom",
+        "zerofrom-derive",
+        "zeroize",
+        "zeroize_derive",
+        "zerotrie",
+        "zerovec",
+        "zerovec-derive",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "custody",
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "base64",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "chatelaine",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "dramatis",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "eidetic",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "insigne",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "personae",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "uuid",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "projection-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "aead",
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "bytes",
+        "cc",
+        "cfg-if",
+        "chacha20",
+        "chacha20poly1305",
+        "chirograph",
+        "cipher",
+        "cmov",
+        "const-oid",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "ctutils",
+        "curve25519-dalek",
+        "curve25519-dalek-derive",
+        "custody-projection-projection-fixture",
+        "digest",
+        "djinn",
+        "ed25519",
+        "ed25519-dalek",
+        "find-msvc-tools",
+        "getrandom",
+        "graphshell-endpoint",
+        "hest",
+        "hybrid-array",
+        "inout",
+        "insigne",
+        "itoa",
+        "libc",
+        "memchr",
+        "mio",
+        "personae",
+        "pin-project-lite",
+        "poly1305",
+        "proc-macro2",
+        "quote",
+        "rand_core",
+        "rustc_version",
+        "sceno",
+        "scenotime",
+        "semver",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "signature",
+        "socket2",
+        "subtle",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "tokio",
+        "tokio-macros",
+        "typenum",
+        "unicode-ident",
+        "universal-hash",
+        "uuid",
+        "zeroize",
+        "zeroize_derive",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "projection",
+        "projection-door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "djinn",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        }
+      ]
+    },
+    "portable-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "custody-projection-portable-fixture",
+        "djinn",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "quote",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "unicode-ident",
+        "zeroize",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "offer-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "cc",
+        "cfg-if",
+        "chirograph",
+        "const-oid",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "digest",
+        "djinn",
+        "find-msvc-tools",
+        "graphshell-endpoint",
+        "hest",
+        "hybrid-array",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "projection-offer-consumer-fixture",
+        "quote",
+        "sceno",
+        "scenotime",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "typenum",
+        "unicode-ident",
+        "zeroize",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "projection",
+        "projection-offer"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "djinn",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "provider-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "aead",
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "bytes",
+        "cc",
+        "cfg-if",
+        "chacha20",
+        "chacha20poly1305",
+        "chirograph",
+        "cipher",
+        "cmov",
+        "const-oid",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "ctutils",
+        "curve25519-dalek",
+        "curve25519-dalek-derive",
+        "digest",
+        "djinn",
+        "ed25519",
+        "ed25519-dalek",
+        "find-msvc-tools",
+        "getrandom",
+        "graphshell-endpoint",
+        "hest",
+        "hybrid-array",
+        "inout",
+        "insigne",
+        "itoa",
+        "libc",
+        "memchr",
+        "mio",
+        "personae",
+        "pin-project-lite",
+        "poly1305",
+        "proc-macro2",
+        "projection-provider-consumer-fixture",
+        "quote",
+        "rand_core",
+        "rustc_version",
+        "sceno",
+        "scenotime",
+        "semver",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "signature",
+        "socket2",
+        "subtle",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "tokio",
+        "tokio-macros",
+        "typenum",
+        "unicode-ident",
+        "universal-hash",
+        "uuid",
+        "zeroize",
+        "zeroize_derive",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "projection",
+        "projection-offer",
+        "projection-provider"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "djinn",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "tokio",
+          "kinds": [
+            {
+              "kind": null,
+              "target": "cfg(all(not(target_arch = \"wasm32\"), any(unix, windows)))"
+            }
+          ]
+        }
+      ]
+    },
+    "host-x86_64-unknown-linux-gnu.cone.json": {
+      "target": "x86_64-unknown-linux-gnu",
+      "normal_build_package_names": [
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "cc",
+        "cfg-if",
+        "chirograph",
+        "const-oid",
+        "constant_time_eq",
+        "cpufeatures",
+        "crypto-common",
+        "custody-projection-host-fixture",
+        "digest",
+        "find-msvc-tools",
+        "graphshell-client",
+        "graphshell-endpoint",
+        "graphshell-host",
+        "hest",
+        "hybrid-array",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "quote",
+        "sceno",
+        "scenotime",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "syn",
+        "typenum",
+        "unicode-ident",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "default",
+        "projection"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "portable-wasm32-unknown-unknown.cone.json": {
+      "target": "wasm32-unknown-unknown",
+      "normal_build_package_names": [
+        "custody-projection-portable-fixture",
+        "djinn",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "quote",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "unicode-ident",
+        "zeroize",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "door"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "thiserror",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "zeroize",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "offer-wasm32-unknown-unknown.cone.json": {
+      "target": "wasm32-unknown-unknown",
+      "normal_build_package_names": [
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "cc",
+        "cfg-if",
+        "chirograph",
+        "const-oid",
+        "constant_time_eq",
+        "crypto-common",
+        "digest",
+        "djinn",
+        "find-msvc-tools",
+        "graphshell-endpoint",
+        "hest",
+        "hybrid-array",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "projection-offer-consumer-fixture",
+        "quote",
+        "sceno",
+        "scenotime",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "typenum",
+        "unicode-ident",
+        "zeroize",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "projection",
+        "projection-offer"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "djinn",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        },
+        {
+          "name": "serde_json",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    },
+    "host-wasm32-unknown-unknown.cone.json": {
+      "target": "wasm32-unknown-unknown",
+      "normal_build_package_names": [
+        "arrayvec",
+        "base64",
+        "blake3",
+        "block-buffer",
+        "cc",
+        "cfg-if",
+        "chirograph",
+        "const-oid",
+        "constant_time_eq",
+        "crypto-common",
+        "custody-projection-host-fixture",
+        "digest",
+        "find-msvc-tools",
+        "graphshell-client",
+        "graphshell-endpoint",
+        "graphshell-host",
+        "hest",
+        "hybrid-array",
+        "itoa",
+        "memchr",
+        "proc-macro2",
+        "quote",
+        "sceno",
+        "scenotime",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "serde_json",
+        "sha2",
+        "shlex",
+        "syn",
+        "typenum",
+        "unicode-ident",
+        "zmij"
+      ],
+      "endpoint_features": [
+        "default",
+        "projection"
+      ],
+      "endpoint_direct_dependencies": [
+        {
+          "name": "chirograph",
+          "kinds": [
+            {
+              "kind": null,
+              "target": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "lock_audit": {
+    "added": [
+      [
+        "armillary",
+        "0.1.1",
+        "git+https://www.github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+      ],
+      [
+        "djinn",
+        "0.0.3",
+        "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+      ],
+      [
+        "knot-capture",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "knot-catalog",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "knot-composition",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "knot-document",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "knot-editor",
+        "0.0.3",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "knot-site",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0"
+      ],
+      [
+        "mere-resident",
+        "0.0.2",
+        ""
+      ]
+    ],
+    "removed": [
+      [
+        "armillary",
+        "0.1.1",
+        "git+https://www.github.com/merely-made/armillary.git?rev=864f107d44bf759111ad2ea3c9036b2cfbf03f4c#864f107d44bf759111ad2ea3c9036b2cfbf03f4c"
+      ],
+      [
+        "djinn",
+        "0.0.2",
+        ""
+      ],
+      [
+        "knot-capture",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ],
+      [
+        "knot-catalog",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ],
+      [
+        "knot-composition",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ],
+      [
+        "knot-document",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ],
+      [
+        "knot-editor",
+        "0.0.3",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ],
+      [
+        "knot-site",
+        "0.0.1",
+        "git+https://github.com/merely-made/knot-editor.git?branch=main#704084d064da886dd14cbe8ac3dd8758af105e1d"
+      ]
+    ],
+    "changed_edges": [
+      {
+        "package": [
+          "dramatis-app",
+          "0.0.1",
+          ""
+        ],
+        "before": [
+          "cambium",
+          "cambium-desktop",
+          "chatelaine",
+          "dramatis",
+          "graphshell-endpoint",
+          "image",
+          "luggage",
+          "mesquite",
+          "persona-picker",
+          "personae",
+          "serde_json",
+          "sha2 0.11.0",
+          "taproot",
+          "tempfile",
+          "tokio"
+        ],
+        "after": [
+          "cambium",
+          "cambium-desktop",
+          "chatelaine",
+          "djinn",
+          "dramatis",
+          "image",
+          "luggage",
+          "mesquite",
+          "persona-picker",
+          "personae",
+          "serde_json",
+          "sha2 0.11.0",
+          "taproot",
+          "tempfile",
+          "tokio"
+        ]
+      },
+      {
+        "package": [
+          "graphshell",
+          "0.0.2",
+          ""
+        ],
+        "before": [
+          "accesskit 0.25.1",
+          "async-trait",
+          "base64 0.22.1",
+          "blake3",
+          "cambium",
+          "cambium-a11y",
+          "cambium-desktop",
+          "cambium-rootstock",
+          "chacha20poly1305 0.10.1",
+          "chartulary",
+          "chatelaine",
+          "chirograph",
+          "cue-netrender",
+          "distillery",
+          "dramatis",
+          "eidetic",
+          "gemot",
+          "genet-presenter",
+          "genet-scripted-dom",
+          "getrandom 0.3.4",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "graphshell-host",
+          "hest",
+          "illume",
+          "image",
+          "inker",
+          "insigne",
+          "knot-editor-host",
+          "layout-dom-api",
+          "mere",
+          "mere-alembic",
+          "mere-athanor",
+          "mere-comms",
+          "mere-fleece",
+          "mere-kernel",
+          "mere-lanes",
+          "mere-mesh",
+          "mere-moot",
+          "mere-overmap",
+          "mere-proofs",
+          "mere-transport",
+          "mien",
+          "muniment",
+          "murm-webrtc",
+          "netrender",
+          "notochord",
+          "p2panda-core",
+          "p2panda-store",
+          "pandect",
+          "pelt-core",
+          "personae",
+          "platen",
+          "pollster 0.4.0",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenograph",
+          "scenomise",
+          "scenotime",
+          "script-rhai",
+          "serde",
+          "serde_json",
+          "servitor",
+          "sha2 0.11.0",
+          "signature 2.2.0",
+          "ssh-agent-lib",
+          "ssh-key",
+          "stickleback",
+          "tabard",
+          "tempfile",
+          "thiserror 1.0.69",
+          "tokio",
+          "tracing",
+          "tracing-subscriber",
+          "url",
+          "uuid",
+          "wgpu",
+          "wgpu-cue",
+          "woodshedding",
+          "workbench",
+          "zeroize"
+        ],
+        "after": [
+          "accesskit 0.25.1",
+          "async-trait",
+          "base64 0.22.1",
+          "blake3",
+          "cambium",
+          "cambium-a11y",
+          "cambium-desktop",
+          "cambium-rootstock",
+          "chacha20poly1305 0.10.1",
+          "chartulary",
+          "chatelaine",
+          "chirograph",
+          "cue-netrender",
+          "distillery",
+          "djinn",
+          "dramatis",
+          "eidetic",
+          "gemot",
+          "genet-presenter",
+          "genet-scripted-dom",
+          "getrandom 0.3.4",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "graphshell-host",
+          "hest",
+          "illume",
+          "image",
+          "inker",
+          "insigne",
+          "knot-editor-host",
+          "layout-dom-api",
+          "mere",
+          "mere-alembic",
+          "mere-athanor",
+          "mere-comms",
+          "mere-fleece",
+          "mere-kernel",
+          "mere-lanes",
+          "mere-mesh",
+          "mere-moot",
+          "mere-overmap",
+          "mere-proofs",
+          "mere-transport",
+          "mien",
+          "muniment",
+          "murm-webrtc",
+          "netrender",
+          "notochord",
+          "p2panda-core",
+          "p2panda-store",
+          "pandect",
+          "pelt-core",
+          "personae",
+          "platen",
+          "pollster 0.4.0",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenograph",
+          "scenomise",
+          "scenotime",
+          "script-rhai",
+          "serde",
+          "serde_json",
+          "servitor",
+          "sha2 0.11.0",
+          "signature 2.2.0",
+          "ssh-agent-lib",
+          "ssh-key",
+          "stickleback",
+          "tabard",
+          "tempfile",
+          "thiserror 1.0.69",
+          "tokio",
+          "tracing",
+          "tracing-subscriber",
+          "url",
+          "uuid",
+          "wgpu",
+          "wgpu-cue",
+          "woodshedding",
+          "workbench",
+          "zeroize"
+        ]
+      },
+      {
+        "package": [
+          "graphshell-endpoint",
+          "0.0.2",
+          ""
+        ],
+        "before": [
+          "armillary",
+          "base64 0.22.1",
+          "chatelaine",
+          "chirograph",
+          "dramatis",
+          "eidetic",
+          "insigne",
+          "libc",
+          "personae",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "thiserror 1.0.69",
+          "tokio",
+          "tracing",
+          "uuid",
+          "windows-sys 0.59.0",
+          "zeroize"
+        ],
+        "after": [
+          "chirograph",
+          "djinn",
+          "dramatis",
+          "insigne",
+          "personae",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "tokio"
+        ]
+      },
+      {
+        "package": [
+          "graphshell-host",
+          "0.0.2",
+          ""
+        ],
+        "before": [
+          "base64 0.22.1",
+          "chirograph",
+          "getrandom 0.3.4",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "insigne",
+          "mere-transport",
+          "murm-webrtc",
+          "notochord",
+          "pandect",
+          "personae",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "tempfile",
+          "thiserror 1.0.69",
+          "tokio"
+        ],
+        "after": [
+          "base64 0.22.1",
+          "chirograph",
+          "djinn",
+          "getrandom 0.3.4",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "insigne",
+          "mere-transport",
+          "murm-webrtc",
+          "notochord",
+          "pandect",
+          "personae",
+          "rand_core 0.6.4",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "tempfile",
+          "thiserror 1.0.69",
+          "tokio"
+        ]
+      },
+      {
+        "package": [
+          "graphshell-mcp",
+          "0.0.1",
+          ""
+        ],
+        "before": [
+          "chirograph",
+          "graphshell-endpoint",
+          "sceno",
+          "scenotime",
+          "serde_json"
+        ],
+        "after": [
+          "chirograph",
+          "djinn",
+          "graphshell-endpoint",
+          "sceno",
+          "scenotime",
+          "serde_json"
+        ]
+      },
+      {
+        "package": [
+          "graphshell-mere",
+          "0.0.2",
+          ""
+        ],
+        "before": [
+          "cambium",
+          "cambium-desktop",
+          "cambium-rootstock",
+          "chirograph",
+          "genet-scripted-dom",
+          "graphshell",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "hest",
+          "layout-dom-api",
+          "mere",
+          "mere-overmap",
+          "mere-view",
+          "mesquite",
+          "pandect",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "sprigging",
+          "taproot",
+          "tempfile",
+          "tokio",
+          "url",
+          "uuid"
+        ],
+        "after": [
+          "cambium",
+          "cambium-desktop",
+          "cambium-rootstock",
+          "chirograph",
+          "djinn",
+          "genet-scripted-dom",
+          "graphshell",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "hest",
+          "layout-dom-api",
+          "mere",
+          "mere-overmap",
+          "mere-view",
+          "mesquite",
+          "pandect",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "sprigging",
+          "taproot",
+          "tempfile",
+          "tokio",
+          "url",
+          "uuid"
+        ]
+      },
+      {
+        "package": [
+          "mere-overmap",
+          "0.1.0",
+          ""
+        ],
+        "before": [
+          "chirograph",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "hest",
+          "mere-cartography",
+          "mere-kernel",
+          "mere-view",
+          "pandect",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "uuid"
+        ],
+        "after": [
+          "chirograph",
+          "djinn",
+          "graphshell-client",
+          "graphshell-endpoint",
+          "hest",
+          "mere-cartography",
+          "mere-kernel",
+          "mere-view",
+          "pandect",
+          "sceno",
+          "scenotime",
+          "serde",
+          "serde_json",
+          "uuid"
+        ]
+      },
+      {
+        "package": [
+          "station-custody",
+          "0.0.1",
+          ""
+        ],
+        "before": [
+          "blake3",
+          "graphshell-endpoint",
+          "insigne",
+          "outrider",
+          "p2panda-core",
+          "pandect",
+          "personae",
+          "postilion",
+          "radio-hand",
+          "retinue",
+          "serde",
+          "serde_json",
+          "tempfile",
+          "tokio",
+          "uuid",
+          "zeroize"
+        ],
+        "after": [
+          "blake3",
+          "djinn",
+          "dramatis",
+          "insigne",
+          "outrider",
+          "p2panda-core",
+          "pandect",
+          "personae",
+          "postilion",
+          "radio-hand",
+          "retinue",
+          "serde",
+          "serde_json",
+          "tempfile",
+          "tokio",
+          "uuid",
+          "zeroize"
+        ]
+      }
+    ]
+  },
+  "actual_checkout_heads": [
+    {
+      "package": "apparatus-core",
+      "source": "git+https://www.github.com/merely-made/armillary.git?rev=06340b08327b29c3485ecb0089bb5cafed20fd80#06340b08327b29c3485ecb0089bb5cafed20fd80",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0/crates/apparatus-core",
+      "checkout_head": "06340b08327b29c3485ecb0089bb5cafed20fd80"
+    },
+    {
+      "package": "armillary",
+      "source": "git+https://www.github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/armillary-e679513f2dd65b22/721e17d/crates/armillary",
+      "checkout_head": "721e17d41a8f258073f440adbbb39ad145250868"
+    },
+    {
+      "package": "chatelaine",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/chatelaine",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "djinn",
+      "source": "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/armillary-e301d2b0038cb879/721e17d/crates/djinn",
+      "checkout_head": "721e17d41a8f258073f440adbbb39ad145250868"
+    },
+    {
+      "package": "dramatis",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/dramatis",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "embedded-graphics",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/vendor/embedded-graphics",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "embedded-graphics-core",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/vendor/embedded-graphics-core",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "gaz",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/gaz",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "insigne",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/insigne",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "knot-capture",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-capture",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "knot-catalog",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-file-catalog",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "knot-composition",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-composition",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "knot-document",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-document",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "knot-editor",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-editor",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "knot-site",
+      "source": "git+https://github.com/merely-made/knot-editor.git?branch=main#072ff2ca300a56de710ccdbe1af0160112d28dc0",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/072ff2c/crates/knot-site",
+      "checkout_head": "072ff2ca300a56de710ccdbe1af0160112d28dc0"
+    },
+    {
+      "package": "mere-transport",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/native/crates/transport",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "murm-webrtc",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/native/crates/webrtc-carrier",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "murm-wire",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/wire/crates/wire",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "notochord",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/notochord",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "outrider",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/outrider",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "personae",
+      "source": "git+https://github.com/merely-made/dramatis.git?branch=main#6aa0daa4ba957e2197d649e1e87f381261f9087e",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/6aa0daa/crates/personae",
+      "checkout_head": "6aa0daa4ba957e2197d649e1e87f381261f9087e"
+    },
+    {
+      "package": "postilion",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/postilion",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "radio-face",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/radio-face",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "radio-hand",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/radio-hand",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "retinue",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/retinue",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "selvage",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/selvage",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "seneschal",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/seneschal",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    },
+    {
+      "package": "tulle",
+      "source": "git+https://github.com/merely-made/murm.git?branch=main#75eb9108879003015c934426565a55097d21a193",
+      "manifest_directory": "/home/markik/.cargo/git/checkouts/murm-ebfa134ea22785bd/75eb910/crates/tulle",
+      "checkout_head": "75eb9108879003015c934426565a55097d21a193"
+    }
+  ],
+  "combined_fixture": {
+    "Cargo.toml": "d80a265481b794be8eed0fa19412d139b456fed0d2f3b7ed052cea8eff710a7a",
+    "Cargo.lock": "522d9031ee6522d21b67fe6ae105a74ba5fb0599032d60a3d1cfe73a48ff642b",
+    "metadata.json": "9af32acb53f7a6a4415ea864b670285d99fe0408639234d474e0f39372f2128f",
+    "lock-audit.json": "8b27f97b02cd27b22dbbe16ce6444783301baf837b724c6dcec721427a18bf6f",
+    "cone.txt": "de0d4f8de0c788346b810c080b1a43e6fd3fa917e2edc330ac233e48600179c8"
+  },
+  "limits": [
+    "Focused Linux native and portable Wasm checks; Windows runtime, browser IPC and full graphical operation unqualified.",
+    "Prior combined regression run reached 600-second cap during station-custody after preceding commands passed; separate published-pin station gate passed.",
+    "Relationship recipe fixture has unchanged conflicting Inker document-session dependency identities; baseline compilation not independently observed.",
+    "Receiver commits and final pins are recorded in the follow-up receiving receipt."
+  ]
+}

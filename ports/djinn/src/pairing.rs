@@ -222,6 +222,7 @@ mod tests {
     fn configured(directory: &Path) -> PathBuf {
         let path = owner_settings::settings_path(directory, &profile());
         OwnerSettings {
+            projection_providers: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),
@@ -295,6 +296,7 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let path = owner_settings::settings_path(directory.path(), &profile());
         OwnerSettings {
+            projection_providers: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),

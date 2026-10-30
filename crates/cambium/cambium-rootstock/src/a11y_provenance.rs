@@ -105,6 +105,39 @@ impl A11yProvenance {
                 .then(|| crate::owned_layout::custom_leaf_key(dom, *node))
                 .flatten(),
         };
+        Self::capture_with_slot(owner, target, slot, dom, leaves, producers)
+    }
+
+    /// Capture publication identity only after the current window inventory
+    /// supplied the target node, or the producer's owning slot. The private
+    /// membership token cannot be manufactured from an unverified NodeId.
+    pub(crate) fn capture_published_member(
+        owner: &A11yOwner,
+        target: NodeTarget,
+        member: crate::window_dom::WindowMember<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> Option<Self> {
+        let dom = member.window();
+        let slot = crate::owned_layout::custom_leaf_key(&dom, member.node());
+        match &target {
+            NodeTarget::Node(node) if *node == member.node() => {},
+            NodeTarget::Produced { slot: key, .. } if slot == Some(*key) => {},
+            _ => return None,
+        }
+        Some(Self::capture_with_slot(
+            owner, target, slot, &dom, leaves, producers,
+        ))
+    }
+
+    fn capture_with_slot(
+        owner: &A11yOwner,
+        target: NodeTarget,
+        slot: Option<u64>,
+        dom: &WindowDom<'_>,
+        leaves: &LeafRegistry<u64>,
+        producers: &ProducerRegistry,
+    ) -> Self {
         Self {
             owner: owner.clone(),
             document: dom.dom().document(),

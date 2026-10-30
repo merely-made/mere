@@ -15,8 +15,8 @@ use common::inference_door::{endpoint_name, intent, keeper_host, open, read_runs
 use common::{lane, lending, open_vault, owner, profile, write_device_settings};
 use distillery::inference::{ASK_INTENT, AskRequestV1, GenerationCheckpoint, RunStateV1};
 use distillery::inference_protocol::AutomaticStageSettings;
-use djinn::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
-use djinn::{
+use mere_resident::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
+use mere_resident::{
     resident::DjinnResident,
     settings::{
         InferenceDeviceSettings, InferenceLaneSettings, InferenceModelSettings, SyncSettings,
@@ -49,7 +49,7 @@ async fn save_library(data: &std::path::Path, root: &std::path::Path) -> eidetic
     .unwrap();
     std::fs::write(root.join("model.safetensors"), fixture::weights_bytes()).unwrap();
     std::fs::write(root.join("tokenizer.json"), fixture::tokenizer_json()).unwrap();
-    let path = djinn::resident_distillery::model_library_path(data, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(data, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut library = muniment::RedbBackend::open(path).unwrap();
     let model = import_layered_model(
@@ -103,9 +103,9 @@ async fn exercise(native: bool) {
 }
 
 async fn exercise_inner(native: bool) {
-    use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+    use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
     use graphshell::personal_sync::{SyncRoster, SyncSelection};
-    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+    use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
     use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 
     let started = std::time::Instant::now();
@@ -118,7 +118,7 @@ async fn exercise_inner(native: bool) {
     }
     let vaults: Vec<_> = roots.iter().map(|root| open_vault(root)).collect();
     let graph_name = "automatic-inference";
-    let graph = djinn::personal_sync::personal_graph_id(graph_name);
+    let graph = mere_resident::personal_sync::personal_graph_id(graph_name);
     let roster = SyncRoster::new(
         vaults
             .iter()
@@ -139,7 +139,7 @@ async fn exercise_inner(native: bool) {
             let result: serde_json::Value =
                 serde_json::from_slice(&std::fs::read(source.join("stage-result.json")).unwrap())
                     .unwrap();
-            let target = djinn::resident_distillery::model_library_path(&data, &profile().0, None);
+            let target = mere_resident::resident_distillery::model_library_path(&data, &profile().0, None);
             std::fs::create_dir_all(target.parent().unwrap()).unwrap();
             std::fs::copy(
                 source
@@ -157,7 +157,7 @@ async fn exercise_inner(native: bool) {
         } else {
             row = Some(selected);
         }
-        let settings = djinn::settings::OwnerSettings {
+        let settings = mere_resident::settings::OwnerSettings {
             sync: Some(SyncSettings {
                 graph: graph_name.into(),
                 store_path: None,
@@ -202,7 +202,7 @@ async fn exercise_inner(native: bool) {
             ..owner(Some(lane()))
         };
         // Round-trip through the production JSON shape before composition.
-        let settings: djinn::settings::OwnerSettings =
+        let settings: mere_resident::settings::OwnerSettings =
             serde_json::from_slice(&serde_json::to_vec(&settings).unwrap()).unwrap();
         let (_, identity) = &vaults[i];
         if i == 0 {
@@ -218,7 +218,7 @@ async fn exercise_inner(native: bool) {
                 },
                 max_tokens: 8,
             };
-            let prior = DjinnResident::open(identity, &data, &profile(), prior, djinn::resident::MeshAuthor::Resident)
+            let prior = DjinnResident::open(identity, &data, &profile(), prior, mere_resident::resident::MeshAuthor::Resident)
                 .await
                 .unwrap();
             prior
@@ -267,7 +267,7 @@ async fn exercise_inner(native: bool) {
             &data,
             &profile(),
             settings,
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await
         .unwrap();
@@ -368,7 +368,7 @@ async fn exercise_inner(native: bool) {
     let server = tokio::spawn(async move {
         let _ = serve_app_broker(
             &server_endpoint,
-            Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+            Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
             grants,
             600000,
             None,

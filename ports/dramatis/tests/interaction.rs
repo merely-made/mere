@@ -13,7 +13,7 @@ use dramatis_app::{
     Request, Snapshot, State,
     views::{Child, Logic, SHEET, root},
 };
-use graphshell_endpoint::door::quarantine::{QuarantineCard, ReviewAction};
+use djinn::door::quarantine::{QuarantineCard, ReviewAction};
 use personae::ProfileId;
 use taproot::Selector;
 fn state(locked: bool, unsupported: bool) -> State {
@@ -165,7 +165,7 @@ fn older_import_assignment_names_the_destination_and_exact_revision() {
     let mut s = state(false, false);
     let persona = *personae::PersonaId::new().as_uuid();
     s.snapshot.as_mut().unwrap().unassigned.push(
-        graphshell_endpoint::door::quarantine::UnassignedImport {
+        djinn::door::quarantine::UnassignedImport {
             store: ProfileId("family".into()),
             persona,
             titles: vec!["Older imported card".into()],

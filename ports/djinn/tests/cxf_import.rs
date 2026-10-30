@@ -12,12 +12,12 @@
 mod custodian_fixture;
 
 use custodian_fixture::{TestCustodian, manage_grants};
-use djinn::custody_host::ResidentCustody;
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::keeper::Keeper;
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
-use graphshell_endpoint::door::custody_client::{CustodyClient, CustodyClientError};
+use mere_resident::custody_host::ResidentCustody;
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::keeper::Keeper;
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use djinn::door::custody_client::{CustodyClient, CustodyClientError};
 use personae::{PersonaId, ProfileId};
 use serde_json::{Value, json};
 use std::sync::Arc;
@@ -45,7 +45,7 @@ async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
     remote.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();
     let keeper = Arc::new(Keeper::new(remote.clone()));
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let dir = custodian.dir.path();
     let endpoint = dir.join("app.sock").display().to_string();
     let server_endpoint = endpoint.clone();

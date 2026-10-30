@@ -10,12 +10,13 @@ publish = false
 description = "Persona-backed custody adapter for Djinn-managed Retinue stations."
 
 [dependencies]
+dramatis.workspace = true
 blake3.workspace = true
 # The custody client: Signalman asks djinn for a station's keys, its grant
 # and its revocation, and opens no wallet (dramatis repo plan, D5, D17). The
 # first-party door's application side, without the Graphshell port (stack
 # lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["door"] }
+djinn = { workspace = true, features = ["custody-client"] }
 personae.workspace = true
 # The check conclusions and faults, named directly (insigne proofs plan, B).
 insigne = { workspace = true, features = ["verify"] }

@@ -57,7 +57,7 @@ def fixture(mode, capture=True):
 def consent_control():
     source=ROOT/"ports/djinn/src/keeper/review.rs"
     original=source.read_bytes()
-    focused=cargo("test","-p","djinn","--test","quarantine_review","--features","cxf")+["--","--exact","cards_are_secret_free_scoped_and_denial_preserves_the_item"]
+    focused=cargo("test","-p","mere-resident","--test","quarantine_review","--features","cxf")+["--","--exact","cards_are_secret_free_scoped_and_denial_preserves_the_item"]
     flag="DRAMATIS_SYNTHETIC_CONSENT_CONTROL"
     ordinary=dict(os.environ); ordinary.pop(flag,None)
     try:
@@ -76,8 +76,8 @@ def consent_control():
     finally:
         source.write_bytes(original)
     assert source.read_bytes()==original
-    run("restored",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
-    run("restored-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
+    run("restored",cargo("test","-p","mere-resident","--test","quarantine_review","--features","cxf"))
+    run("restored-build",cargo("build","-p","mere-resident","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
     return original
 
 def main():
@@ -110,17 +110,17 @@ def main():
         (OUT/"control-scope.json").write_text(json.dumps({"synthetic_process_flag":"DRAMATIS_SYNTHETIC_CONSENT_CONTROL","commands":records,"restored_consent_sha256":hashlib.sha256(original).hexdigest(),"artifacts_sha256":artifacts},indent=2)+"\n",encoding="utf-8")
         return
     if not args.skip_build:
-        run("host-build",cargo("build","-p","djinn","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
+        run("host-build",cargo("build","-p","mere-resident","--bin","dramatis-review-host","--features","custody-receipt-host,cxf"))
         run("app-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
-    run("resident-check",cargo("check","-p","djinn","--bin","djinn","--features","cxf"))
-    log = run("green",cargo("test","-p","djinn","--test","quarantine_review","--features","cxf"))
+    run("resident-check",cargo("check","-p","mere-resident","--bin","djinn","--features","cxf"))
+    log = run("green",cargo("test","-p","mere-resident","--test","quarantine_review","--features","cxf"))
     assert "running 16 tests" in log
     run("app-state",cargo("test","-p","dramatis-app","--test","state"))
     run("interaction",cargo("test","-p","dramatis-app","--test","interaction"))
     run("castellan",cargo("test","-p","castellan","--features","cxf","--lib"))
     source=ROOT/"ports/djinn/src/keeper/review.rs"
     original=consent_control()
-    run("store-discovery",cargo("test","-p","djinn","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
+    run("store-discovery",cargo("test","-p","mere-resident","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
     run("capture-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
     absent = r"\\.\pipe\dramatis-app-receipt-absent"
     env=dict(os.environ,DRAMATIS_RECEIPT_ENDPOINT=absent,DRAMATIS_RECEIPT_MODE="absent",GRAPHSHELL_APP_ENDPOINT=absent,DRAMATIS_CAPTURE=str(OUT/"absent.png"),DRAMATIS_CAPTURE_MODE="absent")

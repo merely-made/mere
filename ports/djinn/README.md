@@ -1,4 +1,5 @@
-# Djinn
+<!-- The Cargo package is mere-resident; installed executable names remain djinn. -->
+# Mere resident composition
 
 Djinn is Mere's local desktop resident. It composes the owner-held parts of a
 personal device: Personae authority, the SSH agent, Graphshell's local browser
@@ -23,7 +24,7 @@ Feature `moot-site` adds a local public Gemini or Scroll endpoint over supplied
 Gemot and Eidetic owners:
 
 ```text
-cargo run -p djinn --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
+cargo run -p mere-resident --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
 ```
 
 The versioned owners file names `moot_id`, `moot_directory`, `content_database`,
@@ -60,7 +61,7 @@ consumer gates. The earlier `djinn-site` snapshot-handoff command stays availabl
 ### Personal resident
 
 ```text
-cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root> \
+cargo run -p mere-resident --bin djinn -- --dir <personae-vault> --data-root <data-root> \
   --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>
 ```
 
@@ -408,3 +409,56 @@ Distillery.
 ## License
 
 MPL-2.0
+
+## App-owned projections
+
+An external application can offer a projection through the existing application
+door. Its provider permission and its viewers are explicit owner settings, loaded
+on resident restart. For example, add this entry to the profile's owner settings:
+
+```json
+{
+  "projection_providers": [{
+    "provider": "knot-editor",
+    "route": "documents",
+    "viewers": ["turnstone"],
+    "max_sessions": 4,
+    "timeout_ms": 5000
+  }]
+}
+```
+
+Merge the entry into the existing document. An empty list permits no providers.
+A provider permission grants no custody privileges. Existing explicit route
+denials still apply to providers and viewers. App labels identify policy entries;
+they are self-declared within the local same-user transport boundary.
+
+With the matching Knot build, run `knot_endpoint projection-provider /path/to/documents documents`.
+This requires its `peers,projection-provider` features. The directory belongs to
+the application; Djinn neither opens it nor creates a Knot-specific registration.
+Clients use the existing projection door client with route `documents`.
+Knot's provider is read-only and opens a separate endpoint instance for each
+viewer. Its existing stdio modes and Djinn's embedded Knot service remain separate
+compositions.
+
+Offers disappear when their provider disconnects, withdraws, violates the
+protocol, exceeds its work deadline, or loses permission. The host cancels their
+live sessions and rejects late results. An operation already executing inside
+an application cannot be rolled back. In-process hosts can replace permissions
+through `AppEndpointCatalog::set_provider_permissions`; replacement withdraws
+existing offers before their providers register again. Ordinary viewer route
+grant or denial updates retain their existing next-connection semantics; replacing
+provider permissions cancels the active offered sessions. Settings edits take
+effect on restart.
+
+Each permission allows 1–64 simultaneous sessions and a work deadline greater
+than zero and at most 300 seconds. The host caps all offered sessions together at
+64. Bounded provider work runs outside Tokio runtime workers; each provider
+processes one work item at a time. Native frames retain the existing 1 MiB bound
+and native-endian length prefix. `projection-offer` exposes portable DTOs;
+`projection-provider` adds the native runner without enabling custody.
+
+The independent `djinn` crate in Armillary owns the application door, selected
+clients and resident service/task lifetime. This package supplies concrete
+Mere services, product policy and protected custody authority. See the
+[ownership receipt](../../design_docs/mere_docs/testing/receipts/2026-10-30_djinn_ownership.md).

@@ -1,0 +1,82 @@
+{
+  "decision_count": 41,
+  "inventory_repositories": 23,
+  "manifest_package_records": 721,
+  "locked_owned_fork_source_identities": 22,
+  "files": [
+    {
+      "name": "REPORT.md",
+      "bytes": 21672
+    },
+    {
+      "name": "engine.md",
+      "bytes": 28434
+    },
+    {
+      "name": "ui.md",
+      "bytes": 29897
+    },
+    {
+      "name": "network.md",
+      "bytes": 24958
+    },
+    {
+      "name": "storage-identity-inference.md",
+      "bytes": 17413
+    },
+    {
+      "name": "inventory.json",
+      "bytes": 979241
+    },
+    {
+      "name": "turnstone-locked-sources.json",
+      "bytes": 6701
+    }
+  ],
+  "sampled_evidence_paths": [
+    {
+      "repo": "eidetic",
+      "revision": "01ee97b0",
+      "path": "crates/muniment/src/directory_backend.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "eidetic",
+      "revision": "01ee97b0",
+      "path": "crates/eidetic-core/src/import/parser.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "eidetic",
+      "revision": "01ee97b0",
+      "path": "crates/chartulary/src/canonical.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "dramatis",
+      "revision": "6711105",
+      "path": "crates/personae/src/sealed_record_storage/freshness.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "turnstone",
+      "revision": "a1a52f3bcb",
+      "path": "src/download.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "mere",
+      "revision": "f631d1ec89",
+      "path": "crates/cambium/cambium-rootstock/src/embedding.rs",
+      "exists_at_revision": true
+    },
+    {
+      "repo": "genet",
+      "revision": "565458ea3ab",
+      "path": "support/idl-interface-table/src/idl.rs",
+      "exists_at_revision": true
+    }
+  ],
+  "report_local_links": "all exist",
+  "runtime_or_replacement_tests": "not run; source audit only"
+}

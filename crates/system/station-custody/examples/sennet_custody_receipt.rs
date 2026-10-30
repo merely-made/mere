@@ -30,8 +30,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if !error.is_pending()
                     && !matches!(
                         error,
-                        graphshell_endpoint::door::custody_client::CustodyClientError::Refused(
-                            graphshell_endpoint::door::custody::CustodyRefusal::NoWallet
+                        djinn::door::custody_client::CustodyClientError::Refused(
+                            djinn::door::custody::CustodyRefusal::NoWallet
                         )
                     )
                 {
@@ -51,11 +51,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let public = released.identity.node_number();
         report["node_number"] = serde_json::json!(public);
         if args[4] == "unlocked" {
-            use graphshell_endpoint::door::{
-                app_admission::AppId,
-                custody::{CustodyRefusal, KeySource},
-                custody_client::{BlockingCustodyClient, CustodyClientError},
-            };
+            use djinn::door::app_admission::AppId;
+use djinn::door::custody::{CustodyRefusal, KeySource};
+use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
             let salt = personae::sennet::station_salt(device.as_uuid().as_bytes(), &args[2])?;
             let mut other_app = BlockingCustodyClient::open_at(&args[0], AppId::new("turnstone"))?;
             for refused in [

@@ -25,7 +25,7 @@ mod resident_harness;
 use std::collections::BTreeSet;
 use std::time::{Duration, Instant};
 
-use djinn::settings::OwnerSettings;
+use mere_resident::settings::OwnerSettings;
 use djinn_testkit::{Bound, Resident, Run};
 use personae::ProfileId;
 use resident_harness::*;
@@ -38,7 +38,7 @@ const PATIENCE: Duration = Duration::from_secs(90);
 
 /// Remove every saved dial hint, so the next start has only mDNS.
 fn forget_hints(side: &Resident, profile: &str) -> usize {
-    let path = djinn::settings::settings_path(&side.app_dir(), &ProfileId(profile.into()));
+    let path = mere_resident::settings::settings_path(&side.app_dir(), &ProfileId(profile.into()));
     let mut settings = OwnerSettings::load(&path).unwrap();
     let sync = settings.sync.as_mut().expect("sync is configured");
     let forgotten = sync

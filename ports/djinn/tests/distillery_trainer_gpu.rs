@@ -89,8 +89,8 @@ use distillery::{
     GpuDeviceType, TRAINER_AUTODIFF, TRAINER_FINITE_DIFFERENCE, TRAINER_RESOURCE, TrainReceipt,
     TrainRequest, TrainerGpuKind, probe_gpu_adapter,
 };
-use djinn::resident::DjinnResident;
-use djinn::settings::TrainerLaneSettings;
+use mere_resident::resident::DjinnResident;
+use mere_resident::settings::TrainerLaneSettings;
 use eidetic::models::{EvalMetric, EvalReport, OpaqueBlob};
 use eidetic::typed::load_typed;
 use eidetic::{ModelAdapterManifest, NoFetcher};
@@ -159,7 +159,7 @@ async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all(
                 &data_root,
                 &profile(),
                 owner(Some(trains)),
-                djinn::resident::MeshAuthor::Resident,
+                mere_resident::resident::MeshAuthor::Resident,
             )
             .await,
             "a lane that says `device: \"gpu\"` on a machine with no discrete adapter must \
@@ -200,7 +200,7 @@ async fn the_gpu_lane_trains_on_a_discrete_adapter_or_refuses_to_compose_at_all(
         &data_root,
         &profile(),
         owner(Some(trains)),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with a GPU trainer on this machine's discrete GPU");

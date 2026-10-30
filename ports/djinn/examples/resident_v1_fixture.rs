@@ -13,7 +13,7 @@
 
 use std::path::PathBuf;
 
-use djinn::settings::{KnotResidentSettings, OwnerSettings, settings_path};
+use mere_resident::settings::{KnotResidentSettings, OwnerSettings, settings_path};
 use knot_editor::{PersonalVaultKeys, StartupUnlockedPersonalVault, VaultDocument};
 use personae::{PersonaId, ProfileId};
 
@@ -42,8 +42,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     castellan::custody::wallet::ensure_wallet_state(&data_root, persona, "resident-v1")?;
     // The resident's own derivation, so the fixture writes what it will read.
-    let released = djinn::custody::epoch_keys(
-        &djinn::custody::ReleasePolicy::default(),
+    let released = mere_resident::custody::epoch_keys(
+        &mere_resident::custody::ReleasePolicy::default(),
         &data_root,
         persona,
         Some("resident-v1"),

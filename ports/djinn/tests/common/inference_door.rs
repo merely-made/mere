@@ -11,11 +11,10 @@ use chirograph::{
     ProjectionRequest,
 };
 use distillery::inference::{INFERENCE_ASK_ROUTE, InferenceRunsV1};
-use graphshell_endpoint::door::{
-    app_admission::{AppId, AppRouteId},
-    app_client::{AppBrokerClient, AppClientError},
-    identity::VaultProtectionView,
-};
+use djinn::door::app_admission::{AppId, AppRouteId};
+use djinn::door::app_client::AppClientError;
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, ProfileId};
 use sceno::InstanceId;
 use scenotime::{Revision, SceneEpoch};

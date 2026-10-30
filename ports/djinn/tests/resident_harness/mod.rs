@@ -13,7 +13,7 @@
 use std::collections::BTreeSet;
 use std::time::Duration;
 
-use djinn::resident_devices::{AddrKindV1, DeviceDirectoryV1, PairedDeviceV1};
+use mere_resident::resident_devices::{AddrKindV1, DeviceDirectoryV1, PairedDeviceV1};
 use djinn_testkit::{Resident, ResidentStatus, Run, RunConfig, Unlock};
 use personae::ProfileId;
 use transport::PeerAddr;
@@ -38,7 +38,7 @@ pub fn resident(run: &Run, name: &str, profile: &str, passphrase: &str) -> Resid
 
 /// The owner's statement: personal sync on one named graph, reservoir off.
 pub fn configure(resident: &Resident, profile: &str, graph: &str) {
-    let path = djinn::settings::settings_path(&resident.app_dir(), &ProfileId(profile.into()));
+    let path = mere_resident::settings::settings_path(&resident.app_dir(), &ProfileId(profile.into()));
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     std::fs::write(
         &path,

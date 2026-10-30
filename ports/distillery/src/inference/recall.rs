@@ -8,10 +8,15 @@
 use eidetic::models::recall::{
     InferencePassage, PassageSelector, RecallSourceId, RecallSourceKind, RetainedSourceText,
 };
-use eidetic_search::{DocumentIndex, DocumentIndexConfig, SearchDocument};
+use eidetic_search::recall::{
+    RecallIndex as SharedRecallIndex, RecallIndexConfig, RetainedSourceOwner,
+};
 use muniment::Backend;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, sync::Arc};
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, Mutex},
+};
 
 pub use eidetic::models::recall;
 
@@ -19,6 +24,29 @@ pub use eidetic::models::recall;
 pub trait RecallCorpus: Send + Sync {
     fn snapshot(&self) -> Result<Vec<RetainedSourceText>, String>;
     fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String>;
+}
+
+// Distillery admits a fixed snapshot when configuring recall. Its older corpus
+// contract has no scope revision; this adapter records that admission context
+// while continuing to ask the original owner for each source's current head.
+struct AdmittedCorpus {
+    sources: Mutex<Option<Vec<RetainedSourceText>>>,
+    corpus: Arc<dyn RecallCorpus>,
+}
+impl RetainedSourceOwner for AdmittedCorpus {
+    fn snapshot(&self) -> Result<Vec<RetainedSourceText>, String> {
+        self.sources
+            .lock()
+            .map_err(|_| "recall snapshot lock poisoned".to_string())?
+            .take()
+            .ok_or_else(|| "recall snapshot already consumed".into())
+    }
+    fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String> {
+        self.corpus.current_version(source)
+    }
+    fn scope_revision(&self) -> Result<String, String> {
+        Ok("distillery.frozen-admission/v1".into())
+    }
 }
 
 /// One projection observes each source head once; its revision and citations
@@ -390,8 +418,7 @@ pub struct RecallRankings {
 pub struct RecallIndex {
     pub corpus: Arc<dyn RecallCorpus>,
     config: RecallConfig,
-    index: DocumentIndex<String>,
-    passages: BTreeMap<String, InferencePassage>,
+    index: SharedRecallIndex,
     #[cfg(feature = "inference-embedding")]
     embedding: Option<super::recall_embedding::ProjectedEmbedding>,
 }
@@ -428,69 +455,38 @@ impl RecallIndex {
         }
         let mut sources = corpus.snapshot()?;
         sources.sort_by(|a, b| (&a.source, &a.version).cmp(&(&b.source, &b.version)));
-        let mut total = 0usize;
-        let mut index = DocumentIndex::new(DocumentIndexConfig::default());
-        let mut passages = BTreeMap::new();
-        let mut seen = BTreeMap::new();
-        for source in &sources {
-            if source.source.source.trim().is_empty() || source.version.trim().is_empty() {
-                return Err("recall requires a source identity and exact version".into());
+        #[cfg(feature = "inference-embedding")]
+        let descriptor = runtime.map(|_| {
+            use eidetic::models::embedding::{EmbeddingCorpusV1, EmbeddingSourceRevisionV1};
+            EmbeddingCorpusV1 {
+                chunker: format!("{CHUNKER_VERSION}/{}", config.chunk_chars),
+                sources: sources
+                    .iter()
+                    .map(|s| EmbeddingSourceRevisionV1 {
+                        source: s.source.clone(),
+                        version: s.version.clone(),
+                        text_hash: eidetic::Hash::of(s.text.as_bytes()),
+                    })
+                    .collect(),
             }
-            if seen
-                .insert(source.source.clone(), source.version.clone())
-                .is_some()
-            {
-                return Err("recall corpus repeats a source identity".into());
-            }
-            let chars: Vec<char> = source.text.chars().collect();
-            total = total
-                .checked_add(chars.len())
-                .ok_or("recall corpus size overflow")?;
-            if total > config.max_corpus_chars {
-                return Err("recall corpus exceeds configured character limit".into());
-            }
-            let text_hash = eidetic::Hash::of(source.text.as_bytes());
-            for start in (0..chars.len()).step_by(config.chunk_chars) {
-                let end = (start + config.chunk_chars).min(chars.len());
-                let text: String = chars[start..end].iter().collect();
-                if text.trim().is_empty() {
-                    continue;
-                }
-                let passage = InferencePassage {
-                    source: source.source.clone(),
-                    version: source.version.clone(),
-                    text_hash,
-                    selector: PassageSelector { start, end },
-                    chunker: format!("{CHUNKER_VERSION}/{}", config.chunk_chars),
-                    text,
-                };
-                let key = passage.id().to_string();
-                index.add(SearchDocument {
-                    key: key.clone(),
-                    primary_address: source.source.source.clone(),
-                    aliases: vec![],
-                    title: source.title.clone(),
-                    body: Some(passage.text.clone()),
-                });
-                passages.insert(key, passage);
-            }
-        }
+        });
+        let owner = Arc::new(AdmittedCorpus {
+            sources: Mutex::new(Some(sources)),
+            corpus: corpus.clone(),
+        });
+        let index = SharedRecallIndex::build(
+            owner,
+            RecallIndexConfig {
+                chunk_chars: config.chunk_chars,
+                max_corpus_chars: config.max_corpus_chars,
+            },
+        )?;
         #[cfg(feature = "inference-embedding")]
         let embedding = runtime
-            .map(|runtime| {
-                use eidetic::models::embedding::{EmbeddingCorpusV1, EmbeddingSourceRevisionV1};
-                let descriptor = EmbeddingCorpusV1 {
-                    chunker: format!("{CHUNKER_VERSION}/{}", config.chunk_chars),
-                    sources: sources
-                        .iter()
-                        .map(|s| EmbeddingSourceRevisionV1 {
-                            source: s.source.clone(),
-                            version: s.version.clone(),
-                            text_hash: eidetic::Hash::of(s.text.as_bytes()),
-                        })
-                        .collect(),
-                };
-                let items: Vec<_> = passages
+            .zip(descriptor)
+            .map(|(runtime, descriptor)| {
+                let items: Vec<_> = index
+                    .passages()
                     .iter()
                     .map(|(key, p)| (key.clone(), p.text.as_str()))
                     .collect();
@@ -501,7 +497,6 @@ impl RecallIndex {
             corpus,
             config,
             index,
-            passages,
             #[cfg(feature = "inference-embedding")]
             embedding,
         })
@@ -519,15 +514,19 @@ impl RecallIndex {
         &self,
         scope: &[RecallSourceId],
     ) -> BTreeMap<RecallSourceId, Result<Option<String>, String>> {
-        let mut heads = BTreeMap::new();
-        for passage in self.passages.values() {
-            if scope.is_empty() || scope.contains(&passage.source) {
-                heads
-                    .entry(passage.source.clone())
-                    .or_insert_with(|| self.corpus.current_version(&passage.source));
-            }
-        }
-        heads
+        self.index.observe_heads(&self.explicit_scope(scope))
+    }
+    // The legacy empty scope admitted every indexed passage. It did not
+    // observe sources with no passages, nor unknown explicit source IDs.
+    fn explicit_scope(&self, scope: &[RecallSourceId]) -> Vec<RecallSourceId> {
+        self.index
+            .passages()
+            .values()
+            .filter(|passage| scope.is_empty() || scope.contains(&passage.source))
+            .map(|passage| passage.source.clone())
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect()
     }
     fn rankings_observed(
         &self,
@@ -542,8 +541,10 @@ impl RecallIndex {
                 fused: vec![],
             });
         }
+        #[cfg(feature = "inference-embedding")]
         let mut allowed = std::collections::BTreeSet::new();
-        for (key, passage) in &self.passages {
+        #[cfg(feature = "inference-embedding")]
+        for (key, passage) in self.index.passages() {
             if !scope.is_empty() && !scope.contains(&passage.source) {
                 continue;
             }
@@ -552,18 +553,11 @@ impl RecallIndex {
                 allowed.insert(key.clone());
             }
         }
-        let mut lexical_hits: Vec<_> = self
+        // Legacy generation evidence binds to this single observation. Shared
+        // search separately revalidates admission and heads before returning.
+        let lexical = self
             .index
-            .search(question, self.index.len())
-            .into_iter()
-            .filter(|h| allowed.contains(&h.key))
-            .collect();
-        lexical_hits.sort_by(|a, b| {
-            b.score
-                .total_cmp(&a.score)
-                .then_with(|| self.content_tie_order(&a.key, &b.key))
-        });
-        let lexical: Vec<_> = lexical_hits.into_iter().map(|h| h.key).collect();
+            .rankings_observed(question, &self.explicit_scope(scope), heads);
         #[cfg(feature = "inference-embedding")]
         if let Some(embedding) = &self.embedding {
             let mut vector_hits: Vec<_> = if embedding.search.is_empty() {
@@ -616,15 +610,9 @@ impl RecallIndex {
             vector: vec![],
         })
     }
-    // Scores retain priority. Exact passage text breaks ties in descending
-    // order before a provenance-dependent manifest ID. Freshly admitted copies
-    // must not change answer inputs merely because their owner/node IDs changed.
-    // Identical texts retain their distinct source identities and final ID tie.
+    #[cfg(feature = "inference-embedding")]
     fn content_tie_order(&self, a: &str, b: &str) -> std::cmp::Ordering {
-        self.passages[b]
-            .text
-            .cmp(&self.passages[a].text)
-            .then_with(|| a.cmp(b))
+        self.index.content_tie_order(a, b)
     }
     pub fn prepare(
         &self,
@@ -654,7 +642,7 @@ impl RecallIndex {
         );
         // Preserve stale source notices even when the current-version filter
         // removes a candidate before either ranking enters fusion.
-        for passage in self.passages.values() {
+        for passage in self.index.passages().values() {
             if !scope.is_empty() && !scope.contains(&passage.source) {
                 continue;
             }
@@ -667,7 +655,7 @@ impl RecallIndex {
             }
         }
         for key in self.rankings_observed(question, scope, &observed)?.fused {
-            let passage = &self.passages[&key];
+            let passage = &self.index.passages()[&key];
             if !scope.is_empty() && !scope.contains(&passage.source) {
                 continue;
             }
@@ -983,6 +971,51 @@ mod tests {
         assert!(evidence.citations.is_empty());
         evidence.validate("élan 🦉 nebula orange [1]", Some(index.corpus.as_ref()));
         assert_eq!(evidence.citations[0].basis, CitationBasis::ModelMarker);
+    }
+    #[test]
+    fn legacy_scope_observes_only_sources_with_passages_once() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        struct CountingCorpus {
+            sources: Vec<RetainedSourceText>,
+            reads: AtomicUsize,
+        }
+        impl RecallCorpus for CountingCorpus {
+            fn snapshot(&self) -> Result<Vec<RetainedSourceText>, String> {
+                Ok(self.sources.clone())
+            }
+            fn current_version(&self, source: &RecallSourceId) -> Result<Option<String>, String> {
+                self.reads.fetch_add(1, Ordering::SeqCst);
+                Ok(self
+                    .sources
+                    .iter()
+                    .find(|s| &s.source == source)
+                    .map(|s| s.version.clone()))
+            }
+        }
+        let source = |name: &str, text: &str| RetainedSourceText {
+            source: RecallSourceId {
+                kind: RecallSourceKind::Clip,
+                source: name.into(),
+                owner: None,
+                node: None,
+            },
+            version: "v1".into(),
+            title: None,
+            text: text.into(),
+        };
+        let corpus = Arc::new(CountingCorpus {
+            sources: vec![source("present", "nebula"), source("blank", "   ")],
+            reads: AtomicUsize::new(0),
+        });
+        let index = RecallIndex::build(corpus.clone(), Default::default()).unwrap();
+        let (all, _) = index.prepare("nebula", &[]).unwrap();
+        assert_eq!(all.passages.len(), 1);
+        assert_eq!(corpus.reads.load(Ordering::SeqCst), 1);
+        let missing = source("missing", "").source.clone();
+        let (none, _) = index.prepare("nebula", &[missing]).unwrap();
+        assert!(none.passages.is_empty());
+        assert_eq!(corpus.reads.load(Ordering::SeqCst), 1);
     }
     #[test]
     fn scopes_filter_passage_handles_and_ties_are_stable() {

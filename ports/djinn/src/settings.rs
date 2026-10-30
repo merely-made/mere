@@ -118,6 +118,12 @@ pub enum OwnerSettingsError {
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(default, deny_unknown_fields)]
 pub struct OwnerSettings {
+    /// External projections this profile permits applications to offer. Each
+    /// entry grants a provider route and separately names its allowed viewers.
+    /// Empty admits no providers. Loaded on restart; neither provider nor viewer
+    /// labels grant custody privileges or prove executable identity.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub projection_providers: Vec<ProjectionProviderSettings>,
     /// Relays explicitly trusted for invited Graphshell co-op. Empty keeps
     /// co-op LAN-only. This profile-local choice takes effect on restart;
     /// invitation and graph authority remain separate from reachability.
@@ -674,6 +680,31 @@ pub struct LaneSettings {
     pub blob_availability: bool,
 }
 
+/// Owner policy for one app-owned projection route. Limits are explicit in
+/// persisted settings; the host validates their bounds before serving.
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ProjectionProviderSettings {
+    pub provider: String,
+    pub route: String,
+    pub viewers: Vec<String>,
+    pub max_sessions: usize,
+    pub timeout_ms: u64,
+}
+
+impl ProjectionProviderSettings {
+    pub fn permission(&self) -> Result<crate::door::projection_offers::ProviderPermission, String> {
+        use djinn::door::app_admission::{AppId, AppRouteId};
+        Ok(crate::door::projection_offers::ProviderPermission {
+            provider: AppId::new(&self.provider),
+            route: AppRouteId::new(&self.route).map_err(|error| error.to_string())?,
+            viewers: self.viewers.iter().map(AppId::new).collect(),
+            max_sessions: self.max_sessions,
+            timeout: std::time::Duration::from_millis(self.timeout_ms),
+        })
+    }
+}
+
 impl OwnerSettings {
     pub fn coop_relays(
         &self,
@@ -1119,10 +1150,34 @@ mod tests {
     }
 
     #[test]
+    fn projection_provider_permissions_are_explicit_and_round_trip() {
+        let configured = serde_json::json!({"projection_providers": [{
+            "provider": "knot-editor", "route": "documents",
+            "viewers": ["turnstone"], "max_sessions": 4, "timeout_ms": 5000
+        }]});
+        let settings: OwnerSettings = serde_json::from_value(configured.clone()).unwrap();
+        assert_eq!(
+            serde_json::to_value(&settings).unwrap()["projection_providers"],
+            configured["projection_providers"]
+        );
+        assert!(
+            serde_json::to_value(OwnerSettings::default())
+                .unwrap()
+                .get("projection_providers")
+                .is_none()
+        );
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("owner.json");
+        settings.save(&path).unwrap();
+        assert_eq!(OwnerSettings::load(&path).unwrap(), settings);
+    }
+
+    #[test]
     fn settings_round_trip_and_the_write_replaces_the_previous_file() {
         let directory = tempfile::tempdir().unwrap();
         let path = directory.path().join("settings").join("work.json");
         let mut settings = OwnerSettings {
+            projection_providers: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),

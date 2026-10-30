@@ -87,6 +87,27 @@ title = "P4–P6 stay outlines until P2 lands"
 source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
 summary = "P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table."
 
+[decisions."capability-door D1"]
+title = "OS channels on one device"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "On one device a capability is an OS channel that Djinn introduces after consent; revocable grants stay proxied; a gateway meets murm-ocapn at the device edge."
+draws_on = ["stack.2", "stack.3"]
+
+[decisions."capability-door D2"]
+title = "OS identity and launch handles"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "A door app's identity is what the OS reports, or a handle Djinn gave it at launch; labels only in development mode."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D3"]
+title = "WIT interfaces with serde payloads"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Capability interfaces and handles are WIT; bulk data stays Rust types carried as named serde bytes."
+draws_on = ["stack.3", "stack.5"]
+
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"

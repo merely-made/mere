@@ -27,12 +27,12 @@ use distillery::inference::{
     ASK_INTENT, AskRequestV1, CANCEL_INTENT, CancelRequestV1, INFERENCE_ASK_ROUTE,
     INFERENCE_RUNS_SCHEMA, InferenceProvider, RunStateV1,
 };
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::resident::DjinnResident;
-use djinn::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use graphshell_endpoint::door::app_client::AppClientError;
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::resident::DjinnResident;
+use mere_resident::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_client::AppClientError;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {
@@ -59,7 +59,7 @@ async fn save_library(data_root: &std::path::Path) -> eidetic::ManifestId {
     use distillery::inference::{InferenceModelRow, PromptTemplate};
     use eidetic::typed::save_typed;
     use eidetic::{ModelLibrary, PrivacyClass, ProvenanceRecord, Timestamp, TrustEnvelope};
-    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(&data_root, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut store = muniment::RedbBackend::open(&path).unwrap();
     let model = ModelLibrary::save_model_with_components(
@@ -119,7 +119,7 @@ async fn exercise_route(library_model: bool) {
     let (inference, question, model_id, expected_text, expected_session) = if library_model {
         use distillery::inference::{InferenceDevice, load_library_session};
         let row = save_library(&data_root).await;
-        let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+        let path = mere_resident::resident_distillery::model_library_path(&data_root, &profile().0, None);
         let mut store = muniment::RedbBackend::open(&path).unwrap();
         let provider = load_library_session(
             &mut store,
@@ -149,7 +149,7 @@ async fn exercise_route(library_model: bool) {
                 model: InferenceModelSettings::Library {
                     weight_cache: None,
                     row: row.to_string(),
-                    device: djinn::settings::InferenceDeviceSettings::Cpu,
+                    device: mere_resident::settings::InferenceDeviceSettings::Cpu,
                     max_tokens: 4,
                 },
             }),
@@ -176,7 +176,7 @@ async fn exercise_route(library_model: bool) {
         &data_root,
         &profile(),
         settings,
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("open a resident with the inference lane");
@@ -199,7 +199,7 @@ async fn exercise_route(library_model: bool) {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,
@@ -329,7 +329,7 @@ async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
             &data_root,
             &profile(),
             settings,
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await,
         "inference without a distillery lane must be refused",
@@ -344,7 +344,7 @@ async fn the_lane_without_a_distillery_lane_is_refused_before_anything_opens() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     use distillery::inference::{InferenceDevice, RunJournal, load_library_session};
-    use djinn::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
+    use mere_resident::sync::personal_sync_host::{PersonalSyncHost, PersonalSyncHostConfig};
     use graphshell::personal_sync::{SyncRoster, SyncSelection};
     use p2panda_core::{Body, Header, Operation, SigningKey};
     use personae::IdentityProvider;
@@ -373,7 +373,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
             model: InferenceModelSettings::Library {
                 weight_cache: None,
                 row: row.to_string(),
-                device: djinn::settings::InferenceDeviceSettings::Cpu,
+                device: mere_resident::settings::InferenceDeviceSettings::Cpu,
                 max_tokens: 8,
             },
         }),
@@ -384,7 +384,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_a,
         &profile(),
         settings.clone(),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -411,7 +411,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_a,
         &profile(),
         settings.clone(),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -420,7 +420,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         &data_b,
         &profile(),
         settings.clone(),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -711,7 +711,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     // this graph's admitted root and domain-bound writer attestation.
     let outsider = personae::InMemoryProvider::from_seed([0x69; 32]);
     let mut ext = operation.header.extensions.clone();
-    ext.authority = djinn::resident_inference::personal::writer_authority(
+    ext.authority = mere_resident::resident_inference::personal::writer_authority(
         &outsider.attest_derived_key(&salt).unwrap(),
     )
     .unwrap();
@@ -777,7 +777,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         "private asks have no plaintext fallback"
     );
     let mut ext = operation.header.extensions.clone();
-    ext.authority = djinn::resident_inference::personal::writer_authority(
+    ext.authority = mere_resident::resident_inference::personal::writer_authority(
         &identity_a
             .attest_derived_key(b"wrong inference domain")
             .unwrap(),
@@ -900,7 +900,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
         "late-view".into(),
         [0x71; 32],
     ));
-    let late = djinn::resident_inference::personal::open(
+    let late = mere_resident::resident_inference::personal::open(
         &identity_a,
         &late_root,
         &host_a,
@@ -993,7 +993,7 @@ async fn keyed_personal_graph_devices_continue_a_seeded_ask() {
     }]);
     let conflicting = serde_json::from_value(conflicting).unwrap();
     collision_source.append(&conflicting).unwrap();
-    let collision = djinn::resident_inference::personal::open(
+    let collision = mere_resident::resident_inference::personal::open(
         &identity_a,
         &late_root,
         &host_a,
@@ -1107,7 +1107,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
             model: InferenceModelSettings::Library {
                 weight_cache: None,
                 row: row.to_string(),
-                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                device: mere_resident::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: 64,
             },
         }),
@@ -1118,7 +1118,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         &data_root,
         &profile(),
         settings.clone(),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -1167,7 +1167,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(djinn::keeper::Keeper::new(keeper_host())),
+                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,
@@ -1335,7 +1335,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         &data_root,
         &profile(),
         settings,
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();
@@ -1403,7 +1403,7 @@ async fn save_pinned_answer_model(data_root: &std::path::Path) -> eidetic::Manif
         );
         bytes
     };
-    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(&data_root, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut library = muniment::RedbBackend::open(&path).unwrap();
     let config = read("config.json");
@@ -1495,7 +1495,7 @@ async fn save_cross_source_answer_model(data_root: &std::path::Path) -> eidetic:
         );
         bytes
     };
-    let path = djinn::resident_distillery::model_library_path(data_root, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(data_root, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut library = muniment::RedbBackend::open(path).unwrap();
     let model = if qwen15 {
@@ -1657,7 +1657,7 @@ async fn serve_trained_model_for_headed_turnstone() {
         } else {
             let directory = std::path::PathBuf::from(directory);
             let path =
-                djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+                mere_resident::resident_distillery::model_library_path(&data_root, &profile().0, None);
             let mut store = muniment::RedbBackend::open(path).unwrap();
             let model = pollster::block_on(eidetic::ModelLibrary::save_model_with_components(
                 &mut store,
@@ -1706,13 +1706,13 @@ async fn serve_trained_model_for_headed_turnstone() {
             },
             model: InferenceModelSettings::Library {
                 weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
-                    djinn::settings::InferenceWeightCacheSettings {
+                    mere_resident::settings::InferenceWeightCacheSettings {
                         host_bytes: 3 * 1024_u64.pow(3),
                         device_layer_bytes: 4 * 1024_u64.pow(3),
                     }
                 }),
                 row: row.to_string(),
-                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                device: mere_resident::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: if mixed.as_ref().is_some_and(|v| v["claim_support"] == true) {
                     1024
                 } else {
@@ -1746,7 +1746,7 @@ async fn serve_trained_model_for_headed_turnstone() {
             &data_root,
             &profile(),
             settings.clone(),
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await
         .unwrap();
@@ -1768,7 +1768,7 @@ async fn serve_trained_model_for_headed_turnstone() {
         // Opt-in receiving fixture: the same broker supplies the normal
         // wallet-backed clip custody route alongside inference. Both cold
         // processes use this marked wallet; no host-side fallback key exists.
-        let keeper = Arc::new(djinn::keeper::Keeper::new(keeper_host()));
+        let keeper = Arc::new(mere_resident::keeper::Keeper::new(keeper_host()));
         if let Some(root) = std::env::var_os("DJINN_HEADED_CLIP_CUSTODY") {
             let root = std::path::PathBuf::from(root);
             assert_eq!(
@@ -1785,7 +1785,7 @@ async fn serve_trained_model_for_headed_turnstone() {
             keeper
                 .configure_payload_custody(personae::ProfileId("default".into()), persona, root)
                 .unwrap();
-            djinn::custody::grant(&grants).unwrap();
+            mere_resident::custody::grant(&grants).unwrap();
         }
         let server = {
             let endpoint = endpoint.clone();
@@ -2327,13 +2327,13 @@ async fn probe_bounded_cross_source_answers() {
             recall: config.clone(),
             model: InferenceModelSettings::Library {
                 weight_cache: std::env::var_os("DJINN_CROSS_SOURCE_QWEN15").map(|_| {
-                    djinn::settings::InferenceWeightCacheSettings {
+                    mere_resident::settings::InferenceWeightCacheSettings {
                         host_bytes: 3 * 1024_u64.pow(3),
                         device_layer_bytes: 4 * 1024_u64.pow(3),
                     }
                 }),
                 row: row.to_string(),
-                device: djinn::settings::InferenceDeviceSettings::Gpu,
+                device: mere_resident::settings::InferenceDeviceSettings::Gpu,
                 max_tokens: 1024,
             },
         }),
@@ -2344,7 +2344,7 @@ async fn probe_bounded_cross_source_answers() {
         &data_root,
         &profile(),
         settings,
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();

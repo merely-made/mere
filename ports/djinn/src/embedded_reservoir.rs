@@ -25,10 +25,11 @@ use crate::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use armillary::tasks::ResidentTasks;
 use crate::custody_host::ResidentCustody;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
-use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
+use djinn::door::app_client::AppClientError;
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
 use personae::{PersonaId, ProfileId};
@@ -519,7 +520,7 @@ impl EmbeddedOwner {
                     "resident stopped before listening".into(),
                 ));
             }
-            if graphshell_endpoint::door::local_endpoint::connect_local(&options.endpoint)
+            if djinn::door::local_endpoint::connect_local(&options.endpoint)
                 .await
                 .is_ok()
             {

@@ -18,16 +18,14 @@ use chirograph::{
     CarrierRequestBody, CarrierResponseBody, ContentHash, IntentInvocation, IntentResult,
     PortableCardV1, PresentationCodec, ProjectionRequest, ProjectionSnapshot,
 };
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::{
     embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId},
-    app_client::AppBrokerClient,
-    identity::VaultProtectionView,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{self as session_item, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS};
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
@@ -523,7 +521,7 @@ async fn main() {
             .cloned()
             .map(|app| (app, ResidentReservoir::route())),
     ));
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let routes = MereRoutes::new(
         root.join("shared"),
         persona,
@@ -558,7 +556,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if graphshell_endpoint::door::local_endpoint::connect_local(&endpoint)
+        if djinn::door::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

@@ -172,7 +172,7 @@ def main():
         elif source is None and not manifest.is_relative_to(repo):
             assert package["id"] not in actual_packages, ("unrecorded external source", package["name"])
             external_paths.append({"name": package["name"], "manifest": str(manifest)})
-    for package in ["dramatis-app", "djinn"]:
+    for package in ["dramatis-app", "mere-resident"]:
         tree = run(cargo, "+" + args.toolchain, "tree", "--locked", "--offline", "-p", package, "--edges", "normal,build")
         (output / (package + "-tree.txt")).write_text(tree + "\n", encoding="utf-8")
         if package == "dramatis-app":

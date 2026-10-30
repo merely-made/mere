@@ -31,8 +31,8 @@ use castellan::{
     custody::{IdentityVault, InMemoryStorage, Profile},
 };
 use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::{
     embedded_reservoir::reservoir_applications,
     keeper::Keeper,
     resident_mere::{MereRoutes, mere_route_id},
@@ -40,10 +40,8 @@ use djinn::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     },
 };
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppRouteGrants},
-    identity::VaultProtectionView,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::{
     endpoint_catalog::ResidentEndpointCatalog, lifecycle::AdmittedEndpointContext,
@@ -125,8 +123,8 @@ async fn main() {
     castellan::custody::wallet::save_identity_seed(&shared, PUBLIC_SEED).unwrap();
     let seed = castellan::custody::wallet::ensure_wallet_state(&shared, persona, DEVICE).unwrap();
     assert_eq!(seed, PUBLIC_SEED, "fixture wallet uses the public seed");
-    let released = djinn::custody::epoch_keys(
-        &djinn::custody::ReleasePolicy::default(),
+    let released = mere_resident::custody::epoch_keys(
+        &mere_resident::custody::ReleasePolicy::default(),
         &shared,
         persona,
         Some(DEVICE),
@@ -156,7 +154,7 @@ async fn main() {
             .cloned()
             .map(|app| (app, ResidentReservoir::route())),
     ));
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let routes = MereRoutes::new(
         shared.clone(),
         persona,
@@ -280,7 +278,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if graphshell_endpoint::door::local_endpoint::connect_local(&endpoint)
+        if djinn::door::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

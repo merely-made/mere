@@ -41,9 +41,9 @@ use distillery::{
     ChronicleEndpoint, ChronicleObserver, ChronicleRevision, ResidentReceipt,
     chronicle_shelfmark_input, verify_chronicle_shelfmark_input,
 };
-use djinn::resident::DjinnResident;
-use djinn::resident_distillery::ResidentDistillery;
-use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
+use mere_resident::resident::DjinnResident;
+use mere_resident::resident_distillery::ResidentDistillery;
+use mere_resident::settings::{DistilleryLaneSettings, OwnerSettings};
 use graphshell_host::carrier::projection_policy;
 use graphshell_host::projection_host::{ResidentProjectionHost, admit_webrtc_catalog};
 use graphshell_host::webrtc_door::{InviteTerms, issue_invite};
@@ -284,7 +284,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         &data_root,
         &profile,
         owner,
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .map_err(|error| format!("compose temporary Djinn resident: {error}"))?;

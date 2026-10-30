@@ -15,11 +15,11 @@
 use std::io;
 use std::sync::Arc;
 
-use graphshell_endpoint::door::app_admission::{AppId, configured_app_endpoint};
-use graphshell_endpoint::door::custody::{
+use djinn::door::app_admission::{AppId, configured_app_endpoint};
+use djinn::door::custody::{
     CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest,
 };
-use graphshell_endpoint::door::custody_client::{BlockingCustodyClient, CustodyClientError};
+use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
 use personae::RetainedKeys;
 use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};

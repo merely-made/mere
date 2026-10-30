@@ -287,10 +287,16 @@ impl OwnedLayout {
         &self,
         dom: &D,
     ) -> Vec<(u64, (f32, f32))> {
-        self.custom_leaf_nodes(dom)
-            .into_iter()
-            .filter_map(|(key, node)| Some((key, self.element_geometry(dom, node)?.content_size())))
-            .collect()
+        let mut boxes = Vec::new();
+        self.walk_painted_geometry(dom, |node, geometry| {
+            if geometry.placement_visible
+                && let Some(key) = custom_leaf_key(dom, node)
+                && let Some((_, _, width, height)) = geometry.content_rect
+            {
+                boxes.push((key, (width, height)));
+            }
+        });
+        boxes
     }
 
     pub(crate) fn hit_test<D: LayoutDom<NodeId = NodeId>>(
@@ -322,6 +328,36 @@ impl OwnedLayout {
             fragment.width,
             fragment.height,
         ))
+    }
+
+    /// Visit translated semantic border geometry and retained style facts in
+    /// this DOM's flat-tree order. Genet owns ancestor placement; this host
+    /// subtracts its viewport scroll once. No per-read cache survives this call.
+    ///
+    /// This follows the shared translation-only host convention. Full affine
+    /// transforms and clipping remain the `element_geometry` contract.
+    pub(crate) fn walk_painted_geometry<'a, D: LayoutDom<NodeId = NodeId>>(
+        &'a self,
+        dom: &D,
+        mut visit: impl FnMut(NodeId, genet_livery::TranslatedGeometry<'a>),
+    ) {
+        genet_livery::walk_translated_geometry(
+            dom,
+            &self.styles,
+            &self.fragments,
+            &self.element_scroll,
+            |node, mut geometry| {
+                if let Some(rect) = &mut geometry.border_rect {
+                    rect.0 -= self.viewport_scroll.0;
+                    rect.1 -= self.viewport_scroll.1;
+                }
+                if let Some(rect) = &mut geometry.content_rect {
+                    rect.0 -= self.viewport_scroll.0;
+                    rect.1 -= self.viewport_scroll.1;
+                }
+                visit(node, geometry);
+            },
+        );
     }
 
     /// The part of `node` a reader can see: its painted rect cut by every

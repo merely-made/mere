@@ -8,7 +8,7 @@
 //! contain status or refusal, never identity keys. EOF joins resident work while
 //! retaining the configured restart intent. `stop` durably disables that intent.
 
-use djinn::{
+use mere_resident::{
     moot_site::{MootSiteOwnersV1, MootSiteTransport, NomadNetListenerPolicyV1, open_owned},
     resident_site::GeminiListenerPolicyV1,
 };

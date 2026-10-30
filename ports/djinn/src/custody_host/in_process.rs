@@ -19,9 +19,9 @@ use custody_wire::contract::PayloadOperation;
 use custody_wire::secret::Bytes;
 use dramatis::authentication::PassphraseChangeFailureV1;
 use dramatis::intents::{CreateProfileIntentV1, ImportSshKeyNativeIntentV1, SwitchProfileIntentV1};
-use graphshell_endpoint::door::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
-use graphshell_endpoint::door::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
-use graphshell_endpoint::door::identity::{IdentitySurfaceSnapshot, VaultLockView};
+use djinn::door::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
+use djinn::door::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
+use dramatis::view::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{IdentityError, IdentityProvider, InMemoryProvider, PersonaId, ProfileId, RetainedKeys};
 
 use super::{CredentialCall, ImportedSshKey, LockHolder, ResidentCustody, VaultOutput, WalletPublic, refusal};

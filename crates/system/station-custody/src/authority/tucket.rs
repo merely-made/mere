@@ -6,7 +6,8 @@
 
 //! One scoped Tucket release with a connection-lifetime custody watch.
 use super::*;
-use graphshell_endpoint::door::{custody_client::CustodyClient, identity::VaultLockView};
+use djinn::door::custody_client::CustodyClient;
+use dramatis::view::VaultLockView;
 use personae::{IdentityError, IdentityProvider, tucket::TucketStationMaterial};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;

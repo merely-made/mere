@@ -15,7 +15,7 @@ mod resident_harness;
 
 use std::time::{Duration, Instant};
 
-use djinn::custody_host::ResidentCustody;
+use mere_resident::custody_host::ResidentCustody;
 use djinn_testkit::Bound;
 use resident_harness::*;
 use serde_json::json;
@@ -38,7 +38,7 @@ fn wait_lock(r: &djinn_testkit::Resident, want: &str) -> String {
 fn a_resident_with_a_custodian_opens_no_vault_and_follows_its_lock() {
     let run = begin("custody-isolation", "a_resident_with_a_custodian_opens_no_vault_and_follows_its_lock");
     let r = resident(&run, "client", "work", PASSPHRASE);
-    let settings = djinn::settings::settings_path(&r.app_dir(), &personae::ProfileId("work".into()));
+    let settings = mere_resident::settings::settings_path(&r.app_dir(), &personae::ProfileId("work".into()));
     std::fs::create_dir_all(settings.parent().unwrap()).unwrap();
     std::fs::write(&settings, r#"{"reservoir":{"enabled":false}}"#).unwrap();
 
@@ -96,8 +96,8 @@ fn a_resident_with_a_custodian_opens_no_vault_and_follows_its_lock() {
         locked == "locked",
     );
 
-    let owner = djinn::custody_host::remote::RemoteHost::connect(
-        djinn::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap(),
+    let owner = mere_resident::custody_host::remote::RemoteHost::connect(
+        mere_resident::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap(),
     )
     .unwrap();
     owner.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();

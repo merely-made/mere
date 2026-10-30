@@ -23,15 +23,15 @@ use castellan::custody::{
     IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
 };
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::embedded_reservoir::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::embedded_reservoir::{
     ReservoirAttachment, ReservoirAttachmentError, ReservoirAttachmentOptions,
 };
-use djinn::resident_mere::MereRoutes;
-use djinn::resident_reservoir::ResidentReservoir;
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_reservoir::ResidentReservoir;
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_overmap::wire::{APPLY_EDITS_INTENT, ApplyEditsV1};
 use pandect::{CapturedDelta, DomainId};
@@ -73,7 +73,7 @@ fn options(root: &Path, endpoint: &str) -> ReservoirAttachmentOptions {
     }
 }
 
-fn identity() -> Arc<dyn djinn::custody_host::ResidentCustody> {
+fn identity() -> Arc<dyn mere_resident::custody_host::ResidentCustody> {
     let profile = Profile::new(
         ProfileId("v5-fixture".into()),
         "V5 fixture",
@@ -350,7 +350,7 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
     ));
     host.lock_vault().unwrap();
     let config = options(&root.path().join("meres"), &endpoint());
-    let locked = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn djinn::custody_host::ResidentCustody>) }).await;
+    let locked = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn mere_resident::custody_host::ResidentCustody>) }).await;
     assert!(
         matches!(locked, Err(ReservoirAttachmentError::Embedded(reason)) if reason.contains("locked"))
     );
@@ -359,7 +359,7 @@ async fn locked_identity_never_opens_a_reservoir_and_lock_stops_an_embedded_owne
         b"isolated v5 fixture",
     ))
     .unwrap();
-    let attached = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn djinn::custody_host::ResidentCustody>) })
+    let attached = ReservoirAttachment::open(config.clone(), || async { Ok(host.clone() as Arc<dyn mere_resident::custody_host::ResidentCustody>) })
         .await
         .unwrap();
     host.lock_vault().unwrap();
@@ -513,7 +513,7 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
         scoped
             .scope(serve_app_broker(
                 &address,
-                std::sync::Arc::new(djinn::keeper::Keeper::new(identity())),
+                std::sync::Arc::new(mere_resident::keeper::Keeper::new(identity())),
                 grants,
                 60_000,
                 None,
@@ -522,7 +522,7 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
             .await
     });
     for _ in 0..100 {
-        if graphshell_endpoint::door::local_endpoint::connect_local(&config.endpoint)
+        if djinn::door::local_endpoint::connect_local(&config.endpoint)
             .await
             .is_ok()
         {

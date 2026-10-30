@@ -14,13 +14,13 @@ use std::path::Path;
 use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSession,
 };
-use djinn::resident_site::{
+use mere_resident::resident_site::{
     GeminiListenerPolicyV1, MAX_PUBLISHED_SITE_UPLOAD_CHUNK_BYTES, PUBLISHED_SITE_CHUNK_INTENT,
     PUBLISHED_SITE_COMMIT_INTENT, PUBLISHED_SITE_PREPARE_INTENT, PUBLISHED_SITE_REMOVE_INTENT,
     PUBLISHED_SITE_ROUTE, PUBLISHED_SITE_STOP_INTENT, PublishedSiteChunkV1, PublishedSitePrepareV1,
 };
-use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::app_client::AppBrokerClient;
+use djinn::door::app_admission::{AppId, AppRouteId};
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use knot_site::Site;
 use sceno::InstanceId;
 use scenotime::{Revision, SceneEpoch};
@@ -144,7 +144,7 @@ async fn print_status(client: &mut AppBrokerClient) -> Result<(), Box<dyn std::e
         .first()
         .ok_or("published-site status card has no typed status resource")?;
     let bytes = client.resource(snapshot.session, *status_resource).await?;
-    let status: djinn::resident_site::PublishedSiteStatusV1 = serde_json::from_slice(&bytes)?;
+    let status: mere_resident::resident_site::PublishedSiteStatusV1 = serde_json::from_slice(&bytes)?;
     println!("{}", serde_json::to_string_pretty(&status)?);
     Ok(())
 }

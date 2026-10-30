@@ -9,6 +9,13 @@ Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
 plan (DOC_POLICY §8). Evidence that matters is a test in the repository or a
 line in Findings.
 
+**Optional live interaction, 2026-10-30:** the secure-session foundation and
+OCapN wire/runtime work are owned by
+`murm/design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`.
+Its N2/N3 prerequisites passed before this port's bounded adapter began. Gemot's
+product port is the first consumer; the governance crate keeps its independent
+membership, authority and durable command APIs. This integration is M14 below.
+
 ## Constraints
 
 - Murm is the peer-exchange family; Moot is a governed-space domain over its replication foundation and depends on that crate, not on the high-level conversation API; Mere stays offline-first; Turnstone configures services and never builds `LogSync`, drains p2panda events or decides retention law; local authoring, gossip, LogSync and drop import pass through one accepted-operation path; a murmur is invited exchange identified by its participants, a moot a durable governed space whose identity survives membership changes. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:41-71`
@@ -118,6 +125,41 @@ Deferred with triggers of their own: literal Willow Drop interoperability (Willo
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md:87-89, 234-242, 641-643, 723-724`; `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:424-430`
 
+### M14. Optional OCapN adapter for bounded Gemot/coop interaction
+
+**Status:** 2026-10-30, implemented and qualified for the bounded native
+software profile after Murm's N2/N3 acceptance. Product UI, broader exports,
+durable references and third-party handoffs remain separate work.
+
+Add an opt-in `ocapn-coop` feature to the existing `mere-moot` product port.
+Expose a configured collection view, a bounded callback subscription and one
+version-checked collection membership proposal over an already admitted
+session. The runtime is the separately optional `murm-ocapn` package; its pinned
+wire profile and unsupported operations remain Murm's contract. Native iroh
+uses its qualified stream binding without an inner Noise handshake and borrows
+the host's existing endpoint.
+
+- Done when: every method and emission uses the immutable host-supplied
+  Notochord principal and session epoch, rechecks the current admission ledger,
+  and asks Gemot for current membership and the exact typed collection grant.
+  Peer-supplied identities and CapTP ephemeral keys supply no community rights.
+- Done when: callback storage and queues are bounded, disconnect removes
+  session references, old references fail on reconnect, and a slow subscriber
+  cannot block unrelated endpoint services. Reuse the existing coop lifecycle
+  report as a view, without adding another lifecycle store.
+- Done when: a proposal passes exact observed-head and current caller checks,
+  then the host authors it under its own independently checked identity through
+  Gemot's ordinary command and outbound path. Receipts distinguish submitting
+  caller and actual author; stale retries fail and transport never replays a
+  mutation automatically.
+- Done when: real Gemot read/proposal, revocation, expiry, stale-version and
+  disconnect controls pass, with durable reopen or ordinary replica intake of
+  the accepted command. Runtime interoperability and native endpoint acceptance
+  are separate evidence from product UI or broader coop exports.
+- Needs: Murm N2/N3 and the declared bounded OCapN profile. Third-party handoffs,
+  durable object references and broader product mutations retain their own
+  decisions and tests.
+
 ## Open questions
 
 - Is Phase A closed? Its done-conditions read as met on the removal of the compatibility re-exports, but mesh still depends directly on `p2panda-core`, `p2panda-store` and `p2panda-net`. Declare it closed, or keep it open until those dependencies go. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:241-248`
@@ -130,6 +172,20 @@ Deferred with triggers of their own: literal Willow Drop interoperability (Willo
 
 ## Findings
 
+- 2026-10-30: [`ocapn_coop`](../../../ports/moot/src/ocapn_coop.rs) and its
+  optional port feature expose one configured collection through immutable
+  admitted context. Current Notochord authority, Gemot membership and typed
+  collection grants are rechecked under the owner coordinator. Callback queue
+  insertion is bounded and repeats current authority at a fresh owner clock;
+  accepted work may finish according to the documented linearization policy.
+- 2026-10-30: the [isolated source consumer](../../../testing/moot-ocapn-coop/README.md)
+  uses published Git suppliers and actual scoped native endpoints before CapTP
+  and Gemot calls. A proposal enters the host's ordinary authorized command and
+  outbound path, then an independent Moot ingests that signed operation.
+  The actual `mere-moot` feature also compiles in its normal workspace, and its
+  default dependency graph excludes OCapN. Shared source revisions, commands
+  and evidence limits live in
+  `murm/design_docs/archive_docs/2026-10-29/2026-10-29_secure_sessions_and_live_interaction_plan_receipts.md`.
 - 2026-07-26: done-conditions are claims about the tree and decay as the tree moves; three had drifted (Phase E #1 already met, Phase F's subjects gone, Phase G void). Auditing them costs one pass whenever a phase is declared complete. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:556-596`
 - 2026-10-11: Murm's `RetentionCheckpoint` extension (post type 6) carries p2panda's `PruneFlag` and a signed authority revision; the default conversation policy refuses it, possession of a cabal secret grants no retention authority, and older Murm readers refuse the unknown kind. The checkpoint removes only the signer's own earlier log records and is not a snapshot of old topics. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:1146-1180`
 - 2026-10-13: Murm's `local_peer_id` returned the persona master key although production transports accept a scoped `DerivedKeypair`; it now reads the transport's own identity. From: `archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md:1238-1255`
@@ -138,3 +194,7 @@ Deferred with triggers of their own: literal Willow Drop interoperability (Willo
 ## Progress
 
 - 2026-10-28: cut from `2026-07-12_murm_peer_runtime_and_moot_domain_plan.md` and `2026-07-12_deletion_retention_and_native_drop_plan.md`, plus the transport shutdown gate from `2026-10-19_family_promotion_plan.md`; nothing new landed.
+- 2026-10-30: M14 bounded collection view/subscription/proposal adapter
+  implemented and qualified with native secure admission, normal Gemot replica
+  intake, revocation/expiry and lifetime controls. Optional runtime and wire
+  qualification remain owned by Murm; broader product integration stays open.

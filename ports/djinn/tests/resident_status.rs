@@ -15,21 +15,22 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::door::device_broker::default_device_endpoint;
-use djinn::resident_events::EVENTS_SCHEMA;
-use djinn::resident_status::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::door::device_broker::default_device_endpoint;
+use mere_resident::resident_events::EVENTS_SCHEMA;
+use mere_resident::resident_status::{
     self, AgentListenerV1, LockStateV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE,
     RESIDENT_STATUS_ROUTE, ResidentControlEndpoint, ResidentEndpointsV1, ResidentStatusEndpoint,
     ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal,
     SyncStatusV1, default_endpoints_taken,
 };
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, default_app_endpoint,
 };
-use graphshell_endpoint::door::app_client::{AppBrokerClient, AppClientError};
-use graphshell_endpoint::door::identity::VaultProtectionView;
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::app_client::AppClientError;
+use graphshell_endpoint::door::projection::AppBrokerClient;
+use dramatis::view::VaultProtectionView;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
@@ -94,9 +95,9 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         AppId::new("turnstone"),
         ResidentEndpointRoute::new("identity", Duration::from_millis(50)).unwrap(),
     )]));
-    let events = djinn::resident_events::EventLog::open(
+    let events = mere_resident::resident_events::EventLog::open(
         None,
-        Some(djinn::resident_events::DiagnosticsConfig {
+        Some(mere_resident::resident_events::DiagnosticsConfig {
             ingress_records: 8,
             ingress_bytes: 16384,
             ingress_age_secs: 60,
@@ -131,7 +132,7 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,

@@ -1,0 +1,15 @@
+[workspace]
+
+[package]
+name = "custody-projection-custody-fixture"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[features]
+forbidden-api = []
+
+[dependencies]
+djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "721e17d41a8f258073f440adbbb39ad145250868", default-features = false, features = ["custody-client"] }
+serde_json = "1"
+

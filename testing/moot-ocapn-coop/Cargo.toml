@@ -1,0 +1,45 @@
+[workspace]
+resolver = "2"
+
+[package]
+name = "moot-ocapn-coop-checks"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.97.1"
+publish = false
+
+[dependencies]
+gemot = { version = "0.1.1", git = "https://github.com/merely-made/gemot.git", rev = "998133bc17b8636152e9c4f7605eb475498213c8" }
+mien = { version = "0.0.1", git = "https://github.com/merely-made/gemot.git", rev = "998133bc17b8636152e9c4f7605eb475498213c8" }
+transport = { package = "mere-transport", version = "0.0.2", git = "https://github.com/merely-made/murm.git", rev = "75eb9108879003015c934426565a55097d21a193", features = ["noise", "notochord"] }
+murm-ocapn-transport = { version = "0.1.0", git = "https://github.com/merely-made/murm.git", rev = "75eb9108879003015c934426565a55097d21a193" }
+murm-ocapn = { version = "0.1.0", git = "https://github.com/merely-made/murm.git", rev = "75eb9108879003015c934426565a55097d21a193" }
+notochord = { version = "0.1.1", git = "https://github.com/merely-made/dramatis.git", branch = "main", features = ["tokio"] }
+personae = { version = "0.3.0", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+insigne = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", branch = "main", features = ["verify"] }
+muniment = { version = "0.2", git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3", features = ["redb"] }
+proofs = { package = "mere-proofs", version = "0.1.0", git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+servitor = { version = "0.0.2", git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "sync", "time"] }
+
+[patch."https://github.com/merely-made/eidetic.git"]
+muniment = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+mere-proofs = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+servitor = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+stickleback = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+
+[patch.crates-io]
+muniment = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+servitor = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+mere-proofs = { git = "https://www.github.com/merely-made/eidetic.git", rev = "01ee97b0b95d679430986dffd54c64ce9b3b5ea3" }
+insigne = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+personae = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
+p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5-upstream-20261013" }
