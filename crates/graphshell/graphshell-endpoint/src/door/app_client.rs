@@ -324,9 +324,46 @@ mod tests {
     }
 
     #[cfg(feature = "custody")]
+    fn released_answer() -> crate::door::custody::CustodyAnswer {
+        use crate::door::custody::{CustodyAnswer, ReleasedKey};
+        use personae::IdentityProvider;
+        let salt = b"test-release-key".to_vec();
+        let provider = personae::InMemoryProvider::from_seed([9; 32]);
+        let attestation = provider.attest_derived_key(&salt).unwrap();
+        CustodyAnswer::Released {
+            master: [0x5a; 32],
+            keys: vec![ReleasedKey {
+                salt,
+                seed: [0x6b; 32],
+                attestation,
+            }],
+        }
+    }
+
+    #[cfg(feature = "custody")]
+    fn assert_release_secrets_absent(error: &AppClientError) {
+        let sentinels = [
+            "WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo",
+            "a2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2s",
+            "107, 107, 107",
+            "90, 90, 90",
+        ];
+        let mut errors: Vec<&dyn std::error::Error> = vec![error];
+        while let Some(cause) = errors.pop() {
+            let description = format!("{cause:?} {cause}");
+            for sentinel in sentinels {
+                assert!(!description.contains(sentinel));
+            }
+            if let Some(source) = cause.source() {
+                errors.push(source);
+            }
+        }
+    }
+
+    #[cfg(feature = "custody")]
     #[tokio::test]
     async fn unexpected_real_custody_release_does_not_leak_in_error_chain() {
-        use crate::door::custody::{CustodyAnswer, CustodyRefusal};
+        use crate::door::custody::CustodyRefusal;
         let (client, mut server) = tokio::io::duplex(4096);
         let mut connection = AppConnection {
             stream: Box::new(client),
@@ -338,10 +375,7 @@ mod tests {
                 read_native_message_async(&mut server).await.unwrap();
             let answer = AppHostMessage::<(), (), _>::Answer {
                 id: 1,
-                answer: Ok::<_, CustodyRefusal>(CustodyAnswer::Released {
-                    master: [0x5a; 32],
-                    keys: vec![],
-                }),
+                answer: Ok::<_, CustodyRefusal>(released_answer()),
             };
             write_native_message_async(&mut server, &answer)
                 .await
@@ -352,13 +386,46 @@ mod tests {
             .await
             .unwrap_err();
         assert!(matches!(error, AppClientError::UnexpectedAnswer { .. }));
-        let sentinel = "WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo";
-        assert!(!format!("{error:?} {error}").contains(sentinel));
-        let mut source = std::error::Error::source(&error);
-        while let Some(cause) = source {
-            assert!(!format!("{cause:?} {cause}").contains(sentinel));
-            source = cause.source();
-        }
+        assert_release_secrets_absent(&error);
+        host.await.unwrap();
+    }
+
+    #[cfg(feature = "custody")]
+    #[tokio::test]
+    async fn mismatched_custody_release_does_not_leak_key_material() {
+        use crate::door::custody::{CustodyAnswer, CustodyRefusal};
+        let (client, mut server) = tokio::io::duplex(4096);
+        let mut connection = AppConnection {
+            stream: Box::new(client),
+            session: "fixture".into(),
+            next_id: 1,
+        };
+        let host = tokio::spawn(async move {
+            let call: AppMessage<(), String> = read_native_message_async(&mut server)
+                .await
+                .unwrap()
+                .unwrap();
+            assert!(matches!(call, AppMessage::Call { id: 1, .. }));
+            let answer = AppHostMessage::<(), (), _>::Answer {
+                id: 99,
+                answer: Ok::<_, CustodyRefusal>(released_answer()),
+            };
+            write_native_message_async(&mut server, &answer)
+                .await
+                .unwrap();
+        });
+        let error = connection
+            .call::<_, Result<CustodyAnswer, CustodyRefusal>>("release")
+            .await
+            .unwrap_err();
+        assert!(matches!(
+            error,
+            AppClientError::MismatchedResponse {
+                expected: 1,
+                got: 99
+            }
+        ));
+        assert_release_secrets_absent(&error);
         host.await.unwrap();
     }
 
