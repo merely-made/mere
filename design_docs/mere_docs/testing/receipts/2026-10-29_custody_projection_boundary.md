@@ -174,8 +174,8 @@ The endpoint supplier published to receivers is Mere
 `root-split-published-broker` passed without local overrides: 44 Djinn door
 tests, one custody-payload test, two custody-route tests and five vault-lock
 tests. The retained-process fixture remains explicitly ignored. This includes
-the fresh custody connection while locked, unexpected/released-key responses,
-and browser-wrapper JSON diagnostics. The gate used the same 3 GiB, zero-swap,
+the fresh custody connection while locked and browser-wrapper JSON diagnostics.
+Unexpected and released-key response coverage is in the endpoint suites above. The gate used the same 3 GiB, zero-swap,
 150 percent CPU limits. Log SHA-256:
 `1e48a7b3cd19fdb8f326670558ec372d29e416c366b4ad7a6dc150981f2a436c`.
 
@@ -185,3 +185,60 @@ supplier targets advanced; no dependency target name or version changed.
 The web lock is unchanged. Earlier local-cohort results above remain bounded
 to their recorded sources; this published-cohort run supersedes their pending
 unpatched broker gate.
+
+## Delivered application migrations
+
+The receiving repositories publish the explicit feature selections and removed
+mixed-client imports immediately, without compatibility aliases:
+
+| Receiver | Published migration | Evidence |
+|---|---|---|
+| Knot | `704084d` (receipt update `e4810ef`) | Overlay regression: 1 pass; peer-enabled sync host compiles; secure publishing: 9 passes. |
+| Turnstone | `13f4c31b` | Locked native library check with inference and authoring passed. |
+| Woodshed/Hocket | `914adc7` (receipt update `1f57db5`) | Both locked native checks including test code passed. |
+| Cleromancy | `89bf653`, fixture completion `f62b673` | Focused local broker grant/revocation test passed after three fixture adaptations. |
+
+Turnstone's completed command is in `root-split-receivers-check.log`, SHA-256
+`a682a07b8c8ecda91ba0c2be2d46ec41c84955dec038eeed694fe7f598d32088`.
+The bundle later timed out compiling Cleromancy's dependencies; that does not
+change Turnstone's explicit exit-code-zero result. The diagnostic from Servo's
+invalid tidy fixture during dependency scanning did not terminate Turnstone's
+command.
+
+Woodshed and Hocket's completed commands are in
+`root-split-remaining-receivers.log`, SHA-256
+`cf09073b2041e2dcd9bcdc059f337c52783acfde9e13b86c6093b2c0e9a19888`.
+That bundle subsequently timed out compiling the broader relationship-recipe
+fixture; its behavioral test remains unqualified. Native checks do not exercise
+the ignored keeper-dependent runtime fixtures.
+
+All receiving locks were reviewed by resolved edges. Registry target version
+choices and unrelated NetRender selections were retained. Hocket's Tokio
+macros and the recipe's ObjC/Metal optional dependency edges reflect normalized
+feature closures. Woodshed's existing aa94 Eidetic source and incoming 01ee
+source are divergent histories and remain distinct; ambiguous lock dependency
+strings were qualified without conflating their owners. The recipe's current
+path packages retain their own existing storage selections.
+
+Cleromancy's focused test reached source compilation and found that its
+Castellan dev dependency needed `keeper`, its Djinn dev dependency needed
+`in-process-custody`, and its reservoir fixture needed the current mandatory
+`PersonaId` argument. These are recorded receiving fixture
+updates; the application library and the moved projection import compiled.
+The failed test-compilation receipt is `root-split-cleromancy-check-2.log`,
+SHA-256 `740d88193c2c2b4a179aa1be25f49308b212142b6c07ddb2eb0c7d2a77be6e73`.
+Subsequent qualification is recorded with that receiver's final fixture result.
+
+Cleromancy's final locked fixture run `root-split-cleromancy-final` passed one
+test with zero failures or ignored tests. It verifies the live ambient grant,
+large resource assembly and withdrawal of previously read cards after revocation.
+Log SHA-256: `15457b1be832bb8fdec7bb57a05597a0074b54fb64cda2c2fd1f1e1e15683ae0`.
+Its final lock adds two fixture packages and their feature edges; all existing
+package identities and edges remain. These fixture-only adaptations do not
+change production feature declarations. The three-line source/manifest change
+received independent static review before the passing gate.
+
+Delivery is complete for this boundary and its receiving API migrations.
+The public package owner/name remains unsettled, and the broader relationship
+recipe, retained-process fixture, previous Distillery probe, Windows execution
+and full GUI/browser runtime remain outside the qualified results above.
