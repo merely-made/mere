@@ -8,9 +8,8 @@ operation context, Settings/outer-frame renderer calls and native queue submissi
 P3's arrangement and viewer-pin save/restart smoke pairs retain their recorded
 qualification. P6 remains open: native IME candidate finalization/echo correlation,
 broader movement/focus/AT and exact-frame host acceptance are not implied.
-Receiving uses temporary local source overrides; existing tracked dependency
-pins remain unchanged. A direct Registry diagnostics dependency is added at the
-existing Mere pin. Publication and consumer repinning remain separate. Earlier
+Published on Mere main and received by Turnstone main at Mere ccdfc8941,
+adapted to Turnstone's deferred native presentation (Findings). Earlier
 findings retain their dated baselines.
 
 **For:** reusable controls that retain local state while the user rearranges,
@@ -790,6 +789,27 @@ presentation PT1. Needs P1–P5.
   Turnstone-owned Genet calls. This does not establish every pane's invalidation
   provenance, physical presentation, M7 exact-frame/readback acceptance, P6 host
   IME/AT/movement acceptance, publication or consumer repinning.
+- Current Turnstone stages native frames and presents them later from a queue,
+  and runs the window frame's style and layout while preparing geometry, before
+  its scene paints. Merged as committed, the headed chain stopped at the
+  mutation: preparation ran outside any work scope, and `completed()` drops
+  such calls without counting a renderer gap, so coverage read clean while
+  style and layout were missing. Receiving now hands the frame scope's outputs
+  to the staged frame, records submission after the deferred queue present (or
+  refusal if the staged frame is dropped), enters the window work scope during
+  frame preparation and carries the window's last stage across work scopes.
+- On the merged code the headed scenario reproduces both capture digests and
+  resolves the twelve-stage chain over the same flush interval [604, 605), with
+  zero cause omissions and 469 prior join evictions. The full Turnstone library
+  suite passes (1355); Cambium 420, Meristem 9.
+- Meristem's `no_std` trace sequence (producer 0) is process-wide while a test
+  subscriber observes one thread, so the two gap-asserting Settings tests
+  passed only when run serially; they now rerun alone in a child process. The
+  receipt export test failed on the P5 commit because the export's coverage
+  record takes a retention slot, which can evict the oldest app record at a
+  full store. A renderer call outside a work scope still disappears from
+  coverage rather than counting as a gap; the chain verifier, not the counters,
+  caught the move.
 
 ## Findings (2026-10-29)
 
@@ -1064,3 +1084,6 @@ confirmed it.
   decisions through the existing diagnostics stream. The first Settings scope
   includes actual retained-core operation context and native submit evidence;
   broader P6/M7 host qualification remains open.
+- 2026-10-30: published (Mere 767c53a61, ccdfc8941) and received on Turnstone
+  main 068f182e, including the deferred-presentation and frame-preparation
+  adaptation recorded in Findings.
