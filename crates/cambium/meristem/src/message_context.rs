@@ -10,6 +10,7 @@ use alloc::vec::Vec;
 
 use anymore::AnyDebug;
 
+use crate::reactive_trace::{self, CoreTraceKind};
 use crate::{DynMessage, ViewId};
 
 /// The `MessageCtx` is used in [`View::message`](crate::View::message).
@@ -34,6 +35,11 @@ impl MessageCtx {
     pub fn take_first(&mut self) -> Option<ViewId> {
         let ret = self.full_id_path.get(self.id_path_index)?;
         self.id_path_index += 1;
+        reactive_trace::emit(
+            CoreTraceKind::MessagePathAdvanced,
+            None,
+            Some(self.id_path_index),
+        );
         Some(*ret)
     }
 
@@ -84,11 +90,26 @@ impl MessageCtx {
             if message.is::<T>() {
                 let message = message.downcast().unwrap();
                 if f(&*message) {
+                    reactive_trace::emit(
+                        CoreTraceKind::MessageConsumed,
+                        None,
+                        Some(self.id_path_index),
+                    );
                     return Some(message);
                 } else {
+                    reactive_trace::emit(
+                        CoreTraceKind::MessageDeclined,
+                        None,
+                        Some(self.id_path_index),
+                    );
                     self.message = Some(DynMessage(message));
                 }
             } else {
+                reactive_trace::emit(
+                    CoreTraceKind::MessageDeclined,
+                    None,
+                    Some(self.id_path_index),
+                );
                 self.message = Some(message);
             }
             None

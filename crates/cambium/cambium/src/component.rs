@@ -13,12 +13,31 @@
 //! [`GenetCtx`] and [`GenetElement`], and its optional probe identity is a DOM
 //! attribute. Meristem remains the renderer-neutral diff and message core.
 
-use std::marker::PhantomData;
+use std::{marker::PhantomData, sync::OnceLock};
 
 use layout_dom_api::{LayoutDom, LayoutDomMut};
 use meristem::{AnyView, MessageCtx, MessageResult, Mut, View, ViewMarker};
 
+use crate::reactive_diagnostics::{DiagnosticDetails, DiagnosticKind, DiagnosticReason, Producer};
 use crate::{GenetCtx, GenetElement, OptionalAction, attr_qual};
+
+static REACTIVE_PRODUCER: OnceLock<Option<Producer>> = OnceLock::new();
+
+fn trace_component(kind: DiagnosticKind, reason: DiagnosticReason, path_depth: usize) {
+    let producer = REACTIVE_PRODUCER.get_or_init(|| Producer::new().ok());
+    if let Some(producer) = producer {
+        let _ = producer.emit(
+            kind,
+            None,
+            DiagnosticDetails {
+                path_depth: Some(u16::try_from(path_depth).unwrap_or(u16::MAX)),
+                path_truncated: path_depth > usize::from(u16::MAX),
+                reason,
+                ..DiagnosticDetails::default()
+            },
+        );
+    }
+}
 
 /// The DOM attribute stamped by [`Component::probe_id`].
 ///
@@ -158,6 +177,11 @@ where
         ctx: &mut GenetCtx,
         _app_state: &mut State,
     ) -> (Self::Element, Self::ViewState) {
+        trace_component(
+            DiagnosticKind::ComponentBuilt,
+            DiagnosticReason::Accepted,
+            ctx.current_view_path().len(),
+        );
         let mut local = (self.init)(&self.props);
         let child = (self.body)(&self.props, &local);
         let (element, child_state) = child.build(ctx, &mut local);
@@ -182,6 +206,15 @@ where
         mut element: Mut<'_, Self::Element>,
         _app_state: &mut State,
     ) {
+        trace_component(
+            DiagnosticKind::ComponentRebuildStarted,
+            if ctx.route_refresh_requested() {
+                DiagnosticReason::RouteChanged
+            } else {
+                DiagnosticReason::None
+            },
+            ctx.current_view_path().len(),
+        );
         if ctx.route_refresh_requested() {
             // A host placement walk is routing-only even for components that
             // are not memoized. Preserve the retained factory result and local
@@ -195,6 +228,11 @@ where
             );
             state.route_path = ctx.current_view_path().to_vec();
             apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+            trace_component(
+                DiagnosticKind::ComponentRouteRefreshed,
+                DiagnosticReason::RouteChanged,
+                ctx.current_view_path().len(),
+            );
             return;
         }
         if let Some(unchanged) = self.props_unchanged {
@@ -205,6 +243,11 @@ where
                 // The probe stamp is cheap and idempotent, and `probe_id` is
                 // not covered by the props comparison, so keep it honest.
                 apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+                trace_component(
+                    DiagnosticKind::ComponentMemoSkipped,
+                    DiagnosticReason::EqualAndClean,
+                    ctx.current_view_path().len(),
+                );
                 return;
             }
             if unchanged(&prev.props, &self.props)
@@ -223,9 +266,15 @@ where
                 );
                 state.route_path = ctx.current_view_path().to_vec();
                 apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+                trace_component(
+                    DiagnosticKind::ComponentRouteRefreshed,
+                    DiagnosticReason::RouteChanged,
+                    ctx.current_view_path().len(),
+                );
                 return;
             }
         }
+        let was_local_dirty = state.local_dirty;
         (self.reconcile)(&prev.props, &self.props, &mut state.local);
         let child = (self.body)(&self.props, &state.local);
         child.rebuild(
@@ -239,6 +288,15 @@ where
         state.local_dirty = false;
         state.route_path = ctx.current_view_path().to_vec();
         apply_probe_id(&element.dom, *element.node, self.probe_id.as_deref());
+        trace_component(
+            DiagnosticKind::ComponentRebuildCompleted,
+            if was_local_dirty {
+                DiagnosticReason::LocalStateDirty
+            } else {
+                DiagnosticReason::DependencyChanged
+            },
+            ctx.current_view_path().len(),
+        );
     }
 
     fn teardown(
@@ -247,6 +305,11 @@ where
         ctx: &mut GenetCtx,
         element: Mut<'_, Self::Element>,
     ) {
+        trace_component(
+            DiagnosticKind::ComponentTornDown,
+            DiagnosticReason::Teardown,
+            ctx.current_view_path().len(),
+        );
         state.child.teardown(&mut state.child_state, ctx, element);
     }
 
@@ -257,6 +320,11 @@ where
         element: Mut<'_, Self::Element>,
         app_state: &mut State,
     ) -> MessageResult<Action> {
+        trace_component(
+            DiagnosticKind::ComponentMessageRouted,
+            DiagnosticReason::None,
+            message.current_path().len(),
+        );
         // Any delivered message may have mutated `local` through a handler, so
         // the next rebuild must run `body` even under `memo()` with equal props.
         state.local_dirty = true;

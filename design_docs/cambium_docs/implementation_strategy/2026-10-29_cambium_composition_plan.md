@@ -1,15 +1,17 @@
 # Cambium composition: retained components, bindings and selective updates
 
-**Status:** 2026-10-29: P0–P3 implemented and locally qualified in their recorded
-automated supplier/receiving scopes. P3 adds managed draft sessions, the Settings
-arrangement editor and frame-owned config/view persistence. Native arrangement
-and viewer-pin save/restart smoke pairs passed; this is narrower than full P6 host
-acceptance. Move preparation commits tracked Cambium preedit and cancels pointer
-capture through the old route; native IME candidate finalization and host echo
-correlation remain P6 gaps. P4–P6 remain open. Receiving used temporary local
-source overrides with tracked dependency pins unchanged; publication and
-consumer repinning remain separate from these source changes. Earlier findings
-retain their dated baselines.
+**Status:** 2026-10-30: P0–P5 implemented; qualification is limited to the recorded
+supplier, receiving and native Settings scopes below. P4 adds coherent named
+inputs, bounded coalescing and selective retained evaluation. P5 installs causal
+decision evidence in Turnstone's existing diagnostics, including actual core
+operation context, Settings/outer-frame renderer calls and native queue submission.
+P3's arrangement and viewer-pin save/restart smoke pairs retain their recorded
+qualification. P6 remains open: native IME candidate finalization/echo correlation,
+broader movement/focus/AT and exact-frame host acceptance are not implied.
+Receiving uses temporary local source overrides; existing tracked dependency
+pins remain unchanged. A direct Registry diagnostics dependency is added at the
+existing Mere pin. Publication and consumer repinning remain separate. Earlier
+findings retain their dated baselines.
 
 **For:** reusable controls that retain local state while the user rearranges,
 regroups, hides and saves them. Turnstone's settings pane is the first consumer.
@@ -350,9 +352,9 @@ change to the generic `PaneConfig` container.
 
 ### Selective updates and scheduling
 
-P4 stays in this plan (D11) and is an outline until P2 lands (D14). Its
-detailed design is written from P2's result; the 2026-10-29 draft is in this
-file at Mere `01fce8a78`, a starting point rather than a commitment.
+P4 uses the flat owner table proved in P2. `composition_scheduler.rs` supplies
+an opt-in complete input table; ordinary `RetainedComposition` construction
+keeps its previous rebuild behavior.
 
 - Dependencies are declared per owner as named domain revisions. No global
   application-change counter and no automatic per-field signal.
@@ -365,6 +367,34 @@ file at Mere `01fce8a78`, a starting point rather than a commitment.
   Continuous input cannot starve an ordinary update.
 - Each flush presents one coherent owner snapshot. `update_deferred` stays a
   paint-only escape hatch, not this queue.
+
+The concrete dependency axis is source identity, owner incarnation and named
+domain, with an owner-issued revision. Local input axes have named generations.
+Vectors reject duplicate axes. Turnstone maps opaque provider incarnations to
+checked per-pane tokens; it does not require UUID syntax or hash values. Its
+appearance-choice/theme-catalog, shell-chrome and behaviors domains are sampled
+from one cached snapshot per provider refresh. A session snapshot supplies both
+the local generation and the factory's row props in the same flush.
+
+The queue admits at most 256 components, one pending entry per key, 64 bytes
+per axis name and 256 incoming causes per component; it retains eight causes
+with explicit omission evidence. A full-table publication and its per-component
+causes are atomic. Changed vectors and explicit same-vector notices invalidate;
+identical publication without a notice does not. Capture freezes inputs and
+pending generations before factories run. Acknowledgement removes only the
+generation captured, so publication during a rebuild remains pending. Removing
+a key prunes its pending work and mutation handoff.
+
+One synchronous flush evaluates all dirty visible entries within the admitted
+table. There is no idle-only debounce that continuous input can starve and no
+partially evaluated shared revision. Hidden entries retain the latest pending
+revision, including explicit same-vector notices, until reveal catches up.
+Missing vectors are unknown and conservatively evaluate. Moves with unchanged
+inputs refresh routes without invoking the factory or body. Messages still
+dispatch individually and mark their owner dirty. Invalid input construction,
+publication or exhausted adapter identities uses the legacy evaluation path
+and records a coverage gap; it cannot freeze a row behind a clean fallback
+vector. The retained table's normal visibility/input admission remains in force.
 
 ### Diagnostics are part of the contract
 
@@ -382,8 +412,9 @@ for emitting them. Record causes where decisions happen.
 | Genet | Mutation batch admitted, which work it required (style/layout/paint or none), produced layout/render revision and failure. This is renderer evidence, not a Cambium guess from DOM-mutation counts. |
 | Host | Window/surface incarnation, committed presentation revision and actual frame/submission/presentation outcome at the boundary available on that host. |
 
-The rest of this section is an outline until P2 lands (D14); the 2026-10-29
-detail is in this file at Mere `01fce8a78`.
+The first installed producer/collector path is Turnstone Settings, with renderer
+evidence at its owned Genet adapters and the outer window frame. This is narrower
+than complete renderer invalidation provenance across every pane.
 
 - Events are versioned, with fixed reason enums. They carry the identities
   above, a producer sequence, an operation/request id and explicit causal
@@ -403,6 +434,44 @@ detail is in this file at Mere `01fce8a78`.
   These producers do not close M7's exact-frame gate.
 - A cause arriving from a remote peer, if Murm's live interaction lands, is
   referenced by its session epoch and request id, never by a capability.
+
+Cambium's version-one payload uses only numeric identities and fixed enums.
+Meristem reserves producer zero and emits bounded generation/path-depth facts;
+Cambium producers receive checked nonzero identities. A retained operation span
+supplies component/update identity to nested synchronous core calls. An actual
+operation-start decision precedes each child call; a completion links back to
+that start after the call returns. Recording a reference after a call cannot
+retroactively give its nested events a cause. Core event
+identity and ambient operation identity remain distinct. Unsupported atomic
+targets and exhausted identities expose unavailable coverage rather than
+silently reusing a sequence.
+
+Turnstone installs a target-filtered tracing layer independently of its normal
+log filter. Validated payloads pass through Registry's existing structured
+Event ingress (4,096 records, 2 MiB, 300 seconds) into the existing Apparatus
+observation history. Run and source-boot admission precede projection. Exact
+producer-reference to admitted-record joins are bounded to 4,096 references;
+256 unresolved edges can await reordered parents. Append-only resolution records
+preserve exact record references. Missing/evicted parents, sequence holes and
+late fills, malformed input, bounded cause omissions, ingress loss and store
+loss remain distinguishable. Inspection and explicit export drain the same
+history; export includes its typed coverage counters and renderer scope.
+Owner-domain advance events alone populate the optional semantic-revision
+metadata; scheduler generations and update identities remain in their typed
+payloads. Event-supplied subjects take precedence over ambient subjects.
+
+Nonempty accepted reconciliation emits a flush event and a MutationBatch with
+the exact shared DOM mutation-cursor interval. This interval covers that flush,
+not exclusive work attributable to one row. Visible Settings owners hand the
+latest nonempty batch references to their receiving window's render attempt.
+The actual `resolve_styles`, layout and paint-list call boundaries emit completed
+work only when those calls ran. Separate work scopes prevent an unrelated DOM
+root from acquiring a Settings cause by proximity. The final host fact is
+HostFrameSubmitted after `queue().present` returns, with an opaque native-window
+lifetime, surface generation and render-attempt identity. Its ScopeContains edge
+names completed work in that submission; it is not physical presentation or
+M7 exact-frame/readback evidence. Genet's internal invalidation decisions and
+broader pane coverage need their own future producer instrumentation.
 
 ### Exactly what reaches Meristem
 
@@ -433,10 +502,11 @@ reports its lifecycle and full route outcome. A renderer-neutral optional
 observer hook is a later alternative only if tracing cannot meet a demonstrated
 coverage/overhead requirement. It is not a prerequisite to retained components.
 
-Tracing is the ruled path (D12). Turnstone installs one global subscriber whose
-default filter is `turnstone=info` (`turnstone/src/launch.rs:27-30`), which
-drops Meristem's and Cambium's events. The bridge needs its own targets in
-that filter, or its own layer.
+Tracing is the ruled path (D12). Turnstone's installed global subscriber now
+has an independently filtered reactive layer for `meristem::reactive` and
+`cambium::reactive`, alongside the existing formatted-log layer. The log filter
+does not determine reactive collection. This introduces no public core trait,
+scheduler, binding or renderer dependency in Meristem.
 
 ### Change ownership and compatibility
 
@@ -637,19 +707,29 @@ composition editing and P2–P6 remain open.
 
 ### P4. Selective updates with coherent flushes
 
-Outline (D14). Goal: rebuild only the rows whose declared inputs changed.
-Done when a two-panel fixture with one shared and two independent
-dependencies shows untouched panels skipping their factory and body, shared
-changes landing coherently, and commands still dispatching once each.
-Needs P2.
+Implemented source: `composition_scheduler.rs`, the retained composition rebuild
+and Turnstone's Settings input adapter. Named dependencies, local session
+generations, atomic publication/capture, coalescing, visible synchronous flushes,
+hidden catch-up, unchanged factory/body skips and route-only moves are described
+above. Queue failure falls back to ordinary evaluation rather than stale input.
+Supplier tests cover independent and shared dependencies, exact-generation
+acknowledgement, command delivery, same-vector notices, missing vectors,
+visibility, removal and bounds. Receiving tests cover real Settings sessions,
+opaque owner incarnations and independent source causes. Needs P2.
 
 ### P5. Connected diagnostic evidence
 
-Outline (D14). Goal: the installed settings consumer traces a real settings
-write from owner revision to the renderer work it caused, through the event
-schemas the tests use. Done when move, hide, skip and coalescing are visible,
-and loss, eviction and missing parents show as explicit gaps. Needs P1–P4 and
-diagnostics M8/M11/M13; it cannot close M7.
+Implemented source: versioned Cambium producers, bounded Meristem tracing,
+Turnstone's reactive layer and projection into its existing observation store,
+and Settings/outer-frame Genet-call and native-submit evidence. The owner emits
+request, persistence outcome and advanced-domain references at its actual
+decision boundaries. The same payloads support regression assertions and
+inspection/export. Receiving tests trace actual Apply through owner revision,
+input evaluation, flush/batch, style/layout/paint and submission, and check
+loss counters before an unchanged-row negative assertion. Reordered/missing/
+evicted parents, disabled and disconnected collection remain explicit. Needs
+P1–P4 and diagnostics M8/M11/M13; it cannot close M7. Native and automated
+qualification results are recorded in Findings after the final source gates.
 
 ### P6. Turnstone receiving and supplier qualification
 
@@ -662,12 +742,13 @@ presentation PT1. Needs P1–P5.
 
 ## Remaining implementation questions
 
-- P1 now supplies concrete model admission defaults above. Select the P4
-  scheduling budgets from the actual consumer and qualify nonstarvation.
+- P4 now supplies synchronous budgets from the bounded Settings consumer.
+  A larger or asynchronous consumer needs a separately qualified scheduling policy.
 - Inventory uncoordinated or cross-process settings writers in P1. The proposed
   single-owner guarantee must not be widened without storage-owner support.
-- Inventory the actual Genet mutation and host frame tokens in P5. Missing
-  causal links remain explicit rather than inferred from timing.
+- P5 now connects exact flush mutation intervals to actual adapter calls and
+  native queue submission. Genet internal invalidation provenance, other panes
+  and M7's exact-frame/readback links remain open.
 - Row transfer across panes/documents and live deletion-undo retention remain
   later capabilities, not unresolved choices blocking this pilot.
 - D4 needs the host to force-commit an active IME composition before a move.
@@ -677,6 +758,38 @@ presentation PT1. Needs P1–P5.
 - D6 is the settings pilot's rule. A consumer whose source sees frequent
   outside edits, such as a shared document under Murm's live interaction,
   decides its own conflict timing rather than inheriting D6.
+
+## Findings (2026-10-30)
+
+- P4/P5 supplier and receiving source is implemented. The final supplier gate
+  passes 420 Cambium and 9 Meristem tests; the host check with Meristem default
+  features disabled passes. Receiving uses the existing Turnstone lane and a
+  temporary 15-package local source closure, including Registry. Existing
+  tracked pins remain unchanged; only the new direct Registry dependency is
+  added at the existing Mere revision.
+- Final receiving gates pass 103 Settings, 19 reactive diagnostics, 33 Arrange
+  and 25 workspace tests from the same frozen consumer executable. These are
+  selected overlapping test filters, not a sum of distinct cases. The owner
+  conflict trace and real queue-merge payload regressions cover numeric domain/
+  expected/current facts and keep notice counts separate from operation identity.
+- The native Settings scenario applies Show shellbar through its actual toggle
+  and Apply control in a private profile. Two captures are nonblank. Its export
+  resolves the shell-chrome owner commit through invalidation, capture, component
+  evaluation, flush, MutationBatch, actual style/layout/paint and native queue
+  submission. Nested Meristem decisions carry the same component subject and
+  resolve through the pre-call operation start to that evaluation's completion.
+- The selected native chain is complete. Its mutation range is the exact shared
+  flush interval [604, 605), and the native host fact names a window lifetime,
+  surface generation and render attempt. The run reports zero malformed input,
+  ingress/store loss, missing producer sequences and renderer coverage gaps.
+  It also reports 35 bounded cause omissions and 2,022 prior join-index evictions;
+  these remain visible and prevent claiming a complete graph for the whole run.
+  The unchanged-row negative regression separately requires zero added loss over
+  its measured interval, including explicit producer-unavailable records.
+- Renderer scope is Settings plus the outer window frame, observed at actual
+  Turnstone-owned Genet calls. This does not establish every pane's invalidation
+  provenance, physical presentation, M7 exact-frame/readback acceptance, P6 host
+  IME/AT/movement acceptance, publication or consumer repinning.
 
 ## Findings (2026-10-29)
 
@@ -946,3 +1059,8 @@ confirmed it.
   clean undo, missing-target recovery and save acknowledgements are exercised
   through the installed consumer. No Meristem API changes, publication or
   dependency repin; full P6 host/native IME acceptance remains open.
+
+- 2026-10-30: implemented P4 coherent selective evaluation and P5 connected
+  decisions through the existing diagnostics stream. The first Settings scope
+  includes actual retained-core operation context and native submit evidence;
+  broader P6/M7 host qualification remains open.

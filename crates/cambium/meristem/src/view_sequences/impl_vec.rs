@@ -8,6 +8,7 @@
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use crate::reactive_trace::{self, CoreTraceKind};
 use crate::{
     AppendVec, Count, ElementSplice, MessageCtx, MessageResult, ViewElement, ViewId,
     ViewPathTracker, ViewSequence,
@@ -94,6 +95,11 @@ where
             .enumerate()
             .zip(&generations)
             .map(|((index, seq), generation)| {
+                reactive_trace::emit(
+                    CoreTraceKind::SequenceChildAdded,
+                    Some(u64::from(*generation)),
+                    None,
+                );
                 let id = create_generational_view_id(index, *generation);
                 let this_skip = elements.index() - start_idx;
                 let inner_state = ctx.with_id(id, |ctx| seq.seq_build(ctx, elements, app_state));
@@ -141,6 +147,11 @@ where
             for (index, ((old_seq, generation), (_, mut inner_state))) in
                 to_teardown.zip(generations).zip(states).enumerate()
             {
+                reactive_trace::emit(
+                    CoreTraceKind::SequenceChildRemoved,
+                    Some(u64::from(*generation)),
+                    None,
+                );
                 let id = create_generational_view_id(index + n, *generation);
                 ctx.with_id(id, |ctx| {
                     old_seq.seq_teardown(&mut inner_state, ctx, elements);
@@ -181,6 +192,11 @@ where
                         .zip(&seq_state.generations[prev_n..])
                         .enumerate()
                         .map(|(index, (seq, generation))| {
+                            reactive_trace::emit(
+                                CoreTraceKind::SequenceChildAdded,
+                                Some(u64::from(*generation)),
+                                None,
+                            );
                             let id = create_generational_view_id(index + prev_n, *generation);
                             let this_skip = elements.index() + outer_idx - start_idx;
                             let inner_state =
@@ -225,8 +241,18 @@ where
         let stored_generation = &seq_state.generations[index];
         if *stored_generation != generation {
             // The value in the sequence is no longer the same child
+            reactive_trace::emit(
+                CoreTraceKind::SequenceMessageRefused,
+                Some(u64::from(*stored_generation)),
+                Some(message.current_path().len()),
+            );
             return MessageResult::Stale;
         }
+        reactive_trace::emit(
+            CoreTraceKind::SequenceMessageMatched,
+            Some(u64::from(generation)),
+            Some(message.current_path().len()),
+        );
         // Panics if index is out of bounds, but we know it isn't because this is the same generation
         let (child_skip, inner_state) = &mut seq_state.inner_states[index];
 

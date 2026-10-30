@@ -501,6 +501,9 @@ fn final_teardown_disposes_once_and_rejects_late_route_message() {
 }
 
 #[cfg(test)]
+mod scheduler;
+
+#[cfg(test)]
 mod admission;
 
 #[test]

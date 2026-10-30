@@ -62,6 +62,20 @@ repository root for the rationale and receipts. The workspace now versions
 `meristem` as 0.2.0 for the removed public API; registry publication remains
 a separate release operation.
 
+### 2026-10-30 reactive diagnostic decisions
+
+Turnstone's retained Settings consumer adds bounded tracing at existing
+`AnyView` reuse/replacement/teardown and generation decisions, `MessageCtx`
+consumption/routing, and vector-sequence child/routing decisions. The private
+`reactive_trace.rs` helper emits fixed outcomes, checked producer sequences and
+bounded path-depth/generation facts. Cambium operation spans supply retained
+component context to the product collector. Message payloads and full authored
+keys are excluded. Public core traits and splice behavior are unchanged;
+Meristem retains its `no_std` plus `alloc` source contract and existing tracing
+dependency. The [composition plan](../implementation_strategy/2026-10-29_cambium_composition_plan.md#exactly-what-reaches-meristem)
+owns the first-consumer scope and qualification. This patch does not import an
+upstream scheduler, environment or effect protocol.
+
 ## xilem_web derivatives in Cambium
 
 Cambium's Genet backend was templated on Linebender's Apache-2.0 `xilem_web`

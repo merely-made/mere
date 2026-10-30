@@ -31,6 +31,12 @@ mod placement;
 mod tests;
 mod view;
 
+pub use crate::composition_scheduler::{
+    CompositionCauseRef, CompositionInputError, CompositionInputQueue,
+    CompositionInputSnapshot, CompositionInputs, DependencyStamp, InputVector,
+    LocalInputStamp, MutationRecord,
+};
+
 const ROOT_CONTAINER: ContainerKey = ContainerKey {
     kind: ContainerKind::Root,
     key: String::new(),
@@ -184,6 +190,7 @@ pub struct RetainedComposition<State: 'static, Action: 'static> {
     factory: RetainedComponentFactory<State, Action>,
     collapsed: BTreeSet<ContainerKey>,
     lifecycle: LifecycleEventSink,
+    inputs: Option<CompositionInputSnapshot>,
     marker: PhantomData<fn(State) -> Action>,
 }
 
@@ -194,6 +201,7 @@ impl<State: 'static, Action: 'static> Clone for RetainedComposition<State, Actio
             factory: self.factory.clone(),
             collapsed: self.collapsed.clone(),
             lifecycle: self.lifecycle.clone(),
+            inputs: self.inputs.clone(),
             marker: PhantomData,
         }
     }
@@ -211,6 +219,7 @@ impl<State: 'static, Action: 'static> RetainedComposition<State, Action> {
             factory,
             collapsed: BTreeSet::new(),
             lifecycle: LifecycleEventSink::default(),
+            inputs: None,
             marker: PhantomData,
         }
     }
@@ -225,6 +234,14 @@ impl<State: 'static, Action: 'static> RetainedComposition<State, Action> {
     /// Share the bounded lifecycle trace sink across successive view props.
     pub fn with_lifecycle_sink(mut self, sink: LifecycleEventSink) -> Self {
         self.lifecycle = sink;
+        self
+    }
+
+    /// Reconcile only components whose named inputs changed. The snapshot is
+    /// immutable for this rebuild; callers should capture all owner snapshots
+    /// before constructing it. Omitting this opts into legacy full rebuilding.
+    pub fn with_inputs(mut self, inputs: CompositionInputSnapshot) -> Self {
+        self.inputs = Some(inputs);
         self
     }
 
@@ -251,6 +268,10 @@ pub(super) struct Entry<State: 'static, Action: 'static> {
     pub(super) location: PlacementLocation,
     pub(super) location_signature: Vec<(ContainerKey, usize)>,
     pub(super) hidden: bool,
+    pub(super) applied_inputs: Option<InputVector>,
+    pub(super) message_dirty: bool,
+    pub(super) deferred_inputs: bool,
+    pub(super) last_deferred_generation: Option<u64>,
 }
 
 impl<State: 'static, Action: 'static> Entry<State, Action> {

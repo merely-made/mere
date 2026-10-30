@@ -33,6 +33,8 @@ mod backdrop_scene;
 mod command_menu_bar;
 mod command_surface;
 mod component;
+pub mod composition_scheduler;
+pub mod reactive_diagnostics;
 pub mod composition;
 pub use backdrop_scene::{BACKDROP_SCENE_CSS, BackdropSceneEvent, backdrop_scene_reading};
 mod context;

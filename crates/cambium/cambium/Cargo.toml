@@ -13,6 +13,7 @@ publish = true
 highlight = ["dep:illume", "dep:tinct"]
 
 [dependencies]
+tracing = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 # Owner-scoped navigation lineage and its persisted snapshot, shared with Eidetic.
 chartulary = { workspace = true }

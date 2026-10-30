@@ -39,6 +39,7 @@ mod element;
 mod element_splice;
 mod message;
 mod message_context;
+mod reactive_trace;
 mod view;
 mod view_ctx;
 mod view_sequence;
