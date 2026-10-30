@@ -73,7 +73,7 @@ Rule authoring and availability-aware resolution live in Scenograph and Mere Vie
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:225-234,542-548,2047-2068`
 
 ### P8. `personal_sync` and the product operations
-`personal_sync` (3,693 lines), `receipts` (1,368) and `transfer_offer` (363) are still in the port. The facet dissolution brief has been open since 2026-10-08, waiting on graph semantics' owner (the nudge is Mark's to give). `personal_sync` now imports its scene facet constants from `pandect`; what keeps it in the port is the rest of its product-facet reading. `validate_facet_name` refuses any name containing "seed", so a facet named like `arrangement.seed` cannot sync. Product operations follow Pandect live commands. Cleromancy's `personal-sync` feature fails with 15 `PersonalGraphEvent.basis` errors against current Mere.
+`personal_sync` (3,693 lines), `receipts` (1,368) and `transfer_offer` (363) are still in the port. The facet dissolution brief has been open since 2026-10-08, waiting on graph semantics' owner (the nudge is Mark's to give). `personal_sync` now imports its scene facet constants from `pandect`; what keeps it in the port is the rest of its product-facet reading. `validate_facet_name` refuses any name containing "seed", so a facet named like `arrangement.seed` cannot sync. Product operations follow Pandect live commands. The earlier Cleromancy `PersonalGraphEvent.basis` errors are historical: the later fresh-clone receiving round passed default, `personal-sync`, `graphshell-admission`, core checks and tests. That receipt does not close the remaining ownership work here.
 - Done when: Cleromancy builds with no `graphshell` package; `product.rs` holds no operation Pandect now owns.
 - Needs: the facet dissolution brief; the resident-host port (`2026-10-28_graph_semantics_plan.md`).
 - Rulings: R5
@@ -81,13 +81,13 @@ Rule authoring and availability-aware resolution live in Scenograph and Mere Vie
 
 ### P9. The `web_tree` views
 Query editor, workbench editor and presentation controls are components. Open: documents, reading tiles and cards (`web_tree/blocks::Pane`, `reading::Reading`) mix document state with IndexedDB and rendering and move next to their owners, with load, save, export and play as effects; other owner operations keep separate completion paths; `SavedProduct` still serializes writes, the browser pumps adapters from its frame hook and the host owns the movable application and persistence task; the Graph-tools retry bridge and the query-specific completion queue are consolidation candidates; `GraphSession::edit_as` clones candidates (a performance claim needs its own measurement); real viewer dependency reduction means changing the transitive `graphshell-client` composition; saved-scene conversions elsewhere are not retired; constant-time inline-body change detection is unavailable because the kernel content revision does not cover body edits. Woodshed's adoption of these views changes its feature set (Mere's `mere-view` needs Pictograph `signals`).
-- Done when: a design note rules the `Page` split (the source states this condition; see the question below).
+- Done when: the remaining document, reading-tile and card views expose typed component inputs and effects, their port copies are removed, and a receiving host qualifies the adopted view lifecycle. The `Page` split ruling is already satisfied.
 - Needs: P2r, P6 and P7r for the lifts that own each view's state.
 - Rulings: the `Page` split
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:556-565,1614-1623,1673-1680,1702-1714,1766-1767,1780-1785,2042-2045`
 
-### Q1. Known red and unqualified
-Browser interaction, Woodshed runtime adoption and physical-device acceptance are not qualified, and reading and document-tile lifecycle and the larger presentation and rules boundaries are separate from the completed slice. Known red at the last round: Djinn integration tests read removed `crates/intel/esp` files; Knot's `command_chrome` and `scroll_site` cases; `tabard-desktop`'s `native_shared_recovery` example and `mere-mesh` examples with dead `include!` paths; Woodshed's `validation/relationship-recipe` lacks a `tempfile` dev-dependency. The vendored vello fork keeps its patch rows until the next vello repin. In Turnstone the flat law, overlay and source-form draft applies at once, and the speed pick is not in the saved scene in either host.
+### Q1. Runtime qualification and historical test failures
+Browser interaction, Woodshed runtime adoption and physical-device acceptance are not qualified, and reading and document-tile lifecycle and the larger presentation and rules boundaries are separate from the completed slice. The archived run failures are historical observations, not a current failing-test inventory. Djinn now vendors the ESP fixtures under `ports/djinn/tests/fixtures/esp`; Woodshed's `validation/relationship-recipe/Cargo.toml` declares `tempfile`; the family composition brief records the Tabard `native_shared_recovery` compile repair. Knot's old `command_chrome` and `scroll_site` failures and the old `mere-mesh` example failures need reproduction against named current revisions before being listed as active blockers. No new full-family test run is claimed by this status correction. The vendored vello fork keeps its patch rows until the next vello repin. In Turnstone the flat law, overlay and source-form draft applies at once, and the speed pick is not in the saved scene in either host.
 - Done when: not stated; owed.
 - Needs: a headed browser, a Woodshed runtime, physical devices.
 - Rulings: -
@@ -95,12 +95,14 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 
 ## Open questions
 
-- **Is the P9 design note still owed?** P9's done condition is "a design note rules the Page split; no code moves before it", yet the ruling was made on 2026-10-15 and code has since moved under it. From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:556-565,1668-1680`
+- **P9 completion criteria.** The Page split was ruled on 2026-10-15; another ruling note is not a prerequisite. Remaining work is component extraction with explicit owner completions and receiving-host qualification. From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:556-565,1668-1680`
 - **Multi-route overmap composition.** What identifies a node across meres and whose authority a merged view shows; no code moves until this is designed. From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:313-316`
 - **Who owns stored-overmap promotion and cross-session edges** (the Murm and Moot seam), left "here" by the archived overmap plan. From: `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:632-633`
 - **Murm and I2P.** The Murm desktop result does not extend to the I2P runtime. From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:2008-2010`
 
 ## Findings
+
+- 2026-10-29: the historical ESP fixture paths have been replaced in Djinn tests by vendored `tests/fixtures/esp` inputs; Woodshed's relationship-recipe manifest includes `tempfile`. Historical failure receipts remain archived and do not establish current test status.
 
 - 2026-10-28: the app-facing half of the port is the `door` feature on `graphshell-endpoint`; Signalman and `ports/dramatis` build without the `graphshell` package. Knot's recipe editor and the shared option helpers are siblings, not copies.
 - 2026-10-28: the `web_tree` views are page-shaped; twelve of its files call no browser API.
@@ -110,3 +112,5 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 ## Progress
 
 - 2026-10-28: cut from the stack lift plan; nothing new landed.
+
+- 2026-10-29: corrected stale receiving-failure claims and the already-satisfied P9 ruling prerequisite; runtime qualification remains open.
