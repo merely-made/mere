@@ -10315,6 +10315,7 @@ dependencies = [
 name = "mere-lanes"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "bytes",
  "document-canvas",
  "document-session-api",
@@ -10326,6 +10327,7 @@ dependencies = [
  "inker",
  "mere-fleece",
  "mockito",
+ "muniment",
  "nematic",
  "netfetcher",
  "netrender",
