@@ -13,6 +13,7 @@
 
 #![doc(html_no_source)]
 
+pub mod applications;
 pub mod conditions;
 pub mod custodian;
 pub mod custody;

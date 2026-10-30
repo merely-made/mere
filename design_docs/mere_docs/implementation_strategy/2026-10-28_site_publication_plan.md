@@ -90,7 +90,7 @@ touches several of them but none is ticked off.
 - From: `archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md:556-607,609-651`
 
 ### P2. Desktop publish control and main-broker owner attachment
-The initial authoring caller is the CLI (`djinn-site publish`, `knot-site-publish` for the governed route). A Knot
+The initial authoring caller is Knot's CLI (`knot_site publish`, `knot-site-publish` for the governed route). A Knot
 desktop publish-to-Djinn control, and attaching the owner to the main broker for the governed route, are separate consumer
 gates. Knot's existing in-process serving remains a separate editor-owned lifetime.
 - Done when: the source sets none; the headed handoff is received separately (P4).

@@ -515,13 +515,15 @@ impl AccessEndpoint {
         let app = context
             .application()
             .ok_or("mere access requires an admitted application")?;
-        let request = AppRequest {
-            app: AppId::new(app),
-            route: AppRouteId::new(route).map_err(|error| error.to_string())?,
-        };
+        let request = AppRequest::new(
+            AppId::new(app),
+            AppRouteId::new(route).map_err(|error| error.to_string())?,
+        );
+        // The door admitted the connection, declaration included; this
+        // rechecks only live owner policy.
         grants
             .current()
-            .admit(&request)
+            .permits(&request.app, &request.route)
             .map_err(|error| error.to_string())?;
         Ok(Self {
             endpoint: MereEndpoint::open_mode(shared, context, ambient)?,
@@ -535,7 +537,7 @@ impl AccessEndpoint {
     fn check(&self) -> Result<(), String> {
         self.grants
             .current()
-            .admit(&self.request)
+            .permits(&self.request.app, &self.request.route)
             .map(|_| ())
             .map_err(|error| error.to_string())
     }
@@ -2123,20 +2125,14 @@ mod tests {
             fixture
                 .grants
                 .current()
-                .admit(&AppRequest {
-                    app: AppId::new("graphshell"),
-                    route: AppRouteId::new(route).unwrap()
-                })
+                .admit(&AppRequest::new(AppId::new("graphshell"), AppRouteId::new(route).unwrap()))
                 .is_ok()
         );
         assert!(
             fixture
                 .grants
                 .current()
-                .admit(&AppRequest {
-                    app: AppId::new("turnstone"),
-                    route: AppRouteId::new(route).unwrap()
-                })
+                .admit(&AppRequest::new(AppId::new("turnstone"), AppRouteId::new(route).unwrap()))
                 .is_err()
         );
         assert!(
@@ -5677,10 +5673,7 @@ mod tests {
         let mut explicit = fixture.attach("cleromancy").await;
         let before = graph(&mut explicit);
         let ambient_id = ambient_mere_route_id("divination");
-        let request = |app: &str, route: &str| AppRequest {
-            app: AppId::new(app),
-            route: AppRouteId::new(route).unwrap(),
-        };
+        let request = |app: &str, route: &str| AppRequest::new(AppId::new(app), AppRouteId::new(route).unwrap());
         assert!(
             fixture
                 .grants
@@ -5947,10 +5940,7 @@ mod tests {
             fixture
                 .grants
                 .grant(AppId::new(actor), ResidentReservoir::route());
-            let request = AppRequest {
-                app: AppId::new(actor),
-                route: AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).unwrap(),
-            };
+            let request = AppRequest::new(AppId::new(actor), AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).unwrap());
             assert!(fixture.grants.current().admit(&request).is_ok());
             let mut control = fixture
                 .catalog
@@ -5979,10 +5969,7 @@ mod tests {
                 fixture
                     .grants
                     .current()
-                    .admit(&AppRequest {
-                        app: denied.clone(),
-                        route: AppRouteId::new(route).unwrap()
-                    })
+                    .admit(&AppRequest::new(denied.clone(), AppRouteId::new(route).unwrap()))
                     .is_err()
             );
             assert!(

@@ -26,6 +26,7 @@ use crate::door::local_session::{DoorIdentity, door_salts};
 use crate::door::resident_identity::{CustodyFuture, ResidentIdentity};
 use djinn::door::app_admission::AppId;
 use djinn::door::custody::CustodyCall;
+use djinn::door::declaration::AppAuthority;
 use dramatis::view::IdentitySurfaceSnapshot;
 use personae::{IdentityError, RetainedKeys};
 
@@ -192,7 +193,12 @@ impl ResidentIdentity for Keeper {
         apply_native_identity_action(self.host.as_ref(), self.ui.as_ref(), action)
     }
 
-    fn custody(self: Arc<Self>, app: AppId, call: CustodyCall) -> CustodyFuture {
-        Box::pin(crate::custody::answer(self, app, call))
+    fn custody(
+        self: Arc<Self>,
+        app: AppId,
+        authority: Option<AppAuthority>,
+        call: CustodyCall,
+    ) -> CustodyFuture {
+        Box::pin(crate::custody::answer(self, app, authority, call))
     }
 }

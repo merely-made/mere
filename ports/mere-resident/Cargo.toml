@@ -236,11 +236,6 @@ path = "src/bin/djinn.rs"
 required-features = ["personal-sync"]
 
 [[bin]]
-name = "djinn-site"
-path = "src/bin/djinn_site.rs"
-required-features = ["personal-sync"]
-
-[[bin]]
 name = "djinn-moot-site"
 path = "src/bin/djinn_moot_site.rs"
 required-features = ["moot-site"]

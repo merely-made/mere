@@ -124,7 +124,8 @@ async fn main() {
     let seed = castellan::custody::wallet::ensure_wallet_state(&shared, persona, DEVICE).unwrap();
     assert_eq!(seed, PUBLIC_SEED, "fixture wallet uses the public seed");
     let released = mere_resident::custody::epoch_keys(
-        &mere_resident::custody::ReleasePolicy::default(),
+        &mere_resident::custody::ReleasePolicy::none()
+            .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch),
         &shared,
         persona,
         Some(DEVICE),

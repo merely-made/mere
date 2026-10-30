@@ -89,10 +89,12 @@ impl MeshAuthor {
             .map_err(|error| format!("the Distillery mesh author: {error}"))
     }
 
-    /// Knot's personal vault keys, each derivation checked against the
-    /// default release policy where they are made.
+    /// Knot's personal vault keys, each derivation checked against Knot's own
+    /// declaration where they are made: this resident composes Knot in
+    /// process, so it asks for no more than Knot states it needs.
     fn knot_epochs(&self, data_root: &Path) -> crate::resident_knot::KnotEpochs {
-        let policy = crate::custody::ReleasePolicy::default();
+        let policy = crate::custody::ReleasePolicy::none()
+            .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch);
         match self {
             Self::Custody(host) => {
                 let host = Arc::clone(host);
@@ -730,3 +732,4 @@ mod tests {
         assert!(published_site_profile_root(root, &work).starts_with(root));
     }
 }
+

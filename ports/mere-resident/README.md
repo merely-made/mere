@@ -56,7 +56,7 @@ preserving it. Armillary records actual task outcomes. Local disk I/O and bounde
 snapshot decoding run inline and are not preempted by network deadlines.
 Desktop publishing controls, the main resident broker's owner attachment,
 remote acquisition, hosting promises and Micron listeners remain later
-consumer gates. The earlier `djinn-site` snapshot-handoff command stays available.
+consumer gates. The snapshot-handoff client is Knot's `knot_site`.
 
 ### Personal resident
 
@@ -173,15 +173,17 @@ device-pairing plan. Installing an SSH server does not establish those grants.
 
 ## Saved Gemini sites
 
-`djinn-site` submits an ordinary saved Knot site to the running resident through
-its owner-only application broker. Each selected Personae profile has one
+Knot's `knot_site` client (knot-editor, feature `site-handoff`) submits an
+ordinary saved Knot site to the running resident through its owner-only
+application broker, as `knot-editor` under Knot's declaration. The handoff
+contract lives in `knot_site::handoff`; this resident owns the listener. Each selected Personae profile has one
 publication, its own certificate, and independently retained content.
 
 ```text
-djinn-site publish <site-directory> 1965 --resume
-djinn-site status
-djinn-site stop
-djinn-site remove
+knot_site publish <site-directory> 1965 --resume
+knot_site status
+knot_site stop
+knot_site remove
 ```
 
 The port is optional; zero asks the operating system for a free loopback port.
@@ -222,7 +224,7 @@ djinn-devices --json
 ```
 
 The directory is read-only and lists paired devices only. The broker endpoint
-follows `GRAPHSHELL_APP_ENDPOINT`, as `djinn-site` does.
+follows `GRAPHSHELL_APP_ENDPOINT`, as Knot's `knot_site` does.
 
 ## Resident inference
 
@@ -409,6 +411,40 @@ Distillery.
 ## License
 
 MPL-2.0
+
+## Declared applications
+
+An application may carry a declaration on its door hello
+(`djinn::door::declaration`): the routes it opens, the projections it offers and
+the custody calls and epoch derivations it needs. The owner's grants decide what
+it receives; a connection gets only what both name. An undeclared request is
+refused as undeclared, a declared but ungranted one as not granted, and an
+application with a grant must declare. Knot is the first declared application.
+
+Grants are the `applications` entry of the profile's owner settings. Absent, the
+resident uses Mere's defaults in `policy/default_applications.json`; an empty
+list admits no application by declaration. Grants name namespaces, so an
+application can add a need inside its granted namespace without a resident
+change:
+
+```json
+{
+  "applications": [{
+    "app": "knot-editor",
+    "routes": [{ "exact": "custody" }, { "prefix": "mere/" }, { "exact": "published-site-v1" }],
+    "custody": {
+      "operations": ["status", "roster", "watch_lock", "release_epoch_keys"],
+      "epoch": [{ "prefix": "mere.knot." }]
+    }
+  }]
+}
+```
+
+A declared provider still needs its `projection_providers` permission, and
+offers only routes its declaration names. Other applications keep their label
+grants (`CUSTODY_APPS` and the resident's first-party route grants) until they
+declare. Declarations, like labels, are statements within the same-user
+transport boundary, not executable authentication.
 
 ## App-owned projections
 

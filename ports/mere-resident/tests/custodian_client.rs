@@ -107,7 +107,7 @@ async fn a_graphshell_delegation_is_signed_by_the_custodian_not_by_djinn() {
         salt: salt.clone(),
         message: statement.signing_bytes(),
     };
-    let answer = keeper.clone().custody(AppId::new("graphshell"), call).await.unwrap();
+    let answer = keeper.clone().custody(AppId::new("graphshell"), None, call).await.unwrap();
     let CustodyAnswer::Signature { public_key, signature } = answer else {
         panic!("not a signature")
     };
@@ -123,7 +123,7 @@ async fn a_graphshell_delegation_is_signed_by_the_custodian_not_by_djinn() {
         salt: delegation_signing_salt(&foreign.scope),
         message: foreign.signing_bytes(),
     };
-    let refused = keeper.clone().custody(AppId::new("graphshell"), call).await;
+    let refused = keeper.clone().custody(AppId::new("graphshell"), None, call).await;
     assert!(matches!(refused, Err(CustodyRefusal::Refused { reason }) if reason.contains("issuer-not-profile")));
 }
 
@@ -140,7 +140,7 @@ async fn a_locked_or_lost_custodian_leaves_the_identity_pending_with_no_fallback
     };
     remote.lock_vault().unwrap();
     assert!(keeper.is_locked());
-    assert!(matches!(keeper.clone().custody(AppId::new("graphshell"), call()).await, Err(CustodyRefusal::Locked)));
+    assert!(matches!(keeper.clone().custody(AppId::new("graphshell"), None, call()).await, Err(CustodyRefusal::Locked)));
     let salts = distillery::InstalledAuthority::release_salts();
     assert!(matches!(remote.retained_keys(&salts), Err(IdentityError::Locked)));
 

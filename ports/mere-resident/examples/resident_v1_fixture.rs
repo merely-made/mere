@@ -43,7 +43,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     castellan::custody::wallet::ensure_wallet_state(&data_root, persona, "resident-v1")?;
     // The resident's own derivation, so the fixture writes what it will read.
     let released = mere_resident::custody::epoch_keys(
-        &mere_resident::custody::ReleasePolicy::default(),
+        &mere_resident::custody::ReleasePolicy::none()
+            .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch),
         &data_root,
         persona,
         Some("resident-v1"),

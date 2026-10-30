@@ -196,10 +196,7 @@ pub(super) fn register(
             for route in [mere_route_id(&domain), route_id.clone()] {
                 grants
                     .current()
-                    .admit(&AppRequest {
-                        app: app.clone(),
-                        route: AppRouteId::new(route).map_err(|e| e.to_string())?,
-                    })
+                    .permits(&app, &AppRouteId::new(route).map_err(|e| e.to_string())?)
                     .map_err(|_| "owner application access ended".to_string())?;
             }
             Ok(())

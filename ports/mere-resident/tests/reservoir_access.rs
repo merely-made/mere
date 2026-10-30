@@ -140,14 +140,16 @@ async fn fresh_resident_enforces_recorded_access() {
     for mere in &meres {
         routes.serve(mere).await.unwrap();
     }
-    let request = |app: &str, domain: &str, ambient: bool| AppRequest {
-        app: AppId::new(app),
-        route: AppRouteId::new(if ambient {
-            ambient_mere_route_id(domain)
-        } else {
-            mere_route_id(domain)
-        })
-        .unwrap(),
+    let request = |app: &str, domain: &str, ambient: bool| {
+        AppRequest::new(
+            AppId::new(app),
+            AppRouteId::new(if ambient {
+                ambient_mere_route_id(domain)
+            } else {
+                mere_route_id(domain)
+            })
+            .unwrap(),
+        )
     };
     for ambient in [false, true] {
         let denied = request("turnstone", "divination", ambient);

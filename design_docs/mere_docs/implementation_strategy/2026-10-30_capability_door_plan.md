@@ -151,6 +151,11 @@ custody salt namespaces and persona use. Djinn routes from the declarations.
   refused with a typed reason; the MCP door's ban on Retinue routes is a
   manifest check; Woodshed and Hocket declare theirs.
 - Needs: I1. A manifest is matched to an identity, not a label.
+- Knot first, ahead of I1 (Mark, 2026-10-30: "Application registration is
+  next, with Knot as the first complete case"; declaration on the hello,
+  namespace grants with Mere defaults, Knot's custody limited to what it
+  declares). Declarations stay statements under a label until I1; they give
+  honest applications least authority, not authentication.
 
 ### S1. Applications serve routes
 The door's missing message: an application offers a route (a projection or
@@ -253,3 +258,15 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
 ## Progress
 
 - 2026-10-30: plan opened; nothing built.
+- 2026-10-30: M1's first case, Knot. Djinn's `door::declaration` carries an
+  application's routes, offers, custody operations and epoch derivations on
+  the route hello; the owner's `AppGrant` names what it may receive, by
+  namespace, and a connection gets both or a typed `Undeclared` /
+  `NotGranted` refusal. Mere supplies grants from owner settings
+  (`applications`) or `ports/mere-resident/policy/default_applications.json`.
+  Knot left `CUSTODY_APPS`, the `first_party` list, the published-site grant
+  and `ReleasePolicy::default()`'s epoch rules; its site handoff client moved
+  into Knot (`knot_site`, contract in `knot_site::handoff`) and Mere's
+  `djinn-site` is gone. Remaining for M1: the other applications' entries,
+  salt namespaces in declarations, `reservoir_applications()` for the
+  embedded reservoir owner, the MCP door's Retinue ban, and I1.

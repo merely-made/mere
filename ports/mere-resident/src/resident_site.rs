@@ -6,9 +6,10 @@
 
 //! Djinn-owned lifetime for an explicitly handed-off Gemini publication.
 //!
-//! Knot selects a completed immutable snapshot. Djinn copies the snapshot into
-//! its scoped blob custody, records only its digest and listener policy, and
-//! owns the listener afterwards. This module never opens a Knot site directory
+//! Knot selects a completed immutable snapshot and hands it off under the
+//! contract in `knot_site::handoff` (Knot's `knot_site` client). Djinn copies
+//! the snapshot into its scoped blob custody, records only its digest and
+//! listener policy, and owns the listener afterwards. This module never opens a Knot site directory
 //! or a vault, and it deliberately has no governed-hosting interpretation.
 
 use std::net::{Ipv4Addr, SocketAddr};
@@ -31,6 +32,13 @@ use djinn::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use knot_site::Publication;
+// Knot owns the handoff contract; this module owns the listener it hands to.
+pub use knot_site::handoff::{
+    GeminiListenerPolicyV1, MAX_PUBLISHED_SITE_UPLOAD_CHUNK_BYTES, PUBLISHED_SITE_CHUNK_INTENT,
+    PUBLISHED_SITE_COMMIT_INTENT, PUBLISHED_SITE_PREPARE_INTENT, PUBLISHED_SITE_REMOVE_INTENT,
+    PUBLISHED_SITE_ROUTE, PUBLISHED_SITE_SESSION, PUBLISHED_SITE_STOP_INTENT,
+    PublishedSiteChunkV1, PublishedSitePrepareV1, PublishedSiteStateV1, PublishedSiteStatusV1,
+};
 use sceno::{
     Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,
     SourceRef, Transform2,
@@ -48,57 +56,9 @@ const DESCRIPTOR: &str = "published-site.json";
 const IDENTITY: &str = "published-site-identity.json";
 const RETIRED: &str = "published-site-retired.json";
 const LEASE_NAMESPACE: &str = "djinn.published-site";
-const MAX_CONNECTIONS: u16 = 32;
-const MAX_TIMEOUT_MS: u64 = 30_000;
 const MAX_DESCRIPTOR_BYTES: usize = 16 * 1024;
 const MAX_IDENTITY_BYTES: usize = 16 * 1024;
-pub const PUBLISHED_SITE_ROUTE: &str = "published-site-v1";
-const SESSION: &str = "djinn.published-site/v1";
-pub const PUBLISHED_SITE_PREPARE_INTENT: &str = "djinn.published-site.prepare";
-pub const PUBLISHED_SITE_CHUNK_INTENT: &str = "djinn.published-site.chunk";
-pub const PUBLISHED_SITE_COMMIT_INTENT: &str = "djinn.published-site.commit";
-pub const PUBLISHED_SITE_STOP_INTENT: &str = "djinn.published-site.stop";
-pub const PUBLISHED_SITE_REMOVE_INTENT: &str = "djinn.published-site.remove";
-pub const MAX_PUBLISHED_SITE_UPLOAD_CHUNK_BYTES: usize = 64 * 1024;
 const STATUS_RESOURCE_LABEL: &str = "djinn.published-site.status/v1";
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct GeminiListenerPolicyV1 {
-    /// A loopback port. Zero asks the OS for one on each start.
-    pub port: u16,
-    pub max_connections: u16,
-    pub request_timeout_ms: u64,
-    /// Serving resumes after a Djinn restart only when this is explicitly true.
-    pub resume_on_restart: bool,
-}
-
-impl Default for GeminiListenerPolicyV1 {
-    fn default() -> Self {
-        Self {
-            port: 0,
-            max_connections: 8,
-            request_timeout_ms: 2_000,
-            resume_on_restart: false,
-        }
-    }
-}
-
-impl GeminiListenerPolicyV1 {
-    pub(super) fn validate(&self) -> Result<(), String> {
-        if self.max_connections == 0 || self.max_connections > MAX_CONNECTIONS {
-            return Err(format!(
-                "Gemini max_connections must be 1–{MAX_CONNECTIONS}"
-            ));
-        }
-        if self.request_timeout_ms == 0 || self.request_timeout_ms > MAX_TIMEOUT_MS {
-            return Err(format!(
-                "Gemini request_timeout_ms must be 1–{MAX_TIMEOUT_MS}"
-            ));
-        }
-        Ok(())
-    }
-}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -124,31 +84,6 @@ pub(super) struct GeminiIdentityV1 {
 struct RetiredSiteCustodyV1 {
     version: u8,
     snapshot_digest: [u8; 32],
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum PublishedSiteStateV1 {
-    Unavailable,
-    Stopped {
-        snapshot_digest: [u8; 32],
-    },
-    Serving {
-        snapshot_digest: [u8; 32],
-        address: SocketAddr,
-        certificate_sha256: [u8; 32],
-    },
-}
-
-/// Read-only status returned through the admitted endpoint's typed snapshot
-/// resource. `resume_on_restart` is policy, separate from the current state.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct PublishedSiteStatusV1 {
-    pub version: u8,
-    pub state: PublishedSiteStateV1,
-    pub resume_on_restart: bool,
-    /// A descriptor was removed but its custody lease release must be retried.
-    pub retained_custody: Option<[u8; 32]>,
 }
 
 pub(super) struct RunningGemini {
@@ -198,25 +133,6 @@ pub struct PublishedSiteService {
     running: Option<RunningGemini>,
 }
 
-/// A framed upload is intentionally bounded below the app-broker message cap.
-/// The endpoint holds incomplete bytes only in session memory and never writes
-/// a descriptor until `commit` verifies the complete snapshot.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct PublishedSitePrepareV1 {
-    pub snapshot_digest: [u8; 32],
-    pub total_bytes: u64,
-    pub chunks: u32,
-    pub policy: GeminiListenerPolicyV1,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct PublishedSiteChunkV1 {
-    pub index: u32,
-    pub bytes: Vec<u8>,
-}
-
 struct PendingUpload {
     prepare: PublishedSitePrepareV1,
     bytes: Vec<u8>,
@@ -253,7 +169,7 @@ impl PublishedSiteEndpoint {
     }
 
     fn session() -> ProjectionSession {
-        ProjectionSession(SESSION.into())
+        ProjectionSession(PUBLISHED_SITE_SESSION.into())
     }
 
     fn check_intent(intent: &IntentInvocation) -> Result<(), IntentResult> {

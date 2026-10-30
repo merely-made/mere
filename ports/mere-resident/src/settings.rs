@@ -124,6 +124,16 @@ pub struct OwnerSettings {
     /// labels grant custody privileges or prove executable identity.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub projection_providers: Vec<ProjectionProviderSettings>,
+    /// What each declared application may receive: routes, custody calls and
+    /// epoch contexts, by namespace. A connection gets only what its own
+    /// declaration also names. Absent means Mere's defaults
+    /// (`policy/default_applications.json`); an empty list admits no
+    /// application by declaration. Loaded on restart.
+    ///
+    /// scope=profile; movement=local-only; mutability=restart-required;
+    /// security=ordinary (names and namespaces, no key material).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub applications: Option<Vec<djinn::door::declaration::AppGrant>>,
     /// Relays explicitly trusted for invited Graphshell co-op. Empty keeps
     /// co-op LAN-only. This profile-local choice takes effect on restart;
     /// invitation and graph authority remain separate from reachability.
@@ -706,6 +716,17 @@ impl ProjectionProviderSettings {
 }
 
 impl OwnerSettings {
+    /// The grants declared applications are admitted under: the owner's, or
+    /// Mere's defaults when the owner has written none.
+    pub fn application_grants(
+        &self,
+    ) -> Result<Vec<djinn::door::declaration::AppGrant>, crate::applications::ApplicationPolicyError> {
+        match &self.applications {
+            Some(grants) => crate::applications::validated(grants.clone()),
+            None => Ok(crate::applications::default_grants()),
+        }
+    }
+
     pub fn coop_relays(
         &self,
     ) -> Result<Vec<transport::p2panda_transport::RelayUrl>, transport::TransportError> {
@@ -1178,6 +1199,7 @@ mod tests {
         let path = directory.path().join("settings").join("work.json");
         let mut settings = OwnerSettings {
             projection_providers: Vec::new(),
+            applications: None,
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),

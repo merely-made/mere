@@ -9,6 +9,7 @@ use chirograph::{
 };
 use djinn::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
 use djinn::door::app_client::{AppClientError, AppConnection};
+use djinn::door::declaration::AppDeclaration;
 
 pub struct AppBrokerClient {
     inner: AppConnection,
@@ -41,6 +42,24 @@ impl AppBrokerClient {
     ) -> Result<Self, AppClientError> {
         Ok(Self {
             inner: AppConnection::open_route_at(endpoint, app, route).await?,
+        })
+    }
+    /// Open `route` carrying the application's declaration.
+    pub async fn open_declared_route(
+        app: AppId,
+        route: AppRouteId,
+        declaration: AppDeclaration,
+    ) -> Result<Self, AppClientError> {
+        Self::open_declared_route_at(&configured_app_endpoint(), app, route, declaration).await
+    }
+    pub async fn open_declared_route_at(
+        endpoint: &str,
+        app: AppId,
+        route: AppRouteId,
+        declaration: AppDeclaration,
+    ) -> Result<Self, AppClientError> {
+        Ok(Self {
+            inner: AppConnection::open_declared_route_at(endpoint, app, route, declaration).await?,
         })
     }
     pub fn session(&self) -> &str {

@@ -28,6 +28,7 @@ use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
 use djinn::door::app_admission::AppId;
+use djinn::door::declaration::AppAuthority;
 #[cfg(feature = "in-process-custody")]
 use djinn::door::custody::ReleasedEpochKey;
 use djinn::door::custody::{
@@ -39,14 +40,15 @@ use crate::custody_host::VaultOutput;
 use crate::keeper::Keeper;
 pub(crate) mod payload;
 
-/// The applications the custody route is granted to: the first-party apps
-/// that call djinn instead of opening a vault (D5), and the two command-line
-/// tools that do (Distillery's installed configuration, Signalman's station
-/// commissioning, D17).
+/// The applications the custody route is granted to by label: the
+/// first-party apps that call djinn instead of opening a vault (D5), and the
+/// two command-line tools that do (Distillery's installed configuration,
+/// Signalman's station commissioning, D17). An application that declares its
+/// custody (`djinn::door::declaration`) is admitted by its owner grant
+/// instead (`crate::applications`) and is not listed here.
 pub const CUSTODY_APPS: &[&str] = &[
     "cleromancy",
     "turnstone",
-    "knot-editor",
     "graphshell",
     "woodshed",
     "hocket",
@@ -56,7 +58,8 @@ pub const CUSTODY_APPS: &[&str] = &[
     "dramatis",
 ];
 
-/// Grant the custody route to [`CUSTODY_APPS`].
+/// Grant the custody route to [`CUSTODY_APPS`], and serve it to declared
+/// applications whose owner grant names it.
 pub fn grant(
     grants: &djinn::door::app_admission::AppRouteGrants,
 ) -> Result<(), djinn::door::route::ResidentEndpointRouteError> {
@@ -67,6 +70,7 @@ pub fn grant(
     for app in CUSTODY_APPS {
         grants.grant(AppId::new(app), route.clone());
     }
+    grants.update(|routes| routes.serve(route));
     Ok(())
 }
 
@@ -153,6 +157,18 @@ impl ReleasePolicy {
         self
     }
 
+    /// Release exactly the epoch derivations an application declares, for a
+    /// resident that composes it in process.
+    pub fn with_declared_epochs(self, uses: &[djinn::door::declaration::EpochUse]) -> Self {
+        uses.iter().fold(self, |policy, used| {
+            policy.with_epoch(EpochRule {
+                context: used.context.clone(),
+                device_bound: used.device_bound,
+                secret: used.secret,
+            })
+        })
+    }
+
     /// Whether the epoch derivation `request` may leave djinn.
     pub fn allows_epoch(&self, request: &EpochKeyRequest) -> bool {
         !request.context.is_empty() && self.epoch.iter().any(|rule| rule.allows(request))
@@ -181,19 +197,10 @@ impl Default for ReleasePolicy {
     /// mesh name; Graphshell's per-session endpoint keys; and, from the
     /// wallet, the station- and controller-scoped Reticulum material a sited
     /// station runs on (D17), plus Signalman's exact Tucket device/realm
-    /// child. From the persona epoch: Knot's vault key and
-    /// device-bound writer seed, and only the public half of its legacy
-    /// writer.
+    /// child. No persona-epoch derivation: an application that needs one
+    /// declares it, and its owner grant decides (`crate::applications`).
     fn default() -> Self {
-        let knot = |context: &str, device_bound, secret| EpochRule {
-            context: context.into(),
-            device_bound,
-            secret,
-        };
         Self::none()
-            .with_epoch(knot(knot_editor::VAULT_KEY_CONTEXT, false, true))
-            .with_epoch(knot(knot_editor::SIGNING_KEY_CONTEXT, true, true))
-            .with_epoch(knot(knot_editor::SIGNING_KEY_CONTEXT, false, false))
             .with(
                 KeySource::Persona,
                 SaltRule::Exact(mesh::MESH_AUTHOR_SALT.to_vec()),
@@ -290,12 +297,22 @@ impl ReleasePolicy {
 }
 
 /// Answer one custody call for `app`.
+///
+/// A declared application (`authority`) is answered only the calls and epoch
+/// derivations its declaration names and its owner grants; its epoch
+/// releases are not drawn from the label policy. Salt releases, attestations
+/// and signatures stay under the [`ReleasePolicy`] for every caller.
 pub(crate) async fn answer(
     keeper: Arc<Keeper>,
     app: AppId,
+    authority: Option<AppAuthority>,
     call: CustodyCall,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
-    tracing::debug!(app = %app, call = call_name(&call), "custody call");
+    tracing::debug!(app = %app, call = call_name(&call), declared = authority.is_some(), "custody call");
+    if let Some(authority) = &authority {
+        authority.admit_custody(&call)?;
+    }
+    let declared = authority.is_some();
     if app.as_str() == "hocket"
         && matches!(&call, CustodyCall::Status | CustodyCall::AsProfile { .. })
         && !keeper.is_locked()
@@ -531,7 +548,9 @@ pub(crate) async fn answer(
             keys,
         } => {
             unlocked(&keeper)?;
-            if keys.is_empty() || keys.iter().any(|request| !keeper.policy().allows_epoch(request)) {
+            if keys.is_empty()
+                || (!declared && keys.iter().any(|request| !keeper.policy().allows_epoch(request)))
+            {
                 return Err(CustodyRefusal::NotReleasable);
             }
             let root = keeper.wallet_root().map(Path::to_path_buf).unwrap_or_default();
@@ -800,21 +819,12 @@ mod tests {
         let [station, _] = personae::reticulum::station_salts(b"device");
         assert!(policy.allows(KeySource::Wallet, &station));
         assert!(!policy.allows(KeySource::Persona, &station));
-        assert!(policy.allows_epoch(&EpochKeyRequest::secret(
-            knot_editor::SIGNING_KEY_CONTEXT,
-            true
-        )));
-        assert!(policy.allows_epoch(&EpochKeyRequest::public(
-            knot_editor::SIGNING_KEY_CONTEXT,
-            false
-        )));
-        assert!(
-            !policy.allows_epoch(&EpochKeyRequest::secret(
-                knot_editor::SIGNING_KEY_CONTEXT,
-                false
-            )),
-            "the legacy writer's secret stays in djinn"
-        );
+        for request in knot_editor::PersonalVaultKeys::requests() {
+            assert!(
+                !policy.allows_epoch(&request),
+                "Knot's epoch keys leave only under its declaration and grant"
+            );
+        }
         let install =
             insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
                 domain: "mere.denizen".into(),

@@ -25,6 +25,7 @@ use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::DoorIdentity;
 use djinn::door::app_admission::AppId;
 use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use djinn::door::declaration::AppAuthority;
 
 /// One custody call in flight.
 pub type CustodyFuture =
@@ -43,9 +44,15 @@ pub trait ResidentIdentity: DoorIdentity + IdentityAuthority + Send + Sync + 'st
     }
 
     /// Answer one call on the custody route ([`djinn::door::custody`]),
-    /// from the application the door admitted.
-    fn custody(self: Arc<Self>, app: AppId, call: CustodyCall) -> CustodyFuture {
-        let _ = (app, call);
+    /// from the application the door admitted: by label, or by its
+    /// declaration within its owner grant (`authority`).
+    fn custody(
+        self: Arc<Self>,
+        app: AppId,
+        authority: Option<AppAuthority>,
+        call: CustodyCall,
+    ) -> CustodyFuture {
+        let _ = (app, authority, call);
         Box::pin(async { Err(CustodyRefusal::NotServed) })
     }
 }

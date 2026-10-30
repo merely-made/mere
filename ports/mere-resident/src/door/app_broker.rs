@@ -41,6 +41,7 @@ use djinn::door::app_admission::{
     AppRouteId,
 };
 use djinn::door::custody::CUSTODY_ROUTE;
+use djinn::door::declaration::AppAuthority;
 use djinn::door::local_endpoint::{LocalListener, LocalStream, connect_local};
 use djinn::door::route::ResidentEndpointRoute;
 #[cfg(test)]
@@ -300,7 +301,11 @@ where
         }
     })
     .await?;
-    let djinn::door::server::AdmittedApp { app, route } = admitted;
+    let djinn::door::server::AdmittedApp {
+        app,
+        route,
+        authority,
+    } = admitted;
     // Read once, at session start, exactly as the browser door does: a
     // transfer accepted while an application is already connected becomes
     // visible on its next session rather than mid-stream.
@@ -316,6 +321,7 @@ where
         writer,
         personae,
         app,
+        authority,
         route,
         link,
         session_duration_ms,
@@ -330,6 +336,7 @@ async fn serve_admitted_app<A, R, W>(
     writer: &mut W,
     personae: Arc<A>,
     app: AppId,
+    authority: Option<AppAuthority>,
     route: ResidentEndpointRoute,
     link: LocalLink,
     session_duration_ms: u64,
@@ -342,7 +349,7 @@ where
     W: AsyncWrite + Unpin,
 {
     if route.id() == PROJECTION_PROVIDER_ROUTE {
-        return serve_provider(reader, writer, app, catalog).await;
+        return serve_provider(reader, writer, app, authority, catalog).await;
     }
 
     // Custody is calls, not a projection, and it must answer while the vault
@@ -350,7 +357,7 @@ where
     // door keys and no admitted carrier session: reaching the owner-only
     // endpoint is the trust root, as for every route.
     if route.id() == CUSTODY_ROUTE {
-        return serve_custody(reader, writer, personae, app, &link).await;
+        return serve_custody(reader, writer, personae, app, authority, &link).await;
     }
 
     let identity = Arc::clone(&personae);
@@ -556,6 +563,7 @@ async fn serve_custody<A, R, W>(
     writer: &mut W,
     personae: Arc<A>,
     app: AppId,
+    authority: Option<AppAuthority>,
     link: &LocalLink,
 ) -> Result<Option<SessionSummary>, AppBrokerError>
 where
@@ -576,7 +584,9 @@ where
         let reply = match message {
             AppMessage::Call { id, call } => AppHostMessage::Answer {
                 id,
-                answer: Arc::clone(&personae).custody(app.clone(), call).await,
+                answer: Arc::clone(&personae)
+                    .custody(app.clone(), authority.clone(), call)
+                    .await,
             },
             _ => AppHostMessage::Failure {
                 message: "the custody route answers custody calls only".to_string(),
@@ -646,6 +656,7 @@ async fn serve_provider<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
     reader: &mut R,
     writer: &mut W,
     app: AppId,
+    authority: Option<AppAuthority>,
     catalog: AppEndpointCatalog,
 ) -> Result<Option<SessionSummary>, AppBrokerError> {
     write_native_message_async(
@@ -670,6 +681,18 @@ async fn serve_provider<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
         return Ok(None);
     };
     if label.is_empty() || label.len() > 1024 {
+        return Ok(None);
+    }
+    // A declared provider offers only what it declared; the owner's provider
+    // policy still decides whether it may serve it.
+    if let Some(Err(refusal)) = authority.as_ref().map(|authority| authority.offer(&route)) {
+        write_native_message_async(
+            writer,
+            &ProviderHostMessage::Failure {
+                message: refusal.to_string(),
+            },
+        )
+        .await?;
         return Ok(None);
     }
     let mut guard = catalog.inner.lock().await;

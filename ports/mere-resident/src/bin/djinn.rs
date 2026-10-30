@@ -1110,6 +1110,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())?;
     let owner =
         owner_settings::OwnerSettings::load(&owner_settings::settings_path(&app_dir, &profile_id))?;
+    // Declared applications receive what their declaration names and these
+    // grants allow (capability door plan, M1).
+    let application_grants = owner.application_grants()?;
     let projection_providers = owner
         .projection_providers
         .iter()
@@ -1276,10 +1279,11 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             {
                 grants.grant(AppId::new("turnstone"), route);
             }
+            // Served to the declared applications whose grant names it.
             let route = catalog
                 .update(|catalog| resident.register_published_site_route(catalog))
                 .await?;
-            grants.grant(AppId::new("knot-editor"), route);
+            grants.update(|routes| routes.serve(route));
             // Owner-only and read-only: where each paired device is now.
             let route = catalog
                 .update(|catalog| DeviceDirectoryEndpoint::register(device_directory, catalog))
@@ -1302,10 +1306,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             resident_status::grant(&grants, route);
             // Custody, for every first-party application (D5).
             mere_resident::custody::grant(&grants)?;
+            mere_resident::applications::install(&grants, application_grants);
             // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
-            let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor"), AppId::new("cleromancy"), AppId::new("graphshell")];
+            // Declared applications reach each mere through their grant.
+            let first_party = vec![AppId::new("turnstone"), AppId::new("cleromancy"), AppId::new("graphshell")];
             let routes = resident.reservoir().reservoir().map(|reservoir| {
                 MereRoutes::new(
                     pandect::shared_root::shared_root(),
@@ -1361,6 +1367,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let (allowed_app_routes, app_catalog) = {
             let grants = AppRouteGrants::default();
             mere_resident::custody::grant(&grants)?;
+            mere_resident::applications::install(&grants, application_grants);
             (grants, AppEndpointCatalog::default())
         };
         app_catalog

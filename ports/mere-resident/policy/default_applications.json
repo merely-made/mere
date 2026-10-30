@@ -1,0 +1,14 @@
+[
+  {
+    "app": "knot-editor",
+    "routes": [
+      { "exact": "custody" },
+      { "prefix": "mere/" },
+      { "exact": "published-site-v1" }
+    ],
+    "custody": {
+      "operations": ["status", "roster", "watch_lock", "release_epoch_keys"],
+      "epoch": [{ "prefix": "mere.knot." }]
+    }
+  }
+]
