@@ -150,3 +150,12 @@ local paths and one dependency owner outside those identities changing its
 Knot edge. Other package identities and resolved edges were preserved. The
 original lock was restored after the run. These results qualify this local
 cohort; published receiver locks and the unpatched broker gate are still due.
+
+## Upstream reconciliation before supplier publication
+
+Upstream advanced to `54e09dd11` with documentation and audit artifacts only.
+The reviewed series was rebased onto it. A direct comparison against retained
+local branch `archive/custody-projection-reviewed-20261029` found no differences
+in crates, ports, support, Cargo.toml or Cargo.lock. Review hashes above describe
+the original series: `171bec593` corresponds to `66cdeb368`, `d5d5605e1` to
+`972855420`, and `1047cfc30` to `3f344e2b4` in the rebased publication history.
