@@ -25,7 +25,7 @@ Detailed evidence, exact paths, primary library documentation and deciding tests
 - [Transport, wire formats, radio and community](network.md)
 - [Storage, identity, inference and Turnstone](storage-identity-inference.md)
 
-Security reuse follow-up (2026-10-30): the [Dramatis/Castellan comparison](storage-identity-inference.md#security-reuse-follow-up-2026-10-30) maps custody, delegation and storage obligations to Bitwarden, COSE, age, UCAN, Biscuit and specialist services. Bitwarden’s local keystore is the strongest substantive partial candidate; COSE is the narrow standards-envelope candidate. Current artifacts, audit scope, native build costs and remaining authorization/freshness duties are explicit. No replacement is adopted or qualified.
+Security reuse follow-up (2026-10-30): the [Dramatis/Castellan comparison](storage-identity-inference.md#security-reuse-follow-up-2026-10-30) maps custody, delegation and storage obligations to Bitwarden, COSE, age, UCAN, Biscuit and specialist services. COSE/coset has the concrete private-grammar deletion target and is the next recommended comparison. Bitwarden remains on hold until a net deletion of current key machinery is demonstrated. Current artifacts, audit scope, native build costs and remaining authorization/freshness duties are explicit. No replacement is adopted or qualified.
 
 ## Reuse criteria
 

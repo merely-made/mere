@@ -22,11 +22,13 @@ R01 and R02 remain open across the family. The audit records four additional ver
 
 ## Candidate follow-up
 
-The 2026-10-30 [security reuse research](../research/2026-10-29_stack_ownership_audit/storage-identity-inference.md#security-reuse-follow-up-2026-10-30) is complete as a source/specification comparison. Bitwarden keystore isolation and a narrow COSE profile are the most useful further comparisons; no implementation, platform gate or dependency adoption is implied.
+The 2026-10-30 [security reuse research](../research/2026-10-29_stack_ownership_audit/storage-identity-inference.md#security-reuse-follow-up-2026-10-30) is complete as a source/specification comparison. The recorded next comparison is one certificate/revocation pair under a narrow COSE profile, outside production paths. Its done condition is actual private-grammar removal, preserved policy and refusal behavior, independent interoperability evidence, acceptable target/dependency costs and an explicit signed-material migration account. Bitwarden is held pending a concrete net-deletion case; no implementation, platform gate or dependency adoption is implied.
 
 Prefer checking existing in-family reuse (Backstep, already-used RDF/color primitives), the comparison/codec patterns and unused Pool consumers. Cache policy, header syntax and bookmark tokenization have concrete coverage gaps, but their library choices still need benefit and cost comparison. Luggage's staging trust concern is separate from selecting an updater framework. No new implementation is running.
 
 ## Remote lane and cleanup
+
+Recording continuation (2026-10-30): S-PC was unreachable, so documentation only was updated locally in `/home/markik/Code/worktrees/mere-stack-reduction-record-20261030`, using the same comparison branch. No builds or product changes were performed. Fetch the published branch before resuming either checkout.
 
 S-PC worktrees remain under `/home/markik/Code/worktrees/{mere,dramatis,eidetic}-stack-reduction-20261029` on the branches above. Preserve them for comparison. Push branches only. After comparison, retain any needed evidence and unique work, check ancestry and then explicitly choose which branches/worktrees to clean; no automatic deletion is scheduled.
 
