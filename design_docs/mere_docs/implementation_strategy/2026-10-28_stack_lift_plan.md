@@ -1,6 +1,6 @@
 # Stack lift: Graphshell component extraction
 
-**Status:** 2026-10-29: status corrected; cut on 2026-10-28 from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), the Forme second host (P6), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
+**Status:** 2026-10-29: status corrected; cut on 2026-10-28 from `2026-10-14_graphshell_stack_lift_plan.md`, archived in `archive_docs/2026-10-28/`. R1 to R8 and the `Page` split are ruled. The `door` feature (P1), the serving half `graphshell-host` (P4), the Djinn broker move (P5), the option helpers (P3, Mere side), the rule-authoring and presentation controls (P7, Scenograph and Mere View) and the component and source-ownership slice are landed and published, and the five receiving repositories are cut over. P6's Knot second-host adoption is committed locally and qualified on 2026-10-29; it has not been pushed. Open: the dependency-cone baselines (P0), the remote overmap's Turnstone receipt (P2a), `personal_sync` and the facet brief (P8), the remaining `web_tree` views and owner completions (P9), Woodshed's dataset publication (W1, W3), the canvas lifts that wait on a second host, and the browser, Woodshed-runtime and physical-device qualification the slice did not claim.
 
 **For:** extracting from the Graphshell port (about 100k lines) the parts other applications want without taking the whole port. It began when Mark noticed the reference host's size and asked what could be generalised; Knot, Cleromancy and Woodshed want its interactive capabilities, and Woodshed's own survey asks whether Mere extracts the canvas controls and editors into native-buildable crates with Woodshed as second native consumer. Each phase names a home, a prerequisite and a second-host receipt; a phase that lands code ends with that receipt, and a receipt in this repository's tests does not stand in for the other repository's build.
 Not here: the Graphshell one-tree cutover and the reference host's own phases, `2026-10-28_graphshell_host_plan.md`; the facet dissolution brief's ruling and the resident-host port that replaces `product.rs` operations with Pandect `LiveCommand` values, `2026-10-28_graph_semantics_plan.md` (the brief's owner); the Eidetic development plan's P0 inventory, which takes `capture` (Eidetic repository); SE13, SE24, SE46 to SE51 and SE78 (gestures, command-menu verb ids), `2026-10-28_scenograph_editor_plan.md`; `appearance`, which stays in Graphshell (R6) with Tabard's division in `2026-10-28_appearance_plan.md`; custody isolation, `2026-10-28_custody_plan.md`; Woodshed's manifest repins, the Woodshed lane.
@@ -58,12 +58,29 @@ Woodshed publishes the practice host dataset; `practice_disclosure` loses the Wo
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:241-252`
 
-### P6. Forme: the second host
-`platen::workspace` and `mere_view::workbench_editor` landed with the lifecycle cases; no second host (Turnstone's workbench, or Knot's desktop workspace, which already holds a `workbench` tile tree) has named and met its done condition. The scenograph editor plan records "adoption by other hosts remains pending".
-- Done when: that host unlocks, drafts, discards and applies a forme through the lifted session.
-- Needs: a second host naming its done condition.
+### P6. Forme: Knot second-host adoption (complete locally)
+`platen::workspace::FormeSession` now drives Knot's actual workspace layout draft,
+with View/menu-palette commands for Unlock, first-pane more/less space, Discard
+and Apply. Knot keeps document sessions, focus, source undo and local persistence;
+only layout state enters the shared session. Apply installs a draft after the
+host acknowledges its preferences write; failures retain it. Changed tile
+bindings and changed saved slots refuse stale application. Stable host bindings
+allow different runtime tile allocation on reopen; scratch instances and changed
+reading pins do not inherit another binding's saved layout. Unlock preserves the
+host's focused document when saved active-tab geometry is restored.
+
+The implementation is local Knot commit `2924a5f`. Its receiving tests cover the
+shared session, real source Edit/Undo through layout Discard, focus, failed saves
+and responsive compact-to-wide recovery. Native review covers explicit layout
+authoring, a fresh process loading the same pinned-reading layout on Unlock, and
+default compact presentation. The receiving record is
+`knot-editor/docs/receipts/2026-10-29_forme_workspace/README.md`.
+
+- Done when: the second host unlocks, drafts, discards and applies a forme through the lifted session. **Met by Knot.**
+- Remaining UI scope: Frisket pointer resizing, tab drags, new splits, floats, layout-undo controls and automatic source-session reopening are separate follow-ups. Responsive presentation may constrain the visible fractions to protect the writing measure; it does not rewrite the saved canonical layout.
+- Needs: no further second-host prerequisite for P6; publication remains separate.
 - Rulings: R2
-- From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:235-240,536-541,1733-1755`
+- From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:235-240,536-541,1733-1755`; Knot's receiving record above.
 
 ### P7r. Rule authoring: runtime adoption
 Rule authoring and availability-aware resolution live in Scenograph and Mere View; an independent windowless host qualifies the shared boundary. Turnstone or Woodshed runtime adoption is a separate receipt, and graph occurrence binding, renderer support and inspection remain Graphshell adapters.
@@ -102,6 +119,8 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 
 ## Findings
 
+- 2026-10-29: Knot now consumes the shared Platen workspace session in production layout commands. Its actual source-edit history and focus remain host-owned; native and receiving tests distinguish canonical layout from responsive presentation. See `knot-editor/apps/desktop/src/workspace_forme.rs`, `knot-editor/apps/desktop/src/documents.rs` and `knot-editor/apps/desktop/tests/workspace_forme.rs`.
+
 - 2026-10-29: the historical ESP fixture paths have been replaced in Djinn tests by vendored `ports/djinn/tests/fixtures/esp` inputs; Woodshed's relationship-recipe manifest includes `tempfile`. Historical failure receipts remain archived and do not establish current test status.
 
 - 2026-10-28: the app-facing half of the port is the `door` feature on `graphshell-endpoint`; Signalman and `ports/dramatis` build without the `graphshell` package. Knot's recipe editor and the shared option helpers are siblings, not copies.
@@ -116,3 +135,5 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - 2026-10-29: corrected stale receiving-failure claims and the already-satisfied P9 ruling prerequisite; runtime qualification remains open.
 
 - 2026-10-29: source-checked Knot's existing option-helper adoption; retained L4b as the separate whole-definition reducer receipt.
+
+- 2026-10-29: P6 second-host adoption completed locally in Knot (`2924a5f`), with coordinated source review, receiving tests and bounded native/fresh-process qualification; no push.
