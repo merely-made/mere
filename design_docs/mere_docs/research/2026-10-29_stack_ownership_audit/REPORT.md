@@ -25,6 +25,8 @@ Detailed evidence, exact paths, primary library documentation and deciding tests
 - [Transport, wire formats, radio and community](network.md)
 - [Storage, identity, inference and Turnstone](storage-identity-inference.md)
 
+Security reuse follow-up (2026-10-30): the [Dramatis/Castellan comparison](storage-identity-inference.md#security-reuse-follow-up-2026-10-30) maps custody, delegation and storage obligations to Bitwarden, COSE, age, UCAN, Biscuit and specialist services. Bitwarden’s local keystore is the strongest substantive partial candidate; COSE is the narrow standards-envelope candidate. Current artifacts, audit scope, native build costs and remaining authorization/freshness duties are explicit. No replacement is adopted or qualified.
+
 ## Reuse criteria
 
 Candidates below need both a concrete benefit and a compatible cost. Prefer an already-used primitive or internal consolidation when it removes the same obligation.

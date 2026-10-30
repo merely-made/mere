@@ -22,6 +22,8 @@ R01 and R02 remain open across the family. The audit records four additional ver
 
 ## Candidate follow-up
 
+The 2026-10-30 [security reuse research](../research/2026-10-29_stack_ownership_audit/storage-identity-inference.md#security-reuse-follow-up-2026-10-30) is complete as a source/specification comparison. Bitwarden keystore isolation and a narrow COSE profile are the most useful further comparisons; no implementation, platform gate or dependency adoption is implied.
+
 Prefer checking existing in-family reuse (Backstep, already-used RDF/color primitives), the comparison/codec patterns and unused Pool consumers. Cache policy, header syntax and bookmark tokenization have concrete coverage gaps, but their library choices still need benefit and cost comparison. Luggage's staging trust concern is separate from selecting an updater framework. No new implementation is running.
 
 ## Remote lane and cleanup
