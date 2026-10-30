@@ -8,7 +8,7 @@
 //!
 //! A castellan holds a keep in trust for its lord: custody without ownership,
 //! and the office of the gate. This crate is that keeper for your
-//! credentials, and it has no screens. It lives at `ports/djinn/castellan`
+//! credentials, and it has no screens. It lives at `ports/mere-resident/castellan`
 //! (graphshell stack lift plan, ruling R8, 2026-10-15), and only djinn links
 //! it. Credential release, signing and presentation happen here, inside the
 //! resident: requests arrive as participant-gate petitions and are answered

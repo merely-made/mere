@@ -28,7 +28,7 @@ public presentation and gazette announces it (ruled 2026-09-30), so the port
 that holds secrets never grows a public listener.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
-`ports/djinn/castellan`, nested under the Djinn port (graphshell stack lift
+`ports/mere-resident/castellan`, nested under the Djinn port (graphshell stack lift
 plan, ruling R8, 2026-10-15).
 
 ## State (2026-08-21)

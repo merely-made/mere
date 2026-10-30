@@ -40,7 +40,7 @@ Even a passing synthetic receiving run does not enable real consumers automatica
 
 The historical attacker decoder understands the old CryptoKit envelope. Any obtained wrapping key or available signing authority fails the new gate, but that decoder is not a positive control for Castellan's storage codec. User cancellation, missing files, arbitrary signing failures, timeouts, unavailable providers and ENOENT are not passing denials.
 
-Implementation: [service core](../../../ports/djinn/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). The harness still links the synthetic core (`djinn_custodian::synthetic`) through the `native-host` C ABI. Its receipts were retired with the residue-fix worktree on 2026-10-26; the results that matter are recorded here and in the repair plan.
+Implementation: [service core](../../../ports/mere-resident/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). The harness still links the synthetic core (`djinn_custodian::synthetic`) through the `native-host` C ABI. Its receipts were retired with the residue-fix worktree on 2026-10-26; the results that matter are recorded here and in the repair plan.
 
 ## Portable cut, 2026-10-26
 

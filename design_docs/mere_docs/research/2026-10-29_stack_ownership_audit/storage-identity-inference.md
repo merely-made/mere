@@ -46,7 +46,7 @@ Done when quoted separators/escapes, filename versus filename* precedence, encod
 
 ### 5. Consolidate atomic file replacement on a maintained primitive
 
-**Confidence: high that duplication exists; medium for an exact shared adapter.** The inspected stack has independent temporary-file/flush/rename implementations in Turnstone `src/session_graph_file.rs:84`, Personae `crates/personae/src/sealed_record_storage.rs:593`, Castellan `ports/djinn/castellan/src/custody/atomic_secret_file.rs`, and Muniment `crates/muniment/src/directory_backend.rs:227`. Their permissions, temporary naming, backup handling and directory-sync promises differ.
+**Confidence: high that duplication exists; medium for an exact shared adapter.** The inspected stack has independent temporary-file/flush/rename implementations in Turnstone `src/session_graph_file.rs:84`, Personae `crates/personae/src/sealed_record_storage.rs:593`, Castellan `ports/mere-resident/castellan/src/custody/atomic_secret_file.rs`, and Muniment `crates/muniment/src/directory_backend.rs:227`. Their permissions, temporary naming, backup handling and directory-sync promises differ.
 
 Evaluate [`atomic-write-file`](https://docs.rs/atomic-write-file/latest/atomic_write_file/) or the already-used `tempfile` building blocks through one small internal policy adapter. Do not collapse different durability guarantees into one falsely broad contract. Secret writes still require restrictive permissions and buffer treatment; graph saves still own backups. Single-file atomic replacement does not replace a multi-file transaction.
 

@@ -91,7 +91,7 @@ The `personal-facts` domain consumes Dramatis plain birth and association contra
 - 2026-10-28: the shared root's rule is that personas and the identity wallet are family-shared and everything else is app-private; the reservoir moves only meres (`crates/system/pandect/src/shared_root.rs`).
 - 2026-10-28: Eidetic's `manifest:<hash>` keys cannot use the directory backend's portable filenames, so the resident exclusively owns the Redb backend at each mere's `archive.redb`; the optional session payload extends graph codicil v2 and older payloads stay readable.
 - 2026-10-28: an explicit session discloses graph and facets and only the admitted application's view; ambient routes offer graph reads only and do not mint a session in an empty mere. Complete candidate graphs are validated before installation or journal writes; rejection creates no fork.
-- 2026-10-28: V1 and V2 proof is real two-process (`ports/djinn/tests/reservoir_two_process.rs`, `ports/djinn/tests/mere_two_process.rs`).
+- 2026-10-28: V1 and V2 proof is real two-process (`ports/mere-resident/tests/reservoir_two_process.rs`, `ports/mere-resident/tests/mere_two_process.rs`).
 
 ## Progress
 

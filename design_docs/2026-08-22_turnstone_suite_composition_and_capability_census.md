@@ -122,7 +122,7 @@ The old viewer-and-redirector restriction above is superseded by this ruling.
 
 ### Djinn is currently a stale reservation
 
-`ports/djinn` currently describes itself as a possible public name for Knot.
+`ports/mere-resident` currently describes itself as a possible public name for Knot.
 That meaning is obsolete under this ruling. Djinn is the logical
 user-scoped resident already embodied first by `graphshell_device_host` and
 the device-resident consolidation work.
@@ -552,7 +552,7 @@ incumbent application.
 
 1. Amend the Graphshell product description around overmap and routing while
    preserving its completed receipts.
-2. Repurpose `ports/djinn` from the Knot-name stub to the logical resident
+2. Repurpose `ports/mere-resident` from the Knot-name stub to the logical resident
    package and composition root.
 3. Write and execute the Knot shared-UI plan, using status as its first
    standalone plus Turnstone receipt.

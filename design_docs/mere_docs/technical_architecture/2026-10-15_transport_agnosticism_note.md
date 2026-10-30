@@ -33,14 +33,14 @@ transport-blind: it takes lines (`on_line`) and gives lines
 still needs is underneath it:
 
 1. **A route on a carrier a remote peer can reach.** `MereRoutes::serve`
-   (`ports/djinn/src/resident_mere.rs:263-332`) registers `mere/<domain>` and
+   (`ports/mere-resident/src/resident_mere.rs:263-332`) registers `mere/<domain>` and
    `ambient/mere/<domain>` on the `AppEndpointCatalog`, which wraps the same
    `ResidentEndpointCatalog` that `ResidentProjectionHost` serves
    (`ports/graphshell/src/native/app_broker.rs:134`,
    `native/projection_host.rs:203-206`). The registration is reusable; no
    dialable accept loop exposes it. The Djinn product binary runs no
    projection host over QUIC; the only Djinn projection host is Distillery's
-   chronicle over WebRTC (`ports/djinn/src/resident_distillery.rs:459-474`).
+   chronicle over WebRTC (`ports/mere-resident/src/resident_distillery.rs:459-474`).
 2. **An application identity for the dialer.** `AccessEndpoint::open`
    refuses a context with no application: "mere access requires an admitted
    application" (`resident_mere.rs:359-361`). Only the app door binds one

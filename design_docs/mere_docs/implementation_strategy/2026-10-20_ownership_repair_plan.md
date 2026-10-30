@@ -709,7 +709,7 @@ Mark's answer follows each.
   scripts **"Re-document, keep bytes (Recommended)"**; GPU patches **"Ledger all 11
   (Recommended)"**; Q052 **"Narrow claim, report all (Recommended)"**. First crate landed on
   branch `l6/misleading-success` (not merged): Q052 repaired (verdict extracted to
-  `ports/djinn/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
+  `ports/mere-resident/tests/residue_verdict`, unjudged host blocks printed with their reason, regression
   `residue_verdict_classifier` 5 tests, mutation control fails 4 of 5, the audit's probe rerun 5
   passed), Q054 verified in the worktree (djinn-testkit 14 passed), GPU findings added to the
   upstream ledger as item 14. Receipt: `support/receipts/ownership-repair/l6/2026-10-20_l6_receipt.json`.

@@ -299,7 +299,7 @@ settled-scene per-key caching (M3), a per-(member, viewport) scene set (M4).
 Arrives from the Graphshell reference host plan, whose other H4 work is done. Two operational items remain: the resident
 proved to start at login and recover from a crash on the same Windows machine through a real sign-out or reboot, and the
 retained, now disabled, interim `personae-agent` logon task finally retired. The resident host moved from Graphshell to
-Djinn, so both concern Djinn's launcher (the Windows installer under `ports/djinn`).
+Djinn, so both concern Djinn's launcher (the Windows installer under `ports/mere-resident`).
 - Done when: the interim resident task is removed only after launch-at-login and crash recovery are proved for the
   resident on the same machine, by a real sign-out or reboot receipt; the task is retired in the same change that
   replaces it, never before, and the standalone agent is kept until the replacement passes the real SSH and recovery receipts.
@@ -342,7 +342,7 @@ Djinn, so both concern Djinn's launcher (the Windows installer under `ports/djin
   the Djinn composition is what is unbuilt. `ReleaseRefV1` is at `crates/system/luggage/src/release.rs:62` and the
   WebRTC carrier's `invite.rs` uses it; `ReleaseOfferV1` and the versioned manifest are absent. Source:
   `archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md:60-64,255-259`.
-- 2026-10-06: the desktop resident is `ports/djinn` (`src/bin/djinn.rs`, `install-windows.ps1`); Graphshell ships no
+- 2026-10-06: the desktop resident is `ports/mere-resident` (`src/bin/djinn.rs`, `install-windows.ps1`); Graphshell ships no
   device-host binary. The Windows installer disables the retained Personae task after cutover. Source: `archive_docs/2026-10-28/2026-07-27_graphshell_reference_host_plan.md:81-85,828-833`.
 
 ## Progress

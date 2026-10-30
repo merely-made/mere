@@ -124,7 +124,7 @@ def main():
 
     files = set(names)
     files.update(["support/dramatis_auth_receipts.py", "support/dramatis_auth_freeze.py",
-                  "ports/djinn/tests/passphrase_change.rs", "scripts/test_dramatis_auth_tools.py"])
+                  "ports/mere-resident/tests/passphrase_change.rs", "scripts/test_dramatis_auth_tools.py"])
     depfiles = {args.artifacts / "debug/dramatis-ui.d"}
     for artifact in artifacts:
         manifest = Path(artifact["manifest_path"]).resolve()

@@ -20,7 +20,7 @@ Candidate/replay cloning can increase the peak. Report process memory separately
 from reader-record savings; this milestone makes no bounded-process-memory claim.
 
 `ports/graphshell/src/mere_host.rs` already owns GraphSession and staged storage.
-`ports/djinn/src/resident_mere.rs` shares hosts by session and sends revision
+`ports/mere-resident/src/resident_mere.rs` shares hosts by session and sends revision
 notices. Reuse that ownership and event path. Refuse an independently opened
 writer without proven ownership. Do not add a general multiwriter lock service,
 authority epochs or persistent request-receipt log for this milestone.

@@ -213,17 +213,17 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   (`door/wire.rs:62`).
 - 2026-10-30: Djinn grants routes by label in code: identity, Knot, site,
   devices, status, control, custody, reservoir, chronicle and inference
-  (`ports/djinn/src/bin/djinn.rs:1245-1339`). `CUSTODY_APPS` lists ten labels
-  (`ports/djinn/src/custody.rs:46`) and a `first_party` list four
+  (`ports/mere-resident/src/bin/djinn.rs:1245-1339`). `CUSTODY_APPS` lists ten labels
+  (`ports/mere-resident/src/custody.rs:46`) and a `first_party` list four
   (`bin/djinn.rs:1284`). Djinn launches no applications; its only child
-  processes are identity dialogs (`ports/djinn/src/identity_ui.rs`).
+  processes are identity dialogs (`ports/mere-resident/src/identity_ui.rs`).
 - 2026-10-30: `custody-wire`'s `Peer` already reads OS peer facts:
   `SO_PEERCRED`, `getpeereid` and `LOCAL_PEERPID`, a macOS audit token checked
   against the code signature's team and identifier, and a Windows pipe
-  client's process and image (`ports/djinn/custodian/wire/src/peer.rs`). The
+  client's process and image (`ports/mere-resident/custodian/wire/src/peer.rs`). The
   custodian's policy records a Windows image match as "the same-user posture
   of a polkit authentication agent, not an OS-held identity"
-  (`ports/djinn/custodian/src/policy.rs:96-108`). Its Linux platform hands a
+  (`ports/mere-resident/custodian/src/policy.rs:96-108`). Its Linux platform hands a
   child it forks one end of a socket pair (`platform/linux.rs:268`), the
   launch-handle shape D2 uses.
 - 2026-10-30: `mere:script@0.1.0` has two worlds, `app-core` and

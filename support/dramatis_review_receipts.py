@@ -55,7 +55,7 @@ def fixture(mode, capture=True):
             host.wait(timeout=30)
         remove_runtime(root)
 def consent_control():
-    source=ROOT/"ports/djinn/src/keeper/review.rs"
+    source=ROOT/"ports/mere-resident/src/keeper/review.rs"
     original=source.read_bytes()
     focused=cargo("test","-p","mere-resident","--test","quarantine_review","--features","cxf")+["--","--exact","cards_are_secret_free_scoped_and_denial_preserves_the_item"]
     flag="DRAMATIS_SYNTHETIC_CONSENT_CONTROL"
@@ -118,7 +118,7 @@ def main():
     run("app-state",cargo("test","-p","dramatis-app","--test","state"))
     run("interaction",cargo("test","-p","dramatis-app","--test","interaction"))
     run("castellan",cargo("test","-p","castellan","--features","cxf","--lib"))
-    source=ROOT/"ports/djinn/src/keeper/review.rs"
+    source=ROOT/"ports/mere-resident/src/keeper/review.rs"
     original=consent_control()
     run("store-discovery",cargo("test","-p","mere-resident","--lib","--features","cxf")+["--","--exact","resident::tests::startup_discovers_original_store_after_selected_persona_changes"])
     run("capture-build",cargo("build","-p","dramatis-app","--bin","dramatis-ui"))
@@ -128,7 +128,7 @@ def main():
     run("window-absent",[str(TARGET/"debug/dramatis-ui.exe")],env)
     fixture("locked"); fixture("unlocked")
     hashes={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in ROOT.glob("ports/dramatis/**/*.rs")}
-    owned = subprocess.check_output(["git", "ls-files", "ports/djinn/castellan", "ports/djinn", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
+    owned = subprocess.check_output(["git", "ls-files", "ports/mere-resident/castellan", "ports/mere-resident", "ports/graphshell", "ports/dramatis"],cwd=ROOT,text=True).splitlines() + ["Cargo.toml", "Cargo.lock"]
     for p in [ROOT/name for name in owned if name.endswith((".rs", ".toml", "Cargo.lock"))]:
         hashes[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     executables={name:hashlib.sha256((TARGET/"debug"/name).read_bytes()).hexdigest() for name in ["dramatis-ui.exe","dramatis-review-host.exe"]}

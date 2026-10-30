@@ -53,7 +53,7 @@ publish = false
 mere-resident = { path = %s, default-features = false }
 djinn = %s
 graphshell-endpoint = { path = %s, default-features = false, features = ["projection-door", "projection-provider"] }
-''' % (json.dumps(str(root / "ports/djinn")), djinn_dependency,
+''' % (json.dumps(str(root / "ports/mere-resident")), djinn_dependency,
        json.dumps(str(root / "crates/graphshell/graphshell-endpoint")))
 manifest += "\n\n".join(["", *patches]) + "\n"
 # Fail before writing if extraction accidentally produced invalid TOML.

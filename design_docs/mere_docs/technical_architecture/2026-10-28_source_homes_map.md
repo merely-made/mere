@@ -144,7 +144,7 @@ every copy is one more edge for a move to carry.
     - Every installer defines one principal, `djinn`.
     - Its grants (`custodian/packaging/djinn-grants.json.in`) are the union of
       every app's salts.
-    - They repeat Djinn's `ReleasePolicy` (`ports/djinn/src/custody.rs`). One
+    - They repeat Djinn's `ReleasePolicy` (`ports/mere-resident/src/custody.rs`). One
       test is the only check that the two agree.
 - **Transport.**
   - Consumers call `P2pandaTransport`'s own p2panda and iroh methods rather

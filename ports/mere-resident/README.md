@@ -117,7 +117,7 @@ on the target or replacing its existing `ssh-agent`. The optional last two
 arguments set the resident's memory ceiling and CPU quota:
 
 ```sh
-bash ports/djinn/install-linux.sh /path/to/djinn /path/to/personae-vault 768M 50%
+bash ports/mere-resident/install-linux.sh /path/to/djinn /path/to/personae-vault 768M 50%
 systemctl --user start --no-block djinn.service
 ```
 

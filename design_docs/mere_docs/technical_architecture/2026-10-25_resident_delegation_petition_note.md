@@ -19,7 +19,7 @@ in Turnstone's `denizen.rs`.
 - **Custody signs without looking.** `CustodyIdentity::issue_certificate`
   checks only that the certificate is well formed and that the issuer is the
   master. It then sends a plain `CustodyCall::Sign` under the scope's salt.
-  Djinn's `sign()` (`ports/djinn/src/custody.rs`) checks `policy.allows_act`
+  Djinn's `sign()` (`ports/mere-resident/src/custody.rs`) checks `policy.allows_act`
   against `with_act(Persona, Prefix(delegation_signing_prefix("mere.denizen")))`.
   That rule covers the domain only, so custody never sees the subject, the
   capability, the resource or the expiry, keeps no record, and shows the

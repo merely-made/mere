@@ -165,7 +165,7 @@ workspace needs the `p2panda-core` patch row; the second Retinue copy (0.2.0, fo
   live crate has no per-interface sockets), and ruling 26 keeps it out until diagnosed. Has the diagnosis been done? From:
   `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:611-616,1264-1272`
 - Do the three knot-desktop Collapse tests still fail on Knot's `main`? From: `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:941-949`
-- Do the lane-reported code-comment drifts still hold: `ports/djinn/src/pairing.rs:46-48` (the host never writes settings
+- Do the lane-reported code-comment drifts still hold: `ports/mere-resident/src/pairing.rs:46-48` (the host never writes settings
   back, while `personal_sync.rs` writes hints), `peer_id.rs:11-14` (a `PeerID` derives from the master, while hosts pass
   per-graph seeds), and `djinn --pairing-facts` computing the group pre-key and omitting it from its output? From:
   `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:1044-1049`

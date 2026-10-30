@@ -89,7 +89,7 @@ Every real gap is in **crypto agility**, not in crypto choice.
 
 Verified in code, 2026-08-24:
 
-- `ports/djinn/castellan/src/custody/passphrase_storage.rs` — the on-disk
+- `ports/mere-resident/castellan/src/custody/passphrase_storage.rs` — the on-disk
   `EncryptedFile` carries `version`, `salt`, `profiles`. It does **not** carry
   the Argon2 cost parameters; `grep` for `m_cost`/`t_cost`/`p_cost` across both
   `passphrase_storage.rs` and `passphrase_root.rs` returns nothing. The module
