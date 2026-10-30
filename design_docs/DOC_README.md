@@ -297,7 +297,7 @@ Root-level briefs that span multiple area-docs (not required reading).
 - [low_power_managed_network_plan](mere_docs/implementation_strategy/2026-10-28_low_power_managed_network_plan.md) — **cut 2026-10-28**: low-power radio and the managed network; keeps its decisions.
 - [moot_protocols_plan](mere_docs/implementation_strategy/2026-10-28_moot_protocols_plan.md) — **cut 2026-10-28**: what still holds of the protocol architecture, federation interop, commitment proofs.
 - [family_update_resident_plan](mere_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md) — **cut 2026-10-28**: Luggage and the Djinn update resident, the device resident's remaining acceptance receipts.
-- [site_publication_plan](mere_docs/implementation_strategy/2026-10-28_site_publication_plan.md) — **cut 2026-10-28**: smolweb publication and site hosting, the governed hosting follow-ons; P10 portable reader verification implemented locally 2026-10-29, with supplied-history freshness scope and isolated-process proof.
+- [site_publication_plan](mere_docs/implementation_strategy/2026-10-28_site_publication_plan.md) — **cut 2026-10-28**: smolweb publication and site hosting, the governed hosting follow-ons; P10 portable verification and P11 remembered-authority rollback refusal implemented locally through 2026-10-30, with explicit freshness scopes and reader-process proofs.
 - [graph_behaviors_plan](mere_docs/implementation_strategy/2026-10-28_graph_behaviors_plan.md) — **cut 2026-10-28**: Servitor behaviors and resident runs; where Rhai command packs and the authoring pane live now.
 - [alembic_implementation_plan](mere_docs/implementation_strategy/2026-10-28_alembic_implementation_plan.md) — **cut 2026-10-28**: the Alembic and Athanor workshop and the image-store GC pass; keeps its decisions.
 - [resident_inference_plan](mere_docs/implementation_strategy/2026-10-28_resident_inference_plan.md) — **cut 2026-10-28**: the djinn inference lane and recall and search.
@@ -919,7 +919,10 @@ is historical evidence, not the current path or ownership inventory. For the wor
   enduring hosting grant. Portable reader verification uses an independently
   configured founder/collection anchor and only claims validity under supplied
   history; provider identity and content digests alone supply no publication
-  authority or newest-state guarantee. See the [site publication plan](mere_docs/implementation_strategy/2026-10-28_site_publication_plan.md#p10-portable-reader-verification-2026-10-29)
+  authority or newest-state guarantee. Remember valid authority changes even when
+  content verification refuses; persist their union transactionally before
+  returning a page, so a later older provider cannot undo an observed withdrawal.
+  See the [site publication plan](mere_docs/implementation_strategy/2026-10-28_site_publication_plan.md#p10-portable-reader-verification-2026-10-29)
   and the [shared site plan](archive_docs/2026-10-28/2026-10-20_shared_site_model_plan.md#moot-publication-binding-2026-10-21).
 
 - **Retained recall context (2026-10-20):** generation receives numbered passage text; full owner/version/selector identity stays in sealed run evidence and current-head citation admission. Fourteen focused recall cases and both ordinary resident routes pass; the combined custody/inference fixture qualifies both Knot-selection and Redshank-note native receiving/cold pairs in Turnstone. The final merged-shell SDK `7edfe3b09` also passes both native warm/cold pairs; the fixed-question and short-word citation/model bounds remain explicit under the [resident I10 gate](archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md#i10-the-envelope-and-a-vector-lane).

@@ -20,6 +20,8 @@ use super::{
 };
 use crate::{MAX_ENCODED_SNAPSHOT_BYTES, PublishedSnapshotV1};
 
+pub mod history;
+
 /// Obtain this anchor independently of the serving provider. The founder is
 /// Gemot's constitutional root; a collection names the particular site to read.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -50,12 +52,15 @@ impl Default for ReaderLimits {
     }
 }
 
-/// The only freshness assertion made by this stateless verifier. A valid older
-/// drop can omit later replacement or revocation. Persistent observations and
-/// rollback refusal belong to a later reader-history owner.
+/// History considered by verification. Neither scope proves global freshness.
+/// The stateless verifier sees supplied history only; [`history::ReaderHistory`]
+/// also preserves previously observed authority across reads and restarts.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EvidenceScope {
     SuppliedHistoryOnly,
+    /// Valid against supplied evidence merged with durably remembered authority.
+    /// Unseen newer evidence elsewhere can still exist.
+    SuppliedAndRememberedHistory,
 }
 
 #[derive(Clone, Debug)]

@@ -217,7 +217,7 @@ when the existing authority path cannot establish an effective selection.
 A successful result explicitly means **valid under supplied history**. It cannot
 prove that a provider supplied all newer authority/revocation records. Each call
 starts empty and has no remembered frontier, so it does not provide known-rollback
-protection; a persistent reader history owner is a later slice. The snapshot V1
+protection; P11 adds a separate persistent reader history owner. The snapshot V1
 schema version is never a release sequence. Provider discovery and TLS identity
 remain separate from this publication trust anchor.
 
@@ -226,9 +226,48 @@ remain separate from this publication trust anchor.
   authority, invalid signed records, ambiguous selections, known withdrawal and
   bounded-input failures refuse; an older valid evidence set succeeds with its
   explicit freshness limitation. The proof covers Gemini, Scroll and Micron.
-- Follow-ons: persistent reader observations and rollback refusal; minimal public
-  authority export; transport framing/acquisition; daemon evidence delivery and
+- Continuation: P11 implements remembered reader observations and rollback refusal.
+  Follow-ons: minimal public authority export; transport framing/acquisition; daemon evidence delivery and
   exact-release custody acknowledgement; independent-machine serving.
+
+### P11. Remembered reader authority (2026-10-30)
+
+**Status:** implemented and locally checked, 2026-10-30. Extend P10 with a
+caller-owned transactional Muniment store partitioned by the full
+founder/Moot/collection trust anchor.
+
+The API is `mere_site::publication::reader::history::ReaderHistory`. Its
+`observe` method commits admitted history without requiring content, while
+`verify` observes first and opens a snapshot against the merged history. A
+successful read returns `EvidenceScope::SuppliedAndRememberedHistory`.
+
+The reader reimports remembered Gemot evidence and the provider's complete drop
+into disposable stores, then persists their re-exported union. It does not rank
+releases by timestamp, schema version or a provider counter. A missing newer
+operation in the incoming drop cannot remove an observed replacement, withdrawal,
+revocation or conflict from the local authority fold.
+
+Authority observation commits independently of content verification: valid new
+history remains remembered even if the requested snapshot is missing, invalid or
+no longer selected. Invalid imports and failed storage commits produce no new
+observation. State metadata and full evidence bytes commit atomically with a
+comparison against the previously read pair; concurrent writers retry rather
+than overwrite a newer observation. Both reads use transactional snapshots.
+Persist the reader's evaluation-time high-water mark and refuse a backwards
+clock; this is local policy, not a publication sequence.
+
+Success still cannot establish global newest state. Remembered history survives
+ordinary process restart but relies on the host preserving the local store:
+deletion or replacement of the entire store with an older valid backup is outside
+this proof. Corrupt or incomplete state refuses instead of resetting silently.
+Full retained history remains bounded; exceeding capacity refuses without pruning.
+
+- Done when: a fresh process reopens reader storage and refuses an older snapshot
+  after replacement; observation of withdrawal/revocation persists even when the
+  associated page read refuses; malformed evidence, corrupt storage, failed writes,
+  capacity, backwards time and concurrent stale commits cannot weaken memory.
+- Follow-ons: host adoption, protected local storage/backup policy, selective
+  evidence retention/checkpoint handling, acquisition/discovery and device proof.
 
 ## Open questions
 
@@ -248,6 +287,19 @@ remain separate from this publication trust anchor.
   preferences introduce no variant negotiation. Is it to be designed, and by whom? From: `archive_docs/2026-10-28/2026-10-20_shared_site_model_plan.md:383-385,468-469`
 
 ## Findings
+
+- 2026-10-30: `crates/domain/site/src/publication/reader/history.rs` retains a
+  bounded full-evidence union plus trust identity, digest and evaluation-time
+  high-water mark in one Muniment transaction. It imports into disposable Gemot
+  stores, commits admitted authority before content verification, and compares
+  both stored records before writing. Final read validation refuses a concurrent
+  observation. `crates/domain/site/tests/reader/remembered.rs` covers Redb-backed
+  process reopen, remembered replacement/withdrawal/revocation/conflict, invalid
+  evidence and content, clock rollback, corrupt/incomplete state, transaction
+  refusal/failure, capacity and stale writers. Re-export uses Gemot's existing
+  complete native drop; history is not replaced by a release counter. Host
+  adoption, pruning/checkpoint policy and protection against whole-store rollback
+  remain open.
 
 - 2026-10-29: `crates/domain/site/src/publication/reader.rs` verifies provider
   evidence using an independently configured founder and collection, Gemot native
@@ -293,3 +345,7 @@ remain separate from this publication trust anchor.
   implemented in the local worktree. The supplier proof preserves existing
   publication/history behavior and schema V1. Persistent rollback observations,
   selective evidence export, daemon delivery and consumer adoption remain open.
+
+- 2026-10-30: P11's remembered-authority adapter and persistent reader-process
+  proof are implemented locally. P10 remains available as a stateless verifier;
+  both scopes still allow unknown newer history elsewhere.

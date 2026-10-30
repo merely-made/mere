@@ -463,3 +463,6 @@ fn replacement_resolves_from_history_and_refuses_the_previous_snapshot() {
         );
     });
 }
+
+#[path = "reader/remembered.rs"]
+mod remembered;
