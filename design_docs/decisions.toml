@@ -10,6 +10,83 @@ area = "Stack"
 summary = "Servitor remains in Eidetic while Alembic composes its admission and run contracts."
 draws_on = ["stack.1"]
 
+[decisions."alembic-implementation D9"]
+title = "private-source support first (2026-10-28)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_alembic_implementation_plan.md"
+area = "Stack"
+summary = "Private source and derived-state protection precede further workshop UI completion."
+draws_on = ["stack.1"]
+
+[decisions."cambium-composition D1"]
+title = "one flat owner table in the pane runner"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Live settings rows live in one flat owner table inside the pane's existing runner, not a runner and mount per row."
+
+[decisions."cambium-composition D2"]
+title = "hidden rows keep state and stop rendering"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Hidden rows keep their state and subscriptions but leave focus and accessibility and stop rendering."
+
+[decisions."cambium-composition D3"]
+title = "undoing a deletion recreates a clean control"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Undoing a confirmed deletion recreates a clean row from its descriptor; no tombstone cache."
+
+[decisions."cambium-composition D4"]
+title = "a move commits an active IME composition, then moves"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Moving a row mid-composition commits the IME text as a focus loss would, then moves."
+
+[decisions."cambium-composition D5"]
+title = "moves stay within one pane"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "The pilot moves rows only within one settings pane; cross-pane and cross-document moves are refused."
+
+[decisions."cambium-composition D6"]
+title = "outside changes are caught at Apply"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "A dirty row keeps its edit through outside changes; Apply's revision guard catches the conflict."
+
+[decisions."cambium-composition D7"]
+title = "a dirty row cannot be rebound"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Rebinding a row with an unapplied edit is blocked until the edit is applied or discarded."
+
+[decisions."cambium-composition D8"]
+title = "one write authority with revisions"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Turnstone's settings writes go through one application-owned authority with revision-guarded Apply."
+
+[decisions."cambium-composition D9"]
+title = "arrangement in pane config, view state apart"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "The authored arrangement is saved in the settings pane config; expansion and scroll in view-state."
+
+[decisions."cambium-composition D10"]
+title = "a small rows, groups and drawers tree"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "The authored composition is a small rows, groups and drawers tree."
+
+[decisions."cambium-composition D11"]
+title = "selective updates stay as P4"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Selective updates remain this plan's P4."
+
+[decisions."cambium-composition D12"]
+title = "Meristem reports through existing tracing"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Meristem reports its decisions through its existing tracing dependency, with no observer hook."
+
+[decisions."cambium-composition D13"]
+title = "producer references with multi-cause edges"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "Observations carry producer references, and bounded edge records keep every cause of a join."
+
+[decisions."cambium-composition D14"]
+title = "P4–P6 stay outlines until P2 lands"
+source = "design_docs/cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md"
+summary = "P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table."
+
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"

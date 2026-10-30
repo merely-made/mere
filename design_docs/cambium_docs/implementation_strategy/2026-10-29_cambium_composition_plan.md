@@ -12,8 +12,9 @@ separate from these source changes. Earlier findings retain the pre-P0 baseline.
 regroups, hides and saves them. Turnstone's settings pane is the first consumer.
 The requested selective-update and causal-diagnostics work is included.
 Mark requested the concrete design on 2026-10-29 and then asked to reconcile
-this plan with the presentation plan. The technical choices below are proposed
-defaults, not additional maintainer rulings.
+this plan with the presentation plan. He ruled on fourteen of its choices the
+same day (Decisions, D1–D14); the other technical choices remain proposed
+defaults.
 
 The [presentation plan](2026-10-28_cambium_presentation_plan.md) owns browser
 tenants, UA widgets, whole-pane/portable-tile movement and host qualification.
@@ -38,7 +39,7 @@ The original Q1–Q5 alternatives are folded into these proposed contracts.
 | Disagreement | Reconciled proposal and reason |
 |---|---|
 | Flat instance table or runner/mount per row | One flat retained table in the existing pane runner. Placement changes do not own lifetime; ordinary rows share focus, capture and dispatch authority. Whole panes keep RetainedMount. |
-| External writes and rebinding discard drafts or preserve them | Preserve dirty drafts and surface conflicts. Explicit rebind resolves the old draft through Apply/Discard/Cancel; a revision guard prevents silent overwrite. |
+| External writes and rebinding discard drafts or preserve them | Preserve dirty drafts. An outside change shows no live conflict; Apply's revision guard refuses a stale write and offers theirs or yours (D6). A dirty row cannot be rebound until its edit is applied or discarded (D7). |
 | Hold deleted instances for undo or destroy on confirmed deletion | Resolve dirty/pending work before confirmed deletion, then dispose. Undo recreates a clean incarnation. Live tombstone retention is deferred; hide and move still retain the same instance. |
 | Composition in pane config or pane view-state | Authored structure/bindings in turnstone.settings.config; remembered expansion/scroll under the pane's view-state policy. Drafts and runtime machinery never persist. |
 | Selective scheduling excluded or included | Included as P4, using explicit dependencies and bounded dirty entries. Commands remain individually delivered. |
@@ -73,15 +74,17 @@ Turnstone's settings pane should allow a person to start editing a setting,
 reorder the row, move it into a group or drawer, hide and reveal that group,
 move the containing pane between windows, and apply the original draft to the
 original setting. Saving the arrangement must not apply or erase that draft.
-Another committed settings change must either refresh a clean row or leave a
-dirty row with an explicit conflict. It must never silently replace the edit.
+Another committed settings change refreshes a clean row and leaves a dirty
+row's edit in place; the conflict surfaces when Apply's guard is refused (D6).
+It must never silently replace the edit.
 
 The first composition vocabulary is rows, ordered groups and collapsible
 groups/drawers within the settings pane. Whole-pane docking, floating and
 window assignment continue to use Turnstone's existing frame model. A row
 does not become a catalogued product surface merely because it has a component
 identity. Cross-pane row transfer, arbitrary scripting, a visual Rust editor,
-code hot reload and a general plugin marketplace are outside this pilot.
+code hot reload and a general plugin marketplace are outside this pilot; rows
+move only within one pane (D5).
 
 The implementation has three authorities:
 
@@ -131,7 +134,7 @@ The following names describe proposed contracts, not existing Rust APIs.
 live component identity. Diagnostic subjects include their owner namespace.
 
 The composition view owns a flat table keyed by durable component keys,
-inside the pane's existing runner. Each entry retains its current view, opaque
+inside the pane's existing runner (D1). Each entry retains its current view, opaque
 view state (including typed component-local state), element, subscriptions and
 pending freshness independently of the group that presents it. The placement
 tree names these entries; group reconstruction does not recreate their bodies.
@@ -204,9 +207,10 @@ owner to a valid old station or explicit parking; it cannot drop the draft.
 
 Same-document moves preserve DOM identity, local selection and scroll state.
 The target host recomputes bounds, clips and accessibility mappings. Active
-pointer capture is cancelled before transfer. In v1 an active IME composition
-defers the move until composition ends, or until an explicit cancel; native
-composition is not assumed transferable. Cross-window focus is restored only
+pointer capture is cancelled before transfer. In v1 a move commits an active
+IME composition, as a focus loss would, and then moves (D4); native
+composition is not assumed transferable. The host must be able to force that
+commit, which nobody has checked for Genet. Cross-window focus is restored only
 after target custody and native focus admission. Hidden controls are absent
 from the active accessibility projection even while their DOM is retained.
 
@@ -217,36 +221,39 @@ serializing Meristem's opaque `ViewState` is not that contract. Whole-pane
 window custody and its headed qualification remain PT1 in the
 [presentation plan](2026-10-28_cambium_presentation_plan.md#pt1-retained-dom-lane-owners-portable-tiles-p1-re-grounded-2026-10-29).
 
-Collapsing a group or switching an inactive tab hides its owners. Removing a
+Collapsing a group or switching an inactive tab hides its owners; they keep
+their state and stop rendering (D2). Removing a
 row or closing/destroying its pane retires them. Proposed pilot deletion policy:
 a dirty row offers Apply, Discard or Cancel; a pending Apply must settle or be
 cancelled at its actual owner before deletion. Undoing a move/group edit keeps
 the live instance. Undoing a confirmed deletion recreates a clean instance from
-the saved descriptor, with a new incarnation; v1 promises no deleted-draft
+the saved descriptor, with a new incarnation (D3); v1 promises no deleted-draft
 resurrection and retains no unbounded tombstone cache.
 
 ### Binding and draft rules
 
 A row holds committed value/spec, the source revision guard, local draft and
 local edit generation. Draft states are clean, dirty, applying, conflicted or
-unavailable. These are UI states; the provider alone declares write success.
+unavailable; a row becomes conflicted only when Apply is refused (D6). These
+are UI states; the provider alone declares write success.
 
 | Event | Draft and binding outcome |
 |---|---|
 | Edit | Change only local draft, increment local generation and request an interactive refresh. No settings write. |
 | Equal inputs / placement change | Retain draft, binding and local control state. No source read or body evaluation merely to move. Layout can still change. |
 | New source revision while clean | Adopt the coherent current value and guard. Update the control only where its inputs changed. |
-| New source revision while dirty | Preserve the draft. If its guarded write scope or control semantics changed, mark conflicted; an unrelated domain change is not a conflict. Refreshing a label alone does not reset the editor. |
+| New source revision while dirty | Preserve the draft and the guard it was edited against; show no live conflict (D6). A changed write scope surfaces when Apply is refused; changed control semantics follow the incompatible-schema row below. Refreshing a label alone does not reset the editor. |
 | Apply | Capture instance, binding generation, target owner incarnation, expected write revision, local edit generation and a unique request id. Validate and commit at the owner. Keep the draft until an acknowledged result. |
 | Successful Apply | Publish only after persistence succeeds. Acknowledge the exact committed value/revision. Mark clean only if the current draft still matches the captured edit generation; edits made during an asynchronous Apply remain dirty. |
-| Conflict / validation / storage failure | Preserve the draft and show the typed reason. Conflict offers reload/discard or explicit review and retry against a fresh guard. No automatic last-writer-wins retry. |
+| Conflict / validation / storage failure | Preserve the draft and show the typed reason. Conflict offers theirs (discard and adopt the current value) or yours (review, then retry against a fresh guard). No automatic last-writer-wins retry. |
 | Source disappears / becomes read-only | Preserve the draft as unavailable, disable Apply, revoke old admission and show the reason. A returning source with a new owner incarnation requires revalidation. |
 | Schema/control becomes incompatible | Do not reinterpret old editor state as the new type. Preserve the old draft for resolution; rebuild a clean control only after discard or a declared, tested migration. |
 
 Rebinding is explicit. Resolve and validate the proposed target first. A clean
-row can adopt it with a new binding generation; a dirty row must Apply to the
-**old** target, Discard, or Cancel before adoption. V1 has no implicit
-"carry this draft to the new setting" operation. Replace subscriptions as one
+row can adopt it with a new binding generation. A dirty row cannot be rebound:
+the rebind control is disabled, with its reason, until the edit is applied or
+discarded (D7). V1 has no implicit "carry this draft to the new setting"
+operation. Replace subscriptions as one
 binding transaction and mark the new target stale. A failed resolution leaves
 the old binding intact. Late responses must match instance, binding, owner and
 request generations before installation; movement does not invalidate a
@@ -265,7 +272,7 @@ the existing API but cannot claim guarded writes; no default method may
 pretend a read followed by `apply` is atomic.
 
 Turnstone must make all participating settings panes and theme-choice writes
-use one application-owned authority, rather than independent cached providers.
+use one application-owned authority (D8), rather than independent cached providers.
 Begin with named revision domains for appearance choice, shell chrome,
 behavior settings and the theme catalog. A row subscribes only to its relevant
 domains. The owner returns the write guard for the domain being edited; this
@@ -283,6 +290,14 @@ protocol is required before claiming that scope. A pre-write file read or
 atomic rename alone is insufficient. Persistence stays with the existing
 Pandect application-settings path/API, not a Cambium side store.
 
+A remote edit proposal through Murm's optional live interaction layer (Murm's
+`design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`, O2–O3)
+would be one more writer: its exported object submits through this authority,
+never the provider. Request ids are correlation only today, and a redelivered
+Apply is refused by its stale guard. Before remote writers are admitted, a
+redelivery must return its original outcome, which is the domain-owned
+idempotency that plan's O3 asks for.
+
 Keep theme-library editing distinct from selecting/applying a theme. A catalog
 refresh updates available definitions; it does not silently adopt saved bytes
 under the currently selected theme id. Preserve Turnstone's existing explicit
@@ -293,14 +308,15 @@ Apply behavior and its live appearance snapshot.
 Store the authored tree and component descriptors in the existing
 `turnstone.settings.config` pane payload: versioned row/group kinds, stable
 keys, ordered placements, setting bindings and supported presentation options.
-Use existing pane/view persistence policy for remembered expansion and scroll.
+Use existing pane/view persistence policy for remembered expansion and scroll
+(D9).
 Runtime instances, DOM ids, callbacks, subscriptions, pending requests and
 unsaved setting drafts are not serialized. Saving the composition leaves live
 drafts untouched; restart restores the composition with fresh owner snapshots
 and clean drafts.
 
 The product registers the allowed component kinds and validates their
-configuration. V1 needs a settings row and group/drawer, not a global registry
+configuration. V1 needs a settings row and group/drawer (D10), not a global registry
 of all application objects. Reject duplicate placements, cycles, unsupported
 versions and malformed bindings before replacing the live composition. Unknown
 kinds or temporarily missing settings retain their authored descriptor and
@@ -322,63 +338,21 @@ change to the generic `PaneConfig` container.
 
 ### Selective updates and scheduling
 
-There are two questions: which retained owner is stale, and when its next
-projection should be produced. A cheap composition-root call may still occur
-in the pane runner; unchanged entries must skip both their registered view
-factory and component body. Stable descriptor handles/factories prevent the
-root logic from eagerly recreating every row before the table can skip it.
-Declare dependencies explicitly in v1. Do not
-add a global application-change counter or an automatic signal for every field.
-A future tracked-read interface must produce the same dependency set and must
-not become a second owner of domain state.
+P4 stays in this plan (D11) and is an outline until P2 lands (D14). Its
+detailed design is written from P2's result; the 2026-10-29 draft is in this
+file at Mere `01fce8a78`, a starting point rather than a commitment.
 
-Each owner tracks its last evaluated revision vector, desired revisions, local
-and config generations, visibility and update policy. Cambium maintains a
-subscription index and at most one queued render job per live instance.
-Repeated invalidations merge reasons and advance desired revisions; their
-causal edges remain observable within configured diagnostic bounds. The
-scheduler compares full inputs before body evaluation and emits an explicit
-unchanged-input skip. A memoized child-body skip and avoiding the outer view
-constructor are different outcomes and need distinct counters/events.
-
-Policies are interactive (draft/focus feedback at the next legal event-loop
-flush), next-frame (ordinary shared state) and bounded-rate (telemetry). Hidden
-owners defer ordinary reconstruction and catch up before becoming actionable.
-They keep a latest revision vector rather than every intermediate payload.
-Continuous visible input cannot starve a pending ordinary update; a per-frame
-budget and carry-forward queue make deferral explicit. Audio and other domain
-engines continue on their own schedules.
-
-Commands are never coalesced by this scheduler. Two clicks dispatch twice,
-even if the owner rejects one as stale/conflicting. Completion, cancellation,
-validation and subscription maintenance continue while rendering is deferred.
-Keep existing async request generations; dependency freshness does not replace
-stale-result admission. Work requested during a rebuild remains queued for a
-later pass, using a newer generation; clearing the current job must not clear
-that invalidation or recurse into reconstruction.
-
-Mark an admitted row message's owner-table entry locally dirty even when its
-result is `Nop`: component-local state may have changed without an application
-action. Rejected stale routes do not become new commands. P4 observes local
-edits as well as source revisions so equal committed props cannot suppress
-draft or focus feedback.
-
-Add an opt-in scheduled dispatch/flush path in Cambium's runner, preserving the
-existing eager API for current callers. It must process each message and mark
-local work without automatically rebuilding the entire pane after each message.
-The existing `update_deferred` is a paint-only escape hatch, not this semantic
-update queue. Structural edits and target changes require a flush/admission
-barrier before later input can use the changed tree.
-
-For each flush, capture a coherent committed snapshot and revision vector from
-the participating owner. Related settings rows and their status/Apply state
-must reflect that snapshot; publish their updated mutations as one presentation
-transaction or keep the previous coherent result with an explicit pending
-state. A data snapshot changing during evaluation schedules another pass.
-Future document, selection and Undo projections need an owner-issued shared
-commit boundary; the scheduler cannot synthesize atomicity across unrelated
-stores. Coherence is per presentation: different windows may display different
-committed revisions, but each reports the one it actually presents.
+- Dependencies are declared per owner as named domain revisions. No global
+  application-change counter and no automatic per-field signal.
+- At most one queued evaluation per live instance; repeated invalidations
+  merge. An unchanged-input skip avoids both the view factory and the
+  component body; a memoized child skip is a different outcome, counted
+  separately.
+- Commands are never coalesced: two clicks dispatch twice.
+- Hidden owners defer and catch up before they become actionable.
+  Continuous input cannot starve an ordinary update.
+- Each flush presents one coherent owner snapshot. `update_deferred` stays a
+  paint-only escape hatch, not this queue.
 
 ### Diagnostics are part of the contract
 
@@ -396,50 +370,27 @@ for emitting them. Record causes where decisions happen.
 | Genet | Mutation batch admitted, which work it required (style/layout/paint or none), produced layout/render revision and failure. This is renderer evidence, not a Cambium guess from DOM-mutation counts. |
 | Host | Window/surface incarnation, committed presentation revision and actual frame/submission/presentation outcome at the boundary available on that host. |
 
-Carry the runtime identities above plus run/source/source-boot, producer event
-sequence, operation/request id, and explicit causal references. Define
-versioned structured events and reason enums. Human labels may be resolved by
-the product when displaying a subject; they are not buffered in these events.
-Cambium invalidations refer to the owner revision that caused them. Each update
-names the invalidations it consumed; resulting mutation batches name that
-update. Genet and the host carry those references forward. A mutation count is
-not proof that layout ran, and an operation id alone is not a causal edge.
+The rest of this section is an outline until P2 lands (D14); the 2026-10-29
+detail is in this file at Mere `01fce8a78`.
 
-Registry already has `DiagnosticCorrelation` (run/source/operation), bounded
-ingress and product-projected `RegistryCollector` history. Apparatus in
-`armillary/crates/apparatus-core/src/observation.rs` has `RecordRef`, subject,
-revision and frame metadata, but one optional primary `cause`. It does not
-already provide a complete multi-parent UI graph. Use a versioned UI decision
-payload and separate cause-edge records for coalesced parents, within existing
-history limits. Producer references must exist at emission; the product bridge
-maps them to `RecordRef` only when the exact record is known. Preserve unresolved
-references and explicit gaps when collection order, sampling or eviction makes
-the record unavailable. Do not rewrite an old record or infer a parent from a
-timestamp. Keep the mapping and pending joins bounded too.
-
-Install the producer/collector bridge in Turnstone with explicit lifetime,
-redaction, thread routing and drain policy. Use Registry's structured `Event`
-path rather than disguising an update as a channel message. Never buffer raw
-drafts, settings values, arbitrary debug payloads or source addresses in order
-to redact them later. Optional collection, no sink, queue rejection and history
-loss must not change scheduling or command outcomes. Summary counts and omitted
-cause counts expose bounded detail. Tests asserting that something did not
-rebuild must verify collection coverage and zero loss for their observation
-interval; missing events alone are not proof of absence.
-
-Turnstone already has `turnstone/src/diagnostic_observations.rs`, an installed
-redacted `AppEvent` category store with independent reads and scenario export.
-Extend that product diagnostics integration to receive the new producer stream;
-preserve its current app-event source and receipt behavior. Its default metadata
-does not supply operation correlation, so categories cannot be retroactively
-treated as the missing causal events. A new payload/source adapter in the same
-diagnostics facilities is required, not a second component-inspector subsystem.
-
-The intended chain is owner revision → invalidation(s) → component update →
-mutation batch → Genet work → a named host frame. Where the frame bridge is
-missing, the trace ends explicitly at the last proven milestone. Submitted,
-captured and presented remain different outcomes. The existing M7 exact-frame
-and delayed-readback gate is not closed by adding these producers.
+- Events are versioned, with fixed reason enums. They carry the identities
+  above, a producer sequence, an operation/request id and explicit causal
+  references. Labels, setting values, drafts, bearer capabilities and
+  invitation secrets never enter an event.
+- Causes use producer references plus bounded cause-edge records for
+  coalesced parents (D13), over apparatus-core's single `cause`. An
+  unresolved reference stays an explicit gap; no parent is inferred from a
+  timestamp.
+- Turnstone extends `turnstone/src/diagnostic_observations.rs` with the
+  producer stream through Registry's structured `Event` path, not a second
+  inspector store. Collection loss never changes scheduling or command
+  outcomes, and a test claiming that something did not rebuild proves zero
+  loss over its interval.
+- The chain is owner revision → invalidations → update → mutation batch →
+  Genet work → named host frame, ending explicitly at the last proven link.
+  These producers do not close M7's exact-frame gate.
+- A cause arriving from a remote peer, if Murm's live interaction lands, is
+  referenced by its session epoch and request id, never by a capability.
 
 ### Exactly what reaches Meristem
 
@@ -469,6 +420,11 @@ core adapters report their own decisions; Cambium's component/runner boundary
 reports its lifecycle and full route outcome. A renderer-neutral optional
 observer hook is a later alternative only if tracing cannot meet a demonstrated
 coverage/overhead requirement. It is not a prerequisite to retained components.
+
+Tracing is the ruled path (D12). Turnstone installs one global subscriber whose
+default filter is `turnstone=info` (`turnstone/src/launch.rs:27-30`), which
+drops Meristem's and Cambium's events. The bridge needs its own targets in
+that filter, or its own layer.
 
 ### Change ownership and compatibility
 
@@ -552,21 +508,28 @@ lands; this design does not authorize a release or claim external compatibility.
 
 ### P4. Selective updates with coherent flushes
 
-- Add explicit subscriptions, scheduled dispatch/flush, bounded dirty queues, revision/input skips and hidden catch-up. Keep interactive updates prompt and ordinary work nonstarving.
-- Done when: a deterministic two-panel fixture has independent dependencies and one shared dependency; advancing one leaves the other's view constructor and body counts unchanged, shared changes update both coherently, and repeated invalidations yield one queued evaluation. Two commands still execute twice. Hidden updates defer and catch up before admission; invalidation during evaluation is not lost; stale async results remain rejected. A synthetic meter cannot rebuild an unrelated editor. No global application counter is needed.
-- Needs: P2's retained boundaries and P1 snapshots. Production settings demonstrates the same dependency behavior; synthetic telemetry does not add a product meter.
+Outline (D14). Goal: rebuild only the rows whose declared inputs changed.
+Done when a two-panel fixture with one shared and two independent
+dependencies shows untouched panels skipping their factory and body, shared
+changes landing coherently, and commands still dispatching once each.
+Needs P2.
 
 ### P5. Connected diagnostic evidence
 
-- Add Meristem decision events, connect Cambium events to Registry's product collector, and inventory then wire the applicable Genet mutation and host frame boundaries. Implement bounded joins and explicit incomplete traces.
-- Done when: the installed settings consumer exposes dependency cause, coalescing, hidden deferral, unchanged skip and preserved instance on move through the same event schemas used by tests. Controls cover no sink, loss/eviction, reordered collection, rebound/disposed targets and malformed/missing parent references. A real settings write is traced through its resulting renderer work; any claimed frame link passes the corresponding M7 mismatch/failure/delayed-readback tests.
-- Needs: P1–P4; diagnostics M8/M11/M13. This phase cannot by itself close M7's two-consumer or physical presentation gates.
+Outline (D14). Goal: the installed settings consumer traces a real settings
+write from owner revision to the renderer work it caused, through the event
+schemas the tests use. Done when move, hide, skip and coalescing are visible,
+and loss, eviction and missing parents show as explicit gaps. Needs P1–P4 and
+diagnostics M8/M11/M13; it cannot close M7.
 
 ### P6. Turnstone receiving and supplier qualification
 
-- Exercise the settings pane in its real retained shell, then review the Cambium API against the consumer before promoting it to other panes. Record the supported runtime/document scope and dependency pins.
-- Done when: focused automated lifecycle/binding/scheduling tests and a headed settings drive pass; window move, scroll, keyboard focus, IME move deferral, hidden accessibility exclusion and re-entry are qualified at their actual owners. Native/human AT checks and other platforms retain their separate gates. No component inspector UI is required to declare these producer contracts usable. Whole-pane move qualification is shared with presentation PT1; it is not a second implementation of that capability.
-- Needs: P1–P5. Future implementation builds use the workspace guarded launcher and stable lane; retained run evidence stays under `Code/output` per workspace policy.
+Outline (D14). Goal: qualify the settings pane in the real retained shell and
+review the Cambium API before other panes adopt it. Done when the automated
+lifecycle, binding and scheduling tests and a headed settings drive pass,
+including window move, keyboard focus, IME commit on move and hidden
+accessibility exclusion. Whole-pane move qualification is shared with
+presentation PT1. Needs P1–P5.
 
 ## Remaining implementation questions
 
@@ -578,6 +541,13 @@ lands; this design does not authorize a release or claim external compatibility.
   causal links remain explicit rather than inferred from timing.
 - Row transfer across panes/documents and live deletion-undo retention remain
   later capabilities, not unresolved choices blocking this pilot.
+- D4 needs the host to force-commit an active IME composition before a move.
+  Genet's IME path has not been checked for this. Upstream Masonry clears the
+  composition on IME disable today; linebender/xilem#1692 (open) proposes
+  finishing it instead.
+- D6 is the settings pilot's rule. A consumer whose source sees frequent
+  outside edits, such as a shared document under Murm's live interaction,
+  decides its own conflict timing rather than inheriting D6.
 
 ## Findings (2026-10-29)
 
@@ -674,10 +644,99 @@ earlier source revisions.
   protection. Consolidation must cover the actual pane writers and retain this
   explicit library-versus-selection boundary; cross-process safety needs its
   own storage-owner protocol.
+- 2026-10-29 (upstream Xilem): Meristem's audit base is linebender/xilem
+  `5d72ad41e`. Since then two upstream commits touched `xilem_core`:
+  `31a9ccf26` (tuple sequences, for Grid track sizing) and `ce7b04d2b` (MSRV
+  and README). Neither changes a contract this plan relies on. Open #1766
+  (`AppCtx`, app-wide services) is Masonry-side and does not reach
+  `xilem_core`. `mark-ik/xilem` main mirrors upstream, six commits behind; its
+  branches hold May–July Masonry theme work, not Meristem.
+- 2026-10-29 (Murm secure sessions and live interaction, `31281d62514`, N1–N3
+  then optional OCapN O1–O4): no ruling here depends on it landing. If it
+  lands, a remote proposal is one more writer that must enter through D8's
+  authority. A session epoch maps onto this plan's owner incarnation, so
+  reconnect and revocation already fall under the "source disappears" and
+  "returning source requires revalidation" rows. Remote causes need a
+  redacted reference form (D13). The request id is correlation only
+  (`crates/system/surface-api/settings/revisioned.rs:71-79,138-149`): a
+  redelivered Apply carries its old guard and is refused as stale rather than
+  returning its original outcome, short of the domain-owned idempotency O3
+  asks for.
 
 ## Decisions
 
-None yet.
+Mark answered fourteen question cards on 2026-10-29. Each entry quotes the
+option he chose. D4 replaced the proposed default; the other thirteen
+confirmed it.
+
+- **D1, one flat owner table in the pane runner.** Mark chose "Flat table in pane runner". Rows live in one retained table inside the settings pane's existing runner;
+  RetainedMount stays at the whole-pane boundary.
+
+  Links: summary Live settings rows live in one flat owner table inside the pane's existing runner, not a runner and mount per row.
+
+- **D2, hidden rows keep state and stop rendering.** Mark chose "Keep state, stop rendering". A collapsed group or inactive tab keeps its rows' drafts and subscriptions,
+  removes them from focus and accessibility, and stops rendering them.
+
+  Links: summary Hidden rows keep their state and subscriptions but leave focus and accessibility and stop rendering.
+
+- **D3, undoing a deletion recreates a clean control.** Mark chose "A clean new control". Edits are resolved before deletion; undo rebuilds the row from its saved
+  descriptor as a new incarnation. No tombstone cache.
+
+  Links: summary Undoing a confirmed deletion recreates a clean row from its descriptor; no tombstone cache.
+
+- **D4, a move commits an active IME composition, then moves.** Mark chose "Commit the text, then move". This replaces the proposed default of waiting for the composition to end.
+  The host must be able to force the commit; Genet has not been checked.
+
+  Links: summary Moving a row mid-composition commits the IME text as a focus loss would, then moves.
+
+- **D5, moves stay within one pane.** Mark chose "Within one pane". Moves to another pane or document are refused in the pilot.
+
+  Links: summary The pilot moves rows only within one settings pane; cross-pane and cross-document moves are refused.
+
+- **D6, outside changes are caught at Apply.** Mark chose "Keep edit, check at Apply". Chosen over flagging conflicts live. A dirty row keeps its edit and the
+  guard it was edited against; a stale Apply is refused and offers theirs or
+  yours.
+
+  Links: summary A dirty row keeps its edit through outside changes; Apply's revision guard catches the conflict.
+
+- **D7, a dirty row cannot be rebound.** Mark chose "Block until resolved". Rebinding stays disabled, with its reason, until the edit is applied or
+  discarded.
+
+  Links: summary Rebinding a row with an unapplied edit is blocked until the edit is applied or discarded.
+
+- **D8, one write authority with revisions.** Mark chose "One authority with revisions". Participating panes and theme-choice writes go through one
+  application-owned writer with domain revisions and guarded Apply.
+
+  Links: summary Turnstone's settings writes go through one application-owned authority with revision-guarded Apply.
+
+- **D9, arrangement in pane config, view state apart.** Mark chose "Pane config + view-state". Rows, groups and bindings go in `turnstone.settings.config`; expansion and
+  scroll follow the pane's view-state policy.
+
+  Links: summary The authored arrangement is saved in the settings pane config; expansion and scroll in view-state.
+
+- **D10, a small rows, groups and drawers tree.** Mark chose "Rows, groups, drawers". A product-registered tree with only the kinds settings needs, not the
+  workbench split/tab tree.
+
+  Links: summary The authored composition is a small rows, groups and drawers tree.
+
+- **D11, selective updates stay as P4.** Mark chose "P4 of this plan". Not split into a plan of its own.
+
+  Links: summary Selective updates remain this plan's P4.
+
+- **D12, Meristem reports through existing tracing.** Mark chose "Existing tracing events". No observer hook API. Turnstone's subscriber filter must admit the new
+  targets.
+
+  Links: summary Meristem reports its decisions through its existing tracing dependency, with no observer hook.
+
+- **D13, producer references with multi-cause edges.** Mark chose "Producer refs + multi-cause". Observations carry producer references, and bounded edge records keep
+  every cause of a join.
+
+  Links: summary Observations carry producer references, and bounded edge records keep every cause of a join.
+
+- **D14, P4–P6 stay outlines until P2 lands.** Mark chose "Outlines until P2 lands". Each keeps a goal and a done-condition; the detail is written from P2's
+  result.
+
+  Links: summary P4–P6 stay outlines with a goal and done-condition until P2 proves the retained table.
 
 ## Progress
 
@@ -695,3 +754,7 @@ None yet.
   unit-qualified. The real Turnstone write-owner/adapter handoff remains open;
   P1 is in progress. P0 source commits were retained while reconciling with the
   latest Turnstone module split.
+- 2026-10-29: Mark ruled D1–D14 by question card. Lifecycle, binding and
+  persistence text now cites them; P4–P6 and their design sections are
+  outlines (D14). Findings added for upstream Xilem and Murm's secure
+  sessions and live interaction plan.
