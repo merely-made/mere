@@ -60,3 +60,28 @@ rather than hangs).
   exists, and its lock is gitignored; it builds only as a dependency.
 - Knot's provider factory test compared a temporary path with the
   directory's canonical root and failed on macOS; fixed in Knot `3e089ba1`.
+
+## 2026-10-30: Turnstone and Hocket after the arboard fork's removal
+
+`https://github.com/mark-ik/arboard` (branch `custom-formats`) returns 404, so
+Turnstone's lock (`bec2dcd1`) and Hocket's could not resolve even `--locked`.
+The "invalid type: boolean `true`, expected a map" message during resolution
+is Servo `aac43a3f`'s tidy fixture
+`python/tidy/tests/lints-configuration/no-workspace/Cargo.toml`
+(`[lints] foo = true`); Cargo 1.97.1 and 1.99.1 print it and continue (a
+standalone reproduction exited 0 and wrote its lock). Netrender `main` resolves
+on its own.
+
+| Repository | Commit | What landed |
+| --- | --- | --- |
+| Genet | `b7c0bef0461` | `genet-clipboard` on arboard 3.7; custom formats `Unsupported` on the system backend |
+| Woodshed | `e1d93b0d` | Hocket keeps copied audio host-locally; Genet `b7c0bef`; stale `genet-taffy =0.14` patch row removed |
+| Turnstone | `554f323f` | Djinn `a333f51`, Mere `845fe1c4`, Knot `3e089ba1`, Genet `b7c0bef`, arboard 3.7.0 (shared with Servo); Murm and Netrender unchanged |
+
+| Gate | Result |
+| --- | --- |
+| `genet-clipboard` tests | 4 passed, the on-host OS clipboard test ignored (not run; it would overwrite the user's clipboard) |
+| Hocket workspace all-targets and tests | Passed; 5 test binaries |
+| Turnstone all-targets, default and `authoring` | Passed |
+| Turnstone lib tests | 1355 passed, 9 ignored |
+| Fresh clones of Turnstone `554f323f` and Woodshed's Hocket | All-target checks passed; neither lock references the fork |
