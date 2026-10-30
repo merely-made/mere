@@ -1,6 +1,6 @@
 # Stack reduction implementation plan
 
-**Status (2026-10-29): in progress.** The ownership audit is the source inventory; its candidate rankings are not compatibility qualification. This plan establishes a remote implementation lane and a first narrow supplier cut.
+**Status (2026-10-29): P0 committed; P1 supplier code implemented and qualified on an isolated S-PC branch.** The remaining audit candidates are unimplemented or awaiting their owner-specific trials. Product receiving and integration are separate.
 
 ## Goal and source basis
 
@@ -61,7 +61,17 @@ Selectors, Streams, ESSL, ordinary GUI controls, dual VM support, model architec
 ## Progress
 
 - 2026-10-29: audit dossier transferred to the S-PC Mere lane; isolated current-main worktrees established. Initial gate invocation exposed systemd's default working-directory behavior before any compile; subsequent runs specify the checkout explicitly and retain the failed launch log.
+- 2026-10-29: P1 supplier changes committed in Dramatis at `c15a65b` and `27b731f`, with both task reviews approved. The owning plan records source and test boundaries; retained evidence lives in `dramatis/support/receipts/identity-primitives-20261029/`. Whole-branch review is recorded separately. No product dependency pins were advanced.
 
 ## Decisions
 
 The controller's initial scope is P0 and P1. The audit is a ranked investigation, so broad toolkit, engine, storage-format and protocol replacement needs its own concrete comparison. The rest of the queue remains explicit rather than silently committing to all 41 items.
+
+## Remote continuation
+
+- Host: `s-pc`, selected after read-only load/process/memory checks. Builds remain capped and serialized.
+- Mere lane: `/home/markik/Code/worktrees/mere-stack-reduction-20261029`, branch `stack-reduction-audit-20261029`.
+- Dramatis lane: `/home/markik/Code/worktrees/dramatis-stack-reduction-20261029`, branch `stack-reduction-identity-20261029`.
+- Supplier plan: `dramatis/design_docs/2026-10-29_identity_primitives_plan.md`; per-task reports, review verdicts and the active ledger are retained on that lane.
+- Receipts: `/home/markik/Code/output/stack-reduction-20261029` on S-PC and the committed Dramatis receipt directory.
+- Branches are committed and preserved for continuation, without merging shared main or pushing GitHub. Local copies of the same branches can be fetched over the configured SSH host without changing a checkout.
