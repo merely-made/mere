@@ -17,6 +17,16 @@ use layout_dom_api::{
     QualName, QuirksMode, ShadowRootInit,
 };
 
+#[cfg(test)]
+thread_local! {
+    static MEMBERSHIP_STEPS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
+#[cfg(test)]
+pub(crate) fn take_membership_steps() -> usize {
+    MEMBERSHIP_STEPS.with(|steps| steps.replace(0))
+}
+
 /// A window's subtree of `dom`, rooted at `root`.
 ///
 /// The root answers as a document: no parent, no siblings, no element name or
@@ -29,6 +39,25 @@ use layout_dom_api::{
 pub struct WindowDom<'a> {
     dom: &'a ScriptedDom,
     root: NodeId,
+}
+
+/// Current flat-tree membership, created only by a scoped window traversal.
+/// Publication can reuse this proof; later action admission checks fresh
+/// ancestry with `WindowDom::contains`.
+#[derive(Clone, Copy)]
+pub(crate) struct WindowMember<'a> {
+    node: NodeId,
+    window: WindowDom<'a>,
+}
+
+impl<'a> WindowMember<'a> {
+    pub(crate) fn node(self) -> NodeId {
+        self.node
+    }
+
+    pub(crate) fn window(self) -> WindowDom<'a> {
+        self.window
+    }
 }
 
 impl<'a> WindowDom<'a> {
@@ -52,6 +81,13 @@ impl<'a> WindowDom<'a> {
     /// parent; its host's place decides.
     pub fn contains(&self, node: NodeId) -> bool {
         ancestor_or_self(self.dom, node, self.root)
+    }
+
+    pub(crate) fn members(&self) -> impl Iterator<Item = WindowMember<'a>> + '_ {
+        crate::owned_layout::flat_nodes(self).map(|node| WindowMember {
+            node,
+            window: *self,
+        })
     }
 
     /// Whether `node` lives under another window: live, in the document, and
@@ -216,6 +252,8 @@ impl LayoutDom for WindowDom<'_> {
 pub(crate) fn ancestor_or_self(dom: &ScriptedDom, node: NodeId, ancestor: NodeId) -> bool {
     let mut current = Some(node);
     while let Some(id) = current {
+        #[cfg(test)]
+        MEMBERSHIP_STEPS.with(|steps| steps.set(steps.get() + 1));
         if !dom.is_live(id) {
             return false;
         }
