@@ -44,7 +44,7 @@ use common::{
     lane, lending, now_ms, open_vault, owner, profile, refusal_from, write_device_settings,
 };
 use distillery::ResidentReceipt;
-use djinn::resident::DjinnResident;
+use mere_resident::resident::DjinnResident;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{DevicePolicy, NetworkClass, ResourceId};
 use distillery::mesh_host::Step;
@@ -77,7 +77,7 @@ async fn the_works_run_a_real_mesh_job_to_completion_and_close_clean() {
         &data_root,
         &profile(),
         owner(Some(lane())),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with its Distillery lane");
@@ -225,7 +225,7 @@ async fn a_thermal_limit_with_no_stated_temperature_refuses_composition() {
             &data_root,
             &profile(),
             owner(Some(lane())),
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await,
         "a thermal limit on a device with no thermometer is not a policy",
@@ -253,7 +253,7 @@ async fn an_enabled_lane_with_no_stated_lending_posture_refuses_composition() {
             &data_root,
             &profile(),
             owner(Some(lane())),
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await,
         "a works lane with no lending posture must refuse rather than assume one",
@@ -280,7 +280,7 @@ async fn a_profile_with_no_lane_composes_no_works_at_all() {
         &data_root,
         &profile(),
         owner(None),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("a resident with no works lane still opens");
@@ -305,7 +305,7 @@ async fn a_profile_with_no_lane_composes_no_works_at_all() {
 #[cfg(not(feature = "trainer"))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_build_with_no_trainer_refuses_a_lane_that_states_one() {
-    use djinn::settings::TrainerLaneSettings;
+    use mere_resident::settings::TrainerLaneSettings;
 
     let directory = tempfile::tempdir().expect("temporary resident root");
     let data_root = directory.path().join("data");
@@ -328,7 +328,7 @@ async fn a_build_with_no_trainer_refuses_a_lane_that_states_one() {
             &data_root,
             &profile(),
             owner(Some(asks_for_a_trainer)),
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await,
         "a build with no trainer must refuse a lane that states one rather than \

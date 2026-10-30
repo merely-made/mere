@@ -14,12 +14,12 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::keeper::Keeper;
-use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
-use graphshell_endpoint::door::custody_client::{CustodyClient, CustodyClientError};
-use graphshell_endpoint::door::identity::{VaultLockView, VaultProtectionView};
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::keeper::Keeper;
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
+use djinn::door::custody_client::{CustodyClient, CustodyClientError};
+use dramatis::view::{VaultLockView, VaultProtectionView};
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId};
 use uuid::Uuid;
 
@@ -56,7 +56,7 @@ async fn open(endpoint: &str, app: &str) -> Result<CustodyClient, CustodyClientE
 async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     let host = resident_host();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let endpoint = endpoint_name();
     {
         let (endpoint, keeper) = (endpoint.clone(), Arc::new(Keeper::new(host.clone())));

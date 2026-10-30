@@ -14,9 +14,9 @@
 
 use std::net::TcpListener;
 
-use djinn::resident_blobs::ResidentBlobCustody;
-use djinn::resident_site::{GeminiListenerPolicyV1, PublishedSiteService, PublishedSiteStateV1};
-use djinn::settings::ResidentContentSettings;
+use mere_resident::resident_blobs::ResidentBlobCustody;
+use mere_resident::resident_site::{GeminiListenerPolicyV1, PublishedSiteService, PublishedSiteStateV1};
+use mere_resident::settings::ResidentContentSettings;
 use knot_site::{PublishedSnapshotV1, Site, SiteFormat};
 use transport::BlobScope;
 

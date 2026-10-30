@@ -1,14 +1,14 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 //! Projection client and carrier over the application connection.
-use crate::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
-use crate::door::app_client::{AppClientError, AppConnection};
 use chirograph::{
     CapabilityProfile, Carrier, CarrierError, CarrierNotice, CarrierRequest, CarrierRequestBody,
     CarrierResponseBody, ContentHash, PortableCardV1, PresentationCodec, ProjectionRequest,
     ProjectionSnapshot, ProtocolVersion, ResourceAssembly, ResourceChunkRequest,
     ResourceChunkResponse, SessionOpen, SessionOpened,
 };
+use djinn::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
+use djinn::door::app_client::{AppClientError, AppConnection};
 
 pub struct AppBrokerClient {
     inner: AppConnection,
@@ -124,7 +124,11 @@ impl AppBrokerClient {
                 .await?;
             cards.push(DeviceCard {
                 label: offer.semantics.label.clone(),
-                card: serde_json::from_slice(&bytes).map_err(|_| AppClientError::MalformedCard)?,
+                card: serde_json::from_slice(&bytes).map_err(|_| {
+                    AppClientError::InvalidResponse(
+                        "a card resource was not valid PortableCardV1 JSON".into(),
+                    )
+                })?,
             });
         }
         Ok(cards)
@@ -269,34 +273,36 @@ fn accept_resource_chunk(
     total: &mut Option<u64>,
 ) -> Result<Option<Vec<u8>>, AppClientError> {
     if &response.session != session || response.resource != resource {
-        return Err(AppClientError::InvalidResourceAddress);
+        return Err(AppClientError::InvalidResponse(
+            "resource scope or content address mismatch".into(),
+        ));
     }
     if response.total_len > MAX_APP_RESOURCE_BYTES
         || total.is_some_and(|size| size != response.total_len)
     {
-        return Err(AppClientError::InvalidResourceChunk(
+        return Err(AppClientError::InvalidResponse(
             "inconsistent or excessive total length".into(),
         ));
     }
     let bytes = response
         .decode()
-        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk address or encoding".into()))?;
+        .ok_or_else(|| AppClientError::InvalidResponse("chunk address or encoding".into()))?;
     let end = response
         .offset
         .checked_add(bytes.len() as u64)
-        .ok_or_else(|| AppClientError::InvalidResourceChunk("chunk length overflow".into()))?;
+        .ok_or_else(|| AppClientError::InvalidResponse("chunk length overflow".into()))?;
     if bytes.len() > chirograph::MAX_RESOURCE_CHUNK_BYTES as usize
         || end > response.total_len
         || (bytes.is_empty() && response.offset < response.total_len)
     {
-        return Err(AppClientError::InvalidResourceChunk(
+        return Err(AppClientError::InvalidResponse(
             "chunk exceeds its bounds or makes no progress".into(),
         ));
     }
     *total = Some(response.total_len);
     assembly
         .accept(response)
-        .map_err(|e| AppClientError::InvalidResourceChunk(e.to_string()))
+        .map_err(|e| AppClientError::InvalidResponse(e.to_string()))
 }
 #[cfg(test)]
 mod resource_boundary_tests {
@@ -319,9 +325,9 @@ mod resource_boundary_tests {
                 id: 1,
                 body: Ok(CarrierResponseBody::ResourceChunk(Box::new(chunk.clone()))),
             };
-            let framed = crate::door::wire::AppHostMessage::<_, (), ()>::Response { response };
+            let framed = djinn::door::wire::AppHostMessage::<_, (), ()>::Response { response };
             let mut wire = Vec::new();
-            crate::door::frame::write_native_message(&mut wire, &framed).unwrap();
+            djinn::door::frame::write_native_message(&mut wire, &framed).unwrap();
             assert!(wire.len() < 1024 * 1024);
             frames += 1;
             if let Some(actual) =

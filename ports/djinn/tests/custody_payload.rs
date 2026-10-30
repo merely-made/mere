@@ -8,21 +8,19 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::{
     IdentityStorage, IdentityVault, InMemoryStorage, Profile, SealedProfileStorage,
 };
-use djinn::{
+use mere_resident::{
     door::app_broker::{AppEndpointCatalog, serve_app_broker},
     keeper::Keeper,
 };
 use eidetic::{Hash, PayloadSealer};
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody::{CustodyAnswer, CustodyCall, CustodyRefusal},
-    custody_client::{CustodyClient, CustodyClientError},
-    custody_identity::CustodyIdentity,
-    custody_payload::{
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use djinn::door::custody_client::{CustodyClient, CustodyClientError};
+use djinn::door::custody_identity::CustodyIdentity;
+use djinn::door::custody_payload::{
         MAX_PAYLOAD_BYTES, PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult,
-    },
-    identity::{VaultLockView, VaultProtectionView},
-};
+    };
+use dramatis::view::{VaultLockView, VaultProtectionView};
 use personae::{Ed25519Keypair, IdentityProvider, PersonaId, ProfileId};
 use std::{sync::Arc, time::Duration};
 
@@ -56,7 +54,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         )
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     #[cfg(unix)]
     let endpoint = root
         .path()
@@ -213,7 +211,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     ));
     for bad in [
         PayloadRequest {
-            custody_epoch: Some(graphshell_endpoint::door::custody::CustodyEpoch {
+            custody_epoch: Some(djinn::door::custody::CustodyEpoch {
                 instance: "a-different-custodian".into(),
                 generation: 1,
             }),
@@ -350,7 +348,7 @@ fn retained_custody_receipt_host() {
         .configure_payload_custody(ProfileId("family".into()), persona, root.clone())
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let endpoint = std::env::var("EIDETIC_CUSTODY_FIXTURE_ENDPOINT").expect("fixture endpoint");
     tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)

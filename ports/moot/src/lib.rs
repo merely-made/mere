@@ -48,6 +48,8 @@ pub mod captured_web;
 
 pub mod conversation;
 pub mod coop;
+#[cfg(feature = "ocapn-coop")]
+pub mod ocapn_coop;
 pub mod resource_coop;
 
 #[cfg(feature = "resource-owner")]

@@ -25,8 +25,8 @@ use crate::door::local_session::{
 };
 use crate::door::resident_identity::ResidentIdentity;
 use armillary::tasks::spawn_tracked_with_handle;
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
-use graphshell_endpoint::door::wire::BrowserChallenge;
+use djinn::door::route::ResidentEndpointRoute;
+use djinn::door::wire::BrowserChallenge;
 use graphshell_host::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointSession,
 };

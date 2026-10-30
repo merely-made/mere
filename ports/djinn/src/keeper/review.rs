@@ -9,9 +9,9 @@
 //! import revision under profile authority and applies its own consent
 //! policy. A stale item is refused there, not here.
 use super::*;
-use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyRefusal};
+use djinn::door::custody::{CustodyAnswer, CustodyRefusal};
 #[cfg(feature = "cxf")]
-use graphshell_endpoint::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
+use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 #[cfg(feature = "cxf")]
 use personae::ProfileId;
 
@@ -43,14 +43,14 @@ impl Keeper {
     #[cfg(feature = "cxf")]
     pub(crate) fn unassigned_imports(
         &self,
-    ) -> Result<Vec<graphshell_endpoint::door::quarantine::UnassignedImport>, CustodyRefusal> {
+    ) -> Result<Vec<djinn::door::quarantine::UnassignedImport>, CustodyRefusal> {
         let value = self.host.credentials(CredentialCall::UnassignedImports)?;
         serde_json::from_value(value).map_err(refusal)
     }
     #[cfg(feature = "cxf")]
     pub(crate) fn assign_import(
         &self,
-        request: graphshell_endpoint::door::quarantine::AssignImportRequest,
+        request: djinn::door::quarantine::AssignImportRequest,
     ) -> Result<CustodyAnswer, CustodyRefusal> {
         let imports = self
             .unassigned_imports()?

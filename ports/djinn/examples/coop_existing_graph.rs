@@ -2,10 +2,8 @@
 //! Acceptance preparation through ordinary admitted application routes.
 //! No direct store writes and no co-op invitation or edit API is used here.
 use chirograph::*;
-use graphshell_endpoint::door::{
-    app_admission::{AppId, AppRouteId},
-    projection::AppBrokerClient,
-};
+use djinn::door::app_admission::{AppId, AppRouteId};
+use graphshell_endpoint::door::projection::AppBrokerClient;
 use mere_overmap::wire::*;
 use pandect::CapturedDelta;
 use sceno::InstanceId;
@@ -83,7 +81,7 @@ async fn main() {
     let domain = args.get(1).map(String::as_str).unwrap_or("coop-acceptance");
     if args[0] == "seed" {
         let (mut reservoir, descriptor) =
-            open(djinn::resident_reservoir::RESIDENT_RESERVOIR_ROUTE).await;
+            open(mere_resident::resident_reservoir::RESIDENT_RESERVOIR_ROUTE).await;
         let s = reservoir
             .snapshot(descriptor.projections[0].request.clone())
             .await
@@ -92,8 +90,8 @@ async fn main() {
             &mut reservoir,
             &s,
             InstanceId(0),
-            djinn::resident_reservoir::RESERVOIR_ENSURE_MERE_INTENT,
-            serde_json::to_vec(&djinn::resident_reservoir::EnsureMereV1::new(domain)).unwrap(),
+            mere_resident::resident_reservoir::RESERVOIR_ENSURE_MERE_INTENT,
+            serde_json::to_vec(&mere_resident::resident_reservoir::EnsureMereV1::new(domain)).unwrap(),
         )
         .await;
         let (mut c, d) = open(&format!("mere/{domain}")).await;

@@ -40,8 +40,8 @@ use chirograph::{
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
-use graphshell_endpoint::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
@@ -2079,7 +2079,7 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphshell_endpoint::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
+    use djinn::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_overmap::route as mere_route;
@@ -2257,7 +2257,7 @@ mod tests {
         let owner = Arc::new(castellan::authority::PersonaeHost::new(
             castellan::custody::IdentityVault::with_profile(storage, profile),
             None,
-            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
+            dramatis::view::VaultProtectionView::Ephemeral,
         ));
         let routes = routes
             .with_custody_endpoint("unused-in-unit-tests".into())
@@ -3513,7 +3513,7 @@ mod tests {
                 ),
             ),
             None,
-            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
+            dramatis::view::VaultProtectionView::Ephemeral,
         ));
         #[cfg(not(windows))]
         let address = format!("/tmp/knov-{}.sock", Uuid::new_v4());
@@ -3539,7 +3539,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if graphshell_endpoint::door::local_endpoint::connect_local(&address)
+            if djinn::door::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {
@@ -3797,7 +3797,7 @@ mod tests {
                 ),
             ),
             None,
-            graphshell_endpoint::door::identity::VaultProtectionView::Ephemeral,
+            dramatis::view::VaultProtectionView::Ephemeral,
         ));
         #[cfg(not(windows))]
         let address = format!("/tmp/c1px-{}.sock", Uuid::new_v4());
@@ -3823,7 +3823,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if graphshell_endpoint::door::local_endpoint::connect_local(&address)
+            if djinn::door::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {

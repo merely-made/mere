@@ -7,11 +7,11 @@
 //! Where is each paired device now? Reads the running resident's paired-device
 //! directory through the owner-only application door and prints it.
 
-use djinn::resident_devices::{
+use mere_resident::resident_devices::{
     AddrKindV1, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
     not_connected_path_active, read_directory,
 };
-use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
+use djinn::door::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 
 const USAGE: &str = "usage: djinn-devices [--json]";
@@ -109,7 +109,7 @@ fn render_device(device: &PairedDeviceV1) -> String {
 
 #[cfg(test)]
 mod tests {
-    use djinn::resident_devices::PathAddrV1;
+    use mere_resident::resident_devices::PathAddrV1;
 
     use super::*;
 

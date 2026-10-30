@@ -21,16 +21,14 @@ mod fixture {
         time::{Duration, Instant},
     };
 
-    use djinn::{
+    use mere_resident::{
         custodian::InstalledCustodian,
         custody_host::{ResidentCustody, remote::RemoteHost},
         door::app_broker::{AppEndpointCatalog, serve_app_broker_on},
         keeper::Keeper,
     };
-    use graphshell_endpoint::door::{
-        app_admission::{AllowedAppRoutes, AppRouteGrants},
-        local_endpoint::LocalListener,
-    };
+    use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use djinn::door::local_endpoint::LocalListener;
     use personae::{PersonaId, ProfileId};
     use serde_json::json;
 
@@ -185,7 +183,7 @@ mod fixture {
             child_root.join("data"),
         )?;
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-        djinn::custody::grant(&grants).map_err(|e| e.to_string())?;
+        mere_resident::custody::grant(&grants).map_err(|e| e.to_string())?;
         let endpoint = root
             .join("app.sock")
             .to_str()

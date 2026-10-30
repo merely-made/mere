@@ -5,12 +5,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #[cfg(feature = "forbidden-api")]
-pub use graphshell_endpoint::ProjectionCatalog;
-pub use graphshell_endpoint::door::custody_client::{BlockingCustodyClient, CustodyClient};
+pub use djinn::ProjectionCatalog;
+pub use djinn::door::custody_client::{BlockingCustodyClient, CustodyClient};
 
 #[cfg(test)]
 mod tests {
-    use graphshell_endpoint::door::{custody::CustodyRefusal, custody_client::CustodyClientError};
+    use djinn::door::custody::CustodyRefusal;
+use djinn::door::custody_client::CustodyClientError;
 
     #[test]
     fn legacy_refusal_is_pending_without_a_projection_api() {

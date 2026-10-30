@@ -28,7 +28,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::admission::{AMBIENT_ACTION, CONNECT_ACTION, GRAPHSHELL_DOMAIN};
 use graphshell_host::carrier::ProjectionRefusal;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;

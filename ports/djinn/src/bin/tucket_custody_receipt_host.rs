@@ -6,15 +6,13 @@ use castellan::{
         wallet::bootstrap_wallet_state,
     },
 };
-use djinn::{
+use mere_resident::{
     door::app_broker::{AppEndpointCatalog, serve_app_broker},
     keeper::Keeper,
 };
-use graphshell_endpoint::door::{
-    app_admission::{AllowedAppRoutes, AppId, AppRouteGrants},
-    custody_client::CustodyClient,
-    identity::VaultProtectionView,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::custody_client::CustodyClient;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{path::PathBuf, sync::Arc, time::Duration};
 
@@ -65,7 +63,7 @@ async fn main() {
     let keeper =
         Arc::new(Keeper::new(host.clone()).with_wallet_root(has_wallet.then_some(wallet_root)));
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
-    djinn::custody::grant(&grants).unwrap();
+    mere_resident::custody::grant(&grants).unwrap();
     let serving = endpoint.clone();
     let mut server = tokio::spawn(async move {
         serve_app_broker(

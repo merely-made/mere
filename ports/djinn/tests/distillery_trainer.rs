@@ -69,8 +69,8 @@ use common::{
 use distillery::{
     TRAINER_AUTODIFF, TRAINER_FINITE_DIFFERENCE, TRAINER_RESOURCE, TrainReceipt, TrainRequest,
 };
-use djinn::resident::DjinnResident;
-use djinn::settings::TrainerLaneSettings;
+use mere_resident::resident::DjinnResident;
+use mere_resident::settings::TrainerLaneSettings;
 use eidetic::models::{EvalMetric, EvalReport, OpaqueBlob};
 use eidetic::typed::load_typed;
 use eidetic::{ModelAdapterManifest, NoFetcher};
@@ -128,7 +128,7 @@ async fn the_composed_trainer_trains_a_real_adapter_into_the_personas_model_libr
         &data_root,
         &profile(),
         owner(Some(trains)),
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .expect("compose the Djinn resident with a trainer-carrying Distillery lane");
@@ -382,7 +382,7 @@ async fn assert_published_adapter(
 /// How many jobs on this lane's board have committed an output. Used only to
 /// prove that a refused run added none.
 #[cfg(not(feature = "trainer-autodiff"))]
-async fn committed_jobs(works: &djinn::resident_distillery::ResidentDistillery) -> usize {
+async fn committed_jobs(works: &mere_resident::resident_distillery::ResidentDistillery) -> usize {
     works
         .authority()
         .host()
@@ -438,7 +438,7 @@ async fn a_build_with_no_gpu_trainer_refuses_a_lane_that_states_one() {
             &data_root,
             &profile(),
             owner(Some(asks_for_a_gpu)),
-            djinn::resident::MeshAuthor::Resident,
+            mere_resident::resident::MeshAuthor::Resident,
         )
         .await,
         "a build with no GPU trainer must refuse a lane that states one rather than \

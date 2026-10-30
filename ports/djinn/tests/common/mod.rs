@@ -34,8 +34,8 @@ use std::path::{Path, PathBuf};
 
 use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap::{self, Unlock};
-use djinn::resident::DjinnResident;
-use djinn::settings::{DistilleryLaneSettings, OwnerSettings};
+use mere_resident::resident::DjinnResident;
+use mere_resident::settings::{DistilleryLaneSettings, OwnerSettings};
 use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
 use personae::ProfileId;
 
@@ -475,7 +475,7 @@ pub async fn author_fixture(
 /// make both assertions pass for the wrong reason.
 #[cfg(feature = "trainer")]
 pub async fn run_trainer_job(
-    works: &mut djinn::resident_distillery::ResidentDistillery,
+    works: &mut mere_resident::resident_distillery::ResidentDistillery,
     request: &distillery::TrainRequest,
     nonce: u64,
     failure_bound: std::time::Duration,

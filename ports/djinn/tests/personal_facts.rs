@@ -5,11 +5,12 @@ use castellan::{
     authority::PersonaeHost,
     custody::{IdentityVault, InMemoryStorage, Profile},
 };
-use djinn::{
+use mere_resident::{
     embedded_reservoir::{ReservoirAttachment, ReservoirAttachmentOptions},
     personal_facts::PersonalFactsClient,
 };
-use graphshell_endpoint::door::{app_admission::AppId, identity::VaultProtectionView};
+use djinn::door::app_admission::AppId;
+use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{process::Command, sync::Arc, time::Duration};
 #[test]
@@ -46,7 +47,7 @@ fn personal_facts_child() {
         "/tmp/pf-{}.sock",
         root.file_name().unwrap().to_string_lossy()
     );
-    let identity: Arc<dyn djinn::custody_host::ResidentCustody> = Arc::new(PersonaeHost::new(
+    let identity: Arc<dyn mere_resident::custody_host::ResidentCustody> = Arc::new(PersonaeHost::new(
         IdentityVault::with_profile(
             InMemoryStorage::new(),
             Profile::new(

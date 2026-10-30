@@ -5,12 +5,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #[cfg(feature = "forbidden-api")]
-pub use graphshell_endpoint::door::app_client::AppConnection;
-pub use graphshell_endpoint::door::wire::{AppHostMessage, AppMessage, BrowserChallenge};
+pub use djinn::door::app_client::AppConnection;
+pub use djinn::door::wire::{AppHostMessage, AppMessage, BrowserChallenge};
 
 #[cfg(test)]
 mod tests {
-    use graphshell_endpoint::door::{app_admission::AppHello, frame::read_native_message};
+    use djinn::door::app_admission::AppHello;
+use djinn::door::frame::read_native_message;
 
     #[test]
     fn installed_hello_decodes_from_native_endian_reference_frame() {

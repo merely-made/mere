@@ -1,6 +1,6 @@
 [package]
 rust-version = "1.97.1"
-name = "djinn"
+name = "mere-resident"
 version = "0.0.2"
 edition.workspace = true
 license.workspace = true
@@ -126,7 +126,8 @@ distillery = { workspace = true, features = ["inference-wire"] }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
-graphshell-endpoint = { workspace = true, features = ["door-serve", "projection-door", "custody-client", "profile"] }
+graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-offer", "profile"] }
+djinn = { workspace = true, features = ["resident", "door-serve", "custody-client"] }
 # The serving half: the endpoint catalog and its admitted context, the
 # projection host, admission and the session loop (stack lift plan, L2).
 graphshell-host = { workspace = true, features = ["native"] }
@@ -292,7 +293,7 @@ esp.workspace = true
 knot-editor = { workspace = true, features = ["mere-overlay"] }
 # This package with `passphrase-fd`, so the binary the tests spawn reads the
 # harness's passphrase (ruling 65).
-djinn = { path = ".", default-features = false, features = ["passphrase-fd", "in-process-custody"] }
+mere-resident = { path = ".", default-features = false, features = ["passphrase-fd", "in-process-custody"] }
 # The shared resident harness (djinn test harness plan): path only, unpublished,
 # so packaging drops it.
 djinn-testkit = { path = "../../crates/system/djinn-testkit" }
@@ -315,7 +316,8 @@ graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 # mere view's model it fills, and the kernel's relations to fill it with.
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 mere-overmap = { workspace = true, features = ["view"] }
-graphshell-endpoint = { workspace = true, features = ["door-serve", "projection-door", "custody-client", "profile"] }
+graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-provider", "profile"] }
+djinn = { workspace = true, features = ["resident", "door-serve", "custody-client"] }
 pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"

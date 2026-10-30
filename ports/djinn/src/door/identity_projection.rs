@@ -24,7 +24,7 @@ use chirograph::{ActionFormV1, CardValueV1, PortableCardV1};
 use serde_json::Value;
 use uuid::Uuid;
 
-use graphshell_endpoint::door::identity::{
+use dramatis::view::{
     AgentListenerView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
 };
 
@@ -586,7 +586,7 @@ mod tests {
     use personae::signing::{PendingSigningRequest, SigningPolicy, SigningRequest};
 
     use super::*;
-    use graphshell_endpoint::door::identity::{
+    use dramatis::view::{
         CarryView, DeviceGrantView, DeviceView, IdentitySurfaceSnapshot, SshKeyView, VaultView,
     };
 
@@ -719,7 +719,7 @@ mod tests {
     /// card acts while locked.
     #[test]
     fn a_locked_surface_offers_only_the_native_unlock() {
-        use graphshell_endpoint::door::identity::ProfileView;
+        use dramatis::view::ProfileView;
         let mut snapshot = snapshot(SigningPolicy::PerUse);
         snapshot.vault.lock = VaultLockView::Locked;
         snapshot.profiles.push(ProfileView {
@@ -776,7 +776,7 @@ mod tests {
 
     #[test]
     fn every_persona_but_the_selected_one_offers_the_switch() {
-        use graphshell_endpoint::door::identity::ProfileView;
+        use dramatis::view::ProfileView;
         let mut snapshot = snapshot(SigningPolicy::PerUse);
         for (id, selected) in [("work", true), ("personal", false)] {
             snapshot.profiles.push(ProfileView {

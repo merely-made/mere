@@ -37,7 +37,7 @@ def metadata(name, target):
                 walk(dependency["pkg"])
 
     walk(data["resolve"]["root"])
-    endpoint = next(p for p in seen if packages[p]["name"] == "graphshell-endpoint")
+    endpoint = next(p for p in seen if packages[p]["name"] == ("djinn" if name in ("custody", "custody-types", "portable") else "graphshell-endpoint"))
     names = sorted({packages[p]["name"] for p in seen})
     direct = [
         {"name": packages[d["pkg"]]["name"], "kinds": d["dep_kinds"]}
@@ -50,13 +50,13 @@ def metadata(name, target):
     if name in ("custody", "custody-types"):
         assert not set(names) & {"chirograph", "sceno", "scenotime", "hest", "pandect",
                                  "mere-kernel", "mere-alembic", "graphshell"}, names
-    if name == "projection":
+    if name in ("projection", "provider"):
         assert not {d["name"] for d in direct} & {"eidetic", "chatelaine", "dramatis", "insigne"}, direct
     print(name, target, len(names), "normal/build package names", flush=True)
 
 
 for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "app_client"), ("projection", "custody_client"),
-                        ("portable", "app_client"), ("host", None)]:
+                        ("portable", "app_client"), ("offer", "app_client"), ("provider", "custody_client"), ("host", None)]:
     manifest = str(base / name / "Cargo.toml")
     metadata(name, native)
     subprocess.run(["cargo", "test", "--locked", "--manifest-path", manifest], check=True)
@@ -69,7 +69,7 @@ for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "app
         assert result.returncode and "E0432" in result.stderr and forbidden in result.stderr, result.stderr
         print(name, "expected missing", forbidden, "compile failure", flush=True)
 
-for name in ["portable", "host"]:
+for name in ["portable", "offer", "host"]:
     target = "wasm32-unknown-unknown"
     metadata(name, target)
     subprocess.run(["cargo", "check", "--locked", "--manifest-path",

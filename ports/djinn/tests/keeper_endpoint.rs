@@ -18,12 +18,12 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::ssh_slot::{protocol_key_for, slot_for};
 use castellan::custody::{IdentityVault, InMemoryStorage, Profile};
 use chirograph::{IntentInvocation, IntentResult, ResourceRequest};
-use djinn::door::identity_endpoint::IdentityEndpoint;
-use djinn::door::identity_projection::{
+use mere_resident::door::identity_endpoint::IdentityEndpoint;
+use mere_resident::door::identity_projection::{
     GenerateSshKeyIntentV1, SSH_GENERATE_INTENT, SshUnlockPolicyIntentV1,
 };
-use djinn::keeper::Keeper;
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use mere_resident::keeper::Keeper;
+use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionSource};
 use personae::{Ed25519Keypair, ProfileId, UnlockTier};
 use ssh_key::{Algorithm, LineEnding};

@@ -43,7 +43,7 @@ impl GraphAuthority for Attached {
 }
 struct Activity {
     owner: coop::SharedOwner<DirectoryBackend>,
-    identity: Arc<graphshell_endpoint::door::custody_identity::CustodyIdentity>,
+    identity: Arc<djinn::door::custody_identity::CustodyIdentity>,
     contact: network::Card,
     ledger: Arc<std::sync::RwLock<notochord::RevocationLedger>>,
     _stop: tokio::sync::oneshot::Sender<()>,
@@ -73,7 +73,7 @@ impl Activities {
                 .as_deref()
                 .ok_or("co-op custody is not composed")?;
             let identity = Arc::new(
-                graphshell_endpoint::door::custody_identity::CustodyIdentity::connect_at(
+                djinn::door::custody_identity::CustodyIdentity::connect_at(
                     endpoint,
                     "graphshell",
                 )

@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #[cfg(feature = "forbidden-api")]
-pub use graphshell_endpoint::door::app_client::AppConnection;
-pub use graphshell_endpoint::door::custody::{CustodyAnswer, CustodyCall};
+pub use djinn::door::app_client::AppConnection;
+pub use djinn::door::custody::{CustodyAnswer, CustodyCall};
 
 #[cfg(test)]
 mod tests {

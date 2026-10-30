@@ -202,6 +202,7 @@ dependencies = [
 name = "custody-projection-projection-fixture"
 version = "0.0.0"
 dependencies = [
+ "djinn",
  "graphshell-endpoint",
  "serde_json",
 ]
@@ -215,6 +216,21 @@ dependencies = [
  "block-buffer",
  "const-oid",
  "crypto-common",
+]
+
+[[package]]
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+dependencies = [
+ "base64",
+ "personae",
+ "rand_core 0.6.4",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "zeroize",
 ]
 
 [[package]]
@@ -318,15 +334,10 @@ dependencies = [
 name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
- "base64",
  "chirograph",
- "personae",
- "rand_core 0.6.4",
- "serde",
+ "djinn",
  "serde_json",
- "thiserror",
  "tokio",
- "zeroize",
 ]
 
 [[package]]

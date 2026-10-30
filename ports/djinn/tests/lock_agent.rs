@@ -24,9 +24,9 @@ mod resident_harness;
 use std::path::{Path, PathBuf};
 use std::process::Output;
 
-use djinn::resident_status::{self, RESIDENT_APP, RESIDENT_CONTROL_ROUTE};
+use mere_resident::resident_status::{self, RESIDENT_APP, RESIDENT_CONTROL_ROUTE};
 use djinn_testkit::{Bound, verify};
-use graphshell_endpoint::door::app_admission::{AppId, AppRouteId};
+use djinn::door::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use resident_harness::*;
 use serde_json::json;

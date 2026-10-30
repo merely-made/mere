@@ -240,7 +240,7 @@ dependencies = [
 name = "custody-projection-custody-types-fixture"
 version = "0.0.0"
 dependencies = [
- "graphshell-endpoint",
+ "djinn",
  "serde_json",
 ]
 
@@ -263,6 +263,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
+]
+
+[[package]]
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
+dependencies = [
+ "base64",
+ "chatelaine",
+ "dramatis",
+ "eidetic",
+ "insigne",
+ "personae",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "uuid",
+ "zeroize",
 ]
 
 [[package]]
@@ -413,23 +431,6 @@ dependencies = [
  "r-efi 6.0.0",
  "rand_core",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "graphshell-endpoint"
-version = "0.0.2"
-dependencies = [
- "base64",
- "chatelaine",
- "dramatis",
- "eidetic",
- "insigne",
- "personae",
- "serde",
- "serde_json",
- "thiserror",
- "uuid",
- "zeroize",
 ]
 
 [[package]]

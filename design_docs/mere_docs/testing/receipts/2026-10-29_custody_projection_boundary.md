@@ -1,6 +1,6 @@
 # Custody and projection dependency boundary
 
-Status: Implemented; supplier and local cohort qualification passed; published receiver integration in progress.
+Status: Implemented and published; endpoint and unpatched broker qualification passed. External receiving checks are recorded separately.
 
 This slice makes custody independently buildable inside the existing
 `graphshell-endpoint` package. It does not settle the eventual public package
@@ -159,3 +159,138 @@ local branch `archive/custody-projection-reviewed-20261029` found no differences
 in crates, ports, support, Cargo.toml or Cargo.lock. Review hashes above describe
 the original series: `171bec593` corresponds to `66cdeb368`, `d5d5605e1` to
 `972855420`, and `1047cfc30` to `3f344e2b4` in the rebased publication history.
+
+## Published supplier cohort
+
+The final unpatched broker gate receives Knot
+`704084d064da886dd14cbe8ac3dd8758af105e1d`, Dramatis
+`051e95a68011072f172b9ec4c0f04d4e5259df5b` and Murm
+`1f601488f851c4e54672cd439b7c45728255ea65`. Knot's upstream `d400d0c`
+introduced secure-publishing APIs requiring those Dramatis/Murm revisions;
+its source and pins were preserved when the endpoint migration was rebased.
+The endpoint supplier published to receivers is Mere
+`c6290142866eefead385e728c5c5da24ac6f624a`.
+
+`root-split-published-broker` passed without local overrides: 44 Djinn door
+tests, one custody-payload test, two custody-route tests and five vault-lock
+tests. The retained-process fixture remains explicitly ignored. This includes
+the fresh custody connection while locked and browser-wrapper JSON diagnostics.
+Unexpected and released-key response coverage is in the endpoint suites above. The gate used the same 3 GiB, zero-swap,
+150 percent CPU limits. Log SHA-256:
+`1e48a7b3cd19fdb8f326670558ec372d29e416c366b4ad7a6dc150981f2a436c`.
+
+The root lock changes only the 26 Git package identities from those three
+suppliers. Its resolved edge audit found 28 unchanged-identity owners whose
+supplier targets advanced; no dependency target name or version changed.
+The web lock is unchanged. Earlier local-cohort results above remain bounded
+to their recorded sources; this published-cohort run supersedes their pending
+unpatched broker gate.
+
+## Delivered application migrations
+
+The receiving repositories publish the explicit feature selections and removed
+mixed-client imports immediately, without compatibility aliases:
+
+| Receiver | Published migration | Evidence |
+|---|---|---|
+| Knot | `704084d` (receipt update `e4810ef`) | Overlay regression: 1 pass; peer-enabled sync host compiles; secure publishing: 9 passes. |
+| Turnstone | `13f4c31b` | Locked native library check with inference and authoring passed. |
+| Woodshed/Hocket | `914adc7` (receipt update `1f57db5`) | Both locked native checks including test code passed. |
+| Cleromancy | `89bf653`, fixture completion `f62b673` | Focused local broker grant/revocation test passed after three fixture adaptations. |
+
+Turnstone's completed command is in `root-split-receivers-check.log`, SHA-256
+`a682a07b8c8ecda91ba0c2be2d46ec41c84955dec038eeed694fe7f598d32088`.
+The bundle later timed out compiling Cleromancy's dependencies; that does not
+change Turnstone's explicit exit-code-zero result. The diagnostic from Servo's
+invalid tidy fixture during dependency scanning did not terminate Turnstone's
+command.
+
+Woodshed and Hocket's completed commands are in
+`root-split-remaining-receivers.log`, SHA-256
+`cf09073b2041e2dcd9bcdc059f337c52783acfde9e13b86c6093b2c0e9a19888`.
+That bundle subsequently timed out compiling the broader relationship-recipe
+fixture; its behavioral test remains unqualified. Native checks do not exercise
+the ignored keeper-dependent runtime fixtures.
+
+All receiving locks were reviewed by resolved edges. Registry target version
+choices and unrelated NetRender selections were retained. Hocket's Tokio
+macros and the recipe's ObjC/Metal optional dependency edges reflect normalized
+feature closures. Woodshed's existing aa94 Eidetic source and incoming 01ee
+source are divergent histories and remain distinct; ambiguous lock dependency
+strings were qualified without conflating their owners. The recipe's current
+path packages retain their own existing storage selections.
+
+Cleromancy's focused test reached source compilation and found that its
+Castellan dev dependency needed `keeper`, its Djinn dev dependency needed
+`in-process-custody`, and its reservoir fixture needed the current mandatory
+`PersonaId` argument. These are recorded receiving fixture
+updates; the application library and the moved projection import compiled.
+The failed test-compilation receipt is `root-split-cleromancy-check-2.log`,
+SHA-256 `740d88193c2c2b4a179aa1be25f49308b212142b6c07ddb2eb0c7d2a77be6e73`.
+Subsequent qualification is recorded with that receiver's final fixture result.
+
+Cleromancy's final locked fixture run `root-split-cleromancy-final` passed one
+test with zero failures or ignored tests. It verifies the live ambient grant,
+large resource assembly and withdrawal of previously read cards after revocation.
+Log SHA-256: `15457b1be832bb8fdec7bb57a05597a0074b54fb64cda2c2fd1f1e1e15683ae0`.
+Its final lock adds two fixture packages and their feature edges; all existing
+package identities and edges remain. These fixture-only adaptations do not
+change production feature declarations. The three-line source/manifest change
+received independent static review before the passing gate.
+
+Delivery is complete for this boundary and its receiving API migrations.
+The public package owner/name remains unsettled, and the broader relationship
+recipe, retained-process fixture, previous Distillery probe, Windows execution
+and full GUI/browser runtime remain outside the qualified results above.
+
+## Reconciliation of the earlier 7516c6206 review
+
+The Base64 feature defect and empty-key coverage gap were corrected in the
+published series (`972855420` after rebase). Actual sync/async writer failures
+were added in `881383aab`; observed wiping after JSON decode errors followed in
+`3f344e2b4`. The old empty-key exact-wire fixture remains, supplemented by a
+nonempty ReleasedKey round trip and unexpected/mismatched-answer tests checking
+the encoded synthetic seed and every exposed error/source formatting path.
+
+Two cleanup items remained in the delivered source. The neutral AppClientError
+now uses InvalidResponse; projection owns its card/chunk diagnostic reasons.
+No return type, rejection check, package owner or wire format changed. The
+removed projection-specific variants have no remaining live consumers. Root
+crate documentation now describes the separate portable/native features.
+Independent static review found no blocker in this three-file cleanup.
+
+Fresh bounded gates passed:
+
+- `root-split-review-cleanup`: custody DTO-only 26 tests, projection-door 34 tests,
+  and Djinn library check. Log SHA-256:
+  `3630eaab535a672702a3ec784d2d66327405214658ae6dd68c47d39bcd0edede`.
+- `root-split-review-isolated`: the independent custody-types workspace passed
+  its one test with default features disabled and only custody selected; the
+  combined endpoint suite passed 70 tests, including populated-key redaction,
+  failing-writer wiping and observed wiping after JSON failures. Log SHA-256:
+  `2fe323729ee022f5eba9517e7677be0f648d5ad65ee9ddbbe30147e262ac498d`.
+
+These feature suites overlap. Repository and fixture locks remained unchanged.
+
+## Djinn consumer review reconciliation
+
+`split-final-check-3` remains a failed receipt (exit 101). Its six E0277 errors
+were introduced consumer migration failures, not an unrelated baseline. The
+later `97e8e1b3c` correction supplies a sanitizing From<serde_json::Error> for
+AppClientError: only category, line and column survive. Existing question-mark
+parsing sites, including resident_devices and resident_status, use that safe
+conversion. No raw Serde error or payload-bearing source is retained. The
+sentinel test exercises Display, Debug and the complete exposed source chain.
+
+On source `aacce9979`, `root-split-consumer-review` passed:
+
+- `cargo check --locked -p djinn --all-targets`, covering the library, tests,
+  examples and binaries enabled by default features;
+- `cargo test --locked -p djinn --test device_directory --test resident_status`,
+  with one device-directory and four resident-status tests passing, none ignored.
+
+The opt-in feature targets and Windows are not implied by this default-target
+check. No source or lock edits were needed for this reconciliation. The run
+retained the existing resource caps. Log SHA-256:
+`b19fbaab7bd44d1e27ba3632e13ea25ceeffa1309f1bf840d0db879d4bfc6601`.
+The original failed gate and these later green gates remain distinct evidence.

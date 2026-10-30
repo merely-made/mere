@@ -16,8 +16,8 @@ use distillery::mesh_host::Step;
 use distillery::{
     ResidentReceipt, TRAINER_REQUEST_INPUT, TRAINER_RESOURCE, TrainRequest, TrainerSettings,
 };
-use djinn::resident::DjinnResident;
-use djinn::settings::{
+use mere_resident::resident::DjinnResident;
+use mere_resident::settings::{
     InferenceDeviceSettings, InferenceLaneSettings, InferenceModelSettings, TrainerLaneSettings,
 };
 use eidetic::typed::{TypedPayload, save_typed};
@@ -71,7 +71,7 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
     posture.allowed_resources = vec![TRAINER_RESOURCE.into()];
     posture.accepted_checkpoints = vec!["restart".into(), "resumable".into()];
     write_device_settings(&data_root, Some(posture));
-    let path = djinn::resident_distillery::model_library_path(&data_root, &profile().0, None);
+    let path = mere_resident::resident_distillery::model_library_path(&data_root, &profile().0, None);
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     let (base_model_ref, tokenizer_ref, corpus_ref, row) = {
         let mut store = muniment::RedbBackend::open(&path).unwrap();
@@ -109,7 +109,7 @@ async fn reclaim(autodiff: bool, checkpoint: mesh::CheckpointClass) {
         &data_root,
         &profile(),
         settings,
-        djinn::resident::MeshAuthor::Resident,
+        mere_resident::resident::MeshAuthor::Resident,
     )
     .await
     .unwrap();

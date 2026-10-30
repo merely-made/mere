@@ -59,7 +59,7 @@ use distillery::{
     ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
     ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
 };
-use graphshell_endpoint::door::route::ResidentEndpointRoute;
+use djinn::door::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use mesh::spec::JobSpec;
 use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, JobBoard, MeshRetentionPolicy};

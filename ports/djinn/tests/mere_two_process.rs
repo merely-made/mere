@@ -26,16 +26,16 @@ use chirograph::{
     CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult, ProjectionSession,
     ProjectionSnapshot,
 };
-use djinn::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use djinn::resident_mere::{MereRoutes, mere_route_id};
-use djinn::resident_reservoir::{
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
+use mere_resident::resident_mere::{MereRoutes, mere_route_id};
+use mere_resident::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::projection::AppBrokerClient;
-use graphshell_endpoint::door::identity::VaultProtectionView;
+use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_host::lifecycle::AdmittedEndpointContext;
@@ -182,7 +182,7 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(djinn::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,

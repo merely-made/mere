@@ -6,18 +6,18 @@
 
 //! Traits application adapters implement beside their own source truth.
 //!
-//! The carriers live here too, one feature each: `stdio` (NDJSON over a child
-//! process's standard streams), `local` (an endpoint hosted in this process)
-//! and `network` (NDJSON over any async byte stream, bringing Tokio). They were
-//! separate crates until 2026-09-24. With no feature on, the crate stays
-//! wasm-clean.
+//! The default feature set is empty. `projection` enables the endpoint traits;
+//! the `stdio`, `local` and `network` carriers imply it. `network` is native-only.
 //!
-//! The `door` feature is the application side of the first-party door
-//! ([`door`]): admission, the client, custody, quarantine and the local
-//! endpoint, native only. It was Graphshell's `native` app-facing half until
-//! 2026-10-15.
+//! Projection and identity adapters use the independent Djinn door; native
+//! adapters are unavailable on Wasm.
 
-#[cfg(feature = "door")]
+#[cfg(any(
+    feature = "projection-door",
+    feature = "projection-offer",
+    feature = "projection-provider",
+    feature = "profile"
+))]
 pub mod door;
 #[cfg(feature = "local")]
 pub mod local;

@@ -35,6 +35,21 @@ use crate::lifecycle::AdmittedEndpointContext;
 /// ordinary Graphshell endpoint implementations without exposing error types
 /// across product registrations.
 pub trait ResidentEndpoint: Send {
+    /// Complete any per-session setup outside the catalog lock.
+    fn prepare(&mut self) -> Result<(), String> {
+        Ok(())
+    }
+    /// Whether this endpoint must run on a bounded blocking worker.
+    fn requires_blocking(&self) -> bool {
+        false
+    }
+    fn cancellation(&self) -> Option<tokio::sync::watch::Receiver<bool>> {
+        None
+    }
+    /// Whether the owner still permits this endpoint to serve.
+    fn is_live(&self) -> bool {
+        true
+    }
     fn describe(&self) -> EndpointDescriptor;
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, String>;
     fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, String>;
@@ -75,6 +90,7 @@ type Factory =
     dyn FnMut(&AdmittedEndpointContext) -> Result<Box<dyn ResidentEndpoint>, String> + Send;
 
 struct Registration {
+    owner: Option<u64>,
     label: String,
     factory: Box<Factory>,
 }
@@ -133,7 +149,34 @@ impl ResidentEndpointCatalog {
         + Send
         + 'static,
     ) -> Result<(), ResidentEndpointCatalogError> {
-        self.insert(id.into(), label.into(), factory)
+        self.insert(id.into(), label.into(), None, factory)
+    }
+
+    /// Register a lease-owned endpoint; owner tokens must be unique per lease.
+    pub fn register_owned(
+        &mut self,
+        id: impl Into<String>,
+        label: impl Into<String>,
+        owner: u64,
+        factory: impl FnMut(&AdmittedEndpointContext) -> Result<Box<dyn ResidentEndpoint>, String>
+        + Send
+        + 'static,
+    ) -> Result<(), ResidentEndpointCatalogError> {
+        self.insert(id.into(), label.into(), Some(owner), factory)
+    }
+
+    /// Remove only the exact lease, leaving any replacement intact.
+    pub fn remove_owned(&mut self, id: &str, owner: u64) -> bool {
+        if self
+            .registrations
+            .get(id)
+            .is_some_and(|r| r.owner == Some(owner))
+        {
+            self.registrations.remove(id);
+            true
+        } else {
+            false
+        }
     }
 
     /// Register a silent endpoint factory. The factory runs once when this
@@ -247,6 +290,7 @@ impl ResidentEndpointCatalog {
         &mut self,
         id: String,
         label: String,
+        owner: Option<u64>,
         factory: impl FnMut(&AdmittedEndpointContext) -> Result<Box<dyn ResidentEndpoint>, String>
         + Send
         + 'static,
@@ -260,6 +304,7 @@ impl ResidentEndpointCatalog {
         self.registrations.insert(
             id,
             Registration {
+                owner,
                 label,
                 factory: Box::new(factory),
             },
@@ -274,6 +319,18 @@ pub struct ResidentEndpointSession {
 }
 
 impl ResidentEndpointSession {
+    pub fn prepare(&mut self) -> Result<(), String> {
+        self.endpoint.prepare()
+    }
+    pub fn requires_blocking(&self) -> bool {
+        self.endpoint.requires_blocking()
+    }
+    pub fn is_live(&self) -> bool {
+        self.endpoint.is_live()
+    }
+    pub fn cancellation(&self) -> Option<tokio::sync::watch::Receiver<bool>> {
+        self.endpoint.cancellation()
+    }
     pub fn resume(&mut self, request: ResumeRequest) -> Result<ResumeReply, String> {
         self.endpoint.resume(request)
     }
@@ -538,6 +595,68 @@ mod tests {
         assert_eq!(endpoint.describe().label, "Fixture endpoint");
         assert_eq!(endpoint.poll_notice().unwrap(), None);
         assert_eq!(*polls.lock().unwrap(), 1);
+    }
+
+    #[test]
+    fn session_exposes_preparation_and_liveness_of_its_endpoint() {
+        struct Stopped;
+        impl ResidentEndpoint for Stopped {
+            fn describe(&self) -> EndpointDescriptor {
+                EndpointDescriptor {
+                    label: "stopped".into(),
+                    projections: vec![],
+                }
+            }
+            fn snapshot(&mut self, _: ProjectionRequest) -> Result<ProjectionSnapshot, String> {
+                Err("stopped".into())
+            }
+            fn resource(&mut self, _: ResourceRequest) -> Result<ResourceResponse, String> {
+                Err("stopped".into())
+            }
+            fn invoke(&mut self, _: IntentInvocation) -> Result<IntentResult, String> {
+                Err("stopped".into())
+            }
+            fn prepare(&mut self) -> Result<(), String> {
+                Err("stopped".into())
+            }
+            fn is_live(&self) -> bool {
+                false
+            }
+            fn requires_blocking(&self) -> bool {
+                true
+            }
+        }
+        let mut session = ResidentEndpointSession {
+            endpoint: Box::new(Stopped),
+        };
+        assert!(session.requires_blocking());
+        assert!(!session.is_live());
+        assert!(session.prepare().is_err());
+    }
+
+    #[test]
+    fn removal_requires_the_registration_owner() {
+        let mut catalog = ResidentEndpointCatalog::new();
+        catalog
+            .register_owned("fixture", "Fixture", 7, |_| {
+                Ok(Box::new(TypedResidentEndpoint::silent(
+                    FixtureEndpoint::default(),
+                )))
+            })
+            .unwrap();
+        assert!(!catalog.remove_owned("fixture", 6));
+        assert_eq!(catalog.offers().len(), 1);
+        assert!(catalog.remove_owned("fixture", 7));
+        assert!(catalog.offers().is_empty());
+        catalog
+            .register_owned("fixture", "Replacement", 8, |_| {
+                Ok(Box::new(TypedResidentEndpoint::silent(
+                    FixtureEndpoint::default(),
+                )))
+            })
+            .unwrap();
+        assert!(!catalog.remove_owned("fixture", 7));
+        assert_eq!(catalog.offers()[0].label, "Replacement");
     }
 
     #[test]

@@ -30,4 +30,5 @@ pub mod identity_projection;
 #[cfg(test)]
 mod identity_session_tests;
 pub mod local_session;
+pub mod projection_offers;
 pub mod resident_identity;

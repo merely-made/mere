@@ -25,14 +25,14 @@ use chirograph::{
     CapabilityProfile, CarrierRequest, CarrierRequestBody, CarrierResponseBody, ContentHash,
     PortableCardV1, ProtocolVersion, ResourceRequest, SessionOpen,
 };
-use graphshell_endpoint::door::app_admission::{
+use djinn::door::app_admission::{
     AllowedAppRoutes, AppHello, AppId, AppRouteGrants, AppRouteId,
 };
 use graphshell_endpoint::door::projection::AppBrokerClient;
-use graphshell_endpoint::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
+use djinn::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
-type AppMessage = WireMessage<chirograph::CarrierRequest, graphshell_endpoint::door::custody::CustodyCall>;
-type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<graphshell_endpoint::door::custody::CustodyAnswer, graphshell_endpoint::door::custody::CustodyRefusal>>;
+type AppMessage = WireMessage<chirograph::CarrierRequest, djinn::door::custody::CustodyCall>;
+type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<djinn::door::custody::CustodyAnswer, djinn::door::custody::CustodyRefusal>>;
 
 fn resident_host() -> Arc<FixedIdentity> {
     FixedIdentity::new(0x91)
@@ -434,7 +434,7 @@ async fn the_client_reads_cards_over_the_served_endpoint() {
 /// item 20).
 #[tokio::test(flavor = "multi_thread")]
 async fn a_route_granted_while_serving_opens_for_the_next_connection() {
-    use graphshell_endpoint::door::route::ResidentEndpointRoute;
+    use djinn::door::route::ResidentEndpointRoute;
     use graphshell_host::canary::FixtureEndpoint;
 
     let personae = resident_host();
@@ -501,7 +501,7 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
 /// without opt-in. Neither case may reach even the Graphshell challenge.
 #[tokio::test]
 async fn denials_and_ambient_refusals_precede_product_construction() {
-    use graphshell_endpoint::door::route::ResidentEndpointRoute;
+    use djinn::door::route::ResidentEndpointRoute;
     for (app, route, denied) in [
         ("turnstone", "mere/divination", true),
         ("turnstone", "ambient/mere/divination", false),
