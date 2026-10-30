@@ -388,9 +388,9 @@ error types settle.
   S1 marked mostly built, I1 next before M1's remaining entries, C0 held,
   G1 deferred, payloads CBOR, and the OS peer facts homed in one Armillary
   crate.
-- 2026-10-30: Turnstone's declaration built and parked behind I1 (D4).
-  Armillary `b2388f4` landed declared salt namespaces (`exact`, `prefix`,
-  `delegation_scope`), declarations through `CustodyIdentity`, and an
-  `AllowedAppRoutes::default()` that admits no one. Mere, Knot and Turnstone
-  hold the rest on `agent/turnstone-declaration`; landing it repins the
-  cohort to `b2388f4`.
+- 2026-10-30: Turnstone's declaration built and parked behind I1 (D4) on
+  `agent/turnstone-declaration` in Armillary (`b2388f4`: salt namespaces as
+  `exact`, `prefix` or `delegation_scope`, declarations through
+  `CustodyIdentity`, an `AllowedAppRoutes::default()` that admits no one),
+  Mere, Knot and Turnstone. Armillary `main` reverted `b2388f4` (`1cb9518`);
+  landing the branches repins the cohort to it.
