@@ -344,6 +344,88 @@ mod tests {
         finish_wipe_observation(&observations, message.len());
     }
 
+    struct FailAfterPrefix(Vec<u8>);
+
+    impl Write for FailAfterPrefix {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            if self.0.len() == 4 {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::BrokenPipe,
+                    "writer failed",
+                ));
+            }
+            let count = bytes.len().min(4 - self.0.len());
+            self.0.extend_from_slice(&bytes[..count]);
+            Ok(count)
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn writer_failure_after_prefix_wipes_owned_buffer() {
+        let observations = observe_wipe();
+        let message = "secret-write-body";
+        let mut writer = FailAfterPrefix(Vec::new());
+        let error = write_native_message(&mut writer, &message).unwrap_err();
+        assert!(
+            matches!(error, FrameError::Io(ref error) if error.kind() == std::io::ErrorKind::BrokenPipe)
+        );
+        assert_eq!(writer.0, ((message.len() + 2) as u32).to_ne_bytes());
+        finish_wipe_observation(&observations, message.len());
+    }
+
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
+    impl tokio::io::AsyncWrite for FailAfterPrefix {
+        fn poll_write(
+            mut self: std::pin::Pin<&mut Self>,
+            _cx: &mut std::task::Context<'_>,
+            bytes: &[u8],
+        ) -> std::task::Poll<std::io::Result<usize>> {
+            std::task::Poll::Ready(Write::write(&mut *self, bytes))
+        }
+
+        fn poll_flush(
+            self: std::pin::Pin<&mut Self>,
+            _cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<std::io::Result<()>> {
+            std::task::Poll::Ready(Ok(()))
+        }
+
+        fn poll_shutdown(
+            self: std::pin::Pin<&mut Self>,
+            _cx: &mut std::task::Context<'_>,
+        ) -> std::task::Poll<std::io::Result<()>> {
+            std::task::Poll::Ready(Ok(()))
+        }
+    }
+
+    #[cfg(all(
+        feature = "door-native",
+        any(unix, windows),
+        not(target_arch = "wasm32")
+    ))]
+    #[tokio::test]
+    async fn async_writer_failure_after_prefix_wipes_owned_buffer() {
+        let observations = observe_wipe();
+        let message = "secret-write-body";
+        let mut writer = FailAfterPrefix(Vec::new());
+        let error = write_native_message_async(&mut writer, &message)
+            .await
+            .unwrap_err();
+        assert!(
+            matches!(error, FrameError::Io(ref error) if error.kind() == std::io::ErrorKind::BrokenPipe)
+        );
+        assert_eq!(writer.0, ((message.len() + 2) as u32).to_ne_bytes());
+        finish_wipe_observation(&observations, message.len());
+    }
+
     #[test]
     fn frames_json_with_a_native_endian_length() {
         let message = serde_json::json!({ "type": "take_notice" });
