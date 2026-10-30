@@ -913,6 +913,6 @@ mod tests {
     fn an_unadmitted_application_is_refused_at_the_hello() {
         let hello = AppHello::new(AppId::new("not-ours"));
         let request = hello.accept().unwrap();
-        assert!(AllowedAppRoutes::default().admit(&request).is_err());
+        assert!(AllowedAppRoutes::identity_for(AppId::new("turnstone")).admit(&request).is_err());
     }
 }

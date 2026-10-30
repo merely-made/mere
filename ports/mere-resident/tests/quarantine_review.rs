@@ -317,7 +317,7 @@ async fn wrong_persona_stale_revision_and_ordinary_app_cannot_mutate() {
             .is_err()
     );
     assert!(matches!(
-        f.client("turnstone").await.review_quarantine(r.clone()).await,
+        f.client("cleromancy").await.review_quarantine(r.clone()).await,
         Err(CustodyClientError::Refused(CustodyRefusal::NotServed))
     ));
     f.still_held(&r).await;

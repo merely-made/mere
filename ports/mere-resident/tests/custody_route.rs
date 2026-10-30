@@ -75,7 +75,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
     let mut client = None;
     for _ in 0..100 {
-        if let Ok(opened) = open(&endpoint, "turnstone").await {
+        if let Ok(opened) = open(&endpoint, "cleromancy").await {
             client = Some(opened);
             break;
         }
@@ -218,6 +218,6 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
 #[tokio::test]
 async fn an_absent_djinn_is_pending_not_a_fallback() {
-    let absent = open(&endpoint_name(), "turnstone").await;
+    let absent = open(&endpoint_name(), "cleromancy").await;
     assert!(matches!(&absent, Err(error) if error.is_pending()));
 }

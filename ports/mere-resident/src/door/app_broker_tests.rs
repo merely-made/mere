@@ -79,7 +79,7 @@ async fn turnstone_opens_a_session_and_reads_a_capture() {
     let (mut host_reader, mut host_writer) = tokio::io::split(host_stream);
     let (mut app_reader, mut app_writer) = tokio::io::split(app_stream);
 
-    let allowed = AllowedAppRoutes::default();
+    let allowed = AllowedAppRoutes::identity_for(AppId::new("turnstone"));
     let host = serve_app_connection_for_tests(
         &mut host_reader,
         &mut host_writer,
@@ -221,7 +221,7 @@ async fn an_unadmitted_application_never_sees_a_challenge() {
     write_native_message_async(&mut app_writer, &AppHello::new(AppId::new("not-ours")))
         .await
         .unwrap();
-    let allowed = AllowedAppRoutes::default();
+    let allowed = AllowedAppRoutes::identity_for(AppId::new("turnstone"));
     let served = serve_app_connection_for_tests(
         &mut host_reader,
         &mut host_writer,
@@ -281,7 +281,7 @@ async fn an_ungranted_route_never_opens_its_product_endpoint() {
         &mut host_reader,
         &mut host_writer,
         personae,
-        &AllowedAppRoutes::default(),
+        &AllowedAppRoutes::identity_for(AppId::new("turnstone")),
         60_000,
         Some(Arc::new(RwLock::new(DeviceSurface::default()))),
         AppEndpointCatalog::new(catalog),
@@ -304,7 +304,7 @@ async fn the_browser_connect_frame_does_not_open_an_application_session() {
     let (mut host_reader, mut host_writer) = tokio::io::split(host_stream);
     let (mut app_reader, mut app_writer) = tokio::io::split(app_stream);
 
-    let allowed = AllowedAppRoutes::default();
+    let allowed = AllowedAppRoutes::identity_for(AppId::new("turnstone"));
     let host = serve_app_connection_for_tests(
         &mut host_reader,
         &mut host_writer,
@@ -380,7 +380,7 @@ async fn the_client_reads_cards_over_the_served_endpoint() {
         let _ = serve_app_broker(
             &server_endpoint,
             personae,
-            AppRouteGrants::default(),
+            AppRouteGrants::new(AllowedAppRoutes::identity_for(AppId::new("turnstone"))),
             60_000,
             Some(Arc::new(RwLock::new(surface))),
             AppEndpointCatalog::default(),
@@ -445,7 +445,7 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
         .join(format!("graphshell-app-late-{}.sock", uuid::Uuid::new_v4()))
         .display()
         .to_string();
-    let grants = AppRouteGrants::default();
+    let grants = AppRouteGrants::new(AllowedAppRoutes::identity_for(AppId::new("turnstone")));
     let catalog = AppEndpointCatalog::default();
     let server = {
         let (endpoint, grants, catalog) = (endpoint.clone(), grants.clone(), catalog.clone());
@@ -516,7 +516,7 @@ async fn denials_and_ambient_refusals_precede_product_construction() {
                 Err("factory must not open".into())
             })
             .unwrap();
-        let mut allowed = AllowedAppRoutes::default();
+        let mut allowed = AllowedAppRoutes::identity_for(AppId::new("turnstone"));
         allowed.grant_default(
             ResidentEndpointRoute::new("mere/divination", std::time::Duration::from_millis(50))
                 .unwrap(),

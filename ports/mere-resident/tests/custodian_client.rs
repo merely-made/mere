@@ -346,15 +346,16 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
     keeper.configure_payload_custody(ProfileId("work".into()), persona, custodian.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
     let endpoint = custodian.dir.path().join("app.sock").to_string_lossy().to_string();
     let server = tokio::spawn({ let endpoint = endpoint.clone(); async move {
         serve_app_broker(&endpoint, keeper, grants, 60_000, None, AppEndpointCatalog::default()).await
     }});
     for _ in 0..100 {
-        if CustodyClient::open_at(&endpoint, AppId::new("turnstone")).await.is_ok() { break; }
+        if CustodyClient::open_declared_at(&endpoint, AppId::new("turnstone"), turnstone_declaration()).await.is_ok() { break; }
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
-    let open = |endpoint: String| tokio::task::spawn_blocking(move || CustodyIdentity::connect_at_timeout(&endpoint, "turnstone", Duration::from_secs(3)));
+    let open = |endpoint: String| tokio::task::spawn_blocking(move || CustodyIdentity::connect_declared_at_timeout(&endpoint, "turnstone", turnstone_declaration(), Duration::from_secs(3)));
     let old = open(endpoint.clone()).await.unwrap().expect("application custody connects");
     let epoch = old.connected_status().custody_epoch.clone().expect("authoritative generation forwarded");
     let clear = b"PRIVATE-BROKER-EPOCH-CANARY-417";
@@ -369,4 +370,24 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
     drop(old);
     drop(fresh);
     server.abort();
+}
+
+/// Turnstone's custody declaration, as Turnstone sends it: payload sealing
+/// keys its scope by the `turnstone` label, and that label is admitted by
+/// declaration under Mere's default grants.
+fn turnstone_declaration() -> djinn::door::declaration::AppDeclaration {
+    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+    let mut declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        ..AppDeclaration::default()
+    };
+    declaration.custody.operations = [
+        CustodyOperation::Status,
+        CustodyOperation::WatchLock,
+        CustodyOperation::Release,
+        CustodyOperation::Attest,
+        CustodyOperation::Payload,
+    ]
+    .into();
+    declaration
 }

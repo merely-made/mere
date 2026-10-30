@@ -94,7 +94,7 @@ async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
             hash,
         ]
     };
-    let mut ordinary = CustodyClient::open_at(&endpoint, AppId::new("turnstone"))
+    let mut ordinary = CustodyClient::open_at(&endpoint, AppId::new("cleromancy"))
         .await
         .unwrap();
     assert!(matches!(

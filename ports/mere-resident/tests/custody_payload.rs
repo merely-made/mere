@@ -55,6 +55,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
     #[cfg(unix)]
     let endpoint = root
         .path()
@@ -79,7 +80,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     });
     let mut client = None;
     for _ in 0..100 {
-        if let Ok(opened) = CustodyClient::open_at(&endpoint, AppId::new("turnstone")).await {
+        if let Ok(opened) = CustodyClient::open_declared_at(&endpoint, AppId::new("turnstone"), turnstone_declaration()).await {
             client = Some(opened);
             break;
         }
@@ -253,7 +254,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     // Reconnect through the actual synchronous identity adapter on its actor.
     let identity_endpoint = endpoint.clone();
     let reader = tokio::task::spawn_blocking(move || {
-        CustodyIdentity::connect_at(&identity_endpoint, "turnstone").unwrap()
+        CustodyIdentity::connect_declared_at_timeout(&identity_endpoint, "turnstone", turnstone_declaration(), Duration::from_secs(10)).unwrap()
     })
     .await
     .unwrap();
@@ -296,7 +297,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     host.lock_vault().unwrap();
     // A fresh custody connection must not need projection admission or door
     // keys after the vault locks. It may read status, but cannot release data.
-    let mut locked_client = CustodyClient::open_at(&endpoint, AppId::new("turnstone"))
+    let mut locked_client = CustodyClient::open_declared_at(&endpoint, AppId::new("turnstone"), turnstone_declaration())
         .await
         .expect("custody remains reachable while locked");
     assert_eq!(
@@ -392,9 +393,30 @@ fn retained_custody_receipt_host() {
     keeper.configure_payload_custody(ProfileId("family".into()), persona, fixture.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
     tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap()
         .block_on(serve_app_broker(endpoint.to_str().unwrap(), keeper, grants, 60_000, None, AppEndpointCatalog::default())).unwrap();
 }
 
 #[cfg(unix)]
 mod custody_receipt_tests;
+
+/// Turnstone's custody declaration, as Turnstone sends it: payload sealing
+/// keys its scope by the `turnstone` label, and that label is admitted by
+/// declaration under Mere's default grants.
+fn turnstone_declaration() -> djinn::door::declaration::AppDeclaration {
+    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+    let mut declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        ..AppDeclaration::default()
+    };
+    declaration.custody.operations = [
+        CustodyOperation::Status,
+        CustodyOperation::WatchLock,
+        CustodyOperation::Release,
+        CustodyOperation::Attest,
+        CustodyOperation::Payload,
+    ]
+    .into();
+    declaration
+}

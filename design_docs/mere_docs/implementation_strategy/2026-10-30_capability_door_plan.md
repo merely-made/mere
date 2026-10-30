@@ -388,3 +388,12 @@ error types settle.
   S1 marked mostly built, I1 next before M1's remaining entries, C0 held,
   G1 deferred, payloads CBOR, and the OS peer facts homed in one Armillary
   crate.
+
+- 2026-10-30: M1's second case, Turnstone. Declarations and grants name salt
+  namespaces (`exact`, `prefix`, `delegation_scope`), released or acts only;
+  `CustodyIdentity` and the blocking custody calls carry declarations. Turnstone
+  left `CUSTODY_APPS`, the first-party list, the binary's identity, Knot,
+  chronicle and inference grants, and the label release policy's Turnstone
+  namespaces; Djinn's `AllowedAppRoutes::default()` admits no one. Remaining
+  label tables: `CUSTODY_APPS` for the other applications,
+  `reservoir_applications()`, and the payload scope chosen by label.

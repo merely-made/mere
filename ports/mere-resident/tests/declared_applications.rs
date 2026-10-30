@@ -30,7 +30,7 @@ use knot_editor::PersonalVaultKeys;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::projection_offers::ProviderPermission;
 use mere_resident::keeper::Keeper;
-use personae::{Ed25519Keypair, PersonaId, ProfileId};
+use personae::{Ed25519Keypair, IdentityProvider, PersonaId, ProfileId};
 
 const DEVICE: &str = "declared-applications-fixture";
 
@@ -171,9 +171,9 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
     assert!(open(&endpoint, knot_editor::KNOT_APP_ID, None).await.is_err());
 
     // A label-admitted application no longer reaches Knot's keys.
-    let mut turnstone = open(&endpoint, "turnstone", None).await.unwrap();
+    let mut labelled = open(&endpoint, "cleromancy", None).await.unwrap();
     assert_eq!(
-        refusal(turnstone.call(release(PersonalVaultKeys::requests())).await),
+        refusal(labelled.call(release(PersonalVaultKeys::requests())).await),
         CustodyRefusal::NotReleasable
     );
 }
@@ -200,6 +200,7 @@ async fn a_declared_request_beyond_the_owner_grant_is_refused_as_not_granted() {
                 EpochUse::secret("fixture.granted.key", false),
                 EpochUse::secret("fixture.other.key", false),
             ],
+            ..CustodyUse::default()
         },
         ..AppDeclaration::default()
     };
@@ -227,6 +228,97 @@ async fn a_declared_request_beyond_the_owner_grant_is_refused_as_not_granted() {
         ..AppDeclaration::default()
     };
     assert!(open(&endpoint, "fixture-app", Some(undeclared)).await.is_err());
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn declared_salts_release_and_sign_only_within_declaration_and_grant() {
+    use djinn::door::custody::KeySource;
+    use djinn::door::declaration::{SaltPattern, SaltUse};
+    let wallet = tempfile::tempdir().unwrap();
+    let mut grant = AppGrant::new(AppId::new("salted-app"));
+    grant.routes = vec![NamePattern::exact("custody")];
+    grant.custody.operations =
+        [CustodyOperation::Release, CustodyOperation::Sign, CustodyOperation::Attest].into();
+    grant.custody.salts = vec![SaltUse::persona(SaltPattern::Prefix("salted.".into()))];
+    grant.custody.acts = vec![SaltUse::persona(SaltPattern::Prefix("salted-acts/".into()))];
+    let endpoint = serve(wallet.path(), vec![grant], AppEndpointCatalog::default()).await;
+    let mut declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        ..AppDeclaration::default()
+    };
+    declaration.custody.operations =
+        [CustodyOperation::Release, CustodyOperation::Sign, CustodyOperation::Attest].into();
+    declaration.custody.salts = vec![
+        SaltUse::persona(SaltPattern::Prefix("salted.place.".into())),
+        SaltUse::persona(SaltPattern::Exact("undeclared-by-grant".into())),
+    ];
+    declaration.custody.acts = vec![SaltUse::persona(SaltPattern::Prefix("salted-acts/".into()))];
+    let mut client = open(&endpoint, "salted-app", Some(declaration)).await.unwrap();
+
+    // Released within both, and not from the label policy, which names none of these.
+    let released = client
+        .release(KeySource::Persona, vec![b"salted.place.one".to_vec()])
+        .await
+        .expect("a declared, granted salt is released");
+    assert!(released.derive_keypair(b"salted.place.one").is_ok());
+    // Signed with, never released.
+    let act = [b"salted-acts/".as_slice(), &[0xff, 0x01]].concat();
+    client
+        .sign(KeySource::Persona, act.clone(), b"m".to_vec())
+        .await
+        .expect("a declared act signs");
+    assert!(matches!(
+        refusal(client.release(KeySource::Persona, vec![act]).await),
+        CustodyRefusal::Undeclared { .. }
+    ));
+    assert!(matches!(
+        refusal(client.release(KeySource::Persona, vec![b"undeclared-by-grant".to_vec()]).await),
+        CustodyRefusal::NotGranted { .. }
+    ));
+    assert!(matches!(
+        refusal(client.release(KeySource::Persona, vec![mesh::MESH_AUTHOR_SALT.to_vec()]).await),
+        CustodyRefusal::Undeclared { .. }
+    ));
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn turnstone_releases_its_place_and_scope_keys_within_the_default_grant() {
+    use djinn::door::custody::KeySource;
+    use djinn::door::declaration::{SaltPattern, SaltUse, delegation_scope_prefix};
+    let wallet = tempfile::tempdir().unwrap();
+    let endpoint = serve(wallet.path(), Vec::new(), AppEndpointCatalog::default()).await;
+    let mut declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        ..AppDeclaration::default()
+    };
+    declaration.custody.operations =
+        [CustodyOperation::Status, CustodyOperation::Release, CustodyOperation::Attest].into();
+    declaration.custody.salts = vec![
+        SaltUse::persona(SaltPattern::Prefix("turnstone.place.".into())),
+        SaltUse::persona(SaltPattern::DelegationScope("moot".into())),
+        SaltUse::persona(SaltPattern::DelegationScope("mere.graphshell".into())),
+    ];
+    let mut client = open(&endpoint, "turnstone", Some(declaration)).await.unwrap();
+    client
+        .release(KeySource::Persona, vec![b"turnstone.place.transport.v1/moot".to_vec()])
+        .await
+        .expect("a place key is released");
+    let scope = |domain: &str| [delegation_scope_prefix(domain), vec![4, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4]].concat();
+    client
+        .release(KeySource::Persona, vec![scope("moot")])
+        .await
+        .expect("a Moot's delegation scope key is released");
+    // The owner grants a place's Graphshell guest scope as an act only.
+    client
+        .attest(KeySource::Persona, scope("mere.graphshell"))
+        .await
+        .expect("the Graphshell guest scope is attested");
+    assert!(matches!(
+        refusal(client.release(KeySource::Persona, vec![scope("mere.graphshell")]).await),
+        CustodyRefusal::NotGranted { .. }
+    ));
+    // Turnstone's label without its declaration is refused at the door.
+    assert!(open(&endpoint, "turnstone", None).await.is_err());
 }
 
 #[tokio::test(flavor = "multi_thread")]

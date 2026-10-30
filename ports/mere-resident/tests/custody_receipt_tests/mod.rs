@@ -20,7 +20,7 @@ impl Host {
             .stdout(Stdio::null()).stderr(Stdio::inherit()).spawn().unwrap();
         let deadline = std::time::Instant::now() + Duration::from_secs(30);
         let identity = loop {
-            if let Ok(identity) = CustodyIdentity::connect_at_timeout(endpoint.to_str().unwrap(), "turnstone", Duration::from_secs(1)) { break identity; }
+            if let Ok(identity) = CustodyIdentity::connect_declared_at_timeout(endpoint.to_str().unwrap(), "turnstone", super::turnstone_declaration(), Duration::from_secs(1)) { break identity; }
             assert!(child.try_wait().unwrap().is_none(), "fixture process exited");
             assert!(std::time::Instant::now() < deadline, "fixture did not start");
             std::thread::sleep(Duration::from_millis(50));
@@ -80,7 +80,7 @@ fn real_receipt_process_reopens_wallet_and_fences_stale_epoch() {
     assert_eq!(fresh.unseal(&Hash::of(clear), &marker, &sealed).unwrap(), clear);
     let endpoint = root.path().join("app.sock").to_string_lossy().into_owned();
     tokio::runtime::Runtime::new().unwrap().block_on(async {
-        let mut client = CustodyClient::open_at(&endpoint, AppId::new("turnstone")).await.unwrap();
+        let mut client = CustodyClient::open_declared_at(&endpoint, AppId::new("turnstone"), super::turnstone_declaration()).await.unwrap();
         let request = PayloadRequest { profile: old_status.profile.unwrap(), master: old_status.persona_public_key.unwrap(),
             content_hash: Hash::of(clear), operation: PayloadOperation::Seal { bytes: PayloadBytes(clear.to_vec()) }, custody_epoch: Some(old_epoch) };
         assert!(client.call(CustodyCall::Payload(request)).await.is_err(), "old instance epoch cannot write after restart");

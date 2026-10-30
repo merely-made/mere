@@ -48,7 +48,6 @@ pub(crate) mod payload;
 /// instead (`crate::applications`) and is not listed here.
 pub const CUSTODY_APPS: &[&str] = &[
     "cleromancy",
-    "turnstone",
     "graphshell",
     "woodshed",
     "hocket",
@@ -229,54 +228,20 @@ impl Default for ReleasePolicy {
     }
 }
 
-/// The application namespaces DR-C moved behind the custody route: the
-/// derived keys Turnstone, Woodshed and Hocket need continuously (transport
-/// and sealing, D11), and the delegations Turnstone issues through djinn.
+/// The application namespaces DR-C moved behind the custody route for
+/// applications admitted by label: the derived keys Woodshed and Hocket need
+/// continuously (transport and sealing, D11), and the root acts Graphshell and
+/// installs sign through djinn. Turnstone's and Knot's namespaces are their
+/// declarations within the owner's grants (`crate::applications`).
 impl ReleasePolicy {
     fn with_apps(self) -> Self {
-        let persona = |policy: Self, prefix: &[u8]| {
-            policy.with(KeySource::Persona, SaltRule::Prefix(prefix.to_vec()))
-        };
-        let mut policy = self.with(
-            KeySource::Persona,
-            SaltRule::Exact(b"woodshed.practice-session.seal.v1".to_vec()),
-        );
-        for prefix in [
+        let policy = self
+            .with(
+                KeySource::Persona,
+                SaltRule::Exact(b"woodshed.practice-session.seal.v1".to_vec()),
+            )
             // Hocket's per-session hand-off signer.
-            &b"hocket/handoff/v2/"[..],
-            // Turnstone: a place's transport, sealed secrets and founding key;
-            // the projection endpoint; capsule-scoped Gemini identities.
-            b"turnstone.place.",
-            b"turnstone/projection-endpoint/",
-            b"personae/gemini-client-identity/v1/",
-            // The shared-place writers Turnstone authors under: Commons
-            // containers and chat, Gemot membership and objects, Stickleback
-            // group keys and prekeys.
-            b"mere.commons.writer.v1/",
-            b"mere.commons.chat.writer.v1/",
-            b"mere.gemot.membership.v1/",
-            b"mere.gemot.objects.v1/",
-            b"stickleback/group-key-writer/v1/",
-            b"stickleback/group-prekey-identity/v1",
-        ] {
-            policy = persona(policy, prefix);
-        }
-        // Gemot authors a Moot's delegation facts under the scope key that
-        // signed them, so a place's delegation key is held while it is open.
-        // Knot's share grants and revocations are issued through a provider
-        // by the host publishing them (Turnstone), so their scope key too.
-        for domain in ["moot", "mere.knot"] {
-            policy = persona(
-                policy,
-                &insigne::delegation::delegation_signing_prefix(domain),
-            );
-        }
-        // The reader key Turnstone opens Knot's published shares with
-        // (`knot_editor::KNOT_PUBLISH_READER_KEY_CONTEXT`).
-        policy = policy.with(
-            KeySource::Persona,
-            SaltRule::Exact(b"mere/knot-publish/reader/v1".to_vec()),
-        );
+            .with(KeySource::Persona, SaltRule::Prefix(b"hocket/handoff/v2/".to_vec()));
         // A participant install is the root's act: signed here, never released.
         policy
             .with_act(
@@ -298,10 +263,11 @@ impl ReleasePolicy {
 
 /// Answer one custody call for `app`.
 ///
-/// A declared application (`authority`) is answered only the calls and epoch
-/// derivations its declaration names and its owner grants; its epoch
-/// releases are not drawn from the label policy. Salt releases, attestations
-/// and signatures stay under the [`ReleasePolicy`] for every caller.
+/// A declared application (`authority`) is answered only the calls, epoch
+/// derivations and salts its declaration names and its owner grants; none of
+/// them are drawn from the label [`ReleasePolicy`]. The floors hold for every
+/// caller: never the master's place, station salts only for Signalman, and a
+/// Graphshell delegation checked before it is signed.
 pub(crate) async fn answer(
     keeper: Arc<Keeper>,
     app: AppId,
@@ -467,14 +433,14 @@ pub(crate) async fn answer(
         },
         CustodyCall::Release { source, salts } => {
             unlocked(&keeper)?;
-            release(&keeper, &app, source, None, salts).await
+            release(&keeper, &app, declared, source, None, salts).await
         },
         CustodyCall::Attest { source, salt } => {
             if !radio_station_app_allowed(&app, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
-            attest(&keeper, source, None, salt).await
+            attest(&keeper, declared, source, None, salt).await
         },
         CustodyCall::Sign {
             source,
@@ -485,7 +451,7 @@ pub(crate) async fn answer(
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
-            sign(&keeper, source, None, salt, message).await
+            sign(&keeper, declared, source, None, salt, message).await
         },
         CustodyCall::AsProfile { profile, inner } => {
             unlocked(&keeper)?;
@@ -506,16 +472,16 @@ pub(crate) async fn answer(
                 CustodyCall::Release {
                     source: KeySource::Persona,
                     salts,
-                } => release(&keeper, &app, source, Some(profile), salts).await,
+                } => release(&keeper, &app, declared, source, Some(profile), salts).await,
                 CustodyCall::Attest {
                     source: KeySource::Persona,
                     salt,
-                } => attest(&keeper, source, Some(profile), salt).await,
+                } => attest(&keeper, declared, source, Some(profile), salt).await,
                 CustodyCall::Sign {
                     source: KeySource::Persona,
                     salt,
                     message,
-                } => sign(&keeper, source, Some(profile), salt, message).await,
+                } => sign(&keeper, declared, source, Some(profile), salt, message).await,
                 _ => Err(CustodyRefusal::Refused {
                     reason: "only a status, or a persona release, attestation or signature, answers as a named persona".into(),
                 }),
@@ -651,11 +617,21 @@ fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
 async fn release(
     keeper: &Keeper,
     app: &AppId,
+    declared: bool,
     source: KeySource,
     profile: Option<ProfileId>,
     salts: Vec<Vec<u8>>,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
-    if !releasable(keeper.policy(), app, source, &salts) {
+    // A declared application's salts were admitted by its declaration and
+    // grant; the floors below hold for every caller.
+    let allowed = match declared {
+        true => {
+            !salts.is_empty()
+                && salts.iter().all(|salt| !salt.is_empty() && radio_station_app_allowed(app, salt))
+        },
+        false => releasable(keeper.policy(), app, source, &salts),
+    };
+    if !allowed {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
@@ -675,8 +651,8 @@ fn releasable(policy: &ReleasePolicy, app: &AppId, source: KeySource, salts: &[V
 }
 
 /// The root's attestation of `salt`'s key; no key crosses.
-async fn attest(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
-    if !keeper.policy().allows_act(source, &salt) {
+async fn attest(keeper: &Keeper, declared: bool, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if salt.is_empty() || (!declared && !keeper.policy().allows_act(source, &salt)) {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
@@ -689,8 +665,8 @@ async fn attest(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, 
 /// Sign `message` with `salt`'s key where the key is; only the signature
 /// crosses. A Graphshell guest delegation is decoded and checked for its
 /// audience, issuer and scope key before it is signed.
-async fn sign(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>, message: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
-    if !keeper.policy().allows_act(source, &salt) {
+async fn sign(keeper: &Keeper, declared: bool, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>, message: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if salt.is_empty() || (!declared && !keeper.policy().allows_act(source, &salt)) {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
