@@ -21,7 +21,6 @@ $resolvedModel = (Resolve-Path -LiteralPath $ModelDir).Path
 $env:DISTILLERY_REMOTE_PROBE_COMMIT = (git -C $mereRoot rev-parse HEAD).Trim()
 $ownedStatus = git -C $mereRoot status --porcelain -- `
     ports/distillery `
-    crates/intel/esp `
     crates/mesh/mesh `
     crates/mesh/host `
     Cargo.toml `

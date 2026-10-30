@@ -21,12 +21,15 @@ Within the budget in `doctrine_budget.toml`.
 A product builds on the stack it has. A crate it doesn't need or want is not
 invited in, and a stale dependency of marginal benefit leaves rather than
 being fetched to keep a build whole. A product's own crates are made when the
-abstraction earns one.
+abstraction earns one, and a component is a module in its parent crate, not a
+crate of its own. A crate reserved as a capability's home receives that
+capability, which moves there when it is found elsewhere. A seam is reserved
+for a consumer that can be named today, never for a speculative one.
 
-Links: draws on isocosm:600, isocosm:organs.5 · summary Build on the stack we have: unneeded crates stay out, stale ones leave, own crates when the abstraction earns one.
+Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2 · summary Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers.
 
-*Moved 2026-10-22 from isocosm's doctrine, its Stack 1, worded for any product
-("Reword to 'a product'").*
+*Refined 2026-10-30 (house-style D1, D2): "Named futures only"; "Fold into
+Stack 1".*
 
 ### Stack 2. The stack supplies identity and trust
 
@@ -98,3 +101,20 @@ Links: draws on node-body-face-model D1 · summary Storage follows the death con
 
 *Added 2026-10-25, outcome new ("Write stack.6 now"), the first statement from
 this repository's own rulings.*
+
+### Stack 7. Source size
+
+No tracked source file in an owned repository exceeds 600 physical lines,
+comments and blanks included, without a technical reason listed beside it.
+Tests, scripts and shaders count; generated files and imported upstream
+sources are excluded by declared path, never by size. An oversize file splits
+along responsibilities the code already has, not into arbitrary fragments,
+and the split widens no visibility. Docs are outside the ceiling and are
+deduplicated instead. One shared check enforces it at commit and in CI; files
+over it today are listed as exceptions and leave the list through named
+cleanup slices.
+
+Links: draws on isocosm:592, isocosm:method.3, house-style D10 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in CI.
+
+*Added 2026-10-30, outcome new (house-style D10): "add the 600 line ceiling
+to the doctrine".*

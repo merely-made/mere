@@ -87,7 +87,7 @@ Mark's own.
 
 | Path | Upstream | Notices kept |
 |---|---|---|
-| `crates/system/luggage` | [cargo-packager-updater](https://github.com/crabnebula-dev/cargo-packager), MIT OR Apache-2.0 | `Copyright 2019-2023 Tauri Programme within The Commons Conservancy`; `Copyright 2023-2023 CrabNebula Ltd.` |
+| `crates/system/luggage` (moved to Eidetic 2026-10-19; see Source promotions below) | [cargo-packager-updater](https://github.com/crabnebula-dev/cargo-packager), MIT OR Apache-2.0 | `Copyright 2019-2023 Tauri Programme within The Commons Conservancy`; `Copyright 2023-2023 CrabNebula Ltd.` |
 
 Ruled 2026-08-27, on the brief's substantial-derivative precedent: tucket keeps
 MeshCore's MIT notice, and cambium and meristem go MPL-2.0 with the Apache
@@ -122,7 +122,7 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 | `document-canvas` | `crates/inker/document-canvas` | 0.1.0 | — |
 | `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
 | `illume` | `crates/nematic/illume` | 0.0.2 | — |
-| `errand` | `crates/system/errand` | 0.3.4, MIT OR Apache-2.0 | — |
+| `errand` | `crates/system/errand` (moved to Errand's repository 2026-10-19; see Source promotions below) | 0.3.4, MIT OR Apache-2.0 | — |
 | `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
 
 Each arrived from genet 2026-09-03 under its own published grant; relicensing
@@ -175,7 +175,8 @@ published-grant disposition in the section above, which is a different thing.
 ## A note on the discovery grep
 
 The sweep plan's invariant 1 lists `Copyright (c)` among its discovery
-patterns. That form is not universal: `crates/system/luggage` writes bare
+patterns. That form is not universal: Luggage (then `crates/system/luggage`,
+now Eidetic's `crates/luggage`) writes bare
 `Copyright 2019-2023 <holder>` with no parenthesised `(c)`, and was missed by
 the plan's own pattern set on 2026-08-27. Discovery should grep for
 `Copyright` unqualified, then read the hits.
