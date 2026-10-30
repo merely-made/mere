@@ -206,6 +206,11 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
 - **Whether introduction may cross personas.** The host plan keeps
   cross-application persona linkage opt-in.
 - **Which routes are direct and which proxied by default.**
+- **Custom clipboard formats as a capability.** Mark, 2026-10-30, choosing
+  upstream arboard over the deleted fork: custom OS clipboard formats
+  (Hocket's `audio/wav`) "should be provided through the new boundaries",
+  with arboard used as a library rather than forked. Which facet carries them,
+  and on which platforms, is open.
 
 ## Findings
 
@@ -254,6 +259,13 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   WASI on 2026-08-24 and `wasi:webgpu` is at Phase 2. OCapN's "a finish line"
   milestone has ten issues open and none closed, among them its encoding,
   ordering guarantees and error types.
+
+- 2026-10-30: the `mark-ik/arboard` custom-formats fork no longer exists, so
+  any graph resolving Genet's clipboard failed (Turnstone, Hocket). Genet
+  `b7c0bef` returns `genet-clipboard` to arboard 3.7: one primary
+  representation per write, custom formats reported `Unsupported`. Hocket
+  (Woodshed `e1d93b0`) keeps copied loop audio host-locally, so audio paste
+  works only inside one running Hocket.
 
 ## Progress
 
