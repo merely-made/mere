@@ -12,6 +12,8 @@ use chartulary::{Address, Addressed, Identified};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
+pub use super::resource_pair_bounds::ResourceEdgesBoundError;
+
 /// A tagging assertion points from the tagged resource to its concept resource.
 pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
 

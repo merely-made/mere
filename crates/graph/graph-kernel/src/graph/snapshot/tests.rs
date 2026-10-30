@@ -17,7 +17,7 @@ use crate::persistence::{
 };
 use crate::types::GraphScope;
 
-fn complete_payload() -> EdgePayload {
+pub(super) fn complete_payload() -> EdgePayload {
     let mut payload = EdgePayload::new();
     for sub_kind in all_semantic_sub_kinds() {
         for (asserter, time) in [("https://alice.test/", 11), ("https://bob.test/", 22)] {
@@ -162,7 +162,7 @@ fn surface_restore_retains_revision_bumps_and_normalization_boundary() {
     );
 }
 
-fn resource_snapshot_fixture() -> (GraphSnapshot, Uuid, Uuid, Uuid) {
+pub(super) fn resource_snapshot_fixture() -> (GraphSnapshot, Uuid, Uuid, Uuid) {
     let mut graph = Graph::new();
     let surface = graph.add_node("https://surface.test/".into(), Point2D::new(0.0, 0.0));
     let surface_id = graph.get_node(surface).unwrap().id;

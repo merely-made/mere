@@ -112,6 +112,7 @@ pub mod predicate_declarations;
 pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
+mod resource_pair_bounds;
 pub mod resource_classifications;
 pub mod resource_content;
 #[cfg(test)]
