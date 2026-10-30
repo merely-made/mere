@@ -2,6 +2,8 @@
 
 **Status:** 2026-10-28: cut from `2026-06-08_system_diagnostics_and_accessibility_plan.md` and from the apparatus tail of `2026-09-23_crate_consolidation_plan.md`, archived in `archive_docs/2026-10-28/`. The September design is implemented and machine-qualified within stated limits: the bounded observation store, the optional Mesquite attachment, Turnstone's Gloss and Inspector migration, the Redshank and Knot worker pilots, shared selectors, current-target admission, producer identities, child, leaf and member lifetimes, native ID remapping, publication outcomes, cache membership and delayed host results. Open: owner-issued target lifetimes in deeper producers, provider provenance, authored-source lifetimes, guest ingress and native install recovery, a supplier-qualified semantic model with forward geometry, correlated action, worker and frame receipts, product collectors, the Inspector and Gloss gates, and the apparatus row of crate consolidation. The June design, built around the retired Meerkat host (D0 to D8), is history and is not carried.
 
+**Status (2026-10-29):** M13 adds the proposed reactive UI producers requested alongside retained editable components. It shares the current collector/history contract; no new producer implementation, reactive-UI bridge installation or exact-frame qualification is claimed by this addition.
+
 **For:** sharing bounded observations and causal references across applications over their existing state and event producers, without a universal application-event enum, a replacement for domain journals or a runtime rewrite; and making semantics, actions and publication trustworthy for automation and assistive technology. Mark ruled on 2026-09-29 that Apparatus is the shared diagnostics library, that Gloss takes the operational overview and that Inspector takes object analysis.
 Not here: human Narrator, VoiceOver and Orca runs and the human-accessibility checklist, headed AT and physical delivery, browser-runtime acceptance (a Wasm compile is not acceptance), native bridge acceptance on a real platform, the physical Narrator tear-out receipt, and the headed failure-and-recovery gate that must precede any native retry policy, all `2026-10-28_platform_qualification_plan.md`; the Hest plan's native, browser and AT acceptance residue, also platform qualification (its broader command declaration, invocation and result consolidation stays a question below, since that plan is complete and archived); boundary consolidation (execution and shutdown, the shared observation and semantic-action follow-up, the separate Castellan process design), `2026-10-28_family_promotion_plan.md`; custody-process gates, `2026-10-28_custody_plan.md`; fetch actor adoption, `2026-10-28_smolweb_fidelity_plan.md`; contributed-pane semantic automation and its scoped retained-layout and admission-generation work, Turnstone's pane registry plan (`turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md`); the meaning of link, field and assertion lifetimes, `2026-10-28_graph_semantics_plan.md`, `2026-10-28_link_model_plan.md` and `2026-10-28_graph_view_curation_plan.md`; the dramatis facade and the version baseline of crate consolidation, `2026-10-28_workspace_hygiene_plan.md`. The June design's D7 external agent transport for Hermes and Burn was never built and is not carried.
 
@@ -107,6 +109,50 @@ Crate consolidation's C2 table lists `mere-apparatus` with exact presented frame
 - Rulings: Mark, 2026-09-23 (reserved homes receive their capabilities; components are modules).
 - From: `archive_docs/2026-10-28/2026-09-23_crate_consolidation_plan.md:58,60-61`
 
+### M13. Reactive UI decisions and causal references
+
+Meristem and Cambium supply the missing facts behind selective updates and
+retained component moves. The lifecycle, bindings, event/identity contract,
+producer coverage and first-consumer acceptance live once in the
+[Cambium composition plan](../../cambium_docs/implementation_strategy/2026-10-29_cambium_composition_plan.md#diagnostics-are-part-of-the-contract)
+(P0–P6, Turnstone settings). This phase owns their admission to existing
+diagnostics, not the component lifecycle itself.
+
+- Meristem reports route/generation match or refusal and retained-state reuse,
+  replacement and teardown at the core decisions it can observe. Cambium
+  reports dependency invalidation, coalescing, skip/defer/update and instance
+  movement. Genet reports resulting style/layout/paint work; the host reports
+  the actual frame milestone with window/surface incarnation.
+- Add versioned structured decision and cause-edge payloads through Registry's
+  existing `Event` ingress and product projection into Apparatus. Product-owned
+  joins map producer-issued references to exact `RecordRef`s; the existing
+  run/source/operation correlation is insufficient by itself. Multiple causes
+  use bounded edge records alongside the existing optional primary cause;
+  unresolved parents and collection loss remain visible. No new event store
+  or inspector-specific collector is introduced.
+- Collection must not alter command delivery or update decisions. Redact and
+  bound before buffering, preserve explicit sink/thread/run lifetimes, and
+  keep joins bounded. Tests consume the same schema as a future component
+  inspector and check coverage/loss before asserting that a rebuild did not
+  happen. An inspector presentation is not required to qualify the producers.
+- Turnstone already installs an Apparatus store for redacted `AppEvent`
+  categories in `turnstone/src/diagnostic_observations.rs`. Extend that product
+  integration with the producer stream and preserve existing inspection/export
+  behavior; its default metadata cannot supply the missing causal links.
+- Done when: Turnstone settings supplies connected owner-revision,
+  invalidation/update and retained-instance evidence with skip, hidden defer,
+  coalescing, stale-route, replacement and teardown controls; the installed
+  collector preserves causal references under reordered collection and reports
+  absent/evicted parents and sink loss. Renderer/frame claims are added only at
+  verified producer boundaries. M7's exact-frame, delayed-readback and
+  two-consumer gates remain separate; submission or capture is not physical
+  presentation.
+- Needs: composition P1–P4; M8 for installed product collection and M11 for safe
+  tracing. The bounded Meristem changes are specified in the Cambium plan.
+- From: Mark's 2026-10-29 request to include diagnostics alongside selective
+  updating and movable components: “recording the causal links when the
+  decisions happen.” The detailed implementation choices are proposals.
+
 ## Open questions
 
 - Which 2026-10-21 target-life gaps survive the later repairs? The earlier lists name originating native and browser requests across document, window and provider replacement, removed-and-reintroduced child and leaf keys, and a native initial-install branch that sets its installed guard after an error. The 2026-10-22 and 2026-10-23 sections call those lists historical for their bounded repairs (host-owner binding, late native IDs refused, failed first installation never commits the draft and leaves the installed flag false) without saying what is left, so the two accounts of install-failure state disagree. From: `archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md:306-312,445-460,567-608,662-687`
@@ -118,6 +164,7 @@ Crate consolidation's C2 table lists `mere-apparatus` with exact presented frame
 
 ## Findings
 
+- 2026-10-29 (source inspection): `crates/system/registry/src/diagnostics/correlation.rs` carries run/source/operation, `diagnostics/emit.rs` provides structured non-message `Event` records, and `observations.rs` leaves projection and correlation mapping to the product. `armillary/crates/apparatus-core/src/observation.rs` has a single optional primary `cause`; multi-parent UI causality and a settings-installed bridge are not already delivered by those types. M13 uses these facilities and adds producer/edge evidence without claiming M7 completion.
 - 2026-10-28 (observed in the tree): there is no `mere-apparatus` crate and no `crates/domain/apparatus`; `apparatus-core` is pinned from the Armillary repository (`Cargo.toml:477`, `:914`) and used by Registry as an optional dependency (`crates/system/registry/Cargo.toml:26`), by Mesquite (`crates/cambium/mesquite/Cargo.toml:36`), and by `ports/distillery` and `ports/djinn`.
 - 2026-10-23 (carried): `crates/cambium/cambium-winit-a11y/src/publication.rs` owns native IDs; Rootstock (`crates/cambium/cambium-rootstock`) owns authored identity; AccessKit owns typed reference traversal; the Genet bridge owns installation and replay. `a11y_projection` deliberately remains the DOM seed and current consumers use `semantic_projection` (`archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md:299-304,1024-1026`).
 - 2026-10-22 (carried): the note that latest-main receiving remains open (fetched main 50 commits ahead) is superseded by the main integration receiving that follows it (`archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md:392-409,462-466`).
@@ -126,3 +173,5 @@ Crate consolidation's C2 table lists `mere-apparatus` with exact presented frame
 ## Progress
 
 - 2026-10-28: cut from `2026-06-08_system_diagnostics_and_accessibility_plan.md` and the apparatus row of `2026-09-23_crate_consolidation_plan.md`; nothing new landed.
+- 2026-10-29: added M13 and its Cambium design cross-reference; producer events, causal joins, product installation and qualification remain planned.
+- 2026-10-29: reconciled M13 with the canonical composition plan and its P0–P6 sequence; presentation retains host/whole-pane qualification. No diagnostic gate changed status.

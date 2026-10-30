@@ -1,8 +1,8 @@
 # Cambium presentation: browser tenants, UA widgets, portable tiles and operator presence
 
-**Status:** 2026-10-28: cut from `2026-10-13_browser_presentation_tenants_plan.md`, `2026-07-05_overlay_roots_and_ua_widgets_plan.md`, `2026-07-08_portable_tiles_plan.md` and `2026-06-25_operator_presence_overlay_plan.md`, archived in `archive_docs/2026-10-28/`. The browser presentation tenants are built and qualified (coordinated supplier adoption 2026-10-15, native shadow-mask admission 2026-10-16, document scroll boundary adoption 2026-10-17); what is open there is a short residue. Overlay roots landed P0 to P2 and then retired with their substrate; P3 to P6 were never started. Portable tiles and operator presence are plan-only and their hosts are gone.
+**Status:** 2026-10-29: reconciled with the composition plan. Editable-component lifecycle, binding, scheduling and producer contracts now live there; its P0 identity repair is locally machine-qualified and P1–P6 remain proposed. This plan retains the browser-tenant, UA-widget, portable-tile and operator-presence residue cut on 2026-10-28. Browser presentation tenants are built and qualified within their recorded scopes; overlay roots P0–P2 retired with their substrate and P3–P6 remain unstarted. Turnstone already supplies the retained whole-pane owner used by the settings pilot; broader portable-tile and headed acceptance remain below. Operator presence still lacks a live host/source.
 
-**For:** Cambium-hosted presentation shared by tenants and hosts: the viewer on direct WebGL2 when WebGPU is unavailable, browser features rebuilt as UA widgets and overlay views, tiles that keep their identity across windows, and a live presence overlay for operators (an agent, a guest, yourself). It was opened by Mark's two 2026-07-05 directives (overlay roots; UA widgets rebuilt from the Cambium control views), the 2026-10-13 browser WebGL2 presentation tenants design, step 4 of the one-state, N-windows design (portable tiles), and the 2026-06-25 presence idea.
+**For:** Cambium-hosted presentation shared by tenants and hosts: browser presentation routes, UA widgets and overlays, whole panes/tiles that keep identity across windows, and operator presence. The original directives and archived sources remain in Constraints and Phases. The related 2026-10-29 settings composition request is specified in the composition plan linked below.
 Not here:
 - The human assistive-technology validation gate for browser presentation tenants (automated ARIA-mirror checks do not count as human validation): `2026-10-28_platform_qualification_plan.md`.
 - Woodshed's physical audio and other-platform qualification: Woodshed's own receipt, in its repository.
@@ -44,6 +44,24 @@ From the operator presence plan (`archive_docs/2026-10-28/2026-06-25_operator_pr
 - The recording mode is a published, visible constitutional parameter, consented to by joining and never a hidden capability; covert surveillance is the line not to cross (:134-140).
 - Your own conduct and your agent's activity are separate visibility grants; by default a guest cannot watch your agent work (:141-146).
 - An agent's presence is local by default; a guest's is opt-in per moot (:188-191).
+
+## Relationship to the composition plan
+
+The [Cambium composition plan](2026-10-29_cambium_composition_plan.md) is the
+canonical home for editable component instances, lifecycle/binding rules,
+settings composition persistence, selective updating and diagnostic producer
+contracts. Its P0–P6 replaces the RC sequence previously drafted here.
+Presentation keeps browser tenants, UA widgets, portable whole-pane/tile
+movement and operator presence.
+
+For Turnstone settings, the existing whole-pane runner and RetainedMount
+remain this plan's boundary. Composition owns rows inside that runner through
+a flat instance table; it does not allocate a host runner per row or rebuild
+the workbench's window model. PT1 and composition P6 share the headed move,
+scroll, focus/IME and accessibility qualification; each receipt states which
+boundary it proves. Component retention alone does not prove physical
+presentation. Diagnostic collection and exact-frame qualification remain in
+the [diagnostics plan](../../mere_docs/implementation_strategy/2026-10-28_diagnostics_and_accessibility_plan.md).
 
 ## Phases
 
@@ -103,10 +121,10 @@ Link previews, annotation pins (statement-bucket consumers), autofill chips, and
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-07-05_overlay_roots_and_ua_widgets_plan.md:210-213, 441-449, 422-424, 57-58, 289-293`
 
-### PT1. DOM-lane tiles as `PortableKeyed` children (portable tiles P1)
-Wrap portable shell-DOM subtrees (start with a settings tile or a document-lane card) in `PortableKeyed`, keyed by member. A float view child through `PortableKeyed` is a tail of the archived workbench component plan, and belongs here. Handing over per-member textures for a frame-perfect handoff was a nicety, not correctness.
+### PT1. Retained DOM-lane owners (portable tiles P1, re-grounded 2026-10-29)
+For Turnstone settings, use the existing retained pane owner and `RetainedMount`. The [composition plan](2026-10-29_cambium_composition_plan.md) owns editable rows inside that runner through a flat table. The archived instruction to wrap the settings subtree in `PortableKeyed` is superseded for this consumer: a per-context nursery is not a shared cross-runner owner. Ordinary keyed children still use their local reconciliation contract. Other portable document-lane cards need a demonstrated owner before adoption. Handing over per-member textures for a frame-perfect handoff remains a nicety, not correctness.
 - Done when: a cross-window move of a DOM-lane tile keeps its `NodeId` and scroll, with the target apply scoped rather than a full recompute, under test and a headed drive.
-- Needs: the lane split settled (open question 9); a host (Turnstone and Cambium replace the retired meerkat shell).
+- Needs: composition P2–P3 for editable settings rows; P6 shares the remaining headed scroll and window-custody qualification. Existing whole-pane retention does not depend on building the new composition model. Open question 9 no longer blocks the settings pilot.
 - Rulings: S51 (the portable tiles plan stays active against the tear-out gestures).
 - From: `archive_docs/2026-10-28/2026-07-08_portable_tiles_plan.md:122-125, 93, 131-134`; `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:1220`
 
@@ -162,7 +180,7 @@ The same `OperatorFocus` overlay fed by a remote operator's presence over the ep
 6. Can a DocumentScript mod request an overlay root? Host-only in v1; the capability shape rides the mod permissions model later. From: `archive_docs/2026-10-28/2026-07-05_overlay_roots_and_ua_widgets_plan.md:262-264`
 7. Do the smolweb and document lanes use the same slot machinery over `DocumentRenderPacket`, or chrome-DOM overlays as today? Deferred until the Genet-lane version proves the model. From: `archive_docs/2026-10-28/2026-07-05_overlay_roots_and_ua_widgets_plan.md:265-267`
 8. P2's two unclosed items name code that retired: the visual confirmation of engine-painted find fills, and deleting the match-rect compositing (which waited on that and a snapshot-lane decision). Does either still apply? From: `archive_docs/2026-10-28/2026-07-05_overlay_roots_and_ua_widgets_plan.md:356-364`
-9. Which lane model do portable tiles take: the two-lane story (DOM-lane tiles by `PortableKeyed`, surface-lane tiles by member-to-window reassignment) or the workbench migrating into the shell DOM? The premise (meerkat's `WindowView`, Pelt's `TileShell`) is gone, and the plan needs re-grounding on Cambium and Turnstone. From: `archive_docs/2026-10-28/2026-07-08_portable_tiles_plan.md:43-69, 131-134, 25-29`
+9. Re-grounded for settings on 2026-10-29: Turnstone retains the pane runner outside placement, and Cambium's `RetainedMount` moves its owner within a shared document. The composition plan uses a flat row-owner table within that retained pane, rather than choosing a new whole-application lane model. Broader document-card and graph gesture adoption remains PT2 work. Historical question from: `archive_docs/2026-10-28/2026-07-08_portable_tiles_plan.md:43-69, 131-134, 25-29`
 10. P0 (surface-lane portability and scroll carry) is claimed delivered by Turnstone's `TearOutActivePane`, but the member scroll carry was not re-verified in this plan. Is a headed check still owed? From: `archive_docs/2026-10-28/2026-07-08_portable_tiles_plan.md:4-15, 89, 117-121, 151-154`
 11. Which host and which sources carry operator presence? The agent-focus source and the find overlay went with meerkat. Surviving: the cartography `Overlay` channel (`ClusterHalo`, `BridgeEmphasis`, with a minimap consumer), the accessibility projection in Turnstone, and `ProvenanceSubKind::ClippedFrom`. From: `archive_docs/2026-10-28/2026-06-25_operator_presence_overlay_plan.md:44-57, 174-180`
 12. Presence design questions the plan left open: stacked rings or a blended colour for several operators on one node; trail length and decay, and whether the trail is a transient comet or the agent's durable operation nodes; element-reference stability across re-layout (anchor on the accessibility or DOM node, not a pixel rect); the set of recording modes and the per-tier default (orrery ephemeral; a large moot the constitution's call); whether the constitution must make the recording mode visible to members (lean yes); how the observe-activity capability is delegated and revoked (meadowcap now, Biscuit later; per role or per grant); and whether a charter may require agent transparency, with agent actions in the record private by default. From: `archive_docs/2026-10-28/2026-06-25_operator_presence_overlay_plan.md:184-204`
@@ -170,6 +188,7 @@ The same `OperatorFocus` overlay fed by a remote operator's presence over the ep
 
 ## Findings
 
+- 2026-10-29 (source inspection): Turnstone's settings pane owns its runner outside frame placement, and Cambium's retained mount parks/reparents its live DOM inside one document. Whole-pane movement is an existing boundary; editable-row retention and selective updates are distinct proposed work in the composition plan. The retained-mount tests are source evidence, not a new headed qualification run.
 - 2026-10-13: `TextureProducer::portable_scene`, `ProducedScene`, `ProducerRegistry::plan_portable` and `admit_portable`, and `Host::capture_portable` exist; Netrender's `vello_backends/sessions.rs` owns CPU and Hybrid image and text admission, which direct WebGL reuses. From: `archive_docs/2026-10-28/2026-10-13_browser_presentation_tenants_plan.md:260-262`
 - 2026-10-16: Netrender generates shadow-mask keys from `0xFFFF_0000_0000_0000` and retains image overrides across frames. Rootstock keeps physical producer allocation below that band and attributes masks by ownership and producer draw boundaries; moving masks into ordinary inline-image keys would let an old override capture a later inline image. The whole scene is validated before anything is rewritten. From: `archive_docs/2026-10-28/2026-10-13_browser_presentation_tenants_plan.md:408-425`
 - 2026-10-15: the viewer ships per-route artifacts (`pkg/webgpu/`, `pkg/webgl2/`); Auto probes for an actual WebGPU device and remounts on WebGL2 if the WebGPU artifact refuses at boot. The Classic Vello opt-out is a compile error off wasm32. From: `archive_docs/2026-10-28/2026-10-13_browser_presentation_tenants_plan.md:295-296`
@@ -180,6 +199,7 @@ The same `OperatorFocus` overlay fed by a remote operator's presence over the ep
 ## Progress
 
 - 2026-10-28: cut from the browser presentation tenants, overlay roots and UA widgets, portable tiles and operator presence plans; nothing new landed.
+- 2026-10-29: drafted the retained-component design here, then reconciled it into the canonical composition plan. Removed the duplicate contracts and phase sequence; PT1 retains whole-pane movement and shares qualification with composition P6. Implementation, runtime qualification and publication remain open.
 
 ## Received from the backlog holder, 2026-10-28
 

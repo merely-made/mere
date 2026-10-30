@@ -11,8 +11,10 @@
 //! caller lowers into its own action vocabulary and provider.
 //!
 //! The committed value remains parent-controlled: when a spec arrives with a
-//! different `value` or `control` (an external write, a provider reload), the
-//! draft re-derives from it. Editing the draft alone never resets it, because
+//! different setting `id`, `value` or `control` (a replacement binding, external
+//! write or provider reload), the draft re-derives from it. A draft must never
+//! carry into another setting just because its control and value match.
+//! Editing the draft alone never resets it, because
 //! the row is memoized on its props and a local edit marks the component
 //! dirty rather than changing the spec.
 
@@ -272,7 +274,10 @@ where
         },
         |props: &RowProps| draft_for(&props.spec),
         |prev: &RowProps, next: &RowProps, draft: &mut SettingDraft| {
-            if prev.spec.value != next.spec.value || prev.spec.control != next.spec.control {
+            if prev.spec.id != next.spec.id
+                || prev.spec.value != next.spec.value
+                || prev.spec.control != next.spec.control
+            {
                 *draft = draft_for(&next.spec);
             }
         },
@@ -280,4 +285,82 @@ where
         on_apply,
     )
     .memo()
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{cell::RefCell, rc::Rc};
+
+    use genet_scripted_dom::ScriptedDom;
+    use layout_dom_api::LayoutDom;
+    use mere_surface_api::settings::{
+        SettingMovement, SettingMutability, SettingScope, SettingSecurity,
+    };
+
+    use super::*;
+    use crate::GenetAppRunner;
+
+    struct State {
+        spec: SettingSpec,
+        writes: Vec<(String, SettingValue)>,
+    }
+
+    fn state() -> State {
+        State {
+            spec: SettingSpec {
+                id: "first".into(),
+                label: "First".into(),
+                scope: SettingScope::Application,
+                movement: SettingMovement::LocalOnly,
+                mutability: SettingMutability::Live,
+                security: SettingSecurity::Ordinary,
+                control: SettingControl::Toggle,
+                value: SettingValue::Boolean(false),
+            },
+            writes: Vec::new(),
+        }
+    }
+
+    fn row(state: &State) -> impl View<State, (), GenetCtx, Element = GenetElement> + use<> {
+        let id = state.spec.id.clone();
+        setting_row(
+            &state.spec,
+            state.spec.label.clone(),
+            move |state: &mut State, value| {
+                state.writes.push((id.clone(), value));
+            },
+        )
+    }
+
+    #[test]
+    fn same_setting_keeps_draft_when_presentation_changes() {
+        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(dom.clone(), row, state());
+        let toggle = dom.borrow().all_with_class(runner.root(), "toggle")[0];
+        let _: Vec<()> = runner.dispatch_click(toggle, PointerClick::at((0.0, 0.0)));
+        runner.update(|state| state.spec.label = "Renamed".into());
+
+        let apply = dom.borrow().all_with_class(runner.root(), "setting-apply")[0];
+        let _: Vec<()> = runner.dispatch_click(apply, PointerClick::at((0.0, 0.0)));
+        assert_eq!(
+            runner.state().writes,
+            [("first".into(), SettingValue::Boolean(true))]
+        );
+    }
+
+    #[test]
+    fn replacement_setting_with_equal_control_and_value_drops_previous_draft() {
+        let dom = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(dom.clone(), row, state());
+        let toggle = dom.borrow().all_with_class(runner.root(), "toggle")[0];
+        let _: Vec<()> = runner.dispatch_click(toggle, PointerClick::at((0.0, 0.0)));
+        runner.update(|state| state.spec.id = "replacement".into());
+
+        let apply = dom.borrow().all_with_class(runner.root(), "setting-apply")[0];
+        let _: Vec<()> = runner.dispatch_click(apply, PointerClick::at((0.0, 0.0)));
+        assert_eq!(
+            runner.state().writes,
+            [("replacement".into(), SettingValue::Boolean(false))]
+        );
+    }
 }
