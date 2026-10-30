@@ -13,7 +13,7 @@
 //! [`GenetCtx`] and [`GenetElement`], and its optional probe identity is a DOM
 //! attribute. Meristem remains the renderer-neutral diff and message core.
 
-use std::{marker::PhantomData, sync::OnceLock};
+use std::marker::PhantomData;
 
 use layout_dom_api::{LayoutDom, LayoutDomMut};
 use meristem::{AnyView, MessageCtx, MessageResult, Mut, View, ViewMarker};
@@ -21,22 +21,27 @@ use meristem::{AnyView, MessageCtx, MessageResult, Mut, View, ViewMarker};
 use crate::reactive_diagnostics::{DiagnosticDetails, DiagnosticKind, DiagnosticReason, Producer};
 use crate::{GenetCtx, GenetElement, OptionalAction, attr_qual};
 
-static REACTIVE_PRODUCER: OnceLock<Option<Producer>> = OnceLock::new();
+thread_local! {
+    // A sequence is gap-free only to the collector observing its thread, so
+    // components evaluated on another thread must not consume it.
+    static REACTIVE_PRODUCER: Option<Producer> = Producer::new().ok();
+}
 
 fn trace_component(kind: DiagnosticKind, reason: DiagnosticReason, path_depth: usize) {
-    let producer = REACTIVE_PRODUCER.get_or_init(|| Producer::new().ok());
-    if let Some(producer) = producer {
-        let _ = producer.emit(
-            kind,
-            None,
-            DiagnosticDetails {
-                path_depth: Some(u16::try_from(path_depth).unwrap_or(u16::MAX)),
-                path_truncated: path_depth > usize::from(u16::MAX),
-                reason,
-                ..DiagnosticDetails::default()
-            },
-        );
-    }
+    REACTIVE_PRODUCER.with(|producer| {
+        if let Some(producer) = producer {
+            let _ = producer.emit(
+                kind,
+                None,
+                DiagnosticDetails {
+                    path_depth: Some(u16::try_from(path_depth).unwrap_or(u16::MAX)),
+                    path_truncated: path_depth > usize::from(u16::MAX),
+                    reason,
+                    ..DiagnosticDetails::default()
+                },
+            );
+        }
+    });
 }
 
 /// The DOM attribute stamped by [`Component::probe_id`].
