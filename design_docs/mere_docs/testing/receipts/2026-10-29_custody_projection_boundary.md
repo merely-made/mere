@@ -1,6 +1,6 @@
 # Custody and projection dependency boundary
 
-Status: Implemented; endpoint qualification passed; receiver integration in progress.
+Status: Implemented; supplier and local cohort qualification passed; published receiver integration in progress.
 
 This slice makes custody independently buildable inside the existing
 `graphshell-endpoint` package. It does not settle the eventual public package
@@ -129,3 +129,24 @@ Windows runtime, full browser behavior and the previously bounded Distillery
 fixture are not qualified by this receipt. The earlier first-cut web lock
 regression was an introduced defect repaired upstream; its spareval-to-sha2
 0.11 edge must remain intact.
+
+## Final supplier and local cohort gates
+
+`root-split-final-review` passed the same five endpoint configurations after
+`1047cfc30` added observed wiping on sync and async JSON decode errors. It also
+passed the full default `graphshell-web` locked Wasm check. Both repository
+lockfiles remained byte-for-byte unchanged; spareval still selects sha2 0.11.0.
+Log SHA-256: `91a2259dad6e2936afb5a80c523ee96fa4b2e52efdcb1ec0b1859040fdcbc89f`.
+
+`root-split-local-cohort-2` selected migrated Knot source `77d163c` using a
+temporary local patch. It passed 44 Djinn door tests (including the browser
+JSON-wrapper sentinel), one custody-payload test, two custody-route tests and
+five vault-lock tests. The explicit retained-process fixture remained ignored.
+The new fresh custody connection while locked assertion executed successfully.
+Log SHA-256: `3d309179d90a7716bb2fe00000be442948e3ba249c97793d4b9d23229db18744`.
+
+This cohort's lock audit found only six Knot identities changing from Git to
+local paths and one dependency owner outside those identities changing its
+Knot edge. Other package identities and resolved edges were preserved. The
+original lock was restored after the run. These results qualify this local
+cohort; published receiver locks and the unpatched broker gate are still due.
