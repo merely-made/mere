@@ -223,7 +223,9 @@ mod tests {
         let body = b"\"secret-variant\"";
         let mut wire = (body.len() as u32).to_ne_bytes().to_vec();
         wire.extend_from_slice(body);
+        let observations = observe_wipe();
         assert_redacted(read_native_message::<_, Expected>(&mut Cursor::new(wire)).unwrap_err());
+        finish_wipe_observation(&observations, body.len());
         let mut output = Vec::new();
         assert_redacted(write_native_message(&mut output, &FailsAfterWriting).unwrap_err());
         assert!(output.is_empty());
@@ -239,11 +241,13 @@ mod tests {
         let body = b"\"secret-variant\"";
         let mut wire = (body.len() as u32).to_ne_bytes().to_vec();
         wire.extend_from_slice(body);
+        let observations = observe_wipe();
         assert_redacted(
             read_native_message_async::<_, Expected>(&mut Cursor::new(wire))
                 .await
                 .unwrap_err(),
         );
+        finish_wipe_observation(&observations, body.len());
         let mut output = Vec::new();
         assert_redacted(
             write_native_message_async(&mut output, &FailsAfterWriting)
