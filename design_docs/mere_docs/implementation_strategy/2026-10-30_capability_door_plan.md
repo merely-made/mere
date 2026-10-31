@@ -401,6 +401,22 @@ error types settle.
   (`crates/graphshell/graphshell-host/src/lifecycle.rs:105-150`). Djinn's
   `AppAuthority` is declaration and owner grant with no persona term
   (Armillary `d0c79f5`, `crates/djinn/src/door/declaration.rs:244-340`).
+- 2026-10-31, review of `d0c79f5` and `b6578ee` against D7 and I1: D7 holds
+  (one crate, both consumers, the moved Windows functions unchanged, custody
+  policy left in custody-wire), and `b6578ee` closes the review's macOS gap
+  (the audit token kept as `Connected`), refuses a pinned label with no peer,
+  and Mere pins `djinn` and `peer-facts` at one revision (`73968e2`). Three
+  points remain. The Windows image is read by process id after the pipe
+  connects (`peer-facts` `pipe_client_peer`), so a reused id reports another
+  process's image; status should say the match was read at connect. On
+  Linux, `DJINN_LAUNCH_FD` stays in the environment and descriptor 3 is
+  inherited by any child spawned before the application's first route hello
+  calls `launch::inherited()`, so such a child can present the handle;
+  reading it at startup, or clearing the variable on read, closes that.
+  `admit` and `serve_on` remain as label-only paths beside `admit_from`;
+  they refuse under a pin, so this is cleanup, not a hole. `peer-facts` is
+  not in the naming ledger, which the tier rule allows while it is
+  unpublished.
 
 ## Progress
 
@@ -459,3 +475,7 @@ error types settle.
   `agent/turnstone-declaration` branches. Turnstone's label is admitted by
   its declaration within Mere's default grant, in development mode until
   its identity is pinned.
+- 2026-10-31: the review's three findings closed. Armillary `7eebeeb` adds
+  `launch::claim`, which Knot's and Turnstone's binaries call first in
+  `main`; the Windows image basis is described as read at connect; `admit`
+  and `serve_on` are removed.
