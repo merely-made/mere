@@ -117,3 +117,25 @@ Turnstone's declaration stays parked on `agent/turnstone-declaration`
 Not verified: custody-wire's and Djinn's Windows builds (blake3's C build
 needs an MSVC toolchain on this host), Windows image matching at runtime,
 and a Linux launch end to end.
+
+## 2026-10-30: Turnstone's declaration landed after I1
+
+| Repository | Commit | What landed |
+| --- | --- | --- |
+| Armillary | `73968e2` | Reverts `1cb9518`, reapplying `b2388f4` on I1 |
+| Mere | `afb7e81`, lock `68608e3` | Merged `agent/turnstone-declaration`; Djinn `73968e2`, Knot `057f531` |
+| Knot | `057f531` | Merged its branch; Djinn `73968e2`, Mere `afb7e81` |
+| Cleromancy | `403dbc7` | Djinn `73968e2`, Mere `68608e3`, Knot `057f531` |
+| Turnstone | `31333f32` | Merged its branch; Djinn `73968e2`, Mere `68608e3`, Knot `057f531` |
+
+| Gate | Result |
+| --- | --- |
+| Djinn `--all-features` | 91 passed |
+| `mere-resident`, custody-wire, djinn-custodian (merged, local cohort) | 54 test binaries passed; the pre-existing remote-route test failed as before |
+| Mere all-targets and door suites from the lock | Passed; `declared_applications` 6 passed |
+| Knot lib, bins, tests; workspace all-targets | Passed |
+| Cleromancy all-targets | Passed |
+| Turnstone all-targets (default; `authoring,inference,diagnostics`); lib | Passed; 1360 lib tests, including the declaration and inference-route checks |
+
+The `agent/turnstone-declaration` branches remain on the remotes, merged;
+deleting them was refused by this session's permission rules.
