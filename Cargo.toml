@@ -219,10 +219,10 @@ armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary
 # footprints, spaces, measurements) — git sibling consumed one-way, local
 # checkout via the gitignored `.cargo/config.toml` patch. cartography emits
 # sceno scenes (the P2 consumption slice; projection_proofs_plan).
-sceno = { version = "0.0.6", path = "crates/cambium/scenes/sceno" }
-scenomise = { version = "0.0.6", path = "crates/cambium/scenes/scenomise" }
-scenotime = { version = "0.0.4", path = "crates/cambium/scenes/scenotime" }
-scenograph = { version = "0.0.5", path = "crates/cambium/scenes/scenograph" }
+sceno = { version = "0.0.7", path = "crates/cambium/scenes/sceno" }
+scenomise = { version = "0.0.7", path = "crates/cambium/scenes/scenomise" }
+scenotime = { version = "0.0.5", path = "crates/cambium/scenes/scenotime" }
+scenograph = { version = "0.0.6", path = "crates/cambium/scenes/scenograph" }
 # The remaining families absorbed 2026-07-23. Consumers keep using
 # `<dep>.workspace = true`, so only this block knows where each one lives.
 # The identity tier lives in merely-made/dramatis since DR-D (dramatis repo
@@ -245,10 +245,10 @@ mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
-chirograph = { version = "0.0.2", path = "crates/chirograph" }
+chirograph = { version = "0.0.3", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
-graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-endpoint" }
+graphshell-endpoint = { version = "0.0.3", path = "crates/graphshell/graphshell-endpoint" }
 # The serving half: admission, the session loop, the catalog and the projection
 # host (Graphshell stack lift plan, L2, ruling R4). Default features off here;
 # each consumer names the half it serves.
@@ -313,7 +313,7 @@ fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch
 framing = { package = "mere-framing", version = "0.0.2", path = "crates/system/framing" }
 page-load = { package = "mere-pageload", version = "0.0.1", path = "crates/system/page-load" }
 proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
-incipit = { version = "0.2.0", path = "crates/incipit" }
+incipit = { version = "0.2.1", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
 comms = { package = "mere-comms", path = "crates/shell/comms" }
 pandect = { version = "0.1.1", path = "crates/system/pandect" }
@@ -359,13 +359,13 @@ illume = { version = "0.0.3", path = "crates/nematic/illume" }
 # Workspace members, so path deps. None of the eleven may appear in
 # .cargo/config.toml's genet patch table: patching a git source at a path that
 # is also a workspace member is a hard lockfile collision.
-cambium = { version = "0.6.0", path = "crates/cambium/cambium" }
+cambium = { version = "0.6.1", path = "crates/cambium/cambium" }
 cambium-rootstock = { version = "0.1.0", path = "crates/cambium/cambium-rootstock", default-features = false }
 mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-web = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
-hest = { version = "0.2.0", path = "crates/cambium/hest" }
+hest = { version = "0.2.1", path = "crates/cambium/hest" }
 backstep = { version = "0.1.0", path = "crates/cambium/backstep" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.3.0", path = "crates/cambium/sprigging" }
@@ -394,8 +394,8 @@ genet-static-dom = { git = "https://github.com/merely-made/genet.git", branch = 
 # `mere-surface-api` (genet 57bcc38fdae, platform boundary plan §9.3), leaving
 # `genet-host-api` at 0.2.0 as the raw engine half, which mere does not
 # consume. The plan moved it here on 2026-09-03; it is a workspace member now.
-mere-surface-api = { version = "0.1.0", path = "crates/system/surface-api" }
-workbench = { version = "=0.1.0", path = "crates/cambium/workbench" }
+mere-surface-api = { version = "0.1.1", path = "crates/system/surface-api" }
+workbench = { version = "=0.1.1", path = "crates/cambium/workbench" }
 mere-view = { version = "0.1.0", path = "crates/cambium/mere-view" }
 mere-overmap = { version = "0.1.0", path = "crates/cambium/mere-overmap", default-features = false }
 errand = { version = "0.4.0", git = "https://github.com/merely-made/errand.git", rev = "897fb963d184f0e379ab9041d68e17e726cb7763" }
