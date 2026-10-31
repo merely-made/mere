@@ -2,13 +2,124 @@
   {
     "app": "knot-editor",
     "routes": [
-      { "exact": "custody" },
-      { "prefix": "mere/" },
-      { "exact": "published-site-v1" }
+      {
+        "exact": "custody"
+      },
+      {
+        "prefix": "mere/"
+      },
+      {
+        "exact": "published-site-v1"
+      }
     ],
     "custody": {
-      "operations": ["status", "roster", "watch_lock", "release_epoch_keys"],
-      "epoch": [{ "prefix": "mere.knot." }]
+      "operations": [
+        "status",
+        "roster",
+        "watch_lock",
+        "release_epoch_keys"
+      ],
+      "epoch": [
+        {
+          "prefix": "mere.knot."
+        }
+      ]
+    }
+  },
+  {
+    "app": "turnstone",
+    "routes": [
+      {
+        "exact": "custody"
+      },
+      {
+        "exact": "identity"
+      },
+      {
+        "exact": "knot"
+      },
+      {
+        "exact": "inference.ask"
+      }
+    ],
+    "custody": {
+      "operations": [
+        "status",
+        "watch_lock",
+        "release",
+        "attest",
+        "payload"
+      ],
+      "salts": [
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "turnstone."
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "turnstone/"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "personae/gemini-client-identity/v1/"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "exact": "mere/knot-publish/reader/v1"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "mere.gemot."
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "mere.commons."
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "prefix": "stickleback/"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "delegation_scope": "moot"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "delegation_scope": "mere.knot"
+          }
+        }
+      ],
+      "acts": [
+        {
+          "source": "persona",
+          "name": {
+            "delegation_scope": "mere.graphshell"
+          }
+        },
+        {
+          "source": "persona",
+          "name": {
+            "delegation_scope": "mere.denizen"
+          }
+        }
+      ]
     }
   }
 ]

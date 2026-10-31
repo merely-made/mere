@@ -444,3 +444,18 @@ error types settle.
   basis and peer account in status and launches by `djinn --launch <app>`.
   Not run here: the Linux launch-pin test (cross-checked only) and Windows
   image matching on Windows.
+
+
+- 2026-10-30: M1's second case, Turnstone. Declarations and grants name salt
+  namespaces (`exact`, `prefix`, `delegation_scope`), released or acts only;
+  `CustodyIdentity` and the blocking custody calls carry declarations. Turnstone
+  left `CUSTODY_APPS`, the first-party list, the binary's identity, Knot,
+  chronicle and inference grants, and the label release policy's Turnstone
+  namespaces; Djinn's `AllowedAppRoutes::default()` admits no one. Remaining
+  label tables: `CUSTODY_APPS` for the other applications,
+  `reservoir_applications()`, and the payload scope chosen by label.
+- 2026-10-30: Turnstone's declaration landed after I1: Armillary `73968e2`
+  reapplies `b2388f4` on I1, and Mere, Knot and Turnstone merged their
+  `agent/turnstone-declaration` branches. Turnstone's label is admitted by
+  its declaration within Mere's default grant, in development mode until
+  its identity is pinned.

@@ -419,7 +419,15 @@ An application may carry a declaration on its door hello
 the custody calls and epoch derivations it needs. The owner's grants decide what
 it receives; a connection gets only what both name. An undeclared request is
 refused as undeclared, a declared but ungranted one as not granted, and an
-application with a grant must declare. Knot is the first declared application.
+application with a grant must declare. Knot and Turnstone are declared
+applications.
+
+Salts are named as UTF-8 text matched against the salt's bytes (`exact` or
+`prefix`), or as `delegation_scope` for the binary-framed delegation signing
+keys of a capability domain. `salts` may be released; `acts` are only signed
+or attested with inside custody. A declared application's releases are not
+drawn from the label release policy, though the floors still hold: never the
+master's place, and station salts only for Signalman.
 
 Grants are the `applications` entry of the profile's owner settings. Absent, the
 resident uses Mere's defaults in `policy/default_applications.json`; an empty
@@ -442,8 +450,9 @@ change:
 
 A declared provider still needs its `projection_providers` permission, and
 offers only routes its declaration names. Other applications keep their label
-grants (`CUSTODY_APPS` and the resident's first-party route grants) until they
-declare. Declarations, like labels, are statements within the same-user
+grants (`CUSTODY_APPS`, the resident's first-party route grants and the label
+release policy) until they declare. Retained-content payload scopes are still
+chosen by label. Declarations, like labels, are statements within the same-user
 transport boundary, not executable authentication.
 
 ## Application identity

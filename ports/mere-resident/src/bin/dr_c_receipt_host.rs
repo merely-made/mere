@@ -68,7 +68,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("turnstone"))
+        if CustodyClient::open_at(&endpoint, AppId::new("cleromancy"))
             .await
             .is_ok()
         {

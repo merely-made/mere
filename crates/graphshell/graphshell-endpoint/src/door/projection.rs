@@ -206,11 +206,36 @@ impl AppRouteCarrier {
     }
 
     pub fn open_at(endpoint: &str, app: AppId, route: AppRouteId) -> Result<Self, AppClientError> {
+        Self::open_at_with(endpoint, app, route, None)
+    }
+
+    /// Open `route` carrying the application's declaration.
+    pub fn open_declared(
+        app: AppId,
+        route: AppRouteId,
+        declaration: AppDeclaration,
+    ) -> Result<Self, AppClientError> {
+        Self::open_at_with(&configured_app_endpoint(), app, route, Some(declaration))
+    }
+
+    fn open_at_with(
+        endpoint: &str,
+        app: AppId,
+        route: AppRouteId,
+        declaration: Option<AppDeclaration>,
+    ) -> Result<Self, AppClientError> {
         let runtime = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .map_err(AppClientError::Io)?;
-        let client = runtime.block_on(AppBrokerClient::open_route_at(endpoint, app, route))?;
+        let client = runtime.block_on(async {
+            match declaration {
+                Some(declaration) => {
+                    AppBrokerClient::open_declared_route_at(endpoint, app, route, declaration).await
+                },
+                None => AppBrokerClient::open_route_at(endpoint, app, route).await,
+            }
+        })?;
         Ok(Self {
             runtime,
             client: Some(client),

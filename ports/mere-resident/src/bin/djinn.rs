@@ -25,7 +25,6 @@ use djinn::door::local_endpoint::LocalListener;
 #[cfg(all(not(windows), feature = "in-process-custody"))]
 use djinn::door::local_endpoint::prepare_unix_endpoint;
 #[cfg(feature = "personal-sync")]
-use djinn::door::route::ResidentEndpointRoute;
 use djinn::resident::{
     MaintenanceActivity, Resident, RunFailure, Service, supervise_with_maintenance,
 };
@@ -1330,15 +1329,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(feature = "personal-sync")]
         let (allowed_app_routes, app_catalog) = {
             let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-            let grants = AppRouteGrants::new(AllowedAppRoutes::new([(
-                AppId::new("turnstone"),
-                ResidentEndpointRoute::new("identity", Duration::from_millis(50))?,
-            )]));
+            // Routes below are served to declared applications whose grant
+            // names them; label grants remain only for undeclared applications.
+            let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+            grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
             if let Some(route) = catalog
                 .update(|catalog| resident.register_knot_route(catalog))
                 .await?
             {
-                grants.grant(AppId::new("turnstone"), route);
+                grants.update(|routes| routes.serve(route));
             }
             // Served to the declared applications whose grant names it.
             let route = catalog
@@ -1374,7 +1373,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
             // Declared applications reach each mere through their grant.
-            let first_party = vec![AppId::new("turnstone"), AppId::new("cleromancy"), AppId::new("graphshell")];
+            let first_party = vec![AppId::new("cleromancy"), AppId::new("graphshell")];
             let routes = resident.reservoir().reservoir().map(|reservoir| {
                 MereRoutes::new(
                     pandect::shared_root::shared_root(),
@@ -1414,21 +1413,22 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                         ResidentDistillery::register_chronicle_route(observer, catalog)
                     })
                     .await?;
-                grants.grant(AppId::new("turnstone"), route);
+                grants.update(|routes| routes.serve(route));
             }
-            // The inference lane, to Turnstone (resident inference plan,
-            // ruling 8).
+            // The inference lane, for Turnstone's grant (resident inference
+            // plan, ruling 8).
             if let Some(route) = catalog
                 .update(|catalog| resident.register_inference_route(catalog))
                 .await?
             {
-                grants.grant(AppId::new("turnstone"), route);
+                grants.update(|routes| routes.serve(route));
             }
             (grants, catalog)
         };
         #[cfg(not(feature = "personal-sync"))]
         let (allowed_app_routes, app_catalog) = {
             let grants = AppRouteGrants::default();
+            grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
             mere_resident::custody::grant(&grants)?;
             mere_resident::applications::install(&grants, application_grants);
             (grants, AppEndpointCatalog::default())
