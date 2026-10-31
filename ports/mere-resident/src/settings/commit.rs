@@ -15,7 +15,7 @@
 
 use std::path::Path;
 
-use pandect::{Replacement, replace_bytes_if_unchanged};
+use muniment::atomic_file::{Replacement, replace_bytes_if_unchanged};
 
 use super::{OwnerSettings, OwnerSettingsError};
 

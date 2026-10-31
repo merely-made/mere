@@ -1,0 +1,84 @@
+{
+  "status": "native-frame-visual-check-blocked-on-macos-screen-recording",
+  "platform": {
+    "system": "macOS",
+    "version": "15.8.1",
+    "arch": "x86_64",
+    "display_scale": 2
+  },
+  "native_frame_qualified": false,
+  "receipt_cap_bytes_across_hosts": 100000000,
+  "apps": {
+    "woodshed": {
+      "source": "535a2efcc150c19acd7db3036796ce708d8fd80d",
+      "source_status": "",
+      "build": "locked offline native build passed",
+      "binary_sha256": "e78eca57b2f2dd1b23f99fdab0c1d98d5284519eb8d4221d3e6ebfcbf5062f9f",
+      "process": {
+        "launch_method": "direct native executable; same product/scenario/renderer",
+        "launcher_exit": -15,
+        "timeout": true,
+        "success": false,
+        "elapsed_seconds": 90.887,
+        "binary_sha256": "e78eca57b2f2dd1b23f99fdab0c1d98d5284519eb8d4221d3e6ebfcbf5062f9f",
+        "scenario_sha256": "8feb3340981fd1ca066b0dcaa6b6b08a86ef91ed81a99dc67a9cef41d69301dc",
+        "receipt": "scenario.done",
+        "captures": 2
+      },
+      "scenario_result": "RESULT ok",
+      "app_render_captures": [
+        "woodshed-app-side-01/narrow.png",
+        "woodshed-app-side-01/wide.png"
+      ],
+      "widths_tested": [
+        1280,
+        640
+      ]
+    },
+    "knot-editor": {
+      "source": "e9ff2407c3a9a056a371958b41d1b3e6433a46ac",
+      "source_status": "",
+      "build": "locked offline native build passed",
+      "binary_sha256": "48a25a6af17692e65fb5ad0e217a193764e51b511c82ab5b272c472e199e5e77",
+      "process": {
+        "launch_method": "direct native executable; same product/scenario/renderer",
+        "launcher_exit": 0,
+        "timeout": false,
+        "success": true,
+        "elapsed_seconds": 8.38,
+        "binary_sha256": "48a25a6af17692e65fb5ad0e217a193764e51b511c82ab5b272c472e199e5e77",
+        "scenario_sha256": "3cf900e7a36df6e2e4692008abaff8d277c5fe1e0ae743853e64d6af7cf84fc8",
+        "receipt": "scenario.done",
+        "captures": 2
+      },
+      "scenario_result": "RESULT ok",
+      "app_render_captures": [
+        "knot-editor-app-side-01/narrow.png",
+        "knot-editor-app-side-01/wide.png"
+      ],
+      "widths_tested": [
+        1280,
+        640
+      ]
+    }
+  },
+  "findings": [
+    {
+      "app": "knot-editor",
+      "result": "App-side scenario and process exit passed at both sizes; no app-caption groups; source remains clean. Native frame and traffic lights require permission.",
+      "visual": "1280 command row wraps into two rows;640 commands collapse to Menu with context controls visible."
+    },
+    {
+      "app": "woodshed",
+      "result": "App-side scenario passed; playback remained stopped; process did not exit and required termination at90second runner timeout.",
+      "visual": "640 pixel top workspace/context row clips current owning-place breadcrumb on right. Native frame/traffic lights not captured."
+    }
+  ],
+  "notes": [
+    "Only in-process app render PNGs were viewed; these omit native window frames.",
+    "Woodshed profile used pending/locked local Mac identity; this is a chrome inspection, not a storage/custody qualification.",
+    "LaunchServices first Woodshed attempt did not produce frames; direct native path exercised the shipping host/renderer instead.",
+    "Both failed OS captures and all failed launcher/process receipts retained.",
+    "Mac Screen Recording request and settings page opened; user approval pending."
+  ]
+}

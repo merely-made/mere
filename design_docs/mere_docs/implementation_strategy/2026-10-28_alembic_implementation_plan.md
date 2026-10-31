@@ -258,6 +258,19 @@ win.
   against a living render path (Turnstone's or pictograph's canvas), or close on the eviction test
   and the byte bound alone? From:
   `archive_docs/2026-10-28/2026-07-06_node_image_externalization_plan.md:223-239`
+- **From the Distillery extraction (2026-10-31), for this lane.** Distillery and `mere-mesh`
+  leave Mere for the ESP repository, renamed `distillery`, as a producer
+  ([distillery-extraction plan](2026-10-31_distillery_extraction_plan.md), D7, D15). Already
+  moved with Mark's ruling D12: `alembic::memory_levels` is `pandect::memory_levels` and
+  Athanor's forgetting and consolidation passes are `pandect::furnace` (feature `furnace`).
+  Open, for this lane to answer: (1) may `workshop_destination` and
+  `workshop_sealed_destination`, which write into a mere graph through `pandect::graph_session`
+  and `kernel::GraphDelta`, become a `pandect` feature as the furnace did, with Graphshell's
+  `alembic-workshop` taking it? (2) once W3 lands, does the graph-free workshop core (Athanor's
+  `workshop`, `workshop_seal`, `workshop_driver`; Alembic's `workshop`, `workshop-surface`,
+  `workshop-native`) leave Mere with Distillery, against this plan's "no source-home move"
+  constraint? Athanor and Alembic stay in Mere until this is answered (distillery-extraction
+  D16).
 
 ## Decisions — workshop reconciliation (2026-10-24)
 

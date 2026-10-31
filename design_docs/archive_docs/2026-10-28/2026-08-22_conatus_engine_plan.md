@@ -759,10 +759,12 @@ specific. The extraction rule is split (ruled 2026-08-23):
 - **Contracts wait for the second consumer.** Public contracts governing
   orchestration, identity, authority, device ownership, or cross-product
   frames — the conductor, source bindings, the spatial frame, shared trigger
-  vocabulary, resident lease contracts — stay provisional until a second
-  game proves them. The first implementation uses a neutral-shaped seam in
-  its profile; the second consumer tests that shape before it becomes stack
-  law.
+  vocabulary, resident lease contracts — move to the stack once a second
+  game plans adopting them in its own dated plan, and stay provisional there
+  until that game proves them. The first implementation uses a
+  neutral-shaped seam in its profile; the second consumer's adoption tests
+  that shape before it becomes stack law (house-style D12, 2026-10-31,
+  refining the 2026-08-23 split's "wait for a second consumer").
 
 The body-table comparison in §1 has satisfied that comparison requirement;
 its implementation remains separately gated by ruling 346. It does not

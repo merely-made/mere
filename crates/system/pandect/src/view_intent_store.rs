@@ -230,7 +230,7 @@ pub fn save_view_intent(
     let target = view_intent_path(session_dir, frame_id_str, pane_id);
     let json = serde_json::to_string_pretty(intent)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read `<session_dir>/views/<frame_id>/<pane_id>.json` and parse it

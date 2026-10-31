@@ -20,12 +20,9 @@ $mereRoot = (Resolve-Path (Join-Path $probeRoot '..\..\..')).Path
 Use-RepoToolchain -MereRoot $mereRoot
 $env:CARGO_TARGET_DIR = $TargetDir
 $env:DISTILLERY_PROBE_COMMIT = (git -C $mereRoot rev-parse HEAD).Trim()
-$ownedStatus = git -C $mereRoot status --porcelain -- `
-    ports/distillery/probe `
-    crates/eidetic/muniment/Cargo.toml `
-    crates/eidetic/muniment/src/indexeddb_backend.rs `
-    crates/intel/esp/src/embed/bert/provider.rs `
-    crates/intel/esp/src/infer/decoder
+# Muniment and ESP are git suppliers pinned by rev in the probe's own manifest
+# and lock, so the probe directory covers them.
+$ownedStatus = git -C $mereRoot status --porcelain -- ports/distillery/probe
 $env:DISTILLERY_PROBE_DIRTY = if ($ownedStatus) { 'true' } else { 'false' }
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null

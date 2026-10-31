@@ -7,7 +7,9 @@
 //! The three memory levels' read-model: classifying a node as short-term or
 //! long-term, and computing which short-term nodes an eviction policy would drop.
 //!
-//! This is the spine of Alembic slice C (the memory model). It is pure logic over
+//! Moved back from Alembic 2026-10-31 (distillery-extraction D12); it reads a
+//! mere's graph, so it stays with the graph. This is the spine of Alembic slice C
+//! (the memory model). It is pure logic over
 //! a graph's persisted nodes plus per-node last-visit timing the host supplies, so
 //! it is fully testable without a live graph, store, or clock. The host wiring (the
 //! Alembic Recent / Saved sections rendering over this, the policy as a setting, the

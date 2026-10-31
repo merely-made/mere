@@ -73,14 +73,13 @@ pub mod shared_root;
 // graph.json. The durable home the bespoke per-node sidecars (browser/participant/
 // arrangement) converge onto. Wraps chartulary's FacetStore.
 pub mod facet_store;
+#[cfg(feature = "furnace")]
+pub mod furnace;
 // The arrangement.* facet namespace: cartography's per-node data (position
 // first; size/sprite/hull/material/face follow) as facets in facets.json —
 // born as facets, since the bespoke cartography sidecar was never wired.
 pub mod arrangement_facets;
 pub mod cartography_geometry;
-// Recoverable replacement mechanics shared by product-owned settings stores.
-// Paths, schemas, and validation remain with the configured product.
-pub mod atomic_file;
 // The one compare-and-replace over a muniment slot, for every store that
 // writes back bytes it loaded (rules, blocks, Forme).
 pub mod slot_guard;
@@ -121,6 +120,7 @@ pub mod station_grant;
 // now — the pane-coupled half of this crate, split exactly as the
 // boundary-pass plan parked it.
 pub mod manifest;
+pub mod memory_levels;
 pub mod manifest_store;
 // The session graph file's name and path (graph.json; GraphSession writes it);
 // native-only so the crate stays wasm-clean (wasm hosts use a different storage
@@ -172,7 +172,6 @@ pub use arrangement_facets::{
     write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
     write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
 };
-pub use atomic_file::{Replacement, replace_bytes_if_unchanged, write_bytes_with_backup};
 pub use codicil_seal::WalletEpochSealer;
 pub use denizen_facets::{
     DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,

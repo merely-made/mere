@@ -27,12 +27,22 @@ so each statement's note names them.
 A product builds on the stack it has. A crate it doesn't need or want is not
 invited in, and a stale dependency of marginal benefit leaves rather than
 being fetched to keep a build whole. A product's own crates are made when the
-abstraction earns one.
+abstraction earns one, and a component is a module in its parent crate, not a
+crate of its own. A crate reserved as a capability's home receives that
+capability, which moves there when it is found elsewhere. A seam is reserved
+for a consumer that can be named today, never for a speculative one. Code
+leaves a port for the stack once a second host is planned, in a dated plan of
+the host's own repository with a done-condition, not once one shows up. The
+move is done when the code has moved and its first host builds on it; the
+second host's adoption is that host's receipt.
 
-Links: draws on isocosm:600, isocosm:organs.5 · summary Build on the stack we have: unneeded crates stay out, stale ones leave, own crates when the abstraction earns one.
+Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2, house-style D12 · summary Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers; extraction waits for a planned second host, not an arrived one.
 
-*Moved 2026-10-22 from isocosm's doctrine, its Stack 1, worded for any product
-("Reword to 'a product'").*
+*Refined 2026-10-30 (house-style D1, D2): "Named futures only"; "Fold into
+Stack 1".*
+
+*Refined 2026-10-31 (house-style D12): "second host is planned", because
+"shows up doesn't happen, you know, until it's planned."*
 
 ### Stack 2. The stack supplies identity and trust
 
@@ -51,12 +61,24 @@ Links: draws on isocosm:962 · summary Identity and admitted connections come fr
 Seams between components stay clean even at some cost in speed: a missing
 boundary bites later, and hardware improves. A renderer sits behind a scene
 contract and can be swapped. Formats follow open standards; a product makes
-its own only where none holds the thing.
+its own only where none holds the thing. Applications meet at the contract
+too. A producer offers surfaces or datagraphs, widgets and utilities
+included, and the endpoints a host dials; a host owns a graph and loads
+producers at runtime, Graphshell its reference; a runner runs or carries
+both and owns no graph. An installable app is a frame, a host with its
+producers fixed at build. The graph core a producer needs is contract tier,
+published like the scene crates, so Mere consumes producers and never the
+reverse.
 
-Links: draws on isocosm:27, isocosm:78 · summary Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first.
+Links: draws on isocosm:27, isocosm:78, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15 · summary Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; producers, hosts and runners meet at the contract; apps are frames.
 
 *Moved 2026-10-22 from isocosm's doctrine, the stack-wide half of its Stack 3;
 the wing's placements stay there ("Split as drafted").*
+
+*Refined 2026-10-31 (distillery-extraction D8, D9, D15): "Both must hold";
+"Any branch hosts"; then the four repairs. Owed: the graph core is not yet
+published, so graph-owning producers (Cleromancy, Knot, Woodshed) still
+compile in lockstep with Mere.*
 
 ### Stack 4. Platforms and the web
 
@@ -104,6 +126,22 @@ Links: draws on node-body-face-model D1 · summary Storage follows the death con
 
 *Added 2026-10-25, outcome new ("Write stack.6 now"), the first statement from
 this repository's own rulings.*
+
+### Stack 7. Source size
+
+No tracked source file in an owned repository exceeds 600 physical lines,
+comments and blanks included, without a technical reason listed beside it.
+Tests, scripts and shaders count; generated files and imported upstream
+sources are excluded by declared path, never by size. An oversize file splits
+along responsibilities the code already has, not into arbitrary fragments,
+and the split widens no visibility. Docs are outside the ceiling and are
+deduplicated instead. One shared check enforces it at commit and over the
+whole tree in each repository's local gate; files over it today are listed as exceptions and leave the list through named
+cleanup slices.
+
+Links: draws on isocosm:592, isocosm:method.3, house-style D10, house-style D11 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate.
+
+*Refined 2026-10-30 (house-style D11): "Local only".*
 
 ## Surfaces
 

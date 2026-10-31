@@ -38,7 +38,9 @@ Two extraction rules govern every row:
    already settled and the move creates no second authority.
 2. Cross-product contracts for orchestration, identity, authority, device
    ownership, frames, triggers, or leases remain product-local until a second
-   heterogeneous consumer tests the shape.
+   heterogeneous consumer plans its adoption in its own dated plan; they then
+   move, and that consumer's adoption tests the shape as its own receipt
+   (house-style D12, 2026-10-31).
 
 ## Ownership and acceptance ledger
 

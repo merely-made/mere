@@ -26,7 +26,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::engine_profile_store::PERSONAS_DIR;
 use crate::manifest::PersonaId;
-use alembic::memory_levels::EvictionPolicy;
+use crate::memory_levels::EvictionPolicy;
 
 /// Subdirectory under a persona holding persona settings.
 pub const PERSONA_SETTINGS_DIR: &str = "settings";
@@ -139,7 +139,7 @@ pub fn save_persona_settings(
     let target = persona_settings_path(data_root, persona);
     let json = serde_json::to_string_pretty(settings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 #[cfg(test)]

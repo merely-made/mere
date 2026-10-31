@@ -251,7 +251,7 @@ pub fn save_device_settings(data_root: &Path, settings: &DeviceSettings) -> io::
     let target = device_settings_path(data_root);
     let json = serde_json::to_string_pretty(settings)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 pub fn load_device_settings(data_root: &Path) -> io::Result<Option<DeviceSettings>> {

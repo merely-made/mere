@@ -1,0 +1,27 @@
+{
+  "app": "knot-editor",
+  "source": "e9ff2407c3a9a056a371958b41d1b3e6433a46ac",
+  "binary": "/Users/markik/Code/targets/lanes/context-navigation-chrome/artifacts/debug/knot",
+  "binary_sha256": "48a25a6af17692e65fb5ad0e217a193764e51b511c82ab5b272c472e199e5e77",
+  "scenario_sha256": "4f437e70c1e3ac1817107862dedbbdcc64123c39d5369f43e8a01786b0b4ba3f",
+  "captures": [
+    {
+      "checkpoint": "wide",
+      "window_id": 16813,
+      "native_bounds": {
+        "Height": 788,
+        "Width": 1280,
+        "X": 730,
+        "Y": 342
+      },
+      "exit": 1,
+      "stderr": "could not create image from window\n",
+      "captured": false
+    }
+  ],
+  "native_success": false,
+  "error": "OS capture failed: could not create image from window",
+  "runtime": "/Users/markik/Code/repos/knot-editor/.cargo/local/context-navigation-chrome/knot-native-attempt-01",
+  "launcher_exit": 1,
+  "fixture_unchanged": true
+}

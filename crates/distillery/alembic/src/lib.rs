@@ -50,13 +50,10 @@
 //! completing a useful workflow in two hosts through the same grant and
 //! observation surface.
 //!
-//! The recall half starts with [`memory_levels`] (feature `recall`), the three
-//! memory levels' read-model, moved here from `pandect` 2026-09-23. The
-//! workshop's host-neutral records and controls are in [`workshop`] (feature
-//! `workshop`); Athanor supplies their domain implementation.
-
-#[cfg(feature = "recall")]
-pub mod memory_levels;
+//! The recall half's memory levels went back to `pandect` 2026-10-31
+//! (distillery-extraction D12), since they read a mere's graph. The workshop's
+//! host-neutral records and controls are in [`workshop`] (feature `workshop`);
+//! Athanor supplies their domain implementation.
 
 #[cfg(feature = "workshop")]
 pub mod workshop;

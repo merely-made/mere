@@ -170,8 +170,13 @@ The first pass was by imports. These are the places source disagreed with it.
   `native/` is the clearest breach: it is a library for other ports.
 - **Anti-shell test** (same section): a capability that works only with
   Graphshell outermost is a shell with plugins. The receipt is a second host
-  that keeps its own identity, not a second view. Every lift below names one,
-  and a lift with no second host today is marked as waiting, not scheduled.
+  that keeps its own identity, not a second view. Every lift below names one.
+  A lift is scheduled once its second host is planned in that host's own dated
+  plan with a done-condition; a lift whose host has no such plan waits for the
+  plan, not for the host. A lift is done when the code has moved and Graphshell
+  builds on it; the second host's adoption is that host's receipt
+  ([house-style D12](2026-10-30_house_style_plan.md), 2026-10-31, replacing
+  "a lift with no second host today is marked as waiting").
 - **Suite composition census** ([§3](../../2026-08-22_turnstone_suite_composition_and_capability_census.md#3-corrections-to-older-posture)):
   Graphshell stays the overmap, local Mere host, remote projection client,
   transfer surface and handler router; Castellan owns the identity product
@@ -533,11 +538,13 @@ build against Djinn or a fixture host.
 `ResidentIdentity` (Mark's ruling), the native host relay, the C4 fixture and
 Knot's app-route receipt (Progress).
 
-**P6. L12, forme.** R2 ruled: `platen`. Needs a second host (Turnstone's workbench or
-Knot's workspace) that names its done condition.
-*Done when:* that host unlocks, drafts, discards and applies a forme through
-the lifted session; the lifted crate's tests carry the lifecycle cases that
-today live in `forme_session_lifecycle_tests.rs` without importing the port.
+**P6. L12, forme.** R2 ruled: `platen`. Starts once a second host (Turnstone's
+workbench or Knot's workspace) plans the adoption with a done condition (§3).
+*Done when:* the lifted crate's tests carry the lifecycle cases that today
+live in `forme_session_lifecycle_tests.rs` without importing the port, and
+Graphshell runs its forme session through it. The second host unlocking,
+drafting, discarding and applying a forme through the lifted session is that
+host's receipt (house-style D12).
 
 **P7. L11, L10 and the inspection readers.** Rule authoring and availability-aware
 resolution now belong to Scenograph; Mere View owns the reusable controls.

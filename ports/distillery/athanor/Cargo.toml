@@ -15,8 +15,7 @@ name = "athanor"
 path = "src/lib.rs"
 
 [features]
-default = ["furnace"]
-furnace = ["dep:alembic", "alembic/recall", "dep:eidetic", "dep:kernel", "dep:pandect"]
+default = []
 workshop = ["dep:alembic", "alembic/workshop", "dep:servitor", "dep:muniment", "dep:serde", "dep:serde_json", "dep:blake3"]
 workshop-worker = ["workshop", "dep:armillary"]
 workshop-sealed = ["workshop", "dep:eidetic"]
@@ -40,9 +39,6 @@ uuid = { version = "1", optional = true }
 [dev-dependencies]
 chacha20poly1305 = "=0.10.1"
 async-trait = "0.1"
-chartulary.workspace = true
-euclid = "0.22"
-kernel = { workspace = true, features = ["fixtures"] }
 muniment = { workspace = true, features = ["directory"] }
 pollster = "0.4"
 serde_json = "1"

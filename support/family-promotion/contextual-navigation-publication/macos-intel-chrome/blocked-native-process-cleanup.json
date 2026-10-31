@@ -1,0 +1,12 @@
+[
+  {
+    "attempt": "woodshed-native-attempt-02",
+    "pid": 75276,
+    "reason": "native screenshot permission unavailable; stop own isolated test pending grant"
+  },
+  {
+    "attempt": "knot-native-attempt-01",
+    "pid": 75481,
+    "reason": "native screenshot permission unavailable; stop own isolated test pending grant"
+  }
+]

@@ -183,7 +183,7 @@ pub fn save_settings(session_dir: &Path, settings: &PersistedSettings) -> io::Re
     let target = settings_path(session_dir);
     let json = serde_json::to_string_pretty(settings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read a session sidecar and expose both its current session policy and any

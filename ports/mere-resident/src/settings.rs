@@ -29,7 +29,7 @@
 use std::path::{Path, PathBuf};
 
 use mesh::KeepBound;
-use pandect::write_bytes_with_backup;
+use muniment::atomic_file::write_bytes_with_backup;
 use personae::ProfileId;
 use serde::{Deserialize, Serialize};
 

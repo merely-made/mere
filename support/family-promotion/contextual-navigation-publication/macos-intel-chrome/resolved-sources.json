@@ -1,0 +1,106 @@
+{
+  "woodshed": [
+    {
+      "name": "cambium",
+      "version": "0.6.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#9bba595c26a4a71ad6a4906bf1073b827f199721"
+    },
+    {
+      "name": "cambium-desktop",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#9bba595c26a4a71ad6a4906bf1073b827f199721"
+    },
+    {
+      "name": "cambium-rootstock",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#9bba595c26a4a71ad6a4906bf1073b827f199721"
+    },
+    {
+      "name": "chartulary",
+      "version": "0.2.2",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22eea29e9b54e01ed21e6991536ed4f208"
+    },
+    {
+      "name": "genet-livery",
+      "version": "0.0.4",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "genet-presenter",
+      "version": "0.2.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "genet-render",
+      "version": "0.2.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "mesquite",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#9bba595c26a4a71ad6a4906bf1073b827f199721"
+    },
+    {
+      "name": "muniment",
+      "version": "0.2.0",
+      "source": "git+https://github.com/merely-made/eidetic.git?rev=aa94fe22eea29e9b54e01ed21e6991536ed4f208#aa94fe22eea29e9b54e01ed21e6991536ed4f208"
+    },
+    {
+      "name": "taproot",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    }
+  ],
+  "knot-editor": [
+    {
+      "name": "cambium",
+      "version": "0.6.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#b232631f3e5ef30d24b19b3e832ddf225177c381"
+    },
+    {
+      "name": "cambium-desktop",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#b232631f3e5ef30d24b19b3e832ddf225177c381"
+    },
+    {
+      "name": "cambium-rootstock",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#b232631f3e5ef30d24b19b3e832ddf225177c381"
+    },
+    {
+      "name": "chartulary",
+      "version": "0.2.2",
+      "source": "git+https://www.github.com/merely-made/eidetic.git?rev=f599ffe93298025bf6d65ae310a7cb4270ea52e3#f599ffe93298025bf6d65ae310a7cb4270ea52e3"
+    },
+    {
+      "name": "genet-livery",
+      "version": "0.0.4",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "genet-presenter",
+      "version": "0.2.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "genet-render",
+      "version": "0.2.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    },
+    {
+      "name": "mesquite",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/mere.git?branch=main#b232631f3e5ef30d24b19b3e832ddf225177c381"
+    },
+    {
+      "name": "muniment",
+      "version": "0.2.0",
+      "source": "git+https://www.github.com/merely-made/eidetic.git?rev=f599ffe93298025bf6d65ae310a7cb4270ea52e3#f599ffe93298025bf6d65ae310a7cb4270ea52e3"
+    },
+    {
+      "name": "taproot",
+      "version": "0.1.0",
+      "source": "git+https://github.com/merely-made/genet.git?branch=main#01d3f528a8ff3f7c69201a736cdfdf296acccea3"
+    }
+  ]
+}

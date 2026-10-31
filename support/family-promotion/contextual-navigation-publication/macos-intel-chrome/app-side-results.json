@@ -1,0 +1,10 @@
+[
+  {
+    "app": "woodshed",
+    "exit": 1
+  },
+  {
+    "app": "knot-editor",
+    "exit": 0
+  }
+]

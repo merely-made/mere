@@ -1,0 +1,11 @@
+{"launch_method": "direct native executable; same product/scenario/renderer", "launcher_exit": 0, "timeout": false, "success": true, "elapsed_seconds": 8.38, "binary_sha256": "48a25a6af17692e65fb5ad0e217a193764e51b511c82ab5b272c472e199e5e77", "scenario_sha256": "3cf900e7a36df6e2e4692008abaff8d277c5fe1e0ae743853e64d6af7cf84fc8", "receipt": "scenario.done", "captures": 2}
+RESULT ok
+captured wide
+captured narrow
+Native macOS chrome checkpoints complete
+capture wide 2560x1520 digest=c8ed985df1e94194 file=/Users/markik/Code/output/context-navigation-chrome/knot-editor-app-side-01/wide.png
+capture narrow 1280x1520 digest=ebaf2a688995baec file=/Users/markik/Code/output/context-navigation-chrome/knot-editor-app-side-01/narrow.png
+frames: 2 captured, 0 blank, 2 distinct digests
+presentation: 34 frames, 36 redraws, 2 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":34,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":43,"phase":"submitted"}},"sequence":37}}
+

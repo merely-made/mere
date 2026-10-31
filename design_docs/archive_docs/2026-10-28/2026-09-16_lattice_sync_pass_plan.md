@@ -171,7 +171,7 @@ which does not record the filesystem path of a path package.
   pins with 1.98.1, track their portable locks, make build-script child commands
   locked, and explicitly qualify all three WASI guests before claiming them.
 - Crate-level cycle inventory: Mere's root points to `retinue`; Retinue's Mere
-  dependencies are in `repos/retinue/apps/signalman` and `repos/retinue/apps/signalman-desktop`. Mere also
+  dependencies are in `repos/murm/apps/signalman` and `repos/murm/apps/signalman-desktop`. Mere also
   consumes Knot's editor/document packages and Djinn consumes `knot-site`;
   Knot declares 35 Mere dependency/patch entries. This does not establish a
   removable shared-interface crate. Defer extraction until a concrete type or

@@ -1,0 +1,11 @@
+{"launch_method": "direct native executable; same product/scenario/renderer", "launcher_exit": -15, "timeout": true, "success": false, "elapsed_seconds": 90.887, "binary_sha256": "e78eca57b2f2dd1b23f99fdab0c1d98d5284519eb8d4221d3e6ebfcbf5062f9f", "scenario_sha256": "8feb3340981fd1ca066b0dcaa6b6b08a86ef91ed81a99dc67a9cef41d69301dc", "receipt": "scenario.done", "captures": 2}
+RESULT ok
+captured wide
+captured narrow
+Native macOS chrome checkpoints complete
+capture wide 2560x1520 digest=a67b2f53369bbc50 file=/Users/markik/Code/output/context-navigation-chrome/woodshed-app-side-01/wide.png
+capture narrow 1280x1520 digest=9d3c050c92b3fedc file=/Users/markik/Code/output/context-navigation-chrome/woodshed-app-side-01/narrow.png
+frames: 2 captured, 0 blank, 2 distinct digests
+presentation: 26 frames, 29 redraws, 3 unpresented redraws
+a11y-publication {"sampled_at_lane_frame":26,"snapshot":{"host":1,"publication":{"adapter":"installed","outcome":{"contribution_issues":0,"nodes":296,"phase":"submitted"}},"sequence":30}}
+
