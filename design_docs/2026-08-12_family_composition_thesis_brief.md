@@ -127,7 +127,10 @@ workflow, and authority, it is a platform capability. This is the product-tier
 form of the discipline the engine work already follows ("the framing pays rent
 only when a pipeline end has more than one occupant" — proof 4). Worth
 adopting as a named gate when Graphshell embedding is ever scheduled: the
-receipt is a *second host*, not a second view.
+receipt is a *second host*, not a second view. *2026-10-31 (house-style D12):
+the gate opens when that host is planned in its own repository's dated plan,
+not when it arrives; the extraction closes on the move and the first host,
+and the second host's embed is its own receipt.*
 
 **The capability, named (Mark, 2026-09-02).** The thing that passes the
 anti-shell test is the *projection manipulator*, and its name is
@@ -298,7 +301,8 @@ failure behavior, a forcing consumer, and bounded owner-specific slices.
 Reuse the [runtime composition ledger's](mere_docs/implementation_strategy/2026-08-23_runtime_composition_acceptance_plan.md)
 distinction: settled reusable mechanics can move for one forcing consumer;
 cross-product orchestration, identity, authority and lease contracts require
-a heterogeneous second consumer before promotion.
+a planned heterogeneous second consumer before promotion (house-style D12,
+2026-10-31).
 
 **Implementation done:** the selected slice passes its named regression
 manifest, including refusal and teardown cases, through the actual consumer

@@ -1,8 +1,8 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-10-30):** plan. Ten rulings recorded (D1 to D10); stack.1 refined by D1 and
-D2; stack.7 added by D10. No check adopted yet; H1 is planned in eidetic.
+**Status (2026-10-31):** plan. Twelve rulings recorded (D1 to D12); stack.1 refined by D1,
+D2 and D12; stack.7 added by D10. No check adopted yet; H1 is planned in eidetic.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
 measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
@@ -95,6 +95,21 @@ abstraction" contradicted the known-futures ruling (2026-09-23).
   eidetic's line-ceiling plan as D6.
 
   Links: amends stack.7, house-style D3, house-style D8 · summary The shared checks run at commit and in each repository's full local gate; no CI.
+
+- **D12. Extraction timing (Mark, 2026-10-31):** "second host is planned", over waiting for a
+  second host to show up: "shows up doesn't happen, you know, until it's planned. And shows up
+  also doesn't happen until the extraction happens. But then the extraction is gated on a
+  second consumer, right? So it's just circular." Put to Mark on finding the Graphshell
+  stack lift's L4b, L6, L7 and P6 and the family promotion's source-home follow-up waiting
+  on hosts that could only adopt after the move. Then "Refine stack.1"; planned is "Host's
+  own plan" (a dated plan in the host's repository names the adoption with a
+  done-condition); done is "Moved + first host" (the second host's adoption is a receipt in
+  that host's plan); scope "Also isocosm Stack 7" (isocosm case 1045). The same change
+  rewrites the gates in the Graphshell stack lift plan (§3, P6), the composition thesis's
+  anti-shell test, the runtime composition ledger's rule 2 and the conatus plan's contract
+  rule.
+
+  Links: amends stack.1 · summary Extraction proceeds once a second host is planned in its own repository's plan; it is done when the code has moved and the first host builds on it.
 
 ## Open forks
 

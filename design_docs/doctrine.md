@@ -24,12 +24,19 @@ being fetched to keep a build whole. A product's own crates are made when the
 abstraction earns one, and a component is a module in its parent crate, not a
 crate of its own. A crate reserved as a capability's home receives that
 capability, which moves there when it is found elsewhere. A seam is reserved
-for a consumer that can be named today, never for a speculative one.
+for a consumer that can be named today, never for a speculative one. Code
+leaves a port for the stack once a second host is planned, in a dated plan of
+the host's own repository with a done-condition, not once one shows up. The
+move is done when the code has moved and its first host builds on it; the
+second host's adoption is that host's receipt.
 
-Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2 · summary Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers.
+Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2, house-style D12 · summary Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers; extraction waits for a planned second host, not an arrived one.
 
 *Refined 2026-10-30 (house-style D1, D2): "Named futures only"; "Fold into
 Stack 1".*
+
+*Refined 2026-10-31 (house-style D12): "second host is planned", because
+"shows up doesn't happen, you know, until it's planned."*
 
 ### Stack 2. The stack supplies identity and trust
 
