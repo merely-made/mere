@@ -808,7 +808,8 @@ presentation PT1. Needs P1–P5.
   receipt export test failed on the P5 commit because the export's coverage
   record takes a retention slot, which can evict the oldest app record at a
   full store. A renderer call outside a work scope still disappears from
-  coverage rather than counting as a gap; the chain verifier, not the counters,
+  coverage rather than counting as a gap; the chain verifier
+  (Turnstone `scripts/check-settings-reactive-chain.py`), not the counters,
   caught the move.
 
 ## Findings (2026-10-29)
