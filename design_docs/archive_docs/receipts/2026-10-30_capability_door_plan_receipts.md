@@ -85,3 +85,35 @@ on its own.
 | Turnstone all-targets, default and `authoring` | Passed |
 | Turnstone lib tests | 1355 passed, 9 ignored |
 | Fresh clones of Turnstone `554f323f` and Woodshed's Hocket | All-target checks passed; neither lock references the fork |
+
+## 2026-10-30: I1, identity at the door
+
+| Repository | Commit | What landed |
+| --- | --- | --- |
+| Armillary | `d0c79f5` | `peer-facts` (D7); the door records each connection's peer |
+| Armillary | `b6578ee` | Grants pin labels per platform; `Connected` keeps the macOS audit token; `door::launch` with a one-time handle on descriptor 3 |
+| Mere | `e41ec6a` | custody-wire reads peers through `peer-facts` |
+| Mere | `b7439ab`, lock `ce7ee71` | Status `connections` with identity basis and peer account; `djinn --launch`; Djinn `b6578ee`, Knot `bda4143` |
+| Knot | `bda4143` | Djinn `b6578ee`, Mere `b7439ab` |
+| Cleromancy | `a374a50` | Djinn `b6578ee`, Mere `ce7ee71`, Knot `bda4143` |
+| Turnstone | `be1c3aad` | Djinn `b6578ee`, Mere `ce7ee71`, Knot `bda4143` |
+
+Turnstone's declaration stays parked on `agent/turnstone-declaration`
+(Armillary `b2388f4`, Mere, Knot, Turnstone); those branches predate I1.
+
+| Gate | Result |
+| --- | --- |
+| Djinn `--all-features` | 88 passed, including the macOS signature refusal and the launch handle read from descriptor 3 |
+| Djinn no-default, `door-native`, Wasm `door` | Passed |
+| `peer-facts` | 3 passed; Windows and Linux targets compile |
+| Djinn `--tests` for `x86_64-unknown-linux-gnu` | Compiles; the Linux launch-pin test was not run |
+| `mere-resident`, custody-wire, djinn-custodian | 54 test binaries passed; the pre-existing `the_dialable_host_serves_only_what_the_grant_and_the_owner_name` failed as before |
+| `declared_applications` (macOS) | A label pinned to a signature is refused for the unsigned test binary; unpinned is admitted |
+| `resident_status` | Status lists the reading connection (development, `uid:<euid>`) and drops it on close |
+| Knot lib, bins, tests; workspace all-targets | Passed |
+| Cleromancy all-targets; `--no-default-features` tests | Passed except the pre-existing `consultation_authoring_dom` |
+| Turnstone all-targets (default, `authoring`); lib | Passed; 1359 lib tests |
+
+Not verified: custody-wire's and Djinn's Windows builds (blake3's C build
+needs an MSVC toolchain on this host), Windows image matching at runtime,
+and a Linux launch end to end.
