@@ -238,6 +238,17 @@ source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_ex
 summary = "Distillery and mere-mesh move now; Athanor and Alembic wait for the Alembic lane's answer."
 amends = ["distillery-extraction D3"]
 
+[decisions."distillery-extraction D17"]
+title = ". Republish the drifted contract crates (Mark, 2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Bump and republish the contract crates whose source drifted from crates.io."
+
+[decisions."distillery-extraction D18"]
+title = ". Slim Djinn before publishing it (Mark, 2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Slim Djinn to the door before publishing; producers depend on the door's wire contract, not on Djinn."
+amends = ["distillery-extraction D17"]
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"

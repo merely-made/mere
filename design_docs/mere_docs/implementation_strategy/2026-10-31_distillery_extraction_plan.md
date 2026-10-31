@@ -1,8 +1,10 @@
 # Distillery extraction plan
 
 **Date:** 2026-10-31
-**Status (2026-10-31):** in progress. Rulings D1 to D16 recorded; Athanor and Alembic wait
-for the Alembic lane (D16). P1's graph halves are in
+**Status (2026-10-31):** paused in P2. Rulings D1 to D18 recorded. P1 is on Mere main
+(`0874522c`); four of the eleven contract crates are republished (D17); the receiving
+branch `distillery-receive` in the ESP checkout is verified and unpushed. P2 resumes once
+Djinn is slimmed (D18). Athanor and Alembic wait for the Alembic lane (D16). P1's graph halves are in
 `pandect`; the atomic write moves to `muniment` (D13); G1 is approved (D14) with the
 publish chain reported before the real publish.
 **Scope:** Distillery, its job and lease layer `mere-mesh`, and the workshop halves of
@@ -130,10 +132,32 @@ waits for a planned second host, not an arrived one.
 
   Links: amends distillery-extraction D3 · summary Distillery and mere-mesh move now; Athanor and Alembic wait for the Alembic lane's answer.
 
+- **D17. Republish the drifted contract crates (Mark, 2026-10-31):** "Bump and publish all
+  11", over parking P2 or pinning `mere.git`. Put to Mark on finding that ten of the eleven
+  contract crates in Distillery's graph no longer matched crates.io under their versions
+  (`graphshell-endpoint` 0.0.2 there lacks `projection`). Bumped in Mere `e55850a1`.
+
+  Links: summary Bump and republish the contract crates whose source drifted from crates.io.
+
+- **D18. Slim Djinn before publishing it (Mark, 2026-10-31):** "Publish the djinn chain, but
+  also, aren't we supposed to be moving those services so djinn isn't a god crate and can
+  just be execution?", then "Slim, then publish", over publishing Djinn 0.0.3 as it stands.
+  `graphshell-endpoint` 0.0.3 needs `djinn` 0.0.3, which links custody and identity services
+  (`custody-client`, `profile`: chatelaine, dramatis, personae, insigne, eidetic) and the
+  unpublished `peer-facts`. The door stays in Djinn as runner work (capability-door D1, D8);
+  custody and identity services move to their owners, and the door's wire types become a
+  small contract crate that `graphshell-endpoint` depends on in place of `djinn`. That gets
+  its own plan; P2 waits for it.
+
+  Links: amends distillery-extraction D17 · summary Slim Djinn to the door before publishing; producers depend on the door's wire contract, not on Djinn.
+
 ## Open forks
 
 - **F1 (D11).** If Djinn holds no meres, which owner takes the resident's store lifetimes?
 - **F2.** Closed by D14.
+- **F4 (D18).** The Djinn slimming plan: where `custody-client` and `profile` go, the door's
+  wire-contract crate and its name, and the eight consumers of `graphshell-endpoint`'s
+  `projection-door`, `projection-offer`, `projection-provider` and `profile` features.
 - **F3 (D15).** Publishing the graph core (kernel and the graph persistence in pandect) as
   contract tier is its own plan. Until then Cleromancy, Knot and Woodshed compile in
   lockstep with Mere; this pass moves Cleromancy off `mere-alembic` and no further.
@@ -205,6 +229,19 @@ pass; changes are committed in each repository.
   crates.io; Cleromancy reads `pandect::memory_levels` (`8cc4f83`). Mere's branch
   `distillery-extraction` merged 201 upstream commits (Djinn moved to Armillary; the
   remaining resident is `ports/mere-resident`).
+- 2026-10-31: P2 receiving. `git filter-repo` with default pruning silently dropped merge
+  content (the received `wire.rs` lacked upstream's strict decode); with
+  `--prune-degenerate never` the 964-commit history matches all 268 donor blobs at
+  `0874522c`. Merged into ESP branch `distillery-receive` (local, unpushed) with a generated
+  workspace. Its first resolve failed on `graphshell-endpoint` 0.0.2's missing `projection`,
+  which found the drift behind D17.
+- 2026-10-31: D17 wave. Mere `e55850a1` bumped the eleven; Knot `81b2c209` took them (its
+  0.0.x requirements had pinned the old versions, so Mere's patch stopped applying and the
+  lock carried two copies until Knot moved); Mere `7300f91f` locked them with one copy each;
+  Cleromancy `f86874eb` follows. Published: sceno 0.0.7, scenotime 0.0.5, hest 0.2.1,
+  chirograph 0.0.3. Stopped at `graphshell-endpoint` 0.0.3 (D18). Not yet published:
+  graphshell-endpoint, scenograph, workbench, scenomise, mere-surface-api, cambium 0.6.1,
+  incipit.
 - 2026-10-31: P1 in part. `alembic::memory_levels` is `pandect::memory_levels`;
   `athanor::furnace` is `pandect::furnace` (feature `furnace`); Alembic and Athanor are
   workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a
