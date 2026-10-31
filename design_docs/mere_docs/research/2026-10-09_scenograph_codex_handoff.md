@@ -76,7 +76,7 @@ to dynamics. Graphshell is the reference host; the proposed terminology needs
 reconciliation before a new proof is opened.
 
 **Planning continuation (2026-10-09):** the editor plan's
-[primitive and dynamics map](../implementation_strategy/2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
+[primitive and dynamics map](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md#primitive-and-dynamics-map-2026-10-09-source-backed-planning)
 maps existing surface/Resource, relation and field/coupling identities to
 authoring controls and dynamics. It records source gaps and proposed
 done-conditions without taking over the active dynamics implementation or
@@ -183,7 +183,7 @@ boundaries. Membership, clocks, event execution and conflicting writers remain
 open. The point probe invokes no applet and changes no graph assertion.
 
 **Exact binding and execution continuation (2026-10-12):** the authorized
-[next dynamics draft](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#exact-coupling-bindings-and-applied-effect-tracing-2026-10-12)
+[next dynamics draft](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md#exact-coupling-bindings-and-applied-effect-tracing-2026-10-12)
 now retains compiled inputs and graph-supplied field/coupling/member IDs, and
 observes actual writes with immediate body state. It keeps configured row caps,
 truncation counts, binding generations and distinct runtime owners; the actor
@@ -198,7 +198,7 @@ visible UI explanation, external consumer adoption and coordinator review.
 
 **Field-runtime continuation (2026-10-12):** Mark authorized F203 to F205's
 runtime adapter. The
-[owning dynamics plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md#field-clock-and-membership-runtime-2026-10-12)
+[owning dynamics plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md#field-clock-and-membership-runtime-2026-10-12)
 now records accepted simulation time, Pause freezing, Reset rewinding on a
 separate epoch, and inclusive per-body reference-point eligibility. Extent and
 selector join the exact compiled provenance. Initial matches run no entry
@@ -327,7 +327,7 @@ be preserved during that owner's cutover. F199's broader queue stays paused.
 
 ## The work, in order
 
-1. **The dynamics slot** (dynamics grammar plan, `mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
+1. **The dynamics slot** (dynamics grammar plan, `archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md`, F192 to F195; asked for by the Scenograph plan's SE69).
    - F192: `scenograph::AuthoredProjectionDefinition` gains `dynamics: Option<DynamicsSlot { version, spec }>`, the spec as canonical JSON. scenograph stays on sceno and serde and keeps `Eq`; no seiche dependency. The binding host reads the spec through seiche and refuses by path.
    - F193: the recipe's `arrangement.kind` and the spec's `target.arrangement` must agree; binding refuses a mismatch, naming both paths.
    - F194: `ProjectionVariant` varies dynamics by a catalog preset id or a whole `DynamicsSlot`, one or the other (naming both is refused under F201).

@@ -22,7 +22,7 @@ as the Navigator; this realizes it),
 (owns the gloss swatch lens),
 [petgraph / RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)
 (owns edge multigraph storage + the collapse-as-LOD ruling),
-[scriptable field regions plan](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
+[scriptable field regions plan](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md)
 (owns field-region edge visibility).
 
 ---
@@ -202,7 +202,7 @@ derivation follows projection over real edges, so a hide never drops a node out 
 subgraph.
 
 A placed field-region rule
-([scriptable field regions](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md))
+([scriptable field regions](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md))
 governs edge visibility inside its extent; it resolves into this stack as another
 contributor rather than a parallel mechanism.
 
@@ -308,4 +308,4 @@ Fragments exist, each owned by a sibling plan; the unifying primitive does not.
   candidate swatch scope: the nodes inside it become the scoped set, a convenient grab-bag that
   need not be connected (so it reads as a Loose / Session shape, not a structural one). Extends the
   scope axis (node / selection / subgraph / graph, plus **field**); cross-refs the
-  [scriptable field regions plan](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md).
+  [scriptable field regions plan](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md).

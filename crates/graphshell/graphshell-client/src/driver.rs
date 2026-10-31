@@ -103,7 +103,8 @@ impl SessionDriver {
     /// The session state, for starting an operation.
     ///
     /// The ordinary shape is two statements — ask the core to start something,
-    /// then hand what it wants to [`SessionDriver::begin`]:
+    /// then hand what it wants to [`SessionDriver::begin`]. The core refuses a
+    /// start while an operation awaits its answer, before anything is sent:
     ///
     /// ```ignore
     /// let progress = driver.core_mut().ok_or("not discovered")?.mount(0)?;
@@ -140,7 +141,8 @@ impl SessionDriver {
     pub fn begin(&mut self, progress: Progress<Outcome>) -> Result<Advance, String> {
         match progress {
             Progress::Done(outcome) => Ok(Advance::Done(outcome)),
-            Progress::Ask(body) => self.send(body),
+            Progress::Ask(body) => self.send(body).inspect_err(|_| self.abandon()),
+            Progress::Refused(message) => Err(message),
         }
     }
 
@@ -175,7 +177,13 @@ impl SessionDriver {
                     ));
                 }
                 self.inflight = None;
-                let body = response.body.map_err(|failure| failure.message)?;
+                let body = match response.body {
+                    Ok(body) => body,
+                    Err(failure) => {
+                        self.abandon();
+                        return Err(failure.message);
+                    },
+                };
                 let core = self.core_or_adopt(body)?;
                 match core {
                     Adopted::Descriptor(descriptor) => {
@@ -212,6 +220,14 @@ impl SessionDriver {
     }
 
     // ── Internals ───────────────────────────────────────────────────────────
+
+    /// The request in flight ended without an answer for the core to fold, so
+    /// the core stops awaiting it too: the two never disagree.
+    fn abandon(&mut self) {
+        if let Some(core) = self.core.as_mut() {
+            core.abandon();
+        }
+    }
 
     /// Serialize one request body as a line and record its id as in flight.
     fn send(&mut self, body: CarrierRequestBody) -> Result<Advance, String> {
@@ -390,11 +406,40 @@ mod tests {
     }
 
     /// One request at a time. Two in flight would make the id correlation above
-    /// meaningless, so the second is refused at the point of sending.
+    /// meaningless, so the core refuses the second start before anything is
+    /// sent or armed, and the first stays answerable: its reply, with its own
+    /// id, still completes it.
     #[test]
-    fn a_second_request_while_one_is_in_flight_is_refused() {
+    fn a_refused_second_start_leaves_the_first_answerable() {
         let mut driver = driver();
-        let _ = mount_in_flight(&mut driver);
+        let close = driver.core_mut().expect("discovered").close();
+        let id = request_id(&sent(driver.begin(close).expect("close encodes")));
+
+        let error = driver.discover().expect_err("one at a time");
+        assert!(error.contains("awaiting the endpoint's answer"), "{error}");
+        assert!(driver.is_awaiting(), "the close is still in flight");
+        assert!(driver.core().expect("core").is_awaiting());
+
+        let reply = line_of(CarrierResponse {
+            id,
+            body: Ok(CarrierResponseBody::Closed),
+        });
+        let advance = driver
+            .on_line(&reply)
+            .expect("the original answer is still accepted");
+        assert!(
+            matches!(advance, Advance::Done(Outcome::Closed)),
+            "{advance:?}"
+        );
+        assert!(!driver.is_awaiting());
+        assert!(!driver.core().expect("core").is_awaiting());
+    }
+
+    /// With no core yet, discovery has nothing to refuse it, so the send does.
+    #[test]
+    fn a_second_discovery_before_the_core_exists_is_refused_at_the_send() {
+        let mut driver = SessionDriver::new(CapabilityProfile::default());
+        let _ = sent(driver.discover().expect("discovery starts"));
         let error = driver.discover().expect_err("one at a time");
         assert!(error.contains("still waiting on request"), "{error}");
     }
@@ -414,9 +459,10 @@ mod tests {
         let error = driver.on_line(&refusal).expect_err("the endpoint said no");
         assert!(error.contains("not available"), "{error}");
         assert!(
-            !driver.is_awaiting(),
+            !driver.is_awaiting() && !driver.core().expect("core").is_awaiting(),
             "a refusal is an answer, so the session is free to ask again"
         );
+        let _ = mount_in_flight(&mut driver);
     }
 
     /// Notices arrive unsolicited and must not be mistaken for the answer being

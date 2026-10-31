@@ -89,7 +89,7 @@ Every real gap is in **crypto agility**, not in crypto choice.
 
 Verified in code, 2026-08-24:
 
-- `ports/djinn/castellan/src/custody/passphrase_storage.rs` — the on-disk
+- `ports/mere-resident/castellan/src/custody/passphrase_storage.rs` — the on-disk
   `EncryptedFile` carries `version`, `salt`, `profiles`. It does **not** carry
   the Argon2 cost parameters; `grep` for `m_cost`/`t_cost`/`p_cost` across both
   `passphrase_storage.rs` and `passphrase_root.rs` returns nothing. The module
@@ -440,7 +440,7 @@ discovery story existed anywhere in the stack. Half right. Peer discovery over
 mDNS is in production: p2panda's mDNS runs `Active` in Turnstone, Graphshell,
 Knot and Djinn behind Murm's `P2pandaOverlayHost`, with two branch-pinned forks
 and a macOS signing finding. The home for that record is R0 of the
-[reachability rungs plan](mere_docs/implementation_strategy/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md).
+[reachability rungs plan](archive_docs/2026-10-28/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md).
 What is absent is DNS-SD service browsing and advertisement (RFC 6763), planned
 work owned by Murm with Djinn's registry (F3) and the reference host plan's H10
 as consumer. The rest of this section stands for that half. The survey covers

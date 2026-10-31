@@ -38,6 +38,9 @@ pub use sprigging::LeafRegistry;
 
 use genet_render::VisualMovement;
 
+#[cfg(test)]
+mod projection_tests;
+
 mod a11y_publication;
 mod semantics;
 pub use a11y_provenance::SemanticNodeIdentity;
@@ -480,173 +483,8 @@ pub trait Accessibility {
     ) -> A11ySync;
 }
 
-/// The renderer-neutral DOM observation used to seed host semantics, including
-/// Cambium's app-owned committed text for marked textboxes. Contributed leaf
-/// and producer semantics are added by [`project_semantics`], which native and
-/// browser publication consume. This read does not invoke those contributors.
-/// `focus` is the focused node's opaque id, as
-/// [`Accessibility::sync`] receives it.
-pub fn document_projection<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
-    dom: &D,
-    layout: &OwnedLayout,
-    focus: Option<u64>,
-) -> DocumentA11yProjection {
-    use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
-    let focused_opaque = focus;
-    let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    let projection = genet_render::document_a11y_projection_with_style(
-        dom,
-        layout.fragments(),
-        focus,
-        0,
-        None,
-        &genet_render::A11yStyleQueries {
-            generated: &|node| layout.generated_text(dom, node),
-            rendered: &|node| layout.rendered_visible(dom, node),
-        },
-    );
-
-    // Cambium fields paint committed text and transient decoration as DOM
-    // children. Preserve Genet's generic projection, then make explicitly
-    // marked app textboxes accessible leaves with their app-owned value.
-    let mut markers = std::collections::HashMap::new();
-    let mut painted = std::collections::HashMap::new();
-    let mut numeric = std::collections::HashSet::new();
-    let mut pending = vec![dom.document()];
-    while let Some(node) = pending.pop() {
-        if let Some((x, y, width, height)) = layout.painted_rect(dom, node) {
-            painted.insert(
-                dom.opaque_id(node),
-                document_session_api::DocumentA11yBounds {
-                    x,
-                    y,
-                    width,
-                    height,
-                },
-            );
-        }
-        if dom.kind(node) == NodeKind::Element
-            && dom
-                .attribute(node, &Namespace::default(), &LocalName::from("role"))
-                .is_some_and(|role| role.trim().eq_ignore_ascii_case("textbox"))
-            && let Some(value) = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("data-cambium-text-value"),
-            )
-        {
-            let multiline = dom.attribute(
-                node,
-                &Namespace::default(),
-                &LocalName::from("aria-multiline"),
-            ) == Some("true");
-            markers.insert(dom.opaque_id(node), (value.to_owned(), multiline));
-        }
-        if dom.attribute(
-            node,
-            &Namespace::default(),
-            &LocalName::from("data-cambium-set-value"),
-        ) == Some("true")
-        {
-            numeric.insert(dom.opaque_id(node));
-        }
-        pending.extend(dom.flat_children(node));
-    }
-    // Genet supplies semantic names and actions; this host owns the retained
-    // scroll planes. Match the rectangles used by paint and pointer hit testing,
-    // including both document and nested scrolling, before a platform lowers
-    // the projection. Semantic requests dispatch by node identity, so their
-    // actions remain independent of the current cursor or scroll offset.
-    let mut nodes = projection.nodes().to_vec();
-    for node in &mut nodes {
-        if numeric.contains(&node.id.get())
-            && node
-                .actions
-                .contains(&document_session_api::DocumentA11yAction::Click)
-            && !node.state.disabled
-            && !node.state.read_only
-            && !node
-                .actions
-                .contains(&document_session_api::DocumentA11yAction::SetValue)
-        {
-            node.actions
-                .push(document_session_api::DocumentA11yAction::SetValue);
-        }
-        if node.bounds.is_some()
-            && let Some(bounds) = painted.get(&node.id.get())
-        {
-            node.bounds = Some(*bounds);
-        }
-    }
-    let projection = DocumentA11yProjection::new(
-        projection.revision(),
-        projection.support().clone(),
-        projection.root(),
-        nodes,
-    );
-    if markers.is_empty() {
-        return projection;
-    }
-
-    let children: std::collections::HashMap<_, _> = projection
-        .nodes()
-        .iter()
-        .map(|node| (node.id, node.children.clone()))
-        .collect();
-    let mut descendants = std::collections::HashMap::new();
-    for id in markers.keys().copied() {
-        let mut found = Vec::new();
-        let mut pending = children
-            .get(&document_session_api::DocumentA11yNodeId::new(id))
-            .into_iter()
-            .flatten()
-            .copied()
-            .collect::<Vec<_>>();
-        while let Some(child) = pending.pop() {
-            found.push(child);
-            pending.extend(children.get(&child).into_iter().flatten().copied());
-        }
-        descendants.insert(id, found);
-    }
-    let hidden: std::collections::HashSet<_> = descendants.values().flatten().copied().collect();
-    let mut nodes: Vec<_> = projection
-        .nodes()
-        .iter()
-        .filter(|node| !hidden.contains(&node.id))
-        .cloned()
-        .collect();
-    for node in &mut nodes {
-        let Some((value, multiline)) = markers.get(&node.id.get()) else {
-            continue;
-        };
-        node.value = Some(value.clone());
-        node.state.multiline = *multiline;
-        node.state.editable = !node.state.disabled && !node.state.read_only;
-        node.children.clear();
-        node.state.focused |= descendants
-            .get(&node.id.get())
-            .is_some_and(|ids| ids.iter().any(|id| focused_opaque == Some(id.get())));
-    }
-    DocumentA11yProjection::new(
-        projection.revision(),
-        projection.support().clone(),
-        projection.root(),
-        nodes,
-    )
-}
-
-fn find_opaque<D: layout_dom_api::LayoutDom<NodeId = NodeId>>(
-    dom: &D,
-    node: NodeId,
-    opaque: u64,
-) -> Option<NodeId> {
-    use layout_dom_api::LayoutDom as _;
-    if dom.opaque_id(node) == opaque {
-        return Some(node);
-    }
-    dom.flat_children(node)
-        .find_map(|child| find_opaque(dom, child, opaque))
-}
+mod document_projection;
+pub use document_projection::document_projection;
 
 /// A logical key, after the platform applied layout and modifiers.
 ///

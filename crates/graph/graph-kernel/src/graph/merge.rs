@@ -251,8 +251,10 @@ mod tests {
         merged.edges.extend(snapshot.edges.iter().cloned());
         merged.timestamp_secs = snapshot.timestamp_secs;
         let mut graph = Graph::from_snapshot(&merged);
-        graph.overlay_facets(current);
-        graph.overlay_facets(facets.clone());
+        graph.overlay_facets(current).expect("live facets install");
+        graph
+            .overlay_facets(facets.clone())
+            .expect("codicil facets install");
         graph
     }
 

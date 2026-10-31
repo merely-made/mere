@@ -25,11 +25,11 @@
 use std::fmt;
 use std::path::Path;
 
-use identity::carry::DeviceGrantSet;
+use identity::carry::{DeviceGrantSet, DeviceId};
 use insigne::CheckFault;
 
 use crate::{
-    DeviceExposure, DeviceGrantError, DeviceId, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
+    DeviceExposure, DeviceGrantError, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
     certificate_device_id, device_grant_set_ref, device_is_fully_revoked, load_device_grant_set,
     load_device_roster,
 };

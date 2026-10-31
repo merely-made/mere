@@ -4,18 +4,33 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Navigation history — one **shared** visit space for the whole graph.
+//! Navigation history: the browse trail, in one **shared** visit space for the
+//! whole graph.
 //!
 //! Every node is an `Owner` within a single `chartulary::stemma::Stemma`, keyed by
 //! the node's UUID. A node's own browse history is its owner's path (within-node
 //! back/forward); a node minted by an "open in new node" gesture is **spawned**
 //! with its creator set to the origin node, so its first visit attaches under the
-//! origin's *current* visit — the navigated-from anchor is correct-by-construction
+//! origin's *current* visit: the navigated-from anchor is correct-by-construction
 //! and within-node + cross-node lineage live in one tree (the (b) anchor design,
 //! 2026-06-06; see the node-navigation-lineage plan).
 //!
+//! The trail is not the address. A node's primary address is its own: the url
+//! index finds the node by it, and `SetNodeUrl` changes it with no visit. A visit
+//! (`navigate_node`) records the page here and writes it as the address. A history
+//! step moves the cursor and lands the page it reveals on the address, the one
+//! place history writes the address, so a step re-imposes the trail's page over an
+//! address a `SetNodeUrl` has since moved. The cursor is the position in the trail
+//! (`node_history_projection`); nothing reads it back as the address.
+//!
+//! Stemma holds the trail: the cursor, each visit's transition and its time. It
+//! does not hold recency. When a node was last visited is the `visit.history`
+//! facet's `last_visited_ms`, stamped by navigation, the history steps, creation
+//! and the canvas touch; a read of it costs one facet lookup, where a read of
+//! this memory rebuilds the whole space.
+//!
 //! The store keeps the serializable [`GraphMemorySnapshot`] and rehydrates the
-//! live `GraphMemory` (a non-serializable `SlotMap`) per operation — the same
+//! live `GraphMemory` (a non-serializable `SlotMap`) per operation, the same
 //! pattern the per-node predecessor used, now over one shared space. (A live
 //! in-memory copy with custom (de)serialization is the future optimization if the
 //! per-op rehydrate cost matters.)
@@ -89,15 +104,6 @@ pub struct NodeHistorySemanticSummary {
     pub current_url: Option<String>,
     pub last_visit_at_ms: Option<u64>,
     pub visit_count: usize,
-}
-
-/// One node's most-recent visit, for the graph-wide "recently visited" projection
-/// (gloss recent-nodes; the lineage pane). A row of [`recent_visited`](SharedNavigationMemory::recent_visited).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RecentVisit {
-    pub node: Uuid,
-    pub url: String,
-    pub last_visit_at_ms: u64,
 }
 
 type Memory = OwnerScopedMemory<String, String, NodeHistoryOwner, ()>;
@@ -325,48 +331,6 @@ impl SharedNavigationMemory {
         }
     }
 
-    /// The graph's recently-visited nodes, newest first, capped at `limit`. A pure
-    /// projection over the one shared visit space (R0 shared-projection): each node
-    /// (owner) contributes the url + timestamp of its latest visit; nodes never
-    /// navigated are omitted. This is the graph-wide "recent" the forest composes
-    /// into — no separate recency list. (gloss recent-nodes; the lineage pane.)
-    pub fn recent_visited(&self, limit: usize) -> Vec<RecentVisit> {
-        let memory = self.hydrate();
-        let mut recent: Vec<RecentVisit> = memory
-            .owners()
-            .filter_map(|(_, owner)| {
-                let NodeHistoryOwner::Node(node_str) = &owner.identity;
-                let node = Uuid::parse_str(node_str).ok()?;
-                // The owner's latest visit (max created_at over all its visits), so
-                // the timestamp is "last touched", robust to back/forward stepping.
-                let (entry_id, at_ms) = owner
-                    .owned_visits
-                    .iter()
-                    .filter_map(|vid| {
-                        memory
-                            .visit(*vid)
-                            .map(|visit| (visit.entry, visit.created_at_ms))
-                    })
-                    .max_by_key(|(_, at)| *at)?;
-                let url = memory.entry(entry_id).map(|entry| entry.payload.clone())?;
-                Some(RecentVisit {
-                    node,
-                    url,
-                    last_visit_at_ms: at_ms,
-                })
-            })
-            .collect();
-        recent.sort_by(|a, b| b.last_visit_at_ms.cmp(&a.last_visit_at_ms));
-        recent.truncate(limit);
-        recent
-    }
-
-    /// `node`'s current page (its cursor's URL), if any.
-    pub fn current_url(&self, node: Uuid) -> Option<String> {
-        let projection = self.projection(node);
-        projection.entries.get(projection.current_index).cloned()
-    }
-
     /// Whether [`back`](Self::back) would move `node`'s cursor.
     pub fn can_back(&self, node: Uuid) -> bool {
         self.projection(node).current_index > 0
@@ -426,6 +390,12 @@ mod tests {
         Uuid::from_u128(x)
     }
 
+    /// The page the cursor rests on.
+    fn cursor(m: &SharedNavigationMemory, node: Uuid) -> Option<String> {
+        let trail = m.projection(node);
+        trail.entries.get(trail.current_index).cloned()
+    }
+
     #[test]
     fn record_visit_back_forward_and_forward_fork() {
         let node = n(1);
@@ -433,7 +403,7 @@ mod tests {
         m.record_visit(node, "a", MemoryTransitionKind::UrlTyped, 1);
         m.record_visit(node, "b", MemoryTransitionKind::LinkClick, 2);
         m.record_visit(node, "c", MemoryTransitionKind::LinkClick, 3);
-        assert_eq!(m.current_url(node).as_deref(), Some("c"));
+        assert_eq!(cursor(&m, node).as_deref(), Some("c"));
         assert!(m.can_back(node));
         assert!(!m.can_forward(node));
 
@@ -446,7 +416,7 @@ mod tests {
 
         // Forward-fork: from b, navigate to d. c is preserved as an alternate.
         m.record_visit(node, "d", MemoryTransitionKind::UrlTyped, 8);
-        assert_eq!(m.current_url(node).as_deref(), Some("d"));
+        assert_eq!(cursor(&m, node).as_deref(), Some("d"));
         let branch = m.branch_projection(node);
         let b_visit = branch
             .visits
@@ -466,8 +436,8 @@ mod tests {
         m.record_visit(a, "a1", MemoryTransitionKind::UrlTyped, 1);
         m.record_visit(a, "a2", MemoryTransitionKind::LinkClick, 2);
         m.record_visit(b, "b1", MemoryTransitionKind::UrlTyped, 3);
-        assert_eq!(m.current_url(a).as_deref(), Some("a2"));
-        assert_eq!(m.current_url(b).as_deref(), Some("b1"));
+        assert_eq!(cursor(&m, a).as_deref(), Some("a2"));
+        assert_eq!(cursor(&m, b).as_deref(), Some("b1"));
         assert!(
             m.can_back(a) && !m.can_back(b),
             "each node walks only its own path"
@@ -483,9 +453,9 @@ mod tests {
         // Branch: spawn child anchored at the parent, then its first visit.
         m.spawn(child, parent);
         m.record_visit(child, "c1", MemoryTransitionKind::UrlTyped, 3);
-        assert_eq!(m.current_url(child).as_deref(), Some("c1"));
+        assert_eq!(cursor(&m, child).as_deref(), Some("c1"));
         // The child is its own history; the parent is unchanged (still at p2).
-        assert_eq!(m.current_url(parent).as_deref(), Some("p2"));
+        assert_eq!(cursor(&m, parent).as_deref(), Some("p2"));
         assert!(!m.can_back(child), "the child's first visit is its root");
     }
 
@@ -507,38 +477,12 @@ mod tests {
         let mut m = SharedNavigationMemory::empty();
         m.seed_linear(node, vec!["a".into(), "b".into(), "c".into()], 1);
         assert_eq!(
-            m.current_url(node).as_deref(),
+            cursor(&m, node).as_deref(),
             Some("b"),
             "cursor at the seeded index"
         );
         assert!(m.can_back(node) && m.can_forward(node));
         m.remove(node);
-        assert_eq!(m.current_url(node), None, "owner dropped on remove");
-    }
-
-    #[test]
-    fn recent_visited_rolls_the_forest_up_by_last_visit_newest_first() {
-        let (a, b, c) = (n(1), n(2), n(3));
-        let mut m = SharedNavigationMemory::empty();
-        m.record_visit(a, "a1", MemoryTransitionKind::UrlTyped, 10);
-        m.record_visit(b, "b1", MemoryTransitionKind::UrlTyped, 30);
-        m.record_visit(c, "c1", MemoryTransitionKind::UrlTyped, 20);
-        m.record_visit(a, "a2", MemoryTransitionKind::LinkClick, 40); // a's last touch is now newest
-
-        let recent = m.recent_visited(10);
-        assert_eq!(recent.len(), 3, "every visited node appears once");
-        assert_eq!(recent[0].node, a, "a (last visit 40) is newest");
-        assert_eq!(recent[0].url, "a2", "its latest url, not its first");
-        assert_eq!(recent[0].last_visit_at_ms, 40);
-        assert_eq!(recent[1].node, b, "b (30) before c (20)");
-        assert_eq!(recent[2].node, c);
-
-        // `limit` caps the list to the most-recent N.
-        let top = m.recent_visited(1);
-        assert_eq!(top.len(), 1);
-        assert_eq!(top[0].node, a);
-
-        // A fresh space has no recents.
-        assert!(SharedNavigationMemory::empty().recent_visited(5).is_empty());
+        assert_eq!(cursor(&m, node), None, "owner dropped on remove");
     }
 }

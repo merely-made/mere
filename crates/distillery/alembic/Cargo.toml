@@ -16,7 +16,16 @@ path = "src/lib.rs"
 
 [features]
 workshop = ["dep:serde"]
+workshop-surface = ["workshop", "dep:cambium"]
+workshop-native = ["workshop-surface", "dep:cambium-desktop"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"], optional = true }
+cambium = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+cambium-desktop = { workspace = true, optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+taproot.workspace = true
 

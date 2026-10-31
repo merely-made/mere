@@ -1,7 +1,8 @@
 # Distillery extraction plan
 
 **Date:** 2026-10-31
-**Status (2026-10-31):** in progress. Rulings D1 to D15 recorded. P1's graph halves are in
+**Status (2026-10-31):** in progress. Rulings D1 to D16 recorded; Athanor and Alembic wait
+for the Alembic lane (D16). P1's graph halves are in
 `pandect`; the atomic write moves to `muniment` (D13); G1 is approved (D14) with the
 publish chain reported before the real publish.
 **Scope:** Distillery, its job and lease layer `mere-mesh`, and the workshop halves of
@@ -119,6 +120,16 @@ waits for a planned second host, not an arrived one.
 
   Links: amends stack.3, distillery-extraction D8 · summary Producers, hosts and runners; frames are not hosts; endpoints are producer-side; the graph core is contract tier.
 
+- **D16. Athanor and Alembic wait for their lane (Mark, 2026-10-31):** "Communicate with the
+  active lane?", then "Plan note + prompt". Put to Mark on finding, after merging 201
+  upstream commits, that the Codex lane's Alembic workshop (`codex/alembic-workshop-20261025`,
+  merged 2026-10-29) added `workshop_destination` and `workshop_sealed_destination`, which
+  write into a mere graph, and that its plan says "there is no source-home move or new crate".
+  Distillery and `mere-mesh` move now; Athanor and Alembic stay in Mere until the lane answers
+  the two questions recorded in the Alembic plan's Open questions. D12's pandect moves stand.
+
+  Links: amends distillery-extraction D3 · summary Distillery and mere-mesh move now; Athanor and Alembic wait for the Alembic lane's answer.
+
 ## Open forks
 
 - **F1 (D11).** If Djinn holds no meres, which owner takes the resident's store lifetimes?
@@ -144,7 +155,7 @@ and pandect tests pass.
 ### P2. Receive in the renamed repository
 
 Filter Mere's history to the moved paths and merge it into ESP, laid out as
-`crates/{distillery,athanor,alembic,mesh}` plus the probe workspaces. Contract crates come
+`crates/{distillery,mesh}` plus the probe workspaces (Athanor and Alembic wait, D16). Contract crates come
 from crates.io (G1 for cambium and sprigging).
 
 *Done when:* moved sources match the donor at the P1 commit, with recorded manifest
@@ -161,6 +172,16 @@ the donor directories.
 *Done when:* no manifest in the six repositories names `esp.git` or a removed path; each
 lock resolves one source per package; Mere's touched crates and each consumer's check
 pass; changes are committed in each repository.
+
+## Prompt for the Alembic lane
+
+> Read `design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md`
+> (D7, D12, D15, D16) and the last item under Open questions in
+> `2026-10-28_alembic_implementation_plan.md`. Answer its two questions in that plan: whether
+> `workshop_destination` and `workshop_sealed_destination` can become a `pandect` feature, and
+> whether the graph-free workshop core leaves Mere with Distillery after W3. Note that
+> `alembic::memory_levels` is now `pandect::memory_levels` and Athanor's furnace is
+> `pandect::furnace`. Stop and show Mark the answer before moving any code.
 
 ## Findings
 
@@ -179,6 +200,11 @@ pass; changes are committed in each repository.
 ## Progress
 
 - 2026-10-31: assessment and rulings D1 to D12; no code moved.
+- 2026-10-31: muniment took `atomic_file` (Eidetic `5b3752f1`, then `613799af` carrying
+  upstream's `replace_bytes_if_unchanged`); sprigging 0.3.0 and cambium 0.6.0 published to
+  crates.io; Cleromancy reads `pandect::memory_levels` (`8cc4f83`). Mere's branch
+  `distillery-extraction` merged 201 upstream commits (Djinn moved to Armillary; the
+  remaining resident is `ports/mere-resident`).
 - 2026-10-31: P1 in part. `alembic::memory_levels` is `pandect::memory_levels`;
   `athanor::furnace` is `pandect::furnace` (feature `furnace`); Alembic and Athanor are
   workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a

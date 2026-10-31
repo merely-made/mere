@@ -11,7 +11,7 @@ now mien's Standing (see Ledgers).
 [`../../mere_docs/research/2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md),
 [`../../mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md`](../../mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md),
 [`../../mere_docs/implementation_strategy/2026-06-06_moot_constitution_brief.md`](../../mere_docs/implementation_strategy/2026-06-06_moot_constitution_brief.md),
-[`../../mere_docs/implementation_strategy/2026-06-30_commitment_proof_interface_plan.md`](../../mere_docs/implementation_strategy/2026-06-30_commitment_proof_interface_plan.md),
+[`../../mere_docs/implementation_strategy/2026-06-30_commitment_proof_interface_plan.md`](../2026-10-28/2026-06-30_commitment_proof_interface_plan.md),
 [`../../archive_docs/2026-06-09_completed_plans/2026-06-02_tessera_plan.md`](../2026-06-09_completed_plans/2026-06-02_tessera_plan.md)
 
 The bounty economy is not the mesh. It is the verification and settlement layer
@@ -134,7 +134,7 @@ pub struct MootEpochHeader {
 
 The commitments are not plain roster hashes. They are typed by scheme and
 domain, per the
-[`commitment_proof_interface_plan`](../../mere_docs/implementation_strategy/2026-06-30_commitment_proof_interface_plan.md).
+[`commitment_proof_interface_plan`](../2026-10-28/2026-06-30_commitment_proof_interface_plan.md).
 The first build should use sparse Merkle commitments for role rosters. Later
 vector commitments, accumulators, or private-set-cardinality proofs can replace
 that backend without changing the receipt shape.

@@ -24,7 +24,7 @@ fn test_snapshot_roundtrip_preserves_import_provenance() {
 
     let facets = graph.facets().clone();
     let mut restored = Graph::from_snapshot(&graph.to_snapshot());
-    restored.overlay_facets(facets);
+    restored.overlay_facets(facets).unwrap();
     let (key, _) = restored.get_node_by_url("https://example.com").unwrap();
     assert_eq!(
         restored.node_import_provenance(key).unwrap(),
@@ -53,7 +53,7 @@ fn test_snapshot_roundtrip_preserves_classifications() {
 
     let facets = graph.facets().clone();
     let mut restored = Graph::from_snapshot(&graph.to_snapshot());
-    restored.overlay_facets(facets);
+    restored.overlay_facets(facets).unwrap();
     let (key, _) = restored.get_node_by_url("https://example.com").unwrap();
     let classifications = restored.node_classifications(key).unwrap();
     assert_eq!(classifications.len(), 1);

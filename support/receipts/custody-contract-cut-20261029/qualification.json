@@ -1,0 +1,202 @@
+{
+  "scope": "First half only: carry contract ownership and immediate consumer migration; client/projection separation awaits review.",
+  "supplier_commit": "6711105e0284adb3e881fc9aebcc56f25000c1ca",
+  "mere_source_commit": "951e2f3702aa4206525c565ea8a07e327325b650",
+  "mere_upstream_base": "87e6c4b2009acf2c7b5ca61478dab7c2e0433fc8",
+  "murm_consumer_commit": "8b6b79504ed",
+  "canonical_types": [
+    "personae::carry::DeviceId",
+    "personae::carry::RemoteAuthRevocationOutcome"
+  ],
+  "compatibility_reexports": false,
+  "endpoint_conservative_lock_closure": {
+    "package_names": 299,
+    "absent": [
+      "pandect",
+      "mere-kernel",
+      "mere-alembic",
+      "graphshell"
+    ]
+  },
+  "resource_limits": {
+    "memory_max": "3G",
+    "memory_swap_max": 0,
+    "cpu_quota": "150%",
+    "cargo_jobs": 1,
+    "test_threads": 1,
+    "timeout_seconds": 600,
+    "lock": "/home/markik/Code/testing/machine-heavy.lock"
+  },
+  "results": [
+    {
+      "name": "personae-red-host",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "personae",
+        "remote_auth_revocation_preserves_pandect_json_shape"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 78.42,
+      "finished_utc": "2026-10-29T02:37:47.632334+00:00",
+      "log_sha256": "b61ce4fce80e4a62c9ce1849fc9c509c12069258e119c4a7775ae7cf2d1e17ba",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/personae-red-host.log"
+    },
+    {
+      "name": "personae-green",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "personae",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.0,
+      "finished_utc": "2026-10-29T04:22:48.735698+00:00",
+      "log_sha256": "a34895a6c09f010beaac54b3f6e4fbca5fa8f7f00a8563d443755c487f017b5b",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/personae-green.log",
+      "tests": [
+        {
+          "passed": 75,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "endpoint-publish",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "graphshell-endpoint",
+        "--features",
+        "door",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.75,
+      "finished_utc": "2026-10-29T04:56:28.637175+00:00",
+      "log_sha256": "d1e27ffbddcac8682934665ec628798378782985e6145f52cf8e6fd299fdcf1d",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/endpoint-publish.log",
+      "tests": [
+        {
+          "passed": 45,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "castellan-wallet",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "castellan",
+        "--features",
+        "wallet",
+        "--test",
+        "wallet_authority"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 131.64,
+      "finished_utc": "2026-10-29T04:52:07.960716+00:00",
+      "log_sha256": "dac499c77bb72c7446143f28fa0087ac4822b7df92e1d6efe67cac33c19084ec",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/castellan-wallet.log",
+      "tests": [
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "pandect-grants",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "pandect",
+        "wallet_grant",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 70.17,
+      "finished_utc": "2026-10-29T04:54:42.729367+00:00",
+      "log_sha256": "bb0882a17b5253f495515a30a815bab14ee38a9e3e363869656e852b196392fc",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/pandect-grants.log",
+      "tests": [
+        {
+          "passed": 26,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "name": "station-publish",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "station-custody",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 10.82,
+      "finished_utc": "2026-10-29T04:56:39.495851+00:00",
+      "log_sha256": "d39760564402166738ba95361c3b28457130502f8127101bdf4c3cd98b63270c",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/station-publish.log"
+    },
+    {
+      "name": "signalman-resolution",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.59,
+      "finished_utc": "2026-10-29T04:53:01.783015+00:00",
+      "log_sha256": "1fe120db195f028e69cd80028874abff9ec4a464a3eb07146946ba80f098d686",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/signalman-resolution.log"
+    },
+    {
+      "name": "fixture-lock",
+      "command": [
+        "cargo",
+        "update",
+        "-p",
+        "personae",
+        "--precise",
+        "6711105e0284adb3e881fc9aebcc56f25000c1ca"
+      ],
+      "exit_code": 101,
+      "elapsed_seconds": 2.76,
+      "finished_utc": "2026-10-29T04:49:32.303586+00:00",
+      "log_sha256": "e6c31849c79d2a7d13b4622b11940966bb1fa334ce355ba09330a8428a1732d1",
+      "log_path": "/home/markik/Code/testing/custody-contract-20261029/fixture-lock.log"
+    }
+  ],
+  "limitations": [
+    "Linux focused checks only; no full Djinn or Signalman GUI build, browser or physical-device qualification.",
+    "The old Distillery remote fixture cannot resolve existing Eidetic revision 5afe6723b75cc2b62420328c079c05c60c90380d; its lock is unchanged and remains unvalidated.",
+    "The serialization regression fixes the moved outer JSON envelope and checks a nonempty signed payload. Insigne nested serialization is unchanged, not independently frozen by this test.",
+    "Existing compiler and unused-patch warnings remain.",
+    "Cargo update retained all package name/version sets but normalized existing dependency edges, including Windows targets, root tempfile/getrandom and web spareval/sha2.",
+    "Signalman imports the longstanding DeviceId contract; its previous supplier pins are retained and its direct Pandect lock edge is removed. Locked metadata resolution succeeds.",
+    "Wallet/grant tests preceded the final Pictograph-caption-only rebase; their source and dependencies did not change. Endpoint tests and station checks were rerun afterward."
+  ]
+}

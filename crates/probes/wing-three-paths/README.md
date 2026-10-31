@@ -9,7 +9,7 @@ SPDX-License-Identifier: MPL-2.0
 # Three voxel presentation paths
 
 An explicitly retained experiment for the
-[wing presentation plan](https://github.com/merely-made/isometry/blob/main/mesocosm/design_docs/2026-09-11_orthographic_voxel_presentation_plan.md).
+[wing presentation plan](https://github.com/merely-made/isometry/blob/main/mesocosm/design_docs/archive_docs/2026-10-28/2026-09-11_orthographic_voxel_presentation_plan.md).
 One orthographic scene compares A, retained planar fragments; B, content-cached
 quarter-turn sprites; and C, Mesocosm resident geometry with a shared depth
 attachment, composited through netrender. This is a standalone Rust/wgpu probe.

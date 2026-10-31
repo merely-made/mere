@@ -32,7 +32,7 @@ Pre-release, under active development.
   establish new browser, network, model or physical-device capabilities.
 - Working Rust toolchain: 1.99.1; shared declared minimum: 1.97.1.
 
-The [family promotion plan](design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)
+The [family promotion plan](design_docs/archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md)
 records source ownership, independent test gates and consumer cutover status.
 
 ## Design vocabulary
@@ -128,7 +128,7 @@ ordinary Cargo commands do not. Use the launcher for editor check commands too
 (an absolute script path works from a member directory). Editor metadata using
 bare Cargo sees the portable graph. Do not set a global lockfile redirect.
 Nested workspace portable locks and platform gates are tracked separately in
-the [lattice plan](design_docs/mere_docs/implementation_strategy/2026-09-16_lattice_sync_pass_plan.md).
+the [lattice plan](design_docs/archive_docs/2026-10-28/2026-09-16_lattice_sync_pass_plan.md).
 
 Integration uses a tested set of published revisions. Local sibling changes do
 not require immediate Git repins, and pin-only commits do not trigger reciprocal

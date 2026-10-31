@@ -37,6 +37,8 @@ pub(crate) use to::persisted_edge_for_ids;
 #[cfg(test)]
 mod handle_tests;
 #[cfg(test)]
+mod bounded_resource_tests;
+#[cfg(test)]
 mod tests;
 
 impl Graph {

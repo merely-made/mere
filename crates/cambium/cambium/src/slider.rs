@@ -11,7 +11,8 @@
 
 use crate::pod::GenetElement;
 use crate::{
-    GenetCtx, Key, NamedKey, PointerEvent, ValueEvent, View, el, on_key, on_pointer, on_value,
+    GenetCtx, Key, NamedKey, PointerEvent, PointerPhase, ValueEvent, View, el, on_key, on_pointer,
+    on_value,
 };
 
 /// The state of a [`slider`]: a normalized value in `0.0..=1.0`. Composable via
@@ -87,7 +88,7 @@ pub fn slider(state: &Slider) -> impl View<Slider, (), GenetCtx, Element = Genet
         |s: &mut Slider, e: PointerEvent| {
             // Down / Move / Up all set the value from the pointer fraction, so a
             // press jumps to that point and a drag tracks it.
-            if e.size.0 > 0.0 {
+            if e.phase != PointerPhase::Cancel && e.size.0 > 0.0 {
                 s.value = (e.local.0 / e.size.0).clamp(0.0, 1.0);
             }
         },
@@ -164,5 +165,33 @@ mod tests {
             runner.dispatch_value(root, ValueEvent { value: refused });
             assert_eq!(runner.state().value, 1.0);
         }
+    }
+
+    #[test]
+    fn pointer_cancel_keeps_last_drag_value() {
+        use std::{cell::RefCell, rc::Rc};
+
+        use crate::{AnyView, DomHandle, GenetAppRunner, PointerEvent, PointerPhase};
+        use genet_scripted_dom::ScriptedDom;
+
+        type SliderView = Box<dyn AnyView<Slider, (), GenetCtx, GenetElement>>;
+        fn view(state: &Slider) -> SliderView {
+            Box::new(slider(state))
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(dom, view, Slider::new(0.5));
+        let track = runner.root();
+
+        runner.dispatch_pointer_down(
+            track,
+            PointerEvent::new(PointerPhase::Down, (30.0, 0.0), (100.0, 10.0)),
+        );
+        assert!((runner.state().value - 0.3).abs() < f32::EPSILON);
+        runner.dispatch_pointer_up(PointerEvent::new(
+            PointerPhase::Cancel,
+            (90.0, 0.0),
+            (100.0, 10.0),
+        ));
+        assert!((runner.state().value - 0.3).abs() < f32::EPSILON);
     }
 }

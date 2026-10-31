@@ -169,7 +169,7 @@ IngressContext::in_process(link.shared_link))` and calls
 
 ## 6. T7: the dialable host (landed; not started by the binary)
 
-**Landed, Mere `8b08c98b2`:** `ports/djinn/src/resident_projection.rs`:
+**Landed, Mere `8b08c98b2`:** `ports/mere-resident/src/resident_projection.rs`:
 
 - `pub const RESIDENT_PROJECTION_SALT: &[u8] = b"mere.djinn/resident-projection/v1";`
 - `pub fn dial_policy(network: NetworkId, roots: Vec<TrustedRoot>,
@@ -185,7 +185,7 @@ IngressContext::in_process(link.shared_link))` and calls
   SharedCatalog`, `live_sessions()`, `accept_one(&T, now_ms)`, and
   `serve(self, Arc<T>, now_ms) -> ResidentProjectionError` (accepts until
   the transport fails; logs refusals);
-- `ports/djinn/src/resident_mere.rs`: `MereRoutes::with_remote_catalog(SharedCatalog)`
+- `ports/mere-resident/src/resident_mere.rs`: `MereRoutes::with_remote_catalog(SharedCatalog)`
   (set before cloning or serving) registers each served mere's two routes in
   the dial host's catalog too, through the shared `register_mere_routes`.
 
@@ -275,7 +275,7 @@ the pushed commit `K`.
 ### 7.4 Mere's Knot pin
 
 Root `Cargo.toml` `knot-editor` and `knot-document`, and
-`ports/djinn/Cargo.toml` `knot-site`: rev → `K`; add a pin note. Once no
+`ports/mere-resident/Cargo.toml` `knot-site`: rev → `K`; add a pin note. Once no
 consumer in Mere's graph names `graphshell` through git, its rows in Mere's
 two `mere.git` patch tables report "patch not used": remove the
 `graphshell = { path = "ports/graphshell" }` rows from both tables in the
@@ -333,7 +333,7 @@ source; the lift plan's Progress records the five revisions and the checks.
 
 ## 8. Start the dialable host in the Djinn binary (to do, after §11 Q2 and Q3)
 
-File: `ports/djinn/src/bin/djinn.rs`, where `MereRoutes::new(…)` is composed
+File: `ports/mere-resident/src/bin/djinn.rs`, where `MereRoutes::new(…)` is composed
 (around the `first_party` list).
 
 1. Build the host before the routes: `let dial = ResidentDialHost::new(
@@ -345,7 +345,7 @@ File: `ports/djinn/src/bin/djinn.rs`, where `MereRoutes::new(…)` is composed
    enabled (Q3): `let transport = Arc::new(bind_dial_transport(&identity).await?);`
    log its peer id and ticket, then `tokio::spawn(dial.serve(transport,
    now_ms))` inside the resident's task scope so shutdown joins it.
-4. Tests: an integration test in `ports/djinn/tests/` that composes the
+4. Tests: an integration test in `ports/mere-resident/tests/` that composes the
    resident as the binary does (the existing harness in `tests/common`) with
    the host enabled on a memory transport, dials as a granted device and
    reads `mere/<domain>`; and one with the host disabled that finds no
@@ -376,9 +376,9 @@ and a native run against a real resident once §8 lands.
 
 Ordered; each step keeps every carrier working.
 
-1. **Browser host relays pushes.** `ports/djinn/src/door/browser_carrier.rs`:
+1. **Browser host relays pushes.** `ports/mere-resident/src/door/browser_carrier.rs`:
    add `BrowserHostMessage::Notice { notice: CarrierNotice }` (`type:
-   "notice"`). `ports/djinn/src/door/browser_host.rs` `serve_native_messages`:
+   "notice"`). `ports/mere-resident/src/door/browser_host.rs` `serve_native_messages`:
    while waiting for the next browser frame, also wait on the admitted
    session's notices (`BrowserSessionClient::wait_for_notice`) with
    `tokio::select!`, and write each as a `Notice` frame. The extension
@@ -388,7 +388,7 @@ Ordered; each step keeps every carrier working.
    resume the named session from the notice (re-snapshot it as it does after
    an intent) instead of polling; add a case to `smoke-native-host.mjs`.
 3. **The app door pushes.** `crates/graphshell/graphshell-endpoint/src/door/wire.rs`:
-   add `AppHostMessage::Notice { notice }`; `ports/djinn/src/door/app_broker.rs`:
+   add `AppHostMessage::Notice { notice }`; `ports/mere-resident/src/door/app_broker.rs`:
    forward the session's notices as they arrive (the same `select!`), and
    keep answering `TakeNotice` / `WaitNotice` for one release; the client
    (`door/app_client.rs`) queues pushed notices so `take_notice` answers

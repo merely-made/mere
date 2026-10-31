@@ -216,7 +216,7 @@ fn producer_without_slot_geometry_does_not_invent_screen_coordinates() {
     };
     add_producer_semantics(
         &mut tree,
-        slot,
+        0,
         7,
         board(),
         Some((0.0, 0.0)),
@@ -239,9 +239,14 @@ fn invalid_producer_rectangle_does_not_reach_accessibility_bounds() {
             SemanticProjection::from_document(crate::document_projection(&dom, &layout, None)).tree;
         let mut semantics = board();
         semantics.children[0].rect = rect;
+        let index = tree
+            .nodes
+            .iter()
+            .position(|(id, _)| *id == A11yNodeId(dom.opaque_id(slot)))
+            .unwrap();
         add_producer_semantics(
             &mut tree,
-            A11yNodeId(dom.opaque_id(slot)),
+            index,
             7,
             semantics,
             Some((0.0, 0.0)),
@@ -470,7 +475,7 @@ fn identity_tests_existing_node_and_action_id_collisions_preserve_the_original_t
         let mut targets = HashMap::new();
         let result = add_producer_semantics(
             &mut tree,
-            slot,
+            0,
             7,
             board(),
             Some((0.0, 0.0)),

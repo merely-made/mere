@@ -24,8 +24,11 @@ use uuid::Uuid;
 
 use super::apply::{GraphDelta, apply_graph_delta};
 use super::capture::{CapturedDelta, persisted_coupling_from_coupling, persisted_field_from_field};
-use super::{CouplingId, FieldId, Graph, NodeKey};
-use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
+use super::node_facets::ARRANGEMENT_FRAME_LAYOUT;
+use super::{CouplingId, FieldId, FrameLayoutHint, Graph, NodeKey};
+use crate::persistence::{
+    PersistedEdge, PersistedFieldExtent, PersistedResourceFacet, PersistedResourceRecord,
+};
 
 /// One part of the graph a change can alter.
 #[derive(
@@ -225,6 +228,197 @@ impl Touched {
             },
             Part::ShownResource(id) => self.shown_surfaces.contains(id) || self.nodes.contains(id),
         }
+    }
+}
+
+/// Rewrites an id in place when the map names it.
+type Swap<'a> = &'a dyn Fn(&mut String);
+
+impl CapturedDelta {
+    /// This edit with each id in `ids` (old to new, as canonical UUID text)
+    /// rewritten where the edit holds an id, and every other string as it was:
+    /// a title, tag, url or body that reads like an id is text.
+    ///
+    /// The id fields are those [`Touched`] reads, and the ids those edits carry
+    /// in their payloads: the ends of a relation, an import membership, a
+    /// field's attached node and a frame-layout member. A node facet's value is
+    /// rewritten through [`remap_facet_value`]; a resource record and a
+    /// derivation are carried as written.
+    ///
+    /// Exhaustive on purpose, as `Touched::add` is: a new edit kind must say
+    /// which of its fields are ids.
+    pub fn remap_ids(&self, ids: &BTreeMap<String, String>) -> CapturedDelta {
+        use CapturedDelta as D;
+        let swap = |id: &mut String| {
+            if let Some(mapped) = ids.get(id.as_str()) {
+                id.clone_from(mapped);
+            }
+        };
+        let mut edit = self.clone();
+        match &mut edit {
+            D::ReplayAddNodeWithIdIfMissing { id, .. } => swap(id),
+            D::ReplayRemoveNodeById { node_id }
+            | D::ReplaySetNodeTitleById { node_id, .. }
+            | D::ReplaySetNodeUrlById { node_id, .. }
+            | D::ReplaySetNodeImageById { node_id, .. }
+            | D::ReplaySetNodeThumbnailById { node_id, .. }
+            | D::ReplaySetNodeFaviconById { node_id, .. }
+            | D::ReplaySetNodeMimeHintById { node_id, .. }
+            | D::ReplaySetNodeNestedById { node_id, .. }
+            | D::ReplaySetNodePinnedById { node_id, .. }
+            | D::ReplayRemoveNodeFacetById { node_id, .. }
+            | D::ReplayInsertNodeTagById { node_id, .. }
+            | D::ReplayRemoveNodeTagById { node_id, .. }
+            | D::ReplaySetNodeBodyById { node_id, .. }
+            | D::ReplayNavigateNodeById { node_id, .. }
+            | D::ReplayNodeHistoryBackById { node_id, .. }
+            | D::ReplayNodeHistoryForwardById { node_id, .. }
+            | D::ReplayAppendNodePropertyById { node_id, .. }
+            | D::ReplayAddNodeClassificationById { node_id, .. }
+            | D::ReplayRemoveNodeClassificationById { node_id, .. }
+            | D::ReplaySetNodeClassificationStatusById { node_id, .. }
+            | D::ReplaySetNodePrimaryClassificationById { node_id, .. }
+            // A derivation's `source_node` names a node of another graph: kept.
+            | D::ReplayRecordNodeDerivationById { node_id, .. }
+            | D::ReplaySetNodeTagIconOverrideById { node_id, .. }
+            | D::ReplayRemoveFrameLayoutHintById { node_id, .. }
+            | D::ReplayMoveFrameLayoutHintById { node_id, .. }
+            | D::ReplaySetFrameSplitOfferSuppressedById { node_id, .. }
+            | D::ReplayUpdateNodeHistoryById { node_id, .. }
+            | D::ReplayTouchNodeLastVisitedById { node_id, .. }
+            | D::ReplaySetNodeContentById { node_id, .. } => swap(node_id),
+            D::ReplaySetNodeFacetById {
+                node_id,
+                facet,
+                value_json,
+            } => {
+                swap(node_id);
+                *value_json = remap_facet_value(facet, value_json, &swap);
+            },
+            D::ReplayAppendFrameLayoutHintById { node_id, hint } => {
+                swap(node_id);
+                remap_hint(hint, &swap);
+            },
+            D::ReplayBranchHistoryByIds {
+                child_id,
+                parent_id,
+            } => {
+                swap(child_id);
+                swap(parent_id);
+            },
+            D::ReplayAssertRelationByIds { from_id, to_id, .. }
+            | D::ReplayRetractRelationsByIds { from_id, to_id, .. }
+            | D::ReplayAppendTraversalByIds { from_id, to_id, .. }
+            | D::ReplaySetEdgeSemanticPredicateByIds { from_id, to_id, .. }
+            | D::ReplayAssertSemanticPredicateByIds { from_id, to_id, .. } => {
+                swap(from_id);
+                swap(to_id);
+            },
+            D::ReplaySetEdgesByIds {
+                from_id,
+                to_id,
+                edges,
+            } => {
+                swap(from_id);
+                swap(to_id);
+                remap_ends(edges, &swap);
+            },
+            D::ReplaySetImportRecords { import_records } => {
+                for member in import_records.iter_mut().flat_map(|r| &mut r.memberships) {
+                    swap(&mut member.node_id);
+                }
+            },
+            D::ReplayAddField { field } => {
+                swap(&mut field.id);
+                if let PersistedFieldExtent::AttachedToNode(node) = &mut field.extent {
+                    swap(node);
+                }
+            },
+            D::ReplayRetireFieldById { field_id }
+            | D::ReplayActivateFieldById { field_id }
+            | D::ReplayRemoveFieldById { field_id }
+            | D::ReplaySetFieldCouplingStrengthByFieldId { field_id, .. } => swap(field_id),
+            D::ReplayAddCoupling { coupling } => {
+                swap(&mut coupling.id);
+                swap(&mut coupling.field_id);
+            },
+            D::ReplayRetractCouplingById { coupling_id } => swap(coupling_id),
+            D::ReplaySetResourceRecordById { resource_id, .. } => swap(resource_id),
+            D::ReplaySetResourceEdgesByIds {
+                from_resource_id,
+                to_resource_id,
+                edges,
+            } => {
+                swap(from_resource_id);
+                swap(to_resource_id);
+                remap_ends(edges, &swap);
+            },
+            D::ReplaySetShownResourceById {
+                surface_id,
+                resource_id,
+            } => {
+                swap(surface_id);
+                if let Some(resource) = resource_id {
+                    swap(resource);
+                }
+            },
+        }
+        edit
+    }
+}
+
+fn remap_ends(edges: &mut [PersistedEdge], swap: Swap) {
+    for edge in edges {
+        swap(&mut edge.from_node_id);
+        swap(&mut edge.to_node_id);
+    }
+}
+
+fn remap_hint(hint: &mut FrameLayoutHint, swap: Swap) {
+    use FrameLayoutHint as H;
+    match hint {
+        H::SplitHalf { first, second, .. } => [first, second].into_iter().for_each(swap),
+        H::SplitPamphlet { members, .. } => members.iter_mut().for_each(swap),
+        H::SplitTriptych {
+            dominant, wings, ..
+        } => {
+            swap(dominant);
+            wings.iter_mut().for_each(swap);
+        },
+        H::SplitQuartered {
+            top_left,
+            top_right,
+            bottom_left,
+            bottom_right,
+        } => [top_left, top_right, bottom_left, bottom_right]
+            .into_iter()
+            .for_each(swap),
+    }
+}
+
+/// The value of node facet `facet` with the ids it declares rewritten, and
+/// the text unchanged for every other facet: facets are open JSON, so a facet
+/// names ids only by declaring them here. The kernel's own:
+///
+/// - `arrangement.frame-layout` holds hints whose members are node ids of the
+///   graph itself: rewritten.
+/// - `provenance.derivations` holds `source_node`, a node of the source
+///   graph, which is what a pick merge matches on: kept.
+/// - `arrangement.pin` and `arrangement.split-offer-suppressed` are flags,
+///   `visit.history` clocks, `presentation.tags` tag names and icons,
+///   `provenance.import` an import source's id and label,
+///   `semantic.classifications` and `semantic.properties` scheme values and
+///   literals: none holds a node id.
+fn remap_facet_value(facet: &str, value_json: &str, swap: Swap) -> String {
+    match facet {
+        ARRANGEMENT_FRAME_LAYOUT => serde_json::from_str::<Vec<FrameLayoutHint>>(value_json)
+            .ok()
+            .and_then(|mut hints| {
+                hints.iter_mut().for_each(|hint| remap_hint(hint, swap));
+                serde_json::to_string(&hints).ok()
+            })
+            .unwrap_or_else(|| value_json.to_string()),
+        _ => value_json.to_string(),
     }
 }
 
@@ -1787,5 +1981,402 @@ mod resource_revert_tests {
         assert!(touched.reaches(&Part::ShownResource(from)));
         assert!(touched.reaches(&Part::Resource(to)));
         assert!(!touched.reaches(&Part::Resource(from)));
+    }
+}
+
+#[cfg(test)]
+mod remap_tests {
+    use serde_json::json;
+
+    use super::tests::{facet, id};
+    use super::*;
+    use crate::graph::node_facets::{PROVENANCE_DERIVATIONS, SEMANTIC_PROPERTIES};
+    use crate::graph::{EdgeAssertion, ProvenanceSubKind, SemanticSubKind, SplitOrientation};
+    use crate::persistence::{
+        PersistedCoupling, PersistedCouplingResponse, PersistedField, PersistedFieldLifecycle,
+        PersistedNodeSelector,
+    };
+    use crate::types::{ImportRecord, ImportRecordMembership, NodeDerivation, NodeProperty};
+
+    fn node(n: u128) -> String {
+        id(n).to_string()
+    }
+
+    /// Ids 1 to 8, the ones the edits below hold, each mapped to itself plus 100.
+    fn ids() -> BTreeMap<String, String> {
+        (1..=8).map(|n| (node(n), node(n + 100))).collect()
+    }
+
+    fn edge(from: u128, to: u128) -> PersistedEdge {
+        serde_json::from_value(json!({ "from_node_id": node(from), "to_node_id": node(to) }))
+            .unwrap()
+    }
+
+    fn hint(first: u128, second: u128) -> FrameLayoutHint {
+        FrameLayoutHint::SplitHalf {
+            first: node(first),
+            second: node(second),
+            orientation: SplitOrientation::Vertical,
+        }
+    }
+
+    /// Edits whose other strings read as the id of node 1, with the leaves of
+    /// each that are ids.
+    fn cases() -> Vec<(CapturedDelta, Vec<&'static str>)> {
+        use CapturedDelta as D;
+        let text = node(1);
+        let record = ImportRecord {
+            record_id: text.clone(),
+            source_id: text.clone(),
+            source_label: text.clone(),
+            imported_at_secs: 0,
+            memberships: vec![
+                ImportRecordMembership {
+                    node_id: node(1),
+                    suppressed: false,
+                },
+                ImportRecordMembership {
+                    node_id: node(2),
+                    suppressed: true,
+                },
+            ],
+        };
+        let derivation = NodeDerivation {
+            sub_kind: ProvenanceSubKind::CopiedFrom,
+            source_node: node(2),
+            source_graph: Some(text.clone()),
+        };
+        let field = PersistedField {
+            id: node(5),
+            name: Some(text.clone()),
+            definition_json: text.clone(),
+            extent: PersistedFieldExtent::AttachedToNode(node(1)),
+            lifecycle: PersistedFieldLifecycle::Active,
+        };
+        let coupling = PersistedCoupling {
+            id: node(6),
+            field_id: node(5),
+            selector: PersistedNodeSelector::Tagged(text.clone()),
+            response: PersistedCouplingResponse::AttractToMin,
+            strength: 1.0,
+        };
+        let resource = PersistedResourceRecord {
+            canonical_iri: text.clone(),
+            facets: vec![PersistedResourceFacet {
+                facet: text.clone(),
+                value_json: format!("\"{text}\""),
+            }],
+        };
+        vec![
+            (
+                D::ReplayAddNodeWithIdIfMissing {
+                    id: node(1),
+                    url: text.clone(),
+                    position: [0.0, 0.0],
+                },
+                vec!["/id"],
+            ),
+            (
+                D::ReplaySetNodeTitleById {
+                    node_id: node(1),
+                    title: text.clone(),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplaySetNodeUrlById {
+                    node_id: node(1),
+                    new_url: text.clone(),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplayInsertNodeTagById {
+                    node_id: node(1),
+                    tag: text.clone(),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplaySetNodeBodyById {
+                    node_id: node(1),
+                    body: Some(text.clone()),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplaySetNodeNestedById {
+                    node_id: node(1),
+                    nested: Some(text.clone()),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplayUpdateNodeHistoryById {
+                    node_id: node(1),
+                    entries: vec![text.clone()],
+                    current_index: 0,
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplayAppendNodePropertyById {
+                    node_id: node(1),
+                    property: NodeProperty::new(text.clone(), text.clone()),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplayRecordNodeDerivationById {
+                    node_id: node(1),
+                    derivation,
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplaySetNodeFacetById {
+                    node_id: node(1),
+                    facet: text.clone(),
+                    value_json: format!("\"{text}\""),
+                },
+                vec!["/node_id"],
+            ),
+            (
+                D::ReplayAppendFrameLayoutHintById {
+                    node_id: node(1),
+                    hint: hint(2, 3),
+                },
+                vec![
+                    "/node_id",
+                    "/hint/SplitHalf/first",
+                    "/hint/SplitHalf/second",
+                ],
+            ),
+            (
+                D::ReplayBranchHistoryByIds {
+                    child_id: node(1),
+                    parent_id: node(2),
+                },
+                vec!["/child_id", "/parent_id"],
+            ),
+            (
+                D::ReplayAssertSemanticPredicateByIds {
+                    from_id: node(1),
+                    to_id: node(2),
+                    predicate: text.clone(),
+                },
+                vec!["/from_id", "/to_id"],
+            ),
+            (
+                D::ReplayAssertRelationByIds {
+                    from_id: node(1),
+                    to_id: node(2),
+                    assertion: EdgeAssertion::Semantic {
+                        sub_kind: SemanticSubKind::Cites,
+                        label: Some(text.clone()),
+                    },
+                },
+                vec!["/from_id", "/to_id"],
+            ),
+            (
+                D::ReplaySetEdgesByIds {
+                    from_id: node(1),
+                    to_id: node(2),
+                    edges: vec![edge(1, 2)],
+                },
+                vec![
+                    "/from_id",
+                    "/to_id",
+                    "/edges/0/from_node_id",
+                    "/edges/0/to_node_id",
+                ],
+            ),
+            (
+                D::ReplaySetImportRecords {
+                    import_records: vec![record],
+                },
+                vec![
+                    "/import_records/0/memberships/0/node_id",
+                    "/import_records/0/memberships/1/node_id",
+                ],
+            ),
+            (
+                D::ReplayAddField { field },
+                vec!["/field/id", "/field/extent/AttachedToNode"],
+            ),
+            (
+                D::ReplaySetFieldCouplingStrengthByFieldId {
+                    field_id: node(5),
+                    strength: 0.5,
+                },
+                vec!["/field_id"],
+            ),
+            (
+                D::ReplayAddCoupling { coupling },
+                vec!["/coupling/id", "/coupling/field_id"],
+            ),
+            (
+                D::ReplayRetractCouplingById {
+                    coupling_id: node(6),
+                },
+                vec!["/coupling_id"],
+            ),
+            (
+                D::ReplaySetResourceRecordById {
+                    resource_id: node(7),
+                    record: Some(resource),
+                },
+                vec!["/resource_id"],
+            ),
+            (
+                D::ReplaySetResourceEdgesByIds {
+                    from_resource_id: node(7),
+                    to_resource_id: node(8),
+                    edges: vec![edge(7, 8)],
+                },
+                vec![
+                    "/from_resource_id",
+                    "/to_resource_id",
+                    "/edges/0/from_node_id",
+                    "/edges/0/to_node_id",
+                ],
+            ),
+            (
+                D::ReplaySetShownResourceById {
+                    surface_id: node(1),
+                    resource_id: Some(node(7)),
+                },
+                vec!["/surface_id", "/resource_id"],
+            ),
+        ]
+    }
+
+    /// The variant's fields, without its name.
+    fn body(edit: &CapturedDelta) -> Value {
+        let value = serde_json::to_value(edit).unwrap();
+        value.as_object().unwrap().values().next().unwrap().clone()
+    }
+
+    /// The paths of the leaves that differ.
+    fn changed(before: &Value, after: &Value, at: String, out: &mut Vec<String>) {
+        match (before, after) {
+            (Value::Object(a), Value::Object(b)) if a.len() == b.len() => {
+                for (key, value) in a {
+                    changed(value, &b[key], format!("{at}/{key}"), out);
+                }
+            },
+            (Value::Array(a), Value::Array(b)) if a.len() == b.len() => {
+                for (n, (x, y)) in a.iter().zip(b).enumerate() {
+                    changed(x, y, format!("{at}/{n}"), out);
+                }
+            },
+            _ if before != after => out.push(at),
+            _ => {},
+        }
+    }
+
+    /// What `Touched` reports, with each id it names taken through `ids`.
+    fn renamed(touched: &Touched, ids: &BTreeMap<String, String>) -> Touched {
+        let swap = |id: &Uuid| {
+            ids.get(&id.to_string())
+                .map_or(*id, |new| Uuid::parse_str(new).unwrap())
+        };
+        let set = |set: &BTreeSet<Uuid>| set.iter().map(swap).collect::<BTreeSet<_>>();
+        let pairs = |pairs: &BTreeSet<(Uuid, Uuid)>| {
+            pairs
+                .iter()
+                .map(|(a, b)| (swap(a), swap(b)))
+                .collect::<BTreeSet<_>>()
+        };
+        Touched {
+            nodes: set(&touched.nodes),
+            edges: pairs(&touched.edges),
+            fields: set(&touched.fields),
+            couplings: set(&touched.couplings),
+            coupled_fields: set(&touched.coupled_fields),
+            import_records: touched.import_records,
+            resources: set(&touched.resources),
+            resource_edges: pairs(&touched.resource_edges),
+            shown_surfaces: set(&touched.shown_surfaces),
+        }
+    }
+
+    #[test]
+    fn remap_ids_rewrites_what_touched_names_and_nothing_else() {
+        let ids = ids();
+        for (edit, expected) in cases() {
+            let remapped = edit.remap_ids(&ids);
+            let mut moved = Vec::new();
+            changed(&body(&edit), &body(&remapped), String::new(), &mut moved);
+            moved.sort();
+            let mut expected = expected;
+            expected.sort();
+            assert_eq!(moved, expected, "{edit:?}");
+            assert_eq!(
+                Touched::of([&remapped]),
+                renamed(&Touched::of([&edit]), &ids),
+                "{edit:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn remap_ids_leaves_an_id_the_map_does_not_name() {
+        let ids = BTreeMap::from([(node(1), node(101))]);
+        let edit = CapturedDelta::ReplayBranchHistoryByIds {
+            child_id: node(1),
+            parent_id: node(2),
+        };
+        assert_eq!(
+            edit.remap_ids(&ids),
+            CapturedDelta::ReplayBranchHistoryByIds {
+                child_id: node(101),
+                parent_id: node(2),
+            }
+        );
+    }
+
+    fn text_of(value: &impl serde::Serialize) -> String {
+        serde_json::to_string(value).unwrap()
+    }
+
+    #[test]
+    fn a_facet_value_is_remapped_only_through_the_ids_it_declares() {
+        let ids = ids();
+        let remapped = |name: &str, value: &str| match facet(1, name, value).remap_ids(&ids) {
+            CapturedDelta::ReplaySetNodeFacetById {
+                node_id,
+                value_json,
+                ..
+            } => {
+                assert_eq!(node_id, node(101), "the node key moves with the edit");
+                value_json
+            },
+            other => panic!("{other:?}"),
+        };
+        // Frame-layout members are node ids.
+        assert_eq!(
+            remapped(ARRANGEMENT_FRAME_LAYOUT, &text_of(&[hint(2, 3)])),
+            text_of(&[hint(102, 103)])
+        );
+        // Everything else the kernel defines, and anything it does not, carries as written.
+        let derivation = vec![NodeDerivation {
+            sub_kind: ProvenanceSubKind::CopiedFrom,
+            source_node: node(2),
+            source_graph: Some(node(3)),
+        }];
+        let property = vec![NodeProperty::new(node(1), node(2))];
+        for (name, value) in [
+            (PROVENANCE_DERIVATIONS, text_of(&derivation)),
+            (SEMANTIC_PROPERTIES, text_of(&property)),
+            ("extension.note", json!({ "about": node(2) }).to_string()),
+            (ARRANGEMENT_FRAME_LAYOUT, "not a list of hints".to_string()),
+            (
+                ARRANGEMENT_FRAME_LAYOUT,
+                json!([{ "Unknown": node(2) }]).to_string(),
+            ),
+        ] {
+            assert_eq!(remapped(name, &value), value, "{name}");
+        }
     }
 }

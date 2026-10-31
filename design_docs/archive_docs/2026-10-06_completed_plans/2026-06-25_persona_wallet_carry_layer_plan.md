@@ -14,10 +14,10 @@ pandect's `wallet_sealed_backend.rs`; open: the PAKE/QR chrome and transport UI,
 epoch-history usage beyond the current epoch, copy-mode export/import, non-Windows
 startup unlock backends, and a migration pass for cleartext private blobs. Lock/unlock
 follow-through belongs to the
-[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md).
+[vault lock plan](../2026-10-28/2026-10-05_vault_lock_plan.md).
 
 Companion to the
-[persona_transport_unlinkability_plan](../../mere_docs/implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md).
+[persona_transport_unlinkability_plan](../2026-10-28/2026-06-25_persona_transport_unlinkability_plan.md).
 The wallet is "Layer 0", the carry layer everything else references; the slice-by-slice
 record is in Progress.
 
@@ -793,7 +793,7 @@ current head, and replacement of the temporary plaintext bridges as the live sea
   seed-backed lanes.
   **Corrected 2026-10-06 (S14 pass):** the relock and the unlock page went with meerkat
   (retired 2026-07-18, `c5f01064`). The
-  [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)
+  [vault lock plan](../2026-10-28/2026-10-05_vault_lock_plan.md)
   (§1-2, citing this plan) found "the vault never locks", and lock/unlock follow-through is
   that plan's.
 - **2026-07-06** — landed the passphrase-wrapped vault-root backend in

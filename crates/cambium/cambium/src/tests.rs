@@ -3613,11 +3613,11 @@ mod capture {
 
     // --- MARK: native cancellation (stopPropagation / preventDefault) ---------
     //
-    // The native twin of dom.rs's `__stop` / `__canceled`. These mirror the JS
-    // dispatcher's behaviour so the two paths satisfy one contract
-    // (design_docs/cambium_docs/implementation_strategy/2026-06-01_event_model_convergence_plan.md). The JS-side equivalents
+    // The native column of the scenario table both owners satisfy through the
+    // one `genet_events::dispatch` walk (genet
+    // `docs/2026-10-17_native_event_dispatch_plan.md`). The JS-side equivalents
     // live in `script-runtime-api`'s `dom_node_events_work` (run on Boa + Nova);
-    // the assertions here are the native column of the same scenario table.
+    // the full table, including stacked listeners, is in `event_layer_tests`.
 
     /// `<div on_click><button on_click(stops) /></div>`: the child (target,
     /// bubble) calls `stop_propagation`, so the parent's bubble handler must NOT

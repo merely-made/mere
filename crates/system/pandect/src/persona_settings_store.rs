@@ -21,6 +21,7 @@
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
+use muniment::{Backend, JsonSlots, StoreError};
 use serde::{Deserialize, Serialize};
 
 use crate::engine_profile_store::PERSONAS_DIR;
@@ -56,11 +57,13 @@ pub struct PersonaSettings {
     #[serde(default)]
     pub eviction_policy: EvictionPolicy,
     /// scope=persona; movement=local-only; mutability=live; security=ordinary. Runtime
-    /// bookkeeping riding in the persona settings file: incremented once at boot and saved back
-    /// immediately. A crash between increment and save just under-counts by one launch, never
-    /// duplicates a count. The host stamps each navigated node's
+    /// bookkeeping riding in the persona settings file: the launch counter. The boot owner
+    /// calls [`record_launch`] once per process per persona, which increments it and saves it
+    /// back immediately; a crash between increment and save just under-counts by one launch,
+    /// never duplicates a count. Every host that opens one of the persona's sessions installs
+    /// that value with `MereHost::with_launch`, so each navigated node's
     /// [`PersistedNode::last_session_visited`](kernel::persistence::PersistedNode::last_session_visited)
-    /// with this value, so `0` is reserved for "never stamped" and the first real launch is `1`.
+    /// carries it. `0` is reserved for "never stamped" and the first real launch is `1`.
     /// (Alembic B5 — by-sessions eviction.)
     #[serde(default)]
     pub session_count: u64,
@@ -77,6 +80,34 @@ pub fn persona_settings_dir(data_root: &Path, persona: PersonaId) -> PathBuf {
 /// The `ui.json` path for `persona`. Pure — callers can use it for an existence check.
 pub fn persona_settings_path(data_root: &Path, persona: PersonaId) -> PathBuf {
     persona_settings_dir(data_root, persona).join(PERSONA_UI_FILENAME)
+}
+
+/// The slot key of `persona`'s `ui.json` in a backend rooted at the data root: the relative form
+/// of [`persona_settings_path`], so a directory backend opened there reads and writes the same
+/// file the path-based functions do.
+fn persona_settings_key(persona: PersonaId) -> String {
+    format!(
+        "{PERSONAS_DIR}/{}/{PERSONA_SETTINGS_DIR}/{PERSONA_UI_FILENAME}",
+        persona.as_uuid()
+    )
+}
+
+/// Count one launch for `persona`: read its settings from `slots` (a backend rooted at the data
+/// root; defaults when none are stored yet), add one to
+/// [`session_count`](PersonaSettings::session_count), store them and return the new count. The
+/// boot owner calls this once per process per persona. A malformed record is an error, not a
+/// silent reset of the user's settings.
+pub async fn record_launch<B: Backend>(
+    slots: &JsonSlots<B>,
+    persona: PersonaId,
+) -> Result<u64, StoreError> {
+    let key = persona_settings_key(persona);
+    let mut settings: PersonaSettings = slots.load(&key).await?.unwrap_or_default();
+    settings.session_count = settings.session_count.saturating_add(1);
+    let bytes = serde_json::to_vec_pretty(&settings)
+        .map_err(|error| StoreError::Codec(error.to_string()))?;
+    slots.backend().put(&key, &bytes).await?;
+    Ok(settings.session_count)
 }
 
 /// Load this persona's UI settings, or `None` when the file does not exist yet (a fresh
@@ -178,5 +209,52 @@ mod tests {
         );
         assert_eq!(restored.session_count, 7, "the launch counter persists");
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn record_launch_counts_each_boot_and_keeps_the_other_settings() {
+        pollster::block_on(async {
+            let slots = JsonSlots::new(muniment::MemoryBackend::new());
+            let key = persona_settings_key(fixture_persona());
+            let curated = PersonaSettings {
+                menu_actions: Some(vec!["add_node".into(), "settings".into()]),
+                ..PersonaSettings::default()
+            };
+            slots.save(&key, &curated).await.unwrap();
+            assert_eq!(record_launch(&slots, fixture_persona()).await.unwrap(), 1);
+            assert_eq!(record_launch(&slots, fixture_persona()).await.unwrap(), 2);
+            let stored: PersonaSettings = slots.load(&key).await.unwrap().unwrap();
+            assert_eq!(stored.session_count, 2);
+            assert_eq!(stored.menu_actions, curated.menu_actions);
+            let other = PersonaId(Uuid::from_u128(0x7777));
+            assert_eq!(
+                record_launch(&slots, other).await.unwrap(),
+                1,
+                "per persona"
+            );
+        });
+    }
+
+    #[test]
+    fn record_launch_reads_and_writes_the_file_the_path_store_does() {
+        pollster::block_on(async {
+            let root = temp_data_root("record-launch");
+            async fn launch(root: &Path) -> u64 {
+                let slots = JsonSlots::new(muniment::DirectoryBackend::open(root).unwrap());
+                record_launch(&slots, fixture_persona()).await.unwrap()
+            }
+            assert_eq!(launch(&root).await, 1);
+            let stored = load_persona_settings(&root, fixture_persona())
+                .unwrap()
+                .expect("the slot is the path store's file");
+            assert_eq!(stored.session_count, 1);
+            let edited = PersonaSettings {
+                session_count: 9,
+                ..stored
+            };
+            save_persona_settings(&root, fixture_persona(), &edited).unwrap();
+            assert_eq!(launch(&root).await, 10);
+            let _ = fs::remove_dir_all(&root);
+        });
     }
 }

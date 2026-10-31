@@ -1,7 +1,7 @@
 # Cable Migration From Verso Plan
 
 **Date**: 2026-05-04
-**Status**: Active for Phases 0–4. **Phase 5+ scope (cabal store integration, retention, multi-channel) is superseded by [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md) §6 (Phase 2C onward).** That plan owns the workspace-wide phase numbering for Cable's persistent-store wiring, iroh-toolkit layering, and downstream Cable + iroh-gossip / iroh-blobs integration.
+**Status**: Active for Phases 0–4. **Phase 5+ scope (cabal store integration, retention, multi-channel) is superseded by [`../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md`](../2026-10-28/2026-05-05_protocol_architecture_plan.md) §6 (Phase 2C onward).** That plan owns the workspace-wide phase numbering for Cable's persistent-store wiring, iroh-toolkit layering, and downstream Cable + iroh-gossip / iroh-blobs integration.
 **Scope**: Code-level migration of Cable application logic from Verso (in the inherited `graphshell/` repo) to **Murm** (in the new Mere workspace). Defines what moves, what stays, and the migration phases.
 **Related**:
 - Inherited: [`graphshell/design_docs/verso_docs/implementation_strategy/2026-03-28_cable_coop_minichat_spec.md`](../../../../graphshell/design_docs/verso_docs/implementation_strategy/2026-03-28_cable_coop_minichat_spec.md) — Cable adoption plan

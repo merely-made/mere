@@ -2,7 +2,7 @@
 
 **Date**: 2026-06-03
 **Status (2026-10-06):** superseded by the
-[Murm/Moot plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+[Murm/Moot plan](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
 (2026-09-05). S5.0 to S5.2 landed in meerkat on 2026-06-03 to 2026-06-05,
 retired with it 2026-07-18 (`c5f01064`). Surviving library parts: the ticket
 bootstrap, `P2pandaTransport::ticket` and `add_peer_ticket`
@@ -21,7 +21,7 @@ store/sync productization ([tessera plan](../2026-06-09_completed_plans/2026-06-
 > **Historical/supersession note (2026-09-05):** This pre-consolidation
 > Meerkat wiring proposal retains its seam analysis as context, but its host and
 > module references are receipt-era. Current peer-runtime and domain ownership
-> is tracked by the [Murm/Moot plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
+> is tracked by the [Murm/Moot plan](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md).
 
 ---
 

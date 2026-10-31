@@ -27,6 +27,8 @@ required-features = ["resource-owner", "resource-view"]
 
 [features]
 default = []
+# Session-bound live objects; Gemot remains the durable authority and command owner.
+ocapn-coop = ["dep:murm-ocapn", "dep:notochord", "dep:tokio", "dep:gemot", "dep:personae", "dep:muniment", "dep:servitor", "dep:mien", "dep:serde_json"]
 presentation = ["dep:cambium"]
 resource-owners = ["dep:gemot", "dep:servitor", "dep:eidetic"]
 resource-handlers = ["resource-owners", "dep:personae", "dep:muniment", "dep:mien", "dep:serde_json"]
@@ -49,6 +51,9 @@ captured-web = [
 ]
 
 [dependencies]
+murm-ocapn = { workspace = true, optional = true }
+notochord = { workspace = true, optional = true }
+tokio = { version = "1", features = ["sync", "time", "rt"], optional = true }
 serde_json = { workspace = true, optional = true }
 personae = { workspace = true, optional = true }
 mien = { workspace = true, optional = true }

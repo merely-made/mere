@@ -16,7 +16,7 @@ impl Graph {
         coverage: CoverageNote,
     ) -> Result<(), super::snapshot::ResourceSnapshotError> {
         let mut candidate = Self::try_from_recorded_snapshot(snapshot)?;
-        *candidate.facets_mut() = facets.clone();
+        candidate.install_facets(facets.clone())?;
         candidate.set_known_coverage(coverage);
         candidate.revision = self
             .revision

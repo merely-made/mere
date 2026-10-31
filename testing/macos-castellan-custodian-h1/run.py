@@ -94,7 +94,7 @@ def prepare(args):
     (state/'blobs').mkdir(mode=0o700)
     castellan=state/'custody/castellan';castellan.mkdir()
     (castellan/'.djinn-synthetic-custody').write_text(run)
-    header=out/'CustodianNative.h';shutil.copyfile(ROOT/'ports/djinn/custodian/native.h',header)
+    header=out/'CustodianNative.h';shutil.copyfile(ROOT/'ports/mere-resident/custodian/native.h',header)
     identity=out/'BuildIdentity.swift'
     identity.write_text('import Foundation\nlet expectedCustodianBundlePath = '+json.dumps(str(installed/'Contents/Library/Helpers/Custodian.app'))+'\n')
     for p in [state/'custody/canary',state/'blobs/canary']:

@@ -17,7 +17,7 @@ repository manifest and transfer receipts.
 where it places Cambium and upper application components in Genet, and where it
 treats the resulting repository layout as final. Its completed migration and
 publication receipts remain historical facts.  
-**Companions:** the [projection grammar adoption plan](../../mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md),
+**Companions:** the [projection grammar adoption plan](../2026-10-28/2026-08-15_projection_grammar_adoption_plan.md),
 the [Scenograph absorption plan](2026-08-22_scenograph_absorption_plan.md), and
 the [projection/scenes architecture](../../2026-08-23_projection_scenes_and_graph_native_platform.md).
 The public-repository execution record lives at
@@ -335,8 +335,8 @@ stated point before the phase that touches their seam:
 | --- | --- | --- | --- |
 | P2 | [Workbench component plan](2026-08-31_workbench_component_plan.md) | W4 landed on genet `main` | `codex/workbench-core-20260831` is already on `main`; the four remaining `codex/workbench-followups-*` and `codex/pelt-*` branches (nine commits) touch none of the four mixed crates, so P1 may split them, but Workbench itself must not move under an open lane |
 | P1 | [Knot shared surface and port contribution plan](2026-08-24_knot_shared_surface_and_port_contribution_plan.md) | F0, or an explicit hold on the v1-frozen surface contract | the surface contract in `genet-host-api` is what P1 moves to Mere; it was frozen at v1 under this plan (Genet `001448d55`) |
-| P2 | [License sweep plan](../../mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md) | genet's P2-P7 headers and ledger, or a deliberate move-then-sweep ruling | invariant 5; each moved crate otherwise re-enters the sweep |
-| P2 | [Browser WebRTC carrier plan](../../mere_docs/implementation_strategy/2026-08-25_browser_webrtc_carrier_plan.md) | a quiet window, not completion | the lane commits to mere hourly and `git subtree` refuses a dirty tree (July finding) |
+| P2 | [License sweep plan](../2026-10-28/2026-08-22_license_sweep_plan.md) | genet's P2-P7 headers and ledger, or a deliberate move-then-sweep ruling | invariant 5; each moved crate otherwise re-enters the sweep |
+| P2 | [Browser WebRTC carrier plan](../2026-10-28/2026-08-25_browser_webrtc_carrier_plan.md) | a quiet window, not completion | the lane commits to mere hourly and `git subtree` refuses a dirty tree (July finding) |
 | P3 | [Pelt host reconstruction plan](../../../../genet/docs/2026-08-22_pelt_host_reconstruction_execution_plan.md) | its stated immediate next lane closed | Pelt and Tabard move in P3 |
 | P3 | [Knot editor repository extraction plan](../../../../knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md) | E1 and E2 consumer PRs merged | P3 reconciles Knot around its standalone authority |
 | P4 | Turnstone [browser surface](../../../../turnstone/design_docs/2026-08-25_browser_surface_implementation_plan.md) and [page capture](../../../../turnstone/design_docs/2026-08-28_page_capture_plan.md) plans | their clean-source compile gates | both pin genet at exact revisions; a repoint before their gates close cannot be receipted |

@@ -192,6 +192,7 @@ impl Canvas {
             node_document,
             gnode_of,
             stage_node,
+            stage_style: crate::canvas::build::stage_style(None),
             camera: Camera::default(),
             style: dark_scene_style(),
             backdrop: surface_bg(),
@@ -210,6 +211,7 @@ impl Canvas {
             mosaic: Default::default(),
             territory_field: false,
             graph_grammar: false,
+            withdraw_policy: None,
             category_colors: Vec::new(),
             field_drag: None,
             forme_region: None,
@@ -873,6 +875,9 @@ impl Canvas {
             .validate_active_resource_assertion_handles()
             .map_err(|error| error.to_string())?;
         let actual = scratch.to_snapshot();
+        // The snapshot keeps Resource records, and the parallel edges of one
+        // pair, in the order they were added; the shown bindings are already
+        // in Surface id order.
         let content = |snapshot: &kernel::persistence::GraphSnapshot| {
             let mut records: Vec<_> = snapshot
                 .resources
@@ -884,13 +889,12 @@ impl Canvas {
                 .iter()
                 .map(|edge| serde_json::to_string(edge).unwrap())
                 .collect();
-            let mut shown = snapshot.shown_resources.clone();
             records.sort();
             pairs.sort();
-            shown.sort_by(|a, b| a.surface_id.cmp(&b.surface_id));
-            (records, pairs, shown)
+            (records, pairs)
         };
         if content(&actual) != content(&expected)
+            || actual.shown_resources != expected.shown_resources
             || actual
                 .nodes
                 .iter()

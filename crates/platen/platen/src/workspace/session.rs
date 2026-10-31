@@ -13,6 +13,7 @@ use backstep::History;
 use forme::Arrangement;
 use kernel::graph::Graph;
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, OnceLock};
 use uuid::Uuid;
 
 const HISTORY_LIMIT: usize = 32;
@@ -130,27 +131,44 @@ pub enum SaveKind<P = NoPreferences> {
 }
 /// Prepared writes never change committed state until the store acknowledges
 /// them. The session is frozen while its proposal is in flight.
+///
+/// A proposal carries the slot bytes its session held when it was prepared
+/// (`baseline`). The host replaces the slot with `bytes` only if it still holds
+/// them; a refused write leaves the session's draft and baseline as they were.
 #[derive(Clone)]
 pub struct PreparedSave<P = NoPreferences> {
     next: SavedRecord<P>,
     kind: SaveKind<P>,
     token: Uuid,
+    baseline: Option<Vec<u8>>,
+    encoded: Arc<OnceLock<Result<Vec<u8>, String>>>,
 }
 impl<P: WorkspacePreferences + Serialize> PreparedSave<P> {
     pub fn graph_id(&self) -> Uuid {
         self.next.workspace.document.graph_id
     }
+    /// The slot bytes this save replaces; `None` for a slot that was empty.
+    pub fn baseline(&self) -> Option<&[u8]> {
+        self.baseline.as_deref()
+    }
+    /// The record to write. Encoded once, so the bytes acknowledged are the
+    /// bytes the host wrote.
     pub fn bytes(&self) -> Result<Vec<u8>, String> {
-        self.next.validate(self.next.workspace.document.graph_id)?;
-        let bytes = serde_json::to_vec(&self.next).map_err(|e| e.to_string())?;
-        if bytes.len() > RECORD_LIMIT {
-            return Err("Forme history exceeds 4 MiB".into());
-        }
-        Ok(bytes)
+        self.encoded
+            .get_or_init(|| {
+                self.next.validate(self.next.workspace.document.graph_id)?;
+                let bytes = serde_json::to_vec(&self.next).map_err(|e| e.to_string())?;
+                if bytes.len() > RECORD_LIMIT {
+                    return Err("Forme history exceeds 4 MiB".into());
+                }
+                Ok(bytes)
+            })
+            .clone()
     }
 }
 pub struct FormeSession<P: WorkspacePreferences = NoPreferences> {
     saved: SavedRecord<P>,
+    baseline: Option<Vec<u8>>,
     draft: Option<Draft<P>>,
     busy: bool,
     pending: Option<Uuid>,
@@ -159,6 +177,7 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
     pub fn new(workspace: FormeWorkspace<P>) -> Self {
         Self {
             saved: SavedRecord::new(workspace),
+            baseline: None,
             draft: None,
             busy: false,
             pending: None,
@@ -171,6 +190,11 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
     }
     pub fn committed(&self) -> &FormeWorkspace<P> {
         &self.saved.workspace
+    }
+    /// The slot bytes as this session last loaded or wrote them, `None` for an
+    /// empty slot. A save compares the slot with these before replacing it.
+    pub fn baseline(&self) -> Option<&[u8]> {
+        self.baseline.as_deref()
     }
     pub fn editing(&self) -> bool {
         self.draft.is_some()
@@ -499,10 +523,17 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
         self.busy = true;
         let token = Uuid::new_v4();
         self.pending = Some(token);
-        Ok(PreparedSave { next, kind, token })
+        Ok(PreparedSave {
+            next,
+            kind,
+            token,
+            baseline: self.baseline.clone(),
+            encoded: Arc::default(),
+        })
     }
-    /// A failed write leaves the complete draft and its history available.
-    /// Saved undo/redo also advances only after acknowledgement.
+    /// A failed or refused write leaves the complete draft, its history and the
+    /// baseline available. Saved undo/redo also advances only after
+    /// acknowledgement, which makes the bytes written the new baseline.
     pub fn finish_save(
         &mut self,
         proposal: PreparedSave<P>,
@@ -514,6 +545,7 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
         self.pending = None;
         self.busy = false;
         result?;
+        let written = proposal.bytes()?;
         match proposal.kind {
             SaveKind::Preferences {
                 draft_value: preferences,
@@ -531,6 +563,7 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
             _ => self.draft = None,
         }
         self.saved = proposal.next;
+        self.baseline = Some(written);
         Ok(())
     }
     pub fn from_bytes(bytes: Option<&[u8]>, graph_id: Uuid, graph: &Graph) -> Result<Self, String> {
@@ -556,6 +589,7 @@ impl<P: WorkspacePreferences + Serialize + for<'de> Deserialize<'de>> FormeSessi
         saved.validate(graph_id)?;
         Ok(Self {
             saved,
+            baseline: bytes.map(<[u8]>::to_vec),
             draft: None,
             busy: false,
             pending: None,
@@ -1088,5 +1122,44 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn baseline_is_the_loaded_bytes_then_the_bytes_an_acknowledged_save_wrote() {
+        let (graph, mut session, [_, b, _]) = fixture();
+        let owner = Uuid::from_u128(10);
+        assert_eq!(
+            session.baseline(),
+            None,
+            "a new session starts on an empty slot"
+        );
+        session.unlock().unwrap();
+        session.edit(None, 1, |w| w.open(b, &graph)).unwrap();
+        let first = session.prepare_save(SaveKind::Apply, 2).unwrap();
+        assert_eq!(first.baseline(), None);
+        let written = first.bytes().unwrap();
+        session.finish_save(first, Ok(())).unwrap();
+        assert_eq!(session.baseline(), Some(written.as_slice()));
+
+        let mut reloaded =
+            FormeSession::<NoPreferences>::from_bytes(Some(&written), owner, &graph).unwrap();
+        assert_eq!(reloaded.baseline(), Some(written.as_slice()));
+        let hide = reloaded.prepare_save(SaveKind::Visibility, 3).unwrap();
+        assert_eq!(hide.baseline(), Some(written.as_slice()));
+        let refused = hide.clone();
+        reloaded
+            .finish_save(hide, Err("changed elsewhere".into()))
+            .unwrap_err();
+        assert_eq!(
+            reloaded.baseline(),
+            Some(written.as_slice()),
+            "a refused write keeps the baseline it was refused against"
+        );
+        assert!(reloaded.finish_save(refused, Ok(())).is_err());
+        let hide = reloaded.prepare_save(SaveKind::Visibility, 4).unwrap();
+        let hidden = hide.bytes().unwrap();
+        reloaded.finish_save(hide, Ok(())).unwrap();
+        assert_eq!(reloaded.baseline(), Some(hidden.as_slice()));
+        assert_ne!(hidden, written);
     }
 }

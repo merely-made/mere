@@ -31,8 +31,8 @@
 use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
     AdmittedPrincipal, DenyReason, HandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,
-    ProofBinding, RequestedAction, RevocationLedger, SessionFacts, SessionHello, TrafficClass,
-    admit,
+    ProofBinding, RequestedAction, RevocationLedger, SessionDecision, SessionFacts, SessionHello,
+    TrafficClass, admit, respond,
 };
 use personae::IdentityProvider;
 
@@ -157,14 +157,28 @@ pub fn serves_action(principal: &AdmittedPrincipal) -> bool {
     principal.action == connect_action()
 }
 
+/// Whether this host serves what an admitted principal was admitted for,
+/// given the delegation chain the conclusion was drawn from. The chain is
+/// there for checks that read the grant itself, such as an application its
+/// leaf must name.
+pub type ActionCheck<'a> =
+    &'a (dyn Fn(&AdmittedPrincipal, &[SignedDelegationCertificate]) -> bool + Send + Sync);
+
+/// [`serves_action`] as an [`ActionCheck`].
+pub(crate) fn serves_admitted(
+    principal: &AdmittedPrincipal,
+    _chain: &[SignedDelegationCertificate],
+) -> bool {
+    serves_action(principal)
+}
+
 /// Admit (or refuse) an incoming Graphshell session.
 ///
-/// Returns the reply frame to write in both cases — a refusal is still a
-/// well-formed reply — and the principal when the session is admitted.
-///
-/// The action is checked again after policy admission. The policy enforces the
-/// owner's allow-list; [`serves_action`] enforces Graphshell's implemented
-/// vocabulary.
+/// Returns the reply frame to write in both cases and the principal when the
+/// session is admitted. The two always agree: the host's served vocabulary is
+/// part of what admission answers, so an action the owner allows and
+/// [`serves_action`] does not serve is refused `ActionNotOffered` in the reply
+/// as well as in the outcome.
 pub fn admit_session(
     policy: &LocalNetworkPolicy,
     ledger: &RevocationLedger,
@@ -173,18 +187,82 @@ pub fn admit_session(
     now_ms: u64,
     active_sessions: u32,
 ) -> (Vec<u8>, Result<AdmittedPrincipal, DenyReason>) {
+    admit_session_with(
+        policy,
+        ledger,
+        hello_bytes,
+        facts,
+        now_ms,
+        active_sessions,
+        &serves_admitted,
+    )
+}
+
+/// [`admit_session`] with the host's own [`ActionCheck`] in place of
+/// [`serves_action`], for a host serving a vocabulary of its own under the
+/// projection service.
+///
+/// Two stages, both decided before the reply: the policy enforces the owner's
+/// allow-list, then `serves` enforces what the host implements, so a
+/// permissive or stale owner document cannot make the host serve something it
+/// does not.
+pub fn admit_session_with(
+    policy: &LocalNetworkPolicy,
+    ledger: &RevocationLedger,
+    hello_bytes: &[u8],
+    facts: &SessionFacts,
+    now_ms: u64,
+    active_sessions: u32,
+    serves: ActionCheck<'_>,
+) -> (Vec<u8>, Result<AdmittedPrincipal, DenyReason>) {
     let (reply, outcome) = admit(policy, ledger, hello_bytes, facts, now_ms, active_sessions);
-    let outcome = outcome.and_then(|principal| {
-        if serves_action(&principal) {
-            Ok(principal)
-        } else {
-            // The owner allowed the action, but this implementation does not
-            // serve it. Authority was sufficient for the request; the local
-            // service vocabulary is the refusal.
-            Err(DenyReason::ActionNotOffered)
-        }
-    });
-    (reply, outcome)
+    let principal = match outcome {
+        Ok(principal) => principal,
+        Err(reason) => return (reply, Err(reason)),
+    };
+    // `admit` accepted this frame, so it decodes; a frame that does not is not
+    // served.
+    let chain = SessionHello::decode(hello_bytes, &policy.limits.clamped())
+        .map(|hello| hello.claims().delegations);
+    if chain.is_ok_and(|chain| serves(&principal, &chain)) {
+        return (reply, Ok(principal));
+    }
+    unserved_refusal(policy, ledger, hello_bytes, facts, now_ms, active_sessions)
+}
+
+/// The refusal for an action the owner allows and this host does not serve.
+///
+/// Notochord writes every reply and exports no encoder for a bare refusal, so
+/// the host's vocabulary is applied as one more narrowing of the owner's rule:
+/// the same hello, judged against a policy that offers no action, is refused
+/// `ActionNotOffered` by Notochord itself, and reply and outcome come from the
+/// one decision.
+fn unserved_refusal(
+    policy: &LocalNetworkPolicy,
+    ledger: &RevocationLedger,
+    hello_bytes: &[u8],
+    facts: &SessionFacts,
+    now_ms: u64,
+    active_sessions: u32,
+) -> (Vec<u8>, Result<AdmittedPrincipal, DenyReason>) {
+    let mut offers_nothing = policy.clone();
+    for rule in offers_nothing.services.values_mut() {
+        rule.actions.clear();
+    }
+    let (reply, decision) = respond(
+        &offers_nothing,
+        ledger,
+        hello_bytes,
+        facts,
+        now_ms,
+        active_sessions,
+    );
+    match decision {
+        SessionDecision::Deny { reason } => (reply, Err(reason)),
+        SessionDecision::Accept { .. } => {
+            unreachable!("a policy that offers no action admits none")
+        },
+    }
 }
 
 #[cfg(test)]
@@ -193,7 +271,7 @@ mod tests {
     use insigne::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
     };
-    use notochord::{CarrierKind, ServiceAccess, ServiceRule, TrustedRoot};
+    use notochord::{CarrierKind, ServiceAccess, ServiceRule, SessionReply, TrustedRoot};
     use personae::InMemoryProvider;
     use personae::delegation::Issue;
     use std::collections::BTreeMap;
@@ -227,6 +305,15 @@ mod tests {
         path: &str,
         domain: &str,
     ) -> SignedDelegationCertificate {
+        grant_for(subject, path, domain, CONNECT_ACTION)
+    }
+
+    fn grant_for(
+        subject: [u8; 32],
+        path: &str,
+        domain: &str,
+        action: &str,
+    ) -> SignedDelegationCertificate {
         SignedDelegationCertificate::issue(
             &owner(),
             DelegationCertificate::new(
@@ -237,7 +324,7 @@ mod tests {
                     domain: domain.into(),
                     resource: NETWORK.0.to_vec(),
                     path_prefix: path.into(),
-                    actions: [CONNECT_ACTION.to_string()].into_iter().collect(),
+                    actions: [action.to_string()].into_iter().collect(),
                 },
                 5,
                 10,
@@ -313,13 +400,18 @@ mod tests {
             )],
         );
 
-        let (_, outcome) = admit_session(
+        let (reply, outcome) = admit_session(
             &policy(),
             &RevocationLedger::default(),
             &hello,
             &facts(),
             NOW_MS,
             0,
+        );
+        assert!(
+            SessionReply::decode(&reply, &policy().limits.clamped())
+                .expect("a well-formed reply")
+                .is_accept()
         );
         let principal = outcome.expect("a granted viewer opens a projection session");
         assert_eq!(
@@ -368,6 +460,66 @@ mod tests {
         assert!(
             outcome.is_err(),
             "a Murm grant is not a Graphshell grant, even for the same subject"
+        );
+    }
+
+    #[test]
+    fn an_action_the_owner_allows_but_this_host_does_not_serve_is_refused_in_the_reply() {
+        // The owner's rule offers `administer` and the grant covers it, so
+        // Notochord alone would admit. The host's vocabulary is part of what
+        // admission answers: the peer is told, not left to see a close after
+        // an accept.
+        const ADMINISTER: &str = "administer";
+        let mut permissive = policy();
+        permissive
+            .services
+            .get_mut(PROJECTION_SERVICE)
+            .expect("the projection rule")
+            .actions
+            .insert(ADMINISTER.to_string());
+        let viewer = viewer();
+        let subject = viewer.master_public_key().to_bytes();
+        let mut requested = connect_action();
+        requested.action = ADMINISTER.to_string();
+        let hello = open_session_for(
+            &viewer,
+            NETWORK,
+            profile_ref(),
+            requested,
+            TrafficClass::Interactive,
+            [5; 32],
+            &binding(),
+            vec![grant_for(
+                subject,
+                PROJECTION_SERVICE,
+                GRAPHSHELL_DOMAIN,
+                ADMINISTER,
+            )],
+        )
+        .expect("issue hello")
+        .encode(&permissive.limits.clamped())
+        .expect("encode hello");
+
+        let (reply, outcome) = admit_session(
+            &permissive,
+            &RevocationLedger::default(),
+            &hello,
+            &facts(),
+            NOW_MS,
+            0,
+        );
+        assert_eq!(
+            SessionReply::decode(&reply, &permissive.limits.clamped())
+                .expect("a well-formed reply"),
+            SessionReply::Reject {
+                reason: DenyReason::ActionNotOffered
+            },
+            "the reply the peer reads is the refusal"
+        );
+        assert_eq!(
+            outcome.unwrap_err(),
+            DenyReason::ActionNotOffered,
+            "and it agrees with the outcome the host acts on"
         );
     }
 

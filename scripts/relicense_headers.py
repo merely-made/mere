@@ -10,7 +10,7 @@
 
 Carries the 2026-08-22 license ruling into a repository's sources. See
 design_docs/2026-08-22_license_posture_brief.md for the ruling and
-design_docs/mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md
+design_docs/archive_docs/2026-10-28/2026-08-22_license_sweep_plan.md
 for the process; invariants 1-3 are implemented here.
 
 Provenance before license: a file receives Exhibit A only if Mark wrote it.

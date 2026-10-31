@@ -531,7 +531,9 @@ pub fn webrtc_session_facts(shared_link: [u8; 16]) -> SessionFacts {
 /// Sans-I/O, exactly as the port's browser carrier is: the hello arrives as
 /// bytes and the reply leaves as bytes, so the caller writes the refusal on a
 /// refused session and closes, and no application byte can precede that. The
-/// returned reply is well-formed in both arms.
+/// reply is the refusal in every refusing arm, including an action the owner
+/// allows and this door does not serve (`ActionNotOffered`), so it always
+/// agrees with the outcome.
 pub fn admit_webrtc_session(
     policy: &LocalNetworkPolicy,
     ledger: &RevocationLedger,
@@ -1087,7 +1089,8 @@ mod tests {
         // here the owner's policy *does* allow the action and the chain *does*
         // cover it, so Notochord admits. Graphshell's own service vocabulary
         // is what refuses, which is why the reason is `ActionNotOffered` and
-        // not `ActionNotCovered`.
+        // not `ActionNotCovered`, and why the reply must say so rather than
+        // accept.
         //
         // The hello is hand-built rather than going through `open_session`,
         // for `carrier.rs`'s reason: that helper fixes the action to
@@ -1121,13 +1124,21 @@ mod tests {
         .encode(&permissive.limits.clamped())
         .expect("encode hello");
 
-        let (_, outcome) = admit_webrtc_session(
+        let (reply, outcome) = admit_webrtc_session(
             &permissive,
             &RevocationLedger::new(),
             &hello,
             link,
             NOW_MS,
             0,
+        );
+        assert_eq!(
+            SessionReply::decode(&reply, &permissive.limits.clamped())
+                .expect("a well-formed reply"),
+            SessionReply::Reject {
+                reason: DenyReason::ActionNotOffered
+            },
+            "the peer is refused in the reply, not accepted and then closed on"
         );
         assert_eq!(outcome.unwrap_err(), DenyReason::ActionNotOffered);
     }

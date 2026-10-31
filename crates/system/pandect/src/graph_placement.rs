@@ -92,14 +92,12 @@ fn comparison_graph_value(snapshot: &GraphSnapshot) -> Option<serde_json::Value>
     // assertion shape for truth comparison; canonical snapshots retain their
     // exact persisted columns in the comparison.
     let mut value = match snapshot.assertion_schema {
-        0 => {
-            let graph = Graph::try_from_recorded_snapshot(snapshot).ok()?;
-            let mut normalized = graph.to_snapshot();
-            normalized.edges.sort_by_cached_key(|edge| {
-                serde_json::to_vec(edge).expect("persisted surface edge encodes")
-            });
-            serde_json::to_value(normalized).ok()?
-        },
+        0 => serde_json::to_value(
+            Graph::try_from_recorded_snapshot(snapshot)
+                .ok()?
+                .to_snapshot(),
+        )
+        .ok()?,
         1 => serde_json::to_value(snapshot).ok()?,
         _ => return None,
     };
@@ -113,13 +111,8 @@ fn comparison_graph_value(snapshot: &GraphSnapshot) -> Option<serde_json::Value>
 
 impl FrozenGraph {
     pub fn of(graph: &Graph) -> Self {
-        let mut snapshot = graph.to_snapshot();
-        // Surface edge slots can be reused after migration; full records are unordered.
-        snapshot.edges.sort_by_cached_key(|edge| {
-            serde_json::to_vec(edge).expect("persisted surface edge encodes")
-        });
         Self {
-            graph: snapshot,
+            graph: graph.to_snapshot(),
             facets: graph.facets().clone(),
         }
     }
@@ -127,9 +120,8 @@ impl FrozenGraph {
     pub fn materialize(&self) -> Result<Graph, String> {
         let mut graph =
             Graph::try_from_recorded_snapshot(&self.graph).map_err(|error| error.to_string())?;
-        *graph.facets_mut() = self.facets.clone();
         graph
-            .validate_active_resource_assertion_handles()
+            .install_facets(self.facets.clone())
             .map_err(|error| error.to_string())?;
         Ok(graph)
     }
@@ -369,7 +361,7 @@ pub(crate) fn placement_test_graph() -> Graph {
     claim.provenance_iri = Some("urn:mere:profile:source".into());
     claim.asserted_at_ms = Some(42);
     let mut recorded = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
-    *recorded.facets_mut() = graph.facets().clone();
+    recorded.install_facets(graph.facets().clone()).unwrap();
     recorded
 }
 

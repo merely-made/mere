@@ -23,7 +23,7 @@ repository (`docs/handoffs/2026-10-07_viewer_cone/`).
 - [Projection grammar catalog](2026-08-15_projection_grammar_catalog.md):
   the governing primitive vocabulary and promotion rules. Last reconciled
   2026-10-03, for arrangement roles.
-- [Projection grammar adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md):
+- [Projection grammar adoption plan](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md):
   gated targets carrying the projection grammar report's transfers into mere,
   genet and cambium. Its top status line (2026-10-06) is current and
   supersedes the two older status lines further down, which are kept as
@@ -50,7 +50,7 @@ adoption plan except for these sections, which other lanes wrote:
   `3b220f90`. P1 itself landed at `1633be0c`. This lane added only a dated
   "landed" line.
 
-**Added 2026-10-07.** The successor session also carries the [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md) (Mark, ruling SE4: "This session (Recommended)").
+**Added 2026-10-07.** The successor session also carries the [Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md) (Mark, ruling SE4: "This session (Recommended)").
 
 ## Open and gated targets
 
@@ -61,7 +61,7 @@ consumer.
   remote viewer re-selects rungs on a camera of its own. Its gate, sharpened
   2026-09-01: `Recency` and `Focused` are host facts the wire does not carry.
 - **A5, gap proofs adopt named anatomies.** No proof is active. The
-  [Distillery projection walk](../implementation_strategy/2026-09-02_distillery_projection_walk_plan.md)
+  [Distillery projection walk](../../archive_docs/2026-10-28/2026-09-02_distillery_projection_walk_plan.md)
   W3 is the prospective schematic consumer. At W3's entrance, check the
   existing routed polylines and endpoint semantics before claiming a portable
   port or routing addition. Its entrance gate and per-proof done-condition
@@ -69,7 +69,7 @@ consumer.
 - **Track F, the field receipts (gated; received 2026-10-06).** F1 is the old
   FT9, derived-mark integrity; F2 is FT10, field distinction. They came from
   the archived projection receipts plan under stack seams S61, and the tail is
-  in the [archived plan tails plan](../implementation_strategy/2026-07-03_archived_plan_tails_plan.md),
+  in the [archived plan tails plan](../../archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md),
   section "2026-10-06 archive pass". *Reading, not ruled* (written into Track
   F): both open with A5, because a field consumer would force A5's gap 1 too.
   F2's trigger candidates are host-side radio and mesh placement facts, and a

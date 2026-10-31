@@ -51,9 +51,10 @@ pub fn importance(graph: &impl TopologyView, metric: ImportanceMetric) -> Import
 }
 /// Per-node **degree importance**: each node's undirected neighbour count, normalized so the
 /// most-connected node is `1.0` (a graph with no edges yields all-zero weights). Degree is the
-/// cheapest importance proxy and matches the existing size-by-degree exactly (same
-/// `neighbors_undirected` count), so routing it through the signal contract is behaviour-
-/// preserving; betweenness / PageRank replace the metric here without touching the contract.
+/// cheapest importance proxy and matches size-by-degree exactly on the kernel graph (both
+/// count `Graph::projected_neighbors`: both strata, a self-loop once), so routing it through
+/// the signal contract is behaviour-preserving; betweenness / PageRank replace the metric
+/// here without touching the contract.
 /// (Graph signals — degree importance.)
 pub fn degree_importance(graph: &impl TopologyView) -> ImportanceWeights {
     let degrees: Vec<(NodeKey, f32)> = graph

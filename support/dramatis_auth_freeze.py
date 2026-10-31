@@ -124,7 +124,7 @@ def main():
 
     files = set(names)
     files.update(["support/dramatis_auth_receipts.py", "support/dramatis_auth_freeze.py",
-                  "ports/djinn/tests/passphrase_change.rs", "scripts/test_dramatis_auth_tools.py"])
+                  "ports/mere-resident/tests/passphrase_change.rs", "scripts/test_dramatis_auth_tools.py"])
     depfiles = {args.artifacts / "debug/dramatis-ui.d"}
     for artifact in artifacts:
         manifest = Path(artifact["manifest_path"]).resolve()
@@ -172,7 +172,7 @@ def main():
         elif source is None and not manifest.is_relative_to(repo):
             assert package["id"] not in actual_packages, ("unrecorded external source", package["name"])
             external_paths.append({"name": package["name"], "manifest": str(manifest)})
-    for package in ["dramatis-app", "djinn"]:
+    for package in ["dramatis-app", "mere-resident"]:
         tree = run(cargo, "+" + args.toolchain, "tree", "--locked", "--offline", "-p", package, "--edges", "normal,build")
         (output / (package + "-tree.txt")).write_text(tree + "\n", encoding="utf-8")
         if package == "dramatis-app":

@@ -1132,7 +1132,7 @@ founded at `ports/distillery/athanor` as `mere-athanor`, on the suite census
 domain rather than the resident. Both are reservation stubs with no
 dependencies; neither opens a lane in this plan. When Alembic emits runs they
 are one more job kind on the board, and the
-[projection walk plan](../../mere_docs/implementation_strategy/2026-09-02_distillery_projection_walk_plan.md) carries
+[projection walk plan](../2026-10-28/2026-09-02_distillery_projection_walk_plan.md) carries
 them into the board's Chronicle as such.
 
 **Corrected 2026-10-06 (S14 pass):** neither is a stub any longer. At mere

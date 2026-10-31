@@ -303,8 +303,10 @@ fn captured_live_lifecycle_replays_exact_resource_records_and_shown_associations
     );
     let replayed_surface = replayed.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
     assert_eq!(
-        replayed.node_current_url(replayed_surface),
-        graph.node_current_url(surface)
+        replayed
+            .node_history_semantic_summary(replayed_surface)
+            .current_url,
+        graph.node_history_semantic_summary(surface).current_url
     );
     assert_eq!(
         replayed.shown_resource_id(replayed_surface),

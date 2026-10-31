@@ -102,7 +102,7 @@ The Oct 9–11 resident-host implementation lane never left the ThinkPad. It is
 preserved in full, including its uncommitted Task 7 WIP, at tag
 `archive/resident-current-main-20261010` (the WIP is its top commit,
 `fd1640d0e`; Tasks 1–6 end at `2530e44d0`). Its plan,
-`design_docs/mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md`,
+`design_docs/archive_docs/2026-10-28/2026-10-09_resident_host_implementation_plan.md`,
 exists only on that tag. Main carries the
 [design](mere_docs/technical_architecture/2026-10-09_resident_host_design.md),
 still marked proposed, although the tag's plan records Mark's approval.
@@ -129,7 +129,7 @@ Prompt for the O-PC session:
 > Port the resident-host lane onto current Mere main. Read
 > `design_docs/2026-10-14_mere_lane_handoff.md` (this section), then the lane's
 > plan from tag `archive/resident-current-main-20261010`
-> (`git show archive/resident-current-main-20261010:design_docs/mere_docs/implementation_strategy/2026-10-09_resident_host_implementation_plan.md`)
+> (`git show archive/resident-current-main-20261010:design_docs/archive_docs/2026-10-28/2026-10-09_resident_host_implementation_plan.md`)
 > and the design on main. First map each of the plan's Tasks 1–6 against what
 > C1 already provides on main (its residency modules listed above) and write
 > that map into the plan, deciding per behaviour: already covered, port, or

@@ -12,7 +12,7 @@ eidetic-core (`254b23b6`), and graphshell-web has had its own workspace since
 `74b55236`; both are noted below.
 
 **Related**:
-[search_surface_wiring_plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md) (W4
+[search_surface_wiring_plan](../2026-10-28/2026-08-12_search_surface_wiring_plan.md) (W4
 is the consumer of both moves),
 [leverage census](../../2026-08-10_leverage_census_brief.md) (§2 rows this
 plan resolves), the esp consolidation plan (whose split left the glue

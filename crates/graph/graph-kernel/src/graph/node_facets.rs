@@ -13,6 +13,7 @@
 use serde::{Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
+use super::snapshot::ResourceSnapshotError;
 use super::{Graph, NodeKey};
 use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
 
@@ -43,26 +44,46 @@ impl Graph {
         &self.facets
     }
 
-    /// Mutable facet access for the host and extension gate.
+    /// Raw mutable access to the store, for kernel code and test fixtures.
     ///
-    /// Kernel-owned facet families should still use their typed graph methods;
-    /// this surface exists for host-defined and unknown-forward namespaces.
+    /// Outside the kernel a loaded store goes in through
+    /// [`install_facets`](Self::install_facets) or
+    /// [`overlay_facets`](Self::overlay_facets), which apply the handle rule
+    /// checked open applies; this skips it.
     ///
     /// A write through it may touch visit history, so taking it advances the
     /// [visit revision](Graph::visit_revision).
-    pub fn facets_mut(&mut self) -> &mut NodeFacetStore {
+    pub(crate) fn facets_mut(&mut self) -> &mut NodeFacetStore {
         self.bump_visit_revision();
         &mut self.facets
+    }
+
+    /// Replace the facet store with `facets`, a sidecar loaded for this graph.
+    ///
+    /// Refused, with the previous store kept, when the result would fail
+    /// checked open: a retained Surface literal may not reuse a handle a
+    /// Resource holds ([`validate_active_resource_assertion_handles`]
+    /// (Graph::validate_active_resource_assertion_handles)).
+    pub fn install_facets(&mut self, facets: NodeFacetStore) -> Result<(), ResourceSnapshotError> {
+        let previous = std::mem::replace(&mut self.facets, facets);
+        if let Err(error) = self.validate_active_resource_assertion_handles() {
+            self.facets = previous;
+            return Err(ResourceSnapshotError::InvalidFacets(error));
+        }
+        self.bump_visit_revision();
+        Ok(())
     }
 
     /// Overlay a canonical sidecar after snapshot load.
     ///
     /// Legacy snapshot columns are imported while reconstructing the graph.
     /// Existing `facets.json` values then win for matching keys, while both
-    /// stores preserve unrelated namespaces.
-    pub fn overlay_facets(&mut self, facets: NodeFacetStore) {
-        self.facets.overlay(facets);
-        self.bump_visit_revision();
+    /// stores preserve unrelated namespaces. Checked and kept as
+    /// [`install_facets`](Self::install_facets) is.
+    pub fn overlay_facets(&mut self, facets: NodeFacetStore) -> Result<(), ResourceSnapshotError> {
+        let mut merged = self.facets.clone();
+        merged.overlay(facets);
+        self.install_facets(merged)
     }
 
     pub(crate) fn node_facet<T: DeserializeOwned>(

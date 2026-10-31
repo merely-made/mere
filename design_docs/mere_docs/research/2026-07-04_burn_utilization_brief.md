@@ -73,7 +73,7 @@ with the caveat that browser-side transport is websocket for now.
 
 **Gate refreshed 2026-08-09**: Burn and Burn Remote exist only as
 `0.22.0-pre.1`; the stable 0.22 migration has its own
-[plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md).
+[plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md).
 **Done when** a second machine executes tensor ops for the first over
 murm's endpoint under a lease, authorized by a tessera/kith credential.
 
@@ -231,7 +231,7 @@ at a measured node count.
   owns artifact/storage copies, worker execution, cancellation, UI impact, and
   the configured size sweep. It proceeds independently of Lane 2.
 - **D3 burn-remote release timing**: the
-  [Burn 0.22 migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+  [Burn 0.22 migration plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md)
   waits for stable 0.22 and keeps remote execution outside the dependency
   migration. A disposable prerelease compatibility probe is allowed after the
   M2/M3 resource and reclaim seams exist.

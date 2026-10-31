@@ -377,7 +377,7 @@ fn frame_layout_metadata_survives_snapshot_roundtrip() {
 
     let facets = graph.facets().clone();
     let mut restored = Graph::from_snapshot(&graph.to_snapshot());
-    restored.overlay_facets(facets);
+    restored.overlay_facets(facets).unwrap();
     let (restored_frame, _) = restored.get_node_by_url("verso://frame/demo").unwrap();
     let hints = restored.frame_layout_hints(restored_frame).unwrap();
 

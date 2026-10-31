@@ -7,6 +7,7 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::{Path, PathBuf};
 
+use super::contributes::Contribution;
 use super::types::*;
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -17,6 +18,9 @@ struct DiskModManifest {
     provides: Vec<String>,
     #[serde(default)]
     requires: Vec<String>,
+    /// TOML `[[contributes]]` tables, each a `kind` and its declaration.
+    #[serde(default)]
+    contributes: Vec<Contribution>,
     #[serde(default)]
     capabilities: Vec<String>,
     /// Origin globs this mod's wasm binds as a DocumentScript (TOML
@@ -128,6 +132,7 @@ pub(super) fn read_wasm_mod_from_path(
         disk_manifest.requires,
         capabilities,
     );
+    manifest.contributes = disk_manifest.contributes;
     manifest.document_script_origins = disk_manifest.document_script_origins;
 
     Ok((

@@ -168,7 +168,7 @@ substrate owners are named; this plan owns the Representation variant + dispatch
 - **The decorative scripted form.** A custom-drawn / data-driven face is substrate-available now
   via DOM (the swatch proves node-scoped interactive chrome-DOM). The *behavioral* scripted form
   (forces / rules) stays field-regions territory; rhai survives narrowly as the field-rule
-  language ([scriptable_field_regions_plan](2026-06-13_scriptable_field_regions_plan.md)), so the
+  language ([scriptable_field_regions_plan](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md)), so the
   predecessor plan's "rhai substrate" reference was accurate, not stale.
 
 Done when sprites and custom bodies render on secondary panes; a live-surface form is selectable
@@ -276,8 +276,8 @@ fidelity) = a directly-authored hull, convex now, concave/compound as the B3 fid
   sidecar never records one node's override under another's identity. Found and argued in
   the [data-oriented doctrine brief](../../2026-07-02_data_oriented_doctrine_brief.md) §7.7.
 
-  Received 2026-10-26: UUID keys remain the override model. Canvas now also
-  receives the kernel membership witness during reconciliation, so a hidden
+  **Received for D1, 2026-10-26:** UUID keys remain the override model. Canvas now
+  also receives the kernel membership witness during reconciliation, so a hidden
   same-call removal/recreation of the same UUID prunes its departed overrides.
   Ordinary edits and metadata clones retain them. Runtime body/hold retirement
   is qualified separately from authored roster intent and delayed host replies;

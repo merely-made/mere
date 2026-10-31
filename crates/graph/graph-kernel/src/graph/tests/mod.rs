@@ -20,6 +20,7 @@ pub mod nodes_and_edges;
 pub mod production_routing;
 pub mod queries_and_address;
 pub mod snapshot_basic;
+pub mod snapshot_canonical;
 pub mod snapshot_imports;
 pub mod snapshot_navigation;
 pub mod snapshot_size;

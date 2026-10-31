@@ -5,7 +5,7 @@
 still waits on Mark's run over a real exported history. E3 and E4 were built on
 tantivy, which `7a5b7e19` (2026-09-07) replaced with an in-tree BM25 and
 stored-column reports. E5 is partly delivered in Turnstone under the
-[search surface wiring plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md)'s
+[search surface wiring plan](../2026-10-28/2026-08-12_search_surface_wiring_plan.md)'s
 W2 (omnibar recall); W3's reports and the corridor strip are not delivered. The
 plan activated two of the [deferred phases](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md),
 Phase 8 (browsing memory) in full and Phase 9's producer half native-first; the
@@ -148,7 +148,7 @@ The bin is the proof surface until then.
 
 **Corrected 2026-10-06 (S14 pass):** E5 is partly delivered, in Turnstone rather
 than a Mere shell. Omnibar recall shipped under the
-[search surface wiring plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md)'s
+[search surface wiring plan](../2026-10-28/2026-08-12_search_surface_wiring_plan.md)'s
 W2 (Turnstone `18cf209`, 2026-08-12; `fuse_many` from `501d87a`, 2026-09-07):
 Turnstone's `trail_memory.rs` uses `BrowsingMemory`, `TrailIndex` and
 `fuse_many`. W3's reports and the corridor strip are not delivered, and that

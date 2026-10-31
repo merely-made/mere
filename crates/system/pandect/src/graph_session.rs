@@ -7,7 +7,7 @@
 //! A mere's sessions: their schema over one muniment store, the live session
 //! ([`GraphSession`]) and the lifecycle ([`MereSessions`]).
 //!
-//! Reservoir plan V2 (`design_docs/mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md`).
+//! Reservoir plan V2 (`design_docs/archive_docs/2026-10-28/2026-09-23_reservoir_plan.md`).
 //! A mere is one muniment store, and each of its sessions lives at keys under
 //! `sessions/<id>/`:
 //!
@@ -42,7 +42,7 @@ use kernel::graph::{
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
-use muniment::{Backend, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
+use muniment::{Backend, Hash, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
@@ -314,6 +314,86 @@ struct Checkpoint {
     cursor: Seq,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     translated_receipt_digest: Option<String>,
+    /// The muniment digest (hex) of the journal's first `cursor` entries: what
+    /// ties the checkpoint to the journal it was written beside.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    journal_digest: Option<String>,
+    /// The muniment hash (hex) of the stored bytes of `graph.json` and
+    /// `facets.json` as this checkpoint wrote them: what ties the checkpoint to
+    /// the files it summarizes with. Open reads a checkpoint only if it names
+    /// both; one that names neither, or that the journal or the files no longer
+    /// match, is a cache the journal outranks and is replayed past. (A session
+    /// with a retained translation compares the files with it instead.)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    contents_digest: Option<String>,
+}
+
+/// The digest a checkpoint at `cursor` stores for `journal`.
+fn journal_digest(journal: &GraphJournal, cursor: Seq) -> Result<Option<String>, SessionError> {
+    Ok(journal
+        .log()
+        .prefix_digest(cursor.index())?
+        .map(|digest| digest.to_hex()))
+}
+
+/// The hash a checkpoint stores for the bytes of its graph and facets files.
+fn contents_digest(graph: &[u8], facets: &[u8]) -> String {
+    let mut framed = Vec::with_capacity(graph.len() + facets.len() + 16);
+    for bytes in [graph, facets] {
+        framed.extend((bytes.len() as u64).to_le_bytes());
+        framed.extend(bytes);
+    }
+    Hash::of(&framed).to_hex()
+}
+
+/// The three records of a checkpoint at `cursor`: the graph, its facets, and the
+/// record naming the journal prefix and the exact bytes of the other two.
+fn checkpoint_ops(
+    keys: &Keys,
+    graph: &Graph,
+    journal: &GraphJournal,
+    cursor: Seq,
+    translated_receipt_digest: Option<String>,
+) -> Result<[WriteOp; 3], SessionError> {
+    let graph_bytes = pretty_bytes(&graph.to_snapshot())?;
+    let facets_bytes = pretty_bytes(graph.facets())?;
+    let record = Checkpoint {
+        cursor,
+        translated_receipt_digest,
+        journal_digest: journal_digest(journal, cursor)?,
+        contents_digest: Some(contents_digest(&graph_bytes, &facets_bytes)),
+    };
+    Ok([
+        WriteOp::Put {
+            key: keys.at(GRAPH),
+            value: graph_bytes,
+        },
+        WriteOp::Put {
+            key: keys.at(NODE_FACETS_FILE),
+            value: facets_bytes,
+        },
+        pretty(keys.at(CHECKPOINT), &record)?,
+    ])
+}
+
+/// Whether the stored graph and facets files are the ones `checkpoint` wrote.
+async fn stored_contents_match<B: Backend>(
+    slots: &JsonSlots<B>,
+    keys: &Keys,
+    checkpoint: &Checkpoint,
+) -> Result<bool, SessionError> {
+    let Some(expected) = &checkpoint.contents_digest else {
+        return Ok(false);
+    };
+    let Some(graph) = slots.backend().get(&keys.at(GRAPH)).await? else {
+        return Ok(false);
+    };
+    let facets = slots
+        .backend()
+        .get(&keys.at(NODE_FACETS_FILE))
+        .await?
+        .unwrap_or_default();
+    Ok(contents_digest(&graph, &facets) == *expected)
 }
 
 #[derive(Clone, Default)]
@@ -344,10 +424,15 @@ impl Keys {
     }
 }
 
+fn pretty_bytes<T: Serialize>(value: &T) -> Result<Vec<u8>, SessionError> {
+    Ok(serde_json::to_vec_pretty(value).map_err(|error| StoreError::Codec(error.to_string()))?)
+}
+
 fn pretty<T: Serialize>(key: String, value: &T) -> Result<WriteOp, SessionError> {
-    let value =
-        serde_json::to_vec_pretty(value).map_err(|error| StoreError::Codec(error.to_string()))?;
-    Ok(WriteOp::Put { key, value })
+    Ok(WriteOp::Put {
+        key,
+        value: pretty_bytes(value)?,
+    })
 }
 
 async fn read<B: Backend, T: DeserializeOwned>(
@@ -369,7 +454,7 @@ fn graph_of(
     facets: NodeFacetStore,
 ) -> Result<Graph, kernel::graph::snapshot::ResourceSnapshotError> {
     let mut graph = Graph::try_from_snapshot(snapshot)?;
-    *graph.facets_mut() = facets;
+    graph.install_facets(facets)?;
     Ok(graph)
 }
 
@@ -523,12 +608,9 @@ async fn load_retained_source<B: Backend>(
                 Graph::try_from_snapshot(&baseline.graph)
             }
             .map_err(|error| SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE))))?;
-            *graph.facets_mut() = baseline.facets;
-            graph
-                .validate_active_resource_assertion_handles()
-                .map_err(|error| {
-                    SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
-                })?;
+            graph.install_facets(baseline.facets).map_err(|error| {
+                SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE)))
+            })?;
             Ok::<_, SessionError>(graph)
         })
         .transpose()?
@@ -628,10 +710,14 @@ pub struct GraphSession<B> {
 
 #[path = "graph_session_transaction.rs"]
 mod transaction;
+#[path = "graph_session_operation.rs"]
+mod operation;
+pub use operation::OperationReceipt;
 
 #[path = "graph_session_merge.rs"]
 mod merge;
 pub use merge::{DroppedChoice, MergeChoice, MergeConflict, MergeMatch, PendingMerge};
+pub use transaction::CommitExtra;
 
 impl<B: Backend> GraphSession<B> {
     /// Begin a new session in memory, from `baseline` or empty, with `kind` as
@@ -769,6 +855,24 @@ impl<B: Backend> GraphSession<B> {
         }
 
         let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
+        // A checkpoint is read only beside the journal prefix and the files it
+        // names. Any other is a cache the journal outranks: it is replayed past,
+        // and the next checkpoint names what it was written with. A session with
+        // a retained translation compares its checkpoint with that translation
+        // below instead, and refuses a difference.
+        let checkpoint = match checkpoint {
+            Some(checkpoint)
+                if checkpoint.cursor <= live
+                    && checkpoint.journal_digest.is_some()
+                    && journal_digest(&journal, checkpoint.cursor)?
+                        == checkpoint.journal_digest
+                    && (translation.is_some()
+                        || stored_contents_match(&slots, &keys, &checkpoint).await?) =>
+            {
+                Some(checkpoint)
+            },
+            _ => None,
+        };
         let (mut graph, checkpointed) = match checkpoint {
             Some(checkpoint)
                 if checkpoint.cursor <= live
@@ -1040,21 +1144,20 @@ impl<B: Backend> GraphSession<B> {
             .graph_at(self.journal.entries(), live)
             .map_err(SessionError::Corrupt)?
             .expect("cutoff validated against live journal");
-        let ops = [
+        let mut ops = vec![
             pretty(self.keys.at(PLACEMENT), &placement)?,
             pretty(self.keys.at(TRANSLATION), &receipt)?,
-            pretty(self.keys.at(GRAPH), &graph.to_snapshot())?,
-            pretty(self.keys.at(NODE_FACETS_FILE), graph.facets())?,
-            pretty(
-                self.keys.at(CHECKPOINT),
-                &Checkpoint {
-                    cursor: live,
-                    translated_receipt_digest: Some(receipt.translation_digest.clone()),
-                },
-            )?,
         ];
-        self.commit_translation(retained, ops.to_vec()).await?;
+        ops.extend(checkpoint_ops(
+            &self.keys,
+            &graph,
+            &self.journal,
+            live,
+            Some(receipt.translation_digest.clone()),
+        )?);
+        self.commit_translation(retained, ops).await?;
         graph.copy_semantic_context_from(&self.graph);
+        graph.set_current_session(self.graph.current_session());
         record_into(&mut graph, &self.pending);
         self.graph = graph;
         self.placement = Some(placement);
@@ -1158,6 +1261,14 @@ impl<B: Backend> GraphSession<B> {
         &self.graph
     }
 
+    /// Install the host's launch number: the kernel stamps it as the
+    /// `last_session_visited` of every node navigated from now on. Per-launch
+    /// host wiring, not graph truth, so it is neither journaled nor compared;
+    /// the candidates an edit clones carry it.
+    pub fn set_current_session(&mut self, launch: u64) {
+        self.graph.set_current_session(launch);
+    }
+
     pub fn journal(&self) -> &GraphJournal {
         &self.journal
     }
@@ -1224,9 +1335,12 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Run `edit` on the live graph as one change under `author`, journaled
-    /// but not stored until the next flush. Every mutation goes through
-    /// `apply_graph_delta`, the kernel's one write path, so the journal sees
-    /// all of them.
+    /// but not stored until the next flush. Every writer the closure uses,
+    /// `apply_graph_delta` or a public assertion or declaration writer, emits
+    /// captured deltas that `edit_as` records, replays onto a fresh clone and
+    /// compares, refusing a candidate that differs
+    /// ([`SessionError::NotReplayable`]). That check is the write boundary;
+    /// `GraphDelta` is one of its writers.
     pub fn edit_now<R>(
         &mut self,
         author: Author,
@@ -1403,20 +1517,15 @@ impl<B: Backend> GraphSession<B> {
             || journal.0 - self.checkpointed.0 >= self.checkpoint_interval)
             .then_some(journal);
         if checkpoint.is_some() {
-            ops.extend([
-                pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
-                pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
-                pretty(
-                    self.keys.at(CHECKPOINT),
-                    &Checkpoint {
-                        cursor: journal,
-                        translated_receipt_digest: self
-                            .translation
-                            .as_ref()
-                            .map(|receipt| receipt.translation_digest.clone()),
-                    },
-                )?,
-            ]);
+            ops.extend(checkpoint_ops(
+                &self.keys,
+                &self.graph,
+                &self.journal,
+                journal,
+                self.translation
+                    .as_ref()
+                    .map(|receipt| receipt.translation_digest.clone()),
+            )?);
         }
         for (source, mark) in &self.merge_marks {
             let key = Keys::new(*source).at(MERGED);
@@ -1473,11 +1582,6 @@ impl<B: Backend> GraphSession<B> {
         if let Some(at) = pending.updated_at {
             self.manifest.updated_at = at;
         }
-    }
-
-    /// Store everything not stored yet, stamping new changes `at`.
-    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
-        self.store(at, Vec::new(), false).await
     }
 
     /// Store what is pending, with `extra`, as one batch.
@@ -1900,19 +2004,20 @@ pub fn picked_session_name(source: Option<&str>) -> String {
 /// `seed`, copied with its facets through the id remap, and the donor
 /// container's scene settings carried to the fork's container. The
 /// product-neutral half of Turnstone's tear-out; nested worlds and resident
-/// admissions stay Turnstone's to carry. Native only, as the kernel's
-/// component copy is.
+/// admissions stay Turnstone's to carry. `None` when `seed` names no node;
+/// refused when the carried facets fail the handle rule. Native only, as the
+/// kernel's component copy is.
 #[cfg(not(target_arch = "wasm32"))]
 pub fn fork_component_graph(
     donor: &Graph,
     donor_container: Uuid,
     seed: Uuid,
     fork_container: Uuid,
-) -> Option<Graph> {
+) -> Result<Option<Graph>, kernel::graph::snapshot::ResourceSnapshotError> {
     let mut fork = Graph::new();
     let copy = fork.copy_component_from(donor, seed, Some(donor_container.to_string()));
     if copy.new_keys.is_empty() {
-        return None;
+        return Ok(None);
     }
     let mut facets = NodeFacetStore::new();
     copy_node_facets(donor.facets(), &mut facets, &copy.id_remap);
@@ -1930,17 +2035,19 @@ pub fn fork_component_graph(
                 .map(|value| (*minted, value))
         })
         .collect();
-    fork.overlay_facets(facets);
+    let mut merged = fork.facets().clone();
+    merged.overlay(facets);
     let import = FacetId::new(PROVENANCE_IMPORT);
     for (_, minted) in &copy.id_remap {
-        fork.facets_mut().remove(minted, &import);
+        merged.remove(minted, &import);
     }
     for (minted, value) in derivations {
-        fork.facets_mut()
+        merged
             .set(minted, derivation.clone(), value, &AcceptAll)
             .expect("AcceptAll admits every value");
     }
-    Some(fork)
+    fork.install_facets(merged)?;
+    Ok(Some(fork))
 }
 
 /// A mere's sessions, over its one store.
@@ -2113,7 +2220,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             }
         }
         session.manifest.codicil_read_only = true;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2126,7 +2233,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_fork_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2152,7 +2259,7 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
     ) -> Result<GraphSessionManifest, SessionError> {
         let mut session = self.begin_branch_at(parent, at, author)?;
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 
@@ -2239,6 +2346,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             seed,
             *fork_graph_id.as_uuid(),
         )
+        .map_err(|error| SessionError::Validation(error.to_string()))?
         .ok_or(SessionError::NoSuchNode(seed))?;
         parent.validate(&graph)?;
         let at = parent.journal().live_cursor();
@@ -2260,6 +2368,7 @@ impl<B: Backend + Clone> MereSessions<B> {
     }
 
     /// Write a new session's manifest, baseline and first change as one batch.
+    /// Nobody else holds it, so there is nothing to recheck.
     async fn create(
         &self,
         manifest: GraphSessionManifest,
@@ -2274,7 +2383,7 @@ impl<B: Backend + Clone> MereSessions<B> {
             author,
             kind,
         );
-        session.flush(wall_clock_now()).await?;
+        session.store(wall_clock_now(), Vec::new(), false).await?;
         Ok(session.manifest().clone())
     }
 }
@@ -2292,8 +2401,17 @@ mod pending_tests;
 mod navigation_tests;
 
 #[cfg(test)]
+#[path = "graph_session_checkpoint_tests.rs"]
+mod checkpoint_tests;
+
+#[cfg(test)]
+#[path = "graph_session_transaction_tests.rs"]
+mod transaction_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
+    use kernel::graph::fixtures::GraphFixtures;
     use kernel::graph::replay_captured_deltas_onto;
 
     use euclid::default::Point2D;
@@ -2707,6 +2825,8 @@ mod tests {
                     &Checkpoint {
                         cursor: session.journal().live_cursor(),
                         translated_receipt_digest: None,
+                        journal_digest: None,
+                        contents_digest: None,
                     },
                 )
                 .unwrap()])
@@ -3433,11 +3553,13 @@ mod tests {
             second.retained_assertions_mut()[0].statement_id = "held-profile-second".into();
             snapshot.edges.push(second);
             let mut graph = Graph::try_from_recorded_snapshot(&snapshot).unwrap();
-            graph.overlay_facets(
-                crate::graph_placement::placement_test_graph()
-                    .facets()
-                    .clone(),
-            );
+            graph
+                .overlay_facets(
+                    crate::graph_placement::placement_test_graph()
+                        .facets()
+                        .clone(),
+                )
+                .unwrap();
             let mut live = sessions.begin_recorded(person(), Some(graph));
             live.set_view_now(
                 person(),
@@ -4043,20 +4165,26 @@ mod tests {
                 graph: snapshot,
                 facets: NodeFacetStore::default(),
             };
+            // The checkpoint record a writer would leave beside `graph` bytes.
+            let record = |graph: &[u8]| {
+                pretty(
+                    keys.at(CHECKPOINT),
+                    &Checkpoint {
+                        cursor: Seq(0),
+                        translated_receipt_digest: None,
+                        journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                        contents_digest: Some(contents_digest(graph, b"")),
+                    },
+                )
+                .unwrap()
+            };
             for column in [BASELINE, GRAPH] {
                 for conflict in [false, true] {
                     store
                         .apply(&[
                             pretty(keys.at(BASELINE), &baseline(valid.clone())).unwrap(),
                             pretty(keys.at(GRAPH), &valid).unwrap(),
-                            pretty(
-                                keys.at(CHECKPOINT),
-                                &Checkpoint {
-                                    cursor: Seq(0),
-                                    translated_receipt_digest: None,
-                                },
-                            )
-                            .unwrap(),
+                            record(&pretty_bytes(&valid).unwrap()),
                         ])
                         .await
                         .unwrap();
@@ -4077,6 +4205,14 @@ mod tests {
                         pretty(keys.at(column), &invalid).unwrap()
                     };
                     store.apply(&[op.clone()]).await.unwrap();
+                    if column == GRAPH {
+                        // Written consistently, as a faulty writer would: the
+                        // checkpoint names these bytes, so they are validated.
+                        store
+                            .apply(&[record(&pretty_bytes(&invalid).unwrap())])
+                            .await
+                            .unwrap();
+                    }
                     match GraphSession::open(store.clone(), id).await {
                         Err(SessionError::Corrupt(error)) => {
                             assert!(error.contains(&keys.at(column)));
@@ -4114,12 +4250,158 @@ mod tests {
                 .apply(&[
                     pretty(keys.at(BASELINE), &baseline(legacy.clone())).unwrap(),
                     pretty(keys.at(GRAPH), &legacy).unwrap(),
+                    record(&pretty_bytes(&legacy).unwrap()),
                 ])
                 .await
                 .unwrap();
             let opened = GraphSession::open(store, id).await.unwrap();
             assert_eq!(opened.graph().node_count(), 1);
             assert!(opened.graph().to_snapshot().resources.is_empty());
+        });
+    }
+
+    #[test]
+    fn an_eight_field_baseline_qualifies_whatever_the_hash_order() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+        use kernel::graph::{Field, FieldDefinition, FieldId, ScalarField};
+
+        pollster::block_on(async {
+            for _ in 0..8 {
+                let mut graph = Graph::new();
+                for n in 0..8u128 {
+                    let field = Field::new(
+                        FieldId::from_uuid(Uuid::from_u128(n + 1)),
+                        FieldDefinition::Scalar(ScalarField::Const(n as f32)),
+                    );
+                    apply_graph_delta(&mut graph, GraphDelta::AddField { field });
+                }
+                let expected = graph.to_snapshot().fields;
+                let sessions = MereSessions::new(MemoryBackend::new());
+                let mut session = sessions.begin(person(), Some(graph));
+                session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+                let id = session.id();
+                let mut opened = sessions.open(id).await.unwrap();
+                assert_eq!(opened.graph().to_snapshot().fields, expected);
+                opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
+                assert_eq!(
+                    sessions
+                        .open(id)
+                        .await
+                        .unwrap()
+                        .graph()
+                        .to_snapshot()
+                        .fields,
+                    expected
+                );
+            }
+        });
+    }
+
+    #[test]
+    fn qualifying_a_legacy_session_keeps_the_launch() {
+        use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+
+        pollster::block_on(async {
+            let sessions = MereSessions::new(MemoryBackend::new());
+            let graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut session = sessions.begin(person(), Some(graph));
+            session.flush(SystemTime::UNIX_EPOCH).await.unwrap();
+            let mut opened = sessions.open(session.id()).await.unwrap();
+            opened.set_current_session(7);
+            opened.qualify_legacy(Seq(0), vec![]).await.unwrap();
+            assert_eq!(opened.graph().current_session(), 7);
+
+            let node = Uuid::from_u128(1);
+            let key = opened.graph().get_node_key_by_id(node).unwrap();
+            opened
+                .edit_now(person(), |graph| {
+                    apply_graph_delta(
+                        graph,
+                        GraphDelta::NavigateNode {
+                            key,
+                            url: "https://1.test/next".into(),
+                        },
+                    );
+                })
+                .unwrap();
+            let key = opened.graph().get_node_key_by_id(node).unwrap();
+            assert_eq!(opened.graph().node_last_session_visited(key), Some(7));
+        });
+    }
+
+    #[test]
+    fn opening_a_session_whose_facets_steal_a_handle_is_refused() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let keys = Keys::new(id);
+            let surface = Uuid::from_u128(1);
+            let mut graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut held =
+                kernel::types::NodeProperty::new("urn:test:predicate".into(), "held".into());
+            held.statement_id = "owned-handle".into();
+            let key = graph.get_node_key_by_id(surface).unwrap();
+            assert!(graph.append_node_properties(key, vec![held.clone()]));
+            let snapshot = graph.to_snapshot();
+            let honest = graph.facets().clone();
+            let mut stolen = honest.clone();
+            stolen
+                .set(
+                    surface,
+                    chartulary::FacetId::new(kernel::graph::node_facets::SEMANTIC_PROPERTIES),
+                    serde_json::to_value(vec![held]).unwrap(),
+                    &chartulary::AcceptAll,
+                )
+                .unwrap();
+            // The files a faulty writer would leave: the checkpoint names the
+            // very bytes of `graph.json` and `facets.json`, so it is trusted.
+            let write = |baseline: &NodeFacetStore, checkpoint: &NodeFacetStore| {
+                let graph_bytes = pretty_bytes(&snapshot).unwrap();
+                let facet_bytes = pretty_bytes(checkpoint).unwrap();
+                let record = Checkpoint {
+                    cursor: Seq(0),
+                    translated_receipt_digest: None,
+                    journal_digest: journal_digest(&GraphJournal::default(), Seq(0)).unwrap(),
+                    contents_digest: Some(contents_digest(&graph_bytes, &facet_bytes)),
+                };
+                [
+                    pretty(
+                        keys.at(BASELINE),
+                        &Baseline {
+                            graph: snapshot.clone(),
+                            facets: baseline.clone(),
+                        },
+                    )
+                    .unwrap(),
+                    WriteOp::Put {
+                        key: keys.at(GRAPH),
+                        value: graph_bytes,
+                    },
+                    WriteOp::Put {
+                        key: keys.at(NODE_FACETS_FILE),
+                        value: facet_bytes,
+                    },
+                    pretty(keys.at(CHECKPOINT), &record).unwrap(),
+                ]
+            };
+            store.apply(&write(&honest, &honest)).await.unwrap();
+            let opened = GraphSession::open(store.clone(), id).await.unwrap();
+            assert_eq!(opened.graph().facets(), &honest);
+
+            for (baseline, checkpoint, refused_at) in
+                [(&stolen, &honest, BASELINE), (&honest, &stolen, GRAPH)]
+            {
+                store.apply(&write(baseline, checkpoint)).await.unwrap();
+                match GraphSession::open(store.clone(), id).await {
+                    Err(SessionError::Corrupt(error)) => {
+                        assert!(error.contains(&keys.at(refused_at)), "{error}");
+                        assert!(error.contains("facets refused"), "{error}");
+                    },
+                    Err(error) => panic!("unexpected load error: {error}"),
+                    Ok(_) => panic!("facets that steal a handle were installed"),
+                }
+            }
         });
     }
 

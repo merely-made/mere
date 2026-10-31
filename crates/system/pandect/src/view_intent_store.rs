@@ -16,7 +16,7 @@
 //! <sessions_dir>/
 //! └── <session_id>/
 //!     ├── manifest.json            ← ManifestStore
-//!     ├── graph.json               ← session_graph_store
+//!     ├── graph.json               ← GraphSession
 //!     └── views/
 //!         └── <frame_id>/
 //!             └── <pane_id>.json   ← this module

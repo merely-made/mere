@@ -400,6 +400,90 @@ fn test_retract_relation_by_sub_kind_between_nodes() {
     assert!(!payload.has_relation(RelationSelector::Semantic(SemanticSubKind::UserGrouped)));
 }
 
+#[test]
+fn projected_neighbors_reads_both_strata_and_a_self_loop_once() {
+    let mut graph = Graph::new();
+    let [a, b, c, d] = ["a", "b", "c", "d"]
+        .map(|name| graph.add_node(format!("https://{name}.com"), Point2D::new(0.0, 0.0)));
+    graph.assert_relation(a, b, user_grouped(None)).unwrap();
+    graph.assert_relation(c, a, hyperlink()).unwrap();
+    graph.assert_relation(a, a, user_grouped(None)).unwrap();
+    graph.assert_relation(d, d, hyperlink()).unwrap();
+
+    let neighbors = |key| {
+        let mut found: Vec<_> = graph.projected_neighbors(key).collect();
+        found.sort_by_key(|node| node.index());
+        found
+    };
+    assert_eq!(
+        neighbors(a),
+        vec![a, b, c],
+        "Surface b, Resource c, itself once"
+    );
+    assert_eq!(neighbors(c), vec![a]);
+    assert_eq!(
+        neighbors(d),
+        vec![d],
+        "a Resource self-loop is read once too"
+    );
+    assert_eq!(
+        graph.neighbors_undirected(a).count(),
+        2,
+        "the Surface reader alone sees b and itself"
+    );
+}
+
+#[test]
+fn retract_relations_where_leaves_what_the_predicate_refuses() {
+    use crate::graph::{EdgeFamily, Retraction, SemanticStatementSpec, predicate_iri};
+    use crate::types::GraphScope;
+
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.com".to_string(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.com".to_string(), Point2D::new(1.0, 1.0));
+    for (sub_kind, graph_scope) in [
+        (SemanticSubKind::Cites, GraphScope::User),
+        (SemanticSubKind::Quotes, GraphScope::Source),
+    ] {
+        let spec = SemanticStatementSpec {
+            predicate: predicate_iri(sub_kind).into(),
+            recognized_sub_kind: Some(sub_kind),
+            graph_scope,
+            ..Default::default()
+        };
+        graph.try_assert_semantic_statement(a, b, spec).unwrap();
+    }
+    assert_eq!(
+        graph.resource_relations().count(),
+        1,
+        "both live on the Resource stratum"
+    );
+
+    let semantic = RelationSelector::Family(EdgeFamily::Semantic);
+    let done = graph.retract_relations_where(a, b, semantic, |s| s.graph_scope == GraphScope::User);
+    assert_eq!(
+        done,
+        Retraction {
+            withdrawn: 1,
+            refused: 1
+        }
+    );
+    let held: Vec<_> = graph
+        .projected_assertions()
+        .map(|(_, _, _, statement)| statement.recognized_sub_kind)
+        .collect();
+    assert_eq!(held, vec![Some(SemanticSubKind::Quotes)]);
+
+    let again = graph.retract_relations_where(a, b, semantic, |_| false);
+    assert_eq!(
+        again,
+        Retraction {
+            withdrawn: 0,
+            refused: 1
+        }
+    );
+}
+
 /// The statement-aware write API (petgraph-RDF Phase 1): assert returns a
 /// device-safe fact handle; content-dedup returns the SAME handle (updating
 /// metadata in place); retract-by-id removes exactly that fact, clears the

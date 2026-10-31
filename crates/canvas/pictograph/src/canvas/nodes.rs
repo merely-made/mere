@@ -339,7 +339,7 @@ impl Canvas {
     /// visited node and the "unvisited" placeholder otherwise. (Card system #4.)
     pub fn member_visited(&self, member: uuid::Uuid) -> bool {
         match self.graph.get_node_by_id(member) {
-            Some((key, _)) => self.graph.node_current_url(key).is_some(),
+            Some((key, _)) => !self.graph.node_history_projection(key).entries.is_empty(),
             None => false,
         }
     }

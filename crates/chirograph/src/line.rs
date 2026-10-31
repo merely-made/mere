@@ -65,30 +65,33 @@ impl LineAssembler {
         self.buffer.extend_from_slice(bytes);
     }
 
-    /// The next complete line, without its newline, if one is buffered.
+    /// The next complete UTF-8 line, without its newline, if one is buffered.
     ///
     /// A trailing carriage return is dropped too, so a host writing CRLF is
-    /// read the same as one writing LF.
-    pub fn next_line(&mut self) -> Option<String> {
-        let end = self.buffer.iter().position(|byte| *byte == b'\n')?;
+    /// read the same as one writing LF. Invalid UTF-8 is returned as an error.
+    pub fn next_line(&mut self) -> Result<Option<String>, std::string::FromUtf8Error> {
+        let Some(end) = self.buffer.iter().position(|byte| *byte == b'\n') else {
+            return Ok(None);
+        };
         let mut line: Vec<u8> = self.buffer.drain(..=end).collect();
         line.pop();
         if line.last() == Some(&b'\r') {
             line.pop();
         }
-        Some(String::from_utf8_lossy(&line).into_owned())
+        String::from_utf8(line).map(Some)
     }
 
-    /// Whatever is buffered without a terminating newline, taken.
+    /// Whatever is buffered without a terminating newline, taken as UTF-8.
     ///
     /// For end-of-stream: a host that closed after a final line with no
-    /// newline still said something, and this is how it is heard.
-    pub fn take_partial(&mut self) -> Option<String> {
+    /// newline still said something, and this is how it is heard. Invalid
+    /// UTF-8 is returned as an error.
+    pub fn take_partial(&mut self) -> Result<Option<String>, std::string::FromUtf8Error> {
         if self.buffer.is_empty() {
-            return None;
+            return Ok(None);
         }
         let tail = std::mem::take(&mut self.buffer);
-        Some(String::from_utf8_lossy(&tail).into_owned())
+        String::from_utf8(tail).map(Some)
     }
 }
 
@@ -100,46 +103,95 @@ mod tests {
     fn a_line_split_across_two_pushes_arrives_once() {
         let mut lines = LineAssembler::default();
         lines.push(b"{\"id\":1,\"bo");
-        assert_eq!(lines.next_line(), None, "half a line is not a line");
+        assert_eq!(
+            lines.next_line().unwrap(),
+            None,
+            "half a line is not a line"
+        );
         lines.push(b"dy\":null}\n");
         assert_eq!(
-            lines.next_line().as_deref(),
+            lines.next_line().unwrap().as_deref(),
             Some("{\"id\":1,\"body\":null}")
         );
-        assert_eq!(lines.next_line(), None);
+        assert_eq!(lines.next_line().unwrap(), None);
     }
 
     #[test]
     fn two_lines_in_one_push_come_out_as_two() {
         let mut lines = LineAssembler::default();
         lines.push(b"a\nb\n");
-        assert_eq!(lines.next_line().as_deref(), Some("a"));
-        assert_eq!(lines.next_line().as_deref(), Some("b"));
-        assert_eq!(lines.next_line(), None);
+        assert_eq!(lines.next_line().unwrap().as_deref(), Some("a"));
+        assert_eq!(lines.next_line().unwrap().as_deref(), Some("b"));
+        assert_eq!(lines.next_line().unwrap(), None);
     }
 
     #[test]
     fn crlf_reads_the_same_as_lf() {
         let mut lines = LineAssembler::default();
         lines.push(b"a\r\nb\n");
-        assert_eq!(lines.next_line().as_deref(), Some("a"));
-        assert_eq!(lines.next_line().as_deref(), Some("b"));
+        assert_eq!(lines.next_line().unwrap().as_deref(), Some("a"));
+        assert_eq!(lines.next_line().unwrap().as_deref(), Some("b"));
     }
 
     #[test]
     fn an_empty_line_is_a_line() {
         let mut lines = LineAssembler::default();
         lines.push(b"\n");
-        assert_eq!(lines.next_line().as_deref(), Some(""));
+        assert_eq!(lines.next_line().unwrap().as_deref(), Some(""));
+    }
+
+    #[test]
+    fn invalid_utf8_in_a_descriptor_label_is_not_rewritten_before_decode() {
+        let mut lines = LineAssembler::default();
+        lines.push(
+            b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"A\xff\",\"projections\":[]}}}}\n",
+        );
+
+        assert!(
+            lines.next_line().is_err(),
+            "invalid UTF-8 in a completed line must be rejected before JSON decoding"
+        );
+    }
+
+    #[test]
+    fn invalid_utf8_in_an_eof_descriptor_tail_is_not_rewritten_before_decode() {
+        let mut lines = LineAssembler::default();
+        lines.push(
+            b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"A\xff\",\"projections\":[]}}}}",
+        );
+
+        assert!(
+            lines.take_partial().is_err(),
+            "invalid UTF-8 in an EOF tail must be rejected before JSON decoding"
+        );
+    }
+
+    #[test]
+    fn a_multibyte_character_split_inside_a_codepoint_survives_reassembly() {
+        let mut lines = LineAssembler::default();
+        lines.push(b"{\"label\":\"");
+        lines.push(&[0xe2, 0x82]);
+        assert_eq!(
+            lines.next_line().unwrap(),
+            None,
+            "a partial codepoint is not a line"
+        );
+        lines.push(&[0xac]);
+        lines.push(b"\"}\n");
+
+        assert_eq!(
+            lines.next_line().unwrap().as_deref(),
+            Some("{\"label\":\"€\"}")
+        );
     }
 
     #[test]
     fn the_unterminated_tail_is_taken_only_on_request() {
         let mut lines = LineAssembler::default();
         lines.push(b"unfinished");
-        assert_eq!(lines.next_line(), None);
-        assert_eq!(lines.take_partial().as_deref(), Some("unfinished"));
-        assert_eq!(lines.take_partial(), None, "taken once");
+        assert_eq!(lines.next_line().unwrap(), None);
+        assert_eq!(lines.take_partial().unwrap().as_deref(), Some("unfinished"));
+        assert_eq!(lines.take_partial().unwrap(), None, "taken once");
     }
 
     #[test]

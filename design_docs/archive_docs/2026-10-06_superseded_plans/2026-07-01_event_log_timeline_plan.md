@@ -1,7 +1,7 @@
 # Event log + Timeline (Alembic slice E)
 
 > **Superseded for implementation on 2026-08-03 by
-> [Graph View Curation and Interaction](../../mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md).**
+> [Graph View Curation and Interaction](../2026-10-28/2026-08-03_graph_view_curation_and_interaction_plan.md).**
 > `GraphJournal` now supplies the append-only attributed `CapturedDelta` replay
 > substrate this plan proposed as a new `GraphMutation` log, and Cambium now
 > supplies continuous pointer capture for the scrubber. The undo/restore
@@ -11,7 +11,7 @@
 **Date**: 2026-07-01
 **Status**: Superseded for implementation; retained as a historical decision
 record. Spun out of
-[alembic_implementation_plan](../../mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md) §E, per that plan's own flag
+[alembic_implementation_plan](../2026-10-28/2026-06-24_alembic_implementation_plan.md) §E, per that plan's own flag
 ("large enough that E may spin to its own plan once C and D land"). Slices A-D have since landed (C's
 by-sessions eviction and D's Athanor P1/P2 both shipped 2026-06-30/07-01); that made E ready when this
 historical plan was drafted, before the later replay and pointer substrates superseded its implementation.

@@ -20,7 +20,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use outrider::LxmfPayload;
 use pandect::station_grant::{SitedStationGrant, SitedStationGrantError, SitedStationGrantRequest};
-use pandect::{DeviceId, RemoteAuthRevocationOutcome};
+use personae::carry::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::reticulum::{ReticulumControllerMaterial, ReticulumStationMaterial};
 use personae::{IdentityError, IdentityProvider, SealedRecordStorage};
 use postilion::control::first_owner::{
@@ -692,7 +692,7 @@ async fn watch_station_lease(lease: SitedStationLease, station: Arc<Mutex<Option
 mod tests {
     use std::collections::VecDeque;
 
-    use pandect::DeviceId;
+    use personae::carry::DeviceId;
     use personae::InMemoryProvider;
 
     use crate::authority::test_support::TestWallet;

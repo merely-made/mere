@@ -7,7 +7,7 @@
 //! The dynamics grammar's G1 receipts over the physics catalog: every law,
 //! overlay and slot declares its terms, and seiche's instruments agree with
 //! each declared class on the P2 fixture and on a generated graph. Plan:
-//! `design_docs/mere_docs/implementation_strategy/2026-10-02_dynamics_grammar_plan.md`.
+//! `design_docs/archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md`.
 
 use std::rc::Rc;
 

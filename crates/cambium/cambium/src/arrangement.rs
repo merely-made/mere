@@ -14,7 +14,7 @@
 //! ride through. Fixed-height virtualization pairs this with
 //! [`sprigging::VirtualWindow`]: the container takes `total_height()` so the
 //! scroll range stays honest while only `range()` rows exist as DOM.
-//! Design: `design_docs/cambium_docs/implementation_strategy/2026-07-08_chisel_widget_catalog.md`.
+//! Design: `design_docs/archive_docs/2026-10-28/2026-07-08_chisel_widget_catalog.md`.
 
 use meristem::ViewSequence;
 use sprigging::Placement;

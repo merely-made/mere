@@ -47,6 +47,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{MAX_ENCODED_SNAPSHOT_BYTES, PublishedPageV1, PublishedSnapshotV1, SiteFormat};
 
+pub mod reader;
+
 pub const SNAPSHOT_SCHEMA_ID: &str = "mere.site-snapshot.v1";
 const SNAPSHOT_SCHEMA_BYTES: &[u8] = include_bytes!("snapshot-schema.json");
 
@@ -121,6 +123,15 @@ pub async fn open_binding<B: Backend + Clone>(
     binding: &SiteBindingV1,
     at_ms: u64,
 ) -> Result<OpenedSite, PublicationError> {
+    let selection = binding_selection(moot, binding, at_ms).await?;
+    open(moot, store, &selection, at_ms).await
+}
+
+async fn binding_selection<B: Backend + Clone>(
+    moot: &Moot<B>,
+    binding: &SiteBindingV1,
+    at_ms: u64,
+) -> Result<SiteSelection, PublicationError> {
     binding.validate()?;
     if binding.collection.moot_id != moot.moot_id().0 {
         return Err(refuse("The endpoint binding belongs to another Moot"));
@@ -149,16 +160,10 @@ pub async fn open_binding<B: Backend + Clone>(
             site
         },
     };
-    open(
-        moot,
-        store,
-        &SiteSelection {
-            collection: view.version,
-            contribution,
-        },
-        at_ms,
-    )
-    .await
+    Ok(SiteSelection {
+        collection: view.version,
+        contribution,
+    })
 }
 
 #[derive(Debug)]

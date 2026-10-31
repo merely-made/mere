@@ -130,7 +130,7 @@ Done conditions:
   after the field rename in `ports/djinn/tests/`.
 - **2026-09-02:** the Djinn receipts on windows-msvc link only with
   `mere-canvas` built non-incrementally, the rust-lang/rust#86049 shape the
-  [projection grammar plan](../../mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md)
+  [projection grammar plan](../2026-10-28/2026-08-15_projection_grammar_adoption_plan.md)
   already records; the raw invocation fails with 83 unresolved externals
   even from a cleaned target. Strict Clippy over Djinn's library also carries
   four pre-existing lints in `personal_sync.rs` and `resident_knot.rs` that

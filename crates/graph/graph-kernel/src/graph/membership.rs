@@ -49,6 +49,7 @@ impl Graph {
 
 #[cfg(test)]
 mod tests {
+    use super::super::snapshot::ResourceSnapshotError;
     use super::*;
     #[test]
     fn ordinary_edits_upserts_and_clones_keep_membership_but_recreation_does_not() {
@@ -172,7 +173,7 @@ mod tests {
         assert_eq!(graph.get_nodes_by_url(unrelated), vec![other]);
     }
     #[test]
-    fn copy_and_snapshot_onto_an_existing_id_keep_the_first_node_and_its_index() {
+    fn copy_onto_an_existing_id_keeps_the_first_node_and_a_repeated_snapshot_id_is_refused() {
         let mut graph = Graph::new();
         let id = Uuid::from_u128(5);
         let key = graph.add_node_with_id(id, "https://first.example".into(), Default::default());
@@ -202,20 +203,13 @@ mod tests {
         repeated.node_id = id.to_string();
         repeated.title = "Repeat".into();
         snapshot.nodes.push(repeated);
-        let restored = Graph::from_snapshot(&snapshot);
-        let (restored_key, node) = restored.get_node_by_id(id).unwrap();
         assert_eq!(
-            (node.url(), node.title.as_str()),
-            ("https://first.example", "https://first.example")
-        );
-        assert_eq!(
-            restored.get_nodes_by_url("https://first.example"),
-            vec![restored_key]
-        );
-        assert!(
-            restored
-                .get_nodes_by_url("https://repeat.example")
-                .is_empty()
+            Graph::try_from_snapshot(&snapshot).err(),
+            Some(ResourceSnapshotError::RepeatedSurfaceId {
+                surface_id: id,
+                first_index: 0,
+                index: 1
+            })
         );
     }
     #[test]

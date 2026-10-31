@@ -105,7 +105,7 @@ Three subtleties:
   p2panda prefix pruning may then remove the withdrawal with the older history.
   This avoids a permanent tombstone per statement while preserving
   anti-resurrection. See the
-  [deletion, retention, and native drop plan](../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md).
+  [deletion, retention, and native drop plan](../../archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md).
   Local-only statements collect freely; shared ones are CRDT-shaped. This is one
   reason the profile keeps provenance: you need a statement's reach before you can
   collect it.

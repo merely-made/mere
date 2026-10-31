@@ -4,7 +4,7 @@
 
 **Status**: Captured. This is the "before" the stable 0.22 migration gets diffed
 against — B0 items 4 and 5 of the
-[Burn 0.22 migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md),
+[Burn 0.22 migration plan](../../archive_docs/2026-10-28/2026-08-09_burn_0_22_migration_plan.md),
 taken **now** rather than after the bump, so nothing has to be reconstructed
 from memory once APIs have moved.
 

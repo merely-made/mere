@@ -7,7 +7,7 @@ counting Athanor P1 and engram-compose P1-P3 as done) are complete. The two item
 [engram_compose_merge_plan §Deferred follow-on](../../mere_docs/implementation_strategy/2026-06-25_engram_compose_merge_plan.md#deferred-follow-on-not-this-plan-parked-here--touches-the-same-file);
 section C (event log/Timeline, local-models harness) was already correctly deferred to its own future
 plans and needed no spin-out — both bullets already point at the docs that actually scope them
-([alembic_implementation_plan](../../mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md) §E,
+([alembic_implementation_plan](../2026-10-28/2026-06-24_alembic_implementation_plan.md) §E,
 [local_models_harness_brief](../../mere_docs/research/2026-06-24_local_models_harness_brief.md)).
 
 **Cross-cutting gotcha (read first).** Many chrome items below touch files Mark is editing concurrently
@@ -17,7 +17,7 @@ Commit with explicit pathspec or per-hunk `git apply --cached` so a bare commit 
 uncommitted work in. Verify the tree builds before starting (it has been building on his stable state).
 The items marked **[chrome-hot]** should wait until his chrome work commits, or be done with care.
 
-**Related:** [Alembic implementation plan](../../mere_docs/implementation_strategy/2026-06-24_alembic_implementation_plan.md) (slices + the full
+**Related:** [Alembic implementation plan](../2026-10-28/2026-06-24_alembic_implementation_plan.md) (slices + the full
 decision table), [local_models_harness_brief](../../mere_docs/research/2026-06-24_local_models_harness_brief.md) (the #4 lane).
 
 ---

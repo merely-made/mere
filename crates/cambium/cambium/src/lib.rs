@@ -33,6 +33,9 @@ mod backdrop_scene;
 mod command_menu_bar;
 mod command_surface;
 mod component;
+pub mod composition_scheduler;
+pub mod reactive_diagnostics;
+pub mod composition;
 pub use backdrop_scene::{BACKDROP_SCENE_CSS, BackdropSceneEvent, backdrop_scene_reading};
 mod context;
 mod controls;
@@ -47,6 +50,7 @@ mod disclosure;
 mod editor;
 mod element;
 mod event;
+mod events;
 mod file;
 mod focus;
 mod focus_request;
@@ -81,7 +85,9 @@ mod runner;
 mod sectioned_list;
 mod select;
 mod selection_bar;
+mod setting_row_managed;
 mod setting_row;
+mod setting_row_session;
 mod shell;
 mod slider;
 mod splice;
@@ -99,6 +105,8 @@ mod value;
 mod wheel;
 mod workspace;
 
+#[cfg(test)]
+mod event_layer_tests;
 #[cfg(test)]
 mod tests;
 
@@ -144,6 +152,11 @@ pub use hest::menu::{Command, CommandChoices, CommandSet, MenuSession};
 pub use hest::{EffectClass, Invocation, Outcome};
 pub use menu::{MENU_CLASS, MENU_ROW_ACTIVE_CLASS, MENU_ROW_CLASS, menu};
 pub use setting_row::setting_row;
+pub use setting_row_managed::{SettingRowEvent, setting_row_managed};
+pub use setting_row_session::{
+    SettingRowAckDisposition, SettingRowFailureKind, SettingRowObservation, SettingRowPhase,
+    SettingRowSession, SettingRowSnapshot,
+};
 // Re-export the grid's spec types from Sprigging so a host building a `data_grid`
 // needs no second direct `sprigging` dependency. The grid widget's home
 // is here; its column model rides along.
@@ -155,6 +168,7 @@ pub use controls::{
 };
 pub use element::{El, Element, ElementView, el};
 pub use event::{OnClick, OnClickState, PointerClick, clickable, on_click};
+pub use events::{CAMBIUM_OWNER, NativeOwner};
 pub use focus::{FocusEvent, FocusPhase, OnFocus, OnFocusState, on_focus};
 pub use focus_request::{FocusRequest, FocusRequestState, request_focus};
 pub use focusable::{Focusable, FocusableState, focusable, focusable_if};
@@ -179,6 +193,7 @@ pub use overlay_surface::{OverlayDismiss, OverlayRole, OverlaySurface, overlay_s
 pub use pod::{GenetElement, GenetElementMut};
 pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_pointer};
 pub use portable::{PortableKeyed, PortableKeyedState};
+mod retained_composition;
 mod retained_mount;
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, RadioOption, radio_group, radio_options};
@@ -187,6 +202,11 @@ pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
 pub use resize_handle::{RESIZE_HANDLE_CSS, ResizeBounds, ResizeHandleEvent, resize_handle};
+pub use retained_composition::{
+    ComponentRoute, ComponentRouteSnapshot, ErasedComponentView, LifecycleEvent,
+    LifecycleEventSink, LifecycleRefusal, RetainedComponentFactory, RetainedComposition,
+    RetainedState,
+};
 pub use retained_mount::{RetainedMount, RetainedMountView};
 pub use runner::{FocusExit, GenetAppRunner};
 pub use select::{SelectState, select};

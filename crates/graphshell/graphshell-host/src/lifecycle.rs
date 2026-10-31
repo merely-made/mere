@@ -19,14 +19,19 @@
 //! here, in the application, and reaches the client only through the mutators
 //! the client already exposed.
 //!
-//! ## A reconnect is a new admission
+//! ## A reconnect is a new admission when the link or the nonce is fresh
 //!
 //! [`projection_session`] derives the session id from
-//! `AdmittedPrincipal::session_id`, which is transcript-bound. A client
-//! therefore cannot name the session it mounts under: reconnecting produces a
-//! different id, so cached scenes from a previous admission are unreachable by
-//! construction rather than by a rule someone has to enforce. Resume within
-//! one admission stays exactly as G2 built it.
+//! `AdmittedPrincipal::session_id`, the transcript digest over the client's
+//! nonce, the subject, the transport identity and the shared link. A client
+//! therefore cannot name the session it mounts under, and a reconnect over a
+//! fresh link or with a fresh nonce lands on a different id, so cached scenes
+//! from a previous admission are unreachable without a rule someone has to
+//! enforce. Freshness comes from the carrier's link or the client: the WebRTC
+//! carrier mixes a fresh host nonce into the link on every join, and on a
+//! carrier without one a reused nonce lands on the same session. Admission
+//! keeps no replay state. Resume within one admission stays exactly as G2
+//! built it.
 //!
 //! ## Why the chain is retained
 //!
@@ -54,14 +59,15 @@ use crate::admission::{CONNECT_ACTION, PROJECTION_SERVICE};
 /// client, so a cached scene cannot be re-mounted under an authority that did
 /// not earn it.
 ///
-/// Distinctness is the *client's* to maintain, and the responder does not
-/// enforce it. `session_id` is a digest of the transcript, the transcript
-/// carries the client's nonce, and nothing checks that a nonce is fresh. Two
-/// admissions of the same subject reusing one nonce therefore land on the same
-/// projection session. That is not an authority hole, because the transcript
-/// binds the subject and a peer can only collide with itself, but a client
-/// mounting two projections in one `ClientState` must mint per-session
-/// randomness or the second silently replaces the first.
+/// Distinctness comes from the carrier's link or the client, and the responder
+/// does not enforce it. `session_id` is a digest of the transcript, the
+/// transcript carries the client's nonce and the shared link, and nothing
+/// checks that either is fresh. Two admissions of the same subject reusing one
+/// nonce over one link therefore land on the same projection session. That is
+/// not an authority hole, because the transcript binds the subject and a peer
+/// can only collide with itself, but a client mounting two projections in one
+/// `ClientState` must mint per-session randomness or the second silently
+/// replaces the first.
 pub fn projection_session(principal: &AdmittedPrincipal) -> ProjectionSession {
     use base64::Engine;
     ProjectionSession(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(principal.session_id))
@@ -333,14 +339,15 @@ fn purges_on(policy: &CachePolicy) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::admission::GRAPHSHELL_DOMAIN;
+    use crate::admission::{GRAPHSHELL_DOMAIN, PROJECTION_PROTOCOL, admit_session, open_session};
+    use crate::carrier::projection_policy;
     use chirograph::{PresentationManifest, ProjectionSnapshot, ProtocolVersion, SceneSnapshot};
     use insigne::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationRevocation,
     };
     use notochord::{
-        CarrierKind, HandshakeLimits, NetworkId, ProfileRef, RequestedAction, SessionClaims,
-        SessionFacts, TrafficClass,
+        CarrierKind, HandshakeLimits, LocalNetworkPolicy, NetworkId, ProfileRef, ProofBinding,
+        RequestedAction, SessionClaims, SessionFacts, TrafficClass, TrustedRoot,
     };
     use personae::IdentityProvider;
     use personae::InMemoryProvider;
@@ -468,22 +475,84 @@ mod tests {
 
     // --- reconnect ------------------------------------------------------
 
-    #[test]
-    fn a_reconnect_is_a_new_session_the_client_cannot_name() {
-        let first = authority_at(PROJECTION_SERVICE, [21; 32]);
-        let second = authority_at(PROJECTION_SERVICE, [22; 32]);
-        assert_ne!(
-            first.session(),
-            second.session(),
-            "a second admission must not land on the first session's id"
+    fn profile() -> ProfileRef {
+        ProfileRef {
+            id: "mere.base".into(),
+            revision: 1,
+        }
+    }
+
+    fn policy() -> LocalNetworkPolicy {
+        projection_policy(
+            NetworkId(NETWORK),
+            vec![TrustedRoot {
+                authority: ROOT_AUTHORITY,
+                issuer: owner().master_public_key().to_bytes(),
+            }],
+            vec![profile()],
+            None,
+        )
+    }
+
+    /// The viewer's signed hello carrying `nonce`, bound to `link`.
+    fn hello_over(link: [u8; 16], nonce: [u8; 32]) -> Vec<u8> {
+        let binding = ProofBinding::initiator(PROJECTION_PROTOCOL, None, Some(link));
+        open_session(
+            &viewer(),
+            NetworkId(NETWORK),
+            profile(),
+            TrafficClass::Interactive,
+            nonce,
+            &binding,
+            vec![grant(PROJECTION_SERVICE)],
+        )
+        .expect("issue hello")
+        .encode(&policy().limits.clamped())
+        .expect("encode hello")
+    }
+
+    /// Admit `hello` on a carrier that reports `link`.
+    fn admitted_over(hello: &[u8], link: [u8; 16]) -> SessionAuthority {
+        let facts = SessionFacts::new(PROJECTION_PROTOCOL, CarrierKind::Other)
+            .with_ingress(None, Some(link));
+        let (_, outcome) = admit_session(
+            &policy(),
+            &RevocationLedger::default(),
+            hello,
+            &facts,
+            NOW_MS,
+            0,
         );
+        let principal = outcome.expect("the hello is admitted");
+        SessionAuthority::retain(principal, vec![grant(PROJECTION_SERVICE)])
+    }
+
+    #[test]
+    fn a_reconnect_is_a_new_session_when_the_link_or_the_nonce_is_fresh() {
+        let (link, fresh_link) = ([1; 16], [2; 16]);
+        let hello = hello_over(link, [5; 32]);
+
+        // Admission keeps no replay state: one hello over one link is one
+        // session, however many times it is admitted.
+        let first = admitted_over(&hello, link);
+        assert_eq!(
+            first.session(),
+            admitted_over(&hello, link).session(),
+            "a reused nonce over a reused link lands on the same session"
+        );
+
+        // The proof binds both, so each fresh case is a newly signed hello.
+        let relinked = admitted_over(&hello_over(fresh_link, [5; 32]), fresh_link);
+        let renonced = admitted_over(&hello_over(link, [6; 32]), link);
+        assert_ne!(first.session(), relinked.session());
+        assert_ne!(first.session(), renonced.session());
 
         // The point of deriving the id: state cached under the first session
         // is unreachable from the second, without anyone enforcing a rule.
         let mut client = ClientState::default();
         mount(&mut client, first.session(), CachePolicy::default());
         assert!(client.mounted(first.session()).is_some());
-        assert!(client.mounted(second.session()).is_none());
+        assert!(client.mounted(relinked.session()).is_none());
     }
 
     #[test]

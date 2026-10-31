@@ -1,7 +1,7 @@
 # Orrery Browser Lane Plan (capture-first)
 
 **Status (2026-10-06):** superseded 2026-07-27 by the
-[Graphshell reference host plan](../../mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md) (the banner
+[Graphshell reference host plan](../2026-10-28/2026-07-27_graphshell_reference_host_plan.md) (the banner
 below); evidence only. The v1 extension shipped as Graphshell H5
 (`ports/graphshell/web/extension/`, receipt
 `ports/graphshell/docs/2026-07-28_h5a_browser_storage_capture_core_receipt.md`).
@@ -15,7 +15,7 @@ companion / smolweb / p2p / federation half of that plan stands as the forward
 vision; this plan is the shippable **v1 with no native sync**.
 
 **Product framing superseded 2026-07-27** by the
-[Graphshell reference host plan](../../mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md).
+[Graphshell reference host plan](../2026-10-28/2026-07-27_graphshell_reference_host_plan.md).
 The capture API and browser-delivery findings below remain evidence; Graphshell,
 not the former orrery/Merecat framing, owns the extension and PWA product.
 
@@ -118,7 +118,7 @@ layer** is the underlay (edges / fields) in the WebGPU Scene.
 - `genet-extract`, the capture's content half (render-free; depends only on
   `layout-dom-api`, no engine rides in).
 - `glossary` (`outline_djot` / `graph_metrics`, the
-  [gloss outline lens](../../mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md)), feeds the sidebar.
+  [gloss outline lens](../2026-10-28/2026-06-23_gloss_outline_lens_plan.md)), feeds the sidebar.
 - `netrender`, lowers the underlay Scene to WebGPU; the relational neighborhood is
   the [relational-browse](../2026-08-06_completed_plans/2026-06-23_relational_browse_graphlet_plan.md) link graph.
 
@@ -195,7 +195,7 @@ Nova/Boa, the companion (deferred with sync).
   sidesteps; the actor-per-origin substrate).
 - [eidetic Phase 7](../2026-10-11_superseded_plans/2026-06-09_eidetic_deferred_phases_plan.md)
   (the OPFS Store this lane activates; gates measured, pack small blobs).
-- [gloss outline lens](../../mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md),
+- [gloss outline lens](../2026-10-28/2026-06-23_gloss_outline_lens_plan.md),
   [relational browse](../2026-08-06_completed_plans/2026-06-23_relational_browse_graphlet_plan.md),
   [node-body/face](../../mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md),
   [document-script substrate](../2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md)

@@ -69,7 +69,7 @@ Sibling / converging docs:
 - [modular_integration_plan](2026-06-02_modular_integration_plan.md) — orrery/workbench/gloss
   as projections of graph truth; representation + arrangement are how the orrery projection
   draws.
-- [scriptable_field_regions_plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) — a field region
+- [scriptable_field_regions_plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md) — a field region
   is a placed spatial rule region whose rhai rules govern forces, edge-visibility, and node
   *layout* (arrangements) inside its extent. It owns the localized + scripted half of
   arrangement (and the "scripted" representation form shares its rhai substrate); this plan owns
@@ -98,7 +98,7 @@ and behavior; its *presentation* is experience-derived, and should be free:
   over an open set of forms.
 - **Arrangement** — how nodes position relative to each other. This substrate is mature: the
   `crates/orrery/arrangements` *(historical citation)* <!-- doc-audit: historical-path --> registry + `apply_strategy_positions` apply a scene arrangement
-  each frame, and the [scriptable field regions plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md)
+  each frame, and the [scriptable field regions plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md)
   adds placed, scripted, localized arrangement rules. The delta for the vision (a scene picks an
   arrangement, nodes assume and keep assuming it, customizable) is mostly UX + per-scene
   persistence, tracked here; the scripted/localized half is owned by the field-regions plan.
@@ -191,7 +191,7 @@ the "scene picks an arrangement, nodes follow it" vision and points at the owner
   active arrangement's positions. Because it runs every frame, nodes already *follow* the
   arrangement as the graph changes (a no-op under force-directed, a live overlay under a strategy).
 - **Localized + scripted arrangement is owned elsewhere.** The
-  [scriptable field regions plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md): a field region is
+  [scriptable field regions plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md): a field region is
   a placed spatial rule region whose rhai rules select an arrangement (from this same family) for
   the nodes in its extent, beside forces (gyre couplings) and edge-visibility. That plan owns
   placement, the rhai rule surface, and per-region scoping.
@@ -249,7 +249,7 @@ data) plus targeted reads.
   phyllotaxis / grid / penrose / lsystem, `cartography_scene.rs:150`); semantic / timeline / kanban
   exist as adapters but are unwired (their input signals are not yet plumbed). So Decision 7's
   "wire semantic next, then timeline / kanban" is exposing built layouts, not authoring them. The
-  [scriptable field regions plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md) extends it: a placed
+  [scriptable field regions plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md) extends it: a placed
   field region's rhai rules scope an arrangement (+ forces + edge-visibility) to the nodes in its
   extent. So arrangement is largely built; the delta for the scene-wide vision is UX + per-scene
   persistence, not mechanism. The cartography seam doc models the live orrery as a rapier object
@@ -353,7 +353,7 @@ plan already cover the mechanism and the localized/scripted surface). Confirm an
 for the scene-wide vision: a per-scene *persisted* arrangement choice (re-applies on reopen), the
 dynamic-follow semantics under the per-frame overlay, and the per-scene customization surface.
 Localized + scripted arrangement defers to the
-[scriptable field regions plan](../../mere_docs/implementation_strategy/2026-06-13_scriptable_field_regions_plan.md).
+[scriptable field regions plan](../2026-10-28/2026-06-13_scriptable_field_regions_plan.md).
 
 Done when a scene's arrangement persists and re-applies on reopen, holds as nodes/edges arrive,
 stays draggable, and is user-selectable per scene.

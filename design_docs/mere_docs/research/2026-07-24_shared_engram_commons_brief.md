@@ -20,9 +20,9 @@ The substrate for a shared, encrypted, permissioned graph already exists or
 is in flight: codicil holds per-writer append-only logs, chartulary holds the
 container graph with the GraphJournal edit spine, muniment stores it, murm
 replicates it (the
-[peer runtime plan](../implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+[peer runtime plan](../../archive_docs/2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
 and the
-[deletion/retention plan](../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md)),
+[deletion/retention plan](../../archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md)),
 retinue and p2panda carry it, personae proves authority, gemot owns
 membership. A sibling product embedding a shared graph later would pull these
 same crates; there is no commons crate to found.
@@ -35,7 +35,7 @@ What makes a graph communal is three declarations over that substrate:
 2. **a replication policy for those classes**: what syncs to whom, under
    which privacy selection and byte budgets (stickleback's
    selector/budget seam; V10 of the
-   [managed-network plan](../implementation_strategy/2026-07-24_low_power_managed_network_plan.md));
+   [managed-network plan](../../archive_docs/2026-10-28/2026-07-24_low_power_managed_network_plan.md));
 3. **membership and moderation**: gemot for who belongs, personae delegation
    for what each member may do, revocation as the moderation primitive.
 
@@ -136,7 +136,7 @@ Commons model.
 
 Calls remain their own product, built inside a Commons rather than folded into
 chat replication. The
-[calls plan](../implementation_strategy/2026-07-27_commons_calls_plan.md)
+[calls plan](../../archive_docs/2026-10-28/2026-07-27_commons_calls_plan.md)
 uses a retained Commons invitation to find an admitted live Notochord session,
 then keeps presence, media control, and carrier quality ephemeral. IP is the
 first live-audio bearer. Reticulum and direct PHY carry invitations, terminal

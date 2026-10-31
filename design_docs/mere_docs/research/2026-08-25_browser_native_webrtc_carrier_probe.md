@@ -188,7 +188,7 @@ feed, update channel, or executable.
 
 This pulls the release-reference and verification half of Luggage's P2P
 direction forward. General peer distribution remains later. The current
-[Djinn resident plan](../implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md)
+[Djinn resident plan](../../archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md)
 already owns the prerequisite that a staged Luggage offer persist and reverify
 the signed manifest, application id, target, version, artifact signature, and
 digest without retaining an ephemeral feed response.

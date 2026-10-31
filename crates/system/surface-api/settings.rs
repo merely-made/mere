@@ -11,6 +11,14 @@
 
 use workbench::SettingsRef;
 
+mod revisioned;
+pub use revisioned::{
+    CommittedSettingsWrite, RevisionedSettingSpec, RevisionedSettingsProvider,
+    RevisionedSettingsSnapshot, RevisionedSettingsWriteRequest, RevisionedWriteOutcome,
+    SettingsDomainRevision, SettingsOwnerIncarnation, SettingsRevisionDomain,
+    SettingsRevisionGuard, SettingsStorageFailure, SettingsUnavailable, SettingsValidationFailure,
+};
+
 /// The thing whose behavior the setting configures.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SettingScope {

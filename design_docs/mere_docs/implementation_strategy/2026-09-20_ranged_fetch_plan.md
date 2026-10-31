@@ -7,10 +7,10 @@
 The research, probes and rulings stay there; this plan owns the work.  
 **Companions:** the [netfetcher plan](../../archive_docs/2026-06-09_completed_plans/2026-05-25_netfetcher_plan.md)
 (Mere owns networking, hosts run the fetcher, Genet consumes bytes), the
-[session store plan](2026-06-23_native_session_store_plan.md) (one session
+[session store plan](../../archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md) (one session
 substrate per persona), the [engine profile boundary plan](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md)
 (a session's profile binding is persona, session or graph scoped), the
-[net-media plan](2026-05-26_net_media_plan.md) (the likely second consumer), and
+[net-media plan](../../archive_docs/2026-10-28/2026-05-26_net_media_plan.md) (the likely second consumer), and
 the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).
 Cross-repo: `woodshed/design_docs/2026-09-01_listening_annotation_port_plan.md`
 and `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` gate 1.
@@ -115,6 +115,45 @@ so that it can answer a range from a stored body. The page-side media element.
 - The fetch crate is published (`mere-fetch` 0.0.1). Making existing behaviour a
   default-on feature is additive; removing a default later would not be.
 
+## Received 2026-10-28: the session and storage substrate
+
+The native session store plan (`archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md`,
+archived whole in the 2026-10-28 cut) left these open; this plan owns them now,
+beside lane T2, because the jar, the persona partitioning and the fetch worker
+are one substrate (`crates/system/fetch`, Turnstone's cookie custody).
+
+- No production `CookieProvider` is wired in mere, genet or Turnstone (genet's
+  two are test-only), so script cookie writes cannot reach the jar.
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:12-13,191-196`
+- Open question the old plan asked and nothing answered: is the persist-trigger
+  item done, since Turnstone flushes each drain, or open until a script
+  `CookieProvider` is wired and a JS-set cookie is shown to survive restart?
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:213-215`
+- Netfetcher's `set_cookie` is source-agnostic, so script could set HttpOnly; a
+  `CookieSource` argument is wanted (low priority).
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:204-206`
+- A host `StorageProvider` over eidetic keyed `(persona, origin)` on the
+  scripted page runtime; the engine seam exists, the host half does not.
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:161-168`
+- Flip-back SESSION import (`FlipBack::extract` reading WebView cookies into
+  `BackState.cookies`, `FlipReceiver` applying them to `session_jar()`), gated on
+  flip-back existing, which is the presentation engines plan's
+  (`inker_docs/implementation_strategy/2026-10-28_presentation_engines_plan.md`).
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:217-224`
+- The per-persona in-memory jar registry (`HashMap<PersonaId,
+  Arc<InMemoryCookieJar>>`) and threading the persona to the fetch worker; the
+  live persona-switch jar swap follows it.
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:226-240,138-140`
+- `Partitioned` and top-level-site (CHIPS) refinements: the jar does not track
+  `Partitioned`. From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:13-14,257-258`
+- The HttpOnly access gate is not wired to a script reader; the Cookie Store API
+  and the Storage Access API are "not yet", and sessionStorage, IndexedDB and the
+  Cookie Store API stay separate standards items.
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:88-92,167-168,289-290`
+- Out of scope, carried as the old plan ruled it: deliberate cross-persona use
+  would be an explicit authenticated bridge.
+  From: `archive_docs/2026-10-28/2026-06-23_native_session_store_plan.md:239-240`
+
 ## Progress
 
 - **2026-09-20:** plan written from the R3 rulings; D1 to D7 decided the same day.
@@ -155,7 +194,7 @@ so that it can answer a range from a stored body. The page-side media element.
     gone.
   - **Lane F merged to main by fast-forward and pushed with Mark's sign-off**
     (`c0463e98`, `ba4f4951`, `e35898d1`). Lanes R, T and I pin from here; their
-    pin moves belong with the [lattice sync pass](2026-09-16_lattice_sync_pass_plan.md),
+    pin moves belong with the [lattice sync pass](../../archive_docs/2026-10-28/2026-09-16_lattice_sync_pass_plan.md),
     which owns cross-repo revisions.
 - **2026-09-22:** `Stores` gains a `transport` slot (`None` is netfetcher's
   direct HTTP). Found in the R3 assessment: without it the reachability plan's

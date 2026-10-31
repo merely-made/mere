@@ -47,7 +47,7 @@ belongs to the notification/toast subsystem plus the pin-vs-drag-out gesture spl
 **Corrected 2026-10-06 (S14 pass):** the
 [notification subsystem plan](../2026-09-02_retired_plans/2026-06-27_notification_subsystem_plan.md)
 was retired on 2026-09-02; its Phase 0 foundation left with meerkat and its model is
-carried in the [archived plan tails](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md). The
+carried in the [archived plan tails](../2026-10-28/2026-07-03_archived_plan_tails_plan.md). The
 ambiguous drag has no live home outside this plan.
 
 Both triggers queue the now-built `TearOut { node, from }`. Spun out of the

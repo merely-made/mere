@@ -130,7 +130,7 @@ rule; read them as the pre-rename vocabulary.
 
 **Corrected 2026-10-06 (S14 pass):** titulus was folded back into chirograph
 in `83feb122` (2026-09-23, recorded in the
-[crate consolidation plan](../../mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md)). At mere
+[crate consolidation plan](../2026-10-28/2026-09-23_crate_consolidation_plan.md)). At mere
 `535bca11` there is no titulus crate, only `crates/chirograph/src/titulus.rs`;
 castellan imports the cards from chirograph (`ports/castellan/src/projection.rs`,
 line 21), and chirograph is at 0.0.2.

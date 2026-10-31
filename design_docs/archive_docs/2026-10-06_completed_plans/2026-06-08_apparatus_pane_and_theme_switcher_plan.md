@@ -8,7 +8,7 @@ switcher and apparatus pane; A2, orrery theming), retired with it 2026-07-18
 `PersistedSettings.theme_id` in `crates/system/pandect/src/settings_store.rs`;
 open, with no current host: A3 (fold the settings overlay into apparatus) and
 per-theme high-contrast node fills. Theme modes now have their own
-[theme modes plan](../../mere_docs/implementation_strategy/2026-07-05_theme_modes_plan.md), which does not claim to
+[theme modes plan](../2026-10-28/2026-07-05_theme_modes_plan.md), which does not claim to
 replace this one.
 **Related**: [frame tree in meerkat](../2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md) (the pane substrate), [graph roster + frame taxonomy](../../mere_docs/design/2026-06-07_graph_roster_and_frame_taxonomy.md) (apparatus = the system pane; settings folds into it), `register-theme` (the tokens), `apparatus` crate (uxtree skeleton).
 

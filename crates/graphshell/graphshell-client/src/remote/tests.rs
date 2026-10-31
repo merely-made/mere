@@ -764,3 +764,32 @@ fn local_actions_are_listed_and_run_by_the_host_never_the_carrier() {
     pump(&mut remote, &mut board);
     assert_eq!(cards(&remote), 2);
 }
+
+/// A second draft submitted while the first awaits its answer is refused by
+/// the core before anything is sent. The adapter keeps owning the first
+/// operation, so all three layers still agree and the first answer completes.
+#[test]
+fn a_refused_draft_leaves_the_adapters_pending_as_it_was() {
+    let (mut remote, mut board) = mounted();
+    remote.invoke_action(index_of(&remote, APPEND));
+    assert_eq!(remote.pending(), Some(RemoteOp::Invoke));
+    assert_eq!(remote.form.count, 1);
+    remote.take_events();
+
+    remote.submit_draft();
+    assert_eq!(remote.pending(), Some(RemoteOp::Invoke));
+    assert_eq!(remote.status(), "open", "the link is not at fault");
+    assert!(
+        remote.form.status.contains("awaiting"),
+        "{}",
+        remote.form.status
+    );
+    assert_eq!(remote.form.count, 1, "the refused draft was not sent");
+    assert_eq!(remote.take_events().len(), 1, "one error line, no resume");
+
+    pump(&mut remote, &mut board);
+    assert_eq!(board.count("intent"), 1);
+    assert_eq!(remote.form.status, "Accepted · 1 invocation(s)");
+    assert_eq!(cards(&remote), 2);
+    assert!(!remote.in_flight());
+}

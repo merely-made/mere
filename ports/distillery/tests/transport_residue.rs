@@ -18,7 +18,7 @@
 //!
 //! No libtest harness: the allocator is process-wide.
 
-#[path = "../../djinn/castellan/tests/residue/mod.rs"]
+#[path = "../../mere-resident/castellan/tests/residue/mod.rs"]
 mod residue;
 
 use std::path::Path;

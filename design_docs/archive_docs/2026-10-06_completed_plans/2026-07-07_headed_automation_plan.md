@@ -13,7 +13,7 @@ scenario work is graphshell's `ports/graphshell/src/web_scenario.rs` and the `.s
 scheme to let one *scenario* run either way.
 **Related**: the [meerkat one-state migration (archived)](../2026-07-07_one_state_migration/2026-07-06_meerkat_one_state_migration_plan.md)
 (whose Slice 3 headed check surfaced this); the mod-authoring loop's
-[snapshot-in/action-out automation](../../mere_docs/implementation_strategy/2026-06-30_runtime_mod_authoring_loop_plan.md)
+[snapshot-in/action-out automation](../2026-10-28/2026-06-30_runtime_mod_authoring_loop_plan.md)
 (user-facing Rhai packs — adjacent, not the dev harness).
 
 ## The finding: two automation subsystems, different layers

@@ -3,7 +3,7 @@
 **Date:** 2026-10-08
 **Status:** open: waiting for graph semantics' owner, to whom Mark hands it.
 **For:** graph semantics' owner (the Codex agent on the ThinkPad, per the Scenograph editor plan's SE74), handed over by Mark.
-**From:** the Scenograph editor lane. Rulings quoted are in [the Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md), SE71, SE72 and SE75.
+**From:** the Scenograph editor lane. Rulings quoted are in [the Scenograph editor plan](../../archive_docs/2026-10-28/2026-10-07_scenograph_editor_plan.md), SE71, SE72 and SE75.
 
 ## What Mark ruled
 

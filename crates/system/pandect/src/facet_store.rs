@@ -19,7 +19,7 @@
 //!
 //! ```text
 //! <sessions_dir>/<session_id>/
-//! ├── graph.json               ← session_graph_store
+//! ├── graph.json               ← GraphSession
 //! ├── browser_nodes.json       ← browser_node_state   (web.* facets, later)
 //! ├── denizen_bindings.json    ← denizen_bindings     (denizen.* facets, later)
 //! └── facets.json              ← this module

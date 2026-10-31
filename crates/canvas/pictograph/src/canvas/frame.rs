@@ -392,10 +392,11 @@ impl Canvas {
                 .collect()
         };
         let stage_node = self.stage_node;
+        let stage_style = self.stage_style.as_str();
         let mut badge_nodes = std::mem::take(&mut self.fold_badge_nodes);
         observer.mark(3);
         let (_, restyle) = self.node_document.mutate_dom(|dom| {
-            set_style(dom, stage_node, "transform: translate(0px, 0px) scale(1);");
+            set_style(dom, stage_node, stage_style);
             for (gnode, style, class) in &gnode_updates {
                 set_style(dom, *gnode, style);
                 if let Some(class) = class {

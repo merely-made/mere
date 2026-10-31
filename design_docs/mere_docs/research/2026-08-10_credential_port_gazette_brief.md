@@ -117,7 +117,7 @@ product claim.
 
 ### The name and the vocabulary (ratified 2026-08-10, same day)
 
-The port is **castellan** (claimed, 0.0.1; now at `ports/djinn/castellan`): the keeper
+The port is **castellan** (claimed, 0.0.1; now at `ports/mere-resident/castellan`): the keeper
 who holds a keep in trust for its lord, custody without ownership, the office
 of the gate. Tiring-house is retired (its meaning, where the costume is
 donned, was always personae's). Two register siblings were promoted from

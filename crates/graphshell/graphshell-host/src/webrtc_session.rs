@@ -145,9 +145,12 @@ impl JoinConclusion {
 /// Run the host side of the join over one connected channel.
 ///
 /// `client_fingerprint` and `server_fingerprint` are this connection's, read
-/// off the carrier after DTLS; `channel_label` likewise. On every refusing
-/// path the refusal is written to the peer before this returns, so the caller
-/// only has to close the channel, not explain it.
+/// off the carrier after DTLS; `channel_label` likewise. A refusal is written
+/// to the peer before this returns, so the caller only has to close the
+/// channel, not explain it: an unknown invitation, a failed redemption, and an
+/// admission denial, including an action the owner allows and this host does
+/// not serve. A message out of sequence or a broken channel returns its error
+/// unannounced.
 #[allow(clippy::too_many_arguments)]
 pub async fn host_join<P: IdentityProvider, F: JoinFrames>(
     frames: &mut F,
@@ -236,8 +239,9 @@ pub async fn host_join<P: IdentityProvider, F: JoinFrames>(
     }
 
     // Hello and reply: Notochord admission, bytes in and bytes out, exactly
-    // as the door declares. The reply travels on the deny path too — that is
-    // the "write the refusal, then close" rule.
+    // as the door declares. The reply travels on the deny path too, whether the
+    // owner's rule or the host's vocabulary denied — that is the "write the
+    // refusal, then close" rule.
     let hello = recv_binary(frames, "a Notochord hello").await?;
     let shared_link = challenge.shared_link();
     let (reply, outcome) =

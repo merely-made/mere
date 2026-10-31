@@ -112,6 +112,7 @@ pub mod predicate_declarations;
 pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
+mod resource_pair_bounds;
 pub mod resource_classifications;
 pub mod resource_content;
 #[cfg(test)]
@@ -155,6 +156,7 @@ pub use identity::{
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
 pub use assertion_write::StatementWriteError;
+pub use edge_ops::Retraction;
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
 pub use predicate_declarations::{
@@ -170,8 +172,7 @@ pub use resource::ResourceNode;
 // (`kernel::graph::NodeNavigationMemory`, etc.) keep resolving.
 pub use history::{
     NodeHistoryBranchAlternative, NodeHistoryBranchProjection, NodeHistoryBranchVisit,
-    NodeHistoryOwner, NodeHistoryProjection, NodeHistorySemanticSummary, RecentVisit,
-    SharedNavigationMemory,
+    NodeHistoryOwner, NodeHistoryProjection, NodeHistorySemanticSummary, SharedNavigationMemory,
 };
 pub use navigation_check::NavigationIndexError;
 
@@ -376,8 +377,12 @@ pub struct Graph {
     /// beside the node/edge petgraph. A coupling targets a *selector* over nodes,
     /// not a node→node edge, so fields/couplings cannot ride the petgraph; they
     /// are content truth that numen reads and evaluates (derived).
-    pub(crate) fields: HashMap<FieldId, Field>,
-    pub(crate) couplings: HashMap<CouplingId, Coupling>,
+    ///
+    /// Ordered by id (the inner UUID, which orders as its canonical string
+    /// does; `FieldId` and `CouplingId` carry no `Ord`), so every read and
+    /// every snapshot sees one order.
+    pub(crate) fields: BTreeMap<Uuid, Field>,
+    pub(crate) couplings: BTreeMap<Uuid, Coupling>,
 
     /// The graph's whole navigation history: one shared visit space, one owner
     /// per node (the (b) anchor design). In-place navigation extends a node's own
@@ -453,8 +458,8 @@ impl Graph {
             facets: chartulary::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
-            fields: HashMap::new(),
-            couplings: HashMap::new(),
+            fields: BTreeMap::new(),
+            couplings: BTreeMap::new(),
             nav: SharedNavigationMemory::empty(),
             revision: 0,
             url_grouping_revision: 0,
@@ -507,6 +512,11 @@ impl Graph {
     /// the visited node's [`Node::last_session_visited`] with this value.
     pub fn set_current_session(&mut self, session: u64) {
         self.current_session = session;
+    }
+
+    /// The launch number [`set_current_session`](Self::set_current_session) installed.
+    pub fn current_session(&self) -> u64 {
+        self.current_session
     }
 
     /// The current structural revision (see [`revision`](Self::revision)). A consumer captures it
@@ -578,7 +588,9 @@ impl Graph {
     //   1. Ordinary primitive mutations (topology, relations, nav history, tags,
     //      titles, body, media, classifications, properties, predicates,
     //      fields/couplings, frame hints, import records) — `pub(crate)`,
-    //      reached externally only via `GraphDelta`.
+    //      reached externally only via `GraphDelta`. Navigation has one primitive
+    //      per operation (`navigate_node`, `branch_history`, `node_history_back`,
+    //      `node_history_forward`) under both the live and the replay arm.
     //   2. Public native assertion/declaration writes: `assertion_write` and
     //      `predicate_declarations`, with their own capture emission.
     //   3. Compound kernel operations stay `pub`: `from_snapshot`,
@@ -590,8 +602,10 @@ impl Graph {
     //      host wiring). Webview runtime state left the kernel entirely
     //      (`BrowserNodeState` sidecar, boundary pass slice C).
     //   5. Test fixtures: the `fixtures` cargo feature re-exposes the raw
-    //      mutators via `graph::fixtures::GraphFixtures` — dev-dependencies
-    //      only, never a production enable.
+    //      structural mutators via `graph::fixtures::GraphFixtures` —
+    //      dev-dependencies only, never a production enable. Navigation is not
+    //      among them: a fixture graph navigates through `GraphDelta`, so it
+    //      carries what a live navigation leaves.
 
     /// The fixed namespace for the deterministic node id (see
     /// [`node_namespace_id`](Self::node_namespace_id)). Fixed forever: changing it
@@ -693,8 +707,14 @@ impl Graph {
         }
     }
 
-    /// Update a node's Primary URL, maintaining the url_to_nodes index.
+    /// Write a node's primary address, maintaining the url_to_nodes index.
     /// Returns the old URL, or None if the node doesn't exist.
+    ///
+    /// The one writer of the address. `SetNodeUrl` calls it alone, changing the
+    /// address with no visit; [`navigate_node`](Self::navigate_node) calls it
+    /// after recording the visit, and a history step after moving the cursor
+    /// (`land_history_step`). The Stemma cursor is the browse trail's position,
+    /// not the address; see the `history` module.
     ///
     /// Operates on the Primary claim only; aliases (when supported) stay
     /// attached. To mutate aliases, use dedicated alias methods (future).
@@ -765,52 +785,72 @@ impl Graph {
     }
 
     /// Navigate `key` in place to `url`: record the visit in the node's own
-    /// browse history (a forward-fork if the cursor had stepped back) and update
-    /// its Primary URL. No new node and no edge — the node is a browsing surface
-    /// whose content changes; the graph shape does not. Cross-node lineage
-    /// (the navigated-from relation) is a separate, explicit edge.
-    pub(crate) fn navigate_node(&mut self, key: NodeKey, url: &str) {
-        let at_ms = Self::epoch_ms();
-        if let Some(id) = self.inner.node(key).map(|n| n.id) {
-            self.nav
-                .record_visit(id, url, chartulary::stemma::TransitionKind::UrlTyped, at_ms);
-        }
-        self.set_node_last_session_visited(key, self.current_session);
+    /// browse history (a forward-fork if the cursor had stepped back), write
+    /// `url` as its primary address, and stamp its recency at `at_ms` and its
+    /// session. A visit moves the trail and the address together; `SetNodeUrl`
+    /// moves the address alone. No new node and no edge: the node is a browsing
+    /// surface whose content changes; the graph shape does not. Cross-node
+    /// lineage (the navigated-from relation) is a separate, explicit edge.
+    ///
+    /// The one mutation under both the live and the replayed arm, which differ
+    /// only in the stamp they pass. Returns the node's id, or `None` if absent.
+    pub(crate) fn navigate_node(
+        &mut self,
+        key: NodeKey,
+        url: &str,
+        transition: NodeHistoryTransitionKind,
+        at_ms: u64,
+        last_session_visited: u64,
+    ) -> Option<Uuid> {
+        let id = self.inner.node(key)?.id;
+        self.nav.record_visit(id, url, transition, at_ms);
+        self.set_node_last_session_visited(key, last_session_visited);
         self.update_node_url(key, url.to_string());
+        self.set_node_last_visited_at_ms(key, at_ms);
+        Some(id)
     }
 
     /// Anchor a freshly-minted `child` node's history under `parent`'s current
-    /// visit — the navigated-from anchor. Call **before** the child's first
-    /// [`navigate_node`](Self::navigate_node) so that first visit attaches there in
-    /// the shared lineage tree (the (b) cross-node anchor; the branch-mint path).
-    pub(crate) fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
-        let (Some(child_id), Some(parent_id)) = (
-            self.inner.node(child).map(|n| n.id),
-            self.inner.node(parent).map(|n| n.id),
-        ) else {
-            return;
-        };
+    /// visit, the navigated-from anchor. Do this **before** the child's first
+    /// [`navigate_node`](Self::navigate_node) so that first visit attaches there
+    /// in the shared lineage tree (the (b) cross-node anchor; the branch-mint
+    /// path). Returns the `(child, parent)` ids, or `None` if either is absent.
+    pub(crate) fn branch_history(
+        &mut self,
+        child: NodeKey,
+        parent: NodeKey,
+    ) -> Option<(Uuid, Uuid)> {
+        let child_id = self.inner.node(child)?.id;
+        let parent_id = self.inner.node(parent)?.id;
         self.nav.spawn(child_id, parent_id);
+        Some((child_id, parent_id))
     }
 
     /// Step `key` back one visit in its own history, updating its Primary URL to
     /// the revealed page. Returns the new URL, or `None` if already at the root.
-    pub(crate) fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
-        let at_ms = Self::epoch_ms();
+    pub(crate) fn node_history_back(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.back(id, at_ms)?;
-        self.update_node_url(key, url.clone());
+        self.land_history_step(key, &url, at_ms);
         Some(url)
     }
 
     /// Step `key` forward one visit in its own history. Returns the new URL, or
     /// `None` if already at the tip.
-    pub(crate) fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
-        let at_ms = Self::epoch_ms();
+    pub(crate) fn node_history_forward(&mut self, key: NodeKey, at_ms: u64) -> Option<String> {
         let id = self.inner.node(key)?.id;
         let url = self.nav.forward(id, at_ms)?;
-        self.update_node_url(key, url.clone());
+        self.land_history_step(key, &url, at_ms);
         Some(url)
+    }
+
+    /// What a moved history cursor leaves on the node: the revealed page as its
+    /// primary address, and the step as its latest visit. The one place history
+    /// writes the address: the cursor is the trail's position, and a step lands
+    /// its page on the address even where a `SetNodeUrl` has moved it since.
+    fn land_history_step(&mut self, key: NodeKey, url: &str, at_ms: u64) {
+        self.update_node_url(key, url.to_string());
+        self.set_node_last_visited_at_ms(key, at_ms);
     }
 
     /// Whether `key`'s within-node history can step back (toolbar gating).
@@ -825,12 +865,6 @@ impl Graph {
         self.inner
             .node(key)
             .is_some_and(|n| self.nav.can_forward(n.id))
-    }
-
-    /// `key`'s current page (its history cursor's URL), if any.
-    pub fn node_current_url(&self, key: NodeKey) -> Option<String> {
-        let id = self.inner.node(key)?.id;
-        self.nav.current_url(id)
     }
 
     /// `key`'s linear-history projection (active path + cursor).
@@ -858,13 +892,6 @@ impl Graph {
             .node(key)
             .map(|node| self.nav.semantic_summary(node.id))
             .unwrap_or_default()
-    }
-
-    /// The graph's recently-visited nodes, newest first, capped at `limit` — the
-    /// graph-wide "recent" projection over the shared visit space (gloss; the
-    /// lineage pane). Delegates to [`SharedNavigationMemory::recent_visited`].
-    pub fn recent_visited(&self, limit: usize) -> Vec<RecentVisit> {
-        self.nav.recent_visited(limit)
     }
 
     /// Milliseconds since the Unix epoch, for visit timestamps (live-app clock).

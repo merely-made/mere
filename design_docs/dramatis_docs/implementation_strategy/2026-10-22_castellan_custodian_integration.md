@@ -40,7 +40,7 @@ Even a passing synthetic receiving run does not enable real consumers automatica
 
 The historical attacker decoder understands the old CryptoKit envelope. Any obtained wrapping key or available signing authority fails the new gate, but that decoder is not a positive control for Castellan's storage codec. User cancellation, missing files, arbitrary signing failures, timeouts, unavailable providers and ENOENT are not passing denials.
 
-Implementation: [service core](../../../ports/djinn/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). The harness still links the synthetic core (`djinn_custodian::synthetic`) through the `native-host` C ABI. Its receipts were retired with the residue-fix worktree on 2026-10-26; the results that matter are recorded here and in the repair plan.
+Implementation: [service core](../../../ports/mere-resident/custodian/README.md) and [receiving harness](../../../testing/macos-castellan-custodian-h1/README.md). The harness still links the synthetic core (`djinn_custodian::synthetic`) through the `native-host` C ABI. Its receipts were retired with the residue-fix worktree on 2026-10-26; the results that matter are recorded here and in the repair plan.
 
 ## Portable cut, 2026-10-26
 
@@ -72,7 +72,7 @@ Still gated, recorded in the hardening plan's §6 and §8:
 
 ## H2 consumer migration, 2026-10-26
 
-The custodian now hosts Castellan's resident host (`PersonaeHost`), the wallet, the credential catalog and the SSH agent. Djinn's custody is one trait, `ResidentCustody`. A production build has only its client, `RemoteHost`, and links no castellan. The in-process host survives only under the `in-process-custody` feature, for test suites and receipt hosts, and is never a fallback. The hardening plan's [H2 section](2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration) maps each consumer to its §5.6 operation, and records two things:
+The custodian now hosts Castellan's resident host (`PersonaeHost`), the wallet, the credential catalog and the SSH agent. Djinn's custody is one trait, `ResidentCustody`. A production build has only its client, `RemoteHost`, and links no castellan. The in-process host survives only under the `in-process-custody` feature, for test suites and receipt hosts, and is never a fallback. The hardening plan's [H2 section](../../archive_docs/2026-10-28/2026-10-21_custody_isolation_and_security_hardening_plan.md#h2--complete-authority-and-consumer-migration) maps each consumer to its §5.6 operation, and records two things:
 - Hocket adoption is stopped: it needs an identity-format change.
 - The wallet is migrated at the operation level, but its secret files move into custody only after a public/secret file split.
 

@@ -19,7 +19,7 @@
 use euclid::default::Point2D;
 use uuid::Uuid;
 
-use super::node_facets::{PROVENANCE_DERIVATIONS, VisitHistoryFacet};
+use super::node_facets::PROVENANCE_DERIVATIONS;
 use super::{Graph, Node, NodeKey, ProvenanceSubKind};
 use crate::types::NodeDerivation;
 
@@ -91,14 +91,7 @@ impl Graph {
             return key;
         }
         self.set_node_facet(key, PROVENANCE_DERIVATIONS, &vec![derivation]);
-        self.set_node_facet(
-            key,
-            super::node_facets::VISIT_HISTORY,
-            &VisitHistoryFacet {
-                last_visited_ms: Some(Self::epoch_ms()),
-                last_session_visited: 0,
-            },
-        );
+        self.set_node_last_visited_at_ms(key, Self::epoch_ms());
 
         self.url_to_nodes.entry(url).or_default().push(key);
         self.bump_revision();

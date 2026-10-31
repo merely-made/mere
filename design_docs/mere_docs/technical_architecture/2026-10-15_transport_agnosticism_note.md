@@ -9,7 +9,7 @@ GitHub. Line numbers are as read at those revisions. Nothing was built for
 this note.
 
 **Origin.** P2a of the
-[Graphshell stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+[Graphshell stack lift plan](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
 moved the remote overmap client into `mere-overmap`. Its receipt needs a mere
 route that a remote device can dial, and Djinn registers `mere/<domain>` only
 on the local application door. Mark chose to design that first and widened
@@ -33,14 +33,14 @@ transport-blind: it takes lines (`on_line`) and gives lines
 still needs is underneath it:
 
 1. **A route on a carrier a remote peer can reach.** `MereRoutes::serve`
-   (`ports/djinn/src/resident_mere.rs:263-332`) registers `mere/<domain>` and
+   (`ports/mere-resident/src/resident_mere.rs:263-332`) registers `mere/<domain>` and
    `ambient/mere/<domain>` on the `AppEndpointCatalog`, which wraps the same
    `ResidentEndpointCatalog` that `ResidentProjectionHost` serves
    (`ports/graphshell/src/native/app_broker.rs:134`,
    `native/projection_host.rs:203-206`). The registration is reusable; no
    dialable accept loop exposes it. The Djinn product binary runs no
    projection host over QUIC; the only Djinn projection host is Distillery's
-   chronicle over WebRTC (`ports/djinn/src/resident_distillery.rs:459-474`).
+   chronicle over WebRTC (`ports/mere-resident/src/resident_distillery.rs:459-474`).
 2. **An application identity for the dialer.** `AccessEndpoint::open`
    refuses a context with no application: "mere access requires an admitted
    application" (`resident_mere.rs:359-361`). Only the app door binds one

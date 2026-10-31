@@ -15,7 +15,7 @@ vault with an SSH-agent front end. This is the "our own 1Password/KeePassXC
 alternative" utility, scoped honestly: protocol credentials and SSH keys first,
 general password-manager item types later, sync later still.
 
-Continues [`2026-05-05_protocol_architecture_plan.md`](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md)
+Continues [`2026-05-05_protocol_architecture_plan.md`](../2026-10-28/2026-05-05_protocol_architecture_plan.md)
 §3 (Identity Vault, Phase 2C), which `personae/src/vault.rs` cites as its
 source. That section already resolved the shape (Direct vs Bootstrap slots,
 `CredentialLineage`, unlock tiers, storage-backend table, the level-0

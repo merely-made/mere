@@ -38,7 +38,7 @@ intentional:
 | Product composition and authoring UX | [Knot authoring consumer plan](../2026-10-06_completed_plans/2026-07-27_knot_authoring_consumer_plan.md): Graphshell protocol with a Turnstone/Cambium pane | Open. The live Knot endpoint discloses a read-only directory and rejects intents. The dedicated plan owns the authorized editable resource, Save intent, retained session, pane, and receipts. |
 | Semantic web clipping and `ClippedFrom` provenance | Mere `crates/import::web_clip`; Turnstone Inspector/content lane | The host-neutral producer survived. The Meerkat command did not. A current Inspector selection-to-Knot write path is open. |
 | Outline and folds in the product | Genet readout plus a consumer-pulled Cambium tree/outline; Turnstone Gloss/Inspector | Outline data exists; a Knot authoring consumer and interactive tree are open. This is shared component work, not a Knot parser fork. |
-| Query, agent, diagram, and Wasm blocks | polyglot block resolver plan (`design_docs/nematic_docs/implementation_strategy/2026-06-13_polyglot_block_resolver_plan.md`) | Separate resolver work. It is not unfinished Phase 3 editor work. |
+| Query, agent, diagram, and Wasm blocks | polyglot block resolver plan (`design_docs/archive_docs/2026-10-28/2026-06-13_polyglot_block_resolver_plan.md`) | Separate resolver work. It is not unfinished Phase 3 editor work. |
 | Transclusion, evaluation, sanitized HTML, consent, and derived-result caching | Knot evaluation and export plan (`genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md`) | Reconciled there. Pure transforms live in Genet; effect policy and cache live in Knot; the product host presents intents and consent. |
 | Shared documents | Knot sync plus Commons | Personal and communal convergence landed. Public addressing, discovery, and publishing UX remain separate product work, not restoration of `knot://` node storage. |
 
@@ -797,12 +797,12 @@ Open:
 This plan extends, and does not re-scope, the following owners:
 
 - 2026-05-08 polyglot knot design (`design_docs/nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md`)
-  and 2026-06-13 polyglot block resolver plan (`design_docs/nematic_docs/implementation_strategy/2026-06-13_polyglot_block_resolver_plan.md`):
+  and 2026-06-13 polyglot block resolver plan (`design_docs/archive_docs/2026-10-28/2026-06-13_polyglot_block_resolver_plan.md`):
   the block vocabulary and the descriptor-as-`CodeBlock` decision.
 - 2026-06-12 knot evaluation and export plan (`genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md`):
   the eval and include passes, the HTML fragment fidelity tier (K4), and richer
   span fidelity. Phase 6 fidelity work belongs there.
-- [2026-06-23 gloss outline lens plan](../../mere_docs/implementation_strategy/2026-06-23_gloss_outline_lens_plan.md):
+- [2026-06-23 gloss outline lens plan](../2026-10-28/2026-06-23_gloss_outline_lens_plan.md):
   owns the graph-outline-as-editable-knot payoff at its P4 and the outline surface.
   The editor here is the shared writing surface that P4 also uses.
 - [2026-06-23 node body face model plan](../../mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md):
@@ -1127,7 +1127,7 @@ Code-verified anchors from the 2026-06-24 sweeps, kept for the next session:
   surface; genet `6a3ceace`) and tinct's `syntax` palette (themed contrast-gated
   colours; tincture `03661ce`). The highlight core's promotion to a standalone sibling
   lexer crate (**illume**) and the full text-legibility architecture are spun out to
-  their own plan, [illume text lexer plan](../../mere_docs/implementation_strategy/2026-06-26_illume_text_lexer_plan.md): the
+  their own plan, [illume text lexer plan](../2026-10-28/2026-06-26_illume_text_lexer_plan.md): the
   editor consumes illume (lexer: text → spans) + tinct (palette: role → colour) + the
   genet styled field (renderer), with the host owning the `SyntaxKind` → `SyntaxRole`
   seam. Three editor-architecture fixes resolved there: #1 colours derive from tinct
@@ -1231,7 +1231,7 @@ Code-verified anchors from the 2026-06-24 sweeps, kept for the next session:
   render refresh, inline clip decoration anchors, and autosave/history polish.
 - **2026-07-01, status-refresh correction.** Re-verified this plan's own "remaining"
   claims against the code and against the
-  [illume text lexer plan](../../mere_docs/implementation_strategy/2026-06-26_illume_text_lexer_plan.md), which this plan
+  [illume text lexer plan](../2026-10-28/2026-06-26_illume_text_lexer_plan.md), which this plan
   had spun highlight work out to on 2026-06-26 but never synced back. Finding:
   "richer source highlighting" was stale everywhere it appeared (top status, Reframe
   slice 4, What is net-new, Phase 2 remaining, and the prior progress bullet) — the
@@ -1293,7 +1293,7 @@ Code-verified anchors from the 2026-06-24 sweeps, kept for the next session:
   grouping, and the Phase 3 structural/authoring layers.
 - **2026-07-08, highlight bridge moved to genet (+ Phase 2 live-refresh/toggle in flight).**
   While starting the Phase 2 tail, Mark raised promoting the editor for Isometry to
-  consume. Outcome (tracked in the [illume plan](../../mere_docs/implementation_strategy/2026-06-26_illume_text_lexer_plan.md)
+  consume. Outcome (tracked in the [illume plan](../2026-10-28/2026-06-26_illume_text_lexer_plan.md)
   point 8): illume extracted to its own public repo, and the highlight bridge
   (`meerkat/knot_highlight.rs`) dissolved *into* xilem-serval's new `highlight` feature —
   so the editor field is now `xilem_serval::highlighted_textarea(t, Highlight::Note)` and

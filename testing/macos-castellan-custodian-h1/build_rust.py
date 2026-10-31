@@ -17,7 +17,7 @@ ROOT=Path(__file__).resolve().parents[2]
 
 def source_hashes():
     paths=[ROOT/'Cargo.toml',ROOT/'Cargo.lock',ROOT/'rust-toolchain.toml']
-    for directory in ['ports/djinn/castellan','ports/djinn/custodian']:
+    for directory in ['ports/mere-resident/castellan','ports/mere-resident/custodian']:
         paths.extend(p for p in (ROOT/directory).rglob('*') if p.is_file() and p.suffix in ['.rs','.toml','.h'])
     return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
 

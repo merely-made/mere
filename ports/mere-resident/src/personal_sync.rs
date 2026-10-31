@@ -1,0 +1,1344 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! Djinn bring-up for the resident's personal-graph sync.
+//!
+//! Split out of the device-host binary so the settings resolution, the data
+//! root migration and the pairing write are ordinary library code with tests,
+//! rather than logic reachable only by running the resident host.
+
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+
+use personae::{IdentityProvider, ProfileId};
+
+use crate::door::device_broker::{DeviceSurface, DeviceSurfaceHandle};
+use crate::door::identity_endpoint::TransferDecision;
+use crate::resident_blobs::{LEGACY_PERSONAL_LEASE, LegacyBlobMigration, ResidentBlobCustody};
+use crate::resident_devices::DeviceDirectorySource;
+use crate::settings::{
+    self as owner_settings, DataRootMigration, OwnerSettings, OwnerSettingsError, SyncOverrides,
+};
+use crate::sync::personal_sync_host::{
+    PersonalSyncHost, PersonalSyncHostConfig, PersonalSyncHostError,
+};
+use crate::sync::transfer_staging::{receive_transfer, released_blobs_for};
+use graphshell::personal_sync::{PersonalGraphEvent, SyncRoster, SyncSelection};
+
+const PERSONAL_GRAPH_DOMAIN: &[u8] = b"mere.graphshell/personal-graph/v1";
+
+/// How often the resident host re-reads the settings file to pick up a device
+/// paired while it was running.
+const PAIRING_POLL: std::time::Duration = std::time::Duration::from_secs(5);
+
+/// The graph a name refers to. Both devices must use the same name.
+pub fn personal_graph_id(name: &str) -> [u8; 32] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(PERSONAL_GRAPH_DOMAIN);
+    hasher.update(name.as_bytes());
+    *hasher.finalize().as_bytes()
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum DeviceSyncError {
+    #[error(transparent)]
+    Settings(#[from] OwnerSettingsError),
+    #[error(transparent)]
+    Host(#[from] PersonalSyncHostError),
+    #[error(
+        "no personal graph is configured for profile {profile:?}; set sync.graph in {path} first"
+    )]
+    NoGraphConfigured { profile: String, path: String },
+}
+
+/// A node to author into the graph as the host starts.
+///
+/// A deliberate stopgap. The product path for editing the graph is a typed
+/// intent over the admitted session, which is the H9 lane; until that exists
+/// the resident host is a sync engine with no input, and nothing can be proven
+/// to converge because nothing can be written.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SeedNote {
+    pub address: String,
+    pub title: String,
+}
+
+/// How long a startup fetch waits for the graph to name a holder. Long enough
+/// for a first sync on a cold join, short enough that a genuinely absent
+/// advertisement is reported while the operator is still watching.
+const BLOB_FETCH_WAIT_TICK: std::time::Duration = std::time::Duration::from_secs(2);
+const BLOB_FETCH_WAIT_TICKS: u64 = 30;
+
+/// A blob operation to run once as the host starts.
+///
+/// Here for the same reason [`SeedNote`] is: the blob store and the graph
+/// that advertises it are owned by this process, so a second binary cannot do
+/// this without taking the lock away from the resident host. Stage-then-serve
+/// in particular has to keep running afterwards, which a command that exits
+/// cannot do.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum BlobAction {
+    /// Read a local file, hold its bytes, and tell paired devices this one has
+    /// them. Logs the hash a sibling needs in order to ask.
+    Stage { path: PathBuf },
+    /// Fetch a blob some paired device has advertised, into this device's
+    /// store. Logs which device supplied it.
+    Fetch { blob: [u8; 32] },
+}
+
+/// Resolve the data root, moving it out of the Personae vault once if it is
+/// still there. An explicit override is the owner naming a location, so it is
+/// taken as given.
+pub fn resolve_data_root(
+    app_dir: &Path,
+    vault_dir: &Path,
+    override_path: Option<PathBuf>,
+) -> Result<PathBuf, DeviceSyncError> {
+    if let Some(explicit) = override_path {
+        return Ok(explicit);
+    }
+    let current = owner_settings::default_data_root(app_dir);
+    let legacy = owner_settings::legacy_data_root(vault_dir);
+    if let DataRootMigration::Moved { from, to } =
+        owner_settings::migrate_data_root(&legacy, &current)?
+    {
+        tracing::info!(
+            from = %from.display(),
+            to = %to.display(),
+            "moved the Graphshell data root out of the Personae vault"
+        );
+    }
+    Ok(current)
+}
+
+/// What started personal sync hands the resident's doors.
+pub struct PersonalSyncStarted {
+    /// Endpoint and group owner borrowed by private sibling lanes.
+    pub host: Arc<PersonalSyncHost>,
+    /// The cards both doors serve.
+    pub surface: DeviceSurfaceHandle,
+    /// The paired-device directory, read live from this host.
+    pub directory: DeviceDirectorySource,
+    /// This device's personal-graph node id, hex.
+    pub node_id: String,
+    /// The ticket this start listens on, as the status route reports it.
+    pub ticket: String,
+}
+
+/// Start personal sync for a profile, or return `None` when the owner has not
+/// enabled it.
+pub async fn start<P: IdentityProvider + ?Sized>(
+    identity: &P,
+    app_dir: &Path,
+    vault_dir: &Path,
+    profile: &ProfileId,
+    data_root_override: Option<PathBuf>,
+    overrides: SyncOverrides,
+    peer_tickets: Vec<String>,
+    seed_notes: Vec<SeedNote>,
+    blob_actions: Vec<BlobAction>,
+    blob_custody: ResidentBlobCustody,
+) -> Result<Option<PersonalSyncStarted>, DeviceSyncError> {
+    let settings_file = owner_settings::settings_path(app_dir, profile);
+    let stored = OwnerSettings::load(&settings_file)?;
+    tracing::info!(
+        path = %settings_file.display(),
+        configured = stored.sync.is_some(),
+        "owner settings"
+    );
+    let Some(sync) = owner_settings::resolve_sync(stored.sync, overrides) else {
+        return Ok(None);
+    };
+
+    let graph = personal_graph_id(&sync.graph);
+    let data_root = resolve_data_root(app_dir, vault_dir, data_root_override)?;
+    let store_path = sync.store_path.clone().unwrap_or_else(|| {
+        data_root
+            .join("personal-sync")
+            .join(format!("{}.redb", owner_settings::hex32(&graph)))
+    });
+    let blob_scope = transport::BlobScope::new(graph);
+    let legacy_blob_root = store_path.with_extension("blobs");
+    match blob_custody
+        .migrate_legacy_store(&legacy_blob_root, blob_scope, LEGACY_PERSONAL_LEASE)
+        .await
+        .map_err(|error| DeviceSyncError::Host(PersonalSyncHostError::Transport(error)))?
+    {
+        LegacyBlobMigration::Copied { blobs } => tracing::info!(
+            source = %legacy_blob_root.display(),
+            blobs,
+            "imported the personal graph's old blob store into resident custody"
+        ),
+        LegacyBlobMigration::AlreadyComplete { blobs } => tracing::debug!(
+            source = %legacy_blob_root.display(),
+            blobs,
+            "personal graph blob migration remains verified"
+        ),
+        LegacyBlobMigration::SourceAbsent | LegacyBlobMigration::AlreadyShared => {},
+    }
+    blob_custody
+        .bind_scope(blob_scope)
+        .await
+        .map_err(|error| PersonalSyncHostError::Transport(error))?;
+    let mut roots = sync.roster_root_keys()?;
+    roots.push(identity.master_public_key().to_bytes());
+    roots.sort_unstable();
+    roots.dedup();
+    let paired_devices = paired_nodes_with_roots(&sync)?;
+    let paired_nodes = paired_devices.keys().copied().collect::<Vec<_>>();
+    // A malformed relay url is refused rather than dropped: silently starting
+    // LAN-only when the owner asked for a relay would look like the relay was
+    // configured and simply not helping.
+    let relays =
+        transport::P2pandaHostPolicy::parse_relay_urls(sync.relay_urls.iter().map(String::as_str))
+            .map_err(|error| {
+                DeviceSyncError::Host(PersonalSyncHostError::Transport(error.to_string()))
+            })?;
+    if !relays.is_empty() {
+        tracing::info!(relays = relays.len(), "personal sync will register relays");
+    }
+    // The receipt lane rides alongside whatever the owner selected. Its facets
+    // are added rather than configured because a device that ingests receipts
+    // always wants their provenance: a receipt whose `receipt.run` facet was
+    // filtered out replicates as a bare title, which is the failure this lane
+    // exists to prevent. Blob availability comes on with it, since a receipt
+    // without its captures is half a fact.
+    let mut facets = sync.lanes.facets.clone();
+    for facet in graphshell::receipts::sync_facets() {
+        if !facets.iter().any(|selected| selected == facet) {
+            facets.push(facet.to_string());
+        }
+    }
+    let selection = SyncSelection::default()
+        .with_facets(facets)
+        .with_access_records(sync.lanes.access_records)
+        .with_saved_scenes(sync.lanes.saved_scenes)
+        .with_handler_preferences(sync.lanes.handler_preferences)
+        // Left as the owner set it. With the lane off, a receipt still
+        // replicates whole — its artifacts facet carries every blake3 hash —
+        // and only *which device holds the bytes* goes unsaid, which is a
+        // separate thing an owner may reasonably decline.
+        .with_blob_availability(sync.lanes.blob_availability)
+        // The only synthetic rule the resident host installs today. If a
+        // second lane ever needs one, extend this list rather than calling
+        // the setter twice: it replaces rather than appends.
+        .with_synthetic_addresses([graphshell::receipts::sync_address_rule()]);
+
+    // The cached-address rung: every hint recorded by a previous run rides in
+    // as a best-effort address, so a device that has connected once can redial
+    // through the relay after both ends restart, with no discovery working.
+    // This is what turns the paired-device record from a name into a route.
+    let peer_hints: Vec<String> = sync
+        .paired_devices
+        .iter()
+        .filter_map(|device| device.last_endpoint.clone())
+        .collect();
+    if !peer_hints.is_empty() {
+        tracing::info!(hints = peer_hints.len(), "seeding stored dial hints");
+    }
+    let host = Arc::new(
+        PersonalSyncHost::open_with_blob_custody(
+            identity,
+            PersonalSyncHostConfig {
+                graph,
+                store_path,
+                roster: SyncRoster::new(roots),
+                selection,
+                peer_tickets,
+                peer_hints,
+                paired_nodes: paired_nodes.clone(),
+                relay_urls: relays,
+            },
+            blob_custody.blobs(),
+            blob_custody.authorizer(),
+        )
+        .await?,
+    );
+    // node_id is per-graph derived, so it is unlinkable across graphs and safe
+    // to leave in a log that sits on disk. The master root is NOT: it is the
+    // one identifier common to every graph this profile joins, so it is
+    // disclosed on request through `pairing_facts` rather than written here on
+    // every start. A peer learns it from the attestation on the wire anyway;
+    // that is a different surface from a plaintext file.
+    let node_id = owner_settings::hex32(&host.node_id());
+    let ticket = host.ticket().await?;
+    tracing::info!(
+        graph = %owner_settings::hex32(&graph),
+        node_id = %node_id,
+        paired = sync.paired_devices.len(),
+        ticket = %ticket,
+        "personal graph sync listening"
+    );
+    // Name any device that can reach this graph but cannot write to it. The
+    // failure it would otherwise produce is a stream of refused operations on
+    // the far side, which is a confusing place to learn about a missing root.
+    for device in sync.receive_only_devices() {
+        tracing::warn!(
+            node = %device.node_id,
+            label = %device.label,
+            "paired device has no roster root: it will receive this graph, and \
+             its own writes will be refused"
+        );
+    }
+
+    // Author before the watchers start, so the receipt of a seeded node is
+    // never confused with something that arrived from a peer.
+    //
+    // This runs at start-up rather than as its own command because the store
+    // is single-writer and this process holds its lock: authoring can only
+    // enter through this process, by argv now or by a typed intent over the
+    // admitted session later. There is no third door, and a second binary
+    // writing to the same store would be the wrong answer to that.
+    for note in seed_notes {
+        host.author(vec![PersonalGraphEvent::AddNode {
+            id: uuid::Uuid::new_v4(),
+            address: note.address.clone(),
+            title: note.title.clone(),
+        }])
+        .await?;
+        tracing::info!(address = %note.address, title = %note.title, "authored a node");
+    }
+
+    // After the seed notes, and still before the watchers, so a staged blob's
+    // advertisement is authored in the same quiet window.
+    run_blob_actions(&host, blob_actions).await;
+
+    let directory = DeviceDirectorySource::live(Arc::clone(&host), settings_file.clone());
+    spawn_pairing_watch(
+        Arc::clone(&host),
+        settings_file,
+        paired_devices,
+        identity.master_public_key().to_bytes(),
+    );
+    // The read-through into the replicating store. `block_in_place` because
+    // the resource trait a session serves is synchronous while a store read is
+    // not; this runs on the multi-thread runtime the resident host already
+    // uses, so the blocking call moves off the async worker rather than
+    // stalling it.
+    let reader_host = Arc::clone(&host);
+    let blob_reader: Arc<crate::door::device_broker::BlobReader> =
+        Arc::new(move |resource: &chirograph::ContentHash| {
+            let host = Arc::clone(&reader_host);
+            let hash = transport::BlobHash::from_bytes(resource.0);
+            tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current()
+                    .block_on(async { host.blobs().get_bytes(hash).await })
+                    .ok()
+                    .map(|bytes| bytes.to_vec())
+            })
+        });
+    let surface: DeviceSurfaceHandle = Arc::new(tokio::sync::RwLock::new(DeviceSurface {
+        cards: host.supplemental_cards().await?,
+        released_blobs: Vec::new(),
+        decisions: Default::default(),
+        blob_reader: Some(blob_reader),
+    }));
+    spawn_card_refresh(Arc::clone(&host), Arc::clone(&surface));
+    spawn_receipt_intake(
+        Arc::clone(&host),
+        graphshell::receipts::inbox_dir(&data_root),
+    );
+    spawn_accept_watch(host.clone(), Arc::clone(&surface));
+    Ok(Some(PersonalSyncStarted {
+        host,
+        surface,
+        directory,
+        node_id,
+        ticket,
+    }))
+}
+
+/// Run the one-shot blob operations the operator asked for on this start.
+///
+/// Nothing here can stop the host. Staging is a request to hold and offer
+/// bytes; if it fails the host is still a working sync engine, and exiting
+/// would take the graph down over a file that could not be read. A fetch
+/// failure is more often "the holder is not up yet" than anything permanent,
+/// and the record stays, so asking again later is the recovery.
+///
+/// This lives beside sync bring-up only because the blob store and the graph
+/// that advertises it are owned by this process, which holds the store's
+/// single-writer lock.
+async fn run_blob_actions(host: &PersonalSyncHost, actions: Vec<BlobAction>) {
+    for action in actions {
+        match action {
+            BlobAction::Stage { path } => stage_blob(host, &path).await,
+            BlobAction::Fetch { blob } => fetch_blob(host, blob).await,
+        }
+    }
+}
+
+async fn stage_blob(host: &PersonalSyncHost, path: &Path) {
+    let bytes = match std::fs::read(path) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            tracing::error!(path = %path.display(), %error, "could not read the file to stage");
+            return;
+        },
+    };
+    let byte_len = bytes.len();
+    let container = uuid::Uuid::new_v4();
+    match host.stage_blob(container, bytes).await {
+        Ok(blob) => tracing::info!(
+            path = %path.display(),
+            byte_len,
+            container = %container,
+            blob = %owner_settings::hex32(&blob),
+            "staged a blob; a paired device can now fetch it by this hash"
+        ),
+        Err(error) => {
+            tracing::error!(path = %path.display(), %error, "could not stage the blob")
+        },
+    }
+}
+
+async fn fetch_blob(host: &PersonalSyncHost, blob: [u8; 32]) {
+    // Wait for the graph to say who holds this before asking.
+    //
+    // These actions run before the watchers start, which is early: on a host
+    // that has only just joined, the advertisement has not arrived yet, so an
+    // immediate attempt would report "no paired device has advertised" for a
+    // blob that is on its way. Waiting for the record is what a fetch means
+    // here, since the graph is how this device learns where bytes are.
+    let mut holders = Vec::new();
+    for _ in 0..BLOB_FETCH_WAIT_TICKS {
+        holders = host.blob_holders(blob).await.unwrap_or_default();
+        if !holders.is_empty() {
+            break;
+        }
+        tokio::time::sleep(BLOB_FETCH_WAIT_TICK).await;
+    }
+    if holders.is_empty() {
+        report_unadvertised_blob(host, blob).await;
+        return;
+    }
+    match host.fetch_blob_by_availability(blob).await {
+        Ok(supplier) => tracing::info!(
+            blob = %owner_settings::hex32(&blob),
+            supplier = %owner_settings::hex32(&supplier),
+            "fetched a blob from a paired device"
+        ),
+        Err(error) => tracing::error!(
+            blob = %owner_settings::hex32(&blob),
+            %error,
+            "could not fetch the blob"
+        ),
+    }
+}
+
+/// Say which of the causes it is. The first version of this blamed the lane,
+/// and cost an hour on a device whose lane was on and which simply had no route
+/// to its peer: no relay configured, and mDNS not announcing. Those need
+/// opposite fixes, so guessing between them is worse than saying nothing.
+///
+/// `known_peers` lists every paired device, whether or not an address is known,
+/// so it separates "none is paired", "none has been found" and "one has been
+/// found and is not talking"; only the last is a firewall question.
+async fn report_unadvertised_blob(host: &PersonalSyncHost, blob: [u8; 32]) {
+    let peers = host.known_peers().await.unwrap_or_default();
+    let addressed = peers.iter().filter(|peer| peer.reachable).count();
+    let connected = peers.iter().filter(|peer| peer.connected).count();
+    let waited_s = BLOB_FETCH_WAIT_TICKS * BLOB_FETCH_WAIT_TICK.as_secs();
+    let blob = owner_settings::hex32(&blob);
+    if peers.is_empty() {
+        tracing::error!(
+            %blob,
+            waited_s,
+            "no device is paired onto this graph's overlay, so \
+             nothing could advertise this blob"
+        );
+        return;
+    }
+    match silence(peers.len(), addressed, connected) {
+        Some(Silence::Unfound) => tracing::error!(
+            %blob,
+            waited_s,
+            peers = peers.len(),
+            "no paired device has an address, so no advertisement \
+             could arrive: local discovery has not found one on this \
+             network, and no saved hint or relay names one. Check \
+             that the holder is on, and on this network"
+        ),
+        Some(Silence::Unanswered) => tracing::error!(
+            %blob,
+            waited_s,
+            peers = peers.len(),
+            "no paired device has a live path, so no \
+             advertisement could arrive. This is a connectivity \
+             failure, not a missing blob: check a firewall on \
+             either end, then whether a relay is configured and \
+             reachable"
+        ),
+        None => tracing::error!(
+            %blob,
+            waited_s,
+            peers = peers.len(),
+            connected,
+            "a device is connected but none advertised this \
+             blob. The holder most likely never staged it, or \
+             staged it with the blob-availability lane disabled"
+        ),
+    }
+}
+
+/// Node id to Personae root, the shape every reconciliation phase below passes
+/// around. See [`paired_nodes_with_roots`] for why both halves travel together.
+type PairedNodes = std::collections::BTreeMap<[u8; 32], Option<[u8; 32]>>;
+
+/// The pairing loop's second half: `pair_device` and `unpair_device` write the
+/// file, and this reconciles the live overlay against it, so a device paired
+/// or dropped now takes effect now.
+///
+/// This reconciles in both directions deliberately. An unpair that only took
+/// effect on the next restart would leave a device the owner believes they
+/// removed still receiving the graph until they happened to reboot.
+/// Paired devices as node id to Personae root.
+///
+/// Both halves together because unpairing needs them together: the node id is
+/// what the overlay drops, and the root is what resolves the device's seat in
+/// the key group. A receive-only device has no root recorded and cannot join
+/// the key group, so `None` is a real answer rather than missing data.
+fn paired_nodes_with_roots(
+    sync: &owner_settings::SyncSettings,
+) -> Result<PairedNodes, OwnerSettingsError> {
+    let mut paired = std::collections::BTreeMap::new();
+    for device in &sync.paired_devices {
+        let node = owner_settings::parse_hex32(&device.node_id)?;
+        let root = match device.root.as_deref() {
+            Some(root) => Some(owner_settings::parse_hex32(root)?),
+            None => None,
+        };
+        paired.insert(node, root);
+    }
+    Ok(paired)
+}
+
+fn spawn_pairing_watch(
+    host: Arc<PersonalSyncHost>,
+    settings_file: PathBuf,
+    already_applied: PairedNodes,
+    local_root: [u8; 32],
+) {
+    // Node id to Personae root, not just node ids. Unpairing has to revoke the
+    // departed device's key, the key group knows devices by a recipient
+    // derived from their root, and the settings record is gone by the time the
+    // removal is noticed. Remembering the root here is what makes revocation
+    // possible at all; `None` is a receive-only device, which cannot join the
+    // key group and so has nothing to revoke.
+    let mut applied = already_applied;
+    // Last reported reachability, so the log records transitions rather than
+    // repeating the same line every poll.
+    // (node, has an address, has a live path). Connectivity is in the compared
+    // tuple deliberately: a peer going silent while keeping its address is a
+    // change worth logging, and was previously invisible.
+    let mut reported: Option<Vec<(String, bool, bool)>> = None;
+    armillary::tasks::spawn_tracked(async move {
+        loop {
+            tokio::time::sleep(PAIRING_POLL).await;
+            let reloaded = match OwnerSettings::load(&settings_file) {
+                Ok(settings) => settings,
+                Err(error) => {
+                    tracing::warn!(%error, "could not reload owner settings");
+                    continue;
+                },
+            };
+            // Absent sync means the owner turned it off in the file, which is
+            // not the same as an empty roster; leave the live overlay alone
+            // rather than tearing every device off it on a partial edit.
+            let Some(sync) = reloaded.sync else { continue };
+            let desired: PairedNodes = match paired_nodes_with_roots(&sync) {
+                Ok(paired) => paired,
+                Err(error) => {
+                    tracing::warn!(%error, "owner settings hold an unusable node id");
+                    continue;
+                },
+            };
+
+            // Each phase carries its own failure and retry policy, and they run
+            // in this order deliberately: authority is admitted before a device
+            // is tagged onto the overlay, and revoked before it is forgotten.
+            reconcile_roster(&host, &sync, local_root).await;
+            reconcile_authority(&host, &desired, &mut applied).await;
+            apply_arrivals(&host, &sync, &desired, &mut applied).await;
+            apply_departures(&host, &desired, &mut applied).await;
+            ensure_encryption(&host, &sync).await;
+            key_paired_devices(&host).await;
+            refresh_peer_directory(&host, &settings_file, &sync, &mut reported).await;
+        }
+    });
+}
+
+/// Authority moves with reachability. Tagging a peer onto the overlay without
+/// admitting its root produces a device that connects and then has everything
+/// it sends refused, which is the most confusing shape this can fail in.
+async fn reconcile_roster(
+    host: &PersonalSyncHost,
+    sync: &owner_settings::SyncSettings,
+    local_root: [u8; 32],
+) {
+    match sync.roster_root_keys() {
+        Ok(mut roots) => {
+            roots.push(local_root);
+            roots.sort_unstable();
+            roots.dedup();
+            let roots_len = roots.len();
+            let next = SyncRoster::new(roots);
+            if host.roster().await != next {
+                host.set_roster(next).await;
+                tracing::info!(admitted = roots_len, "personal sync roster changed");
+            }
+        },
+        Err(error) => tracing::warn!(%error, "owner settings hold an unusable roster root"),
+    }
+}
+
+/// A node can stay paired while its Personae authority changes, especially when
+/// a receive-only pairing is promoted. Reconcile that value as well as map
+/// membership. When a root is removed or replaced, finish its key revocation
+/// before forgetting it so a transient lane-write failure remains retryable on
+/// the next pass.
+async fn reconcile_authority(
+    host: &PersonalSyncHost,
+    desired: &PairedNodes,
+    applied: &mut PairedNodes,
+) {
+    let authority_changes: Vec<([u8; 32], Option<[u8; 32]>, Option<[u8; 32]>)> = desired
+        .iter()
+        .filter_map(|(node, next)| {
+            let previous = applied.get(node)?;
+            (previous != next).then_some((*node, *previous, *next))
+        })
+        .collect();
+    for (node, previous, next) in authority_changes {
+        if let Some(root) = previous {
+            match host.retire_reader(root).await {
+                Ok(()) => tracing::info!(
+                    node = %owner_settings::hex32(&node),
+                    "retired the device's previous readership"
+                ),
+                Err(error) => {
+                    tracing::warn!(
+                        %error,
+                        node = %owner_settings::hex32(&node),
+                        "could not revoke changed key authority; will retry"
+                    );
+                    continue;
+                },
+            }
+        }
+        applied.insert(node, next);
+    }
+}
+
+/// Tag devices the owner has paired since the last pass onto the live overlay.
+async fn apply_arrivals(
+    host: &PersonalSyncHost,
+    sync: &owner_settings::SyncSettings,
+    desired: &PairedNodes,
+    applied: &mut PairedNodes,
+) {
+    let relayed: std::collections::BTreeMap<[u8; 32], Option<String>> = sync
+        .paired_devices
+        .iter()
+        .filter_map(|device| {
+            let node = owner_settings::parse_hex32(&device.node_id).ok()?;
+            Some((node, device.prekey.clone()))
+        })
+        .collect();
+    let arrivals: Vec<([u8; 32], Option<[u8; 32]>)> = desired
+        .iter()
+        .filter(|(node, _)| !applied.contains_key(*node))
+        .map(|(node, root)| (*node, *root))
+        .collect();
+    for (node, root) in arrivals {
+        match host.pair_node(node).await {
+            Ok(()) => {
+                applied.insert(node, root);
+                admit_paired_reader(host, node, root).await;
+                if let Some(prekey) = relayed.get(&node).cloned().flatten() {
+                    relay_prekey(host, node, &prekey).await;
+                }
+                tracing::info!(
+                    node = %owner_settings::hex32(&node),
+                    "applied a newly paired device without a restart"
+                );
+            },
+            // Leave it unapplied so the next pass retries rather than
+            // silently dropping the pairing.
+            Err(error) => tracing::warn!(
+                %error,
+                node = %owner_settings::hex32(&node),
+                "could not apply a paired device"
+            ),
+        }
+    }
+}
+
+/// Reachability and readership are separate grants and stay separate: pairing
+/// says where a device is, this says it may read. A receive-only device has no
+/// root and gets neither, which is what receive-only means.
+async fn admit_paired_reader(host: &PersonalSyncHost, node: [u8; 32], root: Option<[u8; 32]>) {
+    let Some(root) = root else { return };
+    if let Err(error) = host.admit_reader(root, "paired device").await {
+        tracing::warn!(
+            %error,
+            node = %owner_settings::hex32(&node),
+            "could not admit the paired device as a reader"
+        );
+    }
+}
+
+/// Relay a pre-key its owner could not publish. The bundle authenticates its
+/// own subject, so carrying it asserts nothing on that device's behalf beyond
+/// what it already signed.
+async fn relay_prekey(host: &PersonalSyncHost, node: [u8; 32], prekey: &str) {
+    let bundle = match owner_settings::parse_hex(prekey) {
+        Ok(bundle) => bundle,
+        Err(error) => {
+            tracing::warn!(
+                %error,
+                node = %owner_settings::hex32(&node),
+                "the paired device's recorded pre-key is unreadable"
+            );
+            return;
+        },
+    };
+    if let Err(error) = host
+        .author(vec![PersonalGraphEvent::PublishPrekey { bundle }])
+        .await
+    {
+        tracing::warn!(
+            %error,
+            node = %owner_settings::hex32(&node),
+            "could not relay the paired device's pre-key; it                                              stays reachable but unreadable until this succeeds"
+        );
+    }
+}
+
+/// Drop devices the owner has removed from the settings file.
+async fn apply_departures(
+    host: &PersonalSyncHost,
+    desired: &PairedNodes,
+    applied: &mut PairedNodes,
+) {
+    let departures: Vec<([u8; 32], Option<[u8; 32]>)> = applied
+        .iter()
+        .filter(|(node, _)| !desired.contains_key(*node))
+        .map(|(node, root)| (*node, *root))
+        .collect();
+    for (node, root) in departures {
+        // Revoke while the departure remains in `applied`. A failed
+        // lane write then retries next pass instead of leaving a local
+        // epoch turn that the rest of the graph never received.
+        if let Some(root) = root {
+            match host.retire_reader(root).await {
+                Ok(()) => tracing::info!(
+                    node = %owner_settings::hex32(&node),
+                    "retired the unpaired device's readership"
+                ),
+                Err(error) => {
+                    tracing::warn!(
+                        %error,
+                        node = %owner_settings::hex32(&node),
+                        "could not retire the unpaired device's readership; will retry"
+                    );
+                    continue;
+                },
+            }
+        }
+        match host.unpair_node(node).await {
+            Ok(()) => {
+                applied.remove(&node);
+                tracing::info!(
+                    node = %owner_settings::hex32(&node),
+                    "dropped an unpaired device without a restart"
+                );
+            },
+            // Keep it in `applied` so the next pass retries: a device
+            // the owner removed must not stay on the overlay quietly.
+            Err(error) => tracing::warn!(
+                %error,
+                node = %owner_settings::hex32(&node),
+                "could not drop an unpaired device"
+            ),
+        }
+    }
+}
+
+/// Turn encryption on if the owner asked and nobody has yet.
+///
+/// Checked against the lane, not against this device: seeing a group means some
+/// device already created one, and starting a second would split the graph into
+/// two halves that cannot read each other. So this creates at most once per
+/// graph, and only from the device whose settings say so.
+async fn ensure_encryption(host: &PersonalSyncHost, sync: &owner_settings::SyncSettings) {
+    if !sync.encrypted || host.is_keyed().await {
+        return;
+    }
+    match host.key_group_exists().await {
+        Ok(false) => match host.enable_encryption().await {
+            Ok(()) => tracing::info!("encryption is on for this graph"),
+            Err(error) => tracing::warn!(
+                %error,
+                "could not turn encryption on; this graph stays readable to every                              admitted device"
+            ),
+        },
+        // Somebody created it. This device waits to be added,
+        // which is the ordinary path for every device but one.
+        Ok(true) => {},
+        Err(error) => {
+            tracing::warn!(%error, "could not tell whether this graph has a key group")
+        },
+    }
+}
+
+/// Key whatever has published since the last pass, and learn any epoch this
+/// device has been given. Paired with the revocation above deliberately: a host
+/// that keys devices automatically but waits for someone to revoke would widen
+/// the reader set on its own and narrow it only when asked.
+///
+/// A no-op on a graph where encryption was never turned on, which is why it is
+/// unconditional rather than gated on a setting.
+async fn key_paired_devices(host: &PersonalSyncHost) {
+    match host.key_paired_devices().await {
+        Ok(0) => {},
+        Ok(keyed) => tracing::info!(keyed, "keyed newly paired devices"),
+        Err(error) => tracing::warn!(%error, "could not key paired devices this pass"),
+    }
+}
+
+/// Report connectedness, not just membership or a known address. A paired
+/// device discovery never resolved is silently doing nothing, and one with an
+/// address it cannot actually reach looks identical unless the two are named
+/// apart.
+///
+/// They were not, and it cost hours: a firewall dropped every inbound packet to
+/// a peer while its address stayed in the book, so this line read `reachable=1`
+/// the whole time and the host looked healthy while nothing replicated at all
+/// (2026-08-03).
+async fn refresh_peer_directory(
+    host: &PersonalSyncHost,
+    settings_file: &Path,
+    sync: &owner_settings::SyncSettings,
+    reported: &mut Option<Vec<(String, bool, bool)>>,
+) {
+    let peers = match host.known_peers().await {
+        Ok(peers) => peers,
+        Err(error) => {
+            tracing::warn!(%error, "could not read the peer directory");
+            return;
+        },
+    };
+    // Refresh the cached dial hints while the truth is live. Only connected
+    // peers: an address the endpoint holds for a peer it is NOT talking to may
+    // be exactly the stale route a working hint would replace, so writing it
+    // back would overwrite good information with bad.
+    for peer in peers.iter().filter(|peer| peer.connected) {
+        refresh_dial_hint(host, settings_file, sync, peer.peer.to_bytes()).await;
+    }
+    let mut current: Vec<(String, bool, bool)> = peers
+        .iter()
+        .map(|peer| {
+            (
+                owner_settings::hex32(&peer.peer.to_bytes()),
+                peer.reachable,
+                peer.connected,
+            )
+        })
+        .collect();
+    current.sort();
+    if reported.as_ref() == Some(&current) {
+        return;
+    }
+    let addressed = current.iter().filter(|(_, ok, _)| *ok).count();
+    let connected = current.iter().filter(|(_, _, live)| *live).count();
+    tracing::info!(
+        peers = current.len(),
+        addressed,
+        connected,
+        detail = ?current,
+        "personal sync peer directory changed"
+    );
+    match silence(current.len(), addressed, connected) {
+        // Every paired device is listed from the start, address or not, so
+        // this is how a start reads before discovery has found anyone, and
+        // how any start reads while the others are off. Not a fault.
+        Some(Silence::Unfound) => tracing::info!(
+            peers = current.len(),
+            "no paired device has an address yet: local discovery has not \
+             found one on this network, and no saved hint or relay names one"
+        ),
+        // The state that looks fine and is not: an address is known and not
+        // one device is talking. Say it plainly rather than leaving it to be
+        // inferred from a count nobody reads as connectivity.
+        Some(Silence::Unanswered) => tracing::warn!(
+            peers = current.len(),
+            addressed,
+            "no paired device has a live path: this host is \
+             replicating nothing. Check a firewall on either \
+             end, then whether a relay is configured and \
+             reachable"
+        ),
+        None => {},
+    }
+    *reported = Some(current);
+}
+
+/// Why nothing replicates, when nothing does.
+#[derive(Debug, PartialEq, Eq)]
+enum Silence {
+    /// Devices are paired, and none has an address yet.
+    Unfound,
+    /// An address is known for at least one, and none is connected.
+    Unanswered,
+}
+
+/// `None` while a device is connected, or while none is paired.
+fn silence(peers: usize, addressed: usize, connected: usize) -> Option<Silence> {
+    if peers == 0 || connected > 0 {
+        None
+    } else if addressed == 0 {
+        Some(Silence::Unfound)
+    } else {
+        Some(Silence::Unanswered)
+    }
+}
+
+async fn refresh_dial_hint(
+    host: &PersonalSyncHost,
+    settings_file: &Path,
+    sync: &owner_settings::SyncSettings,
+    node: [u8; 32],
+) {
+    let ticket = match host.peer_ticket(node).await {
+        Ok(Some(ticket)) => ticket,
+        Ok(None) => return,
+        Err(error) => {
+            tracing::warn!(%error, "could not read a peer's current address");
+            return;
+        },
+    };
+    // Encode the node once, not once per candidate device: this runs on every
+    // pairing poll, and hex32 inside the `find` predicate allocated a 64-byte
+    // String for every device in the settings file.
+    let node_hex = owner_settings::hex32(&node);
+    let stored = sync
+        .paired_devices
+        .iter()
+        .find(|device| device.node_id.eq_ignore_ascii_case(&node_hex))
+        .and_then(|device| device.last_endpoint.as_deref());
+    if stored == Some(ticket.as_str()) {
+        return;
+    }
+    // The resident is one of three writers of this file, with pair and unpair,
+    // and they run in separate processes. `update` commits only if the file is
+    // still what it loaded and otherwise reloads and reapplies the hint, so a
+    // device paired or unpaired meanwhile is kept rather than overwritten.
+    let recorded = OwnerSettings::update(settings_file, |latest| {
+        Ok::<_, OwnerSettingsError>(
+            latest
+                .sync
+                .as_mut()
+                .is_some_and(|live| live.record_endpoint(&node, &ticket)),
+        )
+    });
+    match recorded {
+        Ok(true) => {
+            tracing::info!(node = %node_hex, "recorded a fresh dial hint for a connected device")
+        },
+        Ok(false) => {},
+        Err(error) => tracing::warn!(%error, "could not record a refreshed dial hint"),
+    }
+}
+
+/// Act on transfers a person has accepted.
+///
+/// The gesture is answered synchronously by the endpoint, which records it and
+/// returns; fetching the bytes it implies cannot happen there. This is where
+/// awaiting is possible, so this is where the decision becomes bytes.
+///
+/// A failed accept is logged and dropped rather than retried forever: the
+/// offer stays on the graph, so the person can accept again once whatever
+/// blocked it (a peer that is offline, bytes that are too large) has changed.
+fn spawn_accept_watch(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle) {
+    armillary::tasks::spawn_tracked(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            // Take the queue handle out first, so the surface lock is not held
+            // while the decision lock is. Two locks held in one order here and
+            // the other order anywhere else is how a deadlock is written.
+            let decisions = surface.read().await.decisions.clone();
+            let accepted = match decisions.lock() {
+                Ok(mut queue) => std::mem::take(&mut *queue),
+                Err(_) => {
+                    tracing::warn!("transfer decisions are unreadable; accepts will not be served");
+                    continue;
+                },
+            };
+            for decision in accepted {
+                match serve_accepted_transfer(&host, &decision).await {
+                    Ok(released) => {
+                        let blobs = released.len();
+                        surface.write().await.released_blobs = released;
+                        tracing::info!(
+                            transfer = %decision.transfer_id,
+                            blobs,
+                            "accepted transfer is staged and released to the browser"
+                        );
+                    },
+                    Err(error) => tracing::warn!(
+                        transfer = %decision.transfer_id,
+                        %error,
+                        "accepted transfer could not be served; the offer remains"
+                    ),
+                }
+            }
+        }
+    });
+}
+
+/// Fetch one accepted transfer and produce the blobs a browser may pull.
+async fn serve_accepted_transfer(
+    host: &PersonalSyncHost,
+    decision: &TransferDecision,
+) -> Result<Vec<(chirograph::ContentHash, Vec<u8>)>, DeviceSyncError> {
+    let offers = host.offers().await.map_err(DeviceSyncError::Host)?;
+    let offer = offers
+        .into_iter()
+        .find(|offer| offer.transfer_id.to_string() == decision.transfer_id)
+        .ok_or_else(|| {
+            DeviceSyncError::Host(PersonalSyncHostError::Transport(format!(
+                "no offer named {} is addressed to this device",
+                decision.transfer_id
+            )))
+        })?;
+    // Staging writes into the host's own store, which is also what apply will
+    // read. A browser-side apply reads the released bytes instead, so the
+    // product store here is the same one either path uses.
+    let staging = muniment::BlobStore::new(muniment::MemoryBackend::new());
+    let manifest = receive_transfer(host, &staging, &offer)
+        .await
+        .map_err(|error| {
+            DeviceSyncError::Host(PersonalSyncHostError::Transport(error.to_string()))
+        })?;
+    released_blobs_for(host, &manifest)
+        .await
+        .map_err(|error| DeviceSyncError::Host(PersonalSyncHostError::Transport(error.to_string())))
+}
+
+fn spawn_card_refresh(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle) {
+    // The projection is otherwise only visible to an admitted browser session,
+    // which means a graph arriving from a peer leaves no trace anywhere an
+    // operator can see. Report the size when it changes, so convergence is
+    // observable rather than merely asserted.
+    let mut reported: Option<usize> = None;
+    armillary::tasks::spawn_tracked(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            match host.supplemental_cards().await {
+                Ok(snapshot) => {
+                    if reported != Some(snapshot.len()) {
+                        tracing::info!(cards = snapshot.len(), "personal graph projection changed");
+                        reported = Some(snapshot.len());
+                    }
+                    // Only the cards: released blobs are granted by
+                    // accepting a transfer, not derived from the projection,
+                    // so a refresh must not revoke them.
+                    surface.write().await.cards = snapshot;
+                },
+                Err(error) => tracing::warn!(%error, "personal sync projection refresh failed"),
+            }
+        }
+    });
+}
+
+/// Put a receipt's captures into the store that replicates.
+///
+/// Ingest computes the hashes anywhere; only the host can put bytes in the
+/// transport store its peers fetch from, which is why this is here and not in
+/// the CLI. Verifies each file against the hash the graph is about to claim,
+/// so a receipt cannot advertise a blob whose bytes say something else.
+async fn stage_captures(
+    host: &PersonalSyncHost,
+    receipt: &graphshell::receipts::PendingReceipt,
+) -> Result<usize, String> {
+    let captures = graphshell::receipts::captures_in(&receipt.events);
+    let mut staged = 0;
+    for (name, expected) in captures {
+        // Already staged (a re-poll, or the same capture from another run):
+        // skip rather than re-read and re-put. A store error here is reported
+        // rather than treated as absent, so a broken store does not look like
+        // an endless supply of missing blobs.
+        if host
+            .blobs()
+            .has(transport::BlobHash::from_bytes(expected))
+            .await
+            .map_err(|error| format!("{name}: {error}"))?
+        {
+            continue;
+        }
+        let path = receipt.source.join(&name);
+        let bytes = std::fs::read(&path).map_err(|error| format!("{}: {error}", path.display()))?;
+        let hash = host
+            .blobs()
+            .put_bytes(bytes)
+            .await
+            .map_err(|error| format!("{name}: {error}"))?;
+        if hash.as_bytes() != &expected {
+            return Err(format!(
+                "{name}: bytes hash to {} but the receipt claims {}",
+                owner_settings::hex32(hash.as_bytes()),
+                owner_settings::hex32(&expected),
+            ));
+        }
+        staged += 1;
+    }
+    Ok(staged)
+}
+
+/// How often the host looks for receipts deposited by `receipt_ingest`.
+///
+/// Slow on purpose: a receipt arrives when a person runs a scenario on another
+/// machine, which is minutes apart at best, and the intake is a directory scan
+/// rather than something worth spinning on.
+const RECEIPT_POLL: std::time::Duration = std::time::Duration::from_secs(10);
+
+/// Author receipts that ingest left in the inbox.
+///
+/// The resident host is the only writer for this graph, so ingest deposits and
+/// this authors. One turn per receipt: a run is one fact, and batching two
+/// runs into a turn would make a later reader unable to tell which events
+/// belonged to which.
+fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
+    armillary::tasks::spawn_tracked(async move {
+        loop {
+            tokio::time::sleep(RECEIPT_POLL).await;
+            let waiting = match graphshell::receipts::claim_pending(&inbox) {
+                Ok(waiting) if waiting.is_empty() => continue,
+                Ok(waiting) => waiting,
+                Err(error) => {
+                    tracing::warn!(%error, inbox = %inbox.display(), "receipt intake scan failed");
+                    continue;
+                },
+            };
+            for claim in waiting {
+                let path = claim.receipt().path.clone();
+                match author_receipt_claim(&host, claim).await {
+                    Ok(events) => tracing::info!(
+                        events,
+                        path = %path.display(),
+                        "authored a receipt into the personal graph"
+                    ),
+                    Err(error) => tracing::warn!(
+                        %error,
+                        path = %path.display(),
+                        "receipt intake incomplete; retaining claim for retry"
+                    ),
+                }
+            }
+        }
+    });
+}
+
+/// Stage, author, then acknowledge the same immutable hand-off. Leaving the
+/// claim on any failure also covers interruption at either await. A restart
+/// after authoring may replay the turn; it must never clear a newer deposit.
+async fn author_receipt_claim(
+    host: &PersonalSyncHost,
+    claim: graphshell::receipts::ClaimedReceipt,
+) -> Result<usize, String> {
+    let receipt = claim.receipt();
+    let events = receipt.events.len();
+    // Author only after all capture hashes have been checked and staged: the
+    // signed turn must not advertise bytes this device cannot serve.
+    stage_captures(host, receipt)
+        .await
+        .map_err(|error| format!("could not stage receipt captures: {error}"))?;
+    host.author(receipt.events.clone())
+        .await
+        .map_err(|error| format!("could not author receipt: {error}"))?;
+    claim.mark_applied().map_err(|error| {
+        format!(
+            "authored receipt but could not archive its claim; retry may repeat the turn: {error}"
+        )
+    })?;
+    Ok(events)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    async fn receipt_host() -> (tempfile::TempDir, PersonalSyncHost) {
+        let directory = tempfile::tempdir().unwrap();
+        let identity = personae::InMemoryProvider::from_seed([0x83; 32]);
+        let host = PersonalSyncHost::open(
+            &identity,
+            PersonalSyncHostConfig {
+                graph: [0x84; 32],
+                store_path: directory.path().join("receipts.redb"),
+                roster: SyncRoster::new([identity.master_public_key().to_bytes()]),
+                selection: SyncSelection::default(),
+                peer_tickets: Vec::new(),
+                peer_hints: Vec::new(),
+                paired_nodes: Vec::new(),
+                relay_urls: Vec::new(),
+            },
+        )
+        .await
+        .unwrap();
+        (directory, host)
+    }
+
+    fn receipt_events(id: uuid::Uuid, title: &str) -> Vec<PersonalGraphEvent> {
+        vec![
+            PersonalGraphEvent::AddNode {
+                id,
+                address: format!("https://receipt.test/{id}"),
+                title: title.into(),
+            },
+            PersonalGraphEvent::SetTitle {
+                node: id,
+                title: title.into(),
+            },
+        ]
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn receipt_authoring_acknowledges_only_the_claimed_version() {
+        let (directory, host) = receipt_host().await;
+        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let node = uuid::Uuid::from_u128(0x85);
+        graphshell::receipts::write_to_inbox(
+            &inbox,
+            node,
+            directory.path(),
+            &receipt_events(node, "original"),
+        )
+        .unwrap();
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        graphshell::receipts::write_to_inbox(
+            &inbox,
+            node,
+            directory.path(),
+            &receipt_events(node, "corrected"),
+        )
+        .unwrap();
+
+        assert_eq!(author_receipt_claim(&host, claim).await.unwrap(), 2);
+        let cards = host.supplemental_cards().await.unwrap();
+        assert!(cards.iter().any(|card| card.card.title == "original"));
+        assert!(!cards.iter().any(|card| card.card.title == "corrected"));
+        assert_eq!(graphshell::receipts::pending(&inbox).unwrap().len(), 1);
+
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        author_receipt_claim(&host, claim).await.unwrap();
+        assert!(
+            host.supplemental_cards()
+                .await
+                .unwrap()
+                .iter()
+                .any(|card| card.card.title == "corrected")
+        );
+        assert!(
+            graphshell::receipts::claim_pending(&inbox)
+                .unwrap()
+                .is_empty()
+        );
+        host.close().await.unwrap();
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn a_receipt_capture_failure_retains_the_claim_without_authoring() {
+        let (directory, host) = receipt_host().await;
+        let inbox = graphshell::receipts::inbox_dir(directory.path());
+        let node = uuid::Uuid::from_u128(0x86);
+        let mut events = receipt_events(node, "must not be authored");
+        events.push(PersonalGraphEvent::SetFacet {
+            node,
+            facet: graphshell::receipts::FACET_ARTIFACTS.into(),
+            value: serde_json::json!([{"name":"absent.png", "blake3":"42".repeat(32)}]),
+        });
+        graphshell::receipts::write_to_inbox(&inbox, node, directory.path(), &events).unwrap();
+        let claim = graphshell::receipts::claim_pending(&inbox)
+            .unwrap()
+            .pop()
+            .unwrap();
+        let path = claim.receipt().path.clone();
+        assert!(
+            author_receipt_claim(&host, claim)
+                .await
+                .unwrap_err()
+                .contains("could not stage")
+        );
+        assert!(path.exists());
+        assert!(
+            !host
+                .supplemental_cards()
+                .await
+                .unwrap()
+                .iter()
+                .any(|card| card.card.title == "must not be authored")
+        );
+        assert_eq!(
+            graphshell::receipts::claim_pending(&inbox).unwrap().len(),
+            1
+        );
+        host.close().await.unwrap();
+    }
+
+    #[test]
+    fn the_data_root_override_is_taken_as_given_and_skips_the_migration() {
+        let directory = tempfile::tempdir().unwrap();
+        let vault = directory.path().join("vault");
+        std::fs::create_dir_all(owner_settings::legacy_data_root(&vault)).unwrap();
+        let chosen = directory.path().join("elsewhere");
+
+        let resolved = resolve_data_root(directory.path(), &vault, Some(chosen.clone())).unwrap();
+        assert_eq!(resolved, chosen);
+        assert!(
+            owner_settings::legacy_data_root(&vault).exists(),
+            "an explicit --data-root must not move anything behind the \
+             owner's back"
+        );
+    }
+
+    #[test]
+    fn a_graph_name_maps_to_one_id_and_different_names_do_not_collide() {
+        assert_eq!(personal_graph_id("personal"), personal_graph_id("personal"));
+        assert_ne!(personal_graph_id("personal"), personal_graph_id("scratch"));
+    }
+
+    /// A paired device with no address is listed from the start (pairing plan
+    /// D1b), so "none found yet" must not read as the firewall warning.
+    #[test]
+    fn silence_names_unfound_apart_from_unanswered() {
+        assert_eq!(silence(0, 0, 0), None, "nothing paired is not silence");
+        assert_eq!(silence(2, 2, 1), None, "one connected device is enough");
+        assert_eq!(silence(2, 0, 0), Some(Silence::Unfound));
+        assert_eq!(silence(2, 1, 0), Some(Silence::Unanswered));
+    }
+
+    /// The pairing watcher starts from this value. Losing the root here means
+    /// an ordinary restart followed by unpair can drop reachability while
+    /// silently leaving the departed device in the graph's key group.
+    #[test]
+    fn initial_pairing_watch_state_retains_each_device_root() {
+        let node = [0xd4; 32];
+        let root = [0xd5; 32];
+        let mut sync = owner_settings::SyncSettings::default();
+        assert!(sync.pair(node, Some(root), "sibling", 1));
+
+        let applied = paired_nodes_with_roots(&sync).unwrap();
+        assert_eq!(applied.get(&node), Some(&Some(root)));
+    }
+}

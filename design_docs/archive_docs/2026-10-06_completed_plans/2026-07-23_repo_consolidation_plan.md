@@ -32,7 +32,7 @@ sequence, and receipts remain in force.
 **Companions:** the
 [projection-engine prior-art brief](../../mere_docs/research/2026-07-21_projection_engine_prior_art_brief.md),
 the [projection proofs plan](2026-07-21_projection_proofs_plan.md), the
-[Murm peer-runtime and Moot-domain plan](../../mere_docs/implementation_strategy/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+[Murm peer-runtime and Moot-domain plan](../2026-10-28/2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
 (promotion rows withdrawn by this plan), and the
 [mere/turnstone boundary pass plan](2026-07-09_mere_turnstone_boundary_pass_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.
 

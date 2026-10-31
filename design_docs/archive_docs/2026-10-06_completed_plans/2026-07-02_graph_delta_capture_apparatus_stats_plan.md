@@ -144,7 +144,7 @@ stats.
 **Open, raised by the S14 pass (2026-10-06):** do per-table stats get a new
 home? Options: re-scope them into `crates/domain/apparatus`; leave them
 retired with meerkat, with `GraphJournal` and the
-[graph view curation plan](../../mere_docs/implementation_strategy/2026-08-03_graph_view_curation_and_interaction_plan.md)
+[graph view curation plan](../2026-10-28/2026-08-03_graph_view_curation_and_interaction_plan.md)
 as the successors.
 
 ## Progress

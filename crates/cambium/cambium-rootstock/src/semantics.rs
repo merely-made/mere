@@ -8,7 +8,9 @@
 //! AccessKit remains the existing contributor vocabulary. This copied read is
 //! not a presentation revision, target lease or operation-outcome authority.
 use crate::a11y_provenance::{A11yProvenance, NodeTarget, SemanticNodeIdentity};
-use crate::owned_layout::{custom_leaf_key, flat_nodes};
+use crate::owned_layout::custom_leaf_key;
+#[cfg(test)]
+use crate::owned_layout::flat_nodes;
 use crate::{
     LeafRegistry, NodeId, OwnedLayout, ProducedAction, ProducerRegistry, ProducerRole,
     ProducerSemantics,
@@ -63,21 +65,37 @@ impl SemanticProjection {
         if !owner.is_live() {
             return Err(PublicationIssue::OwnerEnded);
         }
-        let dom_nodes: HashMap<_, _> = flat_nodes(dom)
-            .into_iter()
-            .map(|node| (A11yNodeId(dom.opaque_id(node)), node))
-            .collect();
+        let mut dom_nodes = HashMap::new();
+        let mut members = HashMap::new();
+        for member in dom.members() {
+            dom_nodes.insert(A11yNodeId(dom.opaque_id(member.node())), member);
+            members.insert(member.node(), member);
+        }
         let mut identities = HashMap::new();
         for (id, _) in &self.tree.nodes {
             let target = self
                 .produced_nodes
                 .get(id)
                 .cloned()
-                .or_else(|| dom_nodes.get(id).map(|node| NodeTarget::Node(*node)))
+                .or_else(|| {
+                    dom_nodes
+                        .get(id)
+                        .map(|member| NodeTarget::Node(member.node()))
+                })
                 .ok_or(PublicationIssue::UnknownNode(*id))?;
-            let identity = SemanticNodeIdentity(A11yProvenance::capture_node(
-                owner, target, dom, leaves, producers,
-            ));
+            let member = match &target {
+                NodeTarget::Node(node) => members.get(node),
+                NodeTarget::Produced { slot, .. } => self
+                    .producer_slots
+                    .get(slot)
+                    .and_then(|node| members.get(node)),
+            }
+            .copied()
+            .ok_or(PublicationIssue::UnknownNode(*id))?;
+            let identity = SemanticNodeIdentity(
+                A11yProvenance::capture_published_member(owner, target, member, leaves, producers)
+                    .ok_or(PublicationIssue::RouteMismatch(*id))?,
+            );
             if !identity.0.contributors_live() {
                 return Err(PublicationIssue::ContributorEnded(*id));
             }
@@ -174,14 +192,19 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
     let mut reserved_ids = indices.keys().copied().collect();
     let mut nodes = Vec::new();
     let mut slot_counts = HashMap::<u64, usize>::new();
-    for node in flat_nodes(dom) {
+    layout.walk_painted_geometry(dom, |node, geometry| {
         let key = custom_leaf_key(dom, node);
         if let Some(key) = key {
             *slot_counts.entry(key).or_default() += 1;
         }
-        nodes.push((node, key));
-    }
-    for (node, key) in nodes {
+        let origin = geometry
+            .content_rect
+            .filter(|_| geometry.placement_visible)
+            .map(|(x, y, _, _)| (f64::from(x), f64::from(y)))
+            .filter(|(x, y)| x.is_finite() && y.is_finite());
+        nodes.push((node, key, origin));
+    });
+    for (node, key, content_origin) in nodes {
         let id = A11yNodeId(dom.opaque_id(node));
         let Some(&index) = indices.get(&id) else {
             continue;
@@ -192,10 +215,10 @@ pub fn project_semantics<D: LayoutDom<NodeId = NodeId>>(
             if let Some(semantics) = producers.semantics(key) {
                 match add_producer_semantics(
                     &mut result.tree,
-                    id,
+                    index,
                     key,
                     semantics,
-                    layout.scrolled_content_origin(dom, node),
+                    content_origin,
                     &mut result.produced_targets,
                     &mut result.produced_nodes,
                     &mut reserved_ids,
@@ -289,14 +312,14 @@ fn restrict_actions(node: &mut accesskit::Node) {
 }
 
 /// Write a producer's own semantics onto its slot's node, and what it draws
-/// as child nodes in the host's current untransformed, scroll-adjusted content
-/// space. Forward CSS transforms and clipping remain a supplier mapping gate.
+/// as child nodes in the host's current translated, scroll-adjusted content
+/// space. Full affine transforms and clipping remain a supplier mapping gate.
 /// A drawn node's actions become
 /// its Button children, each taking Click (`producer` is the slot's registry
 /// key, which a reader's click on one names in `produced_map`).
 fn add_producer_semantics(
     tree: &mut TreeUpdate,
-    slot: A11yNodeId,
+    index: usize,
     producer: u64,
     semantics: ProducerSemantics,
     content_origin: Option<(f64, f64)>,
@@ -304,9 +327,7 @@ fn add_producer_semantics(
     produced_nodes: &mut HashMap<A11yNodeId, NodeTarget>,
     reserved_ids: &mut HashSet<A11yNodeId>,
 ) -> Result<(), ProducerSemanticIssue> {
-    let Some(index) = tree.nodes.iter().position(|(id, _)| *id == slot) else {
-        return Ok(());
-    };
+    let slot = tree.nodes[index].0;
     // Reserve the complete contribution before changing the slot or any route.
     // An invalid later child must not leave an actionable prefix behind.
     reserve_producer_ids(slot, producer, &semantics, reserved_ids)?;
@@ -479,5 +500,7 @@ fn accesskit_role(role: ProducerRole) -> Role {
     }
 }
 
+#[cfg(test)]
+mod geometry_tests;
 #[cfg(test)]
 mod tests;

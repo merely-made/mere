@@ -5,7 +5,7 @@
 each of Knot's requirements, headed on the winit host. Each scenario runs at
 the full centre (1,100 by 700) and in a 280 px side tile, and every frame was
 reviewed whole. This is step 2 of V2b in the
-[reservoir plan](../implementation_strategy/2026-09-23_reservoir_plan.md).
+[reservoir plan](../../archive_docs/2026-10-28/2026-09-23_reservoir_plan.md).
 
 ## How it runs
 
@@ -101,7 +101,7 @@ under `Code/testing/mere/scenarios/mere-view-at-5c1905b3/`.
 
 - **Only the native winit host, on Windows at 2× scale.** The browser host
   projects no accessibility yet; that is phase 1 of the
-  [one-tree plan](../implementation_strategy/2026-09-25_graphshell_one_tree_plan.md).
+  [one-tree plan](../../archive_docs/2026-10-28/2026-09-25_graphshell_one_tree_plan.md).
 - **A catalog like Knot's, not Knot's.** Knot's step 8 re-proves the
   requirements in its own embedding.
 - **Screen readers:** AccessKit projected the tree (67 nodes, from the host's

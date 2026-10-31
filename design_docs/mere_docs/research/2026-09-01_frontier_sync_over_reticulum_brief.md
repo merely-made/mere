@@ -18,9 +18,9 @@ two peers may never be online together.
   tiny frames, which is a Reticulum-native sync projection nobody has built."
   The finding here is that RBSR is the wrong tool and the frontier vector
   p2panda already carries is the right one.
-- [`../implementation_strategy/2026-07-24_low_power_managed_network_plan.md`](../implementation_strategy/2026-07-24_low_power_managed_network_plan.md)
+- [`../implementation_strategy/2026-07-24_low_power_managed_network_plan.md`](../../archive_docs/2026-10-28/2026-07-24_low_power_managed_network_plan.md)
   V10 (selective replication) is the unstarted item this brief scopes.
-- [`../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md`](../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md)
+- [`../implementation_strategy/2026-07-12_deletion_retention_and_native_drop_plan.md`](../../archive_docs/2026-10-28/2026-07-12_deletion_retention_and_native_drop_plan.md)
   decision 6, "the drop is a carrier, not a second sync engine," and its seam
   table row "no delay-tolerant application bundle," both bind here.
 - `murm/design_docs/2026-08-25_compact_signed_feed_and_local_control_plan.md`

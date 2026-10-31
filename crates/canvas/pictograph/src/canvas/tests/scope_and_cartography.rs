@@ -10,6 +10,32 @@
 use super::*;
 
 #[test]
+fn isolating_a_selection_keeps_a_resource_neighbour_and_degree_counts_it() {
+    let mut canvas = Canvas::new();
+    let [hub, cited, apart] = ["hub", "cited", "apart"]
+        .map(|name| canvas.open_member_as_new_node(None, &format!("https://{name}.test")));
+    let [hub_key, cited_key, apart_key] =
+        [hub, cited, apart].map(|id| canvas.graph().get_node_by_id(id).unwrap().0);
+    // A Cites lives on the Resource stratum, where the Surface reader sees nothing.
+    assert!(canvas.assert_relation_between_members(hub, cited, SemanticSubKind::Cites));
+    assert_eq!(canvas.graph().neighbors_undirected(hub_key).count(), 0);
+
+    canvas.select_member(hub);
+    canvas.isolate_selection();
+    assert!(
+        canvas.node_in_scope(cited_key),
+        "the neighbour stays in scope"
+    );
+    assert!(!canvas.node_in_scope(apart_key));
+
+    canvas.set_size_by_degree(true);
+    canvas.set_height_by_degree(true);
+    assert_eq!(canvas.node_size(hub_key), canvas.node_size(apart_key) + 8.0);
+    assert_eq!(canvas.node_height(hub_key), 16.0);
+    assert_eq!(canvas.node_height(apart_key), 0.0);
+}
+
+#[test]
 fn isolate_selection_scopes_the_canvas() {
     let mut graph = Graph::new();
     let a = graph.add_node(

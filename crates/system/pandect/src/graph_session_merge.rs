@@ -239,32 +239,6 @@ struct Basis {
     ids: BTreeMap<Uuid, Uuid>,
 }
 
-/// Rewrite every id `ids` names, wherever it appears in `edit` (node ids,
-/// edge endpoints, import memberships, facet-store keys).
-fn remap_edit(edit: &CapturedDelta, ids: &BTreeMap<String, String>) -> CapturedDelta {
-    fn walk(value: &mut Value, ids: &BTreeMap<String, String>) {
-        match value {
-            Value::String(text) => {
-                if let Some(mapped) = ids.get(text.as_str()) {
-                    *text = mapped.clone();
-                }
-            },
-            Value::Array(items) => items.iter_mut().for_each(|item| walk(item, ids)),
-            Value::Object(map) => {
-                let entries = std::mem::take(map);
-                for (key, mut item) in entries {
-                    walk(&mut item, ids);
-                    map.insert(ids.get(&key).cloned().unwrap_or(key), item);
-                }
-            },
-            _ => {},
-        }
-    }
-    let mut value = serde_json::to_value(edit).expect("a captured edit encodes");
-    walk(&mut value, ids);
-    serde_json::from_value(value).expect("a remapped edit decodes")
-}
-
 /// The `CopiedFrom` derivation of node `id` into `container`, looked up in
 /// each graph in turn.
 fn copied_from(graphs: &[&Graph], id: Uuid, container: Uuid) -> Option<Uuid> {
@@ -599,7 +573,7 @@ impl<B: Backend + Clone> MereSessions<B> {
                 {
                     continue;
                 }
-                change.push(remap_edit(&edit, &names));
+                change.push(edit.remap_ids(&names));
             }
         }
         // A node of the source's baseline the replay did not bring (a part
@@ -616,20 +590,20 @@ impl<B: Backend + Clone> MereSessions<B> {
             .collect();
         for id in &missing {
             if let Some(made) = recreate_node_edits(&baseline, *id) {
-                change.extend(made.iter().map(|edit| remap_edit(edit, &names)));
+                change.extend(made.iter().map(|edit| edit.remap_ids(&names)));
             }
         }
         change.extend(
             incident_edge_edits(&baseline, &missing)
                 .iter()
-                .map(|edit| remap_edit(edit, &names)),
+                .map(|edit| edit.remap_ids(&names)),
         );
         let live = source.journal().live_cursor();
         change.extend(
             source
                 .edits_in(Seq(0), live)
                 .iter()
-                .map(|edit| remap_edit(edit, &names)),
+                .map(|edit| edit.remap_ids(&names)),
         );
         let mut source_graph = base.clone();
         replay_captured_deltas_onto(&mut source_graph, change.iter().cloned());
@@ -770,7 +744,7 @@ impl<B: Backend + Clone> MereSessions<B> {
                     let mut made =
                         recreate_node_edits(&pending.source_graph, *node).unwrap_or_default();
                     made.extend(incident_edge_edits(&pending.source_graph, &[*node]));
-                    let made = made.iter().map(|edit| remap_edit(edit, &names)).collect();
+                    let made = made.iter().map(|edit| edit.remap_ids(&names)).collect();
                     if let Some(origin) = origins.get(node).copied() {
                         origins.insert(fresh, origin);
                     }

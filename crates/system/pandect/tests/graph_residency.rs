@@ -4,6 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{
     CoverageLayer, Graph, SemanticStatementSpec,
     apply::{self, GraphDelta, apply_graph_delta},

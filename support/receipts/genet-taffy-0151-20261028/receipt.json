@@ -1,0 +1,699 @@
+{
+  "date": "2026-10-28",
+  "receiving_code_commit": "590097f6a35164c3d0fcc74961ef3ae4661c28f4",
+  "genet_commit": "565458ea3ab816940484079330eb165a878a22e0",
+  "upstream_release": "0.15.1",
+  "published_fork": {
+    "version": "0.16.0",
+    "registry_checksum": "c956cab2c4b0ae59ce89800c22d6f8db0cf4b45152fc17a5a945f260af085805",
+    "source_identical_to_tested_package": true,
+    "vcs": {
+      "git": {
+        "sha1": "565458ea3ab816940484079330eb165a878a22e0"
+      },
+      "path_in_vcs": "support/patches/taffy"
+    },
+    "files": 72
+  },
+  "lock_reconciliation": {
+    "root": {
+      "selected_records": 36,
+      "all_nonselected_records_preserved": true,
+      "before_sha256": "d626c692ec1c49db834d7d7e110fcd1a0820341b271080dd7eee5143e74d690d",
+      "after_sha256": "349d12ebfe447d1c381d700aa016e1b41f1d48ecaf6d22d191234bdfee54a658"
+    },
+    "web": {
+      "selected_records": 25,
+      "all_nonselected_records_preserved": true,
+      "before_sha256": "e51cbb786f53c5e8c510c958f68807a462198f620b8ca6bc38a4010e4a08f2f4",
+      "after_sha256": "4e9ec2117c5899228846f1b4e53a3b0353e889da10cb9bf6bb4a9febffdade0f"
+    }
+  },
+  "metadata_source_audit": {
+    "root": {
+      "resolved_packages": 1611,
+      "lock_records": 1830,
+      "missing_source_aware_records": [],
+      "fork": [
+        {
+          "version": "0.16.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "manifest_path": "<home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/genet-taffy-0.16.0/Cargo.toml"
+        }
+      ],
+      "lock_sha256": "349d12ebfe447d1c381d700aa016e1b41f1d48ecaf6d22d191234bdfee54a658",
+      "checkout_heads": {
+        "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80",
+        "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+        "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e": "565458ea3ab816940484079330eb165a878a22e0",
+        "<home>/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+        "<home>/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+        "<home>/.cargo/git/checkouts/cleromancy-1cf25b25af3bf29c/ee21cf0": "ee21cf01edefa9ee685b2ab34c87c7e247175d55",
+        "<home>/.cargo/git/checkouts/gemot-59818c29094871e0/998133b": "998133bc17b8636152e9c4f7605eb475498213c8",
+        "<home>/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+        "<home>/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+        "<home>/.cargo/git/checkouts/errand-22a5c66f8a0a2658/897fb96": "897fb963d184f0e379ab9041d68e17e726cb7763",
+        "<home>/.cargo/git/checkouts/esp-fee4926440a1bad1/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+        "<home>/.cargo/git/checkouts/esp-45bbaf8e1db2afe3/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+        "<home>/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+        "<home>/.cargo/git/checkouts/kiss3d-2156ff9785df68b8/c362cd5": "c362cd5855c01a525d1091589a0e38135007692f",
+        "<home>/.cargo/git/checkouts/knot-editor-87fc402d91cabea0/3e22516": "3e2251698bada90d20cc0eb19551841339376f9a",
+        "<home>/.cargo/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b": "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+        "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72": "66b2f72e9e0785819139739cc4503bf1e8766de9",
+        "<home>/.cargo/git/checkouts/turquet-b11669ab490b8380/8e3755b": "8e3755bbd0d40343eb4750b072801c941ff32802"
+      }
+    },
+    "web": {
+      "resolved_packages": 725,
+      "lock_records": 1131,
+      "missing_source_aware_records": [],
+      "fork": [
+        {
+          "version": "0.16.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "manifest_path": "<home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/genet-taffy-0.16.0/Cargo.toml"
+        }
+      ],
+      "lock_sha256": "4e9ec2117c5899228846f1b4e53a3b0353e889da10cb9bf6bb4a9febffdade0f",
+      "checkout_heads": {
+        "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80",
+        "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+        "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e": "565458ea3ab816940484079330eb165a878a22e0",
+        "<home>/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+        "<home>/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+        "<home>/.cargo/git/checkouts/esp-45bbaf8e1db2afe3/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+        "<home>/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+        "<home>/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+        "<home>/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+        "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b": "11e208b84a981993df8077bb6025f8b3adbe2291",
+        "<home>/.cargo/git/checkouts/woodshed-b9974f59ddc43cf9/a0ae58f": "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61"
+      }
+    }
+  },
+  "genet_validation": {
+    "date": "2026-10-28",
+    "base_genet_commit": "8a6a805039ec791a28d59dcda6add174abe772d1",
+    "upstream_release": "0.15.1",
+    "upstream_release_url": "https://github.com/DioxusLabs/taffy/releases/tag/v0.15.1",
+    "fork_version": "0.16.0",
+    "current_upstream_preserved": true,
+    "old_delta_was_stale_in_five_files": true,
+    "fresh_old_base_delta_roundtrip": true,
+    "final_source_delta": {
+      "upstream_version": "0.15.1",
+      "fork_version": "0.16.0",
+      "all_source_files": 52,
+      "changed_files": [
+        "compute/block.rs",
+        "compute/flexbox.rs",
+        "compute/float.rs",
+        "compute/grid/alignment.rs",
+        "compute/grid/mod.rs",
+        "compute/leaf.rs",
+        "compute/mod.rs",
+        "compute/oof.rs",
+        "prelude.rs",
+        "style/compact_length.rs",
+        "style/dimension.rs",
+        "style/flex.rs",
+        "style/grid.rs",
+        "style/mod.rs",
+        "tree/cache.rs",
+        "tree/layout.rs",
+        "tree/taffy_tree.rs",
+        "tree/traits.rs",
+        "util/print.rs"
+      ],
+      "delta_sha256": "cfbdbf78b6109b4a7f0c0a2def47f2a88d6dddb98f44089b9e9c7a83ae86e1d0",
+      "delta_size": 62939,
+      "byte_exact_source_roundtrip": true
+    },
+    "tests": {
+      "fork_all_features": {
+        "passed": 196,
+        "doctests_passed": 5
+      },
+      "extracted_package_all_features": {
+        "passed": 196,
+        "doctests_passed": 5
+      },
+      "buckram_genet_livery_livery": {
+        "command": [
+          "test",
+          "--locked",
+          "--offline",
+          "-p",
+          "buckram",
+          "-p",
+          "genet-livery",
+          "-p",
+          "livery",
+          "--no-fail-fast",
+          "-j",
+          "4"
+        ],
+        "targets": 70,
+        "passed": 1220,
+        "failed": 0,
+        "ignored": 12
+      }
+    },
+    "retained_regressions": {
+      "wrapped_column_automatic_minimum": {
+        "before": 500,
+        "expected_and_after": 100,
+        "red_log": "probe-0005.stdout"
+      },
+      "authored_content_basis_ratio": {
+        "before": 500,
+        "expected_and_after": 80,
+        "red_log": "probe-0009.stdout"
+      },
+      "positioned_grid_origin": {
+        "before_y": 9,
+        "expected_and_after_y": 8,
+        "red_log": "consumers-tests-0006.stdout",
+        "control": "explicit align-content:stretch retains child top margin; both forms pass"
+      }
+    },
+    "css_alignment_reference": "https://www.w3.org/TR/css-align-3/#propdef-align-content",
+    "scope_limits": [
+      "No new physical IME or accessibility qualification",
+      "No new Linux/Vulkan or GPU pixel qualification",
+      "No new browser reference-engine measurement"
+    ],
+    "generated_delta_whitespace_diagnostics": 17,
+    "non_patch_diff_check_passed": true,
+    "evidence_root": "<Code>/output/graphshell-taffy-source-20261028",
+    "evidence_sha256": {
+      "consumers-tests-0007.stdout": "a9903561e1dd6cb31c47512c70480f6d8d1c070f97f3852033446cbc9df9e961",
+      "consumers-tests-0007.stderr": "8f06b25d93cba906ace16658e411baf428e9e267345b05f375d858eeda62c1f6",
+      "probe-0010.stdout": "91617222fa91c908eaee237f39e01eee065ec54f401c7f8218a173751e839de3",
+      "probe-0010.stderr": "5ce9e185dd4c6ebbec577fdf1654770035bd8e432804edb889872fc4fbbf7ca0",
+      "package-tests.stdout": "05a69d4db385beb772702e2705b9b9837a00e8734b42af12b72aa1cb1de9a3f2",
+      "package-tests.stderr": "0bee2ed5a3299525624eb97b16efbec4fae9214d1192c42e8267654c61a02187",
+      "final-delta-roundtrip.json": "f016dbeca4ec9f46a88a0e7526e2e9bd6e956bdfab367fea2b39ee871200de30",
+      "probe-0005.stdout": "8f540d26d6581f3801d0980cbdeb272c871333cb4fa43e692fc221546a770385",
+      "probe-0009.stdout": "8bc51fab3a9cc508b645a1f090b058cf94031d012745a203c10ec6e6530b5041",
+      "consumers-tests-0006.stdout": "ee74a849e49e7a5b5dcd82a89a6fa10dd3a4b12b3ecff9012d6af2abb5238bb1"
+    }
+  },
+  "receiving_builds": {
+    "native": {
+      "run": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "20",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027",
+          "--",
+          "build",
+          "--locked",
+          "--offline",
+          "-p",
+          "graphshell",
+          "-p",
+          "graphshell-mere",
+          "--lib",
+          "--bin",
+          "graphshell_mere",
+          "--message-format",
+          "json-render-diagnostics",
+          "-j4"
+        ],
+        "source_head": "590097f6a35164c3d0fcc74961ef3ae4661c28f4",
+        "lock_sha256": "349d12ebfe447d1c381d700aa016e1b41f1d48ecaf6d22d191234bdfee54a658",
+        "started": 1793244216.45825,
+        "exit": 0,
+        "elapsed_seconds": 195.545
+      },
+      "source_audit": {
+        "built_package_identities": 721,
+        "lock_records": 1830,
+        "all_built_package_identities_match_lock": true,
+        "missing_source_aware_records": [],
+        "git_checkout_heads": {
+          "<home>/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+          "<home>/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+          "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72": "66b2f72e9e0785819139739cc4503bf1e8766de9",
+          "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e": "565458ea3ab816940484079330eb165a878a22e0",
+          "<home>/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+          "<home>/.cargo/git/checkouts/p2panda-d3fc8d2ceee505e1/1f69c9b": "1f69c9bcb9f2a9d798b1c25b2ec2f47c0416bd65",
+          "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+          "<home>/.cargo/git/checkouts/esp-fee4926440a1bad1/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+          "<home>/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+          "<home>/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+          "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80"
+        },
+        "rendering_cohorts": [
+          {
+            "package": "paint_list_api",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/paint_list_api/Cargo.toml"
+          },
+          {
+            "package": "netrender_device",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/netrender_device/Cargo.toml"
+          },
+          {
+            "package": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/netrender/Cargo.toml"
+          },
+          {
+            "package": "layout-dom-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/layout-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-paint-types",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/paint-types/Cargo.toml"
+          },
+          {
+            "package": "document-session-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/document-session-api/Cargo.toml"
+          },
+          {
+            "package": "engine-observables-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/engine-observables-api/Cargo.toml"
+          },
+          {
+            "package": "genet-fontique",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/fontique/Cargo.toml"
+          },
+          {
+            "package": "genet-text",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-text/Cargo.toml"
+          },
+          {
+            "package": "genet-static-dom",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-static-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-host-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-host-api/Cargo.toml"
+          },
+          {
+            "package": "genet-flow",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/css-flow/Cargo.toml"
+          },
+          {
+            "package": "cadency",
+            "version": "0.0.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/cadency/Cargo.toml"
+          },
+          {
+            "package": "genet-parley",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/parley/Cargo.toml"
+          },
+          {
+            "package": "paint_list_render",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#66b2f72e9e0785819139739cc4503bf1e8766de9",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/66b2f72/paint_list_render/Cargo.toml"
+          },
+          {
+            "package": "livery",
+            "version": "0.0.5",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/livery/Cargo.toml"
+          },
+          {
+            "package": "regress",
+            "version": "0.11.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/regress-0.11.1/Cargo.toml"
+          },
+          {
+            "package": "genet-document-resources",
+            "version": "0.2.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-document-resources/Cargo.toml"
+          },
+          {
+            "package": "genet-scripted-dom",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-scripted-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-events",
+            "version": "0.0.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-events/Cargo.toml"
+          },
+          {
+            "package": "buckram",
+            "version": "0.0.3",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/buckram/Cargo.toml"
+          },
+          {
+            "package": "genet-livery",
+            "version": "0.0.4",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-livery/Cargo.toml"
+          },
+          {
+            "package": "fleece",
+            "version": "0.5.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/fleece/Cargo.toml"
+          },
+          {
+            "package": "genet-presenter",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-render-host/Cargo.toml"
+          },
+          {
+            "package": "genet-render",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-render/Cargo.toml"
+          },
+          {
+            "package": "genet-browsing",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/browsing-context/Cargo.toml"
+          },
+          {
+            "package": "genet-documents",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-documents/Cargo.toml"
+          },
+          {
+            "package": "genet-winit",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-winit-host/Cargo.toml"
+          },
+          {
+            "package": "taproot",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/taproot/Cargo.toml"
+          }
+        ],
+        "method": "Cargo compiler-artifact messages supply the actual package manifests; Git HEAD is read from each Cargo checkout and compared with the precise lock source. Registry/path identities use the Cargo package id and manifest package name.",
+        "published_fork_artifacts": [
+          {
+            "package_id": "registry+https://github.com/rust-lang/crates.io-index#genet-taffy@0.16.0",
+            "manifest_path": "<home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/genet-taffy-0.16.0/Cargo.toml",
+            "fresh": false
+          }
+        ]
+      },
+      "artifact": {
+        "path": "<Code>/output/graphshell-taffy-source-20261028/receiving-builds/graphshell_mere",
+        "sha256": "6d21d83acef395eefbdc9208d8e6a015301578ae830d5fe20b31624076f3cfb7",
+        "size": 225974784
+      }
+    },
+    "web": {
+      "run": {
+        "command": [
+          "python3",
+          "<Code>/tools/build_storage.py",
+          "build",
+          "--lane",
+          "graphshell-components",
+          "--reserve-gib",
+          "20",
+          "--cwd",
+          "<Code>/worktrees/mere-cue-geometry-linux-20261027/ports/graphshell/web",
+          "--",
+          "build",
+          "--locked",
+          "--offline",
+          "--target",
+          "wasm32-unknown-unknown",
+          "--lib",
+          "--message-format",
+          "json-render-diagnostics",
+          "-j4"
+        ],
+        "source_head": "590097f6a35164c3d0fcc74961ef3ae4661c28f4",
+        "lock_sha256": "4e9ec2117c5899228846f1b4e53a3b0353e889da10cb9bf6bb4a9febffdade0f",
+        "started": 1793244414.244864,
+        "exit": 0,
+        "elapsed_seconds": 241.842
+      },
+      "source_audit": {
+        "built_package_identities": 554,
+        "lock_records": 1131,
+        "all_built_package_identities_match_lock": true,
+        "missing_source_aware_records": [],
+        "git_checkout_heads": {
+          "<home>/.cargo/git/checkouts/vello-79c0d0e9216b3668/276b466": "276b46648c08f3d2062e70559afa999842e1873c",
+          "<home>/.cargo/git/checkouts/eidetic-52ab114568dd1263/e7eef1e": "e7eef1e622c8af7ea2a04e85ef7485aac0763433",
+          "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b": "11e208b84a981993df8077bb6025f8b3adbe2291",
+          "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e": "565458ea3ab816940484079330eb165a878a22e0",
+          "<home>/.cargo/git/checkouts/dramatis-c1632f2f3bdc2597/dc593a3": "dc593a343258cdabd9743a5a57ba49e8b103a876",
+          "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/864f107": "864f107d44bf759111ad2ea3c9036b2cfbf03f4c",
+          "<home>/.cargo/git/checkouts/esp-45bbaf8e1db2afe3/bd0468c": "bd0468c5c44c0b098494d30b3cfd0aa283cecf48",
+          "<home>/.cargo/git/checkouts/woodshed-b9974f59ddc43cf9/a0ae58f": "a0ae58f97ca962b29fcd6ae08c9e6aec35d74c61",
+          "<home>/.cargo/git/checkouts/wgpu-cue-f36cb044abc37f42/b5b70c2": "b5b70c2c9c40748abedc0c18d2b6ec5373e48958",
+          "<home>/.cargo/git/checkouts/murm-ebfa134ea22785bd/4ba804b": "4ba804b3a52af2de43b659aa16d9ed99c16a94d9",
+          "<home>/.cargo/git/checkouts/armillary-e679513f2dd65b22/06340b0": "06340b08327b29c3485ecb0089bb5cafed20fd80"
+        },
+        "rendering_cohorts": [
+          {
+            "package": "paint_list_api",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#11e208b84a981993df8077bb6025f8b3adbe2291",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b/paint_list_api/Cargo.toml"
+          },
+          {
+            "package": "netrender_device",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#11e208b84a981993df8077bb6025f8b3adbe2291",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b/netrender_device/Cargo.toml"
+          },
+          {
+            "package": "layout-dom-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/layout-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-paint-types",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/paint-types/Cargo.toml"
+          },
+          {
+            "package": "engine-observables-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/engine-observables-api/Cargo.toml"
+          },
+          {
+            "package": "netrender",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#11e208b84a981993df8077bb6025f8b3adbe2291",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b/netrender/Cargo.toml"
+          },
+          {
+            "package": "document-session-api",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/document-session-api/Cargo.toml"
+          },
+          {
+            "package": "genet-fontique",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/fontique/Cargo.toml"
+          },
+          {
+            "package": "genet-text",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-text/Cargo.toml"
+          },
+          {
+            "package": "genet-static-dom",
+            "version": "0.1.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-static-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-host-api",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-host-api/Cargo.toml"
+          },
+          {
+            "package": "genet-flow",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/css-flow/Cargo.toml"
+          },
+          {
+            "package": "cadency",
+            "version": "0.0.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/cadency/Cargo.toml"
+          },
+          {
+            "package": "paint_list_render",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/netrender.git?branch=main#11e208b84a981993df8077bb6025f8b3adbe2291",
+            "manifest": "<home>/.cargo/git/checkouts/netrender-a79f0762881dec01/11e208b/paint_list_render/Cargo.toml"
+          },
+          {
+            "package": "genet-parley",
+            "version": "0.10.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/parley/Cargo.toml"
+          },
+          {
+            "package": "livery",
+            "version": "0.0.5",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/livery/Cargo.toml"
+          },
+          {
+            "package": "regress",
+            "version": "0.11.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/support/patches/regress-0.11.1/Cargo.toml"
+          },
+          {
+            "package": "genet-scripted-dom",
+            "version": "0.1.2",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-scripted-dom/Cargo.toml"
+          },
+          {
+            "package": "genet-document-resources",
+            "version": "0.2.1",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-document-resources/Cargo.toml"
+          },
+          {
+            "package": "genet-events",
+            "version": "0.0.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-events/Cargo.toml"
+          },
+          {
+            "package": "buckram",
+            "version": "0.0.3",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/buckram/Cargo.toml"
+          },
+          {
+            "package": "genet-livery",
+            "version": "0.0.4",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-livery/Cargo.toml"
+          },
+          {
+            "package": "fleece",
+            "version": "0.5.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/fleece/Cargo.toml"
+          },
+          {
+            "package": "genet-presenter",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-render-host/Cargo.toml"
+          },
+          {
+            "package": "genet-render",
+            "version": "0.2.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-render/Cargo.toml"
+          },
+          {
+            "package": "genet-browsing",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/shared/browsing-context/Cargo.toml"
+          },
+          {
+            "package": "genet-documents",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/genet-documents/Cargo.toml"
+          },
+          {
+            "package": "taproot",
+            "version": "0.1.0",
+            "source": "git+https://github.com/merely-made/genet.git?branch=main#565458ea3ab816940484079330eb165a878a22e0",
+            "manifest": "<home>/.cargo/git/checkouts/genet-0bbbe1b4c8511eb3/565458e/components/taproot/Cargo.toml"
+          }
+        ],
+        "method": "Cargo compiler-artifact messages supply the actual package manifests; Git HEAD is read from each Cargo checkout and compared with the precise lock source. Registry/path identities use the Cargo package id and manifest package name.",
+        "published_fork_artifacts": [
+          {
+            "package_id": "registry+https://github.com/rust-lang/crates.io-index#genet-taffy@0.16.0",
+            "manifest_path": "<home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/genet-taffy-0.16.0/Cargo.toml",
+            "fresh": false
+          }
+        ]
+      },
+      "artifact": {
+        "path": "<Code>/output/graphshell-taffy-source-20261028/receiving-builds/graphshell_web.wasm",
+        "sha256": "975607581a57feb192fa448b8716ab98092e05bf5a45a00f6d2c85a631a1f48d",
+        "size": 1634423269
+      }
+    }
+  },
+  "scope_limits": [
+    "Native receiving build executed on macOS x86_64, Rust 1.99.1",
+    "No new native UI, physical IME, human accessibility or Linux/Vulkan qualification"
+  ],
+  "evidence_root": "<Code>/output/graphshell-taffy-source-20261028",
+  "status": "published fork and native/web receiving builds passed; source identities match both locks",
+  "evidence_sha256": {
+    "published-verification.json": "115c04bd3e0c02fc6a88ffb2bfad25906911f669ec665dbae8af7e39f5725101",
+    "genet-taffy-0.16.0-published.crate": "c956cab2c4b0ae59ce89800c22d6f8db0cf4b45152fc17a5a945f260af085805",
+    "mere-lock-reconciliation.json": "58ca5d046a539640f4564f98360173cddde044c81e2fd7d98a570a9c0680cf45",
+    "mere-metadata-source-audit.json": "9babad994991da21150ad8b279e5a65d115ba01fd5140b5267a1e8888d065fdd",
+    "receiving-builds/native.json": "e3549a8297937cf8f46ad3b723fb1a5acfb0e483d72d8b24cd18613e084f27a1",
+    "receiving-builds/native.stdout": "16e4d71a656c79c1c6ce7e6b4c7c6bb55b5948c1a73ac3a05db95105ded2023b",
+    "receiving-builds/native.stderr": "b5ffc20b172b1e2aad3148536694acee3de27bd60c62de671e1566b55eac0b25",
+    "receiving-builds/web.json": "6411d974c84349987b58ad47bae400ce6d675abe23f49814d90aeff7d7f22f6d",
+    "receiving-builds/web.stdout": "6d91926a8adef5def54488522df3cfa6b33b9319e99351894ac744cb56ff9375",
+    "receiving-builds/web.stderr": "e1787a4557acbabfc065eb4bdefe66edde75b065cadf36f39ba11f6c59826aa9",
+    "receiving-builds/native-source-audit.json": "2e9b90b13e03bd2eaf495c66133d7eb5d4f464b664b54c4c3c84ce59a865771f",
+    "receiving-builds/native-artifact.json": "c8fbacc82a5dcedce2c9dbc83972d5d83fb0d651de9808fd7ae1be506bad8761",
+    "receiving-builds/web-source-audit.json": "37ccbd74012d382232421ff84a47586d7a8acf394934264d34d674a577280d3d",
+    "receiving-builds/web-artifact.json": "97b706cb08852e619df7b75ad0af0c3c6c132cf9da7abacedf2600c968cc39d1"
+  }
+}

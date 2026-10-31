@@ -575,7 +575,9 @@ pub struct ProjectionDiff {
     pub status: Option<SessionStatus>,
 }
 
-/// The last revision a client has durably applied.
+/// The last revision a client has applied in memory: the session, epoch and
+/// revision of its mounted scene. It says nothing about what the client has
+/// stored.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProjectionAck {
     pub session: ProjectionSession,

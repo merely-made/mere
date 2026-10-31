@@ -7,9 +7,9 @@
 //! Dramatis: public persona and quarantine management, backed by Djinn.
 use dramatis::roster::Roster;
 use dramatis::view::VaultLockView;
-use graphshell_endpoint::door::app_admission::{AppId, configured_app_endpoint};
-use graphshell_endpoint::door::custody_client::CustodyClient;
-use graphshell_endpoint::door::quarantine::{
+use djinn::door::app_admission::{AppId, configured_app_endpoint};
+use djinn::door::custody_client::CustodyClient;
+use djinn::door::quarantine::{
     AssignImportRequest, QuarantineCard, ReviewAction, ReviewRequest, UnassignedImport,
 };
 use personae::ProfileId;
@@ -178,7 +178,7 @@ pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
         } else {
             vec![]
         };
-        Ok::<_, graphshell_endpoint::door::custody_client::CustodyClientError>(Snapshot {
+        Ok::<_, djinn::door::custody_client::CustodyClientError>(Snapshot {
             lock: status.lock,
             roster,
             cards,

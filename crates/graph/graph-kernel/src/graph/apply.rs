@@ -1188,16 +1188,17 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::NavigateNode { key, url } => {
-            let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
+            let timestamp_ms = Graph::epoch_ms();
+            let last_session_visited = graph.current_session;
+            let Some(node_id) = graph.navigate_node(
+                key,
+                &url,
+                TransitionKind::UrlTyped,
+                timestamp_ms,
+                last_session_visited,
+            ) else {
                 return GraphDeltaResult::Applied;
             };
-            let timestamp_ms = Graph::epoch_ms();
-            graph
-                .nav
-                .record_visit(node_id, &url, TransitionKind::UrlTyped, timestamp_ms);
-            let last_session_visited = graph.current_session;
-            graph.set_node_last_session_visited(key, last_session_visited);
-            let _ = graph.update_node_url(key, url.clone());
             graph.record_delta(&CapturedDelta::ReplayNavigateNodeById {
                 node_id: node_id.to_string(),
                 url,
@@ -1209,11 +1210,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             GraphDeltaResult::Applied
         },
         GraphDelta::BranchHistory { child, parent } => {
-            if let (Some(child_id), Some(parent_id)) = (
-                graph.get_node(child).map(|node| node.id),
-                graph.get_node(parent).map(|node| node.id),
-            ) {
-                graph.nav.spawn(child_id, parent_id);
+            if let Some((child_id, parent_id)) = graph.branch_history(child, parent) {
                 graph.record_delta(&CapturedDelta::ReplayBranchHistoryByIds {
                     child_id: child_id.to_string(),
                     parent_id: parent_id.to_string(),
@@ -1226,9 +1223,8 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 return GraphDeltaResult::HistoryStepped(None);
             };
             let timestamp_ms = Graph::epoch_ms();
-            let stepped = graph.nav.back(node_id, timestamp_ms);
-            if let Some(url) = stepped.clone() {
-                let _ = graph.update_node_url(key, url);
+            let stepped = graph.node_history_back(key, timestamp_ms);
+            if stepped.is_some() {
                 graph.record_delta(&CapturedDelta::ReplayNodeHistoryBackById {
                     node_id: node_id.to_string(),
                     timestamp_ms,
@@ -1242,9 +1238,8 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 return GraphDeltaResult::HistoryStepped(None);
             };
             let timestamp_ms = Graph::epoch_ms();
-            let stepped = graph.nav.forward(node_id, timestamp_ms);
-            if let Some(url) = stepped.clone() {
-                let _ = graph.update_node_url(key, url);
+            let stepped = graph.node_history_forward(key, timestamp_ms);
+            if stepped.is_some() {
                 graph.record_delta(&CapturedDelta::ReplayNodeHistoryForwardById {
                     node_id: node_id.to_string(),
                     timestamp_ms,
@@ -1316,11 +1311,8 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
         } => {
             let applied = graph.get_node_key_by_id(node_id).is_some_and(|key| {
                 graph
-                    .nav
-                    .record_visit(node_id, &url, transition, timestamp_ms);
-                graph.set_node_last_session_visited(key, last_session_visited);
-                let _ = graph.update_node_url(key, url.clone());
-                true
+                    .navigate_node(key, &url, transition, timestamp_ms, last_session_visited)
+                    .is_some()
             });
             if applied {
                 graph.record_delta(&CapturedDelta::ReplayNavigateNodeById {
@@ -1341,10 +1333,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 graph.get_node_key_by_id(child_id),
                 graph.get_node_key_by_id(parent_id),
             ) {
-                (Some(_child), Some(_parent)) => {
-                    graph.nav.spawn(child_id, parent_id);
-                    true
-                },
+                (Some(child), Some(parent)) => graph.branch_history(child, parent).is_some(),
                 _ => false,
             };
             if applied {
@@ -1359,11 +1348,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             node_id,
             timestamp_ms,
         } => {
-            let stepped = graph.get_node_key_by_id(node_id).and_then(|key| {
-                let url = graph.nav.back(node_id, timestamp_ms)?;
-                let _ = graph.update_node_url(key, url.clone());
-                Some(url)
-            });
+            let stepped = graph
+                .get_node_key_by_id(node_id)
+                .and_then(|key| graph.node_history_back(key, timestamp_ms));
             if stepped.is_some() {
                 graph.record_delta(&CapturedDelta::ReplayNodeHistoryBackById {
                     node_id: node_id.to_string(),
@@ -1376,11 +1363,9 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             node_id,
             timestamp_ms,
         } => {
-            let stepped = graph.get_node_key_by_id(node_id).and_then(|key| {
-                let url = graph.nav.forward(node_id, timestamp_ms)?;
-                let _ = graph.update_node_url(key, url.clone());
-                Some(url)
-            });
+            let stepped = graph
+                .get_node_key_by_id(node_id)
+                .and_then(|key| graph.node_history_forward(key, timestamp_ms));
             if stepped.is_some() {
                 graph.record_delta(&CapturedDelta::ReplayNodeHistoryForwardById {
                     node_id: node_id.to_string(),

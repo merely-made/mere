@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The Map's physics composition form: role, role groups, two-law mix,
-//! grouping, two-stage schedule and speed, as one model both hosts drive.
+//! The Map's physics form: flat law, sources, overlays and profile; role,
+//! two-law mix, grouping, two-stage schedule and speed, as one model both hosts drive.
 //!
 //! A host renders [`PhysicsForm::fields`] (ids, labels, valid choices and the
 //! current values), feeds each edit back through [`PhysicsForm::choose`],
@@ -17,14 +17,16 @@
 //! tree and Turnstone's Arrange pane differ only in how they draw it.
 
 use super::composition::CHARGE_BETWEEN_WEIGHT;
-use super::physics_catalog::PhysicsLaw;
+use super::physics_catalog::{
+    CANVAS_PHYSICS_PROFILES, PhysicsDepthSource, PhysicsLaw, PhysicsMassSource,
+};
 use super::physics_controls::{
-    self, SPEED_PRESETS, StageDraft, TwoLawGrouping, TwoLawMix, TwoStageSchedule,
+    self, CUSTOM_PROFILE, SPEED_PRESETS, StageDraft, TwoLawGrouping, TwoLawMix, TwoStageSchedule,
 };
 use super::schedule::StageStop;
 use super::{
-    CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS, Canvas, PhysicsChoice, PhysicsKindSource,
-    PhysicsOverlay, Role,
+    CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
+    CANVAS_PHYSICS_MASS_SOURCES, Canvas, PhysicsChoice, PhysicsKindSource, PhysicsOverlay, Role,
 };
 
 /// The frame count a stage form starts with.
@@ -76,6 +78,13 @@ pub enum FieldId {
     StageFrames(Slot),
     StageCapture(Slot),
     ScheduleOverlay(PhysicsOverlay),
+    PhysicsLaw,
+    PhysicsKind,
+    PhysicsMass,
+    PhysicsDepth,
+    PhysicsGroups,
+    PhysicsOverlay(PhysicsOverlay),
+    PhysicsProfile,
 }
 
 impl FieldId {
@@ -97,6 +106,13 @@ impl FieldId {
             FieldId::StageFrames(slot) => format!("schedule.{}.frames", slot.id()),
             FieldId::StageCapture(slot) => format!("schedule.{}.capture", slot.id()),
             FieldId::ScheduleOverlay(overlay) => format!("schedule.overlay.{}", overlay.id()),
+            FieldId::PhysicsLaw => "physics.law".into(),
+            FieldId::PhysicsKind => "physics.kind".into(),
+            FieldId::PhysicsMass => "physics.mass".into(),
+            FieldId::PhysicsDepth => "physics.depth".into(),
+            FieldId::PhysicsGroups => "physics.groups".into(),
+            FieldId::PhysicsOverlay(overlay) => format!("physics.overlay.{}", overlay.id()),
+            FieldId::PhysicsProfile => "physics.profile".into(),
         }
     }
 
@@ -121,6 +137,13 @@ impl FieldId {
             FieldId::StageFrames(slot) => format!("{} stage frames", ordinal(slot)),
             FieldId::StageCapture(slot) => format!("{} stage capture", ordinal(slot)),
             FieldId::ScheduleOverlay(overlay) => format!("Schedule {}", overlay.label()),
+            FieldId::PhysicsLaw => "Physics law".into(),
+            FieldId::PhysicsKind => "Kinds".into(),
+            FieldId::PhysicsMass => "Mass".into(),
+            FieldId::PhysicsDepth => "Depth".into(),
+            FieldId::PhysicsGroups => "Groups".into(),
+            FieldId::PhysicsOverlay(overlay) => overlay.label().into(),
+            FieldId::PhysicsProfile => "Profile".into(),
         }
     }
 }
@@ -334,6 +357,10 @@ pub struct Readback {
     pub mix: Result<Option<TwoLawMix>, String>,
     pub grouping: Result<Option<TwoLawGrouping>, String>,
     pub schedule: Result<Option<TwoStageSchedule>, String>,
+    /// The flat live law/overlays and four bound sources.
+    pub physics: PhysicsChoice,
+    /// The profile named by the authored root shape and flat physics pair.
+    pub physics_profile: &'static str,
 }
 
 impl Default for Readback {
@@ -347,19 +374,28 @@ impl Default for Readback {
             mix: Ok(None),
             grouping: Ok(None),
             schedule: Ok(None),
+            physics: PhysicsChoice::default(),
+            physics_profile: CUSTOM_PROFILE,
         }
     }
 }
 
 impl Readback {
     pub fn of(canvas: &Canvas) -> Self {
+        let mix = physics_controls::read_two_law_mix(canvas);
+        let grouping = physics_controls::read_two_law_grouping(canvas);
+        let schedule = physics_controls::read_two_stage_schedule(canvas);
+        let physics = PhysicsChoice::live(canvas);
+        let physics_profile = physics_controls::profile_id(canvas);
         Self {
             role: canvas.arrangement_roles().default,
             role_groups: canvas.role_group_source(),
             speed: physics_controls::speed_preset(canvas),
-            mix: physics_controls::read_two_law_mix(canvas),
-            grouping: physics_controls::read_two_law_grouping(canvas),
-            schedule: physics_controls::read_two_stage_schedule(canvas),
+            mix,
+            grouping,
+            schedule,
+            physics,
+            physics_profile,
         }
     }
 
@@ -500,6 +536,8 @@ pub struct PhysicsForm {
     grouping: (PhysicsKindSource, PhysicsLaw, PhysicsLaw, String),
     stages: [StageFields; 2],
     overlays: Vec<PhysicsOverlay>,
+    physics: PhysicsChoice,
+    physics_profile: &'static str,
 }
 
 fn slot_index(slot: Slot) -> usize {
@@ -515,6 +553,24 @@ fn law_options() -> Vec<(&'static str, &'static str)> {
 
 fn kind_options() -> Vec<(&'static str, &'static str)> {
     CANVAS_PHYSICS_KIND_SOURCES.to_vec()
+}
+
+fn mass_options() -> Vec<(&'static str, &'static str)> {
+    CANVAS_PHYSICS_MASS_SOURCES.to_vec()
+}
+
+fn depth_options() -> Vec<(&'static str, &'static str)> {
+    CANVAS_PHYSICS_DEPTH_SOURCES.to_vec()
+}
+
+fn profile_options() -> Vec<(&'static str, &'static str)> {
+    std::iter::once((CUSTOM_PROFILE, "Custom (no profile)"))
+        .chain(
+            CANVAS_PHYSICS_PROFILES
+                .iter()
+                .map(|profile| (profile.id, profile.label)),
+        )
+        .collect()
 }
 
 fn role_options() -> impl Iterator<Item = (&'static str, &'static str)> {
@@ -542,6 +598,8 @@ impl Default for PhysicsForm {
                 StageFields::new(PhysicsLaw::ALL[1]),
             ],
             overlays: Vec::new(),
+            physics: PhysicsChoice::default(),
+            physics_profile: CUSTOM_PROFILE,
         }
     }
 }
@@ -554,6 +612,7 @@ impl PhysicsForm {
         form.follow_roles(&readback);
         form.follow_speed(&readback);
         form.follow_composition(&readback);
+        form.follow_physics(&readback);
         form
     }
 
@@ -568,6 +627,43 @@ impl PhysicsForm {
     /// read as a pick.
     pub fn follow_speed(&mut self, readback: &Readback) {
         self.speed = readback.speed;
+    }
+
+    /// Take the flat physics fields and root-aware profile readback.
+    pub fn follow_physics(&mut self, readback: &Readback) {
+        self.physics = readback.physics.clone();
+        self.physics_profile = readback.physics_profile;
+    }
+
+    fn follow_flat_profile(&mut self) {
+        self.physics_profile = self.physics.profile_id().unwrap_or(CUSTOM_PROFILE);
+    }
+
+    /// The raw typed flat input held by these fields. Checked overlays remain
+    /// present even when the selected law refuses them; hosts may apply their
+    /// own staged filtering, while the writer admits choices at commit time.
+    pub fn physics_choice(&self) -> PhysicsChoice {
+        self.physics.clone()
+    }
+
+    /// The profile id shown by the profile field.
+    pub fn profile_id(&self) -> &'static str {
+        self.physics_profile
+    }
+
+    /// Flat physics field catalog in stable control order.
+    pub fn physics_fields() -> Vec<FieldId> {
+        [
+            FieldId::PhysicsLaw,
+            FieldId::PhysicsKind,
+            FieldId::PhysicsMass,
+            FieldId::PhysicsDepth,
+            FieldId::PhysicsGroups,
+        ]
+        .into_iter()
+        .chain(PhysicsOverlay::ALL.into_iter().map(FieldId::PhysicsOverlay))
+        .chain([FieldId::PhysicsProfile])
+        .collect()
     }
 
     /// Take what the canvas authored, for each form it authored in the shape
@@ -641,6 +737,30 @@ impl PhysicsForm {
                 current: stage(slot).capture.map_or(NO_CAPTURE, Role::id),
             },
             FieldId::ScheduleOverlay(overlay) => Control::Toggle(self.overlays.contains(&overlay)),
+            FieldId::PhysicsLaw => law(self.physics.law),
+            FieldId::PhysicsKind => Control::Choice {
+                options: kind_options(),
+                current: self.physics.kind.id(),
+            },
+            FieldId::PhysicsMass => Control::Choice {
+                options: mass_options(),
+                current: self.physics.mass.id(),
+            },
+            FieldId::PhysicsDepth => Control::Choice {
+                options: depth_options(),
+                current: self.physics.depth.id(),
+            },
+            FieldId::PhysicsGroups => Control::Choice {
+                options: kind_options(),
+                current: self.physics.groups.id(),
+            },
+            FieldId::PhysicsOverlay(overlay) => {
+                Control::Toggle(self.physics.overlays.contains(&overlay))
+            },
+            FieldId::PhysicsProfile => Control::Choice {
+                options: profile_options(),
+                current: self.physics_profile,
+            },
         };
         let relevant = match id {
             FieldId::StageFrames(slot) => stage(slot).stop == STOP_FRAMES,
@@ -708,6 +828,35 @@ impl PhysicsForm {
             FieldId::StageCapture(slot) => {
                 self.stages[slot_index(slot)].capture = Role::parse(option);
             },
+            FieldId::PhysicsLaw => {
+                let Some(law) = law else {
+                    return false;
+                };
+                if law != self.physics.law {
+                    self.physics.law = law;
+                    self.follow_flat_profile();
+                }
+            },
+            FieldId::PhysicsKind => self.physics.kind = kind.unwrap_or(self.physics.kind),
+            FieldId::PhysicsMass => {
+                self.physics.mass = PhysicsMassSource::parse(option).unwrap_or(self.physics.mass)
+            },
+            FieldId::PhysicsDepth => {
+                self.physics.depth = PhysicsDepthSource::parse(option).unwrap_or(self.physics.depth)
+            },
+            FieldId::PhysicsGroups => self.physics.groups = kind.unwrap_or(self.physics.groups),
+            FieldId::PhysicsProfile => {
+                if option != CUSTOM_PROFILE {
+                    let Some(choice) = self.physics.clone().with_profile(option) else {
+                        return false;
+                    };
+                    self.physics.law = choice.law;
+                    self.physics.overlays = choice.overlays;
+                    self.follow_flat_profile();
+                } else {
+                    self.physics_profile = CUSTOM_PROFILE;
+                }
+            },
             _ => return false,
         }
         true
@@ -728,14 +877,31 @@ impl PhysicsForm {
 
     /// Tick or untick a toggle field. False when the field is not a toggle.
     pub fn tick(&mut self, id: FieldId, on: bool) -> bool {
-        let FieldId::ScheduleOverlay(overlay) = id else {
-            return false;
-        };
-        self.overlays.retain(|known| *known != overlay);
-        if on {
-            self.overlays.push(overlay);
+        match id {
+            FieldId::ScheduleOverlay(overlay) => {
+                self.overlays.retain(|known| *known != overlay);
+                if on {
+                    self.overlays.push(overlay);
+                }
+                true
+            },
+            FieldId::PhysicsOverlay(overlay) => {
+                let was_on = self.physics.overlays.contains(&overlay);
+                if was_on == on {
+                    return true;
+                }
+                self.physics.overlays.retain(|known| *known != overlay);
+                if on {
+                    self.physics.overlays.push(overlay);
+                }
+                self.physics.overlays = physics_controls::ticked_overlays(|candidate| {
+                    self.physics.overlays.contains(&candidate)
+                });
+                self.follow_flat_profile();
+                true
+            },
+            _ => false,
         }
-        true
     }
 
     /// The overlays the schedule form ticks, in catalog order.
@@ -783,15 +949,14 @@ impl PhysicsForm {
         })
     }
 
-    /// What pressing `command` asks of the canvas. `picked` is the flat
-    /// choice the host's own law, overlay and source controls hold, which
-    /// Use single law writes. An `Err` is a refusal, worded as a status.
-    pub fn action(&self, command: Command, picked: &PhysicsChoice) -> Result<FormAction, String> {
+    /// What pressing `command` asks of the canvas, using this form's flat
+    /// physics fields. An `Err` is a refusal, worded as a status.
+    pub fn action(&self, command: Command) -> Result<FormAction, String> {
         Ok(match command {
             Command::ApplyRole => FormAction::Role(self.role),
             Command::ApplyRoleGroups => FormAction::RoleGroups(self.role_groups),
             Command::ApplyMix => FormAction::Mix(self.mix()?),
-            Command::UseSingleLaw => FormAction::SingleLaw(picked.clone()),
+            Command::UseSingleLaw => FormAction::SingleLaw(self.physics_choice()),
             Command::ApplyGrouping => FormAction::Grouping(self.grouping()?),
             Command::ApplySchedule => FormAction::Schedule(self.schedule()?),
         })

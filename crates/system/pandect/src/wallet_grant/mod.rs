@@ -30,9 +30,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
 use uuid::Uuid;
 
+use identity::carry::DeviceId;
+
 use crate::wallet_store::{
-    CarryRef, DeviceExposure, DeviceId, DeviceMode, DevicePublicKey, KeyEpochId,
-    PersonaWalletManifest,
+    CarryRef, DeviceExposure, DeviceMode, DevicePublicKey, KeyEpochId, PersonaWalletManifest,
 };
 
 /// Canonical CBOR, byte for byte what p2panda-core's helpers wrote.
@@ -158,6 +159,5 @@ pub use trust::{GrantStanding, assess_device_grant, wallet_trusted_roots};
 pub use types::{
     EpochCarriage, PairedRemoteAuthGrantSpec, PrivateEpochPlaintext, RemoteAuthEnrollmentBundle,
     RemoteAuthGrantSpec, RemoteAuthPairingMaterial, RemoteAuthPairingResponse,
-    RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest, RemoteAuthRevocationOutcome,
-    WrappedEpochMaterial,
+    RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest, WrappedEpochMaterial,
 };

@@ -31,7 +31,7 @@ plugin API.
 - [Knot port plan](2026-07-25_knot_port_plan.md)
 - [Knot authoring consumer plan](2026-07-27_knot_authoring_consumer_plan.md)
 - [Knot in Graphshell plan](2026-08-02_knot_in_graphshell_plan.md)
-- [Device resident consolidation plan](../../mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md)
+- [Device resident consolidation plan](../2026-10-28/2026-08-20_device_resident_consolidation_plan.md)
 - [Configuration ownership and settings projection plan](2026-08-06_configuration_ownership_settings_projection_plan.md)
 - Turnstone `design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md` *(historical citation)* <!-- doc-audit: historical-path -->
 - Genet `docs/2026-08-12_meristem_scope_cut_and_component_contract_brief.md`

@@ -9,7 +9,7 @@ Mere's application-facing reader and smolweb lanes live in
 **Corrected 2026-10-06:** `cambium-nematic` folded into `cambium` as feature
 `nematic` on 2026-09-25, and that feature and its views were removed on
 2026-10-06 under ruling S66 of the Mere stack seams plan (the
-[smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
+[smolweb fidelity plan](../../archive_docs/2026-10-28/2026-07-01_smolweb_fidelity_plan.md)
 WS4, R0): smolweb renders through `mere-document-lanes` only. The published
 `cambium-nematic` 0.3.1 stays on crates.io; its table row is history.
 
@@ -442,7 +442,7 @@ legacy Genet identities remain separately qualified. The old-matcher negative
 control fails the referenced-name test; restored source passes. Native smoke
 evidence and current limitations are recorded in the
 [Cambium architecture](2026-09-03_cambium_architecture.md#dom-selector-parity-2026-09-29-implemented-and-verified)
-and the [diagnostics plan](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md).
+and the [diagnostics plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md).
 Raw receipts live under `testing/cambium/semantic-observation` in the shared Code
 root. The dated compatibility checkpoints below retain their original scope.
 

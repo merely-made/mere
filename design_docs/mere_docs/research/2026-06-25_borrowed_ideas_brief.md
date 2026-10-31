@@ -76,7 +76,7 @@ Bidirectional lenses let peers on different schema versions read each other's da
 Mere's engrams are schema plus data (alembic `SchemaRef`), and over federation
 peers will drift engram-schema versions, so lenses are the principled alternative
 to lockstep upgrades. **Net-new.** Conceptual home is the engram layer, the
-[alembic implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md).
+[alembic implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md).
 
 ### Capability-scoped subgraph sharing [p2panda-dependent]
 
@@ -84,7 +84,7 @@ An object-capability token that says "this peer may read this subgraph, revocabl
 with no central server. This is the sharing gesture the federation tiers need, and
 it dovetails with Tessera as the trust receipt. **Mark's framing:** p2panda-dependent.
 It rides the persona and federation work
-([persona transport unlinkability](../implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md),
+([persona transport unlinkability](../../archive_docs/2026-10-28/2026-06-25_persona_transport_unlinkability_plan.md),
 [persona wallet carry](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md),
 [actor constellation](../../archive_docs/2026-08-20_completed_plans/2026-06-03_actor_constellation_plan.md)),
 adopted as a layered borrow there rather than standalone.
@@ -131,7 +131,7 @@ fence architecture.
 
 Peer cursors and viewports on the shared graph (Figma, but p2p). **Mark:**
 discussed and scoped already, see the
-[operator presence overlay plan](../implementation_strategy/2026-06-25_operator_presence_overlay_plan.md).
+[operator presence overlay plan](../../archive_docs/2026-10-28/2026-06-25_operator_presence_overlay_plan.md).
 Recorded here only for completeness; no new work implied.
 
 ### All three: the living document
@@ -165,11 +165,11 @@ feature in itself:**
   the grammar-level companion.
 - [graph signals layer plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md):
   edge config and lens, for live query regions.
-- [operator presence overlay plan](../implementation_strategy/2026-06-25_operator_presence_overlay_plan.md):
+- [operator presence overlay plan](../../archive_docs/2026-10-28/2026-06-25_operator_presence_overlay_plan.md):
   multiplayer presence (already scoped).
-- [alembic implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md):
+- [alembic implementation plan](../../archive_docs/2026-10-28/2026-06-24_alembic_implementation_plan.md):
   engram schema layer (Cambria home).
-- [persona transport unlinkability](../implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md),
+- [persona transport unlinkability](../../archive_docs/2026-10-28/2026-06-25_persona_transport_unlinkability_plan.md),
   [persona wallet carry](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md),
   [actor constellation](../../archive_docs/2026-08-20_completed_plans/2026-06-03_actor_constellation_plan.md):
   persona and federation, for capability-scoped sharing.

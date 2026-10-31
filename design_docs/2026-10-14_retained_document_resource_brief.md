@@ -10,7 +10,7 @@
   batched DOM, opt-in TOML 1.1), with text-only history by default,
   PID-checked lease reclaim and structure-aware commands.
   It uses the real pack schema and passes a real-pack workflow.
-- The shared [`mere-source-edit`](2026-10-18_source_edit_proposal_plan.md)
+- The shared [`mere-source-edit`](archive_docs/2026-10-28/2026-10-18_source_edit_proposal_plan.md)
   proposal crate is published, and Isocosm and Knot both consume it.
 - Mark ruled on history, stale leases, TOML 1.1, the fork's home and CLI
   commands on 2026-10-19 ([decisions](#decisions-2026-10-19)).
@@ -161,7 +161,7 @@ document must not change domain identity.
 | Rowan 0.17 | Lossless authored syntax and structurally shared revisions. A format parser must build the tree, including unknown and erroneous input. |
 | TOML parser | The taplo 0.14 (MIT) fork at [merely-made/taplo](https://github.com/merely-made/taplo), branch `merely/rowan-0.17`: Rowan 0.17, batched DOM construction, `parse_with_cache`, and opt-in TOML 1.1 (TOML 1.0 stays its default). Isocosm pins it by exact revision. It builds lossless trees and collects syntax errors; DOM validation checks semantics such as duplicate keys. Product typed decoding remains authoritative. |
 | `toml_edit` | Existing comment- and format-preserving editing for documents that parse. Existing uses remain. |
-| `mere-source-edit` | Parser-neutral UTF-8 edit proposals with instance/revision/exact-source checks, previews and candidate receipts. Hosts keep their buffers, undo, save and admission. See the [source-edit plan](2026-10-18_source_edit_proposal_plan.md). |
+| `mere-source-edit` | Parser-neutral UTF-8 edit proposals with instance/revision/exact-source checks, previews and candidate receipts. Hosts keep their buffers, undo, save and admission. See the [source-edit plan](archive_docs/2026-10-28/2026-10-18_source_edit_proposal_plan.md). |
 | Sonic | JSON ingestion and typed deserialization of machine interchange; not part of the authored-syntax slice. `OwnedLazyValue` remains an unmeasured candidate for deferred materialization. |
 | Source overlay | The byte-exact JSON overlay from the 2026-10-13 probe remains the candidate where machine JSON must survive byte for byte. Rowan does not replace it. |
 | Serde and application schemas | Typed lowering, validation, and canonical domain encoding. |

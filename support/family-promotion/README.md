@@ -1,7 +1,7 @@
 # Family promotion checkpoint, 2026-10-19
 
 Canonical scope and outcomes:
-`design_docs/mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md`.
+`design_docs/archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md`.
 
 These are bounded migration receipts and one-time helpers, not runtime libraries
 or a second dependency policy. The actual consumer manifests own their build

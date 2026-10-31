@@ -18,17 +18,26 @@ path = "src/lib.rs"
 default = []
 workshop = ["dep:alembic", "alembic/workshop", "dep:servitor", "dep:muniment", "dep:serde", "dep:serde_json", "dep:blake3"]
 workshop-worker = ["workshop", "dep:armillary"]
+workshop-sealed = ["workshop", "dep:eidetic"]
+workshop-destination = ["workshop", "dep:pandect", "dep:kernel", "dep:chartulary", "dep:euclid", "dep:uuid"]
 
 [dependencies]
 alembic = { workspace = true, optional = true }
+eidetic = { workspace = true, optional = true }
+kernel = { workspace = true, optional = true }
+pandect = { workspace = true, optional = true }
 servitor = { workspace = true, optional = true }
 muniment = { workspace = true, optional = true }
 armillary = { workspace = true, optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 blake3 = { version = "1", optional = true }
+chartulary = { workspace = true, optional = true }
+euclid = { version = "0.22", optional = true }
+uuid = { version = "1", optional = true }
 
 [dev-dependencies]
+chacha20poly1305 = "=0.10.1"
 async-trait = "0.1"
 muniment = { workspace = true, features = ["directory"] }
 pollster = "0.4"

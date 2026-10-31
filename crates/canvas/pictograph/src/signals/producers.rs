@@ -21,13 +21,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use kernel::graph::{Graph, NodeKey};
 
-fn projected_neighbors(graph: &Graph, key: NodeKey) -> impl Iterator<Item = NodeKey> + '_ {
-    graph
-        .projected_outgoing_relations(key)
-        .chain(graph.projected_incoming_relations(key))
-        .map(|(neighbor, _, _)| neighbor)
-}
-
 /// Breadth-first ring index from `focus`. The focus is ring zero.
 ///
 /// Nodes unreachable from the focus are absent from the map rather than given a
@@ -44,7 +37,7 @@ pub fn radial_rings(graph: &Graph, focus: NodeKey) -> HashMap<NodeKey, u32> {
     let mut queue: VecDeque<NodeKey> = VecDeque::from([focus]);
     while let Some(key) = queue.pop_front() {
         let next = ring_of[&key] + 1;
-        for neighbour in projected_neighbors(graph, key) {
+        for neighbour in graph.projected_neighbors(key) {
             if let std::collections::hash_map::Entry::Vacant(slot) = ring_of.entry(neighbour) {
                 slot.insert(next);
                 queue.push_back(neighbour);
@@ -67,7 +60,8 @@ pub fn degree_weights(graph: &Graph) -> HashMap<NodeKey, f32> {
     graph
         .nodes()
         .map(|(key, _)| {
-            let degree = projected_neighbors(graph, key)
+            let degree = graph
+                .projected_neighbors(key)
                 .filter(|neighbour| *neighbour != key)
                 .count();
             (key, (degree + 1) as f32)
@@ -118,7 +112,7 @@ fn weighted_adjacency(graph: &Graph, keys: &[NodeKey]) -> Vec<Vec<(usize, f64)>>
         keys.iter().enumerate().map(|(i, key)| (*key, i)).collect();
     let mut rows: Vec<HashMap<usize, f64>> = vec![HashMap::new(); keys.len()];
     for (i, key) in keys.iter().enumerate() {
-        for neighbour in projected_neighbors(graph, *key) {
+        for neighbour in graph.projected_neighbors(*key) {
             if let Some(&j) = index.get(&neighbour)
                 && i != j
             {

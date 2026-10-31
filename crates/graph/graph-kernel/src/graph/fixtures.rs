@@ -24,7 +24,8 @@ use uuid::Uuid;
 
 use super::edge_payload::EdgePayload;
 use super::{
-    Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeKey, RelationKey, RelationSelector,
+    Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeFacetStore, NodeKey, RelationKey,
+    RelationSelector,
 };
 
 /// Raw-mutator access for test fixtures. Every method delegates to the
@@ -52,10 +53,6 @@ pub trait GraphFixtures {
         to: NodeKey,
         selector: RelationSelector,
     ) -> usize;
-    fn navigate_node(&mut self, key: NodeKey, url: &str);
-    fn branch_history(&mut self, child: NodeKey, parent: NodeKey);
-    fn node_history_back(&mut self, key: NodeKey) -> Option<String>;
-    fn node_history_forward(&mut self, key: NodeKey) -> Option<String>;
     fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool;
     fn remove_node_tag(&mut self, key: NodeKey, tag: &str) -> bool;
     fn set_node_title(&mut self, key: NodeKey, title: String) -> bool;
@@ -72,6 +69,9 @@ pub trait GraphFixtures {
     fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node>;
     fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload>;
     fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload>;
+    /// The facet store, unchecked: a test that must hold a graph checked open
+    /// would refuse. Production installs through `install_facets`.
+    fn facets_mut(&mut self) -> &mut NodeFacetStore;
 }
 
 impl GraphFixtures for Graph {
@@ -108,18 +108,6 @@ impl GraphFixtures for Graph {
         selector: RelationSelector,
     ) -> usize {
         Graph::retract_relations(self, from, to, selector)
-    }
-    fn navigate_node(&mut self, key: NodeKey, url: &str) {
-        Graph::navigate_node(self, key, url)
-    }
-    fn branch_history(&mut self, child: NodeKey, parent: NodeKey) {
-        Graph::branch_history(self, child, parent)
-    }
-    fn node_history_back(&mut self, key: NodeKey) -> Option<String> {
-        Graph::node_history_back(self, key)
-    }
-    fn node_history_forward(&mut self, key: NodeKey) -> Option<String> {
-        Graph::node_history_forward(self, key)
     }
     fn insert_node_tag(&mut self, key: NodeKey, tag: String) -> bool {
         Graph::insert_node_tag(self, key, tag)
@@ -158,5 +146,8 @@ impl GraphFixtures for Graph {
     }
     fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload> {
         Graph::get_relation_mut(self, key)
+    }
+    fn facets_mut(&mut self) -> &mut NodeFacetStore {
+        Graph::facets_mut(self)
     }
 }

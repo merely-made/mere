@@ -85,7 +85,7 @@ shipped consumers.
 scene to its Cambium surface to its host. The Projection Editor's seven tools —
 Source, Reading, Encoding, Arrangement, Interaction, Appearance, Provenance —
 are the authoring UI for exactly that walk, and it has never been walked. The
-[Distillery projection walk plan](../implementation_strategy/2026-09-02_distillery_projection_walk_plan.md)
+[Distillery projection walk plan](../../archive_docs/2026-10-28/2026-09-02_distillery_projection_walk_plan.md)
 is the first.
 
 **Rulings the assessment produced, recorded in their homes the same day:**

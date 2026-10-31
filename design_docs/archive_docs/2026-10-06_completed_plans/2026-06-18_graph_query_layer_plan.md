@@ -109,7 +109,7 @@ feature remains (`crates/mere/Cargo.toml`, line 53).
 3. **`CONSTRUCT` / `DESCRIBE` → graphlet.** `query.rs` currently returns an error
    for `QueryResults::Graph`. Wiring `CONSTRUCT` output into a derived subgraph
    ties SPARQL to graphlet-derivation (reveal latent structure as a real graphlet).
-   **Amended 2026-10-04 (Mark, [graph semantics plan](../../mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)
+   **Amended 2026-10-04 (Mark, [graph semantics plan](../2026-10-28/2026-10-04_graph_semantics_plan.md)
    ruling 3):** a SPARQL query becomes a `Linked` subgraph spec, shared by spec and
    frozen on demand into a nested graph; that plan's P4 carries this item.
 4. **Results pane.** Slice 2 echoes one line on the status bar; a tabular

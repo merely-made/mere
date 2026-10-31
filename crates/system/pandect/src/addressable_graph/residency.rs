@@ -65,10 +65,7 @@ impl<B: Backend> ResidentGraph<B> {
             )
             .await?;
             footprint.pending_bytes = bytes;
-            let mut comparable = snapshot.clone();
-            comparable.fields.sort_by(|a, b| a.id.cmp(&b.id));
-            comparable.couplings.sort_by(|a, b| a.id.cmp(&b.id));
-            let digest = hash(&encode(&(comparable, &facets))?);
+            let digest = hash(&encode(&(&snapshot, &facets))?);
             Some((snapshot, facets, coverage, footprint, pending, digest))
         };
         if persist {

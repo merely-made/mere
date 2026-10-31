@@ -135,7 +135,8 @@ pub const IDLE: NodeAccent = NodeAccent {
 };
 
 /// The canvas caption label riding beside a gnode (not a node fill, so it is not
-/// a [`NodeAccent`]).
+/// a [`NodeAccent`]): light, for the default dark ground. A theme replaces it
+/// with its text role ([`Canvas::set_caption_color`](crate::canvas::Canvas::set_caption_color)).
 pub const CAPTION_FG: [u8; 3] = [216, 222, 234];
 
 /// The accent for a node, applying the selection-wins rule.

@@ -8,7 +8,7 @@ in distillery as `distillery::mesh_host` (2026-09-23). Production is the Burn
 0.22.0-pre.4 row since `cec0b3a4` (2026-10-05), with burn-remote's close patch
 carried at pre.4. Stable Burn 0.22 closure (repin and clean package receipt) is
 the only gate left, and the
-[Burn 0.22 migration plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md) owns it.
+[Burn 0.22 migration plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md) owns it.
 
 The remote gate landed on 2026-08-23 in mere `7fb07225`, after the pre.2 source
 re-audit corrected the close seam and the client/server identity rules. The
@@ -20,7 +20,7 @@ external-ALPN seam landed first in its `main` as `9f2c2a01`.
 **Related**:
 [`2026-06-30_personal_mesh_substrate_m2_plan.md`](../2026-08-09_completed_plans/2026-06-30_personal_mesh_substrate_m2_plan.md),
 [`2026-06-30_mesh_lease_scheduler_plan.md`](../2026-08-09_completed_plans/2026-06-30_mesh_lease_scheduler_plan.md),
-[`2026-08-09_burn_0_22_migration_plan.md`](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md),
+[`2026-08-09_burn_0_22_migration_plan.md`](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md),
 [`2026-06-30_kith_capability_sharing_plan.md`](../2026-09-02_retired_plans/2026-06-30_kith_capability_sharing_plan.md),
 [`../research/2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md)
 
@@ -279,7 +279,7 @@ The chosen `v0.22.0-pre.2` row migrated ESP and Quint on 2026-08-20, retired the
 old `cubecl-wgpu` compatibility patch, and re-proved the native, wasm, WGPU,
 real-device, and ESP package boundaries. Stable 0.22 is still unavailable, so
 the final repin and clean package receipt remain release-gated. Owned by the
-[Burn 0.22 migration plan](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md).
+[Burn 0.22 migration plan](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md).
 
 The remote adapter uses this exact production prerelease row. Stable
 publication closure must still repeat the dependency and receipt matrix; the
@@ -444,7 +444,7 @@ classes, and remote tensor transport beyond the adapter gate above.
   sidequests; stable publication remains the release gate.
 - **2026-09-23**: `mere-mesh-host` folded into distillery as `distillery::mesh_host`
   (`ports/distillery/src/mesh_host.rs`) under Mark's
-  [crate consolidation](../../mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md) ruling; Djinn
+  [crate consolidation](../2026-10-28/2026-09-23_crate_consolidation_plan.md) ruling; Djinn
   reaches it through its existing distillery dependency. Its 10 unit and 2
   integration tests moved with it and pass.
 - **2026-10-06 (S14 pass).** Status and claims corrected against the tree at

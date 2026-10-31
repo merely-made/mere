@@ -142,7 +142,7 @@ as the thing to revisit if a consumer grows the set.
   before: dropping it on burn 0.21 puts wgpu 29 back. The migration itself is
   real API work (`burn::backend` and `burn::tensor::backend` moved, `Tensor`'s
   rank parameter changed) and was not attempted. Probe reverted. Recorded in
-  [burn 0.22 migration](../../mere_docs/implementation_strategy/2026-08-09_burn_0_22_migration_plan.md).
+  [burn 0.22 migration](../2026-10-28/2026-08-09_burn_0_22_migration_plan.md).
 - Adopting burn 0.22 reintroduces an embedded SQLite as `rusqlite`, behind
   CubeCL's autotune cache. It does not cross mere's storage boundary, but the
   workspace should not be called sqlite-free after that point.

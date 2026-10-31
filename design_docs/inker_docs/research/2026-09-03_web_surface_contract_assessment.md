@@ -766,12 +766,159 @@ compositor correlation retain separate bounds.
   resolution passes. These checks do not change the earlier physical receipt
   or establish human AT and physical CJK behavior. Turnstone's two-window
   geometry test, existing IME-admission test, nine navigation compatibility tests
-  and default-feature all-target compile check pass. A fresh ThinkPad Linux/Vulkan
-  rerun remains blocked on mesh SSH identity unlock.
-- **Display masking still has its own index boundary.** Source inspection shows
-  that native Genet shapes password display text as grapheme-counted bullets,
-  while its caret queries use editing-value byte offsets. The shared publisher
-  inherits that native projection boundary. A mapping between editing and
-  projected text would align password caret and selection geometry. This run
-  checks password classification and value exclusion; password offset-to-glyph
-  behavior has not been qualified.
+  and default-feature all-target compile check pass. The later
+  [ThinkPad geometry receiving](https://github.com/merely-made/turnstone/blob/main/docs/receipts/cue_geometry_linux_20261027/README.md)
+  passes on native Wayland / hardware RADV Renoir Vulkan after mesh SSH unlock.
+  Five focused tests and a native-window run bind shared observations to actual
+  Wayland cursor-rectangle messages for the primary and lens. Real page zoom
+  changes the caret height from 34 to 37.4 pixels; both windows receive matching
+  geometry. Native display scale 1 is exercised, while scale 2 remains a
+  programmatic fixture. Two rejected setup runs remain evidence. The scenario
+  runner gains window-scoped content clicks; the caret mapping and producer
+  publication code are unchanged. This does not repeat the physical keyboard or
+  candidate-popup exercise.
+- **Display masking had its own index boundary.** The earlier native geometry
+  run checked password classification and value exclusion, while shaping counted
+  grapheme bullets and caret queries used editing-value bytes directly. The
+  later password projection repair below closes that mismatch; the earlier
+  frozen receipt retains its original source and qualification bounds.
+
+## Password projection and native receiving (2026-10-27)
+
+- **The native owner now understands projected indices.** Genet `a732a7d4` maps
+  source-byte carets and selections through the bullet string it actually shapes,
+  then maps pointer hits and returned text ranges back to source bytes. A caret
+  inside a grapheme uses the leading edge; a partial-grapheme selection covers
+  the touched bullet. Retained state stores numeric boundaries and masked text,
+  with no extra plaintext copy. Same-mask edits refresh those boundaries and a
+  control-type change removes the projection. The static and scripted engines,
+  shared producer, Pelt and Graphshell receive the fix at the owner boundary.
+- **Tests distinguish source offsets from actual glyph edges.** The original
+  implementation fails both new retained-layout regressions. The repaired suite
+  passes 359 tests with two ignored. ASCII, multibyte characters, combining
+  marks, emoji sequences and flags match separately shaped bullet references in
+  LTR and RTL, including inverse hits and selection geometry. Five focused
+  static/scripted geometry tests and two hardware Vulkan producer tests pass;
+  UTF-16 editing offsets survive composition while masked caret geometry stays
+  correct. Password values remain excluded from shared observations.
+- **The native host receives the repaired geometry.** Turnstone's
+  [password receiving receipt](https://github.com/merely-made/turnstone/blob/main/docs/receipts/cue_password_geometry_linux_20261027/README.md)
+  records three passing host tests and a native Wayland password-field run on
+  RADV Renoir / Vulkan. Both primary and document lens shared rectangles match
+  actual Wayland cursor-rectangle messages. Page zoom changes caret height from
+  33 to 36.3 pixels and the lens receives 36.3. Native display scale 1 is covered;
+  scale 2 remains a producer fixture. This removes the earlier password-offset
+  caveat, with no new physical IME, OS candidate-popup, CJK, human AT, X11,
+  native high-DPI or Servo IME claim. Earlier frozen receipts stay unchanged.
+- **Consumer adoption is a narrow lock update.** Turnstone and Mere root/web
+  change only Genet source revisions to `a732a7d4`. Locked root and wasm web
+  metadata pass and resolve that single Genet source. The receipt records an
+  unrelated existing root-lock split: `netrender_device` is locked at `d9d6e778`,
+  while metadata emits it with `netrender` at `66b2f72e`. Those records are
+  preserved; this pass does not claim a new Graphshell executable build.
+
+## Netrender device source identity (2026-10-28)
+
+- **The root lock now names the loaded device workspace.** At the start of
+  this pass, main recorded `netrender_device` at `d9d6e778` while Cargo loaded it from its parent
+  Netrender checkout at `66b2f72e`. The device source trees are identical. Mere
+  `db8983943` aligns that one root record with the already-selected parent and
+  preserves the intervening published dependency update. Cargo's metadata package
+  ID omits the precise Git revision here; its reported source or the actual
+  checkout head is needed to catch the disagreement. The earlier password
+  receipt retains the discrepancy it actually observed.
+- **The standalone receiving repair was superseded upstream.** The isolated
+  Graphshell web candidate needed Cambium's `genet-events` edge and package
+  record at its existing `a732a7d4` cohort. Its full web build passed. Upstream
+  `8996e935a` subsequently supplied that edge with a newer web supplier cohort;
+  the candidate lock was preserved as evidence and not published over it. This
+  fix changes only the root device source record, with no supplier revision
+  chosen for the web consumer.
+- **A green build belongs to its source snapshot.** The initial native library,
+  viewer and full default web builds passed on their older snapshot. The queued
+  refresh of `db8983943` subsequently built the native library/viewer and matched
+  all 721 compiled package identities to the root lock. Its full default web
+  build reached Cargo and failed in `spareval 0.2.7`: MD5/SHA-1 used `digest 0.11`
+  while SHA-2 used `digest 0.10`. The
+  [qualification receipt](../../../support/receipts/netrender-lock-20261028/receipt.json)
+  retains those passes, the compiler failure, frozen native artifact and earlier
+  guard refusals without treating the older web pass as newer-cohort evidence.
+- **The evaluator and its exact companions form one receiving set.** Mere
+  `4559b860a` raises the evaluator minimum to the latest stable `spareval 0.2.9`
+  and updates eight registry records in both locks. Existing dependency choices
+  stay fixed except the evaluator's SHA-2 edge, which joins MD5/SHA-1 on `0.11`.
+  All package records outside that set remain unchanged. A query regression
+  checks the known MD5, SHA-1, SHA-256, SHA-384 and SHA-512 digests of `abc`.
+- **Executed tests and linking close the evaluator build gap.** The queued
+  validation of `4559b860a` completed: all 105 native query tests passed,
+  including the five hash-function results, and the full default web product
+  linked. The frozen Wasm artifact and source audit are retained with the
+  [qualification receipt](../../../support/receipts/netrender-lock-20261028/receipt.json).
+  The audit matches 553 of 554 compiled package identities; its one existing
+  Taffy source-record disagreement remains a distinct issue. This is build
+  and test evidence for that snapshot, with no new native UI, browser runtime,
+  physical IME, GPU pixel or human accessibility claim.
+- **The evaluator snapshot retains its earlier source disagreement.** Locked web metadata
+  for `4559b860a` loads `genet-taffy 0.14.0` from the parent Genet checkout at `36526e0`, while its
+  existing lock record names `a732a7d4`. The Taffy source trees are identical at
+  those revisions. This pre-existing record is preserved separately from the
+  evaluator update; compile success alone does not close that identity gap.
+  The receiving upgrade below replaces both old fork identities.
+
+## Genet Taffy upstream base and consumer identity (2026-10-28)
+
+- **The fork now carries the current upstream release.** Genet `565458ea3ab`
+  rebases the current fork, including its unreleased changes, from upstream
+  Taffy 0.13.0 onto 0.15.1. Published `genet-taffy 0.16.0` contains that result.
+  A fork's own latest published version did not establish that its upstream
+  base was current. The retained float, containment, order, static-position
+  and automatic-minimum seams now sit on the new upstream algorithms and API.
+- **One registry package removes the fork's parent-checkout ambiguity.** Mere
+  `590097f6a` adopts the new Genet cohort in both locks and removes the redundant
+  Taffy Git patches. Buckram and Livery select the published fork directly.
+  All nonselected package records, including the evaluator's repaired hash
+  dependencies, remain unchanged. Locked metadata checks actual checkout
+  heads and matches all 1,611 root and 725 web package identities to their locks.
+- **The migration keeps regressions visible.** The refreshed complete delta
+  reproduces all 52 source files byte for byte against pristine 0.15.1. The
+  fork and its extracted package each pass 196 unit tests and five doctests;
+  Buckram, Genet-Livery and Livery pass 1,220 tests with 12 existing ignored
+  tests. Retained red/green evidence covers the wrapped-column automatic
+  minimum and explicit content-basis ratio. Livery's stale `align-content`
+  initial value is corrected to `normal`; a positioned-grid regression and
+  explicit `stretch` control distinguish margin collapse from intentional
+  independent formatting contexts. These results are source and native test
+  evidence, with no new physical IME, human accessibility or Linux/Vulkan claim.
+- **The receiving products link with the published fork.** The native
+  Graphshell library/viewer and full default Wasm web product build at
+  `590097f6a`. All 721 native and 554 web compiled package identities match
+  their respective locks, including the registry fork. Frozen artifacts,
+  hashes, lock-preservation proof and the upstream/package evidence are in the
+  [receiving receipt](../../../support/receipts/genet-taffy-0151-20261028/receipt.json).
+  This closes the old fork source-record gap on the new receiving snapshot.
+
+
+## Linux geometry receiving on the rebased Taffy fork (2026-10-29)
+
+- **The rebased owner reaches hardware Vulkan.** Turnstone `299d6ff` and SDK
+  `c314b7e` use Genet `565458ea3ab` and registry `genet-taffy 0.16.0`, based on
+  upstream Taffy 0.15.1. The ThinkPad verifies all 52 fork source files against
+  the published package, with no lock/source disagreement. The two native SDK
+  geometry cases and the three focused host geometry, IME-admission and
+  pending-frame tests pass on AMD Radeon Graphics / RADV Renoir / Vulkan.
+- **Both field types keep their geometry through native receiving.** Fresh
+  ordinary and password scenarios pass primary-window editing, 110% page zoom
+  and explicit lens-content focus. Every distinct shared caret rectangle
+  matches a native Wayland request on the correct window surface within one
+  logical pixel; swapping the window identities fails the checker. Ordinary
+  caret height changes from 34 to 37.4, password height from 33 to 36.3, and
+  both lenses retain the zoomed height. All source captures are nonblank and
+  identify hardware Vulkan at native display scale 1.
+- **The rerun preserves the other acceptance boundaries.** Every nonselected
+  dependency record and the earlier physical IME, ordinary geometry and
+  password receipt trees remain unchanged. This is synthetic geometry
+  receiving, with no new physical IME, candidate-popup, CJK, human AT,
+  native high-DPI, X11 or Servo IME claim. The canonical evidence is
+  `turnstone/docs/receipts/cue_taffy_geometry_linux_20261029/receipt.json`;
+  its manifests bind the frozen executable, source cohorts, native protocol,
+  source rasters and original evidence hashes.

@@ -59,7 +59,7 @@ above. Human AT, exact captured-frame/state correlation, other worker families
 remain open. These two products qualify the bounded core; they do not establish
 two complete action/worker/exact-pixel causal receipts.
 
-See the [canonical diagnostics plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+See the [canonical diagnostics plan](../../archive_docs/2026-10-28/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 for current ownership and remaining acceptance conditions. June receipts remain
 historical evidence.
 

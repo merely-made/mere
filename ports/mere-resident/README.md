@@ -1,0 +1,537 @@
+<!-- The Cargo package is mere-resident; installed executable names remain djinn. -->
+# Mere resident composition
+
+Djinn is Mere's local desktop resident. It composes the owner-held parts of a
+personal device: Personae authority, the SSH agent, Graphshell's local browser
+and application brokers, personal sync,
+[Knot's](https://github.com/merely-made/knot-editor) source/sync/evidence custody,
+per-profile Castellan custody, and the shared physical blob store.
+
+Graphshell remains the local session and admission protocol. Knot remains the
+Djot editor and document authority. Djinn owns their shared process lifetime
+when they use persona-held state.
+
+## Run
+
+The default build links no Reticulum-licensed code. Features
+`knot-site-nomadnet` and `moot-site-nomadnet` add NomadNet serving through
+retinue and tulle, whose license bars any use that contributes to training or
+developing a model.
+
+### Explicit Moot site endpoint
+
+Feature `moot-site` adds a local public Gemini or Scroll endpoint over supplied
+Gemot and Eidetic owners:
+
+```text
+cargo run -p mere-resident --no-default-features --features moot-site --bin djinn-moot-site -- ENDPOINT_ROOT OWNERS_JSON
+```
+
+The versioned owners file names `moot_id`, `moot_directory`, `content_database`,
+`retention_revision`, `availability` and `erasure`. Governance is reopened from
+signed genesis. It contains no author signing key. This standalone caller uses
+redb; an embedding supplies existing owner handles to `MootSiteService`.
+
+Stdin accepts one JSON command per line: `configure` with a `SiteBindingV1`,
+`GeminiListenerPolicyV1` and optional `transport` (`"gemini"` or `"scroll"`),
+`import` with local signed-record and optional snapshot
+paths, `start`, `status`, `stop`, or `shutdown`. Replies describe success, refusal
+and endpoint status. Import is explicit local delivery, with signature and
+content verification; admission and retention span separate owners and a later
+failure does not roll back facts already admitted. Ordinary requests acquire
+nothing. An empty or ambiguous selection, lost authority or withdrawal refuses
+subsequent requests once the signed updates have been admitted locally.
+
+Omitted transport keeps existing commands and descriptors on Gemini. Scroll
+configuration requires a Scroll snapshot; a later collection selection cannot
+switch the listener's protocol. Scroll preserves native full/abstract bytes,
+UDC class, author, language and date fields. Each path has one declared language;
+request preferences do not choose a variant. Static-site requests must name the
+actual loopback endpoint without credentials, query, fragment or path parameters.
+
+The binding and TLS identity survive restart. Restart serving requires the
+configured opt-in policy and a currently valid selection. `stop` durably clears
+the running intent; shutdown/EOF joins listener and connection work while
+preserving it. Armillary records actual task outcomes. Local disk I/O and bounded
+snapshot decoding run inline and are not preempted by network deadlines.
+Desktop publishing controls, the main resident broker's owner attachment,
+remote acquisition, hosting promises and Micron listeners remain later
+consumer gates. The snapshot-handoff client is Knot's `knot_site`.
+
+### Personal resident
+
+```text
+cargo run -p mere-resident --bin djinn -- --dir <personae-vault> --data-root <data-root> \
+  --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>
+```
+
+The standard SSH agent endpoint and the default browser and app endpoints
+belong to the installed resident, which the installer launches with
+`--installed`. Any other run refuses them and names its own.
+
+`--log-filter <directives>` sets the tracing filter (`info` by default, for
+example `info,iroh_gossip=debug`). `--events-file <path>` appends one JSON line
+per lifecycle event: `started`, `listening`, `ready`, `stopping` and `stopped`
+with its reason. `djinn --resident-status` prints a running resident's status
+from its app door, and `djinn --stop-resident` stops it the way Ctrl-C does;
+both routes are owner-only.
+
+`--diagnostics-config <path>` opts into an in-memory redacted lifecycle history.
+The JSON file requires explicit ingress and retained record/byte/age bounds and
+a sampling rate. For example:
+
+```json
+{"ingress_records":32,"ingress_bytes":65536,"ingress_age_secs":300,
+ "retained_records":32,"retained_bytes":65536,"retained_age_secs":300,
+ "sample_rate":1.0}
+```
+
+A zero in any ingress or retained bound disables that buffer; `sample_rate`
+must be between zero and one. `djinn --resident-diagnostics` reads the bounded
+copy through the existing owner-only status route. Absent configuration reports
+disabled coverage. Only fixed lifecycle phases and explicit stopped outcomes
+are retained; profile/credential/endpoint/error text is excluded before queue
+admission. The event file remains separate. This history is neither a durable
+journal nor a final stopped receipt after process exit, and it installs no
+process-wide capture of other logs. Each reader has an independent cursor. Byte limits use admission accounting,
+not JSON output size.
+
+The default configuration continues to read the existing Graphshell
+application directory. That is a compatibility bridge for selected profiles,
+pairing records, and content-store migrations, not an additional resident.
+
+An enabled personal Knot lane obtains its keys from custody before opening its
+store. Knot startup repairs legacy checkpoint storage from authenticated signed
+history before Djinn exposes the route. A completed rewrite logs the previous
+and rebuilt checkpoint IDs and preserved-key count. Missing history or keys
+require recovery; the lane refuses to open. Legacy replacement currently
+supports Unix. The [receiving receipt](../../support/family-promotion/knot-checkpoint-intake-20261022.json)
+records the imported source and qualification; backups and filesystem snapshots
+retain their own cleanup requirements.
+
+## Installation and SSH
+
+On Linux, `install-linux.sh` takes prebuilt Djinn and `personae-vault`
+binaries. It installs a systemd user unit, enabled at login, without building
+on the target or replacing its existing `ssh-agent`. The optional last two
+arguments set the resident's memory ceiling and CPU quota:
+
+```sh
+bash ports/mere-resident/install-linux.sh /path/to/djinn /path/to/personae-vault 768M 50%
+systemctl --user start --no-block djinn.service
+```
+
+The native desktop dialog creates or unlocks the vault. Passphrases are not
+stored in the unit, environment, or installer. Start from the desktop user's
+session so the systemd user manager has its display and session bus environment.
+The dedicated agent is `$XDG_RUNTIME_DIR/djinn/agent.sock`; name that socket in
+each peer's SSH `IdentityAgent` setting. The desktop's existing agent remains
+available to other clients. An active resident or another owner's unit is
+preserved; a stopped unit's stale socket is removed only after checking its
+type, owner, inode and absence of a listener.
+
+An existing Windows OS-protected vault without a passphrase uses
+`djinn --enroll-passphrase --native` for first enrollment. It asks twice in
+masked native prompts, preserves the existing root and profiles, and refuses
+cancellation, unavailable UI or an already-enrolled vault without a terminal
+fallback. A persisted lock must first be opened with Windows Hello. Subsequent
+changes use Dramatis's **Change passphrase…** action.
+
+When native authentication is needed, an installed resident may use
+`--prefer-passphrase` to open the vault-passphrase box directly, including during
+cold startup and Dramatis unlocks. This requires an already-enrolled passphrase for an OS-protected vault;
+it does not unlock storage or bypass verification. Without the option, native
+unlocks continue to offer OS presence first.
+
+`personae-vault generate-ssh <comment>` creates an Ed25519 SSH key inside
+Djinn and prints only its public half. The existing persona master remains
+unchanged. The key uses session unlock, is held in the encrypted vault, and
+becomes available to the live agent immediately. Register the public half on
+the intended peer. `scripts/djinn-ssh-control.py` is a small owner-local custody
+client for generation, public inspection and explicit lock checks; it handles
+neither private keys nor passphrases.
+
+On Windows, `install-ssh-server-windows.ps1` runs elevated to install the inbox
+OpenSSH Server, initialize missing host keys, and enable `sshd` automatically.
+It permits public-key authentication for one named local account and restricts
+the firewall rule to one peer IPv4 address. Existing SSH configuration owned
+elsewhere is refused for review. For an administrator account, pass the peer's
+public Ed25519 key as `-AuthorizedKeyFile`; enrollment appends it to the
+administrator key file and applies the Windows-required ACL. The script is
+for an administrator login, as used by this lane. Inspect its public host-key
+fingerprints locally before pinning the host at the peer.
+
+Windows' native identity unlock uses desktop Windows Hello with a visible
+parent window owned by Djinn. Its UI thread keeps that window responsive
+while Castellan verifies presence; the parent closes when verification ends.
+The SSH agent cannot unlock the vault over its wire. After a lock, use the
+resident's native unlock action before retrying SSH.
+
+These scripts establish SSH execution and custody. The Iroh SSH proxy,
+cross-device CA approval, and fleet pairing ceremony remain work in the
+device-pairing plan. Installing an SSH server does not establish those grants.
+
+## Saved Gemini sites
+
+Knot's `knot_site` client (knot-editor, feature `site-handoff`) submits an
+ordinary saved Knot site to the running resident through its owner-only
+application broker, as `knot-editor` under Knot's declaration. The handoff
+contract lives in `knot_site::handoff`; this resident owns the listener. Each selected Personae profile has one
+publication, its own certificate, and independently retained content.
+
+```text
+knot_site publish <site-directory> 1965 --resume
+knot_site status
+knot_site stop
+knot_site remove
+```
+
+The port is optional; zero asks the operating system for a free loopback port.
+Status reports the bound address, snapshot digest and certificate fingerprint.
+Browse `gemini://localhost:<reported-port>/` in Lagrange. The stock 1.21.1 client
+passed with this hostname; its IP-literal certificate check refused the same
+loopback certificate, so `127.0.0.1` is not an accepted Lagrange URL receipt.
+`--resume` explicitly enables serving after a resident restart. Without it,
+the saved publication starts stopped on the next run. The default listener is
+restricted to `127.0.0.1`. The broker endpoint follows
+`GRAPHSHELL_APP_ENDPOINT`, matching the resident's `--app-endpoint` when one is
+selected.
+
+Publishing selects saved bytes once. Later source edits become visible only
+after another successful publish. Stop releases the listener and retains the
+publication. Remove forgets the serving record and releases its storage lease;
+status reports retained custody if cleanup needs retrying. The profile's TLS
+identity remains available for its next publication. Missing or mismatched
+identity files are refused during serving restoration.
+
+The initial caller is a command-line utility. Knot's desktop controls, explicit
+certificate rotation, additional protocols, public binding and governed moot
+hosting remain separate integration work. Exporting Tabard's Lagrange palette
+does not change Gemini page content or this listener's policy.
+
+## Paired devices
+
+`djinn-devices` asks the running resident where each paired device is now,
+through the same owner-only application broker. For every device paired in
+this profile's personal sync it prints the node id, label, root, pairing id and
+time added; whether the device is connected now; every address the transport
+holds for it, the live ones marked active; and the last saved dial hint,
+decoded into its direct addresses and relay.
+
+```text
+djinn-devices
+djinn-devices --json
+```
+
+The directory is read-only and lists paired devices only. The broker endpoint
+follows `GRAPHSHELL_APP_ENDPOINT`, as Knot's `knot_site` does.
+
+## Resident inference
+
+Build with `--features inference` for a CPU model-library lane, or
+`--features inference-gpu` for the first discrete GPU. GPU selection is
+probed and refused when that adapter class is unavailable. Owner settings
+name the exact imported row and output limit:
+
+```json
+{"inference":{"model":{"library":{"row":"blake3:<row hash>","device":"gpu","max_tokens":256}}}}
+```
+
+The lane requires a `distillery` block and shares its persona's model library.
+`esp`'s `import_inference_model` example imports a local checkpoint and declared
+template into that library. Its printed settings select CPU; change `device`
+to `gpu` for the GPU build. The `inference.ask` route is granted to Turnstone.
+
+Passing a streaming-options JSON file as the import example's sixth argument
+stores weights as immutable per-layer artifacts. The same library setting
+selects that row on CPU or GPU. The resident reads and verifies one layer at a
+time through its existing library owner, releases the library lock before
+tensor work, and uses bounded query blocks during prefill. Its execution loader
+has a `/layer-stream-v1` suffix, so checkpoints cannot silently resume through
+another loader. The native I6 decoder rows qualify a model exceeding GPU
+memory and bounded long prefill; the plan records those measurements and the
+resident composition regressions separately.
+
+An indexed GPU row can also carry an explicit `weight_cache` block:
+
+```json
+{"host_bytes":3221225472,"device_layer_bytes":4294967296}
+```
+
+These illustrative numbers are owner limits, not detected free memory. The
+optional block belongs inside `library`; absence preserves uncached streaming.
+`host_bytes` bounds the retained capacity of verified immutable encoded layer
+buffers (at most 128 entries). `device_layer_bytes` bounds additional retained
+dense f32 layer-tensor payload during a generation. The owner must separately
+reserve shared weights, KV, one transient streamed layer, execution workspace,
+allocator overhead and other applications. These limits are not RSS or total
+VRAM bounds. Nonzero cache settings are refused for CPU library execution;
+device-layer caching currently refuses MoE and reduced-precision rows.
+
+Caches admit a first-fit subset instead of evicting every layer on a cyclic
+sweep. Remaining layers still stream. Host hits share their verified allocation;
+source errors are not cached and tighter byte limits are rechecked. Device
+weights stay inside the inference foreground guard and are dropped before that
+guard is released; host buffers belong to the lane and can serve later asks.
+Both caches are ephemeral. They change placement and repeated work, while the
+original format, prompt, token sampling, checkpoint/session identity and model
+content references remain the same. Debug cache counters report logical reads,
+hits and payload/capacity bounds without recording prompt or answer text.
+Performance qualification also needs an optimized tensor/backend build: an
+unoptimized development backend can spend most of its time constructing and
+submitting kernels even when the caches hit. Cache counters establish reuse;
+measure generation separately from artifact verification, import and prefill.
+
+A GPU ask preempts the GPU trainer through owner reclaim. The offer is
+withdrawn while inference waits or runs; inference loads device tensors for
+each ask and releases them before returning the GPU. CPU inference retains
+its loaded model, with only shared weights resident for layered rows. Library
+asks now retain exact token checkpoints in an
+append-only encrypted log. Shutdown pauses unfinished asks and joins the actor;
+local interrupted asks resume after reopen. Lock refuses the route, pauses at a
+token boundary, clears materialized runs and their device-local data key, and
+unlock rehydrates and resumes lock-paused work while the device retains a
+current execution seat. Unlock also reconciles operations refused while locked.
+Explicit pauses remain paused. A GPU pause drops
+its KV cache and device tensors before releasing the foreground guard.
+
+A qualified `esp.layer-weights/v2` row selects its declared f16, bf16, Q8 or
+Q4 format through the same library setting. CPU rows use Flex for half precision;
+GPU rows retain the trainer reclaim path. Imported format candidates must be
+measured against bf16 before publication. The measured loader must match the
+selected device's loader, and a format change refuses old checkpoints.
+
+The optional `inference-stages` feature also composes automatic execution from
+settings. It requires the live keyed personal graph and a layer-indexed library
+row. For example, the `model` field can be:
+
+```json
+{"automatic":{"row":"blake3:<qualified-row-hash>","device":"gpu","max_tokens":128,"stages":{
+  "local_resident_bytes":2147483648,"worker_layer_bytes":536870912,
+  "max_peers":8,"max_hidden_bytes":16777216,
+  "discovery_timeout_ms":2000,"discovery_every_ms":1000,
+  "lease_wait_ms":10000,"call_timeout_ms":60000,"poll_every_ms":25,
+  "lease_duration_ms":600000,"heartbeat_ms":10000
+}}}
+```
+
+These numbers illustrate explicit owner limits. `local_resident_bytes` admits
+weights and full-context KV for whole-model residence; zero skips that rung.
+`worker_layer_bytes` is the offered layer/KV budget after reserving embedding/head,
+RoPE, activations, allocator and backend space. Zero offers no worker. Neither
+budget is a process RSS or VRAM limit. The device's existing mesh lending rules
+still apply; an explicit resource allowlist must permit its device-addressed
+`esp.inference.stage.<mesh-author-hex>/v1` resource and the restart class.
+
+An ordinary ask first tries local residence within that budget, then discovers
+current keyed readers offering the exact row, format and backend, posts real
+stage leases, and falls back to local layer streaming if placement is unavailable
+or leaves mid-answer. Discovery exchanges attested compute endpoints over the
+existing personal connection, then uses Distillery's existing endpoint for
+stage work. Compute joins a graph-scoped mesh across distinct profile roots.
+Ask journals, device IDs and existing history retain their profile-scoped paths.
+No prompt enters discovery, reservation, the mesh post or its fixed receipt.
+
+`ResidentDistillery::enable_inference_stages` and the explicit staged actor API
+remain available to embedding hosts. Both paths use the existing library and GPU
+owner, exact-session guards and current graph seats through `PersonalGraphSeals`.
+The vault holder refuses new work and waits for catalog, KV and tensors to drain
+on lock. Historical readability does not authorize new stage work. Install the
+holder before admitting application sessions. Native I8 rows use independently
+rooted software devices/libraries on one physical computer; physical fleet
+capacity and inter-computer latency require separate receipts.
+
+The route also takes `distillery.inference/pause-v1` and
+`distillery.inference/resume-v1` with the cancel payload's `{"run":"name"}`.
+`distillery.inference/ask-sampled-v1` accepts `ask`, `max_tokens`, `temperature`,
+`top_p` and `seed`; the owner cap still applies. Every keyed personal-graph
+device can read received asks and resume one with the exact model session.
+Inference borrows personal sync's existing key group and endpoint; devices
+keep separate identity roots. Shared asks refuse until the device is keyed,
+then become available through live key agreement. With personal sync off,
+asks stay locally durable. Existing local history is imported when keyed.
+Revocation excludes future epochs while preserving already received history.
+The native/embedded composition can call `configure_inference_recall` with an
+already-owned retained corpus and recall limits. Turnstone then uses
+`distillery.inference/ask-recall-v1` with `{"ask":{"run":"name","question":"..."},"scope":[]}`.
+An empty scope means the composed corpus. The route returns supplied passages,
+source-version staleness, validated citations and their answer spans alongside
+the run. Citation bases distinguish model markers from exact-quote annotations.
+The journal retains exact source versions and selectors through restart and
+personal-graph continuation. The desktop binary does not discover or reopen
+Turnstone's app-owned browsing database. Turnstone publishes retained text over
+the admitted route, with an owner namespace per browsing session, then asks
+against that publication. Only supplied passages enter the sealed run journal.
+The optional `inference.recall` object sets `chunk_chars`, `max_passages`,
+`min_quote_chars`, `max_context_chars` and `max_corpus_chars`. When this object is
+omitted, RecallConfig defaults apply. Inline publications above 128 KiB are
+refused. The Turnstone native client is qualified through I5, including streaming,
+pause/resume, cancellation and exact source reopening after both processes
+restart with the origin offline. That gate uses a test-owned native resident;
+the installed Djinn binary retains its separate gate.
+See the
+[resident inference plan](../../design_docs/archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md).
+
+## Publishing
+
+`0.0.2` is the source version of this workspace resident, not a crates.io
+release. Knot Editor is pinned from its own public repository; the Graphshell
+composition still uses workspace-only dependencies, so `cargo package` correctly
+refuses it. A public Djinn release needs an installable package boundary and a
+staged release of the Mere dependencies it exposes.
+
+## Security boundary
+
+Djinn holds durable authority but does not manufacture public services. Its
+default personal-sync policy can use local discovery when the owner has
+configured it; relays remain owner-selected transport configuration.
+
+The following deployments are intentionally absent until a forcing consumer
+defines their policy and acceptance receipt:
+
+- a public Knot publisher;
+- a Misfin receiver;
+- a Gemot community host;
+- a dedicated relay;
+- a Secret Service daemon.
+
+Castellan record and freshness keys are separately derived from the unlocked
+Personae identity and opened per Djinn profile. Starting Secret Service also
+requires a concrete persona selection and allowed-caller policy, so Djinn does
+not guess either from a profile name.
+
+## Lifecycle
+
+Djinn uses Distillery's `lifecycle` module (the `mere-resident` crate until
+2026-09-23) for the small rule shared with Distillery: close
+resources in a concrete order, attempt every close, and retain every failure.
+It does not share product policy, configuration, or service APIs with
+Distillery.
+
+## License
+
+MPL-2.0
+
+## Declared applications
+
+An application may carry a declaration on its door hello
+(`djinn::door::declaration`): the routes it opens, the projections it offers and
+the custody calls and epoch derivations it needs. The owner's grants decide what
+it receives; a connection gets only what both name. An undeclared request is
+refused as undeclared, a declared but ungranted one as not granted, and an
+application with a grant must declare. Knot and Turnstone are declared
+applications.
+
+Salts are named as UTF-8 text matched against the salt's bytes (`exact` or
+`prefix`), or as `delegation_scope` for the binary-framed delegation signing
+keys of a capability domain. `salts` may be released; `acts` are only signed
+or attested with inside custody. A declared application's releases are not
+drawn from the label release policy, though the floors still hold: never the
+master's place, and station salts only for Signalman.
+
+Grants are the `applications` entry of the profile's owner settings. Absent, the
+resident uses Mere's defaults in `policy/default_applications.json`; an empty
+list admits no application by declaration. Grants name namespaces, so an
+application can add a need inside its granted namespace without a resident
+change:
+
+```json
+{
+  "applications": [{
+    "app": "knot-editor",
+    "routes": [{ "exact": "custody" }, { "prefix": "mere/" }, { "exact": "published-site-v1" }],
+    "custody": {
+      "operations": ["status", "roster", "watch_lock", "release_epoch_keys"],
+      "epoch": [{ "prefix": "mere.knot." }]
+    }
+  }]
+}
+```
+
+A declared provider still needs its `projection_providers` permission, and
+offers only routes its declaration names. Other applications keep their label
+grants (`CUSTODY_APPS`, the resident's first-party route grants and the label
+release policy) until they declare. Retained-content payload scopes are still
+chosen by label. Declarations, like labels, are statements within the same-user
+transport boundary, not executable authentication.
+
+## Application identity
+
+The door records what the OS says about each connection's peer, and status
+lists each admitted connection with its identity basis and peer account
+(`djinn --resident-status`, `connections`). An owner grant may pin a label to
+an OS identity with an `identity` entry: `macos` (code signing team and
+identifier), `windows` (executable image, the same-user posture of a path) or
+`linux` (an executable and arguments the resident launches). A pinned label
+without that identity is refused; a grant without a pin for the running
+platform is development mode, which status reports. Mere's defaults pin none.
+
+`djinn --launch <app>` asks the running resident to start an application by
+its grant's `linux` launch. The child receives a one-time handle on
+descriptor 3; Djinn's door client carries it on every route hello, and the
+handle stays live until the child exits.
+
+```json
+{
+  "applications": [{
+    "app": "knot-editor",
+    "identity": {
+      "macos": { "team": "ABCDE12345", "identifier": "com.merely.knot" },
+      "linux": { "executable": "/usr/bin/knot", "args": [] }
+    }
+  }]
+}
+```
+
+## App-owned projections
+
+An external application can offer a projection through the existing application
+door. Its provider permission and its viewers are explicit owner settings, loaded
+on resident restart. For example, add this entry to the profile's owner settings:
+
+```json
+{
+  "projection_providers": [{
+    "provider": "knot-editor",
+    "route": "documents",
+    "viewers": ["turnstone"],
+    "max_sessions": 4,
+    "timeout_ms": 5000
+  }]
+}
+```
+
+Merge the entry into the existing document. An empty list permits no providers.
+A provider permission grants no custody privileges. Existing explicit route
+denials still apply to providers and viewers. App labels identify policy entries;
+they are self-declared within the local same-user transport boundary.
+
+With the matching Knot build, run `knot_endpoint projection-provider /path/to/documents documents`.
+This requires its `peers,projection-provider` features. The directory belongs to
+the application; Djinn neither opens it nor creates a Knot-specific registration.
+Clients use the existing projection door client with route `documents`.
+Knot's provider is read-only and opens a separate endpoint instance for each
+viewer. Its existing stdio modes and Djinn's embedded Knot service remain separate
+compositions.
+
+Offers disappear when their provider disconnects, withdraws, violates the
+protocol, exceeds its work deadline, or loses permission. The host cancels their
+live sessions and rejects late results. An operation already executing inside
+an application cannot be rolled back. In-process hosts can replace permissions
+through `AppEndpointCatalog::set_provider_permissions`; replacement withdraws
+existing offers before their providers register again. Ordinary viewer route
+grant or denial updates retain their existing next-connection semantics; replacing
+provider permissions cancels the active offered sessions. Settings edits take
+effect on restart.
+
+Each permission allows 1–64 simultaneous sessions and a work deadline greater
+than zero and at most 300 seconds. The host caps all offered sessions together at
+64. Bounded provider work runs outside Tokio runtime workers; each provider
+processes one work item at a time. Native frames retain the existing 1 MiB bound
+and native-endian length prefix. `projection-offer` exposes portable DTOs;
+`projection-provider` adds the native runner without enabling custody.
+
+The independent `djinn` crate in Armillary owns the application door, selected
+clients and resident service/task lifetime. This package supplies concrete
+Mere services, product policy and protected custody authority. See the
+[ownership receipt](../../design_docs/mere_docs/testing/receipts/2026-10-30_djinn_ownership.md).

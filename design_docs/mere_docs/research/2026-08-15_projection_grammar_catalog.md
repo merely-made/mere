@@ -38,7 +38,7 @@ projection grammar -> scene recipe -> product adapter and authority
 
 `sceno` carries the grammar and scene result. It does not import the scene catalog or know product scene names.
 
-**2026-10-03, recipe slots.** A scene recipe names an arrangement and, optionally, a dynamics recipe. One domain binding supplies the facts both read and the actions both honour, such as drag and pin. This is ruling F21 of the [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md), the sibling grammar for motion. The chain above is unchanged: the recipe still depends on this grammar, and now on that one too.
+**2026-10-03, recipe slots.** A scene recipe names an arrangement and, optionally, a dynamics recipe. One domain binding supplies the facts both read and the actions both honour, such as drag and pin. This is ruling F21 of the [dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md), the sibling grammar for motion. The chain above is unchanged: the recipe still depends on this grammar, and now on that one too.
 
 ## The projection stack
 
@@ -66,7 +66,7 @@ For movable spatial projections, the useful placement policies are:
 - **Anchored:** the solver supplies a home position; displacement is temporary and the item returns toward home.
 - **Pinned:** an explicit constraint fixes an item until the pin is removed. Pinning is independent of free versus anchored behavior.
 
-**2026-10-03, the three roles.** The [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md) rules these policies as *roles*: what an arrangement's coordinates do once physics or scripting acts on them (F18). It names them seeded, anchored and pinned, and retires "encourage" and "ensure" (F26).
+**2026-10-03, the three roles.** The [dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md) rules these policies as *roles*: what an arrangement's coordinates do once physics or scripting acts on them (F18). It names them seeded, anchored and pinned, and retires "encourage" and "ensure" (F26).
 
 | Policy above | Role | Behaviour | Ruling |
 | --- | --- | --- | --- |
@@ -245,7 +245,7 @@ An arrangement computes geometry under constraints. A reading may support severa
 | Nested and faceted | Small multiples, compound nodes, nested canvases | Nested spaces are portable; facet composition needs a forcing proof |
 | Three-dimensional | Spatial volume, layered depth, immersive graph | Deferred until a real second consumer forces portable depth semantics |
 
-**2026-10-03, forces leave this table.** Until this date the table had a row "Force and constraint", with variants "Spring, collision, gravity, clusters" and position "Landed in Seiche; portable score promotion requires a forcing consumer". By ruling F29 of the [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md), that row moved out, because arrangements are positions, not motion. Forces now belong to the dynamics grammar, which acts on an arrangement through the three roles of [the projection stack](#the-projection-stack). One part of that row comes back as positions: a law's latest settle, which F30 makes an arrangement source, Settled, in the row above.
+**2026-10-03, forces leave this table.** Until this date the table had a row "Force and constraint", with variants "Spring, collision, gravity, clusters" and position "Landed in Seiche; portable score promotion requires a forcing consumer". By ruling F29 of the [dynamics grammar plan](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md), that row moved out, because arrangements are positions, not motion. Forces now belong to the dynamics grammar, which acts on an arrangement through the three roles of [the projection stack](#the-projection-stack). One part of that row comes back as positions: a law's latest settle, which F30 makes an arrangement source, Settled, in the row above.
 - Each settle replaces Settled, and the three roles apply to it as to any arrangement.
 - An authored arrangement stays the reference unless Settled is chosen.
 - *Reading, not ruled* (the plan's): a law that never rests leaves Settled at its last value.
@@ -574,7 +574,7 @@ External prior art divides into two shelves, and the division is the point. Rend
 
 ### Specification languages and design solvers
 
-Eleven systems reviewed against this catalog in the projection grammar report (2026-08-15). Each line states what transfers; the [projection grammar adoption plan](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) is the in-repo record of which gated target carries it and what forcing consumer it waits on. The report's own conclusion is that these are prior art for the compiler, not for the scene: none of them replaces a Mere realization, and none of them has the authority layer this catalog is built around.
+Eleven systems reviewed against this catalog in the projection grammar report (2026-08-15). Each line states what transfers; the [projection grammar adoption plan](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md) is the in-repo record of which gated target carries it and what forcing consumer it waits on. The report's own conclusion is that these are prior art for the compiler, not for the scene: none of them replaces a Mere realization, and none of them has the authority layer this catalog is built around.
 
 - [Vega-Lite](https://vega.github.io/vega-lite/docs/) makes selections first-class spec citizens, fills in scales and guides by rule rather than by hand, and gives `resolve` for per-channel shared or independent scales across composed views. Transfers: the scales-and-guides gap, the facet gap, and the vocabulary for declaring how coordinated views share a scale.
 - [Draco](https://github.com/uwdata/draco) encodes visualization effectiveness as weighted constraints held separately from the grammar, and searches for completions of an underspecified design. [Draco 2](https://github.com/cmudig/draco2) replaced the knowledge base without changing what a spec means. Transfers: effectiveness and default-choosing knowledge is versioned *beside* the score, never inside it; a solver proposes, the score records what was chosen.
@@ -650,10 +650,10 @@ tangible, manipulable objects in the scene rather than host-only state. Mosaic
 - [`2026-07-21_projection_engine_prior_art_brief.md`](2026-07-21_projection_engine_prior_art_brief.md): prior-art comparison for the projection engine.
 - [`2026-06-22_graph_projections_research.md`](2026-06-22_graph_projections_research.md): graph projection families and early taxonomy.
 - [`2026-06-18_node_representation_arrangement_plan.md`](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md): representation and arrangement implementation seams.
-- [`2026-06-13_scriptable_field_regions_plan.md`](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md): field and region model.
+- [`2026-06-13_scriptable_field_regions_plan.md`](../../archive_docs/2026-10-28/2026-06-13_scriptable_field_regions_plan.md): field and region model.
 - [`2026-07-21_projection_proofs_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md): proof sequence and portable projection discipline.
-- [`2026-08-15_projection_grammar_adoption_plan.md`](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md): gated targets carrying the projection grammar report's transfers into mere, genet, and cambium.
-- [`2026-10-02_dynamics_grammar_plan.md`](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md): the sibling grammar for motion. Its rulings F18–F30 set the arrangement roles and the recipe slots recorded above.
+- [`2026-08-15_projection_grammar_adoption_plan.md`](../../archive_docs/2026-10-28/2026-08-15_projection_grammar_adoption_plan.md): gated targets carrying the projection grammar report's transfers into mere, genet, and cambium.
+- [`2026-10-02_dynamics_grammar_plan.md`](../../archive_docs/2026-10-28/2026-10-02_dynamics_grammar_plan.md): the sibling grammar for motion. Its rulings F18–F30 set the arrangement roles and the recipe slots recorded above.
 - [`2026-10-03_arrangement_and_dynamics_brief.md`](2026-10-03_arrangement_and_dynamics_brief.md): the evidence behind those rulings, with the points where arrangement and physics meet.
 - [`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`](../../scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md): scene ownership contract.
 - [`2026-07-24_scenograph_0_0_3_release_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md): historical 0.0.3 release boundary.

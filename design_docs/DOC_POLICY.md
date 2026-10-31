@@ -78,7 +78,7 @@ wins.
 
 ### 7. PROJECT_DESCRIPTION.md ownership
 
-**design_docs/PROJECT_DESCRIPTION.md** — inside the doc root, not at the
+`design_docs/PROJECT_DESCRIPTION.md` — inside the doc root, not at the
 repository root — is reserved for the maintainer. Do not edit it without
 explicit instruction. Treat it as authoritative and surface contradictions for
 discussion rather than resolving them silently.
@@ -100,7 +100,18 @@ roots, in `<area>_docs/implementation_strategy/`. Each plan carries:
   never time estimates.
 - A **Findings** section for facts verified during the work, dated, with code
   references.
-- A **Progress** log, dated, appended as phases land.
+- A **Progress** log, dated, appended as phases land: a line per landing,
+  naming what landed.
+
+A plan holds no receipts. Receipts are not live, so they are archived from
+the start: each plan keeps one receipt file,
+`archive_docs/receipts/<plan file stem>_receipts.md`, appended under dated
+headings, and no folder of outputs, logs or captures beside it. Receipts
+are run evidence: hashes, seeds, timings, counts, commands run, run
+narratives. Evidence that matters is also a test in the repository or a line
+in Findings. Thresholds in done-conditions stay in the plan. When a plan
+grows its history past its open work, cut a new plan from its open, deferred
+and follow-on items and archive the old one whole (as on 2026-10-28).
 
 Code samples in a plan state whether they are illustrative or compile-ready.
 
@@ -258,7 +269,7 @@ the repo that owns the subject" is the general form of it. Track the work in
 the [doc policy consolidation plan](archive_docs/2026-10-06_completed_plans/2026-08-24_doc_policy_consolidation_plan.md).
 
 **Amended 2026-10-06 (ruling S65 of the
-[stack seams plan](mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md)):**
+[stack seams plan](archive_docs/2026-10-28/2026-10-04_stack_seams_plan.md)):**
 that plan is complete and archived. The work is recorded here, in this
 policy, instead: this addendum's area-root list and the round-trip
 paragraph above are the record of the 2026-09-03 return, and a later move
@@ -319,7 +330,7 @@ When pulling a donor doc's content into a mere doc:
 Armillary founding proposal, and four community authority/publication documents
 with their retained proof receipt followed the code into Eidetic, Armillary and
 Gemot. Mere keeps application integration plans and links to those owners. The
-[family promotion record](mere_docs/implementation_strategy/2026-10-19_family_promotion_plan.md)
+[family promotion record](archive_docs/2026-10-28/2026-10-19_family_promotion_plan.md)
 records the source cutover and validation boundaries.
 
 ### Decisions and doctrine

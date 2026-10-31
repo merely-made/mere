@@ -82,9 +82,9 @@ members = [
     "crates/graphshell/graphshell-host",
     "ports/graphshell",
     "ports/graphshell/mere",
-    "ports/djinn",
+    "ports/mere-resident",
     "ports/dramatis",
-    "ports/djinn/castellan",
+    "ports/mere-resident/castellan",
     "ports/distillery",
     "ports/moot",
     "ports/distillery/athanor",
@@ -295,7 +295,7 @@ knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
-castellan = { version = "0.0.3", path = "ports/djinn/castellan" }
+castellan = { version = "0.0.3", path = "ports/mere-resident/castellan" }
 # The model-works port; first real consumer of the mesh host supervisor.
 distillery = { version = "0.0.1", path = "ports/distillery" }
 # The places port: one port, two surfaces (murmur = conversation, moot =

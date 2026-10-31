@@ -463,7 +463,7 @@ impl Canvas {
             return DEFAULT + recency * (MAX - DEFAULT);
         }
         if self.size_by_degree {
-            let degree = self.graph.neighbors_undirected(key).count();
+            let degree = self.graph.projected_neighbors(key).count();
             return (DEFAULT + 8.0 * degree as f32).min(MAX);
         }
         DEFAULT
@@ -588,7 +588,7 @@ impl Canvas {
         if !self.height_by_degree {
             return 0.0;
         }
-        let degree = self.graph.neighbors_undirected(key).count();
+        let degree = self.graph.projected_neighbors(key).count();
         (16.0 * degree as f32).min(80.0)
     }
 

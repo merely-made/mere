@@ -26,7 +26,7 @@ path deliberately.
 
 **2026-08-20 topology addendum:** K3's stdio carrier remains a conformance and
 isolated-deployment proof. Its persona-vault production topology is superseded
-by the [device resident consolidation plan](../../mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md):
+by the [device resident consolidation plan](../2026-10-28/2026-08-20_device_resident_consolidation_plan.md):
 one logical resident owns personal Knot authoring, sync, and content, while
 Turnstone and standalone Knot consume or embed that resident.
 

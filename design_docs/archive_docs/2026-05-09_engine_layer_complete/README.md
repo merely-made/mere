@@ -9,6 +9,6 @@ Archived 2026-05-09 when the Graphshell→Mere migration finished and the engine
 
 ## Why archived
 
-The forward-looking active plan is now [`../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md). It carries forward only the parts that are still genuinely open (host completion, donor-area rebuilds, Phase-1 loose ends, engine-layer follow-ups, legitimate defers, pitfalls, cadence) — about 130 lines, focused on action.
+The forward-looking active plan is now [`../../mere_docs/implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../2026-10-28/2026-05-09_post_engine_layer_priorities.md). It carries forward only the parts that are still genuinely open (host completion, donor-area rebuilds, Phase-1 loose ends, engine-layer follow-ups, legitimate defers, pitfalls, cadence) — about 130 lines, focused on action.
 
 The archived plan was 800+ lines of accumulated progress entries. Its history is preserved here for context; for current direction, read the new plan.

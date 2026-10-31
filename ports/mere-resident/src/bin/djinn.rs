@@ -1,0 +1,1676 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! Resident Djinn authority.
+//!
+//! One process owns the selected Personae profile, OpenSSH agent endpoint, and
+//! private browser-session broker. The browser-launched executable is only a
+//! relay into this process.
+
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+#[cfg(feature = "personal-sync")]
+use std::time::Duration;
+
+#[cfg(feature = "personal-sync")]
+use distillery::ResidentReceipt;
+use djinn::door::app_admission::{
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
+    default_app_endpoint,
+};
+use djinn::door::local_endpoint::LocalListener;
+#[cfg(all(not(windows), feature = "in-process-custody"))]
+use djinn::door::local_endpoint::prepare_unix_endpoint;
+#[cfg(feature = "personal-sync")]
+use djinn::resident::{
+    MaintenanceActivity, Resident, RunFailure, Service, supervise_with_maintenance,
+};
+use dramatis::view::{VaultLockView, VaultProtectionView};
+use graphshell_endpoint::door::projection::AppBrokerClient;
+#[cfg(feature = "personal-sync")]
+use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
+use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
+use mere_resident::door::browser_carrier::AllowedExtensions;
+use mere_resident::door::device_broker::{
+    configured_device_endpoint, default_device_endpoint, serve_browser_broker_on,
+};
+use mere_resident::identity_ui::SystemNativeIdentityUi;
+use mere_resident::keeper::Keeper;
+#[cfg(feature = "personal-sync")]
+use mere_resident::pairing;
+#[cfg(feature = "personal-sync")]
+use mere_resident::personal_sync as device_sync;
+use mere_resident::resident::DjinnResident;
+#[cfg(feature = "personal-sync")]
+use mere_resident::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
+#[cfg(feature = "personal-sync")]
+use mere_resident::resident_distillery::ResidentDistillery;
+use mere_resident::resident_events::EventLog;
+#[cfg(feature = "personal-sync")]
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_reservoir::ReservoirLane;
+use mere_resident::resident_status::{
+    self, AgentListenerV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE,
+    ResidentControlEndpoint, ResidentEndpointsV1, ResidentStatusEndpoint, ResidentStatusSource,
+    ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal, SyncStatusV1,
+};
+#[cfg(feature = "personal-sync")]
+use mere_resident::settings::{self as owner_settings, SyncOverrides};
+use mere_resident::startup_vault;
+use personae::{ProfileId, default_vault_dir};
+use serde_json::json;
+#[cfg(feature = "in-process-custody")]
+use ssh_agent_lib::agent::listen;
+
+const EXTRA_EXTENSIONS_ENV: &str = "DJINN_EXTENSION_IDS";
+const DATA_ROOT_ENV: &str = "DJINN_DATA_ROOT";
+const SESSION_SECONDS_ENV: &str = "DJINN_BROWSER_SESSION_SECONDS";
+#[cfg(windows)]
+const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
+
+enum AgentEndpoint {
+    Standard(String),
+    Receipt(String),
+}
+
+struct Args {
+    vault_dir: PathBuf,
+    /// `--profile`, when given. `None` means custody's own choice decides:
+    /// the custodian's configured profile, or in a build with
+    /// `in-process-custody` the family ladder after the open.
+    profile: Option<ProfileId>,
+    agent: AgentEndpoint,
+    browser_endpoint: String,
+    /// Where first-party applications connect. A separate door from the
+    /// browser one, on purpose: see `djinn::door::app_admission`.
+    app_endpoint: String,
+    data_root: Option<PathBuf>,
+    log_file: Option<PathBuf>,
+    /// Tracing directives (`info,iroh_gossip=debug`), in place of patching
+    /// the subscriber.
+    log_filter: String,
+    /// The lifecycle event file (`resident_events`).
+    events_file: Option<PathBuf>,
+    /// Opt-in bounded lifecycle diagnostics configuration.
+    diagnostics_config: Option<PathBuf>,
+    /// The installer launched this process: it alone may bind the default
+    /// endpoints.
+    installed: bool,
+    /// Print a running resident's status from its app door, and exit.
+    resident_status: bool,
+    resident_diagnostics: bool,
+    /// Ask a running resident to stop through its app door, and exit.
+    stop_resident: bool,
+    /// Ask a running resident to launch a granted application, and exit.
+    launch: Option<String>,
+    /// Receipt control: leave one blob-store holder outside the task scope,
+    /// so a graceful stop must fail its borrower check.
+    control_unjoined_holder: bool,
+    /// Enrol a vault passphrase typed at the terminal, and exit.
+    enroll_passphrase: bool,
+    /// Unlock a running resident with a passphrase typed at the terminal.
+    unlock: bool,
+    /// With `--unlock`: have the resident show its own prompt instead.
+    native: bool,
+    /// Prefer an enrolled passphrase over OS presence in native unlock prompts.
+    prefer_passphrase: bool,
+    /// `--passphrase-fd 0`: the harness's passphrase on standard input
+    /// (vault lock ruling 65).
+    #[cfg(feature = "passphrase-fd")]
+    passphrase_fd: Option<u32>,
+    /// `--custodian <client-file>`: the harness's custodian, in place of the
+    /// installed client file.
+    #[cfg(feature = "passphrase-fd")]
+    custodian: Option<PathBuf>,
+    /// Command-line overrides folded over the profile's stored settings.
+    #[cfg(feature = "personal-sync")]
+    sync_overrides: SyncOverrides,
+    /// Peer tickets stay arguments rather than settings: a ticket is only
+    /// valid until that peer rebinds, so storing one would go stale.
+    #[cfg(feature = "personal-sync")]
+    sync_peer_tickets: Vec<String>,
+    /// Pair a device into this profile's settings and exit, rather than
+    /// starting the host.
+    #[cfg(feature = "personal-sync")]
+    pair: Option<PairRequest>,
+    /// Forget a device and exit.
+    #[cfg(feature = "personal-sync")]
+    unpair: Option<String>,
+    /// Print what the other device needs in order to pair, and exit.
+    #[cfg(feature = "personal-sync")]
+    pairing_facts: bool,
+    /// Nodes to author as the host starts. See `device_sync::SeedNote`: this
+    /// is a stopgap until typed intents over the admitted session exist.
+    #[cfg(feature = "personal-sync")]
+    seed_notes: Vec<device_sync::SeedNote>,
+    /// Blob operations to run once as the host starts. Same reason as
+    /// `seed_notes`: this process owns the store and must keep running to
+    /// serve what it stages.
+    #[cfg(feature = "personal-sync")]
+    blob_actions: Vec<device_sync::BlobAction>,
+}
+
+#[cfg(feature = "personal-sync")]
+struct PairRequest {
+    node_id: String,
+    root: Option<String>,
+    label: String,
+    /// Relayed for a device that cannot announce itself.
+    prekey: Option<String>,
+}
+
+impl Args {
+    fn native_identity_ui(&self) -> SystemNativeIdentityUi {
+        SystemNativeIdentityUi::default().with_passphrase_preference(self.prefer_passphrase)
+    }
+}
+
+#[tokio::main(flavor = "multi_thread")]
+async fn main() {
+    let args = match parse_args() {
+        Ok(args) => args,
+        Err(message) => {
+            eprintln!("{message}");
+            std::process::exit(2);
+        },
+    };
+    #[cfg(feature = "passphrase-fd")]
+    if let Some(path) = &args.custodian {
+        mere_resident::custodian::InstalledCustodian::use_fixture(path.clone());
+    }
+    // Enrolment edits the vault directory and reports; it hosts nothing.
+    if args.enroll_passphrase {
+        match enroll(&args) {
+            Ok(message) => {
+                println!("{message}");
+                return;
+            },
+            Err(error) => {
+                eprintln!("djinn: {error}");
+                std::process::exit(1);
+            },
+        }
+    }
+    // Status, stop and unlock talk to a running resident; this process hosts
+    // nothing.
+    if args.resident_status
+        || args.resident_diagnostics
+        || args.stop_resident
+        || args.unlock
+        || args.launch.is_some()
+    {
+        match resident_client(&args).await {
+            Ok(message) => {
+                println!("{message}");
+                return;
+            },
+            Err(error) => {
+                eprintln!("djinn: {error}");
+                std::process::exit(1);
+            },
+        }
+    }
+    // Pairing is a management operation, not a run of the host: it edits the
+    // settings and reports, so it writes to the console rather than the log.
+    #[cfg(feature = "personal-sync")]
+    {
+        let management = match (&args.pair, &args.unpair, args.pairing_facts) {
+            (Some(_), Some(_), _) => {
+                eprintln!("djinn: --pair-node and --unpair-node are mutually exclusive");
+                std::process::exit(2);
+            },
+            (Some(request), None, _) => Some(pair_device(&args, request)),
+            (None, Some(node_id), _) => Some(unpair_device(&args, node_id)),
+            (None, None, true) => Some(report_pairing_facts(&args)),
+            (None, None, false) => None,
+        };
+        if let Some(result) = management {
+            match result {
+                Ok(message) => {
+                    println!("{message}");
+                    return;
+                },
+                Err(error) => {
+                    eprintln!("djinn: {error}");
+                    std::process::exit(1);
+                },
+            }
+        }
+    }
+    if let Err(refusal) = refuse_default_endpoints(&args) {
+        eprintln!("djinn: {refusal}");
+        std::process::exit(2);
+    }
+    let diagnostics = match args
+        .diagnostics_config
+        .as_deref()
+        .map(|path| {
+            let file = std::fs::File::open(path)?;
+            serde_json::from_reader::<_, mere_resident::resident_events::DiagnosticsConfig>(file)
+                .map_err(std::io::Error::other)
+        })
+        .transpose()
+    {
+        Ok(config) => config,
+        Err(error) => {
+            eprintln!("djinn: diagnostic configuration: {error}");
+            std::process::exit(2);
+        },
+    };
+    let events = match EventLog::open(args.events_file.as_deref(), diagnostics) {
+        Ok(events) => events,
+        Err(error) => {
+            eprintln!("djinn: initialize resident events: {error}");
+            std::process::exit(1);
+        },
+    };
+    if let Err(error) = init_logging(args.log_file.as_deref(), &args.log_filter) {
+        eprintln!("djinn: initialize logging: {error}");
+        std::process::exit(1);
+    }
+    events.emit(
+        "started",
+        json!({ "installed": args.installed, "version": env!("CARGO_PKG_VERSION") }),
+    );
+    let result = run(args, events.clone()).await;
+    let reason = events.stopping_reason();
+    match &result {
+        Ok(()) => events.emit("stopped", json!({ "reason": reason, "ok": true })),
+        Err(error) => events.emit(
+            "stopped",
+            json!({
+                "reason": reason.unwrap_or_else(|| "startup failed".into()),
+                "ok": false,
+                "error": error.to_string(),
+            }),
+        ),
+    }
+    if let Err(error) = result {
+        tracing::error!(%error, "device host stopped");
+        std::process::exit(1);
+    }
+}
+
+const DEFAULT_LOG_FILTER: &str = "info";
+
+#[cfg(feature = "in-process-custody")]
+fn enroll(args: &Args) -> Result<String, String> {
+    if args.native {
+        mere_resident::enrollment::enroll_passphrase_native(
+            &args.vault_dir,
+            &SystemNativeIdentityUi::default(),
+        )
+    } else {
+        mere_resident::enrollment::enroll_passphrase(
+            &args.vault_dir,
+            &mut mere_resident::enrollment::read_from_terminal,
+        )
+    }
+}
+
+/// The custodian holds the vault, so its passphrase is enrolled there.
+#[cfg(not(feature = "in-process-custody"))]
+fn enroll(_: &Args) -> Result<String, String> {
+    Err(
+        "the vault is held by djinn-custodian: create one with `djinn-custodian init`, \
+         or move this vault in with `djinn-custodian adopt --from <vault-dir>`"
+            .into(),
+    )
+}
+
+/// Only the installed resident binds the default endpoints (djinn test
+/// harness plan, ruling 8). The installer says which process that is by
+/// passing `--installed`; any other run names its own endpoints.
+fn refuse_default_endpoints(args: &Args) -> Result<(), String> {
+    let taken = resident_status::default_endpoints_taken(
+        args.installed,
+        matches!(args.agent, AgentEndpoint::Standard(_)),
+        (&args.browser_endpoint, &default_device_endpoint()),
+        (&args.app_endpoint, &default_app_endpoint()),
+    );
+    if taken.is_empty() {
+        return Ok(());
+    }
+    Err(format!(
+        "{} belong to the installed resident; name others with \
+         --receipt-agent-endpoint, --browser-endpoint and --app-endpoint, or pass \
+         --installed when this is the installed resident",
+        taken.join(", ")
+    ))
+}
+
+/// `--resident-status`, `--stop-resident` and `--unlock`, over the app door.
+/// Unlock rides the control route only: the status route never carries a
+/// passphrase (vault lock ruling 41).
+async fn resident_client(args: &Args) -> Result<String, String> {
+    let route = if args.stop_resident || args.unlock || args.launch.is_some() {
+        RESIDENT_CONTROL_ROUTE
+    } else {
+        RESIDENT_STATUS_ROUTE
+    };
+    // Read before the door opens, so a cancelled prompt opens nothing.
+    let passphrase = match args.unlock && !args.native {
+        true => Some(
+            mere_resident::enrollment::read_from_terminal("Vault passphrase: ")
+                .map_err(|error| error.to_string())?,
+        ),
+        false => None,
+    };
+    let route = AppRouteId::new(route).map_err(|error| error.to_string())?;
+    let mut client =
+        AppBrokerClient::open_route_at(&args.app_endpoint, AppId::new(RESIDENT_APP), route)
+            .await
+            .map_err(|error| error.to_string())?;
+    if args.unlock && args.native {
+        let unlocked = resident_status::request_native_unlock(&mut client).await;
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked on the resident's own prompt".into());
+    }
+    if let Some(passphrase) = passphrase {
+        let unlocked = resident_status::request_unlock(&mut client, passphrase.as_bytes()).await;
+        drop(passphrase);
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked".into());
+    }
+    if let Some(app) = &args.launch {
+        let launched = resident_status::request_launch(&mut client, app).await;
+        let _ = client.close().await;
+        launched.map_err(|error| error.to_string())?;
+        return Ok(format!("{app} launched"));
+    }
+    if args.stop_resident {
+        resident_status::request_stop(&mut client)
+            .await
+            .map_err(|error| error.to_string())?;
+        // The resident is leaving; its door may close before ours does.
+        let _ = client.close().await;
+        return Ok("stop accepted".into());
+    }
+    if args.resident_diagnostics {
+        let diagnostics = resident_status::read_diagnostics(&mut client).await;
+        let _ = client.close().await;
+        let diagnostics = diagnostics
+            .map_err(|error| error.to_string())?
+            .unwrap_or_else(
+                || json!({ "schema":"djinn.lifecycle-diagnostics/v1", "enabled":false }),
+            );
+        return serde_json::to_string_pretty(&diagnostics).map_err(|error| error.to_string());
+    }
+    let status = resident_status::read_status(&mut client)
+        .await
+        .map_err(|error| error.to_string())?;
+    let _ = client.close().await;
+    serde_json::to_string_pretty(&status).map_err(|error| error.to_string())
+}
+
+/// Launch a granted application by the Linux launch its owner grant pins
+/// (capability door plan, I1). The launch's handle is live until the process
+/// exits. Applications without a pinned launch are refused.
+#[cfg(feature = "personal-sync")]
+fn application_launcher(
+    grants: &AppRouteGrants,
+    applications: &[djinn::door::declaration::AppGrant],
+) -> resident_status::Launcher {
+    let pins: std::collections::BTreeMap<AppId, djinn::door::declaration::LinuxLaunch> = applications
+        .iter()
+        .filter_map(|grant| {
+            let launch = grant.identity.as_ref()?.linux.clone()?;
+            Some((grant.app.clone(), launch))
+        })
+        .collect();
+    let grants = grants.clone();
+    std::sync::Arc::new(move |app: &str| {
+        let app = AppId::new(app);
+        let Some(pin) = pins.get(&app) else {
+            return Err(format!("{app} has no launch in its owner grant"));
+        };
+        #[cfg(unix)]
+        {
+            let launched = djinn::door::launch::launch(&grants, &app, &pin.executable, &pin.args)
+                .map_err(|error| format!("{app} did not start: {error}"))?;
+            let (grants, handle, mut child) = (grants.clone(), launched.handle, launched.child);
+            std::thread::Builder::new()
+                .name(format!("launched-{app}"))
+                .spawn(move || {
+                    let _ = child.wait();
+                    djinn::door::launch::end(&grants, &handle);
+                })
+                .map_err(|error| error.to_string())?;
+            tracing::info!(app = %app, "launched");
+            Ok(())
+        }
+        #[cfg(not(unix))]
+        {
+            let _ = (&grants, pin);
+            Err("launching an application is available on Unix".into())
+        }
+    })
+}
+
+fn parse_args() -> Result<Args, String> {
+    let mut vault_dir = default_vault_dir();
+    let mut profile = None;
+    let mut agent_endpoint = None;
+    let mut receipt_agent_endpoint = None;
+    let mut browser_endpoint = configured_device_endpoint();
+    let mut app_endpoint = configured_app_endpoint();
+    let mut data_root = std::env::var_os(DATA_ROOT_ENV).map(PathBuf::from);
+    let mut log_file = None;
+    let mut log_filter = DEFAULT_LOG_FILTER.to_string();
+    let mut events_file = None;
+    let mut diagnostics_config = None;
+    let mut installed = false;
+    let mut resident_status = false;
+    let mut resident_diagnostics = false;
+    let mut stop_resident = false;
+    let mut launch = None;
+    let mut control_unjoined_holder = false;
+    let mut enroll_passphrase = false;
+    let mut unlock = false;
+    let mut native = false;
+    let mut prefer_passphrase = false;
+    #[cfg(feature = "passphrase-fd")]
+    let mut passphrase_fd = None;
+    #[cfg(feature = "passphrase-fd")]
+    let mut custodian = None;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_graph = None;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_store = None;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_roots = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut sync_peers = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut sync_peer_nodes = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut sync_relays = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut sync_facets = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut sync_access = false;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_scenes = false;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_handlers = false;
+    #[cfg(feature = "personal-sync")]
+    let mut sync_blobs = false;
+    #[cfg(feature = "personal-sync")]
+    let mut pair_node = None;
+    #[cfg(feature = "personal-sync")]
+    let mut pair_root = None;
+    #[cfg(feature = "personal-sync")]
+    let mut pair_label = String::new();
+    #[cfg(feature = "personal-sync")]
+    let mut pair_prekey = None;
+    #[cfg(feature = "personal-sync")]
+    let mut unpair_node = None;
+    #[cfg(feature = "personal-sync")]
+    let mut pairing_facts = false;
+    #[cfg(feature = "personal-sync")]
+    let mut seed_notes = Vec::new();
+    #[cfg(feature = "personal-sync")]
+    let mut blob_actions = Vec::new();
+    let mut argv = std::env::args().skip(1);
+
+    while let Some(arg) = argv.next() {
+        match arg.as_str() {
+            "--dir" => {
+                vault_dir = PathBuf::from(argv.next().ok_or("--dir needs a value")?);
+            },
+            "--profile" => {
+                profile = Some(ProfileId(argv.next().ok_or("--profile needs a value")?));
+            },
+            "--agent-endpoint" => {
+                agent_endpoint = Some(argv.next().ok_or("--agent-endpoint needs a value")?);
+            },
+            "--receipt-agent-endpoint" => {
+                receipt_agent_endpoint = Some(
+                    argv.next()
+                        .ok_or("--receipt-agent-endpoint needs a value")?,
+                );
+            },
+            "--browser-endpoint" => {
+                browser_endpoint = argv.next().ok_or("--browser-endpoint needs a value")?;
+            },
+            "--app-endpoint" => {
+                app_endpoint = argv.next().ok_or("--app-endpoint needs a value")?;
+            },
+            "--data-root" => {
+                data_root = Some(PathBuf::from(
+                    argv.next().ok_or("--data-root needs a value")?,
+                ));
+            },
+            "--log-file" => {
+                log_file = Some(PathBuf::from(
+                    argv.next().ok_or("--log-file needs a value")?,
+                ));
+            },
+            "--log-filter" => {
+                log_filter = argv.next().ok_or("--log-filter needs directives")?;
+            },
+            "--diagnostics-config" => {
+                diagnostics_config = Some(PathBuf::from(
+                    argv.next().ok_or("--diagnostics-config needs a path")?,
+                ));
+            },
+            "--events-file" => {
+                events_file = Some(PathBuf::from(
+                    argv.next().ok_or("--events-file needs a value")?,
+                ));
+            },
+            "--installed" => installed = true,
+            "--resident-status" => resident_status = true,
+            "--resident-diagnostics" => resident_diagnostics = true,
+            "--stop-resident" => stop_resident = true,
+            "--launch" => launch = Some(argv.next().ok_or("--launch needs an application")?),
+            "--control-unjoined-holder" => control_unjoined_holder = true,
+            "--enroll-passphrase" => enroll_passphrase = true,
+            "--unlock" => unlock = true,
+            "--native" => native = true,
+            "--prefer-passphrase" => prefer_passphrase = true,
+            #[cfg(feature = "passphrase-fd")]
+            "--passphrase-fd" => {
+                let fd = argv.next().ok_or("--passphrase-fd needs a value")?;
+                passphrase_fd = Some(fd.parse().map_err(|_| "--passphrase-fd takes a number")?);
+            },
+            #[cfg(feature = "passphrase-fd")]
+            "--custodian" => {
+                custodian = Some(PathBuf::from(
+                    argv.next().ok_or("--custodian needs a client file")?,
+                ));
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-graph" => {
+                sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-store" => {
+                sync_store = Some(PathBuf::from(
+                    argv.next().ok_or("--sync-store needs a value")?,
+                ));
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-root" => {
+                let value = argv.next().ok_or("--sync-root needs a value")?;
+                owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                sync_roots.push(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-relay" => {
+                sync_relays.push(argv.next().ok_or("--sync-relay needs a url")?);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-peer" => {
+                sync_peers.push(argv.next().ok_or("--sync-peer needs a value")?);
+            },
+            // Prefer this over --sync-peer: a ticket embeds the peer's current
+            // address and is rebuilt on every bind, so a stored one is stale
+            // after that device restarts. A node id is stable.
+            #[cfg(feature = "personal-sync")]
+            "--sync-peer-node" => {
+                let value = argv.next().ok_or("--sync-peer-node needs a value")?;
+                owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                sync_peer_nodes.push(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-facet" => {
+                sync_facets.push(argv.next().ok_or("--sync-facet needs a value")?);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--pair-node" => {
+                let value = argv.next().ok_or("--pair-node needs a value")?;
+                owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                pair_node = Some(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--pair-root" => {
+                let value = argv.next().ok_or("--pair-root needs a value")?;
+                owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                pair_root = Some(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--pair-label" => {
+                pair_label = argv.next().ok_or("--pair-label needs a value")?;
+            },
+            // Only needed for a device with no roster root here. It cannot
+            // author, so it cannot announce itself, and this device relays what
+            // it disclosed instead. Validated now rather than at relay time, so
+            // a mistyped paste fails where the person can still see it.
+            #[cfg(feature = "personal-sync")]
+            "--pair-prekey" => {
+                let value = argv.next().ok_or("--pair-prekey needs a value")?;
+                owner_settings::parse_hex(&value).map_err(|error| error.to_string())?;
+                pair_prekey = Some(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--pairing-facts" => pairing_facts = true,
+            #[cfg(feature = "personal-sync")]
+            "--seed-node" => {
+                let address = argv.next().ok_or("--seed-node needs an address")?;
+                let title = argv
+                    .next()
+                    .ok_or("--seed-node needs a title after the address")?;
+                seed_notes.push(device_sync::SeedNote { address, title });
+            },
+            #[cfg(feature = "personal-sync")]
+            "--stage-blob" => {
+                let path = argv.next().ok_or("--stage-blob needs a file path")?;
+                blob_actions.push(device_sync::BlobAction::Stage {
+                    path: PathBuf::from(path),
+                });
+            },
+            #[cfg(feature = "personal-sync")]
+            "--fetch-blob" => {
+                let value = argv.next().ok_or("--fetch-blob needs a 64-hex hash")?;
+                let blob =
+                    owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                blob_actions.push(device_sync::BlobAction::Fetch { blob });
+            },
+            #[cfg(feature = "personal-sync")]
+            "--unpair-node" => {
+                let value = argv.next().ok_or("--unpair-node needs a value")?;
+                owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
+                unpair_node = Some(value);
+            },
+            #[cfg(feature = "personal-sync")]
+            "--sync-access" => sync_access = true,
+            #[cfg(feature = "personal-sync")]
+            "--sync-scenes" => sync_scenes = true,
+            #[cfg(feature = "personal-sync")]
+            "--sync-handlers" => sync_handlers = true,
+            #[cfg(feature = "personal-sync")]
+            "--sync-blobs" => sync_blobs = true,
+            "--help" | "-h" => {
+                return Err(usage().to_string());
+            },
+            other => return Err(format!("unknown argument: {other}")),
+        }
+    }
+    if agent_endpoint.is_some() && receipt_agent_endpoint.is_some() {
+        return Err(
+            "--agent-endpoint and --receipt-agent-endpoint are mutually exclusive".to_string(),
+        );
+    }
+    let agent = match receipt_agent_endpoint {
+        Some(endpoint) => AgentEndpoint::Receipt(endpoint),
+        None => AgentEndpoint::Standard(
+            agent_endpoint.unwrap_or_else(|| default_agent_endpoint(&vault_dir)),
+        ),
+    };
+    Ok(Args {
+        vault_dir,
+        profile,
+        agent,
+        browser_endpoint,
+        app_endpoint,
+        data_root,
+        log_file,
+        log_filter,
+        events_file,
+        diagnostics_config,
+        installed,
+        resident_status,
+        resident_diagnostics,
+        stop_resident,
+        launch,
+        control_unjoined_holder,
+        enroll_passphrase,
+        unlock,
+        native,
+        prefer_passphrase,
+        #[cfg(feature = "passphrase-fd")]
+        passphrase_fd,
+        #[cfg(feature = "passphrase-fd")]
+        custodian,
+        #[cfg(feature = "personal-sync")]
+        sync_overrides: SyncOverrides {
+            graph: sync_graph,
+            store_path: sync_store,
+            roster_roots: sync_roots,
+            paired_nodes: sync_peer_nodes,
+            relay_urls: sync_relays,
+            facets: sync_facets,
+            access_records: sync_access,
+            saved_scenes: sync_scenes,
+            handler_preferences: sync_handlers,
+            blob_availability: sync_blobs,
+        },
+        #[cfg(feature = "personal-sync")]
+        sync_peer_tickets: sync_peers,
+        #[cfg(feature = "personal-sync")]
+        pair: pair_node.map(|node_id| PairRequest {
+            node_id,
+            root: pair_root,
+            label: pair_label,
+            prekey: pair_prekey,
+        }),
+        #[cfg(feature = "personal-sync")]
+        unpair: unpair_node,
+        #[cfg(feature = "personal-sync")]
+        pairing_facts,
+        #[cfg(feature = "personal-sync")]
+        seed_notes,
+        #[cfg(feature = "personal-sync")]
+        blob_actions,
+    })
+}
+
+/// Print what the other device needs in order to pair with this one.
+///
+/// Reaches custody but not the store, so it works while the resident host is
+/// running and holding the store's lock.
+#[cfg(feature = "personal-sync")]
+fn report_pairing_facts(args: &Args) -> Result<String, String> {
+    let custody = cli_custody(args)?;
+    let profile_id = custody.host.current_profile_id();
+    let app_dir = owner_settings::default_app_dir();
+    // The data root is where the key group's sealed session lives, so passing
+    // it is what makes the pre-key appear in these facts. Resolving it the
+    // same way the resident host does keeps the two from disagreeing about
+    // where this device's session is.
+    let data_root =
+        device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())
+            .map_err(|error| error.to_string())?;
+    let facts = pairing::pairing_facts(
+        custody.host.as_ref(),
+        &app_dir,
+        &profile_id,
+        Some(&data_root),
+    )
+    .map_err(|error| error.to_string())?;
+    let Some(facts) = facts else {
+        return Err(format!(
+            "personal sync is not configured for profile {:?}",
+            profile_id.0
+        ));
+    };
+    Ok(format!(
+        "graph   {}\nnode_id {}\nroot    {}\n\nOn the other device, run:\n  \
+         djinn --pair-node {} --pair-root {} --pair-label <name>",
+        owner_settings::hex32(&facts.graph),
+        owner_settings::hex32(&facts.node_id),
+        owner_settings::hex32(&facts.root),
+        owner_settings::hex32(&facts.node_id),
+        owner_settings::hex32(&facts.root),
+    ))
+}
+
+#[cfg(feature = "personal-sync")]
+fn unpair_device(args: &Args, node_id: &str) -> Result<String, String> {
+    let node = owner_settings::parse_hex32(node_id).map_err(|error| error.to_string())?;
+    // Pairing settings are per-profile, so unpairing the wrong profile's
+    // settings would silently unpair nothing. Resolving reaches custody once;
+    // this is a one-shot command that exits.
+    let profile_id = resolve_cli_profile(args)?;
+    let outcome = pairing::unpair_device(&owner_settings::default_app_dir(), &profile_id, node)
+        .map_err(|error| error.to_string())?;
+    Ok(match outcome {
+        pairing::UnpairOutcome::Removed { path } => {
+            format!("unpaired {} in {}", node_id, path.display())
+        },
+        pairing::UnpairOutcome::NotPaired => {
+            format!("{node_id} was not paired; settings unchanged")
+        },
+    })
+}
+
+/// Resolve the profile for a one-shot CLI flow that does not otherwise use
+/// custody: the profile custody holds.
+#[cfg(feature = "personal-sync")]
+fn resolve_cli_profile(args: &Args) -> Result<ProfileId, String> {
+    Ok(cli_custody(args)?.host.current_profile_id())
+}
+
+#[cfg(feature = "personal-sync")]
+fn pair_device(args: &Args, request: &PairRequest) -> Result<String, String> {
+    let node = owner_settings::parse_hex32(&request.node_id).map_err(|error| error.to_string())?;
+    let root = match &request.root {
+        Some(value) => Some(owner_settings::parse_hex32(value).map_err(|error| error.to_string())?),
+        None => None,
+    };
+    let profile_id = resolve_cli_profile(args)?;
+    let outcome = pairing::pair_device_with_prekey(
+        &owner_settings::default_app_dir(),
+        &profile_id,
+        node,
+        root,
+        &request.label,
+        now_ms(),
+        request.prekey.clone(),
+    )
+    .map_err(|error| error.to_string())?;
+    Ok(match outcome {
+        pairing::PairOutcome::Added { path, receive_only } => format!(
+            "paired {} as {:?} in {}{}",
+            request.node_id,
+            request.label,
+            path.display(),
+            if receive_only {
+                "\nno --pair-root given: this device will receive the graph, \
+                 and its own writes will be refused"
+            } else {
+                ""
+            }
+        ),
+        pairing::PairOutcome::AlreadyPaired => {
+            format!("{} was already paired; settings unchanged", request.node_id)
+        },
+    })
+}
+
+fn now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|elapsed| elapsed.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+#[cfg(feature = "personal-sync")]
+fn usage() -> &'static str {
+    "usage: djinn [--dir <vault-dir>] [--profile <name>] \
+     [--agent-endpoint <standard-endpoint>] \
+     [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
+     [--log-file <path>] [--log-filter <directives>] [--events-file <path>] [--diagnostics-config <path>] [--resident-diagnostics] \
+     [--installed] [--prefer-passphrase]\n\
+     personal sync: [--sync-graph <name>] [--sync-store <path>] \
+     [--sync-root <64-hex-public-root>] [--sync-peer-node <64-hex-node-id>] \
+     [--sync-peer <ticket>] [--sync-relay <url>] \
+     [--sync-facet <id>] [--sync-access] [--sync-scenes] \
+     [--sync-handlers] [--sync-blobs]\n\
+     pair and exit: --pair-node <64-hex-node-id> \
+     [--pair-root <64-hex-master-root>] [--pair-label <name>]\n\
+     unpair and exit: --unpair-node <64-hex-node-id>\n\
+     what the other device needs: --pairing-facts\n\
+     seed a node at start: [--seed-node <address> <title>]\n\
+     blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
+     a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
+     enrol a vault passphrase: --enroll-passphrase [--native] [--dir <vault-dir>]\n\
+     unlock a running resident at the terminal: --unlock [--native] [--app-endpoint <endpoint>]\n\
+     receipt only: --receipt-agent-endpoint <isolated-endpoint>"
+}
+
+#[cfg(not(feature = "personal-sync"))]
+fn usage() -> &'static str {
+    "usage: djinn [--dir <vault-dir>] [--profile <name>] \
+     [--agent-endpoint <standard-endpoint>] \
+     [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
+     [--log-file <path>] [--prefer-passphrase]\n\
+     receipt only: --receipt-agent-endpoint <isolated-endpoint>"
+}
+
+fn default_agent_endpoint(vault_dir: &Path) -> String {
+    #[cfg(windows)]
+    {
+        let _ = vault_dir;
+        STANDARD_WINDOWS_AGENT_ENDPOINT.to_string()
+    }
+    #[cfg(not(windows))]
+    {
+        std::env::var("SSH_AUTH_SOCK")
+            .ok()
+            .filter(|endpoint| !endpoint.trim().is_empty())
+            .unwrap_or_else(|| vault_dir.join("djinn-agent.sock").display().to_string())
+    }
+}
+
+fn init_logging(path: Option<&Path>, filter: &str) -> Result<(), std::io::Error> {
+    let filter = tracing_subscriber::EnvFilter::try_new(filter).map_err(std::io::Error::other)?;
+    if let Some(path) = path {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        let file = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)?;
+        tracing_subscriber::fmt()
+            .with_env_filter(filter)
+            .with_ansi(false)
+            .with_writer(std::sync::Mutex::new(file))
+            .init();
+    } else {
+        tracing_subscriber::fmt().with_env_filter(filter).init();
+    }
+    Ok(())
+}
+
+/// Reach custody before anything else exists: a locked custodian (or, in a
+/// build with `in-process-custody`, a passphrase vault) waits on the
+/// resident's own prompt (vault lock rulings 42, 62 to 66).
+async fn start_custody(
+    args: &Args,
+    events: &EventLog,
+) -> Result<startup_vault::OpenedCustody, String> {
+    let given = given_passphrase(args)?;
+    let vault_dir = args.vault_dir.clone();
+    let profile = args.profile.clone();
+    let data_root = args.data_root.clone();
+    let native_ui = args.native_identity_ui();
+    let events = events.clone();
+    // A dialog or a terminal read blocks; it gets a thread of its own.
+    tokio::task::spawn_blocking(move || {
+        let mut waiting = |event: &str, fields: serde_json::Value| events.emit(event, fields);
+        let passphrase_given = given.is_some();
+        let mut prompt: Box<dyn startup_vault::Prompt> = match given {
+            Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
+            None => Box::new(startup_vault::NativeOrTerminal { native: native_ui }),
+        };
+        startup_vault::open_custody(
+            &vault_dir,
+            profile.as_ref(),
+            data_root,
+            passphrase_given,
+            prompt.as_mut(),
+            &mut waiting,
+            &mut std::thread::sleep,
+        )
+    })
+    .await
+    .map_err(|error| error.to_string())?
+}
+
+/// The harness's passphrase, when this build reads one (ruling 65).
+fn given_passphrase(args: &Args) -> Result<Option<zeroize::Zeroizing<String>>, String> {
+    #[cfg(feature = "passphrase-fd")]
+    return args
+        .passphrase_fd
+        .map(startup_vault::read_passphrase_fd)
+        .transpose();
+    #[cfg(not(feature = "passphrase-fd"))]
+    {
+        let _ = args;
+        Ok(None)
+    }
+}
+
+/// A one-shot command's custody: the same start, asked at the terminal.
+#[cfg(feature = "personal-sync")]
+fn cli_custody(args: &Args) -> Result<startup_vault::OpenedCustody, String> {
+    let given = given_passphrase(args)?;
+    let passphrase_given = given.is_some();
+    let mut prompt: Box<dyn startup_vault::Prompt> = match given {
+        Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
+        None => Box::new(startup_vault::NativeOrTerminal {
+            native: mere_resident::identity_ui::UnavailableNativeIdentityUi,
+        }),
+    };
+    startup_vault::open_custody(
+        &args.vault_dir,
+        args.profile.as_ref(),
+        args.data_root.clone(),
+        passphrase_given,
+        prompt.as_mut(),
+        &mut |_: &str, _: serde_json::Value| {},
+        &mut std::thread::sleep,
+    )
+}
+
+/// The SSH agent. The custodian serves it beside the vault; only a vault
+/// opened in this process (a test or receipt build) is served here.
+type AgentRun = std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), String>> + Send>>;
+
+async fn serve_agent(
+    args: &Args,
+    custody: &startup_vault::OpenedCustody,
+) -> Result<AgentRun, Box<dyn std::error::Error>> {
+    #[cfg(feature = "in-process-custody")]
+    if let Some(host) = custody.in_process.clone() {
+        let endpoint = match &args.agent {
+            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
+        };
+        #[cfg(not(windows))]
+        prepare_unix_endpoint(Path::new(endpoint)).await?;
+        let listener = match &args.agent {
+            AgentEndpoint::Standard(endpoint) => host.bind_standard_listener(endpoint)?,
+            AgentEndpoint::Receipt(endpoint) => host.bind_receipt_listener(endpoint)?,
+        };
+        #[cfg(not(windows))]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(endpoint, std::fs::Permissions::from_mode(0o600))?;
+        }
+        tracing::info!(endpoint, "SSH agent listening");
+        return Ok(Box::pin(async move {
+            listen(listener, host.agent_session())
+                .await
+                .map_err(|error| error.to_string())
+        }));
+    }
+    let _ = (args, custody);
+    tracing::info!("SSH agent served by the custodian");
+    Ok(Box::pin(std::future::pending()))
+}
+
+async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Error>> {
+    let custody = start_custody(&args, &events).await?;
+    let personae = Arc::clone(&custody.host);
+    let profile_id = personae.current_profile_id();
+    #[cfg(feature = "in-process-custody")]
+    let in_process = custody.in_process.is_some();
+    #[cfg(not(feature = "in-process-custody"))]
+    let in_process = false;
+    tracing::info!(profile = %profile_id.0, in_process, "custody reached");
+    let protection = custody.protection;
+    let startup_unlock = match protection {
+        VaultProtectionView::OsProtected => StartupUnlockV1::AutoOs,
+        _ => StartupUnlockV1::Passphrase,
+    };
+    // A custodian serves the SSH agent; the status names its endpoint.
+    let agent_endpoint = match (
+        in_process,
+        mere_resident::custodian::InstalledCustodian::load()?,
+    ) {
+        (false, Some(installed)) => installed.agent.unwrap_or_default(),
+        _ => match &args.agent {
+            AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => {
+                endpoint.clone()
+            },
+        },
+    };
+    let status = ResidentStatusSource::new(ResidentStatusV1 {
+        schema: STATUS_SCHEMA.into(),
+        pid: std::process::id(),
+        started_ms: now_ms(),
+        installed: args.installed,
+        ready: false,
+        startup_unlock,
+        protection: protection.into(),
+        // The host's lock state follows once it exists (below).
+        lock: VaultLockView::Unlocked.into(),
+        endpoints: ResidentEndpointsV1 {
+            agent: agent_endpoint,
+            agent_listener: match &args.agent {
+                AgentEndpoint::Standard(_) => AgentListenerV1::Standard,
+                AgentEndpoint::Receipt(_) => AgentListenerV1::Receipt,
+            },
+            browser: args.browser_endpoint.clone(),
+            app: args.app_endpoint.clone(),
+        },
+        sync: None,
+        connections: Vec::new(),
+    })
+    .with_events(events.clone());
+    let stop = StopSignal::default();
+    // What Graphshell's doors and the custody route serve (dramatis repo
+    // plan, D15): custody, its native surface and its wallet root.
+    let keeper = Keeper::new(Arc::clone(&personae)).with_ui(Arc::new(args.native_identity_ui()));
+    // Only an in-process host reads a wallet root itself. A custodian holds
+    // the wallet in its own state directory, so Djinn names none.
+    #[cfg(feature = "in-process-custody")]
+    let keeper = keeper.with_wallet_root(args.data_root.clone());
+    let keeper = Arc::new(keeper);
+    // The status follows the lock (ruling 31's watch channel; harness H4).
+    // The doors' kept keys are captured now, while unlocked, so the doors
+    // stay open through any later lock (rulings 40, 46). A resident that
+    // starts locked (ruling 42, L3) captures them at its first unlock.
+    if let Err(error) = mere_resident::door::local_session::DoorIdentity::door_keys(keeper.as_ref())
+    {
+        tracing::warn!(%error, "door keys not captured at start");
+    }
+    // `djinn --unlock` arrives here over the control route (ruling 41).
+    let unlocker: resident_status::Unlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move |passphrase: &[u8]| {
+            tokio::task::block_in_place(|| personae.unlock_with_passphrase(passphrase))
+        })
+    };
+    // `djinn --unlock --native` shows the resident's own prompt (ruling 47).
+    let native_unlocker: resident_status::NativeUnlocker = {
+        let personae = Arc::clone(&personae);
+        let native_ui = args.native_identity_ui();
+        Arc::new(move || {
+            let prompt = || {
+                mere_resident::identity_ui::apply_native_identity_action(
+                    personae.as_ref(),
+                    &native_ui,
+                    mere_resident::door::browser_carrier::NativeIdentityAction::UnlockVault,
+                )
+            };
+            // A dialog blocks; the worker it holds is handed over meanwhile.
+            match tokio::task::block_in_place(prompt) {
+                mere_resident::door::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                other => Err(format!("the native unlock ended: {other:?}")),
+            }
+        })
+    };
+    // What locks the vault besides an explicit act: the session locking,
+    // sleep and idle, each set in lock.toml (vault lock rulings 3, 73 to 77).
+    let _lock_triggers = {
+        let locker = Arc::clone(&personae);
+        let reported = events.clone();
+        let warned = events.clone();
+        mere_resident::lock_triggers::spawn(
+            mere_resident::lock_triggers::settings_path(&owner_settings::default_app_dir()),
+            move || tokio::task::block_in_place(|| locker.lock_vault()),
+            personae.lock_state(),
+            move |reason| reported.emit("lock-trigger", json!({ "reason": reason.as_str() })),
+            move |warning| {
+                tracing::warn!(%warning, "lock settings");
+                warned.emit("lock-settings-warning", json!({ "warning": warning }));
+            },
+        )
+    };
+    let control_unlock = resident_status::ControlUnlock {
+        passphrase: Some(unlocker.clone()),
+        native: Some(native_unlocker),
+    };
+    let mut lock_state = personae.lock_state();
+    let initial_lock = *lock_state.borrow_and_update();
+    status.update(|status| status.lock = initial_lock.into());
+
+    let app_dir = owner_settings::default_app_dir();
+    #[cfg(feature = "personal-sync")]
+    let data_root =
+        device_sync::resolve_data_root(&app_dir, &args.vault_dir, args.data_root.clone())?;
+    let owner =
+        owner_settings::OwnerSettings::load(&owner_settings::settings_path(&app_dir, &profile_id))?;
+    // Declared applications receive what their declaration names and these
+    // grants allow (capability door plan, M1).
+    let application_grants = owner.application_grants()?;
+    let projection_providers = owner
+        .projection_providers
+        .iter()
+        .map(owner_settings::ProjectionProviderSettings::permission)
+        .collect::<Result<Vec<_>, _>>()?;
+    #[cfg(feature = "personal-sync")]
+    let coop_relays = owner.coop_relays()?;
+    #[cfg(feature = "personal-sync")]
+    if let Some(persona) = owner.content.retained_persona {
+        keeper.configure_payload_custody(profile_id.clone(), persona, data_root.clone())?;
+    }
+    #[cfg(feature = "personal-sync")]
+    let address_handlers = owner.reservoir.handlers();
+    #[cfg(feature = "personal-sync")]
+    let mut resident = DjinnResident::open_deferred_inference(
+        personae.as_ref(),
+        &data_root,
+        &profile_id,
+        owner,
+        // The lane's mesh author: exactly its two release salts, from custody.
+        mere_resident::resident::MeshAuthor::Custody(Arc::clone(&personae)),
+    )
+    .await?;
+    // The reservoir lives under the family-shared root, not this resident's
+    // data root: every application of the identity reaches the same meres.
+    #[cfg(feature = "personal-sync")]
+    //
+    // The persona is custody's to name: the wallet's index is a disclosure
+    // from the custodian, never a file Djinn lists.
+    match resident
+        .open_reservoir(
+            &pandect::shared_root::shared_root(),
+            Arc::new(mere_resident::custody_host::CustodyPersonas {
+                custody: Arc::clone(&personae),
+                wallet_root: pandect::shared_root::shared_root(),
+            }),
+        )
+        .await
+    {
+        ReservoirLane::Open(reservoir) => {
+            tracing::info!(persona = %reservoir.persona().as_uuid(), "resident reservoir open");
+        },
+        ReservoirLane::Unavailable(reason) => {
+            tracing::warn!(%reason, "resident reservoir unavailable");
+        },
+        ReservoirLane::Off => tracing::info!("resident reservoir off by owner setting"),
+    }
+    #[cfg(feature = "personal-sync")]
+    if let Some(works) = resident.distillery() {
+        tracing::info!(
+            profile = works.profile(),
+            mesh = owner_settings::hex32(&works.mesh_id()),
+            author = owner_settings::hex32(&works.author()),
+            root = %works.mesh_root().display(),
+            "resident Distillery works open"
+        );
+    }
+    #[cfg(feature = "personal-sync")]
+    if resident.knot_enabled() {
+        if let Some((node, space)) = resident.knot_network_facts() {
+            tracing::info!(
+                sync = true,
+                node = owner_settings::hex32(&node),
+                space = owner_settings::hex32(&space),
+                "resident Knot route open"
+            );
+        } else {
+            tracing::info!(sync = false, "resident Knot route open");
+        }
+    }
+
+    // The works run for the whole length of the loop and need `&mut` on the
+    // lane the entire time, while the Knot arm of the same `select!` still
+    // needs `&mut` on the resident. Lifting the lane out for the duration
+    // splits a borrow Rust cannot split on its own; it goes back in below,
+    // before the ordered shutdown that owns its close.
+    // Chronicle carries an immutable, resident-owned projection source into
+    // the app catalog. Clone that narrow handle before lifting the mutable
+    // works into their run loop, preserving the deliberate borrow split.
+    let distillery_chronicle = resident.distillery_chronicle_observer();
+    let mut works = None;
+
+    // Keep every broker future inside this async block.  Its captures, most
+    // notably the blob-store clones held by personal sync, are dropped before
+    // the resident begins its ordered shutdown. What the block spawns (door
+    // connections, sync's watchers) is not dropped with it, so it runs in a
+    // task scope that is cancelled and joined below. Boxed: the loop's future
+    // is large, and the scope must not carry it on the main thread's stack.
+    let lifetime = Resident::new();
+    if args.control_unjoined_holder {
+        // A receipt control: one blob-store holder outside the scope, which
+        // the shutdown's borrower check must refuse.
+        let held = resident.blobs();
+        tokio::spawn(async move {
+            let _held = held;
+            std::future::pending::<()>().await;
+        });
+        tracing::warn!("control: a blob-store holder left outside the task scope");
+    }
+    let drained = lifetime.run(Box::pin(async {
+        let product: Result<(), Box<dyn std::error::Error>> = async {
+        let agent = serve_agent(&args, &custody).await?;
+
+        let allowlist = AllowedExtensions::default()
+            .with_additional(&std::env::var(EXTRA_EXTENSIONS_ENV).unwrap_or_default());
+        #[cfg(feature = "personal-sync")]
+        let (supplemental_cards, device_directory, personal_sync_host) = match device_sync::start(
+            personae.as_ref(),
+            &app_dir,
+            &args.vault_dir,
+            &profile_id,
+            args.data_root.clone(),
+            args.sync_overrides,
+            args.sync_peer_tickets,
+            args.seed_notes,
+            args.blob_actions,
+            resident.blobs(),
+        )
+        .await?
+        {
+            Some(started) => {
+                status.update(|status| {
+                    status.sync = Some(SyncStatusV1 {
+                        node_id: started.node_id.clone(),
+                        ticket: started.ticket.clone(),
+                    })
+                });
+                (Some(started.surface), started.directory, Some(started.host))
+            },
+            None => (None, DeviceDirectorySource::sync_off(), None),
+        };
+        #[cfg(feature = "inference")]
+        {
+            resident.start_inference(personae.as_ref(), personal_sync_host.clone()).await?;
+            if let Some(holder) = resident.inference_lock_holder() {
+                personae.register_lock_holder(holder);
+            }
+            #[cfg(feature="inference-stages")]
+            if let Some(holder)=resident.inference_stage_lock_holder() {
+                personae.register_lock_holder(holder);
+            }
+        }
+        #[cfg(not(feature = "inference"))]
+        drop(personal_sync_host);
+        works = resident.take_distillery();
+        // Both doors are served from the same surface handle, so an application
+        // and a browser on this device see one set of cards rather than two.
+        #[cfg(feature = "personal-sync")]
+        let app_surface = supplemental_cards.clone();
+        #[cfg(not(feature = "personal-sync"))]
+        let app_surface: Option<mere_resident::door::device_broker::DeviceSurfaceHandle> = None;
+        // The catalog and grants are shared with the door, so a mere ensured
+        // while it serves gets its route then (reservoir plan Â§7 item 20).
+        #[cfg(feature = "personal-sync")]
+        let (allowed_app_routes, app_catalog) = {
+            let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+            // Routes below are served to declared applications whose grant
+            // names them; label grants remain only for undeclared applications.
+            let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+            grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_knot_route(catalog))
+                .await?
+            {
+                grants.update(|routes| routes.serve(route));
+            }
+            // Served to the declared applications whose grant names it.
+            let route = catalog
+                .update(|catalog| resident.register_published_site_route(catalog))
+                .await?;
+            grants.update(|routes| routes.serve(route));
+            // Owner-only and read-only: where each paired device is now.
+            let route = catalog
+                .update(|catalog| DeviceDirectoryEndpoint::register(device_directory, catalog))
+                .await?;
+            resident_devices::grant(&grants, route);
+            // Owner-only: the resident's own status, and its stop.
+            let route = catalog
+                .update(|catalog| ResidentStatusEndpoint::register(status.clone(), catalog))
+                .await?;
+            resident_status::grant(&grants, route);
+            let launcher = application_launcher(&grants, &application_grants);
+            let route = catalog
+                .update(|catalog| {
+                    ResidentControlEndpoint::register_with(
+                        stop.clone(),
+                        control_unlock.clone(),
+                        Some(launcher),
+                        catalog,
+                    )
+                })
+                .await?;
+            resident_status::grant(&grants, route);
+            // Custody, for every first-party application (D5).
+            mere_resident::custody::grant(&grants)?;
+            mere_resident::applications::install(&grants, application_grants);
+            // The reservoir admits this door's first-party clients. Each
+            // mere goes to the same clients on its own route (V2, step 5):
+            // those the reservoir holds now, and each one ensured later.
+            // Declared applications reach each mere through their grant.
+            let first_party = vec![AppId::new("cleromancy"), AppId::new("graphshell")];
+            let routes = resident.reservoir().reservoir().map(|reservoir| {
+                MereRoutes::new(
+                    pandect::shared_root::shared_root(),
+                    reservoir.persona(),
+                    catalog.clone(),
+                    grants.clone(),
+                    first_party.clone(),
+                )
+                .with_handlers(address_handlers.clone())
+                .with_custody_endpoint(args.app_endpoint.clone())
+                .with_coop_relays(coop_relays.clone())
+                .with_profile_subject_authority(personae.clone())
+                .with_divination_authority()
+            });
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))
+                .await?
+            {
+                for app in &first_party {
+                    grants.grant(app.clone(), route.clone());
+                }
+            }
+            if let (Some(routes), Some(reservoir)) = (&routes, resident.reservoir().reservoir()) {
+                routes.load_access(reservoir).await?;
+                for mere in reservoir.meres().await {
+                    match routes.serve(&mere).await {
+                        Ok(route) => tracing::info!(route = route.id(), "mere route open"),
+                        Err(reason) => {
+                            tracing::warn!(domain = %mere.domain, %reason, "mere route unavailable")
+                        },
+                    }
+                }
+            }
+            if let Some(observer) = distillery_chronicle {
+                let route = catalog
+                    .update(|catalog| {
+                        ResidentDistillery::register_chronicle_route(observer, catalog)
+                    })
+                    .await?;
+                grants.update(|routes| routes.serve(route));
+            }
+            // The inference lane, for Turnstone's grant (resident inference
+            // plan, ruling 8).
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_inference_route(catalog))
+                .await?
+            {
+                grants.update(|routes| routes.serve(route));
+            }
+            (grants, catalog)
+        };
+        #[cfg(not(feature = "personal-sync"))]
+        let (allowed_app_routes, app_catalog) = {
+            let grants = AppRouteGrants::default();
+            grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
+            mere_resident::custody::grant(&grants)?;
+            mere_resident::applications::install(&grants, application_grants);
+            (grants, AppEndpointCatalog::default())
+        };
+        app_catalog.set_connection_ledger(resident_status::ConnectionLedger::new(status.clone()));
+        app_catalog
+            .set_provider_permissions(projection_providers)
+            .await?;
+        // Binding is startup work: a ready resident must already own every
+        // endpoint. Keep serving lazy so the resident loop owns their lifetime.
+        let app_listener = LocalListener::bind(&args.app_endpoint, "first-party")
+            .await
+            .map_err(|error| format!("could not bind app endpoint {}: {error}", args.app_endpoint))?;
+        let browser_listener = LocalListener::bind(&args.browser_endpoint, "browser")
+            .await
+            .map_err(|error| format!("could not bind browser endpoint {}: {error}", args.browser_endpoint))?;
+        {
+            let now = status.read();
+            events.emit(
+                "listening",
+                json!({
+                    "agent": now.endpoints.agent,
+                    "browser": now.endpoints.browser,
+                    "app": now.endpoints.app,
+                    "ticket": now.sync.map(|sync| sync.ticket),
+                }),
+            );
+        }
+        let apps = serve_app_broker_on(
+            app_listener,
+            Arc::clone(&keeper),
+            allowed_app_routes,
+            session_duration_ms(),
+            app_surface,
+            app_catalog,
+        );
+        #[cfg(not(feature = "personal-sync"))]
+        let supplemental_cards = None;
+        let browser = serve_browser_broker_on(
+            browser_listener,
+            Arc::clone(&keeper),
+            allowlist,
+            session_duration_ms(),
+            supplemental_cards,
+        );
+        let mut knot_refresh = tokio::time::interval(Duration::from_secs(1));
+        knot_refresh.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let works_enabled = works.is_some();
+        let stop_works = Arc::new(tokio::sync::Notify::new());
+        let works_stop = Arc::clone(&stop_works);
+        let stopping = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let works_stopping = stopping.clone();
+        let works_run = async {
+            let result = match works.as_mut() {
+                Some(lane) => lane.run_until(async move { works_stop.notified().await }, |receipt| {
+                    observe_distillery(&receipt)
+                }).await,
+                None => std::future::pending::<Result<(), String>>().await,
+            };
+            if !works_stopping.load(std::sync::atomic::Ordering::SeqCst) {
+                events.stopping("distillery works ended");
+                status.update(|status| status.ready = false);
+            }
+            result
+        };
+        let services = vec![
+            watch_service("SSH agent listener", "agent listener ended", agent, &events, &status),
+            watch_service("browser device broker", "browser broker ended", async { browser.await.map_err(|error| error.to_string()) }, &events, &status),
+            watch_service("first-party application broker", "app broker ended", async { apps.await.map_err(|error| error.to_string()) }, &events, &status),
+        ];
+        let control = async {
+            let interrupt = tokio::signal::ctrl_c();
+            tokio::pin!(interrupt);
+            loop {
+                tokio::select! {
+                    result = &mut interrupt => {
+                        tracing::info!("shutdown requested");
+                        events.stopping("interrupt");
+                        status.update(|status| status.ready = false);
+                        break result.map_err(|error| error.to_string());
+                    }
+                    () = stop.raised() => {
+                        tracing::info!("stop requested on the control route");
+                        events.stopping("stop intent");
+                        status.update(|status| status.ready = false);
+                        break Ok(());
+                    }
+                }
+            }
+        };
+        let maintenance_stopping = stopping.clone();
+        let activity = MaintenanceActivity::new();
+        let action_activity = activity.clone();
+        let maintenance = async {
+            let mut lock_watched = true;
+            loop {
+                tokio::select! {
+                changed = lock_state.changed(), if lock_watched => {
+                    let _action = action_activity.begin();
+                    match changed {
+                        Ok(()) => {
+                            let now = *lock_state.borrow_and_update();
+                            status.update(|status| status.lock = now.into());
+                            let event = match now {
+                                VaultLockView::Locked => "locked",
+                                VaultLockView::Unlocked => "unlocked",
+                            };
+                            tracing::info!(event, "vault lock state changed");
+                            events.emit(event, json!({}));
+                            // Knot's lane follows the lock (ruling 48). The
+                            // close runs after lock() returned: that window
+                            // is logged.
+                            let since = std::time::Instant::now();
+                            if now == VaultLockView::Unlocked {
+                                // Kept from the first unlock on (ruling 46).
+                                let _ = mere_resident::door::local_session::DoorIdentity::door_keys(
+                                    keeper.as_ref(),
+                                );
+                            }
+                            match now {
+                                VaultLockView::Locked => match resident.close_knot().await {
+                                    Ok(None) => {},
+                                    Ok(Some(cut)) => {
+                                        let window_ms = since.elapsed().as_millis() as u64;
+                                        tracing::info!(cut, window_ms, "Knot lane closed after the lock");
+                                        events.emit("knot-closed", json!({ "cut": cut, "window_ms": window_ms }));
+                                    },
+                                    Err(error) => tracing::error!(%error, "Knot lane did not close cleanly"),
+                                },
+                                VaultLockView::Unlocked => match resident.reopen_knot().await {
+                                    Ok(true) => {
+                                        tracing::info!("Knot lane reopened after the unlock");
+                                        events.emit("knot-reopened", json!({}));
+                                    },
+                                    Ok(false) => {},
+                                    Err(error) => tracing::error!(%error, "Knot lane did not reopen"),
+                                },
+                            }
+                        },
+                        Err(_) => lock_watched = false,
+                    }
+                }
+                _ = knot_refresh.tick(), if resident.knot_enabled() && !maintenance_stopping.load(std::sync::atomic::Ordering::SeqCst) => {
+                    let _action = action_activity.begin();
+                    if let Err(error) = resident.refresh().await {
+                        tracing::warn!(%error, "could not refresh resident Knot authority");
+                    }
+                }
+                }
+            }
+        };
+        status.update(|status| status.ready = true);
+        events.emit("ready", json!({}));
+        supervise_with_maintenance(services, control, works_enabled.then_some(works_run), maintenance, activity, move || {
+            stopping.store(true, std::sync::atomic::Ordering::SeqCst);
+            stop_works.notify_one();
+        }).await.map_err(|error| Box::new(error) as Box<dyn std::error::Error>)
+        }.await;
+        product.map_err(|error| match error.downcast::<RunFailure>() {
+            Ok(error) => *error,
+            Err(error) => RunFailure::new("startup", error.to_string()),
+        })
+    }))
+    .await;
+    tracing::info!(?drained.tasks, "resident task shutdown report");
+    // Return borrowed works before the product's ordered close.
+    resident.restore_distillery(works);
+    let report = drained.finish(|| resident.shutdown()).await;
+    let mut errors = Vec::new();
+    if let Err(error) = report.outcome {
+        errors.push(error.to_string());
+    }
+    if !report.tasks.is_clean() {
+        errors.push(format!("resident task failures: {:?}", report.tasks));
+    }
+    if let Err(error) = report.shutdown {
+        errors.push(format!("resident shutdown: {error}"));
+    }
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors.join("; ").into())
+    }
+}
+
+fn watch_service<'a>(
+    name: &'static str,
+    reason: &'static str,
+    future: impl std::future::Future<Output = Result<(), String>> + 'a,
+    events: &'a EventLog,
+    status: &'a ResidentStatusSource,
+) -> Service<'a> {
+    Service::new(name, async move {
+        let result = future.await;
+        events.stopping(reason);
+        status.update(|status| status.ready = false);
+        result
+    })
+}
+
+/// Report exactly what the works did, without building a second lifecycle
+/// model beside the receipts.
+#[cfg(feature = "personal-sync")]
+fn observe_distillery(receipt: &ResidentReceipt) {
+    match receipt {
+        // A supervisor turn with nothing to do is the common case at any
+        // useful tick cadence, so it stays out of the INFO log.
+        ResidentReceipt::Tick { steps }
+            if steps.is_empty()
+                || steps
+                    .iter()
+                    .all(|step| matches!(step, distillery::mesh_host::Step::Idle)) =>
+        {
+            tracing::debug!("Distillery supervisor turn with nothing to do")
+        },
+        ResidentReceipt::Tick { steps } => {
+            tracing::info!(steps = steps.len(), "Distillery supervisor turn")
+        },
+        ResidentReceipt::MaintenanceCompleted(report) => tracing::info!(
+            candidates = report.candidates,
+            collected = report.collected,
+            "Distillery retention checkpoint accepted"
+        ),
+        ResidentReceipt::MaintenanceIdle => {
+            tracing::debug!("Distillery frontier unchanged; nothing to checkpoint")
+        },
+        // Non-fatal and expected: a live lease is the ordinary reason.
+        ResidentReceipt::MaintenanceFailed { error } => {
+            tracing::warn!(%error, "Distillery maintenance refused")
+        },
+        ResidentReceipt::SupervisorFailed { error } => {
+            tracing::error!(%error, "Distillery supervisor failed")
+        },
+        ResidentReceipt::StopRequested => tracing::info!("Distillery works stopping"),
+    }
+}
+
+fn session_duration_ms() -> u64 {
+    let seconds = std::env::var(SESSION_SECONDS_ENV)
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .unwrap_or(60 * 60)
+        .clamp(60, 24 * 60 * 60);
+    seconds * 1_000
+}

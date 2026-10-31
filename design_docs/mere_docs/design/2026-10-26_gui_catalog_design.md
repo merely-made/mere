@@ -9,7 +9,10 @@ day with §6, where the catalogs disagree with each other and with the tree,
 frame hosts one presentation, and what a mod contributes is a catalog axis, and
 §9, his rulings 6 to 8 on the cues §8 left: a typed `contributes` list, a misfin
 address opens its Comms conversation, and inker defines the embedded-application
-declaration that a manifest carries.
+declaration that a manifest carries. The §9 code landed 2026-10-27, read at
+`10fe98b50`; §9 closes with what it leaves. Since 2026-10-28 the rules are
+the doctrine's Surfaces area (statements 1 to 4) and the inventory stays here.
+§10, his ruling 9 of 2026-10-28: no Steward pane.
 
 **Origin.** Mark, 2026-10-26, thinking aloud: "what a complete gui catalog
 would look like... considering all these distinctions... graph/canvas, card,
@@ -134,7 +137,7 @@ Mark's list did not name. The citation is where the stack already says it.
   in the persistence column.
 - **Scope and the trail.** `ScopeNavigation<P, A>` in
   `crates/cambium/cambium/src/scope_navigation/` landed in Woodshed and Knot on
-  2026-10-23 ([contextual navigation](../implementation_strategy/2026-10-23_contextual_navigation_plan.md)).
+  2026-10-23 ([contextual navigation](../../archive_docs/2026-10-28/2026-10-23_contextual_navigation_plan.md)).
   Mark's 2026-10-25 description of settings reached as "context cards opened
   from the context menu as a peek-down scope" is the same mechanism.
 - **Selection and focus as separate authorities.** The contextual navigation
@@ -153,7 +156,7 @@ Mark's list did not name. The citation is where the stack already says it.
   the vault lock view (`dramatis::view::VaultLockView`, used by the door's
   custody client). Identity is not one column. It decides which cells render.
 - **Asks and refusals.** Durable asks checkpoint at every token boundary
-  ([resident inference](../implementation_strategy/2026-10-15_resident_inference_and_recall_plan.md)
+  ([resident inference](../../archive_docs/2026-10-28/2026-10-15_resident_inference_and_recall_plan.md)
   R8); disabled reasons; empty, error and unavailable states; typed offline
   refusals. These are one row today only in Cambium's catalog.
 - **Accessibility and input.** The web host's a11y mirror
@@ -202,7 +205,7 @@ The evidence is cited; what would improve the stack follows it.
    (`crates/platen/platen/Cargo.toml`); Graphshell's `forme_session` and
    `forme_workspace` use `platen::TileLayout` and `TreeGeometry` and touch
    pictograph, so they cannot move into `forme`, and only the `mere` facade
-   sees all four ([stack lift](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+   sees all four ([stack lift](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
    §2 and R2). The tile tree's authority, its plan compiler and its canvas form
    a cycle at the center of the workbench row. R2 cuts it by putting workspace
    and session in `platen` behind a feature once the three canvas-touching
@@ -266,7 +269,10 @@ each of the five authorities has a line for it, including its refusal.
 
 This record proposes nothing beyond that reading. A ruling would decide
 whether the matrix is kept as one document, as a column in TERMINOLOGY's
-aspect table, or as a doctrine area that the Stack statements lack.
+aspect table, or as a doctrine area that the Stack statements lack. Ruled
+2026-10-28 (Mark): the rules are the doctrine's Surfaces area, four
+statements in [`doctrine.md`](../../doctrine.md), and the inventory stays in a
+document; the aspect table's rows are ways of dividing a mere, not surfaces.
 
 ## 6. Where the catalogs disagree
 
@@ -329,7 +335,7 @@ What would improve the stack, as cues:
 
 Mark ruled 1 to 5 on 2026-10-26. Each was a choice among offered options; the
 options and the evidence put to him are kept under each ruling, as the
-[stack lift plan](../implementation_strategy/2026-10-14_graphshell_stack_lift_plan.md)
+[stack lift plan](../../archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md)
 §5 does. Three of §6's rows needed no ruling: orrery (already reconciled),
 swatch (TERMINOLOGY's entry now lists link and selection scopes), and the
 cabal types (the survivor rule).
@@ -545,12 +551,93 @@ ruling as §7 does.
    owner, which would have the registry crate define a schema inker cannot
    import; three owners named in TERMINOLOGY with nothing unified.
 
-What the rulings leave in code, as cues: seven built-in manifests carry both
-vocabularies in `provides`; `ModExtensionRecord` keeps its viewer words and
-produces one variant; inker's default policy and the registry's middlenet
-list still route the `misfin` scheme, and no open path reaches
-`CommsPane::select` from a node; the registry's viewer registry has no caller
-and no retirement; the brief's operations have no type. Rulings 6 and 7 are
-mechanical; ruling 8's declaration type is a design slice, and the
-`contributes` entry for a presentation waits on it. Whether a murm author key
-or an LXMF destination opens the way a misfin address does is unruled.
+Landed 2026-10-27, read at `10fe98b50`. Rulings 6 and 8 (`cebb68fa4`, merged
+as `306fa68c7`): `inker::PresentationDeclaration`
+(`crates/inker/inker/src/presentation.rs`) carries the four parts: `presents`
+(schemes, content types, extensions), `reaches` (`SurfaceContractMode`,
+accessibility, producer capabilities), `accepts` (source edits, commands) and
+`operations`. `EngineRoutePolicy::default` is built from the declared
+built-in readers, routing unchanged, and graft, weld and scrying carry their
+id and accessibility in their declaration. `ModManifest` and
+`DiskModManifest` carry a typed `contributes` (`loader/contributes.rs`:
+presentation, pane adapter, pane, servitor); Verso's four ids left `provides`
+and are one presentation; activation refuses a protocol, content-type,
+extension or reach record the manifest did not declare
+(`ModActivationError::undeclared`) and rolls back what the mod applied. The
+registry's viewer registry is deleted with its `viewer`, `audio` and `pdf`
+features, `ModExtensionRecord`'s viewer variants are
+`PresentationContentType`, `PresentationExtension` and
+`PresentationReaches`, and the registry takes `inker` under `mod-loader`.
+Ruling 7 (`c499b708f`, `10fe98b50`): the `misfin` scheme rule is out of
+inker's default policy, and the middlenet list went with the viewer registry;
+`comms::misfin_correspondent` reads the correspondent from a misfin address
+and `CommsPane::misfin_conversation` finds its loaded conversation;
+graphshell's tree page owns a `CommsPane` (`web_tree/comms_pane.rs`), and its
+three Forme open paths (`open_selected`, `open_retained`, `read_related`)
+send a correspondent node to Comms through `graphshell::comms_open::open_node`
+instead of a tile, with `mere-comms` an optional dependency under
+`workspace-editor`.
+
+What that leaves, as cues: verification runs one way, since native activation
+returns no records, and Action, IndexProvider, Lens, Theme and WasmRuntime
+records are not declarable; the built-in declarations list no operations and
+accept nothing, because nothing in code exposes either, so the brief's
+operations have a type (`Operation`) and a field that no host reads;
+`ViewerRegistry` and
+`mod:core-viewer` remain as dependency names so load order holds; the tree
+page loads no inbox, since the misfin adapter reads a native mailbox store the
+browser lacks, so every misfin open lands on the no-conversation notice until
+a backend fills it; what opening does when no conversation is loaded (the pane
+opens and keeps its selection) is unruled; the pelt workspace has no Comms
+path; and whether a murm author key or an LXMF destination opens the way a
+misfin address does is unruled.
+
+## 10. Ruling 9: no Steward pane
+
+Mark, 2026-10-28, after reading what Steward was supposed to be: "if we're
+going to make the apps into panes, embeddable, then steward kind of loses its
+purpose, so I'm okay with cutting it, because there could just be a
+distillery, right?"
+
+**What the tree says, read at `d4d5b0c32`.** The June panes architecture
+(`../technical_architecture/2026-06-06_peripheral_panes_architecture.md`)
+defines Steward as the live async plane: running actors and user-facing async
+operations (fetch, upload, sync, pinning, storage repair, model jobs, mesh
+jobs, distillation passes, background tabs, failed retries) shown as status
+you can act on, reading armillary's actor constellation, with the rule that
+it shows genuine status and never a placebo; the 2026-06-09 correction
+(`../technical_architecture/2026-06-09_alembic_memory_and_engrams.md` §8)
+split it from Apparatus on a live-versus-at-rest axis. Nothing built it. It
+is `SurfaceId::StewardPane` with an accessibility descriptor
+(`crates/graph/graph-kernel/src/accessibility.rs`) and a diagnostics channel
+pair (`crates/system/ux-events/src/ux_diagnostics.rs`), and Cambium's list and
+detail components name "Steward (active / queued)" as a predicted consumer
+(`crates/cambium/cambium/src/sectioned_list.rs`, `detail_panel.rs`).
+Distillery's crate doc (`ports/distillery/src/lib.rs`) already describes an
+embeddable half any host composes: the job board, lease and heartbeat tiles,
+the device roster, retention and device-policy panes, model-manifest browsing
+and a streaming console, rendering what the supervisor reports and never a
+placebo. Armillary, whose actors Steward would read, is a separate repository
+(`merely-made/armillary`, pinned in `Cargo.toml`) that also holds
+`apparatus-core`. Distillery's fixtures already use *steward* for the mesh
+device that posts a lendable job (`ports/distillery/tests/walk_fixtures.rs`).
+
+**Ruled: no Steward pane.** Under §8 an embedded application is a
+presentation, not a pane, so the live-jobs monitor is distillery's embeddable
+half, presented in a frame. What distillery does not cover, armillary's host
+actors, shows in two places that exist: per node, on the node's own faces,
+since a fetch in flight is that node's activation state, which the gnode's
+colour is reserved for; and system-wide, in apparatus, whose domain crate
+lives beside those actors. The 2026-06-09 live-versus-at-rest axis goes with
+it. Loop 5 (§4) closes on the job id alone: the ask, whichever presentation
+shows the job, and the facet all carry it. Ruling 1's "plus Steward once
+built" is withdrawn; `StewardPane` leaves `SurfaceId` with ruling 2's trim;
+the word is free for distillery's device role. Options set aside: a Steward
+presentation contributed by the host over armillary's constellation, which
+would need a seam armillary does not expose; a pane for the fetch and sync
+actors alone, which would show state the node already shows.
+
+What this leaves, as cues: the panes doc and the §8 correction describe
+Steward as current and carry a banner from today; Cambium's two module docs
+still name Steward rows, under the survivor rule; nothing yet shows
+armillary's actor state in apparatus; the job id is unbuilt.

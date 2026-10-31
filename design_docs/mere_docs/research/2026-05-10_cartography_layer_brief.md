@@ -8,7 +8,7 @@
 
 **Related**:
 
-- [`../implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../implementation_strategy/2026-05-09_post_engine_layer_priorities.md) — §2.3 resolved the donor `graph-cartography` crate as **drop, don't migrate**. This brief reclaims the name for a substantially different concern.
+- [`../implementation_strategy/2026-05-09_post_engine_layer_priorities.md`](../../archive_docs/2026-10-28/2026-05-09_post_engine_layer_priorities.md) — §2.3 resolved the donor `graph-cartography` crate as **drop, don't migrate**. This brief reclaims the name for a substantially different concern.
 - [`../../graphshell_docs/implementation_strategy/2026-05-07_graph_canvas_field_algebra_plan.md`](../../graphshell_docs/implementation_strategy/2026-05-07_graph_canvas_field_algebra_plan.md) *(historical citation)* <!-- doc-audit: historical-link --> — field algebra living inside `graph-canvas` (ZSource → FieldProjection, Burn lowering). Cartography sits *above* this: the field algebra is one of the primitives strategies use; cartography is the contract layer that picks and composes strategies.
 - [`2026-05-08_local_intelligence_integration_research.md`](2026-05-08_local_intelligence_integration_research.md) — clusters, affinity, embeddings. The primary upstream signal source for cartography overlays.
 

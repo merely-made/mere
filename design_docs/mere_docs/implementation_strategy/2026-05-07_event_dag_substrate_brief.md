@@ -7,7 +7,7 @@
 **Scope**: Replaces specific wire-format, sync-layer, schema-locality, privacy-transport, and persona-design decisions in the 2026-05-05 protocol architecture plan. The bulk of that plan (iroh layering, identity vault, self-host-with-fallback, protocol-mod pattern) remains load-bearing.
 **Related**:
 
-- [`2026-05-05_protocol_architecture_plan.md`](2026-05-05_protocol_architecture_plan.md) — the prior plan; this brief refines specific sections (see §11).
+- [`2026-05-05_protocol_architecture_plan.md`](../../archive_docs/2026-10-28/2026-05-05_protocol_architecture_plan.md) — the prior plan; this brief refines specific sections (see §11).
 - [`2026-05-10_graph_cluster_namespaces_brief.md`](2026-05-10_graph_cluster_namespaces_brief.md) — namespace-as-graph-cluster design direction emerging from §14.
 - `2026-05-09_post_engine_layer_priorities.md` — current forward-looking plan; the original 2026-05-06 graphshell migration plan is archived at `../../archive_docs/2026-05-09_engine_layer_complete/2026-05-06_graphshell_migration_plan.md` (engine layer landed before today's BLAKE3 unification work).
 - Inherited: `../../../../../graphshell/design_docs/verse_docs/implementation_strategy/engram_spec.md` — the engram envelope spec that anchors the schema-at-engram-boundary insight.
@@ -208,7 +208,7 @@ Each candidate evaluated as: "can it carry MereEvents, and at what cost?"
 
 > **Retired 2026-09-01.** The per-moot Veilid policy below is superseded by
 > the plane split ruled in the
-> [reachability rungs and privacy lanes plan](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
+> [reachability rungs and privacy lanes plan](../../archive_docs/2026-10-28/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md):
 > iroh is the byte plane; the identity-routed lanes (retinue announces,
 > emissary/I2P destinations) are the control and rendezvous plane; arti stays
 > consumer-posture for a later clearnet browse toggle. No

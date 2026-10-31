@@ -7,6 +7,7 @@
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
+use super::super::contributes::{Contribution, verify_records};
 use super::super::free_fns::{
     NativeModRuntime, WasmModRuntime, discover_mod_manifests, read_wasm_mod_from_path,
     resolve_mod_load_order,
@@ -200,9 +201,9 @@ impl ModRegistry {
                     }
                 },
                 ModExtensionRecord::ProtocolScheme { .. }
-                | ModExtensionRecord::ViewerMime { .. }
-                | ModExtensionRecord::ViewerExtension { .. }
-                | ModExtensionRecord::ViewerCapabilities { .. }
+                | ModExtensionRecord::PresentationContentType { .. }
+                | ModExtensionRecord::PresentationExtension { .. }
+                | ModExtensionRecord::PresentationReaches { .. }
                 | ModExtensionRecord::Action { .. }
                 | ModExtensionRecord::IndexProvider { .. }
                 | ModExtensionRecord::Lens { .. }
@@ -248,7 +249,8 @@ impl ModRegistry {
 
             self.status.insert(mod_id.clone(), ModStatus::Loading);
 
-            let load_result = activate(manifest, self.wasm_sources.get(mod_id));
+            let load_result = activate(manifest, self.wasm_sources.get(mod_id))
+                .and_then(|records| verify_records(mod_id, &manifest.contributes, records));
 
             match load_result {
                 Ok(extension_records) => {
@@ -412,6 +414,16 @@ impl ModRegistry {
             })
             .map(|candidate| candidate.mod_id.clone())
             .min()
+    }
+
+    /// Contributions of the active, enabled mods, by kind and id.
+    pub fn active_contributions(&self) -> Vec<&Contribution> {
+        self.manifests
+            .values()
+            .filter(|manifest| !self.disabled_mod_ids.contains(&manifest.mod_id))
+            .filter(|manifest| self.status.get(&manifest.mod_id) == Some(&ModStatus::Active))
+            .flat_map(|manifest| manifest.contributes.iter())
+            .collect()
     }
 
     /// Get the status of a mod

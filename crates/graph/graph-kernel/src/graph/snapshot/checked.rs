@@ -12,6 +12,7 @@ use std::fmt;
 use uuid::Uuid;
 
 use crate::graph::assertion_handles::{AssertionHandleRepeat, AssertionHandles};
+use crate::graph::resource_content::ContentError;
 use crate::graph::{Graph, GraphStratum, NavigationIndexError};
 use crate::persistence::GraphSnapshot;
 
@@ -74,6 +75,17 @@ pub enum ResourceSnapshotError {
         resource_id: Uuid,
     },
     InvalidNavigation(NavigationIndexError),
+    InvalidSurfaceId {
+        index: usize,
+        value: String,
+    },
+    RepeatedSurfaceId {
+        surface_id: Uuid,
+        first_index: usize,
+        index: usize,
+    },
+    /// Installing facets would leave the graph failing checked open.
+    InvalidFacets(ContentError),
 }
 
 impl fmt::Display for ResourceSnapshotError {
@@ -154,6 +166,18 @@ impl fmt::Display for ResourceSnapshotError {
                 "surface {surface_id} shows conflicting resources {first_resource} and {resource_id}"
             ),
             Self::InvalidNavigation(error) => fmt::Display::fmt(error, f),
+            Self::InvalidSurfaceId { index, value } => {
+                write!(f, "nodes[{index}] has invalid surface UUID {value:?}")
+            },
+            Self::RepeatedSurfaceId {
+                surface_id,
+                first_index,
+                index,
+            } => write!(
+                f,
+                "nodes[{index}] repeats surface {surface_id} of nodes[{first_index}]"
+            ),
+            Self::InvalidFacets(error) => write!(f, "facets refused: {error}"),
         }
     }
 }
@@ -180,10 +204,37 @@ fn validate_snapshot(snapshot: &GraphSnapshot) -> Result<(), ResourceSnapshotErr
         .navigation
         .check_indices()
         .map_err(ResourceSnapshotError::InvalidNavigation)?;
-    validate_resource_columns(snapshot)
+    let surfaces = validate_surface_ids(snapshot)?;
+    validate_resource_columns(snapshot, &surfaces)
 }
 
-fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSnapshotError> {
+/// The Surface ids of `snapshot.nodes`. A node whose id is unparseable or
+/// repeats an earlier node's is refused, as a malformed facet is, so the
+/// materializer never silently drops or merges one.
+fn validate_surface_ids(snapshot: &GraphSnapshot) -> Result<BTreeSet<Uuid>, ResourceSnapshotError> {
+    let mut first_indices = BTreeMap::new();
+    for (index, node) in snapshot.nodes.iter().enumerate() {
+        let surface_id = Uuid::parse_str(&node.node_id).map_err(|_| {
+            ResourceSnapshotError::InvalidSurfaceId {
+                index,
+                value: node.node_id.clone(),
+            }
+        })?;
+        if let Some(first_index) = first_indices.insert(surface_id, index) {
+            return Err(ResourceSnapshotError::RepeatedSurfaceId {
+                surface_id,
+                first_index,
+                index,
+            });
+        }
+    }
+    Ok(first_indices.into_keys().collect())
+}
+
+fn validate_resource_columns(
+    snapshot: &GraphSnapshot,
+    surfaces: &BTreeSet<Uuid>,
+) -> Result<(), ResourceSnapshotError> {
     if snapshot.assertion_schema > 1 {
         return Err(ResourceSnapshotError::UnsupportedAssertionSchema {
             schema: snapshot.assertion_schema,
@@ -257,11 +308,6 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
         }
     }
 
-    let surfaces = snapshot
-        .nodes
-        .iter()
-        .filter_map(|node| Uuid::parse_str(&node.node_id).ok())
-        .collect::<BTreeSet<_>>();
     let mut handles = AssertionHandles::new();
     let repeated = ResourceSnapshotError::RepeatedAssertionHandle;
     if snapshot.assertion_schema == 1 {
@@ -606,6 +652,37 @@ mod assertion_schema_tests {
         let mut legacy_orphan = orphan;
         legacy_orphan.assertion_schema = 0;
         assert!(Graph::try_from_snapshot(&legacy_orphan).is_ok());
+    }
+
+    #[test]
+    fn checked_load_refuses_an_unparseable_or_repeated_surface_id() {
+        for schema in [0, 1] {
+            let mut unparseable = base_snapshot();
+            unparseable.assertion_schema = schema;
+            unparseable.nodes[1].node_id = "not-a-uuid".into();
+            let mut repeated = base_snapshot();
+            repeated.assertion_schema = schema;
+            repeated.nodes[1].node_id = repeated.nodes[0].node_id.clone();
+            let first = Uuid::parse_str(&repeated.nodes[0].node_id).unwrap();
+
+            for load in [Graph::try_from_snapshot, Graph::try_from_recorded_snapshot] {
+                assert_eq!(
+                    load(&unparseable).err(),
+                    Some(ResourceSnapshotError::InvalidSurfaceId {
+                        index: 1,
+                        value: "not-a-uuid".into()
+                    })
+                );
+                assert_eq!(
+                    load(&repeated).err(),
+                    Some(ResourceSnapshotError::RepeatedSurfaceId {
+                        surface_id: first,
+                        first_index: 0,
+                        index: 1
+                    })
+                );
+            }
+        }
     }
 
     #[test]

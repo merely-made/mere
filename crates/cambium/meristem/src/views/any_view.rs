@@ -10,6 +10,7 @@
 use alloc::boxed::Box;
 use core::any::Any;
 
+use crate::reactive_trace::{self, CoreTraceKind};
 use crate::{
     AnyElement, MessageCtx, MessageResult, Mut, View, ViewElement, ViewId, ViewMarker,
     ViewPathTracker,
@@ -106,6 +107,11 @@ where
         app_state: &mut State,
     ) {
         if let Some(prev) = prev.as_any().downcast_ref() {
+            reactive_trace::emit(
+                CoreTraceKind::AnyViewReused,
+                Some(dyn_state.generation),
+                None,
+            );
             // If we were previously of this type, then do a normal rebuild
             DynamicElement::with_downcast(element, |element| {
                 let state = dyn_state
@@ -118,6 +124,11 @@ where
                 });
             });
         } else {
+            reactive_trace::emit(
+                CoreTraceKind::AnyViewReplaced,
+                Some(dyn_state.generation),
+                None,
+            );
             // Otherwise, teardown the old element, then replace the value
             // Note that we need to use `dyn_teardown` here, because `prev`
             // is of a different type.
@@ -140,6 +151,11 @@ where
         ctx: &mut Context,
         element: DynamicElement::Mut<'el>,
     ) -> DynamicElement::Mut<'el> {
+        reactive_trace::emit(
+            CoreTraceKind::AnyViewTornDown,
+            Some(dyn_state.generation),
+            None,
+        );
         let state = dyn_state
             .inner_state
             .downcast_mut()
@@ -170,8 +186,18 @@ where
         };
         if first.routing_id() != dyn_state.generation {
             // Do we want to log something here?
+            reactive_trace::emit(
+                CoreTraceKind::GenerationRefused,
+                Some(dyn_state.generation),
+                Some(message.current_path().len()),
+            );
             return MessageResult::Stale;
         }
+        reactive_trace::emit(
+            CoreTraceKind::GenerationMatched,
+            Some(dyn_state.generation),
+            Some(message.current_path().len()),
+        );
         DynamicElement::with_downcast_val(element, |element| {
             self.message(state, message, element, app_state)
         })

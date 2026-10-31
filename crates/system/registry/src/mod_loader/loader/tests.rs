@@ -45,7 +45,7 @@ fn disabled_set(disabled: &[&str]) -> HashSet<String> {
         .collect::<HashSet<_>>()
 }
 
-fn write_wasm_fixture(
+pub(super) fn write_wasm_fixture(
     temp_dir: &tempfile::TempDir,
     module_name: &str,
     manifest_body: &str,
@@ -325,10 +325,9 @@ fn mod_registry_checks_capability_availability() {
     registry.resolve_dependencies().expect("should resolve");
     registry.load_all();
 
-    // Verso provides these capabilities
-    assert!(registry.is_capability_available("protocol:http"));
-    assert!(registry.is_capability_available("protocol:https"));
-    assert!(registry.is_capability_available("viewer:webview"));
+    // Verso contributes these; they are not dependency names
+    assert!(!registry.is_capability_available("protocol:http"));
+    assert!(!registry.is_capability_available("viewer:webview"));
 
     // Core provides these
     assert!(registry.is_capability_available("ProtocolRegistry"));
@@ -346,19 +345,17 @@ fn mod_registry_without_verso_disables_webview_capability() {
         .expect("dependencies should resolve without verso");
     registry.load_all();
 
-    assert!(!registry.is_capability_available("viewer:webview"));
-    assert!(!registry.is_capability_available("protocol:https"));
+    assert!(registry.active_contributions().is_empty());
     assert!(registry.is_capability_available("ProtocolRegistry"));
     assert!(registry.is_capability_available("ViewerRegistry"));
 }
 
 #[test]
-fn test_safe_capability_path_disabling_verso_removes_webview_capabilities() {
+fn test_safe_capability_path_disabling_verso_keeps_dependency_names_only() {
     let disabled = disabled_set(&["mod:web-runtime"]);
     let capabilities = compute_active_capabilities_with_disabled(&disabled);
 
-    assert!(!capabilities.contains("viewer:webview"));
-    assert!(!capabilities.contains("protocol:https"));
+    assert!(capabilities.iter().all(|id| !id.contains(':')));
     assert!(capabilities.contains("ProtocolRegistry"));
     assert!(capabilities.contains("ViewerRegistry"));
 }

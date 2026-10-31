@@ -32,24 +32,6 @@ impl OwnedLayout {
             .collect()
     }
 
-    /// Content origin in the same untransformed, scroll-adjusted space as
-    /// `painted_rect`. Genet owns border/padding interpretation. This observation
-    /// does not supply forward CSS transforms or clipped semantic bounds.
-    pub(crate) fn scrolled_content_origin<D: LayoutDom<NodeId = NodeId>>(
-        &self,
-        dom: &D,
-        node: NodeId,
-    ) -> Option<(f64, f64)> {
-        let geometry = self.element_geometry(dom, node)?;
-        let fragment = self.fragments.get(node)?;
-        let (x, y, _, _) = self.painted_rect(dom, node)?;
-        let origin = (
-            f64::from(x) + f64::from(geometry.content_rect.0) - f64::from(fragment.x),
-            f64::from(y) + f64::from(geometry.content_rect.1) - f64::from(fragment.y),
-        );
-        (origin.0.is_finite() && origin.1.is_finite()).then_some(origin)
-    }
-
     pub(crate) fn resolved_appearance(
         &self,
         node: NodeId,

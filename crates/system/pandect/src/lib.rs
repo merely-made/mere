@@ -80,6 +80,9 @@ pub mod furnace;
 // born as facets, since the bespoke cartography sidecar was never wired.
 pub mod arrangement_facets;
 pub mod cartography_geometry;
+// The one compare-and-replace over a muniment slot, for every store that
+// writes back bytes it loaded (rules, blocks, Forme).
+pub mod slot_guard;
 // The scene.* facet namespace: the graph-scene's own view settings (sizing
 // mode, importance metric, physics damping) as facets of the CONTAINER node
 // (keyed by the session's root_graph_id) — scene-scoped, not per-node.
@@ -119,8 +122,9 @@ pub mod station_grant;
 pub mod manifest;
 pub mod memory_levels;
 pub mod manifest_store;
-// Filesystem persistence of the session graph (graph.json); native-only so the
-// crate stays wasm-clean (wasm hosts use a different storage backend).
+// The session graph file's name and path (graph.json; GraphSession writes it);
+// native-only so the crate stays wasm-clean (wasm hosts use a different storage
+// backend).
 #[cfg(not(target_arch = "wasm32"))]
 pub mod session_graph_store;
 pub mod session_service_runner;
@@ -224,7 +228,7 @@ pub use notochord_policy_store::{
 };
 pub use persona_settings_store::{
     PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
-    persona_settings_path, save_persona_settings,
+    persona_settings_path, record_launch, save_persona_settings,
 };
 pub use reservoir::{
     DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereApplicationAccess, MereId, MereRecord,
@@ -266,7 +270,7 @@ pub use wallet_grant::{
     REMOTE_AUTH_PAIRING_TICKET_SCHEMA_VERSION, REMOTE_AUTH_PAIRING_WRAP_CONTEXT_V1,
     RemoteAuthEnrollmentBundle, RemoteAuthGrantSpec, RemoteAuthPairingMaterial,
     RemoteAuthPairingResponse, RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest,
-    RemoteAuthRevocationOutcome, WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
+    WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
     WrappedEpochMaterial, WrappedEpochRecord, assess_device_grant, blinded_slot_id,
     build_remote_auth_enrollment_bundle, certificate_device_id, decode_device_grant_set,
     decode_epoch_record, decode_remote_auth_enrollment_bundle, decode_remote_auth_pairing_ticket,
@@ -281,7 +285,7 @@ pub use wallet_grant::{
 };
 pub use wallet_store::{
     CapabilitySlotRef, CarriagePolicy, DEVICE_ROSTER_FILENAME, DeviceExposure, DeviceGrantRef,
-    DeviceId, DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
+    DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
     IDENTITY_GRANTS_DIR, IDENTITY_SEED_FILENAME, IDENTITY_WALLET_FILENAME, IdentityWalletManifest,
     KeyEpochId, LOCAL_DEVICE_IDENTITY_FILENAME, LocalDeviceIdentity, PERSONA_EPOCH_BRIDGE_FILENAME,
     PERSONA_WALLET_FILENAME, PersonaChainRoot, PersonaEpochBridge, PersonaWalletManifest,

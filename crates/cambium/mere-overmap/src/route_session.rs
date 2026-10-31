@@ -688,6 +688,7 @@ impl MereRouteSession {
                 match (task, outcome) {
                     (Task::Mount(_), Outcome::Mounted(session)) => {
                         let snapshot = self.snapshot(&session)?;
+                        mere_route::validate_required_cards(&snapshot, false)?;
                         if session == self.sessions {
                             mere_route::unique_merge_card(&snapshot)?;
                         }
@@ -855,9 +856,18 @@ mod busy_tests {
     use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 
     fn panel() -> MereRouteSession {
+        panel_with_archive(false)
+    }
+
+    fn panel_with_archive(include_archive: bool) -> MereRouteSession {
+        let names: Vec<_> = if include_archive {
+            vec![MERE_SESSIONS, MERE_GRAPH, crate::wire::MERE_ARCHIVE]
+        } else {
+            vec![MERE_SESSIONS, MERE_GRAPH]
+        };
         let descriptor = EndpointDescriptor {
             label: "Resident mere".into(),
-            projections: [MERE_SESSIONS, MERE_GRAPH]
+            projections: names
                 .into_iter()
                 .map(|name| ProjectionOffer {
                     label: name.into(),
@@ -1024,6 +1034,333 @@ mod busy_tests {
             presentation: PresentationManifest { bindings, offers },
             cache_policy: Default::default(),
         }
+    }
+
+    fn empty_snapshot(name: &str) -> ProjectionSnapshot {
+        ProjectionSnapshot {
+            version: ProtocolVersion::V1,
+            session: ProjectionSession(name.into()),
+            scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), Scene::new()).unwrap(),
+            presentation: PresentationManifest::default(),
+            cache_policy: Default::default(),
+        }
+    }
+
+    fn required_card_snapshot(
+        session: &str,
+        adapter: &str,
+        with_binding: bool,
+        with_offer: bool,
+    ) -> (ProjectionSnapshot, HashMap<ContentHash, Vec<u8>>) {
+        let mut scene = Scene::new();
+        let id = if adapter == crate::wire::SESSIONS_SOURCE {
+            "00000000-0000-0000-0000-000000000011"
+        } else {
+            "required-entry"
+        };
+        let source = scene.intern_source(SourceRef::new(adapter, id));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::translation(0.0, 0.0),
+            footprint: Footprint::Circle { radius: 8.0 },
+            representation: Representation::Card,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: vec![],
+        });
+        let pending_bytes = if adapter == crate::wire::MERGE_SOURCE {
+            Some(pending_merge_bytes())
+        } else {
+            None
+        };
+        let card_bytes = serde_json::to_vec(&chirograph::PortableCardV1 {
+            title: format!("title-{adapter}"),
+            values: vec![],
+            badges: vec!["detail".into()],
+            media: pending_bytes
+                .as_ref()
+                .map(|bytes| vec![ContentHash::of(bytes)])
+                .unwrap_or_default(),
+        })
+        .unwrap();
+        let hash = ContentHash::of(&card_bytes);
+        let key = PresentationKey(format!("required-{adapter}"));
+        let bindings = if with_binding {
+            vec![PresentationBinding {
+                instance: InstanceId(0),
+                key: key.clone(),
+            }]
+        } else {
+            vec![]
+        };
+        let offers = if with_offer {
+            [(
+                key,
+                vec![PresentationOffer {
+                    codec: PresentationCodec::PortableCardV1,
+                    resource: hash,
+                    byte_size: card_bytes.len() as u64,
+                    requires: PresentationCapability::PortableCard,
+                    semantics: PresentationSemantics {
+                        label: "required".into(),
+                        role: SemanticRole::Graphic,
+                        bounds: BoundsRelationship::FillFootprint,
+                        actions: vec![],
+                    },
+                }],
+            )]
+            .into_iter()
+            .collect()
+        } else {
+            Default::default()
+        };
+        (
+            ProjectionSnapshot {
+                version: ProtocolVersion::V1,
+                session: ProjectionSession(session.into()),
+                scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap(),
+                presentation: PresentationManifest { bindings, offers },
+                cache_policy: Default::default(),
+            },
+            {
+                let mut resources = [(hash, card_bytes)].into_iter().collect::<HashMap<_, _>>();
+                if let Some(bytes) = pending_bytes {
+                    resources.insert(ContentHash::of(&bytes), bytes);
+                }
+                resources
+            },
+        )
+    }
+
+    fn mount_required_card_route(
+        target: &str,
+        adapter: &str,
+        with_binding: bool,
+        with_offer: bool,
+    ) -> MereRouteSession {
+        let include_archive = target == crate::wire::MERE_ARCHIVE;
+        let mut panel = panel_with_archive(include_archive);
+        seed_partial_state(&mut panel);
+        let (required, mut resources) =
+            required_card_snapshot(target, adapter, with_binding, with_offer);
+        let sessions = if target == MERE_SESSIONS {
+            required.clone()
+        } else {
+            empty_snapshot(MERE_SESSIONS)
+        };
+        let archive = if include_archive {
+            Some(required)
+        } else {
+            None
+        };
+        for _ in 0..16 {
+            if panel.closed || panel.outbox.is_empty() {
+                break;
+            }
+            let outgoing = panel.take_outgoing();
+            for line in outgoing {
+                let request: CarrierRequest = serde_json::from_str(&line).unwrap();
+                let body = match request.body {
+                    chirograph::CarrierRequestBody::Snapshot(requested) => {
+                        let name = requested.session.0.as_str();
+                        let snapshot = if name == MERE_SESSIONS {
+                            sessions.clone()
+                        } else if name == MERE_GRAPH {
+                            empty_snapshot(MERE_GRAPH)
+                        } else if name == crate::wire::MERE_ARCHIVE {
+                            archive.clone().unwrap_or_else(|| empty_snapshot(name))
+                        } else {
+                            panic!("unexpected projection {name}")
+                        };
+                        CarrierResponseBody::Snapshot(Box::new(snapshot))
+                    },
+                    chirograph::CarrierRequestBody::Resource(resource) => {
+                        let bytes = resources
+                            .remove(&resource.resource)
+                            .expect("known card resource");
+                        CarrierResponseBody::Resource(chirograph::ResourceResponse::new(
+                            resource.session,
+                            bytes,
+                        ))
+                    },
+                    other => panic!("unexpected carrier request: {other:?}"),
+                };
+                let response =
+                    chirograph::line::encode(&CarrierOutput::Response(CarrierResponse {
+                        id: request.id,
+                        body: Ok(body),
+                    }))
+                    .unwrap();
+                panel.on_line(&response);
+                if panel.closed {
+                    break;
+                }
+            }
+        }
+        panel
+    }
+
+    fn assert_route_purged(panel: &MereRouteSession) {
+        assert!(panel.closed);
+        assert!(matches!(&panel.model.status, ViewStatus::Unavailable(_)));
+        assert!(panel.cards.is_empty());
+        assert!(panel.records.is_empty());
+        assert!(panel.inspected.is_none());
+        assert!(panel.transient_layout.is_none());
+        assert!(panel.merge_choices.is_empty());
+        assert!(panel.merge.is_none());
+        assert!(panel.material.is_none());
+    }
+
+    macro_rules! required_card_rejection_test {
+        ($name:ident, $target:expr, $adapter:expr, $with_binding:expr, $with_offer:expr, $expected:expr) => {
+            #[test]
+            fn $name() {
+                let panel = mount_required_card_route(
+                    $target,
+                    $adapter,
+                    $with_binding,
+                    $with_offer,
+                );
+                assert_route_purged(&panel);
+                assert!(panel.outbox.is_empty(), "no resolve/resource work after admission failure");
+                assert!(matches!(&panel.model.status, ViewStatus::Unavailable(note) if note.message.contains($expected)), "{} / {}: {:?}", $target, $adapter, panel.model.status);
+            }
+        };
+    }
+
+    required_card_rejection_test!(
+        required_card_sessions_missing_binding,
+        MERE_SESSIONS,
+        crate::wire::SESSIONS_SOURCE,
+        false,
+        true,
+        "Missing material card binding"
+    );
+    required_card_rejection_test!(
+        required_card_sessions_missing_offer,
+        MERE_SESSIONS,
+        crate::wire::SESSIONS_SOURCE,
+        true,
+        false,
+        "Missing material card offer"
+    );
+    required_card_rejection_test!(
+        required_card_merge_missing_binding,
+        MERE_SESSIONS,
+        crate::wire::MERGE_SOURCE,
+        false,
+        true,
+        "Missing material card binding"
+    );
+    required_card_rejection_test!(
+        required_card_merge_missing_offer,
+        MERE_SESSIONS,
+        crate::wire::MERGE_SOURCE,
+        true,
+        false,
+        "Missing material card offer"
+    );
+    required_card_rejection_test!(
+        required_card_archive_missing_binding,
+        crate::wire::MERE_ARCHIVE,
+        crate::wire::ARCHIVE_SOURCE,
+        false,
+        true,
+        "Missing material card binding"
+    );
+    required_card_rejection_test!(
+        required_card_archive_missing_offer,
+        crate::wire::MERE_ARCHIVE,
+        crate::wire::ARCHIVE_SOURCE,
+        true,
+        false,
+        "Missing material card offer"
+    );
+
+    #[test]
+    fn live_carrier_accepts_required_cards_and_unbound_optional_items() {
+        for (target, adapter) in [
+            (MERE_SESSIONS, crate::wire::SESSIONS_SOURCE),
+            (MERE_SESSIONS, crate::wire::MERGE_SOURCE),
+            (crate::wire::MERE_ARCHIVE, crate::wire::ARCHIVE_SOURCE),
+        ] {
+            let panel = mount_required_card_route(target, adapter, true, true);
+            assert!(!panel.closed, "{} / {} should be healthy", target, adapter);
+            assert!(matches!(panel.model.status, ViewStatus::Ready));
+            match adapter {
+                crate::wire::SESSIONS_SOURCE => assert!(
+                    panel
+                        .model
+                        .sessions
+                        .iter()
+                        .any(|entry| entry.name == format!("title-{adapter}"))
+                ),
+                crate::wire::MERGE_SOURCE => assert!(panel.merge.is_some()),
+                crate::wire::ARCHIVE_SOURCE => {
+                    assert!(panel.model.archive.as_ref().is_some_and(|archive| {
+                        archive.entries.iter().any(|entry| {
+                            entry.key == "required-entry"
+                                && entry.name == format!("title-{adapter}")
+                        })
+                    }))
+                },
+                _ => unreachable!(),
+            }
+        }
+
+        let mut panel = panel();
+        let mut optional = empty_snapshot(MERE_SESSIONS);
+        let mut scene = Scene::new();
+        let source = scene.intern_source(SourceRef::new("optional-unrelated", "optional"));
+        scene.items.push(ProjectedItem {
+            source,
+            space: Scene::WORLD,
+            transform: Transform2::translation(0.0, 0.0),
+            footprint: Footprint::Circle { radius: 8.0 },
+            representation: Representation::Card,
+            layer: 0,
+            visible: true,
+            hit: None,
+            channels: vec![],
+        });
+        optional.scene = SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene).unwrap();
+        seed_partial_state(&mut panel);
+        // Empty graph and archive follow the normal carrier request sequence.
+        for _ in 0..8 {
+            if panel.closed || panel.outbox.is_empty() {
+                break;
+            }
+            let outgoing = panel.take_outgoing();
+            for line in outgoing {
+                let request: CarrierRequest = serde_json::from_str(&line).unwrap();
+                let name = match &request.body {
+                    chirograph::CarrierRequestBody::Snapshot(snapshot) => {
+                        snapshot.session.0.as_str()
+                    },
+                    _ => panic!("unexpected request"),
+                };
+                let snapshot = if name == MERE_SESSIONS {
+                    optional.clone()
+                } else {
+                    empty_snapshot(name)
+                };
+                let response =
+                    chirograph::line::encode(&CarrierOutput::Response(CarrierResponse {
+                        id: request.id,
+                        body: Ok(CarrierResponseBody::Snapshot(Box::new(snapshot))),
+                    }))
+                    .unwrap();
+                panel.on_line(&response);
+            }
+        }
+        assert!(
+            !panel.closed,
+            "unbound optional active item remains allowed"
+        );
+        assert!(matches!(panel.model.status, ViewStatus::Ready));
     }
 
     fn pending_merge_bytes() -> Vec<u8> {

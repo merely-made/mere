@@ -145,3 +145,54 @@ fn checked_replay_reports_a_refused_literal_handle_instead_of_dropping_it() {
     journal.record_as(super::Author::person("test"), colliding);
     assert!(journal.snapshot_at_from(&graph, super::Seq(1)).is_err());
 }
+
+#[test]
+fn installing_facets_that_steal_a_resource_handle_is_refused_and_leaves_the_store() {
+    use super::resource_content::ContentError;
+    use super::snapshot::ResourceSnapshotError;
+
+    let mut graph = Graph::new();
+    let mut held = NodeProperty::new("urn:audit:predicate".into(), "value".into());
+    held.statement_id = "owned-handle".into();
+    set_record(&mut graph, "urn:audit:first", &[held.clone()]);
+    let surface = Uuid::from_u128(7);
+    apply::add_node(
+        &mut graph,
+        Some(surface),
+        "https://surface.test/".into(),
+        Default::default(),
+    );
+    let before = graph.facets().clone();
+    let revision = graph.visit_revision();
+
+    let carrying = |property: &NodeProperty| {
+        let mut facets = NodeFacetStore::new();
+        facets
+            .set(
+                surface,
+                chartulary::FacetId::new(SEMANTIC_PROPERTIES),
+                serde_json::to_value(vec![property.clone()]).unwrap(),
+                &chartulary::AcceptAll,
+            )
+            .unwrap();
+        facets
+    };
+    let stolen = carrying(&held);
+    let refusal = Err(ResourceSnapshotError::InvalidFacets(
+        ContentError::HandleCollision("owned-handle".into()),
+    ));
+    assert_eq!(graph.overlay_facets(stolen.clone()), refusal);
+    assert_eq!(graph.install_facets(stolen), refusal);
+    assert_eq!(graph.facets(), &before);
+    assert_eq!(graph.visit_revision(), revision);
+    assert!(reopens(&graph));
+
+    // A handle no Resource holds installs, and replaces rather than merges.
+    let other = NodeProperty::new("urn:audit:other".into(), "x".into());
+    graph.overlay_facets(carrying(&other)).unwrap();
+    let key = graph.get_node_key_by_id(surface).unwrap();
+    assert_eq!(graph.legacy_node_properties(key), Some(vec![other]));
+    graph.install_facets(NodeFacetStore::new()).unwrap();
+    assert_eq!(graph.facets(), &NodeFacetStore::new());
+    assert!(graph.visit_revision() > revision);
+}

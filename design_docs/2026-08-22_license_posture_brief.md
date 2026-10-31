@@ -5,7 +5,7 @@ steps: first "copyleft on the platform, consumers license themselves", then,
 on noticing that every app becomes a platform when it matures, the simpler
 rule this brief records: MPL-2.0 is the default for everything Merely owns.
 This brief is the durable record. No manifest has changed yet; the sweep is
-the [license sweep plan](mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md).
+the [license sweep plan](archive_docs/2026-10-28/2026-08-22_license_sweep_plan.md).
 **Date:** 2026-08-22.
 **Scope:** cross-cutting, every repository Mark owns. Supersedes the founding
 license convention of 2026-07-08 (MIT OR Apache-2.0 by default, MPL-2.0 only
@@ -224,7 +224,7 @@ provided the notice is retained.
 
 ## 7. Follow-ups this ruling creates
 
-1. The [license sweep plan](mere_docs/implementation_strategy/2026-08-22_license_sweep_plan.md),
+1. The [license sweep plan](archive_docs/2026-10-28/2026-08-22_license_sweep_plan.md),
    written 2026-08-22: tooling and provenance ledger first, then mere, genet,
    isometry, the applications as their trees come clean, the standalones.
 2. The `founding-license-edition-convention` memory in `Code/membackup/`

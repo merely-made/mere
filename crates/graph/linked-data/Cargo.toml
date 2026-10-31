@@ -40,7 +40,7 @@ oxjsonld = "0.2"
 oxttl = { version = "0.2", features = ["rdf-12"] }
 oxrdf = { version = "0.3", features = ["rdf-12"] }
 # Preserve query extensions previously enabled transitively by Oxigraph.
-spareval = { version = "0.2", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
+spareval = { version = "0.2.9", optional = true, features = ["sparql-12", "sep-0002", "sep-0006", "calendar-ext"] }
 spargebra = { version = "0.4", optional = true, features = ["sparql-12"] }
 time = { version = "0.3", features = ["formatting", "parsing"] }
 

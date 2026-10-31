@@ -133,4 +133,101 @@ mod tests {
             "the end of the stream is None"
         );
     }
+    #[tokio::test]
+    async fn native_line_reader_rejects_invalid_utf8_in_complete_line() {
+        let (mut writer, reader) = tokio::io::duplex(128);
+        let mut lines = LineReader::new(reader);
+        writer
+            .write_all(b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"A")
+            .await
+            .unwrap();
+        writer.write_all(&[0xff]).await.unwrap();
+        writer
+            .write_all(b"\",\"projections\":[]}}}}\n")
+            .await
+            .unwrap();
+
+        let error = lines.next::<CarrierOutput>().await.unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+    }
+
+    #[tokio::test]
+    async fn native_line_reader_rejects_invalid_utf8_in_eof_tail() {
+        let (mut writer, reader) = tokio::io::duplex(128);
+        let mut lines = LineReader::new(reader);
+        writer
+            .write_all(b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"A")
+            .await
+            .unwrap();
+        writer.write_all(&[0xff]).await.unwrap();
+        writer
+            .write_all(b"\",\"projections\":[]}}}}")
+            .await
+            .unwrap();
+        drop(writer);
+
+        let error = lines.next::<CarrierOutput>().await.unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+    }
+
+    #[tokio::test]
+    async fn cancelled_read_keeps_a_partial_multibyte_line() {
+        use std::future::{Future, poll_fn};
+        use std::task::Poll;
+
+        let (mut writer, reader) = tokio::io::duplex(128);
+        let mut lines = LineReader::new(reader);
+        writer
+            .write_all(b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"")
+            .await
+            .unwrap();
+        writer.write_all(&[0xe2, 0x82]).await.unwrap();
+        let mut pending = Box::pin(lines.next::<CarrierOutput>());
+        poll_fn(|cx| {
+            assert!(pending.as_mut().poll(cx).is_pending());
+            Poll::Ready(())
+        })
+        .await;
+        drop(pending);
+        writer.write_all(&[0xac]).await.unwrap();
+        writer
+            .write_all(b"\",\"projections\":[]}}}}\n")
+            .await
+            .unwrap();
+        let output = lines
+            .next::<CarrierOutput>()
+            .await
+            .unwrap()
+            .unwrap()
+            .unwrap();
+        assert!(matches!(output, CarrierOutput::Response(response)
+            if matches!(&response.body, Ok(chirograph::CarrierResponseBody::Descriptor(descriptor))
+                if descriptor.label == "€")));
+    }
+
+    #[tokio::test]
+    async fn native_line_reader_preserves_valid_multibyte_utf8_across_writes() {
+        let (mut writer, reader) = tokio::io::duplex(128);
+        let mut lines = LineReader::new(reader);
+        writer
+            .write_all(b"{\"id\":1,\"body\":{\"Ok\":{\"Descriptor\":{\"label\":\"")
+            .await
+            .unwrap();
+        writer.write_all(&[0xe2, 0x82]).await.unwrap();
+        writer.write_all(&[0xac]).await.unwrap();
+        writer
+            .write_all(b"\",\"projections\":[]}}}}\n")
+            .await
+            .unwrap();
+
+        let output = lines
+            .next::<CarrierOutput>()
+            .await
+            .unwrap()
+            .unwrap()
+            .unwrap();
+        assert!(matches!(output, CarrierOutput::Response(response)
+            if matches!(&response.body, Ok(chirograph::CarrierResponseBody::Descriptor(descriptor))
+                if descriptor.label == "€")));
+    }
 }

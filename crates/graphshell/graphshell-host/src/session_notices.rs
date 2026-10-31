@@ -76,6 +76,48 @@ where
         Some((poll_interval, |endpoint: &mut E| {
             endpoint.poll_notice().map_err(|error| error.to_string())
         })),
+        |_| true,
+    )
+    .await
+}
+
+/// Serve a notifying session while checking the owner's live lease before dispatch and replies.
+pub async fn serve_admitted_session_notifying_checked<E, S, F, N, L>(
+    session: &mut AdmittedSession<S>,
+    authority: &SessionAuthority,
+    revocations: &RwLock<RevocationLedger>,
+    endpoint: &mut E,
+    resume: &mut F,
+    now_ms: N,
+    poll_interval: Duration,
+    is_live: L,
+) -> Result<SessionSummary, SessionLoopError>
+where
+    E: ProjectionCatalog
+        + ProjectionSource
+        + PresentationSource
+        + IntentSink
+        + ProjectionNoticeSource,
+    <E as ProjectionSource>::Error: Display,
+    <E as PresentationSource>::Error: Display,
+    <E as IntentSink>::Error: Display,
+    <E as ProjectionNoticeSource>::Error: Display,
+    S: AsyncRead + AsyncWrite + Unpin,
+    F: FnMut(&mut E, ResumeRequest) -> Result<ResumeReply, String>,
+    N: Fn() -> u64,
+    L: Fn(&E) -> bool,
+{
+    serve_admitted_session_with(
+        session,
+        authority,
+        revocations,
+        endpoint,
+        resume,
+        now_ms,
+        Some((poll_interval, |endpoint: &mut E| {
+            endpoint.poll_notice().map_err(|e| e.to_string())
+        })),
+        is_live,
     )
     .await
 }

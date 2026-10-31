@@ -15,7 +15,7 @@ use station_custody::{
     DjinnStationAuthority, SITED_STATION_CONTROL_TITLE, SitedStationControlResult,
     SitedStationCredential, SitedStationHead, SitedStationHeadError,
 };
-use pandect::DeviceId;
+use personae::carry::DeviceId;
 use personae::{IdentityProvider, SealedRecordStorage};
 
 struct ProvisionArgs {
@@ -98,7 +98,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn pending(error: graphshell_endpoint::door::custody_client::CustodyClientError) -> Box<dyn Error> {
+fn pending(error: djinn::door::custody_client::CustodyClientError) -> Box<dyn Error> {
     match error.is_pending() {
         true => format!("the Signalman authority is pending: {error}").into(),
         false => error.into(),

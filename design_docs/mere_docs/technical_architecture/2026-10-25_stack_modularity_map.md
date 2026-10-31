@@ -111,7 +111,7 @@ What the table says in one line each:
   without `peers` it links no iroh, quinn, p2panda-net, p2panda-sync or reqwest
   (`p2panda-core`, `-store` and `-encryption` remain: operation format, local
   store, group crypto). `check_profile.py library` and `default` hold that, with a
-  positive control. Djinn opts in by name (`ports/djinn/Cargo.toml`); Turnstone
+  positive control. Djinn opts in by name (`ports/mere-resident/Cargo.toml`); Turnstone
   does the same in its own repository.
 
 ## Cues: what is wrong, and what would improve the stack
@@ -203,7 +203,7 @@ if Mark wants that stricter reading.
 ### Djinn's `personal-sync` gates code but not the dependencies it implies
 
 `personal-sync = []` is empty, yet 91 `cfg(feature = "personal-sync")` sites in
-`ports/djinn/src` hang off it, and `cxf` and `inference-stages` name it. The
+`ports/mere-resident/src` hang off it, and `cxf` and `inference-stages` name it. The
 sync stack's dependencies (`p2panda-core`, `p2panda-store`, `stickleback`,
 `transport`, `knot-editor`) are unconditional, so a build without
 `personal-sync` compiles less of Djinn and still links all of the stack. Making
