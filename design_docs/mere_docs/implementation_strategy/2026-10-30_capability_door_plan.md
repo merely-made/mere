@@ -191,10 +191,50 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.2 · summary An application's grant lists the personas it may act as, empty by default.
 
+- **D10, one upstream ipc-channel, no in-process flag in libraries
+  (2026-10-31).** Genet's vendored fork existed only because ipc-channel 0.22
+  pulled `windows` 0.61 while wgpu-hal needs 0.62; 0.23.0's only change is
+  `windows` 0.62, and 0.23.1 fixes the macOS advisory. Mark chose "Upstream
+  0.23.1, no flag (Recommended)": the fork goes, Genet's media takes crates.io
+  0.23.1 on its default OS backend, and Turnstone drops its patch row so its
+  Servo copy and Genet's are one 0.23.1. A library never sets
+  `force-inprocess`: Cargo unifies features, so the flag would put N1's
+  channels in-process in any application that links Genet's media. Only an
+  application root may set it.
+
+  Links: area Stack · draws on stack.1 · summary Genet and Turnstone take one crates.io ipc-channel 0.23.1; libraries never set force-inprocess, which only an application root may.
+
+- **D11, Windows identity rests on launch (2026-10-31).** Mark chose "Launch
+  + hardened pin (Recommended)": Djinn launches a Windows application and
+  holds its process handle, so the pipe client's process id cannot be reused
+  while it is compared, with a job object covering the application's own
+  children; an application Djinn did not launch gets a hardened image pin,
+  both facts read from one process handle and refused if the process was
+  created after the connect, reported as same-user and read at connect; the
+  token's user, session, integrity level and AppContainer are read through the
+  pipe; and the door's pipe gets an explicit access list and refuses remote
+  clients, as Mere's custodian pipe already does. Package identity and
+  Authenticode stay out of admission until an installer exists.
+
+  Links: area Stack · draws on stack.2 · summary On Windows Djinn launches and holds the child handle; a hardened, same-user image pin covers the rest; token facts and a strict pipe access list apply to every connection.
+
+- **D12, C0 runs now and probes two binding routes (2026-10-31).** Mark
+  chose "Probe both first" for C0's native binding and "Lift the hold now
+  (Recommended)" for its timing, amending D4's hold: the projection session
+  is bound both through a small generator of our own over an exactly pinned
+  `wit-parser` and through `wit-bindgen-wrpc` at a pinned revision with our
+  own transport over OS channels; effort, size and fit with the blocking,
+  single-thread `Carrier` are measured, then one route is chosen. Wasmtime's
+  `bindgen!` stays on the component side, since its generated types bring
+  Wasmtime and its C helpers into every native process. The component
+  consumer is a test guest under `app-host` until a real provider is wanted.
+
+  Links: area Stack · amends capability-door D4 · draws on stack.3, stack.5 · summary C0 runs now: the projection session is bound through our own wit-parser generator and through pinned wRPC, measured, then one route is chosen.
+
 ## Phases
 
 ### C0. One contract, bound both ways
-Held (D4) until a component provider is wanted; G6 no longer needs it.
+Runs now (D12), probing two native routes; G6 does not need it.
 
 Write the projection session's control surface (`CarrierRequestBody`'s
 Discover, Open, Resume, Intent, Close and Suspend) as a WIT interface with a
@@ -207,10 +247,13 @@ revocation and cancellation apart from Close and Suspend, and size limits. Flow
 control is already settled: a chunk request acknowledges the previous chunk,
 and notices carry no payload (`crates/chirograph/src/lib.rs:1131-1205`).
 - Done when: the native pair and the component exchange the same calls and
-  payloads; the binding route for native code is chosen and the rejected ones
-  recorded (Wasmtime's `bindgen!` types, `wit-bindgen-wrpc` over a channel
-  transport, a small generator of our own); the default build needs no C
-  toolchain; the existing JSON door path still works unchanged.
+  payloads; the session is bound through both D12 routes, a generator of our
+  own over `wit-parser` and `wit-bindgen-wrpc` with our transport, and their
+  effort, generated size, dependency closure and fit with the blocking
+  `Carrier` are compared before one is chosen and the other recorded as
+  rejected; a test shows our generated types and Wasmtime's encode the same
+  values alike; the default build needs no C toolchain; the existing JSON door
+  path still works unchanged.
 - Needs: nothing. This phase is in-process; carriage is N1.
 
 ### I1. Identity at the door
@@ -225,6 +268,13 @@ same-user check (`crates/djinn/src/door/local_endpoint.rs:300-345`).
   handle and refuses a Linux label without one; status shows each
   connection's identity basis, including that a Windows image match is a
   same-user posture.
+- Windows remainder (D11): Djinn launches Windows applications, holding the
+  child's process handle and a job for its children, and admits a pinned
+  label when the pipe client's process id is that child's; the image pin
+  reads both facts from one process handle and refuses a process created after
+  the connect; token facts are read through the pipe on a pinned thread; the
+  door's pipe gets an explicit access list and refuses remote clients. Run on
+  Windows, not only cross-checked.
 - Needs: nothing.
 
 ### M1. Manifests for door apps
@@ -265,8 +315,8 @@ socket's identity.
 - Done when: on Linux, macOS and Windows a consumer gets a channel only after
   consent; revoking a proxied grant refuses new calls and settles in-flight
   ones by a stated rule; a direct grant ends when its provider is told; the
-  carrier is ipc-channel's OS backend or a small layer of our own, with the
-  reasons recorded.
+  carrier is ipc-channel's OS backend at 0.23.1 or later (D10) or a small
+  layer of our own, with the reasons recorded.
 - Needs: S1. C0 only where the consumer or provider is a component; native
   channels need no WIT (D4).
 
@@ -464,6 +514,43 @@ error types settle.
   ([#284](https://github.com/ocapn/ocapn/pull/284)) is open and the "a
   finish line" milestone has ten issues open and none closed. D5's deferral
   stands.
+- 2026-10-31, Windows survey for D2: `peer-facts` reads the pipe client's
+  process id after the connect and opens that id twice, once for the SID and
+  once for the image, so a reused id can mix two processes; its comment says
+  so (Armillary `7eebeeb`, `crates/peer-facts/src/lib.rs:358-372`). The
+  door's pipe is created with default security
+  (`crates/djinn/src/door/local_endpoint.rs:57-59,177`), unlike Mere's
+  custodian pipe, which sets a protected access list and rejects remote
+  clients; `door/launch.rs` launches on Unix only. Windows returns no process
+  handle for a pipe client, only the id the pipe recorded at connect; a held
+  handle keeps that id from being reused
+  ([Old New Thing](https://devblogs.microsoft.com/oldnewthing/20110107-00/?p=11803)),
+  and Project Zero describes a deliberate same-user reuse attack against the
+  id alone
+  ([2019](https://projectzero.google/2019/09/windows-exploitation-tricks-spoofing.html)).
+  Sparse MSIX packages are the only OS-held program identity for unpackaged
+  applications and need a certificate, a manifest and installer registration;
+  Authenticode proves a file's signer, not the running process. Win32-OpenSSH's
+  agent reads its client the way the door does today; Chromium's Mojo does not
+  identify by process id at all and relies on access lists and inherited
+  endpoints. No approach stops a same-user process injecting into another.
+- 2026-10-31, for C0: Wasmtime's imported-interface `Host` traits work
+  without a `Store`, but its generated types derive Wasmtime's own traits,
+  and its `runtime` feature compiles `helpers.c` through `cc`, so native use
+  brings Wasmtime and C into every process. `wit-parser` 0.263.0 is pure Rust
+  and states no API stability, with a new 0.X each release.
+  `wit-bindgen-wrpc` 0.12.0 generates native clients and `Handler` traits over
+  a pluggable `Invoke`/`Serve` transport and any async reader and writer; its
+  spec is a draft, one maintainer wrote nearly all recent commits, its main
+  branch carries unreleased breaking changes, it needs tokio and `Send`, opens
+  one Unix-socket connection per call and has no `map`; `wrpc-wasmtime` needs
+  Wasmtime 50, and Mere's hosts are on 45.
+- 2026-10-31, for D10: Genet's ipc-channel users are its media components
+  only, sending player events and seek acknowledgements
+  (`components/media/player/lib.rs:72-81`, `backends/gstreamer/player.rs`).
+  Turnstone's lock holds both Genet's fork 0.22.0 (for `servo-media-player`)
+  and crates.io 0.23.0 (for Servo 0.7), with one `windows` 0.62.2, so the
+  0.61 clash is already absent there.
 
 ## Progress
 
@@ -530,3 +617,5 @@ error types settle.
   carrying `7eebeeb` follows `081c650ae`, which removed athanor's `furnace`
   feature Turnstone enables. When Turnstone receives that change, it repins
   Djinn and calls `djinn::door::launch::claim()` first in `main`.
+- 2026-10-31: D10 to D12 ruled: one upstream ipc-channel, Windows identity
+  through launch, and C0 lifted to probe two binding routes. Nothing built.

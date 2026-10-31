@@ -150,6 +150,28 @@ area = "Stack"
 summary = "An application's grant lists the personas it may act as, empty by default."
 draws_on = ["stack.2"]
 
+[decisions."capability-door D10"]
+title = "one upstream ipc-channel, no in-process flag in libraries (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Genet and Turnstone take one crates.io ipc-channel 0.23.1; libraries never set force-inprocess, which only an application root may."
+draws_on = ["stack.1"]
+
+[decisions."capability-door D11"]
+title = "Windows identity rests on launch (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "On Windows Djinn launches and holds the child handle; a hardened, same-user image pin covers the rest; token facts and a strict pipe access list apply to every connection."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D12"]
+title = "C0 runs now and probes two binding routes (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "C0 runs now: the projection session is bound through our own wit-parser generator and through pinned wRPC, measured, then one route is chosen."
+draws_on = ["stack.3", "stack.5"]
+amends = ["capability-door D4"]
+
 [decisions."distillery-extraction D1"]
 title = ". The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
