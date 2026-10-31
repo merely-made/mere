@@ -461,15 +461,18 @@ The door records what the OS says about each connection's peer, and status
 lists each admitted connection with its identity basis and peer account
 (`djinn --resident-status`, `connections`). An owner grant may pin a label to
 an OS identity with an `identity` entry: `macos` (code signing team and
-identifier), `windows` (executable image, the same-user posture of a path) or
-`linux` (an executable and arguments the resident launches). A pinned label
+identifier), `windows` (executable image, the same-user posture of a path,
+read by the peer's process id at connect rather than bound to the
+connection) or `linux` (an executable and arguments the resident launches). A pinned label
 without that identity is refused; a grant without a pin for the running
 platform is development mode, which status reports. Mere's defaults pin none.
 
 `djinn --launch <app>` asks the running resident to start an application by
 its grant's `linux` launch. The child receives a one-time handle on
-descriptor 3; Djinn's door client carries it on every route hello, and the
-handle stays live until the child exits.
+descriptor 3 and claims it first in `main` (`djinn::door::launch::claim`),
+which closes the descriptor and clears its variable before anything is
+spawned; Djinn's door client carries it on every route hello, and the handle
+stays live until the child exits.
 
 ```json
 {

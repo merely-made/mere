@@ -475,3 +475,7 @@ error types settle.
   `agent/turnstone-declaration` branches. Turnstone's label is admitted by
   its declaration within Mere's default grant, in development mode until
   its identity is pinned.
+- 2026-10-31: the review's three findings closed. Armillary `7eebeeb` adds
+  `launch::claim`, which Knot's and Turnstone's binaries call first in
+  `main`; the Windows image basis is described as read at connect; `admit`
+  and `serve_on` are removed.
