@@ -4849,27 +4849,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "djinn"
-version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
-dependencies = [
- "base64 0.22.1",
- "chatelaine",
- "dramatis",
- "eidetic",
- "insigne",
- "personae",
- "rand_core 0.6.4",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
- "tokio",
- "tracing",
- "uuid",
- "zeroize",
-]
-
-[[package]]
 name = "djinn-custodian"
 version = "0.0.1"
 dependencies = [
@@ -5041,7 +5020,7 @@ dependencies = [
  "cambium",
  "cambium-desktop",
  "chatelaine",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "dramatis",
  "image",
  "luggage",
@@ -7243,7 +7222,7 @@ dependencies = [
  "chirograph",
  "cue-netrender",
  "distillery",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "dramatis",
  "eidetic",
  "gemot",
@@ -7339,7 +7318,7 @@ name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "dramatis",
  "insigne",
  "personae",
@@ -7356,7 +7335,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
@@ -7381,7 +7360,7 @@ name = "graphshell-mcp"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "graphshell-endpoint",
  "sceno",
  "scenotime",
@@ -7396,7 +7375,7 @@ dependencies = [
  "cambium-desktop",
  "cambium-rootstock",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
@@ -9230,7 +9209,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "knot-catalog",
 ]
@@ -9238,7 +9217,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9251,7 +9230,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9271,7 +9250,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "cambium",
  "illume",
@@ -9288,13 +9267,13 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "base64 0.22.1",
  "blake3",
  "chartulary",
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
+ "djinn",
  "dramatis",
  "eidetic",
  "esp",
@@ -9359,7 +9338,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?branch=main#bda414396bde2d54302c762cddb84f3a8addfb82"
+source = "git+https://github.com/merely-made/knot-editor.git?branch=main#057f53100d17c049325c096d528928b92a65eef8"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -10430,7 +10409,7 @@ name = "mere-overmap"
 version = "0.1.0"
 dependencies = [
  "chirograph",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "graphshell-client",
  "graphshell-endpoint",
  "hest",
@@ -10546,7 +10525,7 @@ dependencies = [
  "cleromancy-core",
  "custody-wire",
  "distillery",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "djinn-custodian",
  "djinn-testkit",
  "dramatis",
@@ -17287,7 +17266,7 @@ name = "station-custody"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=73968e28e2ceb78399b9d533bfa037cd300126c5)",
+ "djinn",
  "dramatis",
  "insigne",
  "outrider",
