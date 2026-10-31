@@ -127,6 +127,7 @@ graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-
 # The application side of the first-party door: admission, the app client,
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
 graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-offer", "profile"] }
+peer-facts.workspace = true
 djinn = { workspace = true, features = ["resident", "door-serve", "custody-client"] }
 # The serving half: the endpoint catalog and its admitted context, the
 # projection host, admission and the session loop (stack lift plan, L2).

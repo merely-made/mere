@@ -82,6 +82,7 @@ fn status_fixture() -> ResidentStatusV1 {
             app: "app".into(),
         },
         sync: None,
+        connections: Vec::new(),
     }
 }
 

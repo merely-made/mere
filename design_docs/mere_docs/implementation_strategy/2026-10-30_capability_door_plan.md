@@ -435,3 +435,12 @@ error types settle.
   custodian policy. Mere adopts the recorded peers when it repins Djinn.
 - 2026-10-30: effective authority mapped; D8 (Djinn computes, services
   recheck) and D9 (grants name personas) recorded, to be built with N1 or G1.
+- 2026-10-30: I1 built. Grants pin a label per platform (macOS signature,
+  Windows image, Linux launch); unpinned is development mode (Mark: "Per grant:
+  no identity pinned", "Include a minimal launcher"). Armillary `b6578ee`
+  checks the pin at admission against `peer-facts::Connected` (the macOS audit
+  token kept from accept) and launches with a one-time handle on descriptor 3
+  that the door client carries on route hellos. Mere reports each connection's
+  basis and peer account in status and launches by `djinn --launch <app>`.
+  Not run here: the Linux launch-pin test (cross-checked only) and Windows
+  image matching on Windows.

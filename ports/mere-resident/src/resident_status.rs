@@ -57,6 +57,12 @@ pub const UNLOCK_INTENT: &str = "djinn.resident/unlock-v1";
 /// Show the resident's own unlock prompt; the payload is empty, and no
 /// credential crosses the pipe (vault lock ruling 47).
 pub const UNLOCK_NATIVE_INTENT: &str = "djinn.resident/unlock-native-v1";
+/// Launch a granted application by the launch its owner grant pins; the
+/// payload is the application's label.
+pub const LAUNCH_INTENT: &str = "djinn.resident/launch-v1";
+
+/// Launches a granted application by label; the reason on refusal.
+pub type Launcher = Arc<dyn Fn(&str) -> Result<(), String> + Send + Sync>;
 const STATUS_SESSION: &str = "djinn.resident-status/v1";
 const CONTROL_SESSION: &str = "djinn.resident-control/v1";
 
@@ -140,6 +146,86 @@ pub struct ResidentStatusV1 {
     pub endpoints: ResidentEndpointsV1,
     /// Absent when personal sync is off.
     pub sync: Option<SyncStatusV1>,
+    /// Each application connection the door admitted and still serves, with
+    /// what its label rests on (capability door plan, I1).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub connections: Vec<AppConnectionV1>,
+}
+
+/// One admitted application connection, as status reports it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AppConnectionV1 {
+    pub app: String,
+    pub route: String,
+    /// What the label rests on: development mode, a macOS signature, a
+    /// Windows image (the same-user posture of a path) or a Linux launch.
+    pub identity: djinn::door::declaration::IdentityBasis,
+    /// The OS account of the peer, where the OS said.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub peer: Option<String>,
+}
+
+/// Keeps [`ResidentStatusV1::connections`] current: the door enters each
+/// connection it admits, and the entry leaves when the connection ends.
+#[derive(Clone)]
+pub struct ConnectionLedger {
+    status: ResidentStatusSource,
+    entries: Arc<std::sync::Mutex<(u64, std::collections::BTreeMap<u64, AppConnectionV1>)>>,
+}
+
+/// An entry in the ledger, removed when dropped.
+pub struct LedgerEntry {
+    ledger: ConnectionLedger,
+    id: u64,
+}
+
+impl ConnectionLedger {
+    pub fn new(status: ResidentStatusSource) -> Self {
+        Self {
+            status,
+            entries: Arc::default(),
+        }
+    }
+
+    /// Enter `connection` until the returned entry is dropped.
+    pub fn enter(&self, connection: AppConnectionV1) -> LedgerEntry {
+        let id = {
+            let mut entries = self.entries.lock().unwrap_or_else(|e| e.into_inner());
+            entries.0 += 1;
+            let id = entries.0;
+            entries.1.insert(id, connection);
+            id
+        };
+        self.publish();
+        LedgerEntry {
+            ledger: self.clone(),
+            id,
+        }
+    }
+
+    fn publish(&self) {
+        let connections: Vec<_> = self
+            .entries
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .1
+            .values()
+            .cloned()
+            .collect();
+        self.status.update(|status| status.connections = connections);
+    }
+}
+
+impl Drop for LedgerEntry {
+    fn drop(&mut self) {
+        self.ledger
+            .entries
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .1
+            .remove(&self.id);
+        self.ledger.publish();
+    }
 }
 
 /// The status the resident keeps current and the route reads.
@@ -420,6 +506,7 @@ const STOP_FALLBACK: std::time::Duration = std::time::Duration::from_secs(2);
 pub struct ResidentControlEndpoint {
     stop: StopSignal,
     unlock: ControlUnlock,
+    launch: Option<Launcher>,
     stop_asked: bool,
 }
 
@@ -428,6 +515,7 @@ impl ResidentControlEndpoint {
         Self {
             stop,
             unlock: ControlUnlock::default(),
+            launch: None,
             stop_asked: false,
         }
     }
@@ -445,10 +533,22 @@ impl ResidentControlEndpoint {
         unlock: ControlUnlock,
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
+        Self::register_with(stop, unlock, None, catalog)
+    }
+
+    /// Register the route with its unlock intents, and the launch intent
+    /// served by `launch` when there is one.
+    pub fn register_with(
+        stop: StopSignal,
+        unlock: ControlUnlock,
+        launch: Option<Launcher>,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
         catalog.register(RESIDENT_CONTROL_ROUTE, "Resident control", move |_| {
             Ok(Self {
                 stop: stop.clone(),
                 unlock: unlock.clone(),
+                launch: launch.clone(),
                 stop_asked: false,
             })
         })?;
@@ -528,9 +628,16 @@ impl IntentSink for ResidentControlEndpoint {
                 },
                 None => refused("a native unlock"),
             }),
+            LAUNCH_INTENT => Ok(match (&self.launch, std::str::from_utf8(&payload)) {
+                (Some(launch), Ok(app)) => answer(launch(app)),
+                (Some(_), Err(_)) => IntentResult::Rejected {
+                    reason: "the launch names an application in UTF-8".into(),
+                },
+                (None, _) => refused("an application launch"),
+            }),
             _ => Ok(IntentResult::Rejected {
                 reason: format!(
-                    "resident control takes {STOP_INTENT}, {UNLOCK_INTENT} or {UNLOCK_NATIVE_INTENT}"
+                    "resident control takes {STOP_INTENT}, {UNLOCK_INTENT}, {UNLOCK_NATIVE_INTENT} or {LAUNCH_INTENT}"
                 ),
             }),
         }
@@ -613,6 +720,12 @@ pub async fn request_unlock(
     passphrase: &[u8],
 ) -> Result<(), AppClientError> {
     control_intent(client, UNLOCK_INTENT, passphrase.to_vec(), "unlock").await
+}
+
+/// Ask the resident to launch a granted application by the launch its owner
+/// grant pins (`djinn --launch <app>`).
+pub async fn request_launch(client: &mut AppBrokerClient, app: &str) -> Result<(), AppClientError> {
+    control_intent(client, LAUNCH_INTENT, app.as_bytes().to_vec(), "the launch").await
 }
 
 /// Ask the resident to show its own unlock prompt: nothing crosses the pipe.
@@ -699,6 +812,40 @@ mod tests {
         drop(open);
     }
 
+    /// The launch intent names a granted application; the resident's
+    /// launcher decides, and an endpoint without one refuses.
+    #[test]
+    fn the_launch_intent_asks_the_launcher_by_label() {
+        let asked = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let seen = Arc::clone(&asked);
+        let launcher: Launcher = Arc::new(move |app: &str| {
+            seen.lock().unwrap().push(app.to_string());
+            match app {
+                "knot-editor" => Ok(()),
+                other => Err(format!("{other} has no launch in its owner grant")),
+            }
+        });
+        let invoke = |control: &mut ResidentControlEndpoint, app: &[u8]| {
+            control
+                .invoke(IntentInvocation {
+                    session: ProjectionSession(CONTROL_SESSION.into()),
+                    target: InstanceId(0),
+                    observed_epoch: SceneEpoch(1),
+                    observed_revision: Revision(1),
+                    intent: LAUNCH_INTENT.into(),
+                    payload: app.to_vec(),
+                })
+                .unwrap()
+        };
+        let mut control = ResidentControlEndpoint::new(StopSignal::default());
+        assert!(matches!(invoke(&mut control, b"knot-editor"), IntentResult::Rejected { .. }), "no launcher, no launch");
+        control.launch = Some(launcher);
+        assert!(matches!(invoke(&mut control, b"knot-editor"), IntentResult::Accepted));
+        assert!(matches!(invoke(&mut control, b"turnstone"), IntentResult::Rejected { .. }));
+        assert!(matches!(invoke(&mut control, &[0xff]), IntentResult::Rejected { .. }));
+        assert_eq!(*asked.lock().unwrap(), ["knot-editor", "turnstone"]);
+    }
+
     /// Ruling 47: `unlock-native-v1` carries nothing. A payload, a
     /// passphrase sent where none belongs, is refused before the resident's
     /// prompt runs; the empty one runs it.
@@ -709,6 +856,7 @@ mod tests {
         let mut control = ResidentControlEndpoint {
             stop_asked: false,
             stop: StopSignal::default(),
+            launch: None,
             unlock: ControlUnlock {
                 passphrase: None,
                 native: Some(Arc::new(move || {

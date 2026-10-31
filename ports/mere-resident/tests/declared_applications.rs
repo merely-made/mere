@@ -229,6 +229,45 @@ async fn a_declared_request_beyond_the_owner_grant_is_refused_as_not_granted() {
     assert!(open(&endpoint, "fixture-app", Some(undeclared)).await.is_err());
 }
 
+/// I1: a label the owner pinned to a macOS code signature is refused for a
+/// peer without it; the same grant unpinned is admitted (development mode).
+#[cfg(target_os = "macos")]
+#[tokio::test(flavor = "multi_thread")]
+async fn a_label_pinned_to_a_signature_refuses_an_unsigned_peer() {
+    use djinn::door::declaration::{AppIdentity, SignedAppIdentity};
+    let wallet = tempfile::tempdir().unwrap();
+    let grant = |app: &str, pinned: bool| {
+        let mut grant = AppGrant::new(AppId::new(app));
+        grant.routes = vec![NamePattern::exact("custody")];
+        grant.custody.operations = [CustodyOperation::Status].into();
+        grant.identity = pinned.then(|| AppIdentity {
+            macos: Some(SignedAppIdentity { team: "ABCDE12345".into(), identifier: "com.merely.pinned".into() }),
+            ..AppIdentity::default()
+        });
+        grant
+    };
+    let endpoint = serve(
+        wallet.path(),
+        vec![grant("pinned-app", true), grant("unpinned-app", false)],
+        AppEndpointCatalog::default(),
+    )
+    .await;
+    let declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        custody: CustodyUse {
+            operations: [CustodyOperation::Status].into(),
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    };
+    let mut unpinned = open(&endpoint, "unpinned-app", Some(declaration.clone())).await.unwrap();
+    unpinned.status().await.unwrap();
+    assert!(
+        open(&endpoint, "pinned-app", Some(declaration)).await.is_err(),
+        "this test binary is not signed by the pinned team"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn a_declared_provider_offers_only_what_it_declares() {
     use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;

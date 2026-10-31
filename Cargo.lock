@@ -502,7 +502,7 @@ dependencies = [
 [[package]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
+source = "git+https://www.github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
 dependencies = [
  "tokio",
  "tracing",
@@ -4827,6 +4827,27 @@ name = "djinn"
 version = "0.0.3"
 source = "git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
 dependencies = [
+ "base64 0.22.1",
+ "chatelaine",
+ "dramatis",
+ "eidetic",
+ "insigne",
+ "personae",
+ "rand_core 0.6.4",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
+ "tracing",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
+name = "djinn"
+version = "0.0.3"
+source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
+dependencies = [
  "armillary",
  "base64 0.22.1",
  "blake3",
@@ -4835,6 +4856,7 @@ dependencies = [
  "eidetic",
  "insigne",
  "libc",
+ "peer-facts",
  "personae",
  "rand_core 0.6.4",
  "serde",
@@ -5019,7 +5041,7 @@ dependencies = [
  "cambium",
  "cambium-desktop",
  "chatelaine",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "dramatis",
  "image",
  "luggage",
@@ -7221,7 +7243,7 @@ dependencies = [
  "chirograph",
  "cue-netrender",
  "distillery",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "dramatis",
  "eidetic",
  "gemot",
@@ -7317,7 +7339,7 @@ name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "dramatis",
  "insigne",
  "personae",
@@ -7334,7 +7356,7 @@ version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
@@ -7359,7 +7381,7 @@ name = "graphshell-mcp"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "graphshell-endpoint",
  "sceno",
  "scenotime",
@@ -7374,7 +7396,7 @@ dependencies = [
  "cambium-desktop",
  "cambium-rootstock",
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "genet-scripted-dom",
  "graphshell",
  "graphshell-client",
@@ -9272,7 +9294,7 @@ dependencies = [
  "blake3",
  "chartulary",
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592)",
  "dramatis",
  "eidetic",
  "esp",
@@ -10408,7 +10430,7 @@ name = "mere-overmap"
 version = "0.1.0"
 dependencies = [
  "chirograph",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "graphshell-client",
  "graphshell-endpoint",
  "hest",
@@ -10524,7 +10546,7 @@ dependencies = [
  "cleromancy-core",
  "custody-wire",
  "distillery",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "djinn-custodian",
  "djinn-testkit",
  "dramatis",
@@ -10563,6 +10585,7 @@ dependencies = [
  "p2panda-core",
  "p2panda-store",
  "pandect",
+ "peer-facts",
  "personae",
  "pollster 0.4.0",
  "rand_core 0.6.4",
@@ -13527,7 +13550,7 @@ dependencies = [
 [[package]]
 name = "peer-facts"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=d0c79f5edf1ba0a4987898a5d44609a8b1c0ce86#d0c79f5edf1ba0a4987898a5d44609a8b1c0ce86"
+source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
 dependencies = [
  "libc",
  "serde",
@@ -17264,7 +17287,7 @@ name = "station-custody"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "djinn",
+ "djinn 0.0.3 (git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de)",
  "dramatis",
  "insigne",
  "outrider",
@@ -21763,7 +21786,7 @@ dependencies = [
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
+source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21808,7 +21831,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=01ee97b0b95d6794309
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
+source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21853,7 +21876,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=01ee97b0b95d6794309
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=a333f516a3b8e05c381a3b0b55e617ffe154b592#a333f516a3b8e05c381a3b0b55e617ffe154b592"
+source = "git+https://github.com/merely-made/armillary.git?rev=b6578ee6fbb8ae5efcf819d660d4124d092ef2de#b6578ee6fbb8ae5efcf819d660d4124d092ef2de"
 
 [[patch.unused]]
 name = "chartulary"

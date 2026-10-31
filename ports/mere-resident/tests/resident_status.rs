@@ -68,6 +68,7 @@ fn fixture() -> ResidentStatusV1 {
             node_id: "ab".repeat(32),
             ticket: "ticket".into(),
         }),
+        connections: Vec::new(),
     }
 }
 
@@ -86,6 +87,64 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
 
 async fn open(endpoint: &str, app: &str, route: &str) -> Result<AppBrokerClient, AppClientError> {
     AppBrokerClient::open_route_at(endpoint, AppId::new(app), AppRouteId::new(route).unwrap()).await
+}
+
+/// Status names each admitted connection with what its label rests on and
+/// the OS account of its peer, and drops it when the connection ends.
+#[tokio::test(flavor = "multi_thread")]
+async fn status_reports_each_connection_with_its_identity_basis() {
+    use djinn::door::declaration::IdentityBasis;
+    use mere_resident::resident_status::ConnectionLedger;
+    let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    let status = ResidentStatusSource::new(fixture());
+    let route = catalog
+        .update(|catalog| ResidentStatusEndpoint::register(status.clone(), catalog))
+        .await
+        .unwrap();
+    resident_status::grant(&grants, route);
+    catalog.set_connection_ledger(ConnectionLedger::new(status.clone()));
+    let endpoint = endpoint_name();
+    let server = {
+        let (endpoint, grants, catalog) = (endpoint.clone(), grants.clone(), catalog.clone());
+        tokio::spawn(async move {
+            let _ = serve_app_broker(
+                &endpoint,
+                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
+                grants,
+                60_000,
+                None,
+                catalog,
+            )
+            .await;
+        })
+    };
+    let mut client = None;
+    for _ in 0..100 {
+        if let Ok(opened) = open(&endpoint, RESIDENT_APP, RESIDENT_STATUS_ROUTE).await {
+            client = Some(opened);
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    let mut client = client.expect("djinn's label is admitted");
+    let read = resident_status::read_status(&mut client).await.unwrap();
+    assert_eq!(read.connections.len(), 1, "the reading connection itself");
+    let connection = &read.connections[0];
+    assert_eq!(connection.app, RESIDENT_APP);
+    assert_eq!(connection.route, RESIDENT_STATUS_ROUTE);
+    assert_eq!(connection.identity, IdentityBasis::Development);
+    #[cfg(unix)]
+    assert_eq!(connection.peer.as_deref(), Some(format!("uid:{}", peer_facts::effective_uid()).as_str()));
+    client.close().await.unwrap();
+    tokio::time::timeout(Duration::from_secs(5), async {
+        while !status.read().connections.is_empty() {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .expect("the ended connection leaves status");
+    server.abort();
 }
 
 #[tokio::test(flavor = "multi_thread")]

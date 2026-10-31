@@ -97,6 +97,7 @@ pub enum AppBrokerError {
 pub struct AppEndpointCatalog {
     inner: Arc<tokio::sync::Mutex<ResidentEndpointCatalog>>,
     pub(crate) offers: Arc<OfferRegistry>,
+    ledger: Arc<std::sync::OnceLock<crate::resident_status::ConnectionLedger>>,
 }
 impl Default for AppEndpointCatalog {
     fn default() -> Self {
@@ -113,9 +114,11 @@ pub struct WeakAppEndpointCatalog {
 impl WeakAppEndpointCatalog {
     pub fn upgrade(&self) -> Option<AppEndpointCatalog> {
         self.inner.upgrade().and_then(|inner| {
-            self.offers
-                .upgrade()
-                .map(|offers| AppEndpointCatalog { inner, offers })
+            self.offers.upgrade().map(|offers| AppEndpointCatalog {
+                inner,
+                offers,
+                ledger: Arc::default(),
+            })
         })
     }
 }
@@ -125,7 +128,14 @@ impl AppEndpointCatalog {
         Self {
             inner: Arc::new(tokio::sync::Mutex::new(catalog)),
             offers: Arc::new(OfferRegistry::new()),
+            ledger: Arc::default(),
         }
+    }
+
+    /// Report each admitted connection, and what its label rests on, in
+    /// resident status. Set once, before serving.
+    pub fn set_connection_ledger(&self, ledger: crate::resident_status::ConnectionLedger) {
+        let _ = self.ledger.set(ledger);
     }
 
     pub fn downgrade(&self) -> WeakAppEndpointCatalog {
@@ -224,18 +234,19 @@ pub async fn serve_app_broker_on<A>(
 where
     A: ResidentIdentity,
 {
-    djinn::door::server::serve_on(
+    djinn::door::server::serve_on_with_peer(
         listener,
         grants,
-        move |stream: Box<dyn LocalStream>, allowed| {
+        move |stream: Box<dyn LocalStream>, allowed, connected| {
             let personae = Arc::clone(&personae);
             let surface = surface.clone();
             let catalog = catalog.clone();
             async move {
                 let (mut reader, mut writer) = tokio::io::split(stream);
-                if let Err(error) = serve_app_connection(
+                if let Err(error) = serve_app_connection_from(
                     &mut reader,
                     &mut writer,
+                    connected,
                     personae,
                     &allowed,
                     session_duration_ms,
@@ -270,7 +281,29 @@ where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
 {
-    let admitted = djinn::door::server::admit(reader, allowed, |request, allowed| {
+    serve_app_connection_from(reader, writer, None, personae, allowed, session_duration_ms, surface, catalog).await
+}
+
+/// [`serve_app_connection`] for a connection whose peer the OS described:
+/// an identity the owner pinned the label to is checked against it, and the
+/// connection is reported with what its label rests on.
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn serve_app_connection_from<A, R, W>(
+    reader: &mut R,
+    writer: &mut W,
+    connected: Option<peer_facts::Connected>,
+    personae: Arc<A>,
+    allowed: &AllowedAppRoutes,
+    session_duration_ms: u64,
+    surface: Option<DeviceSurfaceHandle>,
+    catalog: AppEndpointCatalog,
+) -> Result<Option<SessionSummary>, AppBrokerError>
+where
+    A: ResidentIdentity,
+    R: AsyncRead + Unpin,
+    W: AsyncWrite + Unpin,
+{
+    let admitted = djinn::door::server::admit_from(reader, connected, allowed, |request, allowed| {
         if request.route.as_str() == PROJECTION_PROVIDER_ROUTE {
             if !catalog.offers.provider_allowed(&request.app) {
                 return Err(AppAdmissionError::NotAllowed(request.app.clone()).into());
@@ -304,8 +337,19 @@ where
     let djinn::door::server::AdmittedApp {
         app,
         route,
+        peer,
+        basis,
         authority,
     } = admitted;
+    tracing::debug!(app = %app, route = route.id(), ?basis, "application admitted");
+    let _ledger_entry = catalog.ledger.get().map(|ledger| {
+        ledger.enter(crate::resident_status::AppConnectionV1 {
+            app: app.to_string(),
+            route: route.id().to_string(),
+            identity: basis,
+            peer: peer.as_ref().map(peer_facts::Peer::account),
+        })
+    });
     // Read once, at session start, exactly as the browser door does: a
     // transfer accepted while an application is already connected becomes
     // visible on its next session rather than mid-stream.

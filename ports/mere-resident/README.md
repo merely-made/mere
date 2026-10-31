@@ -446,6 +446,34 @@ grants (`CUSTODY_APPS` and the resident's first-party route grants) until they
 declare. Declarations, like labels, are statements within the same-user
 transport boundary, not executable authentication.
 
+## Application identity
+
+The door records what the OS says about each connection's peer, and status
+lists each admitted connection with its identity basis and peer account
+(`djinn --resident-status`, `connections`). An owner grant may pin a label to
+an OS identity with an `identity` entry: `macos` (code signing team and
+identifier), `windows` (executable image, the same-user posture of a path) or
+`linux` (an executable and arguments the resident launches). A pinned label
+without that identity is refused; a grant without a pin for the running
+platform is development mode, which status reports. Mere's defaults pin none.
+
+`djinn --launch <app>` asks the running resident to start an application by
+its grant's `linux` launch. The child receives a one-time handle on
+descriptor 3; Djinn's door client carries it on every route hello, and the
+handle stays live until the child exits.
+
+```json
+{
+  "applications": [{
+    "app": "knot-editor",
+    "identity": {
+      "macos": { "team": "ABCDE12345", "identifier": "com.merely.knot" },
+      "linux": { "executable": "/usr/bin/knot", "args": [] }
+    }
+  }]
+}
+```
+
 ## App-owned projections
 
 An external application can offer a projection through the existing application

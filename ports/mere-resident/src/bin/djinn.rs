@@ -105,6 +105,8 @@ struct Args {
     resident_diagnostics: bool,
     /// Ask a running resident to stop through its app door, and exit.
     stop_resident: bool,
+    /// Ask a running resident to launch a granted application, and exit.
+    launch: Option<String>,
     /// Receipt control: leave one blob-store holder outside the task scope,
     /// so a graceful stop must fail its borrower check.
     control_unjoined_holder: bool,
@@ -195,7 +197,12 @@ async fn main() {
     }
     // Status, stop and unlock talk to a running resident; this process hosts
     // nothing.
-    if args.resident_status || args.resident_diagnostics || args.stop_resident || args.unlock {
+    if args.resident_status
+        || args.resident_diagnostics
+        || args.stop_resident
+        || args.unlock
+        || args.launch.is_some()
+    {
         match resident_client(&args).await {
             Ok(message) => {
                 println!("{message}");
@@ -340,7 +347,7 @@ fn refuse_default_endpoints(args: &Args) -> Result<(), String> {
 /// Unlock rides the control route only: the status route never carries a
 /// passphrase (vault lock ruling 41).
 async fn resident_client(args: &Args) -> Result<String, String> {
-    let route = if args.stop_resident || args.unlock {
+    let route = if args.stop_resident || args.unlock || args.launch.is_some() {
         RESIDENT_CONTROL_ROUTE
     } else {
         RESIDENT_STATUS_ROUTE
@@ -371,6 +378,12 @@ async fn resident_client(args: &Args) -> Result<String, String> {
         unlocked.map_err(|error| error.to_string())?;
         return Ok("unlocked".into());
     }
+    if let Some(app) = &args.launch {
+        let launched = resident_status::request_launch(&mut client, app).await;
+        let _ = client.close().await;
+        launched.map_err(|error| error.to_string())?;
+        return Ok(format!("{app} launched"));
+    }
     if args.stop_resident {
         resident_status::request_stop(&mut client)
             .await
@@ -396,6 +409,50 @@ async fn resident_client(args: &Args) -> Result<String, String> {
     serde_json::to_string_pretty(&status).map_err(|error| error.to_string())
 }
 
+/// Launch a granted application by the Linux launch its owner grant pins
+/// (capability door plan, I1). The launch's handle is live until the process
+/// exits. Applications without a pinned launch are refused.
+#[cfg(feature = "personal-sync")]
+fn application_launcher(
+    grants: &AppRouteGrants,
+    applications: &[djinn::door::declaration::AppGrant],
+) -> resident_status::Launcher {
+    let pins: std::collections::BTreeMap<AppId, djinn::door::declaration::LinuxLaunch> = applications
+        .iter()
+        .filter_map(|grant| {
+            let launch = grant.identity.as_ref()?.linux.clone()?;
+            Some((grant.app.clone(), launch))
+        })
+        .collect();
+    let grants = grants.clone();
+    std::sync::Arc::new(move |app: &str| {
+        let app = AppId::new(app);
+        let Some(pin) = pins.get(&app) else {
+            return Err(format!("{app} has no launch in its owner grant"));
+        };
+        #[cfg(unix)]
+        {
+            let launched = djinn::door::launch::launch(&grants, &app, &pin.executable, &pin.args)
+                .map_err(|error| format!("{app} did not start: {error}"))?;
+            let (grants, handle, mut child) = (grants.clone(), launched.handle, launched.child);
+            std::thread::Builder::new()
+                .name(format!("launched-{app}"))
+                .spawn(move || {
+                    let _ = child.wait();
+                    djinn::door::launch::end(&grants, &handle);
+                })
+                .map_err(|error| error.to_string())?;
+            tracing::info!(app = %app, "launched");
+            Ok(())
+        }
+        #[cfg(not(unix))]
+        {
+            let _ = (&grants, pin);
+            Err("launching an application is available on Unix".into())
+        }
+    })
+}
+
 fn parse_args() -> Result<Args, String> {
     let mut vault_dir = default_vault_dir();
     let mut profile = None;
@@ -412,6 +469,7 @@ fn parse_args() -> Result<Args, String> {
     let mut resident_status = false;
     let mut resident_diagnostics = false;
     let mut stop_resident = false;
+    let mut launch = None;
     let mut control_unjoined_holder = false;
     let mut enroll_passphrase = false;
     let mut unlock = false;
@@ -511,6 +569,7 @@ fn parse_args() -> Result<Args, String> {
             "--resident-status" => resident_status = true,
             "--resident-diagnostics" => resident_diagnostics = true,
             "--stop-resident" => stop_resident = true,
+            "--launch" => launch = Some(argv.next().ok_or("--launch needs an application")?),
             "--control-unjoined-holder" => control_unjoined_holder = true,
             "--enroll-passphrase" => enroll_passphrase = true,
             "--unlock" => unlock = true,
@@ -660,6 +719,7 @@ fn parse_args() -> Result<Args, String> {
         resident_status,
         resident_diagnostics,
         stop_resident,
+        launch,
         control_unjoined_holder,
         enroll_passphrase,
         unlock,
@@ -1034,6 +1094,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             app: args.app_endpoint.clone(),
         },
         sync: None,
+        connections: Vec::new(),
     })
     .with_events(events.clone());
     let stop = StopSignal::default();
@@ -1294,11 +1355,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .update(|catalog| ResidentStatusEndpoint::register(status.clone(), catalog))
                 .await?;
             resident_status::grant(&grants, route);
+            let launcher = application_launcher(&grants, &application_grants);
             let route = catalog
                 .update(|catalog| {
-                    ResidentControlEndpoint::register_with_unlock(
+                    ResidentControlEndpoint::register_with(
                         stop.clone(),
                         control_unlock.clone(),
+                        Some(launcher),
                         catalog,
                     )
                 })
@@ -1370,6 +1433,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             mere_resident::applications::install(&grants, application_grants);
             (grants, AppEndpointCatalog::default())
         };
+        app_catalog.set_connection_ledger(resident_status::ConnectionLedger::new(status.clone()));
         app_catalog
             .set_provider_permissions(projection_providers)
             .await?;
