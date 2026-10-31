@@ -183,6 +183,16 @@ source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_
 title = ". Lane F starts now in an isolated Mere worktree,"
 source = "design_docs/mere_docs/implementation_strategy/2026-09-20_ranged_fetch_plan.md"
 
+[decisions."stack-lift D1"]
+title = "the remote board's mapping lives in `graphshell-host`"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
+summary = "The remote board's scene-to-board mapping moves out of the port into graphshell-host behind a board feature."
+
+[decisions."stack-lift D2"]
+title = "the board draws edges and honours folds"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
+summary = "Pictograph's board draws a scene's relations as edges and honours its folds, the stand-in carrying the hidden count."
+
 [statements."stack.1"]
 title = "Build on the stack we have"
 source = "design_docs/doctrine.md"

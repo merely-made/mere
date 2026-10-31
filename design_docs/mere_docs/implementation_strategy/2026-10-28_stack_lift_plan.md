@@ -121,6 +121,25 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:9-11,1456-1459,1511-1517,1558-1564,1590-1592,2012-2017`
 
+### P10. The remote board leaves the port
+`ports/graphshell/src/remote_board.rs` mapped a mounted Graphshell scene onto Pictograph's board behind the port's `web` feature, so no native host could draw a remote session with it. Isocosm's world-graph viewer (`isocosm/mesocosm/design_docs/2026-10-28_sim_host_plan.md` H9, isocosm case 1048) is the planned second consumer, which moves it now (isocosm case 1045's rule). The mapping moves into `graphshell-host` behind a `board` feature (D1), and Pictograph's `BoardScene` gains edges from the scene's relations and honours its folds (D2).
+- Done when: `graphshell-host` with `board` builds natively and its board tests pass; the port's browser pages consume `graphshell_host::board` with the port copy deleted, and the port builds and its tests pass with `web`; the second consumer's receipt is Isocosm's viewer drawing a Cosmograph endpoint through it.
+- Needs: -
+- Rulings: D1, D2
+- From: the isocosm viewer lane's checkpoint, 2026-10-31.
+
+## Decisions
+
+Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by the isocosm coordinator; each entry quotes the option he chose, both the recommended one.
+
+- **D1, the remote board's mapping lives in `graphshell-host`.** Mark chose "graphshell-host, `board` feature". The mapping moves from the port into `graphshell-host`, beside `view`, which already derives the layout it reads, behind a new `board` feature that takes Pictograph's `canvas`; against Pictograph taking the Graphshell session crates, or `graphshell-client` taking Pictograph and a copy of the layout view.
+
+  Links: summary The remote board's scene-to-board mapping moves out of the port into graphshell-host behind a board feature.
+
+- **D2, the board draws edges and honours folds.** Mark chose "Board draws edges and folds". As part of the move, `BoardScene` gains relations drawn as edges under the cards, and the mapping leaves out a fold's hidden members while the stand-in carries "+N"; against the viewer mapping into the full canvas separately, or moving the mapping unchanged.
+
+  Links: summary Pictograph's board draws a scene's relations as edges and honours its folds, the stand-in carrying the hidden count.
+
 ## Open questions
 
 - **P9 completion criteria.** The Page split was ruled on 2026-10-15; another ruling note is not a prerequisite. Remaining work is component extraction with explicit owner completions and receiving-host qualification. From: `archive_docs/2026-10-28/2026-10-14_graphshell_stack_lift_plan.md:556-565,1668-1680`
@@ -150,3 +169,5 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - 2026-10-29: P6 second-host adoption completed locally in Knot (`2924a5f`), with coordinated source review, receiving tests and bounded native/fresh-process qualification; no push.
 
 - 2026-10-30: P6 published on Knot `main` at `3e380e2` after merging current upstream and passing receiving gates. The original native qualification remains source-bound; the locked-console repeat is unqualified, as recorded in the publication update above.
+
+- 2026-10-31: P10 landed on branch `remote-board-to-stack`: `graphshell-host::board` (feature `board`) holds the remote board with relations as edges and folds honoured; `pictograph::canvas::board_relations` draws the edges; the port's copy is deleted and its browser pages use the moved module.

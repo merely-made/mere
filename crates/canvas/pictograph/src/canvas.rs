@@ -217,6 +217,8 @@ pub mod backdrop_surface;
 /// A board scene: the cards and backdrops of a scene that is not a graph,
 /// painted where the physics board holds them.
 pub mod board_scene;
+/// A board's edges between cards.
+pub mod board_relations;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
@@ -250,6 +252,7 @@ pub mod projection_dynamics;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
+pub use board_relations::BoardRelation;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
     BoardTransform, backdrop_color,

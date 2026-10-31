@@ -7345,6 +7345,7 @@ dependencies = [
  "notochord",
  "pandect",
  "personae",
+ "pictograph",
  "rand_core 0.6.4",
  "sceno",
  "scenotime",

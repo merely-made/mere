@@ -23,6 +23,7 @@ use paint_list_render::{CompositeLayer, composite_paint_layers};
 
 use crate::canvas::build::qual;
 
+use crate::canvas::board_relations::{BoardRelation, Edge};
 use crate::canvas::physics_board::{BoardItem, PhysicsBoard};
 
 /// The board's ground, behind every backdrop.
@@ -110,6 +111,9 @@ pub struct BoardCard {
     pub pinned: bool,
     /// Drawn in the lead tone.
     pub lead: bool,
+    /// How many other cards a fold hides behind this one: its title carries
+    /// "+N" when there are any.
+    pub folded: usize,
 }
 
 /// A region behind the cards. `kind` is open; it picks a stable fallback
@@ -128,6 +132,8 @@ pub struct BoardScene {
     pub bounds: BoardRect,
     pub backdrops: Vec<BoardBackdrop>,
     pub cards: Vec<BoardCard>,
+    /// Edges between cards, drawn under them ([`BoardRelation`]).
+    pub relations: Vec<BoardRelation>,
 }
 
 /// How a board is fitted into a viewport: margins in viewport px. The board
@@ -282,7 +288,7 @@ impl BoardScene {
         BoardRect::new(x0, y0, x1 - x0, y1 - y0)
     }
 
-    fn framed(&self, fit: BoardFit) -> BoardRect {
+    pub(crate) fn framed(&self, fit: BoardFit) -> BoardRect {
         if fit.frame_edges {
             self.frame()
         } else {
@@ -308,7 +314,7 @@ impl BoardScene {
                 let (card_w, card_h) = card_size(card, transform.scale);
                 (
                     card.id.clone(),
-                    card.title.clone(),
+                    card.labelled(),
                     BoardRect::new(
                         center_x - card_w * 0.5,
                         center_y - card_h * 0.5,
@@ -323,6 +329,13 @@ impl BoardScene {
     /// The ground, the backdrops and the cards as filled rectangles in
     /// viewport px, back to front.
     fn fills(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Vec<Fill> {
+        let mut fills = self.ground(width, height, fit);
+        fills.extend(self.card_fills(board, width, height, fit));
+        fills
+    }
+
+    /// The ground and the backdrops, which the edges are drawn over.
+    fn ground(&self, width: u32, height: u32, fit: BoardFit) -> Vec<Fill> {
         let mut fills = vec![Fill([0.0, 0.0, width as f32, height as f32], BOARD_GROUND)];
         if self.cards.is_empty() && self.backdrops.is_empty() {
             return fills;
@@ -342,6 +355,17 @@ impl BoardScene {
                 fills.push(Fill([x1 - stroke, y0, x1, y1], COLLIDABLE_EDGE));
             }
         }
+        fills
+    }
+
+    /// The cards, over the edges.
+    fn card_fills(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Vec<Fill> {
+        let mut fills = Vec::new();
+        if self.cards.is_empty() {
+            return fills;
+        }
+        let transform = fit.transform(self.framed(fit), width as f32, height as f32);
+        let scale = transform.scale;
         for card in &self.cards {
             let (center_x, center_y) = transform.to_viewport(self.position(card, board));
             let (card_w, card_h) = card_size(card, scale);
@@ -385,7 +409,13 @@ impl BoardScene {
     /// positions into a `width` × `height` viewport.
     pub fn paint(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Scene {
         let mut scene = Scene::new(width, height);
-        for Fill([x0, y0, x1, y1], color) in self.fills(board, width, height, fit) {
+        for Fill([x0, y0, x1, y1], color) in self.ground(width, height, fit) {
+            scene.push_rect(x0, y0, x1, y1, color);
+        }
+        for edge in self.edges(board, width, height, fit) {
+            edge.push(&mut scene);
+        }
+        for Fill([x0, y0, x1, y1], color) in self.card_fills(board, width, height, fit) {
             scene.push_rect(x0, y0, x1, y1, color);
         }
         scene
@@ -401,19 +431,19 @@ impl BoardScene {
         fit: BoardFit,
         text: &mut BoardText,
     ) -> Result<Scene, paint_list_render::TranslationError> {
-        let rects: Vec<PaintCmd> = self
-            .fills(board, width, height, fit)
-            .into_iter()
-            .map(|Fill([x0, y0, x1, y1], [r, g, b, a])| {
-                PaintCmd::DrawRect(RectItem {
-                    placement: CommonPlacement::new(LayoutRect::new(
-                        LayoutPoint::new(x0, y0),
-                        LayoutPoint::new(x1, y1),
-                    )),
-                    color: ColorF::new(r, g, b, a),
-                })
+        let rect = |Fill([x0, y0, x1, y1], [r, g, b, a]): Fill| {
+            PaintCmd::DrawRect(RectItem {
+                placement: CommonPlacement::new(LayoutRect::new(
+                    LayoutPoint::new(x0, y0),
+                    LayoutPoint::new(x1, y1),
+                )),
+                color: ColorF::new(r, g, b, a),
             })
-            .collect();
+        };
+        let mut rects: Vec<PaintCmd> =
+            self.ground(width, height, fit).into_iter().map(rect).collect();
+        rects.extend(self.edges(board, width, height, fit).iter().map(Edge::command));
+        rects.extend(self.card_fills(board, width, height, fit).into_iter().map(rect));
         let viewport = DeviceIntSize::new(width as i32, height as i32);
         let titles = text.titles(&self.card_rects(board, width, height, fit), width, height);
         let mut layers = vec![CompositeLayer::commands_only(&rects)];
@@ -428,8 +458,20 @@ impl BoardScene {
     }
 }
 
+impl BoardCard {
+    /// The title as painted and named: with "+N" when a fold hides others
+    /// behind this card.
+    pub fn labelled(&self) -> String {
+        if self.folded == 0 {
+            self.title.clone()
+        } else {
+            format!("{} +{}", self.title, self.folded)
+        }
+    }
+}
+
 /// A card's drawn size: its footprint scaled, or the unsized default.
-fn card_size(card: &BoardCard, scale: f32) -> (f32, f32) {
+pub(crate) fn card_size(card: &BoardCard, scale: f32) -> (f32, f32) {
     match card.footprint {
         BoardFootprint::Rect { width, height } => (width * scale, height * scale),
         BoardFootprint::Other { .. } => UNSIZED_CARD,
@@ -437,7 +479,7 @@ fn card_size(card: &BoardCard, scale: f32) -> (f32, f32) {
 }
 
 /// One filled rectangle, `[x0, y0, x1, y1]` in viewport px, and its colour.
-struct Fill([f32; 4], [f32; 4]);
+pub(crate) struct Fill([f32; 4], [f32; 4]);
 
 /// The faces a board sets its card titles in, and the retained shaping state.
 /// A browser lends no system faces, so a host registers the ones it ships.
@@ -600,6 +642,7 @@ mod tests {
             },
             pinned: false,
             lead: false,
+            folded: 0,
         }
     }
 
@@ -653,6 +696,7 @@ mod tests {
     #[test]
     fn cards_are_drawn_where_the_board_holds_them_not_at_their_slots() {
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(-140.0, -78.0, 560.0, 156.0),
             backdrops: Vec::new(),
             cards: vec![card("0", 0.0, 0.0), card("1", 140.0, 0.0)],
@@ -688,6 +732,7 @@ mod tests {
         lead.lead = true;
         lead.pinned = true;
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(-140.0, -78.0, 280.0, 156.0),
             backdrops: Vec::new(),
             cards: vec![lead, card("1", 0.0, 400.0)],
@@ -707,6 +752,7 @@ mod tests {
     #[test]
     fn backdrops_take_their_kind_paint_and_collidable_ones_an_edge() {
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(0.0, 0.0, 400.0, 200.0),
             backdrops: vec![
                 BoardBackdrop {
@@ -738,6 +784,7 @@ mod tests {
     fn overlap_counts_shared_area_not_touching_edges() {
         let board = PhysicsBoard::new();
         let touching = BoardScene {
+            relations: Vec::new(),
             cards: vec![
                 card("a", 0.0, 0.0),
                 card("b", 280.0, 0.0),
@@ -747,6 +794,7 @@ mod tests {
         };
         assert_eq!(touching.overlaps(&board), 0);
         let overlapping = BoardScene {
+            relations: Vec::new(),
             cards: vec![card("a", 0.0, 0.0), card("b", 279.0, 0.0)],
             ..BoardScene::default()
         };
@@ -755,6 +803,7 @@ mod tests {
         let mut point = card("p", 0.0, 0.0);
         point.footprint = BoardFootprint::from(&sceno::Footprint::Point);
         let with_point = BoardScene {
+            relations: Vec::new(),
             cards: vec![card("a", 0.0, 0.0), point],
             ..BoardScene::default()
         };
@@ -792,6 +841,7 @@ mod tests {
         let mut second = card("1", 140.0, 0.0);
         second.footprint = first.footprint.clone();
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(0.0, 0.0, 140.0, 0.0),
             backdrops: Vec::new(),
             cards: vec![first, second],
@@ -823,6 +873,7 @@ mod tests {
     #[test]
     fn titled_paint_sets_each_title_and_untitled_paint_sets_none() {
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(-140.0, -78.0, 560.0, 156.0),
             backdrops: Vec::new(),
             cards: vec![card("0", 0.0, 0.0), card("1", 280.0, 0.0)],
@@ -892,6 +943,7 @@ mod tests {
     #[test]
     fn titles_are_centred_in_their_cards() {
         let scene_desc = BoardScene {
+            relations: Vec::new(),
             bounds: BoardRect::new(-140.0, -78.0, 560.0, 156.0),
             backdrops: Vec::new(),
             cards: vec![card("0", 0.0, 0.0), card("1", 280.0, 0.0)],

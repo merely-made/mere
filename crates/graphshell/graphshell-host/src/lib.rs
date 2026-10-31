@@ -56,6 +56,9 @@ pub mod endpoint_catalog;
 pub mod lifecycle;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod line;
+/// A mounted remote scene as Pictograph's board (stack lift plan, P10).
+#[cfg(feature = "board")]
+pub mod board;
 pub mod live_endpoint;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod network_carrier;
