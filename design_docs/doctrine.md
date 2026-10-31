@@ -56,17 +56,23 @@ Seams between components stay clean even at some cost in speed: a missing
 boundary bites later, and hardware improves. A renderer sits behind a scene
 contract and can be swapped. Formats follow open standards; a product makes
 its own only where none holds the thing. Applications meet at the contract
-too: one that owns a graph and hosts others' surfaces is a branch, and any
-branch can host; anything else is a leaf that produces surfaces, with or
-without a standalone frame, and Mere consumes it.
+too. A producer offers surfaces or datagraphs, widgets and utilities
+included, and the endpoints a host dials; a host owns a graph and loads
+producers at runtime, Graphshell its reference; a runner runs or carries
+both and owns no graph. An installable app is a frame, a host with its
+producers fixed at build. The graph core a producer needs is contract tier,
+published like the scene crates, so Mere consumes producers and never the
+reverse.
 
-Links: draws on isocosm:27, isocosm:78, distillery-extraction D8, distillery-extraction D9 · summary Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; apps owning a graph and hosting are branches, the rest producer leaves.
+Links: draws on isocosm:27, isocosm:78, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15 · summary Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; producers, hosts and runners meet at the contract; apps are frames.
 
 *Moved 2026-10-22 from isocosm's doctrine, the stack-wide half of its Stack 3;
 the wing's placements stay there ("Split as drafted").*
 
-*Refined 2026-10-31 (distillery-extraction D8, D9): "Both must hold"; "Any
-branch hosts".*
+*Refined 2026-10-31 (distillery-extraction D8, D9, D15): "Both must hold";
+"Any branch hosts"; then the four repairs. Owed: the graph core is not yet
+published, so graph-owning producers (Cleromancy, Knot, Woodshed) still
+compile in lockstep with Mere.*
 
 ### Stack 4. Platforms and the web
 

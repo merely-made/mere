@@ -1,13 +1,10 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 
-//! Athanor's proposal-producing furnace and persistent evidence-brief workshop.
-//! The default furnace API is retained; a workshop host can select only
-//! `workshop`, adding `workshop-worker` for native Armillary execution.
+//! Athanor's persistent evidence-brief workshop: the authority half of
+//! Alembic's workshop. `workshop-worker` adds native Armillary execution. The
+//! furnace's graph passes moved to `pandect::furnace` 2026-10-31
+//! (distillery-extraction D12).
 
-#[cfg(feature = "furnace")]
-mod furnace;
-#[cfg(feature = "furnace")]
-pub use furnace::*;
 #[cfg(feature = "workshop")]
 pub mod workshop;

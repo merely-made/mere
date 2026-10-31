@@ -22,7 +22,6 @@ mesh = { workspace = true, features = ["admitted-ingress"] }
 incipit.workspace = true
 muniment.workspace = true
 personae.workspace = true
-pandect.workspace = true
 cambium.workspace = true
 chirograph.workspace = true
 graphshell-endpoint.workspace = true

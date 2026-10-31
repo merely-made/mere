@@ -142,7 +142,7 @@ pub fn save_application_settings(
     let target = application_settings_path(data_root);
     let json = serde_json::to_string_pretty(settings)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Load application settings, returning `None` when the application has not

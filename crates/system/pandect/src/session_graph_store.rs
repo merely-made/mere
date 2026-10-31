@@ -76,7 +76,7 @@ pub fn save_profiled(
     };
     let bytes = serde_json::to_vec_pretty(&input)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    crate::atomic_file::write_bytes_with_backup(path, &bytes)
+    muniment::atomic_file::write_bytes_with_backup(path, &bytes)
 }
 
 /// Load a graph from `path`, or `Ok(None)` when the file does not exist (a fresh

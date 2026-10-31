@@ -1,8 +1,9 @@
 # Distillery extraction plan
 
 **Date:** 2026-10-31
-**Status (2026-10-31):** plan. Rulings D1 to D12 recorded. Nothing has moved yet. Gate G1
-(publishing cambium 0.6.0 and sprigging 0.3.0) waits for Mark.
+**Status (2026-10-31):** in progress. Rulings D1 to D15 recorded. P1's graph halves are in
+`pandect`; the atomic write moves to `muniment` (D13); G1 is approved (D14) with the
+publish chain reported before the real publish.
 **Scope:** Distillery, its job and lease layer `mere-mesh`, and the workshop halves of
 Alembic and Athanor leave Mere for the ESP repository, which is renamed `distillery`.
 Distillery becomes a producer: it keeps its own surfaces and speaks only the published
@@ -94,12 +95,37 @@ waits for a planned second host, not an arrived one.
 
   Links: draws on house-style D2 · summary Graph halves become pandect modules; mere-alembic and mere-athanor leave Mere whole.
 
+- **D13. Atomic file replacement (Mark, 2026-10-31):** "Move to muniment", over copying
+  it into Distillery. `pandect::atomic_file` goes down into `muniment` (Eidetic), which
+  pandect and Distillery both depend on.
+
+  Links: draws on house-style D2 · summary Atomic file replacement lives in muniment; pandect and Distillery share it.
+
+- **D14. Gate G1 (Mark, 2026-10-31):** "Publish both", over gating Distillery's surface.
+  cambium 0.6.0 and sprigging 0.3.0 go to crates.io after a dry run, with the dependency
+  chain reported first.
+
+  Links: summary Publish cambium 0.6.0 and sprigging 0.3.0 so Distillery's surface builds standalone.
+
+- **D15. Repairs to D8 (Mark, 2026-10-31):** asked for "a lil consistency critique first",
+  then "Quite odd contradiction!", then all four repairs: "Frame ≠ host", "Endpoints are
+  producer-side", "Graph core is contract tier", "Runners are a third kind". Before them:
+  Cleromancy, Woodshed, Signalman and Knot "could own graphs but not be hosts", Tabard
+  "doesn't own a graph"; "They all have widget/utility potential, too. But that doesn't
+  make them hosts outright"; "i still would like to be able to build and install a
+  'woodshed' app". Hosting is loading producers at runtime; an installable app is a frame
+  with its producers fixed at build; an endpoint is what a producer exposes; Djinn, Murm,
+  Luggage and Armillary are runners. Refines stack.3.
+
+  Links: amends stack.3, distillery-extraction D8 · summary Producers, hosts and runners; frames are not hosts; endpoints are producer-side; the graph core is contract tier.
+
 ## Open forks
 
 - **F1 (D11).** If Djinn holds no meres, which owner takes the resident's store lifetimes?
-- **F2, gate G1.** Distillery's installed surface draws with Cambium (`GenetAppRunner`,
-  `RunnerSurfaceSession`). crates.io has cambium 0.5.0 and sprigging 0.2.2; Mere has 0.6.0
-  and 0.3.0. Publishing them is outside the five contract crates D7 named.
+- **F2.** Closed by D14.
+- **F3 (D15).** Publishing the graph core (kernel and the graph persistence in pandect) as
+  contract tier is its own plan. Until then Cleromancy, Knot and Woodshed compile in
+  lockstep with Mere; this pass moves Cleromancy off `mere-alembic` and no further.
 
 ## Phases
 
@@ -153,3 +179,8 @@ pass; changes are committed in each repository.
 ## Progress
 
 - 2026-10-31: assessment and rulings D1 to D12; no code moved.
+- 2026-10-31: P1 in part. `alembic::memory_levels` is `pandect::memory_levels`;
+  `athanor::furnace` is `pandect::furnace` (feature `furnace`); Alembic and Athanor are
+  workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a
+  `--config` patch). pandect's 21 moved and dependent tests and Alembic/Athanor's 23
+  pass.

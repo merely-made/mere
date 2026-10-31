@@ -57,7 +57,7 @@ pub fn save_script_bindings(session_dir: &Path, bindings: &[ScriptBinding]) -> i
     let target = script_bindings_path(session_dir);
     let json = serde_json::to_string_pretty(bindings)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Read `<session_dir>/script-bindings.json`. `Ok(None)` when the file doesn't

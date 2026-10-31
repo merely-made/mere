@@ -86,7 +86,7 @@ pub fn save_node_facets(session_dir: &Path, facets: &NodeFacetStore) -> io::Resu
     let target = node_facets_path(session_dir);
     let json = serde_json::to_string_pretty(facets)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-    crate::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 /// Copy every facet of every donor node named in `remap` onto its fork

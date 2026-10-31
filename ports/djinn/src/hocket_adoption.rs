@@ -25,7 +25,7 @@ use std::path::{Path, PathBuf};
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, SealedIdentityProvider, load_existing_auto_unlock_root};
-use pandect::write_bytes_with_backup;
+use muniment::atomic_file::write_bytes_with_backup;
 use personae::{IdentityError, ProfileId, SealedRecordStorage};
 use serde::{Deserialize, Serialize};
 

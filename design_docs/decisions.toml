@@ -75,6 +75,23 @@ source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_ex
 summary = "Graph halves become pandect modules; mere-alembic and mere-athanor leave Mere whole."
 draws_on = ["house-style D2"]
 
+[decisions."distillery-extraction D13"]
+title = ". Atomic file replacement (Mark, 2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Atomic file replacement lives in muniment; pandect and Distillery share it."
+draws_on = ["house-style D2"]
+
+[decisions."distillery-extraction D14"]
+title = ". Gate G1 (Mark, 2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Publish cambium 0.6.0 and sprigging 0.3.0 so Distillery's surface builds standalone."
+
+[decisions."distillery-extraction D15"]
+title = ". Repairs to D8 (Mark, 2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
+summary = "Producers, hosts and runners; frames are not hosts; endpoints are producer-side; the graph core is contract tier."
+amends = ["distillery-extraction D8", "stack.3"]
+
 [decisions."house-style D1"]
 title = ". Abstraction timing (Mark, 2026-10-30)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
@@ -197,8 +214,8 @@ draws_on = ["isocosm:962"]
 title = "Seams and formats"
 source = "design_docs/doctrine.md"
 area = "The stack"
-summary = "Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; apps owning a graph and hosting are branches, the rest producer leaves."
-draws_on = ["distillery-extraction D8", "distillery-extraction D9", "isocosm:27", "isocosm:78"]
+summary = "Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; producers, hosts and runners meet at the contract; apps are frames."
+draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "isocosm:27", "isocosm:78"]
 
 [statements."stack.4"]
 title = "Platforms and the web"

@@ -46,7 +46,7 @@ where
 
 /// Write `bytes` at `path` atomically, creating its directory.
 pub fn save_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
-    crate::atomic_file::write_bytes_with_backup(path, bytes)
+    muniment::atomic_file::write_bytes_with_backup(path, bytes)
 }
 
 #[cfg(test)]

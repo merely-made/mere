@@ -13,6 +13,10 @@ keywords = ["session", "state", "manifest", "wallet", "mere"]
 categories = ["data-structures"]
 description = "Pandect: session manifests, graph and view sidecars, worker declarations, graph-reference adapters, settings and the persona wallet carry lane."
 
+[features]
+# The furnace's graph passes (forgetting, consolidation), moved from Athanor.
+furnace = []
+
 [dependencies]
 sceno.workspace = true
 async-trait = "0.1"
@@ -26,7 +30,6 @@ dirs = "5"
 muniment.workspace = true
 incipit.workspace = true
 kernel.workspace = true
-alembic = { workspace = true, features = ["recall"] }
 # The native fold record (mer3ly site plan, Rulings 153 and 163).
 curation.workspace = true
 identity.workspace = true

@@ -111,7 +111,7 @@ impl InstalledSettings {
         let mut json = serde_json::to_string_pretty(self)
             .map_err(|error| InstalledSettingsError::file(&path, error))?;
         json.push('\n');
-        pandect::write_bytes_with_backup(&path, json.as_bytes())
+        muniment::atomic_file::write_bytes_with_backup(&path, json.as_bytes())
             .map_err(|error| InstalledSettingsError::file(&path, error))
     }
 }

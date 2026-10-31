@@ -60,7 +60,7 @@ pub fn save_notochord_policy(
     let target = notochord_policy_path(data_root, persona);
     let json = serde_json::to_string_pretty(policies)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
-    crate::write_bytes_with_backup(&target, json.as_bytes())
+    muniment::atomic_file::write_bytes_with_backup(&target, json.as_bytes())
 }
 
 #[cfg(test)]

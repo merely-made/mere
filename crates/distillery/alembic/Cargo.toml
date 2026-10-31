@@ -15,19 +15,8 @@ name = "alembic"
 path = "src/lib.rs"
 
 [features]
-# The memory surfaces without the workshop, for a host that wants recall only.
-# An embeddable half a host composes, and an authority half that stays with
-# the resident.
-recall = ["dep:kernel", "dep:serde"]
 workshop = ["dep:serde"]
 
 [dependencies]
-kernel = { workspace = true, optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 
-[dev-dependencies]
-chartulary.workspace = true
-euclid = "0.22"
-kernel = { workspace = true, features = ["fixtures"] }
-serde_json = "1"
-uuid = { version = "1", features = ["v4"] }

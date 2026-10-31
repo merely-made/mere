@@ -4,60 +4,23 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! **Athanor**, the distillation furnace of Distillery, the Mere platform's
-//! works.
+//! The furnace's graph passes: forgetting and consolidation over a mere.
 //!
-//! An athanor is the furnace that holds a constant low heat for as long as
-//! the work takes. This crate is the authority half of the `alembic`
-//! workshop: what a furnace pass is, what it may propose — distillation,
-//! cleanup, facet proposals — and the grants, runs, pending petitions,
-//! refusals, costs, pause, revoke, retry, and dissolve over the bounded actors
-//! the workshop admits, of which the furnace was always the first.
+//! Moved from Athanor 2026-10-31 (distillery-extraction D12): these passes read
+//! and write a mere's graph, codicils and content store, so they stay with the
+//! graph when Distillery leaves Mere. Athanor keeps the workshop.
 //!
-//! Two rules it keeps:
+//! The forgetting pass proposes which short-term cached content to evict and
+//! applies an accepted proposal by dropping that content. It honours eidetic
+//! **R0**: the `propose_*` half is pure (reads a snapshot, mutates nothing), and
+//! the `apply_*` half drops only short-term **cached content** (`content_store`
+//! blobs), never graph truth and never codicils.
 //!
-//! - **It proposes; it never owns truth.** A furnace pass emits proposals,
-//!   and the authority that owns the affected store decides. Athanor is not
-//!   a graph-truth authority and does not become one.
-//! - **It is scheduled, not resident.** Djinn contains the scheduler and runs
-//!   Athanor as one resident service, composing this crate the way it
-//!   composes Distillery's works — putting owners together and inventing
-//!   nothing. Lifetime is Djinn's; the domain is Distillery's.
-//!
-//! Ruled 2026-09-02: the authority lives with the domain, by the precedent
-//! Djinn set for the works. Beside `alembic` at `ports/distillery/athanor`.
-//! The package is `mere-athanor`; the library keeps the name.
-//!
-//! The furnace's passes are below. Scheduling them as one job kind on the
-//! works' board, carried into the board's Chronicle by the projection walk
-//! plan, is still to come.
-//!
-//! ## Passes
-//!
-//! The forgetting pass: propose which short-term cached content to evict, and
-//! apply an accepted proposal by dropping that content.
-//!
-//! Athanor is the distillation daemon (Alembic plan slice D) — eventually an
-//! [armillary](https://crates.io/crates/armillary) actor running steady-heat in the
-//! background. This crate holds its pure pass *logic*, separate from the actor that
-//! will schedule it, so it tests without a runtime. It honours eidetic **R0**: the
-//! `propose_*` half is pure (reads a snapshot, mutates nothing), and the `apply_*`
-//! half drops only short-term **cached content** (`content_store` blobs), never graph
-//! truth (nodes / edges stay) and never codicils (immutable). Forgetting is the one
-//! place blobs are dropped, and it drops only auto-captured short-term memory.
-//!
-//! Facet extraction is the pass still to come (graph codicils are already
-//! deduplicated by content-addressing, so consolidation stays light).
-//!
-//! Consolidation (the second pass) relates graph codicils that are
-//! successive versions of the same material — significant URL overlap — but carry
-//! no lineage link yet. Composing is the *only* way eidetic offers to link two
-//! already-saved manifests (they are immutable; there is no post-hoc amendment), so
-//! `apply_consolidation` reuses [`graph_codicil::compose_graph_codicils`]. That is
-//! content-addressed, so re-linking an already-consolidated pair on a later pass is
-//! a safe no-op (same bytes, same id) rather than a duplicate.
-
-#![forbid(unsafe_code)]
+//! Consolidation relates graph codicils that are successive versions of the same
+//! material (significant URL overlap) but carry no lineage link yet. Composing is
+//! the only way eidetic links two saved manifests, so `apply_consolidation` reuses
+//! [`graph_codicil::compose_graph_codicils`], which is content-addressed: re-linking
+//! an already-consolidated pair is a no-op.
 
 use std::collections::{HashMap, HashSet};
 
@@ -66,10 +29,10 @@ use kernel::graph::Graph;
 use kernel::persistence::GraphSnapshot;
 use kernel::types::ImageRole;
 
-use alembic::memory_levels::{EvictionPolicy, evictable_short_term};
+use crate::memory_levels::{EvictionPolicy, evictable_short_term};
 use eidetic::content_store;
-use pandect::graph_codicil::{self, RedactionPolicy};
-use pandect::image_store;
+use crate::graph_codicil::{self, RedactionPolicy};
+use crate::image_store;
 
 /// How many of the most-recently-created codicils a consolidation pass considers.
 /// Bounds the pairwise scan (thaw is per-candidate, comparison is per-pair) as the
@@ -110,7 +73,7 @@ impl ForgetProposal {
 /// [`KeepSessions`](EvictionPolicy::KeepSessions).
 ///
 /// Pure: it reads `snapshot` and mutates nothing (R0). The eviction decision is
-/// [`evictable_short_term`](alembic::memory_levels::evictable_short_term) (short-term
+/// [`evictable_short_term`](crate::memory_levels::evictable_short_term) (short-term
 /// only, dated-and-stale only, promoted exempt); this maps the evictable node ids to
 /// their urls, since cached content is url-keyed.
 pub fn propose_forgetting(
