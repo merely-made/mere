@@ -166,6 +166,29 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.1 · summary OS peer facts move into one small Armillary crate shared by Djinn's door and custody-wire; custody policy stays in custody-wire.
 
+- **D8, Djinn computes effective authority; services recheck.** Three
+  checks exist and each service ANDs them by hand: subject admission
+  (Notochord's `RetainedAuthority`), the application grant (Djinn's
+  `AppAuthority`) and domain authority (Gemot, Moot, Servitor). No type holds
+  the first two together, and Djinn's proxied projections hand providers a
+  `ViewerContext` documented as "not credentials". Mark chose "Djinn
+  computes, services recheck (Recommended)": at admission Djinn builds one
+  value holding the application's `AppAuthority` and the subject's
+  `RetainedAuthority`, and passes it on in place of `ViewerContext`; a service
+  re-asks lapse and coverage on each call and keeps its own domain checks. A
+  deputy (Djinn's proxy, G1's gateway) passes the narrower party's authority,
+  never its own. The shape is recorded now and built with N1 or G1.
+
+  Links: area Stack · draws on stack.2 · summary Djinn builds one effective-authority value (app grant and subject's retained authority) at admission; services recheck lapse and coverage per call and keep domain checks; a deputy never lends its own authority.
+
+- **D9, an application's grant names its personas.** The persona in use is
+  vault-wide today, and `AppGrant` has no persona term. Mark chose "Yes, in
+  AppGrant (Recommended)": the owner's grant lists the personas an
+  application may act as, empty by default, so linkage across applications
+  stays opt-in and the gateway has a persona term to intersect.
+
+  Links: area Stack · draws on stack.2 · summary An application's grant lists the personas it may act as, empty by default.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -263,10 +286,9 @@ error types settle.
 
 ## Open questions
 
-- **Which authority computes the effective grant.** Notochord admission,
-  Djinn's route and provider policy, insigne and Servitor delegations, Gemot
-  membership and, at the edge, OCapN references all bear on authority. The
-  intersection rule needs a named owner before G1.
+- **Where D8's value lives.** Djinn (Armillary) holds `AppAuthority` and
+  Notochord (Dramatis) holds `RetainedAuthority`; the type needs a home both
+  directions of dependency allow.
 - **How native code binds WIT.** C0 decides.
 - **The WIT package:** extend `mere:script` or open a sibling package. Mark's
   2026-10-28 preference applies: "redefine existing names instead of minting
@@ -276,7 +298,8 @@ error types settle.
 - **Linux identity beyond launch.** Flatpak application ids and desktop
   portals are the platform's route; not surveyed.
 - **Whether introduction may cross personas.** The host plan keeps
-  cross-application persona linkage opt-in.
+  cross-application persona linkage opt-in; D9 gives each grant its
+  personas, and an introduction's rule across them is open.
 - **Which routes are direct and which proxied by default.**
 - **Custom clipboard formats as a capability.** Mark, 2026-10-30, choosing
   upstream arboard over the deleted fork: custom OS clipboard formats
@@ -368,6 +391,16 @@ error types settle.
   "first consensus draft" milestone shows one issue closed; "a finish line"
   shows ten open. Murm's plan already records this and keeps its pinned
   `ocapn-suite-31f0b806` Syrup profile (D5).
+- 2026-10-30, effective authority (D8): the remote Gemot path checks
+  subject admission and domain authority per method, with no deputy
+  (`MootSessionAuthority::from_admitted`, then lapse, coverage, Moot
+  membership and `authorize_current_capability`,
+  `ports/moot/src/ocapn_coop.rs:65-360`). Graphshell's viewer sessions keep
+  `RetainedAuthority` in `SessionAuthority` and name the application in
+  `AdmittedEndpointContext` as attribution only
+  (`crates/graphshell/graphshell-host/src/lifecycle.rs:105-150`). Djinn's
+  `AppAuthority` is declaration and owner grant with no persona term
+  (Armillary `d0c79f5`, `crates/djinn/src/door/declaration.rs:244-340`).
 
 ## Progress
 
@@ -400,3 +433,5 @@ error types settle.
   record each connection's peer (`serve_with_peer`, `admit_from`,
   `AdmittedApp::peer`). custody-wire reads peers through it and keeps its
   custodian policy. Mere adopts the recorded peers when it repins Djinn.
+- 2026-10-30: effective authority mapped; D8 (Djinn computes, services
+  recheck) and D9 (grants name personas) recorded, to be built with N1 or G1.

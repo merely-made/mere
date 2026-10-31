@@ -136,6 +136,20 @@ area = "Stack"
 summary = "OS peer facts move into one small Armillary crate shared by Djinn's door and custody-wire; custody policy stays in custody-wire."
 draws_on = ["stack.1"]
 
+[decisions."capability-door D8"]
+title = "Djinn computes effective authority; services recheck"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Djinn builds one effective-authority value (app grant and subject's retained authority) at admission; services recheck lapse and coverage per call and keep domain checks; a deputy never lends its own authority."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D9"]
+title = "an application's grant names its personas"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "An application's grant lists the personas it may act as, empty by default."
+draws_on = ["stack.2"]
+
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"
