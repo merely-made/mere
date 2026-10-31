@@ -619,3 +619,12 @@ error types settle.
   Djinn and calls `djinn::door::launch::claim()` first in `main`.
 - 2026-10-31: D10 to D12 ruled: one upstream ipc-channel, Windows identity
   through launch, and C0 lifted to probe two binding routes. Nothing built.
+- 2026-10-31: D10 landed. Genet `a3ea104bb9a` drops the vendored fork for
+  crates.io ipc-channel 0.23.1 with no flag; `30e4c190ca3` before it lets
+  `servo-media-derive` enable syn's `proc-macro` feature itself, which it had
+  only through other crates' features. Turnstone `317f0bf7` removes its patch
+  row and locks one ipc-channel 0.23.1 and one `windows` 0.62.2. Because
+  0.23.1 caps uuid below 1.27.0 for Servo's Rust 1.88, uuid moves from 1.27.0
+  to 1.26.1, the pair Servo's own main locks; 1.27.0 changed no public API.
+  Checked on this Mac: Genet's media crates and Turnstone with `audio`. Not
+  run: Turnstone's `servo` feature and a Windows build on o-pc.
