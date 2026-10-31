@@ -110,11 +110,10 @@ Tests, scripts and shaders count; generated files and imported upstream
 sources are excluded by declared path, never by size. An oversize file splits
 along responsibilities the code already has, not into arbitrary fragments,
 and the split widens no visibility. Docs are outside the ceiling and are
-deduplicated instead. One shared check enforces it at commit and in CI; files
-over it today are listed as exceptions and leave the list through named
+deduplicated instead. One shared check enforces it at commit and over the
+whole tree in each repository's local gate; files over it today are listed as exceptions and leave the list through named
 cleanup slices.
 
-Links: draws on isocosm:592, isocosm:method.3, house-style D10 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in CI.
+Links: draws on isocosm:592, isocosm:method.3, house-style D10, house-style D11 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate.
 
-*Added 2026-10-30, outcome new (house-style D10): "add the 600 line ceiling
-to the doctrine".*
+*Refined 2026-10-30 (house-style D11): "Local only".*

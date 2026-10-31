@@ -330,7 +330,8 @@ and a later pass reviews them into the doctrine. The doctrine, `doctrine.md`,
 began on 2026-10-22 with five statements moved from isocosm's, citing
 isocosm's cases as `isocosm:<n>`. The decisions tool is eidetic's
 `responsa`, run from this repository's root (for example `cargo run
---release --manifest-path ../eidetic/Cargo.toml -p responsa -- check`):
+--release --manifest-path ../eidetic/crates/responsa/Cargo.toml -- check`; responsa is
+its own workspace since 2026-10-30):
 `regen --stage` after a change to the doctrine or to a plan's Decisions,
 `check`, and `lookup`. *The doctrine* here is `doctrine.md`; the data-oriented
 doctrine brief names a representational discipline.

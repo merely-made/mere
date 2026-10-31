@@ -5,7 +5,7 @@
 D2; stack.7 added by D10. No check adopted yet; H1 is planned in eidetic.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
-measurable parts locally and in CI. Doctrine lives in [doctrine.md](../../doctrine.md); this
+measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
 plan carries the rollout.
 
 ## Origin
@@ -87,6 +87,15 @@ abstraction" contradicted the known-futures ruling (2026-09-23).
 
   Links: draws on isocosm:592 · summary The 600-line ceiling becomes stack.7, the area's last budget slot.
 
+- **D11. Local only (Mark, 2026-10-30):** "Local only", over one prek-only workflow or CI as
+  recorded. Put to Mark on finding that CI was removed from eidetic and isocosm on 2026-10-28
+  ("Gates live in local scripts and dated receipts"), which contradicted D3, D8 and stack.7's
+  "at commit and in CI". The checks run in the prek pre-commit hook and, over the whole tree,
+  as `prek run --all-files` in each repository's local gate. Recorded with the rollout in
+  eidetic's line-ceiling plan as D6.
+
+  Links: amends stack.7, house-style D3, house-style D8 · summary The shared checks run at commit and in each repository's full local gate; no CI.
+
 ## Open forks
 
 Each comes back as a question before anything is written.
@@ -105,14 +114,15 @@ Each comes back as a question before anything is written.
 
 - **H1. Shared check command.** prek (D8) runs the line ceiling (eidetic, D9),
   `responsa check`, Clippy with the D6 set and, where configured, `cargo deny check bans`,
-  identically in the pre-commit hook and CI. The line ceiling keeps per-repository scope and
-  an exceptions file whose entries carry a reason. Done when isocosm runs it in place of
-  `.githooks` and its own script, a planted 601-line file fails locally and in CI, and the
-  original script is deleted.
+  identically in the pre-commit hook and the repository's local gate (D11). The line
+  ceiling keeps per-repository scope and an exceptions file whose entries carry a reason.
+  Done when isocosm runs it in place of `.githooks` and its own script, a planted 601-line
+  file fails at commit and in the full local run, and the original script is deleted.
 - **H2. Inventory.** Record every owned repository's existing oversize files as listed
   exceptions. Done when each owned repository passes with an explicit inventory.
-- **H3. Adoption.** Pre-commit hook and CI step in every owned repository. Done when every
-  owned repository runs both checks in CI and a deliberate violation fails there.
+- **H3. Adoption.** Pre-commit hook and local-gate step in every owned repository. Done when
+  every owned repository runs the checks at commit and in its local gate, and a deliberate
+  violation fails both.
 - **H4. Doctrine pass.** Put forks 1 to 3 to Mark and fold the answers per D4. Done when the
   doctrine is within budget and `responsa check` is clean.
 
