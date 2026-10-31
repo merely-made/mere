@@ -1,12 +1,14 @@
 # Capability door: app identity, manifests, introduction and WIT contracts
 
-**Status:** 2026-10-30, revised the same day (D4): plan. Most of S1 landed
+**Status:** 2026-10-31: plan, revised on 2026-10-30 (D4). Most of S1 landed
 outside this plan in Mere `c3567c5ab` (application projection offers), and the
-door library moved to Armillary's `djinn` crate (`721e17d`). Knot's M1
-case has landed; I1 comes next, before M1's remaining entries, and C0 waits
-for a component provider someone wants. The first findings
-were read against Mere `56fbdc2e4` and Murm `96e8843e814`, the revision's
-against Mere `94c1bd1a3` and Armillary `a333f51`; no test was run for them.
+door library moved to Armillary's `djinn` crate (`721e17d`). I1 is built
+(Armillary `b6578ee`) and M1's Knot and Turnstone cases have landed; M1's
+remaining entries follow, and C0 waits for a component provider someone
+wants. The first findings were read against Mere `56fbdc2e4` and Murm
+`96e8843e814`, the revision's against Mere `94c1bd1a3` and Armillary
+`a333f51`, and the upstream findings of 2026-10-31 on GitHub and crates.io
+that day; no test was run for them.
 
 **For:** letting applications and components share capabilities with each
 other, on one device and beyond it, without each one carrying the stack.
@@ -257,13 +259,16 @@ serving routes other than projections.
 ### N1. Introduction
 Djinn hands a consumer a channel to a provider's served route after consent:
 a direct pair where the manifest marks the route direct, a proxied channel
-otherwise.
+otherwise. A passed channel's peer facts say nothing trustworthy about who
+holds it, so the consumer's authority travels in D8's value, never in the
+socket's identity.
 - Done when: on Linux, macOS and Windows a consumer gets a channel only after
   consent; revoking a proxied grant refuses new calls and settles in-flight
   ones by a stated rule; a direct grant ends when its provider is told; the
   carrier is ipc-channel's OS backend or a small layer of our own, with the
   reasons recorded.
-- Needs: S1 and C0.
+- Needs: S1. C0 only where the consumer or provider is a component; native
+  channels need no WIT (D4).
 
 ### K1. The capability contracts in WIT
 Persona, settings, custody facets and projection-session control, each
@@ -417,6 +422,48 @@ error types settle.
   they refuse under a pin, so this is cleanup, not a hole. `peer-facts` is
   not in the naming ledger, which the tier rule allows while it is
   unpublished.
+- 2026-10-31, upstream, for N1's carrier: std's ancillary data is still
+  unstable ([rust#76915](https://github.com/rust-lang/rust/issues/76915))
+  and leaves macOS out; rustix 1.1.6 (2026-10-27) sends `ScmRights` through
+  `sendmsg` and compiles no C, as does nix 0.31. `CommandExt::fd`, the
+  launch-handle API, is accepted but unstable
+  ([rust#144989](https://github.com/rust-lang/rust/issues/144989)).
+  ipc-channel 0.23 passes channels on all three systems (SCM_RIGHTS, Mach
+  ports, named pipes with `DuplicateHandle`) and now takes `windows` 0.62,
+  the line Genet's fork collided with; wgpu-hal's current pin is unchecked.
+  [GHSA-fj85-w6rj-rxrc](https://github.com/servo/ipc-channel/security/advisories/GHSA-fj85-w6rj-rxrc)
+  (high, 2026-10-24): on macOS a sender could make a receiver read and free
+  arbitrary memory; fixed in 0.23.1, so N1 on ipc-channel takes 0.23.1 or
+  later. Genet's vendored 0.22 predates the fix, which matters only if its OS
+  backend is enabled.
+- 2026-10-31, upstream, for D2: Linux's `SO_PEERPIDFD` (kernel 6.5) gives a
+  pidfd for the connecting process; nix exposes it and rustix does not yet
+  ([rustix#1474](https://github.com/bytecodealliance/rustix/issues/1474)).
+  xdg-desktop-portal's host app registry
+  ([#1521](https://github.com/flatpak/xdg-desktop-portal/pull/1521), in
+  1.19.4) records an id the application declares itself, a label rather
+  than identity, and nothing upstream verifies unsandboxed applications;
+  the launch handle stays Linux's identity. On macOS, `LOCAL_PEERTOKEN` with
+  the code signature is supported from macOS 13, while Apple steers toward
+  XPC peer code-signing requirements
+  (`xpc_connection_set_peer_code_signing_requirement`, macOS 12;
+  `XPCPeerRequirement`, macOS 26), and Apple's developer support notes that a
+  socket's peer identity is not trustworthy once its descriptor is passed on.
+  Windows was not surveyed.
+- 2026-10-31, upstream, for C0: Wasmtime's `component::bindgen!` output
+  needs a `Store`, with no documented store-free use, and wit-bindgen targets
+  wasm guests. `wit-bindgen-wrpc` 0.12.0 generates native clients and
+  servers over a pluggable transport (`Invoke`, `Serve`), but encodes
+  resources as opaque bytes, lacks `map`
+  ([wrpc#1151](https://github.com/bytecodealliance/wrpc/issues/1151)), and
+  changed its transport API on 2026-10-30. No upstream tool binds WIT
+  natively with handles carried as OS channels. jco 1.40.0 (2026-10-28) and
+  its WASI 0.3 shim claim browser support on the 0.2 model.
+- 2026-10-31, upstream, for G1: OCapN has had no commits since 2026-10-13;
+  the encoding draft
+  ([#284](https://github.com/ocapn/ocapn/pull/284)) is open and the "a
+  finish line" milestone has ten issues open and none closed. D5's deferral
+  stands.
 
 ## Progress
 
