@@ -523,6 +523,10 @@ error types settle.
   its declaration within Mere's default grant, in development mode until
   its identity is pinned.
 - 2026-10-31: the review's three findings closed. Armillary `7eebeeb` adds
-  `launch::claim`, which Knot's and Turnstone's binaries call first in
-  `main`; the Windows image basis is described as read at connect; `admit`
-  and `serve_on` are removed.
+  `launch::claim`, which Knot's binaries call first in `main` (Knot
+  `5e47782`); the Windows image basis is described as read at connect;
+  `admit` and `serve_on` are removed. Mere `81c83c5`, Cleromancy `4a09fc9`.
+  Turnstone stays on Djinn `73968e2` with Mere `68608e3`: every Mere commit
+  carrying `7eebeeb` follows `081c650ae`, which removed athanor's `furnace`
+  feature Turnstone enables. When Turnstone receives that change, it repins
+  Djinn and calls `djinn::door::launch::claim()` first in `main`.
