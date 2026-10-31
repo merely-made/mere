@@ -219,6 +219,8 @@ pub mod backdrop_surface;
 pub mod board_scene;
 /// A board's edges between cards.
 pub mod board_relations;
+/// The board's camera and the links its law reads (stack-lift D3).
+mod board_camera;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;

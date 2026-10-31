@@ -363,6 +363,11 @@ title = "the board draws edges and honours folds"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
 summary = "Pictograph's board draws a scene's relations as edges and honours its folds, the stand-in carrying the hidden count."
 
+[decisions."stack-lift D3"]
+title = "a relation-reading force on the board"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
+summary = "The board's law reads the scene's relations as edges so linked cards cluster, and a camera zooms over fixed-size cards instead of shrinking them."
+
 [statements."stack.1"]
 title = "Build on the stack we have"
 source = "design_docs/doctrine.md"

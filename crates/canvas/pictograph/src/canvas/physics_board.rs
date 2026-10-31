@@ -73,6 +73,8 @@ pub struct PhysicsBoard {
     keys: HashMap<String, NodeKey>,
     next_key: usize,
     items: Vec<BoardItem>,
+    /// Pairs of item ids the law reads as edges (stack-lift D3).
+    links: Vec<(String, String)>,
     /// The stage the board runs, as the spec it was given (F150, F162).
     stage: DynamicsSpec,
     /// That stage read: the flat choice, a composition in the law slot, and
@@ -116,6 +118,7 @@ impl PhysicsBoard {
             keys: HashMap::new(),
             next_key: 0,
             items: Vec::new(),
+            links: Vec::new(),
             stage: PhysicsChoice::default().into_spec(),
             choice: PhysicsChoice::default(),
             composition: None,
@@ -387,7 +390,7 @@ impl PhysicsBoard {
                 })
                 .collect(),
         );
-        self.physics.sync_edges(Vec::new());
+        self.physics.sync_edges(self.edges());
         // An encoded axis is pinned to its value (F28), so a card whose value
         // moved goes there on that axis; its free axes keep what physics gave
         // them, as every axis of an unencoded card does.
@@ -423,6 +426,27 @@ impl PhysicsBoard {
         // So a host that syncs and draws in one frame sees the fresh item.
         self.physics.refresh(&mut self.view);
         fresh
+    }
+
+    /// The pairs of items the law reads as edges, so linked cards cluster
+    /// (stack-lift D3). A pair naming an item the board does not hold is
+    /// kept and reads once it arrives. Changed links earn a settle burst.
+    pub fn set_links(&mut self, links: Vec<(String, String)>) {
+        if links == self.links {
+            return;
+        }
+        self.links = links;
+        self.physics.sync_edges(self.edges());
+        self.rebuild_forces();
+        self.settle_for_choice();
+    }
+
+    /// The links between held items, as the backend's keys.
+    fn edges(&self) -> Vec<(NodeKey, NodeKey)> {
+        self.links
+            .iter()
+            .filter_map(|(a, b)| Some((*self.keys.get(a)?, *self.keys.get(b)?)))
+            .collect()
     }
 
     /// Advance one frame, folding the freshest layout into the board's view.
@@ -691,7 +715,7 @@ impl PhysicsBoard {
                 })]);
             return;
         }
-        let inputs = LawInputs::from_parts(nodes, Vec::new(), sites);
+        let inputs = LawInputs::from_parts(nodes, self.edges(), sites);
         let sources = LawSources {
             kind: self.choice.kind,
             groups: self.choice.groups,

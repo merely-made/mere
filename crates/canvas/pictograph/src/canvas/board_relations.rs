@@ -80,7 +80,7 @@ impl BoardScene {
         if self.relations.is_empty() {
             return Vec::new();
         }
-        let transform = fit.transform(self.framed(fit), width as f32, height as f32);
+        let transform = fit.transform(self.framed(fit, board), width as f32, height as f32);
         let at = |id: &str| {
             let card = self.cards.iter().find(|card| card.id == id)?;
             Some(transform.to_viewport(self.position(card, board)))

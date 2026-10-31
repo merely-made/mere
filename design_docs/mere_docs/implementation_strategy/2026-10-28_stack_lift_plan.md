@@ -128,6 +128,13 @@ Browser interaction, Woodshed runtime adoption and physical-device acceptance ar
 - Rulings: D1, D2
 - From: the isocosm viewer lane's checkpoint, 2026-10-31.
 
+### P11. The board's layout reads its relations
+The board's law ran with no edges, so a remote graph kept its score's arrangement and a fitted board shrank its cards as the graph grew (isocosm's viewer: cards about 70 px wide at 17 cards, titles and "+N" cut off). The scene's relations become links the board's law reads as edges, so linked cards cluster, and the fit gains a camera that zooms and pans with the cards kept at a fixed size (D3).
+- Done when: under the board's default law two linked groups gather apart from each other where the same cards unlinked do not; with fixed cards a card's drawn size is its footprint at every zoom and viewport; the port's tests pass with `web`; and isocosm's viewer draws its graph through it.
+- Needs: P10
+- Rulings: D3
+- From: the isocosm viewer lane, 2026-10-31.
+
 ## Decisions
 
 Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by the isocosm coordinator; each entry quotes the option he chose, both the recommended one.
@@ -139,6 +146,10 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - **D2, the board draws edges and honours folds.** Mark chose "Board draws edges and folds". As part of the move, `BoardScene` gains relations drawn as edges under the cards, and the mapping leaves out a fold's hidden members while the stand-in carries "+N"; against the viewer mapping into the full canvas separately, or moving the mapping unchanged.
 
   Links: summary Pictograph's board draws a scene's relations as edges and honours its folds, the stand-in carrying the hidden count.
+
+- **D3, a relation-reading force on the board.** Mark chose "A relation-reading force on the board", with the reading relayed by the isocosm coordinator: Pictograph's board gets a force law over its relations, so linked cards cluster, and card size stays fixed while the camera zooms instead of shrinking cards. The relations reach the board's existing laws as edges, and `BoardFit` gains the camera (`zoom`, `pan`) and `card_scale`, off by default so a fitted score is unchanged.
+
+  Links: summary The board's law reads the scene's relations as edges so linked cards cluster, and a camera zooms over fixed-size cards instead of shrinking them.
 
 ## Open questions
 
@@ -158,6 +169,8 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - 2026-10-28: `capture` (consented browser-history intake into Mere and Eidetic memory) is not Turnstone's today and waits on the Eidetic plan's P0 inventory.
 - 2026-10-28: `scripts/check_port_boundaries.py` does not check dependency direction between ports, so Djinn depending on `graphshell` passes it.
 
+- 2026-10-31: under each law with the scene's relations as edges, two linked triangles dealt alternately along a row (mean gap within a triangle, then across): Springs 170 and 307, Charge 173 and 437, Stress 170 and 306, Energy 116 and 712; unlinked, within exceeds across under each (Springs 673 and 509). A start with every card on one line leaves every force on that line, and the triangles do not separate (within 154, across 117). `crates/canvas/pictograph/src/canvas/board_camera.rs` holds the Springs case.
+
 ## Progress
 
 - 2026-10-28: cut from the stack lift plan; nothing new landed.
@@ -171,3 +184,5 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - 2026-10-30: P6 published on Knot `main` at `3e380e2` after merging current upstream and passing receiving gates. The original native qualification remains source-bound; the locked-console repeat is unqualified, as recorded in the publication update above.
 
 - 2026-10-31: P10 landed on branch `remote-board-to-stack`: `graphshell-host::board` (feature `board`) holds the remote board with relations as edges and folds honoured; `pictograph::canvas::board_relations` draws the edges; the port's copy is deleted and its browser pages use the moved module.
+
+- 2026-10-31: P11 on branch `board-relation-force`: `PhysicsBoard::set_links` gives the law the scene's relations as edges, `BoardScene::links` derives them, `RemoteBoard` passes them on every sync, and `BoardFit` gains the camera and fixed cards (`board_camera.rs`).

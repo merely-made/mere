@@ -241,6 +241,7 @@ impl RemoteBoard {
         let Some(mounted) = mounted else {
             self.scene = BoardScene::default();
             self.board.sync(self.scene.items());
+        self.board.set_links(self.scene.links());
             self.position = None;
             return;
         };
@@ -250,6 +251,7 @@ impl RemoteBoard {
         }
         self.scene = board_scene(mounted);
         self.board.sync(self.scene.items());
+        self.board.set_links(self.scene.links());
         self.position = Some(position);
     }
 
