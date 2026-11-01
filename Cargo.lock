@@ -7332,6 +7332,7 @@ name = "graphshell-host"
 version = "0.0.2"
 dependencies = [
  "base64 0.22.1",
+ "blake3",
  "chirograph",
  "djinn",
  "getrandom 0.3.4",
@@ -7352,6 +7353,7 @@ dependencies = [
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
