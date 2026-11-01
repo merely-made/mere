@@ -127,6 +127,8 @@ members = [
     # The application host contract genet's P1 split out of genet-host-api. A
     # host contract rather than a widget, so it lands beside `fetch`.
     "crates/system/surface-api",
+    # The settings contract over mere:script's WIT (capability door K1, D22).
+    "crates/system/settings-wit",
     # The djinn test harness (djinn test harness plan, ruling 5): unpublished,
     # a path dev-dependency for djinn, castellan, personae and their siblings.
     "crates/system/djinn-testkit",
@@ -571,6 +573,7 @@ persona-picker = { package = "persona-picker", path = "crates/cambium/persona-pi
 script-rhai = { version = "0.0.1", path = "crates/script/rhai" }
 script-wire = { version = "0.0.1", path = "crates/script/wire" }
 script-witgen = { version = "0.0.1", path = "crates/script/witgen" }
+settings-wit = { version = "0.0.1", path = "crates/system/settings-wit" }
 
 # ─── External pins ───────────────────────────────────────────────────────────
 # Linebender visual stack — both aliases use the same maintained Classic

@@ -1,0 +1,25 @@
+[package]
+rust-version = "1.97.1"
+name = "settings-wit"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "The revisioned settings contract over mere:script's WIT settings interface: a gated server over any owner and a client that is itself an owner."
+
+[features]
+default = []
+# The fixture owner, gate and call script every binding is checked with.
+testkit = []
+
+[dependencies]
+mere-surface-api = { workspace = true }
+script-wire = { workspace = true }
+workbench = { workspace = true }
+
+[build-dependencies]
+script-witgen = { workspace = true }
+
+[dev-dependencies]
+settings-wit = { path = ".", features = ["testkit"] }

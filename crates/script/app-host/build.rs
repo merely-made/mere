@@ -30,6 +30,16 @@ const GUESTS: &[(&str, &str, &[&str])] = &[
             "../../chirograph/src",
         ],
     ),
+    // The settings test guest (capability door K1, D22) runs settings-wit's
+    // call script over the imported settings interface.
+    (
+        "guest-settings",
+        "settings_guest.wasm",
+        &[
+            "../../system/settings-wit/src",
+            "../../system/surface-api",
+        ],
+    ),
 ];
 
 fn main() {

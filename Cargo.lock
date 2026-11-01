@@ -401,6 +401,7 @@ dependencies = [
  "graphshell-endpoint",
  "pollster 0.4.0",
  "script-wire",
+ "settings-wit",
  "tokio",
  "wasmtime",
  "wasmtime-wasi",
@@ -16593,6 +16594,17 @@ source = "git+https://github.com/merely-made/genet.git?branch=main#c0144fe59dea4
 dependencies = [
  "log",
  "markup5ever",
+]
+
+[[package]]
+name = "settings-wit"
+version = "0.0.1"
+dependencies = [
+ "mere-surface-api",
+ "script-wire",
+ "script-witgen",
+ "settings-wit",
+ "workbench",
 ]
 
 [[package]]

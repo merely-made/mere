@@ -1,0 +1,27 @@
+# The settings test guest (capability door K1, D22): runs settings-wit's
+# call script over the imported settings interface. Standalone workspace with
+# its own toolchain pin, built to wasm32-wasip2 by the host's build.rs; the
+# host tests load the artifact.
+[workspace]
+
+[package]
+rust-version = "1.97.1"
+name = "settings-guest"
+version = "0.0.1"
+edition = "2024"
+license = "MPL-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+settings-wit = { path = "../../../system/settings-wit", features = ["testkit"] }
+wit-bindgen = "0.58"
+
+[profile.release]
+opt-level = "s"
+strip = true
+
+[workspace.package]
+rust-version = "1.97.1"

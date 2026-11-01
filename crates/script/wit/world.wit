@@ -255,3 +255,174 @@ world document-core {
 world projection-provider {
     export projection-session;
 }
+
+/// A settings owner's revisioned contract (capability door K1, D22): the
+/// WIT form of `mere-surface-api`'s `RevisionedSettingsProvider`. A read is
+/// one coherent snapshot of a settings reference with each setting's guard;
+/// a write names the guard it read and the owner commits it or says why
+/// not. The provider asks its gate on every call, and a caller outside its
+/// grant gets a typed `denied`. Native code binds it with script-witgen in
+/// `settings-wit`.
+interface settings {
+    /// What the setting configures.
+    enum scope {
+        process,
+        device,
+        persona,
+        application,
+        session-dataspace,
+        artifact-entity,
+        governed-place,
+    }
+
+    /// How a setting may move beyond its owner.
+    enum movement {
+        local-only,
+        persona-synced,
+        travels-with-artifact,
+        governed-replication,
+    }
+
+    /// When a change takes effect.
+    enum mutability {
+        startup-only,
+        live,
+        restart-required,
+    }
+
+    /// What kind of value may cross the boundary.
+    enum security {
+        ordinary,
+        %private,
+        secret-reference,
+    }
+
+    variant value {
+        boolean(bool),
+        integer(s64),
+        number(f64),
+        text(string),
+    }
+
+    /// One entry of a choice control.
+    record choice-option {
+        value: string,
+        label: string,
+    }
+
+    record number-range {
+        min: option<f64>,
+        max: option<f64>,
+        step: option<f64>,
+    }
+
+    /// The control a renderer may use.
+    variant control {
+        toggle,
+        choice(list<choice-option>),
+        number(number-range),
+        text,
+    }
+
+    record spec {
+        id: string,
+        label: string,
+        scope: scope,
+        movement: movement,
+        mutability: mutability,
+        security: security,
+        control: control,
+        value: value,
+    }
+
+    /// The owner's version of one revision domain. `owner` names the
+    /// owner's incarnation, so a guard from an earlier run never matches.
+    record guard {
+        owner: string,
+        domain: string,
+        revision: u64,
+    }
+
+    record domain-revision {
+        domain: string,
+        revision: u64,
+    }
+
+    record guarded-spec {
+        spec: spec,
+        guard: guard,
+    }
+
+    /// One coherent read of a settings reference.
+    record settings-snapshot {
+        reference: string,
+        owner: string,
+        revisions: list<domain-revision>,
+        specs: list<guarded-spec>,
+    }
+
+    variant failure {
+        /// The caller's grant does not cover this reference.
+        denied(string),
+        /// The settings source is unavailable.
+        unavailable(string),
+    }
+
+    /// Change one setting, guarded by the guard read with it.
+    record write-request {
+        /// The caller's correlation id, returned in the outcome.
+        request-id: string,
+        reference: string,
+        setting-id: string,
+        expected: guard,
+        value: value,
+    }
+
+    /// The owner's stored value, which may differ from the requested one
+    /// after a documented conversion, and the guard it published.
+    record committed-write {
+        request-id: string,
+        reference: string,
+        setting-id: string,
+        value: value,
+        guard: guard,
+    }
+
+    record conflict {
+        request-id: string,
+        current: guard,
+    }
+
+    /// A refusal that changed nothing: the reason, under its request.
+    record refusal {
+        request-id: string,
+        message: string,
+    }
+
+    record validation-failure {
+        request-id: string,
+        setting-id: string,
+        message: string,
+    }
+
+    /// Only `committed` confirms a change; every other case claims none.
+    variant write-outcome {
+        committed(committed-write),
+        /// The guard was stale; carries the owner's current one.
+        conflict(conflict),
+        unavailable(refusal),
+        validation(validation-failure),
+        storage(refusal),
+        /// The caller's grant does not cover writing this reference.
+        denied(refusal),
+    }
+
+    snapshot: func(reference: string) -> result<settings-snapshot, failure>;
+    write: func(request: write-request) -> write-outcome;
+}
+
+/// A settings owner (capability door K1): a component that serves its
+/// settings, through app-host, to any consumer.
+world settings-provider {
+    export settings;
+}
