@@ -4,7 +4,7 @@
 **Status (2026-10-31):** paused in P2. Rulings D1 to D18 recorded. P1 is on Mere main
 (`0874522c`); four of the eleven contract crates are republished (D17); the receiving
 branch `distillery-receive` in the ESP checkout is verified and unpushed. P2 resumes once
-Djinn is slimmed (D18). Athanor and Alembic wait for the Alembic lane (D16). P1's graph halves are in
+Djinn is slimmed (D18; Armillary's Djinn slimming plan, after capability-door I1). Athanor and Alembic wait for the Alembic lane (D16). P1's graph halves are in
 `pandect`; the atomic write moves to `muniment` (D13); G1 is approved (D14) with the
 publish chain reported before the real publish.
 **Scope:** Distillery, its job and lease layer `mere-mesh`, and the workshop halves of
@@ -155,9 +155,11 @@ waits for a planned second host, not an arrived one.
 
 - **F1 (D11).** If Djinn holds no meres, which owner takes the resident's store lifetimes?
 - **F2.** Closed by D14.
-- **F4 (D18).** The Djinn slimming plan: where `custody-client` and `profile` go, the door's
-  wire-contract crate and its name, and the eight consumers of `graphshell-endpoint`'s
-  `projection-door`, `projection-offer`, `projection-provider` and `profile` features.
+- **F4 (D18).** Answered by Armillary's Djinn slimming plan
+  (`armillary/design_docs/armillary_docs/implementation_strategy/2026-10-31_djinn_slimming_plan.md`):
+  the custody half becomes a Dramatis crate (`armillary:djinn-slimming` D2), producers depend
+  on a door contract crate in Armillary (D3), and the cut waits for capability-door I1 (D4).
+  Closes when that plan's S5 publishes.
 - **F3 (D15).** Publishing the graph core (kernel and the graph persistence in pandect) as
   contract tier is its own plan. Until then Cleromancy, Knot and Woodshed compile in
   lockstep with Mere; this pass moves Cleromancy off `mere-alembic` and no further.
@@ -223,6 +225,8 @@ pass; changes are committed in each repository.
 
 ## Progress
 
+- 2026-10-31: F4 answered in Armillary's Djinn slimming plan (D1 to D4). The library
+  slims first; `mere-resident`'s lanes move to their producers in the plan after it.
 - 2026-10-31: assessment and rulings D1 to D12; no code moved.
 - 2026-10-31: muniment took `atomic_file` (Eidetic `5b3752f1`, then `613799af` carrying
   upstream's `replace_bytes_if_unchanged`); sprigging 0.3.0 and cambium 0.6.0 published to
