@@ -224,6 +224,14 @@ summary = "N1 channels carry the generated WIT calls for every provider; script-
 draws_on = ["stack.1", "stack.3"]
 amends = ["capability-door D4"]
 
+[decisions."capability-door D20"]
+title = "a lapse reaches the client as its status (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "CarrierError gains Lapsed(status); the WIT carrier raises it for revoked and expired, and the client marks the session from it."
+draws_on = ["stack.2"]
+amends = ["capability-door D13"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

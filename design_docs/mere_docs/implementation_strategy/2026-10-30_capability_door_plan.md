@@ -329,6 +329,19 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D4 · draws on stack.1, stack.3 · summary N1 channels carry the generated WIT calls for every provider; script-wire ships pipe and ipc-channel transports; a channel's end closes its sessions.
 
+- **D20, a lapse reaches the client as its status (2026-11-01).** Asked
+  for the drawbacks of turning the WIT carrier's `revoked` failure into the
+  status the client acts on, Mark chose "New CarrierError::Lapsed(status)
+  (Recommended)": chirograph's `CarrierError` gains `Lapsed(SessionStatus)`
+  for `Revoked` and `Expired`; `WitCarrier` raises it for those typed
+  failures and keeps one that `take_notice` would swallow for the next
+  call; graphshell-client marks the session revoked or expired from it,
+  purging per the cache policy. The JSON carriers keep reporting status
+  inside snapshots. Knot and Turnstone do not use `CarrierError` and
+  Cleromancy only constructs it, so no other repository needs a repin.
+
+  Links: area Stack · amends capability-door D13 · draws on stack.2 · summary CarrierError gains Lapsed(status); the WIT carrier raises it for revoked and expired, and the client marks the session from it.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -847,3 +860,4 @@ error types settle.
   script-witgen and graphshell-endpoint's `wit` carrier, and what N1's
   channels carry.
 - 2026-11-01: C0 built and promoted (Mere `32be2f0b0`); the probe is deleted.
+- 2026-11-01: D20 ruled: a lapse reaches the client as its status.
