@@ -3,4 +3,4 @@
 # excludes crates/probes. The guest is its own workspace (wasm32-wasip2).
 [workspace]
 resolver = "3"
-members = ["contract", "witgen", "route-a", "route-b", "host"]
+members = ["contract", "witgen", "route-a", "route-b", "host", "conformance"]

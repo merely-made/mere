@@ -1,0 +1,42 @@
+package c0:conformance@0.0.0;
+
+/// Every type our generator supports, nested, with Rust keywords for names.
+interface values {
+    record point {
+        x: u32,
+        y: u64,
+        %type: string,
+        %match: bool,
+    }
+
+    variant shape {
+        empty,
+        dot(point),
+        bytes(list<u8>),
+        many(list<point>),
+        named(string),
+        nested(option<result<u64, string>>),
+    }
+
+    record bag {
+        flag: bool,
+        small: u8,
+        shapes: list<shape>,
+        pair: tuple<u32, string>,
+        triple: tuple<u8, list<u8>, option<u64>>,
+        maybe: option<option<u8>>,
+        outcome: result<_, shape>,
+        ok-only: result<point>,
+    }
+
+    resource handle {
+        %type: func(%match: u32) -> u32;
+    }
+
+    echo: func(value: bag) -> bag;
+    %type: func(%loop: u32) -> result<handle, shape>;
+}
+
+world conformance {
+    import values;
+}

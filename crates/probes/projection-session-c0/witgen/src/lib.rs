@@ -1,8 +1,10 @@
-//! Route A (D12): a small generator of our own over an exactly pinned
+//! Route A (D12, D17): a small generator of our own over an exactly pinned
 //! `wit-parser`. It binds one WIT interface for native code: plain types, a
 //! blocking client over any `Transport`, and a `Handler` trait with a
 //! dispatcher. Values are written in wRPC's value encoding (D15) by the
-//! runtime in `c0-route-a`; resources travel as opaque handle bytes.
+//! runtime in `c0-route-a`; calls travel under wRPC's names (`open`,
+//! `session.snapshot`, `[drop]session`); resources travel as opaque handle
+//! bytes.
 //!
 //! Covers what the projection session uses: records, variants, options,
 //! results, tuples, lists, strings, integers, type aliases and one level of
@@ -15,6 +17,35 @@ use anyhow::{Context, Result, bail};
 use heck::{ToSnakeCase, ToUpperCamelCase};
 use wit_parser::{Function, FunctionKind, Handle, InterfaceId, Resolve, Type, TypeDefKind, TypeId};
 
+const KEYWORDS: &[&str] = &[
+    "as", "async", "await", "break", "const", "continue", "dyn", "else", "enum", "extern", "false",
+    "fn", "for", "gen", "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub",
+    "ref", "return", "static", "struct", "trait", "true", "try", "type", "unsafe", "use", "where",
+    "while", "abstract", "become", "box", "do", "final", "macro", "override", "priv", "typeof",
+    "unsized", "virtual", "yield",
+];
+
+/// A snake-case Rust identifier, escaped where it is a keyword. `self`,
+/// `super` and `crate` cannot be raw, so they take a trailing `_`.
+fn ident(name: &str) -> String {
+    let snake = name.to_snake_case();
+    match snake.as_str() {
+        "self" | "super" | "crate" => format!("{snake}_"),
+        s if KEYWORDS.contains(&s) => format!("r#{snake}"),
+        _ => snake,
+    }
+}
+
+/// An upper-camel Rust type name; `Self` takes a trailing `_`.
+fn type_name(name: &str) -> String {
+    let camel = name.to_upper_camel_case();
+    if camel == "Self" {
+        format!("{camel}_")
+    } else {
+        camel
+    }
+}
+
 /// Generate Rust for `interface` from the WIT file at `wit`.
 pub fn generate(wit: &Path, interface: &str) -> Result<String> {
     let mut resolve = Resolve::default();
@@ -23,8 +54,13 @@ pub fn generate(wit: &Path, interface: &str) -> Result<String> {
         .interfaces
         .get(interface)
         .with_context(|| format!("no interface `{interface}`"))?;
+    generate_interface(&resolve, id)
+}
+
+/// Generate Rust for one interface of an already-resolved package.
+pub fn generate_interface(resolve: &Resolve, id: InterfaceId) -> Result<String> {
     Gen {
-        resolve: &resolve,
+        resolve,
         id,
         out: String::new(),
     }
@@ -59,7 +95,10 @@ impl Gen<'_> {
             Type::Id(id) => {
                 let def = &self.resolve.types[*id];
                 if let Some(name) = &def.name {
-                    return Ok(name.to_upper_camel_case());
+                    if def.owner != wit_parser::TypeOwner::Interface(self.id) {
+                        bail!("unsupported type used from another interface");
+                    }
+                    return Ok(type_name(name));
                 }
                 self.anon(&def.kind)?
             },
@@ -75,15 +114,18 @@ impl Gen<'_> {
             TypeDefKind::Result(r) => {
                 format!("Result<{}, {}>", self.opt(&r.ok)?, self.opt(&r.err)?)
             },
+            TypeDefKind::Tuple(t) if !(1..=6).contains(&t.types.len()) => {
+                bail!("unsupported tuple of {}", t.types.len())
+            },
             TypeDefKind::Tuple(t) => {
                 let parts: Result<Vec<_>> = t.types.iter().map(|t| self.ty(t)).collect();
                 format!("({},)", parts?.join(", "))
             },
             TypeDefKind::Handle(Handle::Own(r) | Handle::Borrow(r)) => self.resolve.types[*r]
                 .name
-                .as_ref()
-                .unwrap()
-                .to_upper_camel_case(),
+                .as_deref()
+                .map(type_name)
+                .context("unnamed resource")?,
             TypeDefKind::Type(t) => self.ty(t)?,
             other => bail!("unsupported anonymous type {other:?}"),
         })
@@ -94,7 +136,7 @@ impl Gen<'_> {
     }
 
     fn typedef(&mut self, name: &str, id: TypeId) -> Result<()> {
-        let rust = name.to_upper_camel_case();
+        let rust = type_name(name);
         let out = &mut String::new();
         match &self.resolve.types[id].kind {
             kind @ (TypeDefKind::Type(_)
@@ -120,30 +162,21 @@ impl Gen<'_> {
                     "#[derive(Clone, Debug, PartialEq, Eq)]\npub struct {rust} {{"
                 )?;
                 for f in &r.fields {
-                    writeln!(
-                        out,
-                        "    pub {}: {},",
-                        f.name.to_snake_case(),
-                        self.ty(&f.ty)?
-                    )?;
+                    writeln!(out, "    pub {}: {},", ident(&f.name), self.ty(&f.ty)?)?;
                 }
                 writeln!(
                     out,
                     "}}\nimpl Wire for {rust} {{\n    fn put(&self, out: &mut Vec<u8>) {{"
                 )?;
                 for f in &r.fields {
-                    writeln!(out, "        self.{}.put(out);", f.name.to_snake_case())?;
+                    writeln!(out, "        self.{}.put(out);", ident(&f.name))?;
                 }
                 writeln!(
                     out,
                     "    }}\n    fn take(input: &mut &[u8]) -> std::io::Result<Self> {{\n        Ok(Self {{"
                 )?;
                 for f in &r.fields {
-                    writeln!(
-                        out,
-                        "            {}: Wire::take(input)?,",
-                        f.name.to_snake_case()
-                    )?;
+                    writeln!(out, "            {}: Wire::take(input)?,", ident(&f.name))?;
                 }
                 writeln!(out, "        }})\n    }}\n}}")?;
             },
@@ -153,7 +186,7 @@ impl Gen<'_> {
                     "#[derive(Clone, Debug, PartialEq, Eq)]\npub enum {rust} {{"
                 )?;
                 for c in &v.cases {
-                    let case = c.name.to_upper_camel_case();
+                    let case = type_name(&c.name);
                     match &c.ty {
                         Some(t) => writeln!(out, "    {case}({}),", self.ty(t)?)?,
                         None => writeln!(out, "    {case},")?,
@@ -164,7 +197,7 @@ impl Gen<'_> {
                     "}}\nimpl Wire for {rust} {{\n    fn put(&self, out: &mut Vec<u8>) {{\n        match self {{"
                 )?;
                 for (i, c) in v.cases.iter().enumerate() {
-                    let case = c.name.to_upper_camel_case();
+                    let case = type_name(&c.name);
                     match &c.ty {
                         Some(_) => writeln!(
                             out,
@@ -178,7 +211,7 @@ impl Gen<'_> {
                     "        }}\n    }}\n    fn take(input: &mut &[u8]) -> std::io::Result<Self> {{\n        Ok(match take_disc(input)? {{"
                 )?;
                 for (i, c) in v.cases.iter().enumerate() {
-                    let case = c.name.to_upper_camel_case();
+                    let case = type_name(&c.name);
                     match &c.ty {
                         Some(_) => {
                             writeln!(out, "            {i} => Self::{case}(Wire::take(input)?),")?
@@ -203,13 +236,16 @@ impl Gen<'_> {
         f: &'f Function,
     ) -> Result<(String, Option<String>, &'f [wit_parser::Param])> {
         match &f.kind {
-            FunctionKind::Freestanding => Ok((f.name.to_snake_case(), None, &f.params)),
+            FunctionKind::Freestanding => Ok((ident(&f.name), None, &f.params)),
             FunctionKind::Method(r) => {
-                let res = self.resolve.types[*r].name.clone().unwrap();
+                let res = self.resolve.types[*r]
+                    .name
+                    .clone()
+                    .context("unnamed resource")?;
                 let method = f.name.rsplit('.').next().unwrap();
                 Ok((
-                    format!("{}_{}", res.to_snake_case(), method.to_snake_case()),
-                    Some(res.to_upper_camel_case()),
+                    ident(&format!("{res}-{method}")),
+                    Some(type_name(&res)),
                     &f.params[1..],
                 ))
             },
@@ -217,34 +253,40 @@ impl Gen<'_> {
         }
     }
 
-    fn resources(&self) -> Vec<String> {
+    /// The name a call travels under, as wRPC names it.
+    fn key(f: &Function) -> &str {
+        f.name.strip_prefix("[method]").unwrap_or(&f.name)
+    }
+
+    /// `(rust type, wire key)` for each resource.
+    fn resources(&self) -> Vec<(String, String)> {
         self.resolve.interfaces[self.id]
             .types
             .iter()
             .filter(|(_, id)| matches!(self.resolve.types[**id].kind, TypeDefKind::Resource))
-            .map(|(n, _)| n.to_upper_camel_case())
+            .map(|(n, _)| (type_name(n), format!("[drop]{n}")))
             .collect()
     }
 
     fn handler(&mut self, functions: &[&Function]) -> Result<()> {
         let mut trait_src = String::from("/// The provider side.\npub trait Handler {\n");
         let mut arms = String::new();
-        for (index, f) in functions.iter().enumerate() {
+        for f in functions {
+            let key = Self::key(f);
             let (name, receiver, params) = self.shape(f)?;
             let ret = self.opt(&f.result)?;
             let mut args = String::new();
             let mut call = String::new();
+            arms.push_str(&format!("        {key:?} => {{\n"));
             if let Some(r) = &receiver {
                 args.push_str(&format!(", this: &{r}"));
                 arms.push_str(&format!(
-                    "        {index} => {{\n            let this: {r} = Wire::take(input)?;\n"
+                    "            let this: {r} = Wire::take(input)?;\n"
                 ));
                 call.push_str("&this, ");
-            } else {
-                arms.push_str(&format!("        {index} => {{\n"));
             }
             for p in params {
-                let n = p.name.to_snake_case();
+                let n = ident(&p.name);
                 let t = self.ty(&p.ty)?;
                 args.push_str(&format!(", {n}: {t}"));
                 arms.push_str(&format!("            let {n}: {t} = Wire::take(input)?;\n"));
@@ -255,24 +297,23 @@ impl Gen<'_> {
                 "            handler.{name}({call}).put(&mut out);\n        }},\n"
             ));
         }
-        for (k, r) in self.resources().iter().enumerate() {
-            let index = functions.len() + k;
-            let snake = r.to_snake_case();
+        for (r, key) in self.resources() {
+            let snake = ident(&r);
             trait_src.push_str(&format!("    fn drop_{snake}(&mut self, this: {r});\n"));
             arms.push_str(&format!(
-                "        {index} => handler.drop_{snake}(Wire::take(input)?),\n"
+                "        {key:?} => handler.drop_{snake}(Wire::take(input)?),\n"
             ));
         }
         trait_src.push_str("}\n");
         self.out.push_str(&trait_src);
         writeln!(
             self.out,
-            "/// Answer one request frame.\n\
+            "/// Answer one request frame: the call's name, then its arguments.\n\
              pub fn dispatch<H: Handler>(handler: &mut H, mut frame: &[u8]) -> std::io::Result<Vec<u8>> {{\n\
              \x20   let input = &mut frame;\n\
              \x20   let mut out = Vec::new();\n\
-             \x20   match take_disc(input)? {{\n{arms}\
-             \x20       f => return Err(bad(format!(\"unknown function {{f}}\"))),\n\
+             \x20   match String::take(input)?.as_str() {{\n{arms}\
+             \x20       f => return Err(bad(format!(\"unknown function `{{f}}`\"))),\n\
              \x20   }}\n\
              \x20   if !input.is_empty() {{ return Err(bad(\"trailing bytes\".into())); }}\n\
              \x20   Ok(out)\n\
@@ -287,19 +328,20 @@ impl Gen<'_> {
              pub struct Client<T: Transport>(pub T);\n\
              impl<T: Transport> Client<T> {\n",
         );
-        for (index, f) in functions.iter().enumerate() {
+        for f in functions {
+            let key = Self::key(f);
             let (name, receiver, params) = self.shape(f)?;
             let ret = self.opt(&f.result)?;
             let mut args = String::new();
             let mut body = format!(
-                "        let mut out = Vec::new();\n        put_disc(&mut out, {index});\n"
+                "        let mut out = Vec::new();\n        String::from({key:?}).put(&mut out);\n"
             );
             if let Some(r) = &receiver {
                 args.push_str(&format!(", this: &{r}"));
                 body.push_str("        this.put(&mut out);\n");
             }
             for p in params {
-                let n = p.name.to_snake_case();
+                let n = ident(&p.name);
                 args.push_str(&format!(", {n}: {}", self.ty(&p.ty)?));
                 body.push_str(&format!("        {n}.put(&mut out);\n"));
             }
@@ -308,13 +350,12 @@ impl Gen<'_> {
                  let reply = self.0.call(out)?;\n        finish(&reply)\n    }}\n"
             ));
         }
-        for (k, r) in self.resources().iter().enumerate() {
-            let index = functions.len() + k;
+        for (r, key) in self.resources() {
             src.push_str(&format!(
                 "    pub fn drop_{}(&mut self, this: {r}) -> std::io::Result<()> {{\n        \
-                 let mut out = Vec::new();\n        put_disc(&mut out, {index});\n        \
+                 let mut out = Vec::new();\n        String::from({key:?}).put(&mut out);\n        \
                  this.put(&mut out);\n        let reply = self.0.call(out)?;\n        finish(&reply)\n    }}\n",
-                r.to_snake_case()
+                ident(&r)
             ));
         }
         src.push_str("}\n");

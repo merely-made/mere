@@ -31,11 +31,13 @@ fn take_leb(input: &mut &[u8], bits: u32) -> io::Result<u64> {
             .split_first()
             .ok_or_else(|| bad("short integer".into()))?;
         *input = rest;
-        n |= u64::from(byte & 0x7f) << shift;
+        let part = u64::from(byte & 0x7f);
+        // The last byte may carry only the bits the type has left.
+        if shift + 7 > bits && part >> (bits - shift) != 0 {
+            return Err(bad("integer overflows its type".into()));
+        }
+        n |= part << shift;
         if byte & 0x80 == 0 {
-            if bits < 64 && n >> bits != 0 {
-                return Err(bad("integer overflows its type".into()));
-            }
             return Ok(n);
         }
     }
@@ -116,14 +118,24 @@ impl Wire for u64 {
     }
 }
 
-impl Wire for Vec<u8> {
+/// A list: its length, then each element. A `u8` element is its byte, so
+/// `list<u8>` comes out as wRPC's length-prefixed bytes.
+impl<T: Wire> Wire for Vec<T> {
     fn put(&self, out: &mut Vec<u8>) {
         put_leb(out, self.len() as u64);
-        out.extend_from_slice(self);
+        for v in self {
+            v.put(out);
+        }
     }
     fn take(input: &mut &[u8]) -> io::Result<Self> {
         let n = take_leb(input, 32)? as usize;
-        Ok(take_bytes(input, n)?.to_vec())
+        // Every element takes at least a byte, except `()`: never trust a
+        // claimed length past what the input could hold.
+        let mut items = Vec::with_capacity(n.min(input.len()));
+        for _ in 0..n {
+            items.push(T::take(input)?);
+        }
+        Ok(items)
     }
 }
 
@@ -179,15 +191,26 @@ impl<T: Wire, E: Wire> Wire for Result<T, E> {
     }
 }
 
-impl<A: Wire, B: Wire> Wire for (A, B) {
-    fn put(&self, out: &mut Vec<u8>) {
-        self.0.put(out);
-        self.1.put(out);
-    }
-    fn take(input: &mut &[u8]) -> io::Result<Self> {
-        Ok((A::take(input)?, B::take(input)?))
-    }
+/// A tuple: its elements in order.
+macro_rules! tuple {
+    ($($t:ident $i:tt),+) => {
+        impl<$($t: Wire),+> Wire for ($($t,)+) {
+            fn put(&self, out: &mut Vec<u8>) {
+                $(self.$i.put(out);)+
+            }
+            fn take(input: &mut &[u8]) -> io::Result<Self> {
+                Ok(($($t::take(input)?,)+))
+            }
+        }
+    };
 }
+
+tuple!(A 0);
+tuple!(A 0, B 1);
+tuple!(A 0, B 1, C 2);
+tuple!(A 0, B 1, C 2, D 3);
+tuple!(A 0, B 1, C 2, D 3, E 4);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5);
 
 /// One blocking request and its reply.
 pub trait Transport {
