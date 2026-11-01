@@ -354,6 +354,54 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.1, stack.3 · summary The WIT calls replace JSON lines on local channels now and on remote ones once script-wire is async, pushes notices and pipelines; browser native messaging stays JSON.
 
+- **D22, every label application declares (2026-11-01).** Removing
+  `CUSTODY_APPS` means all eight label applications declare, not only
+  Woodshed and Hocket: Graphshell, Distillery, Signalman, personae-vault and
+  Dramatis in Mere, Woodshed and Hocket in Woodshed, and Cleromancy in its
+  own repository. Mark chose "All eight + label checks (Recommended)": the
+  custody route's checks by label (Dramatis's passphrase and import calls,
+  personae-vault's, Signalman's station salts, Hocket's record adoption)
+  become declared operations too.
+
+  Links: area Stack · draws on stack.2 · summary All eight label applications declare, and custody's label checks become declared operations.
+
+- **D23, the owner is asked on first use (2026-11-01).** Asked whether
+  first-party grants survive as defaults, Mark chose "Ask the owner on first
+  use" over JSON defaults, then "Native confirm from Djinn (Recommended)":
+  a `confirm_application` dialog beside the identity confirms lists the
+  declaration and the connection's identity basis, and a yes is written to
+  the owner's `applications`. "Knot+Turnstone ask; CLI exempt
+  (Recommended)": `policy/default_applications.json` goes and every
+  application is asked once, except the resident's own `djinn` command line,
+  whose grant is built into Djinn as data. "The declaration, pinned
+  (Recommended)": a yes grants exactly what was declared, personas empty
+  (D9), pinned to the identity the door recorded, or in development mode
+  where none can be pinned, which the dialog says. "Typed refusal, retry
+  (Recommended)": until answered the hello is refused as awaiting consent,
+  the dialog shows once, a no is kept as a denial until the owner clears
+  it, and with no dialog available the application is refused.
+
+  Links: area Stack · draws on stack.2 · summary No default grants: Djinn asks the owner with a native confirm on first use, a yes grants the pinned declaration, and the application sees a typed refusal until then; Djinn's own CLI is exempt.
+
+- **D24, admission refusals are typed on the wire (2026-11-01).** Asked
+  where M1's typed refusal lives, Mark chose "Also type it on the wire",
+  adding "coordinate with the relevant agent": existing types are reused
+  (`AppAdmissionError`, `AuthorityRefusal`), the label path in admission is
+  removed, and a refused hello reaches the client as a typed frame rather
+  than `Refused(String)`. The door crate's move (Armillary's slimming S2) and
+  W1's byte path are coordinated with before Armillary is edited.
+
+  Links: area Stack · draws on stack.2 · summary Admission refusals reuse the existing types, the label path goes, and a refused hello is a typed frame on the wire, after the slimming's S2.
+
+- **D25, the owner marks agents (2026-11-01).** The MCP door's ban on
+  Retinue routes was prose only, and no Retinue route is served yet. Mark
+  chose "Owner marks agents (Recommended)": the owner's `AppGrant` marks an
+  application as an agent, a served route can be closed to agents, and an
+  agent is refused one with a typed reason; `retinue/` is closed to agents,
+  and `mere-mcp` declares its route.
+
+  Links: area Stack · draws on stack.2 · summary Grants mark agents, routes can be closed to agents with a typed refusal, and retinue/ is closed to them.
+
 ## Phases
 
 ### C0. One contract, bound both ways
