@@ -342,6 +342,18 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D13 · draws on stack.2 · summary CarrierError gains Lapsed(status); the WIT carrier raises it for revoked and expired, and the client marks the session from it.
 
+- **D21, the WIT carrier takes the local wires first (2026-11-01).** Asked
+  whether the WIT carrier should supplant the JSON one, Mark chose "Local
+  first, remote later (Recommended)": the generated calls carry every local
+  channel, N1 (D19) and stdio, local and Djinn's door path as each is
+  touched; the remote carriers (QUIC through iroh, the WebRTC door, network
+  NDJSON) move once script-wire has an async transport, pushed notices and
+  more than one call in flight, each measured against the JSON carrier
+  first; browser native messaging stays JSON, which Chrome's protocol
+  requires. Phase W1 carries it.
+
+  Links: area Stack · draws on stack.1, stack.3 · summary The WIT calls replace JSON lines on local channels now and on remote ones once script-wire is async, pushes notices and pipelines; browser native messaging stays JSON.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -366,6 +378,20 @@ and notices carry no payload (`crates/chirograph/src/lib.rs:1131-1205`).
   values alike; the default build needs no C toolchain; the existing JSON door
   path still works unchanged.
 - Needs: nothing. This phase is in-process; carriage is N1.
+
+### W1. One wire for the projection session
+The generated WIT calls (D19) replace JSON lines carrier by carrier (D21).
+Local first: N1's channels carry them from the start, and the stdio, local
+and Djinn door carriers move as each is next touched. Remote next: QUIC,
+the WebRTC door and network NDJSON move once script-wire has an async
+transport, notices pushed rather than pulled, and more than one call in
+flight. Browser native messaging stays JSON, as Chrome requires.
+- Done when: stdio, local and the door path carry the generated calls and
+  their JSON form is gone; script-wire's async transport, pushed notices
+  and pipelining are measured against the JSON carrier over QUIC and
+  WebRTC before those move; afterwards JSON lines remain only on browser
+  native messaging.
+- Needs: C0 (built). The remote half needs script-wire's async transport.
 
 ### I1. Identity at the door
 Next (D4). The door now lives in Armillary's `djinn` crate, so this phase
@@ -745,6 +771,16 @@ error types settle.
   adds no C build beyond chirograph's blake3. `wait-notice` polls the
   endpoint every 5 ms, since `ProjectionNoticeSource` offers no blocking
   wait. Run on Windows only; macOS and Linux not built.
+- 2026-11-01, D20 built (Mere `1dd59c48a`): chirograph's `CarrierError` gains
+  `Lapsed(SessionStatus)`; `WitCarrier` raises it for `revoked` and
+  `expired` and keeps one met in `take_notice` for the next call;
+  graphshell-client's session marks its scenes from it (revoked purges per
+  the cache policy, expired keeps the bytes); graphshell-mcp treats it as
+  the session's end. The only exhaustive match outside chirograph was
+  graphshell-mcp's; Knot and Turnstone do not use `CarrierError` and
+  Cleromancy only constructs it. 217 tests pass across chirograph,
+  graphshell-client, graphshell-mcp, graphshell-endpoint and app-host, the
+  component test on a freshly built guest among them. Windows only.
 
 ## Progress
 
@@ -861,3 +897,4 @@ error types settle.
   channels carry.
 - 2026-11-01: C0 built and promoted (Mere `32be2f0b0`); the probe is deleted.
 - 2026-11-01: D20 ruled: a lapse reaches the client as its status.
+- 2026-11-01: D20 built (Mere `1dd59c48a`); D21 ruled and phase W1 added.

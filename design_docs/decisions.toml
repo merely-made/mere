@@ -232,6 +232,13 @@ summary = "CarrierError gains Lapsed(status); the WIT carrier raises it for revo
 draws_on = ["stack.2"]
 amends = ["capability-door D13"]
 
+[decisions."capability-door D21"]
+title = "the WIT carrier takes the local wires first (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "The WIT calls replace JSON lines on local channels now and on remote ones once script-wire is async, pushes notices and pipelines; browser native messaging stays JSON."
+draws_on = ["stack.1", "stack.3"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
