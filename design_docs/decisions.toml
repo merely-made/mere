@@ -239,6 +239,21 @@ area = "Stack"
 summary = "The WIT calls replace JSON lines on local channels now and on remote ones once script-wire is async, pushes notices and pipelines; browser native messaging stays JSON."
 draws_on = ["stack.1", "stack.3"]
 
+[decisions."capability-door D22"]
+title = "settings is K1's first contract (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Settings in mere:script as typed WIT free functions with a typed denied failure and a gate, bound in crates/system/settings-wit, with an app world that imports it."
+draws_on = ["stack.3", "stack.5"]
+
+[decisions."capability-door D23"]
+title = "how stdio and local take the WIT calls (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Stdio and local carry the WIT calls with one session per offer, a gate for advertised offers, the full encoding in-process, a 250 ms blocking notice wait, and a version cut-over."
+draws_on = ["stack.1", "stack.3"]
+amends = ["capability-door D21"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

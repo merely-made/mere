@@ -354,6 +354,41 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.1, stack.3 · summary The WIT calls replace JSON lines on local channels now and on remote ones once script-wire is async, pushes notices and pipelines; browser native messaging stays JSON.
 
+- **D22, settings is K1's first contract (2026-11-01).** On payloads Mark
+  said "nobody depends on the api yet, so if it's the best path forward, i
+  don't mind a change. if serde not being in the api is useful and a
+  benefit in its own right, then fair enough", then chose "Typed WIT
+  (Recommended)": settings types are WIT records and variants, and
+  surface-api stays without serde. Asked whether a resource's only cost is
+  the session, he chose "Free functions now (Recommended)": `snapshot` and
+  `write`, with change-watching as its own interface when an application
+  needs it. "New crate crates/system/settings-wit (Recommended)": an
+  unpublished crate holds the server, a client implementing
+  `RevisionedSettingsProvider` over a transport, and a testkit. "Typed
+  denied + SettingsGate (Recommended)": the WIT gains a typed `denied`
+  failure and the server asks a gate on every call. "Also a new app world
+  importing settings": `caps` and `actions` stay with their reasons, and an
+  application world that imports settings is added so app participants
+  reach it under their grant.
+
+  Links: area Stack · draws on stack.3, stack.5 · summary Settings in mere:script as typed WIT free functions with a typed denied failure and a gate, bound in crates/system/settings-wit, with an app world that imports it.
+
+- **D23, how stdio and local take the WIT calls (2026-11-01).** Mark chose
+  "One resource per offer (Recommended)": the carrier opens one session per
+  advertised offer the first time a request names it; "ChannelGate for
+  advertised offers (Recommended)": stdio and local admit only advertised
+  offers on the parent's spawn and never report a proved principal; "Full
+  wire encoding, in-process (Recommended)": local still runs every call
+  through the encoding; "Provided method, 250 ms rechecks (Recommended)":
+  `ProjectionNoticeSource` gains a provided `wait_notice(within)` and the
+  server rechecks authority between 250 ms slices; "Same API; cut over by
+  version (Recommended)": script-wire's pipe transport becomes generic over
+  any reader and writer, callers keep their names and signatures, and a
+  mismatched child and host fail at the first frame with a message naming
+  both sides.
+
+  Links: area Stack · amends capability-door D21 · draws on stack.1, stack.3 · summary Stdio and local carry the WIT calls with one session per offer, a gate for advertised offers, the full encoding in-process, a 250 ms blocking notice wait, and a version cut-over.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -781,6 +816,13 @@ error types settle.
   Cleromancy only constructs it. 217 tests pass across chirograph,
   graphshell-client, graphshell-mcp, graphshell-endpoint and app-host, the
   component test on a freshly built guest among them. Windows only.
+- 2026-11-01, C0 off Windows: at Mere `23bb596e2` script-wire with `ipc`
+  (14), script-witgen (1), graphshell-endpoint with stdio, local, network,
+  wit, wit-testkit and wit-ipc (22), app-host's component test (2) and the
+  coverage compile all pass on Q-PC (macOS 15.8.1, x86_64) and the Fedora 44
+  ThinkPad (x86_64), so ipc-channel's macOS and Linux backends and
+  `std::io::pipe` have run. The M4 (aarch64) was off the mesh network and
+  is not yet checked.
 
 ## Progress
 
@@ -898,3 +940,4 @@ error types settle.
 - 2026-11-01: C0 built and promoted (Mere `32be2f0b0`); the probe is deleted.
 - 2026-11-01: D20 ruled: a lapse reaches the client as its status.
 - 2026-11-01: D20 built (Mere `1dd59c48a`); D21 ruled and phase W1 added.
+- 2026-11-01: C0 checked on macOS x86_64 and Linux; D22 (K1 settings) and D23 (W1 local) ruled.
