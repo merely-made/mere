@@ -158,7 +158,8 @@ pub struct AppConnectionV1 {
     pub app: String,
     pub route: String,
     /// What the label rests on: development mode, a macOS signature, a
-    /// Windows image (the same-user posture of a path) or a Linux launch.
+    /// Windows image (the same-user posture of a path) or a process Djinn
+    /// launched.
     pub identity: djinn::door::declaration::IdentityBasis,
     /// The OS account of the peer, where the OS said.
     #[serde(default, skip_serializing_if = "Option::is_none")]

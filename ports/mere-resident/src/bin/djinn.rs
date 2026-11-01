@@ -408,30 +408,35 @@ async fn resident_client(args: &Args) -> Result<String, String> {
     serde_json::to_string_pretty(&status).map_err(|error| error.to_string())
 }
 
-/// Launch a granted application by the Linux launch its owner grant pins
-/// (capability door plan, I1). The launch's handle is live until the process
-/// exits. Applications without a pinned launch are refused.
+/// Launch a granted application by the launch its owner grant pins
+/// (capability door plan, I1 and D11): the Linux launch's program and
+/// arguments, or on Windows the pinned image. The launch is live until the
+/// process exits. Applications without a pinned launch are refused.
 #[cfg(feature = "personal-sync")]
 fn application_launcher(
     grants: &AppRouteGrants,
     applications: &[djinn::door::declaration::AppGrant],
 ) -> resident_status::Launcher {
-    let pins: std::collections::BTreeMap<AppId, djinn::door::declaration::LinuxLaunch> = applications
+    let pins: std::collections::BTreeMap<AppId, (String, Vec<String>)> = applications
         .iter()
         .filter_map(|grant| {
-            let launch = grant.identity.as_ref()?.linux.clone()?;
-            Some((grant.app.clone(), launch))
+            let identity = grant.identity.as_ref()?;
+            #[cfg(windows)]
+            let launch = identity.windows.as_ref().map(|pin| (pin.image.clone(), Vec::new()));
+            #[cfg(not(windows))]
+            let launch = identity.linux.as_ref().map(|pin| (pin.executable.clone(), pin.args.clone()));
+            Some((grant.app.clone(), launch?))
         })
         .collect();
     let grants = grants.clone();
     std::sync::Arc::new(move |app: &str| {
         let app = AppId::new(app);
-        let Some(pin) = pins.get(&app) else {
+        let Some((program, args)) = pins.get(&app) else {
             return Err(format!("{app} has no launch in its owner grant"));
         };
         #[cfg(unix)]
         {
-            let launched = djinn::door::launch::launch(&grants, &app, &pin.executable, &pin.args)
+            let launched = djinn::door::launch::launch(&grants, &app, program, args)
                 .map_err(|error| format!("{app} did not start: {error}"))?;
             let (grants, handle, mut child) = (grants.clone(), launched.handle, launched.child);
             std::thread::Builder::new()
@@ -444,10 +449,28 @@ fn application_launcher(
             tracing::info!(app = %app, "launched");
             Ok(())
         }
-        #[cfg(not(unix))]
+        #[cfg(windows)]
         {
-            let _ = (&grants, pin);
-            Err("launching an application is available on Unix".into())
+            let launched = djinn::door::launch::launch(&grants, &app, program, args)
+                .map_err(|error| format!("{app} did not start: {error}"))?;
+            let (grants, process, mut child) = (grants.clone(), launched.process, launched.child);
+            std::thread::Builder::new()
+                .name(format!("launched-{app}"))
+                .spawn(move || {
+                    let _ = child.wait();
+                    // End the launch before the child's handle closes, while
+                    // its process id still names it.
+                    djinn::door::launch::end_process(&grants, &process);
+                    drop(child);
+                })
+                .map_err(|error| error.to_string())?;
+            tracing::info!(app = %app, "launched");
+            Ok(())
+        }
+        #[cfg(not(any(unix, windows)))]
+        {
+            let _ = (&grants, program, args);
+            Err("launching an application is available on Unix and Windows".into())
         }
     })
 }

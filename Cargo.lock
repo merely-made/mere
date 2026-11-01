@@ -502,7 +502,7 @@ dependencies = [
 [[package]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://www.github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 dependencies = [
  "tokio",
  "tracing",
@@ -4824,7 +4824,7 @@ dependencies = [
 [[package]]
 name = "djinn"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://www.github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 dependencies = [
  "armillary",
  "base64 0.22.1",
@@ -13523,7 +13523,7 @@ dependencies = [
 [[package]]
 name = "peer-facts"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://www.github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 dependencies = [
  "libc",
  "serde",
@@ -21759,7 +21759,7 @@ dependencies = [
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21804,7 +21804,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=613799afd001200792e
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 
 [[patch.unused]]
 name = "chartulary"
@@ -21849,7 +21849,7 @@ source = "git+https://github.com/merely-made/eidetic.git?rev=613799afd001200792e
 [[patch.unused]]
 name = "armillary"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=7eebeeb4447c5dfa70b813e64dc5b492a6212d3d#7eebeeb4447c5dfa70b813e64dc5b492a6212d3d"
+source = "git+https://github.com/merely-made/armillary.git?rev=104b8d45e9b3aa8cd5892116ad5046fd5471d5ee#104b8d45e9b3aa8cd5892116ad5046fd5471d5ee"
 
 [[patch.unused]]
 name = "chartulary"
