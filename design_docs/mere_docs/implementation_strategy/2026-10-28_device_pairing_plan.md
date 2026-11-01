@@ -137,9 +137,11 @@ has no caller.
 - From: `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:444-449,1133-1139`
 
 ### D6. The other network
-A self-hosted iroh-relay both networks can reach, set on every resident. Where it runs is a fork for Mark at this phase's start.
-- Done when: the M4 on its wired-only network is reached by key through the relay; a control isolates the relay as what carried
-  the dial (direct paths blocked), which is also the reachability plan's open R1 receipt.
+A self-hosted iroh-relay both networks can reach, set on every resident (the resident already takes `relay_urls`,
+`ports/mere-resident/src/settings.rs:610`). It runs on T-PC behind a mesh-router port forward and a dynamic-DNS name, with
+other idle mesh machines as further relays once set to stay on (D2 below).
+- Done when: the M4 on the work line (192.168.1.224, D1 below) is reached by key through the relay; a control isolates the
+  relay as what carried the dial (direct paths blocked), which is also the reachability plan's open R1 receipt.
 - Needs: D3
 - Rulings: 4
 - From: `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:1141-1146`
@@ -152,6 +154,26 @@ workspace needs the `p2panda-core` patch row; the second Retinue copy (0.2.0, fo
 - Needs: each owner's next repin
 - Rulings: 24, 29
 - From: `archive_docs/2026-10-28/2026-10-02_device_pairing_by_key_plan.md:1604-1607,1678-1682`
+
+## Decisions
+
+Mark answered while making the fleet reachable by name on 2026-10-31. Traces both ways that day showed the work line
+(192.168.1.0/24, router 192.168.1.1) and the Boykin mesh (192.168.4.0/22) on separate internet connections, with no
+route between them.
+
+- **D1, the M4 stays on the work line.** Mark: "it's better for network health to let the computers that have their own
+  networks use 'em. so just use that ip", and "the boykin mesh ip is preferably only when the other line's down for
+  whatever reason". The M4's address is 192.168.1.224; the mesh reservation 192.168.4.53 is the fallback.
+
+  Links: summary The M4 lives on the work line at 192.168.1.224 and joins the mesh only while that line is down.
+
+- **D2, the relay runs on mesh machines behind a port forward.** Mark chose "Mesh machine + forward" over a small VPS or the
+  M4 behind a work-router forward, and for the host: "T-PC, but hey, if we can have more than one, we could use x, r, s, or
+  y pc too (usually idle), if we adjust them to always stay on." Reading, not ruled: every mesh relay shares the mesh's one
+  public address, so more of them cover a machine being off, not the mesh line going down, and each needs its own forwarded
+  port.
+
+  Links: summary The self-hosted iroh relay runs on T-PC behind a mesh port forward and dynamic DNS, with idle mesh machines as further relays.
 
 ## Open questions
 
@@ -191,3 +213,6 @@ workspace needs the `p2panda-core` patch row; the second Retinue copy (0.2.0, fo
 ## Progress
 
 - 2026-10-28: cut from the device pairing plan; nothing new landed.
+- 2026-10-31: D6's relay host decided (D1, D2). Observed over SSH: the resident runs on T-PC and S-PC (`djinn.service`) and
+  Q-PC (`org.merely.djinn`), not on the fresh R-PC and X-PC installs; mere's source has no SSH `ProxyCommand` helper or
+  resident SSH ALPN yet, so D3 is unbuilt.

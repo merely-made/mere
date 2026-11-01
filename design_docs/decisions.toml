@@ -209,6 +209,16 @@ summary = "C0 chose our own wit-parser generator with a blocking runtime; wRPC 0
 draws_on = ["stack.1", "stack.3"]
 amends = ["capability-door D12"]
 
+[decisions."device-pairing D1"]
+title = "the M4 stays on the work line"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
+summary = "The M4 lives on the work line at 192.168.1.224 and joins the mesh only while that line is down."
+
+[decisions."device-pairing D2"]
+title = "the relay runs on mesh machines behind a port forward"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"
+summary = "The self-hosted iroh relay runs on T-PC behind a mesh port forward and dynamic DNS, with idle mesh machines as further relays."
+
 [decisions."distillery-extraction D1"]
 title = ". The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
