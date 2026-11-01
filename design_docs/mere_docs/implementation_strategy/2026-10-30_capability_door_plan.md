@@ -1,13 +1,13 @@
 # Capability door: app identity, manifests, introduction and WIT contracts
 
-**Status:** 2026-10-31: plan, revised on 2026-10-30 (D4). Most of S1 landed
+**Status:** 2026-11-01: plan, revised on 2026-10-30 (D4). Most of S1 landed
 outside this plan in Mere `c3567c5ab` (application projection offers), and the
 door library moved to Armillary's `djinn` crate (`721e17d`). I1 is built
 (Armillary `b6578ee`, its Windows remainder `104b8d4`) and M1's Knot and
 Turnstone cases have landed; M1's
-remaining entries follow. C0's probe ran in
-`crates/probes/projection-session-c0/` and chose our own generator (D17);
-promoting it is next. The first findings were read against Mere `56fbdc2e4` and Murm
+remaining entries follow. C0 is built (Mere `32be2f0b0`): script-witgen and
+script-wire bind WIT natively, and graphshell-endpoint's `wit` carrier is what
+N1's channels will carry (D19).
 `96e8843e814`, the revision's against Mere `94c1bd1a3` and Armillary
 `a333f51`, and the upstream findings of 2026-10-31 on GitHub and crates.io
 that day; no test was run for them.
@@ -332,8 +332,7 @@ part of its manifest entry.
 ## Phases
 
 ### C0. One contract, bound both ways
-Probe done (D17): our own generator chosen; promotion next. G6 does not
-need it.
+Built (Mere `32be2f0b0`, D17-D19). G6 does not need it.
 
 Write the projection session's control surface (`CarrierRequestBody`'s
 Discover, Open, Resume, Intent, Close and Suspend) as a WIT interface with a
@@ -711,6 +710,28 @@ error types settle.
   refused features. `c0-corpus` compiles the 551 emitted interfaces (the
   real ones and the first 500 random) with no errors; a planted error is
   caught. Run on Windows only.
+- 2026-11-01, C0 promoted (Mere `32be2f0b0`, D18, D19): `script-witgen` (the
+  generator, a build-dependency only) and `script-wire` (value encoding,
+  `Transport`, OS-pipe and, behind `ipc`, ipc-channel 0.23.1 transports) in
+  `crates/script`; the projection-session interface and a
+  `projection-provider` world in `mere:script`; graphshell-endpoint's `wit`
+  feature with `WitCarrier` (a chirograph `Carrier` over any
+  `SessionCalls`), `WitServer` (a complete endpoint behind the generated
+  handler, authority rechecked through a `SessionGate` on every call) and
+  `serve`, which closes a channel's sessions when it ends. One call script,
+  run through `Carrier`, gives the same transcript over pipes, ipc-channel,
+  an ipc end passed over a channel, and a Wasmtime 45 guest under app-host
+  served by the same `WitServer`; a vanished provider reads as
+  `Disconnected`. Tests: script-wire 14 (9 against wRPC, 5 transport),
+  script-witgen's golden test, graphshell-endpoint 22 with its stdio, local
+  and network tests unchanged, app-host's two component tests. Coverage from
+  its new home: 49 of 57 real interfaces (WASI 0.2.6, WASI 0.3 rc and
+  `mere:script`; the 8 refused are async, streams and futures) and all of
+  1,999 random packages; the 549 emitted interfaces compile. The `wit`
+  feature takes graphshell-endpoint's dependencies from 29 crates to 37 and
+  adds no C build beyond chirograph's blake3. `wait-notice` polls the
+  endpoint every 5 ms, since `ProjectionNoticeSource` offers no blocking
+  wait. Run on Windows only; macOS and Linux not built.
 
 ## Progress
 
@@ -825,3 +846,4 @@ error types settle.
 - 2026-11-01: D18 and D19 ruled: C0's promotion into script-wire,
   script-witgen and graphshell-endpoint's `wit` carrier, and what N1's
   channels carry.
+- 2026-11-01: C0 built and promoted (Mere `32be2f0b0`); the probe is deleted.
