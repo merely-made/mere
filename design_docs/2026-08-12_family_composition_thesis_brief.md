@@ -928,7 +928,7 @@ parent references and known context, including an unresolved parent outside an
 import range. Followed navigation, links contained in captured content, clipping
 provenance and computed relationships retain their different evidence meanings.
 
-The [Eidetic development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md)
+The [Eidetic memory gates plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-11-01_memory_gates_plan.md)
 owns the proposed intake and admission work with Chartulary/Stemma, Pandect,
 Inker, Fleece and ESP. It treats dependency capabilities as part of development.
 This direction does not claim that current browser intake preserves those facts
@@ -977,7 +977,7 @@ exports gathered from the applications' various runtimes. The receiving mere
 uses a declared content profile, carrying required bytes and meaningful
 relationships so supported content remains accessible with the source apps
 stopped. Format understanding and complete retained material each need a
-qualified receiving path. The [Eidetic development plan's collection gate](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#p6-qualify-storage-custody-retention-and-exchange)
+qualified receiving path. The [Eidetic memory gates plan's collection gate](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-11-01_memory_gates_plan.md#p6-qualify-storage-custody-retention-and-exchange)
 now makes this outcome explicit. It preserves the existing distinction between
 portable content and live source authority; general replication remains planned.
 
@@ -1005,7 +1005,8 @@ Mark selected Knot Editor and Redshank as the forcing pair, with a real shared
 host receiving their exports. He settled these four questions in **Assess Mere
 dynamics status** (`01a122a7-f13f-7d11-af4f-0361e1b9492e`). The Eidetic/Fleece
 lane owns the profile, owner-adapter and tag design in the
-[development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters).
+[development plan](https://github.com/merely-made/eidetic/blob/main/design_docs/archive_docs/2026-11-01/2026-10-11_eidetic_development_plan.md#knotredshank-profile-and-owner-adapters) (open work continues in the
+[memory gates plan](https://github.com/merely-made/eidetic/blob/main/design_docs/eidetic_docs/implementation_strategy/2026-11-01_memory_gates_plan.md)).
 The rulings settle policy, not a wire schema or implementation receipt.
 
 1. **CP1, retained source backing.** Mark: **"Keep selected material plus private

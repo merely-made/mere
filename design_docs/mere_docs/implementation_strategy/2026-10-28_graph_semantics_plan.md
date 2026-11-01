@@ -349,9 +349,9 @@ presentation alone (every lane).
   The public kernel API checks edge count and serialized bytes before cloning
   the selected payloads. These are operation bounds, not a total process-memory
   ceiling. The consumer's authority, storage and recovery contract stays in
-  `eidetic/design_docs/eidetic_docs/implementation_strategy/2026-10-11_eidetic_development_plan.md`,
+  `eidetic/design_docs/archive_docs/2026-11-01/2026-10-11_eidetic_development_plan.md`,
   P4a M4; supplier and consumer evidence has one home in
-  `eidetic/design_docs/archive_docs/2026-10-30/2026-10-11_eidetic_development_plan_receipts.md`.
+  `eidetic/design_docs/archive_docs/receipts/2026-10-11_eidetic_development_plan_receipts.md`.
 
 ## Progress
 
