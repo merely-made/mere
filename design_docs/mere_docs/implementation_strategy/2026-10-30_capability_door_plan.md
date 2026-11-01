@@ -3,7 +3,8 @@
 **Status:** 2026-10-31: plan, revised on 2026-10-30 (D4). Most of S1 landed
 outside this plan in Mere `c3567c5ab` (application projection offers), and the
 door library moved to Armillary's `djinn` crate (`721e17d`). I1 is built
-(Armillary `b6578ee`) and M1's Knot and Turnstone cases have landed; M1's
+(Armillary `b6578ee`, its Windows remainder `104b8d4`) and M1's Knot and
+Turnstone cases have landed; M1's
 remaining entries follow, and C0 waits for a component provider someone
 wants. The first findings were read against Mere `56fbdc2e4` and Murm
 `96e8843e814`, the revision's against Mere `94c1bd1a3` and Armillary
@@ -271,6 +272,17 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.3 · summary The session resource holds the admission-derived id; notices are taken or awaited as typed records; our generator writes wRPC's value encoding.
 
+- **D16, a launched Windows application is the child alone (2026-10-31).**
+  Asked what D11's job object should do, since Linux's `claim` (Armillary
+  `7eebeeb`) keeps a launched application's children from speaking as it,
+  Mark chose "Child only, no job (Recommended)": the door admits only the
+  process Djinn launched, by id and creation time while Djinn holds its
+  handle, as on Linux, and no job is made. Nothing would use one, and
+  starting a child inside a job without a race needs `CreateProcessW` by
+  hand, since std's attribute list and main-thread handle are unstable.
+
+  Links: area Stack · amends capability-door D11 · draws on stack.2 · summary A launched Windows application is the process Djinn started, known by id and creation time; its children are not the application, and no job is made.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -308,13 +320,14 @@ same-user check (`crates/djinn/src/door/local_endpoint.rs:300-345`).
   handle and refuses a Linux label without one; status shows each
   connection's identity basis, including that a Windows image match is a
   same-user posture.
-- Windows remainder (D11): Djinn launches Windows applications, holding the
-  child's process handle and a job for its children, and admits a pinned
-  label when the pipe client's process id is that child's; the image pin
-  reads both facts from one process handle and refuses a process created after
-  the connect; token facts are read through the pipe on a pinned thread; the
-  door's pipe gets an explicit access list and refuses remote clients. Run on
-  Windows, not only cross-checked.
+- Windows remainder (D11, D16; built 2026-10-31): Djinn launches Windows
+  applications, holding the child's process handle, and admits a pinned
+  label when the pipe recorded that child, by id and creation time; the image
+  pin reads the image and creation time from one process handle and refuses
+  a process created after the connect; token facts are read through the pipe
+  with nothing awaited while impersonating; the door's pipe gets an explicit
+  access list and refuses remote clients. Run on Windows, not only
+  cross-checked.
 - Needs: nothing.
 
 ### M1. Manifests for door apps
@@ -677,3 +690,25 @@ error types settle.
   revocation as status and a typed failure, 1 MiB payloads) and where C0's
   pieces live. The two-route probe starts under
   `crates/probes/projection-session-c0/`.
+- 2026-10-31: D10 checked on Windows. On o-pc (Rust 1.99.0) Turnstone
+  `317f0bf7` checks with `audio,scry`: one ipc-channel 0.23.1 and one
+  `windows` 0.62.2 build together with Genet's media. It first needed
+  Turnstone `73565e33`: `forward_native!` refused the trailing commas in
+  three calls, which broke the Windows `scry` build before D10 as well
+  (`7d72d9e8` failed the same way).
+- 2026-10-31: D11 built, with D16. Armillary `104b8d4`: Windows
+  `launch::launch` registers the launched process by id and creation time,
+  and a Windows pin admits the label when the pipe recorded that process, or
+  else the pinned image. `peer-facts` reads a pipe client's image and
+  creation time from one process handle and refuses a process created after
+  the connect (`pipe_client_peer` too, which custody-wire's custodian uses),
+  and `Connected::pipe_client` reads the client's token through the pipe.
+  The door's pipe instances carry a protected access list for SYSTEM and the
+  user and refuse remote clients, and the door refuses another user, an
+  AppContainer and anything below medium integrity by that token. Mere
+  `c92368402` repins Armillary, adds `djinn` and `peer-facts` to the
+  armillary patch so Knot's `7eebeeb` pin resolves to the same packages, and
+  launches a Windows grant's pinned image. Run on o-pc: Djinn's 52 tests and
+  peer-facts' pass, among them the token read before any byte, the refusal
+  of a later process, the access list, launched-process admission and the
+  image fallback. Mere's launcher was cross-checked for Windows, not run.
