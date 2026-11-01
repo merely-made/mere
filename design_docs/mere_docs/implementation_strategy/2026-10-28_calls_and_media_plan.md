@@ -126,6 +126,14 @@ Items both plans defer with a trigger of their own: group calls, video, screen s
 
 ## Findings
 
+- 2026-11-01: Genet's WebRTC web APIs and WPT work have their own receiving
+  plan, `genet/design_docs/2026-11-01_webrtc_conformance_plan.md`, independent
+  of this plan's A1-A6 product gates. Q2 should consume that engine comparison
+  as well as the existing data-carrier receipts. Generic RTC mechanisms now
+  live in Murm's independent wire workspace and feed Genet's native host;
+  browser objects/policy stay in Genet and Commons call policy stays here.
+  This does not select or move a codec/device backend or implement a call.
+
 - 2026-05 (re-verify at build time): AV1 via `rav1d` and `rav1e` is the only ship-today pure-Rust codec bet; pure-Rust H.264 and H.265 are young; the hand-written asm versus compiler gap is permanent, so the tier policy is steady-state architecture. Demux (`mp4parse`, `matroska`, Symphonia's demuxers) and audio decode (Symphonia) are solved in pure Rust. `woodshed-audio` is a musician's-tool infrastructure crate and not reusable as a codec stack; the relevant crates are Symphonia and `web-audio-api`-rs. From: `archive_docs/2026-10-28/2026-05-26_net_media_plan.md:50-78, 195-207`
 - 2026-08-25: WebRTC data channels and media decode have different authority, portability and acceptance consumers, which is why the data-channel lane left this plan. From: `archive_docs/2026-10-28/2026-05-26_net_media_plan.md:195-197`
 

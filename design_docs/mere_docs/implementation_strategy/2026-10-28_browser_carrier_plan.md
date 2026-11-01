@@ -152,6 +152,16 @@ Nym is the single option touching a global passive timing adversary, at the pric
 
 ## Findings
 
+- 2026-11-01: Genet's web-platform WebRTC evaluation and receiving gates now
+  live in `genet/design_docs/2026-11-01_webrtc_conformance_plan.md`; shared
+  provider extraction belongs to
+  `murm/design_docs/2026-10-13_murm_family_move_plan.md`, WebRTC evaluation
+  section. The independent `murm-rtc` supplier now feeds Genet's native host.
+  It stays below this plan's invitation, framing and Notochord profile.
+  Genet supports ordinary web peers and general channel modes independently
+  of that admission ceremony. Existing C3/C4 receipts
+  remain exact-source evidence; a core comparison does not requalify them.
+
 - 2026-09-01: R0 was built without a home in any plan: `P2pandaOverlayHost` and the product mDNS surfaces. The standards survey's claim that no local-link discovery story existed was true only for DNS-SD service browsing. The service on the wire is a p2panda one (`_p2pandav1<network-digest>._udp.local` since the October 13 supplier snapshot), so a diagnostic derives the exact name from the configured network id; old and new advertisements do not discover each other and explicit endpoint tickets remain the mixed-version bootstrap. From: `archive_docs/2026-10-28/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md:48-79, 397-411`
 - 2026-10-06: the `iroh-mdns-address-lookup` fork pin was never in effect (`mere-p2panda-net` required 0.5.0, so the 0.4.0 fork was an unused patch) and was removed; the macOS stall is policy, not sockets. The H10 receipts dialled a known peer id; first contact through gossip bootstrap fails (device pairing plan, D1b). From: `archive_docs/2026-10-28/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md:88-114, 135-145`
 - 2026-08-26: str0m's `do_poll_output` recurses once per queued SCTP packet at teardown, so stack depth equals the outstanding SCTP window; proven by dose-response and mitigated by `CarrierConfig::sctp_window_bytes`. From: `archive_docs/2026-10-28/2026-08-25_browser_webrtc_carrier_plan.md:1255-1268`
