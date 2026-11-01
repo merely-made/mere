@@ -63,12 +63,14 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
     ))
 }
 
-/// Serve the door as the resident does: label custody, Mere's default
-/// application grants, and `extra` grants for fixture applications.
+/// Serve the door as the resident does: custody, an owner's written grants
+/// for Knot and Turnstone (`fixtures/owner_applications.json`), and `extra`
+/// grants for fixture applications.
 async fn serve(wallet: &Path, extra: Vec<AppGrant>, catalog: AppEndpointCatalog) -> String {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    let mut policy = mere_resident::applications::default_grants();
+    let mut policy: Vec<AppGrant> =
+        serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap();
     policy.extend(extra);
     mere_resident::applications::install(
         &grants,

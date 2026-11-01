@@ -299,10 +299,6 @@ impl<S: IdentityStorage + 'static> ResidentCustody for PersonaeHost<S> {
         })
     }
 
-    fn adopt_hocket(&self) -> Result<(), String> {
-        crate::hocket_adoption::adopt(self).map(|_| ()).map_err(|error| error.to_string())
-    }
-
     fn confirm_signing(&self, ui: &dyn NativeIdentityUi, intent: &str, payload: &[u8]) -> Result<(), String> {
         crate::keeper::signing::confirm(self, ui, intent, payload)
     }

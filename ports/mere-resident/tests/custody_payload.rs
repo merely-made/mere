@@ -55,7 +55,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
+    mere_resident::applications::install(&grants, serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap());
     #[cfg(unix)]
     let endpoint = root
         .path()
@@ -393,7 +393,7 @@ fn retained_custody_receipt_host() {
     keeper.configure_payload_custody(ProfileId("family".into()), persona, fixture.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
+    mere_resident::applications::install(&grants, serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap());
     tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap()
         .block_on(serve_app_broker(endpoint.to_str().unwrap(), keeper, grants, 60_000, None, AppEndpointCatalog::default())).unwrap();
 }

@@ -29,6 +29,7 @@ use djinn::door::app_admission::{
     AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
 };
 use djinn::door::app_client::AppClientError;
+use djinn::door::declaration::{AppDeclaration, AppGrant};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
@@ -50,13 +51,15 @@ const OPEN_MERE_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Explicit identity, endpoint and storage selection for one application.
 ///
-/// `applications` names the owner's admitted first-party clients; it must
-/// include `application`. It is not a list supplied by an untrusted client.
+/// `declaration` is what `application` declares on every hello. An embedded
+/// owner grants `application` exactly that, and admits the others by the
+/// owner's written `grants` (capability door D26); it never asks.
 #[derive(Clone)]
 pub struct ReservoirAttachmentOptions {
     pub endpoint: String,
     pub application: AppId,
-    pub applications: Vec<AppId>,
+    pub declaration: AppDeclaration,
+    pub grants: Vec<AppGrant>,
     pub shared_root: PathBuf,
     pub persona: PersonaId,
     pub domain: DomainId,
@@ -70,6 +73,8 @@ pub struct ReservoirAttachmentOptions {
 pub struct ApplicationReservoirOptions {
     pub endpoint: String,
     pub application: AppId,
+    /// What the application declares on every hello.
+    pub declaration: AppDeclaration,
     pub domain: DomainId,
     pub shared_root: PathBuf,
     pub vault_dir: PathBuf,
@@ -79,12 +84,18 @@ pub struct ApplicationReservoirOptions {
     pub session_duration: Duration,
 }
 
-/// Applications admitted by the shared reservoir's standard composition.
-pub fn reservoir_applications() -> Vec<AppId> {
-    ["turnstone", "knot-editor", "cleromancy", "graphshell"]
-        .into_iter()
-        .map(AppId::new)
-        .collect()
+/// The owner's written application grants for `profile`, which an embedded
+/// owner admits by (D26). A profile with none, or unreadable settings,
+/// admits no other application.
+pub fn owner_grants(profile: &ProfileId) -> Vec<AppGrant> {
+    let path = crate::settings::settings_path(&crate::settings::default_app_dir(), profile);
+    crate::settings::OwnerSettings::load(&path)
+        .map_err(|error| error.to_string())
+        .and_then(|settings| settings.application_grants().map_err(|error| error.to_string()))
+        .unwrap_or_else(|error| {
+            tracing::warn!(%error, "owner application grants unreadable; the embedded owner admits only its application");
+            Vec::new()
+        })
 }
 
 /// Why attachment or embedded ownership could not complete.
@@ -130,7 +141,12 @@ impl ReservoirAttachment {
         let route = AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).expect("valid reservoir route");
         let initial = tokio::time::timeout(
             ATTACH_TIMEOUT,
-            AppBrokerClient::open_route_at(&options.endpoint, options.application.clone(), route),
+            AppBrokerClient::open_declared_route_at(
+                &options.endpoint,
+                options.application.clone(),
+                route,
+                options.declaration.clone(),
+            ),
         )
         .await
         .map_err(|_| ReservoirAttachmentError::Timeout)?;
@@ -149,10 +165,11 @@ impl ReservoirAttachment {
                     ensure(&mut reservoir, &options.domain).await?;
                     let route = AppRouteId::new(mere_route_id(options.domain.as_str()))
                         .map_err(|e| ReservoirAttachmentError::Embedded(e.to_string()))?;
-                    AppBrokerClient::open_route_at(
+                    AppBrokerClient::open_declared_route_at(
                         &options.endpoint,
                         options.application.clone(),
                         route,
+                        options.declaration.clone(),
                     )
                     .await
                     .map_err(Into::into)
@@ -205,10 +222,12 @@ impl ReservoirAttachment {
                 )
                 .await
                 .map_err(ReservoirAttachmentError::Embedded)?;
+                let profile = options.profile.clone().unwrap_or_else(|| host.current_profile_id());
                 let attached = ReservoirAttachmentOptions {
                     endpoint: options.endpoint,
                     application: options.application,
-                    applications: reservoir_applications(),
+                    declaration: options.declaration,
+                    grants: owner_grants(&profile),
                     shared_root: options.shared_root,
                     persona,
                     domain: options.domain,
@@ -344,7 +363,12 @@ async fn connect(
 ) -> Result<AppBrokerClient, ReservoirAttachmentError> {
     tokio::time::timeout(
         patience,
-        AppBrokerClient::open_route_at(&options.endpoint, options.application.clone(), route),
+        AppBrokerClient::open_declared_route_at(
+            &options.endpoint,
+            options.application.clone(),
+            route,
+            options.declaration.clone(),
+        ),
     )
     .await
     .map_err(|_| ReservoirAttachmentError::Timeout)?
@@ -423,11 +447,6 @@ impl EmbeddedOwner {
         C: FnOnce(MereRoutes) -> CFut,
         CFut: Future<Output = Result<MereRoutes, String>>,
     {
-        if !options.applications.contains(&options.application) {
-            return Err(ReservoirAttachmentError::Embedded(
-                "application is not in the owner's admitted application set".into(),
-            ));
-        }
         let session_duration_ms = u64::try_from(options.session_duration.as_millis())
             .ok()
             .filter(|duration| *duration > 0)
@@ -438,19 +457,18 @@ impl EmbeddedOwner {
             .await
             .map_err(ReservoirAttachmentError::Embedded)?;
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-        let grants = AppRouteGrants::new(AllowedAppRoutes::new(
-            options
-                .applications
-                .iter()
-                .cloned()
-                .map(|app| (app, ResidentReservoir::route())),
-        ));
+        let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+        // The owner's grants, and the embedding application's own
+        // declaration: it composed this owner.
+        let own = crate::applications::grant_for(&options.application, &options.declaration, None);
+        let others = options.grants.iter().filter(|grant| grant.app != options.application).cloned();
+        crate::applications::install(&grants, others.chain([own]).collect());
+        grants.update(|routes| routes.serve(ResidentReservoir::route()));
         let routes = MereRoutes::new(
             options.shared_root.clone(),
             options.persona,
             catalog.clone(),
             grants.clone(),
-            options.applications.clone(),
         )
         .with_profile_subject_authority(host.clone());
         let routes = configure(routes)

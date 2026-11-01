@@ -224,6 +224,7 @@ mod tests {
         OwnerSettings {
             projection_providers: Vec::new(),
             applications: None,
+            refused_applications: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),
@@ -299,6 +300,7 @@ mod tests {
         OwnerSettings {
             projection_providers: Vec::new(),
             applications: None,
+            refused_applications: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),

@@ -318,9 +318,24 @@ pub fn default_endpoints_taken(
     taken
 }
 
-/// Grant both routes to their one caller.
+/// Serve a resident route to the applications whose grant names it: the
+/// resident's own command line (`crate::applications::resident_grant`).
 pub fn grant(grants: &AppRouteGrants, route: ResidentEndpointRoute) {
-    grants.grant(AppId::new(RESIDENT_APP), route);
+    grants.update(|routes| routes.serve(route));
+}
+
+/// Open one of the resident's own routes as its command line, declaring it.
+pub async fn open_resident_route(
+    endpoint: &str,
+    route: djinn::door::app_admission::AppRouteId,
+) -> Result<AppBrokerClient, AppClientError> {
+    AppBrokerClient::open_declared_route_at(
+        endpoint,
+        AppId::new(RESIDENT_APP),
+        route,
+        crate::applications::resident_declaration(),
+    )
+    .await
 }
 
 fn route(id: &str) -> ResidentEndpointRoute {

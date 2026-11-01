@@ -54,6 +54,22 @@ use crate::settings::ReservoirLaneSettings;
 
 /// The stable first-party route an admitted application requests.
 pub const RESIDENT_RESERVOIR_ROUTE: &str = "reservoir";
+/// What a client of the reservoir and its meres declares: the reservoir,
+/// the identity route, and every mere's explicit and ambient route. An
+/// application declares more beside it; the owner's grant decides.
+pub fn mere_client_declaration() -> djinn::door::declaration::AppDeclaration {
+    use djinn::door::declaration::NamePattern;
+    djinn::door::declaration::AppDeclaration {
+        routes: vec![
+            NamePattern::exact(RESIDENT_RESERVOIR_ROUTE),
+            NamePattern::exact(djinn::door::app_admission::AppRouteId::identity().as_str()),
+            NamePattern::prefix("mere/"),
+            NamePattern::prefix("ambient/mere/"),
+        ],
+        ..Default::default()
+    }
+}
+
 /// How often a granted client polls the route for notices.
 pub const RESIDENT_RESERVOIR_NOTICE_POLL: Duration = Duration::from_millis(50);
 /// Ensure the mere for a data domain, creating it if the reservoir has none.

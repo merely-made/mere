@@ -62,6 +62,12 @@ pub trait NativeIdentityUi: Send + Sync {
     ) -> Result<bool, NativeIdentityFailure> {
         Err(NativeIdentityFailure::UiUnavailable)
     }
+    /// Ask the owner whether `app` may have what `grant` describes, the
+    /// first time it connects (capability door D23). Djinn writes the text;
+    /// the application supplies only its name and declaration.
+    fn confirm_application(&self, _app: &str, _grant: &str) -> Result<bool, NativeIdentityFailure> {
+        Err(NativeIdentityFailure::UiUnavailable)
+    }
     fn pick_ssh_private_key(&self) -> Result<Option<PathBuf>, NativeIdentityFailure>;
 
     fn prompt_ssh_private_key_passphrase(
@@ -269,6 +275,20 @@ impl NativeIdentityUi for SystemNativeIdentityUi {
         );
         Ok(
             light_file_dialog::dialog::MessageBox::new("Djinn · Signing confirmation", &message)
+                .buttons(light_file_dialog::MessageBoxType::YesNo)
+                .default_button(if cfg!(windows) { 1 } else { 0 })
+                .show()
+                == light_file_dialog::MessageBoxButton::Ok,
+        )
+    }
+    fn confirm_application(&self, app: &str, grant: &str) -> Result<bool, NativeIdentityFailure> {
+        self.require_graphical_backend()?;
+        let app: String = app.chars().filter(|c| !c.is_control()).take(64).collect();
+        let message = format!(
+            "An application named \"{app}\" asks for:\n\n{grant}\n\nAllow it? Djinn remembers the answer."
+        );
+        Ok(
+            light_file_dialog::dialog::MessageBox::new("Djinn · New application", &message)
                 .buttons(light_file_dialog::MessageBoxType::YesNo)
                 .default_button(if cfg!(windows) { 1 } else { 0 })
                 .show()

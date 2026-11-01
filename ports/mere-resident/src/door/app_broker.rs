@@ -98,6 +98,7 @@ pub struct AppEndpointCatalog {
     inner: Arc<tokio::sync::Mutex<ResidentEndpointCatalog>>,
     pub(crate) offers: Arc<OfferRegistry>,
     ledger: Arc<std::sync::OnceLock<crate::resident_status::ConnectionLedger>>,
+    consent: Arc<std::sync::OnceLock<Arc<dyn crate::applications::ApplicationConsent>>>,
 }
 impl Default for AppEndpointCatalog {
     fn default() -> Self {
@@ -118,6 +119,7 @@ impl WeakAppEndpointCatalog {
                 inner,
                 offers,
                 ledger: Arc::default(),
+                consent: Arc::default(),
             })
         })
     }
@@ -129,7 +131,15 @@ impl AppEndpointCatalog {
             inner: Arc::new(tokio::sync::Mutex::new(catalog)),
             offers: Arc::new(OfferRegistry::new()),
             ledger: Arc::default(),
+            consent: Arc::default(),
         }
+    }
+
+    /// Ask the owner about a declared application nobody has granted
+    /// (capability door D23). Set once, before serving; without it such an
+    /// application is only refused.
+    pub fn set_consent(&self, consent: Arc<dyn crate::applications::ApplicationConsent>) {
+        let _ = self.consent.set(consent);
     }
 
     /// Report each admitted connection, and what its label rests on, in
@@ -303,6 +313,7 @@ where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
 {
+    let peer = connected.as_ref().map(|connected| connected.peer.clone());
     let admitted = djinn::door::server::admit_from(reader, connected, allowed, |request, allowed| {
         if request.route.as_str() == PROJECTION_PROVIDER_ROUTE {
             if !catalog.offers.provider_allowed(&request.app) {
@@ -330,7 +341,13 @@ where
                     .expect("validated policy route"),
                 );
             }
-            allowed.admit(request)
+            let admitted = allowed.admit(request);
+            if let (Err(AppAdmissionError::NotAllowed(app)), Some(declaration), Some(consent)) =
+                (&admitted, &request.declaration, catalog.consent.get())
+            {
+                consent.ask(app, declaration, peer.as_ref());
+            }
+            admitted
         }
     })
     .await?;

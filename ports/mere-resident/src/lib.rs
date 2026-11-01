@@ -21,8 +21,6 @@ pub mod custody_host;
 pub mod door;
 pub mod embedded_reservoir;
 pub mod enrollment;
-#[cfg(feature = "in-process-custody")]
-pub mod hocket_adoption;
 pub mod identity_ui;
 pub mod keeper;
 pub mod knot_relation_intake;

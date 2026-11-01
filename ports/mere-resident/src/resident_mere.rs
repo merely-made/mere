@@ -115,7 +115,6 @@ struct Routes {
     launch: OnceCell<u64>,
     catalog: WeakAppEndpointCatalog,
     grants: AppRouteGrants,
-    apps: Vec<AppId>,
     validators: BTreeMap<String, pandect::GraphValidator>,
     handlers: HandlerRegistry,
     profile_lookup: Option<ProfileLookup>,
@@ -162,14 +161,13 @@ impl MereRoutes {
         self
     }
 
-    /// Routes for `persona`'s meres, registered in `catalog` and granted to
-    /// `apps` as each is served.
+    /// Routes for `persona`'s meres, registered in `catalog` and served as
+    /// each opens, to the applications whose owner grant names them.
     pub fn new(
         shared_root: PathBuf,
         persona: PersonaId,
         catalog: AppEndpointCatalog,
         grants: AppRouteGrants,
-        apps: Vec<AppId>,
     ) -> Self {
         Self {
             inner: Arc::new(Routes {
@@ -180,7 +178,6 @@ impl MereRoutes {
                 launch: OnceCell::new(),
                 catalog: catalog.downgrade(),
                 grants,
-                apps,
                 validators: BTreeMap::new(),
                 handlers: HandlerRegistry::default(),
                 profile_lookup: None,
@@ -433,12 +430,7 @@ impl MereRoutes {
                 .update(|catalog| coop::register(catalog, coop_shared, coop_grants))
                 .await
                 .map_err(|e| e.to_string())?;
-            self.inner
-                .grants
-                .grant(AppId::new("graphshell"), coop_route);
-        }
-        for app in &self.inner.apps {
-            self.inner.grants.grant(app.clone(), route.clone());
+            self.inner.grants.update(|grants| grants.serve(coop_route));
         }
         self.inner.grants.grant_default(route.clone());
         for ((id, app), access) in self.inner.access.lock().await.iter() {
@@ -2081,6 +2073,13 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A request from `app` for `route`, carrying a mere client's declaration.
+    fn declared(app: &str, route: &str) -> AppRequest {
+        let mut request = AppRequest::new(AppId::new(app), AppRouteId::new(route).unwrap());
+        request.declaration = Some(crate::resident_reservoir::mere_client_declaration());
+        request
+    }
     use djinn::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
@@ -2125,14 +2124,14 @@ mod tests {
             fixture
                 .grants
                 .current()
-                .admit(&AppRequest::new(AppId::new("graphshell"), AppRouteId::new(route).unwrap()))
+                .admit(&declared("graphshell", route))
                 .is_ok()
         );
         assert!(
             fixture
                 .grants
                 .current()
-                .admit(&AppRequest::new(AppId::new("turnstone"), AppRouteId::new(route).unwrap()))
+                .admit(&declared("turnstone", route))
                 .is_err()
         );
         assert!(
@@ -2235,12 +2234,23 @@ mod tests {
             .unwrap();
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+        crate::applications::install(
+            &grants,
+            ["turnstone", "knot-editor"]
+                .map(|app| {
+                    crate::applications::grant_for(
+                        &AppId::new(app),
+                        &crate::resident_reservoir::mere_client_declaration(),
+                        None,
+                    )
+                })
+                .to_vec(),
+        );
         let routes = MereRoutes::new(
             root.path().to_path_buf(),
             persona(persona_n),
             catalog.clone(),
             grants.clone(),
-            vec![AppId::new("turnstone"), AppId::new("knot-editor")],
         )
         .with_handlers(handlers);
         let storage = castellan::custody::InMemoryStorage::new();
@@ -4688,7 +4698,6 @@ mod tests {
             record.persona,
             AppEndpointCatalog::default(),
             AppRouteGrants::default(),
-            vec![AppId::new("cleromancy")],
         );
         missing.load_access(&fixture.reservoir).await.unwrap();
         assert!(
@@ -5673,7 +5682,7 @@ mod tests {
         let mut explicit = fixture.attach("cleromancy").await;
         let before = graph(&mut explicit);
         let ambient_id = ambient_mere_route_id("divination");
-        let request = |app: &str, route: &str| AppRequest::new(AppId::new(app), AppRouteId::new(route).unwrap());
+        let request = |app: &str, route: &str| declared(app, route);
         assert!(
             fixture
                 .grants
@@ -5940,7 +5949,7 @@ mod tests {
             fixture
                 .grants
                 .grant(AppId::new(actor), ResidentReservoir::route());
-            let request = AppRequest::new(AppId::new(actor), AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).unwrap());
+            let request = declared(actor, RESIDENT_RESERVOIR_ROUTE);
             assert!(fixture.grants.current().admit(&request).is_ok());
             let mut control = fixture
                 .catalog
@@ -5969,7 +5978,7 @@ mod tests {
                 fixture
                     .grants
                     .current()
-                    .admit(&AppRequest::new(denied.clone(), AppRouteId::new(route).unwrap()))
+                    .admit(&declared(denied.as_str(), route))
                     .is_err()
             );
             assert!(

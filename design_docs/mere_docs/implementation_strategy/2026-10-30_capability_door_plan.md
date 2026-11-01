@@ -402,6 +402,26 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.2 · summary Grants mark agents, routes can be closed to agents with a typed refusal, and retinue/ is closed to them.
 
+- **D26, an embedded owner admits by the owner's grants (2026-11-01).** An
+  application that composes the reservoir when Djinn is absent admitted
+  four labels (`reservoir_applications()`), and no resident is there to
+  ask. Mark chose "Owner's grants, no ask (Recommended)": the embedded owner
+  reads the same owner `applications` Djinn writes after a yes, and grants
+  the embedding application its own declaration; any other application not
+  yet granted gets the typed refusal. Consent is asked only by Djinn.
+
+  Links: area Stack · draws on stack.2 · summary An embedded reservoir owner admits by the owner's written grants plus the embedding application's own declaration, and never asks.
+
+- **D27, Hocket's identity adoption is retired (2026-11-01).** Djinn
+  adopted Hocket's own sealed identity whenever Hocket asked its status, a
+  check by label. Offered a declared adoption operation, Mark answered "if
+  1 is useful otherwise, sure, but i don't think we have more than 1-2
+  hocket installs and it's not like they're crucial. they were for
+  testing". The operation would serve only Hocket, so the adoption is
+  removed rather than declared.
+
+  Links: area Stack · draws on stack.2 · summary Hocket's legacy identity adoption is removed, not made a declared operation.
+
 ## Phases
 
 ### C0. One contract, bound both ways
