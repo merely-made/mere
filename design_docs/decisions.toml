@@ -390,6 +390,11 @@ title = "a relation-reading force on the board"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
 summary = "The board's law reads the scene's relations as edges so linked cards cluster, and a camera zooms over fixed-size cards instead of shrinking them."
 
+[decisions."stack-lift D4"]
+title = "co-op's identity is lifted into the stack"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-28_stack_lift_plan.md"
+summary = "Graphshell co-op's contact, invitation and card, with their admission checks over the custody identity, move into graphshell-host for a second product."
+
 [statements."stack.1"]
 title = "Build on the stack we have"
 source = "design_docs/doctrine.md"

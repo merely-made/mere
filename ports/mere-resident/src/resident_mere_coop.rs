@@ -44,7 +44,7 @@ impl GraphAuthority for Attached {
 struct Activity {
     owner: coop::SharedOwner<DirectoryBackend>,
     identity: Arc<djinn::door::custody_identity::CustodyIdentity>,
-    contact: network::Card,
+    contact: coop::Card,
     ledger: Arc<std::sync::RwLock<notochord::RevocationLedger>>,
     _stop: tokio::sync::oneshot::Sender<()>,
 }

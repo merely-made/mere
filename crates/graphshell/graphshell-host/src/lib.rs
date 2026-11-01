@@ -36,7 +36,7 @@
 //! | none | [`resume`], [`live_endpoint`] and [`canary`] (fixture endpoints), [`view`] (the projection receipt views) and [`sessions`] (the session switcher's receipt; its endpoint spawning needs `native`) |
 //! | `admission` | [`admission`] |
 //! | `webrtc-join` (default) | [`webrtc_door`], [`webrtc_join`] |
-//! | `native` | [`carrier`], [`line`], [`lifecycle`], [`session_loop`], [`session_notices`], [`endpoint_catalog`], [`projection_host`], [`network_carrier`], [`policy_projection`], and the host halves of [`webrtc_door`] |
+//! | `native` | [`carrier`], [`invitation`], [`line`], [`lifecycle`], [`session_loop`], [`session_notices`], [`endpoint_catalog`], [`projection_host`], [`network_carrier`], [`policy_projection`], and the host halves of [`webrtc_door`] |
 //! | `webrtc-session` | `webrtc_session` and [`projection_host`]'s WebRTC door |
 //!
 //! The default build, `admission` and no features at all build for
@@ -52,6 +52,9 @@ pub mod canary;
 pub mod carrier;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod endpoint_catalog;
+/// An owner's invitation of one guest into one session (case 1060).
+#[cfg(all(feature = "native", not(target_arch = "wasm32")))]
+pub mod invitation;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod lifecycle;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]

@@ -41,11 +41,17 @@ native = [
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
     "notochord/tokio",
+    "dep:blake3",
     "dep:pandect",
     "dep:rand_core",
+    "dep:serde",
+    "dep:uuid",
     "dep:tokio",
     "dep:transport",
 ]
+# `invitation`'s signer over the holder's custody identity (Djinn's
+# custody client), for a host that issues invitations.
+custody-client = ["native", "djinn/custody-client"]
 # The live WebRTC lane: the join over a real carrier and the pump that
 # presents its frames as the session stream. Pulls str0m and the carrier's
 # own tokio driver, so it stays separate from `native`.
@@ -80,6 +86,9 @@ pictograph = { workspace = true, optional = true, features = ["canvas"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 pandect = { workspace = true, optional = true }
+# An invitation's network id and session (`invitation`).
+blake3 = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 tokio = { version = "1", features = ["io-util", "macros", "net", "rt-multi-thread", "sync", "time"], optional = true }
 # The one audited `AcceptedSession -> SessionFacts` adapter (Notochord N1).

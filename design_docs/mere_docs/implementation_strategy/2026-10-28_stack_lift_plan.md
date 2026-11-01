@@ -135,6 +135,13 @@ The board's law ran with no edges, so a remote graph kept its score's arrangemen
 - Rulings: D3
 - From: the isocosm viewer lane, 2026-10-31.
 
+### P12. Co-op's invitation leaves the port
+Graphshell co-op's identity and invitation pieces (the signed `Contact`, `Invitation` and `Card`, the owner's grant and its check on admission, the guest's hello, over Djinn's custody identity) were the only product composition of peer admission, so Isocosm, which needs the same for its table, could not reach them (isocosm case 1060). They move into `graphshell-host` as `invitation` under `native`, beside the admission, accept and dial they compose; the custodian's signer is behind a `custody-client` feature that forwards Djinn's (D4). What differs per product (domain, key salt, network label, projection path) is `InvitationTerms`; co-op's saved invitations keep their serialized `graph` field and still load.
+- Done when: `graphshell-host` with `native` builds and its `invitation` test passes; the port's co-op consumes `graphshell_host::invitation` with its own copies deleted, and its co-op tests pass; the second consumer's receipt is Isocosm's table admitting a peer through it.
+- Needs: -
+- Rulings: D4
+- From: the isocosm working-table lane, 2026-10-31.
+
 ## Decisions
 
 Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by the isocosm coordinator; each entry quotes the option he chose, both the recommended one.
@@ -150,6 +157,10 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - **D3, a relation-reading force on the board.** Mark chose "A relation-reading force on the board", with the reading relayed by the isocosm coordinator: Pictograph's board gets a force law over its relations, so linked cards cluster, and card size stays fixed while the camera zooms instead of shrinking cards. The relations reach the board's existing laws as edges, and `BoardFit` gains the camera (`zoom`, `pan`) and `card_scale`, off by default so a fitted score is unchanged.
 
   Links: summary The board's law reads the scene's relations as edges so linked cards cluster, and a camera zooms over fixed-size cards instead of shrinking them.
+
+- **D4, co-op's identity is lifted into the stack.** Mark chose "Lift co-op's identity into the stack", relayed by the isocosm coordinator (isocosm case 1060): Graphshell co-op's identity and invitation pieces move out of the port into a stack crate, with Isocosm as the planned second consumer (isocosm case 1045's rule); against Isocosm building the same flow on the custody identity itself, or a seeded development identity first. Where it lands was left to the lane, with a new crate's name Mark's: it went into the existing `graphshell-host`, so no name was needed.
+
+  Links: summary Graphshell co-op's contact, invitation and card, with their admission checks over the custody identity, move into graphshell-host for a second product.
 
 ## Open questions
 
@@ -172,6 +183,8 @@ Mark answered two of the isocosm viewer lane's forks on 2026-10-31, relayed by t
 - 2026-10-31: under each law with the scene's relations as edges, two linked triangles dealt alternately along a row (mean gap within a triangle, then across): Springs 170 and 307, Charge 173 and 437, Stress 170 and 306, Energy 116 and 712; unlinked, within exceeds across under each (Springs 673 and 509). A start with every card on one line leaves every force on that line, and the triangles do not separate (within 154, across 117). `crates/canvas/pictograph/src/canvas/board_camera.rs` holds the Springs case.
 
 ## Progress
+
+- 2026-10-31: P12 landed locally on `coop-invitation-lift`: `graphshell_host::invitation`, the port's co-op on it; not pushed.
 
 - 2026-10-28: cut from the stack lift plan; nothing new landed.
 
