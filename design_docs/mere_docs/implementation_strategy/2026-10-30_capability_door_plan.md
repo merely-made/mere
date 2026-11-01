@@ -641,6 +641,26 @@ error types settle.
   Wasmtime's `cc` users (zstd, ittapi, its fiber and helpers) stay on the
   component side. `resource` is a WIT keyword, so the fetch method is named
   `fetch`. Run on Windows only; not timed.
+- 2026-10-31, C0 generator measured (Mere `54ac51415`): calls now travel under
+  wRPC's names rather than their position in the WIT, and Rust keywords are
+  escaped. Against wRPC, 20,000 random values per property on a conformance
+  interface (every supported type nested, keyword names) encode to the same
+  bytes and decode back unchanged; 20,000 mutated encodings are accepted by
+  ours exactly when wRPC accepts them. That test found a u64 decode that
+  truncated a ten-byte integer instead of refusing it; fixed, with a
+  regression test. A corrupted case is refused by both (the positive
+  control); both accept non-minimal integers, so the wire is not canonical.
+  Pure random bytes reached past the eighth byte only 10 times in 20,000 and
+  were replaced by mutation. Coverage, counting an interface bound when code
+  is generated and its first refusal otherwise: 25 of 57 interfaces across
+  WASI 0.2.6, WASI 0.3.0-rc-2026-03-15 and `mere:script` (29 of the 32
+  refusals are a type `use`d from another interface, 2 enums, 1 async
+  function), and 2,123 of 3,430 interfaces in 1,999 random `wit-smith`
+  packages (use 308, enum 144, flags 125, then the signed, float and `char`
+  types, static functions, constructors and tuples over six). A Wasmtime
+  differential adds nothing to wRPC's for our wire, since Wasmtime decodes
+  the canonical ABI, not this encoding; values crossing Wasmtime unchanged
+  stays the existing check.
 
 ## Progress
 
@@ -748,3 +768,5 @@ error types settle.
 - 2026-10-31: C0's two-route probe built and run on Windows; D17 chose our
   own generator. Promoting it into a shipping crate and moving the interface
   into `mere:script` remain.
+- 2026-10-31: the C0 generator measured against wRPC, mutated input and
+  real WIT; one decode bug found and fixed. Promotion remains.
