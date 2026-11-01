@@ -661,6 +661,21 @@ error types settle.
   differential adds nothing to wRPC's for our wire, since Wasmtime decodes
   the canonical ABI, not this encoding; values crossing Wasmtime unchanged
   stays the existing check.
+- 2026-11-01, C0 generator's gaps closed (Mere `62b3884de`, Mark: "All
+  synchronous gaps"): every primitive, enums, flags, tuples to sixteen,
+  static functions, constructors and types `use`d from other interfaces
+  (emitted as sibling modules) are bound in wRPC's encoding; async
+  functions, streams, futures, maps and fixed-length lists are refused.
+  The conformance interface now carries them all and agrees with wRPC on
+  20,000 random and 20,000 mutated values, and at each type's edges
+  (signed extremes, NaN written canonically, the last `char`, a flag bit
+  past the last refused by both). Coverage: 51 of 59 real interfaces (all
+  of WASI 0.2.6 and `mere:script`; the 8 refused are WASI 0.3's async
+  functions, streams and futures) and all 3,430 interfaces in 1,999 random
+  `wit-smith` packages, whose default configuration generates none of the
+  refused features. `c0-corpus` compiles the 551 emitted interfaces (the
+  real ones and the first 500 random) with no errors; a planted error is
+  caught. Run on Windows only.
 
 ## Progress
 
@@ -770,3 +785,5 @@ error types settle.
   into `mere:script` remain.
 - 2026-10-31: the C0 generator measured against wRPC, mutated input and
   real WIT; one decode bug found and fixed. Promotion remains.
+- 2026-11-01: the C0 generator covers the synchronous Component Model and
+  compiles what it binds. Promotion remains.
