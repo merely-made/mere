@@ -231,6 +231,33 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D4 · draws on stack.3, stack.5 · summary C0 runs now: the projection session is bound through our own wit-parser generator and through pinned wRPC, measured, then one route is chosen.
 
+- **D13, the projection session's contract (2026-10-31).** Mark chose
+  "Free calls, then a resource (Recommended)": `discover` and `open` are free
+  functions and `open` returns a `projection-session` resource whose methods
+  are snapshot, resource, chunk, resume, intent, close and suspend, so the
+  session id no longer rides in each payload. "Every method rechecks
+  (Recommended)": the provider rechecks the session's retained authority on
+  every call, resume included; a lapse comes back as Revoked or Expired and
+  nothing is disclosed under it. "Status stays, drop is close
+  (Recommended)": revocation stays a status in replies plus a typed
+  `revoked` failure after a lapse, dropping the resource is Close, and
+  cancelling a call in flight is left to N1. "Cap every payload at 1 MiB
+  (Recommended)": each CBOR payload is capped at 1 MiB, the browser
+  carrier's limit, checked on both sides with a typed `too-large` failure;
+  chunks stay at 512 KiB.
+
+  Links: area Stack · draws on stack.2, stack.3 · summary Discover and open are free calls returning a session resource; every method rechecks authority; revocation is a status and a typed failure, drop is close; payloads cap at 1 MiB.
+
+- **D14, where C0's pieces live (2026-10-31).** Mark chose "Interface in
+  mere:script (Recommended)": the projection-session interface joins
+  `mere:script` with its own provider world, and no package name is minted.
+  "Probe dir, then promote (Recommended)": both routes are built under
+  `crates/probes/projection-session-c0/`, and only the chosen one is promoted
+  into a shipping crate. "ciborium (Recommended)": payloads are CBOR through
+  `ciborium`, already in graph-kernel and pandect.
+
+  Links: area Stack · draws on stack.1, stack.3 · summary The interface joins mere:script; both routes are probed under crates/probes and only the winner is promoted; CBOR through ciborium.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -240,10 +267,10 @@ Write the projection session's control surface (`CarrierRequestBody`'s
 Discover, Open, Resume, Intent, Close and Suspend) as a WIT interface with a
 `projection-session` resource. Snapshots and resource chunks return bytes in
 chirograph's serde form as versioned CBOR (D6). Bind it from a native provider
-and consumer, and from a component guest under `app-host`. Before binding,
-the phase settles what the existing contract leaves open: discovery and
-opening apart from methods on an opened session, Resume rechecking authority,
-revocation and cancellation apart from Close and Suspend, and size limits. Flow
+and consumer, and from a component guest under `app-host`. D13 settles
+what the existing contract left open: discovery and opening apart from
+methods on an opened session, Resume rechecking authority, revocation and
+cancellation apart from Close and Suspend, and size limits. D14 places it. Flow
 control is already settled: a chunk request acknowledges the previous chunk,
 and notices carry no payload (`crates/chirograph/src/lib.rs:1131-1205`).
 - Done when: the native pair and the component exchange the same calls and
@@ -345,9 +372,6 @@ error types settle.
   Notochord (Dramatis) holds `RetainedAuthority`; the type needs a home both
   directions of dependency allow.
 - **How native code binds WIT.** C0 decides.
-- **The WIT package:** extend `mere:script` or open a sibling package. Mark's
-  2026-10-28 preference applies: "redefine existing names instead of minting
-  new ones."
 - **Where consent is asked, and how it reads.** Djinn asks under castellan's
   rule; the surface's owner is not named.
 - **Linux identity beyond launch.** Flatpak application ids and desktop
@@ -628,3 +652,8 @@ error types settle.
   to 1.26.1, the pair Servo's own main locks; 1.27.0 changed no public API.
   Checked on this Mac: Genet's media crates and Turnstone with `audio`. Not
   run: Turnstone's `servo` feature and a Windows build on o-pc.
+- 2026-10-31: D13 and D14 ruled: the projection session's contract (free
+  discover and open, a session resource, authority rechecked on every call,
+  revocation as status and a typed failure, 1 MiB payloads) and where C0's
+  pieces live. The two-route probe starts under
+  `crates/probes/projection-session-c0/`.

@@ -172,6 +172,20 @@ summary = "C0 runs now: the projection session is bound through our own wit-pars
 draws_on = ["stack.3", "stack.5"]
 amends = ["capability-door D4"]
 
+[decisions."capability-door D13"]
+title = "the projection session's contract (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Discover and open are free calls returning a session resource; every method rechecks authority; revocation is a status and a typed failure, drop is close; payloads cap at 1 MiB."
+draws_on = ["stack.2", "stack.3"]
+
+[decisions."capability-door D14"]
+title = "where C0's pieces live (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "The interface joins mere:script; both routes are probed under crates/probes and only the winner is promoted; CBOR through ciborium."
+draws_on = ["stack.1", "stack.3"]
+
 [decisions."distillery-extraction D1"]
 title = ". The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
