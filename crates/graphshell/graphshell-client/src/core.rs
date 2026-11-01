@@ -234,6 +234,18 @@ impl SessionCore {
         }
     }
 
+    /// The carrier reported the sessions' authority lapsed (D20): mark each
+    /// mounted scene expired or revoked, purging per its cache policy.
+    pub fn lapse(&mut self, status: chirograph::SessionStatus) {
+        self.pending = None;
+        for session in self.mounted.iter() {
+            match status {
+                chirograph::SessionStatus::Expired => self.client.mark_expired(session),
+                _ => self.client.mark_revoked(session),
+            }
+        }
+    }
+
     /// Drop every mounted scene and its cached bytes.
     pub fn purge(&mut self) {
         let sessions: Vec<ProjectionSession> = self.mounted.iter().cloned().collect();
@@ -1007,6 +1019,29 @@ mod tests {
             )))
             .unwrap();
         (core, session, card, media)
+    }
+
+    /// D20: a carrier's lapse marks the scene as its status says; revoked
+    /// purges per the cache policy, expired keeps the bytes for a renewal.
+    #[test]
+    fn a_carrier_lapse_marks_the_scene() {
+        let (mut core, session, card, _) = media_core();
+        core.client
+            .apply_resource(ResourceResponse::new(session.clone(), card.clone()))
+            .unwrap();
+        core.lapse(chirograph::SessionStatus::Expired);
+        assert_eq!(
+            core.client.mounted(&session).unwrap().status,
+            chirograph::SessionStatus::Expired
+        );
+        assert!(core.client.resources.contains_key(&session));
+
+        core.lapse(chirograph::SessionStatus::Revoked);
+        assert_eq!(
+            core.client.mounted(&session).unwrap().status,
+            chirograph::SessionStatus::Revoked
+        );
+        assert!(!core.client.resources.contains_key(&session));
     }
 
     #[test]

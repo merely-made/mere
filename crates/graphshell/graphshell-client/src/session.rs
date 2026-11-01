@@ -305,6 +305,8 @@ impl RetainedEndpointSession {
             Err(error) => {
                 if error.is_disconnected() {
                     self.core.disconnect();
+                } else if let Some(status) = error.lapse() {
+                    self.core.lapse(status);
                 }
                 Err(error.to_string())
             },

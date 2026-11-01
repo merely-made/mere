@@ -9,7 +9,7 @@
 use chirograph::{
     Carrier, CarrierError, CarrierNotice, CarrierRequestBody, CarrierResponseBody,
     EndpointDescriptor, IntentResult, ProjectionSession, ProjectionSnapshot, ResourceChunkResponse,
-    ResourceResponse, ResumeReply, Revision, SceneEpoch, SessionOpened,
+    ResourceResponse, ResumeReply, Revision, SceneEpoch, SessionOpened, SessionStatus,
 };
 
 use super::{Failure, IntentCall, Notice, ProjectionAsk, payload};
@@ -31,6 +31,9 @@ impl From<Failure> for Fault {
 impl From<Fault> for CarrierError {
     fn from(f: Fault) -> Self {
         match f {
+            // A lapse reaches the client as its status (D20).
+            Fault::Refused(Failure::Revoked) => CarrierError::Lapsed(SessionStatus::Revoked),
+            Fault::Refused(Failure::Expired) => CarrierError::Lapsed(SessionStatus::Expired),
             Fault::Refused(f) => CarrierError::Refused(format!("{f:?}")),
             Fault::Disconnected(m) => CarrierError::Disconnected(m),
         }
@@ -63,11 +66,14 @@ pub trait SessionCalls {
 
 /// A `Carrier` over [`SessionCalls`]. It holds the opened session, fills
 /// chirograph's session field from it, and refuses a request or reply that
-/// names another session (D15).
+/// names another session (D15). A `revoked` or `expired` failure is
+/// [`CarrierError::Lapsed`] (D20); one met where it cannot be returned, in
+/// `take_notice`, is kept and returned by the next call.
 pub struct WitCarrier<C: SessionCalls> {
     calls: C,
     session: Option<C::Session>,
     id: Option<ProjectionSession>,
+    lapsed: Option<SessionStatus>,
 }
 
 impl<C: SessionCalls> WitCarrier<C> {
@@ -76,6 +82,7 @@ impl<C: SessionCalls> WitCarrier<C> {
             calls,
             session: None,
             id: None,
+            lapsed: None,
         }
     }
 
@@ -129,6 +136,9 @@ fn encode<T: serde::Serialize>(value: &T) -> Result<Vec<u8>, CarrierError> {
 
 impl<C: SessionCalls> Carrier for WitCarrier<C> {
     fn request(&mut self, body: CarrierRequestBody) -> Result<CarrierResponseBody, CarrierError> {
+        if let Some(status) = self.lapsed.take() {
+            return Err(CarrierError::Lapsed(status));
+        }
         use CarrierRequestBody as Q;
         use CarrierResponseBody as A;
         Ok(match body {
@@ -207,11 +217,19 @@ impl<C: SessionCalls> Carrier for WitCarrier<C> {
 
     fn take_notice(&mut self) -> Option<CarrierNotice> {
         let session = self.session.as_ref()?;
-        let n = self.calls.take_notice(session).ok()??;
-        self.notice(n).ok()
+        match self.calls.take_notice(session) {
+            Ok(n) => self.notice(n?).ok(),
+            Err(fault) => {
+                self.lapsed = CarrierError::from(fault).lapse();
+                None
+            },
+        }
     }
 
     fn wait_for_notice(&mut self) -> Result<CarrierNotice, CarrierError> {
+        if let Some(status) = self.lapsed.take() {
+            return Err(CarrierError::Lapsed(status));
+        }
         let n = self.call(|c, s| c.wait_notice(s))?;
         self.notice(n)
     }

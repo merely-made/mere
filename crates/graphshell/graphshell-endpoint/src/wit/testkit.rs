@@ -312,8 +312,8 @@ pub fn assert_outcomes(t: &Transcript) {
     assert!(get("intent.huge").contains("TooLarge"));
     assert_eq!(get("suspend"), "Ok(Suspended)");
     assert!(get("snapshot.other").contains("is not this carrier's"));
-    assert_eq!(get("snapshot.revoked"), "Err(Refused(\"Revoked\"))");
+    assert_eq!(get("snapshot.revoked"), "Err(Lapsed(Revoked))");
     assert_eq!(get("take-notice.revoked"), "None");
-    assert_eq!(get("wait-notice.revoked"), "Err(Refused(\"Revoked\"))");
+    assert_eq!(get("wait-notice.revoked"), "Err(Lapsed(Revoked))");
     assert_eq!(get("close"), "Ok(Closed)");
 }

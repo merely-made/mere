@@ -1249,6 +1249,11 @@ pub enum CarrierError {
     /// still presenting its scene as live is showing something it can no
     /// longer save to.
     Disconnected(String),
+    /// The session's authority ran out: `Expired` on schedule, `Revoked` by
+    /// its issuer (capability door D20). Nothing more is disclosed on it; the
+    /// host marks the scene as the status says and purges per its cache
+    /// policy. Any other status here is a carrier's bug.
+    Lapsed(SessionStatus),
 }
 
 impl CarrierError {
@@ -1261,6 +1266,16 @@ impl CarrierError {
     pub fn message(&self) -> &str {
         match self {
             CarrierError::Refused(message) | CarrierError::Disconnected(message) => message,
+            CarrierError::Lapsed(SessionStatus::Expired) => "the session's authority expired",
+            CarrierError::Lapsed(_) => "the session's authority was revoked",
+        }
+    }
+
+    /// The status a lapse leaves the session in, if this is one.
+    pub fn lapse(&self) -> Option<SessionStatus> {
+        match self {
+            CarrierError::Lapsed(status) => Some(*status),
+            _ => None,
         }
     }
 }
@@ -1272,6 +1287,7 @@ impl core::fmt::Display for CarrierError {
             CarrierError::Disconnected(message) => {
                 write!(f, "the endpoint is no longer reachable: {message}")
             },
+            CarrierError::Lapsed(_) => write!(f, "{}", self.message()),
         }
     }
 }
