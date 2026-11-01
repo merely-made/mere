@@ -30,6 +30,11 @@
 //! shape the piccolo lane already uses (evaluate, collect Actions, lower them
 //! through the ordinary spine under the participant's author).
 //!
+//! A participant built for the `app-settings` world (capability door K1,
+//! D22) also reaches the `settings` interface, attached with
+//! [`AppScript::attach_with_settings`]: its calls go to that participant's
+//! [`Settings`], an owner behind a gate holding its grant.
+//!
 //! Containment mirrors document-host: [`guarded_engine`] turns on epoch
 //! interruption, [`Watchdog`] bumps the epoch so a runaway turn hits its
 //! deadline, and `StoreLimits` caps allocation. A misbehaving component traps;
@@ -52,6 +57,32 @@ wasmtime::component::bindgen!({
     exports: { default: async },
     imports: { default: async },
 });
+
+/// The `app-settings` world (capability door K1, D22): `app-core` plus the
+/// settings interface. Its `log`, `caps` and `actions` are `app-core`'s, so
+/// one host implementation serves both worlds.
+mod app_settings {
+    wasmtime::component::bindgen!({
+        path: "../wit",
+        world: "app-settings",
+        exports: { default: async },
+        imports: { default: async },
+        with: {
+            "mere:script/log": crate::mere::script::log,
+            "mere:script/caps": crate::mere::script::caps,
+            "mere:script/actions": crate::mere::script::actions,
+        },
+    });
+}
+
+use app_settings::mere::script::settings as ws;
+
+settings_wit::bridge!(crate::app_settings::mere::script::settings);
+
+/// One participant's settings: an owner and the gate holding that
+/// participant's grant, as a [`settings_wit::SettingsServer`]. The gate is
+/// asked before every call the participant makes.
+pub type Settings = Box<dyn settings_wit::bindings::Handler + Send>;
 
 /// Why an emission did not become an action. Returned to the guest as the
 /// WIT `emit-error`, so a refusal is part of the contract rather than a trap.
@@ -86,12 +117,13 @@ pub trait ActionSink: Send {
 }
 
 /// The per-instance store data: the app's sink, the guest's captured log
-/// output, the grant names `caps.granted()` reports, and the WASI floor a std
-/// guest needs.
+/// output, the grant names `caps.granted()` reports, the participant's
+/// settings under `app-settings`, and the WASI floor a std guest needs.
 pub struct AppHostState<S: ActionSink> {
     sink: S,
     logs: Vec<String>,
     granted: Vec<String>,
+    settings: Option<Settings>,
     wasi: WasiCtx,
     table: ResourceTable,
     limits: StoreLimits,
@@ -119,6 +151,31 @@ impl<S: ActionSink> crate::mere::script::actions::Host for AppHostState<S> {
             .map_err(Refusal::into_wit)
     }
 }
+
+impl<S: ActionSink> ws::Host for AppHostState<S> {
+    async fn snapshot(&mut self, reference: String) -> Result<ws::SettingsSnapshot, ws::Failure> {
+        let Some(settings) = self.settings.as_mut() else {
+            return Err(ws::Failure::Unavailable(NO_SETTINGS.into()));
+        };
+        settings
+            .snapshot(reference)
+            .map(bridge::theirs::snapshot)
+            .map_err(bridge::theirs::failure)
+    }
+
+    async fn write(&mut self, request: ws::WriteRequest) -> ws::WriteOutcome {
+        let Some(settings) = self.settings.as_mut() else {
+            return ws::WriteOutcome::Unavailable(ws::Refusal {
+                request_id: request.request_id,
+                message: NO_SETTINGS.into(),
+            });
+        };
+        bridge::theirs::outcome(settings.write(bridge::wire::request(request)))
+    }
+}
+
+/// Settings are linked only under `app-settings`, which always has them.
+const NO_SETTINGS: &str = "no settings for this participant";
 
 impl<S: ActionSink> WasiView for AppHostState<S> {
     fn ctx(&mut self) -> WasiCtxView<'_> {
@@ -170,12 +227,19 @@ impl Drop for Watchdog {
     }
 }
 
-/// One live `app-core` instance: the store (holding the sink) plus bindings.
-/// Drive it with [`activate`](Self::activate) / [`on_event`](Self::on_event) /
-/// [`deactivate`](Self::deactivate), draining the sink between turns.
+/// The world an instance was bound as.
+enum Bindings {
+    Core(AppCore),
+    Settings(app_settings::AppSettings),
+}
+
+/// One live `app-core` or `app-settings` instance: the store (holding the
+/// sink) plus bindings. Drive it with [`activate`](Self::activate) /
+/// [`on_event`](Self::on_event) / [`deactivate`](Self::deactivate), draining
+/// the sink between turns.
 pub struct AppScript<S: ActionSink + 'static> {
     store: Store<AppHostState<S>>,
-    bindings: AppCore,
+    bindings: Bindings,
 }
 
 impl<S: ActionSink + 'static> AppScript<S> {
@@ -212,6 +276,36 @@ impl<S: ActionSink + 'static> AppScript<S> {
         Self::attach_component(engine, &component, sink, granted, limits, epoch_deadline).await
     }
 
+    /// Instantiate an `app-settings` component: an `app-core` participant
+    /// that also reaches `settings`, whose calls go to this participant's
+    /// own owner and gate.
+    pub async fn attach_with_settings(
+        engine: &Engine,
+        component: &Component,
+        sink: S,
+        granted: Vec<String>,
+        settings: Settings,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> wasmtime::Result<Self> {
+        let mut linker = Self::linker(engine)?;
+        ws::add_to_linker::<_, HasSelf<AppHostState<S>>>(&mut linker, |s| s)?;
+        let mut store = Self::store(
+            engine,
+            sink,
+            granted,
+            Some(settings),
+            limits,
+            epoch_deadline,
+        );
+        let bindings =
+            app_settings::AppSettings::instantiate_async(&mut store, component, &linker).await?;
+        Ok(Self {
+            store,
+            bindings: Bindings::Settings(bindings),
+        })
+    }
+
     async fn attach_component(
         engine: &Engine,
         component: &Component,
@@ -220,6 +314,16 @@ impl<S: ActionSink + 'static> AppScript<S> {
         limits: StoreLimits,
         epoch_deadline: Option<u64>,
     ) -> wasmtime::Result<Self> {
+        let linker = Self::linker(engine)?;
+        let mut store = Self::store(engine, sink, granted, None, limits, epoch_deadline);
+        let bindings = AppCore::instantiate_async(&mut store, component, &linker).await?;
+        Ok(Self {
+            store,
+            bindings: Bindings::Core(bindings),
+        })
+    }
+
+    fn linker(engine: &Engine) -> wasmtime::Result<Linker<AppHostState<S>>> {
         let mut linker: Linker<AppHostState<S>> = Linker::new(engine);
         wasmtime_wasi::p2::add_to_linker_async(&mut linker)?;
         // All three imports are intrinsic to the world: `log` and `caps` name
@@ -235,13 +339,24 @@ impl<S: ActionSink + 'static> AppScript<S> {
             &mut linker,
             |s| s,
         )?;
+        Ok(linker)
+    }
 
+    fn store(
+        engine: &Engine,
+        sink: S,
+        granted: Vec<String>,
+        settings: Option<Settings>,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> Store<AppHostState<S>> {
         let mut store = Store::new(
             engine,
             AppHostState {
                 sink,
                 logs: Vec::new(),
                 granted,
+                settings,
                 wasi: WasiCtxBuilder::new().build(),
                 table: ResourceTable::new(),
                 limits,
@@ -251,24 +366,30 @@ impl<S: ActionSink + 'static> AppScript<S> {
         if let Some(ticks) = epoch_deadline {
             store.set_epoch_deadline(ticks);
         }
-        let bindings = AppCore::instantiate_async(&mut store, &component, &linker).await?;
-        Ok(Self { store, bindings })
+        store
     }
 
     pub async fn activate(&mut self) -> wasmtime::Result<()> {
-        self.bindings.call_activate(&mut self.store).await
+        match &self.bindings {
+            Bindings::Core(b) => b.call_activate(&mut self.store).await,
+            Bindings::Settings(b) => b.call_activate(&mut self.store).await,
+        }
     }
 
     /// Deliver one host event. The component emits during this call; the
     /// accepted emissions land in the sink, which the caller drains after.
     pub async fn on_event(&mut self, kind: &str, payload: &str) -> wasmtime::Result<()> {
-        self.bindings
-            .call_on_event(&mut self.store, kind, payload)
-            .await
+        match &self.bindings {
+            Bindings::Core(b) => b.call_on_event(&mut self.store, kind, payload).await,
+            Bindings::Settings(b) => b.call_on_event(&mut self.store, kind, payload).await,
+        }
     }
 
     pub async fn deactivate(&mut self) -> wasmtime::Result<()> {
-        self.bindings.call_deactivate(&mut self.store).await
+        match &self.bindings {
+            Bindings::Core(b) => b.call_deactivate(&mut self.store).await,
+            Bindings::Settings(b) => b.call_deactivate(&mut self.store).await,
+        }
     }
 
     pub fn sink(&self) -> &S {
@@ -303,6 +424,27 @@ impl<S: ActionSink + 'static> AppScript<S> {
             path,
             sink,
             granted,
+            limits,
+            epoch_deadline,
+        ))
+    }
+
+    /// Blocking counterpart to [`Self::attach_with_settings`].
+    pub fn attach_with_settings_blocking(
+        engine: &Engine,
+        component: &Component,
+        sink: S,
+        granted: Vec<String>,
+        settings: Settings,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> wasmtime::Result<Self> {
+        pollster::block_on(Self::attach_with_settings(
+            engine,
+            component,
+            sink,
+            granted,
+            settings,
             limits,
             epoch_deadline,
         ))

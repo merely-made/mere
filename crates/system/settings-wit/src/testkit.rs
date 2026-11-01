@@ -497,6 +497,23 @@ pub fn run(calls: &mut impl SettingsCalls) -> Vec<(String, String)> {
     out
 }
 
+/// Separates an entry's label from its result in a participant's log line.
+const SEPARATOR: char = '\u{1f}';
+
+/// One transcript entry as a participant logs it.
+pub fn log_line((label, result): &(String, String)) -> String {
+    format!("{label}{SEPARATOR}{result}")
+}
+
+/// A participant's logged transcript, back as entries.
+pub fn from_log(lines: &[String]) -> Vec<(String, String)> {
+    lines
+        .iter()
+        .filter_map(|l| l.split_once(SEPARATOR))
+        .map(|(a, b)| (a.to_string(), b.to_string()))
+        .collect()
+}
+
 /// What [`run`] must have seen, whichever binding carried it.
 pub fn assert_outcomes(transcript: &[(String, String)]) {
     assert_eq!(transcript.len(), CALLS, "{transcript:#?}");

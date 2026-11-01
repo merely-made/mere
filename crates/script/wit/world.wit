@@ -426,3 +426,12 @@ interface settings {
 world settings-provider {
     export settings;
 }
+
+/// An app participant that also reaches settings (capability door K1, D22):
+/// everything `app-core` has, plus the settings interface. Each call is put
+/// to the participant's settings gate, so the grant decides what it reads
+/// and writes, as the ring gate decides its actions.
+world app-settings {
+    include app-core;
+    import settings;
+}

@@ -1,13 +1,12 @@
 package mere:settings-test@0.1.0;
 
-/// The settings test guest (capability door K1): it runs the shared call
-/// script against the imported settings and echoes values for the crossing
-/// test.
-world settings-consumer {
-    import mere:script/settings@0.1.0;
+/// The settings test guest (capability door K1): an `app-settings`
+/// participant that runs the shared call script on a `run` event, logging
+/// each entry, and echoes values for the crossing test.
+world settings-participant {
+    include mere:script/app-settings@0.1.0;
     use mere:script/settings@0.1.0.{settings-snapshot, write-outcome, failure};
 
-    export run: func() -> list<tuple<string, string>>;
     export echo-snapshot: func(value: settings-snapshot) -> settings-snapshot;
     export echo-outcome: func(value: write-outcome) -> write-outcome;
     export echo-failure: func(value: failure) -> failure;

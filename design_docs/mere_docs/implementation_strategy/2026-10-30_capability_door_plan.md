@@ -507,7 +507,9 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   and `actions` stay: `caps` reports the host's grant and names no
   capability, and a grant of settings shows as `settings` being linked;
   `actions` is the stable action envelope (2026-07-23), and settings writes
-  are not actions. The application world that imports settings follows.
+  are not actions. The `app-settings` world (`app-core` plus `settings`)
+  is hosted by app-host's `AppScript::attach_with_settings`, with an owner
+  and gate per participant; `app-core`'s path is unchanged.
 
 ### G1. The gateway to Murm
 Deferred (D5) until a remote consumer is named and OCapN's encoding and
@@ -845,9 +847,15 @@ error types settle.
   an f32 owner's canonical value) gives the same transcript in process, over
   OS pipes and from the component; the gate is asked the same 16 questions
   and the owner ends in the same state, and values cross Wasmtime unchanged.
-  The settings guest's dependency closure compiles no C. Tests: settings-wit
-  6, app-host 9 (settings 2, projection 2, emit 5), script-witgen 1. Run on
-  Windows only.
+  The guest is an `app-settings` participant attached through `AppScript`:
+  it runs the script on a `run` event and logs each entry, and a second
+  participant on the same engine with no settings grant is refused at its
+  first snapshot by its own gate. app-host binds `app-settings` with
+  `app-core`'s `log`, `caps` and `actions` reused through Wasmtime's
+  `with`, so one host implementation serves both worlds. The settings
+  guest's dependency closure compiles no C. Tests: settings-wit 6, app-host
+  10 (settings 3, projection 2, emit 5), script-witgen 1. Run on Windows
+  only.
 
 ## Progress
 

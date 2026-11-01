@@ -4,12 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The settings test guest: the shared call script over this component's
-//! imports.
+//! The settings test guest: an `app-settings` participant that runs the
+//! shared call script over its imports on a `run` event and logs each entry.
 
 wit_bindgen::generate!({
     path: ["../../wit", "wit"],
-    world: "mere:settings-test/settings-consumer",
+    world: "mere:settings-test/settings-participant",
     // The imported interface lives in another package, mere:script.
     generate_all,
 });
@@ -42,9 +42,15 @@ impl SettingsCalls for Imports {
 struct Component;
 
 impl Guest for Component {
-    fn run() -> Vec<(String, String)> {
-        testkit::run(&mut Imports)
+    fn activate() {}
+    fn on_event(kind: String, _payload: String) {
+        if kind == "run" {
+            for entry in testkit::run(&mut Imports) {
+                mere::script::log::log(&testkit::log_line(&entry));
+            }
+        }
     }
+    fn deactivate() {}
     fn echo_snapshot(value: imported::SettingsSnapshot) -> imported::SettingsSnapshot {
         value
     }
