@@ -29,3 +29,6 @@ pollster = "0.4"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt", "macros"] }
+# The projection session served to a component guest (capability door D18).
+graphshell-endpoint = { workspace = true, features = ["wit-testkit"] }
+script-wire.workspace = true

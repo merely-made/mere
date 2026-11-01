@@ -1,0 +1,13 @@
+package mere:projection-test@0.1.0;
+
+/// The projection-session test guest (capability door C0): it runs the
+/// shared call script against the imported session and echoes values for
+/// the crossing test.
+world projection-consumer {
+    import mere:script/projection-session@0.1.0;
+    use mere:script/projection-session@0.1.0.{failure, notice};
+
+    export run: func() -> list<tuple<string, string>>;
+    export echo-failure: func(value: failure) -> failure;
+    export echo-notice: func(value: option<notice>) -> option<notice>;
+}

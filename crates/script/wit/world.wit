@@ -162,6 +162,64 @@ interface actions {
     emit: func(action: action-envelope) -> result<_, emit-error>;
 }
 
+/// The projection session's control surface (capability door C0; D13, D15).
+///
+/// One `session` resource per Open. It holds the session id the provider
+/// derived at admission, so no argument names a session. Payloads are
+/// chirograph serde values as versioned CBOR (D6), at most 1 MiB each (D13).
+/// Dropping the resource is Close, and when the channel carrying it ends the
+/// provider closes every session opened on it (D19). Native code binds it
+/// with script-witgen; an N1 channel carries these calls for every provider,
+/// native or component (D19).
+interface projection-session {
+    /// One chirograph value: a version byte, then CBOR.
+    type payload = list<u8>;
+
+    variant failure {
+        /// The session's authority was revoked; nothing is disclosed.
+        revoked,
+        /// The session's authority ran out.
+        expired,
+        /// A payload over the 1 MiB cap; carries its length.
+        too-large(u64),
+        /// The provider declined the call.
+        refused(string),
+        /// A payload that did not decode.
+        malformed(string),
+    }
+
+    /// A projection advanced. Carries no scene data: the consumer resumes.
+    record notice {
+        epoch: u64,
+        revision: u64,
+    }
+
+    resource session {
+        /// `ProjectionAsk` in, `ProjectionSnapshot` out.
+        snapshot: func(ask: payload) -> result<payload, failure>;
+        /// `ContentHash` in, `ResourceResponse` out.
+        fetch: func(address: payload) -> result<payload, failure>;
+        /// One slice of a resource; asking for the next acknowledges this one.
+        /// `ResourceChunkResponse` out.
+        chunk: func(address: payload, offset: u64, length: u32) -> result<payload, failure>;
+        /// `ResumeReply` out.
+        resume: func(epoch: u64, revision: u64) -> result<payload, failure>;
+        /// `IntentCall` in, `IntentResult` out.
+        intent: func(call: payload) -> result<payload, failure>;
+        /// Going away, but keep the session resumable.
+        suspend: func() -> result<_, failure>;
+        /// A queued notice, if any. Never blocks.
+        take-notice: func() -> option<notice>;
+        /// Block until a notice arrives.
+        wait-notice: func() -> result<notice, failure>;
+    }
+
+    /// `EndpointDescriptor` out.
+    discover: func() -> result<payload, failure>;
+    /// `SessionOpen` in; the session and `SessionOpened` out.
+    open: func(request: payload) -> result<tuple<session, payload>, failure>;
+}
+
 /// The app-core world: a component that can BE an app participant. Its runnable
 /// body reacts to host events and emits actions through the envelope; the
 /// ring gate decides what lowers. Lifecycle mirrors document-core.
@@ -190,4 +248,10 @@ world document-core {
     export activate: func();
     export handle-event: func(ev: event) -> result<apply-batch, turn-error>;
     export deactivate: func();
+}
+
+/// A projection provider (capability door C0): a component that serves
+/// projection sessions, through app-host, to any consumer.
+world projection-provider {
+    export projection-session;
 }

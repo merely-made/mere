@@ -7,7 +7,8 @@
 //! Traits application adapters implement beside their own source truth.
 //!
 //! The default feature set is empty. `projection` enables the endpoint traits;
-//! the `stdio`, `local` and `network` carriers imply it. `network` is native-only.
+//! the `stdio`, `local`, `network` and `wit` carriers imply it. `network` is
+//! native-only.
 //!
 //! Projection and identity adapters use the independent Djinn door; native
 //! adapters are unavailable on Wasm.
@@ -25,6 +26,8 @@ pub mod local;
 pub mod network;
 #[cfg(feature = "stdio")]
 pub mod stdio;
+#[cfg(feature = "wit")]
+pub mod wit;
 
 #[cfg(feature = "projection")]
 mod projection_contract {

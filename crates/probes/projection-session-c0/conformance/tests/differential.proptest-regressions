@@ -1,7 +1,0 @@
-# Seeds for failure cases proptest has generated in the past. It is
-# automatically read and these particular cases re-run before any
-# novel cases are generated.
-#
-# It is recommended to check this file in to source control so that
-# everyone who runs the test benefits from these saved cases.
-cc 6f623f009e5fab247027c51e0d9201a866e7a396d985ee8395c739b7d5c4989b # shrinks to v = Bag { flag: false, small: 0, shapes: [Dot(Point { x: 0, y: 0, type: "\0a¡𐀀A A ", match: false }), Dot(Point { x: 268435456, y: 72057594037927936, type: "\0aa¡", match: false })], pair: (268435456, "a"), triple: (0, [0, 0, 0], Some(144115188075855872)), maybe: None, outcome: Ok(()), ok_only: Ok(Point { x: 0, y: 0, type: "¡00\u{80}ࠀ𐀀", match: false }) }, at = Index(12078225286357444511), byte = 128, how = 1

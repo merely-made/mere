@@ -39,6 +39,9 @@ members = [
     "crates/script/rhai",
     "crates/script/document-host",
     "crates/script/app-host",
+    # Native WIT bindings (capability door D17-D19): the runtime and its generator.
+    "crates/script/wire",
+    "crates/script/witgen",
     # ─── Absorbed 2026-07-23 (design_docs/.../2026-07-23_repo_consolidation_plan.md) ───
     # Cambium and Conatus remain platform components. The 2026-10-19 foundation
     # promotion moved Eidetic, Armillary, ESP and Gemot to independent suppliers;
@@ -307,6 +310,12 @@ athanor = { package = "mere-athanor", version = "0.0.1", path = "ports/distiller
 # Shared pins the graphshell crates inherit.
 base64 = "0.22"
 blake3 = "1"
+# One upstream ipc-channel across the family (capability door D10); never
+# force-inprocess outside an application root.
+ipc-channel = "0.23.1"
+# Exactly pinned: wit-parser states no API stability and ships a new 0.X
+# with every wasm-tools release (capability door D17).
+wit-parser = "=0.263.0"
 mere = { path = "crates/mere" }
 
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
@@ -560,6 +569,8 @@ persona-picker = { package = "persona-picker", path = "crates/cambium/persona-pi
 # Rhai backend for the knot block-evaluator lane (the thin BlockEvaluator
 # slice, distinct from genet's full ScriptEngine seam). Pure Rust, sandboxed.
 script-rhai = { version = "0.0.1", path = "crates/script/rhai" }
+script-wire = { version = "0.0.1", path = "crates/script/wire" }
+script-witgen = { version = "0.0.1", path = "crates/script/witgen" }
 
 # ─── External pins ───────────────────────────────────────────────────────────
 # Linebender visual stack — both aliases use the same maintained Classic
@@ -694,6 +705,8 @@ scenograph = { path = "crates/cambium/scenes/scenograph" }
 scenomise = { path = "crates/cambium/scenes/scenomise" }
 scenotime = { path = "crates/cambium/scenes/scenotime" }
 script-rhai = { path = "crates/script/rhai" }
+script-wire = { path = "crates/script/wire" }
+script-witgen = { path = "crates/script/witgen" }
 servitor = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 

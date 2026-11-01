@@ -16,6 +16,12 @@ stdio = ["projection", "dep:serde_json"]
 projection-door = ["projection", "dep:djinn", "djinn/door-native", "dep:serde_json", "dep:tokio"]
 projection-offer = ["projection", "dep:djinn", "djinn/door", "dep:serde", "dep:serde_json"]
 projection-provider = ["projection-offer", "djinn/door-native", "dep:tokio"]
+# The projection session over mere:script's WIT (capability door D18, D19).
+wit = ["projection", "dep:script-wire", "dep:script-witgen", "dep:ciborium", "dep:serde", "dep:sceno"]
+# The ipc-channel transport N1's channels use.
+wit-ipc = ["wit", "script-wire/ipc"]
+# The fixture endpoint, gate and call script every binding is checked with.
+wit-testkit = ["wit"]
 profile = ["dep:djinn", "djinn/custody-client", "dep:dramatis", "dep:insigne", "dep:personae"]
 
 [dependencies]
@@ -23,6 +29,12 @@ chirograph = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 djinn = { workspace = true, optional = true }
+script-wire = { workspace = true, optional = true }
+ciborium = { version = "0.2", optional = true }
+sceno = { workspace = true, optional = true }
+
+[build-dependencies]
+script-witgen = { workspace = true, optional = true }
 
 [target.'cfg(all(not(target_arch = "wasm32"), any(unix, windows)))'.dependencies]
 tokio = { version = "1", features = ["io-util", "rt", "rt-multi-thread", "net", "time", "sync", "macros"], optional = true }
@@ -31,6 +43,8 @@ insigne = { workspace = true, optional = true }
 personae = { workspace = true, optional = true }
 
 [dev-dependencies]
+# Passes a provider's end over a channel, as N1 does (wit_carrier tests).
+ipc-channel.workspace = true
 sceno.workspace = true
 scenotime.workspace = true
 tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "time"] }

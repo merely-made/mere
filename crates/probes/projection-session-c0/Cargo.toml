@@ -1,6 +1,0 @@
-# Capability door C0 probe (D12-D15): the projection session bound through two
-# native routes and a Wasmtime component guest. Standalone: the mere workspace
-# excludes crates/probes. The guest is its own workspace (wasm32-wasip2).
-[workspace]
-resolver = "3"
-members = ["contract", "witgen", "route-a", "route-b", "host", "conformance", "corpus"]

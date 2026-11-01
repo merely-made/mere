@@ -1,0 +1,27 @@
+# The projection-session test guest (capability door C0, D18): runs
+# graphshell-endpoint's call script through its WIT carrier over the imported
+# session. Standalone workspace with its own toolchain pin, built to
+# wasm32-wasip2 by the host's build.rs; the host tests load the artifact.
+[workspace]
+
+[package]
+rust-version = "1.97.1"
+name = "projection-guest"
+version = "0.0.1"
+edition = "2024"
+license = "MPL-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+graphshell-endpoint = { path = "../../../graphshell/graphshell-endpoint", features = ["wit-testkit"] }
+wit-bindgen = "0.58"
+
+[profile.release]
+opt-level = "s"
+strip = true
+
+[workspace.package]
+rust-version = "1.97.1"

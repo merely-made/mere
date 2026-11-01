@@ -17,12 +17,29 @@
 use std::path::Path;
 use std::process::Command;
 
-const GUEST: (&str, &str) = ("guest", "app_core_guest.wasm");
+/// Each guest: its directory, its artifact, and what else it is built from.
+const GUESTS: &[(&str, &str, &[&str])] = &[
+    ("guest", "app_core_guest.wasm", &[]),
+    // The projection-session test guest (capability door C0, D18) runs the
+    // shared call script through graphshell-endpoint's WIT carrier.
+    (
+        "guest-projection",
+        "projection_guest.wasm",
+        &[
+            "../../graphshell/graphshell-endpoint/src",
+            "../../chirograph/src",
+        ],
+    ),
+];
 
 fn main() {
     let root = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR");
-    let root = Path::new(&root);
-    let (dir, artifact) = GUEST;
+    for &(dir, artifact, watch) in GUESTS {
+        build(Path::new(&root), dir, artifact, watch);
+    }
+}
+
+fn build(root: &Path, dir: &str, artifact: &str, watch: &[&str]) {
     let guest = root.join(dir);
     if !guest.join("Cargo.toml").exists() {
         println!("cargo::warning={dir}: no Cargo.toml; skipping guest build");
@@ -37,6 +54,9 @@ fn main() {
         guest.display()
     );
     println!("cargo::rerun-if-changed=../wit/world.wit");
+    for path in watch {
+        println!("cargo::rerun-if-changed={path}");
+    }
 
     // The guest is a separate workspace with its own target dir and toolchain
     // pin. Strip the parent cargo's environment so the child resolves its own.

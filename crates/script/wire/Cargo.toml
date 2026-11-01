@@ -1,0 +1,23 @@
+[package]
+rust-version = "1.97.1"
+name = "script-wire"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Runtime for script-witgen's bindings: wRPC's value encoding and blocking transports over OS pipes or ipc-channel."
+
+[features]
+default = []
+# The ipc-channel transport (D19). Never sets force-inprocess (D10).
+ipc = ["dep:ipc-channel", "dep:serde"]
+
+[dependencies]
+ipc-channel = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = "1"
+# The reference encoder the conformance tests compare against (D15).
+wit-bindgen-wrpc = "=0.12.0"
