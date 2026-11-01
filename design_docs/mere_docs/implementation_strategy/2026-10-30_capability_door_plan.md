@@ -5,8 +5,9 @@ outside this plan in Mere `c3567c5ab` (application projection offers), and the
 door library moved to Armillary's `djinn` crate (`721e17d`). I1 is built
 (Armillary `b6578ee`, its Windows remainder `104b8d4`) and M1's Knot and
 Turnstone cases have landed; M1's
-remaining entries follow, and C0 waits for a component provider someone
-wants. The first findings were read against Mere `56fbdc2e4` and Murm
+remaining entries follow. C0's probe ran in
+`crates/probes/projection-session-c0/` and chose our own generator (D17);
+promoting it is next. The first findings were read against Mere `56fbdc2e4` and Murm
 `96e8843e814`, the revision's against Mere `94c1bd1a3` and Armillary
 `a333f51`, and the upstream findings of 2026-10-31 on GitHub and crates.io
 that day; no test was run for them.
@@ -283,10 +284,21 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D11 · draws on stack.2 · summary A launched Windows application is the process Djinn started, known by id and creation time; its children are not the application, and no job is made.
 
+- **D17, C0 binds native code with our own generator (2026-10-31).** Mark
+  chose "Route A, our generator (Recommended)" after the probe: our
+  generator over `wit-parser` =0.263.0 and its blocking runtime are promoted
+  into a shipping crate, and `wit-bindgen-wrpc` 0.12.0 is rejected. The
+  measurements are in the 2026-10-31 C0 finding. Because our encoding equals
+  wRPC's byte for byte, wRPC could be taken up later without changing the
+  wire.
+
+  Links: area Stack · amends capability-door D12 · draws on stack.1, stack.3 · summary C0 chose our own wit-parser generator with a blocking runtime; wRPC 0.12.0 is rejected for its runtime, Send bounds and missing resource drop.
+
 ## Phases
 
 ### C0. One contract, bound both ways
-Runs now (D12), probing two native routes; G6 does not need it.
+Probe done (D17): our own generator chosen; promotion next. G6 does not
+need it.
 
 Write the projection session's control surface (`CarrierRequestBody`'s
 Discover, Open, Resume, Intent, Close and Suspend) as a WIT interface with a
@@ -608,6 +620,27 @@ error types settle.
   one carrier occur only on stdio and local, which refuse Open. So a resource
   per Open is a resource per projection session, and no plan needs one
   resource per offer.
+- 2026-10-31, C0 probe (`crates/probes/projection-session-c0/`, Mere
+  branch `c0/projection-session-probe`): one script of 19 calls (a refused
+  open, both caps, a stale intent, both notice calls, suspend, and three calls
+  after revocation) gives the same transcript through route A (our generator,
+  OS pipes), route B (`wit-bindgen-wrpc` 0.12.0, Windows named pipes), the
+  Wasmtime 45 guest and a direct call. Route A's encoding equals wRPC's byte
+  for byte on failures, notices, replies and an opened session, and each
+  decodes the other's; values cross Wasmtime unchanged. Hand-written code:
+  A 277 (generator) + 193 (runtime) + 214 (adapter) lines, B 321. Generated:
+  A 214 lines, B 3,246. Normal dependencies: A 37 crates, B 81 (tokio,
+  futures, anyhow, bytes, tracing). B needs a runtime per consumer, a
+  `Send + Sync + Clone` handler (the provider behind a mutex), a connection
+  per call and a transport per platform, and it has no resource-drop hook,
+  so D13's drop-is-close cannot be expressed: its provider never saw Close.
+  A is blocking, `&mut self`, single-threaded, and its drop reaches the
+  provider. Neither route adds a C build, but chirograph already compiles
+  blake3's C and assembly through `cc` (no `pure` feature), so no native
+  path that carries chirograph builds without a C toolchain today;
+  Wasmtime's `cc` users (zstd, ittapi, its fiber and helpers) stay on the
+  component side. `resource` is a WIT keyword, so the fetch method is named
+  `fetch`. Run on Windows only; not timed.
 
 ## Progress
 
@@ -712,3 +745,6 @@ error types settle.
   peer-facts' pass, among them the token read before any byte, the refusal
   of a later process, the access list, launched-process admission and the
   image fallback. Mere's launcher was cross-checked for Windows, not run.
+- 2026-10-31: C0's two-route probe built and run on Windows; D17 chose our
+  own generator. Promoting it into a shipping crate and moving the interface
+  into `mere:script` remain.

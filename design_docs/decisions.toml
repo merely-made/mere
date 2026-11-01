@@ -201,6 +201,14 @@ summary = "A launched Windows application is the process Djinn started, known by
 draws_on = ["stack.2"]
 amends = ["capability-door D11"]
 
+[decisions."capability-door D17"]
+title = "C0 binds native code with our own generator (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "C0 chose our own wit-parser generator with a blocking runtime; wRPC 0.12.0 is rejected for its runtime, Send bounds and missing resource drop."
+draws_on = ["stack.1", "stack.3"]
+amends = ["capability-door D12"]
+
 [decisions."distillery-extraction D1"]
 title = ". The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
