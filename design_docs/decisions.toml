@@ -209,6 +209,21 @@ summary = "C0 chose our own wit-parser generator with a blocking runtime; wRPC 0
 draws_on = ["stack.1", "stack.3"]
 amends = ["capability-door D12"]
 
+[decisions."capability-door D18"]
+title = "promoting C0's generator (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "script-wire and script-witgen in crates/script; the interface joins mere:script; a Carrier over the generated client ships in graphshell-endpoint's wit feature; the probe is deleted."
+draws_on = ["stack.1", "stack.3", "stack.5"]
+
+[decisions."capability-door D19"]
+title = "what an N1 channel carries (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "N1 channels carry the generated WIT calls for every provider; script-wire ships pipe and ipc-channel transports; a channel's end closes its sessions."
+draws_on = ["stack.1", "stack.3"]
+amends = ["capability-door D4"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

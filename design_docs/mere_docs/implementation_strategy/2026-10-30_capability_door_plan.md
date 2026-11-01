@@ -294,6 +294,41 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D12 · draws on stack.1, stack.3 · summary C0 chose our own wit-parser generator with a blocking runtime; wRPC 0.12.0 is rejected for its runtime, Send bounds and missing resource drop.
 
+- **D18, promoting C0's generator (2026-11-01).** Mark chose "Two crates in
+  crates/script (Recommended)" and "script-wire, script-witgen
+  (Recommended)": `script-wire` is the runtime a consumer links (the value
+  encoding, the transport seam, the transports) and `script-witgen` the
+  generator, only ever a build-dependency, so `wit-parser` reaches no shipped
+  binary. For what moves he chose "Also a Carrier now", adding "but have a
+  look at n1… compatibility is critical": the projection-session interface
+  and its provider world join `crates/script/wit`, the test guest and
+  Wasmtime host test go under app-host's tests, the test provider, call
+  script and conformance checks become the runtime's tests, and a `Carrier`
+  over the generated client ships now. For its home he chose
+  "graphshell-endpoint, `wit` feature (Recommended)", beside the stdio,
+  local, network and door carriers. "Delete it once promoted
+  (Recommended)": the probe goes in the promotion commit; its commits and
+  the findings keep the comparison.
+
+  Links: area Stack · draws on stack.1, stack.3, stack.5 · summary script-wire and script-witgen in crates/script; the interface joins mere:script; a Carrier over the generated client ships in graphshell-endpoint's wit feature; the probe is deleted.
+
+- **D19, what an N1 channel carries (2026-11-01).** Mark chose "The WIT
+  calls, in wRPC encoding (Recommended)": every projection provider on an
+  N1 channel, native or component, speaks the generated calls, so a consumer
+  cannot tell which it reached; app-host serves a component by passing
+  frames to its guest, and the JSON-lines wire stays on the existing
+  carriers. D4's "native channels need no WIT" now reads "need no Wasm".
+  "Pipes + ipc-channel, feature off (Recommended)": `script-wire` ships an
+  OS-pipe transport and an ipc-channel 0.23.1 bytes-channel transport behind
+  an `ipc` feature off by default, never setting `force-inprocess` (D10),
+  and the transcript runs over both, once with the provider's ends passed
+  over a channel first. "Disconnect closes all (Recommended)": when a
+  channel ends the provider closes every session opened on it, the call in
+  flight returns `CarrierError::Disconnected`, and a revoked grant shows as
+  `revoked` on the next call (D13).
+
+  Links: area Stack · amends capability-door D4 · draws on stack.1, stack.3 · summary N1 channels carry the generated WIT calls for every provider; script-wire ships pipe and ipc-channel transports; a channel's end closes its sessions.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -382,8 +417,8 @@ socket's identity.
   ones by a stated rule; a direct grant ends when its provider is told; the
   carrier is ipc-channel's OS backend at 0.23.1 or later (D10) or a small
   layer of our own, with the reasons recorded.
-- Needs: S1. C0 only where the consumer or provider is a component; native
-  channels need no WIT (D4).
+- Needs: S1 and C0's promotion: every N1 channel carries the generated WIT
+  calls (D19); native channels need no Wasm.
 
 ### K1. The capability contracts in WIT
 Persona, settings, custody facets and projection-session control, each
@@ -787,3 +822,6 @@ error types settle.
   real WIT; one decode bug found and fixed. Promotion remains.
 - 2026-11-01: the C0 generator covers the synchronous Component Model and
   compiles what it binds. Promotion remains.
+- 2026-11-01: D18 and D19 ruled: C0's promotion into script-wire,
+  script-witgen and graphshell-endpoint's `wit` carrier, and what N1's
+  channels carry.
