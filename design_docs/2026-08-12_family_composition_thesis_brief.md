@@ -1297,7 +1297,7 @@ Resource, access and appearance identities remain distinct.
 Murm can exchange disclosed material and references; Gemot governs community
 contributions and collections that refer to that material. Contributions keep
 their own identity and context, as in the
-[Moot ownership model](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-model-and-ownership).
+[Moot ownership model](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#shared-model-and-ownership).
 Sharing material preserves independent encounters. Authored arrangements and
 application-defined coop operations can also be shared under their own scope.
 

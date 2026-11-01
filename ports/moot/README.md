@@ -63,7 +63,7 @@ authoring; a snapshot or coop report cannot authorize a later write. Failure
 keeps the draft. No new wire protocol, message store or key distribution lives
 in this view. The CPU receipt uses two encrypted replicas and signed Gemot
 delegation/revocation facts; it qualifies no network, browser UI, presence or
-media path. See the [Moot implementation plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10).
+media path. See the [Moot implementation plan](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#moot-conversation-and-coop-continuation-2026-10-10).
 
 ## Resource owner and Cambium controls
 
@@ -80,7 +80,7 @@ and coop controls. Each reading has independent attention and a scoped request
 outbox. Hosts consume requests, deliver owner feedback and refresh authoritative
 reads; rebuilding or arranging the UI performs no domain action. The host owns
 mounting, style, rendering and application-session routing. See the
-[owner and control continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#resource-owners-and-cambium-controls-2026-10-11)
+[owner and control continuation](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#resource-owners-and-cambium-controls-2026-10-11)
 for acceptance boundaries.
 
 ## Shared resource controls and coop
@@ -124,7 +124,7 @@ scoped Gemot authority and real Eidetic verification. Its identities are synthet
 and unsealed. Its first receipt covers Open; the handler continuation below adds
 retention and hosting. Live signed peer revocation, production activity adapters,
 and collection/content fork writes retain separate gates in the
-[Moot plan](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12).
+[Moot plan](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#shared-resource-controls-and-owner-reads-2026-10-12) (open work continues in the [Moot publication plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md)).
 
 `resource-handlers` adds the native composition of those actual owners.
 `handlers::Owner` receives the existing Moot service, signing identity, encounter
@@ -148,14 +148,14 @@ Its rendered host qualifies retain, bounded public hosting, refresh and restart;
 the native serving API separately checks held bytes and current authority. Network
 serving, live peer revocation, full historical-cut validation and native Turnstone
 mounting remain separate gates. See the
-[handler continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12).
+[handler continuation](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#retention-and-hosting-handlers-2026-10-12) (open work continues in the [Moot publication plan](https://github.com/merely-made/gemot/blob/main/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md)).
 Graphshell's opt-in `moot-resources` host binds a mount to an existing verified
 projection session. It rechecks retained session authority and the actual
 resource owners before dispatch, refreshes current owner reads afterward, and
 keeps opened bytes and feedback local to each reading. The separate
 `moot-resource-proof` binary exercises two mounts on the native Cambium host
 using signed, public in-memory fixtures. It installs no activity owner. See
-the [host continuation](../../design_docs/moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#admitted-graphshell-resource-mount-2026-10-12).
+the [host continuation](https://github.com/merely-made/gemot/blob/main/design_docs/archive_docs/2026-11-01/2026-06-12_moot_object_m1_plan.md#admitted-graphshell-resource-mount-2026-10-12).
 
 ## Optional live collection interaction
 
