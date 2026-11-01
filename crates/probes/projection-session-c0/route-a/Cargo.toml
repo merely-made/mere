@@ -1,0 +1,13 @@
+# Route A (D12): our generator's bindings, a blocking transport over OS pipes,
+# and the adapters to the shared contract.
+[package]
+name = "c0-route-a"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+c0-contract = { path = "../contract" }
+
+[build-dependencies]
+c0-witgen = { path = "../witgen" }

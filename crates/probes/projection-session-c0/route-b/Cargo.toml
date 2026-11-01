@@ -1,0 +1,19 @@
+# Route B (D12): wit-bindgen-wrpc 0.12.0 at a pinned version, with our own
+# transport over OS channels, and adapters to the shared contract.
+[package]
+name = "c0-route-b"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+c0-contract = { path = "../contract" }
+wit-bindgen-wrpc = "=0.12.0"
+tokio = { version = "1", features = ["rt", "net", "io-util", "macros", "sync", "time"] }
+
+[dev-dependencies]
+c0-route-a = { path = "../route-a" }
+
+[build-dependencies]
+wit-bindgen-wrpc-rust = "=0.12.0"
+wit-bindgen-core = "0.59"

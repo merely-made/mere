@@ -1,0 +1,20 @@
+# The C0 test guest (wasm32-wasip2), its own workspace so the native
+# routes' dependencies never unify with it.
+[workspace]
+
+[package]
+name = "c0-guest"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+c0-contract = { path = "../contract" }
+wit-bindgen = "0.58"
+
+[profile.release]
+opt-level = "s"
+strip = true
