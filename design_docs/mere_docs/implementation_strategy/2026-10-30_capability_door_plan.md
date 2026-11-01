@@ -258,6 +258,19 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.1, stack.3 · summary The interface joins mere:script; both routes are probed under crates/probes and only the winner is promoted; CBOR through ciborium.
 
+- **D15, notices and the wire encoding for C0 (2026-10-31).** Mark chose
+  "Opened session holds the id (Recommended)": one resource per Open holds
+  the session id derived at admission, method arguments carry none, and the
+  binding fills chirograph's field and refuses a reply naming another session;
+  D13 stands as written, on the finding below. "Both, mirroring Carrier
+  (Recommended)": the resource has `take-notice` and `wait-notice`, notices
+  as typed records. "wRPC's value encoding (Recommended)": our generator
+  writes WIT values in wRPC's value encoding, and the test asserts byte
+  equality with wRPC for a set of values and equal values back through a
+  Wasmtime guest.
+
+  Links: area Stack · draws on stack.3 · summary The session resource holds the admission-derived id; notices are taken or awaited as typed records; our generator writes wRPC's value encoding.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -575,6 +588,13 @@ error types settle.
   Turnstone's lock holds both Genet's fork 0.22.0 (for `servo-media-player`)
   and crates.io 0.23.0 (for Servo 0.7), with one `windows` 0.62.2, so the
   0.61 clash is already absent there.
+- 2026-10-31, for C0: one admission mints one projection session. The id is
+  derived from the admission transcript (graphshell-host
+  `lifecycle.rs:23-29,204-207`), a client cannot name another, and
+  graphshell-client keeps one mounted projection per id; several ids under
+  one carrier occur only on stdio and local, which refuse Open. So a resource
+  per Open is a resource per projection session, and no plan needs one
+  resource per offer.
 
 ## Progress
 

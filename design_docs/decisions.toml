@@ -186,6 +186,13 @@ area = "Stack"
 summary = "The interface joins mere:script; both routes are probed under crates/probes and only the winner is promoted; CBOR through ciborium."
 draws_on = ["stack.1", "stack.3"]
 
+[decisions."capability-door D15"]
+title = "notices and the wire encoding for C0 (2026-10-31)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "The session resource holds the admission-derived id; notices are taken or awaited as typed records; our generator writes wRPC's value encoding."
+draws_on = ["stack.3"]
+
 [decisions."distillery-extraction D1"]
 title = ". The move (Mark, 2026-10-31)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md"
