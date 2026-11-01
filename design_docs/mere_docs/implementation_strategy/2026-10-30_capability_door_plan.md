@@ -621,7 +621,7 @@ error types settle.
   per Open is a resource per projection session, and no plan needs one
   resource per offer.
 - 2026-10-31, C0 probe (`crates/probes/projection-session-c0/`, Mere
-  branch `c0/projection-session-probe`): one script of 19 calls (a refused
+  `e5cf4cbd5`): one script of 19 calls (a refused
   open, both caps, a stale intent, both notice calls, suspend, and three calls
   after revocation) gives the same transcript through route A (our generator,
   OS pipes), route B (`wit-bindgen-wrpc` 0.12.0, Windows named pipes), the
