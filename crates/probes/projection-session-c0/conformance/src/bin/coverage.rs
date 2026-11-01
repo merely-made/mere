@@ -3,7 +3,10 @@
 //! An interface counts as bound when the generator emits code for it; the
 //! first feature it refuses is tallied otherwise.
 //!
-//! `coverage <wit dir>... [--smith N]`
+//! With `--emit FILE`, every bound interface (the first 500 random ones)
+//! is written to FILE as a module, for `c0-corpus` to compile.
+//!
+//! `coverage <wit dir>... [--smith N] [--emit FILE]`
 
 use std::collections::BTreeMap;
 
@@ -14,6 +17,7 @@ struct Tally {
     bound: usize,
     total: usize,
     refusals: BTreeMap<String, usize>,
+    emitted: Vec<String>,
 }
 
 impl Tally {
@@ -23,8 +27,11 @@ impl Tally {
             for (name, &id) in &pkg.interfaces {
                 self.total += 1;
                 match c0_witgen::generate_interface(resolve, id) {
-                    Ok(_) => {
+                    Ok(code) => {
                         self.bound += 1;
+                        if self.emitted.len() < 500 || show {
+                            self.emitted.push(code);
+                        }
                         if show {
                             println!("  bound    {}/{name}", pkg.name);
                         }
@@ -82,6 +89,15 @@ fn main() -> anyhow::Result<()> {
         None => 0,
     };
 
+    let emit = match args.iter().position(|a| a == "--emit") {
+        Some(i) => {
+            let path = args[i + 1].clone();
+            args.drain(i..=i + 1);
+            Some(path)
+        },
+        None => None,
+    };
+
     let mut corpus = Tally::default();
     for dir in &args {
         let mut resolve = Resolve::default();
@@ -120,6 +136,20 @@ fn main() -> anyhow::Result<()> {
             random.interfaces(&resolve, &[package], false);
         }
         random.report(&format!("wit-smith, {generated} packages"));
+        corpus.emitted.append(&mut random.emitted);
+    }
+    if let Some(path) = emit {
+        let mut out = String::new();
+        for (i, code) in corpus.emitted.iter().enumerate() {
+            out.push_str(&format!(
+                "pub mod m{i} {{
+    use c0_route_a::rt::*;
+{code}}}
+"
+            ));
+        }
+        std::fs::write(&path, out)?;
+        println!("emitted {} interfaces to {path}", corpus.emitted.len());
     }
     Ok(())
 }

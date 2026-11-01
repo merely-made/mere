@@ -1,5 +1,5 @@
 //! The runtime the generated code calls: wRPC's value encoding (D15) for the
-//! types the projection session uses, and the blocking transport seam.
+//! synchronous Component Model types, and the blocking transport seam.
 
 use std::io;
 
@@ -39,6 +39,45 @@ fn take_leb(input: &mut &[u8], bits: u32) -> io::Result<u64> {
         n |= part << shift;
         if byte & 0x80 == 0 {
             return Ok(n);
+        }
+    }
+    Err(bad("integer too long".into()))
+}
+
+/// Signed LEB128.
+fn put_sleb(out: &mut Vec<u8>, mut n: i64) {
+    loop {
+        let byte = (n & 0x7f) as u8;
+        n >>= 7;
+        let done = (n == 0 && byte & 0x40 == 0) || (n == -1 && byte & 0x40 != 0);
+        if done {
+            out.push(byte);
+            return;
+        }
+        out.push(byte | 0x80);
+    }
+}
+
+/// Signed LEB128 of at most `bits`, refusing a value outside the type.
+fn take_sleb(input: &mut &[u8], bits: u32) -> io::Result<i64> {
+    let mut n = 0i128;
+    let mut shift = 0;
+    while shift < bits {
+        let (&byte, rest) = input
+            .split_first()
+            .ok_or_else(|| bad("short integer".into()))?;
+        *input = rest;
+        n |= i128::from(byte & 0x7f) << shift;
+        shift += 7;
+        if byte & 0x80 == 0 {
+            if byte & 0x40 != 0 {
+                n |= -1i128 << shift;
+            }
+            let (min, max) = (-(1i128 << (bits - 1)), (1i128 << (bits - 1)) - 1);
+            if n < min || n > max {
+                return Err(bad("integer overflows its type".into()));
+            }
+            return Ok(n as i64);
         }
     }
     Err(bad("integer too long".into()))
@@ -98,6 +137,111 @@ impl Wire for u8 {
     fn take(input: &mut &[u8]) -> io::Result<Self> {
         Ok(take_bytes(input, 1)?[0])
     }
+}
+
+impl Wire for i8 {
+    fn put(&self, out: &mut Vec<u8>) {
+        out.push(*self as u8)
+    }
+    fn take(input: &mut &[u8]) -> io::Result<Self> {
+        Ok(take_bytes(input, 1)?[0] as i8)
+    }
+}
+
+impl Wire for u16 {
+    fn put(&self, out: &mut Vec<u8>) {
+        put_leb(out, (*self).into())
+    }
+    fn take(input: &mut &[u8]) -> io::Result<Self> {
+        take_leb(input, 16).map(|n| n as u16)
+    }
+}
+
+macro_rules! signed {
+    ($t:ty, $bits:literal) => {
+        impl Wire for $t {
+            fn put(&self, out: &mut Vec<u8>) {
+                put_sleb(out, (*self).into())
+            }
+            fn take(input: &mut &[u8]) -> io::Result<Self> {
+                take_sleb(input, $bits).map(|n| n as $t)
+            }
+        }
+    };
+}
+
+signed!(i16, 16);
+signed!(i32, 32);
+signed!(i64, 64);
+
+/// Floats are little-endian, with every NaN written as the canonical one.
+impl Wire for f32 {
+    fn put(&self, out: &mut Vec<u8>) {
+        let bits = if self.is_nan() {
+            0x7fc0_0000
+        } else {
+            self.to_bits()
+        };
+        out.extend_from_slice(&bits.to_le_bytes())
+    }
+    fn take(input: &mut &[u8]) -> io::Result<Self> {
+        Ok(f32::from_le_bytes(
+            take_bytes(input, 4)?.try_into().unwrap(),
+        ))
+    }
+}
+
+impl Wire for f64 {
+    fn put(&self, out: &mut Vec<u8>) {
+        let bits = if self.is_nan() {
+            0x7ff8_0000_0000_0000
+        } else {
+            self.to_bits()
+        };
+        out.extend_from_slice(&bits.to_le_bytes())
+    }
+    fn take(input: &mut &[u8]) -> io::Result<Self> {
+        Ok(f64::from_le_bytes(
+            take_bytes(input, 8)?.try_into().unwrap(),
+        ))
+    }
+}
+
+/// A char is its UTF-8 bytes, with no length: the first byte says how many.
+impl Wire for char {
+    fn put(&self, out: &mut Vec<u8>) {
+        let mut buf = [0; 4];
+        out.extend_from_slice(self.encode_utf8(&mut buf).as_bytes())
+    }
+    fn take(input: &mut &[u8]) -> io::Result<Self> {
+        let first = *input.first().ok_or_else(|| bad("short char".into()))?;
+        let len = match first {
+            0x00..=0x7f => 1,
+            0xc0..=0xdf => 2,
+            0xe0..=0xef => 3,
+            0xf0..=0xf7 => 4,
+            b => return Err(bad(format!("char lead byte {b:#x}"))),
+        };
+        let bytes = take_bytes(input, len)?;
+        let s = std::str::from_utf8(bytes).map_err(|e| bad(e.to_string()))?;
+        Ok(s.chars().next().unwrap())
+    }
+}
+
+/// Flags: a little-endian bitset of `bytes` bytes.
+pub fn put_flags(out: &mut Vec<u8>, bits: u64, bytes: usize) {
+    out.extend_from_slice(&bits.to_le_bytes()[..bytes])
+}
+
+/// Flags of `count` flags, refusing a bit past the last.
+pub fn take_flags(input: &mut &[u8], count: usize) -> io::Result<u64> {
+    let mut buf = [0; 8];
+    buf[..count.div_ceil(8)].copy_from_slice(take_bytes(input, count.div_ceil(8))?);
+    let bits = u64::from_le_bytes(buf);
+    if count < 64 && bits >> count != 0 {
+        return Err(bad("unknown flag".into()));
+    }
+    Ok(bits)
 }
 
 impl Wire for u32 {
@@ -211,6 +355,16 @@ tuple!(A 0, B 1, C 2);
 tuple!(A 0, B 1, C 2, D 3);
 tuple!(A 0, B 1, C 2, D 3, E 4);
 tuple!(A 0, B 1, C 2, D 3, E 4, F 5);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10, L 11);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10, L 11, M 12);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10, L 11, M 12, N 13);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10, L 11, M 12, N 13, O 14);
+tuple!(A 0, B 1, C 2, D 3, E 4, F 5, G 6, H 7, I 8, J 9, K 10, L 11, M 12, N 13, O 14, P 15);
 
 /// One blocking request and its reply.
 pub trait Transport {

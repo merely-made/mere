@@ -2,6 +2,7 @@
 //! and re-encode to the same bytes, and decode back under ours to the
 //! value we started with. Random bytes must never panic our decoders.
 
+use c0_conformance::ours::c0_conformance_shared::{Color, Numbers, Perms, Token};
 use c0_conformance::ours::{Bag, Handle, Point, Shape};
 use c0_conformance::wrpc::c0::conformance::values as w;
 use c0_route_a::rt::{Wire, finish};
@@ -56,7 +57,55 @@ fn shape() -> impl Strategy<Value = Shape> {
             ".{0,8}".prop_map(Err),
         ])
         .prop_map(Shape::Nested),
+        color().prop_map(Shape::Painted),
     ]
+}
+
+fn color() -> impl Strategy<Value = Color> {
+    prop_oneof![Just(Color::Red), Just(Color::Green), Just(Color::Blue)]
+}
+
+fn numbers() -> impl Strategy<Value = Numbers> {
+    (
+        any::<i8>(),
+        any::<i16>(),
+        any::<i32>(),
+        any::<i64>(),
+        any::<u16>(),
+        proptest::num::f32::ANY,
+        proptest::num::f64::ANY,
+        any::<char>(),
+    )
+        .prop_map(|(a, b, c, d, e, f, g, h)| Numbers {
+            a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+        })
+}
+
+type More = (
+    Vec<Color>,
+    Perms,
+    Vec<Numbers>,
+    (u8, u8, u8, u8, u8, u8, u8, u8, char),
+    Option<Token>,
+);
+
+/// The rest of a bag, past proptest's twelve-element tuples.
+fn more() -> impl Strategy<Value = More> {
+    (
+        proptest::collection::vec(color(), 0..6),
+        (0u64..1024).prop_map(Perms),
+        proptest::collection::vec(numbers(), 0..4),
+        (any::<[u8; 8]>(), any::<char>())
+            .prop_map(|(b, c)| (b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7], c)),
+        proptest::option::of(proptest::collection::vec(any::<u8>(), 0..8).prop_map(Token)),
+    )
 }
 
 fn bag() -> impl Strategy<Value = Bag> {
@@ -73,9 +122,10 @@ fn bag() -> impl Strategy<Value = Bag> {
         proptest::option::of(proptest::option::of(any::<u8>())),
         prop_oneof![Just(Ok(())), shape().prop_map(Err)],
         prop_oneof![point().prop_map(Ok), Just(Err(()))],
+        more(),
     )
         .prop_map(
-            |(flag, small, shapes, pair, triple, maybe, outcome, ok_only)| Bag {
+            |(flag, small, shapes, pair, triple, maybe, outcome, ok_only, more)| Bag {
                 flag,
                 small,
                 shapes,
@@ -84,6 +134,11 @@ fn bag() -> impl Strategy<Value = Bag> {
                 maybe,
                 outcome,
                 ok_only,
+                colors: more.0,
+                perms: more.1,
+                numbers: more.2,
+                nine: more.3,
+                token: more.4,
             },
         )
 }
@@ -95,7 +150,7 @@ proptest! {
     fn bags_agree_with_wrpc(v in bag()) {
         let bytes = ours(&v);
         prop_assert_eq!(&through_wrpc::<w::Bag>(&bytes).unwrap(), &bytes);
-        prop_assert_eq!(finish::<Bag>(&bytes).unwrap(), v);
+        prop_assert_eq!(ours(&finish::<Bag>(&bytes).unwrap()), bytes);
     }
 
     #[test]
@@ -151,6 +206,11 @@ fn a_corrupted_case_is_refused_by_both() {
         maybe: None,
         outcome: Ok(()),
         ok_only: Err(()),
+        colors: vec![],
+        perms: Perms::default(),
+        numbers: vec![],
+        nine: (0, 0, 0, 0, 0, 0, 0, 0, 'x'),
+        token: None,
     };
     let mut bytes = ours(&v);
     // flag, small, list length 1, then the shape's case byte.
@@ -207,4 +267,48 @@ fn an_overflowing_u64_is_refused() {
         finish::<u32>(&[0xff, 0xff, 0xff, 0xff, 0x0f]).unwrap(),
         u32::MAX
     );
+}
+
+/// Each new encoding against wRPC at its edges.
+#[test]
+fn new_types_at_their_edges() {
+    fn same<T: Wire, U: Decode + Encode>(v: T) {
+        let bytes = ours(&v);
+        assert_eq!(through_wrpc::<U>(&bytes).unwrap(), bytes);
+        assert_eq!(ours(&finish::<T>(&bytes).unwrap()), bytes);
+    }
+    for v in [i64::MIN, -65, -64, -1, 0, 63, 64, i64::MAX] {
+        same::<i64, i64>(v);
+    }
+    for v in [i32::MIN, -1, 0, i32::MAX] {
+        same::<i32, i32>(v);
+    }
+    for v in [i16::MIN, -1, 0, i16::MAX] {
+        same::<i16, i16>(v);
+    }
+    for v in [i8::MIN, -1, 0, i8::MAX] {
+        same::<i8, i8>(v);
+    }
+    for v in [0, 127, 128, u16::MAX] {
+        same::<u16, u16>(v);
+    }
+    for v in ['\0', 'a', 'é', '✓', '\u{10FFFF}'] {
+        same::<char, char>(v);
+    }
+    for v in [0.0f64, -0.0, f64::INFINITY, f64::NAN, f64::MIN_POSITIVE] {
+        same::<f64, f64>(v);
+    }
+    // A non-canonical NaN comes out canonical, as wRPC writes it.
+    let odd = f32::from_bits(0x7fc0_0001);
+    assert_eq!(ours(&odd), 0x7fc0_0000u32.to_le_bytes());
+    for v in [Color::Red, Color::Blue] {
+        same::<Color, w::Color>(v);
+    }
+    for v in [Perms(0), Perms(1), Perms(0x3ff)] {
+        same::<Perms, w::Perms>(v);
+    }
+    // A bit past the tenth flag is refused by both.
+    let bad = [0x00, 0x04];
+    assert!(finish::<Perms>(&bad).is_err());
+    assert!(through_wrpc::<w::Perms>(&bad).is_err());
 }

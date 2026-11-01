@@ -3,19 +3,24 @@
 //! blocking client over any `Transport`, and a `Handler` trait with a
 //! dispatcher. Values are written in wRPC's value encoding (D15) by the
 //! runtime in `c0-route-a`; calls travel under wRPC's names (`open`,
-//! `session.snapshot`, `[drop]session`); resources travel as opaque handle
-//! bytes.
+//! `session.snapshot`, `session` for a constructor, `[drop]session`);
+//! resources travel as opaque handle bytes.
 //!
-//! Covers what the projection session uses: records, variants, options,
-//! results, tuples, lists, strings, integers, type aliases and one level of
-//! resources with methods. Anything else is refused, not guessed.
+//! Covers the synchronous Component Model: every primitive, records,
+//! variants, enums, flags, options, results, tuples of up to sixteen, lists,
+//! type aliases, resources with methods, static functions and constructors,
+//! and types `use`d from other interfaces, which are emitted as sibling
+//! modules. Async functions, streams, futures, maps and fixed-length lists
+//! are refused, not guessed.
 
 use std::fmt::Write;
 use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 use heck::{ToSnakeCase, ToUpperCamelCase};
-use wit_parser::{Function, FunctionKind, Handle, InterfaceId, Resolve, Type, TypeDefKind, TypeId};
+use wit_parser::{
+    Function, FunctionKind, Handle, InterfaceId, Resolve, Type, TypeDefKind, TypeId, TypeOwner,
+};
 
 const KEYWORDS: &[&str] = &[
     "as", "async", "await", "break", "const", "continue", "dyn", "else", "enum", "extern", "false",
@@ -46,6 +51,11 @@ fn type_name(name: &str) -> String {
     }
 }
 
+/// A flag's associated constant.
+fn const_name(name: &str) -> String {
+    name.to_snake_case().to_uppercase()
+}
+
 /// Generate Rust for `interface` from the WIT file at `wit`.
 pub fn generate(wit: &Path, interface: &str) -> Result<String> {
     let mut resolve = Resolve::default();
@@ -57,48 +67,112 @@ pub fn generate(wit: &Path, interface: &str) -> Result<String> {
     generate_interface(&resolve, id)
 }
 
-/// Generate Rust for one interface of an already-resolved package.
+/// Generate Rust for one interface of an already-resolved package: its
+/// items at the top level, and each interface it borrows types from as a
+/// module of types beside them.
 pub fn generate_interface(resolve: &Resolve, id: InterfaceId) -> Result<String> {
-    Gen {
-        resolve,
-        id,
-        out: String::new(),
+    let mut deps = Vec::new();
+    borrowed(resolve, id, &mut deps)?;
+    let mut out = String::new();
+    for &dep in &deps {
+        let mut g = Gen {
+            resolve,
+            top: id,
+            current: dep,
+            out: String::new(),
+        };
+        g.types()?;
+        writeln!(
+            out,
+            "pub mod {} {{\n    use super::*;\n{}}}",
+            module(resolve, dep),
+            g.out
+        )?;
     }
-    .run()
+    let mut g = Gen {
+        resolve,
+        top: id,
+        current: id,
+        out: String::new(),
+    };
+    g.types()?;
+    let functions: Vec<&Function> = resolve.interfaces[id].functions.values().collect();
+    g.handler(&functions)?;
+    g.client(&functions)?;
+    out.push_str(&g.out);
+    Ok(out)
+}
+
+/// The module an interface's types live in when another borrows them.
+fn module(resolve: &Resolve, id: InterfaceId) -> String {
+    let iface = &resolve.interfaces[id];
+    let name = iface.name.as_deref().unwrap_or("anonymous");
+    match iface.package {
+        Some(p) => {
+            let pkg = &resolve.packages[p].name;
+            format!(
+                "{}_{}_{}",
+                ident(&pkg.namespace),
+                ident(&pkg.name),
+                ident(name)
+            )
+            .replace("r#", "")
+        },
+        None => ident(name).replace("r#", ""),
+    }
+}
+
+/// Every interface whose types `id` uses, dependencies first.
+fn borrowed(resolve: &Resolve, id: InterfaceId, deps: &mut Vec<InterfaceId>) -> Result<()> {
+    for &ty in resolve.interfaces[id].types.values() {
+        if let TypeDefKind::Type(Type::Id(other)) = resolve.types[ty].kind {
+            match resolve.types[other].owner {
+                TypeOwner::Interface(o) if o != id && !deps.contains(&o) => {
+                    borrowed(resolve, o, deps)?;
+                    deps.push(o);
+                },
+                TypeOwner::World(_) => bail!("unsupported type owned by a world"),
+                _ => {},
+            }
+        }
+    }
+    Ok(())
 }
 
 struct Gen<'a> {
     resolve: &'a Resolve,
-    id: InterfaceId,
+    top: InterfaceId,
+    current: InterfaceId,
     out: String,
 }
 
 impl Gen<'_> {
-    fn run(mut self) -> Result<String> {
-        let iface = &self.resolve.interfaces[self.id];
-        for (name, &ty) in &iface.types {
+    fn types(&mut self) -> Result<()> {
+        for (name, &ty) in &self.resolve.interfaces[self.current].types {
             self.typedef(name, ty)?;
         }
-        let functions: Vec<&Function> = iface.functions.values().collect();
-        self.handler(&functions)?;
-        self.client(&functions)?;
-        Ok(self.out)
+        Ok(())
     }
 
     fn ty(&self, ty: &Type) -> Result<String> {
         Ok(match ty {
             Type::Bool => "bool".into(),
             Type::U8 => "u8".into(),
+            Type::U16 => "u16".into(),
             Type::U32 => "u32".into(),
             Type::U64 => "u64".into(),
+            Type::S8 => "i8".into(),
+            Type::S16 => "i16".into(),
+            Type::S32 => "i32".into(),
+            Type::S64 => "i64".into(),
+            Type::F32 => "f32".into(),
+            Type::F64 => "f64".into(),
+            Type::Char => "char".into(),
             Type::String => "String".into(),
             Type::Id(id) => {
                 let def = &self.resolve.types[*id];
                 if let Some(name) = &def.name {
-                    if def.owner != wit_parser::TypeOwner::Interface(self.id) {
-                        bail!("unsupported type used from another interface");
-                    }
-                    return Ok(type_name(name));
+                    return self.path(def.owner, name);
                 }
                 self.anon(&def.kind)?
             },
@@ -106,27 +180,49 @@ impl Gen<'_> {
         })
     }
 
+    /// A named type as seen from the module being generated.
+    fn path(&self, owner: TypeOwner, name: &str) -> Result<String> {
+        let TypeOwner::Interface(owner) = owner else {
+            bail!("unsupported type owned by a world");
+        };
+        if owner == self.current {
+            return Ok(type_name(name));
+        }
+        let up = if self.current == self.top {
+            ""
+        } else {
+            "super::"
+        };
+        Ok(format!(
+            "{up}{}::{}",
+            module(self.resolve, owner),
+            type_name(name)
+        ))
+    }
+
     fn anon(&self, kind: &TypeDefKind) -> Result<String> {
         Ok(match kind {
-            TypeDefKind::List(Type::U8) => "Vec<u8>".into(),
             TypeDefKind::List(t) => format!("Vec<{}>", self.ty(t)?),
             TypeDefKind::Option(t) => format!("Option<{}>", self.ty(t)?),
             TypeDefKind::Result(r) => {
                 format!("Result<{}, {}>", self.opt(&r.ok)?, self.opt(&r.err)?)
             },
-            TypeDefKind::Tuple(t) if !(1..=6).contains(&t.types.len()) => {
+            TypeDefKind::Tuple(t) if !(1..=16).contains(&t.types.len()) => {
                 bail!("unsupported tuple of {}", t.types.len())
             },
             TypeDefKind::Tuple(t) => {
                 let parts: Result<Vec<_>> = t.types.iter().map(|t| self.ty(t)).collect();
                 format!("({},)", parts?.join(", "))
             },
-            TypeDefKind::Handle(Handle::Own(r) | Handle::Borrow(r)) => self.resolve.types[*r]
-                .name
-                .as_deref()
-                .map(type_name)
-                .context("unnamed resource")?,
+            TypeDefKind::Handle(Handle::Own(r) | Handle::Borrow(r)) => {
+                let def = &self.resolve.types[*r];
+                self.path(def.owner, def.name.as_deref().context("unnamed resource")?)?
+            },
             TypeDefKind::Type(t) => self.ty(t)?,
+            TypeDefKind::Map(..) => bail!("unsupported map"),
+            TypeDefKind::FixedLengthList(..) => bail!("unsupported fixed-length list"),
+            TypeDefKind::Future(_) => bail!("unsupported future"),
+            TypeDefKind::Stream(_) => bail!("unsupported stream"),
             other => bail!("unsupported anonymous type {other:?}"),
         })
     }
@@ -143,7 +239,12 @@ impl Gen<'_> {
             | TypeDefKind::List(_)
             | TypeDefKind::Option(_)
             | TypeDefKind::Result(_)
-            | TypeDefKind::Tuple(_)) => writeln!(out, "pub type {rust} = {};", self.anon(kind)?)?,
+            | TypeDefKind::Tuple(_)
+            | TypeDefKind::Handle(_)
+            | TypeDefKind::Map(..)
+            | TypeDefKind::FixedLengthList(..)
+            | TypeDefKind::Future(_)
+            | TypeDefKind::Stream(_)) => writeln!(out, "pub type {rust} = {};", self.anon(kind)?)?,
             TypeDefKind::Resource => {
                 writeln!(
                     out,
@@ -159,7 +260,7 @@ impl Gen<'_> {
             TypeDefKind::Record(r) => {
                 writeln!(
                     out,
-                    "#[derive(Clone, Debug, PartialEq, Eq)]\npub struct {rust} {{"
+                    "#[derive(Clone, Debug, PartialEq)]\npub struct {rust} {{"
                 )?;
                 for f in &r.fields {
                     writeln!(out, "    pub {}: {},", ident(&f.name), self.ty(&f.ty)?)?;
@@ -183,7 +284,7 @@ impl Gen<'_> {
             TypeDefKind::Variant(v) => {
                 writeln!(
                     out,
-                    "#[derive(Clone, Debug, PartialEq, Eq)]\npub enum {rust} {{"
+                    "#[derive(Clone, Debug, PartialEq)]\npub enum {rust} {{"
                 )?;
                 for c in &v.cases {
                     let case = type_name(&c.name);
@@ -224,6 +325,55 @@ impl Gen<'_> {
                     "            d => return Err(bad(format!(\"unknown {name} case {{d}}\"))),\n        }})\n    }}\n}}"
                 )?;
             },
+            TypeDefKind::Enum(e) => {
+                writeln!(
+                    out,
+                    "#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]\npub enum {rust} {{"
+                )?;
+                for c in &e.cases {
+                    writeln!(out, "    {},", type_name(&c.name))?;
+                }
+                writeln!(
+                    out,
+                    "}}\nimpl Wire for {rust} {{\n    fn put(&self, out: &mut Vec<u8>) {{ put_disc(out, *self as u32) }}\n    \
+                     fn take(input: &mut &[u8]) -> std::io::Result<Self> {{\n        Ok(match take_disc(input)? {{"
+                )?;
+                for (i, c) in e.cases.iter().enumerate() {
+                    writeln!(out, "            {i} => Self::{},", type_name(&c.name))?;
+                }
+                writeln!(
+                    out,
+                    "            d => return Err(bad(format!(\"unknown {name} case {{d}}\"))),\n        }})\n    }}\n}}"
+                )?;
+            },
+            TypeDefKind::Flags(f) => {
+                if f.flags.len() > 64 {
+                    bail!("unsupported flags of {}", f.flags.len());
+                }
+                let bytes = f.flags.len().div_ceil(8);
+                writeln!(
+                    out,
+                    "/// A set of `{name}` flags; bit `i` is the `i`th flag.\n\
+                     #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]\n\
+                     pub struct {rust}(pub u64);\nimpl {rust} {{"
+                )?;
+                for (i, flag) in f.flags.iter().enumerate() {
+                    writeln!(
+                        out,
+                        "    pub const {}: Self = Self(1 << {i});",
+                        const_name(&flag.name)
+                    )?;
+                }
+                writeln!(
+                    out,
+                    "    pub fn contains(self, other: Self) -> bool {{ self.0 & other.0 == other.0 }}\n}}\n\
+                     impl Wire for {rust} {{\n\
+                     \x20   fn put(&self, out: &mut Vec<u8>) {{ put_flags(out, self.0, {bytes}) }}\n\
+                     \x20   fn take(input: &mut &[u8]) -> std::io::Result<Self> {{ take_flags(input, {count}).map(Self) }}\n\
+                     }}",
+                    count = f.flags.len()
+                )?;
+            },
             other => bail!("unsupported type definition `{name}`: {other:?}"),
         }
         self.out.push_str(out);
@@ -235,13 +385,16 @@ impl Gen<'_> {
         &self,
         f: &'f Function,
     ) -> Result<(String, Option<String>, &'f [wit_parser::Param])> {
+        let resource = |r: &TypeId| -> Result<String> {
+            self.resolve.types[*r]
+                .name
+                .clone()
+                .context("unnamed resource")
+        };
         match &f.kind {
             FunctionKind::Freestanding => Ok((ident(&f.name), None, &f.params)),
             FunctionKind::Method(r) => {
-                let res = self.resolve.types[*r]
-                    .name
-                    .clone()
-                    .context("unnamed resource")?;
+                let res = resource(r)?;
                 let method = f.name.rsplit('.').next().unwrap();
                 Ok((
                     ident(&format!("{res}-{method}")),
@@ -249,18 +402,29 @@ impl Gen<'_> {
                     &f.params[1..],
                 ))
             },
+            FunctionKind::Static(r) => {
+                let res = resource(r)?;
+                let name = f.name.rsplit('.').next().unwrap();
+                Ok((ident(&format!("{res}-{name}")), None, &f.params))
+            },
+            FunctionKind::Constructor(r) => {
+                Ok((ident(&format!("{}-new", resource(r)?)), None, &f.params))
+            },
             other => bail!("unsupported function kind {other:?} for `{}`", f.name),
         }
     }
 
     /// The name a call travels under, as wRPC names it.
     fn key(f: &Function) -> &str {
-        f.name.strip_prefix("[method]").unwrap_or(&f.name)
+        ["[method]", "[static]", "[constructor]"]
+            .iter()
+            .find_map(|p| f.name.strip_prefix(p))
+            .unwrap_or(&f.name)
     }
 
     /// `(rust type, wire key)` for each resource.
     fn resources(&self) -> Vec<(String, String)> {
-        self.resolve.interfaces[self.id]
+        self.resolve.interfaces[self.current]
             .types
             .iter()
             .filter(|(_, id)| matches!(self.resolve.types[**id].kind, TypeDefKind::Resource))

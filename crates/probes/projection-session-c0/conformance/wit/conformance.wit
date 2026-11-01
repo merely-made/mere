@@ -1,7 +1,30 @@
 package c0:conformance@0.0.0;
 
+/// Types another interface borrows.
+interface shared {
+    enum color { red, green, blue }
+
+    /// Ten flags, so two bytes on the wire.
+    flags perms { a, b, c, d, e, f, g, h, i, j }
+
+    record numbers {
+        a: s8,
+        b: s16,
+        c: s32,
+        d: s64,
+        e: u16,
+        f: f32,
+        g: f64,
+        h: char,
+    }
+
+    resource token;
+}
+
 /// Every type our generator supports, nested, with Rust keywords for names.
 interface values {
+    use shared.{color, perms, numbers, token};
+
     record point {
         x: u32,
         y: u64,
@@ -16,6 +39,7 @@ interface values {
         many(list<point>),
         named(string),
         nested(option<result<u64, string>>),
+        painted(color),
     }
 
     record bag {
@@ -27,9 +51,16 @@ interface values {
         maybe: option<option<u8>>,
         outcome: result<_, shape>,
         ok-only: result<point>,
+        colors: list<color>,
+        perms: perms,
+        numbers: list<numbers>,
+        nine: tuple<u8, u8, u8, u8, u8, u8, u8, u8, char>,
+        token: option<token>,
     }
 
     resource handle {
+        constructor(seed: u32);
+        make: static func(name: string) -> handle;
         %type: func(%match: u32) -> u32;
     }
 

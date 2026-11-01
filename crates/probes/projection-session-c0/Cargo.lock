@@ -198,6 +198,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "c0-corpus"
+version = "0.0.0"
+dependencies = [
+ "c0-route-a",
+]
+
+[[package]]
 name = "c0-host"
 version = "0.0.0"
 dependencies = [
