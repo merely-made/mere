@@ -501,6 +501,13 @@ revisioned contract in `surface-api` that Turnstone's settings owner uses.
   string `caps` and JSON `actions` are expressed through them or kept with a
   stated reason.
 - Needs: C0.
+- Settings built (D22, Mere `7c1053de1`): the `settings` interface and a
+  `settings-provider` world in `mere:script`, bound in
+  `crates/system/settings-wit` and from app-host's `guest-settings`. `caps`
+  and `actions` stay: `caps` reports the host's grant and names no
+  capability, and a grant of settings shows as `settings` being linked;
+  `actions` is the stable action envelope (2026-07-23), and settings writes
+  are not actions. The application world that imports settings follows.
 
 ### G1. The gateway to Murm
 Deferred (D5) until a remote consumer is named and OCapN's encoding and
@@ -823,6 +830,24 @@ error types settle.
   ThinkPad (x86_64), so ipc-channel's macOS and Linux backends and
   `std::io::pipe` have run. The M4 (aarch64) was off the mesh network and
   is not yet checked.
+- 2026-11-01, K1 settings built (Mere `7c1053de1`, D22): `mere:script`'s
+  `settings` interface carries surface-api's revisioned contract as typed
+  WIT (`option` is a WIT keyword, so a choice entry is `choice-option`)
+  with a typed `denied`. `settings-wit` holds `SettingsServer`, which asks
+  its `SettingsGate` before every call, and `Remote`, a
+  `RevisionedSettingsProvider` over any transport; the owner contract has no
+  refusal for authority, so through `Remote` a `denied`, like a broken
+  channel, reads as `Unavailable`, which claims no change, while
+  `Remote::calls` keeps it typed. Turnstone's revisioned owner
+  (`SharedApplicationSettingsOwner`, Turnstone `5992c311`) is on its
+  origin/main; the local checkout was 78 commits behind. One call script of
+  16 calls (every outcome, both gate refusals, an i64 extreme, NaN refused,
+  an f32 owner's canonical value) gives the same transcript in process, over
+  OS pipes and from the component; the gate is asked the same 16 questions
+  and the owner ends in the same state, and values cross Wasmtime unchanged.
+  The settings guest's dependency closure compiles no C. Tests: settings-wit
+  6, app-host 9 (settings 2, projection 2, emit 5), script-witgen 1. Run on
+  Windows only.
 
 ## Progress
 
@@ -941,3 +966,4 @@ error types settle.
 - 2026-11-01: D20 ruled: a lapse reaches the client as its status.
 - 2026-11-01: D20 built (Mere `1dd59c48a`); D21 ruled and phase W1 added.
 - 2026-11-01: C0 checked on macOS x86_64 and Linux; D22 (K1 settings) and D23 (W1 local) ruled.
+- 2026-11-01: K1's settings contract built (Mere `7c1053de1`, D22).
