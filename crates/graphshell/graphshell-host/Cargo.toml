@@ -52,6 +52,9 @@ native = [
 # `invitation`'s signer over the holder's custody identity (Djinn's
 # custody client), for a host that issues invitations.
 custody-client = ["native", "djinn/custody-client"]
+# `invitation`'s in-memory signer, for tests only: products enable it as a
+# dev-dependency feature, never in a release build (stack-lift D4).
+test-signer = ["native"]
 # The live WebRTC lane: the join over a real carrier and the pump that
 # presents its frames as the session stream. Pulls str0m and the carrier's
 # own tokio driver, so it stays separate from `native`.

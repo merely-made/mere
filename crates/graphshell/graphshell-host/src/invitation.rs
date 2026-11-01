@@ -79,7 +79,9 @@ pub trait Signer: IdentityProvider {
 }
 
 /// An in-memory owner, which tests inject explicitly; a product's owner signs
-/// through its custodian.
+/// through its custodian. Test builds only: no product enables `test-signer`
+/// outside its dev-dependencies (stack-lift D4).
+#[cfg(any(test, feature = "test-signer"))]
 impl Signer for personae::InMemoryProvider {
     fn certificate(
         &self,
