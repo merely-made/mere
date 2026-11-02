@@ -8,11 +8,11 @@
 //! directory through the owner-only application door and prints it.
 
 use mere_resident::resident_devices::{
-    AddrKindV1, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
+    AddrKindV1, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
     not_connected_path_active, read_directory,
 };
-use djinn::door::app_admission::{AppId, AppRouteId};
-use graphshell_endpoint::door::projection::AppBrokerClient;
+use djinn::door::app_admission::{AppRouteId, configured_app_endpoint};
+use mere_resident::resident_status::open_resident_route;
 
 const USAGE: &str = "usage: djinn-devices [--json]";
 
@@ -25,11 +25,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => return Err(USAGE.into()),
         }
     }
-    let mut client = AppBrokerClient::open_route(
-        AppId::new(DEVICE_DIRECTORY_APP),
-        AppRouteId::new(DEVICE_DIRECTORY_ROUTE)?,
-    )
-    .await?;
+    let mut client =
+        open_resident_route(&configured_app_endpoint(), AppRouteId::new(DEVICE_DIRECTORY_ROUTE)?).await?;
     let directory = read_directory(&mut client).await?;
     client.close().await?;
     if json {

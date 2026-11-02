@@ -5,9 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The custody route, served as djinn serves it (dramatis repo plan, D5,
-//! D11, D12): an application reads the identity, gets the derived keys the
-//! policy names and nothing else, and an app the door does not know, or a
-//! door that is not there, leaves the identity pending.
+//! D11, D12): an application reads the identity, gets the derived keys its
+//! declaration names and its owner grants and nothing else (capability door
+//! D24), and an app the door does not know, or a door that is not there,
+//! leaves the identity pending.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -20,6 +21,9 @@ use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
 use djinn::door::custody_client::{CustodyClient, CustodyClientError};
 use dramatis::view::{VaultLockView, VaultProtectionView};
+use djinn::door::declaration::{
+    AppDeclaration, CustodyOperation, CustodyUse, NamePattern, SaltPattern, SaltUse,
+};
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId};
 use uuid::Uuid;
 
@@ -48,8 +52,43 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
     ))
 }
 
+/// The fixture application: identity reads, the mesh author released, the
+/// per-session endpoint keys signed with, and the Reticulum station roots.
+fn app_declaration() -> AppDeclaration {
+    use CustodyOperation as Op;
+    AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        custody: CustodyUse {
+            operations: [Op::Status, Op::Roster, Op::Release, Op::Attest, Op::Sign].into(),
+            salts: vec![
+                SaltUse::persona(SaltPattern::Exact("mesh-author".into())),
+                SaltUse::wallet(SaltPattern::Prefix("mere.castellan.reticulum.station/v1".into())),
+            ],
+            acts: vec![SaltUse::persona(SaltPattern::Prefix("graphshell/endpoint-session/".into()))],
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    }
+}
+
+/// The vault's command line: status and its administrative commands.
+fn vault_declaration() -> AppDeclaration {
+    AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        custody: CustodyUse {
+            operations: [CustodyOperation::Status, CustodyOperation::VaultCommand].into(),
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    }
+}
+
 async fn open(endpoint: &str, app: &str) -> Result<CustodyClient, CustodyClientError> {
-    CustodyClient::open_at(endpoint, AppId::new(app)).await
+    let declaration = match app {
+        "personae-vault" => vault_declaration(),
+        _ => app_declaration(),
+    };
+    CustodyClient::open_declared_at(endpoint, AppId::new(app), declaration).await
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -57,6 +96,13 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     let host = resident_host();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    mere_resident::applications::install(
+        &grants,
+        vec![
+            mere_resident::applications::grant_for(&AppId::new("fixture-app"), &app_declaration(), None),
+            mere_resident::applications::grant_for(&AppId::new("personae-vault"), &vault_declaration(), None),
+        ],
+    );
     let endpoint = endpoint_name();
     {
         let (endpoint, keeper) = (endpoint.clone(), Arc::new(Keeper::new(host.clone())));
@@ -75,13 +121,13 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
     let mut client = None;
     for _ in 0..100 {
-        if let Ok(opened) = open(&endpoint, "cleromancy").await {
+        if let Ok(opened) = open(&endpoint, "fixture-app").await {
             client = Some(opened);
             break;
         }
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
-    let mut client = client.expect("a first-party app is admitted to custody");
+    let mut client = client.expect("a declared, granted app is admitted to custody");
 
     let status = client.status().await.unwrap();
     assert_eq!(status.lock, VaultLockView::Unlocked);
@@ -115,17 +161,17 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     );
     assert_eq!(released.master_public_key(), host.master_public_key());
 
-    // The control: a salt outside the policy stays in djinn, and so does
-    // anything from a wallet the resident does not have.
+    // The control: a salt outside the declaration stays in djinn, and so
+    // does anything from a wallet the resident does not have.
     for salt in [b"knot".to_vec(), Vec::new()] {
         assert!(matches!(
             client.release(KeySource::Persona, vec![salt]).await,
-            Err(CustodyClientError::Refused(CustodyRefusal::NotReleasable))
+            Err(CustodyClientError::Refused(CustodyRefusal::Undeclared { .. }))
         ));
     }
     assert!(matches!(
         client.attest(KeySource::Persona, b"knot".to_vec()).await,
-        Err(CustodyClientError::Refused(CustodyRefusal::NotReleasable))
+        Err(CustodyClientError::Refused(CustodyRefusal::Undeclared { .. }))
     ));
     let station = personae::reticulum::station_salts(b"device")[0].clone();
     assert!(matches!(
@@ -154,7 +200,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     assert_eq!(signature.len(), 64);
 
     // Administrative CLI operations stay in the live keeper and return public
-    // output only. Ordinary app identities cannot use this administrative door.
+    // output only. An application that did not declare them cannot use them.
     let command = CustodyCall::VaultCommand {
         profile: ProfileId("default".into()),
         command: "new-profile".into(),
@@ -162,7 +208,7 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
     };
     assert!(matches!(
         client.call(command.clone()).await,
-        Err(CustodyClientError::Refused(CustodyRefusal::NotServed))
+        Err(CustodyClientError::Refused(CustodyRefusal::Undeclared { .. }))
     ));
     let mut cli = open(&endpoint, "personae-vault").await.unwrap();
     assert!(matches!(cli.call(command).await.unwrap(),
@@ -218,6 +264,6 @@ async fn an_app_reads_and_releases_through_djinn_and_nothing_else_leaves() {
 
 #[tokio::test]
 async fn an_absent_djinn_is_pending_not_a_fallback() {
-    let absent = open(&endpoint_name(), "cleromancy").await;
+    let absent = open(&endpoint_name(), "fixture-app").await;
     assert!(matches!(&absent, Err(error) if error.is_pending()));
 }

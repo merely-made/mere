@@ -70,10 +70,11 @@ fn fixture() -> DeviceDirectoryV1 {
 }
 
 async fn open(endpoint: &str, app: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(
+    AppBrokerClient::open_declared_route_at(
         endpoint,
         AppId::new(app),
         AppRouteId::new(DEVICE_DIRECTORY_ROUTE).unwrap(),
+        mere_resident::applications::resident_declaration(),
     )
     .await
 }
@@ -93,6 +94,7 @@ async fn only_the_granted_caller_reads_the_device_directory() {
         .await
         .unwrap();
     resident_devices::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
 
     let endpoint = endpoint_name();
     let server = {

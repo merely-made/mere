@@ -20,6 +20,9 @@ use djinn::door::custody::{
     CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest,
 };
 use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
+use djinn::door::declaration::{
+    AppDeclaration, CustodyOperation, CustodyUse, NamePattern, SaltPattern, SaltUse,
+};
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
 use personae::RetainedKeys;
 use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};
@@ -31,6 +34,43 @@ pub use tucket::{ReleasedTucketStation, StationCustodyLease, TucketCustodyLease}
 
 /// The application name Signalman connects to djinn as.
 pub const SIGNALMAN_APP: &str = "signalman";
+
+/// The wallet namespaces a sited station's keys come from: the Reticulum
+/// station and controller roots, a station's control and storage, and the
+/// Tucket and Sennet station seeds (`personae::reticulum`, `tucket`, `sennet`).
+const STATION_NAMESPACES: [&str; 6] = [
+    "mere.castellan.reticulum.station/v1",
+    "mere.castellan.reticulum.controller/v1",
+    "mere/signalman/sited-station-control/v1/",
+    "mere/signalman/sited-station-storage/v1/",
+    "mere.signalman.tucket.station/v1/",
+    "mere.signalman.sennet.station/v1/",
+];
+
+/// What Signalman declares on every custody hello (Mere's capability door
+/// D24): its status and lock, wallet releases from the station namespaces,
+/// and the station grant and device revocation djinn performs for it.
+pub fn declaration() -> AppDeclaration {
+    AppDeclaration {
+        routes: vec![NamePattern::exact(djinn::door::custody::CUSTODY_ROUTE)],
+        custody: CustodyUse {
+            operations: [
+                CustodyOperation::Status,
+                CustodyOperation::WatchLock,
+                CustodyOperation::Release,
+                CustodyOperation::IssueStationGrant,
+                CustodyOperation::RevokeDevice,
+            ]
+            .into(),
+            salts: STATION_NAMESPACES
+                .iter()
+                .map(|namespace| SaltUse::wallet(SaltPattern::Prefix((*namespace).into())))
+                .collect(),
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    }
+}
 
 /// The salts a station's credential derives from: its Reticulum material and
 /// its control signer. These are what djinn releases for one station.
@@ -106,8 +146,11 @@ impl DjinnStationAuthority {
         std::thread::scope(|scope| {
             scope
                 .spawn(|| {
-                    let mut client =
-                        BlockingCustodyClient::open_at(&self.endpoint, self.app.clone())?;
+                    let mut client = BlockingCustodyClient::open_declared_at(
+                        &self.endpoint,
+                        self.app.clone(),
+                        declaration(),
+                    )?;
                     act(&mut client)
                 })
                 .join()

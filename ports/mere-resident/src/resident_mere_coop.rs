@@ -73,9 +73,11 @@ impl Activities {
                 .as_deref()
                 .ok_or("co-op custody is not composed")?;
             let identity = Arc::new(
-                djinn::door::custody_identity::CustodyIdentity::connect_at(
+                djinn::door::custody_identity::CustodyIdentity::connect_declared_at_timeout(
                     endpoint,
-                    "graphshell",
+                    graphshell::declaration::APP,
+                    graphshell::declaration::declaration(),
+                    std::time::Duration::from_secs(10),
                 )
                 .map_err(|e| e.to_string())?,
             );
@@ -192,7 +194,7 @@ pub(super) fn register(
         let route_id = route_id.clone();
         let domain = shared.domain.clone();
         let authorize = Arc::new(move || {
-            let app = AppId::new("graphshell");
+            let app = AppId::new(graphshell::declaration::APP);
             for route in [mere_route_id(&domain), route_id.clone()] {
                 grants
                     .current()

@@ -28,7 +28,7 @@ use mere_resident::embedded_reservoir::{
     ReservoirAttachment, ReservoirAttachmentError, ReservoirAttachmentOptions,
 };
 use mere_resident::resident_mere::MereRoutes;
-use mere_resident::resident_reservoir::ResidentReservoir;
+use mere_resident::resident_reservoir::{ResidentReservoir, mere_client_declaration};
 use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
@@ -61,11 +61,10 @@ fn options(root: &Path, endpoint: &str) -> ReservoirAttachmentOptions {
     ReservoirAttachmentOptions {
         endpoint: endpoint.into(),
         application: AppId::new("cleromancy"),
-        applications: vec![
-            AppId::new("cleromancy"),
-            AppId::new("knot-editor"),
-            AppId::new("denied-fixture"),
-        ],
+        declaration: mere_client_declaration(),
+        grants: ["knot-editor", "denied-fixture"]
+            .map(|app| mere_resident::applications::grant_for(&AppId::new(app), &mere_client_declaration(), None))
+            .to_vec(),
         shared_root: root.into(),
         persona: persona(),
         domain: DomainId::new("divination").unwrap(),
@@ -471,19 +470,15 @@ async fn daemon_fixture(config: ReservoirAttachmentOptions) {
         .await
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-    let grants = AppRouteGrants::new(AllowedAppRoutes::new(
-        config
-            .applications
-            .iter()
-            .cloned()
-            .map(|app| (app, ResidentReservoir::route())),
-    ));
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    let own = mere_resident::applications::grant_for(&config.application, &config.declaration, None);
+    mere_resident::applications::install(&grants, config.grants.iter().cloned().chain([own]).collect());
+    grants.update(|routes| routes.serve(ResidentReservoir::route()));
     let routes = MereRoutes::new(
         config.shared_root.clone(),
         config.persona,
         catalog.clone(),
         grants.clone(),
-        config.applications.clone(),
     )
     .with_divination_authority();
     routes.load_access(&reservoir).await.unwrap();

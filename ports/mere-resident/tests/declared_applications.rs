@@ -63,12 +63,14 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
     ))
 }
 
-/// Serve the door as the resident does: label custody, Mere's default
-/// application grants, and `extra` grants for fixture applications.
+/// Serve the door as the resident does: custody, an owner's written grants
+/// for Knot and Turnstone (`fixtures/owner_applications.json`), and `extra`
+/// grants for fixture applications.
 async fn serve(wallet: &Path, extra: Vec<AppGrant>, catalog: AppEndpointCatalog) -> String {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    let mut policy = mere_resident::applications::default_grants();
+    let mut policy: Vec<AppGrant> =
+        serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap();
     policy.extend(extra);
     mere_resident::applications::install(
         &grants,
@@ -170,12 +172,8 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
     // Knot's label without its declaration is refused at the door.
     assert!(open(&endpoint, knot_editor::KNOT_APP_ID, None).await.is_err());
 
-    // A label-admitted application no longer reaches Knot's keys.
-    let mut labelled = open(&endpoint, "cleromancy", None).await.unwrap();
-    assert_eq!(
-        refusal(labelled.call(release(PersonalVaultKeys::requests())).await),
-        CustodyRefusal::NotReleasable
-    );
+    // No application reaches custody by its label alone.
+    assert!(open(&endpoint, "cleromancy", None).await.is_err());
 }
 
 #[tokio::test(flavor = "multi_thread")]

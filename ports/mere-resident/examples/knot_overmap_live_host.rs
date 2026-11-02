@@ -33,14 +33,13 @@ use castellan::{
 use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::{
-    embedded_reservoir::reservoir_applications,
     keeper::Keeper,
     resident_mere::{MereRoutes, mere_route_id},
     resident_reservoir::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     },
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
 use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::{
@@ -148,20 +147,23 @@ async fn main() {
     let reservoir = ResidentReservoir::open(&shared, persona)
         .await
         .unwrap();
-    let apps = reservoir_applications();
+    let apps = ["turnstone", "knot-editor", "cleromancy", "graphshell"].map(AppId::new);
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-    let grants = AppRouteGrants::new(AllowedAppRoutes::new(
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    let declaration = mere_resident::resident_reservoir::mere_client_declaration();
+    mere_resident::applications::install(
+        &grants,
         apps.iter()
-            .cloned()
-            .map(|app| (app, ResidentReservoir::route())),
-    ));
+            .map(|app| mere_resident::applications::grant_for(app, &declaration, None))
+            .collect(),
+    );
+    grants.update(|routes| routes.serve(ResidentReservoir::route()));
     mere_resident::custody::grant(&grants).unwrap();
     let routes = MereRoutes::new(
         shared.clone(),
         persona,
         catalog.clone(),
         grants.clone(),
-        apps,
     )
     .with_divination_authority();
     routes.load_access(&reservoir).await.unwrap();

@@ -20,7 +20,7 @@ use chirograph::{
 };
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::{
-    embedded_reservoir::reservoir_applications, keeper::Keeper, resident_mere::MereRoutes,
+    keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
 use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
@@ -162,10 +162,11 @@ async fn inspect(
     application: InspectApplication,
     target_session: Option<Uuid>,
 ) -> Result<serde_json::Value, String> {
-    let mut client = AppBrokerClient::open_route_at(
+    let mut client = AppBrokerClient::open_declared_route_at(
         endpoint,
         AppId::new(application.id()),
         AppRouteId::new("mere/divination").map_err(|e| e.to_string())?,
+        mere_resident::resident_reservoir::mere_client_declaration(),
     )
     .await
     .map_err(|e| e.to_string())?;
@@ -514,20 +515,23 @@ async fn main() {
     let reservoir = ResidentReservoir::open(&root.join("shared"), persona)
         .await
         .unwrap();
-    let apps = reservoir_applications();
+    let apps = ["turnstone", "knot-editor", "cleromancy", "graphshell"].map(AppId::new);
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-    let grants = AppRouteGrants::new(AllowedAppRoutes::new(
+    let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    let declaration = mere_resident::resident_reservoir::mere_client_declaration();
+    mere_resident::applications::install(
+        &grants,
         apps.iter()
-            .cloned()
-            .map(|app| (app, ResidentReservoir::route())),
-    ));
+            .map(|app| mere_resident::applications::grant_for(app, &declaration, None))
+            .collect(),
+    );
+    grants.update(|routes| routes.serve(ResidentReservoir::route()));
     mere_resident::custody::grant(&grants).unwrap();
     let routes = MereRoutes::new(
         root.join("shared"),
         persona,
         catalog.clone(),
         grants.clone(),
-        apps,
     )
     .with_divination_authority();
     routes.load_access(&reservoir).await.unwrap();

@@ -126,14 +126,21 @@ pub struct OwnerSettings {
     pub projection_providers: Vec<ProjectionProviderSettings>,
     /// What each declared application may receive: routes, custody calls and
     /// epoch contexts, by namespace. A connection gets only what its own
-    /// declaration also names. Absent means Mere's defaults
-    /// (`policy/default_applications.json`); an empty list admits no
-    /// application by declaration. Loaded on restart.
+    /// declaration also names. There are no defaults: Djinn asks the owner
+    /// the first time an application connects and writes a yes here
+    /// (capability door D25). Loaded on restart; a yes applies at once.
     ///
     /// scope=profile; movement=local-only; mutability=restart-required;
     /// security=ordinary (names and namespaces, no key material).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub applications: Option<Vec<djinn::door::declaration::AppGrant>>,
+    /// Applications the owner said no to. Djinn does not ask about them
+    /// again until the owner removes them here.
+    ///
+    /// scope=profile; movement=local-only; mutability=restart-required;
+    /// security=ordinary (names only).
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub refused_applications: Vec<djinn::door::app_admission::AppId>,
     /// Relays explicitly trusted for invited Graphshell co-op. Empty keeps
     /// co-op LAN-only. This profile-local choice takes effect on restart;
     /// invitation and graph authority remain separate from reachability.
@@ -716,15 +723,14 @@ impl ProjectionProviderSettings {
 }
 
 impl OwnerSettings {
-    /// The grants declared applications are admitted under: the owner's, or
-    /// Mere's defaults when the owner has written none.
+    /// The grants declared applications are admitted under: the owner's, and
+    /// the resident's own command line.
     pub fn application_grants(
         &self,
     ) -> Result<Vec<djinn::door::declaration::AppGrant>, crate::applications::ApplicationPolicyError> {
-        match &self.applications {
-            Some(grants) => crate::applications::validated(grants.clone()),
-            None => Ok(crate::applications::default_grants()),
-        }
+        let mut grants = self.applications.clone().unwrap_or_default();
+        grants.push(crate::applications::resident_grant());
+        crate::applications::validated(grants)
     }
 
     pub fn coop_relays(
@@ -1200,6 +1206,7 @@ mod tests {
         let mut settings = OwnerSettings {
             projection_providers: Vec::new(),
             applications: None,
+            refused_applications: Vec::new(),
             coop_relay_urls: Vec::new(),
             sync: Some(SyncSettings {
                 graph: "personal".into(),

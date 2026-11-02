@@ -65,9 +65,9 @@ fn personal_facts_child() {
         .build()
         .unwrap();
     runtime.block_on(async {
-  let attachment=ReservoirAttachment::open(ReservoirAttachmentOptions{endpoint:address.clone(),application:AppId::new("cleromancy"),applications:vec![AppId::new("cleromancy"),AppId::new("graphshell")],shared_root:root.join("shared"),persona:PersonaId::from_uuid(uuid::Uuid::from_u128(0x5046)),domain:pandect::DomainId::new("personal-facts").unwrap(),session_duration:Duration::from_secs(600)},||async{Ok(identity)}).await.unwrap();
-  let mut first=PersonalFactsClient::open(&address,AppId::new("cleromancy")).await.unwrap();
-  let mut second=PersonalFactsClient::open(&address,AppId::new("graphshell")).await.unwrap();
+  let attachment=ReservoirAttachment::open(ReservoirAttachmentOptions{endpoint:address.clone(),application:AppId::new("cleromancy"),declaration:mere_resident::resident_reservoir::mere_client_declaration(),grants:vec![mere_resident::applications::grant_for(&AppId::new("graphshell"),&mere_resident::resident_reservoir::mere_client_declaration(),None)],shared_root:root.join("shared"),persona:PersonaId::from_uuid(uuid::Uuid::from_u128(0x5046)),domain:pandect::DomainId::new("personal-facts").unwrap(),session_duration:Duration::from_secs(600)},||async{Ok(identity)}).await.unwrap();
+  let mut first=PersonalFactsClient::open(&address,AppId::new("cleromancy"),mere_resident::resident_reservoir::mere_client_declaration()).await.unwrap();
+  let mut second=PersonalFactsClient::open(&address,AppId::new("graphshell"),mere_resident::resident_reservoir::mere_client_declaration()).await.unwrap();
   if mode=="create"{
    let subject=first.create_contact("Public synthetic natal subject").await.unwrap();
    let facts:dramatis::birth::BirthFacts=serde_json::from_value(serde_json::json!({"schema":"dramatis.birth-facts/v1","subject":subject,"date":{"year":2000,"month":1,"day":1},"time":{"Known":{"hour":12,"minute":0,"second":0}},"place":null,"timezone":"UTC","source":{"label":"Public real-process fixture","reference":null}})).unwrap();

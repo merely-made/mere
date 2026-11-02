@@ -11,6 +11,7 @@ use chirograph::{
 };
 use dramatis::{birth::BirthFacts, resources::SubjectResourceAssociation, subject::SubjectRef};
 use djinn::door::app_admission::{AppId, AppRouteId};
+use djinn::door::declaration::AppDeclaration;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use mere_overmap::wire;
 use personal_facts::{BirthResource, ContactResource};
@@ -40,12 +41,15 @@ pub struct PersonalFactsClient {
     sessions: Option<ProjectionSnapshot>,
 }
 impl PersonalFactsClient {
-    /// Connect to an already running admitted resident; never embed or open a file.
-    pub async fn open(endpoint: &str, app: AppId) -> Result<Self, String> {
-        let mut reservoir = AppBrokerClient::open_route_at(
+    /// Connect to an already running admitted resident; never embed or open a
+    /// file. `declaration` is what `app` declares on every hello: the
+    /// reservoir, the identity route and `mere/personal-facts`.
+    pub async fn open(endpoint: &str, app: AppId, declaration: AppDeclaration) -> Result<Self, String> {
+        let mut reservoir = AppBrokerClient::open_declared_route_at(
             endpoint,
             app.clone(),
             AppRouteId::new(crate::resident_reservoir::RESIDENT_RESERVOIR_ROUTE).map_err(err)?,
+            declaration.clone(),
         )
         .await
         .map_err(err)?;
@@ -85,7 +89,14 @@ impl PersonalFactsClient {
                 .map_err(err)?,
         )?;
         reservoir.close().await.map_err(err)?;
-        let profiles = match AppBrokerClient::open_at(endpoint, app.clone()).await {
+        let profiles = match AppBrokerClient::open_declared_route_at(
+            endpoint,
+            app.clone(),
+            AppRouteId::identity(),
+            declaration.clone(),
+        )
+        .await
+        {
             Ok(mut identity) => {
                 let cards = identity.read_cards().await.map_err(err)?;
                 let result = cards
@@ -118,10 +129,11 @@ impl PersonalFactsClient {
             Err(_) => Vec::new(), // No invented profile; explicitly created contacts still work.
         };
         let application = app.as_str().to_string();
-        let client = AppBrokerClient::open_route_at(
+        let client = AppBrokerClient::open_declared_route_at(
             endpoint,
             app,
             AppRouteId::new("mere/personal-facts").map_err(err)?,
+            declaration,
         )
         .await
         .map_err(err)?;

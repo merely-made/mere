@@ -254,6 +254,55 @@ summary = "Stdio and local carry the WIT calls with one session per offer, a gat
 draws_on = ["stack.1", "stack.3"]
 amends = ["capability-door D21"]
 
+[decisions."capability-door D24"]
+title = "every label application declares (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "All eight label applications declare, and custody's label checks become declared operations."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D25"]
+title = "the owner is asked on first use (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "No default grants: Djinn asks the owner with a native confirm on first use, a yes grants the pinned declaration, and the application sees a typed refusal until then; Djinn's own CLI is exempt."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D26"]
+title = "admission refusals are typed on the wire (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Admission refusals reuse the existing types, the label path goes, and a refused hello is a typed frame on the wire, after the slimming's S2."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D27"]
+title = "the owner marks agents (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Grants mark agents, routes can be closed to agents with a typed refusal, and retinue/ is closed to them."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D28"]
+title = "an embedded owner admits by the owner's grants (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "An embedded reservoir owner admits by the owner's written grants plus the embedding application's own declaration, and never asks."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D29"]
+title = "Hocket's identity adoption is retired (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "Hocket's legacy identity adoption is removed, not made a declared operation."
+draws_on = ["stack.2"]
+
+[decisions."capability-door D30"]
+title = "the seal scope is declared (2026-11-01)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_capability_door_plan.md"
+area = "Stack"
+summary = "An application declares its retained-content seal scope and the grant pins it; Turnstone keeps its string; the label table goes after S2."
+draws_on = ["stack.2"]
+
 [decisions."device-pairing D1"]
 title = "the M4 stays on the work line"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-28_device_pairing_plan.md"

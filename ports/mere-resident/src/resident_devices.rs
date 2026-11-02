@@ -27,7 +27,7 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use djinn::door::app_admission::{AppId, AppRouteGrants};
+use djinn::door::app_admission::AppRouteGrants;
 use djinn::door::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use djinn::door::route::ResidentEndpointRoute;
@@ -275,10 +275,11 @@ fn addr_parts(addr: &PeerAddr) -> (AddrKindV1, String) {
     }
 }
 
-/// Grant the directory route to its one caller. The resident and its refusal
-/// receipt both grant through here, so they cannot disagree.
+/// Serve the directory route to the applications whose grant names it: the
+/// resident's own command line. The resident and its refusal receipt both
+/// serve through here, so they cannot disagree.
 pub fn grant(grants: &AppRouteGrants, route: ResidentEndpointRoute) {
-    grants.grant(AppId::new(DEVICE_DIRECTORY_APP), route);
+    grants.update(|routes| routes.serve(route));
 }
 
 /// Read the directory through an open route: snapshot, card, typed resource.

@@ -393,6 +393,83 @@ part of its manifest entry.
 
   Links: area Stack · amends capability-door D21 · draws on stack.1, stack.3 · summary Stdio and local carry the WIT calls with one session per offer, a gate for advertised offers, the full encoding in-process, a 250 ms blocking notice wait, and a version cut-over.
 
+- **D24, every label application declares (2026-11-01).** Removing
+  `CUSTODY_APPS` means all eight label applications declare, not only
+  Woodshed and Hocket: Graphshell, Distillery, Signalman, personae-vault and
+  Dramatis in Mere, Woodshed and Hocket in Woodshed, and Cleromancy in its
+  own repository. Mark chose "All eight + label checks (Recommended)": the
+  custody route's checks by label (Dramatis's passphrase and import calls,
+  personae-vault's, Signalman's station salts, Hocket's record adoption)
+  become declared operations too.
+
+  Links: area Stack · draws on stack.2 · summary All eight label applications declare, and custody's label checks become declared operations.
+
+- **D25, the owner is asked on first use (2026-11-01).** Asked whether
+  first-party grants survive as defaults, Mark chose "Ask the owner on first
+  use" over JSON defaults, then "Native confirm from Djinn (Recommended)":
+  a `confirm_application` dialog beside the identity confirms lists the
+  declaration and the connection's identity basis, and a yes is written to
+  the owner's `applications`. "Knot+Turnstone ask; CLI exempt
+  (Recommended)": `policy/default_applications.json` goes and every
+  application is asked once, except the resident's own `djinn` command line,
+  whose grant is built into Djinn as data. "The declaration, pinned
+  (Recommended)": a yes grants exactly what was declared, personas empty
+  (D9), pinned to the identity the door recorded, or in development mode
+  where none can be pinned, which the dialog says. "Typed refusal, retry
+  (Recommended)": until answered the hello is refused as awaiting consent,
+  the dialog shows once, a no is kept as a denial until the owner clears
+  it, and with no dialog available the application is refused.
+
+  Links: area Stack · draws on stack.2 · summary No default grants: Djinn asks the owner with a native confirm on first use, a yes grants the pinned declaration, and the application sees a typed refusal until then; Djinn's own CLI is exempt.
+
+- **D26, admission refusals are typed on the wire (2026-11-01).** Asked
+  where M1's typed refusal lives, Mark chose "Also type it on the wire",
+  adding "coordinate with the relevant agent": existing types are reused
+  (`AppAdmissionError`, `AuthorityRefusal`), the label path in admission is
+  removed, and a refused hello reaches the client as a typed frame rather
+  than `Refused(String)`. The door crate's move (Armillary's slimming S2) and
+  W1's byte path are coordinated with before Armillary is edited.
+
+  Links: area Stack · draws on stack.2 · summary Admission refusals reuse the existing types, the label path goes, and a refused hello is a typed frame on the wire, after the slimming's S2.
+
+- **D27, the owner marks agents (2026-11-01).** The MCP door's ban on
+  Retinue routes was prose only, and no Retinue route is served yet. Mark
+  chose "Owner marks agents (Recommended)": the owner's `AppGrant` marks an
+  application as an agent, a served route can be closed to agents, and an
+  agent is refused one with a typed reason; `retinue/` is closed to agents,
+  and `mere-mcp` declares its route.
+
+  Links: area Stack · draws on stack.2 · summary Grants mark agents, routes can be closed to agents with a typed refusal, and retinue/ is closed to them.
+
+- **D28, an embedded owner admits by the owner's grants (2026-11-01).** An
+  application that composes the reservoir when Djinn is absent admitted
+  four labels (`reservoir_applications()`), and no resident is there to
+  ask. Mark chose "Owner's grants, no ask (Recommended)": the embedded owner
+  reads the same owner `applications` Djinn writes after a yes, and grants
+  the embedding application its own declaration; any other application not
+  yet granted gets the typed refusal. Consent is asked only by Djinn.
+
+  Links: area Stack · draws on stack.2 · summary An embedded reservoir owner admits by the owner's written grants plus the embedding application's own declaration, and never asks.
+
+- **D29, Hocket's identity adoption is retired (2026-11-01).** Djinn
+  adopted Hocket's own sealed identity whenever Hocket asked its status, a
+  check by label. Offered a declared adoption operation, Mark answered "if
+  1 is useful otherwise, sure, but i don't think we have more than 1-2
+  hocket installs and it's not like they're crucial. they were for
+  testing". The operation would serve only Hocket, so the adoption is
+  removed rather than declared.
+
+  Links: area Stack · draws on stack.2 · summary Hocket's legacy identity adoption is removed, not made a declared operation.
+
+- **D30, the seal scope is declared (2026-11-01).** Retained-content
+  sealing chose its scope by label (`custody/payload.rs`), and the scope is
+  bound into existing ciphertext. Mark chose "Declared scope, after S2
+  (Recommended)": the declaration's custody gains a payload scope the owner's
+  grant pins, Turnstone declares its existing string so nothing re-seals,
+  and the table stays until the Armillary change after the slimming's S2.
+
+  Links: area Stack · draws on stack.2 · summary An application declares its retained-content seal scope and the grant pins it; Turnstone keeps its string; the label table goes after S2.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -982,3 +1059,24 @@ error types settle.
 - 2026-11-01: K1's settings contract built (Mere `7c1053de1`, D22).
 - 2026-11-01: K1's settings contract landed (Mere `f8055a93c`).
 - 2026-11-01: C0 checked on the M4 (arm64 macOS) too.
+
+- 2026-11-01: D24 to D29 ruled; M1's Mere side built on `m1/manifests`.
+  `CUSTODY_APPS`, the first-party list, the label grants in `bin/djinn.rs`,
+  `reservoir_applications()`, the label release policy and custody's label
+  checks are gone; custody answers declared applications only, and a
+  station's salts need a grant naming that station namespace. An
+  application nobody granted is put to the owner (`applications::OwnerConsent`,
+  a native confirm) and a yes is written to `applications`; the resident's
+  own command line is the one built-in grant. Signalman, Dramatis,
+  Graphshell, Distillery's tool, personae-vault and `mere-mcp` declare;
+  Cleromancy declares on its own branch, and Hocket stops waiting for an
+  adoption. Remaining: Woodshed's and Hocket's declarations (need a custody
+  connect carrying a declaration and a profile, after the slimming's S2),
+  D26's typed refusal frame and D27's agent marks (Armillary, after S2),
+  the retained-content seal scope still chosen by label until D30's
+  Armillary change, and the DR-C receipt host's grants. Six
+  `mere-resident` tests fail on Windows on `main` as well (the dialable
+  host's broad grant, `personal_facts`, `knot_relation_intake`).
+- 2026-11-02: M1's Mere side merged onto main for Armillary's slimming S4
+  (D14 there). Main had recorded D22 and D23 first, so M1's rulings became
+  D24 to D30 here and in their citations (Mark: "M1's become D24-D30").

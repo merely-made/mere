@@ -218,6 +218,16 @@ impl AppRouteCarrier {
         Self::open_at_with(&configured_app_endpoint(), app, route, Some(declaration))
     }
 
+    /// [`Self::open_declared`] at an explicit endpoint.
+    pub fn open_declared_at(
+        endpoint: &str,
+        app: AppId,
+        route: AppRouteId,
+        declaration: AppDeclaration,
+    ) -> Result<Self, AppClientError> {
+        Self::open_at_with(endpoint, app, route, Some(declaration))
+    }
+
     fn open_at_with(
         endpoint: &str,
         app: AppId,

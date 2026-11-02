@@ -29,7 +29,6 @@ use djinn::resident::{
     MaintenanceActivity, Resident, RunFailure, Service, supervise_with_maintenance,
 };
 use dramatis::view::{VaultLockView, VaultProtectionView};
-use graphshell_endpoint::door::projection::AppBrokerClient;
 #[cfg(feature = "personal-sync")]
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker_on};
@@ -53,7 +52,7 @@ use mere_resident::resident_events::EventLog;
 use mere_resident::resident_mere::MereRoutes;
 use mere_resident::resident_reservoir::ReservoirLane;
 use mere_resident::resident_status::{
-    self, AgentListenerV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE,
+    self, AgentListenerV1, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE,
     ResidentControlEndpoint, ResidentEndpointsV1, ResidentStatusEndpoint, ResidentStatusSource,
     ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal, SyncStatusV1,
 };
@@ -360,10 +359,9 @@ async fn resident_client(args: &Args) -> Result<String, String> {
         false => None,
     };
     let route = AppRouteId::new(route).map_err(|error| error.to_string())?;
-    let mut client =
-        AppBrokerClient::open_route_at(&args.app_endpoint, AppId::new(RESIDENT_APP), route)
-            .await
-            .map_err(|error| error.to_string())?;
+    let mut client = resident_status::open_resident_route(&args.app_endpoint, route)
+        .await
+        .map_err(|error| error.to_string())?;
     if args.unlock && args.native {
         let unlocked = resident_status::request_native_unlock(&mut client).await;
         let _ = client.close().await;
@@ -1196,6 +1194,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // Declared applications receive what their declaration names and these
     // grants allow (capability door plan, M1).
     let application_grants = owner.application_grants()?;
+    let consent_ui = args.native_identity_ui();
     let projection_providers = owner
         .projection_providers
         .iter()
@@ -1352,8 +1351,8 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         #[cfg(feature = "personal-sync")]
         let (allowed_app_routes, app_catalog) = {
             let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-            // Routes below are served to declared applications whose grant
-            // names them; label grants remain only for undeclared applications.
+            // Every route below is served to the declared applications whose
+            // owner grant names it; none is granted by label (D24).
             let grants = AppRouteGrants::new(AllowedAppRoutes::none());
             grants.update(|routes| routes.serve(AllowedAppRoutes::identity_route()));
             if let Some(route) = catalog
@@ -1389,21 +1388,18 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 })
                 .await?;
             resident_status::grant(&grants, route);
-            // Custody, for every first-party application (D5).
+            // Custody, for the declared applications granted it (D5, D24).
             mere_resident::custody::grant(&grants)?;
             mere_resident::applications::install(&grants, application_grants);
-            // The reservoir admits this door's first-party clients. Each
-            // mere goes to the same clients on its own route (V2, step 5):
-            // those the reservoir holds now, and each one ensured later.
-            // Declared applications reach each mere through their grant.
-            let first_party = vec![AppId::new("cleromancy"), AppId::new("graphshell")];
+            // The reservoir and each mere on its own route (V2, step 5):
+            // those the reservoir holds now, and each one ensured later,
+            // reached by the applications whose grant names them.
             let routes = resident.reservoir().reservoir().map(|reservoir| {
                 MereRoutes::new(
                     pandect::shared_root::shared_root(),
                     reservoir.persona(),
                     catalog.clone(),
                     grants.clone(),
-                    first_party.clone(),
                 )
                 .with_handlers(address_handlers.clone())
                 .with_custody_endpoint(args.app_endpoint.clone())
@@ -1415,9 +1411,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))
                 .await?
             {
-                for app in &first_party {
-                    grants.grant(app.clone(), route.clone());
-                }
+                grants.update(|routes| routes.serve(route));
             }
             if let (Some(routes), Some(reservoir)) = (&routes, resident.reservoir().reservoir()) {
                 routes.load_access(reservoir).await?;
@@ -1457,6 +1451,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
             (grants, AppEndpointCatalog::default())
         };
         app_catalog.set_connection_ledger(resident_status::ConnectionLedger::new(status.clone()));
+        // An application nobody has granted is put to the owner (D25).
+        app_catalog.set_consent(std::sync::Arc::new(mere_resident::applications::OwnerConsent::new(
+            owner_settings::settings_path(&app_dir, &profile_id),
+            allowed_app_routes.clone(),
+            std::sync::Arc::new(consent_ui),
+        )));
         app_catalog
             .set_provider_permissions(projection_providers)
             .await?;

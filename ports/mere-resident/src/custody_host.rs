@@ -147,14 +147,6 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     /// Seal or unseal one retained payload, admitted to the open profile.
     fn payload(&self, wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal>;
     fn credentials(&self, call: CredentialCall) -> Result<serde_json::Value, CustodyRefusal>;
-    /// Adopt Hocket's own sealed identity as a persona (D13). Hocket seals it
-    /// under the desktop user's OS key, which a custodian running under its
-    /// own account cannot open; adopting it here would open that store in
-    /// Djinn. So only an in-process host adopts, and a custodian refuses
-    /// until the import is moved into custody with its own envelope.
-    fn adopt_hocket(&self) -> Result<(), String> {
-        Err("Hocket's identity is adopted only by an in-process host; a custodian refuses it".into())
-    }
 
     /// A projected signing decision. Only an in-process host with its own
     /// native confirmation answers; a custodian decides on its own channel.

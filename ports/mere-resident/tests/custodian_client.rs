@@ -346,7 +346,7 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
     keeper.configure_payload_custody(ProfileId("work".into()), persona, custodian.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
+    mere_resident::applications::install(&grants, serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap());
     let endpoint = custodian.dir.path().join("app.sock").to_string_lossy().to_string();
     let server = tokio::spawn({ let endpoint = endpoint.clone(); async move {
         serve_app_broker(&endpoint, keeper, grants, 60_000, None, AppEndpointCatalog::default()).await

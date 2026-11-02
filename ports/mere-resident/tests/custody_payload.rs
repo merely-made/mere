@@ -55,7 +55,12 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
+    let mut owner: Vec<djinn::door::declaration::AppGrant> =
+        serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap();
+    for app in ["graphshell", "fixture-app"] {
+        owner.push(mere_resident::applications::grant_for(&AppId::new(app), &payload_declaration(), None));
+    }
+    mere_resident::applications::install(&grants, owner);
     #[cfg(unix)]
     let endpoint = root
         .path()
@@ -109,7 +114,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     assert_ne!(bytes.0, clear);
     // Both product hosts retain private sources through custody. They use
     // distinct authenticated app scopes even under the same wallet/profile.
-    let mut graphshell = CustodyClient::open_at(&endpoint, AppId::new("graphshell"))
+    let mut graphshell = CustodyClient::open_declared_at(&endpoint, AppId::new("graphshell"), payload_declaration())
         .await
         .unwrap();
     let CustodyAnswer::Payload {
@@ -203,7 +208,8 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     assert!(
         matches!(client.call(CustodyCall::Payload(read.clone())).await.unwrap(), CustodyAnswer::Payload { result: PayloadResult::Clear { bytes } } if bytes.0 == clear)
     );
-    let mut other = CustodyClient::open_at(&endpoint, AppId::new("woodshed"))
+    // Declaring the operation does not give an application a seal scope.
+    let mut other = CustodyClient::open_declared_at(&endpoint, AppId::new("fixture-app"), payload_declaration())
         .await
         .unwrap();
     assert!(matches!(
@@ -393,7 +399,7 @@ fn retained_custody_receipt_host() {
     keeper.configure_payload_custody(ProfileId("family".into()), persona, fixture.data_root.clone()).unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    mere_resident::applications::install(&grants, mere_resident::applications::default_grants());
+    mere_resident::applications::install(&grants, serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap());
     tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap()
         .block_on(serve_app_broker(endpoint.to_str().unwrap(), keeper, grants, 60_000, None, AppEndpointCatalog::default())).unwrap();
 }
@@ -404,6 +410,17 @@ mod custody_receipt_tests;
 /// Turnstone's custody declaration, as Turnstone sends it: payload sealing
 /// keys its scope by the `turnstone` label, and that label is admitted by
 /// declaration under Mere's default grants.
+/// Status and retained-content payloads, and nothing else.
+fn payload_declaration() -> djinn::door::declaration::AppDeclaration {
+    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+    let mut declaration = AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        ..AppDeclaration::default()
+    };
+    declaration.custody.operations = [CustodyOperation::Status, CustodyOperation::Payload].into();
+    declaration
+}
+
 fn turnstone_declaration() -> djinn::door::declaration::AppDeclaration {
     use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
     let mut declaration = AppDeclaration {

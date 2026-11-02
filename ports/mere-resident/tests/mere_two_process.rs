@@ -142,12 +142,23 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    mere_resident::applications::install(
+        &grants,
+        ["turnstone", "knot-editor"]
+            .map(|app| {
+                mere_resident::applications::grant_for(
+                    &AppId::new(app),
+                    &mere_resident::resident_reservoir::mere_client_declaration(),
+                    None,
+                )
+            })
+            .to_vec(),
+    );
     let routes = MereRoutes::new(
         root.path().to_path_buf(),
         persona(),
         catalog.clone(),
         grants.clone(),
-        vec![AppId::new("turnstone"), AppId::new("knot-editor")],
     )
     .with_divination_authority();
     catalog
@@ -196,8 +207,13 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
     let mut probe = None;
     for _ in 0..100 {
         if let Ok(client) =
-            AppBrokerClient::open_route_at(&endpoint, AppId::new("knot-editor"), route.clone())
-                .await
+            AppBrokerClient::open_declared_route_at(
+                &endpoint,
+                AppId::new("knot-editor"),
+                route.clone(),
+                mere_resident::resident_reservoir::mere_client_declaration(),
+            )
+            .await
         {
             probe = Some(client);
             break;
@@ -278,8 +294,13 @@ async fn child_edits_the_shared_session() {
         return;
     };
     let route = AppRouteId::new(mere_route_id(DOMAIN)).unwrap();
-    let mut client = AppBrokerClient::open_route_at(&endpoint, AppId::new(&app), route)
-        .await
+    let mut client = AppBrokerClient::open_declared_route_at(
+        &endpoint,
+        AppId::new(&app),
+        route,
+        mere_resident::resident_reservoir::mere_client_declaration(),
+    )
+    .await
         .expect("attached through the door");
     let opened = client.open_session().await.unwrap();
     let graph = opened.descriptor.projections[1].request.clone();

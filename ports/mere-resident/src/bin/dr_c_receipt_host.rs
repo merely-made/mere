@@ -68,7 +68,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("cleromancy"))
+        if djinn::door::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

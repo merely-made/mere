@@ -28,7 +28,7 @@ use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
 use djinn::door::app_admission::AppId;
-use djinn::door::declaration::AppAuthority;
+use djinn::door::declaration::{AppAuthority, SaltPattern};
 #[cfg(feature = "in-process-custody")]
 use djinn::door::custody::ReleasedEpochKey;
 use djinn::door::custody::{
@@ -40,25 +40,8 @@ use crate::custody_host::VaultOutput;
 use crate::keeper::Keeper;
 pub(crate) mod payload;
 
-/// The applications the custody route is granted to by label: the
-/// first-party apps that call djinn instead of opening a vault (D5), and the
-/// two command-line tools that do (Distillery's installed configuration,
-/// Signalman's station commissioning, D17). An application that declares its
-/// custody (`djinn::door::declaration`) is admitted by its owner grant
-/// instead (`crate::applications`) and is not listed here.
-pub const CUSTODY_APPS: &[&str] = &[
-    "cleromancy",
-    "graphshell",
-    "woodshed",
-    "hocket",
-    "distillery",
-    "signalman",
-    "personae-vault",
-    "dramatis",
-];
-
-/// Grant the custody route to [`CUSTODY_APPS`], and serve it to declared
-/// applications whose owner grant names it.
+/// Serve the custody route to declared applications whose owner grant names
+/// it. No application holds it by label (capability door D24).
 pub fn grant(
     grants: &djinn::door::app_admission::AppRouteGrants,
 ) -> Result<(), djinn::door::route::ResidentEndpointRouteError> {
@@ -66,9 +49,6 @@ pub fn grant(
         djinn::door::custody::CUSTODY_ROUTE,
         std::time::Duration::from_millis(50),
     )?;
-    for app in CUSTODY_APPS {
-        grants.grant(AppId::new(app), route.clone());
-    }
     grants.update(|routes| routes.serve(route));
     Ok(())
 }
@@ -190,84 +170,14 @@ impl ReleasePolicy {
     }
 }
 
-impl Default for ReleasePolicy {
-    /// The keys apps need continuously today: a mesh author, which is also
-    /// the transport identity (vault lock ruling 92); Distillery's personal
-    /// mesh name; Graphshell's per-session endpoint keys; and, from the
-    /// wallet, the station- and controller-scoped Reticulum material a sited
-    /// station runs on (D17), plus Signalman's exact Tucket device/realm
-    /// child. No persona-epoch derivation: an application that needs one
-    /// declares it, and its owner grant decides (`crate::applications`).
-    fn default() -> Self {
-        Self::none()
-            .with(
-                KeySource::Persona,
-                SaltRule::Exact(mesh::MESH_AUTHOR_SALT.to_vec()),
-            )
-            .with(
-                KeySource::Persona,
-                SaltRule::Exact(distillery::DISTILLERY_MESH_SALT.to_vec()),
-            )
-            .with(
-                KeySource::Persona,
-                SaltRule::Prefix(b"graphshell/endpoint-session/".to_vec()),
-            )
-            .with(
-                KeySource::Wallet,
-                SaltRule::Matches(personae::reticulum::is_reticulum_salt),
-            )
-            .with(
-                KeySource::Wallet,
-                SaltRule::Matches(personae::tucket::is_station_salt),
-            )
-            .with(
-                KeySource::Wallet,
-                SaltRule::Matches(personae::sennet::is_station_salt),
-            )
-            .with_apps()
-    }
-}
-
-/// The application namespaces DR-C moved behind the custody route for
-/// applications admitted by label: the derived keys Woodshed and Hocket need
-/// continuously (transport and sealing, D11), and the root acts Graphshell and
-/// installs sign through djinn. Turnstone's and Knot's namespaces are their
-/// declarations within the owner's grants (`crate::applications`).
-impl ReleasePolicy {
-    fn with_apps(self) -> Self {
-        let policy = self
-            .with(
-                KeySource::Persona,
-                SaltRule::Exact(b"woodshed.practice-session.seal.v1".to_vec()),
-            )
-            // Hocket's per-session hand-off signer.
-            .with(KeySource::Persona, SaltRule::Prefix(b"hocket/handoff/v2/".to_vec()));
-        // A participant install is the root's act: signed here, never released.
-        policy
-            .with_act(
-                KeySource::Persona,
-                SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
-                    "mere.denizen",
-                )),
-            )
-            .with_act(
-                KeySource::Persona,
-                // Inviting a Graphshell guest and withdrawing that invitation are
-                // root acts. Sign inside custody; never release the scope key.
-                SaltRule::Prefix(insigne::delegation::delegation_signing_prefix(
-                    "mere.graphshell",
-                )),
-            )
-    }
-}
-
 /// Answer one custody call for `app`.
 ///
-/// A declared application (`authority`) is answered only the calls, epoch
-/// derivations and salts its declaration names and its owner grants; none of
-/// them are drawn from the label [`ReleasePolicy`]. The floors hold for every
-/// caller: never the master's place, station salts only for Signalman, and a
-/// Graphshell delegation checked before it is signed.
+/// Only a declared application (`authority`) is answered, and only the
+/// calls, epoch derivations and salts its declaration names and its owner
+/// grants (capability door D24). The floors hold for every caller: never the
+/// master's place, a radio station's salts only under a grant naming that
+/// station namespace itself, and a Graphshell delegation checked before it
+/// is signed.
 pub(crate) async fn answer(
     keeper: Arc<Keeper>,
     app: AppId,
@@ -275,19 +185,12 @@ pub(crate) async fn answer(
     call: CustodyCall,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
     tracing::debug!(app = %app, call = call_name(&call), declared = authority.is_some(), "custody call");
-    if let Some(authority) = &authority {
-        authority.admit_custody(&call)?;
-    }
-    let declared = authority.is_some();
-    if app.as_str() == "hocket"
-        && matches!(&call, CustodyCall::Status | CustodyCall::AsProfile { .. })
-        && !keeper.is_locked()
-    {
-        // D13: Hocket's own record joins custody before Hocket asks who it is.
-        if let Err(error) = keeper.host().adopt_hocket() {
-            tracing::warn!(%error, "Hocket's identity was not adopted");
-        }
-    }
+    let Some(authority) = authority else {
+        return Err(CustodyRefusal::Undeclared {
+            what: "a declaration".into(),
+        });
+    };
+    authority.admit_custody(&call)?;
     match call {
         CustodyCall::Payload(request) => payload::answer(&keeper, &app, request),
         CustodyCall::LockVault => {
@@ -295,7 +198,6 @@ pub(crate) async fn answer(
             Ok(CustodyAnswer::Done)
         },
         CustodyCall::ChangePassphraseNative(_) => {
-            if app.as_str() != "dramatis" { return Err(CustodyRefusal::NotServed); }
             let receipt = tokio::task::spawn_blocking(move || keeper.change_passphrase_native())
                 .await.map_err(failed)?;
             Ok(CustodyAnswer::PassphraseChange { receipt })
@@ -317,9 +219,6 @@ pub(crate) async fn answer(
             }
         },
         CustodyCall::AssignImport(request) => {
-            if app.as_str() != "dramatis" {
-                return Err(CustodyRefusal::NotServed);
-            }
             #[cfg(feature = "cxf")]
             {
                 unlocked(&keeper)?;
@@ -348,9 +247,6 @@ pub(crate) async fn answer(
             }
         },
         CustodyCall::ReviewQuarantine(request) => {
-            if app.as_str() != "dramatis" {
-                return Err(CustodyRefusal::NotServed);
-            }
             #[cfg(feature = "cxf")]
             {
                 unlocked(&keeper)?;
@@ -369,9 +265,6 @@ pub(crate) async fn answer(
             command,
             args,
         } => {
-            if app.as_str() != "personae-vault" {
-                return Err(CustodyRefusal::NotServed);
-            }
             unlocked(&keeper)?;
             #[cfg(feature = "cxf")]
             if matches!(command.as_str(), "cxf-preview" | "cxf-import") {
@@ -433,25 +326,25 @@ pub(crate) async fn answer(
         },
         CustodyCall::Release { source, salts } => {
             unlocked(&keeper)?;
-            release(&keeper, &app, declared, source, None, salts).await
+            release(&keeper, &app, &authority, source, None, salts).await
         },
         CustodyCall::Attest { source, salt } => {
-            if !radio_station_app_allowed(&app, &salt) {
+            if !station_floor(&authority, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
-            attest(&keeper, declared, source, None, salt).await
+            attest(&keeper, source, None, salt).await
         },
         CustodyCall::Sign {
             source,
             salt,
             message,
         } => {
-            if !radio_station_app_allowed(&app, &salt) {
+            if !station_floor(&authority, &salt) {
                 return Err(CustodyRefusal::NotReleasable);
             }
             unlocked(&keeper)?;
-            sign(&keeper, declared, source, None, salt, message).await
+            sign(&keeper, source, None, salt, message).await
         },
         CustodyCall::AsProfile { profile, inner } => {
             unlocked(&keeper)?;
@@ -472,16 +365,16 @@ pub(crate) async fn answer(
                 CustodyCall::Release {
                     source: KeySource::Persona,
                     salts,
-                } => release(&keeper, &app, declared, source, Some(profile), salts).await,
+                } => release(&keeper, &app, &authority, source, Some(profile), salts).await,
                 CustodyCall::Attest {
                     source: KeySource::Persona,
                     salt,
-                } => attest(&keeper, declared, source, Some(profile), salt).await,
+                } => attest(&keeper, source, Some(profile), salt).await,
                 CustodyCall::Sign {
                     source: KeySource::Persona,
                     salt,
                     message,
-                } => sign(&keeper, declared, source, Some(profile), salt, message).await,
+                } => sign(&keeper, source, Some(profile), salt, message).await,
                 _ => Err(CustodyRefusal::Refused {
                     reason: "only a status, or a persona release, attestation or signature, answers as a named persona".into(),
                 }),
@@ -514,9 +407,7 @@ pub(crate) async fn answer(
             keys,
         } => {
             unlocked(&keeper)?;
-            if keys.is_empty()
-                || (!declared && keys.iter().any(|request| !keeper.policy().allows_epoch(request)))
-            {
+            if keys.is_empty() {
                 return Err(CustodyRefusal::NotReleasable);
             }
             let root = keeper.wallet_root().map(Path::to_path_buf).unwrap_or_default();
@@ -608,30 +499,36 @@ pub fn epoch_keys(
         .collect()
 }
 
-fn radio_station_app_allowed(app: &AppId, salt: &[u8]) -> bool {
-    !(personae::tucket::is_station_salt(salt) || personae::sennet::is_station_salt(salt))
-        || app == &AppId::new("signalman")
+/// The radio station namespaces (`personae::tucket`, `personae::sennet`).
+const STATION_NAMESPACES: [&str; 2] = [
+    "mere.signalman.tucket.station/v1/",
+    "mere.signalman.sennet.station/v1/",
+];
+
+/// A station's salt only under a grant naming that station namespace itself,
+/// never under a broader pattern that happens to cover it.
+fn station_floor(authority: &AppAuthority, salt: &[u8]) -> bool {
+    if !(personae::tucket::is_station_salt(salt) || personae::sennet::is_station_salt(salt)) {
+        return true;
+    }
+    let custody = &authority.grant().custody;
+    custody.salts.iter().chain(&custody.acts).any(|used| {
+        matches!(&used.name, SaltPattern::Prefix(prefix)
+            if STATION_NAMESPACES.contains(&prefix.as_str()) && salt.starts_with(prefix.as_bytes()))
+    })
 }
 
 /// Release `salts`' keys from `source`, each with its attestation (D11).
+/// The declaration and grant admitted the salts; the floors hold here.
 async fn release(
     keeper: &Keeper,
     app: &AppId,
-    declared: bool,
+    authority: &AppAuthority,
     source: KeySource,
     profile: Option<ProfileId>,
     salts: Vec<Vec<u8>>,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
-    // A declared application's salts were admitted by its declaration and
-    // grant; the floors below hold for every caller.
-    let allowed = match declared {
-        true => {
-            !salts.is_empty()
-                && salts.iter().all(|salt| !salt.is_empty() && radio_station_app_allowed(app, salt))
-        },
-        false => releasable(keeper.policy(), app, source, &salts),
-    };
-    if !allowed {
+    if salts.is_empty() || salts.iter().any(|salt| salt.is_empty() || !station_floor(authority, salt)) {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
@@ -642,17 +539,9 @@ async fn release(
     Ok(CustodyAnswer::Released { master, keys })
 }
 
-/// Whether every one of `salts` may leave for `app` under `policy`.
-fn releasable(policy: &ReleasePolicy, app: &AppId, source: KeySource, salts: &[Vec<u8>]) -> bool {
-    !salts.is_empty()
-        && salts
-            .iter()
-            .all(|salt| policy.allows(source, salt) && radio_station_app_allowed(app, salt))
-}
-
 /// The root's attestation of `salt`'s key; no key crosses.
-async fn attest(keeper: &Keeper, declared: bool, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
-    if salt.is_empty() || (!declared && !keeper.policy().allows_act(source, &salt)) {
+async fn attest(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if salt.is_empty() {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
@@ -665,8 +554,8 @@ async fn attest(keeper: &Keeper, declared: bool, source: KeySource, profile: Opt
 /// Sign `message` with `salt`'s key where the key is; only the signature
 /// crosses. A Graphshell guest delegation is decoded and checked for its
 /// audience, issuer and scope key before it is signed.
-async fn sign(keeper: &Keeper, declared: bool, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>, message: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
-    if salt.is_empty() || (!declared && !keeper.policy().allows_act(source, &salt)) {
+async fn sign(keeper: &Keeper, source: KeySource, profile: Option<ProfileId>, salt: Vec<u8>, message: Vec<u8>) -> Result<CustodyAnswer, CustodyRefusal> {
+    if salt.is_empty() {
         return Err(CustodyRefusal::NotReleasable);
     }
     let host = Arc::clone(keeper.host());
@@ -763,83 +652,34 @@ fn failed(error: impl std::fmt::Display) -> CustodyRefusal {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use djinn::door::declaration::{AppDeclaration, AppGrant, CustodyUse, SaltUse};
+
+    fn wallet_authority(prefix: &str) -> AppAuthority {
+        let used = SaltUse::wallet(SaltPattern::Prefix(prefix.into()));
+        let declaration = AppDeclaration {
+            custody: CustodyUse { salts: vec![used.clone()], ..CustodyUse::default() },
+            ..AppDeclaration::default()
+        };
+        let mut grant = AppGrant::new(AppId::new("signalman"));
+        grant.custody.salts.push(used);
+        AppAuthority::new(declaration, grant)
+    }
 
     #[test]
-    fn radio_station_release_is_exact_wallet_scope_for_signalman_only() {
-        let policy = ReleasePolicy::default();
-        for salt in [
-            personae::tucket::station_salt(&[4; 16], "ridge").unwrap(),
-            personae::sennet::station_salt(&[4; 16], "ridge").unwrap(),
+    fn a_station_salt_needs_a_grant_naming_its_station_namespace() {
+        for (salt, namespace) in [
+            (personae::tucket::station_salt(&[4; 16], "ridge").unwrap(), STATION_NAMESPACES[0]),
+            (personae::sennet::station_salt(&[4; 16], "ridge").unwrap(), STATION_NAMESPACES[1]),
         ] {
-            let signalman = AppId::new("signalman");
-            assert!(releasable(&policy, &signalman, KeySource::Wallet, &[salt.clone()]));
-            assert!(!releasable(&policy, &AppId::new("turnstone"), KeySource::Wallet, &[salt.clone()]));
-            assert!(!releasable(&policy, &signalman, KeySource::Persona, &[salt.clone()]));
-            for forbidden in [
-                vec![],
-                b"mere.signalman.tucket.station/v1/".to_vec(),
-                [salt.as_slice(), b"x"].concat(),
-            ] {
-                assert!(!releasable(&policy, &signalman, KeySource::Wallet, &[salt.clone(), forbidden]));
-            }
-        }
-    }
-    #[test]
-    fn the_default_policy_releases_named_namespaces_and_never_the_master() {
-        let policy = ReleasePolicy::default();
-        assert!(policy.allows(KeySource::Persona, mesh::MESH_AUTHOR_SALT));
-        assert!(policy.allows(KeySource::Persona, b"graphshell/endpoint-session/s1"));
-        assert!(!policy.allows(KeySource::Persona, b"graphshell/endpoint-session/"));
-        assert!(!policy.allows(KeySource::Persona, b""));
-        assert!(!policy.allows(KeySource::Wallet, mesh::MESH_AUTHOR_SALT));
-        let [station, _] = personae::reticulum::station_salts(b"device");
-        assert!(policy.allows(KeySource::Wallet, &station));
-        assert!(!policy.allows(KeySource::Persona, &station));
-        for request in knot_editor::PersonalVaultKeys::requests() {
+            assert!(station_floor(&wallet_authority(namespace), &salt));
             assert!(
-                !policy.allows_epoch(&request),
-                "Knot's epoch keys leave only under its declaration and grant"
+                !station_floor(&wallet_authority("mere.signalman."), &salt),
+                "a broader grant does not reach a station's keys"
             );
         }
-        let install =
-            insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
-                domain: "mere.denizen".into(),
-                resource: b"resident".to_vec(),
-                path_prefix: "scope/".into(),
-                actions: ["write".to_string()].into_iter().collect(),
-            });
         assert!(
-            policy.allows_act(KeySource::Persona, &install),
-            "djinn signs an install"
+            station_floor(&wallet_authority("other/"), b"other/salt"),
+            "the floor speaks only to station salts"
         );
-        assert!(
-            !policy.allows(KeySource::Persona, &install),
-            "and never releases its key"
-        );
-        let graphshell =
-            insigne::delegation::delegation_signing_salt(&insigne::delegation::CapabilityScope {
-                domain: "mere.graphshell".into(),
-                resource: vec![2; 32],
-                path_prefix: "/services/projection/coop/chosen-graph".into(),
-                actions: ["connect".into(), "edit".into()].into_iter().collect(),
-            });
-        assert!(
-            policy.allows_act(KeySource::Persona, &graphshell),
-            "the holder signs a scoped Graphshell invitation and revocation"
-        );
-        assert!(
-            !policy.allows(KeySource::Persona, &graphshell),
-            "Graphshell never receives the delegation signing key"
-        );
-        assert!(
-            !policy.allows_act(KeySource::Wallet, &graphshell),
-            "the graph grant is not a wallet act"
-        );
-        for door in crate::door::local_session::door_salts([7; 32]) {
-            assert!(
-                !policy.allows(KeySource::Persona, &door),
-                "door keys stay in djinn"
-            );
-        }
     }
 }

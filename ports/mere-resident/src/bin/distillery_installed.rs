@@ -27,6 +27,20 @@ use personae::ProfileId;
 /// The application name this tool connects to djinn as.
 const APP: &str = "distillery";
 
+/// What this tool declares (Mere's capability door D24): djinn's status and
+/// roster, to check the configured profile. No key is released to it.
+fn declaration() -> djinn::door::declaration::AppDeclaration {
+    use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
+    AppDeclaration {
+        routes: vec![NamePattern::exact("custody")],
+        custody: CustodyUse {
+            operations: [CustodyOperation::Status, CustodyOperation::Roster].into(),
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    }
+}
+
 fn main() {
     if let Err(error) = run(std::env::args().skip(1).collect()) {
         eprintln!("distillery-installed: {error}");
@@ -58,7 +72,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 .map_err(|error| error.to_string())?
                 .ok_or("Distillery is not configured: run `configure` first")?;
             let endpoint = options.app_endpoint.unwrap_or_else(configured_app_endpoint);
-            let answer = BlockingCustodyClient::open_at(&endpoint, AppId::new(APP))
+            let answer = BlockingCustodyClient::open_declared_at(&endpoint, AppId::new(APP), declaration())
                 .and_then(|mut djinn| Ok((djinn.status()?, djinn.roster()?)));
             let (status, roster) = match answer {
                 Ok(answer) => answer,

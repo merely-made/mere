@@ -57,7 +57,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 use djinn::door::custody::{CustodyRefusal, KeySource};
 use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
             let salt = personae::tucket::station_salt(device.as_uuid().as_bytes(), &args[2])?;
-            let mut other_app = BlockingCustodyClient::open_at(&args[0], AppId::new("turnstone"))?;
+            // Another application, granted the whole Signalman wallet
+            // namespace: a station's keys still stay (the station floor).
+            let broad = djinn::door::declaration::AppDeclaration {
+                routes: vec![djinn::door::declaration::NamePattern::exact("custody")],
+                custody: djinn::door::declaration::CustodyUse {
+                    operations: [
+                        djinn::door::declaration::CustodyOperation::Release,
+                        djinn::door::declaration::CustodyOperation::Attest,
+                        djinn::door::declaration::CustodyOperation::Sign,
+                    ]
+                    .into(),
+                    salts: vec![djinn::door::declaration::SaltUse::wallet(
+                        djinn::door::declaration::SaltPattern::Prefix("mere.signalman.".into()),
+                    )],
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
+            let mut other_app = BlockingCustodyClient::open_declared_at(&args[0], AppId::new("turnstone"), broad)?;
             for refused in [
                 other_app
                     .release(KeySource::Wallet, vec![salt.clone()])

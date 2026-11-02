@@ -21,6 +21,8 @@ use djinn::door::custody_client::{CustodyClient, CustodyClientError};
 use personae::{PersonaId, ProfileId};
 use serde_json::{Value, json};
 use std::sync::Arc;
+#[path = "fixture_declarations/mod.rs"]
+mod fixture_declarations;
 
 const PASSPHRASE: &str = "synthetic custody wire receipt";
 
@@ -46,6 +48,7 @@ async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
     let keeper = Arc::new(Keeper::new(remote.clone()));
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    fixture_declarations::grant(&grants, &["dramatis", "personae-vault", "graphshell", "cleromancy"]);
     let dir = custodian.dir.path();
     let endpoint = dir.join("app.sock").display().to_string();
     let server_endpoint = endpoint.clone();
@@ -62,7 +65,7 @@ async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
     });
     let mut client = None;
     for _ in 0..100 {
-        if let Ok(opened) = CustodyClient::open_at(&endpoint, AppId::new("personae-vault")).await {
+        if let Ok(opened) = CustodyClient::open_declared_at(&endpoint, AppId::new("personae-vault"), fixture_declarations::declaration("personae-vault")).await {
             client = Some(opened);
             break;
         }
@@ -94,7 +97,7 @@ async fn preview_commit_and_locked_refusal_go_through_the_custodians_catalog() {
             hash,
         ]
     };
-    let mut ordinary = CustodyClient::open_at(&endpoint, AppId::new("cleromancy"))
+    let mut ordinary = CustodyClient::open_declared_at(&endpoint, AppId::new("cleromancy"), fixture_declarations::declaration("cleromancy"))
         .await
         .unwrap();
     assert!(matches!(
