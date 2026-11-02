@@ -54,7 +54,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "chirograph"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "base64",
  "blake3",
@@ -108,17 +108,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "djinn"
-version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror",
- "zeroize",
-]
-
-[[package]]
 name = "find-msvc-tools"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -126,17 +115,17 @@ checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
 
 [[package]]
 name = "graphshell-endpoint"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "chirograph",
- "djinn",
+ "ostiary",
  "serde",
  "serde_json",
 ]
 
 [[package]]
 name = "hest"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "serde",
 ]
@@ -169,6 +158,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
 
 [[package]]
+name = "ostiary"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "zeroize",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -181,8 +181,8 @@ dependencies = [
 name = "projection-offer-consumer-fixture"
 version = "0.0.0"
 dependencies = [
- "djinn",
  "graphshell-endpoint",
+ "ostiary",
  "serde_json",
 ]
 
@@ -197,7 +197,7 @@ dependencies = [
 
 [[package]]
 name = "sceno"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -205,7 +205,7 @@ dependencies = [
 
 [[package]]
 name = "scenotime"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
  "sceno",
  "serde",

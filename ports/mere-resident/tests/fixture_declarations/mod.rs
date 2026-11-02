@@ -10,8 +10,9 @@
 
 #![allow(dead_code)]
 
-use djinn::door::app_admission::{AppId, AppRouteGrants};
-use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
+use djinn::door::app_admission::AppRouteGrants;
+use ostiary::app_admission::AppId;
+use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
 
 pub fn declaration(app: &str) -> AppDeclaration {
     use CustodyOperation as Op;

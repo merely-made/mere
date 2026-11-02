@@ -10,8 +10,9 @@ use mere_resident::{
     door::app_broker::{AppEndpointCatalog, serve_app_broker},
     keeper::Keeper,
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody_client::CustodyClient;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody_client::CustodyClient;
 use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{path::PathBuf, sync::Arc, time::Duration};
@@ -68,7 +69,7 @@ async fn main() {
     // and the receipt's other application, granted the whole Signalman
     // wallet namespace, which still does not reach a station's keys.
     {
-        use djinn::door::declaration::{
+        use ostiary::declaration::{
             AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern, SaltPattern, SaltUse,
         };
         let declared = |operations: Vec<Op>, namespaces: &[&str]| AppDeclaration {
@@ -117,7 +118,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if djinn::door::local_endpoint::connect_local(&endpoint)
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

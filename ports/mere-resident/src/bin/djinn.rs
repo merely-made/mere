@@ -17,10 +17,8 @@ use std::time::Duration;
 
 #[cfg(feature = "personal-sync")]
 use distillery::ResidentReceipt;
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
-    default_app_endpoint,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId, configured_app_endpoint, default_app_endpoint};
 use djinn::door::local_endpoint::LocalListener;
 #[cfg(all(not(windows), feature = "in-process-custody"))]
 use djinn::door::local_endpoint::prepare_unix_endpoint;
@@ -84,7 +82,7 @@ struct Args {
     agent: AgentEndpoint,
     browser_endpoint: String,
     /// Where first-party applications connect. A separate door from the
-    /// browser one, on purpose: see `djinn::door::app_admission`.
+    /// browser one, on purpose: see `ostiary::app_admission`.
     app_endpoint: String,
     data_root: Option<PathBuf>,
     log_file: Option<PathBuf>,
@@ -413,7 +411,7 @@ async fn resident_client(args: &Args) -> Result<String, String> {
 #[cfg(feature = "personal-sync")]
 fn application_launcher(
     grants: &AppRouteGrants,
-    applications: &[djinn::door::declaration::AppGrant],
+    applications: &[ostiary::declaration::AppGrant],
 ) -> resident_status::Launcher {
     let pins: std::collections::BTreeMap<AppId, (String, Vec<String>)> = applications
         .iter()

@@ -223,7 +223,7 @@ fn local_grant<P: IdentityProvider>(
 #[cfg(test)]
 mod tests {
     use crate::door::browser_carrier::BrowserMessage;
-    use djinn::door::wire::BrowserChallenge;
+    use ostiary::wire::BrowserChallenge;
 
     /// The transcript binds the client label, so two clients answering the
     /// same challenge with the same nonce still get different sessions. This

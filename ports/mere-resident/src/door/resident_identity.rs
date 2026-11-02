@@ -23,9 +23,9 @@ use crate::door::browser_carrier::{
 };
 use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::DoorIdentity;
-use djinn::door::app_admission::AppId;
-use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
-use djinn::door::declaration::AppAuthority;
+use ostiary::app_admission::AppId;
+use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use ostiary::declaration::AppAuthority;
 
 /// One custody call in flight.
 pub type CustodyFuture =
@@ -43,7 +43,7 @@ pub trait ResidentIdentity: DoorIdentity + IdentityAuthority + Send + Sync + 'st
         }
     }
 
-    /// Answer one call on the custody route ([`djinn::door::custody`]),
+    /// Answer one call on the custody route ([`castellan_client::custody`]),
     /// from the application the door admitted: by label, or by its
     /// declaration within its owner grant (`authority`).
     fn custody(

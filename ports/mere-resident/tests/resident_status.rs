@@ -24,13 +24,12 @@ use mere_resident::resident_status::{
     ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal,
     SyncStatusV1, default_endpoints_taken,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, default_app_endpoint,
-};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId, default_app_endpoint};
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
@@ -99,7 +98,7 @@ async fn open(endpoint: &str, app: &str, route: &str) -> Result<AppBrokerClient,
 /// the OS account of its peer, and drops it when the connection ends.
 #[tokio::test(flavor = "multi_thread")]
 async fn status_reports_each_connection_with_its_identity_basis() {
-    use djinn::door::declaration::IdentityBasis;
+    use ostiary::declaration::IdentityBasis;
     use mere_resident::resident_status::ConnectionLedger;
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());

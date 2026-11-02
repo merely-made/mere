@@ -44,7 +44,7 @@ use transport::BlobScope;
 
 use crate::resident_blobs::{LEGACY_KNOT_LEASE, LegacyBlobMigration, ResidentBlobCustody};
 use crate::settings::KnotResidentSettings;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 
 /// Stable first-party route for the resident Djot vault.
@@ -187,8 +187,8 @@ pub type KnotEpochs = Arc<
     dyn Fn(
             personae::PersonaId,
             &str,
-            &[djinn::door::custody::EpochKeyRequest],
-        ) -> Result<Vec<djinn::door::custody::ReleasedEpochKey>, String>
+            &[castellan_client::custody::EpochKeyRequest],
+        ) -> Result<Vec<castellan_client::custody::ReleasedEpochKey>, String>
         + Send
         + Sync,
 >;

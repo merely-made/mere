@@ -10,6 +10,6 @@ publish = false
 forbidden-api = []
 
 [dependencies]
-djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "721e17d41a8f258073f440adbbb39ad145250868", default-features = false, features = ["door"] }
+ostiary = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 serde_json = "1"
 

@@ -24,9 +24,9 @@ use crate::door::browser_carrier::{NativeIdentityAction, NativeIdentityResult};
 use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::{DoorIdentity, door_salts};
 use crate::door::resident_identity::{CustodyFuture, ResidentIdentity};
-use djinn::door::app_admission::AppId;
-use djinn::door::custody::CustodyCall;
-use djinn::door::declaration::AppAuthority;
+use ostiary::app_admission::AppId;
+use castellan_client::custody::CustodyCall;
+use ostiary::declaration::AppAuthority;
 use dramatis::view::IdentitySurfaceSnapshot;
 use personae::{IdentityError, RetainedKeys};
 
@@ -107,8 +107,8 @@ impl Keeper {
         }
         let source = args.first().ok_or("CXF command requires a source file")?;
         let bytes = std::fs::read(source).map_err(|_| "cannot read CXF source file")?;
-        let refused = |r: djinn::door::custody::CustodyRefusal| match r {
-            djinn::door::custody::CustodyRefusal::Refused { reason } => reason,
+        let refused = |r: castellan_client::custody::CustodyRefusal| match r {
+            castellan_client::custody::CustodyRefusal::Refused { reason } => reason,
             other => format!("{other:?}"),
         };
         if command == "cxf-preview" {

@@ -31,9 +31,8 @@ use mere_resident::resident_mere::{MereRoutes, mere_route_id};
 use mere_resident::resident_reservoir::{
     EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};

@@ -39,7 +39,8 @@ use mere_resident::{
         EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
     },
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
 use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, ProjectionCatalog, ProjectionSource};
 use graphshell_host::{
@@ -281,7 +282,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if djinn::door::local_endpoint::connect_local(&endpoint)
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

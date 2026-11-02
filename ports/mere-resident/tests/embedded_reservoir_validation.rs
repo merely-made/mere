@@ -31,7 +31,8 @@ use mere_resident::embedded_reservoir::{
 };
 use mere_resident::resident_mere::MereRoutes;
 use mere_resident::resident_reservoir::ResidentReservoir;
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
@@ -518,7 +519,7 @@ async fn child_serves_the_registered_domain() {
                 .await
         });
         for _ in 0..100 {
-            if djinn::door::local_endpoint::connect_local(&config.endpoint)
+            if ostiary::local_endpoint::connect_local(&config.endpoint)
                 .await
                 .is_ok()
             {

@@ -100,7 +100,7 @@ impl Signer for personae::InMemoryProvider {
 }
 
 #[cfg(feature = "custody-client")]
-impl Signer for djinn::door::custody_identity::CustodyIdentity {
+impl Signer for castellan_client::custody_identity::CustodyIdentity {
     fn certificate(
         &self,
         value: DelegationCertificate,

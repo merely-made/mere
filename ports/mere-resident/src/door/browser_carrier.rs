@@ -21,10 +21,10 @@ use std::io::{Read, Write};
 
 use base64::Engine;
 use chirograph::{CarrierNotice, CarrierOutput, CarrierRequest, CarrierResponse};
-use djinn::door::frame::{self, FrameError};
+use ostiary::frame::{self, FrameError};
 #[cfg(test)]
-use djinn::door::wire::BROWSER_CHALLENGE_SCHEMA as CHALLENGE_SCHEMA;
-use djinn::door::wire::BrowserChallenge;
+use ostiary::wire::BROWSER_CHALLENGE_SCHEMA as CHALLENGE_SCHEMA;
+use ostiary::wire::BrowserChallenge;
 use insigne::delegation::SignedDelegationCertificate;
 use notochord::{
     AdmittedSession, DenyReason, IoHandshakeError, LocalNetworkPolicy, NetworkId, ProfileRef,

@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #[cfg(feature = "forbidden-api")]
-pub use djinn::ProjectionCatalog;
-pub use djinn::door::custody_client::{BlockingCustodyClient, CustodyClient};
+pub use castellan_client::ProjectionCatalog;
+pub use castellan_client::custody_client::{BlockingCustodyClient, CustodyClient};
 
 #[cfg(test)]
 mod tests {
-    use djinn::door::custody::CustodyRefusal;
-use djinn::door::custody_client::CustodyClientError;
+    use castellan_client::custody::CustodyRefusal;
+    use castellan_client::custody_client::CustodyClientError;
 
     #[test]
     fn legacy_refusal_is_pending_without_a_projection_api() {

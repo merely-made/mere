@@ -31,8 +31,8 @@ use chirograph::{
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
     ResourceRequest, ResourceResponse, SemanticRole,
 };
-use djinn::door::app_admission::AppId;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::app_admission::AppId;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use muniment::RedbBackend;
@@ -57,12 +57,12 @@ pub const RESIDENT_RESERVOIR_ROUTE: &str = "reservoir";
 /// What a client of the reservoir and its meres declares: the reservoir,
 /// the identity route, and every mere's explicit and ambient route. An
 /// application declares more beside it; the owner's grant decides.
-pub fn mere_client_declaration() -> djinn::door::declaration::AppDeclaration {
-    use djinn::door::declaration::NamePattern;
-    djinn::door::declaration::AppDeclaration {
+pub fn mere_client_declaration() -> ostiary::declaration::AppDeclaration {
+    use ostiary::declaration::NamePattern;
+    ostiary::declaration::AppDeclaration {
         routes: vec![
             NamePattern::exact(RESIDENT_RESERVOIR_ROUTE),
-            NamePattern::exact(djinn::door::app_admission::AppRouteId::identity().as_str()),
+            NamePattern::exact(ostiary::app_admission::AppRouteId::identity().as_str()),
             NamePattern::prefix("mere/"),
             NamePattern::prefix("ambient/mere/"),
         ],

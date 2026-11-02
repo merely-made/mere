@@ -14,7 +14,8 @@ use mere_resident::{
     resident::DjinnResident,
     settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings},
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use serde_json::{Value, json};
 use std::{

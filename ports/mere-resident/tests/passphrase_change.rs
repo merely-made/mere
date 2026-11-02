@@ -17,9 +17,10 @@ use mere_resident::{
     keeper::Keeper,
 };
 use dramatis::authentication::{PassphraseChangeFailureV1 as F, PassphraseChangeReceiptV1 as R};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody::{CustodyAnswer, CustodyCall};
-use djinn::door::custody_client::CustodyClient;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::{CustodyAnswer, CustodyCall};
+use castellan_client::custody_client::CustodyClient;
 use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, ProfileId};
 use std::{

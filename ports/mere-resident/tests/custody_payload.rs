@@ -13,11 +13,12 @@ use mere_resident::{
     keeper::Keeper,
 };
 use eidetic::{Hash, PayloadSealer};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
-use djinn::door::custody_identity::CustodyIdentity;
-use djinn::door::custody_payload::{
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
+use castellan_client::custody_identity::CustodyIdentity;
+use castellan_client::custody_payload::{
         MAX_PAYLOAD_BYTES, PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult,
     };
 use dramatis::view::{VaultLockView, VaultProtectionView};
@@ -55,7 +56,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         .unwrap();
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    let mut owner: Vec<djinn::door::declaration::AppGrant> =
+    let mut owner: Vec<ostiary::declaration::AppGrant> =
         serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap();
     for app in ["graphshell", "fixture-app"] {
         owner.push(mere_resident::applications::grant_for(&AppId::new(app), &payload_declaration(), None));
@@ -218,7 +219,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     ));
     for bad in [
         PayloadRequest {
-            custody_epoch: Some(djinn::door::custody::CustodyEpoch {
+            custody_epoch: Some(castellan_client::custody::CustodyEpoch {
                 instance: "a-different-custodian".into(),
                 generation: 1,
             }),
@@ -411,8 +412,8 @@ mod custody_receipt_tests;
 /// keys its scope by the `turnstone` label, and that label is admitted by
 /// declaration under Mere's default grants.
 /// Status and retained-content payloads, and nothing else.
-fn payload_declaration() -> djinn::door::declaration::AppDeclaration {
-    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+fn payload_declaration() -> ostiary::declaration::AppDeclaration {
+    use ostiary::declaration::{AppDeclaration, CustodyOperation, NamePattern};
     let mut declaration = AppDeclaration {
         routes: vec![NamePattern::exact("custody")],
         ..AppDeclaration::default()
@@ -421,8 +422,8 @@ fn payload_declaration() -> djinn::door::declaration::AppDeclaration {
     declaration
 }
 
-fn turnstone_declaration() -> djinn::door::declaration::AppDeclaration {
-    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+fn turnstone_declaration() -> ostiary::declaration::AppDeclaration {
+    use ostiary::declaration::{AppDeclaration, CustodyOperation, NamePattern};
     let mut declaration = AppDeclaration {
         routes: vec![NamePattern::exact("custody")],
         ..AppDeclaration::default()

@@ -24,8 +24,8 @@ use chirograph::{
     IntentResult, ProjectionRequest, ProjectionSnapshot, ResourceChunkRequest,
     ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
 };
-use djinn::door::app_admission::{AppId, AppRouteId};
-use djinn::door::declaration::AppDeclaration;
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::declaration::AppDeclaration;
 use std::sync::mpsc::{self, Sender};
 use std::thread::JoinHandle;
 use std::time::Duration;

@@ -23,7 +23,8 @@ use mere_resident::{
     keeper::Keeper, resident_mere::MereRoutes,
     resident_reservoir::ResidentReservoir,
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
@@ -560,7 +561,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if djinn::door::local_endpoint::connect_local(&endpoint)
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

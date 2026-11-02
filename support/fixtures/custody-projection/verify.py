@@ -37,7 +37,7 @@ def metadata(name, target):
                 walk(dependency["pkg"])
 
     walk(data["resolve"]["root"])
-    endpoint = next(p for p in seen if packages[p]["name"] == ("djinn" if name in ("custody", "custody-types", "portable") else "graphshell-endpoint"))
+    endpoint = next(p for p in seen if packages[p]["name"] == {"custody": "castellan-client", "custody-types": "castellan-client", "portable": "ostiary"}.get(name, "graphshell-endpoint"))
     names = sorted({packages[p]["name"] for p in seen})
     direct = [
         {"name": packages[d["pkg"]]["name"], "kinds": d["dep_kinds"]}
@@ -49,13 +49,13 @@ def metadata(name, target):
     (out / f"{name}-{target}.cone.json").write_text(json.dumps(report, indent=2) + "\n")
     if name in ("custody", "custody-types"):
         assert not set(names) & {"chirograph", "sceno", "scenotime", "hest", "pandect",
-                                 "mere-kernel", "mere-alembic", "graphshell"}, names
+                                 "mere-kernel", "mere-alembic", "graphshell", "djinn"}, names
     if name in ("projection", "provider"):
-        assert not {d["name"] for d in direct} & {"eidetic", "chatelaine", "dramatis", "insigne"}, direct
+        assert not {d["name"] for d in direct} & {"castellan-client", "eidetic", "chatelaine", "dramatis", "insigne"}, direct
     print(name, target, len(names), "normal/build package names", flush=True)
 
 
-for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "app_client"), ("projection", "custody_client"),
+for name, forbidden in [("custody", "ProjectionCatalog"), ("custody-types", "custody_client"), ("projection", "custody_client"),
                         ("portable", "app_client"), ("offer", "app_client"), ("provider", "custody_client"), ("host", None)]:
     manifest = str(base / name / "Cargo.toml")
     metadata(name, native)

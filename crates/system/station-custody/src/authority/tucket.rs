@@ -6,7 +6,7 @@
 
 //! One scoped Tucket release with a connection-lifetime custody watch.
 use super::*;
-use djinn::door::custody_client::CustodyClient;
+use castellan_client::custody_client::CustodyClient;
 use dramatis::view::VaultLockView;
 use personae::{IdentityError, IdentityProvider, tucket::TucketStationMaterial};
 use std::sync::atomic::{AtomicBool, Ordering};

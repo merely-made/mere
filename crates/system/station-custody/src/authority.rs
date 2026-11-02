@@ -15,12 +15,12 @@
 use std::io;
 use std::sync::Arc;
 
-use djinn::door::app_admission::{AppId, configured_app_endpoint};
-use djinn::door::custody::{
+use ostiary::app_admission::{AppId, configured_app_endpoint};
+use castellan_client::custody::{
     CustodyRefusal, KeySource, ResidentStatus, StationGrantRequest,
 };
-use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
-use djinn::door::declaration::{
+use castellan_client::custody_client::{BlockingCustodyClient, CustodyClientError};
+use ostiary::declaration::{
     AppDeclaration, CustodyOperation, CustodyUse, NamePattern, SaltPattern, SaltUse,
 };
 use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
@@ -52,7 +52,7 @@ const STATION_NAMESPACES: [&str; 6] = [
 /// and the station grant and device revocation djinn performs for it.
 pub fn declaration() -> AppDeclaration {
     AppDeclaration {
-        routes: vec![NamePattern::exact(djinn::door::custody::CUSTODY_ROUTE)],
+        routes: vec![NamePattern::exact(castellan_client::custody::CUSTODY_ROUTE)],
         custody: CustodyUse {
             operations: [
                 CustodyOperation::Status,

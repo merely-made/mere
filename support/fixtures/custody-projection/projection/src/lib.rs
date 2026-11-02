@@ -6,12 +6,12 @@
 
 pub use graphshell_endpoint::ProjectionCatalog;
 #[cfg(feature = "forbidden-api")]
-pub use djinn::door::custody_client::CustodyClient;
+pub use ostiary::custody_client::CustodyClient;
 pub use graphshell_endpoint::door::projection::{AppBrokerClient, AppRouteCarrier};
 
 #[cfg(test)]
 mod tests {
-    use djinn::door::app_admission::AppHello;
+    use ostiary::app_admission::AppHello;
 
     #[test]
     fn legacy_projection_hello_selects_identity_without_custody() {

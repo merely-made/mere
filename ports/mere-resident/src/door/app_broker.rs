@@ -6,7 +6,7 @@
 
 //! The first-party application door.
 //!
-//! Serves `djinn::door::app_admission`'s endpoint: an owner-only socket that a
+//! Serves `ostiary::app_admission`'s endpoint: an owner-only socket that a
 //! first-party application — turnstone, today — opens to browse this device's
 //! graph. Everything past the hello is the same machinery the browser door
 //! uses, from `local_session`, so the two doors cannot come to two different
@@ -15,7 +15,7 @@
 //! **What is different here, and why.** Two things only:
 //!
 //! - *The wire.* An application speaks [`AppMessage`] (the shared envelope in
-//!   `djinn::door::wire`), not the browser's
+//!   `ostiary::wire`), not the browser's
 //!   native-messaging frames. The carrier payload inside is identical; the
 //!   envelope is separate so this door can version independently of a shipped
 //!   browser extension.
@@ -36,23 +36,22 @@ use std::sync::RwLock as StdRwLock;
 
 use armillary::tasks::spawn_tracked_with_handle;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, ResumeRequest};
-use djinn::door::app_admission::{
-    APP_IDENTITY_ROUTE, AllowedAppRoutes, AppAdmissionError, AppHello, AppId, AppRouteGrants,
-    AppRouteId,
-};
-use djinn::door::custody::CUSTODY_ROUTE;
-use djinn::door::declaration::AppAuthority;
-use djinn::door::local_endpoint::{LocalListener, LocalStream, connect_local};
-use djinn::door::route::ResidentEndpointRoute;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{APP_IDENTITY_ROUTE, AppAdmissionError, AppHello, AppId, AppRouteId};
+use castellan_client::custody::CUSTODY_ROUTE;
+use ostiary::declaration::AppAuthority;
+use djinn::door::local_endpoint::LocalListener;
+use ostiary::local_endpoint::{LocalStream, connect_local};
+use ostiary::route::ResidentEndpointRoute;
 #[cfg(test)]
-use djinn::door::wire::APP_CONNECT_SCHEMA;
-use djinn::door::wire::{AppHostMessage as WireHostMessage, AppMessage as WireMessage};
+use ostiary::wire::APP_CONNECT_SCHEMA;
+use ostiary::wire::{AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use tokio::io::{AsyncRead, AsyncWrite};
-type AppMessage = WireMessage<chirograph::CarrierRequest, djinn::door::custody::CustodyCall>;
+type AppMessage = WireMessage<chirograph::CarrierRequest, castellan_client::custody::CustodyCall>;
 type AppHostMessage = WireHostMessage<
     chirograph::CarrierResponse,
     chirograph::CarrierNotice,
-    Result<djinn::door::custody::CustodyAnswer, djinn::door::custody::CustodyRefusal>,
+    Result<castellan_client::custody::CustodyAnswer, castellan_client::custody::CustodyRefusal>,
 >;
 
 use crate::door::browser_carrier::{read_native_message_async, write_native_message_async};

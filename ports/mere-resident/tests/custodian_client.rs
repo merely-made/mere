@@ -25,8 +25,8 @@ use mere_resident::custody_host::{LockHolder, ResidentCustody};
 use mere_resident::door::resident_identity::ResidentIdentity;
 use mere_resident::keeper::Keeper;
 use dramatis::intents::CreateProfileIntentV1;
-use djinn::door::app_admission::AppId;
-use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
 use dramatis::view::VaultLockView;
 use insigne::delegation::{CapabilityScope, DelegationCertificate, DelegationParent, delegation_signing_salt};
 use personae::{IdentityError, IdentityProvider, ProfileId};
@@ -300,7 +300,7 @@ fn the_custodians_door_rule_names_exactly_djinns_door_keys() {
 #[test]
 fn real_custodian_fences_private_payload_to_authoritative_generation() {
     use eidetic::Hash;
-    use djinn::door::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult};
+    use castellan_client::custody_payload::{PayloadBytes, PayloadOperation, PayloadRequest, PayloadResult};
     let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
     let persona = personae::PersonaId::new();
     castellan::custody::wallet::ensure_wallet_state(&custodian.data_root, persona, "isolated fixture").unwrap();
@@ -334,8 +334,8 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
     use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
     use eidetic::{Hash, PayloadSealer};
     use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
-    use djinn::door::custody_client::CustodyClient;
-    use djinn::door::custody_identity::CustodyIdentity;
+    use castellan_client::custody_client::CustodyClient;
+    use castellan_client::custody_identity::CustodyIdentity;
     use std::time::Duration;
 
     let custodian = TestCustodian::start(PASSPHRASE, &[("work", WORK)], manage_grants());
@@ -375,8 +375,8 @@ async fn real_custodian_generation_reaches_the_app_payload_route() {
 /// Turnstone's custody declaration, as Turnstone sends it: payload sealing
 /// keys its scope by the `turnstone` label, and that label is admitted by
 /// declaration under Mere's default grants.
-fn turnstone_declaration() -> djinn::door::declaration::AppDeclaration {
-    use djinn::door::declaration::{AppDeclaration, CustodyOperation, NamePattern};
+fn turnstone_declaration() -> ostiary::declaration::AppDeclaration {
+    use ostiary::declaration::{AppDeclaration, CustodyOperation, NamePattern};
     let mut declaration = AppDeclaration {
         routes: vec![NamePattern::exact("custody")],
         ..AppDeclaration::default()

@@ -7,10 +7,10 @@
 //! Dramatis: public persona and quarantine management, backed by Djinn.
 use dramatis::roster::Roster;
 use dramatis::view::VaultLockView;
-use djinn::door::app_admission::{AppId, configured_app_endpoint};
-use djinn::door::custody_client::CustodyClient;
-use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
-use djinn::door::quarantine::{
+use ostiary::app_admission::{AppId, configured_app_endpoint};
+use castellan_client::custody_client::CustodyClient;
+use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
+use castellan_client::quarantine::{
     AssignImportRequest, QuarantineCard, ReviewAction, ReviewRequest, UnassignedImport,
 };
 use personae::ProfileId;
@@ -110,7 +110,7 @@ impl State {
 pub fn declaration() -> AppDeclaration {
     use CustodyOperation as Op;
     AppDeclaration {
-        routes: vec![NamePattern::exact(djinn::door::custody::CUSTODY_ROUTE)],
+        routes: vec![NamePattern::exact(castellan_client::custody::CUSTODY_ROUTE)],
         custody: CustodyUse {
             operations: [
                 Op::Status,
@@ -207,7 +207,7 @@ pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
         } else {
             vec![]
         };
-        Ok::<_, djinn::door::custody_client::CustodyClientError>(Snapshot {
+        Ok::<_, castellan_client::custody_client::CustodyClientError>(Snapshot {
             lock: status.lock,
             roster,
             cards,

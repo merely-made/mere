@@ -9,9 +9,9 @@
 //! import revision under profile authority and applies its own consent
 //! policy. A stale item is refused there, not here.
 use super::*;
-use djinn::door::custody::{CustodyAnswer, CustodyRefusal};
+use castellan_client::custody::{CustodyAnswer, CustodyRefusal};
 #[cfg(feature = "cxf")]
-use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
+use castellan_client::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 #[cfg(feature = "cxf")]
 use personae::ProfileId;
 
@@ -43,14 +43,14 @@ impl Keeper {
     #[cfg(feature = "cxf")]
     pub(crate) fn unassigned_imports(
         &self,
-    ) -> Result<Vec<djinn::door::quarantine::UnassignedImport>, CustodyRefusal> {
+    ) -> Result<Vec<castellan_client::quarantine::UnassignedImport>, CustodyRefusal> {
         let value = self.host.credentials(CredentialCall::UnassignedImports)?;
         serde_json::from_value(value).map_err(refusal)
     }
     #[cfg(feature = "cxf")]
     pub(crate) fn assign_import(
         &self,
-        request: djinn::door::quarantine::AssignImportRequest,
+        request: castellan_client::quarantine::AssignImportRequest,
     ) -> Result<CustodyAnswer, CustodyRefusal> {
         let imports = self
             .unassigned_imports()?

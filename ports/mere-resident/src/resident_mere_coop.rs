@@ -43,7 +43,7 @@ impl GraphAuthority for Attached {
 }
 struct Activity {
     owner: coop::SharedOwner<DirectoryBackend>,
-    identity: Arc<djinn::door::custody_identity::CustodyIdentity>,
+    identity: Arc<castellan_client::custody_identity::CustodyIdentity>,
     contact: coop::Card,
     ledger: Arc<std::sync::RwLock<notochord::RevocationLedger>>,
     _stop: tokio::sync::oneshot::Sender<()>,
@@ -73,7 +73,7 @@ impl Activities {
                 .as_deref()
                 .ok_or("co-op custody is not composed")?;
             let identity = Arc::new(
-                djinn::door::custody_identity::CustodyIdentity::connect_declared_at_timeout(
+                castellan_client::custody_identity::CustodyIdentity::connect_declared_at_timeout(
                     endpoint,
                     graphshell::declaration::APP,
                     graphshell::declaration::declaration(),

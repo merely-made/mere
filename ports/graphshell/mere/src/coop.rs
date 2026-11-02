@@ -3,7 +3,7 @@
 use super::*;
 use cambium::{TextInput, button, lens, text_field_typed};
 use graphshell::coop::{self, Contact, Data, Operation, control, network};
-use djinn::door::app_admission::{AppId, AppRouteId};
+use ostiary::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use std::{path::PathBuf, time::Duration};
 

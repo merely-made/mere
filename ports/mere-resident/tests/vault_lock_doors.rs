@@ -31,13 +31,12 @@ use mere_resident::resident_status::{
     ResidentStatusEndpoint, ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1,
     StopSignal, Unlocker,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::{VaultLockView, VaultProtectionView};
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
 use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};

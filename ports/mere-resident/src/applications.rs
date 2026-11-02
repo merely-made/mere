@@ -8,7 +8,7 @@
 //! plan, M1, D24, D25).
 //!
 //! An application states on its hello what it opens, offers and needs
-//! (`djinn::door::declaration`). The owner's grants decide what it receives;
+//! (`ostiary::declaration`). The owner's grants decide what it receives;
 //! a connection gets only what both name. There are no default grants: the
 //! first time an application nobody has granted connects, Djinn asks the
 //! owner ([`OwnerConsent`]), and a yes is written to `OwnerSettings::applications`.
@@ -19,8 +19,9 @@ use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use djinn::door::app_admission::{AppId, AppRouteGrants};
-use djinn::door::declaration::{
+use djinn::door::app_admission::AppRouteGrants;
+use ostiary::app_admission::AppId;
+use ostiary::declaration::{
     AppDeclaration, AppGrant, AppIdentity, CustodyGrant, NamePattern, WindowsAppIdentity,
 };
 
@@ -100,8 +101,11 @@ pub fn grant_for(app: &AppId, declaration: &AppDeclaration, peer: Option<&peer_f
             epoch: custody.epoch.iter().map(|used| NamePattern::exact(&used.context)).collect(),
             salts: custody.salts.clone(),
             acts: custody.acts.clone(),
+            payload_scope: custody.payload_scope.clone(),
         },
         identity: pin(peer),
+        // Marking an agent is the owner's own act (D27), not part of a yes.
+        agent: false,
     }
 }
 
@@ -203,7 +207,7 @@ pub fn describe(grant: &AppGrant) -> String {
             })
             .collect::<Vec<_>>()
     };
-    let salts = |uses: &[djinn::door::declaration::SaltUse]| {
+    let salts = |uses: &[ostiary::declaration::SaltUse]| {
         uses.iter().map(|used| format!("{used:?}")).collect::<Vec<_>>()
     };
     let mut lines = Vec::new();
@@ -230,7 +234,7 @@ pub fn describe(grant: &AppGrant) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use djinn::door::declaration::{CustodyOperation, CustodyUse, EpochUse, SaltPattern, SaltUse};
+    use ostiary::declaration::{CustodyOperation, CustodyUse, EpochUse, SaltPattern, SaltUse};
 
     #[test]
     fn the_resident_grant_names_only_its_own_routes() {
@@ -249,6 +253,7 @@ mod tests {
                 epoch: vec![EpochUse::secret("app.key", false)],
                 salts: vec![SaltUse::persona(SaltPattern::Prefix("app/".into()))],
                 acts: Vec::new(),
+                payload_scope: None,
             },
             ..AppDeclaration::default()
         };

@@ -27,11 +27,11 @@ use std::sync::Arc;
 use dramatis::intents::{CreateProfileIntentV1, SwitchProfileIntentV1};
 use dramatis::roster::{Roster, RosterEntry};
 use dramatis::view::VaultLockView;
-use djinn::door::app_admission::AppId;
-use djinn::door::declaration::{AppAuthority, SaltPattern};
+use ostiary::app_admission::AppId;
+use ostiary::declaration::{AppAuthority, SaltPattern};
 #[cfg(feature = "in-process-custody")]
-use djinn::door::custody::ReleasedEpochKey;
-use djinn::door::custody::{
+use castellan_client::custody::ReleasedEpochKey;
+use castellan_client::custody::{
     CustodyAnswer, CustodyCall, CustodyRefusal, EpochKeyRequest, KeySource, ResidentStatus,
 };
 use personae::ProfileId;
@@ -44,9 +44,9 @@ pub(crate) mod payload;
 /// it. No application holds it by label (capability door D24).
 pub fn grant(
     grants: &djinn::door::app_admission::AppRouteGrants,
-) -> Result<(), djinn::door::route::ResidentEndpointRouteError> {
-    let route = djinn::door::route::ResidentEndpointRoute::new(
-        djinn::door::custody::CUSTODY_ROUTE,
+) -> Result<(), ostiary::route::ResidentEndpointRouteError> {
+    let route = ostiary::route::ResidentEndpointRoute::new(
+        castellan_client::custody::CUSTODY_ROUTE,
         std::time::Duration::from_millis(50),
     )?;
     grants.update(|routes| routes.serve(route));
@@ -138,7 +138,7 @@ impl ReleasePolicy {
 
     /// Release exactly the epoch derivations an application declares, for a
     /// resident that composes it in process.
-    pub fn with_declared_epochs(self, uses: &[djinn::door::declaration::EpochUse]) -> Self {
+    pub fn with_declared_epochs(self, uses: &[ostiary::declaration::EpochUse]) -> Self {
         uses.iter().fold(self, |policy, used| {
             policy.with_epoch(EpochRule {
                 context: used.context.clone(),
@@ -190,9 +190,9 @@ pub(crate) async fn answer(
             what: "a declaration".into(),
         });
     };
-    authority.admit_custody(&call)?;
+    call.admitted_by(&authority)?;
     match call {
-        CustodyCall::Payload(request) => payload::answer(&keeper, &app, request),
+        CustodyCall::Payload(request) => payload::answer(&keeper, &authority, request),
         CustodyCall::LockVault => {
             keeper.host().lock_vault().map_err(refused)?;
             Ok(CustodyAnswer::Done)
@@ -652,7 +652,7 @@ fn failed(error: impl std::fmt::Display) -> CustodyRefusal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use djinn::door::declaration::{AppDeclaration, AppGrant, CustodyUse, SaltUse};
+    use ostiary::declaration::{AppDeclaration, AppGrant, CustodyUse, SaltUse};
 
     fn wallet_authority(prefix: &str) -> AppAuthority {
         let used = SaltUse::wallet(SaltPattern::Prefix(prefix.into()));

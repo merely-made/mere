@@ -17,8 +17,9 @@ use mere_resident::{
     identity_ui::{NativeIdentityUi, SystemNativeIdentityUi},
     keeper::Keeper,
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody_client::CustodyClient;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody_client::CustodyClient;
 use personae::PersonaId;
 use serde_json::json;
 use std::{path::PathBuf, sync::Arc, time::Duration};
@@ -117,7 +118,7 @@ async fn main() {
     // The Dramatis application, granted what it declares
     // (`dramatis_app::declaration`).
     {
-        use djinn::door::declaration::{AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern};
+        use ostiary::declaration::{AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern};
         let dramatis = AppDeclaration {
             routes: vec![NamePattern::exact("custody")],
             custody: CustodyUse {
@@ -149,7 +150,7 @@ async fn main() {
         .await
     });
     for _ in 0..200 {
-        if djinn::door::local_endpoint::connect_local(&endpoint)
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

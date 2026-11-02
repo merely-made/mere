@@ -20,12 +20,11 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppAdmissionError, AppId, AppRequest, AppRouteGrants, AppRouteId,
-};
-use djinn::door::custody::CustodyRefusal;
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
-use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppAdmissionError, AppId, AppRequest, AppRouteId};
+use castellan_client::custody::CustodyRefusal;
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
+use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
 use dramatis::view::VaultProtectionView;
 use mere_resident::applications::OwnerConsent;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};

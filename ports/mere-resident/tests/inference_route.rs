@@ -30,9 +30,10 @@ use distillery::inference::{
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::resident::DjinnResident;
 use mere_resident::settings::{InferenceLaneSettings, InferenceModelSettings, OwnerSettings};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::app_client::AppClientError;
-use djinn::door::route::ResidentEndpointRoute;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use ostiary::app_client::AppClientError;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 
 fn stub_lane() -> Option<InferenceLaneSettings> {

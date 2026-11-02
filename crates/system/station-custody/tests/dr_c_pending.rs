@@ -15,9 +15,9 @@ fn dr_c_signalman_identity_stays_pending() {
         assert_eq!(status.lock, dramatis::view::VaultLockView::Locked);
         assert!(status.wallet_public_key.is_none());
         let mut reader = station_custody::declaration();
-        reader.custody.operations.insert(djinn::door::declaration::CustodyOperation::Roster);
-        let mut client = djinn::door::custody_client::BlockingCustodyClient::open_declared(
-            djinn::door::app_admission::AppId::new("signalman"), reader).unwrap();
+        reader.custody.operations.insert(ostiary::declaration::CustodyOperation::Roster);
+        let mut client = castellan_client::custody_client::BlockingCustodyClient::open_declared(
+            ostiary::app_admission::AppId::new("signalman"), reader).unwrap();
         assert!(!client.roster().unwrap().entries.is_empty(), "public persona roster remains readable");
     } else {
         assert_eq!(mode, "absent");

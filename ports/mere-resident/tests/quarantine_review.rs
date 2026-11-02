@@ -20,10 +20,11 @@ use mere_resident::custody_host::{CredentialCall, ResidentCustody};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::browser_carrier::NativeIdentityFailure;
 use mere_resident::{identity_ui::NativeIdentityUi, keeper::Keeper};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody::CustodyRefusal;
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
-use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::CustodyRefusal;
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
+use castellan_client::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 use personae::{PersonaId, ProfileId};
 use serde_json::json;
 #[path = "fixture_declarations/mod.rs"]
@@ -417,7 +418,7 @@ async fn an_owned_namespace_is_not_offered_for_assignment() {
     let card = f.cards("family").await.remove(0);
     let mut c = f.client("dramatis").await;
     assert!(c.unassigned_imports().await.unwrap().is_empty());
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: card.persona,
@@ -470,7 +471,7 @@ async fn older_import_assignment_needs_consent_and_is_not_replayed() {
             .unwrap()
             .contains("GEZDGNBV")
     );
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),
@@ -490,7 +491,7 @@ async fn older_import_assignment_rechecks_the_lock_after_consent() {
     let persona = persona.unwrap();
     let mut c = f.client("dramatis").await;
     let import = c.unassigned_imports().await.unwrap().remove(0);
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),

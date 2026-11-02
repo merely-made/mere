@@ -21,18 +21,24 @@ def edge(node, name):
 
 resident = edge(root, "mere_resident")
 djinn = edge(root, "djinn")
+ostiary = edge(root, "ostiary")
+custody = edge(root, "castellan_client")
 endpoint = edge(root, "graphshell_endpoint")
-if edge(resident, "djinn") != djinn or edge(endpoint, "djinn") != djinn:
-    sys.exit("resident and endpoint must share the fixture's Djinn package")
-for node, expected in [(djinn, {"resident", "custody-client"}),
+if edge(resident, "djinn") != djinn:
+    sys.exit("resident and the fixture must share one Djinn package")
+if edge(resident, "ostiary") != ostiary or edge(endpoint, "ostiary") != ostiary or edge(djinn, "ostiary") != ostiary:
+    sys.exit("resident, endpoint and Djinn must share the fixture's ostiary package")
+if edge(resident, "castellan_client") != custody:
+    sys.exit("resident and the fixture must share one castellan-client package")
+for node, expected in [(djinn, {"resident"}), (ostiary, {"native"}), (custody, {"client"}),
                        (endpoint, {"projection-door", "projection-provider"})]:
     missing = expected - set(nodes[node]["features"])
     if missing:
         sys.exit(f"{packages[node]['name']} missing features: {sorted(missing)}")
 if "default" in nodes[resident]["features"]:
     sys.exit("fixture unexpectedly enabled mere-resident default features")
-print("fixture direct edges and shared Djinn identity:")
-for node in (root, resident, djinn, endpoint):
+print("fixture direct edges and shared door identities:")
+for node in (root, resident, djinn, ostiary, custody, endpoint):
     pkg = packages[node]
     print(f"  {pkg['name']} {pkg['version']} {pkg['manifest_path']}")
     print(f"    features: {', '.join(nodes[node]['features'])}")

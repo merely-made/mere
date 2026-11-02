@@ -40,8 +40,9 @@ use chirograph::{
 use graphshell::access::AccessContext;
 use graphshell::handlers::HandlerRegistry;
 use graphshell::mere_host::{MereHost, MereHostError, SelectedPersonaRef};
-use djinn::door::app_admission::{AppId, AppRequest, AppRouteGrants, AppRouteId};
-use djinn::door::route::ResidentEndpointRoute;
+use djinn::door::app_admission::AppRouteGrants;
+use ostiary::app_admission::{AppId, AppRequest, AppRouteId};
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
@@ -2075,9 +2076,9 @@ mod tests {
     use super::*;
 
     /// A mere client's declaration, co-op routes included.
-    fn mere_client() -> djinn::door::declaration::AppDeclaration {
+    fn mere_client() -> ostiary::declaration::AppDeclaration {
         let mut declaration = crate::resident_reservoir::mere_client_declaration();
-        declaration.routes.push(djinn::door::declaration::NamePattern::prefix("coop/"));
+        declaration.routes.push(ostiary::declaration::NamePattern::prefix("coop/"));
         declaration
     }
 
@@ -2087,7 +2088,8 @@ mod tests {
         request.declaration = Some(mere_client());
         request
     }
-    use djinn::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
+    use djinn::door::app_admission::AllowedAppRoutes;
+    use ostiary::app_admission::{AppHello, AppRouteId};
     use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     use mere_overmap::route as mere_route;
@@ -3550,7 +3552,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if djinn::door::local_endpoint::connect_local(&address)
+            if ostiary::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {
@@ -3834,7 +3836,7 @@ mod tests {
                 .await
         });
         for _ in 0..100 {
-            if djinn::door::local_endpoint::connect_local(&address)
+            if ostiary::local_endpoint::connect_local(&address)
                 .await
                 .is_ok()
             {

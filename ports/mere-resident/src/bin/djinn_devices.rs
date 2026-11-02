@@ -11,7 +11,7 @@ use mere_resident::resident_devices::{
     AddrKindV1, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
     not_connected_path_active, read_directory,
 };
-use djinn::door::app_admission::{AppRouteId, configured_app_endpoint};
+use ostiary::app_admission::{AppRouteId, configured_app_endpoint};
 use mere_resident::resident_status::open_resident_route;
 
 const USAGE: &str = "usage: djinn-devices [--json]";

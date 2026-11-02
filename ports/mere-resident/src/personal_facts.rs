@@ -10,8 +10,8 @@ use chirograph::{
     ProjectionSnapshot,
 };
 use dramatis::{birth::BirthFacts, resources::SubjectResourceAssociation, subject::SubjectRef};
-use djinn::door::app_admission::{AppId, AppRouteId};
-use djinn::door::declaration::AppDeclaration;
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::declaration::AppDeclaration;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use mere_overmap::wire;
 use personal_facts::{BirthResource, ContactResource};

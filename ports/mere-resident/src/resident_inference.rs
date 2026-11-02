@@ -119,7 +119,7 @@ impl ResidentInference {
         &self,
         _: &mut graphshell_host::endpoint_catalog::ResidentEndpointCatalog,
     ) -> Result<
-        djinn::door::route::ResidentEndpointRoute,
+        ostiary::route::ResidentEndpointRoute,
         graphshell_host::endpoint_catalog::ResidentEndpointCatalogError,
     > {
         match *self {}
@@ -136,7 +136,7 @@ mod lane {
     use distillery::inference::{
         INFERENCE_ASK_NOTICE_POLL, INFERENCE_ASK_ROUTE, InferenceLane, StubInferenceProvider,
     };
-    use djinn::door::route::ResidentEndpointRoute;
+    use ostiary::route::ResidentEndpointRoute;
     use graphshell_host::endpoint_catalog::{
         ResidentEndpointCatalog, ResidentEndpointCatalogError,
     };

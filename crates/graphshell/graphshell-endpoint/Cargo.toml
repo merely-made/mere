@@ -13,22 +13,23 @@ projection = ["dep:chirograph"]
 local = ["projection", "dep:serde", "dep:serde_json"]
 network = ["projection", "dep:serde_json", "dep:tokio"]
 stdio = ["projection", "dep:serde_json"]
-projection-door = ["projection", "dep:djinn", "djinn/door-native", "dep:serde_json", "dep:tokio"]
-projection-offer = ["projection", "dep:djinn", "djinn/door", "dep:serde", "dep:serde_json"]
-projection-provider = ["projection-offer", "djinn/door-native", "dep:tokio"]
+projection-door = ["projection", "dep:ostiary", "ostiary/native", "dep:serde_json", "dep:tokio"]
+projection-offer = ["projection", "dep:ostiary", "dep:serde", "dep:serde_json"]
+projection-provider = ["projection-offer", "ostiary/native", "dep:tokio"]
 # The projection session over mere:script's WIT (capability door D18, D19).
 wit = ["projection", "dep:script-wire", "dep:script-witgen", "dep:ciborium", "dep:serde", "dep:sceno"]
 # The ipc-channel transport N1's channels use.
 wit-ipc = ["wit", "script-wire/ipc"]
 # The fixture endpoint, gate and call script every binding is checked with.
 wit-testkit = ["wit"]
-profile = ["dep:djinn", "djinn/custody-client", "dep:dramatis", "dep:insigne", "dep:personae"]
+profile = ["dep:ostiary", "ostiary/native", "dep:castellan-client", "castellan-client/client", "dep:dramatis", "dep:insigne", "dep:personae"]
 
 [dependencies]
 chirograph = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
-djinn = { workspace = true, optional = true }
+ostiary = { workspace = true, optional = true }
+castellan-client = { workspace = true, optional = true }
 script-wire = { workspace = true, optional = true }
 ciborium = { version = "0.2", optional = true }
 sceno = { workspace = true, optional = true }

@@ -93,6 +93,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
+name = "castellan-client"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
+dependencies = [
+ "base64",
+ "chatelaine",
+ "dramatis",
+ "eidetic",
+ "insigne",
+ "ostiary",
+ "personae",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
 name = "cc"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -150,7 +169,7 @@ dependencies = [
 [[package]]
 name = "chatelaine"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
 dependencies = [
  "serde",
  "uuid",
@@ -240,7 +259,7 @@ dependencies = [
 name = "custody-projection-custody-types-fixture"
 version = "0.0.0"
 dependencies = [
- "djinn",
+ "castellan-client",
  "serde_json",
 ]
 
@@ -266,27 +285,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "djinn"
-version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
-dependencies = [
- "base64",
- "chatelaine",
- "dramatis",
- "eidetic",
- "insigne",
- "personae",
- "serde",
- "serde_json",
- "thiserror",
- "uuid",
- "zeroize",
-]
-
-[[package]]
 name = "dramatis"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
 dependencies = [
  "gaz",
  "personae",
@@ -398,7 +399,7 @@ dependencies = [
 [[package]]
 name = "gaz"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
 dependencies = [
  "insigne",
  "serde",
@@ -583,7 +584,7 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.2"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
 dependencies = [
  "blake3",
  "ed25519-dalek",
@@ -663,6 +664,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
+name = "ostiary"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "zeroize",
+]
+
+[[package]]
 name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -671,7 +683,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "personae"
 version = "0.3.0"
-source = "git+https://github.com/merely-made/dramatis.git?branch=main#6711105e0284adb3e881fc9aebcc56f25000c1ca"
+source = "git+https://github.com/merely-made/dramatis.git?rev=9d6e77eefe37b8371be2bcebc21be47da705ec83#9d6e77eefe37b8371be2bcebc21be47da705ec83"
 dependencies = [
  "blake3",
  "chacha20poly1305",

@@ -30,8 +30,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if !error.is_pending()
                     && !matches!(
                         error,
-                        djinn::door::custody_client::CustodyClientError::Refused(
-                            djinn::door::custody::CustodyRefusal::NoWallet
+                        castellan_client::custody_client::CustodyClientError::Refused(
+                            castellan_client::custody::CustodyRefusal::NoWallet
                         )
                     )
                 {
@@ -51,23 +51,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let public = released.identity.node_number();
         report["node_number"] = serde_json::json!(public);
         if args[4] == "unlocked" {
-            use djinn::door::app_admission::AppId;
-use djinn::door::custody::{CustodyRefusal, KeySource};
-use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
+            use ostiary::app_admission::AppId;
+            use castellan_client::custody::{CustodyRefusal, KeySource};
+            use castellan_client::custody_client::{BlockingCustodyClient, CustodyClientError};
             let salt = personae::sennet::station_salt(device.as_uuid().as_bytes(), &args[2])?;
             // Another application, granted the whole Signalman wallet
             // namespace: a station's keys still stay (the station floor).
-            let broad = djinn::door::declaration::AppDeclaration {
-                routes: vec![djinn::door::declaration::NamePattern::exact("custody")],
-                custody: djinn::door::declaration::CustodyUse {
+            let broad = ostiary::declaration::AppDeclaration {
+                routes: vec![ostiary::declaration::NamePattern::exact("custody")],
+                custody: ostiary::declaration::CustodyUse {
                     operations: [
-                        djinn::door::declaration::CustodyOperation::Release,
-                        djinn::door::declaration::CustodyOperation::Attest,
-                        djinn::door::declaration::CustodyOperation::Sign,
+                        ostiary::declaration::CustodyOperation::Release,
+                        ostiary::declaration::CustodyOperation::Attest,
+                        ostiary::declaration::CustodyOperation::Sign,
                     ]
                     .into(),
-                    salts: vec![djinn::door::declaration::SaltUse::wallet(
-                        djinn::door::declaration::SaltPattern::Prefix("mere.signalman.".into()),
+                    salts: vec![ostiary::declaration::SaltUse::wallet(
+                        ostiary::declaration::SaltPattern::Prefix("mere.signalman.".into()),
                     )],
                     ..Default::default()
                 },

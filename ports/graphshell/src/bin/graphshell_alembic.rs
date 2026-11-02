@@ -38,7 +38,7 @@ fn open_owner(
         },
         #[cfg(feature = "alembic-workshop-private")]
         OwnerMode::Private { endpoint } => {
-            use djinn::door::custody_identity::CustodyIdentity;
+            use castellan_client::custody_identity::CustodyIdentity;
 use dramatis::view::VaultLockView;
             let identity = Arc::new(
                 CustodyIdentity::connect_declared_at_timeout(

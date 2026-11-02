@@ -25,11 +25,10 @@ use crate::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use armillary::tasks::ResidentTasks;
 use crate::custody_host::ResidentCustody;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
-use djinn::door::app_client::AppClientError;
-use djinn::door::declaration::{AppDeclaration, AppGrant};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::app_client::AppClientError;
+use ostiary::declaration::{AppDeclaration, AppGrant};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use pandect::DomainId;
@@ -538,7 +537,7 @@ impl EmbeddedOwner {
                     "resident stopped before listening".into(),
                 ));
             }
-            if djinn::door::local_endpoint::connect_local(&options.endpoint)
+            if ostiary::local_endpoint::connect_local(&options.endpoint)
                 .await
                 .is_ok()
             {

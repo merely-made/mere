@@ -149,7 +149,12 @@ fn advertised(server: &mut Server<Admitted>, intent: &str) -> (Value, Value, Val
 #[tokio::test(flavor = "multi_thread")]
 async fn an_agent_writes_a_mere_as_its_granted_app_and_the_door_names_it() {
     let fixture = fixture(41, "memory").await;
-    let route_request = AppRequest::new(AppId::new(AGENT), AppRouteId::new(&fixture.route).unwrap());
+    let mut route_request = AppRequest::new(AppId::new(AGENT), AppRouteId::new(&fixture.route).unwrap());
+    // The door admits by declaration only (capability door D24).
+    route_request.declaration = Some(ostiary::declaration::AppDeclaration {
+        routes: vec![ostiary::declaration::NamePattern::exact(&fixture.route)],
+        ..Default::default()
+    });
     assert!(
         fixture.grants.current().admit(&route_request).is_err(),
         "an app the owner has not admitted reaches no mere"

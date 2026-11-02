@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: MPL-2.0
 //! The product composition of Graphshell's existing admitted carrier and host.
 use super::*;
-use djinn::door::custody_identity::CustodyIdentity;
-use djinn::door::route::ResidentEndpointRoute;
+use castellan_client::custody_identity::CustodyIdentity;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::{
     carrier::{projection_alpn, projection_policy},
     endpoint_catalog::ResidentEndpointCatalog,

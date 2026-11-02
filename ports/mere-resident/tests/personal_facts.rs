@@ -9,7 +9,7 @@ use mere_resident::{
     embedded_reservoir::{ReservoirAttachment, ReservoirAttachmentOptions},
     personal_facts::PersonalFactsClient,
 };
-use djinn::door::app_admission::AppId;
+use ostiary::app_admission::AppId;
 use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{process::Command, sync::Arc, time::Duration};

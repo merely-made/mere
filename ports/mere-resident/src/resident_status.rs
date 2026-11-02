@@ -29,11 +29,12 @@ use chirograph::{
     ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion, ResourceRequest,
     ResourceResponse, SemanticRole,
 };
-use djinn::door::app_admission::{AppId, AppRouteGrants};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::AppRouteGrants;
+use ostiary::app_admission::AppId;
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::{VaultLockView, VaultProtectionView};
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use sceno::{
@@ -160,7 +161,7 @@ pub struct AppConnectionV1 {
     /// What the label rests on: development mode, a macOS signature, a
     /// Windows image (the same-user posture of a path) or a process Djinn
     /// launched.
-    pub identity: djinn::door::declaration::IdentityBasis,
+    pub identity: ostiary::declaration::IdentityBasis,
     /// The OS account of the peer, where the OS said.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub peer: Option<String>,
@@ -327,7 +328,7 @@ pub fn grant(grants: &AppRouteGrants, route: ResidentEndpointRoute) {
 /// Open one of the resident's own routes as its command line, declaring it.
 pub async fn open_resident_route(
     endpoint: &str,
-    route: djinn::door::app_admission::AppRouteId,
+    route: ostiary::app_admission::AppRouteId,
 ) -> Result<AppBrokerClient, AppClientError> {
     AppBrokerClient::open_declared_route_at(
         endpoint,

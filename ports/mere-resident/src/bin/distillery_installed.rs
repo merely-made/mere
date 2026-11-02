@@ -20,8 +20,8 @@
 use std::path::PathBuf;
 
 use distillery::{InstalledAuthority, InstalledSettings};
-use djinn::door::app_admission::{AppId, configured_app_endpoint};
-use djinn::door::custody_client::BlockingCustodyClient;
+use ostiary::app_admission::{AppId, configured_app_endpoint};
+use castellan_client::custody_client::BlockingCustodyClient;
 use personae::ProfileId;
 
 /// The application name this tool connects to djinn as.
@@ -29,8 +29,8 @@ const APP: &str = "distillery";
 
 /// What this tool declares (Mere's capability door D24): djinn's status and
 /// roster, to check the configured profile. No key is released to it.
-fn declaration() -> djinn::door::declaration::AppDeclaration {
-    use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
+fn declaration() -> ostiary::declaration::AppDeclaration {
+    use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
     AppDeclaration {
         routes: vec![NamePattern::exact("custody")],
         custody: CustodyUse {

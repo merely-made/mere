@@ -17,11 +17,12 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::keeper::Keeper;
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
 use dramatis::view::{VaultLockView, VaultProtectionView};
-use djinn::door::declaration::{
+use ostiary::declaration::{
     AppDeclaration, CustodyOperation, CustodyUse, NamePattern, SaltPattern, SaltUse,
 };
 use personae::{Ed25519Keypair, IdentityProvider, ProfileId};
