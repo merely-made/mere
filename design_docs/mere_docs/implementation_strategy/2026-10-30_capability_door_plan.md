@@ -370,6 +370,10 @@ part of its manifest entry.
   importing settings": `caps` and `actions` stay with their reasons, and an
   application world that imports settings is added so app participants
   reach it under their grant.
+  Asked whether app-host hosts that world now or only declares it, Mark
+  chose "Host it now" and "app-settings (Recommended)": `world app-settings
+  { include app-core; import settings; }`, attached with a settings source
+  per participant. Built in Mere `f8055a93c`.
 
   Links: area Stack · draws on stack.3, stack.5 · summary Settings in mere:script as typed WIT free functions with a typed denied failure and a gate, bound in crates/system/settings-wit, with an app world that imports it.
 
@@ -975,3 +979,4 @@ error types settle.
 - 2026-11-01: D20 built (Mere `1dd59c48a`); D21 ruled and phase W1 added.
 - 2026-11-01: C0 checked on macOS x86_64 and Linux; D22 (K1 settings) and D23 (W1 local) ruled.
 - 2026-11-01: K1's settings contract built (Mere `7c1053de1`, D22).
+- 2026-11-01: K1's settings contract landed (Mere `f8055a93c`).
