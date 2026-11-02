@@ -114,6 +114,28 @@ async fn main() {
     }
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    // The Dramatis application, granted what it declares
+    // (`dramatis_app::declaration`).
+    {
+        use djinn::door::declaration::{AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern};
+        let dramatis = AppDeclaration {
+            routes: vec![NamePattern::exact("custody")],
+            custody: CustodyUse {
+                operations: [
+                    Op::Status, Op::Roster, Op::ChooseProfile, Op::LockVault, Op::UnlockNative,
+                    Op::ChangePassphraseNative, Op::Quarantine, Op::ReviewQuarantine,
+                    Op::UnassignedImports, Op::AssignImport,
+                ]
+                .into(),
+                ..CustodyUse::default()
+            },
+            ..AppDeclaration::default()
+        };
+        mere_resident::applications::install(
+            &grants,
+            vec![mere_resident::applications::grant_for(&AppId::new("dramatis"), &dramatis, None)],
+        );
+    }
     let serving = endpoint.clone();
     let server = tokio::spawn(async move {
         serve_app_broker(
@@ -127,7 +149,7 @@ async fn main() {
         .await
     });
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+        if djinn::door::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

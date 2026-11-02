@@ -9,6 +9,7 @@ use dramatis::roster::Roster;
 use dramatis::view::VaultLockView;
 use djinn::door::app_admission::{AppId, configured_app_endpoint};
 use djinn::door::custody_client::CustodyClient;
+use djinn::door::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePattern};
 use djinn::door::quarantine::{
     AssignImportRequest, QuarantineCard, ReviewAction, ReviewRequest, UnassignedImport,
 };
@@ -102,9 +103,37 @@ impl State {
         }));
     }
 }
+/// What Dramatis declares on every custody hello (Mere's capability door
+/// D22): the vault's lock and roster, persona choice, quarantine review and
+/// import assignment, and the native unlock and passphrase change djinn
+/// performs. No key is released to it.
+pub fn declaration() -> AppDeclaration {
+    use CustodyOperation as Op;
+    AppDeclaration {
+        routes: vec![NamePattern::exact(djinn::door::custody::CUSTODY_ROUTE)],
+        custody: CustodyUse {
+            operations: [
+                Op::Status,
+                Op::Roster,
+                Op::ChooseProfile,
+                Op::LockVault,
+                Op::UnlockNative,
+                Op::ChangePassphraseNative,
+                Op::Quarantine,
+                Op::ReviewQuarantine,
+                Op::UnassignedImports,
+                Op::AssignImport,
+            ]
+            .into(),
+            ..CustodyUse::default()
+        },
+        ..AppDeclaration::default()
+    }
+}
+
 /// There is no filesystem, seed or passphrase operation in the application.
 pub async fn execute_at(endpoint: &str, request: Request) -> Reply {
-    let mut client = match CustodyClient::open_at(endpoint, AppId::new("dramatis")).await {
+    let mut client = match CustodyClient::open_declared_at(endpoint, AppId::new("dramatis"), declaration()).await {
         Ok(client) => client,
         Err(_) => {
             return Reply {

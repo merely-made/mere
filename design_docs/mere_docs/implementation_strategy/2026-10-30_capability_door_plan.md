@@ -422,6 +422,15 @@ part of its manifest entry.
 
   Links: area Stack · draws on stack.2 · summary Hocket's legacy identity adoption is removed, not made a declared operation.
 
+- **D28, the seal scope is declared (2026-11-01).** Retained-content
+  sealing chose its scope by label (`custody/payload.rs`), and the scope is
+  bound into existing ciphertext. Mark chose "Declared scope, after S2
+  (Recommended)": the declaration's custody gains a payload scope the owner's
+  grant pins, Turnstone declares its existing string so nothing re-seals,
+  and the table stays until the Armillary change after the slimming's S2.
+
+  Links: area Stack · draws on stack.2 · summary An application declares its retained-content seal scope and the grant pins it; Turnstone keeps its string; the label table goes after S2.
+
 ## Phases
 
 ### C0. One contract, bound both ways
@@ -966,3 +975,20 @@ error types settle.
 - 2026-11-01: C0 built and promoted (Mere `32be2f0b0`); the probe is deleted.
 - 2026-11-01: D20 ruled: a lapse reaches the client as its status.
 - 2026-11-01: D20 built (Mere `1dd59c48a`); D21 ruled and phase W1 added.
+- 2026-11-01: D22 to D27 ruled; M1's Mere side built on `m1/manifests`.
+  `CUSTODY_APPS`, the first-party list, the label grants in `bin/djinn.rs`,
+  `reservoir_applications()`, the label release policy and custody's label
+  checks are gone; custody answers declared applications only, and a
+  station's salts need a grant naming that station namespace. An
+  application nobody granted is put to the owner (`applications::OwnerConsent`,
+  a native confirm) and a yes is written to `applications`; the resident's
+  own command line is the one built-in grant. Signalman, Dramatis,
+  Graphshell, Distillery's tool, personae-vault and `mere-mcp` declare;
+  Cleromancy declares on its own branch, and Hocket stops waiting for an
+  adoption. Remaining: Woodshed's and Hocket's declarations (need a custody
+  connect carrying a declaration and a profile, after the slimming's S2),
+  D24's typed refusal frame and D25's agent marks (Armillary, after S2),
+  the retained-content seal scope still chosen by label until D28's
+  Armillary change, and the DR-C receipt host's grants. Six
+  `mere-resident` tests fail on Windows on `main` as well (the dialable
+  host's broad grant, `personal_facts`, `knot_relation_intake`).

@@ -26,6 +26,8 @@ use djinn::door::custody_client::{CustodyClient, CustodyClientError};
 use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 use personae::{PersonaId, ProfileId};
 use serde_json::json;
+#[path = "fixture_declarations/mod.rs"]
+mod fixture_declarations;
 use std::{
     sync::{
         Arc, Mutex,
@@ -174,6 +176,7 @@ impl Fixture {
         let keeper = Arc::new(Keeper::new(remote.clone()).with_ui(ui.clone()));
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
         mere_resident::custody::grant(&grants).unwrap();
+        fixture_declarations::grant(&grants, &["dramatis", "personae-vault", "graphshell", "cleromancy"]);
         let endpoint = custodian.dir.path().join("review.sock").display().to_string();
         let serving = endpoint.clone();
         let server = tokio::spawn(async move {
@@ -195,7 +198,7 @@ impl Fixture {
             server,
         };
         for _ in 0..100 {
-            if CustodyClient::open_at(&fixture.endpoint, AppId::new("dramatis"))
+            if CustodyClient::open_declared_at(&fixture.endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
                 .await
                 .is_ok()
             {
@@ -206,7 +209,7 @@ impl Fixture {
         panic!("broker must bind");
     }
     async fn client(&self, app: &str) -> CustodyClient {
-        CustodyClient::open_at(&self.endpoint, AppId::new(app))
+        CustodyClient::open_declared_at(&self.endpoint, AppId::new(app), fixture_declarations::declaration(app))
             .await
             .unwrap()
     }

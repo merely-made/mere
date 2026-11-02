@@ -86,7 +86,13 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
 }
 
 async fn open(endpoint: &str, app: &str, route: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(endpoint, AppId::new(app), AppRouteId::new(route).unwrap()).await
+    AppBrokerClient::open_declared_route_at(
+        endpoint,
+        AppId::new(app),
+        AppRouteId::new(route).unwrap(),
+        mere_resident::applications::resident_declaration(),
+    )
+    .await
 }
 
 /// Status names each admitted connection with what its label rests on and
@@ -103,6 +109,7 @@ async fn status_reports_each_connection_with_its_identity_basis() {
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     catalog.set_connection_ledger(ConnectionLedger::new(status.clone()));
     let endpoint = endpoint_name();
     let server = {
@@ -179,11 +186,13 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     let route = catalog
         .update(|catalog| ResidentControlEndpoint::register(stop.clone(), catalog))
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
 
     let endpoint = endpoint_name();
     let server = {

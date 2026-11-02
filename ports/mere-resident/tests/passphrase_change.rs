@@ -29,6 +29,8 @@ use std::{
     time::Duration,
 };
 use zeroize::Zeroizing;
+#[path = "fixture_declarations/mod.rs"]
+mod fixture_declarations;
 const OLD: &str = "Old local fixture";
 // Deliberately exercise exact Linux helper output, including two spaces and a glob.
 const NEW: &str = "New  local fixture * ' café";
@@ -160,6 +162,7 @@ async fn serve(
 ) -> tokio::task::JoinHandle<()> {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    fixture_declarations::grant(&grants, &["dramatis", "personae-vault", "graphshell", "cleromancy"]);
     let path = endpoint.clone();
     let task = tokio::spawn(async move {
         serve_app_broker(
@@ -174,7 +177,7 @@ async fn serve(
         .unwrap();
     });
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+        if CustodyClient::open_declared_at(&endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
             .await
             .is_ok()
         {
@@ -207,12 +210,12 @@ async fn resident_requires_dramatis_and_fresh_credentials_and_honors_cancellatio
         let k = keeper(dir.path(), portable, OLD, ui.clone());
         let endpoint = endpoint(dir.path());
         let task = serve(k.clone(), endpoint.clone()).await;
-        let mut other = CustodyClient::open_at(&endpoint, AppId::new("graphshell"))
+        let mut other = CustodyClient::open_declared_at(&endpoint, AppId::new("graphshell"), fixture_declarations::declaration("graphshell"))
             .await
             .unwrap();
         assert!(other.change_passphrase_native().await.is_err());
         assert_eq!(ui.0.lock().unwrap().len(), 12);
-        let mut c = CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+        let mut c = CustodyClient::open_declared_at(&endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
             .await
             .unwrap();
         k.lock_vault().unwrap();
@@ -271,7 +274,7 @@ async fn locking_while_the_confirmation_is_open_refuses_the_change() {
     *ui.1.lock().unwrap() = Some(Box::new(move || host.lock_vault().unwrap()));
     let endpoint = endpoint(dir.path());
     let server = serve(k, endpoint.clone()).await;
-    let mut c = CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+    let mut c = CustodyClient::open_declared_at(&endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
         .await
         .unwrap();
     assert_eq!(
@@ -306,7 +309,7 @@ async fn absent_graphical_password_provider_refuses_without_changing_the_vault()
     );
     let endpoint = endpoint(dir.path());
     let server = serve(k, endpoint.clone()).await;
-    let mut client = CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+    let mut client = CustodyClient::open_declared_at(&endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
         .await
         .unwrap();
     assert_eq!(

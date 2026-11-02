@@ -172,12 +172,8 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
     // Knot's label without its declaration is refused at the door.
     assert!(open(&endpoint, knot_editor::KNOT_APP_ID, None).await.is_err());
 
-    // A label-admitted application no longer reaches Knot's keys.
-    let mut labelled = open(&endpoint, "cleromancy", None).await.unwrap();
-    assert_eq!(
-        refusal(labelled.call(release(PersonalVaultKeys::requests())).await),
-        CustodyRefusal::NotReleasable
-    );
+    // No application reaches custody by its label alone.
+    assert!(open(&endpoint, "cleromancy", None).await.is_err());
 }
 
 #[tokio::test(flavor = "multi_thread")]

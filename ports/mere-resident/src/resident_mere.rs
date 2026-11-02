@@ -2074,10 +2074,17 @@ impl ProjectionNoticeSource for MereEndpoint {
 mod tests {
     use super::*;
 
+    /// A mere client's declaration, co-op routes included.
+    fn mere_client() -> djinn::door::declaration::AppDeclaration {
+        let mut declaration = crate::resident_reservoir::mere_client_declaration();
+        declaration.routes.push(djinn::door::declaration::NamePattern::prefix("coop/"));
+        declaration
+    }
+
     /// A request from `app` for `route`, carrying a mere client's declaration.
     fn declared(app: &str, route: &str) -> AppRequest {
         let mut request = AppRequest::new(AppId::new(app), AppRouteId::new(route).unwrap());
-        request.declaration = Some(crate::resident_reservoir::mere_client_declaration());
+        request.declaration = Some(mere_client());
         request
     }
     use djinn::door::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
@@ -2236,15 +2243,12 @@ mod tests {
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
         crate::applications::install(
             &grants,
-            ["turnstone", "knot-editor"]
-                .map(|app| {
-                    crate::applications::grant_for(
-                        &AppId::new(app),
-                        &crate::resident_reservoir::mere_client_declaration(),
-                        None,
-                    )
-                })
-                .to_vec(),
+            vec![
+                crate::applications::grant_for(&AppId::new("turnstone"), &crate::resident_reservoir::mere_client_declaration(), None),
+                crate::applications::grant_for(&AppId::new("knot-editor"), &crate::resident_reservoir::mere_client_declaration(), None),
+                // Graphshell alone holds the co-op routes.
+                crate::applications::grant_for(&AppId::new("graphshell"), &mere_client(), None),
+            ],
         );
         let routes = MereRoutes::new(
             root.path().to_path_buf(),
@@ -2857,6 +2861,7 @@ mod tests {
         for app in ["turnstone", "knot-editor"] {
             let hello =
                 AppHello::for_route(AppId::new(app), AppRouteId::new(&fixture.route).unwrap())
+                    .declaring(mere_client())
                     .accept()
                     .unwrap();
             assert!(
@@ -3838,7 +3843,7 @@ mod tests {
             assert!(!server.is_finished());
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
-        let mut proxy = ResidentMereProxy::divination(&address).unwrap();
+        let mut proxy = ResidentMereProxy::divination(&address, mere_client()).unwrap();
         let request = proxy
             .describe()
             .projections

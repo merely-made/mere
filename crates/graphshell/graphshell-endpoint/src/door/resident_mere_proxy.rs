@@ -25,6 +25,7 @@ use chirograph::{
     ResourceChunkResponse, ResourceRequest, ResourceResponse, ResumeReply, ResumeRequest,
 };
 use djinn::door::app_admission::{AppId, AppRouteId};
+use djinn::door::declaration::AppDeclaration;
 use std::sync::mpsc::{self, Sender};
 use std::thread::JoinHandle;
 use std::time::Duration;
@@ -37,8 +38,9 @@ enum Command {
     Stop,
 }
 
-/// A fixed `mere/divination` proxy, acting through the admitted Graphshell app.
-/// Its worker owns only a carrier. All graphs and durable writes stay resident.
+/// A fixed `mere/divination` proxy, acting through the admitted Graphshell app
+/// under the declaration Graphshell gives it. Its worker owns only a carrier.
+/// All graphs and durable writes stay resident.
 pub struct ResidentMereProxy {
     descriptor: EndpointDescriptor,
     send: Sender<Command>,
@@ -46,7 +48,7 @@ pub struct ResidentMereProxy {
 }
 
 impl ResidentMereProxy {
-    pub fn divination(endpoint: &str) -> Result<Self, String> {
+    pub fn divination(endpoint: &str, declaration: AppDeclaration) -> Result<Self, String> {
         let endpoint = endpoint.to_owned();
         let (send, receive) = mpsc::channel();
         let (ready, started) = mpsc::channel();
@@ -66,10 +68,11 @@ impl ResidentMereProxy {
             let connected = runtime.block_on(async {
                 tokio::time::timeout(
                     TIMEOUT,
-                    AppBrokerClient::open_route_at(
+                    AppBrokerClient::open_declared_route_at(
                         &endpoint,
                         AppId::new("graphshell"),
                         AppRouteId::new("mere/divination").expect("fixed route"),
+                        declaration,
                     ),
                 )
                 .await

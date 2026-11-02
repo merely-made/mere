@@ -104,7 +104,7 @@ impl StationCustodyLease {
                 tokio::select! {
                     _ = async { while !actor_stop.load(Ordering::SeqCst) { tokio::time::sleep(Duration::from_millis(25)).await; } } => {},
                     _ = async {
-                        match CustodyClient::open_at(&endpoint, app).await {
+                        match CustodyClient::open_declared_at(&endpoint, app, super::declaration()).await {
                             Ok(mut client) => {
                                 let _ = ready.send(Ok(()));
                                 let _ = client.watch_lock(VaultLockView::Unlocked).await;
