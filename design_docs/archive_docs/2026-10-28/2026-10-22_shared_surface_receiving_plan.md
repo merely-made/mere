@@ -141,7 +141,7 @@ passes the visible-window gate; native physical IME and human AT remain separate
 - 2026-10-23: the concrete-report and typed-Graft-zoom prerequisites pass
   251 Inker/Pelt/Graft tests and both explicit Pelt Metal tests. The native
   Servo consumer and pixel qualification are tracked in
-  `turnstone/design_docs/2026-08-25_browser_surface_implementation_plan.md`.
+  `turnstone/design_docs/archive_docs/2026-11-02/2026-08-25_browser_surface_implementation_plan.md`.
 
 - 2026-10-23: a concrete process turn must progress without frame acquisition.
   The browser binding installs a bounded engine turn on shared `advance`,

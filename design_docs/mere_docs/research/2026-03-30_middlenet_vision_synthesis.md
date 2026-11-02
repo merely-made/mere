@@ -21,7 +21,7 @@
 > `2026-04-11_linked_data_over_middlenet_relevance_note.md` (which cites this
 > synthesis by name) and `2026-04-11_tabfs_tablab_graphshell_relevance_note.md`.
 > The smolnet dependency-health audit in its Related list was recovered in the
-> same pass to `turnstone/design_docs/2026-03-28_smolnet_dependency_health_audit.md`,
+> same pass to `turnstone/design_docs/archive_docs/2026-11-02/2026-03-28_smolnet_dependency_health_audit.md`,
 > alongside `2026-04-16_smolnet_capability_model_and_scroll_alignment.md`, which
 > is the direct successor to this document's protocol inventory.
 

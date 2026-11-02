@@ -159,4 +159,4 @@ already merged and were deleted outright.
 `/home/markik/Code/repos/mere` is `main`, clean, with no other worktrees. The
 `mere-receipt` worktree (a clean detached checkout already on main) was
 removed. Genet and Turnstone were reconciled the same day; Turnstone's lane
-moved to q-pc (`turnstone/design_docs/2026-10-14_qpc_lane_handoff.md`).
+moved to q-pc (`turnstone/design_docs/archive_docs/2026-11-02/2026-10-14_qpc_lane_handoff.md`).

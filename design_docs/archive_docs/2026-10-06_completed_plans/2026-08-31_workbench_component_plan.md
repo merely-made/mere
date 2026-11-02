@@ -166,7 +166,7 @@ heterogeneous headed consumers.
 a tab bar on every tiled pane (a one-tab stack *is* the sub-title bar), a
 close × on each tab, panes stacked by dragging one onto another, and the
 whole layout saved and restored. The ruling reverses Turnstone's A4 decision
-of 2026-08-11 (`turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md`,
+of 2026-08-11 (`turnstone/design_docs/archive_docs/2026-11-02/2026-08-08_pane_registry_and_graph_panes_plan.md`,
 "The `TileTree` decision"), which kept a Turnstone-private topology because
 the shared contract "cannot own mixed GPU/document/Cambium surface routing,
 persistence, or stable pane identity." Mark's reading of that sentence is the
@@ -335,7 +335,7 @@ crate now churns twenty-five files, and which style wins is Mark's call.
 true`, which is Genet's style.
 
 **S3. Turnstone's panes ride the tree.** (Owned by
-`turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md`,
+`turnstone/design_docs/archive_docs/2026-11-02/2026-08-08_pane_registry_and_graph_panes_plan.md`,
 A4 as revised 2026-09-04; summarized here so the two halves read as one.)
 - `PaneId` ↔ `TileId` one-to-one; `PaneContent`, graph binding and `PaneSpec`
   stay Turnstone's, keyed by `PaneId` beside the tree, never in it — the

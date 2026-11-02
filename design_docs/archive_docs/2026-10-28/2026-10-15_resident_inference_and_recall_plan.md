@@ -1308,7 +1308,7 @@ Stop and record the reason if any of these happen:
   - *Evidence and limits.* [The I5 receipt](../../../support/receipts/resident_inference_answer_card.json)
     records exact source and binary hashes and indexes the public native
     frames, run/prompt records and scenario receipts in
-    `turnstone/docs/receipts/resident_inference_i5_windows_20261016/native/`.
+    `Code/testing/turnstone/receipts/resident_inference_i5_windows_20261016/native/`.
     The installed Djinn binary, physical second-device and whole-workspace
     gates remain separate. Inline publication remains capped at 128 KiB;
     larger-corpus handoff is open. I5 closes M2 and only the inference-surface

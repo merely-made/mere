@@ -46,7 +46,7 @@ five participant checks, 33 UI checks, a normal native build and final fresh/
 restarted scenarios pass. Initial retention of two records reports eight evictions
 and gap `[1,9)`; configured Downloads/Recent order and Inspector persist. The
 consumer receipt records all three inspected nonblank captures and source/binary
-hashes at `turnstone/design_docs/2026-09-29_shared_diagnostics_gloss_inspector_receipt.md`.
+hashes at `turnstone/design_docs/archive_docs/receipts/2026-09-29_shared_diagnostics_gloss_inspector_receipts.md`.
 Separately, Redshank's persistence pilot
 is published at Woodshed `a57085b`: 63 desktop tests, strict Clippy, a restored
 early-durability negative control and native opt-in/default/invalid-setting

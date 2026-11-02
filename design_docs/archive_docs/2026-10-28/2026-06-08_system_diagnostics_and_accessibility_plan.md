@@ -1497,7 +1497,7 @@ product-owned; the current Downloads section is read-only. Background/sync
 sections and retry/cancel actions are future extensions with their own gates.
 
 This supersedes the operational-status assignment in the July 18 taxonomy
-(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). At the naming ruling,
+(`turnstone/design_docs/archive_docs/receipts/2026-07-18_meerkat_harvest_receipts.md`). At the naming ruling,
 Turnstone's Apparatus pane analyzed selected graph-object facets and handling controls.
 **Mark's follow-up assigns that object analysis to Inspector**, alongside its
 inspection of documents and content within them, metadata and clipping. Inspector
@@ -1688,7 +1688,7 @@ also pass. The normal native binary and fresh/restarted scenarios pass with
 three inspected nonblank captures. Initial retention of two records reports
 eight evictions and gap `[1,9)`; restart retains one record without loss. Saved
 Downloads/Recent order and Inspector's requested viewer override are checked.
-The consumer's `turnstone/design_docs/2026-09-29_shared_diagnostics_gloss_inspector_receipt.md`
+The consumer's `turnstone/design_docs/archive_docs/receipts/2026-09-29_shared_diagnostics_gloss_inspector_receipts.md`
 records the source graph, hashes, failures and open gates. Counts overlap and
 must not be summed; requested viewer selection does not qualify Reader completion.
 

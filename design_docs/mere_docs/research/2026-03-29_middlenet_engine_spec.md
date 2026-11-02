@@ -25,7 +25,7 @@
 > `2026-04-09_smolweb_graph_enrichment_and_accessibility_note.md`. Its companion
 > `2026-04-16_middlenet_lane_architecture_spec.md` is recovered beside it in
 > this folder in the same pass, and the HTML-lane contract it anticipates is at
-> `turnstone/design_docs/2026-04-16_smolweb_compliance_and_middlenet_html_contract.md`.
+> `turnstone/design_docs/archive_docs/2026-11-02/2026-04-16_smolweb_compliance_and_middlenet_html_contract.md`.
 >
 > The portable WASM engine described here was not built in this shape. What the
 > stack has instead is Genet for HTML at full depth and nematic for the

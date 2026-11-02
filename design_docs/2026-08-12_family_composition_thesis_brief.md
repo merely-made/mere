@@ -399,7 +399,7 @@ Evidence homes are Genet `components/genet-scripted-dom/lib.rs`,
 `crates/eidetic/muniment/src/blob.rs`,
 `crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs`; Turnstone
 `src/action.rs` and
-`repos/turnstone/design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
+`repos/turnstone/design_docs/archive_docs/2026-11-02/2026-09-05_reader_appearance_isolation_plan.md`.
 
 Genet's current arena fence is enabled only on 64-bit debug builds. Release
 and wasm need an explicit refusal/translation contract for foreign handles.
@@ -430,7 +430,7 @@ envelope supplies attachment, acquisition context and retention references.
 Muniment's byte deduplication does not merge two observations. The existing
 generic `ProvenanceRecord` does not yet express all capture acquisition facts,
 and tombstone capture references/reaping remain work in
-`turnstone/design_docs/2026-09-06_page_lifecycle_plan.md`.
+`turnstone/design_docs/2026-11-02_page_lifecycle_plan.md`.
 
 **Custody clarification:** composing a view does not surrender or merge the
 originating application's authoritative store. Storage and retention can be
@@ -853,7 +853,7 @@ at proposal time — no serialized writer, no safe delete.
 **Owner:** Mere `crates/eidetic/muniment` (blob/reference store) plus
 `crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs` (tombstones);
 Turnstone's lifecycle work
-(`turnstone/design_docs/2026-09-06_page_lifecycle_plan.md`) as the product
+(`turnstone/design_docs/2026-11-02_page_lifecycle_plan.md`) as the product
 consumer.
 
 **Consumers:** Turnstone's live-page/tombstone/download reference classes.

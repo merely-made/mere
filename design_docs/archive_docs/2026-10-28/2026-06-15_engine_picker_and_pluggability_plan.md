@@ -223,7 +223,7 @@ reads.
   `cef_input::send_key` casts a Rust scalar directly to `u16`; native UTF-16
   delivery and OS IME require separate supplier/host work. Native consumer
   evidence lives at
-  `turnstone/docs/receipts/browser_scry_windows_20261006/`; this library pass
+  `Code/testing/turnstone/receipts/browser_scry_windows_20261006/`; this library pass
   does not extend those receipts to its new source.
 
 - 2026-08-30: **Page capture P1 contract landed.** Removed the old synchronous
@@ -286,7 +286,7 @@ reads.
   Turnstone's exact-source Scry/Weld production executable passed the four
   Windows input, Scry restart and CEF permission gates with native exit zero
   and `RESULT ok`. Its frozen source/archive evidence is owned by
-  `turnstone/docs/receipts/browser_supplier_integration_20261006/`.
+  `Code/testing/turnstone/receipts/browser_supplier_integration_20261006/`.
   The ordered Graft host contract remains library-qualified; the upstream
   Servo native consumer and supplementary Unicode/OS IME gates are separate.
 

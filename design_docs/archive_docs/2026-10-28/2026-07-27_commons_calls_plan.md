@@ -4,7 +4,7 @@
 **Status (2026-10-06):** A0 complete and promoted at `crates/moot/commons`
 2026-07-28; A1-A6 not started. Turnstone is the fixed first consumer for A1,
 gated on **T5** of the
-[place-port plan](../../../../turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md).
+[place-port plan](../../../../turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md).
 T5 now has receipts: T5a (2026-09-13), T5b (2026-09-14) and T5c (2026-09-15),
 with the reframe's step 5 receipted "at the strength of a founder-held document
 on a loopback place". Whether that meets A1's gate is open (see A1), and A1

@@ -77,7 +77,7 @@ records source hashes, exact commands/logs, and scope:
   active; this excludes GPU work and is not a headed FPS benchmark.
 
 Native Reader's headed scroll/close proof passed on 2026-09-06; see
-`turnstone/design_docs/2026-09-06_reader_appearance_native_check_receipt.md`.
+`turnstone/design_docs/archive_docs/receipts/2026-09-05_reader_appearance_isolation_plan_receipts.md`.
 It verifies shared source identity, different viewport widths, independent
 scroll, and stable surviving inset identity after Workbench closes. The first
 three global waits reached their frame caps. A follow-up traced this to a

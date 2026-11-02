@@ -1016,7 +1016,7 @@ an extracted document is a derived representation unless native text becomes
 the authored source by an explicit migration. Browser-local persistence,
 extension permissions and attached native sessions remain later, separate gates.
 The canonical consumer scope stays in
-`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`;
+`turnstone/design_docs/2026-11-02_unusual_protocols_browser_plan.md`;
 these recommendations do not reorder its native lane or the site's Ruling 22.
 
 ### 10.8 Current composition and delivery boundaries (2026-10-09)

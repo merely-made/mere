@@ -22,12 +22,12 @@
 > died in the donor repository.
 >
 > Cross-references this recovery closes:
-> `turnstone/design_docs/2026-04-16_smolnet_capability_model_and_scroll_alignment.md`,
+> `turnstone/design_docs/archive_docs/2026-11-02/2026-04-16_smolnet_capability_model_and_scroll_alignment.md`,
 > recovered earlier today, names this spec for its lane split and async
 > rendering lifecycle. Its baseline `2026-03-29_middlenet_engine_spec.md` is
 > recovered beside it in this folder in the same pass, and the HTML-lane
 > contract it defers to is at
-> `turnstone/design_docs/2026-04-16_smolweb_compliance_and_middlenet_html_contract.md`.
+> `turnstone/design_docs/archive_docs/2026-11-02/2026-04-16_smolweb_compliance_and_middlenet_html_contract.md`.
 >
 > The three-lane split survived as an idea and not as this crate layout. The
 > Blitz-DOM-painted-through-a-WebRender-fork lane was never built; HTML at any
@@ -67,7 +67,7 @@ fallback.
   — vello/parley/AccessKit direction and custom-canvas strategy
 - [`../research/2026-04-14_wasm_portable_renderer_feasibility.md`](../research/2026-04-14_wasm_portable_renderer_feasibility.md) *(historical citation)* <!-- doc-audit: historical-link -->
   — portable renderer feasibility and host/WASM constraints
-- [`../../verso_docs/research/2026-04-16_smolnet_capability_model_and_scroll_alignment.md`](../../../../turnstone/design_docs/2026-04-16_smolnet_capability_model_and_scroll_alignment.md)
+- [`../../verso_docs/research/2026-04-16_smolnet_capability_model_and_scroll_alignment.md`](../../../../turnstone/design_docs/archive_docs/2026-11-02/2026-04-16_smolnet_capability_model_and_scroll_alignment.md)
   — capability-model framing for smolnet protocols, Scroll's UDC alignment,
   and the recommended transport-plus-format adapter split
 

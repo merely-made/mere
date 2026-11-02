@@ -16,7 +16,7 @@ accepted revisions under current hosting authority. Opened by the 2026-09-11 sco
 first, governed hosting later) and by the shared-model extraction of 2026-10-20 that moved the model out of `knot-site`.
 Not here:
 - rendering, browser routing, input and certificate conversations and trust projection: `2026-10-28_smolweb_fidelity_plan.md`
-  and `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`, including the browser-owner findings that
+  and `turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`, including the browser-owner findings that
   Turnstone's identity-origin code permits Gemini and Titan but not Scroll and that Nematic trust defaults to Unknown
   despite the browser host's TOFU;
 - the Djinn update resident (phases A to G), the entry gate, and the open strict-Clippy and fixture-failure items on the

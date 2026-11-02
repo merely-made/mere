@@ -317,7 +317,7 @@ jar to follow the active persona:
   fallback is invented. PageLoad also stops borrowing a previous same-address
   request's acquisition time while preserving its displayed document until
   replacement. Qualification is recorded with Turnstone's R1 integration at
-  `turnstone/docs/receipts/r1_source_keep_20261017/`; this does not close the
+  `Code/testing/turnstone/receipts/r1_source_keep_20261017/`; this does not close the
   independent cookie/localStorage/session-import tails above.
 
   The [supplier receipt](../../../validation/http-source-provenance-20261017/receipt.json)

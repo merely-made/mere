@@ -1582,7 +1582,7 @@ is that objective's assessment.
   Disclosed projection document with its summary spoken, twelve items by
   name, all twenty-seven relationships to the last entry, in the operator's
   words "made it to 27 of 27". Receipt at turnstone
-  design_docs/2026-08-20_screen_reader_pass_receipt.md (05a2ec8), replacing
+  design_docs/archive_docs/receipts/2026-08-20_screen_reader_pass_receipts.md (05a2ec8), replacing
   the meerkat-era checklist as the worked example. Recorded follow-ups, none
   speculative: route ActionRequests when a consumer asks for operable rather
   than readable, per-node rects from the surface plan, and a label for the

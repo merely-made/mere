@@ -107,7 +107,7 @@ through bespoke per-format views; the per-format views in
 
 **Received 2026-10-07 (Turnstone U3):** Turnstone's
 unusual-protocols browser plan
-(`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`) gives
+(`turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`) gives
 this plan the Mere halves of its stages S1 to S4, with Turnstone as the
 forcing consumer. Mark: **"Mere's smolweb fidelity lane (Recommended)"**.
 The halves are: S1, document-lanes chooses its lowering by content type

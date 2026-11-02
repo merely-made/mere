@@ -1212,7 +1212,7 @@ Archived as [2026-10-06_completed_plans/2026-08-31_workbench_component_plan.md](
 - **S3, Turnstone's compositor walking the shared tree** (its pin,
   `bd5912fb`, is satisfied; adoption has not started) — owner: Turnstone's
   pane registry plan
-  (`turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md`,
+  (`turnstone/design_docs/archive_docs/2026-11-02/2026-08-08_pane_registry_and_graph_panes_plan.md`,
   A4).
 - **Pelt onto the shared bar names, retiring the `frisket-*` aliases and
   `TabBarNames`** — here.

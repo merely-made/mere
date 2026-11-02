@@ -140,7 +140,7 @@ private version of the UI.
 
 ### The place ruling is reversed (amended 2026-08-22, with Mark)
 
-The [Turnstone place port plan](../../turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md)
+The [Turnstone place port plan](../../turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md)
 ruled that a place is "a Turnstone product composition over reusable
 Mere-side domains … not another application or authority layer." Founding the
 Moot port (§7.1–7.2) reverses the *application* half of that ruling: the
@@ -223,7 +223,7 @@ This permits a clean internal pane inventory but does not yet let a port offer
 one reusable surface to its standalone host and Turnstone.
 
 The source half is planned already (lane correction 2026-08-24): the
-[pane registry and graph panes plan](../../turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md)
+[pane registry and graph panes plan](../../turnstone/design_docs/archive_docs/2026-11-02/2026-08-08_pane_registry_and_graph_panes_plan.md)
 (landed A1) removes `System` and replaces `Custom(String)` with a namespaced
 `External` pane source, which covers source identity. A2 is the graph runtime
 pool and `PaneId` / `graph_id` propagation lane. It does not own provider
@@ -713,7 +713,7 @@ The local app/session tests cover completion, failure and retry, plus binding
 removal without deleting retained files. This uses Turnstone's local workspace
 resolution, not a locked release or headed lifecycle receipt. Exact validation
 and remaining timeout/reconnect boundaries live in
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`. A second
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md`. A second
 application's explicit leave and renewed-admission reconnect remain open; the
 shared coop lifecycle contract is still to be earned from those consumers.
 
@@ -733,7 +733,7 @@ Descriptor bounds, scope, expiry, replacement failure, and partial leave
 failures have focused tests. Validation is under Turnstone's local workspace
 resolution; headed, physical radio and power-cut receipts remain separate.
 The authoritative behavior and acceptance detail remain in
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`.
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md`.
 
 The parallel I2 privacy audit promotes no new badge: a recorded sender key is
 not sufficient evidence of validated message ingestion. A future shared
@@ -749,7 +749,7 @@ ordinary authoring still rechecks authority. A filtered omnibar view and the
 app observation snapshot share the same status lines. These observations do
 not establish peer reachability, message delivery, or confidentiality. The
 focused validation and remaining headed gate live in
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`.
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md`.
 
 
 ### I3d founder path and two-window place receipt, 2026-09-13
@@ -766,7 +766,7 @@ authoring, restart and convergence, with two Personae roots, one Moot and
 identical projection digests recorded on both sides. Steps 4, 5 and 7 stay
 open. Delivery, peer reachability and confidentiality remain unclaimed. The
 receipt and its limits live in
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md` under T5a.
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md` under T5a.
 
 ### I3e lane leave latency, planned 2026-09-13, done 2026-09-14
 
@@ -839,7 +839,7 @@ recorded two members on the returning joiner where the others saw three,
 and a later run three everywhere. Step 5, the shared Knot document by
 projection, remains the open step and the second application the coop
 contract is meant to follow. Receipt and limits:
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`, T5b.
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md`, T5b.
 
 ### I3g Gemot facts reach connected peers live, 2026-09-15
 

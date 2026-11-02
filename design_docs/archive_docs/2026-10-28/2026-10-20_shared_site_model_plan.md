@@ -184,7 +184,7 @@ again with exact browser executable `4ef1b302…61757`, unchanged governed host
 joined without cancellation. Final receipt:
 `knot-editor/support/receipts/smolweb-browser-receiving/process-integrated.json`.
 Current SDK/build/test records live under
-`turnstone/docs/receipts/native_browser_receiving_20261022/`.
+`Code/testing/turnstone/receipts/native_browser_receiving_20261022/`.
 
 ## Governed Micron resident (2026-10-22)
 
@@ -431,7 +431,7 @@ I/O constraint remains visible when considering other host backends.
 Rendering, browser routing, input/certificate conversations and trust projection
 continue through the existing
 [smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
-and `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`.
+and `turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`.
 Nematic lowers native documents; browser registration or rendering does not
 qualify the publication host. Finger's separate WebFinger support is HTTP and
 does not expand Errand's non-HTTP fetch router.
@@ -530,7 +530,7 @@ existing browser source/accessibility/build queue intact.
   scenarios, launch settings, original receiving/controller behavior and
   current reading/command/owner regressions. Existing external-host/R3 tests
   remain ignored. The exact code/lock/executable and all filters are recorded
-  in `turnstone/support/receipts/client-limits/consumer.json`. No registry
+  in `Code/testing/turnstone/support_receipts/client-limits/consumer.json`. No registry
   version or unrelated supplier changes are introduced; the immutable
   source-edit exception remains. The client-limit lane is complete for routed
   Errand and native Micron consumers. Standalone session follow-ups remain

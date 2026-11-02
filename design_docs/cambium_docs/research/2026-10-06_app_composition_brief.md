@@ -35,7 +35,7 @@ wgpu-scry `2c3ebd24`, netrender `0edc6077`, Genet `90c5ef50`, and the AccessKit
 ## 1. The question
 
 Fork U8 of Turnstone's unusual-protocols browser plan
-(`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`, at
+(`turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`, at
 Turnstone `62b29eb`) asked how and when the stack's applications compose. The options were crate
 panes and session projections beside the bar work, waiting until the bar is
 met, or a live-pixel research lane as well. Mark:
@@ -218,7 +218,7 @@ line 83 onward). That suits a graph canvas. It cannot describe a text editor.
 
 On the host side, Turnstone composes imported textures beside its own
 (F1). Its Scry importer checks metadata and the exact fence, and waits on
-every paint (`turnstone/docs/receipts/browser_scry_windows_20261005/README.md`).
+every paint (`Code/testing/turnstone/receipts/browser_scry_windows_20261005/README.md`).
 
 The family's parts, by operating system:
 
@@ -271,7 +271,7 @@ The Graphshell machinery carries projections and intents between processes.
 The receipts are G3 (Turnstone's endpoint, `turnstone/src/remote_projection.rs`),
 K2 (Knot's two-machine physical receipt, 2026-08-08) and I3h (a founder-held
 Knot document edited live by place members through projection,
-`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`, T5c). Knot
+`turnstone/design_docs/archive_docs/2026-11-02/2026-07-28_turnstone_place_port_plan.md`, T5c). Knot
 authoring in Turnstone shows the hybrid that matters most here: "The background
 hub owns the one endpoint process and all carrier traffic. Each visible
 document owns a local Cambium editor. Keystrokes, selection, undo, IME,
@@ -312,12 +312,12 @@ The frozen realization turns a scene into navigable semantics for any host
   back with an admission-generation check (lines 30 to 49).
 - **Only Windows has been heard, and never a composed pane.** The 2026-08-20
   Narrator pass walked Turnstone's stitched tree through the Frozen Projection
-  pane, "27 of 27" (`turnstone/design_docs/2026-08-20_screen_reader_pass_receipt.md`).
+  pane, "27 of 27" (`turnstone/design_docs/archive_docs/receipts/2026-08-20_screen_reader_pass_receipts.md`).
   That pane shows a session projection, so the one screen-reader receipt that
   touches composition is a B4 receipt on Windows. The same pass found that
   Narrator stops at nodes with no bounds. For contributed panes, "A manual
   Narrator walk remains the honest gate for claiming screen-reader coverage of
-  a registered surface" (`turnstone/design_docs/2026-07-17_genet_probe_automatability_plan.md`,
+  a registered surface" (`turnstone/design_docs/archive_docs/2026-11-02/2026-07-17_genet_probe_automatability_plan.md`,
   around line 310). No VoiceOver or Orca run of any stack application is
   recorded.
 - **Custom actions are not read.** No pinned adapter reads AccessKit's
@@ -775,7 +775,7 @@ controller in `pelt-core`) and S8 (page accessibility).
   Turnstone unusual-protocols lane builds the helper, focus handback, panic
   containment, key namespaces, AC5's reservations and E1, beside its
   `pelt-core` work (Turnstone U11). Record:
-  `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`, §7.
+  `turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`, §7.
 - **Leaf keys (Turnstone U17).** Asked once the lane found that no
   contributed session hands leaves to a host yet: per-session registries,
   namespaced keys in one host registry, or both. Mark: **"Per-session
@@ -809,9 +809,9 @@ controller in `pelt-core`) and S8 (page accessibility).
   the contribution contract frozen at v1.
 - [Postcard framing plan](../../mere_docs/implementation_strategy/2026-10-06_postcard_framing_plan.md):
   the framing a cross-process wire would use.
-- Turnstone: `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`
-  (§4, S11, U2, U8); `turnstone/design_docs/2026-08-20_screen_reader_pass_receipt.md`;
-  `turnstone/docs/receipts/browser_scry_windows_20261005/README.md`.
+- Turnstone: `turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`
+  (§4, S11, U2, U8); `turnstone/design_docs/archive_docs/receipts/2026-08-20_screen_reader_pass_receipts.md`;
+  `Code/testing/turnstone/receipts/browser_scry_windows_20261005/README.md`.
 
 ## 11. Current consumers and design direction (2026-10-09)
 
@@ -865,7 +865,7 @@ a full browser application is delivered. A static site, a browser-local session,
 an extension sidecar and a native-owned attached session have separate storage,
 capability and lifecycle boundaries. Existing owner plans retain those choices:
 `merelyllc.com/docs/2026-09-30_graphshell_site_canvas_plan.md` and
-`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`.
+`turnstone/design_docs/archive_docs/2026-11-02/2026-10-06_unusual_protocols_browser_plan.md`.
 
 ### 11.1 Renderer choice for composed applications (2026-10-10)
 
