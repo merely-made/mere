@@ -14,7 +14,7 @@ resident contracts from the remaining consumer gates.
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
 Cleromancy is the first consumer; its own plan
-(`repos/cleromancy/design_docs/2026-09-23_divination_mere_plan.md`)
+(`repos/cleromancy/design_docs/archive_docs/2026-11-01/2026-09-23_divination_mere_plan.md`)
 builds on this one.
 
 **Related:**
@@ -294,7 +294,7 @@ these owners instead of repeating their phase summaries, resolving the
   (`repos/knot-editor/design_docs/2026-09-23_knot_workspace_slice1_plan.md`),
   which says whether Knot shows an interim view or waits for V2b is Mark's call
   when step 8 comes up; Knot's last recorded step is 4c. Cleromancy's is C1
-  (`repos/cleromancy/design_docs/2026-09-23_divination_mere_plan.md`), which
+  (`repos/cleromancy/design_docs/archive_docs/2026-11-01/2026-09-23_divination_mere_plan.md`), which
   waits for V1 to V5. V2b's done-conditions as first written could not be met
   from this repository.
 - **Knot's catalog is not in a mere.** Knot's step 8 hands the view its
@@ -1771,7 +1771,7 @@ complete-candidate validator in daemon and embedded compositions. Its client
 uses the existing admitted mere session route, checked journal transactions and
 resource hashes, never an application-local store or custody fallback. Source:
 `dramatis/design_docs/2026-10-16_subject_reference_plan.md`; consumer:
-`cleromancy/design_docs/2026-09-23_divination_mere_plan.md`.
+`cleromancy/design_docs/archive_docs/2026-11-01/2026-09-23_divination_mere_plan.md`.
 
 Done when valid revisions and exact associations persist across owner reopening;
 tampering, wrong persona, stale candidate and access revocation refuse without

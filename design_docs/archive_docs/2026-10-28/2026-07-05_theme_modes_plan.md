@@ -1245,7 +1245,7 @@ family availability does not close its recorded-loop glyph coverage gate.
   portable-core tests pass; two native processes pass nine reviewed captures
   and 123 presentations. Shared font picker Apply, all four canonical modes,
   authored restoration, compact Reading entry and fresh reopening are recorded
-  in `cleromancy/design_docs/receipts/tabard_20261011/font-roles/qualification.json`.
+  in `Code/testing/cleromancy/tabard_20261011/font-roles/qualification.json`.
   Exact font request/library bytes, card data, all three durable IDs and 1/3/1
   counts survive reopening. The original eight-capture text-input attempt stays
   rejected. Knot/Woodshed have the published contract, metric/cache/dynamics

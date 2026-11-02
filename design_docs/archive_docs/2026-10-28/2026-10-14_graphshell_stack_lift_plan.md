@@ -1534,7 +1534,7 @@ fast-forward of local main; nothing built).**
   `graphshell::personal_sync::SyncProjection`; the Graphshell package also
   remains in the resolved dependency graph. This is the P4 endpoint-path
   consumer proof, not L13/P8 removal of the port or new native acceptance.
-  `cleromancy/receipts/family-intake_20261015.json` records the software intake
+  `Code/testing/cleromancy/receipts/family-intake_20261015.json` records the software intake
   and preserves the original C1/C2 qualification identities.
 - **2026-10-19 (the Cambium publish chain, done):** Mark chose to keep the name
   `command-menu` (the name `alembic` is held on crates.io by a third party, a

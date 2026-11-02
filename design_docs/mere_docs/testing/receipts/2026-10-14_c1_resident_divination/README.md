@@ -58,7 +58,7 @@ Staged Save/exact Open/read-only controls/return pass with nine independently re
 
 The [reservoir plan](../../../implementation_strategy/2026-09-23_reservoir_plan.md#cleromancy-c1-coordinated-consumer-cutover-2026-10-13-in-progress) owns supplier status; Cleromancy's plan owns the final C1 consumer verdict. Card ambient presentation remains later C4. Source checkpoint publication is complete; final canonical qualification documentation publication remains pending. No main merge is claimed.
 
-The curated consumer ledger is `cleromancy/receipts/c1-resident-qualification_20261014.json`. Text JSON and source-build manifests are eligible for Git; original headed images remain local and ignored under the consumer evidence policy. Canonical index/D2 changes receive a final mechanical and judgment audit compared with exact pre-edit F `c51e1913`; inherited documentation findings remain visible.
+The curated consumer ledger is `Code/testing/cleromancy/receipts/c1-resident-qualification_20261014.json`. Text JSON and source-build manifests are eligible for Git; original headed images remain local and ignored under the consumer evidence policy. Canonical index/D2 changes receive a final mechanical and judgment audit compared with exact pre-edit F `c51e1913`; inherited documentation findings remain visible.
 
 The H controls batch now closes 21 of 164 original canonical cases, with
 43 independently reviewed originals: 20 fresh profiles plus the retained Scene
