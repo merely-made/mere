@@ -834,8 +834,9 @@ error types settle.
   wit, wit-testkit and wit-ipc (22), app-host's component test (2) and the
   coverage compile all pass on Q-PC (macOS 15.8.1, x86_64) and the Fedora 44
   ThinkPad (x86_64), so ipc-channel's macOS and Linux backends and
-  `std::io::pipe` have run. The M4 (aarch64) was off the mesh network and
-  is not yet checked.
+  `std::io::pipe` have run. The M4 (macOS 26.5.1, arm64) passes the same
+  five steps once back on the mesh, so C0 is green on all three hosts with
+  no fix.
 - 2026-11-01, K1 settings built (Mere `7c1053de1`, D22): `mere:script`'s
   `settings` interface carries surface-api's revisioned contract as typed
   WIT (`option` is a WIT keyword, so a choice entry is `choice-option`)
@@ -980,3 +981,4 @@ error types settle.
 - 2026-11-01: C0 checked on macOS x86_64 and Linux; D22 (K1 settings) and D23 (W1 local) ruled.
 - 2026-11-01: K1's settings contract built (Mere `7c1053de1`, D22).
 - 2026-11-01: K1's settings contract landed (Mere `f8055a93c`).
+- 2026-11-01: C0 checked on the M4 (arm64 macOS) too.
