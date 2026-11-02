@@ -7,7 +7,7 @@ deployment is Mark's step. Ruling 44's hard switch landed on 2026-10-09 (§6), s
 keeps the master while locked. Not yet carried out: pandect's wallets
 until D8 (ruling 81). The vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`)
 says what the lock defends and leaves open. The
-dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`) moves this code
+dramatis repo plan (`repos/dramatis/design_docs/archive_docs/2026-11-01/2026-10-06_dramatis_repo_plan.md`) moves this code
 later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
 64, 65).
 **Security continuation (2026-10-21):** the [custody isolation and security
@@ -25,7 +25,7 @@ locked.
 
 **Related**:
 
-- chatelaine and CXF import plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`):
+- chatelaine and CXF import plan (`repos/dramatis/design_docs/archive_docs/2026-11-01/2026-10-01_chatelaine_cxf_plan.md`):
   rulings 63 to 65 and the finding "the vault never locks".
 - dramatis tier architecture (`repos/dramatis/design_docs/2026-09-30_dramatis_tier_architecture.md`):
   the tier's invariants (1, custody; 12, quarantine).
@@ -38,7 +38,7 @@ locked.
 - vault threat statement (`repos/dramatis/design_docs/2026-10-08_vault_threat_statement.md`):
   what the lock defends, what stays while locked, and what it does not
   defend (ruling 82).
-- dramatis repo plan (`repos/dramatis/design_docs/2026-10-06_dramatis_repo_plan.md`): moves the
+- dramatis repo plan (`repos/dramatis/design_docs/archive_docs/2026-11-01/2026-10-06_dramatis_repo_plan.md`): moves the
   vault's custody from personae into castellan and the tier out of mere;
   sequenced after this plan's L2 at the earliest.
 

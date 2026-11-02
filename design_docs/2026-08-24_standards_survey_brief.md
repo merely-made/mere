@@ -531,7 +531,7 @@ Three more cross-cutting items:
     WATCH grade stands for atproto's repository and sync layers; the identity
     layer (`did:plc` and handle resolution) is **ADOPT** for gaz and gazette.
   - Consequences for gaz (anchoring, collisions, proofs of key changes) live in
-    the gaz founding plan (`repos/dramatis/design_docs/2026-08-08_gaz_founding_plan.md`)
+    the gaz founding plan (`repos/dramatis/design_docs/archive_docs/2026-11-01/2026-08-08_gaz_founding_plan.md`)
     §2 and §5.
 - **moot / murmur.** MLS (RFC 9420) is ADOPT *here* even though it is SKIP for
   the vault — group messaging is what it was designed for. MIMI is WATCH. Matrix:

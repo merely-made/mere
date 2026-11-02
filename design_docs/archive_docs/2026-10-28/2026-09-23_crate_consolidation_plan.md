@@ -410,7 +410,7 @@ crate inventory at the Code root.
   its shape ruled, that condition is now buildable rather than waiting on
   design. The facade is not a C5 condition.
 - 2026-10-01, later. The
-  chatelaine and CXF plan (`repos/dramatis/design_docs/2026-10-01_chatelaine_cxf_plan.md`)
+  chatelaine and CXF plan (`repos/dramatis/design_docs/archive_docs/2026-11-01/2026-10-01_chatelaine_cxf_plan.md`)
   is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
   store as part of founding (its ruling 17), so C5's chatelaine condition is
   met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
