@@ -66,7 +66,7 @@ Fresh Linux qualification covers the published Hest, command-menu and Cambium pa
 ### V1. The VTT campaign consumer of folds
 Curation named Isocosm's VTT campaign as a consumer of folds; its Overmap has no fold controls, and Knot's catalog supplied the production proof instead without waiting for it.
 - Done when: the VTT campaign consumer is qualified against the fold contract.
-- Needs: `isocosm/design_docs/2026-10-28_vtt_overlay_plan.md`
+- Needs: `isocosm/design_docs/2026-11-02_vtt_overlay_plan.md`
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-08-03_graph_view_curation_and_interaction_plan.md:6-7,662-666,676-678`
 
