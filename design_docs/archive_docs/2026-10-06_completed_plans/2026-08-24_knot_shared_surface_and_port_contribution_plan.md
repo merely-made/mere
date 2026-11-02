@@ -554,7 +554,7 @@ through UI admission.
 
 **Corrected 2026-10-06 (S14 pass):** F0 is no longer governed here. The
 knot-editor copy of this plan
-(knot-editor/design_docs/2026-08-24_knot_shared_surface_and_port_contribution_plan.md,
+(knot-editor/design_docs/archive_docs/2026-11-02/2026-08-24_knot_shared_surface_and_port_contribution_plan.md,
 repository note 2026-09-05) names knot-editor's
 2026-09-05_knot_application_workspace_plan.md as F0's current authority and
 calls this shared-surface plan a historical record. The two copies have

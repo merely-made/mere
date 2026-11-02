@@ -74,7 +74,7 @@ shared session, real source Edit/Undo through layout Discard, focus, failed save
 and responsive compact-to-wide recovery. Native review covers explicit layout
 authoring, a fresh process loading the same pinned-reading layout on Unlock, and
 default compact presentation. The receiving record is
-[`knot-editor/docs/receipts/2026-10-29_forme_workspace/README.md`](https://github.com/merely-made/knot-editor/blob/2924a5f1571f010bb9eb7692d6767117f3dff8ef/docs/receipts/2026-10-29_forme_workspace/README.md).
+[`Code/testing/knot-editor/receipts/2026-10-29_forme_workspace/README.md`](https://github.com/merely-made/knot-editor/blob/2924a5f1571f010bb9eb7692d6767117f3dff8ef/docs/receipts/2026-10-29_forme_workspace/README.md).
 
 **Publication update, 2026-10-30:** Knot `main` is published at
 [`3e380e2`](https://github.com/merely-made/knot-editor/blob/3e380e21fd1453d91e121b8539e07474d3e50d64/docs/receipts/2026-10-29_forme_workspace/README.md).

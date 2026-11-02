@@ -14,7 +14,7 @@ vocabulary alignment are added here.
 [family update resident plan](mere_docs/implementation_strategy/2026-10-28_family_update_resident_plan.md)
 (the built device resident and Djinn as desktop composition root),
 [Knot device resident V1 receipt](https://github.com/merely-made/knot-editor/blob/main/crates/knot-editor/docs/2026-08-22_device_resident_v1_receipt.md),
-[Knot governed native Scroll process receipt](https://github.com/merely-made/knot-editor/blob/main/design_docs/2026-09-11_small_web_authoring_plan.md#governed-native-scroll-process-receipt-2026-10-22),
+[Knot governed native Scroll process receipt](https://github.com/merely-made/knot-editor/blob/main/design_docs/archive_docs/2026-11-02/2026-09-11_small_web_authoring_plan.md#governed-native-scroll-process-receipt-2026-10-22),
 [Turnstone peer-web reframe](https://github.com/merely-made/turnstone/blob/main/design_docs/2026-07-28_turnstone_peer_web_reframe.md),
 [family composition thesis](2026-08-12_family_composition_thesis_brief.md),
 [GUI catalog §8](mere_docs/design/2026-10-26_gui_catalog_design.md) (the contribution kinds).

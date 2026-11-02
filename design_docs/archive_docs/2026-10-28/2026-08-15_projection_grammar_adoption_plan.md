@@ -157,7 +157,7 @@ identity, source anchors and source bytes keep their original authority. Drag
 release and keyboard controls use Knot's existing undo/redo history.
 
 Knot's canonical receipt is
-`knot-editor/docs/receipts/2026-10-11_authored_scene/README.md`. It records 647
+`Code/testing/knot-editor/receipts/2026-10-11_authored_scene/README.md`. It records 647
 workspace tests, 45 default and 61 engine/highlight document tests, four native
 save/fresh-process-reopen runs at 1100×900 and 420×900, and 28 inspected captures.
 That native evidence uses disposable synthetic identities. Personal-custody
@@ -1901,7 +1901,7 @@ qualified. Source imports remain read-only; explicit local copies receive a new
 Graphshell identity and exported copied facts. No generic command bus, history,
 playback clock or source-write capability was moved into the shared intent type.
 Evidence: [shared/browser receipt](../../../validation/shared-span-intents_20261017/receipt.json),
-`knot-editor/docs/receipts/2026-10-17_metre_editing/`, and
+`Code/testing/knot-editor/receipts/2026-10-17_metre_editing/`, and
 `woodshed/validation/shared-span-intents_20261017/`. The older A5 and unrelated
 portable-grammar gates in this plan remain open.
 

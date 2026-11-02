@@ -291,7 +291,7 @@ these owners instead of repeating their phase summaries, resolving the
 
 - **The consumers' embeddings are their own plans' steps.** Knot's is step 8
   of its slice 1 plan
-  (`repos/knot-editor/design_docs/2026-09-23_knot_workspace_slice1_plan.md`),
+  (`repos/knot-editor/design_docs/archive_docs/2026-11-02/2026-09-23_knot_workspace_slice1_plan.md`),
   which says whether Knot shows an interim view or waits for V2b is Mark's call
   when step 8 comes up; Knot's last recorded step is 4c. Cleromancy's is C1
   (`repos/cleromancy/design_docs/archive_docs/2026-11-01/2026-09-23_divination_mere_plan.md`), which

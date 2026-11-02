@@ -219,7 +219,7 @@ is included. Native presentation/human AT and MSRV remain separate evidence.
 [owned receiver references](../../../support/receipts/hest-h4-20261020/receivers.json)
 and [source preservation](../../../support/receipts/hest-h4-20261020/source-preservation.json)
 record the exact software basis. The receiver owns its complete logs at
-`knot-editor/docs/receipts/hest-h4-20261020/qualification.json`; root does not
+`Code/testing/knot-editor/receipts/hest-h4-20261020/qualification.json`; root does not
 duplicate them. Knot preserves 1,246 unrelated package blocks and 150 other
 Rust files; endpoint production logic is exact. The initial Rhai fixture
 syntax attempt and Knot's incorrect denied-language expectation are retained

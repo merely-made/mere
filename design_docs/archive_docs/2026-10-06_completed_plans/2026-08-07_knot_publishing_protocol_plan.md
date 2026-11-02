@@ -13,7 +13,7 @@ workspace root share one Knot revision, `c966e31` (`cf88887d`, merged in
 `840c543d`); Turnstone's pin is outside this repository.
 
 **Open, raised by the S14 pass (2026-10-06):** Knot Editor carries its own copy
-of this plan (`knot-editor/design_docs/2026-08-07_knot_publishing_protocol_plan.md`),
+of this plan (`knot-editor/design_docs/archive_docs/2026-11-02/2026-08-07_knot_publishing_protocol_plan.md`),
 which differs from this one only in the repository note and the audit markers
 and calls itself a historical integration record; the Mark read adapter doc is
 duplicated there too. Which copy is canonical (DOC_POLICY §2 and §4)? Options:

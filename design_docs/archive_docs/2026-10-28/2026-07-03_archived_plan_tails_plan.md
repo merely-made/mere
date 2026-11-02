@@ -698,7 +698,7 @@ Archived as [2026-10-06_completed_plans/2026-07-25_knot_port_plan.md](../../arch
 - **Whether "one immutable revision" is the rule for Knot's consumers** (its
   S14 question: one shared knot-editor revision across Turnstone, Mere and
   djinn's `knot-site`, or each consumer pins its own) — owner: knot-editor's
-  copy of this plan (`knot-editor/design_docs/2026-07-25_knot_port_plan.md`).
+  copy of this plan (`knot-editor/design_docs/archive_docs/2026-11-02/2026-07-25_knot_port_plan.md`).
   At this pass Mere's root manifest and djinn's `knot-site` both pin
   knot-editor `a5888dc6`.
 
@@ -708,7 +708,7 @@ Archived as [2026-10-06_completed_plans/2026-07-27_knot_authoring_consumer_plan.
 
 - **An optional headed Turnstone receipt of selected clips from Genet's Livery
   and scripted producers** — owner: knot-editor's copy
-  (`knot-editor/design_docs/2026-07-27_knot_authoring_consumer_plan.md`).
+  (`knot-editor/design_docs/archive_docs/2026-11-02/2026-07-27_knot_authoring_consumer_plan.md`).
 - **The "one immutable revision" pin rule** — owner: knot-editor's copy, as
   under the knot port plan above.
 
@@ -717,7 +717,7 @@ Archived as [2026-10-06_completed_plans/2026-07-27_knot_authoring_consumer_plan.
 Archived as [2026-10-06_completed_plans/2026-08-02_knot_in_graphshell_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-02_knot_in_graphshell_plan.md).
 
 - **Knot search S0 and S1** — owner: knot-editor's copy
-  (`knot-editor/design_docs/2026-08-02_knot_in_graphshell_plan.md`), which
+  (`knot-editor/design_docs/archive_docs/2026-11-02/2026-08-02_knot_in_graphshell_plan.md`), which
   carries it.
 - **The "one immutable revision" pin rule** — owner: knot-editor's copy, as
   above.
@@ -1225,7 +1225,7 @@ Archived as [2026-10-06_completed_plans/2026-08-31_workbench_component_plan.md](
 Archived as [2026-10-06_completed_plans/2026-08-24_knot_shared_surface_and_port_contribution_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-24_knot_shared_surface_and_port_contribution_plan.md).
 
 - **F0** — owner: knot-editor's application workspace plan
-  (`knot-editor/design_docs/2026-09-05_knot_application_workspace_plan.md`),
+  (`knot-editor/design_docs/archive_docs/2026-11-02/2026-09-05_knot_application_workspace_plan.md`),
   which knot-editor's copy of this plan names as F0's authority.
 - **The pointer-capture gap** — owner: Turnstone (its T lane).
 
@@ -1287,7 +1287,7 @@ Archived as [2026-10-06_completed_plans/2026-08-07_knot_publishing_protocol_plan
 
 - **Phase B: its specification and the `knot-protocol` crate** — owner:
   knot-editor's copy
-  (`knot-editor/design_docs/2026-08-07_knot_publishing_protocol_plan.md`),
+  (`knot-editor/design_docs/archive_docs/2026-11-02/2026-08-07_knot_publishing_protocol_plan.md`),
   canonical under S61.
 - **Whether the Mark read adapter counts as Phase B's entry** (its S14
   question) — owner: knot-editor's copy.

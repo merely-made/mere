@@ -1476,7 +1476,7 @@ separate completion claims.
   dynamics reopen cold and typography changes reset/remeasure without resuming.
   Compact Code/Apply are visible. The search field is captured, while the
   off-viewport results are not a full visual or accessibility qualification.
-  Canonical evidence is `knot-editor/docs/receipts/2026-10-12_font_roles/README.md`.
+  Canonical evidence is `Code/testing/knot-editor/receipts/2026-10-12_font_roles/README.md`.
   The version-1 typography fixture and compact missing-Menu failures remain
   rejected evidence; corrected v2 loading and real 420 px menu routing have
   focused regressions. Initial activation grace is explicit and synthetic-only;
