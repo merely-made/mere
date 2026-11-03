@@ -18,3 +18,11 @@
 
 The shared lint set and remaining repository inventory/adoption are not
 qualified by this doctrine-only gate. Retained receipt cap: 100 MB.
+
+### Final cross-repository gate
+
+Mere's `responsa check` and isocosm's `responsa check` both pass after
+isocosm's Method 3 retirement. Cross-repository links target its live case
+1160; the retired method.3 key remains a local replacement target.
+Isocosm's full `prek run --all-files` passes. The approved CLAUDE.md edit
+changes only the source-size rule's citation.

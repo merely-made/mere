@@ -3,7 +3,7 @@
 **Date:** 2026-10-30
 **Status (2026-11-02):** in progress. Fifteen rulings recorded (D1 to D15).
 Eidetic's E1-E4 landed: standalone tagged tools, Windows/Linux installs and
-line-ceiling adoption in isocosm and eidetic. H4's doctrine pass is ruled;
+line-ceiling adoption in isocosm and eidetic. H4's doctrine pass landed;
 H1's Clippy/deny work and H2-H3's stack-wide inventory/adoption remain open.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
@@ -168,6 +168,18 @@ Each comes back as a question before anything is written.
 
 ## Findings
 
+- 2026-11-02: H2 reconnaissance over the current tool's default extensions
+  finds 949 oversize candidates after skipping candidate imported/generated
+  paths (`tests/wpt/`, `support/patches/`, `vendor/`, `third_party/`,
+  `generated/`); this is not the adopted inventory. Mere has 389, Genet 188,
+  Woodshed 105, Knot 39 and ESP 34. Candidate exclusions still need review:
+  Genet's remaining count includes imported Blink performance fixtures;
+  generated bindings and owned modifications must be classified by path.
+  H2 is not done until every retained exception has its technical reason
+  and the binary passes in each repository.
+- 2026-11-02: the shared hook stanza and both adopters now use `always_run`
+  so deletion-only commits still reject stale exceptions. Eidetic's
+  line-ceiling receipt records the empty-effective-file-list control.
 - 2026-10-30: isocosm's checker is 47 lines (`scripts/line-ceiling.ps1`), with `-Staged`
   for the pre-commit hook and `line-ceiling-exceptions.txt` requiring a reason per entry.
 - 2026-10-30: [doctrine.md](../../doctrine.md) stack.5 already carries the WIT and native
