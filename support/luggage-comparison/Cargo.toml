@@ -10,7 +10,7 @@ license = "MPL-2.0"
 [workspace]
 
 [dependencies]
-luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "5afe6723b75cc2b62420328c079c05c60c90380d" }
+luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "1014cf48e1882ff926b55f3509ac3dbf5a5aec8e" }
 velopack = "=1.2.161"
 minisign = "0.7"
 blake3 = "1"
@@ -49,3 +49,9 @@ too_many_lines = "warn"
 
 [lints]
 workspace = true
+
+[patch."https://github.com/merely-made/distillery.git"]
+esp = { git = "https://www.github.com/merely-made/distillery.git", rev = "66108581b3d2ca66eb42a282eccc8ec5d4039e4e" }
+esp-testkit = { git = "https://www.github.com/merely-made/distillery.git", rev = "66108581b3d2ca66eb42a282eccc8ec5d4039e4e" }
+distillery = { git = "https://www.github.com/merely-made/distillery.git", rev = "66108581b3d2ca66eb42a282eccc8ec5d4039e4e" }
+mere-mesh = { git = "https://www.github.com/merely-made/distillery.git", rev = "66108581b3d2ca66eb42a282eccc8ec5d4039e4e" }

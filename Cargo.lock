@@ -1023,7 +1023,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cffb0e931875b666fc4fcb20fee52e9bbd1ef836fd9e9e04ec21555f9f85f7ef"
 dependencies = [
  "fastrand",
- "gloo-timers 0.3.0",
+ "gloo-timers",
  "tokio",
 ]
 
@@ -1799,7 +1799,6 @@ version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e05d08ef48d738fadf13f8689b634f8b396d5a8cbb27d0a87f61e163d241846"
 dependencies = [
- "aligned-vec",
  "burn-backend",
  "burn-ir",
  "burn-std",
@@ -1807,11 +1806,9 @@ dependencies = [
  "gemm",
  "half",
  "libm",
- "macerator",
  "num-traits",
  "once_cell",
  "portable-atomic",
- "rayon",
 ]
 
 [[package]]
@@ -1916,31 +1913,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "burn-remote"
-version = "0.22.1"
-dependencies = [
- "blake3",
- "burn-backend",
- "burn-ir",
- "burn-router",
- "burn-std",
- "bytes",
- "futures-util",
- "gloo-timers 0.4.0",
- "iroh",
- "log",
- "rand 0.10.3",
- "rmp-serde",
- "serde",
- "serde_bytes",
- "tempfile",
- "tokio",
- "tokio-util",
- "tracing-subscriber",
- "wasm-bindgen-futures",
-]
-
-[[package]]
 name = "burn-rocm"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1949,20 +1921,6 @@ dependencies = [
  "burn-backend",
  "burn-cubecl",
  "cubecl",
-]
-
-[[package]]
-name = "burn-router"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ee6cc0353eb5c0aa07df9150c58887bcebfc55bdfe9476d8036c6be5ec4abdf"
-dependencies = [
- "burn-backend",
- "burn-ir",
- "burn-std",
- "hashbrown 0.16.1",
- "portable-atomic",
- "spin 0.12.3",
 ]
 
 [[package]]
@@ -2698,7 +2656,7 @@ dependencies = [
 [[package]]
 name = "chartulary"
 version = "0.3.0"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "muniment",
  "petgraph 0.8.3",
@@ -4804,33 +4762,22 @@ dependencies = [
 [[package]]
 name = "distillery"
 version = "0.0.1"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=66108581b3d2ca66eb42a282eccc8ec5d4039e4e#66108581b3d2ca66eb42a282eccc8ec5d4039e4e"
 dependencies = [
  "apparatus-core",
  "armillary",
- "burn-backend",
- "burn-flex",
- "burn-ir",
- "burn-remote",
  "cambium",
  "chacha20poly1305 0.11.0",
  "chirograph",
  "eidetic",
  "eidetic-search",
  "esp",
- "esp-testkit",
- "gemot",
- "genet-scripted-dom",
  "graphshell-endpoint",
  "incipit",
  "insigne",
- "iroh",
- "layout-dom-api",
  "mere-mesh",
- "mere-proofs",
  "mere-surface-api",
  "mere-transport",
- "mien",
- "mooting",
  "muniment",
  "notochord",
  "p2panda-core",
@@ -4846,7 +4793,6 @@ dependencies = [
  "serde",
  "serde_json",
  "stickleback",
- "tempfile",
  "thiserror 1.0.69",
  "tokio",
  "tracing",
@@ -5293,7 +5239,7 @@ dependencies = [
 [[package]]
 name = "eidetic"
 version = "0.0.3"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "async-trait",
  "blake3",
@@ -5310,7 +5256,7 @@ dependencies = [
 [[package]]
 name = "eidetic-search"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "eidetic",
  "genet-text",
@@ -5563,7 +5509,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccc5801fd11762e24d1e420d01d2ac518f2a2ca4329d4fbb6639f2412b6204e0"
 dependencies = [
  "enumset_derive",
- "serde",
 ]
 
 [[package]]
@@ -5688,7 +5633,7 @@ checksum = "d817e038c30374a4bcb22f94d0a8a0e216958d4c3dcde369b1439fec4bdda6e6"
 [[package]]
 name = "esp"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/esp.git?rev=9e8a32d43cca0160f7c7924db3764212fb1d9d61#9e8a32d43cca0160f7c7924db3764212fb1d9d61"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=66108581b3d2ca66eb42a282eccc8ec5d4039e4e#66108581b3d2ca66eb42a282eccc8ec5d4039e4e"
 dependencies = [
  "armillary",
  "burn",
@@ -5703,14 +5648,6 @@ dependencies = [
  "tracing",
  "wgpu",
  "zeroize",
-]
-
-[[package]]
-name = "esp-testkit"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=9e8a32d43cca0160f7c7924db3764212fb1d9d61#9e8a32d43cca0160f7c7924db3764212fb1d9d61"
-dependencies = [
- "safetensors 0.4.5",
 ]
 
 [[package]]
@@ -6402,7 +6339,6 @@ dependencies = [
  "paste",
  "pulp",
  "raw-cpuid",
- "rayon",
  "seq-macro",
  "sysctl",
 ]
@@ -6421,7 +6357,6 @@ dependencies = [
  "num-traits",
  "paste",
  "raw-cpuid",
- "rayon",
  "seq-macro",
 ]
 
@@ -6725,7 +6660,7 @@ name = "genet-presenter"
 version = "0.2.0"
 source = "git+https://github.com/merely-made/genet.git?branch=main#ad362723109b7e1738dfce13a625cf1a1b5e9ed1"
 dependencies = [
- "gloo-timers 0.3.0",
+ "gloo-timers",
  "js-sys",
  "netrender",
  "tracing",
@@ -7077,18 +7012,6 @@ name = "gloo-timers"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbb143cf96099802033e0d4f4963b19fd2e0b728bcf076cd9cf7f6634f092994"
-dependencies = [
- "futures-channel",
- "futures-core",
- "js-sys",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "gloo-timers"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "482ce8a491a501da4cd806bd190275363d674f2845005c6ddbd5d3e1dd54495d"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -9942,7 +9865,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 [[package]]
 name = "luggage"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10275,7 +10198,7 @@ dependencies = [
 [[package]]
 name = "mere-fjall"
 version = "2.11.2"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "byteorder",
  "byteview",
@@ -10404,7 +10327,7 @@ dependencies = [
 [[package]]
 name = "mere-lsm-tree"
 version = "2.10.4"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "byteorder",
  "crossbeam-skiplist",
@@ -10427,6 +10350,7 @@ dependencies = [
 [[package]]
 name = "mere-mesh"
 version = "0.0.1"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=66108581b3d2ca66eb42a282eccc8ec5d4039e4e#66108581b3d2ca66eb42a282eccc8ec5d4039e4e"
 dependencies = [
  "blake3",
  "esp",
@@ -10441,10 +10365,8 @@ dependencies = [
  "serde",
  "serde_json",
  "stickleback",
- "tempfile",
  "thiserror 1.0.69",
  "tokio",
- "toml 0.9.12+spec-1.1.0",
 ]
 
 [[package]]
@@ -10538,7 +10460,7 @@ version = "0.0.1"
 [[package]]
 name = "mere-proofs"
 version = "0.1.0"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "blake3",
  "serde",
@@ -11054,7 +10976,7 @@ dependencies = [
 [[package]]
 name = "muniment"
 version = "0.2.1"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "async-trait",
  "blake3",
@@ -16630,7 +16552,7 @@ dependencies = [
 [[package]]
 name = "servitor"
 version = "0.0.3"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "chartulary",
  "insigne",
@@ -17442,7 +17364,7 @@ checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 [[package]]
 name = "stickleback"
 version = "0.1.1"
-source = "git+https://www.github.com/merely-made/eidetic.git?rev=9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5#9fe08ee2c793064fc65a2275c7e3ebe7eb9997c5"
+source = "git+https://www.github.com/merely-made/eidetic.git?rev=1014cf48e1882ff926b55f3509ac3dbf5a5aec8e#1014cf48e1882ff926b55f3509ac3dbf5a5aec8e"
 dependencies = [
  "blake3",
  "futures-util",
@@ -22160,9 +22082,9 @@ version = "0.1.1"
 source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
 
 [[patch.unused]]
-name = "esp"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=9e8a32d43cca0160f7c7924db3764212fb1d9d61#9e8a32d43cca0160f7c7924db3764212fb1d9d61"
+name = "armillary"
+version = "0.1.1"
+source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
 
 [[patch.unused]]
 name = "armillary"
@@ -22170,16 +22092,11 @@ version = "0.1.1"
 source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
 
 [[patch.unused]]
-name = "esp"
-version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=9e8a32d43cca0160f7c7924db3764212fb1d9d61#9e8a32d43cca0160f7c7924db3764212fb1d9d61"
+name = "burn-remote"
+version = "0.22.1"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=66108581b3d2ca66eb42a282eccc8ec5d4039e4e#66108581b3d2ca66eb42a282eccc8ec5d4039e4e"
 
 [[patch.unused]]
-name = "armillary"
-version = "0.1.1"
-source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
-
-[[patch.unused]]
-name = "esp"
+name = "esp-testkit"
 version = "0.1.0"
-source = "git+https://github.com/merely-made/esp.git?rev=9e8a32d43cca0160f7c7924db3764212fb1d9d61#9e8a32d43cca0160f7c7924db3764212fb1d9d61"
+source = "git+https://www.github.com/merely-made/distillery.git?rev=66108581b3d2ca66eb42a282eccc8ec5d4039e4e#66108581b3d2ca66eb42a282eccc8ec5d4039e4e"

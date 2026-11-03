@@ -1,12 +1,16 @@
 # Distillery extraction plan
 
 **Date:** 2026-10-31
-**Status (2026-10-31):** paused in P2. Rulings D1 to D18 recorded. P1 is on Mere main
-(`0874522c`); four of the eleven contract crates are republished (D17); the receiving
-branch `distillery-receive` in the ESP checkout is verified and unpushed. P2 resumes once
-Djinn is slimmed (D18; Armillary's Djinn slimming plan, after capability-door I1). Athanor and Alembic wait for the Alembic lane (D16). P1's graph halves are in
-`pandect`; the atomic write moves to `muniment` (D13); G1 is approved (D14) with the
-publish chain reported before the real publish.
+**Status (2026-11-03):** P2 landed; P3 consumer cutover is in progress under the instruction to move developed
+subsystems out of Mere. The published producer contracts and Djinn slimming
+prerequisites are complete. The existing ESP receiving history is being merged
+on main in a collision worktree; the primary `distillery-receive` checkout is
+preserved. Distillery, compute mesh, probes and their inference patches move now.
+Athanor and Alembic remain held under D16.
+**Receipts:** donor/source and manifest comparison, standalone tests and feature
+checks, Cargo source identities, every actual consumer check, and final pushed
+commits. Retain at most 100 MB in `Code/testing/esp/distillery-extraction-20261103`;
+use the stable ESP and consumer targets, with no isolated Cargo home.
 **Scope:** Distillery, its job and lease layer `mere-mesh`, and the workshop halves of
 Alembic and Athanor leave Mere for the ESP repository, which is renamed `distillery`.
 Distillery becomes a producer: it keeps its own surfaces and speaks only the published
@@ -195,8 +199,8 @@ in its lock; history is preserved.
 
 ### P3. Rename and cut over
 
-Rename `merely-made/esp` to `merely-made/distillery`. Mere takes `distillery`, `mere-mesh`,
-`mere-athanor` and `mere-alembic` from `distillery.git` at one revision and patches the
+Rename `merely-made/esp` to `merely-made/distillery`. Mere takes `distillery` and `mere-mesh` from `distillery.git` at one revision
+(Athanor and Alembic remain in Mere under D16) and patches the
 contract crates from crates.io to its paths. Sweep the six consumers named in D4. Remove
 the donor directories.
 
@@ -264,3 +268,22 @@ pass; changes are committed in each repository.
   workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a
   `--config` patch). pandect's 21 moved and dependent tests and Alembic/Athanor's 23
   pass.
+
+- 2026-11-03: P2 resumes. Dramatis now owns the reusable resident identity service;
+  Distillery receiving follows the current cleanup direction. The original filtered
+  history is merged with current ESP main. Standalone default tests, actor tests,
+  and all-feature/all-target compilation pass. Probe intake also repairs old paths
+  and updates unconstrained generation requests to the current ESP API. The
+  browser probe owns its module constructor guard rather than depending on a
+  whole unpublished Cambium host for that helper. Cubek's carried browser repair
+  follows the probes; its historical receipts are retained unchanged.
+
+- 2026-11-03: P2 landed in the renamed Distillery repository. The source cut
+  removes the two Mere workspace members, their probes and inference patches;
+  graph/host composition uses external `distillery` and `mere-mesh` dependencies.
+  Mere patches published producer contracts to its own paths so runtime type
+  identities stay singular. A separate, previously broken lexical wasm probe
+  moves beside its codec and again agrees with the native pinned digest.
+  Isocosm is an additional actual ESP consumer beyond D4's original six. Its
+  independent roots are included in the receiving sweep. The original ESP
+  receiving branch remains untouched; a collision worktree holds main.

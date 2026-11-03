@@ -37,8 +37,18 @@ These are implementation boundaries, not a claim that all moves have landed.
 Upstream module descriptions: [p2panda](https://p2panda.org/) and
 [access-control CRDT](https://p2panda.org/2025/08/27/notes-convergent-access-control-crdt.html).
 
-Current execution: Dramatis's D15 extracts the reusable resident identity
-service first. The remaining domain moves and each p2panda module integration
+Current code inventory (2026-11-03): Gemot already has the p2panda-auth group
+CRDT adapter in `crates/gemot/src/moot/group.rs` and its wire/store modules.
+Eidetic's Stickleback already owns the signed-operation store and carrier-neutral
+p2panda group-encryption engine (`group_crypto.rs`); Gemot supplies membership
+and ordered control facts. The remaining transport ownership issue is concrete:
+Stickleback defaults its `net` feature on and links p2panda-net/sync there.
+This cleanup must factor that existing engine through Murm, preserving the
+accepted-history and policy-before-insert boundary, rather than build a second
+replication implementation. A manifest entry alone is not module acceptance.
+
+Current execution: Dramatis's D15 has extracted the reusable resident identity
+service. The remaining domain moves and each p2panda module integration
 keep their owner plans and must carry source-qualified receiving evidence.
 
 ## Constraints

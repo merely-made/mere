@@ -71,7 +71,7 @@ const PASSPHRASE: &[u8] = b"mere-distillery-chronicle-receipt-host";
 const DELEGATION_TTL_MS: u64 = 60 * 60 * 1000;
 const CHRONICLE_BINDING_RECEIPT_SCHEMA: &str = "mere.chronicle-binding-receipt/1";
 const DISTILLERY_BOARD_FIXTURE: &str =
-    include_str!("../../../distillery/tests/fixtures/chronicle/distillery_board.json");
+    include_str!("../../tests/fixtures/distillery_board.json");
 
 #[derive(Deserialize)]
 struct ChronicleFixture {

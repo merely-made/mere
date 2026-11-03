@@ -4,7 +4,7 @@
 **Status:** findings, read at Mere `d4d5b0c32` (`cargo metadata` over the
 workspace) and at the 2026-10-28 `main` of Murm, Gemot, Eidetic, ESP, Isocosm,
 Knot, Turnstone, Cleromancy and Woodshed (their manifests' Mere dependencies).
-Nothing has moved yet. This is the dependency evidence that the family promotion
+The inventory below records that original survey; the dated ownership update records later moves. This is the dependency evidence that the family promotion
 plan's F3 asks for before it chooses a grouping
 ([family promotion plan](../implementation_strategy/2026-10-28_family_promotion_plan.md)).
 [What the code adds](#what-the-code-adds) comes from reading every package's
@@ -73,6 +73,13 @@ D14 moves the custodian and custody-wire there too. The resident composition
 remains in Mere. D15 also moves the reusable resident identity service into `dramatis-resident`;
 Mere retains its graph-door and platform-dialog adapters. The grants template is now
 `repos/dramatis/crates/djinn-custodian/packaging/djinn-grants.json.in`.
+Distillery and its compute mesh now live in the renamed Distillery repository,
+with the model probes, lexical wasm probe and their inference patches. Their
+core uses the published producer contracts and has no Mere source dependency.
+Mere composes those Git dependencies and keeps concrete graph/host adapters.
+Athanor and Alembic remain held by extraction-plan D16. The earlier candidate
+row and source paths below retain their original audit basis; the current
+cutover and remaining work are in the Distillery extraction plan.
 
 ## What the code adds
 

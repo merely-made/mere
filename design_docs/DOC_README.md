@@ -1,4 +1,11 @@
-Resident identity extraction (2026-11-03), in progress: Dramatis D15 now owns
+Distillery extraction (2026-11-03), receiving qualified and consumer cutover
+in progress: [canonical plan](mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md).
+Distillery, compute mesh, probes and inference patches leave Mere; graph/host
+composition stays here. Athanor and Alembic retain their D16 hold. The plan's
+[receipts](archive_docs/receipts/2026-10-31_distillery_extraction_plan_receipts.md)
+record source preservation, standalone checks and exact consumer cohorts.
+
+Resident identity extraction (2026-11-03), landed: Dramatis D15 now owns
 the reusable startup, profile, custody and identity service. Mere keeps graph
 projections, door registration and concrete platform dialogs. The broader
 subsystem/p2panda ownership map is in the family promotion plan's

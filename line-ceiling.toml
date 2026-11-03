@@ -714,34 +714,6 @@ path = "crates/mere/src/roster.rs"
 reason = "Neutral roster snapshot vocabulary and pure helpers, shared by host data builders and views. Existing source-size debt; a responsibility split must preserve RosterTab, RosterSubject, FacetSubject and existing module visibility."
 
 [[exception]]
-path = "crates/mesh/mesh/src/board.rs"
-reason = "The job board — a deterministic, order-independent fold of mesh operations. Existing source-size debt; a responsibility split must preserve JobId, JobState, Job and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/lease.rs"
-reason = "Lease vocabulary: the facts a lending device signs, and what the fold keeps. Existing source-size debt; a responsibility split must preserve LeaseId, LeaseTerms, LeaseTermsError and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/registry.rs"
-reason = "The one registry, and the one route from a job to its committed output. Existing source-size debt; a responsibility split must preserve ResourceRegistry, RegistryError, RunError and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/remote.rs"
-reason = "Lease-bound authority for a remote compute session. Existing source-size debt; a responsibility split must preserve RemoteSessionClaim, RemoteAdmission, RemoteClaimError and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/store.rs"
-reason = "The mesh's store of record — muniment behind the p2panda-store adapter. Existing source-size debt; a responsibility split must preserve MeshStoreError, StoredCheckpoint, MeshPolicy and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/sync.rs"
-reason = "Mesh sync over LogSync — the personal space's job log, replicated. Existing source-size debt; a responsibility split must preserve MeshSyncError, SyncedMesh and existing module visibility."
-
-[[exception]]
-path = "crates/mesh/mesh/src/worker.rs"
-reason = "The worker's decision function. Existing source-size debt; a responsibility split must preserve HostOffer, WorkerAction and existing module visibility."
-
-[[exception]]
 path = "crates/nematic/nematic/src/html.rs"
 reason = "Reader-mode HTML fragment engine. Existing source-size debt; a responsibility split must preserve HtmlFragmentEngine, Converter and existing module visibility."
 
@@ -937,78 +909,6 @@ reason = "Native worker pump shared by application owners. Existing source-size 
 [[exception]]
 path = "ports/distillery/athanor/src/workshop_sealed_destination.rs"
 reason = "Private evidence briefs in the graph owner's existing snapshot transaction. Existing source-size debt; a responsibility split must preserve Routing, Envelope, Preparation and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/probe/remote-fixture/src/main.rs"
-reason = "Src main. Existing source-size debt; a responsibility split must preserve Works, NoCustody, ActiveRun and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/probe/repros/burn_browser_embedding/src/lib.rs"
-reason = "Headed BrowserWebGpu reproducer for Burn embedding and shared-input binary graphs. Existing source-size debt; a responsibility split must preserve EmbeddingCaseReceipt, EmbeddingReceipt, GraphCaseReceipt and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/probe/session-fixture/src/main.rs"
-reason = "Src main. Existing source-size debt; a responsibility split must preserve ArtifactReceipt, PublishedCheckpointAudit, NumericalReceipt and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/probe/src/lib.rs"
-reason = "Machine-readable browser-model probe used by Distillery's D2 evidence lane. Existing source-size debt; a responsibility split must preserve RunMode, WorkloadKind, ProbeConfig and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/probe/web/probe.js"
-reason = "Probe. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "ports/distillery/src/chronicle.rs"
-reason = "A read-only Chronicle projection of a Distillery job board. Existing source-size debt; a responsibility split must preserve ChronicleRevision, ChronicleEndpointError, ChronicleShelfmarkError and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/flora.rs"
-reason = "Exact federated-LoRA (FLoRA) factor stacking. Existing source-size debt; a responsibility split must preserve FloraWeight, FloraContribution, FloraRequest and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/inference.rs"
-reason = "The resident inference lane: one esp inference actor behind an application route (resident inference and recall plan, I1). Existing source-size debt; a responsibility split must preserve RunV1, InferenceRunsV1, InferenceLaneError and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/inference/answer_contract.rs"
-reason = "A bounded, reproducible task contract. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "ports/distillery/src/inference/durable.rs"
-reason = "Signed, encrypted private ask logs over the resident's existing p2panda endpoint. Existing source-size debt; a responsibility split must preserve RunExt, RunGroupProtection, Policy and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/inference/recall.rs"
-reason = "Version-checked lexical recall; source owners retain storage and authority. Existing source-size debt; a responsibility split must preserve RecallCorpus, AdmittedCorpus, ObservedSources and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/inference_stage.rs"
-reason = "Layer-stage work on the resident's shared iroh endpoint. Existing source-size debt; a responsibility split must preserve StageRequest, StageSettings, StageRuntime and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/mesh_host/host.rs"
-reason = "The supervisor: one tick, and everything it is allowed to do. Existing source-size debt; a responsibility split must preserve BlobSpace, HostConfig, Step and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/remote.rs"
-reason = "Burn Remote as a lease-bound Distillery resource. Existing source-size debt; a responsibility split must preserve RemoteSessionSettings, RemoteSessionError, RunKey and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/src/trainer.rs"
-reason = "The trainer resource: one mesh job that trains and publishes a LoRA adapter under the artifact shape the trainer forcing receipt decided (distillery v0 plan §9). Existing source-size debt; a responsibility split must preserve TrainerSettings, AdapterShape, TrainRequest and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/tests/inference_stages.rs"
-reason = "Inference stages. Existing source-size debt; a responsibility split must preserve Library, Departure, Profile and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/tests/trainer.rs"
-reason = "The trainer resource receipt: one real mesh job runs a LoRA trainer end to end, once per arm. Existing source-size debt; a responsibility split must preserve TrainerRun and existing module visibility."
-
-[[exception]]
-path = "ports/distillery/tests/walk_fixtures.rs"
-reason = "W0 receipt: the projection walk's two second datasets, plus the bare headless scenario that drives the installed surface end to end. Existing source-size debt; a responsibility split must preserve TickRecord, ChronicleFixture, Device and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/mere/src/app_tests.rs"
