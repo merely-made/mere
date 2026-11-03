@@ -682,7 +682,7 @@ G5 S3/S4 in `genet/docs/2026-06-11_gc_arena_dom_plan.md`.
 
 **Consumers:** ~70 runtime conversion sites narrowing `ReflectorData` via
 `as usize` (S3 receipt); Boa/Nova reflector caches
-(`genet/design_docs/2026-09-08_realms_plan.md`, "Corrected findings": *"Boa's
+(`genet/design_docs/archive_docs/2026-11-03/2026-09-08_realms_plan.md`, "Corrected findings": *"Boa's
 old context-wide reflector cache could alias equal raw node IDs from
 different arenas in release builds. Debug arena tags concealed that case."* —
 now scoped per-realm in that plan's continuation).
