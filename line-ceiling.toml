@@ -869,9 +869,6 @@ reason = "The reservoir: every mere a persona holds, one per data domain. Existi
 path = "crates/system/pandect/src/snapshot_merge.rs"
 reason = "Snapshot-level merge for codicil compose (Alembic tail B7 / decision 1). Existing source-size debt; a responsibility split must preserve MergeReport and existing module visibility."
 
-[[exception]]
-path = "crates/system/pandect/src/station_grant.rs"
-reason = "Narrow, expiring RemoteAuth grants for sited Reticulum stations. Existing source-size debt; a responsibility split must preserve SitedStationGrantRequest, SitedStationGrant, SitedStationGrantError and existing module visibility."
 
 [[exception]]
 path = "crates/system/pandect/src/view_intent_store.rs"
@@ -1213,9 +1210,6 @@ reason = "The \"Graph tools\" region's remote session section, and where the tre
 path = "ports/graphshell/web/styles.css"
 reason = "Styles. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
-[[exception]]
-path = "ports/mere-resident/custodian/src/core.rs"
-reason = "The custodian's state machine, without I/O. Existing source-size debt; a responsibility split must preserve SessionId, Effects, Prompt and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/src/bin/c1_receipt_host.rs"

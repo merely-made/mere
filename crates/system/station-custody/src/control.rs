@@ -17,7 +17,7 @@ use std::fmt;
 use insigne::CheckFault;
 use insigne::DerivedKeyAttestation;
 use p2panda_core::cbor::{decode_cbor, decode_cbor_strict, encode_cbor};
-use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
+use sporran::station_grant::{SitedStationGrant, SitedStationGrantError};
 use sporran::{DeviceGrantError, decode_device_grant_set, encode_device_grant_set};
 use personae::carry::DeviceId;
 use personae::{

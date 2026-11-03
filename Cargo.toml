@@ -72,8 +72,6 @@ members = [
     "ports/graphshell/mere",
     "ports/mere-resident",
     "ports/dramatis",
-    "ports/mere-resident/custodian",
-    "ports/mere-resident/custodian/wire",
     "ports/distillery",
     "ports/moot",
     "ports/distillery/athanor",
@@ -299,6 +297,8 @@ knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-
 # `keeper` identity surface graphshell re-exports.
 castellan = { version = "0.0.4", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 sporran = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+custody-wire = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+djinn-custodian = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The model-works port; first real consumer of the mesh host supervisor.
 distillery = { version = "0.0.1", path = "ports/distillery" }
 # The places port: one port, two surfaces (murmur = conversation, moot =
@@ -764,6 +764,8 @@ uxtree = { path = "crates/forme/uxtree" }
 workbench = { path = "crates/cambium/workbench" }
 
 [patch.crates-io]
+# The custody contract and resident use the same OS peer fact types.
+peer-facts = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 # Registry custody clients and Git-hosted Djinn share the same door types.
 ostiary = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 # Schema-owned complete NodeId traversal for native publication namespaces.

@@ -67,6 +67,12 @@ each package's coupling measured in files.
 | `document-host`, `ux-events` | nothing | nothing in the nine repositories read | — | — | Workspace members with no consumer. |
 | `support/graphshell-coop/relay_server`, `support/patches/burn-remote`, `crates/probes/murm-direct-phy` | the co-op harness; Distillery `remote` | — | — | The relay and the Burn patch: murm `design_docs/2026-10-28_transport_consolidation_plan.md`, T5 and T4. The probe: Murm. | Transport plan. |
 
+**2026-11-03 ownership update:** the table retains its original audit basis.
+Castellan, Sporran and Gazette's domain now live in Dramatis (D11-D13), and
+D14 moves the custodian and custody-wire there too. The resident composition
+remains in Mere. The grants template is now
+`repos/dramatis/crates/djinn-custodian/packaging/djinn-grants.json.in`.
+
 ## What the code adds
 
 On 2026-10-28, eleven readers went through the code of the whole stack: every
@@ -142,7 +148,7 @@ every copy is one more edge for a move to carry.
   - The custody plan says a forwarded label never grants scope, and that
     releasable-salt permission becomes per-principal grants. The code differs:
     - Every installer defines one principal, `djinn`.
-    - Its grants (`custodian/packaging/djinn-grants.json.in`) are the union of
+    - Its grants (`repos/dramatis/crates/djinn-custodian/packaging/djinn-grants.json.in`) are the union of
       every app's salts.
     - They repeat Djinn's `ReleasePolicy` (`ports/mere-resident/src/custody.rs`). One
       test is the only check that the two agree.

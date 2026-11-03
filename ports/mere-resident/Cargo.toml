@@ -108,7 +108,7 @@ chatelaine.workspace = true
 # `os-presence`: the resident's own unlock prompt asks Windows Hello first
 # (vault lock ruling 47); it moved from personae with custody (DR-B).
 castellan = { workspace = true, features = ["keeper", "os-presence"], optional = true }
-djinn-custodian = { path = "custodian", optional = true }
+djinn-custodian = { workspace = true, optional = true }
 chirograph.workspace = true
 # Divination replay authority is supplied by the product's portable package;
 # the native Cleromancy executable may itself embed Djinn without a crate cycle.
@@ -155,7 +155,7 @@ mesh.workspace = true
 insigne = { workspace = true, features = ["verify"] }
 # The custody contract: Djinn is a client of its independently launched
 # custodian (custody isolation plan, H1). No castellan comes with it.
-custody-wire = { path = "custodian/wire" }
+custody-wire.workspace = true
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
@@ -299,7 +299,7 @@ djinn-testkit = { path = "../../crates/system/djinn-testkit" }
 insigne = { workspace = true, features = ["verify"] }
 # The custody isolation tests run Djinn's client against a real custodian,
 # served from a test thread over a synthetic vault.
-djinn-custodian = { path = "custodian", features = ["fixture"] }
+djinn-custodian = { workspace = true, features = ["fixture"] }
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
 # so the test names safetensors (and eidetic, which production names too since

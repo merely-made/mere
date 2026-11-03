@@ -17,7 +17,7 @@ Not here:
 - the pairing receipts (D1 and D1b) that run on this harness, and the legacy launcher's retirement at D2's switch (ruling
   12): `2026-10-28_device_pairing_plan.md`;
 - the lock's receipts and the parked Secret Service design whose receipt needs a harness-owned bus (control C6):
-  `2026-10-28_custody_plan.md`.
+  `repos/dramatis/design_docs/2026-10-28_custody_plan.md`.
 
 Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
 plan (DOC_POLICY §8). Evidence that matters is a test in the repository or a

@@ -19,7 +19,7 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use outrider::LxmfPayload;
-use pandect::station_grant::{SitedStationGrant, SitedStationGrantError, SitedStationGrantRequest};
+use sporran::station_grant::{SitedStationGrant, SitedStationGrantError, SitedStationGrantRequest};
 use personae::carry::{DeviceId, RemoteAuthRevocationOutcome};
 use personae::reticulum::{ReticulumControllerMaterial, ReticulumStationMaterial};
 use personae::{IdentityError, IdentityProvider, SealedRecordStorage};

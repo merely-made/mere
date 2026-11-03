@@ -16,7 +16,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use pandect::station_grant::{SitedStationGrant, SitedStationGrantError};
+use sporran::station_grant::{SitedStationGrant, SitedStationGrantError};
 use personae::carry::{DeviceId, RemoteAuthRevocationOutcome};
 
 use crate::authority::StationAuthority;

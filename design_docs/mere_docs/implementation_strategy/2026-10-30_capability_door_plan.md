@@ -513,7 +513,7 @@ flight. Browser native messaging stays JSON, as Chrome requires.
 Next (D4). The door now lives in Armillary's `djinn` crate, so this phase
 works in two repositories, Armillary first. Its first step extracts the OS
 peer facts into one small Armillary crate (D7): `custody-wire`'s `Peer`
-(`ports/mere-resident/custodian/wire/src/peer.rs`, 246 lines) and the door's
+(`repos/dramatis/crates/custody-wire/src/peer.rs`, 246 lines) and the door's
 same-user check (`crates/djinn/src/door/local_endpoint.rs:300-345`).
 - Done when: the door records each connection's OS peer facts; outside
   development mode it refuses a label that disagrees with them, on macOS
@@ -641,10 +641,10 @@ error types settle.
 - 2026-10-30: `custody-wire`'s `Peer` already reads OS peer facts:
   `SO_PEERCRED`, `getpeereid` and `LOCAL_PEERPID`, a macOS audit token checked
   against the code signature's team and identifier, and a Windows pipe
-  client's process and image (`ports/mere-resident/custodian/wire/src/peer.rs`). The
+  client's process and image (`repos/dramatis/crates/custody-wire/src/peer.rs`). The
   custodian's policy records a Windows image match as "the same-user posture
   of a polkit authentication agent, not an OS-held identity"
-  (`ports/mere-resident/custodian/src/policy.rs:96-108`). Its Linux platform hands a
+  (`repos/dramatis/crates/djinn-custodian/src/policy.rs:96-108`). Its Linux platform hands a
   child it forks one end of a socket pair (`platform/linux.rs:268`), the
   launch-handle shape D2 uses.
 - 2026-10-30: `mere:script@0.1.0` has two worlds, `app-core` and

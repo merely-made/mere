@@ -21,7 +21,7 @@ Not here:
   despite the browser host's TOFU;
 - the Djinn update resident (phases A to G), the entry gate, and the open strict-Clippy and fixture-failure items on the
   Djinn port: `2026-10-28_family_update_resident_plan.md`;
-- confinement of the publication worker (the tier 3 publication role): `2026-10-28_custody_plan.md`;
+- confinement of the publication worker (the tier 3 publication role): `repos/dramatis/design_docs/2026-10-28_custody_plan.md`;
 - the native Scroll supplier plan (`smolweb/design_docs/implementation_strategy/2026-10-21_native_scroll_server_plan.md`)
   and Errand's client-limits plan (`.../2026-10-22_client_limits_plan.md`): buffered smolweb allocation limits,
   standalone session follow-ups, caller-configurable client bounds and the 4096-byte response-line cap;
@@ -132,7 +132,7 @@ availability separately and retaining bytes grants neither editing rights nor de
 - Done when: not set by the sources; they fix the shape: selection by hash under a lease, permission rechecked on restart
   and on every authority change with refusal after revocation or expiry, a saved ordinary site still served with no moot,
   and acceptance on two machines.
-- Needs: P1 item 6; Gemot's production records; `2026-10-28_custody_plan.md` for the worker's confinement
+- Needs: P1 item 6; Gemot's production records; `repos/dramatis/design_docs/2026-10-28_custody_plan.md` for the worker's confinement
 - Rulings: -
 - From: `archive_docs/2026-10-28/2026-08-22_djinn_family_resident_services_plan.md:551-569,694-702`; `archive_docs/2026-10-28/2026-10-20_shared_site_model_plan.md:25-27,296-298,316-318,679-680,694-696`
 

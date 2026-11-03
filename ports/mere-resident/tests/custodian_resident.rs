@@ -43,7 +43,7 @@ fn a_resident_with_a_custodian_opens_no_vault_and_follows_its_lock() {
     std::fs::write(&settings, r#"{"reservoir":{"enabled":false}}"#).unwrap();
 
     let grants: serde_json::Value = serde_json::from_str(
-        &include_str!("../custodian/packaging/djinn-grants.json.in")
+        &djinn_custodian::fixture::DJINN_GRANTS_TEMPLATE
             .replace("@CONSENT@", "none")
             .replace("@SIGN_CONSENT@", "none"),
     )

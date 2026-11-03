@@ -16,7 +16,7 @@ Not here:
 - DNS-SD (the Djinn update resident's F3): it is unbuilt and would not help SSH, since service records are link-local claims
   rather than identity; `2026-10-28_family_update_resident_plan.md`;
 - the custody rules the principal, session and key flows must compose with, and the Secret Service design that waits on D2's
-  launcher: `2026-10-28_custody_plan.md`; the LAN SSH and presence receipts do not complete D3 to D6;
+  launcher: `repos/dramatis/design_docs/2026-10-28_custody_plan.md`; the LAN SSH and presence receipts do not complete D3 to D6;
 - the Djinn self-update launcher: `2026-10-28_family_update_resident_plan.md` phase D;
 - alternative overlays (Tailscale with Headscale, Nebula): considered on 2026-10-12 and not installed in this slice; D3
   (Djinn and Iroh) is the stack-owned transport slice;

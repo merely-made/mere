@@ -23,7 +23,7 @@ use castellan_client::custody_client::{BlockingCustodyClient, CustodyClientError
 use ostiary::declaration::{
     AppDeclaration, CustodyOperation, CustodyUse, NamePattern, SaltPattern, SaltUse,
 };
-use pandect::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
+use sporran::station_grant::{SitedStationGrantError, SitedStationGrantRequest};
 use personae::RetainedKeys;
 use personae::carry::{DeviceGrantSet, DeviceId, RemoteAuthRevocationOutcome};
 
@@ -225,7 +225,7 @@ pub(crate) mod test_support {
 
     use std::path::{Path, PathBuf};
 
-    use pandect::station_grant::SitedStationGrant;
+    use sporran::station_grant::SitedStationGrant;
     use sporran::wallet_grant::upsert_remote_auth_device_record;
     use sporran::{DeviceRoster, load_device_roster, revoke_device_certificates, save_device_grant_set, save_device_roster};
     use personae::{IdentityProvider, InMemoryProvider};

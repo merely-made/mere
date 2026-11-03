@@ -23,7 +23,7 @@ the gloss host and swatch visibility stack that lineage P4 needs
 (`2026-10-28_graph_view_curation_plan.md`); ownership repair lanes L2 (projections), L3 (saved
 versus live content), L5 (transport admission) and L6 (receipts), the routing of the audit's
 unrepaired findings and the start order of L2-L5 (`2026-10-28_source_audit_repairs_plan.md`); L4,
-custody lifetimes (`2026-10-28_custody_plan.md`); L6's djinn-testkit slice, Q052 and Q054
+custody lifetimes (`repos/dramatis/design_docs/2026-10-28_custody_plan.md`); L6's djinn-testkit slice, Q052 and Q054
 (`2026-10-28_djinn_test_harness_plan.md`). Vendored GPU patches go to the upstream candidates
 ledger, outside every plan (Mark).
 

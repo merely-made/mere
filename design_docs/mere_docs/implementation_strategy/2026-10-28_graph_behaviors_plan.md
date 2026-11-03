@@ -21,7 +21,7 @@ Not here: the workshop composition and the first retained-passage evidence-brief
 Turnstone and Graphshell (`2026-10-28_alembic_implementation_plan.md`; R2 and R3 do not gate it);
 projection-tier rules such as nearby refresh, staleness badges and rollup counts, which field
 regions own (`2026-10-28_dynamics_grammar_plan.md`); Servitor itself, which stays in Eidetic
-(Alembic D8); custody's signing and lock contract (`2026-10-28_custody_plan.md`); cross-app and
+(Alembic D8); custody's signing and lock contract (`repos/dramatis/design_docs/2026-10-28_custody_plan.md`); cross-app and
 peer-carried triggers across murm or retinue, which the source calls "its own future plan" (not yet
 written), with the cross-app woodshed practice-event row placed in the murm lane and out of scope.
 

@@ -26,7 +26,7 @@ Not here: Servitor's admission and run semantics and the later R2 and R3 contrac
 (`2026-10-28_projection_grammar_plan.md`, whose W5 waits on this plan's workshop emitting runs); the
 event log and Timeline of old slice E, superseded by `GraphJournal` and the source-time scrubber
 (`2026-10-28_graph_view_curation_plan.md`); the LoRA lane (the local models harness brief and
-`2026-10-28_distillery_models_plan.md`); custody for private rows (`2026-10-28_custody_plan.md`).
+`2026-10-28_distillery_models_plan.md`); custody for private rows (`repos/dramatis/design_docs/2026-10-28_custody_plan.md`).
 
 Receipts from this plan's runs go to `archive_docs/<date>/`, never into this plan (DOC_POLICY §8).
 Evidence that matters is a test in the repository or a line in Findings.

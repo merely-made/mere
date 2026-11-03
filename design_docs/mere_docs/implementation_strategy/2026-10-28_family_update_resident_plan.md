@@ -21,7 +21,7 @@ Not here:
 - Tucket and Sennet custody, consumer nonce reservations and the radio gates: Murm's family move plan (R6 to R8,
   `murm/design_docs/2026-11-02_murm_family_move_plan.md`) and `2026-10-28_murm_runtime_plan.md`;
 - observation and action gates: `2026-10-28_family_promotion_plan.md`; the custody process boundary and the resident's
-  three authority tiers: `2026-10-28_custody_plan.md`;
+  three authority tiers: `repos/dramatis/design_docs/2026-10-28_custody_plan.md`;
 - the fleet rollout of the resident, its Linux launcher and the Windows switch from the legacy host:
   `2026-10-28_device_pairing_plan.md`;
 - the rest of H4's follow-ons (native Firefox key import, macOS and Linux dialog providers, a configured carry root,
