@@ -126,7 +126,7 @@ fn incomplete_wallet_is_refused_without_reseeding() {
     host.stop();
     let data = root.path().join("custodian/data");
     let persona = PersonaId::from_uuid(uuid::Uuid::from_u128(0xe1de_2026_1019));
-    let missing = pandect::wallet_store::persona_wallet_path(&data, persona);
+    let missing = sporran::wallet_store::persona_wallet_path(&data, persona);
     let saved = std::fs::read(&missing).unwrap();
     std::fs::remove_file(&missing).unwrap();
     let before = files(&data);

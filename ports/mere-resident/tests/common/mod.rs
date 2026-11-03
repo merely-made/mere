@@ -36,7 +36,7 @@ use castellan::custody::IdentityVault;
 use castellan::custody::bootstrap::{self, Unlock};
 use mere_resident::resident::DjinnResident;
 use mere_resident::settings::{DistilleryLaneSettings, OwnerSettings};
-use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
+use sporran::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
 use personae::ProfileId;
 
 pub const PASSPHRASE: &[u8] = b"djinn-distillery-lane-receipt-passphrase";
@@ -162,7 +162,7 @@ pub fn lane() -> DistilleryLaneSettings {
 }
 
 pub fn write_device_settings(data_root: &Path, mesh_lending: Option<MeshLendingSettings>) {
-    pandect::save_device_settings(
+    sporran::save_device_settings(
         data_root,
         &DeviceSettings {
             mesh_lending,

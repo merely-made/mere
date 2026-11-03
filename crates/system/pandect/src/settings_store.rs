@@ -22,7 +22,7 @@ use kernel::permissions::Permission;
 use serde::{Deserialize, Serialize};
 
 use crate::application_settings_store::{ApplicationSettings, ShellbarEdge};
-use crate::device_settings_store::DeviceSettings;
+use sporran::device_settings_store::DeviceSettings;
 
 /// Filename for the session-wide settings sidecar (sibling to `graph.json`).
 pub const SETTINGS_FILENAME: &str = "settings.json";

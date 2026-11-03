@@ -263,8 +263,8 @@ impl<S: IdentityStorage + 'static> ResidentCustody for PersonaeHost<S> {
 
     fn wallet_public(&self, wallet_root: &Path) -> Result<WalletPublic, CustodyRefusal> {
         Ok(WalletPublic {
-            personas: pandect::wallet_store::list_personas(wallet_root).map_err(failed)?,
-            roster: pandect::wallet_store::load_device_roster(wallet_root).map_err(failed)?,
+            personas: sporran::wallet_store::list_personas(wallet_root).map_err(failed)?,
+            roster: sporran::wallet_store::load_device_roster(wallet_root).map_err(failed)?,
         })
     }
 

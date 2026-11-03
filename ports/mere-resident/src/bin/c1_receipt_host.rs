@@ -59,7 +59,7 @@ fn provision_ordinary(root: &std::path::Path) -> Result<serde_json::Value, Strin
     let persona = fixture_persona();
     let shared = root.join("shared");
     let vault = root.join("ordinary-vault");
-    let known = pandect::wallet_store::list_personas(&shared).map_err(|e| e.to_string())?;
+    let known = sporran::wallet_store::list_personas(&shared).map_err(|e| e.to_string())?;
     if known.iter().any(|id| *id != persona) {
         return Err("public fixture provisioning refuses another persona wallet".into());
     }
@@ -67,12 +67,12 @@ fn provision_ordinary(root: &std::path::Path) -> Result<serde_json::Value, Strin
     if previous_seed.is_some_and(|seed| seed != PUBLIC_SEED) {
         return Err("public fixture provisioning refuses another identity seed".into());
     }
-    if previous_seed.is_none() && pandect::wallet_store::identity_seed_path(&shared).exists() {
+    if previous_seed.is_none() && sporran::wallet_store::identity_seed_path(&shared).exists() {
         return Err("public fixture provisioning refuses an unreadable existing seed".into());
     }
-    let chain = pandect::wallet_store::derive_persona_chain_root(PUBLIC_SEED, persona)
+    let chain = sporran::wallet_store::derive_persona_chain_root(PUBLIC_SEED, persona)
         .map_err(|e| e.to_string())?;
-    if pandect::wallet_store::load_persona_wallet(&shared, persona)
+    if sporran::wallet_store::load_persona_wallet(&shared, persona)
         .map_err(|e| e.to_string())?
         .is_some_and(|wallet| wallet.chain_root != chain)
     {
@@ -115,7 +115,7 @@ fn provision_ordinary(root: &std::path::Path) -> Result<serde_json::Value, Strin
     {
         return Err("typed fixture wallet bootstrap returned another identity seed".into());
     }
-    if pandect::wallet_store::resolve_persona(&shared, None).map_err(|e| e.to_string())? != persona
+    if sporran::wallet_store::resolve_persona(&shared, None).map_err(|e| e.to_string())? != persona
     {
         return Err("fixture wallet did not resolve the exact public persona".into());
     }

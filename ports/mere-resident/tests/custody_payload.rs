@@ -265,12 +265,12 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
     })
     .await
     .unwrap();
-    let mut wallet = pandect::wallet_store::load_persona_wallet(root.path(), persona)
+    let mut wallet = sporran::wallet_store::load_persona_wallet(root.path(), persona)
         .unwrap()
         .unwrap();
     let previous_head = wallet.private_epoch_head;
-    wallet.private_epoch_head = pandect::KeyEpochId::new();
-    pandect::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
+    wallet.private_epoch_head = sporran::KeyEpochId::new();
+    sporran::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
     assert!(matches!(
         client.call(CustodyCall::Payload(request.clone())).await,
         Err(CustodyClientError::Refused(CustodyRefusal::Locked))
@@ -280,8 +280,8 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         "historical reads do not require an available writing head"
     );
     wallet.private_epoch_head = previous_head;
-    pandect::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
-    wallet.private_epoch_head = pandect::KeyEpochId::new();
+    sporran::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
+    wallet.private_epoch_head = sporran::KeyEpochId::new();
     castellan::custody::wallet::stage_persona_private_epoch(
         root.path(),
         persona,
@@ -289,7 +289,7 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
         b"rotated retained fixture epoch",
     )
     .unwrap();
-    pandect::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
+    sporran::wallet_store::save_persona_wallet(root.path(), &wallet).unwrap();
     let (reader, new_marker) = tokio::task::spawn_blocking(move || {
         assert_eq!(
             reader.unseal(&Hash::of(clear), &marker, &bytes.0).unwrap(),
@@ -375,7 +375,7 @@ fn retained_custody_receipt_host() {
         castellan::custody::wallet::ensure_wallet_state(&fixture.data_root, persona, "Retained process fixture").unwrap();
         std::fs::write(state.join("initialized"), b"receipt-fixture-v1\n").unwrap();
     } else {
-        use pandect::wallet_store as store;
+        use sporran::wallet_store as store;
         let data = &fixture.data_root;
         assert!(castellan::custody::wallet::load_identity_seed_read_only(data).unwrap().is_some(), "missing wallet seed");
         let identity = store::load_identity_wallet(data).unwrap().expect("missing identity wallet");

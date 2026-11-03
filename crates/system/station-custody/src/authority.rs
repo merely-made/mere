@@ -226,11 +226,8 @@ pub(crate) mod test_support {
     use std::path::{Path, PathBuf};
 
     use pandect::station_grant::SitedStationGrant;
-    use pandect::wallet_grant::upsert_remote_auth_device_record;
-    use pandect::{
-        DeviceRoster, load_device_roster, revoke_device_certificates, save_device_grant_set,
-        save_device_roster,
-    };
+    use sporran::wallet_grant::upsert_remote_auth_device_record;
+    use sporran::{DeviceRoster, load_device_roster, revoke_device_certificates, save_device_grant_set, save_device_roster};
     use personae::{IdentityProvider, InMemoryProvider};
 
     use super::*;

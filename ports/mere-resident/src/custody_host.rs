@@ -163,7 +163,7 @@ pub struct WalletPublic {
     /// The personas that hold a wallet manifest, sorted by UUID.
     pub personas: Vec<PersonaId>,
     /// The device roster, absent when the wallet has none.
-    pub roster: Option<pandect::DeviceRoster>,
+    pub roster: Option<sporran::DeviceRoster>,
 }
 
 /// Where the wallet's persona index comes from. The index is custody's to

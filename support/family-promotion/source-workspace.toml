@@ -84,11 +84,10 @@ members = [
     "ports/graphshell/mere",
     "ports/mere-resident",
     "ports/dramatis",
-    "ports/mere-resident/castellan",
     "ports/distillery",
     "ports/moot",
     "ports/distillery/athanor",
-    "ports/gazette",
+    "ports/gazette-ledger",
     # Commissions and operates Retinue stations through Castellan. A member
     # since the p2panda 0.7.5 repin (device pairing plan, ruling 35).
     "ports/signalman",
@@ -295,7 +294,8 @@ knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
-castellan = { version = "0.0.3", path = "ports/mere-resident/castellan" }
+castellan = { version = "0.0.4", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+sporran = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The model-works port; first real consumer of the mesh host supervisor.
 distillery = { version = "0.0.1", path = "ports/distillery" }
 # The places port: one port, two surfaces (murmur = conversation, moot =
@@ -552,7 +552,7 @@ muniment = { version = "0.1.2", path = "crates/eidetic/muniment" }
 # resolution. Unbuilt: the contact and recipient surfaces over `gaz`, feed
 # polling over `fleece::crawl`, and the reading room. Its blocking reqwest
 # still needs an async port before a resident polls with it.
-gazette = { version = "0.0.1", path = "ports/gazette" }
+gazette-ledger = { version = "0.0.1", path = "ports/gazette-ledger" }
 # Stored key-rooted contacts (the "them" side personae keeps): petnames, handles,
 # per-endpoint trust, kith/kin tiers, recency. Relocated from repos/gaz 2026-08-10.
 gaz = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", branch = "main" }

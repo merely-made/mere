@@ -974,8 +974,8 @@ fn open_model_library(
 }
 
 /// The device's lending posture, or a refusal naming what is missing.
-fn load_lending(data_root: &Path) -> Result<pandect::MeshLendingSettings, String> {
-    let settings = pandect::load_device_settings(data_root)
+fn load_lending(data_root: &Path) -> Result<sporran::MeshLendingSettings, String> {
+    let settings = sporran::load_device_settings(data_root)
         .map_err(|error| format!("read device settings: {error}"))?;
     settings
         .and_then(|settings| settings.mesh_lending)
@@ -985,7 +985,7 @@ fn load_lending(data_root: &Path) -> Result<pandect::MeshLendingSettings, String
                  lending posture: write a `mesh_lending` block in {} before running work for \
                  anyone. A composition that needs a lending posture must refuse rather than \
                  assume one.",
-                pandect::device_settings_path(data_root).display()
+                sporran::device_settings_path(data_root).display()
             )
         })
 }
@@ -995,7 +995,7 @@ fn load_lending(data_root: &Path) -> Result<pandect::MeshLendingSettings, String
 /// This conversion lives here rather than in pandect on purpose: pandect must
 /// stay mesh-free, so it stores the closed-set strings and the consumer types
 /// them.
-fn device_policy(lending: &pandect::MeshLendingSettings) -> Result<DevicePolicy, String> {
+fn device_policy(lending: &sporran::MeshLendingSettings) -> Result<DevicePolicy, String> {
     Ok(DevicePolicy {
         min_idle_ms: lending.min_idle_ms,
         min_battery_pct: lending.min_battery_pct,
@@ -1022,7 +1022,7 @@ fn device_policy(lending: &pandect::MeshLendingSettings) -> Result<DevicePolicy,
 }
 
 /// Convert the owner's stated fallbacks into the sensor's typed form.
-fn stated_conditions(lending: &pandect::MeshLendingSettings) -> Result<StatedConditions, String> {
+fn stated_conditions(lending: &sporran::MeshLendingSettings) -> Result<StatedConditions, String> {
     let stated = &lending.stated;
     Ok(StatedConditions {
         idle_ms: stated.idle_ms,
@@ -1253,7 +1253,7 @@ fn total_memory_mib() -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
-    use pandect::{MeshLendingSettings, QuietHoursSettings, StatedConditionSettings};
+    use sporran::{MeshLendingSettings, QuietHoursSettings, StatedConditionSettings};
 
     use super::*;
 

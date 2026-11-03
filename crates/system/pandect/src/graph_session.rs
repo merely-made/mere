@@ -3231,10 +3231,10 @@ mod tests {
         pollster::block_on(async {
             let (source, id, cutoff) = legacy_receipt_fixture_with_addresses(true).await;
             let raw = MemoryBackend::new();
-            let epoch = crate::wallet_store::KeyEpochId(Uuid::from_bytes([7; 16]));
-            let sealed = crate::WalletSealedBackend::new(
+            let epoch = sporran::wallet_store::KeyEpochId(Uuid::from_bytes([7; 16]));
+            let sealed = sporran::WalletSealedBackend::new(
                 raw.clone(),
-                crate::WalletEpochSealer::from_epoch(
+                sporran::WalletEpochSealer::from_epoch(
                     crate::PersonaId::new(),
                     epoch,
                     b"session secret",

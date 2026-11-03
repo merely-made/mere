@@ -28,7 +28,7 @@ use std::path::Path;
 use identity::carry::{DeviceGrantSet, DeviceId};
 use insigne::CheckFault;
 
-use crate::{
+use sporran::{
     DeviceExposure, DeviceGrantError, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
     certificate_device_id, device_grant_set_ref, device_is_fully_revoked, load_device_grant_set,
     load_device_roster,
@@ -587,7 +587,7 @@ mod tests {
                 spec.issued_at_ms,
             )
             .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
-            crate::save_device_grant_set(root, spec.device_id, &set)?;
+            sporran::save_device_grant_set(root, spec.device_id, &set)?;
             Ok(set)
         }
     }

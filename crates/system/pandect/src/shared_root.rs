@@ -22,7 +22,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use crate::engine_profile_store::PERSONAS_DIR;
-use crate::wallet_store::IDENTITY_DIR;
+use sporran::wallet_store::IDENTITY_DIR;
 
 /// The environment override, for scenario runs and for pointing a test at a
 /// scratch profile rather than the real one.

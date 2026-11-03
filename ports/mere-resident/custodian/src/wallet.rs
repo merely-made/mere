@@ -30,8 +30,8 @@ fn storage(_: impl std::fmt::Display) -> Refusal {
 /// wallet manifest, sorted) and the device roster as stored. Neither holds
 /// a seed, an epoch or a device secret, and neither needs the vault open.
 pub fn public_records(root: &Path) -> Result<(Vec<String>, Option<serde_json::Value>), Refusal> {
-    let personas = pandect::wallet_store::list_personas(root).map_err(storage)?;
-    let roster = pandect::wallet_store::load_device_roster(root).map_err(storage)?;
+    let personas = sporran::wallet_store::list_personas(root).map_err(storage)?;
+    let roster = sporran::wallet_store::load_device_roster(root).map_err(storage)?;
     Ok((
         personas.iter().map(|persona| persona.as_uuid().to_string()).collect(),
         roster.map(|roster| serde_json::to_value(roster)).transpose().map_err(storage)?,
@@ -45,7 +45,7 @@ pub fn epoch_keys(root: &Path, persona: PersonaId, device_label: Option<&str>, r
     if requests.is_empty() || requests.iter().any(|r| r.context.is_empty()) {
         return Err(Refusal("operation-or-scope"));
     }
-    if pandect::wallet_store::load_persona_wallet(root, persona).map_err(storage)?.is_none() {
+    if sporran::wallet_store::load_persona_wallet(root, persona).map_err(storage)?.is_none() {
         return Err(Refusal("no-persona"));
     }
     let epoch = castellan::custody::wallet::load_current_private_epoch(root, persona)
@@ -85,7 +85,7 @@ fn device_root(root: &Path, label: Option<&str>) -> Result<[u8; 32], Refusal> {
     };
     match identity {
         Some(identity) => Ok(Ed25519Keypair::from_seed(identity.device_seed).public_key().to_bytes()),
-        None if pandect::wallet_store::local_device_identity_path(root).is_file() => Err(Refusal("locked")),
+        None if sporran::wallet_store::local_device_identity_path(root).is_file() => Err(Refusal("locked")),
         None => Err(Refusal("no-device-identity")),
     }
 }

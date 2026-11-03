@@ -34,6 +34,7 @@ kernel.workspace = true
 curation.workspace = true
 identity.workspace = true
 notochord.workspace = true
+sporran.workspace = true
 blake3 = "1.5"
 # The wallet's CBOR, called directly: p2panda-core's helpers were these two
 # calls, and its `rand` pulled getrandom 0.2 into the browser build.

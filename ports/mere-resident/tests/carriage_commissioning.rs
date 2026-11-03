@@ -19,7 +19,7 @@ use graphshell::carriage::CarriageCeilings;
 use personae::Ed25519Keypair;
 
 /// The wrapping keys pairing retained, as the resident loads them.
-fn wrapping_keys(carry_root: &std::path::Path) -> pandect::RemoteAuthWrappingKeyBridge {
+fn wrapping_keys(carry_root: &std::path::Path) -> sporran::RemoteAuthWrappingKeyBridge {
     castellan::custody::wallet::load_remote_auth_wrapping_key_bridge(carry_root)
         .unwrap()
         .unwrap_or_default()
@@ -34,12 +34,8 @@ mod commissioning {
     use castellan::custody::wallet::{
         ensure_wallet_state, issue_remote_auth_device_grant_from_pairing, load_identity_seed,
     };
-    use pandect::{
-        CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId,
-        PairedRemoteAuthGrantSpec, PersonaId, PrivateEpochPlaintext, blinded_slot_id,
-        decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster,
-        unwrap_private_epoch_material,
-    };
+    use pandect::{PersonaId};
+    use sporran::{CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId, PairedRemoteAuthGrantSpec, PrivateEpochPlaintext, blinded_slot_id, decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster, unwrap_private_epoch_material};
     use personae::carry::DeviceId;
     use personae::InMemoryProvider;
     use personae::carry::derive_persona_chain_root;
@@ -180,11 +176,8 @@ mod retraction {
         ensure_wallet_state, issue_remote_auth_device_grant_from_pairing, load_identity_seed,
         revoke_remote_auth_device,
     };
-    use pandect::{
-        CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId,
-        PairedRemoteAuthGrantSpec, PersonaId, PrivateEpochPlaintext, blinded_slot_id,
-        decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster,
-    };
+    use pandect::{PersonaId};
+    use sporran::{CarriagePolicy, DeviceExposure, DevicePublicKey, KeyEpochId, PairedRemoteAuthGrantSpec, PrivateEpochPlaintext, blinded_slot_id, decode_epoch_record, load_device_grant_set, load_device_roster, save_device_roster};
     use personae::carry::DeviceId;
     use personae::InMemoryProvider;
     use personae::carry::derive_persona_chain_root;

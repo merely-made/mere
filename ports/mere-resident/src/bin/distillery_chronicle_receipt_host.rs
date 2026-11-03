@@ -52,7 +52,7 @@ use incipit::ShelfmarkV1;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{Job, JobBoard, JobBoardSnapshot, ResourceId};
 use notochord::{NetworkId, ProfileRef, TrustedRoot};
-use pandect::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
+use sporran::{DeviceSettings, MeshLendingSettings, StatedConditionSettings};
 use personae::{IdentityProvider, InMemoryProvider, ProfileId};
 use rand_core::{OsRng, RngCore};
 use scenograph::{ProjectionInputBinding, PublicSourceRevision, RevisionEvidence, SourceBinding};
@@ -494,7 +494,7 @@ fn open_vault(
 
 fn write_device_settings(data_root: &Path) -> Result<(), Box<dyn std::error::Error>> {
     std::fs::create_dir_all(data_root)?;
-    pandect::save_device_settings(
+    sporran::save_device_settings(
         data_root,
         &DeviceSettings {
             mesh_lending: Some(MeshLendingSettings {
