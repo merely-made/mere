@@ -1,5 +1,5 @@
-Distillery extraction (2026-11-03), receiving qualified and consumer cutover
-in progress: [canonical plan](mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md).
+Distillery extraction (2026-11-03), landed and consumer cutover qualified:
+[canonical plan](mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md).
 Distillery, compute mesh, probes and inference patches leave Mere; graph/host
 composition stays here. Athanor and Alembic retain their D16 hold. The plan's
 [receipts](archive_docs/receipts/2026-10-31_distillery_extraction_plan_receipts.md)

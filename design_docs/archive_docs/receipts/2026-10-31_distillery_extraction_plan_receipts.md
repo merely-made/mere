@@ -48,3 +48,62 @@
 Mere's direct receiving gates also pass: the two Chronicle-route cases and
 five Distillery-lane cases, including an actual mesh job and ordered shutdown.
 The full-tree line ceiling, Responsa, Clippy and dependency-ban checks pass.
+
+## 2026-11-03: consumer cutover
+
+| Consumer | Pushed source cohort | Receiving checks |
+| --- | --- | --- |
+| Mere | `f673d313d09e6c7a043779e8c172a53f76e328a7` donor cut; this closeout changes manifests, locks and docs | workspace/all targets; optional inference/training/Chronicle composition; seven composition tests; five standalone roots |
+| Eidetic | `1014cf48e1882ff926b55f3509ac3dbf5a5aec8e` | workspace/all targets |
+| Knot | `a84ae72840e07b390eb5a14446f1badcc4d2754a` | root, knot-document and knot-site/all targets |
+| Cleromancy | `3b65ebc01ec8475aa724f894adb60c93718c34bc` | workspace/all targets |
+| Isocosm | `33ea4199568d4f858eb6051b53cd47b112bfd4df` | nine independent roots/all features/all targets |
+| Mer3ly | `4ff6a1571c625088cf32a95212f60199bd734484` | three native roots; both wasm32 clients; 40 site tests |
+| Turnstone | `4321a55482bcbe7d9bbc48e32c6a0c91e2dc82c5` | workspace/all targets, including Windows sandbox helper; two recycle tests |
+
+All checks use their own locked graphs. The 24 independent consumer roots
+have compact selected-source audits in `consumer-source-audits.jsonl`.
+The final audit compares manifest and lock hashes with each working root.
+Eidetic retains its already-qualified `genet-text` source `01d3f528`; other
+Genet-bearing receiving roots retain `ad362723`. An exploratory metadata
+normalization of Eidetic's lock was preserved separately and restored,
+keeping its source intake bounded.
+
+The additional Isocosm roots are cosmograph-host, shared/cosmograph,
+shared/isomere, shared/isometer, shared/wing-integration, mesocosm, eponym and
+mesocosm/crates/probes/parry-ground, alongside the main root. Mer3ly's roots
+are the site, crates/repo-graph and crates/radio-mirror. Mere's standalone roots
+are crates/cambium/examples/genet_web_smoke, crates/probes/murm-direct-phy,
+ports/graphshell/web, ports/muniment-opfs-probe and support/luggage-comparison.
+Ignored library/probe locks are preserved beside the gates, with their hashes.
+These compilation receipts do not extend an earlier browser, headed, model
+or physical-radio acceptance claim.
+
+Turnstone's old Djinn door imports now use Ostiary and castellan-client
+directly; four test fixtures take wallet sealers from Sporran. Its recycle
+actor uses `pandect::furnace`, retaining application retention policy and
+the held Athanor workshop dependency. No Pandect re-export shim was added.
+Knot's standalone site requirement now accepts the current Servitor 0.0.3.
+Registry producer-contract patches select each consumer's own Mere source,
+preventing registry/Git copies of the same host contract.
+
+The standalone Graphshell lock had selected incompatible digest generations
+for Spareval's broad hash-library requirements. Its MD5 and SHA-1 selections
+now match its SHA-2 digest generation, and its locked check passes. The
+Cambium smoke override names the actual Genet Taffy 0.16 package at the
+qualified revision. The direct-PHY probe's lock selects the p2panda fork
+already declared in its manifest and forwards older Eidetic Git sources into
+the receiving cohort. The fork tag itself is unchanged.
+
+The final active-manifest scan covers all seven consumer repositories plus
+the receiving Distillery main worktree; it finds no `merely-made/esp.git`.
+Frozen historical receipts are excluded. All consumer full-tree hooks pass.
+Mer3ly's ordinary main push starts its separate Pages pipeline; local native
+and wasm compilation does not certify that deployment.
+
+The extraction removes 367 tracked donor files including the lexical probe.
+It completes the compute source-home cut and Pandect caller follow-through.
+Athanor/Alembic workshop relocation retains D16's hold. The family promotion
+plan separately records the next p2panda ownership seam: moving Stickleback's
+network joining/sync mechanics through Murm while preserving Eidetic's one
+validated store and Gemot's group policy. No full-module completion is claimed.

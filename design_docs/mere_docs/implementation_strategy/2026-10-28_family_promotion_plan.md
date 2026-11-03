@@ -48,8 +48,12 @@ accepted-history and policy-before-insert boundary, rather than build a second
 replication implementation. A manifest entry alone is not module acceptance.
 
 Current execution: Dramatis's D15 has extracted the reusable resident identity
-service. The remaining domain moves and each p2panda module integration
-keep their owner plans and must carry source-qualified receiving evidence.
+service. Distillery, compute mesh, probes and inference patches now live in
+the renamed Distillery repository, with seven consumer repositories qualified
+by the Distillery extraction plan. Turnstone calls Pandect's graph retention
+API and the direct Dramatis/Ostiary clients. The remaining domain moves and
+each p2panda module integration keep their owner plans and must carry
+source-qualified receiving evidence.
 
 ## Constraints
 

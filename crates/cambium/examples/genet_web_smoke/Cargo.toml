@@ -108,7 +108,7 @@ genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", branch 
 layout-dom-api = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.1.1" }
 # Published Genet Taffy fork, locally patched to this checkout for smoke builds.
 # The exact versions pick one package each: genet holds two `genet-taffy`s.
-genet-taffy = { git = "https://github.com/merely-made/genet.git", branch = "main", version = "=0.14.0" }
+genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "ad362723109b7e1738dfce13a625cf1a1b5e9ed1", version = "=0.16.0" }
 # ahash runtime-rng/getrandom-0.3 drop for the wasm graph.
 sonic-rs = { git = "https://github.com/merely-made/genet.git", branch = "main" }
 # Classic 0.11 and its owned repairs; standalone patches are not inherited.

@@ -10,7 +10,7 @@ license = "MPL-2.0"
 [workspace]
 
 [dependencies]
-luggage = { git = "https://github.com/merely-made/eidetic.git", rev = "1014cf48e1882ff926b55f3509ac3dbf5a5aec8e" }
+luggage = { git = "https://www.github.com/merely-made/eidetic.git", rev = "1014cf48e1882ff926b55f3509ac3dbf5a5aec8e" }
 velopack = "=1.2.161"
 minisign = "0.7"
 blake3 = "1"

@@ -1,12 +1,11 @@
 # Distillery extraction plan
 
 **Date:** 2026-10-31
-**Status (2026-11-03):** P2 landed; P3 consumer cutover is in progress under the instruction to move developed
-subsystems out of Mere. The published producer contracts and Djinn slimming
-prerequisites are complete. The existing ESP receiving history is being merged
-on main in a collision worktree; the primary `distillery-receive` checkout is
-preserved. Distillery, compute mesh, probes and their inference patches move now.
-Athanor and Alembic remain held under D16.
+**Status (2026-11-03):** P1–P3 landed for Distillery, compute mesh, probes and
+inference patches. The renamed repository preserves the receiving history;
+all seven actual consumer repositories pass their locked receiving checks.
+The primary `distillery-receive` checkout is preserved. Athanor and Alembic
+remain held under D16, outside this completed cutover.
 **Receipts:** donor/source and manifest comparison, standalone tests and feature
 checks, Cargo source identities, every actual consumer check, and final pushed
 commits. Retain at most 100 MB in `Code/testing/esp/distillery-extraction-20261103`;
@@ -204,7 +203,8 @@ Rename `merely-made/esp` to `merely-made/distillery`. Mere takes `distillery` an
 contract crates from crates.io to its paths. Sweep the six consumers named in D4. Remove
 the donor directories.
 
-*Done when:* no manifest in the six repositories names `esp.git` or a removed path; each
+*Done when:* no active manifest in the six named repositories or the additional
+Isocosm consumer names `esp.git` or a removed path; each
 lock resolves one source per package; Mere's touched crates and each consumer's check
 pass; changes are committed in each repository.
 
@@ -287,3 +287,12 @@ pass; changes are committed in each repository.
   Isocosm is an additional actual ESP consumer beyond D4's original six. Its
   independent roots are included in the receiving sweep. The original ESP
   receiving branch remains untouched; a collision worktree holds main.
+
+- 2026-11-03: P3 receiving checks pass in Mere, Eidetic, Knot, Cleromancy,
+  Isocosm, Mer3ly and Turnstone, including independent standalone roots.
+  Turnstone's graph retirement calls now use `pandect::furnace`; custody and
+  door callers use Dramatis and Ostiary directly. Its two recycle tests pass.
+  Every active tracked Cargo manifest in those repositories and Distillery
+  is free of the old ESP URL. Exact pushed consumer revisions and qualification
+  limits are in the linked receipts. Further p2panda ownership work remains
+  in the family promotion plan, including Stickleback's networking split.
