@@ -1,6 +1,6 @@
 # Workspace hygiene: releases, dependency currency, portable graph, licenses
 
-**Status:** 2026-10-28: cut from `2026-09-23_crate_consolidation_plan.md`, `2026-10-08_dependency_currency_plan.md`, `2026-09-16_lattice_sync_pass_plan.md`, `2026-08-22_license_sweep_plan.md`, `2026-08-10_crypto_generation_unification_plan.md` (complete; residue only) and the open cues of `2026-10-04_stack_seams_plan.md`, all archived in `archive_docs/2026-10-28/`. Landed: crate consolidation C1 to C4 and C2a, insigne phases A to D and chatelaine P1 to P3 (so C5's conditions are met); the crypto unification; netrender's dependency lane and the renderer cohort; lattice L1, L2 passes A and B, the 2026-09-23 consumer round, the portable workflow and a two-row unused-patch baseline; license P0, P1, P2, P4 (turnstone, hocket), P5, P6's clause, P7 except the retinue household, and the mere header gate. Open: the version baseline, the registry deletions and the dramatis facade; genet's held `dep-currency` branch and four mere dependency lanes; lattice L3, L5, L6, L7, cleanup, CI confirmation and the unused-patch causes; license P3 Isometry, P4 Woodshed and P7 retinue; and three stack-seams cues (F18/F20 measurements, the Eidetic critical pass, the render ladder rethink).
+**Status:** 2026-10-28: cut from `2026-09-23_crate_consolidation_plan.md`, `2026-10-08_dependency_currency_plan.md`, `2026-09-16_lattice_sync_pass_plan.md`, `2026-08-22_license_sweep_plan.md`, `2026-08-10_crypto_generation_unification_plan.md` (complete; residue only) and the open cues of `2026-10-04_stack_seams_plan.md`, all archived in `archive_docs/2026-10-28/`. Landed: crate consolidation C1 to C4 and C2a, insigne phases A to D and chatelaine P1 to P3 (so C5's conditions are met); the crypto unification; netrender's dependency lane and the renderer cohort; lattice L1, L2 passes A and B, the 2026-09-23 consumer round, the portable workflow and a two-row unused-patch baseline; license P0, P1, P2, P4 (turnstone, hocket), P5, P6's clause, P7 except the retinue household, and the mere header gate. The Dramatis facade is published (2026-11-03). Open: the version baseline and the registry deletions; genet's held `dep-currency` branch and four mere dependency lanes; lattice L3, L5, L6, L7, cleanup, CI confirmation and the unused-patch causes; license P3 Isometry, P4 Woodshed and P7 retinue; and three stack-seams cues (F18/F20 measurements, the Eidetic critical pass, the render ladder rethink).
 
 **For:** keeping the family's repositories buildable from a clean checkout and consistent in releases, versions, registry names, dependency currency and license headers. Opened by Mark's 2026-09-23 audit of the publishable crates (reserved crates receive their capabilities; components are modules), the 2026-09-16 lattice rulings, the 2026-10-08 refresh scope (mere, genet and netrender, the rest by propagation) and the 2026-08-22 license ruling (MPL-2.0 by default with correct provenance).
 Not here: the mere-apparatus row of C2 (exact presented frame, worker qualification, human AT), which is `2026-10-28_diagnostics_and_accessibility_plan.md`; CXF import (chatelaine plan P4 onward), which is the chatelaine and CXF plan in the dramatis repository; the Burn cohort's residue, carried vendor patches and the ESP package receipt, which are `2026-10-28_distillery_models_plan.md`, and S63's consolidated ML plan, which that plan is; dynamics determinism and permitted actions (S3 to S6) and C3's libm figure at 5,000 bodies, which are `2026-10-28_dynamics_grammar_plan.md`; the lexical capability plan's L1, L3, L5 and Turnstone L4 (S42), which stay in `2026-09-16_lexical_capability_plan.md`; the MPL section 3.2 executable-form notice (one line in an About panel or installer), which is the packaging lane in `2026-10-28_family_update_resident_plan.md`; the Linebender text family and glyph-facing types, which are netrender's Vello lane (`netrender-notes/2026-10-08_vello_upstream_lane.md`); the 441 audit findings, which are routed by `2026-10-28_source_audit_repairs_plan.md`; the Linux and macOS headed runs of other plans' gates, which are `2026-10-28_platform_qualification_plan.md` (F18 and F20, phase X1, stay here).
@@ -13,7 +13,7 @@ line in Findings.
 
 ### Registry release pass, 2026-11-03
 
-**Status:** in progress. Mark authorized the remaining registry releases and
+**Status:** complete, 2026-11-03. Mark authorized the remaining registry releases and
 consumer repins, including Pandect regardless of the additional release work.
 This pass owns dependency versions, packaging repairs, registry publication and
 consumer alignment. Identity-layer extraction remains in its owning plans.
@@ -43,7 +43,9 @@ Required receipts are package/dependency summaries, publish results, test and
 receiving-check summaries, source identities and final commit hashes. Retain
 at most 100 MB total under `Code/testing/mere/registry-releases-20261103`;
 index them in this plan's [archived receipt file](../../archive_docs/receipts/2026-10-28_workspace_hygiene_plan_receipts.md). Use existing reusable targets
-under `C:/t/cargo-targets/<repo>` and create no isolated Cargo home or worktree.
+under `C:/t/cargo-targets/<repo>`. No isolated Cargo home was needed. ESP's
+concurrent checkout required one temporary worktree; it was integrated, pushed
+and removed with its branch.
 
 **Finding, 2026-11-03:** the first registry-only Muniment feature check exposed
 that its bounded Fjall APIs existed only in carried path dependencies. Their
@@ -52,6 +54,18 @@ published names retain upstream version numbers and library names, with the
 types change from Muniment 0.1 to 0.2; Eidetic, Gaz and Servitor take fresh
 0.0-series releases. Pandect's cascade test passes Chartulary types to Servitor,
 so its packaged tests also need the aligned Servitor release.
+
+**Result, 2026-11-03:** all sixteen required versions are published, including
+Pandect 0.2.0. Registry archive hashes and clean source provenance are recorded
+in the archived receipt index. Mere's locked whole-workspace all-target check,
+Knot and Cleromancy's locked all-target receiving checks, and all nine Isocosm
+workspaces' locked all-feature/all-target checks pass. Their locks consolidate
+Genet at the events-release commit `ad362723109b` and storage at Eidetic
+`9fe08ee`; consumers receive Mere `47dce59ee`. Isometer's resident-ground
+feature now requests Conatus's `burn` integration and matching Burn 0.22.1.
+Its headless Vulkan receipt passes on the RTX 4060 Laptop GPU; current
+device-wide allocation totals are recorded separately from the older source
+receipt. Platform, headed and MSRV qualification remain separate gates.
 
 Sources are cited by short name with line numbers into the archived copies: consolidation, currency, lattice, sweep, crypto, seams, tails.
 
@@ -101,7 +115,7 @@ Ten crates.io names have no crate behind them: `sibylla`, `vates`, `mere-capabil
 - From: `archive_docs/2026-10-28/2026-09-23_crate_consolidation_plan.md:11-12,232-241`; `archive_docs/2026-10-28/2026-07-03_archived_plan_tails_plan.md:660`
 
 ### R3. The dramatis facade
-A real facade crate re-exporting personae, insigne and gaz for repositories outside mere; ruled 2026-10-01, unbuilt, and not a condition of C5. The tails name the dramatis repository plan, whose ruling D1 makes dramatis the product, as its owner.
+A real facade crate re-exporting personae, insigne and gaz for repositories outside mere; ruled 2026-10-01 and not a condition of C5. **Complete, 2026-11-03:** Dramatis owns the facade and publishes it as `dramatis` 0.0.5; its registry-only packaged suite passes 25 tests. The tails name the dramatis repository plan, whose ruling D1 makes dramatis the product, as its owner.
 - Done when: the dramatis row is landed or ruled out, which is what C2's done-condition asks (every row landed, ruled out by Mark, or found to have nothing misplaced, each landed move carrying its tests); the apparatus row closes elsewhere.
 - Needs: the dramatis repository plan's D1
 - Rulings: Mark 2026-10-01
