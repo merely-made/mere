@@ -122,7 +122,7 @@ upstream names adds a patch row per adopted crate to every root, Mark asked:
 
 > So like, I should rename it and publish fork crates instead? And cherry pick from upstream on an ongoing basis, kinda like cambium/meristem?
 
-On the name he first offered "p2mere-*, or m2p-*" (the bare `m2p` is an
+On the name he first offered "mere2panda-*, or m2p-*" (the bare `m2p` is an
 unrelated Markdown-to-PDF crate), asked for better options and animals, then:
 
 > how about mere2p, or p2mere?
