@@ -242,7 +242,7 @@ neck. Each question is a different relation family, and each wants its own
 scene.
 
 Woodshed has built several of these
-(`repos/woodshed/design_docs/2026-09-04_musical_projections_plan.md`, status
+(`repos/woodshed/design_docs/archive_docs/2026-11-03/2026-09-04_musical_projections_plan.md`, status
 2026-09-08). Circle of fifths and Tonnetz are two musical readings over the
 same keyed material; nearby candidates are ranked within each reading; an
 anchored pitch-motion reading places material by distance from a captured
@@ -587,7 +587,7 @@ Consequences:
   domain, which retires its per-application examples ("Isometry's overmap,
   Woodshed's stage, Strophe's arrangement, and Turnstone's canvas").
 - Across repositories:
-  `repos/woodshed/design_docs/2026-09-04_musical_projections_plan.md` (the
+  `repos/woodshed/design_docs/archive_docs/2026-11-03/2026-09-04_musical_projections_plan.md` (the
   ambient context boundary and its rules);
   `repos/isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`
   (rulings 69–71, 80 and D11, and §3.4.1's three tiers of keeping); and
@@ -845,8 +845,8 @@ acceptance. A second heterogeneous consumer over Woodshed or Knot data must
 prove the lifecycle without project-specific shared code before claiming a
 general ambient interaction contract. Their existing proofs are precedents,
 not acceptance of this proposal:
-`repos/woodshed/design_docs/2026-09-04_musical_projections_plan.md`,
-`repos/woodshed/design_docs/2026-07-11_stage_set_tools_plan.md`, and
+`repos/woodshed/design_docs/archive_docs/2026-11-03/2026-09-04_musical_projections_plan.md`,
+`repos/woodshed/design_docs/archive_docs/2026-11-03/2026-07-11_stage_set_tools_plan.md`, and
 `repos/knot-editor/design_docs/archive_docs/2026-11-02/2026-09-30_composition_mere_retention.md`.
 
 Open product choices for the first consumer:

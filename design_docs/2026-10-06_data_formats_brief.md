@@ -96,7 +96,7 @@ What each format holds today:
 | Format | Production use | Non-test call sites |
 |---|---|---:|
 | postcard | Mere: `graph-kernel` 30, `notochord` 11, `gaz` 6, `content-contract` 4, `muniment` 4, `chatelaine` 4, `insigne` 3, `mesquite` 1. isometry: `isonetry`'s session wire, Isocosm, isometer, `wing-formats`. netrender and genet capture corpora. knot. | Mere 63, isometry 61, netrender 9, genet 5, knot 3 |
-| CBOR (`ciborium`) | p2panda's protocol, which Mere decodes at about 70 sites through `p2panda_core::cbor`. `pandect`'s wallet grants (`src/wallet_grant/mod.rs:47`). hocket's open `.hock` file, a zip of `manifest.cbor`, chosen "to align with Moothold" (`hocket/design_docs/2026-05-18_initial_plan.md:1406`). | `pandect` 4, hocket 5 |
+| CBOR (`ciborium`) | p2panda's protocol, which Mere decodes at about 70 sites through `p2panda_core::cbor`. `pandect`'s wallet grants (`src/wallet_grant/mod.rs:47`). hocket's open `.hock` file, a zip of `manifest.cbor`, chosen "to align with Moothold" (`woodshed/ports/hocket/design_docs/archive_docs/2026-11-03/2026-05-18_initial_plan.md:1406`). | `pandect` 4, hocket 5 |
 | MessagePack (`rmp-serde`), `cbor4ii`, `minicbor-serde` | none: dev-dependencies of `graph-kernel`'s dissolution-gate codec race ("candidates must be self-describing so unknown-forward foreign facets survive") | 0 |
 
 **Version headers.** A quick grep for version or header names beside the

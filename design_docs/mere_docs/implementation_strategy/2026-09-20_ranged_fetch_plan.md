@@ -12,7 +12,7 @@ substrate per persona), the [engine profile boundary plan](../../archive_docs/20
 (a session's profile binding is persona, session or graph scoped), the
 [net-media plan](../../archive_docs/2026-10-28/2026-05-26_net_media_plan.md) (the likely second consumer), and
 the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).
-Cross-repo: `woodshed/design_docs/2026-09-01_listening_annotation_port_plan.md`
+Cross-repo: `woodshed/design_docs/2026-11-03_listening_annotation_port_plan.md`
 and `turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` gate 1.
 
 ## What was ruled (Mark, 2026-09-20)

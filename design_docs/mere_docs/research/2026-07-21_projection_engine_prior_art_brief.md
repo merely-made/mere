@@ -390,7 +390,7 @@ crates.io publication beyond name-holding 0.0.1s.
   selection, multi-family edges, ranking that must not deduplicate reasons — where isometry
   stresses the **scene** structure. Its relations are static, so it does not exercise
   late-arriving signals or streaming uncertainty; it is the clean first fixture, not the
-  whole proof. Woodshed's own plan (`2026-07-11_stage_set_tools_plan.md`) records the
+  whole proof. Woodshed's own plan (`woodshed/design_docs/archive_docs/2026-11-03/2026-07-11_stage_set_tools_plan.md`) records the
   reciprocal decision: it consumes this contract and does not import mere's graph kernel.
 - **Retinue: streaming, uncertain, capability-controlled facts.** A management snapshot exposes
   destinations, interfaces, routes, links, radios, battery, signal quality, GNSS position,
