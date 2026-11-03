@@ -918,7 +918,7 @@ later integration and qualification open. Mark prefers published standards for c
 for orchestration, the useful specification scope, prior art and a WPT-like
 testing set. This section is the canonical cross-repository research record.
 Implementation sequencing lives in
-`murm/design_docs/2026-10-11_transport_conformance_plan.md`.
+`murm/design_docs/2026-11-02_transport_conformance_plan.md`.
 
 **Execution posture, owner clarification:** prototype the composed stack toward
 its final shape using code and canonical documents as the execution frontier.

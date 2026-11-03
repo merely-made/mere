@@ -155,7 +155,7 @@ Nym is the single option touching a global passive timing adversary, at the pric
 - 2026-11-01: Genet's web-platform WebRTC evaluation and receiving gates now
   live in `genet/design_docs/2026-11-01_webrtc_conformance_plan.md`; shared
   provider extraction belongs to
-  `murm/design_docs/2026-10-13_murm_family_move_plan.md`, WebRTC evaluation
+  `murm/design_docs/2026-11-02_murm_family_move_plan.md`, RTC provider continuation
   section. The independent `murm-rtc` supplier now feeds Genet's native host.
   It stays below this plan's invitation, framing and Notochord profile.
   Genet supports ordinary web peers and general channel modes independently

@@ -19,7 +19,7 @@ Not here:
 - ordinary site serving and governed hosting (the old section 13, its "settle and verify" list, the headed Knot handoff
   and the further slices): `2026-10-28_site_publication_plan.md`;
 - Tucket and Sennet custody, consumer nonce reservations and the radio gates: Murm's family move plan (R6 to R8,
-  `murm/design_docs/2026-10-13_murm_family_move_plan.md`) and `2026-10-28_murm_runtime_plan.md`;
+  `murm/design_docs/2026-11-02_murm_family_move_plan.md`) and `2026-10-28_murm_runtime_plan.md`;
 - observation and action gates: `2026-10-28_family_promotion_plan.md`; the custody process boundary and the resident's
   three authority tiers: `2026-10-28_custody_plan.md`;
 - the fleet rollout of the resident, its Linux launcher and the Windows switch from the legacy host:

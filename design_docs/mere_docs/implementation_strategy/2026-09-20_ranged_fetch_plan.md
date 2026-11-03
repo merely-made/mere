@@ -284,7 +284,7 @@ The host keeps its existing ranged/whole-body, cookie/store, cancellation and
 admission contracts. Netfetcher still owns web-observable Fetch and WebSocket
 policy in Genet; its raw HTTP/1-2-3 and WebSocket connector now come from Murm's
 independent `wire` workspace. Canonical move authority:
-`murm/design_docs/2026-10-13_murm_family_move_plan.md`, MOVE5.
+`murm/design_docs/archive_docs/2026-11-02/2026-10-13_murm_family_move_plan.md`, MOVE5.
 
 Mere adopts Genet `b6bfbeb556a6a17eddf8d5ad8254d3fcac95b084` as one coherent
 Genet cohort. That supplier selects `murm-wire` at
