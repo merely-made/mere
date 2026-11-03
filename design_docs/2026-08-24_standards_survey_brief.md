@@ -1088,7 +1088,7 @@ authored frame/signature bytes and uses ideal simultaneous transmitter lanes,
 preconfigured channel/manifest cadence and a common slot clock. Findings and
 the historical source-fingerprinted report live once in
 `murm/design_docs/2026-10-11_retained_repair_simulation_profile.md` and
-`retinue/testing/transport-conformance/results/retained-repair-exploration-20261011.json`.
+[retained-repair report](https://github.com/merely-made/murm/blob/b0e31de8b581940dcd347968585c401e3ad786ca/testing/transport-conformance/results/retained-repair-exploration-20261011.json).
 The owner-local receive continuation below now exercises application admission;
 the model does not establish live carrier integration or physical Mbps.
 

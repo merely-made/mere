@@ -59,7 +59,8 @@ status = "Manual identifies version 1.5.5 and matching Git tag 07bf986f31d54266a
 authority = "Retinue inspected oracle requirements and repin receipt"
 path = "../retinue/crates/retinue/oracle/requirements.txt"
 revision = "7aa87f2e9fdd973e4729e610d7130189dc22c0a0"
-receipt_path = "../retinue/testing/receipts/rns-1.5.7-repin/README.md"
+receipt_path = "Code/testing/murm/testing/receipts/rns-1.5.7-repin/README.md"
+receipt_url = "https://github.com/merely-made/murm/blob/b0e31de8b581940dcd347968585c401e3ad786ca/testing/receipts/rns-1.5.7-repin/README.md"
 status = "Requirements select rns==1.5.7 and lxmf==1.2.0. Existing subset qualification receipts remain scoped historical evidence, not a conformance claim from this catalog."
 
 [sources.lxmf_oracle_package]
