@@ -12,9 +12,9 @@
 mod custodian_fixture;
 
 use custodian_fixture::{TestCustodian, manage_grants};
-use mere_resident::custody_host::ResidentCustody;
+use dramatis_resident::custody_host::ResidentCustody;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};

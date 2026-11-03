@@ -47,7 +47,7 @@ fn personal_facts_child() {
         "/tmp/pf-{}.sock",
         root.file_name().unwrap().to_string_lossy()
     );
-    let identity: Arc<dyn mere_resident::custody_host::ResidentCustody> = Arc::new(PersonaeHost::new(
+    let identity: Arc<dyn dramatis_resident::custody_host::ResidentCustody> = Arc::new(PersonaeHost::new(
         IdentityVault::with_profile(
             InMemoryStorage::new(),
             Profile::new(

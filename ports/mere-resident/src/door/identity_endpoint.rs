@@ -37,23 +37,7 @@ use crate::door::identity_projection::{
 };
 use dramatis::view::IdentitySurfaceSnapshot;
 
-/// What the identity endpoint reads from the resident's identity authority:
-/// the secret-free snapshot the cards project, and typed intents applied
-/// back.
-///
-/// [`crate::door::resident_identity::ResidentIdentity`] (the doors'
-/// authority) extends this with door keys, native actions and custody; the
-/// endpoint needs only these two, so its tests can stand up an authority with
-/// no keys. It was Graphshell's until the endpoint moved here with the stack
-/// lift plan's P5.
-pub trait IdentityAuthority: Send + Sync + 'static {
-    /// The secret-free read model the identity cards project.
-    fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot>;
-
-    /// Apply one typed identity intent from an admitted session. The error
-    /// is the reason shown to the caller.
-    fn apply_intent(&self, intent: &str, payload: &[u8]) -> Result<(), String>;
-}
+use dramatis_resident::identity::IdentityAuthority;
 
 fn now_ms() -> u64 {
     std::time::SystemTime::now()

@@ -16,7 +16,7 @@ use std::sync::Arc;
 
 use armillary::lifecycle::{CloseAction, CloseFuture, close_all};
 #[cfg(feature = "inference")]
-use crate::custody_host::LockHolder as VaultLockHolder;
+use dramatis_resident::custody_host::LockHolder as VaultLockHolder;
 use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use personae::{IdentityProvider, ProfileId};
@@ -66,7 +66,7 @@ pub enum MeshAuthor {
     /// read in this process only in a build with `in-process-custody`.
     Resident,
     /// Custody itself: the independently launched custodian in production.
-    Custody(Arc<dyn crate::custody_host::ResidentCustody>),
+    Custody(Arc<dyn dramatis_resident::custody_host::ResidentCustody>),
 }
 
 impl MeshAuthor {
@@ -93,7 +93,7 @@ impl MeshAuthor {
     /// declaration where they are made: this resident composes Knot in
     /// process, so it asks for no more than Knot states it needs.
     fn knot_epochs(&self, data_root: &Path) -> crate::resident_knot::KnotEpochs {
-        let policy = crate::custody::ReleasePolicy::none()
+        let policy = dramatis_resident::custody::ReleasePolicy::none()
             .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch);
         match self {
             Self::Custody(host) => {
@@ -111,7 +111,7 @@ impl MeshAuthor {
                 {
                     let root = data_root.to_path_buf();
                     Arc::new(move |persona, label, requests| {
-                        crate::custody::epoch_keys(&policy, &root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
+                        dramatis_resident::custody::epoch_keys(&policy, &root, persona, Some(label), requests).map_err(|refusal| format!("{refusal:?}"))
                     })
                 }
                 #[cfg(not(feature = "in-process-custody"))]
@@ -402,7 +402,7 @@ impl DjinnResident {
     /// test passes a scratch directory rather than the owner's real one. It
     /// never fails the resident; a reservoir that cannot open leaves the lane
     /// unavailable with its reason.
-    pub async fn open_reservoir(&mut self, shared_root: &Path, personas: Arc<dyn crate::custody_host::PersonaIndex>) -> &ReservoirLane {
+    pub async fn open_reservoir(&mut self, shared_root: &Path, personas: Arc<dyn dramatis_resident::custody_host::PersonaIndex>) -> &ReservoirLane {
         self.reservoir = ReservoirLane::open(shared_root, &self.reservoir_settings, personas).await;
         &self.reservoir
     }

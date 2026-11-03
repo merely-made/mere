@@ -30,7 +30,7 @@ use dramatis::view::VaultProtectionView;
 use knot_editor::PersonalVaultKeys;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::projection_offers::ProviderPermission;
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use personae::{Ed25519Keypair, IdentityProvider, PersonaId, ProfileId};
 
 const DEVICE: &str = "declared-applications-fixture";
@@ -140,8 +140,8 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
         .release_epoch_keys(*persona().as_uuid(), Some(DEVICE.into()), PersonalVaultKeys::requests())
         .await
         .unwrap();
-    let expected = mere_resident::custody::epoch_keys(
-        &mere_resident::custody::ReleasePolicy::none().with_declared_epochs(&knot.custody.epoch),
+    let expected = dramatis_resident::custody::epoch_keys(
+        &dramatis_resident::custody::ReleasePolicy::none().with_declared_epochs(&knot.custody.epoch),
         wallet.path(),
         persona(),
         Some(DEVICE),

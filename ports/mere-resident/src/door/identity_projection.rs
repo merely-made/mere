@@ -9,7 +9,7 @@
 //!
 //! The cards are portable resources. Actions carry only public, typed fields;
 //! authorization and all private key handling stay with the resident
-//! authority behind [`crate::door::identity_endpoint::IdentityAuthority`]
+//! authority behind [`dramatis_resident::identity::IdentityAuthority`]
 //! (the doors' `ResidentIdentity`).
 //!
 //! The cards lived in castellan from the keeper founding (2026-08-14), came

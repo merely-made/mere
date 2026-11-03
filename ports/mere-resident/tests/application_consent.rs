@@ -28,9 +28,9 @@ use ostiary::declaration::{AppDeclaration, CustodyOperation, CustodyUse, NamePat
 use dramatis::view::VaultProtectionView;
 use mere_resident::applications::OwnerConsent;
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::door::browser_carrier::NativeIdentityFailure;
-use mere_resident::identity_ui::NativeIdentityUi;
-use mere_resident::keeper::Keeper;
+use dramatis_resident::native::NativeIdentityFailure;
+use dramatis_resident::identity_ui::NativeIdentityUi;
+use dramatis_resident::keeper::Keeper;
 use mere_resident::settings::OwnerSettings;
 use personae::{Ed25519Keypair, ProfileId};
 use zeroize::Zeroizing;

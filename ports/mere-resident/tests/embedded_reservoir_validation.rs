@@ -51,11 +51,11 @@ const PRODUCT: &str = "DJINN_V35_PRODUCT";
 const PATIENCE: Duration = Duration::from_secs(30);
 
 struct NoLocalPrompt;
-impl mere_resident::startup_vault::Prompt for NoLocalPrompt {
+impl dramatis_resident::startup_vault::Prompt for NoLocalPrompt {
     fn ask(
         &mut self,
-        _: &mere_resident::startup_vault::Ask,
-    ) -> Result<mere_resident::startup_vault::Answer, String> {
+        _: &dramatis_resident::startup_vault::Ask,
+    ) -> Result<dramatis_resident::startup_vault::Answer, String> {
         panic!("live resident attachment must not prompt for local custody");
     }
 }
@@ -81,7 +81,7 @@ fn options(root: &Path, address: &str) -> ReservoirAttachmentOptions {
         session_duration: Duration::from_secs(60),
     }
 }
-fn identity() -> Arc<dyn mere_resident::custody_host::ResidentCustody> {
+fn identity() -> Arc<dyn dramatis_resident::custody_host::ResidentCustody> {
     Arc::new(PersonaeHost::new(
         IdentityVault::with_profile(
             InMemoryStorage::new(),
@@ -510,7 +510,7 @@ async fn child_serves_the_registered_domain() {
             scope
                 .scope(serve_app_broker(
                     &address,
-                    std::sync::Arc::new(mere_resident::keeper::Keeper::new(identity())),
+                    std::sync::Arc::new(dramatis_resident::keeper::Keeper::new(identity())),
                     grants,
                     60_000,
                     None,

@@ -17,7 +17,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::door::identity_endpoint::IdentityAuthority;
+use dramatis_resident::identity::IdentityAuthority;
 use mere_resident::door::local_session::DoorIdentity;
 use mere_resident::door::resident_identity::ResidentIdentity;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};

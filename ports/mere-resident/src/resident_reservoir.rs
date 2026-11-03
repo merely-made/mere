@@ -48,7 +48,7 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 
-use crate::custody_host::{PersonaIndex, resolve_persona};
+use dramatis_resident::custody_host::{PersonaIndex, resolve_persona};
 use crate::resident_mere::MereRoutes;
 use crate::settings::ReservoirLaneSettings;
 

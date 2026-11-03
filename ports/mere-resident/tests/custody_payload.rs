@@ -8,10 +8,9 @@ use castellan::authority::PersonaeHost;
 use castellan::custody::{
     IdentityStorage, IdentityVault, Profile, SealedProfileStorage,
 };
-use mere_resident::{
-    door::app_broker::{AppEndpointCatalog, serve_app_broker},
-    keeper::Keeper,
-};
+use mere_resident::door::app_broker::AppEndpointCatalog;
+use mere_resident::door::app_broker::serve_app_broker;
+use dramatis_resident::keeper::Keeper;
 use eidetic::{Hash, PayloadSealer};
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
@@ -331,8 +330,8 @@ async fn private_payloads_use_bound_custody_and_survive_epoch_rotation() {
 #[ignore]
 fn retained_custody_receipt_host() {
     use std::os::unix::fs::MetadataExt;
-    use mere_resident::custodian::InstalledCustodian;
-    use mere_resident::custody_host::{remote::RemoteHost, ResidentCustody};
+    use dramatis_resident::custodian::InstalledCustodian;
+    use dramatis_resident::custody_host::{remote::RemoteHost, ResidentCustody};
 
     let root = std::path::PathBuf::from(std::env::var_os("EIDETIC_CUSTODY_FIXTURE_ROOT").expect("fixture root"));
     let endpoint = std::path::PathBuf::from(std::env::var_os("EIDETIC_CUSTODY_FIXTURE_ENDPOINT").expect("fixture endpoint"));

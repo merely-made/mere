@@ -154,7 +154,7 @@ impl MereRoutes {
     /// Existing admitted references continue to replay after profile deletion.
     pub fn with_profile_subject_authority(
         mut self,
-        host: Arc<dyn crate::custody_host::ResidentCustody>,
+        host: Arc<dyn dramatis_resident::custody_host::ResidentCustody>,
     ) -> Self {
         Arc::get_mut(&mut self.inner)
             .expect("set profile authority before serving routes")
@@ -3543,7 +3543,7 @@ mod tests {
             scope
                 .scope(serve_app_broker(
                     &socket,
-                    Arc::new(crate::keeper::Keeper::new(host)),
+                    Arc::new(dramatis_resident::keeper::Keeper::new(host)),
                     grants,
                     60_000,
                     None,
@@ -3827,7 +3827,7 @@ mod tests {
             scope
                 .scope(serve_app_broker(
                     &socket,
-                    Arc::new(crate::keeper::Keeper::new(host)),
+                    Arc::new(dramatis_resident::keeper::Keeper::new(host)),
                     grants,
                     60_000,
                     None,

@@ -13,11 +13,8 @@ use base64::Engine;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, ResumeRequest};
 use personae::delegation::DelegationError;
 
-use crate::door::browser_carrier::{
-    BrowserCarrierError, BrowserHostMessage, BrowserLauncher, BrowserLink, BrowserMessage,
-    NativeIdentityFailure, NativeIdentityResult, read_native_message_async,
-    write_native_message_async,
-};
+use crate::door::browser_carrier::{BrowserCarrierError, BrowserHostMessage, BrowserLauncher, BrowserLink, BrowserMessage, read_native_message_async, write_native_message_async};
+use dramatis_resident::native::{NativeIdentityFailure, NativeIdentityResult};
 use crate::door::device_broker::DeviceSurface;
 use crate::door::identity_endpoint::IdentityEndpoint;
 use crate::door::local_session::{

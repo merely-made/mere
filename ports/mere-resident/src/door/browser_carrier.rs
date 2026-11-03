@@ -35,7 +35,9 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncRead, AsyncWrite, DuplexStream};
 
-use crate::door::identity_projection::SshUnlockPolicyIntentV1;
+#[cfg(test)]
+use dramatis::intents::SshUnlockPolicyIntentV1;
+use dramatis_resident::native::{NativeIdentityAction, NativeIdentityResult, NativeIdentityFailure};
 use graphshell_host::admission::{PROJECTION_PROTOCOL, open_network_bound_session};
 use graphshell_host::carrier::{ProjectionAcceptError, ProjectionRefusal, admit_accepted_session};
 use graphshell_host::line::{self, LineReader};
@@ -187,51 +189,6 @@ pub struct NativeIdentityRequest {
     pub id: u64,
     pub session: String,
     pub action: NativeIdentityAction,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum NativeIdentityAction {
-    ImportSshPrivate {
-        unlock_policy: SshUnlockPolicyIntentV1,
-    },
-    /// Unlock the vault on the resident's own surface: OS presence first,
-    /// then a passphrase box (vault lock ruling 47). Nothing crosses back.
-    UnlockVault,
-}
-
-/// Public result of a native-only identity interaction.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "status", rename_all = "snake_case")]
-pub enum NativeIdentityResult {
-    ImportedSshPrivate {
-        fingerprint: String,
-        comment: String,
-        unlock_policy: String,
-        replaced_existing: bool,
-    },
-    /// The vault is unlocked (or already was).
-    UnlockedVault,
-    Cancelled,
-    Rejected {
-        reason: NativeIdentityFailure,
-    },
-}
-
-/// Bounded public failure vocabulary. Local paths, key bytes, passphrases,
-/// and parser diagnostics never become native-messaging responses.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum NativeIdentityFailure {
-    WrongSession,
-    UiUnavailable,
-    SelectedFileUnreadable,
-    SelectedFileTooLarge,
-    InvalidPrivateKey,
-    IncorrectPassphrase,
-    ImportRejected,
-    /// The vault refused the unlock for a reason other than the passphrase.
-    UnlockRejected,
 }
 
 /// Host-to-browser messages.

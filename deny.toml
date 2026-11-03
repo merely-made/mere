@@ -10,7 +10,9 @@
 # custodian through custody-wire, which links no castellan. Since H2 a
 # default Djinn build links none either: only its `in-process-custody`
 # feature (test suites and receipt hosts) does, which is why Djinn stays a
-# wrapper here, where every feature is on.
+# wrapper here, where every feature is on. Dramatis resident has the same
+# explicit in-process test feature after D15; its normal production graph must
+# exclude castellan and is checked separately because this rule sees all features.
 #
 #   cargo deny check bans
 #
@@ -24,5 +26,5 @@ all-features = true
 multiple-versions = "allow"
 wildcards = "allow"
 deny = [
-  { crate = "castellan", wrappers = ["mere-resident", "djinn-custodian"], reason = "castellan is secret custody; only Djinn and its independently launched custodian link it; applications and workers may not" },
+  { crate = "castellan", wrappers = ["mere-resident", "dramatis-resident", "djinn-custodian"], reason = "castellan is secret custody; the custodian and explicit in-process test hosts may link it; production resident/service graphs, applications and workers may not" },
 ]

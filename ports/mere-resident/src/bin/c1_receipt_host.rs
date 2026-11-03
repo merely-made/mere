@@ -19,10 +19,9 @@ use chirograph::{
     PortableCardV1, PresentationCodec, ProjectionRequest, ProjectionSnapshot,
 };
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::{
-    keeper::Keeper, resident_mere::MereRoutes,
-    resident_reservoir::ResidentReservoir,
-};
+use dramatis_resident::keeper::Keeper;
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_reservoir::ResidentReservoir;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;

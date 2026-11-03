@@ -20,11 +20,9 @@ use castellan::custody::{
     IdentityStorage, IdentityVault, OsPresence, Profile, SealedProfileStorage, UnlockMethod,
 };
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::door::browser_carrier::{
-    NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
-};
+use dramatis_resident::native::{NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult};
 use mere_resident::door::local_session::{DoorIdentity, door_salts};
-use mere_resident::identity_ui::{NativeIdentityUi, apply_native_identity_action};
+use dramatis_resident::identity_ui::{NativeIdentityUi, apply_native_identity_action};
 use mere_resident::resident_status::{
     self, AgentListenerV1, ControlUnlock, LockStateV1, NativeUnlocker,
     RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE, ResidentControlEndpoint, ResidentEndpointsV1,
@@ -128,7 +126,7 @@ async fn serve(host: Arc<Host>, unlock: ControlUnlock) -> (String, ResidentStatu
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(mere_resident::keeper::Keeper::new(host)),
+                Arc::new(dramatis_resident::keeper::Keeper::new(host)),
                 grants,
                 60_000,
                 None,
@@ -164,11 +162,11 @@ fn the_door_keeps_two_keys_and_every_other_salt_is_locked() {
     let dir = tempfile::tempdir().unwrap();
     let host = lockable(dir.path());
     let subject = host.master_public_key().to_bytes();
-    let kept = mere_resident::keeper::Keeper::new(host.clone())
+    let kept = dramatis_resident::keeper::Keeper::new(host.clone())
         .door_keys()
         .unwrap();
     host.lock_vault().unwrap();
-    let again = mere_resident::keeper::Keeper::new(host.clone())
+    let again = dramatis_resident::keeper::Keeper::new(host.clone())
         .door_keys()
         .expect("the lock leaves the door keys in place");
     assert!(Arc::ptr_eq(&kept, &again));
@@ -221,7 +219,7 @@ fn a_door_never_used_before_the_lock_stays_closed() {
     let host = lockable(dir.path());
     host.lock_vault().unwrap();
     assert!(matches!(
-        mere_resident::keeper::Keeper::new(host.clone()).door_keys(),
+        dramatis_resident::keeper::Keeper::new(host.clone()).door_keys(),
         Err(IdentityError::Locked)
     ));
 }

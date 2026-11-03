@@ -15,7 +15,7 @@ mod resident_harness;
 
 use std::time::{Duration, Instant};
 
-use mere_resident::custody_host::ResidentCustody;
+use dramatis_resident::custody_host::ResidentCustody;
 use djinn_testkit::Bound;
 use resident_harness::*;
 use serde_json::json;
@@ -96,8 +96,8 @@ fn a_resident_with_a_custodian_opens_no_vault_and_follows_its_lock() {
         locked == "locked",
     );
 
-    let owner = mere_resident::custody_host::remote::RemoteHost::connect(
-        mere_resident::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap(),
+    let owner = dramatis_resident::custody_host::remote::RemoteHost::connect(
+        dramatis_resident::custodian::InstalledCustodian::from_path(&fixture.client_file, false).unwrap(),
     )
     .unwrap();
     owner.unlock_with_passphrase(PASSPHRASE.as_bytes()).unwrap();

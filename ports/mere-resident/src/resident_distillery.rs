@@ -83,7 +83,7 @@ struct StageVaultLock {
     profile: ProfileId,
 }
 #[cfg(feature = "inference-stages")]
-impl crate::custody_host::LockHolder for StageVaultLock {
+impl dramatis_resident::custody_host::LockHolder for StageVaultLock {
     fn name(&self) -> &str {
         "resident inference stages"
     }
@@ -339,7 +339,7 @@ impl ResidentDistillery {
     /// Register alongside the ask lane's holder. An idle resident with only
     /// stage workers still participates in private-data lock handling.
     #[cfg(feature = "inference-stages")]
-    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn crate::custody_host::LockHolder>> {
+    pub fn inference_stage_lock_holder(&self) -> Option<Arc<dyn dramatis_resident::custody_host::LockHolder>> {
         let services = self.resident.inference_stage_services();
         if services.is_empty() {
             None

@@ -16,7 +16,7 @@ use std::time::Duration;
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};

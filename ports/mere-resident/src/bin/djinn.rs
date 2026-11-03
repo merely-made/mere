@@ -35,7 +35,7 @@ use mere_resident::door::device_broker::{
     configured_device_endpoint, default_device_endpoint, serve_browser_broker_on,
 };
 use mere_resident::identity_ui::SystemNativeIdentityUi;
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 #[cfg(feature = "personal-sync")]
 use mere_resident::pairing;
 #[cfg(feature = "personal-sync")]
@@ -56,7 +56,7 @@ use mere_resident::resident_status::{
 };
 #[cfg(feature = "personal-sync")]
 use mere_resident::settings::{self as owner_settings, SyncOverrides};
-use mere_resident::startup_vault;
+use dramatis_resident::startup_vault;
 use personae::{ProfileId, default_vault_dir};
 use serde_json::json;
 #[cfg(feature = "in-process-custody")]
@@ -176,7 +176,7 @@ async fn main() {
     };
     #[cfg(feature = "passphrase-fd")]
     if let Some(path) = &args.custodian {
-        mere_resident::custodian::InstalledCustodian::use_fixture(path.clone());
+        dramatis_resident::custodian::InstalledCustodian::use_fixture(path.clone());
     }
     // Enrolment edits the vault directory and reports; it hosts nothing.
     if args.enroll_passphrase {
@@ -296,14 +296,14 @@ const DEFAULT_LOG_FILTER: &str = "info";
 #[cfg(feature = "in-process-custody")]
 fn enroll(args: &Args) -> Result<String, String> {
     if args.native {
-        mere_resident::enrollment::enroll_passphrase_native(
+        dramatis_resident::enrollment::enroll_passphrase_native(
             &args.vault_dir,
             &SystemNativeIdentityUi::default(),
         )
     } else {
-        mere_resident::enrollment::enroll_passphrase(
+        dramatis_resident::enrollment::enroll_passphrase(
             &args.vault_dir,
-            &mut mere_resident::enrollment::read_from_terminal,
+            &mut dramatis_resident::enrollment::read_from_terminal,
         )
     }
 }
@@ -351,7 +351,7 @@ async fn resident_client(args: &Args) -> Result<String, String> {
     // Read before the door opens, so a cancelled prompt opens nothing.
     let passphrase = match args.unlock && !args.native {
         true => Some(
-            mere_resident::enrollment::read_from_terminal("Vault passphrase: ")
+            dramatis_resident::enrollment::read_from_terminal("Vault passphrase: ")
                 .map_err(|error| error.to_string())?,
         ),
         false => None,
@@ -1016,7 +1016,7 @@ fn cli_custody(args: &Args) -> Result<startup_vault::OpenedCustody, String> {
     let mut prompt: Box<dyn startup_vault::Prompt> = match given {
         Some(passphrase) => Box::new(startup_vault::Given::new(passphrase)),
         None => Box::new(startup_vault::NativeOrTerminal {
-            native: mere_resident::identity_ui::UnavailableNativeIdentityUi,
+            native: dramatis_resident::identity_ui::UnavailableNativeIdentityUi,
         }),
     };
     startup_vault::open_custody(
@@ -1083,7 +1083,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     // A custodian serves the SSH agent; the status names its endpoint.
     let agent_endpoint = match (
         in_process,
-        mere_resident::custodian::InstalledCustodian::load()?,
+        dramatis_resident::custodian::InstalledCustodian::load()?,
     ) {
         (false, Some(installed)) => installed.agent.unwrap_or_default(),
         _ => match &args.agent {
@@ -1145,15 +1145,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         let native_ui = args.native_identity_ui();
         Arc::new(move || {
             let prompt = || {
-                mere_resident::identity_ui::apply_native_identity_action(
+                dramatis_resident::identity_ui::apply_native_identity_action(
                     personae.as_ref(),
                     &native_ui,
-                    mere_resident::door::browser_carrier::NativeIdentityAction::UnlockVault,
+                    dramatis_resident::native::NativeIdentityAction::UnlockVault,
                 )
             };
             // A dialog blocks; the worker it holds is handed over meanwhile.
             match tokio::task::block_in_place(prompt) {
-                mere_resident::door::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                dramatis_resident::native::NativeIdentityResult::UnlockedVault => Ok(()),
                 other => Err(format!("the native unlock ended: {other:?}")),
             }
         })
@@ -1225,7 +1225,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
     match resident
         .open_reservoir(
             &pandect::shared_root::shared_root(),
-            Arc::new(mere_resident::custody_host::CustodyPersonas {
+            Arc::new(dramatis_resident::custody_host::CustodyPersonas {
                 custody: Arc::clone(&personae),
                 wallet_root: pandect::shared_root::shared_root(),
             }),

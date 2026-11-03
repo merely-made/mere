@@ -192,7 +192,7 @@ async fn two_processes_edit_one_session_through_djinn_and_hear_each_other() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(dramatis_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,

@@ -19,11 +19,11 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use custodian_fixture::{TestCustodian, grants_with, manage_grants};
-use mere_resident::custodian::InstalledCustodian;
-use mere_resident::custody_host::remote::RemoteHost;
-use mere_resident::custody_host::{LockHolder, ResidentCustody};
+use dramatis_resident::custodian::InstalledCustodian;
+use dramatis_resident::custody_host::remote::RemoteHost;
+use dramatis_resident::custody_host::{LockHolder, ResidentCustody};
 use mere_resident::door::resident_identity::ResidentIdentity;
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use dramatis::intents::CreateProfileIntentV1;
 use ostiary::app_admission::AppId;
 use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal, KeySource};
@@ -249,11 +249,11 @@ fn profiles_snapshot_and_intents_are_answered_by_the_custodian() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn the_wallets_persona_index_is_the_custodians_to_disclose_and_djinn_never_lists_a_file() {
-    use mere_resident::custody_host::{CustodyPersonas, resolve_persona};
+    use dramatis_resident::custody_host::{CustodyPersonas, resolve_persona};
     let custodian = custodian();
     let remote = custodian.remote();
     let (first, second) = (personae::PersonaId::new(), personae::PersonaId::new());
-    let index = |host: Arc<RemoteHost>| -> Arc<dyn mere_resident::custody_host::PersonaIndex> {
+    let index = |host: Arc<RemoteHost>| -> Arc<dyn dramatis_resident::custody_host::PersonaIndex> {
         // A root that holds no wallet: only the custodian's own is read.
         Arc::new(CustodyPersonas { custody: host, wallet_root: custodian.dir.path().join("djinns-data-root-has-no-wallet") })
     };

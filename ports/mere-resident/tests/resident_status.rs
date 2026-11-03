@@ -116,7 +116,7 @@ async fn status_reports_each_connection_with_its_identity_basis() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(dramatis_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,
@@ -199,7 +199,7 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                std::sync::Arc::new(mere_resident::keeper::Keeper::new(resident_host())),
+                std::sync::Arc::new(dramatis_resident::keeper::Keeper::new(resident_host())),
                 grants,
                 60_000,
                 None,

@@ -369,7 +369,7 @@ async fn exercise_inner(native: bool) {
     let server = tokio::spawn(async move {
         let _ = serve_app_broker(
             &server_endpoint,
-            Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
+            Arc::new(dramatis_resident::keeper::Keeper::new(keeper_host())),
             grants,
             600000,
             None,

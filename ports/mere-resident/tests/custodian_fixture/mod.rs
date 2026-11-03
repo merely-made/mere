@@ -11,8 +11,8 @@
 
 use std::sync::Arc;
 
-use mere_resident::custodian::InstalledCustodian;
-use mere_resident::custody_host::remote::RemoteHost;
+use dramatis_resident::custodian::InstalledCustodian;
+use dramatis_resident::custody_host::remote::RemoteHost;
 use djinn_custodian::fixture::{Fixture, Spec};
 use serde_json::{Value, json};
 

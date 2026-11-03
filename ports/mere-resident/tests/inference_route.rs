@@ -200,7 +200,7 @@ async fn exercise_route(library_model: bool) {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
+                Arc::new(dramatis_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,
@@ -1168,7 +1168,7 @@ async fn a_real_model_cites_exact_retained_versions_and_reopens_its_run() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
+                Arc::new(dramatis_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,
@@ -1769,7 +1769,7 @@ async fn serve_trained_model_for_headed_turnstone() {
         // Opt-in receiving fixture: the same broker supplies the normal
         // wallet-backed clip custody route alongside inference. Both cold
         // processes use this marked wallet; no host-side fallback key exists.
-        let keeper = Arc::new(mere_resident::keeper::Keeper::new(keeper_host()));
+        let keeper = Arc::new(dramatis_resident::keeper::Keeper::new(keeper_host()));
         if let Some(root) = std::env::var_os("DJINN_HEADED_CLIP_CUSTODY") {
             let root = std::path::PathBuf::from(root);
             assert_eq!(

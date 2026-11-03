@@ -39,15 +39,8 @@ use personae::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider
 use castellan_client::custody::{CustodyRefusal, KeySource};
 use castellan_client::custody_client::{CustodyClient, CustodyClientError};
 
-pub const PROFILE_ENV: &str = "GRAPHSHELL_PROFILE";
-
-pub fn env_profile() -> Option<ProfileId> {
-    std::env::var(PROFILE_ENV)
-        .ok()
-        .map(|value| value.trim().to_string())
-        .filter(|value| !value.is_empty())
-        .map(ProfileId)
-}
+// This public client contract uses Dramatis's profile selection implementation.
+pub use dramatis::authentication::{PROFILE_ENV, env_profile};
 
 /// The derivation salt for one session's endpoint key.
 pub fn session_salt(session: &str) -> Vec<u8> {

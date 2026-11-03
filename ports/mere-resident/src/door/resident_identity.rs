@@ -18,10 +18,8 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use crate::door::browser_carrier::{
-    NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult,
-};
-use crate::door::identity_endpoint::IdentityAuthority;
+use dramatis_resident::native::{NativeIdentityAction, NativeIdentityFailure, NativeIdentityResult};
+use dramatis_resident::identity::IdentityAuthority;
 use crate::door::local_session::DoorIdentity;
 use ostiary::app_admission::AppId;
 use castellan_client::custody::{CustodyAnswer, CustodyCall, CustodyRefusal};

@@ -15,11 +15,12 @@
 mod custodian_fixture;
 
 use custodian_fixture::{TestCustodian, manage_grants};
-use mere_resident::custody_host::remote::RemoteHost;
-use mere_resident::custody_host::{CredentialCall, ResidentCustody};
+use dramatis_resident::custody_host::remote::RemoteHost;
+use dramatis_resident::custody_host::{CredentialCall, ResidentCustody};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::door::browser_carrier::NativeIdentityFailure;
-use mere_resident::{identity_ui::NativeIdentityUi, keeper::Keeper};
+use dramatis_resident::native::NativeIdentityFailure;
+use dramatis_resident::identity_ui::NativeIdentityUi;
+use dramatis_resident::keeper::Keeper;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use castellan_client::custody::CustodyRefusal;

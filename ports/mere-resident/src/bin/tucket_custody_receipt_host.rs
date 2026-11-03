@@ -6,10 +6,9 @@ use castellan::{
         wallet::bootstrap_wallet_state,
     },
 };
-use mere_resident::{
-    door::app_broker::{AppEndpointCatalog, serve_app_broker},
-    keeper::Keeper,
-};
+use mere_resident::door::app_broker::AppEndpointCatalog;
+use mere_resident::door::app_broker::serve_app_broker;
+use dramatis_resident::keeper::Keeper;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use castellan_client::custody_client::CustodyClient;

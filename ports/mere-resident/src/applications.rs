@@ -25,7 +25,7 @@ use ostiary::declaration::{
     AppDeclaration, AppGrant, AppIdentity, CustodyGrant, NamePattern, WindowsAppIdentity,
 };
 
-use crate::identity_ui::NativeIdentityUi;
+use dramatis_resident::identity_ui::NativeIdentityUi;
 use crate::resident_devices::DEVICE_DIRECTORY_ROUTE;
 use crate::resident_status::{RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE};
 use crate::settings::OwnerSettings;

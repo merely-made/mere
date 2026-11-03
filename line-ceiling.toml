@@ -1211,9 +1211,6 @@ path = "ports/graphshell/web/styles.css"
 reason = "Styles. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 
-[[exception]]
-path = "ports/mere-resident/src/bin/c1_receipt_host.rs"
-reason = "Explicit public synthetic resident for the Cleromancy C1 headed lane. Existing source-size debt; a responsibility split must preserve InspectApplication and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/src/bin/distillery_chronicle_receipt_host.rs"
@@ -1227,13 +1224,7 @@ reason = "Resident Djinn authority. Existing source-size debt; a responsibility 
 path = "ports/mere-resident/src/conditions.rs"
 reason = "What this device can honestly say about itself. Existing source-size debt; a responsibility split must preserve SignalProvenance, ConditionCoverage, StatedConditions and existing module visibility."
 
-[[exception]]
-path = "ports/mere-resident/src/custody.rs"
-reason = "The custody route's answers: what djinn does for an application that asks instead of opening a vault, storage or wallet (dramatis repo plan, D5, D11, D12, D17). Existing source-size debt; a responsibility split must preserve ReleasePolicy, EpochRule, SaltRule and existing module visibility."
 
-[[exception]]
-path = "ports/mere-resident/src/custody_host/remote.rs"
-reason = "[ResidentCustody] over the independently launched custodian: the only implementation a production build has. Existing source-size debt; a responsibility split must preserve State, RemoteHost and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/src/door/app_broker.rs"
@@ -1259,9 +1250,6 @@ reason = "The identity cards: Graphshell's presentation of the resident identity
 path = "ports/mere-resident/src/door/projection_offers.rs"
 reason = "Owner policy and short-lived application projection registrations. Existing source-size debt; a responsibility split must preserve ProviderPermission, ProviderPolicyError, ProviderPolicy and existing module visibility."
 
-[[exception]]
-path = "ports/mere-resident/src/identity_ui.rs"
-reason = "Native-only identity interactions. Existing source-size debt; a responsibility split must preserve NativeIdentityUi, SystemNativeIdentityUi, UnavailableNativeIdentityUi and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/src/moot_site.rs"
@@ -1307,9 +1295,6 @@ reason = "The resident's account of itself and its owner-only stop, on the appli
 path = "ports/mere-resident/src/settings.rs"
 reason = "Persisted owner settings for the Djinn resident. Existing source-size debt; a responsibility split must preserve OwnerSettingsError, OwnerSettings, InferenceLaneSettings and existing module visibility."
 
-[[exception]]
-path = "ports/mere-resident/src/startup_vault.rs"
-reason = "How the resident reaches its custody without the environment (vault lock rulings 42 and 62 to 66; custody isolation plan, H2). Existing source-size debt; a responsibility split must preserve VaultChoice, Ask, Answer and existing module visibility."
 
 [[exception]]
 path = "ports/mere-resident/src/sync/graph_keys.rs"

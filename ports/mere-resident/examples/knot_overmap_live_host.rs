@@ -32,13 +32,13 @@ use castellan::{
 };
 use chirograph::{IntentInvocation, IntentResult, ProjectionSession};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::{
-    keeper::Keeper,
-    resident_mere::{MereRoutes, mere_route_id},
-    resident_reservoir::{
-        EnsureMereV1, RESERVOIR_ENSURE_MERE_INTENT, RESIDENT_RESERVOIR_ROUTE, ResidentReservoir,
-    },
-};
+use dramatis_resident::keeper::Keeper;
+use mere_resident::resident_mere::MereRoutes;
+use mere_resident::resident_mere::mere_route_id;
+use mere_resident::resident_reservoir::EnsureMereV1;
+use mere_resident::resident_reservoir::RESERVOIR_ENSURE_MERE_INTENT;
+use mere_resident::resident_reservoir::RESIDENT_RESERVOIR_ROUTE;
+use mere_resident::resident_reservoir::ResidentReservoir;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use dramatis::view::VaultProtectionView;
@@ -123,8 +123,8 @@ async fn main() {
     castellan::custody::wallet::save_identity_seed(&shared, PUBLIC_SEED).unwrap();
     let seed = castellan::custody::wallet::ensure_wallet_state(&shared, persona, DEVICE).unwrap();
     assert_eq!(seed, PUBLIC_SEED, "fixture wallet uses the public seed");
-    let released = mere_resident::custody::epoch_keys(
-        &mere_resident::custody::ReleasePolicy::none()
+    let released = dramatis_resident::custody::epoch_keys(
+        &dramatis_resident::custody::ReleasePolicy::none()
             .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch),
         &shared,
         persona,

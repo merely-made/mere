@@ -97,7 +97,7 @@ mod custodian_fixture;
 #[test]
 fn profile_roundtrip_fences_a_stale_payload_write() {
     use custodian_fixture::{TestCustodian, manage_grants};
-    use mere_resident::custody_host::ResidentCustody;
+    use dramatis_resident::custody_host::ResidentCustody;
     use dramatis::intents::SwitchProfileIntentV1;
     let host = TestCustodian::start("profile fence fixture", &[("work", [0x31; 32]), ("home", [0x32; 32])], manage_grants());
     let persona = PersonaId::new();

@@ -70,7 +70,8 @@ each package's coupling measured in files.
 **2026-11-03 ownership update:** the table retains its original audit basis.
 Castellan, Sporran and Gazette's domain now live in Dramatis (D11-D13), and
 D14 moves the custodian and custody-wire there too. The resident composition
-remains in Mere. The grants template is now
+remains in Mere. D15 also moves the reusable resident identity service into `dramatis-resident`;
+Mere retains its graph-door and platform-dialog adapters. The grants template is now
 `repos/dramatis/crates/djinn-custodian/packaging/djinn-grants.json.in`.
 
 ## What the code adds

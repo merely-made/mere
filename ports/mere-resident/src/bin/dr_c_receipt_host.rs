@@ -11,7 +11,7 @@ use castellan::{
     custody::{IdentityStorage, IdentityVault, Profile, SealedProfileStorage},
 };
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;
 use castellan_client::custody_client::CustodyClient;

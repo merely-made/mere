@@ -9,6 +9,38 @@ Receipts from this plan's runs go to `archive_docs/<date>/`, never into this
 plan (DOC_POLICY §8). Evidence that matters is a test in the repository or a
 line in Findings.
 
+## Cleanup direction, 2026-11-03
+
+Mark's goal is to implement the p2panda modules under developed subsystem
+owners and reduce Mere to its graph/UI semantics and composition. The working
+boundary map, checked against current sources, is:
+
+| Owner | Responsibility | Caller supplies |
+| --- | --- | --- |
+| Dramatis | identities, credential custody, authentication and identity service | application declarations and operation policy |
+| Distillery | inference, compute jobs, leases, mesh and producer surfaces | selected models, budgets and owner decisions |
+| Eidetic | stores, blobs, signed durable history, validation and stored-content encryption mechanisms | domain grammar, keys/authority and merge semantics |
+| Murm | transports, carrier/session security, discovery, exchange and sync sessions | admitted peer/domain scopes and durable storage adapters |
+| Gemot | governed spaces, membership, roles, sharing and group-key policy | identity/custody and store/transport suppliers |
+| Armillary/Djinn | execution, task lifetime and supervision | domain services and shutdown/resource ordering |
+| Mere | graph semantics, projections, editing and host composition | developed subsystem capabilities |
+
+p2panda-auth is group access control and therefore a Gemot integration, while
+Dramatis supplies identities and credentials. Group encryption mechanisms can
+live below policy in Eidetic, with Gemot deciding membership and rotation.
+Stickleback's current `net` feature still bundles exchange in Eidetic; factoring
+that through Murm must preserve one validated history/storage implementation.
+The Distillery extraction plan already owns ESP, mesh and port migration,
+including the committed receiving branch and history-preserving cutover; its
+older pause is re-evaluated against completed Djinn slimming and publication.
+These are implementation boundaries, not a claim that all moves have landed.
+Upstream module descriptions: [p2panda](https://p2panda.org/) and
+[access-control CRDT](https://p2panda.org/2025/08/27/notes-convergent-access-control-crdt.html).
+
+Current execution: Dramatis's D15 extracts the reusable resident identity
+service first. The remaining domain moves and each p2panda module integration
+keep their owner plans and must carry source-qualified receiving evidence.
+
 ## Constraints
 
 - One implementation per shared responsibility. Execution owns actor and thread completion, typed messaging, task scopes, cancellation and shutdown mechanics, with the caller supplying resource order, policy, deadlines and domain meaning, and optional Tokio support never mandatory for synchronous consumers. Service supervision composes domain owners without duplicating their journals, job grammar, authority or retention. Distillery keeps its own jobs, leases and scheduling (a job scheduler and a task executor differ). Observability owns the shared envelope, bounded retention, causal references, independent readers and explicit loss, while producers own redaction and outcome truth (family promotion 194-213).

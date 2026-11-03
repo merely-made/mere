@@ -11,6 +11,12 @@ Graphshell remains the local session and admission protocol. Knot remains the
 Djot editor and document authority. Djinn owns their shared process lifetime
 when they use persona-held state.
 
+Identity startup, profile selection, public identity, scoped custody operations
+and native-interaction commands come from Dramatis's `dramatis-resident`.
+The independent custodian owns the vault and wallet. This package supplies the
+graph projections, door wiring, concrete platform dialogs and the lifetime of
+the services it composes. Its normal graph contains no custody implementation.
+
 ## Run
 
 The default build links no Reticulum-licensed code. Features

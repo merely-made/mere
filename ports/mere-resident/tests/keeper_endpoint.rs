@@ -22,7 +22,7 @@ use mere_resident::door::identity_endpoint::IdentityEndpoint;
 use mere_resident::door::identity_projection::{
     GenerateSshKeyIntentV1, SSH_GENERATE_INTENT, SshUnlockPolicyIntentV1,
 };
-use mere_resident::keeper::Keeper;
+use dramatis_resident::keeper::Keeper;
 use dramatis::view::VaultProtectionView;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionSource};
 use personae::{Ed25519Keypair, ProfileId, UnlockTier};

@@ -19,6 +19,7 @@
 //! (`resident_mere_proxy`), is `graphshell_endpoint::door`; the serving half
 //! they compose is `graphshell_host`.
 
+mod dramatis_identity;
 pub mod app_broker;
 #[cfg(test)]
 mod app_broker_tests;

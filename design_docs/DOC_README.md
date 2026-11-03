@@ -1,3 +1,10 @@
+Resident identity extraction (2026-11-03), in progress: Dramatis D15 now owns
+the reusable startup, profile, custody and identity service. Mere keeps graph
+projections, door registration and concrete platform dialogs. The broader
+subsystem/p2panda ownership map is in the family promotion plan's
+"Cleanup direction, 2026-11-03" section. Source-qualified receiving work is
+tracked by `dramatis/design_docs/2026-11-01_dramatis_repo_plan.md`.
+
 Custodian extraction (2026-11-03): `djinn-custodian`, `custody-wire`, the
 station-grant policy and native receiving harness now belong to Dramatis
 (`repos/dramatis/design_docs/2026-11-01_dramatis_repo_plan.md`, D14).

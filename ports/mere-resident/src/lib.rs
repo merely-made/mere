@@ -15,21 +15,15 @@
 
 pub mod applications;
 pub mod conditions;
-pub mod custodian;
 pub mod custody;
-pub mod custody_host;
 pub mod door;
 pub mod embedded_reservoir;
-pub mod enrollment;
 pub mod identity_ui;
-pub mod keeper;
 pub mod knot_relation_intake;
 pub mod lock_triggers;
 pub mod pairing;
 pub mod personal_sync;
 pub mod personal_facts;
-#[cfg(feature = "in-process-custody")]
-pub mod profile;
 pub mod resident;
 pub mod resident_blobs;
 pub mod resident_devices;
@@ -45,5 +39,4 @@ pub mod resident_site;
 pub mod moot_site;
 pub mod resident_status;
 pub mod settings;
-pub mod startup_vault;
 pub mod sync;

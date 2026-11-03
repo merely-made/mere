@@ -36,8 +36,8 @@ fn persona() -> PersonaId {
 }
 
 fn keys(root: &Path) -> (PersonalVaultKeys, Zeroizing<[u8; 32]>) {
-    let mut released = mere_resident::custody::epoch_keys(
-        &mere_resident::custody::ReleasePolicy::none()
+    let mut released = dramatis_resident::custody::epoch_keys(
+        &dramatis_resident::custody::ReleasePolicy::none()
             .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch),
         root,
         persona(),
@@ -157,7 +157,7 @@ async fn receive_through_owner(root: &Path, replacement: Option<&str>) -> String
         },
         custody.clone(),
         std::sync::Arc::new(move |persona, label: &str, requests: &[_]| {
-            mere_resident::custody::epoch_keys(&mere_resident::custody::ReleasePolicy::none()
+            dramatis_resident::custody::epoch_keys(&dramatis_resident::custody::ReleasePolicy::none()
             .with_declared_epochs(&knot_editor::declaration::app_declaration().custody.epoch), &epoch_root, persona, Some(label), requests).map_err(|r| format!("{r:?}"))
         }),
     )

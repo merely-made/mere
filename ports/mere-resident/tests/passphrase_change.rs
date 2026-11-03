@@ -8,14 +8,12 @@ use castellan::{
         SealedProfileStorage, SecretBytes, UnlockMethod,
     },
 };
-use mere_resident::{
-    door::{
-        app_broker::{AppEndpointCatalog, serve_app_broker},
-        browser_carrier::NativeIdentityFailure,
-    },
-    identity_ui::{NativeIdentityUi, SystemNativeIdentityUi},
-    keeper::Keeper,
-};
+use mere_resident::door::app_broker::AppEndpointCatalog;
+use mere_resident::door::app_broker::serve_app_broker;
+use dramatis_resident::native::NativeIdentityFailure;
+use dramatis_resident::identity_ui::NativeIdentityUi;
+use mere_resident::identity_ui::SystemNativeIdentityUi;
+use dramatis_resident::keeper::Keeper;
 use dramatis::authentication::{PassphraseChangeFailureV1 as F, PassphraseChangeReceiptV1 as R};
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::AppId;

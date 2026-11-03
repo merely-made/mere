@@ -298,7 +298,7 @@ mod lane {
         pub fn lock_holder(
             &self,
             profile: personae::ProfileId,
-        ) -> std::sync::Arc<dyn crate::custody_host::LockHolder> {
+        ) -> std::sync::Arc<dyn dramatis_resident::custody_host::LockHolder> {
             std::sync::Arc::new(InferenceLock {
                 lane: self.lane.clone(),
                 journal: self.journal.clone(),
@@ -371,7 +371,7 @@ mod lane {
         >,
         profile: personae::ProfileId,
     }
-    impl crate::custody_host::LockHolder for InferenceLock {
+    impl dramatis_resident::custody_host::LockHolder for InferenceLock {
         fn name(&self) -> &str {
             "resident inference"
         }

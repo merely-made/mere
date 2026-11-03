@@ -23,7 +23,7 @@ use std::time::Duration;
 
 use crate::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use armillary::tasks::ResidentTasks;
-use crate::custody_host::ResidentCustody;
+use dramatis_resident::custody_host::ResidentCustody;
 use chirograph::{CarrierRequestBody, CarrierResponseBody, IntentInvocation, IntentResult};
 use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
 use ostiary::app_admission::{AppId, AppRouteId};
@@ -130,7 +130,7 @@ impl ReservoirAttachment {
     /// A refusal, malformed response, lock or timeout never triggers fallback.
     pub async fn open_application<C, CFut>(
         options: ApplicationReservoirOptions,
-        prompt: &mut dyn crate::startup_vault::Prompt,
+        prompt: &mut dyn dramatis_resident::startup_vault::Prompt,
         configure: C,
     ) -> Result<Self, ReservoirAttachmentError>
     where
@@ -198,7 +198,7 @@ impl ReservoirAttachment {
                 let mut quiet = |_: &str, _: serde_json::Value| {};
                 // The family identity through custody: the installed
                 // custodian, or the in-process vault in a test build.
-                let opened = crate::startup_vault::open_custody(
+                let opened = dramatis_resident::startup_vault::open_custody(
                     &options.vault_dir,
                     options.profile.as_ref(),
                     None,
@@ -212,8 +212,8 @@ impl ReservoirAttachment {
                 // Resolve the existing wallet namespace, rather than minting a
                 // product-specific identity beside the user's selected one.
                 // Custody discloses the index: no wallet file is opened here.
-                let persona = crate::custody_host::resolve_persona(
-                    Arc::new(crate::custody_host::CustodyPersonas {
+                let persona = dramatis_resident::custody_host::resolve_persona(
+                    Arc::new(dramatis_resident::custody_host::CustodyPersonas {
                         custody: host.clone(),
                         wallet_root: options.shared_root.clone(),
                     }),
@@ -500,7 +500,7 @@ impl EmbeddedOwner {
                     return Err("selected identity locked during embedded startup".into());
                 }
                 tokio::select! {
-                    result = serve_app_broker(&endpoint, Arc::new(crate::keeper::Keeper::new(host)), grants, session_duration_ms, None, catalog.clone()) => {
+                    result = serve_app_broker(&endpoint, Arc::new(dramatis_resident::keeper::Keeper::new(host)), grants, session_duration_ms, None, catalog.clone()) => {
                         result.map_err(|error| error.to_string())
                     },
                     _ = &mut stopped => Ok(()),

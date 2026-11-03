@@ -330,7 +330,7 @@ async fn resident_embedding_process_fixture() {
         tokio::spawn(async move {
             let _ = serve_app_broker(
                 &endpoint,
-                Arc::new(mere_resident::keeper::Keeper::new(keeper_host())),
+                Arc::new(dramatis_resident::keeper::Keeper::new(keeper_host())),
                 grants,
                 60_000,
                 None,
