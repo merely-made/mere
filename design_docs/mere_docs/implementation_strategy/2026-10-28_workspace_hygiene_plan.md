@@ -11,6 +11,48 @@ line in Findings.
 
 ## Constraints
 
+### Registry release pass, 2026-11-03
+
+**Status:** in progress. Mark authorized the remaining registry releases and
+consumer repins, including Pandect regardless of the additional release work.
+This pass owns dependency versions, packaging repairs, registry publication and
+consumer alignment. Identity-layer extraction remains in its owning plans.
+
+Publish the carried `mere-lsm-tree` and `mere-fjall` forks, then Muniment's
+atomic-file API. Align Chartulary, Eidetic, Servitor and Gaz with the same
+storage API. Publish Sporran, Gazette and Castellan in dependency order.
+Pandect releases as 0.2.0 because the wallet API moved to Sporran. Audit its
+complete packaged dependency closure and release the required versions of Mere
+Kernel, Numen and Tabard; retain already published dependencies whose sources
+and APIs suffice. Set dependency lower bounds to the APIs actually required.
+
+Mere already locks Genet at the genet-events release. Verify that source cohort
+and align Isocosm's Mere rows and direct Genet overrides across its independent
+workspaces. Refresh Knot and Cleromancy when release-version changes require it.
+Preserve unrelated commits, dirty files and lockfile selections.
+
+**Done when:** each released archive builds against registry dependencies
+without local patches; storage, wallet, contact and custody tests pass with the
+selected features; Pandect's packaged tests pass; locked receiving checks pass
+in each affected workspace; source audits show the intended storage and Genet
+identities; release and pin commits are pushed on main; and plans record exact
+remaining platform gates. Registry-only checks must not inherit workspace git
+or path overrides. Keep the existing custody refusal and sealed-data formats.
+
+Required receipts are package/dependency summaries, publish results, test and
+receiving-check summaries, source identities and final commit hashes. Retain
+at most 100 MB total under `Code/testing/mere/registry-releases-20261103`;
+index them in this plan's archived receipt file. Use existing reusable targets
+under `C:/t/cargo-targets/<repo>` and create no isolated Cargo home or worktree.
+
+**Finding, 2026-11-03:** the first registry-only Muniment feature check exposed
+that its bounded Fjall APIs existed only in carried path dependencies. Their
+published names retain upstream version numbers and library names, with the
+`mere-` package prefix. Chartulary moves to 0.3.0 because its public storage
+types change from Muniment 0.1 to 0.2; Eidetic, Gaz and Servitor take fresh
+0.0-series releases. Pandect's cascade test passes Chartulary types to Servitor,
+so its packaged tests also need the aligned Servitor release.
+
 Sources are cited by short name with line numbers into the archived copies: consolidation, currency, lattice, sweep, crypto, seams, tails.
 
 **Releases and registry**

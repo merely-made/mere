@@ -1,6 +1,6 @@
 [package]
 name = "pandect"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["@mark-ik"]
 license.workspace = true
 edition = "2024"
@@ -11,7 +11,7 @@ rust-version = "1.97.1"
 readme = "README.md"
 keywords = ["session", "state", "manifest", "wallet", "mere"]
 categories = ["data-structures"]
-description = "Pandect: session manifests, graph and view sidecars, worker declarations, graph-reference adapters, settings and the persona wallet carry lane."
+description = "Session manifests, graph and view sidecars, worker declarations, graph-reference adapters and application settings for Mere."
 
 [features]
 # The furnace's graph passes (forgetting, consolidation), moved from Athanor.
@@ -21,8 +21,7 @@ furnace = []
 sceno.workspace = true
 async-trait = "0.1"
 insigne = { workspace = true, features = ["verify"] }
-# Certificate filenames are hex-encoded ids, so this is production code,
-# not a test helper: wallet_grant/certificate.rs encodes on the write path.
+# Stored graph and policy identifiers use hexadecimal encodings.
 hex = "0.4"
 # The platform data dir, for the family-shared identity root.
 dirs = "5"

@@ -209,7 +209,7 @@ modulus = { version = "0.1.0", path = "crates/conatus/modulus" }
 conatus = { path = "crates/conatus/conatus" }
 cartography = { package = "mere-cartography", version = "0.0.2", path = "crates/canvas/cartography" }
 linked-data = { package = "mere-rdf", version = "0.0.1", path = "crates/graph/linked-data" }
-kernel = { package = "mere-kernel", version = "0.0.2", path = "crates/graph/graph-kernel" }
+kernel = { package = "mere-kernel", version = "0.0.3", path = "crates/graph/graph-kernel" }
 # The graph-canvas content-root (was `orrery`; that name retired to the Merely
 # product tier ladder, 2026-07-09 — see the boundary pass plan amendments).
 pictograph = { version = "0.2.0", path = "crates/canvas/pictograph", default-features = false }
@@ -243,7 +243,7 @@ notochord = { version = "0.1.1", git = "https://github.com/merely-made/dramatis.
 chartulary = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 # The legend/memorial view over journals and codicils; reservation only.
 hagiograph = { version = "0.0.1", git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
-numen = { version = "0.2.0", path = "crates/conatus/numen" }
+numen = { version = "0.2.1", path = "crates/conatus/numen" }
 esp = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "bd0468c5c44c0b098494d30b3cfd0aa283cecf48" }
 # Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
 esp-testkit = { version = "0.1.0", git = "https://github.com/merely-made/esp.git", rev = "bd0468c5c44c0b098494d30b3cfd0aa283cecf48" }
@@ -330,7 +330,7 @@ proofs = { package = "mere-proofs", version = "0.1.0", git = "https://github.com
 incipit = { version = "0.2.1", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
 comms = { package = "mere-comms", path = "crates/shell/comms" }
-pandect = { version = "0.1.1", path = "crates/system/pandect" }
+pandect = { version = "0.2.0", path = "crates/system/pandect" }
 # Self-update over signed manifests (the cargo-packager-updater fork; ruled
 # 2026-07-24: name luggage, home mere). Apps consume it via git dep like the
 # rest of the family; mere itself will when its own packaging lands.
@@ -402,7 +402,7 @@ layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https:
 genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false }
 # Named genet-probe until genet 7baa554c (2026-09-14); same crate, new name.
 taproot = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false, features = ["accesskit"] }
-genet-static-dom = { git = "https://github.com/merely-made/genet.git", branch = "main" }
+genet-static-dom = { version = "0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 # The application half of the former `genet-host-api` — the settings
 # projection and the surface admission vocabulary. Genet's P1 split it out as
 # `mere-surface-api` (genet 57bcc38fdae, platform boundary plan §9.3), leaving
