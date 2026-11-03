@@ -1,10 +1,12 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-03):** in progress. Seventeen rulings recorded (D1 to D17).
-Eidetic's E1-E4 and H1, H2 and H4 landed. H3 is qualified in 23 of 25
-owned repositories; D17 authorizes the remaining Knot and Woodshed
-receiving repairs, now in progress. The adoption ledger and remaining failures are in the receipt.
+**Status (2026-11-03):** landed. Seventeen rulings recorded (D1 to D17).
+H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
+published local-check adoption, reviewed inventories and passing positive
+and deliberate-violation gates. Qualification uses the native package and
+feature scopes recorded in the receipt; broader product/platform acceptance
+remains with its owning plans.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
 measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
@@ -202,11 +204,14 @@ Each comes back as a question before anything is written.
   versions with their immediate callers, and retains the independent local
   DOM patch and registry JavaScript-engine regex sources. It does not
   update the dependency graph or remove the `num` ban.
-- 2026-11-03: D17 resolves receiving scope: repair the necessary cohorts.
-  Knot's targeted Dramatis dry-run also moves Mere, Genet and Murm cohorts.
-  Woodshed's Windows HAL30 path has gpu-allocator 0.28 on windows 0.57 while
-  HAL uses windows 0.62.2. The remaining work repairs and qualifies those
-  receiving graphs before enabling and publishing their hooks.
+- 2026-11-03: D17's receiving repairs are qualified and published.
+  Knot aligns the required Mere, Genet, Murm and Dramatis cohorts, including
+  a stale AccessKit source record. Every registry package record remains
+  unchanged, and actual resolved package records and dependency edges match
+  the lock. Woodshed changes only gpu-allocator's Windows edge to HAL30's
+  0.62.2 line; BLE keeps its required 0.57.0 line. A deliberately empty
+  reversed-scope test has a function-scoped lint allowance, preserving its
+  negative assertion. Neither repair claims new headed or device acceptance.
 - 2026-11-02: H1-H3 receiving work has begun in the primary checkouts.
   The shared five Clippy lints are warnings in workspace tables and opted
   into by owned members; existing package-specific lint tables retain their
@@ -301,3 +306,9 @@ Each comes back as a question before anything is written.
 - 2026-11-03: returned cards recorded in answer order as D16 (Turquet's
   reference table) and D17 (necessary receiving repairs). H3 resumes in
   Knot and Woodshed under D17; their adoption is not yet qualified.
+- 2026-11-03: **H3 landed.** Knot and Woodshed pass the final full local
+  gates and actual commit hooks after the D17 receiving repairs. All 25
+  adoption commits are pushed to main; the 25 earlier full/commit rejection
+  controls remain valid for their unchanged ceiling hooks. H1-H4 and the
+  tool plan's E1-E4 are complete. The receipt appends the final receiving
+  hashes, lock audits, scope and cleanup; no remaining rollout phase is open.

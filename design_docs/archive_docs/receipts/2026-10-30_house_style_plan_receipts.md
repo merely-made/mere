@@ -143,3 +143,69 @@ No isolated Cargo home, target or worktree was created. Existing generated
 build/cache output was retained for reuse; no cleanup of other lanes’
 evidence or source was performed. The original handoff’s temporary location
 is not needed to understand this receipt and the current plan.
+
+## 2026-11-03: receiving repairs and H3 closeout
+
+The returned cards are recorded verbatim in the house-style plan, in answer
+order: D16 preserves Turquet's reference coefficients with the module-only
+allowance; D17 includes necessary receiving-cohort repairs. The rulings and
+regenerated manifest were pushed in Mere `83fc7e84a5b3`.
+
+### Final receiving results
+
+| Repository | Pushed main | Final full local gate |
+|---|---|---|
+| Knot | `8148b669bb2264058ba29331638dfceedf877d43` | pass, 43.25 s |
+| Woodshed | `445b7deca620f598b9ff3141d65c5549ba544d22` | pass, 15.53 s |
+
+Both ran `prek run --all-files` on their final source/configuration/lock
+inputs. Their pre-commit shims were reinstalled, and both real adoption
+commits passed their installed hooks. Their earlier 601-line full-run and
+real-commit rejection controls use the same ceiling configuration and tool.
+All 25 repositories now have pushed adoption and passing full local gates.
+The earlier 23-repository checkpoint above is preserved as run history.
+H1-H4 and the linked tool plan's E1-E4 are complete.
+
+Knot's receiving graph uses these coherent source cohorts:
+
+- Mere `fc0e92d0132f6cc44ba9e6c53410b8ced594f166`.
+- Genet `ad362723109b7e1738dfce13a625cf1a1b5e9ed1`.
+- Murm transport/WebRTC `c332e9c528d8505564ba54b2453463cf062ae9f9`.
+- Dramatis `260a431b34e8e9e888fc3b57c8db5a8483793949`.
+
+The disabled Retinue selection remains at its prior Murm revision. The
+initial offline precise-Dramatis update was followed by the targeted
+AccessKit alignment; the Dramatis packages were then aligned together.
+Cargo's updates also rewrote 15 unrelated registry dependency records.
+Those complete records were restored from the original lock, preserving
+all registry versions, checksums and dependency selections. Final
+`cargo metadata --locked --offline --format-version 1` passes: zero
+resolved-package gaps, zero resolved dependency edges absent from the
+lock, and all 12 first-party checkout heads match their reported sources.
+Every registry package record is identical to the pre-repair lock.
+Existing unused patch/URL-alias warnings were preserved; the rollout does
+not normalize unrelated source identities.
+
+Woodshed changes exactly the gpu-allocator 0.28.0 dependency edge from
+windows 0.57.0 to windows 0.62.2, alongside wgpu-hal 30.0.1. Locked metadata
+confirms BLE still resolves windows 0.57.0. Its remaining Clippy error was
+the intentionally empty `1..=0` scope in
+`wide_necks_wrap_readably_and_scopes_stay_bounded`; a function-only
+`reversed_empty_ranges` allowance keeps the existing assertion intact.
+The final gate passes without changing playback or coefficient data.
+
+### Qualification and retained output
+
+These gates qualify the local house-style adoption on the documented native
+Cargo scopes. They do not requalify historical headed, audio, physical-peer,
+firmware or other-platform receipts on new dependencies. Those remain tied
+to their original inputs and owner plans. The prior Linux tagged-tool
+installation remains the tool plan's cross-platform receipt.
+
+The stable Cargo paths are `C:/t/cargo-targets/<repo>` and their `build`
+directories, with two jobs per invocation. This forward-slash spelling also
+clarifies the path in the earlier hygiene paragraph. No isolated target,
+Cargo home or worktree was created or retained. Rollout helper/state files
+in system Temp are removed after final publication; the source records,
+configs and this appended receipt are the durable handoff. Receipt cap
+remains 100 MB; only compact text is retained.
