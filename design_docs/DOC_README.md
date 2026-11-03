@@ -1,3 +1,8 @@
+Stickleback network extraction (2026-11-03): Eidetic retains admission/history
+and Murm owns `murm-sync`; the canonical receiving scope is Murm's transport
+consolidation plan, T7. The [source homes map](mere_docs/technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
+refreshes the next extractions and directory cleanup against current consumers.
+
 Distillery extraction (2026-11-03), landed and consumer cutover qualified:
 [canonical plan](mere_docs/implementation_strategy/2026-10-31_distillery_extraction_plan.md).
 Distillery, compute mesh, probes and inference patches leave Mere; graph/host

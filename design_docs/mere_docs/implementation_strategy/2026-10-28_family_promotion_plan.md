@@ -28,8 +28,9 @@ boundary map, checked against current sources, is:
 p2panda-auth is group access control and therefore a Gemot integration, while
 Dramatis supplies identities and credentials. Group encryption mechanisms can
 live below policy in Eidetic, with Gemot deciding membership and rotation.
-Stickleback's current `net` feature still bundles exchange in Eidetic; factoring
-that through Murm must preserve one validated history/storage implementation.
+Stickleback 0.2 keeps storage and admission in Eidetic; Murm's `murm-sync`
+owns the extracted address book, join ceremony and receive drain. The network
+receiver reuses the existing policy-before-insert path.
 The Distillery extraction plan already owns ESP, mesh and port migration,
 including the committed receiving branch and history-preserving cutover; its
 older pause is re-evaluated against completed Djinn slimming and publication.
@@ -41,11 +42,11 @@ Current code inventory (2026-11-03): Gemot already has the p2panda-auth group
 CRDT adapter in `crates/gemot/src/moot/group.rs` and its wire/store modules.
 Eidetic's Stickleback already owns the signed-operation store and carrier-neutral
 p2panda group-encryption engine (`group_crypto.rs`); Gemot supplies membership
-and ordered control facts. The remaining transport ownership issue is concrete:
-Stickleback defaults its `net` feature on and links p2panda-net/sync there.
-This cleanup must factor that existing engine through Murm, preserving the
-accepted-history and policy-before-insert boundary, rather than build a second
-replication implementation. A manifest entry alone is not module acceptance.
+and ordered control facts. Stickleback's network feature is removed, and its
+normal graph contains neither p2panda-net nor p2panda-sync. Murm's T7 records
+the source move, receiver boundary, live convergence/rotation/shutdown tests
+and actual consumer receiving cohorts. A manifest entry alone is not module
+acceptance.
 
 Current execution: Dramatis's D15 has extracted the reusable resident identity
 service. Distillery, compute mesh, probes and inference patches now live in
@@ -53,7 +54,10 @@ the renamed Distillery repository, with seven consumer repositories qualified
 by the Distillery extraction plan. Turnstone calls Pandect's graph retention
 API and the direct Dramatis/Ostiary clients. The remaining domain moves and
 each p2panda module integration keep their owner plans and must carry
-source-qualified receiving evidence.
+source-qualified receiving evidence. The refreshed
+[source homes map](../technical_architecture/2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
+scopes the remaining leaves, adapters and directories. Station Custody is the
+next ready move; workshop destinations retain D16's separate checkpoint.
 
 ## Constraints
 
@@ -65,6 +69,7 @@ source-qualified receiving evidence.
 - Hosts and Chirograph keep authorization, confirmation, current-target and session, document and revision lifetime validation, dispatch and execution. Hest's effect and destructive declarations describe commands and grant no permission. An accepted invocation or handled input establishes admission or dispatch only; terminal completion needs the executing owner's actual reply, so Chirograph `IntentResult::Accepted` never becomes terminal `Done`. Apparatus records a redacted copy with producer-supplied operation and source scope (family promotion 374-382).
 - UxTree's Inker-specific projections and ux-events' browser vocabulary remain adapters that generic users must not inherit. Diagnostics and local automation keep working without Djinn running (family promotion 385-390).
 - Promotion preserves public APIs, crate names, licenses, stored formats, authority rules and default feature semantics. Storage-only consumers never acquire replication, an updater or participant execution; Stickleback keeps policy-before-insert; Luggage keeps a portable release identity core and a separately selected native updater; Servitor evaluates host-supplied authority while hosts execute work (family promotion 13-25).
+- The versioned Stickleback 0.2 / Murm T7 cut is an explicit API and feature exception: callers import live sessions from `murm-sync` instead of `stickleback::net`. Stored bytes, admission policy and lane identifiers retain their existing semantics; receiving roots qualify the breaking import change together.
 - Excluded: a universal transport rewrite, a replacement async runtime, new product panes, a universal automation protocol, model or backend work, a new capability algebra, a vault-format migration and new restart or retry defaults (family promotion 419-422).
 - Pool drop is nonblocking: it neither cancels jobs nor joins OS threads, an actor's completion handle owns the completion observation, and `workers()` counts threads ever spawned and is no shutdown signal (family promotion 742-746).
 

@@ -1,7 +1,8 @@
 # Source homes map: which Mere packages fit another repository
 
 **Date:** 2026-10-28
-**Status:** findings, read at Mere `d4d5b0c32` (`cargo metadata` over the
+**Status (2026-11-03):** the remaining extraction and directory scope is refreshed
+below. The original findings were read at Mere `d4d5b0c32` (`cargo metadata` over the
 workspace) and at the 2026-10-28 `main` of Murm, Gemot, Eidetic, ESP, Isocosm,
 Knot, Turnstone, Cleromancy and Woodshed (their manifests' Mere dependencies).
 The inventory below records that original survey; the dated ownership update records later moves. This is the dependency evidence that the family promotion
@@ -80,6 +81,62 @@ Mere composes those Git dependencies and keeps concrete graph/host adapters.
 Athanor and Alembic remain held by extraction-plan D16. The earlier candidate
 row and source paths below retain their original audit basis; the current
 cutover and remaining work are in the Distillery extraction plan.
+
+## Remaining extraction and directory scope, 2026-11-03
+
+Mark requested this scope after the Stickleback network move. The current
+tracked inventory contains 104 Rust packages, 88 in the main workspace.
+`Code/testing/murm/stickleback-extraction-20261103/mere-package-scope.json`
+records paths, physical Rust source lines including tests, normal/build
+dependency declarations, and external package consumers across twelve sibling
+repositories. These are declared edges; optional features and process entry
+points still need their receiving gate. The historical candidate table above
+must not substitute for this current inventory.
+
+Stickleback 0.2 retains signed history, admission and group encryption in
+Eidetic. Murm's `murm-sync` now owns its address book and live joined/synced
+sessions. The same admission receiver feeds both local and network arrivals.
+Domain grammar, graph projection and application authority remain with their
+owners. Qualification is Murm's transport consolidation plan, T7.
+
+| Slice | Current evidence | Next scope and done-condition |
+| --- | --- | --- |
+| `crates/system/station-custody` | 12 Rust files, 4,463 lines; no Mere dependency or internal consumer. Signalman's desktop is its external consumer. The old Pandect/Graphshell coupling in the historical table is gone. | First ready source move: Murm owns this Retinue-specific custody adapter; Dramatis still supplies credentials and grant policy. Preserve scoped derivation, expiry, revocation, first-owner control, licenses and fixture paths. Done after standalone tests, Signalman receiving and a Mere graph check without the member. Physical station qualification remains separate. |
+| `crates/domain/site` | 10 Rust files, 3,365 lines; portable native-site/snapshot validation with optional history/publication adapters. Resident and Knot consume it. | Split by responsibility before choosing a blanket Gemot home: Knot owns the authored snapshot/schema; Gemot owns collection/publication authority; Eidetic supplies retained history. Preserve V1 field order, exact bytes, content identities and source trust boundaries. Qualify both actual consumers and offline/default features. |
+| `crates/intel/mora-cmudict`, `reference-data` | 145 and 1,743 Rust lines, with no internal consumer; Knot is the declared external consumer. CMUdict also contains its corpus and license. | Candidate leaf move with Knot's lexical providers, preserving corpus/license hashes and the portable pack schema. Keep host-owned trust/download policy outside pack validation. `mere-edit` is different: its format-neutral source-edit proposal contract now serves both Knot and Isocosm and fits Mere's reusable application framework. |
+| `modulus`, `tenant`, `conatus`, `nisus` | Modulus and Tenant have only Isocosm consumers. Seiche now optionally imports Conatus for GPU evaluation; Numen and Seiche still serve the graph toolkit. | Review Modulus/Tenant as a bounded games-wing slice. A bulk four-crate games-only move is stale: first qualify Seiche's GPU path and choose a portable engine owner for Conatus/Nisus. Preserve the host's shared device. Numen/Seiche remain platform components under this scope. |
+| `ports/dramatis` | A real packaged `dramatis-ui` binary, not an unused library; 1,464 Rust lines. It uses Cambium/Desktop, Mesquite, Taproot and Persona Picker. | Candidate Dramatis application root with a standalone producer/SDK gate and preserved packaging/profile behavior. Core Dramatis must remain free of GUI dependencies. Persona Picker stays reusable GUI code; Woodshed also consumes it. |
+| `ports/distillery/athanor`, `crates/distillery/alembic` | 5,222 and 738 Rust lines. The `workshop-destination` feature still imports Kernel/Pandect; graph destinations call Athanor validation and share a durable operation transaction. | D16 still applies. Separate Mere's graph-destination adapter from the graph-free workshop core, then move that core to Distillery after the W3 recovery/two-host gate. A Pandect feature must take admitted effects/injected checks rather than import agent-domain authority. Preserve operation ids, sealed contexts, transactions and recovery semantics. |
+
+`mere-moot` and `mere-facts` contain graph/application adapters, so a Gemot or
+Dramatis name alone is insufficient reason to move them. The Comms contract
+is reusable; provider implementations belong with their protocol owners.
+`document-host` and `ux-events` have no declared production consumer in this
+census, but Document Host has its own component tests/probes and implements
+Registry's runtime trait. Review integration or retirement in the scripting
+and diagnostics plans before deleting or relocating either.
+
+Directory cleanup follows these cuts:
+
+1. Move ready owner-specific leaves first, updating workspace members, scripts,
+   fixtures, notices, source pins and actual consumers together. Remove a donor
+   only after the receiving source is pushed and its blobs are verified.
+2. The remaining `ports/distillery/athanor` and `crates/distillery/alembic`
+   directories are live held code. Remove those misleading parent groupings
+   when the workshop split lands; an interim cosmetic move adds another path
+   migration without settling ownership.
+3. Keep standalone applications in `ports/` and reusable graph/host adapters
+   in the existing `crates/` groups. Classify `ports/moot` by its library role
+   before a mechanical relocation; preserve public crate and protocol names.
+4. `crates/probes/murm-direct-phy` belongs with Murm's physical harnesses.
+   The co-op relay belongs beside Murm's transport pin, but its frozen input
+   hashes require a new harness cohort. `testing/moot-ocapn-coop` needs its
+   Gemot/Murm consumer boundary recorded before relocation. Keep historical
+   receipts at their cited locations and retain their original input scope.
+
+The next implementation slice is Station Custody. The remaining rows are
+reviewable scopes with named receiving gates, not completed moves or authority
+to replace the existing policies.
 
 ## What the code adds
 

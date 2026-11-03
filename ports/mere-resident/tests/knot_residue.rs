@@ -47,7 +47,7 @@ use p2panda_net::gossip::Gossip;
 use p2panda_net::{AddressBook, Endpoint};
 use residue::*;
 use residue_verdict::{Run, own_blocks, unjudged};
-use stickleback::MunimentAddressBook;
+use murm_sync::MunimentAddressBook;
 
 const RUNS: usize = 5;
 const SPACE: [u8; 32] = [0x91; 32];

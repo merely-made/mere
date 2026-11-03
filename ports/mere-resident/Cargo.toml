@@ -82,6 +82,7 @@ path = "src/bin/c1_receipt_host.rs"
 required-features = ["custody-receipt-host"]
 
 [dependencies]
+murm-sync.workspace = true
 dramatis-resident.workspace = true
 site-model.workspace = true
 gemot = { workspace = true, optional = true }
