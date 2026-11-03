@@ -15,7 +15,8 @@ use chirograph::{
 use muniment::RedbBackend;
 use personae::IdentityProvider;
 use std::sync::Arc;
-use stickleback::{GroupPrekeyBundle, GroupRecipientId, JoinError, JoinedSpace, SyncStatus};
+use stickleback::{GroupPrekeyBundle, GroupRecipientId, JoinError};
+use murm_sync::{JoinedSpace, SyncStatus};
 
 use stickleback::DataKeyring;
 use tokio::sync::{Mutex, RwLock};
