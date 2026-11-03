@@ -1,10 +1,10 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-03):** in progress. Fifteen rulings recorded (D1 to D15).
+**Status (2026-11-03):** in progress. Seventeen rulings recorded (D1 to D17).
 Eidetic's E1-E4 and H1, H2 and H4 landed. H3 is qualified in 23 of 25
-owned repositories; Knot and Woodshed await the receiving-graph scope
-answer below. The adoption ledger and remaining failures are in the receipt.
+owned repositories; D17 authorizes the remaining Knot and Woodshed
+receiving repairs, now in progress. The adoption ledger and remaining failures are in the receipt.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
 measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
@@ -137,6 +137,22 @@ abstraction" contradicted the known-futures ruling (2026-09-23).
 
   Links: amends stack.3, stack.6 · governs H4 · summary Consolidate related Stack statements within seven slots for bounded work and distinguishable failure; refine ownership and capability routing in place.
 
+- **D16. Preserve reference coefficients (Mark, 2026-11-03):** "Keep coefficients; allow only on the table module (Recommended)".
+  Outcome: applies to stack.7 and H1's lint adoption. Turquet preserves
+  the VSOP87D decimals and confines the coefficient-table
+  `clippy::approx_constant` allowance to that module. This records the
+  returned answer to the earlier card; it creates no stack-wide allowance.
+
+  Links: draws on stack.7 · governs H1 · summary Preserve the VSOP87D coefficients with a module-only approximate-constant lint allowance.
+
+- **D17. Repair receiving graphs (Mark, 2026-11-03):** "Repair the necessary receiving cohorts (Recommended)".
+  Outcome: applies to stack.7 and H3. Include the receiving-graph repairs
+  necessary for the new local lint gates, including Knot's related Mere,
+  Genet, Murm and Dramatis source cohorts. Preserve unrelated lock selections
+  and qualify the resulting receiving graph before publishing adoption.
+
+  Links: draws on stack.7 · governs H3 · summary Repair the necessary receiving cohorts to qualify the local lint gates.
+
 ## Open forks
 
 Each comes back as a question before anything is written.
@@ -186,13 +202,11 @@ Each comes back as a question before anything is written.
   versions with their immediate callers, and retains the independent local
   DOM patch and registry JavaScript-engine regex sources. It does not
   update the dependency graph or remove the `num` ban.
-- 2026-11-03: receiving scope is an open question, not a ruling: whether
-  this rollout includes necessary first-party graph repairs, or records
-  inventory/lints while deferring blocked hooks. Knot's targeted Dramatis
-  dry-run also moves Mere, Genet and Murm cohorts. Woodshed's Windows HAL30
-  path has gpu-allocator 0.28 on windows 0.57 while HAL uses windows 0.62.2.
-  Neither lockfile has been changed by this rollout. Do not treat an
-  unreturned card as approval for those repairs.
+- 2026-11-03: D17 resolves receiving scope: repair the necessary cohorts.
+  Knot's targeted Dramatis dry-run also moves Mere, Genet and Murm cohorts.
+  Woodshed's Windows HAL30 path has gpu-allocator 0.28 on windows 0.57 while
+  HAL uses windows 0.62.2. The remaining work repairs and qualifies those
+  receiving graphs before enabling and publishing their hooks.
 - 2026-11-02: H1-H3 receiving work has begun in the primary checkouts.
   The shared five Clippy lints are warnings in workspace tables and opted
   into by owned members; existing package-specific lint tables retain their
@@ -284,3 +298,6 @@ Each comes back as a question before anything is written.
   hook shims are uninstalled pending the scope answer, with reviewable
   configuration and lint changes preserved unstaged. Their lockfiles are
   unchanged. This does not mark H3 complete.
+- 2026-11-03: returned cards recorded in answer order as D16 (Turquet's
+  reference table) and D17 (necessary receiving repairs). H3 resumes in
+  Knot and Woodshed under D17; their adoption is not yet qualified.
