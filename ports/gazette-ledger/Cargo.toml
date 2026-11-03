@@ -5,9 +5,9 @@ version = "0.0.1"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "The contact ledger projection and the reading-room extractor: gazette's Cambium side, over chirograph, incipit, sceno and Fleece."
+description = "The contact ledger projection: gazette's Cambium side, over chirograph, incipit and sceno."
 readme = "README.md"
-keywords = ["contacts", "ledger", "projection", "reader"]
+keywords = ["contacts", "ledger", "projection"]
 categories = ["data-structures"]
 
 [dependencies]
@@ -16,8 +16,6 @@ incipit.workspace = true
 sceno.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
-fleece.workspace = true
-genet-static-dom.workspace = true
 
 [dev-dependencies]
 # Test-only: the Ledger parity test reproduces the Ledger's receipts through

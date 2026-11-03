@@ -4,91 +4,14 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The contact ledger projection and the reading-room extractor.
+//! The contact ledger projection.
 //!
 //! Gazette's directory domain, WebFinger discovery and the intake that hands
 //! what it learns to `gaz`, lives in dramatis (`gazette`, 0.0.2) and links
 //! nothing from mere. What stays here is the Cambium side: the ledger that
-//! projects contacts into a scene over `chirograph`, `incipit` and `sceno`, and
-//! the helper that reads an article out of supplied HTML through the static DOM
-//! and Fleece. It moved out of `gazette` on 2026-11-03 so dramatis would not
-//! pin mere (dramatis repo plan, D13).
+//! projects contacts into a scene over `chirograph`, `incipit` and `sceno`. It
+//! moved out of `gazette` on 2026-11-03 so dramatis would not pin mere
+//! (dramatis repo plan, D13); the reading-room article extractor went to
+//! `mere-fleece`, behind its `article` feature.
 
 pub mod ledger;
-
-/// Extract a reader article from supplied HTML without fetching or storing it.
-///
-/// Gazette's future poller owns response acquisition and persistence. This helper
-/// only admits declared HTML, parses it through the static DOM, and asks Fleece
-/// whether the document has a readable article.
-pub fn article_from_html(content_type: Option<&str>, html: &str) -> Option<fleece::Article> {
-    let document = match html_syntax(content_type)? {
-        HtmlSyntax::Html => genet_static_dom::StaticDocument::parse(html),
-        HtmlSyntax::Xhtml => genet_static_dom::StaticDocument::parse_xml(html),
-    };
-    fleece::extract_article(&document)
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum HtmlSyntax {
-    Html,
-    Xhtml,
-}
-
-fn html_syntax(content_type: Option<&str>) -> Option<HtmlSyntax> {
-    let media_type = content_type?.split(';').next()?.trim();
-    if media_type.eq_ignore_ascii_case("text/html") {
-        Some(HtmlSyntax::Html)
-    } else if media_type.eq_ignore_ascii_case("application/xhtml+xml") {
-        Some(HtmlSyntax::Xhtml)
-    } else {
-        None
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn supplied_html_article_extraction_is_readable_only() {
-        let article = article_from_html(
-            Some("text/html; charset=utf-8"),
-            r#"<!doctype html><title>Field notes</title><main><article>
-                <h1>Field notes</h1>
-                <p>The first paragraph carries enough prose to be a reader article.</p>
-                <p>The second paragraph confirms this is content, not site chrome.</p>
-            </article></main>"#,
-        )
-        .expect("readable supplied HTML should produce an article");
-        assert_eq!(article.title.as_deref(), Some("Field notes"));
-        assert!(!article.blocks.is_empty());
-
-        assert!(article_from_html(Some("text/html"), "<nav><a href='/'>Home</a></nav>").is_none());
-    }
-
-    #[test]
-    fn supplied_non_html_never_enters_the_reader_extractor() {
-        assert!(
-            article_from_html(
-                Some("application/json"),
-                r#"{"title":"not HTML","body":"<main>not parsed</main>"}"#,
-            )
-            .is_none()
-        );
-    }
-
-    #[test]
-    fn supplied_xhtml_uses_the_declared_xml_syntax() {
-        assert_eq!(
-            html_syntax(Some("application/xhtml+xml; charset=utf-8")),
-            Some(HtmlSyntax::Xhtml),
-        );
-        let article = article_from_html(
-            Some("application/xhtml+xml"),
-            r#"<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XML field notes</title></head><body><main><article><h1>XML field notes</h1><p>The first paragraph carries enough prose to be a reader article.</p><p>The second paragraph confirms this is structured XHTML content.</p></article></main></body></html>"#,
-        )
-        .expect("declared XHTML should produce an article without a sniff marker");
-        assert_eq!(article.title.as_deref(), Some("XML field notes"));
-    }
-}

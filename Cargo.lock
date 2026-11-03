@@ -6302,10 +6302,8 @@ name = "gazette-ledger"
 version = "0.0.1"
 dependencies = [
  "chirograph",
- "genet-static-dom",
  "graphshell-client",
  "incipit",
- "mere-fleece",
  "sceno",
  "scenomise",
  "serde",
