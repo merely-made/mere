@@ -6,7 +6,7 @@
 "which Beaker Browser features can we build". Claims from the chat were checked
 against origin/main of Murm, Eidetic, Gemot, Knot, Turnstone and Mere the same
 day; corrections are in §6.
-**Status:** direction. The implementation strategy is
+**Status:** direction; rescoped 2026-11-03 after a redundancy pass (plan Findings). The implementation strategy is
 [release_log_plan](mere_docs/implementation_strategy/2026-11-03_release_log_plan.md).
 **Anchors:**
 [own-device serving brief](2026-10-29_own_device_serving_brief.md) (Beaker's
@@ -55,7 +55,7 @@ transfer remain iroh-only; this is the bilateral stream lane only."
 | | Reach | Data | Shared spaces |
 |---|---|---|---|
 | Co-op / iroh | p2panda-net discovery, endpoint, LogSync, gossip | store, encryption; blobs via iroh-blobs | Gemot auth, Stickleback group crypto, OCapN live layer |
-| Reticulum | retinue announces and address book; no sync; session lane carries posts | store, encryption; no blob transfer (one Retinue response segment is 1,048,575 bytes) | works as data, but nothing delivers missing history |
+| Reticulum | retinue announces and address book; no sync; session lane carries posts | store, encryption; no blob transfer through `ReticulumTransport`, though retinue has multi-segment resources | works as data, but nothing delivers missing history |
 | I2P | only as a Reticulum interface (truchman SAM, optional embedded emissary) | as Reticulum | as Reticulum |
 | Tor | nothing; "Arti is deferred" | — | — |
 | Noise / TCP | `NoiseListener` exists but is not a `Transport` | store, encryption | as Reticulum |
@@ -149,7 +149,7 @@ transport relay alone is not such a holder."
 
 | Relay | Who still sees your address |
 |---|---|
-| iroh relay with direct paths disabled (whether iroh 1.0 exposes that setting is unchecked) | the relay operator, not the reader |
+| iroh relay, relay-only endpoint (`clear_ip_transports()` in iroh 1.4.1) | the relay operator, not the reader |
 | Reticulum transport node | the next hop on your path |
 | I2P tunnel or Tor onion | nobody on the path |
 
@@ -189,9 +189,12 @@ ruling: "Native hosts and contributions, not injected web APIs."
   than adding a parallel envelope.
 - **Freshness is solved for governed sites, not ordinary ones.** P10 and P11
   landed 2026-10-29 and 2026-10-30.
-- **Snapshot size vs Reticulum.** A snapshot V1 can encode to 24 MiB; one
-  Retinue response segment is 1,048,575 bytes. Off-iroh blob carriage needs
-  hash-verified chunks or Retinue's multi-segment transfer (Knot small-web O2).
+- **Snapshot size vs Reticulum.** A snapshot V1 can encode to 24 MiB and one
+  Retinue segment is 1,048,575 bytes, but retinue already moves multi-segment
+  resources (`SegmentedSender`) and Stickleback already verifies chunks
+  (`assemble_chunks`). What's missing is resource carriage through Murm, which
+  murm runtime M12 owns. (Corrected after the redundancy pass; the first draft
+  proposed a new chunker.)
 - **p2panda-blobs exists in the fork** but nothing uses it; iroh-blobs stays the
   iroh path.
 

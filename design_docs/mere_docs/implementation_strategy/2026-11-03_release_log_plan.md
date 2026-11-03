@@ -1,6 +1,8 @@
 # Release log: carrier-neutral sites, shares and clips
 
-**Status:** 2026-11-03: plan. Nothing implemented. Design:
+**Status:** 2026-11-03: plan. Nothing implemented. Phases rescoped the same day
+after a redundancy pass over Eidetic, Murm, Gemot, Dramatis, Armillary, Errand,
+Distillery and Mere (Findings, "Redundancy pass"). Design:
 [release_log_brief](../../2026-11-03_release_log_brief.md).
 
 **For:** one primitive, a release in a signed p2panda log, that a site, an
@@ -11,18 +13,25 @@ holders while the author is offline, forks, link sharing, and the same features
 over Reticulum, I2P, Tor and Noise-over-TCP as over iroh.
 
 Not here, and cited instead of repeated:
-- governed publication, hosting commitments and historical authority:
+- governed publication, hosting promises and historical authority:
   `gemot/design_docs/moothold_docs/implementation_strategy/2026-11-01_moot_publication_plan.md`;
-- ordinary serving, the Djinn publication host, P10/P11 reader verification:
-  [site_publication_plan](2026-10-28_site_publication_plan.md);
-- drop codec, retention and drop carriage (M12):
+- ordinary serving, the publication host, P10/P11 reader verification, public
+  binding (P3, P4): [site_publication_plan](2026-10-28_site_publication_plan.md);
+- drop codec, retention and drop carriage over iroh and Retinue (M12):
   [murm_runtime_plan](2026-10-28_murm_runtime_plan.md);
-- endpoint authority and the T1–T6 consolidation:
-  `murm/design_docs/2026-10-28_transport_consolidation_plan.md`;
-- the setup gate and OCapN: `murm/design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`;
+- device pairing: [device_pairing_plan](2026-10-28_device_pairing_plan.md);
+- supervision, the scheduler (phase E), DNS-SD (F3) and the remote-listener rule
+  (F2): [family_update_resident_plan](2026-10-28_family_update_resident_plan.md);
+- distinct per-persona NodeIds and discovery off for non-main personas:
+  [browser_carrier_plan](2026-10-28_browser_carrier_plan.md);
+- the p2panda-spaces deciding test: the stack ownership audit, item R25
+  (`design_docs/mere_docs/research/2026-10-29_stack_ownership_audit/REPORT.md`);
+- endpoint authority: `murm/design_docs/2026-10-28_transport_consolidation_plan.md`;
+- the setup gate: `murm/design_docs/2026-10-29_secure_sessions_and_live_interaction_plan.md`;
 - the I2P identity fork and SAM interop: `murm/design_docs/2026-11-02_i2p_sam_seam_plan.md`;
 - Knot's serving contract and first acceptance gate:
-  `knot-editor/design_docs/2026-10-29_knot_writing_workspace_and_mesh.md`.
+  `knot-editor/design_docs/2026-10-29_knot_writing_workspace_and_mesh.md`;
+- sleep hand-off and "last one out": [own-device serving brief](../../2026-10-29_own_device_serving_brief.md) §2.
 
 Receipts from this plan's runs go to
 `archive_docs/receipts/2026-11-03_release_log_plan_receipts.md`, never into this
@@ -84,97 +93,152 @@ publisher's own devices never serve HTTP on their own addresses.
 
 Links: area publishing · plans R9 · summary HTTP compatibility for mainstream browsers, after R5 and R7, never exposing the publisher's address
 
+### release_log D5: tailor the p2panda fork, take from upstream as needed (2026-11-03)
+
+**2026-11-03 · new.** On the fork posture R1 asked about, Mark:
+
+> we can edit the fork to tailor it to our needs; take what's needed from upstream, too.
+
+R1 is settled: the mark-ik/p2panda fork carries what the family needs and
+pulls upstream work when it's wanted. Adopting a crate the family doesn't link
+yet adds a row to each root's patch table; that cost is accepted. R8 no longer
+waits.
+
+Links: area dependencies · plans R1 · plans R8 · summary keep and tailor the p2panda fork, merging upstream as needed
+
+### release_log D6: the solo-Moot adapter is optional (2026-11-03)
+
+**2026-11-03 · refines release_log D2.** Asked to confirm that the solo-Moot
+path is an optional feature so the site-log path builds without Gemot, Mark:
+
+> agreed with the optional solo-moot of it; not every site's a community!
+
+Links: area publishing · amends release_log D2 · plans R2 · summary the solo-Moot adapter is a feature; the site-log path builds without Gemot
+
 ## Constraints
 
 - **Two release authorities.** Governed releases are Gemot collection
   selections and keep P10/P11's verification and remembered history. Ordinary
-  releases are the new site log and must work with no Gemot membership, paired
-  device or moot replica. A release log never replaces governed selection with
-  a looser envelope (Knot mesh record).
+  releases use a site log, or an optional solo Moot (D2, D6). A release log
+  never replaces governed selection with a looser envelope (Knot mesh record).
 - **Snapshot V1 unchanged.** A release names a `PublishedSnapshotV1` digest; it
   doesn't add fields to it. The schema version is never a release counter.
-- **Ownership.** Release record and reader history: Eidetic/Stickleback
-  (mechanics) and `mere-site` (site profile). Carriage, discovery adapters,
-  relays and route diagnostics: Murm. Publication host and holder lifecycle:
-  Djinn. Release intent and product wording: Knot. Content capture and
-  provenance: Turnstone's engines. Governance meaning: Gemot.
+- **Ownership.** Release record: Stickleback (mechanics) and `mere-site` (site
+  profile). The LogSync session is Stickleback's (consolidation ruling (b));
+  Murm hands it a stream. Carriage, discovery adapters, relays and route
+  diagnostics: Murm. Holder lifecycle: Djinn (`armillary/crates/djinn`) with
+  the resident's site and blob owners (`mere/ports/mere-resident`). Release
+  intent and wording: Knot. Content capture and provenance: Turnstone's
+  engines. Governance meaning and hosting promises: Gemot. Keys: Personae.
 - **Footprint.** The record, reader history and resolver core build with no
   carrier. Each carrier adapter is a default-off feature. Default builds compile
-  no C. Knot's offline profile stays carrier-free.
+  no C. Knot's offline profile stays carrier-free. `mere-site`'s `publication`
+  feature pulls Gemot, Personae and Stickleback, so the site-log adapter lives
+  outside it.
 - **Hints are not authority.** Provider hints and announces route; the log
   decides. Advertising availability copies no content and grants nothing.
-- **Licence.** Reticulum adapters call retinue's API; no RNS-derived code
-  leaves retinue, outrider, tulle or radio-hand.
+- **Licence.** Reticulum adapters call retinue's API. Matching announces by a
+  key-bearing name, or propagation-node peering, would be RNS-derived logic and
+  lands inside retinue or outrider, never in `transport` or Stickleback.
 - **No injected web APIs.** Dynamic applications arrive as mods and
   contributions.
+- **Names.** "Transport" means Murm's `transport::Transport`; netfetcher and
+  `script/wire` have their own traits of that name. Release types avoid the
+  `Release*` names the family update plan's A4 uses for application updates
+  (`ReleaseRefV1`, `ReleaseOfferV1`).
 
 ## Phases
 
 ### R1. p2panda fork posture
 
-Adopting crates the family doesn't link yet (p2panda-spaces, possibly
-p2panda-blobs) adds a row to the patch table repeated in 22 build roots. The
-posture is Mark's call: upstream the seams (address book, shutdown drain,
-admitted ALPN handlers, gossip watcher refresh, dalek 3), publish the fork under
-fork names as Bole, Vano and Didgeridoo are, or keep the personal fork.
-R2–R6 use only crates already in the table (core, store, sync, encryption,
-auth, stream, net) and don't wait on this.
+Settled by D5: tailor the fork and merge upstream as needed. The local clone is
+`Code/crates/p2panda`; the current tag is
+`mere-p2panda-net-0.7.5-upstream-20261013`.
 
-- Done when: the posture is recorded as a decision here, and R8 knows whether
-  adoption adds rows.
+- Done when: met 2026-11-03 by D5.
 
 ### R2. Release record and reader history
 
 A release operation body: kind (site, share, clip), content reference
 (snapshot V1 digest or blob manifest root), provenance, optional `fork_of`
-release hash, optional provider hints, optional sealed-payload marker. The log
-key takes any of D3's three tiers: unassociated by default (no derivation from
-any root; association is a signed claim added later), associated (a disposable
-persona derived from a root, for managed identities), or root. Ordinary reader
-history mirrors P11: remembered head per log key, refusal of known rollback,
-equivocation (two operations at one sequence) surfaced as a conflict, an
-explicit freshness scope. Per D2 the reader history takes two authority
-adapters, the log chain and a solo Moot's collection fold through P10/P11, and
-moving a site from a log to a Moot makes the Moot's first selection name the
-log's last release. Decide here whether
-out-of-order buffering extends Stickleback's `causal.rs` or adopts
-p2panda-stream's ingest; record the reason in Findings.
+release hash, optional provider hints, optional sealed-payload marker. Its
+log key takes any of D3's tiers (R7 gives the key types).
+
+Reuse:
+- Stickleback `causal.rs` for order and equivocation: `CausalError::ForkedSequence`
+  (`:122`), `causal_projection` (`:167`), `author_head` (`:321`), pending and
+  missing-parent diagnostics. Out-of-order buffering extends it; p2panda-stream
+  isn't needed, and Stickleback outside `net` builds with no carrier.
+- Stickleback `processor.rs` `OperationPolicy::admit` (`:124`) for the release
+  body's policy, `store.rs` `put_blob`/`get_blob` (blake3 `BlobRef`) for content.
+- Stickleback `drop.rs` `DropProtector` and protected drops for sealed payloads.
+- `mere-site` `publication/reader/history.rs` (`ReaderHistory`, P11): refactor it
+  into one store with two adapters. Its compare-and-write, clock high-water
+  mark, capacity bound and corrupt-state refusal carry over. The Gemot adapter
+  is today's code behind the optional solo-Moot feature (D6); the site-log
+  adapter adds a remembered head per key.
+- Gemot `moot/records/collection.rs` (`authorized_collection`, `CollectionFork`)
+  is the second adapter. A solo Moot is a Moot whose founder is the author;
+  `constitution/mod.rs:11`'s founder-signed first rule needs no helper.
+- `mere-site` `history.rs` `SiteRevision.sequence` is a local checkpoint
+  journal and stays separate from the log sequence.
+
+New: the release body, the site-log adapter, and log-to-Moot lineage (Gemot's
+collection lineage is same-Moot only; cross-Moot lineage is Gemot P3).
 
 - Done when: a cold reader process holding only a log key verifies a release
   chain and opens the named snapshot; tampered bytes, a forged operation, known
   rollback and equivocation refuse; an older valid chain opens with its
   limited-freshness scope stated; a fork's first release resolves its source;
-  the same refusals hold for a solo-Moot site through the second adapter, and a
-  log-to-Moot move keeps lineage; an unassociated key verifies with no root in
-  scope, and an association claim verifies separately; the record builds with
-  no carrier feature.
+  with the solo-Moot feature on, the same refusals hold through the Gemot
+  adapter and a log-to-Moot move keeps lineage; the site-log path builds
+  without Gemot and with no carrier feature.
 
-### R3. Carriage over any `Transport`
+### R3. Carriage over any carrier
 
-- LogSync as a Stickleback session over a framed bidirectional stream, so Murm
-  can hand it a stream from any carrier. p2panda-net stays the native iroh path.
-- Drops carried over `Transport` for carriers without sync; this is murm
-  runtime M12's item and lands there.
-- Hash-verified chunk fetch over `Transport`, chunks sized under one Retinue
-  response segment (1,048,575 bytes), so a 24 MiB snapshot moves over
-  Reticulum.
-- Noise over TCP as a `Transport` implementation, so services written against
-  `Transport` can choose it.
+- **LogSync over a stream.** A Stickleback session that runs p2panda-sync's
+  `Protocol` over a framed bidirectional stream, so Murm can hand it a stream
+  from any carrier. p2panda-net stays the native iroh path (`synced_space.rs`,
+  `joined_space.rs`). Murm's `session_lane.rs` is the proven pattern for gated
+  carriage off gossip. Stickleback's `object_stream.rs` caps an object at
+  64 KiB, so LogSync framing needs its own bound.
+- **Drops and blobs off iroh.** Murm runtime M12 owns drop carriage over iroh
+  blobs and Retinue resources, with identical import reports across file, iroh
+  and resource. Large content rides that: Retinue's `SegmentedSender` and
+  `SegmentedReceiver` (`retinue/src/resource_transfer.rs`) already move
+  multi-segment resources past `MAX_SEGMENT_SIZE`, and Stickleback's
+  `BlobChunk` and `assemble_chunks` (`drop_io.rs:893`) already verify chunks.
+  `ReticulumTransport` uses the reliable stream, not resources, so what's new
+  is exposing resource carriage through Murm, not a new chunker.
+- **Noise over TCP.** `NoiseListener` stays outside `Transport`, as its own
+  ruling says (`noise.rs`, "Deliberately not a Transport": it dials by address
+  and owns no discovery). R4's resolver supplies the address, and services
+  already receive Noise sessions as `TransportKind::Noise` through
+  `AcceptedSession`. Every route goes through `transport::security`.
 
 - Done when: two in-process peers converge the same release log over
-  `P2pandaTransport`, `ReticulumTransport` and Noise/TCP; a 24 MiB snapshot
-  transfers over the Reticulum transport with every chunk verified and a
-  tampered chunk refused; all three go through the `transport::security` gate.
+  `P2pandaTransport`, `ReticulumTransport` and Noise/TCP through the gate; a
+  24 MiB snapshot reaches a reader over Reticulum through M12's resource
+  carriage with every chunk verified and a tampered chunk refused.
 
 ### R4. Addresses and resolver
 
 Extend Turnstone's `knot://<64-hex>/<path>` grammar: the host is a release-log
 key or a Moot collection anchor, and `@<release hash>` pins a version. One
-parser, shared by Turnstone and Knot. A Murm resolver tries one discovery
-adapter per enabled carrier: a p2panda topic derived from the key, Reticulum
-announces whose destination name carries the key, and I2P or onion destinations
-read from provider hints. Moots and co-op sessions resolve through the same
-grammar.
+parser, shared by Turnstone and Knot. A Murm resolver tries one adapter per
+enabled carrier:
+
+- p2panda: `subscribe`, `peers_for_topic` and `set_topics` on a topic derived
+  from the key (`p2panda_transport.rs:1033-1159`), with `MunimentAddressBook`.
+- Reticulum: extend the ALPN-to-destination-name mapping
+  (`reticulum_transport.rs:392`) so holders announce a name carrying the key;
+  name filtering on announces lives in retinue.
+- I2P and onion: destinations read from provider hints. I2P is reachable only
+  as a Reticulum interface today, so a direct I2P stream path is new.
+- Noise/TCP: addresses from hints, handed to `NoiseListener::connect_addr`.
+
+LAN DNS-SD stays family update F3. Provider hints follow the same rule as A4's
+disposable locators: never trusted.
 
 - Done when: a reader holding only an address finds a holder on each enabled
   carrier in-process and verifies through R2; a hint pointing at a holder with a
@@ -182,39 +246,75 @@ grammar.
 
 ### R5. Holders, the personal mesh and pools
 
-A holder syncs a log, retains its blobs under an explicit storage policy,
-serves on its enrolled carriers and signs a custody acknowledgement for an exact
-release, bound to its session (drop receipts carry no peer identity by design).
-The personal mesh is a private space of the owner's devices that replicates the
-sealed vault and public releases and hands serving off between devices. Relay
-pools and holder pools are one stack setting with a visible privacy tier per
-route.
+Extend what exists:
+- **Serving and retention:** `mere-resident` `resident_site.rs` and
+  `moot_site.rs` already retain snapshots under a custody lease and serve them
+  with restart and Stop/Remove rules; `resident_blobs.rs` owns blob custody with
+  namespaced `BlobLease`s. A holder adds log sync and peer acquisition.
+- **Supervision:** Armillary `ResidentTasks` (`close_and_join`, `cancel_and_join`)
+  and Djinn `supervise`. Restart and backoff wait on family update phase E.
+- **Personal mesh:** `personal_sync_host.rs`, Graphshell's `PersonalGraphReplica`
+  and `SyncRoster`, Dramatis's `DeviceRoster`, and the device pairing plan (D1
+  landed, D5 open). Vault replication between devices has no plan yet; the
+  archived wallet carry layer plan covers carrying a persona.
+- **Custody acknowledgement:** new. Gemot's `HostingPromise` is "neither a
+  custody claim nor a retrieval observation", and its publication plan keeps
+  promise, accepted transfer and demonstrated service as separate facts. The
+  acknowledgement is the accepted-transfer fact: Gemot P1 records it for
+  governed sites; a holder-signed statement bound to the session records it for
+  ordinary ones (drop receipts carry no peer identity by design, `receipt.rs:83`).
+- **Mesh holders:** Outrider's LXMF propagation nodes are a Reticulum
+  store-and-forward holder; node peering isn't implemented.
+- **Pools:** relay and holder pools as one stack setting with a visible privacy
+  tier per route. New; only `relay_url` exists today.
 
-- Done when: the Knot mesh record's first acceptance gate passes in-process
-  (A releases, B holds and survives restart, A goes away, cold reader C with
-  only the address reads R), once over iroh and once over a non-iroh carrier;
-  publishing reports "replication pending" until the configured holders
-  acknowledge.
+- Done when: the Knot mesh record's first acceptance gate passes in-process,
+  once over iroh and once over a non-iroh carrier; publishing reports
+  "replication pending" until the configured holders acknowledge.
 
 ### R6. Provider, frame and publisher contract
 
 Turnstone's engines emit clips as releases with provenance; Knot opens a
 release as a frame and publishes. Knot's named-recipient gate (publishing
-protocol O2) becomes an unlisted release with a capability address. "Share a
-folder" is an unlisted release of a blob manifest.
+protocol O2, owned there) becomes an unlisted release with a capability
+address. "Share a folder" is an unlisted release of a blob manifest. No
+capability-address code exists; per-persona gating can use Gemot delegation
+(`moot/delegation.rs`, insigne certificates). Private collection encryption is
+Gemot P3.
 
 - Done when: a Turnstone clip becomes a release, Knot opens and republishes it
   with provenance intact, and a folder share opens by address for a second
   persona and refuses for a third.
 
-### R7. Anonymity identities and Tor
+### R7. Key tiers, anonymous identities and Tor
 
-Carrier identities follow D3: an anonymous carrier uses an unassociated key by
-default, so an I2P or onion identity never shares a derivation with the plain
-identity; associated and root identities stay available where management
-matters more than anonymity. This decides the I2P plan's identity fork. Tor as a default-off `Transport` through arti, after checking its
-storage dependencies against the no-C rule. Tor's open-internet role also
-reaches fetch (netfetcher, Errand) through the same feature.
+What each D3 tier maps to:
+- **Associated:** Personae `derive_keypair` / `derived_keypair(salt)`
+  (BLAKE3-keyed from the master seed) with insigne `DerivedKeyAttestation` as
+  the link to the root. Exists.
+- **Unassociated:** Gemot's mien already models it as a new unlinked chain with
+  zero standing (`persona_chain.rs`). The key is a fresh Ed25519 key held in
+  custody outside the master-derived tree. Association added later is a scoped,
+  revocable insigne `DelegationCertificate`-style claim, not a
+  `DerivedKeyAttestation`, which binds a derivation.
+- **Root:** today's `knot://<root>`.
+
+Conflicts to resolve here:
+- Murm binds production transports only from a `DerivedKeypair`
+  (`p2panda_transport.rs:641` `builder_for`, vault lock ruling 96), and
+  `DerivedKeypair::new` is `pub(crate)` in Personae. An unassociated carrier
+  key needs a Personae-owned custodied key type that keeps the master
+  unreachable.
+- The Reticulum identity is derived from the persona key
+  (`transport/src/reticulum_transport/keys.rs`, Dramatis `reticulum.rs:62`).
+  That's the associated tier; anonymous carriers need the unassociated one.
+- The archived unlinkability plan skipped I2P and Yggdrasil for personas. R7
+  reverses that for anonymous carriers and decides the I2P plan's identity fork.
+- Arti is deferred in the I2P plan. A Tor `Transport` lifts that deferral, behind
+  a default-off feature, after checking arti's storage dependencies against the
+  no-C rule. For fetch, netfetcher already has the seam: `Stores.transport`
+  (`mere/crates/system/fetch/src/handle.rs:147`, "a proxy, an onion or garlic
+  lane").
 
 - Done when: no announce, hint or handshake on an anonymous carrier carries a
   key that links to the persona's plain identity; a release resolves and
@@ -222,15 +322,16 @@ reaches fetch (netfetcher, Errand) through the same feature.
 
 ### R8. p2panda-spaces evaluation in Gemot
 
-Run the stack ownership audit's deciding test: generic group transitions and
-key agreement through p2panda-spaces against Gemot's `GroupCrdt` use and
-Stickleback's group session, with Gemot keeping constitution and authority
-interpretation. Space-rooted release logs for multi-writer ordinary sites
-follow from the answer.
+This executes the stack ownership audit's item R25, whose deciding test is
+already written: concurrent add and remove, nested devices, key rotation,
+offline revoked peers, cold reopen, Muniment without SQLite, durable-data
+versus forward profiles. The code under test is Gemot `moot/group.rs`
+(`MootGroup` over `GroupCrdt`) and Stickleback `group_session.rs`,
+`group_lane.rs`, `group_crypto.rs`. Space-rooted logs for multi-writer
+ordinary sites follow from the answer.
 
-- Needs: R1.
-- Done when: the evaluation's result is recorded in Gemot's plan and here,
-  with the reason.
+- Done when: R25's result is recorded in the audit and Gemot's plan, with the
+  reason.
 
 ### R9. HTTP compatibility layer
 
@@ -246,10 +347,23 @@ addresses. Two routes:
   publisher only over a relay or anonymous route. Chrome and Firefox read it;
   the holder's address is public and the publisher's never is.
 
-The browser can't verify the log itself, so the gateway states that it, not the
-reader, verified the release, and serves the release hash and evidence beside
-each page so a capable client can check it. Small-web pages are rendered to
-HTML on the holder; static HTML releases are served as they are.
+Existing rules this phase has to answer:
+- Serving binds loopback only and "public exposure needs its own reviewed
+  deployment receipt" (site publication plan, Constraints; P3, P4).
+  `GeminiListenerPolicyV1` is loopback and `deny_unknown_fields`, so a public
+  listener needs its own policy type.
+- Family update F2 keeps remote listeners out of scope "until a consumer
+  supplies an admission and disclosure model". R9 is that consumer and supplies
+  the model.
+- Errand "does not speak HTTP, on purpose" (`errand/src/lib.rs`). The HTTP
+  server needs its own owner; Errand's `serve::Source` trait can feed it.
+- No small-web-to-HTML renderer exists. Parsers exist (Errand
+  `parse/gemtext.rs`, `parse/scrolltext.rs`; Micron in Turnstone and retinue's
+  NomadNet layer); the renderer is new.
+
+The browser can't verify the log, so the gateway states that it verified, using
+P10/P11's `EvidenceScope` vocabulary, and serves the release hash and evidence
+beside each page so a capable client can check them.
 
 - Needs: R5, R7.
 - Done when: a release opens in Tor Browser through an onion holder and in
@@ -267,26 +381,17 @@ repin.
 
 | Lane | Phases | Repos | Needs |
 |---|---|---|---|
-| record | R2 | eidetic (Stickleback), mere (`mere-site`) | — |
-| carriage | R3, R4 resolver | murm, eidetic | — (M12 in murm runtime plan) |
-| holder | R5 | mere (Djinn), murm | record, carriage |
+| record | R2 | eidetic (Stickleback), mere (`mere-site`), gemot for the solo-Moot adapter | — |
+| carriage | R3, R4 resolver | murm (with retinue), eidetic | M12 in the murm runtime plan |
+| holder | R5 | mere (`mere-resident`), armillary (Djinn), murm | record, carriage |
 | frames | R4 grammar, R6 | turnstone, knot-editor | record |
-| anonymity | R7 | murm (retinue I2P, arti), Personae custody | — |
-| spaces | R8 | gemot | R1 |
-| gateway | R9 | mere (Djinn), murm | holder, anonymity |
+| identity | R7 | dramatis (Personae, insigne), murm, mere (fetch) | — |
+| spaces | R8 | gemot, eidetic | — |
+| gateway | R9 | a new HTTP owner, mere (`mere-resident`), armillary | holder, identity |
 
 Lanes cost about 30 GiB of build cache each against the shared 400 GiB budget,
-so two or three run at a time. `record` and `carriage` are independent;
-`anonymity` can run beside either.
-
-## Open questions
-
-- **Gemot in ordinary builds.** D2 lets an author pick a solo Moot, and the site
-  publication plan says ordinary serving works without Gemot. Read together,
-  the solo-Moot adapter has to be an optional feature, so the site-log path
-  still builds without Gemot. Confirm that reading.
-- **iroh relay-only.** Does iroh 1.0 let an endpoint withhold direct addresses
-  so a reader sees only the relay?
+so two or three run at a time. `record`, `carriage`, `identity` and `spaces`
+are independent of each other.
 
 ## Findings
 
@@ -294,22 +399,42 @@ so two or three run at a time. `record` and `carriage` are independent;
   blobs are iroh-only (`murm/native/crates/transport/src/reticulum_transport.rs`, header).
 - 2026-11-03: `p2panda-sync`'s `Protocol` works over any `Sink`/`Stream` and has
   no iroh dependency (fork rev `1f69c9b`, `p2panda-sync/src/traits.rs:15`).
-- 2026-11-03: Stickleback already owns causal bookkeeping
-  (`eidetic/crates/stickleback/src/causal.rs`), the policy-before-insert
-  processor (`processor.rs`), plain and protected drops (`drop.rs`) and
-  identity-free drop receipts (`receipt.rs`).
-- 2026-11-03: `NoiseListener` runs Noise over plain TCP but is not a
-  `Transport` (`murm/native/crates/transport/src/noise.rs`).
 - 2026-11-03: Turnstone parses `knot://<64-hex Personae root>/<path>` and
   refuses other hosts (`turnstone/src/knot_authoring/parse_place_held_address.rs`).
-- 2026-11-03: snapshot V1 encodes up to 24 MiB (site publication plan,
-  Constraints); one Retinue response segment is 1,048,575 bytes (Knot small-web
-  plan O2).
 - 2026-11-03: the fork carries p2panda-spaces and p2panda-blobs; neither is
   used outside a cleromancy manifest.
+- 2026-11-03, iroh relays: iroh 1.4.1's `Endpoint::builder().clear_ip_transports()`
+  removes IP transports, leaving a relay-only endpoint, so a reader sees the
+  relay's address and not the publisher's. By default an endpoint also offers
+  direct addresses for hole punching, which a peer learns. The relay operator
+  (n0 for the default relays) sees the address of each endpoint connected to
+  it; a self-hosted relay keeps that in your hands.
+- 2026-11-03, redundancy pass, Eidetic and Murm: Stickleback already has causal
+  order and fork-at-sequence detection, policy-before-insert, blake3 blob
+  storage, protected drops, verified chunk assembly and identity-free receipts.
+  Retinue already has multi-segment resources. No release body, remembered
+  head, LogSync-over-stream, resolver, custody acknowledgement or pool setting
+  exists. `NoiseListener` is not a `Transport` by an explicit ruling; the first
+  draft of R3 would have reversed it.
+- 2026-11-03, redundancy pass, Gemot, Dramatis and Personae: P11's
+  `ReaderHistory` is Gemot-only and becomes the shared store. Personae derives
+  every persona from the master, so associated keys exist and unassociated ones
+  need a new custodied key type; mien already models the unlinked tier.
+  `HostingPromise` is not a custody acknowledgement. R8 restated the audit's
+  R25.
+- 2026-11-03, redundancy pass, Armillary, Distillery and Errand: Djinn lives in
+  `armillary/crates/djinn`; the resident's site and blob owners are the holder
+  base. Armillary supervises but has no leases or restart. Distillery's
+  inference code isn't in a local repo, and Mere's `distillery` crates
+  (Alembic, Athanor) don't overlap. Errand refuses HTTP by design and no
+  small-web-to-HTML renderer exists. netfetcher's `Stores.transport` is the Tor
+  fetch seam.
 
 ## Progress
 
 - 2026-11-03: plan written with the brief; decision D1 recorded.
 - 2026-11-03: D2 (both authorities), D3 (three address tiers) and D4 (HTTP
   compatibility without exposing the publisher) recorded; R9 added.
+- 2026-11-03: redundancy pass folded in; D5 (tailor the fork) and D6 (solo Moot
+  optional) recorded; R1 met; R3 drops its new chunker and the Noise
+  `Transport`; R7 maps D3's tiers onto Personae; R8 executes audit R25.
