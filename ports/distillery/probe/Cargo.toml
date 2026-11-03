@@ -69,3 +69,13 @@ chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "5afe67
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "5afe6723b75cc2b62420328c079c05c60c90380d" }
 esp = { git = "https://github.com/merely-made/esp.git", rev = "0ba91dbce5aaaad1b866a3891a0255045ba5131b" }
 muniment = { git = "https://github.com/merely-made/eidetic.git", rev = "5afe6723b75cc2b62420328c079c05c60c90380d" }
+
+[workspace.lints.clippy]
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+missing_safety_doc = "warn"
+undocumented_unsafe_blocks = "warn"
+too_many_lines = "warn"
+
+[lints]
+workspace = true

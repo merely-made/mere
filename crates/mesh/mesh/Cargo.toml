@@ -69,3 +69,6 @@ toml = "0.9"
 name = "inventory_ingress"
 path = "examples/inventory_ingress/main.rs"
 required-features = ["admitted-ingress"]
+
+[lints]
+workspace = true

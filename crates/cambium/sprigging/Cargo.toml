@@ -13,3 +13,6 @@ publish = true
 paint_list_api.workspace = true
 accesskit = { workspace = true, features = ["serde"] }
 vello = { workspace = true }
+
+[lints]
+workspace = true

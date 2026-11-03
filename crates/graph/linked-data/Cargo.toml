@@ -56,3 +56,6 @@ getrandom02 = { package = "getrandom", version = "0.2", features = ["js"], optio
 
 [dev-dependencies]
 kernel = { workspace = true, features = ["fixtures"] }
+
+[lints]
+workspace = true

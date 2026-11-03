@@ -49,3 +49,6 @@ accesskit_consumer.workspace = true
 # through AccessKit's own winit adapter and checks subtree actions and focus.
 accesskit_winit.workspace = true
 cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
+
+[lints]
+workspace = true

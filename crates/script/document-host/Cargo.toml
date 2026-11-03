@@ -40,3 +40,6 @@ pollster = "0.4"
 [dev-dependencies]
 # Drives the async export calls in the tests; the lib stays executor-neutral.
 tokio = { version = "1", features = ["rt", "macros"] }
+
+[lints]
+workspace = true

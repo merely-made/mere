@@ -48,3 +48,6 @@ uuid = { version = "1", features = ["serde", "v4"] }
 kernel = { package = "mere-kernel", path = "../../graph/graph-kernel", features = ["fixtures"] }
 serde_json = "1.0"
 proptest = "1.11"
+
+[lints]
+workspace = true

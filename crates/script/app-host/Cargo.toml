@@ -37,3 +37,6 @@ graphshell-endpoint = { workspace = true, features = ["wit-testkit"] }
 settings-wit = { workspace = true, features = ["testkit"] }
 script-wire.workspace = true
 workbench = { workspace = true }
+
+[lints]
+workspace = true

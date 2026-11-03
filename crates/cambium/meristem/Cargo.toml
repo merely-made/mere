@@ -24,3 +24,6 @@ kurbo = ["dep:kurbo"]
 tracing = { workspace = true }
 kurbo = { workspace = true, optional = true }
 anymore = "1.0.0"
+
+[lints]
+workspace = true

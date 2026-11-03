@@ -43,3 +43,6 @@ muniment = { workspace = true, features = ["directory"] }
 pollster = "0.4"
 serde_json = "1"
 tempfile = "3"
+
+[lints]
+workspace = true

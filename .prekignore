@@ -1,0 +1,3 @@
+# Imported/generated paths declared in line-ceiling.toml are not hook projects.
+/support/patches/
+/crates/script/wire/tests/generated/

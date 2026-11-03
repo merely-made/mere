@@ -31,3 +31,6 @@ editor = ["dep:backstep"]
 # Run `Condition::Script` (`RuleSet::resolve_with_scripts`). Off by default: the
 # condition is data and always present, and `resolve` refuses a set carrying one.
 scripts = ["dep:script-engine-api"]
+
+[lints]
+workspace = true

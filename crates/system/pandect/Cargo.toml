@@ -83,3 +83,6 @@ muniment = { workspace = true, features = ["fjall"] }
 muniment = { workspace = true, features = ["indexeddb"] }
 wasm-bindgen-test = "=0.3.79"
 uuid = { version = "1", features = ["js"] }
+
+[lints]
+workspace = true

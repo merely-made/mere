@@ -894,6 +894,15 @@ is historical evidence, not the current path or ownership inventory. For the wor
 
 ## Working principles
 
+- **Local hook scope (2026-11-03):** exclude imported hook projects with
+  `.prekignore`; a root hook's file filter alone does not stop nested project
+  discovery. Keep source-check exclusions and runner filters aligned. Set
+  the approved repository Cargo target before both direct gates and Git
+  commands that invoke hooks. Do not mutate a repository's index during a
+  full hook run: prek can report those concurrent changes as hook output.
+  The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
+  records the rollout and receiving boundaries.
+
 - **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
   while a lock record names an older revision than the package Cargo loads from
   its Git workspace. Compare resolved `(name, version, source)` records with the

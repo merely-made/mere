@@ -106,3 +106,6 @@ layout-dom-api = { workspace = true }
 name = "transport_residue"
 path = "tests/transport_residue.rs"
 harness = false
+
+[lints]
+workspace = true

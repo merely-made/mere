@@ -29,3 +29,5 @@ cambium-desktop = { workspace = true, optional = true }
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 taproot.workspace = true
 
+[lints]
+workspace = true

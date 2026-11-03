@@ -32,3 +32,6 @@ muniment = { workspace = true, features = ["directory", "redb"] }
 proofs.workspace = true
 servitor.workspace = true
 mien.workspace = true
+
+[lints]
+workspace = true

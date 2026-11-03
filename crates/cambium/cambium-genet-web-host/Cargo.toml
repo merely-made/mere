@@ -111,3 +111,6 @@ name = "presentation_page"
 path = "examples/presentation_page/main.rs"
 crate-type = ["cdylib"]
 required-features = ["webgl"]
+
+[lints]
+workspace = true

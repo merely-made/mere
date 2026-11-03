@@ -20,3 +20,6 @@ serde = { workspace = true, optional = true }
 proptest = "1"
 # The reference encoder the conformance tests compare against (D15).
 wit-bindgen-wrpc = "=0.12.0"
+
+[lints]
+workspace = true

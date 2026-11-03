@@ -37,3 +37,6 @@ graphshell-endpoint = { workspace = true, optional = true, features = ["projecti
 mere-view = { workspace = true, optional = true }
 sceno = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
+
+[lints]
+workspace = true

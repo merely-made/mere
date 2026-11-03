@@ -42,3 +42,6 @@ png = "0.17"
 [dev-dependencies]
 sprigging = { workspace = true }
 taproot = { workspace = true, features = ["estimated-probe-fixtures"] }
+
+[lints]
+workspace = true

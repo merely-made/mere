@@ -67,3 +67,6 @@ serde = { workspace = true, features = ["derive"] }
 # AC7's mount probe discovers the `<style>` elements a document and its shadow
 # roots carry, with their owner nodes, which `OwnedLayout::new` does not.
 genet-document-resources = { workspace = true }
+
+[lints]
+workspace = true

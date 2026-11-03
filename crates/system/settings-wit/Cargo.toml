@@ -23,3 +23,6 @@ script-witgen = { workspace = true }
 
 [dev-dependencies]
 settings-wit = { path = ".", features = ["testkit"] }
+
+[lints]
+workspace = true

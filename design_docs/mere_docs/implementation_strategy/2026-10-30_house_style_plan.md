@@ -1,10 +1,10 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-02):** in progress. Fifteen rulings recorded (D1 to D15).
-Eidetic's E1-E4 landed: standalone tagged tools, Windows/Linux installs and
-line-ceiling adoption in isocosm and eidetic. H4's doctrine pass landed;
-H1's Clippy/deny work and H2-H3's stack-wide inventory/adoption remain open.
+**Status (2026-11-03):** in progress. Fifteen rulings recorded (D1 to D15).
+Eidetic's E1-E4 and H1, H2 and H4 landed. H3 is qualified in 23 of 25
+owned repositories; Knot and Woodshed await the receiving-graph scope
+answer below. The adoption ledger and remaining failures are in the receipt.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
 measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
@@ -168,6 +168,65 @@ Each comes back as a question before anything is written.
 
 ## Findings
 
+- 2026-11-03: H2 records 900 individual oversize exceptions across 25
+  owned repositories, each with a technical reason. Imported patches,
+  vendored corpora and proven generated outputs have explicit exclusions.
+  This supersedes the reconnaissance counts below. All 25 positive ceiling
+  runs pass; a staged 601-line source file fails both the full local run and
+  an actual commit, without advancing HEAD, in every repository.
+- 2026-11-03: Smolweb, Wavicle and Mer3ly had existing CI Clippy commands
+  that promoted warnings to errors. D11 moves those commands to their local
+  hooks. Smolweb retains all-feature coverage; Mer3ly retains its root,
+  repo-graph and radio-mirror packages. Other workflow gates remain.
+- 2026-11-03: Mere's custody bans named the old `djinn` Cargo package. Its
+  allowed host is now `mere-resident`; correcting that wrapper name makes
+  the existing full-feature boundary pass without adding another host.
+- 2026-11-03: Genet's duplicate policy has drifted behind its resolved graph.
+  The refresh keeps `multiple-versions = "deny"`, exempts exact inspected
+  versions with their immediate callers, and retains the independent local
+  DOM patch and registry JavaScript-engine regex sources. It does not
+  update the dependency graph or remove the `num` ban.
+- 2026-11-03: receiving scope is an open question, not a ruling: whether
+  this rollout includes necessary first-party graph repairs, or records
+  inventory/lints while deferring blocked hooks. Knot's targeted Dramatis
+  dry-run also moves Mere, Genet and Murm cohorts. Woodshed's Windows HAL30
+  path has gpu-allocator 0.28 on windows 0.57 while HAL uses windows 0.62.2.
+  Neither lockfile has been changed by this rollout. Do not treat an
+  unreturned card as approval for those repairs.
+- 2026-11-02: H1-H3 receiving work has begun in the primary checkouts.
+  The shared five Clippy lints are warnings in workspace tables and opted
+  into by owned members; existing package-specific lint tables retain their
+  local policy and receive the same five warnings. Standalone packages use
+  their package lint table. Imported patches, generated sources and frozen
+  fixture manifests keep their own inputs and are not rewritten.
+- Patron references (D5): [rust-analyzer's style guide](https://rust-analyzer.github.io/book/contributing/style.html)
+  and [TigerStyle](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md),
+  from the latter only bounds and units-last naming. [Cargo's workspace lint
+  inheritance](https://doc.rust-lang.org/cargo/reference/workspaces.html#the-lints-table)
+  requires package opt-in; adding only a root table would leave members unchecked.
+- 2026-11-02: the native Clippy hook follows the repository's Cargo package
+  selection and default features. Graft selects `grafting` and
+  `grafting-frame`, Scry selects `scrying`, and Murm selects its portable
+  root libraries to respect their existing platform and firmware boundaries.
+  Other-platform demos, firmware and optional feature gates stay separately
+  owned. Existing bans are configured in Dramatis, Genet and Mere; Murm's
+  deny configuration is licenses-only, so it gets no invented bans policy.
+- 2026-11-03: the first Turquet Clippy gate reports 55 `approx_constant`
+  errors in the VSOP87D coefficient tables. A module-scoped allow preserves
+  every coefficient decimal. Netrender's deliberately reversed selection
+  range receives a test-scoped `reversed_empty_ranges` allow. These preserve
+  intentional inputs, outside the shared five-warning set; they do not
+  change a ruling. The initially requested Turquet card was unnecessary.
+- 2026-11-03: all 393 owned package manifests in the rollout's active
+  manifest scope resolve the five warnings, locally or through workspace
+  inheritance. Generated/imported sources and frozen fixture manifests are
+  outside that manifest rewrite; their source-size scope remains declared.
+- 2026-11-03: prek discovers nested hook projects independently of its root
+  filters. Genet's imported WPT dependencies therefore tried to install
+  their historical hooks. `.prekignore` now excludes the declared imported
+  and generated directories from project discovery. Genet's line hook also
+  filters the same declared paths before file classification; the runner's
+  pattern and the checker's path scope must change together.
 - 2026-11-02: H2 reconnaissance over the current tool's default extensions
   finds 949 oversize candidates after skipping candidate imported/generated
   paths (`tests/wpt/`, `support/patches/`, `vendor/`, `third_party/`,
@@ -213,3 +272,15 @@ Each comes back as a question before anything is written.
   doctrine checks passing after the retirement. Receipts live at
   `archive_docs/receipts/2026-10-30_house_style_plan_receipts.md` (100 MB cap;
   compact text only). H2-H3 and H1's remaining lint/deny wiring stay open.
+- 2026-11-03: H2 is qualified across the 25-repository scope. Local
+  controls pass in each repository. H1/H3 publication is continuing with
+  platform/default-feature scope and any blocked receiving graphs recorded
+  in the [rollout receipt](../../archive_docs/receipts/2026-10-30_house_style_plan_receipts.md).
+- 2026-11-03: **H1 landed** with the five warning lints, applicable
+  decision checks and existing bans in the same local/commit runner.
+  Isocosm now checks its regenerated manifest as well as regenerating it.
+  **H2 landed** with the reviewed 900-file inventory. H3 is qualified in
+  23 repositories; Knot and Woodshed remain receiving blockers. Their new
+  hook shims are uninstalled pending the scope answer, with reviewable
+  configuration and lint changes preserved unstaged. Their lockfiles are
+  unchanged. This does not mark H3 complete.

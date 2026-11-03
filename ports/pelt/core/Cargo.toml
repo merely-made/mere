@@ -35,3 +35,6 @@ url = "2.5"
 
 [dev-dependencies]
 genet-presenter.workspace = true
+
+[lints]
+workspace = true

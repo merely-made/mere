@@ -52,3 +52,6 @@ tempfile = "3"
 
 [build-dependencies]
 sha2.workspace = true
+
+[lints]
+workspace = true

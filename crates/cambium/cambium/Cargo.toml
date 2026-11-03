@@ -41,3 +41,6 @@ layout_dom_api = { workspace = true }
 genet-text = { workspace = true }
 illume = { workspace = true, optional = true }
 tinct = { workspace = true, optional = true }
+
+[lints]
+workspace = true

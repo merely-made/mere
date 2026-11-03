@@ -36,3 +36,6 @@ workbench = { version = "0.1.1", path = "../../workbench", optional = true }
 [dev-dependencies]
 # A composed facet opens as a scenotime snapshot (Scenograph editor plan, S1).
 scenotime = { version = "0.0.5", path = "../scenotime" }
+
+[lints]
+workspace = true

@@ -45,3 +45,6 @@ cambium-desktop = { workspace = true }
 genet-scripted-dom = { workspace = true }
 taproot = { workspace = true, features = ["image-decode"] }
 layout_dom_api = { workspace = true }
+
+[lints]
+workspace = true

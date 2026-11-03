@@ -175,3 +175,6 @@ harness = false
 name = "personae-agent"
 path = "src/bin/personae-agent.rs"
 required-features = ["agent"]
+
+[lints]
+workspace = true

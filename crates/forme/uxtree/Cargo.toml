@@ -25,3 +25,6 @@ nematic.workspace = true
 # Experiment E1a (app composition brief, AC3): the subtree join is checked
 # against the shared stable consumer used by the pinned platform adapters.
 accesskit_consumer.workspace = true
+
+[lints]
+workspace = true

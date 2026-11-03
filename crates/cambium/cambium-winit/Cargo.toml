@@ -19,3 +19,6 @@ winit = "0.30.13"
 # The fade clock. std::time::Instant panics on wasm32-unknown-unknown; this
 # re-exports std on native and performance.now() on wasm.
 web-time = "1"
+
+[lints]
+workspace = true

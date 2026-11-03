@@ -49,3 +49,6 @@ ipc-channel.workspace = true
 sceno.workspace = true
 scenotime.workspace = true
 tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "time"] }
+
+[lints]
+workspace = true

@@ -37,3 +37,6 @@ uuid = { version = "1.10", features = ["v4"] }
 # `pub(crate)` on the kernel and reachable only through the `GraphFixtures`
 # extension trait behind this feature. Dev-only, as the feature requires.
 kernel = { workspace = true, features = ["fixtures"] }
+
+[lints]
+workspace = true

@@ -22,3 +22,6 @@ crate-type = ["cdylib"]
 esp = { path = "../../intel/esp" }
 blake3 = "1.5"
 thiserror = "1"
+
+[lints]
+workspace = true

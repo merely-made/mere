@@ -22,3 +22,6 @@ genet-livery = { workspace = true, features = ["image-decode"] }
 genet-static-dom = { workspace = true }
 layout-dom-api = { workspace = true }
 livery = { workspace = true }
+
+[lints]
+workspace = true

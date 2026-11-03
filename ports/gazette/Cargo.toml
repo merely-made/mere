@@ -38,3 +38,6 @@ graphshell-client.workspace = true
 [lib]
 name = "gazette"
 path = "src/lib.rs"
+
+[lints]
+workspace = true

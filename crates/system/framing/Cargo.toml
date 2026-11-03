@@ -15,3 +15,6 @@ path = "src/lib.rs"
 [dependencies]
 postcard = { version = "1", default-features = false, features = ["alloc"] }
 serde = "1"
+
+[lints]
+workspace = true

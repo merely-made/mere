@@ -86,3 +86,6 @@ tempfile = "3"
 # Block on the journal's async muniment save/load in tests (matches the substrate
 # crates' test harness).
 pollster = "0.4"
+
+[lints]
+workspace = true

@@ -45,3 +45,6 @@ tower = { version = "0.5", optional = true }
 [dev-dependencies]
 serde_json = { workspace = true }
 tempfile = "3"
+
+[lints]
+workspace = true

@@ -46,3 +46,6 @@ layout_dom_api = { workspace = true }
 # the DOM carries, which is the only way taproot can drive anything.
 # Named genet-probe until genet 7baa554c (2026-09-14).
 taproot = { workspace = true, features = ["image-decode", "estimated-probe-fixtures"] }
+
+[lints]
+workspace = true

@@ -16,3 +16,6 @@ wit-parser.workspace = true
 arbitrary = "1"
 wit-parser = { workspace = true, features = ["decoding"] }
 wit-smith = "=0.263.0"
+
+[lints]
+workspace = true

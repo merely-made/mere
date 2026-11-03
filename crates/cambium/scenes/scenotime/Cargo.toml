@@ -22,3 +22,6 @@ serde_json = "1.0.140"
 [dev-dependencies]
 # The tests show a host keeping scene traces in Cambium's one history.
 backstep = { version = "0.1.0", path = "../../backstep" }
+
+[lints]
+workspace = true

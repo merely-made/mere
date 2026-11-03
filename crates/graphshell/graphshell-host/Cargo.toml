@@ -118,3 +118,6 @@ required-features = ["native"]
 [[test]]
 name = "projection_round_trip"
 required-features = ["native"]
+
+[lints]
+workspace = true

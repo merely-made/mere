@@ -98,3 +98,6 @@ app-host = { path = "../../crates/script/app-host" }
 wasmtime = "45"
 blake3 = "1.5"
 tempfile = "3"
+
+[lints]
+workspace = true

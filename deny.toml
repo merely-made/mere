@@ -22,5 +22,5 @@ all-features = true
 multiple-versions = "allow"
 wildcards = "allow"
 deny = [
-  { crate = "castellan", wrappers = ["djinn", "djinn-custodian"], reason = "castellan is secret custody; only Djinn and its independently launched custodian link it; applications and workers may not" },
+  { crate = "castellan", wrappers = ["mere-resident", "djinn-custodian"], reason = "castellan is secret custody; only Djinn and its independently launched custodian link it; applications and workers may not" },
 ]
