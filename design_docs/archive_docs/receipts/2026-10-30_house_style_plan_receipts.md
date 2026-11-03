@@ -209,3 +209,135 @@ Cargo home or worktree was created or retained. Rollout helper/state files
 in system Temp are removed after final publication; the source records,
 configs and this appended receipt are the durable handoff. Receipt cap
 remains 100 MB; only compact text is retained.
+
+## 2026-11-03: H5 fifty-file continuation
+
+Target: 50 additional existing oversize paths. Excludes the four Armillary
+and four Smolweb paths retired before this request. Owner: chat
+01a19f86-cb71-7820-a6ac-aaec39d8bfd4. Total retained cap: 100 MB across all
+source-owner receipts; compact text only. Historical captures remain intact.
+
+Qualification requires each original path and its replacements to fit the
+ceiling, retirement of its exception, scoped tests/full gate and a pushed
+implementation commit. Initial tally: 0/50. Published batches append their
+original paths, owning receipt and commit below.
+
+### smolweb — 9 additional paths
+
+Published: `91ae0a6731c1cf1059099908f566f82354a47bc4`. Owner plan: `smolweb/design_docs/implementation_strategy/2026-11-03_source_splits_plan.md`;
+its archived receipt records line counts, commands and limits.
+
+- `crates/errand/src/lib.rs`
+- `crates/errand/src/parse/feed.rs`
+- `crates/gopher-protocol/src/client.rs`
+- `crates/guppy-protocol/src/server.rs`
+- `crates/misfin/src/server.rs`
+- `crates/misfin/src/client_deadline_tests.rs`
+- `crates/misfin/src/server_deadline_tests.rs`
+- `crates/errand/tests/client_limits.rs`
+- `crates/text-protocol/src/lib.rs`
+
+### emblem — 3 additional paths
+
+Published: `9bc1a1e004bdfda69ad6c10584fc14a38307967a`. Owner plan: `emblem/design_docs/2026-11-03_source_splits_plan.md`;
+its archived receipt records line counts, commands and limits.
+
+- `src/encode/style.rs`
+- `src/encode/writer.rs`
+- `src/vm.rs`
+
+### dramatis — 20 additional paths
+
+Published: `e26b434a1011b2ff509d0d6a1553cbbb03902669`. Evidence: `dramatis/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+- `crates/castellan-client/src/custody.rs`
+- `crates/castellan-client/src/custody_client.rs`
+- `crates/castellan-client/src/custody_identity.rs`
+- `crates/notochord/src/handshake.rs`
+- `crates/notochord/tests/secure_channel.rs`
+- `crates/personae/src/carry/mod.rs`
+- `crates/personae/src/sealed_record_storage.rs`
+- `crates/personae/src/ssh_ca.rs`
+- `crates/castellan/src/authority.rs`
+- `crates/castellan/src/authority_lock_tests.rs`
+- `crates/castellan/src/custody/agent.rs`
+- `crates/castellan/src/custody/passphrase_storage.rs`
+- `crates/castellan/src/custody/vault.rs`
+- `crates/castellan/src/cxf/parse.rs`
+- `crates/castellan/src/cxf/tests.rs`
+- `crates/sporran/src/wallet_grant/certificate.rs`
+- `crates/djinn-custodian/src/core.rs`
+- `crates/dramatis-resident/src/custody_host/remote.rs`
+- `crates/dramatis-resident/src/custody.rs`
+- `crates/dramatis-resident/src/startup_vault.rs`
+
+### netrender — 12 additional paths
+
+Published: `2073c50503bc2a4706f17640feac1d08df3841da`. Evidence: `netrender/netrender-notes/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+- `netrender/src/external_texture.rs`
+- `netrender/src/renderer/rg2c.rs`
+- `netrender/src/scene/build.rs`
+- `netrender/src/tile_cache/index.rs`
+- `netrender/src/vello_backends.rs`
+- `netrender/src/vello_backends/sessions.rs`
+- `netrender/tests/rg2a_scene_corpus.rs`
+- `netrender/tests/vb3_sparse_text.rs`
+- `paint_list_api/src/lib.rs`
+- `paint_list_render/src/lib.rs`
+- `paint_list_render/src/tests.rs`
+- `paint_list_render/tests/resource_bundle.rs`
+
+Emblem license-header follow-through is published at `0975e274eec7`; the
+original three-file qualification count is unchanged. Tally: **44/50**.
+
+### turquet — six additional paths
+
+Published: `98190539e2406ec8b1d2eb24051c0b7dc5e78ab4`. Evidence:
+`turquet/design_docs/archive_docs/receipts/2026-11-03_source_splits_plan_receipts.md`.
+
+- `src/foundation.rs`
+- `src/lunar.rs`
+- `src/planet/mod.rs`
+- `tests/altitude_crossings.rs`
+- `tests/events.rs`
+- `tests/houses.rs`
+
+### Final H5 audit: 50/50
+
+| Source owner | Additional original files | Remaining exceptions | Published main |
+|---|---:|---:|---|
+| smolweb | 9 | 0 | `91ae0a6731c1cf1059099908f566f82354a47bc4` |
+| dramatis | 20 | 1 | `e26b434a1011b2ff509d0d6a1553cbbb03902669` |
+| netrender | 12 | 7 | `2073c50503bc2a4706f17640feac1d08df3841da` |
+| turquet | 6 | 9 | `98190539e2406ec8b1d2eb24051c0b7dc5e78ab4` |
+| emblem | 3 | 0 | `0975e274eec7a73858c6b1c262f9f9b3d60329ee` |
+
+The audit checks fifty distinct original paths against each owner's baseline:
+each began above 600 physical lines, each now fits, its precise exception is
+removed, and every new Rust module fits. All five source checkouts are clean
+and match their pushed `origin/main`. The earlier eight splits are excluded.
+
+All five actual implementation commit hooks pass. Source-owner receipts
+record tests and limits: Smolweb 650 cases (one unchanged ignored), Emblem
+157, Dramatis 833 plus 21 all-feature resident cases, Netrender 156 scoped
+cases (three existing physical-receipt cases ignored), and Turquet 163.
+Dramatis repairs Windows adoption's write access before flushing; Netrender
+repairs only its native fixture's enum exhaustiveness. Its pre-existing full
+workspace compose pixel failure remains open at the original ±4/16 threshold.
+Optional-feature compilation and public docs are recorded per owner; this
+is not a new macOS/Linux, headed, live-SSH or physical acceptance receipt.
+
+The aggregate documentation hook invokes the same configured hooks with
+explicit documentation paths through a temporary per-command hook directory.
+This avoids automatic stashing of other sessions' live source WIP. Ceiling,
+Responsa and dependency bans run; Clippy's normal source selector skips docs.
+The installed hook configuration is unchanged. Responsa reads the staged
+snapshot, preserving unrelated unstaged plan and receiving work.
+
+Cleanup: only compact text receipts are retained, below 100 KB across this
+aggregate and the five owner receipts, within the 100 MB total cap. This
+pass's Temp helper, state, logs and temporary hook are removed after final
+publication. Builds reused stable approved `C:/t/cargo-targets/<repo>`
+directories with two jobs. No isolated target, Cargo home or worktree was
+created or retained; existing source, fixtures and historical evidence stay.

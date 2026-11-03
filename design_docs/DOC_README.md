@@ -923,7 +923,8 @@ is historical evidence, not the current path or ownership inventory. For the wor
   commands that invoke hooks. Do not mutate a repository's index during a
   full hook run: prek can report those concurrent changes as hook output.
   The [house-style plan](mere_docs/implementation_strategy/2026-10-30_house_style_plan.md)
-  records the completed 25-repository rollout and receiving boundaries.
+  records the completed 25-repository rollout, receiving boundaries and
+  H5's additional source-split pass.
 
 - **Resolved Git identity (2026-10-28):** `cargo metadata --locked` can succeed
   while a lock record names an older revision than the package Cargo loads from

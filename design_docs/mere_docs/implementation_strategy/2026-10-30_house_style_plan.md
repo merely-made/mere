@@ -1,7 +1,7 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-11-03):** landed. Seventeen rulings recorded (D1 to D17).
+**Status (2026-11-03):** landed. H1-H5 complete; H5 qualifies 50 additional oversize files. Seventeen rulings recorded (D1 to D17).
 H1-H4 and Eidetic's E1-E4 are complete. All 25 owned repositories have
 published local-check adoption, reviewed inventories and passing positive
 and deliberate-violation gates. Qualification uses the native package and
@@ -184,7 +184,21 @@ Each comes back as a question before anything is written.
 - **H4. Doctrine pass.** Put forks 1 to 3 to Mark and fold the answers per D4. Done when the
   doctrine is within budget and `responsa check` is clean.
 
+- **H5. Fifty additional source splits.** Mark requested a 50-file pass
+  after the four Armillary and four Smolweb exceptions already retired.
+  Those eight earlier files do not count toward this target. Choose existing
+  oversize files with real responsibility or fixture-group boundaries;
+  preserve public APIs, semantics, feature/cfg isolation and concurrent work.
+  Count a file only when it and its replacement modules fit the ceiling,
+  its exception is retired, the appropriate tests/full local gate pass,
+  and the implementation is committed and pushed. Keep immutable historical
+  receipts and fixture captures intact. Done when 50 distinct original paths
+  are recorded as qualified in the appended H5 receipt. Retained cap stays
+  100 MB across repositories, with compact evidence only.
+
 ## Findings
+
+- 2026-11-03: H5 qualifies fifty additional paths across Smolweb (9), Dramatis (20), Netrender (12), Turquet (6) and Emblem (3). Every replacement module fits the ceiling, fifty exact exceptions are retired, and all implementations are pushed. The Windows adoption flush and native fixture exhaustiveness repairs are recorded separately from source moves; Netrender's existing full-suite compose pixel failure remains open at its unchanged threshold.
 
 - 2026-11-03: H2 records 900 individual oversize exceptions across 25
   owned repositories, each with a technical reason. Imported patches,
@@ -312,3 +326,14 @@ Each comes back as a question before anything is written.
   controls remain valid for their unchanged ceiling hooks. H1-H4 and the
   tool plan's E1-E4 are complete. The receipt appends the final receiving
   hashes, lock audits, scope and cleanup; no remaining rollout phase is open.
+- 2026-11-03: H5 started at **0/50** additional qualified paths. Mark's
+  new scope is a 50-file pass; the first eight source splits remain previous
+  work. The selected approach batches coherent changes per clean repository,
+  preserving active WIP in Mere, Eidetic, Murm and Gemot. Each source owner
+  keeps its local plan/receipt; the H5 receipt aggregates the published paths.
+
+- 2026-11-03: H5 **12/50** published: Smolweb nine (`91ae0a67`) and Emblem three (`9bc1a1e`). Both reach zero exceptions, with matching baseline/post tests and full gates. Remaining candidates are Dramatis twenty, Netrender twelve and Turquet six; Cleromancy and Mer3ly now have concurrent manifest work and are left to their owners.
+
+- 2026-11-03: H5 **44/50** published. Dramatis twenty (`e26b434`) and Netrender twelve (`2073c5050`) pass their recorded tests and full gates. Dramatis also repairs the baseline Windows adoption flush; Netrender retains its existing full-suite compose pixel failure at the original threshold. Emblem retains its extracted-file source notices at `0975e27`. Turquet six awaits its actual commit gate.
+
+- 2026-11-03: H5 **50/50 landed**. Turquet six (`9819053`) completes the target. All five source checkouts are clean and match pushed main; the aggregate receipt lists every original path and owning receipt. Source notices, fixtures and concurrent WIP are preserved. Compact receipts stay below 100 KB; no isolated build area or worktree is retained.
