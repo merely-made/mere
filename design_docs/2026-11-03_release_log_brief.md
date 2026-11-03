@@ -111,6 +111,9 @@ The chat assumed one. The code has two, and both stay:
 Both reach a reader as evidence plus bytes, and both should share the
 reader-history shape P11 established: remembered state per trust anchor,
 refusal of known rollback, an explicit "valid under supplied history" scope.
+Mark chose to let an ordinary site use either a site log or a solo Moot, at the
+author's choice (plan decision D2), so the reader history takes two authority
+adapters over one store.
 
 ## 4. Addresses, discovery and holders
 
@@ -120,6 +123,13 @@ refusal of known rollback, an explicit "valid under supplied history" scope.
 key (or a Moot collection anchor for governed sites), the path names a page or
 file, and an optional release hash pins a version. Moots and co-op sessions get
 openable addresses the same way.
+
+Keys come in three tiers (plan decision D3). Mark: "unassociated first and
+foremost is the most secure and can be associated in a layer above at
+convenience." **Unassociated** keys share no derivation with any root and are
+the default. **Associated** keys are disposable personas derived from a root,
+for managing identities you don't own: children, a business, an organisation's
+hierarchy. **Root** addresses stay available.
 
 **Discovery gives hints; the log gives authority.** A resolver tries one adapter
 per carrier:
@@ -190,10 +200,10 @@ ruling: "Native hosts and contributions, not injected web APIs."
 - **Identity vs anonymity.** `ReticulumTransport` derives its Reticulum identity
   from the same Ed25519 key, so a verified announce carries the `PeerID`. That's
   what lets the plain verticals cohere, and it is exactly what an I2P or onion
-  identity must not do. A persona's anonymous identities need their own
-  derivations, and a release log key shouldn't be the persona root either. The
-  current `knot://<root>` form exposes the Personae root. The I2P plan's open
-  identity fork sits here.
+  identity must not do. D3's unassociated tier answers it: anonymous carriers
+  use keys with no root derivation, and association is added above when
+  wanted. The current `knot://<root>` form is the root tier. The I2P plan's
+  open identity fork is decided by this.
 - **Fork patch cost.** 22 build roots repeat the mark-ik/p2panda patch table.
   Adopting p2panda-spaces adds a row everywhere. Upstreaming the seams or
   publishing the fork under fork names would remove rows; neither is decided.
@@ -207,7 +217,13 @@ ruling: "Native hosts and contributions, not injected web APIs."
   against the no-C rule.
 - **Ordinary browsers.** Existing small-web clients can read the protocols Knot
   serves, but Chrome can't read Gemini any more than it could read `hyper://`.
-  Whether a read-only HTTP gateway belongs here is open.
+  Mark ruled an HTTP compatibility layer "absolutely necessary", and added "if
+  it exposes your ip, who would do it? not me" (plan decision D4). So a
+  publisher's devices never serve HTTP themselves. An onion holder reaches Tor
+  Browser, which is Firefox-based, with nobody seeing either address; a
+  clearnet holder reaches Chrome and Firefox and acquires releases from the
+  publisher only over a relay or anonymous route. The gateway, not the browser,
+  verifies, and says so. Plan phase R9.
 
 ## 8. What Beaker had, mapped onto releases
 
@@ -222,3 +238,4 @@ ruling: "Native hosts and contributions, not injected web APIs."
 | Multi-writer | governed sites through Gemot; space-rooted logs if spaces is adopted |
 | Web app APIs | mods and contributions instead |
 | Homebase | Djinn resident as a holder |
+| HTTP mirroring | onion or clearnet holders serving HTTP; the publisher's address stays hidden (R9) |

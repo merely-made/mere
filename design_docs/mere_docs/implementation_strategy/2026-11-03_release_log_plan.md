@@ -38,7 +38,51 @@ plan (DOC_POLICY §8).
 
 > the entire discussion seems quite relevant as context if you can
 
-Links: area publishing · draws on 2026-10-29_own_device_serving_brief · draws on 2026-10-28_site_publication_plan · draws on 2026-10-28_murm_runtime_plan · plans R1–R8 · summary one release primitive over every carrier, built in lanes
+Links: area publishing · draws on 2026-10-29_own_device_serving_brief · draws on 2026-10-28_site_publication_plan · draws on 2026-10-28_murm_runtime_plan · plans R1–R9 · summary one release primitive over every carrier, built in lanes
+
+### release_log D2: ordinary sites take either authority, author's choice (2026-11-03)
+
+**2026-11-03 · new.** Asked whether an ordinary site's releases are vouched for
+by a site log, a solo Moot, or both with the author choosing, Mark chose both:
+
+> 3, but what's the redundancy there?
+
+The redundancy is in verification, not in anything else. Both paths share the
+release body, content references, carriage, holders, the resolver and the
+reader-history store. What doubles: two ways to decide the current release (a
+log chain's head versus Gemot's collection fold), two refusal matrices
+(tamper, rollback, equivocation or conflict, withdrawal) and a lineage rule for
+an author who moves a site from a log to a Moot. R2 keeps that to one reader
+history with two authority adapters, and the Moot's first selection names the
+log's last release.
+
+Links: area publishing · amends release_log D1 · plans R2 · summary ordinary sites use a site log or a solo Moot; one reader history, two authority adapters
+
+### release_log D3: three address tiers, unassociated first (2026-11-03)
+
+**2026-11-03 · new.** Asked which key roots a site's address, Mark:
+
+> you want all three; root, associated, unassociated addresses. unassociated first and foremost is the most secure and can be associated in a layer above at convenience, but deriving disposable personas from root for permission management is a legitimate benefit when you need to manage other people's identities without owning them (kids, biz, orgs, hierarchy). anonymity is important and manageable identity is important.
+
+Unassociated keys share no derivation with any root, and association is a
+signed claim added above them when the holder wants it. Associated keys are
+derived from a root as disposable personas, so a parent, business or
+organisation can manage permissions over identities it doesn't own. Root
+addresses stay available. Unassociated is the default.
+
+Links: area identity · plans R2 · plans R7 · summary root, associated and unassociated addresses; unassociated is the default and association is a layer above
+
+### release_log D4: an HTTP compatibility layer is required, and must not reveal the publisher (2026-11-03)
+
+**2026-11-03 · new.** Asked whether a read-only HTTP gateway is in scope, Mark
+chose "later, not now", adding:
+
+> but it is absolutely necessary. in a secure manner. we could potentially even allow people to enable serving a compatibility layer so their sites could be parsed by firefox/chrome; that is doable. but like, if it exposes your ip, who would do it? not me. so there must be a secure means of making available sites, without revealing your whole ass
+
+R9 holds it. It runs after holders and anonymity identities exist, and a
+publisher's own devices never serve HTTP on their own addresses.
+
+Links: area publishing · plans R9 · summary HTTP compatibility for mainstream browsers, after R5 and R7, never exposing the publisher's address
 
 ## Constraints
 
@@ -84,10 +128,15 @@ auth, stream, net) and don't wait on this.
 A release operation body: kind (site, share, clip), content reference
 (snapshot V1 digest or blob manifest root), provenance, optional `fork_of`
 release hash, optional provider hints, optional sealed-payload marker. The log
-is keyed by a release-log key derived from Personae per site, not the persona
-root. Ordinary reader history mirrors P11: remembered head per log key,
-refusal of known rollback, equivocation (two operations at one sequence)
-surfaced as a conflict, an explicit freshness scope. Decide here whether
+key takes any of D3's three tiers: unassociated by default (no derivation from
+any root; association is a signed claim added later), associated (a disposable
+persona derived from a root, for managed identities), or root. Ordinary reader
+history mirrors P11: remembered head per log key, refusal of known rollback,
+equivocation (two operations at one sequence) surfaced as a conflict, an
+explicit freshness scope. Per D2 the reader history takes two authority
+adapters, the log chain and a solo Moot's collection fold through P10/P11, and
+moving a site from a log to a Moot makes the Moot's first selection name the
+log's last release. Decide here whether
 out-of-order buffering extends Stickleback's `causal.rs` or adopts
 p2panda-stream's ingest; record the reason in Findings.
 
@@ -95,7 +144,10 @@ p2panda-stream's ingest; record the reason in Findings.
   chain and opens the named snapshot; tampered bytes, a forged operation, known
   rollback and equivocation refuse; an older valid chain opens with its
   limited-freshness scope stated; a fork's first release resolves its source;
-  the record builds with no carrier feature.
+  the same refusals hold for a solo-Moot site through the second adapter, and a
+  log-to-Moot move keeps lineage; an unassociated key verifies with no root in
+  scope, and an association claim verifies separately; the record builds with
+  no carrier feature.
 
 ### R3. Carriage over any `Transport`
 
@@ -157,9 +209,10 @@ folder" is an unlisted release of a blob manifest.
 
 ### R7. Anonymity identities and Tor
 
-Per-persona, per-carrier derived identities so an I2P or onion identity never
-shares a key with the plain identity; this decides the I2P plan's identity
-fork. Tor as a default-off `Transport` through arti, after checking its
+Carrier identities follow D3: an anonymous carrier uses an unassociated key by
+default, so an I2P or onion identity never shares a derivation with the plain
+identity; associated and root identities stay available where management
+matters more than anonymity. This decides the I2P plan's identity fork. Tor as a default-off `Transport` through arti, after checking its
 storage dependencies against the no-C rule. Tor's open-internet role also
 reaches fetch (netfetcher, Errand) through the same feature.
 
@@ -179,6 +232,31 @@ follow from the answer.
 - Done when: the evaluation's result is recorded in Gemot's plan and here,
   with the reason.
 
+### R9. HTTP compatibility layer
+
+Per D4, mainstream browsers read releases without the publisher's address
+being exposed. The publisher's own devices never serve HTTP on their own
+addresses. Two routes:
+
+- **Onion HTTP.** A holder serves the release over HTTP as a Tor onion service.
+  Tor Browser is Firefox-based, so it reads the site with nobody on the path
+  seeing either address. Needs R7's Tor carrier.
+- **Clearnet holder.** A holder with its own public address (a rented host, a
+  friend, an opted-in reader) serves HTTP and acquires releases from the
+  publisher only over a relay or anonymous route. Chrome and Firefox read it;
+  the holder's address is public and the publisher's never is.
+
+The browser can't verify the log itself, so the gateway states that it, not the
+reader, verified the release, and serves the release hash and evidence beside
+each page so a capable client can check it. Small-web pages are rendered to
+HTML on the holder; static HTML releases are served as they are.
+
+- Needs: R5, R7.
+- Done when: a release opens in Tor Browser through an onion holder and in
+  Chrome through a clearnet holder; in both runs the publisher's devices make
+  no connection that reveals their address to the holder or the reader; a
+  tampered release is refused by the gateway, not served.
+
 ## Lanes
 
 Each lane is one worktree in `Code/worktrees/<repo>-release-<lane>` and one
@@ -195,6 +273,7 @@ repin.
 | frames | R4 grammar, R6 | turnstone, knot-editor | record |
 | anonymity | R7 | murm (retinue I2P, arti), Personae custody | — |
 | spaces | R8 | gemot | R1 |
+| gateway | R9 | mere (Djinn), murm | holder, anonymity |
 
 Lanes cost about 30 GiB of build cache each against the shared 400 GiB budget,
 so two or three run at a time. `record` and `carriage` are independent;
@@ -202,13 +281,10 @@ so two or three run at a time. `record` and `carriage` are independent;
 
 ## Open questions
 
-- **Ordinary-site authority.** A site log (R2 as written), or a solo Moot whose
-  founder is the author so P10/P11 apply unchanged? The solo Moot reuses landed
-  code but makes Gemot a dependency of ordinary serving, which the site
-  publication plan's constraint rules out.
-- **Release-log key.** Derived per site from Personae (R2 as written), or the
-  persona root that `knot://` uses today?
-- **HTTP gateway.** Is a read-only HTTP gateway for ordinary browsers in scope?
+- **Gemot in ordinary builds.** D2 lets an author pick a solo Moot, and the site
+  publication plan says ordinary serving works without Gemot. Read together,
+  the solo-Moot adapter has to be an optional feature, so the site-log path
+  still builds without Gemot. Confirm that reading.
 - **iroh relay-only.** Does iroh 1.0 let an endpoint withhold direct addresses
   so a reader sees only the relay?
 
@@ -235,3 +311,5 @@ so two or three run at a time. `record` and `carriage` are independent;
 ## Progress
 
 - 2026-11-03: plan written with the brief; decision D1 recorded.
+- 2026-11-03: D2 (both authorities), D3 (three address tiers) and D4 (HTTP
+  compatibility without exposing the publisher) recorded; R9 added.
