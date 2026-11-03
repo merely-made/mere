@@ -253,7 +253,7 @@ mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
-chirograph = { version = "0.0.3", path = "crates/chirograph" }
+chirograph = { version = "0.0.4", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
 graphshell-endpoint = { version = "0.0.3", path = "crates/graphshell/graphshell-endpoint" }
