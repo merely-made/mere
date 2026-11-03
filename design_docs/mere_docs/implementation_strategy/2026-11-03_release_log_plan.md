@@ -115,6 +115,39 @@ path is an optional feature so the site-log path builds without Gemot, Mark:
 
 Links: area publishing · amends release_log D2 · plans R2 · summary the solo-Moot adapter is a feature; the site-log path builds without Gemot
 
+### release_log D7: publish the fork as `mere2panda-*` (2026-11-03)
+
+**2026-11-03 · refines release_log D5.** Told that tailoring the fork under
+upstream names adds a patch row per adopted crate to every root, Mark asked:
+
+> So like, I should rename it and publish fork crates instead? And cherry pick from upstream on an ongoing basis, kinda like cambium/meristem?
+
+Then, on the name:
+
+> mere2panda-*, or m2p-*
+
+`mere2panda-*` was chosen: every name is free on crates.io and has one hyphen,
+whereas the bare `m2p` is an unrelated Markdown-to-PDF crate (checked
+2026-11-03). The fork follows the `genet-parley` precedent (new package names,
+library names unchanged) and Meristem's (a provenance ledger with selective
+upstream intake). R1 becomes the migration.
+
+Links: area dependencies · amends release_log D5 · plans R1 · summary rename and publish the p2panda fork as mere2panda-*, keep library names, take upstream selectively with a ledger
+
+### release_log D8: compatibility ranks below coherence across transports (2026-11-03)
+
+**2026-11-03 · new.** Mark:
+
+> staying compatible is a priority, but ensuring compatibility with and coherent usage of other transports than iroh is a bigger and stack-defining priority
+
+Wire compatibility with upstream p2panda peers is kept where it costs nothing.
+Where it conflicts with running the same sync, ordering and group machinery
+over Reticulum, I2P, Tor and Noise/TCP, the carrier-neutral path wins. Tailored
+changes are additive where possible, so iroh peers still speak upstream's
+protocols.
+
+Links: area dependencies · plans R1 · plans R3 · summary upstream wire compatibility is kept where free; coherent use over non-iroh transports wins any conflict
+
 ## Constraints
 
 - **Two release authorities.** Governed releases are Gemot collection
@@ -149,13 +182,34 @@ Links: area publishing · amends release_log D2 · plans R2 · summary the solo-
 
 ## Phases
 
-### R1. p2panda fork posture
+### R1. The fork as published `mere2panda-*` crates
 
-Settled by D5: tailor the fork and merge upstream as needed. The local clone is
-`Code/crates/p2panda`; the current tag is
-`mere-p2panda-net-0.7.5-upstream-20261013`.
+Per D5 and D7. Today 20 roots repeat seven patch rows pointing crates.io
+`p2panda-*` names at the mark-ik fork tag
+`mere-p2panda-net-0.7.5-upstream-20261013`, because Cargo applies `[patch]`
+only from the root being built. `p2panda-net` is already renamed
+(`mere-p2panda-net`; 0.7.2 was published) but keeps two hyphens, against the
+house rule.
 
-- Done when: met 2026-11-03 by D5.
+- Rename every package the family uses to `mere2panda-<crate>` (core, store,
+  sync, encryption, auth, discovery, stream, net, and spaces and blobs when
+  adopted), with internal dependencies pointing at each other. Library names
+  stay `p2panda_*`, so consumers change manifests only.
+- Keep upstream's MIT OR Apache-2.0 licence, so patches can still be offered
+  back.
+- Publish in dependency order. Consumers declare the `mere2panda-*` versions
+  and every root drops its p2panda patch rows. `mere-p2panda-net` is yanked or
+  left as a final release pointing at `mere2panda-net`.
+- A provenance ledger beside the fork records upstream bases, the family's
+  patches and anything cut, as `upstream-xilem.md` does for Meristem. Upstream
+  work comes in by selective merge or cherry-pick; under D8, a change that
+  breaks carrier-neutral use is not taken as is.
+- The fork moves from mark-ik to merely-made, recorded in merelyllc.com's
+  `ops/org-migration.toml`.
+
+- Done when: no root in `Code/repos` has a `mark-ik/p2panda` patch row; every
+  family crate that depended on p2panda resolves `mere2panda-*` from crates.io;
+  the ledger exists; the fork lives in merely-made.
 
 ### R2. Release record and reader history
 
@@ -381,6 +435,7 @@ repin.
 
 | Lane | Phases | Repos | Needs |
 |---|---|---|---|
+| fork | R1 | p2panda fork, then every root's manifest | — |
 | record | R2 | eidetic (Stickleback), mere (`mere-site`), gemot for the solo-Moot adapter | — |
 | carriage | R3, R4 resolver | murm (with retinue), eidetic | M12 in the murm runtime plan |
 | holder | R5 | mere (`mere-resident`), armillary (Djinn), murm | record, carriage |
@@ -390,8 +445,9 @@ repin.
 | gateway | R9 | a new HTTP owner, mere (`mere-resident`), armillary | holder, identity |
 
 Lanes cost about 30 GiB of build cache each against the shared 400 GiB budget,
-so two or three run at a time. `record`, `carriage`, `identity` and `spaces`
-are independent of each other.
+so two or three run at a time. `fork`, `record`, `carriage`, `identity` and
+`spaces` are independent of each other; the fork's last step touches every
+root's manifest, so it lands between other lanes' merges.
 
 ## Findings
 
@@ -438,3 +494,6 @@ are independent of each other.
 - 2026-11-03: redundancy pass folded in; D5 (tailor the fork) and D6 (solo Moot
   optional) recorded; R1 met; R3 drops its new chunker and the Noise
   `Transport`; R7 maps D3's tiers onto Personae; R8 executes audit R25.
+- 2026-11-03: D7 (publish the fork as `mere2panda-*`) and D8 (coherence across
+  transports outranks upstream compatibility) recorded; R1 reopened as the
+  fork migration and given the `fork` lane.
