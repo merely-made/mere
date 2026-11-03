@@ -115,24 +115,27 @@ path is an optional feature so the site-log path builds without Gemot, Mark:
 
 Links: area publishing · amends release_log D2 · plans R2 · summary the solo-Moot adapter is a feature; the site-log path builds without Gemot
 
-### release_log D7: publish the fork as `mere2panda-*` (2026-11-03)
+### release_log D7: publish the fork as `p2mere-*` (2026-11-03)
 
 **2026-11-03 · refines release_log D5.** Told that tailoring the fork under
 upstream names adds a patch row per adopted crate to every root, Mark asked:
 
 > So like, I should rename it and publish fork crates instead? And cherry pick from upstream on an ongoing basis, kinda like cambium/meristem?
 
-Then, on the name:
+On the name he first offered "p2mere-*, or m2p-*" (the bare `m2p` is an
+unrelated Markdown-to-PDF crate), asked for better options and animals, then:
 
-> mere2panda-*, or m2p-*
+> how about mere2p, or p2mere?
 
-`mere2panda-*` was chosen: every name is free on crates.io and has one hyphen,
-whereas the bare `m2p` is an unrelated Markdown-to-PDF crate (checked
+> alright, sounds good
+
+`p2mere-*` was chosen. It mirrors upstream (`p2panda-core` becomes
+`p2mere-core`), every name is free on crates.io and has one hyphen (checked
 2026-11-03). The fork follows the `genet-parley` precedent (new package names,
 library names unchanged) and Meristem's (a provenance ledger with selective
 upstream intake). R1 becomes the migration.
 
-Links: area dependencies · amends release_log D5 · plans R1 · summary rename and publish the p2panda fork as mere2panda-*, keep library names, take upstream selectively with a ledger
+Links: area dependencies · amends release_log D5 · plans R1 · summary rename and publish the p2panda fork as p2mere-*, keep library names, take upstream selectively with a ledger
 
 ### release_log D8: compatibility ranks below coherence across transports (2026-11-03)
 
@@ -182,7 +185,7 @@ Links: area dependencies · plans R1 · plans R3 · summary upstream wire compat
 
 ## Phases
 
-### R1. The fork as published `mere2panda-*` crates
+### R1. The fork as published `p2mere-*` crates
 
 Per D5 and D7. Today 20 roots repeat seven patch rows pointing crates.io
 `p2panda-*` names at the mark-ik fork tag
@@ -191,15 +194,15 @@ only from the root being built. `p2panda-net` is already renamed
 (`mere-p2panda-net`; 0.7.2 was published) but keeps two hyphens, against the
 house rule.
 
-- Rename every package the family uses to `mere2panda-<crate>` (core, store,
+- Rename every package the family uses to `p2mere-<crate>` (core, store,
   sync, encryption, auth, discovery, stream, net, and spaces and blobs when
   adopted), with internal dependencies pointing at each other. Library names
   stay `p2panda_*`, so consumers change manifests only.
 - Keep upstream's MIT OR Apache-2.0 licence, so patches can still be offered
   back.
-- Publish in dependency order. Consumers declare the `mere2panda-*` versions
+- Publish in dependency order. Consumers declare the `p2mere-*` versions
   and every root drops its p2panda patch rows. `mere-p2panda-net` is yanked or
-  left as a final release pointing at `mere2panda-net`.
+  left as a final release pointing at `p2mere-net`.
 - A provenance ledger beside the fork records upstream bases, the family's
   patches and anything cut, as `upstream-xilem.md` does for Meristem. Upstream
   work comes in by selective merge or cherry-pick; under D8, a change that
@@ -208,7 +211,7 @@ house rule.
   `ops/org-migration.toml`.
 
 - Done when: no root in `Code/repos` has a `mark-ik/p2panda` patch row; every
-  family crate that depended on p2panda resolves `mere2panda-*` from crates.io;
+  family crate that depended on p2panda resolves `p2mere-*` from crates.io;
   the ledger exists; the fork lives in merely-made.
 
 ### R2. Release record and reader history
@@ -494,6 +497,6 @@ root's manifest, so it lands between other lanes' merges.
 - 2026-11-03: redundancy pass folded in; D5 (tailor the fork) and D6 (solo Moot
   optional) recorded; R1 met; R3 drops its new chunker and the Noise
   `Transport`; R7 maps D3's tiers onto Personae; R8 executes audit R25.
-- 2026-11-03: D7 (publish the fork as `mere2panda-*`) and D8 (coherence across
+- 2026-11-03: D7 (publish the fork as `p2mere-*`) and D8 (coherence across
   transports outranks upstream compatibility) recorded; R1 reopened as the
   fork migration and given the `fork` lane.
