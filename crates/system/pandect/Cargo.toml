@@ -9,7 +9,7 @@ publish = true
 
 rust-version = "1.97.1"
 readme = "README.md"
-keywords = ["session", "state", "manifest", "wallet", "mere"]
+keywords = ["session", "state", "manifest", "graph", "mere"]
 categories = ["data-structures"]
 description = "Session manifests, graph and view sidecars, worker declarations, graph-reference adapters and application settings for Mere."
 

@@ -42,7 +42,7 @@ or path overrides. Keep the existing custody refusal and sealed-data formats.
 Required receipts are package/dependency summaries, publish results, test and
 receiving-check summaries, source identities and final commit hashes. Retain
 at most 100 MB total under `Code/testing/mere/registry-releases-20261103`;
-index them in this plan's archived receipt file. Use existing reusable targets
+index them in this plan's [archived receipt file](../../archive_docs/receipts/2026-10-28_workspace_hygiene_plan_receipts.md). Use existing reusable targets
 under `C:/t/cargo-targets/<repo>` and create no isolated Cargo home or worktree.
 
 **Finding, 2026-11-03:** the first registry-only Muniment feature check exposed
