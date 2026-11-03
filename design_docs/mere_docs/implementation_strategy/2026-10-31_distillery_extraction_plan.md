@@ -159,7 +159,12 @@ waits for a planned second host, not an arrived one.
   (`armillary/design_docs/armillary_docs/implementation_strategy/2026-10-31_djinn_slimming_plan.md`):
   the custody half becomes a Dramatis crate (`armillary:djinn-slimming` D2), producers depend
   on a door contract crate in Armillary (D3), and the cut waits for capability-door I1 (D4).
-  Closes when that plan's S5 publishes.
+  Closed 2026-11-02: the slimming's S4 and S5 landed. `graphshell-endpoint` 0.0.3 depends
+  on `ostiary` and `castellan-client`, not `djinn`, and is published with
+  `script-wire`, `script-witgen`, `chirograph` 0.0.4, `workbench`, `incipit`, `scenograph`,
+  `scenomise`, `mere-surface-api` and `cambium` 0.6.1. Cambium waited on `genet-events`
+  (Genet commit `43d13ce56` made it a dependency); Genet released it as 0.0.1 on 2026-11-02
+  at Mark's instruction, with the API still unsettled.
 - **F3 (D15).** Publishing the graph core (kernel and the graph persistence in pandect) as
   contract tier is its own plan. Until then Cleromancy, Knot and Woodshed compile in
   lockstep with Mere; this pass moves Cleromancy off `mere-alembic` and no further.
@@ -246,6 +251,14 @@ pass; changes are committed in each repository.
   chirograph 0.0.3. Stopped at `graphshell-endpoint` 0.0.3 (D18). Not yet published:
   graphshell-endpoint, scenograph, workbench, scenomise, mere-surface-api, cambium 0.6.1,
   incipit.
+- 2026-11-02: F4 closed by the Djinn slimming's S5 (Armillary plan). Published the rest of
+  D17's chain: script-wire 0.0.1, script-witgen 0.0.1 (their publish guard removed),
+  chirograph 0.0.4 (Knot's requirement moved first, `62aff7b`; the wit feature needs
+  `CarrierError::Lapsed`), graphshell-endpoint 0.0.3 (its `wit/world.wit` is a copy of
+  `crates/script/wit/world.wit` that `tests/wit_copy.rs` holds equal), workbench 0.1.1,
+  incipit 0.2.1, scenograph 0.0.6, scenomise 0.0.7, mere-surface-api 0.1.1. `dramatis` and
+  `personae` rows follow Dramatis's 0.0.4 and 0.3.1. `genet-events` 0.0.1 (Genet `ad3627231`)
+  and then `cambium` 0.6.1 followed (Mere `e14dd68cf`): D17's chain is published.
 - 2026-10-31: P1 in part. `alembic::memory_levels` is `pandect::memory_levels`;
   `athanor::furnace` is `pandect::furnace` (feature `furnace`); Alembic and Athanor are
   workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a

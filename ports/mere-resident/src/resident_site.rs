@@ -28,7 +28,7 @@ use chirograph::{
     PresentationSemantics, ProjectionOffer, ProjectionRequest, ProjectionSession,
     ProjectionSnapshot, ProtocolVersion, ResourceRequest, ResourceResponse, SemanticRole,
 };
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use knot_site::Publication;

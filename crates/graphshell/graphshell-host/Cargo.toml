@@ -37,7 +37,7 @@ webrtc-join = [
 native = [
     "admission",
     "webrtc-join",
-    "djinn/door",
+    "dep:ostiary",
     "graphshell-endpoint/network",
     "graphshell-endpoint/stdio",
     "notochord/tokio",
@@ -51,7 +51,7 @@ native = [
 ]
 # `invitation`'s signer over the holder's custody identity (Djinn's
 # custody client), for a host that issues invitations.
-custody-client = ["native", "djinn/custody-client"]
+custody-client = ["native", "dep:castellan-client", "castellan-client/client"]
 # `invitation`'s in-memory signer, for tests only: products enable it as a
 # dev-dependency feature, never in a release build (stack-lift D4).
 test-signer = ["native"]
@@ -67,7 +67,8 @@ board = ["dep:pictograph"]
 board-gpu = ["board", "pictograph/gpu"]
 
 [dependencies]
-djinn = { workspace = true, optional = true, features = ["door"] }
+ostiary = { workspace = true, optional = true }
+castellan-client = { workspace = true, optional = true }
 base64.workspace = true
 chirograph.workspace = true
 graphshell-client.workspace = true

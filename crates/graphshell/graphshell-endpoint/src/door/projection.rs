@@ -7,9 +7,9 @@ use chirograph::{
     ProjectionSnapshot, ProtocolVersion, ResourceAssembly, ResourceChunkRequest,
     ResourceChunkResponse, SessionOpen, SessionOpened,
 };
-use djinn::door::app_admission::{AppId, AppRouteId, configured_app_endpoint};
-use djinn::door::app_client::{AppClientError, AppConnection};
-use djinn::door::declaration::AppDeclaration;
+use ostiary::app_admission::{AppId, AppRouteId, configured_app_endpoint};
+use ostiary::app_client::{AppClientError, AppConnection};
+use ostiary::declaration::AppDeclaration;
 
 pub struct AppBrokerClient {
     inner: AppConnection,
@@ -218,6 +218,16 @@ impl AppRouteCarrier {
         Self::open_at_with(&configured_app_endpoint(), app, route, Some(declaration))
     }
 
+    /// [`Self::open_declared`] at an explicit endpoint.
+    pub fn open_declared_at(
+        endpoint: &str,
+        app: AppId,
+        route: AppRouteId,
+        declaration: AppDeclaration,
+    ) -> Result<Self, AppClientError> {
+        Self::open_at_with(endpoint, app, route, Some(declaration))
+    }
+
     fn open_at_with(
         endpoint: &str,
         app: AppId,
@@ -369,9 +379,9 @@ mod resource_boundary_tests {
                 id: 1,
                 body: Ok(CarrierResponseBody::ResourceChunk(Box::new(chunk.clone()))),
             };
-            let framed = djinn::door::wire::AppHostMessage::<_, (), ()>::Response { response };
+            let framed = ostiary::wire::AppHostMessage::<_, (), ()>::Response { response };
             let mut wire = Vec::new();
-            djinn::door::frame::write_native_message(&mut wire, &framed).unwrap();
+            ostiary::frame::write_native_message(&mut wire, &framed).unwrap();
             assert!(wire.len() < 1024 * 1024);
             frames += 1;
             if let Some(actual) =

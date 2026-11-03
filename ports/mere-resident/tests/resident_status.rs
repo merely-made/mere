@@ -24,13 +24,12 @@ use mere_resident::resident_status::{
     ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal,
     SyncStatusV1, default_endpoints_taken,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, default_app_endpoint,
-};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId, default_app_endpoint};
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
@@ -86,14 +85,20 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
 }
 
 async fn open(endpoint: &str, app: &str, route: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(endpoint, AppId::new(app), AppRouteId::new(route).unwrap()).await
+    AppBrokerClient::open_declared_route_at(
+        endpoint,
+        AppId::new(app),
+        AppRouteId::new(route).unwrap(),
+        mere_resident::applications::resident_declaration(),
+    )
+    .await
 }
 
 /// Status names each admitted connection with what its label rests on and
 /// the OS account of its peer, and drops it when the connection ends.
 #[tokio::test(flavor = "multi_thread")]
 async fn status_reports_each_connection_with_its_identity_basis() {
-    use djinn::door::declaration::IdentityBasis;
+    use ostiary::declaration::IdentityBasis;
     use mere_resident::resident_status::ConnectionLedger;
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
@@ -103,6 +108,7 @@ async fn status_reports_each_connection_with_its_identity_basis() {
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     catalog.set_connection_ledger(ConnectionLedger::new(status.clone()));
     let endpoint = endpoint_name();
     let server = {
@@ -179,11 +185,13 @@ async fn only_djinn_reads_the_status_and_stops_the_resident() {
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     let route = catalog
         .update(|catalog| ResidentControlEndpoint::register(stop.clone(), catalog))
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
 
     let endpoint = endpoint_name();
     let server = {

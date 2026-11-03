@@ -6,19 +6,8 @@ version = 4
 name = "custody-projection-portable-fixture"
 version = "0.0.0"
 dependencies = [
- "djinn",
+ "ostiary",
  "serde_json",
-]
-
-[[package]]
-name = "djinn"
-version = "0.0.3"
-source = "git+https://github.com/merely-made/armillary.git?rev=721e17d41a8f258073f440adbbb39ad145250868#721e17d41a8f258073f440adbbb39ad145250868"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror",
- "zeroize",
 ]
 
 [[package]]
@@ -32,6 +21,17 @@ name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+
+[[package]]
+name = "ostiary"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/armillary.git?rev=08ebbc44f5d391bd263fcc26b6053edf72741954#08ebbc44f5d391bd263fcc26b6053edf72741954"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
+ "zeroize",
+]
 
 [[package]]
 name = "proc-macro2"

@@ -25,14 +25,29 @@ use chirograph::{
     CapabilityProfile, CarrierRequest, CarrierRequestBody, CarrierResponseBody, ContentHash,
     PortableCardV1, ProtocolVersion, ResourceRequest, SessionOpen,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppHello, AppId, AppRouteGrants, AppRouteId,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppHello, AppId, AppRouteId};
+use ostiary::declaration::{AppDeclaration, NamePattern};
 use graphshell_endpoint::door::projection::AppBrokerClient;
-use djinn::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
+use ostiary::wire::{APP_CONNECT_SCHEMA, AppHostMessage as WireHostMessage, AppMessage as WireMessage};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
-type AppMessage = WireMessage<chirograph::CarrierRequest, djinn::door::custody::CustodyCall>;
-type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<djinn::door::custody::CustodyAnswer, djinn::door::custody::CustodyRefusal>>;
+type AppMessage = WireMessage<chirograph::CarrierRequest, castellan_client::custody::CustodyCall>;
+type AppHostMessage = WireHostMessage<chirograph::CarrierResponse, chirograph::CarrierNotice, Result<castellan_client::custody::CustodyAnswer, castellan_client::custody::CustodyRefusal>>;
+
+/// The hello an admitted application sends: the identity route, declared. The
+/// door admits by declaration only (capability door D24), so a bare label
+/// hello is refused before any challenge.
+fn identity_hello(app: &str) -> AppHello {
+    AppHello::for_route(AppId::new(app), AppRouteId::new("identity").unwrap()).declaring(declaring(&["identity"]))
+}
+
+/// A declaration naming exactly `routes`.
+fn declaring(routes: &[&str]) -> AppDeclaration {
+    AppDeclaration {
+        routes: routes.iter().map(|route| NamePattern::exact(*route)).collect(),
+        ..AppDeclaration::default()
+    }
+}
 
 fn resident_host() -> Arc<FixedIdentity> {
     FixedIdentity::new(0x91)
@@ -91,7 +106,7 @@ async fn turnstone_opens_a_session_and_reads_a_capture() {
     );
 
     let app = async {
-        write_native_message_async(&mut app_writer, &AppHello::new(AppId::new("turnstone")))
+        write_native_message_async(&mut app_writer, &identity_hello("turnstone"))
             .await
             .unwrap();
         let challenge = match read_native_message_async::<_, AppHostMessage>(&mut app_reader)
@@ -315,7 +330,7 @@ async fn the_browser_connect_frame_does_not_open_an_application_session() {
         AppEndpointCatalog::default(),
     );
     let app = async {
-        write_native_message_async(&mut app_writer, &AppHello::new(AppId::new("turnstone")))
+        write_native_message_async(&mut app_writer, &identity_hello("turnstone"))
             .await
             .unwrap();
         let challenge = match read_native_message_async::<_, AppHostMessage>(&mut app_reader)
@@ -393,7 +408,14 @@ async fn the_client_reads_cards_over_the_served_endpoint() {
     let mut client = None;
     let mut last_error = String::new();
     for _ in 0..50 {
-        match AppBrokerClient::open_at(&endpoint, AppId::new("turnstone")).await {
+        match AppBrokerClient::open_declared_route_at(
+            &endpoint,
+            AppId::new("turnstone"),
+            AppRouteId::new("identity").unwrap(),
+            declaring(&["identity"]),
+        )
+        .await
+        {
             Ok(open) => {
                 client = Some(open);
                 break;
@@ -434,7 +456,7 @@ async fn the_client_reads_cards_over_the_served_endpoint() {
 /// item 20).
 #[tokio::test(flavor = "multi_thread")]
 async fn a_route_granted_while_serving_opens_for_the_next_connection() {
-    use djinn::door::route::ResidentEndpointRoute;
+    use ostiary::route::ResidentEndpointRoute;
     use graphshell_host::canary::FixtureEndpoint;
 
     let personae = resident_host();
@@ -458,7 +480,14 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
     // Wait for the door on the route it opened with.
     let mut ready = false;
     for _ in 0..50 {
-        if let Ok(client) = AppBrokerClient::open_at(&endpoint, AppId::new("turnstone")).await {
+        if let Ok(client) = AppBrokerClient::open_declared_route_at(
+            &endpoint,
+            AppId::new("turnstone"),
+            AppRouteId::new("identity").unwrap(),
+            declaring(&["identity", "late"]),
+        )
+        .await
+        {
             client.close().await.unwrap();
             ready = true;
             break;
@@ -467,9 +496,14 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
     }
     assert!(ready, "the door never opened");
     assert!(
-        AppBrokerClient::open_route_at(&endpoint, AppId::new("turnstone"), late())
-            .await
-            .is_err(),
+        AppBrokerClient::open_declared_route_at(
+            &endpoint,
+            AppId::new("turnstone"),
+            late(),
+            declaring(&["identity", "late"]),
+        )
+        .await
+        .is_err(),
         "a route not yet granted is refused"
     );
 
@@ -489,9 +523,14 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
         ResidentEndpointRoute::new("late", std::time::Duration::from_millis(50)).unwrap(),
     );
 
-    let client = AppBrokerClient::open_route_at(&endpoint, AppId::new("turnstone"), late())
-        .await
-        .expect("the route granted while serving opens");
+    let client = AppBrokerClient::open_declared_route_at(
+        &endpoint,
+        AppId::new("turnstone"),
+        late(),
+        declaring(&["identity", "late"]),
+    )
+    .await
+    .expect("the route granted while serving opens");
     assert_eq!(seen.lock().unwrap().as_deref(), Some("turnstone"));
     client.close().await.unwrap();
     server.abort();
@@ -501,7 +540,7 @@ async fn a_route_granted_while_serving_opens_for_the_next_connection() {
 /// without opt-in. Neither case may reach even the Graphshell challenge.
 #[tokio::test]
 async fn denials_and_ambient_refusals_precede_product_construction() {
-    use djinn::door::route::ResidentEndpointRoute;
+    use ostiary::route::ResidentEndpointRoute;
     for (app, route, denied) in [
         ("turnstone", "mere/divination", true),
         ("turnstone", "ambient/mere/divination", false),

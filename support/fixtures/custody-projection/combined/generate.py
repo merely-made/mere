@@ -24,14 +24,16 @@ if output.exists() and any(output.iterdir()):
     parser.error("output must be a new or empty directory")
 output.mkdir(parents=True, exist_ok=True)
 source = (root / "Cargo.toml").read_text()
-dependency = tomllib.loads(source)["workspace"]["dependencies"]["djinn"].copy()
-if "path" in dependency:
-    dependency["path"] = str((root / dependency["path"]).resolve())
-dependency["default-features"] = False
-dependency["features"] = ["resident", "custody-client"]
+workspace = tomllib.loads(source)["workspace"]["dependencies"]
 def toml_value(value):
     return str(value).lower() if isinstance(value, bool) else json.dumps(value)
-djinn_dependency = "{ " + ", ".join(key + " = " + toml_value(value) for key, value in dependency.items()) + " }"
+def from_root(name, features):
+    dependency = workspace[name].copy()
+    if "path" in dependency:
+        dependency["path"] = str((root / dependency["path"]).resolve())
+    dependency["default-features"] = False
+    dependency["features"] = features
+    return "{ " + ", ".join(key + " = " + toml_value(value) for key, value in dependency.items()) + " }"
 # Root patch sections are top-level tables; preserve their exact entries and
 # rewrite relative path values against the root that owns those entries.
 sections = re.split(r"(?m)(?=^\[)", source)
@@ -52,8 +54,11 @@ publish = false
 [dependencies]
 mere-resident = { path = %s, default-features = false }
 djinn = %s
+ostiary = %s
+castellan-client = %s
 graphshell-endpoint = { path = %s, default-features = false, features = ["projection-door", "projection-provider"] }
-''' % (json.dumps(str(root / "ports/mere-resident")), djinn_dependency,
+''' % (json.dumps(str(root / "ports/mere-resident")), from_root("djinn", ["resident"]),
+       from_root("ostiary", ["native"]), from_root("castellan-client", ["client"]),
        json.dumps(str(root / "crates/graphshell/graphshell-endpoint")))
 manifest += "\n\n".join(["", *patches]) + "\n"
 # Fail before writing if extraction accidentally produced invalid TOML.

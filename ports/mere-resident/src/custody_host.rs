@@ -26,10 +26,10 @@ use std::sync::Arc;
 
 use dramatis::authentication::PassphraseChangeFailureV1;
 use dramatis::intents::{CreateProfileIntentV1, ImportSshKeyNativeIntentV1, SwitchProfileIntentV1};
-use djinn::door::custody::{
+use castellan_client::custody::{
     CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest,
 };
-use djinn::door::custody_payload::{PayloadRequest, PayloadResult};
+use castellan_client::custody_payload::{PayloadRequest, PayloadResult};
 use dramatis::view::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{IdentityError, IdentityProvider, PersonaId, ProfileId, RetainedKeys};
 
@@ -95,7 +95,7 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     /// evidence. A private consumer must not upgrade it to a synthetic epoch.
     fn custody_epoch(
         &self,
-    ) -> Result<Option<djinn::door::custody::CustodyEpoch>, CustodyRefusal> {
+    ) -> Result<Option<castellan_client::custody::CustodyEpoch>, CustodyRefusal> {
         Ok(None)
     }
     /// The public identity read model, answerable while locked.
@@ -147,14 +147,6 @@ pub trait ResidentCustody: IdentityProvider + Send + Sync + 'static {
     /// Seal or unseal one retained payload, admitted to the open profile.
     fn payload(&self, wallet_root: &Path, persona: PersonaId, request: PayloadRequest, scope: Vec<u8>) -> Result<PayloadResult, CustodyRefusal>;
     fn credentials(&self, call: CredentialCall) -> Result<serde_json::Value, CustodyRefusal>;
-    /// Adopt Hocket's own sealed identity as a persona (D13). Hocket seals it
-    /// under the desktop user's OS key, which a custodian running under its
-    /// own account cannot open; adopting it here would open that store in
-    /// Djinn. So only an in-process host adopts, and a custodian refuses
-    /// until the import is moved into custody with its own envelope.
-    fn adopt_hocket(&self) -> Result<(), String> {
-        Err("Hocket's identity is adopted only by an in-process host; a custodian refuses it".into())
-    }
 
     /// A projected signing decision. Only an in-process host with its own
     /// native confirmation answers; a custodian decides on its own channel.

@@ -31,7 +31,8 @@ use mere_resident::embedded_reservoir::{
 };
 use mere_resident::resident_mere::MereRoutes;
 use mere_resident::resident_reservoir::ResidentReservoir;
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
@@ -72,7 +73,8 @@ fn options(root: &Path, address: &str) -> ReservoirAttachmentOptions {
     ReservoirAttachmentOptions {
         endpoint: address.into(),
         application: AppId::new("validator-fixture"),
-        applications: vec![AppId::new("validator-fixture")],
+        declaration: mere_resident::resident_reservoir::mere_client_declaration(),
+        grants: Vec::new(),
         shared_root: root.into(),
         persona: persona(),
         domain: DomainId::new(DOMAIN).unwrap(),
@@ -265,6 +267,7 @@ async fn published_divination_authority_survives_three_real_resident_owner_proce
             ApplicationReservoirOptions {
                 endpoint: address,
                 application: AppId::new("validator-fixture"),
+                declaration: mere_resident::resident_reservoir::mere_client_declaration(),
                 domain: DomainId::new("divination").unwrap(),
                 shared_root: unusable.clone(),
                 vault_dir: unusable.clone(),
@@ -332,6 +335,7 @@ async fn registered_domain_validator_survives_ownership_and_refuses_complete_bat
             ApplicationReservoirOptions {
                 endpoint: address.clone(),
                 application: AppId::new("validator-fixture"),
+                declaration: mere_resident::resident_reservoir::mere_client_declaration(),
                 domain: DomainId::new(DOMAIN).unwrap(),
                 shared_root: unusable.clone(),
                 vault_dir: unusable.clone(),
@@ -474,16 +478,17 @@ async fn child_serves_the_registered_domain() {
             .await
             .unwrap();
         let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
-        let grants = AppRouteGrants::new(AllowedAppRoutes::new([(
-            config.application.clone(),
-            ResidentReservoir::route(),
-        )]));
+        let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+        mere_resident::applications::install(
+            &grants,
+            vec![mere_resident::applications::grant_for(&config.application, &config.declaration, None)],
+        );
+        grants.update(|routes| routes.serve(ResidentReservoir::route()));
         let routes = MereRoutes::new(
             config.shared_root.clone(),
             config.persona,
             catalog.clone(),
             grants.clone(),
-            config.applications.clone(),
         );
         let routes = if product {
             routes.with_divination_authority()
@@ -514,7 +519,7 @@ async fn child_serves_the_registered_domain() {
                 .await
         });
         for _ in 0..100 {
-            if djinn::door::local_endpoint::connect_local(&config.endpoint)
+            if ostiary::local_endpoint::connect_local(&config.endpoint)
                 .await
                 .is_ok()
             {
@@ -943,6 +948,7 @@ mod published_replay_regression {
                 ApplicationReservoirOptions {
                     endpoint: address,
                     application: AppId::new("validator-fixture"),
+                declaration: mere_resident::resident_reservoir::mere_client_declaration(),
                     domain: DomainId::new("divination").unwrap(),
                     shared_root: unusable.clone(),
                     vault_dir: unusable.clone(),

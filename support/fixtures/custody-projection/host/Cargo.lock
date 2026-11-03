@@ -54,7 +54,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "chirograph"
-version = "0.0.2"
+version = "0.0.4"
 dependencies = [
  "base64",
  "blake3",
@@ -134,7 +134,7 @@ dependencies = [
 
 [[package]]
 name = "graphshell-endpoint"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "chirograph",
 ]
@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "hest"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "serde",
 ]
@@ -206,7 +206,7 @@ dependencies = [
 
 [[package]]
 name = "sceno"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -214,7 +214,7 @@ dependencies = [
 
 [[package]]
 name = "scenotime"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
  "sceno",
  "serde",

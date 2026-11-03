@@ -8,7 +8,7 @@
 use crate::{Request, State};
 use cambium::{AnyView, GenetCtx, GenetElement, button, el, text};
 use dramatis::view::VaultLockView;
-use djinn::door::quarantine::ReviewAction;
+use castellan_client::quarantine::ReviewAction;
 pub type Child = Box<dyn AnyView<State, (), GenetCtx, GenetElement>>;
 pub type Logic = fn(&State) -> Child;
 fn line(s: impl Into<String>) -> Child {
@@ -103,7 +103,7 @@ pub fn root(state: &State) -> Child {
                     contents.push(action(
                         "Assign to this persona",
                         Request::Assign(
-                            djinn::door::quarantine::AssignImportRequest {
+                            castellan_client::quarantine::AssignImportRequest {
                                 store: import.store.clone(),
                                 profile: snapshot.roster.chosen.clone(),
                                 persona: import.persona,

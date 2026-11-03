@@ -20,15 +20,15 @@ use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::identity_endpoint::IdentityAuthority;
 use mere_resident::door::local_session::DoorIdentity;
 use mere_resident::door::resident_identity::ResidentIdentity;
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::declaration::{AppDeclaration, NamePattern};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
     VaultView,
 };
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{IdentityError, InMemoryProvider, RetainedKeys};
 
@@ -115,10 +115,14 @@ async fn turnstone_opens_the_in_memory_knot_route() {
     let mut client = None;
     let mut last_error = String::new();
     for _ in 0..50 {
-        match AppBrokerClient::open_route_at(
+        match AppBrokerClient::open_declared_route_at(
             &endpoint,
             AppId::new("turnstone"),
             AppRouteId::new("knot").unwrap(),
+            AppDeclaration {
+                routes: vec![NamePattern::exact("knot")],
+                ..AppDeclaration::default()
+            },
         )
         .await
         {

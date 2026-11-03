@@ -17,9 +17,9 @@ use mere_resident::door::identity_endpoint::IdentityAuthority;
 use mere_resident::door::local_session::DoorIdentity;
 use mere_resident::door::projection_offers::ProviderPermission;
 use mere_resident::door::resident_identity::ResidentIdentity;
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::declaration::{AppDeclaration, NamePattern};
 use dramatis::view::{
     AgentListenerView, CarryView, IdentitySurfaceSnapshot, VaultLockView, VaultProtectionView,
     VaultView,
@@ -27,7 +27,7 @@ use dramatis::view::{
 use djinn::door::local_endpoint::LocalListener;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use graphshell_endpoint::door::projection_offer::PROJECTION_PROVIDER_ROUTE;
-use djinn::door::app_client::AppConnection;
+use ostiary::app_client::AppConnection;
 use graphshell_endpoint::door::projection_provider;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{IdentityError, InMemoryProvider, RetainedKeys};
@@ -77,6 +77,15 @@ impl IdentityAuthority for FixtureResident {
 
 fn resident_host() -> Arc<FixtureResident> {
     Arc::new(FixtureResident(InMemoryProvider::from_seed([0xA1; 32])))
+}
+
+/// What a fixture application declares: exactly `routes`. The door admits by
+/// declaration only (capability door D24).
+fn declaring(routes: &[&str]) -> AppDeclaration {
+    AppDeclaration {
+        routes: routes.iter().map(|route| NamePattern::exact(*route)).collect(),
+        ..AppDeclaration::default()
+    }
 }
 
 const PROVIDER: &str = "independent-directory-app";
@@ -148,7 +157,7 @@ async fn door() -> Door {
 }
 
 struct Provider(
-    tokio::task::JoinHandle<Result<(), djinn::door::app_client::AppClientError>>,
+    tokio::task::JoinHandle<Result<(), ostiary::app_client::AppClientError>>,
 );
 impl Drop for Provider {
     fn drop(&mut self) {
@@ -161,10 +170,11 @@ async fn provider(door: &Door, root: &std::path::Path) -> Provider {
 }
 
 async fn provider_with_limit(door: &Door, root: &std::path::Path, limit: usize) -> Provider {
-    let connection = AppConnection::open_route_at(
+    let connection = AppConnection::open_declared_route_at(
         &door.endpoint,
         AppId::new(PROVIDER),
         AppRouteId::new(PROJECTION_PROVIDER_ROUTE).unwrap(),
+        declaring(&[PROJECTION_PROVIDER_ROUTE]),
     )
     .await
     .unwrap();
@@ -203,13 +213,14 @@ async fn wait_offer(catalog: &AppEndpointCatalog, present: bool) {
 async fn viewer(
     door: &Door,
     app: &str,
-) -> Result<AppBrokerClient, djinn::door::app_client::AppClientError> {
+) -> Result<AppBrokerClient, ostiary::app_client::AppClientError> {
     tokio::time::timeout(
         Duration::from_secs(5),
-        AppBrokerClient::open_route_at(
+        AppBrokerClient::open_declared_route_at(
             &door.endpoint,
             AppId::new(app),
             AppRouteId::new(ROUTE).unwrap(),
+            declaring(&[ROUTE]),
         ),
     )
     .await
@@ -229,10 +240,11 @@ async fn real_directory_offer_has_separate_viewer_permission_and_revocation() {
         )
     });
     assert!(
-        AppConnection::open_route_at(
+        AppConnection::open_declared_route_at(
             &door.endpoint,
             AppId::new(PROVIDER),
-            AppRouteId::new(PROJECTION_PROVIDER_ROUTE).unwrap()
+            AppRouteId::new(PROJECTION_PROVIDER_ROUTE).unwrap(),
+            declaring(&[PROJECTION_PROVIDER_ROUTE]),
         )
         .await
         .is_err(),
@@ -331,10 +343,10 @@ async fn idle_provider_disconnect_withdraws_and_replacement_does_not_inherit_vie
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn withdrawing_an_offer_closes_an_idle_viewer_socket() {
     use base64::Engine;
-    use djinn::door::app_admission::AppHello;
-use djinn::door::frame::{read_native_message_async, write_native_message_async};
-use djinn::door::local_endpoint::connect_local;
-use djinn::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
+    use ostiary::app_admission::AppHello;
+    use ostiary::frame::{read_native_message_async, write_native_message_async};
+    use ostiary::local_endpoint::connect_local;
+    use ostiary::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
     use tokio::io::AsyncReadExt;
     type Reply = AppHostMessage<(), (), ()>;
     let directory = tempfile::tempdir().unwrap();
@@ -343,7 +355,7 @@ use djinn::door::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage};
     let mut socket = connect_local(&door.endpoint).await.unwrap();
     write_native_message_async(
         &mut socket,
-        &AppHello::for_route(AppId::new(VIEWER), AppRouteId::new(ROUTE).unwrap()),
+        &AppHello::for_route(AppId::new(VIEWER), AppRouteId::new(ROUTE).unwrap()).declaring(declaring(&[ROUTE])),
     )
     .await
     .unwrap();

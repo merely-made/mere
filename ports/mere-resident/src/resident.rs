@@ -17,7 +17,7 @@ use std::sync::Arc;
 use armillary::lifecycle::{CloseAction, CloseFuture, close_all};
 #[cfg(feature = "inference")]
 use crate::custody_host::LockHolder as VaultLockHolder;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointCatalogError};
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;

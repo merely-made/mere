@@ -13,9 +13,8 @@ use chirograph::ProjectionSession;
 use mere_resident::door::app_broker::AppEndpointCatalog;
 use mere_resident::resident_mere::{MereRoutes, ambient_mere_route_id, mere_route_id};
 use mere_resident::resident_reservoir::ResidentReservoir;
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRequest, AppRouteGrants, AppRouteId,
-};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRequest, AppRouteId};
 use graphshell_endpoint::{ProjectionCatalog, ProjectionSource};
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use graphshell_host::lifecycle::AdmittedEndpointContext;
@@ -122,15 +121,18 @@ async fn fresh_resident_enforces_recorded_access() {
         .unwrap();
     let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
+    let declaration = mere_resident::resident_reservoir::mere_client_declaration();
+    mere_resident::applications::install(
+        &grants,
+        ["turnstone", "knot-editor", "cleromancy"]
+            .map(|app| mere_resident::applications::grant_for(&AppId::new(app), &declaration, None))
+            .to_vec(),
+    );
     let routes = MereRoutes::new(
         root.into(),
         persona(),
         catalog.clone(),
         grants.clone(),
-        ["turnstone", "knot-editor", "cleromancy"]
-            .into_iter()
-            .map(AppId::new)
-            .collect(),
     )
     .with_divination_authority();
     // Serve fails closed if the composition forgets to load policy.
@@ -141,7 +143,7 @@ async fn fresh_resident_enforces_recorded_access() {
         routes.serve(mere).await.unwrap();
     }
     let request = |app: &str, domain: &str, ambient: bool| {
-        AppRequest::new(
+        let mut request = AppRequest::new(
             AppId::new(app),
             AppRouteId::new(if ambient {
                 ambient_mere_route_id(domain)
@@ -149,7 +151,9 @@ async fn fresh_resident_enforces_recorded_access() {
                 mere_route_id(domain)
             })
             .unwrap(),
-        )
+        );
+        request.declaration = Some(mere_resident::resident_reservoir::mere_client_declaration());
+        request
     };
     for ambient in [false, true] {
         let denied = request("turnstone", "divination", ambient);

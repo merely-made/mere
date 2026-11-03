@@ -19,8 +19,8 @@ use custody_wire::contract::PayloadOperation;
 use custody_wire::secret::Bytes;
 use dramatis::authentication::PassphraseChangeFailureV1;
 use dramatis::intents::{CreateProfileIntentV1, ImportSshKeyNativeIntentV1, SwitchProfileIntentV1};
-use djinn::door::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
-use djinn::door::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
+use castellan_client::custody::{CustodyRefusal, EpochKeyRequest, KeySource, ReleasedEpochKey, ReleasedKey, StationGrantRequest};
+use castellan_client::custody_payload::{PayloadBytes, PayloadOperation as AppPayload, PayloadRequest, PayloadResult};
 use dramatis::view::{IdentitySurfaceSnapshot, VaultLockView};
 use personae::{IdentityError, IdentityProvider, InMemoryProvider, PersonaId, ProfileId, RetainedKeys};
 
@@ -297,10 +297,6 @@ impl<S: IdentityStorage + 'static> ResidentCustody for PersonaeHost<S> {
         Err(CustodyRefusal::Refused {
             reason: "the credential catalog is held by the custodian".into(),
         })
-    }
-
-    fn adopt_hocket(&self) -> Result<(), String> {
-        crate::hocket_adoption::adopt(self).map(|_| ()).map_err(|error| error.to_string())
     }
 
     fn confirm_signing(&self, ui: &dyn NativeIdentityUi, intent: &str, payload: &[u8]) -> Result<(), String> {

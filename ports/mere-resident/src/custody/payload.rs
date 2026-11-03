@@ -3,9 +3,10 @@
 
 //! Retained-content seal operations under stable custody/profile authority.
 use crate::keeper::Keeper;
-use djinn::door::app_admission::AppId;
-use djinn::door::custody::{CustodyAnswer, CustodyRefusal};
-use djinn::door::custody_payload::PayloadRequest;
+use ostiary::app_admission::AppId;
+use ostiary::declaration::AppAuthority;
+use castellan_client::custody::{CustodyAnswer, CustodyRefusal};
+use castellan_client::custody_payload::PayloadRequest;
 use personae::{PersonaId, ProfileId};
 use std::path::PathBuf;
 
@@ -17,15 +18,16 @@ pub(crate) struct PayloadCustody {
 
 pub(super) fn answer(
     keeper: &Keeper,
-    app: &AppId,
+    authority: &AppAuthority,
     request: PayloadRequest,
 ) -> Result<CustodyAnswer, CustodyRefusal> {
     // Route admission alone does not authorize use of retained-content keys.
-    let app_scope = match app.as_str() {
-        // Preserve the existing encoded AAD for retained Turnstone ciphertext.
-        "turnstone" => "turnstone.retained-clips/custody-v1",
-        "graphshell" => "graphshell.retained-content/custody-v1",
-        _ => return Err(CustodyRefusal::NotServed),
+    // The scope is the one declared and granted (capability door D30); until
+    // every retained-content application declares one, the label's scope
+    // stands in (djinn-slimming D22, removed by the M1 lane).
+    let app_scope = match authority.payload_scope() {
+        Ok(scope) => scope,
+        Err(_) => label_scope(authority.app())?,
     };
     request.validate().map_err(super::refused)?;
     if let Some(expected) = request.custody_epoch.as_ref() {
@@ -50,4 +52,14 @@ pub(super) fn answer(
         .host()
         .payload(&binding.root, binding.persona, request, scope)?;
     Ok(CustodyAnswer::Payload { result })
+}
+
+/// The scope each label sealed under before scopes were declared.
+fn label_scope(app: &AppId) -> Result<&'static str, CustodyRefusal> {
+    match app.as_str() {
+        // Preserve the existing encoded AAD for retained Turnstone ciphertext.
+        "turnstone" => Ok("turnstone.retained-clips/custody-v1"),
+        "graphshell" => Ok("graphshell.retained-content/custody-v1"),
+        _ => Err(CustodyRefusal::NotServed),
+    }
 }

@@ -1,5 +1,5 @@
 #![cfg(feature = "projection-door")]
-use djinn::door::wire::{AppHostMessage, AppMessage};
+use ostiary::wire::{AppHostMessage, AppMessage};
 #[test]
 fn projection_slots_preserve_exact_wire_fixtures() {
     use chirograph::{

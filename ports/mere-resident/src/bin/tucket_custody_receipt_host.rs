@@ -10,8 +10,9 @@ use mere_resident::{
     door::app_broker::{AppEndpointCatalog, serve_app_broker},
     keeper::Keeper,
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody_client::CustodyClient;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody_client::CustodyClient;
 use dramatis::view::VaultProtectionView;
 use personae::{Ed25519Keypair, PersonaId, ProfileId};
 use std::{path::PathBuf, sync::Arc, time::Duration};
@@ -64,6 +65,45 @@ async fn main() {
         Arc::new(Keeper::new(host.clone()).with_wallet_root(has_wallet.then_some(wallet_root)));
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    // Signalman, granted what it declares (`station_custody::declaration`),
+    // and the receipt's other application, granted the whole Signalman
+    // wallet namespace, which still does not reach a station's keys.
+    {
+        use ostiary::declaration::{
+            AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern, SaltPattern, SaltUse,
+        };
+        let declared = |operations: Vec<Op>, namespaces: &[&str]| AppDeclaration {
+            routes: vec![NamePattern::exact("custody")],
+            custody: CustodyUse {
+                operations: operations.into_iter().collect(),
+                salts: namespaces
+                    .iter()
+                    .map(|namespace| SaltUse::wallet(SaltPattern::Prefix((*namespace).into())))
+                    .collect(),
+                ..CustodyUse::default()
+            },
+            ..AppDeclaration::default()
+        };
+        let signalman = declared(
+            vec![Op::Status, Op::WatchLock, Op::Release, Op::IssueStationGrant, Op::RevokeDevice],
+            &[
+                "mere.castellan.reticulum.station/v1",
+                "mere.castellan.reticulum.controller/v1",
+                "mere/signalman/sited-station-control/v1/",
+                "mere/signalman/sited-station-storage/v1/",
+                "mere.signalman.tucket.station/v1/",
+                "mere.signalman.sennet.station/v1/",
+            ],
+        );
+        let broad = declared(vec![Op::Release, Op::Attest, Op::Sign], &["mere.signalman."]);
+        mere_resident::applications::install(
+            &grants,
+            vec![
+                mere_resident::applications::grant_for(&AppId::new("signalman"), &signalman, None),
+                mere_resident::applications::grant_for(&AppId::new("turnstone"), &broad, None),
+            ],
+        );
+    }
     let serving = endpoint.clone();
     let mut server = tokio::spawn(async move {
         serve_app_broker(
@@ -78,7 +118,7 @@ async fn main() {
     });
     let mut ready = false;
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("signalman"))
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

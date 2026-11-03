@@ -17,8 +17,9 @@ use mere_resident::{
     identity_ui::{NativeIdentityUi, SystemNativeIdentityUi},
     keeper::Keeper,
 };
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody_client::CustodyClient;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody_client::CustodyClient;
 use personae::PersonaId;
 use serde_json::json;
 use std::{path::PathBuf, sync::Arc, time::Duration};
@@ -114,6 +115,28 @@ async fn main() {
     }
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
+    // The Dramatis application, granted what it declares
+    // (`dramatis_app::declaration`).
+    {
+        use ostiary::declaration::{AppDeclaration, CustodyOperation as Op, CustodyUse, NamePattern};
+        let dramatis = AppDeclaration {
+            routes: vec![NamePattern::exact("custody")],
+            custody: CustodyUse {
+                operations: [
+                    Op::Status, Op::Roster, Op::ChooseProfile, Op::LockVault, Op::UnlockNative,
+                    Op::ChangePassphraseNative, Op::Quarantine, Op::ReviewQuarantine,
+                    Op::UnassignedImports, Op::AssignImport,
+                ]
+                .into(),
+                ..CustodyUse::default()
+            },
+            ..AppDeclaration::default()
+        };
+        mere_resident::applications::install(
+            &grants,
+            vec![mere_resident::applications::grant_for(&AppId::new("dramatis"), &dramatis, None)],
+        );
+    }
     let serving = endpoint.clone();
     let server = tokio::spawn(async move {
         serve_app_broker(
@@ -127,7 +150,7 @@ async fn main() {
         .await
     });
     for _ in 0..200 {
-        if CustodyClient::open_at(&endpoint, AppId::new("dramatis"))
+        if ostiary::local_endpoint::connect_local(&endpoint)
             .await
             .is_ok()
         {

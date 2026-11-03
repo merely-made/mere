@@ -21,13 +21,12 @@ use mere_resident::resident_devices::{
     self, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryEndpoint,
     DeviceDirectorySource, DeviceDirectoryV1, read_directory,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::VaultProtectionView;
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use personae::{Ed25519Keypair, ProfileId};
 use uuid::Uuid;
@@ -70,10 +69,11 @@ fn fixture() -> DeviceDirectoryV1 {
 }
 
 async fn open(endpoint: &str, app: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(
+    AppBrokerClient::open_declared_route_at(
         endpoint,
         AppId::new(app),
         AppRouteId::new(DEVICE_DIRECTORY_ROUTE).unwrap(),
+        mere_resident::applications::resident_declaration(),
     )
     .await
 }
@@ -93,6 +93,7 @@ async fn only_the_granted_caller_reads_the_device_directory() {
         .await
         .unwrap();
     resident_devices::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
 
     let endpoint = endpoint_name();
     let server = {

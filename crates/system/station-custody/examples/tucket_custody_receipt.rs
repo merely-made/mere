@@ -30,8 +30,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if !error.is_pending()
                     && !matches!(
                         error,
-                        djinn::door::custody_client::CustodyClientError::Refused(
-                            djinn::door::custody::CustodyRefusal::NoWallet
+                        castellan_client::custody_client::CustodyClientError::Refused(
+                            castellan_client::custody::CustodyRefusal::NoWallet
                         )
                     )
                 {
@@ -53,11 +53,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .to_bytes();
         report["public_key"] = serde_json::json!(public);
         if args[4] == "unlocked" {
-            use djinn::door::app_admission::AppId;
-use djinn::door::custody::{CustodyRefusal, KeySource};
-use djinn::door::custody_client::{BlockingCustodyClient, CustodyClientError};
+            use ostiary::app_admission::AppId;
+            use castellan_client::custody::{CustodyRefusal, KeySource};
+            use castellan_client::custody_client::{BlockingCustodyClient, CustodyClientError};
             let salt = personae::tucket::station_salt(device.as_uuid().as_bytes(), &args[2])?;
-            let mut other_app = BlockingCustodyClient::open_at(&args[0], AppId::new("turnstone"))?;
+            // Another application, granted the whole Signalman wallet
+            // namespace: a station's keys still stay (the station floor).
+            let broad = ostiary::declaration::AppDeclaration {
+                routes: vec![ostiary::declaration::NamePattern::exact("custody")],
+                custody: ostiary::declaration::CustodyUse {
+                    operations: [
+                        ostiary::declaration::CustodyOperation::Release,
+                        ostiary::declaration::CustodyOperation::Attest,
+                        ostiary::declaration::CustodyOperation::Sign,
+                    ]
+                    .into(),
+                    salts: vec![ostiary::declaration::SaltUse::wallet(
+                        ostiary::declaration::SaltPattern::Prefix("mere.signalman.".into()),
+                    )],
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
+            let mut other_app = BlockingCustodyClient::open_declared_at(&args[0], AppId::new("turnstone"), broad)?;
             for refused in [
                 other_app
                     .release(KeySource::Wallet, vec![salt.clone()])

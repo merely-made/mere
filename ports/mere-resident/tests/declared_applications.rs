@@ -18,11 +18,12 @@ use std::time::Duration;
 
 use castellan::authority::PersonaeHost;
 use castellan::custody::{IdentityStorage, IdentityVault, InMemoryStorage, Profile};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId};
-use djinn::door::app_client::AppConnection;
-use djinn::door::custody::{CustodyCall, CustodyRefusal, EpochKeyRequest};
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
-use djinn::door::declaration::{
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::app_client::AppConnection;
+use castellan_client::custody::{CustodyCall, CustodyRefusal, EpochKeyRequest};
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
+use ostiary::declaration::{
     AppDeclaration, AppGrant, CustodyOperation, CustodyUse, EpochUse, NamePattern,
 };
 use dramatis::view::VaultProtectionView;
@@ -63,12 +64,14 @@ fn resident_host() -> Arc<PersonaeHost<InMemoryStorage>> {
     ))
 }
 
-/// Serve the door as the resident does: label custody, Mere's default
-/// application grants, and `extra` grants for fixture applications.
+/// Serve the door as the resident does: custody, an owner's written grants
+/// for Knot and Turnstone (`fixtures/owner_applications.json`), and `extra`
+/// grants for fixture applications.
 async fn serve(wallet: &Path, extra: Vec<AppGrant>, catalog: AppEndpointCatalog) -> String {
     let grants = AppRouteGrants::new(AllowedAppRoutes::none());
     mere_resident::custody::grant(&grants).unwrap();
-    let mut policy = mere_resident::applications::default_grants();
+    let mut policy: Vec<AppGrant> =
+        serde_json::from_str(include_str!("fixtures/owner_applications.json")).unwrap();
     policy.extend(extra);
     mere_resident::applications::install(
         &grants,
@@ -161,7 +164,7 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
     assert!(matches!(
         refusal(
             client
-                .release(djinn::door::custody::KeySource::Persona, vec![mesh::MESH_AUTHOR_SALT.to_vec()])
+                .release(castellan_client::custody::KeySource::Persona, vec![mesh::MESH_AUTHOR_SALT.to_vec()])
                 .await
         ),
         CustodyRefusal::Undeclared { .. }
@@ -170,12 +173,8 @@ async fn knot_receives_its_declared_custody_within_the_default_grant() {
     // Knot's label without its declaration is refused at the door.
     assert!(open(&endpoint, knot_editor::KNOT_APP_ID, None).await.is_err());
 
-    // A label-admitted application no longer reaches Knot's keys.
-    let mut labelled = open(&endpoint, "cleromancy", None).await.unwrap();
-    assert_eq!(
-        refusal(labelled.call(release(PersonalVaultKeys::requests())).await),
-        CustodyRefusal::NotReleasable
-    );
+    // No application reaches custody by its label alone.
+    assert!(open(&endpoint, "cleromancy", None).await.is_err());
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -232,8 +231,8 @@ async fn a_declared_request_beyond_the_owner_grant_is_refused_as_not_granted() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn declared_salts_release_and_sign_only_within_declaration_and_grant() {
-    use djinn::door::custody::KeySource;
-    use djinn::door::declaration::{SaltPattern, SaltUse};
+    use castellan_client::custody::KeySource;
+    use ostiary::declaration::{SaltPattern, SaltUse};
     let wallet = tempfile::tempdir().unwrap();
     let mut grant = AppGrant::new(AppId::new("salted-app"));
     grant.routes = vec![NamePattern::exact("custody")];
@@ -283,8 +282,8 @@ async fn declared_salts_release_and_sign_only_within_declaration_and_grant() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn turnstone_releases_its_place_and_scope_keys_within_the_default_grant() {
-    use djinn::door::custody::KeySource;
-    use djinn::door::declaration::{SaltPattern, SaltUse, delegation_scope_prefix};
+    use castellan_client::custody::KeySource;
+    use ostiary::declaration::{SaltPattern, SaltUse, delegation_scope_prefix};
     let wallet = tempfile::tempdir().unwrap();
     let endpoint = serve(wallet.path(), Vec::new(), AppEndpointCatalog::default()).await;
     let mut declaration = AppDeclaration {
@@ -326,7 +325,7 @@ async fn turnstone_releases_its_place_and_scope_keys_within_the_default_grant() 
 #[cfg(target_os = "macos")]
 #[tokio::test(flavor = "multi_thread")]
 async fn a_label_pinned_to_a_signature_refuses_an_unsigned_peer() {
-    use djinn::door::declaration::{AppIdentity, SignedAppIdentity};
+    use ostiary::declaration::{AppIdentity, SignedAppIdentity};
     let wallet = tempfile::tempdir().unwrap();
     let grant = |app: &str, pinned: bool| {
         let mut grant = AppGrant::new(AppId::new(app));
@@ -445,7 +444,7 @@ async fn projection_provider_serve(
     connection: AppConnection,
     route: AppRouteId,
     root: std::path::PathBuf,
-) -> Result<(), djinn::door::app_client::AppClientError> {
+) -> Result<(), ostiary::app_client::AppClientError> {
     graphshell_endpoint::door::projection_provider::serve(
         connection,
         route,

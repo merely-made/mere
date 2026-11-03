@@ -20,12 +20,15 @@ use mere_resident::custody_host::{CredentialCall, ResidentCustody};
 use mere_resident::door::app_broker::{AppEndpointCatalog, serve_app_broker};
 use mere_resident::door::browser_carrier::NativeIdentityFailure;
 use mere_resident::{identity_ui::NativeIdentityUi, keeper::Keeper};
-use djinn::door::app_admission::{AllowedAppRoutes, AppId, AppRouteGrants};
-use djinn::door::custody::CustodyRefusal;
-use djinn::door::custody_client::{CustodyClient, CustodyClientError};
-use djinn::door::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::AppId;
+use castellan_client::custody::CustodyRefusal;
+use castellan_client::custody_client::{CustodyClient, CustodyClientError};
+use castellan_client::quarantine::{QuarantineCard, ReviewAction, ReviewRequest};
 use personae::{PersonaId, ProfileId};
 use serde_json::json;
+#[path = "fixture_declarations/mod.rs"]
+mod fixture_declarations;
 use std::{
     sync::{
         Arc, Mutex,
@@ -174,6 +177,7 @@ impl Fixture {
         let keeper = Arc::new(Keeper::new(remote.clone()).with_ui(ui.clone()));
         let grants = AppRouteGrants::new(AllowedAppRoutes::none());
         mere_resident::custody::grant(&grants).unwrap();
+        fixture_declarations::grant(&grants, &["dramatis", "personae-vault", "graphshell", "cleromancy"]);
         let endpoint = custodian.dir.path().join("review.sock").display().to_string();
         let serving = endpoint.clone();
         let server = tokio::spawn(async move {
@@ -195,7 +199,7 @@ impl Fixture {
             server,
         };
         for _ in 0..100 {
-            if CustodyClient::open_at(&fixture.endpoint, AppId::new("dramatis"))
+            if CustodyClient::open_declared_at(&fixture.endpoint, AppId::new("dramatis"), fixture_declarations::declaration("dramatis"))
                 .await
                 .is_ok()
             {
@@ -206,7 +210,7 @@ impl Fixture {
         panic!("broker must bind");
     }
     async fn client(&self, app: &str) -> CustodyClient {
-        CustodyClient::open_at(&self.endpoint, AppId::new(app))
+        CustodyClient::open_declared_at(&self.endpoint, AppId::new(app), fixture_declarations::declaration(app))
             .await
             .unwrap()
     }
@@ -414,7 +418,7 @@ async fn an_owned_namespace_is_not_offered_for_assignment() {
     let card = f.cards("family").await.remove(0);
     let mut c = f.client("dramatis").await;
     assert!(c.unassigned_imports().await.unwrap().is_empty());
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: card.persona,
@@ -467,7 +471,7 @@ async fn older_import_assignment_needs_consent_and_is_not_replayed() {
             .unwrap()
             .contains("GEZDGNBV")
     );
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),
@@ -487,7 +491,7 @@ async fn older_import_assignment_rechecks_the_lock_after_consent() {
     let persona = persona.unwrap();
     let mut c = f.client("dramatis").await;
     let import = c.unassigned_imports().await.unwrap().remove(0);
-    let request = djinn::door::quarantine::AssignImportRequest {
+    let request = castellan_client::quarantine::AssignImportRequest {
         store: ProfileId("family".into()),
         profile: ProfileId("work".into()),
         persona: *persona.as_uuid(),

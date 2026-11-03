@@ -26,18 +26,17 @@ use mere_resident::door::browser_carrier::{
 use mere_resident::door::local_session::{DoorIdentity, door_salts};
 use mere_resident::identity_ui::{NativeIdentityUi, apply_native_identity_action};
 use mere_resident::resident_status::{
-    self, AgentListenerV1, ControlUnlock, LockStateV1, NativeUnlocker, RESIDENT_APP,
+    self, AgentListenerV1, ControlUnlock, LockStateV1, NativeUnlocker,
     RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE, ResidentControlEndpoint, ResidentEndpointsV1,
     ResidentStatusEndpoint, ResidentStatusSource, ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1,
     StopSignal, Unlocker,
 };
-use djinn::door::app_admission::{
-    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId,
-};
-use djinn::door::app_client::AppClientError;
+use djinn::door::app_admission::{AllowedAppRoutes, AppRouteGrants};
+use ostiary::app_admission::{AppId, AppRouteId};
+use ostiary::app_client::AppClientError;
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use dramatis::view::{VaultLockView, VaultProtectionView};
-use djinn::door::route::ResidentEndpointRoute;
+use ostiary::route::ResidentEndpointRoute;
 use graphshell_host::endpoint_catalog::ResidentEndpointCatalog;
 use notochord::{NetworkId, ProfileRef, ProofBinding, SessionHello, TrafficClass};
 use personae::{Ed25519Keypair, IdentityError, IdentityProvider, ProfileId};
@@ -97,12 +96,7 @@ fn endpoint_name() -> String {
 }
 
 async fn open(endpoint: &str, route: &str) -> Result<AppBrokerClient, AppClientError> {
-    AppBrokerClient::open_route_at(
-        endpoint,
-        AppId::new(RESIDENT_APP),
-        AppRouteId::new(route).unwrap(),
-    )
-    .await
+    mere_resident::resident_status::open_resident_route(endpoint, AppRouteId::new(route).unwrap()).await
 }
 
 /// Serve the app door over `host` with the status and control routes, the
@@ -119,6 +113,7 @@ async fn serve(host: Arc<Host>, unlock: ControlUnlock) -> (String, ResidentStatu
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     let route = catalog
         .update(|catalog| {
             ResidentControlEndpoint::register_with_unlock(StopSignal::default(), unlock, catalog)
@@ -126,6 +121,7 @@ async fn serve(host: Arc<Host>, unlock: ControlUnlock) -> (String, ResidentStatu
         .await
         .unwrap();
     resident_status::grant(&grants, route);
+    mere_resident::applications::install(&grants, vec![mere_resident::applications::resident_grant()]);
     let endpoint = endpoint_name();
     {
         let endpoint = endpoint.clone();

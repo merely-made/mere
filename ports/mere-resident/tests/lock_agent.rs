@@ -26,7 +26,7 @@ use std::process::Output;
 
 use mere_resident::resident_status::{self, RESIDENT_APP, RESIDENT_CONTROL_ROUTE};
 use djinn_testkit::{Bound, verify};
-use djinn::door::app_admission::{AppId, AppRouteId};
+use ostiary::app_admission::{AppId, AppRouteId};
 use graphshell_endpoint::door::projection::AppBrokerClient;
 use resident_harness::*;
 use serde_json::json;

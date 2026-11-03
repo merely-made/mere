@@ -128,7 +128,9 @@ graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-
 # custody, quarantine, tasks and the identity views (stack lift plan, L1).
 graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-offer", "profile"] }
 peer-facts.workspace = true
-djinn = { workspace = true, features = ["resident", "door-serve", "custody-client"] }
+djinn = { workspace = true, features = ["resident", "door-serve"] }
+ostiary = { workspace = true, features = ["native"] }
+castellan-client = { workspace = true, features = ["client"] }
 # The serving half: the endpoint catalog and its admitted context, the
 # projection host, admission and the session loop (stack lift plan, L2).
 graphshell-host = { workspace = true, features = ["native"] }
@@ -313,7 +315,9 @@ graphshell-mcp = { path = "../../crates/graphshell/graphshell-mcp" }
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "coop"] }
 mere-overmap = { workspace = true, features = ["view"] }
 graphshell-endpoint = { workspace = true, features = ["projection-door", "projection-provider", "profile"] }
-djinn = { workspace = true, features = ["resident", "door-serve", "custody-client"] }
+djinn = { workspace = true, features = ["resident", "door-serve"] }
+ostiary = { workspace = true, features = ["native"] }
+castellan-client = { workspace = true, features = ["client"] }
 pollster = "0.4"
 mere-view.workspace = true
 p2panda-core = "0.7.0"

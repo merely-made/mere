@@ -24,13 +24,12 @@ use crate::door::browser_carrier::{NativeIdentityAction, NativeIdentityResult};
 use crate::door::identity_endpoint::IdentityAuthority;
 use crate::door::local_session::{DoorIdentity, door_salts};
 use crate::door::resident_identity::{CustodyFuture, ResidentIdentity};
-use djinn::door::app_admission::AppId;
-use djinn::door::custody::CustodyCall;
-use djinn::door::declaration::AppAuthority;
+use ostiary::app_admission::AppId;
+use castellan_client::custody::CustodyCall;
+use ostiary::declaration::AppAuthority;
 use dramatis::view::IdentitySurfaceSnapshot;
 use personae::{IdentityError, RetainedKeys};
 
-use crate::custody::ReleasePolicy;
 mod review;
 #[cfg(feature = "in-process-custody")]
 pub(crate) mod signing;
@@ -43,19 +42,17 @@ pub struct Keeper {
     host: Arc<dyn ResidentCustody>,
     ui: Arc<dyn NativeIdentityUi>,
     wallet_root: Option<PathBuf>,
-    policy: ReleasePolicy,
     payload_custody: std::sync::OnceLock<crate::custody::payload::PayloadCustody>,
 }
 
 impl Keeper {
-    /// Keep `host`, with no native surface, no wallet and the default
-    /// release policy.
+    /// Keep `host`, with no native surface and no wallet. What it releases
+    /// is each declared application's grant (capability door D24).
     pub fn new(host: Arc<dyn ResidentCustody>) -> Self {
         Self {
             host,
             ui: Arc::new(UnavailableNativeIdentityUi),
             wallet_root: None,
-            policy: ReleasePolicy::default(),
             payload_custody: std::sync::OnceLock::new(),
         }
     }
@@ -96,12 +93,6 @@ impl Keeper {
         self.payload_custody.get()
     }
 
-    /// Replace which salts may be released (D11).
-    pub fn with_release_policy(mut self, policy: ReleasePolicy) -> Self {
-        self.policy = policy;
-        self
-    }
-
     /// Custody itself, for the resident's own composition.
     pub fn host(&self) -> &Arc<dyn ResidentCustody> {
         &self.host
@@ -116,8 +107,8 @@ impl Keeper {
         }
         let source = args.first().ok_or("CXF command requires a source file")?;
         let bytes = std::fs::read(source).map_err(|_| "cannot read CXF source file")?;
-        let refused = |r: djinn::door::custody::CustodyRefusal| match r {
-            djinn::door::custody::CustodyRefusal::Refused { reason } => reason,
+        let refused = |r: castellan_client::custody::CustodyRefusal| match r {
+            castellan_client::custody::CustodyRefusal::Refused { reason } => reason,
             other => format!("{other:?}"),
         };
         if command == "cxf-preview" {
@@ -152,10 +143,6 @@ impl Keeper {
 
     pub(crate) fn wallet_root(&self) -> Option<&Path> {
         self.wallet_root.as_deref()
-    }
-
-    pub(crate) fn policy(&self) -> &ReleasePolicy {
-        &self.policy
     }
 }
 

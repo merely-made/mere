@@ -185,10 +185,13 @@ authors = ["Mark AB (markik)"]
 # `~/.claude/.../memory/feedback_workspace_pins_drive_probes.md`: workspace
 # pins canonically, probes adapt; pick once with the user, don't churn.
 [workspace.dependencies]
+# The application door's contract: wire, frames, routes, declarations and the
+# client (Armillary's djinn-slimming S2).
+ostiary = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954", default-features = false }
 # Independent application door and resident lifetime supplier.
-djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee", default-features = false }
+djinn = { version = "0.0.3", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954", default-features = false }
 # OS peer facts shared with Djinn's door (capability door plan D7).
-peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+peer-facts = { version = "0.0.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 
 cue-netrender = { git = "https://github.com/merely-made/wgpu-cue.git", rev = "b5b70c2c9c40748abedc0c18d2b6ec5373e48958" }
 webcue = "=0.1.2"
@@ -219,7 +222,7 @@ emblem = "0.2.0"
 # Send actor harness the constellation is built on. Promoted to its standalone
 # repo (code-identical cutover 2026-07-09, boundary pass slice A); git sibling
 # consumed one-way, local checkout via the gitignored `.cargo/config.toml` patch.
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 # The scenograph projection-engine family's core contract (scene snapshots,
 # footprints, spaces, measurements) — git sibling consumed one-way, local
 # checkout via the gitignored `.cargo/config.toml` patch. cartography emits
@@ -236,7 +239,7 @@ scenograph = { version = "0.0.6", path = "crates/cambium/scenes/scenograph" }
 # this graph (Knot, through djinn) must pin the same revision too. Until
 # dramatis is pushed, the gitignored `.cargo/config.toml` patches these to a
 # local checkout.
-personae = { version = "0.3.0", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+personae = { version = "0.3.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 notochord = { version = "0.1.1", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 chartulary = { version = "0.2.1", git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 # The legend/memorial view over journals and codicils; reservation only.
@@ -250,7 +253,7 @@ mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
-chirograph = { version = "0.0.3", path = "crates/chirograph" }
+chirograph = { version = "0.0.4", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
 graphshell-endpoint = { version = "0.0.3", path = "crates/graphshell/graphshell-endpoint" }
@@ -393,7 +396,7 @@ weld-engine = { version = "0.2.0", path = "crates/inker/engines/weld-engine" }
 # `foo.workspace = true` and add only their own features/optional flags.
 genet-scripted-dom = { version = "=0.1.2", git = "https://github.com/merely-made/genet.git", branch = "main" }
 # Unpublished (0.0.0): native event dispatch plan, Phase 2 (cambium click, key and focus listeners).
-genet-events = { git = "https://github.com/merely-made/genet.git", branch = "main" }
+genet-events = { version = "0.0.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 layout-dom-api = { version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 layout_dom_api = { package = "layout-dom-api", version = "=0.1.1", git = "https://github.com/merely-made/genet.git", branch = "main" }
 genet-livery = { version = "0.0.4", git = "https://github.com/merely-made/genet.git", branch = "main", default-features = false }
@@ -560,10 +563,12 @@ gazette = { version = "0.0.1", path = "ports/gazette" }
 # per-endpoint trust, kith/kin tiers, recency. Relocated from repos/gaz 2026-08-10.
 gaz = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The cast-list tier's facade reservation; empty until something imports it.
-dramatis = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+dramatis = { version = "0.0.4", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 # The graded identity proofs and the never-shown secrets; reservations, no code.
 insigne = { version = "0.0.2", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
 chatelaine = { version = "0.0.3", git = "https://github.com/merely-made/dramatis.git", branch = "main" }
+# The custody route's application side (Armillary's djinn-slimming S3).
+castellan-client = { version = "0.0.1", git = "https://github.com/merely-made/dramatis.git", branch = "main", default-features = false }
 # The shared "which persona am I?" list. A Cambium view over the personae
 # roster, so the four applications with a GUI draw one picker rather than four.
 persona-picker = { package = "persona-picker", path = "crates/cambium/persona-picker" }
@@ -715,7 +720,7 @@ stickleback = { git = "https://github.com/merely-made/eidetic.git", rev = "61379
 
 # Complete the selected Knot contract closure so transitive Mere packages
 # use this workspace source rather than a second immutable Mere checkout.
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 cambium-rootstock = { path = "crates/cambium/cambium-rootstock" }
 cambium-winit = { path = "crates/cambium/cambium-winit" }
 cambium-a11y = { path = "crates/cambium/cambium-winit-a11y" }
@@ -760,7 +765,7 @@ document-session-api = { git = "https://github.com/merely-made/genet.git", branc
 # Reuse the Windows password class across cancellation and sequential prompts.
 light-file-dialog = { path = "support/patches/light-file-dialog" }
 # Canonical promoted families; keep registry and Git consumers type-identical.
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "998133bc17b8636152e9c4f7605eb475498213c8" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
@@ -900,7 +905,7 @@ seneschal = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 tulle = { git = "https://github.com/merely-made/murm.git", branch = "main" }
 
 [patch."https://www.github.com/merely-made/mere.git"]
-armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+armillary = { version = "0.1.1", git = "https://github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 chartulary = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
 commons-spine = { git = "https://github.com/merely-made/gemot.git", rev = "998133bc17b8636152e9c4f7605eb475498213c8" }
 eidetic = { git = "https://github.com/merely-made/eidetic.git", rev = "613799afd001200792e6c37d4406807848dadabc" }
@@ -933,7 +938,8 @@ esp = { git = "https://www.github.com/merely-made/esp.git", rev = "bd0468c5c44c0
 
 # Keep actor and observation types coherent across retained older suppliers.
 [patch."https://github.com/merely-made/armillary.git"]
-armillary = { version = "0.1.1", git = "https://www.github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
-djinn = { version = "0.0.3", git = "https://www.github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
-peer-facts = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "104b8d45e9b3aa8cd5892116ad5046fd5471d5ee" }
+armillary = { version = "0.1.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
+djinn = { version = "0.0.3", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
+ostiary = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
+peer-facts = { version = "0.0.1", git = "https://www.github.com/merely-made/armillary.git", rev = "08ebbc44f5d391bd263fcc26b6053edf72741954" }
 apparatus-core = { git = "https://www.github.com/merely-made/armillary.git", rev = "06340b08327b29c3485ecb0089bb5cafed20fd80" }

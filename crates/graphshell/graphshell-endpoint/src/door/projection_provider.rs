@@ -8,10 +8,8 @@ use crate::{
     CompleteEndpoint, IntentSink, PresentationSource, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource, dispatch_common,
 };
-use djinn::door::{
-    app_admission::AppRouteId,
-    app_client::{AppClientError, AppConnection},
-};
+use ostiary::app_admission::AppRouteId;
+use ostiary::app_client::{AppClientError, AppConnection};
 use std::{collections::BTreeMap, fmt::Display, time::Duration};
 
 /// Serve until the host withdraws the lease or the connection fails. The factory
@@ -292,11 +290,9 @@ mod tests {
     }
     #[cfg(unix)]
     async fn fixture_connection() -> (AppConnection, tokio::net::UnixStream) {
-        use djinn::door::{
-            app_admission::{AppHello, AppId},
-            frame::{read_native_message_async, write_native_message_async},
-            wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge},
-        };
+        use ostiary::app_admission::{AppHello, AppId};
+        use ostiary::frame::{read_native_message_async, write_native_message_async};
+        use ostiary::wire::{APP_CONNECT_SCHEMA, AppHostMessage, AppMessage, BrowserChallenge};
         use std::sync::atomic::{AtomicU64, Ordering};
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let path = std::env::temp_dir().join(format!(
@@ -311,7 +307,7 @@ mod tests {
             let hello: AppHello = read_native_message_async(&mut host).await.unwrap().unwrap();
             let request = hello.accept().unwrap();
             let challenge = BrowserChallenge {
-                schema: djinn::door::wire::BROWSER_CHALLENGE_SCHEMA.into(),
+                schema: ostiary::wire::BROWSER_CHALLENGE_SCHEMA.into(),
                 host_nonce: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA".into(),
             };
             write_native_message_async(
@@ -348,10 +344,8 @@ mod tests {
     #[cfg(unix)]
     #[tokio::test]
     async fn runner_exchanges_work_and_reports_disconnect() {
-        use djinn::door::{
-            frame::{read_native_message_async, write_native_message_async},
-            wire::{AppHostMessage, AppMessage},
-        };
+        use ostiary::frame::{read_native_message_async, write_native_message_async};
+        use ostiary::wire::{AppHostMessage, AppMessage};
         let (connection, mut host) = fixture_connection().await;
         let server = tokio::spawn(async move {
             let first: AppMessage<(), ProviderCall> =
@@ -423,10 +417,8 @@ mod tests {
     #[cfg(unix)]
     #[tokio::test(flavor = "current_thread")]
     async fn slow_factory_does_not_block_the_async_runtime() {
-        use djinn::door::{
-            frame::{read_native_message_async, write_native_message_async},
-            wire::{AppHostMessage, AppMessage},
-        };
+        use ostiary::frame::{read_native_message_async, write_native_message_async};
+        use ostiary::wire::{AppHostMessage, AppMessage};
         use std::sync::{
             Arc,
             atomic::{AtomicBool, Ordering},
