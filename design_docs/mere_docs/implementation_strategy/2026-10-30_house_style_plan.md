@@ -1,8 +1,10 @@
 # House Style Plan
 
 **Date:** 2026-10-30
-**Status (2026-10-31):** plan. Twelve rulings recorded (D1 to D12); stack.1 refined by D1,
-D2 and D12; stack.7 added by D10. No check adopted yet; H1 is planned in eidetic.
+**Status (2026-11-02):** in progress. Fifteen rulings recorded (D1 to D15).
+Eidetic's E1-E4 landed: standalone tagged tools, Windows/Linux installs and
+line-ceiling adoption in isocosm and eidetic. H4's doctrine pass is ruled;
+H1's Clippy/deny work and H2-H3's stack-wide inventory/adoption remain open.
 **Scope:** stack-wide house style for owned repositories: the source-size ceiling, comment
 economy, reuse and consolidation obligations, and the shared check command that enforces the
 measurable parts locally (D11). Doctrine lives in [doctrine.md](../../doctrine.md); this
@@ -111,18 +113,41 @@ abstraction" contradicted the known-futures ruling (2026-09-23).
 
   Links: amends stack.1 · summary Extraction proceeds once a second host is planned in its own repository's plan; it is done when the code has moved and the first host builds on it.
 
+- **D13. One source-size statement (Mark, 2026-11-02):** "Retire it and cite
+  stack.7 (Recommended)", over keeping isocosm's Method 3 as a local
+  restatement or deferring. Outcome: applies to stack.7; retire the duplicate
+  Method 3 in isocosm and cite `mere:stack.7` there. Coordinate with the VTT
+  session before changing that repository.
+
+  Links: draws on stack.7 · replaces isocosm:method.3 · summary Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7.
+
+- **D14. Reuse order (Mark, 2026-11-02):** "Add that reuse order
+  (Recommended)", over keeping stack.1's wording or deferring. Outcome:
+  refines stack.1 with use, configure, compose, extend, then implement the
+  gap, while retaining its test that a dependency must earn its cost.
+
+  Links: amends stack.1 · summary Try use, configure, compose and extend before implementing the gap; a dependency still earns its cost.
+
+- **D15. Consolidate before adding principles (Mark, 2026-11-02):**
+  "Consolidate within the seven-statement budget (Recommended)", over
+  refining existing statements only or deferring. Outcome: refines the Stack
+  area within its seven-statement budget for bounded background work and
+  distinguishable failure; ownership refines stack.6 and capability routing
+  refines stack.3.
+
+  Links: amends stack.3, stack.6 · governs H4 · summary Consolidate related Stack statements within seven slots for bounded work and distinguishable failure; refine ownership and capability routing in place.
+
 ## Open forks
 
 Each comes back as a question before anything is written.
 
-1. Resolved by D10. Follow-on: whether isocosm's Method 3 retires in favour of stack.7, as
-   Stack 1 to 5 moved on 2026-10-22; and the Stack area is now at budget, so the next new
-   statement opens with its consolidation.
-2. Which of the remaining drafted principles fold where: bounded background work and
-   distinguishable failure have no existing statement; ownership and lifetimes fit stack.6;
-   capability routing ("who supplies, who grants, who owns the lifetime") fits stack.3.
-3. The reuse ladder (use, configure, compose, extend, implement the gap) against stack.1's
-   counterweight that a new dependency is itself a cost.
+1. Resolved by D10 and D13: source size lives in stack.7 and isocosm retires
+   Method 3. D15 consolidates the Stack area before adding a statement.
+2. Resolved by D15: extension rungs fold from stack.5 into stack.3;
+   capability routing refines stack.3, ownership refines stack.6, and new
+   stack.8 carries bounded background work and distinguishable outcomes.
+   The retired stack.5 key is not reused; the area stays at seven statements.
+3. Resolved by D14: stack.1 names the reuse order and retains dependency cost.
 4. Resolved by D8 and D9.
 
 ## Phases
@@ -167,3 +192,11 @@ Each comes back as a question before anything is written.
 
 - 2026-10-30: D1 to D4 recorded; stack.1 refined.
 - 2026-10-30: D5 to D10 recorded; stack.7 added.
+- 2026-11-02: eidetic's E4 and Linux E2 landed; the tool rollout's E-phases
+  are complete. See eidetic's line-ceiling plan and its compact receipt.
+- 2026-11-02: D13-D15 recorded in answer order. The doctrine pass consolidates
+  extension rungs into stack.3, adds stack.8 without reusing stack.5's key,
+  and refines stack.1, stack.3 and stack.6. Isocosm's case 1160 carries the
+  Method 3 retirement. Receipts live at
+  `archive_docs/receipts/2026-10-30_house_style_plan_receipts.md` (100 MB cap;
+  compact text only). H2-H3 and H1's remaining lint/deny wiring stay open.

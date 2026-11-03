@@ -434,6 +434,26 @@ source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_p
 summary = "Extraction proceeds once a second host is planned in its own repository's plan; it is done when the code has moved and the first host builds on it."
 amends = ["stack.1"]
 
+[decisions."house-style D13"]
+title = ". One source-size statement (Mark, 2026-11-02)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
+summary = "Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7."
+draws_on = ["stack.7"]
+replaces = ["isocosm:method.3"]
+
+[decisions."house-style D14"]
+title = ". Reuse order (Mark, 2026-11-02)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
+summary = "Try use, configure, compose and extend before implementing the gap; a dependency still earns its cost."
+amends = ["stack.1"]
+
+[decisions."house-style D15"]
+title = ". Consolidate before adding principles (Mark, 2026-11-02)"
+source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
+summary = "Consolidate related Stack statements within seven slots for bounded work and distinguishable failure; refine ownership and capability routing in place."
+amends = ["stack.3", "stack.6"]
+governs = ["H4"]
+
 [decisions."node-body-face-model D1"]
 title = ". Per-node overrides key by member, pruned (Mark, 2026-10-25)"
 source = "design_docs/mere_docs/implementation_strategy/2026-06-23_node_body_face_model_plan.md"
@@ -491,8 +511,8 @@ summary = "Graphshell co-op's contact, invitation and card, with their admission
 title = "Build on the stack we have"
 source = "design_docs/doctrine.md"
 area = "The stack"
-summary = "Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers; extraction waits for a planned second host, not an arrived one."
-draws_on = ["house-style D1", "house-style D2", "house-style D12", "isocosm:600", "isocosm:organs.5"]
+summary = "Build on the stack we have; try use, configure, compose and extend before implementing the gap; dependencies earn their cost, components are modules, and extraction serves planned hosts."
+draws_on = ["house-style D1", "house-style D2", "house-style D12", "house-style D14", "isocosm:600", "isocosm:organs.5"]
 
 [statements."stack.2"]
 title = "The stack supplies identity and trust"
@@ -505,8 +525,9 @@ draws_on = ["isocosm:962"]
 title = "Seams and formats"
 source = "design_docs/doctrine.md"
 area = "The stack"
-summary = "Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; producers, hosts and runners meet at the contract; apps are frames."
-draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "isocosm:27", "isocosm:78"]
+summary = "Open contracts separate producers, hosts and runners; capabilities name supplier, grant and lifetime owner; extension follows data, scripts, components and native crates by call cost."
+draws_on = ["distillery-extraction D8", "distillery-extraction D9", "distillery-extraction D15", "house-style D15", "isocosm:27", "isocosm:77", "isocosm:78", "isocosm:1000"]
+replaces = ["stack.5"]
 
 [statements."stack.4"]
 title = "Platforms and the web"
@@ -515,19 +536,12 @@ area = "The stack"
 summary = "Desktop first-class, the web a floored tier; best capabilities where free; gamepads are the stack's; web modules share one helper and pin."
 draws_on = ["isocosm:21", "isocosm:29", "isocosm:77", "isocosm:532", "isocosm:536", "isocosm:537", "isocosm:556", "isocosm:567"]
 
-[statements."stack.5"]
-title = "Extension rungs"
-source = "design_docs/doctrine.md"
-area = "The stack"
-summary = "Data, scripts, components and native crates; cold and narrow goes behind a component when pluggable, hot or wide stays native."
-draws_on = ["stack.3", "isocosm:77", "isocosm:78", "isocosm:1000"]
-
 [statements."stack.6"]
 title = "Storage follows the death condition"
 source = "design_docs/doctrine.md"
 area = "The stack"
-summary = "Storage follows the death condition; cross domains by copy or handle; persist by durable identity."
-draws_on = ["node-body-face-model D1"]
+summary = "Storage follows the death condition; mutable state has one owner, consumers borrow within its lifetime or carry a handle or copy; persist by durable identity."
+draws_on = ["house-style D15", "node-body-face-model D1"]
 
 [statements."stack.7"]
 title = "Source size"
@@ -535,6 +549,13 @@ source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate."
 draws_on = ["house-style D10", "house-style D11", "isocosm:592", "isocosm:method.3"]
+
+[statements."stack.8"]
+title = "Bound work and distinguish its outcomes"
+source = "design_docs/doctrine.md"
+area = "The stack"
+summary = "Background work has an owner, configurable limits, cancellation and joined completion; refusal, failure, cancellation and success remain distinguishable."
+draws_on = ["house-style D15", "stack.6"]
 
 [statements."surfaces.1"]
 title = "A frame hosts one presentation"
@@ -553,7 +574,7 @@ title = "A contribution is one of four kinds"
 source = "design_docs/doctrine.md"
 area = "Surfaces"
 summary = "Four contribution kinds, declared in a typed manifest list and verified at activation; a presentation's declaration is one type the reader layer owns and the manifest carries."
-draws_on = ["stack.5"]
+draws_on = ["stack.3"]
 
 [statements."surfaces.4"]
 title = "A surface names its five authorities"

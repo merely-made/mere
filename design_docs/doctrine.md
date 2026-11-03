@@ -34,15 +34,13 @@ for a consumer that can be named today, never for a speculative one. Code
 leaves a port for the stack once a second host is planned, in a dated plan of
 the host's own repository with a done-condition, not once one shows up. The
 move is done when the code has moved and its first host builds on it; the
-second host's adoption is that host's receipt.
+second host's adoption is that host's receipt. Try use, configure, compose and
+extend before implementing the gap; a new dependency still earns its cost.
 
-Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2, house-style D12 · summary Build on the stack we have: unneeded crates stay out, stale ones leave; components are modules, reserved homes receive their capability; seams serve named consumers; extraction waits for a planned second host, not an arrived one.
+Links: draws on isocosm:600, isocosm:organs.5, house-style D1, house-style D2, house-style D12, house-style D14 · summary Build on the stack we have; try use, configure, compose and extend before implementing the gap; dependencies earn their cost, components are modules, and extraction serves planned hosts.
 
-*Refined 2026-10-30 (house-style D1, D2): "Named futures only"; "Fold into
-Stack 1".*
-
-*Refined 2026-10-31 (house-style D12): "second host is planned", because
-"shows up doesn't happen, you know, until it's planned."*
+*Refined 2026-11-02 (house-style D14): "Add that reuse order
+(Recommended)". D1, D2 and D12 continue to apply.*
 
 ### Stack 2. The stack supplies identity and trust
 
@@ -58,27 +56,28 @@ Links: draws on isocosm:962 · summary Identity and admitted connections come fr
 
 ### Stack 3. Seams and formats
 
-Seams between components stay clean even at some cost in speed: a missing
-boundary bites later, and hardware improves. A renderer sits behind a scene
-contract and can be swapped. Formats follow open standards; a product makes
-its own only where none holds the thing. Applications meet at the contract
-too. A producer offers surfaces or datagraphs, widgets and utilities
-included, and the endpoints a host dials; a host owns a graph and loads
-producers at runtime, Graphshell its reference; a runner runs or carries
-both and owns no graph. An installable app is a frame, a host with its
-producers fixed at build. The graph core a producer needs is contract tier,
-published like the scene crates, so Mere consumes producers and never the
-reverse.
+Seams stay clean even at some cost in speed: a missing boundary bites later,
+and hardware improves. Renderers swap behind a scene contract. Open formats
+come first; a product makes its own only where none holds the thing.
+Applications meet at the contract too. A producer offers surfaces or
+datagraphs, widgets and utilities included, and endpoints a host dials; a
+host owns a graph and loads producers at runtime, Graphshell its reference;
+a runner carries either or both and owns no graph. An installable app is a
+frame, a host with producers fixed at build. The producer's graph core is
+contract tier, published like scene crates; Mere consumes producers, never
+the reverse. Publication is still owed, so graph-owning producers currently
+compile in lockstep with Mere. Each capability names its supplier, who
+grants its use and who owns its lifetime. Extension follows four rungs:
+data (product-defined open sets), scripts (authored rules and packs lowered
+by digest), components (outside code on Wasmtime where supported), native
+crates (first-party cores). By call frequency times data volume, cold and
+narrow may be pluggable components; hot or wide stays native.
 
-Links: draws on isocosm:27, isocosm:78, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15 · summary Seams stay clean at some cost in speed; renderers swap behind a scene contract; open formats first; producers, hosts and runners meet at the contract; apps are frames.
+Links: draws on isocosm:27, isocosm:77, isocosm:78, isocosm:1000, distillery-extraction D8, distillery-extraction D9, distillery-extraction D15, house-style D15 · replaces stack.5 · summary Open contracts separate producers, hosts and runners; capabilities name supplier, grant and lifetime owner; extension follows data, scripts, components and native crates by call cost.
 
-*Moved 2026-10-22 from isocosm's doctrine, the stack-wide half of its Stack 3;
-the wing's placements stay there ("Split as drafted").*
-
-*Refined 2026-10-31 (distillery-extraction D8, D9, D15): "Both must hold";
-"Any branch hosts"; then the four repairs. Owed: the graph core is not yet
-published, so graph-owning producers (Cleromancy, Knot, Woodshed) still
-compile in lockstep with Mere.*
+*Refined 2026-11-02 (house-style D15): "Consolidate within the
+seven-statement budget (Recommended)"; folds in Stack 5's extension rule.
+Distillery-extraction D8, D9 and D15 continue to apply.*
 
 ### Stack 4. Platforms and the web
 
@@ -96,20 +95,6 @@ product ("Reword to 'a product'"). Cases 532 to 567 are this repository's
 burn-migration rulings as the wing recorded them; the burn plan here records
 them first.*
 
-### Stack 5. Extension rungs
-
-Extension rides four rungs: data (open sets a product defines), scripts
-(authored rules and packs, lowered to definitions by digest), components
-(outside code, on Wasmtime where a platform allows) and native crates (the
-first-party cores). Total componentisation is not worth it applied totally: by
-call frequency times data volume, cold and narrow goes behind a component when
-it wants to be pluggable, and hot or wide stays native.
-
-Links: draws on isocosm:77, isocosm:78, isocosm:1000, stack.3 · summary Data, scripts, components and native crates; cold and narrow goes behind a component when pluggable, hot or wide stays native.
-
-*Moved 2026-10-22 from isocosm's doctrine, the rungs and their rule from its
-Stack 14; the wing's instances stay there ("Split as drafted").*
-
 ### Stack 6. Storage follows the death condition
 
 Data is classified by what makes it dead: a boundary (scratch, task, frame,
@@ -119,13 +104,16 @@ allegiance to an allocator. Identity is stable; representations are
 projections with their own lifetimes. Data crossing into a longer-lived domain
 is copied, promoted or re-acquired through that domain's handle, never
 borrowed across, and persisted state keys by durable identity, never by a
-reusable slot. The domains, death kinds and crossing rule are argued in the
+reusable slot. Each mutable state has one owner; consumers borrow within
+its lifetime or carry their own handle or copy. The domains, death kinds and
+crossing rule are argued in the
 [data-oriented doctrine brief](2026-07-02_data_oriented_doctrine_brief.md) §7.
 
-Links: draws on node-body-face-model D1 · summary Storage follows the death condition; cross domains by copy or handle; persist by durable identity.
+Links: draws on node-body-face-model D1, house-style D15 · summary Storage follows the death condition; mutable state has one owner, consumers borrow within its lifetime or carry a handle or copy; persist by durable identity.
 
-*Added 2026-10-25, outcome new ("Write stack.6 now"), the first statement from
-this repository's own rulings.*
+*Refined 2026-11-02 (house-style D15): "Consolidate within the
+seven-statement budget (Recommended)"; ownership and lifetimes refine this
+statement. Node-body-face-model D1 continues to apply.*
 
 ### Stack 7. Source size
 
@@ -142,6 +130,23 @@ cleanup slices.
 Links: draws on isocosm:592, isocosm:method.3, house-style D10, house-style D11 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate.
 
 *Refined 2026-10-30 (house-style D11): "Local only".*
+
+### Stack 8. Bound work and distinguish its outcomes
+
+Background work names its owner, admission bound, cancellation path and
+completion condition. Queues, concurrency, retained bytes and retries have
+explicit limits supplied through configuration; a deadline bounds waiting
+where the operation can stall. The owner joins completion before retiring
+the resources the work can touch. Callers can distinguish refusal, failure,
+cancellation and success, with enough context to decide what to do next.
+Fallback and retry are explicit policy; they preserve the cause and cannot
+turn missing authority or structurally invalid input into accepted work.
+
+Links: draws on house-style D15, stack.6 · summary Background work has an owner, configurable limits, cancellation and joined completion; refusal, failure, cancellation and success remain distinguishable.
+
+*Added 2026-11-02, outcome new (house-style D15): "Consolidate within the
+seven-statement budget (Recommended)". Stack 5 first folded into stack.3;
+its key is retired, not reused.*
 
 ## Surfaces
 
@@ -193,7 +198,7 @@ operations it exposes. Trust stays with the manifest's capabilities and the
 pack's requested scopes; leaves and clips stay graph facts that the
 operations act on.
 
-Links: draws on stack.5 · summary Four contribution kinds, declared in a typed manifest list and verified at activation; a presentation's declaration is one type the reader layer owns and the manifest carries.
+Links: draws on stack.3 · summary Four contribution kinds, declared in a typed manifest list and verified at activation; a presentation's declaration is one type the reader layer owns and the manifest carries.
 
 *Added 2026-10-28, outcome new, from the GUI catalog record §8 and its
 rulings 6 and 8 (Mark, 2026-10-26); the code landed 2026-10-27, as the
