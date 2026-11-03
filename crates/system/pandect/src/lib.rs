@@ -64,9 +64,6 @@ pub mod web_facets;
 // a facet bundle on the node, in facets.json. Supersedes the transitional
 // denizen_bindings.json sidecar (removed before any host wrote one).
 pub mod denizen_facets;
-// Device-local policy, including startup unlock behavior, lives beside the
-// install-local data root and never travels with a session.
-pub mod device_settings_store;
 pub mod shared_root;
 // Per-node facet-store sidecar (facets.json): the runtime tier of the one-node
 // facet system — typed per-node metadata keyed by node UUID, persisted beside
@@ -89,10 +86,6 @@ pub mod slot_guard;
 pub mod engine_profile_store;
 pub mod saved_scene;
 pub mod scene_facets;
-// Freeze/thaw a live graph into an immutable, content-addressed graph codicil over
-// an eidetic Store (the Alembic memory spine; wasm-clean — store-agnostic, not
-// filesystem). Save redacts private fields by default; open thaws read-only.
-pub mod codicil_seal;
 pub mod graph_codicil;
 pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
@@ -148,12 +141,6 @@ pub mod switcher_thumbnail;
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
 // they live in turnstone's `frisket::tearout` now.
 pub mod view_intent_store;
-// Identity-level and persona-level wallet manifests (`identity/` + `personas/<id>/wallet.json`)
-// for the carry layer. Storage only; pairing and crypto semantics layer on top.
-pub mod wallet_grant;
-/// Wallet-sealed mutable slots over a caller-selected Muniment backend.
-pub mod wallet_sealed_backend;
-pub mod wallet_store;
 
 pub use application_settings_store::{
     APPLICATION_SETTINGS_DIR, APPLICATION_SETTINGS_FILENAME, ApplicationSettings, ShellbarEdge,
@@ -172,15 +159,9 @@ pub use arrangement_facets::{
     write_arrangement_seed, write_arrangement_sizes, write_arrangement_sprite_hulls,
     write_arrangement_sprites, clear_arrangement, read_arrangement_geometry,
 };
-pub use codicil_seal::WalletEpochSealer;
 pub use denizen_facets::{
     DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,
     read_denizen_bindings, remove_denizen_binding, write_denizen_binding,
-};
-pub use device_settings_store::{
-    DEVICE_SETTINGS_DIR, DEVICE_SETTINGS_FILENAME, DeviceSettings, MeshLendingSettings,
-    QuietHoursSettings, StatedConditionSettings, device_settings_exist, device_settings_path,
-    load_device_settings, save_device_settings,
 };
 /// Compatibility names for published consumers. Schema content and validation
 /// are implemented by Eidetic; new callers use `eidetic::schema_facets`.
@@ -206,7 +187,6 @@ pub use graph_session::{
     ViewEntry, ViewKey, branched_session_name, forked_session_name, picked_session_name,
 };
 pub use identity::StartupUnlockMode;
-pub use wallet_sealed_backend::WalletSealedBackend;
 // The ids and author the session schema names, so a host can name them
 // through pandect.
 pub use incipit::{GraphId, SessionId};
@@ -262,43 +242,6 @@ pub use switcher_thumbnail::{
     build_switcher_thumbnail_with,
 };
 pub use view_intent_store::{CameraSnapshot, HiddenRelationRecord, VIEW_INTENT_DIR, ViewIntent};
-pub use wallet_grant::{
-    BlindedSlotId, DEVICE_GRANT_SCHEMA_VERSION, DeviceGrantError, EnrollmentBundleError,
-    GrantStanding, PairedRemoteAuthGrantSpec, PairingCodeError, PairingMaterialError,
-    PairingTicketError, PrivateEpochPlaintext, REMOTE_AUTH_ENROLLMENT_BUNDLE_SCHEMA_VERSION,
-    REMOTE_AUTH_PAIRING_SAS_CONTEXT_V1, REMOTE_AUTH_PAIRING_SECRET_LEN,
-    REMOTE_AUTH_PAIRING_TICKET_SCHEMA_VERSION, REMOTE_AUTH_PAIRING_WRAP_CONTEXT_V1,
-    RemoteAuthEnrollmentBundle, RemoteAuthGrantSpec, RemoteAuthPairingMaterial,
-    RemoteAuthPairingResponse, RemoteAuthPairingTicket, RemoteAuthPairingTicketRequest,
-    WRAPPED_PRIVATE_EPOCH_FORMAT_V1, WrappedEpochError,
-    WrappedEpochMaterial, WrappedEpochRecord, assess_device_grant, blinded_slot_id,
-    build_remote_auth_enrollment_bundle, certificate_device_id, decode_device_grant_set,
-    decode_epoch_record, decode_remote_auth_enrollment_bundle, decode_remote_auth_pairing_ticket,
-    derive_remote_auth_pairing_material, device_grant_set_ref, device_is_fully_revoked,
-    encode_device_grant_set, encode_epoch_record, encode_remote_auth_enrollment_bundle,
-    encode_remote_auth_pairing_ticket, fold_revocations, format_remote_auth_pairing_code,
-    load_device_grant_set, load_revocation_ledger, load_wrapped_epoch_record,
-    mint_remote_auth_pairing_ticket, parse_remote_auth_pairing_code, requires_epoch_material,
-    revoke_device_certificates, revoked_certificate_count, save_device_grant_set,
-    save_wrapped_epoch_record, unwrap_private_epoch_material, wallet_trusted_roots,
-    wrap_private_epoch_material,
-};
-pub use wallet_store::{
-    CapabilitySlotRef, CarriagePolicy, DEVICE_ROSTER_FILENAME, DeviceExposure, DeviceGrantRef,
-    DeviceMode, DevicePublicKey, DeviceRecord, DeviceRoster, IDENTITY_DIR,
-    IDENTITY_GRANTS_DIR, IDENTITY_SEED_FILENAME, IDENTITY_WALLET_FILENAME, IdentityWalletManifest,
-    KeyEpochId, LOCAL_DEVICE_IDENTITY_FILENAME, LocalDeviceIdentity, PERSONA_EPOCH_BRIDGE_FILENAME,
-    PERSONA_WALLET_FILENAME, PersonaChainRoot, PersonaEpochBridge, PersonaWalletManifest,
-    PersonaWalletRef, PrivateEpochRecord, PrivateRoots, PublicRoots,
-    REMOTE_AUTH_WRAPPING_KEYS_FILENAME, RecoveryPolicy, RemoteAuthWrappingKeyBridge,
-    RemoteAuthWrappingKeyRecord, WALLET_SCHEMA_VERSION, derive_persona_chain_root,
-    device_grant_path, device_roster_path, device_roster_ref, identity_dir, identity_grants_dir,
-    identity_seed_path, identity_wallet_path, load_device_grant, load_device_roster,
-    load_identity_wallet, load_persona_wallet, local_device_identity_path,
-    persona_epoch_bridge_path, persona_wallet_path, persona_wallet_salt,
-    remote_auth_wrapping_keys_path, save_device_grant, save_device_roster, save_identity_wallet,
-    save_persona_wallet,
-};
 pub use web_facets::{
     WEB_COMPAT, WEB_CONTENT, WEB_FORM_DRAFT, WEB_PAGE_SCALE, WEB_SCROLL, WEB_VIEWER,
     read_web_states, write_web_state, write_web_states,

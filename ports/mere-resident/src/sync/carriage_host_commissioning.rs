@@ -34,7 +34,8 @@
 //! party that already knows every association the blinding hides from peers.
 
 use muniment::JsonSlots;
-use pandect::{PersonaId, WrappedEpochRecord, encode_epoch_record};
+use pandect::{PersonaId};
+use sporran::{WrappedEpochRecord, encode_epoch_record};
 use personae::carry::DeviceId;
 use personae::IdentityProvider;
 use personae::carry::persona_wallet_salt;
@@ -111,19 +112,19 @@ impl CarriageHost {
         &self,
         data_root: &std::path::Path,
         wallet: &dyn IdentityProvider,
-        bridge: &pandect::RemoteAuthWrappingKeyBridge,
+        bridge: &sporran::RemoteAuthWrappingKeyBridge,
     ) -> Result<CarriagePublishReport, CarriageHostError> {
         let provider = wallet;
-        let roster = pandect::load_device_roster(data_root)
+        let roster = sporran::load_device_roster(data_root)
             .map_err(|error| CarriageHostError::Transport(error.to_string()))?
-            .unwrap_or_else(pandect::DeviceRoster::new);
+            .unwrap_or_else(sporran::DeviceRoster::new);
 
         let mut report = CarriagePublishReport::default();
         for device in &roster.devices {
             if roster.revoked.contains(&device.device_id) {
                 continue;
             }
-            let pandect::CarriagePolicy::Leased { max_ttl_ms, graph } = device.carriage else {
+            let sporran::CarriagePolicy::Leased { max_ttl_ms, graph } = device.carriage else {
                 continue;
             };
             if graph != self.graph {
@@ -138,21 +139,21 @@ impl CarriageHost {
                 report.skipped_no_wrapping_key.push(device.device_id);
                 continue;
             };
-            let set = pandect::load_device_grant_set(data_root, device.device_id)
+            let set = sporran::load_device_grant_set(data_root, device.device_id)
                 .map_err(|error| CarriageHostError::Transport(error.to_string()))?;
             let mut retraction_targets = Vec::new();
             for (persona, certificate) in &set.personas {
-                if !pandect::requires_epoch_material(certificate) {
+                if !sporran::requires_epoch_material(certificate) {
                     continue;
                 }
                 let certificate_id = certificate.certificate.id();
-                let Some(record) = pandect::load_wrapped_epoch_record(data_root, certificate_id)
+                let Some(record) = sporran::load_wrapped_epoch_record(data_root, certificate_id)
                     .map_err(|error| CarriageHostError::Transport(error.to_string()))?
                 else {
                     report.skipped_no_record += 1;
                     continue;
                 };
-                let bytes = pandect::encode_epoch_record(&record)
+                let bytes = sporran::encode_epoch_record(&record)
                     .map_err(|error| CarriageHostError::Refused(error.to_string()))?;
 
                 let now = now_ms();
@@ -165,7 +166,7 @@ impl CarriageHost {
                     continue;
                 }
 
-                let slot = pandect::blinded_slot_id(certificate_id, wrapping_key);
+                let slot = sporran::blinded_slot_id(certificate_id, wrapping_key);
                 let issue = self
                     .held
                     .read()
@@ -256,7 +257,7 @@ impl CarriageHost {
 
         let mut report = CarriageRetractReport::default();
         for target in &targets {
-            let slot = pandect::BlindedSlotId(target.slot);
+            let slot = sporran::BlindedSlotId(target.slot);
             let Some(issue) = self
                 .held
                 .read()

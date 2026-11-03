@@ -159,6 +159,7 @@ custody-wire = { path = "custodian/wire" }
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
+sporran.workspace = true
 personae = { workspace = true, features = ["ssh"] }
 # The receipt hosts' and the native picker's SSH keys (`src/bin/h4*`), and
 # the chronicle receipt host's nonces.

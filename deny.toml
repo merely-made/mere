@@ -1,7 +1,9 @@
 # cargo-deny configuration for mere.
 #
 # Today it holds one rule, the custody boundary (dramatis repo plan, rulings
-# D4 and D16): castellan keeps every secret at rest and in hand (the vault,
+# D4 and D16; castellan has lived in dramatis since 2026-11-03, D11, and arrives
+# here as a git dependency, so the rule is unchanged): castellan keeps every
+# secret at rest and in hand (the vault,
 # its storages and unlock ladder, the SSH agent, the wallet's seeds and
 # private epochs). Its independently launched custodian links it; apps and
 # workers call an authenticated custody route, and Djinn reaches the

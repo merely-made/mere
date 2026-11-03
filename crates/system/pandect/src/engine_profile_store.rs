@@ -33,7 +33,7 @@ pub const ENGINE_PROFILES_DIR: &str = "engine-profiles";
 
 /// Top-level subdirectory holding per-persona state — engine UDFs,
 /// future persona-scoped data (vaults, settings).
-pub const PERSONAS_DIR: &str = "personas";
+pub use sporran::PERSONAS_DIR;
 
 /// Top-level subdirectory holding per-session state. Matches the
 /// `ManifestStore` layout convention.

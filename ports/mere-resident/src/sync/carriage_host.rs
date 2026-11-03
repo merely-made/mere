@@ -28,7 +28,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use muniment::RedbBackend;
 use p2panda_core::{Body, Hash, Header, Operation, SigningKey, Topic, VerifyingKey};
-use pandect::BlindedSlotId;
+use sporran::BlindedSlotId;
 use personae::{Ed25519Keypair, IdentityProvider};
 use stickleback::{JoinedSpace, MunimentStore, OperationProcessor, lane_id};
 use tokio::sync::RwLock;

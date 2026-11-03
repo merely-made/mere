@@ -28,6 +28,7 @@ custody-wire = { path = "wire" }
 dramatis.workspace = true
 eidetic.workspace = true
 pandect.workspace = true
+sporran.workspace = true
 ssh-key = { version = "0.6", features = ["ed25519", "encryption"] }
 ssh-agent-lib = "0.6"
 tokio = { version = "1", features = ["net", "rt"] }

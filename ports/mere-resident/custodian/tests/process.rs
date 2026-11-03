@@ -267,7 +267,7 @@ fn an_adopted_wallet_is_disclosed_over_the_wire_while_the_custodian_is_locked() 
         panic!("not disclosed")
     };
     assert_eq!(personas, vec![persona.as_uuid().to_string()]);
-    let direct = pandect::wallet_store::load_device_roster(&data_root).unwrap().map(|roster| serde_json::to_value(roster).unwrap());
+    let direct = sporran::wallet_store::load_device_roster(&data_root).unwrap().map(|roster| serde_json::to_value(roster).unwrap());
     assert!(direct.is_some());
     assert_eq!(roster, direct);
     let text = serde_json::to_string(&roster).unwrap();

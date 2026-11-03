@@ -1,0 +1,34 @@
+[package]
+rust-version = "1.97.1"
+name = "gazette-ledger"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The contact ledger projection and the reading-room extractor: gazette's Cambium side, over chirograph, incipit, sceno and Fleece."
+readme = "README.md"
+keywords = ["contacts", "ledger", "projection", "reader"]
+categories = ["data-structures"]
+
+[dependencies]
+chirograph.workspace = true
+incipit.workspace = true
+sceno.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
+fleece.workspace = true
+genet-static-dom.workspace = true
+
+[dev-dependencies]
+# Test-only: the Ledger parity test reproduces the Ledger's receipts through
+# the shared matrix derivation and the frozen grid (site canvas plan, Ruling
+# 143). `ledger.rs` retires onto them at the dramatis split.
+scenomise.workspace = true
+graphshell-client.workspace = true
+
+[lib]
+name = "gazette_ledger"
+path = "src/lib.rs"
+
+[lints]
+workspace = true

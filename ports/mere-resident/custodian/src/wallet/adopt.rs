@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::{fs, io};
 
 use pandect::engine_profile_store::PERSONAS_DIR;
-use pandect::wallet_store::{IDENTITY_DIR, PERSONA_EPOCH_BRIDGE_FILENAME, PERSONA_WALLET_FILENAME};
+use sporran::wallet_store::{IDENTITY_DIR, PERSONA_EPOCH_BRIDGE_FILENAME, PERSONA_WALLET_FILENAME};
 
 use crate::host::CATALOG_DIR;
 
@@ -199,7 +199,7 @@ fn copy_all(files: &[PathBuf], source: &Path, dest: &Path, written: &mut Vec<Pat
 /// index and each persona's manifest, the identity manifest and the roster.
 fn same_wallet(source: &Path, dest: &Path) -> Result<(), String> {
     use castellan::custody::wallet::load_identity_seed_read_only;
-    use pandect::wallet_store::{list_personas, load_device_roster, load_identity_wallet, load_persona_wallet};
+    use sporran::wallet_store::{list_personas, load_device_roster, load_identity_wallet, load_persona_wallet};
     let described = |error: io::Error| error.to_string();
     let (kept, copy) = (list_personas(source).map_err(described)?, list_personas(dest).map_err(described)?);
     if kept != copy {

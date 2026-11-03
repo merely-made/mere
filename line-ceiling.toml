@@ -878,10 +878,6 @@ path = "crates/system/pandect/src/view_intent_store.rs"
 reason = "Per-pane view-intent sidecar — durable storage for view-local state that doesn't belong in graph truth. Existing source-size debt; a responsibility split must preserve HiddenRelationRecord, CameraSnapshot, ViewIntent and existing module visibility."
 
 [[exception]]
-path = "crates/system/pandect/src/wallet_grant/certificate.rs"
-reason = "Device grants as delegation certificates, and the epoch material that stopped travelling inside them. Existing source-size debt; a responsibility split must preserve WrappedEpochRecord and existing module visibility."
-
-[[exception]]
 path = "crates/system/pandect/tests/graph_residency.rs"
 reason = "Graph residency. Existing source-size debt; a responsibility split must preserve ProbeBackend, ProbeBackend, ReadProbe and existing module visibility."
 
@@ -1016,10 +1012,6 @@ reason = "The trainer resource receipt: one real mesh job runs a LoRA trainer en
 [[exception]]
 path = "ports/distillery/tests/walk_fixtures.rs"
 reason = "W0 receipt: the projection walk's two second datasets, plus the bare headless scenario that drives the installed surface end to end. Existing source-size debt; a responsibility split must preserve TickRecord, ChronicleFixture, Device and existing module visibility."
-
-[[exception]]
-path = "ports/gazette/src/lib.rs"
-reason = "Gazette, the Mere platform's directory port: who someone is, where they can be reached, and what they publish. Existing source-size debt; a responsibility split must preserve HtmlSyntax, TestFetchImportOverride, WebFingerDocument and existing module visibility."
 
 [[exception]]
 path = "ports/graphshell/mere/src/app_tests.rs"
@@ -1220,34 +1212,6 @@ reason = "The \"Graph tools\" region's remote session section, and where the tre
 [[exception]]
 path = "ports/graphshell/web/styles.css"
 reason = "Styles. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/authority.rs"
-reason = "Castellan's authority half: the resident Personae host. Existing source-size debt; a responsibility split must preserve IdentityIntentError, VaultCommandOutput, PersonaeHost and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/authority_lock_tests.rs"
-reason = "Vault lock, L2: castellan obeys (rulings 1, 10, 11, 13, 14, 27, 31). Existing source-size debt; a responsibility split must preserve Locked and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/custody/agent.rs"
-reason = "SSH agent backend serving the vault's ssh slots. Existing source-size debt; a responsibility split must preserve VaultLockRequest, VaultAgent, VerifiedSshBinding and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/custody/passphrase_storage.rs"
-reason = "[PassphraseEncryptedStorage] — passphrase-encrypted on-disk vault. Existing source-size debt; a responsibility split must preserve EncryptedFile, EncryptedProfile, PassphraseEncryptedStorage and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/custody/vault.rs"
-reason = "Multi-protocol identity vault: custody (dramatis repo plan, DR-B). Existing source-size debt; a responsibility split must preserve SecretBytes, IdentitySlot, Profile and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/cxf/parse.rs"
-reason = "Parse. Existing source-size debt; a responsibility split must preserve RawHeader, RawVersion, RawAccount and existing module visibility."
-
-[[exception]]
-path = "ports/mere-resident/castellan/src/cxf/tests.rs"
-reason = "Cxf tests. Existing source-size debt; a responsibility split must preserve existing entry points, fixture identity and module visibility."
 
 [[exception]]
 path = "ports/mere-resident/custodian/src/core.rs"

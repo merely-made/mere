@@ -265,7 +265,7 @@ async fn the_wallets_persona_index_is_the_custodians_to_disclose_and_djinn_never
     // Answered while locked, and without the wallet root Djinn names.
     let locked = remote.wallet_public(custodian.dir.path()).unwrap();
     assert_eq!(locked.personas, vec![first]);
-    assert_eq!(locked.roster, pandect::wallet_store::load_device_roster(&custodian.data_root).unwrap());
+    assert_eq!(locked.roster, sporran::wallet_store::load_device_roster(&custodian.data_root).unwrap());
     assert!(locked.roster.is_some());
     assert_eq!(resolve_persona(index(Arc::clone(&remote)), None).await.unwrap(), first);
     assert_eq!(resolve_persona(index(Arc::clone(&remote)), Some(second)).await.unwrap(), second, "a named persona is never second-guessed");
