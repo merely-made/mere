@@ -162,9 +162,9 @@ waits for a planned second host, not an arrived one.
   Closed 2026-11-02: the slimming's S4 and S5 landed. `graphshell-endpoint` 0.0.3 depends
   on `ostiary` and `castellan-client`, not `djinn`, and is published with
   `script-wire`, `script-witgen`, `chirograph` 0.0.4, `workbench`, `incipit`, `scenograph`,
-  `scenomise` and `mere-surface-api`. Not published: `cambium` 0.6.1, which a Genet
-  commit (`43d13ce56`) made depend on `genet-events`, a crate Genet marks `publish = false`
-  at 0.0.0.
+  `scenomise`, `mere-surface-api` and `cambium` 0.6.1. Cambium waited on `genet-events`
+  (Genet commit `43d13ce56` made it a dependency); Genet released it as 0.0.1 on 2026-11-02
+  at Mark's instruction, with the API still unsettled.
 - **F3 (D15).** Publishing the graph core (kernel and the graph persistence in pandect) as
   contract tier is its own plan. Until then Cleromancy, Knot and Woodshed compile in
   lockstep with Mere; this pass moves Cleromancy off `mere-alembic` and no further.
@@ -257,7 +257,8 @@ pass; changes are committed in each repository.
   `CarrierError::Lapsed`), graphshell-endpoint 0.0.3 (its `wit/world.wit` is a copy of
   `crates/script/wit/world.wit` that `tests/wit_copy.rs` holds equal), workbench 0.1.1,
   incipit 0.2.1, scenograph 0.0.6, scenomise 0.0.7, mere-surface-api 0.1.1. `dramatis` and
-  `personae` rows follow Dramatis's 0.0.4 and 0.3.1. `cambium` 0.6.1 waits on `genet-events`.
+  `personae` rows follow Dramatis's 0.0.4 and 0.3.1. `genet-events` 0.0.1 (Genet `ad3627231`)
+  and then `cambium` 0.6.1 followed (Mere `e14dd68cf`): D17's chain is published.
 - 2026-10-31: P1 in part. `alembic::memory_levels` is `pandect::memory_levels`;
   `athanor::furnace` is `pandect::furnace` (feature `furnace`); Alembic and Athanor are
   workshop-only. Cleromancy reads `pandect::memory_levels` (local, verified through a
