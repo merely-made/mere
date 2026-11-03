@@ -119,7 +119,7 @@ abstraction" contradicted the known-futures ruling (2026-09-23).
   Method 3 in isocosm and cite `mere:stack.7` there. Coordinate with the VTT
   session before changing that repository.
 
-  Links: draws on stack.7 · replaces isocosm:method.3 · summary Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7.
+  Links: draws on stack.7 · governs isocosm:1160 · summary Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7.
 
 - **D14. Reuse order (Mark, 2026-11-02):** "Add that reuse order
   (Recommended)", over keeping stack.1's wording or deferring. Outcome:
@@ -197,6 +197,7 @@ Each comes back as a question before anything is written.
 - 2026-11-02: D13-D15 recorded in answer order. The doctrine pass consolidates
   extension rungs into stack.3, adds stack.8 without reusing stack.5's key,
   and refines stack.1, stack.3 and stack.6. Isocosm's case 1160 carries the
-  Method 3 retirement. Receipts live at
+  Method 3 retirement. **H4 landed**, with both repositories' manifests and
+  doctrine checks passing after the retirement. Receipts live at
   `archive_docs/receipts/2026-10-30_house_style_plan_receipts.md` (100 MB cap;
   compact text only). H2-H3 and H1's remaining lint/deny wiring stay open.

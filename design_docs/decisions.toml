@@ -488,7 +488,7 @@ title = ". One source-size statement (Mark, 2026-11-02)"
 source = "design_docs/mere_docs/implementation_strategy/2026-10-30_house_style_plan.md"
 summary = "Isocosm retires its duplicate Method 3 source-size statement and cites Mere stack.7."
 draws_on = ["stack.7"]
-replaces = ["isocosm:method.3"]
+governs = ["isocosm:1160"]
 
 [decisions."house-style D14"]
 title = ". Reuse order (Mark, 2026-11-02)"
@@ -597,7 +597,7 @@ title = "Source size"
 source = "design_docs/doctrine.md"
 area = "The stack"
 summary = "No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate."
-draws_on = ["house-style D10", "house-style D11", "isocosm:592", "isocosm:method.3"]
+draws_on = ["house-style D10", "house-style D11", "house-style D13", "isocosm:592", "isocosm:1160"]
 
 [statements."stack.8"]
 title = "Bound work and distinguish its outcomes"

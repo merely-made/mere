@@ -127,9 +127,10 @@ deduplicated instead. One shared check enforces it at commit and over the
 whole tree in each repository's local gate; files over it today are listed as exceptions and leave the list through named
 cleanup slices.
 
-Links: draws on isocosm:592, isocosm:method.3, house-style D10, house-style D11 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate.
+Links: draws on isocosm:592, isocosm:1160, house-style D10, house-style D11, house-style D13 · summary No source file over 600 lines without a listed reason; splits follow existing responsibilities; one shared check at commit and in each local gate.
 
-*Refined 2026-10-30 (house-style D11): "Local only".*
+*Latest outcome 2026-11-02, applies (house-style D13): "Retire it and cite
+stack.7 (Recommended)". D11's "Local only" continues to apply.*
 
 ### Stack 8. Bound work and distinguish its outcomes
 
