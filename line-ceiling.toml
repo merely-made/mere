@@ -309,9 +309,6 @@ reason = "Round-trip rendering of [EngineDocument] back into native CommonMark a
 path = "crates/inker/inker/src/surface_engine.rs"
 reason = "Surface-engine traits and registry — parallel dispatch path for long-lived, frame-streaming engines alongside [crate::engine]. Existing source-size debt; a responsibility split must preserve UserAgentRequestId, WebRequestId, PermissionDescriptor and existing module visibility."
 
-[[exception]]
-path = "crates/intel/reference-data/src/tests.rs"
-reason = "Src tests. Existing source-size debt; a responsibility split must preserve TempDirectory and existing module visibility."
 
 [[exception]]
 path = "crates/mere/src/roster.rs"

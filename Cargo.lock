@@ -9193,7 +9193,7 @@ dependencies = [
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=402eb28d2e02c41624ec573cff080a3b2f1feec5#402eb28d2e02c41624ec573cff080a3b2f1feec5"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "knot-catalog",
 ]
@@ -9201,7 +9201,7 @@ dependencies = [
 [[package]]
 name = "knot-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=402eb28d2e02c41624ec573cff080a3b2f1feec5#402eb28d2e02c41624ec573cff080a3b2f1feec5"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "muniment",
  "pollster 0.4.0",
@@ -9214,7 +9214,7 @@ dependencies = [
 [[package]]
 name = "knot-composition"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=402eb28d2e02c41624ec573cff080a3b2f1feec5#402eb28d2e02c41624ec573cff080a3b2f1feec5"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "blake3",
  "knot-capture",
@@ -9234,7 +9234,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=402eb28d2e02c41624ec573cff080a3b2f1feec5#402eb28d2e02c41624ec573cff080a3b2f1feec5"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "cambium",
  "illume",
@@ -9251,7 +9251,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=402eb28d2e02c41624ec573cff080a3b2f1feec5#402eb28d2e02c41624ec573cff080a3b2f1feec5"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -10881,12 +10881,12 @@ dependencies = [
 [[package]]
 name = "mora"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f61139ec5831650112f1c300bdeaabe7e793cfcc9a6de66179a096db40e52289"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 
 [[package]]
 name = "mora-cmudict"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "mora",
 ]
@@ -15305,6 +15305,7 @@ dependencies = [
 [[package]]
 name = "reference-data"
 version = "0.0.1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=2ecc7939e0e9253f37d1623be685e3441a54c800#2ecc7939e0e9253f37d1623be685e3441a54c800"
 dependencies = [
  "blake3",
  "serde",

@@ -481,3 +481,7 @@ Outside Mere, five Errand crates and Gemot's `moothold` have no consumer.
     `[patch]` rows beyond today's.
   - Count the repositories that must be repinned for a change in the moved
     package to reach Turnstone.
+
+## Lexical source move, 2026-11-04
+
+Mora, CMUdict and Reference Data now live in Knot (`2ecc7939e0e9253f37d1623be685e3441a54c800`). The lexical engines remain independent of the editor and Mora retains its allocation-free workspace. Mere removes both provider members and their patch rows, and receives them through its repinned Knot editor/document dependencies. The receiving tests preserve 37 Mora, 2 CMUdict and 23 Reference Data cases, plus Knot sound/rosette consumers. The source-home move does not generalize a new shared prosody service.

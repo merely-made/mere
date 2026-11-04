@@ -26,8 +26,6 @@ members = [
     "crates/domain/personal-facts",
     "crates/platen/platen",
     "crates/fleece",
-    "crates/intel/mora-cmudict",
-    "crates/intel/reference-data",
     # personae, insigne, gaz, chatelaine, notochord and the dramatis facade
     # left for their own repository on 2026-10-09 (dramatis repo plan, DR-D);
     # the shared persona picker belongs to the Cambium widget family.
@@ -241,9 +239,6 @@ numen = { version = "0.2.1", path = "crates/conatus/numen" }
 esp = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
 # Fixture data is a dev-only supplier package; keep the runtime cohort unchanged.
 esp-testkit = { version = "0.1.0", git = "https://www.github.com/merely-made/distillery.git", rev = "6346f087bb87d879cc9367dfb3d20fa00a8cbb9d" }
-mora = "0.1.0"
-mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
-reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
 chirograph = { version = "0.0.4", path = "crates/chirograph" }
@@ -286,8 +281,8 @@ graphshell-host = { version = "0.0.2", path = "crates/graphshell/graphshell-host
 # Family source convention (2026-10-15): every first-party row names its repository
 # by `branch = "main"` at the canonical URL; Cargo.lock pins the tested revision and
 # a repin is `cargo update -p knot-editor`. See the family composition brief.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "402eb28d2e02c41624ec573cff080a3b2f1feec5" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "402eb28d2e02c41624ec573cff080a3b2f1feec5" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "2ecc7939e0e9253f37d1623be685e3441a54c800" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "2ecc7939e0e9253f37d1623be685e3441a54c800" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -697,8 +692,6 @@ knot-editor-host = { path = "crates/inker/knot-editor-host" }
 mere-proofs = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 mere-surface-api = { path = "crates/system/surface-api" }
 mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-mora-cmudict = { path = "crates/intel/mora-cmudict" }
-reference-data = { path = "crates/intel/reference-data" }
 muniment = { git = "https://www.github.com/merely-made/eidetic.git", rev = "7a3453a02bc7dea391ef18814c1bfa1a46e67160" }
 nematic = { path = "crates/nematic/nematic" }
 notochord = { git = "https://github.com/merely-made/dramatis.git", branch = "main" }
