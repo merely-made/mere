@@ -17,8 +17,6 @@ members = [
     "crates/system/state-witness",
     "crates/system/source-edit",
     "crates/system/registry",
-    # Shared custody adapter for Djinn-managed Retinue stations.
-    "crates/system/station-custody",
     "crates/system/tabard",
     "crates/distillery/alembic",
     "crates/system/ux-events",
@@ -642,11 +640,7 @@ tincture = { package = "tinct", version = "=0.2.0", path = "crates/cambium/tinct
 # merge the repo is one workspace (retinue, tulle, sennet, tucket, firmware), so
 # this is an immutable source-revision pin rather than a relative path.
 retinue = { version = "0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-# Signalman's station crates come from the same Retinue revision, so one
-# rev governs all four (device pairing plan, rulings 42 and 44).
-outrider = { version = "=0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-postilion = { version = "=0.3.0", git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-radio-hand = { version = "=0.0.1", git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
+# Station commissioning now lives in Murm; resident NomadNet remains optional.
 
 # Reticulum identity derivation: HKDF-SHA256 stretches Mere's 32-byte master seed
 # into retinue's 64-byte dual-key private identity. retinue owns the X25519/RNG
@@ -923,10 +917,7 @@ embedded-graphics-core = { git = "https://www.github.com/merely-made/murm.git", 
 mere-transport = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 murm-webrtc = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 murm = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-outrider = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-postilion = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 radio-face = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
-radio-hand = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 retinue = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 selvage = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }
 seneschal = { git = "https://www.github.com/merely-made/murm.git", rev = "ce53cebb2ae9f420de5a0dcaa5a9768c639910af" }

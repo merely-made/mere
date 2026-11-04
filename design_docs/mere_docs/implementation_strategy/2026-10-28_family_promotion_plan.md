@@ -110,5 +110,12 @@ After the functional seams qualify, promote the resident and its custody impleme
 
 ## Progress
 
+- 2026-11-04: Station Custody moved to Murm's standalone
+  `crates/station-custody` workspace. Its twelve Rust files retain their donor
+  blobs; Signalman uses that local path. Mere's member/source removal leaves
+  87 workspace members and removes the station/radio family from the default
+  native normal/build graph. Resident NomadNet still has an optional Retinue
+  dependency. The source homes map and Murm's family integration plan record
+  receiving tests and the separate physical/headed boundary.
 - 2026-10-28: cut from the family promotion plan; nothing new landed.
 - 2026-10-28: source homes map added for F3; nothing moved.

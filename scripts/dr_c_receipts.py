@@ -29,6 +29,7 @@ def digest(path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--murm", type=Path)
     parser.add_argument("--woodshed", type=Path)
     parser.add_argument("--knot", type=Path)
     parser.add_argument("--turnstone", type=Path)
@@ -38,6 +39,8 @@ def main():
     args = parser.parse_args()
     mere = Path(__file__).resolve().parents[1]
     repos = mere.parent
+    murm = (args.murm or repos / "murm").resolve()
+    station_custody = murm / "crates/station-custody"
     woodshed = (args.woodshed or repos / "woodshed").resolve()
     knot = (args.knot or repos / "knot-editor").resolve()
     turnstone = (args.turnstone or repos / "turnstone").resolve()
@@ -51,7 +54,8 @@ def main():
     (runtime / ".dr-c-generated").write_text("synthetic receipt data\n")
     records = []
     sources = {
-        "mere": (mere, ["scripts/dr_c_receipts.py", "ports/graphshell/Cargo.toml", "ports/mere-resident/Cargo.toml", "crates/graphshell/graphshell-endpoint/src/door/custody.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs", "ports/graphshell/src/bin/personae_vault.rs", "ports/mere-resident/src/bin/dr_c_receipt_host.rs", "ports/mere-resident/src/custody.rs", "ports/mere-resident/tests/custody_route.rs", "ports/mere-resident/castellan/src/authority.rs", "ports/mere-resident/castellan/src/custody/vault_commands/mod.rs", "ports/mere-resident/castellan/src/custody/vault_commands/certs.rs", "ports/mere-resident/castellan/src/custody/vault_commands/tests.rs", "crates/graphshell/graphshell-endpoint/src/door/profile.rs", "ports/graphshell/tests/dr_c_pending.rs", "crates/system/station-custody/src/authority.rs", "crates/system/station-custody/tests/dr_c_pending.rs", "ports/mere-resident/src/bin/distillery_installed.rs"]),
+        "mere": (mere, ["scripts/dr_c_receipts.py", "ports/graphshell/Cargo.toml", "ports/mere-resident/Cargo.toml", "crates/graphshell/graphshell-endpoint/src/door/custody.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_client.rs", "crates/graphshell/graphshell-endpoint/src/door/custody_identity.rs", "ports/graphshell/src/bin/personae_vault.rs", "ports/mere-resident/src/bin/dr_c_receipt_host.rs", "ports/mere-resident/src/custody.rs", "ports/mere-resident/tests/custody_route.rs", "ports/mere-resident/castellan/src/authority.rs", "ports/mere-resident/castellan/src/custody/vault_commands/mod.rs", "ports/mere-resident/castellan/src/custody/vault_commands/certs.rs", "ports/mere-resident/castellan/src/custody/vault_commands/tests.rs", "crates/graphshell/graphshell-endpoint/src/door/profile.rs", "ports/graphshell/tests/dr_c_pending.rs", "ports/mere-resident/src/bin/distillery_installed.rs"]),
+        "murm": (murm, ["crates/station-custody/Cargo.toml", "crates/station-custody/Cargo.lock", "crates/station-custody/src/authority.rs", "crates/station-custody/tests/dr_c_pending.rs"]),
         "knot": (knot, ["crates/knot-editor/src/startup.rs", "apps/desktop/src/main.rs", "crates/knot-editor/src/bin/knot_endpoint.rs", "crates/knot-editor/src/bin/knot_sync_host.rs"]),
         "woodshed": (woodshed, ["crates/woodshed-genet/src/storage.rs", "ports/hocket/crates/hocket-genet/src/identity.rs"]),
         "turnstone": (turnstone, ["src/identity.rs", "src/app/tests.rs", "src/bin/g3_receipt.rs", "src/remote_projection.rs"]),
@@ -70,7 +74,11 @@ def main():
             started = time.monotonic()
             print(label, flush=True)
             with log.open("w", encoding="utf-8") as stream:
-                result = subprocess.run(command, cwd=cwd, env=child_env or env, stdout=stream, stderr=subprocess.STDOUT)
+                run_env = dict(child_env or env)
+                if command[0] == "cargo" and "--target-dir" in command:
+                    target = str(command[command.index("--target-dir") + 1])
+                    run_env.update(CARGO_TARGET_DIR=target, CARGO_BUILD_BUILD_DIR=target)
+                result = subprocess.run(command, cwd=cwd, env=run_env, stdout=stream, stderr=subprocess.STDOUT)
             record = {"label": label, "cwd": str(cwd), "command": [str(value) for value in command], "exit": result.returncode, "expected": expected, "elapsed_seconds": round(time.monotonic() - started, 2), "log": log.name, "sha256": digest(log)}
             executable = Path(command[0])
             if executable.is_file():
@@ -87,7 +95,7 @@ def main():
 
         jobs = [
             ("graphshell", mere, "mere", ["-p", "graphshell", "--test", "dr_c_pending"]),
-            ("signalman", mere, "mere", ["-p", "station-custody", "--test", "dr_c_pending"]),
+            ("signalman", station_custody, "murm", ["--test", "dr_c_pending"]),
             ("knot", knot, "knot-editor", ["-p", "knot-editor", "--lib"]),
             ("knot-desktop", knot, "knot-editor", ["-p", "knot-desktop", "--bin", "knot"]),
             ("woodshed", woodshed, "woodshed", ["-p", "woodshed-genet", "--bin", "woodshed-genet"]),
@@ -119,7 +127,7 @@ def main():
         for label, repo, target, options in jobs:
             binaries[label] = test_executable(label, repo, target, options)
         run("build-knot-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "knot-editor"), "-j", "4", "-p", "knot-editor", "--bin", "knot_endpoint", "--bin", "knot_sync_host"], cwd=knot)
-        run("build-signalman-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "mere"), "-j", "4", "-p", "station-custody", "--bin", "station-provision"], cwd=mere)
+        run("build-signalman-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "murm"), "-j", "4", "--bin", "station-provision"], cwd=station_custody)
         run("build-turnstone-cli", ["cargo", "build", "--locked", "--target-dir", str(targets / "turnstone"), "-j", "4", "-p", "turnstone", "--bin", "g3_receipt"], cwd=turnstone)
 
         debug = targets / "mere" / "debug"
@@ -162,7 +170,7 @@ def main():
                     raise RuntimeError(f"Knot {label} failed to stay pending without creating state")
             before = sorted(str(path.relative_to(product_root)) for path in product_root.rglob("*"))
             station = product_root / "station"
-            log = run(f"{mode}-signalman-provision", [str(debug / ("station-provision" + suffix)), "--app-endpoint", endpoint, "--station-root", str(station), "--record", "head.json", "--label", "DR-C fixture", "--expires-hours", "1"], expected=1)
+            log = run(f"{mode}-signalman-provision", [str(targets / "murm/debug" / ("station-provision" + suffix)), "--app-endpoint", endpoint, "--station-root", str(station), "--record", "head.json", "--label", "DR-C fixture", "--expires-hours", "1"], expected=1)
             if "pending" not in log.read_text() or station.exists():
                 raise RuntimeError("Signalman must provision no credential or record while pending")
             rendered = product_root / "g3.html"

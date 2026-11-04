@@ -84,6 +84,17 @@ cutover and remaining work are in the Distillery extraction plan.
 
 ## Remaining extraction and directory scope, 2026-11-03
 
+**Station Custody cutover, 2026-11-04:** its standalone home is
+`murm/crates/station-custody`; Signalman's desktop consumes it by path. All
+twelve Rust files retain their donor blobs. Dramatis/Personae and Djinn retain
+credential and grant authority. The receiver's tests, MSRV and Signalman gates
+are in `Code/testing/murm/station-custody-extraction-20261104`; the owning plan
+is `murm/design_docs/2026-11-02_murm_family_move_plan.md`. Mere now has 87
+workspace members. Its default native normal/build graph contains none of the
+station/radio family below. The optional resident NomadNet feature still names
+Retinue, so Retinue remains in the lockfile; the earlier blanket exclusivity
+claim applies to the default graph, not every declared optional edge.
+
 Mark requested this scope after the Stickleback network move. The current
 tracked inventory contains 104 Rust packages, 88 in the main workspace.
 `Code/testing/murm/stickleback-extraction-20261103/mere-package-scope.json`
@@ -101,7 +112,7 @@ owners. Qualification is Murm's transport consolidation plan, T7.
 
 | Slice | Current evidence | Next scope and done-condition |
 | --- | --- | --- |
-| `crates/system/station-custody` | 12 Rust files, 4,463 lines; no Mere dependency or internal consumer. Signalman's desktop is its external consumer. The old Pandect/Graphshell coupling in the historical table is gone. | First ready source move: Murm owns this Retinue-specific custody adapter; Dramatis still supplies credentials and grant policy. Preserve scoped derivation, expiry, revocation, first-owner control, licenses and fixture paths. Done after standalone tests, Signalman receiving and a Mere graph check without the member. Physical station qualification remains separate. |
+| `station-custody`, moved 2026-11-04 | Twelve unchanged Rust files now in `murm/crates/station-custody`, outside the default radio workspace. Signalman consumes that path; Mere's donor member, source files and three source-size exceptions are removed. | Murm owns this Retinue-specific custody adapter; Dramatis/Personae and Djinn retain credentials and grant policy. Scoped derivation, expiry, revocation, first-owner control, licenses and fixtures are unchanged. The standalone adapter and Signalman receiving pass; Mere's remaining workspace is checked separately. Physical qualification retains its prior scope. |
 | `crates/domain/site` | 10 Rust files, 3,365 lines; portable native-site/snapshot validation with optional history/publication adapters. Resident and Knot consume it. | Split by responsibility before choosing a blanket Gemot home: Knot owns the authored snapshot/schema; Gemot owns collection/publication authority; Eidetic supplies retained history. Preserve V1 field order, exact bytes, content identities and source trust boundaries. Qualify both actual consumers and offline/default features. |
 | `crates/intel/mora-cmudict`, `reference-data` | 145 and 1,743 Rust lines, with no internal consumer; Knot is the declared external consumer. CMUdict also contains its corpus and license. | Candidate leaf move with Knot's lexical providers, preserving corpus/license hashes and the portable pack schema. Keep host-owned trust/download policy outside pack validation. `mere-edit` is different: its format-neutral source-edit proposal contract now serves both Knot and Isocosm and fits Mere's reusable application framework. |
 | `modulus`, `tenant`, `conatus`, `nisus` | Modulus and Tenant have only Isocosm consumers. Seiche now optionally imports Conatus for GPU evaluation; Numen and Seiche still serve the graph toolkit. | Review Modulus/Tenant as a bounded games-wing slice. A bulk four-crate games-only move is stale: first qualify Seiche's GPU path and choose a portable engine owner for Conatus/Nisus. Preserve the host's shared device. Numen/Seiche remain platform components under this scope. |
@@ -134,7 +145,7 @@ Directory cleanup follows these cuts:
    Gemot/Murm consumer boundary recorded before relocation. Keep historical
    receipts at their cited locations and retain their original input scope.
 
-The next implementation slice is Station Custody. The remaining rows are
+Station Custody is the first completed source cut under this scope. The remaining rows are
 reviewable scopes with named receiving gates, not completed moves or authority
 to replace the existing policies.
 

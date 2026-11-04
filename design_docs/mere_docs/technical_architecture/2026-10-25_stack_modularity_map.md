@@ -46,6 +46,11 @@ metadata one the first version of this note used.
 
 ## The map
 
+Source placement follow-up, 2026-11-04: Station Custody now lives in Murm.
+The [source homes map](2026-10-28_source_homes_map.md#remaining-extraction-and-directory-scope-2026-11-03)
+records the current default graph and retained optional NomadNet dependency;
+the table below retains its original dated product readings.
+
 | Link | Turnstone | Djinn | Knot desktop, default (`mere-retention`) | Knot desktop, `--no-default-features` | First hop | Contract it should sit behind |
 |---|---|---|---|---|---|---|
 | retinue (+ tulle) | **was linked, now opt-in** (`nomadnet`) | off (`knot-site-nomadnet`, `moot-site-nomadnet`) | off (`knot-desktop/retinue`) | off | `turnstone` | a page-fetch contract; `mere-transport`'s `reticulum` feature |

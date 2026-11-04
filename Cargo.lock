@@ -1011,12 +1011,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "az"
-version = "1.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be5eb007b7cacc6c660343e96f650fedf4b5a77512399eb952ca6642cf8d13f7"
-
-[[package]]
 name = "backon"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5334,27 +5328,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "embedded-graphics"
-version = "0.8.2"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "az",
- "byteorder",
- "embedded-graphics-core",
- "float-cmp",
- "micromath",
-]
-
-[[package]]
-name = "embedded-graphics-core"
-version = "0.4.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "az",
- "byteorder",
-]
-
-[[package]]
 name = "embedded-hal"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5904,15 +5877,6 @@ dependencies = [
  "sha2 0.11.0",
  "unicode-bidi",
  "unicode-segmentation",
-]
-
-[[package]]
-name = "float-cmp"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98de4bbd547a563b716d8dfa9aad1cb19bfab00f4fa09a6a4ed21dbcf44ce9c4"
-dependencies = [
- "num-traits",
 ]
 
 [[package]]
@@ -9846,12 +9810,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lora-modulation"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c96c4a41a1f1ad04de765306e1829c7007a37898fe4033204fa82cf2e055624"
-
-[[package]]
 name = "lru"
 version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10711,12 +10669,6 @@ dependencies = [
  "sprigging",
  "taproot",
 ]
-
-[[package]]
-name = "micromath"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3c8dda44ff03a2f238717214da50f65d5a53b45cd213a7370424ffdb6fae815"
 
 [[package]]
 name = "mien"
@@ -12828,20 +12780,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "outrider"
-version = "0.3.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "hkdf 0.13.0",
- "retinue",
- "rmpv",
- "sha2 0.11.0",
- "thiserror 2.0.21",
- "tokio",
- "tulle",
-]
-
-[[package]]
 name = "owned_ttf_parser"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14413,23 +14351,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "postilion"
-version = "0.3.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "getrandom 0.3.4",
- "heapless 0.9.3",
- "outrider",
- "retinue",
- "selvage",
- "seneschal",
- "serial2-tokio",
- "thiserror 2.0.21",
- "tokio",
- "tulle",
-]
-
-[[package]]
 name = "potential_utf"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14908,28 +14829,6 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-time",
-]
-
-[[package]]
-name = "radio-face"
-version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "embedded-graphics",
-]
-
-[[package]]
-name = "radio-hand"
-version = "0.0.1"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "heapless 0.9.3",
- "hmac 0.13.0",
- "lora-modulation",
- "radio-face",
- "selvage",
- "seneschal",
- "sha2 0.11.0",
 ]
 
 [[package]]
@@ -15614,7 +15513,6 @@ dependencies = [
  "sha2 0.11.0",
  "socket2",
  "tokio",
- "tulle",
  "x25519-dalek 3.0.0",
 ]
 
@@ -15727,15 +15625,6 @@ checksum = "72f81bee8c8ef9b577d1681a70ebbc962c232461e397b22c208c43c04b67a155"
 dependencies = [
  "rmp",
  "serde",
-]
-
-[[package]]
-name = "rmpv"
-version = "1.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a4e1d4b9b938a26d2996af33229f0ca0956c652c1375067f0b45291c1df8417"
-dependencies = [
- "rmp",
 ]
 
 [[package]]
@@ -16399,11 +16288,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 
 [[package]]
-name = "selvage"
-version = "0.1.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-
-[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16418,19 +16302,6 @@ name = "send_wrapper"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
-
-[[package]]
-name = "seneschal"
-version = "0.2.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "ed25519-dalek 3.0.0",
- "heapless 0.9.3",
- "hmac 0.13.0",
- "retinue",
- "selvage",
- "sha2 0.11.0",
-]
 
 [[package]]
 name = "seq-macro"
@@ -16563,29 +16434,6 @@ checksum = "66cf8fedced2fcf12406bcb34223dffb92eaf34908ede12fed414c82b7f00b3e"
 dependencies = [
  "base16ct 1.0.0",
  "serde",
-]
-
-[[package]]
-name = "serial2"
-version = "0.2.38"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b16809bc35793b19ce4e0c53924bc0dce3937f15487997cfdaed936004180730"
-dependencies = [
- "cfg-if",
- "libc",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "serial2-tokio"
-version = "0.1.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5da5d1d379ecbacdfb9cd4b971b1b475947e4dca84249e9cde9b57109a5e7c28"
-dependencies = [
- "libc",
- "serial2",
- "tokio",
- "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17378,30 +17226,6 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
-
-[[package]]
-name = "station-custody"
-version = "0.0.1"
-dependencies = [
- "blake3",
- "castellan-client",
- "dramatis",
- "insigne",
- "ostiary",
- "outrider",
- "p2panda-core",
- "personae",
- "postilion",
- "radio-hand",
- "retinue",
- "serde",
- "serde_json",
- "sporran",
- "tempfile",
- "tokio",
- "uuid 1.27.0",
- "zeroize",
-]
 
 [[package]]
 name = "std-semaphore"
@@ -18642,16 +18466,6 @@ name = "ttf-parser"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
-
-[[package]]
-name = "tulle"
-version = "0.2.0"
-source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
-dependencies = [
- "selvage",
- "serial2-tokio",
- "tokio",
-]
 
 [[package]]
 name = "tungstenite"
@@ -22118,6 +21932,71 @@ version = "0.22.1"
 source = "git+https://www.github.com/merely-made/distillery.git?rev=6346f087bb87d879cc9367dfb3d20fa00a8cbb9d#6346f087bb87d879cc9367dfb3d20fa00a8cbb9d"
 
 [[patch.unused]]
+name = "embedded-graphics"
+version = "0.8.2"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "embedded-graphics-core"
+version = "0.4.1"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "radio-face"
+version = "0.0.1"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "selvage"
+version = "0.1.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "seneschal"
+version = "0.2.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "tulle"
+version = "0.2.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
 name = "esp-testkit"
 version = "0.1.0"
 source = "git+https://www.github.com/merely-made/distillery.git?rev=6346f087bb87d879cc9367dfb3d20fa00a8cbb9d#6346f087bb87d879cc9367dfb3d20fa00a8cbb9d"
+
+[[patch.unused]]
+name = "outrider"
+version = "0.3.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "postilion"
+version = "0.3.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "radio-face"
+version = "0.0.1"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "radio-hand"
+version = "0.0.1"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "selvage"
+version = "0.1.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "seneschal"
+version = "0.2.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"
+
+[[patch.unused]]
+name = "tulle"
+version = "0.2.0"
+source = "git+https://www.github.com/merely-made/murm.git?rev=ce53cebb2ae9f420de5a0dcaa5a9768c639910af#ce53cebb2ae9f420de5a0dcaa5a9768c639910af"

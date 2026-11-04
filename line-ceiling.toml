@@ -863,18 +863,6 @@ path = "crates/system/settings-wit/src/testkit.rs"
 reason = "The fixture owner, gate and call script every settings binding is checked with: natively over a channel, and from a component guest. Existing source-size debt; a responsibility split must preserve FixtureOwner, FixtureGate and existing module visibility."
 
 [[exception]]
-path = "crates/system/station-custody/src/control.rs"
-reason = "Signed low-bandwidth control frames for a sited station. Existing source-size debt; a responsibility split must preserve SitedStationControlSigner, SitedStationControl, SitedStationControlBody and existing module visibility."
-
-[[exception]]
-path = "crates/system/station-custody/src/head.rs"
-reason = "The unattended sited-station host. Existing source-size debt; a responsibility split must preserve SitedStationHead, SitedStationHeadCore, HeadPersistence and existing module visibility."
-
-[[exception]]
-path = "crates/system/station-custody/src/lib.rs"
-reason = "Persona-backed custody adapter for Djinn-managed Retinue stations. Existing source-size debt; a responsibility split must preserve FirstOwnerCredential, ControllerStatusError, FirstOwnerCredentialError and existing module visibility."
-
-[[exception]]
 path = "crates/system/tabard/src/lib.rs"
 reason = "Tabard owns portable theme artifacts: Tinct seeds in, typed design tokens and a Livery stylesheet out. Existing source-size debt; a responsibility split must preserve Theme, CategoryOverrides, LagrangePaletteExport and existing module visibility."
 
