@@ -260,7 +260,9 @@ their live tools and open repair conditions have a maintained home.
   actual role; no open condition is lost and remaining owner holds are named.
 - Needs: the packet and fixture manifests under `Code/testing/mere/closure-audit/`;
   maintained Instrument tools are in `support/instrument`, link tools in
-  `support/link-model`; Q465 runtime qualification remains with Cambium presentation.
+  `support/link-model`; Q465's close contract has source-bound controls and an owned
+  headless macOS browser receipt. Full Instrument product qualification remains
+  with Cambium presentation and needs its original or freshly qualified inputs.
 - From: the standing receipt-home instruction and the 2026-11-04 closure approval.
 
 ## Open questions
@@ -306,6 +308,7 @@ their live tools and open repair conditions have a maintained home.
 - 2026-11-04: adopted the approved dialog-cancellation carry and VDIP whole archive, relocated qualified evidence and executable inputs with their path repairs, and preserved remaining mixed-packet owner holds. Manifests and qualification limits are in `Code/testing/mere/closure-audit/`.
 - 2026-11-04: continued with 55 frozen receipt groups (1,618 tracked files), preserving checkout and canonical Git forms where they differ. Current Mere navigation and two Genet references now use the external homes. Existing browser-family and stack-pillar manifest discrepancies remain disclosed; no historical tools were run. Seven ignored local Cargo inputs remain untouched at their old paths. Instrument renewal/Q465, four cross-importing link-model verifiers, P7 server, ownership-repair output and active owner packets remain held for their actual harness or ownership work; the complete disposition and locator are `Code/testing/mere/closure-audit/batch-06-support-review.json` and `Code/testing/mere/receipt-relocation-2026-11-04/batch-06-reader.md`.
 - 2026-11-04: split the six Instrument renewal tools, four shared link verifiers and P7 server into maintained source homes with explicit paths and fresh-output guards. Close-failure controls are separate from a real browser closure receipt; Q465 is not declared fully qualified. The six unblocked packets move whole, including original tool bytes, to `Code/testing/mere/support/receipts/`. The ownership-repair packet and active owner work remain in place. Batch-07 records byte verification, import/path controls, current navigation and the remaining scope limits.
+- 2026-11-04: batch 08 recovered nine byte-identical link-package inputs and checked surviving source/archives on O-PC, Q-PC and T-PC. The three full link verifiers still stop at missing generated package files; the exact twelve-file missing list and SHA-256 values are in `Code/testing/mere/closure-audit/batch-08-restored-inputs-and-final-checks.json`. M4 was unreachable; another retained copy is needed, not a fabricated pass. Q465's original false-success defect is repaired in the maintained source: five exact-finalizer controls and one real owned headless Chrome/macOS release-helper probe pass, with seven owned processes gone, temporary profile removed and port reused. That contract proof is separate from full Instrument/headed/product acceptance; the old Wasm/native binary and current-source binding remain unavailable. Frozen ledgers, original receipts and active owner work remain unchanged.
 
 - 2026-11-04: aligned the renderer pins and tracked locks with Netrender `6364e5d9` and Vello `b4a53486`; focused graph and Sprigging checks are recorded in the archived receipt.
 
